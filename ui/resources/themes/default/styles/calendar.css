@@ -198,6 +198,49 @@
 }
 
 /* ------------------------------------------------------------------------- */
+/* Calendar Quick Form */
+/* ------------------------------------------------------------------------- */
+
+#calendarQuickForm {
+  display: none;
+  width: 25em;
+  text-align: center;
+}
+
+#calendarQuickForm form  {
+  background-color: #ebebeb;
+  border: 1px solid #b3b3b3;
+  text-align: left;
+}
+
+#calendarQuickForm h1 {
+  margin: 0;
+  background-color: #d1d2d4;
+  font-weight: bold;
+  font-size: 100%;
+  background-image: url('../images/popup_title_border.png');
+  background-repeat: repeat-x;
+  background-position: 0 0.5em;  
+}
+
+#calendarQuickForm img {
+  margin-top: -2px;
+}
+
+#calendarQuickForm h1 img{
+  vertical-align: middle;
+  float: right;
+  margin: 1px 3px 0 0;
+}
+
+#calendarQuickForm fieldset {
+  border: 0;
+}
+
+#calendarQuickForm .buttons input{
+  margin: 0 0.5em;
+}
+/* ------------------------------------------------------------------------- */
 /* Free/Busy view styles */
 /* ------------------------------------------------------------------------- */
 
@@ -219,6 +262,8 @@
   border-top: 1px dashed #6a90c3;
   border-right: 1px dashed #6a90c3;    
 }
+
+
 
 /* //////////////////AGENDA////////////////// */
 /* ////// Agenda table style definition ///// */

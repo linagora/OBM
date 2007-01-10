@@ -492,7 +492,7 @@ class OBM_DISPLAY {
     function dis_data_index($url, $dis_data_entity) {
     global $path, $page, $sql_order_field, $sql_order_dir, $entity, $of_display_name, $ctu_sql_limit;
     global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
-    global $set_theme, $set_rows, $set_rows_default;
+    global $set_rows, $set_rows_default;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
     global $ico_export, $ico_export_all, $ico_begin, $ico_end, $ico_previous, $ico_next;
 
@@ -1046,7 +1046,7 @@ function display_actions($section, $module) {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_last_visited($path="..") {
-  global $path, $cgp_show, $last_v, $set_theme, $l_last_visit;
+  global $path, $cgp_show, $last_v, $l_last_visit;
 
   // If a theme specif function is provided
   if (function_exists("display_last_visited_theme")) {

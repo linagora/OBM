@@ -189,3 +189,19 @@ function popup(url,name,height,width) {
   return false;
 }
 
+function showOkMessage(message) {
+  showMessage('ok',message);
+}
+
+function showErrorMessage(message) {
+  showMessage('error',message);
+}
+
+function showMessage(class, message) {
+  content = $('ajaxMessage');
+  new Element('p').addClassName('message')
+                  .addClassName(class)
+                  .appendText(message)
+                  .injectInside(content);
+  setTimeout(function () {content.innerHTML = ''}, 5000);
+}

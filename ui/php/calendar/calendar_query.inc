@@ -886,7 +886,7 @@ function run_query_calendar_update_event_data($calendar) {
   $description = $calendar["description"];
   $location = $calendar["location"];
   $datebegin = $calendar["date_begin"];
-  $event_duration = $calendar["event_duration"];
+  $event_duration = $calendar["duration"];
   ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
   $event_id = $calendar["calendar_id"]; 
   if ($calendar["privacy"] != 1) $privacy = 0; else $privacy = 1; 
@@ -919,18 +919,20 @@ function run_query_calendar_update_event_data($calendar) {
   $obm_q->query($query);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Event Data Update Execution
-// Parameters: 
-//   - $calendar : Calendar params
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Event Data Update Execution for ajax client 
+ * 
+ * @param mixed $calendar 
+ * @access public
+ * @return void
+ */
 function run_query_calendar_quick_event_update($calendar) {
   global $cdg_sql, $uid;
 
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
   $datebegin = $calendar["date_begin"];
-  $event_duration = $calendar["event_duration"];
+  $event_duration = $calendar["duration"];
   $event_id = $calendar["calendar_id"]; 
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
@@ -943,6 +945,61 @@ function run_query_calendar_quick_event_update($calendar) {
   calendarevent_id = '$event_id'";
   display_debug_msg($query, $cdg_sql, "run_query_calendar_update_event_data()");
   $obm_q->query($query);  
+}
+
+/**
+ * Event Data  Execution for ajax client 
+ * 
+ * @param mixed $calendar 
+ * @access public
+ * @return void
+ */
+function run_query_calendar_quick_event_insert($calendar) {
+  global $cdg_sql, $uid;
+
+
+  $now = date("Y-m-d H:i:s");
+  $title = $calendar["title"];
+  $datebegin = $calendar["date_begin"];
+  $event_duration = $calendar["duration"];
+  $all_day = $calendar["all_day"];
+
+  $obm_q = new DB_OBM;
+  $query = "INSERT INTO CalendarEvent
+    (calendarevent_timecreate,
+     calendarevent_usercreate,
+     calendarevent_owner,
+     calendarevent_title,
+     calendarevent_date,
+     calendarevent_duration,
+     calendarevent_allday,
+     calendarevent_description,
+     calendarevent_privacy,
+     calendarevent_repeatkind,
+    calendarevent_repeatfrequence
+  )
+  VALUES (
+    '$now',
+    '$uid', 
+    '$uid', 
+    '$title', 
+    '$datebegin',     
+    '$event_duration',
+    '$all_day',
+    '',
+    '0',
+    'none',
+    '1'
+  )";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_quick_insert_event_data()");
+  $obm_q->query($query);
+  $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data()");
+  $obm_q->query($query);
+  $obm_q->next_record(); 
+  $event_id = $obm_q->f("max_id");  
+  run_query_calendar_insert_entity_event("user", $uid, $event_id, 'A');
+  return $event_id;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1423,8 +1480,7 @@ function check_calendar_data_quick_form($calendar) {
 
   $title = $calendar["title"];
   $datebegin = $calendar["date_begin"];
-  $dateend = $calendar["date_end"];
-
+  $duration = $calendar["duration"];
   if (trim($title) == "") {
     $err_msg = $l_fill_title;
     return false;
@@ -1440,19 +1496,10 @@ function check_calendar_data_quick_form($calendar) {
   }
   
   // End Date check
-  if (trim($dateend) == "") {
-    $err_msg = $l_fill_dateend;
-    return false;
-  } else if (preg_match($php_regexp_isodatetime, $dateend) == 0) {
-    $err_msg = "$l_dateend : $l_invalid_date"; 
-    return false;
-  }
-  
-  if ($dateend<$datebegin) {
+  if(!is_numeric($duration) ||  $duration < 1) {
     $err_msg = $l_err_begin_end;
     return false;
   }
-
   return true;
 }
 
@@ -2471,7 +2518,7 @@ class Event {
   }
 
   function isMeeting() {
-    return (count($this->attendee) > 1);
+    return (count($this->attendee["user"]) > 1);
   }
 
   function isPeriodic() {

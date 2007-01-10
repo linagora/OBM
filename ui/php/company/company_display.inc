@@ -48,7 +48,7 @@ $fieldnames["company_deal_number"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ic
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_company(&$OD, $fieldname, $link_ok) {
-  global $path, $params, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
+  global $path, $params, $ico_mail, $ico_web, $ico_contact_new;
 
   $ext_url = $params["ext_url"];
 
@@ -76,7 +76,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("company_email");
     if (strcmp($email,"") != 0) {
       $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\" />";
+      $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\" />";
       $res["txt_name"] = $email;
     }
   }
@@ -95,7 +95,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
       $res["window"] = true;
       $res["popup_width"] = 800;
       $res["popup_height"] = 600;
-      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_web\" alt=\"$web\" />";
+      $res["name"] = "<img src=\"$ico_web\" alt=\"$web\" />";
       $res["txt_name"] = $web;
     }
   }
@@ -806,7 +806,7 @@ function html_company_consult($co_q) {
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult_address($co_q) {
-  global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
+  global $set_theme, $ico_contact, $ico_contact_new;
   global $l_name, $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment;
   global $l_company, $l_coord;
@@ -898,7 +898,7 @@ function html_company_consult_address($co_q) {
   // Email link
   if ($email != "") {
     $link_email = "<a href=\"mailto:$email\">
-    <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\"
+    <img border=\"0\" src=\"$ico_mail\"
     alt=\"$email\" /></a>";
   } else {
     $link_email = "&nbsp;";
@@ -914,7 +914,7 @@ function html_company_consult_address($co_q) {
       $link_web .= "http://";
     }
     $link_web .= "$web\">
-    <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_web\"
+    <img border=\"0\" src=\"$ico_web\"
     alt=\"$web\" /></a>";
   } else {
     $link_web = "&nbsp;";
@@ -1188,7 +1188,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if (($action=="detailupdate") || ($action=="update")) { 
     if ($email != "") {
       $link_email = "<a href=\"mailto:$email\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\" /></a>";
+      <img src=\"$ico_mail\" alt=\"$email\" /></a>";
     } else { $link_email = "&nbsp;"; }
   } else { $link_email = "&nbsp;"; }
 
@@ -1196,7 +1196,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if (($action=="detailupdate") || ($action=="update")) {
     if ($web != "") {
       $link_web = "<a target=\"_blank\" href=\"$web\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_web\" alt=\"$web\" /></a>";
+      <img src=\"$ico_web\" alt=\"$web\" /></a>";
     } else { $link_web = "&nbsp;"; }
   } else { $link_web = "&nbsp;"; }
   

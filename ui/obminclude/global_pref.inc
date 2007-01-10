@@ -266,11 +266,11 @@ $modules["admin_ref"] = array('Name'=> $l_module_admin_ref,
                   'Url' => "$path/admin_ref/admin_ref_index.php",
                   'Right'=> $cright_read_admin);
 $modules["import"] = array('Name'=> $l_module_import,
-                  'Ico' => "$ico_ref",
+                  'Ico' => "$ico_import",
                   'Url' => "$path/import/import_index.php",
                   'Right'=> $cright_read_admin);
 $modules["backup"] = array('Name'=> $l_module_backup,
-                  'Ico' => "$ico_ref",
+                  'Ico' => "$ico_backup",
                   'Url' => "$path/backup/backup_index.php",
                   'Right'=> $cright_read_admin);
 $modules["domain"] = array('Name'=> $l_module_domain,

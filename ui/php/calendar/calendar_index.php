@@ -250,11 +250,29 @@ if ($action == "index") {
 } elseif ($action == "quick_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_quick_form($params)) {
-      run_query_calendar_quick_event_update($params, $cal_entity_id, $event_id);
-      $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
+      run_query_calendar_quick_event_update($params);
+      json_event_data($params["calendar_id"],$params);
+      json_ok_msg("$l_event : $l_update_ok");
+      echo "({".$display['json']."})";
+      exit();
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    json_error_msg($l_invalid_data . " : " . $err_msg);
+    echo "({".$display['json']."})";
+    exit();
   }
+} elseif ($action == "quick_insert") {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_calendar_data_quick_form($params)) {
+    $id = run_query_calendar_quick_event_insert($params, $event_id);
+    json_ok_msg("$l_event : $l_update_ok");
+    json_event_data($id, $params);
+    echo "({".$display['json']."})";
+    exit();
+  } else {
+    json_error_msg($l_invalid_data . " : " . $err_msg);
+    echo "({".$display['json']."})";
+    exit();
+  }  
 } elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_calendar_update_occurence_state($params["calendar_id"],$uid,$params["decision_event"]);
@@ -653,6 +671,13 @@ function get_calendar_action() {
   // Update
   $actions["calendar"]["quick_update"] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=quick_update",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+
+    // Insert
+  $actions["calendar"]["quick_insert"] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=quick_insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );

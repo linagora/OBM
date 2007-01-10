@@ -689,7 +689,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
   if(is_array($occurrences)) {
     $week_duration = 86400*7;
     $options = array("xUnit:86400","yUnit:$week_duration",
-                     "context:obm.calendarManager.bodyContext","type:'day'");
+                     "context:obm.calendarManager.bodyContext");
     foreach($occurrences as $occurrence) {
       $dis_event .= dis_calendar_event($occurrence, "day",$calendar_entity,$options);
     }
@@ -699,7 +699,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
   <h1>
     <a href=\"calendar_index.php?action=view_month&amp;date=$prev_month\"><img src=\"$ico_previous\" alt=\"[Previous Month]\" /></a>     
     $display_date
-    <a href=\"calendar_index.php?action=view_month&amp;date=$next_week\"><img src=\"$ico_next\" alt=\"[Next Month]\" /></a>     
+    <a href=\"calendar_index.php?action=view_month&amp;date=$next_month\"><img src=\"$ico_next\" alt=\"[Next Month]\" /></a>     
   </h1> 
   <table class=\"calendar month\">
     <colgroup span=\"1\" />
@@ -736,6 +736,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
 function dis_calendar_week_planning($calendar, $calendar_entity) {
   global $path, $ico_next, $ico_previous;
   global $ccalendar_weekstart, $set_cal_interval,$ico_meeting;
+  global $ico_resize, $ico_periodic, $ico_meeting;
   global $ccalendar_first_hour, $ccalendar_last_hour;
 
  
@@ -811,7 +812,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
     $display_date
     <a href=\"calendar_index.php?action=view_week&amp;date=$next_week\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
   </h1> 
-  <table class=\"calendar week\" title=\"The body of the tooltip is stored in the title\" tooltitle=\"The Title of the Tooltip\">
+  <table class=\"calendar week\">
     <colgroup span=\"1\" />
     <colgroup span=\"7\" id=\"calendarEventContext\" />
     <thead>
@@ -824,11 +825,14 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
     $week_day_event_list
     </tr>    
     </thead>
-    <tbody id=\"calendarBody\" onclick=\"\">
+    <tbody id=\"calendarBody\" onclick=\"obm.calendarQuickForm.compute(event, 'week');\">
     $week_cal
     </tbody>
   </table>
   <script type=\"text/javascript\">
+    obm.vars.images.resize = '$ico_resize';
+    obm.vars.images.periodic = '$ico_periodic';
+    obm.vars.images.meeting = '$ico_meeting';
     obm.vars.consts.timeUnit = $time_unit_sec;
     obm.calendarManager = new Obm.CalendarManager($start_week_time);
     obm.calendarManager.lock()
@@ -851,6 +855,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
 function dis_calendar_day_planning($calendar, $calendar_entity) {
   global $set_theme, $ico_previous, $ico_next,$ico_resize,$ico_meeting;
   global $ccalendar_first_hour, $ccalendar_last_hour,$set_cal_interval;
+  global $ico_resize, $ico_periodic, $ico_meeting;
   global $l_private, $l_all_day;
 
   $iso_date = $calendar["date"];
@@ -917,6 +922,9 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
     </tbody>
   </table>
   <script type=\"text/javascript\">
+    obm.vars.images.resize = '$ico_resize';
+    obm.vars.images.periodic = '$ico_periodic';
+    obm.vars.images.meeting = '$ico_meeting';
     obm.vars.consts.timeUnit = $time_unit_sec;
     obm.calendarManager = new Obm.CalendarManager($start_time);
     obm.calendarManager.lock()
@@ -944,16 +952,22 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity, $options=array
   global $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting, $auth;
   $event = $occurrence->event;
-  $title = $event->title;
+  $title = addslashes($event->title);
   $duration = $event->duration;
   $date = $occurrence->date;
   $id = $event->id;
   $entity_id = $occurrence->id;
   $entity = $occurrence->entity;
-  
   $all_day = $event->all_day;
-
-
+  $entityClass = $calendar_entity[$entity][$entity_id]["class"];
+  $ed[] = "id:$id";
+  $ed[] = "entity:'$entity'";
+  $ed[] = "entity_id:$entity_id"; 
+  $ed[] = "duration:$duration";
+  $ed[] = "time:$date";
+  $ed[] = "title:'$title'";
+  $ed[] = "all_day:$all_day";
+  $ed[] = "class:'$entityClass'"; 
   if($entity == "user" && $entity_id == $auth->auth["uid"]) {
     $updatable =  true;
   }
@@ -977,36 +991,29 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity, $options=array
   }
 
   if($event->isMeeting()) {
-    $head .= "<img src=\"$ico_meeting\" alt=\"Meeting\" />";
+    $ed[] = "meeting:true";
   }
   if($event->isPeriodic()) {
-    $head .= "<img src=\"$ico_periodic\" alt=\"Periodic\" />";
+    $ed[] = "periodic:true";
   }
   if($all_day) {
     $head .= $title;
   } else {
     $head .= date("H:i",$date);
   }
-  $entityClass = $calendar_entity[$entity][$entity_id]["class"];
+  
   $opt = "{".implode(',',$options)."}";
+  $event_data =  "{".implode(',',$ed)."}";
   if($day) {
     $display_events = "        
-      <div id=\"event-$id-$entity-$entity_id-$date\" class=\"event $entityClass\">
-        <h1 id=\"moveHandler-$id-$entity-$entity_id-$date\">$head</h1>
-      </div>
       <script type=\"text/javascript\">
-        obm.calendarManager.newDayEvent($id,'$entity',$entity_id,$date, $duration,'$title',$opt);
+        obm.calendarManager.newDayEvent($event_data,$opt);
       </script>
         ";
   } else {
     $display_events = "
-      <div id=\"event-$id-$entity-$entity_id-$date\" class=\"event $entityClass\">
-      <h1 id=\"moveHandler-$id-$entity-$entity_id-$date\">$head</h1>
-      $title
-      <img class=\"handle\" id=\"resizeHandler-$id-$entity-$entity_id-$date\" src=\"$ico_resize\" alt=\"Resize Handler\" />
-      </div>
       <script type=\"text/javascript\">
-        obm.calendarManager.newEvent($id,'$entity',$entity_id,$date,$duration,'$title',$opt);
+        obm.calendarManager.newEvent($event_data,$opt);
       </script>
       ";
   }
@@ -1661,26 +1668,42 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
  * @return HTML
  */
 function dis_calendar_quick_form($calendar) {
-  global $uid;
+  global $uid, $ico_popup_close,$l_validate,$popup_queue,$l_title;
 
   $block = "
     <div id=\"calendarQuickForm\">
-      <span id=\"calendarQuickFormDate\"> </span>
-      <form id=\"calendarQuickFormCreate\">
+      <h1>
+      <a href=\"\" onclick=\"obm.calendarQuickForm.hide();return false;\">
+      <img src=\"$ico_popup_close\" alt=\"close\" />
+      </a>
+      <span id=\"calendarQuickFormDate\"></span>
+      </h1>
+      <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
       <fieldset>
-        <input type=\"text\" name=\"tf_title\" />
+        $l_title : <input type=\"text\" name=\"tf_title\" />
+        <input type=\"hidden\" name=\"event_id\"/>
         <input type=\"hidden\" name=\"entity\" value=\"user\" />
         <input type=\"hidden\" name=\"entity_id\" value=\"$uid\" />
-        <input type=\"hidden\" name=\"action\" value=\"\" />
+        <input type=\"hidden\" name=\"element_id\" />
+        <input type=\"hidden\" name=\"all_day\"/>
+        <input type=\"hidden\" name=\"action\" />
         <input type=\"hidden\" name=\"date_begin\" />
-        <input type=\"hidden\" name=\"date_end\" />
+        <input type=\"hidden\" name=\"duration\" />
+        <input type=\"hidden\" name=\"context\" />
       </fieldset> 
+      <fieldset class=\"buttons\">
+        <input type=\"submit\" value=\"$l_validate\" />
+        <input type=\"button\" value=\"$l_validate\" />
+      </fieldset>
       </form>
-      <div>
-        
-      </div>
+      <img src=\"$popup_queue\" />
     </div>
-  ";
+    <script type=\"text/javascript\">
+      obm.calendarQuickForm = new Obm.CalendarQuickForm();
+    </script>
+    ";
+
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3102,4 +3125,122 @@ END:VEVENT";
   }
   echo "
 END:VCALENDAR";
+}
+
+/**
+ * JSON ok Message. 
+ * 
+ * @access public
+ * @return void
+ */
+function json_ok_msg($msg) {
+  global $display;
+
+  if($display['json'] != '') {
+    $display['json'] .= ',';
+  }
+  $display['json'] .= "error:0,message:'$msg'";
+}
+
+/**
+ * JSON Error Message.
+ * 
+ * @param mixed $msg 
+ * @access public
+ * @return void
+ */
+function json_error_msg($msg) {
+  global $display;
+
+  if($display['json'] != '') {
+    $display['json'] .= ',';
+  }
+  $display['json'] .= "error:1,message:'$msg'";
+
+}
+
+/**
+ * Build a JSON message with all the event data
+ * the respone is a table of event objects.
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function json_event_data($id,$calendar) {
+  global $display,$ccalendar_first_hour,$ccalendar_last_hour;
+  global $max_display, $cal_entity_id;
+  global $uid;
+  $context = $calendar["context"];
+  $element_id = $calendar["element_id"];
+  $eve_q = run_query_calendar_detail($id);
+  $ent_q = run_query_get_events_attendee(array($id));
+  $entities = get_calendar_event_entity($id);
+  $all_day = $eve_q->f("calendarevent_allday");
+  $date = $eve_q->f("calendarevent_date");
+  $duration = $eve_q->f("calendarevent_duration");
+  $ed[] = "id:".$eve_q->f("calendarevent_id");
+  $ed[] = "duration:".$duration;
+  $ed[] = "time:".$date;
+  $ed[] = "all_day:".$all_day;
+  $ed[] = "title:'".$eve_q->f("calendarevent_title")."'";
+  
+  $entity_readable = get_calendar_entity_readable();
+  $sel_entity_id = slice_calendar_entities($cal_entity_id, $max_display, $max_display, $entity_readable);
+  $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($cal_entity_id));
+  switch($context)  {
+    case "day" :
+      $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
+      $day = $day || (date('H',$date + $duration) <  $ccalendar_first_hour);
+      $day = $day || (date('H',$date) >  $ccalendar_last_hour );
+      $options = array("xUnit:0"); 
+      break;
+    case "week" :
+      $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
+      $day = $day || (date('H',$date + $duration) <  $ccalendar_first_hour);
+      $day = $day || (date('H',$date) >  $ccalendar_last_hour );
+      $options = array();
+      break;
+    case "month" :
+      $day = true;
+      $week_duration = 86400*7;
+      $options = array("xUnit:86400","yUnit:$week_duration",
+                       "context:obm.calendarManager.bodyContext");      
+      break;      
+  }
+  $updatable[] = "draggable:'true'"; 
+  if(!$day) {
+    $updatable[] = "resizable:'true'"; 
+  }
+  foreach ($calendar_entity as $entity => $data) {
+
+    foreach ($data as $entity_id => $entity_data) {
+      if($entities[$entity]["entity"][$entity_id]) {
+        $info = $ed;
+        $opt = $options;
+        $info[] = "entity:'$entity'";
+        $info[] = "entity_id:$entity_id";
+        $info[] = "class:'".$entity_data["class"]."'";
+        $info[] = "state:'".$entities[$entity]["entity"][$entity_id]["state"]."'";
+        if($entity_id = $uid && $entity = 'user') {
+          $opt = array_merge($opt,$updatable);
+        }
+        if($json != '') {
+          $json .= ',';
+        }
+        $json .= "{event:{".implode(",",$info)."},options:{".implode(",",$opt)."}}";
+      }
+    }
+  }
+  if($display['json'] != '') {
+    $display['json'] .= ',';
+  }
+  if($day) {
+    $display['json'] .= "day:'$day',";
+  }
+  if($element_id != '') {
+    $display['json'] .= "elementId:'$element_id',";
+  }
+  $display['json'] .=  "eventsData:[$json]";
+
 }
