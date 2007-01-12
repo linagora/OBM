@@ -107,8 +107,7 @@ $l_reconnect = "Presione aqui para conectar nuevamente";
 $l_version = "Versión";
 $l_aka = "Tambien Conocida como";
 $l_cat_tree = "Arbol de Categorías";
-$l_category1 = "Categoría 1";
-$l_category2 = "Categoría 2";
+$l_category = "Categoría";
 $l_aduplicate = "Duplicar";
 
 // Entities

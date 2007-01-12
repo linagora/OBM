@@ -45,7 +45,49 @@ Les données utilisateurs sont déclarées et définies dans la tableau global \vari
 Les fonctions de gestion des données utilisateurs sont celles à intégrer dans les modules d'\obm et proposent un appel unique (wrapper) pour gérer l'ensemble des données utilisateurs (catégories, champs,...).
 Les fonctions de gestion de catégories ou de champs utilisateurs ne doivent donc pas être utilisées directement dans les modules.\\
 
-L'implémentation dans un module nécessite en général l'appel des fonctions correspondantes dans les fonctions suivantes du module :\\
+L'implémentation dans un module nécessite en général :
+\begin{itemize}
+\item La prise en compte dans le fichier \fichier{module\_index.php}
+  \begin{itemize}
+  \item[*] Inclusion du fichier source\\
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+require_once("$obminclude/of/of_category.inc");)
+\end{verbatim}
+\end{minipage}
+}
+
+  \item[*] Définition des actions fournies\\
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+function get_module_actions() {
+  ...
+  of_category_user_module_action("module");
+\end{verbatim}
+\end{minipage}
+}
+
+  \item[*] Utilisation des actions fournies\\
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+} else if ($action == "dispref_level") {
+///////////////////////////////////////////////////////////////////////////////
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($auth->auth["uid"], "document", 1);
+  $display["detail"] = dis_document_display_pref($prefs);
+}
+
+of_category_user_action_switch($module, $action, $params);
+\end{verbatim}
+\end{minipage}
+}
+
+  \end{itemize}
+\item l'appel des fonctions correspondantes dans les fonctions suivantes du module :
+\end{itemize}
 
 \begin{tabular}{|p{6cm}|c|}
 \hline
@@ -126,7 +168,7 @@ of_userdata_get_url_search_params($entity, $params) {
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String url & Block des paramètres utilisateurs : \&amp;sel_companycategory1=2&amp;...\\
+String url & Block des paramètres utilisateurs : \&amp;sel\_companycategory1=2\&amp;...\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -162,7 +204,7 @@ String XHTML & Block de données utilisateurs en affichage consultation\\
 \shadowbox{
 \begin{minipage}{14cm}
 \begin{verbatim}
-of_userdata_dis_entity_form($entity, $ent_id) {
+of_userdata_dis_entity_form($entity, $ent_id, $params) {
 \end{verbatim}
 \end{minipage}
 }
@@ -176,6 +218,8 @@ of_userdata_dis_entity_form($entity, $ent_id) {
 \$entity & entité (ex: ``company'', ``contact'',..)\\
 \hline
 \$ent\_id & Id de l'entité affichée\\
+\hline
+\$params & Paramètres (permet de préciser des sélections)\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\

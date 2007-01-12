@@ -112,8 +112,8 @@ $l_reconnect = "Cliquer ici pour se reconnecter";
 $l_version = "Version";
 $l_aka = "Aussi connu comme";
 $l_cat_tree = "Sous Catégories";
-$l_category1 = "Catégorie 1";
-$l_category2 = "Catégorie 2";
+$l_category = "Catégorie";
+$l_category1 = "Catégorie";
 $l_aduplicate = "Duplicata";
 
 // Entities

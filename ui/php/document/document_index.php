@@ -106,7 +106,7 @@ elseif ($action == "ext_get_ids") {
   
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_document_consult($params["document_id"]);
+  $display["detail"] = dis_document_consult($params);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////

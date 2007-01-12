@@ -188,8 +188,8 @@ function run_query_lead_insert($params) {
   $date = ($params["date"] ? "'".$params["date"]."'" : "null");
   $datealarm = ($params["datealarm"] ? "'".$params["datealarm"]."'" : "null");
   $todo = $params["todo"];
-  $archive = ($params["archive"] == 1 ? "1" : "0");
-  $privacy = ($params["privacy"] == 1 ? "1" : "0");
+  $archive = ($params["archive"] == "1" ? "1" : "0");
+  $privacy = ($params["privacy"] == "1" ? "1" : "0");
 
   $add_comment = $params["add_comment"];
   if ($add_comment != "") {

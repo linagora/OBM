@@ -508,7 +508,7 @@ function run_query_project_update($pid, $params) {
   $reference_duration = $params["reference_duration"];
   $reference_desc = $params["reference_desc"];
   $reference_tech = $params["reference_tech"];
-  $archive = $params["archive"];
+  $archive = ($params["archive"] == "1" ? "1" : "0");
   $shortname = $params["shortname"];
 
   if ($archive) {

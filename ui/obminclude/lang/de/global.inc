@@ -65,8 +65,7 @@ $l_public = "Öffentlich";
 $l_local = "Local";
 $l_ext_id = "Id ext";
 $l_aka = "Also known as";
-$l_category1 = "Kategorie 1";
-$l_category2 = "Kategorie 2";
+$l_category = "Kategorie";
 $l_aduplicate = "Duplicate";
 
 // Entities

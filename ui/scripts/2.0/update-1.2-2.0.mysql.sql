@@ -174,6 +174,10 @@ DROP TABLE IncidentCategory1;
 
 
 ---------------------------------------------------------------------------
+-- Add Project reference and cv infos
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
 -- Update UserObm table
 ---------------------------------------------------------------------------
 -- Add existent column which had not been added
@@ -229,3 +233,9 @@ CREATE TABLE DefaultOdtTemplate (
   PRIMARY KEY(defaultodttemplate_id)
 );
 
+
+---------------------------------------------------------------------------
+-- Update UserObm table from Aliamin
+---------------------------------------------------------------------------
+-- Add existent column which had not been added
+ALTER TABLE UserObm ADD COLUMN userobm_mobile varchar(32) DEFAULT '' AFTER userobm_phone2;

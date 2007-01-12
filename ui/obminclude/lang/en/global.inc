@@ -109,8 +109,7 @@ $l_reconnect = "Click here to reconnect";
 $l_version = "Version";
 $l_aka = "Also known as";
 $l_cat_tree = "Category tree";
-$l_category1 = "Category 1";
-$l_category2 = "Category 2";
+$l_category = "Category";
 $l_aduplicate = "Duplicate";
 
 // Entities

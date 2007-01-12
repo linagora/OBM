@@ -502,6 +502,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
       <input type=\"checkbox\" name=\"cba_fuzzy\" value=\"1\" $fuzzy />
     </label>
     <label>&nbsp;<br />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"hd_company_id\" type=\"hidden\" value=\"$company_id\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
@@ -1211,7 +1212,7 @@ function dis_contact_form($action, $co_q, $contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
-  global $cgp_mailing_default, $cgp_submit_form_begin_enabled, $ccontact_private_default;
+  global $cgp_mailing_default, $ccontact_private_default;
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
   global $l_market, $l_address, $l_town, $l_country,$l_email,$l_mailing_ok, $l_date, $l_no_date;
@@ -1372,7 +1373,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   $show_comment3 = (! $cgp_hide["contact"]["contact_comment3"]);
 
   // User defined data
-  $block_userdata = of_userdata_dis_entity_form("contact", $id);
+  $block_userdata = of_userdata_dis_entity_form("contact", $id, $contact);
 
   // some constants
   $csize_add = "48";
@@ -1630,10 +1631,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
 
   // UPDATE 
   if (($action == "detailupdate") || ($action == "update")) {
-    if ($cgp_submit_form_begin_enabled) {
-      $dis_begin_button = "<input type=\"submit\" value=\"$l_update\" />";
-      $block_begin_button = "<fieldset class=\"buttons\">$dis_begin_button</fieldset>";
-    }
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"contact_id\" value=\"$id\" />
@@ -1642,10 +1639,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
 
   // INSERT
   } elseif (($action=="new") || ($action=="insert")) {
-    if ($cgp_submit_form_begin_enabled){
-      $dis_begin_button = "<input type=\"submit\" value=\"$l_insert\" />";
-      $block_begin_button = "<fieldset class=\"buttons\">$dis_begin_button</fieldset><br>";
-    }
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
@@ -1658,9 +1651,9 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
 
   $block .= "
     <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare("contact_index.php")."\">
+
     <fieldset class=\"detail infos\">
     <legend>$l_contact</legend>
-    $block_begin_button
 
     <table>
     <tr>

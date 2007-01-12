@@ -160,7 +160,6 @@ $profiles["editor"] = array (
 //$cgp_hide["company"]["type"] = true;
 //$cgp_hide["company"]["activity"] = true;
 //$cgp_hide["company"]["nafcode"] = true;
-//$cgp_hide["company"]["category1"] = true;
 //$cgp_hide["company"]["company_address3"] = true;
 //$cgp_hide["company"]["company_expresspostal"] = true;
 
@@ -168,11 +167,6 @@ $profiles["editor"] = array (
 //$cgp_hide["contact"]["function"] = true;
 //$cgp_hide["contact"]["contact_title"] = true;
 //$cgp_hide["contact"]["responsible"] = true;
-//$cgp_hide["contact"]["category1"] = true;
-//$cgp_hide["contact"]["category2"] = true;
-//$cgp_hide["contact"]["category3"] = true;
-//$cgp_hide["contact"]["category4"] = true;
-//$cgp_hide["contact"]["category5"] = true;
 //$cgp_hide["contact"]["contact_service"] = true;
 //$cgp_hide["contact"]["contact_comment2"] = true;
 //$cgp_hide["contact"]["contact_comment3"] = true;
@@ -181,9 +175,20 @@ $profiles["editor"] = array (
 // Deal module
 //$cgp_hide["deal"]["category1"] = true;
 
-// Incident module
-//$cgp_hide["incident"]["category1"] = true;
-//$cgp_hide["incident"]["category2"] = true;
+//--------------------//
+// User specific data //
+//--------------------//
+// Categories available for modules :
+// company, contact, incident, document
+// Lang var definitions here for example : Put these in conf/lang/
+//$l_companycategory1 = "Category1";
+//$cgp_user["company"]["category"]["companycategory1"] = array("mode"=>"multi");
+//$l_contactcategory1 = "Contact category1";
+//$cgp_user["contact"]["category"]["contactcategory1"] = array("mode"=>"multi");
+//$l_contactcategory2 = "Contact category2";
+//$cgp_user["contact"]["category"]["contactcategory2"] = array("mode"=>"multi");
+//$l_documentcategory1 = "Doc cat1";
+//$cgp_user["document"]["category"]["documentcategory1"] = array("mode"=>"mono");
 
 // AliaSuite : Set if there is a link for Aliamin, Blogs and Aliacms
 //$aliamin_link = "http://aliamin.aliacom.local/";

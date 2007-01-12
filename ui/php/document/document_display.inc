@@ -119,6 +119,7 @@ function html_document_search_form ($document, $mime_q) {
       $sel_mime
     </label>
     <label>&nbsp;<br />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext&nbsp; 
@@ -187,7 +188,7 @@ function html_document_search_list($doc_q, $prefs, $document) {
    $url_ent = "&amp;entity=$entity&amp;entity_id=$entity_id";
  }
    
-  $url = url_prepare("document_index.php?action=search$url_userdata&amp;tf_title=$title&sel_category1=$category1&sel_category2=$category2&tf_author=$author&tf_name=$name&sel_mime=$mime$url_ent$url_ext");
+  $url = url_prepare("document_index.php?action=search$url_userdata&amp;tf_title=$title&tf_author=$author&tf_name=$name&sel_mime=$mime$url_ent$url_ext");
 
   $doc_d = new OBM_DISPLAY("DATA", $prefs, "document");
 
@@ -259,11 +260,8 @@ function html_document_consult($doc_q) {
   global $l_file, $l_consult, $l_insert, $l_update, $l_checkdelete;
   global $c_yes, $c_no;
 
-  // if update mode and first display values are taken from database
   $id = $doc_q->f("document_id");
   $title = $doc_q->f("document_title");
-  $cats1 = of_category_get_entitycategories("document", "category1", $id, "mono");
-  $cats2 = of_category_get_entitycategories("document", "category2", $id, "mono");
   $author = $doc_q->f("document_author");
   $privacy = ($doc_q->f("document_privacy") == 1 ? $c_yes : $c_no );
   $mimetype = $doc_q->f("documentmimetype_label");
@@ -271,9 +269,8 @@ function html_document_consult($doc_q) {
   $size = $doc_q->f("document_size");
   $name = $doc_q->f("document_name");
 
-  // Category 1 & 2 
-  $block_category1 = of_category_dis_block_consult("document", "category1", $cats1, "mono");
-  $block_category2 = of_category_dis_block_consult("document", "category2", $cats2, "mono");
+  // User defined data
+  $block_userdata .= of_userdata_dis_entity_consult("document", $id);
 
   $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
   $url = "document_index.php?action=accessfile&amp;document_id=$id&amp;popup=1";
@@ -283,56 +280,54 @@ function html_document_consult($doc_q) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <div class=\"detail infos\">
+   <div class=\"detail infos\">
    <h1>$l_document</h1>
+   <table>
+   <tr>
+     <th>$l_title</th>
+     <td>$title</td>
+   </tr>
+   <tr>
+     <th>$l_name</th>
+     <td>$name</td>
+   </tr>
+   <tr>
+     <th>$l_author</th>
+     <td>$author</td>
+   </tr>
+   <tr>
+     <th>$l_private</th>
+     <td>$privacy</td>
+   </tr>
+   $block_userdata
+   </table>
+   </div>
 
-    <table>
-    <tr>
-      <th>$l_title</th>
-      <td>$title</td>
-    </tr>
-    <tr>
-      <th>$l_name</th>
-      <td>$name</td>
-    </tr>
-    <tr>
-      <th>$l_author</th>
-      <td>$author</td>
-    </tr><tr>
-      <th>$l_private</th>
-      <td>$privacy</td>
-    </tr>
-    $block_category1
-    $block_category2
-    </table>
-    </div>
+   <div class=\"detail infos\"> 
+   <h1>$l_file</h1>
 
-    <div class=\"detail infos\"> 
-    <h1>$l_file</h1>
-
-    <table>
-    <tr>
-      <th>$l_mimetype</th>
-      <td>$mimetype</td>
-    </tr><tr>
-      <th>$l_path</th>
-      <td>$path</td>
+   <table>
+   <tr>
+     <th>$l_mimetype</th>
+     <td>$mimetype</td>
+   </tr><tr>
+     <th>$l_path</th>
+     <td>$path</td>
+   </tr>    
+   <tr>
+     <th>$l_size</th>
+     <td>$size $l_bytes</td>
     </tr>    
-    <tr>
-      <th>$l_size</th>
-      <td>$size $l_bytes</td>
-     </tr>    
-    </table>
-    </div>
-    
+   </table>
+   </div>
    
    <div class=\"detail infos\">
-    <h1>
-    <a target=\"_blank\" href=\"$url\">
-     $l_consult
-    </a>
-    </h1>
-    </div>
+   <h1>
+   <a target=\"_blank\" href=\"$url\">
+    $l_consult
+   </a>
+   </h1>
+   </div>
 ";
 
   return $block;
@@ -348,11 +343,9 @@ function html_document_consult($doc_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_form($action, $document, $doc_q) {
 
-  $cats1 = of_category_get_ordered("document", "category1");
-  $cats2 = of_category_get_ordered("document", "category2");
   $mime_q = run_query_document_mime();
 
-  $block = html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q);
+  $block = html_document_form($action, $document, $doc_q, $mime_q);
 
   return $block;
 }
@@ -364,11 +357,9 @@ function dis_document_form($action, $document, $doc_q) {
 //   - $action     : action called
 //   - $document[] : Document hash values
 //   - $doc_q      : document database result 
-//   - $cats1      : Document category1 array
-//   - $cats2      : Document category2 array
 //   - $mime_q     : Mime types database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q) {
+function html_document_form($action, $document, $doc_q, $mime_q) {
   global $display, $path, $default_path, $set_theme;
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
@@ -383,8 +374,6 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
     $title = $doc_q->f("document_title");
     $name = $doc_q->f("document_name");
     $kind = $doc_q->f("document_kind");
-    $cat1 = $doc_q->f("document_category1_id");
-    $cat2 = $doc_q->f("document_category2_id");
     $author = $doc_q->f("document_author");
     $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype_id");
@@ -423,8 +412,6 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
   if (isset($document["document_id"])) { $id = $document["document_id"]; }
   if (isset($document["title"])) { $title = stripslashes($document["title"]); }
   if (isset($document["privacy"])) { $privacy = ($document["privacy"] == 1 ? "checked=\"checked\"" : ""); }
-  if (isset($document["category1"])) { $cat1 = $document["category1"]; }
-  if (isset($document["category2"])) { $cat2 = $document["category2"]; }
   if (isset($document["author"])) { $author = stripslashes($document["author"]); }
   if (isset($document["mime"])) { $mime = $document["mime"]; }
   if (isset($document["path"])) { $fi_path = stripslashes($document["path"]); }
@@ -441,8 +428,8 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
 
   if ($fi_path == "") $fi_path = $default_path;
 
-  $block_category1 = of_category_dis_entity_form("document", "category1", $cats1, "mono", $cat1);
-  $block_category2 = of_category_dis_entity_form("document", "category2", $cats2, "mono", $cat2, "none");
+  // User defined data
+  $block_userdata = of_userdata_dis_entity_form("document", $id, $document);
 
   // Mime-type select
   $sel_mime = "<select id=\"sel_mime\" name=\"sel_mime\">";
@@ -466,8 +453,7 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
   } elseif (($action == "new") || ($action == "insert")) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\" />
-      ";
+      <input type=\"submit\" value=\"$l_insert\" />";
   }
 
   if (($kind == $cdoc_kind_file) || ($kind == "")) { 
@@ -481,10 +467,10 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
   $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" id=\"$cdoc_kind_file\" value=\"$cdoc_kind_file\" $checked /><label for=\"$cdoc_kind_file\">$l_new_file</label> &nbsp;";
 
   if (($kind == $cdoc_kind_link) && ($proto == "http")) {
-     $dis_field = " style=\"display: none;\" ";
-     $dis_img2 = " style=\"display: none;\" ";
-     $checked = "checked=\"checked\"";
-     $tp = "http://";
+    $dis_field = " style=\"display: none;\" ";
+    $dis_img2 = " style=\"display: none;\" ";
+    $checked = "checked=\"checked\"";
+    $tp = "http://";
   } else { 
     $checked = "";
   }
@@ -492,10 +478,10 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
    $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" id=\"$cdoc_kind_link\" value=\"$cdoc_kind_link\" $checked /><label for=\"$cdoc_kind_link\">$l_link</label> &nbsp;";
 
   if (($kind == $cdoc_kind_link) && ($proto == "https")) {
-     $dis_field = " style=\"display: none;\" ";
-     $dis_img2 = " style=\"display: none;\" ";
-     $checked = "checked=\"checked\"";
-     $tp = "https://";
+    $dis_field = " style=\"display: none;\" ";
+    $dis_img2 = " style=\"display: none;\" ";
+    $checked = "checked=\"checked\"";
+    $tp = "https://";
   } else { 
     $checked = "";
   }
@@ -509,11 +495,11 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-    <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\"
-      onsubmit=\"if (check_document(this)){this.tf_url.value= this.preurl.value + this.tf_url.value; return true;} else return false;\"
-      action=\"document_index.php\">
+  <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\"
+    onsubmit=\"if (check_document(this)){this.tf_url.value= this.preurl.value + this.tf_url.value; return true;} else return false;\"
+    action=\"document_index.php\">
    
-   <fieldset class=\"detail infos\">
+  <fieldset class=\"detail infos\">
     <legend>$l_document</legend>
 
     <table>
@@ -525,14 +511,13 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
       <td><input type=\"text\" id=\"tf_author\" name=\"tf_author\" value=\"$author\" size=\"50\"/ /></td>
     </tr><tr>
       <th>$l_private</th>
-      <td><input type=\"checkbox\" name=\"cb_privacy\" value=\"1\" $privacy /></td> 
+      <td><input type=\"checkbox\" name=\"cba_privacy\" value=\"1\" $privacy /></td> 
     </tr>
-    $block_category1
-    $block_category2
+    $block_userdata
     </table>
-   </fieldset>
+  </fieldset>
 
-    <fieldset class=\"detail infos\">
+  <fieldset class=\"detail infos\">
     <legend>$l_file</legend>
     $update_file
 
@@ -561,18 +546,18 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
       <th>$l_url</th>
       <td><input type=\"text\" disabled=\"true\" name=\"preurl\" value=\"$tp\" size=\"5\" /><input type=\"text\" id=\"tf_url\" name=\"tf_url\" size=\"50\" value=\"$url\" /></td>
     </tr> 
-   </table>
-   $update_file_end
-   </fieldset>
+    </table>
+    $update_file_end
+  </fieldset>
    
-   <fieldset class=\"buttons\">
+  <fieldset class=\"buttons\">
     <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\" />
     <input type=\"hidden\" name=\"upload\" value=\"yes\" />
     $dis_button
     <input type=\"hidden\" name=\"entity_id\" value=\"$entity_id\" />
     <input type=\"hidden\" name=\"entity\" value=\"$entity\" />
-    </fieldset>
-    </form>
+  </fieldset>
+  </form>
 ";
 
   return $block;
@@ -647,7 +632,7 @@ function html_document_dir_form($action, $document,$doc_q=null) {
     <input type=\"hidden\" name=\"document_id\" value=\"$id\" />
     </div>
     </form>
-   ";
+";
 
   return $block;
 }
@@ -681,7 +666,6 @@ function dis_document_can_delete($p_id) {
 function dis_document_can_delete_dir($p_id) {
   global $display,$path,$l_dir_can_delete,$l_dir_delete,$l_back;
 
-  
   $display["msg"] .= display_ok_msg($l_dir_can_delete);
 
   $block .="
@@ -699,13 +683,11 @@ function dis_document_can_delete_dir($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_admin_index() {
 
-  $cats1 = of_category_get_ordered("document", "category1");
-  $cats2 = of_category_get_ordered("document", "category2");
   $mime_q = run_query_document_mime();
-
-  $block = of_category_dis_admin_form("category1", $cats1);
-  $block .= of_category_dis_admin_form("category2", $cats2);
   $block .= html_document_mime_form($mime_q);
+
+  // User defined data
+  $block .= of_userdata_dis_admin_form("document");
 
   return $block;
 }
@@ -720,8 +702,6 @@ function html_document_mime_form($mime_q) {
   global $l_mime_manage,$l_mime_exist,$l_label,$l_extension,$l_mimetype;
   global $l_mime_checkdelete,$l_mime_update,$l_mime_new,$l_mime_insert,$l_mime_label,$l_new,$l_c_insert;
   global $ico_ok, $ico_delete;
-
-  
 
   $char_title = '=';
   $key = 0;

@@ -394,6 +394,10 @@ Liste des modules dépendants :\\
 
 Afin de permettre des utilisations d'\obm d'orientations diverses, certains modules peuvent être paramétrés afin de ne pas afficher et gérer tous les champs prévus.
 
+\paragraph{Note :} Ceci permêt d'activer / désactiver des champs connus d'\obm. Pour définir de nouvelles données ou champs de façon générique, voir la section \ref{of_userdata}.\\
+
+
+
 A partir de la version 0.8 d'\obm, les modules \company, \contact et \deal ont des champs paramétrables.\\
 
 Le tableau \$cgp\_hide[``entity''] définit pour les modules cibles les champs devant être cachés.
@@ -449,7 +453,6 @@ $cgp_hide["company"]["company_vat"] = true;     // numéro intracommunautaire
 $cgp_hide["company"]["type"] = true;            // type
 $cgp_hide["company"]["activity"] = true;        // secteur d'activité
 $cgp_hide["company"]["nafcode"] = true;         // code NAF
-$cgp_hide["company"]["category1"] = true;       // catégorie
 $cgp_hide["company"]["company_address3"] = true;       // ligne adresse 3
 $cgp_hide["company"]["company_expresspostal"] = true;  // Cedex
 \end{verbatim}  
@@ -464,11 +467,6 @@ Liste des champs paramétrables (masquables) du module \contact :
 $cgp_hide["contact"]["function"] = true;          // fonction
 $cgp_hide["contact"]["contact_title"] = true;     // titre
 $cgp_hide["contact"]["responsible"] = true;       // responsible
-$cgp_hide["contact"]["category1"] = true;         // catégorie 1
-$cgp_hide["contact"]["category2"] = true;         // catégorie 2
-$cgp_hide["contact"]["category3"] = true;         // catégorie 3
-$cgp_hide["contact"]["category4"] = true;         // catégorie 4
-$cgp_hide["contact"]["category5"] = true;         // catégorie 5
 $cgp_hide["contact"]["contact_service"] = true;   // ligne service
 $cgp_hide["contact"]["contact_address3"] = [AUTO] // ligne adresse 3
 $cgp_hide["contact"]["contact_expresspostal"] = [AUTO]; // Cedex

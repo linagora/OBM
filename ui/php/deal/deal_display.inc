@@ -1191,7 +1191,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   if (isset($deal["ext_target"])) { $ext_target = $deal["ext_target"]; }
 
   // User defined data
-  $block_userdata = of_userdata_dis_entity_form("deal", $id);
+  $block_userdata = of_userdata_dis_entity_form("deal", $id, $deal);
  
   // Kind select construction
   $sel_kind = "<select name=\"sel_kind_id\">
@@ -2510,7 +2510,6 @@ function html_deal_admin_form($kind_q, $status_q) {
   // Actions : 
   global $l_kind_checkdelete, $l_kind_update, $l_kind_insert;
   global $l_status_checkdelete,$l_status_update,$l_status_insert, $l_hitrate;
-  global $cgp_hide;
 
   // Kind Select construction
   $sel_kind = "<select name=\"sel_kind_id\" onChange=\"

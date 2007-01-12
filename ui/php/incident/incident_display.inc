@@ -157,52 +157,53 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $reso, $incid
   // --- html template --------------------------------------------------------
 
   $block = "
-    <form  class=\"search\" method=\"get\" name=\"f_search\" action=\"" .
+  <form  class=\"search\" method=\"get\" name=\"f_search\" action=\"" .
     url_prepare("incident_index.php") . " \">
 
-       <label>$l_text<br />
-         <input type=\"text\" name=\"tf_text\" size=\"16\" value=\"$text\" />
-       </label>
-       <label>$l_label<br />
-         <input type=\"text\" name=\"tf_lincident\" size=\"16\" value=\"$lincident\" />
-       </label>
-       <label>$l_reference<br />
-         <input type=\"text\" name=\"tf_reference\" size=\"16\" value=\"$reference\" />
-       </label>
-       <label>$l_id<br />
-         <input type=\"text\" name=\"tf_incident_id\" size=\"10\" value=\"$i_id\" />
-       </label>
-       <label>$l_company<br />
-         <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
-       </label>
-       <label>$l_contract<br />
-         <input type=\"text\" name=\"tf_lcontract\" size=\"16\" value=\"$lcontract\" />
-       </label>
-       <label>$l_date_after<br />
-        <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
-       </label>
-       <label>$l_date_before<br />
-       <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
-       </label>
-       $block_priority
-       $block_status
-       $block_resolutiontype
-       <label>$l_logger<br />
-         $dis_sel_logger
-       </label>
-       <label>$l_owner<br />
-         $dis_sel_owner
-       </label>
-       $block_userdata
-       <label>$l_archive<br />
-         <input name=\"cba_archive\" type=\"checkbox\" size=\"10\" value=\"1\" $archive />
-       </label>
-       <label>&nbsp;<br />
-         <input name=\"contract_id\" id=\"contract_id\" type=\"hidden\" value=\"$contract_id\" />     
-         <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-       </label>
-       <p class=\"CL\" />
-       </form>
+    <label>$l_text<br />
+      <input type=\"text\" name=\"tf_text\" size=\"16\" value=\"$text\" />
+    </label>
+    <label>$l_label<br />
+      <input type=\"text\" name=\"tf_lincident\" size=\"16\" value=\"$lincident\" />
+    </label>
+    <label>$l_reference<br />
+      <input type=\"text\" name=\"tf_reference\" size=\"16\" value=\"$reference\" />
+    </label>
+    <label>$l_id<br />
+      <input type=\"text\" name=\"tf_incident_id\" size=\"10\" value=\"$i_id\" />
+    </label>
+    <label>$l_company<br />
+      <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
+    </label>
+    <label>$l_contract<br />
+      <input type=\"text\" name=\"tf_lcontract\" size=\"16\" value=\"$lcontract\" />
+    </label>
+    <label>$l_date_after<br />
+      <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
+    </label>
+    <label>$l_date_before<br />
+    <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
+    </label>
+    $block_priority
+    $block_status
+    $block_resolutiontype
+    <label>$l_logger<br />
+      $dis_sel_logger
+    </label>
+    <label>$l_owner<br />
+      $dis_sel_owner
+    </label>
+    $block_userdata
+    <label>$l_archive<br />
+      <input name=\"cba_archive\" type=\"checkbox\" size=\"10\" value=\"1\" $archive />
+    </label>
+    <label>&nbsp;<br />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"contract_id\" id=\"contract_id\" type=\"hidden\" value=\"$contract_id\" />     
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+     </label>
+     <p class=\"CL\" />
+   </form>
 ";
 
   return $block;
@@ -604,7 +605,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   if (isset($incident["reference"])) { $reference = $incident["reference"]; }
 
   // User defined data
-  $block_userdata = of_userdata_dis_entity_form("incident", $id);
+  $block_userdata = of_userdata_dis_entity_form("incident", $id, $incident);
 
   // Owner select
   if (! isset($owner)) { $owner = $uid; }
@@ -698,12 +699,12 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   // --- html template --------------------------------------------------------
 
   $block = "
-    <form method=\"post\" name=\"f_entity\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
+  <form method=\"post\" name=\"f_entity\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
       
-      <fieldset class=\"detail infos\">  
-      <legend>$l_contract</legend>
-      <table>
-      <tr>
+  <fieldset class=\"detail infos\">  
+    <legend>$l_contract</legend>
+    <table>
+    <tr>
       <th>$l_contract</th>
       <td>
       <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$param_contract")."\">$c_label</a>
@@ -713,66 +714,67 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
       <img src=\"$ico_contract\" alt=\"[Contract]\" /></a>
       <input type=\"text\" name=\"contract_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>
-      </tr>
-      </table>
-      </fieldset>
+    </tr>
+    </table>
+  </fieldset>
       
-      
-      <fieldset class=\"detail infos\">  
-      <legend>$l_incident</legend>
-        <table>
-          <tr>
-            <th>$l_label</th>
-            <td><input name=\"tf_lincident\" size=\"30\" value=\"$lincident\" /></td>
-          </tr><tr>
-            <th>$l_reference</th>
-            <td><input name=\"tf_reference\" size=\"10\" value=\"$reference\" /></td>
-          </tr><tr>
-            <th>$l_logger</th>
-            <td>$dis_sel_logger</td>
-          </tr><tr>
-            <th>$l_owner</th>
-            <td>$dis_sel_owner</td>
-          </tr><tr>
-            <th>$l_archive_new</th>
-            <td><input name=\"cba_archive\" type=\"checkbox\"size=\"30\" value=\"1\" $archive /></td>
-          </tr>
-          $block_priority
-          $block_status
-          $block_reso
-          $block_userdata
-          <tr>
-            <th>$l_date</th>
-            <td><input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>  $sel_hour H</td>
-          </tr><tr>
-            <th>$l_duration</th>
-            <td><input type=\"text\" name=\"tf_duration\" size=\"6\" maxlength=\"6\" value=\"$duration\" readonly=\"readonly\" />H</td>
-          </tr>
-        </table>
-</fieldset>
+  <fieldset class=\"detail infos\">  
+    <legend>$l_incident</legend>
+    <table>
+    <tr>
+      <th>$l_label</th>
+      <td><input name=\"tf_lincident\" size=\"30\" value=\"$lincident\" /></td>
+    </tr><tr>
+      <th>$l_reference</th>
+      <td><input name=\"tf_reference\" size=\"10\" value=\"$reference\" /></td>
+    </tr><tr>
+      <th>$l_logger</th>
+      <td>$dis_sel_logger</td>
+    </tr><tr>
+      <th>$l_owner</th>
+      <td>$dis_sel_owner</td>
+    </tr><tr>
+      <th>$l_archive_new</th>
+      <td><input name=\"cba_archive\" type=\"checkbox\"size=\"30\" value=\"1\" $archive /></td>
+    </tr>
+    $block_priority
+    $block_status
+    $block_reso
+    $block_userdata
+    <tr>
+      <th>$l_date</th>
+      <td><input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>  $sel_hour H</td>
+    </tr><tr>
+      <th>$l_duration</th>
+      <td><input type=\"text\" name=\"tf_duration\" size=\"6\" maxlength=\"6\" value=\"$duration\" readonly=\"readonly\" />H</td>
+    </tr>
+    </table>
+  </fieldset>
 
   <fieldset class=\"detail extra\">  
-      <legend>$l_solution</legend>
-        <table>
-          <tr>
-            <td colspan=\"2\"><textarea name=\"ta_solution\" rows=\"6\" cols=\"60\">$solu</textarea></td>
-          </tr>
-        </table>
-</fieldset>
-<fieldset class=\"detail extra\">  
-      <legend>$l_comment</legend>
-       $l_add_comment
-       <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
-       $sel_usercomment
-       $l_res_duration
-      $sel_dur 
-     <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
-      $dis_comment
-      </fielset>
-      <fieldset class=\"buttons\">
-       $dis_button
-      </fieldset>
-    </form>
+    <legend>$l_solution</legend>
+    <table>
+    <tr>
+      <td colspan=\"2\"><textarea name=\"ta_solution\" rows=\"6\" cols=\"60\">$solu</textarea></td>
+    </tr>
+    </table>
+  </fieldset>
+
+  <fieldset class=\"detail extra\">  
+    <legend>$l_comment</legend>
+    $l_add_comment
+    <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
+    $sel_usercomment
+    $l_res_duration
+    $sel_dur 
+    <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
+    $dis_comment
+  </fieldset>
+
+  <fieldset class=\"buttons\">
+    $dis_button
+  </fieldset>
+  </form>
 ";
 
   return $block;

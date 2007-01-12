@@ -1077,7 +1077,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
   // User defined data
-  $block_userdata = of_userdata_dis_entity_form("company", $id);
+  $block_userdata = of_userdata_dis_entity_form("company", $id, $company);
 
   // some constants
   $csize_add = "48";

@@ -195,7 +195,7 @@ function run_query_user_insert($user) {
     }
   }
   $perms = $user["perms"];
-  $archive = ($user["archive"] ? "1" : "0");
+  $archive = ($user["archive"] == "1" ? "1" : "0");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $desc = $user["desc"];
@@ -300,7 +300,7 @@ function run_query_user_update($p_id, $user) {
     $passwd_update = "userobm_password='$passwd_crypt',";
   }
   $perms = $user["perms"];
-  $archive = ($user["archive"] ? "1" : "0");
+  $archive = ($user["archive"] == "1" ? "1" : "0");
   $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
   $lname = $user["lastname"];
   $fname = $user["firstname"];

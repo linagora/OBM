@@ -1179,7 +1179,7 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
 //   - $properties :
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_event_allday_planning(&$dis_cal, &$hidden_div,&$event,$nb_user,&$properties) {
-  global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category1;
+  global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category;
   global $l_location, $l_private, $l_private_description, $l_begin,$l_end,$l_resource,$l_task,$l_user;
 
   $id = $event->id;
@@ -1189,13 +1189,13 @@ function dis_calendar_event_allday_planning(&$dis_cal, &$hidden_div,&$event,$nb_
     $title = $l_private;
     $description = $l_private_description;
     $link = "javascript:return false;";
-    $category1 = $l_private;    
+    $category = $l_private;    
   } else {
     $title = $event->title;
     $location = $event->location;
     $link = "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=$id";
     $description = $event->description;
-    $category1 = $event->category1;
+    $category = $event->category1;
     $attendee = $event->attendee;
     foreach($attendee as $entity => $entities) {
       $attendee_list .= "<li class=\"blockItem\">".${"l_".$entity}." : ".implode(", ",$entities)."</li>";
@@ -1210,7 +1210,7 @@ function dis_calendar_event_allday_planning(&$dis_cal, &$hidden_div,&$event,$nb_
    <div class=\"blockTitle\">:: $title<br />($user_info)</div>
    <ul class=\"blockItem\">
     <li class=\"blockItem\">$l_location : $location</li>
-    <li class=\"blockItem\">$l_category1 : $category1</li>
+    <li class=\"blockItem\">$l_category : $category</li>
     <li class=\"blockItem\">$description</li>
     $attendee_list
    </ul>
@@ -1229,7 +1229,7 @@ function dis_calendar_event_allday_planning(&$dis_cal, &$hidden_div,&$event,$nb_
 //   - $properties :
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_event_planning($view, &$dis_cal, &$hidden_div, &$event,$nb_ent,&$properties) {
-  global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category1,$l_resource,$l_task;
+  global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category,$l_resource,$l_task;
   global $l_location, $l_private, $l_private_description, $l_begin,$l_end,$l_user;
 
   $id = $event["event"]->id;
@@ -1239,13 +1239,13 @@ function dis_calendar_event_planning($view, &$dis_cal, &$hidden_div, &$event,$nb
     $title = $l_private;
     $description = $l_private_description;
     $link = "javascript:return false;";
-    $category1 = $l_private;    
+    $category = $l_private;    
   } else {
     $title = $event["event"]->title;
     $location = $event["event"]->location;
     $link = "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=$id";
     $description = $event["event"]->description;
-    $category1 = $event["event"]->category1;
+    $category = $event["event"]->category1;
     $attendee = $event["event"]->attendee;
     foreach($attendee as $entity => $entities) {
       $attendee_list .= "<li class=\"blockItem\">".${"l_".$entity}." : ".implode(", ",$entities)."</li>";
@@ -1286,7 +1286,7 @@ function dis_calendar_event_planning($view, &$dis_cal, &$hidden_div, &$event,$nb
    <div class=\"blockTitle\">:: $title <br />($user_info)</div>
    <ul class=\"blockItem\">
     <li class=\"blockItem\">$l_location : $location</li>
-    <li class=\"blockItem\">$l_category1 : $category1</li>
+    <li class=\"blockItem\">$l_category : $category</li>
     <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
     <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
     <li class=\"blockItem\">$description</li>
@@ -2162,7 +2162,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_waiting_events2($obm_wait) {
-  global $l_users, $l_title, $l_location, $l_priority, $l_category1,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_location, $l_priority, $l_category,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$l_change_state,$l_validate,$l_from;
   global $l_repeatkind,$l_repeatdays2,$l_date_repeatend,$l_daily,$l_weekly,$ccalendar_weekstart,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
@@ -2191,7 +2191,7 @@ function html_calendar_waiting_events2($obm_wait) {
 	 <tr>
 	  <td class=\"detailText\">$l_title</td>
 	  <td class=\"detailText\">$l_location</td>
-	  <td class=\"detailText\">$l_category1</td>
+	  <td class=\"detailText\">$l_category</td>
 	  <td class=\"detailText\">$l_priority</td>
 	  <td class=\"detailText\">$l_from</td>
 	  <td class=\"detailText\">$dis_kind</td>
@@ -2277,7 +2277,7 @@ function html_calendar_waiting_events2($obm_wait) {
    <tr>
     <td class=\"detailText\">$l_title</td>
     <td class=\"detailText\">$l_location</td>
-    <td class=\"detailText\">$l_category1</td>
+    <td class=\"detailText\">$l_category</td>
     <td class=\"detailText\">$l_priority</td>
     <td class=\"detailText\">$l_from</td>
     <td class=\"detailText\">$dis_kind</td>
@@ -2299,7 +2299,7 @@ function html_calendar_waiting_events2($obm_wait) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_waiting_events($obm_wait) {
-  global $l_users, $l_title, $l_location, $l_priority, $l_category1,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_location, $l_priority, $l_category,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$l_change_state,$l_validate,$l_from;
   global $l_repeatkind,$l_repeatdays2,$l_date_repeatend,$l_daily,$l_weekly,$ccalendar_weekstart,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
@@ -2334,7 +2334,7 @@ function html_calendar_waiting_events($obm_wait) {
 	 <tr>
 	  <td class=\"detailText\">$l_title</td>
 	  <td class=\"detailText\">$l_location</td>
-	  <td class=\"detailText\">$l_category1</td>
+	  <td class=\"detailText\">$l_category</td>
 	  <td class=\"detailText\">$l_priority</td>
 	  <td class=\"detailText\">$l_from</td>
 	  <td class=\"detailText\">$dis_kind</td>
@@ -2430,7 +2430,7 @@ function html_calendar_waiting_events($obm_wait) {
 	 <tr>
 	  <td class=\"detailText\">$l_title</td>
 	  <td class=\"detailText\">$l_location</td>
-	  <td class=\"detailText\">$l_category1</td>
+	  <td class=\"detailText\">$l_category</td>
 	  <td class=\"detailText\">$l_priority</td>
 	  <td class=\"detailText\">$l_from</td>
 	  <td class=\"detailText\">$dis_kind</td>

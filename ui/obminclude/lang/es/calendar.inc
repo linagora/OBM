@@ -1,7 +1,7 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
-//     - File     : calendar.inc                                               //
+//     - File     : calendar.inc                                             //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -48,7 +48,6 @@ $l_possible = "Libre";
 $l_occupied = "No disponible";
 $l_meeting_legend = "Leyenda";
 $l_selection = "Selección";
-$l_category1 = "categoría";
 
 $l_accepted = "Aceptar";
 $l_rejected = "Rechazar";

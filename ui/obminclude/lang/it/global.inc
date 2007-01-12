@@ -92,8 +92,7 @@ $l_reconnect = "Click here to reconnect";
 $l_version = "Versione";
 $l_aka = "Altri nome";
 $l_cat_tree = "Entera Categoria";
-$l_category1 = "Categoria 1";
-$l_category2 = "Categoria 2";
+$l_category = "Categoria";
 $l_aduplicate = "Copia";
 
 // Entities

@@ -343,19 +343,15 @@ function dis_publication_form($action, $publication) {
     } else {
       $display["msg"] .= display_err_msg($l_err_reference);
     }
-    $concat1_q = "";
   } else {
     $pub_q = "";
-    // We retrieve contact category 1 and list only on new
-    // auto subscription to all contact from a category or list only on insert
-    $concat1_q = run_query_publication_contactcategory1();
     $list_q = run_query_publication_list();
   }
 
   $type_q = run_query_publication_type();
   $recept_q = run_query_publication_subscription_reception(); 
 
-  $block = html_publication_form($action, $pub_q, $type_q, $recept_q, $publication, $concat1_q, $list_q);
+  $block = html_publication_form($action, $pub_q, $type_q, $recept_q, $publication, $list_q);
 
   return $block;
 }
@@ -369,15 +365,14 @@ function dis_publication_form($action, $publication) {
 //   - $type_q    : type database result 
 //   - $recept_q  : reception modes database result 
 //   - $publication[] : default values
-//   - $cat1_q    : contact category
 //   - $list_q    : lists
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$cat1_q, $list_q) {
+function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, $list_q) {
   global $display, $auth, $set_dsrc, $l_none, $ico_add;
   global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_publication_title, $l_type, $l_year, $l_lang, $l_desc;
   global $l_insert,$l_update,$l_checkdelete, $l_publication, $l_list;
-  global $l_contact_category1,$l_auto_sub;
+  global $l_contact_category1,$l_auto_sub, $public_contact_cat;
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
@@ -388,7 +383,6 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$
     $desc = $pub_q->f("publication_desc");
     $lang = $pub_q->f("publication_lang");    
   }
-  $concat1 = array();
   $list_sub = array();
   // If parameters have been given, they supercede the default action value
   if (isset($publication["publication_id"])) { $id = $publication["publication_id"]; }
@@ -397,9 +391,8 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$
   if (isset($publication["year"])) { $year = stripslashes($publication["year"]); }
   if (isset($publication["lang"])) { $lang = stripslashes($publication["lang"]); }
   if (isset($publication["desc"])) { $desc = stripslashes($publication["desc"]); }
-  if (isset($publication["concat1"])) { $concat1 = $publication["concat1"]; }
+  if (isset($publication[$public_contact_cat])) { $cats1 = $publication[$public_contact_cat]; }
   if (isset($publication["list_sub"])) { $list_sub = $publication["list_sub"]; }
- 
 
   // type select
   $sel_type = "<select name=\"sel_type\" id=\"sel_type\">";
@@ -423,17 +416,9 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
 
-    $sel_contcat1 = "<select name=\"sel_contactcategory1[]\" multiple=\"multiple\">";
-    while($cat1_q->next_record()) {
-      $cat_id = $cat1_q->f("contactcategory1_id");
-      $cat_label = $cat1_q->f("contactcategory1_label");
-      $sel_contcat1 .= "<option value=\"".$cat_id ."\" ";
-      if (in_array($cat_id,$concat1)) {
-	$sel_contcat1 .= "selected=\"selected\" ";
-      }
-      $sel_contcat1 .= ">$cat_label</option>";
-    }
-    $sel_contcat1 .= "</select>";
+    // auto subscription to all contact from a category or list only on insert
+    $cats = of_category_user_get_infos($cats1);
+    $block_cat = of_category_user_dis_entity_form("contact", $public_contact_cat, $cats);
 
     $sel_list = "<select name=\"sel_list[]\" multiple=\"multiple\">";
     while($list_q->next_record()) {
@@ -452,10 +437,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$
     <fieldset class=\"detail infos\">
     <legend>$l_auto_sub</legend>
     <table>
-    <tr>
-      <th>$l_contact_category1</th>
-      <td>$sel_contcat1</td>
-    </tr>
+    $block_cat
     <tr>
       <th>$l_list</th>
       <td>$sel_list</td>
@@ -521,43 +503,26 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$
 // Parameters:
 //   - $action    : action called
 //   - $pub_q      : publication database result 
-//   - $dsrc_q    : datasource database result 
-//   - $type_q    : type database result 
-//   - $usr_q     : userobm database result 
-//   - $ctry_q    : country database result 
 //   - $publication[] : default values
-//     keys used  : id, num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
-//                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_group_subscription_form($action,$pub_q, $cat1_q, $publication) {
+function html_publication_group_subscription_form($action,$pub_q, $publication) {
   global $display, $auth, $set_dsrc;
   global $set_theme,$l_category;
-  global $l_publication, $l_contact_category1, $l_auto_sub;
+  global $l_publication, $l_contact_category1, $l_auto_sub, $public_contact_cat;
 
-  $concat1 = array();
   $title = $pub_q->f("publication_title");
   // If parameters have been given, they supercede the default action value
   if (isset($publication["publication_id"])) { $id = $publication["publication_id"]; }
-  if (isset($publication["concat1"])) { $concat1 = $publication["concat1"]; }
- 
+  if (isset($publication[$public_contact_cat])) { $cats1 = $publication[$public_contact_cat]; }
 
   $dis_button = "
     <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$id\" />  
     <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_group_subscription\" />
-    <input type=\"submit\" value=\"$l_auto_sub\" />
-    ";
-  $sel_contcat1 = "<select name=\"sel_contactcategory1[]\" multiple=\"multiple\"> "; 
-  while($cat1_q->next_record()) {
-    $cat_id = $cat1_q->f("contactcategory1_id");
-    $cat_label = $cat1_q->f("contactcategory1_label");
-    $sel_contcat1 .= "<option value=\"".$cat_id ."\" ";
-    if ($cat_id = current($concat1)) {
-      $sel_contcat1 .= "selected=\"selected\" ";
-      next($concat1);
-    }
-    $sel_contcat1 .= ">$cat_label</option>";
-  }
-  $sel_contcat1 .= "</select>";
+    <input type=\"submit\" value=\"$l_auto_sub\" />";
+
+    // auto subscription to all contact from a category or list only on insert
+    $cats = of_category_user_get_infos($cats1);
+    $block_cat = of_category_user_dis_entity_form("contact", $public_contact_cat, $cats);
 
   $display["title"] = "<h1 class=\"title\">$l_publication : $title</h1>";
 
@@ -573,18 +538,12 @@ function html_publication_group_subscription_form($action,$pub_q, $cat1_q, $publ
     <legend>$l_auto_sub</legend>
    
     <table>
-     <tr>
-      <th>$l_contact_category1</th>
-      <td>
-       $sel_contcat1
-      </td>
-     </tr>   
-     <tr>
+    $block_cat
+    </tr>   
+    <tr>
       <th></td>
-      <td>
-      $sel_recept
-      </td>
-     </tr>       
+      <td>$sel_recept</td>
+    </tr>       
     </table>    
 </fieldset>
     <fieldset class=\"buttons\">

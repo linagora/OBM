@@ -265,3 +265,12 @@ CREATE TABLE DefaultOdtTemplate (
   PRIMARY KEY(defaultodttemplate_id)
 );
 
+
+---------------------------------------------------------------------------
+-- Update UserObm table from Aliamin
+---------------------------------------------------------------------------
+ALTER TABLE UserObm ADD COLUMN userobm_mobile varchar(32);
+ALTER TABLE UserObm ALTER COLUMN userobm_mobile SET DEFAULT '';
+
+ALTER TABLE Project ADD COLUMN project_reference_tech text;
+ALTER TABLE Project ALTER COLUMN project_reference_tech SET DEFAULT '';

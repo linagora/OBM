@@ -265,7 +265,7 @@ function run_query_company_insert($company) {
   $num = $company["num"];
   $vat = $company["vat"];
   $siret = $company["siret"];
-  $archive = (isset($company["archive"]) ? $company["archive"] : '0');
+  $archive = ($company["archive"] == "1" ? "1" : "0");
   $name = $company["name"];
   $aka = trim($company["aka"]);
   // If aka is empty we auto fill it
@@ -417,7 +417,7 @@ function run_query_company_update($cid, $company) {
   $num = $company["num"];
   $vat = $company["vat"];
   $siret = $company["siret"];
-  $archive = (isset($company["archive"]) ? $company["archive"] : '0');
+  $archive = ($company["archive"] == "1" ? "1" : "0");
   $name = $company["name"];
   $aka = trim($company["aka"]);
   // If aka is empty we auto fill it

@@ -1,7 +1,7 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
-//     - File     : calendar.inc                                               //
+//     - File     : calendar.inc                                             //
 // 2001-06-28 by Francois Bloque                                             //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -49,7 +49,6 @@ $l_possible = "Libre";
 $l_occupied = "Non disponible";
 $l_meeting_legend = "Légende";
 $l_selection = "Sélection";
-$l_category1 = "Catégorie";
 $l_repeatfrequency = "Fréquence";
 $l_accepted = "Accepté";
 $l_rejected = "Rejeté";

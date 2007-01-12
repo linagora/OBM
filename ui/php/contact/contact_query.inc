@@ -508,7 +508,7 @@ function run_query_contact_insert($contact) {
     $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
   }
 
-  $archive = $contact["archive"];
+  $archive = ($contact["archive"] == "1" ? "1" : "0");
   $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
 
   $query = "INSERT INTO Contact (contact_timeupdate,
@@ -695,7 +695,7 @@ function run_query_contact_update($contact) {
     $usercomment3 = $contact["usercomment3"];
     $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
   }
-  $archive = (isset($contact["archive"]) ? '1' : '0');
+  $archive = ($contact["archive"] == "1" ? "1" : "0");
   $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
   $multidomain = sql_multidomain("contact");
   

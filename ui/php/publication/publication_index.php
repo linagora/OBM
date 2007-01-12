@@ -28,6 +28,10 @@
 // - ext_get_id         -- $title         -- select a publication (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
+// Contact category used to select auto contact subscription
+$public_contact_cat = "contactcategory1";
+
+//-----------------------------------------------------------------------------
 $path = "..";
 $module = "publication";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -38,6 +42,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("publication_query.inc");
 require("publication_display.inc");
+require_once("$obminclude/of/of_category.inc");
 
 update_last_visit("publication", $param_publication, $action);
 
@@ -173,8 +178,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "new_group_subscription") {
 ///////////////////////////////////////////////////////////////////////////////
   $pub_q = run_query_publication_detail($params["publication_id"]);
-  $concat1_q = run_query_publication_contactcategory1();
-  $display["detail"] = html_publication_group_subscription_form($action,$pub_q, $concat1_q,$params);
+  $display["detail"] = html_publication_group_subscription_form($action,$pub_q,$params);
 
 } elseif ($action == "insert_group_subscription") {
 ///////////////////////////////////////////////////////////////////////////////

@@ -610,7 +610,7 @@ function of_category_dis_links($entities, $cat, $params, $mode="multi") {
       $nb_cat = $obm_q->num_rows();
       if ($nb_cat > 0) {
 	$has_links = true;
-        $url = url_prepare("?action=search&amp;sel_${cat}=$id&amp;cb_archive=1");
+        $url = url_prepare("?action=search&amp;sel_${cat}=$id&amp;cba_archive=1");
 
 	$dis_link .= "<h1>".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a></h1>";
       } else {
@@ -629,7 +629,7 @@ function of_category_dis_links($entities, $cat, $params, $mode="multi") {
     $nb_cat = $obm_q->num_rows();
     if ($nb_cat > 0) {
       $has_links = true;
-      $url = url_prepare("?action=search&amp;sel_${cat}=$id&amp;cb_archive=1");
+      $url = url_prepare("?action=search&amp;sel_${cat}=$id&amp;cba_archive=1");
 
       $dis_link .= "<h1>".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a></h1>";
     } else {
@@ -1467,25 +1467,44 @@ function of_userdata_dis_entity_consult($entity, $ent_id) {
 // Parameters:
 //   - $entity : entity
 //   - $id     : entity id
+//   - $params : parameters hash
 ///////////////////////////////////////////////////////////////////////////////
-function of_userdata_dis_entity_form($entity, $ent_id) {
+function of_userdata_dis_entity_form($entity, $ent_id, $params) {
   global $cgp_user;
 
-  $cats = array();
   if (is_array($cgp_user[$entity]["category"])) {
     foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+      $cats = array();
       $mode = $one_cat["mode"];
       if ($mode == "mono") {
 	$cats = of_category_user_get_ordered($cat_name, $entity);
 	if ($ent_id > 0) {
-	  $cats_sel = of_category_user_get_ordered($cat_name, $entity, $ent_id);
-	  $cat_id = $cats_sel[0]["id"];
+	  if (isset($params["$cat_name"])) {
+	    $cats_sel = of_category_user_get_infos($params["$cat_name"]);
+	  } else {
+	    $cats_sel = of_category_user_get_ordered($cat_name, $entity, $ent_id);
+	  }
+	  $cat_id = $cats_sel[$params["$cat_name"]]["id"];
 	} else {
-	  $cat_id = "";
+	  if (isset($params["$cat_name"])) {
+	    $cats_sel = of_category_user_get_infos($params["$cat_name"]);
+	    $cat_id = $cats_sel[$params["$cat_name"]]["id"];
+	  } else {
+	    $cats_sel = of_category_user_get_ordered($cat_name, $entity, $ent_id);
+	    $cat_id = "";
+	  }
 	}
       } else {
 	if ($ent_id > 0) {
-	  $cats = of_category_user_get_ordered($cat_name, $entity, $ent_id);
+	  if (isset($params["$cat_name"])) {
+	    $cats = of_category_user_get_infos($params["$cat_name"]);
+	  } else {
+	    $cats = of_category_user_get_ordered($cat_name, $entity, $ent_id);
+	  }
+	} else {
+	  if (isset($params["$cat_name"])) {
+	    $cats = of_category_user_get_infos($params["$cat_name"]);
+	  }
 	}
       }
       $block_user .= of_category_user_dis_entity_form($entity, $cat_name, $cats, $one_cat["mode"], $cat_id, "undef");
@@ -1576,7 +1595,7 @@ function of_userdata_query_search($entity, $params) {
 	$where .= " $and ($tlink.categorylink_category_id='$cat' $where_cat_user)";
 	$and = "AND";
       } else if ($cat == $c_none) {
-	$join_cat_user = "LEFT JOIN CategoryLink AS $tlink
+	$join_cat_user .= " LEFT JOIN CategoryLink AS $tlink
           ON ${entity}_id=$tlink.categorylink_entity_id
           AND $tlink.categorylink_entity='$entity'
           AND $tlink.categorylink_category='$cat_name'";
@@ -1933,7 +1952,7 @@ function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $
           </div>";
       }
     }
-    $url = "${entity}_index.php?action=ext_get_category_ids&amp;category=$cat&amp;popup=1&amp;ext_element=sel_${cat}&amp;ext_title=${$l_cat}";
+    $url = "../$entity/${entity}_index.php?action=ext_get_category_ids&amp;category=$cat&amp;popup=1&amp;ext_element=sel_${cat}&amp;ext_title=${$l_cat}";
     $link = "<a href=\"javascript: return false;\" style=\"float:right;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
@@ -2071,7 +2090,7 @@ function of_category_user_dis_links($params) {
 
   $has_links = false;
   $cat = of_category_user_get_infos($cat_id);
-  $cat_label = $cat["label"];
+  $cat_label = $cat[$cat_id]["label"];
 
   $cats = of_category_user_get_links($category, $cat_id);
 
@@ -2083,7 +2102,7 @@ function of_category_user_dis_links($params) {
       $nb_links = count($one_cat);
       if ($nb_links > 0) {
 	$has_links = true;
-        $url = url_prepare("?action=search&amp;sel_${category}=$cat_id&amp;cb_archive=1");
+        $url = url_prepare("?action=search&amp;sel_${category}=$cat_id&amp;cba_archive=1");
 
 	$dis_link .= "
     <tr>
@@ -2184,7 +2203,7 @@ function of_category_user_get_ordered($cat, $entity="", $entity_id=0) {
     $cat_info = array("id" => $id,
 		      "label" => $label,
 		      "code" => $code);
-    $cats[] = $cat_info;
+    $cats[$id] = $cat_info;
   }
 
   if (is_array($cats)) {
@@ -2481,7 +2500,7 @@ function of_category_user_get_links($category, $p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // USER Category - get category infos
 // Parameters:
-//   - $cat_id : category id
+//   - $cat_id : category id || array of category ids
 // Return:
 //   - array with category infos
 ///////////////////////////////////////////////////////////////////////////////
@@ -2490,20 +2509,38 @@ function of_category_user_get_infos($cat_id) {
 
   $cat = array();
 
-  if ($cat_id > 0) {
-    $query = "SELECT *
-      FROM Category
-      WHERE category_id = '$cat_id'";
+  if (is_array($cat_id)) {
+    if (count($cat_id) > 0) {
+      $or = "";
+      foreach ($cat_id as $one_id) {
+	$where_cat .= " $or category_id = '$one_id'";
+	$or = "OR";
+      }
+    } else {
+      return $cat;
+    }
+  } else {
+    if ($cat_id > 0) {
+      $where_cat .= "category_id = '$cat_id'";
+    } else {
+      return $cat;
+    }
+  }
 
-    display_debug_msg($query, $cdg_sql, "of_category_user_get_infos()");
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    $obm_q->next_record();
-    
-    $cat["category"] = $obm_q->f("category_category");
-    $cat["id"] = $cat_id;
-    $cat["code"] = $obm_q->f("category_code");
-    $cat["label"] = $obm_q->f("category_label");
+  $query = "SELECT *
+    FROM Category
+    WHERE $where_cat";
+
+  display_debug_msg($query, $cdg_sql, "of_category_user_get_infos()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  while($obm_q->next_record() ) {
+    $id = $obm_q->f("category_id");
+    $cat[$id] = array (
+		    "category" => $obm_q->f("category_category"),
+		    "id" => $id,
+		    "code" => $obm_q->f("category_code"),
+		    "label" => $obm_q->f("category_label"));
   }
 
   return $cat;

@@ -248,7 +248,7 @@ function run_query_invoice_insert($invoice) {
   if ($status == ""){
     $status = "0";
   }
-  $arch = (isset($invoice["archive"]) ? $invoice["archive"] : '0');
+  $arch = ($invoice["archive"] == "1" ? "1" : "0");
 
   $query = "INSERT INTO Invoice (
       invoice_domain_id,
@@ -311,7 +311,7 @@ function run_query_invoice_update($invoice) {
   $id = $invoice["invoice_id"];
   $label = $invoice["label"];
   $number = $invoice["number"];
-  $arch = (isset($invoice["archive"]) ? $invoice["archive"] : '0');
+  $arch = ($invoice["archive"] == "1" ? "1" : "0");
   $ht = $invoice["amount_ht"];
   $ttc = $invoice["amount_ttc"];
   $status = $invoice["status"];

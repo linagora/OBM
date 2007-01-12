@@ -253,7 +253,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
     </label>
 
     <label>$l_include_archive<br />
-      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /> 
+      <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /> 
     </label>
 
     <label>$l_inout<br />
@@ -272,6 +272,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
     </label>
 
     <label>&nbsp;<br />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
       <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"project_id\" value=\"$project_new_id\" />
@@ -366,7 +367,7 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 		    "&amp;deal_id=$deal_id".
 		    "&amp;project_id=$project_new_id".
 		    "&amp;tf_company=$company".
-		    "&amp;cb_archive=$archive".
+		    "&amp;cba_archive=$archive".
                     "$url_ext"); 
 
   $dis_invoice = new OBM_DISPLAY ("DATA", $prefs, "invoice");
@@ -921,7 +922,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     </td>
   </tr><tr>
     <th>$l_archive</th>
-    <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+    <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
   </tr><tr>
     <th>$l_date</th>
     <td>
@@ -1128,7 +1129,7 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_bil_row .= "
-          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cb_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
+          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
       } else {
         $dis_bil_row .= "
           <td class=\"$data\"> </td>";
@@ -1156,7 +1157,7 @@ function dis_invoice_dashboard($invoice) {
       $month_start = "$year_month-01";
       $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
       $dis_bil_row_total .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search$total_status_param&amp;cb_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search$total_status_param&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
     } else {
       $dis_bil_row_total .= "
           <td>&nbsp;$dis_amount_ht</td>";
@@ -1219,7 +1220,7 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_pot_row .= "
-          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cb_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
+          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
       } else {
         $dis_pot_row .= "
           <td class=\"$data\"> </td>";
@@ -1276,7 +1277,7 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_pay_row .= "
-          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cb_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
       } else {
         $dis_pay_row .= "
           <td class=\"$data\"> </td>";
@@ -1304,7 +1305,7 @@ function dis_invoice_dashboard($invoice) {
       $month_start = "$year_month-01";
       $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
       $dis_pay_row_total .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;cb_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;cba_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
     } else {
       $dis_pay_row_total .= "
           <td>&nbsp;$dis_amount_ttc</td>";

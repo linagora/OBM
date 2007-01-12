@@ -293,7 +293,7 @@ function run_query_deal_insert($deal) {
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
   $status = $deal["status_id"];
-  $archive = ($deal["archive"] == 1 ? "1" : "0");
+  $archive = ($deal["archive"] == "1" ? "1" : "0");
   $todo = $deal["todo"];
   $comment = $deal["comment"];
   $add_comment = $deal["add_comment"];
@@ -445,7 +445,7 @@ function run_query_deal_update($deal) {
   $con1 = ($deal["contact1"] ? "'".$deal["contact1"]."'" : "null");
   $con2 = ($deal["contact2"] ? "'".$deal["contact2"]."'" : "null");
   $status = $deal["status_id"];
-  $archive = ($deal["archive"] == 1 ? "1" : "0");
+  $archive = ($deal["archive"] == "1" ? "1" : "0");
   $todo = $deal["todo"];
   $comment = $deal["comment"];
   $add_comment = $deal["add_comment"];
@@ -698,7 +698,7 @@ function run_query_deal_id($deal) {
   $datealarm = ($deal["datealarm"] ? "='".$deal["datealarm"]."'" : "is null");
   $status = $deal["status_id"];
   $todo = $deal["todo"];
-  $archive = ($deal["archive"] == 1 ? "1" : "0");
+  $archive = ($deal["archive"] == "1" ? "1" : "0");
   $domain_id = $obm["domain_id"];
 	
   // comment not searched because processed before stored in db
