@@ -294,11 +294,13 @@ function html_publication_consult($pub_q) {
 
 
   // --- HTML Template --------------------------------------------------------
-  $block .= "<h1>$l_publication</h1>
-
-<table>
+  $block .= "
+  
+ <div class=\"detail extra\">
+ <h1>$l_publication</h1>
+ <table>
   <tr> 
-      <th>$l_publication_title</th>
+   <th>$l_publication_title</th>
       <td>$title</td>
     </tr>
     <tr> 
@@ -314,14 +316,16 @@ function html_publication_consult($pub_q) {
       <td>$type</td>
     </tr>
   </table>
+  </div>
 
-<h1>$l_desc</h1>
-  
+  <div class=\"detail extra\">
+  <h1>$l_desc</h1>
   <table>
     <tr> 
       <th>$ldesc</th>
     </tr>
-  </table>";
+  </table>
+  </div>";
 
   return $block;
 }
@@ -434,7 +438,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
     $sel_list .= "</select>";
 
     $dis_auto_sub = "
-    <fieldset class=\"detail infos\">
+    <fieldset class=\"detail extra\">
     <legend>$l_auto_sub</legend>
     <table>
     $block_cat
@@ -461,7 +465,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
       onsubmit=\"if (check_publication(this)) return true; else return false;\"
       action=\"".url_prepare("publication_index.php")."\">
 
-<fieldset class=\"detail infos\"> 
+<fieldset class=\"detail extra\"> 
     <legend>$l_publication</legend>
     <table>
     <tr>
@@ -623,7 +627,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
       <input type=\"submit\" value=\"$l_insert_sub\" />";
     $block_publi = "      
     <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
+     <img src=\"$ico_publication_new\" alt=\"[New Publication]\" /> 
     </a>
     <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$pub_id\" />
     <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"$title\" />
@@ -727,7 +731,7 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
   $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang";   
  $block_publi_dest = "      
     <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
+     <img src=\"$ico_publication_new\" alt=\"[New Publication]\" /> 
     </a>
     <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"\" />
     <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"\" />
@@ -905,91 +909,93 @@ function dis_publication_admin_index() {
 //   - $type_q : Kind list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_type_form($type_q) {
-  global $l_type_manage,$l_type_exist;
+  global $l_type_manage,$l_type_exist,$ico_delete,$ico_ok;
   global $l_type_checkdelete,$l_type_update,$l_type_new,$l_type_insert;
 
-  $sel_type = "<select name=\"sel_type\" onChange=\"
-    forms.form_type_update.tf_type_label.value=this.options[this.selectedIndex].text;
-		forms.form_type_update.tf_type.value=this.options[this.selectedIndex].value;\"
-    size=\"4\" >";
-  while ($type_q->next_record()) {
-    $id = $type_q->f("publicationtype_id");
-    $label = $type_q->f("publicationtype_label");
-    $sel_type .= "\n<option value=\"$id\">$label</option>";
+
+
+
+$char_title = '=';
+$key = 0;
+while ($type_q->next_record()) {
+  $id = $type_q->f("publicationtype_id");
+  $label = $type_q->f("publicationtype_label");
+
+  if($key%2 == 0) {
+    $class = "class=\"pair\"";
+  } else {
+    $class = "";
   }
-  $sel_type .= "</select>";
+  $c_label = htmlentities($one_cat["label"]);
+  $type_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"type_$id\" value=\"$id\" />
+    <a href=\"?action=type_checklink&amp;category=type&amp;type=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_type_checkdelete\" title=\"$l_type_checkdelete\" />
+    </a></td>
+    <td> <input type=\"text\" id=\"tf_type_label_$id\" value=\"$label\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'type');\">
+    <img src=\"$ico_ok\" alt=\"$l_type_update\" title=\"$l_type_update\" />
+    </a>
+    </td>
+    </tr>
+    ";    
+}
+
+
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_type_manage
-      </td>
-    </tr><tr>
-      <td>
 
-<!-- Kind Check Delete Section -->
 
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_type_delete\" method=\"post\"
-              action=\"" . url_prepare("publication_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_type_exist</td>
-              <td class=\"adminLabel\">$sel_type</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"type_checklink\" />
-              <input type=\"submit\" name=\"sub_type\" value=\"$l_type_checkdelete\" onclick=\"if (check_type_checkdel(this.form)) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-<!-- Kind Update Section -->
-
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_type_update\" method=\"get\"
-              action=\"" . url_prepare("publication_index.php") . "\">
-            <input type=\"hidden\" name=\"tf_type\" />
-            <input type=\"hidden\" name=\"action\" value=\"type_update\" />
-            <input type=\"text\" name=\"tf_type_label\" />
-            <input type=\"submit\" name=\"sub_type\" value=\"$l_type_update\"
-              onclick=\"if (check_type_upd(this.form,document.form_type_delete)) return true; else return false;\" />
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td>
-
-<!-- New Kind Section -->
-
-        <form name=\"form_type_new\" method=\"get\"
-          action=\"" . url_prepare("publication_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_type_new :
-            <input name=\"tf_type_label\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"type_insert\" />
-            <input type=\"submit\" name=\"sub_type\" value=\"$l_type_insert\"
-              onclick=\"if (check_type_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>";
+  <div class=\"detail admin\" >
+  <form id=\"form_type_update\" action=\"?action=type_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_type_label\" value=\"\" />
+  <input type=\"hidden\" name=\"type\" value=\"\" />
+  </form>    
+  <h1>$l_type_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_label</td>
+  <td>&nbsp;</td>        
+  </tr>    
+  </thead>
+  <tbody>
+  $type_list
+  </tbody>
+  </table>
+  </div>    
+  <form id=\"form_type_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_c_new</td>
+  </tr>
+  <tbody>   
+  <tr>
+  <td>$l_label</td>    
+  </tr>       
+  <tr>
+  <td><input type=\"text\" name=\"tf_type_label\" value=\"\" /></td>    
+  </tr>  
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_type_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"type_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"type\" />
+  </form>
+  </div>";
 
   return $block;
 }
@@ -1012,40 +1018,24 @@ function dis_publication_type_links($publication) {
   $nb_type = $obm_q->num_rows();
   if ($nb_type > 0) {
     $delete_ok = false;
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_type_link_publication ($nb_type)</td>
-    </tr>";
+    $dis_link = "<h1>$label : $l_type_link_publication ($nb_type)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $cid = $obm_q->f("publication_id");
       $cname = $obm_q->f("publication_title");
-      $dis_link .="
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
+      $dis_link .="<a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$cid") . "\">$cname</a>";
     }
     if ($cpt < $nb_type) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+      $dis_link .= "...";
     }
 
   } else {
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_type_link_publication_no</td>
-    </tr>";
+    $dis_link = "<h1>$label : $l_type_link_publication_no</h1>";
   }
 
-  $block .= "<table class=\"detail\">
-    $dis_link
-    </table>";
+  $block .= "$dis_link";
 
   $dis_back = "<form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("publication_index.php") . "\">
@@ -1062,15 +1052,15 @@ function dis_publication_type_links($publication) {
         <input type=\"submit\" name=\"sub_type\" value=\"$l_type_delete\" />
         </form>";
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_del
+        $dis_back
       </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_type_cant_delete);
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_back
       </div>";
   }
 
@@ -1085,91 +1075,90 @@ function dis_publication_type_links($publication) {
 //   - $recept_q : Renewal list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_subscription_reception_form($recept_q) {
-  global $l_recept_manage,$l_recept_exist;
+  global $l_recept_manage,$l_recept_exist,$ico_ok,$ico_delete;
   global $l_recept_checkdelete,$l_recept_update,$l_recept_new,$l_recept_insert;
 
-  $sel_recept = "<select name=\"sel_recept\" onChange=\"
-    forms.form_recept_update.tf_recept_label.value=this.options[this.selectedIndex].text;
-		forms.form_recept_update.tf_recept.value=this.options[this.selectedIndex].value;\"
-    size=\"4\" >";
-  while ($recept_q->next_record()) {
-    $id = $recept_q->f("subscriptionreception_id");
-    $label = $recept_q->f("subscriptionreception_label");
-    $sel_recept .= "\n<option value=\"$id\">$label</option>";
-  }
-  $sel_recept .= "</select>";
+ $char_title = '=';
+$key = 0;
+while ($recept_q->next_record()) {
+  $id = $recept_q->f("subscriptionreception_id");
+  $label = $recept_q->f("subscriptionreception_label");
 
+  if($key%2 == 0) {
+    $class = "class=\"pair\"";
+  } else {
+    $class = "";
+  }
+  $c_label = htmlentities($one_cat["label"]);
+  $recept_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"recept_$id\" value=\"$id\" />
+    <a href=\"?action=recept_checklink&amp;category=recept&amp;recept=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_recept_checkdelete\" title=\"$l_recept_checkdelete\" />
+    </a></td>
+    <td> <input type=\"text\" id=\"tf_recept_label_$id\" value=\"$label\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'recept');\">
+    <img src=\"$ico_ok\" alt=\"$l_recept_update\" title=\"$l_recept_update\" />
+    </a>
+    </td>
+    </tr>
+    ";    
+}
+
+ 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_recept_manage
-      </td>
-    </tr><tr>
-      <td>
 
-<!-- Kind Check Delete Section -->
 
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_recept_delete\" method=\"post\"
-              action=\"" . url_prepare("publication_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_recept_exist</td>
-              <td class=\"adminLabel\">$sel_recept</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"recept_checklink\" />
-              <input type=\"submit\" name=\"sub_recept\" value=\"$l_recept_checkdelete\" onclick=\"if (check_recept_checkdel(this.form)) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
 
-<!-- Kind Update Section -->
-
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_recept_update\" method=\"get\"
-              action=\"" . url_prepare("publication_index.php") . "\">
-            <input type=\"hidden\" name=\"tf_recept\" />
-            <input type=\"hidden\" name=\"action\" value=\"recept_update\" />
-            <input type=\"text\" name=\"tf_recept_label\" />
-            <input type=\"submit\" name=\"sub_recept\" value=\"$l_recept_update\"
-              onclick=\"if (check_recept_upd(this.form,document.form_recept_delete)) return true; else return false;\" />
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td>
-
-<!-- New Kind Section -->
-
-        <form name=\"form_recept_new\" method=\"get\"
-          action=\"" . url_prepare("publication_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_recept_new :
-            <input name=\"tf_recept_label\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"recept_insert\" />
-            <input type=\"submit\" name=\"sub_recept\" value=\"$l_recept_insert\"
-              onclick=\"if (check_recept_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>";
+ <div class=\"detail admin\" >
+  <form id=\"form_recept_update\" action=\"?action=recept_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_recept_label\" value=\"\" />
+  <input type=\"hidden\" name=\"recept\" value=\"\" />
+  </form>    
+  <h1>$l_recept_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_label</td>
+  <td>&nbsp;</td>        
+  </tr>    
+  </thead>
+  <tbody>
+  $recept_list
+  </tbody>
+  </table>
+  </div>    
+  <form id=\"form_recept_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_c_new</td>
+  </tr>
+  <tbody>   
+  <tr>
+  <td>$l_label</td>    
+  </tr>       
+  <tr>
+  <td><input type=\"text\" name=\"tf_recept_label\" value=\"\" /></td>    
+  </tr>  
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_recept_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"recept_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"recept\" />
+  </form>
+  </div>";
 
   return $block;
 }
@@ -1359,12 +1348,12 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
       $display_write = "
     <td class=\"resultText\">
       <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_update\" />
+      <img src=\"$ico_update\" />
       </a>
     </td>    
     <td class=\"resultText\">
       <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_delete','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" />
+      <img src=\"$ico_crow\" />
       </a>
       </td>";
     }
