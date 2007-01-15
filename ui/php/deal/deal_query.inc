@@ -1536,8 +1536,8 @@ function run_query_deal_type() {
 function run_query_deal_kind_insert($deal) {
   global $auth, $cdg_sql, $obm;
 	
-  $label = $deal["label"];
-  $inout = $deal["inout"];
+  $label = $deal["kind_label"];
+  $inout = $deal["kind_inout"];
   $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO DealType (dealtype_timeupdate,
@@ -1569,9 +1569,9 @@ function run_query_deal_kind_insert($deal) {
 function run_query_deal_kind_update($deal) {
   global $auth, $cdg_sql;  
 
-  $label = $deal["label"];
-  $kind = $deal["kind_id"];
-  $inout = $deal["inout"];
+  $label = $deal["kind_label"];
+  $kind = $deal["kind"];
+  $inout = $deal["kind_inout"];
   $multidomain = sql_multidomain("deal");
 	
   $query = "UPDATE DealType SET
@@ -1657,9 +1657,9 @@ function run_query_deal_status_list() {
 function run_query_deal_status_insert($deal) {
   global $auth, $cdg_sql, $obm;
 	
-  $label = $deal["label"];
-  $order = $deal["order"];
-  $hitrate = $deal["hitrate"];
+  $label = $deal["status_label"];
+  $order = $deal["status_order"];
+  $hitrate = $deal["status_hitrate"];
   $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO DealStatus (dealstatus_timeupdate,
@@ -1693,10 +1693,10 @@ function run_query_deal_status_insert($deal) {
 function run_query_deal_status_update($deal) {
   global $auth, $cdg_sql;
 
-  $status = $deal["status_id"];
-  $label = $deal["label"];
-  $order = $deal["order"];
-  $hitrate = $deal["hitrate"];
+  $status = $deal["status"];
+  $label = $deal["status_label"];
+  $order = $deal["status_order"];
+  $hitrate = $deal["status_hitrate"];
   $multidomain = sql_multidomain("dealstatus");
 	
   $query = "UPDATE DealStatus SET

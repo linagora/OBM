@@ -137,7 +137,7 @@ function dis_logout_detail() {
   <td align=\"center\">&nbsp;</td>
 </tr>
 <tr>
-  <td align=\"center\" colspan=\"4\"><hr></td>
+  <td align=\"center\" colspan=\"4\"><hr /></td>
 </tr>
 </table>
 

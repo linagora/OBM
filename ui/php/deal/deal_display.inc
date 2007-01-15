@@ -620,7 +620,7 @@ function html_deal_links($deal_q) {
     $plabel = get_deal_parent_label($pid);
     $url_pdeal = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;parentdeal_id=$pid");
     $dis_pdeal = "
-    <li><a href=\"$url_pdeal\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_pdeal\" alt=\"\" /></a>
+    <li><a href=\"$url_pdeal\"><img src=\"$ico_pdeal\" alt=\"\" /></a>
         <a href=\"$url_pdeal\">$l_parentdeal ($plabel)</a></li>";
   }
   $url_pdeal_upd = url_prepare("$path/deal/deal_index.php?action=affect&amp;parentdeal_id=$pid&amp;deal_id=$id");
@@ -632,14 +632,14 @@ function html_deal_links($deal_q) {
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;deal_id=$id");
     $url_pro_arch = url_prepare("$path/project/project_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
     $dis_ico_project = "
-        <li><a href=\"$url_pro\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
+        <li><a href=\"$url_pro\"><img src=\"$ico_project\" alt=\"\" /></a>
             $l_module_project (<a href=\"$url_pro\">$nb_pro</a> / <a href=\"$url_pro_arch\">$nb_pro_arch</a>)</li>";
 
     // New project allowed only if hitrate = 100
     if ($hitrate == "100") {
       $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;deal_id=$id&amp;deal_label=$label&amp;company_id=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
       $dis_ico_project .= "
-        <li><a href=\"$url_pro_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
+        <li><a href=\"$url_pro_new\"><img src=\"$ico_project\" alt=\"\" /></a>
             <a href=\"$url_pro_new\">$l_new</a></li>";
     }
     
@@ -657,7 +657,7 @@ function html_deal_links($deal_q) {
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id");
     $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
     $dis_contract = "
-    <li><a href=\"$url_contract\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
+    <li><a href=\"$url_contract\"><img src=\"$ico_contract\" alt=\"\" /></a>
         $l_module_contract (
         <a href=\"$url_contract\">$contract_active</a> /
         <a href=\"$url_contract_total\">$contract_total</a> )</li>";
@@ -666,7 +666,7 @@ function html_deal_links($deal_q) {
     if ($hitrate == "100") {
       $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;deal_id=$id&amp;company_id=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
       $dis_contract .= "
-      <li><a href=\"$url_contract_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
+      <li><a href=\"$url_contract_new\"><img src=\"$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract_new\">$l_new</a></li>";
     }
     $block_contract = "
@@ -683,7 +683,7 @@ function html_deal_links($deal_q) {
     $nb_inv_tot = get_global_linked_invoice_nb($id, "deal", 1);
     $nb_inv = get_global_linked_invoice_nb($id, "deal");
     $dis_invoice = "
-    <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv\"><img src=\"$ico_invoice\" alt=\"\" /></a>
         $l_module_invoice (<a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a>)</li>";
 
@@ -691,7 +691,7 @@ function html_deal_links($deal_q) {
     if ($hitrate == "100") {
       $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;deal_id=$id&amp;deal_label=$ulabel&amp;company_id=$cid&amp;company_name=$uname");
       $dis_invoice .= "
-    <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv_new\"><img src=\"$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>";
     }
     $block_invoice = "
@@ -710,13 +710,13 @@ function html_deal_links($deal_q) {
     $block_doc = "
   <h1> $l_module_document</h1>
   <ul>
-    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
+	 \"><img src=\"$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_deal'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>";
@@ -728,7 +728,7 @@ function html_deal_links($deal_q) {
   <h1> $l_parentdeal</h1>
   <ul>
     $dis_pdeal
-    <li><a href=\"$url_pdeal_upd\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"\" /></a>
+    <li><a href=\"$url_pdeal_upd\"><img src=\"$ico_deal\" alt=\"\" /></a>
         <a href=\"$url_pdeal_upd\">$l_affect_deal</a></li>
   </ul>
   </div>
@@ -859,150 +859,141 @@ function html_deal_consult($deal_q, $dc="") {
       $dis_dc .= "
         <div>
           <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$dc_cid")."\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a> $dc_cname : $dc_role
+        <img src=\"$ico_company\" alt=\"[details]\" /></a> $dc_cname : $dc_role
         </div>";
     }
   }
 
 
   $block = "
-    <table width=\"100%\">
-    <tr>
-      <td valign=\"top\">
+    <div class=\"detail infos\">
+    <h1>$l_deal</h1>
 
-    <div class=\"detailHead\">$l_deal</div>
-
-      <table class=\"detail\">
+      <table>
       <tr>
-        <td class=\"detailLabel\">$l_label</td>
-        <td class=\"detailText\">$label</td>
+        <th>$l_label</th>
+        <td>$label</td>
       </tr>
       <tr>
-        <td class=\"detailLabel\">$l_number</td>
-        <td class=\"detailText\">$num</td>
+        <th>$l_number</th>
+        <td>$num</td>
       </tr>
       <tr>
-        <td class=\"detailLabel\">$l_kind</td>
-        <td class=\"detailText\">$kind</td>
+        <th>$l_kind</th>
+        <td>$kind</td>
       </tr>
       <tr>
-        <td class=\"detailLabel\">$l_tt</td>
-        <td class=\"detailText\">$tt_label</td>
+        <th>$l_tt</th>
+        <td>$tt_label</td>
       </tr>
       <tr>
-        <td class=\"detailLabel\">$l_region</td>
-        <td class=\"detailText\">$region_label</td>
+        <th>$l_region</th>
+        <td>$region_label</td>
       </tr>
       <tr>
-        <td class=\"detailLabel\">$l_source</td>
-        <td class=\"detailText\">$source_label : $source</td>
+        <th>$l_source</th>
+        <td>$source_label : $source</td>
       </tr>
       <tr>
-        <td class=\"detailLabel\">$l_commission_p</td>
-        <td class=\"detailText\">$commission</td>
+        <th>$l_commission_p</th>
+        <td>$commission</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_marketing_manager</td>
-        <td class=\"detailText\">$market</td>
+        <th>$l_marketing_manager</th>
+        <td>$market</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_technical_manager</td>
-        <td class=\"detailText\">$tech</td>
+        <th>$l_technical_manager</th>
+        <td>$tech</td>
       </tr>
       </table>
+      </div>
 
-    <div class=\"detailHead\">$l_dates</div>
+    <div class=\"detail infos\">
+    <h1>$l_dates</h1>
 
-      <table class=\"detail\">
+      <table>
       <tr>
-        <td class=\"detailLabel\">$l_begin</td>
-        <td class=\"detailText\">$datebegin</td>
+        <th>$l_begin</th>
+        <td>$datebegin</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_proposal</td>
-        <td class=\"detailText\">$datepro</td>
+        <th>$l_proposal</th>
+        <td>$datepro</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_expected</td>
-        <td class=\"detailText\">$dateexpected $quarter_exp</td>
+        <th>$l_expected</th>
+        <td>$dateexpected $quarter_exp</td>
       </tr>
       <tr>
-        <td class=\"detailLabel\">$l_end</td>
-        <td class=\"detailText\">$dateend $quarter_end</td>
+        <th>$l_end</th>
+        <td>$dateend $quarter_end</td>
       </tr>
       <tr>
-        <td class=\"detailLabel\">$l_sale_delay</td>
-        <td class=\"detailText\">$sale_delay</td>
+        <th>$l_sale_delay</th>
+        <td>$sale_delay</td>
       </tr>
       </table>
+      </div>
 
-    </td>
-    <td valign=\"top\">
+     <div class=\"detail infos\">
+     <h1>$l_relation</h1>
 
-    <div class=\"detailHead\">$l_relation</div>
-
-      <table class=\"detail\">
+      <table>
       <tr>
-        <td class=\"detailLabel\">$l_company</td>
-        <td class=\"detailText\"><a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id")."\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a> $comp<br />$ad1<br/>$zip $town</td>
+        <th>$l_company</th>
+        <td><a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id")."\">
+        <img src=\"$ico_company\" alt=\"[details]\" /></a> $comp<br />$ad1<br/>$zip $town</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_contact 1</td>
-        <td class=\"detailText\"><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1") . "\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[details]\" /></a> $dis_con1 - $phone_con1
+        <th>$l_contact 1</th>
+        <td><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1") . "\">
+        <img src=\"$ico_contact\" alt=\"[details]\" /></a> $dis_con1 - $phone_con1
         </td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_contact 2</td>
-        <td class=\"detailText\"><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2") . "\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[details]\" /></a> $dis_con2 - $phone_con2
+        <th>$l_contact 2</th>
+        <td><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2") . "\">
+        <img src=\"$ico_contact\" alt=\"[details]\" /></a> $dis_con2 - $phone_con2
         </td>
       </tr>
       <tr>
-        <td class=\"detailLabel\">$l_other_relation</td>
-        <td class=\"detailText\">$dis_dc</td>
+        <th>$l_other_relation</th>
+        <td>$dis_dc</td>
       </tr>
       </table>
+      </div>
 
-    <div class=\"detailHead\">$l_status</div>
+     <div class=\"detail extra\">
+     <h1>$l_status</h1>
 
-      <table class=\"detail\">
+      <table>
       <tr>
-        <td class=\"detailLabel\">$l_archive</td>
-        <td class=\"detailText\">$archive</td>
+        <th>$l_archive</th>
+        <td>$archive</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_alarm</td>
-        <td class=\"detailText\">$datealarm</td>
+        <th>$l_alarm</th>
+        <td>$datealarm</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_status</td>
-        <td class=\"detailText\">$status</td>
+        <th>$l_status</th>
+        <td>$status</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_hitrate</td>
-        <td class=\"detailText\">$hitrate %</td>
+        <th>$l_hitrate</th>
+        <td>$hitrate %</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_amount</td>
-        <td class=\"detailText\">$amount</td>
+        <th>$l_amount</th>
+        <td>$amount</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_todo</td>
-        <td class=\"detailText\">$todo</td>
+        <th>$l_todo</th>
+        <td>$todo</td>
       </tr>
       </table>
+     </div>
 
-      </td>
-    </tr><tr>
-   <td colspan=\"2\">
-      
+      <div class=\"detail infos\"> 
       $block_userdata
+      </div>
       
-      <tr>
-    <td colspan=\"2\">
 
-    <div class=\"detailHead\">$l_comment</div>
-
-      <table class=\"detail\">
-      <tr>
-        <td colspan=\"2\" class=\"detailText\">$com</td>
-      </tr>
-      </table>
-
-      </td>
-    </tr>
-    </table>";
+    <div class=\"detail extra\">
+    <h1>$l_comment</h1>
+      $com
+    </div>
+    ";
 
   return $block;
 }
@@ -1312,7 +1303,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
       <input type=\"hidden\" name=\"data_dccname_$cpt\" value=\"$dc_cname\" />
       <input type=\"hidden\" name=\"data_dccnewid_$cpt\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.data_dccnewid_$cpt&amp;ext_widget_text=f_entity.data_dccnewname_$cpt','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-      <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
+      <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"data_dccnewname_$cpt\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </div>";
     }
@@ -1327,7 +1318,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
       <input type=\"hidden\" name=\"data_dccname_$cpt\" value=\"\" />
       <input type=\"hidden\" name=\"data_dccnewid_$cpt\" value=\"\" />
       <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.data_dccnewid_$cpt&amp;ext_widget_text=f_entity.data_dccnewname_$cpt','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-      <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
+      <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"data_dccnewname_$cpt\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </div>";
 
@@ -1396,11 +1387,8 @@ $js_status_loop
   //  if (($action == "detailupdate") || ($action == "update")) {
   if ($comment != "") {
     $dis_comment = "
-      </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment</td>
-        <td>&nbsp;</td>
-      </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        $l_upd_comment
+        <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>
     ";
   }
 
@@ -1411,18 +1399,18 @@ $js_status_loop
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert \" />";
     $dis_priv = "
-             <td class=\"detailLabel\">$l_private</td>
-             <td class=\"detailForm\"><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
+             <th>$l_private</th>
+             <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
     if ($priv == 1) $dis_priv .= "checked = \"checked\"";
     $dis_priv .= " /></td></tr><tr>";
   }
 
   if ($action == "detailupdate") {
     $dis_contact_2 = "<a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2")."\">
-             <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[details]\" />
+             <img src=\"$ico_contact\" alt=\"[details]\" />
              </a>";
     $dis_contact_1 = "<a href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1")."\">
-             <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[details]\" />
+             <img src=\"$ico_contact\" alt=\"[details]\" />
              </a>";
   }
   if (($action == "detailupdate") || ($action == "update")) {
@@ -1455,142 +1443,142 @@ $js_status_loop
       onsubmit=\"if (check_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
 
-  <div class=\"detailHead\">$l_relation</div>
-
-    <table class=\"detail\">
+  <fieldset class=\"detail infos\">
+  <legend>$l_relation</legend>
+    <table>
     <tr>
-      <td class=\"detailLabel\">
+      <th>
       $l_company
-      </td>
-      <td class=\"detailText\">
+      </th>
+      <td>
         <a href=\"" . url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id") . "\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+        <img src=\"$ico_company\" alt=\"[details]\" /></a>
         $comp
         $ad1
         <br />$zip $town 
       </td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_contact 1</td>
-      <td class=\"detailForm\">$dis_contact_1 $sel_con1</td>
+      <th>$l_contact 1</th>
+      <td>$dis_contact_1 $sel_con1</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_contact 2</td>
-      <td class=\"detailForm\">$dis_contact_2 $sel_con2</td>
+      <th>$l_contact 2</th>
+      <td>$dis_contact_2 $sel_con2</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_other_relation <a href=\"\" onclick=\"add_DC_line();return false\">+</a></td>
-      <td class=\"detailForm\" id=\"dc_container\">$dis_dc</td>
+      <th>$l_other_relation <a href=\"\" onclick=\"add_DC_line();return false\">+</a></th>
+      <td id=\"dc_container\">$dis_dc</td>
     </tr>
     </table>
+    </fieldset>
+    
+  <fieldset class=\"detail infos\">
+  <legend>$l_deal</legend>
 
-  <div class=\"detailHead\">$l_deal</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
       $dis_priv
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailForm\"><input name=\"tf_label\" type=\"text\" maxlength=\"128\" size=\"40\" value=\"$label\" /></td>
+      <th>$l_label</th>
+      <td><input name=\"tf_label\" type=\"text\" maxlength=\"128\" size=\"40\" value=\"$label\" /></td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_number</td>
-        <td class=\"detailForm\"><input type=\"text\" name=\"tf_num\" size=\"40\" maxlength=\"32\" value=\"$num\" /></td>
+        <th>$l_number</th>
+        <td><input type=\"text\" name=\"tf_num\" size=\"40\" maxlength=\"32\" value=\"$num\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailForm\">$sel_kind</td>
+      <th>$l_kind</th>
+      <td>$sel_kind</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_tt</td>
-      <td class=\"detailForm\">$sel_tt</td>
+      <th>$l_tt</th>
+      <td>$sel_tt</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_region</td>
-      <td class=\"detailForm\">$sel_region</td>
+      <th>$l_region</th>
+      <td>$sel_region</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_source</td>
-      <td class=\"detailForm\">$sel_source <input type=\"text\" name=\"tf_source\" size=\"40\" maxlength=\"64\" value=\"$source\" /></td>
+      <th>$l_source</th>
+      <td>$sel_source <input type=\"text\" name=\"tf_source\" size=\"40\" maxlength=\"64\" value=\"$source\" /></td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_commission_p</td>
-      <td class=\"detailForm\"><input name=\"tf_commission\" type=\"text\" size=\"5\" value=\"$commission\" /> %</td>
+      <th>$l_commission_p</th>
+      <td><input name=\"tf_commission\" type=\"text\" size=\"5\" value=\"$commission\" /> %</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_marketing_manager</td>
-      <td class=\"detailForm\">$sel_market</td>
+      <th>$l_marketing_manager</th>
+      <td>$sel_market</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_technical_manager</td>
-      <td class=\"detailForm\">$sel_tech</td>
+      <th>$l_technical_manager</th>
+      <td>$sel_tech</td>
     </tr>
     </table>
+    </fieldset>
 
-  <div class=\"detailHead\">$l_dates</div>
+  <fieldset class=\"detail infos\">
+  <legend>$l_dates</legend>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_begin</td>
-      <td class=\"detailForm\"><script>calendar('tf_datebegin','$datebegin')</script></td>
+      <th>$l_begin</th>
+      <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_proposal</td>
-      <td class=\"detailForm\"><script>calendar('tf_dateproposal','$dateprop')</script></td>
+      <th>$l_proposal</th>
+      <td><input type=\"text\" name=\"tf_dateproposal\" value=\"$dateprop\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_expected</td>
-      <td class=\"detailForm\"><script>calendar('tf_dateexpected','$dateexpected')</script></td>
+      <th>$l_expected</th>
+      <td><input type=\"text\" name=\"tf_dateexpected\" value=\"$dateexpected\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_end</td>
-      <td class=\"detailForm\"><script>calendar('tf_dateend','$dateend')</script></td>
+      <th>$l_end</th>
+      <td>
+      <input type=\"text\" name=\"tf_dateend\" value=\"$dateend\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_amount</td>
-      <td class=\"detailForm\"><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
+      <th>$l_amount</th>
+      <td><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_hitrate</td>
-      <td class=\"detailForm\"><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
+      <th>$l_hitrate</th>
+      <td><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
     </tr>
-    <tr>
      $block_userdata
-    </tr>
     </table>
-   </table>
+   </fieldset>
 
-  <div class=\"detailHead\">$l_status</div>
+  <fieldset class=\"detail infos\">
+  <legend>$l_status</legend>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_alarm</td>
-      <td class=\"detailForm\"><script>calendar('tf_datealarm','$datealarm')</script></td>
+      <th>$l_alarm</th>
+      <td><input type=\"text\" name=\"tf_datealarm\" value=\"$datealarm\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_status</td>
+      <th>$l_status</th>
       <td class=\"detailForm\">$sel_status</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_todo</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
+      <th>$l_todo</th>
+      <td><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
+      <th>$l_archive</th>
+      <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
     </tr>
     </table>
+    </fieldset>
 
-  <div class=\"detailHead\">$l_comment</div>
+   <fieldset class=\"detail extra\">
+   <legend>$l_comment</legend>
 
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\">
-        <script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_mail_comment</td>
-      <td class=\"detailForm\">
+      $l_add_comment
+      <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
+      $sel_usercomment
+      $l_mail_comment
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
-      </td>
-    </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+     <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
       $dis_comment
-    </tr>
-    </table>
+  </fieldset>
+ 
 
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_button1</p>   
-    </div>
+    <fieldset class=\"buttons\">
+      $dis_button1   
+    </fieldset>
     </form>
 ";
 
@@ -1738,59 +1726,50 @@ $js_status_loop
       onsubmit=\"if (check_quick_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
 
-  <div class=\"detailHead\">$l_status</div>
+  <fieldset class=\"detail extra\">
+  <legend>$l_status</legend>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_alarm</td>
-      <td class=\"detailForm\"><script>calendar('tf_datealarm','$datealarm')</script></td>
+      <th>$l_alarm</th>
+      <td><input type=\"text\" name=\"tf_datealarm\" value=\"$datealarm\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_status</td>
-      <td class=\"detailForm\">$sel_status</td>
+      <th>$l_status</th>
+      <td>$sel_status</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_todo</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
+      <th>$l_todo</th>
+      <td><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_hitrate</td>
-      <td class=\"detailForm\"><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
+      <th>$l_hitrate</th>
+      <td><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_expected</td>
-      <td class=\"detailForm\"><script>calendar('tf_dateexpected','$dateexp')</script></td>
-    </tr>
-    </table>
-
-  <div class=\"detailHead\">$l_comment</div>
-
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\">
-      <script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_mail_comment</td>
-      <td class=\"detailForm\">
-        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
-        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
-        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
-      </td>
-    </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"8\" cols=\"78\">$add_comment</textarea></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_upd_comment</td>
-      <td>&nbsp;</td>
-    </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"8\" cols=\"78\">$comment</textarea></td>
+      <th>$l_expected</th>
+      <td><input type=\"text\" name=\"tf_dateexp\" value=\"$dateexp\" class=\"datePicker\"/></td>
     </tr>
     </table>
+    </fieldset>
 
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">
+  <fieldset class=\"detail extra\">
+  <legend>$l_comment</legend>
+
+   $l_add_comment
+      <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
+      $sel_usercomment
+    $l_mail_comment
+     <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
+     <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
+     <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
+     <textarea name=\"ta_add_comment\" rows=\"8\" cols=\"78\">$add_comment</textarea>
+     $l_upd_comment
+     <textarea name=\"ta_comment\" rows=\"8\" cols=\"78\">$comment</textarea>
+  </fieldset>
+
+    <fieldset class=\"buttons\">
         <input type=\"hidden\" name=\"action\" value=\"quick_update\" />
         <input type=\"hidden\" name=\"deal_id\" value=\"$id\" />
         <input type=\"submit\" value=\"$l_update\" />
-      </p>   
-    </div>
+     </fieldset>
     </form>
 ";
 
@@ -1825,9 +1804,9 @@ function dis_deal_can_delete_deal($p_id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-    <p class=\"detailButtons\">$dis_back</p>
+    <div class=\"buttons\">
+    $dis_delete
+    $dis_back
     </div>";
 
   return $block;
@@ -2486,7 +2465,6 @@ function dis_deal_admin_index() {
   $block = html_deal_admin_form($kind_q, $status_q);
 
   $roles = of_category_get_ordered("DealCompany", "role");
-  $block .= "<hr />";
   $block .= of_category_dis_admin_form("role", $roles);
 
   // User defined data
@@ -2505,246 +2483,207 @@ function dis_deal_admin_index() {
 function html_deal_admin_form($kind_q, $status_q) {
    // Labels : 
   global $l_kind_manage,$l_kind_new,$l_kind_exist;
-  global $l_status_manage,$l_status_exist,$l_status_new;
-  global $l_label,$l_minus,$l_plus,$l_order;
+  global $l_status_manage,$l_status_exist,$l_status_new,$l_c_new;
+  global $l_kind_label,$l_minus,$l_plus,$l_order,$ico_delete,$ico_ok;
   // Actions : 
   global $l_kind_checkdelete, $l_kind_update, $l_kind_insert;
   global $l_status_checkdelete,$l_status_update,$l_status_insert, $l_hitrate;
 
-  // Kind Select construction
-  $sel_kind = "<select name=\"sel_kind_id\" onChange=\"
-    mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf(' ');
-    forms.form_kind_update.tf_label.value=mytext.substr(pos+1);
-    pos = 0;
-    sign = mytext.substr(0,1);
-    if (sign == '+') { pos = 1; }
-    forms.form_kind_update.rd_inout[pos].checked=true;\"
-    size=\"4\">";
+
+
+
+  $char_title = '=';
+  $key = 0;
   while ($kind_q->next_record()) {
-    $k_id = $kind_q->f("dealtype_id");
+    $id = $kind_q->f("dealtype_id");
     $inout = $kind_q->f("dealtype_inout");
     $label = $kind_q->f("dealtype_label");
-    $sel_kind .= "<option value=\"$k_id\">$inout $label</option>\n";
+   
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
+    }
+    $c_label = htmlentities($one_cat["label"]);
+    $kind_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"kind_$id\" value=\"$id\" />
+    <a href=\"?action=kind_checklink&amp;category=kind&amp;kind=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_kind_checkdelete\" title=\"$l_kind_checkdelete\" />
+    </a></td>
+    <td><input type=\"text\" id=\"tf_kind_inout_$id\" value=\"$inout\" size=\"6\"/></td>
+    <td><input type=\"text\" id=\"tf_kind_label_$id\" value=\"$label\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'kind');\">
+    <img src=\"$ico_ok\" alt=\"$l_kind_update\" title=\"$l_kind_update\" />
+    </a>
+    </td>
+    </tr>";
   }
-  $sel_kind .= "</select>";
 
-  // status select construction
-  $sel_sta = "<select name=\"sel_status_id\" onChange=\"
-    mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf('(');
-    hit = mytext.substr(pos+1);
-    pos2 = hit.indexOf(')');
-    hit = hit.substr(0,pos2);
-    mytext = mytext.substr(0, pos);
-    pos = mytext.indexOf('-');
-    forms.form_status_update.tf_label.value=mytext.substr(pos+1);
-    forms.form_status_update.tf_order.value=mytext.substr(0,pos);
-    forms.form_status_update.tf_hitrate.value=hit;\"
-    size=\"4\">";
+  $char_title = '=';
+  $key = 0;
   while ($status_q->next_record()) {
-    $s_id = $status_q->f("dealstatus_id");
+
+    $id = $status_q->f("dealstatus_id");
     $order = $status_q->f("dealstatus_order");
     $label = $status_q->f("dealstatus_label");
     $hitrate = $status_q->f("dealstatus_hitrate");
-    $sel_sta .= "<option value=\"$s_id\">$order-$label ($hitrate)</option>\n";
+   
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
+    }
+    $c_label = htmlentities($one_cat["label"]);
+    $sta_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"status_$id\" value=\"$id\" />
+    <a href=\"?action=status_checklink&amp;category=status&amp;status=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_status_checkdelete\" title=\"$l_status_checkdelete\" />
+    </a></td>
+    <td><input type=\"text\" id=\"tf_status_order_$id\" value=\"$order\" size=\"6\"/></td>
+    <td><input type=\"text\" id=\"tf_status_label_$id\" value=\"$label\" /></td>
+    <td><input type=\"text\" id=\"tf_status_hitrate_$id\" value=\"$hitrate\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'status');\">
+    <img src=\"$ico_ok\" alt=\"$l_status_update\" title=\"$l_status_update\" />
+    </a>
+    </td>
+    </tr>";
   }
-  $sel_sta .= "</select>";
-
 
   $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">$l_kind_manage</td>
-    </tr>
-    <tr>
-      <td>
-        <table>
-        <tr>
-         <td colspan=\"3\">
-    <form name=\"form_kind_delete\"
-      method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
 
-<!-- kind delete section -->
+ <div class=\"detail admin\" >
+  <form id=\"form_kind_update\" action=\"?action=kind_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_kind_inout\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_kind_label\" value=\"\" />
+  <input type=\"hidden\" name=\"kind\" value=\"\" />
+  </form>    
+  <h1>$l_kind_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_minus $l_plus</td>
+  <td>$l_kind_label</td>
+  <td>&nbsp;</td>  
+  </tr>    
+  </thead>
+  <tbody>
+  $kind_list
+  </tbody>
+  </table>
+  </div>  
 
-       <table>
-        <tr>
-          <td class=\"adminLabel\">$l_kind_exist</td>
-          <td class=\"adminLabel\">$sel_kind</td>
-          <td>
-            <input type=\"hidden\" name=\"action\" value=\"kind_checklink\" />
-            <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_checkdelete\"
-              onclick=\"if (check_kind_checkdel(this.form)) return true;
-              else return false;\" />
-          </td>
-        </tr>
-        </table>
-    </form>
-          </td>
-        </tr>
-
-<!-- kind update section -->
-
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-    <form name=\"form_kind_update\"
-      method=\"get\" action=\"" . url_prepare("deal_index.php") . "\">
-       <table>
-         <tr>
-          <td>
-            <input type=\"hidden\" name=\"sel_kind_id\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
-            <input type=\"text\" name=\"tf_label\" />
-          </td>
-           <td rowspan=\"2\">
-            <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_update\"
-              onclick=\"if (check_kind_upd(this.form,document.form_kind_delete)) return true; else return false;\" />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type=\"radio\" name=\"rd_inout\" value=\"-\" checked=\"checked\" />$l_minus
-            <input type=\"radio\" name=\"rd_inout\" value=\"+\" />$l_plus
-          </td>
-        </tr>   
-       </table>
-     </form>
-      </td>
-          <td>&nbsp;</td>
-      </tr>
-     </table>
-      </td>
-
-<!-- New Kind Section -->
-
-      <td>
-    <form name=\"form_kind_new\"
-      method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_kind_new : <input name=\"tf_label\" /></td>
-        <td>
-          <input type=\"radio\" name=\"rd_inout\" value=\"-\" checked=\"checked\" />$l_minus<br />
-          <input type=\"radio\" name=\"rd_inout\" value=\"+\" />$l_plus
-        </td>
-      </tr><tr>
-        <td class=\"adminLabel\">
-          <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
-          <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_insert\"
-            onclick=\"if (check_kind_new(this.form)) return true; else return false;\" />
-        </td>
-      </tr>
-      </table>
-    </form>
-      </td>
-    </tr>
-    </table>
-
-<!-- status section -->
-
-    <hr />
-
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">$l_status_manage</td>
-    </tr>
-    <tr>
-      <td>
-
-<!-- status delete section -->
-
-        <table>
-        <tr>
-         <td colspan=\"3\">
-          <form name=\"form_status_delete\"
-          method=\"post\" action=\"" . url_prepare("deal_index.php")."\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_status_exist</td>
-        <td class=\"adminLabel\">$sel_sta</td>
-        <td>
-          <input type=\"hidden\" name=\"action\" value=\"status_checklink\" />
-          <input type=\"submit\" name=\"sub_status\" value=\"$l_status_checkdelete\"
-          onclick=\"if (check_status_checkdel(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-         </form>
-        </td>
-      </tr>
-
-<!-- status update section -->
-
-      <tr>
-        <td colspan=\"2\">
-      <form name=\"form_status_update\"
-        method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
-          <input type=\"hidden\" name=\"sel_status_id\" value=\"\" />
-          <input type=\"hidden\" name=\"action\" value=\"status_update\" />
-          <table>
-          <tr>
-            <td class=\"adminLabel\">$l_label : </td>
-            <td><input type=\"text\" name=\"tf_label\" /></td>
-            <td rowspan=\"3\">
-              <input type=\"submit\" name=\"sub_status\" value=\"$l_status_update\"
-              onclick=\"if (check_status_upd(this.form, document.form_status_delete)) return true; else return false;\" />
-            </td>
-          </tr>
-          <tr>
-            <td class=\"adminLabel\">$l_order : </td>
-            <td>
-	      <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
-	    </td>
-          </tr>
-          <tr>
-            <td class=\"adminLabel\">$l_hitrate : </td>
-            <td>
-	      <input type=\"text\" name=\"tf_hitrate\" size=\"3\" maxlength=\"3\" />
-	    </td>
-          </tr>
-          </table>
-      </form>
-        </td>
-          <td>&nbsp;</td>
-      </tr>
-      </table>
-      </td>
-      <td>
-
-<!-- new status section -->
-
-      <form name=\"form_status_new\"
-        method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_status_new : </td>
-          <td><input type=\"text\" name=\"tf_label\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_order : </td>
-          <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_hitrate : </td>
-          <td><input type=\"text\" name=\"tf_hitrate\" size=\"3\" maxlength=\"3\" /></td>
-        </tr>
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-          <input type=\"hidden\" name=\"action\" value=\"status_insert\" />
-          <input type=\"submit\" name=\"sub_status\" value=\"$l_status_insert\"
-            onclick=\"if (check_status_new(this.form)) return true; " .
-            "else return false;\" />
-        </td>
-      </tr>
-     </table>
-    </form>
-    </td>
-    </tr>
-    </table>
-
-    </td>
+  <form id=\"form_kind_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_c_new</td>
   </tr>
-  </table>";
+  <tbody>   
+  <tr>
+  <td>
+  &nbsp;
+  </td>
+  <td>$l_kind_label</td>    
+  </tr>
+  <tr>
+  <td>
+  <input type=\"radio\" name=\"rd_kind_inout\" value=\"-\" checked=\"checked\" />$l_minus
+  <input type=\"radio\" name=\"rd_kind_inout\" value=\"+\" />$l_plus
+  </td>
+  <td>
+  <input type=\"text\" name=\"tf_kind_label\" value=\"\" />
+  </td>
+  </tr>
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_kind_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"kind\" />
+  </form>
+  </div>
+
+
+
+
+ <div class=\"detail admin\" >
+  <form id=\"form_status_update\" action=\"?action=status_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_status_order\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_status_label\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_status_hitrate\" value=\"\" />
+  <input type=\"hidden\" name=\"status\" value=\"\" />
+  </form>    
+  <h1>$l_status_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_order</td>
+  <td>$l_status_exist</td>
+  <td>$l_hitrate</td>
+  <td>&nbsp;</td>  
+  </tr>    
+  </thead>
+  <tbody>
+  $sta_list
+  </tbody>
+  </table>
+  </div>  
+
+  <form id=\"form_status_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_c_new</td>
+  </tr>
+  <tbody>   
+  <tr>
+  <td>
+  $l_order
+  </td>
+  <td>
+  $l_status_new
+  </td>
+  <td>
+  $l_hitrate
+  </td> 
+  </tr>
+  <tr>
+  <td>
+  <input type=\"text\" name=\"tf_status_order\" value=\"\" />
+  </td>
+  <td>
+  <input type=\"text\" name=\"tf_status_label\" value=\"\" />
+  </td>
+  <td>
+  <input type=\"text\" name=\"tf_status_hitrate\" value=\"\" />
+  </td>
+  </tr>
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_status_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"status_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"status\" />
+  </form>
+  </div>";
 
   return $block;
 }
@@ -2766,28 +2705,17 @@ function dis_deal_kind_links($id) {
   $nb_kind = $obm_q->num_rows();
   if ($nb_kind > 0) {
     $delete_ok = false;
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_kind_link_deal ($nb_kind)</td>
-    </tr>";
+    $dis_link = "<li><h1>$label : $l_kind_link_deal ($nb_kind)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a>
-      </td>
-    </tr>";
+      $dis_link .= "<a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a></li>";
     }
     if ($cpt < $nb_kind) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+      $dis_link .= "<li>...</li>";
     }
 
   } else {
@@ -2797,9 +2725,11 @@ function dis_deal_kind_links($id) {
     </tr>";
   }
 
-  $block .= "<table class=\"detail\">
+  $block .= "<div class=\"detail\">
+   <ul>
    $dis_link
-   </table>";
+   </ul>
+   </div>";
 
   $dis_back = "<form name=\"form_back\" method=\"get\"
         action=\"" .url_prepare("deal_index.php") . "\">
@@ -2823,8 +2753,8 @@ function dis_deal_kind_links($id) {
   } else {
     $display["msg"] .= display_warn_msg($l_kind_cant_delete);
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_back
       </div>";
   }
 
@@ -3267,33 +3197,32 @@ function html_deal_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
   <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_parentdeal(this)) return true; else return false;\"
       action=\"" . url_prepare("deal_index.php") . "\">
+  
+  <fieldset class=\"detail extra\">
+  <legend>$l_parentdeal</legend>
 
-  <div class=\"detailHead\">$l_parentdeal</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailHead\">$l_label</td>
-      <td class=\"detailForm\"><input name=\"tf_plabel\" type=\"text\" size=\"40\" value=\"$plabel\" /></td>
+      <th>$l_label</th>
+      <td><input name=\"tf_plabel\" type=\"text\" size=\"40\" value=\"$plabel\" /></td>
     </tr><tr>
-      <td class=\"detailHead\">$l_marketing_manager</td>
-      <td class=\"detailForm\">$sel_market</td>
+      <th>$l_marketing_manager</th>
+      <td>$sel_market</td>
     </tr><tr>
-      <td class=\"detailHead\">$l_technical_manager</td>
-      <td class=\"detailForm\">$sel_tech</td>
+      <th>$l_technical_manager</th>
+      <td>$sel_tech</td>
     </tr>
     </table>
+  </fieldset>
 
-  <div class=\"detailHead\">$l_comment</div>
+  <fieldset class=\"detail extra\">
+  <legend>$l_comment</legend>
+  <textarea name=\"ta_pcom\" rows=\"8\" cols=\"72\">$pcomment</textarea>
+  </fieldset>  
 
-    <table class=\"detail\">
-    <tr>
-     <td class=\"detailForm\"><textarea name=\"ta_pcom\" rows=\"8\" cols=\"72\">$pcomment</textarea></td>
-    </tr>
-    </table>
-
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_button</p>
-    </div>
+    <fieldset class=\"buttons\">
+      $dis_button
+    </fieldset>
     </form>
 ";
 

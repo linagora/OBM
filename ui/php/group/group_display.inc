@@ -101,7 +101,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("group_email");
     if (strcmp($email,"") != 0) {
       $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\" />";
+      $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\" />";
       $res["txt_name"] = $email;
     }
   }

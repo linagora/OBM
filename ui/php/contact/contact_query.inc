@@ -1097,10 +1097,10 @@ function run_query_contact_kind_insert($contact) {
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
-  $label = $contact["label"];
-  $lang = $contact["lang"];
-  $header = $contact["header"];
-  $default = ($contact["default"] == 1 ? 1 : 0);
+  $label = $contact["kind_label"];
+  $lang = $contact["kind_lang"];
+  $header = $contact["kind_header"];
+  $default = ($contact["kind_default"] == 1 ? 1 : 0);
 	$domain_id = $obm["domain_id"];
 	
   // If kind is new default for this lang, we cancel other defaults
@@ -1119,7 +1119,7 @@ function run_query_contact_kind_insert($contact) {
   VALUES (
     '$timecreate',
     '$usercreate',
-		'$domain_id';
+    '$domain_id',
     '$label',
     '$header',
     '$lang',
@@ -1167,10 +1167,10 @@ function run_query_contact_kind_update($contact) {
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
   $id = $contact["kind"];
-  $label = $contact["label"];
-  $lang = $contact["lang"];
-  $header = $contact["header"];
-  $default = ($contact["default"] == 1 ? 1 : 0);
+  $label = $contact["kind_label"];
+  $lang = $contact["kind_lang"];
+  $header = $contact["kind_header"];
+  $default = ($contact["kind_default"] == 1 ? 1 : 0);
 	$multidomain = sql_multidomain("kind");
 	
   // If kind is new default for this lang, we cancel other defaults

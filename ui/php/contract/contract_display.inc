@@ -408,7 +408,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   if ($last > 0) {
     $url_inc_last = url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;contract_id=$id&amp;incident_id=$last");
     $dis_last = "<li>
-    <a href=\"$url_inc_last\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
+    <a href=\"$url_inc_last\"><img src=\"$ico_incident\" /></a>
     <a href=\"$url_inc_last\">$l_last</a></li>";
   }
 
@@ -420,7 +420,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
     <h1>$l_module_deal</h1>
     <ul>
     <li>
-      <a href=\"$url_deal\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
+      <a href=\"$url_deal\"><img src=\"$ico_deal\" /></a>
       <a href=\"$url_deal\">$l_deal</a>
     </li>
     </ul>
@@ -438,13 +438,13 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
     <div  class=\"portlet\" id=\"contractDocument\">
   <h1>$l_module_document</h1>
   <ul>
-    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
+	 \"><img src=\"$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_contract'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>
@@ -456,12 +456,12 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   <h1>$l_module_incident</h1>
   <ul>
   <li>
-    <a href=\"$url_inc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
+    <a href=\"$url_inc\"><img src=\"$ico_incident\" /></a>
     <a href=\"$url_inc\">$l_incident_list ($inc_nb)</a>
   </li>
     $dis_last
   <li>
-    <a href=\"$url_inc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
+    <a href=\"$url_inc_new\"><img src=\"$ico_incident\" /></a>
     <a href=\"$url_inc_new\">$l_incident_new</a></li>
   </ul>
   </div>
@@ -618,19 +618,19 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
       <tr>
         <th>$l_company
           <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id")."\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+          <img src=\"$ico_company\" alt=\"[Company]\" /></a>
         </th>
         <td>$comp_name</td>
       </tr><tr>
         <th>$l_client_manager 1
           <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1_id") . "\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
+          <img src=\"$ico_contact\" alt=\"[Contact]\" /></a>
         </th>
         <td>$con1</td> 
       </tr><tr>
         <th>$l_client_manager 2
           <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2_id") . "\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
+          <img src=\"$ico_contact\" alt=\"[Contact]\" /></a>
         </th>
         <td>$con2</td>
       </tr>
@@ -1153,7 +1153,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <td>
         <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id")."\">$deal_label</a>
         <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
+        <img src=\"$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>
     </tr>";
@@ -1704,7 +1704,7 @@ function dis_contract_priority_links($id) {
   $nb_pri = $obm_q->num_rows();
   if ($nb_pri > 0) {
     $display["msg"] = display_warn_msg($l_pri_cant_delete); 
-    $dis_link = "<h1> $label : $l_pri_link_contract ($nb_pri)</h1>";
+    $dis_link = "<h1>$label : $l_pri_link_contract ($nb_pri)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {

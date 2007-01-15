@@ -517,13 +517,13 @@ function html_invoice_links($inv_q) {
     $block_doc = "
   <div class=\"linkTitle\">:: $l_module_document</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
+	 \"><img src=\"$ico_document_new\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_invoice'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>";
@@ -537,9 +537,9 @@ function html_invoice_links($inv_q) {
     $block_payment = "
   <div class=\"linkTitle\">:: $l_module_payment</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_payment\" alt=\"\" /></a>
+    <li><a href=\"$url_inv\"><img src=\"$ico_payment\" alt=\"\" /></a>
         $l_module_payment ( <a href=\"$url_pay\">$nb_pay</a> )</li>
-    <li><a href=\"$url_pay_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_payment\" alt=\"\" /></a>
+    <li><a href=\"$url_pay_new\"><img src=\"$ico_payment\" alt=\"\" /></a>
         <a href=\"$url_pay_new\">$l_new</a></li>
   </ul>";
   }
@@ -590,11 +590,11 @@ function dis_invoice_detail($inv_q) {
   $url_comp = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id");
   if ($deal_id > 0) {
     $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id");
-    $deal_link = "<a href=\"$url_deal\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"\" /></a>";
+    $deal_link = "<a href=\"$url_deal\"><img src=\"$ico_deal\" alt=\"\" /></a>";
   }
   if ($project_id > 0) {
     $url_proj = url_prepare("$path/project/project_index.php?action=detailconsult&amp;project_id=$project_id");
-    $project_new_link = "<a href=\"$url_proj\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>";
+    $project_new_link = "<a href=\"$url_proj\"><img src=\"$ico_project\" alt=\"\" /></a>";
   }
 
   $block .= "
@@ -603,7 +603,7 @@ function dis_invoice_detail($inv_q) {
 
     <table>
     <tr>
-      <th>$l_company <a href=\"$url_comp\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"\" /></a></th>
+      <th>$l_company <a href=\"$url_comp\"><img src=\"$ico_company\" alt=\"\" /></a></th>
       <td>$company</td>
     </tr>
     <tr>
@@ -875,7 +875,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"\" /></a>
+      <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
   </tr><tr>
@@ -887,7 +887,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       <input type=\"hidden\" name=\"deal_label\" value=\"$d_label\" />
       <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_new_label','Deal','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"\" /></a>
+      <img src=\"$ico_deal\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"deal_new_label\" value=\"$d_new_label\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
   </tr><tr>
@@ -899,7 +899,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       <input type=\"hidden\" name=\"project_name\" value=\"$p_name\" />
       <input type=\"hidden\" name=\"project_new_id\" value=\"$p_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.project_new_id&amp;ext_widget_text=f_entity.project_new_name','Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
+      <img src=\"$ico_project\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"project_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
   </tr>

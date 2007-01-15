@@ -470,7 +470,7 @@ function display_debug_msg($msg, $debug=0, $function_name="") {
   global $set_debug, $global_dis_debug_msg;
 
   if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
-    $global_dis_debug_msg .= "<b>$function_name</b> : $msg<hr>";
+    $global_dis_debug_msg .= "<b>$function_name</b> : $msg<hr />";
   }
   return $global_dis_debug_msg;
 }  

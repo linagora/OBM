@@ -48,6 +48,7 @@ $l_no_invoice = "Pas de factures";
 $l_kind_manage = "Gestion des Types d'Affaires";
 $l_kind_exist = "Types existants";
 $l_kind_new = "Nouveau Type";
+$l_kind_label = "Type";
 $l_status_manage = "Gestion des Etats d'Affaires";
 $l_status_exist = "Etats existants";
 $l_status_new = "Nouvel Etat";

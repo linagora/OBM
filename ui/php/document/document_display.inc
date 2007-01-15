@@ -445,7 +445,6 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
-      <!-- Update button -->
       <input type=\"hidden\" name=\"document_id\" id=\"document_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
@@ -612,25 +611,27 @@ function html_document_dir_form($action, $document,$doc_q=null) {
     <form method=\"get\" name=\"f_new_dir\"
       onsubmit=\"if (check_dir(this)) return true; else return false;\"
       action=\"".url_prepare("document_index.php")."\">
+    
+    <fieldset class=\"detail extra\">
+    <legend>$l_dir</legend>
 
-    <div class=\"detailHead\">$l_dir</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
+      <th>$l_name</th>
+      <td><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_path</td>
-      <td class=\"detailForm\">
+      <th>$l_path</th>
+      <td>
       $dis_path
       </td>
     </tr>
     </table>
+    </fieldset>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
+    <fieldset class=\"buttons\">
+    $dis_button
     <input type=\"hidden\" name=\"document_id\" value=\"$id\" />
-    </div>
+    </fieldset>
     </form>
 ";
 
@@ -826,7 +827,7 @@ function dis_document_mime_links($document) {
       $dis_link .= "<a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;document_id=$did") . "\">$dtitle</a></li>";
     }
     if ($cpt < $nb_mime) {
-      $dis_link .= "...";
+      $dis_link .= "<li>...</li>";
     }
 
   } else {
@@ -980,7 +981,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
 	<td class=\"documentFile\" style=\"padding-left:".$indent_file."px;text-align:left;\">
 	 <a  href=\"document_index.php?action=detailconsult&amp;document_id=$id\" >
 
-	  <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_file\" alt=\"\" />
+	  <img src=\"$ico_file\" alt=\"\" />
 	 </a>
 	 <a class=\"documentFile\" 
 	  href=\"document_index.php?action=accessfile&amp;document_id=$id&amp;popup=1\" 
@@ -1011,7 +1012,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
        <tr>
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	 <a href=\"\" onclick=\"show_hide_dir('$current_dir_id');return false;\"> 
-	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"[Dir]\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"$ico_directory_close\" alt=\"[Dir]\"/>
          </a>
          $dis_name
 	</td>
@@ -1030,7 +1031,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
        <tr>
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	 <a href=\"document_index.php?action=dir_check_delete&amp;document_id=$d_id\"> 
-	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"$ico_del_directory\" alt=\"[File]\"/>
 	 </a>
 	 $dis_name
 	</td>
@@ -1064,7 +1065,7 @@ function display_document_popup_tree($tree,$current_directory,$name,$indent) {
        <tr>
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	<a href=\"\" onclick=\"show_hide_dir('$current_dir_id');return false;\"> 
-	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"$ico_directory_close\" alt=\"\"/>
 	 </a>
 	 <a class=\"documentDir\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
 	  $name
@@ -1083,7 +1084,7 @@ function display_document_popup_tree($tree,$current_directory,$name,$indent) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"$ico_directory\" alt=\"\"/>
 	 <a class=\"documentDir\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
 	  $name
 	 </a>

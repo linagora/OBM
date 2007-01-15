@@ -123,7 +123,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("contact_email");
     if (strcmp($email,"") != 0) {
       $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\" />";
+      $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\" />";
       $res["txt_name"] = $email;
     }
   }
@@ -1001,7 +1001,7 @@ function html_contact_view_main($co_q) {
     </tr><tr>
       <th>
       $l_address 1
-      <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"Copy\" ><img alt=\"Copy\" src=\"/images/$set_theme/$ico_clipboard\" /></a>
+      <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"Copy\" ><img alt=\"Copy\" src=\"$ico_clipboard\" /></a>
       </th>
       <td>$ad1</td>
     </tr><tr>
@@ -1945,12 +1945,12 @@ function dis_contact_admin_index() {
 function html_contact_kind_form($kind_q) {
   global $l_kind_manage, $l_kind_exist, $l_kind_no;
   global $l_kind_checkdelete, $l_kind_update, $l_kind_new, $l_kind_insert;
-  global $l_label, $l_lang, $l_default, $l_header;
+  global $l_label, $l_lang, $l_default, $l_header,$ico_ok,$ico_delete,$l_c_new;
 
-  if ($kind_q->num_rows() > 0) {
+/*  if ($kind_q->num_rows() > 0) {
 
     // Kind select construction
-    $sel_kind = "<select name=\"sel_kind\" onChange=\"
+    $kind_list = "<select name=\"sel_kind\" onChange=\"
       mytext = this.options[this.selectedIndex].text;
 
       // Get Lang
@@ -1978,144 +1978,107 @@ function html_contact_kind_form($kind_q) {
       }
       forms.form_kind_update.tf_label.value=label;
       forms.form_kind_update.tf_header.value=header;\"
-      size=\"8\">";
+      size=\"8\">";*/
 
-    while ($kind_q->next_record()) {
-      $id = $kind_q->f("kind_id");
-      $lang = $kind_q->f("kind_lang");
-      $default = ($kind_q->f("kind_default") == 1 ? "X" : " ");
-      $mlabel = $kind_q->f("kind_minilabel");
-      $header = $kind_q->f("kind_header");
-      $sel_kind .= "\n<option value=\"$id\">$lang-$default-$mlabel-$header</option>";
+
+  $char_title = '=';
+  $key = 0;
+  while ($kind_q->next_record()) {
+    $id = $kind_q->f("kind_id");
+    $lang = $kind_q->f("kind_lang");
+    $default = ($kind_q->f("kind_default") == 1 ? "X" : " ");
+    $mlabel = $kind_q->f("kind_minilabel");
+    $header = $kind_q->f("kind_header");
+   
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
     }
-    $sel_kind .= "</select>";
-
-    $dis_update_delete = "
-<!-- Kind Check Delete Section -->
-
-    <table>
-    <tr>
-      <td colspan=\"3\">
-      <form name=\"form_kind_delete\" method=\"post\"
-        action=\"" . url_prepare("contact_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_kind_exist</td>
-      </tr>
-      <tr>
-        <td class=\"adminLabel\">$sel_kind</td>
-        <td>
-          <input type=\"hidden\" name=\"action\" value=\"kind_checklink\" />
-          <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_checkdelete\"
-            onclick=\"if (check_contact_kind_checkdel(this.form.sel_kind)) return true;
-            else return false;\" />
-        </td>
-      </tr>
-      </table>
-      </form>
-      </td>
-    </tr>
-
-<!-- Kind Update Section -->
-
-    <tr>
-      <td colspan=\"2\">
-        <form name=\"form_kind_update\" method=\"get\"
-          action=\"" . url_prepare("contact_index.php") . "\">
-        <input type=\"hidden\" name=\"sel_kind\" value=\"\" />
-        <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
-
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_lang : </td>
-          <td><input type=\"text\" name=\"tf_lang\" size=\"2\" maxlength=\"2\"/></td>
-          <td rowspan=\"3\">
-          <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_update\"
-            onclick=\"if (check_contact_kind_upd(this.form,document.form_kind_delete.sel_kind)) return true; else return false;\" />
-          </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_default : </td>
-          <td>
-            <input type=\"checkbox\" name=\"cba_default\" value=\"1\" />
-	  </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_label : </td>
-          <td>
-            <input type=\"text\" name=\"tf_label\" />
-	  </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_header : </td>
-          <td>
-            <input type=\"text\" name=\"tf_header\" size=\"24\" maxlength=\"64\" />
-          </td>
-        </tr>
-        </table>
-
-        </form>
-      </td>
-      <td>&nbsp;</td>
-    </tr>
-    </table>";
-    
-  } else {
-    $dis_update_delete = $l_kind_no;
+    $c_label = htmlentities($one_cat["label"]);
+    $kind_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"kind_$id\" value=\"$id\" />
+    <a href=\"?action=kind_checklink&amp;category=kind&amp;kind=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_kind_checkdelete\" title=\"$l_kind_checkdelete\" />
+    </a></td>
+    <td><input type=\"checkbox\" id=\"cba_kind_default_$id\" value=\"1\" /></td>
+    <td><input type=\"text\" id=\"tf_kind_lang_$id\" value=\"$lang\" size=\"6\"/></td>
+    <td><input type=\"text\" id=\"tf_kind_label_$id\" value=\"$mlabel\" size=\"6\"/></td>
+    <td><input type=\"text\" id=\"tf_kind_header_$id\" value=\"$header\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'kind');\">
+    <img src=\"$ico_ok\" alt=\"$l_kind_update\" title=\"$l_kind_update\" />
+    </a>
+    </td>
+    </tr>";
   }
 
-  // --- HTML Template --------------------------------------------------------
+
+ // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">$l_kind_manage</td>
-    </tr>
-    <tr>
-      <td>
-      $dis_update_delete
 
-      </td>
-      <td>
+ <div class=\"detail admin\" >
+  <form id=\"form_kind_update\" action=\"?action=kind_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_kind_lang\" value=\"\" />
+  <input type=\"hidden\" name=\"cba_kind_default\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_kind_label\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_kind_header\" value=\"\" />
+  <input type=\"hidden\" name=\"kind\" value=\"\" />
+  </form>    
+  <h1>$l_kind_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_default</td>
+  <td>$l_lang</td>
+  <td>$l_label</td>
+  <td>$l_header</td>
+  <td>&nbsp;</td>  
+  </tr>    
+  </thead>
+  <tbody>
+  $kind_list
+  </tbody>
+  </table>
+  </div>  
 
-<!-- New Kind Section -->
-
-        <form name=\"form_kind_new\" method=\"get\"
-          action=\"" . url_prepare("contact_index.php") . "\">
-        <table>
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">$l_kind_new</td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_lang : </td>
-          <td><input name=\"tf_lang\" size=\"2\" maxlength=\"2\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_default : </td>
-          <td>
-            <input type=\"checkbox\" name=\"cba_default\" value=\"1\"/>
-	  </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_label : </td>
-          <td><input type=\"text\" name=\"tf_label\" size=\"5\" maxlength=\"5\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_header : </td>
-          <td><input type=\"text\" name=\"tf_header\" size=\"24\" maxlength=\"64\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
-            <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_insert\"
-              onclick=\"if (check_contact_kind_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>";
+  <form id=\"form_kind_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"4\">$l_c_new</td>
+  </tr>
+  <tbody>   
+  <tr>
+  <td>$l_default</td>
+  <td>$l_lang</td>
+  <td>$l_label</td>    
+  <td>$l_header</td>
+  </tr>
+  <tr>
+  <td><input type=\"checkbox\" name=\"cba_kind_default\" value=\"1\" /></td>
+  <td><input type=\"text\" name=\"tf_kind_lang\" value=\"\" size=\"6\" /></td>
+  <td><input type=\"text\" name=\"tf_kind_label\" value=\"\" size=\"6\" /></td>
+  <td><input type=\"text\" name=\"tf_kind_header\" value=\"\" /></td>
+  </tr>
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"4\"><input type=\"submit\" value=\"$l_kind_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"kind\" />
+  </form>
+  </div>
+";
 
   return $block;
 }

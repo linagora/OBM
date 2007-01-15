@@ -62,7 +62,6 @@ require("deal_display.inc");
 require("deal_js.inc");
 require_once("$obminclude/of/of_select.inc");
 require_once("$obminclude/of/of_category.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
 $uid = $auth->auth["uid"];
 
 get_deal_action();

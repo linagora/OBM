@@ -518,13 +518,13 @@ function html_project_links($p_q) {
  <div  class=\"portlet\" id=\"projectDocument\">
  <h1>$l_module_document</h1>
   <ul>
-    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
+	 \"><img src=\"$ico_document_new\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_project'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>
@@ -542,10 +542,10 @@ function html_project_links($p_q) {
  <div  class=\"portlet\" id=\"projectInvoice\"> 
   <h1>$l_module_invoice</h1>
   <ul>
-    <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv\"><img src=\"$ico_invoice\" alt=\"\" /></a>
         $l_module_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
-    <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv_new\"><img src=\"$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>
   </ul>
   </div>";
@@ -644,7 +644,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       <th>$l_deal</th>
       <td>
         <a href=\"". url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal")."\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"[details]\" /></a>
+        <img src=\"$ico_deal\" alt=\"[details]\" /></a>
         $deal_label
       </td>";
     }
@@ -656,7 +656,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       <th>$l_company</th>
       <td>
         <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$company")."\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+        <img src=\"$ico_company\" alt=\"[details]\" /></a>
         $company_name
       </td>
     $dis_deal
@@ -1172,7 +1172,7 @@ function html_project_form($action, $project_q, $project) {
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"[Add]\" />
+       <img src=\"$ico_project\" alt=\"[Add]\" />
       </a>  
   </th>
     <td id=\"sel_task_id\">$dis_sel_tasks</td>";
@@ -1501,7 +1501,7 @@ function html_project_task_form($ptask_q, $project) {
       <a href=\"javascript: return false;\" 
         onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
         return false;\">
-         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"[Add]\" />
+         <img src=\"$ico_project\" alt=\"[Add]\" />
         </a>  
     </th>
     <td id=\"sel_task_id\">$dis_sel_tasks</td>      
@@ -1850,8 +1850,8 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
 
     <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
 
-   <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
+   <div class=\"buttons\">
+    $dis_button
    </div>
 
    </form>

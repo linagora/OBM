@@ -303,7 +303,7 @@ function html_lead_consult($l_q) {
     <tr>
       <th>$l_company 
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+      <img src=\"$ico_company\" alt=\"[details]\" /></a>
       </th>
       <td>$c_name<br />$ad1<br/>$zip $town</td>
     </tr>
@@ -460,7 +460,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-      <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
+      <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 
   // User comment select construction
@@ -561,13 +561,13 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       
    <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
     $dis_comment
+    </fieldset>
 
 
     <fieldset class=\"buttons\">
     $dis_button
     </fieldset>
-    </form>
-</fieldset>";
+    </form>";
 
   return $block;
 }

@@ -366,7 +366,7 @@ function html_incident_consult($inc_q) {
   <tr>
     <th>$l_company
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id")."\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+      <img src=\"$ico_company\" alt=\"[Company]\" /></a>
     </th>
     <td>$comp_name</td>
   </tr><tr>
@@ -380,7 +380,7 @@ function html_incident_consult($inc_q) {
       <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contract_id=$con_cli2")."\"></a> 
       $con_label
       <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$con_id") . "\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
+      <img src=\"$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
     </th>
     <td>
       # $con_num ($con_debut - $con_exp)
@@ -430,7 +430,7 @@ function html_incident_consult($inc_q) {
 </div>
 
 <div class=\"detail extra\">
-  <h1>$l_solution <a href=\"mailto:$email_con?subject=$l_incident $label : $l_solution&cc=$cmail_incident&body=$inc_reso\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"[Mail]\" /></a>
+  <h1>$l_solution <a href=\"mailto:$email_con?subject=$l_incident $label : $l_solution&cc=$cmail_incident&body=$inc_reso\"><img src=\"$ico_mail\" alt=\"[Mail]\" /></a>
 </h1>
   <table> 
   <tr>
@@ -478,13 +478,13 @@ function html_incident_links($inc_q) {
   <div class=\"portlet\" id=\"incidentDocument\">
   <h1>$l_module_document</h1>
   <ul>
-    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
+	 \"><img src=\"$ico_document_new\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_incident'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul></div>";

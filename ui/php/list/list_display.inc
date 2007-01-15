@@ -589,17 +589,17 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   if ($mode == $clist_mode_expert) {
     $d_query = nl2br($query);
     $dis_query = "<tr>
-      <td class=\"detailLabel\">$l_query</td>
-      <td class=\"detailText\">$d_query</td>
+      <th>$l_query</th>
+      <td>$d_query</td>
     </tr>";
   }
 
 
   $display["detailInfo"] = display_record_info($list_q);
-  $display["title"] = "<div class=\"title\">$l_list : $name</div>";
+  $display["title"] = "<h1 class=\"title\">$l_list : $name</h1>";
 
   $block = "
-<div class=\"detail infos\">
+<div class=\"detail extra\">
   <h1>$l_list</h1>
   <table>
   <tr>
@@ -621,7 +621,8 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     <th># $l_contact : $l_static / $l_query</th>
     <td>$static_nb / $con_query_nb</td>
   </tr>
-    <th># $l_company : $l_static / $l_query</td>
+  <tr>
+    <th># $l_company : $l_static / $l_query</th>
     <td>$comp_static_nb / $comp_query_nb</td>
   </tr>
     $dis_query
@@ -734,11 +735,9 @@ function dis_list_form($action, $list_q, $list) {
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $block .= "<div class=\"detailButton\">
-    <p class=\"detailButtons\">
+  $block .= "<fieldset class=\"buttons\">
     $dis_but 
-    </p>
-    </div>
+    </fieldset>
     </form>";
   return $block; 
 }
@@ -793,8 +792,8 @@ function html_list_form($action, $list_q, $list) {
        || ( (($action == "detailupdate") || ($action == "update")) && 
 	    ($usercreate == $uid) ) ) {
     $dis_priv = "
-      <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailForm\"><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
+      <th>$l_private</th>
+      <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
     if ($priv == 1) $dis_priv .= "checked = \"checked\"";
     $dis_priv .= " /></td>
   </tr><tr>";
@@ -807,8 +806,8 @@ function html_list_form($action, $list_q, $list) {
   if ($cgp_show["module"]["publication"]) {
     $dis_pub = "
     <tr>
-      <td class=\"detailLabel\">$l_info_pub</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" $dis_info_pub name=\"cba_info_pub\" value=\"1\" /></td>
+      <th>$l_info_pub</th>
+      <td><input type=\"checkbox\" $dis_info_pub name=\"cba_info_pub\" value=\"1\" /></td>
     </tr>";
   }
 
@@ -827,51 +826,66 @@ function html_list_form($action, $list_q, $list) {
   $dis_query = html_list_normal_criteria_form($action, $list_q, $list);
 
   $block = "
-  <div class=\"detailHead\">$l_list</div>
-  <table class=\"detail\">
+  <fieldset class=\"detail extra\">
+  <legend>$l_list</legend>
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_name</td>
-    <td class=\"detailForm\">
+    <th>$l_name</th>
+    <td>
       <input type=\"text\" name=\"tf_name\" size=\"32\" maxlength=\"32\" value=\"$name\" /></td>
   </tr>
   <tr>
   $dis_priv
-    <td class=\"detailLabel\">$l_subject</td>
-    <td class=\"detailForm\">
+    <th>$l_subject</th>
+    <td>
       <input name=\"tf_subject\" size=\"30\" value=\"$subject\" /></td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_email</td>
-    <td class=\"detailForm\">
+    <th>$l_email</th>
+    <td>
       <input name=\"tf_email\" size=\"30\" value=\"$email\" /></td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_mailing</td>
-    <td class=\"detailForm\">
+    <th>$l_mailing</th>
+    <td>
       <input type=\"checkbox\" $dis_mailing name=\"cba_mailing_ok\" value=\"1\" /></td>
   </tr>  
   <tr>
-    <td class=\"detailLabel\">$l_contact_archive</td>
-    <td class=\"detailForm\">
+    <th>$l_contact_archive</th>
+    <td>
       <input type=\"checkbox\" $dis_con_arch name=\"cba_contact_archive\" value=\"1\" /></td>
   </tr>  
   $dis_pub
   </table>
-  <div class=\"detailHead\">$l_query</div>  
-    <table class=\"detail\">
+  </fieldset>
+  
+  <fieldset class=\"detail extra\">
+  <legend>$l_query</legend>  
+    <table>
     <tr>
-      <td class=\"detailLabel\">
-       <input type=\"radio\" $expert_checked name=\"rd_mode\" value=\"$clist_mode_expert\" onclick=\"return show_query_field('','none',this);\" />$l_expert
-       <input type=\"radio\" $normal_checked name=\"rd_mode\" value=\"$clist_mode_normal\" onclick=\"return show_query_field('none','',this);\" />$l_normal
-      </td>
+    <th>
+    $l_expert
+    </th>
+    <td>
+    <input type=\"radio\" $expert_checked name=\"rd_mode\" value=\"$clist_mode_expert\" onclick=\"return show_query_field('','none',this);\" />
+    </td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">
+    <th>
+    $l_normal
+    </th>
+    <td>
+    <input type=\"radio\" $normal_checked name=\"rd_mode\" value=\"$clist_mode_normal\" onclick=\"return show_query_field('none','',this);\" />
+    </td>
+    </tr>
+    <tr>
+      <td>
       <textarea id=\"ta_query\" $style_query name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea>
       $dis_query
       </td>
     </tr>
-  </table>";
+  </table>
+  </fieldset>";
 
   if (($action == "detailupdate") || ($action == "update")) {
     $block .= "<input type=\"hidden\" name=\"list_id\" value=\"$id\" />";
@@ -1158,9 +1172,9 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
     }
 
     $del_cell = "<td><a href=\"javascript:void(0);\" onclick=\"del_row(this.parentNode.parentNode);return false;\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" alt=\"Delete\" /></a></td>";
+    <img src=\"$ico_crow\" alt=\"Delete\" /></a></td>";
     $upd_cell = "<td><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"Update\" /></a></td>"; 
+    <img src=\"$ico_updated\" alt=\"Update\" /></a></td>"; 
 
     if (is_array($structure)) {
       foreach($structure as $key=>$line) {
@@ -1203,8 +1217,8 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
     $display = "style=\"display:none\"";
   }
   $block = "
-  <div id=\"di_query\" $display>
-  <table class=\"search\" id=\"list_criterion\">
+  <div id=\"di_query\" $display class=\"buttons\">
+  <table id=\"list_criterion\">
    $dis_criteria
   </table>
   <input type=\"button\" value=\"$l_add_criterion\" 
@@ -1247,11 +1261,9 @@ function dis_list_add_criterion_form($list) {
   }
 
   $block .= "
-  <div class=\"detailButton\">
-  <p class=\"detailButtons\">
+  <fieldset class=\"buttons\">
   <input type=\"submit\" value=\"$l_add_criterion\"/>
-  </p>
-  </div>
+  </fieldset>
 
   <input type=\"hidden\" name=\"ext_element\" value=\"$ext_element\" />
 </form>";
@@ -1351,45 +1363,47 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
   $dis_cat = dis_list_add_criterion_userdata_form("company");
 
   $block .= "
-  <div class=\"detailHead\">$l_company</div>
-  <table class=\"search\">
+  <fieldset class=\"detail infos\">
+  <legend>$l_company</legend>
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_company</td>
-    <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailLabel\">$l_timeafter</td>
+    <th>$l_company</th>
+    <th>$l_country</th>
+    <th>$l_timeafter</th>
   </tr>
   <tr>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
-    <td class=\"detailForm\"><select name=\"sel_company_country_iso3166\">$sel_cty</select></td>
-    <td class=\"detailForm\" style=\"white-space: nowrap;\">
-      <script>calendar('tf_company_timeafter','$company_timeafter')</script>
+    <td><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
+    <td><select name=\"sel_company_country_iso3166\">$sel_cty</select></td>
+    <td style=\"white-space: nowrap;\">
+      <input type=\"text\" name=\"tf_company_timeafter\" value=\"$company_timeafter\" class=\"datePicker\"/>
     </td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_postcode</td>
-    <td class=\"detailLabel\">$l_market</td>
-    <td class=\"detailLabel\">$l_timebefore</td>
+    <th>$l_postcode</th>
+    <th>$l_market</th>
+    <th>$l_timebefore</th>
   </tr>
   <tr>
-    <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_company_zipcode\" value=\"\" /></td>
-    <td class=\"detailForm\"><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>
-    <td class=\"detailForm\" style=\"white-space: nowrap;\">
-      <script>calendar('tf_company_timebefore','$company_timebefore')</script>
+    <td><input type=\"text\" size=\"10\" name=\"tf_company_zipcode\" value=\"\" /></td>
+    <td><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>
+    <td style=\"white-space: nowrap;\">
+      <input type=\"text\" name=\"tf_company_timebefore\" value=\"$company_timebefore\" class=\"datePicker\"/>
     </td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_town</td>
-    <td class=\"detailLabel\">$l_company_cat1</td>
-    <td class=\"detailLabel\">$l_datasource</td>
+    <th>$l_town</th>
+    <th>$l_company_cat1</th>
+    <th>$l_datasource</th>
   </tr>
   <tr>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td>
-    <td class=\"detailForm\" style=\"white-space: nowrap;\">
+    <td><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td>
+    <td style=\"white-space: nowrap;\">
 $dis_cat
     </td>
-    <td class=\"detailForm\"><select name=\"sel_company_datasource_id\">$sel_dsr</select></td>
+    <td><select name=\"sel_company_datasource_id\">$sel_dsr</select></td>
   </tr>
   </table>
+  </fieldset>
 ";
   return $block;
 }
@@ -1452,63 +1466,65 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q) {
   $dis_cat = dis_list_add_criterion_userdata_form("contact");
  
   $block = "
-  <div class=\"detailHead\">$l_contact</div>
-  <table class=\"search\">
+  <fieldset class=\"detail infos\">
+  <legend>$l_contact</legend>
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_lastname</td>
-    <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailLabel\">$l_timeafter</td>
+    <th>$l_lastname</th>
+    <th>$l_country</th>
+    <th>$l_timeafter</th>
   </tr>
   <tr>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_lastname\" value=\"\" /></td>
-    <td class=\"detailForm\"><select name=\"sel_contact_country_iso3166\">$sel_cty</select></td>
-    <td class=\"detailForm\" style=\"white-space: nowrap;\">
-      <script>calendar('tf_contact_timeafter','$contact_timeafter')</script>
+    <td><input type=\"text\" size=\"17\" name=\"tf_contact_lastname\" value=\"\" /></td>
+    <td><select name=\"sel_contact_country_iso3166\">$sel_cty</select></td>
+    <td style=\"white-space: nowrap;\">
+      <input type=\"text\" name=\"tf_contact_timeafter\" value=\"$contact_timeafter\" class=\"datePicker\"/>
     </td>
   <tr>
-    <td class=\"detailLabel\">$l_firstname</td>
-    <td class=\"detailLabel\">$l_market</td>
-    <td class=\"detailLabel\">$l_timebefore</td>
+    <th>$l_firstname</th>
+    <th>$l_market</th>
+    <th>$l_timebefore</th>
   </tr>
   <tr>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_firstname\" value=\"\" /></td>
-    <td class=\"detailForm\"><select name=\"sel_contact_marketingmanager_id\">$sel_usr</select></td>
-    <td class=\"detailForm\" style=\"white-space: nowrap;\">
-      <script>calendar('tf_contact_timebefore','$contact_timebefore')</script>
+    <td><input type=\"text\" size=\"17\" name=\"tf_contact_firstname\" value=\"\" /></td>
+    <td><select name=\"sel_contact_marketingmanager_id\">$sel_usr</select></td>
+    <td style=\"white-space: nowrap;\">
+      <input type=\"text\" name=\"tf_contact_timebefore\" value=\"$contact_timebefore\" class=\"datePicker\"/>
     </td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_datasource</td>
-    <td class=\"detailLabel\">$l_town</td>
-    <td class=\"detailLabel\">$l_postcode</td>
+    <th>$l_datasource</th>
+    <th>$l_town</th>
+    <th>$l_postcode</th>
   </tr>
   <tr>
-    <td class=\"detailForm\"><select name=\"sel_contact_datasource_id\">$sel_dsr</select></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_town\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_contact_zipcode\" value=\"\" /></td>
+    <td><select name=\"sel_contact_datasource_id\">$sel_dsr</select></td>
+    <td><input type=\"text\" size=\"17\" name=\"tf_contact_town\" value=\"\" /></td>
+    <td><input type=\"text\" size=\"10\" name=\"tf_contact_zipcode\" value=\"\" /></td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_function</td>
-    <td class=\"detailLabel\"></td>   
-    <td class=\"detailLabel\"></td>
+    <th>$l_function</th>
+    <th></th>   
+    <th></th>
   </tr>
   <tr>
-    <td class=\"detailForm\"><select name=\"sel_contact_function_id\">$sel_fct</select></td>    
-    <td class=\"detailForm\">$dis_cat</td>
-    <td class=\"detailForm\"></td>    
+    <td><select name=\"sel_contact_function_id\">$sel_fct</select></td>    
+    <td>$dis_cat</td>
+    <td></td>    
   </tr>
   <tr> 
-    <td class=\"detailLabel\">$l_lang</td>
+    <th>$l_lang</th>
     <td></td>
     <td></td>
   </tr> 
   <tr>  
-    <td class=\"detailForm\"><select name=\"sel_kind_lang\">$sel_lag</select></td>    
+    <td><select name=\"sel_kind_lang\">$sel_lag</select></td>    
     <td></td>
     <td></td>
   </tr>
 
-  </table>";
+  </table>
+  </fieldset>";
 
   return $block;
 }
@@ -1540,44 +1556,46 @@ function html_list_publication_criterion($rec_q,$pub_q) {
   }   
   
   $block = "
-  <div class=\"detailHead\">$l_publication</div>    
-  <table class=\"search\">
+  <fieldset class=\"detail extra\">
+  <legend>$l_publication</legend>    
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_title</td>
-    <td class=\"detailLabel\">$l_lang</td>
-    <td class=\"detailLabel\">$l_year</td>
-    <td class=\"detailLabel\">$l_after</td>  
+    <th>$l_title</th>
+    <th>$l_lang</th>
+    <th>$l_year</th>
+    <th>$l_after</th>  
   </tr>
   <tr>
-    <td class=\"detailForm\"><select name=\"sel_subscription_publication_id\">$sel_pub</select></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_publication_lang\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_publication_year\" value=\"\" /></td>  
-    <td class=\"detailForm\" style=\"white-space: nowrap;\">
-      <script>calendar('tf_subscription_timeafter','$subscription_timeafter')</script>
+    <td><select name=\"sel_subscription_publication_id\">$sel_pub</select></td>
+    <td><input type=\"text\" size=\"10\" name=\"tf_publication_lang\" value=\"\" /></td>
+    <td><input type=\"text\" size=\"10\" name=\"tf_publication_year\" value=\"\" /></td>  
+    <td style=\"white-space: nowrap;\">
+      <input type=\"text\" name=\"tf_subscription_timeafter\" value=\"$subscription_timeafter\" class=\"datePicker\"/>
     </td>     
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_renew</td>
-    <td class=\"detailLabel\">$l_recept</td>
-    <td class=\"detailLabel\">&nbsp;</td>  
-    <td class=\"detailLabel\">$l_before</td>  
+    <th>$l_renew</th>
+    <th>$l_recept</th>
+    <th>&nbsp;</th>  
+    <th>$l_before</th>  
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <select name=\"tf_subscription_renewal\">
        <option value=\"\">$l_undef</option>
        <option value=\"1\">$l_yes</option>
        <option value=\"0\">$l_no</option>
       </select>
     </td>    
-    <td class=\"detailForm\"><select name=\"sel_subscription_reception_id\">$sel_rec</select></td>
-    <td class=\"detailForm\">&nbsp;</td>
-    <td class=\"detailForm\" style=\"white-space: nowrap;\">
-      <script>calendar('tf_subscription_timebefore','$subscription_timebefore')</script>
+    <td><select name=\"sel_subscription_reception_id\">$sel_rec</select></td>
+    <td>&nbsp;</td>
+    <td style=\"white-space: nowrap;\">
+      <input type=\"text\" name=\"tf_subscription_timebefore\" value=\"$subscription_timebefore\" class=\"datePicker\"/>
     </td>
   </tr>
   
   </table>
+  </fieldset>
 ";
   return $block;
 }
@@ -1640,9 +1658,9 @@ function dis_list_can_delete($p_id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-    <p class=\"detailButtons\">$dis_back</p>
+    <div class=\"buttons\">
+      $dis_delete
+      $dis_back
     </div>";
 
   return $block;
@@ -1678,9 +1696,9 @@ function dis_list_warn_insert($list_q, $list) {
     $samename = $list_q->f("list_name");
     $samesubject = $list_q->f("list_subject");
     $dis_same_list .= "
-      <tr><td class=\"detailLabel\">
+      <li>
         <a class=\"detail\" href=\"" .url_prepare("list_index.php?action=detailconsult&amp;list_id=$id") . "\">$samename ($samesubject)</a>
-      </td></tr>";
+      </li>";
   }
 
   $hidden = "
@@ -1695,12 +1713,13 @@ function dis_list_warn_insert($list_q, $list) {
       <input type=\"hidden\" name=\"id_duplicated\" value=\"$id_duplicated\" />";
 
   $block = "<p />
-  <table class=\"detail\">
+  <div class=\"detail\">
+  <ul>
   $dis_same_list
-  </table>
+  </ul>
+  </div>
 
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
+  <div class=\"buttons\">
     <form method=\"post\" name=\"form_insert\"
       action=\"" .url_prepare("list_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
@@ -1708,15 +1727,12 @@ function dis_list_warn_insert($list_q, $list) {
       <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
       $hidden
     </form>
-    </p>
-    <p class=\"detailButtons\">
     <form name=\"form_back\" method=\"post\"
       action=\"" .url_prepare("list_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"new\" />
       <input type=\"submit\" value=\"$l_back\" />
       $hidden
     </form>
-    </p>
   </div>";
 
   return $block;

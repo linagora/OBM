@@ -33,9 +33,9 @@ $fieldnames["company_web"] = $l_web;
 $fieldnames["type_label"] = $l_type;
 $fieldnames["activity_label"] = $l_activity;
 $fieldnames["nafcode_code"] = $l_nafcode;
-$fieldnames["company_contact_number"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"C\" />";
-$fieldnames["company_new_contact"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact_new\" alt=\"NC\" />";
-$fieldnames["company_deal_number"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"D\" />";
+$fieldnames["company_contact_number"] = "<img src=\"$ico_contact\" alt=\"C\" />";
+$fieldnames["company_new_contact"] = "<img src=\"$ico_contact_new\" alt=\"NC\" />";
+$fieldnames["company_deal_number"] = "<img src=\"$ico_deal\" alt=\"D\" />";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("company_email");
     $ctry = $OD->data_set->f("company_country_iso3166");
     $res["url"] = "$path/contact/contact_index.php?action=new&amp;company_id=".$OD->data_set->f("company_id")."&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email";
-    $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact_new\" alt=\"\" />";
+    $res["name"] = "<img src=\"$ico_contact_new\" alt=\"\" />";
     $res["txt_name"] = " ";
   }
 
@@ -475,9 +475,9 @@ function html_company_links($co_q) {
 <div  class=\"portlet\" id=\"companyContact\">
   <h1>$l_module_contact</h1>
   <ul>
-  <li><a href=\"$url_con_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" /></a>
+  <li><a href=\"$url_con_list\"><img src=\"$ico_contact\" /></a>
       <a href=\"$url_con_list\">$l_module_contact ($con_num)</a></li>
-  <li><a href=\"$url_con_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact_new\" /></a>
+  <li><a href=\"$url_con_new\"><img src=\"$ico_contact_new\" /></a>
       <a href=\"$url_con_new\">$l_new</a></li>
       </ul>
 </div>";
@@ -492,11 +492,11 @@ function html_company_links($co_q) {
 <div  class=\"portlet\" id=\"companyDeal\">
 <h1>$l_module_deal</h1>
 <ul>
-  <li><a href=\"$url_deal_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
+  <li><a href=\"$url_deal_list\"><img src=\"$ico_deal\" /></a>
       $l_module_deal (
       <a href=\"$url_deal_list\">$deal_num</a> /
       <a href=\"$url_deal_total\">$deal_total</a> )</li>
-  <li><a href=\"$url_deal_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal_new\" /></a>
+  <li><a href=\"$url_deal_new\"><img src=\"$ico_deal_new\" /></a>
       <a href=\"$url_deal_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -511,9 +511,9 @@ function html_company_links($co_q) {
 <div  class=\"portlet\" id=\"companyLead\">
 <h1>$l_module_lead</h1>
 <ul>
-  <li><a href=\"$url_lead_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_lead\" /></a>
+  <li><a href=\"$url_lead_list\"><img src=\"$ico_lead\" /></a>
       $l_module_lead (<a href=\"$url_lead_list\">$nb_lead</a>)</li>
-  <li><a href=\"$url_lead_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_lead\" /></a>
+  <li><a href=\"$url_lead_new\"><img src=\"$ico_lead\" /></a>
       <a href=\"$url_lead_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -529,13 +529,13 @@ function html_company_links($co_q) {
 <div  class=\"portlet\" id=\"companyDocument\">
 <h1>$l_module_document</h1>
 <ul>
-  <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
+  <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
       <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-  <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
+  <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" /></a>
       <a href=\"$url_doc_new\">$l_new</a></li>
   <li><a href=\"\" 
        onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-       \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
+       \"><img src=\"$ico_document_new\" /></a>
       <a href=\"\" onclick=\"window.name='$l_company'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
        $l_document_add</a></li>
 </ul>
@@ -553,10 +553,10 @@ function html_company_links($co_q) {
 <div  class=\"portlet\" id=\"companyProject\">
 <h1>$l_module_project</h1>
 <ul>
-  <li><a href=\"$url_pro\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" /></a>
+  <li><a href=\"$url_pro\"><img src=\"$ico_project\" /></a>
       $l_module_project ( <a href=\"$url_pro\">$nb_pro</a> /
       <a href=\"$url_pro_tot\">$nb_pro_total</a> )</li>
-  <li><a href=\"$url_pro_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" /></a>
+  <li><a href=\"$url_pro_new\"><img src=\"$ico_project\" /></a>
       <a href=\"$url_pro_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -574,10 +574,10 @@ function html_company_links($co_q) {
 <div  class=\"portlet\" id=\"companyContract\">
 <h1>$l_module_contract</h1>
 <ul>
-  <li><a href=\"$url_ctra\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" /></a>
+  <li><a href=\"$url_ctra\"><img src=\"$ico_contract\" /></a>
       $l_module_contract ( <a href=\"$url_ctra\">$nb_ctra</a> /
       <a href=\"$url_ctra_total\">$nb_ctra_total</a> )</li>
-  <li><a href=\"$url_ctra_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" /></a>
+  <li><a href=\"$url_ctra_new\"><img src=\"$ico_contract\" /></a>
       <a href=\"$url_ctra_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -594,10 +594,10 @@ function html_company_links($co_q) {
 <div class=\"portlet\" id=\"companyInvoice\">
 <h1>$l_module_invoice</h1>
 <ul>
-  <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
+  <li><a href=\"$url_inv\"><img src=\"$ico_invoice\" alt=\"\" /></a>
       $l_module_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
       <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
-  <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
+  <li><a href=\"$url_inv_new\"><img src=\"$ico_invoice\" alt=\"\" /></a>
       <a href=\"$url_inv_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -612,9 +612,9 @@ function html_company_links($co_q) {
 <div  class=\"portlet\" id=\"companyPayment\">
 <h1>$l_module_payment</h1>
 <ul>
-  <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_payment\" alt=\"\" /></a>
+  <li><a href=\"$url_inv\"><img src=\"$ico_payment\" alt=\"\" /></a>
       $l_module_payment ( <a href=\"$url_pay\">$nb_pay</a> )</li>
-  <li><a href=\"$url_pay_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_payment\" alt=\"\" /></a>
+  <li><a href=\"$url_pay_new\"><img src=\"$ico_payment\" alt=\"\" /></a>
       <a href=\"$url_pay_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -1603,17 +1603,17 @@ function dis_company_nafcode_links($company) {
   $nb_naf = $obm_q->num_rows();
   if ($nb_naf > 0) {
     $delete_ok = false;
-    $dis_link = "<h1>$label : $l_naf_link_company ($nb_naf)</h1>";
+    $dis_link = "<li><h1>$label : $l_naf_link_company ($nb_naf)</h1>";
     
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
-      $dis_link .= "<a href=\"company_index.php?action=detailconsult&amp;company_id=$cid\">$cname</a>";
+      $dis_link .= "<a href=\"company_index.php?action=detailconsult&amp;company_id=$cid\">$cname</a></li>";
     }
     if ($cpt < $nb_naf) {
-      $dis_link .= "...";
+      $dis_link .= "<li>...</li>";
     }
 
   } else {
