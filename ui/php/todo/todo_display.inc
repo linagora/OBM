@@ -270,7 +270,7 @@ function dis_todo_form($todo, $todo_q = 0) {
       $div_id = "sel_user_id-$sel_id";
       $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
       <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\" />
+      <img src=\"$ico_delete\" />
       </a>
       $u_name
       <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
@@ -287,7 +287,7 @@ function dis_todo_form($todo, $todo_q = 0) {
       <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
+      <img src=\"$ico_add_user\" alt=\"[Add]\" />
       </a>
     </th>    
     <td id=\"sel_user_id\">
