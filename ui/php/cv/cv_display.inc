@@ -180,7 +180,6 @@ function dis_cv_search_list($cv) {
  global $l_found, $l_no_found;
   global $display, $auth, $new_order, $order_dir;
 
-  echo "aa";
   $popup = $cv["popup"];
   $prefs = get_display_pref($auth->auth["uid"], "cv");
   $obm_q = run_query_cv_search($cv, $new_order, $order_dir);
