@@ -114,6 +114,7 @@ function html_resource_search_form($resource) {
       <input type=\"text\" name=\"tf_qtysup\" size=\"4\" maxlength=\"8\" value=\"$qtysup\" /> 
     </label>
     <label>&nbsp;<br />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $dis_restriction
