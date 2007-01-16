@@ -66,7 +66,7 @@ Obm.Portlets = new Class({
   initialize: function() {
     if(!$('portlets'))
       return false;
-    img = document.createElement('img');
+    img = new Element('img');
     img.src = obm.vars.images.upArrow;
     this.upArrow = img.src;
     img.src = obm.vars.images.downArrow;
@@ -80,24 +80,28 @@ Obm.Portlets = new Class({
     this.portlets = new Object();
     
     this.sidebar = new Fx.Style('portlets', 'width', {duration: 250});    
-    $('portlets').setStyle('overflow', 'hidden');
+    this.sidebar.element.setStyle('overflow', 'hidden');
     this.main = new Fx.Style('mainPanel', 'margin-left',{duration: 250});
-    this.delta = $('mainPanel').getOffset('left') - $('portlets').offsetWidth;
-    this.width = $('portlets').offsetWidth;
-
+    this.delta = this.main.element.getOffset('left') - this.sidebar.element.offsetWidth;
+    this.width = this.sidebar.element.offsetWidth;
+    this.panel = $('portletsPanel');
+    
     this.handler = $('portletsHandler');
+    console.log(this.handler.getFirst().getNext());
+    this.handler.getFirst().getNext().setStyle('display','none'); ;
     this.handler.addEvent('click', function(e){
       obm.portlets.toggle();
     });
 
     if(Cookie.get("portletHidden") == "true") {
-      this.handler.setAttribute("src", this.rightArrow);
+      this.handler.getFirst().setStyle('display','none')
+                  .getNext().setStyle('display','inline'); 
       this.sidebar.set(0);
-      $('portletsPanel').setStyle('width',this.delta + 'px');
+      this.panel.setStyle('width',this.delta + 'px');
       this.main.set(this.delta);
     }
 
-    elements = $ES('.portlet','portletsPanel');
+    elements = $ES('.portlet',this.panel);
     
     for(i=0;i<elements.length;i++) {
       el = elements[i];      
@@ -105,7 +109,7 @@ Obm.Portlets = new Class({
       content = title.getNext();
       this.portlets[el.id] = new Fx.Slide(content, {duration: 150,wait:false});
       
-      img = document.createElement('img');
+      img = new Element('img');
       if(Cookie.get(el.id + "Hidden")  == "true") {
         this.portlets[el.id].hide();
         img.src = this.downArrow;
@@ -127,19 +131,21 @@ Obm.Portlets = new Class({
 
   toggle: function() {
     
-    if(this.handler.getAttribute("src") == obm.portlets.leftArrow) 
-      this.handler.setAttribute("src", obm.portlets.rightArrow);
-    else 
-     this.handler.setAttribute("src", obm.portlets.leftArrow);
+    if(this.handler.getFirst().getStyle('display') == 'none')
+       this.handler.getFirst().setStyle('display','inline')
+                   .getNext().setStyle('display','none');
+    else
+       this.handler.getFirst().setStyle('display','none')
+                   .getNext().setStyle('display','inline');      
 
-    if($('mainPanel').offsetLeft > this.width) {
+    if(this.main.element.offsetLeft > this.width) {
       this.main.custom(this.width + this.delta,this.delta );
       this.sidebar.custom(this.width,0);
-      $('portletsPanel').setStyle('width',this.delta + 'px');
+      this.panel.setStyle('width',this.delta + 'px');
     } else {
       this.main.custom(this.delta, this.width + this.delta);
       this.sidebar.custom(0,this.width);
-      $('portletsPanel').setStyle('width',this.width + 'px');
+      this.panel.setStyle('width',this.width + 'px');
     }
 
     if(Cookie.get("portletHidden")  != "true") {

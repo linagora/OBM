@@ -548,7 +548,6 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
     </table>
     $update_file_end
   </fieldset>
-   
   <fieldset class=\"buttons\">
     <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\" />
     <input type=\"hidden\" name=\"upload\" value=\"yes\" />

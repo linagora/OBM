@@ -115,6 +115,8 @@ $l_cat_tree = "Sous Catégories";
 $l_category = "Catégorie";
 $l_category1 = "Catégorie";
 $l_aduplicate = "Duplicata";
+$l_hide = "Masquer";
+$l_show = "Afficher";
 
 // Entities
 $l_company = "Société";

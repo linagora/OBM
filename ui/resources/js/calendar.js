@@ -36,7 +36,7 @@ Obm.CalendarDayEvent = new Class({
       yMin: this.options.context.top,
       yMax: this.options.context.bottom - this.element.offsetHeight,
 
-      onStart:function() {
+      onSnap:function() {
         obm.calendarManager.lock();
         this.element.setStyle('width', obm.calendarManager.defaultWidth + 'px');
         this.element.setStyle('margin-left', '0');
@@ -69,7 +69,9 @@ Obm.CalendarDayEvent = new Class({
       new Element('img').setProperty('src',obm.vars.images.periodic)
                         .injectInside(this.dragHandler);
     }   
-    this.titleContainer = new Element('span').injectInside(this.dragHandler);
+    this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
+                                          .setProperty('onclick','if(obm.calendarManager.redrawLock) return false;')
+                                          .injectInside(this.dragHandler);
     this.resetTitle();
 
   },
@@ -114,6 +116,8 @@ Obm.CalendarDayEvent = new Class({
        hr.parentNode.setStyle('height', (hr.parentNode.offsetHeight + this.element.offsetHeight) + 'px');
     }
     this.origin = origin;
+    this.element.remove();
+    hr.adopt(this.element);
     this.redraw();
     if(obm.calendarManager.lock()) {
       obm.calendarManager.resizeWindow();
@@ -171,8 +175,11 @@ Obm.CalendarDayEvent = new Class({
     query += '&duration=' + this.event.duration;
     query += '&title=' + this.event.title;
     return query;
+  },
+  
+  destroy: function() {
+    this.element.remove();
   }
-
 })
 
 /******************************************************************************
@@ -228,7 +235,9 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
                                              .injectInside(this.element);
     }
     this.titleContainer = new Element('span').injectInside(this.element);
-    this.timeContainer = new Element('span').injectInside(this.dragHandler);
+    this.timeContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
+                                         .setProperty('onclick','if(obm.calendarManager.redrawLock) return false;')
+                                         .injectInside(this.dragHandler);
     this.resetTitle();
 
   },
@@ -598,7 +607,8 @@ Obm.CalendarManager = new Class({
         } else if (evt) {
           obm.calendarManager.unregister(id);
           obm.calendarManager.events.remove(id);
-          ev.destroy();
+          evt.destroy();
+          delete evt;
         }
       }
       obm.calendarManager.redrawAllEvents();      
@@ -622,7 +632,7 @@ Obm.CalendarManager = new Class({
     events = resp.eventsData;
     if(resp.error == 0) {
       showOkMessage(resp.message);
-      if(resp.day == 'true') {
+      if(resp.day == 1) {
         obm.calendarManager.newDayEvent(events[0].event,events[0].options);
       } else {
         obm.calendarManager.newEvent(events[0].event,events[0].options);
@@ -648,10 +658,13 @@ Obm.CalendarQuickForm = new Class({
     if(obm.calendarManager.redrawLock || target.id == '') {
       return false;
     }
+    target = $(target);
     str = target.id.split('-');
     type = str[0];
     if(type == 'time' || type == 'hour') {
       this.setDefaultFormValues(str[1].toInt(),0, context);
+    } else if (type == 'day') {
+      this.setDefaultFormValues(str[1].toInt() + obm.calendarManager.startTime,1, context);
     } else {
       elId = 'event-' + str[1] + '-' + str[2] + '-' + str[3] + '-' + str[4];
       evt = obm.calendarManager.events.get(elId);

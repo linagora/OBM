@@ -21,8 +21,6 @@
   border-collapse: collapse;	
   border-spacing: 0;
 }
-.calendar tbody {
-}
 
 .calendar tbody td {
   border-top: 1px dotted #ddd; 
@@ -75,7 +73,7 @@
   background-color: #fff;
 }
 
-.month tbody td h1{
+.month tbody td h2{
   position:relative;
   height:1em;
   top:-1em;
@@ -113,7 +111,6 @@
 
 .event {
   position: absolute;
-  color: #fff;
   overflow: hidden;
 }
 
@@ -125,8 +122,11 @@
   white-space: nowrap,
 }
 
+.event h1 a {
+  color: #fff;
+}
+
 .event img {
-  vertical-align: middle;
   margin-right: 1px;
 }
 
@@ -137,6 +137,7 @@
 }
 
 .eventOwner0 {
+  color: #fff;
   background-color: #83B6E6;
 }
 
@@ -148,6 +149,7 @@
 
 
 .eventOwner1 {
+  color: #fff;
   background-color: #f5b043;
 }
 
@@ -158,6 +160,7 @@
 }
 
 .eventOwner2 {
+  color: #fff;
   background-color: #98BF5E;
 }
 
@@ -168,6 +171,7 @@
 }
 
 .eventOwner3 {
+  color: #fff;
   background-color: #E7AB9E;
 }
 
@@ -178,6 +182,7 @@
 }
 
 .eventOwner4 {
+  color: #fff;
   background-color: #BBACC4;
 }
 
@@ -188,6 +193,7 @@
 }
 
 .eventOwner5 {
+  color: #fff;
   background-color: #5672d0;
 }
 
@@ -205,6 +211,7 @@
   display: none;
   width: 25em;
   text-align: center;
+  z-index: 1000;
 }
 
 #calendarQuickForm form  {

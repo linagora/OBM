@@ -141,14 +141,13 @@ function drawDatePicker(targetDateField, x, y)
     // that are currently pointing to objects on the page to have bad references
     //document.body.innerHTML += "<div id='" + datePickerDivID + "' class='dpDiv'></div>";
     var newNode = document.createElement("div");
-    newNode.setAttribute("id", datePickerDivID);
-    newNode.setAttribute("class", "datePickerWidget");
+    newNode.setAttribute("id", "datepicker");
     newNode.setAttribute("style", "visibility: hidden;");
     document.body.appendChild(newNode);
   }
 
   // move the datepicker div to the proper x,y coordinate and toggle the visiblity
-  var pickerDiv = document.getElementById(datePickerDivID);
+  var pickerDiv = document.getElementById("datepicker");
   pickerDiv.style.position = "absolute";
   pickerDiv.style.left = x + "px";
   pickerDiv.style.top = y + "px";
@@ -166,8 +165,6 @@ function drawDatePicker(targetDateField, x, y)
  */
 function refreshDatePicker(dateFieldName, year, month, day)
 {
-  // if no arguments are passed, use today's date; otherwise, month and year
-  // are required (if a day is passed, it will be highlighted later)
   var thisDay = new Date();
 
   if ((month >= 0) && (year > 0)) {
@@ -177,96 +174,69 @@ function refreshDatePicker(dateFieldName, year, month, day)
     thisDay.setDate(1);
   }
 
-  // the calendar will be drawn as a table
-  // you can customize the table elements with a global CSS style sheet,
-  // or by hardcoding style and formatting elements below
-  var crlf = "\r\n";
-  var TABLE = "<table>" + crlf;
-  var xTABLE = "</table>" + crlf;
-  var THEAD = "<thead>"
-  var xTHEAD = "</thead>" + crlf;
-  var TBODY = "<tbody>"
-  var xTBODY = "</tbody>" + crlf;
-  var TFOOT = "<tfoot>"
-  var xTFOOT = "</tfoot>" + crlf;
-  var TR = "<tr>";
-
-  var TR_days = "<tr>";
-  var xTR = "</tr>" + crlf;
-
+  var title = new Element('h1').adopt(
+                                   new Element('a').setProperty('href','')
+                                                 .setProperty('onclick',getGoToSource(dateFieldName, thisDay, -12))
+                                                 .appendText('<<'))
+                               .adopt(
+                                   new Element('a').setProperty('href','')
+                                                 .setProperty('onclick',getGoToSource(dateFieldName, thisDay, -1))
+                                                 .appendText('<'))
+                               .appendText(obm.vars.labels.months[thisDay.getMonth()] + ' ' + thisDay.getFullYear())
+                               .adopt(
+                                 new Element('a').setProperty('href','')
+                                                 .setProperty('onclick',getGoToSource(dateFieldName, thisDay, +1))
+                                                 .appendText('>'))
+                               .adopt(
+                                 new Element('a').setProperty('href','')
+                                                 .setProperty('onclick',getGoToSource(dateFieldName, thisDay, +12))
+                                                 .appendText('>>'));
   
-  var TD = "<td onmouseout='this.className=\"\";' onmouseover=' this.className=\"hover\";' ";    // leave this tag open, because we'll be adding an onClick event
-  var TH_title = "<td colspan=5 >";
-  var TD_foot = "<td colspan=7 >";
-  var TH = "<th>";
-  var xTH = "</th>" + crlf;
-  var TD_selected = "<td class='highlight' onmouseout='this.className=\"highlight\";' onmouseover='this.className=\"hover\";' ";    // leave this tag open, because we'll be adding an onClick event
-  var xTD = "</td>" + crlf;
-  var DIV_title = "<div>";
-  var DIV_selected = "<div class='highlight'>";
-  var xDIV = "</div>";
+  var labels = new Element('tr');
+  for(i = 0; i < obm.vars.labels.dayShort.length; i++) {
+    new Element('td').appendText(obm.vars.labels.dayShort[i]).injectInside(labels);
+  }
+  var content = new Element('tbody');
+  var line = new Element('tr').injectInside(content);
 
-  // start generating the code for the calendar table
-  var html = TABLE;
-
-  // this is the title bar, which displays the month and the buttons to
-  // go back to a previous month or forward to the next month
-  html += THEAD + TR;
-  html += TH + getButtonCode(dateFieldName, thisDay, -1, "&lt;") + xTH;
-  html += TH_title + DIV_title + obm.vars.labels.months[ thisDay.getMonth()] + " " + thisDay.getFullYear() + xDIV + xTH;
-  html += TH + getButtonCode(dateFieldName, thisDay, 1, "&gt;") + xTH;
-  html += xTR + xTHEAD;
-
-  // this is the row that indicates which day of the week we're on
-  html += TBODY + TR;
-  for(i = 0; i < obm.vars.labels.dayShort.length; i++)
-    html += TH + obm.vars.labels.dayShort[i] + xTH;
-  html += xTR ;
-
-  // now we'll start populating the table with days of the month
-  html += TR;
-
-  // first, the leading blanks
-  for (i = 0; i < thisDay.getDay(); i++)
-    html += TD + "&nbsp;" + xTD;
-
-  // now, the days of the month
+  for (i = 0; i < thisDay.getDay(); i++) {
+    new Element('td').addClassName('downlight')
+                     .injectInside(line);
+  }
+  
   do {
     dayNum = thisDay.getDate();
-    TD_onclick = " onclick=\"updateDateField('" + dateFieldName + "', '" + getDateString(thisDay) + "');\">";
-
-    if (dayNum == day)
-      html += TD_selected + TD_onclick + DIV_selected + dayNum + xDIV + xTD;
-    else
-      html += TD + TD_onclick + dayNum + xTD;
-
-    // if this is a Saturday, start a new row
-    if (thisDay.getDay() == 6)
-      html += xTR + TR;
-
-    // increment the day
+    var td = new Element('td');
+    td.setProperty("onclick","updateDateField('"+dateFieldName+"','"+getDateString(thisDay)+"')");
+    if (dayNum == day) {
+      td.setProperty("onmouseout","this.className='highlight';");
+      td.addClassName('highlight');
+    } else {
+      td.setProperty("onmouseout","this.className='';");
+    }
+    td.setProperty("onmouseover","this.className='hover';");
+    td.appendText(dayNum).injectInside(line);
+    if (thisDay.getDay() == 6) {
+      var line = new Element('tr').injectInside(content);
+    }
     thisDay.setDate(thisDay.getDate() + 1);
   } while (thisDay.getDate() > 1)
 
-  // fill in any trailing blanks
   if (thisDay.getDay() > 0) {
-    for (i = 6; i > thisDay.getDay(); i--)
-      html += TD + "&nbsp;" + xTD;
+    for (i = 7; i > thisDay.getDay(); i--) {
+      new Element('td').addClassName('downlight')
+                       .injectInside(line);
+    }
   }
-  html += xTR + xTBODY;
 
-  // add a button to allow the user to easily return to today, or close the calendar
-  var today = new Date();
-  var todayString = "Today is " + obm.vars.labels.dayMedium[today.getDay()] + ", " + obm.vars.labels.monthsShort[ today.getMonth()] + " " + today.getDate();
-  html += TFOOT + TR + TD_foot;
-  html += "<button onclick='refreshDatePicker(\"" + dateFieldName + "\");'>"+obm.vars.labels.today+"</button> ";
-  html += xTD + xTR;
+  var today = new Element('a').setProperty('href','')
+                              .setProperty("onclick","refreshDatePicker('" + dateFieldName + "');return false;")
+                              .appendText(obm.vars.labels.today);
+  var table = new Element('table').adopt(new Element('thead').adopt(labels))
+                                  .adopt(content);
 
-  // and finally, close the table
-  html += xTFOOT + xTABLE;
-
-  document.getElementById(datePickerDivID).innerHTML = html;
-  // add an "iFrame shim" to allow the datepicker to display above selection lists
+  $("datepicker").setHTML('');
+  $("datepicker").adopt(title).adopt(table).adopt(today);
   adjustiFrame();
 }
 
@@ -275,7 +245,7 @@ function refreshDatePicker(dateFieldName, year, month, day)
   Convenience function for writing the code for the buttons that bring us back or forward
   a month.
  */
-function getButtonCode(dateFieldName, dateVal, adjust, label)
+function getGoToSource(dateFieldName, dateVal, adjust)
 {
   var newMonth = (dateVal.getMonth () + adjust) % 12;
   var newYear = dateVal.getFullYear() + parseInt((dateVal.getMonth() + adjust) / 12);
@@ -284,7 +254,7 @@ function getButtonCode(dateFieldName, dateVal, adjust, label)
     newYear += -1;
   }
 
-  return "<button onclick='refreshDatePicker(\"" + dateFieldName + "\", " + newYear + ", " + newMonth + ");'>" + label + "</button>";
+  return "refreshDatePicker('" + dateFieldName + "', " + newYear + ", " + newMonth + ");return false;";
 }
 
 
@@ -330,15 +300,15 @@ function getFieldDate(dateString)
     if (dArray) {
       switch (dFormat) {
         case "dmy" :
-        d = parseInt(dArray[0], 10);
-        m = parseInt(dArray[1], 10) - 1;
-        y = parseInt(dArray[2], 10);
-        break;
+          d = parseInt(dArray[0], 10);
+          m = parseInt(dArray[1], 10) - 1;
+          y = parseInt(dArray[2], 10);
+          break;
         case "ymd" :
           d = parseInt(dArray[2], 10);
-        m = parseInt(dArray[1], 10) - 1;
-        y = parseInt(dArray[0], 10);
-        break;
+          m = parseInt(dArray[1], 10) - 1;
+          y = parseInt(dArray[0], 10);
+          break;
         case "mdy" :
         default :
           d = parseInt(dArray[1], 10);
@@ -421,7 +391,7 @@ function updateDateField(dateFieldName, dateString)
   if (dateString)
     targetDateField.value = dateString;
 
-  var pickerDiv = document.getElementById(datePickerDivID);
+  var pickerDiv = document.getElementById("datepicker");
   pickerDiv.style.visibility = "hidden";
   pickerDiv.style.display = "none";
 
@@ -472,7 +442,7 @@ function adjustiFrame(pickerDiv, iFrameDiv)
     }
 
     if (!pickerDiv)
-      pickerDiv = document.getElementById(datePickerDivID);
+      pickerDiv = document.getElementById("datepicker");
     if (!iFrameDiv)
       iFrameDiv = document.getElementById(iFrameDivID);
 

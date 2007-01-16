@@ -26,7 +26,7 @@ define("C_IMAGE_PATH",$cgp_host."images");
 //$c_multidomain = true;
 
 // Home page redirection
-//$c_home_redirect = "$cgp_host" . "agenda/agenda_index.php";
+//$c_home_redirect = "$cgp_host" . "calendar/calendar_index.php";
 
 // Use specific langs
 //$conf_lang = true;
@@ -51,7 +51,7 @@ $cgp_sql_star = true;
 // MySQL (only 4.1+) charset collation used (for database and files !)
 //$cmy_charset_collation = "latin1_general_ci";
 
-// is Mail enabled for OBM ? (eg: agenda)
+// is Mail enabled for OBM ? (eg: calendar)
 //$cgp_mail_enabled = true;
 
 // is Demo enabled (login screen array with default account)
@@ -102,15 +102,15 @@ $cgp_mailing_default = true;
 $ccontact_private_default = true;
 
 // Calendar : show public groups
-$cagenda_public_groups = true;
+$ccalendar_public_groups = true;
 
-// Calendar: generic E-mail resource admin for agenda module
-//$cagenda_resource_admin = "resource@mydomain";
+// Calendar: generic E-mail resource admin for calendar module
+//$ccalendar_resource_admin = "resource@mydomain";
 
 // Calendar first ay of week, first and last hour display
-//$cagenda_weekstart = "monday";
-$cagenda_first_hour = 8;
-$cagenda_last_hour = 20;
+//$ccalendar_weekstart = "monday";
+$ccalendar_first_hour = 8;
+$ccalendar_last_hour = 20;
 
 // Generic E-mail for Incident module
 //$cmail_incident = "support@mydomain";
@@ -144,7 +144,7 @@ $profiles["editor"] = array (
 //-----------------//
 // sections -- Default is true
 //$cgp_show["section"] = ""; // Needed if module order to change
-//$cgp_show["section"]["com"]["url"] = "$path/agenda/agenda_index.php";
+//$cgp_show["section"]["com"]["url"] = "$path/calendar/calendar_index.php";
 
 // modules -- false to hide, otherwise section
 //$cgp_show["module"] = ""; // Needed if module order to change

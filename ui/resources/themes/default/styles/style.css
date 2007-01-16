@@ -12,7 +12,7 @@
 
 body {
   background-color: #ffffff;
-  font-size: 10px;
+  font-size: 11px;
   font-family: arial,sans-serif;
   color: #636466;
   border: 0px;
@@ -73,6 +73,7 @@ textarea {
 }
 
 input {
+  vertical-align: middle;
   color: #636466;
   font-size: 100%;
   border: 1px solid #d2d2d2;
@@ -112,13 +113,13 @@ C {
 
 #portletsPanel {
   position: absolute;
-  width: 15em;
+  width: 15.5em;
   left: 2px;
   margin-top: 10px;
 }
 
 #mainPanel {
-  z-index:1000;
+  z-index:100;
   min-width: 120px;
   margin: 0px 0px 20px 16em;
   padding: 10px;
@@ -142,10 +143,6 @@ C {
   background-image: url('../images/banner_border.png');
   background-repeat: repeat-x;
   background-position: bottom;
-}
-
-#banner img {
-  vertical-align: middle;
 }
 
 #information {
@@ -190,7 +187,6 @@ C {
 /* Section menu */
 /* ------------------------------------------------------------------------- */
 #section {
-  vertical-align: middle;
   display: inline;
   margin: 0;
   padding: 0;
@@ -204,17 +200,17 @@ C {
   padding: 0.3em 0.8em;
   text-align: center;
   border: 1px solid #358399;
-  background: #509cbc;
+  background-color: #509cbc;
   background-image: url('../images/tab_border.png');
   background-repeat: repeat-x;
-  cursor: pointer;
   background-position: 0 0.9em;
+  cursor: pointer;
   color: #fff;   
 }
 
 #section li.hover {
   color: #368397;
-  background: #e0e1e3;
+  background-color: #e0e1e3;
   background-image: url('../images/tab_current_border.png');
   background-repeat: repeat-x;
   background-position: 0 0.9em;
@@ -309,13 +305,26 @@ C {
 /* Portlets */
 /* ------------------------------------------------------------------------- */
 
+#portletsHandler {
+  width: 15em;
+  font-weight: bold;
+  background-image: url('../images/tab_current_border.png');
+  background-repeat: repeat-x;
+  background-position: 0 0.5em;
+  background-color: #e0e1e3;
+  background-color: #eff0f2;
+  border: 1px solid #b3b3b3;
+}
+
 .portlet {
   width: 15em;
   background-color: #eff0f2;
+  border-left: 1px solid #b3b3b3;
+  border-right: 1px solid #b3b3b3;
+  border-bottom: 1px solid #b3b3b3;
   color: #368397;
   list-style-type: none; 
   overflow: hide;
-  margin-top: 6px;
 }
 
 .portlet h1 {
@@ -326,6 +335,7 @@ C {
   text-align: left;
   margin:0;
   padding: 2px 4px 0 4px;
+  border-top: 1px solid #fff;
 }
 
 .portlet .handle{
@@ -448,6 +458,7 @@ fieldset.detail {
 }
 
 .buttons {
+  clear: left;
   text-align: center;
   padding-top : 1em;
   border: 0;
@@ -483,7 +494,6 @@ fieldset.detail {
   cursor: pointer;
 }
 
-
 /* ------------------------------------------------------------------------- */
 /* DatePicker layout */
 /* ------------------------------------------------------------------------- */
@@ -494,73 +504,64 @@ input.datePicker {
 }
 
 /* the div that holds the date picker calendar */
-.datePickerWidget {
-
-}
-
-
-/* the table (within the div) that holds the date picker calendar */
-.datePickerWidget table {
-  font-family: Tahoma, Arial, Helvetica, sans-serif;
-  font-size: 12px;
+#datepicker {
+  width: 17em;
+  background-color: #fff;
   text-align: center;
-  color: #505050;
-  background-color: #ece9d8;
-  border: 1px solid #AAAAAA;
 }
 
-.datePickerWidget table thead {
-
-}
-
-.datePickerWidget table thead button{
-  font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  color: gray;
-  background: #d8e8ff;
+#datepicker h1 {
+  margin: 3px;
+  font-size: 120%;
   font-weight: bold;
-  padding: 0px;
 }
 
-.datePickerWidget table tbody {
-
+#datepicker a {
+  margin-left: 5px;
 }
 
-.datePickerWidget table tbody th{
-  background-color: #CCCCCC;
-  border: 1px solid #AAAAAA;
-  color: white;  
+#datepicker table, .miniCalendar {
+  background-color: #fff;
+  text-align: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right:	auto;
+  border: 1px solid #aaa; 
+  border-collapse: collapse;	
+  border-spacing: 0;  
 }
 
-.datePickerWidget table tbody td{
-  border: 1px solid #ece9d8;
-}
-
-.datePickerWidget table tbody td.highlight{
-  background-color: #CCCCCC;
-  border: 1px solid #AAAAAA;  
-}
-
-.datePickerWidget table tbody td.hover{
-  background-color: #aca998;
-  border: 1px solid #888888;
+#datepicker thead, .miniCalendar thead{
+  background-color: #4692a9;
+  background-image: url('../images/tab_border.png'); 
+  background-repeat: repeat-x;
   cursor: pointer;
-  color: red;  
+  background-position: 0 0.5em;  
+  color: #fff;      
 }
 
-.datePickerWidget table tfoot {
+#datepicker table tbody td, .miniCalendar tbody td{
+  border-top: 1px dotted #ddd; 
+  border-left: 1px solid #aaa;   
 }
 
-
-.datePickerWidget table tfoot button{
-  font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  color: gray;
-  background: #d8e8ff;
-  font-weight: bold;
+#datepicker table tbody td.highlight, .miniCalendar tbody td.highlight{
+  background-color: #fddaa4;
 }
 
+#datepicker table tbody td.downlight, .miniCalendar tbody td.downlight{
+  background-color: #eff0f2;
+}
 
+#datepicker table tbody td.hover, .miniCalendar tbody td.hover {
+  background-color: #4692a9;
+  cursor: pointer;
+  color: #fff;  
+}
+
+#datepicker table tbody td.hover a, .miniCalendar tbody td.hover a {
+  color: #fff;  
+}
 /* ------------------------------------------------------------------------- */
 /* Comments layout */
 /* ------------------------------------------------------------------------- */
@@ -725,10 +726,6 @@ input.datePicker {
 
 }
 
-.result thead img{
-  vertical-align: middle;
-}
-
 .result thead td {
   padding: 2px 0;
 }
@@ -744,6 +741,97 @@ input.datePicker {
 
 .result tbody tr.pair{
   background-color: #fafafa;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Generic table styles*/
+/* ------------------------------------------------------------------------- */
+
+.spreadSheet {
+  width: 100%;
+  background-color: #fff;
+  border-spacing:0;
+  border: 1px solid #959595;
+}
+
+.spreadSheet colgroup.highlight {
+  background-color: #f4f3c5;
+}
+
+.spreadSheet td, .spreadSheet th {
+
+}
+
+.spreadSheet thead th{
+  background-color: #b3b2b2;
+  font-weight: bold;
+  text-align: center;
+  background-image: url('../images/background_tableHead.gif');
+  background-repeat: repeat-x;
+  background-position: top;
+  border-right: 1px solid #aeaeae;
+  border-left: 1px solid #fff;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #a0a0a0;  
+}
+
+.spreadSheet thead td{
+  background-color: #dbdbdb;
+  font-weight: bold;
+  text-align: center;
+  border-right: 1px solid #adadad;
+  border-left: 1px solid #fff;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #b2b2b2;  
+}
+
+.spreadSheet tbody th{
+  background-color: #dbdbdb;
+  font-weight: bold;
+  text-align: center;
+  border-right: 1px solid #aeaeae;
+  border-left: 1px solid #fff;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #c9c9c9;    
+}
+
+.spreadSheet tbody tr.highlight {
+  background-color: #f4f3c5;
+}
+
+.spreadSheet tbody tr.pair {
+  background-color: #ececec;
+}
+
+.spreadSheet tbody td {
+  border-bottom: 1px solid #ececec;
+  border-right: 1px solid #d3d1d6;
+  border-left: 1px solid #fff;
+}
+
+.spreadSheet tbody td.highlight{
+    background-color: #f4f3c5;
+    border: 1px solid #f7df7f;
+}
+
+.spreadSheet tfoot th{
+  background-color: #dbdbdb;
+  font-weight: bold;
+  text-align: center; 
+  border-right: 1px solid #adadad;
+  border-left: 1px solid #fff;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #c2c2c2;    
+}
+
+.spreadSheet tfoot td{
+  background-color: #dbdbdb;
+  font-weight: bold;
+  text-align: center;  
+  border-right: 1px solid #adadad;
+  border-left: 1px solid #fff;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #c2c2c2;      
 }
 
 /* ------------------------------------------------------------------------- */
@@ -854,34 +942,16 @@ input.datePicker {
         white-space:       nowrap;
 }
 
-/* TODO: VIRER CA !!!!!
-.block {
-  background-color: #eff0f2;
-  color: #368397;
-  list-style-type: none;
+/*-------------------------------------------------------------------------- */
+/* Specific styles for the portlets.
+/* ------------------------------------------------------------------------- */
+
+#lastVisitPortlet li{
+  white-space: nowrap;
 }
 
-.block form {
-        padding:                0;
-        margin:                 2px 0;
-}
 
-.blockTitle {
-	font-weight:		bold;
-	color:			#646567;
-	background-color:       #d2d2d2;
-}
 
-.blockItem {
-  font-size: 80%;
-	list-style-type: none;
-	margin: 0px;
-	padding: 3px 0;
-}
-.blockItem li {
-        margin: 1px;
-}
-*/
 /* A PARTIR D'ICI CE SONT DES CLASSES QUE JE N'AI PAS ENCORE RENCOTREES
  * DANS LE CODE....
 .link {
@@ -986,7 +1056,7 @@ span.hiddenLegend {
 /* TODO : Principalement passer tout ca dans un format plus "actuel", donc avec em,
  * % et en virant les truc devenu inutil.
  * verifier également que cette partie de la css est valide Mehdi iso 4000.
- * Normalement oui vu que je l'ai faie il y a pas trop longtemps
+ * Normalement oui vu que je l'ai faite il y a pas trop longtemps
  * PLANNING
  */
 

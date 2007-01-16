@@ -14,8 +14,8 @@
 //   - $display : (by ref) $display hash with each content object
 ///////////////////////////////////////////////////////////////////////////////
 function display_page(&$display) {
-  global $output_target;
-  global $ico_arrow_left;
+  global $output_target, $ico_arrow_right;
+  global $ico_arrow_left, $l_hide;
 
   // If print activated, display only the detail
   if ($output_target == "print") {
@@ -64,7 +64,15 @@ function display_page(&$display) {
   echo $display["head"] . $display["header"] . "
     <!-- left panel -->
     <div id=\"portletsPanel\">
-      <img id='portletsHandler' src='$ico_arrow_left' alt='Hide this bar' />
+      <div id='portletsHandler'>
+      <span>
+      <img src='$ico_arrow_left' alt='Hide this bar' />
+      $l_hide
+      </span>
+      <span id='portletsHandlerShow'>
+      <img src='$ico_arrow_right' alt='Show this bar' />
+      </span>
+      </div>
       <div id=\"portlets\">
         " .
         $display["last"] .

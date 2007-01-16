@@ -630,13 +630,13 @@ function get_calendar_action() {
                                     	 );
 
   // View Year
-  $actions["calendar"]["view_year"] = array (
+/*  $actions["calendar"]["view_year"] = array (
     'Name'     => $l_header_year,
     'Url'      => "$path/calendar/calendar_index.php?action=view_year&amp;date=$date",
     'Right'    => $cright_read,  
     'Condition'=> array ('all') 
                                     	    );
-
+ */
   // View Month
   $actions["calendar"]["view_month"] = array (
     'Name'     => $l_header_month,
