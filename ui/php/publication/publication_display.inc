@@ -597,7 +597,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
   if (isset($publication["quantity"])) { $quantity = $publication["quantity"]; }
   if (isset($publication["subscription_id"])) { $sub_id = $publication["subscription_id"]; }
   if (isset($publication["contact_id"])) { $cont_id = $publication["contact_id"]; }
-  if ($publication["renew"] == 1) { $renew = " checked=\"checked\""; }
+  if ($publication["renewal"] == 1) { $renew = " checked=\"checked\""; }
   if (isset($publication["lang"])) { $lang = stripslashes($publication["lang"]); }
   if (isset($publication["recept"])) { $recept = stripslashes($publication["recept"]); }
   

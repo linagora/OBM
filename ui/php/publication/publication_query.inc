@@ -32,7 +32,7 @@ function run_query_publication_search($publication) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-	$multidomain = sql_multidomain("publication");
+  $multidomain = sql_multidomain("publication");
 	
   $and = "";
   if ($title != "") {
@@ -52,9 +52,9 @@ function run_query_publication_search($publication) {
     $and = "AND";
   }
   if ($where != "") {
-    $whereq = "WHERE $where";
+    $whereq = "WHERE $where $multidomain";
   } else {
-  	$whereq = "WHERE 1=1 $multidomain";
+    $whereq = "WHERE 1=1 $multidomain";
   }
 
   // ORDER construction
@@ -101,7 +101,7 @@ function run_query_publication_detail($p_id) {
 
   $timeupdate = sql_date_format($type, "publication_timeupdate", "timeupdate");
   $timecreate = sql_date_format($type, "publication_timecreate", "timecreate");
-	$multidomain = sql_multidomain("publication");
+  $multidomain = sql_multidomain("publication");
 	
   $query = "SELECT *,
       $timeupdate,
@@ -112,35 +112,12 @@ function run_query_publication_detail($p_id) {
          LEFT JOIN PublicationType on publication_type_id=publicationtype_id
          LEFT JOIN UserObm as c on publication_usercreate=c.userobm_id
          LEFT JOIN UserObm as u on publication_userupdate=u.userobm_id
-    WHERE publication_id='$p_id' $multidomain";
+    WHERE publication_id='$p_id'
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_publication_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Contact Category 1 query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_publication_contactcategory1() {
-  global $cdg_sql;
-
-  $multidomain = sql_multidomain("contactcategory1");
-	
-  $query = "SELECT *
-    FROM Category 
-    WHERE 1=1 $multidomain ORDER BY contactcategory1_code"; 
-  $query = "SELECT *
-    FROM ContactCategory1 
-		WHERE 1=1 $multidomain ORDER BY contactcategory1_code"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_publication_contactcategory1()");
 
   return $obm_q;
 }
@@ -154,13 +131,13 @@ function run_query_publication_contactcategory1() {
 function run_query_publication_list() {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain("list");
 
   $query = "SELECT list_id,
       list_name,
       userobm_login
     FROM List LEFT JOIN UserObm ON list_usercreate=userobm_id
-		WHERE 1=1 $multidomain
+    WHERE 1=1 $multidomain
     ORDER BY list_name"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -417,7 +394,7 @@ function run_query_publication_insert_subscription($publication) {
   $c_id = $publication["contact_id"];
   $quantity = $publication["quantity"];
   $p_id = $publication["publication_id"];
-  $renew = $publication["renew"];
+  $renewal = ($publication["renewal"] == "1" ? "1" : "0");
   $recept = $publication["recept"];
   $domain_id = $obm["domain_id"];
   
@@ -449,7 +426,7 @@ function run_query_publication_insert_subscription($publication) {
     '$domain_id',
     '$c_id',
     '$p_id',
-    '$renew',
+    '$renewal',
     '$recept',
     '$quantity'
     )";
@@ -472,14 +449,14 @@ function run_query_publication_update_subscription($publication) {
 
   $s_id = $publication["subscription_id"];
   $quantity = $publication["quantity"];
-  $renew = $publication["renew"];
+  $renewal = ($publication["renewal"] == "1" ? "1" : "0");
   $recept = $publication["recept"];
   $multidomain = sql_multidomain("subscription");
   
   $query = "UPDATE Subscription SET 
       subscription_timeupdate = '". date("Y-m-d H:i:s") ."',
       subscription_userupdate='". $auth->auth["uid"] ."',
-      subscription_renewal='$renew',
+      subscription_renewal='$renewal',
       subscription_reception_id='$recept',
       subscription_quantity='$quantity'
     WHERE	

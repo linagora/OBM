@@ -191,9 +191,6 @@ $l_section_prod   = "PRODUCCIÓN";
 $l_section_compta = "CONTABILIDAD";
 $l_section_user   = "USUARIOS";
 $l_section_admin  = "ADMINISTRACIÓN";
-$l_section_aliamin = "ALIAMIN";
-$l_section_settings = "PREFERENCIAS";
-
 
 $l_module_company = "Compañías";
 $l_module_contact = "Contactos";

@@ -144,6 +144,7 @@ $l_resourcegroup = "Groupe de ressources";
 $l_settings = "Configuration";
 $l_backup = "Sauvegarde";
 $l_domain = "Domaine";
+$l_password = "Mot de passe";
 
 // OBM_DISPLAY
 $l_entries = "Entrées";
@@ -209,8 +210,7 @@ $l_section_prod   = "Production";
 $l_section_compta = "Comptabilité";
 $l_section_user   = "Utilisateur";
 $l_section_admin  = "Administration";
-$l_section_aliamin = "Aliamin";
-$l_section_settings = "Préférences";
+$l_section_my = "Mon compte";
 
 $l_module_company = "Sociétés";
 $l_module_contact = "Contacts";
@@ -234,7 +234,6 @@ $l_module_account = "Comptes";
 $l_module_invoice = "Factures";
 $l_module_payment = "Paiements";
 
-$l_module_settings = "Configuration";
 $l_module_user = "Utilisateurs";
 $l_module_resource = "Ressources";
 $l_module_group = "Groupes";
@@ -248,6 +247,9 @@ $l_module_admin_code = "Code";
 $l_module_admin_ref = "Référentiel";
 $l_module_import = "Import";
 $l_module_backup = "Sauvegarde";
+
+$l_module_settings = "Configuration";
+$l_module_password = "Mot de passe";
 
 $l_header_admin = "Administration";
 $l_header_new_f = "Nouvelle";

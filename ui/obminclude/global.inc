@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0pre12";
+$obm_version = "2.0pre13";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -216,6 +216,7 @@ $cgp_show["section"]["prod"]["url"] = "$path/time/time_index.php";
 $cgp_show["section"]["compta"]["url"] = "$path/invoice/invoice_index.php";
 $cgp_show["section"]["user"]["url"] = "$path/settings/settings_index.php";
 $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
+$cgp_show["section"]["my"]["url"] = "$path/settings/settings_index.php";
 //$cgp_show["section"]["aliamin"]["url"] = "http://aliamin/";
 
 // modules
@@ -237,7 +238,6 @@ $cgp_show["module"]["document"] = "prod";
 $cgp_show["module"]["invoice"] = "compta";
 $cgp_show["module"]["payment"] = "compta";
 $cgp_show["module"]["account"] = "compta";
-$cgp_show["module"]["settings"] = "user";
 $cgp_show["module"]["user"] = "user";
 $cgp_show["module"]["group"] = "user";
 $cgp_show["module"]["resource"] = "user";
@@ -250,6 +250,8 @@ $cgp_show["module"]["admin_code"] = "admin";
 $cgp_show["module"]["admin_ref"] = "admin";
 $cgp_show["module"]["import"] = "admin";
 $cgp_show["module"]["backup"] = "admin";
+$cgp_show["module"]["settings"] = "my";
+$cgp_show["module"]["password"] = "my";
 
 // Display domain module only when multidomain is activate
 if($c_multidomain) {
@@ -445,6 +447,8 @@ $php_regexp_amount = "/^[0-9]+(\.[0-9][0-9]?)?$/";
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 $php_regexp_percent = "/^[1]?[0-9]?[0-9]$/"; // 0-100
 $php_regexp_backup = "/^obmdb-[0-9]{8}:[0-9]{6}-[0-9]{1,2}.[0-9]{1,2}(.[0-9]{1,2})?.dump$/";
+
+$php_regexp_password = "/^.{4,12}$/";
 
 $global_dis_debug_msg = "";
 $global_dis_debug_param = "";

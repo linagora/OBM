@@ -137,9 +137,10 @@ $l_user = "User";
 $l_resource = "Resource";
 $l_group = "Group";
 $l_resourcegroup = "Resources Group";
-$l_settings = "Settings";
 $l_backup = "Backup";
 $l_domain = "Domain";
+$l_settings = "Settings";
+$l_password = "Password";
 
 // Global display
 $l_last_visit = "Bookmarks";
@@ -207,8 +208,7 @@ $l_section_prod   = "PRODUCTION";
 $l_section_compta = "ACCOUTANCY";
 $l_section_user   = "USERS";
 $l_section_admin  = "ADMINISTRATION";
-$l_section_aliamin = "ALIAMIN";
-$l_section_settings = "PREFERENCES";
+$l_section_my  = "My account";
 
 $l_module_company = "Companies";
 $l_module_contact = "Contacts";
@@ -246,6 +246,9 @@ $l_module_admin_code = "Code";
 $l_module_admin_ref = "Referential";
 $l_module_import = "Import";
 $l_module_backup = "Backup";
+
+$l_module_settings = "Settings";
+$l_module_password = "Password";
 
 $l_header_admin = "Administration";
 $l_header_new_f = "New";

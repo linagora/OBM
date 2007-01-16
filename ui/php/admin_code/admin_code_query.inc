@@ -7,7 +7,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$regexp_def_func = '/^\s*function ([a-z_]*)\s{0,3}\(.*/Us';
+$regexp_def_func = '/^\s*function ([a-z_0-9]*)\s{0,3}\(.*/Us';
 $regexp_used_func = '/^.*([a-z_]{1,96})\s{0,3}\(.*$/Us';
 $regexp_used_func_not_def = '/^\s*(function|\/\/).*$/Us';
 $regexp_used_func_not_debug = '/display_debug_msg.*([a-z_]{1,96})\s{0,3}\(.*$/Us';

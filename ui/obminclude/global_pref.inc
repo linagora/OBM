@@ -297,13 +297,6 @@ if ($cgp_show["module"]["payment"]) {
                                 'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["settings"]) {
-  $modules["settings"] = array(
-                               'Name'=> $l_settings,
-                               'Ico' => "$ico_setting",
-		               'Url' => "$path/settings/settings_index.php",
-			       'Right'=> $cright_read);
-}
 if ($cgp_show["module"]["user"]) {
   $modules["user"] = array('Name'=> $l_module_user,
                                    'Ico' => "$ico_user",
@@ -327,4 +320,20 @@ if ($cgp_show["module"]["resourcegroup"]) {
                                     'Ico' => "$ico_resourcegroup",
                                     'Url' => "$path/resourcegroup/resourcegroup_index.php",
 			            'Right'=> $cright_read);
+}
+
+if ($cgp_show["module"]["settings"]) {
+  $modules["settings"] = array(
+                               'Name'=> $l_module_settings,
+                               'Ico' => "$ico_setting",
+		               'Url' => "$path/settings/settings_index.php",
+			       'Right'=> $cright_read);
+}
+
+if ($cgp_show["module"]["password"]) {
+  $modules["password"] = array(
+                               'Name'=> $l_module_password,
+                               'Ico' => "$ico_password",
+		               'Url' => "$path/password/password_index.php",
+			       'Right'=> $cright_read);
 }
