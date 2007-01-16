@@ -197,6 +197,7 @@ function html_project_search_form ($tts, $member_q, $project) {
         $cb_archive
       </label>
       <label>&nbsp;<br />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"company_id\" type=\"hidden\" value=\"$company_id\" />
         <input name=\"deal_id\" type=\"hidden\" value=\"$deal_id\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
@@ -809,16 +810,16 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       $usedtime += $m_used;
     }
 
-    $dis_memhead = "<td class=\"projectHead\">&nbsp;</td>\n";
+    $dis_memhead = "<td>&nbsp;</td>\n";
 
     // diplay the members of the project
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
       $m_id = $array_mem[$cpt_e]["id"];
       $m_name = $array_mem[$cpt_e]["name"];
-      $dis_memhead .= "<td class=\"projectHead\">$m_name</td>\n";
+      $dis_memhead .= "<th>$m_name</th>\n";
     }
 
-    $dis_memhead .= "<td class=\"projectHead\">$l_total</td>\n";
+    $dis_memhead .= "<th>$l_total</th>\n";
 
     // display the rest of the array (ie. tasknames - projected times)
     for ($cpt_d=0; $cpt_d<$cpt_t; $cpt_d++) {
@@ -830,9 +831,9 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       $t_haschild = $array_child[$t_id];
 
       if ($t_parent) {
-	$dis_member .= "<tr>\n<td class=\"projectPtask\">$t_label</td>\n";
+	$dis_member .= "<tr>\n<th>$t_label</th>\n";
       } else {
-	$dis_member .= "<tr>\n<td class=\"projectCtask\">
+	$dis_member .= "<tr>\n<td>
         <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />
         $t_label</td>\n";
       }
@@ -1043,13 +1044,17 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     </table>
     </div>
 
-    <div class=\"detail infos\">
+    <div class=\"detail extra\">
     <h1>$l_progressinfos</h1>
-    <table>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
       $dis_memhead
     </tr>
-      $dis_member
+    </thead>
+    <tbody>
+    $dis_member
+    </tbody>
     </table>
     </div>
     
