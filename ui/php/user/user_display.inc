@@ -512,6 +512,7 @@ function html_user_consult($obm_q) {
   $g_q = run_query_user_user_group($id);
   if ($g_q->num_rows() > 0) {
     $dis_group = "
+    <div class=\"detail infos\">
     <h1>$l_group_member</h1>
     <table>
     <tr>";
@@ -525,7 +526,7 @@ function html_user_consult($obm_q) {
     }
     $dis_group .= "
     </tr>
-    </table>";
+    </table></div>";
   }
 
   $display["detailInfo"] = display_record_info($obm_q);
