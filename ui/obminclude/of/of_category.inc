@@ -511,7 +511,8 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
         <td>
         <a href=\"#\" onclick=\"updateLine($c_id,'${cat}')\">
         <img src=\"$ico_ok\" alt=\"$l_c_update\" title=\"$l_c_update\" />
-        </td>
+        </a>
+	</td>
         </tr>
         ";
     }

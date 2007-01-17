@@ -710,7 +710,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
       <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$param_contract")."\">$c_label</a>
       <input type=\"hidden\" name=\"contract_id\" value=\"$param_contract\" />
       <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=f_entity.contract_new_id&amp;ext_widget_text=f_entity.contract_new_name','contract','height=$popup_height,width=$popup_width'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=f_entity.contract_new_id&amp;ext_widget_text=f_entity.contract_new_name','contract','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"$ico_contract\" alt=\"[Contract]\" /></a>
       <input type=\"text\" name=\"contract_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>
@@ -823,15 +823,12 @@ function dis_incident_admin_index() {
   $block = "";
 
   $pri = of_category_get_ordered("incident", "priority");
-  $block .= "<hr />";
   $block .= of_category_dis_admin_form("priority", $pri);
 
   $sta = of_category_get_ordered("incident", "status");
-  $block .= "<hr />";
   $block .= of_category_dis_admin_form("status", $sta);
 
   $resos = of_category_get_ordered("incident", "resolutionType");
-  $block .= "<hr />";
   $block .= of_category_dis_admin_form("resolutionType", $resos);
 
   // User defined data

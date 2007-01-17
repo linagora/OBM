@@ -515,8 +515,9 @@ function html_invoice_links($inv_q) {
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/invoice/invoice_index.php")."&amp;ext_id=$id&amp;ext_target=$l_invoice";
     $nb_document = run_query_global_document_nb ($id, "invoice");
     $block_doc = "
-  <div class=\"linkTitle\">:: $l_module_document</div>
-  <ul class=\"linkList\">
+  <div class=\"portlet\" id=\"invoiceDocument\">
+  <h1>$l_module_document</h1>
+  <ul>
     <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" /></a>
@@ -526,7 +527,8 @@ function html_invoice_links($inv_q) {
 	 \"><img src=\"$ico_document_new\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_invoice'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
-  </ul>";
+  </ul>
+  </div>";
   }
 
   // Payment
@@ -535,21 +537,21 @@ function html_invoice_links($inv_q) {
     $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;sel_invoice=$id&amp;invoice_name=$uname&amp;company_id=$company_id&amp;company_name=$company_name&amp;tf_amount=$amount");
     $nb_pay = get_global_linked_payment_nb($id, "invoice");
     $block_payment = "
-  <div class=\"linkTitle\">:: $l_module_payment</div>
-  <ul class=\"linkList\">
+  <div class=\"portlet\" id=\"invoicePayment\">
+  <h1>$l_module_payment</h1>
+  <ul>
     <li><a href=\"$url_inv\"><img src=\"$ico_payment\" alt=\"\" /></a>
         $l_module_payment ( <a href=\"$url_pay\">$nb_pay</a> )</li>
     <li><a href=\"$url_pay_new\"><img src=\"$ico_payment\" alt=\"\" /></a>
         <a href=\"$url_pay_new\">$l_new</a></li>
-  </ul>";
+  </ul>
+  </div>";
   }
 
   // Links Template  
   $block = "
-<div class=\"link\"> 
   $block_doc
-  $block_payment
-</div>";
+  $block_payment";
 
   return $block;
 }
@@ -662,12 +664,13 @@ function dis_invoice_detail($inv_q) {
       <th>$l_amount_ttc</th>
       <td>$ttc</td>
     </tr>
-    <tr>
-      <th>$l_comment</th>
-      <td>$comment</td>
-    </tr>
     </table>
-    </div>";
+  </div>
+    
+  <div class=\"detail extra\">
+     <h1>$l_comment</h1>
+      $comment
+  </div>";
 
   return $block;
 } 

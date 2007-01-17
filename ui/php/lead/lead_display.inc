@@ -129,7 +129,7 @@ function html_lead_search_form($params, $sources, $managers) {
     <form method=\"get\" name=\"f_search\" action=\"lead_index.php?action=search\" class=\"search\">
 
       <label>$l_text<br />
-       <input name=\"tf_text\" size=\"24\" value=\"$text\">
+       <input name=\"tf_text\" size=\"24\" value=\"$text\" />
       </label>
 
       <label>$l_company<br />
@@ -153,8 +153,8 @@ function html_lead_search_form($params, $sources, $managers) {
       </label>
 
       <label><br />
-       <input type=\"hidden\" name=\"action\" value=\"search\">
-       <input type=\"submit\" name=\"submit\" value=\"$l_find\">  
+       <input type=\"hidden\" name=\"action\" value=\"search\" />
+       <input type=\"submit\" name=\"submit\" value=\"$l_find\" />  
       </label>
     <p class=\"CL\" />
     </form>

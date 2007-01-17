@@ -1711,10 +1711,10 @@ function dis_contract_priority_links($id) {
       $cpt++;
       $cid = $obm_q->f("contract_id");
       $cname = $obm_q->f("contract_label");
-      $dis_link .="<a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$cid") . "\">$cname</a>";
+      $dis_link .="<li><a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$cid") . "\">$cname</a></li>";
     }
     if ($cpt < $nb_pri) {
-      $dis_link .= "...";
+      $dis_link .= "<li>...</li>";
     }
 
     $dis_link .="<div class=\"buttons\">$dis_back</div>";
@@ -1732,7 +1732,17 @@ function dis_contract_priority_links($id) {
      </div>";
 
   }
-  return $dis_link;
+
+  $block = "
+ <div class=\"detail\">
+    <ul>
+    $dis_link
+    </ul>
+    </div>
+  ";
+
+  
+  return $block;
 }
 
 
@@ -1918,7 +1928,7 @@ function html_contract_admin_form($type_q) {
   global $l_type_manage, $l_type_new, $l_type_exist;
   global $l_type_checkdelete, $l_type_delete, $l_type_update, $l_type_insert;
   global $l_type_insert_ok, $l_type_insert_error, $l_type_update_ok;
-  global $l_type_update_error, $l_type_delete_error, $l_type_delete_ok,$l_c_new,$ico_ok,$ico_delete;
+  global $l_type_update_error, $l_type_delete_error, $l_type_delete_ok,$l_c_new,$ico_ok,$ico_delete,$l_label;
 
 $char_title = '=';
 $key = 0;
@@ -1962,7 +1972,7 @@ $block = "
   <thead>
   <tr>
   <td>&nbsp;</td>
-  <td>$l_type_label</td>
+  <td>$l_label</td>
   <td>&nbsp;</td>        
   </tr>    
   </thead>

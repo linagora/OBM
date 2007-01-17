@@ -219,8 +219,9 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   <form method=\"get\" name=\"f_mod_right\"
     action=\"".url_prepare($_SERVER["PHP_SELF"])."\">
 
-  <div class=\"detailHead\">$l_read_permission</div>
-  <table class=\"detail\">
+  <fieldset class=\"detail infos\">
+  <legend>$l_read_permission</legend>
+  <table>
   <tr>
     $block_consumer_read_public
   </tr>
@@ -228,9 +229,11 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     $block_consumer_read
   </tr>
   </table>
+  </fieldset>
 
-  <div class=\"detailHead\">$l_write_permission</div>
-  <table class=\"detail\">
+  <fieldset class=\"detail infos\">
+  <legend>$l_write_permission</legend>
+  <table>
   <tr>
     $block_consumer_write_public
   </tr>
@@ -238,12 +241,13 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     $block_consumer_write
   </tr>
   </table>
+  </fieldset>
 
-  <div class=\"detailButton\">
+  <fieldset class=\"buttons\">
     <input type=\"hidden\" name=\"entity_id\" value=\"$entity_id\" />
     <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
     <input type=\"submit\" value=\"$l_right_validate\" />
-  </div>
+  </fieldset>
   </form>
 ";
 

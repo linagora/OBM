@@ -1500,7 +1500,7 @@ $js_status_loop
     </tr>
     <tr>
       <th>$l_commission_p</th>
-      <td><input name=\"tf_commission\" type=\"text\" size=\"5\" value=\"$commission\" /> %</td>
+      <td><input name=\"tf_commission\" type=\"text\" size=\"5\" value=\"$commission\" />%</td>
     </tr>
     <tr>
       <th>$l_marketing_manager</th>
@@ -1535,7 +1535,7 @@ $js_status_loop
       <td><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
     </tr><tr>
       <th>$l_hitrate</th>
-      <td><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
+      <td><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" />%</td>
     </tr>
      $block_userdata
     </table>

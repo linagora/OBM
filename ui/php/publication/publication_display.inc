@@ -911,9 +911,7 @@ function dis_publication_admin_index() {
 function html_publication_type_form($type_q) {
   global $l_type_manage,$l_type_exist,$ico_delete,$ico_ok;
   global $l_type_checkdelete,$l_type_update,$l_type_new,$l_type_insert;
-
-
-
+  global $l_label,$l_c_new;
 
 $char_title = '=';
 $key = 0;
@@ -1025,17 +1023,21 @@ function dis_publication_type_links($publication) {
       $cpt++;
       $cid = $obm_q->f("publication_id");
       $cname = $obm_q->f("publication_title");
-      $dis_link .="<a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$cid") . "\">$cname</a>";
+      $dis_link .= "<li><a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$cid") . "\">$cname</a></li>";
     }
     if ($cpt < $nb_type) {
-      $dis_link .= "...";
+      $dis_link .= "<li>...</li>";
     }
 
   } else {
     $dis_link = "<h1>$label : $l_type_link_publication_no</h1>";
   }
 
-  $block .= "$dis_link";
+  $block .= "<div class=\"detail\">
+    <ul>
+    $dis_link
+    </ul>
+    </div>";
 
   $dis_back = "<form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("publication_index.php") . "\">
@@ -1077,6 +1079,7 @@ function dis_publication_type_links($publication) {
 function html_publication_subscription_reception_form($recept_q) {
   global $l_recept_manage,$l_recept_exist,$ico_ok,$ico_delete;
   global $l_recept_checkdelete,$l_recept_update,$l_recept_new,$l_recept_insert;
+  global $l_label,$l_c_new;
 
  $char_title = '=';
 $key = 0;
@@ -1172,7 +1175,7 @@ while ($recept_q->next_record()) {
 function dis_publication_recept_links($publication) {
   global $display, $l_back, $l_recept_link_publication, $l_recept_link_publication_no;
   global $l_recept_delete, $l_recept_can_delete, $l_recept_cant_delete;
-
+ 
   $delete_ok = true;
   $id = $publication["recept"];
   $label = get_publication_recept_label($id);
@@ -1182,39 +1185,27 @@ function dis_publication_recept_links($publication) {
   if ($nb_recept > 0) {
     $delete_ok = false;
     $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_recept_link_publication ($nb_recept)</td>
-    </tr>";
+    <h1>$label : $l_recept_link_publication ($nb_recept)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $cid = $obm_q->f("publication_id");
       $cname = $obm_q->f("publication_title");
-      $dis_link .="
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
+      $dis_link .="<li><a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$cid") . "\">$cname</a></li>";
     }
     if ($cpt < $nb_recept) {
       $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+    <li>...</li>";
     }
 
   } else {
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_recept_link_publication_no</td>
-    </tr>";
+    $dis_link = "<h1>$label : $l_recept_link_publication_no</h1>";
   }
 
-  $block .= "<table class=\"detail\">
-    $dis_link
-    </table>";
+  $block .= "<div class=\"detail\">
+    <ul>$dis_link</ul>
+    </div>";
 
   $dis_back = "<form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("publication_index.php") . "\">
@@ -1231,15 +1222,15 @@ function dis_publication_recept_links($publication) {
         <input type=\"submit\" name=\"sub_recept\" value=\"$l_recept_delete\" />
         </form>";
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_del
+        $dis_back
       </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_recept_cant_delete);
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_back
       </div>";
   }
 

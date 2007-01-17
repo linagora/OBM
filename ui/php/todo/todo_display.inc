@@ -270,7 +270,7 @@ function dis_todo_form($todo, $todo_q = 0) {
       $div_id = "sel_user_id-$sel_id";
       $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
       <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-      <img src=\"$ico_delete\" />
+      <img src=\"$ico_delete\" alt=\"[delete]\" />
       </a>
       $u_name
       <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
@@ -348,7 +348,7 @@ function dis_todo_form($todo, $todo_q = 0) {
 
   
  <fieldset class=\"detail infos\">
- <legend>$l_todo</legend>
+ <legend>$l_user</legend>
   <table>
   $block_user
   </table>
@@ -368,7 +368,6 @@ function dis_todo_form($todo, $todo_q = 0) {
   <fieldset class=\"buttons\">
     $dis_button
   </fieldset>
-  
   </form>
   ";
 

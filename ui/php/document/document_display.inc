@@ -816,21 +816,21 @@ function dis_document_mime_links($document) {
   $nb_mime = $obm_q->num_rows();
   if ($nb_mime > 0) {
     $delete_ok = false;
-    $dis_link = "<li><h1>$label : $l_mime_link_document ($nb_mime)</h1>";
+    $dis_link = "<h1>$label : $l_mime_link_document ($nb_mime)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $did = $obm_q->f("document_id");
       $dtitle = $obm_q->f("document_title");
-      $dis_link .= "<a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;document_id=$did") . "\">$dtitle</a></li>";
+      $dis_link .= "<li><a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;document_id=$did") . "\">$dtitle</a></li>";
     }
     if ($cpt < $nb_mime) {
       $dis_link .= "<li>...</li>";
     }
 
   } else {
-    $dis_link = "<h1><li>$label : $l_mime_link_document_no</li></h1>";
+    $dis_link = "<h1>$label : $l_mime_link_document_no</h1>";
   }
 
   $block .= "
