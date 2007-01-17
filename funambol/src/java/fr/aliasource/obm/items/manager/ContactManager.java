@@ -292,7 +292,7 @@ public class ContactManager extends ObmManager {
 		BookSync sync = null;
 		//get modified items
 		try {
-			 sync = binding.getBookSync(token, book, d);
+			 sync = binding.getSync(token, book, d);
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
