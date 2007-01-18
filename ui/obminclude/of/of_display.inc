@@ -528,6 +528,7 @@ class OBM_DISPLAY {
     $end_page = $start_page + $nb_page_dis - 1;
     $end_page = min ($end_page, $nb_page); 
 
+    $export_url = "$path/exportcsv/exportcsv_index.php";
     $content = "<div >
      <form style=\"display: inline;\" method=\"post\" action=\"$export_url\">
       <input type=\"hidden\" name=\"action\" value=\"export_page\" />
@@ -538,7 +539,7 @@ class OBM_DISPLAY {
       <input type=\"hidden\" name=\"nb_rows\" value=\"$set_rows\" />
       <input type=\"hidden\" name=\"query\" value=\"$query\" />
       <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
-      <a href='#' onclick='document.forms.export_page.submit();return false;'>$l_export</a>
+      <a href='#' onclick='this.parentNode.submit();return false;'>$l_export</a>
       </form>
 
       <form style=\"display: inline;\" method=\"post\" action=\"$export_url\">
@@ -550,7 +551,7 @@ class OBM_DISPLAY {
       <input type=\"hidden\" name=\"nb_rows\" value=\"$nb_rows\" />
       <input type=\"hidden\" name=\"query\" value=\"$query\" />
       <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
-      <a href='#' onclick='document.forms.export_all.submit();return false;'>$l_export_all</a>
+      <a href='#' onclick='this.parentNode.submit();return false;'>$l_export_all</a>
       </form>   
       
       $l_entries # $nb_rows | $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
@@ -604,7 +605,6 @@ class OBM_DISPLAY {
     // Export - Uses forms to allow big queries to be transmitted
     $module = $this->display_module;
     $query = $this->data_set->obm_query;
-    $export_url = "$path/exportcsv/exportcsv_index.php";
 
     $content .= "
     </div>

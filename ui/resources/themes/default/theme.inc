@@ -68,6 +68,10 @@ $ico_obm            = "$theme_path/logo_obm.gif";
 $ico_print          = "$theme_path/ico_print.gif";
 $ico_web            = "$theme_path/ico_web.gif";
 $ico_mail           = "$theme_path/ico_mail.gif";
+$ico_plus           = "$theme_path/ico_plus.gif";
+$ico_minus          = "$theme_path/ico_minus.gif";
+$ico_nav_close      = "$theme_path/ico_nav_close.gif";
+$ico_nav_open       = "$theme_path/ico_nav_open.gif";
 
 // Agenda Icons
 $ico_resize         = "$theme_path/ico_resize.gif";
@@ -77,3 +81,6 @@ $ico_meeting        = "$theme_path/ico_meeting.gif";
 $ico_periodic       = "$theme_path/ico_calendar_repeat.gif";
 $ico_popup_close    = "$theme_path/ico_popup_close.gif";
 $popup_queue        = "$theme_path/popup_queue.gif";
+
+// Project Icons
+$ico_hierarchy      =  "$theme_path/ico_hierarchy.png";

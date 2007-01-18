@@ -67,14 +67,10 @@ Obm.Portlets = new Class({
     if(!$('portlets'))
       return false;
     img = new Element('img');
-    img.src = obm.vars.images.upArrow;
-    this.upArrow = img.src;
-    img.src = obm.vars.images.downArrow;
-    this.downArrow = img.src; 
-    img.src = obm.vars.images.leftArrow;
-    this.leftArrow = img.src; 
-    img.src = obm.vars.images.rightArrow;
-    this.rightArrow = img.src; 
+    img.src = obm.vars.images.minus;
+    this.close = img.src;
+    img.src = obm.vars.images.plus;
+    this.open = img.src; 
     
     // 
     this.portlets = new Object();
@@ -87,7 +83,6 @@ Obm.Portlets = new Class({
     this.panel = $('portletsPanel');
     
     this.handler = $('portletsHandler');
-    console.log(this.handler.getFirst().getNext());
     this.handler.getFirst().getNext().setStyle('display','none'); ;
     this.handler.addEvent('click', function(e){
       obm.portlets.toggle();
@@ -112,18 +107,18 @@ Obm.Portlets = new Class({
       img = new Element('img');
       if(Cookie.get(el.id + "Hidden")  == "true") {
         this.portlets[el.id].hide();
-        img.src = this.downArrow;
+        img.src = this.open;
       } else {
-        img.src = this.upArrow;
+        img.src = this.close;
       }
       title.insertBefore(img,title.firstChild);
       img.className = 'handle';
       img = $(img);
       img.addEvent('click', function(e){
-        if(this.getAttribute("src") == obm.portlets.upArrow) 
-          this.setAttribute("src", obm.portlets.downArrow);
+        if(this.getAttribute("src") == obm.portlets.close) 
+          this.setAttribute("src", obm.portlets.open);
         else 
-          this.setAttribute("src", obm.portlets.upArrow);
+          this.setAttribute("src", obm.portlets.close);
         obm.portlets.toggleElement(this.parentNode.parentNode.id);
       });
     }

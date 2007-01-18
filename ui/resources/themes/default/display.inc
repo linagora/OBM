@@ -14,8 +14,8 @@
 //   - $display : (by ref) $display hash with each content object
 ///////////////////////////////////////////////////////////////////////////////
 function display_page(&$display) {
-  global $output_target, $ico_arrow_right;
-  global $ico_arrow_left, $l_hide;
+  global $output_target, $ico_nav_close;
+  global $ico_nav_open, $l_hide, $l_show;
 
   // If print activated, display only the detail
   if ($output_target == "print") {
@@ -66,11 +66,12 @@ function display_page(&$display) {
     <div id=\"portletsPanel\">
       <div id='portletsHandler'>
       <span>
-      <img src='$ico_arrow_left' alt='Hide this bar' />
+      <img src='$ico_nav_close' alt='Hide this bar' />
       $l_hide
       </span>
       <span id='portletsHandlerShow'>
-      <img src='$ico_arrow_right' alt='Show this bar' />
+      <img src='$ico_nav_open' alt='Show this bar' />
+      $l_show
       </span>
       </div>
       <div id=\"portlets\">
@@ -141,10 +142,10 @@ $display["section"]
 $dis_printer
 </ul>
 </div>
-&gt;".$modules[$module]["Name"].
-$display["module"]
+".$display["module"]
 ;
 
+//&gt;".$modules[$module]["Name"].
   return $block;
 }
 
@@ -283,10 +284,9 @@ function display_actions_theme($section, $module) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_head_theme($p_module) { 
-  global $l_obm_title, $extra_css, $extra_js, $extra_js_include;
-  global $ico_arrow_up,$ico_arrow_down,$ico_arrow_left,$ico_arrow_right;
+  global $l_obm_title, $extra_css, $extra_js, $extra_js_include,$ico_minus;
   global $ico_datepicker,$set_date_upd,$l_monthsofyear,$l_daysofweekfirst;
-  global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort;
+  global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width;
 
   // Else
@@ -323,10 +323,9 @@ function display_head_theme($p_module) {
   <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/calendar.js\" ></script>
   $js_include
   <script type=\"text/javascript\">
-  obm.vars.images.upArrow = '$ico_arrow_up';
-  obm.vars.images.downArrow = '$ico_arrow_down';
-  obm.vars.images.leftArrow = '$ico_arrow_left';
-  obm.vars.images.rightArrow = '$ico_arrow_right';
+  //<![CDATA[
+  obm.vars.images.minus = '$ico_minus';
+  obm.vars.images.plus = '$ico_plus';
   obm.vars.images.datePicker = '$ico_datepicker';
   obm.vars.regexp.dateFormat = '$set_date_upd';
   obm.vars.consts.popupHeight = '$popup_height';
@@ -350,9 +349,8 @@ function display_head_theme($p_module) {
     }
   });
 
-<!--
-$extra_js
--->
+  $extra_js
+  // ]]>
   </script>
 </head>
 

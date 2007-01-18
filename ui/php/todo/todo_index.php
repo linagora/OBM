@@ -36,7 +36,7 @@ page_close();
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["result"] = dis_todo_form($params);
+  $display["detail"] = dis_todo_form($params);
   $display["result"] .= dis_todo_search_list($params);
 
 } else if ($action == "detailconsult") {

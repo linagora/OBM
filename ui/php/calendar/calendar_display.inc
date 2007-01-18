@@ -936,9 +936,13 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity, $options=array
 
   if($event->isMeeting()) {
     $ed[] = "meeting:true";
+  }else {
+    $ed[] = "meeting:false";
   }
   if($event->isPeriodic()) {
     $ed[] = "periodic:true";
+  } else {
+    $ed[] = "periodic:false";
   }
   if($all_day) {
     $head .= $title;
@@ -1621,15 +1625,6 @@ function dis_calendar_quick_form($calendar) {
       <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
       <fieldset>
         $l_title : <input type=\"text\" name=\"tf_title\" />
-        <input type=\"hidden\" name=\"event_id\"/>
-        <input type=\"hidden\" name=\"entity\" value=\"user\" />
-        <input type=\"hidden\" name=\"entity_id\" value=\"$uid\" />
-        <input type=\"hidden\" name=\"element_id\" />
-        <input type=\"hidden\" name=\"all_day\"/>
-        <input type=\"hidden\" name=\"action\" />
-        <input type=\"hidden\" name=\"date_begin\" />
-        <input type=\"hidden\" name=\"duration\" />
-        <input type=\"hidden\" name=\"context\" />
       </fieldset> 
       <fieldset class=\"buttons\">
         <input type=\"submit\" value=\"$l_validate\" />
@@ -2984,17 +2979,19 @@ function json_event_data($id,$calendar) {
   global $uid;
   $context = $calendar["context"];
   $element_id = $calendar["element_id"];
-  $eve_q = run_query_calendar_detail($id);
   $ent_q = run_query_get_events_attendee(array($id));
   $entities = get_calendar_event_entity($id);
-  $all_day = $eve_q->f("calendarevent_allday");
-  $date = $eve_q->f("calendarevent_date");
-  $duration = $eve_q->f("calendarevent_duration");
-  $ed[] = "id:".$eve_q->f("calendarevent_id");
+  $all_day = $calendar['all_day'];
+  $date = $calendar['date_begin'];
+  //$eve_q->f("calendarevent_date");
+  $duration = $calendar['duration'];
+  $title = $calendar['title'];
+
+  $ed[] = "id:".$id;
   $ed[] = "duration:".$duration;
-  $ed[] = "time:".$date;
+  $ed[] = "time:".strtotime($date);
   $ed[] = "all_day:".$all_day;
-  $ed[] = "title:'".$eve_q->f("calendarevent_title")."'";
+  $ed[] = "title:'".$title."'";
   
   $entity_readable = get_calendar_entity_readable();
   $sel_entity_id = slice_calendar_entities($cal_entity_id, $max_display, $max_display, $entity_readable);

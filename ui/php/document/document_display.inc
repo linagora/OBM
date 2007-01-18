@@ -585,7 +585,7 @@ function html_document_dir_form($action, $document,$doc_q=null) {
   if (isset($document["old_name"])) $old_name = $document["old_name"];
 
   
-  $url = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].elements[1]&amp;ext_disp_file=false"; 
+  $url = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].elements[2]&amp;ext_disp_file=false"; 
   if($action == "new_dir" || $action == "insert_dir") {
     $dis_button = "
     <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_dir\" />

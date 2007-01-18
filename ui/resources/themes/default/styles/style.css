@@ -114,14 +114,14 @@ C {
 #portletsPanel {
   position: absolute;
   width: 15.5em;
-  left: 2px;
-  margin-top: 10px;
+  left: 8px;
+  margin-top: 2px;
 }
 
 #mainPanel {
   z-index:100;
   min-width: 120px;
-  margin: 0px 0px 20px 16em;
+  margin: 1em 0px 20px 16em;
   padding: 10px;
 /*IE workaround*/
   _height: 1px;
@@ -311,7 +311,6 @@ C {
   background-image: url('../images/tab_current_border.png');
   background-repeat: repeat-x;
   background-position: 0 0.5em;
-  background-color: #e0e1e3;
   background-color: #eff0f2;
   border: 1px solid #b3b3b3;
 }
@@ -466,6 +465,10 @@ fieldset.detail {
 
 .buttons form {
   display: inline;
+}
+
+.buttons input {
+  width: auto;
 }
 
 .buttons a {
@@ -754,12 +757,16 @@ input.datePicker {
   border: 1px solid #959595;
 }
 
-.spreadSheet colgroup.highlight {
-  background-color: #f4f3c5;
+.spreadSheet td.hover{
+    background-color: #f4f3c5;
+    border: 1px solid #f7df7f;
+    color: red;
 }
 
-.spreadSheet td, .spreadSheet th {
-
+.spreadSheet td.highlight{
+    background-color: #f4f3c5;
+    border: 1px solid #f7df7f;
+    color: red;
 }
 
 .spreadSheet thead th{
@@ -788,11 +795,12 @@ input.datePicker {
 .spreadSheet tbody th{
   background-color: #dbdbdb;
   font-weight: bold;
-  text-align: center;
+  text-align: left;
+  font-style: normal;
   border-right: 1px solid #aeaeae;
   border-left: 1px solid #fff;
   border-top: 1px solid #fff;
-  border-bottom: 1px solid #c9c9c9;    
+  border-bottom: 1px solid #c9c9c9;   
 }
 
 .spreadSheet tbody tr.highlight {
@@ -800,18 +808,15 @@ input.datePicker {
 }
 
 .spreadSheet tbody tr.pair {
-  background-color: #ececec;
+  background-image: url('../images/transparent_grey.gif');
 }
 
 .spreadSheet tbody td {
+  padding-left: 1px;
+  font-weight: normal;
   border-bottom: 1px solid #ececec;
   border-right: 1px solid #d3d1d6;
   border-left: 1px solid #fff;
-}
-
-.spreadSheet tbody td.highlight{
-    background-color: #f4f3c5;
-    border: 1px solid #f7df7f;
 }
 
 .spreadSheet tfoot th{
@@ -833,6 +838,11 @@ input.datePicker {
   border-top: 1px solid #fff;
   border-bottom: 1px solid #c2c2c2;      
 }
+
+.spreadSheet colgroup.highlight, .spreadSheet col.highlight {
+  background-color: #f4f3c5;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* messsage  */

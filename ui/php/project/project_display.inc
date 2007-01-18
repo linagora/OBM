@@ -281,7 +281,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
     }
    $display_popup_end = "
       <p>
-      <a href=\"\" onclick='window.close();'>$l_close</a>
+      <a href=\"#\" onclick='window.close();'>$l_close</a>
       </p>";
   }
   $proj_d->data_set = $proj_q;
@@ -326,6 +326,7 @@ function dis_project_planning($project) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_nav_date($project) {
   global $cdg_param, $auth, $set_theme, $c_dst_err, $l_monthsofyear,$action;
+  global $ico_previous,$ico_next;
 
   $id = $project["project_id"];
 
@@ -341,25 +342,11 @@ function html_project_nav_date($project) {
   $title = $l_monthsofyear[$month-1] . " $year";
 
   $block = "
-    <div style=\"text-align:center;\">
-      <table style=\" margin: auto;\" width=\"$tot_width\">
-      <tr>
-        <td>
-          <a href=\"$url_prev\">
-          <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/previous.png\" alt=\"\" />
-          </a>
-        </td>
-        <td class=\"timePeriod\">
-          $title
-        </td>
-        <td>
-          <a href=\"$url_next\">
-           <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/next.png\" alt=\"\" />
-          </a>
-        </td>
-      </tr>
-      </table>    
-      </div>
+  <h1>
+    <a href=\"$url_prev\"><img src=\"$ico_previous\" alt=\"[Previous Month]\" /></a>     
+    $title
+    <a href=\"$url_next\"><img src=\"$ico_next\" alt=\"[Next Month]\" /></a>     
+  </h1>     
 ";
 
   return $block;
@@ -523,10 +510,10 @@ function html_project_links($p_q) {
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
-    <li><a href=\"\" 
+    <li><a href=\"#\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
 	 \"><img src=\"$ico_document_new\" /></a>
-	<a href=\"\" onclick=\"window.name='$l_project'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	<a href=\"#\" onclick=\"window.name='$l_project'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>
   </div>";
@@ -602,7 +589,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   global $l_allotted, $l_no_members, $l_progress_update, $l_project, $l_resume;
   global $l_alloestimated, $l_usedestimated, $l_progeval, $l_tasks;
   global $l_members, $l_task_list, $l_members_info, $l_archive, $l_yes, $l_no;
-  global $l_alloproj, $l_usedproj, $l_no_tasks;
+  global $l_alloproj, $l_usedproj, $l_no_tasks,$ico_hierarchy;
   global $l_ref, $l_project_date, $l_project_duration, $l_project_desc, $l_project_tech;
 
   $cpt_t = 0;
@@ -686,11 +673,10 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   if (!($has_tasks) or !($has_members)) {
     $dis_progress = "
      <tr>
-       <th>&nbsp;$l_sold / $l_estimated&nbsp;</th>
-       <td align=\"right\">$soldtime / $estimated</td>
-       <td width=\"10%\">&nbsp;&nbsp;</td>
-       <th>&nbsp;$l_allosold&nbsp;</th>
-       <td align=\"right\">0 %</td>
+       <th>$l_sold / $l_estimated</th>
+       <td>$soldtime / $estimated</td>
+       <th>$l_allosold</th>
+       <td>0 %</td>
       </tr>";    
 
     // we display the task list
@@ -702,7 +688,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 
       while ($tasks_q->next_record()) {
 	$tsk_name = $tasks_q->f("projecttask_label");
-	$img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />" : "";
+	$img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"$ico_hierarchy\" alt=\"\" />" : "";
 	$dis_member .= "
        <tr>
         <th>&nbsp;</th>
@@ -716,11 +702,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
         </tr>";
     }
       
-    $dis_member .= "
-     <tr>
-      <td>&nbsp;</td>
-     </tr>";
-
     if ($has_members) {
       $dis_member .= "
        <tr>
@@ -751,7 +732,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     $allotted = 0;
     $usedtime = 0;
     $missingtime = 0;
-    $tab_style = "class=\"projectDetail\"";
 
     while ($tasks_q->next_record()) {
       $t_id = $tasks_q->f("projecttask_id");
@@ -810,7 +790,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       $usedtime += $m_used;
     }
 
-    $dis_memhead = "<td>&nbsp;</td>\n";
+    $dis_memhead = "<th>&nbsp;</th>\n";
 
     // diplay the members of the project
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
@@ -829,13 +809,17 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       $t_parent = $array_tsk[$cpt_d]["parent"];
 
       $t_haschild = $array_child[$t_id];
-
-      if ($t_parent) {
-	$dis_member .= "<tr>\n<th>$t_label</th>\n";
+      if($cpt_d % 2 == 0) {
+        $class = "class=\"pair\"";
       } else {
-	$dis_member .= "<tr>\n<td>
-        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />
-        $t_label</td>\n";
+        $class = "";
+      }
+      if ($t_parent) {
+	$dis_member .= "<tr $class><th>$t_label</th>";
+      } else {
+	$dis_member .= "<tr $class><td>
+        <img border=\"0\" src=\"$ico_hierarchy\" alt=\"\" />
+        $t_label</td>";
       }
 
       // write a line (corresponding to a task)
@@ -856,13 +840,13 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 	}
 
 	if ($t_haschild) {
-	  $dis_member .= "<td class=\"projectPtime\">&nbsp;</td>\n";
+	  $dis_member .= "<td>&nbsp;</td>\n";
 	} else if ($t_parent) {
-	  $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
+	  $dis_member .= "<td>$tm_label</td>\n";
 	} else {
-	  $dis_member .= "<td class=\"projectCtime\">$tm_label</td>\n";
+	  $dis_member .= "<td>$tm_label</td>\n";
 	}
-      }
+      } 
 
       if ($t_parent) {
 	// write the total for a parent task
@@ -873,25 +857,23 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 	if (!(isset($tm_miss))) $tm_miss = 0;
 	if (!(isset($tm_proj))) $tm_proj = 0;
 
-	if (($tm_used + $tm_miss) > (1.10 * $tm_proj))
-	  $class = "projectPlate";
-	else if (($tm_used + $tm_miss) < (0.90 * $tm_proj))
-	  $class = "projectPearly";
-	else
-	  $class = "projectPtime";
-
+        $class= '';
+        if (($tm_used + $tm_miss) > (1.10 * $tm_proj))
+	  $class = "error";
+        elseif (($tm_used + $tm_miss) < (0.90 * $tm_proj))
+	  $class = "info";        
 	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
 	$dis_member .= "<td class=\"$class\">$tm_label</td>\n";
 
       } else {
-	$dis_member .= "<td class=\"projectCtime\">&nbsp;</td>";
+	$dis_member .= "<td>&nbsp;</td>";
       }
 
       $dis_member .= "</tr>\n";
     }
 
     // display the last line (totals by members)
-    $dis_member .= "<tr>\n <td class=\"projectPtask\">$l_total</td>\n";
+    $dis_member .= "<tr class=\"highlight\">\n <th>$l_total</th>\n";
 
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
       $m_id = $array_mem[$cpt_e]["id"];
@@ -901,7 +883,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       $tm_used = $array_memtot["used"][$m_id];
       $tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
 
-      $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
+      $dis_member .= "<td >$tm_label</td>\n";
     }
 
     //last cell (total of totals)
@@ -913,7 +895,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     if (!(isset($tm_proj))) $tm_proj = 0;
 
     $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
-    $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
+    $dis_member .= "<td >$tm_label</td>\n";
     $dis_member .= "</tr>\n";
 
     if ($estimated != 0) {
@@ -941,54 +923,50 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     //advance array
     $dis_progress = "
     <tr>
-     <th>&nbsp;$text_time&nbsp;</th>
-     <td align=\"right\">$value_time</td>
-     <td>&nbsp;&nbsp;</td>
-     <th>&nbsp;$l_alloestimated&nbsp;</th>
-     <td align=\"right\">$ratio_alloestimated %</td>
+     <th>$text_time :</th>
+     <td>$value_time</td>
+     <th>$l_alloestimated :</th>
+     <td>$ratio_alloestimated %</td>
     </tr>
     <tr>
-     <th>&nbsp;$l_allotted&nbsp;</th>
-     <td align=\"right\">$allotted</td>
-     <td>&nbsp;&nbsp;</td>
-     <th>&nbsp;$l_usedestimated&nbsp;</th>
-     <td align=\"right\">$ratio_usedestimated %</td>
+     <th>$l_allotted :</th>
+     <td>$allotted</td>
+     <th>$l_usedestimated :</th>
+     <td>$ratio_usedestimated %</td>
     </tr>
     <tr>
-     <th>&nbsp;$l_used&nbsp;</th>
-     <td align=\"right\">$usedtime</td>
-     <td>&nbsp;&nbsp;</td>
-     <th>&nbsp;$l_progress&nbsp;</th>
-     <td align=\"right\">$ratio_progress %</td>
+     <th>$l_used :</th>
+     <td>$usedtime</td>
+     <th>$l_progress :</th>
+     <td>$ratio_progress %</td>
     </tr>
     <tr>
-     <th>&nbsp;$l_missing&nbsp;</th>
-     <td align=\"right\">$missingtime</td>
-     <td>&nbsp;&nbsp;</td>
-     <th>&nbsp;$l_progeval&nbsp;</th>
-     <td align=\"right\">$symbol_progeval</td>
+     <th>$l_missing :</th>
+     <td>$missingtime</td>
+     <th>$l_progeval :</th>
+     <td>$symbol_progeval</td>
     </tr>";
 
   } 
   
   // Reference
   $dis_reference = "
-  <h1> $l_ref </h1>
+  <h1>$l_ref</h1>
   <table>
   <tr>
-    <th> $l_project_date </th>
+    <th> $l_project_date :</th>
     <td>$reference_date</td>
   </tr>
   <tr>
-    <th> $l_project_duration </th>
+    <th> $l_project_duration :</th>
     <td>$reference_duration</td>
   </tr>
   <tr>
-    <th> $l_project_desc </th>
+    <th> $l_project_desc :</th>
     <td>$reference_desc</td>
   </tr>
   <tr>
-    <th> $l_project_tech </th>
+    <th> $l_project_tech :</th>
     <td>$reference_tech</td>
   </tr>
   </table>";
@@ -999,45 +977,45 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   $display["title"] = "<h1 class=\"title\">$l_project : $name</h1>";
 
   $block = "
-    $dis_comp
     
    <div class=\"detail infos\">
     <h1>$l_project</h1>
 
     <table>
     <tr>
-      <th>$l_name</th>
+      <th>$l_name :</th>
       <td>$name</td>
     </tr>
     <tr>
-      <th>$l_shortname</th>
+      <th>$l_shortname :</th>
       <td>$shortname</td>
     </tr>      
     <tr>
-      <th>$l_tasktype</th>
+      <th>$l_tasktype :</th>
       <td>$tt</td>
     </tr><tr>
-      <th>$l_datebegin</th>
+      <th>$l_datebegin :</th>
       <td>$datebegin</td>
     </tr><tr>
-      <th>$l_dateend</th>
+      <th>$l_dateend :</th>
       <td>$dateend</td>
     </tr><tr>
-      <th>$l_resume</th>
+      <th>$l_resume :</th>
       <td># $l_tasks : $nb_tsk / # $l_members : $cpt_m</td>
     </tr>
     <tr>
-      <th>$l_archive</th>
+      <th>$l_archive :</th>
       <td>$arc_status</td>
     </tr>
     </table>
     </div>
 
+    $dis_comp
    <div class=\"detail infos\">
     $dis_reference
    </div>
  
-   <div class=\"detail infos\">
+   <div class=\"detail extra\">
     <h1>$l_progress</h1>
     <table>
       $dis_progress
@@ -1047,6 +1025,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     <div class=\"detail extra\">
     <h1>$l_progressinfos</h1>
     <table class=\"spreadSheet\">
+      <colgroup span=\"".($span - 1)."\" />
+      <colgroup class=\"highlight\" />
     <thead>
     <tr>
       $dis_memhead
@@ -1240,30 +1220,6 @@ function html_project_form($action, $project_q, $project) {
     $sel_tt .= "</select>";
   }
 
-  // Reference
-  $dis_reference = "
-  <fieldset class=\"detail infos\">
-    <legend>$l_project_desc</legend>
-
-  <table>
-  <tr>
-    <th> $l_project_date </th>
-    <td><input type=\"text\" name=\"tf_reference_date\" size=\"16\" maxlength=\"32\" value=\"$reference_date\" /></td>
-  </tr>
-  <tr>
-    <th> $l_project_duration </th>
-    <td><input type=\"text\" name=\"tf_reference_duration\" size=\"16\" maxlength=\"16\" value=\"$reference_duration\"  /></td>
-  </tr>
-  <tr>
-    <th> $l_project_desc </th>
-    <td><textarea name=\"ta_reference_desc\" rows=\"4\" cols=\"80\" >$reference_desc</textarea></td>
-  </tr>
-  <tr>
-    <th> $l_project_tech </th>
-    <td><textarea name=\"ta_reference_tech\" rows=\"4\" cols=\"80\" >$reference_tech</textarea></td>
-  </tr>
-  </table>
-  </fieldset>";
 
   // User comment select construction
   if ($usr_q->nf()>0) {
@@ -1313,7 +1269,6 @@ function html_project_form($action, $project_q, $project) {
       onsubmit=\"if (check_project(this)) return true; else return false;\"
       action=\"".url_prepare("project_index.php")."\">
    
-    $dis_comp
     <fieldset class=\"detail infos\">
     <legend>$l_project</legend>
 
@@ -1346,8 +1301,31 @@ function html_project_form($action, $project_q, $project) {
     </tr>
     </table>
     </fieldset>
+    $dis_comp
+    <fieldset class=\"detail infos\">
+    <legend>$l_project_desc</legend>
 
-      $dis_reference
+    <table>
+    <tr>
+      <th> $l_project_date </th>
+      <td><input type=\"text\" name=\"tf_reference_date\" size=\"16\" maxlength=\"32\" value=\"$reference_date\" /></td>
+    </tr>
+    <tr>
+      <th> $l_project_duration </th>
+      <td><input type=\"text\" name=\"tf_reference_duration\" size=\"16\" maxlength=\"16\" value=\"$reference_duration\"  /></td>
+    </tr>
+    </table>
+    </fieldset>
+
+    <fieldset class=\"detail extra\">
+      <legend> $l_project_desc </legend>
+      <textarea name=\"ta_reference_desc\" rows=\"4\" cols=\"80\" >$reference_desc</textarea>
+    </fieldset>
+
+    <fieldset class=\"detail extra\">
+      <legend> $l_project_tech </legend>
+      <textarea name=\"ta_reference_tech\" rows=\"4\" cols=\"80\" >$reference_tech</textarea>
+    </fieldset>
 
     <fieldset class=\"detail extra\">
     <legend>$l_comment</legend>
@@ -1517,13 +1495,13 @@ function html_project_task_form($ptask_q, $project) {
       </td>
     </tr>
     </table>
-    </fieldset>
-
     <fieldset class=\"buttons\">
      <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
      <input type=\"hidden\" name=\"action\" value=\"task_add\" />
      <input type=\"submit\" value=\"$l_task_add\" />
+    </fieldset>    
     </fieldset>
+
   </form>    
 
   <form method=\"post\" name=\"form_taskupd\"
@@ -1550,13 +1528,14 @@ function html_project_task_form($ptask_q, $project) {
       <td><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" value=\"\" /></td>
     </tr>
     </table>
-    </fieldset>
 
     <fieldset class=\"buttons\">
      <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
      <input type=\"hidden\" name=\"action\" value=\"task_update\" />
      <input type=\"submit\" value=\"$l_task_upd\" />
+    </fieldset>    
     </fieldset>
+
 
    </form>
    ";
@@ -1573,7 +1552,7 @@ function html_project_task_form($ptask_q, $project) {
 //     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_tasklist($tasks_q, $project) {
-  global $set_theme;
+  global $set_theme,$ico_hierarchy;
   global $l_task_list, $l_task_del, $l_no_tasks;
 
   $pid = $project["project_id"];
@@ -1589,7 +1568,7 @@ function html_project_tasklist($tasks_q, $project) {
       if ($t_parent == 0) {
 	$dis_task .= "
          <tr>
-          <td align=\"right\" width=\"5%\">
+          <td >
 	   <input type=\"checkbox\" name=\"data-task-$t_id\" />
 	  </td>
 	  <td class=\"detailText\" colspan=\"2\">$t_label</td>
@@ -1597,11 +1576,11 @@ function html_project_tasklist($tasks_q, $project) {
       } else {
 	$dis_task .= "
          <tr>
-          <td align=\"right\">
+          <td>
            <input type=\"checkbox\" name=\"data-task-$t_id\" />
           </td>
-	  <td class=\"detailText\" colspan=\"2\">
-           <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />$t_label
+	  <td colspan=\"2\">
+           <img border=\"0\" src=\"$ico_hierarchy\" alt=\"\" />$t_label
           </td>
          </tr>";
       }
@@ -1618,20 +1597,19 @@ function html_project_tasklist($tasks_q, $project) {
   }
   
   $block = "
-    <fieldset class=\"detail infos\">
+    <form name=\"form_tasklist\" method=\"post\">
+    <fieldset class=\"detail extra\">
     <legend>$l_task_list</legend>
 
-    <form name=\"form_tasklist\" method=\"post\">
      <table>
       $dis_task
      </table>
+     </fieldset>
 
     <fieldset class=\"buttons\">
     $dis_button
-    </fieldset>
-
+    </fieldset>     
     </form>
-    </fieldset>
   ";
 
   return $block;
@@ -1656,8 +1634,6 @@ function html_project_member_form($members_q, $project) {
 
   if (($members_q != 0) && ($members_q->num_rows() != 0)) {
 
-    $class = "projectMemberlist";
-
     while ($members_q->next_record()) {
 
       $m_id = $members_q->f("member_id");
@@ -1680,9 +1656,10 @@ function html_project_member_form($members_q, $project) {
 
       $dis_member .= "
         <tr>
-         <td class=\"projectMember\"><input type=\"checkbox\" name=\"data-u-$m_id\"/></td>
-         <td class=\"projectMember\">$m_name</td>
-         <td class=\"projectMemberrd\">$rd_manager</td>
+        <td>
+         <input type=\"checkbox\" name=\"data-u-$m_id\"/>
+         $m_name</td>
+         <td>$rd_manager</td>
         </tr>";
     }
 
@@ -1745,7 +1722,7 @@ function html_project_member_form($members_q, $project) {
 function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
   global $display, $set_theme;
   global $l_memberstimeinfos, $l_validate;
-  global $l_no_members, $l_project;
+  global $l_no_members, $l_project,$ico_hierarchy;
 
   $cpt_t=0;
   $cpt_m=0;
@@ -1783,16 +1760,16 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
     } 
   }
 
-  $dis_memhead = "<tr><td class=\"projectHead\">&nbsp;</td>";
+  $dis_memhead = "<tr><th></th>";
 
   // diplay the members of the project
   for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
     $m_id = $array_mem[$cpt_e]["id"];
     $m_name = $array_mem[$cpt_e]["name"];
-    $dis_memhead .= "<td class=\"projectHead\" width=\"50\">$m_name</td>\n";
+    $dis_memhead .= "<th>$m_name</th>\n";
   }
 
-  $dis_memhead .= "<tr>";
+  $dis_memhead .= "</tr>";
 
   // display the rest of the array (ie. tasknames - projected times)
   for ($cpt_d=0; $cpt_d<$cpt_t; $cpt_d++) {
@@ -1803,10 +1780,10 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
     $t_parent = $array_child[$t_id];
 
     if ($array_parent[$t_id])
-	$dis_member .= "<tr>\n<td class=\"projectPtask\">$t_label</td>\n";
+	$dis_member .= "<tr><th>$t_label</th>\n";
     else
-    	$dis_member .= "<tr>\n<td class=\"projectCtask\">
-        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />$t_label</td>\n";
+    	$dis_member .= "<tr><td>
+        <img border=\"0\" src=\"$ico_hierarchy\" alt=\"\" />$t_label</td>\n";
 
     //ecrit la ligne pour un tache sans enfants
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
@@ -1815,17 +1792,17 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
 	$tm_proj = $array_time[$t_id][$m_id];
 
 	if ($t_parent) {
-	  $dis_member .= "<td class=\"projectPtime\">&nbsp;</td>\n";
+	  $dis_member .= "<td></td>\n";
 	} else if ($array_parent[$t_id]) {
 	  $dis_member .= "
-          <td class=\"projectPtime\">
-           <input type=\"text\" name=\"tf_projected[$m_id][$t_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_proj\" />
+          <td>
+           <input type=\"text\" name=\"tf_projected[$m_id][$t_id]\" size=\"5\" maxlength=\"8\" value=\"$tm_proj\" />
 	    </td>";
 	} else {
 	  $dis_member .= "
-          <td class=\"projectCtime\">
-           <input type=\"text\" name=\"tf_projected[$m_id][$t_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_proj\" />
-	    </td>";
+          <td>
+           <input type=\"text\" name=\"tf_projected[$m_id][$t_id]\" size=\"5\" maxlength=\"8\" value=\"$tm_proj\" />
+	  </td>";
 	}
     }
 
@@ -1843,21 +1820,26 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-   <form name=\"form_allocate\" method=\"post\">
-    <input type=\"hidden\" name=\"action\" value=\"allocate_update\" />
+   <form action=\"\" name=\"form_allocate\" method=\"post\">
 
-    <div class=\"detailHead\">$l_memberstimeinfos</div>
+    <fieldset class=\"detail extra\">
+    <legend>$l_memberstimeinfos</legend>
 
-    <table class=\"projectDetail\">
-     $dis_memhead
-     $dis_member
+    <table class=\"spreadSheet\">
+    <thead>
+    $dis_memhead
+    </thead>
+    <tbody>
+    $dis_member
+    </tbody>
     </table>
-
+    </fieldset>
+  
+   <fieldset class=\"buttons\">
     <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
-
-   <div class=\"buttons\">
+    <input type=\"hidden\" name=\"action\" value=\"allocate_update\" />
     $dis_button
-   </div>
+   </fieldset>
 
    </form>
    ";
@@ -1875,7 +1857,7 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
 //     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
-  global $display, $set_theme;
+  global $display, $set_theme,$ico_hierarchy;
   global $l_fill_advance_form, $l_validate;
   global $l_no_members, $l_project;
 
@@ -1918,13 +1900,13 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
     } 
   }
 
-  $dis_memhead = "<tr><td class=\"projectHead\">&nbsp;</td>";
+  $dis_memhead = "<tr><th>&nbsp;</th>";
 
   // diplay the members of the project
   for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
     $m_id = $array_mem[$cpt_e]["id"];
     $m_name = $array_mem[$cpt_e]["name"];
-    $dis_memhead .= "<td class=\"projectHead\" width=\"64\">$m_name</td>\n";
+    $dis_memhead .= "<th>$m_name</th>\n";
   }
 
   $dis_memhead .= "<tr>";
@@ -1938,18 +1920,12 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
     $t_parent = $array_child[$t_id];
 
     if ($array_parent["$t_id"]) {
-      $img = "";
-      $classTask = "projectPtask";
-      $classInput = "projectPtime";
+      $dis_member .= "<tr><th> $t_label</th>";
     } else {
-      $img = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />";
-      $classTask = "projectCtask";
-      $classInput = "projectCtime";
+      $dis_member .= "<tr><td><img border=\"0\" src=\"$ico_hierarchy\" alt=\"\" /> $t_label</td>";
     }
 
-    // Header column
-    $dis_member .= "<tr>
-      <td class=\"$classTask\">$img $t_label</td>";
+
 
     // Data columns
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
@@ -1959,10 +1935,10 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
       $tm_miss = $array_time["miss"][$t_id][$m_id];
 
       if ($t_parent) {
-        $dis_member .= "<td class=\"projectPtime\">&nbsp;</td>\n";
+        $dis_member .= "<th>&nbsp;</th>";
       } else {
         $dis_member .= "
-          <td class=\"$classInput\">
+          <td>
             <input type=\"text\" name=\"tf_projected[$m_id][$t_id]\" size=\"3\" maxlength=\"8\" value=\"$tm_proj\" />
             <input type=\"text\" name=\"tf_missing[$m_id][$t_id]\" size=\"3\" maxlength=\"8\" value=\"$tm_miss\" />
           </td>";
@@ -1984,20 +1960,24 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
 
   $block = "
   <form name=\"f_entity\" method=\"post\">
-    <div class=\"detailHead\">$l_fill_advance_form</div>
+  <fieldset class=\"detail extra\">
+    <legend>$l_fill_advance_form</legend>
 
-    <table class=\"projectDetail\">
-      $dis_memhead
-      $dis_member
+    <table class=\"spreadSheet\">
+    <thead>
+    $dis_memhead
+    </thead>
+    <tbody>
+    $dis_member
+    </tbody>
     </table>
 
     <input type=\"hidden\" name=\"action\" value=\"advance_update\" />
     <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
-  
-    <div class=\"detailButton\">
-     <p class=\"detailButtons\">$dis_button</p>
-    </div>
-
+  </fieldset>
+  <fieldset class=\"buttons\"> 
+    $dis_button
+  </fieldset>
   </form>
 ";
 
@@ -2042,7 +2022,7 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
   global $path, $set_theme, $display, $action;
   global $l_board_no_data, $l_total;
   global $l_project, $l_progress, $l_progressinfos;
-  global $l_used, $l_missing;
+  global $l_used, $l_missing,$ico_hierarchy;
   global $l_allotted, $l_progress_update, $l_project, $l_resume;
   global $l_alloestimated, $l_usedestimated, $l_progeval, $l_tasks;
   global $l_yes, $l_no;
@@ -2085,7 +2065,6 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
     $allotted = 0;
     $usedtime = 0;
     $missingtime = 0;
-    $tab_style = "class=\"projectDetail\"";
 
     while ($tasks_q->next_record()) {
       $t_id = $tasks_q->f("projecttask_id");
@@ -2144,16 +2123,16 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
       $usedtime += $m_used;
     }
 
-    $dis_memhead = "<td class=\"projectHead\">&nbsp;</td>\n";
+    $dis_memhead = "<th>&nbsp;</th>\n";
 
     // diplay the members of the project
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
       $m_id = $array_mem[$cpt_e]["id"];
       $m_name = $array_mem[$cpt_e]["name"];
-      $dis_memhead .= "<td class=\"projectHead\">$m_name</td>\n";
+      $dis_memhead .= "<th>$m_name</th>\n";
     }
 
-    $dis_memhead .= "<td class=\"projectHead\">$l_total</td>\n";
+    $dis_memhead .= "<th>$l_total</th>\n";
 
     // display the rest of the array (ie. tasknames - projected times)
     for ($cpt_d=0; $cpt_d<$cpt_t; $cpt_d++) {
@@ -2165,10 +2144,10 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
       $t_haschild = $array_child[$t_id];
 
       if ($t_parent) {
-	$dis_member .= "<tr>\n<td class=\"projectPtask\">$t_label</td>\n";
+	$dis_member .= "<tr><th>$t_label</th>\n";
       } else {
-	$dis_member .= "<tr>\n<td class=\"projectCtask\">
-        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />
+	$dis_member .= "<tr><td>
+        <img src=\"$ico_hierarchy\" alt=\"\" />
         $t_label</td>\n";
       }
 
@@ -2190,11 +2169,11 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
 	}
 
 	if ($t_haschild) {
-	  $dis_member .= "<td class=\"projectPtime\">&nbsp;</td>\n";
+	  $dis_member .= "<td></td>\n";
 	} else if ($t_parent) {
-	  $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
+	  $dis_member .= "<td>$tm_label</td>\n";
 	} else {
-	  $dis_member .= "<td class=\"projectCtime\">$tm_label</td>\n";
+	  $dis_member .= "<td>$tm_label</td>\n";
 	}
       }
 
@@ -2207,25 +2186,24 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
 	if (!(isset($tm_miss))) $tm_miss = 0;
 	if (!(isset($tm_proj))) $tm_proj = 0;
 
+	$class = "";
 	if (($tm_used + $tm_miss) > (1.10 * $tm_proj))
-	  $class = "projectPlate";
-	else if (($tm_used + $tm_miss) < (0.90 * $tm_proj))
-	  $class = "projectPearly";
-	else
-	  $class = "projectPtime";
+          $class = "error";
+        elseif (($tm_used + $tm_miss) < (0.90 * $tm_proj))
+          $class = "info";
 
 	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
 	$dis_member .= "<td class=\"$class\">$tm_label</td>\n";
 
       } else {
-	$dis_member .= "<td class=\"projectCtime\">&nbsp;</td>";
+	$dis_member .= "<td>&nbsp;</td>";
       }
 
       $dis_member .= "</tr>\n";
     }
 
     // display the last line (totals by members)
-    $dis_member .= "<tr>\n <td class=\"projectPtask\">$l_total</td>\n";
+    $dis_member .= "<tr class=\"highlight\">\n <td>$l_total</td>\n";
 
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
       $m_id = $array_mem[$cpt_e]["id"];
@@ -2235,7 +2213,7 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
       $tm_used = $array_memtot["used"][$m_id];
       $tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
 
-      $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
+      $dis_member .= "<td>$tm_label</td>\n";
     }
 
     //last cell (total of totals)
@@ -2247,7 +2225,7 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
     if (!(isset($tm_proj))) $tm_proj = 0;
 
     $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
-    $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
+    $dis_member .= "<td>$tm_label</td>\n";
     $dis_member .= "</tr>\n";
 
     // ratios
@@ -2273,32 +2251,28 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
     //advance array
     $dis_progress = "
     <tr>
-     <td class=\"detailLabel\">&nbsp;$text_time&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$value_time</td>
-     <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$l_alloestimated&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$ratio_alloestimated %</td>
+     <th>$text_time :</th>
+     <td>$value_time</td>
+     <th>$l_alloestimated :</th>
+     <td>$ratio_alloestimated %</td>
     </tr>
     <tr>
-     <td class=\"detailLabel\">&nbsp;$l_allotted&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$allotted</td>
-     <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$l_usedestimated&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$ratio_usedestimated %</td>
+     <th>$l_allotted :</th>
+     <td>$allotted</td>
+     <th>$l_usedestimated :</th>
+     <td>$ratio_usedestimated %</td>
     </tr>
     <tr>
-     <td class=\"detailLabel\">&nbsp;$l_used&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$usedtime</td>
-     <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$l_progress&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$ratio_progress %</td>
+     <th>$l_used :</th>
+     <td>$usedtime</td>
+     <th>$l_progress :</th>
+     <td>$ratio_progress %</td>
     </tr>
     <tr>
-     <td class=\"detailLabel\">&nbsp;$l_missing&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$missingtime</td>
-     <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$l_progeval&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$symbol_progeval</td>
+     <th>$l_missing</th>
+     <td>$missingtime</td>
+     <th>$l_progeval :</th>
+     <td>$symbol_progeval</td>
     </tr>";
 
   } 
@@ -2309,21 +2283,23 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
 
   $block = "
     $dis_comp
-
-    <div class=\"detailHead\">$l_progress</div>
-
-    <table class=\"detail\">
+    <div class=\"detail extra\">
+    <h1>$l_progress</h1>
+    <table>
       $dis_progress
     </table>
-
-    <div class=\"detailHead\">$l_progressinfos</div>
-
-    <div class=\"projectCenter\">
-    <table $tab_style>
+    </div>
+    <div class=\"detail extra\">
+    <h1>$l_progressinfos</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
       $dis_memhead
     </tr>
-      $dis_member
+    </thead>
+    <tbody>
+    $dis_member
+    </tbody>
     </table>
     </div>
     ";

@@ -250,13 +250,19 @@ if ($action == "index") {
 } elseif ($action == "quick_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_quick_form($params)) {
-      run_query_calendar_quick_event_update($params);
-      json_event_data($params["calendar_id"],$params);
+      $id = $params["calendar_id"];
+      $eve_q = run_query_calendar_detail($id);
+      if($eve_q->f('calendarevent_repeatkind') == 'none') {
+        run_query_calendar_quick_event_update($params);
+      } else {
+        $id = run_query_calendar_event_exception_insert($params,$eve_q);
+      }
+      json_event_data($id,$params);
       json_ok_msg("$l_event : $l_update_ok");
       echo "({".$display['json']."})";
       exit();
   } else {
-    json_error_msg($l_invalid_data . " : " . $err_msg);
+    json_error_msg($l_invalid_data . " : " . $err_msg );
     echo "({".$display['json']."})";
     exit();
   }

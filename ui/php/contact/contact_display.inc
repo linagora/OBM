@@ -451,8 +451,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form class=\"search\" method=\"get\" name=\"f_search\" 
-  action=\"".url_prepare("contact_index.php")."\">
-
+  action=\"contact_index.php\">
     <label>$l_contact_name<br />
       <input type=\"text\" name=\"tf_lname\" size=\"12\" value=\"$lname\" />
     </label>
@@ -1589,7 +1588,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
       $sel_usercomment2
       <textarea name=\"ta_add_comment2\" rows=\"6\" cols=\"78\">$add_comment2</textarea>
       $dis_comment2
-      </fieldset>";
+    </fieldset>";
   }
 
   if ($show_comment3) {
@@ -1602,7 +1601,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
       $sel_usercomment3
       <textarea name=\"ta_add_comment3\" rows=\"6\" cols=\"78\">$add_comment3</textarea>
       $dis_comment3
-      </fieldset>";
+    </fieldset>";
   }
 
   // Company Display
@@ -1743,9 +1742,9 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
       <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>$sel_usercomment
       <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
       $dis_comment
+    </fieldset>
     $block_comment2
     $block_comment3
-    </fieldset>
 
     <fieldset class=\"buttons\">
     $dis_button

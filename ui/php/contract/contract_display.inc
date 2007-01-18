@@ -609,10 +609,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
 
 
   $block = "
-  <table width=\"100%\">
-  <tr>
-    <td valign=\"top\" width=\"50%\">
-<div class=\"detail extra\">
+    <div class=\"detail infos\">
       <h1>$l_company</h1>
       <table>
       <tr>
@@ -636,12 +633,9 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
       </tr>
       </table>   
 
-</div>
+    </div>
 
-    </td>
-    <td valign=\"top\" width=\"50%\">
-
-<div class=\"detail extra\">
+<div class=\"detail infos\">
       <h1>$l_manager</h1>
       <table>
       <tr>
@@ -652,15 +646,22 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
         <td>$tech</td>
       </tr>
       </table>
-</div>
-  </td>
+      </div>
+<div class=\"detail infos\">
+  <h1>$l_status</h1>
+  <table>
+  <tr>
+    <th>$l_status</th>
+    <td>$status</td>
+  </tr><tr>
+    $dis_format
+  </tr><tr>
+    <th>$l_duration_used</th>
+    <td>$duration_used</td>
   </tr>
   </table>
-
-  <table width=\"100%\">
-  <tr>
-    <td valign=\"top\" width=\"50%\">
-<div class=\"detail extra\">
+</div>      
+<div class=\"detail infos\">
     <h1>$l_contract</h1>
     <table>
     <tr>
@@ -681,9 +682,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
     </tr>
     </table>
 </div>
-    </td>
-    <td valign=\"top\" width = 50%>
-<div class=\"detail extra\">
+<div class=\"detail infos\">
     <h1>$l_dates</h1>
     <table>
     <tr>
@@ -707,23 +706,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
     </tr>
     </table>
 </div>
-    </td>
-  </tr>
-  </table>
-<div class=\"detail infos\">
-  <h1>$l_status</h1>
-  <table>
-  <tr>
-    <th>$l_status</th>
-    <td>$status</td>
-  </tr><tr>
-    $dis_format
-  </tr><tr>
-    <th>$l_duration_used</th>
-    <td>$duration_used</td>
-  </tr>
-  </table>
-</div>
+
 <div class=\"detail extra\">
  <h1>$l_clause</h1>
   <table>
@@ -1201,8 +1184,19 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
    </table>
 </fieldset>
 
+<fieldset class=\"detail infos\">
+<legend>$l_status</legend>
 
-
+<table>
+<tr>
+ <th>$l_status</th>
+ <td>$sel_sta</td>
+ </tr><tr>
+ <th>$l_format</th>
+ <td>$dis_format</td>
+</tr>$dis_format_detail
+  </table>
+</fieldset>
 
   <fieldset class=\"detail infos\">
   <legend>$l_contract</legend>
@@ -1257,22 +1251,6 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </tr>
   </table>
 </fieldset>
-
-
-<fieldset class=\"detail infos\">
-<legend>$l_status</legend>
-
-<table>
-<tr>
- <th>$l_status</th>
- <td>$sel_sta</td>
- </tr><tr>
- <th>$l_format</th>
- <td>$dis_format</td>
-</tr>$dis_format_detail
-  </table>
-</fieldset>
-
 
 
 
