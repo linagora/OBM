@@ -1065,7 +1065,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 
 	    // text field handling
 	    if ($field_kind[$field] == "tf") {
-	      $input = "<input type=\"text\" name=\"tf_".$field."[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"$value\" />";
+	      $input = "<input type=\"text\" name=\"tf_".$field."[]\" readonly=\"readonly\" value=\"$value\" />";
 
 	    // Select field handling
 	    } elseif ($field_kind[$field] == "sel") {
@@ -1112,7 +1112,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 		}
 		$data_q->seek(0);
 	      }
-	      $input = "<select title=\"$txt\" name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\">$option</select>";
+	      $input = "<select title=\"$txt\" name=\"sel_".$field."[]\" readonly=\"true\" onFocus=\"this.blur();\">$option</select>";
 
 	    } elseif ($field_kind[$field] == "of_sel") {
 	      // special of_select (handle a checkbox first)
@@ -1144,8 +1144,8 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	      }
 
 	      // We add the cb input first
-	      $input = "<input type=\"text\" name=\"sel_".$field."_tree[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"".$module["${field}_tree"][$line]."\" />";
-	      $input .= "<select title=\"$txt\" name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\">$option</select>";
+	      $input = "<input type=\"text\" name=\"sel_".$field."_tree[]\" readonly=\"readonly\" value=\"".$module["${field}_tree"][$line]."\" />";
+	      $input .= "<select title=\"$txt\" name=\"sel_".$field."[]\" readonly=\"true\" onFocus=\"this.blur();\">$option</select>";
 	    }
 
 	    // Exclude fields that have no value (eg: category_tree)
@@ -1197,7 +1197,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
         <option value=\"NOT\" $not>$l_not</option>
         <option value=\"Exclude\" $exclude>$l_exclude</option>
       </select></td>";
-	$dis_criteria .="<tr><td colspan=\"4\"> </td>".$labels[$key]."</tr>";
+	$dis_criteria .="<tr><th colspan=\"4\"></th>///".$labels[$key]."</tr>";
 	if ($logical_criterion[$key] == "AND") {
 	  $and = "selected =\"true\"";
 	  $or = "";
@@ -1205,7 +1205,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	  $or = "selected =\"true\"";
 	  $and = "";
 	}	
-	$dis_logical = "<td><select name=\"sel_log_and[]\"><option value=\"OR\" $or>$l_or</option><option value=\"AND\" $and>$l_and</option></select>";
+	$dis_logical = "<th><select name=\"sel_log_and[]\"><option value=\"OR\" $or>$l_or</option><option value=\"AND\" $and>$l_and</option></select>";
 	$dis_criteria .="<tr><td>".$hid_cell[$key]."</td>$del_cell $upd_cell $dis_logical $dis_no_boolean $line</tr>";      
       }
     }
@@ -1218,11 +1218,21 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
   }
   $block = "
   <div id=\"di_query\" $display class=\"buttons\">
-  <table id=\"list_criterion\">
+  <table id=\"list_criterion\" class=\"spreadSheet\">
+  <thead>
+  <tr>
+  <th>&nbsp;</th>
+  <th>Supprimer</th>
+  <th>Modifier</th>
+  <th>Criteres</th>
+  </tr>
+  </thead>
+  <tbody>
    $dis_criteria
+  </tbody>
   </table>
   <input type=\"button\" value=\"$l_add_criterion\" 
-  onclick=\"window.open('$url2','','height=650,width=$popup_width,scrollbars=yes,status=yes'); return false;\"/>
+  onclick=\"window.open('$url2','','height=650,width=700,scrollbars=yes,status=yes'); return false;\"/>
   </div>";
 
   return $block;
@@ -1368,38 +1378,32 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
   <table>
   <tr>
     <th>$l_company</th>
-    <th>$l_country</th>
-    <th>$l_timeafter</th>
-  </tr>
-  <tr>
     <td><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
+  </tr><tr>  
+    <th>$l_country</th>
     <td><select name=\"sel_company_country_iso3166\">$sel_cty</select></td>
-    <td style=\"white-space: nowrap;\">
-      <input type=\"text\" name=\"tf_company_timeafter\" value=\"$company_timeafter\" class=\"datePicker\"/>
-    </td>
-  </tr>
-  <tr>
+   </tr><tr>   
+    <th>$l_timeafter</th>
+    <td><input type=\"text\" name=\"tf_company_timeafter\" value=\"$company_timeafter\" class=\"datePicker\"/></td>
+  </tr><tr>
     <th>$l_postcode</th>
-    <th>$l_market</th>
-    <th>$l_timebefore</th>
-  </tr>
-  <tr>
     <td><input type=\"text\" size=\"10\" name=\"tf_company_zipcode\" value=\"\" /></td>
+  </tr><tr>
+    <th>$l_market</th>
     <td><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>
-    <td style=\"white-space: nowrap;\">
-      <input type=\"text\" name=\"tf_company_timebefore\" value=\"$company_timebefore\" class=\"datePicker\"/>
-    </td>
+ </tr><tr>
+    <th>$l_timebefore</th>
+      <td><input type=\"text\" name=\"tf_company_timebefore\" value=\"$company_timebefore\" class=\"datePicker\"/></td>
   </tr>
-  <tr>
+  
+    <tr>
     <th>$l_town</th>
-    <th>$l_company_cat1</th>
-    <th>$l_datasource</th>
-  </tr>
-  <tr>
     <td><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td>
-    <td style=\"white-space: nowrap;\">
-$dis_cat
-    </td>
+    </tr><tr>
+    <th>$l_company_cat1</th>
+    <td>$dis_cat</td>
+    </tr><tr>
+    <th>$l_datasource</th>
     <td><select name=\"sel_company_datasource_id\">$sel_dsr</select></td>
   </tr>
   </table>
@@ -1471,58 +1475,51 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q) {
   <table>
   <tr>
     <th>$l_lastname</th>
-    <th>$l_country</th>
-    <th>$l_timeafter</th>
-  </tr>
-  <tr>
     <td><input type=\"text\" size=\"17\" name=\"tf_contact_lastname\" value=\"\" /></td>
+  </tr><tr>  
+    <th>$l_country</th>
     <td><select name=\"sel_contact_country_iso3166\">$sel_cty</select></td>
-    <td style=\"white-space: nowrap;\">
-      <input type=\"text\" name=\"tf_contact_timeafter\" value=\"$contact_timeafter\" class=\"datePicker\"/>
-    </td>
-  <tr>
-    <th>$l_firstname</th>
-    <th>$l_market</th>
-    <th>$l_timebefore</th>
+  </tr><tr>  
+    <th>$l_timeafter</th>
+    <td><input type=\"text\" name=\"tf_contact_timeafter\" value=\"$contact_timeafter\" class=\"datePicker\"/></td>
   </tr>
-  <tr>
+  
+   <tr>
+    <th>$l_firstname</th>
     <td><input type=\"text\" size=\"17\" name=\"tf_contact_firstname\" value=\"\" /></td>
-    <td><select name=\"sel_contact_marketingmanager_id\">$sel_usr</select></td>
-    <td style=\"white-space: nowrap;\">
+   </tr><tr>
+    <th>$l_market</th>
+   <td><select name=\"sel_contact_marketingmanager_id\">$sel_usr</select></td>
+   </tr><tr>
+    <th>$l_timebefore</th>
+    <td>
       <input type=\"text\" name=\"tf_contact_timebefore\" value=\"$contact_timebefore\" class=\"datePicker\"/>
     </td>
   </tr>
+  
   <tr>
     <th>$l_datasource</th>
-    <th>$l_town</th>
-    <th>$l_postcode</th>
-  </tr>
-  <tr>
     <td><select name=\"sel_contact_datasource_id\">$sel_dsr</select></td>
+  </tr><tr>
+    <th>$l_town</th>
     <td><input type=\"text\" size=\"17\" name=\"tf_contact_town\" value=\"\" /></td>
+  </tr><tr>
+    <th>$l_postcode</th>
     <td><input type=\"text\" size=\"10\" name=\"tf_contact_zipcode\" value=\"\" /></td>
   </tr>
+  
   <tr>
     <th>$l_function</th>
-    <th></th>   
-    <th></th>
+    <td><select name=\"sel_contact_function_id\">$sel_fct</select></td>
   </tr>
   <tr>
-    <td><select name=\"sel_contact_function_id\">$sel_fct</select></td>    
-    <td>$dis_cat</td>
-    <td></td>    
+    <th></th>
+    <td>$dis_cat</td> 
   </tr>
   <tr> 
     <th>$l_lang</th>
-    <td></td>
-    <td></td>
-  </tr> 
-  <tr>  
-    <td><select name=\"sel_kind_lang\">$sel_lag</select></td>    
-    <td></td>
-    <td></td>
+    <td><select name=\"sel_kind_lang\">$sel_lag</select></td>  
   </tr>
-
   </table>
   </fieldset>";
 
@@ -1556,44 +1553,40 @@ function html_list_publication_criterion($rec_q,$pub_q) {
   }   
   
   $block = "
-  <fieldset class=\"detail extra\">
+  <fieldset class=\"detail infos\">
   <legend>$l_publication</legend>    
   <table>
   <tr>
     <th>$l_title</th>
-    <th>$l_lang</th>
-    <th>$l_year</th>
-    <th>$l_after</th>  
-  </tr>
-  <tr>
     <td><select name=\"sel_subscription_publication_id\">$sel_pub</select></td>
+  </tr><tr>
+    <th>$l_lang</th>
     <td><input type=\"text\" size=\"10\" name=\"tf_publication_lang\" value=\"\" /></td>
-    <td><input type=\"text\" size=\"10\" name=\"tf_publication_year\" value=\"\" /></td>  
-    <td style=\"white-space: nowrap;\">
-      <input type=\"text\" name=\"tf_subscription_timeafter\" value=\"$subscription_timeafter\" class=\"datePicker\"/>
-    </td>     
+  </tr><tr>
+    <th>$l_year</th>
+    <td><input type=\"text\" size=\"10\" name=\"tf_publication_year\" value=\"\" /></td>
+  </tr><tr>
+    <th>$l_after</th> 
+    <td><input type=\"text\" name=\"tf_subscription_timeafter\" value=\"$subscription_timeafter\" class=\"datePicker\"/></td>  
   </tr>
+
+             
   <tr>
     <th>$l_renew</th>
-    <th>$l_recept</th>
-    <th>&nbsp;</th>  
-    <th>$l_before</th>  
-  </tr>
-  <tr>
-    <td>
+     <td>
       <select name=\"tf_subscription_renewal\">
        <option value=\"\">$l_undef</option>
        <option value=\"1\">$l_yes</option>
        <option value=\"0\">$l_no</option>
       </select>
-    </td>    
-    <td><select name=\"sel_subscription_reception_id\">$sel_rec</select></td>
-    <td>&nbsp;</td>
-    <td style=\"white-space: nowrap;\">
-      <input type=\"text\" name=\"tf_subscription_timebefore\" value=\"$subscription_timebefore\" class=\"datePicker\"/>
     </td>
+  </tr><tr>
+    <th>$l_recept</th>
+    <td><select name=\"sel_subscription_reception_id\">$sel_rec</select></td>
+  </tr><tr>
+     <th>$l_before</th>
+     <td><input type=\"text\" name=\"tf_subscription_timebefore\" value=\"$subscription_timebefore\" class=\"datePicker\"/></td>
   </tr>
-  
   </table>
   </fieldset>
 ";
@@ -1612,21 +1605,16 @@ function dis_list_display_pref($prefs, $prefs_con) {
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "list");
   $dis_pref->pref_title = $l_list_display;
-  $dis_pref->pref_dis_help = 0;
+  $dis_pref->pref_dis_help = 1;
 
-  $block = "<center><table><tr><td>";
   $block .= $dis_pref->display();
 
   $dis_pref->display_pref = $prefs_con;
   $dis_pref->display_entity = "list_contact";
   $dis_pref->pref_title = $l_contact_display;
 
-  $block .= "</td><td>";
   $block .= $dis_pref->display();
 
-  $block .= "</td></tr></table>";
-  $block .= $dis_pref->dis_pref_help();
-  $block .= "</center>";
 
   return $block;
 }

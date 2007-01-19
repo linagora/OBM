@@ -1834,21 +1834,21 @@ function html_deal_affect($parent_q, $p_deal_id) {
       <form name=\"form_affect_deal\" method=\"get\"
         action=\"" . url_prepare("deal_index.php") . "\">
 
-      <table class=\"detail\">
+      <fieldset class=\"detail extra\">
+      <table>
       <tr>
-        <td class=\"detailLabel\">
+        <th>
         $sel_parent
         <input type=\"hidden\" name=\"action\" value=\"affect_update\" />
         <input type=\"hidden\" name=\"deal_id\" value=\"$p_deal_id\" />
-        </td>
+        </th>
       </tr>
       </table>
+      <fieldset>
 
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">
+      <fieldset class=\"buttons\">
         <input type=\"submit\" name=\"sub_affect_deal\" value=\"$l_affect\" />
-        </p>
-      </div>
+      </fieldset>
       </form>";
 
     return $block;
@@ -2513,7 +2513,7 @@ function html_deal_admin_form($kind_q, $status_q) {
     <img src=\"$ico_delete\" alt=\"$l_kind_checkdelete\" title=\"$l_kind_checkdelete\" />
     </a></td>
     <!--<td><input type=\"text\" id=\"tf_kind_inout_$id\" value=\"$inout\" size=\"6\"/></td>-->
-    <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"$inout\" $inout/>$l_minus</td>
+    <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"$inout\" />$l_minus</td>
     <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"$inout\" />$l_plus</td>
     <td><input type=\"text\" id=\"tf_kind_label_$id\" value=\"$label\" /></td>
     <td>
@@ -2845,23 +2845,17 @@ function dis_deal_display_pref($prefs, $prefs_parent) {
  
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "deal");
   $dis_pref->pref_title = $l_deal_display;
-
-  $block = "
-    <table class=\"detail\">
-    <tr>
-      <td>";
-  $block .= $dis_pref->display();
-  $block .= "
-    </td><td>";
+  $dis_pref->pref_dis_help = 1;
+  
+  $block = $dis_pref->display();
 
   $dis_pref->display_pref = $prefs_parent;
   $dis_pref->display_entity = "parentdeal";
   $dis_pref->pref_title = $l_parentdeal_display;
 
+
   $block .= $dis_pref->display();
   
-  $block .= "</td></tr></table>";
-  $block .= $dis_pref->dis_pref_help();
 
   return $block;
 }
@@ -2991,68 +2985,52 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   $p_potential = get_deal_parent_potential($parent);
 
   $block = "
-    <table width=\"100%\">
-    <tr>
-      <td valign=\"top\">
-
-      <div class=\"detailHead\">$l_parentdeal</div>
-
-	<table class=\"detail\">
+     <div class=\"detail infos\">
+      <h1>$l_parentdeal</h1>
+	<table>
 	<tr>
-	  <td class=\"detailLabel\">$l_label</td>
-	  <td class=\"detailText\">$plabel</td>
+	  <th>$l_label</th>
+	  <td>$plabel</td>
 	</tr><tr>
-	  <td class=\"detailLabel\">$l_marketing_manager</td>
-	  <td class=\"detailText\">$pmarket_name</td>
+	  <th>$l_marketing_manager</th>
+	  <td>$pmarket_name</td>
 	</tr><tr>
-	  <td class=\"detailLabel\">$l_technical_manager</td>
-	  <td class=\"detailText\">$ptech_name</td>
+	  <th>$l_technical_manager</th>
+	  <td>$ptech_name</td>
 	</tr><tr>
-	  <td class=\"detailLabel\">$l_proposal</td>
-	  <td class=\"detailText\">$p_dateproposal</td>
+	  <th>$l_proposal</th>
+	  <td>$p_dateproposal</td>
 	</tr>
 	</table>
+	</div>
 
-      </td><td>
-
-      <div class=\"detailHead\">$l_infos</div>
-
-	<table class=\"detail\">
+    <div class=\"detail infos\">
+      <h1>$l_infos</h1>
+	<table>
 	<tr>
-	  <td class=\"detailLabel\">$l_status :</td>
-	  <td class=\"detailText\">$p_status</td>
+	  <th>$l_status :</th>
+	  <td>$p_status</td>
 	</tr><tr>
-	  <td class=\"detailLabel\">$l_alarm</td>
-	  <td class=\"detailText\">$p_datealarm</td>
+	  <th>$l_alarm</th>
+	  <td>$p_datealarm</td>
 	</tr><tr>
-	  <td class=\"detailLabel\">$l_amount_out</td>
-	  <td class=\"detailText\">$p_expense</td>
+	  <th>$l_amount_out</th>
+	  <td>$p_expense</td>
 	</tr><tr>
-	  <td class=\"detailLabel\">$l_amount_in</td>
-	  <td class=\"detailText\">$p_income</td>
+	  <th>$l_amount_in</th>
+	  <td>$p_income</td>
 	</tr><tr>
-	  <td class=\"detailLabel\">$l_potential_balanced</td>
-	  <td class=\"detailText\">$p_potential</td>
+	  <th>$l_potential_balanced</th>
+	  <td>$p_potential</td>
 	</tr>
 	</table>
-
-      </td>
-
-    </tr><tr>
-
-      <td colspan=\"2\">
-
-      <div class=\"detailHead\">$l_comment</div>
-
-	<table class=\"detail\">
-	<tr>
-          <td class=\"detailText\">$pcomment</td>
-        </tr> 
-        </table>
-
-      </td>
-    </tr><tr>
-   </table>";
+        </div>
+     
+      <div class=\"detail extra\">
+      <h1>$l_comment</h1>
+	$pcomment
+	</div>
+	";
     
   $block .= display_info_msg($l_parentdeal_deals);
 

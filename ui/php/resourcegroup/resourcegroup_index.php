@@ -416,14 +416,6 @@ function get_resourcegroup_action() {
     'Condition'=> array ('None')
                                      );
 
-// Admin
-  $actions["resourcegroup"]["admin"] = array (
-    'Name'     => $l_header_admin,
-    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=admin",
-    'Right'    => $cright_read_admin,
-    'Condition'=> array ('all')
-                                    );
-
 // Display
   $actions["resourcegroup"]["display"] = array (
     'Name'     => $l_header_display,

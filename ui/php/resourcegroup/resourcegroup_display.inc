@@ -303,7 +303,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
 
   $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("resourcegroup_index.php")."\">
- <fieldset class=\"detail extra\">
+ <fieldset class=\"detail infos\">
   <legend>$l_resourcegroup</legend>
 
   <table>
@@ -315,7 +315,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
   </table>
   </fieldset>
   
-  <fieldset class=\"detail extra\">
+  <fieldset class=\"detail infos\">
    <legend>$l_desc</legend>
    <table>
     <tr>
@@ -485,23 +485,16 @@ function dis_resourcegroup_display_pref($pref_group_q, $pref_r_q) {
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_group_q, "resourcegroup"); 
   $dis_pref->pref_title = $l_resourcegroup_display;
-  $dis_pref->pref_dis_help = 0;
+  $dis_pref->pref_dis_help = 1;
 
-  $block = "
-    <table>
-    <tr>
-      <td>" . $dis_pref->display() . "</td>";
+  $block = $dis_pref->display();
 
   $dis_pref->display_pref = $pref_r_q;
   $dis_pref->display_entity = "resourcegroup_resource";
   $dis_pref->pref_title = $l_resource_display;
 
-  $block .= "<td>" . $dis_pref->display() . "</td>
-      </td>
-    </tr>
-    </table>";
+  $block .= $dis_pref->display();
 
-  $block .= $dis_pref->dis_pref_help();
 
   return $block;
 }

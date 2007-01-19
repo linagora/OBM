@@ -121,7 +121,7 @@ function html_user_search_form($user) {
   $archive = ($user["archive"] == "1" ? "checked" : "");
   $popup = $user["popup"];
   if ($user["restriction_calendar"]) {
-    $dis_restriction = "<input name=\"restriction_calendar\" type=\"hidden\" value=\"calendar\">";
+    $dis_restriction = "<input name=\"restriction_calendar\" type=\"hidden\" value=\"calendar\" />";
   }
 
   if ($popup) {
@@ -132,13 +132,13 @@ function html_user_search_form($user) {
     $ext_target = $user["ext_target"];
     $ext_widget = $user["ext_widget"];
     $ext_element = $user["ext_element"];
-    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
-            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
-            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
-            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
-            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
-	    <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">
-            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\" />
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\" />
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\" />
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
+            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\" />
+	    <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\" />
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\" />";
     if ($ext_title == "") {
       $ext_title = $l_add_users;
     }
@@ -393,7 +393,7 @@ function html_user_form($usr_q, $user) {
       onsubmit=\"if (check_user(this)) return true; else return false;\"
       action=\"" . url_prepare("user_index.php") . "\">
 
-<fieldset class=\"detail extra\">
+<fieldset class=\"detail infos\">
     <legend>$l_user</legend>
 
     <table>
@@ -437,11 +437,19 @@ function html_user_form($usr_q, $user) {
       <th>$l_datebegin</th>
       <td>
       <input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/>
-    </tr><tr>
-      <th>$l_desc</th>
-      <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
     </tr>
     </table>
+    </fieldset>
+    
+ <fieldset class=\"detail infos\">   
+      <legend>$l_desc</legend>
+      
+      <table>
+      <tr>
+      <th>$l_desc</th>
+      <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
+      </tr>
+      </table>
  </fieldset>
 
     <fieldset class=\"buttons\">
@@ -630,23 +638,24 @@ function html_user_group_consult($usr_q) {
     $dis_group .= "
     <tr>
       <th>$grp_name</th>
-      <td><input name=\"data-g-$grp_id\" type=\"checkbox\" value=\"1\" $checked></td>
+      <td><input name=\"data-g-$grp_id\" type=\"checkbox\" value=\"1\" $checked /></td>
     </tr>";
   }
 
   $block = "
-    <form method=\"post\" name=\"f_entity\"
-      action=\"" . url_prepare("user_index.php") . "\">
-
+  <form method=\"post\" name=\"f_entity\" action=\"" . url_prepare("user_index.php") . "\">
+  <fieldset class=\"detail extra\">
   <h1>$l_user $login ($lname $fname) $l_group_member</h1>
   <table>
   $dis_group
   </table>
-
-  <p>
-  <input type=\"hidden\" name=\"user_id\" value=\"$id\">
-  <input type=\"hidden\" name=\"action\" value=\"group_update\">
-  <input type=\"submit\" value=\"$l_update_group\">
+  </fieldset>
+ 
+  <fieldset class=\"buttons\">
+  <input type=\"hidden\" name=\"user_id\" value=\"$id\" />
+  <input type=\"hidden\" name=\"action\" value=\"group_update\" />
+  <input type=\"submit\" value=\"$l_update_group\" />
+  </fieldset>
   </form>";
 
   return $block;

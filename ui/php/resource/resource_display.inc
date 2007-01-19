@@ -282,12 +282,7 @@ function html_resource_form($usr_q, $resource) {
 
     <fieldset class=\"detail extra\">
     <legend>$l_desc</legend>
-    <table>	  
-    <tr>
-      <th>$l_desc</th>
-      <td><textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"3\" cols=\"80\">$desc</textarea></td>
-    </tr>
-    </table>
+      <textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"3\" cols=\"80\">$desc</textarea>
     </fieldset>
     
     <fieldset class=\"buttons\">
@@ -358,11 +353,7 @@ function html_resource_consult($obm_q) {
 
   <div class=\"detail extra\">
   <h1>$l_desc</h1>
-    <table>
-    <tr>
-      <td>$desc</td>
-    </tr>
-    </table>
+      $desc
     </div>
 ";
 

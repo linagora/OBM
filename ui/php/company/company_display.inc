@@ -681,7 +681,7 @@ function dis_company_consult($params) {
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult($co_q) {
-  global $set_theme, $ico_contact, $ico_contact_new,  $ico_mail;
+  global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   global $l_name, $l_aka, $l_number, $l_nafcode, $l_vat, $l_siret, $l_market;
   global $l_company, $l_archive;
   global $display, $l_yes, $l_no, $cgp_hide;
@@ -809,7 +809,7 @@ function html_company_consult_address($co_q) {
   global $set_theme, $ico_contact, $ico_contact_new;
   global $l_name, $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment;
-  global $l_company, $l_coord,$ico_web;
+  global $l_company, $l_coord;
   global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard,$cclipboard_address;
   
   $id = $co_q->f("company_id");
@@ -1610,7 +1610,7 @@ function dis_company_nafcode_links($company) {
       $cpt++;
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
-      $dis_link = "<li><a href=\"company_index.php?action=detailconsult&amp;company_id=$cid\">$cname</a></li>";
+      $dis_link .= "<li><a href=\"company_index.php?action=detailconsult&amp;company_id=$cid\">$cname</a></li>";
     }
     if ($cpt < $nb_naf) {
       $dis_link .= "<li>...</li>";

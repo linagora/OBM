@@ -279,7 +279,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
     </form>";
 
     $display_popup_end = "
-    <p><a href=\"\" onclick='window.close();'>$l_close</a></p>";
+    <a href=\"\" onclick='window.close();'>$l_close</a>";
   }
 
   $dis_group->data_set = $obm_q;
@@ -343,7 +343,7 @@ function html_group_form($action, $group_q, $group) {
 
   $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
-<fieldset class=\"detail extra\">
+<fieldset class=\"detail infos\">
   <legend>$l_group</legend>
 
   <table>
@@ -361,7 +361,7 @@ function html_group_form($action, $group_q, $group) {
   </table>
   </fieldset>
 
-<fieldset class=\"detail extra\">
+<fieldset class=\"detail infos\">
   <legend>$l_desc</legend>
 
 <table>
@@ -562,6 +562,9 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     </tr><tr>
       <th>$l_ext_id</th>
       <td>$ext_id</td>
+    </tr><tr>
+      <th>$l_email</th>
+      <td>$email</td>
     </tr>
     </table>
     </div>
@@ -573,9 +576,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     <tr>
       <th>$l_desc</th>
       <td>$desc</td>
-    </tr><tr>
-      <th>$l_email</th>
-      <td>$email</td>
     </tr>
     </table>
   </div>";
@@ -686,23 +686,15 @@ function dis_group_display_pref($prefs_g, $prefs_u) {
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_g, "group");
   $dis_pref->pref_title = $l_group_display;
-  $dis_pref->pref_dis_help = 0;
+  $dis_pref->pref_dis_help = 1;
 
-  $block = "
-    <table>
-    <tr>
-      <td>" . $dis_pref->display() . "</td>";
+  $block = $dis_pref->display();
 
   $dis_pref->display_pref = $prefs_u;
   $dis_pref->display_entity = "group_user";
   $dis_pref->pref_title = $l_user_display;
 
-  $block .= "<td>" . $dis_pref->display() . "</td>
-      </td>
-    </tr>
-    </table>";
-
-  $block .= $dis_pref->dis_pref_help();
+  $block .= $dis_pref->display();
 
   return $block;
 }

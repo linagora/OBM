@@ -324,14 +324,6 @@ function get_resource_action() {
     'Condition'=> array ('None')
                                      );
 
-// Admin
-  $actions["resource"]["admin"] = array (
-    'Name'     => $l_header_admin,
-    'Url'      => "$path/resource/resource_index.php?action=admin",
-    'Right'    => $cright_read_admin,
-    'Condition'=> array ('all') 
-                                     );
-
 // Display
   $actions["resource"]["display"] = array (
     'Name'     => $l_header_display,

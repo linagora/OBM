@@ -431,14 +431,6 @@ function get_group_action() {
     'Condition'=> array ('None')
                                      );
 
-// Admin
-  $actions["group"]["admin"] = array (
-    'Name'     => $l_header_admin,
-    'Url'      => "$path/group/group_index.php?action=admin",
-    'Right'    => $cright_read_admin,
-    'Condition'=> array ('all')
-                                    );
-
 // Display
   $actions["group"]["display"] = array (
     'Name'     => $l_header_display,

@@ -2098,7 +2098,7 @@ function dis_contact_kind_links($ref) {
       $cpt++;
       $cid = $obm_q->f("contact_id");
       $cname = $obm_q->f("contact_lastname")." ".$obm_q->f("contact_firstname");
-      $dis_link = "<li><a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a></li>";
+      $dis_link .= "<li><a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a></li>";
     }
     if ($cpt < $nb_kind) {
       $dis_link .= "<li>...</li>";

@@ -282,14 +282,6 @@ function get_account_action() {
     'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	);
 
-// Admin
-  $actions["account"]["admin"] = array (
-    'Name'     => $l_header_admin,
-    'Url'      => "$path/account/account_index.php?action=admin",
-    'Right'    => $cright_read_admin,
-    'Condition'=> array ('all') 
-                                      );
-
 // Display
   $actions["account"]["display"] = array (
     'Name'     => $l_header_display,

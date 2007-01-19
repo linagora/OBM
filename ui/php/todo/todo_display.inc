@@ -201,12 +201,7 @@ function dis_todo_detail($todo, $todo_q) {
   
   <div class=\"detail extra\">
     <h1>$l_content</h1> 
-     <table>
-     <tr>
-      <th>$l_content</th>
-      <td>$content</td>
-     </tr>
-    </table>
+      $content
   </div>
     ";
   
@@ -357,12 +352,7 @@ function dis_todo_form($todo, $todo_q = 0) {
 
   <fieldset class=\"detail extra\">
   <legend>$l_content</legend>
-  <table>
-  <tr>
-    <th>$l_content</th>
-    <td><textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\">$content</textarea></td>
-  </tr>
-  </table>
+    <textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\">$content</textarea>
   </fieldset>
   
   <fieldset class=\"buttons\">

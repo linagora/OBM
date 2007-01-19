@@ -321,7 +321,7 @@ function html_document_consult($doc_q) {
    </table>
    </div>
    
-   <div class=\"detail infos\">
+   <div class=\"detail extra\">
    <h1>
    <a target=\"_blank\" href=\"$url\">
     $l_consult
@@ -816,7 +816,7 @@ function dis_document_mime_links($document) {
   $nb_mime = $obm_q->num_rows();
   if ($nb_mime > 0) {
     $delete_ok = false;
-    $dis_link = "<h1>$label : $l_mime_link_document ($nb_mime)</h1>";
+    $dis_link_head = "<h1>$label : $l_mime_link_document ($nb_mime)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
@@ -830,11 +830,12 @@ function dis_document_mime_links($document) {
     }
 
   } else {
-    $dis_link = "<h1>$label : $l_mime_link_document_no</h1>";
+    $dis_link_head = "<h1>$label : $l_mime_link_document_no</h1>";
   }
 
   $block .= "
     <div class=\"detail\">
+    $dis_link_head
     <ul>
     $dis_link
     </ul>

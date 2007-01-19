@@ -384,13 +384,6 @@ function get_user_action() {
     'Condition'=> array ('None') 
                                      );
 
-// Admin
-  $actions["user"]["admin"] = array (
-    'Name'     => $l_header_admin,
-    'Url'      => "$path/user/user_index.php?action=admin",
-    'Right'    => $cright_read_admin,
-    'Condition'=> array ('all') 
-                                    );
 
 // Display
   $actions["user"]["display"] = array (

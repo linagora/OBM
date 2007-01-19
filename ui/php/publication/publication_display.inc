@@ -296,7 +296,7 @@ function html_publication_consult($pub_q) {
   // --- HTML Template --------------------------------------------------------
   $block .= "
   
- <div class=\"detail extra\">
+ <div class=\"detail infos\">
  <h1>$l_publication</h1>
  <table>
   <tr> 
@@ -318,13 +318,9 @@ function html_publication_consult($pub_q) {
   </table>
   </div>
 
-  <div class=\"detail extra\">
+  <div class=\"detail infos\">
   <h1>$l_desc</h1>
-  <table>
-    <tr> 
-      <th>$ldesc</th>
-    </tr>
-  </table>
+      $ldesc
   </div>";
 
   return $block;
@@ -438,7 +434,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
     $sel_list .= "</select>";
 
     $dis_auto_sub = "
-    <fieldset class=\"detail extra\">
+    <fieldset class=\"detail infos\">
     <legend>$l_auto_sub</legend>
     <table>
     $block_cat
@@ -465,7 +461,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
       onsubmit=\"if (check_publication(this)) return true; else return false;\"
       action=\"".url_prepare("publication_index.php")."\">
 
-<fieldset class=\"detail extra\"> 
+<fieldset class=\"detail infos\"> 
     <legend>$l_publication</legend>
     <table>
     <tr>
@@ -486,12 +482,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
     $dis_auto_sub
  <fieldset class=\"detail extra\"> 
     <legend>$l_desc</legend>
-
-    <table>
-    <tr>
-      <td colspan=\"2\"><textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"8\" cols=\"80\">$desc</textarea></td>
-    </tr>
-    </table>
+      <textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"8\" cols=\"80\">$desc</textarea>
 </fieldset>
 <fieldset class=\"buttons\">
     $dis_button
@@ -752,8 +743,8 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
 
     <form method=\"get\" name=\"form_auto_subscription\"
             action=\"".url_prepare("publication_index.php")."\">
-<fieldset class=\"detail infos\">
-    <legend>$l_subscription</legend>
+<fieldset class=\"detail extra\">
+    <legend>$l_publication</legend>
 
     <table>
     <tr>
@@ -1016,7 +1007,7 @@ function dis_publication_type_links($publication) {
   $nb_type = $obm_q->num_rows();
   if ($nb_type > 0) {
     $delete_ok = false;
-    $dis_link = "<h1>$label : $l_type_link_publication ($nb_type)</h1>";
+    $dis_link_head = "<h1>$label : $l_type_link_publication ($nb_type)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
@@ -1030,10 +1021,11 @@ function dis_publication_type_links($publication) {
     }
 
   } else {
-    $dis_link = "<h1>$label : $l_type_link_publication_no</h1>";
+    $dis_link_head = "<h1>$label : $l_type_link_publication_no</h1>";
   }
 
   $block .= "<div class=\"detail\">
+    $dis_link_head
     <ul>
     $dis_link
     </ul>
@@ -1184,8 +1176,7 @@ function dis_publication_recept_links($publication) {
   $nb_recept = $obm_q->num_rows();
   if ($nb_recept > 0) {
     $delete_ok = false;
-    $dis_link = "
-    <h1>$label : $l_recept_link_publication ($nb_recept)</h1>";
+    $dis_link_head = "<h1>$label : $l_recept_link_publication ($nb_recept)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
@@ -1200,10 +1191,11 @@ function dis_publication_recept_links($publication) {
     }
 
   } else {
-    $dis_link = "<h1>$label : $l_recept_link_publication_no</h1>";
+    $dis_link_head = "<h1>$label : $l_recept_link_publication_no</h1>";
   }
 
   $block .= "<div class=\"detail\">
+    $dis_link_head
     <ul>$dis_link</ul>
     </div>";
 
