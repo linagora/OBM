@@ -1798,21 +1798,13 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $com3 = stripslashes($contact["comment3"]);
   $archive = $contact["archive"];
 
-  $disp_same_cont = "
-    <tr>
-      <td colspan =\"2\" class=\"detailHead\">$l_check_samecontact</td>
-    </tr>";
+  $disp_same_cont_head = "<h1>$l_check_samecontact</h1>";
   while ($co_q->next_record()) {
     $id = $co_q->f("contact_id");
     $samename = $co_q->f("contact_lastname")." ". $co_q->f("contact_firstname");
     $company = $co_q->f("company_name");
-    $disp_same_cont .= "
-      <tr>
-        <td colspan =\"2\" class=\"detailLabel\">
-          <a class=\"detail\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$id") . "\">
-          $samename ($company)</a>
-        </td>
-      </tr>";
+    $disp_same_cont .= "<li><a class=\"detail\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$id") . "\">
+          $samename ($company)</a></li>";
 
   }
 
@@ -1851,28 +1843,25 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 ";
 
   $block = "
-    <table class=\"detail\">
+    <div class=\"detail\">
+    $disp_same_cont_head 
+    <ul>
     $disp_same_cont
-    </table>
+    </ul>
+    </div>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-    <form method=\"post\" id=\"form_insert\" name=\"form_insert\"
-    action=\"" .url_prepare("contact_index.php") . "\">
+    <div class=\"buttons\">
+    <form method=\"post\" id=\"form_insert\" name=\"form_insert\" action=\"" .url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     $hidden
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
-    </p>
-    <p class=\"detailButtons\">
-    <form id=\"form_back\" name=\"form_back\" method=\"post\"
-    action=\"" .url_prepare("contact_index.php") . "\">
+    <form id=\"form_back\" name=\"form_back\" method=\"post\" action=\"" .url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     $hidden
     <input type=\"submit\" value=\"$l_back\" />
     </form>
-    </p>
     </div>";
 
   return $block;
@@ -2102,65 +2091,45 @@ function dis_contact_kind_links($ref) {
   $nb_kind = $obm_q->num_rows();
   if ($nb_kind > 0) {
     $delete_ok = false;
-    $dis_link_cont = "
-    <tr>
-      <td class=\"detailHead\">$name : $l_kind_link_contact ($nb_kind)</td>
-    </tr>";
+    $dis_link_head = "<h1>$name : $l_kind_link_contact ($nb_kind)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $cid = $obm_q->f("contact_id");
       $cname = $obm_q->f("contact_lastname")." ".$obm_q->f("contact_firstname");
-      $dis_link_cont .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
+      $dis_link = "<li><a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a></li>";
     }
     if ($cpt < $nb_kind) {
-      $dis_link_cont .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+      $dis_link .= "<li>...</li>";
     }
 
   } else {
-    $dis_link_cont = "
-    <tr>
-      <td class=\"detailHead\">$name : $l_kind_link_contact_no</td>
-    </tr>";
+    $dis_link_head = "<h1>$name : $l_kind_link_contact_no</h1>";
   }
 
-  $block .= "<table class=\"detail\">
-    $dis_link_cont
-    </table>";
+  $block = "<div class=\"detail\">
+             $dis_link_head
+            <ul>
+             $dis_link
+            </ul>
+            </div>";
 
-  $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("contact_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
+  $dis_back = "<a href=\"$path/contact/contact_index.php?action=admin\">$l_back</a>";
 
   if ($delete_ok == true) {
     $display["msg"] .= display_ok_msg($l_kind_can_delete);
-    $dis_del = "<form name=\"form_act_delete\".
-          method=\"post\" action=\"" . url_prepare("contact_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"kind_delete\" />
-        <input type=\"hidden\" name=\"sel_kind\" value=\"$id\" />
-        <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\" />
-        </form>";
+    $dis_del = "<a href=\"$path/contact/contact_index.php?action=kind_delete&amp;sel_kind=$id\" >$l_kind_delete</a>";
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_del
+        $dis_back
       </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_kind_cant_delete);
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_back
       </div>";
   }
 

@@ -1603,25 +1603,26 @@ function dis_company_nafcode_links($company) {
   $nb_naf = $obm_q->num_rows();
   if ($nb_naf > 0) {
     $delete_ok = false;
-    $dis_link = "<h1>$label : $l_naf_link_company ($nb_naf)</h1>";
+    $dis_link_head = "<h1>$label : $l_naf_link_company ($nb_naf)</h1>";
     
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
-      $dis_link .= "<li><a href=\"company_index.php?action=detailconsult&amp;company_id=$cid\">$cname</a></li>";
+      $dis_link = "<li><a href=\"company_index.php?action=detailconsult&amp;company_id=$cid\">$cname</a></li>";
     }
     if ($cpt < $nb_naf) {
       $dis_link .= "<li>...</li>";
     }
 
   } else {
-    $dis_link = "<h1>$label : $l_naf_link_company_no</h1>";
+    $dis_link_head = "<h1>$label : $l_naf_link_company_no</h1>";
   }
 
   $block .= "
     <div class=\"detail\">
+    $dis_link_head
     <ul>
     $dis_link
     </ul>

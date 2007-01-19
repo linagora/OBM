@@ -2512,7 +2512,9 @@ function html_deal_admin_form($kind_q, $status_q) {
     <a href=\"?action=kind_checklink&amp;category=kind&amp;kind=$id\">
     <img src=\"$ico_delete\" alt=\"$l_kind_checkdelete\" title=\"$l_kind_checkdelete\" />
     </a></td>
-    <td><input type=\"text\" id=\"tf_kind_inout_$id\" value=\"$inout\" size=\"6\"/></td>
+    <!--<td><input type=\"text\" id=\"tf_kind_inout_$id\" value=\"$inout\" size=\"6\"/></td>-->
+    <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"$inout\" $inout/>$l_minus</td>
+    <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"$inout\" />$l_plus</td>
     <td><input type=\"text\" id=\"tf_kind_label_$id\" value=\"$label\" /></td>
     <td>
     <a href=\"#\" onclick=\"return updateLine($id,'kind');\">
@@ -2569,7 +2571,8 @@ function html_deal_admin_form($kind_q, $status_q) {
   <thead>
   <tr>
   <td>&nbsp;</td>
-  <td>$l_minus $l_plus</td>
+  <td>$l_minus</td>
+  <td>$l_plus</td>
   <td>$l_kind_label</td>
   <td>&nbsp;</td>  
   </tr>    
@@ -2705,27 +2708,25 @@ function dis_deal_kind_links($id) {
   $nb_kind = $obm_q->num_rows();
   if ($nb_kind > 0) {
     $delete_ok = false;
-    $dis_link = "<li><h1>$label : $l_kind_link_deal ($nb_kind)</h1>";
+    $dis_link_head = "<h1>$label : $l_kind_link_deal ($nb_kind)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
-      $dis_link .= "<a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a></li>";
+      $dis_link = "<li><a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a></li>";
     }
     if ($cpt < $nb_kind) {
       $dis_link .= "<li>...</li>";
     }
 
   } else {
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$l_kind_link_deal_no</td>
-    </tr>";
+    $dis_link_head = "<h1>$l_kind_link_deal_no</h1>";
   }
 
-  $block .= "<div class=\"detail\">
+  $block = "<div class=\"detail\">
+   $dis_link_head
    <ul>
    $dis_link
    </ul>
@@ -2746,9 +2747,9 @@ function dis_deal_kind_links($id) {
         <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\" />
         </form>";
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_del
+        $dis_back
       </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_kind_cant_delete);
@@ -2778,40 +2779,29 @@ function dis_deal_status_links($id) {
   $nb_stat = $obm_q->num_rows();
   if ($nb_stat > 0) {
     $delete_ok = false;
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_status_link_deal ($nb_stat)</td>
-    </tr>";
+    $dis_link_head = "<h1>$label : $l_status_link_deal ($nb_stat)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
-      $dis_link.= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a>
-      </td>
-    </tr>";
+      $dis_link.= "<li><a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a></li>";
     }
     if ($cpt < $nb_stat) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+      $dis_link .= "<li>...</li>";
     }
 
   } else {
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$l_status_link_deal_no</td>
-    </tr>";
+    $dis_link_head = "<h1>$l_status_link_deal_no</h1>";
   }
 
-  $block .= "<table class=\"detail\">
+  $block .= "<div class=\"detail\">
+   $dis_link_head
+   <ul>
    $dis_link
-   </table>";
+   </ul>
+   </div>";
 
   $dis_back = "<form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("deal_index.php") . "\">
@@ -2828,16 +2818,15 @@ function dis_deal_status_links($id) {
       <input type=\"submit\" name=\"sub_status\" value=\"$l_status_delete\" />
       </form>";
 
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
+    $block .= "<div class=\"buttons\">
+        $dis_del
+        $dis_back
       </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_status_cant_delete);
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_back
       </div>";
   }
 
