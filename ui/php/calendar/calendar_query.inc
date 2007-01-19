@@ -475,6 +475,7 @@ function run_query_calendar_insert_event_data($calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $state) {
   global $cdg_sql,$auth;
+
   $uid = $auth->auth["uid"];
   $query = "INSERT INTO EventEntity (
     evententity_timecreate,
@@ -2201,7 +2202,11 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity) {
  */
 function run_query_get_events_attendee($events) {
   global $cdg_sql;
+
   $event_list = implode(",",$events) ;
+  if ($event_list == "") {
+    $event_list = "0";
+  }
   $obm_q = new DB_OBM;
 
   $query = "SELECT

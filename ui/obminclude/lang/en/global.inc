@@ -139,8 +139,11 @@ $l_group = "Group";
 $l_resourcegroup = "Resources Group";
 $l_backup = "Backup";
 $l_domain = "Domain";
+$l_system = "System";
 $l_settings = "Settings";
 $l_password = "Password";
+$l_mailforward = "Mail forwarding";
+$l_vacation = "Mail Vacation";
 
 // Global display
 $l_last_visit = "Bookmarks";
@@ -249,6 +252,8 @@ $l_module_backup = "Backup";
 
 $l_module_settings = "Settings";
 $l_module_password = "Password";
+$l_module_mailforward = "Mail Forward";
+$l_module_vacation = "Mail Vacation";
 
 $l_header_admin = "Administration";
 $l_header_new_f = "New";

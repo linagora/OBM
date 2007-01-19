@@ -72,33 +72,58 @@ CREATE TABLE UserObm_SessionLog (
 -- Table structure for table 'UserObm'
 --
 CREATE TABLE UserObm (
-  userobm_id                int(8) auto_increment,
-  userobm_domain_id         int(8) default 0,
-  userobm_timeupdate        timestamp(14),
-  userobm_timecreate        timestamp(14),
-  userobm_userupdate        int(8),
-  userobm_usercreate        int(8),
-  userobm_local             int(1) default 1,
-  userobm_ext_id            varchar(16),
-  userobm_login             varchar(32) DEFAULT '' NOT NULL,
-  userobm_password          varchar(64) DEFAULT '' NOT NULL,
-  userobm_perms             varchar(254),
-  userobm_calendar_version  timestamp(14),
-  userobm_datebegin         date,
-  userobm_archive           char(1) not null default '0',
-  userobm_lastname          varchar(32) default '',
-  userobm_firstname         varchar(48) default '',
-  userobm_phone             varchar(32) DEFAULT '',
-  userobm_phone2            varchar(32) DEFAULT '',
-  userobm_mobile            varchar(32) DEFAULT '',
-  userobm_fax               varchar(32) DEFAULT '',
-  userobm_fax2              varchar(32) DEFAULT '',
-  userobm_email             varchar(60) DEFAULT '',
-  userobm_description       varchar(255),
-  userobm_location          varchar(255),
-  userobm_education         varchar(255),
-  userobm_timelastaccess    timestamp(14),
-  PRIMARY KEY (userobm_id)
+  userobm_id                  int(8) auto_increment,
+  userobm_domain_id           int(8) default 0,
+  userobm_timeupdate          timestamp(14),
+  userobm_timecreate          timestamp(14),
+  userobm_userupdate          int(8),
+  userobm_usercreate          int(8),
+  userobm_local               int(1) default 1,
+  userobm_ext_id              varchar(16),
+  userobm_system              int(1) default 0,
+  userobm_timelastaccess      timestamp(14),
+  userobm_login               varchar(32) DEFAULT '' NOT NULL,
+  userobm_password_type       char(6) DEFAULT 'PLAIN' NOT NULL,
+  userobm_password            varchar(64) DEFAULT '' NOT NULL,
+  userobm_perms               varchar(254),
+  userobm_calendar_version    timestamp(14),
+  userobm_uid                 int(8),
+  userobm_gid                 int(8),
+  userobm_datebegin           date,
+  userobm_archive             char(1) not null default '0',
+  userobm_lastname            varchar(32) default '',
+  userobm_firstname           varchar(48) default '',
+  userobm_phone               varchar(32) DEFAULT '',
+  userobm_phone2              varchar(32) DEFAULT '',
+  userobm_mobile              varchar(32) DEFAULT '',
+  userobm_fax                 varchar(32) DEFAULT '',
+  userobm_fax2                varchar(32) DEFAULT '',
+  userobm_web_perms           int(1) default NULL,
+  userobm_web_list 	      text default NULL,  
+  userobm_web_all	      int(1) default 0,
+  userobm_mail_perms          int(1) default NULL,
+  userobm_mail_ext_perms      int(1) default NULL,
+  userobm_email               text DEFAULT '',
+  userobm_mail_server_id      int(8) default NULL,
+  userobm_mail_quota          varchar(8) default NULL,
+  userobm_nomade_perms        int(1) default 0,
+  userobm_nomade_enable       int(1) default 0,
+  userobm_nomade_local_copy   int(1) default 0,
+  userobm_email_nomade        varchar(64) default '',
+  userobm_vacation_enable     int(1) default 0,
+  userobm_vacation_message    text default '',
+  userobm_samba_perms         int(1) default 0,
+  userobm_samba_home          varchar(255) default '',
+  userobm_samba_home_drive    char(2) default '',
+  userobm_samba_logon_script  varchar(128) default '',
+  userobm_host_id             int(8) default 0,
+  userobm_archive             int(1) default 0,
+  userobm_description         varchar(255),
+  userobm_location            varchar(255),
+  userobm_education           varchar(255),
+  PRIMARY KEY (userobm_id),
+  UNIQUE KEY k_login_user (userobm_login),
+  INDEX k_uid_user (userobm_uid)
 );
 
 
@@ -1294,10 +1319,14 @@ CREATE TABLE UGroup (
   group_privacy     int(2) NULL DEFAULT 0, 
   group_local       int(1) DEFAULT 1,
   group_ext_id      int(8),
+  group_samba       int(1) DEFAULT 0,
+  group_gid         int(8),
   group_name        varchar(32) NOT NULL,
   group_desc        varchar(128),
   group_email       varchar(128),
-  PRIMARY KEY (group_id)
+  group_contacts    text,
+  PRIMARY KEY (group_id),
+  UNIQUE KEY group_gid (group_gid)
 );
 
 
@@ -1329,7 +1358,7 @@ CREATE TABLE GroupGroup (
 --
 CREATE TABLE Import (
   import_id                   int(8) auto_increment,
-  import_domain_id             int(8) default 0,
+  import_domain_id            int(8) default 0,
   import_timeupdate           timestamp(14),
   import_timecreate           timestamp(14),
   import_userupdate           int(8),
@@ -1456,12 +1485,14 @@ CREATE TABLE Domain (
   PRIMARY KEY (domain_id)
 );
 
+
 ----------------------------------------------------------------------------
---Create CV table
+-- CV table
 ----------------------------------------------------------------------------
 
 CREATE TABLE CV (
   cv_id              int(8) auto_increment,
+  cv_domain_id       int(8) default 0,
   cv_timeupdate      timestamp(14),
   cv_timecreate      timestamp(14),
   cv_userupdate      int(8),
@@ -1473,26 +1504,182 @@ CREATE TABLE CV (
   PRIMARY KEY(cv_id)
 );
 
+
 ----------------------------------------------------------------------------
---Create ProjectCV table
+-- ProjectCV table
 ----------------------------------------------------------------------------
 
 CREATE TABLE ProjectCV (
-  projectcv_project_id int(8) NOT NULL,
-  projectcv_cv_id      int(8) NOT NULL,
-  projectcv_role       varchar(128) DEFAULT '',
+  projectcv_domain_id   int(8) default 0,
+  projectcv_project_id  int(8) NOT NULL,
+  projectcv_cv_id       int(8) NOT NULL,
+  projectcv_role        varchar(128) DEFAULT '',
   PRIMARY KEY(projectcv_project_id, projectcv_cv_id)
 );
 
+
 ----------------------------------------------------------------------------
---Create DefaultOdtTemplate table
+-- DefaultOdtTemplate table
 ----------------------------------------------------------------------------
 
 CREATE TABLE DefaultOdtTemplate (
-  defaultodttemplate_id                  int(8) auto_increment,
-  defaultodttemplate_entity              varchar(32),
-  defaultodttemplate_document_id         int(8) NOT NULL,
-  defaultodttemplate_label               varchar(64) DEFAULT '',
+  defaultodttemplate_id           int(8) auto_increment,
+  defaultodttemplate_id           int(8) default 0,
+  defaultodttemplate_entity       varchar(32),
+  defaultodttemplate_document_id  int(8) NOT NULL,
+  defaultodttemplate_label        varchar(64) DEFAULT '',
   PRIMARY KEY(defaultodttemplate_id)
 );
 
+
+-------------------------------------------------------------------------------
+-- OBM-Mail, OBM-LDAP tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Host'
+--
+CREATE TABLE Host (
+  host_id               int(8) NOT NULL auto_increment,
+  host_domain_id        int(8) default 0,
+  host_timeupdate       timestamp(14),
+  host_timecreate       timestamp(14),
+  host_userupdate       int(8),
+  host_usercreate       int(8),
+  host_uid              int(8),
+  host_gid              int(8),
+  host_samba            int(1) DEFAULT 0,
+  host_name             varchar(32) NOT NULL,
+  host_ip               varchar(16),
+  host_description      varchar(128),
+  host_web_perms        int(1) default 0,
+  host_web_list         text default '',
+  host_web_all		int(1) default 0,
+  host_ftp_perms        int(1) default 0,
+  host_firewall_perms   varchar(128),
+  PRIMARY KEY (host_id),
+  UNIQUE host_name (host_name),
+  UNIQUE KEY k_uid_host (host_uid)
+);
+
+
+--
+-- Storage for stats
+--
+CREATE TABLE Stats (
+  stats_name   varchar(32) NOT NULL default '',
+  stats_value  varchar(255) NOT NULL default '',
+  PRIMARY KEY (stats_name)
+);
+
+
+--
+-- LDAP tree structure table
+--
+CREATE TABLE Ldap (
+  ldap_id         int(11) default NULL,
+  ldap_domain_id  int(8) default 0,
+  ldap_parent_id  int(11) default NULL,
+  ldap_name       varchar(255) default NULL,
+  ldap_value      varchar(255) default NULL
+);
+
+
+--
+-- Mail parameters table
+--
+CREATE TABLE Mail (
+  mail_domain_id  int(8) default 0,
+  mail_name       varchar(255) NOT NULL default '',
+  mail_value      varchar(255) NOT NULL default ''
+);
+
+
+--
+-- Samba parameters table
+--
+CREATE TABLE Samba (
+  mail_domain_id  int(8) default 0,
+  samba_name      varchar(255) NOT NULL default '',
+  samba_value     varchar(255) NOT NULL default ''
+);
+
+
+--
+-- Shared bals table
+--
+CREATE TABLE MailShareDir (
+  mailsharedir_id            int(8) NOT NULL auto_increment,
+  mailsharedir_domain_id     int(8) default 0,
+  mailsharedir_timeupdate    timestamp(14),
+  mailsharedir_timecreate    timestamp(14),
+  mailsharedir_userupdate    int(8),
+  mailsharedir_usercreate    int(8),
+  mailsharedir_name          varchar(32),
+  mailsharedir_quota         int default 0 NOT NULL,
+  mailsharedir_description   varchar(255),
+  mailsharedir_email         text default NULL,
+  PRIMARY KEY (mailsharedir_id)
+);
+
+
+-----------------------------------------------------------------------------
+-- Table contenant les parametres generaux et non necessaires pour les 
+-- sessions
+-----------------------------------------------------------------------------
+CREATE TABLE Parameters (
+  parameters_name   varchar(255) NOT NULL default '',
+  parameters_value  varchar(255) NOT NULL default '',
+  PRIMARY KEY (parameters_name),
+  UNIQUE KEY parameters_name (parameters_name)
+);
+
+
+CREATE TABLE UserSystem (
+  usersystem_id         int(8) NOT NULL auto_increment,
+  usersystem_login      varchar(32) NOT NULL default '',
+  usersystem_password   varchar(32) NOT NULL default '',
+  usersystem_uid        varchar(6) default NULL,
+  usersystem_gid        varchar(6) default NULL,
+  usersystem_homedir    varchar(32) NOT NULL default '/tmp',
+  usersystem_lastname   varchar(32) default NULL,
+  usersystem_firstname  varchar(32) default NULL,
+  usersystem_shell      varchar(32) default NULL,
+  PRIMARY KEY (usersystem_id),
+  UNIQUE KEY k_login_user (usersystem_login)
+);
+
+
+-----------------------------------------------------------------------------
+-- Table contenant les différents types de réseau gérables
+-- en, gros : externe, interne avec patte dessus, interne autre, VPN
+-----------------------------------------------------------------------------
+-- CREATE TABLE Network_kind (
+-- 	network_kind_id int(11) NOT NULL,
+-- 	network_kind_label varchar(10)
+-- );
+
+
+-----------------------------------------------------------------------------
+-- Table contenant les parametres reseaux du securinet
+-----------------------------------------------------------------------------
+-- CREATE TABLE Network (
+--  network_timeupdate timestamp(14),
+--  network_userupdate int(8),
+--  network_kind int(2) default NULL,
+--  network_interface varchar(10) default NULL,
+--  network_hostname varchar(20) default NULL,
+--  network_localdomain varchar(64) default NULL,
+--  network_ip varchar(16) default NULL,
+--  network_network varchar(16) NOT NULL,
+--  network_mask varchar(16) NOT NULL,
+--  network_gateway varchar(16) default NULL,
+--  network_dns varchar(16) default NULL,
+--  network_name varchar(255) default NULL,
+--  network_psk varchar(255) default NULL
+--);
+-- network_kind : 
+-- 0 => réseau externe
+-- 1 => réseau interne sur lequel le securinet a une patte
+-- 2 => réseau interne sur lequel securinet n'a pas de pattes
+-- 3 => réseau accessible par VPN 
+-- network_psk : preshared key, secret partagé pour les VPNs

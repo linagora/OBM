@@ -35,7 +35,7 @@ if (($action == "index") || ($action == "")) {
   if ($obm_q->num_rows() == 1) {
     $display["detail"] = html_password_form($obm_q, $params);
   } else {
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
 } elseif ($action == "update")  {

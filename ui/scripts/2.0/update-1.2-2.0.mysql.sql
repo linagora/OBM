@@ -239,3 +239,158 @@ CREATE TABLE DefaultOdtTemplate (
 ---------------------------------------------------------------------------
 -- Add existent column which had not been added
 ALTER TABLE UserObm ADD COLUMN userobm_mobile varchar(32) DEFAULT '' AFTER userobm_phone2;
+
+ALTER TABLE UserObm ADD COLUMN userobm_system int(1) DEFAULT 0 AFTER userobm_ext_id;
+ALTER TABLE UserObm ADD COLUMN userobm_password_type char(6) DEFAULT 'PLAIN' AFTER userobm_login;
+ALTER TABLE UserObm ADD COLUMN userobm_uid int(8) AFTER userobm_calendar_version;
+ALTER TABLE UserObm ADD COLUMN userobm_gid int(8) AFTER userobm_uid;
+ALTER TABLE UserObm ADD COLUMN userobm_web_perms int(1) default 0 AFTER userobm_fax2;
+ALTER TABLE UserObm ADD COLUMN userobm_web_list text AFTER userobm_web_perms;
+ALTER TABLE UserObm ADD COLUMN userobm_web_all int(1) default 0 AFTER userobm_web_list;
+ALTER TABLE UserObm ADD COLUMN userobm_mail_perms int(1) default 0 AFTER userobm_web_all;
+ALTER TABLE UserObm ADD COLUMN userobm_mail_ext_perms int(1) default 0 AFTER userobm_mail_perms;
+ALTER TABLE UserObm CHANGE COLUMN userobm_email userobm_email text default NULL;
+ALTER TABLE UserObm ADD COLUMN userobm_mail_server_id int(8) default NULL AFTER userobm_email;
+ALTER TABLE UserObm ADD COLUMN userobm_mail_quota varchar(8) default NULL AFTER userobm_mail_server_id;
+ALTER TABLE UserObm ADD COLUMN userobm_nomade_perms int(1) default 0 AFTER userobm_mail_quota;
+ALTER TABLE UserObm ADD COLUMN userobm_nomade_enable int(1) default 0 AFTER userobm_nomade_perms;
+ALTER TABLE UserObm ADD COLUMN userobm_nomade_local_copy int(1) default 0 AFTER userobm_nomade_enable;
+ALTER TABLE UserObm ADD COLUMN userobm_email_nomade varchar(64) default '' AFTER userobm_nomade_local_copy;
+ALTER TABLE UserObm ADD COLUMN userobm_vacation_enable int(1) default 0 AFTER userobm_email_nomade;
+ALTER TABLE UserObm ADD COLUMN userobm_vacation_message text default '' AFTER userobm_vacation_enable;
+ALTER TABLE UserObm ADD COLUMN userobm_samba_perms int(1) default 0 AFTER userobm_vacation_message;
+ALTER TABLE UserObm ADD COLUMN userobm_samba_home varchar(255) default '' AFTER userobm_samba_perms;
+ALTER TABLE UserObm ADD COLUMN userobm_samba_home_drive char(2) default '' AFTER userobm_samba_home;
+ALTER TABLE UserObm ADD COLUMN userobm_samba_logon_script varchar(255) default '' AFTER userobm_samba_home_drive;
+ALTER TABLE UserObm ADD COLUMN userobm_host_id int(8) default NULL AFTER userobm_samba_logon_script;
+
+-- add constraint ...
+--  UNIQUE KEY k_login_user (userobm_login),
+--  INDEX k_uid_user (userobm_uid)
+
+
+---------------------------------------------------------------------------
+-- Update UGroup table from Aliamin
+---------------------------------------------------------------------------
+ALTER TABLE UGroup ADD COLUMN group_samba int(1) default 0 AFTER group_ext_id;
+ALTER TABLE UGroup ADD COLUMN group_gid int(8) AFTER group_samba;
+ALTER TABLE UGroup ADD COLUMN group_contacts text AFTER group_email;
+
+-- add constraint  UNIQUE KEY group_gid (group_gid)
+
+
+-------------------------------------------------------------------------------
+-- OBM-Mail, OBM-LDAP tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Host'
+--
+CREATE TABLE Host (
+  host_id               int(8) NOT NULL auto_increment,
+  host_domain_id        int(8) default 0,
+  host_timeupdate       timestamp(14),
+  host_timecreate       timestamp(14),
+  host_userupdate       int(8),
+  host_usercreate       int(8),
+  host_uid              int(8),
+  host_gid              int(8),
+  host_samba            int(1) DEFAULT 0,
+  host_name             varchar(32) NOT NULL,
+  host_ip               varchar(16),
+  host_description      varchar(128),
+  host_web_perms        int(1) default 0,
+  host_web_list         text default '',
+  host_web_all		int(1) default 0,
+  host_ftp_perms        int(1) default 0,
+  host_firewall_perms   varchar(128),
+  PRIMARY KEY (host_id),
+  UNIQUE host_name (host_name),
+  UNIQUE KEY k_uid_host (host_uid)
+);
+
+
+--
+-- Storage for stats
+--
+CREATE TABLE Stats (
+  stats_name   varchar(32) NOT NULL default '',
+  stats_value  varchar(255) NOT NULL default '',
+  PRIMARY KEY (stats_name)
+);
+
+
+--
+-- LDAP tree structure table
+--
+CREATE TABLE Ldap (
+  ldap_id         int(11) default NULL,
+  ldap_domain_id  int(8) default 0,
+  ldap_parent_id  int(11) default NULL,
+  ldap_name       varchar(255) default NULL,
+  ldap_value      varchar(255) default NULL
+);
+
+
+--
+-- Mail parameters table
+--
+CREATE TABLE Mail (
+  mail_domain_id  int(8) default 0,
+  mail_name       varchar(255) NOT NULL default '',
+  mail_value      varchar(255) NOT NULL default ''
+);
+
+
+--
+-- Samba parameters table
+--
+CREATE TABLE Samba (
+  mail_domain_id  int(8) default 0,
+  samba_name      varchar(255) NOT NULL default '',
+  samba_value     varchar(255) NOT NULL default ''
+);
+
+
+--
+-- Shared bals table
+--
+CREATE TABLE MailShareDir (
+  mailsharedir_id            int(8) NOT NULL auto_increment,
+  mailsharedir_domain_id     int(8) default 0,
+  mailsharedir_timeupdate    timestamp(14),
+  mailsharedir_timecreate    timestamp(14),
+  mailsharedir_userupdate    int(8),
+  mailsharedir_usercreate    int(8),
+  mailsharedir_name          varchar(32),
+  mailsharedir_quota         int default 0 NOT NULL,
+  mailsharedir_description   varchar(255),
+  mailsharedir_email         text default NULL,
+  PRIMARY KEY (mailsharedir_id)
+);
+
+
+-----------------------------------------------------------------------------
+-- Table contenant les parametres generaux et non necessaires pour les 
+-- sessions
+-----------------------------------------------------------------------------
+CREATE TABLE Parameters (
+  parameters_name   varchar(255) NOT NULL default '',
+  parameters_value  varchar(255) NOT NULL default '',
+  PRIMARY KEY (parameters_name),
+  UNIQUE KEY parameters_name (parameters_name)
+);
+
+
+CREATE TABLE UserSystem (
+  usersystem_id         int(8) NOT NULL auto_increment,
+  usersystem_login      varchar(32) NOT NULL default '',
+  usersystem_password   varchar(32) NOT NULL default '',
+  usersystem_uid        varchar(6) default NULL,
+  usersystem_gid        varchar(6) default NULL,
+  usersystem_homedir    varchar(32) NOT NULL default '/tmp',
+  usersystem_lastname   varchar(32) default NULL,
+  usersystem_firstname  varchar(32) default NULL,
+  usersystem_shell      varchar(32) default NULL,
+  PRIMARY KEY (usersystem_id),
+  UNIQUE KEY k_login_user (usersystem_login)
+);

@@ -144,7 +144,10 @@ $l_resourcegroup = "Groupe de ressources";
 $l_settings = "Configuration";
 $l_backup = "Sauvegarde";
 $l_domain = "Domaine";
+$l_system = "Système";
 $l_password = "Mot de passe";
+$l_mailforward = "Redirection de messagerie";
+$l_vacation = "Répondeur";
 
 // OBM_DISPLAY
 $l_entries = "Entrées";
@@ -208,7 +211,7 @@ $l_daysofweekfirst = array ('D','L','M','M','J','V','S');
 $l_section_com    = "Commercial";
 $l_section_prod   = "Production";
 $l_section_compta = "Comptabilité";
-$l_section_user   = "Utilisateur";
+$l_section_user   = "Annuaire";
 $l_section_admin  = "Administration";
 $l_section_my = "Mon compte";
 
@@ -250,6 +253,8 @@ $l_module_backup = "Sauvegarde";
 
 $l_module_settings = "Configuration";
 $l_module_password = "Mot de passe";
+$l_module_mailforward = "Redirection messagerie";
+$l_module_vacation = "Répondeur messagerie";
 
 $l_header_admin = "Administration";
 $l_header_new_f = "Nouvelle";

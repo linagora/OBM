@@ -1,0 +1,163 @@
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : mailforward_display.inc                                      //
+//     - Desc : Mail forwarding Display functions File                       //
+// 2002-09-01 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Mail Forwarding Consultation
+// Parameters:
+//   - $usr_q : User mail forwarding database result
+///////////////////////////////////////////////////////////////////////////////
+function html_forward_consult($usr_q) {
+  global $l_mail, $l_mailforward, $l_internal_email;
+  global $l_nomade_not_allowed,$l_local_copy;
+  global $l_email_nomade, $l_enable, $l_disable, $l_forbid, $l_state;
+  global $c_yes, $c_no;
+
+  $id = $usr_q->f("userobm_id");
+  $email = $usr_q->f("userobm_email");
+  $email_nomade = $usr_q->f("userobm_email_nomade");
+  $nomade_perms = $usr_q->f("userobm_nomade_perms");
+  $nomade_enable = $usr_q->f("userobm_nomade_enable");
+  $nomade_local_copy = $usr_q->f("userobm_nomade_local_copy");    
+
+  $mail = get_mail_info();
+  $domain = $mail["main_domain"];
+
+  if (! $nomade_perms) {
+    $dis_nomade = "<td class=\"detailLabel\">$l_nomade_not_allowed</td>";
+  } else {
+    if ($nomade_enable) $state = $l_enable;
+    else $state = $l_disable;
+    if ($nomade_local_copy) $state_local = $l_enable;
+    else $state_local = $l_disable;
+ 
+    $dis_nomade = "
+    <tr>
+      <th>$l_state</th>
+      <td>$state</td>
+    </tr>
+    <tr>
+      <th>$l_email_nomade</th>
+      <td>$email_nomade</td>
+    </tr>
+    <tr>      
+      <th>$l_local_copy</th>    
+      <td>$state_local</td>
+    </tr>";
+  }
+
+  $block = "
+    <div class=\"detail infos\">
+    <h1>$l_mail</h1>
+    <table>
+    <tr>
+      <th>$l_internal_email</th>
+      <td>$email (@$domain)</td>
+    </tr>
+    </table>
+    </div>
+
+    <div class=\"detail infos\">
+    <h1>$l_forward</h1>
+
+    <table>
+    $dis_nomade
+    </table>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Mail Forwarding Form                                              //
+// Parameters:
+//   - $usr_q     : User mail forwarding database result
+//   - $forward   : default values or updated values (if error)
+//     kes used   : all
+///////////////////////////////////////////////////////////////////////////////
+function html_forward_form($usr_q, $forward) {
+  global $l_mail, $l_forward, $l_internal_email, $l_nomade_not_allowed;
+  global $l_email_nomade, $l_enable,$l_local_copy;
+  global $action, $c_yes, $c_no, $l_update;
+
+  $id = $usr_q->f("userobm_id");
+  $email = $usr_q->f("userobm_email");
+  $nomade_perms = $usr_q->f("userobm_nomade_perms");
+
+  $mail = get_mail_info();
+  $domain = $mail["main_domain"];
+  
+  // if update mode and first time value are taken from database
+  if ($action == "detailupdate") {
+    $email_nomade = $usr_q->f("userobm_email_nomade");
+    $nomade_enable = $usr_q->f("userobm_nomade_enable");
+    $nomade_local_copy = $usr_q->f("userobm_nomade_local_copy");    
+  }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($forward["email_nomade"])) { $email_nomade = $forward["email_nomade"]; }
+  if (isset($forward["nomade_enable"])) { $nomade_enable = $forward["nomade_enable"]; }
+  if (isset($forward["nomade_local_copy"])) { $nomade_local_copy = $forward["nomade_local_copy"]; }  
+
+  // Nomad enable chekbox checked value
+  if ($nomade_enable) $nomade_enable_c = " checked";
+  if ($nomade_local_copy) $nomade_local_copy_c = " checked";
+  if (! $nomade_perms) {
+    $block = display_ok_msg($l_nomade_not_allowed);
+    return $block;
+  } else {
+    if ($nomade_enable) $state = $l_enable;
+    else $state = $l_disable;
+
+    $dis_nomade = "
+      <td class=\"detailLabel\">$l_enable</td>
+      <td class=\"detailForm\"><input name=\"cb_nomade_enable\" type=\"checkbox\" value=\"1\" $nomade_enable_c></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_email_nomade</td>
+      <td class=\"detailForm\"><input name=\"tf_email_nomade\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\"></td>";
+  }
+
+
+  $block = "
+    <form method=\"post\" name=\"form_forward\"
+      onSubmit=\"if (check_user(this)) return true; else return false;\"
+      action=\"" . url_prepare("mailforward_index.php") . "\">
+
+    <div class=\"detailHead\">$l_mail</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_internal_email</td>
+      <td class=\"detailForm\">$email (@$domain)</td>
+    </tr>
+    </table>
+
+    <div class=\"detailHead\">$l_forward</div>
+
+    <table class=\"detail\">
+    <tr>
+      $dis_nomade      
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_local_copy</td>
+      <td class=\"detailForm\"><input name=\"cb_nomade_local_copy\" type=\"checkbox\" value=\"1\" $nomade_local_copy_c /></td>
+    </tr>
+    
+    </table>
+
+    <p>
+    <input type=\"hidden\" name=\"action\" value=\"update\">
+    <input type=\"submit\" value=\"$l_update\">
+    </form>";
+
+  return $block;
+}
+
+
+</script>

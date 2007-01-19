@@ -337,3 +337,19 @@ if ($cgp_show["module"]["password"]) {
 		               'Url' => "$path/password/password_index.php",
 			       'Right'=> $cright_read);
 }
+
+if ($cgp_show["module"]["mailforward"]) {
+  $modules["mailforward"] = array(
+                               'Name'=> $l_module_mailforward,
+                               'Ico' => "$ico_mailforward",
+		               'Url' => "$path/mailforward/mailforward_index.php",
+			       'Right'=> $cright_read);
+}
+
+if ($cgp_show["module"]["vacation"]) {
+  $modules["vacation"] = array(
+                               'Name'=> $l_module_vacation,
+                               'Ico' => "$ico_vacation",
+		               'Url' => "$path/vacation/vacation_index.php",
+			       'Right'=> $cright_read);
+}

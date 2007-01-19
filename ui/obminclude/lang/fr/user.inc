@@ -26,8 +26,30 @@ $l_check_userupdate = " entrées modifiées par cet utilisateur.";
 $l_no_user = "Pas de champs utilisateurs dans cette table";
 $l_group = "Groupe";
 
-// Titres
-$l_user = "Utilisateur";
+$l_mail_ext = "Messagerie externe";
+$l_mail_server = "Serveur de boîte à lettres";
+$l_email_nomade = "Adresse E-mail nomade";
+$l_nomade = "Accès E-mail nomade";
+$l_access_nomade = "Accès nomade";
+$l_perms = "Autorisé";
+$l_vacation = "Message d'absence";
+$l_vacation_message = "Message";
+$l_forbidden = "Interdit";
+$l_local_copy = "Copie locale";
+$l_access = "Accès Internet";
+$l_host = "Hôte";
+$l_user_select_host = "Choix de la machine de l'utilisateur";
+$l_host_enable = "Activé sur l'hote";
+$l_web = "Accès Web";
+$l_web_mode = "Accès web autorisés";
+$l_web_list = "Liste d'accès";
+$l_web_all = "Tous sauf liste";
+$l_web_list_only = "Uniquement liste";
+$l_smb = "Réseaux Windows";
+$l_smb_perms = "Utilisateur Windows";
+$l_smb_home = "Répertoire home";
+$l_smb_home_drive = "Lecteur home";
+$l_smb_logon = "Script de logon";
 $l_group_member = "Membre des groupes";
 
 // Actions
@@ -48,12 +70,32 @@ $l_can_delete = "L'utilisateur peut être supprimé.";
 $l_cant_delete = "L'utilisateur ne peut être supprimé !";
 $l_link_timetask = "L'utilisateur est référencé dans la gestion du temps sur des projets";
 $l_link_timetask_no = "L'utilisateur n'est pas référencé dans la gestion du temps sur des projets";
-$l_login_error = "Le login doit être renseigné !";
+
+$l_login_error = "Le login doit être correctement renseigné ! Il ne doit pas être vide ou contenir de caractères spéciaux";
+$l_login_in_use = "Le login est déjà attribué à un autre utilisateur !";
 $l_password_error = "Le mot de passe doit être renseigné !";
+$l_last_admin_error = "Le profil du dernier administrateur ne peut être modifié !";
+$l_mail_perms_error = "La messagerie interne doit être activée afin de bénéficier de la messagerie externe !";
+$l_mail_server_error = "Vous devez indiquer un serveur de boîte à lettres !";
 $l_email_error = "L'adresse E-mail saisie n'est pas valide !";
+$l_email_empty = "Vous devez saisir une adresse E-mail afin d'activer la messagerie !";
+$l_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
+$l_uemail_exist = "L'adresse E-mail est saisie plusieurs fois !";
+$l_quota_error = "Le quota de messagerie saisi n'est pas valide !";
+$l_web_all_error = "Le mode d'accès Web n'a pas été précisé !";
+$l_nomade_without_mail_perms = "L'E-mail nomade ne peut pas être autorisé si la messagerie n'est pas autorisée !";
+$l_nomade_perms_error = "L'E-mail nomade ne peut pas être activé s'il n'est pas autorisé !";
+$l_nomade_local_copy_error = "La copie locale ne peut-être activée si l'E-mail nomade n'est pas autorisé et activé";
+$l_email_nomad_error = "L'E-mail nomade ne peut pas être activé si l'adresse E-mail nomade n'est pas renseignée !";
+$l_vacation_without_mail_perms = "Le message d'absence ne peut pas être activé si la messagerie n'est pas autorisée !";
+$l_empty_vacation_message = "Le message d'absence ne peut être vide quand l'envoi est activé !" ;
 $l_check_sameuser = "Ces utilisateurs semblent similaires à cette nouvelle entrée !";
-$l_exist_error = "Ce login est déjà utilisé !";
+$l_exist_error = "Un utilisateur portant ce nom existe déjà !";
 $l_lname_error = "Le nom doit être correctement renseigné !";
+$l_err_home = "Le répertoire Home Windows est incorrect !";
+$l_err_drive = "Le lecteur Home WIndows est incorrect !";
+$l_err_system_samba = "La modification des droits windows d'un utilisateur système n'est pas autorisée.";
+$l_err_host_already_used_by = "La machine est déjà affectée à l'utilisateur ";
 
 $l_add_users = "Ajouter des utilisateurs";
 

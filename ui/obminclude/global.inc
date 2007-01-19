@@ -252,6 +252,8 @@ $cgp_show["module"]["import"] = "admin";
 $cgp_show["module"]["backup"] = "admin";
 $cgp_show["module"]["settings"] = "my";
 $cgp_show["module"]["password"] = "my";
+$cgp_show["module"]["mailforward"] = "my";
+$cgp_show["module"]["vacation"] = "my";
 
 // Display domain module only when multidomain is activate
 if($c_multidomain) {
@@ -495,6 +497,7 @@ function display_debug_variables() {
 //Includes
 ///////////////////////////////////////////////////////////////////////////////
 require_once("$obminclude/global_query.inc");
+require_once("$obminclude/global_aliamin.inc");
 
 
 ///////////////////////////////////////////////////////////////////////////////

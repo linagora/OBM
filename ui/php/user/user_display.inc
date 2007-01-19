@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames["userobm_login"] = $l_login;
+$fieldnames["userobm_system"] = $l_system;
 $fieldnames["userobm_local"] = $l_local;
 $fieldnames["userobm_ext_id"] = $l_ext_id;
 $fieldnames["userobm_perms"] = $l_user_perms;
@@ -25,7 +26,10 @@ $fieldnames["userobm_fax"] = $l_fax;
 $fieldnames["userobm_fax2"] = $l_fax2;
 $fieldnames["datebegin"] = $l_datebegin;
 $fieldnames["timelastaccess"] = $l_lastaccess;
+$fieldnames["userobm_web_perms"] = $l_web;
 $fieldnames["userobm_email"] = $l_email;
+$fieldnames["userobm_nomade"] = $l_access_nomade;
+$fieldnames["userobm_samba_perms"] = $l_smb_perms;
 $fieldnames["userobm_description"] = $l_desc;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,6 +63,16 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
     "</span>";
   }  
 
+  else if ($fieldname == "userobm_system") {
+    $res["align"] = "center";
+    $system = $OD->data_set->f("userobm_system");
+    if ($system) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = " ";
+    }
+  } 
+
   else if ($fieldname == "userobm_email") {
     $email = $OD->data_set->f("userobm_email");
     if (strcmp($email ,"") != 0) {
@@ -77,6 +91,49 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
       $res["txt_name"] = " ";
     }
   }
+  else if ($fieldname == "userobm_web_perms") {
+    $res["align"] = "center";
+    $web_perms = $OD->data_set->f("userobm_web_perms");
+    if ($web_perms) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+    }
+  } 
+  else if ($fieldname == "userobm_samba_perms") {
+    $res["align"] = "center";
+    $samba_perms = $OD->data_set->f("userobm_samba_perms");
+    if ($samba_perms) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+    }
+  } 
+  else if ($fieldname == "userobm_email") {
+    $email = $OD->data_set->f("userobm_email");
+    if (strcmp($email ,"") != 0) {
+      $emails = explode("\n",$email);
+      $email = trim($emails[0])."@$main_domain";
+      $res["url"] = "mailto:$email";
+      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\">$email";
+      $res["txt_name"] = "$email";
+    }
+  } 
+  else if ($fieldname == "userobm_nomade") {
+    $nomade_perms = $OD->data_set->f("userobm_nomade_perms");
+    $nomade_enable = $OD->data_set->f("userobm_nomade_enable");
+    $email_nomade = $OD->data_set->f("userobm_email_nomade");
+
+    if ($nomade_perms) {
+      if ($nomade_enable) {
+	$res["name"] = $l_enable;
+      } else {
+	$res["name"] = $l_perms;
+      }
+    } else {
+      $res["name"] = $l_forbidden;
+    }
+  } 
 
   else if ($fieldname == "userobm_local") {
     $res["align"] = "center";
@@ -252,7 +309,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $ext_widget = $user["ext_widget"];
     $ext_widget_text = $user["ext_widget_text"];
     $ext_element = $user["ext_element"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
   }
 
   $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;tf_email=$email&amp;tf_desc=$desc&amp;tf_group=$group&amp;cba_archive=$archive$url_ext");
@@ -393,7 +450,7 @@ function html_user_form($usr_q, $user) {
       onsubmit=\"if (check_user(this)) return true; else return false;\"
       action=\"" . url_prepare("user_index.php") . "\">
 
-<fieldset class=\"detail infos\">
+<fieldset class=\"detail extra\">
     <legend>$l_user</legend>
 
     <table>
@@ -437,19 +494,11 @@ function html_user_form($usr_q, $user) {
       <th>$l_datebegin</th>
       <td>
       <input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/>
-    </tr>
-    </table>
-    </fieldset>
-    
- <fieldset class=\"detail infos\">   
-      <legend>$l_desc</legend>
-      
-      <table>
-      <tr>
+    </tr><tr>
       <th>$l_desc</th>
       <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
-      </tr>
-      </table>
+    </tr>
+    </table>
  </fieldset>
 
     <fieldset class=\"buttons\">
@@ -485,8 +534,6 @@ function dis_user_consult($user) {
 }
 
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display User Consultation
 // Parameters:
@@ -495,8 +542,17 @@ function dis_user_consult($user) {
 function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
   global $l_user, $l_lastaccess, $l_archive, $l_datebegin;
+  global $l_address1, $l_zipcode, $l_town, $l_direction, $l_service;
   global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_email, $l_desc;
   global $l_group_member, $l_group, $l_local, $l_ext_id;
+
+  global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
+  global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
+  global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
+  global $l_vacation, $l_vacation_message, $l_mail_server;
+  global $l_enable, $l_disable, $l_consult_web_list;
+  global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
+
   global $path, $display, $c_yes, $c_no;
 
   $id = $obm_q->f("userobm_id");
