@@ -327,6 +327,12 @@ function html_lead_consult($l_q) {
       <th>$l_alarm</th>
       <td>$datealarm</td>
     </tr>
+    </table>
+    </div>
+
+<div class=\"detail infos\"> 
+  <h1>$l_todo</h1>    
+    <table>
     <tr>
       <th>$l_todo</th>
       <td>$todo</td>
@@ -337,7 +343,6 @@ function html_lead_consult($l_q) {
 <div class=\"detail extra\">
 
   <h1>$l_comment</h1>
-
    $comment
 </div>
 ";
@@ -541,6 +546,13 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
        <input type=\"text\" name=\"tf_datealarm\" value=\"$datealarm\" class=\"datePicker\"/>
       </td>
     </tr>
+    </table>
+    </fieldset>
+
+
+<fieldset class=\"detail infos\">
+    <legend>$l_todo</legend>
+    <table>    
     <tr>
       <th>$l_todo</th>
       <td><input type=\"text\" name=\"tf_todo\" size=\"32\" maxlength=\"128\" value=\"$todo\" /></td>
