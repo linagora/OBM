@@ -2496,7 +2496,9 @@ function html_deal_admin_form($kind_q, $status_q) {
   $key = 0;
   while ($kind_q->next_record()) {
     $id = $kind_q->f("dealtype_id");
-    $inout = $kind_q->f("dealtype_inout");
+    //$inout = $kind_q->f("dealtype_inout");
+    $inout_plus = ($kind_q->f("dealtype_inout"))== "+" ? "checked=\"checked\"" : "";
+    $inout_minus = ($kind_q->f("dealtype_inout"))== "-" ? "checked=\"checked\"" : "";
     $label = $kind_q->f("dealtype_label");
    
     if ($key%2 == 0) {
@@ -2512,9 +2514,8 @@ function html_deal_admin_form($kind_q, $status_q) {
     <a href=\"?action=kind_checklink&amp;category=kind&amp;kind=$id\">
     <img src=\"$ico_delete\" alt=\"$l_kind_checkdelete\" title=\"$l_kind_checkdelete\" />
     </a></td>
-    <!--<td><input type=\"text\" id=\"tf_kind_inout_$id\" value=\"$inout\" size=\"6\"/></td>-->
-    <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"$inout\" />$l_minus</td>
-    <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"$inout\" />$l_plus</td>
+    <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"-\" $inout_minus />$l_minus</td>
+    <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"+\" $inout_plus />$l_plus</td>
     <td><input type=\"text\" id=\"tf_kind_label_$id\" value=\"$label\" /></td>
     <td>
     <a href=\"#\" onclick=\"return updateLine($id,'kind');\">
@@ -2561,7 +2562,7 @@ function html_deal_admin_form($kind_q, $status_q) {
 
  <div class=\"detail admin\" >
   <form id=\"form_kind_update\" action=\"?action=kind_update\" method=\"post\">
-  <input type=\"hidden\" name=\"tf_kind_inout\" value=\"\" />
+  <input type=\"hidden\" name=\"rd_kind_inout\" value=\"\" />
   <input type=\"hidden\" name=\"tf_kind_label\" value=\"\" />
   <input type=\"hidden\" name=\"kind\" value=\"\" />
   </form>    
@@ -2599,7 +2600,7 @@ function html_deal_admin_form($kind_q, $status_q) {
   </tr>
   <tr>
   <td>
-  <input type=\"radio\" name=\"rd_kind_inout\" value=\"-\" checked=\"checked\" />$l_minus
+  <input type=\"radio\" name=\"rd_kind_inout\" value=\"-\" checked=\"checked\"/>$l_minus
   <input type=\"radio\" name=\"rd_kind_inout\" value=\"+\" />$l_plus
   </td>
   <td>

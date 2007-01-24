@@ -450,7 +450,7 @@ function html_user_form($usr_q, $user) {
       onsubmit=\"if (check_user(this)) return true; else return false;\"
       action=\"" . url_prepare("user_index.php") . "\">
 
-<fieldset class=\"detail extra\">
+<fieldset class=\"detail infos\">
     <legend>$l_user</legend>
 
     <table>
@@ -495,6 +495,14 @@ function html_user_form($usr_q, $user) {
       <td>
       <input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/>
     </tr><tr>
+    </table>
+    </fieldset>
+
+  
+   <fieldset class=\"detail infos\">
+    <legend>$l_desc</legend>
+     <table>
+     <tr>      
       <th>$l_desc</th>
       <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
     </tr>

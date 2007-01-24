@@ -1100,7 +1100,8 @@ function run_query_contact_kind_insert($contact) {
   $label = $contact["kind_label"];
   $lang = $contact["kind_lang"];
   $header = $contact["kind_header"];
-  $default = ($contact["kind_default"] == 1 ? 1 : 0);
+  //$default = ($contact["kind_default"] == 1 ? 1 : 0);
+  $default = (isset($contact["kind_default"]) ? $contact["kind_default"] : '0');
 	$domain_id = $obm["domain_id"];
 	
   // If kind is new default for this lang, we cancel other defaults
@@ -1170,8 +1171,8 @@ function run_query_contact_kind_update($contact) {
   $label = $contact["kind_label"];
   $lang = $contact["kind_lang"];
   $header = $contact["kind_header"];
-  $default = ($contact["kind_default"] == 1 ? 1 : 0);
-	$multidomain = sql_multidomain("kind");
+  $default = (isset($contact["kind_default"]) ? $contact["kind_default"] : '0');
+  $multidomain = sql_multidomain("kind");
 	
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
@@ -1224,7 +1225,7 @@ function run_query_contact_kind_delete($id) {
 function run_query_contact_kind_links($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain("contact");
 
   $query = "SELECT contact_lastname,
       contact_firstname,
@@ -1249,7 +1250,7 @@ function run_query_contact_kind_links($id) {
 function get_contact_kind_label($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("kind");	
+  $multidomain = sql_multidomain("kind");	
 
   $query = "SELECT kind_lang, kind_minilabel, kind_header
     FROM Kind

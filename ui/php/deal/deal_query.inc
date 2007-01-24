@@ -1572,6 +1572,7 @@ function run_query_deal_kind_update($deal) {
   $label = $deal["kind_label"];
   $kind = $deal["kind"];
   $inout = $deal["kind_inout"];
+  //$inout = (($deal["kind_inout"]) == "+" ? $deal["kind_inout"] : '-');
   $multidomain = sql_multidomain("deal");
 	
   $query = "UPDATE DealType SET

@@ -220,12 +220,7 @@ function html_account_consult($obm_q_account, $p_action){
   
   <div class=\"detail extra\">
     <h1>$l_comment</h1>     
-     <table>
-     <tr>
-      <th>$l_comment</th>
-      <td>$comment</td>
-     </tr>
-    </table>
+      $comment
     </div>";
 
 //   // we display buttons only if we need them :
@@ -393,7 +388,6 @@ function html_account_form($obm_q_account, $action) {
 
      <fieldset class=\"detail extra\">
       <legend>$l_comment</legend>
-      $l_comment
       <textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
       </fieldset>
      
@@ -417,27 +411,20 @@ function dis_account_display_pref ($prefs, $prefs_p) {
   global $l_account_options, $l_payment_options;
   global $set_theme;
 
-  $block .= "<center>\n";
  
- $block .= "<table><tr valign=\"top\">";
-   $block .= "<td>";
  
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "account");
   $dis_pref->pref_title = $l_account_options;
   $dis_pref->pref_dis_help = 0;
   $dis_pref->display();
 
-  $block .= "</td><td>";
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_p, "account", "payment");
   $dis_pref->pref_title = $l_payment_options;
   $dis_pref->pref_dis_help = 0;
   $block .= $dis_pref->display ();
 
-  $block .=  "</td></tr></table>";
   $dis_pref->dis_pref_help ();
-
-  $block .=  "</center>";
 
   return $block;
 }
@@ -504,7 +491,6 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   $block .= "<br><br>";
   $url = url_prepare("account_index.php?action=compute_balance&amp;account_id=".$p_account["account_id"]);
   $block .= "
-<center>
  <table border=\"$border\" cellspacing=\"$cellspacing\">
   <form method=\"post\" action=\"$url\"
   onsubmit=\"return check_account_balance_form (this);\">
@@ -515,13 +501,10 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
     <input type=submit value=\"".$l_compute_balance."\">
    </td></tr>
   </form>
- </table>
-</center>
- <br><br><hr />";
+ </table>";
      
   // we display the result :
   $block .= "
-<center>
  <table border=\"$border\" cellspacing=\"$cellspacing\" cellpadding=\"5\">
   <tr><td>
    &nbsp;";
@@ -566,8 +549,7 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   </td><td colspan=\"2\" align=\"center\">
    <font color=\"#$col_balance\">".$data["balance"]."</font>
   </td></tr>
- </table>
-</center><br><br>";
+ </table>";
 
   /*  $block .= "
 <center>

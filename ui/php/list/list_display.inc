@@ -1196,8 +1196,10 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
         <option value=\"\" $empty >$l_empty</option>
         <option value=\"NOT\" $not>$l_not</option>
         <option value=\"Exclude\" $exclude>$l_exclude</option>
-      </select></td>";
-	$dis_criteria .="<tr><th colspan=\"4\"></th>///".$labels[$key]."</tr>";
+      </select></td>";  
+      
+       $dis_criteria .="
+	<tr><th colspan=\"4\"></th>".$labels[$key]."</tr>";
 	if ($logical_criterion[$key] == "AND") {
 	  $and = "selected =\"true\"";
 	  $or = "";
@@ -1216,21 +1218,17 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
   if ($mode == $clist_mode_expert) {
     $display = "style=\"display:none\"";
   }
+  
+
+
+  
   $block = "
-  <div id=\"di_query\" $display class=\"buttons\">
   <table id=\"list_criterion\" class=\"spreadSheet\">
-  <thead>
-  <tr>
-  <th>&nbsp;</th>
-  <th>Supprimer</th>
-  <th>Modifier</th>
-  <th>Criteres</th>
-  </tr>
-  </thead>
   <tbody>
    $dis_criteria
   </tbody>
   </table>
+  <div id=\"di_query\" $display class=\"buttons\">
   <input type=\"button\" value=\"$l_add_criterion\" 
   onclick=\"window.open('$url2','','height=650,width=700,scrollbars=yes,status=yes'); return false;\"/>
   </div>";
@@ -1700,7 +1698,7 @@ function dis_list_warn_insert($list_q, $list) {
       <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" />
       <input type=\"hidden\" name=\"id_duplicated\" value=\"$id_duplicated\" />";
 
-  $block = "<p />
+  $block = "
   <div class=\"detail\">
   <ul>
   $dis_same_list

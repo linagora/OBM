@@ -1303,7 +1303,7 @@ function html_project_form($action, $project_q, $project) {
     </fieldset>
     $dis_comp
     <fieldset class=\"detail infos\">
-    <legend>$l_project_desc</legend>
+    <legend>$l_project_date</legend>
 
     <table>
     <tr>

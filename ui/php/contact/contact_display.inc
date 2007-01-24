@@ -1935,46 +1935,12 @@ function html_contact_kind_form($kind_q) {
   global $l_kind_checkdelete, $l_kind_update, $l_kind_new, $l_kind_insert;
   global $l_label, $l_lang, $l_default, $l_header,$ico_ok,$ico_delete,$l_c_new;
 
-/*  if ($kind_q->num_rows() > 0) {
-
-    // Kind select construction
-    $kind_list = "<select name=\"sel_kind\" onChange=\"
-      mytext = this.options[this.selectedIndex].text;
-
-      // Get Lang
-      pos = mytext.indexOf('-');
-      lang = mytext.substr(0, pos);
-
-      // Get Default
-      mytext = mytext.substr(pos+1);
-      pos = mytext.indexOf('-');
-      ldefault = mytext.substr(0,pos);
-
-      // Get Label
-      mytext = mytext.substr(pos+1);
-      pos = mytext.indexOf('-');
-      label = mytext.substr(0,pos);
-
-      // Get header
-      header = mytext.substr(pos+1);
-
-      forms.form_kind_update.tf_lang.value=lang;
-      if (ldefault == 'X') {
-        forms.form_kind_update.cba_default.checked=true;
-      } else {
-        forms.form_kind_update.cba_default.checked=false;
-      }
-      forms.form_kind_update.tf_label.value=label;
-      forms.form_kind_update.tf_header.value=header;\"
-      size=\"8\">";*/
-
-
   $char_title = '=';
   $key = 0;
   while ($kind_q->next_record()) {
     $id = $kind_q->f("kind_id");
     $lang = $kind_q->f("kind_lang");
-    $default = ($kind_q->f("kind_default") == 1 ? "X" : " ");
+    $default = ($kind_q->f("kind_default"))== 1 ? "checked=\"checked\"" : "";
     $mlabel = $kind_q->f("kind_minilabel");
     $header = $kind_q->f("kind_header");
    
@@ -1991,7 +1957,7 @@ function html_contact_kind_form($kind_q) {
     <a href=\"?action=kind_checklink&amp;category=kind&amp;kind=$id\">
     <img src=\"$ico_delete\" alt=\"$l_kind_checkdelete\" title=\"$l_kind_checkdelete\" />
     </a></td>
-    <td><input type=\"checkbox\" id=\"cba_kind_default_$id\" value=\"1\" /></td>
+    <td><input type=\"checkbox\" id=\"cba_kind_default_$id\" value=\"1\" $default /></td>
     <td><input type=\"text\" id=\"tf_kind_lang_$id\" value=\"$lang\" size=\"6\"/></td>
     <td><input type=\"text\" id=\"tf_kind_label_$id\" value=\"$mlabel\" size=\"6\"/></td>
     <td><input type=\"text\" id=\"tf_kind_header_$id\" value=\"$header\" /></td>
@@ -2010,8 +1976,8 @@ function html_contact_kind_form($kind_q) {
 
  <div class=\"detail admin\" >
   <form id=\"form_kind_update\" action=\"?action=kind_update\" method=\"post\">
-  <input type=\"hidden\" name=\"tf_kind_lang\" value=\"\" />
   <input type=\"hidden\" name=\"cba_kind_default\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_kind_lang\" value=\"\" />
   <input type=\"hidden\" name=\"tf_kind_label\" value=\"\" />
   <input type=\"hidden\" name=\"tf_kind_header\" value=\"\" />
   <input type=\"hidden\" name=\"kind\" value=\"\" />
