@@ -17,12 +17,12 @@ function dis_admin_help($mode) {
   if ($mode == "html")
     echo "<table class=\"details\">
       <tr>
-        <td><pre>";
+        <td>";
 
   include ("admin_help.inc");
 
   if ($mode == "html")
-    echo "</pre>
+    echo "
         </td>
       </tr>
       </table>";
@@ -128,16 +128,18 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     </tr><tr>
       <th>Clear all passive users sessions</th>
       <td>$nb_sess_to_clear</td>
-      <tr>
-        <th>
+    
+    </table>
+    <div class=\"buttons\">  
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"clear_sess\" />
         <input type=\"submit\" value=\"$l_execute\" /></th>
-	</tr>
-    </table>
+    </div>
     </div>
     </form>
-
+       
+       
+ 
 
     <div class=\"detail extra\">
     <h1>$l_session_stats</h1>

@@ -16,15 +16,14 @@
 function dis_admin_pref_help($mode) {
 
   if ($mode == "html")
-    echo "<table class=\"detail\">
+    echo "<table>
       <tr>
-        <td><pre>";
+        <td>";
 
   include ("admin_pref_help.inc");
 
   if ($mode == "html")
-    echo "</pre>
-        </td>
+    echo "</td>
       </tr>
       </table>";
 }
@@ -69,44 +68,58 @@ function html_admin_pref_index() {
   $sel_userpref .= "</select>";
 
   $block = "
-    <br />
     <form method=\"get\" action=\"" . url_prepare("admin_pref_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>$l_user_pref</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"2\">$l_user_pref</td>
+      <th>Action : user_pref_reset</th>
     </tr>
-    <tr>
-      <td class=\"adminText\">action : user_pref_reset
-        <br />$l_user_pref_reset</td>
-      <td class=\"adminLabel\">
+    </thead>
+    <tbody>
+      <tr>
+      <td>$l_user_pref_reset</td>
+      </tr>
+    </tbody>
+    </table>
+    <div class=\"buttons\">
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"user_pref_reset\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
-    </tr>
-    </table>
+        <input type=\"submit\" value=\"$l_execute\" />
+	</div>
+	</div>
     </form>
 
     <form method=\"get\" action=\"" . url_prepare("admin_pref_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Update Preferences</h1>    
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\">action : user_pref_update_one</td>
-      <td class=\"adminHead\">Pref</td>
-      <td class=\"adminHead\">Value</td>
-      <td class=\"adminLabel\" rowspan=\"2\">
-        <input type=\"hidden\" name=\"mode\" value=\"html\" />
-        <input type=\"hidden\" name=\"action\" value=\"user_pref_update_one\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
+      <th>action : user_pref_update_one</th>
+      <th>Pref</th>
+      <th>Value</th>
     </tr>
+    </thead>
+    <tbody>
     <tr>
-      <td class=\"adminText\">
+      <td>
         $l_user_pref_update_one
       </td>
-      <td class=\"adminText\">
+      <td>
         $sel_userpref</td>
-      <td class=\"adminText\">
+      <td>
         <input type=\"text\" name=\"tf_pref_value\" value=\"\" maxlength=\"20\" size=\"8\"/></td>
     </tr>
+    </tbody>
     </table>
+    <div class=\"buttons\">
+        <input type=\"hidden\" name=\"mode\" value=\"html\" />
+        <input type=\"hidden\" name=\"action\" value=\"user_pref_update_one\" />
+        <input type=\"submit\" value=\"$l_execute\" />
+    </div>
+    </div>
     </form>
 ";
 
