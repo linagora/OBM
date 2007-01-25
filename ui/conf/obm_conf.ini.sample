@@ -1,0 +1,54 @@
+; Fichier de configuration global d'Aliamin. Copier ce fichier sans l'extension ".sample"
+; Placer dans ce fichier les paramètres communs à la partie automate (Perl) et www (PHP)
+; 
+; Les paramètres sont de type clef = valeur
+; Les commentaires commencent par ";"
+; Il est nécessaire d'avoir la section [global] pour le côté perl (attention : php est permissif)
+
+[global]
+; Information generales
+title = OBM
+
+; Répertoire d'installation d'Aliamin
+path = /opt/aliamin
+
+; Information sur les bases de données
+host = localhost
+dbtype = MYSQL
+db = obm
+user = aliamin
+; Le mot de passe DOIT etre entre "
+password = "aliacom"
+
+; Gestion de la configuration de postfix ldap, file, ou false
+postfixConf = ldap
+
+; Aliamin gere les alias de messagerie dans LDAP
+aliasLdap = true
+
+; Aliamin fonctionne en mode sécurinet (true|false)
+securinet = false
+
+; Les '.' sont autorisés dans les logins et le nom des répertoires partagés
+; Si Aliamin fonctionne avec la messagerie (Cyrus), il faut positionner
+; 'unixhierarchysep=true' dans le imapd.conf
+; true : les '.' sont acceptés ; false : les '.' sont interdits
+loginDotsEnable = false
+
+[automate]
+; Parametrage specifique a l'automate
+
+; Faut-il executer les hooks
+enableHook = false
+
+; Adresse du serveur hebergeant les repertoires partages
+shareDirServer = localhost
+
+; Adresse du serveur LDAP
+ldapServer = localhost
+
+; Adresse du serveur Samba sur lequel les repertoires personnels sont crees
+; utile dans les hook
+sambaHomeServer = ""
+
+; EOF
