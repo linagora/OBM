@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0pre13";
+$obm_version = "2.0pre14";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -349,6 +349,7 @@ $cdg_id = 1;     // id display
 $cdg_param = 2;  // parameter display
 $cdg_sess = 4;   // session display
 $cdg_sql = 8;    // sql query display
+$cdg_exe = 16;   // program execution
 
 // Date constants
 $c_php_isodate_format = "Y-m-d";  // AAAA-MM-JJ iso format for php date()
@@ -484,6 +485,7 @@ function display_debug_msg($msg, $debug=0, $function_name="") {
 
 function display_debug_variables() {
   global  $global_dis_debug_custom;
+
   $vars = func_get_args();
   foreach($vars as $var) {
     $global_dis_debug_custom .="<pre>".var_export($var,true)."</pre><hr />";
@@ -507,6 +509,7 @@ require_once("$obminclude/global_aliamin.inc");
 ///////////////////////////////////////////////////////////////////////////////
 function display_debug_param($params) {
   global $cdg_param, $action, $global_dis_debug_param;
+
   if (debug_level_isset($cdg_param)) {
     $global_dis_debug_param .= "action=$action";
     if ( $params ) {

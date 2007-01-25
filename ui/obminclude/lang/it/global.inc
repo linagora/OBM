@@ -253,4 +253,4 @@ $l_dg_id = "Id";
 $l_dg_param = "Parametri";
 $l_dg_sess = "Sessione";
 $l_dg_sql = "SQL";
-
+$l_dg_exe = "Exec";

@@ -21,12 +21,9 @@ $l_enable = "Activé";
 $l_disable = "Désactivé";
 $l_local_copy = "Copie locale";
 
-// Actions
-$l_update = "Modifier l'utilisateur";
-$l_confirm= "Confirmer l'action";
-
 // Messages
+$l_err_email = "L'adresse email n'est pas valide !";
 $l_nomade_not_allowed = "Le renvoi de messagerie n'est pas autorisé.";
-$l_nomade_local_copy_error = "La copie locale ne peut-être activée si l'E-mail nomade n'est pas autorisé et activé";
+$l_err_nomade_local_copy = "La copie locale ne peut-être activée si l'E-mail nomade n'est pas autorisé et activé";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
+$l_err_email = "L'adresse email n'est pas valide. Le nom et domaine doivent être renseignés.";

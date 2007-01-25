@@ -32,6 +32,8 @@ $l_all_f = "Toutes";
 $l_none = "Aucun";
 $l_undef = "---";
 $l_without = "Sans";
+$l_enabled = "Activé";
+$l_disabled = "Désactivé";
 $l_id = "Id";
 $l_comment = "Commentaire";
 $l_add_comment = "Ajouter un commentaire";
@@ -403,4 +405,5 @@ $l_dg_id = "Id";
 $l_dg_param = "Paramètres";
 $l_dg_sess = "Session";
 $l_dg_sql = "SQL";
+$l_dg_exe = "Exec";
 

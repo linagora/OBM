@@ -14,7 +14,7 @@
 //   - $usr_q : User mail forwarding database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_forward_consult($usr_q) {
-  global $l_mail, $l_mailforward, $l_internal_email;
+  global $l_mailforward, $l_internal_email;
   global $l_nomade_not_allowed,$l_local_copy;
   global $l_email_nomade, $l_enable, $l_disable, $l_forbid, $l_state;
   global $c_yes, $c_no;
@@ -53,20 +53,13 @@ function html_forward_consult($usr_q) {
   }
 
   $block = "
-    <div class=\"detail infos\">
-    <h1>$l_mail</h1>
+    <div class=\"detail extra\">
+    <h1>$l_mailforward</h1>
     <table>
     <tr>
       <th>$l_internal_email</th>
       <td>$email (@$domain)</td>
     </tr>
-    </table>
-    </div>
-
-    <div class=\"detail infos\">
-    <h1>$l_forward</h1>
-
-    <table>
     $dis_nomade
     </table>";
 
@@ -75,14 +68,14 @@ function html_forward_consult($usr_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Mail Forwarding Form                                              //
+// Display Mail Forwarding Form
 // Parameters:
-//   - $usr_q     : User mail forwarding database result
-//   - $forward   : default values or updated values (if error)
-//     kes used   : all
+//   - $usr_q   : User mail forwarding database result
+//   - $forward : default values or updated values (if error)
+//   - $err     : error array
 ///////////////////////////////////////////////////////////////////////////////
-function html_forward_form($usr_q, $forward) {
-  global $l_mail, $l_forward, $l_internal_email, $l_nomade_not_allowed;
+function html_forward_form($usr_q, $forward, $err) {
+  global $l_mailforward, $l_internal_email, $l_nomade_not_allowed;
   global $l_email_nomade, $l_enable,$l_local_copy;
   global $action, $c_yes, $c_no, $l_update;
 
@@ -97,13 +90,13 @@ function html_forward_form($usr_q, $forward) {
   if ($action == "detailupdate") {
     $email_nomade = $usr_q->f("userobm_email_nomade");
     $nomade_enable = $usr_q->f("userobm_nomade_enable");
-    $nomade_local_copy = $usr_q->f("userobm_nomade_local_copy");    
+    $nomade_local_copy = $usr_q->f("userobm_nomade_local_copy");
   }
 
   // If parameters have been given, they supercede the default action value
   if (isset($forward["email_nomade"])) { $email_nomade = $forward["email_nomade"]; }
   if (isset($forward["nomade_enable"])) { $nomade_enable = $forward["nomade_enable"]; }
-  if (isset($forward["nomade_local_copy"])) { $nomade_local_copy = $forward["nomade_local_copy"]; }  
+  if (isset($forward["nomade_local_copy"])) { $nomade_local_copy = $forward["nomade_local_copy"]; }
 
   // Nomad enable chekbox checked value
   if ($nomade_enable) $nomade_enable_c = " checked";
@@ -116,11 +109,14 @@ function html_forward_form($usr_q, $forward) {
     else $state = $l_disable;
 
     $dis_nomade = "
-      <td class=\"detailLabel\">$l_enable</td>
-      <td class=\"detailForm\"><input name=\"cb_nomade_enable\" type=\"checkbox\" value=\"1\" $nomade_enable_c></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_email_nomade</td>
-      <td class=\"detailForm\"><input name=\"tf_email_nomade\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\"></td>";
+    <tr>
+      <th>$l_enable</th>
+      <td><input name=\"cb_nomade_enable\" type=\"checkbox\" value=\"1\" $nomade_enable_c></td>
+    </tr>
+    <tr>
+      <th>$l_email_nomade</th>
+      <td><input name=\"tf_email_nomade\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\"></td>
+    </tr>";
   }
 
 
@@ -129,31 +125,27 @@ function html_forward_form($usr_q, $forward) {
       onSubmit=\"if (check_user(this)) return true; else return false;\"
       action=\"" . url_prepare("mailforward_index.php") . "\">
 
-    <div class=\"detailHead\">$l_mail</div>
+    <fieldset class=\"detail extra\">
+    <legend>$l_mailforward</legend>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_internal_email</td>
-      <td class=\"detailForm\">$email (@$domain)</td>
+      <th>$l_internal_email</th>
+      <td>$email (@$domain)</td>
     </tr>
-    </table>
-
-    <div class=\"detailHead\">$l_forward</div>
-
-    <table class=\"detail\">
+    $dis_nomade      
     <tr>
-      $dis_nomade      
-    </tr>
-    <tr>
-      <td class=\"detailLabel\">$l_local_copy</td>
-      <td class=\"detailForm\"><input name=\"cb_nomade_local_copy\" type=\"checkbox\" value=\"1\" $nomade_local_copy_c /></td>
+      <th>$l_local_copy</th>
+      <td><input name=\"cb_nomade_local_copy\" type=\"checkbox\" value=\"1\" $nomade_local_copy_c /></td>
     </tr>
     
     </table>
+    </fieldset>
 
-    <p>
+    <fieldset class=\"buttons\">
     <input type=\"hidden\" name=\"action\" value=\"update\">
     <input type=\"submit\" value=\"$l_update\">
+    </fieldset>
     </form>";
 
   return $block;

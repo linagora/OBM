@@ -394,3 +394,20 @@ CREATE TABLE UserSystem (
   PRIMARY KEY (usersystem_id),
   UNIQUE KEY k_login_user (usersystem_login)
 );
+
+
+-------------------------------------------------------------------------------
+-- OBM-Mail, OBM-LDAP Production tables (used by automate)
+-------------------------------------------------------------------------------
+
+CREATE TABLE P_UserObm like UserObm;
+CREATE TABLE P_UGroup like UGroup;
+CREATE TABLE P_UserObmGroup like UserObmGroup;
+CREATE TABLE P_GroupGroup like GroupGroup;
+CREATE TABLE P_Host like Host;
+CREATE TABLE P_Samba like Samba;
+CREATE TABLE P_Ldap like Ldap;
+CREATE TABLE P_Mail like Mail;
+CREATE TABLE P_MailShareDir like MailShareDir;
+CREATE TABLE P_EntityRight like EntityRight;
+CREATE TABLE P_Network like Network;

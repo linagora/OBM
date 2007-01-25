@@ -29,7 +29,7 @@ if ($param_theme != "") {
 // Validate user preferences
 if ($form_user_pref) {
 
-  $param_debug = $param_debug_id | $param_debug_param | $param_debug_sess | $param_debug_sql;
+  $param_debug = $param_debug_id | $param_debug_param | $param_debug_sess | $param_debug_sql | $param_debug_exe;
   $set_debug = $param_debug;
   $sess->register("set_debug");
   update_user_pref($uid, "set_debug", $set_debug);
@@ -120,6 +120,7 @@ if (($set_debug & $cdg_id) == $cdg_id) $dg_id = "checked";
 if (($set_debug & $cdg_param) == $cdg_param) $dg_param = "checked";
 if (($set_debug & $cdg_sess) == $cdg_sess) $dg_sess = "checked";
 if (($set_debug & $cdg_sql) == $cdg_sql) $dg_sql = "checked";
+if (($set_debug & $cdg_exe) == $cdg_exe) $dg_exe = "checked";
 
 if ($set_menu == $cme_txt) $me_txt = "checked";
 if ($set_menu == $cme_ico) $me_ico = "checked";
@@ -182,6 +183,7 @@ $sel_dsrc .= "</select>";
       <input type=\"checkbox\" name=\"param_debug_param\" value=\"$cdg_param\" $dg_param />$l_dg_param
       <input type=\"checkbox\" name=\"param_debug_sess\" value=\"$cdg_sess\" $dg_sess />$l_dg_sess
       <input type=\"checkbox\" name=\"param_debug_sql\" value=\"$cdg_sql\" $dg_sql />$l_dg_sql
+      <input type=\"checkbox\" name=\"param_debug_exe\" value=\"$cdg_exe\" $dg_exe />$l_dg_exe
     </td>
   </tr>";
 //}
