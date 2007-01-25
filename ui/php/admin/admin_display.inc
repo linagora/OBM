@@ -84,82 +84,98 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     $ip = $obm_u->f("activeuserobm_ip");
     $list_user .= "
       <tr>
-      <td class=\"adminText\">$login</td>
-      <td class=\"adminText\">$login_date</td>
-      <td class=\"adminText\">$last_acces</td>
-      <td class=\"adminText\">$nb_con</td>
-      <td class=\"adminText\">$lastpage</td>
-      <td class=\"adminText\">$ip</td>
+      <td>$login</td>
+      <td>$login_date</td>
+      <td>$last_acces</td>
+      <td>$nb_con</td>
+      <td>$lastpage</td>
+      <td>$ip</td>
       </tr>";
   }
   
 	$multidomain = $c_multidomain == true ? "Multi" : "Single";
 	 
   echo "
-    <br />
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>$l_check</h1>
+    <table>
     <tr> 
-      <td class=\"adminHead\" colspan=\"2\">$l_check</td>
-    </tr><tr> 
-      <td class=\"adminLabel\">$l_version</td>
-      <td class=\"adminText\">$obm_version</td>
+      <th>$l_version</th>
+      <td>$obm_version</td>
     </tr><tr>
-      <td class=\"adminLabel\">$l_database_server</td>
-      <td class=\"adminText\">". strtoupper($obm_u->type). "</td>
+      <th>$l_database_server</th>
+      <td>". strtoupper($obm_u->type). "</td>
     </tr><tr>
-      <td class=\"adminLabel\">$l_database</td>
-      <td class=\"adminText\">" . $obm_u->Database . "</td>
+      <th>$l_database</th>
+      <td>" . $obm_u->Database . "</td>
     </tr><tr>
-      <td class=\"adminLabel\">$l_host</td>
-      <td class=\"adminText\">" . $obm_u->Host . "</td>
+      <th>$l_host</th>
+      <td>" . $obm_u->Host . "</td>
     </tr><tr>
-      <td class=\"adminLabel\">$l_domain</td>
-      <td class=\"adminText\">$multidomain</td>
+      <th>$l_domain</th>
+      <td>$multidomain</td>
     </tr>
     </table>
+    </div>
 
-  <!--  Mini stats section -->
-
-    <p />
-    <table class=\"admin\">
-    <tr> 
-      <td class=\"adminHead\" colspan=\"6\">$l_session_stats</td>
-    </tr><tr> 
-      <td class=\"adminLabel\" colspan=\"4\">$l_date</td>
-      <td class=\"adminText\" colspan=\"2\">$date</td>
-    </tr><tr> 
-      <td class=\"adminLabel\" colspan=\"4\">$l_lifetime</td>
-      <td class=\"adminText\" colspan=\"2\">$lifetime</td>
-    </tr><tr> 
-      <td class=\"adminLabel\" colspan=\"4\">$l_user_session</td>
-      <td class=\"adminText\" colspan=\"2\">$nb_user_ses</td>
-    </tr><tr align=center> 
-      <td class=\"adminHead\">$l_active_user</td>
-      <td class=\"adminHead\">$l_login_date</td>
-      <td class=\"adminHead\">$l_last_acces</td>
-      <td class=\"adminHead\">$l_nb_connec</td>
-      <td class=\"adminHead\">$l_last_page</td>
-      <td class=\"adminHead\">$l_user_ip</td>
-
-    </tr>
-    $list_user
-    </table>
-
-    <br />
     <form method=\"get\" action=\"" . url_prepare("admin_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Sessions</h1>
+    <table>
     <tr>
-      <td class=\"adminHead\">action : clear_sess</td>
-      <td class=\"adminHead\">Passive Sessions (delay > $d_lifetime)</td>
-      <td class=\"adminLabel\" rowspan=\"2\">
+      <th>Action : clear_sess</th>
+      <td>Passive Sessions (delay > $d_lifetime)</td>
+    </tr><tr>
+      <th>Clear all passive users sessions</th>
+      <td>$nb_sess_to_clear</td>
+      <tr>
+        <th>
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"clear_sess\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
-    </tr><tr>
-      <td class=\"adminText\">Clear all passive users sessions</td>
-      <td class=\"adminText\">$nb_sess_to_clear</td>
+        <input type=\"submit\" value=\"$l_execute\" /></th>
+	</tr>
     </table>
-    </form>";
+    </div>
+    </form>
+
+
+    <div class=\"detail extra\">
+    <h1>$l_session_stats</h1>
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr> 
+      <td colspan=\"6\">$l_session_stats</td>
+    </tr>
+    <tr> 
+      <th>$l_date</th>
+      <th>$l_lifetime</th>
+      <th colspan=\"4\">$l_user_session</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr> 
+    <td>$date</td>
+    <td>$lifetime</td>
+    <td>$nb_user_ses</td>
+    </tr>
+    </tbody>
+    <thead>
+    <tr> 
+      <th>$l_active_user</th>
+      <th>$l_login_date</th>
+      <th>$l_last_acces</th>
+      <th>$l_nb_connec</th>
+      <th>$l_last_page</th>
+      <th>$l_user_ip</th>
+    </tr>
+    </thead>
+    <tbody>
+    $list_user
+    </tbody>
+    </table>
+    </div>
+
+";
 }
 
 

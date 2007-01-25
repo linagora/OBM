@@ -1053,7 +1053,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   <form method=\"post\" name=\"f_entity\" action=\"$url\"
     onSubmit=\"if (check_import_form(this)) return true; else return false;\">
   
-  <fieldset class=\"detail extra\">
+  <fieldset class=\"detail infos\">
   <legend>$l_import</legend>
   <table>
   <tr>
@@ -1084,7 +1084,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   </fieldset>
 
 
-  <fieldset class=\"detail extra\">
+  <fieldset class=\"detail infos\">
   <legend>$l_mapping</legend>
   <table>
   <tr>
@@ -1127,70 +1127,70 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_ad3\" value=\"$comp_ad3\" /></td>
-    <th>$l_address 3</th>
+    <td>$l_address 3</td>
     <td>
       <input type=\"text\" name=\"tf_comp_ad3_d\" value=\"$comp_ad3_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_zip\" value=\"$comp_zip\" /></td>
-    <th>$l_postcode</th>
+    <td>$l_postcode</td>
     <td>
       <input type=\"text\" name=\"tf_comp_zip_d\" value=\"$comp_zip_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_town\" value=\"$comp_town\" /></td>
-    <th>$l_town</th>
+    <td>$l_town</td>
     <td>
       <input type=\"text\" name=\"tf_comp_town_d\" value=\"$comp_town_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_cdx\" value=\"$comp_cdx\" /></td>
-    <th>$l_expresspostal</th>
+    <td>$l_expresspostal</td>
     <td>
       <input type=\"text\" name=\"tf_comp_cdx_d\" value=\"$comp_cdx_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_ctry\" value=\"$comp_ctry\" /></td>
-    <th>$l_country</th>
+    <td>$l_country</td>
     <td>
       <input type=\"text\" name=\"tf_comp_ctry_d\" value=\"$comp_ctry_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_pho\" value=\"$comp_pho\" /></td>
-    <th>$l_phone</th>
+    <td>$l_phone</td>
     <td>
       <input type=\"text\" name=\"tf_comp_pho_d\" value=\"$comp_pho_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_fax\" value=\"$comp_fax\" /></td>
-    <th>$l_fax</th>
+    <td>$l_fax</td>
     <td>
       <input type=\"text\" name=\"tf_comp_fax_d\" value=\"$comp_fax_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_web\" value=\"$comp_web\" /></td>
-    <th>$l_web</th>
+    <td>$l_web</td>
     <td>
       <input type=\"text\" name=\"tf_comp_web_d\" value=\"$comp_web_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_mail\" value=\"$comp_mail\" /></td>
-    <th>$l_email</th>
+    <td>$l_email</td>
     <td>
       <input type=\"text\" name=\"tf_comp_mail_d\" value=\"$comp_mail_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_com\" value=\"$comp_com\" /></td>
-    <th>$l_comment</th>
+    <td>$l_comment</td>
     <td>
       <input type=\"text\" name=\"tf_comp_com_d\" value=\"$comp_com_d\" /></td>
   </tr>
@@ -1203,133 +1203,133 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_ln\" value=\"$con_ln\" /></td>
-    <th>$l_lastname</th>
+    <td>$l_lastname</td>
     <td>
       <input type=\"text\" name=\"tf_con_ln_d\" value=\"$con_ln_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_fn\" value=\"$con_fn\" /></td>
-    <th>$l_firstname</th>
+    <td>$l_firstname</td>
     <td>
       <input type=\"text\" name=\"tf_con_fn_d\" value=\"$con_fn_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_lang\" value=\"$con_lang\" /></td>
-    <th>$l_lang</th>
+    <td>$l_lang</td>
     <td>
       <input type=\"text\" name=\"tf_con_lang_d\" value=\"$con_lang_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_func\" value=\"$con_func\" /></td>
-    <th>$l_function</th>
+    <td>$l_function</td>
     <td>
       <input type=\"text\" name=\"tf_con_func_d\" value=\"$con_func_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_tit\" value=\"$con_tit\" /></td>
-    <th>$l_title</th>
+    <td>$l_title</td>
     <td>
       <input type=\"text\" name=\"tf_con_tit_d\" value=\"$con_tit_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_ad1\" value=\"$con_ad1\" /></td>
-    <th>$l_address 1</th>
+    <td>$l_address 1</td>
     <td>
       <input type=\"text\" name=\"tf_con_ad1_d\" value=\"$con_ad1_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_ad2\" value=\"$con_ad2\" /></td>
-    <th>$l_address 2</th>
+    <td>$l_address 2</td>
     <td>
       <input type=\"text\" name=\"tf_con_ad2_d\" value=\"$con_ad2_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_ad3\" value=\"$con_ad3\" /></td>
-    <th>$l_address 3</th>
+    <td>$l_address 3</td>
     <td>
       <input type=\"text\" name=\"tf_con_ad3_d\" value=\"$con_ad3_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_zip\" value=\"$con_zip\" /></td>
-    <th>$l_postcode</th>
+    <td>$l_postcode</td>
     <td>
       <input type=\"text\" name=\"tf_con_zip_d\" value=\"$con_zip_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_town\" value=\"$con_town\" /></td>
-    <th>$l_town</th>
+    <td>$l_town</td>
     <td>
       <input type=\"text\" name=\"tf_con_town_d\" value=\"$con_town_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_cdx\" value=\"$con_cdx\" /></td>
-    <th>$l_expresspostal</th>
+    <td>$l_expresspostal</td>
     <td>
       <input type=\"text\" name=\"tf_con_cdx_d\" value=\"$con_cdx_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_ctry\" value=\"$con_ctry\" /></td>
-    <th>$l_country</th>
+    <td>$l_country</td>
     <td>
       <input type=\"text\" name=\"tf_con_ctry_d\" value=\"$con_ctry_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_pho\" value=\"$con_pho\" /></td>
-    <th>$l_phone</th>
+    <td>$l_phone</td>
     <td>
       <input type=\"text\" name=\"tf_con_pho_d\" value=\"$con_pho_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_hpho\" value=\"$con_hpho\" /></td>
-    <th>$l_hphone</th>
+    <td>$l_hphone</td>
     <td>
       <input type=\"text\" name=\"tf_con_hpho_d\" value=\"$con_hpho_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_mpho\" value=\"$con_mpho\" /></td>
-    <th>$l_mphone</th>
+    <td>$l_mphone</td>
     <td>
       <input type=\"text\" name=\"tf_con_mpho_d\" value=\"$con_mpho_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_fax\" value=\"$con_fax\" /></td>
-    <th>$l_fax</th>
+    <td>$l_fax</td>
     <td>
       <input type=\"text\" name=\"tf_con_fax_d\" value=\"$con_fax_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_mail\" value=\"$con_mail\" /></td>
-    <th>$l_email</th>
+    <td>$l_email</td>
     <td>
       <input type=\"text\" name=\"tf_con_mail_d\" value=\"$con_mail_d\" /></td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_mailok\" value=\"$con_mailok\" /></td>
-    <th>$l_mailing_ok</th>
+    <td>$l_mailing_ok</td>
     <td>
       <input type=\"text\" name=\"tf_con_mailok_d\" maxlength=\"1\" value=\"$con_mailok_d\" /> $l_mailing_ok_msg</td>
   </tr>
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_com\" value=\"$con_com\" /></td>
-    <th>$l_comment</th>
+    <td>$l_comment</td>
     <td>
       <input type=\"text\" name=\"tf_con_com_d\" value=\"$con_com_d\" /></td>
   </tr>
@@ -1416,13 +1416,10 @@ function dis_import_warn_insert($import_q, $import) {
   <table>
   $dis_same_import
   </table>
-
   <div class=\"buttons\">
-
  <a href=\"$path/import/import_index.php?action=insert&amp;hd_confirm=$c_yes&amp;tf_name=$name&amp;sel_datasource=$dsrc\">
     $l_confirm 
  </a>
-
  <a href=\"$path/import/import_index.php?action=new&amp;tf_name=$name&amp;sel_datasource=$dsrc\">
     $l_back
  </a>
