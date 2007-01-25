@@ -50,20 +50,17 @@ function html_domain_search_form($domain) {
   $text = $domain["text"];
   
   $block = "
-  <form method=\"get\" name=\"f_search\"
-    action=\"". url_prepare("domain_index.php")."\">
+  <form method=\"get\" name=\"f_search\" class=\"search\" action=\"". url_prepare("domain_index.php")."\">
 
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_text<br />
+    <label>$l_text<br />
       <input type=\"text\" name=\"tf_text\" size=\"16\" maxlength=\"32\"
       value=\"$label\" />
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\">
       <input name=\"submit\" type=\"submit\" value=\"$l_find\">
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
+    </label>
+    <p class=\"CL\" />
   </form>";
 
   return $block;
@@ -154,8 +151,8 @@ function html_domain_form($dom_q, $domain) {
 
   // Buttons
   if (($domain["action"] == "new") || ($domain["action"] == "insert")) {
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\">
-          <input type=\"submit\" value=\"$l_insert\">";
+    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+          <input type=\"submit\" value=\"$l_insert\" />";
 
   } elseif (($domain["action"]=="detailupdate") || ($domain["action"]=="update")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\">
@@ -167,34 +164,41 @@ function html_domain_form($dom_q, $domain) {
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-    <form method=\"POST\" name=\"f_entity\"
+    <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_domain(this)) return true; else return false;\"
       action=\"" . url_prepare("domain_index.php") . "\">
 
-    <div class=\"detailHead\">$l_domain</div>
-
-    <table class=\"detail\">
+    <fieldset class=\"detail infos\">
+    <legend>$l_domain</legend>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailForm\"><input name=\"tf_label\" size=\"24\" maxlength=\"32\" value=\"$label\" /></td>
+      <th>$l_label</th>
+      <td><input name=\"tf_label\" size=\"24\" maxlength=\"32\" value=\"$label\" /></td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_desc</td>
-      <td class=\"detailForm\"><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
+      <th>$l_desc</th>
+      <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_domain_name</td>
-      <td class=\"detailForm\"><input name=\"tf_domain_name\" size=\"48\" maxlength=\"128\" value=\"$domain_name\" /></td>
-    </tr>
-    <tr>
-      <td class=\"detailLabel\">$l_alias</td>
-      <td class=\"detailForm\"><textarea name=\"ta_alias\" rows=\"6\" cols=\"48\">$alias</textarea></td>
+      <th>$l_domain_name</th>
+      <td><input name=\"tf_domain_name\" size=\"48\" maxlength=\"128\" value=\"$domain_name\" /></td>
     </tr>
     </table>
+    </fieldset>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+     <fieldset class=\"detail infos\">
+    <legend>$l_alias</legend>
+    <table>
+    <tr>
+      <th>$l_alias</th>
+      <td><textarea name=\"ta_alias\" rows=\"6\" cols=\"48\">$alias</textarea></td>
+    </tr>
+    </table>
+    </fieldset>
+
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
     </form>";
 
   return $block;
@@ -238,29 +242,36 @@ function html_domain_consult($obm_q) {
   $alias = $obm_q->f("domain_alias");
 
   $display["detailInfo"] = display_record_info($obm_q);
-  $display["title"] = "<div class=\"title\">$l_domain : $label </div>";
+  $display["title"] = "<h1 class=\"title\">$l_domain : $label </h1>";
 
   $block = "
-  <div class=\"detailHead\">$l_domain</div>
- 
-    <table class=\"detail\">
+  <div class=\"detail infos\">
+  <h1>$l_domain</h1>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailText\">$label</td>
+      <th>$l_label</th>
+      <td>$label</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_desc</td>
-      <td class=\"detailText\">$desc</td>
+      <th>$l_desc</th>
+      <td>$desc</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_domain_name</td>
-      <td class=\"detailText\">$domain_name</td>
-    </tr>
-    <tr>
-      <td class=\"detailLabel\">$l_alias</td>
-      <td class=\"detailText\">$alias</td>
+      <th>$l_domain_name</th>
+      <td>$domain_name</td>
     </tr>
     </table>
+    </div>
+
+  <div class=\"detail infos\">
+  <h1>$l_alias</h1>
+  <table>
+    <tr>
+      <th>$l_alias</th>
+      <td>$alias</td>
+    </tr>
+    </table>
+    </div>
 ";
 
   return $block;
@@ -278,18 +289,12 @@ function dis_domain_can_delete($p_id) {
 
   $url = url_prepare("domain_index.php");
 
-  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
-    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"domain_id\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_back\" />
-    </form>";
+  $dis_back = "<a href=\"$path/domain/domain_index.php?action=detailconsult&amp;domain_id=$p_id\">$l_back</a>";
 
-  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"domain_id\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
-    </form>";
+  $dis_delete = "
+  <a href=\"$path/domain/domain_index.php?action=delete&amp;domain_id=$p_id\" onclick=\"return confirm_del(this.form);\">
+  $l_delete 
+  </a>";
 
   $infos_q = run_query_domain_detail($p_id);
   $title = $infos_q->f("domain_label");
@@ -297,9 +302,9 @@ function dis_domain_can_delete($p_id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-      <p class=\"detailButtons\">$dis_back</p>
+    <div class=\"buttons\">
+      $dis_delete
+      $dis_back
     </div>
 ";
   return $block;

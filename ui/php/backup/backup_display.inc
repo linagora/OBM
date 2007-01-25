@@ -54,21 +54,19 @@ function html_backup_search_form($backup) {
 
   $block = "
   <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\">
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_version<br />
+    <label>$l_version
       <input type=\"text\" name=\"tf_version\" id=\"tf_version\" size=\"8\" maxlength=\"8\" value=\"$version\" />
-    </div>
-    <div class=\"searchLabel\">$l_date<br />
-      <script>calendar('tf_date','$date')</script>
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>$l_date
+    <input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>
+    </label>
+    <label>
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext&nbsp; 
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
+    </label>
+    <p class=\"CL\" />
   </form>";
 
   return $block;
@@ -149,26 +147,16 @@ function html_backup_search_list($files, $nb_files) {
 function dis_backup_form() {
   global $display, $l_back, $l_confirm, $l_can_create;
 
-  $url = url_prepare("backup_index.php");
+  $dis_back = "<a href=\"$path/backup/backup_index.php?action=index\">$l_back</a>";
 
-  $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
-    <input type=\"hidden\" name=\"action\" value=\"index\" />
-    <input type=\"hidden\" name=\"tf_filename\" value=\"$filename\" />
-    <input type=\"submit\" value=\"$l_back\" />
-    </form>";
-
-  $dis_ok = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
-    <input type=\"hidden\" name=\"action\" value=\"insert\" />
-    <input type=\"submit\" value=\"$l_confirm\" />
-    </form>";
+  $dis_ok = "<a href=\"$path/backup/backup_index.php?action=insert\">$l_confirm </a>";
 
   $display["msg"] .= display_ok_msg($l_can_create);
 
-  $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_ok</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
+  $block .= "<div class=\"buttons\">
+             $dis_ok
+             $dis_back
+             </div>";
 
   return $block;
 }
@@ -182,26 +170,17 @@ function dis_backup_form() {
 function dis_can_delete_backup($filename) {
   global $display, $l_can_delete, $l_cant_delete, $l_back, $l_delete;
 
-  $url = url_prepare("backup_index.php");
 
-  $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
-    <input type=\"hidden\" name=\"action\" value=\"index\" />
-    <input type=\"hidden\" name=\"tf_filename\" value=\"$filename\" />
-    <input type=\"submit\" value=\"$l_back\" />
-    </form>";
+  $dis_back = "<a href=\"$path/backup/backup_index.php?action=index&amp;tf_filename=$filename\">$l_back</a>";
 
-  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"tf_filename\" value=\"$filename\" />
-    <input type=\"submit\" value=\"$l_delete\" />
-    </form>";
+  $dis_delete = "<a href=\"$path/backup/backup_index.php?action=delete&amp;tf_filename=$filename\">$l_delete</a>";
 
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_delete</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_delete
+        $dis_back
       </div>";
 
   return $block;

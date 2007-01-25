@@ -1877,20 +1877,12 @@ function dis_can_delete_contact($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display;
 
-  $dis_back = "<form name=\"form_back\" method=\"post\"
-    action=\"".url_prepare("contact_index.php") ."\">
-    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"contact_id\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_back\" />
-    </form>";
+  $dis_back = "<a href=\"$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$p_id\">$l_back</a>";
 
-  $dis_delete = "<form name=\"form_delete\" method=\"post\"
-      action=\"" . url_prepare("contact_index.php") . "\">
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"contact_id\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_contact_del(this.form)) return true; else return false;\" />
-    </form>";
+  $dis_delete = "
+    <a href=\"$path/contact/contact_index.php?action=delete&amp;contact_id=$p_id\" onclick=\"return confirm_contact_del(this.form);\">
+    $l_delete 
+    </a>";
 
   $display["msg"] .= display_ok_msg($l_can_delete);
 

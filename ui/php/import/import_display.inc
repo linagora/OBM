@@ -103,26 +103,24 @@ function html_import_search_form ($import, $dsrc_q, $usr_q) {
   // --- HTML Page display ----------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\"
+  <form method=\"get\" name=\"f_search\" class=\"search\"
     action=\"".url_prepare("import_index.php")."\">
 
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_name<br />
+    <label>$l_name
       <input type=\"text\" name=\"tf_name\" size=\"16\" value=\"$name\" />
-    </div>
-    <div class=\"searchLabel\">$l_datasource<br />
+    </label>
+    <label>$l_datasource
       $sel_dsrc
-    </div>
-    <div class=\"searchLabel\">$l_market<br />
+    </label>
+    <label>$l_market
       $sel_market
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $ext
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
+    </label>
+    <p class=\"CL\" />
   </form>";
 
   return $block;
@@ -244,9 +242,9 @@ function html_import_consult($import_q) {
     if (($label != "") && (($value != "") || ($default != ""))) {
       $mapping .= "
   <tr>
-    <td class=\"detailLabel\">$label</td>
-    <td class=\"detailText\">$value</td>
-    <td class=\"detailText\">$default</td>
+    <th>$label</th>
+    <td>$value</td>
+    <td>$default</td>
   </tr>";
       if ($value != "") {
 	$map["$value"] = $field;
@@ -256,7 +254,7 @@ function html_import_consult($import_q) {
 
   $mapping .= "
   <tr>
-    <td class=\"detailHead\" colspan=\"3\">$l_contact</td>
+    <td colspan=\"3\"><h1 class=\"title\">$l_contact</h1></td>
   </tr>";
 
   while (list($field, $el) = each($con)) {
@@ -267,49 +265,55 @@ function html_import_consult($import_q) {
     if (($label != "") && (($value != "") || ($default != ""))) {
       $mapping .= "
   <tr>
-    <td class=\"detailLabel\">$label</td>
-    <td class=\"detailText\">$value</td>
-    <td class=\"detailText\">$default</td>
+    <th>$label</th>
+    <td>$value</td>
+    <td>$default</td>
   </tr>";
     }
   }
 
   $display["detailInfo"] = display_record_info($import_q);
-  $display["title"] = "<div class=\"title\">$l_import : $name</div>";
+  $display["title"] = "<h1 class=\"title\">$l_import : $name</div>";
 
   $block = "
-    <div class=\"detailHead\">$l_import</div>
-    <table class=\"detail\">
+  <div class=\"detail extra\">
+    <h1>$l_import</h1>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
+      <th>$l_name</th>
+      <td>$name</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_datasource</td>
-      <td class=\"detailText\">$datasource</td>
+      <th>$l_datasource</th>
+      <td>$datasource</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_market</td>
-      <td class=\"detailText\">$market</td>
+      <th>$l_market</th>
+      <td>$market</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_csv_sep</td>
-      <td class=\"detailText\">$csv_sep</td>
+      <th>$l_csv_sep</th>
+      <td>$csv_sep</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_enclosed</td>
-      <td class=\"detailText\">$enclosed</td>
+      <th>$l_enclosed</th>
+      <td>$enclosed</td>
     </tr>
     </table>
+    </div>
 
-  <div class=\"detailHead\">$l_mapping</div>
-  <table class=\"detail\">
+  <div class=\"detail extra\">
+  <h1>$l_mapping</h1>
+  <table>
   <tr>
-    <td class=\"detailForm\">$l_field</td>
-    <td class=\"detailForm\">$l_field_num</td>
-    <td class=\"detailForm\">$l_default</td>
+    <td>$l_field</td>
+    <td>$l_field_num</td>
+    <td>$l_default</td>
   </tr>
   <tr>
-    <td class=\"detailHead\" colspan=\"3\">$l_company</td>
+    <td colspan=\"3\"><h1 class=\"title\">$l_company</h1></td>
   </tr>
   $mapping
-  </table>";
+  </table>
+  </div>
+  
+  ";
 
   $block .= html_import_consult_file($import_q);
 
@@ -334,14 +338,15 @@ function html_import_consult_file($import_q) {
   $display["title"] = "<div class=\"title\">$l_import : $name</div>";
 
   $block = "
-    <div class=\"detailHead\">$l_file</div>
+    <div class=\"detail extra\">
+    <h1>$l_file</h1>
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
       <input type=\"hidden\" name=\"action\" value=\"file_sample\" />
       <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_sample_file</td>
-      <td class=\"detailForm\">
+      <th>$l_sample_file</th>
+      <td>
         <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
         <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_check_file\" /></td>
@@ -352,10 +357,11 @@ function html_import_consult_file($import_q) {
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
       <input type=\"hidden\" name=\"action\" value=\"file_test\" />
       <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
-    <table class=\"detail\">
+    
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_test_file</td>
-      <td class=\"detailForm\">
+      <th>$l_test_file</th>
+      <td>
         <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
         <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_test_file\" /></td>
@@ -366,16 +372,17 @@ function html_import_consult_file($import_q) {
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
       <input type=\"hidden\" name=\"action\" value=\"file_import\" />
       <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_import_file</td>
-      <td class=\"detailForm\">
+      <th>$l_import_file</th>
+      <td>
         <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
         <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_import_file\" /></td>
     </tr>
     </table>
-    </form>";
+    </form>
+    </div>";
 
   return $block;
 }
@@ -1030,10 +1037,10 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
 
       $dis_userdata .= "
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_$field\" value=\"$value\" /></td>
-    <td class=\"detailLabel\">$cat_label</td>
-    <td class=\"detailForm\">
+    <th>$cat_label</th>
+    <td>
       <input type=\"text\" name=\"tf_${field}_d\" value=\"$value_d\" /></td>
   </tr>";
     }
@@ -1045,283 +1052,289 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   $block = "
   <form method=\"post\" name=\"f_entity\" action=\"$url\"
     onSubmit=\"if (check_import_form(this)) return true; else return false;\">
-
-  <div class=\"detailHead\">$l_import</div>
-  <table class=\"detail\">
+  
+  <fieldset class=\"detail extra\">
+  <legend>$l_import</legend>
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_name</td>
-    <td class=\"detailForm\">
+    <th>$l_name</th>
+    <td>
       <input type=\"text\" name=\"tf_name\" value=\"$name\" /></td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_datasource</td>
-    <td class=\"detailForm\">$sel_dsrc</td>
+    <th>$l_datasource</th>
+    <td>$sel_dsrc</td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_market</td>
-    <td class=\"detailForm\">$sel_market</td>
+    <th>$l_market</th>
+    <td>$sel_market</td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_csv_sep</td>
-    <td class=\"detailForm\">
+    <th>$l_csv_sep</th>
+    <td>
       <input type=\"radio\" name=\"rd_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc
       <input type=\"radio\" name=\"rd_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_enclosed</td>
-    <td class=\"detailForm\">
+    <th>$l_enclosed</th>
+    <td>
       <input type=\"text\" name=\"tf_enclosed\" size=\"1\" maxlength=\"1\" value=\"$enc\" /></td>
   </tr>
   </table>
+  </fieldset>
 
-  <div class=\"detailHead\">$l_mapping</div>
-  <table class=\"detail\">
+
+  <fieldset class=\"detail extra\">
+  <legend>$l_mapping</legend>
+  <table>
   <tr>
-    <td class=\"detailForm\">$l_field_num</td>
-    <td class=\"detailForm\">$l_field</td>
-    <td class=\"detailForm\">$l_default</td>
+    <td>$l_field_num</td>
+    <td>$l_field</td>
+    <td>$l_default</td>
+  </tr>
+
+  <tr>
+    <td colspan=\"3\"><h1 class=\"title\">$l_company</h1></td>
   </tr>
   <tr>
-    <td class=\"detailHead\" colspan=\"3\">$l_company</td>
-  </tr>
-  <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_name\" value=\"$comp_name\" /></td>
-    <td class=\"detailLabel\">$l_name</td>
-    <td class=\"detailForm\">
+    <td>$l_name</td>
+    <td>
       <input type=\"text\" name=\"tf_comp_name_d\" value=\"$comp_name_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_num\" value=\"$comp_num\" /></td>
-    <td class=\"detailLabel\">$l_number</td>
-    <td class=\"detailForm\">
+    <td>$l_number</td>
+    <td>
       <input type=\"text\" name=\"tf_comp_num_d\" value=\"$comp_num_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_ad1\" value=\"$comp_ad1\" /></td>
-    <td class=\"detailLabel\">$l_address 1</td>
-    <td class=\"detailForm\">
+    <td>$l_address 1</td>
+    <td>
       <input type=\"text\" name=\"tf_comp_ad1_d\" value=\"$comp_ad1_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_ad2\" value=\"$comp_ad2\" /></td>
-    <td class=\"detailLabel\">$l_address 2</td>
-    <td class=\"detailForm\">
+    <td>$l_address 2</td>
+    <td>
       <input type=\"text\" name=\"tf_comp_ad2_d\" value=\"$comp_ad2_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_ad3\" value=\"$comp_ad3\" /></td>
-    <td class=\"detailLabel\">$l_address 3</td>
-    <td class=\"detailForm\">
+    <th>$l_address 3</th>
+    <td>
       <input type=\"text\" name=\"tf_comp_ad3_d\" value=\"$comp_ad3_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_zip\" value=\"$comp_zip\" /></td>
-    <td class=\"detailLabel\">$l_postcode</td>
-    <td class=\"detailForm\">
+    <th>$l_postcode</th>
+    <td>
       <input type=\"text\" name=\"tf_comp_zip_d\" value=\"$comp_zip_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_town\" value=\"$comp_town\" /></td>
-    <td class=\"detailLabel\">$l_town</td>
-    <td class=\"detailForm\">
+    <th>$l_town</th>
+    <td>
       <input type=\"text\" name=\"tf_comp_town_d\" value=\"$comp_town_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_cdx\" value=\"$comp_cdx\" /></td>
-    <td class=\"detailLabel\">$l_expresspostal</td>
-    <td class=\"detailForm\">
+    <th>$l_expresspostal</th>
+    <td>
       <input type=\"text\" name=\"tf_comp_cdx_d\" value=\"$comp_cdx_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_ctry\" value=\"$comp_ctry\" /></td>
-    <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailForm\">
+    <th>$l_country</th>
+    <td>
       <input type=\"text\" name=\"tf_comp_ctry_d\" value=\"$comp_ctry_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_pho\" value=\"$comp_pho\" /></td>
-    <td class=\"detailLabel\">$l_phone</td>
-    <td class=\"detailForm\">
+    <th>$l_phone</th>
+    <td>
       <input type=\"text\" name=\"tf_comp_pho_d\" value=\"$comp_pho_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_fax\" value=\"$comp_fax\" /></td>
-    <td class=\"detailLabel\">$l_fax</td>
-    <td class=\"detailForm\">
+    <th>$l_fax</th>
+    <td>
       <input type=\"text\" name=\"tf_comp_fax_d\" value=\"$comp_fax_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_web\" value=\"$comp_web\" /></td>
-    <td class=\"detailLabel\">$l_web</td>
-    <td class=\"detailForm\">
+    <th>$l_web</th>
+    <td>
       <input type=\"text\" name=\"tf_comp_web_d\" value=\"$comp_web_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_mail\" value=\"$comp_mail\" /></td>
-    <td class=\"detailLabel\">$l_email</td>
-    <td class=\"detailForm\">
+    <th>$l_email</th>
+    <td>
       <input type=\"text\" name=\"tf_comp_mail_d\" value=\"$comp_mail_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_comp_com\" value=\"$comp_com\" /></td>
-    <td class=\"detailLabel\">$l_comment</td>
-    <td class=\"detailForm\">
+    <th>$l_comment</th>
+    <td>
       <input type=\"text\" name=\"tf_comp_com_d\" value=\"$comp_com_d\" /></td>
   </tr>
   $dis_userdata
 
   <tr>
-    <td class=\"detailHead\" colspan=\"3\">$l_contact</td>
+    <td colspan=\"3\"><h1 class=\"title\">$l_contact</h1></td>
   </tr>
 
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_ln\" value=\"$con_ln\" /></td>
-    <td class=\"detailLabel\">$l_lastname</td>
-    <td class=\"detailForm\">
+    <th>$l_lastname</th>
+    <td>
       <input type=\"text\" name=\"tf_con_ln_d\" value=\"$con_ln_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_fn\" value=\"$con_fn\" /></td>
-    <td class=\"detailLabel\">$l_firstname</td>
-    <td class=\"detailForm\">
+    <th>$l_firstname</th>
+    <td>
       <input type=\"text\" name=\"tf_con_fn_d\" value=\"$con_fn_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_lang\" value=\"$con_lang\" /></td>
-    <td class=\"detailLabel\">$l_lang</td>
-    <td class=\"detailForm\">
+    <th>$l_lang</th>
+    <td>
       <input type=\"text\" name=\"tf_con_lang_d\" value=\"$con_lang_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_func\" value=\"$con_func\" /></td>
-    <td class=\"detailLabel\">$l_function</td>
-    <td class=\"detailForm\">
+    <th>$l_function</th>
+    <td>
       <input type=\"text\" name=\"tf_con_func_d\" value=\"$con_func_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_tit\" value=\"$con_tit\" /></td>
-    <td class=\"detailLabel\">$l_title</td>
-    <td class=\"detailForm\">
+    <th>$l_title</th>
+    <td>
       <input type=\"text\" name=\"tf_con_tit_d\" value=\"$con_tit_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_ad1\" value=\"$con_ad1\" /></td>
-    <td class=\"detailLabel\">$l_address 1</td>
-    <td class=\"detailForm\">
+    <th>$l_address 1</th>
+    <td>
       <input type=\"text\" name=\"tf_con_ad1_d\" value=\"$con_ad1_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_ad2\" value=\"$con_ad2\" /></td>
-    <td class=\"detailLabel\">$l_address 2</td>
-    <td class=\"detailForm\">
+    <th>$l_address 2</th>
+    <td>
       <input type=\"text\" name=\"tf_con_ad2_d\" value=\"$con_ad2_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_ad3\" value=\"$con_ad3\" /></td>
-    <td class=\"detailLabel\">$l_address 3</td>
-    <td class=\"detailForm\">
+    <th>$l_address 3</th>
+    <td>
       <input type=\"text\" name=\"tf_con_ad3_d\" value=\"$con_ad3_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_zip\" value=\"$con_zip\" /></td>
-    <td class=\"detailLabel\">$l_postcode</td>
-    <td class=\"detailForm\">
+    <th>$l_postcode</th>
+    <td>
       <input type=\"text\" name=\"tf_con_zip_d\" value=\"$con_zip_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_town\" value=\"$con_town\" /></td>
-    <td class=\"detailLabel\">$l_town</td>
-    <td class=\"detailForm\">
+    <th>$l_town</th>
+    <td>
       <input type=\"text\" name=\"tf_con_town_d\" value=\"$con_town_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_cdx\" value=\"$con_cdx\" /></td>
-    <td class=\"detailLabel\">$l_expresspostal</td>
-    <td class=\"detailForm\">
+    <th>$l_expresspostal</th>
+    <td>
       <input type=\"text\" name=\"tf_con_cdx_d\" value=\"$con_cdx_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_ctry\" value=\"$con_ctry\" /></td>
-    <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailForm\">
+    <th>$l_country</th>
+    <td>
       <input type=\"text\" name=\"tf_con_ctry_d\" value=\"$con_ctry_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_pho\" value=\"$con_pho\" /></td>
-    <td class=\"detailLabel\">$l_phone</td>
-    <td class=\"detailForm\">
+    <th>$l_phone</th>
+    <td>
       <input type=\"text\" name=\"tf_con_pho_d\" value=\"$con_pho_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_hpho\" value=\"$con_hpho\" /></td>
-    <td class=\"detailLabel\">$l_hphone</td>
-    <td class=\"detailForm\">
+    <th>$l_hphone</th>
+    <td>
       <input type=\"text\" name=\"tf_con_hpho_d\" value=\"$con_hpho_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_mpho\" value=\"$con_mpho\" /></td>
-    <td class=\"detailLabel\">$l_mphone</td>
-    <td class=\"detailForm\">
+    <th>$l_mphone</th>
+    <td>
       <input type=\"text\" name=\"tf_con_mpho_d\" value=\"$con_mpho_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_fax\" value=\"$con_fax\" /></td>
-    <td class=\"detailLabel\">$l_fax</td>
-    <td class=\"detailForm\">
+    <th>$l_fax</th>
+    <td>
       <input type=\"text\" name=\"tf_con_fax_d\" value=\"$con_fax_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_mail\" value=\"$con_mail\" /></td>
-    <td class=\"detailLabel\">$l_email</td>
-    <td class=\"detailForm\">
+    <th>$l_email</th>
+    <td>
       <input type=\"text\" name=\"tf_con_mail_d\" value=\"$con_mail_d\" /></td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_mailok\" value=\"$con_mailok\" /></td>
-    <td class=\"detailLabel\">$l_mailing_ok</td>
-    <td class=\"detailForm\">
+    <th>$l_mailing_ok</th>
+    <td>
       <input type=\"text\" name=\"tf_con_mailok_d\" maxlength=\"1\" value=\"$con_mailok_d\" /> $l_mailing_ok_msg</td>
   </tr>
   <tr>
-    <td class=\"detailForm\">
+    <td>
       <input type=\"text\" size=\"3\" name=\"tf_con_com\" value=\"$con_com\" /></td>
-    <td class=\"detailLabel\">$l_comment</td>
-    <td class=\"detailForm\">
+    <th>$l_comment</th>
+    <td>
       <input type=\"text\" name=\"tf_con_com_d\" value=\"$con_com_d\" /></td>
   </tr>
   </table>
+  </fieldset>
 ";
 
   if (($action == "detailupdate") || ($action == "update")) {
@@ -1341,11 +1354,9 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $block .= "<div class=\"detailButton\">
-    <p class=\"detailButtons\">
+  $block .= "<fieldset class=\"buttons\">
     $dis_but
-    </p>
-    </div>
+    </fieldset>
     </form>";
 
   return $block;
@@ -1359,28 +1370,16 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
 //   - $id : import id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_import_warn_delete($id) {
-  global $display, $l_warn_delete, $l_delete, $l_back;
+  global $display, $l_warn_delete, $l_delete, $l_back,$path;
 
   $display["msg"] .= display_warn_msg("$l_warn_delete");
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">
-        <form method=\"get\" name=\"form_delete\"
-          action=\"" .url_prepare("import_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"delete\" />
-        <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
-        <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
-        </form>
-      </p>
-      <p class=\"detailButtons\">
-        <form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("import_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-        <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>
-      </p>
+    <div class=\"buttons\">
+    <a href=\"$path/import/import_index.php?action=delete&amp;import_id=$id\">
+    $l_delete 
+    </a>
+    <a href=\"$path/import/import_index.php?action=detailconsult&amp;import_id=$id\">$l_back</a>
     </div>";
 
   return $block;
@@ -1397,7 +1396,7 @@ function dis_import_warn_delete($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_import_warn_insert($import_q, $import) {
   global $l_check_sameimport, $l_confirm, $l_back;
-  global $display, $c_yes, $c_no;
+  global $display,$path,$c_yes, $c_no;
 
   $name = $import["name"];
   $dsrc = $import["datasource"];
@@ -1408,36 +1407,25 @@ function dis_import_warn_insert($import_q, $import) {
     $samename = $import_q->f("import_name");
     $samedsrc = $import_q->f("datasource_name");
     $dis_same_import .= "
-      <tr><td class=\"detailLabel\">
+      <tr><th>
         <a class=\"detail\" href=\"" .url_prepare("import_index.php?action=detailconsult&amp;import_id=$id") . "\">$samename ($samedsrc)</a>
-      </td></tr>";
+      </th></tr>";
   }
 
-  $block = "<p />
-  <table class=\"detail\">
+  $block = "
+  <table>
   $dis_same_import
   </table>
 
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-    <form method=\"post\" name=\"form_insert\"
-      action=\"" .url_prepare("import_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-      <input type=\"hidden\" name=\"sel_datasource\" value=\"$dsrc\" />
-      <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
-    </form>
-    </p>
-    <p class=\"detailButtons\">
-    <form name=\"form_back method=\"post\"
-      action=\"" .url_prepare("import_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"new\" />
-      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-      <input type=\"hidden\" name=\"sel_datasource\" value=\"$dsrc\" />
-      <input type=\"submit\" value=\"$l_back\" />
-    </form>
-    </p>
+  <div class=\"buttons\">
+
+ <a href=\"$path/import/import_index.php?action=insert&amp;hd_confirm=$c_yes&amp;tf_name=$name&amp;sel_datasource=$dsrc\">
+    $l_confirm 
+ </a>
+
+ <a href=\"$path/import/import_index.php?action=new&amp;tf_name=$name&amp;sel_datasource=$dsrc\">
+    $l_back
+ </a>
   </div>";
 
   return $block;

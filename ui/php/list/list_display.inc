@@ -1207,6 +1207,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	  $or = "selected =\"true\"";
 	  $and = "";
 	}	
+	$dis_head = "<thead><tr><th>test</th><th>test</th><th>test</th><th>test</th></tr></thead>";
 	$dis_logical = "<th><select name=\"sel_log_and[]\"><option value=\"OR\" $or>$l_or</option><option value=\"AND\" $and>$l_and</option></select>";
 	$dis_criteria .="<tr><td>".$hid_cell[$key]."</td>$del_cell $upd_cell $dis_logical $dis_no_boolean $line</tr>";      
       }
@@ -1229,8 +1230,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
   </tbody>
   </table>
   <div id=\"di_query\" $display class=\"buttons\">
-  <input type=\"button\" value=\"$l_add_criterion\" 
-  onclick=\"window.open('$url2','','height=650,width=700,scrollbars=yes,status=yes'); return false;\"/>
+  <input type=\"button\" value=\"$l_add_criterion\" onclick=\"window.open('$url2','','height=650,width=700,scrollbars=yes,status=yes'); return false;\"/>
   </div>";
 
   return $block;
