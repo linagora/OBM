@@ -56,6 +56,7 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("invoice_id").",'".addslashes($OD->data_set->f("invoice_label"))."');";
     } else if ($OD->display_ext == "get_id_url") {
       $ext_url = $invoice["ext_url"];
+      var_dump($ext_url);
       $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("invoice_id").");";
     } elseif($link_ok) {
       $res["url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=".$OD->data_set->f("invoice_id");

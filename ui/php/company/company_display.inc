@@ -424,10 +424,7 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
     } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
       $comp_d->display_ext = "get_id";
     }
-    $display_popup_end = "
-      <p>
-      <a href=\"\" onclick='window.close();'>$l_close</a>
-      </p>";
+    $display_popup_end = "<a href=\"\" onclick='window.close();'>$l_close</a>";
   }
   
   $comp_d->data_set = $comp_q;

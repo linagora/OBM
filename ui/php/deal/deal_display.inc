@@ -379,7 +379,9 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
 
   $block = "
   <form class=\"search\" method=\"get\" name=\"f_search\" action=\"$url\">
-  <h1>$l_deal</h1>
+  <fieldset class=\"detail extra\">
+  <legend>$l_deal</legend>
+  </fieldset>
     <label>$l_label_start<br />
       <input name=\"tf_label\" size=\"16\" maxlength=\"128\" value=\"$label\" />
     </label>
@@ -476,7 +478,9 @@ function html_deal_parentdeal_search_form($deal, $pmanager_q) {
   $block = "
   <form method=\"get\" class=\"search\" name=\"form_search_parentdeal\"
     action=\"" . url_prepare("deal_index.php") . "\">
-  <h1>$l_parentdeal</h1>
+  <fieldset class=\"detail extra\">
+  <legend>$l_parentdeal</legend>
+  </fieldset>
     <label>$l_label_start<br />
       <input type=\"text\" name=\"tf_plabel\" size=\"20\" value=\"$plabel\" />
     </label>

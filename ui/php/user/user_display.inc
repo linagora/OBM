@@ -587,12 +587,12 @@ function html_user_consult($obm_q) {
     <div class=\"detail infos\">
     <h1>$l_group_member</h1>
     <table>
-    <tr>";
+    <tr><td>";
     while ($g_q->next_record()) {
       $grp_id = $g_q->f("group_id");
       $grp_name = $g_q->f("group_name");
       $dis_group .= "
-    </tr><tr>
+    </td></tr><tr>
       <th>$l_group</th>
       <td><a href=\"$path/group/group_index.php?action=detailconsult&amp;group_id=$grp_id\">$grp_name</a></td>";
     }
@@ -709,7 +709,7 @@ function html_user_group_consult($usr_q) {
   $block = "
   <form method=\"post\" name=\"f_entity\" action=\"" . url_prepare("user_index.php") . "\">
   <fieldset class=\"detail extra\">
-  <h1>$l_user $login ($lname $fname) $l_group_member</h1>
+  <legend>$l_user $login ($lname $fname) $l_group_member</legend>
   <table>
   $dis_group
   </table>

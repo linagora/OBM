@@ -278,19 +278,14 @@ function html_payment_search_list($obm_q, $prefs, $params) {
     $dis_p->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     $dis_p->data_form_end = "
-      <p class=\"detailButton\">
-        <p class=\"detailButtons\">
+      <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_add\" />
         <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-        </p>
-      </p>
+      </div>
       </form>";
 
-    $display_popup_end = "
-      <p>
-      <a href=\"\" onclick='window.close();'>$l_close</a>
-      </p>";
+    $display_popup_end = "<a href=\"\" onclick='window.close();'>$l_close</a>";
   }
   $dis_p->data_set = $obm_q;
   $dis_p->data_url = $url;
@@ -453,13 +448,7 @@ function html_payment_consult($p_q, $invs) {
  
 <div class=\"detail extra\">
 <h1>$l_comment</h1>
-
- <table>
-    <tr>
-      <th>$l_comment</th>
-      <td>$comment</td>
-    </tr>
-    </table>
+      $comment
   $block_invoice
   </div>
 ";
@@ -506,15 +495,17 @@ function html_payment_invoice($amounts, $params) {
   if (count($invs) > 0) {
     $l_invoice_title = $l_invoice;
     $block_invoice = "
-<table class=\"resultTable\">
+<table class=\"spreadSheet\">
+<thead>
 <tr>
-  <td class=\"resultHead\">$l_date</td>
-  <td class=\"resultHead\">$l_company</td>
-  <td class=\"resultHead\">$l_label</td>
-  <td class=\"resultHead\">$l_amount</td>
-  <td class=\"resultHead\">$l_already_paid</td>
-  <td class=\"resultHead\">$l_payment : $l_amount</td>
-</tr>";
+  <th>$l_date</th>
+  <th>$l_company</th>
+  <th>$l_label</th>
+  <th>$l_amount</th>
+  <th>$l_already_paid</th>
+  <th>$l_payment : $l_amount</th>
+</tr>
+</thead>";
     $affected_amount_total = 0;
     foreach ($invs as $one_inv) {
       $i_id = $one_inv["id"];
@@ -567,12 +558,12 @@ function html_payment_invoice($amounts, $params) {
     $l_invoice_title = $l_no_invoice;
   }
 
-  $display["title"] = "<div class=\"title\">$l_payment : $date $c_name $paid</div>";
+  $display["title"] = "<h1 class=\"title\">$l_payment : $date $c_name $paid</h1>";
 
   $block = "
-<div class=\"detailHead\">$title</div>
+<legend>$title</legend>
 
-  <div class=\"detailHead\">$l_invoice_title</div>
+<legend>$l_invoice_title</legend>
   $dis_invoice
 ";
 
@@ -771,7 +762,6 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
 
 <fieldset class=\"detail extra\"> 
     <legend>$l_comment</legend>
-    $l_comment
     <textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
 </fieldset>
 
