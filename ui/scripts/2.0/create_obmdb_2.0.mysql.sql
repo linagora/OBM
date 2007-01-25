@@ -90,7 +90,6 @@ CREATE TABLE UserObm (
   userobm_uid                 int(8),
   userobm_gid                 int(8),
   userobm_datebegin           date,
-  userobm_archive             char(1) not null default '0',
   userobm_lastname            varchar(32) default '',
   userobm_firstname           varchar(48) default '',
   userobm_phone               varchar(32) DEFAULT '',
@@ -117,7 +116,7 @@ CREATE TABLE UserObm (
   userobm_samba_home_drive    char(2) default '',
   userobm_samba_logon_script  varchar(128) default '',
   userobm_host_id             int(8) default 0,
-  userobm_archive             int(1) default 0,
+  userobm_archive             int(1) not null default 0,
   userobm_description         varchar(255),
   userobm_location            varchar(255),
   userobm_education           varchar(255),
@@ -1524,7 +1523,6 @@ CREATE TABLE ProjectCV (
 
 CREATE TABLE DefaultOdtTemplate (
   defaultodttemplate_id           int(8) auto_increment,
-  defaultodttemplate_id           int(8) default 0,
   defaultodttemplate_entity       varchar(32),
   defaultodttemplate_document_id  int(8) NOT NULL,
   defaultodttemplate_label        varchar(64) DEFAULT '',
@@ -1699,4 +1697,4 @@ CREATE TABLE P_Ldap like Ldap;
 CREATE TABLE P_Mail like Mail;
 CREATE TABLE P_MailShareDir like MailShareDir;
 CREATE TABLE P_EntityRight like EntityRight;
-CREATE TABLE P_Network like Network;
+-- CREATE TABLE P_Network like Network;
