@@ -57,8 +57,8 @@ function html_domain_search_form($domain) {
       value=\"$label\" />
     </label>
     <label>&nbsp;<br />
-      <input name=\"action\" type=\"hidden\" value=\"search\">
-      <input name=\"submit\" type=\"submit\" value=\"$l_find\">
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
     </label>
     <p class=\"CL\" />
   </form>";
