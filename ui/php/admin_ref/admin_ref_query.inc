@@ -18,10 +18,10 @@ function run_query_admin_ref_country_insert($ctry) {
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
-  $name = $ctry["name"];
-  $iso = $ctry["iso"];
-  $lang = $ctry["lang"];
-  $phone = $ctry["phone"];
+  $name = $ctry["ctry_name"];
+  $iso = $ctry["ctry_code"];
+  $lang = $ctry["ctry_lang"];
+  $phone = $ctry["ctry_phone"];
 
   $query = "insert into Country (
       country_timecreate,
@@ -56,10 +56,10 @@ function run_query_admin_ref_country_update($ctry) {
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-  $name = $ctry["name"];
-  $iso = $ctry["iso"];
-  $lang = $ctry["lang"];
-  $phone = $ctry["phone"];
+  $name = $ctry["ctry_name"];
+  $iso = $ctry["ctry_code"];
+  $lang = $ctry["ctry_lang"];
+  $phone = $ctry["ctry_phone"];
   $old_iso = $ctry["old_iso"];
   $old_lang = $ctry["old_lang"];
 
@@ -90,8 +90,8 @@ function run_query_admin_ref_country_update($ctry) {
 function run_query_admin_ref_country_delete($ctry) {
   global $cdg_sql;
 
-  $iso = $ctry["iso"];
-  $lang = $ctry["lang"];
+  $iso = $ctry["ctry_code"];
+  $lang = $ctry["ctry_lang"];
 
   $query = "delete from Country
     where country_iso3166='$iso'

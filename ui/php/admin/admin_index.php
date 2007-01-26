@@ -41,7 +41,7 @@ switch ($mode) {
    $perm->check_permissions($module, $action);
    $display["head"] = display_head($module);
    $display["header"] = display_menu($module);
-   echo $display["head"] . $display["header"];
+   echo $display["head"] . $display["header"] . $display["action"];
    break;
 }
 

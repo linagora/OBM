@@ -28,169 +28,97 @@ function dis_admin_ref_country_index() {
 function html_admin_ref_country_form($ctry_q) {
   global $l_ctry_manage, $l_ctry_exist, $l_ctry_no;
   global $l_ctry_checkdelete, $l_ctry_update, $l_ctry_new, $l_ctry_insert;
-  global $l_name, $l_lang, $l_iso_3166, $l_phone;
+  global $l_name, $l_lang, $l_iso_3166, $l_phone,$ico_ok,$ico_delete,$l_c_new;
 
-  if ($ctry_q->num_rows() > 0) {
-
-    // Country select construction
-    $sel_ctry = "<select name=\"sel_country\" onChange=\"
-      mytext = this.options[this.selectedIndex].text;
-
-      // Get Iso
-      pos = mytext.indexOf('-');
-      iso = mytext.substr(0, pos);
-
-      // Get Lang
-      mytext = mytext.substr(pos+1);
-      pos = mytext.indexOf('-');
-      lang = mytext.substr(0,pos);
-
-      // Get name
-      mytext = mytext.substr(pos+1);
-      pos = mytext.indexOf('(');
-      myname = mytext.substr(0,pos-1);
-
-      // Get phone
-      mytext = mytext.substr(pos+1);
-      pos = mytext.indexOf(')');
-      phone = mytext.substr(0,pos);
-
-      forms.form_ctry_update.tf_name.value=myname;
-      forms.form_ctry_update.tf_iso.value=iso;
-      forms.form_ctry_update.tf_lang.value=lang;
-      forms.form_ctry_update.tf_phone.value=phone;
-      forms.form_ctry_update.hd_old_iso.value=iso;
-      forms.form_ctry_update.hd_old_lang.value=lang;\"
-      size=\"20\">";
-    while ($ctry_q->next_record()) {
+  $char_title = '=';
+  $key = 0;
+  while ($ctry_q->next_record()) {
       $iso = $ctry_q->f("country_iso3166");
       $lang = $ctry_q->f("country_lang");
       $name = $ctry_q->f("country_name");
       $phone = $ctry_q->f("country_phone");
-      $sel_ctry .= "\n<option value=\"$iso-$lang\">$iso-$lang-$name ($phone)</option>";
-    }
-    $sel_ctry .= "</select>";
-
-    $dis_update_delete = "
-<!-- Country Check Delete Section -->
-
-    <table>
-    <tr>
-      <td colspan=\"3\">
-      <form name=\"form_ctry_delete\" method=\"post\"
-        action=\"" . url_prepare("admin_ref_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_ctry_exist</td>
-        <td class=\"adminLabel\">$sel_ctry</td>
-        <td>
-          <input type=\"hidden\" name=\"action\" value=\"country_checklink\" />
-          <input type=\"submit\" name=\"sub_ctry\" value=\"$l_ctry_checkdelete\"
-            onclick=\"if (check_admin_ref_ctry_checkdel(this.form.sel_country)) return true;
-            else return false;\" />
-        </td>
-      </tr>
-      </table>
-      </form>
-      </td>
-    </tr>
-
-<!-- Country Update Section -->
-
-    <tr>
-      <td colspan=\"2\">
-        <form name=\"form_ctry_update\" method=\"get\"
-          action=\"" . url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"hd_old_iso\" value=\"\" />
-        <input type=\"hidden\" name=\"hd_old_lang\" value=\"\" />
-        <input type=\"hidden\" name=\"action\" value=\"country_update\" />
-
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_name : </td>
-          <td><input type=\"text\" name=\"tf_name\" maxlength=\"64\" /></td>
-          <td rowspan=\"4\">
-          <input type=\"submit\" name=\"sub_ctry\" value=\"$l_ctry_update\"
-            onclick=\"if (check_admin_ref_ctry_upd(this.form,document.form_ctry_delete.sel_country)) return true; else return false;\" />
-          </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_iso_3166 : </td>
-          <td>
-            <input type=\"text\" name=\"tf_iso\" size=\"2\" maxlength=\"2\" />
-	  </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_lang : </td>
-          <td>
-            <input type=\"text\" name=\"tf_lang\" size=\"2\" maxlength=\"2\" />
-          </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_phone : </td>
-          <td>
-            <input type=\"text\" name=\"tf_phone\" size=\"5\" maxlength=\"5\" />
-          </td>
-        </tr>
-        </table>
-
-        </form>
-      </td>
-      <td>&nbsp;</td>
-    </tr>
-    </table>";
     
-  } else {
-    $dis_update_delete = $l_ctry_no;
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
+    }
+    $c_label = htmlentities($one_cat["label"]);
+    $ctry_list .= "
+    <tr $class>
+    <td>
+    <a href=\"?action=country_checklink&amp;category=country\">
+    <img src=\"$ico_delete\" alt=\"$l_ctry_checkdelete\" title=\"$l_ctry_checkdelete\" />
+    </a></td>
+    <td> <input type=\"text\" id=\"tf_ctry_code_$id\" value=\"$iso\" size=\"3\" /></td>
+    <td> <input type=\"text\" id=\"tf_ctry_lang_$id\" value=\"$lang\" size=\"3\" /></td>
+    <td> <input type=\"text\" id=\"tf_ctry_name_$id\" value=\"$name\" size=\"12\" /></td>
+    <td> <input type=\"text\" id=\"tf_ctry_phone_$id\" value=\"$phone\" size=\"6\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'country');\">
+    <img src=\"$ico_ok\" alt=\"$l_ctry_update\" title=\"$l_ctry_update\" />
+    </a>
+    </td>
+    </tr>";
   }
 
   // --- HTML Template --------------------------------------------------------
-
   $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">$l_ctry_manage</td>
-    </tr>
-    <tr>
-      <td>
-      $dis_update_delete
-
-      </td>
-      <td>
-
-<!-- New Country Section -->
-
-        <form name=\"form_ctry_new\" method=\"get\"
-          action=\"" . url_prepare("admin_ref_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_ctry_new :
-            <input name=\"tf_name\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_iso_3166 : </td>
-          <td><input type=\"text\" name=\"tf_iso\" size=\"2\" maxlength=\"2\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_lang : </td>
-          <td><input type=\"text\" name=\"tf_lang\" size=\"2\" maxlength=\"2\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_phone : </td>
-          <td><input type=\"text\" name=\"tf_phone\" size=\"5\" maxlength=\"5\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"country_insert\" />
-            <input type=\"submit\" name=\"sub_ctry\" value=\"$l_ctry_insert\"
-              onclick=\"if (check_admin_ref_ctry_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>";
+  <div class=\"detail admin\" >
+  <form id=\"form_country_update\" action=\"?action=country_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_ctry_name\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_ctry_code\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_ctry_lang\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_ctry_phone\" value=\"\" />
+  </form>    
+  <h1>$l_ctry_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_iso_3166</td>
+  <td>$l_lang</td>
+  <td>$l_name</td>
+  <td>$l_phone</td>
+  <td>&nbsp;</td>
+  </tr>    
+  </thead>
+  <tbody>
+  $ctry_list
+  </tbody>
+  </table>
+  </div>    
+  <form id=\"form_country_new\" action=\"\" method=\"post\" onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"4\">$l_c_new</td>
+  </tr>
+  <tbody>   
+  <tr>
+  <td>$l_iso_3166</td>    
+  <td>$l_lang</td>
+  <td>$l_name</td>    
+  <td>$l_phone</td>    
+  </tr>       
+  <tr>
+  <td><input type=\"text\" name=\"tf_ctry_code\" value=\"\" size=\"3\" /></td>
+  <td><input type=\"text\" name=\"tf_ctry_lang\" value=\"\" size=\"3\" /></td>
+  <td><input type=\"text\" name=\"tf_ctry_name\" value=\"\" size=\"12\" /></td>    
+  <td><input type=\"text\" name=\"tf_ctry_phone\" value=\"\" size=\"6\" /></td>    
+  </tr>  
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"4\"><input type=\"submit\" value=\"$l_ctry_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"country_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"country\" />
+  </form>
+  </div>";
 
   return $block;
 }
@@ -207,8 +135,8 @@ function dis_admin_ref_country_links($ref) {
   global $l_ctry_delete, $l_ctry_can_delete, $l_ctry_cant_delete;
 
   $delete_ok = true;
-  $iso = $ref["iso"];
-  $lang = $ref["lang"];
+  $iso = $ref["ctry_code"];
+  $lang = $ref["ctry_lang"];
   $name = get_admin_ref_country_name($iso, $lang);
 
   // Company Links
