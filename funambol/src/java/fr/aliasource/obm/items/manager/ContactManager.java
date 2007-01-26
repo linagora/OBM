@@ -79,19 +79,6 @@ public class ContactManager extends ObmManager {
 		keys = extractKeys(updatedRest);
 		
 		return keys;
-		
-		/*
-		try {
-			keys = binding.getAllKeys(token, book);
-		} catch (AuthFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
-			throw new OBMException(e.getMessage());
-		}
-		
-		return keys;*/
 	}	
 	
 	public String getBook() {
@@ -112,17 +99,7 @@ public class ContactManager extends ObmManager {
 		Calendar d = Calendar.getInstance();
 		d.setTime(since);
 		String[] keys = null;
-		/*
-		try {
-			keys = binding.getNewKeys(token,book,d);
-		} catch (AuthFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
-			throw new OBMException(e.getMessage());
-		}*/
-		
+	
 		return keys;
 	}
 
@@ -140,18 +117,6 @@ public class ContactManager extends ObmManager {
 		keys = Helper.listToTab(deletedRest);
 		
 		return keys;
-		/*
-		try {
-			keys = binding.getDeletedKeys(token,book,d);
-		} catch (AuthFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
-			throw new OBMException(e.getMessage());
-		}
-		
-		return keys;*/
 	}
 
 	public String[] getUpdatedItemKeys(Timestamp since) throws OBMException {
@@ -168,18 +133,6 @@ public class ContactManager extends ObmManager {
 		keys = extractKeys(updatedRest);
 		
 		return keys;
-		/*
-		try {
-			keys = binding.getUpdatedKeys(token,book,d);
-		} catch (AuthFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
-			throw new OBMException(e.getMessage());
-		}
-		
-		return keys;*/
 	}
 
 	public com.funambol.foundation.pdi.contact.Contact getItemFromId(String key, String type) 
@@ -314,8 +267,8 @@ public class ContactManager extends ObmManager {
 		for (int i=0 ; i < updated.length ; i++) {
 			owner = Helper.nullToEmptyString(updated[i].getOwner());
 			if ( ( ((restrictions & Helper.RESTRICT_PRIVATE) == Helper.RESTRICT_PRIVATE)
-				    && (updated[i].getClassification() == 1 && !owner.equals(user)) )
-			  || ( ((restrictions & Helper.RESTRICT_OWNER) == Helper.RESTRICT_OWNER)
+				    && (updated[i].getClassification().intValue() == 1 && !owner.equals(user)) )
+			  || ( ((restrictions & Helper.RESTRICT_OWNER  ) == Helper.RESTRICT_OWNER)
 					&& (!owner.equals(user)) ) )
 			{
 				if (d != null) {
@@ -371,7 +324,7 @@ public class ContactManager extends ObmManager {
     	if (type.equals(ObmSyncSource.MSG_TYPE_VCARD)) {
     		ContactHelper.setFoundationPhone(
     				contact.getPersonalDetail(),
-    	   			obmcontact.getHomePhone(), ContactHelper.OTHER_PHONE );
+    	   			obmcontact.getHomePhone(), ContactHelper.HOME_PHONE );//OTHER_PHONE );
     	} else {
     		ContactHelper.setFoundationPhone(
     				contact.getPersonalDetail(),
@@ -387,7 +340,7 @@ public class ContactManager extends ObmManager {
     	
     	
     	//Classification  	
-    	if (obmcontact.getClassification() == 1 ) {
+    	if (obmcontact.getClassification().intValue() == 1 ) {
     		contact.setSensitivity(new Short((short)2) ); //olPrivate
     	} else {
     		contact.setSensitivity(new Short((short)0) ); //olNormal
@@ -457,7 +410,7 @@ public class ContactManager extends ObmManager {
     	   	contact.setHomePhone(
 	    			ContactHelper.nullToEmptyString(
 	    					ContactHelper.getPhone(
-	    							foundation.getPersonalDetail().getPhones(),ContactHelper.OTHER_PHONE)) );
+	    							foundation.getPersonalDetail().getPhones(),ContactHelper.HOME_PHONE)) );//OTHER_PHONE)) );
     	} else {
 	    	contact.setHomePhone(
 	    			ContactHelper.nullToEmptyString(
@@ -478,9 +431,9 @@ public class ContactManager extends ObmManager {
     	//private
     	if ( Helper.nullToZero(
     			foundation.getSensitivity() ).shortValue() == 2 ) {
-    		contact.setClassification(1); //private
+    		contact.setClassification(new Integer(1)); //private
     	} else {
-    		contact.setClassification(0); 
+    		contact.setClassification(new Integer(0)); 
     	}
     	
     	return contact;

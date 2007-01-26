@@ -112,19 +112,6 @@ public class CalendarManager extends ObmManager {
 		keys = extractKeys(updatedRest);
 		
 		return keys;
-		
-		/*
-		try {
-			keys = binding.getAllKeys(token, calendar);
-		} catch (AuthFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
-			throw new OBMException(e.getMessage());
-		}
-		
-		return keys;*/
 	}
 	
 	
@@ -136,17 +123,6 @@ public class CalendarManager extends ObmManager {
 		String[] keys = null;
 		
 		return keys;
-		/*try {
-			keys = binding.getNewKeys(token,calendar,d);
-		} catch (AuthFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
-			throw new OBMException(e.getMessage());
-		}
-		
-		return keys;*/
 	}
 
 	public String[] getDeletedItemKeys(Timestamp since) throws OBMException {
@@ -163,18 +139,6 @@ public class CalendarManager extends ObmManager {
 		keys = Helper.listToTab(deletedRest);
 		
 		return keys;
-		/*
-		try {
-			keys = binding.getDeletedKeys(token,calendar,d);
-		} catch (AuthFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
-			throw new OBMException(e.getMessage());
-		}
-		
-		return keys;*/
 	}
 
 	public String[] getRefusedItemKeys(Timestamp since) throws OBMException {
@@ -211,18 +175,6 @@ public class CalendarManager extends ObmManager {
 		keys = extractKeys(updatedRest);
 		
 		return keys;
-		/*
-		try {
-			keys = binding.getUpdatedKeys(token,calendar,d);
-		} catch (AuthFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
-			throw new OBMException(e.getMessage());
-		}
-		
-		return keys;*/
 	}
 
 	public com.funambol.foundation.pdi.event.Calendar getItemFromId(String key, String type) 
