@@ -99,7 +99,8 @@ $ico_periodic       = "$theme_path/ico_calendar_repeat.gif";
 $ico_popup_close    = "$theme_path/ico_popup_close.gif";
 $popup_queue        = "$theme_path/popup_queue.gif";
 
-
+// Company Icons
+$ico_clipboard      = "$theme_path/ico_clipboard.gif";
 
 
 // Project Icons

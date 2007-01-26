@@ -461,7 +461,7 @@ function html_incident_consult($inc_q) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_links($inc_q) {
-  global $set_theme, $ico_document, $ico_document_new;
+  global $set_theme, $ico_document, $ico_add;
   global $l_new, $l_incident, $l_module_document, $l_document_add;
   global $path, $auth, $cgp_show, $popup_height, $popup_width;
 
@@ -480,11 +480,11 @@ function html_incident_links($inc_q) {
   <ul>
     <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"$ico_document_new\" /></a>
+	 \"><img src=\"$ico_add\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_incident'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul></div>";

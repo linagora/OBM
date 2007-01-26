@@ -596,12 +596,12 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_links($deal_q) {
-  global $set_theme, $ico_pdeal, $ico_deal, $ico_contract;
-  global $ico_contract_new, $ico_invoice, $ico_invoice_new, $ico_project;
+  global $ico_pdeal, $ico_deal, $ico_contract;
+  global $ico_add, $ico_invoice, $ico_project;
   global $l_new, $l_parentdeal, $l_affect_deal, $l_module_contract;
   global $l_module_project, $l_module_invoice;
   global $l_module_document,$ico_document, $l_deal;
-  global $l_document_add, $ico_document_new;
+  global $l_document_add;
   global $path, $auth, $cgp_show, $popup_height,$popup_width;
 
   $id = $deal_q->f("deal_id");
@@ -643,7 +643,7 @@ function html_deal_links($deal_q) {
     if ($hitrate == "100") {
       $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;deal_id=$id&amp;deal_label=$label&amp;company_id=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
       $dis_ico_project .= "
-        <li><a href=\"$url_pro_new\"><img src=\"$ico_project\" alt=\"\" /></a>
+        <li><a href=\"$url_pro_new\"><img src=\"$ico_add\" alt=\"\" /></a>
             <a href=\"$url_pro_new\">$l_new</a></li>";
     }
     
@@ -670,7 +670,7 @@ function html_deal_links($deal_q) {
     if ($hitrate == "100") {
       $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;deal_id=$id&amp;company_id=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
       $dis_contract .= "
-      <li><a href=\"$url_contract_new\"><img src=\"$ico_contract\" alt=\"\" /></a>
+      <li><a href=\"$url_contract_new\"><img src=\"$ico_add\" alt=\"\" /></a>
         <a href=\"$url_contract_new\">$l_new</a></li>";
     }
     $block_contract = "
@@ -695,7 +695,7 @@ function html_deal_links($deal_q) {
     if ($hitrate == "100") {
       $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;deal_id=$id&amp;deal_label=$ulabel&amp;company_id=$cid&amp;company_name=$uname");
       $dis_invoice .= "
-    <li><a href=\"$url_inv_new\"><img src=\"$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv_new\"><img src=\"$ico_add\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>";
     }
     $block_invoice = "
@@ -716,11 +716,11 @@ function html_deal_links($deal_q) {
   <ul>
     <li><a href=\"$url_doc\"><img src=\"$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" alt=\"\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"$ico_document_new\" alt=\"\" /></a>
+	 \"><img src=\"$ico_add\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_deal'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>";

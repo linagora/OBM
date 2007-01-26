@@ -213,7 +213,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <h1>$l_selection</h1>
     <div>
     <form action=\"\" onsubmit=\"return false;\">
-    <fieldset class=\"detail extra\"
+    <fieldset class=\"detail extra\">
     <legend>$l_group_members</legend>
     <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
     $sel_group

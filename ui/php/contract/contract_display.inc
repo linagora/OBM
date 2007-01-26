@@ -396,7 +396,7 @@ function html_contract_search_list($contract_q, $prefs, $contract, $popup) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last) {
-  global $set_theme, $ico_incident, $ico_deal, $ico_document,$ico_document_new;
+  global $set_theme, $ico_incident, $ico_deal, $ico_document,$ico_add;
   global $l_module_incident, $l_incident_list, $l_incident_new, $l_last;
   global $l_module_deal, $l_module_document, $l_contract;
   global $l_document_new,$l_document_add,$l_add_document,$l_deal;
@@ -440,11 +440,11 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   <ul>
     <li><a href=\"$url_doc\"><img src=\"$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" alt=\"\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"$ico_document_new\" alt=\"\" /></a>
+	 \"><img src=\"$ico_add\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_contract'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>
@@ -461,7 +461,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   </li>
     $dis_last
   <li>
-    <a href=\"$url_inc_new\"><img src=\"$ico_incident\" /></a>
+    <a href=\"$url_inc_new\"><img src=\"$ico_add\" alt=\"[Alt]\" /></a>
     <a href=\"$url_inc_new\">$l_incident_new</a></li>
   </ul>
   </div>

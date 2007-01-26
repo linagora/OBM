@@ -1050,8 +1050,8 @@ function html_contact_view_main($co_q) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_links($id) {
-  global $set_theme, $ico_document, $ico_document_new, $ico_deal,$ico_contract;
-  global $ico_list, $ico_publication,$ico_publication_new;
+  global $set_theme, $ico_document, $ico_add, $ico_deal,$ico_contract;
+  global $ico_list, $ico_publication;
   global $l_module_document, $l_contact;
   global $l_module_deal, $l_module_list, $l_module_contract;
   global $l_document_new,$l_document_add;
@@ -1120,11 +1120,11 @@ function html_contact_links($id) {
   <ul>
     <li><a href=\"$url_doc\"><img src=\"$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" alt=\"\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"$ico_document_new\" alt=\"\" /></a>
+	 \"><img src=\"$ico_add\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>
@@ -1143,7 +1143,7 @@ function html_contact_links($id) {
   <ul>
     <li><a href=\"$url_subscription\"><img src=\"$ico_publication\" alt=\"\" /></a>
         <a href=\"$url_subscription\">$l_subscription_list ($nb_subscription)</a></li>
-    <li><a href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"$ico_publication_new\" alt=\"\" /></a>
+    <li><a href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"$ico_add\" alt=\"\" /></a>
 	<a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> $l_subscription_new</a></li>
   </ul>
   </div>";

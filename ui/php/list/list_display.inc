@@ -587,7 +587,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
 
   // If expert mode, we display the query (empty or manual)
   if ($mode == $clist_mode_expert) {
-    $d_query = nl2br($query);
+    $d_query = "<div class=\"O\" style=\"max-height:8em;_height:8em;\" >".nl2br($query)."</div>";
     $dis_query = "<tr>
       <th>$l_query</th>
       <td>$d_query</td>
@@ -1151,7 +1151,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	    // Exclude fields that have no value (eg: category_tree)
 	    if ($input != "") {
 	      $structure[$line] .= "<td>$input</td>";
-	      $labels[$line] .= "<td>".$fields_label[$field]."</td>";
+	      $labels[$line] .= "<th>".$fields_label[$field]."</th>";
 	    }
 	  } else {
 	    // No value (no data), we display hidden input
@@ -1171,10 +1171,10 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
       }
     }
 
-    $del_cell = "<td><a href=\"javascript:void(0);\" onclick=\"del_row(this.parentNode.parentNode);return false;\">
-    <img src=\"$ico_crow\" alt=\"Delete\" /></a></td>";
-    $upd_cell = "<td><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
-    <img src=\"$ico_updated\" alt=\"Update\" /></a></td>"; 
+    $del_cell = "<th><a href=\"javascript:void(0);\" onclick=\"del_row(this.parentNode.parentNode);return false;\">
+    <img src=\"$ico_crow\" alt=\"Delete\" /></a></th>";
+    $upd_cell = "<th><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
+    <img src=\"$ico_updated\" alt=\"Update\" /></a></th>"; 
 
     if (is_array($structure)) {
       foreach($structure as $key=>$line) {
@@ -1192,14 +1192,14 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	  $not = "";
 	}
 	$logical_criterion;      
-	$dis_no_boolean = "<select name=\"sel_log_not[]\">
+	$dis_no_boolean = "<th><select name=\"sel_log_not[]\">
         <option value=\"\" $empty >$l_empty</option>
         <option value=\"NOT\" $not>$l_not</option>
         <option value=\"Exclude\" $exclude>$l_exclude</option>
-      </select></td>";  
+      </select></th>";  
       
        $dis_criteria .="
-	<tr><th colspan=\"4\"></th>".$labels[$key]."</tr>";
+	<tr><th colspan=\"5\"></th>".$labels[$key]."</tr>";
 	if ($logical_criterion[$key] == "AND") {
 	  $and = "selected =\"true\"";
 	  $or = "";
@@ -1207,7 +1207,6 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	  $or = "selected =\"true\"";
 	  $and = "";
 	}	
-	$dis_head = "<thead><tr><th>test</th><th>test</th><th>test</th><th>test</th></tr></thead>";
 	$dis_logical = "<th><select name=\"sel_log_and[]\"><option value=\"OR\" $or>$l_or</option><option value=\"AND\" $and>$l_and</option></select>";
 	$dis_criteria .="<tr><td>".$hid_cell[$key]."</td>$del_cell $upd_cell $dis_logical $dis_no_boolean $line</tr>";      
       }

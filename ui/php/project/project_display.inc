@@ -32,7 +32,7 @@ $fieldnames["project_archive"] = $l_archive_first;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_project(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
+  global $path, $set_theme, $ico_mail, $ico_web;
   
   if ($fieldname == "project_name") {
     if ($OD->display_ext == "get_id") {
@@ -481,7 +481,7 @@ function html_project_planning($obm_q, $params) {
 //   $r : string with XHTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_links($p_q) {
-  global $set_theme, $ico_document, $ico_document_new, $ico_invoice;
+  global $set_theme, $ico_document, $ico_add, $ico_invoice;
   global $l_new, $l_module_invoice, $l_module_document;
   global $l_document_add, $l_project;
   global $path, $auth, $cgp_show, $popup_height, $popup_width;
@@ -508,11 +508,11 @@ function html_project_links($p_q) {
   <ul>
     <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"#\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"$ico_document_new\" /></a>
+	 \"><img src=\"$ico_add\" /></a>
 	<a href=\"#\" onclick=\"window.name='$l_project'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>
@@ -533,7 +533,7 @@ function html_project_links($p_q) {
     <li><a href=\"$url_inv\"><img src=\"$ico_invoice\" alt=\"\" /></a>
         $l_module_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
-    <li><a href=\"$url_inv_new\"><img src=\"$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv_new\"><img src=\"$ico_add\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>
   </ul>
   </div>";

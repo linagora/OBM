@@ -1139,8 +1139,8 @@ function display_record_info($obm_q) {
     $datasource = $obm_q->f("datasource_name");
     $privacy = ($obm_q->f("privacy") == 0 ? $l_public : $l_private);
     
-    $created = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_created\" alt=\"\" />$usercreate : $timecreate";
-    $updated = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"\" />$userupdate : $timeupdate";
+    $created = "<img src=\"$ico_created\" alt=\"\" />$usercreate : $timecreate";
+    $updated = "<img src=\"$ico_updated\" alt=\"\" />$userupdate : $timeupdate";
 
     if ($datasource != "") {
       $dis_dsrc = "<br />$datasource";
@@ -1148,10 +1148,11 @@ function display_record_info($obm_q) {
       $dis_dsrc = "";
     }
     
-    $block = "<div class=\"detailInfo\">$created<br />$updated<br />$privacy $dis_dsrc
+    $block = "<div class=\"portlet\"><h1>$privacy</h1>
+      <p>$created<br />
+      $updated<br /> 
+      $dis_dsrc</p>
   </div>";
-  } else {
-    $block = "<div class=\"detailInfo\">---</div>";
   }
 
   return $block;

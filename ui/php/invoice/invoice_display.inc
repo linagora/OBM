@@ -496,7 +496,7 @@ function html_invoice_consult($inv_q, $pays) {
 //   $r : string with XHTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_links($inv_q) {
-  global $set_theme, $ico_document, $ico_document_new, $ico_payment;
+  global $set_theme, $ico_document, $ico_add, $ico_payment;
   global $l_invoice, $l_new, $l_module_document, $l_module_payment;
   global $l_document_add;
   global $path, $auth, $cgp_show, $popup_height, $popup_width;
@@ -519,13 +519,13 @@ function html_invoice_links($inv_q) {
   <div class=\"portlet\" id=\"invoiceDocument\">
   <h1>$l_module_document</h1>
   <ul>
-    <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"$ico_document_new\" /></a>
+	 \"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_invoice'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>
@@ -543,7 +543,7 @@ function html_invoice_links($inv_q) {
   <ul>
     <li><a href=\"$url_inv\"><img src=\"$ico_payment\" alt=\"\" /></a>
         $l_module_payment ( <a href=\"$url_pay\">$nb_pay</a> )</li>
-    <li><a href=\"$url_pay_new\"><img src=\"$ico_payment\" alt=\"\" /></a>
+    <li><a href=\"$url_pay_new\"><img src=\"$ico_add\" alt=\"\" /></a>
         <a href=\"$url_pay_new\">$l_new</a></li>
   </ul>
   </div>";

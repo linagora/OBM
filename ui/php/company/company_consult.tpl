@@ -3,7 +3,7 @@
   <table>
     <tr>
       <th>$l_address 1
-        <a href="#" onclick="company_copy_clip($copy);return false;"  title="Copy" ><img alt="Copy" src="/images/$set_theme/$ico_clipboard" /></a>
+        <a href="#" onclick="company_copy_clip($copy);return false;"  title="Copy" ><img alt="Copy" src="$ico_clipboard" /></a>
         :</th>
       <td>$ad1</td>
     </tr>

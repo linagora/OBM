@@ -445,8 +445,8 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_links($co_q) {
-  global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
-  global $ico_document,$ico_document_new, $ico_project, $ico_contract, $ico_lead;
+  global $set_theme,$ico_contact;
+  global $ico_document,$ico_add, $ico_project, $ico_contract, $ico_lead;
   global $ico_invoice, $ico_payment;
   global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
   global $l_module_lead, $l_module_contract, $l_module_invoice;
@@ -474,7 +474,7 @@ function html_company_links($co_q) {
   <ul>
   <li><a href=\"$url_con_list\"><img src=\"$ico_contact\" /></a>
       <a href=\"$url_con_list\">$l_module_contact ($con_num)</a></li>
-  <li><a href=\"$url_con_new\"><img src=\"$ico_contact_new\" /></a>
+  <li><a href=\"$url_con_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
       <a href=\"$url_con_new\">$l_new</a></li>
       </ul>
 </div>";
@@ -493,7 +493,7 @@ function html_company_links($co_q) {
       $l_module_deal (
       <a href=\"$url_deal_list\">$deal_num</a> /
       <a href=\"$url_deal_total\">$deal_total</a> )</li>
-  <li><a href=\"$url_deal_new\"><img src=\"$ico_deal_new\" /></a>
+  <li><a href=\"$url_deal_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
       <a href=\"$url_deal_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -510,7 +510,7 @@ function html_company_links($co_q) {
 <ul>
   <li><a href=\"$url_lead_list\"><img src=\"$ico_lead\" /></a>
       $l_module_lead (<a href=\"$url_lead_list\">$nb_lead</a>)</li>
-  <li><a href=\"$url_lead_new\"><img src=\"$ico_lead\" /></a>
+  <li><a href=\"$url_lead_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
       <a href=\"$url_lead_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -528,7 +528,7 @@ function html_company_links($co_q) {
 <ul>
   <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
       <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-  <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" /></a>
+  <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
       <a href=\"$url_doc_new\">$l_new</a></li>
   <li><a href=\"\" 
        onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
@@ -553,7 +553,7 @@ function html_company_links($co_q) {
   <li><a href=\"$url_pro\"><img src=\"$ico_project\" /></a>
       $l_module_project ( <a href=\"$url_pro\">$nb_pro</a> /
       <a href=\"$url_pro_tot\">$nb_pro_total</a> )</li>
-  <li><a href=\"$url_pro_new\"><img src=\"$ico_project\" /></a>
+  <li><a href=\"$url_pro_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
       <a href=\"$url_pro_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -574,7 +574,7 @@ function html_company_links($co_q) {
   <li><a href=\"$url_ctra\"><img src=\"$ico_contract\" /></a>
       $l_module_contract ( <a href=\"$url_ctra\">$nb_ctra</a> /
       <a href=\"$url_ctra_total\">$nb_ctra_total</a> )</li>
-  <li><a href=\"$url_ctra_new\"><img src=\"$ico_contract\" /></a>
+  <li><a href=\"$url_ctra_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
       <a href=\"$url_ctra_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -594,7 +594,7 @@ function html_company_links($co_q) {
   <li><a href=\"$url_inv\"><img src=\"$ico_invoice\" alt=\"\" /></a>
       $l_module_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
       <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
-  <li><a href=\"$url_inv_new\"><img src=\"$ico_invoice\" alt=\"\" /></a>
+  <li><a href=\"$url_inv_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
       <a href=\"$url_inv_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -611,7 +611,7 @@ function html_company_links($co_q) {
 <ul>
   <li><a href=\"$url_inv\"><img src=\"$ico_payment\" alt=\"\" /></a>
       $l_module_payment ( <a href=\"$url_pay\">$nb_pay</a> )</li>
-  <li><a href=\"$url_pay_new\"><img src=\"$ico_payment\" alt=\"\" /></a>
+  <li><a href=\"$url_pay_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
       <a href=\"$url_pay_new\">$l_new</a></li>
 </ul>
 </div>";
@@ -806,7 +806,7 @@ function html_company_consult_address($co_q) {
   global $set_theme, $ico_contact, $ico_contact_new;
   global $l_name, $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment;
-  global $l_company, $l_coord;
+  global $l_company, $l_coord,$ico_mail,$ico_web;
   global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard,$cclipboard_address;
   
   $id = $co_q->f("company_id");
