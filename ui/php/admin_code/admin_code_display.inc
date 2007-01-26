@@ -173,7 +173,7 @@ function dis_admin_code_amp($mode) {
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<div class=\"detail extra\"><table class=\"spreadSheet\">";
+    echo "<div overflow:auto width=\"100%\"><table class=\"spreadSheet\">";
   }
   dis_admin_code_amp_directory($mode, $obm_root);
   if ($mode == "txt") {
@@ -183,8 +183,8 @@ $cpt_line lines parsed
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "</table></div>
-      <b>$cpt_line</b> lines parsed";
+    echo "<tr><th colspan=\"3\"><b>$cpt_line</b> lines parsed</th></tr></table></div>
+      ";
   }
 
   return true;
@@ -382,7 +382,6 @@ Line   --   File   --   #Use
 ";
   } else {
     echo "
-    <div overflow : auto>
     <table class=\"spreadSheet\">
     <thead>
     <tr>
@@ -401,7 +400,7 @@ Line   --   File   --   #Use
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "</table></div>";
+    echo "</table>";
   }
 
   return true;
