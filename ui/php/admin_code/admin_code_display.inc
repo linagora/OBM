@@ -173,7 +173,7 @@ function dis_admin_code_amp($mode) {
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<div overflow:auto width=\"100%\"><table class=\"spreadSheet\">";
+    echo "<div class=\"O\" style=\"width=100%;\"><table class=\"spreadSheet\">";
   }
   dis_admin_code_amp_directory($mode, $obm_root);
   if ($mode == "txt") {
