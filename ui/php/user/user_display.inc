@@ -368,157 +368,6 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display User Form
-// Parameters:
-//   - $usr_q     : user database result
-//   - $user      : default values or updated values (if error)
-//     kes used   : id, name, passwd, perms, email
-///////////////////////////////////////////////////////////////////////////////
-function html_user_form($usr_q, $user) {
-  global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_user, $l_email, $l_archive, $l_insert, $l_update;
-  global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_desc, $l_datebegin;
-  global $action, $profiles;
-  global $c_multidomain, $obm, $c_default_domain, $l_domain;
-  
-  // if update mode and first time value are taken from database
-  if ($action == "detailupdate") {
-    $id = $usr_q->f("userobm_id");
-    $login = $usr_q->f("userobm_login");
-    $passwd = "";
-    $perms = $usr_q->f("userobm_perms");
-    $lname = $usr_q->f("userobm_lastname");
-    $fname = $usr_q->f("userobm_firstname");
-    $phone = $usr_q->f("userobm_phone");
-    $phone2 = $usr_q->f("userobm_phone2");
-    $fax = $usr_q->f("userobm_fax");
-    $fax2 = $usr_q->f("userobm_fax2");
-    $email = $usr_q->f("userobm_email");
-    $desc = $usr_q->f("userobm_description");
-    $datebegin = $usr_q->f("userobm_datebegin");
-    $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
-  }
-
-  // If parameters have been given, they supercede the default action value
-  if (isset($user["user_id"])) { $id = $user["user_id"]; }
-  if (isset($user["login"])) { $login = $user["login"]; }
-  if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
-  if (isset($user["perms"])) { $perms = $user["perms"]; }
-  if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
-  if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
-  if (isset($user["phone"])) { $phone = $user["phone"]; }
-  if (isset($user["phone2"])) { $phone2 = $user["phone2"]; }
-  if (isset($user["fax"])) { $fax = $user["fax"]; }
-  if (isset($user["fax2"])) { $fax2 = $user["fax2"]; }
-  if (isset($user["email"])) { $email = $user["email"]; }
-  if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
-  if (isset($user["desc"])) { $desc = $user["desc"]; }
-  if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
-
-  // Domain
-  if ($c_multidomain && $obm["domain_id"] == $c_default_domain) {
-    $domain_list = get_global_domain_list();
-    $sel_domain = "<tr><th>$l_domain</th><td>
-      $domain_list </td></tr>";
-  }
-
-  // Profiles
-  foreach ($profiles as $profile => $one_profile) {
-    if ($perms == $profile) {
-      $selected = " selected";
-    } else {
-      $selected = "";
-    }
-    $block_pro .= "
-      <option value=\"$profile\"$selected> $profile</option>";
-  }
-
-  // Buttons
-  if (($action == "new") || ($action == "insert")) {
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-          <input type=\"submit\" value=\"$l_insert\" />";
-
-  } elseif (($action=="detailupdate") || ($action=="update")) {
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
-          <input type=\"hidden\" name=\"user_id\" value=\"$id\" />
-          <input type=\"submit\" value=\"$l_update\" />";
-  }
-
-  // --- HTML Template --------------------------------------------------------
-  $block = "
-    <form method=\"post\" name=\"f_entity\"
-      onsubmit=\"if (check_user(this)) return true; else return false;\"
-      action=\"" . url_prepare("user_index.php") . "\">
-
-<fieldset class=\"detail infos\">
-    <legend>$l_user</legend>
-
-    <table>
-    <tr>
-      <th>$l_login</th>
-      <td><input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" /></td>
-    </tr><tr>
-      <th>$l_password</th>
-      <td><input type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
-    </tr>$sel_domain<tr>
-      <th>$l_archive</th>
-      <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
-    </tr><tr>
-      <th>$l_user_perms</th>
-      <td><select name=\"sel_perms\">
-        $block_pro
-        </select>
-      </td>
-    </tr><tr>
-      <th>$l_lastname</th>
-      <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"32\" value=\"$lname\" /></td>
-    </tr><tr>
-      <th>$l_firstname</th>
-      <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
-    </tr><tr>
-      <th>$l_phone</th>
-      <td><input name=\"tf_phone\" size=\"20\" maxlength=\"20\" value=\"$phone\" /></td>
-    </tr><tr>
-      <th>$l_phone2</th>
-      <td><input name=\"tf_phone2\" size=\"20\" maxlength=\"20\" value=\"$phone2\" /></td>
-    </tr><tr>
-      <th>$l_fax</th>
-      <td><input name=\"tf_fax\" size=\"20\" maxlength=\"20\" value=\"$fax\" /></td>
-    </tr><tr>
-      <th>$l_fax2</th>
-      <td><input name=\"tf_fax2\" size=\"20\" maxlength=\"20\" value=\"$fax2\" /></td>
-    </tr><tr>
-      <th>$l_email</th>
-      <td><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
-    </tr><tr>
-      <th>$l_datebegin</th>
-      <td>
-      <input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/>
-    </tr><tr>
-    </table>
-    </fieldset>
-
-  
-   <fieldset class=\"detail infos\">
-    <legend>$l_desc</legend>
-     <table>
-     <tr>      
-      <th>$l_desc</th>
-      <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
-    </tr>
-    </table>
- </fieldset>
-
-    <fieldset class=\"buttons\">
-    $dis_button
-    </fieldset>
-    </form>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display User Consultation
 // Parameters:
 //   - $user : user database result
@@ -550,8 +399,9 @@ function dis_user_consult($user) {
 function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
   global $l_user, $l_lastaccess, $l_archive, $l_datebegin;
-  global $l_address1, $l_zipcode, $l_town, $l_direction, $l_service;
-  global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_email, $l_desc;
+  global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal;
+  global $l_direction, $l_service;
+  global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_email, $l_desc;
   global $l_group_member, $l_group, $l_local, $l_ext_id;
 
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
@@ -560,25 +410,71 @@ function html_user_consult($obm_q) {
   global $l_vacation, $l_vacation_message, $l_mail_server;
   global $l_enable, $l_disable, $l_consult_web_list;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
-
   global $path, $display, $c_yes, $c_no;
 
   $id = $obm_q->f("userobm_id");
+  $system = $obm_q->f("userobm_system");
   $login = $obm_q->f("userobm_login");
   $local = ($obm_q->f("userobm_local") == 1 ? $c_yes : $c_no);
   $ext_id = $obm_q->f("userobm_ext_id");
   $perms = $obm_q->f("userobm_perms");
   $lname = $obm_q->f("userobm_lastname");
   $fname = $obm_q->f("userobm_firstname");
+  $service = $obm_q->f("userobm_service");
+  $ad1 = $obm_q->f("userobm_address1");
+  $ad2 = $obm_q->f("userobm_address2");
+  $ad3 = $obm_q->f("userobm_address3");
+  $zip = $obm_q->f("userobm_zipcode");
+  $town = $obm_q->f("userobm_town");
+  $cdx = $obm_q->f("userobm_expresspostal");
+  $ctry_name = $obm_q->f("country_name");
   $phone = $obm_q->f("userobm_phone");
   $phone2 = $obm_q->f("userobm_phone2");
   $fax = $obm_q->f("userobm_fax");
   $fax2 = $obm_q->f("userobm_fax2");
-  $email = $obm_q->f("userobm_email");
   $desc = $obm_q->f("userobm_description");
   $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
   $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
+
+  $web_perms = $obm_q->f("userobm_web_perms");
+  $host_web_perms = $obm_q->f("host_web_perms");
+  $web_all = $obm_q->f("userobm_web_all");
+  $mail_perms = $obm_q->f("userobm_mail_perms");
+  $mail_ext_perms = $obm_q->f("userobm_mail_ext_perms");
+  $email = $obm_q->f("userobm_email");
+  $mail_server_id = $obm_q->f("userobm_mail_server_id");
+  $mail_quota = $obm_q->f("userobm_mail_quota");
+  $email_nomade = $obm_q->f("userobm_email_nomade");
+  $nomade_perms = $obm_q->f("userobm_nomade_perms");
+  $nomade_enable = $obm_q->f("userobm_nomade_enable");
+  $nomade_local_copy = $obm_q->f("userobm_nomade_local_copy");
+  $vacation_enable = $obm_q->f("userobm_vacation_enable");
+  $vacation_message = stripslashes($obm_q->f("userobm_vacation_message"));
+  $smb_perms = $obm_q->f("userobm_samba_perms");
+  $smb_home = $obm_q->f("userobm_samba_home");
+  $smb_home_drive = $obm_q->f("userobm_samba_home_drive");
+  $smb_logon = $obm_q->f("userobm_samba_logon_script");
+
+  $nomade_perms = ($nomade_perms ? $c_yes : $c_no);
+  $nomade_enable = ($nomade_enable ? $c_yes : $c_no);
+  $nomade_local_copy = ($nomade_localcopy ? $c_yes : $c_no);
+  $vacation_enable = ($vacation_enable ? $c_yes : $c_no);
+  $vacation_message = ($vacation_enable ? nl2br($vacation_message) : "---");
+
+  //  $mail = get_mail_info();
+  $main_domain = $mail["main_domain"];
+  if ($host_name == '') {
+    $dis_host = $l_empty;
+  } else {
+    $dis_host = "<a href=\"$path/host/host_index.php?action=detailconsult&amp;param_host=$host_id\">$host_name</a>";
+  }
+  if ($host_ip == '') $host_ip = $l_empty;
+  $web_state  = ($web_perms ? $l_enable : ($host_web_perms ? $l_host_enable : $l_disable));
+  $web_access = ($web_all ? $l_web_all : $l_web_list_only);
+  $mail_state  = ($mail_perms ? $l_enable : $l_disable);
+  $mail_ext_state  = ($mail_ext_perms ? $l_enable : $l_disable);
+  $smb_state  = ($smb_perms ? $l_enable : $l_disable);
 
   // Liste des groupes de l'utilisateur
   $g_q = run_query_user_user_group($id);
@@ -601,6 +497,146 @@ function html_user_consult($obm_q) {
     </table></div>";
   }
 
+  $cgp_use["service"]["web"] = true;
+  $cgp_use["service"]["mail"] = true;
+  $cgp_use["service"]["nomad"] = true;
+  $cgp_use["service"]["vacation"] = true;
+  $cgp_use["service"]["samba"] = true;
+
+
+  // Section Web
+  if ($cgp_use["service"]["web"]) {
+    // Affichage uniquement si acces web ET mode web_local
+    // sinon il n'y a pas generation de squid.conf donc pas d'ACL
+    if ($web_perms == 1 && $cgp_use["service"]["web_local"]) {
+      $dis_access = "
+      <tr>
+        <th>$l_web_mode</th>
+        <td>$web_access (<a href=\"$path/user/user_index.php?action=showlist&amp;param_user=$id\" >$l_consult_web_list</a>)</td>
+      </tr>";
+    }
+    $web_section = "
+    <div class=\"detail infos\">
+    <h1>$l_access</h1>
+
+    <table>
+    <tr>
+      <th>$l_web</th>
+      <td>$web_state</td>
+    </tr>
+    $dis_access
+    </table>
+    </div>";
+  }
+
+  // Section Mail
+  //if ($cgp_use["service"]["mail"] && !is_only_relaying_mails()) {
+  if ($cgp_use["service"]["mail"]) {
+    $mail_section = "
+    <div class=\"detail infos\">
+    <h1>$l_mail</h1>
+
+    <table>
+    <tr>
+      <th>$l_mail</th>
+      <td>$mail_state</td>
+    </tr>
+    <tr>
+      <th>$l_mail_ext</th>
+      <td>$mail_ext_state</td>
+    </tr>
+    <tr>
+      <th>$l_mail_server</th>
+      <td>";
+      if ($mail_server_id) {
+        $mail_section .= "<a href=\"../host/host_index.php?action=detailconsult&param_host=".$mail_server_id."\">".get_hostname_by_id($mail_server_id)."</a>";
+      } else {
+        $mail_section .= "-";
+      }
+      $mail_section .= "</td>
+    </tr>
+    <tr>
+      <th>$l_email</th>
+      <td>$email (@$main_domain)</td>
+    </tr>
+    <tr>
+      <th>$l_quota (Mo)</th>
+      <td>$mail_quota</td>
+    </tr>
+    </table>
+    </div>";
+  }
+
+  if ($cgp_use["service"]["mail_nomad"]) {
+    $nomad_section = "
+    <div class=\"detail infos\">
+    <h1>$l_nomade</h1>
+
+    <table>
+    <tr>
+      <th>$l_email_nomade</th>
+      <td>$email_nomade</td>
+    </tr>
+    <tr>
+      <th>$l_perms</th>
+      <td>$nomade_perms</td>
+    </tr>
+    <tr>
+      <th>$l_enable</th>
+      <td>$nomade_enable</td>
+    </tr>
+    <tr>
+      <th>$l_local_copy</th>
+      <td>$nomade_local_copy</td>
+    </tr>
+    </table>
+    </div>";
+  }
+
+  if ($cgp_use["service"]["vacation"]) {
+    $vacation_section = "
+    <div class=\"detail infos\">
+    <h1>$l_vacation</h1>
+
+    <table>
+    <tr>
+      <th>$l_enable</th>
+      <td>$vacation_enable</td>
+    </tr>
+    <tr>
+      <th>$l_vacation_message</th>
+      <td>$vacation_message</td>
+    </tr>
+    </table>
+    </div>";
+  }
+
+  if ($cgp_use["service"]["samba"]) {
+    $samba_section = "
+    <div class=\"detail infos\">
+    <h1>$l_smb</h1>
+
+    <table>
+    <tr>
+      <th>$l_smb_perms</th>
+      <td>$smb_state</td>
+    </tr>
+    <tr>
+      <th>$l_smb_home</th>
+      <td>$smb_home</td>
+    </tr>
+    <tr>
+      <th>$l_smb_home_drive</th>
+      <td>$smb_home_drive</td>
+    </tr>
+    <tr>
+      <th>$l_smb_logon</th>
+      <td>$smb_logon</td>
+    </tr>
+    </table>
+    </div>";
+  }
+
   $display["detailInfo"] = display_record_info($obm_q);
   $display["title"] = "<h1 class=\"title\">$l_user : $fname $lname</h1>";
 
@@ -608,63 +644,112 @@ function html_user_consult($obm_q) {
 <div class=\"detail infos\">
   <h1>$l_user</h1>
  
-    <table>
-    <tr>
-      <th>$l_archive</th>
-      <td>$archive</td>
-    </tr><tr>
-      <th>$l_login</th>
-      <td>$login</td>
-    </tr><tr>
-      <th>$l_local</th>
-      <td>$local</td>
-    </tr><tr>
-      <th>$l_ext_id</th>
-      <td>$ext_id</td>
-    </tr><tr>
-      <th>$l_user_perms</th>
-      <td>$perms</td>
-    </tr><tr>
-      <th>$l_lastname</th>
-      <td>$lname</td>
-    </tr><tr>
-      <th>$l_firstname</th>
-      <td>$fname</td>
-    </tr><tr>
-      <th>$l_phone</th>
-      <td>$phone</td>
-    </tr><tr>
-      <th>$l_phone2</th>
-      <td>$phone2</td>
-    </tr><tr>
-      <th>$l_fax</th>
-      <td>$fax</td>
-    </tr><tr>
-      <th>$l_fax2</th>
-      <td>$fax2</td>
-    </tr><tr>
-      <th>$l_email</th>
-      <td>$email</td>
-    </tr><tr>
-      <th>$l_datebegin</th>
-      <td>$datebegin</td>
-    </tr><tr>
-      <th>$l_lastaccess</th>
-      <td>$lastaccess</td>
-    </tr>
+  <table>
+  <tr>
+    <th>$l_archive</th>
+    <td>$archive</td>
+  </tr><tr>
+    <th>$l_login</th>
+    <td>$login</td>
+  </tr><tr>
+    <th>$l_local</th>
+    <td>$local</td>
+  </tr><tr>
+    <th>$l_ext_id</th>
+    <td>$ext_id</td>
+  </tr><tr>
+    <th>$l_user_perms</th>
+    <td>$perms</td>
+  </tr><tr>
+    <th>$l_lastname</th>
+    <td>$lname</td>
+  </tr><tr>
+    <th>$l_firstname</th>
+    <td>$fname</td>
+  </tr>
+  <tr>
+    <th>$l_email</th>
+    <td>$email</td>
+  </tr><tr>
+    <th>$l_datebegin</th>
+    <td>$datebegin</td>
+  </tr><tr>
+    <th>$l_lastaccess</th>
+    <td>$lastaccess</td>
+  </tr>
 </table>
 </div>
 
 <div class=\"detail infos\">
   <h1>$l_desc</h1>
   <table>
-   <tr>
-     <th>$l_desc</th>
-      <td>$desc</td>
-    </tr>
-    </table>
+  <tr>
+    <th>$l_desc</th>
+    <td>$desc</td>
+  </tr>
+  </table>
 </div>
-    $dis_group
+
+<div class=\"detail infos\">
+  <h1>$l_coord</h1>
+  <table>
+  <tr>
+    <th>$l_phone</th>
+    <td>$phone</td>
+  </tr>
+  <tr>
+    <th>$l_phone2</th>
+    <td>$phone2</td>
+  </tr>
+  <tr>
+    <th>$l_fax</th>
+    <td>$fax</td>
+  </tr>
+  <tr>
+    <th>$l_fax2</th>
+    <td>$fax2</td>
+  </tr>
+  <tr>
+    <th>$l_service</th>
+    <td>$service</td>
+  </tr>
+  <tr>
+    <th>$l_address 1</th>
+    <td>$ad1</td>
+  </tr>
+  <tr>
+    <th>$l_address 2</th>
+    <td>$ad2</td>
+  </tr>
+  <tr>
+    <th>$l_address 3</th>
+    <td>$ad3</td>
+  </tr>
+  <tr>
+    <th>$l_postcode</th>
+    <td>$zip</td>
+  </tr>
+  <tr>
+    <th>$l_town</th>
+    <td>$town</td>
+  </tr>
+  <tr>
+    <th>$l_expresspostal</th>
+    <td>$cdx</td>
+  </tr>
+  <tr>
+    <th>$l_country</th>
+    <td>$ctry_name</td>
+  </tr>
+  </table>
+</div>
+
+$web_section
+$mail_section
+$nomad_section
+$vacation_section
+$samba_section
+$dis_group
 ";
 
   return $block;
@@ -719,6 +804,224 @@ function html_user_group_consult($usr_q) {
   <input type=\"hidden\" name=\"user_id\" value=\"$id\" />
   <input type=\"hidden\" name=\"action\" value=\"group_update\" />
   <input type=\"submit\" value=\"$l_update_group\" />
+  </fieldset>
+  </form>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display User Form
+// Parameters:
+//   - $usr_q     : user database result
+//   - $user      : default values or updated values (if error)
+//     kes used   : id, name, passwd, perms, email
+///////////////////////////////////////////////////////////////////////////////
+function html_user_form($usr_q, $user) {
+  global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
+  global $l_user, $l_email, $l_archive, $l_insert, $l_update;
+  global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_desc, $l_datebegin;
+  global $l_coord, $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
+  global $action, $profiles;
+  global $c_multidomain, $obm, $c_default_domain, $l_domain;
+  
+  // if update mode and first time value are taken from database
+  if ($action == "detailupdate") {
+    $id = $usr_q->f("userobm_id");
+    $login = $usr_q->f("userobm_login");
+    $passwd = "";
+    $perms = $usr_q->f("userobm_perms");
+    $lname = $usr_q->f("userobm_lastname");
+    $fname = $usr_q->f("userobm_firstname");
+    $phone = $usr_q->f("userobm_phone");
+    $phone2 = $usr_q->f("userobm_phone2");
+    $fax = $usr_q->f("userobm_fax");
+    $fax2 = $usr_q->f("userobm_fax2");
+    $service = $usr_q->f("userobm_service");
+    $ad1 = $usr_q->f("userobm_address1");
+    $ad2 = $usr_q->f("userobm_address2");
+    $ad3 = $usr_q->f("userobm_address3");
+    $zip = $usr_q->f("userobm_zipcode");
+    $town = $usr_q->f("userobm_town");
+    $cdx = $usr_q->f("userobm_expresspostal");
+    $ctry_name = $usr_q->f("country_name");
+    $email = $usr_q->f("userobm_email");
+    $desc = $usr_q->f("userobm_description");
+    $datebegin = $usr_q->f("userobm_datebegin");
+    $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
+  }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($user["user_id"])) { $id = $user["user_id"]; }
+  if (isset($user["login"])) { $login = $user["login"]; }
+  if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
+  if (isset($user["perms"])) { $perms = $user["perms"]; }
+  if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
+  if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
+  if (isset($user["phone"])) { $phone = $user["phone"]; }
+  if (isset($user["phone2"])) { $phone2 = $user["phone2"]; }
+  if (isset($user["fax"])) { $fax = $user["fax"]; }
+  if (isset($user["fax2"])) { $fax2 = $user["fax2"]; }
+  if (isset($user["service"])) { $service = $user["service"]; }
+  if (isset($user["ad1"])) { $ad1 = $user["ad1"]; }
+  if (isset($user["ad2"])) { $ad2 = $user["ad2"]; }
+  if (isset($user["ad3"])) { $ad3 = $user["ad3"]; }
+  if (isset($user["zip"])) { $zip = $user["zip"]; }
+  if (isset($user["town"])) { $town = $user["town"]; }
+  if (isset($user["cdx"])) { $cdx = $user["cdx"]; }
+  if (isset($user["ctry"])) { $ctry = $user["country"]; }
+  if (isset($user["email"])) { $email = $user["email"]; }
+  if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
+  if (isset($user["desc"])) { $desc = $user["desc"]; }
+  if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
+
+  // Domain
+  if ($c_multidomain && $obm["domain_id"] == $c_default_domain) {
+    $domain_list = get_global_domain_list();
+    $sel_domain = "<tr><th>$l_domain</th>
+    <td>$domain_list </td></tr>";
+  }
+
+  // Profiles
+  foreach ($profiles as $profile => $one_profile) {
+    if ($perms == $profile) {
+      $selected = " selected";
+    } else {
+      $selected = "";
+    }
+    $block_pro .= "
+      <option value=\"$profile\"$selected> $profile</option>";
+  }
+
+  // Buttons
+  if (($action == "new") || ($action == "insert")) {
+    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"submit\" value=\"$l_insert\" />";
+
+  } elseif (($action=="detailupdate") || ($action=="update")) {
+    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
+      <input type=\"hidden\" name=\"user_id\" value=\"$id\" />
+      <input type=\"submit\" value=\"$l_update\" />";
+  }
+
+  // some constants
+  $csize_add = "48";
+  $cmax_add = "64";
+  $csize_phone = "24";
+
+  // --- HTML Template --------------------------------------------------------
+  $block = "
+  <form method=\"post\" name=\"f_entity\"
+    onsubmit=\"if (check_user(this)) return true; else return false;\"
+    action=\"" . url_prepare("user_index.php") . "\">
+
+  <fieldset class=\"detail infos\">
+  <legend>$l_user</legend>
+
+  <table>
+  <tr>
+    <th>$l_login</th>
+    <td><input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" /></td>
+  </tr>
+  <tr>
+    <th>$l_password</th>
+    <td><input type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
+  </tr>
+  $sel_domain
+  <tr>
+    <th>$l_archive</th>
+    <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
+  </tr>
+  <tr>
+    <th>$l_user_perms</th>
+    <td><select name=\"sel_perms\">
+      $block_pro
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <th>$l_lastname</th>
+    <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"32\" value=\"$lname\" /></td>
+  </tr>
+  <tr>
+    <th>$l_firstname</th>
+    <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
+  </tr>
+  <tr>
+    <th>$l_email</th>
+    <td><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
+  </tr>
+  <tr>
+    <th>$l_datebegin</th>
+    <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
+  </tr>
+  </table>
+  </fieldset>
+
+  
+  <fieldset class=\"detail infos\">
+  <legend>$l_coord</legend>
+  <table>
+  <tr>
+    <th>$l_phone</th>
+    <td><input name=\"tf_phone\" size=\"20\" maxlength=\"20\" value=\"$phone\" /></td>
+  </tr>
+  <tr>
+    <th>$l_phone2</th>
+    <td><input name=\"tf_phone2\" size=\"20\" maxlength=\"20\" value=\"$phone2\" /></td>
+  </tr>
+  <tr>
+    <th>$l_fax</th>
+    <td><input name=\"tf_fax\" size=\"20\" maxlength=\"20\" value=\"$fax\" /></td>
+  </tr>
+  <tr>
+    <th>$l_fax2</th>
+    <td><input name=\"tf_fax2\" size=\"20\" maxlength=\"20\" value=\"$fax2\" /></td>
+  </tr>
+  <tr>
+    <th>$l_service</th>
+    <td><input name=\"tf_service\" size=\"64\" maxlength=\"65\" value=\"$service\" /></td>
+  </tr>
+  <tr>
+    <th>$l_address 1</th>
+    <td><input name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /></td>
+  </tr>
+  <tr>
+    <th>$l_address 2</th>
+    <td><input name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /></td>
+  </tr>
+  <tr>
+    <th>$l_address 3</th>
+    <td><input name=\"tf_ad3\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad3\" /></td>
+  </tr>
+  <tr>
+    <th>$l_postcode</th>
+    <td><input name=\"tf_zip\" size=\"8\" maxlength=\"8\" value=\"$zip\" /></td>
+  </tr>
+  <tr>
+    <th>$l_town</th>
+    <td><input name=\"tf_town\" size=\"24\" maxlength=\"24\" value=\"$town\" /></td>
+  </tr>
+  <tr>      
+    <th>$l_expresspostal</th>
+    <td><input name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /></td>
+  </tr>
+  </table>
+  </fieldset>
+
+  <fieldset class=\"detail infos\">
+  <legend>$l_desc</legend>
+  <table>
+  <tr>      
+    <th>$l_desc</th>
+    <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
+  </tr>
+  </table>
+  </fieldset>
+
+  <fieldset class=\"buttons\">
+  $dis_button
   </fieldset>
   </form>";
 

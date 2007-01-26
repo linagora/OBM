@@ -73,6 +73,8 @@ $l_phone = "Phone";
 $l_hphone = "Home phone";
 $l_mphone = "Mobile phone";
 $l_fax = "Fax";
+$l_coord = "Details";
+$l_service = "Service";
 $l_address = "Address";
 $l_postcode = "Zip Code";
 $l_town = "Town";
@@ -145,6 +147,7 @@ $l_system = "System";
 $l_settings = "Settings";
 $l_password = "Password";
 $l_mailforward = "Mail forwarding";
+$l_mail = "Mail";
 $l_vacation = "Mail Vacation";
 
 // Global display

@@ -74,6 +74,8 @@ $l_phone = "Tel";
 $l_hphone = "Tel perso.";
 $l_mphone = "Tel mobile";
 $l_fax = "Fax";
+$l_coord = "Coordonnées";
+$l_service = "Service";
 $l_address = "Adresse";
 $l_postcode = "Code Postal";
 $l_town = "Ville";
@@ -149,6 +151,7 @@ $l_domain = "Domaine";
 $l_system = "Système";
 $l_password = "Mot de passe";
 $l_mailforward = "Redirection de messagerie";
+$l_mail = "Messagerie";
 $l_vacation = "Répondeur";
 
 // OBM_DISPLAY
