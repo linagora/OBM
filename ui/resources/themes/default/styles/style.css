@@ -98,11 +98,15 @@ h1 {
   clear: left;
 }
 
-.LR {
+.RC {
   clear: right;
 }
 
-C {
+.O {
+  overflow: auto;
+}
+
+.C {
   text-align: center;
 }
 
