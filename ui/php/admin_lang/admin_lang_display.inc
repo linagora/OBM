@@ -16,14 +16,14 @@
 function dis_admin_lang_help($mode) {
 
   if ($mode == "html")
-    echo "<table class=\"detail\">
+    echo "<table>
       <tr>
-        <td><pre>";
+        <td>";
 
   include ("admin_lang_help.inc");
 
   if ($mode == "html")
-    echo "</pre>
+    echo "
         </td>
       </tr>
       </table>";
@@ -90,72 +90,121 @@ function html_admin_lang_index($actions, $modules, $langs, $themes) {
   $sel_theme .= "</select>";
 
   echo "
-    <br />
+    
     <form method=\"get\" action=\"" . url_prepare("admin_lang_index.php")."\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Show vars</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminText\">action : <b>show_src</b>
-        <br />
-        Show vars from source</td>
-      <td class=\"adminLabel\">module :<br />$sel_module</td>
-      <td class=\"adminLabel\">
+      <th>Action : show_src</th>
+      <th>Module</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Show vars from source</td>
+      <td>$sel_module</td>
+    </tr>
+    </tbody>
+    </table>
+     <div class=\"buttons\">
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"show_src\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
-    </tr>
-    </table>
+        <input type=\"submit\" value=\"$l_execute\" />
+    </div>
+    </div>
     </form>
 
-    <hr />
-
     <form method=\"get\" action=\"" . url_prepare("admin_lang_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Lang Definition</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminText\">action : <b>show_lang</b>
-        <br />Show Lang definition</td>
-      <td class=\"adminLabel\">module :<br />$sel_module</td>
-      <td class=\"adminLabel\">lang 1 :<br />$sel_lang1</td>
-      <td class=\"adminLabel\">
+      <th>Action : show_lang</th>
+      <th>Module</th>
+      <th>Lang 1</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Show Lang definition</td>
+      <td>$sel_module</td>
+      <td>$sel_lang1</td>
+    </tr>
+    </tbody>
+    </table>
+    <div class=\"buttons\">    
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"show_lang\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
-    </tr>
-    </table>
+        <input type=\"submit\" value=\"$l_execute\" />
+    </div>
+    </div>    
     </form>
 
-    <hr />
-
     <form method=\"get\" action=\"" . url_prepare("admin_lang_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Compare Lang</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminText\">action : <b>comp_lang</b>
-        <br />Compare Lang definition</td>
-      <td class=\"adminLabel\">module :<br />$sel_module</td>
-      <td class=\"adminLabel\">lang 1 :<br />$sel_lang1</td>
-      <td class=\"adminLabel\">lang 2 :<br />$sel_lang2</td>
-      <td class=\"adminLabel\">
-        <input type=\"hidden\" name=\"mode\" value=\"html\" />
-        <input type=\"hidden\" name=\"action\" value=\"comp_lang\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
+      <th>Action : Comp_lang</th>
+      <th>Module</th>
+         </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Compare Lang Definition</td>
+      <td>$sel_module</td>
     </tr>
+    </tbody>
+    <thead>
+    <tr>
+     <th>Lang 1</th>
+     <th>Lang 2</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>$sel_lang1</td>
+    <td>$sel_lang2</td>
+    </tr>
+    </tbody>
     </table>
+    <div class=\"buttons\">
+      <input type=\"hidden\" name=\"mode\" value=\"html\" />
+      <input type=\"hidden\" name=\"action\" value=\"comp_lang\" />
+      <input type=\"submit\" value=\"$l_execute\" />
+    </div>
+    </div>
     </form>
 
-    <hr />
-
     <form method=\"get\" action=\"" . url_prepare("admin_lang_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Compare Lang</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminText\">action : <b>comp_global_lang</b>
-        <br />Compare Global Lang definition</td>
-      <td class=\"adminLabel\">lang 1 :<br />$sel_lang1</td>
-      <td class=\"adminLabel\">lang 2 :<br />$sel_lang2</td>
-      <td class=\"adminLabel\">
-        <input type=\"hidden\" name=\"mode\" value=\"html\" />
-        <input type=\"hidden\" name=\"action\" value=\"comp_global_lang\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
+      <th>Action : comp_global_lang</th>
+      <th>Lang 1</th>
+      <th>Lang 2</th>
     </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>Compare Global Lang definition</td>
+    <td>$sel_lang1</td>
+    <td>$sel_lang2</td>
+        </tr>
+    </tbody>
     </table>
+     <div class=\"buttons\">
+     <input type=\"hidden\" name=\"mode\" value=\"html\" />
+     <input type=\"hidden\" name=\"action\" value=\"comp_global_lang\" />
+     <input type=\"submit\" value=\"$l_execute\" />
+     </div>
+     </div>
     </form>";
 }
 

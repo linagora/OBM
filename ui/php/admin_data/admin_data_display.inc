@@ -16,15 +16,14 @@
 function dis_admin_data_help($mode) {
 
   if ($mode == "html")
-    echo "<table class=\"detail\">
+    echo "<table>
       <tr>
-        <td><pre>";
+        <td>";
 
   include ("admin_data_help.inc");
 
   if ($mode == "html")
-    echo "</pre>
-        </td>
+    echo "</td>
       </tr>
       </table>";
 }
@@ -81,53 +80,78 @@ function html_data_index($actions, $modules, $upd_modules) {
   echo "
     <br />
     <form method=\"get\" action=\"" . url_prepare("admin_data_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Inconsistencies</h1>
+    <table class=\"spreadSheet\">
+    <thead> 
     <tr>
-      <td class=\"adminHead\">action : data_show</td>
-      <td class=\"adminHead\">module</td>
-      <td class=\"adminLabel\" rowspan=\"2\">
+      <th>Action : data_show</th>
+      <th>module</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Show inconsistencies in data</td>
+      <td>$sel_module</td>
+    </tr>
+    </tbody>
+    </table>
+        <div class=\"buttons\">
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"data_show\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
-    </tr><tr>
-      <td class=\"adminText\">Show inconsistencies in data</td>
-      <td class=\"adminText\">$sel_module</td>
-    </tr>
-    </table>
+        <input type=\"submit\" value=\"$l_execute\" />
+	</div>
+    </div>
     </form>
 
-    <hr />
-
     <form method=\"get\" action=\"" . url_prepare("admin_data_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Update</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\">action : data_update</td>
-      <td class=\"adminHead\">module</td>
-      <td class=\"adminLabel\" rowspan=\"2\">
+      <th>Action : data_update</th>
+      <th>module</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Update inconsistencies in data</td>
+      <td>$sel_upd_module</td>
+    </tr>
+    </tbody>
+    </table>
+    <div class=\"buttons\">
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"data_update\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
-    </tr><tr>
-      <td class=\"adminText\">Update inconsistencies in data</td>
-      <td class=\"adminText\">$sel_upd_module</td>
-    </tr>
-    </table>
+        <input type=\"submit\" value=\"$l_execute\" />
+   </div>
+   </div>
     </form>
 
-    <hr />
 
     <form method=\"get\" action=\"" . url_prepare("admin_data_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Update aka and sound keys</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\">action : sound_aka_update</td>
-      <td class=\"adminLabel\" rowspan=\"2\">
-        <input type=\"hidden\" name=\"mode\" value=\"html\" />
-        <input type=\"hidden\" name=\"action\" value=\"sound_aka_update\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
-    </tr><tr>
-      <td class=\"adminText\">Update aka and sound keys used for searches (Company, Contact)</td>
+      <th>action : sound_aka_update</th>
     </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Update aka and sound keys used for searches (Company, Contact)</td>
+    </tr>
+    </tbody>
     </table>
+    
+    <div class=\"buttons\">
+     <input type=\"hidden\" name=\"mode\" value=\"html\" />
+     <input type=\"hidden\" name=\"action\" value=\"sound_aka_update\" />
+     <input type=\"submit\" value=\"$l_execute\" />
+    </div>
+    </div>
     </form>";
 }
 

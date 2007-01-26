@@ -18,12 +18,12 @@ function dis_admin_code_help($mode) {
   if ($mode == "html")
     echo "<table class=\"detail\">
       <tr>
-        <td><pre>";
+        <td>";
 
   include ("admin_code_help.inc");
 
   if ($mode == "html")
-    echo "</pre>
+    echo "
         </td>
       </tr>
       </table>";
@@ -75,53 +75,87 @@ function html_admin_code_index($actions, $words) {
   echo "
     <br />
     <form method=\"get\" action=\"" . url_prepare("admin_code_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Show misuse</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\">action : show_amp</td>
-      <td class=\"adminHead\">Excluded words</td>
-      <td class=\"adminLabel\" rowspan=\"2\">
+      <th>action : show_amp</th>
+      <th>Excluded words</th>      
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>
+        Show misuse of & in url (& amp; required) from source</td>
+      <td>$word_list</td>
+    </tr>
+    </tbody>
+    </table>
+    <div class=\"buttons\">
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"show_amp\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
-    </tr><tr>
-      <td class=\"adminText\">
-        Show misuse of & in url (& amp; required) from source</td>
-      <td class=\"adminText\"><tt>$word_list</tt></td>
-    </tr>
-    </table>
-    </form>
+        <input type=\"submit\" value=\"$l_execute\" />
+   </div>
+   </div>
+   </form>
 
     <form method=\"get\" action=\"" . url_prepare("admin_code_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Show used and unused functions</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\">action : func_unused</td>
-      <td class=\"adminLabel\" rowspan=\"2\">module :<br />$sel_module</td>
-      <td class=\"adminLabel\" rowspan=\"2\">
-        <input type=\"hidden\" name=\"mode\" value=\"html\" />
+      <th>Action : func_unused</th>
+      <th>Module</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>
+        Show used and unused functions (defined but not used in code)
+      </td>
+      <td>
+      $sel_module
+      </td>
+    </tr>
+    </table>    
+    <div class=\"buttons\">  
+	<input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"func_unused\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
-    </tr><tr>
-      <td class=\"adminText\">
-        Show used and unused functions (defined but not used in code)</td>
-    </tr>
-    </table>
-    </form>
+        <input type=\"submit\" value=\"$l_execute\" />
+   </div>
+   </div>    
+   </form>
 
     <form method=\"get\" action=\"" . url_prepare("admin_code_index.php"). "\">
-    <table class=\"admin\">
+    <div class=\"detail infos\">
+    <h1>Show Uses</h1>
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\">action : function_uses</td>
-      <td class=\"adminLabel\" rowspan=\"2\">
-        <input type=\"hidden\" name=\"mode\" value=\"html\" />
-        <input type=\"hidden\" name=\"action\" value=\"function_uses\" />
-        <input type=\"submit\" value=\"$l_execute\" /></td>
-    </tr><tr>
-      <td class=\"adminText\">
+      <th colspan=\"2\">Action : function_uses</th>
+    </tr>
+    </thead>
+    <tbody>
+      <tr>
+      <td>
         Show Uses of function
+      </td>
+      <td>
         <input type=\"text\" name=\"function\" value=\"\" />
       </td>
     </tr>
+    </tbody>
     </table>
+    <div class=\"buttons\">
+    <input type=\"hidden\" name=\"mode\" value=\"html\" />
+    <input type=\"hidden\" name=\"action\" value=\"function_uses\" />
+    <input type=\"submit\" value=\"$l_execute\" />
+    </div>
+    </div>
+
+    
     </form>
 ";
 }
