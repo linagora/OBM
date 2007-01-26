@@ -117,7 +117,7 @@ $l_category = "Category";
 $l_aduplicate = "Duplicate";
 $l_hide = "Hide";
 $l_show = "Show";
-
+$l_advanced = "Advanced";
 // Entities
 $l_company = "Company";
 $l_contact = "Contact";

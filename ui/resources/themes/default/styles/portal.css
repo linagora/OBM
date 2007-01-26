@@ -1,0 +1,68 @@
+/*/////////////////////////////////////////////////////////////////////////////
+// OBM - File : portal.css                                                   //
+//     - Desc : CSS style file                                               //
+// 2007-01-24 Mehdi Rande                                                    //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+/////////////////////////////////////////////////////////////////////////////*/
+
+.summaryBox {
+  margin: 2px;
+  background-color: #eeeff1;
+  border: 1px solid #b3b3b3;
+  height: 20em;
+  width: 20em;
+  float : left;
+}
+
+.summaryBox h1 {
+  margin: 0 0 5px 0;
+  font-size: 140%;
+  height: 1.6em;
+  line-height: 1.6em;
+  background-image: url('../images/tab_current_border.png');
+  background-repeat: repeat-x;
+  background-position: 0 0.8em;
+  background-color: #eff0f2;
+  border-bottom: 1px solid #b3b3b3;  
+}
+
+.summaryBox h1 img{
+  float: left;
+}
+
+.summaryBox h2 {
+  text-align: center;
+}
+
+.summaryBox .link {
+  display: block;
+  clear: left;
+  position: relative;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.summaryBox dl {
+  margin-left: 5px;
+}
+
+.summaryBox table {
+  margin: 0 0 5px;
+}
+
+.summaryBox dt {
+  font-weight: bold;
+  float: left;
+  clear: left;
+  width: 12em;
+  overflow: show;
+  margin-bottom: 5px;
+}
+
+.summaryBox dd {
+  float: left;
+  margin: 0;
+}

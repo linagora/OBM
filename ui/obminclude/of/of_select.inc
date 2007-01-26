@@ -74,7 +74,7 @@ function of_select_add_element(target, element_name, sel_id, fieldLabel) {
 
   // Create the icon image
   image = target.createElement('img');
-  image.src = '".C_IMAGE_PATH."/$set_theme/$ico_delete';
+  image.src = '$ico_delete';
   link.appendChild(image);
 
   // Create the label
@@ -161,7 +161,7 @@ function of_select_get_element_array(elementName) {
 //   - $tree       : display the tree option
 ///////////////////////////////////////////////////////////////////////////////
 function of_select_dis_search_select($data_array, $data_name, $url, $tree=false) {
-  global $set_theme, $ico_add, $ico_delete, $l_cat_tree;
+  global  $ico_add, $ico_delete, $l_cat_tree;
 
   $l_name = "l_${data_name}"; 
   global $$l_name;
@@ -177,12 +177,12 @@ function of_select_dis_search_select($data_array, $data_name, $url, $tree=false)
       <a href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=360,width=240,scrollbars=yes');
       return false;\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" /></a>
+       <img src=\"$ico_add\" alt=\"[Add]\" /></a>
       &nbsp;$dis_tree&nbsp;
       <a href=\"javascript: return false;\"
         onclick=\"remove_all_element('sel_${data_name}');
         return false;\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\" alt=\"[Clear]\" /></a>
+        <img src=\"$ico_delete\" alt=\"[Clear]\" /></a>
       <br />
       <div class=\"elementRow\" id=\"sel_$data_name\"><div class=\"elementRowEmpty\"></div>$sel</div>
     </div>";
@@ -203,7 +203,7 @@ function of_select_dis_search_select($data_array, $data_name, $url, $tree=false)
 //   - $data_name  : data name to construct the fields
 ///////////////////////////////////////////////////////////////////////////////
 function _of_select_select($data_array, $data_name) {
-  global $set_theme, $ico_delete;
+  global  $ico_delete;
 
   if (is_array($data_array)) {
     foreach ($data_array as $id => $one_data) {
@@ -211,7 +211,7 @@ function _of_select_select($data_array, $data_name) {
       $data_id = "data-$data_name-$id";
       $div_id = "sel_$data_name-$data_id";
       $sel_data .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_$data_name');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\"></a>
+        <a href=\"javascript: remove_element('$div_id','sel_$data_name');\"><img src=\"$ico_delete\"></a>
         $data_label
         <input value=\"$data_id\" name=\"sel_${data_name}[]\" type=\"hidden\" />
         </div>";

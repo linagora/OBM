@@ -133,7 +133,7 @@ function html_entitywritable_bar($writable_entity,$entity_id, $entity) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_dis_right_admin(&$consumers, $entity_id) {
   global $l_authorize_list,$l_read_permission, $l_write_permission;
-  global $l_right_validate ,$l_authorize,$l_deny,$set_theme, $ico_delete;
+  global $l_right_validate ,$l_authorize,$l_deny, $ico_delete;
   global $l_public;
   global $ico_add_user,$popup_height,$popup_width,$l_users,$path;
 
@@ -157,7 +157,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 	$sel_id = "data-user-$id";
 	$div_id = "sel_accept_write-data-user-$id";
         $dis_write_ok .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_accept_write');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\"></a>
+        <a href=\"javascript: remove_element('$div_id','sel_accept_write');\"><img src=\"$ico_delete\"></a>
         $label
        <input value=\"$sel_id\" name=\"sel_accept_write[]\" type=\"hidden\" />
        </div>";
@@ -166,7 +166,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 	$sel_id = "data-user-$id";
 	$div_id = "sel_accept_read-data-user-$id";
         $dis_read_ok .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_accept_read');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\"></a>
+        <a href=\"javascript: remove_element('$div_id','sel_accept_read');\"><img src=\"$ico_delete\"></a>
         $label
        <input value=\"$sel_id\" name=\"sel_accept_read[]\" type=\"hidden\" />
        </div>";
@@ -188,7 +188,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <a style=\"$style_read\" id=\"lnk_accept_read\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
+      <img src=\"$ico_add_user\" alt=\"[Add]\" />
     </a>
     </td>
     <td class=\"detailForm\" id=\"sel_accept_read\">
@@ -208,7 +208,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     $l_users
       <a style=\"$style_write\" id=\"lnk_accept_write\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
+       <img src=\"$ico_add_user\" alt=\"[Add]\" />
      </a>
      </td>
      <td class=\"detailForm\" id=\"sel_accept_write\">

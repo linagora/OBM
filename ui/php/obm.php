@@ -10,13 +10,14 @@
 // $module and $action defined for ActiveUser stats
 $module = "obm";
 $path = ".";
-$extra_css = "portal.css";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 $params = get_obm_params();
 include_once("obm_query.inc");
 require("$obminclude/lib/right.inc");
+
+
 
 $OBM_Session = $params["OBM_Session"];
 if ($action == "") { $action = "home"; }
@@ -39,6 +40,8 @@ if ($action == "logout") {
   $uid = $auth->auth["uid"];
 }
 
+$extra_css[] = $css_portal;
+
 page_close();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,9 +57,9 @@ if ($c_home_redirect != "") {
 $display["head"] = display_head("OBM Version $obm_version");
 $display["header"] = display_menu("");
 $display["title"] = "
-<div class=\"title\">
-<b>OBM</b> version $obm_version - " . date("Y-m-d H:i:s") . "
-</div>";
+<h1 class=\"title\">
+OBM version $obm_version - " . date("Y-m-d H:i:s") . "
+</h1>";
 
 if ($cgp_show["module"]["calendar"] && $perm->check_right("calendar", $cright_read)) { 
   require("$path/calendar/calendar_query.inc");
@@ -95,10 +98,9 @@ if ($cgp_show["module"]["invoice"] && $perm->check_right("invoice", $cright_read
 }
 
 $display["detail"] = "
-<div class=\"portal\">
 $block
 <p style=\"clear:both;\"/>  
-</div>";
+";
 
 $display["end"] = display_end();
 display_page($display);
@@ -154,7 +156,7 @@ function dis_logout_detail() {
 // Display The calendar specific portal layer.                               //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_portal() {
-  global $ico_calendar_portal,$set_theme;
+  global $ico_big_calendar,$path;
   global $l_module_calendar,$l_daysofweekfirst,$l_my_calendar,$l_waiting_events;
   global $auth, $ccalendar_weekstart;
 
@@ -169,28 +171,65 @@ function dis_calendar_portal() {
 
   $current_time = $start_time; 
   $calendar_entity["user"] = array($auth->auth["uid"] => array("dummy"));
-  $events_list = calendar_events_model($start_time,$end_time, $calendar_entity);
+  $occurrences = calendar_events_model($start_time,$end_time, $calendar_entity);
   $whole_month = TRUE;
   $num_of_events = 0;
+
+  // Minicalendar
+  $i = 0;
+  do {
+    if ($i == 0) $dis_minical .= "<tr>\n";
+    $day = date ("j", $start_day);
+    $iso_day = of_isodate_format($start_day);
+    $check_month = of_date_get_month($start_day);
+
+    if ($check_month != $this_month) {
+      $dis_minical .= "<td class=\"downlight\" onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\"
+        onmouseout=\"this.className='downlight'\" onmouseover=\"this.className='hover'\">
+        $day
+        </td>";
+    } else {
+      if (of_isodate_format() == $iso_day) {
+        $dis_minical .= "<td class=\"highlight\" onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\" 
+          onmouseout=\"this.className='highlight'\" onmouseover=\"this.className='hover'\">
+          $day
+          </td>";
+      } else {
+        $dis_minical .= "<td onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\" 
+          onmouseout=\"this.className=''\" onmouseover=\"this.className='hover'\">
+          $day
+          </td>";
+      }
+    }
+    $start_day = strtotime("+1 day", $start_day);
+    $i++;
+    if ($i == 7) {
+      $dis_minical .= "</tr>\n";
+      $i = 0;
+      $checkagain = of_date_get_month($start_day);
+      if ($checkagain != $this_month) $whole_month = FALSE;
+    }
+  } while ($whole_month == TRUE);
+/*  
   $i = 0;
   do {
     $day = date ("j", $current_time);
     $iso_day = of_isodate_format($current_time);
     $check_month = of_date_get_month($current_time);
     if ($check_month != $this_month) {
-      $day = "<a class=\"calendarLink2\" href=\"".url_prepare("calendar/calendar_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
+      $day = "<a href=\"".url_prepare("calendar/calendar_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
     } else {
       if (isset($events_list[$iso_day]) && $dayObj = $events_list[$iso_day]) {
 	$events_data = $dayObj->get_events($id);
-        $day = "<a class=\"calendarLink3\" href=\"".url_prepare("calendar/calendar_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
+        $day = "<a href=\"".url_prepare("calendar/calendar_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
       } else {
-        $day = "<a class=\"calendarLink\" href=\"".url_prepare("calendar/calendar_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
+        $day = "<a href=\"".url_prepare("calendar/calendar_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
       }
     }
     if ($i == 0) {
       $dis_minical .= "<tr>\n";
     }
-    $dis_minical .= "<td class=\"calendarCell\">$day</td>\n";
+    $dis_minical .= "<td>$day</td>\n";
     $current_time = strtotime("+1 day", $current_time); 
     $i++;
     if ($i == 7) { 
@@ -200,7 +239,7 @@ function dis_calendar_portal() {
       if ($checkagain != $this_month) $whole_month = FALSE;	
     }
   } while ($whole_month == TRUE);
-
+ */
   
   // Minicalendar Head
   for ($i=0; $i<7; $i++) {
@@ -210,21 +249,18 @@ function dis_calendar_portal() {
     $current_time = strtotime("+1 day", $current_time); 
   } 
   $block = "
-   <div class=\"portalModule\"> 
-   <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_portal\" alt=\"\" />
-   </div>
-   <div class=\"portalTitle\">$l_module_calendar</div>
-   <div class=\"portalContent\">
-    <table class=\"calendarCalendar\" >
-     <tr>
-      $dis_minical_head
-     </tr>
-     $dis_minical
-    </table>  
-    $num $l_waiting_events
-   </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("calendar/calendar_index.php")."\">$l_my_calendar</a></div>
+   <div class=\"summaryBox\"> 
+   <h1><img src=\"$ico_big_calendar\" alt=\"Calendar\" />$l_module_calendar</h1>
+   <table class=\"miniCalendar\" >
+   <thead>
+   <tr>$dis_minical_head</tr>
+   </thead>
+   <tbody>
+   $dis_minical
+   </tbody>
+   </table>  
+   $num $l_waiting_events
+   <a class=\"link\" href=\"$path/calendar/calendar_index.php\">$l_my_calendar</a>
   </div>
 ";
 
@@ -236,22 +272,20 @@ function dis_calendar_portal() {
 // Display The Time Management specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_portal() {
-  global $ico_time_portal, $set_theme;
+  global $ico_big_time, $set_theme,$path;
   global $l_module_time, $l_my_time, $l_unfilled;
 
   $num = run_query_days_unfilled();
+  if( $num <= 1 ) {
+    $class = "info";
+  } else {
+    $class = "error";
+  }
   $block = "
-  <div class=\"portalModule\"> 
-   <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_time_portal\" alt=\"\" />
-   </div>
-   <div class=\"portalTitle\">$l_module_time</div>
-   <div class=\"portalContent\">
-    <div class=\"timeWarn\">
-    $num $l_unfilled
-    </div>
-   </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("time/time_index.php")."\">$l_my_time</a></div>
+  <div class=\"summaryBox\"> 
+    <h1><img src=\"$ico_big_time\" alt=\"Time\" />$l_module_time</h1>
+    <h2 class=\"$class\">$num $l_unfilled</h2>
+   <a class=\"link\" href=\"$path/time/time_index.php\">$l_my_time</a>
   </div>
 ";
   return $block;
@@ -262,7 +296,7 @@ function dis_time_portal() {
 // Display The Lead specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_lead_portal() {
-  global $uid, $ico_lead_portal, $set_theme, $c_null;
+  global $uid, $ico_big_lead, $c_null,$path;
   global $l_module_lead, $l_my_lead, $l_days, $l_alarm, $l_late, $l_without;
 
   $today = date("Y-m-d");
@@ -284,51 +318,28 @@ function dis_lead_portal() {
   $leads = run_query_lead_time_range($date_ranges, array($uid));
   $leads_date = $leads["date"];
   $block = "
-  <div class=\"portalModule\">
-   <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_lead_portal\" alt=\"\" />
-   </div>
-   <div class=\"portalTitle\">$l_module_lead</div>
-   <div class=\"portalContent\">
-    <div>
-    <table>
-    <tr>
-      <td><a href=\"".url_prepare("lead/lead_index.php?action=search&amp;sel_manager_id=$uid")."\">$l_my_lead</a>&nbsp;</td>
-      <td class=\"number\">$leads[total]</td>
-    </tr>
-    <tr>
-      <td>&nbsp;</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>- 7 $l_days</td>
-      <td class=\"number\">&nbsp; $leads_date[0]</td>
-    </tr>
-    <tr>
-      <td>- 14 $l_days</td>
-      <td class=\"number\">&nbsp; $leads_date[1]</td>
-    </tr>
-    <tr>
-      <td>- 30 $l_days</td>
-      <td class=\"number\">&nbsp; $leads_date[2]</td>
-    </tr>
-    <tr>
-      <td>- 90 $l_days</td>
-      <td class=\"number\">&nbsp; $leads_date[3]</td>
-    </tr>
-    <tr>
-      <td>&nbsp;</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>$l_alarm (<a href=\"".url_prepare("lead/lead_index.php?action=search&amp;sel_manager_id=$uid&amp;date_field=datealarm&amp;tf_date_before=$today")."\">$l_late</a> / <a href=\"".url_prepare("lead/lead_index.php?action=search&amp;sel_manager_id=$uid&amp;tf_date_field=datealarm&amp;tf_date_after=$c_null")."\">$l_without</a>)&nbsp;</td>
-      <td class=\"number\">$leads[alarm] / $leads[no_alarm]</td>
-    </tr>
-    </table>
-
-    </div>
-   </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("lead/lead_index.php?action=search&amp;sel_manager_id=$uid")."\">$l_my_lead</a></div>
+  <div class=\"summaryBox\">
+   <h1>
+    <img src=\"$ico_big_lead\" alt=\"Lead\" />$l_module_lead
+   </h1>
+   <dl>
+   <dt><a href=\"$path/lead/lead_index.php?action=search&amp;sel_manager_id=$uid\">$l_my_lead</a></dt>
+   <dd>$leads[total]</dd>
+   <dt>- 7 $l_days</dt>
+   <dd>$leads_date[0]</dd>
+   <dt>- 14 $l_days</dt>
+   <dd>$leads_date[1]</dd>
+   <dt>- 30 $l_days</dt>
+   <dd>$leads_date[2]</dd>   
+   <dt>- 90 $l_days</dt>
+   <dd>$leads_date[3]</dd>   
+   <dt>$l_alarm
+   (<a href=\"$path/lead/lead_index.php?action=search&amp;sel_manager_id=$uid&amp;date_field=datealarm&amp;tf_date_before=$today\">$l_late</a> /
+   <a href=\"$path/lead/lead_index.php?action=search&amp;sel_manager_id=$uid&amp;tf_date_field=datealarm&amp;tf_date_after=$c_null\">$l_without</a>)
+   </dt>
+   <dd>$leads[alarm] / $leads[no_alarm]</dd>
+   </dl>
+   <a class=\"link\" href=\"$path/lead/lead_index.php?action=search&amp;sel_manager_id=$uid\">$l_my_lead</a>
   </div>";
 
   return $block;
@@ -339,8 +350,8 @@ function dis_lead_portal() {
 // Display The Deal specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_portal() {
-  global $uid, $ico_deal_portal, $set_theme;
-  global $l_deal_total, $l_module_deal, $l_my_deal, $l_my_deal_current, $l_deal_balanced;
+  global $uid, $ico_big_deal,$path, $l_my_deal_current;
+  global $l_deal_total, $l_module_deal, $l_my_deal, $l_deal_balanced;
 
   $potential = run_query_deal_potential(array($uid));
   $m_amount = number_format($potential["market"]["$uid"]["amount"]);
@@ -358,39 +369,38 @@ function dis_deal_portal() {
   if (count($deals) > 0) {
     foreach ($deals as $status => $nb) {
       $dis_status .= "
-    <tr>
-      <td>$status</td>
-      <td class=\"number\">$nb</td>
-    </tr>";
+      <dt>$status</dt>
+      <dd>$nb</dd>";
     }
   }
 
   $block = "
-  <div class=\"portalModule\"> 
-   <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal_portal\" alt=\"\" />
-   </div>
-   <div class=\"portalTitle\">$l_module_deal</div>
-   <div class=\"portalContent\">
-    <div>
+  <div class=\"summaryBox\"> 
+   <h1>
+   <img src=\"$ico_big_deal\" alt=\"Deal\" />$l_module_deal
+   </h1>
+   <dl>
+   <dt><a href=\"$path/deal/deal_index.php?action=dashboard&amp;sel_manager=$uid\">$l_my_deal_current</a></dt>
+   <dd>$m_nb_potential / $t_nb_potential</dd>
+   <dt>$l_deal_total</dt>
+   <dd>$m_amount</dd>
+   <dt>$l_deal_balanced</dt>
+   <dd>$m_balanced</dd>
     <table>
     <tr>
-      <td><a href=\"".url_prepare("deal/deal_index.php?action=dashboard&amp;sel_manager=$uid")."\">$l_my_deal_current</a></td>
-      <td class=\"number\">$m_nb_potential / $t_nb_potential</td>
+      <td></td>
+      <td class=\"number\"></td>
     </tr><tr>
-      <td>$l_deal_total</td>
-      <td class=\"number\">&nbsp; $m_amount</td>
+      <td></td>
+      <td class=\"number\">&nbsp; </td>
     </tr><tr>
-      <td>$l_deal_balanced</td>
-      <td class=\"number\">$m_balanced</td>
+      <td></td>
+      <td class=\"number\"></td>
     </tr>
     <tr><td>&nbsp;</td><td></td></tr>
     $dis_status
     </table>
-
-    </div>
-   </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("deal/deal_index.php?action=search&amp;sel_manager=$uid")."\">$l_my_deal</a></div>
+   <a class=\"link\" href=\"$path/deal/deal_index.php?action=search&amp;sel_manager=$uid\">$l_my_deal</a>
   </div>";
 
   return $block;
@@ -401,46 +411,28 @@ function dis_deal_portal() {
 // Display The Project specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_portal() {
-  global $uid, $ico_project_portal, $set_theme;
+  global $uid, $ico_big_project, $path;
   global $l_total, $l_module_project, $l_project_manager, $l_member;
   global $l_my_project, $l_my_project_current;
 
   $proj = run_query_project_memberstatus($uid);
   if (count($proj) > 0) {
     $dis_project .= "
-      <tr>
-        <td><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_manager=$uid")."\">$l_project_manager</a></td>
-        <td class=\"number\">$proj[1]</td>
-      </tr>
-      <tr>
-        <td><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_member=$uid")."\">$l_member</a></td>
-        <td class=\"number\">$proj[0]</td>
-      </tr>";
+    <dt><a href=\"$path/project/project_index.php?action=search&amp;sel_manager=$uid\">$l_project_manager</a></dt>
+    <dd>$proj[1]</dd>
+    <dt><a href=\"$path/project/project_index.php?action=search&amp;sel_member=$uid\">$l_member</a></dt>
+    <dd>$proj[0]</dd>";
   }
 
   $block = "
-  <div class=\"portalModule\"> 
-   <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project_portal\" alt=\"\" />
-   </div>
-   <div class=\"portalTitle\">$l_module_project</div>
-   <div class=\"portalContent\">
-    <div>
-    <table>
-    <tr>
-      <td>$l_my_project_current &nbsp;</td>
-      <td class=\"number\">$proj[total]</td>
-    </tr>
-    <tr>
-      <td>&nbsp;</td>
-      <td></td>
-    </tr>
+  <div class=\"summaryBox\"> 
+   <h1><img src=\"$ico_big_project\" alt=\"Project\" />$l_module_project</h1>
+   <dl>
+   <dt>$l_my_project_current</dt>
+   <dd>$proj[total]</dd>
     $dis_project
-    </table>
-
-    </div>
-   </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_member=$uid")."\">$l_my_project</a></div>
+   </dt>
+   <a class=\"link\" href=\"$path/project/project_index.php?action=search&amp;sel_member=$uid\">$l_my_project</a>
   </div>";
 
   return $block;
@@ -451,7 +443,7 @@ function dis_project_portal() {
 // Display The Incident specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_portal() {
-  global $uid, $ico_incident_portal, $set_theme;
+  global $uid, $ico_big_incident, $path;
   global $l_total, $l_module_incident, $l_my_incident, $l_my_incident_current;
 
   $incs = run_query_incident_status($uid);
@@ -459,37 +451,22 @@ function dis_incident_portal() {
     foreach ($incs as $status => $nb) {
       if ($status != "0") {
         $dis_status .= "
-      <tr>
-        <td>$status</td>
-        <td class=\"number\">$nb</td>
-      </tr>";
+        <dt>$status</dt>
+        <dd>$nb</dd>";
       }
     }
   }
 
   $block = "
-  <div class=\"portalModule\"> 
-   <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident_portal\" alt=\"\" />
-   </div>
-   <div class=\"portalTitle\">$l_module_incident</div>
-   <div class=\"portalContent\">
-    <div>
-    <table>
-    <tr>
-      <td>$l_my_incident_current &nbsp;</td>
-      <td class=\"number\">$incs[0]</td>
-    </tr>
-    <tr>
-      <td>&nbsp;</td>
-      <td></td>
-    </tr>
+  <div class=\"summaryBox\"> 
+    <h1>
+    <img src=\"$ico_big_incident\" alt=\"Incident\" />$l_module_incident
+    </h1>
+    <dl>
+    <dt>$l_my_incident_current</dt>
+    <dd>$incs[0]</dd>
     $dis_status
-    </table>
-
-    </div>
-   </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("incident/incident_index.php?action=search&amp;sel_owner=$uid")."\">$l_my_incident</a></div>
+   <a class=\"link\" href=\"$path/incident/incident_index.php?action=search&amp;sel_owner=$uid\">$l_my_incident</a>
   </div>";
 
   return $block;
@@ -500,43 +477,33 @@ function dis_incident_portal() {
 // Display The Contract specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_portal() {
-  global $uid, $ico_contract_portal, $set_theme;
+  global $uid, $ico_big_contract, $set_theme;
   global $l_total, $l_module_contract, $l_my_contract, $l_my_contract_current;
-  global $l_cr_date;
-  global $cr_date_tosign, $cr_date_tobegin, $cr_date_current, $cr_date_torenew, $cr_date_ended;
+  global $l_cr_date, $cr_date_ended, $path;
+  global $cr_date_tosign, $cr_date_tobegin, $cr_date_current, $cr_date_torenew;
 
   $conts = run_query_contract_range($uid);
   if (count($conts) > 0) {
     foreach ($conts as $range => $nb) {
       $dis_range .= "
-    <tr>
-      <td>$l_cr_date[$range]</td>
-      <td class=\"number\">$nb</td>
-    </tr>";
+      <dt>$l_cr_date[$range]</dt>
+      <dd >$nb</dd>";
     }
   }
 
   $total = array_sum($conts);
   $block = "
-  <div class=\"portalModule\"> 
-   <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract_portal\" alt=\"\" />
-   </div>
-   <div class=\"portalTitle\">$l_module_contract</div>
-   <div class=\"portalContent\">
-    <div>
-    <table>
-    <tr>
-      <td>$l_my_contract_current &nbsp;</td>
-      <td class=\"number\">$total</td>
-    </tr>
-    <tr><td>&nbsp;</td><td></td></tr>
+  <div class=\"summaryBox\"> 
+    <h1>
+    <img src=\"$ico_big_contract\" alt=\"Contract\" />
+    $l_module_contract
+    </h1>
+    <dl>
+    <dt>$l_my_contract_current</dt>
+    <dd>$total</dd>
     $dis_range
-    </table>
-
-    </div>
-   </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("contract/contract_index.php?action=search&amp;sel_manager=$uid")."\">$l_my_contract</a></div>
+    </dl>
+    <a class=\"link\" href=\"$path/contract/contract_index.php?action=search&amp;sel_manager=$uid\">$l_my_contract</a>
   </div>";
 
   return $block;
@@ -547,9 +514,9 @@ function dis_contract_portal() {
 // Display The Invoice specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_portal() {
-  global $uid, $ico_invoice_portal, $set_theme;
+  global $uid, $ico_big_invoice;
   global $l_total, $l_module_invoice, $l_billed, $l_order_no_bill;
-  global $l_header_dashboard;
+  global $l_header_dashboard, $path;
 
   $year = date("Y");
   $month = date("m");
@@ -567,11 +534,8 @@ function dis_invoice_portal() {
 	$amount_ht = $status_info["amount_ht"];
 	$nb = $status_info["nb"];
 	$dis_created .= "
-      <tr>
-        <td>$label</td>
-        <td class=\"number\">$amount_ht / </td>
-        <td class=\"number\">$nb</td>
-      </tr>";
+        <dt>$label</dt>
+        <dd>$amount_ht / $nb</dd>";
       }
     }
   }
@@ -583,46 +547,26 @@ function dis_invoice_portal() {
 	$label = $status_info["label"];
 	$amount_ht = $status_info["amount_ht"];
 	$nb = $status_info["nb"];
-	$dis_potential .= "
-      <tr>
-        <td>$label</td>
-        <td class=\"number\">$amount_ht / </td>
-        <td class=\"number\">$nb</td>
-      </tr>";
+	$dis_potential .= "          
+        <dt>$label</dt>
+        <dd>$amount_ht / $nb</dd>";
       }
     }
   }
 
   $block = "
-  <div class=\"portalModule\">
-   <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice_portal\" alt=\"\" />
-   </div>
-   <div class=\"portalTitle\">$l_module_invoice</div>
-   <div class=\"portalContent\">
-    <div>
-    <table>
-    <tr>
-      <td>$l_billed &nbsp;</td>
-      <td class=\"number\">".$inv["$year_month"]["billed"]["total"]["amount_ht"]. " / </td>
-      <td class=\"number\">".$inv["$year_month"]["billed"]["total"]["nb"]."</td>
-    </tr>
+  <div class=\"summaryBox\">
+   <h1><img src=\"$ico_big_invoice\" alt=\"Invoice\" />
+   $l_module_invoice</h1>
+   <dl>
+   <dt>$l_billed</dt>
+   <dd>".$inv["$year_month"]["billed"]["total"]["amount_ht"]. " / ".$inv["$year_month"]["billed"]["total"]["nb"]."</dd>
     $dis_created
-    <tr>
-      <td>&nbsp;</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>$l_order_no_bill &nbsp;</td>
-      <td class=\"number\">".$inv["$year_month"]["potential"]["total"]["amount_ht"]. " / </td>
-      <td class=\"number\">".$inv["$year_month"]["potential"]["total"]["nb"]."</td>
-    </tr>
+    <dt>$l_order_no_bill</dt>
+    <dd>".$inv["$year_month"]["potential"]["total"]["amount_ht"]. " / ".$inv["$year_month"]["potential"]["total"]["nb"]."</dd>
     $dis_potential
-    </table>
-
-    </div>
-   </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("invoice/invoice_index.php?action=dashboard")."\">$l_header_dashboard</a></div>
+    </dl>
+   <a class=\"link\" href=\"$path/invoice/invoice_index.php?action=dashboard\">$l_header_dashboard</a>
   </div>";
 
   return $block;

@@ -34,7 +34,8 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 $uid = $auth->auth["uid"];
 
-$extra_css = $css_calendar;
+$extra_css[] = $css_calendar;
+$extra_js_include[] = "calendar.js";
 
 require("calendar_query.inc");
 require("calendar_display.inc");

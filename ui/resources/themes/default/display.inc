@@ -1,8 +1,8 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : display.inc (standard)                                       //
+// OBM - File : display.inc                                                  //
 //     - Desc : Default global display File                                  //
-// 2005-11-08 Mehdi Rande                                                    //
+// 2006-11-08 Mehdi Rande                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ function display_page(&$display) {
         $display["link"] .
         $display["detailInfo"] ." 
       </div>
-    </div>
+      </div>
     <!-- left panel end -->
     <div id=\"mainPanel\" >".
     $display["title"].
@@ -289,10 +289,6 @@ function display_head_theme($p_module) {
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width;
 
-  // Else
-  if (isset($extra_css)) {
-    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$extra_css\" />";
-  }
   $monthShort =  phpArrayToJsArray($l_monthsofyearshort);
   $monthLong = phpArrayToJsArray($l_monthsofyear);
   $daysShort = phpArrayToJsArray($l_daysofweekfirst);
@@ -303,9 +299,17 @@ function display_head_theme($p_module) {
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
 <html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
 
+  if (is_array($extra_css)) {
+    foreach($extra_css as $css_file) {
+      $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\" />";
+    }
+  } elseif (isset($extra_css)) {
+    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$extra_css\" />";
+  }
+
   if (is_array($extra_js_include)) {
     foreach($extra_js_include as $js_file) {
-      $js_include = "<script type=\"text/javascript\" src=\"$js_file\" ></script>\n";
+      $js_include = "<script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/$js_file\" ></script>\n";
     }
   }
 
@@ -320,7 +324,6 @@ function display_head_theme($p_module) {
   <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/obm.js\" ></script>
   <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/utils.js\" ></script>
 
-  <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/calendar.js\" ></script>
   $js_include
   <script type=\"text/javascript\">
   //<![CDATA[

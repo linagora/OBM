@@ -1,7 +1,7 @@
 /*/////////////////////////////////////////////////////////////////////////////
-// OBM - File : style.css (standard)                                         //
-//     - Desc : CSS style file (standard theme)                              //
-// 2003-07-30 Mehdi Rande                                                    //
+// OBM - File : style.css                                                    //
+//     - Desc : CSS style file                                               //
+// 2006-11-27 Mehdi Rande                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -960,6 +960,30 @@ input.datePicker {
   white-space: nowrap;
 }
 
+/*-------------------------------------------------------------------------- */
+/* TabbedPane styles
+/* ------------------------------------------------------------------------- */
+
+
+.tabs * {
+  display: inline;
+  font-size: 100%;
+  padding: 0 2px;
+  margin: 0 2px;
+  border: 1px solid #358399;
+  cursor: pointer;
+}
+
+.tabs .current {
+  background-color: #358399;
+  color: #fff;
+  border-bottom: none;
+}
+
+.tabs {
+  margin-top: 5px;
+  border-bottom: 1px solid #358399;
+}
 
 
 /* A PARTIR D'ICI CE SONT DES CLASSES QUE JE N'AI PAS ENCORE RENCOTREES

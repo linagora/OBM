@@ -16,7 +16,7 @@ Obm.CalendarDayEvent = new Class({
   },
 
   
-  initialize: function(eventData,options) {;
+  initialize: function(eventData,options) {
     this.setOptions(options);
     this.event = eventData;
     this.buildEvent();
@@ -26,6 +26,7 @@ Obm.CalendarDayEvent = new Class({
       this.makeDraggable();    
     this.setTime(this.event.time);
     this.setDuration(this.event.duration);
+
   },
 
   makeDraggable: function() {
@@ -44,9 +45,11 @@ Obm.CalendarDayEvent = new Class({
       },
 
       onComplete:function() {
-        this.element.setOpacity(1);
-        obm.calendarManager.moveEventTo(this.element.id,this.element.getLeft(),this.element.getTop());
-        obm.calendarManager.unlock()
+        if(obm.calendarManager.redrawLock) {
+          this.element.setOpacity(1);
+          obm.calendarManager.moveEventTo(this.element.id,this.element.getLeft(),this.element.getTop());
+          obm.calendarManager.unlock();
+        }
       }     
     };   
 
@@ -73,7 +76,7 @@ Obm.CalendarDayEvent = new Class({
 
   },
  
-  setPeriodicity() {
+  setPeriodicity: function() {
     if(this.event.periodic) {                                 
       this.periodic = new Element('img').setProperty('src',obm.vars.images.periodic)
                         .injectInside(this.dragHandler);
@@ -105,7 +108,6 @@ Obm.CalendarDayEvent = new Class({
     } else {
       this.redraw();
     }
-
   },
 
   setOrigin: function(origin) {
@@ -116,19 +118,21 @@ Obm.CalendarDayEvent = new Class({
         this.hidden = 0;
         this.setSize(this.size);
     }
-    head = $('calendarHead');
-    hr = $(this.options.type+'-'+origin);
-    if(head && typeof(this.origin) == 'undefined') {
-       hr.parentNode.setStyle('height', (hr.parentNode.offsetHeight + this.element.offsetHeight) + 'px');
-    }
+    var hr = $(this.options.type+'-'+origin);
     this.origin = origin;
     this.element.remove();
     hr.adopt(this.element);
     this.redraw();
-    if(obm.calendarManager.lock()) {
+    var thead = hr.parentNode.getFirst();
+    var size = 0;
+    do {
+      if(thead.childNodes.length > size) size = thead.childNodes.length;
+    } while(thead = thead.getNext());
+    size = size * this.element.offsetHeight + 5;
+    if(hr.parentNode.offsetHeight != size) {
+      hr.parentNode.setStyle('height', size + 'px');    
       obm.calendarManager.resizeWindow();
-      obm.calendarManager.unlock()
-    }    
+    }
     return true;
   },
 
@@ -148,7 +152,7 @@ Obm.CalendarDayEvent = new Class({
   },
 
   redraw: function() {
-    hr = $(this.options.type+'-'+this.origin);
+    hr = this.element.parentNode;
     this.element.setStyles({
       'top':  hr.getTop() + hr.getStyle('padding-top').toInt() + 'px',
       'left': hr.getLeft() + 'px'
@@ -210,7 +214,6 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     this.setOptions(options);
     this.event = eventData;
     this.buildEvent();
-    //this.element = $('event-'+this.event.id+'-'+this.event.entity+'-'+this.event.entity_id+'-'+this.event.time);
     if(this.options.resizable) 
       this.makeResizable(options);
     if(this.options.draggable)
@@ -279,7 +282,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
       yMax: this.options.context.bottom - this.element.getTop(),
 
       onStart:function() {
-        //this.element.setStyle('width', obm.calendarManager.defaultWidth + 'px');
+        obm.calendarManager.lock();
         this.element.setStyle('margin-left', '0');
         this.element.setOpacity(.7);
       },
@@ -287,6 +290,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
       onComplete:function() {
         this.element.setOpacity(1);
         obm.calendarManager.resizeEventTo(this.element.id,this.element.offsetHeight);
+        obm.calendarManager.unlock();
       }     
     };       
 
@@ -322,7 +326,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   },
 
   redraw: function() {
-    hr = $(this.options.type+'-'+this.origin);
+    hr = this.element.parentNode;
     this.element.setStyles({
       'top':  hr.getTop() + 'px',
       'left': hr.getLeft()  + 'px'      
@@ -472,6 +476,7 @@ Obm.CalendarManager = new Class({
       eventData.calendar_id = evt.event.id;
       eventData.element_id = id;
       eventData.date_begin = new Date(time * 1000).format('Y-m-d H:i:s');
+      eventData.old_date_begin = new Date(evt.event.time * 1000).format('Y-m-d H:i:s');
       eventData.duration = evt.event.duration;
       eventData.title = evt.event.title;
       eventData.all_day = evt.event.all_day;
@@ -513,6 +518,7 @@ Obm.CalendarManager = new Class({
   },
 
   unregister: function(id) {
+    evt = this.events.get(id);
     size = evt.size;
     for(var i=0;i < size;i++) {
       t = evt.origin + i*evt.options.unit;
@@ -643,24 +649,56 @@ Obm.CalendarManager = new Class({
     } else {
       showErrorMessage(resp.message);
     }
+  }, 
+
+    sendDeleteEvent: function(eventData) {
+    ajax = new Ajax('calendar_index.php',
+    {postBody:'ajax=1&action=quick_delete&' + Object.toQueryString(eventData), onComplete: this.receiveDeleteEvent, method: 'post'});
+    ajax.request();
+  },
+  
+  receiveDeleteEvent: function(request) {
+
   }
 });
 
 
+/******************************************************************************
+ * Calendar Update and creation quick form
+ ******************************************************************************/
+
 Obm.CalendarQuickForm = new Class({
   initialize: function() {
+    
     this.popup = $('calendarQuickForm');
-    this.date = $('calendarQuickFormDate');
     this.form = $('calendarQuickFormStore');
+    this.date = $('calendarQuickFormDate');
+    this.title = $('calendarQuickFormTitle');
+    this.data = $('calendarQuickFormData');
+    this.description = $('calendarQuickFormDescription');
+    this.location = $('calendarQuickFormLocation');
+    this.category = $('calendarQuickFormCategory');
+
     this.popup.setStyle('position','absolute');
+
     this.eventData = new Object();
     this.eventData.ajax = 1;
+
+    new Obm.TabbedPane(this.data);
+
   },
   
   compute: function(evt, context) {
     var target = evt.target || evt.srcElement
-    if(obm.calendarManager.redrawLock || target.id == '') {
+    var origin = evt.currentTarget || evt.srcTarget;
+    if(obm.calendarManager.redrawLock || target.getTag() == 'a') {
       return false;
+    }
+    while(target.id == '') {
+      if(target == origin) {
+        return false;
+      }
+      target = target.parentNode;
     }
     var target = $(target);
     var str = target.id.split('-');
@@ -693,17 +731,29 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.entity = evt.event.entity;
     this.eventData.all_day = evt.event.all_day;
     this.eventData.date_begin = date_begin.format('Y-m-d H:i:s');
-    this.eventData.duration = this.form.duration.value;
+    this.eventData.duration = evt.event.duration;
     this.eventData.context = context;
-    this.eventData.element_id = evt.element.id;;
+    this.eventData.element_id = evt.element.id;
     this.eventData.action = 'quick_update';
-    
+    this.eventData.gotoURI = 'action=detailupdate&calendar_id='+evt.event.id;
+    if(evt.event.updatable) {
+      this.form.setStyle('display','block');
+    } else {
+      this.form.setStyle('display','none');
+      this.title.setHTML(evt.event.title);
+      this.title.setStyle('display','block');
+
+    }
+    this.description.setHTML(evt.event.description);
+    this.category.setHTML(evt.event.category);
+    this.location.setHTML(evt.event.location);
+    this.data.setStyle('display','block');
     this.date.innerHTML = date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i');
   },
 
   setDefaultFormValues: function(time, allDay,context) {
     var date_begin = new Date(time * 1000);
-    var date_end = new Date((time + 3600) * 1000);    
+    var date_end = new Date((time + 3600) * 1000);  
     this.form.tf_title.value = '';
     this.eventData.calendar_id = '';
     this.eventData.entity_id = '';
@@ -713,7 +763,11 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.duration = 3600;
     this.eventData.context = context;
     this.eventData.element_id = '';
-    this.eventData.action = 'quick_insert';    
+    this.eventData.action = 'quick_insert';   
+    this.eventData.gotoURI = 'action=new';
+    this.form.setStyle('display','block');
+    this.data.setStyle('display','none');
+    this.title.setStyle('display','none');
     this.date.innerHTML = date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i');
   },
   
@@ -725,14 +779,61 @@ Obm.CalendarQuickForm = new Class({
     this.popup.setStyle('display','none');
   },
 
-  submit: function() {
+  submit: function(action) {
     this.eventData.title = this.form.tf_title.value;
-    
-    if(eventData.action == 'quick_insert') {
+    this.eventData.action = action || this.eventData.action;
+    if(this.eventData.action == 'quick_insert') {
       obm.calendarManager.sendCreateEvent(this.eventData);
+    } else if (this.eventData.action == 'delete') {
+      obm.calendarManager.sendDeleteEvent(this.eventData); 
     } else {
       obm.calendarManager.sendUpdateEvent(this.eventData);
     }
     this.hide();
+  },
+
+  goto: function(action) {
+    if(action) {
+      this.eventData.gotoURI += '&action='+action;
+    }
+    window.location.href = 'calendar_index.php?'+this.eventData.gotoURI;
   }
-})
+});
+
+Obm.TabbedPane = new Class({
+  initialize: function(el) {
+    this.element = el;
+    this.tabs = new Array();
+    var tab = this.element.getFirst();
+    this.tabsContainer = new Element('p').injectBefore(tab).addClassName('tabs');
+
+    do {
+      this.tabs.push(tab);
+    } while (tab = tab.getNext());
+
+    this.tabs.each(function (tabContent, index) {
+      var title = tabContent.getFirst();
+      tabContent.setStyle('height',(tabContent.parentNode.getStyle('height').toInt() - 20) + 'px');
+      tabContent.setStyle('overflow','auto');
+      title.remove();
+      title.injectInside(this.tabsContainer);
+      title.tabIndex = index;
+      if(index != 0) {
+        tabContent.setStyle('display','none');
+      } else {
+        title.addClassName('current');
+        this.current = title;
+      }
+
+      title.addEvent('click', function(evt) {
+        var target = evt.currentTarget || evt.srcTarget;
+        this.tabs[this.current.tabIndex].setStyle('display','none');
+        this.current.removeClassName('current');
+        this.current = target;
+        target.addClassName('current');
+        this.tabs[this.current.tabIndex].setStyle('display','block');
+      }.bind(this));
+      
+    }.bind(this));
+  }
+});

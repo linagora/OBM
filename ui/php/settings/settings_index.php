@@ -177,8 +177,8 @@ $sel_dsrc .= "</select>";
 
   $dis_debug = "
   <tr>
-    <td class=\"adminLabel\">$l_set_debug ($set_debug)</td>
-    <td class=\"adminText\">
+    <th>$l_set_debug ($set_debug)</th>
+    <td>
       <input type=\"checkbox\" name=\"param_debug_id\" value=\"$cdg_id\" $dg_id />$l_dg_id
       <input type=\"checkbox\" name=\"param_debug_param\" value=\"$cdg_param\" $dg_param />$l_dg_param
       <input type=\"checkbox\" name=\"param_debug_sess\" value=\"$cdg_sess\" $dg_sess />$l_dg_sess
@@ -193,19 +193,15 @@ $sel_dsrc .= "</select>";
 // display en entry                                                          //
 ///////////////////////////////////////////////////////////////////////////////
 $lang_dir = dir("$path/../$obminclude/lang");
-$dis_lang = "<table class=\"admin\">";
 while ($entry=$lang_dir->read()) {
   if (strcmp($entry, ".") && strcmp($entry,"..") && strcmp($entry,"CVS")
       && is_dir($lang_dir->path."/".$entry)) {
-    $dis_lang .= "<tr>
-      <td class=\"adminLabel\">
-        <a href=\"" . url_prepare("settings_index.php?param_lang=$entry") ."\">
-        <img src=\"".C_IMAGE_PATH."/images/flag-$entry.gif\" /></a>
-      </td>
-      </tr>";
+        $dis_lang .= "
+      <a href=\"settings_index.php?param_lang=$entry\">
+        <img src=\"".${"flag_$entry"}."\" alt=\"[Language $entry]\"/></a>
+      ";
   }
 }
-$dis_lang .= "</table>";
 $lang_dir->close();
 
 
@@ -213,21 +209,21 @@ $lang_dir->close();
 // For each THEME directory in the themes direcory (but ., .., CVS)          //
 // display en entry                                                          //
 ///////////////////////////////////////////////////////////////////////////////
-$theme_dir = dir("$path/../$obminclude/themes");
-$dis_theme = "<table class=\"admin\">";
+$theme_dir = dir("../$path/resources/themes");
+$dis_theme = "";
 while ($entry = $theme_dir->read()) {
   $dotcase = strcmp($entry, "."); 
   if (strcmp($entry, ".") && strcmp($entry,"..") && strcmp($entry,"CVS")
        && strcmp($entry,"images") && is_dir($theme_dir->path."/".$entry)) {
-    $dis_theme .= "<tr>
-      <td class=\"adminLabel\">
-        <a href=\"".url_prepare("settings_index.php?param_theme=$entry") .
-        "\"><img src=\"".C_IMAGE_PATH."/$entry/$entry.jpg\" /></a>
-      </td>
-      </tr>";
+    $dis_theme .= "
+      <a href=\"settings_index.php?param_theme=$entry\">
+      <img src=\"".${"preview_".$entry}."\" alt=\"[Theme $entry]\" style=\"height:20%;width:20%;\"
+      onmouseover=\"\" 
+      onmouseout=\"\"/>
+      </a>
+      ";
   }
 }
-$dis_theme .= "</table>";
 $theme_dir->close();
 
 
@@ -241,27 +237,26 @@ if ($form_user_pref) {
 $display["detail"] .= "
 <!--User preferences current config -->
 
-  <center>
-  <form action=\"".url_prepare("settings_index.php")."\" method=\"get\">
-  <table class=\"admin\">
+  <form action=\"settings_index.php\" method=\"get\">
+  <fieldset class=\"detail infos\">
+  <legend>$l_cur_settings</legend>
+  <table>
   <tr>
-    <td class=\"adminHead\" colspan=\"2\">$l_cur_settings</td>
-  </tr><tr>
-    <td class=\"adminLabel\">$l_set_menu</td>
-    <td class=\"adminText\">
+    <th>$l_set_menu</th>
+    <td>
       <input type=\"radio\" name=\"param_menu\" value=\"$cme_txt\" $me_txt />$l_me_txt
       <input type=\"radio\" name=\"param_menu\" value=\"$cme_ico\" $me_ico />$l_me_ico
       <input type=\"radio\" name=\"param_menu\" value=\"$cme_both\" $me_both />$l_me_both
     </td>
   </tr><tr>
-    <td class=\"adminLabel\">$l_auto_display</td>
-    <td class=\"adminText\">
+    <th>$l_auto_display</th>
+    <td>
       <input type=\"checkbox\" name=\"param_display\" value=\"yes\" ";
 if ($set_display == "yes") $display["detail"] .= "checked = \"checked\"";
 $display["detail"] .= " /></td>
   </tr><tr>
-    <td class=\"adminLabel\">$l_set_rows</td>
-    <td class=\"adminText\">
+    <th>$l_set_rows</th>
+    <td>
       <input size=\"3\" name=\"param_rows\" value=\"$set_rows\" /></td>
   </tr>";
 
@@ -269,45 +264,34 @@ if ($cgp_show["module"]["todo"]) {
 
   $display["detail"] .= "
 
-<!-- Todo Order config ------------------------------------------------------->
+<!-- Todo Order config -->
   <tr>
-    <td class=\"adminLabel\">$l_set_todo</td>
-    <td class=\"adminText\">$sel_todo</td>
+    <th>$l_set_todo</th>
+    <td>$sel_todo</td>
   </tr>";
 }
 
 $display["detail"] .= "
 
-<!-- Data Source config ------------------------------------------------------>
+<!-- Data Source config -->
   <tr>
-    <td class=\"adminLabel\">$l_datasource</td>
-    <td class=\"adminText\">$sel_dsrc</td>
+    <th>$l_datasource</th>
+    <td>$sel_dsrc</td>
   </tr>
-
-<!-- Date Format config ------------------------------------------------------>
+  </table>
+  </fieldset>
+  <fieldset class=\"detail infos\">
+  <legend>$l_cur_settings</legend>
+  <table>
+<!-- Date Format config -->
   <tr>
-      <td class=\"adminLabel\">$l_set_date_upd</td>
-          <td class=\"adminText\">
-          <input type=\"radio\" name=\"param_date_upd\" value=\"$cda_upd_dmy\" $da_dmy />$l_da_dmy
-          <input type=\"radio\" name=\"param_date_upd\" value=\"$cda_upd_mdy\" $da_mdy />$l_da_mdy
-        </td>
-  </tr>
-  <tr>
-    <td class=\"adminLabel\">$l_set_date</td>
-    <td class=\"adminText\">
-      <input type=\"radio\" name=\"param_date\" value=\"$cda_iso\" $da_iso />$l_da_iso
-      <input type=\"radio\" name=\"param_date\" value=\"$cda_en\" $da_en />$l_da_en
-      <input type=\"radio\" name=\"param_date\" value=\"$cda_fr\" $da_fr />$l_da_fr
-      <input type=\"radio\" name=\"param_date\" value=\"$cda_txt\" $da_txt />$l_da_txt
-    </td>
-  </tr><tr>
-    <td class=\"adminLabel\">$l_set_commentorder</td>
-    <td class=\"adminText\">
+    <th>$l_set_commentorder</th>
+    <td>
       <input type=\"radio\" name=\"param_commentorder\" value=\"$cco_chro\" $co_chro />$l_co_chro
       <input type=\"radio\" name=\"param_commentorder\" value=\"$cco_rev\" $co_rev />$l_co_rev
     </td>
   </tr><tr>
-    <td class=\"adminLabel\">$l_send_mail</td>
+    <th>$l_send_mail</th>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"param_mail\" value=\"yes\" ";
 if ($set_mail == "yes") $display["detail"] .= "checked";
@@ -318,8 +302,8 @@ $display["detail"] .= " /></td>
 if ($cgp_show["module"]["calendar"]) {
   $display["detail"] .= "
   <tr>
-    <td class=\"adminLabel\">$l_set_cal_interval</td>
-    <td class=\"adminText\">
+    <th>$l_set_cal_interval</th>
+    <td>
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1
@@ -329,60 +313,57 @@ if ($cgp_show["module"]["calendar"]) {
 
 $display["detail"] .= "
   <tr>
-    <td class=\"adminLabel\">$l_set_csv_sep</td>
-    <td class=\"adminText\">
-      <input type=\"radio\" name=\"param_csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc
-      <input type=\"radio\" name=\"param_csv_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab
-    </td>
+  <th>$l_set_csv_sep</th>
+  <td>
+    <input type=\"radio\" name=\"param_csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc
+    <input type=\"radio\" name=\"param_csv_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab
+  </td>
   </tr>
   $dis_debug
+  </table>
+  </fieldset>
+  <fieldset class=\"detail extra\">
+  <legend>$l_date</legend>
+  <table>
   <tr>
-    <td class=\"adminLabel\" colspan=\"2\">
-      <input name=\"form_user_pref\" type=\"hidden\" value=\"1\" />
-      <input name=\"submit\" type=\"submit\" value=\"$l_validate\" />
-    </td>
+  <td>$l_set_date_upd</td>
+  <td>
+    <input type=\"radio\" name=\"param_date_upd\" value=\"$cda_upd_dmy\" $da_dmy />$l_da_dmy
+    <input type=\"radio\" name=\"param_date_upd\" value=\"$cda_upd_mdy\" $da_mdy />$l_da_mdy
+  </td>
+  <td>$l_set_date</td>
+  <td>
+    <input type=\"radio\" name=\"param_date\" value=\"$cda_iso\" $da_iso />$l_da_iso
+    <input type=\"radio\" name=\"param_date\" value=\"$cda_en\" $da_en />$l_da_en
+    <input type=\"radio\" name=\"param_date\" value=\"$cda_fr\" $da_fr />$l_da_fr
+    <input type=\"radio\" name=\"param_date\" value=\"$cda_txt\" $da_txt />$l_da_txt
+  </td>
   </tr>
   </table>
+  </fieldset>  
+  <fieldset class=\"buttons\">
+    <input name=\"form_user_pref\" type=\"hidden\" value=\"1\" />
+    <input name=\"submit\" type=\"submit\" value=\"$l_validate\" />
+  </fieldset>
   </form>
-  <p />
+  <hr />
+<!-- Lang and theme current config -->
+  <div class=\"detail infos\">
+  <h1>$l_cur_lang</h1>
+  <img src=\"".${"flag_$set_lang"}."\" alt=\"[language]\" />
+  <h1>$l_set_lang</h1>
+  $dis_lang
+  </div>
+  <div class=\"detail infos\">
+  <h1>$l_cur_theme</h1>
+  <img src=\"".${"preview_$set_theme"}."\" alt=\"[Theme]\"  />
+  <h1>$l_set_theme</h1>
+  $dis_theme
+  </div>
 
-<!-- Lang and theme current config ---------------------------------------- -->
+<!-- Display available configs -->
 
-  <table class=\"admin\">
-  <tr>
-    <td class=\"adminHead\">$l_cur_lang</td>
-    <td class=\"adminHead\">$l_cur_theme</td>
-  </tr><tr>
-    <td class=\"adminLabel\">
-      <img src=\"".C_IMAGE_PATH."/images/flag-$set_lang.gif\" />
-    </td>
-    <td class=\"adminLabel\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$set_theme.jpg\" />
-    </td>
-  </tr>
-  </table>
-
-<!-- Display available configs -------------------------------------------- -->
-
-  <p />$l_new_settings
-  <p />
-  <table class=\"admin\">
-  <tr>
-    <td class=\"adminHead\">&nbsp; $l_set_lang &nbsp;</td>
-    <td class=\"adminHead\">&nbsp; $l_set_theme &nbsp;</td>
-  </tr><tr>
-    <td class=\"adminLabel\">
-      $dis_lang
-    </td>
-    <td class=\"adminLabel\">
-      $dis_theme
-    </td>
-  </tr>
-  </table>
-
-  </center>
-  </body>
-  </html>";
+  ";
 
 
 ///////////////////////////////////////////////////////////////////////////////

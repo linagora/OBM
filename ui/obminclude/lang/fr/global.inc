@@ -121,6 +121,7 @@ $l_category1 = "Catégorie";
 $l_aduplicate = "Duplicata";
 $l_hide = "Masquer";
 $l_show = "Afficher";
+$l_advanced = "Avancé";
 
 // Entities
 $l_company = "Société";

@@ -887,7 +887,7 @@ function run_query_calendar_update_event_data($calendar) {
   $description = $calendar["description"];
   $location = $calendar["location"];
   $datebegin = $calendar["date_begin"];
-  $event_duration = $calendar["duration"];
+  $event_duration = $calendar["event_duration"];
   ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
   $event_id = $calendar["calendar_id"]; 
   if ($calendar["privacy"] != 1) $privacy = 0; else $privacy = 1; 
@@ -1001,6 +1001,7 @@ function run_query_calendar_quick_event_insert($calendar) {
   $obm_q->query($query);
   $obm_q->next_record(); 
   $event_id = $obm_q->f("max_id"); 
+  run_query_calendar_insert_entity_event("user", $uid, $event_id, 'A');
   return $event_id;
 }
 
@@ -1024,6 +1025,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q) {
   $location = $event_q->f("calendarevent_location");
   ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
   $datebegin = $calendar["date_begin"];
+  $olddatebegin = $calendar["old_date_begin"];
   $event_duration = $calendar["duration"];
   if ($event_q->f("calendarevent_privacy")!=1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $event_q->f("calendarevent_repeatkind");
@@ -1046,7 +1048,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q) {
         '$uid',
         '$now',
         '$id',
-        '$datebegin'
+        '$olddatebegin'
       )";
   $obm_q->query($query);
   

@@ -167,7 +167,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     } else {
       $selected_s = "";
     }
-    $sel_group .= "<option value=\"".url_prepare("calendar_index.php?action=$new_action&amp;date=$iso_date&amp;group_id=$g_id&amp;new_group=1")."\" $selected_s>$g_name</option>\n";
+    $sel_group .= "<option value=\"calendar_index.php?action=$new_action&amp;date=$iso_date&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
   }
   $sel_group .= "</optgroup>
   </select>";
@@ -193,46 +193,59 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   if ($ccalendar_resource) {
     $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction=user";
     $dis_block_resource = "
+    </fieldset>
+    <fieldset class=\"detail extra\">
+    <legend>           
       $l_resources
       <a href=\"javascript: return false;\"
       onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-      <img src=\"$ico_add\" alt=\"[Add]\" /> </a><br />
+      <img src=\"$ico_add\" alt=\"[Add]\" /> </a>
+    </legend>       
+
     ";
   }
 
-  $dis_back_myview = "<a class=\"calendarLink\" href=\"calendar_index.php?action=$new_action&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$uid&amp;date=$iso_date\">$l_back_mono</a>";
+  $dis_back_myview = "<a href=\"calendar_index.php?action=$new_action&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$uid&amp;date=$iso_date\">$l_back_mono</a>";
 
   $block = "
     <div class=\"portlet\" id=\"calendarSelection\">
     <h1>$l_selection</h1>
     <div>
-        $l_group_members
-        <form action=\"\" onsubmit=\"return false;\">
-        <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-        $sel_group
-        </select>
-        $dis_back_all_users
-        </form>
+    <form action=\"\" onsubmit=\"return false;\">
+    <fieldset class=\"detail extra\"
+    <legend>$l_group_members</legend>
+    <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+    $sel_group
+    </select>
+    $dis_back_all_users
+    </fieldset>
+    </form>
 
     <form action=\"calendar_index.php\" method=\"get\">
+    <fieldset class=\"detail extra\">
+    <legend>
+    $l_users
+    <a href=\"javascript: return false;\" 
+    onclick=\"window.open('$url_user','','height=$popup_height,width=$popup_width,scrollbars=yes');
+  return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
+    </legend>
     <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
     <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
     <input type=\"hidden\" name=\"new_group\" value=\"1\" />
     <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
     <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
-    $l_users
-    <a href=\"javascript: return false;\" 
-      onclick=\"window.open('$url_user','','height=$popup_height,width=$popup_width,scrollbars=yes');
-      return false;\">
-       <img src=\"$ico_add\" alt=\"[Add]\" />
-    </a><br />
     $dis_block_resource
-      <input type=\"submit\" value=\"$l_validate\" />
-      $dis_back_myview
+    </fieldset>
+    <div id=\"sel_ent\">
+    </div>
+    <fieldset class=\"buttons\">
+    <input type=\"submit\" value=\"$l_validate\" />
+    </fieldset>
+    $dis_back_myview
     </form>
     </div>
-    </div>";
+   </div>";
 
   return $block;
 }
@@ -356,15 +369,15 @@ function html_calendar_bar_date_selector($calendar) {
   <div class=\"portlet\" id=\"calendarGoTo\">
   <h1>$l_go_to</h1>
   <form action=\"\" class=\"detail\" onsubmit=\"return false;\">
-    <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+    <select name=\"actionWeek\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
     $sel_month
     </select>
-    <input type=\"image\" src=\"$ico_ok\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);return false;\" />
+    <input type=\"image\" src=\"$ico_ok\" value=\"$l_go\" onclick=\"window.location=(this.form.actionWeek.options[this.form.actionWeek.selectedIndex].value);return false;\" />
     <br />
-    <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+    <select name=\"actionMonth\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
     $sel_week
     </select>
-    <input type=\"image\" src=\"$ico_ok\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);return false;\" />
+    <input type=\"image\" src=\"$ico_ok\" value=\"$l_go\" onclick=\"window.location=(this.form.actionMonth.options[this.form.actionMonth.selectedIndex].value);return false;\" />
   </form>
   </div>
 ";
@@ -424,7 +437,7 @@ function dis_calendar_year_planning($calendar, $calendar_entity) {
       <table class=\"calendarCal\">
       <tr>
         <td colspan=\"7\" class=\"calendarHead2\">
-          <a class=\"calendarLink\" href=\"".url_prepare("calendar_index.php?action=view_month&amp;date=$iso_month")."\">
+          <a class=\"calendarLink\" href=\"calendar_index.php?action=view_month&amp;date=$iso_month\">
       " . calendar_localizeDate ("month", $ts_minical) . "
           </a>
         </td>
@@ -475,7 +488,7 @@ function dis_calendar_year_planning($calendar, $calendar_entity) {
               onmouseover=\"this.style.backgroundColor='#dddddd'\" 
 	      onmouseout=\"this.style.backgroundColor='#f4e5a9'\"
 	      onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\">
-	  <a class=\"calendarLink\" href=\"".url_prepare("calendar_index.php?action=view_day&amp;date=$iso_day")."\">$day</a>$dis_event_cal
+	  <a class=\"calendarLink\" href=\"calendar_index.php?action=view_day&amp;date=$iso_day\">$day</a>$dis_event_cal
           </td>";
       }	
       elseif ($check_month == $minical_month) {	   
@@ -484,7 +497,7 @@ function dis_calendar_year_planning($calendar, $calendar_entity) {
 	      onmouseover=\"this.style.backgroundColor='#dddddd'\"
 	      onmouseout=\"this.style.backgroundColor='#ffffff'\" 
 	      onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\">
-          <a class=\"calendarLink\" href=\"".url_prepare("calendar_index.php?action=view_day&amp;date=$iso_day")."\">$day</a>$dis_event_cal
+          <a class=\"calendarLink\" href=\"calendar_index.php?action=view_day&amp;date=$iso_day\">$day</a>$dis_event_cal
           </td>";
       } else {
 	$dis_calendar .= "
@@ -492,7 +505,7 @@ function dis_calendar_year_planning($calendar, $calendar_entity) {
 	      onmouseover=\"this.style.backgroundColor='#dddddd'\"
 	      onmouseout=\"this.style.backgroundColor='#f2f2f2'\"
 	      onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\">
-	  <a class=\"calendarLink2\" href=\"".url_prepare("calendar_index.php?action=view_day&amp;date=$iso_day")."\">$day</a>$dis_event_cal
+	  <a class=\"calendarLink2\" href=\"calendar_index.php?action=view_day&amp;date=$iso_day\">$day</a>$dis_event_cal
           </td>";
       }
       $start_day = strtotime("+1 day", $start_day); 
@@ -526,13 +539,13 @@ function dis_calendar_year_planning($calendar, $calendar_entity) {
   <table class=\"calendarCalYear\">
   <tr>
     <td class=\"calendarHead\">
-      <a href=\"".url_prepare("calendar_index.php?action=view_year&amp;date=".$prev_year)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"Previous Month\" /></a>
+      <a href=\"calendar_index.php?action=view_year&amp;date=$prev_year\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"Previous Month\" /></a>
     </td>
     <td class=\"calendarHead\" colspan=\"3\">
       $this_year
     </td>
     <td class=\"calendarHead\">
-      <a href=\"".url_prepare("calendar_index.php?action=view_year&amp;date=".$next_year)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"Next Month\" /></a>
+      <a href=\"calendar_index.php?action=view_year&amp;date=$next_year\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"Next Month\" /></a>
     </td>
   </tr> 
   <tr>
@@ -779,7 +792,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
     obm.vars.images.meeting = '$ico_meeting';
     obm.vars.consts.timeUnit = $time_unit_sec;
     obm.calendarManager = new Obm.CalendarManager($start_week_time);
-    obm.calendarManager.lock()
+    obm.calendarManager.lock();
   </script>
   $dis_event
   <script type=\"text/javascript\">
@@ -895,6 +908,8 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
 function dis_calendar_event($occurrence, $unit, $calendar_entity, $options=array()) {
   global $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting, $auth;
+  global $l_user, $l_resource, $l_task;
+
   $event = $occurrence->event;
   $title = addslashes($event->title);
   $duration = $event->duration;
@@ -903,6 +918,10 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity, $options=array
   $entity_id = $occurrence->id;
   $entity = $occurrence->entity;
   $all_day = $event->all_day;
+  $description = phpStringToJsString($event->description);
+  $attendee = $event->attendee;
+  $location = phpStringToJsString($event->location);
+  $category = phpStringToJsString($event->category1);
   $entityClass = $calendar_entity[$entity][$entity_id]["class"];
   $ed[] = "id:$id";
   $ed[] = "entity:'$entity'";
@@ -912,8 +931,15 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity, $options=array
   $ed[] = "title:'$title'";
   $ed[] = "all_day:$all_day";
   $ed[] = "class:'$entityClass'"; 
+  $ed[] = "description:'$description'";
+  $ed[] = "location:'$location'";
+  $ed[] = "category:'$category'";
+  foreach ($attendee as $entity => $entities) {
+    $ed[] = ${"l_$entity"}.":['".implode("','",$entities)."']"; 
+  }
   if($entity == "user" && $entity_id == $auth->auth["uid"]) {
     $updatable =  true;
+    $ed[] = "updatable:true";
   }
 
   switch($unit)  {
@@ -1613,6 +1639,8 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
  */
 function dis_calendar_quick_form($calendar) {
   global $uid, $ico_popup_close,$l_validate,$popup_queue,$l_title;
+  global $l_advanced,$l_desc,$l_confirm_delete,$l_c_delete,$l_category1;
+  global $l_location,$l_members,$l_carac;
 
   $block = "
     <div id=\"calendarQuickForm\">
@@ -1622,15 +1650,46 @@ function dis_calendar_quick_form($calendar) {
       </a>
       <span id=\"calendarQuickFormDate\"></span>
       </h1>
+      <h2>
+      <a id=\"calendarQuickFormTitle\" href=\"\" onclick=\"obm.calendarQuickForm.goto('detailconsult'); return false\">
+      </a>
+      </h2> 
       <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
       <fieldset>
-        $l_title : <input type=\"text\" name=\"tf_title\" />
+        $l_title : <input type=\"text\" name=\"tf_title\" /> <input type=\"submit\" value=\"$l_validate\" />
       </fieldset> 
-      <fieldset class=\"buttons\">
-        <input type=\"submit\" value=\"$l_validate\" />
-        <input type=\"button\" value=\"$l_validate\" />
+      <fieldset class=\"buttons\"> 
+        <input type=\"button\" onclick=\"obm.calendarQuickForm.goto();\" value=\"$l_advanced\" />
+      <input type=\"button\" 
+      onclick=\"if(confirm('$l_confirm_delete')) obm.calendarQuickForm.submit('delete');\"
+      value=\"$l_c_delete\" />
       </fieldset>
       </form>
+      <div id=\"calendarQuickFormData\">
+      <div>
+      <h3>$l_members</h3>
+      Youpu
+        <table id=\"calendarQuickFormAttendees\">
+        </table>
+      </div>
+      <div>
+        <h3>$l_carac</h3>
+        <table>
+        <tr>
+        <th>$l_location</th>
+        <td id=\"calendarQuickFormLocation\"></td>
+        </tr>
+        <tr>
+        <th>$l_category1</th>
+        <td id=\"calendarQuickFormCategory\"></td>
+        </tr>
+        </table>
+      </div>
+      <div>
+        <h3>$l_desc</h3>
+        <p id=\"calendarQuickFormDescription\"></p>
+        </div>
+      </div>
       <img src=\"$popup_queue\" alt=\"\"/>
     </div>
     <script type=\"text/javascript\">
@@ -1655,7 +1714,7 @@ function dis_calendar_quick_form($calendar) {
 function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $groups,$tasks, $cats1) {
   global $path, $display, $auth;
   global $ccalendar_resource, $ccalendar_weekstart, $set_cal_interval,$ico_project;
-  global $ico_mini_cal, $ico_add_user, $ico_add_resource, $ico_add_group,$ico_delete;
+  global $ico_mini_cal, $ico_add,$ico_delete;
   global $ccalendar_first_hour, $ccalendar_last_hour,$ico_project;
   // -- Labels
   global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_desc;
@@ -1823,7 +1882,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"$ico_add_user\" alt=\"[Add]\" />
+       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>
      </th>
      <td id=\"sel_user_id\">
@@ -1855,7 +1914,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"$ico_add_group\" alt=\"[Add]\" />
+       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>
      </th>    
      <td id=\"sel_group_id\">
@@ -1889,7 +1948,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"$ico_add_resource\" alt=\"[Add]\" />
+       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>
      </th>    
      <td id=\"sel_resource_id\">
@@ -1989,7 +2048,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
   $block = "
   <form method=\"get\" name=\"f_entity\"
    onsubmit=\"if(this.tf_title.value == '')this.tf_title.value = this.task_new_name.value; if (check_calendar_calendar(this)) return true; else return false;\"
-   action=\"".url_prepare("calendar_index.php")."\">
+   action=\"calendar_index.php\">
   <fieldset class=\"detail infos\">  
   <legend>$l_module_calendar</legend>
   <table>
@@ -2300,8 +2359,8 @@ function html_calendar_dis_delete($calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   global $display, $path, $set_cal_interval;
-  global $ico_delete, $ico_mini_cal, $ico_add_user, $ico_add_group,$ico_add_resource;
-  global $popup_height,$popup_width,$ccalendar_resource,$ico_add_resourcegroup;
+  global $ico_delete, $ico_mini_cal, $ico_add ;
+  global $popup_height,$popup_width,$ccalendar_resource;
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
   global $l_groups,$l_resources,$l_module_resourcegroup;
@@ -2352,15 +2411,15 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
    
   $block_user = "
-    <td class=\"detailLabel\">
+    <th>
     $l_users
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-      <img src=\"$ico_add_user\" alt=\"[Add]\" />
+      <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>
-    </td>    
-    <td class=\"detailForm\" id=\"sel_user_id\">
+    </th>    
+    <td id=\"sel_user_id\">
       $dis_sel_user
     </td>
   ";
@@ -2383,15 +2442,15 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
     $dis_block_resource = "
     <tr>
-      <td class=\"detailLabel\">
+      <th>
       $l_resources
       <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"$ico_add_resource\" alt=\"[Add]\" />
+       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>      
-      </td>
-     <td class=\"detailForm\" id=\"sel_resource_id\">
+      </th>
+     <td>
        $dis_sel_resource
      </td>      
     </tr>";
@@ -2414,15 +2473,15 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     $url_resource_group = "$path/resourcegroup/resourcegroup_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_group_id";
     $dis_block_resource_group = "
     <tr>
-      <td class=\"detailLabel\">
+      <th>
       $l_module_resourcegroup
       <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url_resource_group','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"$ico_add_resourcegroup\" alt=\"[Add]\" />
+       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>      
-      </td>
-     <td class=\"detailForm\" id=\"sel_resource_group_id\">
+      </th>
+      <td id=\"sel_resource_group_id\">
        $dis_sel_resource_group
      </td>      
     </tr>";
@@ -2448,15 +2507,15 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
 
   $block_group = "
-    <td class=\"detailLabel\">
+    <th>
     $l_groups
     <a href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"$ico_add_group\" alt=\"[Add]\" />
+       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>
-     </td>
-     <td class=\"detailForm\" id=\"sel_group_id\">
+     </th>
+     <td id=\"sel_group_id\">
        $dis_sel_group
      </td>
 ";
@@ -2483,16 +2542,17 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     }
   }
   $dis_min_d .= "</select>";
-  $display["title"] = "<div class=\"title\">$l_header_meeting</div>";
+  $display["title"] = "<h1 class=\"title\">$l_header_meeting</h1>";
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[0]";
 
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"post\" name=\"f_entity\"
    onsubmit=\"if (calendar_check_meeting(this)) return true; else return false;\"
-   action=\"".url_prepare("calendar_index.php")."\">
-  <div class=\"detailHead\">$l_header_meeting</div>
-  <table class=\"detail\">
+   action=\"calendar_index.php\">
+  <fieldset class=\"detail extra\">  
+  <legend>$l_header_meeting</legend>
+  <table>
   <tr>
     $block_user
   </tr>
@@ -2502,20 +2562,20 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   $dis_block_resource  
   $dis_block_resource_group
   <tr>
-    <td class=\"detailLabel\">$l_datebegin $l_format</td>
-    <td class=\"detailForm\">
-  		<script>calendar('tf_date_begin','$datebegin')</script>
+    <th>$l_datebegin $l_format</th>
+    <td>
+      <input type=\"text\" name=\"tf_date_begin\" value=\"$datebegin\" class=\"datePicker\" />
     </td>
   </tr>
   <tr>    
-    <td class=\"detailLabel\">$l_event_duration</td>
-    <td class=\"detailForm\">$dis_hour_d : $dis_min_d</td>
+    <th>$l_event_duration</th>
+    <td>$dis_hour_d : $dis_min_d</td>
   </tr>
   </table>
-
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-  </div>    
+  </fieldset>
+  <fieldset class=\"buttons\">
+    $dis_button
+  </fieldset>    
   </form>
 ";
 
@@ -2561,6 +2621,8 @@ function dis_calendar_free_interval($calendar, $entity_store) {
   $end_week = calendar_localizeDate("week", $end_week_time);
   $display_date = "$start_week - $end_week"; 
   $events = calendar_events_model($start_week_day,$end_week_time,$entity_store);
+  echo "<pre>";var_dump($events);echo "</pre>";
+
   $day_duration = 86400; 
   $resource_div .= "
   <div id=\"ressource-default\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
@@ -2982,20 +3044,21 @@ function json_event_data($id,$calendar) {
   $ent_q = run_query_get_events_attendee(array($id));
   $entities = get_calendar_event_entity($id);
   $all_day = $calendar['all_day'];
-  $date = $calendar['date_begin'];
+  $date = strtotime($calendar['date_begin']);
   //$eve_q->f("calendarevent_date");
   $duration = $calendar['duration'];
   $title = $calendar['title'];
 
   $ed[] = "id:".$id;
   $ed[] = "duration:".$duration;
-  $ed[] = "time:".strtotime($date);
+  $ed[] = "time:".$date;
   $ed[] = "all_day:".$all_day;
   $ed[] = "title:'".$title."'";
   
   $entity_readable = get_calendar_entity_readable();
   $sel_entity_id = slice_calendar_entities($cal_entity_id, $max_display, $max_display, $entity_readable);
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($cal_entity_id));
+  
   switch($context)  {
     case "day" :
       $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
