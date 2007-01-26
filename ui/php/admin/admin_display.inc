@@ -133,7 +133,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     <div class=\"buttons\">  
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"clear_sess\" />
-        <input type=\"submit\" value=\"$l_execute\" /></th>
+        <input type=\"submit\" value=\"$l_execute\" />
     </div>
     </div>
     </form>
