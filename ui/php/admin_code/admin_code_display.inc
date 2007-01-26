@@ -16,7 +16,7 @@
 function dis_admin_code_help($mode) {
 
   if ($mode == "html")
-    echo "<table class=\"detail\">
+    echo "<table>
       <tr>
         <td><pre>";
 
@@ -73,7 +73,6 @@ function html_admin_code_index($actions, $words) {
   }
 
   echo "
-    <br />
     <form method=\"get\" action=\"" . url_prepare("admin_code_index.php"). "\">
     <div class=\"detail infos\">
     <h1>Show misuse</h1>
@@ -382,7 +381,9 @@ Line   --   File   --   #Use
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<table class=\"spreadSheet\">
+    echo "
+    <div overflow : auto>
+    <table class=\"spreadSheet\">
     <thead>
     <tr>
       <th colspan=\"3\">Function $func</th>
@@ -400,7 +401,7 @@ Line   --   File   --   #Use
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "</table>";
+    echo "</table></div>";
   }
 
   return true;
