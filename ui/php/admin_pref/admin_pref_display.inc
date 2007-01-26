@@ -18,12 +18,12 @@ function dis_admin_pref_help($mode) {
   if ($mode == "html")
     echo "<table>
       <tr>
-        <td>";
+        <td><pre>";
 
   include ("admin_pref_help.inc");
 
   if ($mode == "html")
-    echo "</td>
+    echo "</pre></td>
       </tr>
       </table>";
 }

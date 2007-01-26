@@ -18,12 +18,12 @@ function dis_admin_lang_help($mode) {
   if ($mode == "html")
     echo "<table>
       <tr>
-        <td>";
+        <td><pre>";
 
   include ("admin_lang_help.inc");
 
   if ($mode == "html")
-    echo "
+    echo "</pre>
         </td>
       </tr>
       </table>";
@@ -289,23 +289,31 @@ function html_admin_lang_src_vars($module, $ref_vars, $used_vars, $unused_vars) 
   }
 
   echo "
-    <table class=\"admin\">
+   <div class=\"detail extra\">
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"2\">
+      <th colspan=\"2\">
       $module : Variables referenced from module source
-      </td>
-    </tr><tr>
-      <td class=\"adminHead\">used vars : $nb_used_vars</td>
-      <td class=\"adminHead\">UNused vars : $nb_unused_vars</td>
-    </tr><tr>
-      <td class=\"adminText\">
+      </th> 
+    </tr>
+    <tr>
+      <td>used vars : $nb_used_vars</td>
+      <td>UNused vars : $nb_unused_vars</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>
         $dis_var
       </td>
-      <td class=\"adminText\">
+      <td>
         $dis_uvar
       </td>
     </tr>
-    </table>";
+    </tbody>
+    </table>
+    </div>";
 }
 
 
@@ -526,8 +534,8 @@ function html_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v
     if ($value) {
       $text_used_def .= "
     <tr>
-      <td class=\"adminText\">$lval</td>
-      <td class=\"adminText\">$value</td>
+      <td>$lval</td>
+      <td>$value</td>
     </tr>";
       $nb_used_def++;
     }
@@ -540,8 +548,8 @@ function html_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v
     if ($value) {
       $text_used_def_glo .= "
     <tr>
-      <td class=\"adminText\">$lval</td>
-      <td class=\"adminText\">$value</td>
+      <td>$lval</td>
+      <td>$value</td>
     </tr>";
       $nb_used_def_glo++;
     }
@@ -555,8 +563,8 @@ function html_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v
     if (($value)  && ($gvalue)) {
       $text_used_def_twi .= "
     <tr>
-      <td class=\"adminText\">$lval</td>
-      <td class=\"adminText\">$value</td>
+      <td>$lval</td>
+      <td>$value</td>
     </tr>";
       $nb_used_def_twi++;
     }
@@ -570,8 +578,8 @@ function html_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v
     if ((! $value) && (! $value2)) {
       $text_used_undef .= "
     <tr>
-      <td class=\"adminText\">$lval</td>
-      <td class=\"adminText\">$value</td>
+      <td>$lval</td>
+      <td>$value</td>
     </tr>";
       $nb_used_undef++;
     }
@@ -583,8 +591,8 @@ function html_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v
     if ($value) {
       $text_unused_def .= "
     <tr>
-      <td class=\"adminText\">$lval</td>
-      <td class=\"adminText\">$value</td>
+      <td>$lval</td>
+      <td>$value</td>
     </tr>";
       $nb_unused_def++;
     }
@@ -596,8 +604,8 @@ function html_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v
     if (! $value) {
       $text_unused_undef .= "
     <tr>
-      <td class=\"adminText\">$lval</td>
-      <td class=\"adminText\">$value</td>
+      <td>$lval</td>
+      <td>$value</td>
     </tr>";
       $nb_unused_undef++;
     }
@@ -608,67 +616,95 @@ function html_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v
     if ((! in_array($lvar, $used_v)) && (! in_array($lvar, $unused_v))) {
       $text_def_unref .= "
     <tr>
-      <td class=\"adminText\">$lvar</td>
-      <td class=\"adminText\">$lval</td>
+      <td>$lvar</td>
+      <td>$lval</td>
     </tr>";
       $nb_def_unref++;
     }
   }
 
   echo "
-    <table class=\"admin\">
+    <div class=\"detail extra\">
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"2\">$module / $lang<br />
+      <th colspan=\"2\">$module / $lang<br />
       From Source : <b>$nb_ref</b> var referenced :
         <b>$nb_used</b> used - <b>$nb_unused</b> unused 
       <br />From lang file : <b>$nb_lang</b> ($module.inc),
           <b>$nb_used_def_glo</b> ($lang/global.inc) vars defined
-      </td>
+      </th>
     </tr><tr>
-      <td class=\"adminText\" colspan=\"2\">&nbsp;</td>
-    </tr><tr>
-      <td class=\"adminHead\" colspan=\"2\">
+      <th colspan=\"2\">
         Vars Used and defined : <b>$nb_used_def</b>
-      </td>
+      </th>
     </tr>
+    </thead>
+    <tbody>
       $text_used_def
-    </tr><tr>
-      <td class=\"adminHead\" colspan=\"2\">
+    </tbody>
+    <thead>
+    <tr>
+      <th colspan=\"2\">
         Vars Used and defined in lang global : <b>$nb_used_def_glo</b>
-      </td>
+      </th>
     </tr>
+    </thead>
+    <tbody>
       $text_used_def_glo
-    </tr><tr>
-      <td class=\"adminHead\" colspan=\"2\">
+    </tbody>
+    <thead>
+    <tr>
+      <th colspan=\"2\">
         Vars Used and defined twice ($module.inc + $lang/global.inc) : <b>$nb_used_def_twi</b>
-      </td>
+      </th>
     </tr>
+    </thead>
+    <tbody>
       $text_used_def_twi
+    </tbody>  
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"2\">
+      <th colspan=\"2\">
         Vars used but not defined : <b>$nb_used_undef</b>
-      </td>
+      </th>
     </tr>
+    </thead>
+    <tbody>
       $text_used_undef
+    </tbody>
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"2\">
+      <th colspan=\"2\">
         Vars UNused but defined : <b>$nb_unused_def</b>
-      </td>
+      </th>
     </tr>
+    </thead>
+    <tbody>
       $text_unused_def
+    </tbody>
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"2\">
+      <th colspan=\"2\">
         Vars UNused and not defined : <b>$nb_unused_undef</b>
-      </td>
+      </th>
     </tr>
+    </thead>
+    <tbody>
       $text_unused_undef
+    </tbody>
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"2\">
+      <th colspan=\"2\">
         Vars defined but not referenced : <b>$nb_def_unref</b>
-      </td>
+      </th>
     </tr>
+    </thead>
+    <tbody>
       $text_def_unref
-    </table>";
+    </tbody>
+    </table>
+    </div>";
 
 }
 
@@ -778,9 +814,9 @@ function html_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_
     $value2 = $lang2_v[$lval];
     if ($value || $value2) {
       $text_used_def .= "<tr>
-        <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$value</td>
-        <td class=\"adminText\">$value2</td>
+        <td>$lval</td>
+        <td>$value</td>
+        <td>$value2</td>
         </tr>";
       if ($value) $nb_used_def++;
       if ($value2) $nb_used_def_2++;
@@ -794,9 +830,9 @@ function html_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_
     $value2 = $glang2_v[$lval];
     if ($value || $value2) {
       $text_used_def_glo .= "<tr>
-        <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$value</td>
-        <td class=\"adminText\">$value2</td>
+        <td>$lval</td>
+        <td>$value</td>
+        <td>$value2</td>
         </tr>";
       if ($value) $nb_used_def_glo++;
       if ($value2) $nb_used_def_glo_2++;
@@ -812,9 +848,9 @@ function html_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_
     $gvalue2 = $glang2_v[$lval];
     if ( ((! $value) && (! $gvalue)) || ((! $value2) && (! $gvalue2)) ) {
       $text_used_undef .= "<tr>
-        <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$value $gvalue</td>
-        <td class=\"adminText\">$value2 $gvalue2</td>
+        <td>$lval</td>
+        <td>$value $gvalue</td>
+        <td>$value2 $gvalue2</td>
         </tr>";
       if (! $value) $nb_used_undef++;
       if (! $value2) $nb_used_undef_2++;
@@ -830,9 +866,9 @@ function html_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_
     $gvalue2 = $glang2_v[$lval];
     if ($value || $value2 || $gvalue || $gvalue2) {
       $text_unused_def .= "<tr>
-        <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$value $gvalue</td>
-        <td class=\"adminText\">$value2 $gvalue2</td>
+        <td>$lval</td>
+        <td>$value $gvalue</td>
+        <td>$value2 $gvalue2</td>
         </tr>";
       if ($value) $nb_unused_def++;
       if ($value2) $nb_unused_def_2++;
@@ -845,9 +881,9 @@ function html_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_
     $value2 = $lang2_v[$lval];
     if ((! $value) || (! $value2)) {
       $text_unused_undef .= "<tr>
-        <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$value</td>
-        <td class=\"adminText\">$value2</td>
+        <td>$lval</td>
+        <td>$value</td>
+        <td>$value2</td>
         </tr>";
       if (! $value) $nb_unused_undef++;
       if (! $value2) $nb_unused_undef_2++;
@@ -859,9 +895,9 @@ function html_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_
     if ((! in_array($lvar, $used_v)) && (! in_array($lvar, $unused_v))) {
       $lval2 = $lang2_v[$lvar];
       $text_def_unref .= "<tr>
-        <td class=\"adminText\">$lvar</td>
-        <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$lval2</td>
+        <td>$lvar</td>
+        <td>$lval</td>
+        <td>$lval2</td>
         </tr>";
       $nb_def_unref++;
       if (array_key_exists($lvar, $lang2_v)) $nb_def_unref_2++;
@@ -874,9 +910,9 @@ function html_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_
          (! in_array($lvar2, $used_v)) && (! in_array($lvar2, $unused_v))) {
       $lval = $lang_v[$lvar2];
       $text_def_unref .= "<tr>
-        <td class=\"adminText\">$lvar2</td>
-        <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$lval2</td>
+        <td>$lvar2</td>
+        <td>$lval</td>
+        <td>$lval2</td>
         </tr>";
       $nb_def_unref_2++;
       if (array_key_exists($lvar2, $lang_v)) $nb_def_unref++;
@@ -884,59 +920,84 @@ function html_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_
   }
 
   echo "
-    <table class=\"admin\">
+    <div class=\"detail extra\">
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"3\">$module : From Source :
+      <th colspan=\"3\">$module : From Source :
         <b>$nb_ref</b> var referenced :
         <b>$nb_used</b> used - <b>$nb_unused</b> unused
-      </td>
-    </tr><tr>
-      <td class=\"adminHead\">&nbsp;</td>
-      <td class=\"adminHead\">$module / $lang</td>
-      <td class=\"adminHead\">$module / $lang2</td>
-    </tr><tr>
-      <td class=\"adminHead\">From lang file :</td>
-      <td class=\"adminHead\">(<b>$nb_lang + $nb_used_def_glo</b>) vars defined</td>
-      <td class=\"adminHead\">(<b>$nb_lang2 + $nb_used_def_glo_2</b>) vars defined</td>
-    </tr><tr>
-      <td class=\"adminText\" colspan=\"3\">&nbsp;</td>
-    </tr><tr>
-      <td class=\"adminHead\">Vars Used and defined :</td>
-      <td class=\"adminHead\"><b>$nb_used_def</b></td>
-      <td class=\"adminHead\"><b>$nb_used_def_2</b></td>
+      </th>
     </tr>
+    <tr>
+      <th>&nbsp;</th>
+      <th>$module / $lang</th>
+      <th>$module / $lang2</th>
+    </tr><tr>
+      <th>From lang file :</th>
+      <th>(<b>$nb_lang + $nb_used_def_glo</b>) vars defined</th>
+      <th>(<b>$nb_lang2 + $nb_used_def_glo_2</b>) vars defined</th>
+    </tr><tr>
+      <th>Vars Used and defined :</th>
+      <th><b>$nb_used_def</b></th>
+      <th><b>$nb_used_def_2</b></th>
+    </tr>
+    </thead>
+    <tbody>
       $text_used_def
-    </tr><tr>
-      <td class=\"adminHead\">Vars Used and defined in global</td>
-      <td class=\"adminHead\"><b>$nb_used_def_glo</b></td>
-      <td class=\"adminHead\"><b>$nb_used_def_glo_2</b></td>
+    </tbody>
+    <thead>
+    <tr>
+      <th>Vars Used and defined in global</th>
+      <th><b>$nb_used_def_glo</b></th>
+      <th><b>$nb_used_def_glo_2</b></th>
     </tr>
+    </thead>
+    <tbody>
       $text_used_def_glo
+    </tbody>
+    <thead>
     <tr>
-      <td class=\"adminHead\">Vars used but not defined</td>
-      <td class=\"adminHead\"><b>$nb_used_undef</b></td>
-      <td class=\"adminHead\"><b>$nb_used_undef_2</b></td>
+      <th>Vars used but not defined</th>
+      <th><b>$nb_used_undef</b></th>
+      <th><b>$nb_used_undef_2</b></th>
     </tr>
+    </thead>
+    <tbody>
       $text_used_undef
+    </tbody>
+    <thead>
     <tr>
-      <td class=\"adminHead\">Vars UNused but defined</td>
-      <td class=\"adminHead\"><b>$nb_unused_def</b></td>
-      <td class=\"adminHead\"><b>$nb_unused_def_2</b></td>
+      <th>Vars UNused but defined</th>
+      <th><b>$nb_unused_def</b></th>
+      <th><b>$nb_unused_def_2</b></th>
     </tr>
+    </thead>
+    <tbody>
       $text_unused_def
+    </tbody>
+    <thead>
     <tr>
-      <td class=\"adminHead\">Vars UNused and not defined</td>
-      <td class=\"adminHead\"><b>$nb_unused_undef</b></td>
-      <td class=\"adminHead\"><b>$nb_unused_undef_2</b></td>
+      <th>Vars UNused and not defined</th>
+      <th><b>$nb_unused_undef</b></th>
+      <th><b>$nb_unused_undef_2</b></th>
     </tr>
-      $text_unused_undef
+    </thead>
+    <tbody>
+    $text_unused_undef
+    </tbody>
+    <thead>
     <tr>
-      <td class=\"adminHead\">Vars defined but not referenced</td>
-      <td class=\"adminHead\"><b>$nb_def_unref</b></td>
-      <td class=\"adminHead\"><b>$nb_def_unref_2</b></td>
+      <th>Vars defined but not referenced</th>
+      <th><b>$nb_def_unref</b></th>
+      <th><b>$nb_def_unref_2</b></th>
     </tr>
+    </thead>
+    <tbody>
       $text_def_unref
-    </table>";
+    </tbody>
+    </table>
+    </div>";
 
 }
 
@@ -1020,43 +1081,52 @@ function html_admin_lang_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v,
     if (in_array($lvar, $ref_v)) {
       $nb_def_ref++;
       $text_def_ref .= "<tr>
-        <td class=\"adminText\">$lvar</td>
-        <td class=\"adminText\">$value</td>
-        <td class=\"adminText\">$value2</td>
+        <td>$lvar</td>
+        <td>$value</td>
+        <td>$value2</td>
         </tr>";
     } else {
       $nb_def_unref++;
       $text_def_unref .= "<tr>
-        <td class=\"adminText\">$lvar</td>
-        <td class=\"adminText\">$value</td>
-        <td class=\"adminText\">$value2</td>
+        <td>$lvar</td>
+        <td>$value</td>
+        <td>$value2</td>
         </tr>";
     }
   }
 
   echo "
-    <table class=\"admin\">
+    <div class=\"detail extra\">
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"3\">
+      <th colspan=\"3\">
       From global lang files : $nb_langs var defined $nb_ref
-      </td>
+      </th>
     </tr><tr>
-      <td class=\"adminHead\">From lang file :</td>
-      <td class=\"adminHead\">$lang : $nb_lang vars defined</td>
-      <td class=\"adminHead\">$lang2 : $nb_lang2 vars defined</td>
+      <th>From lang file :</th>
+      <th>$lang : $nb_lang vars defined</th>
+      <th>$lang2 : $nb_lang2 vars defined</th>
     </tr><tr>
-      <td class=\"adminText\" colspan=\"3\">&nbsp;</td>
-    </tr><tr>
-      <td class=\"adminHead\" colspan=\"3\">
-        Vars defined and referenced : <b>$nb_def_ref</b></td>
+      <th colspan=\"3\">
+        Vars defined and referenced : <b>$nb_def_ref</b>
+    </th>
     </tr>
+    </thead>
+    <tbody>
       $text_def_ref
+    </tbody>
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"3\">
-        Vars defined but not referenced : <b>$nb_def_unref</b></td>
+      <th colspan=\"3\">
+        Vars defined but not referenced : <b>$nb_def_unref</b></th>
     </tr>
+    </thead>
+    <tbody>
       $text_def_unref
-    </table>";
+    </tbody>
+    </table>
+    </div>";
 }
 
 ?>

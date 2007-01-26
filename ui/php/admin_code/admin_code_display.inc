@@ -18,12 +18,12 @@ function dis_admin_code_help($mode) {
   if ($mode == "html")
     echo "<table class=\"detail\">
       <tr>
-        <td>";
+        <td><pre>";
 
   include ("admin_code_help.inc");
 
   if ($mode == "html")
-    echo "
+    echo "</pre>
         </td>
       </tr>
       </table>";
@@ -174,7 +174,7 @@ function dis_admin_code_amp($mode) {
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<table class=\"admin\">";
+    echo "<div class=\"detail extra\"><table class=\"spreadSheet\">";
   }
   dis_admin_code_amp_directory($mode, $obm_root);
   if ($mode == "txt") {
@@ -184,8 +184,7 @@ $cpt_line lines parsed
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "</table>
-      <p />
+    echo "</table></div>
       <b>$cpt_line</b> lines parsed";
   }
 
@@ -257,20 +256,25 @@ function dis_admin_code_amp_file($mode, $file) {
 ";
 	} else {
 	  echo "
+    <thead>
     <tr>
-      <td class=\"adminHead\">#&nbsp;Line</td>
-      <td class=\"adminHead\">$file</td>
-    </tr>";
+      <th># &nbsp; Line</th>
+      <th>$file</th>
+    </tr>
+    </thead>";
 	}
       }
 
       if ($mode == "txt") {
 	echo "$line_num : $line";
       } else {
-	echo "<tr>
-          <td class=\"adminLabel\">$line_num</td>
-          <td class=\"adminText\">$line</td>
-        </tr>";
+	echo "
+	<tbody>
+	<tr>
+          <td>$line_num</td>
+          <td>$line</td>
+        </tr>
+	</tbody>";
       }
 
       $line = "";
@@ -302,13 +306,17 @@ function dis_admin_code_unused_functions($mode, $module="") {
 File   --   Line   --   Function   --   Used
 ";
   } else {
-    echo "<table class=\"admin\">
+    echo "
+    <div class=\"detail extra\">
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\">Function</td>
-      <td class=\"adminHead\"> # Line</td>
-      <td class=\"adminHead\">Defined in file</td>
-      <td class=\"adminHead\"> # used</td>
-    </tr>";
+      <th>Function</th>
+      <th> # Line</th>
+      <th>Defined in file</th>
+      <th> # used</th>
+    </tr>
+    </thead>";
   }
   dis_admin_code_unused_func_content($mode, $def_func, $used_func);
   if ($mode == "txt") {
@@ -316,7 +324,7 @@ File   --   Line   --   Function   --   Used
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "</table>";
+    echo "</table></div>";
   }
 
   return true;
@@ -338,25 +346,21 @@ function dis_admin_code_unused_func_content($mode, $def, $used) {
 
     if (array_key_exists($func, $used)) {
       $used_cpt = $used["$func"]["cpt"];
-      $classl = "class=\"adminTextLeft\"";
-      $classr = "class=\"adminTextRight\"";
       $html_func = "<a href=\"" . url_prepare("admin_code_index.php?action=function_uses&amp;function=$func&amp;mode=html") . "\">$func</a>";
     } else {
       $used_cpt = "No";
-      $classl = "class=\"adminLabel\"";
-      $classr = "class=\"adminLabel\"";
       $html_func = $func;
     }
 
     if ($mode == "txt") {
       echo "$def_file -- $def_ln -- $func -- $used_cpt\n";
     } else {
-      echo "<tr>
-        <td $classl>$html_func</td>
-        <td $classr>$def_ln</td>
-        <td $classl>$def_file</td>
-        <td $classr>$used_cpt</td>
-      </tr>";
+      echo "<tbody><tr>
+        <td>$html_func</td>
+        <td>$def_ln</td>
+        <td>$def_file</td>
+        <td>$used_cpt</td>
+      </tr></tbody>";
     }
   }
 }
@@ -378,15 +382,17 @@ Line   --   File   --   #Use
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<table class=\"admin\">
+    echo "<table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"adminHead\" colspan=\"3\">Function $func</td>
+      <th colspan=\"3\">Function $func</th>
     </tr>
     <tr>
-      <td class=\"adminHead\"> # Line</td>
-      <td class=\"adminHead\"> File</td>
-      <td class=\"adminHead\"> # used</td>
-    </tr>";
+      <th> # Line</th>
+      <th> File</th>
+      <th> # used</th>
+    </tr>
+    </thead>";
   }
   dis_admin_code_function_uses_content($mode, $func, $obm_root);
   if ($mode == "txt") {
@@ -472,11 +478,13 @@ function dis_admin_code_function_uses_content_file($mode, $function, $file) {
 	    echo "\n$line_num - $file - $cpt";
 	  } else {
 	    echo "
+    <tbody>
     <tr>
-      <td class=\"adminTextRight\"> $line_num</td>
-      <td class=\"adminTextLeft\"> $file</td>
-      <td class=\"adminTextRight\"> $cpt</td>
-    </tr>";
+      <td>$line_num</td>
+      <td>$file</td>
+      <td>$cpt</td>
+    </tr>
+    </tbody>";
 	  }
 	}
 	$pattern = preg_quote($matches[1]);

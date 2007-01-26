@@ -18,12 +18,12 @@ function dis_admin_data_help($mode) {
   if ($mode == "html")
     echo "<table>
       <tr>
-        <td>";
+        <td><pre>";
 
   include ("admin_data_help.inc");
 
   if ($mode == "html")
-    echo "</td>
+    echo "</pre></td>
       </tr>
       </table>";
 }
@@ -78,7 +78,6 @@ function html_data_index($actions, $modules, $upd_modules) {
   $sel_upd_module .= "</select>";
 
   echo "
-    <br />
     <form method=\"get\" action=\"" . url_prepare("admin_data_index.php"). "\">
     <div class=\"detail infos\">
     <h1>Inconsistencies</h1>
@@ -207,28 +206,31 @@ function dis_admin_data_company($action, $mode) {
 ";
   } else {
     if ($action == "data_update") {
-      $update = "<td class=\"adminLabel\">Update</td>";
+      $update = "<th>Update</th>";
     } else {
       $update = "";
     }
     echo "
-      <table class=\"admin\">
+      <div class=\"detail extra\">
+      <table class=\"spreadSheet\">
+      <thead>
       <tr>
-        <td class=\"adminHead\">Company ($nb_comp)</td>
-        <td class=\"adminHead\" colspan=\"2\"># Contact</td>
-        <td class=\"adminHead\" colspan=\"2\"># Deal Active</td>
-        <td class=\"adminHead\" colspan=\"2\"># Deal Total</td>
+        <th>Company ($nb_comp)</th>
+        <th colspan=\"2\"># Contact</th>
+        <th colspan=\"2\"># Deal Active</th>
+        <th colspan=\"2\"># Deal Total</th>
         $update
       </tr><tr>
-        <td class=\"adminHead\">Id</td>
-        <td class=\"adminHead\">field</td>
-        <td class=\"adminHead\">calculated</td>
-        <td class=\"adminHead\">field</td>
-        <td class=\"adminHead\">calculated</td>
-        <td class=\"adminHead\">field</td>
-        <td class=\"adminHead\">calculated</td>
+        <th>Id</th>
+        <th>field</th>
+        <th>calculated</th>
+        <th>field</th>
+        <th>calculated</th>
+        <th>field</th>
+        <th>calculated</th>
         $update
-      </tr>";
+      </tr>
+      </thead>";
   }
 
   while ($c_q->next_record()) {
@@ -252,13 +254,13 @@ function dis_admin_data_company($action, $mode) {
 	echo "\nCompany (id=$id) : Contact ($con_num, $new_con_num) : Deal ($deal_num, $new_deal_num) : Deal total ($deal_total, $new_deal_total)";
       } else {
 	echo "<tr>
-          <td class=\"adminText\">$id</td>
-          <td class=\"adminText\">$con_num</td>
-          <td class=\"adminText\">$new_con_num</td>
-          <td class=\"adminText\">$deal_num</td>
-          <td class=\"adminText\">$new_deal_num</td>
-          <td class=\"adminText\">$deal_total</td>
-          <td class=\"adminText\">$new_deal_total</td>";
+          <td>$id</td>
+          <td>$con_num</td>
+          <td>$new_con_num</td>
+          <td>$deal_num</td>
+          <td>$new_deal_num</td>
+          <td>$deal_total</td>
+          <td>$new_deal_total</td>";
       }
 
       if ($action == "data_update") {
@@ -267,13 +269,13 @@ function dis_admin_data_company($action, $mode) {
 	  if ($mode == "txt") {
 	    echo "OK";
 	  } else {
-	    echo "<td class=\"adminLabel\">OK</td>";
+	    echo "<td>OK</td>";
 	  }
 	} else {
 	  if ($mode == "txt") {
 	    echo "Problem !";
 	  } else {
-	    echo "<td class=\"adminLabel\">Problem !</td>";
+	    echo "<td>Problem !</td>";
 	  }
 	}
       }
@@ -289,7 +291,7 @@ function dis_admin_data_company($action, $mode) {
 	echo ".";
       } else {
 	echo "<tr>
-          <td class=\"adminLabel\" colspan=\"8\">$cpt_c</td>
+          <td colspan=\"8\">$cpt_c</td>
         </tr>";
 	flush();
       }
@@ -303,11 +305,15 @@ function dis_admin_data_company($action, $mode) {
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<tr>
-        <td class=\"adminLabel\" colspan=\"8\">
-          Company : $nb_comp to parse, $cpt_cu inconsistencies</td>
+    echo "
+       <thead>
+       <tr>
+        <th colspan=\"8\">
+          Company : $nb_comp to parse, $cpt_cu inconsistencies</th>
       </tr>
-      </table>";
+      </thead>
+      </table>
+      </div>";
   }
 }
 
@@ -335,20 +341,23 @@ function dis_admin_data_deal($action, $mode) {
 ";
   } else {
     if ($action == "data_update") {
-      $update = "<td class=\"adminHead\">Update</td>";
+      $update = "<th>Update</th>";
     } else {
       $update = "";
     }
     echo "
-      <table class=\"admin\">
+    <div class=\"detail extra\">
+      <table class=\"spreadSheet\">
+      <thead>
       <tr>
-        <td class=\"adminHead\">Deal ($nb_deal)</td>
-        <td class=\"adminHead\">Status</td>
-        <td class=\"adminHead\">Archive</td>
-        <td class=\"adminHead\">Hitrate</td>
-        <td class=\"adminHead\">Should be</td>
+        <th>Deal ($nb_deal)</th>
+        <th>Status</th>
+        <th>Archive</th>
+        <th>Hitrate</th>
+        <th>Should be</th>
         $update
-      </tr>";
+      </tr>
+      </thead>";
   }
 
   while ($d_q->next_record()) {
@@ -377,11 +386,11 @@ function dis_admin_data_deal($action, $mode) {
       } else {
 	$arch = (($archive == "1") ? "X" : "&nbsp;");
 	echo "<tr>
-          <td class=\"adminText\"><a href=\"$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$id\">$id</a></td>
-          <td class=\"adminText\">$status</td>
-          <td class=\"adminText\">$arch</td>
-          <td class=\"adminText\">$hitrate</td>
-          <td class=\"adminText\">$new_hitrate</td>";
+          <td><a href=\"$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$id\">$id</a></td>
+          <td>$status</td>
+          <td>$arch</td>
+          <td>$hitrate</td>
+          <td>$new_hitrate</td>";
       }
 
       if ($action == "data_update") {
@@ -393,13 +402,13 @@ function dis_admin_data_deal($action, $mode) {
 	  if ($mode == "txt") {
 	    echo "OK";
 	  } else {
-	    echo "<td class=\"adminLabel\">OK</td>";
+	    echo "<td>OK</td>";
 	  }
 	} else {
 	  if ($mode == "txt") {
 	    echo "Manual !";
 	  } else {
-	    echo "<td class=\"adminLabel\">Manual !</td>";
+	    echo "<td>Manual !</td>";
 	  }
 	}
       }
@@ -415,7 +424,7 @@ function dis_admin_data_deal($action, $mode) {
 	echo ".";
       } else {
 	echo "<tr>
-          <td class=\"adminLabel\" colspan=\"8\">$cpt_d</td>
+          <td colspan=\"8\">$cpt_d</td>
         </tr>";
 	flush();
       }
@@ -429,11 +438,12 @@ function dis_admin_data_deal($action, $mode) {
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<tr>
-        <td class=\"adminLabel\" colspan=\"8\">
+    echo "<thead><tr>
+        <td colspan=\"8\">
           Deal : $nb_deal to parse, $cpt_du inconsistencies</td>
-      </tr>
-      </table>";
+      </tr></thead>
+      </table>
+      </div>";
   }
 }
 
@@ -470,23 +480,26 @@ function dis_admin_data_list($action, $mode) {
       $update = "";
     }
     echo "
-      <table class=\"admin\">
+      <div class=\"detail extra\">
+      <table class=\"spreadSheet\">
+      <thead>
       <tr>
-        <td class=\"adminHead\" colspan=\"2\">List ($nb_l)</td>
-        <td class=\"adminHead\" colspan=\"2\"># Static Contact</td>
-        <td class=\"adminHead\" colspan=\"2\"># Query Contact</td>
-        <td class=\"adminHead\">Query Generation =</td>
+        <th colspan=\"2\">List ($nb_l)</th>
+        <th colspan=\"2\"># Static Contact</th>
+        <th colspan=\"2\"># Query Contact</th>
+        <th>Query Generation =</th>
         $update
       </tr><tr>
-        <td class=\"adminHead\">Id</td>
-        <td class=\"adminHead\">Name</td>
-        <td class=\"adminHead\">field</td>
-        <td class=\"adminHead\">calculated</td>
-        <td class=\"adminHead\">field</td>
-        <td class=\"adminHead\">calculated</td>
-        <td class=\"adminHead\">&nbsp;</td>
+        <th>Id</th>
+        <th>Name</th>
+        <th>field</th>
+        <th>calculated</th>
+        <th>field</th>
+        <th>calculated</th>
+        <th>&nbsp;</th>
         $update
-      </tr>";
+      </tr>
+      </thead>";
   }
 
   // Loop through each list
@@ -533,13 +546,13 @@ function dis_admin_data_list($action, $mode) {
 	echo "\nList (id=$id), Contacts : Statiques ($sta_nb, $new_sta_nb) : Dynamiques ($dyn_nb, $new_dyn_nb)";
       } else {
 	echo "<tr>
-          <td class=\"adminText\">$id</td>
-          <td class=\"adminText\">$name</td>
-          <td class=\"adminText\">$sta_nb</td>
-          <td class=\"adminText\">$new_sta_nb</td>
-          <td class=\"adminText\">$dyn_nb</td>
-          <td class=\"adminText\">$new_dyn_nb</td>
-          <td class=\"adminText\">$query_diff_txt</td>";
+          <td>$id</td>
+          <td>$name</td>
+          <td>$sta_nb</td>
+          <td>$new_sta_nb</td>
+          <td>$dyn_nb</td>
+          <td>$new_dyn_nb</td>
+          <td>$query_diff_txt</td>";
       }
 
       if ($action == "data_update") {
@@ -549,13 +562,13 @@ function dis_admin_data_list($action, $mode) {
 	  if ($mode == "txt") {
 	    echo "OK";
 	  } else {
-	    echo "<td class=\"adminLabel\">OK</td>";
+	    echo "<td>OK</td>";
 	  }
 	} else {
 	  if ($mode == "txt") {
 	    echo "Problem !";
 	  } else {
-	    echo "<td class=\"adminLabel\">Problem !</td>";
+	    echo "<td>Problem !</td>";
 	  }
 	}
       }
@@ -571,7 +584,7 @@ function dis_admin_data_list($action, $mode) {
 	echo ".";
       } else {
 	echo "<tr>
-          <td class=\"adminLabel\" colspan=\"8\">$cpt_l</td>
+          <td colspan=\"8\">$cpt_l</td>
         </tr>";
 	flush();
       }
@@ -585,11 +598,13 @@ function dis_admin_data_list($action, $mode) {
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<tr>
+    echo "<thead><tr>
         <td class=\"adminLabel\" colspan=\"8\">
           List : $nb_l to parse, $cpt_lu inconsistencies</td>
       </tr>
-      </table>";
+      </thead>
+      </table>
+      </div>";
   }
 }
 
@@ -623,22 +638,25 @@ Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
 ";
   } else {
     if ($action == "data_update") {
-      $update = "<td class=\"adminHead\">Update</td>";
+      $update = "<th>Update</th>";
     } else {
       $update = "";
     }
     echo "
-      <table class=\"admin\">
+      <div class=\"detail extra\">
+      <table class=\"spreadSheet\">
+      <thead>
       <tr>
-	<td class=\"adminHead\">Id (# $nb_document)</td>
-        <td class=\"adminHead\">Document Path</td>
-        <td class=\"adminHead\">Document Name</td>
-        <td class=\"adminHead\">Document Kind</td>
-        <td class=\"adminHead\">Disk Path <br />($cdocument_root)</td>
-	<td class=\"adminHead\">Missing <br /> in Database</td>
-        <td class=\"adminHead\">Missing <br /> in File System</td>
+	<th>Id (# $nb_document)</th>
+        <th>Document Path</th>
+        <th>Document Name</th>
+	<th>Document Kind</th>
+        <th>Disk Path <br />($cdocument_root)</th>
+	<th>Missing <br /> in Database</th>
+        <th>Missing <br /> in File System</th>
         $update
-      </tr>";
+      </tr>
+      </thead>";
   }
 
   // First Loop through DB
@@ -679,14 +697,14 @@ Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
       } else {
 	$dis_id = "<a href=\"$path/document/document_index.php?action=detailconsult&amp;document_id=$id\">$id</a>";
 	$line = "
-     <tr>
-	<td class=\"adminText\">$dis_id</td>
-        <td class=\"adminText\">$dpath</td>
-        <td class=\"adminText\">$name</td>
-        <td class=\"adminText\">$type</td>
-        <td class=\"adminText\">$disk_rel</td>
-	<td class=\"adminText\">$miss_bd</td>
-        <td class=\"adminText\">$miss_fs</td>
+          <tr>
+	<td>$dis_id</td>
+        <td>$dpath</td>
+        <td>$name</td>
+        <td>$type</td>
+        <td>$disk_rel</td>
+	<td>$miss_bd</td>
+        <td>$miss_fs</td>
         $update
       </tr>";
       }
@@ -711,14 +729,14 @@ Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
       $line = " | | | $type | $disk_rel | X | |\n";
     } else {
       $line = "
-     <tr>
-	<td class=\"adminText\"></td>
-        <td class=\"adminText\"></td>
-        <td class=\"adminText\"></td>
-        <td class=\"adminText\">$type</td>
-        <td class=\"adminText\">$disk_rel</td>
-	<td class=\"adminText\">X</td>
-        <td class=\"adminText\"></td>
+        <tr>
+	<td></td>
+        <td></td>
+        <td></td>
+        <td>$type</td>
+        <td>$disk_rel</td>
+	<td>X</td>
+        <td></td>
       </tr>";
     }
     echo $line;
@@ -731,11 +749,13 @@ Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<tr>
-        <td class=\"adminLabel\" colspan=\"8\">
-          Document : $nb_document from DB, $nb_files Files from disk, $cpt_err inconsistencies</td>
+    echo "<thead><tr>
+        <th colspan=\"8\">
+          Document : $nb_document from DB, $nb_files Files from disk, $cpt_err inconsistencies</th>
       </tr>
-      </table>";
+      </thead>
+      </table>
+      </div>";
   }
 
 }
@@ -779,11 +799,14 @@ function dis_admin_data_sound_aka_update_company($mode) {
   } else {
 
     echo "
-      <table class=\"admin\">
+      <div class=\"detail extra\">
+      <table class=\"spreadSheet\">
+      <thead>
       <tr>
-        <td class=\"adminHead\">$l_module_company ($nb_comp)</td>
-        <td class=\"adminHead\">Aka and Sound Update</td>
-      </tr>";
+        <th>$l_module_company ($nb_comp)</th>
+        <th>Aka and Sound Update</th>
+      </tr>
+      </thead>";
   }
 
   while ($c_q->next_record()) {
@@ -806,7 +829,7 @@ function dis_admin_data_sound_aka_update_company($mode) {
 	echo ".";
       } else {
 	echo "<tr>
-          <td class=\"adminLabel\" colspan=\"2\">$cpt_c</td>
+          <td colspan=\"2\">$cpt_c</td>
         </tr>";
 	flush();
       }
@@ -820,11 +843,13 @@ function dis_admin_data_sound_aka_update_company($mode) {
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<tr>
-        <td class=\"adminLabel\" colspan=\"2\">
+    echo "<thead><tr>
+        <td colspan=\"2\">
           Sound Update : $l_module_company : $cpt_c processed</td>
       </tr>
-      </table>";
+      </thead>
+      </table>
+      </div>";
   }
 }
 
@@ -853,11 +878,14 @@ function dis_admin_data_sound_aka_update_contact($mode) {
   } else {
 
     echo "
-      <table class=\"admin\">
+      <div class=\"detail extra\">
+      <table class=\"spreadSheet\">
+      <thead>
       <tr>
-        <td class=\"adminHead\">$l_module_contact ($nb)</td>
-        <td class=\"adminHead\">Aka and Sound Update</td>
-      </tr>";
+        <th>$l_module_contact ($nb)</th>
+        <th>Aka and Sound Update</th>
+      </tr>
+      </thead>";
   }
 
   while ($c_q->next_record()) {
@@ -887,7 +915,7 @@ function dis_admin_data_sound_aka_update_contact($mode) {
 	echo ".";
       } else {
 	echo "<tr>
-          <td class=\"adminLabel\" colspan=\"2\">$cpt_c</td>
+          <td colspan=\"2\">$cpt_c</td>
         </tr>";
 	flush();
       }
@@ -901,11 +929,15 @@ function dis_admin_data_sound_aka_update_contact($mode) {
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<tr>
-        <td class=\"adminLabel\" colspan=\"2\">
+    echo "
+    <thead>
+    <tr>
+        <td colspan=\"2\">
           Sound Update : $l_module_contact : $nb processed</td>
       </tr>
-      </table>";
+      </thead>
+      </table>
+      </div>";
   }
 }
 

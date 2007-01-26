@@ -17,13 +17,12 @@ function dis_admin_help($mode) {
   if ($mode == "html")
     echo "<table class=\"details\">
       <tr>
-        <td>";
+        <td><pre>";
 
   include ("admin_help.inc");
 
   if ($mode == "html")
-    echo "
-        </td>
+    echo "</pre></td>
       </tr>
       </table>";
 }
