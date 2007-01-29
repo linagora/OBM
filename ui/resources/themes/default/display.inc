@@ -86,13 +86,16 @@ function display_page(&$display) {
     <div id=\"mainPanel\" >".
     $display["title"].
     $display["action"] .
-    $display["msg"] .
-    "<div id=\"mainContent\">".
-    $display["search"] .
-    $display["detail"] . "
-    <p class=\"LC\" />
-    </div>
-     ".$display["result"] ."
+    $display["msg"] ;
+    if($display["search"] != "" || $display["detail"] != "") {
+      echo  
+      "<div id=\"mainContent\">".
+      $display["search"] .
+      $display["detail"] . "
+      <p class=\"LC\" />
+      </div>";
+    }
+    echo $display["result"] ."
     </div>
     <script type=\"text/javascript\">
       obm.initialize.chain(function() {

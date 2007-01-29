@@ -97,7 +97,7 @@ if ($cgp_show["module"]["invoice"] && $perm->check_right("invoice", $cright_read
   $block .= dis_invoice_portal();
 }
 
-$display["detail"] = "
+$display["result"] = "
 $block
 <p style=\"clear:both;\"/>  
 ";
