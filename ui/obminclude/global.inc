@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0pre14";
+$obm_version = "2.0pre15";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -256,15 +256,56 @@ $cgp_show["module"]["mailforward"] = "my";
 $cgp_show["module"]["vacation"] = "my";
 
 // Display domain module only when multidomain is activate
-if($c_multidomain) {
+if ($c_multidomain) {
   $cgp_show["module"]["domain"] = "admin";
 }
+
+// OBM-LDAP, OBM-Mail, OBM-Windows values
+
+//------------------//
+// Services enabled //
+//------------------//
+$cgp_use["service"]["web"] = false;
+$cgp_use["service"]["web_local"] = false;
+$cgp_use["service"]["mail"] = false;
+$cgp_use["service"]["mail_nomad"] = false;
+$cgp_use["service"]["mail_vacation"] = false;
+$cgp_use["service"]["samba"] = false;
+
+// UID : First User
+$c_first_uid = 1001;
+// First GID for simple users - first GID for group creation
+$c_first_gid_user = 1001;
+// First GID for admin users - by default, simple and admin users have same
+$c_first_gid_admin = $c_first_gid_user;
+
+// OBM-Windows Samba Groups
+$cg_gid_smb_admin = 512;
+$cg_gid_smb_user = 513;
+$cg_gid_smb_guest = 514;
+$cg_gid_smb_host = 515;
+
+//---------------------------------------------------------------------------//
+// END : OBM Default configurable Constants : Default values
+//---------------------------------------------------------------------------//
 
 require_once("conf/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 
 define("C_IMAGE_PATH",$cgp_host."images");
 $section = $cgp_show["module"][$module];
+
+//-----------------------------//
+// Calculated Enabled services //
+//-----------------------------//
+if (! $cgp_use["service"]["mail"]) {
+  $cgp_use["service"]["mail_nomad"] = false;
+  $cgp_use["service"]["mail_vacation"] = false;
+}
+
+if (! $cgp_use["service"]["web"]) {
+  $cgp_use["service"]["web_local"] = false;
+}
 
 //----------------------------//
 // Calculated Displayed Infos //
@@ -434,9 +475,6 @@ $js_regexp_fax="/^[0-9+x \(\)-\.]+$/";   // digits + SPACE ( ) - fax number
 $php_regexp_fax="/^[0-9+x \(\)-\.]+$/";
 $js_regexp_zip="/^[0-9A-Z- ]{2,14}$/";     // 2-8 digits or letters
 $php_regexp_zip="/^[0-9A-Z- ]{2,14}$/";
-$js_regexp_email="/^\w([\.'\w-_&]+)?@([\w'\-]+\.)+[A-Za-z]{2,4}$/";  // Email
-$php_regexp_email="/^[a-z0-9_&\'-]+(\.[a-z0-9_\'-]+)*@([a-z0-9-]+\.)+[a-z]{2,4}$/i"; // Email
-$php_regexp_email_name="/^[a-z0-9_&\'-]+(\.[a-z0-9_\'-]+)*$/"; // Email name
 $js_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}([\-_\.\/A-Za-z0-9])*$/";  // Web
 $php_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[a-z]{2,3}([\-_\.\/A-Za-z0-9]*)$/i"; // Web
 $php_regexp_isodate = "/^[0-9]{4}-[01][0-9]-[0123][0-9]$/";
@@ -452,6 +490,41 @@ $php_regexp_percent = "/^[1]?[0-9]?[0-9]$/"; // 0-100
 $php_regexp_backup = "/^obmdb-[0-9]{8}:[0-9]{6}-[0-9]{1,2}.[0-9]{1,2}(.[0-9]{1,2})?.dump$/";
 
 $php_regexp_password = "/^.{4,12}$/";
+
+$php_regexp_groupname = "/^[A-Za-z0-9][A-Za-z0-9-._]{1,31}$/"; // group name
+$php_regexp_hostname = "/^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$/"; // host
+$php_regexp_fqdn = "/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,6}$/"; // Fqdn
+$php_regexp_ip = '/^([1-2]?[0-9]{1,2}.){3}[1-2]?[0-9]{1,2}$/'; // IP
+$php_regexp_network = '/^([1-2]?[0-9]{1,2}.){3}[1-2]?[0-9]{1,2}(\/[1-2]?[0-9])?$/'; // IP[/MASK]
+$php_regexp_port_list ='/^[0-9]+(-[0-9]*){0,1}$/'; // Une liste de ports TCP/IP num[-num]
+$php_regexp_network_port_list = '/^([1-2]?[0-9]{1,2}.){3}[1-2]?[0-9]{1,2}:[0-9]+(-[0-9]*){0,1}$/'; // IP[:num[-num]]
+
+// Login
+if ($cgp_loginDotsEnable) {
+  $php_regexp_login = "/^[A-Za-z0-9][A-Za-z0-9-._]{1,31}$/";
+} else {
+  $php_regexp_login = "/^[A-Za-z0-9][A-Za-z0-9-_]{1,31}$/";
+}
+
+// Email
+$php_regexp_domain = "/^([a-z0-9-]+\.)+[a-z]{2,6}$/"; // Domain
+$php_regexp_localdomain = "/^([a-z0-9-]+\.)+[a-z]{2,6}$/"; // Local Domain
+$php_regexp_email_name = "/^[a-z0-9_&\'-]+(\.[a-z0-9_\'-]+)*$/";
+$php_regexp_email = "/^[a-z0-9_&\'-]+(\.[a-z0-9_\'-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/";
+$js_regexp_email="/^\w([\.'\w-_&]+)?@([\w'\-]+\.)+[A-Za-z]{2,4}$/";  // Email
+$php_regexp_quota = "/^[0-9]{1,6}$/";
+
+// Samba
+// Backslashes \ needs 2 backslash passes (PHP + regexp) so for "\" -> "\\\\"
+$php_regexp_home = "/^\\\\\\\\[a-zA-Z0-9-]{1,32}\\\\[a-zA-Z0-9_\\\\.-]{1,48}$/";
+$php_regexp_dflt_home = "/^\\\\\\\\[a-zA-Z0-9-]{1,32}\\\\([a-zA-Z0-9_\\\\.]{1,48}|%u)$/";
+$php_regexp_drive = "/^[D-Z]?$/";
+// Virus log
+$php_regexp_main_virus_db = "/^main\.cvd.*$/";
+$php_regexp_daily_virus_db ="/^daily\.cvd.*$/";
+$php_regexp_virus_db_update = "/^ClamAV update process started at.*$/";
+$php_regexp_virus_db_version = "(version: (.*),)sU";
+
 
 $global_dis_debug_msg = "";
 $global_dis_debug_param = "";

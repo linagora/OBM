@@ -139,6 +139,16 @@ $profiles["editor"] = array (
     'default' => $perm_editor)
 );
 
+//------------------//
+// Services enabled //
+//------------------//
+$cgp_use["service"]["web"] = true;
+$cgp_use["service"]["web_local"] = true;
+$cgp_use["service"]["mail"] = true;
+$cgp_use["service"]["mail_nomad"] = true;
+$cgp_use["service"]["mail_vacation"] = true;
+$cgp_use["service"]["samba"] = true;
+
 //-----------------//
 // Displayed Infos //
 //-----------------//

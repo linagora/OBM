@@ -21,6 +21,9 @@ Dans un fonctionnement mono-domaine, les données de domaine ne sont pas utilisée
 
 Dans un fonctionnement multi-domaine, le \textbf{domaine 0} est un domaine particulier.\\
 
+L'utilisation d'OBM-LDAP, OBM-MAIL ou OBM-SAMBA (dès que l'automate entre en jeu) nécessite la définition d'un domaine, même si un seul domaine est utilisé.\\
+
+
 \begin{tabular}{|p{4cm}|p{10cm}|}
 \hline
 \textbf{Donnée} & \textbf{Description}\\
@@ -30,8 +33,9 @@ Utilisateur domaine 0 & C'est un super-administrateur, il :
 \item peut gérer les domaines
 \item peut gérer les utilisateurs de tous les domaines
 \item peut voir toutes les données de tous les domaines
-\item peut gérer les données transverses de référence
+\item peut gérer les données transverses de référence (d'id 0)
 \item ne peut pas insérer de données
+\item au niveau LDAP il est créé dans tous les domaines (bals,..)
 \end{itemize}
 \\
 \hline

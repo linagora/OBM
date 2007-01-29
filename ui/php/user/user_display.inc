@@ -22,6 +22,7 @@ $fieldnames["userobm_lastname"] = $l_lastname;
 $fieldnames["userobm_firstname"] = $l_firstname;
 $fieldnames["userobm_phone"] = $l_phone;
 $fieldnames["userobm_phone2"] = $l_phone2;
+$fieldnames["userobm_mobile"] = $l_mphone;
 $fieldnames["userobm_fax"] = $l_fax;
 $fieldnames["userobm_fax2"] = $l_fax2;
 $fieldnames["datebegin"] = $l_datebegin;
@@ -43,6 +44,7 @@ $fieldnames["userobm_description"] = $l_desc;
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_data(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail,$ext_element, $params;
+  global $l_enabled, $l_disabled, $l_forbidden, $l_perms;
 
   $ext_url = $params["ext_url"];
 
@@ -126,7 +128,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 
     if ($nomade_perms) {
       if ($nomade_enable) {
-	$res["name"] = $l_enable;
+	$res["name"] = $l_enabled;
       } else {
 	$res["name"] = $l_perms;
       }
@@ -166,13 +168,14 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_user_perms, $l_find, $l_all, $l_archive;
-  global $l_email, $l_desc, $l_group, $l_add_users;
+  global $l_email, $l_phone, $l_desc, $l_group, $l_add_users;
   global $display, $c_all, $profiles;
   
   $login = $user["login"];
   $perms = $user["perms"];
   $lname = stripslashes($user["lastname"]);
   $email = $user["email"];
+  $phone = $user["phone"];
   $desc = $user["desc"];
   $group = $user["group"];
   $archive = ($user["archive"] == "1" ? "checked" : "");
@@ -228,6 +231,10 @@ function html_user_search_form($user) {
     <label>$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" maxlength=\"32\"
       value=\"$email\" />
+    </label>
+    <label>$l_phone<br />
+      <input type=\"text\" name=\"tf_phone\" size=\"16\" maxlength=\"16\"
+      value=\"$phone\" />
     </label>
     <label>$l_desc<br />
       <input type=\"text\" name=\"tf_desc\" size=\"16\" maxlength=\"32\"
@@ -403,14 +410,13 @@ function html_user_consult($obm_q) {
   global $l_direction, $l_service;
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_email, $l_desc;
   global $l_group_member, $l_group, $l_local, $l_ext_id;
-
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
   global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
   global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
   global $l_vacation, $l_vacation_message, $l_mail_server;
-  global $l_enable, $l_disable, $l_consult_web_list;
+  global $l_enabled, $l_disabled, $l_web_consult_list;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
-  global $path, $display, $c_yes, $c_no;
+  global $path, $display, $cgp_use, $c_yes, $c_no;
 
   $id = $obm_q->f("userobm_id");
   $system = $obm_q->f("userobm_system");
@@ -420,6 +426,16 @@ function html_user_consult($obm_q) {
   $perms = $obm_q->f("userobm_perms");
   $lname = $obm_q->f("userobm_lastname");
   $fname = $obm_q->f("userobm_firstname");
+  $desc = $obm_q->f("userobm_description");
+  $datebegin = $obm_q->f("userobm_datebegin");
+  $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
+  $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
+
+  $phone = $obm_q->f("userobm_phone");
+  $phone2 = $obm_q->f("userobm_phone2");
+  $mobile = $obm_q->f("userobm_mobile");
+  $fax = $obm_q->f("userobm_fax");
+  $fax2 = $obm_q->f("userobm_fax2");
   $service = $obm_q->f("userobm_service");
   $ad1 = $obm_q->f("userobm_address1");
   $ad2 = $obm_q->f("userobm_address2");
@@ -428,14 +444,6 @@ function html_user_consult($obm_q) {
   $town = $obm_q->f("userobm_town");
   $cdx = $obm_q->f("userobm_expresspostal");
   $ctry_name = $obm_q->f("country_name");
-  $phone = $obm_q->f("userobm_phone");
-  $phone2 = $obm_q->f("userobm_phone2");
-  $fax = $obm_q->f("userobm_fax");
-  $fax2 = $obm_q->f("userobm_fax2");
-  $desc = $obm_q->f("userobm_description");
-  $datebegin = $obm_q->f("userobm_datebegin");
-  $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
-  $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
 
   $web_perms = $obm_q->f("userobm_web_perms");
   $host_web_perms = $obm_q->f("host_web_perms");
@@ -458,7 +466,7 @@ function html_user_consult($obm_q) {
 
   $nomade_perms = ($nomade_perms ? $c_yes : $c_no);
   $nomade_enable = ($nomade_enable ? $c_yes : $c_no);
-  $nomade_local_copy = ($nomade_localcopy ? $c_yes : $c_no);
+  $nomade_local_copy = ($nomade_local_copy ? $c_yes : $c_no);
   $vacation_enable = ($vacation_enable ? $c_yes : $c_no);
   $vacation_message = ($vacation_enable ? nl2br($vacation_message) : "---");
 
@@ -470,11 +478,11 @@ function html_user_consult($obm_q) {
     $dis_host = "<a href=\"$path/host/host_index.php?action=detailconsult&amp;param_host=$host_id\">$host_name</a>";
   }
   if ($host_ip == '') $host_ip = $l_empty;
-  $web_state  = ($web_perms ? $l_enable : ($host_web_perms ? $l_host_enable : $l_disable));
+  $web_state  = ($web_perms ? $l_enabled : ($host_web_perms ? $l_host_enable : $l_disabled));
   $web_access = ($web_all ? $l_web_all : $l_web_list_only);
-  $mail_state  = ($mail_perms ? $l_enable : $l_disable);
-  $mail_ext_state  = ($mail_ext_perms ? $l_enable : $l_disable);
-  $smb_state  = ($smb_perms ? $l_enable : $l_disable);
+  $mail_state  = ($mail_perms ? $l_enabled : $l_disabled);
+  $mail_ext_state  = ($mail_ext_perms ? $l_enabled : $l_disabled);
+  $smb_state  = ($smb_perms ? $l_enabled : $l_disabled);
 
   // Liste des groupes de l'utilisateur
   $g_q = run_query_user_user_group($id);
@@ -497,13 +505,6 @@ function html_user_consult($obm_q) {
     </table></div>";
   }
 
-  $cgp_use["service"]["web"] = true;
-  $cgp_use["service"]["mail"] = true;
-  $cgp_use["service"]["nomad"] = true;
-  $cgp_use["service"]["vacation"] = true;
-  $cgp_use["service"]["samba"] = true;
-
-
   // Section Web
   if ($cgp_use["service"]["web"]) {
     // Affichage uniquement si acces web ET mode web_local
@@ -512,7 +513,7 @@ function html_user_consult($obm_q) {
       $dis_access = "
       <tr>
         <th>$l_web_mode</th>
-        <td>$web_access (<a href=\"$path/user/user_index.php?action=showlist&amp;param_user=$id\" >$l_consult_web_list</a>)</td>
+        <td>$web_access (<a href=\"$path/user/user_index.php?action=showlist&amp;param_user=$id\" >$l_web_consult_list</a>)</td>
       </tr>";
     }
     $web_section = "
@@ -530,8 +531,7 @@ function html_user_consult($obm_q) {
   }
 
   // Section Mail
-  //if ($cgp_use["service"]["mail"] && !is_only_relaying_mails()) {
-  if ($cgp_use["service"]["mail"]) {
+  if ($cgp_use["service"]["mail"] && !is_only_relaying_mails()) {
     $mail_section = "
     <div class=\"detail infos\">
     <h1>$l_mail</h1>
@@ -565,6 +565,18 @@ function html_user_consult($obm_q) {
     </tr>
     </table>
     </div>";
+  } else {
+    $mail_section = "
+    <div class=\"detail infos\">
+    <h1>$l_mail</h1>
+
+    <table>
+    <tr>
+      <th>$l_email</th>
+      <td>$email</td>
+    </tr>
+    </table>
+    </div>";
   }
 
   if ($cgp_use["service"]["mail_nomad"]) {
@@ -582,7 +594,7 @@ function html_user_consult($obm_q) {
       <td>$nomade_perms</td>
     </tr>
     <tr>
-      <th>$l_enable</th>
+      <th>$l_enabled</th>
       <td>$nomade_enable</td>
     </tr>
     <tr>
@@ -593,14 +605,14 @@ function html_user_consult($obm_q) {
     </div>";
   }
 
-  if ($cgp_use["service"]["vacation"]) {
+  if ($cgp_use["service"]["mail_vacation"]) {
     $vacation_section = "
     <div class=\"detail infos\">
     <h1>$l_vacation</h1>
 
     <table>
     <tr>
-      <th>$l_enable</th>
+      <th>$l_enabled</th>
       <td>$vacation_enable</td>
     </tr>
     <tr>
@@ -648,46 +660,40 @@ function html_user_consult($obm_q) {
   <tr>
     <th>$l_archive</th>
     <td>$archive</td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>$l_login</th>
     <td>$login</td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>$l_local</th>
     <td>$local</td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>$l_ext_id</th>
     <td>$ext_id</td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>$l_user_perms</th>
     <td>$perms</td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>$l_lastname</th>
     <td>$lname</td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>$l_firstname</th>
     <td>$fname</td>
   </tr>
   <tr>
-    <th>$l_email</th>
-    <td>$email</td>
-  </tr><tr>
     <th>$l_datebegin</th>
     <td>$datebegin</td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>$l_lastaccess</th>
     <td>$lastaccess</td>
   </tr>
 </table>
-</div>
-
-<div class=\"detail infos\">
-  <h1>$l_desc</h1>
-  <table>
-  <tr>
-    <th>$l_desc</th>
-    <td>$desc</td>
-  </tr>
-  </table>
 </div>
 
 <div class=\"detail infos\">
@@ -700,6 +706,10 @@ function html_user_consult($obm_q) {
   <tr>
     <th>$l_phone2</th>
     <td>$phone2</td>
+  </tr>
+  <tr>
+    <th>$l_mphone</th>
+    <td>$mobile</td>
   </tr>
   <tr>
     <th>$l_fax</th>
@@ -740,6 +750,16 @@ function html_user_consult($obm_q) {
   <tr>
     <th>$l_country</th>
     <td>$ctry_name</td>
+  </tr>
+  </table>
+</div>
+
+<div class=\"detail infos\">
+  <h1>$l_desc</h1>
+  <table>
+  <tr>
+    <th>$l_desc</th>
+    <td>$desc</td>
   </tr>
   </table>
 </div>
@@ -820,24 +840,40 @@ function html_user_group_consult($usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($usr_q, $user) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_user, $l_email, $l_archive, $l_insert, $l_update;
-  global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_desc, $l_datebegin;
+  global $l_user, $l_archive, $l_datebegin, $l_insert, $l_update;
+  global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
-  global $action, $profiles;
+  global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
+  global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
+  global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
+  global $l_vacation, $l_vacation_message, $l_mail_server;
+  global $l_enabled, $l_disabled, $l_web_consult_list;
+  global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
+  global $path, $display, $cgp_use, $action, $profiles, $c_yes, $c_no;
   global $c_multidomain, $obm, $c_default_domain, $l_domain;
+
   
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
+    // infos
     $id = $usr_q->f("userobm_id");
     $login = $usr_q->f("userobm_login");
     $passwd = "";
     $perms = $usr_q->f("userobm_perms");
+    $lastaccess = $usr_q->f("lastaccess");
     $lname = $usr_q->f("userobm_lastname");
     $fname = $usr_q->f("userobm_firstname");
+    $desc = $usr_q->f("userobm_description");
+    $datebegin = $usr_q->f("userobm_datebegin");
+    $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
+
+    // coord
     $phone = $usr_q->f("userobm_phone");
     $phone2 = $usr_q->f("userobm_phone2");
+    $mobile = $usr_q->f("userobm_mobile");
     $fax = $usr_q->f("userobm_fax");
     $fax2 = $usr_q->f("userobm_fax2");
+    $direction = $usr_q->f("userobm_direction");
     $service = $usr_q->f("userobm_service");
     $ad1 = $usr_q->f("userobm_address1");
     $ad2 = $usr_q->f("userobm_address2");
@@ -846,23 +882,62 @@ function html_user_form($usr_q, $user) {
     $town = $usr_q->f("userobm_town");
     $cdx = $usr_q->f("userobm_expresspostal");
     $ctry_name = $usr_q->f("country_name");
+
+    // web
+    $h_name = $usr_q->f("host_name");
+    $h_id = $usr_q->f("userobm_host_id");
+    $web_perms = $usr_q->f("userobm_web_perms");
+    $web_list = $usr_q->f("userobm_web_list");
+    $web_all = $usr_q->f("userobm_web_all");
+
+    // mail
+    $mail_perms = $usr_q->f("userobm_mail_perms");
+    $mail_ext_perms = $usr_q->f("userobm_mail_ext_perms");
+    $mail_server = $usr_q->f("userobm_mail_server_id");
     $email = $usr_q->f("userobm_email");
-    $desc = $usr_q->f("userobm_description");
-    $datebegin = $usr_q->f("userobm_datebegin");
-    $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
+    $mail_quota = $usr_q->f("userobm_mail_quota");
+
+    // nomad email
+    $nomade_perms = $usr_q->f("userobm_nomade_perms");
+    $nomade_enable = $usr_q->f("userobm_nomade_enable");
+    $nomade_local_copy = $usr_q->f("userobm_nomade_local_copy");
+    $email_nomade = $usr_q->f("userobm_email_nomade");
+
+    // vacation
+    $vacation_enable = $usr_q->f("userobm_vacation_enable");
+    $vacation_message = stripslashes($usr_q->f("userobm_vacation_message"));
+
+    // samba
+    $smb_perms = $usr_q->f("userobm_samba_perms");
+    $smb_home = $usr_q->f("userobm_samba_home");
+    $smb_home_drive = $usr_q->f("userobm_samba_home_drive");
+    $smb_logon = $usr_q->f("userobm_samba_logon_script");
+  } elseif ($action == "new") {
+    $smb = get_samba_info();
+    $smb_home = $smb["samba_home_def"];
+    $smb_home_drive = $smb["samba_home_drive_def"];
   }
 
   // If parameters have been given, they supercede the default action value
+  // infos
   if (isset($user["user_id"])) { $id = $user["user_id"]; }
   if (isset($user["login"])) { $login = $user["login"]; }
   if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
   if (isset($user["perms"])) { $perms = $user["perms"]; }
   if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
+  if (isset($user["email"])) { $email = $user["email"]; }
+  if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
+  if (isset($user["desc"])) { $desc = $user["desc"]; }
+  if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
+
+  // coord
   if (isset($user["phone"])) { $phone = $user["phone"]; }
   if (isset($user["phone2"])) { $phone2 = $user["phone2"]; }
+  if (isset($user["mobile"])) { $mobile = $user["mobile"]; }
   if (isset($user["fax"])) { $fax = $user["fax"]; }
   if (isset($user["fax2"])) { $fax2 = $user["fax2"]; }
+  if (isset($user["direction"])) { $direction = stripslashes($user["direction"]); }
   if (isset($user["service"])) { $service = $user["service"]; }
   if (isset($user["ad1"])) { $ad1 = $user["ad1"]; }
   if (isset($user["ad2"])) { $ad2 = $user["ad2"]; }
@@ -871,10 +946,35 @@ function html_user_form($usr_q, $user) {
   if (isset($user["town"])) { $town = $user["town"]; }
   if (isset($user["cdx"])) { $cdx = $user["cdx"]; }
   if (isset($user["ctry"])) { $ctry = $user["country"]; }
-  if (isset($user["email"])) { $email = $user["email"]; }
-  if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
-  if (isset($user["desc"])) { $desc = $user["desc"]; }
-  if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
+
+  // web
+  if (isset($user["host_name"])) { $h_name = $user["host_name"]; }
+  if (isset($user["host_id"])) { $h_id = $user["host_id"]; }
+  if (isset($user["web_perms"])) { $web_perms = $user["web_perms"]; }
+  if (isset($user["web_list"])) { $web_list = $user["web_list"]; }
+  if (isset($user["web_all"])) { $web_all = $user["web_all"]; }
+
+  // mail
+  if (isset($user["mail_perms"])) { $mail_perms = $user["mail_perms"]; }
+  if (isset($user["mail_ext_perms"])) { $mail_ext_perms = $user["mail_ext_perms"]; }
+  if (isset($user["mail_server"])) { $mail_server = $user["mail_server"]; }
+  if (isset($user["mail_quota"])) { $mail_quota = $user["mail_quota"]; }
+
+  // nomad email
+  if (isset($user["nomade_perms"])) { $nomade_perms = $user["nomade_perms"]; }
+  if (isset($user["nomade_enable"])) { $nomade_enable = $user["nomade_enable"]; }
+  if (isset($user["nomade_local_copy"])) { $nomade_local_copy = $user["nomade_local_copy"]; }
+  if (isset($user["email_nomade"])) { $email_nomade = $user["email_nomade"]; }
+
+  // vacation
+  if (isset($user["vacation_enable"])) { $vacation_enable = $user["vacation_enable"]; }
+  if (isset($user["vacation_message"])) { $vacation_message = stripslashes( $user["vacation_message"] ); }
+
+  // samba
+  if (isset($user["smb_perms"])) { $smb_perms = $user["smb_perms"]; }
+  if (isset($user["smb_home"])) { $smb_home = stripslashes($user["smb_home"]); }
+  if (isset($user["smb_home_drive"])) { $smb_home_drive = $user["smb_home_drive"]; }
+  if (isset($user["smb_logon"])) { $smb_logon = $user["smb_logon"]; }
 
   // Domain
   if ($c_multidomain && $obm["domain_id"] == $c_default_domain) {
@@ -892,6 +992,162 @@ function html_user_form($usr_q, $user) {
     }
     $block_pro .= "
       <option value=\"$profile\"$selected> $profile</option>";
+  }
+
+  // Section Web
+  if ($cgp_use["service"]["web"]) {
+    // Web perms checkbox checked value
+    $web_state  = ($web_perms ? "checked" : "");
+
+    // Web mode Radio checked value
+    if ($web_all == "0") $web_all_c0 = " checked";
+    else $web_all_c1 = " checked";
+    
+    // Affichage uniquement si acces web ET mode web_local
+    // sinon il n'y a pas generation de squid.conf donc pas d'ACL
+    if ($web_perms == "1" && $cgp_use["service"]["web_local"]) {
+      $dis_access = "
+      <tr>
+        <th>$l_web_mode</th>
+        <td>$web_access (<a href=\"$path/user/user_index.php?action=showlist&amp;param_user=$id\" >$l_web_consult_list</a>)</td>
+      </tr>";
+    }
+    $web_section = "
+  <fieldset class=\"detail infos\">
+  <legend>$l_access</legend>
+
+  <table>
+  <tr>
+    <th>$l_web</th>
+    <td><input name=\"cb_web_perms\" type=\"checkbox\" value=\"1\" $web_state /></td>
+  </tr>
+  $dis_access
+  </table>
+  </fieldset>";
+  }
+
+  // Section Mail
+  if ($cgp_use["service"]["mail"] && !is_only_relaying_mails()) {
+    // Mail perms checkbox checked values
+    $mail_state  = ($mail_perms ? "checked" : "");
+    $mail_ext_state  = ($mail_ext_perms ? "checked" : "");
+  
+    // Mail server selection
+    if ((!isset($mail_server)) || ($mail_server == "")) {
+      $dis_mailserver = get_select_host_server($mail_server);
+    } else {
+      $dis_mailserver = "
+      <a href=\"../host/host_index.php?action=detailconsult&param_host=".$mail_server."\">".get_hostname_by_id($mail_server)."</a>
+      <input type=\"hidden\" name=\"sel_mail_server\" value=\"".$mail_server."\" />";
+    }
+
+    $mail_section = "
+  <fieldset class=\"detail infos\">
+  <legend>$l_mail</legend>
+
+  <table>
+  <tr>
+    <th>$l_mail</th>
+    <td><input name=\"cb_mail_perms\" type=\"checkbox\" value=\"1\" $mail_state /></td>
+  </tr>
+  <tr>
+    <th>$l_mail_ext</th>
+    <td><input name=\"cb_mail_ext_perms\" type=\"checkbox\" value=\"1\" $mail_ext_state /></td>
+  </tr>
+  <tr>
+    <th>$l_mail_server</th>
+    <td>$dis_mail_server</td>
+  </tr>
+  <tr>
+    <th>$l_email</th>
+    <td><textarea name=\"ta_email\" cols=\"32\" rows=\"3\">$email</textarea>@$main_domain</td>
+  </tr>
+  <tr>
+    <th>$l_quota (Mo)</th>
+    <td><input name=\"tf_mail_quota\" maxlength=\"6\" size=\"6\" value=\"$mail_quota\" /></td>
+  </tr>
+  </table>
+  </fieldset>";
+  }
+
+  if ($cgp_use["service"]["mail_nomad"]) {
+  // Nomad chekbox checked value
+    if ($nomade_perms) $nomade_perms_c = " checked";
+    if ($nomade_enable) $nomade_enable_c = " checked";
+    if ($nomade_local_copy) $nomade_local_copy_c = " checked";
+
+    $nomad_section = "
+  <fieldset class=\"detail infos\">
+  <legend>$l_nomade</legend>
+
+  <table>
+  <tr>
+    <th>$l_email_nomade</th>
+    <td><input name=\"tf_email_nomade\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\" /></td>
+  </tr>
+  <tr>
+    <th>$l_perms</th>
+    <td><input name=\"cb_nomade_perms\" type=\"checkbox\" value=\"1\" $nomade_perms_c /></td>
+  </tr>
+  <tr>
+    <th>$l_enabled</th>
+    <td><input name=\"cb_nomade_enable\" type=\"checkbox\" value=\"1\" $nomade_enable_c /></td>
+  </tr>
+  <tr>
+    <th>$l_local_copy</th>
+    <td><input name=\"cb_nomade_local_copy\" type=\"checkbox\" value=\"1\" $nomade_local_copy_c /></td>
+  </tr>
+  </table>
+  </fieldset>";
+  }
+
+  if ($cgp_use["service"]["mail_vacation"]) {
+    // Vacation checkbox checked value
+    $vacation_state = ($vacation_enable ? "checked" : "");
+    $vacation_section = "
+  <fieldset class=\"detail infos\">
+  <legend>$l_vacation</legend>
+
+  <table>
+  <tr>
+    <th>$l_enabled</th>
+    <td><input name=\"cb_vacation_enable\" type=\"checkbox\" value=\"1\" $vacation_state /></td>
+  </tr>
+  <tr>
+    <th>$l_vacation_message</th>
+    <td><textarea name=\"ta_vacation_message\" cols=\"32\" rows=\"3\">$vacation_message</textarea></td>
+  </tr>
+  </table>
+  </fieldset>";
+  }
+
+  if ($cgp_use["service"]["samba"]) {
+    // Samba perms checkbox checked value
+    $smb_state  = ($smb_perms ? "checked" : "");
+
+    $samba_section = "
+  <fieldset class=\"detail infos\">
+  <legend>$l_smb</legend>
+
+  <table>
+  <tr>
+    <th>$l_smb_perms</th>
+    <td><input name=\"cb_smb_perms\" type=\"checkbox\" value=\"1\" $smb_state /></td>
+  </tr>
+  <tr>
+    <th>$l_smb_home</th>
+    <td><input name=\"tf_smb_home\" maxlength=\"255\" size=\"64\" value=\"$smb_home\" /></td>
+  </tr>
+  <tr>
+    <th>$l_smb_home_drive</th>
+    <td><input name=\"tf_smb_home_drive\" maxlength=\"1\" size=\"1\" value=\"$smb_home_drive\" />:</td>
+  </tr>
+  <tr>
+    <th>$l_smb_logon</th>
+    <td><input name=\"tf_smb_logon\" maxlength=\"128\" size=\"64\" value=\"$smb_logon\" /></td>
+  </tr>
+  </table>
+  </fieldset>";
   }
 
   // Buttons
@@ -949,10 +1205,6 @@ function html_user_form($usr_q, $user) {
     <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
   </tr>
   <tr>
-    <th>$l_email</th>
-    <td><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
-  </tr>
-  <tr>
     <th>$l_datebegin</th>
     <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
   </tr>
@@ -970,6 +1222,10 @@ function html_user_form($usr_q, $user) {
   <tr>
     <th>$l_phone2</th>
     <td><input name=\"tf_phone2\" size=\"20\" maxlength=\"20\" value=\"$phone2\" /></td>
+  <tr>
+    <th>$l_mphone</th>
+    <td><input name=\"tf_mobile\" size=\"20\" maxlength=\"20\" value=\"$mobile\" /></td>
+  </tr>
   </tr>
   <tr>
     <th>$l_fax</th>
@@ -1003,7 +1259,7 @@ function html_user_form($usr_q, $user) {
     <th>$l_town</th>
     <td><input name=\"tf_town\" size=\"24\" maxlength=\"24\" value=\"$town\" /></td>
   </tr>
-  <tr>      
+  <tr>
     <th>$l_expresspostal</th>
     <td><input name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /></td>
   </tr>
@@ -1020,12 +1276,61 @@ function html_user_form($usr_q, $user) {
   </table>
   </fieldset>
 
+$web_section
+$mail_section
+$nomad_section
+$vacation_section
+$samba_section
+
   <fieldset class=\"buttons\">
   $dis_button
   </fieldset>
   </form>";
 
   return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Cette fonction permet de générer la liste des hôtes dans une boîte de
+// sélection avec prise en compte de l'hôte par défaut
+// Parametre :
+//      mail_server : identifiant du serveur à sélectionner
+///////////////////////////////////////////////////////////////////////////////
+function get_select_host_server($mail_server="") {
+    $mail = get_mail_info();
+    $regexp_dflt_mail_server = "/^dflt_mailserver$/";
+    $regexp_mail_server = "/^mailserver_[0-9]{1,2}$/";
+
+    // On construit une boite de selection
+    // La valeur par défaut est le serveur par défaut, sauf si $mail_server
+    // est positionné
+    $dis_mailserver = "
+    <select name=\"sel_mail_server\">";
+    while( list( $key, $val ) = each( $mail ) ) {
+        if( preg_match( $regexp_dflt_mail_server, $key ) ) {
+            if ((!$mail_server) || ($mail_server==$val)) {
+                $dis_mailserver .= "
+        <option value=\"".$val."\" selected>".get_hostname_by_id($val)."</option>";
+            } else {
+                $dis_mailserver .= "
+        <option value=\"".$val."\">".get_hostname_by_id($val)."</option>";
+            }
+        }elseif( preg_match( $regexp_mail_server, $key ) ) {
+            if ($mail_server==$val) {
+                $dis_mailserver .= "
+        <option value=\"".$val."\" selected>".get_hostname_by_id($val)."</option>";
+            } else {
+                $dis_mailserver .= "
+        <option value=\"".$val."\">".get_hostname_by_id($val)."</option>";
+            }
+         }
+    }
+
+    $dis_mailserver .= "
+    </select>";
+
+    return $dis_mailserver;
 }
 
 
@@ -1042,19 +1347,61 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   global $l_check_sameuser, $l_confirm, $l_back;
   global $display, $c_yes, $c_no;
 
+  // infos
   $login = $user["login"];
   $passwd = $user["passwd"];
   $perms = $user["perms"];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $datebegin = $user["datebegin"];
-  $phone = $user["phone"];
-  $phone2 = $user["phone2"];
-  $fax = $user["fax"];
-  $fax2 = $user["fax2"];
   $email = $user["email"];
   $desc = $user["desc"];
   $archive = $user["archive"];
+
+  // coord
+  $phone = $user["phone"];
+  $phone2 = $user["phone2"];
+  $mobile = $user["mobile"];
+  $fax = $user["fax"];
+  $fax2 = $user["fax2"];
+  $direction = $user["direction"];
+  $service = $user["service"];
+  $ad1 = $user["ad1"];
+  $ad2 = $user["ad2"];
+  $ad3 = $user["ad3"];
+  $zip = $user["zip"];
+  $town = $user["town"];
+  $cdx = $user["cdx"];
+  $country = $user["country"];
+
+  // web
+  $host_name = $user["host_name"];
+  $host_id = $user["host_id"];
+  $web_perms = $user["web_perms"];
+  $web_list = $user["web_list"];
+  $web_all = $user["web_all"];
+
+  // mail
+  $mail_perms = $user["mail_perms"];
+  $mail_ext_perms = $user["mail_ext_perms"];
+  $mail_server = $user["mail_server"];
+  $mail_quota = $user["mail_quota"];
+
+  // mail nomad
+  $nomade_perms = $user["nomade_perms"];
+  $nomade_enable = $user["nomade_enable"];
+  $nomade_local_copy = $user["nomade_local_copy"];
+  $nomad_email = $user["email_nomade"];
+
+  // vacation
+  $vacation_enable = $user["vacation_enable"];
+  $vacation_message = $user["vacation_message"];
+  
+  // samba
+  $smb_perms = $user["smb_perms"];
+  $smb_home = $user["smb_home"];
+  $smb_home_drive = $user["smb_home_drive"];
+  $smb_logon = $user["smb_logon"];
 
   $display["msg"] .= display_warn_msg($l_check_sameuser);
   while ($usr_q->next_record()) {
@@ -1067,19 +1414,55 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   }
 
   $hidden_fields = "
-    <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />
-    <input type=\"hidden\" name=\"tf_passwd\" value=\"$passwd\" />
-    <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
-    <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
-    <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
-    <input type=\"hidden\" name=\"tf_datebegin\" value=\"$datebegin\" />
-    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
-    <input type=\"hidden\" name=\"tf_phone2\" value=\"$phone2\" />
-    <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
-    <input type=\"hidden\" name=\"tf_fax2\" value=\"$fax2\" />
-    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-    <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
-    <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />";
+  <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />
+  <input type=\"hidden\" name=\"tf_passwd\" value=\"$passwd\" />
+  <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
+  <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
+  <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
+  <input type=\"hidden\" name=\"tf_datebegin\" value=\"$datebegin\" />
+  <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+  <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+  <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
+
+  <input type=\"hidden\" name=\"phone\" value=\"$phone\" />
+  <input type=\"hidden\" name=\"phone2\" value=\"$phone2\" />
+  <input type=\"hidden\" name=\"mobile\" value=\"$mobile\" />
+  <input type=\"hidden\" name=\"fax\" value=\"$fax\" />
+  <input type=\"hidden\" name=\"fax2\" value=\"$fax2\" />
+  <input type=\"hidden\" name=\"direction\" value=\"$direction\" />
+  <input type=\"hidden\" name=\"service\" value=\"$service\" />
+  <input type=\"hidden\" name=\"ad1\" value=\"$ad1\" />
+  <input type=\"hidden\" name=\"ad2\" value=\"$ad2\" />
+  <input type=\"hidden\" name=\"ad3\" value=\"$ad3\" />
+  <input type=\"hidden\" name=\"zip\" value=\"$zip\" />
+  <input type=\"hidden\" name=\"town\" value=\"$town\" />
+  <input type=\"hidden\" name=\"cdx\" value=\"$cdx\" />
+  <input type=\"hidden\" name=\"country\" value=\"$country\" />
+
+  <input type=\"hidden\" name=\"host_name\" value=\"$host_name\" />
+  <input type=\"hidden\" name=\"host_id\" value=\"$host_id\" />
+  <input type=\"hidden\" name=\"web_perms\" value=\"$web_perms\" />
+  <input type=\"hidden\" name=\"web_list\" value=\"$web_list\" />
+  <input type=\"hidden\" name=\"web_all\" value=\"$web_all\" />
+
+  <input type=\"hidden\" name=\"mail_perms\" value=\"$mail_perms\" />
+  <input type=\"hidden\" name=\"mail_ext_perms\" value=\"$mail_ext_perms\" />
+  <input type=\"hidden\" name=\"mail_server\" value=\"$mail_server\" />
+  <input type=\"hidden\" name=\"mail_quota\" value=\"$mail_quota\" />
+
+  <input type=\"hidden\" name=\"nomade_perms\" value=\"$nomade_perms\" />
+  <input type=\"hidden\" name=\"nomade_enable\" value=\"$nomade_enable\" />
+  <input type=\"hidden\" name=\"nomade_local_copy\" value=\"$nomade_local_copy\" />
+  <input type=\"hidden\" name=\"email_nomade\" value=\"$nomad_email\" />
+
+  <input type=\"hidden\" name=\"vacation_enable\" value=\"$vacation_enable\" />
+  <input type=\"hidden\" name=\"vacation_message\" value=\"$vacation_message\" />
+
+  <input type=\"hidden\" name=\"smb_perms\" value=\"$smb_perms\" />
+  <input type=\"hidden\" name=\"smb_home\" value=\"$smb_home\" />
+  <input type=\"hidden\" name=\"smb_home_drive\" value=\"$smb_home_drive\" />
+  <input type=\"hidden\" name=\"smb_logon\" value=\"$smb_logon\" />
+";
 
   $block = "
   <div class=\"detail\">

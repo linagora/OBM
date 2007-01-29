@@ -36,6 +36,9 @@ require("user_query.inc");
 require("user_js.inc");
 require("$obminclude/lib/right.inc"); // needed by call from calendar
 
+// detailconsult can be accessed without param_user (-> display current user)
+if (($action == "detailconsult") && (! $param_user)) $param_user = $uid;
+
 get_user_action();
 $perm->check_permissions($module, $action);
 $uid = $auth->auth["uid"];
@@ -55,7 +58,8 @@ if ($action == "ext_get_ids") {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
-}elseif ($action == "ext_get_id") {
+
+} elseif ($action == "ext_get_id") {
   $display["search"] = html_user_search_form($params);
   if ($set_display == "yes") {
     $display["result"] = dis_user_search_list($params);
@@ -131,7 +135,7 @@ if ($action == "ext_get_ids") {
 
   // Form data are not valid
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = html_user_form("", $params);
   }
 
@@ -153,7 +157,7 @@ if ($action == "ext_get_ids") {
     }
     $display["detail"] = dis_user_consult($params);
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err["msg"]);
     $display["detail"] = html_user_form("", $params);
   }
 
@@ -163,7 +167,7 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_user_can_delete($params["user_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_user_consult($params);
   }
@@ -180,7 +184,7 @@ if ($action == "ext_get_ids") {
     run_query_user_delete_profile($params["user_id"]);
     $display["search"] = html_user_search_form($params);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_user_consult($params);
   }
