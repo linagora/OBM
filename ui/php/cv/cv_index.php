@@ -32,7 +32,7 @@ include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 $params = get_cv_params();
 include("$obminclude/global_pref.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
+include("$obminclude/of/of_category.inc");
 require("cv_query.inc");
 require("cv_display.inc");
 require_once("$obminclude/of/of_defaultodttemplate.inc");
@@ -192,7 +192,7 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "defaultodttemplate_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_defaultodttemplate_delete($params["defaultodttemplate_id"]);
+  $retour = run_query_defaultodttemplate_delete($params["defaultodttemplate"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_defaultodttemplate_delete_ok);
   } else {
@@ -262,11 +262,11 @@ function get_cv_action() {
 
 
 // Ext Get Id
-//  $actions["cv"]["ext_get_id"] = array (
-//    'Url'      => "$path/cv/cv_index.php?action=ext_get_id",
-//    'Right'    => $cright_read,
-//    'Condition'=> array ('None') 
-//                                      );
+  $actions["cv"]["ext_get_id"] = array (
+    'Url'      => "$path/cv/cv_index.php?action=ext_get_id",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                      );
 
 // Index
   $actions["cv"]["index"] = array (

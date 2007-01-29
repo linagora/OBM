@@ -1036,8 +1036,8 @@ function dis_invoice_dashboard_index($invoice) {
   $url_year_to_year = url_prepare("invoice_index.php?action=dashboard&amp;dash_view=year_to_year");
 
   $block = "
-    <div class=\"detailText\"><a href=\"$url_year_detail\">$l_year_detail</a></div>
-    <div class=\"detailText\"><a href=\"$url_year_to_year\">$l_year_to_year</a></div>
+    <div class=\"detail infos\"><h1><a href=\"$url_year_detail\">$l_year_detail</a></h1></div>
+    <div class=\"detail infos\"><h1><a href=\"$url_year_to_year\">$l_year_to_year</a></h1></div>
 ";
 
   if ($view != "") {
@@ -1094,7 +1094,7 @@ function dis_invoice_dashboard($invoice) {
   for ($month = 1; $month < 13; $month++) {
     $label = $l_monthsofyear[$month - 1];
     $dis_row_head .= "
-      <td class=\"resultHead\">$label</td>";
+      <th>$label</th>";
   }
 
   // Billed infos -------------------------------------------------------------
@@ -1111,8 +1111,7 @@ function dis_invoice_dashboard($invoice) {
     $cpt++;
     $data = "data" . ($cpt % 2);
 
-    $dis_bil_row .= "<tr class=\"$data\" style=\"text-align: right;\">
-      <td style=\"text-align: left;\">$s_label</td>";
+    $dis_bil_row .= "<tr class=\"pair\"><th>$s_label</th>";
 
     // Loop through each month (cols)
     for ($month = 1; $month < 13; $month++) {
@@ -1132,16 +1131,13 @@ function dis_invoice_dashboard($invoice) {
 	$dis_amount_ht = number_format($amount_ht, 2, ",", " ");
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
-        $dis_bil_row .= "
-          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
+        $dis_bil_row .= "<td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
       } else {
-        $dis_bil_row .= "
-          <td class=\"$data\"> </td>";
+        $dis_bil_row .= "<td></td>";
       }
     }
     $f_total_amount_ht = number_format($total_amount_ht, 2, ",", " ");
-    $dis_bil_row .= "<td class=\"data2\">&nbsp;$f_total_amount_ht</td>
-        </tr>";
+    $dis_bil_row .= "<td>&nbsp;$f_total_amount_ht</td></tr>";
   }
 
   // Total row
@@ -1202,8 +1198,7 @@ function dis_invoice_dashboard($invoice) {
     $cpt++;
     $data = "data" . ($cpt % 2);
 
-    $dis_pot_row .= "<tr class=\"$data\" style=\"text-align: right;\">
-      <td style=\"text-align: left;\">$s_label</td>";
+    $dis_pot_row .= "<tr class=\"pair\"><th>$s_label</th>";
 
     // Loop through each month (cols)
     for ($month = 1; $month < 13; $month++) {
@@ -1224,15 +1219,15 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_pot_row .= "
-          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
       } else {
         $dis_pot_row .= "
-          <td class=\"$data\"> </td>";
+          <td> </td>";
       }
       $labels[$month-1] = number_format($amount_ht, 0, ",", " ");
     }
     $f_total_amount_ht = number_format($total_amount_ht, 2, ",", " ");
-    $dis_pot_row .= "<td class=\"data2\">&nbsp;$f_total_amount_ht</td>
+    $dis_pot_row .= "<td>&nbsp;$f_total_amount_ht</td>
         </tr>";
   }
   $title = "$l_potential $year";
@@ -1259,8 +1254,7 @@ function dis_invoice_dashboard($invoice) {
     $cpt++;
     $data = "data" . ($cpt % 2);
 
-    $dis_pay_row .= "<tr class=\"$data\" style=\"text-align: right;\">
-      <td style=\"text-align: left;\">$s_label</td>";
+    $dis_pay_row .= "<tr class=\"pair\"><th>$s_label</th>";
 
     // Loop through each month (cols)
     for ($month = 1; $month < 13; $month++) {
@@ -1281,14 +1275,14 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_pay_row .= "
-          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
       } else {
         $dis_pay_row .= "
-          <td class=\"$data\"> </td>";
+          <td></td>";
       }
     }
     $f_total_amount_ttc = number_format($total_amount_ttc, 2, ",", " ");
-    $dis_pay_row .= "<td class=\"data2\">&nbsp;$f_total_amount_ttc</td>
+    $dis_pay_row .= "<td>&nbsp;$f_total_amount_ttc</td>
         </tr>";
   }
 
@@ -1342,20 +1336,19 @@ function dis_invoice_dashboard($invoice) {
 
 
   $block = "
-    <form method=\"post\" name=\"f_search\" action=\"$url_form\">
-
-    <div class=\"search\">
-      <div class=\"searchLabel\">
-        <a href=\"javascript: return false;\"
+    <form method=\"post\"  name=\"f_search\" action=\"$url_form\">
+      <div class=\"detail extra\">
+       <h1>$year</h1>
+       <a href=\"javascript: return false;\"
           onclick=\"yearfield=window.document.getElementById('year');
                     newyear=Number(yearfield.innerHTML)-1;
                     yearfield.innerHTML=newyear;
                     document.forms.f_search.year.value=newyear;
                     return false;\">
         <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/previous.png\" alt=\"\" /></a>
-      </div>
-      <div class=\"searchLabel\" id=\"year\">$year</div>
-      <div class=\"searchLabel\">
+      
+      
+     
         <a href=\"javascript: return false;\"
           onclick=\"yearfield=window.document.getElementById('year');
                     newyear=Number(yearfield.innerHTML)+1;
@@ -1363,64 +1356,74 @@ function dis_invoice_dashboard($invoice) {
                     document.forms.f_search.year.value=newyear;
                     return false;\">
         <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/next.png\" alt=\"\" /></a>
-      </div>
+      
 
-      <div class=\"detailText\">$block_tt</div>
-      <div class=\"searchLabel\">&nbsp;<br>
+      $block_tt
+      &nbsp;<br />
+      <div class=\"buttons\">
         <input type=\"hidden\" name=\"year\" value=\"$year\" />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
       </div>
-
-      <div class=\"searchEnd\"></div>
-
-    </div>
+      </div>
     </form>
 
-    <div class=\"detailHead\">$l_billed ($l_amount_ht)</div>
 
-    <table class=\"resultTable\">
-    <tr style=\"text-align: right;\">
-      <td class=\"resultHead\" style=\"text-align: left;\">$l_status</td>
+    <div class=\"detail extra\">
+    <h1>$l_billed ($l_amount_ht)</h1>
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr>
+      <th>$l_status</th>
       $dis_row_head
-      <td class=\"resultHead\" style=\"text-align: center;\">$l_total $year</td>
+      <th>$l_total $year</th>
     </tr>
+    </thead>
+    <tbody>
     $dis_bil_row
-    <tr class=\"data2\" style=\"text-align: right;\">
-      <td style=\"text-align: left;\">$l_total</td>
+    <tr class=\"highlight\">
+      <th>$l_total</th>
       $dis_bil_row_total
     </tr>
+    </tbody>
     </table>
-    <p />
+    <p>&nbsp;</p> 
 
-    <div class=\"detailHead\">$l_order_no_bill ($l_amount_ht)</div>
-
-    <table class=\"resultTable\">
-    <tr style=\"text-align: right;\">
-      <td class=\"resultHead\" style=\"text-align: left;\">$l_status</td>
+    <h1>$l_order_no_bill ($l_amount_ht)</h1>
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr>
+      <th>$l_status</th>
       $dis_row_head
-      <td class=\"resultHead\" style=\"text-align: center;\">$l_total $year</td>
+      <th>$l_total $year</th>
     </tr>
+    </thead>
+    <tbody>
     $dis_pot_row
+    </tbody>
     </table>
-    <p />
+    <p>&nbsp;</p>
 
-    <div class=\"detailHead\">$l_payment ($l_amount_ttc)</div>
-
-    <table class=\"resultTable\">
-    <tr style=\"text-align: right;\">
-      <td class=\"resultHead\" style=\"text-align: left;\">$l_status</td>
+    <h1>$l_payment ($l_amount_ttc)</h1>
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr>
+      <th>$l_status</th>
       $dis_row_head
-      <td class=\"resultHead\" style=\"text-align: center;\">$l_total $year</td>
+      <th>$l_total $year</th>
     </tr>
+    </thead>
+    <tbody>
     $dis_pay_row
-    <tr class=\"data2\" style=\"text-align: right;\">
-      <td style=\"text-align: left;\">$l_total</td>
+    <tr class=\"highlight\">
+      <th>$l_total</th>
       $dis_pay_row_total
     </tr>
+    </tbody>
     </table>
-    <p />
-
+    <p>&nbsp;</p>
+    </div>
+    
     <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar$chart_bil_params\" alt=\"\" />
     <br />
     <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pot_params\" alt=\"\" />

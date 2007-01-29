@@ -419,7 +419,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
   while (list($num, $el) = each($map)) {
     if (($num != "default") && ($num != "field")) {
       $label = $el["label"];
-      $mapping_head .= "<td class=\"detailLabel\">$num-$label</td>";
+      $mapping_head .= "<th>$num-$label</th>";
     }
   }
   $mapping_head .= "</tr>";
@@ -439,7 +439,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
     while (list($num, $value) = each($row)) {
       $num++; // $map mapping start at 1 and $row at 0
       if ($map[$num]["label"] != "") {
-	$mapping .= "<td class=\"detailForm\">$value</td>";
+	$mapping .= "<td>$value</td>";
       }
     }
     $mapping .= "</tr>";
@@ -447,14 +447,16 @@ function html_import_file_sample($import_q, $import, $max_rows) {
   fclose($fh);
 
   $block = "
-    <div class=\"detailHead\">$l_sample_file : $file_name</div>
-    <table class=\"detail\">
+    <div class=\"detail extra\">
+    <h1>$l_sample_file : $file_name</h1>
+    <table>
     <tr>
       $mapping_head
     </tr>
       $mapping
     </table>
-    </form>";
+    </form>
+    </div>";
 
   return $block;
 }
@@ -759,24 +761,26 @@ function html_import_file_import($import_q, $import) {
 
   // Test header
   $log_head .= "<tr>
-    <td class=\"detailLabel\">#</td>
-    <td class=\"detailLabel\">$l_company</td>
-    <td class=\"detailLabel\">$l_info</td>
-    <td class=\"detailLabel\">$l_contact</td>
-    <td class=\"detailLabel\">$l_info</td>
-    <td class=\"detailLabel\">$l_result</td>
+    <th>#</th>
+    <th>$l_company</th>
+    <th>$l_info</th>
+    <th>$l_contact</th>
+    <th>$l_info</th>
+    <th>$l_result</th>
   </tr>";
 
   $block = "
+  <div class=\"detail extra\">
     $conflict_block
 
-    <div class=\"detailHead\">$title</div>
-    <table class=\"detail\">
+    <h1>$title</h1>
+    <table>
     <tr>
       $log_head
     </tr>
       $log_block
-    </table>";
+    </table>
+    </div>";
 
   return $block;
 }

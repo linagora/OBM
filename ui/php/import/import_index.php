@@ -582,21 +582,21 @@ function get_import_action() {
   $actions["import"]["file_sample"] = array (
     'Url'      => "$path/import/import_index.php?action=file_sample&amp;import_id=".$params["import_id"]."",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('None') 
                                       );
 
 // Test File
   $actions["import"]["file_test"] = array (
     'Url'      => "$path/import/import_index.php?action=file_test&amp;import_id=".$params["import_id"]."",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('None') 
                                       );
 
 // Import File
   $actions["import"]["file_import"] = array (
     'Url'      => "$path/import/import_index.php?action=file_import&amp;import_id=".$params["import_id"]."",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('None') 
                                       );
 
 }

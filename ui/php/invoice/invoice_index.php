@@ -148,7 +148,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "dashboard") {
 ///////////////////////////////////////////////////////////////////////////////
-  include_once("$obminclude/Artichow/BarPlot.class.php");
+  //include_once("$obminclude/Artichow/BarPlot.class.php");
   $display["detail"] = dis_invoice_dashboard_index($params);
 
 } elseif ($action == "document_add") {
