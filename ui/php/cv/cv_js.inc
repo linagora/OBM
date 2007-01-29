@@ -26,7 +26,7 @@ require("$obminclude/javascript/check_js.inc");
 
 ";
 
-$extra_js = "
+$extra_js .= "
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if a project has already been added (returns true if already added)

@@ -1661,7 +1661,7 @@ function dis_calendar_quick_form($calendar) {
       <fieldset class=\"buttons\"> 
         <input type=\"button\" onclick=\"obm.calendarQuickForm.goto();\" value=\"$l_advanced\" />
       <input type=\"button\" 
-      onclick=\"if(confirm('$l_confirm_delete')) obm.calendarQuickForm.submit('delete');\"
+      onclick=\"if(confirm('$l_confirm_delete')) obm.calendarQuickForm.submit('quick_delete');\"
       value=\"$l_c_delete\" />
       </fieldset>
       </form>
@@ -3077,7 +3077,10 @@ function json_event_data($id,$calendar) {
       $week_duration = 86400*7;
       $options = array("xUnit:86400","yUnit:$week_duration",
                        "context:obm.calendarManager.bodyContext");      
-      break;      
+      break;     
+    default :
+      $options = array();
+      break; 
   }
   $updatable[] = "draggable:'true'"; 
   if(!$day) {

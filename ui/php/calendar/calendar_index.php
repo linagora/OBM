@@ -271,7 +271,7 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_quick_form($params)) {
     $id = run_query_calendar_quick_event_insert($params, $event_id);
-    json_ok_msg("$l_event : $l_update_ok");
+    json_ok_msg("$l_event : $l_insert_ok");
     json_event_data($id, $params);
     echo "({".$display['json']."})";
     exit();
@@ -279,7 +279,30 @@ if ($action == "index") {
     json_error_msg($l_invalid_data . " : " . $err_msg);
     echo "({".$display['json']."})";
     exit();
-  }  
+  } 
+} elseif ($action == "quick_delete") {  
+///////////////////////////////////////////////////////////////////////////////
+  $id = $params["calendar_id"];
+  if (check_calendar_can_delete($id)) {
+    $eve_q = run_query_calendar_detail($id);
+    json_event_data($id,$params);
+    if($eve_q->f('calendarevent_repeatkind') == 'none') {      
+      run_query_calendar_delete($params);
+      json_ok_msg("$l_event : $l_delete_ok");
+      echo "({".$display['json']."})";
+      exit();      
+    } else {
+      run_query_calendar_event_exception_insert($params);
+      json_ok_msg("$l_event : $l_delete_ok");
+      echo "({".$display['json']."})";
+      exit();            
+    }
+  } else {
+    json_error_msg($l_invalid_data);
+    echo "({".$display['json']."})";    
+  }
+
+  
 } elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_calendar_update_occurence_state($params["calendar_id"],$uid,$params["decision_event"]);
@@ -629,13 +652,13 @@ function get_calendar_action() {
   );
 
   // Planning
-  $actions["calendar"]["planning"] = array (
+/*  $actions["calendar"]["planning"] = array (
     'Name'     => $l_header_planning,
     'Url'      => "$path/calendar/calendar_index.php?action=planning&amp;date=$date",
     'Right'    => $cright_read, 
     'Condition'=> array ('all') 
                                     	 );
-
+ */
   // View Year
 /*  $actions["calendar"]["view_year"] = array (
     'Name'     => $l_header_year,
@@ -689,6 +712,13 @@ function get_calendar_action() {
     'Condition'=> array ('None') 
   );
 
+    // Insert
+  $actions["calendar"]["quick_delete"] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=quick_delete",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+
   // Update
   $actions["calendar"]["update_decision"] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=update",
@@ -705,13 +735,13 @@ function get_calendar_action() {
                                          );
 					 
   // New meeting
-  $actions["calendar"]["new_meeting"] = array (
+/*  $actions["calendar"]["new_meeting"] = array (
     'Name'     => $l_header_meeting,
     'Url'      => "$path/calendar/calendar_index.php?action=new_meeting",
     'Right'    => $cright_write,
     'Condition'=> array ('all') 
                                          );
-
+ */
   // Search meeting
   $actions["calendar"]["perform_meeting"] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=perform_meeting",

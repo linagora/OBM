@@ -658,6 +658,36 @@ Obm.CalendarManager = new Class({
   },
   
   receiveDeleteEvent: function(request) {
+    try {
+      var resp = eval(request);
+    } catch (e) {
+      resp = new Object();
+      resp.error = 1;
+      resp.message = 'Fatal server error, please reload';
+    }
+    var events = resp.eventsData;
+    if(resp.error == 0) {
+      showOkMessage(resp.message);
+      var str = resp.elementId.split('-');
+      for(var i=0;i< events.length;i++) {
+        event = events[i].event;
+        var id = str[0]+'-'+str[1] +'-'+event.entity+'-'+event.entity_id+'-'+str[4];
+        var evt = obm.calendarManager.events.get(id);
+        if (evt) {
+          obm.calendarManager.unregister(id);
+          obm.calendarManager.events.remove(id);
+          evt.destroy();
+          delete evt;
+        }
+      }
+      obm.calendarManager.redrawAllEvents();      
+    } else {
+      showErrorMessage(resp.message);
+      obm.calendarManager.events.each(function(key,evt) {
+        evt.redraw(); 
+      });      
+    }
+    
 
   }
 });
@@ -731,11 +761,12 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.entity = evt.event.entity;
     this.eventData.all_day = evt.event.all_day;
     this.eventData.date_begin = date_begin.format('Y-m-d H:i:s');
+    this.eventData.old_date_begin = new Date(evt.event.time * 1000).format('Y-m-d H:i:s');
     this.eventData.duration = evt.event.duration;
     this.eventData.context = context;
     this.eventData.element_id = evt.element.id;
     this.eventData.action = 'quick_update';
-    this.eventData.gotoURI = 'action=detailupdate&calendar_id='+evt.event.id;
+    this.gotoURI = 'action=detailupdate&calendar_id='+evt.event.id;
     if(evt.event.updatable) {
       this.form.setStyle('display','block');
     } else {
@@ -760,11 +791,12 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.entity = '';
     this.eventData.all_day = allDay;
     this.eventData.date_begin = date_begin.format('Y-m-d H:i:s');
+    this.eventData.old_date_begin = this.eventData.date_begin;
     this.eventData.duration = 3600;
     this.eventData.context = context;
     this.eventData.element_id = '';
     this.eventData.action = 'quick_insert';   
-    this.eventData.gotoURI = 'action=new';
+    this.gotoURI = 'action=new';
     this.form.setStyle('display','block');
     this.data.setStyle('display','none');
     this.title.setStyle('display','none');
@@ -784,7 +816,7 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.action = action || this.eventData.action;
     if(this.eventData.action == 'quick_insert') {
       obm.calendarManager.sendCreateEvent(this.eventData);
-    } else if (this.eventData.action == 'delete') {
+    } else if (this.eventData.action == 'quick_delete') {
       obm.calendarManager.sendDeleteEvent(this.eventData); 
     } else {
       obm.calendarManager.sendUpdateEvent(this.eventData);
@@ -794,7 +826,7 @@ Obm.CalendarQuickForm = new Class({
 
   goto: function(action) {
     if(action) {
-      this.eventData.gotoURI += '&action='+action;
+      this.gotoURI += '&action='+action;
     }
     window.location.href = 'calendar_index.php?'+this.eventData.gotoURI;
   }

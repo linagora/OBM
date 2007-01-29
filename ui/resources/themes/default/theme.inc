@@ -89,6 +89,7 @@ $flag_fr            = "$theme_path/flag_fr.gif";
 $flag_it            = "$theme_path/flag_it.gif";
 $flag_no_ny         = "$theme_path/flag_no_ny.gif";
 $preview_default    = "$theme_path/preview_theme.gif";
+$home_obm           = "$theme_path/home_obm.png";
 
 // Agenda Icons
 $ico_resize         = "$theme_path/ico_resize.gif";

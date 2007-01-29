@@ -1013,25 +1013,14 @@ function run_query_calendar_quick_event_insert($calendar) {
  * @access public
  * @return void
  */
-function run_query_calendar_event_exception_insert( $calendar, $event_q) {
+function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
   global $cdg_sql, $uid;
 
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
-  $id = $event_q->f("calendarevent_id");
-  $category1_id = $event_q->f("calendarevent_category1_id");
-  $priority = $event_q->f("calendarevent_priority");
-  $description = $event_q->f("calendarevent_description");
-  $location = $event_q->f("calendarevent_location");
-  ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
-  $datebegin = $calendar["date_begin"];
+  $id = $calendar["calendar_id"];
   $olddatebegin = $calendar["old_date_begin"];
   $event_duration = $calendar["duration"];
-  if ($event_q->f("calendarevent_privacy")!=1) $privacy = 0; else $privacy = 1; 
-  $repeat_kind = $event_q->f("calendarevent_repeatkind");
-  $repeat_days = $event_q->f("calendarevent_repeatdays");
-  $repeat_end = $event_q->f("calendarevent_endrepeat");
-  $repeatfrequency = $event_q->f("calendarevent_repeatfrequence");  
   
   
   $obm_q = new DB_OBM;
@@ -1051,62 +1040,78 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q) {
         '$olddatebegin'
       )";
   $obm_q->query($query);
-  
-  $query = "INSERT INTO CalendarEvent (
-    calendarevent_timeupdate,                         
-    calendarevent_timecreate,                         
-    calendarevent_usercreate,
-    calendarevent_owner,
-    calendarevent_title, 
-    calendarevent_date,     
-    calendarevent_description,
-    calendarevent_location, 
-    calendarevent_category1_id,
-    calendarevent_priority,
-    calendarevent_privacy, 
-    calendarevent_duration,
-    calendarevent_repeatkind,
-    calendarevent_repeatfrequence,
-    calendarevent_repeatdays,
-    calendarevent_allday,
-    calendarevent_endrepeat)
-  VALUES (
-    '$now',
-    '$now',
-    '$uid',
-    '$uid',
-    '$title',
-    '$datebegin',
-    '$description',
-    '$location',
-    '$category1_id',
-    '$priority',
-    '$privacy',
-    '$event_duration',		
-    'none',
-    '$repeatfrequency',
-    '$repeat_days',
-    '$all_day',
-    '$repeat_end')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data()");
-  $obm_q->query($query);
-  
-  $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data()");
-  $obm_q->query($query);
-  $obm_q->next_record(); 
-  $new_id = $obm_q->f("max_id");
+  if(is_object($event_q)) {
+    if ($event_q->f("calendarevent_privacy")!=1) $privacy = 0; else $privacy = 1; 
+    $repeat_kind = $event_q->f("calendarevent_repeatkind");
+    $repeat_days = $event_q->f("calendarevent_repeatdays");
+    $repeat_end = $event_q->f("calendarevent_endrepeat");
+    $repeatfrequency = $event_q->f("calendarevent_repeatfrequence");  
+    $category1_id = $event_q->f("calendarevent_category1_id");
+    $priority = $event_q->f("calendarevent_priority");
+    $description = $event_q->f("calendarevent_description");
+    $location = $event_q->f("calendarevent_location");
+    ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
+    $datebegin = $calendar["date_begin"];
 
-  $entities = get_calendar_event_entity($id);
-  foreach ($entities as $entity => $data) {
-    foreach ($data["entity"] as $entity_id => $entity_data) {  
-      run_query_calendar_insert_entity_event($entity, $entity_id, $new_id, $entity_data['state']);
+    $query = "INSERT INTO CalendarEvent (
+      calendarevent_timeupdate,                         
+      calendarevent_timecreate,                         
+      calendarevent_usercreate,
+      calendarevent_owner,
+      calendarevent_title, 
+      calendarevent_date,     
+      calendarevent_description,
+      calendarevent_location, 
+      calendarevent_category1_id,
+      calendarevent_priority,
+      calendarevent_privacy, 
+      calendarevent_duration,
+      calendarevent_repeatkind,
+      calendarevent_repeatfrequence,
+      calendarevent_repeatdays,
+      calendarevent_allday,
+      calendarevent_endrepeat)
+    VALUES (
+      '$now',
+      '$now',
+      '$uid',
+      '$uid',
+      '$title',
+      '$datebegin',
+      '$description',
+      '$location',
+      '$category1_id',
+      '$priority',
+      '$privacy',
+      '$event_duration',		
+      'none',
+      '$repeatfrequency',
+      '$repeat_days',
+      '$all_day',
+      '$repeat_end')";
+
+    display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data()");
+    $obm_q->query($query);
+    
+    $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
+    display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data()");
+    $obm_q->query($query);
+    $obm_q->next_record(); 
+    $new_id = $obm_q->f("max_id");
+
+    $entities = get_calendar_event_entity($id);
+    foreach ($entities as $entity => $data) {
+      foreach ($data["entity"] as $entity_id => $entity_data) {  
+        run_query_calendar_insert_entity_event($entity, $entity_id, $new_id, $entity_data['state']);
+      }
     }
   }
 
   return $new_id;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the event can be deleted
 // Parameters:

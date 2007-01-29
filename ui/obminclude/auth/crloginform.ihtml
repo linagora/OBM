@@ -6,7 +6,7 @@
 <style type="text/css">
 <!--
 body {
-	background-image: url(<?php echo C_IMAGE_PATH; ?>/images/accueil_obm.png);
+	background-image: url(<?php echo $home_obm ?>);
 	background-repeat: no-repeat;
 	background-position: center top;
 }
