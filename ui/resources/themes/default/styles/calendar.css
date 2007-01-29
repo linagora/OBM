@@ -82,6 +82,13 @@
   background-color: #ccc;
 }
 
+.month tbody td.highlight{
+  background-color: #fddaa4;
+}
+
+.month tbody td.downlight{
+  background-color: #eff0f2;
+}
 /* ------------------------------------------------------------------------- */
 /* Month view styles */
 /* ------------------------------------------------------------------------- */
@@ -261,10 +268,19 @@
 
 #calendarQuickFormData {
   margin:0;
-  padding: 0;
+  padding: 0 0 5px 0;
   height: 6em;
   background-color: #ebebeb;
   border: 1px solid #b3b3b3;
+}
+
+#calendarQuickFormData div {
+  background-color: #fff;
+  margin: 0 5px 5px 5px;
+  padding: 0px 3px;
+  border-left: 1px solid #358399;
+  border-right: 1px solid #358399;
+  border-bottom: 1px solid #358399;
 }
 
 /* ------------------------------------------------------------------------- */

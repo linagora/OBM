@@ -610,12 +610,12 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
     $iso_day = of_isodate_format($current_time);
     $check_month = of_date_get_month ($current_time);
     if ($check_month != $this_month) {
-      $bgclass="class=\"calendarMonthOff\"";
+      $bgclass="class=\"downlight\"";
     } elseif (of_isodate_format(time()) == $iso_day) {
-      $bgclass="class=\"calendarMonthOn\"";
+      $bgclass="class=\"highlight\"";
     } else {
-      $bgclass="class=\"calendarMonthReg\"";
-    }
+      $bgclass="";
+    } 
     if ($i == 0) {
       $week_num = get_calendar_week_num($current_time); 
       $dis_month_cal .= "

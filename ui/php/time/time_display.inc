@@ -106,7 +106,8 @@ function dis_time_index($time) {
 //   - $time : parameter hash
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_nav_date($time) {
-  global $cdg_param, $auth, $set_theme, $c_dst_err, $l_monthsofyear;
+  global $cdg_param, $auth, $c_dst_err, $l_monthsofyear;
+  global $ico_previous,$ico_next;
 
   $action = $time["action"];
   $interval = $time["interval"];
@@ -155,48 +156,13 @@ function dis_time_nav_date($time) {
     $url_prev = url_prepare("time_index.php?action=$link_action&amp;date=$d_prev");
     $url_next = url_prepare("time_index.php?action=$link_action&amp;date=$d_next");
 
-  $block = "
-    <div class=\"timeCenter\">
-      <table class=\"timeLinks\" width=\"$tot_width\">
-      <tr>
-        <td>
-          <a href=\"$url_prev\">
-          <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/previous.png\" alt=\"\" />
-          </a>
-        </td>
-        <td class=\"timePeriod\">
-          $title
-        </td>
-        <td>
-          <a href=\"$url_next\">
-           <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/next.png\" alt=\"\" />
-          </a>
-        </td>
-      </tr>
-      </table>    
-    </div>
-";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the planning according to the interval given
-// Parameters:
-//   - $time[] : time hash
-///////////////////////////////////////////////////////////////////////////////
-function dis_time_planning2($time) {
-  global $auth, $cdg_param;
-
-  if ($time["interval"] == "week") {
-    $task_q = run_query_time_task_one_week($time, '');
-    $block = dis_time_planning_week($task_q, $time);
-
-  } else if ($time["interval"] == "month") {
-    $task_q = run_query_time_task_one_month($time);
-    $block = dis_time_planning_month($task_q, $time);
-  }
+    $block = "
+    <h1>
+    <a href=\"$url_prev\"><img src=\"$ico_previous\" alt=\"[Previous Month]\" /></a>     
+    $title
+    <a href=\"$url_next\"><img src=\"$ico_next\" alt=\"[Next Month]\" /></a>     
+    </h1> 
+    ";    
 
   return $block;
 }
@@ -236,13 +202,13 @@ function dis_time_planning_week($obm_q,$time) {;
 
     if ($c_working_days[$wday] != 0) {
       $line1 .= "
-        <td width=\"$col_width\" class=\"timeWeekhead\">$hum_wday</td>";
+        <td>$hum_wday</td>";
       if ($result[$wday] == $c_day_fraction) {
         $line2 .= "
-        <td class=\"timeWeekvalid\">$c_day_fraction/$c_day_fraction</td>";
+        <td class=\"downlight\">$c_day_fraction/$c_day_fraction</td>";
       } else {
 	$line2 .= "
-        <td class=\"timeWeekunvalid\">".$result[$wday]."/$c_day_fraction</td>";
+        <td class=\"highlight\">".$result[$wday]."/$c_day_fraction</td>";
       }
     }
     
@@ -250,16 +216,19 @@ function dis_time_planning_week($obm_q,$time) {;
   }
   
   $block = "
-  <div class=\"timeCenter\">
-    <table class=\"timeLinks\" width=\"$tot_width\">
+  <table class=\"miniCalendar\">
+  <thead>
     <tr>
       $line1
     </tr>
+    </thead>
+    <tbody>
     <tr>
       $line2
     </tr>
+    </tbody>
     </table>
-  </div>";
+  ";
 
   return $block;
 }
@@ -498,7 +467,6 @@ function dis_time_user_planning($obm_q, $time) {
   <style>
     $css
   </style>
-  <div class=\"timeCenter\">
   <table class=\"planning\">
   <colgroup>
   </colgroup>
@@ -512,7 +480,6 @@ function dis_time_user_planning($obm_q, $time) {
   </thead>
   $d_l
   </table>
-  <div>
 ";
 
   return $block;
@@ -534,7 +501,7 @@ function dis_user_select($time, $usr_q, $multi=false) {
 
   if ($multi) {
     $size = 12;
-    $type = "multiple";
+    $type = "multiple=\"multiple\"";
     $alt = "[]";
     $dis_button_all = "
       <input type=\"submit\" name=\"submit\" value=\"$l_all\"
@@ -544,7 +511,7 @@ function dis_user_select($time, $usr_q, $multi=false) {
   }
   
   // UserObm Select
-  $sel_user = "<select name=\"sel_user_id$alt\" $type size=\"$size\">";
+  $sel_user = "<select name=\"sel_user_id$alt\" $type>";
   $selected = false;
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
@@ -570,24 +537,19 @@ function dis_user_select($time, $usr_q, $multi=false) {
   
   $url = url_prepare("time_index.php");
   
-  $block = "<br />
-    <div class=\"timeBar\">
+  $block = "
+    <div class=\"portlet\">
+    <h1>$l_user</h1>
     <form method=\"post\" name=\"f_time\" action=\"$url\">
-
-    <table class=\"timeUser\">
-    <tr>
-      <td class=\"timeUserhead\">$l_user</td>
-    </tr><tr>
-      <td class=\"timeUserback\">$sel_user</td>
-    </tr><tr>
-      <td class=\"timeUserback\">
-        <input type=\"hidden\" name=\"date\" value=\"".$time["date"]."\" />
+    <fieldset class=\"detail extra\">
+      $sel_user
+    </fieldset>
+    <fieldset class=\"buttons\">
+      <input type=\"hidden\" name=\"date\" value=\"".$time["date"]."\" />
         <input type=\"hidden\" name=\"action\" value=\"$act\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_see\" />
         $dis_button_all
-      </td>
-    </tr>
-    </table>
+    </fieldset>
     </form>
     </div>
 ";
@@ -645,7 +607,7 @@ function dis_time_list_result($task_q,$prefs,$time) {
   $dis_task_list->data_cb_name = "delete_";
   $dis_task_list->data_cb_show = "test_status";
 
-  $block .= "<div class=\"detailHead\">$l_task_list</div>\n";
+  $block .= "<h1>$l_task_list</h1>\n";
   $block .= $dis_task_list->display("dis_time_data");
 
   $dis_button = "
@@ -655,9 +617,9 @@ function dis_time_list_result($task_q,$prefs,$time) {
     <input name=\"submit\" type=\"submit\" value=\"$l_delete\" />";
 
   $block .= "
-     <p class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_button</p>
-     </p>
+     <fieldset class=\"buttons\" >
+      $dis_button
+     </fieldset>
 
      </form>
 ";
@@ -850,7 +812,7 @@ function dis_time_form_addtask($time, $validate_days) {
       }
       $sel_tt .= "\n<option value=\"$tt_id\"";
       if ($is_tt == $tt_id) $sel_tt .= " selected=\"selected\""; 
-      $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
+      $sel_tt .= ">$tt_label</option>\n";
     }
   }
   $sel_tt .= "</select>";
@@ -860,13 +822,13 @@ function dis_time_form_addtask($time, $validate_days) {
     <select name=\"sel_project\"
       onchange=\"fill_tasktype(this.form.sel_tasktype, this.form.sel_project.value);
       fill_project(this.form.sel_project, this.form.sel_tasktype.value, this.form.sel_projecttask, this.form.sel_project.value);return true;\">
-    <option value=\"$c_undef\">$l_undef</option>
+      <option value=\"$c_undef\">$l_undef</option>
     </select>";
 
   // ProjectTask select construction
   $sel_projtask = "
     <select name=\"sel_projecttask\">
-    <option value=\"$c_undef\">$l_undef</option>
+      <option value=\"$c_undef\">$l_undef</option>
     </select>";
 
   // Project time length
@@ -881,15 +843,14 @@ function dis_time_form_addtask($time, $validate_days) {
 
   // Update timetask ----------------------------------------------------------
   if ($action == "detailupdate") {
-    $dis_date .= "$l_date :</td><td class=\"timeForm\" colspan=\"2\">$rd_day";
+    $dis_date .= "$rd_day";
 
     // Action button
     $dis_button .= "
-      <td class=\"timeForm\">
        <input type=\"hidden\" name=\"date\" value=\"".$time["date"]."\" />
        <input type=\"hidden\" name=\"task_id\" value=\"$task_id\" />
        <input type=\"submit\" value=\"$l_update\" />
-      </td>";
+      ";
 
     // Script that prefill values (only if tasktype has project and tasks)
     if ($is_proj > 0) {
@@ -910,14 +871,13 @@ function dis_time_form_addtask($time, $validate_days) {
 
     // New timetask -----------------------------------------------------------
   } else {
-    $dis_date .= "$l_date :</td><td class=\"timeForm\" colspan=\"2\">$ch_day";
+    $dis_date .= "$ch_day";
 
     // Action button
     $dis_button .= "
-      <td class=\"timeForm\">
        <input type=\"hidden\" name=\"date\" value=\"".$time["date"]."\" />
        <input type=\"submit\" value=\"$l_add\" />
-      </td>";
+      ";
 
     // Script that prefill values
     $dis_script .= "
@@ -934,35 +894,35 @@ function dis_time_form_addtask($time, $validate_days) {
     <input type=\"hidden\" name=\"action\" value=\"$obm_action\" />
     <input type=\"hidden\" name=\"popup\" value=\"0\" />
     <input type=\"hidden\" name=\"user_id\" value=\"$user_id\" />
-
-  <div class=\"detailHead\">$l_fill_addtask</div>
-
-  <div class=\"timeCenter\">
-    <table class=\"timeDetail\" width=\"100%\">
+  <fieldset class=\"detail extra\">
+  <legend>$l_fill_addtask</legend>
+  <table class=\"spreadSheet\">
     <tr>
-      <td class=\"timeForm\">$dis_date</td>
-      <td class=\"timeForm\">$l_duration :</td>
-      <td class=\"timeForm\">$sel_time</td>
+      <th>$l_date :</th>
+      <td>$dis_date</td>
+      <th>$l_duration :</th>
+      <td>$sel_time</td>
     </tr>
     <tr>
-      <td class=\"timeForm\">$l_header_tasktype :</td>
-      <td class=\"timeForm\" colspan=\"4\">$sel_tt</td>
+      <th>$l_header_tasktype :</th>
+      <td colspan=\"3\">$sel_tt</td>
     </tr>
     <tr>
-      <td class=\"timeForm\">$l_project :</td>
-      <td class=\"timeForm\">$sel_proj</td>
-      <td class=\"timeForm\" colspan=\"3\">$sel_projtask</td>
+      <th>$l_project :</th>
+      <td>$sel_proj</td>
+      <td colspan=\"2\">$sel_projtask</td>
     </tr>
     <tr>
-      <td class=\"timeForm\">$l_comment :</td>
-      <td class=\"timeForm\" colspan=\"3\">
-        <input type=\"text\" name=\"tf_label\" size=\"30\" value=\"$time_label\" />
+      <th>$l_comment :</th>
+      <td colspan=\"3\">
+      <input type=\"text\" name=\"tf_label\" size=\"30\" value=\"$time_label\" />
       </td>
-      $dis_button
     </tr>
-    </table>
-  </div>
-
+  </table>
+  </fieldset>
+  <fieldset class=\"buttons\">
+  $dis_button
+  </fieldset>
   $dis_script
   </form>";
 
@@ -1010,6 +970,7 @@ function dis_time_month_users_total($time) {
 function html_time_month_users_total($time, $array_res) {
   global $set_theme, $c_working_days, $c_day_fraction;
   global $l_see, $l_fill, $l_valid, $l_unvalid, $l_admin_valid;
+  global $ico_update,$ico_nok,$ico_ok;
 
   $date = $time["date"];
   $tot_workingdays = get_time_nb_working_days($date);
@@ -1025,48 +986,44 @@ function html_time_month_users_total($time, $array_res) {
     $fract = $user_total/$c_day_fraction;
 
     if ($user_status == 2) {
-      $class = "timeValok";
       $dis_validlink = "
-       <a href=\"". url_prepare("time_index.php?action=unvalidate&amp;date=$date&amp;sel_user_id=$uid") ."\">
-       <img border=0 src=\"".C_IMAGE_PATH."/$set_theme/non2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_unvalid</a>";
+       <a href=\"time_index.php?action=unvalidate&amp;date=$date&amp;sel_user_id=$uid\">
+       <img src=\"$ico_nok\" alt=\"$l_unvalid\" /> $l_unvalid</a>";
       $link_act = "$l_see";
     } else if ($fract != $tot_workingdays) {
-      $class = "timeValunfilled";
-      $dis_validlink = "&nbsp;";
+      $dis_validlink = "";
       $link_act = "$l_fill";
     } else {
       $class = "timeValfilled";
       $dis_validlink = "
-       <a href=\"". url_prepare("time_index.php?action=validate&amp;date=$date&amp;sel_user_id=$uid") ."\">
-       <img border=0 src=\"".C_IMAGE_PATH."/$set_theme/oui2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_valid</a>";
+       <a href=\"time_index.php?action=validate&amp;date=$date&amp;sel_user_id=$uid\">
+       <img src=\"$ico_ok\" alt=\"$l_val\" /> $l_valid</a>";
       $link_act = "$l_see";
     }
 
     $fract = ($fract != number_format($fract, 0)) ? number_format($fract, 1) : $fract;
-    $dis_tot= ($fract != $tot_workingdays) ? "<b>$fract / $tot_workingdays</b>" : "$fract / $tot_workingdays";
+    $dis_tot= ($fract != $tot_workingdays) ? $class="" : $class="info";
 
     $dis_months .= "
      <tr>
-      <td><b>&nbsp;$user_title</b></td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"$class\">$dis_tot</td>
-      <td>&nbsp;&nbsp;</td>
-      <td>
-       <a href=\"". url_prepare("time_index.php?action=viewmonth&amp;date=$date&amp;sel_user_id=$uid") ."\">
-       <img border=0 src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" /> $link_act</a>
-      </td>
+      <th>$user_title</th>
+      <td class=\"$class\">$fract / $tot_workingdays</td>
+      <th>
+       <a href=\"time_index.php?action=viewmonth&amp;date=$date&amp;sel_user_id=$uid\">
+       <imgrc=\"$ico_update\" alt=\"Update\" /> $link_act</a>
+      </th>
       <td>$dis_validlink</td>
      </tr>";
   }
 
   $block = "
-   <div class=\"detailHead\">$l_admin_valid</div>
 
-   <div class=\"timeCenter\">
-    <table class=\"timeValid\">
-      $dis_months
-    </table>
-   <div>";
+   <h1>$l_admin_valid</h1>
+    <table class=\"spreadSheet\">
+    <tbody>
+    $dis_months
+    </tbody>
+    </table>";
 
   return $block;
 }
@@ -1097,7 +1054,7 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
     $dis_projuser_list->data_page = false;
     $dis_projuser_list->data_header = "top";
 
-    $block .= "<div class=\"detailHead\">$l_proj_stats</div>";
+    $block .= "<h1>$l_proj_stats</h1>";
     $block .= $dis_projuser_list->display("dis_time_data");
   } else {
     $block .= display_warn_msg($l_no_proj_stats);
@@ -1112,7 +1069,7 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
     $dis_ttuser_list->data_page = false;
     $dis_projuser_list->data_header = "top";
 
-    $block .= "<div class=\"detailHead\">$l_tt_stats</div>";
+    $block .= "<h1>$l_tt_stats</h1>";
     $block .= $dis_ttuser_list->display("dis_time_data");
   } else {
     $block .= display_warn_msg($l_no_tt_stats);

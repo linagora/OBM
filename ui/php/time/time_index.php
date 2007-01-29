@@ -63,8 +63,8 @@ if ($action == "index") {
 } elseif ($action == "viewmonth") {
 ///////////////////////////////////////////////////////////////////////////////
   $params["interval"] = "month";
-  $display["result"] = dis_time_nav_date($params);
-  $display["result"] .= dis_time_planning($params);
+  $display["detail"] = dis_time_nav_date($params);
+  $display["detail"] .= dis_time_planning($params);
   if ($perm->check_right("time", $cright_read_admin)) {
     $display["features"] .= dis_user_select($params, run_query_userobm_active(), 1);
   }
@@ -104,22 +104,22 @@ if ($action == "index") {
 } if ($action == "globalview") {
 //////////////////////////////////////////////////////////////////////////////
   $params["interval"] = "month";
-  $display["result"] = dis_time_nav_date($params);
-  $display["result"] .= dis_time_month_users_total($params);
+  $display["detail"] = dis_time_nav_date($params);
+  $display["detail"] .= dis_time_month_users_total($params);
 
 } elseif ($action == "validate") {
 //////////////////////////////////////////////////////////////////////////////
   $params["interval"] = "month";
   run_query_time_adminvalidate($params);
-  $display["result"] = dis_time_nav_date($params);
-  $display["result"] .= dis_time_month_users_total($params);
+  $display["detail"] = dis_time_nav_date($params);
+  $display["detail"] .= dis_time_month_users_total($params);
 
 } elseif ($action == "unvalidate") {
 //////////////////////////////////////////////////////////////////////////////
   $params["interval"] = "month";
   run_query_time_adminunvalidate($params);
-  $display["result"] = dis_time_nav_date($params);
-  $display["result"] .= dis_time_month_users_total($params);
+  $display["detail"] = dis_time_nav_date($params);
+  $display["detail"] .= dis_time_month_users_total($params);
 
 } elseif ($action == "stats") {
 //////////////////////////////////////////////////////////////////////////////
@@ -127,11 +127,11 @@ if ($action == "index") {
   $params["interval"] = "month";
   $statproj_q = run_query_time_stat_project($params);
   $stattt_q = run_query_time_stat_tasktype($params);
-  $display["result"] = dis_time_nav_date($params);
+  $display["detail"] = dis_time_nav_date($params);
   if ($perm->check_right("time", $cright_read_admin)) {
     $display["features"] .= dis_user_select($params, run_query_userobm_active(), 1);
   }
-  $display["result"] .= dis_time_statsuser($statproj_q, $stattt_q, $params);
+  $display["detail"] .= dis_time_statsuser($statproj_q, $stattt_q, $params);
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
