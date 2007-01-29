@@ -540,9 +540,8 @@ class OBM_DISPLAY {
       <input type=\"hidden\" name=\"query\" value=\"$query\" />
       <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
       <a href='#' onclick='this.parentNode.submit();return false;'>$l_export</a>
-      </form>
-
-      <form style=\"display: inline;\" method=\"post\" action=\"$export_url\">
+      
+      
       <input type=\"hidden\" name=\"action\" value=\"export_page\" />
       <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
       <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
