@@ -37,7 +37,7 @@ function updateLine(id,category) {
       
     }
   }
-  //form.submit();
+  form.submit();
   return false;
 }
 ";
