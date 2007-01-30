@@ -205,9 +205,9 @@ function dis_statistic_cat_stats($comp_q, $tot) {
 
   natsort($cat);
   $block .= "
-  <div class=\"classic\">
-  <table class=\"classic\">
-  <tr>
+  <div class=\"detail extra\">
+  <table class=\"spreadSheet\">
+  <thead><tr>
   <th></th>";
 
   foreach($cat as $cat_id =>$cat_name) {
@@ -220,13 +220,13 @@ function dis_statistic_cat_stats($comp_q, $tot) {
     }
     $cat_label .= "<th $onOver>$cat_name</th>";
     $percent = round(($cat_count[$cat_id])*100/$cat_link_total,1);    
-    $cat_percent .= "<td class=\"totals\">$percent</td>";
-    $cat_tots .= "<td class=\"totals\">".$cat_count[$cat_id]."</td>";
-    $infos .= "<span class=\"hiddenLegend\" id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
+    $cat_percent .= "<td>$percent</td>";
+    $cat_tots .= "<td>".$cat_count[$cat_id]."</td>";
+    $infos .= "<span id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
   }
 
   $pair = 0;
-  $block .= "$cat_label<th>$l_totals</th><th>%</th></tr>";
+  $block .= "$cat_label<th>$l_totals</th><th>%</th></tr></thead>";
   foreach ($stat as $cty_iso => $data) {
     if($cty_iso != "") {
       $onOver = "    onMouseOver=\"show(event,'cty_$cty_iso'); return true;\"
@@ -247,19 +247,20 @@ function dis_statistic_cat_stats($comp_q, $tot) {
       $block .= "<td>".$data[$cat_id]."</td >";
     }
     $percent = round(($cty_count[$cty_iso])*100/$cat_link_total,1);
-    $block .= "<td class=\"totals\">".$cty_count[$cty_iso]."</td>";
-    $block .= "<td class=\"totals\">$percent</td>";
+    $block .= "<td>".$cty_count[$cty_iso]."</td>";
+    $block .= "<td>$percent</td>";
     $block .= "</tr>";
   }
   if (is_array($cat_major_count)) {
     foreach($cat_major_count as $code => $value) {
       $super_cat .= "<td colspan=\"".$cat_major_col[$code]."\">$value</td>";
       $percent = round(($value)*100/$cat_link_total,1);
-      $super_cat_p .= "<td class=\"totals\" colspan=\"".$cat_major_col[$code]."\">$percent</td>";
+      $super_cat_p .= "<td colspan=\"".$cat_major_col[$code]."\">$percent</td>";
     }
   }
   $block .= "
-  <tr><th>$l_totals</th>$cat_tots<td>$cat_link_total</td><td></td></tr>
+  <tr class=\"highlight\"><th>$l_totals
+  </th>$cat_tots<td>$cat_link_total</td><td></td></tr>
   <tr><th>%</th>$cat_percent<td></td><td>100</td></tr>
   <tr><th></th>$cat_label<th>$l_totals</th><th>%</th></tr>
   <tr><th></th>$super_cat<th></th></th><th><th></th></tr>
@@ -267,9 +268,9 @@ function dis_statistic_cat_stats($comp_q, $tot) {
    </table>
    </div>
    <br />
-  <div class=\"detail\">
-  <div class=\"detailText\"> x = $l_compcat </div>
-  <div class=\"detailText\"> y = $l_header_country</div>
+  <div class=\"detail infos\">
+  <h1> x = $l_compcat </h1>
+  <h1> y = $l_header_country</h1>
   </div>
   $infos
   ";
