@@ -464,7 +464,7 @@ function run_query_defaultodttemplate_update($cv) {
   global $auth, $cdg_sql;
 
   $label = $cv["defaultodttemplate_label"];
-  $id = $cv["defaultodttemplate_id"];
+  $id = $cv["defaultodttemplate"];
 
   $query = "UPDATE DefaultOdtTemplate SET
       defaultodttemplate_label='$label'
