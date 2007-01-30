@@ -144,27 +144,37 @@
   right: 0px;
 }
 
-.eventOwner0 {
+.eventOwner {
   color: #fff;
   background-color: #83B6E6;
 }
 
-.eventOwner0 h1 {
+.eventOwner h1 {
   background-color: #639CDA;
   border-top: 1px solid #81B2E3;
   border-bottom: 1px solid #447DCA;
 }
 
-
-.eventOwner1 {
+.eventOwner0 {
   color: #fff;
   background-color: #f5b043;
 }
 
-.eventOwner1 h1 {
+.eventOwner0 h1 {
   background-color: #f08620;
   border-top: 1px solid #f6b453;
   border-bottom: 1px solid #e96612;
+}
+
+.eventOwner1 {
+  color: #fff;
+  background-color: #EE7690;
+}
+
+.eventOwner1 h1 {
+  background-color: #E63C5A;
+  border-top: 1px solid #F2778C;
+  border-bottom: 1px solid #CF3D57;
 }
 
 .eventOwner2 {

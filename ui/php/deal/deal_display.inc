@@ -2501,8 +2501,8 @@ function html_deal_admin_form($kind_q, $status_q) {
   while ($kind_q->next_record()) {
     $id = $kind_q->f("dealtype_id");
     //$inout = $kind_q->f("dealtype_inout");
-    $inout_plus = ($kind_q->f("dealtype_inout"))== "+" ? "checked=\"checked\"" : "";
-    $inout_minus = ($kind_q->f("dealtype_inout"))== "-" ? "checked=\"checked\"" : "";
+    $inout_plus = ($kind_q->f("dealtype_inout"))== "+" ? "selected=\"selected\"" : "";
+    $inout_minus = ($kind_q->f("dealtype_inout"))== "-" ? "selected=\"selected\"" : "";
     $label = $kind_q->f("dealtype_label");
    
     if ($key%2 == 0) {
@@ -2518,8 +2518,12 @@ function html_deal_admin_form($kind_q, $status_q) {
     <a href=\"?action=kind_checklink&amp;category=kind&amp;kind=$id\">
     <img src=\"$ico_delete\" alt=\"$l_kind_checkdelete\" title=\"$l_kind_checkdelete\" />
     </a></td>
-    <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"-\" $inout_minus />$l_minus</td>
-    <td><input type=\"radio\" name=\"rd_kind_inout_$id\" value=\"+\" $inout_plus />$l_plus</td>
+    <td>
+    <select id=\"rd_kind_inout_$id\">
+    <option value=\"-\" $inout_minus />$l_minus</option>
+    <option value=\"+\" $inout_plus />$l_plus</option>
+    </select>
+    </td>
     <td><input type=\"text\" id=\"tf_kind_label_$id\" value=\"$label\" /></td>
     <td>
     <a href=\"#\" onclick=\"return updateLine($id,'kind');\">
@@ -2576,8 +2580,7 @@ function html_deal_admin_form($kind_q, $status_q) {
   <thead>
   <tr>
   <td>&nbsp;</td>
-  <td>$l_minus</td>
-  <td>$l_plus</td>
+  <td>$l_minus / $l_plus</td>
   <td>$l_kind_label</td>
   <td>&nbsp;</td>  
   </tr>    

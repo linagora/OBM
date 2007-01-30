@@ -1376,7 +1376,7 @@ function get_calendar_group_from_ids($groups) {
 function store_calendar_entities($entities_q) {
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
   global $ico_calendar_user3,$ico_calendar_user4,$ico_calendar_user5;
-  global $display;
+  global $display, $uid;
 
   $i = 0;
   $entity_tab = array();
@@ -1385,14 +1385,21 @@ function store_calendar_entities($entities_q) {
     while ($user_q->next_record()) {
       $id = $user_q->f("userobm_id");
       $name = $user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname");
+      if($uid == $id) {
       $entity_tab["user"][$id] = array(
         "name"  => $name,
-        "class" => "eventOwner$i",
-        "image" => ${"ico_calendar_user".$i},
+        "class" => "eventOwner",
         "type"  => "user",
         "id"    => $user_q->f("userobm_id"));
-      $i++;
-      $i = $i%6;
+      } else {
+        $entity_tab["user"][$id] = array(
+          "name"  => $name,
+          "class" => "eventOwner$i",
+          "type"  => "user",
+          "id"    => $user_q->f("userobm_id"));
+        $i++;
+        $i = $i%6;
+      }
     }
   }
   $resource_q = $entities_q["resource"];
@@ -2018,6 +2025,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity) {
       calendarevent_description,
       calendarevent_location,
       calendarevent_repeatfrequence,
+      calendarevent_owner,
       evententity_entity_id,
       'resourcegroup' as evententity_entity,
       calendarcategory1_label,
@@ -2043,6 +2051,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity) {
       calendarevent_description,
       calendarevent_location,
       calendarevent_repeatfrequence,
+      calendarevent_owner,
       evententity_entity_id,
       evententity_entity,
       calendarcategory1_label,
@@ -2290,10 +2299,11 @@ function calendar_events_model($start_time, $end_time, $calendar_entity) {
     $all_day = $nr_q->f("calendarevent_allday");
     $entity = $nr_q->f("evententity_entity");
     $entity_id = $nr_q->f("evententity_entity_id");
+    $owner = $nr_q->f("calendarevent_owner");
     if(isset($of->events[$id])) {
       $event = &$of->events[$id];
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,'none');
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,'none',$owner);
     }
     $of->addOccurrence($event, $date, $entity, $entity_id);
   }
@@ -2316,13 +2326,14 @@ function calendar_events_model($start_time, $end_time, $calendar_entity) {
     $repeatdays = $r_q->f("calendarevent_repeatdays");
     $entity_id = $r_q->f("evententity_entity_id");    
     $all_day = $r_q->f("calendarevent_allday");       
+    $owner = $r_q->f("calendarevent_owner");
     if (!$endrepeat) {
       $endrepeat = $end_time;
     }
     if(isset($of->events[$id])) {
       $event = &$of->events[$id];
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,$repeatkind);
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,$repeatkind,$owner);
     }
     $event_start =  $start_time ;
     $delta = date("H",$date) * 3600 + date("i",$date) * 60 + date("s",$date) + $duration;
@@ -2572,8 +2583,9 @@ class Event {
   var $attendee;
   var $repeat;
   var $all_day;
+  var $owner;
 
-  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,$repeat) {;
+  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,$repeat,$owner) {;
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;
@@ -2584,6 +2596,7 @@ class Event {
     $this->repeat = $repeat;
     $this->all_day = $all_day;
     $this->attendee = array();
+    $this->owner = $owner;
   }
 
   function isMeeting() {

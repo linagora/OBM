@@ -828,7 +828,7 @@ Obm.CalendarQuickForm = new Class({
     if(action) {
       this.gotoURI += '&action='+action;
     }
-    window.location.href = 'calendar_index.php?'+this.eventData.gotoURI;
+    window.location.href = 'calendar_index.php?'+this.gotoURI;
   }
 });
 

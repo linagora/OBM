@@ -698,6 +698,7 @@ function run_query_contact_update($contact) {
   $archive = ($contact["archive"] == "1" ? "1" : "0");
   $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
   $multidomain = sql_multidomain("contact");
+  $dsrc = ($contact["datasource"] ? $contact["datasource"] : 0);
   
   $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
@@ -732,7 +733,8 @@ function run_query_contact_update($contact) {
     contact_date=$date,
     contact_comment='$comment',
     contact_comment2='$comment2',
-    contact_comment3='$comment3'
+    contact_comment3='$comment3',
+    contact_datasource_id = '$dsrc'
   WHERE contact_id='$id'
     $multidomain";
 

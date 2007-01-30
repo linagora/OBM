@@ -16,7 +16,7 @@
 //   - $p_view        : view selected "year", "month", "week" or "day"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") {
-  global $display, $path, $max_display;
+  global $display, $path, $max_display,$uid;
 
   $group_view = $calendar["entity"]["group_view"];
   $entity_readable = get_calendar_entity_readable();
@@ -31,16 +31,17 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") 
   $sel_entity_id["group_view"] = $group_view;
 
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
+  $writable_entity = of_right_entity_for_consumer("calendar", "user", $uid, "write");
   $display["features"] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable);
   $block = "<div id=\"ajaxMessage\" style=\"height:4em;position:absolute;\"></div>";
   if ($p_view == "year") {
-    $block .= dis_calendar_year_planning($calendar, $calendar_entity);
+    $block .= dis_calendar_year_planning($calendar, $calendar_entity,$writable_entity);
   } else if ($p_view == "month") {
-    $block .= dis_calendar_month_planning($calendar, $calendar_entity);
+    $block .= dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity);
   } else if ($p_view == "week") {
-    $block .= dis_calendar_week_planning($calendar, $calendar_entity);
+    $block .= dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity);
   } else if ($p_view == "day") {
-    $block .= dis_calendar_day_planning($calendar, $calendar_entity);
+    $block .= dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity);
   }
   $block .= dis_calendar_quick_form($calendar);
   $display["print_url"] = "$path/calendar/calendar_index.php?action=view_$p_view&amp;date=".$calendar["date"];
@@ -70,7 +71,7 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
     $new_action = "view_week";
   }
 
-  $block = html_calendar_bar_legend($calendar_entity);
+  $block = html_calendar_bar_legend($new_action, $calendar_entity,$calendar);
   if ($action != "perform_meeting"  && $output_target != "print") {
     $block .= html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable);
     $block .= html_calendar_bar_date_selector($calendar);
@@ -85,13 +86,14 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
 // Parameters:
 //   - $calendar_entity : array of entities elements to display
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_bar_legend($calendar_entity) {
+function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
   global $ico_user, $ico_resource, $popup_width, $popup_height;
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
-  global $l_calendar_displayed, $l_resource_displayed;
-  global $action;
+  global $l_calendar_displayed, $l_resource_displayed,$c_all;
+  global $action,$ico_delete;
 
   // Legend
+  $iso_date = $calendar["date"];
   if ($action == "perform_meeting" || $action == "perform_res_meeting") {
     $l_legend = $l_meeting_legend;
     $dis_legend = "
@@ -100,16 +102,16 @@ function html_calendar_bar_legend($calendar_entity) {
     <li>$l_occupied</li>";
   } else {
     $l_legend = $l_calendar_displayed;
-    if (is_array($calendar_entity["user"])) {
-      foreach ($calendar_entity["user"] as $id => $data) {
+    foreach ($calendar_entity as $type => $entity) {
+      foreach ($entity as $id => $data) {      
+        $data_id = "data-$type-$id";        
         $dis_legend .= "
-          <li class=\"".$data["class"]."\"><img src=\"$ico_user\" alt=\"[User]\" />&nbsp;".$data["name"]."</li>";
-      }
-    }
-    if (is_array($calendar_entity["resource"])) {
-      foreach ($calendar_entity["resource"] as $id => $data) {
-	$dis_legend .= "
-          <li class=\"".$data["class"]."\"><h1><img src=\"$ico_ressource\" alt=\"[Resource]\" />&nbsp;".$data["name"]."</h1></li>";
+          <li class=\"".$data["class"]."\"><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
+          <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />
+          <input type=\"image\" src=\"$ico_delete\" 
+          onclick=\"\$('$data_id').remove(); this.form.submit();\" />
+          &nbsp;".$data["name"]."
+          </li>";
       }
     }
   }
@@ -117,9 +119,16 @@ function html_calendar_bar_legend($calendar_entity) {
   $block = "
   <div class=\"portlet\" id=\"calendarLegend\">
   <h1>$l_legend</h1>
+  <form action=\"\" onsubmit=\"return false;\">
   <ul>
     $dis_legend
-  </ul>  
+  </ul>
+  <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
+  <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
+  <input type=\"hidden\" name=\"new_group\" value=\"1\" />
+  <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
+  <input type=\"hidden\" name=\"new_sel\" value=\"1\" />    
+  </form>
   </div>";
 
   return $block;
@@ -177,14 +186,9 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   foreach ($calendar_entity as $type => $entity) {
     foreach ($entity as $id => $data) {
       $name = $data["name"];
-      $ico = $data["image"];
       $data_id = "data-$type-$id";
       $div_id = "sel_ent-$data_id";
-      $sel_ent .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_ent');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico\"></a>
-        $name
-        <input value=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />
-        </div>";
+      $sel_ent .= "<input value=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
     }
   }
 
@@ -240,6 +244,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <div id=\"sel_ent\">
     </div>
     <fieldset class=\"buttons\">
+    $sel_ent
     <input type=\"submit\" value=\"$l_validate\" />
     </fieldset>
     $dis_back_myview
@@ -392,7 +397,7 @@ function html_calendar_bar_date_selector($calendar) {
 //   - $calendar          : calendar parameters
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_year_planning($calendar, $calendar_entity) {
+function dis_calendar_year_planning($calendar, $calendar_entity,$writable_entity) {
   global $set_theme,$ico_left_day,$ico_right_day;
   global $ccalendar_weekstart;
   global $l_daysofweek,$l_daysofweekshort,$ico_calendar_nouser;  
@@ -568,7 +573,7 @@ function dis_calendar_year_planning($calendar, $calendar_entity) {
 //   - $calendar: calendar parameters
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_month_planning($calendar, $calendar_entity) { 
+function dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity) { 
   global $ico_previous, $ico_next;
   global $ccalendar_weekstart;
   global $ico_resize, $ico_periodic, $ico_meeting;
@@ -645,7 +650,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
     $options = array("xUnit:86400","yUnit:$week_duration",
                      "context:obm.calendarManager.bodyContext");
     foreach($occurrences as $occurrence) {
-      $dis_event .= dis_calendar_event($occurrence, "day",$calendar_entity,$options);
+      $dis_event .= dis_calendar_event($occurrence, "day",$calendar_entity,$writable_entity,$options);
     }
   } 
   
@@ -690,12 +695,11 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
 //    - $calendar          : calendar parameters
 //    - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_week_planning($calendar, $calendar_entity) {
+function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity) {
   global $path, $ico_next, $ico_previous;
   global $ccalendar_weekstart, $set_cal_interval,$ico_meeting;
   global $ico_resize, $ico_periodic, $ico_meeting;
   global $ccalendar_first_hour, $ccalendar_last_hour;
-
  
   $ts_date = strtotime($calendar["date"]);
   $time_unit = 60 / $set_cal_interval;
@@ -759,7 +763,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
   
   if(is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
-      $dis_event .= dis_calendar_event($occurrence, "hour",$calendar_entity);
+      $dis_event .= dis_calendar_event($occurrence, "hour",$calendar_entity,$writable_entity);
     }
   }
   
@@ -809,7 +813,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
 //   - $calendar         : calendar parameters
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_day_planning($calendar, $calendar_entity) {
+function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity) {
   global $ico_previous, $ico_next,$ico_resize,$ico_meeting;
   global $ccalendar_first_hour, $ccalendar_last_hour,$set_cal_interval;
   global $ico_resize, $ico_periodic, $ico_meeting;
@@ -857,7 +861,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
   if(is_array($occurrences)) {
     $options = array("xUnit:0");
     foreach($occurrences as $occurrence) {
-      $dis_event .= dis_calendar_event($occurrence, "hour",$calendar_entity,$options);
+      $dis_event .= dis_calendar_event($occurrence, "hour",$calendar_entity,$writable_entity,$options);
     }
   }
   $block = "
@@ -905,7 +909,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
  * @access public
  * @return event HTML and javascript code
  */
-function dis_calendar_event($occurrence, $unit, $calendar_entity, $options=array()) {
+function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entity, $options=array()) {
   global $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting, $auth;
   global $l_user, $l_resource, $l_task;
@@ -920,6 +924,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity, $options=array
   $all_day = $event->all_day;
   $description = phpStringToJsString($event->description);
   $attendee = $event->attendee;
+  $owner = $event->owner;
   $location = phpStringToJsString($event->location);
   $category = phpStringToJsString($event->category1);
   $entityClass = $calendar_entity[$entity][$entity_id]["class"];
@@ -934,10 +939,11 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity, $options=array
   $ed[] = "description:'$description'";
   $ed[] = "location:'$location'";
   $ed[] = "category:'$category'";
+  
   foreach ($attendee as $entity => $entities) {
     $ed[] = ${"l_$entity"}.":['".implode("','",$entities)."']"; 
   }
-  if($entity == "user" && $entity_id == $auth->auth["uid"]) {
+  if($owner == $auth->auth["uid"] || in_array($owner,$writable_entity["ids"]) || true) {
     $updatable =  true;
     $ed[] = "updatable:true";
   }
@@ -1142,133 +1148,6 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
 
   return $block;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Display an individual allday event (with popup) 
-// Parameters:
-//   - $dis_cal    : [return] calendar parameters
-//   - $hidden_div : [return] popup hidden div to add
-//   - $event      : event object 
-//   - $nb_ent     : number of entities to display
-//   - $properties :
-///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_event_allday_planning(&$dis_cal, &$hidden_div,&$event,$nb_user,&$properties) {
-  global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category;
-  global $l_location, $l_private, $l_private_description, $l_begin,$l_end,$l_resource,$l_task,$l_user;
-
-  $id = $event->id;
-  $usr_id = $properties["id"];
-  $user_info = $properties["name"];  
-  if ($event->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
-    $title = $l_private;
-    $description = $l_private_description;
-    $link = "javascript:return false;";
-    $category = $l_private;    
-  } else {
-    $title = $event->title;
-    $location = $event->location;
-    $link = "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=$id";
-    $description = $event->description;
-    $category = $event->category1;
-    $attendee = $event->attendee;
-    foreach($attendee as $entity => $entities) {
-      $attendee_list .= "<li class=\"blockItem\">".${"l_".$entity}." : ".implode(", ",$entities)."</li>";
-    }    
-  }    
-  $event_head_display = "<img class=\"calendarEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_day\" alt=\"[D]\" />".substr($title,0,6);
-
-  $dis_cal .= "<a class=\"calendarLink\" onMouseOver=\"calendar_show(event,'$id-$usr_id'); return true;\" onMouseOut=\"calendar_hide('$id-$usr_id'); return true;\" href=\"$link\">$event_head_display</a>";
-
-  $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
-   <div class=\"blockTitle\">:: $title<br />($user_info)</div>
-   <ul class=\"blockItem\">
-    <li class=\"blockItem\">$l_location : $location</li>
-    <li class=\"blockItem\">$l_category : $category</li>
-    <li class=\"blockItem\">$description</li>
-    $attendee_list
-   </ul>
-  </div>";
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display an individual event (with popup) 
-// Parameters:
-//   - $view       : "allday", "week", "month", "day"
-//   - $dis_cal    : [return] calendar parameters
-//   - $hidden_div : [return] popup hidden div to add
-//   - $event      : event array
-//   - $nb_ent     : number of entities to display
-//   - $properties :
-///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_event_planning($view, &$dis_cal, &$hidden_div, &$event,$nb_ent,&$properties) {
-  global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category,$l_resource,$l_task;
-  global $l_location, $l_private, $l_private_description, $l_begin,$l_end,$l_user;
-
-  $id = $event["event"]->id;
-  $usr_id = $properties["id"];
-  $user_info = $properties["name"];
-  if ($event["event"]->privacy == 1 && $auth->auth["uid"] != $usr_id) {
-    $title = $l_private;
-    $description = $l_private_description;
-    $link = "javascript:return false;";
-    $category = $l_private;    
-  } else {
-    $title = $event["event"]->title;
-    $location = $event["event"]->location;
-    $link = "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=$id";
-    $description = $event["event"]->description;
-    $category = $event["event"]->category1;
-    $attendee = $event["event"]->attendee;
-    foreach($attendee as $entity => $entities) {
-      $attendee_list .= "<li class=\"blockItem\">".${"l_".$entity}." : ".implode(", ",$entities)."</li>";
-    }
-  }
-
-  if ($view == "week") {
-    if ($nb_ent == 1) {
-      $event_head_display = "&#8226; $title";
-    } else {
-      $event_head_display = "<img class=\"calendarEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_event\" alt=\"[D]\" />";
-    }
-  } else if ($view == "month") {
-    if ($nb_ent == 1) {
-      $event_head_display = date("H:i",$event["date"])."->".date("H:i",$event["date"] + $event["event"]->duration). " $title";
-    } else {
-      $event_head_display = "<img class=\"calendarEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_event\" alt=\"[D]\" />";
-    }
-  } else if ($view == "day") {
-    if ($nb_ent == 1) {
-      $event_head_display = "&#8226;
-    ".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."
-    ".$title;
-    } else {
-      $event_head_display = "&#8226;$title";
-    }
-  } else if ($view == "allday") {
-    $event_head_display = "<img class=\"calendarEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_day\" alt=\"[D]\" />";
-  }
-
-  $dis_cal .= "<a class=\"calendarLink\"
-    onMouseOver=\"calendar_show(event,'$id-$usr_id'); return true;\"
-    onMouseOut=\"calendar_hide('$id-$usr_id'); return true;\"
-    href=\"$link\">$event_head_display</a><br />";
-
-  $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"eventData\" style=\"display:none;position:absolute;z-index:1000;\">
-   <div class=\"blockTitle\">:: $title <br />($user_info)</div>
-   <ul class=\"blockItem\">
-    <li class=\"blockItem\">$l_location : $location</li>
-    <li class=\"blockItem\">$l_category : $category</li>
-    <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
-    <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
-    <li class=\"blockItem\">$description</li>
-    $attendee_list
-   </ul>
-  </div>";
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Conflicts
@@ -2621,7 +2500,6 @@ function dis_calendar_free_interval($calendar, $entity_store) {
   $end_week = calendar_localizeDate("week", $end_week_time);
   $display_date = "$start_week - $end_week"; 
   $events = calendar_events_model($start_week_day,$end_week_time,$entity_store);
-  echo "<pre>";var_dump($events);echo "</pre>";
 
   $day_duration = 86400; 
   $resource_div .= "

@@ -47,7 +47,7 @@ get_calendar_action();
 $perm->check_permissions($module, $action);
 
 page_close();
-$max_display = 6;
+$max_display = 200;
 // If a group has just been selected, automatically select all its members
 if ( ($params["new_group"] == "1")
      && ($params["group_view"] != "") ) {
@@ -251,17 +251,25 @@ if ($action == "index") {
 } elseif ($action == "quick_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_quick_form($params)) {
-      $id = $params["calendar_id"];
-      $eve_q = run_query_calendar_detail($id);
-      if($eve_q->f('calendarevent_repeatkind') == 'none') {
-        run_query_calendar_quick_event_update($params);
-      } else {
-        $id = run_query_calendar_event_exception_insert($params,$eve_q);
+    $id = $params["calendar_id"];
+    $eve_q = run_query_calendar_detail($id);
+    if($uid != $eve_q->f("calendarevent_owner")) {
+      $writable = of_right_entity_for_consumer("calendar", "user", $uid, "write",array($eve_q->f("calendarevent_owner")));
+      if(count($writable["ids"]) != 1) {
+        json_error_msg($l_invalid_data . " : " . $l_rights );
+        echo "({".$display['json']."})";
+        exit();
       }
-      json_event_data($id,$params);
-      json_ok_msg("$l_event : $l_update_ok");
-      echo "({".$display['json']."})";
-      exit();
+    }
+    if($eve_q->f('calendarevent_repeatkind') == 'none') {
+      run_query_calendar_quick_event_update($params);
+    } else {
+      $id = run_query_calendar_event_exception_insert($params,$eve_q);
+    }
+    json_event_data($id,$params);
+    json_ok_msg("$l_event : $l_update_ok");
+    echo "({".$display['json']."})";
+    exit();
   } else {
     json_error_msg($l_invalid_data . " : " . $err_msg );
     echo "({".$display['json']."})";
@@ -284,7 +292,15 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $id = $params["calendar_id"];
   if (check_calendar_can_delete($id)) {
-    $eve_q = run_query_calendar_detail($id);
+    $eve_q = run_query_calendar_detail($id);    
+    if($uid != $eve_q->f("calendarevent_owner")) {
+      $writable = of_right_entity_for_consumer("calendar", "user", $uid, "write",array($eve_q->f("calendarevent_owner")));
+      if(count($writable["ids"]) != 1) {
+        json_error_msg($l_invalid_data . " : " . $l_rights );
+        echo "({".$display['json']."})";
+        exit();
+      }    
+    }    
     json_event_data($id,$params);
     if($eve_q->f('calendarevent_repeatkind') == 'none') {      
       run_query_calendar_delete($params);
