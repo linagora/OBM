@@ -32,9 +32,7 @@ function updateLine(id,category) {
   form = \$('form_' + category + '_update');
   for(i=0;i<form.elements.length;i++) {
     elem = $(form.elements[i].name + '_' + id);
-    console.log(form.elements[i].name, form.elements[i].name + '_' + id );
     if(elem) {
-      console.log(form.elements[i].value,elem.getValue())
       form.elements[i].value = elem.getValue();
       
     }
