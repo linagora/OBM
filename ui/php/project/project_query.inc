@@ -2012,7 +2012,7 @@ function run_query_project_reftask_delete($params) {
   global $cdg_sql, $cdg_param,$auth;
 
 	$multidomain = sql_multidomain("projectreftask");
-  $id = $params["reftask_id"];
+  $id = $params["reftask"];
   $query = "DELETE FROM ProjectRefTask WHERE projectreftask_id = '$id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_project_reftask_delete()");
   $obm_q= new DB_OBM;

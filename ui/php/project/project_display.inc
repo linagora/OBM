@@ -2551,28 +2551,13 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
   global $l_c_checkdelete, $l_c_update, $l_c_upd, $l_c_new, $l_c_insert;
   global $l_c_j_create, $l_c_j_insert, $l_c_j_update,$l_reftask_manage;
   global $ctt_sales, $ctt_research, $ctt_others,$l_header_tasktype,$l_reftask;
-  global $l_tt_sales, $l_tt_research, $l_tt_others,$l_task,$extra_js;
+  global $l_tt_sales, $l_tt_research,
+  $l_tt_others,$l_task,$extra_js,$ico_ok,$ico_delete;
 
   // TaskType select construction
   $task_list = array($ctt_sales=>$l_tt_sales,
 		     $ctt_research=>$l_tt_research,
                      $ctt_others=>$l_tt_others);
-  $extra_js .= "
-    var tasktype = Array();
-  ";
-  $sel_reftask = "<select name=\"sel_reftask_id\" onchange=\"
-    mytext = this.options[this.selectedIndex].text;
-    myvalue = this.options[this.selectedIndex].value;
-    forms.form_reftask_update.tf_reftask_label.value=mytext;
-    types = forms.form_reftask_update.sel_tasktype.options;
-    for(k=0;k<types.length;k++) {
-      if(types[k].value == tasktype[myvalue]) {
-        forms.form_reftask_update.sel_tasktype.selectedIndex = k;
-        break;
-      }
-    } 
-    \"
-  size=\"8\" style=\"font-family:monospace;\">";
   while($reftask_q->next_record()) {
     $tt_id = $reftask_q->f("tasktype_id");
     $tt_label = $reftask_q->f("tasktype_label");
@@ -2580,16 +2565,33 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     $projectreftask_name = addslashes($reftask_q->f("projectreftask_label"));
     if($tt_id != $old_tt_id) {
       if($old_tt_id != "") {
-        $sel_reftask .= "</optgroup>";
+        $reftask_list .= "</tr>";
       }
-      $sel_reftask .= "<optgroup label=\"".$tt_label."\">";
+      $sel_reftask .= "<thead><tr><th colspan=\"3\">$tt_label</th></tr></thead>";
       $old_tt_id = $tt_id;
     }
-    $extra_js .= "tasktype[$projectreftask_id] = $tt_id;";
-    $sel_reftask .= "\n<option value=\"$projectreftask_id\">$projectreftask_name</option>";
+    $sel_reftask .= "
+    <tr>
+    <td>
+    <input type=\"hidden\" id=\"reftask_$id\" value=\"$projectreftask_id\" />
+    <a
+    href=\"?action=reftask_delete&amp;category=reftask&amp;reftask=$projectreftask_id\">
+    <img src=\"$ico_delete\" alt=\"$l_reftask_delete\" title=\"$l_delete_reftask\" />
+    </a></td>
+    <td><input type=\"text\" id=\"tf_reftask_label_$projectreftask_id\"
+    value=\"$projectreftask_name\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($projectreftask_id,'reftask');\">
+    <img src=\"$ico_ok\" alt=\"$l_c_j_update\" title=\"$l_c_j_update\" />
+    </a>
+    </td>
+    </tr>";
   }
-  $sel_reftask .= "</optgroup>";
-  $sel_reftask .= "</select>";
+  $sel_reftask .= "</tr>";
+  
+  
+  
+  
   $sel_tasktype = "<select size=\"8\" name=\"sel_tasktype\">";
   while($tasktype_q->next_record()) {
     $tt_internal = $tasktype_q->f("tasktype_internal");
@@ -2608,85 +2610,49 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
   }
   $sel_tasktype .= "</optgroup>";
   $sel_tasktype .= "</select>";
-  // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <div class=\"admin\">
-    <div class=\"adminTitle\">:: $l_reftask_manage</div>
-    <table class=\"admin\" width=\"100%\">
+    <div class=\"detail admin\">
+    <h1>$l_reftask_manage</h1>
+    <form name=\"form_reftask_update\" method=\"post\" action=\"\">
+    <table>
+    <thead>
     <tr>
-      <td>&nbsp;</td>
-      <td class=\"adminLabel\">$l_c_upd</td>
-      <td class=\"adminLabel\">$l_c_new</td>
+    <td colspan=\"3\">&nbsp;</td>
+    </tr>
+    </thead>
+    <tr>
+    <td colspan=\"3\">$l_reftask</td>
     </tr>
     <tr>
-      <td>
-<!-- Category Check Delete Section -->
-        <form name=\"form_reftask_delete\" method=\"post\"
-          action=\"\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_reftask</td>
-        </tr>
-        <tr>
-          <td class=\"adminText\">$sel_reftask</td>
-        </tr>
-        <tr>
-          <td>
-          <input type=\"hidden\" name=\"action\" value=\"reftask_delete\" />
-          <input type=\"submit\" name=\"sub_reftask\" value=\"$l_c_checkdelete\" 
-          onclick=\"if (check_category_checkdel(this.form.sel_reftask_id,'$l_reftask')) return confirm('$l_delete_reftask'); else return false;\" />
-          </td>
-        </tr> 
-        </table>
-        </form>
-      </td>
-      <td>
-
-<!-- Category Update Section -->
-
-          <form name=\"form_reftask_update\" method=\"get\" action=\"\">
-        <table heigth=\"100%\">
-        <tr>
-          <td class=\"adminLabel\">$l_tasktype :</td>
-          <td>$sel_tasktype</td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_label :</td>
-          <td><input type=\"text\" name=\"tf_reftask_label\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\" colspan=\"2\">
-            <input type=\"hidden\" name=\"sel_reftask_id\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"reftask_update\" />
-            <input type=\"submit\" name=\"sub_reftask\" value=\"$l_c_update\"
-              onclick=\"if (check_category_upd(this.form.tf_reftask_label,this.form.sel_reftask_id,document.form_reftask_delete.sel_reftask_id,'$l_reftask') && check_tasktype(this.form.sel_tasktype)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-          </form>
-      </td>
-      <td>
-<!-- New Category Section -->
-        <form name=\"form_reftask_new\" method=\"get\" action=\"\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_tasktype :</td>
-          <td >$sel_tasktype</td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_label :</td>
-          <td ><input type=\"text\" name=\"tf_reftask_label\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\" colspan=\"2\">
-            <input type=\"hidden\" name=\"action\" value=\"reftask_insert\" />
-            <input type=\"submit\" name=\"sub_reftask\" value=\"$l_c_insert\"
-              onclick=\"if (check_category_new(this.form.tf_reftask_label,'$l_reftask') && check_tasktype(this.form.sel_tasktype)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-
-      </td>
+    <td>$sel_reftask</td>
     </tr>
     </table>
+    </form>
+    <form name=\"form_reftask_new\" method=\"post\" action=\"\">
+    <table>
+    <thead>
+    <tr>
+    <td colspan=\"3\">$l_c_new</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>$l_tasktype <br /> $sel_tasktype</td>
+    </tr>
+    <tr>
+    <td>$l_label <br /> <input type=\"text\" name=\"tf_reftask_label\" /></td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <tr>
+    <td>
+    <input type=\"submit\" name=\"sub_reftask\" value=\"$l_c_insert\" onclick=\"if (check_category_new(this.form.tf_reftask_label,'$l_reftask') && check_tasktype(this.form.sel_tasktype)) return true; else return false;\" />
+    </td>
+    </tr>
+    </table>
+    <input type=\"hidden\" name=\"action\" value=\"reftask_insert\" />
+    </form>
     </div>
 ";
 
