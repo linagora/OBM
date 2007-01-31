@@ -321,20 +321,12 @@ function of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
       // Mono Link
       $label = htmlentities($cats[0]["label"]); 
       $block_cat = "
-        <tr>
-          <th>".ucfirst(${$l_cat})." :</th>
-          <td>$label</td>
-         </tr>";
+      <tr><th>".ucfirst(${$l_cat})." :$label</td></tr>
+      ";
 
     } else {
       // Multi Link
       $nb_col_cat = 3;
-      $dis_cat = "<tr>";
-      for ($i=0; $i<$nb_col_cat; $i++) {
-        $dis_cat .= "<td>&nbsp;</td>";
-      }
-      $dis_cat .= "</tr>";
-      $dis_cat = "";
 
       $i = 0;
       if (is_array($cats)) {
@@ -345,7 +337,7 @@ function of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
           $label = htmlentities($one_cat["label"]);
           $code = $one_cat["code"];
           $i++;
-          $dis_cat .= "<td style=\"border: 1px solid\" class=\"detailText\">$code $label </td>";
+          $dis_cat .= "<td>$code $label </td>";
           if ($i==$nb_col_cat) {
             $dis_cat .= "</tr>";
             $i = 0;
@@ -353,10 +345,12 @@ function of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
         }
       }
       $block_cat = "
-      <div class=\"detailHead\">".ucfirst(${$l_cat})."</div>
-      <table class=\"detail\">
+      <div class=\"detail infos\">
+      <h1>".ucfirst(${$l_cat})."</h1>
+      <table>
       $dis_cat
-      </table>";
+      </table>
+      </div>";
     }
 
   }
@@ -1450,13 +1444,28 @@ function of_userdata_get_url_search_params($entity, $params) {
 //   - $id     : entity id
 ///////////////////////////////////////////////////////////////////////////////
 function of_userdata_dis_entity_consult($entity, $ent_id) {
-  global $cgp_user;
+  global $cgp_user,$l_properties;
 
   if (is_array($cgp_user[$entity]["category"])) {
     foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
       $cats = of_category_user_get_entitycategories($entity, "$cat_name", $ent_id);
-      $block_user .= of_category_dis_block_consult($entity, $cat_name, $cats, $one_cat["mode"]);
+      if($one_cat["mode"] == "mono") {
+        $mono .= of_category_dis_block_consult($entity, $cat_name, $cats, $one_cat["mode"]);
+      } else {
+        $multi .= of_category_dis_block_consult($entity, $cat_name, $cats, $one_cat["mode"]);
+      }
     }
+    if($mono != "") {;
+      $block_user .= "
+        <div class=\"detail infos\">
+        <h1>$l_properties</h1>
+        <table>
+        $mono
+        </table>
+        </div>
+        ";
+    }
+    $block_user .= $multi;
   }
 
   return $block_user;
@@ -1931,7 +1940,7 @@ function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel
 //   XHTML display of category form part
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="", $first="") {
-  global $set_theme, $ico_add, $ico_crow, $popup_height, $popup_width, $l_none;
+  global $set_theme, $ico_add, $ico_delete, $popup_height, $popup_width, $l_none;
   
   if ($mode == "mono") {
     $sel_cat = of_category_user_html_select($cat, $cats, $cat_id, $first);
@@ -1946,7 +1955,7 @@ function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $
 	$div_id = "$sel_name-data-$c_id";
 	$sel_cat .= "<div class=\"elementRow\" id=\"$div_id\">
           <a href=\"javascript: remove_element('$div_id','$sel_name');\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\">
+          <img src=\"$ico_delete\">
           </a>
           $c_code $c_label
           <input value=\"$c_id\" name=\"${sel_name}[]\" type=\"hidden\" />
@@ -1957,7 +1966,7 @@ function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $
     $link = "<a href=\"javascript: return false;\" style=\"float:right;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
+       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
     $class = "detail";
   }
