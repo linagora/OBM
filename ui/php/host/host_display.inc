@@ -1,0 +1,719 @@
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// ALIAMIN - File : host_display.php                                         //
+//         - Desc : Host Display File                                        //
+// 2004-09-09 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
+
+//------------------------------------//
+// Fields that appear in result lists //
+//------------------------------------//
+// Direct fields
+$fieldnames["host_name"] = $l_name;
+$fieldnames["host_ip"] = $l_ip;
+$fieldnames["host_samba"] = $l_smb;
+$fieldnames["host_description"] = $l_desc;
+$fieldnames["usercreate"] = $l_creator;
+$fieldnames["userupdate"] = $l_updater;
+$fieldnames["timecreate"] = $l_date_creation;
+$fieldnames["timeupdate"] = $l_date_last_update;
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Host specific dataset fields
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_host(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme;
+
+  if (($fieldname == "host_name") && $link_ok) {
+    if ($OD->display_ext == "get_id") {
+      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("host_id").",'".addslashes($OD->data_set->f("host_name"))."');";
+    } else {
+     $res["url"] = "$path/host/host_index.php?action=detailconsult&amp;param_host=".$OD->data_set->f("host_id");
+    }
+  }
+
+  else if ($fieldname == "host_samba") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname) == "1") {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = " ";
+    }
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Host search Form
+// Parameters : 
+//   - $host[]   : default form values
+//     keys used : name, user
+///////////////////////////////////////////////////////////////////////////////
+function html_host_search_form($host) {
+  global $display, $l_name, $l_ip, $l_smb_only, $l_find;
+  global $cgp_use;
+
+  $popup = $host["popup"];
+
+  if ($popup) {
+    $ext_action = $host["ext_action"];
+    $ext_target = $host["ext_target"];
+    $ext_widget = $host["ext_widget"];
+    $ext_widget_text = $host["ext_widget_text"];
+    $ext_url = $host["ext_url"];
+    $ext_id = $host["ext_id"];
+    $ext_title = stripslashes($host["ext_title"]);
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+      <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+      <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+      <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
+      <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
+      <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
+      <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    if ($ext_title == "") {
+      $ext_title = $l_add_hosts;
+    }
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
+  }
+  
+  // --- Var preparation ------------------------------------------------------
+
+  $name = stripslashes($host["name"]);
+  $ip = stripslashes($host["ip"]);
+  $smb = ($host["samba"] == "1" ? "checked = \"checked\"" : "");
+
+  // --- HTML Page display ----------------------------------------------------
+
+  if ($cgp_use["service"]["samba"]) {
+    $block_samba = "
+    <div class=\"searchLabel\">$l_smb_only<br />
+      <input type=\"checkbox\" name=\"cb_samba\" value=\"1\" $smb />
+    </div>
+    ";
+  }
+
+
+  $block = "
+    <form method=\"get\" name=\"f_search\" action=\"".url_prepare("host_index.php")."\">
+    <div class=\"search\">
+      <div class=\"searchLabel\">$l_name<br />
+        <input name=\"tf_name\" size=\"24\" maxlength=\"32\" value=\"$name\" />
+      </div>
+      <div class=\"searchLabel\">$l_ip<br />
+        <input name=\"tf_ip\" size=\"16\" maxlength=\"16\" value=\"$ip\" />
+      </div>
+      $block_samba
+      <div class=\"searchLabel\">&nbsp;<br />
+        <input name=\"action\" type=\"hidden\" value=\"search\" />
+        <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
+        <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+        $ext
+      </div>
+      <div class=\"searchEnd\"></div>
+    </div>
+  </form>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Host search result
+// Parameters:
+//   - $host[]   : host search criteria
+//     keys used : name, ip, email
+///////////////////////////////////////////////////////////////////////////////
+function dis_host_search_list($host) {
+  global $l_no_found, $display, $auth;
+
+  $prefs = get_display_pref($auth->auth["uid"], "host");
+  $obm_q = run_query_search($host);
+
+  $nb_host = $obm_q->num_rows_total();
+  if ($nb_host == 0) {
+    $display["msg"] .= display_warn_msg($l_no_found);
+  } else {
+    $block = html_host_search_list($obm_q, $prefs, $nb_host, $host);
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display the Host search result
+// Parameters : 
+//   - $obm_q     : DBO : host list
+//   - $pref_q    : fields that have to be displayed
+//   - $nb_host   : nb hosts returned by the search query 
+//   - $group[]   : host search criteria
+//     keys used  : name, ip, popup
+///////////////////////////////////////////////////////////////////////////////
+function html_host_search_list($obm_q, $pref_q, $nb_host, $host) {
+  global $display, $l_found, $l_close, $module;
+
+  $popup = $host["popup"];
+
+  if ($popup) {
+    $ext_action = $host["ext_action"];
+    $ext_url = $host["ext_url"];
+    $ext_target = $host["ext_target"];
+    $ext_widget = $host["ext_widget"];
+    $ext_widget_text = $host["ext_widget_text"];
+    $ext_id = $host["ext_id"];
+    $ext_title = urlencode(stripslashes($host["ext_title"]));
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_title&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
+  }
+
+  $name = urlencode(stripslashes($host["name"]));
+  $ip = urlencode(stripslashes($host["ip"]));
+  $smb = $host["samba"];
+
+  $url = url_prepare("host_index.php?action=search&amp;tf_name=$namet&amp;tf_ip=$ip&amp;cb_smb=$smb$url_ext");
+  
+  $dis_host = new OBM_DISPLAY("DATA", $pref_q, $module);
+  
+  if ($popup) {
+    if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+      $dis_host->display_ext = "get_id";
+    }
+    $dis_host->data_form_end = "
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+  }
+  
+  $dis_host->data_set = $obm_q;
+  $dis_host->data_url = $url;
+
+  // --- HTML Template --------------------------------------------------------
+  $display["msg"] .= display_ok_msg("$nb_host $l_found");
+  $block .= $dis_host->display("dis_data_host");
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Host Consultation
+// Parameters:
+//   - $host[] : host parameters
+///////////////////////////////////////////////////////////////////////////////
+function dis_host_consult($host) {
+  global $display, $l_query_error;
+
+  $host_q = run_query_detail($host["id"]);
+  if ($host_q->num_rows() == 1) {
+    $block = html_host_consult($host_q);
+  } else {
+    $display["msg"] .= display_err_msg($l_query_error);
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display Host Consultation
+// Parameters:
+//   - $host_q : host database result 
+///////////////////////////////////////////////////////////////////////////////
+function html_host_consult($host_q) {
+  global $cgp_use, $c_yes, $c_no;
+  global $l_host, $l_name, $l_ip, $l_desc, $l_smb;
+  global $display, $perm, $menu, $action, $cright_write;
+  global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_mode;
+  global $l_enable, $l_disable, $l_empty, $l_web_all, $l_web_list_only, $l_not_assigned;
+  global $l_user, $l_consult_web_list, $l_web_access, $l_mailserver;
+  global $l_system, $l_help_system;
+
+  $id = $host_q->f("host_id");
+  $samba = $host_q->f("host_samba");
+  $name = $host_q->f("host_name");
+  $desc = $host_q->f("host_description");
+  $ip = $host_q->f("host_ip");
+  $web_perms = $host_q->f("host_web_perms");
+  $web_all = $host_q->f("host_web_all");
+  $ftp_perms = $host_q->f("host_ftp_perms");
+  $firewall_perms = $host_q->f("host_firewall_perms");
+  $user_id = $host_q->f("userobm_id");
+  $user_login = $host_q->f("userobm_login");
+  $mail_server = $host_q->f("mail_name");
+
+  // Formatage des informations de la BD
+  if ($samba) $samba = $c_yes; else $samba = $c_no;
+  $web_state  = ($web_perms ? $l_enable : $l_disable);
+  $web_access = ($web_all ? $l_web_all : $l_web_list_only);
+  $ftp_state  = ($ftp_perms ? $l_enable : $l_disable);
+  if (trim($firewall_perms) != '') {
+    $firewall_str = nl2br($firewall_perms);
+  } else {
+    $firewall_str = $l_empty;
+  }
+  if ($user_login == '') {
+    $dis_user = $l_not_assigned;
+  } else {
+    $dis_user = "<a href=\"$path/user/user_index.php?action=detailconsult&amp;param_user=$user_id\">$user_login</a>";
+  }
+  if ($mail_server) $mail_server = $c_yes; else $mail_server = $c_no;
+
+
+  $display["detailInfo"] = display_record_info($host_q);
+  $display["title"] = "<div class=\"title\">$l_host : $name</div>";
+
+  // Section Web, seulement si squid en local pour les machines car 
+  // acces geres dans les ACL donc dans squid.conf
+  if ($cgp_use["service"]["web_local"]) {
+    // Affichage uniquement si acces web ET mode web_local
+    // sinon il n'y a pas generation de squid.conf donc pas d'ACL
+    if($web_perms == 1) {
+      $dis_access = "
+      <tr>
+        <td class=\"detailLabel\">$l_web_mode</td>
+	<td class=\"detailText\">$web_access (<a href=\"$path/host/host_index.php?action=showlist&amp;param_host=$id\" >$l_consult_web_list</a>)</td>
+      </tr>";
+    }
+    $web_section = "
+    <div class=\"detailHead\">$l_web_access</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_web</td>
+      <td class=\"detailText\">$web_state</td>
+    </tr>
+    $dis_access
+    </table>";
+  }
+  
+  if ($cgp_use["service"]["samba"]) {
+    $block_samba = "
+    <tr>
+      <td class=\"detailLabel\">$l_smb</td>
+      <td class=\"detailText\">$samba</td>
+    </tr>";
+  }
+
+  if ($cgp_use["service"]["mail"]) {
+    $block_mail = "
+    <tr>
+      <td class=\"detailLabel\">".$l_mailserver."</td>
+      <td class=\"detailText\">".$mail_server."</td>
+    </tr>";
+  }
+
+  $block = "
+    <div class=\"detailHead\">$l_host</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailText\">$name</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_ip</td>
+      <td class=\"detailText\">$ip</td>
+    </tr>
+    $block_samba
+    <tr>
+      <td class=\"detailLabel\">$l_desc</td>
+      <td class=\"detailText\">$desc</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_user</td>
+      <td class=\"detailText\">$dis_user</td>
+    </tr>
+    $block_mail
+    </table>
+    $web_section
+";
+
+  if ($cgp_use["service"]["firewall"]) {
+    $block .= "
+    <div class=\"detailHead\">$l_perms</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_ftp</td>
+      <td class=\"detailText\">$ftp_state</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_firewall</td>
+      <td class=\"detailText\">$firewall_str</td>
+    </tr>
+    </table>";
+  
+  }
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display User Web restriction screen
+// Parameters:
+//   - $usr_q     : user database result
+///////////////////////////////////////////////////////////////////////////////
+function html_host_consult_web($host_q) {
+  global $l_lastname, $l_firstname, $l_restrict;
+  global $l_disable;
+  global $action, $sess, $c_yes, $c_no;
+  global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
+
+  $height_sep = "10";
+
+  $id = $host_q->f("host_id");
+  $name = $host_q->f("host_name");
+  $ip = $host_q->f("host_ip");
+  $web_all = $host_q->f("host_web_all");
+  $list = nl2br($host_q->f("host_web_list"));
+
+
+  $web_access = ($web_all ? $l_web_all : $l_web_list_only);
+
+  $block = "
+  <div class=\"detailHead\">
+    $l_restrict $l_web : $name ($ip)
+  </div>
+  <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_web_mode</td>
+      <td class=\"detailText\">$web_access</td>
+    </tr>
+    <tr>
+      <td class=\"detailText\" colspan=\"2\">$list</td>
+    </tr>
+  </table>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Host Form
+// Parameters :
+//   - $action   : action called
+//   - $host_q   : DBO : information about the host (null for new host)
+//   - $host[]   : default or transmitted values
+//     keys used : name, desc, usercreate
+//   - $field    : field in error
+///////////////////////////////////////////////////////////////////////////////
+function html_host_form($action, $host_q, $host, $field="") {
+  global $cgp_use, $display, $l_insert, $l_update, $l_back,$l_web_list;
+  global $l_host, $l_name, $l_desc, $l_ip, $l_smb,$l_web_mode;
+  global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_access;
+  global $l_host_select_user, $l_user, $l_clear,$l_web_all, $l_web_list_only;
+  global $popup_height, $popup_width, $ico_user, $set_theme;
+  
+  // if update mode and first time, values are taken from db
+  if ($action == "detailupdate") {
+    $id = $host_q->f("host_id");
+    $name = $host_q->f("host_name");
+    $ip = $host_q->f("host_ip");
+    $samba = $host_q->f("host_samba");
+    $desc = $host_q->f("host_description");
+    $web_perms = $host_q->f("host_web_perms");
+    $web_list = $host_q->f("host_web_list");
+    $web_all = $host_q->f("host_web_all");
+    $ftp_perms = $host_q->f("host_ftp_perms");
+    $firewall_perms = $host_q->f("host_firewall_perms");
+    $u_login = $host_q->f("userobm_login");
+    $u_id = $host_q->f("userobm_id");
+
+  } else {
+    // Values are taken from parameters
+    $id = $host["id"];
+    $name = stripslashes($host["name"]);
+    $ip = $host["ip"];
+    $samba = $host["samba"];
+    $desc = stripslashes($host["desc"]);
+    $web_perms = $host["web_perms"];
+    $web_list = $host["web_list"];
+    $web_all = $host["web_all"];    
+    $ftp_perms = $host["ftp_perms"];
+    $firewall_perms = $host["firewall_perms"];
+  }
+
+  // Samba host checkbox checked value
+  $samba_state  = ($samba ? "checked" : "");
+
+  // Web mode Radio checked value
+  if ($web_all == "0") $web_all_c0 = " checked";
+  else $web_all_c1 = " checked";
+  
+  // Web/FTP checkbox checked value
+  $web_state  = ($web_perms ? "checked" : "");
+  $ftp_state  = ($ftp_perms ? "checked" : "");
+
+  $class_name = ($field == "name") ? "detailError" : "detailLabel";
+  $class_ip = ($field == "ip") ? "detailError" : "detailLabel";
+  $class_web_list =  ($field == "web_list") ? "detailError" : "detailLabel";
+  $class_web_mode =  ($field == "web_mode") ? "detailError" : "detailLabel";
+
+  $display["detailInfo"] = display_record_info($host_q);
+  $display["title"] = "<div class=\"title\">$l_host : $name</div>";
+
+  // Section Web, seulement si squid en local pour les machines car 
+  // acces geres dans les ACL donc dans squid.conf
+  if ($cgp_use["service"]["web_local"]) {
+
+    $block_web_local = "
+    <tr>
+      <td class=\"$class_web_mode\">$l_web_mode</td>
+      <td class=\"detailForm\">
+        <input type=\"radio\" name=\"rb_web_all\" value=\"1\" $web_all_c1>
+        $l_web_all
+        <input type=\"radio\" name=\"rb_web_all\" value=\"0\" $web_all_c0>
+        $l_web_list_only
+      </td>
+    </tr>    
+    <tr>
+      <td class=\"$class_web_list\">$l_web_list</td>
+      <td class=\"detailForm\">
+        <textarea name=\"ta_web_list\" cols=\"40\" rows=\"6\">$web_list</textarea>
+      </td>
+    </tr>
+    ";
+
+    $dis_web = "
+    <div class=\"detailHead\">$l_web_access</div>
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_web</td>
+      <td class=\"detailForm\">
+        <input name=\"cb_web_perms\" type=\"checkbox\" value=\"1\" $web_state>
+      </td>
+    </tr> 
+    $block_web_local
+    </table>";
+  }
+
+
+  if ($cgp_use["service"]["samba"]) {
+    $block_samba = "
+  <tr>
+    <td class=\"detailLabel\">$l_smb</td>
+    <td class=\"detailForm\">
+      <input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state>
+    </td>
+  </tr>
+  ";
+  }
+
+  $block = "<center>
+  <form method=\"get\" name=\"f_host\" action=\"".url_prepare("host_index.php")."\">
+
+  <div class=\"detailHead\">$l_host</div>
+
+  <table class=\"detail\">
+  <tr>
+    <td class=\"$class_name\">$l_name</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />
+    </td>
+  </tr>
+  <tr>
+    <td class=\"$class_ip\">$l_ip</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_ip\" maxlength=\"16\" size=\"16\" value=\"$ip\" /></td>
+  </tr>
+  $block_samba
+  <tr>
+    <td class=\"detailLabel\">$l_desc</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"128\" />
+    </td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\">$l_user</td>
+    <td class=\"detailForm\">
+    <input type=\"hidden\" name=\"param_user\" value=\"$u_id\" />
+    <a href=\"\" onclick=\"window.open('$path/user/user_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_host_select_user)."&amp;ext_widget=f_host.param_user&amp;ext_widget_text=f_host.tf_user_login','User','height=$popup_height,width=$popup_width'); return false;\">
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_user\" alt=\"\" /></a>
+    <input type=\"text\" name=\"tf_user_login\" value=\"$u_login\" readonly=\"readonly\" onfocus=\"this.blur();\" />
+    <input type=\"button\" value=\"$l_clear\" onclick=\"this.form.param_user.value='';this.form.tf_user_login.value='';\" />
+    </td>
+  </tr>
+
+  </table>
+  $dis_web
+  ";
+
+  if ($cgp_use["service"]["firewall"]) {
+    $block .= "
+  <div class=\"detailHead\">$l_perms</div>
+
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailLabel\">$l_ftp</td>
+    <td class=\"detailForm\">
+      <input name=\"cb_ftp_perms\" type=\"checkbox\" value=\"1\" $ftp_state>
+    </td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\">$l_firewall</td>
+    <td class=\"detailForm\">
+      <textarea name=\"ta_firewall_perms\" cols=\"32\" rows=\"3\">$firewall_perms</textarea>
+    </td>
+  </tr>
+
+  </table>";
+  }
+
+
+  if (($action == "detailupdate") || ($action == "update")) {
+    $dis_but = "
+      <input type=\"hidden\" name=\"param_host\" value=\"$id\" />
+      <input type=\"hidden\" name=\"action\" value=\"update\" />
+      <input type=\"submit\" value=\"$l_update\" />";
+
+  } else {
+    $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"submit\" value=\"$l_insert\" />";
+  }
+
+  $block .= "<div class=\"detailButton\">
+    <p class=\"detailButtons\">
+    $dis_but
+    </p>
+    </div>
+    </form>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Host Display preference screen
+// Parameters:
+//   - $prefs : Display preferences
+///////////////////////////////////////////////////////////////////////////////
+function dis_host_display_pref($prefs) {
+  global $l_host_display;
+
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
+  $dis_pref->display_entity = "host"; 
+  $dis_pref->pref_title = $l_host_display;
+  $dis_pref->pref_dis_help = 1;
+
+  $block = $dis_pref->display();
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display warning before a host deletion
+// We ask confirmation or cancel
+// Parameters:
+//   - $id : host id
+///////////////////////////////////////////////////////////////////////////////
+function dis_warn_delete($id) {
+  global $display, $l_warn_delete, $l_delete, $l_can_delete, $l_back;
+  global $l_cant_delete_mailserver;
+
+  $lhost = get_host_info($id);
+  if ($lhost["mailserver"] != "") {
+    $display["msg"] .= display_warn_msg($l_cant_delete_mailserver);
+    $dis_delete = "";
+
+  } else {
+    $display["msg"] .= display_info_msg("$l_can_delete");
+
+    $dis_delete = "
+    <p class=\"detailButtons\">
+      <form method=\"get\" name=\"form_delete\"
+      action=\"" .url_prepare("host_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"delete\" />
+      <input type=\"hidden\" name=\"param_host\" value=\"$id\" />
+      <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
+      </form>
+    </p>";
+  }
+
+  $dis_back = "
+    <p class=\"detailButtons\">
+      <form name=\"form_back\" method=\"get\"
+      action=\"" .url_prepare("host_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+      <input type=\"hidden\" name=\"param_host\" value=\"$id\" />
+      <input type=\"submit\" value=\"$l_back\" />
+      </form>
+    </p>";
+
+  $block = "
+  <div class=\"detailButton\">
+    $dis_delete
+    $dis_back
+  </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the context about a host insertion or update                     //
+// When similar hosts exist we show these and ask confirmation
+// Parameters:
+//   - $id       : host id
+//   - $h_q      : host database result (at least 1 row)
+//   - $host[]  : values for insertion/update (if confirmation)
+//     keys used : name, desc
+/////////////////////////////////////////////////////////////////////////////
+function dis_host_warn_insert($id, $h_q, $host) {
+  global $display, $l_check_samehost, $l_confirm, $l_back;
+  global $c_yes, $c_no;
+
+  $name = $host["name"];
+  $desc = $host["desc"];
+
+  $display["msg"] .= display_warn_msg($l_check_samehost);
+  while ($h_q->next_record()) {
+    $id = $h_q->f("host_id");
+    $samename = $h_q->f("host_name");
+    $samedesc = $h_q->f("host_description");
+    $dis_same_host .= "
+      <tr><td class=\"detailLabel\">
+        <a href=\"" .url_prepare("host_index.php?action=detailconsult&amp;param_host=$id") . "\">$samename ($samedesc)</a>
+      </td></tr>";
+  }
+
+  $block = "
+  <table class=\"detail\">
+    $dis_same_host
+  </table>
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+      <form method=\"post\" name=\"form_insert\"
+      action=\"" .url_prepare("host_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
+      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+      <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+      <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
+      </form>
+    </p>
+    <p class=\"detailButtons\">
+      <form name=\"form_back\" method=\"get\"
+      action=\"" .url_prepare("host_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"new\" />
+      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+      <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+      <input type=\"submit\" value=\"$l_back\" />
+      </form>
+    </p>
+  </div>";
+
+  return $block;
+}
+
+</script>
