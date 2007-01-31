@@ -33,15 +33,22 @@ function dis_statistic_index() {
     }
   }
 
-  $block = "<div class=\"title\">$l_stats</div>
-    <div class=\"detailText\"><a href=\"$path/statistic/statistic_index.php?action=manager\">$l_stats_manager</a></div>
-    <div class=\"detailText\"><a href=\"$path/statistic/statistic_index.php?action=contact_date_evolution\">$l_stats_contact_date_evolution</a></div>
-    <p />
-    <div class=\"title\">$l_company</div>
+  $block = "
+    <div class=\"detail infos\">
+    <h1>$l_stats</h1>
+    <a
+    href=\"$path/statistic/statistic_index.php?action=manager\">$l_stats_manager</a><br/>
+    <a href=\"$path/statistic/statistic_index.php?action=contact_date_evolution\">$l_stats_contact_date_evolution</a>
+    </div>
+    <div class=\"detail infos\">
+    <h1>$l_company</h1>
     $block_company
-    <p />
-    <div class=\"title\">$l_contact</div>
+    </h1>
+    </div>
+    <div class=\"detail infos\">
+    <h1>$l_contact</h1>
     $block_contact
+    </div>
 ";
 
   return $block;
@@ -63,9 +70,9 @@ function dis_statistic_category_index_item($entity, $category, $title) {
   $url = "$path/list/list_index.php?action=ext_get_id&amp;popup=1&amp;ext_url=".urlencode($path."/statistic/statistic_index.php?action=stats_category&amp;category=$category&amp;entity=$entity&amp;list_id=")."&amp;ext_target=$l_statistc";
   $block .= "
   <form action=\"statistic_index.php\">
-  <div class=\"detailButton\">
-  <div class=\"detailHead\">$title</div>
-  <p class=\"detailButtons\">
+  <div class=\"detail extra\">
+  <h1>$title</h1>
+  <div class=\"buttons\">
   <input type=\"button\"
   onclick=\"window.open('$url','$l_statistc','height=$popup_height,width=$popup_width,scrollbars=yes'); return false; \" value=\"$l_stats_from_list\" />
   <input type=\"hidden\" name=\"action\" value=\"stats_category\" />
@@ -73,7 +80,7 @@ function dis_statistic_category_index_item($entity, $category, $title) {
   <input type=\"hidden\" name=\"entity\" value=\"$entity\" />
   <input type=\"hidden\" name=\"list_id\" value=\"$c_all\" />
   <input type=\"submit\" value=\"$l_stats_from_all\" />
-  </p>
+  </div>
   </div>
   </form>";
 
@@ -136,7 +143,8 @@ function dis_statistic_resp_stats($cont_q,$comp_q) {
     <td class=\"detailLabel\" class=\"detailLabel\" rowspan =\"2\">$l_key</td>
     <td class=\"detailForm\">
      <table>
-      <tr><td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td><td>$l_module_contact</td></tr>
+      <tr><td
+      style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td><td>$l_module_contact</td></tr>
      </table>
     </td>
    </tr>
@@ -162,7 +170,7 @@ function dis_statistic_resp_stats($cont_q,$comp_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_statistic_cat_stats($comp_q, $tot) {
   global $path, $set_theme;
-  global $l_null,$l_totals, $l_header_country,$l_compcat;
+  global $l_null,$l_totals, $l_header_country,$l_contcat;
 
   while ($comp_q->next_record()) {
     if ($comp_q->f("category_id") == NULL) {
@@ -269,7 +277,7 @@ function dis_statistic_cat_stats($comp_q, $tot) {
    </div>
    <br />
   <div class=\"detail infos\">
-  <h1> x = $l_compcat </h1>
+  <h1> x = $l_contcat </h1>
   <h1> y = $l_header_country</h1>
   </div>
   $infos
