@@ -1986,7 +1986,7 @@ function run_query_project_reftask_update($params) {
   $uid = $auth->auth["uid"];
   $tasktype = $params["tasktype"];
   $label = $params["reftask_label"];
-  $id = $params["reftask_id"];
+  $id = $params["reftask"];
   $multidomain = sql_multidomain("projectreftask");
   
   $query = "UPDATE ProjectRefTask 

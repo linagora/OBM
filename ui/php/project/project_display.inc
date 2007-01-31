@@ -2567,15 +2567,15 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
       if($old_tt_id != "") {
         $reftask_list .= "</tr>";
       }
-      $sel_reftask .= "<thead><tr><th colspan=\"3\">$tt_label</th></tr></thead>";
+      $reftask_list .= "<thead><tr><td colspan=\"3\">$tt_label</td></tr></thead>";
       $old_tt_id = $tt_id;
     }
-    $sel_reftask .= "
+    $reftask_list .= "
     <tr>
     <td>
-    <input type=\"hidden\" id=\"reftask_$id\" value=\"$projectreftask_id\" />
-    <a
-    href=\"?action=reftask_delete&amp;category=reftask&amp;reftask=$projectreftask_id\">
+    <input type=\"hidden\" id=\"reftask_$projectreftask_id\" value=\"$projectreftask_id\" />
+    <input type=\"hidden\" id=\"tasktype_$tt_id\" value=\"$tt_id\" />
+    <a href=\"?action=reftask_delete&amp;category=reftask&amp;reftask=$projectreftask_id\">
     <img src=\"$ico_delete\" alt=\"$l_reftask_delete\" title=\"$l_delete_reftask\" />
     </a></td>
     <td><input type=\"text\" id=\"tf_reftask_label_$projectreftask_id\"
@@ -2587,7 +2587,7 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     </td>
     </tr>";
   }
-  $sel_reftask .= "</tr>";
+  $reftask_list .= "</tr>";
   
   
   
@@ -2614,19 +2614,23 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
   $block = "
     <div class=\"detail admin\">
     <h1>$l_reftask_manage</h1>
-    <form name=\"form_reftask_update\" method=\"post\" action=\"\">
+    <form id=\"form_reftask_update\" method=\"post\" action=\"?action=reftask_update\">
+    <input type=\"hidden\" name=\"tf_reftask_label\" value=\"\" />
+    <input type=\"hidden\" name=\"reftask\" value=\"\" />
+    <input type=\"hidden\" name=\"tasktype\" value=\"\" />
+    </form>
     <table>
     <thead>
     <tr>
     <td colspan=\"3\">&nbsp;</td>
     </tr>
-    </thead>
     <tr>
     <td colspan=\"3\">$l_reftask</td>
     </tr>
-    <tr>
-    <td>$sel_reftask</td>
-    </tr>
+    </thead>
+    <tbody>
+    $reftask_list
+    </tbody>
     </table>
     </form>
     <form name=\"form_reftask_new\" method=\"post\" action=\"\">
