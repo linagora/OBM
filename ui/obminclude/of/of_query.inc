@@ -284,23 +284,21 @@ function sql_multidomain($entity, $and=true) {
 //   - domain list in html select
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_domain_list() {
-  global $cdg_sql, $l_undef, $c_undef;
+  global $l_undef, $c_undef;
   
   $obm_q = new DB_OBM;
   $query = "SELECT domain_id, domain_label FROM Domain";
   $obm_q->query($query);
 
-  if($obm_q->next_record()) {
-    do {
-      $domain_label = $obm_q->f("domain_label");
-      $domain_id = $obm_q->f("domain_id");
-      $sel_list .= "<option value=\"$domain_id\">$domain_label</option>";
-    } while ($obm_q->next_record());
+   while ($obm_q->next_record()) {
+    $domain_label = $obm_q->f("domain_label");
+    $domain_id = $obm_q->f("domain_id");
+    $sel_list .= "<option value=\"$domain_id\">$domain_label</option>";
   }
 
   $sel_domain = "<select name=\"sel_domain\" id=\"sel_domain\">
       <option value=\"$c_undef\">$l_undef</option>
-      $domain_list
+      $sel_list
     </select>";
 
   return $sel_domain;
