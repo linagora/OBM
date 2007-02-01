@@ -2551,8 +2551,7 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
   global $l_c_checkdelete, $l_c_update, $l_c_upd, $l_c_new, $l_c_insert;
   global $l_c_j_create, $l_c_j_insert, $l_c_j_update,$l_reftask_manage;
   global $ctt_sales, $ctt_research, $ctt_others,$l_header_tasktype,$l_reftask;
-  global $l_tt_sales, $l_tt_research,
-  $l_tt_others,$l_task,$extra_js,$ico_ok,$ico_delete;
+  global $l_tt_sales, $l_tt_research,$l_tt_others,$l_task,$extra_js,$ico_ok,$ico_delete;
 
   // TaskType select construction
   $task_list = array($ctt_sales=>$l_tt_sales,
