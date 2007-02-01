@@ -69,12 +69,12 @@ public class Helper {
 		return ""+(priority-1);
 	}
 
-	public static int getPriorityFromFoundation(String priority) {
+	public static Integer getPriorityFromFoundation(String priority) {
 		if ( !nullToEmptyString(priority).equals("") ) {
-			Integer value = new Integer(priority);
-			return value.intValue()+1;
+			Integer value = new Integer(priority + 1);
+			return value;
 		} else {
-			return 1;
+			return new Integer(1);
 		}
 		
 	}

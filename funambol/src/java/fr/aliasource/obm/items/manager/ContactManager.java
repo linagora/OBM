@@ -267,7 +267,7 @@ public class ContactManager extends ObmManager {
 		for (int i=0 ; i < updated.length ; i++) {
 			owner = Helper.nullToEmptyString(updated[i].getOwner());
 			if ( ( ((restrictions & Helper.RESTRICT_PRIVATE) == Helper.RESTRICT_PRIVATE)
-				    && (updated[i].getClassification().intValue() == 1 && !owner.equals(user)) )
+				    && (updated[i].getClassification() == 1 && !owner.equals(user)) )
 			  || ( ((restrictions & Helper.RESTRICT_OWNER  ) == Helper.RESTRICT_OWNER)
 					&& (!owner.equals(user)) ) )
 			{
@@ -340,7 +340,7 @@ public class ContactManager extends ObmManager {
     	
     	
     	//Classification  	
-    	if (obmcontact.getClassification().intValue() == 1 ) {
+    	if (obmcontact.getClassification() == 1 ) {
     		contact.setSensitivity(new Short((short)2) ); //olPrivate
     	} else {
     		contact.setSensitivity(new Short((short)0) ); //olNormal
@@ -355,7 +355,7 @@ public class ContactManager extends ObmManager {
     	Contact contact = new Contact();
     	
     	if (foundation.getUid() != null && foundation.getUid() != "") {
-    		contact.setUid( new Integer(foundation.getUid()).intValue());
+    		contact.setUid( new Integer(foundation.getUid()) );
     	}
     	
     	contact.setFirstName(
@@ -431,9 +431,9 @@ public class ContactManager extends ObmManager {
     	//private
     	if ( Helper.nullToZero(
     			foundation.getSensitivity() ).shortValue() == 2 ) {
-    		contact.setClassification(new Integer(1)); //private
+    		contact.setClassification(1); //private
     	} else {
-    		contact.setClassification(new Integer(0)); 
+    		contact.setClassification(0); 
     	}
     	
     	return contact;

@@ -400,7 +400,7 @@ public class CalendarManager extends ObmManager {
     	event.setBusyStatus( new Short((short) 2) ); //olBusy
     
     	event.getPriority().setPropertyValue( 
-    			Helper.getPriority(obmevent.getPriority()) );
+    			Helper.getPriority(obmevent.getPriority().intValue()) );
     	event.getStatus().setPropertyValue("Tentative");
     	
     	/*XTag classification = new XTag();
