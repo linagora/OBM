@@ -15,7 +15,7 @@ $l_stats_contact_date_evolution = "Statistiques sur l'évolution du nombre de con
 $l_key = "Légende";
 $l_totals = "Total";
 $l_null = "Aucun";
-$l_compcat = "Categories des compagnies";
+$l_contcat = "Categories des contacts";
 $l_stats_from_list = "Sur un échantillon (liste) donné";
 $l_stats_from_all = "Sur l'ensemble";
 
