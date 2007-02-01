@@ -165,7 +165,7 @@ function get_statistic_action() {
   $actions["statistic"]["contact_date_evolution_graph"] = array (
     'Url'      => "$path/statistic/statistic_index.php?action=contact_date_evolution_graph",
     'Right'    => $cright_read,
-    'Condition'=> array ('all')
+    'Condition'=> array ('None')
                                         );
 
 
