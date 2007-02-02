@@ -67,8 +67,9 @@ $ico_logout         = "$theme_path/logout.png";
 $ico_login          = "$theme_path/arrow_off.gif";  
 $ico_datepicker     = "$theme_path/ico_datepicker.png";
 $ico_delete         = "$theme_path/ico_delete.gif";
+$ico_validate       = "$theme_path/ico_validate.gif";
 $ico_update         = "$theme_path/ico_modify.gif";
-$ico_ok             = "$theme_path/ico_ok.gif";
+$ico_ok             = "$theme_path/ico_validate.gif";
 $ico_nok            = "$theme_path/ico_delete.gif";
 $ico_lock           = "$theme_path/ico_lock.gif";
 $ico_obm            = "$theme_path/logo_obm.gif";
@@ -106,3 +107,9 @@ $ico_clipboard      = "$theme_path/ico_clipboard.gif";
 
 // Project Icons
 $ico_hierarchy      =  "$theme_path/ico_hierarchy.png";
+
+// Document Icons 
+
+$ico_folder_close   = "$theme_path/ico_folder_close.gif";
+$ico_folder         = "$theme_path/ico_folder.gif";
+$ico_file           = "$theme_path/ico_file.gif";

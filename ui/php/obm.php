@@ -179,9 +179,9 @@ function dis_calendar_portal() {
   $i = 0;
   do {
     if ($i == 0) $dis_minical .= "<tr>\n";
-    $day = date ("j", $start_day);
-    $iso_day = of_isodate_format($start_day);
-    $check_month = of_date_get_month($start_day);
+    $day = date ("j", $current_time);
+    $iso_day = of_isodate_format($current_time);
+    $check_month = of_date_get_month($current_time);
 
     if ($check_month != $this_month) {
       $dis_minical .= "<td class=\"downlight\" onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\"
@@ -201,12 +201,12 @@ function dis_calendar_portal() {
           </td>";
       }
     }
-    $start_day = strtotime("+1 day", $start_day);
+    $current_time = strtotime("+1 day", $current_time);
     $i++;
     if ($i == 7) {
       $dis_minical .= "</tr>\n";
       $i = 0;
-      $checkagain = of_date_get_month($start_day);
+      $checkagain = of_date_get_month($current_time);
       if ($checkagain != $this_month) $whole_month = FALSE;
     }
   } while ($whole_month == TRUE);

@@ -97,30 +97,30 @@ function html_host_search_form($host) {
 
   if ($cgp_use["service"]["samba"]) {
     $block_samba = "
-    <div class=\"searchLabel\">$l_smb_only<br />
+    <label>$l_smb_only<br />
       <input type=\"checkbox\" name=\"cb_samba\" value=\"1\" $smb />
-    </div>
+    </label>
     ";
   }
 
 
   $block = "
-    <form method=\"get\" name=\"f_search\" action=\"".url_prepare("host_index.php")."\">
+    <form method=\"get\" name=\"f_search\" class=\"search\" action=\"".url_prepare("host_index.php")."\">
     <div class=\"search\">
-      <div class=\"searchLabel\">$l_name<br />
+      <label>$l_name<br />
         <input name=\"tf_name\" size=\"24\" maxlength=\"32\" value=\"$name\" />
-      </div>
-      <div class=\"searchLabel\">$l_ip<br />
+      </label>
+      <label>$l_ip<br />
         <input name=\"tf_ip\" size=\"16\" maxlength=\"16\" value=\"$ip\" />
-      </div>
+      </label>
       $block_samba
-      <div class=\"searchLabel\">&nbsp;<br />
+      <label>&nbsp;<br />
         <input name=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
         $ext
-      </div>
-      <div class=\"searchEnd\"></div>
+      </label>
+      <p class=\"CL\" />
     </div>
   </form>";
 
@@ -231,7 +231,7 @@ function dis_host_consult($host) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_host_consult($host_q) {
   global $cgp_use, $c_yes, $c_no;
-  global $l_host, $l_name, $l_ip, $l_desc, $l_smb;
+  global $l_module_host, $l_name, $l_ip, $l_desc, $l_smb;
   global $display, $perm, $menu, $action, $cright_write;
   global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_mode;
   global $l_enable, $l_disable, $l_empty, $l_web_all, $l_web_list_only, $l_not_assigned;
@@ -270,7 +270,7 @@ function html_host_consult($host_q) {
 
 
   $display["detailInfo"] = display_record_info($host_q);
-  $display["title"] = "<div class=\"title\">$l_host : $name</div>";
+  $display["title"] = "<h1 class=\"title\">$l_module_host : $name</h1>";
 
   // Section Web, seulement si squid en local pour les machines car 
   // acces geres dans les ACL donc dans squid.conf
@@ -280,61 +280,64 @@ function html_host_consult($host_q) {
     if($web_perms == 1) {
       $dis_access = "
       <tr>
-        <td class=\"detailLabel\">$l_web_mode</td>
-	<td class=\"detailText\">$web_access (<a href=\"$path/host/host_index.php?action=showlist&amp;param_host=$id\" >$l_consult_web_list</a>)</td>
+        <th>$l_web_mode</th>
+	<td>$web_access (<a href=\"$path/host/host_index.php?action=showlist&amp;param_host=$id\" >$l_consult_web_list</a>)</td>
       </tr>";
     }
     $web_section = "
-    <div class=\"detailHead\">$l_web_access</div>
-
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_web</td>
-      <td class=\"detailText\">$web_state</td>
-    </tr>
-    $dis_access
-    </table>";
+    <div class=\"detail infos\">
+      <h1>$l_web_access</h1>
+      <table>
+      <tr>
+        <th>$l_web</th>
+        <td>$web_state</td>
+      </tr>
+      $dis_access
+      </table>
+    </div>";
   }
   
   if ($cgp_use["service"]["samba"]) {
     $block_samba = "
     <tr>
-      <td class=\"detailLabel\">$l_smb</td>
-      <td class=\"detailText\">$samba</td>
+      <th>$l_smb</th>
+      <td>$samba</td>
     </tr>";
   }
 
   if ($cgp_use["service"]["mail"]) {
     $block_mail = "
     <tr>
-      <td class=\"detailLabel\">".$l_mailserver."</td>
-      <td class=\"detailText\">".$mail_server."</td>
+      <th>".$l_mailserver."</th>
+      <td>".$mail_server."</td>
     </tr>";
   }
 
   $block = "
-    <div class=\"detailHead\">$l_host</div>
+    <div class=\"detail extras\">
+    <h1>$l_module_host</h1>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
+      <th>$l_name</th>
+      <td>$name</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_ip</td>
-      <td class=\"detailText\">$ip</td>
+      <th>$l_ip</th>
+      <td>$ip</td>
     </tr>
     $block_samba
     <tr>
-      <td class=\"detailLabel\">$l_desc</td>
-      <td class=\"detailText\">$desc</td>
+      <th>$l_desc</th>
+      <td>$desc</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_user</td>
-      <td class=\"detailText\">$dis_user</td>
+      <th>$l_user</th>
+      <td>$dis_user</td>
     </tr>
     $block_mail
     </table>
+    </div>
     $web_section
 ";
 
@@ -381,18 +384,18 @@ function html_host_consult_web($host_q) {
   $web_access = ($web_all ? $l_web_all : $l_web_list_only);
 
   $block = "
-  <div class=\"detailHead\">
-    $l_restrict $l_web : $name ($ip)
-  </div>
+  <div>
+    <h1>$l_restrict $l_web : $name ($ip)</h1>
   <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_web_mode</td>
-      <td class=\"detailText\">$web_access</td>
+      <th>$l_web_mode</th>
+      <td>$web_access</td>
     </tr>
     <tr>
-      <td class=\"detailText\" colspan=\"2\">$list</td>
+      <td colspan=\"2\">$list</td>
     </tr>
-  </table>";
+  </table>
+  </div>   ";
 
   return $block;
 }
@@ -409,10 +412,10 @@ function html_host_consult_web($host_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_host_form($action, $host_q, $host, $field="") {
   global $cgp_use, $display, $l_insert, $l_update, $l_back,$l_web_list;
-  global $l_host, $l_name, $l_desc, $l_ip, $l_smb,$l_web_mode;
+  global $l_module_host, $l_name, $l_desc, $l_ip, $l_smb,$l_web_mode;
   global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_access;
   global $l_host_select_user, $l_user, $l_clear,$l_web_all, $l_web_list_only;
-  global $popup_height, $popup_width, $ico_user, $set_theme;
+  global $popup_height, $popup_width, $ico_user;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -454,13 +457,13 @@ function html_host_form($action, $host_q, $host, $field="") {
   $web_state  = ($web_perms ? "checked" : "");
   $ftp_state  = ($ftp_perms ? "checked" : "");
 
-  $class_name = ($field == "name") ? "detailError" : "detailLabel";
-  $class_ip = ($field == "ip") ? "detailError" : "detailLabel";
-  $class_web_list =  ($field == "web_list") ? "detailError" : "detailLabel";
-  $class_web_mode =  ($field == "web_mode") ? "detailError" : "detailLabel";
+  $class_name = ($field == "name") ? "error" : "";
+  $class_ip = ($field == "ip") ? "error" : "";
+  $class_web_list =  ($field == "web_list") ? "error" : "";
+  $class_web_mode =  ($field == "web_mode") ? "error" : "";
 
   $display["detailInfo"] = display_record_info($host_q);
-  $display["title"] = "<div class=\"title\">$l_host : $name</div>";
+  $display["title"] = "<h1 class=\"title\">$l_module_host : $name</h1>";
 
   // Section Web, seulement si squid en local pour les machines car 
   // acces geres dans les ACL donc dans squid.conf
@@ -468,8 +471,8 @@ function html_host_form($action, $host_q, $host, $field="") {
 
     $block_web_local = "
     <tr>
-      <td class=\"$class_web_mode\">$l_web_mode</td>
-      <td class=\"detailForm\">
+      <th class=\"$class_web_mode\">$l_web_mode</th>
+      <td>
         <input type=\"radio\" name=\"rb_web_all\" value=\"1\" $web_all_c1>
         $l_web_all
         <input type=\"radio\" name=\"rb_web_all\" value=\"0\" $web_all_c0>
@@ -477,82 +480,91 @@ function html_host_form($action, $host_q, $host, $field="") {
       </td>
     </tr>    
     <tr>
-      <td class=\"$class_web_list\">$l_web_list</td>
-      <td class=\"detailForm\">
+      <th class=\"$class_web_list\">$l_web_list</th>
+      <td>
         <textarea name=\"ta_web_list\" cols=\"40\" rows=\"6\">$web_list</textarea>
       </td>
     </tr>
     ";
 
     $dis_web = "
-    <div class=\"detailHead\">$l_web_access</div>
-    <table class=\"detail\">
+    <fieldset class=\"detail info\">
+    <legend>$l_web_access</legend>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_web</td>
-      <td class=\"detailForm\">
+      <th>$l_web</th>
+      <td>
         <input name=\"cb_web_perms\" type=\"checkbox\" value=\"1\" $web_state>
       </td>
-    </tr> 
+      </tr>
     $block_web_local
-    </table>";
+      </table>
+    </fieldset>
+    ";
   }
 
 
   if ($cgp_use["service"]["samba"]) {
     $block_samba = "
   <tr>
-    <td class=\"detailLabel\">$l_smb</td>
-    <td class=\"detailForm\">
+    <th>$l_smb</th>
+    <td>
       <input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state>
     </td>
   </tr>
   ";
   }
 
-  $block = "<center>
-  <form method=\"get\" name=\"f_host\" action=\"".url_prepare("host_index.php")."\">
+  $block = "
+  <form method=\"get\" name=\"f_host\" action=\"host_index.php\">
 
-  <div class=\"detailHead\">$l_host</div>
+  <fieldset class=\"detail extras\">
+  <legend>$l_module_host</h1>
 
-  <table class=\"detail\">
+  <table>
   <tr>
-    <td class=\"$class_name\">$l_name</td>
-    <td class=\"detailForm\">
+    <th class=\"$class_name\">$l_name</th>
+    <td>
       <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />
     </td>
   </tr>
   <tr>
-    <td class=\"$class_ip\">$l_ip</td>
-    <td class=\"detailForm\">
+    <th class=\"$class_ip\">$l_ip</th>
+    <td>
       <input name=\"tf_ip\" maxlength=\"16\" size=\"16\" value=\"$ip\" /></td>
   </tr>
   $block_samba
   <tr>
-    <td class=\"detailLabel\">$l_desc</td>
-    <td class=\"detailForm\">
+    <th>$l_desc</th>
+    <td>
       <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"128\" />
     </td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_user</td>
-    <td class=\"detailForm\">
+  <th>
+  $l_user
+  <a href=\"\" onclick=\"window.open('$path/user/user_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_host_select_user)."&amp;ext_widget=f_host.param_user&amp;ext_widget_text=f_host.tf_user_login','User','height=$popup_height,width=$popup_width'); return false;\">
+   <img src=\"$ico_user\" alt=\"\" /></a>
+  </th>
+   
+    <td>
     <input type=\"hidden\" name=\"param_user\" value=\"$u_id\" />
-    <a href=\"\" onclick=\"window.open('$path/user/user_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_host_select_user)."&amp;ext_widget=f_host.param_user&amp;ext_widget_text=f_host.tf_user_login','User','height=$popup_height,width=$popup_width'); return false;\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_user\" alt=\"\" /></a>
     <input type=\"text\" name=\"tf_user_login\" value=\"$u_login\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     <input type=\"button\" value=\"$l_clear\" onclick=\"this.form.param_user.value='';this.form.tf_user_login.value='';\" />
     </td>
   </tr>
 
   </table>
+  </fieldset>
   $dis_web
   ";
 
   if ($cgp_use["service"]["firewall"]) {
     $block .= "
-  <div class=\"detailHead\">$l_perms</div>
+      <fieldset class=\"detail infos\">
+      <h1>$l_perms</h1>
 
-  <table class=\"detail\">
+  <table>
   <tr>
     <td class=\"detailLabel\">$l_ftp</td>
     <td class=\"detailForm\">
@@ -566,7 +578,8 @@ function html_host_form($action, $host_q, $host, $field="") {
     </td>
   </tr>
 
-  </table>";
+  </table>
+  </fieldset>";
   }
 
 
@@ -581,11 +594,9 @@ function html_host_form($action, $host_q, $host, $field="") {
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $block .= "<div class=\"detailButton\">
-    <p class=\"detailButtons\">
+  $block .= "<fieldset class=\"buttons\">
     $dis_but
-    </p>
-    </div>
+    </fieldset>
     </form>";
 
   return $block;

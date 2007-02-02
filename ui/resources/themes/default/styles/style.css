@@ -91,6 +91,12 @@ h1 {
   text-align: center;
   font-size: 130%;
 }
+
+form {
+  margin: 0;
+  padding: 0;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Some toolbox style  */
 /* ------------------------------------------------------------------------- */
@@ -327,7 +333,7 @@ h1 {
   border-bottom: 1px solid #b3b3b3;
   color: #368397;
   list-style-type: none; 
-  overflow: hide;
+  overflow: hidden;
 }
 
 .portlet h1 {

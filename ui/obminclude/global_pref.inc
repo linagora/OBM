@@ -359,3 +359,10 @@ if ($cgp_show["module"]["vacation"]) {
 		               'Url' => "$path/vacation/vacation_index.php",
 			       'Right'=> $cright_read);
 }
+
+if ($cgp_show["module"]["host"]) {
+  $modules["host"] = array('Name'=> $l_module_host,
+                               'Ico' => "$ico_host",
+                               'Url' => "$path/host/host_index.php",
+                               'Right'=> $cright_read);
+}

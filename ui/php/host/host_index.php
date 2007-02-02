@@ -23,9 +23,12 @@
 
 $path = "..";
 $module = "host";
-include("aliainclude/global.inc");
-page_open(array("sess" => "ALIAMIN_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
-include("aliainclude/global_pref.inc");
+$obminclude = getenv("OBM_INCLUDE_VAR");
+if ($obminclude == "") $obminclude = "obminclude";
+include("$obminclude/global.inc");
+
+page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+include("$obminclude/global_pref.inc");
 include("host_display.inc");
 include("host_query.inc");
 
@@ -33,7 +36,7 @@ $host = get_param_host();
 if ($action == "") $action = "index";
 get_host_action();
 $perm->check_permissions($module, $action);
-update_last_visit("host", $param_host, $action);
+update_last_visit("host", $params["host_id"], $action);
 
 page_close();
 
@@ -181,10 +184,11 @@ if ($action == "ext_get_id") {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_host);
-if (! $host["popup"]) {
-  $display["header"] = generate_menu($module,$section);
-}
 $display["end"] = display_end();
+// Update actions url in case some values have been updated (id after insert) 
+if (! $params["popup"]) {
+  $display["header"] = display_menu($module);
+}
 
 display_page($display);
 

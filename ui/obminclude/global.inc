@@ -242,6 +242,7 @@ $cgp_show["module"]["user"] = "user";
 $cgp_show["module"]["group"] = "user";
 $cgp_show["module"]["resource"] = "user";
 $cgp_show["module"]["resourcegroup"] = "user";
+$cgp_show["module"]["host"] = "user";
 $cgp_show["module"]["mailshare"] = "user";
 $cgp_show["module"]["admin"] = "admin";
 $cgp_show["module"]["admin_pref"] = "admin";

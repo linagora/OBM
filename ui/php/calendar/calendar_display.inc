@@ -774,7 +774,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
     <a href=\"calendar_index.php?action=view_week&amp;date=$next_week\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
   </h1> 
   <table class=\"calendar week\">
-    <colgroup span=\"1\" />
+    <colgroup />
     <colgroup span=\"7\" id=\"calendarEventContext\" />
     <thead onclick=\"obm.calendarQuickForm.compute(event, 'week');\">
     <tr>
@@ -782,7 +782,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
     $week_day_list
     </tr>
     <tr id=\"calendarHead\">
-    <td></td>
+    <td>&nbsp;</td>
     $week_day_event_list
     </tr>    
     </thead>
@@ -935,15 +935,20 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "time:$date";
   $ed[] = "title:'$title'";
   $ed[] = "all_day:$all_day";
-  $ed[] = "class:'$entityClass'"; 
+  $ed[] = "klass:'$entityClass'"; 
   $ed[] = "description:'$description'";
   $ed[] = "location:'$location'";
   $ed[] = "category:'$category'";
   
   foreach ($attendee as $entity => $entities) {
-    $ed[] = ${"l_$entity"}.":['".implode("','",$entities)."']"; 
+    $label_entity = phpStringToJsString(${"l_$entity"});
+    foreach($entities as $at) {
+      $ent[] = phpStringToJsString($at);
+    }
+    $attendees[] = "{label:'".$label_entity."', entities:['".implode("','",$ent)."']}"; 
   }
-  if($owner == $auth->auth["uid"] || in_array($owner,$writable_entity["ids"]) || true) {
+  $ed[] = "attendees:[".implode(',',$attendees)."]";
+  if($owner == $auth->auth["uid"] || in_array($owner,$writable_entity["ids"])) {
     $updatable =  true;
     $ed[] = "updatable:true";
   }
@@ -1545,11 +1550,8 @@ function dis_calendar_quick_form($calendar) {
       </fieldset>
       </form>
       <div id=\"calendarQuickFormData\">
-      <div>
+      <div  id=\"calendarQuickFormAttendees\">
       <h3>$l_members</h3>
-      You
-        <table id=\"calendarQuickFormAttendees\">
-        </table>
       </div>
       <div>
         <h3>$l_carac</h3>
@@ -2972,7 +2974,7 @@ function json_event_data($id,$calendar) {
         $opt = $options;
         $info[] = "entity:'$entity'";
         $info[] = "entity_id:$entity_id";
-        $info[] = "class:'".$entity_data["class"]."'";
+        $info[] = "klass:'".$entity_data["class"]."'";
         $info[] = "state:'".$entities[$entity]["entity"][$entity_id]["state"]."'";
         if($entity_id = $uid && $entity = 'user') {
           $opt = array_merge($opt,$updatable);

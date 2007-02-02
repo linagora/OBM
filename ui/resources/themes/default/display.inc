@@ -34,11 +34,6 @@ function display_page(&$display) {
       $display["detail"] . "
       </div>
       </div>
-      <script type=\"text/javascript\">
-        obm.initialize.chain(function() {
-          obm.portlets = new Obm.Portlets();
-        });
-      </script>
       " .
       $display["end"];
     return;
@@ -98,9 +93,7 @@ function display_page(&$display) {
     echo $display["result"] ."
     </div>
     <script type=\"text/javascript\">
-      obm.initialize.chain(function() {
-        obm.portlets = new Obm.Portlets();
-      });
+      obm.portlets = new Obm.Portlets();
     </script>  
     <!-- center zone end -->  
     ".$display["end"];

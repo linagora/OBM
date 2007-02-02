@@ -31,7 +31,7 @@ $fieldnames["documentmimetype_label"] = $l_mimetype;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_document(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
+  global $path ;
 
   if (($fieldname == "document_title") && $link_ok) {
     $res["url"] = "$path/document/document_index.php?action=detailconsult&amp;document_id=".$OD->data_set->f("document_id");
@@ -254,7 +254,7 @@ function dis_document_consult($document) {
 //   - $co_q   : document database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_consult($doc_q) {
-  global $display, $set_theme;
+  global $display ;
   global $l_document, $l_size, $l_bytes, $l_title, $l_mimetype, $l_private;
   global $l_author, $l_path, $l_name; 
   global $l_file, $l_consult, $l_insert, $l_update, $l_checkdelete;
@@ -360,7 +360,7 @@ function dis_document_form($action, $document, $doc_q) {
 //   - $mime_q     : Mime types database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_form($action, $document, $doc_q, $mime_q) {
-  global $display, $path, $default_path, $set_theme;
+  global $display, $path, $default_path;
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
   global $l_name, $l_author, $l_path, $l_kind,$auth; 
@@ -534,7 +534,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
       <td>
       <input type=\"text\" id=\"tf_path\" name=\"tf_path\" size=\"30\" value=\"$fi_path\" />
       <span id=\"browse_img\" $dis_img>
-      <a href=\"javascript:return false;\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_browse\" alt=\"\" /></a></span>
+      <a href=\"javascript:return false;\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"$ico_browse\" alt=\"\" /></a></span>
       </td>
     </tr> 
     <tr id=\"browse_field\" $dis_field>
@@ -570,7 +570,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_dir_form($action, $document,$doc_q=null) {
   global $display,$popup_height,$popup_width;
-  global $set_theme,$l_document;
+  global $l_document;
   global $l_path, $l_name,$path,$ico_browse;
   global $l_dir, $l_add_dir,$l_update_dir;
 
@@ -593,7 +593,7 @@ function html_document_dir_form($action, $document,$doc_q=null) {
     ";    
     $dis_path = "
      <input type=\"text\" id=\"tf_path\" name=\"tf_path\" value=\"$re_path\" size=\"50\"/>
-     <a href=\"javascript:return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_browse\" alt=\"\" /></a>      
+     <a href=\"javascript:return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"$ico_browse\" alt=\"\" /></a>      
      ";
   } else {
     $dis_button = "
@@ -946,7 +946,7 @@ $block.= "
 
 
 function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
-  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
+  global $ico_file,$ico_folder_close,$ico_folder;
   global $ico_del_directory,$popup, $action;
 
   $directories = $tree[$current_directory][0];
@@ -1012,7 +1012,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
        <tr>
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	 <a href=\"\" onclick=\"show_hide_dir('$current_dir_id');return false;\"> 
-	  <img id=\"img_$current_dir_id\"  src=\"$ico_directory_close\" alt=\"[Dir]\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"$ico_folder_close\" alt=\"[Dir]\"/>
          </a>
          $dis_name
 	</td>
@@ -1048,7 +1048,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function display_document_popup_tree($tree,$current_directory,$name,$indent) {
-  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
+  global $ico_file,$ico_folder_close,$ico_folder;
   global $popup;
   
   $indent_file = $indent + 15;
@@ -1065,7 +1065,7 @@ function display_document_popup_tree($tree,$current_directory,$name,$indent) {
        <tr>
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	<a href=\"\" onclick=\"show_hide_dir('$current_dir_id');return false;\"> 
-	  <img id=\"img_$current_dir_id\"  src=\"$ico_directory_close\" alt=\"\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"$ico_folder_close\" alt=\"\"/>
 	 </a>
 	 <a class=\"documentDir\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
 	  $name
@@ -1084,7 +1084,7 @@ function display_document_popup_tree($tree,$current_directory,$name,$indent) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-	  <img id=\"img_$current_dir_id\"  src=\"$ico_directory\" alt=\"\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"$ico_folder\" alt=\"\"/>
 	 <a class=\"documentDir\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
 	  $name
 	 </a>

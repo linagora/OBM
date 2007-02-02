@@ -52,15 +52,15 @@ function hide ( name ) {
   if (W3C) {
     document.getElementById('div_'+name).style.display = \"none\";
     document.getElementById('div_'+name).style.height = \"0px\";
-    document.getElementById('img_'+name).src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\";    
+    document.getElementById('img_'+name).src = \"$ico_folder_close\";    
   } else if (NS4) {
     document.layers['div_'+name].display = \"hide\";
     document.layers['div_'+name].height = \"0px\";
-    document.layers['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\";    
+    document.layers['img_'+name].src = \"$ico_folder_close\";    
   } else {
     document.all['div_'+name].style.display = \"none\";
     document.all['div_'+name].style.height = \"0px\";
-    document.all['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\";
+    document.all['img_'+name].src = \"$ico_folder_close\";
   }
 }
 
@@ -68,15 +68,15 @@ function show ( name ) {
   if (W3C) {
     document.getElementById('div_'+name).style.display = \"\";
     document.getElementById('div_'+name).style.height = \"auto\"; 
-    document.getElementById('img_'+name).src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_open\";
+    document.getElementById('img_'+name).src = \"$ico_folder\";
   } else if (NS4) {
     document.layers['div_'+name].display = \"\";
     document.layers['div_'+name].height = \"auto\";
-    document.layers['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_open\";
+    document.layers['img_'+name].src = \"$ico_folder\";
   } else {
     document.all['div_'+name].style.display = \"\";
     document.all['div_'+name].style.height = \"auto\";
-    document.all['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_open\";
+    document.all['img_'+name].src = \"$ico_folder\";
   }
 }
 
@@ -178,7 +178,7 @@ function of_category_dis_search_select($entity, $cat, $cats, $cat_id, $first_ele
 //   XHTML display of category form part
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="", $first="") {
-  global $set_theme, $ico_add, $ico_crow, $popup_height, $popup_width;
+  global  $ico_add, $ico_delete, $popup_height, $popup_width;
   global $cgp_hide, $l_none;
   
   $show_cat = (! $cgp_hide["$entity"]["${cat}"]);
@@ -199,7 +199,7 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
 	  $div_id = "$sel_name-data-$c_id";
 	  $sel_cat .= "<div class=\"elementRow\" id=\"$div_id\">
           <a href=\"javascript: remove_element('$div_id','$sel_name');\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\">
+          <img src=\"$ico_delete\">
           </a>
           $c_code $c_label
           <input value=\"$c_id\" name=\"${sel_name}[]\" type=\"hidden\" />
@@ -210,7 +210,7 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
       $link="<a href=\"javascript: return false;\" style=\"float:right;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
+       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
       $class = "detail";
     }
@@ -1246,7 +1246,7 @@ function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
 //   - $multi  : tell if multi selection enabled
 ///////////////////////////////////////////////////////////////////////////////
 function _of_category_dis_tree_node($tree, $indent, $multi=false) {
-  global $ico_directory_close, $ico_directory, $set_theme;
+  global $ico_folder_close, $ico_folder;
 
   $code = $tree["code"];
   $label = $tree["label"];
@@ -1288,7 +1288,7 @@ function _of_category_dis_tree_node($tree, $indent, $multi=false) {
       <tr>
 	<td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	  <a href=\"\" onclick=\"show_hide_dir('$code'); return false;\"> 
-	  <img id=\"img_$code\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
+	  <img id=\"img_$code\" src=\"$ico_folder_close\" alt=\"\"/>
 	  </a>
           $dis_cat
 	</td>
@@ -1302,7 +1302,7 @@ function _of_category_dis_tree_node($tree, $indent, $multi=false) {
       <table class=\"category\">
       <tr>
         <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-          <img id=\"img_$code\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
+          <img id=\"img_$code\" src=\"$ico_folder\" alt=\"\"/>
           $dis_cat
         </td>
       </tr>
@@ -1940,7 +1940,7 @@ function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel
 //   XHTML display of category form part
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="", $first="") {
-  global $set_theme, $ico_add, $ico_delete, $popup_height, $popup_width, $l_none;
+  global  $ico_add, $ico_delete, $popup_height, $popup_width, $l_none;
   
   if ($mode == "mono") {
     $sel_cat = of_category_user_html_select($cat, $cats, $cat_id, $first);

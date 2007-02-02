@@ -69,7 +69,7 @@
   width: 13%;
   overflow: visible;
   margin:0;
-  padding-top: 1em;
+  padding-top: 10px;
   background-color: #fff;
 }
 
@@ -131,6 +131,10 @@
 }
 
 .event h1 a {
+  color: #fff;
+}
+
+.event h1 a:visited {
   color: #fff;
 }
 
@@ -256,6 +260,19 @@
   border-right: 1px solid #b3b3b3;
   font-size: 100%;  
   margin: 0;
+}
+
+#calendarQuickForm h4 {
+  font-weight: bold;
+  font-size: 100%; 
+  background-color: #ebebeb;
+  margin: 3px;
+}
+
+#calendarQuickForm ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 #calendarQuickForm img {

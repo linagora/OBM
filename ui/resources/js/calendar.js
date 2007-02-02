@@ -59,7 +59,7 @@ Obm.CalendarDayEvent = new Class({
   buildEvent: function() {
     id = this.event.id+'-'+this.event.entity+'-'+this.event.entity_id+'-'+this.event.time;
     this.element = new Element('div').addClassName('event')
-                                     .addClassName(this.event.class)
+                                     .addClassName(this.event.klass)
                                      .setProperty('id','event-'+id)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
@@ -106,7 +106,10 @@ Obm.CalendarDayEvent = new Class({
       };
       this.event.time = time;
     } else {
-      this.redraw();
+      if(obm.calendarManager.lock()) {
+        this.redraw();
+        obm.calendarManager.unlock();
+      }
     }
   },
 
@@ -122,8 +125,11 @@ Obm.CalendarDayEvent = new Class({
     this.origin = origin;
     this.element.remove();
     hr.adopt(this.element);
-    this.redraw();
-    var thead = hr.parentNode.getFirst();
+    if(obm.calendarManager.lock()) {
+      this.redraw();
+      obm.calendarManager.unlock();
+    }
+    var thead = $(hr.parentNode).getFirst();
     var size = 0;
     do {
       if(thead.childNodes.length > size) size = thead.childNodes.length;
@@ -152,7 +158,7 @@ Obm.CalendarDayEvent = new Class({
   },
 
   redraw: function() {
-    hr = this.element.parentNode;
+    hr = $(this.element.parentNode);
     this.element.setStyles({
       'top':  hr.getTop() + hr.getStyle('padding-top').toInt() + 'px',
       'left': hr.getLeft() + 'px'
@@ -225,7 +231,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   buildEvent: function() {
     id = this.event.id+'-'+this.event.entity+'-'+this.event.entity_id+'-'+this.event.time;
     this.element = new Element('div').addClassName('event')
-                                     .addClassName(this.event.class)
+                                     .addClassName(this.event.klass)
                                      .setProperty('id','event-'+id)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
@@ -267,8 +273,9 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   },
 
   setHeight: function(height) {
-    if((this.element.offsetTop + height) > this.options.context.bottom) {
-      height = this.options.context.bottom - this.element.offsetTop;
+    var wkx = height;
+    if((this.element.getTop() + height) > this.options.context.bottom) {
+      height = this.options.context.bottom - this.element.getTop();
     }
     this.element.setStyle('height',height + 'px');
   },
@@ -308,7 +315,10 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
       this.event.time = time;
       this.timeContainer.setHTML(new Date(this.event.time * 1000).format("H:i"));
     } else {
-      this.redraw();
+      if(obm.calendarManager.lock()) {
+        this.redraw();
+        obm.calendarManager.unlock();
+      }
     }
   },
 
@@ -318,7 +328,10 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
       this.origin = origin;
       this.element.remove();
       hr.adopt(this.element);
-      this.redraw();
+      if(obm.calendarManager.lock()) {
+        this.redraw();
+        obm.calendarManager.unlock();
+      }
       return true;
     } else {
       return false;
@@ -326,7 +339,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   },
 
   redraw: function() {
-    hr = this.element.parentNode;
+    hr = $(this.element.parentNode);
     this.element.setStyles({
       'top':  hr.getTop() + 'px',
       'left': hr.getLeft()  + 'px'      
@@ -372,22 +385,22 @@ Obm.CalendarManager = new Class({
     ctx = $('calendarEventContext');
     head = $('calendarHead');
     body = $('calendarBody');
+    
+    this.evidence = $E('td',body);
 
     this.headContext = new Object();
     if(head) {
       this.headContext.top = head.getTop();
-      this.headContext.right = ctx.getLeft() + ctx.offsetWidth;
-      this.headContext.left = ctx.getLeft();
+      this.headContext.right = this.evidence.getLeft() + ctx.offsetWidth;
+      this.headContext.left = this.evidence.getLeft();
       this.headContext.bottom = head.getTop() + head.offsetHeight;    
     }
 
     this.bodyContext = new Object();
     this.bodyContext.top = body.getTop();
-    this.bodyContext.right = ctx.getLeft() + ctx.offsetWidth;
-    this.bodyContext.left = ctx.getLeft();
+    this.bodyContext.right = this.evidence.getLeft() + ctx.offsetWidth;
+    this.bodyContext.left = this.evidence.getLeft();
     this.bodyContext.bottom = body.getTop() + body.offsetHeight;
-    
-    this.evidence = $E('td',body);
   
     this.evidence.observe({onStop:this.resizeWindow.bind(this), property:'offsetWidth'});
     this.evidence.observe({onStop:this.resizeWindow.bind(this), property:'offsetTop'});
@@ -411,12 +424,14 @@ Obm.CalendarManager = new Class({
     obmEvent = new Obm.CalendarDayEvent(eventData,options);
     this.events.put(obmEvent.element.id,obmEvent);
     this.register(obmEvent.element.id);
+    return obmEvent;
   },
 
   newEvent: function(eventData,options) {
     obmEvent = new Obm.CalendarEvent(eventData,options);
     this.events.put(obmEvent.element.id,obmEvent);
     this.register(obmEvent.element.id);
+    return obmEvent;
   },
 
   resizeWindow: function() {
@@ -428,14 +443,14 @@ Obm.CalendarManager = new Class({
 
       if(head) {
         this.headContext.top = head.getTop();
-        this.headContext.right = ctx.getLeft() + ctx.offsetWidth;
-        this.headContext.left = ctx.getLeft();
+        this.headContext.right = this.evidence.getLeft() + ctx.offsetWidth;
+        this.headContext.left = this.evidence.getLeft();
         this.headContext.bottom = head.getTop() + head.offsetHeight;    
       }
 
       this.bodyContext.top = body.getTop();
-      this.bodyContext.right = ctx.getLeft() + ctx.offsetWidth;
-      this.bodyContext.left = ctx.getLeft();
+      this.bodyContext.right = this.evidence.getLeft() + ctx.offsetWidth;
+      this.bodyContext.left = this.evidence.getLeft();
       this.bodyContext.bottom = body.getTop() + body.offsetHeight;      
   
       
@@ -596,16 +611,16 @@ Obm.CalendarManager = new Class({
       showOkMessage(resp.message);
       var str = resp.elementId.split('-');
       for(var i=0;i< events.length;i++) {
-        event = events[i].event;
-        var id = str[0]+'-'+str[1] +'-'+event.entity+'-'+event.entity_id+'-'+str[4];
+        var ivent = events[i].event;
+        var id = str[0]+'-'+str[1] +'-'+ivent.entity+'-'+ivent.entity_id+'-'+str[4];
         var evt = obm.calendarManager.events.get(id);
-        if(event.state == 'A') {
+        if(ivent.state == 'A') {
           obm.calendarManager.unregister(id);
-          evt.event.id = event.id;
-          evt.setTime(event.time);
-          evt.setDuration(event.duration);
+          evt.event.id = ivent.id;
+          evt.setTime(ivent.time);
+          evt.setDuration(ivent.duration);
           obm.calendarManager.register(id);           
-          evt.setTitle(event.title);
+          evt.setTitle(ivent.title);
         } else if (evt) {
           obm.calendarManager.unregister(id);
           obm.calendarManager.events.remove(id);
@@ -619,6 +634,7 @@ Obm.CalendarManager = new Class({
       obm.calendarManager.events.each(function(key,evt) {
         evt.redraw(); 
       });      
+      obm.calendarManager.redrawAllEvents();      
     }
     
   },
@@ -640,11 +656,14 @@ Obm.CalendarManager = new Class({
     var events = resp.eventsData;
     if(resp.error == 0) {
       showOkMessage(resp.message);
+      obm.calendarManager.lock();
       if(resp.day == 1) {
-        obm.calendarManager.newDayEvent(events[0].event,events[0].options);
+        e = obm.calendarManager.newDayEvent(events[0].event,events[0].options);
       } else {
-        obm.calendarManager.newEvent(events[0].event,events[0].options);
+        e = obm.calendarManager.newEvent(events[0].event,events[0].options);
       }
+      obm.calendarManager.unlock();
+      e.redraw();
       obm.calendarManager.redrawAllEvents();      
     } else {
       showErrorMessage(resp.message);
@@ -670,8 +689,8 @@ Obm.CalendarManager = new Class({
       showOkMessage(resp.message);
       var str = resp.elementId.split('-');
       for(var i=0;i< events.length;i++) {
-        event = events[i].event;
-        var id = str[0]+'-'+str[1] +'-'+event.entity+'-'+event.entity_id+'-'+str[4];
+        ivent = events[i].event;
+        var id = str[0]+'-'+str[1] +'-'+ivent.entity+'-'+ivent.entity_id+'-'+str[4];
         var evt = obm.calendarManager.events.get(id);
         if (evt) {
           obm.calendarManager.unregister(id);
@@ -708,6 +727,7 @@ Obm.CalendarQuickForm = new Class({
     this.description = $('calendarQuickFormDescription');
     this.location = $('calendarQuickFormLocation');
     this.category = $('calendarQuickFormCategory');
+    this.attendees = $('calendarQuickFormAttendees');
 
     this.popup.setStyle('position','absolute');
 
@@ -718,20 +738,23 @@ Obm.CalendarQuickForm = new Class({
 
   },
   
-  compute: function(evt, context) {
-    var target = evt.target || evt.srcElement
-    var origin = evt.currentTarget || evt.srcTarget;
+  compute: function(ivent, context) {
+    var target = ivent.target || ivent.srcElement;
+    target = $(target);
     if(obm.calendarManager.redrawLock || target.getTag() == 'a') {
       return false;
     }
     while(target.id == '') {
-      if(target == origin) {
+      if(target.getTag() == origin) {
         return false;
       }
-      target = target.parentNode;
+      target = $(target.parentNode);
+    }
+    var str = target.id.split('-');
+    if(str.length <= 1) {
+      return false;
     }
     var target = $(target);
-    var str = target.id.split('-');
     var type = str[0];
     if(type == 'time' || type == 'hour') {
       this.setDefaultFormValues(str[1].toInt(),0, context);
@@ -767,6 +790,7 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.element_id = evt.element.id;
     this.eventData.action = 'quick_update';
     this.gotoURI = 'action=detailupdate&calendar_id='+evt.event.id;
+
     if(evt.event.updatable) {
       this.form.setStyle('display','block');
     } else {
@@ -779,7 +803,17 @@ Obm.CalendarQuickForm = new Class({
     this.category.setHTML(evt.event.category);
     this.location.setHTML(evt.event.location);
     this.data.setStyle('display','block');
-    this.date.innerHTML = date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i');
+    this.date.setHTML(date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
+    this.attendees.setHTML('');
+    for(var i=0;i<evt.event.attendees.length;i++) {
+      var attendee = evt.event.attendees[i];
+      new Element('h4').appendText(attendee.label).injectInside(this.attendees);
+      var ul = new Element('ul').injectInside(this.attendees);
+      for(var j=0;j<attendee.entities.length;j++) {
+        entity = attendee.entities[j];
+        new Element('li').appendText(entity).injectInside(ul);
+      }
+    }
   },
 
   setDefaultFormValues: function(time, allDay,context) {
@@ -797,10 +831,14 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.element_id = '';
     this.eventData.action = 'quick_insert';   
     this.gotoURI = 'action=new';
+
     this.form.setStyle('display','block');
     this.data.setStyle('display','none');
     this.title.setStyle('display','none');
-    this.date.innerHTML = date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i');
+    this.date.setHTML(date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
+   
+    this.attendees.setHTML('');
+
   },
   
   show: function() {
@@ -845,7 +883,7 @@ Obm.TabbedPane = new Class({
 
     this.tabs.each(function (tabContent, index) {
       var title = tabContent.getFirst();
-      tabContent.setStyle('height',(tabContent.parentNode.getStyle('height').toInt() - 20) + 'px');
+      tabContent.setStyle('height', '4em');
       tabContent.setStyle('overflow','auto');
       title.remove();
       title.injectInside(this.tabsContainer);
@@ -857,12 +895,12 @@ Obm.TabbedPane = new Class({
         this.current = title;
       }
 
-      title.addEvent('click', function(evt) {
-        var target = evt.currentTarget || evt.srcTarget;
+      title.addEvent('click', function(ivent) {
+        var target = ivent.currentTarget || ivent.srcElement;
         this.tabs[this.current.tabIndex].setStyle('display','none');
         this.current.removeClassName('current');
         this.current = target;
-        target.addClassName('current');
+        this.current.addClassName('current');
         this.tabs[this.current.tabIndex].setStyle('display','block');
       }.bind(this));
       

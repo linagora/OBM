@@ -81,7 +81,6 @@ Obm.Portlets = new Class({
     this.delta = this.main.element.getOffset('left') - this.sidebar.element.offsetWidth;
     this.width = this.sidebar.element.offsetWidth;
     this.panel = $('portletsPanel');
-    
     this.handler = $('portletsHandler');
     this.handler.getFirst().getNext().setStyle('display','none'); ;
     this.handler.addEvent('click', function(e){
@@ -133,7 +132,7 @@ Obm.Portlets = new Class({
        this.handler.getFirst().setStyle('display','none')
                    .getNext().setStyle('display','inline');      
 
-    if(this.main.element.offsetLeft > this.width) {
+    if(this.main.element.getLeft() > this.width) {
       this.main.custom(this.width + this.delta,this.delta );
       this.sidebar.custom(this.width,0);
       this.panel.setStyle('width',this.delta + 'px');
@@ -177,10 +176,6 @@ function datePickerGenerator() {
   });
 }
 
-function formValidator() {
-  $S('[alt=\"require\"]');
-}
-
 function popup(url,name,height,width) {
   if(!width)
     width = obm.vars.consts.popupWidth;
@@ -198,10 +193,10 @@ function showErrorMessage(message) {
   showMessage('error',message);
 }
 
-function showMessage(class, message) {
-  content = $('ajaxMessage');
+function showMessage(klass, message) {
+  var content = $('ajaxMessage');
   new Element('p').addClassName('message')
-                  .addClassName(class)
+                  .addClassName(klass)
                   .appendText(message)
                   .injectInside(content);
   setTimeout(function () {content.innerHTML = ''}, 5000);

@@ -254,6 +254,7 @@ $l_module_user = "Utilisateurs";
 $l_module_resource = "Ressources";
 $l_module_group = "Groupes";
 $l_module_resourcegroup = "Groupes de ressources";
+$l_module_host = "Hôte";
 $l_module_mailshare = "Partages Mail";
 
 $l_module_admin = "Administration";
