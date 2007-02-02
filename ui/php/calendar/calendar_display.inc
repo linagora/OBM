@@ -1547,7 +1547,7 @@ function dis_calendar_quick_form($calendar) {
       <div id=\"calendarQuickFormData\">
       <div>
       <h3>$l_members</h3>
-      Youpu
+      You
         <table id=\"calendarQuickFormAttendees\">
         </table>
       </div>

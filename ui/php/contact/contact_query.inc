@@ -355,7 +355,8 @@ function run_query_contact_detail($p_id) {
         LEFT JOIN UserObm as c ON contact_usercreate=c.userobm_id
         LEFT JOIN UserObm as u ON contact_userupdate=u.userobm_id
       WHERE
-        contact_id='$p_id' $multidomain";
+        contact_id='$p_id'
+        $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_detail()");
   $obm_q->query($query);
@@ -812,7 +813,7 @@ function run_query_contact_delete($p_id) {
   $c = get_contact_info($p_id);
   $comp_id = $c["company_id"];
   $multidomain = sql_multidomain("contact");
-  
+
   run_query_global_delete_document_links($p_id, "contact");    
   run_query_contact_delete_subscription($p_id);    
   $ret = of_userdata_query_delete("contact", $p_id);

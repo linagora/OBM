@@ -72,13 +72,14 @@ if ($c_multidomain) {
 </head>
 
 <?php
-$conf_login_page = "$obminclude/conf/themes/login.html";
-    if (file_exists("$path/../$conf_login_page")) {
-      echo "TTTTTTTTTTTTT";
-    } else {
-      echo "RRRRRRRRRR $path/$login_page";
-    }
+$conf_login_page = "$path/../conf/themes/login.html";
+if (file_exists("$conf_login_page2")) {
+  //  echo "OK_conf_login : ($conf_login_page)";
+  include("$conf_login_page");
+} else {
+  //  echo "NO_conf_login ($conf_login_page)";
+  include("obminclude/themes/login.html");
+}
 
-include("obminclude/themes/login.html");
 ?>
 </html>

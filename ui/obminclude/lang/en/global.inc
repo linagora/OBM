@@ -56,6 +56,8 @@ $l_text = "Text";
 $l_name = "Name";
 $l_label = "Label";
 $l_number = "Number";
+$l_email = "Email";
+$l_quota = "Quota";
 $l_invalid_data = "Invalid Data";
 $l_insert_ok = "Insertion successfull";
 $l_insert_error = "Insertion Error";
@@ -141,6 +143,7 @@ $l_user = "User";
 $l_resource = "Resource";
 $l_group = "Group";
 $l_resourcegroup = "Resources Group";
+$l_mailshare = "Mail share";
 $l_backup = "Backup";
 $l_domain = "Domain";
 $l_system = "System";
@@ -149,6 +152,8 @@ $l_password = "Password";
 $l_mailforward = "Mail forwarding";
 $l_mail = "Mail";
 $l_vacation = "Mail Vacation";
+$l_control = "Dashboard";
+$l_host = "Host";
 
 // Global display
 $l_last_visit = "Bookmarks";
@@ -240,11 +245,11 @@ $l_module_account = "Accounts";
 $l_module_invoice = "Invoices";
 $l_module_payment = "Payments";
 
-$l_module_settings = "Settings";
 $l_module_user = "Users";
 $l_module_resource = "Resources";
 $l_module_group = "Groups";
 $l_module_resourcegroup = "Resources group";
+$l_module_mailshare = "Mail shares";
 
 $l_module_admin = "Administration";
 $l_module_admin_lang = "Lang";
@@ -254,6 +259,8 @@ $l_module_admin_code = "Code";
 $l_module_admin_ref = "Referential";
 $l_module_import = "Import";
 $l_module_backup = "Backup";
+$l_module_control = "Dashboard";
+$l_module_host = "Hosts";
 
 $l_module_settings = "Settings";
 $l_module_password = "Password";

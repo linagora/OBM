@@ -175,9 +175,9 @@ function run_query_user_detail($p_id) {
     WHERE UserObm.userobm_id='$p_id'
       $multidomain";
 
+  display_debug_msg($query, $cdg_sql, "run_query_user_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
-  display_debug_msg($query, $cdg_sql, "run_query_user_detail()");
 
   return $obm_q;
 }

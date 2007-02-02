@@ -28,7 +28,6 @@ $l_group = "Groupe";
 
 $l_mail_ext = "Messagerie externe";
 $l_mail_server = "Serveur de boîte à lettres";
-$l_quota = "Quota";
 $l_email_nomade = "Adresse E-mail nomade";
 $l_nomade = "Accès E-mail nomade";
 $l_access_nomade = "Accès nomade";

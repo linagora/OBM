@@ -921,6 +921,26 @@ function get_last_resourcegroup_text($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the mailshare name from the resourcegroup Id
+// Parameters:
+//   - $id : mailshare id
+///////////////////////////////////////////////////////////////////////////////
+function get_last_mailshare_text($id) {
+  global $cdg_sql;
+
+  if ($id > 0) {
+    $query = "SELECT mailsharedir_name FROM MailShareDir WHERE mailsharedir_id='$id'";
+    display_debug_msg($query, $cdg_sql, "get_last_mailshare_text()");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("mailsharedir_name");
+  }
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the payment label from the payment Id
 // Parameters:
 //   - $id : payment id 

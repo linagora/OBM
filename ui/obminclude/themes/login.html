@@ -6,9 +6,9 @@
 <style type="text/css">
 <!--
 body {
-	background-image: url(<?php echo C_IMAGE_PATH; ?>/images/accueil_obm.png);
+	background-image: url(<?php echo C_IMAGE_PATH; ?>/../images/accueil_obm.png);
 	background-repeat: no-repeat;
-	background-position: center top;
+	background-position: center 32px;
 }
 tr.logintable {
 	border: 1px dashed #CCCCCC;
@@ -23,7 +23,7 @@ tr.logintable {
 
 <body>
 <div align="center"><font color="#0892B5" size="2" face="sans-serif, Verdana, Arial"><strong>OBM 
-<?php print "$obm_version - $obmdb_dbtype"; ?> - DEMO</strong></font> </div>
+<?php print "$obm_version - $obmdb_dbtype"; ?></strong></font> </div>
 <p align="center">&nbsp;</p>
 <p align="center">&nbsp;</p>
 <p align="center">&nbsp;</p>
@@ -31,8 +31,9 @@ tr.logintable {
 <p align="center">&nbsp;</p>
 <p align="center">&nbsp;</p>
 <p align="center">&nbsp;</p>
-<p align="center"><font size="2" face="sans-serif, Verdana, Arial"><em>Please 
-  AAAAAAAAAAAAA :</em></font></p>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
 <form name="login" method="post" action="<?php echo $login_action;?>">
 <table align="center">
 <tr>
@@ -54,7 +55,7 @@ tr.logintable {
   </td><td>
 
   <div align="center">
-  <input name="imageField" type="image" src="<?php echo C_IMAGE_PATH; ?>/images/bouton_login.gif" onclick="doChallengeResponse()">
+  <input name="imageField" type="image" src="<?php echo C_IMAGE_PATH; ?>/../images/bouton_login.gif" onclick="doChallengeResponse()">
   </div>
   </td>
 </tr>
@@ -81,7 +82,7 @@ tr.logintable {
   - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   </font><br>
   <font size="2" face="sans-serif, Verdana, Arial"><a href="http://www.aliasource.fr" target="_blank">AliaSource</a></font> 
-  <font size="2" face="sans-serif, Verdana, Arial">: 1998 - 2006</font></div>
+  <font size="2" face="sans-serif, Verdana, Arial">: 1998 - 2007</font></div>
 
 <!-- Set up the form with the challenge value and an empty reply value -->
 <input type="hidden" name="challenge" value="<?php print $challenge ?>">

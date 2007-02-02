@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0pre15";
+$obm_version = "2.0pre16";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -242,6 +242,7 @@ $cgp_show["module"]["user"] = "user";
 $cgp_show["module"]["group"] = "user";
 $cgp_show["module"]["resource"] = "user";
 $cgp_show["module"]["resourcegroup"] = "user";
+$cgp_show["module"]["mailshare"] = "user";
 $cgp_show["module"]["admin"] = "admin";
 $cgp_show["module"]["admin_pref"] = "admin";
 $cgp_show["module"]["admin_data"] = "admin";
