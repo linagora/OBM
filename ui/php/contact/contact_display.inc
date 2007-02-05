@@ -561,6 +561,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   }
 
   // we urlencode to avoid breakage for space char
+  $datasource = $contact["datasource"];
   $archive = $contact["archive"];
   $advanced = $contact["fuzzy"];
   $mailng_ok_only = $contact["mailng_ok_only"];
@@ -582,7 +583,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params("contact", $contact);
 
-  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
 
   $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
