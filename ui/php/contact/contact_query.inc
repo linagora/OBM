@@ -456,9 +456,8 @@ function run_query_contact_insert($contact) {
   }
   
   $domain_id = $obm["domain_id"];
-	
+  $dsrc = ($contact["datasource"] ? $contact["datasource"] : 0);
   $company = $contact["company"];
-  $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
   $market = ($contact["market"] ? $contact["market"] : 0);
   $lname = $contact["lname"];
@@ -643,6 +642,7 @@ function run_query_contact_update($contact) {
   if ($comp_id == "") {
     $comp_id = "0";
   }
+  $dsrc = ($contact["datasource"] ? $contact["datasource"] : 0);
   $company = $contact["company"];
   $kind = $contact["kind"];
   $market = ($contact["market"] ? $contact["market"] : 0);
@@ -700,10 +700,11 @@ function run_query_contact_update($contact) {
   $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
   $multidomain = sql_multidomain("contact");
   $dsrc = ($contact["datasource"] ? $contact["datasource"] : 0);
-  
+
   $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
     contact_userupdate='".$auth->auth["uid"]."',
+    contact_datasource_id='$dsrc',
     contact_company_id='$comp_id',
     contact_company='$company',
     contact_kind_id='$kind',
