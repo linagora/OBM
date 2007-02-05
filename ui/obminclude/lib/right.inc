@@ -67,10 +67,10 @@ function of_right_dis_admin($entity, $entity_id) {
   $uid = $auth->auth["uid"];
   $consumer = "user";
   $consumer_id = "$uid";
-  $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write");
+    $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write");
+    $display["features"] = html_entitywritable_bar($writable_entity ,$entity_id, $entity);
 
   $consumers = of_right_consumer_for_entity($entity, $entity_id, $consumer);
-  $display["features"] = html_entitywritable_bar($writable_entity ,$entity_id, $entity);
 
   return html_dis_right_admin($consumers, $entity_id);
 }
@@ -263,7 +263,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of entities for the consumer given with the corresponding right
 // Parameters:
-//   - $entity      : target entity
+//   - $entityu     : target entity (table name with capital)
 //   - $consumer    : consumer type
 //   - $consumer_id : consumer id
 //   - $right       : right to get and select from : "read" or "write"
@@ -271,11 +271,13 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 // Returns:
 //   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2)))
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_entity_for_consumer($entity, $consumer, $consumer_id, $right="read", $ids_set="") {
+function of_right_entity_for_consumer($entityu, $consumer, $consumer_id, $right="read", $ids_set="") {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+
+  $entity = strtolower($entityu);
 
   if ($entity == "calendar") {
     $table_entity = "UserObm";
@@ -287,17 +289,21 @@ function of_right_entity_for_consumer($entity, $consumer, $consumer_id, $right="
     $ctt[2]["type"] = "field";
     $ctt[2]["value"] = "userobm_firstname";
     $e_label = sql_string_concat($db_type, $ctt);
-  } else if ($entity == "resource") {
+    /*  } else if ($entity == "resource") {
     $table_entity = "Resource";
     $e_id = "e.resource_id";
-    $e_label = "e.resource_name";
+    $e_label = "e.resource_name";*/
+  } else {
+    $table_entity = "$entityu";
+    $e_id = "e.${entity}_id";
+    $e_label = "e.${entity}_name";
   }
 
   if ($right != "all") {
     $where_right = "AND entityright_$right = 1";
   }
-	
-	$multidomain = sql_multidomain("entityright");
+
+  $multidomain = sql_multidomain("entityright");
 
   $query = "SELECT
       $e_id as id,
@@ -379,7 +385,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="al
     $where_right = "AND entityright_$right = 1";
   }
 
-	$multidomain = sql_multidomain("entityright");
+  $multidomain = sql_multidomain("entityright");
 
   $query = "SELECT
       $c_id as id,
@@ -460,7 +466,7 @@ function of_right_update_right($param, $entity) {
       return false;
     }
   }
-	$multidomain = sql_multidomain("entityright");
+  $multidomain = sql_multidomain("entityright");
 	
   $obm_q = new DB_OBM;
   $query = "DELETE
@@ -479,7 +485,7 @@ function of_right_update_right($param, $entity) {
       entityright_entity_id,
       entityright_consumer,
       entityright_consumer_id,
-			entityright_domain_id,
+      entityright_domain_id,
       entityright_read,
       entityright_write
     ) VALUES (
@@ -487,7 +493,7 @@ function of_right_update_right($param, $entity) {
       '$eid',
       '$consumer',
       '0',
-			'$domain_id',
+      '$domain_id',
       '$pr',
       '$pw')";
     display_debug_msg($query, $cdg_sql, "of_right_update_right(2)");
@@ -506,7 +512,7 @@ function of_right_update_right($param, $entity) {
           entityright_entity_id,
           entityright_consumer,
           entityright_consumer_id,
-					entityright_domain_id,
+          entityright_domain_id,
           entityright_read,
           entityright_write
         ) VALUES (
@@ -514,7 +520,7 @@ function of_right_update_right($param, $entity) {
           '$eid',
           '$consumer',
           '$id',
-					'$domain_id',
+          '$domain_id',
           '1',
           '$w')";
 	display_debug_msg($query, $cdg_sql, "of_right_update_right(3)");
@@ -536,14 +542,14 @@ function of_right_update_right($param, $entity) {
             entityright_consumer,
             entityright_consumer_id,
             entityright_read,
-						entityright_domain_id,
+            entityright_domain_id,
             entityright_write
           ) VALUES (
             '$entity',
             '$eid',
             '$consumer',
             '$id',
-						'$domain_id',
+            '$domain_id',
             '0',
             '1')";
 	  display_debug_msg($query, $cdg_sql, "of_right_update_right(4)");

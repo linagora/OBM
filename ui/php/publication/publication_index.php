@@ -185,8 +185,8 @@ if ($action == "ext_get_id") {
   // If the context (same publications) was confirmed ok, we proceed
   $pub_q = run_query_publication_detail($params["publication_id"]);
   $params["lang"] = $pub_q->f("publication_lang");
-  if (is_array($params["concat1"]) &&
-     count($params["concat1"])>0) {
+  if (is_array($params[$public_contact_cat]) &&
+     count($params[$public_contact_cat])>0) {
     $retour = run_query_publication_auto_subscription($params,$params["publication_id"]);
   }
   if ($retour) {

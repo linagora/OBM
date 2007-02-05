@@ -1,7 +1,7 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : calendar_index.php                                             //
-//     - Desc : Calendar Index File                                            //
+// OBM - File : calendar_index.php                                           //
+//     - Desc : Calendar Index File                                          //
 // 2002-11-26 - Mehdi Rande                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -248,6 +248,7 @@ if ($action == "index") {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $display["detail"] = dis_calendar_event_form($action, $params, "", $cal_entity_id);
   }
+
 } elseif ($action == "quick_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_quick_form($params)) {
@@ -275,6 +276,7 @@ if ($action == "index") {
     echo "({".$display['json']."})";
     exit();
   }
+
 } elseif ($action == "quick_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_quick_form($params)) {
@@ -287,7 +289,8 @@ if ($action == "index") {
     json_error_msg($l_invalid_data . " : " . $err_msg);
     echo "({".$display['json']."})";
     exit();
-  } 
+  }
+
 } elseif ($action == "quick_delete") {  
 ///////////////////////////////////////////////////////////////////////////////
   $id = $params["calendar_id"];
@@ -318,7 +321,6 @@ if ($action == "index") {
     echo "({".$display['json']."})";    
   }
 
-  
 } elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_calendar_update_occurence_state($params["calendar_id"],$uid,$params["decision_event"]);
@@ -721,14 +723,14 @@ function get_calendar_action() {
     'Condition'=> array ('None') 
   );
 
-    // Insert
+  // Quick Insert
   $actions["calendar"]["quick_insert"] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=quick_insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );
 
-    // Insert
+  // Quick Delete
   $actions["calendar"]["quick_delete"] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=quick_delete",
     'Right'    => $cright_write,

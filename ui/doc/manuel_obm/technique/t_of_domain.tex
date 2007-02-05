@@ -21,8 +21,10 @@ Dans un fonctionnement mono-domaine, les données de domaine ne sont pas utilisée
 
 Dans un fonctionnement multi-domaine, le \textbf{domaine 0} est un domaine particulier.\\
 
-L'utilisation d'OBM-LDAP, OBM-MAIL ou OBM-SAMBA (dès que l'automate entre en jeu) nécessite la définition d'un domaine, même si un seul domaine est utilisé.\\
+Pour les objets pouvant être globaux (définis dans le domaine 0) il doit y avoir unicité de la clé (login pour user,...) dans l'espace domaine local + domaine global.
+La seule possibilité de doublon est pour 2 domaines locaux.\\ 
 
+Pour les hôtes, l'adresse IP doit être unique tous domaines confondus.
 
 \begin{tabular}{|p{4cm}|p{10cm}|}
 \hline
@@ -34,9 +36,21 @@ Utilisateur domaine 0 & C'est un super-administrateur, il :
 \item peut gérer les utilisateurs de tous les domaines
 \item peut voir toutes les données de tous les domaines
 \item peut gérer les données transverses de référence (d'id 0)
-\item ne peut pas insérer de données
 \item au niveau LDAP il est créé dans tous les domaines (bals,..)
 \end{itemize}
+\vspace{0.3cm}
+
+Pour la création de données en base : quand il se loggue il choisit un domaine :
+\begin{itemize}
+\item domaine global : il ne peut créer que les données qui permettent de sélectionner un domaine :
+  \begin{itemize}
+  \item user
+  \item host
+  \item mailshare
+  \end{itemize}
+\item domaine spécifique : il agit comme un utilisateur du domaine donc limité aux données du domaine.
+\end{itemize}
+
 \\
 \hline
 Utilisateur domaine != 0 & C'est un utilisateur de son domaine :
@@ -63,7 +77,18 @@ Entité domaine != 0 & C'est une entité de son domaine :
 \end{tabular}
 \vspace{0.3cm}
 
-Il n'est pas possible à un super-administrateur d'insérer des données (autres que référence) ou d'avoir des entités de domaine 0 pour éviter les cas de données de domaines différents liées entre-elles (ex: contact d'un domaine ou public lié à une société de domaine différent).
+Il n'est pas possible à un super-administrateur d'insérer des données (autres que référence) ou d'avoir des entités de domaine 0 pour éviter les cas de données de domaines différents liées entre-elles (ex: contact d'un domaine ou public lié à une société de domaine différent).\\
+
+L'utilisation d'OBM-LDAP, OBM-MAIL ou OBM-SAMBA (dès que l'automate entre en jeu) nécessite la définition d'un domaine, même si un seul domaine est utilisé.\\
+
+Au niveau des hôtes :
+- pour la messagerie :
+Il est nécessaire de choisir un hôte comme serveur de messagerie.
+La liste des hôtes proposée est l'aggrégation des hôtes du domaine OBM et des hôtes du domaine global (cas serveur hébèrge plusieurs domaines).
+
+- pour samba
+Une machine ne peut appartenir qu'à un seul domaine windows.
+Donc les hôtes déclarés dans le domaine global ne pourront pas être déclarés comme une machine windows.
 
 
 \subsubsection{Table Domain et stockage dans les données}
@@ -85,6 +110,11 @@ Il n'est pas possible à un super-administrateur d'insérer des données (autres qu
 \hline
 \end{tabular}
 \vspace{0.3cm}
+
+Les champs \textbf{domain\_name} et \textbf{\_alias} n'apparaissent que dans le cadre D'OBM-LDAP, OBM-Mail ou OBM-Samba.
+Le champ domain\_name n'est pas modifiable via l'interface (car nécessite une intervention sur la conf des services ldap, cyrus).\\
+
+
 
 Chaque table d'entité (hors tables de liaison) doit contenir un champ référençant le domaine :\\
 

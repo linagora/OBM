@@ -174,15 +174,15 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = of_right_dis_admin("mailshare", $params["entity_id"]);
+  $display["detail"] = of_right_dis_admin("MailShareDir", $params["entity_id"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  of_right_update_right($params, "mailshare");
+  of_right_update_right($params, "MailShareDir");
 	// ALIAMIN
   //  update_update_state();
   $display["msg"] .= display_warn_msg($err["msg"]);
-  $display["detail"] = of_right_dis_admin("mailshare", $params["entity_id"]);
+  $display["detail"] = of_right_dis_admin("MailShareDir", $params["entity_id"]);
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -222,76 +222,16 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_mailshare_params() {
   global $action, $cdg_param, $popup;
-  global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity;
+  global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read;
 
   // Get global params
   $params = get_global_params("UserObm");
 
-  // Rights parameters
-  if (isset($param_entity)) $params["entity_id"] = $param_entity;
-  if (is_array($sel_accept_write)) $params["accept_w"] = $sel_accept_write;
-  if (is_array($sel_accept_read)) $params["accept_r"] = $sel_accept_read;
-  if (isset($cb_write_public)) $params["public_w"] = $cb_write_public;
-  if (isset($cb_read_public)) $params["public_r"] = $cb_read_public;
-
-  if (debug_level_isset($cdg_param)) {
-    echo "action=$action";
-    if ( $params ) {
-      while ( list( $key, $val ) = each( $params ) ) {
-        echo "<br>mailshare[$key]=$val";
-      }
-    }
+  if ((isset ($params["entity_id"])) && (! isset($params["mailshare_id"]))) {
+    $params["mailshare_id"] = $params["entity_id"];
   }
 
   return $params;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Clean up a string coming from a textarea : 
-//  + remove empty lines
-//  + remove space at the beginning of the lines
-//  + remove space at the end of the lines
-//  + remove first empty line and last \n of the string
-// Parameters:
-//   - $str String to be cleaned up
-// Returns:
-//   - The string cleaned up  
-///////////////////////////////////////////////////////////////////////////////
-// Vieille implementation pas terrible (trop de regexp, pas simple)
-// function cleanup($str) {
-//   //echo "AVANT : <pre>$str<pre>\n";
-//   // Espaces en fin de ligne
-//   $str = preg_replace("/  *\r\n/", "\r\n", $str);
-//   // Espaces en debut de ligne
-//   $str = preg_replace("/\r\n  */", "\r\n", $str);
-//   // Lignes vides
-//   $str = preg_replace("/(\r\n)(\r\n)*/", "\r\n", $str);
-//   // Premiere ligne vide
-//   $str = preg_replace("/^ *\r\n/", '', $str);
-//   // Derniere ligne vide
-//   $str = preg_replace("/ *\r\n$/", '', $str);
-//   //echo "APRES : <pre>$str<pre>";
-//       
-//   return $str;
-// }
-
-function cleanup($str) {
-  $result = '';
-  $lines = explode("\r\n", $str);
-  $i = 0;
-  while ($i < count($lines)) {
-    $currentline = trim($lines[$i]);
-    if ($currentline != '') {
-      $result .= $currentline."\r\n";
-    }
-    $i++;
-  }
-
-  // Suppression du dernier retour chariot
-  // (plus pratique pour les traitements type explode/tokenizer, on obtient pas de derniere chaine vide)
-  $result = preg_replace("/\r\n$/", '', $result);
-  return $result;
 }
 
 
@@ -374,14 +314,14 @@ function get_mailshare_action() {
 // Rights Admin.
   $actions["mailshare"]["rights_admin"] = array (
     'Name'     => $l_header_right,
-    'Url'      => "$path/mailshare/mailshare_index.php?action=rights_admin&amp;param_entity=".$params["mailshare_id"]."",
+    'Url'      => "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=".$params["mailshare_id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult')
                                      );
 
 // Rights Update
   $actions["mailshare"]["rights_update"] = array (
-    'Url'      => "$path/mailshare/mailshare_index.php?action=rights_update&amp;param_entity=".$params["mailshare_id"]."",
+    'Url'      => "$path/mailshare/mailshare_index.php?action=rights_update&amp;entity_id=".$params["mailshare_id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                      );
@@ -435,7 +375,7 @@ function update_mailshare_action() {
     $actions["mailshare"]["check_delete"]['Condition'][] = 'insert';
 
     // Rights admin
-    $actions["mailshare"]["rights_admin"]['Url'] = "$path/mailshare/mailshare_index.php?action=rights_admin&amp;mailshare_id=$id";
+    $actions["mailshare"]["rights_admin"]['Url'] = "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=$id";
     $actions["mailshare"]["rights_admin"]['Condition'][] = 'insert';
   }
 }

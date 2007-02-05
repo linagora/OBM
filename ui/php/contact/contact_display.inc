@@ -1423,7 +1423,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   }
 
   // data source select
-  $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
+  $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($dsrc_q->next_record()) {
     $d_id = $dsrc_q->f("datasource_id");
@@ -1816,7 +1816,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_lname\" value=\"$lname\" />
     <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
-    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
+    <input type=\"hidden\" name=\"sel_datasource\" value=\"$dsrc\" />
     <input type=\"hidden\" name=\"cba_privacy\" value=\"$privacy\" />
     <input type=\"hidden\" name=\"sel_function\" value=\"$func\" />
     <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />

@@ -346,7 +346,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
   $resources_array = $sel_entity_id["resource"];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
-    $writable_res = of_right_entity_for_consumer("resource", "user", $uid, "write");
+    $writable_res = of_right_entity_for_consumer("Resource", "user", $uid, "write");
     foreach ($resources_array as $res_id) {
       if (in_array($res_id, $writable_res["ids"])) {
 	run_query_calendar_insert_entity_event("resource", $res_id, $event_id, 'A');
@@ -772,7 +772,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
   $resources_array = $sel_entity_id["resource"];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
-    $writable_res = of_right_entity_for_consumer("resource", "user", $uid, "write");
+    $writable_res = of_right_entity_for_consumer("Resource", "user", $uid, "write");
   }    
 
   $event_data = run_query_calendar_detail($event_id);
@@ -1263,7 +1263,7 @@ function get_calendar_group_readable() {
   $uid = $auth->auth["uid"];
   $where = sql_obm_entity_privacy("group");
   if (! $ccalendar_public_groups) {
-    $where .= " and group_privacy=1";
+    $where .= " AND group_privacy=1";
   }
 
   $query = "
@@ -1287,7 +1287,7 @@ function get_calendar_resource_readable() {
   global $cdg_sql, $auth, $ccalendar_public_groups;
 
   $uid = $auth->auth["uid"];
-  $entity = of_right_entity_for_consumer("resource", "user", $uid, "read");
+  $entity = of_right_entity_for_consumer("Resource", "user", $uid, "read");
 
   return $entity;
 }

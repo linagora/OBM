@@ -35,7 +35,7 @@ function run_query_resource_search($resource) {
 	
   if ($restriction == "user") {
     $uid = $auth->auth["uid"];
-    $rs = of_right_entity_for_consumer("resource", "user", $uid, "read");
+    $rs = of_right_entity_for_consumer("Resource", "user", $uid, "read");
     if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
       $where_restriction = " AND (resource_id IN (";
       foreach($rs["ids"] as $r_id) {

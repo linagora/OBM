@@ -162,7 +162,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (of_right_update_right($params, "resource")) {
+  if (of_right_update_right($params, "Resource")) {
     $display["msg"] .= display_ok_msg($l_right_update_ok);
   } else {
     $display["msg"] .= display_warn_msg($err_msg);

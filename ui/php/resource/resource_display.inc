@@ -405,7 +405,7 @@ function dis_resource_right_dis_admin($id) {
   $infos = get_resource_infos($id);
   $name = $infos["name"];
   $display["title"] = "<h1>$l_resource : $name</h1>";
-  $block = of_right_dis_admin("resource", $id);
+  $block = of_right_dis_admin("Resource", $id);
 
   return $block;
 }
