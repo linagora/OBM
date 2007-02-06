@@ -216,7 +216,6 @@ function run_query_user_insert($user) {
   $fname = $user["firstname"];
   $email = $user["email"];
   $desc = $user["desc"];
-  $multidomain = sql_multidomain("userobm");
 
   // Coord
   $phone = $user["phone"];
@@ -1268,29 +1267,29 @@ function check_user_can_delete($p_id) {
 // Delete all references to the user (UserObmPref, DisplayPref, acl)
 // Move all user private contact to public 
 // Parameters:
-//   - $param_user : user id
+//   - $user_id : user id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_delete_profile($param_user)  {
+function run_query_user_delete_profile($user_id)  {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
 
   // Unsubscribe from all groups
-  $retour = run_query_user_unsubscribe_all_groups($param_user);    
+  $retour = run_query_user_unsubscribe_all_groups($user_id);    
 
   // Delete all user prefs
-  $query = "DELETE FROM UserObmPref WHERE userobmpref_user_id='$param_user'"; 
+  $query = "DELETE FROM UserObmPref WHERE userobmpref_user_id='$user_id'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(UserObmPref)");
   $obm_q->query($query);
 
-  $query = "DELETE FROM DisplayPref WHERE display_user_id='$param_user'"; 
+  $query = "DELETE FROM DisplayPref WHERE display_user_id='$user_id'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(DisplayPref)");
   $obm_q->query($query);
 
   // Move all the user contact from private to public
   $query = "UPDATE Contact SET
       contact_privacy='0'
-    WHERE contact_usercreate='$param_user'
+    WHERE contact_usercreate='$user_id'
       AND contact_privacy != '0'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Contact)");
   $obm_q->query($query);
@@ -1298,7 +1297,7 @@ function run_query_user_delete_profile($param_user)  {
   // Move all the user deal from private to public
   $query = "UPDATE Deal SET
       deal_privacy='0'
-    WHERE deal_usercreate='$param_user'
+    WHERE deal_usercreate='$user_id'
       AND deal_privacy != '0'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Deal)");
   $obm_q->query($query);
@@ -1306,7 +1305,7 @@ function run_query_user_delete_profile($param_user)  {
   // Move all the user list from private to public
   $query = "UPDATE List SET
       list_privacy='0'
-    WHERE list_usercreate='$param_user'
+    WHERE list_usercreate='$user_id'
       AND list_privacy != '0'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(List)");
   $obm_q->query($query);
@@ -1315,7 +1314,7 @@ function run_query_user_delete_profile($param_user)  {
   // Not activated ! case of private event with multiple users XXXXX to handle
   $query = "UPDATE CalendarEvent SET
       calendarevent_privacy='0'
-    WHERE calendarevent_usercreate='$param_user'
+    WHERE calendarevent_usercreate='$user_id'
       AND calendarevent_privacy != '0'"; 
   //display_debug_msg($query, $cdg_sql);
   //$obm_q->query($query);
@@ -1323,32 +1322,32 @@ function run_query_user_delete_profile($param_user)  {
   // Remove all User event participation
   $query = "DELETE FROM EventEntity
     WHERE evententity_entity = 'user'
-      AND evententity_entity_id = '$param_user'"; 
+      AND evententity_entity_id = '$user_id'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EventEntity)");
   $obm_q->query($query);
 
   // Remove all acl to the user and user's one
   $query = "DELETE FROM EntityRight
     WHERE entityright_entity = 'calendar'
-      AND entityright_entity_id = '$param_user'"; 
+      AND entityright_entity_id = '$user_id'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EntityRight)");
   $obm_q->query($query);
   $query = "DELETE FROM EntityRight
     WHERE entityright_consumer = 'user'
-      AND entityright_consumer_id = '$param_user'"; 
+      AND entityright_consumer_id = '$user_id'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EntityRight)");
   $obm_q->query($query);
 
   // Remove all Project participation
   $query = "DELETE FROM ProjectUser
-    WHERE projectuser_user_id = '$param_user'"; 
+    WHERE projectuser_user_id = '$user_id'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(ProjectUser)");
   $obm_q->query($query);
 
   // Remove all User Time management data
   // This is dangerous, but forbidden if user has timetask data (check_can..)
   $query = "DELETE FROM TimeTask
-    WHERE timetask_user_id = '$param_user'"; 
+    WHERE timetask_user_id = '$user_id'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(TimeTask)");
   $obm_q->query($query);
 }

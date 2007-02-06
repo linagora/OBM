@@ -1,4 +1,13 @@
 <script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File  : host_js.inc                                                 //
+//     - Desc  : Host javascript functions File                              //
+// 2007-02-02 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
+
+require("$obminclude/javascript/check_js.inc");
 
 // to avoid a javascript error when ext_widget or ext_widget_label not defined
 if (($ext_widget != "") || ($ext_widget_text != "")) {

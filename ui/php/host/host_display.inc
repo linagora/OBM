@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// ALIAMIN - File : host_display.php                                         //
-//         - Desc : Host Display File                                        //
+// OBM - File : host_display.php                                             //
+//     - Desc : Host Display File                                            //
 // 2004-09-09 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -37,7 +37,7 @@ function dis_data_host(&$OD, $fieldname, $link_ok) {
     if ($OD->display_ext == "get_id") {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("host_id").",'".addslashes($OD->data_set->f("host_name"))."');";
     } else {
-     $res["url"] = "$path/host/host_index.php?action=detailconsult&amp;param_host=".$OD->data_set->f("host_id");
+     $res["url"] = "$path/host/host_index.php?action=detailconsult&amp;host_id=".$OD->data_set->f("host_id");
     }
   }
 
@@ -138,7 +138,7 @@ function dis_host_search_list($host) {
   global $l_no_found, $display, $auth;
 
   $prefs = get_display_pref($auth->auth["uid"], "host");
-  $obm_q = run_query_search($host);
+  $obm_q = run_query_host_search($host);
 
   $nb_host = $obm_q->num_rows_total();
   if ($nb_host == 0) {
@@ -183,7 +183,7 @@ function html_host_search_list($obm_q, $pref_q, $nb_host, $host) {
   $url = url_prepare("host_index.php?action=search&amp;tf_name=$namet&amp;tf_ip=$ip&amp;cb_smb=$smb$url_ext");
   
   $dis_host = new OBM_DISPLAY("DATA", $pref_q, $module);
-  
+
   if ($popup) {
     if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
       $dis_host->display_ext = "get_id";
@@ -211,13 +211,13 @@ function html_host_search_list($obm_q, $pref_q, $nb_host, $host) {
 //   - $host[] : host parameters
 ///////////////////////////////////////////////////////////////////////////////
 function dis_host_consult($host) {
-  global $display, $l_query_error;
+  global $display, $l_err_reference;
 
-  $host_q = run_query_detail($host["id"]);
+  $host_q = run_query_host_detail($host["host_id"]);
   if ($host_q->num_rows() == 1) {
     $block = html_host_consult($host_q);
   } else {
-    $display["msg"] .= display_err_msg($l_query_error);
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   return $block;
@@ -264,7 +264,7 @@ function html_host_consult($host_q) {
   if ($user_login == '') {
     $dis_user = $l_not_assigned;
   } else {
-    $dis_user = "<a href=\"$path/user/user_index.php?action=detailconsult&amp;param_user=$user_id\">$user_login</a>";
+    $dis_user = "<a href=\"$path/user/user_index.php?action=detailconsult&amp;user_id=$user_id\">$user_login</a>";
   }
   if ($mail_server) $mail_server = $c_yes; else $mail_server = $c_no;
 
@@ -281,7 +281,7 @@ function html_host_consult($host_q) {
       $dis_access = "
       <tr>
         <th>$l_web_mode</th>
-	<td>$web_access (<a href=\"$path/host/host_index.php?action=showlist&amp;param_host=$id\" >$l_consult_web_list</a>)</td>
+	<td>$web_access (<a href=\"$path/host/host_index.php?action=showlist&amp;host_id=$id\" >$l_consult_web_list</a>)</td>
       </tr>";
     }
     $web_section = "
@@ -380,7 +380,6 @@ function html_host_consult_web($host_q) {
   $web_all = $host_q->f("host_web_all");
   $list = nl2br($host_q->f("host_web_list"));
 
-
   $web_access = ($web_all ? $l_web_all : $l_web_list_only);
 
   $block = "
@@ -434,14 +433,14 @@ function html_host_form($action, $host_q, $host, $field="") {
 
   } else {
     // Values are taken from parameters
-    $id = $host["id"];
+    $id = $host["host_id"];
     $name = stripslashes($host["name"]);
     $ip = $host["ip"];
     $samba = $host["samba"];
     $desc = stripslashes($host["desc"]);
     $web_perms = $host["web_perms"];
     $web_list = $host["web_list"];
-    $web_all = $host["web_all"];    
+    $web_all = $host["web_all"];
     $ftp_perms = $host["ftp_perms"];
     $firewall_perms = $host["firewall_perms"];
   }
@@ -452,7 +451,7 @@ function html_host_form($action, $host_q, $host, $field="") {
   // Web mode Radio checked value
   if ($web_all == "0") $web_all_c0 = " checked";
   else $web_all_c1 = " checked";
-  
+
   // Web/FTP checkbox checked value
   $web_state  = ($web_perms ? "checked" : "");
   $ftp_state  = ($ftp_perms ? "checked" : "");
@@ -473,9 +472,9 @@ function html_host_form($action, $host_q, $host, $field="") {
     <tr>
       <th class=\"$class_web_mode\">$l_web_mode</th>
       <td>
-        <input type=\"radio\" name=\"rb_web_all\" value=\"1\" $web_all_c1>
+        <input type=\"radio\" name=\"rd_web_all\" value=\"1\" $web_all_c1>
         $l_web_all
-        <input type=\"radio\" name=\"rb_web_all\" value=\"0\" $web_all_c0>
+        <input type=\"radio\" name=\"rd_web_all\" value=\"0\" $web_all_c0>
         $l_web_list_only
       </td>
     </tr>    
@@ -485,7 +484,7 @@ function html_host_form($action, $host_q, $host, $field="") {
         <textarea name=\"ta_web_list\" cols=\"40\" rows=\"6\">$web_list</textarea>
       </td>
     </tr>
-    ";
+";
 
     $dis_web = "
     <fieldset class=\"detail info\">
@@ -503,7 +502,6 @@ function html_host_form($action, $host_q, $host, $field="") {
     ";
   }
 
-
   if ($cgp_use["service"]["samba"]) {
     $block_samba = "
   <tr>
@@ -512,7 +510,7 @@ function html_host_form($action, $host_q, $host, $field="") {
       <input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state>
     </td>
   </tr>
-  ";
+";
   }
 
   $block = "
@@ -543,21 +541,21 @@ function html_host_form($action, $host_q, $host, $field="") {
   <tr>
   <th>
   $l_user
-  <a href=\"\" onclick=\"window.open('$path/user/user_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_host_select_user)."&amp;ext_widget=f_host.param_user&amp;ext_widget_text=f_host.tf_user_login','User','height=$popup_height,width=$popup_width'); return false;\">
+  <a href=\"\" onclick=\"window.open('$path/user/user_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_host_select_user)."&amp;ext_widget=f_host.user_id&amp;ext_widget_text=f_host.tf_user_login','User','height=$popup_height,width=$popup_width'); return false;\">
    <img src=\"$ico_user\" alt=\"\" /></a>
   </th>
    
     <td>
-    <input type=\"hidden\" name=\"param_user\" value=\"$u_id\" />
+    <input type=\"hidden\" name=\"user_id\" value=\"$u_id\" />
     <input type=\"text\" name=\"tf_user_login\" value=\"$u_login\" readonly=\"readonly\" onfocus=\"this.blur();\" />
-    <input type=\"button\" value=\"$l_clear\" onclick=\"this.form.param_user.value='';this.form.tf_user_login.value='';\" />
+    <input type=\"button\" value=\"$l_clear\" onclick=\"this.form.user_id.value='';this.form.tf_user_login.value='';\" />
     </td>
   </tr>
 
   </table>
   </fieldset>
   $dis_web
-  ";
+";
 
   if ($cgp_use["service"]["firewall"]) {
     $block .= "
@@ -585,7 +583,7 @@ function html_host_form($action, $host_q, $host, $field="") {
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_but = "
-      <input type=\"hidden\" name=\"param_host\" value=\"$id\" />
+      <input type=\"hidden\" name=\"host_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
@@ -628,7 +626,7 @@ function dis_host_display_pref($prefs) {
 // Parameters:
 //   - $id : host id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_warn_delete($id) {
+function dis_host_warn_delete($id) {
   global $display, $l_warn_delete, $l_delete, $l_can_delete, $l_back;
   global $l_cant_delete_mailserver;
 
@@ -645,7 +643,7 @@ function dis_warn_delete($id) {
       <form method=\"get\" name=\"form_delete\"
       action=\"" .url_prepare("host_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"delete\" />
-      <input type=\"hidden\" name=\"param_host\" value=\"$id\" />
+      <input type=\"hidden\" name=\"host_id\" value=\"$id\" />
       <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
       </form>
     </p>";
@@ -656,7 +654,7 @@ function dis_warn_delete($id) {
       <form name=\"form_back\" method=\"get\"
       action=\"" .url_prepare("host_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-      <input type=\"hidden\" name=\"param_host\" value=\"$id\" />
+      <input type=\"hidden\" name=\"host_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>
     </p>";
@@ -672,7 +670,7 @@ function dis_warn_delete($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the context about a host insertion or update                     //
+// Display the context about a host insertion or update
 // When similar hosts exist we show these and ask confirmation
 // Parameters:
 //   - $id       : host id
@@ -694,7 +692,7 @@ function dis_host_warn_insert($id, $h_q, $host) {
     $samedesc = $h_q->f("host_description");
     $dis_same_host .= "
       <tr><td class=\"detailLabel\">
-        <a href=\"" .url_prepare("host_index.php?action=detailconsult&amp;param_host=$id") . "\">$samename ($samedesc)</a>
+        <a href=\"" .url_prepare("host_index.php?action=detailconsult&amp;host_id=$id") . "\">$samename ($samedesc)</a>
       </td></tr>";
   }
 

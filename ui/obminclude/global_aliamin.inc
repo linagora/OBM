@@ -285,4 +285,36 @@ function get_first_group_free_gid2() {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Return an array of all used IPs (hosts only for now)
+// Parameters:
+//   - $id  : Host id to exclude from the result
+// Returns:
+//   - $mails : array of used emails
+///////////////////////////////////////////////////////////////////////////////
+function get_ip_used($id="") {
+  global $cdg_sql, $php_regexp_email_name, $l_host;
+
+  $ips = array();
+  $query = "SELECT host_name, host_ip
+    FROM Host
+    WHERE host_id != '$id'";
+
+  display_debug_msg($query, $cdg_sql, "get_ip_used()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $ip = $obm_q->f("host_ip");
+    $hname = $obm_q->f("host_name");
+    $name = "$l_host : $hname";
+    $ips["$ip"] = "$name";
+  }
+
+  return $ips;
+}
+
+
+
+
 ?>

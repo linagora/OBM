@@ -10,15 +10,15 @@
 // - index (default) -- search fields  -- show the user search form
 // - search          -- search fields  -- show the result set of search
 // - new             --                -- show the new user form
-// - detailconsult   -- $param_user    -- show the user detail
-// - detailupdate    -- $param_user    -- show the user detail form
+// - detailconsult   -- $user_id       -- show the user detail
+// - detailupdate    -- $user_id       -- show the user detail form
 // - insert          -- form fields    -- insert the user
-// - reset           -- $param_user    -- reset user preferences
+// - reset           -- $user_id       -- reset user preferences
 // - update          -- form fields    -- update the user
-// - check_delete    -- $param_user    -- check links before delete
-// - delete          -- $param_user    -- delete the user
-// - group_consult   -- $param_user    -- show the user groups form
-// - group_update    -- $param_user    -- update the user groups
+// - check_delete    -- $user_id       -- check links before delete
+// - delete          -- $user_id    -- delete the user
+// - group_consult   -- $user_id    -- show the user groups form
+// - group_update    -- $user_id    -- update the user groups
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple users (return id) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,8 +37,8 @@ require("user_query.inc");
 require("user_js.inc");
 require("$obminclude/lib/right.inc"); // needed by call from calendar
 
-// detailconsult can be accessed without param_user (-> display current user)
-if (($action == "detailconsult") && (! $param_user)) $param_user = $uid;
+// detailconsult can be accessed without user_id (-> display current user)
+if (($action == "detailconsult") && (! $params["user_id"])) $params["user_id"] = $uid;
 
 get_user_action();
 $perm->check_permissions($module, $action);

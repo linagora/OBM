@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// ALIAMIN - File : host_index.php                                           //
-//         - Desc : Host Index File                                          //
+// OBM - File : host_index.php                                               //
+//     - Desc : Host Index File                                              //
 // 2004-09-09 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -10,12 +10,12 @@
 // - index (default) -- search fields  -- show the host search form
 // - search          -- search fields  -- show the result set of search
 // - new             --                -- show the new host form
-// - detailconsult   -- $param_host    -- show the host detail
-// - detailupdate    -- $param_host    -- show the host detail form
+// - detailconsult   -- host_id        -- show the host detail
+// - detailupdate    -- host_id        -- show the host detail form
 // - insert          -- form fields    -- insert the host
 // - update          -- form fields    -- update the host
-// - check_delete    -- $param_group   -- check the host
-// - delete          -- $param_group   -- delete the host
+// - check_delete    -- $host_id       -- check the host
+// - delete          -- $host_id       -- delete the host
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
@@ -26,13 +26,12 @@ $module = "host";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
-
+$params = get_host_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 include("host_display.inc");
 include("host_query.inc");
 
-$host = get_param_host();
 if ($action == "") $action = "index";
 get_host_action();
 $perm->check_permissions($module, $action);
@@ -49,16 +48,16 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
   require("host_js.inc");  
-  $display["search"] = html_host_search_form($host);
+  $display["search"] = html_host_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_host_search_list($host);
+    $display["result"] = dis_host_search_list($params);
   } else {
     $display["msg"] = display_info_msg($l_no_display);
   }
 
 } else if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_host_search_form($host);
+  $display["search"] = html_host_search_form($params);
   if ($set_display == "yes") {
     $display["result"] = dis_host_search_list("");
   } else {
@@ -68,93 +67,97 @@ if ($action == "ext_get_id") {
 } else if ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   require("host_js.inc");
-  $display["search"] = html_host_search_form($host);
-  $display["result"] = dis_host_search_list($host);
+  $display["search"] = html_host_search_form($params);
+  $display["result"] = dis_host_search_list($params);
 
 } else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_host_form($action, "", $host);
+  $display["detail"] = html_host_form($action, "", $params);
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_host_consult($host);
+  $display["detail"] = dis_host_consult($params);
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($host["id"]);
-  $display["detail"] = html_host_form($action, $obm_q, $host);
+  $obm_q = run_query_host_detail($params["host_id"]);
+  $display["detail"] = html_host_form($action, $obm_q, $params);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($host)) {
+  if (check_host_data_form($params)) {
     
     // If the context (same host) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $retour = run_query_insert($host);
+      $retour = run_query_host_insert($params);
       if ($retour) {
-	update_update_state();
+	// Aliamin
+	//	update_update_state();
 	$display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
 	$display["msg"] .= display_err_msg($l_insert_error);
       }
-      $display["search"] = html_host_search_form($host);
+      $display["search"] = html_host_search_form($params);
       
       // If it is the first try, we warn the user if some hosts seem similar
     } else {
-      $obm_q = check_host_context("", $host);
+      $obm_q = check_host_context("", $params);
       if ($obm_q->num_rows() > 0) {
-	$display["detail"] = dis_host_warn_insert("", $obm_q, $host);
+	$display["detail"] = dis_host_warn_insert("", $obm_q, $params);
       } else {
-	$retour = run_query_insert($host);
+	$retour = run_query_host_insert($params);
 	if ($retour) {
-	  update_update_state();
+	  // aliamin
+	  //	  update_update_state();
 	  $display["msg"] .= display_ok_msg($l_insert_ok);
 	} else {
 	  $display["msg"] .= display_err_msg($l_insert_error);
 	}
-	$display["search"] = html_host_search_form($host);
+	$display["search"] = html_host_search_form($params);
       }
     }
     
     // Form data are not valid
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"].= html_host_form($action, "", $host, $err_field);
+    $display["detail"].= html_host_form($action, "", $params, $err_field);
   }
 
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($host)) {
-    $retour = run_query_update($host);
+  if (check_host_data_form($params)) {
+    $retour = run_query_host_update($params);
     if ($retour) {
-      update_update_state();
+      // aliamin
+      //      update_update_state();
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $display["detail"] = dis_host_consult($host);
+    $display["detail"] = dis_host_consult($params);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $host_q = run_query_detail($host["id"]);
-    $display["detail"] = html_host_form($action, $host_q, $host, $err_field);
+    $host_q = run_query_host_detail($params["host_id"]);
+    $display["detail"] = html_host_form($action, $host_q, $params, $err_field);
   }
-} elseif ($action == "showlist")  {
+} elseif ($action == "showlist") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($param_host);
+  $obm_q = run_query_host_detail($params["host_id"]);
   if ($obm_q->num_rows() == 1) {
     $display["detail"] = html_host_consult_web($obm_q);
   } else {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_warn_delete($host["id"]);
+  $display["detail"] = dis_host_warn_delete($params["host_id"]);
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($host["id"]);
+  $retour = run_query_host_delete($params["host_id"]);
   if ($retour) {
-    update_update_state();
+    // aliamin
+    //    update_update_state();
     $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
@@ -194,53 +197,19 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores in $host hash, Host parameters transmited
-// returns : $host hash with parameters set
+// Stores in $params hash, Host parameters transmited
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_host() {
-  global $action, $param_host, $cdg_param, $popup, $child_res;
-  global $new_order, $order_dir, $entity;
-  global $tf_name, $tf_ip, $tf_desc, $cb_samba;
-  global $HTTP_POST_VARS, $HTTP_GET_VARS;
-  global $popup, $ext_title, $ext_target;  
-  global $ext_widget, $ext_widget_text;  
-  global $cb_web_perms, $cb_ftp_perms, $ta_firewall_perms;
-  global $rb_web_all, $ta_web_list;  
-  global $param_user;
+function get_host_params() {
+  global $ta_firewall_perms;
 
-  if (isset ($popup)) $host["popup"] = $popup;
-  if (isset ($ext_title)) $host["ext_title"] = stripslashes(urldecode($ext_title));
-  if (isset ($ext_target)) $host["ext_target"] = $ext_target;
-  if (isset ($ext_widget)) $host["ext_widget"] = $ext_widget;
-  if (isset ($ext_widget_text)) $host["ext_widget_text"] = $ext_widget_text;
-  
+  // Get global params
+  $params = get_global_params("Host");
+
   // Group fields
-  if (isset ($param_host)) $host["id"] = $param_host;
-  if (isset ($tf_name)) $host["name"] = trim($tf_name);
-  if (isset ($tf_desc)) $host["desc"] = trim($tf_desc);
-  if (isset ($tf_ip)) $host["ip"] = $tf_ip;
-  if (isset ($cb_samba)) $host["samba"] = $cb_samba;
-  if (isset ($cb_web_perms)) $host["web_perms"] = $cb_web_perms;
-  if (isset ($cb_ftp_perms)) $host["ftp_perms"] = $cb_ftp_perms;
-  if (isset ($ta_firewall_perms)) $host["firewall_perms"] = cleanup($ta_firewall_perms);
-  if (isset ($param_user)) $host["user_id"] = $param_user;
-  if (isset ($rb_web_all)) $host["web_all"] = $rb_web_all;
-  if (isset ($ta_web_list)) $host["web_list"] = $ta_web_list;
-  
-  if (isset ($new_order)) $host["new_order"] = $new_order;
-  if (isset ($order_dir)) $host["order_dir"] = $order_dir;
-  if (isset ($entity)) $host["entity"] = $entity;
+  if (isset ($ta_firewall_perms)) $params["firewall_perms"] = cleanup($ta_firewall_perms);
 
-  if (debug_level_isset($cdg_param)) {
-    echo "action=$action";
-    if ( $host ) {
-      while ( list( $key, $val ) = each( $host ) ) {
-        echo "<br>host[$key]=$val";
-      }
-    }
-  }
-
-  return $host;
+  return $params;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -294,7 +263,7 @@ function cleanup($str) {
 // Host Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_host_action() {
-  global $host, $actions, $path, $l_host;
+  global $params, $actions, $path, $l_host;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
@@ -324,7 +293,7 @@ function get_host_action() {
 // Detail Consult
   $actions["host"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/host/host_index.php?action=detailconsult&amp;param_host=".$host["id"]."",
+    'Url'      => "$path/host/host_index.php?action=detailconsult&amp;host_id=".$params["host_id"]."",
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate','showlist') 
                                   );
@@ -332,38 +301,38 @@ function get_host_action() {
 // Detail Update
   $actions["host"]["detailupdate"] = array (
      'Name'     => $l_header_update,
-     'Url'      => "$path/host/host_index.php?action=detailupdate&amp;param_host=".$host["id"]."",
+     'Url'      => "$path/host/host_index.php?action=detailupdate&amp;host_id=".$params["host_id"]."",
      'Right'    => $cright_write,
-     'Condition'=> array ('detailconsult', 'showlist', 'update') 
+     'Condition'=> array ('detailconsult', 'showlist', 'update')
                                      	   );
-					   
+			   
 // Show List
   $actions["host"]["showlist"] = array (
-     'Url'      => "$path/host/host_index.php?action=showlist&amp;param_host=".$obm_user["id"]."",
+     'Url'      => "$path/host/host_index.php?action=showlist&amp;host_id=".$obm_user["host_id"]."",
      'Right'    => $cright_read,
-     'Condition'=> array ('None') 
+     'Condition'=> array ('None')
                                      	   );
-					   
+
 // Insert
   $actions["host"]["insert"] = array (
     'Url'      => "$path/host/host_index.php?action=insert",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // Update
   $actions["host"]["update"] = array (
     'Url'      => "$path/host/host_index.php?action=update",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // Check Delete
   $actions["host"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/host/host_index.php?action=check_delete&amp;param_host=".$host["id"]."",
+    'Url'      => "$path/host/host_index.php?action=check_delete&amp;host_id=".$params["host_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'showlist', 'showlist', 'detailupdate') 
+    'Condition'=> array ('detailconsult', 'showlist', 'showlist', 'detailupdate')
                                      	   );
 
 // Delete

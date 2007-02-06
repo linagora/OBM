@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// ALIAMIN - Language : French                                               //
-//         - File     : host.inc                                             //
+// OBM - Language : French                                                   //
+//     - File     : host.inc                                                 //
 // 2004-09-09 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -29,15 +29,12 @@ $l_web_access = "Accès Internet";
 $l_restrict = "restrictions";
 $l_not_assigned = "Non assigné";
 $l_mailserver = "Serveur de mail";
-$l_query_error = "Problème en exécutant la requête";
 
 // Labels et textes
 $l_host_display = "Options d'affichage des listes d'hôtes";
 $l_consult_web_list = "Consulter la liste d'url";
 // Actions
-$l_insert = "Enregistrer l'hôte";
-$l_update = "Modifier l'hôte";
-$l_delete = "Supprimer l'hôte";
+$l_clear = "Rompre l'association";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les hôtes correspondants.";

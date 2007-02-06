@@ -514,7 +514,7 @@ function html_user_consult($obm_q) {
       $dis_access = "
       <tr>
         <th>$l_web_mode</th>
-        <td>$web_access (<a href=\"$path/user/user_index.php?action=showlist&amp;param_user=$id\" >$l_web_consult_list</a>)</td>
+        <td>$web_access (<a href=\"$path/user/user_index.php?action=showlist&amp;user_id=$id\" >$l_web_consult_list</a>)</td>
       </tr>";
     }
     $web_section = "
@@ -1012,7 +1012,7 @@ function html_user_form($usr_q, $user) {
       $dis_access = "
       <tr>
         <th>$l_web_mode</th>
-        <td>$web_access (<a href=\"$path/user/user_index.php?action=showlist&amp;param_user=$id\" >$l_web_consult_list</a>)</td>
+        <td>$web_access (<a href=\"$path/user/user_index.php?action=showlist&amp;user_id=$id\" >$l_web_consult_list</a>)</td>
       </tr>";
     }
     $web_section = "

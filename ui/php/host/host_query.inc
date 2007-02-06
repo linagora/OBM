@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// ALIAMIN - File : host_query.inc                                           //
-//         - Desc : host query File                                          //
+// OBM - File : host_query.inc                                               //
+//     - Desc : host query File                                              //
 // 2004-09-09 Aliacom                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -14,14 +14,16 @@
 //   - $host[]   : host search criteria
 //     keys used : name, user
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($host) {
+function run_query_host_search($host) {
   global $cdg_sql, $ctu_sql_limit;
   
+  $sql_order_dir = $host["sql_order_dir"];
+  $sql_order_field = $host["sql_order_field"];
+  $multidomain = sql_multidomain("host");
+
   $name = sql_search_text_parse($host["name"]);
   $ip = sql_search_text_parse($host["ip"]);
   $samba = $host["samba"];
-  $new_order = $host["new_order"];
-  $order_dir = $host["order_dir"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -40,11 +42,11 @@ function run_query_search($host) {
   if ($samba != '') {
     $where .= " AND host_samba = 1";
   }
-  $whereq = "WHERE $where";
+  $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
-  $order = (strcmp($new_order,"") != 0) ? $new_order : "host_name";
-  $orderq .= " ORDER BY $order $order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "host_name";
+  $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "SELECT DISTINCT Host.*,
       host_id as id,
@@ -64,8 +66,8 @@ function run_query_search($host) {
     $obm_q->set_num_rows_total($count);
   }
 
-  if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql);
+  if (($count > 0) || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql, "run_query_host_search()");
     $obm_q->query($query);
   }
 
@@ -78,7 +80,7 @@ function run_query_search($host) {
 // Parameters:
 //   - $id : host id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($id) {
+function run_query_host_detail($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -86,6 +88,7 @@ function run_query_detail($id) {
 
   $timeupdate = sql_date_format($db_type,"host_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"host_timecreate", "timecreate");
+  $multidomain = sql_multidomain("host");
 
   $query = "SELECT *,
       $timecreate,
@@ -100,8 +103,9 @@ function run_query_detail($id) {
          LEFT JOIN UserObm as u ON host_userupdate=u.userobm_id
          LEFT JOIN UserObm as uo ON host_id=uo.userobm_host_id
          LEFT JOIN Mail ON host_id=mail_value AND mail_name LIKE '%mailserver'
-    WHERE host_id = '$id'";
-  display_debug_msg($query, $cdg_sql);
+    WHERE host_id = '$id'
+      $multidomain";
+  display_debug_msg($query, $cdg_sql, "run_query_host_detail()");
   $obm_q->query($query) ;
   $obm_q->next_record();
 
@@ -114,9 +118,10 @@ function run_query_detail($id) {
 // Parameters:
 //   - $host[] : host hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($host) {
-  global $uid, $cdg_sql, $cg_gid_smb_host;
+function run_query_host_insert($host) {
+  global $uid, $obm, $cdg_sql, $cg_gid_smb_host;
 
+  $domain_id = $obm["domain_id"];
   $name = $host["name"];
   $ip = $host["ip"];
   $samba = ($host["samba"] == 1) ? 1 : 0;
@@ -161,7 +166,7 @@ function run_query_insert($host) {
     '$ftp_perms',
     '$firewall_perms')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_host_insert(1)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -190,7 +195,7 @@ function run_query_insert($host) {
       host_ftp_perms='$ftp_perms' and
       host_firewall_perms='$firewall_perms'";
 
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_host_insert(2)");
     $retour = $obm_q->query($query);
 
     // Mise a jour du lien
@@ -205,7 +210,7 @@ function run_query_insert($host) {
       WHERE
           userobm_id='$user_id'";
 
-      display_debug_msg($query, $cdg_sql);
+      display_debug_msg($query, $cdg_sql, "run_query_host_insert(3)");
       $retour = $obm_q->query($query);
     }
   }
@@ -219,10 +224,10 @@ function run_query_insert($host) {
 // Parameters:
 //   - $host[] : host hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($host) {
+function run_query_host_update($host) {
   global $uid, $cdg_sql;
 
-  $id = $host["id"];
+  $id = $host["host_id"];
   $name = $host["name"];
   $ip = $host["ip"];
   $samba = ($host["samba"] == 1) ? 1 : 0;
@@ -234,7 +239,7 @@ function run_query_update($host) {
   $desc = $host["desc"];
   $now = date("Y-m-d H:i:s");
   
-  $query = "update Host set
+  $query = "UPDATE Host SET
     host_timeupdate='$now',
     host_userupdate='$uid',
     host_samba='$samba',
@@ -246,9 +251,9 @@ function run_query_update($host) {
     host_web_list='$web_list',    
     host_ftp_perms='$ftp_perms',
     host_firewall_perms='$firewall_perms'
-  where host_id='$id'";
+  WHERE host_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_host_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -257,11 +262,11 @@ function run_query_update($host) {
   if ($retour) {
 
     // Suppression de l'ancien lien user=>host
-    $query = "update UserObm 
-    set userobm_timeupdate='$now',
+    $query = "UPDATE UserObm 
+    SET userobm_timeupdate='$now',
         userobm_userupdate='$uid',
         userobm_host_id='0'
-    where
+    WHERE
         userobm_host_id='$id'";
     $retour = $obm_q->query($query);
 
@@ -270,18 +275,17 @@ function run_query_update($host) {
       $user_id = 0;
     if ($retour && $user_id != 0) {
       // Creation du nouveau lien user=>host
-      $query = "update UserObm 
-      set userobm_timeupdate='$now',
+      $query = "UPDATE UserObm 
+      SET userobm_timeupdate='$now',
           userobm_userupdate='$uid',
           userobm_host_id='$id'
-      where
+      WHERE
           userobm_id='$user_id'";
 
-      display_debug_msg($query, $cdg_sql);
+      display_debug_msg($query, $cdg_sql, "run_query_host_update()");
       $retour = $obm_q->query($query);
     }
   }
-
 
   return $retour;
 }
@@ -292,12 +296,12 @@ function run_query_update($host) {
 // Parameters:
 //   - $p_id : host id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_host_delete($p_id) {
   global $cdg_sql;
 
   // Delete the Host
   $query = "DELETE FROM Host WHERE host_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_host_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -314,7 +318,7 @@ function run_query_delete($p_id) {
     WHERE
         userobm_host_id='$p_id'";
 
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_host_delete()");
     $retour = $obm_q->query($query);
   }
 
@@ -334,11 +338,12 @@ function get_host_info($id) {
     return false;
   }
 
-  $query = "SELECT * FROM Host
-                LEFT JOIN Mail ON mail_value=$id AND mail_name LIKE '%mailserver'
-                WHERE host_id='$id'";
+  $query = "SELECT *
+    FROM Host
+      LEFT JOIN Mail ON mail_value=$id AND mail_name LIKE '%mailserver'
+    WHERE host_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_host_info()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -367,11 +372,11 @@ function get_host_name_exists($name, $id="") {
     $where_id = "host_id!='$id' and";
   }
 
-  $query = "select host_id, host_name
-    from Host
-    where $where_id host_name='$name'";
+  $query = "SELECT host_id, host_name
+    FROM Host
+    WHERE $where_id host_name='$name'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_host_name_exists()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -424,7 +429,7 @@ function run_query_check_host($id, $name, $desc) {
      where $where_id
        ($wname $wdesc)";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_check_host()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -459,13 +464,13 @@ function check_host_context($id, $host) {
 //   - $host[]  : values checked
 //     keys used : name, desc, email
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($host) {
+function check_host_data_form($host) {
   global $php_regexp_hostname, $l_err_host_name_empty, $l_err_host_name_exist;
   global $cgp_use, $err_msg, $err_field, $l_err_host_name;
   global $php_regexp_ip, $l_err_host_ip, $l_err_host_ip_exist;
   global $l_err_host_ip_not_in_lan, $l_err_firewall_perms, $l_err_web_all;
 
-  $id = $host["id"];
+  $id = $host["host_id"];
   $name = $host["name"];
   $ip = $host["ip"];
   $web_list = $host["web_list"];
@@ -510,7 +515,7 @@ function check_data_form($host) {
       return false;
     }
     // IP is in a network :
-    if($cgp_use["service"]["network"]) {
+    if ($cgp_use["service"]["network"]) {
       if (!is_ip_in_an_internal_network($ip)) {
         $err_msg = "$l_err_host_ip_not_in_lan : $ip ";
         $err_field = "ip";
@@ -519,7 +524,7 @@ function check_data_form($host) {
     }
   }
  
-  if($cgp_use["service"]["web_local"]) {
+  if ($cgp_use["service"]["web_local"]) {
     // web_all must be 0 or 1
     if (($web_all != "0") && ($web_all != "1")) {
       $err_msg = $l_err_web_all;
