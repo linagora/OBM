@@ -433,6 +433,9 @@ function run_query_user_insert($user) {
     $id = false;
   }
 
+  if ($id > 0) {
+    $ret = of_userdata_query_update("user", $id, $user);
+  }
   // Subscribe the user to his default group
   run_query_user_init_group($user_id, $gid, NULL);
 
@@ -648,6 +651,9 @@ function run_query_user_update($p_id, $user) {
     $retour = run_query_user_unsubscribe_all_groups($p_id);    
   }
 
+  if ($retour) {
+    $ret = of_userdata_query_update("user", $p_id, $user);
+  }
   return $retour;
 }
 
@@ -661,6 +667,7 @@ function run_query_user_delete($p_id) {
   global $cdg_sql, $c_use_connectors;
 
   $multidomain = sql_multidomain("userobm");
+  $ret = of_userdata_query_delete("user", $p_id);
 
   $query = "DELETE FROM UserObm
     WHERE userobm_id='$p_id'

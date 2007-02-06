@@ -321,7 +321,7 @@ function of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
       // Mono Link
       $label = htmlentities($cats[0]["label"]); 
       $block_cat = "
-      <tr><th>".ucfirst(${$l_cat})." :$label</td></tr>
+      <tr><th>".ucfirst(${$l_cat})." </th><td>$label</td></tr>
       ";
 
     } else {

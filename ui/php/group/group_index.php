@@ -39,6 +39,7 @@ include("$obminclude/global_pref.inc");
 require("group_display.inc");
 require("group_query.inc");
 require("group_js.inc");
+require_once("$obminclude/of/of_category.inc");
 
 get_group_action();
 $perm->check_permissions($module, $action);
@@ -227,7 +228,9 @@ if (($action == "index") || ($action == "")) {
   $prefs = get_display_pref($uid, "group", 1);
   $prefs_u = get_display_pref($uid, "group_user", 1);
   $display["detail"] = dis_group_display_pref($prefs, $prefs_u);
-
+} elseif ($action == "admin") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_group_admin_index();
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
@@ -240,6 +243,7 @@ if (($action == "index") || ($action == "")) {
   }
 }
 
+of_category_user_action_switch($module, $action, $params);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
@@ -297,6 +301,8 @@ function get_group_action() {
   global $l_header_consult,$l_header_display,$l_header_admin;
   global $l_header_add_user, $l_add_user, $l_header_add_group, $l_add_group;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+
+  of_category_user_module_action("group");
 
 // Index
   $actions["group"]["index"] = array (
@@ -451,6 +457,13 @@ function get_group_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                       	 );
+// Admin
+  $actions["group"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/group/group_index.php?action=admin",
+    'Right'    => $cright_read_admin,
+    'Condition'=> array ('all')
+                                                 );
 
 }
 

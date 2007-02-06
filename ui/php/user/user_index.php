@@ -31,6 +31,7 @@ include("$obminclude/global.inc");
 $params = get_user_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
+require_once("$obminclude/of/of_category.inc");
 require("user_display.inc");
 require("user_query.inc");
 require("user_js.inc");
@@ -224,8 +225,12 @@ if ($action == "ext_get_ids") {
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
   $prefs = get_display_pref($auth->auth["uid"], "user", 1);
   $display["detail"] = dis_user_display_pref($prefs);
+} elseif ($action == "admin") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_user_admin_index();
 }
 
+of_category_user_action_switch($module, $action, $params);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
@@ -272,8 +277,10 @@ function get_user_action() {
   global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin,$l_header_reset;
-  global $l_header_upd_group;
+  global $l_header_upd_group,$l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+  
+  of_category_user_module_action("user");
 
 // Index
   $actions["user"]["index"] = array (
@@ -409,6 +416,15 @@ function get_user_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	 );
+
+// Admin
+  $actions["user"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/user/user_index.php?action=admin",
+    'Right'    => $cright_read_admin,
+    'Condition'=> array ('all')
+                                                 );
+
 
 }
 

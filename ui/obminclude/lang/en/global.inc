@@ -120,6 +120,7 @@ $l_aduplicate = "Duplicate";
 $l_hide = "Hide";
 $l_show = "Show";
 $l_advanced = "Advanced";
+$l_properties = "Properties";
 // Entities
 $l_company = "Company";
 $l_contact = "Contact";

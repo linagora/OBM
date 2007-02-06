@@ -341,6 +341,8 @@ function html_group_form($action, $group_q, $group) {
   </tr>";
   } 
 
+  $block_userdata = of_userdata_dis_entity_form("group", $id, $group);
+
   $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
 <fieldset class=\"detail infos\">
@@ -370,6 +372,7 @@ function html_group_form($action, $group_q, $group) {
     <td>
       <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
   </tr>
+  $block_userdata
   </table>
   </fieldset>";
 
@@ -458,10 +461,10 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $name = $group_q->f("group_name");
   $desc = $group_q->f("group_desc");
   $email = $group_q->f("group_email");
-
   //$mail = get_mail_info();
   //$main_domain = $mail["main_domain"];
 
+  $block_userdata .= of_userdata_dis_entity_consult("group", $id);
   // Affichage des groupes membres 
   $nb_g = $g_q->num_rows_total();
   if ($nb_g == 0) {
@@ -569,6 +572,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     </table>
     </div>
   
+    $block_userdata
   <div class=\"detail infos\">
     <h1>$l_desc</h1>
    
@@ -670,6 +674,16 @@ function dis_group_warn_insert($id, $g_q, $group) {
       <input type=\"submit\" value=\"$l_back\" />
       </form>
   </div>";
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the contact administration index
+///////////////////////////////////////////////////////////////////////////////
+function dis_group_admin_index() {
+
+  $block = of_userdata_dis_admin_form("group");
 
   return $block;
 }

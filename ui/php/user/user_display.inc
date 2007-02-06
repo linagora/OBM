@@ -484,6 +484,7 @@ function html_user_consult($obm_q) {
   $mail_ext_state  = ($mail_ext_perms ? $l_enabled : $l_disabled);
   $smb_state  = ($smb_perms ? $l_enabled : $l_disabled);
 
+  $block_userdata .= of_userdata_dis_entity_consult("user", $id);
   // Liste des groupes de l'utilisateur
   $g_q = run_query_user_user_group($id);
   if ($g_q->num_rows() > 0) {
@@ -695,7 +696,6 @@ function html_user_consult($obm_q) {
   </tr>
 </table>
 </div>
-
 <div class=\"detail infos\">
   <h1>$l_coord</h1>
   <table>
@@ -763,6 +763,7 @@ function html_user_consult($obm_q) {
   </tr>
   </table>
 </div>
+$block_userdata
 
 $web_section
 $mail_section
@@ -975,6 +976,8 @@ function html_user_form($usr_q, $user) {
   if (isset($user["smb_home"])) { $smb_home = stripslashes($user["smb_home"]); }
   if (isset($user["smb_home_drive"])) { $smb_home_drive = $user["smb_home_drive"]; }
   if (isset($user["smb_logon"])) { $smb_logon = $user["smb_logon"]; }
+
+  $block_userdata = of_userdata_dis_entity_form("user", $id, $user);
 
   // Domain
   if ($c_multidomain && $obm["domain_id"] == $c_default_domain) {
@@ -1208,6 +1211,7 @@ function html_user_form($usr_q, $user) {
     <th>$l_datebegin</th>
     <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
   </tr>
+  $block_userdata 
   </table>
   </fieldset>
 
@@ -1275,7 +1279,6 @@ function html_user_form($usr_q, $user) {
   </tr>
   </table>
   </fieldset>
-
 $web_section
 $mail_section
 $nomad_section
@@ -1591,6 +1594,17 @@ function dis_user_can_delete($p_id) {
 
   return $block;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the contact administration index
+///////////////////////////////////////////////////////////////////////////////
+function dis_user_admin_index() {
+
+  $block = of_userdata_dis_admin_form("user");
+
+  return $block;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

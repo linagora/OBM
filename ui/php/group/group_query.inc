@@ -228,6 +228,10 @@ function run_query_group_insert($group) {
 
   $g_id = run_query_group_id($group);
 
+  if ($g_id > 0) {
+    $ret = of_userdata_query_update("group", $g_id, $group);
+  }
+
   return $g_id;
 }
 
@@ -302,9 +306,12 @@ function run_query_group_update($group) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+  if ($id > 0) {
+    $ret = of_userdata_query_update("group", $id, $group);
+  }
+
   return $retour;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Deletion query execution
@@ -314,6 +321,7 @@ function run_query_group_update($group) {
 function run_query_group_delete($p_id) {
   global $cdg_sql;
 
+  $ret = of_userdata_query_delete("group", $p_id);
   // Delete all users registrations to this group
   $query = "DELETE FROM UserObmGroup WHERE userobmgroup_group_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
@@ -336,7 +344,6 @@ function run_query_group_delete($p_id) {
 
   return $retour;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : UserObmGroup conditionnal insertion

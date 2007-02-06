@@ -126,7 +126,7 @@ $l_aduplicate = "Duplicata";
 $l_hide = "Masquer";
 $l_show = "Afficher";
 $l_advanced = "Avancé";
-
+$l_properties = "Propriétés";
 // Entities
 $l_company = "Société";
 $l_contact = "Contact";
