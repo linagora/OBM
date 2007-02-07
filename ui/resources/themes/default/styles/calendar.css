@@ -345,6 +345,9 @@ li.freeBusy {
 
 .infoPopup {
   display: none;
+  position: absolute;
+  background-color: #fff;
+  width: 20em;
 }
 
 .infoPopup h1{
@@ -354,7 +357,7 @@ li.freeBusy {
   font-size: 100%;
   background-image: url('../images/popup_title_border.png');
   background-repeat: repeat-x;
-  background-position: 0 0.5em;  
+  background-position: 0 0.5em; 
 }
 
 .infoPopup h2{
@@ -366,7 +369,12 @@ li.freeBusy {
   margin: 0;
 }
 
+.infoPopup ul{
+  margin: 0;
+  padding:0;
+  list-style: none;
+}
+
 .infoPopup li{
-  display: inline;
   padding-left: 1.5em;
 }

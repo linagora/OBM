@@ -2711,7 +2711,7 @@ Class OccurrenceFactory {
           $eventDuration = $occurence->event->duration;
           $eventDate = $occurence->date;
           if($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate) {
-            $occurences[] = &$occurence;
+            $occurences[] = $occurence;
           }
         }
       }

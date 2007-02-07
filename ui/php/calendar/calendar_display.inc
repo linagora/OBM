@@ -1038,8 +1038,11 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
   
   $nb_ent = $nb_user + $nb_res;
    
-  calendar_events_model($start_time,$end_time, $calendar_entity);
+  $day_duration = 86400;
+
+  $events = calendar_events_model($start_time,$end_time, $calendar_entity);
   $of = &OccurrenceFactory::getInstance();
+
   $current_time = $start_time;
   $day_amount = 0;
   while($current_time < $end_time) {
@@ -1049,28 +1052,23 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
     $day_label = $l_daysofweekfirst[$day_num];
     $day_long_label = $l_daysofweek[$day_num];
     $iso_day = of_isodate_format($current_time);
-    if (isset($events[$iso_day])) {
-      $empty = false;
-      $day = $events[$iso_day];
-      $days_events = $day->day_events;
-    } else {
-      $empty = true;
-    }
+
+    $empty = !$of->periodHaveOccurrences($current_time,$day_duration);
     $line0 .= "<th>$day_label</th>\n";
     $line1 .= "<td>$this_day</td>\n";
-//    $occurences = $of->getPeriodOccurrences();
     foreach ($calendar_entity as $type => $entity) {
       foreach ($entity as $id => $properties) {
+        $haveevent = false;
         $line_id = $type." ".$id;
         if($empty) {
           $line[$line_id] .= "<td></td>";
         } else {
           $today_events = array();
-          $list_events = $days_events[$type][$id];
-          $events_data = $day->get_events($id,$type);
-          if ($list_events != null) {
+          $occurences = $of->getPeriodOccurrences($current_time,$day_duration,array($type => array($id)));
+          if ($occurences != null) {
             $haveevent = true;
-            foreach ($list_events as $event) {
+            foreach ($occurences as $occurence) {
+              $event = &$occurence->event;
               if ($event->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
                 $today_events[] = "$l_private : $l_all_day";
               } else {
@@ -1078,20 +1076,10 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
               }
             }            
           }
-          if(is_array($events_data)) {
-            $haveevent = true;
-            foreach ($events_data as $event) {
-              if ($event->privacy == 1 && $auth->auth["uid"] != $id) {
-                $today_events[] = "$l_private : ".date("H:i",$event["date"])."-".date("H:i",$event["date"] + $event["event"]->duration);
-              } else {
-                $today_events[] = $event["event"]->title." : ".date("H:i",$event["date"])."-".date("H:i",$event["date"] + $event["event"]->duration);
-              }
-            }
-          }
           if($haveevent) {
             $hidden_div .= "
-              <div id=\"$id-$this_day\" class=\"popupInfo\">
-               <h1>::$day_long_label $this_day</h1>
+              <div id=\"$id-$this_day\" class=\"infoPopup\">
+               <h1>$day_long_label $this_day</h1>
                <ul>
                <li>
                ".implode("</li><li>",$today_events)."
@@ -1099,8 +1087,8 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
                </ul>
               </div>";            
             $line[$line_id] .= "<td class=\"".$properties["class"]."\"
-                                    onMouseOver=\"calendar_show(event,'$id-$this_day'); return true;\"
-                                    onMouseOut=\"calendar_hide('$id-$this_day'); return true;\"></td>";
+                                    onmouseover=\"toggleInfo(this,'$id-$this_day'); return true;\"
+                                    onmouseout=\"toggleInfo(this,'$id-$this_day'); return true;\"></td>";
           } else {
             $line[$line_id] .= "<td></td>";
           }
@@ -1138,6 +1126,19 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
   </thead>
   $d_l
   </table>
+  <script type=\"text/javascript\">
+    function toggleInfo(container,id) {
+      resource = \$(id);
+      if(resource) 
+        if(resource.getStyle('display') == 'block') {
+          resource.setStyle('display','none');       
+        } else {
+          resource.setStyle('left',(container.getLeft()+container.offsetWidth)+'px')   
+          resource.setStyle('top',(container.getTop()+container.offsetHeight)+'px')   
+          resource.setStyle('display','block');
+        }
+    }
+  </script>  
   $hidden_div
     ";    
 
@@ -2572,8 +2573,8 @@ function dis_calendar_free_interval($calendar, $entity_store) {
         } elseif ($will_have_event) {
           if($have_resource_grp) {
             $week_cal .= "<td class=\"free\" onclick=\"window.location='$goto'\"
-             onmouseover=\"this.className='hover';this.style.cursor = 'pointer';toggleResource('$current_time');\"
-             onmouseout=\"this.className ='free';toggleResource('$current_time');\">&nbsp;</td>\n";
+             onmouseover=\"this.className='hover';this.style.cursor = 'pointer';toggleResource(this,'$current_time');\"
+             onmouseout=\"this.className ='free';toggleResource(this,'$current_time');\">&nbsp;</td>\n";
           } else {
             $week_cal .= "<td class=\"free\" onclick=\"window.location='$goto'\"
              onmouseover=\"this.className='hover';this.style.cursor = 'pointer';\"
@@ -2582,8 +2583,8 @@ function dis_calendar_free_interval($calendar, $entity_store) {
         } else {
           if($have_resource_grp) {
             $week_cal .= "<td  onclick=\"window.location='$goto'\"
-             onmouseover=\"this.className='hover';this.style.cursor = 'pointer';toggleResource('$current_time');\"
-             onmouseout=\"this.className='';toggleResource('$current_time');\">&nbsp;</td>\n";
+             onmouseover=\"this.className='hover';this.style.cursor = 'pointer';toggleResource(this,'$current_time');\"
+             onmouseout=\"this.className='';toggleResource(this,'$current_time');\">&nbsp;</td>\n";
           } else {
             $week_cal .= "<td onclick=\"window.location='$goto'\"
              onmouseover=\"this.className='hover';this.style.cursor = 'pointer';\"
@@ -2613,13 +2614,16 @@ function dis_calendar_free_interval($calendar, $entity_store) {
     </tbody>
   </table>
   <script type=\"text/javascript\">
-    function toggleResource(time) {
+    function toggleResource(container,time) {
       resource = \$('resource-'+time);
       if(resource) 
         if(resource.getStyle('display') == 'block')
           resource.setStyle('display','none');
-        else 
+        else {
+          resource.setStyle('left',(container.getLeft()+container.offsetWidth)+'px')   
+          resource.setStyle('top',(container.getTop()+container.offsetHeight)+'px')
           resource.setStyle('display','block');
+        } 
     }
   </script>
   <div>
