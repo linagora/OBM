@@ -92,7 +92,7 @@ function run_query_mailshare_detail($id) {
 
   $timeupdate = sql_date_format($db_type,"mailsharedir_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"mailsharedir_timecreate", "timecreate");
-  $multidomain = sql_multidomain("malshare");
+  $multidomain = sql_multidomain("mailshare");
 
   $query = "SELECT *,
       $timecreate,

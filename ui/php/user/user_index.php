@@ -136,8 +136,8 @@ if ($action == "ext_get_ids") {
 
   // Form data are not valid
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
-    $display["detail"] = html_user_form("", $params);
+    $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err["msg"]);
+    $display["detail"] = html_user_form("", $params, $err["field"]);
   }
 
 } elseif ($action == "reset") {
@@ -159,7 +159,7 @@ if ($action == "ext_get_ids") {
     $display["detail"] = dis_user_consult($params);
   } else {
     $display["msg"] .= display_err_msg($err["msg"]);
-    $display["detail"] = html_user_form("", $params);
+    $display["detail"] = html_user_form("", $params, $err["field"]);
   }
 
 } elseif ($action == "check_delete") {

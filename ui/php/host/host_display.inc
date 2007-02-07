@@ -73,7 +73,7 @@ function html_host_search_form($host) {
     $ext_widget_text = $host["ext_widget_text"];
     $ext_url = $host["ext_url"];
     $ext_id = $host["ext_id"];
-    $ext_title = stripslashes($host["ext_title"]);
+    $ext_title = $host["ext_title"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
       <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
       <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
@@ -99,8 +99,7 @@ function html_host_search_form($host) {
     $block_samba = "
     <label>$l_smb_only<br />
       <input type=\"checkbox\" name=\"cb_samba\" value=\"1\" $smb />
-    </label>
-    ";
+    </label>";
   }
 
 
@@ -338,8 +337,7 @@ function html_host_consult($host_q) {
     $block_mail
     </table>
     </div>
-    $web_section
-";
+    $web_section";
 
   if ($cgp_use["service"]["firewall"]) {
     $block .= "
@@ -394,7 +392,7 @@ function html_host_consult_web($host_q) {
       <td colspan=\"2\">$list</td>
     </tr>
   </table>
-  </div>   ";
+  </div>";
 
   return $block;
 }
@@ -456,10 +454,15 @@ function html_host_form($action, $host_q, $host, $field="") {
   $web_state  = ($web_perms ? "checked" : "");
   $ftp_state  = ($ftp_perms ? "checked" : "");
 
+  // Mark the error field
+  if ($field != "") {
+    $class[$field] = "error";
+  }
+
   $class_name = ($field == "name") ? "error" : "";
   $class_ip = ($field == "ip") ? "error" : "";
-  $class_web_list =  ($field == "web_list") ? "error" : "";
-  $class_web_mode =  ($field == "web_mode") ? "error" : "";
+  $class_web_list = ($field == "web_list") ? "error" : "";
+  $class_web_mode = ($field == "web_mode") ? "error" : "";
 
   $display["detailInfo"] = display_record_info($host_q);
   $display["title"] = "<h1 class=\"title\">$l_module_host : $name</h1>";
@@ -470,7 +473,7 @@ function html_host_form($action, $host_q, $host, $field="") {
 
     $block_web_local = "
     <tr>
-      <th class=\"$class_web_mode\">$l_web_mode</th>
+      <th class=\"$class[web_mode]\">$l_web_mode</th>
       <td>
         <input type=\"radio\" name=\"rd_web_all\" value=\"1\" $web_all_c1>
         $l_web_all
@@ -479,38 +482,35 @@ function html_host_form($action, $host_q, $host, $field="") {
       </td>
     </tr>    
     <tr>
-      <th class=\"$class_web_list\">$l_web_list</th>
+      <th class=\"$class[web_list]\">$l_web_list</th>
       <td>
         <textarea name=\"ta_web_list\" cols=\"40\" rows=\"6\">$web_list</textarea>
       </td>
-    </tr>
-";
+    </tr>";
 
     $dis_web = "
     <fieldset class=\"detail info\">
     <legend>$l_web_access</legend>
     <table>
     <tr>
-      <th>$l_web</th>
+      <th class=\"$class[web_perms]\">$l_web</th>
       <td>
         <input name=\"cb_web_perms\" type=\"checkbox\" value=\"1\" $web_state>
       </td>
       </tr>
     $block_web_local
       </table>
-    </fieldset>
-    ";
+    </fieldset>";
   }
 
   if ($cgp_use["service"]["samba"]) {
     $block_samba = "
   <tr>
-    <th>$l_smb</th>
+    <th class=\"$class[samba]\">$l_smb</th>
     <td>
       <input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state>
     </td>
-  </tr>
-";
+  </tr>";
   }
 
   $block = "
@@ -521,25 +521,25 @@ function html_host_form($action, $host_q, $host, $field="") {
 
   <table>
   <tr>
-    <th class=\"$class_name\">$l_name</th>
+    <th class=\"$class[name]\">$l_name</th>
     <td>
       <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />
     </td>
   </tr>
   <tr>
-    <th class=\"$class_ip\">$l_ip</th>
+    <th class=\"$class[ip]\">$l_ip</th>
     <td>
       <input name=\"tf_ip\" maxlength=\"16\" size=\"16\" value=\"$ip\" /></td>
   </tr>
   $block_samba
   <tr>
-    <th>$l_desc</th>
+    <th class=\"$class[desc]\">$l_desc</th>
     <td>
       <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"128\" />
     </td>
   </tr>
   <tr>
-  <th>
+  <th class=\"$class[user]\">
   $l_user
   <a href=\"\" onclick=\"window.open('$path/user/user_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_host_select_user)."&amp;ext_widget=f_host.user_id&amp;ext_widget_text=f_host.tf_user_login','User','height=$popup_height,width=$popup_width'); return false;\">
    <img src=\"$ico_user\" alt=\"\" /></a>
@@ -554,28 +554,26 @@ function html_host_form($action, $host_q, $host, $field="") {
 
   </table>
   </fieldset>
-  $dis_web
-";
+  $dis_web";
 
   if ($cgp_use["service"]["firewall"]) {
     $block .= "
-      <fieldset class=\"detail infos\">
-      <h1>$l_perms</h1>
+  <fieldset class=\"detail infos\">
+  <h1>$l_perms</h1>
 
   <table>
   <tr>
-    <td class=\"detailLabel\">$l_ftp</td>
-    <td class=\"detailForm\">
+    <th class=\"$class[ftp_perms]\">$l_ftp</td>
+    <td>
       <input name=\"cb_ftp_perms\" type=\"checkbox\" value=\"1\" $ftp_state>
     </td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_firewall</td>
-    <td class=\"detailForm\">
+    <th class=\"$class[firewall_perms]\">$l_firewall</td>
+    <td>
       <textarea name=\"ta_firewall_perms\" cols=\"32\" rows=\"3\">$firewall_perms</textarea>
     </td>
   </tr>
-
   </table>
   </fieldset>";
   }

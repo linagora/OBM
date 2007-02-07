@@ -206,7 +206,7 @@ function html_user_search_form($user) {
   }
 
   foreach ($profiles as $profile => $one_profile) {
-    $block_pro .= "
+    $block_profile .= "
       <option value=\"$profile\"> $profile</option>";
   }
 
@@ -225,7 +225,7 @@ function html_user_search_form($user) {
     <label>$l_user_perms<br />
       <select type=\"text\" name=\"sel_perms\">
         <option value=\"$c_all\"> $l_all</option>
-        $block_pro
+        $block_profile
       </select>
     </label>
     <label>$l_email<br />
@@ -405,7 +405,7 @@ function dis_user_consult($user) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_user, $l_lastaccess, $l_archive, $l_datebegin;
+  global $l_domain, $l_user, $l_lastaccess, $l_archive, $l_datebegin;
   global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal;
   global $l_direction, $l_service;
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_email, $l_desc;
@@ -419,6 +419,7 @@ function html_user_consult($obm_q) {
   global $path, $display, $cgp_use, $c_yes, $c_no;
 
   $id = $obm_q->f("userobm_id");
+  $domain_name = ($obm_q->f("domain_name") != "" ? $obm_q->f("domain_name") : "GLOBAL");
   $system = $obm_q->f("userobm_system");
   $login = $obm_q->f("userobm_login");
   $local = ($obm_q->f("userobm_local") == 1 ? $c_yes : $c_no);
@@ -667,6 +668,10 @@ function html_user_consult($obm_q) {
     <td>$login</td>
   </tr>
   <tr>
+    <th>$l_domain</th>
+    <td>$domain_name</td>
+  </tr>
+  <tr>
     <th>$l_local</th>
     <td>$local</td>
   </tr>
@@ -835,11 +840,11 @@ function html_user_group_consult($usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display User Form
 // Parameters:
-//   - $usr_q     : user database result
-//   - $user      : default values or updated values (if error)
-//     kes used   : id, name, passwd, perms, email
+//   - $usr_q : user database result
+//   - $user  : default values or updated values (if error)
+//   - $field : field in error
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_form($usr_q, $user) {
+function html_user_form($usr_q, $user, $field="") {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
   global $l_user, $l_archive, $l_datebegin, $l_insert, $l_update;
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
@@ -922,6 +927,7 @@ function html_user_form($usr_q, $user) {
   // If parameters have been given, they supercede the default action value
   // infos
   if (isset($user["user_id"])) { $id = $user["user_id"]; }
+  if (isset($user["domain"])) { $domain_id = $user["domain"]; }
   if (isset($user["login"])) { $login = $user["login"]; }
   if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
   if (isset($user["perms"])) { $perms = $user["perms"]; }
@@ -979,11 +985,19 @@ function html_user_form($usr_q, $user) {
 
   $block_userdata = of_userdata_dis_entity_form("user", $id, $user);
 
-  // Domain
-  if ($c_multidomain && $obm["domain_id"] == $c_default_domain) {
-    $domain_list = get_global_domain_list();
-    $sel_domain = "<tr><th>$l_domain</th>
-    <td>$domain_list </td></tr>";
+  // Mark the error field
+  if ($field != "") {
+    $class[$field] = "error";
+  }
+
+  // Domain (can't be updated, so only on insert)
+  if (($action == "new" || $action == "insert")
+      && ($c_multidomain && $obm["domain_id"] == $c_default_domain)) {
+    $sel_domain = of_domain_dis_select($domain_id);
+    $dis_domain = "<tr>
+      <th>$l_domain</th>
+      <td>$sel_domain</td>
+  </tr>";
   }
 
   // Profiles
@@ -993,7 +1007,7 @@ function html_user_form($usr_q, $user) {
     } else {
       $selected = "";
     }
-    $block_pro .= "
+    $block_profile .= "
       <option value=\"$profile\"$selected> $profile</option>";
   }
 
@@ -1021,7 +1035,7 @@ function html_user_form($usr_q, $user) {
 
   <table>
   <tr>
-    <th>$l_web</th>
+    <th class=\"$class[web_perms]\">$l_web</th>
     <td><input name=\"cb_web_perms\" type=\"checkbox\" value=\"1\" $web_state /></td>
   </tr>
   $dis_access
@@ -1050,23 +1064,23 @@ function html_user_form($usr_q, $user) {
 
   <table>
   <tr>
-    <th>$l_mail</th>
+    <th class=\"$class[mail_perms]\">$l_mail</th>
     <td><input name=\"cb_mail_perms\" type=\"checkbox\" value=\"1\" $mail_state /></td>
   </tr>
   <tr>
-    <th>$l_mail_ext</th>
+    <th class=\"$class[mail_ext_perms]\">$l_mail_ext</th>
     <td><input name=\"cb_mail_ext_perms\" type=\"checkbox\" value=\"1\" $mail_ext_state /></td>
   </tr>
   <tr>
-    <th>$l_mail_server</th>
+    <th class=\"$class[mail_server]\">$l_mail_server</th>
     <td>$dis_mail_server</td>
   </tr>
   <tr>
-    <th>$l_email</th>
+    <th class=\"$class[email]\">$l_email</th>
     <td><textarea name=\"ta_email\" cols=\"32\" rows=\"3\">$email</textarea>@$main_domain</td>
   </tr>
   <tr>
-    <th>$l_quota (Mo)</th>
+    <th class=\"$class[mail_quota]\">$l_quota (Mo)</th>
     <td><input name=\"tf_mail_quota\" maxlength=\"6\" size=\"6\" value=\"$mail_quota\" /></td>
   </tr>
   </table>
@@ -1085,19 +1099,19 @@ function html_user_form($usr_q, $user) {
 
   <table>
   <tr>
-    <th>$l_email_nomade</th>
+    <th class=\"$class[email_nomade]\">$l_email_nomade</th>
     <td><input name=\"tf_email_nomade\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\" /></td>
   </tr>
   <tr>
-    <th>$l_perms</th>
+    <th class=\"$class[nomade_perms]\">$l_perms</th>
     <td><input name=\"cb_nomade_perms\" type=\"checkbox\" value=\"1\" $nomade_perms_c /></td>
   </tr>
   <tr>
-    <th>$l_enabled</th>
+    <th class=\"$class[nomade_enable]\">$l_enabled</th>
     <td><input name=\"cb_nomade_enable\" type=\"checkbox\" value=\"1\" $nomade_enable_c /></td>
   </tr>
   <tr>
-    <th>$l_local_copy</th>
+    <th class=\"$class[nomade_local_copy]\">$l_local_copy</th>
     <td><input name=\"cb_nomade_local_copy\" type=\"checkbox\" value=\"1\" $nomade_local_copy_c /></td>
   </tr>
   </table>
@@ -1113,11 +1127,11 @@ function html_user_form($usr_q, $user) {
 
   <table>
   <tr>
-    <th>$l_enabled</th>
+    <th class=\"$class[vacation_enable]\">$l_enabled</th>
     <td><input name=\"cb_vacation_enable\" type=\"checkbox\" value=\"1\" $vacation_state /></td>
   </tr>
   <tr>
-    <th>$l_vacation_message</th>
+    <th class=\"$class[vacation_message]\">$l_vacation_message</th>
     <td><textarea name=\"ta_vacation_message\" cols=\"32\" rows=\"3\">$vacation_message</textarea></td>
   </tr>
   </table>
@@ -1134,19 +1148,19 @@ function html_user_form($usr_q, $user) {
 
   <table>
   <tr>
-    <th>$l_smb_perms</th>
+    <th class=\"$class[smb_perms]\">$l_smb_perms</th>
     <td><input name=\"cb_smb_perms\" type=\"checkbox\" value=\"1\" $smb_state /></td>
   </tr>
   <tr>
-    <th>$l_smb_home</th>
+    <th class=\"$class[smb_home]\">$l_smb_home</th>
     <td><input name=\"tf_smb_home\" maxlength=\"255\" size=\"64\" value=\"$smb_home\" /></td>
   </tr>
   <tr>
-    <th>$l_smb_home_drive</th>
+    <th class=\"$class[smb_home_drive]\">$l_smb_home_drive</th>
     <td><input name=\"tf_smb_home_drive\" maxlength=\"1\" size=\"1\" value=\"$smb_home_drive\" />:</td>
   </tr>
   <tr>
-    <th>$l_smb_logon</th>
+    <th class=\"$class[smb_logon]\">$l_smb_logon</th>
     <td><input name=\"tf_smb_logon\" maxlength=\"128\" size=\"64\" value=\"$smb_logon\" /></td>
   </tr>
   </table>
@@ -1180,35 +1194,35 @@ function html_user_form($usr_q, $user) {
 
   <table>
   <tr>
-    <th>$l_login</th>
+    <th class=\"$class[login]\">$l_login</th>
     <td><input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" /></td>
   </tr>
   <tr>
-    <th>$l_password</th>
+    <th class=\"$class[password]\">$l_password</th>
     <td><input type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
   </tr>
-  $sel_domain
+  $dis_domain
   <tr>
-    <th>$l_archive</th>
+    <th class=\"$class[archive]\">$l_archive</th>
     <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
   </tr>
   <tr>
-    <th>$l_user_perms</th>
+    <th class=\"$class[perms]\">$l_user_perms</th>
     <td><select name=\"sel_perms\">
-      $block_pro
+      $block_profile
       </select>
     </td>
   </tr>
   <tr>
-    <th>$l_lastname</th>
+    <th class=\"$class[lastname]\">$l_lastname</th>
     <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"32\" value=\"$lname\" /></td>
   </tr>
   <tr>
-    <th>$l_firstname</th>
+    <th class=\"$class[firstname]\">$l_firstname</th>
     <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
   </tr>
   <tr>
-    <th>$l_datebegin</th>
+    <th class=\"$class[datebegin]\">$l_datebegin</th>
     <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
   </tr>
   $block_userdata 
@@ -1220,51 +1234,51 @@ function html_user_form($usr_q, $user) {
   <legend>$l_coord</legend>
   <table>
   <tr>
-    <th>$l_phone</th>
+    <th class=\"$class[phone]\">$l_phone</th>
     <td><input name=\"tf_phone\" size=\"20\" maxlength=\"20\" value=\"$phone\" /></td>
   </tr>
   <tr>
-    <th>$l_phone2</th>
+    <th class=\"$class[phone2]\">$l_phone2</th>
     <td><input name=\"tf_phone2\" size=\"20\" maxlength=\"20\" value=\"$phone2\" /></td>
+  </tr>
   <tr>
-    <th>$l_mphone</th>
+    <th class=\"$class[mobile]\">$l_mphone</th>
     <td><input name=\"tf_mobile\" size=\"20\" maxlength=\"20\" value=\"$mobile\" /></td>
   </tr>
-  </tr>
   <tr>
-    <th>$l_fax</th>
+    <th class=\"$class[fax]\">$l_fax</th>
     <td><input name=\"tf_fax\" size=\"20\" maxlength=\"20\" value=\"$fax\" /></td>
   </tr>
   <tr>
-    <th>$l_fax2</th>
+    <th class=\"$class[fax2]\">$l_fax2</th>
     <td><input name=\"tf_fax2\" size=\"20\" maxlength=\"20\" value=\"$fax2\" /></td>
   </tr>
   <tr>
-    <th>$l_service</th>
+    <th class=\"$class[service]\">$l_service</th>
     <td><input name=\"tf_service\" size=\"64\" maxlength=\"65\" value=\"$service\" /></td>
   </tr>
   <tr>
-    <th>$l_address 1</th>
+    <th class=\"$class[address1]\">$l_address 1</th>
     <td><input name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /></td>
   </tr>
   <tr>
-    <th>$l_address 2</th>
+    <th class=\"$class[address2]\">$l_address 2</th>
     <td><input name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /></td>
   </tr>
   <tr>
-    <th>$l_address 3</th>
+    <th class=\"$class[address3]\">$l_address 3</th>
     <td><input name=\"tf_ad3\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad3\" /></td>
   </tr>
   <tr>
-    <th>$l_postcode</th>
+    <th class=\"$class[zip]\">$l_postcode</th>
     <td><input name=\"tf_zip\" size=\"8\" maxlength=\"8\" value=\"$zip\" /></td>
   </tr>
   <tr>
-    <th>$l_town</th>
+    <th class=\"$class[town]\">$l_town</th>
     <td><input name=\"tf_town\" size=\"24\" maxlength=\"24\" value=\"$town\" /></td>
   </tr>
   <tr>
-    <th>$l_expresspostal</th>
+    <th class=\"$class[expresspostal]\">$l_expresspostal</th>
     <td><input name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /></td>
   </tr>
   </table>
@@ -1273,8 +1287,8 @@ function html_user_form($usr_q, $user) {
   <fieldset class=\"detail infos\">
   <legend>$l_desc</legend>
   <table>
-  <tr>      
-    <th>$l_desc</th>
+  <tr>
+    <th class=\"$class[desc]\">$l_desc</th>
     <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
   </tr>
   </table>

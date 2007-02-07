@@ -466,7 +466,7 @@ function check_host_context($id, $host) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_host_data_form($host) {
   global $php_regexp_hostname, $l_err_host_name_empty, $l_err_host_name_exist;
-  global $cgp_use, $err_msg, $err_field, $l_err_host_name;
+  global $cgp_use, $err, $l_err_host_name;
   global $php_regexp_ip, $l_err_host_ip, $l_err_host_ip_exist;
   global $l_err_host_ip_not_in_lan, $l_err_firewall_perms, $l_err_web_all;
 
@@ -478,22 +478,22 @@ function check_host_data_form($host) {
 
   // MANDATORY: Host name not empty
   if (trim($name) == "") {
-    $err_msg = $l_err_host_name_empty;
-    $err_field = "name";
+    $err["msg"] = $l_err_host_name_empty;
+    $err["field"] = "name";
     return false;
   }
 
   // MANDATORY: Host name unique
   if (get_host_name_exists($name, $id)) {
-    $err_msg = "$l_err_host_name_exist ($name)";
-    $err_field = "name";
+    $err["msg"] = "$l_err_host_name_exist ($name)";
+    $err["field"] = "name";
     return false;
   }
 
   // Host name correct
   if (($name != "") && (! preg_match($php_regexp_hostname, $name))) {
-    $err_msg = "$name : $l_err_host_name";
-    $err_field = "name";
+    $err["msg"] = "$name : $l_err_host_name";
+    $err["field"] = "name";
     return false;
   }
 
@@ -502,23 +502,23 @@ function check_host_data_form($host) {
 
     // Host IP correct
     if (! preg_match($php_regexp_ip, $ip)) {
-      $err_msg = " $ip : $l_err_host_ip";
-      $err_field = "ip";
+      $err["msg"] = " $ip : $l_err_host_ip";
+      $err["field"] = "ip";
       return false;
     }
 
     $ips = get_ip_used($id);
     // IP address not already used
     if (array_key_exists($ip, $ips)) {
-      $err_msg = "$l_err_host_ip_exist : $ip (" . $ips["$ip"] . ")";
-      $err_field = "ip";
+      $err["msg"] = "$l_err_host_ip_exist : $ip (" . $ips["$ip"] . ")";
+      $err["field"] = "ip";
       return false;
     }
     // IP is in a network :
     if ($cgp_use["service"]["network"]) {
       if (!is_ip_in_an_internal_network($ip)) {
-        $err_msg = "$l_err_host_ip_not_in_lan : $ip ";
-        $err_field = "ip";
+        $err["msg"] = "$l_err_host_ip_not_in_lan : $ip ";
+        $err["field"] = "ip";
         return false;
       }
     }
@@ -527,7 +527,7 @@ function check_host_data_form($host) {
   if ($cgp_use["service"]["web_local"]) {
     // web_all must be 0 or 1
     if (($web_all != "0") && ($web_all != "1")) {
-      $err_msg = $l_err_web_all;
+      $err["msg"] = $l_err_web_all;
       return false;
     }
   }
@@ -536,8 +536,8 @@ function check_host_data_form($host) {
     $firewall_perms = $host["firewall_perms"];
     
     if (!is_valid_firewall_perms($firewall_perms)) {
-      $err_msg = " $l_err_firewall_perms";
-      $err_field = "firewall_perms";
+      $err["msg"] = " $l_err_firewall_perms";
+      $err["field"] = "firewall_perms";
       return false;
     }
   }

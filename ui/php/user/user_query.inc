@@ -39,7 +39,8 @@ function run_query_user_search($user) {
   $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
   $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "timelastaccess");
   $multidomain = sql_multidomain("userobm");
-	
+
+  echo $multidomain;
   if ($restriction == "calendar") {
     $uid = $auth->auth["uid"];
     $users = of_right_entity_for_consumer("calendar", "user", $uid, "read");
@@ -166,11 +167,13 @@ function run_query_user_detail($p_id) {
       $lastaccess,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
+      domain_domain_name as domain_name,
       host_name,
       host_web_perms
     FROM UserObm
          LEFT JOIN UserObm as c ON UserObm.userobm_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON UserObm.userobm_userupdate=u.userobm_id
+         LEFT JOIN Domain on UserObm.userobm_domain_id=domain_id
          LEFT JOIN Host on UserObm.userobm_host_id=host_id
     WHERE UserObm.userobm_id='$p_id'
       $multidomain";
@@ -1029,14 +1032,14 @@ function check_user_data_form($p_id, $user) {
   // If external mail access is granted, internal access should be too
   if ($mail_ext_perms && !($mail_perms)) {
     $err["msg"] = "$l_mail_perms_error";
-    $err["field"] = "mail";
+    $err["field"] = "mail_ext_perms";
     return false;
   }
 
   // If no mail server is set
   if( ($mail_perms) && ($mail_server == "") ) {
     $err["msg"] = "$l_mail_server_error";
-    $err["field"] = "mailserver";
+    $err["field"] = "mail_server";
     //    return false;
   }
 
@@ -1081,6 +1084,7 @@ function check_user_data_form($p_id, $user) {
     // OBM-Mail disabled, email must be full (user@domain)
     if (($email != "") && (preg_match($php_regexp_email, $email) == 0)) {
       $err["msg"] = $l_email_error." : ". $email;
+      $err["field"] = "email";
       return false;
     }
   }
@@ -1089,21 +1093,21 @@ function check_user_data_form($p_id, $user) {
   if ( (trim($email)) && ($mail_quota != "")
        && (! preg_match($php_regexp_quota, $mail_quota))) {
     $err["msg"] = "$mail_quota : $l_quota_error";
-    $err["field"] = "quota";
+    $err["field"] = "mail_quota";
     return false;
   }
   
   // Email Nomad perms
   if (($nomade_perms) && (!$mail_perms)) {
     $err["msg"] = $l_nomade_without_mail_perms;
-    $err["field"] = "mail";
+    $err["field"] = "nomade_perms";
     return false;
   }
 
   // Email Nomad perms
   if (($nomade_enable) && (!$nomade_perms)) {
     $err["msg"] = $l_nomade_perms_error;
-    $err["field"] = "nperms";
+    $err["field"] = "nomade_perms";
     return false;
   }
 
@@ -1111,7 +1115,7 @@ function check_user_data_form($p_id, $user) {
   if ( ($email_nomade == "")
        && ($nomade_enable) ) {
     $err["msg"] = "$l_email_nomad_error";
-    $err["field"] = "nemail";
+    $err["field"] = "email_noamde";
     return false;
   }
 
@@ -1119,7 +1123,7 @@ function check_user_data_form($p_id, $user) {
   if ( ($email_nomade != "")
        && (! preg_match($php_regexp_email, $email_nomade))) {
     $err["msg"] = "$email_nomade : $l_email_error";
-    $err["field"] = "nemail";
+    $err["field"] = "email_nomade";
     return false;
   }
 
@@ -1127,20 +1131,20 @@ function check_user_data_form($p_id, $user) {
   if ( ($nomade_local_copy) && ((! $nomade_perms) || (! $nomade_enable)) )
   {
     $err["msg"] = $l_nomade_local_copy_error;
-    $err["field"] = "nlocalcopy";
+    $err["field"] = "nomade_local_copy";
     return false;
   }
 
   if (($vacation_enable) && (!$mail_perms)) {
     $err["msg"] = $l_vacation_without_mail_perms;
-    $err["field"] = "venable";
+    $err["field"] = "vacation_enable";
     return false;
   }
 
   // If vacation is enable, the message must be set
-  if( $vacation_enable && !$vacation_message ) {
+  if ($vacation_enable && !$vacation_message) {
     $err["msg"] = $l_empty_vacation_message;
-    $err["field"] = "vmessage";
+    $err["field"] = "vacation_message";
     return false;
   }
 
@@ -1156,7 +1160,7 @@ function check_user_data_form($p_id, $user) {
     // Samba home drive correct
     if (($smb_home_drive != "") && (! preg_match($php_regexp_drive, $smb_home_drive))) {
       $err["msg"] = " $smb_home_drive : $l_err_drive";
-      $err["field"] = "smb_drive";
+      $err["field"] = "smb_home_drive";
       return false;
     }
   }
@@ -1191,7 +1195,7 @@ function check_user_data_form($p_id, $user) {
     } else {
       $domain_id = $obm["domain_id"];
     }
-    $where_multidomain = "AND userobm_domain_id = $domain_id";
+    $where_multidomain = "AND userobm_domain_id = '$domain_id'";
   }
   $query = "SELECT * FROM UserObm WHERE userobm_login='$login' $where_multidomain";
   if ($p_id > 0) {
@@ -1202,6 +1206,7 @@ function check_user_data_form($p_id, $user) {
   $obm_q->query($query);
   if ($obm_q->num_rows() > 0) {
     $err["msg"] = "$login : $l_exist_error";
+    $err["field"] = "login";
     return false;
   }
 

@@ -119,8 +119,8 @@ if ($action == "ext_get_id") {
     
     // Form data are not valid
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"].= html_host_form($action, "", $params, $err_field);
+    $display["msg"] .= display_err_msg($err["msg"]);
+    $display["detail"].= html_host_form($action, "", $params, $err["field"]);
   }
 
 } elseif ($action == "update") {
@@ -136,9 +136,9 @@ if ($action == "ext_get_id") {
     }
     $display["detail"] = dis_host_consult($params);
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err["msg"]);
     $host_q = run_query_host_detail($params["host_id"]);
-    $display["detail"] = html_host_form($action, $host_q, $params, $err_field);
+    $display["detail"] = html_host_form($action, $host_q, $params, $err["field"]);
   }
 } elseif ($action == "showlist") {
 ///////////////////////////////////////////////////////////////////////////////
