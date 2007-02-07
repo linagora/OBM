@@ -107,8 +107,8 @@ CREATE TABLE UserObm (
   userobm_fax                 varchar(32) DEFAULT '',
   userobm_fax2                varchar(32) DEFAULT '',
   userobm_web_perms           int(1) default NULL,
-  userobm_web_list 	      text default NULL,  
-  userobm_web_all	      int(1) default 0,
+  userobm_web_list 	          text default NULL,  
+  userobm_web_all	          int(1) default 0,
   userobm_mail_perms          int(1) default NULL,
   userobm_mail_ext_perms      int(1) default NULL,
   userobm_email               text DEFAULT '',
@@ -1592,12 +1592,20 @@ CREATE TABLE Ldap (
 
 
 --
--- Mail parameters table
+-- Mail server declaration table
 --
-CREATE TABLE Mail (
-  mail_domain_id  int(8) default 0,
-  mail_name       varchar(255) NOT NULL default '',
-  mail_value      varchar(255) NOT NULL default ''
+CREATE TABLE MailServer (
+  mailserver_id             int(8) NOT NULL default 0,
+  mailserver_relayhost_id   int(8) default NULL
+);
+
+
+--
+-- Mail server network declaration table
+--
+CREATE TABLE MailServerNetwork (
+  mailservernetwork_mailserver_id   int(8) NOT NULL default 0,
+  mailservernetwork_ip              varchar(16) NOT NULL default '127.0.0.1'
 );
 
 
@@ -1605,7 +1613,7 @@ CREATE TABLE Mail (
 -- Samba parameters table
 --
 CREATE TABLE Samba (
-  mail_domain_id  int(8) default 0,
+  samba_domain_id  int(8) default 0,
   samba_name      varchar(255) NOT NULL default '',
   samba_value     varchar(255) NOT NULL default ''
 );
@@ -1703,7 +1711,8 @@ CREATE TABLE P_GroupGroup like GroupGroup;
 CREATE TABLE P_Host like Host;
 CREATE TABLE P_Samba like Samba;
 CREATE TABLE P_Ldap like Ldap;
-CREATE TABLE P_Mail like Mail;
+CREATE TABLE P_MailServer like MailServer;
+CREATE TABLE P_MailServerNetwork like MailServerNetwork;
 CREATE TABLE P_MailShareDir like MailShareDir;
 CREATE TABLE P_EntityRight like EntityRight;
 -- CREATE TABLE P_Network like Network;
