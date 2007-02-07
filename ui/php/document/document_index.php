@@ -14,7 +14,6 @@
 $path = "..";
 $module = "document";
 $obminclude = getenv("OBM_INCLUDE_VAR");
-$extra_css = "document.css";
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 $params = get_document_params();

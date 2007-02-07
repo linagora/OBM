@@ -153,7 +153,6 @@ $dis_printer
 ///////////////////////////////////////////////////////////////////////////////
 function display_sections_theme($section) {
   global $cgp_show, $sections, $perm;
-  
   $ret = "<ul id='section'>\n";
   foreach ($cgp_show["section"] as $key => $show) {
     if ($show) {
@@ -163,8 +162,12 @@ function display_sections_theme($section) {
       if ($section_right) {
         $module_block = display_modules_theme($key);        
         $mods .= $module_block;
-        $js .= "obm.menu.addItem('section-$key');\n";
-        $ret .= "<li id=\"section-$key\">$section_name</li>\n";
+        $js .= "obm.menu.addItem('section-$key');";
+        if($key == $section) {
+          $ret .= "<li class=\"current\" id=\"section-$key\">$section_name</li>\n";
+        }else {
+          $ret .= "<li id=\"section-$key\">$section_name</li>\n";
+        }
       }
     }
   }

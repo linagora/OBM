@@ -82,11 +82,11 @@ function list_add_criteria_line(form,index) {
   cell = labels.insertCell(4);
   values.insertCell(0);
   cell = values.insertCell(1);
-  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"delete_img\" onclick=\"del_row(this.parentNode.parentNode);return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" alt=\"Delete\" /></a>';
+  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"delete_img\" onclick=\"del_row(this.parentNode.parentNode);return false;\"><img src=\"$ico_delete\" alt=\"Delete\" /></a>';
   cell = values.insertCell(2);
   cell.style.borderRight = '1px solid #7B9EAD';
   cell.style.paddingRight = '5px';
-  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"Update\" /></a>';
+  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"$ico_validate\" alt=\"Update\" /></a>';
   cell = values.insertCell(3);
   cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
   cell = values.insertCell(4);

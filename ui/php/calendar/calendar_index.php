@@ -670,21 +670,19 @@ function get_calendar_action() {
   );
 
   // Planning
-/*  $actions["calendar"]["planning"] = array (
+  $actions["calendar"]["planning"] = array (
     'Name'     => $l_header_planning,
     'Url'      => "$path/calendar/calendar_index.php?action=planning&amp;date=$date",
     'Right'    => $cright_read, 
     'Condition'=> array ('all') 
                                     	 );
- */
   // View Year
 /*  $actions["calendar"]["view_year"] = array (
     'Name'     => $l_header_year,
     'Url'      => "$path/calendar/calendar_index.php?action=view_year&amp;date=$date",
     'Right'    => $cright_read,  
     'Condition'=> array ('all') 
-                                    	    );
- */
+  );*/
   // View Month
   $actions["calendar"]["view_month"] = array (
     'Name'     => $l_header_month,
@@ -753,13 +751,13 @@ function get_calendar_action() {
                                          );
 					 
   // New meeting
-/*  $actions["calendar"]["new_meeting"] = array (
+  $actions["calendar"]["new_meeting"] = array (
     'Name'     => $l_header_meeting,
     'Url'      => "$path/calendar/calendar_index.php?action=new_meeting",
     'Right'    => $cright_write,
     'Condition'=> array ('all') 
                                          );
- */
+   
   // Search meeting
   $actions["calendar"]["perform_meeting"] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=perform_meeting",

@@ -116,6 +116,10 @@ form {
   text-align: center;
 }
 
+.B {
+  font-weight: bold;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Two column layout  */
 /* ------------------------------------------------------------------------- */
@@ -226,7 +230,13 @@ form {
   background-position: 0 0.9em;
 }
 
-
+#section li.current {
+  color: #368397;
+  background-color: #e0e1e3;
+  background-image: url('../images/tab_current_border.png');
+  background-repeat: repeat-x;
+  background-position: 0 0.9em;
+}
 /* ------------------------------------------------------------------------- */
 /* Submenu (modules) */
 /* ------------------------------------------------------------------------- */

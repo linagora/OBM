@@ -184,18 +184,18 @@ function dis_calendar_portal() {
     $check_month = of_date_get_month($current_time);
 
     if ($check_month != $this_month) {
-      $dis_minical .= "<td class=\"downlight\" onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\"
+      $dis_minical .= "<td class=\"downlight\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\"
         onmouseout=\"this.className='downlight'\" onmouseover=\"this.className='hover'\">
         $day
         </td>";
     } else {
       if (of_isodate_format() == $iso_day) {
-        $dis_minical .= "<td class=\"highlight\" onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\" 
+        $dis_minical .= "<td class=\"highlight\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\" 
           onmouseout=\"this.className='highlight'\" onmouseover=\"this.className='hover'\">
           $day
           </td>";
       } else {
-        $dis_minical .= "<td onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\" 
+        $dis_minical .= "<td onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\" 
           onmouseout=\"this.className=''\" onmouseover=\"this.className='hover'\">
           $day
           </td>";
@@ -210,36 +210,6 @@ function dis_calendar_portal() {
       if ($checkagain != $this_month) $whole_month = FALSE;
     }
   } while ($whole_month == TRUE);
-/*  
-  $i = 0;
-  do {
-    $day = date ("j", $current_time);
-    $iso_day = of_isodate_format($current_time);
-    $check_month = of_date_get_month($current_time);
-    if ($check_month != $this_month) {
-      $day = "<a href=\"".url_prepare("calendar/calendar_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
-    } else {
-      if (isset($events_list[$iso_day]) && $dayObj = $events_list[$iso_day]) {
-	$events_data = $dayObj->get_events($id);
-        $day = "<a href=\"".url_prepare("calendar/calendar_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
-      } else {
-        $day = "<a href=\"".url_prepare("calendar/calendar_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
-      }
-    }
-    if ($i == 0) {
-      $dis_minical .= "<tr>\n";
-    }
-    $dis_minical .= "<td>$day</td>\n";
-    $current_time = strtotime("+1 day", $current_time); 
-    $i++;
-    if ($i == 7) { 
-      $dis_minical .= "</tr>\n";
-      $i = 0;
-      $checkagain = of_date_get_month($current_time);
-      if ($checkagain != $this_month) $whole_month = FALSE;	
-    }
-  } while ($whole_month == TRUE);
- */
   
   // Minicalendar Head
   for ($i=0; $i<7; $i++) {

@@ -28,10 +28,10 @@ Obm.Menu = new Class({
       obm.menu.toggle(this.id)
     });   
     sectionBlock.addEvent('mouseover', function(e){
-       this.className='hover';
+       this.addClassName('hover');
     });  
     sectionBlock.addEvent('mouseout', function(e){
-        this.className='';
+        this.removeClassName('hover');
     });      
   },
 
@@ -78,7 +78,7 @@ Obm.Portlets = new Class({
     this.sidebar = new Fx.Style('portlets', 'width', {duration: 250});    
     this.sidebar.element.setStyle('overflow', 'hidden');
     this.main = new Fx.Style('mainPanel', 'margin-left',{duration: 250});
-    this.delta = this.main.element.getOffset('left') - this.sidebar.element.offsetWidth;
+    this.delta = this.main.element.getLeft() - this.sidebar.element.offsetWidth;
     this.width = this.sidebar.element.offsetWidth;
     this.panel = $('portletsPanel');
     this.handler = $('portletsHandler');
@@ -165,7 +165,7 @@ Obm.Portlets = new Class({
 // The element with the class datePicker must have a name attribute.
 
 function datePickerGenerator() {
-  elements = $S('.datePicker');
+  elements = $$('.datePicker');
   elements.each(function(element){
     img = $(document.createElement('img'));
     img.setAttribute("src", obm.vars.images.datePicker);

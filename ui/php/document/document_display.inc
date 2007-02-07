@@ -978,7 +978,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
   else {
    $content.= "
 	 
-	<td class=\"documentFile\" style=\"padding-left:".$indent_file."px;text-align:left;\">
+	<td class=\"documentFile\" style=\"text-align:left;\">
 	 <a  href=\"document_index.php?action=detailconsult&amp;document_id=$id\" >
 
 	  <img src=\"$ico_file\" alt=\"\" />

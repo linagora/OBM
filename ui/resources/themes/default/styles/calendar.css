@@ -314,17 +314,15 @@
 /* Free/Busy view styles */
 /* ------------------------------------------------------------------------- */
 
-
-.calendarPossible 	{ 
+li.freeBusy {
   background-color: #97bdec; 
-  border-top: 1px dashed #6a90c3;
-  border-right: 1px dashed #6a90c3;    
 }
 
-.calendarFree { 
-  background-color: #cee1ed;  
-  border-top: 1px dashed #a0b3c4;
-  border-right: 1px dashed #a0b3c4;     
+.freeBusy tbody td {
+  background-color: #97bdec; 
+  border-top: 1px dashed #6a90c3;
+  border-right: 1px dashed #6a90c3;      
+
 }
 
 .freeBusy tbody td.hover 	{ 
@@ -333,5 +331,42 @@
   border-right: 1px dashed #6a90c3;    
 }
 
+.freeBusy tbody td.busy, .busy   { 
+  background-color: #b3b3b3;
+  border-top: 1px dashed #6a90c3;
+  border-right: 1px dashed #6a90c3;    
+}
 
+.freeBusy tbody td.free, .free { 
+  background-color: #cee1ed;  
+  border-top: 1px dashed #a0b3c4;
+  border-right: 1px dashed #a0b3c4;     
+}
 
+.infoPopup {
+  display: none;
+}
+
+.infoPopup h1{
+  margin: 0;
+  background-color: #d1d2d4;
+  font-weight: bold;
+  font-size: 100%;
+  background-image: url('../images/popup_title_border.png');
+  background-repeat: repeat-x;
+  background-position: 0 0.5em;  
+}
+
+.infoPopup h2{
+  background-color: #ebebeb;
+  font-weight: bold;
+  border-left: 1px solid #b3b3b3;
+  border-right: 1px solid #b3b3b3;
+  font-size: 100%;  
+  margin: 0;
+}
+
+.infoPopup li{
+  display: inline;
+  padding-left: 1.5em;
+}

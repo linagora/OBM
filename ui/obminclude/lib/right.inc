@@ -135,7 +135,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   global $l_authorize_list,$l_read_permission, $l_write_permission;
   global $l_right_validate ,$l_authorize,$l_deny, $ico_delete;
   global $l_public;
-  global $ico_add_user,$popup_height,$popup_width,$l_users,$path;
+  global $ico_add,$popup_height,$popup_width,$l_users,$path;
 
   foreach ($consumers["consumer"] as $one_consumer) {
     $id = $one_consumer["id"];
@@ -188,7 +188,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <a style=\"$style_read\" id=\"lnk_accept_read\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-      <img src=\"$ico_add_user\" alt=\"[Add]\" />
+      <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>
     </td>
     <td class=\"detailForm\" id=\"sel_accept_read\">
@@ -208,7 +208,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     $l_users
       <a style=\"$style_write\" id=\"lnk_accept_write\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-       <img src=\"$ico_add_user\" alt=\"[Add]\" />
+       <img src=\"$ico_add\" alt=\"[Add]\" />
      </a>
      </td>
      <td class=\"detailForm\" id=\"sel_accept_write\">

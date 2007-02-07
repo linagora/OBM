@@ -2610,46 +2610,6 @@ class Event {
   function add_attendee($entity,$entity_id,$entity_label) {
     $this->attendee[$entity][$entity_id] = $entity_label;
   }
-  /**
-   * match_period 
-   *  
-   * Check if an event is in a given lapse of time.
-   * return :
-   * -2 : if the event is before the period
-   * -1 : if the event is after the period
-   * 0 : in all unchecked case (might not happen)
-   * 1 : if the event begin after the beginning of the period but before the end
-   * 2 : if the event begin before the period and end after the beginning of the period
-   * 
-   * @param timestamp $date The timestamp of the event beginning
-   * @param timestamp $start The beginning of the period
-   * @param timestamp $end The end of the period
-   * @access public
-   * @return int
-   */
-  function match_period($date,$start,$end) {
-    
-    $ev_start = $date;
-    $ev_end = $this->duration + $ev_start;
-    
-    if ($ev_end <= $start) {
-      return -2;
-    }
-
-    if ($ev_start >= $end) {
-      return -1;
-    }
-
-    if ($ev_end > $start && $ev_start < $start) {
-      return 2;
-    }
-    
-    if ($ev_start < $end && $ev_end > $start) {
-      return 1;
-    }
-
-    return 0;
-  }
 
 }
 
@@ -2719,8 +2679,44 @@ Class OccurrenceFactory {
     return $singleton;
   }
 
-  function haveOccurence($id) {
+  function eventHaveOccurences($id) {
     return isset($this->events[$id]);
+  }
+
+  function periodHaveOccurrences($time, $duration, $entityFilter=null) {
+    foreach($this->occurrences as $evtOccurrences) {
+      foreach($evtOccurrences as $occurence) {
+        if(!$entityFilter || ( 
+           is_array($entityFilter[$occurence->entity]) && (
+             count($entityFilter[$occurence->entity]) == 0 || 
+             in_array($occurence->id,$entityFilter[$occurence->entity])))) {
+          $eventDuration = $occurence->event->duration;
+          $eventDate = $occurence->date;
+          if($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  function getPeriodOccurrences($time, $duration, $entityFilter=null) {
+    foreach($this->occurrences as $evtOccurrences) {
+      foreach($evtOccurrences as $occurence) {
+        if(!$entityFilter || ( 
+           is_array($entityFilter[$occurence->entity]) && (
+             count($entityFilter[$occurence->entity]) == 0 || 
+             in_array($occurence->id,$entityFilter[$occurence->entity])))) {
+          $eventDuration = $occurence->event->duration;
+          $eventDate = $occurence->date;
+          if($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate) {
+            $occurences[] = &$occurence;
+          }
+        }
+      }
+    }
+    return $occurences;
   }
 }
 

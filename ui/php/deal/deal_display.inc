@@ -2047,7 +2047,7 @@ function dis_deal_dashboard_year_detail($deal) {
   global $l_total, $l_date, $l_amount_ht, $l_amount_ttc;
   global $l_potential, $l_expected, $l_monthsofyearshort;
   global $l_amount, $l_deal_balanced, $l_commission, $l_commission_balanced;
-  global $l_execute;
+  global $l_execute,$ico_prev,$ico_next;
 
   $users_id = $deal["manager"];
 
@@ -2344,7 +2344,7 @@ function dis_deal_dashboard_year_detail($deal) {
                     yearfield.innerHTML=newyear;
                     document.forms.f_search.year.value=newyear;
                     return false;\">
-        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/previous.png\" alt=\"\" /></a>
+        <img border=\"0\" src=\"$ico_prev\" alt=\"\" /></a>
       </div>
       <div class=\"searchLabel\" id=\"year\">$year</div>
       <div class=\"searchLabel\">
@@ -2354,7 +2354,7 @@ function dis_deal_dashboard_year_detail($deal) {
                     yearfield.innerHTML=newyear;
                     document.forms.f_search.year.value=newyear;
                     return false;\">
-        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/next.png\" alt=\"\" /></a>
+        <img border=\"0\" src=\"$ico_next\" alt=\"\" /></a>
       </div>
 
       <div class=\"detailText\">$block_tt</div>
