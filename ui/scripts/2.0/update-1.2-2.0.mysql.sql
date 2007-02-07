@@ -407,6 +407,30 @@ CREATE TABLE UserSystem (
 );
 
 
+-----------------------------------------------------------------------------
+-- Mail server declaration table
+-----------------------------------------------------------------------------
+CREATE TABLE MailServer (
+  mailserver_id             int(8) NOT NULL default 0,
+  mailserver_relayhost_id   int(8) default NULL
+);
+
+
+-----------------------------------------------------------------------------
+-- Mail server network declaration table
+-----------------------------------------------------------------------------
+CREATE TABLE MailServerNetwork (
+  mailservernetwork_mailserver_id   int(8) NOT NULL default 0,
+  mailservernetwork_ip              varchar(16) NOT NULL default ''
+);
+
+
+-------------------------------------------------------------------------------
+-- Suppression de l'ancienne table Mail
+-------------------------------------------------------------------------------
+DROP TABLE IF EXISTS Mail;
+
+
 -------------------------------------------------------------------------------
 -- OBM-Mail, OBM-LDAP Production tables (used by automate)
 -------------------------------------------------------------------------------
@@ -418,7 +442,8 @@ CREATE TABLE P_GroupGroup like GroupGroup;
 CREATE TABLE P_Host like Host;
 CREATE TABLE P_Samba like Samba;
 CREATE TABLE P_Ldap like Ldap;
-CREATE TABLE P_Mail like Mail;
+CREATE TABLE P_MailServer like MailServer;
+CREATE TABLE P_MailServerNetwork like MailServerNetwork;
 CREATE TABLE P_MailShareDir like MailShareDir;
 CREATE TABLE P_EntityRight like EntityRight;
 -- CREATE TABLE P_Network like Network;

@@ -1607,7 +1607,7 @@ CREATE TABLE MailServer (
 --
 CREATE TABLE MailServerNetwork (
   mailservernetwork_mailserver_id   int(8) NOT NULL default 0,
-  mailservernetwork_ip              varchar(16) NOT NULL default '127.0.0.1'
+  mailservernetwork_ip              varchar(16) NOT NULL default ''
 );
 
 
