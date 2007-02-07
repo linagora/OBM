@@ -244,7 +244,8 @@ ALTER TABLE UserObm ADD COLUMN userobm_system int(1) DEFAULT 0 AFTER userobm_ext
 ALTER TABLE UserObm ADD COLUMN userobm_password_type char(6) DEFAULT 'PLAIN' AFTER userobm_login;
 ALTER TABLE UserObm ADD COLUMN userobm_uid int(8) AFTER userobm_calendar_version;
 ALTER TABLE UserObm ADD COLUMN userobm_gid int(8) AFTER userobm_uid;
-ALTER TABLE UserObm ADD COLUMN userobm_sound varchar(48) AFTER userobm_firstname;
+ALTER TABLE UserObm ADD COLUMN userobm_title varchar(64) DEFAULT '' AFTER userobm_firstname;
+ALTER TABLE UserObm ADD COLUMN userobm_sound varchar(48) AFTER userobm_title;
 ALTER TABLE UserObm ADD COLUMN userobm_service varchar(64) AFTER userobm_sound;
 ALTER TABLE UserObm ADD COLUMN userobm_address1 varchar(64) AFTER userobm_service;
 ALTER TABLE UserObm ADD COLUMN userobm_address2 varchar(64) AFTER userobm_address1;
@@ -283,6 +284,7 @@ ALTER TABLE UserObm ADD COLUMN userobm_host_id int(8) default NULL AFTER userobm
 ---------------------------------------------------------------------------
 ALTER TABLE UGroup ADD COLUMN group_samba int(1) default 0 AFTER group_ext_id;
 ALTER TABLE UGroup ADD COLUMN group_gid int(8) AFTER group_samba;
+ALTER TABLE UGroup ADD COLUMN group_mailing int(1) AFTER group_gid;
 ALTER TABLE UGroup ADD COLUMN group_contacts text AFTER group_email;
 
 -- add constraint  UNIQUE KEY group_gid (group_gid)
