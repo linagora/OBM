@@ -274,10 +274,14 @@ $modules["backup"] = array('Name'=> $l_module_backup,
                   'Url' => "$path/backup/backup_index.php",
                   'Right'=> $cright_read_admin);
 $modules["domain"] = array('Name'=> $l_module_domain,
-									'Ico' => "$ico_ref",
+	       	   'Ico' => "$ico_ref",
                    'Url' => "$path/domain/domain_index.php",
                    'Right'=> $cright_read_admin);
-                   
+$modules["mailserver"] = array('Name'=> $l_module_mailserver,
+                  'Ico' => "$ico_mailserver",
+                  'Url' => "$path/mailserver/mailserver_index.php",
+                  'Right'=> $cright_read_admin);
+
 if ($cgp_show["module"]["account"]) {
   $modules["account"] = array('Name'=> $l_module_account,
                                'Ico' => "$ico_account",

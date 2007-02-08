@@ -947,7 +947,7 @@ $block.= "
 
 function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
   global $ico_file,$ico_folder_close,$ico_folder;
-  global $ico_del_directory,$popup, $action;
+  global $ico_folder_empty,$popup, $action;
 
   $directories = $tree[$current_directory][0];
   $files = $tree[$current_directory][1];
@@ -1031,7 +1031,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
        <tr>
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	 <a href=\"document_index.php?action=dir_check_delete&amp;document_id=$d_id\"> 
-	  <img id=\"img_$current_dir_id\"  src=\"$ico_del_directory\" alt=\"[File]\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"$ico_folder_empty\" alt=\"[File]\"/>
 	 </a>
 	 $dis_name
 	</td>

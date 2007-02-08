@@ -31,7 +31,10 @@ $ico_document       = "$theme_path/ico_document.gif";
 $ico_group          = "$theme_path/ico_group.gif";
 $ico_lang           = "$theme_path/ico_lang.gif";
 $ico_lead           = "$theme_path/ico_lead.gif";            
-$ico_list           = "$theme_path/ico_list.gif";            
+$ico_list           = "$theme_path/ico_list.gif";    
+$ico_mailshare      = "$theme_path/ico_mailshare.gif";
+$ico_mailforward    = "$theme_path/ico_mailforward.gif";
+$ico_mailserver     = "$theme_path/ico_mailserver.gif";
 $ico_todo           = "$theme_path/ico_todo.gif";            
 $ico_publication    = "$theme_path/ico_publication.gif";     
 $ico_incident       = "$theme_path/ico_incident.gif";
@@ -45,6 +48,7 @@ $ico_pref           = "$theme_path/ico_pref.gif";
 $ico_project        = "$theme_path/ico_project.gif";
 $ico_big_project    = "$theme_path/ico_big_project.gif";
 $ico_publication    = "$theme_path/ico_publication.gif";    
+$ico_password       = "$theme_path/ico_password.gif";    
 $ico_ref            = "$theme_path/ico_ref.gif";
 $ico_resource       = "$theme_path/ico_resource.gif";
 $ico_resourcegroup  = "$theme_path/ico_resourcegroup.gif";
@@ -54,7 +58,7 @@ $ico_time           = "$theme_path/ico_time.gif";
 $ico_big_time       = "$theme_path/ico_big_time.gif";
 $ico_todo           = "$theme_path/ico_todo.gif";
 $ico_user           = "$theme_path/ico_user.gif";
-
+$ico_vacation       = "$theme_path/ico_vacation.gif";
 // Globals Icons
 $ico_arrow_up       = "$theme_path/arrow_up.gif";       
 $ico_arrow_down     = "$theme_path/arrow_down.gif";  
@@ -113,4 +117,5 @@ $ico_hierarchy      =  "$theme_path/ico_hierarchy.png";
 
 $ico_folder_close   = "$theme_path/ico_folder_close.gif";
 $ico_folder         = "$theme_path/ico_folder.gif";
+$ico_folder_empty   = "$theme_path/ico_folder_empty.gif";
 $ico_file           = "$theme_path/ico_file.gif";

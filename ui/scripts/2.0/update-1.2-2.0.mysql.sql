@@ -411,8 +411,10 @@ CREATE TABLE UserSystem (
 -- Mail server declaration table
 -----------------------------------------------------------------------------
 CREATE TABLE MailServer (
-  mailserver_id             int(8) NOT NULL default 0,
-  mailserver_relayhost_id   int(8) default NULL
+  mailserver_id             int(8) NOT NULL auto_increment,
+  mailserver_host_id        int(8) NOT NULL default 0,
+  mailserver_relayhost_id   int(8) default NULL,
+  PRIMARY KEY (mailserver_id)
 );
 
 
@@ -420,7 +422,7 @@ CREATE TABLE MailServer (
 -- Mail server network declaration table
 -----------------------------------------------------------------------------
 CREATE TABLE MailServerNetwork (
-  mailservernetwork_mailserver_id   int(8) NOT NULL default 0,
+  mailservernetwork_host_id   int(8) NOT NULL default 0,
   mailservernetwork_ip              varchar(16) NOT NULL default ''
 );
 

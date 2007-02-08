@@ -262,6 +262,7 @@ $l_module_import = "Import";
 $l_module_backup = "Backup";
 $l_module_control = "Dashboard";
 $l_module_host = "Hosts";
+$l_module_mailserver = "Mail servers";
 
 $l_module_settings = "Settings";
 $l_module_password = "Password";

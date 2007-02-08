@@ -267,6 +267,7 @@ $l_module_import = "Import";
 $l_module_backup = "Sauvegarde";
 $l_module_control = "Tableau de bord";
 $l_module_host = "Hôtes";
+$l_module_mailserver = "Serveurs de mail";
 
 $l_module_settings = "Configuration";
 $l_module_password = "Mot de passe";
