@@ -44,7 +44,7 @@ page_close();
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
-//  $ms_q = run_query_mailserver_getall();
+  $ms_q = run_query_mailserver_getall();
   $display["result"] = dis_mailserver_list($ms_q);
 } elseif($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,8 +63,38 @@ if ($action == "index") {
 } elseif($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $ms_q = run_query_mailserver_details($params["id"]);
-  $net_q = run_query_mailserver_networks($id);
-  $display["detail"] = dis_mailserver_consult($ms_q,$net_q);
+  $net_q = run_query_mailserver_networks($params["id"]);
+  $display["detail"] = dis_mailserver_consult($ms_q,$net_q);    
+} elseif($action == "checkdelete") {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_can_delete_mailserver($params["id"])) {
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_mailserver($params["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $ms_q = run_query_mailserver_details($params["id"]);
+    $net_q = run_query_mailserver_networks($params["id"]);
+    $display["detail"] = dis_mailserver_consult($ms_q,$net_q);      
+  }
+} elseif($action == "delete") {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_can_delete_mailserver($params["id"])) {
+    $retour = run_query_mailserver_delete($params["id"]);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg("$l_mailserver : $l_delete_ok");
+    } else {
+      $display["msg"] .= display_err_msg("$l_mailserver : $l_delete_error");
+  }
+    $ms_q = run_query_mailserver_getall();
+    $display["result"] = dis_mailserver_list($ms_q);    
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $ms_q = run_query_mailserver_details($params["id"]);
+    $net_q = run_query_mailserver_networks($params["id"]);
+    $display["detail"] = dis_mailserver_consult($ms_q,$net_q);  
+  }
 } elseif($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $ms_q = run_query_mailserver_details($params["id"]);
@@ -109,7 +139,7 @@ function get_mailserver_params() {
 function get_mailserver_action() {
   global $mailserver, $actions, $path;
   global $l_mailserver, $l_header_update,$l_header_consult;
-  global $l_header_index;
+  global $l_header_index, $l_header_delete, $l_header_new;
   global $cright_read_admin,$params;
 
   $actions["mailserver"]["index"] = array (
@@ -120,8 +150,10 @@ function get_mailserver_action() {
   ); 
 
   $actions["mailserver"]["new"] = array (
+    'Name'     => $l_header_new,
+    'Url'      => "$path/mailserver/mailserver_index.php?action=new",
     'Right'    => $cright_read_admin,
-    'Condition'=> array ('none') 
+    'Condition'=> array ('all') 
   );
 
   $actions["mailserver"]["insert"] = array (
@@ -129,14 +161,12 @@ function get_mailserver_action() {
     'Condition'=> array ('none') 
   );
 
-  $actions["mailserver"]["new"] = array (
-    'Right'    => $cright_read_admin,
-    'Condition'=> array ('none') 
-  );
 
-  $actions["mailserver"]["check_delete"] = array (
+  $actions["mailserver"]["checkdelete"] = array (
+    'Name'     => $l_header_delete,    
+    'Url'      => "$path/mailserver/mailserver_index.php?action=checkdelete&amp;id=".$params["id"],
     'Right'    => $cright_read_admin,
-    'Condition'=> array ('none') 
+    'Condition'=> array ('detailconsult','insert','update') 
   );
 
   $actions["mailserver"]["delete"] = array (
@@ -148,14 +178,14 @@ function get_mailserver_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/mailserver/mailserver_index.php?action=detailupdate&amp;id=".$params["id"],
     'Right'    => $cright_read_admin,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('detailconsult','insert','update') 
   );
 
   $actions["mailserver"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/mailserver/mailserver_index.php?action=detailconsult&amp;id=".$params["id"],
     'Right'    => $cright_read_admin,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('detailupdate','update') 
   );
 
   $actions["mailserver"]["update"] = array (
@@ -180,7 +210,7 @@ function update_mailserver_action() {
     $actions["mailserver"]["detailupdate"]['Condition'][] = 'insert';
     
     // Check Delete
-    $actions["mailserver"]["check_delete"]['Url'] = "$path/mailserver/mailserver_index.php?action=check_delete&amp;id=$id";
-    $actions["mailserver"]["check_delete"]['Condition'][] = 'insert';
+    $actions["mailserver"]["checkdelete"]['Url'] = "$path/mailserver/mailserver_index.php?action=checkdelete&amp;id=$id";
+    $actions["mailserver"]["checkdelete"]['Condition'][] = 'insert';
   }
 }

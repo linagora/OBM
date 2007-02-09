@@ -18,6 +18,8 @@ $l_invalid_mailserver = "L'hôte séléctionné pour le serveur de mail est invalid"
 $l_invalid_relayhost = "L'hôte séléctionné pour le relais est invalid";
 $l_invalid_ip = "Cette ip est invalide";
 
+$l_can_delete = "Ce serveur domaine n'est lié à aucun utilisateurs et peux donc etre supprimé";
+$l_cant_delete = "Ce serveur domaine est lié à au moins un utilisateur et ne peux donc pas etre supprimé";
 
 
 

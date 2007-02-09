@@ -11,15 +11,33 @@
 // Display Mail Server List
 ///////////////////////////////////////////////////////////////////////////////
 function dis_mailserver_list($ms_q) {
+  global $l_mailserver, $l_relayhost, $l_ip, $path;
+  
+  while ($ms_q->next_record()) {
+    $id = $ms_q->f("mailserver_id");
+    $name = $ms_q->f("mailserver_name");
+    $ip = $ms_q->f("mailserver_ip");
+    $rname = $ms_q->f("relayhost_name");
+    $rip = $ms_q->f("relayhost_ip");
+    ($i++%2==0)?$class="pair":$class="";
+    $dis_mailserver .= "
+      <tr class=\"$class\">
+      <td><a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&amp;id=$id\">$name</a></td>
+      <td>$ip</td> 
+      <td>$rname</a></td>
+      <td>$rip</td></tr>  
+    ";
+  }
   $block = "
   <div class=\"result\">
   <table>
   <thead>
   <tr>
-  <th>$l_hostname</th><th>$l_ip</th>
+  <th>$l_mailserver</th><th>$l_mailserver $l_ip</th><th>$l_relayhost</th><th>$l_relayhost $l_ip</th>
   </tr>
   </thead>
   <tbody>
+  $dis_mailserver
   </tbody>
   </table>
   ";
@@ -274,4 +292,28 @@ function dis_mailserver_consult($ms_q,$net_q) {
   }
   return $block;
 
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display Mail Server Delete
+///////////////////////////////////////////////////////////////////////////////
+function dis_can_delete_mailserver($id) {
+  global $l_can_delete, $l_back, $l_delete;
+  global $display, $path;
+
+  $dis_back = "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&amp;id=$id\">$l_back</a>";
+
+  $dis_delete = "
+    <a href=\"$path/mailserver/mailserver_index.php?action=delete&amp;id=$id\">
+    $l_delete 
+    </a>";
+
+  $display["msg"] .= display_ok_msg($l_can_delete);
+
+  $block .= "
+    <div class=\"buttons\">
+      $dis_delete
+      $dis_back
+    </div>";
+
+  return $block;
 }
