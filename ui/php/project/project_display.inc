@@ -589,7 +589,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   global $l_allotted, $l_no_members, $l_progress_update, $l_project, $l_resume;
   global $l_alloestimated, $l_usedestimated, $l_progeval, $l_tasks;
   global $l_members, $l_task_list, $l_members_info, $l_archive, $l_yes, $l_no;
-  global $l_alloproj, $l_usedproj, $l_no_tasks,$ico_hierarchy;
+  global $l_alloproj, $l_usedproj, $l_no_tasks,$ico_hierarchy,$l_allosold;
   global $l_ref, $l_project_date, $l_project_duration, $l_project_desc, $l_project_tech;
 
   $cpt_t = 0;
@@ -961,14 +961,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     <th> $l_project_duration :</th>
     <td>$reference_duration</td>
   </tr>
-  <tr>
-    <th> $l_project_desc :</th>
-    <td>$reference_desc</td>
-  </tr>
-  <tr>
-    <th> $l_project_tech :</th>
-    <td>$reference_tech</td>
-  </tr>
+
   </table>";
 
   // --- HTML Template --------------------------------------------------------
@@ -1037,11 +1030,22 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     </tbody>
     </table>
     </div>
-    
-    <div class=\"detail extra\">
-    <h1>$l_comment</h1>
-      $comment
-    </div>
+   
+
+   <div class=\"detail extra\">  
+   <h1> $l_project_desc</h1>
+   $reference_desc
+   </div>
+
+  <div class=\"detail extra\">
+  <h1> $l_project_tech</h1>
+  $reference_tech
+  </div>
+  
+  <div class=\"detail extra\">
+  <h1>$l_comment</h1>
+  $comment
+  </div>
     ";
 
   return $block;
@@ -2577,8 +2581,7 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     <a href=\"?action=reftask_delete&amp;category=reftask&amp;reftask=$projectreftask_id\">
     <img src=\"$ico_delete\" alt=\"$l_reftask_delete\" title=\"$l_delete_reftask\" />
     </a></td>
-    <td><input type=\"text\" id=\"tf_reftask_label_$projectreftask_id\"
-    value=\"$projectreftask_name\" /></td>
+    <td><input type=\"text\" id=\"tf_reftask_label_$projectreftask_id\" value=\"$projectreftask_name\" /></td>
     <td>
     <a href=\"#\" onclick=\"return updateLine($projectreftask_id,'reftask');\">
     <img src=\"$ico_ok\" alt=\"$l_c_j_update\" title=\"$l_c_j_update\" />
@@ -2631,7 +2634,6 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     $reftask_list
     </tbody>
     </table>
-    </form>
     <form name=\"form_reftask_new\" method=\"post\" action=\"\">
     <table>
     <thead>
