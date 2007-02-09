@@ -73,7 +73,7 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
         <tr>
         <td><img src=\"$ico_delete\" alt=\"Remove\" onclick=\"deleteIpRow(this)\"/></td>
         <td>
-        <input type=\"text\" onkeyup=\"checkIp(this)\" autocomplete=\"off\"  name=\"mailserver_networks[]\" value=\"".$net_q->f("mailservernetwork_ip")."\" />
+        <input type=\"text\" onkeyup=\"checkIp(this)\" autocomplete=\"off\"  name=\"relayhost_networks[]\" value=\"".$net_q->f("mailservernetwork_ip")."\" />
         </td></tr>
         ";
 
@@ -125,7 +125,12 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
   $host_q = run_query_mailserver_server_host($id);
   $ms_select = "<select name=\"host_id\">";
   while($host_q->next_record()) {
-    ($id == $host_q->f("host_id"))?$selected = "selected=\"selected\"":$selected="";
+    if($host_id == $host_q->f("host_id")) {
+      $selected = "selected=\"selected\"";
+      $host_label = $host_q->f("host_name");
+    }else {
+      $selected="";
+    }   
     $ms_select .= "<option $selected value=\"".$host_q->f("host_id")."\">".$host_q->f("host_name")."</option>";
   }
   $ms_select .= "</select>";
@@ -139,6 +144,23 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
   }
   $rh_select .= "</select>";
 
+  if(isset($id) && !check_can_change_mailserver($id)) {
+    $dis_host = "
+    <tr>
+      <th>$l_host</th>
+      <td>$host_label</td>
+    </tr>
+    ";
+      
+  } else {
+    $dis_host = "
+    <tr>
+      <th>$l_host</th>
+      <td>$ms_select</td>
+    </tr>
+    ";
+  }
+
   $block = "
     <form method=\"get\" name=\"f_entity\"
     onsubmit=\"\" 
@@ -148,10 +170,7 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
     <legend>$l_mailserver</legend>
 
     <table>
-    <tr>
-      <th>$l_host</th>
-      <td>$ms_select</td>
-    </tr>
+    $dis_host
     </table>
     <h1>$l_networks</h1>
     <table>

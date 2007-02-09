@@ -15,7 +15,7 @@ function run_query_mailserver_count() {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("host");
-  $query = "SELECT COUNT(*) as mode FROM MailServer 
+  $query = "SELECT mailserver_id FROM MailServer 
     JOIN Host ON mailserver_host_id = host_id
     WHERE 1=1 $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_mailserver_count())");
@@ -23,7 +23,7 @@ function run_query_mailserver_count() {
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q->f("mode");  
+  return $obm_q;  
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Return All mailservers
@@ -61,7 +61,7 @@ function run_query_mailserver_server_host($id=false) {
   }
   $query = "
     SELECT host_id, host_name FROM Host
-    LEFT JOIN MailServer ON host_id = mailserver_id OR host_id = mailserver_relayhost_id
+    LEFT JOIN MailServer ON host_id = mailserver_host_id
     WHERE (mailserver_id IS NULL $where)
           $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_mailserver_server_host()");
@@ -76,16 +76,15 @@ function run_query_mailserver_server_host($id=false) {
 function run_query_mailserver_check_server($host_id,$id=false) {
   global $cdg_sql;
   if($id) {
-    $where = "OR mailserver_id = '$id'";
+    $where = "AND mailserver_id != '$id'";
   }
 
   $multidomain = sql_multidomain("host");
   $query = "
-    SELECT host_id, host_name FROM Host
-    LEFT JOIN MailServer ON host_id = mailserver_id OR host_id = mailserver_relayhost_id
-    WHERE (mailserver_id IS NULL $where)
+    SELECT mailserver_id FROM MailServer
+    WHERE mailserver_host_id = '$host_id' $where
           $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_mailserver_server_host()");
+  display_debug_msg($query, $cdg_sql, "run_query_mailserver_check_server()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   return !($obm_q->next_record());
@@ -100,7 +99,9 @@ function run_query_mailserver_insert($mailserver) {
   $host_id = $mailserver["host_id"];
   $relayhost_id = $mailserver["relayhost_id"];
   $mailserver_networks = $mailserver["mailserver_networks"];
-  $relayhost_networks = $relayhost["relayhost_networks"];
+  if($relayhost_id != "") {
+    $relayhost_networks = $mailserver["relayhost_networks"];
+  }
   $query = "
     INSERT INTO MailServer (
       mailserver_host_id,
@@ -118,13 +119,9 @@ function run_query_mailserver_insert($mailserver) {
   $obm_q->query($query);
   $obm_q->next_record();
   $id = $obm_q->f("mailserver_id");
-  if($relayhost_id!= '' && is_array($relayhost_networks)) {
-    run_query_mailserver_add_networks($relayhost_networks,$relayhost_id);
-  }
+  run_query_mailserver_add_networks($relayhost_networks,$relayhost_id);
 
-  if(is_array($mailserver_networks)) {
-    run_query_mailserver_add_networks($mailserver_networks,$host_id);
-  }  
+  run_query_mailserver_add_networks($mailserver_networks,$host_id);
   return $id;
 }
 
@@ -135,7 +132,10 @@ function run_query_mailserver_update($mailserver) {
   $host_id = $mailserver["host_id"];
   $relayhost_id = $mailserver["relayhost_id"];
   $mailserver_networks = $mailserver["mailserver_networks"];
-  $relayhost_networks = $relayhost["relayhost_networks"];
+  $mailserver_networks = $mailserver["mailserver_networks"];
+  if($relayhost_id != "") {
+    $relayhost_networks = $mailserver["relayhost_networks"];
+  }  
   $id = $mailserver["id"];
 
   $query = "
@@ -148,13 +148,9 @@ function run_query_mailserver_update($mailserver) {
   display_debug_msg($query, $cdg_sql, "run_query_mailserver_insert()");
   $obm_q->query($query);
 
-  if($relayhost_id!= '' && is_array($relayhost_networks)) {
-    run_query_mailserver_add_networks($relayhost_networks,$relayhost_id);
-  }
+  run_query_mailserver_add_networks($relayhost_networks,$relayhost_id);
 
-  if(is_array($mailserver_networks)) {
-    run_query_mailserver_add_networks($mailserver_networks,$host_id);
-  }
+  run_query_mailserver_add_networks($mailserver_networks,$host_id);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -230,7 +226,7 @@ function run_query_mailserver_add_networks($networks,$id) {
       '%s'
     )";
 
-
+  if(is_array($networks))
   foreach($networks as $network) {
     if($network != "") {
       $tquery = sprintf($query,$network);
@@ -241,7 +237,7 @@ function run_query_mailserver_add_networks($networks,$id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the mailserver can be deleted
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_mailserver($id) {
+function check_can_change_mailserver($id) {
   global $cdg_sql;
   $multidomain = sql_multidomain("userobm");
   

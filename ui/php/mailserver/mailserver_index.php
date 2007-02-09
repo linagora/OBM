@@ -33,9 +33,10 @@ require_once("$obminclude/of/of_category.inc");
 get_mailserver_action();
 if($action == "index") {
   $mode = run_query_mailserver_count();
-  if($mode == 0) {
+  if($mode->nf() == 0) {
     $action = "new";
-  } elseif($mode == 1) {
+  } elseif($mode->nf() == 1) {
+    $params["id"] = $mode->f("mailserver_id");
     $action = "detailconsult";
   }
 } 
@@ -67,7 +68,7 @@ if ($action == "index") {
   $display["detail"] = dis_mailserver_consult($ms_q,$net_q);    
 } elseif($action == "checkdelete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_mailserver($params["id"])) {
+  if (check_can_change_mailserver($params["id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_mailserver($params["id"]);
   } else {
@@ -79,7 +80,7 @@ if ($action == "index") {
   }
 } elseif($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_mailserver($params["id"])) {
+  if (check_can_change_mailserver($params["id"])) {
     $retour = run_query_mailserver_delete($params["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_mailserver : $l_delete_ok");

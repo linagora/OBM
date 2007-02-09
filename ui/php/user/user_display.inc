@@ -1315,35 +1315,19 @@ $samba_section
 //      mail_server : identifiant du serveur à sélectionner
 ///////////////////////////////////////////////////////////////////////////////
 function get_select_host_server($mail_server="") {
-    $mail = get_mail_info();
-    $regexp_dflt_mail_server = "/^dflt_mailserver$/";
-    $regexp_mail_server = "/^mailserver_[0-9]{1,2}$/";
+    $mail = run_query_user_get_mailserver();
 
     // On construit une boite de selection
     // La valeur par défaut est le serveur par défaut, sauf si $mail_server
     // est positionné
     $dis_mailserver = "
     <select name=\"sel_mail_server\">";
-    while( list( $key, $val ) = each( $mail ) ) {
-        if( preg_match( $regexp_dflt_mail_server, $key ) ) {
-            if ((!$mail_server) || ($mail_server==$val)) {
-                $dis_mailserver .= "
-        <option value=\"".$val."\" selected>".get_hostname_by_id($val)."</option>";
-            } else {
-                $dis_mailserver .= "
-        <option value=\"".$val."\">".get_hostname_by_id($val)."</option>";
-            }
-        }elseif( preg_match( $regexp_mail_server, $key ) ) {
-            if ($mail_server==$val) {
-                $dis_mailserver .= "
-        <option value=\"".$val."\" selected>".get_hostname_by_id($val)."</option>";
-            } else {
-                $dis_mailserver .= "
-        <option value=\"".$val."\">".get_hostname_by_id($val)."</option>";
-            }
-         }
+    while($mail->next_record()) {
+      $name = $mail->f("host_name");
+      $id = $mail->f("mailserver_id");
+      $dis_mailserver .= "<option value=\"$id\">$name</option>";
+      
     }
-
     $dis_mailserver .= "
     </select>";
 
