@@ -167,6 +167,7 @@ function run_query_group_detail($id) {
 	
   $query = "SELECT *,
       group_privacy as privacy,
+      group_mailing as mailing,
       $timecreate,
       $timeupdate,
       c.userobm_login as usercreate,
@@ -197,6 +198,7 @@ function run_query_group_insert($group) {
   $desc = $group["desc"];
   $email = $group["email"];
   $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
+  $mailing = (isset($group["mailing"]) ? $group["mailing"] : '0');
   $now = date("Y-m-d H:i:s");
 	$domain_id = $obm["domain_id"];	
 
@@ -205,22 +207,26 @@ function run_query_group_insert($group) {
     group_timecreate,
     group_userupdate,
     group_usercreate,
-		group_domain_id,
+    group_domain_id,
     group_system,
     group_privacy,
     group_name,
     group_desc,
-    group_email)
-  VALUES (null,
+    group_email,
+    group_mailing
+  ) VALUES (
+    null,
     '$now',
     null,
     '$uid',
-		'$domain_id',
+    '$domain_id',
     '$system',
     '$priv',
     '$name',
     '$desc',
-    '$email')";
+    '$email',
+    '$mailing'
+  )";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_insert()");
   $obm_q = new DB_OBM;
@@ -290,6 +296,7 @@ function run_query_group_update($group) {
   $desc = $group["desc"];
   $email = $group["email"];
   $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
+  $mailing = (isset($group["mailing"]) ? $group["mailing"] : '0');
   $now = date("Y-m-d H:i:s");
   $multidomain = sql_multidomain("group");
   
@@ -299,7 +306,8 @@ function run_query_group_update($group) {
     group_privacy='$priv',
     group_name='$name',
     group_desc='$desc',
-    group_email='$email'
+    group_email='$email',
+    group_mailing='$mailing'
   WHERE group_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql);

@@ -18,6 +18,7 @@ $fieldnames["group_local"] = $l_local;
 $fieldnames["group_ext_id"] = $l_ext_id;
 $fieldnames["group_desc"] = $l_desc;
 $fieldnames["group_email"] = $l_email;
+$fieldnames["group_mailing"] = $l_mailing;
 $fieldnames["usercreate"] = $l_creator;
 $fieldnames["userupdate"] = $l_updater;
 $fieldnames["timecreate"] = $l_date_creation;
@@ -106,6 +107,15 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
     }
   }
 
+  else if ($fieldname == "group_mailing") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
+  }
 
   return $res;
 }
@@ -119,7 +129,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_search_form ($group) {
   global $display, $l_name, $l_group_user, $l_email, $l_find, $l_add_groups;
-  global $l_visibility;
+  global $l_visibility, $l_mailing;
  
   $popup = $group["popup"];
 
@@ -155,6 +165,7 @@ function html_group_search_form ($group) {
   $email = stripslashes($group["email"]);
   $user = stripslashes($group["user"]);
   $privacy = $group["privacy"];
+  $mailing = $group["mailing"];
 
   $sel_privacy = dis_privacy_search_select($privacy);
 
@@ -302,7 +313,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
 //     keys used  : name, desc, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_form($action, $group_q, $group) {
-  global $cgroup_private_default, $l_group, $l_name, $l_desc, $l_email;
+  global $cgroup_private_default, $l_group, $l_name, $l_desc, $l_email, $l_mailing;
   global $l_private, $l_insert, $l_update, $l_back;
   global $auth;
   
@@ -314,6 +325,7 @@ function html_group_form($action, $group_q, $group) {
     $desc = $group_q->f("group_desc");
     $email = $group_q->f("group_email");
     $priv = $group_q->f("privacy");
+    $mailing = $group_q->f("group_mailing");
   } elseif ($action == "new") {
     if ($cgroup_private_default) {
       $private_c = " checked";
@@ -326,6 +338,7 @@ function html_group_form($action, $group_q, $group) {
   if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
   if (isset($group["email"])) { $email = stripslashes($group["email"]); }
   if (isset($group["privacy"])) { $priv = stripslashes($group["privacy"]); }
+  if (isset($group["mailing"])) { $mailing = stripslashes($group["mailing"]); }
 
   // If new group or group update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
@@ -334,6 +347,9 @@ function html_group_form($action, $group_q, $group) {
     if ($priv == '1') {
       $private_c = " checked";
     }
+    if ($mailing == '1') {
+      $mailing_c = " checked";
+    }
     $dis_private = "
   <tr>
     <th>$l_private</th>
@@ -341,6 +357,11 @@ function html_group_form($action, $group_q, $group) {
   </tr>";
   } 
 
+  $dis_mailing = "
+  <tr>
+    <th>$l_mailing</th>
+    <td><input name=\"cba_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
+  </tr>";
   $block_userdata = of_userdata_dis_entity_form("group", $id, $group);
 
   $block = "
@@ -355,11 +376,12 @@ function html_group_form($action, $group_q, $group) {
       <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
   </tr>
   $dis_private
- <tr>
+  <tr>
     <th>$l_email</th>
     <td>
       <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
   </tr>
+  $dis_mailing
   </table>
   </fieldset>
 
@@ -445,7 +467,7 @@ function dis_group_consult($group, $uid) {
 function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $auth;
   global $l_yes, $l_no, $ico_mail;
-  global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
+  global $l_group, $l_name, $l_desc, $l_email, $l_mailing, $l_no_user, $l_no_group_group;
   global $l_system, $l_local, $l_ext_id;
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
   global $display, $perm, $module, $action, $cright_write;
@@ -461,6 +483,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $name = $group_q->f("group_name");
   $desc = $group_q->f("group_desc");
   $email = $group_q->f("group_email");
+  $mailing = ($group_q->f("group_mailing") == 1 ? $l_yes : $l_no);
   //$mail = get_mail_info();
   //$main_domain = $mail["main_domain"];
 
@@ -568,6 +591,9 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     </tr><tr>
       <th>$l_email</th>
       <td>$email</td>
+    </tr><tr>
+      <th>$l_mailing</th>
+      <td>$mailing</td>
     </tr>
     </table>
     </div>
@@ -712,6 +738,5 @@ function dis_group_display_pref($prefs_g, $prefs_u) {
 
   return $block;
 }
-
 
 ?>
