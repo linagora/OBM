@@ -199,6 +199,7 @@ ALTER TABLE Project ADD COLUMN project_reference_tech text DEFAULT '';
 
 CREATE TABLE CV (
   cv_id              int(8) auto_increment,
+  cv_domain_id       int(8) default 0,
   cv_timeupdate      timestamp(14),
   cv_timecreate      timestamp(14),
   cv_userupdate      int(8),

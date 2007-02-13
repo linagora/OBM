@@ -586,12 +586,10 @@ function run_query_document_get_type_by_ext($ext) {
 function get_document_link_nb($document_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("documententity");
 
   $query = "SELECT count(*) as nb
     FROM DocumentEntity
-    WHERE documententity_document_id = '$document_id' 
-      $multidomain";
+    WHERE documententity_document_id = '$document_id' ";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "get_document_link_nb()");

@@ -32,7 +32,7 @@ function run_query_mailserver_count() {
 function run_query_mailserver_getall() {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("host");
+  $multidomain = sql_multidomain("ms.host");
   $query = "SELECT
     mailserver_id,
     rh.host_name as relayhost_name,
@@ -160,7 +160,7 @@ function run_query_mailserver_update($mailserver) {
 function run_query_mailserver_details($id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("host");
+  $multidomain = sql_multidomain("ms.host");
   $query = "
     SELECT
     mailserver_id,
@@ -186,7 +186,6 @@ function run_query_mailserver_details($id) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_mailserver_networks($id) {
-  $multidomain = sql_multidomain("host");
   
   $query = "
     SELECT
@@ -195,7 +194,7 @@ function run_query_mailserver_networks($id) {
     FROM MailServerNetwork
     JOIN MailServer ON mailservernetwork_host_id = mailserver_host_id
                     OR  mailservernetwork_host_id = mailserver_relayhost_id
-    WHERE mailserver_id = $id $multidomain";
+    WHERE mailserver_id = $id ";
   display_debug_msg($query, $cdg_sql, "run_query_mailserver_count())");
   $obm_q= new DB_OBM;
   $obm_q->query($query);

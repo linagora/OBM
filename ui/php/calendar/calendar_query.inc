@@ -22,7 +22,7 @@ function run_query_calendar_detail($calendar_id) {
   $timecreate = sql_date_format($db_type, "calendarevent_timecreate", "timecreate");
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date","calendarevent_date");
   $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat", "calendarevent_endrepeat");
-
+  $multidomain = sql_multidomain("calendarevent");
   $query = "SELECT DISTINCT
       calendarevent_id,
       c.userobm_login as usercreate,
@@ -49,7 +49,7 @@ function run_query_calendar_detail($calendar_id) {
       LEFT JOIN CalendarCategory1 ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN UserObm AS c ON calendarevent_usercreate = c.userobm_id
       LEFT JOIN UserObm AS u ON calendarevent_userupdate = u.userobm_id
-    WHERE calendarevent_id = '$calendar_id'";
+    WHERE calendarevent_id = '$calendar_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_detail()");
   $obm_q->query($query);
@@ -66,13 +66,14 @@ function run_query_calendar_detail($calendar_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_get_user_name($users="") {
   global $cdg_sql;
+  $multidomain = sql_multidomain("userobm");
 
   $in = "'".implode ("','", $users)."'";
 
   $obm_q = new DB_OBM;
   $query = "SELECT userobm_lastname, userobm_firstname, userobm_id
             FROM UserObm
-	    WHERE userobm_id IN ($in)";
+	    WHERE userobm_id IN ($in) $multidomain";
 
   $query.= " ORDER BY userobm_id"; 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_get_user_name()");
@@ -89,15 +90,18 @@ function run_query_calendar_get_user_name($users="") {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_get_resource_label($resources) {
   global $cdg_sql;
-
+  
   if (count($resources) > 0) {
     $in = "'".implode ("','", $resources)."'";
-    $where = "WHERE resource_id IN ($in)";
+    $where = " resource_id IN ($in)";
+    $and = true;
   }
+  $multidomain = sql_multidomain("resource",$and);
+  $and = false; 
   $obm_q = new DB_OBM;
   $query = "SELECT resource_name, resource_id
             FROM Resource 
-            $where";
+            WHERE $where $multidomain";
 
   $query.= " ORDER BY resource_id";
   display_debug_msg($query, $cdg_sql, "run_query_calendar_get_resource_label()");
@@ -160,6 +164,8 @@ function run_query_resource_resourcegroup($group) {
   global $cdg_sql, $ctype_resource;
   if (is_array($group) && count($group) > 0) {
     
+    $multidomain = sql_multidomain("rgroup");
+    
     $obm_q = new DB_OBM;
     $db_type = $obm_q->type;
     $query = "SELECT 
@@ -169,7 +175,7 @@ function run_query_resource_resourcegroup($group) {
            resourcegroup_rgroup_id as resource_group
            FROM ResourceGroup LEFT JOIN Resource ON resourcegroup_resource_id=resource_id
            LEFT JOIN RGroup ON rgroup_id = resourcegroup_rgroup_id
-        WHERE resourcegroup_rgroup_id IN (".implode(",",$group).")";
+        WHERE resourcegroup_rgroup_id IN (".implode(",",$group).") $multidomain";
 
     display_debug_msg($query, $cdg_sql, "run_query_resource_resourcegroup()");
     $obm_q->query($query);
@@ -224,6 +230,7 @@ function run_query_calendar_waiting_events() {
 
   $uid = $auth->auth["uid"];
   
+  $multidomain = sql_multidomain("calendarevent");
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -252,7 +259,8 @@ function run_query_calendar_waiting_events() {
       LEFT JOIN UserObm u ON calendarevent_usercreate = u.userobm_id
     WHERE 
       evententity_state = 'W'
-      AND evententity_entity = 'user'";
+      AND evententity_entity = 'user'
+      $multidomain";
 
   if (is_array($writable_cal)) {
     $query .= " AND evententity_entity_id IN (";
@@ -395,7 +403,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
 // Returns: Event id inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_event_data($calendar) {
-  global $cdg_sql, $uid;
+  global $cdg_sql, $uid,$obm;
 
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
@@ -431,7 +439,8 @@ function run_query_calendar_insert_event_data($calendar) {
     calendarevent_repeatfrequence,
     calendarevent_repeatdays,
     calendarevent_allday,
-    calendarevent_endrepeat)
+    calendarevent_endrepeat,
+    calendarevent_domain_id)
   VALUES (
     '$now',
     '$now',
@@ -449,7 +458,8 @@ function run_query_calendar_insert_event_data($calendar) {
     '$repeatfrequency',
     '$repeat_days',
     '$all_day',
-    '$repeat_end')";
+    '$repeat_end',
+    '$obm[domain_id]')";
 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data()");
   $obm_q->query($query);
@@ -929,7 +939,7 @@ function run_query_calendar_update_event_data($calendar) {
  */
 function run_query_calendar_quick_event_update($calendar) {
   global $cdg_sql, $uid;
-
+  $multidomain = sql_multidomain("calendarevent");
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
   $datebegin = $calendar["date_begin"];
@@ -943,7 +953,7 @@ function run_query_calendar_quick_event_update($calendar) {
     calendarevent_date = '$datebegin',     
     calendarevent_duration = '$event_duration'
   WHERE
-  calendarevent_id = '$event_id'";
+  calendarevent_id = '$event_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_calendar_update_event_data()");
   $obm_q->query($query);  
 }
@@ -956,7 +966,7 @@ function run_query_calendar_quick_event_update($calendar) {
  * @return void
  */
 function run_query_calendar_quick_event_insert($calendar) {
-  global $cdg_sql, $uid;
+  global $cdg_sql, $uid,$obm;
 
 
   $now = date("Y-m-d H:i:s");
@@ -978,8 +988,9 @@ function run_query_calendar_quick_event_insert($calendar) {
      calendarevent_privacy,
      calendarevent_repeatkind,
      calendarevent_repeatfrequence,
-     calendarevent_priority
-  )
+     calendarevent_priority,
+     calendarevent_domain_id
+   )
   VALUES (
     '$now',
     '$uid', 
@@ -992,7 +1003,8 @@ function run_query_calendar_quick_event_insert($calendar) {
     '0',
     'none',
     '1',
-    '2'
+    '2',
+    '$obm[domain_id]'
   )";
   display_debug_msg($query, $cdg_sql, "run_query_calendar_quick_insert_event_data()");
   $obm_q->query($query);
@@ -1014,7 +1026,7 @@ function run_query_calendar_quick_event_insert($calendar) {
  * @return void
  */
 function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
-  global $cdg_sql, $uid;
+  global $cdg_sql, $uid,$obm;
 
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
@@ -1071,7 +1083,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
       calendarevent_repeatfrequence,
       calendarevent_repeatdays,
       calendarevent_allday,
-      calendarevent_endrepeat)
+      calendarevent_endrepeat,
+      calendarevent_domain_id
+    )
     VALUES (
       '$now',
       '$now',
@@ -1089,7 +1103,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
       '$repeatfrequency',
       '$repeat_days',
       '$all_day',
-      '$repeat_end')";
+      '$repeat_end',
+      '$obm[domain_id]'
+    )";
 
     display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data()");
     $obm_q->query($query);
@@ -1144,9 +1160,10 @@ function run_query_calendar_delete($calendar) {
   
   $users_array = get_calendar_event_users_info($event_id);
 
+  $multidomain = sql_multidomain("calendarevent");
   $query = "SELECT calendarevent_title
     FROM CalendarEvent
-    WHERE calendarevent_id = '$event_id'";
+    WHERE calendarevent_id = '$event_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_calendar_delete(1)");
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1266,10 +1283,11 @@ function get_calendar_group_readable() {
     $where .= " AND group_privacy=1";
   }
 
+  $multidomain = sql_multidomain("group");
   $query = "
     SELECT group_id, group_privacy, group_name
     FROM UGroup
-    WHERE $where
+    WHERE $where $multidomain
     ORDER BY group_privacy DESC, group_name";
 
   $obm_q = new DB_OBM;
@@ -1308,10 +1326,11 @@ function get_calendar_resource_from_ids($resources) {
     foreach($resources as $resource) {
       $where .= ", $resource";
     }
+    $multidomain = sql_multidomain("resource");
     $where .= ")";
     $query = "SELECT *
     FROM Resource 
-    WHERE resource_id IN $where
+    WHERE resource_id IN $where $multidomain
     ORDER by resource_name";
     display_debug_msg($query, $cdg_sql, "get_calendar_resource_from_ids()");
     $obm_q = new DB_OBM;
@@ -1340,6 +1359,7 @@ function get_calendar_resource_from_ids($resources) {
 function get_calendar_group_from_ids($groups) {
   global $cdg_sql;
 
+  $multidomain = sql_multidomain("ugroup");
   if (is_array($groups)) {
     $where = "(0";
     foreach($groups as $group) {
@@ -1349,7 +1369,7 @@ function get_calendar_group_from_ids($groups) {
     $query = "SELECT *
     FROM UGroup
     WHERE 
-      group_id IN $where
+      group_id IN $where $multidomain
     ORDER by group_name";
     display_debug_msg($query, $cdg_sql, "get_calendar_group_from_ids()");
     $obm_q = new DB_OBM;
@@ -1451,7 +1471,8 @@ function get_calendar_event_info($id) {
     return false;
   }
 
-  $query = "SELECT * FROM CalendarEvent WHERE calendarevent_id='$id'";
+  $multidomain = sql_multidomain("calendarevent");
+  $query = "SELECT * FROM CalendarEvent WHERE calendarevent_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_calendar_event_info()");
   $obm_q = new DB_OBM;
@@ -1502,6 +1523,7 @@ function get_calendar_event_entity($calendar_id) {
   global $cdg_sql;
 
   // XXXX Optimisation possible : 1 seule requete pour toutes les entites
+  $multidomain = sql_multidomain("userobm");
 
   $query = "SELECT DISTINCT
     userobm_id,
@@ -1514,7 +1536,8 @@ function get_calendar_event_entity($calendar_id) {
     LEFT JOIN UserObm ON evententity_entity_id = userobm_id
   WHERE 
     evententity_event_id = '$calendar_id' AND 
-    evententity_entity = 'user'";
+    evententity_entity = 'user'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_calendar_event_entity(1)");
   $u_q = new DB_OBM;
@@ -1528,6 +1551,7 @@ function get_calendar_event_entity($calendar_id) {
     $entities[$entity]["entity"][$entity_id] = array("label"=> $label,
 						     "state" => $state);
   }
+  $multidomain = sql_multidomain("resource");
 
   $query = "SELECT DISTINCT
     resource_id,
@@ -1539,7 +1563,8 @@ function get_calendar_event_entity($calendar_id) {
     LEFT JOIN Resource ON evententity_entity_id = resource_id
   WHERE 
     evententity_event_id = '$calendar_id'
-    AND evententity_entity = 'resource'";
+    AND evententity_entity = 'resource'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_calendar_event_entity(2)");
   $r_q = new DB_OBM;
@@ -1553,6 +1578,7 @@ function get_calendar_event_entity($calendar_id) {
     $entities[$entity]["entity"][$entity_id] = array("label"=> $label,
 						     "state" => $state);
   }
+  $multidomain = sql_multidomain("project");
 
   $query = "SELECT DISTINCT
     projecttask_id,
@@ -1566,7 +1592,8 @@ function get_calendar_event_entity($calendar_id) {
     LEFT JOIN Project ON projecttask_project_id = project_id
   WHERE 
     evententity_event_id = '$calendar_id'
-    AND evententity_entity = 'task'";
+    AND evententity_entity = 'task'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_calendar_event_entity(2)");
   $r_q = new DB_OBM;
@@ -1916,6 +1943,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
   if ($event_id != "") {
     $where_event .= " AND calendarevent_id != '$event_id' ";
   }
+  $multidomain = sql_multidomain("calendarevent");
 
   $query = "SELECT
       calendarevent_id,
@@ -1942,6 +1970,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
       AND $calendarevent_date < $end 
       $where_ent
       $where_event
+      $multidomain
     ORDER BY calendarevent_date";
 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_conflict_events(()");
@@ -1966,6 +1995,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity) {
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
   $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date","calendarevent_date");
 
+  $multidomain = sql_multidomain("calendarevent");
   if (is_array($calendar_entity["user"])
       && (count($calendar_entity["user"]) > 0) ) {
     $has_user = true;
@@ -2041,6 +2071,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity) {
       AND $calendarevent_date >= $start - calendarevent_duration
       AND $calendarevent_date <= $end
       AND $where_grp
+      $multidomain
     ";
   }
   
@@ -2067,6 +2098,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity) {
       AND $calendarevent_date >= $start - calendarevent_duration
       AND $calendarevent_date <= $end
       $where_ent
+      $multidomain
       $union
       ORDER BY calendarevent_date
       "; 
@@ -2092,6 +2124,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity) {
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
   $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date","calendarevent_date");
   $calendarevent_endrepeat_l = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat");
+  $multidomain = sql_multidomain("calendarevent");
 
   if (is_array($calendar_entity["user"])
       && (count($calendar_entity["user"]) > 0) ) {
@@ -2172,6 +2205,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity) {
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
       OR $calendarevent_endrepeat = '0')
       AND $where_grp
+      $multidomain
     ";
   }
 
@@ -2202,6 +2236,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity) {
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
       OR $calendarevent_endrepeat = '0')
       $where_ent
+      $multidomain
       $union
 
     ORDER BY calendarevent_date"; 
@@ -2227,6 +2262,7 @@ function run_query_get_events_attendee($events) {
   }
   $obm_q = new DB_OBM;
 
+  $multidomain = sql_multidomain("calendarevent");
   $query = "SELECT
    calendarevent_id,
    evententity_entity_id,
@@ -2242,7 +2278,7 @@ function run_query_get_events_attendee($events) {
    LEFT JOIN Resource ON evententity_entity = 'resource' AND evententity_entity_id = resource_id
    LEFT JOIN ProjectTask ON evententity_entity = 'task' AND  evententity_entity_id = projecttask_id
    LEFT JOIN Project ON project_id = projecttask_project_id
-   WHERE calendarevent_id IN ($event_list)";
+   WHERE calendarevent_id IN ($event_list) $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_get_events_attendee()");
   $obm_q->query($query);

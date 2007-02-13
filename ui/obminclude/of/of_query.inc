@@ -271,7 +271,7 @@ function sql_multidomain($entity, $and=true) {
     if ($and) {
       $wand = "AND";
     }
-    $where = "$wand ${entity}_domain_id='$domain_id'";
+    $where = "$wand (${entity}_domain_id='$domain_id' OR ${entity}_domain_id=0)";
   }
 
   return $where;

@@ -68,7 +68,8 @@ function run_query_cv_search($cv, $p_new_order, $p_order_dir) {
   if ($p_new_order == "timecreate") $p_new_order = "cv_timecreate";  
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "cv_timecreate";
   $orderq .= " ORDER BY $order $p_order_dir";
-  
+
+  $multidomain = sql_multidomain("cv"); 
   
   $timeupdate = sql_date_format($db_type, "cv_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "cv_timecreate", "timecreate");
@@ -84,7 +85,8 @@ function run_query_cv_search($cv, $p_new_order, $p_order_dir) {
     FROM CV
      JOIN UserObm ON cv_userobm_id = userobm_id
      $joinq
-    $whereq
+     $whereq
+     $multidomain
     $orderq
     $limit
 ";
@@ -116,7 +118,8 @@ function run_query_cv_detail($id) {
   $timeupdate = sql_date_format($db_type, "cv_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "cv_timecreate", "timecreate");
 
-  $query = "SELECT * FROM CV WHERE cv_id = '$id'";
+  $multidomain = sql_multidomain("cv"); 
+  $query = "SELECT * FROM CV WHERE cv_id = '$id' $multidomain";
 
   /*SELECT *,
       p.userobm_lastname as lastname,
@@ -161,6 +164,7 @@ function run_query_cv_refs_detail($id, $new_order="", $order_dir="") {
     $order = "project_name ASC";
   }
 
+  $multidomain = sql_multidomain("cv"); 
   $query = "SELECT cv_id,
                    project_id, project_name, project_reference_desc, project_reference_tech,
                    project_reference_duration, project_reference_date,
@@ -168,7 +172,7 @@ function run_query_cv_refs_detail($id, $new_order="", $order_dir="") {
             FROM CV
             JOIN ProjectCV ON cv_id=projectcv_cv_id
             JOIN Project ON projectcv_project_id=project_id
-            WHERE cv_id = '$id'
+            WHERE cv_id = '$id' $multidomain
             ORDER BY $order";
 
   display_debug_msg($query, $cdg_sql);
@@ -184,7 +188,7 @@ function run_query_cv_refs_detail($id, $new_order="", $order_dir="") {
 */
 
 function run_query_cv_insert($cv) {
-  global $display, $cdg_sql, $auth, $cgp_show;
+  global $display, $cdg_sql, $auth, $cgp_show, $obm;
 
   // CV insertion
   
@@ -202,7 +206,9 @@ function run_query_cv_insert($cv) {
       cv_title,
       cv_userobm_id,
       cv_additionnalrefs,
-      cv_comment)
+      cv_comment,
+      cv_domain_id  
+    )
     VALUES (
       null,
       '$timecreate', 
@@ -211,7 +217,9 @@ function run_query_cv_insert($cv) {
       '$title',
       '$user_id',
       '$additionalrefs',
-      '$comment')";
+      '$comment',
+      $obm[domain_id]
+    )";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -279,6 +287,7 @@ function run_query_cv_update($cv) {
   $user_id = $cv["user_id"];
   $additionalrefs = $cv["additionalrefs"];
   $comment = $cv["comment"];
+  $multidomain = sql_multidomain("cv"); 
   
   $query = "UPDATE CV SET
       cv_timeupdate = '". date("Y-m-d H:i:s")."',
@@ -286,7 +295,7 @@ function run_query_cv_update($cv) {
       cv_title = '$title',
       cv_additionnalrefs = '$additionalrefs',
       cv_comment = '$comment'
-    WHERE cv_id = '$id'";
+    WHERE cv_id = '$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -299,6 +308,7 @@ function run_query_cv_update($cv) {
   
   $projects_id = $cv["project_id"];
   $projects_role = $cv["project_role"];
+  if(is_array($projects_id))
   foreach ($projects_id as $key => $project_id){
     $role = $projects_role[$project_id];
     $ret = run_query_cv_insert_projectcv($project_id, $id, $role);
@@ -348,6 +358,7 @@ function run_query_cv_id($cv, $timecreate, $uid) {
   $additionalrefs = $cv["additionalrefs"];
   $comment = $cv["comment"];
 
+  $multidomain = sql_multidomain("cv"); 
   // comment and additionalrefs not searched because processed before stored in db
   $query = "SELECT
       cv_id
@@ -355,7 +366,8 @@ function run_query_cv_id($cv, $timecreate, $uid) {
     WHERE cv_title = '$title'
       and cv_userobm_id = '$user_id'
       and cv_timecreate = '$timecreate'
-      and cv_usercreate = '$uid' ";
+      and cv_usercreate = '$uid'
+      $multidomain ";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -418,6 +430,7 @@ function run_query_user_detail($user_id){
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   
+  $multidomain = sql_multidomain("userobm"); 
   $query = "SELECT userobm_login,
                    userobm_lastname,
                    userobm_firstname,
@@ -425,7 +438,7 @@ function run_query_user_detail($user_id){
                    userobm_phone,
                    userobm_education
             FROM UserObm
-            WHERE userobm_id='$user_id'";
+            WHERE userobm_id='$user_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -441,14 +454,15 @@ function run_query_user_detail($user_id){
 * @return string $retour
 */
 function run_query_defaultodttemplate_insert($cv) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql,$obm;
 
   $entity = "cv";
   $document_id = $cv["defaultodttemplate_document_id"];
   $label = $cv["defaultodttemplate_label"];
 
-  $query = "INSERT INTO DefaultOdtTemplate(defaultodttemplate_entity, defaultodttemplate_document_id, defaultodttemplate_label)
-            VALUES('$entity', '$document_id', '$label')";
+  $query = "INSERT INTO DefaultOdtTemplate(defaultodttemplate_entity, defaultodttemplate_document_id,
+                                           defaultodttemplate_label, defaultodttemplate_domain_id)
+            VALUES('$entity', '$document_id', '$label', '$obm[domain_id]')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -467,6 +481,7 @@ function run_query_defaultodttemplate_update($cv) {
 
   $label = $cv["defaultodttemplate_label"];
   $id = $cv["defaultodttemplate"];
+  $multidomain = sql_multidomain("defaultodttemplate"); 
 
   $query = "UPDATE DefaultOdtTemplate SET
       defaultodttemplate_label='$label'
