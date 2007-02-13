@@ -116,7 +116,9 @@ function run_query_cv_detail($id) {
   $timeupdate = sql_date_format($db_type, "cv_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "cv_timecreate", "timecreate");
 
-  $query = "SELECT *,
+  $query = "SELECT * FROM CV WHERE cv_id = '$id'";
+
+  /*SELECT *,
       p.userobm_lastname as lastname,
       p.userobm_firstname as firstname,
       p.userobm_location as location,
@@ -130,7 +132,7 @@ function run_query_cv_detail($id) {
          JOIN UserObm as p on cv_userobm_id=userobm_id
          LEFT JOIN UserObm as c on cv_usercreate=c.userobm_id
          LEFT JOIN UserObm as u on cv_userupdate=u.userobm_id
-    WHERE cv_id = '$id'";
+    WHERE cv_id = '$id'";*/
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

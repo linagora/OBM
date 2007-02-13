@@ -30,13 +30,15 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
-$params = get_cv_params();
 include("$obminclude/global_pref.inc");
-include("$obminclude/of/of_category.inc");
-require("cv_query.inc");
 require("cv_display.inc");
+require("cv_query.inc");
+require_once("cv_js.inc");
+$params = get_cv_params();
 require_once("$obminclude/of/of_defaultodttemplate.inc");
+require_once("$obminclude/of/of_category.inc");
 $uid = $auth->auth["uid"];
+
 get_cv_action();
 if ($action == "") $action = "index";
 $perm->check_permissions($module, $action);
@@ -240,12 +242,9 @@ display_page($display);
 */
 function get_cv_params() {
   
-  $params = get_global_params("CV");
- 
- if (isset ($popup)) $params["popup"] = $popup;
- if (isset ($ext_title)) $params["ext_title"] = stripslashes(urldecode($ext_title));
-  
- if (isset ($additionalrefs)) $params["additionalrefs"] = format_additionalrefs($params["additionalrefs_date"], $params["additionalrefs_duration"], $params["additionalrefs_project"], $params["additionalrefs_role"], $params["additionalrefs_desc"], $params["additionalrefs_tech"]);
+ $params = get_global_params("CV");
+
+ $params["additionalrefs"] = format_additionalrefs($params["additionalrefs_date"], $params["additionalrefs_duration"], $params["additionalrefs_project"], $params["additionalrefs_role"], $params["additionalrefs_desc"], $params["additionalrefs_tech"]);
 
  return $params;
 }
@@ -286,9 +285,10 @@ function get_cv_action() {
 // New
   $actions["cv"]["new"] = array (
     'Name'     => $l_header_new,
-    'Url'      => "$path/user/user_index.php?action=ext_get_id&amp;ext_action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_user)."&amp;ext_url=".urlencode("$path/cv/cv_index.php?action=new&amp;user_id=")."",
+    'Url' => "$path/cv/cv_index.php?action=new",
+   
+    //'Url'      => "$path/user/user_index.php?action=ext_get_id&amp;ext_action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_user)."&amp;ext_url=".urlencode("$path/cv/cv_index.php?action=new&amp;user_id=")."",
     'Right'    => $cright_write,
-    'Popup'    => 1,
     'Condition'=> array ('','search','index','detailconsult','admin','type_insert','type_update','type_delete','display','delete')
                                       );
                                       

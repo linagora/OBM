@@ -139,7 +139,7 @@ function html_cv_search_form($cv) {
 
   $block = "
   <form method=\"get\" class=\"search\" name=\"f_search\" action=\"cv_index.php\">
-    <label>$l_lastname<br />
+   <label>$l_lastname<br />
       <input type=\"text\" name=\"tf_lastname\" size=\"20\" maxlength=\"30\" value=\"$lastname\" />
     </label>
     <label>$l_firstname<br />
@@ -305,57 +305,60 @@ function html_cv_consult($cv, $cv_q, $refs_q, $prefs){
     $tech = $refs_q->f("project_reference_tech");
     $date = $refs_q->f("project_reference_date");
     $duration = $refs_q->f("project_reference_duration");
-    $block_references .= "<div class=\"detailHead\">$l_ref : $name</div>
-                          <table class=\"detail\">
+    $block_references .= "
+                          <div class=\"detail extra\">  
+                          <h1>$l_ref : $name</h1>
+                          <table>
                           <tr>
-                            <td class=\"detailLabel\">$l_role</td>
-                            <td class=\"detailText\">$role</td>
+                            <th>$l_role</th>
+                            <td>$role</td>
                           </tr><tr>
-                            <td class=\"detailLabel\">$l_project_date</td>
-                            <td class=\"detailText\">$duration</td>
+                            <th>$l_project_date</th>
+                            <td>$duration</td>
                           </tr><tr>
-                            <td class=\"detailLabel\">$l_project_duration</td>
-                            <td class=\"detailText\">$duration</td>
+                            <th>$l_project_duration</th>
+                            <td>$duration</td>
                           </tr><tr>
-                            <td class=\"detailLabel\">$l_project_desc</td>
-                            <td class=\"detailText\">$desc</td>
+                            <th>$l_project_desc</th>
+                            <td>$desc</td>
                           </tr><tr>
-                            <td class=\"detailLabel\">$l_project_tech</td>
-                            <td class=\"detailText\">$tech</td>
+                            <th>$l_project_tech</th>
+                            <td>$tech</td>
                           </tr>
-                          </table>      ";
+                          </table></div>";
   }      
   $block_additional_references = "";
    if (is_array($array_additionalrefs)) {
      $display_additional_references = false;
      $block_additional_references .="
-       <div class=\"detailHead\">$l_additionalrefs</div>";
+       <div class=\"detail extra\">
+       <h1>$l_additionalrefs</h1>";
      for ($i=0; $i<count($array_additionalrefs); $i++){
        $adref = $array_additionalrefs[$i];
        if (is_array($adref) && count($adref) == 6) {
          $display_additional_references = true;
          $block_additional_references.= "
-         <table class=\"detail\">
+         <table class=\"spreadSheet\">
+         <thead>
          <tr>
-           <td class=\"detailLabel\">$l_project_date</td>
-           <td class=\"detailText\" > ".$adref[0]."</td>
-         </tr><tr>
-           <td class=\"detailLabel\">$l_project_duration</td>
-           <td class=\"detailText\" > ".$adref[1]."</td>
-         </tr><tr>
-            <td class=\"detailLabel\">$l_project</td>
-            <td class=\"detailText\" > ".$adref[2]."</td>
-         </tr><tr>
-            <td class=\"detailLabel\">$l_role</td>
-            <td class=\"detailText\" > ".$adref[3]."</td>
-         </tr><tr>
-            <td class=\"detailLabel\">$l_project_desc</td>
-            <td class=\"detailText\" > ".nl2br($adref[4])."</td>
-         </tr><tr>
-            <td class=\"detailLabel\">$l_project_tech</td>
-            <td class=\"detailText\" > ".nl2br($adref[5])."</td>
+           <th>$l_project_date</th>
+           <th>$l_project_duration</th>
+           <th>$l_project</th>
+           <th>$l_role</th>
+           <th>$l_project_desc</th>
+            <th>$l_project_tech</th>
+          </tr>
+          <tbody>
+          <tr>
+          <td> ".$adref[0]."</td>
+          <td> ".$adref[1]."</td>
+          <td> ".$adref[2]."</td>
+          <td> ".$adref[3]."</td>
+          <td> ".nl2br($adref[4])."</td>
+          <td> ".nl2br($adref[5])."</td>
          </tr>
-         </table> <br />      ";
+         </tbody>
+         </table></div>";
        }
      }  
     if (!$display_additional_references)
@@ -365,11 +368,11 @@ function html_cv_consult($cv, $cv_q, $refs_q, $prefs){
   // --- HTML Template --------------------------------------------------------
 
   //$display["link"] = html_cv_links($id, $label, $tech_id, $deal_id, $inc_nb, $last_inc);
-  $display["title"] = "<div class=\"title\">$l_cv  : $title</div>";
+  $display["title"] = "<h1 class=\"title\">$l_cv  : $title</h1>";
 
 
   $block = "
-  <div class=\"detailHead\">$l_personal</div>
+  <!--<div class=\"detailHead\">$l_personal</div>
   <table class=\"detail\">
   <tr>
     <td class=\"detailLabel\">$l_lastname</td>
@@ -391,7 +394,7 @@ function html_cv_consult($cv, $cv_q, $refs_q, $prefs){
     <td class=\"detailLabel\">$l_education</td>
     <td class=\"detailText\">$education</td>
   </tr>
-  </table>      ";
+  </table>    -->  ";
 
   //$block_references
   
@@ -404,6 +407,8 @@ function html_cv_consult($cv, $cv_q, $refs_q, $prefs){
   }
 
   $block .= display_info_msg($message);
+  
+  $block .= "<div class=\"detail extra\"><h1>$l_refs</h1></div>";
 
   if ($nb_ref != 0) {
 
@@ -423,12 +428,10 @@ function html_cv_consult($cv, $cv_q, $refs_q, $prefs){
 
   $block_additional_references
 
-  <div class=\"detailHead\">$l_comment</div>
-  <table class=\"detail\">
-  <tr>
-    <td class=\"detailText\">$com</td>
-  </tr>
-  </table>";
+  <div class=\"detail extra\">
+  <h1>$l_comment</h1>
+  $com
+  </div>";
 
   return $block;
 }
@@ -441,11 +444,13 @@ function html_cv_consult($cv, $cv_q, $refs_q, $prefs){
 */
 
 function dis_cv_form($action, $cv) {
-  global $display, $l_query_error;
+  global $display, $l_query_error,$cg_com;
 
   // detailupdate
   if ($cv["cv_id"] > 0) {
     $cv_q = run_query_cv_detail($cv["cv_id"]);
+    $users = array($contract["market"], $contract["tech"]);
+    $u_com_q = run_query_all_users_from_group($cg_com, $users);
     if ($cv_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($cv_q);
     } else {
@@ -457,9 +462,11 @@ function dis_cv_form($action, $cv) {
   else {
     $cv_q = "";
     $refs_q = "";
+    $users = array($contract["market"], $contract["tech"]);
+    $u_com_q = run_query_all_users_from_group($cg_com, $users);
   }
 
-  $block = html_cv_form($action, $cv, $cv_q, $refs_q);
+  $block = html_cv_form($action, $cv, $cv_q, $refs_q,$u_com_q);
 
   return $block;
 }
@@ -472,13 +479,14 @@ function dis_cv_form($action, $cv) {
 * @return string $block html cv form to display
 */
 
-function html_cv_form($action, $cv, $cv_q="", $refs_q="") {
+function html_cv_form($action, $cv, $cv_q="", $refs_q="",$u_com_q) {
   global $display, $auth, $set_dsrc, $l_none, $set_theme, $path, $popup_height, $popup_width;
   global $l_update, $l_insert, $l_delete;
   global $l_cv, $l_title, $l_comment, $l_user, $l_select_user, $l_duplicate;
   global $l_lastname, $l_firstname, $l_location, $l_phone, $l_education, $l_personal;
   global $l_refs, $l_add_ref, $l_add_additionalref, $l_select_ref, $l_project, $l_role, $l_additionalrefs;
   global $l_project_desc, $l_project_tech, $l_project_date, $l_project_duration;
+
 
   // if update or duplicate mode and first display values are taken from database (except user for duplicate)
   if ($action == "detailupdate" || $action == "duplicate") {
@@ -533,10 +541,10 @@ function html_cv_form($action, $cv, $cv_q="", $refs_q="") {
       $name = $refs_q->f("project_name");
       $role = $refs_q->f("projectcv_role");
       $block_refs .= "<tr>
-                        <td class=\"detailForm\" style=\"text-align: center;\">$name</td>
-                        <td class=\"detailForm\" style=\"text-align: center;\"> <input name=\"project_role[$project_id]\" type=\"text\" size=\"64\" maxlength=\"128\" value=\"$role\" />
-                                                  <input name=\"project_id[]\" type=\"hidden\" value=\"$project_id\" /> </td>
-                        <td class=\"detailForm\" style=\"text-align: center;\"> <a href=\"\" onclick=\"deleteRow(this) ;return false;\">$l_delete</a> </td>
+                        <td>$name</td>
+                        <td><input name=\"tf_project_role[$project_id]\" type=\"text\" size=\"64\" maxlength=\"128\" value=\"$role\" />
+                         <input name=\"project_id[]\" type=\"hidden\" value=\"$project_id\" /></td>
+                        <td><a href=\"\" onclick=\"deleteRow(this) ;return false;\">$l_delete</a></td>
                       </tr>";
     } 
    // aditionalrefs formatting
@@ -546,13 +554,13 @@ function html_cv_form($action, $cv, $cv_q="", $refs_q="") {
        $adref = $array_additionalrefs[$i];
        if (is_array($adref) && count($adref) == 6) {
          $block_additionalrefs.= "<tr>
-                                    <td class=\"detailForm\" style=\"text-align: center;\"> <input name=\"additionalrefs_date[]\" type=\"text\" size=\"16\"  value=\"".$adref[0]."\" /> </td>
-                                    <td class=\"detailForm\" style=\"text-align: center;\"> <input name=\"additionalrefs_duration[]\" type=\"text\" size=\"16\"  value=\"".$adref[1]."\" /> </td>
-                                    <td class=\"detailForm\" style=\"text-align: center;\"> <input name=\"additionalrefs_project[]\" type=\"text\" size=\"32\"  value=\"".$adref[2]."\" /> </td>
-                                    <td class=\"detailForm\" style=\"text-align: center;\"> <input name=\"additionalrefs_role[]\" type=\"text\" size=\"32\"  value=\"".$adref[3]."\" /> </td>
-                                    <td class=\"detailForm\" style=\"text-align: center;\"> <textarea name=\"additionalrefs_desc[]\">".$adref[4]."</textarea> </td>
-                                    <td class=\"detailForm\" style=\"text-align: center;\"> <textarea name=\"additionalrefs_tech[]\">".$adref[5]."</textarea> </td>
-                                    <td class=\"detailForm\" style=\"text-align: center;\"> <a href=\"\" onclick=\"deleteRow(this) ;return false;\">$l_delete</a> </td>
+                                    <td><input name=\"tf_additionalrefs_date[]\" type=\"text\" size=\"8\"  value=\"".$adref[0]."\" /></td>
+                                    <td><input name=\"tf_additionalrefs_duration[]\" type=\"text\" size=\"8\"  value=\"".$adref[1]."\" /></td>
+                                    <td><input name=\"tf_additionalrefs_project[]\" type=\"text\" size=\"32\"  value=\"".$adref[2]."\" /></td>
+                                    <td><input name=\"tf_additionalrefs_role[]\" type=\"text\" size=\"32\"  value=\"".$adref[3]."\" /></td>
+                                    <td><textarea name=\"ta_additionalrefs_desc[]\">".$adref[4]."</textarea></td>
+                                    <td><textarea name=\"ta_additionalrefs_tech[]\">".$adref[5]."</textarea></td>
+                                    <td><a href=\"\" onclick=\"deleteRow(this) ;return false;\">$l_delete</a></td>
                                   </tr>";
        }
      }  
@@ -561,12 +569,28 @@ function html_cv_form($action, $cv, $cv_q="", $refs_q="") {
   } elseif (($action == "new") || ($action == "insert")) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
-      <input type=\"hidden\" id=\"tf_user_id\" name=\"tf_user_id\" value=\"$user_id\" />
+      <input type=\"hidden\" id=\"user_id\" name=\"user_id\" value=\"$user_id\" />
       <input type=\"submit\" value=\"$l_insert\" />";
       
   }
 
   $display["title"] = "<div class=\"title\">$l_cv : $title</div>";
+
+  
+  //User select
+
+    // Marketing manager select
+  $sel_user = "<select name=\"sel_user_id\">
+    <option value=\"$c_undef\">$l_undef</option>";
+  while ($u_com_q->next_record()) {
+   $sel_user .= "\n<option value=\"".$u_com_q->f("userobm_id")."\"";
+    if ($u_com_q->f("userobm_id") == $market_id) 
+      $sel_user.= " selected=\"selected\"";
+    $sel_user .= ">". $u_com_q->f("userobm_lastname") . " " . $u_com_q->f("userobm_firstname")."</option>";
+  }
+  $sel_market.="</select>";
+
+
 
   // --- HTML Template --------------------------------------------------------
   
@@ -577,75 +601,84 @@ function html_cv_form($action, $cv, $cv_q="", $refs_q="") {
     <form method=\"post\" name=\"f_cv\"
       onsubmit=\"if (check_cv(this)) return true; else return false;\"
       action=\"".url_prepare("cv_index.php")."\">
+    
+    <fieldset class=\"detail extra\">
+    <legend>$l_personal</legend>
+     <table>
+     <tr>
+     <th>
+     $l_select_user
+     </th>
+     <td>
+     $sel_user
+     </td>
+     </tr>
+     </table>
+    </fieldset>
 
-    <div class=\"detailHead\">$l_personal</div>
-
-    <table class=\"detail\">
+    <fieldset class=\"detail extra\">
+    <legend>$l_title</legend>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_lastname</td>
-      <td class=\"detailText\">$lastname </td>                   
-    </tr><tr>
-      <td class=\"detailLabel\">$l_firstname</td>
-      <td class=\"detailText\">$firstname </td>                   
-    </tr><tr>
-      <td class=\"detailLabel\">$l_location</td>
-      <td class=\"detailText\">$location </td>                   
-    </tr><tr>
-      <td class=\"detailLabel\">$l_phone</td>
-      <td class=\"detailText\">$phone </td>                   
-    </tr><tr>    
-      <td class=\"detailLabel\">$l_education</td>
-      <td class=\"detailText\">$education </td>      
+      <th>$l_title</th>
+      <td><input type=\"text\" name=\"tf_title\" maxlength=\"255\" size=\"70\" value=\"$title\" /></td>
     </tr>
     </table>
+    </fieldset>
 
-    <div class=\"detailHead\">$l_title</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"255\" size=\"128\" value=\"$title\" /></td>
-    </tr>
-    </table> 
 
-    <div class=\"detailHead\">$l_refs</div>
-    <table class=\"detail\" id=\"table_refs\">
+    <fieldset class=\"detail extra\">
+    <legend>$l_refs</legend>
+    <table class=\"spreadSheet\" id=\"table_refs\">
+      <thead>
       <tr>
-        <th class=\"detailLabel\"> $l_project </th>
-        <th class=\"detailLabel\"> $l_role </th>
-        <th class=\"detailLabel\"></th>
+        <th> $l_project </th>
+        <th> $l_role </th>
+        <th></th>
       </tr>
+      </thead>
+      <tbody>
       $block_refs
-      <tr>
-        <td colspan=\"6\" class=\"detailText\"><input onclick=\"$js_project\" value=\"$l_add_ref\"  type=\"button\" /></td>
-      </tr>
-    </table>
+      </tbody>
+      </table>
 
-    <div class=\"detailHead\">$l_additionalrefs</div>
-    <table class=\"detail\" id=\"table_additionalrefs\">
-      <tr>
-        <th class=\"detailLabel\">$l_project_date</th>
-        <th class=\"detailLabel\">$l_project_duration</th>
-        <th class=\"detailLabel\">$l_project</th>
-        <th class=\"detailLabel\">$l_role</th>
-        <th class=\"detailLabel\">$l_project_desc</th>
-        <th class=\"detailLabel\">$l_project_tech</th>
-        <th class=\"detailLabel\"></th>
-      <tr>
-      $block_additionalrefs
-      </tr>
-        <td colspan=\"6\" class=\"detailText\"><input onclick=\"newRow2(); return false;\" value=\"$l_add_additionalref\"  type=\"button\" /></td>
-      </tr>
-    </table>
+      <fieldset class=\"buttons\">
+        <input onclick=\"$js_project\" value=\"$l_add_ref\"  type=\"button\" />
+      </fieldset>
+    </fieldset>
 
-    <div class=\"detailHead\">$l_comment</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea id=\"ta_comment\" name=\"ta_comment\" rows=\"8\" cols=\"80\">$comment</textarea></td>
-    </tr>
+    <fieldset class=\"detail extra\">
+    <legend>$l_additionalrefs</legend>
+    <table class=\"spreadSheet\" id=\"table_additionalrefs\">
+      <thead>
+      <tr>
+        <th>$l_project_date</th>
+        <th>$l_project_duration</th>
+        <th>$l_project</th>
+        <th>$l_role</th>
+        <th>$l_project_desc</th>
+        <th>$l_project_tech</th>
+        <th></th>
+       </tr>
+       </thead>
+       <tbody>
+       $block_additionalrefs
+      </tbody>
+      </table>
+      <fieldset class=\"buttons\">
+        <input onclick=\"newRow2(); return false;\" value=\"$l_add_additionalref\"  type=\"button\" />
+      </fieldset>
     </table>
+    </fieldset>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+    <fieldset class=\"detail extra\">
+    <legend>$l_comment</legend>
+      <textarea id=\"ta_comment\" name=\"ta_comment\" rows=\"8\" cols=\"80\">$comment</textarea>
+    </fieldset>
+
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
     </form>";
 
   return $block;
@@ -743,16 +776,17 @@ function html_cv_export($cv_id, $defaults_q) {
   }
   $sel_default_template .= "</select>";
   
-  $block = "<div class=\"detailHead\">$l_export</div>
+  $block = "<fieldset class=\"detail extra\">
+            <legend>$l_export</legend>
             <form name=\"f_export\" method=\"post\" action=\"$path/cv/cv_index.php\">
-            <table class=\"detail\">
+            <table>
             <tr>
-              <td class=\"detailLabel\">$l_anonymous</td>
-              <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_anonymous\" value=\"1\"></input></td>
+              <th>$l_anonymous</th>
+              <td><input type=\"checkbox\" name=\"cb_anonymous\" value=\"1\"></input></td>
             </tr>
             <tr>
-              <td class=\"detailLabel\"> $l_template_kind </td>
-              <td class=\"detailForm\"> ";
+              <th> $l_template_kind </th>
+              <td> ";
               
   if ($defaults_q->num_rows() > 0) {
     $block .= " <label> <input onclick=\"showHide(0)\" type=\"radio\" value=\"0\" name=\"rd_template_kind\" checked=\"checked\"/> $l_default_template </label> &nbsp;";
@@ -770,15 +804,15 @@ function html_cv_export($cv_id, $defaults_q) {
   if ($defaults_q->num_rows() > 0){
     $block .= "
       <tr id=\"default_template\">
-        <td class=\"detailLabel\">$l_template_selection</td>
-        <td class=\"detailForm\">$sel_default_template</td>              
+        <th>$l_template_selection</th>
+        <td>$sel_default_template</td>              
       </tr>";
       $style_other_template = "style=\"display: none;\"";
   }
   
   $block .="<tr $style_other_template id =\"other_template\">
-              <td class=\"detailLabel\">$l_template_selection</td>
-              <td class=\"detailForm\">
+              <th>$l_template_selection</th>
+              <td>
                 <input readonly=\"readonly\" type=\"text\" name=\"tf_other_template_name\" size=\"50\" maxlength=\"255\" value=\"\" /> 
                 <input type=\"hidden\" name=\"tf_other_template\" value=\"\"/>  
                 &nbsp; $ext_sel_document
@@ -792,14 +826,12 @@ function html_cv_export($cv_id, $defaults_q) {
 */
   $block .= "            
             </table>
-            <div class=\"detailButton\">
-              <p class=\"detailButtons\">
+            </fieldset>
+            <fieldset class=\"buttons\">
                 <input type=\"submit\" value=\"$l_export\"/>
                 <input type=\"hidden\" name=\"action\" value=\"export\"/>
                 <input type=\"hidden\" name=\"cv_id\" value=\"$cv_id\" />
-		
-              </p>
-            </div>
+            </fieldset>
             </form>";
 	    
   return $block;
