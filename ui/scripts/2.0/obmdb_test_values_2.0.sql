@@ -106,26 +106,35 @@ INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALU
 
 
 -------------------------------------------------------------------------------
+-- Domain creation
+-------------------------------------------------------------------------------
+DELETE FROM Domain;
+
+INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 1', '', 'aliacom.fr', NULL );
+INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 2', '', 'test1.aliacom.fr', 'test2.aliacom.fr\r\ntest3.aliacom.com' );
+
+
+-------------------------------------------------------------------------------
+-- Remplissage de la table 'MailServer' : déclaration des serveurs de BALs
+-------------------------------------------------------------------------------
+DELETE FROM MailServer;
+
+-- Déclaration d'un serveur de BAL sans hôte relais (relayhost)
+INSERT INTO MailServer (mailserver_host_id) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail') );
+
+
+-------------------------------------------------------------------------------
 -- Test User creation
 -------------------------------------------------------------------------------
 -- Utilisateur de test :
 --  - appartenant a tous les domaines ;
 --  - ayant le droit mail ;
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_fax, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_description) VALUES ('0', 'test00', 'PLAIN', 'ptest00', 'user', 'User', 'Test 00',  '1050', '512', '23, rue des champs', '31400', 'La ville à Ramon', '05 62 19 24 91', '05 62 19 24 92', '06 55 55 55 55', '1', '1', 'test00\r\nmail.test00', (SELECT host_id FROM Host WHERE host_name='srv-mail'), 'Utilisateur appartient au domaine global');
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_fax, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_description) VALUES ('0', 'test00', 'PLAIN', 'ptest00', 'user', 'User', 'Test 00',  '1050', '512', '23, rue des champs', '31400', 'La ville à Ramon', '05 62 19 24 91', '05 62 19 24 92', '06 55 55 55 55', '1', '1', 'test00\r\nmail.test00', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Utilisateur appartient au domaine global');
 
 -- Utilisateur de test :
 --  - appartenant au domaine 1 ;
 --  - ayant le droit mail ;
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_description) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test01', 'PLAIN', 'ptest01', 'user', 'User', 'Test 01', '1051', '512', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test01\r\nmail.test01', (SELECT host_id FROM Host WHERE host_name='srv-mail'), 'Utilisateur n''appartenant qu''au domaine 1');
-
-
--------------------------------------------------------------------------------
--- Domain creation
--------------------------------------------------------------------------------
-DELETE FROM Domain;
-
-INSERT INTO Domain (domain_id, domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_domain_name, domain_alias) VALUES ( 1, NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 1', '', 'aliacom.fr', NULL );
-INSERT INTO Domain (domain_id, domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_domain_name, domain_alias) VALUES ( 2, NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 2', '', 'test1.aliacom.fr', 'test2.aliacom.fr\r\ntest3.aliacom.com' );
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_description) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test01', 'PLAIN', 'ptest01', 'user', 'User', 'Test 01', '1051', '512', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test01\r\nmail.test01', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Utilisateur n''appartenant qu''au domaine 1');
 
 
 -------------------------------------------------------------------------------
@@ -156,22 +165,13 @@ INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES
 
 
 -------------------------------------------------------------------------------
--- Remplissage de la table 'MailServer' : déclaration des serveurs de BALs
--------------------------------------------------------------------------------
-DELETE FROM MailServer;
-
--- Déclaration d'un serveur de BAL sans hôte relais (relayhost)
-INSERT INTO MailServer (mailserver_id) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail') );
-
-
--------------------------------------------------------------------------------
 -- Remplissage de la table 'MailServerNetwork' : déclaration des serveurs
 -- réseaux locaux des serveurs de BALs
 -------------------------------------------------------------------------------
 DELETE FROM MailServerNetwork;
 
-INSERT INTO MailServerNetwork (mailservernetwork_mailserver_id, mailservernetwork_ip) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail'), '127.0.0.1' );
-INSERT INTO MailServerNetwork (mailservernetwork_mailserver_id, mailservernetwork_ip) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail'), '10.0.0.0/24' );
+INSERT INTO MailServerNetwork (mailservernetwork_host_id, mailservernetwork_ip) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail'), '127.0.0.1' );
+INSERT INTO MailServerNetwork (mailservernetwork_host_id, mailservernetwork_ip) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail'), '10.0.0.0/24' );
 
 
 -------------------------------------------------------------------------------
