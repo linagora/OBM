@@ -453,6 +453,7 @@ function html_user_consult($obm_q) {
   $mail_ext_perms = $obm_q->f("userobm_mail_ext_perms");
   $email = $obm_q->f("userobm_email");
   $mail_server_id = $obm_q->f("userobm_mail_server_id");
+  $mail_server_host_name = $obm_q->f("mailserver_hostname");
   $mail_quota = $obm_q->f("userobm_mail_quota");
   $email_nomade = $obm_q->f("userobm_email_nomade");
   $nomade_perms = $obm_q->f("userobm_nomade_perms");
@@ -533,7 +534,7 @@ function html_user_consult($obm_q) {
   }
 
   // Section Mail
-  if ($cgp_use["service"]["mail"] && !is_only_relaying_mails()) {
+  if ($cgp_use["service"]["mail"]) {
     $mail_section = "
     <div class=\"detail infos\">
     <h1>$l_mail</h1>
@@ -551,7 +552,7 @@ function html_user_consult($obm_q) {
       <th>$l_mail_server</th>
       <td>";
       if ($mail_server_id) {
-        $mail_section .= "<a href=\"../host/host_index.php?action=detailconsult&param_host=".$mail_server_id."\">".get_hostname_by_id($mail_server_id)."</a>";
+        $mail_section .= "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=".$mail_server_id."\">".$mail_server_host_name."</a>";
       } else {
         $mail_section .= "-";
       }
@@ -853,7 +854,7 @@ function html_user_form($usr_q, $user, $field="") {
   global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
   global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
   global $l_vacation, $l_vacation_message, $l_mail_server;
-  global $l_enabled, $l_disabled, $l_web_consult_list;
+  global $l_enabled, $l_disabled, $l_web_consult_list,$path;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $path, $display, $cgp_use, $action, $profiles, $c_yes, $c_no;
   global $c_multidomain, $obm, $c_default_domain, $l_domain;
@@ -899,7 +900,8 @@ function html_user_form($usr_q, $user, $field="") {
     // mail
     $mail_perms = $usr_q->f("userobm_mail_perms");
     $mail_ext_perms = $usr_q->f("userobm_mail_ext_perms");
-    $mail_server = $usr_q->f("userobm_mail_server_id");
+    $mail_server = $usr_q->f("mailserver_id");
+    $mail_server_host_name = $usr_q->f("mailserver_hostname");
     $email = $usr_q->f("userobm_email");
     $mail_quota = $usr_q->f("userobm_mail_quota");
 
@@ -965,6 +967,7 @@ function html_user_form($usr_q, $user, $field="") {
   if (isset($user["mail_perms"])) { $mail_perms = $user["mail_perms"]; }
   if (isset($user["mail_ext_perms"])) { $mail_ext_perms = $user["mail_ext_perms"]; }
   if (isset($user["mail_server"])) { $mail_server = $user["mail_server"]; }
+  if (isset($user["mail_server_hostname"])) { $mail_server_host_name = $user["mail_server_hostname"]; }
   if (isset($user["mail_quota"])) { $mail_quota = $user["mail_quota"]; }
 
   // nomad email
@@ -1044,18 +1047,18 @@ function html_user_form($usr_q, $user, $field="") {
   }
 
   // Section Mail
-  if ($cgp_use["service"]["mail"] && !is_only_relaying_mails()) {
+  if ($cgp_use["service"]["mail"]) {
     // Mail perms checkbox checked values
     $mail_state  = ($mail_perms ? "checked" : "");
     $mail_ext_state  = ($mail_ext_perms ? "checked" : "");
-  
     // Mail server selection
-    if ((!isset($mail_server)) || ($mail_server == "")) {
+    if (!$mail_server_host_name) {
       $dis_mailserver = get_select_host_server($mail_server);
     } else {
       $dis_mailserver = "
-      <a href=\"../host/host_index.php?action=detailconsult&param_host=".$mail_server."\">".get_hostname_by_id($mail_server)."</a>
-      <input type=\"hidden\" name=\"sel_mail_server\" value=\"".$mail_server."\" />";
+      <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server\">$mail_server_host_name</a>
+      <input type=\"hidden\" name=\"sel_mail_server\" value=\"$mail_server\" />
+      <input type=\"hidden\" name=\"sel_mail_server_hostname\" value=\"$mail_server_host_name\" />";
     }
 
     $mail_section = "
@@ -1073,7 +1076,7 @@ function html_user_form($usr_q, $user, $field="") {
   </tr>
   <tr>
     <th class=\"$class[mail_server]\">$l_mail_server</th>
-    <td>$dis_mail_server</td>
+    <td>$dis_mailserver</td>
   </tr>
   <tr>
     <th class=\"$class[email]\">$l_email</th>

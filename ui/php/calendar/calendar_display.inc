@@ -912,7 +912,6 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
 
   $event = $occurrence->event;
   $owner = $event->owner;
-
   if($owner == $auth->auth["uid"] || in_array($owner,$writable_entity["ids"])) {
     $updatable =  true;
     $ed[] = "updatable:true";
@@ -1530,7 +1529,7 @@ function dis_calendar_quick_form($calendar) {
       </h2> 
       <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
       <fieldset>
-        $l_title : <input type=\"text\" name=\"tf_title\" /> <input type=\"submit\" value=\"$l_validate\" />
+        $l_title : <input type=\"text\" name=\"tf_title\" /> <input class=\"button\" type=\"submit\" value=\"$l_validate\" />
       </fieldset> 
       <fieldset class=\"buttons\"> 
         <input type=\"button\" onclick=\"obm.calendarQuickForm.goto();\" value=\"$l_advanced\" />

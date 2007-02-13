@@ -141,8 +141,27 @@ function run_query_user_search($user) {
 
   return $obm_q;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Available mailservers
+// Parameters:
+//   - $p_id : user id
+///////////////////////////////////////////////////////////////////////////////
 
+function run_query_user_get_mailserver() {
+  global $cdg_sql;
 
+  $multidomain = sql_multidomain("host");
+  $query = "SELECT
+    mailserver_id,
+    ms.host_name as host_name
+    FROM MailServer 
+    JOIN Host ms ON mailserver_host_id = ms.host_id
+    WHERE 1=1 $multidomain";
+  display_debug_msg($query, $cdg_sql, "run_query_mailserver_count())");
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;    
+}
 ///////////////////////////////////////////////////////////////////////////////
 // User detail query execution
 // Parameters:
@@ -168,13 +187,18 @@ function run_query_user_detail($p_id) {
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
       domain_domain_name as domain_name,
-      host_name,
-      host_web_perms
+      ms.host_name as mailserver_hostname,
+      mailserver_id,
+      ms.host_id as mailserver_host_id,
+      Host.host_name,
+      Host.host_web_perms
     FROM UserObm
          LEFT JOIN UserObm as c ON UserObm.userobm_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON UserObm.userobm_userupdate=u.userobm_id
          LEFT JOIN Domain on UserObm.userobm_domain_id=domain_id
-         LEFT JOIN Host on UserObm.userobm_host_id=host_id
+         LEFT JOIN Host on UserObm.userobm_host_id=Host.host_id
+         LEFT JOIN MailServer on UserObm.userobm_mail_server_id=mailserver_id
+         LEFT JOIN Host ms on ms.host_id=mailserver_host_id
     WHERE UserObm.userobm_id='$p_id'
       $multidomain";
 

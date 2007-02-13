@@ -285,7 +285,7 @@ function run_query_mailserver_delete($id) {
 // Check creation form
 ///////////////////////////////////////////////////////////////////////////////
 function check_mailserver_data_form($mailserver) {
-  global $php_regexp_ip,$err_msg;
+  global $php_regexp_network,$err_msg;
   global $l_invalid_mailserver,$l_invalid_relayhost,$l_invalid_ip;
 
 
@@ -315,10 +315,10 @@ function check_mailserver_data_form($mailserver) {
       return false;    
     } 
   }
-
+  
   if(is_array($mailserver_networks)) {
     foreach($mailserver_networks as $net) {
-      if($net != "" && preg_match($php_regexp_ip, $net) == 0) {
+      if($net != "" && preg_match($php_regexp_network, $net) == 0) {
         $err_msg = "$l_invalid_ip : $net";
         return false;    
       }

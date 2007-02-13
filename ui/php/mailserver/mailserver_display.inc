@@ -53,7 +53,7 @@ function dis_mailserver_list($ms_q) {
 function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
   global $display, $cgp_hide, $uid,$l_mailserver;
   global $l_networks, $l_host, $l_ip,$l_none,$l_update,$l_insert;
-  global $ico_add, $ico_delete,$l_relayhost,$php_regexp_ip;
+  global $ico_add, $ico_delete,$l_relayhost,$php_regexp_network,$php_regexp_ip;
 
   if($action == "detailupdate") {
     $id = $ms_q->f("mailserver_id");
@@ -65,7 +65,7 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
         <tr>
         <td><img src=\"$ico_delete\" alt=\"Remove\" onclick=\"deleteIpRow(this)\"/></td>
         <td>
-        <input type=\"text\" onkeyup=\"checkIp(this)\" autocomplete=\"off\"  name=\"mailserver_networks[]\" value=\"".$net_q->f("mailservernetwork_ip")."\" />
+        <input type=\"text\" onkeyup=\"checkIp(this)\" onblur=\"transformIp(this)\"  name=\"mailserver_networks[]\" value=\"".$net_q->f("mailservernetwork_ip")."\" />
         </td></tr>
         ";
       } else {
@@ -73,7 +73,7 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
         <tr>
         <td><img src=\"$ico_delete\" alt=\"Remove\" onclick=\"deleteIpRow(this)\"/></td>
         <td>
-        <input type=\"text\" onkeyup=\"checkIp(this)\" autocomplete=\"off\"  name=\"relayhost_networks[]\" value=\"".$net_q->f("mailservernetwork_ip")."\" />
+        <input type=\"text\" onkeyup=\"checkIp(this)\" onblur=\"transformIp(this)\" name=\"relayhost_networks[]\" value=\"".$net_q->f("mailservernetwork_ip")."\" />
         </td></tr>
         ";
 
@@ -90,7 +90,7 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
         <tr>
         <td><img src=\"$ico_delete\" alt=\"Remove\" onclick=\"deleteIpRow(this)\"/></td>
         <td>
-        <input type=\"text\" onkeyup=\"checkIp(this)\" autocomplete=\"off\"  name=\"mailserver_networks[]\" value=\"$network\" />
+        <input type=\"text\" onkeyup=\"checkIp(this)\" onblur=\"transformIp(this)\"  name=\"mailserver_networks[]\" value=\"$network\" />
         </td></tr>
         ";
       }
@@ -103,7 +103,7 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
         <tr>
         <td><img src=\"$ico_delete\" alt=\"Remove\" onclick=\"deleteIpRow(this)\"/></td>
         <td>
-        <input type=\"text\" onkeyup=\"checkIp(this)\" autocomplete=\"off\"  name=\"relayhost_networks[]\" value=\"$network\" />
+        <input type=\"text\" onkeyup=\"checkIp(this)\" onblur=\"transformIp(this)\" name=\"relayhost_networks[]\" value=\"$network\" />
         </td></tr>
         ";
       }
@@ -225,6 +225,7 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
             .adopt(new Element('input')
              .setProperty('name',name + '_networks[]')
              .setProperty('onkeyup','checkIp(this)')
+             .setProperty('onblur','transformIp(this)')
              .setProperty('type','text')))
            );
       }
@@ -236,7 +237,7 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
 
       function checkIp(ipField) {
         \$(ipField);
-        if(ipField.value == '' || ipField.value.match($php_regexp_ip)) {
+        if(ipField.value == '' || ipField.value.match($php_regexp_network)) {
           ipField.removeClassName('error');
           return true;
         } else {
@@ -245,6 +246,19 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
         }
       }
 
+      function transformIp(ipField) {
+        \$(ipField);
+        if(ipField.value == '' || ipField.value.match($php_regexp_network)) {
+          ipField.removeClassName('error');
+        } else {
+          ipField.addClassName('error');
+          return false;
+        }
+        if(ipField.value.match($php_regexp_ip) && ipField.value.match(/\.(0)*$/)) {;
+          ipField.value = ipField.value + '/24';
+        }
+        return true;
+      }
     </script>
     ";
   

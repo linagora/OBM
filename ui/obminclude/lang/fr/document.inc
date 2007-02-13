@@ -67,7 +67,7 @@ $l_err_system_path = "The Root and the Default directories can't be deleted !";
 $l_err_dir_no_empty = "The directory is not empty !"; 
 $l_dir_can_delete = "Le répertoire peut être supprimé.";
 $l_dir_cant_delete = "Le répertoire ne peut être supprimé !";
-
+$l_browse = "Parcourir";
 $l_have_link = "Ce document est lié à divers éléments d'obm";
 $l_have_no_link = "Ce document n'est lié à aucun éléments";
 $l_no_document = "Document introuvable";

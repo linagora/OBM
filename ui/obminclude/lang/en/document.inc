@@ -62,7 +62,7 @@ $l_header_tree = "Tree";
 $l_invalid_link_file = "Cannot create a alias over a link";
 $l_have_link = "This document is linked with various objects";
 $l_have_no_link = "This document has no link";
-
+$l_browse = "Browse";
 $l_no_document = "Document not found";
 $l_invalid_url = "Incorrect URL";
 $l_can_delete = "The document can be deleted.";

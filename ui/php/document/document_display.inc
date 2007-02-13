@@ -363,7 +363,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
   global $display, $path, $default_path;
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
-  global $l_name, $l_author, $l_path, $l_kind,$auth; 
+  global $l_name, $l_author, $l_path, $l_kind,$auth,$l_browse; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto;
   global $popup_width, $popup_height;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
@@ -534,7 +534,8 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
       <td>
       <input type=\"text\" id=\"tf_path\" name=\"tf_path\" size=\"30\" value=\"$fi_path\" />
       <span id=\"browse_img\" $dis_img>
-      <a href=\"javascript:return false;\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"$ico_browse\" alt=\"\" /></a></span>
+      <input type=\"button\" value=\"$l_browse\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      </span>
       </td>
     </tr> 
     <tr id=\"browse_field\" $dis_field>
@@ -571,7 +572,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
 function html_document_dir_form($action, $document,$doc_q=null) {
   global $display,$popup_height,$popup_width;
   global $l_document;
-  global $l_path, $l_name,$path,$ico_browse;
+  global $l_path, $l_name,$path,$l_browse;
   global $l_dir, $l_add_dir,$l_update_dir;
 
   if ($action == "detailupdate_dir") {
@@ -593,7 +594,7 @@ function html_document_dir_form($action, $document,$doc_q=null) {
     ";    
     $dis_path = "
      <input type=\"text\" id=\"tf_path\" name=\"tf_path\" value=\"$re_path\" size=\"50\"/>
-     <a href=\"javascript:return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"$ico_browse\" alt=\"\" /></a>      
+      <input type=\"button\" value=\"$l_browse\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
      ";
   } else {
     $dis_button = "

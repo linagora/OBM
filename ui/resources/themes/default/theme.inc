@@ -29,6 +29,7 @@ $ico_deal           = "$theme_path/ico_deal.gif";
 $ico_big_deal       = "$theme_path/ico_big_deal.gif";            
 $ico_document       = "$theme_path/ico_document.gif";
 $ico_group          = "$theme_path/ico_group.gif";
+$ico_host           = "$theme_path/ico_host.gif";
 $ico_lang           = "$theme_path/ico_lang.gif";
 $ico_lead           = "$theme_path/ico_lead.gif";            
 $ico_list           = "$theme_path/ico_list.gif";    

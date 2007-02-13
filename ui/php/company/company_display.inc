@@ -532,7 +532,7 @@ function html_company_links($co_q) {
       <a href=\"$url_doc_new\">$l_new</a></li>
   <li><a href=\"\" 
        onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-       \"><img src=\"$ico_document_new\" /></a>
+       \"><img src=\"$ico_add\" /></a>
       <a href=\"\" onclick=\"window.name='$l_company'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
        $l_document_add</a></li>
 </ul>

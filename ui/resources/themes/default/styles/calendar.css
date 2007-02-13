@@ -289,7 +289,16 @@
   border: 0;
 }
 
+#calendarQuickForm fieldset input{
+  width: 12em;
+}
+#calendarQuickForm fieldset input.button{
+  width: 6em;
+}
+
+
 #calendarQuickForm .buttons input{
+  width: auto;
   margin: 0 0.5em;
 }
 
