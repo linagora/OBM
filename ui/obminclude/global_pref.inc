@@ -38,7 +38,7 @@ if (($set_debug & $cdg_sess) == $cdg_sess) {
 
 // Default settings
 $set_lang_default = "en";
-$set_theme_default = "standard";
+$set_theme_default = "default";
 $set_menu_default = $cme_both;
 $set_display_default = "no";
 $set_rows_default = 10;

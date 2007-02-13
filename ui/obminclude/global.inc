@@ -21,7 +21,7 @@ $c_focsys = 3;
 // Global parameters --------------------------------------------------------//
 
 // OBM host
-$cgp_host = "http://obm/";
+$cgp_host = "http://obmlocal/";
 
 // Multidomain
 $c_multidomain = true;
@@ -291,6 +291,23 @@ $cg_gid_smb_host = 515;
 //---------------------------------------------------------------------------//
 // END : OBM Default configurable Constants : Default values
 //---------------------------------------------------------------------------//
+
+///////////////////////////////////////////////////////////////////////////////
+// Recuperation des parametres du fichier de configuration global obm_conf.ini
+///////////////////////////////////////////////////////////////////////////////
+// Code repris du fichier www/aliainclude/global.inc d'Aliamin
+
+$ini_array = parse_ini_file("$path/../conf/obm_conf.ini");
+
+$obmdb_host = $ini_array["host"];
+$obmdb_dbtype = $ini_array["dbtype"]; 
+$obmdb_db = $ini_array["db"];
+$obmdb_user = $ini_array["user"];
+$obmdb_password = $ini_array["password"];
+
+///////////////////////////////////////////////////////////////////////////////
+// Fin du chargement
+///////////////////////////////////////////////////////////////////////////////
 
 require_once("conf/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
