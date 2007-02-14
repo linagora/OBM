@@ -1247,11 +1247,12 @@ function check_user_data_form($p_id, $user) {
 function get_linked_user_timetask_nb($p_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("timetask");
+  $multidomain = sql_multidomain("userobm");
 
   $obm_q = new DB_OBM;
   $query = "SELECT count(timetask_id) as nb
     FROM TimeTask
+    JOIN UserObm ON timetask_user_id = userobm_id
     WHERE timetask_user_id='$p_id'
       AND timetask_projecttask_id > 0
       $multidomain";

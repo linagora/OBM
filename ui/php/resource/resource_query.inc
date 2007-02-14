@@ -177,18 +177,16 @@ function run_query_resource_insert($resource) {
 //   - $user_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_right_init($resource_id) {
-  global $cdg_sql, $obm;
+  global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $line_q = new DB_OBM;
-	$multidomain = sql_multidomain("entityright");
-	$domain_id = $obm["domain_id"];
 	
   $query = " DELETE
     FROM EntityRight 
     WHERE 
       entityright_entity = 'resource'
-      AND entityright_entity_id = '$resource_id' $multidomain";
+      AND entityright_entity_id = '$resource_id'";
   display_debug_msg($query, $cdg_sql, "run_query_resource_right_init(1)");
   $line_q->query($query);
 
@@ -198,7 +196,6 @@ function run_query_resource_right_init($resource_id) {
   $query = "INSERT INTO EntityRight (
     entityright_entity,
     entityright_entity_id,
-		entityright_domain_id,
     entityright_consumer,
     entityright_consumer_id,
     entityright_read,
@@ -206,7 +203,6 @@ function run_query_resource_right_init($resource_id) {
   ) values (
     'resource',
     '$resource_id',
-		'$domain_id',
     'user',
     '0',
     '1',
@@ -269,22 +265,18 @@ function run_query_resource_delete($p_id) {
   $retour = $obm_q->query($query);
 
   // Delete Resource rights
-  $multidomain = sql_multidomain("entityright");
   $query = "DELETE FROM EntityRight 
     WHERE
       entityright_entity_id='$p_id'
-      AND entityright_entity = 'resource'
-      $multidomain";
+      AND entityright_entity = 'resource'";
   display_debug_msg($query, $cdg_sql, "run_query_resource_delete(entityright)");
   $retour = $obm_q->query($query);
 
   // Delete Resource events
-  $multidomain = sql_multidomain("evententity");
   $query = "DELETE FROM EventEntity 
     WHERE
       evententity_entity_id='$p_id'
-      AND evententity_entity = 'resource'
-      $multidomain";
+      AND evententity_entity = 'resource'";
   display_debug_msg($query, $cdg_sql, "run_query_resource_delete(resource event)");
   $retour = $obm_q->query($query);
 

@@ -1359,7 +1359,7 @@ function get_calendar_resource_from_ids($resources) {
 function get_calendar_group_from_ids($groups) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("ugroup");
+  $multidomain = sql_multidomain("group");
   if (is_array($groups)) {
     $where = "(0";
     foreach($groups as $group) {
