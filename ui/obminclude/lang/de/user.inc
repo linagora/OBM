@@ -12,6 +12,7 @@ $l_login = "Benutzer";
 $l_user_perms = "Berechtigung";
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";
+$l_title = "Function";
 $l_password = "Password";
 $l_lastaccess = "Letzter Zugriff";
 $l_email = "E-Mail";

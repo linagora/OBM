@@ -241,6 +241,7 @@ function run_query_user_insert($user) {
   $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $title = $user["title"];
   $email = $user["email"];
   $desc = $user["desc"];
 
@@ -381,6 +382,7 @@ function run_query_user_insert($user) {
     userobm_datebegin,
     userobm_lastname,
     userobm_firstname,
+    userobm_title,
     userobm_service,
     userobm_address1,
     userobm_address2,
@@ -416,6 +418,7 @@ function run_query_user_insert($user) {
     $datebegin,
     '$lname',
     '$fname',
+    '$title',
     '$service',
     '$ad1',
     '$ad2',
@@ -544,6 +547,7 @@ function run_query_user_update($p_id, $user) {
   $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $title = $user["title"];
   $email = $user["email"];
   $desc = $user["desc"];
   $multidomain = sql_multidomain("userobm");
@@ -654,6 +658,7 @@ function run_query_user_update($p_id, $user) {
     userobm_datebegin=$datebegin,
     userobm_lastname='$lname',
     userobm_firstname='$fname',
+    userobm_title='$title',
     userobm_phone='$phone',
     userobm_phone2='$phone2',
     userobm_mobile='$mobile',
@@ -973,6 +978,7 @@ function check_user_data_form($p_id, $user) {
   $perms = $user["perms"];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $title = $user["title"];
   $email = $user["email"];
   $phone = $user["phone"];
   $phone2 = $user["phone2"];

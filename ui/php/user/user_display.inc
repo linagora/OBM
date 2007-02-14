@@ -20,6 +20,7 @@ $fieldnames["userobm_perms"] = $l_user_perms;
 $fieldnames["userobm_archive"] = $l_archive;
 $fieldnames["userobm_lastname"] = $l_lastname;
 $fieldnames["userobm_firstname"] = $l_firstname;
+$fieldnames["userobm_title"] = $l_title;
 $fieldnames["userobm_phone"] = $l_phone;
 $fieldnames["userobm_phone2"] = $l_phone2;
 $fieldnames["userobm_mobile"] = $l_mphone;
@@ -404,7 +405,7 @@ function dis_user_consult($user) {
 //   - $obm_q : user database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
-  global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
+  global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname, $l_title;
   global $l_domain, $l_user, $l_lastaccess, $l_archive, $l_datebegin;
   global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal;
   global $l_direction, $l_service;
@@ -427,6 +428,7 @@ function html_user_consult($obm_q) {
   $perms = $obm_q->f("userobm_perms");
   $lname = $obm_q->f("userobm_lastname");
   $fname = $obm_q->f("userobm_firstname");
+  $title = $obm_q->f("userobm_title");
   $desc = $obm_q->f("userobm_description");
   $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
@@ -693,6 +695,10 @@ function html_user_consult($obm_q) {
     <td>$fname</td>
   </tr>
   <tr>
+    <th>$l_title</th>
+    <td>$title</td>
+  </tr>
+  <tr>
     <th>$l_datebegin</th>
     <td>$datebegin</td>
   </tr>
@@ -846,7 +852,7 @@ function html_user_group_consult($usr_q) {
 //   - $field : field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($usr_q, $user, $field="") {
-  global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
+  global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname, $l_title;
   global $l_user, $l_archive, $l_datebegin, $l_insert, $l_update;
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
@@ -870,6 +876,7 @@ function html_user_form($usr_q, $user, $field="") {
     $lastaccess = $usr_q->f("lastaccess");
     $lname = $usr_q->f("userobm_lastname");
     $fname = $usr_q->f("userobm_firstname");
+    $title = $usr_q->f("userobm_title");
     $desc = $usr_q->f("userobm_description");
     $datebegin = $usr_q->f("userobm_datebegin");
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
@@ -935,6 +942,7 @@ function html_user_form($usr_q, $user, $field="") {
   if (isset($user["perms"])) { $perms = $user["perms"]; }
   if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
+  if (isset($user["title"])) { $title = stripslashes($user["title"]); }
   if (isset($user["email"])) { $email = $user["email"]; }
   if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
   if (isset($user["desc"])) { $desc = $user["desc"]; }
@@ -1225,6 +1233,10 @@ function html_user_form($usr_q, $user, $field="") {
     <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
   </tr>
   <tr>
+    <th class=\"$class[title]\">$l_title</th>
+    <td><input name=\"tf_title\" size=\"32\" maxlength=\"32\" value=\"$title\" /></td>
+  </tr>
+  <tr>
     <th class=\"$class[datebegin]\">$l_datebegin</th>
     <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
   </tr>
@@ -1357,6 +1369,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $perms = $user["perms"];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $title = $user["title"];
   $datebegin = $user["datebegin"];
   $email = $user["email"];
   $desc = $user["desc"];
@@ -1423,6 +1436,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
   <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
   <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
+  <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
   <input type=\"hidden\" name=\"tf_datebegin\" value=\"$datebegin\" />
   <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
   <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />

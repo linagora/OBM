@@ -10,6 +10,7 @@
 $l_login = "Login";
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";
+$l_tile = "Function";
 $l_user_perms = "Authorization";
 $l_password = "Password";
 $l_lastaccess = "Last access";
