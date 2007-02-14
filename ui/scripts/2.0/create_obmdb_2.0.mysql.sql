@@ -664,7 +664,6 @@ CREATE TABLE CalendarEvent (
 -- Table structure for the table  'EntityEvent'
 --
 CREATE TABLE EventEntity (
---  evententity_domain_id    int(8) default 0,
   evententity_timeupdate   timestamp(14),
   evententity_timecreate   timestamp(14),
   evententity_userupdate   int(8) default NULL,
@@ -681,7 +680,6 @@ CREATE TABLE EventEntity (
 -- Table structure for table 'CalendarException'
 --
 CREATE TABLE CalendarException (
---  calendarexception_domain_id   int(8) default 0,
   calendarexception_timeupdate  timestamp(14),
   calendarexception_timecreate  timestamp(14),
   calendarexception_userupdate  int(8) default NULL,
@@ -711,7 +709,6 @@ CREATE TABLE CalendarCategory1 (
 -- Table structure for table 'EntityRight'
 --
 CREATE TABLE EntityRight (
---  entityright_domain_id     int(8) default 0,
   entityright_entity        varchar(32) NOT NULL default '',
   entityright_entity_id     int(8) NOT NULL default 0,
   entityright_consumer      varchar(32) NOT NULL default '',
@@ -873,7 +870,6 @@ CREATE TABLE DocumentMimeType (
 -- Table structure for table 'DocumentEntity'
 --
 CREATE TABLE DocumentEntity (
---  documententity_domain_id    int(8) DEFAULT 0,
   documententity_document_id  int(8) NOT NULL,
   documententity_entity_id    int(8) NOT NULL,
   documententity_entity       varchar(255) NOT NULL,
@@ -920,7 +916,6 @@ CREATE TABLE Project (
 --
 CREATE TABLE ProjectTask (
   projecttask_id             int(8) auto_increment,
---  projecttask_domain_id      int(8) default 0,
   projecttask_project_id     int(8) NOT NULL,
   projecttask_timeupdate     timestamp(14),
   projecttask_timecreate     timestamp(14),
@@ -938,7 +933,6 @@ CREATE TABLE ProjectTask (
 --
 CREATE TABLE ProjectRefTask (
   projectreftask_id          int(8) auto_increment,
-  projectreftask_domain_id   int(8) default 0,
   projectreftask_timeupdate  timestamp(14),
   projectreftask_timecreate  timestamp(14),
   projectreftask_userupdate  int(8) default NULL,
@@ -953,7 +947,6 @@ CREATE TABLE ProjectRefTask (
 --
 CREATE TABLE ProjectUser (
   projectuser_id              int(8) auto_increment,
---  projectuser_domain_id       int(8) default 0,
   projectuser_project_id      int(8) NOT NULL,
   projectuser_user_id         int(8) NOT NULL,
   projectuser_projecttask_id  int(8),
@@ -977,7 +970,6 @@ CREATE TABLE ProjectUser (
 -- Table structure for table 'ProjectStat'
 --
 CREATE TABLE ProjectStat (
---  projectstat_domain_id      int(8) default 0,
   projectstat_project_id     int(8) NOT NULL,
   projectstat_usercreate     int(8) NOT NULL,
   projectstat_date           timestamp(14) NOT NULL,
@@ -995,7 +987,6 @@ CREATE TABLE ProjectStat (
 --
 CREATE TABLE TimeTask (
   timetask_id              int(8) auto_increment,
---  timetask_domain_id       int(8) default 0,
   timetask_timeupdate      timestamp(14),
   timetask_timecreate      timestamp(14),
   timetask_userupdate      int(8) default NULL,
@@ -1520,7 +1511,6 @@ CREATE TABLE CV (
 ----------------------------------------------------------------------------
 
 CREATE TABLE ProjectCV (
---  projectcv_domain_id   int(8) default 0,
   projectcv_project_id  int(8) NOT NULL,
   projectcv_cv_id       int(8) NOT NULL,
   projectcv_role        varchar(128) DEFAULT '',

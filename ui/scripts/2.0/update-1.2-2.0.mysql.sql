@@ -30,67 +30,151 @@ CREATE TABLE Domain (
   PRIMARY KEY (domain_id)
 );
 
+INSERT INTO Domain VALUES (1,NOW(),NOW(),0,0,'Main','Main domain','localdomain','');
 --
 -- Update All tables to include Domain info
 --
-ALTER TABLE UserObm ADD Column userobm_domain_id int(8) default 0 after userobm_id;
-UPDATE UserObm SET userobm_domain_id=0;
-ALTER TABLE DataSource ADD Column datasource_domain_id int(8) default 0 after datasource_id;
-ALTER TABLE Country ADD Column country_domain_id int(8) default 0 first;
-ALTER TABLE Region ADD Column region_domain_id int(8) default 0 after region_id;
-ALTER TABLE CompanyType ADD Column companytype_domain_id int(8) default 0 after companytype_id;
-ALTER TABLE CompanyActivity ADD Column companyactivity_domain_id int(8) default 0 after companyactivity_id;
-ALTER TABLE CompanyNafCode ADD Column companynafcode_domain_id int(8) default 0 after companynafcode_id;
-ALTER TABLE Company ADD Column company_domain_id int(8) default 0 after company_id;
-ALTER TABLE Contact ADD Column contact_domain_id int(8) default 0 after contact_id;
-ALTER TABLE Kind ADD Column kind_domain_id int(8) default 0 after kind_id;
-ALTER TABLE ContactFunction ADD Column contactfunction_domain_id int(8) default 0 after contactfunction_id;
-ALTER TABLE LeadSource ADD Column leadsource_domain_id int(8) default 0 after leadsource_id;
-ALTER TABLE Lead ADD Column lead_domain_id int(8) default 0 after lead_id;
-ALTER TABLE ParentDeal ADD Column parentdeal_domain_id int(8) default 0 after parentdeal_id;
-ALTER TABLE Deal ADD Column deal_domain_id int(8) default 0 after deal_id;
-ALTER TABLE DealStatus ADD Column dealstatus_domain_id int(8) default 0 after dealstatus_id;
-ALTER TABLE DealType ADD Column dealtype_domain_id int(8) default 0 after dealtype_id;
-ALTER TABLE DealCompanyRole ADD Column dealcompanyrole_domain_id int(8) default 0 after dealcompanyrole_id;
-ALTER TABLE List ADD Column list_domain_id int(8) default 0 after list_id;
-ALTER TABLE CalendarEvent ADD Column calendarevent_domain_id int(8) default 0 after calendarevent_id;
-ALTER TABLE EventEntity ADD Column evententity_domain_id int(8) default 0 first;
-ALTER TABLE CalendarException ADD Column calendarexception_domain_id int(8) default 0 first;
-ALTER TABLE CalendarCategory1 ADD Column calendarcategory1_domain_id int(8) default 0 after calendarcategory1_id;
-ALTER TABLE EntityRight ADD Column entityright_domain_id int(8) default 0 first;
-ALTER TABLE Todo ADD Column todo_domain_id int(8) default 0 after todo_id;
-ALTER TABLE Publication ADD Column publication_domain_id int(8) default 0 after publication_id;
-ALTER TABLE PublicationType ADD Column publicationtype_domain_id int(8) default 0 after publicationtype_id;
-ALTER TABLE Subscription ADD Column subscription_domain_id int(8) default 0 after subscription_id;
-ALTER TABLE SubscriptionReception ADD Column subscriptionreception_domain_id int(8) default 0 after subscriptionreception_id;
-ALTER TABLE Document ADD Column document_domain_id int(8) default 0 after document_id;
-ALTER TABLE DocumentMimeType ADD Column documentmimetype_domain_id int(8) default 0 after documentmimetype_id;
-ALTER TABLE DocumentEntity ADD Column documententity_domain_id int(8) default 0 first;
-ALTER TABLE Project ADD Column project_domain_id int(8) default 0 after project_id;
-ALTER TABLE ProjectTask ADD Column projecttask_domain_id int(8) default 0 after projecttask_id;
-ALTER TABLE ProjectRefTask ADD Column projectreftask_domain_id int(8) default 0 after projectreftask_id;
-ALTER TABLE ProjectUser ADD Column projectuser_domain_id int(8) default 0 after projectuser_id;
-ALTER TABLE ProjectStat ADD Column projectstat_domain_id int(8) default 0 first;
-ALTER TABLE TimeTask ADD Column timetask_domain_id int(8) default 0 after timetask_id;
-ALTER TABLE TaskType ADD Column tasktype_domain_id int(8) default 0 after tasktype_id;
-ALTER TABLE Contract ADD Column contract_domain_id int(8) default 0 after contract_id;
-ALTER TABLE ContractType ADD Column contracttype_domain_id int(8) default 0 after contracttype_id;
-ALTER TABLE ContractPriority ADD Column contractpriority_domain_id int(8) default 0 after contractpriority_id;
-ALTER TABLE ContractStatus ADD Column contractstatus_domain_id int(8) default 0 after contractstatus_id;
-ALTER TABLE Incident ADD Column incident_domain_id int(8) default 0 after incident_id;
-ALTER TABLE IncidentPriority ADD Column incidentpriority_domain_id int(8) default 0 after incidentpriority_id;
-ALTER TABLE IncidentStatus ADD Column incidentstatus_domain_id int(8) default 0 after incidentstatus_id;
-ALTER TABLE Invoice ADD Column invoice_domain_id int(8) default 0 after invoice_id;
-ALTER TABLE InvoiceStatus ADD Column invoicestatus_domain_id int(8) default 0 after invoicestatus_id;
-ALTER TABLE Payment ADD Column payment_domain_id int(8) default 0 after payment_id;
-ALTER TABLE PaymentKind ADD Column paymentkind_domain_id int(8) default 0 after paymentkind_id;
-ALTER TABLE PaymentInvoice ADD Column paymentinvoice_domain_id int(8) default 0 first;
-ALTER TABLE Account ADD Column account_domain_id int(8) default 0 after account_id;
-ALTER TABLE UGroup ADD Column group_domain_id int(8) default 0 after group_id;
-ALTER TABLE Import ADD Column import_domain_id int(8) default 0 after import_id;
-ALTER TABLE Resource ADD Column resource_domain_id int(8) default 0 after resource_id;
-ALTER TABLE RGroup ADD Column rgroup_domain_id int(8) default 0 after rgroup_id;
 
+ALTER TABLE UserObm ADD Column userobm_domain_id int(8) default 0 after userobm_id;
+UPDATE UserObm SET userobm_domain_id = 1;
+
+ALTER TABLE DataSource ADD Column datasource_domain_id int(8) default 0 after datasource_id;
+UPDATE DataSource SET datasource_domain_id = 1;
+
+ALTER TABLE Country ADD Column country_domain_id int(8) default 0 first;
+UPDATE Country SET country_domain_id = 1;
+
+ALTER TABLE Region ADD Column region_domain_id int(8) default 0 after region_id;
+UPDATE Region SET region_domain_id = 1;
+
+ALTER TABLE CompanyType ADD Column companytype_domain_id int(8) default 0 after companytype_id;
+UPDATE CompanyType SET companytype_domain_id = 1;
+
+ALTER TABLE CompanyActivity ADD Column companyactivity_domain_id int(8) default 0 after companyactivity_id;
+UPDATE CompanyActivity SET companyactivity_domain_id = 1;
+
+ALTER TABLE CompanyNafCode ADD Column companynafcode_domain_id int(8) default 0 after companynafcode_id;
+UPDATE CompanyNafCode SET companynafcode_domain_id = 1;
+
+ALTER TABLE Company ADD Column company_domain_id int(8) default 0 after company_id;
+UPDATE Company SET company_domain_id = 1;
+
+ALTER TABLE Contact ADD Column contact_domain_id int(8) default 0 after contact_id;
+UPDATE Contact SET contact_domain_id = 1;
+
+ALTER TABLE Kind ADD Column kind_domain_id int(8) default 0 after kind_id;
+UPDATE Kind SET kind_domain_id = 1;
+
+ALTER TABLE ContactFunction ADD Column contactfunction_domain_id int(8) default 0 after contactfunction_id;
+UPDATE ContactFunction SET contactfunction_domain_id = 1;
+
+ALTER TABLE LeadSource ADD Column leadsource_domain_id int(8) default 0 after leadsource_id;
+UPDATE LeadSource SET leadsource_domain_id = 1;
+
+ALTER TABLE Lead ADD Column lead_domain_id int(8) default 0 after lead_id;
+UPDATE Lead SET lead_domain_id = 1;
+
+ALTER TABLE ParentDeal ADD Column parentdeal_domain_id int(8) default 0 after parentdeal_id;
+UPDATE ParentDeal SET parentdeal_domain_id = 1;
+
+ALTER TABLE Deal ADD Column deal_domain_id int(8) default 0 after deal_id;
+UPDATE Deal SET deal_domain_id = 1;
+
+ALTER TABLE DealStatus ADD Column dealstatus_domain_id int(8) default 0 after dealstatus_id;
+UPDATE DealStatus SET dealstatus_domain_id = 1;
+
+ALTER TABLE DealType ADD Column dealtype_domain_id int(8) default 0 after dealtype_id;
+UPDATE DealType SET dealtype_domain_id = 1;
+
+ALTER TABLE DealCompanyRole ADD Column dealcompanyrole_domain_id int(8) default 0 after dealcompanyrole_id;
+UPDATE DealCompanyRole SET dealcompanyrole_domain_id = 1;
+
+ALTER TABLE List ADD Column list_domain_id int(8) default 0 after list_id;
+UPDATE List SET list_domain_id = 1;
+
+ALTER TABLE CalendarEvent ADD Column calendarevent_domain_id int(8) default 0 after calendarevent_id;
+UPDATE CalendarEvent SET calendarevent_domain_id = 1;
+
+ALTER TABLE CalendarCategory1 ADD Column calendarcategory1_domain_id int(8) default 0 after calendarcategory1_id;
+UPDATE CalendarCategory1 SET calendarcategory1_domain_id = 1;
+
+ALTER TABLE Todo ADD Column todo_domain_id int(8) default 0 after todo_id;
+UPDATE Todo SET todo_domain_id = 1; 
+
+ALTER TABLE Publication ADD Column publication_domain_id int(8) default 0 after publication_id;
+UPDATE Publication SET publication_domain_id = 1;
+
+ALTER TABLE PublicationType ADD Column publicationtype_domain_id int(8) default 0 after publicationtype_id;
+UPDATE PublicationType SET publicationtype_domain_id = 1;
+
+ALTER TABLE Subscription ADD Column subscription_domain_id int(8) default 0 after subscription_id;
+UPDATE Subscription SET subscription_domain_id = 1;
+
+ALTER TABLE SubscriptionReception ADD Column subscriptionreception_domain_id int(8) default 0 after subscriptionreception_id;
+UPDATE SubscriptionReception SET subscriptionreception_domain_id = 1;
+
+ALTER TABLE Document ADD Column document_domain_id int(8) default 0 after document_id;
+UPDATE Document SET document_domain_id = 1;
+
+ALTER TABLE DocumentMimeType ADD Column documentmimetype_domain_id int(8) default 0 after documentmimetype_id;
+UPDATE DocumentMimeType SET documentmimetype_domain_id = 1;
+
+ALTER TABLE Project ADD Column project_domain_id int(8) default 0 after project_id;
+UPDATE Project SET project_domain_id = 1;
+
+ALTER TABLE TaskType ADD Column tasktype_domain_id int(8) default 0 after tasktype_id;
+UPDATE TaskType SET tasktype_domain_id = 1;
+
+ALTER TABLE Contract ADD Column contract_domain_id int(8) default 0 after contract_id;
+UPDATE Contract SET contract_domain_id = 1;
+
+ALTER TABLE ContractType ADD Column contracttype_domain_id int(8) default 0 after contracttype_id;
+UPDATE ContractType SET contracttype_domain_id = 1;
+
+ALTER TABLE ContractPriority ADD Column contractpriority_domain_id int(8) default 0 after contractpriority_id;
+UPDATE ContractPriority SET contractpriority_domain_id = 1;
+
+ALTER TABLE ContractStatus ADD Column contractstatus_domain_id int(8) default 0 after contractstatus_id;
+UPDATE ContractStatus SET contractstatus_domain_id = 1;
+
+ALTER TABLE Incident ADD Column incident_domain_id int(8) default 0 after incident_id;
+UPDATE Incident SET incident_domain_id = 1;
+
+ALTER TABLE IncidentPriority ADD Column incidentpriority_domain_id int(8) default 0 after incidentpriority_id;
+UPDATE IncidentPriority SET incidentpriority_domain_id = 1;
+
+ALTER TABLE IncidentStatus ADD Column incidentstatus_domain_id int(8) default 0 after incidentstatus_id;
+UPDATE IncidentStatus SET incidentstatus_domain_id = 1;
+
+ALTER TABLE Invoice ADD Column invoice_domain_id int(8) default 0 after invoice_id;
+UPDATE Invoice SET invoice_domain_id = 1;
+
+ALTER TABLE InvoiceStatus ADD Column invoicestatus_domain_id int(8) default 0 after invoicestatus_id;
+UPDATE InvoiceStatus SET invoicestatus_domain_id = 1;
+
+ALTER TABLE Payment ADD Column payment_domain_id int(8) default 0 after payment_id;
+UPDATE Payment SET payment_domain_id = 1;
+
+ALTER TABLE PaymentKind ADD Column paymentkind_domain_id int(8) default 0 after paymentkind_id;
+UPDATE PaymentKind SET paymentkind_domain_id = 1;
+
+ALTER TABLE PaymentInvoice ADD Column paymentinvoice_domain_id int(8) default 0 first;
+UPDATE PaymentKind SET paymentkind_domain_id = 1;
+
+ALTER TABLE Account ADD Column account_domain_id int(8) default 0 after account_id;
+UPDATE Account SET account_domain_id = 1;
+
+ALTER TABLE UGroup ADD Column group_domain_id int(8) default 0 after group_id;
+UPDATE UGroup SET group_domain_id = 1;
+
+ALTER TABLE Import ADD Column import_domain_id int(8) default 0 after import_id;
+UPDATE Import SET import_domain_id = 1;
+
+ALTER TABLE Resource ADD Column resource_domain_id int(8) default 0 after resource_id;
+UPDATE Resource SET resource_domain_id = 1;
+
+ALTER TABLE RGroup ADD Column rgroup_domain_id int(8) default 0 after rgroup_id;
+UPDATE RGroup SET rgroup_domain_id = 1;
 
 -------------------------------------------------------------------------------
 -- Global Category table
@@ -157,7 +241,7 @@ INSERT INTO IncidentResolutionType (
   incidentresolutiontype_label)
 SELECT
   incidentcategory1_id,
-  0,
+  1,
   incidentcategory1_timeupdate,
   incidentcategory1_timecreate,
   incidentcategory1_userupdate,
@@ -357,7 +441,7 @@ CREATE TABLE Mail (
 -- Samba parameters table
 --
 CREATE TABLE Samba (
-  mail_domain_id  int(8) default 0,
+  samba_domain_id  int(8) default 0,
   samba_name      varchar(255) NOT NULL default '',
   samba_value     varchar(255) NOT NULL default ''
 );
