@@ -156,7 +156,7 @@ class OBM_Challenge_Auth extends Auth {
   
   function auth_validatelogin() {
     global $params, $login, $password, $challenge, $response;
-    global $auth_encryption, $password_encryption, $c_multidomain, $c_default_domain;
+    global $auth_encryption, $password_encryption, $c_default_domain;
 
     $login = $params["login"];
     $password = $params["password"];
@@ -169,9 +169,7 @@ class OBM_Challenge_Auth extends Auth {
     }
 
     // If multidomain, add domain clause
-    if ($c_multidomain) {
-      $where_domain = "AND userobm_domain_id='$domain'";
-    }
+    $where_domain = "AND userobm_domain_id='$domain'";
 
     echo "auth_validatelogin:domain=$domain, login=$login";
 

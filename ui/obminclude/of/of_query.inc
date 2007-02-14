@@ -257,22 +257,20 @@ function sql_obm_entity_privacy($entity, $p_uid="") {
 //   - sql where clause for domain (empty for superadmin)
 ///////////////////////////////////////////////////////////////////////////////
 function sql_multidomain($entity, $and=true) {
-  global $c_multidomain, $obm;
+  global $obm;
 
   $where = "";
 
-  if ($c_multidomain) {
-    // If user is multidomain, no restrictions on domain
-    if ($obm["domain_id"] == 0) {
-      return $where;
-    } else {
-      $domain_id = $obm["domain_id"];
-    }
-    if ($and) {
-      $wand = "AND";
-    }
-    $where = "$wand (${entity}_domain_id='$domain_id' OR ${entity}_domain_id=0)";
+  // If user is multidomain, no restrictions on domain
+  if ($obm["domain_id"] == 0) {
+    return $where;
+  } else {
+    $domain_id = $obm["domain_id"];
   }
+  if ($and) {
+    $wand = "AND";
+  }
+  $where = "$wand (${entity}_domain_id='$domain_id' OR ${entity}_domain_id=0)";
 
   return $where;
 }
@@ -387,16 +385,15 @@ function of_domain_get_entity_domain_id($id, $entityu, $ptable="") {
     $table = $ptable;
   }
 
-  if ($c_multidomain) {
-    $obm_q = new DB_OBM;
-    $query = "SELECT ${entity}_domain_id as domain_id
-      FROM $table
-      WHERE ${entity}_id = '$id'";
-    display_debug_msg($query, $cdg_sql, "of_domain_get_entity_domain_id()");
-    $obm_q->query($query);
-    $obm_q->next_record();
-    $dom_id = $obm_q->f("domain_id");
-  }
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT ${entity}_domain_id as domain_id
+    FROM $table
+    WHERE ${entity}_id = '$id'";
+  display_debug_msg($query, $cdg_sql, "of_domain_get_entity_domain_id()");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $dom_id = $obm_q->f("domain_id");
 
   return $dom_id;
 }

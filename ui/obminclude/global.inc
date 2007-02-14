@@ -203,10 +203,25 @@ $profiles["admin"] = array (
   'section' => array (
     'default' => 1),
   'module' => array (
-    'default' => $perm_admin
+    'default' => $perm_admin,
+    'domain' => 0
     )
 );
 
+$profiles["domain"] = array (
+  'section' => array (
+    'default' => 0,
+    'user' => 1,
+    'admin' => 1 
+  ),
+  'module' => array (
+    'default' => 0,
+    'user' => $perm_admin,
+    'mailserver' => $perm_admin,
+    'host' => $perm_admin,
+    'domain' => $perm_admin
+  )
+);
 //-------------------------//
 // Default Displayed Infos //
 //-------------------------//

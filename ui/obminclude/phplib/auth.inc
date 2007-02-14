@@ -240,7 +240,6 @@ class Auth {
   }
 
   function is_authenticated() {
-    global $c_multidomain;
 
     if (
       $this->auth["uid"] && 
