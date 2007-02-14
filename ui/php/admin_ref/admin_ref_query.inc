@@ -193,7 +193,7 @@ function run_query_admin_ref_datasource_insert($dsrc) {
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
-  $name = $dsrc["name"];
+  $name = $dsrc["dsrc_name"];
 
   $query = "INSERT INTO DataSource (
       datasource_timecreate,
@@ -226,8 +226,8 @@ function run_query_admin_ref_datasource_update($dsrc) {
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-  $id = $dsrc["datasource_id"];
-  $name = $dsrc["name"];
+  $id = $dsrc["dsrc"];
+  $name = $dsrc["dsrcname"];
   $multidomain = sql_multidomain("datasource");
 
   $query = "UPDATE DataSource SET
@@ -254,7 +254,7 @@ function run_query_admin_ref_datasource_delete($dsrc) {
   global $cdg_sql;
   $multidomain = sql_multidomain("datasource");
 
-  $id = $dsrc["datasource_id"];
+  $id = $dsrc["dsrc"];
 
   $query = "DELETE FROM DataSource WHERE datasource_id='$id' $multidomain";
 
@@ -274,7 +274,7 @@ function run_query_admin_ref_datasource_delete($dsrc) {
 function run_query_admin_ref_datasource_company_links($dsrc) {
   global $cdg_sql;
 
-  $id = $dsrc["datasource_id"];
+  $id = $dsrc["dsrc"];
   $multidomain = sql_multidomain("company");
 
   $query = "SELECT company_id,
@@ -300,7 +300,7 @@ function run_query_admin_ref_datasource_contact_links($dsrc) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("contact");
-  $id = $dsrc["datasource_id"];
+  $id = $dsrc["dsrc"];
 
   $query = "SELECT contact_id,
       contact_lastname,
@@ -350,7 +350,7 @@ function run_query_admin_ref_tasktype_insert($tt) {
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
-  $label = $tt["label"];
+  $label = $tt["tt_label"];
   $int = $tt["internal"];
 
   $query = "insert into TaskType (
@@ -387,8 +387,8 @@ function run_query_admin_ref_tasktype_update($tt) {
   $multidomain = sql_multidomain("tasktype");
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-  $id = $tt["tasktype_id"];
-  $label = $tt["label"];
+  $id = $tt["tasktype"];
+  $label = $tt["tt_label"];
   $int = $tt["internal"];
 
   $query = "update TaskType set
@@ -415,7 +415,7 @@ function run_query_admin_ref_tasktype_update($tt) {
 function run_query_admin_ref_tasktype_delete($tt) {
   global $cdg_sql;
 
-  $id = $tt["tasktype_id"];
+  $id = $tt["tasktype"];
   $multidomain = sql_multidomain("tasktype");
 
   $query = "delete from TaskType where tasktype_id='$id' $multidomain";

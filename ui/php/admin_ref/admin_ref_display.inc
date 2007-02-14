@@ -47,15 +47,16 @@ function html_admin_ref_country_form($ctry_q) {
     $ctry_list .= "
     <tr $class>
     <td>
-    <a href=\"?action=country_checklink&amp;category=country\">
+    <a
+    href=\"?action=country_checklink&amp;category=country&amp;ctry_code=$iso&amp;ctry_lang=$lang&amp;ctry_name=$name&amp;ctry_phone=$phone\">
     <img src=\"$ico_delete\" alt=\"$l_ctry_checkdelete\" title=\"$l_ctry_checkdelete\" />
     </a></td>
-    <td> <input type=\"text\" id=\"tf_ctry_code_$id\" value=\"$iso\" size=\"3\" /></td>
-    <td> <input type=\"text\" id=\"tf_ctry_lang_$id\" value=\"$lang\" size=\"3\" /></td>
-    <td> <input type=\"text\" id=\"tf_ctry_name_$id\" value=\"$name\" size=\"12\" /></td>
-    <td> <input type=\"text\" id=\"tf_ctry_phone_$id\" value=\"$phone\" size=\"6\" /></td>
+    <td><input type=\"text\" id=\"tf_ctry_code\" value=\"$iso\" size=\"3\" /></td>
+    <td><input type=\"text\" id=\"tf_ctry_lang\" value=\"$lang\" size=\"3\" /></td>
+    <td><input type=\"text\" id=\"tf_ctry_name\" value=\"$name\" size=\"12\" /></td>
+    <td><input type=\"text\" id=\"tf_ctry_phone\" value=\"$phone\" size=\"6\" /></td>
     <td>
-    <a href=\"#\" onclick=\"return updateLine($id,'country');\">
+    <a href=\"#\" onclick=\"return updateLine($iso,'country');\">
     <img src=\"$ico_ok\" alt=\"$l_ctry_update\" title=\"$l_ctry_update\" />
     </a>
     </td>
@@ -70,6 +71,7 @@ function html_admin_ref_country_form($ctry_q) {
   <input type=\"hidden\" name=\"tf_ctry_code\" value=\"\" />
   <input type=\"hidden\" name=\"tf_ctry_lang\" value=\"\" />
   <input type=\"hidden\" name=\"tf_ctry_phone\" value=\"\" />
+  <input type=\"hidden\" name=\"country\" value=\"\" />
   </form>    
   <h1>$l_ctry_manage</h1>
   <div class=\"overflow\">
@@ -143,86 +145,63 @@ function dis_admin_ref_country_links($ref) {
   $obm_q = run_query_admin_ref_country_company_links($iso);
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
-    $dis_link_comp = "
-    <tr>
-      <td class=\"detailHead\">$name($iso) : $l_ctry_link_company</td>
-    </tr>";
+    $dis_link_comp_head = "<h1>$name($iso) : $l_ctry_link_company</h1>";
 
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
-      $dis_link_comp .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;company_id=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
+      $dis_link_comp .= "<li><a href=\"".url_prepare("company_index.php?action=detailconsult&amp;company_id=$cid"). "\">$cname</a></li>";
     }
 
   } else {
-    $dis_link_comp = "
-    <tr>
-      <td class=\"detailHead\">$name($iso) : $l_ctry_link_company_no</td>
-    </tr>";
+    $dis_link_comp_head = "<h1>$name($iso) : $l_ctry_link_company_no</h1>";
   }
 
   // Contacts Links
   $obm_q = run_query_admin_ref_country_contact_links($iso);
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
-    $dis_link_cont = "
-    <tr>
-      <td class=\"detailHead\">$name($iso) : $l_ctry_link_contact</td>
-    </tr>";
+    $dis_link_cont_head = "<h1>$name($iso) : $l_ctry_link_contact</h1>";
 
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("contact_id");
       $cname = $obm_q->f("contact_lastname")." ".$obm_q->f("contact_firstname");
-      $dis_link_cont .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
+      $dis_link_cont .= "<li><a href=\""
+      .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid")
+      . "\">$cname</a></li>";
     }
 
   } else {
-    $dis_link_cont = "
-    <tr>
-      <td class=\"detailHead\">$name($iso) : $l_ctry_link_contact_no</td>
-    </tr>";
+    $dis_link_cont_head = "<h1>$name($iso) : $l_ctry_link_contact_no</h1>";
   }
 
-  $block .= "<table class=\"detail\">
+  $block .= "<div class=\"detail\">
+    $dis_link_comp_head
+    <ul>
     $dis_link_comp
+    </ul>
+    $dis_link_cont_head
+    <ul>
     $dis_link_cont
-    </table>";
+    </ul>
+    </div>";
 
-  $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"country\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
+  $dis_back = "<a href=\"$path/admin_ref/admin_ref_index.php?action=country\">$l_back</a>";
 
   if ($delete_ok == true) {
     $display["msg"] .= display_ok_msg($l_ctry_can_delete);
-    $dis_del = "<form name=\"form_ctry_delete\".
-          method=\"post\" action=\"" . url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"country_delete\" />
-        <input type=\"hidden\" name=\"tf_iso\" value=\"$iso\" />
-        <input type=\"hidden\" name=\"tf_lang\" value=\"$lang\" />
-        <input type=\"submit\" name=\"sub_ctry\" value=\"$l_ctry_delete\" />
-        </form>";
+    $dis_del = "<a
+    href=\"$path/admin_ref/admin_ref_index.php?action=country_delete&amp;ctry_code=$iso&amp;ctry_lang=$lang\">$l_ctry_delete</a>";
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_del
+        $dis_back
       </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_ctry_cant_delete);
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_back
       </div>";
   }
 
@@ -249,98 +228,79 @@ function dis_admin_ref_datasource_index() {
 ///////////////////////////////////////////////////////////////////////////////
 function html_admin_ref_datasource_form($dsrc_q) {
   global $l_dsrc_manage, $l_dsrc_exist, $l_dsrc_no;
-  global $l_dsrc_checkdelete, $l_dsrc_update, $l_dsrc_new, $l_dsrc_insert;
+  global $l_dsrc_checkdelete, $l_dsrc_update, $l_dsrc_new, $l_dsrc_insert,$ico_ok,$ico_delete;
 
-  if ($dsrc_q->num_rows() > 0) {
-    $sel_dsrc = "<select name=\"sel_datasource_id\" onChange=\"
-      forms.form_dsrc_update.tf_name.value=this.options[this.selectedIndex].text;\" size=\"8\">";
-    while ($dsrc_q->next_record()) {
+  $char_title = '=';
+  $key = 0;
+  while ($dsrc_q->next_record()) {
       $id = $dsrc_q->f("datasource_id");
       $name = $dsrc_q->f("datasource_name");
-      $sel_dsrc .= "\n<option value=\"$id\">$name</option>";
-    }
-    $sel_dsrc .= "</select>";
-
-    $dis_update_delete = "
-<!-- Data Source Check Delete Section -->
-
-    <table>
-    <tr>
-      <td colspan=\"3\">
-      <form name=\"form_dsrc_delete\" method=\"post\"
-        action=\"" . url_prepare("admin_ref_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_dsrc_exist</td>
-        <td class=\"adminLabel\">$sel_dsrc</td>
-        <td>
-          <input type=\"hidden\" name=\"action\" value=\"datasource_checklink\" />
-          <input type=\"submit\" name=\"sub_dsrc\" value=\"$l_dsrc_checkdelete\"
-            onclick=\"if (check_admin_ref_dsrc_checkdel(this.form.sel_datasource_id)) return true;
-            else return false;\" />
-        </td>
-      </tr>
-      </table>
-      </form>
-      </td>
-    </tr>
-
-<!-- Data Source Update Section -->
-
-    <tr>
-      <td colspan=\"2\" class=\"adminLabel\">
-        <form name=\"form_dsrc_update\" method=\"get\"
-          action=\"" . url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"sel_datasource_id\" value=\"\" />
-        <input type=\"hidden\" name=\"action\" value=\"datasource_update\" />
-        <input type=\"text\" name=\"tf_name\" />
-        <input type=\"submit\" name=\"sub_dsrc\" value=\"$l_dsrc_update\"
-          onclick=\"if (check_admin_ref_dsrc_upd(this.form,document.form_dsrc_delete.sel_datasource_id)) return true; else return false;\" />
-        </form>
-      </td>
-      <td>&nbsp;</td>
-    </tr>
-    </table>";
     
-  } else {
-    $dis_update_delete = $l_dsrc_no;
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
+    }
+    $dsrc_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"dsrc_$id\" value=\"$id\" />
+    <a href=\"?action=datasource_checklink&amp;category=datasource&amp;dsrc=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_dsrc_checkdelete\" title=\"$l_dsrc_checkdelete\" />
+    </a></td>
+    <td><input type=\"text\" id=\"tf_dsrcname_$id\" value=\"$name\" size=\"30\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'datasource');\">
+    <img src=\"$ico_ok\" alt=\"$l_dsrc_update\" title=\"$l_dsrc_update\" />
+    </a>
+    </td>
+    </tr>";
   }
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_dsrc_manage
-      </td>
-    </tr><tr>
-      <td>
-      $dis_update_delete
-
-      </td>
-      <td>
-
-<!-- New Data Source Section -->
-
-        <form name=\"form_dsrc_new\" method=\"get\"
-          action=\"" . url_prepare("admin_ref_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_dsrc_new :
-            <input name=\"tf_name\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"datasource_insert\" />
-            <input type=\"submit\" name=\"sub_dsrc\" value=\"$l_dsrc_insert\"
-              onclick=\"if (check_admin_ref_dsrc_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>";
+  <div class=\"detail admin\" >
+  <form id=\"form_datasource_update\" action=\"?action=datasource_update\" method=\"post\">
+  <input type=\"hidden\" name=\"dsrc\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_dsrcname\" value=\"\" />
+  </form>    
+  <h1>$l_dsrc_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_dsrc_exist</td>
+  <td>&nbsp;</td>
+  </tr>    
+  </thead>
+  <tbody>
+  $dsrc_list
+  </tbody>
+  </table>
+  </div>    
+  <form id=\"form_datasource_new\" action=\"\" method=\"post\" onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"4\">$l_dsrc_new</td>
+  </tr>
+  <tbody>   
+  <tr>
+  <td><input type=\"text\" name=\"tf_dsrc_name\" value=\"\" size=\"30\" /></td>
+  </tr>  
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"4\"><input type=\"submit\" value=\"$l_dsrc_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"datasource_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"datasource\" />
+  </form>
+  </div>";
 
   return $block;
 }
@@ -358,7 +318,7 @@ function dis_admin_ref_datasource_links($ref) {
   global $l_dsrc_delete, $l_dsrc_can_delete, $l_dsrc_cant_delete;
 
   $delete_ok = true;
-  $id = $ref["datasource_id"];
+  $id = $ref["dsrc"];
   $name = get_admin_ref_datasource_name($id);
 
   // Company Links
@@ -366,27 +326,15 @@ function dis_admin_ref_datasource_links($ref) {
   $nb = $obm_q->num_rows();
   if ($nb > 0) {
     $delete_ok = false;
-    $dis_link_comp = "
-    <tr>
-      <td class=\"detailHead\">$name : $l_dsrc_link_company ($nb)</td>
-    </tr>";
+    $dis_link_comp_head = "<h1>$name : $l_dsrc_link_company ($nb)</h1>";
 
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
-      $dis_link_comp .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
+      $dis_link_comp .= "<li><a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$cid"). "\">$cname</a></li>";
     }
-
-  } else {
-    $dis_link_comp = "
-    <tr>
-      <td class=\"detailHead\">$name : $l_dsrc_link_company_no</td>
-    </tr>";
+      } else {
+    $dis_link_comp_head = "<h1>$name : $l_dsrc_link_company_no</h1>";
   }
 
   // Contacts Links
@@ -394,58 +342,45 @@ function dis_admin_ref_datasource_links($ref) {
   $nb = $obm_q->num_rows();
   if ($nb > 0) {
     $delete_ok = false;
-    $dis_link_cont = "
-    <tr>
-      <td class=\"detailHead\">$name : $l_dsrc_link_contact ($nb)</td>
-    </tr>";
+    $dis_link_cont_head = "<h1>$name : $l_dsrc_link_contact ($nb)</h1>";
 
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("contact_id");
       $cname = $obm_q->f("contact_lastname")." ".$obm_q->f("contact_firstname");
-      $dis_link_cont .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
+      $dis_link_cont .= "<li><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$cid"). "\">$cname</a></li>";
     }
 
   } else {
-    $dis_link_cont = "
-    <tr>
-      <td class=\"detailHead\">$name : $l_dsrc_link_contact_no</td>
-    </tr>";
+    $dis_link_cont_head = "<h1>$name : $l_dsrc_link_contact_no</h1>";
   }
 
-  $block .= "<table class=\"detail\">
+  $block .= "<div class=\"detail\">
+    $dis_link_comp_head
+    <ul>
     $dis_link_comp
+    </ul>
+    $dis_link_cont_head
+    <ul>
     $dis_link_cont
-    </table>";
+    </ul>
+    </div>";
 
-  $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"datasource\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
+  $dis_back = "<a href=\"$path/admin_ref/admin_ref_index.php?action=datasource\">$l_back</a>";
 
   if ($delete_ok == true) {
     $display["msg"] .= display_ok_msg($l_dsrc_can_delete);
-    $dis_del = "<form name=\"form_dsrc_delete\".
-          method=\"post\" action=\"" . url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"datasource_delete\" />
-        <input type=\"hidden\" name=\"sel_datasource_id\" value=\"$id\" />
-        <input type=\"submit\" name=\"sub_dsrc\" value=\"$l_dsrc_delete\" />
-        </form>";
+    $dis_del = "<a
+    href=\"$path/admin_ref/admin_ref_index.php?action=datasource_delete&amp;dsrc=$id&amp;dsrc_name=$name\">$l_dsrc_delete</a>";
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_del
+        $dis_back
       </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_dsrc_cant_delete);
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_back
       </div>";
   }
 
@@ -474,118 +409,99 @@ function html_admin_ref_tasktype_form($tts) {
   global $l_tt_manage, $l_tt_exist, $l_tt_no;
   global $l_tt_checkdelete, $l_tt_update, $l_tt_new, $l_tt_insert;
   global $ctt_sales, $ctt_research, $ctt_others;
-  global $l_tt_sales, $l_tt_research, $l_tt_others;
+  global $l_tt_sales, $l_tt_research, $l_tt_others,$ico_delete,$ico_ok;
 
   $tt_list = array($ctt_sales => $l_tt_sales,
 		     $ctt_research => $l_tt_research,
 		     $ctt_others => $l_tt_others);
 
   $type_prec = -1;
-  $sel_tt = "<select name=\"sel_tasktype_id\" onChange=\"
-      forms.form_tt_update.tf_label.value=this.options[this.selectedIndex].text;\" size=\"16\">";
   if (is_array($tts)) {
     foreach ($tts as $id=>$one_tt) {
       $tt_label = $one_tt["label"];
-      $internal = $one_tt["internal"];
+      $tt_internal = $one_tt["internal"];
+      
       // put menu titles
-      if ($internal != $type_prec) {
-	$sel_tt .= "<option disabled=\"disabled\">".$tt_list[$internal]."</option>";
-	$type_prec = $internal;
+      if ($tt_internal != $type_prec) {
+	$tasktype_list .= "
+    <tr><td colspan=\"3\">&nbsp;</td></tr>
+    <tr><td colspan=\"3\"><h1>".$tt_list[$tt_internal]."</h1></td></tr>
+    <tr><td colspan=\"3\">&nbsp;</td></tr>
+    ";
+	$type_prec = $tt_internal;
       }
-      $sel_tt .= "\n<option value=\"$id\"";
-      if ($tt == $id) $sel_tt .= "selected =\"selected\"";
-      $sel_tt .= ">&nbsp;&nbsp;$tt_label</option>\n";
+      $tasktype_list .= "
+    <tr>
+    <td>
+    <input type=\"hidden\" id=\"tasktype_internal_$tt_internal\" value=\"$tt_internal\" />
+    <input type=\"hidden\" id=\"tasktype_$id\" value=\"$id\" />
+    <a
+    href=\"?action=tasktype_checklink&amp;category=tasktype&amp;tasktype_id=$id&amp;tasktype_internal=$tt_internal\">
+    <img src=\"$ico_delete\" alt=\"$l_tt_delete\" title=\"$l_tt_delete\" />
+    </a></td>
+    <td><input type=\"text\" id=\"tf_tt_label_$id\" value=\"$tt_label\" size=\"40\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'tasktype');\">
+    <img src=\"$ico_ok\" alt=\"$l_tt_update\" title=\"$l_tt_update\" />
+    </a>
+    </td>
+    </tr>      
+      ";
+    } 
     }
-    $sel_tt .= "</select>";
-
-    $dis_update_delete = "
-<!-- Task Type Check Delete Section -->
-
-    <table>
-    <tr>
-      <td colspan=\"3\">
-      <form name=\"form_tt_delete\" method=\"post\"
-        action=\"" . url_prepare("admin_ref_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_tt_exist</td>
-        <td class=\"adminLabel\">$sel_tt</td>
-        <td>
-          <input type=\"hidden\" name=\"action\" value=\"tasktype_checklink\" />
-          <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_checkdelete\"
-            onclick=\"if (check_admin_ref_tt_checkdel(this.form.sel_tasktype_id)) return true;
-            else return false;\" />
-        </td>
-      </tr>
-      </table>
-      </form>
-      </td>
-    </tr>
-
-<!-- Task Type Update Section -->
-
-    <tr>
-      <td colspan=\"2\" class=\"adminLabel\">
-        <form name=\"form_tt_update\" method=\"get\"
-          action=\"" . url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"sel_tasktype_id\" value=\"\" />
-        <input type=\"hidden\" name=\"action\" value=\"tasktype_update\" />
-        <input type=\"text\" name=\"tf_label\" />
-        <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_update\"
-          onclick=\"if (check_admin_ref_tt_upd(this.form,document.form_tt_delete.sel_tasktype_id)) return true; else return false;\" />
-        </form>
-      </td>
-      <td>&nbsp;</td>
-    </tr>
-    </table>";
-    
-  } else {
-    $dis_update_delete = $l_tt_no;
-  }
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <table class=\"admin\">
+    <div class=\"detail admin\">
+    <h1>$l_tt_manage</h1>
+    <form id=\"form_tasktype_update\" method=\"post\" action=\"?action=tasktype_update\">
+    <input type=\"hidden\" name=\"tf_tt_label\" value=\"\" />
+    <input type=\"hidden\" name=\"tasktype_internal\" value=\"\" />
+    <input type=\"hidden\" name=\"tasktype\" value=\"\" />
+    </form>
+    <table>
+    <thead>
     <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_tt_manage
-      </td>
-    </tr><tr>
-      <td>
-      $dis_update_delete
-
-      </td>
-      <td>
-
-<!-- New Task Type Section -->
-
-        <form name=\"form_tt_new\" method=\"get\"
-          action=\"" . url_prepare("admin_ref_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_tt_new :
-            <input name=\"tf_label\" /></td>
-        </tr>
-        <tr>
-          <td colspan=\"2\">
-            <input type=\"radio\" name=\"rd_internal\" value=\"0\" checked=\"checked\" />$l_tt_sales<br />
-            <input type=\"radio\" name=\"rd_internal\" value=\"1\" />$l_tt_research<br />
-            <input type=\"radio\" name=\"rd_internal\" value=\"2\" />$l_tt_others
-          </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"tasktype_insert\" />
-            <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_insert\"
-              onclick=\"if (check_admin_ref_tt_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
+    <td colspan=\"3\">&nbsp;</td>
     </tr>
-    </table>";
+    <tr>
+    <td colspan=\"3\">$l_tt_exist</td>
+    </tr>
+    </thead>
+    <tbody>
+    $tasktype_list
+    </tbody>
+    </table>
+    <form id=\"form_tasktype_new\" method=\"post\" action=\"\">
+    <table>
+    <thead>
+    <tr>
+    <td colspan=\"3\">$l_tt_new</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td colspan=\"2\">
+    <input type=\"radio\" name=\"rd_internal\" value=\"0\" checked=\"checked\" />$l_tt_sales<br />
+    <input type=\"radio\" name=\"rd_internal\" value=\"1\" />$l_tt_research<br />
+    <input type=\"radio\" name=\"rd_internal\" value=\"2\" />$l_tt_others
+    </td>
+    <td><input type=\"text\" name=\"tf_tt_label\" /></td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <tr>
+    <td colspan=\"4\">
+    <input type=\"hidden\" name=\"action\" value=\"tasktype_insert\" />
+    <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_insert\" onclick=\"if (check_admin_ref_tt_new(this.form)) return true; else return false;\" />
+    </td>
+    </tr>
+    </tfoot>
+    </table>
+    </form>
+    </div>
+";
 
   return $block;
 }
@@ -610,35 +526,23 @@ function dis_admin_ref_tasktype_links($ref) {
   $nb_deal = $obm_q->num_rows();
   if ($nb_deal > 0) {
     $delete_ok = false;
-    $dis_link_deal = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_tt_link_deal ($nb_deal)</td>
-    </tr>";
+    $dis_link_deal_head = "<h1>$label : $l_tt_link_deal ($nb_deal)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
-      $dis_link_deal .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a>
-      </td>
-    </tr>";
+      $dis_link_deal .= "<li><a href=\""
+      .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$did")
+      . "\">$dlabel</a></li>";
     }
     if ($cpt < $nb_deal) {
-      $dis_link_deal .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+      $dis_link_deal .= "<li>...</li>";
     }
 
   } else {
-    $dis_link_deal = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_tt_link_deal_no</td>
-    </tr>";
+    $dis_link_deal_head = "<h1>$label : $l_tt_link_deal_no</h1>";
   }
 
   // Projects Links
@@ -646,35 +550,21 @@ function dis_admin_ref_tasktype_links($ref) {
   $nb_proj = $obm_q->num_rows();
   if ($nb_proj > 0) {
     $delete_ok = false;
-    $dis_link_proj = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_tt_link_project ($nb_proj)</td>
-    </tr>";
-
+    $dis_link_proj_head = "<h1>$label : $l_tt_link_project ($nb_proj)</h1>";
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $pid = $obm_q->f("project_id");
       $pname = $obm_q->f("project_name");
-      $dis_link_proj .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("$path/project/project_index.php?action=detailconsult&amp;project_id=$pid") . "\">$pname</a>
-      </td>
-    </tr>";
+      $dis_link_proj .= "<a href=\"" .url_prepare("$path/project/project_index.php?action=detailconsult&amp;project_id=$pid") . "\">$pname</a>";
     }
     if ($cpt < $nb_proj) {
-      $dis_link_proj .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
+      $dis_link_proj .= "<li>...</li>
     </tr>";
     }
 
   } else {
-    $dis_link_proj = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_tt_link_project_no</td>
-    </tr>";
+    $dis_link_proj_head = "<h1>$label : $l_tt_link_project_no</h1>";
   }
 
   // Time Task Links
@@ -682,10 +572,7 @@ function dis_admin_ref_tasktype_links($ref) {
   $nb_time = $obm_q->num_rows();
   if ($nb_time > 0) {
     $delete_ok = false;
-    $dis_link_time = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_tt_link_time ($nb_time)</td>
-    </tr>";
+    $dis_link_time_head = "<h1>$label : $l_tt_link_time ($nb_time)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
@@ -693,57 +580,48 @@ function dis_admin_ref_tasktype_links($ref) {
       $tid = $obm_q->f("timetask_user_id");
       $tname = $obm_q->f("lastname") . " " . $obm_q->f("firstname");
       $tdate = of_date_format($obm_q->f("date"), 1);
-      $dis_link_time .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("$path/time/time_index.php?action=index&amp;sel_user_id=$tid&amp;wbegin=$tdate") . "\">$tname ($tdate)</a>
-      </td>
-    </tr>";
+      $dis_link_time .= "<li><a href=\""
+      .url_prepare("$path/time/time_index.php?action=index&amp;sel_user_id=$tid&amp;wbegin=$tdate")
+      . "\">$tname ($tdate)</a></li>";
     }
     if ($cpt < $nb_time) {
-      $dis_link_time .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+      $dis_link_time .= "<li>...</li>";
     }
 
   } else {
-    $dis_link_time = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_tt_link_time_no</td>
-    </tr>";
+    $dis_link_time_head = "<h1>$label : $l_tt_link_time_no</h1>";
   }
 
-  $block .= "<table class=\"detail\">
+  $block .= "<div class=\"detail\">
+    $dis_link_deal_head
+    <ul>
     $dis_link_deal
+    </ul>
+    $dis_link_proj_head
+    <ul>
     $dis_link_proj
+    </ul>
+    $dis_link_time_head
+    <ul>
     $dis_link_time
-    </table>";
+    </ul>
+    </div>";
 
-  $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"tasktype\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
+  $dis_back = "<a href=\"$path/admin_ref/admin_ref_index.php?action=tasktype\">$l_back</a>";
 
   if ($delete_ok == true) {
     $display["msg"] .= display_ok_msg($l_tt_can_delete);
-    $dis_del = "<form name=\"form_act_delete\".
-          method=\"post\" action=\"" . url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"tasktype_delete\" />
-        <input type=\"hidden\" name=\"sel_tasktype_id\" value=\"$id\" />
-        <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_delete\" />
-        </form>";
+    $dis_del = "<a href=\"$path/admin_ref/admin_ref_index.php?action=tasktype_delete&amp;tasktype=$id\">$l_tt_delete</a>";
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_del
+        $dis_back
       </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_tt_cant_delete);
     $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_back
       </div>";
   }
 
@@ -835,7 +713,6 @@ $table_tt
 function dis_admin_ref_region_index() {
 
   $regions = of_category_get_ordered("", "region");
-  $block .= "<hr />";
   $block .= of_category_dis_admin_form("region", $regions);
 
   return $block;
