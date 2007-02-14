@@ -461,8 +461,8 @@ function run_query_defaultodttemplate_insert($cv) {
   $label = $cv["defaultodttemplate_label"];
 
   $query = "INSERT INTO DefaultOdtTemplate(defaultodttemplate_entity, defaultodttemplate_document_id,
-                                           defaultodttemplate_label, defaultodttemplate_domain_id)
-            VALUES('$entity', '$document_id', '$label', '$obm[domain_id]')";
+                                           defaultodttemplate_label)
+            VALUES('$entity', '$document_id', '$label')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -481,7 +481,6 @@ function run_query_defaultodttemplate_update($cv) {
 
   $label = $cv["defaultodttemplate_label"];
   $id = $cv["defaultodttemplate"];
-  $multidomain = sql_multidomain("defaultodttemplate"); 
 
   $query = "UPDATE DefaultOdtTemplate SET
       defaultodttemplate_label='$label'

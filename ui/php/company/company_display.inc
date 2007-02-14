@@ -1556,6 +1556,7 @@ function html_company_nafcode_form($naf_q) {
   <tr>
   <td colspan=\"3\">$l_c_new</td>
   </tr>
+  </thead>
   <tbody>   
   <tr>
   <td>$l_naf_istitle</td>    

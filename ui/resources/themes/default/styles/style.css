@@ -120,6 +120,11 @@ form {
   font-weight: bold;
 }
 
+.H {
+  display: none;
+}
+
+
 /* ------------------------------------------------------------------------- */
 /* Two column layout  */
 /* ------------------------------------------------------------------------- */
@@ -127,16 +132,16 @@ form {
 
 #portletsPanel {
   position: absolute;
-  width: 15.5em;
+  width: 16.5em;
   left: 8px;
-  margin-top: 2px;
+  margin-top: 2em;
 }
 
 #mainPanel {
   z-index:100;
   min-width: 120px;
-  margin: 1em 0px 20px 16em;
-  padding: 10px;
+  margin: 1em 0px 20px 17.5em;
+  padding: 1em;
 /*IE workaround*/
   _height: 1px;
 }
@@ -157,6 +162,10 @@ form {
   background-image: url('../images/banner_border.png');
   background-repeat: repeat-x;
   background-position: bottom;
+}
+
+#obmLogo {
+  position: absolute;
 }
 
 #information {
@@ -206,6 +215,7 @@ form {
   padding: 0;
   font-weight: bold;
   list-style-type: none;
+  margin-left: 95px;
 }
 
 #section li {
@@ -325,25 +335,26 @@ form {
 /* Portlets */
 /* ------------------------------------------------------------------------- */
 
+
 #portletsHandler {
-  width: 15em;
+  width: 1em;
   font-weight: bold;
-  background-image: url('../images/tab_current_border.png');
-  background-repeat: repeat-x;
-  background-position: 0 0.5em;
   background-color: #eff0f2;
   border: 1px solid #b3b3b3;
+  overflow: hidden;
+  position: absolute
 }
 
 .portlet {
   width: 15em;
+  margin: 0;
+  margin-bottom: 2px;
   background-color: #eff0f2;
-  border-left: 1px solid #b3b3b3;
-  border-right: 1px solid #b3b3b3;
-  border-bottom: 1px solid #b3b3b3;
+  border: 1px solid #b3b3b3;
   color: #368397;
   list-style-type: none; 
   overflow: hidden;
+  z-index: 100;
 }
 
 .portlet h1 {

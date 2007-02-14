@@ -329,6 +329,7 @@ function html_group_form($action, $group_q, $group) {
   } elseif ($action == "new") {
     if ($cgroup_private_default) {
       $private_c = " checked";
+      $mail_class = "H";
     }
   }
 
@@ -346,6 +347,7 @@ function html_group_form($action, $group_q, $group) {
          ($usercreate == $auth->auth["uid"]) ) ) {
     if ($priv == '1') {
       $private_c = " checked";
+      $mail_class = "H";
     }
     if ($mailing == '1') {
       $mailing_c = " checked";
@@ -353,7 +355,7 @@ function html_group_form($action, $group_q, $group) {
     $dis_private = "
   <tr>
     <th>$l_private</th>
-    <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
+    <td><input name=\"cba_privacy\" type=\"checkbox\" onchange=\"($(this).getValue())?$('emailGroup').addClassName('H'):$('emailGroup').removeClassName('H')\" value=\"1\" $private_c /></td>
   </tr>";
   } 
 
@@ -376,7 +378,7 @@ function html_group_form($action, $group_q, $group) {
       <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
   </tr>
   $dis_private
-  <tr>
+  <tr id=\"emailGroup\" class=\"$mail_class\">
     <th>$l_email</th>
     <td>
       <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>

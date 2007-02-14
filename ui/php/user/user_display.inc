@@ -863,7 +863,7 @@ function html_user_form($usr_q, $user, $field="") {
   global $l_enabled, $l_disabled, $l_web_consult_list,$path;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $path, $display, $cgp_use, $action, $profiles, $c_yes, $c_no;
-  global $c_multidomain, $obm, $c_default_domain, $l_domain;
+  global $obm, $c_default_domain, $l_domain;
 
   
   // if update mode and first time value are taken from database
@@ -1003,7 +1003,7 @@ function html_user_form($usr_q, $user, $field="") {
 
   // Domain (can't be updated, so only on insert)
   if (($action == "new" || $action == "insert")
-      && ($c_multidomain && $obm["domain_id"] == $c_default_domain)) {
+      && $obm["domain_id"] == $c_default_domain) {
     $sel_domain = of_domain_dis_select($domain_id);
     $dis_domain = "<tr>
       <th>$l_domain</th>
@@ -1096,6 +1096,19 @@ function html_user_form($usr_q, $user, $field="") {
   </tr>
   </table>
   </fieldset>";
+  } else {
+  $mail_section = "
+    <fieldset class=\"detail infos\">
+    <legend>$l_mail</legend>
+    <table>    
+    <tr>
+      <th class=\"$class[email]\">$l_email</th>
+      <td><input type=\"text\" name=\"ta_email\" value=\"$email\" /></td>
+    </tr>
+    </table>
+    </fieldset>
+    ";
+
   }
 
   if ($cgp_use["service"]["mail_nomad"]) {

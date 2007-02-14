@@ -51,12 +51,16 @@ function html_admin_ref_country_form($ctry_q) {
     href=\"?action=country_checklink&amp;category=country&amp;ctry_code=$iso&amp;ctry_lang=$lang&amp;ctry_name=$name&amp;ctry_phone=$phone\">
     <img src=\"$ico_delete\" alt=\"$l_ctry_checkdelete\" title=\"$l_ctry_checkdelete\" />
     </a></td>
-    <td><input type=\"text\" id=\"tf_ctry_code\" value=\"$iso\" size=\"3\" /></td>
-    <td><input type=\"text\" id=\"tf_ctry_lang\" value=\"$lang\" size=\"3\" /></td>
-    <td><input type=\"text\" id=\"tf_ctry_name\" value=\"$name\" size=\"12\" /></td>
-    <td><input type=\"text\" id=\"tf_ctry_phone\" value=\"$phone\" size=\"6\" /></td>
     <td>
-    <a href=\"#\" onclick=\"return updateLine($iso,'country');\">
+    <input type=\"hidden\" id=\"tf_ctry_old_code_$iso\" value=\"$iso\" size=\"3\" />
+    <input type=\"text\" id=\"tf_ctry_code_$iso\" maxlength=\"2\"  value=\"$iso\" size=\"3\" /></td>
+    <td>
+    <input type=\"hidden\" id=\"tf_ctry_old_lang_$iso\" value=\"$lang\" size=\"3\" />
+    <input type=\"text\" id=\"tf_ctry_lang_$iso\" maxlength=\"2\" value=\"$lang\" size=\"3\" /></td>
+    <td><input type=\"text\" id=\"tf_ctry_name_$iso\" value=\"$name\" size=\"12\" /></td>
+    <td><input type=\"text\" id=\"tf_ctry_phone_$iso\" value=\"$phone\" size=\"6\" /></td>
+    <td>
+    <a  onclick=\"return updateLine('$iso','country');\">
     <img src=\"$ico_ok\" alt=\"$l_ctry_update\" title=\"$l_ctry_update\" />
     </a>
     </td>
@@ -69,9 +73,11 @@ function html_admin_ref_country_form($ctry_q) {
   <form id=\"form_country_update\" action=\"?action=country_update\" method=\"post\">
   <input type=\"hidden\" name=\"tf_ctry_name\" value=\"\" />
   <input type=\"hidden\" name=\"tf_ctry_code\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_ctry_old_code\" value=\"\" />
   <input type=\"hidden\" name=\"tf_ctry_lang\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_ctry_old_lang\" value=\"\" />
   <input type=\"hidden\" name=\"tf_ctry_phone\" value=\"\" />
-  <input type=\"hidden\" name=\"country\" value=\"\" />
+  <input type=\"hidden\" name=\"action\" value=\"country_update\" />
   </form>    
   <h1>$l_ctry_manage</h1>
   <div class=\"overflow\">
@@ -422,15 +428,7 @@ function html_admin_ref_tasktype_form($tts) {
       $tt_internal = $one_tt["internal"];
       
       // put menu titles
-      if ($tt_internal != $type_prec) {
-	$tasktype_list .= "
-    <tr><td colspan=\"3\">&nbsp;</td></tr>
-    <tr><td colspan=\"3\"><h1>".$tt_list[$tt_internal]."</h1></td></tr>
-    <tr><td colspan=\"3\">&nbsp;</td></tr>
-    ";
-	$type_prec = $tt_internal;
-      }
-      $tasktype_list .= "
+      $tasktypelist[$tt_internal] .= "
     <tr>
     <td>
     <input type=\"hidden\" id=\"tasktype_internal_$tt_internal\" value=\"$tt_internal\" />
@@ -439,7 +437,7 @@ function html_admin_ref_tasktype_form($tts) {
     href=\"?action=tasktype_checklink&amp;category=tasktype&amp;tasktype_id=$id&amp;tasktype_internal=$tt_internal\">
     <img src=\"$ico_delete\" alt=\"$l_tt_delete\" title=\"$l_tt_delete\" />
     </a></td>
-    <td><input type=\"text\" id=\"tf_tt_label_$id\" value=\"$tt_label\" size=\"40\" /></td>
+    <td><input type=\"text\" id=\"tf_tt_label_$id\" value=\"$tt_label\" /></td>
     <td>
     <a href=\"#\" onclick=\"return updateLine($id,'tasktype');\">
     <img src=\"$ico_ok\" alt=\"$l_tt_update\" title=\"$l_tt_update\" />
@@ -453,27 +451,28 @@ function html_admin_ref_tasktype_form($tts) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <div class=\"detail admin\">
-    <h1>$l_tt_manage</h1>
     <form id=\"form_tasktype_update\" method=\"post\" action=\"?action=tasktype_update\">
     <input type=\"hidden\" name=\"tf_tt_label\" value=\"\" />
     <input type=\"hidden\" name=\"tasktype_internal\" value=\"\" />
     <input type=\"hidden\" name=\"tasktype\" value=\"\" />
-    </form>
+    </form>    
+    <div class=\"detail admin\">
+    <h1>$tt_list[$ctt_sales]</h1>
+    <div class=\"overflow\">
     <table>
     <thead>
     <tr>
-    <td colspan=\"3\">&nbsp;</td>
-    </tr>
-    <tr>
-    <td colspan=\"3\">$l_tt_exist</td>
+    <td>&nbsp;</td>
+    <td>$l_tt_exist</td>
+    <td>&nbsp;</td>
     </tr>
     </thead>
     <tbody>
-    $tasktype_list
+    $tasktypelist[$ctt_sales]
     </tbody>
     </table>
-    <form id=\"form_tasktype_new\" method=\"post\" action=\"\">
+    </div>
+    <form id=\"form_tasktype1_new\" method=\"post\" action=\"\">
     <table>
     <thead>
     <tr>
@@ -482,17 +481,15 @@ function html_admin_ref_tasktype_form($tts) {
     </thead>
     <tbody>
     <tr>
-    <td colspan=\"2\">
-    <input type=\"radio\" name=\"rd_internal\" value=\"0\" checked=\"checked\" />$l_tt_sales<br />
-    <input type=\"radio\" name=\"rd_internal\" value=\"1\" />$l_tt_research<br />
-    <input type=\"radio\" name=\"rd_internal\" value=\"2\" />$l_tt_others
+    <td>
+    <input type=\"hidden\" name=\"rd_internal\" value=\"0\"/>$l_tt_sales
     </td>
-    <td><input type=\"text\" name=\"tf_tt_label\" /></td>
+    <td colspan=\"2\"><input type=\"text\" name=\"tf_tt_label\" /></td>
     </tr>
     </tbody>
     <tfoot>
     <tr>
-    <td colspan=\"4\">
+    <td colspan=\"3\">
     <input type=\"hidden\" name=\"action\" value=\"tasktype_insert\" />
     <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_insert\" onclick=\"if (check_admin_ref_tt_new(this.form)) return true; else return false;\" />
     </td>
@@ -501,6 +498,91 @@ function html_admin_ref_tasktype_form($tts) {
     </table>
     </form>
     </div>
+   <div class=\"detail admin\">
+    <h1>$tt_list[$ctt_others]</h1>
+    <div class=\"overflow\">
+    <table>
+    <thead>
+    <tr>
+    <td>&nbsp;</td>
+    <td>$l_tt_exist</td>
+    <td>&nbsp;</td>
+    </tr>
+    </thead>
+    <tbody>
+    $tasktypelist[$ctt_others]
+    </tbody>
+    </table>
+    </div>
+    <form id=\"form_tasktype2_new\" method=\"post\" action=\"\">
+    <table>
+    <thead>
+    <tr>
+    <td colspan=\"3\">$l_tt_new</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>
+    <input type=\"hidden\" name=\"rd_internal\" value=\"2\"/>$l_tt_others
+    </td>
+    <td colspan=\"2\"><input type=\"text\" name=\"tf_tt_label\" /></td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <tr>
+    <td colspan=\"3\">
+    <input type=\"hidden\" name=\"action\" value=\"tasktype_insert\" />
+    <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_insert\" onclick=\"if (check_admin_ref_tt_new(this.form)) return true; else return false;\" />
+    </td>
+    </tr>
+    </tfoot>
+    </table>
+    </form>
+    </div>        
+    <div class=\"detail admin\">
+    <h1>$tt_list[$ctt_research]</h1>
+    <div class=\"overflow\">
+    <table>
+    <thead>
+    <tr>
+    <td>&nbsp;</td>
+    <td>$l_tt_exist</td>
+    <td>&nbsp;</td>
+    </tr>
+    </thead>
+    <tbody>
+    $tasktypelist[$ctt_research]
+    </tbody>
+    </table>
+    </div>
+    <form id=\"form_tasktype3_new\" method=\"post\" action=\"\">
+    <table>
+    <thead>
+    <tr>
+    <td colspan=\"3\">$l_tt_new</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>
+    <input type=\"hidden\" name=\"rd_internal\" value=\"1\"/>$l_tt_research
+    </td>
+    <td colspan=\"2\"><input type=\"text\" name=\"tf_tt_label\" /></td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <tr>
+    <td colspan=\"3\">
+    <input type=\"hidden\" name=\"action\" value=\"tasktype_insert\" />
+    <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_insert\" onclick=\"if (check_admin_ref_tt_new(this.form)) return true; else return false;\" />
+    </td>
+    </tr>
+    </tfoot>
+    </table>
+    </form>
+    </div>       
+    
 ";
 
   return $block;

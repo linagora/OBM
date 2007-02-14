@@ -58,30 +58,27 @@ function display_page(&$display) {
 
   echo $display["head"] . $display["header"] . "
     <!-- left panel -->
-    <div id=\"portletsPanel\">
+    <div id=\"portletsPanel\"> 
       <div id='portletsHandler'>
-      <span>
-      <img src='$ico_nav_close' alt='Hide this bar' />
-      $l_hide
-      </span>
-      <span id='portletsHandlerShow'>
-      <img src='$ico_nav_open' alt='Show this bar' />
-      $l_show
-      </span>
-      </div>
-      <div id=\"portlets\">
-        " .
-        $display["last"] .
-        $display["features"] .
-        $display["link"] .
-        $display["detailInfo"] ." 
-      </div>
-      </div>
+       <span>
+        <img src='$ico_nav_close' alt='Hide this bar' />
+       </span>
+       <span id='portletsHandlerShow'>
+        <img src='$ico_nav_open' alt='Show this bar' />
+       </span>
+      </div>         
+     <div id=\"portlets\">          
+      $display[last]
+      $display[features] 
+      $display[link] 
+      $display[detailInfo] 
+     </div>
+    </div>
     <!-- left panel end -->
-    <div id=\"mainPanel\" >".
-    $display["title"].
-    $display["action"] .
-    $display["msg"] ;
+    <div id=\"mainPanel\" >  
+    $display[title]
+    $display[action]
+    $display[msg]" ;
     if($display["search"] != "" || $display["detail"] != "") {
       echo  
       "<div id=\"mainContent\">".
@@ -127,7 +124,7 @@ function display_menu($module) {
   $block = "
 <!-- Bandeau -->
 <div id='banner'>
-<a href=\"$path/obm.php\"><img src='$ico_obm' alt='Logo OBM'/></a>
+<a href=\"$path/obm.php\" id=\"obmLogo\"><img src='$ico_obm' alt='Logo OBM'/></a>
 ".
 $display["section"]
 ."

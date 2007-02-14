@@ -63,8 +63,8 @@ function run_query_admin_ref_country_update($ctry) {
   $iso = $ctry["ctry_code"];
   $lang = $ctry["ctry_lang"];
   $phone = $ctry["ctry_phone"];
-  $old_iso = $ctry["old_iso"];
-  $old_lang = $ctry["old_lang"];
+  $old_iso = $ctry["ctry_old_code"];
+  $old_lang = $ctry["ctry_old_lang"];
 
   $multidomain = sql_multidomain("country");
   $query = "update Country set
@@ -486,7 +486,7 @@ function run_query_admin_ref_tasktype_timetask_links($tt) {
   global $cdg_sql;
 
   $id = $tt["tasktype_id"];
-  $multidomain = sql_multidomain("tasktype");
+  $multidomain = sql_multidomain("userobm");
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;

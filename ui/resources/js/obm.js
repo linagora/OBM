@@ -78,10 +78,13 @@ Obm.Portlets = new Class({
     this.sidebar = new Fx.Style('portlets', 'width', {duration: 250});    
     this.sidebar.element.setStyle('overflow', 'hidden');
     this.main = new Fx.Style('mainPanel', 'margin-left',{duration: 250});
+    this.handle = new Fx.Style('portletsHandler', 'left',{duration: 250});
     this.delta = this.main.element.getLeft() - this.sidebar.element.offsetWidth;
-    this.width = this.sidebar.element.offsetWidth;
     this.panel = $('portletsPanel');
+    this.width = this.panel.offsetWidth;
     this.handler = $('portletsHandler');
+    this.handler.setStyle('height',(this.panel.offsetHeight - 4) + 'px');
+    this.handler.setStyle('left',(this.width - this.handler.offsetWidth)  + 'px');
     this.handler.getFirst().getNext().setStyle('display','none'); ;
     this.handler.addEvent('click', function(e){
       obm.portlets.toggle();
@@ -93,6 +96,7 @@ Obm.Portlets = new Class({
       this.sidebar.set(0);
       this.panel.setStyle('width',this.delta + 'px');
       this.main.set(this.delta);
+      this.handle.set(0);
     }
 
     elements = $ES('.portlet',this.panel);
@@ -135,10 +139,12 @@ Obm.Portlets = new Class({
     if(this.main.element.getLeft() > this.width) {
       this.main.custom(this.width + this.delta,this.delta );
       this.sidebar.custom(this.width,0);
+      this.handle.custom(this.width - this.handler.offsetWidth,0);
       this.panel.setStyle('width',this.delta + 'px');
     } else {
       this.main.custom(this.delta, this.width + this.delta);
       this.sidebar.custom(0,this.width);
+      this.handle.custom(0,this.width - this.handler.offsetWidth);
       this.panel.setStyle('width',this.width + 'px');
     }
 

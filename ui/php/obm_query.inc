@@ -74,7 +74,7 @@ function run_query_lead_time_range($date_ranges, $user_ids=array()) {
   $db_type = $obm_q->type;
   $date = sql_date_format($db_type, "lead_date", "date");
   $datealarm = sql_date_format($db_type, "lead_datealarm", "datealarm");
-
+  $multidomain = sql_multidomain('lead');
   // Manager filter
   if ((is_array($user_ids)) && (count($user_ids)>0)) {
     $w_user .= " AND (";
@@ -91,7 +91,7 @@ function run_query_lead_time_range($date_ranges, $user_ids=array()) {
       $date,
       $datealarm
     FROM Lead
-    WHERE 1=1 $w_user
+    WHERE 1=1 $w_user $multidomain
 ";
   
   display_debug_msg($query, $cdg_sql, "run_query_lead_time_range()");
@@ -149,6 +149,7 @@ function run_query_deal_status($user_id) {
       AND deal_hitrate < 100
       AND deal_archive = '0'
       AND deal_marketingmanager_id = '$user_id'
+      $multidomain
     GROUP BY deal_status_id, dealstatus_label
 ";
   

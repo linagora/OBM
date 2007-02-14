@@ -928,12 +928,10 @@ function run_query_user_check_user($p_id, $user) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-
+  $multidomain = sql_multidomain('userobm');
   $login = $user["login"];
-  if ($c_multidomain) {
-    $domain = $user["domain"];
-    $where_multidomain = " AND userobm_domain_id='$domain'";
-  }
+  $domain = $user["domain"];
+  $where_multidomain = " AND userobm_domain_id='$domain'";
 	
   if ($p_id) {
     $where_user = "AND userobm_id != '$p_id'";
@@ -1219,15 +1217,13 @@ function check_user_data_form($p_id, $user) {
   /////////////////////////////////////////////////////////////////////////////
   // if a user with the same name already exists  return false
   /////////////////////////////////////////////////////////////////////////////
-  if ($c_multidomain) {
-    if (isset($user["domain"])) {
-      $domain_id = $user["domain"];
-    } else {
-      $domain_id = $obm["domain_id"];
-    }
-    $where_multidomain = "AND userobm_domain_id = '$domain_id'";
+  if (isset($user["domain"])) {
+    $domain_id = $user["domain"];
+  } else {
+    $domain_id = $obm["domain_id"];
   }
-  $query = "SELECT * FROM UserObm WHERE userobm_login='$login' $where_multidomain";
+  $where_multidomain = "AND userobm_domain_id = '$domain_id'";
+  $query = "SELECT * FROM UserObm WHERE userobm_login='$login' $where_multidomain ";
   if ($p_id > 0) {
     $query .= " AND userobm_id!='$p_id'";
   }
