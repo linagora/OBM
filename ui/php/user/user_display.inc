@@ -325,7 +325,6 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
   $user_d = new OBM_DISPLAY("DATA", $prefs, "user");
   if ($popup) {
     //    if ($ext_action == "ext_get_ids") {
-    echo "pop=$popup";
     $user_d->display_link = false;
     $user_d->data_cb_text = "X";
     $user_d->data_idfield = "userobm_id";

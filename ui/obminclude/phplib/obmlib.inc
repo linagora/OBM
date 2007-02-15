@@ -146,12 +146,36 @@ class OBM_Challenge_Auth extends Auth {
   function auth_loginform() {
     global $sess, $obminclude, $obm_version, $module, $path, $login_action;
     global $obmdb_dbtype, $challenge, $auth_encryption, $password_encryption;
-    global $params, $c_multidomain, $c_default_domain;
+    global $params, $c_multidomain, $c_default_domain,$set_theme_default;
+    global $set_lang_default,$sel_domain;
 
-    $login_page = "$path/../$obminclude/themes/login.inc";
+    $theme_file = "resources/themes/$set_theme_default/theme.inc";
+    include($theme_file);
+
+    $conf_login_page = "$path/../conf/themes/login.html";
+    if(file_exists($conf_login_page)) {
+      $lp = $conf_login_page;
+    } else {
+      $lp = $login_template;
+    }
+    
+    $lang_file = "obminclude/lang/$set_lang_default/login.inc";
+    include($lang_file);
+
+    if ($c_multidomain) {
+      $sel_domain = of_domain_dis_select();
+      $domain = $l_domain;
+    }
+    
+    if (isset($params["login"])) {
+      $error = $l_error;
+    }
     $challenge = md5(uniqid($this->magic));
     $sess->register("challenge");
-    include($login_page);
+    $login = $this->auth[uname];
+    $template = get_template($lp);
+    eval ("\$template = \"$template\";");
+    echo $template;
   }
   
   function auth_validatelogin() {
@@ -160,8 +184,6 @@ class OBM_Challenge_Auth extends Auth {
 
     $login = $params["login"];
     $password = $params["password"];
-    $challenge = $params["challenge"];
-    $response = $params["response"];
     $domain = $params["domain"];
     // if no domain set, set the default domain
     if ((! isset($domain)) || ($domain == "")) {
@@ -170,8 +192,6 @@ class OBM_Challenge_Auth extends Auth {
 
     // If multidomain, add domain clause
     $where_domain = "AND userobm_domain_id='$domain'";
-
-    echo "auth_validatelogin:domain=$domain, login=$login";
 
     if (isset($login)) {
       $this->auth["uname"] = $login; // provides access for loginform.ihtml
@@ -184,6 +204,7 @@ class OBM_Challenge_Auth extends Auth {
         userobm_id,
         userobm_perms,
         userobm_password,
+        userobm_password_type,
         userobm_domain_id
       FROM $user_table
       WHERE userobm_login = '$user_login'
@@ -195,64 +216,29 @@ class OBM_Challenge_Auth extends Auth {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
       $pass = $this->db->f("userobm_password");
+      $crypt = $this->db->f("userobm_password_type");
       $udomain = $this->db->f("userobm_domain_id");
     }
 
-    if ($auth_encryption) {
-      if ($password_encryption == "md5") {
-
-        // Cas md5
-        $expected_response = md5("$login:$pass:$challenge");
-        // True when JS is disabled
-        if ($response == "") {
-          if ($password != $pass) {
-            return false;
-          } else {
-            $this->auth["perm"] = $perm;
-            return $uid;
-          }
-        }
-        
-        // Response is set, JS is enabled
-        if ($expected_response != $response) {
-          return false;
-        } else {
-          $this->auth["perm"] = $perm;
-          return $uid;
-        }
-      }
-
-      // No auth_encryption, password is given as plain
-    } else {
-      if ($password_encryption == "crypt") {
-        // cas crypt
-        $encrypted = crypt($password, $pass);
-        if ($encrypted == $pass) {
-          $this->auth["perm"] = $perm;
-          return $uid;
-        } else {
-          return false;
-        }      
-      } else if ($password_encryption == "md5") {
+    switch($crypt) {
+      case "md5": 
         $encrypted = md5($password);
-        if ($encrypted == $pass) {
-          $this->auth["perm"] = $perm;
-          return $uid;
-        } else {
-          return false;
-        }      
-      } else {
+        break;
+      case "crypt":
+        $encrypted = crypt($password);
+        break;
+      default:
         $encrypted = $password;
-        if ($encrypted == $pass) {
-          $this->auth["perm"] = $perm;
-          return $uid;
-        } else {
-          return false;
-        }      
-      }
+        break;
     }
 
-  }
+    if ($encrypted == $pass) {
+      $this->auth["perm"] = $perm;
+      return $uid;
+    } else {
+      return false;
+    }     
+  } 
 }
 
 class CAS_Auth extends Auth {

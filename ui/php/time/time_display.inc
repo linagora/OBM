@@ -741,12 +741,12 @@ function dis_time_form_addtask($time, $validate_days) {
 	if ($previous_tt != 0) {
 	  $proj_data .= "\n),";
 	}
-	$proj_data .= "\nnew Array (\n". $proj_tt .",\n";
+	$proj_data .= "\nnew Object(\n". $proj_tt .",\n";
 	$previous_tt = $proj_tt;
       } else {
 	$proj_data .= ",\n";
       }
-      $proj_data .= "new Array($proj_label, $proj_id)";  
+      $proj_data .= "new Object($proj_label, $proj_id)";  
     }
     $proj_data .= "\n)\n";
   }
@@ -769,22 +769,22 @@ function dis_time_form_addtask($time, $validate_days) {
 	if ($previous_pid != 0) {
 	  $projtask_data .= "\n),";
 	}
-	$projtask_data .= "\nnew Array (\n". $projtask_pid .",\n";
+	$projtask_data .= "\nnew Object(\n". $projtask_pid .",\n";
 	$previous_pid = $projtask_pid;
       } else {
 	$projtask_data .= ",\n";
       }
-      $projtask_data .= "new Array(". $projtask_label .", ". $projtask_id .")";
+      $projtask_data .= "new Object(". $projtask_label .", ". $projtask_id .")";
     }
     $projtask_data .= "\n)\n";
   }
 
   $extra_js .= "
-  project = new Array (
+  project = new Object(
     $proj_data
   )
 
-  projecttask = new Array (
+  projecttask = new Object(
     $projtask_data
   )
 ";

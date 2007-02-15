@@ -194,7 +194,7 @@ function check_allo_valid(form, nb_mem)
 {
   error = 0;
   idx = 0;
-  i_nb = new Array(nb_mem);
+  i_nb = new Object(nb_mem);
 
   for (i = 0; i < document.forms[0].length; i++) {
     i_name = document.forms[0].elements[i].name.substr(0,12);

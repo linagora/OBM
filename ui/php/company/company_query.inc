@@ -700,7 +700,7 @@ function run_query_company_nafcode_links($p_id) {
 function get_company_nafcode_label($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("company");
+	$multidomain = sql_multidomain("companynafcode");
 
   $query = "SELECT companynafcode_code,
       companynafcode_label

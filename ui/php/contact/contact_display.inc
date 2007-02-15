@@ -1437,18 +1437,18 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $i=0;
     $j=0;
     $k=0;
-    $k_kind_js .= "lang_array = new Array ();\n";
+    $k_kind_js .= "lang_array = new Object();\n";
     while ($kind_q->next_record()) {      
       $k_id = $kind_q->f("kind_id");
       $k_lang = $kind_q->f("kind_lang");
       $k_label = $kind_q->f("kind_minilabel");
       $k_header = $kind_q->f("kind_header");
       if ($k_lang != $k_old_lang) {
-	$k_kind_js .= "lang_array[\"$k_lang\"] = new Array ();\n";
+	$k_kind_js .= "lang_array[\"$k_lang\"] = new Object();\n";
 	$k_old_lang = $k_lang;
       }     
       if ($k_label != $k_old_label) {
-	$k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"] = new Array ();\n";
+	$k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"] = new Object();\n";
 	$k_old_label = $k_label;
       }
       $k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"][\"$k_header\"] = '$k_id';\n";

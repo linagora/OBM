@@ -6,11 +6,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
-include("obminclude/themes/standard/theme.inc");
+//include("obminclude/themes/standard/theme.inc");
 $theme_path = C_IMAGE_PATH."/default/images";
+
+// CSS
 $css_obm = C_IMAGE_PATH."/default/styles/style.css";
 $css_calendar = C_IMAGE_PATH."/default/styles/calendar.css";
 $css_portal = C_IMAGE_PATH."/default/styles/portal.css";
+
+// Templates 
+$login_template = "$path/../resources/themes/default/templates/login.tpl";
 
 // Menus Icons
 $ico_account        = "$theme_path/ico_account.gif";
@@ -96,7 +101,7 @@ $flag_fr            = "$theme_path/flag_fr.gif";
 $flag_it            = "$theme_path/flag_it.gif";
 $flag_no_ny         = "$theme_path/flag_no_ny.gif";
 $preview_default    = "$theme_path/preview_theme.gif";
-$home_obm           = "$theme_path/home_obm.png";
+$img_home           = "$theme_path/home_obm.png";
 
 // Agenda Icons
 $ico_resize         = "$theme_path/ico_resize.gif";

@@ -152,7 +152,7 @@ $tmp_path = "/tmp";
 $c_dst_err = 7200;
 
 // Default domain id
-$c_default_domain = 0;
+$c_default_domain = 1;
 
 //---------------------------------------------------------------------------//
 // Default access rights bits meanings
@@ -206,21 +206,6 @@ $profiles["admin"] = array (
     'default' => $perm_admin,
     'domain' => 0
     )
-);
-
-$profiles["domain"] = array (
-  'section' => array (
-    'default' => 0,
-    'user' => 1,
-    'admin' => 1 
-  ),
-  'module' => array (
-    'default' => 0,
-    'user' => $perm_admin,
-    'mailserver' => $perm_admin,
-    'host' => $perm_admin,
-    'domain' => $perm_admin
-  )
 );
 //-------------------------//
 // Default Displayed Infos //
@@ -502,6 +487,19 @@ $cdoc_kind_link = 2;
 $perms_user = "user";
 $perms_editor = "editor";
 $perms_admin = "admin";
+
+// Default preferences data
+$set_lang_default = "en";
+$set_theme_default = "default";
+$set_menu_default = $cme_both;
+$set_display_default = "no";
+$set_rows_default = 10;
+$set_todo_default = 'todo_priority';
+$set_date_upd_default = $cda_dmy;
+$set_date_default = $cda_iso;
+$set_commentorder_default = $cco_chro;
+$set_debug_default = 0;
+$set_cal_interval_default = 2;
 
 // JavaScript and PHP Fields masks (PCRE regexp)
 $js_regexp_phone="/^[0-9+x \(\)-\.]+$/"; // digits + SPACE ( ) - phone number

@@ -1457,8 +1457,8 @@ function html_project_task_form($ptask_q, $project) {
 
   $js_script = "
     <script type=\"text/javascript\">
-      parent_pos = new Array();
-      parent_task = new Array();
+      parent_pos = new Object();
+      parent_task = new Object();
       parent_pos[0] = 0;
       $js_task
     </script>\n";
@@ -2352,8 +2352,8 @@ function html_project_task_selector($project,$project_q,$tasktype_q) {
   global $l_tt_sales, $l_tt_research, $l_tt_others,$l_task;
 
   $extra_js .= "
-        projects = new Array(); 
-        tasks = new Array();";
+        projects = new Object(); 
+        tasks = new Object();";
 
   // TaskType select construction
   $task_list = array($ctt_sales=>$l_tt_sales,
@@ -2378,7 +2378,7 @@ function html_project_task_selector($project,$project_q,$tasktype_q) {
 	$type_prec = $tt_internal;
       }
       $extra_js .= "
-        projects[$tt_id] = new Array();";    
+        projects[$tt_id] = new Object();";    
       $sel_tt .= "\n<option value=\"$tt_id\"";
       if ($is_tt == $tt_id) $sel_tt .= " selected=\"selected\""; 
       $sel_tt .= ">$tt_label</option>\n";
@@ -2412,7 +2412,7 @@ function html_project_task_selector($project,$project_q,$tasktype_q) {
       $old_project_id = $project_id;
       $extra_js .= "
         projects[$tasktype_id][$project_id] = '$project_name';
-        tasks[$project_id] = new Array();";
+        tasks[$project_id] = new Object();";
     }
     
     $extra_js .= "
@@ -2465,7 +2465,7 @@ function html_project_reftask_selector($project,$projectreftask_q) {
   global $l_tt_sales, $l_tt_research, $l_tt_others,$l_task;
 
   $extra_js .= "
-        tasks = new Array();";
+        tasks = new Object();";
 
   // TaskType select construction
   $task_list = array($ctt_sales=>$l_tt_sales,
@@ -2494,7 +2494,7 @@ function html_project_reftask_selector($project,$projectreftask_q) {
       }
       if ($tt_id != $old_tt_id) {
         $extra_js .= "
-          tasks[$tt_id] = new Array();"; 
+          tasks[$tt_id] = new Object();"; 
         $sel_tt .= "\n<option value=\"$tt_id\">$tt_label</option>\n";   
         $old_tt_id =  $tt_id;
       }

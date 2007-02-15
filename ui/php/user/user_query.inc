@@ -40,7 +40,6 @@ function run_query_user_search($user) {
   $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "timelastaccess");
   $multidomain = sql_multidomain("userobm");
 
-  echo $multidomain;
   if ($restriction == "calendar") {
     $uid = $auth->auth["uid"];
     $users = of_right_entity_for_consumer("calendar", "user", $uid, "read");
