@@ -38,6 +38,7 @@ function page_open($feature) {
         }
       }
     }
+    $_SESSION["auth"] = $auth;
     $_SESSION["obm"] = $obm;
     //    echo "<p>*** SAVE Session: obm=";
     //    print_r($obm);
