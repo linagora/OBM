@@ -485,7 +485,6 @@ function of_right_update_right($param, $entity) {
       entityright_entity_id,
       entityright_consumer,
       entityright_consumer_id,
-      entityright_domain_id,
       entityright_read,
       entityright_write
     ) VALUES (
@@ -493,7 +492,6 @@ function of_right_update_right($param, $entity) {
       '$eid',
       '$consumer',
       '0',
-      '$domain_id',
       '$pr',
       '$pw')";
     display_debug_msg($query, $cdg_sql, "of_right_update_right(2)");
@@ -512,7 +510,6 @@ function of_right_update_right($param, $entity) {
           entityright_entity_id,
           entityright_consumer,
           entityright_consumer_id,
-          entityright_domain_id,
           entityright_read,
           entityright_write
         ) VALUES (
@@ -520,7 +517,6 @@ function of_right_update_right($param, $entity) {
           '$eid',
           '$consumer',
           '$id',
-          '$domain_id',
           '1',
           '$w')";
 	display_debug_msg($query, $cdg_sql, "of_right_update_right(3)");
@@ -543,13 +539,11 @@ function of_right_update_right($param, $entity) {
             entityright_consumer_id,
             entityright_read,
             entityright_domain_id,
-            entityright_write
           ) VALUES (
             '$entity',
             '$eid',
             '$consumer',
             '$id',
-            '$domain_id',
             '0',
             '1')";
 	  display_debug_msg($query, $cdg_sql, "of_right_update_right(4)");
