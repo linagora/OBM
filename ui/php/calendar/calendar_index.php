@@ -39,7 +39,7 @@ $extra_js_include[] = "calendar.js";
 require("calendar_query.inc");
 require("calendar_display.inc");
 require_once("calendar_js.inc");
-require("$obminclude/lib/right.inc");
+require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 
 get_calendar_action();

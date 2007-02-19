@@ -35,7 +35,7 @@ require_once("$obminclude/of/of_category.inc");
 require("user_display.inc");
 require("user_query.inc");
 require("user_js.inc");
-require("$obminclude/lib/right.inc"); // needed by call from calendar
+require("$obminclude/of/of_right.inc"); // needed by call from calendar
 
 // detailconsult can be accessed without user_id (-> display current user)
 if (($action == "detailconsult") && (! $params["user_id"])) $params["user_id"] = $obm["uid"];

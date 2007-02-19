@@ -148,37 +148,26 @@ class OBM_Challenge_Auth extends Auth {
 
   function of_session_dis_login_page() {
     global $obminclude, $obm_version, $module, $path, $login_action;
-    global $obmdb_dbtype, $challenge, $auth_encryption, $password_encryption;
+    global $obmdb_dbtype,  $auth_encryption, $password_encryption;
     global $params, $c_multidomain, $c_default_domain;
 
-    $login_page = "$path/../$obminclude/themes/login.inc";
-    $challenge = md5(uniqid($this->magic));
-    $_SESSION['challenge'] = $challenge;
+    $login_page = "$path/../$obminclude/login.inc";
     include($login_page);
   }
   
   function auth_validatelogin() {
-    global $obm, $params, $login, $password, $challenge, $response;
-    global $auth_encryption, $password_encryption, $c_multidomain, $c_default_domain;
+    global $obm, $params;
+    global $c_default_domain;
 
-    //    echo "<br>*** auth_validate_login :";
-    //    print_r($params);
     $login = $params["login"];
     $password = $params["password"];
-    $challenge = $params["challenge"];
-    $response = $params["response"];
     $domain = $params["domain"];
     // if no domain set, set the default domain
     if ((! isset($domain)) || ($domain == "")) {
       $domain = "$c_default_domain";
     }
 
-    // If multidomain, add domain clause
-    if ($c_multidomain) {
-      $where_domain = "AND userobm_domain_id='$domain'";
-    }
-
-    //    echo "auth_validatelogin:domain=$domain, login=$login";
+    $where_domain = "AND userobm_domain_id='$domain'";
 
     if (isset($login)) {
       $obm["login"] = $login; // provides access for loginform.ihtml
@@ -191,6 +180,7 @@ class OBM_Challenge_Auth extends Auth {
         userobm_id,
         userobm_perms,
         userobm_password,
+        userobm_password_type,
         userobm_domain_id
       FROM $user_table
       WHERE userobm_login = '$user_login'
@@ -205,67 +195,29 @@ class OBM_Challenge_Auth extends Auth {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
       $pass = $this->db->f("userobm_password");
+      $crypt = $this->db->f("userobm_password_type");      
       $domain_id = $this->db->f("userobm_domain_id");
     }
 
-    if ($auth_encryption) {
-      if ($password_encryption == "md5") {
-
-        // Cas md5
-        $expected_response = md5("$login:$pass:$challenge");
-        // True when JS is disabled
-        if ($response == "") {
-          if ($password != $pass) {
-            return false;
-          } else {
-            $obm["profile"] = $perm;
-            $obm["domain_id"] = $domain_id;
-            return $uid;
-          }
-        }
-        
-        // Response is set, JS is enabled
-        if ($expected_response != $response) {
-          return false;
-        } else {
-	  $obm["profile"] = $perm;
-	  $obm["domain_id"] = $domain_id;
-          return $uid;
-        }
-      }
-
-      // No auth_encryption, password is given as plain
-    } else {
-      if ($password_encryption == "crypt") {
-        // cas crypt
-        $encrypted = crypt($password, $pass);
-        if ($encrypted == $pass) {
-	  $obm["profile"] = $perm;
-	  $obm["domain_id"] = $domain_id;
-          return $uid;
-        } else {
-          return false;
-        }      
-      } else if ($password_encryption == "md5") {
+    switch($crypt) {
+      case "md5": 
         $encrypted = md5($password);
-        if ($encrypted == $pass) {
-	  $obm["profile"] = $perm;
-	  $obm["domain_id"] = $domain_id;
-          return $uid;
-        } else {
-          return false;
-        }      
-      } else {
+        break;
+      case "crypt":
+        $encrypted = crypt($password);
+        break;
+      default:
         $encrypted = $password;
-        if ($encrypted == $pass) {
-	  $obm["profile"] = $perm;
-	  $obm["domain_id"] = $domain_id;
-          return $uid;
-        } else {
-          return false;
-        }      
-      }
+        break;
     }
+
+    if ($encrypted == $pass) {
+      $obm["profile"] = $perm;
+      $obm["domain_id"] = $domain_id;
+      return $uid;
+    } else {
+      return false;
+    }      
 
   }
 }

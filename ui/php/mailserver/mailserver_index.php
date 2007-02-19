@@ -26,7 +26,6 @@ include("$obminclude/global_pref.inc");
 
 require("mailserver_query.inc");
 require("mailserver_display.inc");
-require("$obminclude/lib/right.inc");
 require_once("$obminclude/of/of_category.inc");
 
 get_mailserver_action();

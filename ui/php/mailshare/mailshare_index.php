@@ -32,7 +32,7 @@ include("$obminclude/global_pref.inc");
 require("mailshare_display.inc");
 require("mailshare_query.inc");
 require("mailshare_js.inc");
-require("$obminclude/lib/right.inc");
+require("$obminclude/of/of_right.inc");
 
 if ($action == "") $action = "index";
 get_mailshare_action();

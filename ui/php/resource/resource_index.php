@@ -37,7 +37,7 @@ include("$obminclude/global_pref.inc");
 require("resource_display.inc");
 require("resource_query.inc");
 require("resource_js.inc");
-require("$obminclude/lib/right.inc");
+require("$obminclude/of/of_right.inc");
 
 get_resource_action();
 $perm->check_permissions($module, $action);
