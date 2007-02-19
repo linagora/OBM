@@ -77,7 +77,6 @@ CREATE TABLE UserObm (
   userobm_timecreate        timestamp(14),
   userobm_userupdate        int(8),
   userobm_usercreate        int(8),
-  userobm_domain_id         int(8) default 0,
   userobm_local             int(1) default 1,
   userobm_ext_id            varchar(16),
   userobm_login             varchar(32) DEFAULT '' NOT NULL,
@@ -96,7 +95,8 @@ CREATE TABLE UserObm (
   userobm_description       varchar(255),
   userobm_location          varchar(100),
   userobm_timelastaccess    timestamp(14),
-  PRIMARY KEY (userobm_id)
+  PRIMARY KEY (userobm_id),
+  UNIQUE k_login_user (userobm_login)
 );
 
 
@@ -137,7 +137,6 @@ CREATE TABLE DataSource (
   datasource_timecreate  timestamp(14),
   datasource_userupdate  int(8),
   datasource_usercreate  int(8),
-  datasource_domain_id   int(8) default 0,
   datasource_name        varchar(64),
   PRIMARY KEY (datasource_id)
 );
@@ -151,7 +150,6 @@ CREATE TABLE Country (
   country_timecreate  timestamp(14),
   country_userupdate  int(8),
   country_usercreate  int(8),
-  country_domain_id    int(8) default 0,
   country_iso3166     char(2) NOT NULL,
   country_name        varchar(64),
   country_lang        char(2) NOT NULL,
@@ -169,7 +167,6 @@ CREATE TABLE Region (
   region_timecreate  timestamp(14),
   region_userupdate  int(8),
   region_usercreate  int(8),
-  region_domain_id		int(8) default 0,
   region_code        varchar(10) default '', 
   region_label       varchar(64),
   PRIMARY KEY (region_id)
@@ -188,7 +185,6 @@ CREATE TABLE CompanyType (
   companytype_timecreate  timestamp(14),
   companytype_userupdate  int(8),
   companytype_usercreate  int(8),
-  companytype_domain_id   int(8) default 0,
   companytype_code        varchar(10) default '', 
   companytype_label       char(12),
   PRIMARY KEY (companytype_id)
@@ -204,7 +200,6 @@ CREATE TABLE CompanyActivity (
   companyactivity_timecreate  timestamp(14),
   companyactivity_userupdate  int(8),
   companyactivity_usercreate  int(8),
-  companyactivity_domain_id   int(8) default 0,
   companyactivity_code        varchar(10) default '', 
   companyactivity_label       varchar(64),
   PRIMARY KEY (companyactivity_id)
@@ -220,7 +215,6 @@ CREATE TABLE CompanyNafCode (
   companynafcode_timecreate  timestamp(14),
   companynafcode_userupdate  int(8),
   companynafcode_usercreate  int(8),
-  companynafcode_domain_id   int(8) default 0,
   companynafcode_title       int(1) NOT NULL DEFAULT 0,
   companynafcode_code        varchar(4),
   companynafcode_label       varchar(128),
@@ -237,7 +231,6 @@ CREATE TABLE Company (
   company_timecreate           timestamp(14),
   company_userupdate           int(8),
   company_usercreate           int(8),
-  company_domain_id            int(8) default 0,
   company_datasource_id        int(8) DEFAULT 0,
   company_number               varchar(32),
   company_vat                  varchar(20),
@@ -278,7 +271,6 @@ CREATE TABLE CompanyCategory1 (
   companycategory1_timecreate  timestamp(14),
   companycategory1_userupdate  int(8) NOT NULL default 0,
   companycategory1_usercreate  int(8) NOT NULL default 0,
-  companycategory1_domain_id   int(8) default 0,
   companycategory1_code        varchar(10) NOT NULL default '',
   companycategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (companycategory1_id)
@@ -308,7 +300,6 @@ CREATE TABLE Contact (
   contact_timecreate           timestamp(14),
   contact_userupdate           int(8),
   contact_usercreate           int(8),
-  contact_domain_id             int(8) default 0,
   contact_datasource_id        int(8) DEFAULT 0,
   contact_company_id           int(8),
   contact_company              varchar(64),
@@ -355,7 +346,6 @@ CREATE TABLE Kind (
   kind_timecreate  timestamp(14),
   kind_userupdate  int(8),
   kind_usercreate  int(8),
-  kind_domain_id   int(8) default 0,
   kind_minilabel   varchar(64),
   kind_header      varchar(64),
   kind_lang        char(2),
@@ -373,7 +363,6 @@ CREATE TABLE ContactFunction (
   contactfunction_timecreate  timestamp(14),
   contactfunction_userupdate  int(8),
   contactfunction_usercreate  int(8),
-  contactfunction_domain_id   int(8) default 0,
   contactfunction_code        varchar(10) default '',
   contactfunction_label       varchar(64),
   PRIMARY KEY (contactfunction_id)
@@ -389,7 +378,6 @@ CREATE TABLE ContactCategory1 (
   contactcategory1_timecreate  timestamp(14),
   contactcategory1_userupdate  int(8) default 0,
   contactcategory1_usercreate  int(8) default 0,
-  contactcategory1_domain_id   int(8) default 0,
   contactcategory1_code        varchar(10) default '',
   contactcategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory1_id)
@@ -416,7 +404,6 @@ CREATE TABLE ContactCategory2 (
   contactcategory2_timecreate  timestamp(14),
   contactcategory2_userupdate  int(8) default 0,
   contactcategory2_usercreate  int(8) default 0,
-  contactcategory2_domain_id   int(8) default 0,
   contactcategory2_code        varchar(10) default '',
   contactcategory2_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory2_id)
@@ -443,7 +430,6 @@ CREATE TABLE ContactCategory3 (
   contactcategory3_timecreate  timestamp(14),
   contactcategory3_userupdate  int(8) default 0,
   contactcategory3_usercreate  int(8) default 0,
-  contactcategory3_domain_id   int(8) default 0,
   contactcategory3_code        varchar(10) default '',
   contactcategory3_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory3_id)
@@ -469,7 +455,6 @@ CREATE TABLE ContactCategory4 (
   contactcategory4_timecreate  timestamp(14),
   contactcategory4_userupdate  int(8) default 0,
   contactcategory4_usercreate  int(8) default 0,
-  contactcategory4_domain_id   int(8) default 0,
   contactcategory4_code        varchar(10) default '',
   contactcategory4_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory4_id)
@@ -495,7 +480,6 @@ CREATE TABLE ContactCategory5 (
   contactcategory5_timecreate  timestamp(14),
   contactcategory5_userupdate  int(8) default 0,
   contactcategory5_usercreate  int(8) default 0,
-  contactcategory5_domain_id   int(8) default 0,
   contactcategory5_code        varchar(10) default '',
   contactcategory5_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory5_id)
@@ -514,7 +498,6 @@ CREATE TABLE LeadSource (
   leadsource_timecreate  timestamp(14),
   leadsource_userupdate  int(8),
   leadsource_usercreate  int(8),
-  leadsource_domain_id   int(8) default 0,
   leadsource_code        varchar(10) default '',
   leadsource_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (leadsource_id)
@@ -530,7 +513,6 @@ CREATE TABLE Lead (
   lead_timecreate  timestamp(14),
   lead_userupdate  int(8),
   lead_usercreate  int(8),
-  lead_domain_id   int(8) default 0,
   lead_source_id   int(8),
   lead_manager_id  int(8),
   lead_company_id  int(8) NOT NULL DEFAULT 0,
@@ -558,7 +540,6 @@ CREATE TABLE ParentDeal (
   parentdeal_userupdate           int(8),
   parentdeal_usercreate           int(8),
   parentdeal_label                varchar(128) NOT NULL,
-  parentdeal_domain_id            int(8) default 0,
   parentdeal_marketingmanager_id  int(8),
   parentdeal_technicalmanager_id  int(8),
   parentdeal_archive              char(1) DEFAULT '0',
@@ -579,7 +560,6 @@ CREATE TABLE Deal (
   deal_number               varchar(32),
   deal_label                varchar(128),
   deal_datebegin            date,
-  deal_domain_id            int(8) default 0,
   deal_parentdeal_id        int(8),
   deal_type_id              int(8),
   deal_region_id            int(8) DEFAULT 0 NOT NULL,
@@ -616,7 +596,6 @@ CREATE TABLE DealStatus (
   dealstatus_timecreate  timestamp(14),
   dealstatus_userupdate  int(8),
   dealstatus_usercreate  int(8),
-  dealstatus_domain_id   int(8) default 0,
   dealstatus_label       varchar(24),
   dealstatus_order       int(2),
   dealstatus_hitrate     char(3),
@@ -633,7 +612,6 @@ CREATE TABLE DealType (
   dealtype_timecreate  timestamp(14),
   dealtype_userupdate  int(8),
   dealtype_usercreate  int(8),
-  dealtype_domain_id   int(8) default 0,
   dealtype_label       varchar(16),
   dealtype_inout       varchar(1) DEFAULT '-',
   PRIMARY KEY (dealtype_id)
@@ -649,7 +627,6 @@ CREATE TABLE DealCompanyRole (
   dealcompanyrole_timecreate  timestamp(14),
   dealcompanyrole_userupdate  int(8) default NULL,
   dealcompanyrole_usercreate  int(8) default NULL,
-  dealcompanyrole_domain_id   int(8) default 0,
   dealcompanyrole_code        varchar(10) default '',
   dealcompanyrole_label       varchar(64) NOT NULL default '',
   PRIMARY KEY (dealcompanyrole_id)
@@ -682,7 +659,6 @@ CREATE TABLE DealCategory1 (
   dealcategory1_timecreate  timestamp(14),
   dealcategory1_userupdate  int(8) default 0,
   dealcategory1_usercreate  int(8) default 0,
-  dealcategory1_domain_id   int(8) default 0,
   dealcategory1_code        varchar(10) default '',
   dealcategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (dealcategory1_id)
@@ -710,7 +686,6 @@ CREATE TABLE List (
   list_timecreate  	 timestamp(14),
   list_userupdate  	 int(8),
   list_usercreate  	 int(8),
-  list_domain_id     int(8) default 0,
   list_privacy     	 int(2) NOT NULL DEFAULT 0,
   list_name        	 varchar(64) NOT NULL,
   list_subject     	 varchar(128),
@@ -751,7 +726,6 @@ CREATE TABLE CalendarEvent (
   calendarevent_owner	         int(8) default NULL, 
   calendarevent_title            varchar(255) default NULL,
   calendarevent_location         varchar(100) default NULL,
-  calendarevent_domain_id        int(8) default 0,
   calendarevent_category1_id     int(8) default 0,
   calendarevent_priority         int(2) default NULL,
   calendarevent_privacy          int(2) NOT NULL default 0,
@@ -775,7 +749,6 @@ CREATE TABLE EventEntity (
   evententity_timecreate   timestamp(14),
   evententity_userupdate   int(8) default NULL,
   evententity_usercreate   int(8) default NULL,
-  evententity_domain_id    int(8) default 0,
   evententity_event_id     int(8) NOT NULL default 0,
   evententity_entity_id    int(8) NOT NULL default 0,
   evententity_entity       varchar(32) NOT NULL default 0,
@@ -792,7 +765,6 @@ CREATE TABLE CalendarException (
   calendarexception_timecreate  timestamp(14),
   calendarexception_userupdate  int(8) default NULL,
   calendarexception_usercreate  int(8) default NULL,
-  calendarexception_domain_id   int(8) default 0,
   calendarexception_event_id    int(8) auto_increment,
   calendarexception_date        timestamp(14) NOT NULL,
   PRIMARY KEY (calendarexception_event_id,calendarexception_date)
@@ -808,7 +780,6 @@ CREATE TABLE CalendarCategory1 (
   calendarcategory1_timecreate  timestamp(14),
   calendarcategory1_userupdate  int(8) default NULL,
   calendarcategory1_usercreate  int(8) default NULL,
-  calendarcategory1_domain_id   int(8) default 0,
   calendarcategory1_code        varchar(10) default '',
   calendarcategory1_label       varchar(128) default NULL,
   PRIMARY KEY (calendarcategory1_id)
@@ -822,7 +793,6 @@ CREATE TABLE EntityRight (
   entityright_entity_id     int(8) NOT NULL default 0,
   entityright_consumer      varchar(32) NOT NULL default '',
   entityright_consumer_id   int(8) NOT NULL default 0,
-  entityright_domain_id     int(8) default 0,
   entityright_read          int(1) NOT NULL default 0,
   entityright_write         int(1) NOT NULL default 0,
   PRIMARY KEY (entityright_entity, entityright_entity_id, entityright_consumer, entityright_consumer_id),
@@ -844,7 +814,6 @@ CREATE TABLE Todo (
   todo_userupdate  int(8),
   todo_usercreate  int(8),
   todo_user        int(8),
-  todo_domain_id   int(8) default 0,
   todo_privacy     int(2) NOT NULL DEFAULT 0,
   todo_date        timestamp(14),
   todo_deadline    timestamp(14),
@@ -871,7 +840,6 @@ CREATE TABLE Publication (
   publication_timecreate     timestamp(14),
   publication_userupdate     int(8),
   publication_usercreate     int(8),
-  publication_domain_id      int(8) default 0,
   publication_title          varchar(64) NOT NULL,
   publication_type_id        int(8),
   publication_year           int(4),
@@ -889,7 +857,6 @@ CREATE TABLE PublicationType (
   publicationtype_timecreate  timestamp(14),
   publicationtype_userupdate  int(8),
   publicationtype_usercreate  int(8),
-  publicationtype_domain_id   int(8) default 0,
   publication_code            varchar(10) default '',
   publicationtype_label       varchar(64),
   PRIMARY KEY (publicationtype_id)
@@ -910,7 +877,6 @@ CREATE TABLE Subscription (
   subscription_quantity       	int(8),
   subscription_renewal          int(1) DEFAULT 0 NOT NULL,
   subscription_reception_id     int(8) DEFAULT 0 NOT NULL,
-  subscription_domain_id        int(8) default 0,
   subscription_date_begin       timestamp(14),
   subscription_date_end         timestamp(14),
   PRIMARY KEY (subscription_id)
@@ -926,7 +892,6 @@ CREATE TABLE SubscriptionReception (
   subscriptionreception_timecreate  timestamp(14),
   subscriptionreception_userupdate  int(8),
   subscriptionreception_usercreate  int(8),
-  subscriptionreception_domain_id   int(8) default 0,
   subscriptionreception_code        varchar(10) default '',
   subscriptionreception_label       char(12),
   PRIMARY KEY (subscriptionreception_id)
@@ -948,7 +913,6 @@ CREATE TABLE Document (
   document_title       	 varchar(255) default NULL,
   document_name        	 varchar(255) default NULL,
   document_kind        	 int(2) default NULL,
-  document_domain_id     int(8) default 0,
   document_mimetype_id	 int(8) not null default 0,
   document_category1_id  int(8) not null default 0,
   document_category2_id  int(8) not null default 0,
@@ -970,7 +934,6 @@ CREATE TABLE DocumentCategory1 (
   documentcategory1_timecreate  timestamp(14),
   documentcategory1_userupdate  int(8) default NULL,
   documentcategory1_usercreate  int(8) default NULL,
-  documentcategory1_domain_id   int(8) default 0,
   documentcategory1_code        varchar(10) default '',
   documentcategory1_label       varchar(255) default NULL,
   PRIMARY KEY (documentcategory1_id)
@@ -986,7 +949,6 @@ CREATE TABLE DocumentCategory2 (
   documentcategory2_timecreate  timestamp(14),
   documentcategory2_userupdate  int(8) default NULL,
   documentcategory2_usercreate  int(8) default NULL,
-  documentcategory2_domain_id   int(8) default 0,
   documentcategory2_code        varchar(10) default '',
   documentcategory2_label       varchar(255) default NULL,
   PRIMARY KEY (documentcategory2_id)
@@ -1002,7 +964,6 @@ CREATE TABLE DocumentMimeType (
   documentmimetype_timecreate  timestamp(14),
   documentmimetype_userupdate  int(8) default NULL,
   documentmimetype_usercreate  int(8) default NULL,
-  documentmimetype_domain_id   int(8) default 0,
   documentmimetype_label       varchar(255) default NULL,
   documentmimetype_extension   varchar(10) default NULL,
   documentmimetype_mime        varchar(255) default NULL,
@@ -1015,7 +976,6 @@ CREATE TABLE DocumentMimeType (
 --
 CREATE TABLE DocumentEntity (
   documententity_document_id  int(8) NOT NULL,
-  documententity_domain_id		int(8) DEFAULT 0,
   documententity_entity_id    int(8) NOT NULL,
   documententity_entity       varchar(255) NOT NULL,
   PRIMARY KEY (documententity_document_id, documententity_entity_id, documententity_entity)
@@ -1034,7 +994,6 @@ CREATE TABLE Project (
   project_timecreate     timestamp(14),
   project_userupdate     int(8),
   project_usercreate     int(8),
-  project_domain_id      int(8) default 0,
   project_name           varchar(128),
   project_shortname      varchar(10),
   project_tasktype_id    int(8),
@@ -1064,7 +1023,6 @@ CREATE TABLE ProjectTask (
   projecttask_usercreate     int(8) default NULL,
   projecttask_label          varchar(128) default NULL,
   projecttask_parenttask_id  int(8) default 0,
-  projecttask_domain_id			 int(8) default 0,
   projecttask_rank           int(8) default NULL,
   PRIMARY KEY (projecttask_id),
   INDEX pt_idx_pro (projecttask_project_id)
@@ -1079,7 +1037,6 @@ CREATE TABLE ProjectRefTask (
   projectreftask_timecreate  timestamp(14),
   projectreftask_userupdate  int(8) default NULL,
   projectreftask_usercreate  int(8) default NULL,
-  projectreftask_domain_id      int(8) default 0,
   projectreftask_tasktype_id    int(8),
   projectreftask_label      varchar(128) default NULL,
   PRIMARY KEY (projectreftask_id)
@@ -1093,7 +1050,6 @@ CREATE TABLE ProjectUser (
   projectuser_project_id      int(8) NOT NULL,
   projectuser_user_id         int(8) NOT NULL,
   projectuser_projecttask_id  int(8),
-  projectuser_domain_id       int(8) default 0,
   projectuser_timeupdate      timestamp(14),
   projectuser_timecreate      timestamp(14),
   projectuser_userupdate      int(8) default NULL,
@@ -1116,7 +1072,6 @@ CREATE TABLE ProjectUser (
 CREATE TABLE ProjectStat (
   projectstat_project_id     int(8) NOT NULL,
   projectstat_usercreate     int(8) NOT NULL,
-  projectstat_domain_id      int(8) default 0,
   projectstat_date           timestamp(14) NOT NULL,
   projectstat_useddays       int(8) default NULL,
   projectstat_remainingdays  int(8) default NULL,
@@ -1136,7 +1091,6 @@ CREATE TABLE TimeTask (
   timetask_timecreate      timestamp(14),
   timetask_userupdate      int(8) default NULL,
   timetask_usercreate      int(8) default NULL,
-  timetask_domain_id       int(8) default 0,
   timetask_user_id         int(8) default NULL,
   timetask_date            timestamp(14) NOT NULL,
   timetask_projecttask_id  int(8) default NULL,
@@ -1158,7 +1112,6 @@ CREATE TABLE TaskType (
   tasktype_timecreate  timestamp(14),
   tasktype_userupdate  int(8) default NULL,
   tasktype_usercreate  int(8) default NULL,
-  tasktype_domain_id   int(8) default 0,
   tasktype_internal    int(1) NOT NULL,
   tasktype_label       varchar(32) default NULL,
   PRIMARY KEY (tasktype_id)
@@ -1177,7 +1130,6 @@ CREATE TABLE Contract (
   contract_timecreate        timestamp(14),
   contract_userupdate        int(8) default NULL,
   contract_usercreate        int(8) default NULL,
-  contract_domain_id         int(8) default 0,
   contract_deal_id           int(8) default NULL,
   contract_company_id        int(8) default NULL,
   contract_label             varchar(128) default NULL,
@@ -1216,7 +1168,6 @@ CREATE TABLE ContractType (
   contracttype_timecreate  timestamp(14),
   contracttype_userupdate  int(8) default NULL,
   contracttype_usercreate  int(8) default NULL,
-  contracttype_domain_id   int(8) default 0,
   contracttype_code        varchar(10) default '',
   contracttype_label       varchar(64) default NULL,
   PRIMARY KEY (contracttype_id)
@@ -1232,7 +1183,6 @@ CREATE TABLE ContractPriority (
   contractpriority_timecreate  timestamp(14),
   contractpriority_userupdate  int(8) default NULL,
   contractpriority_usercreate  int(8) default NULL,
-	contractpriority_domain_id   int(8) default 0,
   contractpriority_code        varchar(10) default '',
   contractpriority_color       varchar(6) default NULL,
   contractpriority_label       varchar(64) default NULL,
@@ -1249,7 +1199,6 @@ CREATE TABLE ContractStatus (
   contractstatus_timecreate  	timestamp(14),
   contractstatus_userupdate  	int(8) default NULL,
   contractstatus_usercreate  	int(8) default NULL,
-  contractstatus_domain_id    int(8) default 0,
   contractstatus_code           varchar(10) default '',
   contractstatus_label  	varchar(64) default NULL,
 PRIMARY KEY (contractstatus_id)
@@ -1265,7 +1214,6 @@ CREATE TABLE Incident (
   incident_timecreate       timestamp(14),
   incident_userupdate       int(8) default NULL,
   incident_usercreate       int(8) default NULL,
-  incident_domain_id        int(8) default 0,
   incident_contract_id      int(8) NOT NULL,
   incident_label            varchar(100) default NULL,
   incident_reference        varchar(32) default NULL,
@@ -1293,7 +1241,6 @@ CREATE TABLE IncidentPriority (
   incidentpriority_timecreate  timestamp(14),
   incidentpriority_userupdate  int(8) default NULL,
   incidentpriority_usercreate  int(8) default NULL,
-  incidentpriority_domain_id   int(8) default 0,
   incidentpriority_code        varchar(10) default '',
   incidentpriority_label       varchar(32) default NULL,
   incidentpriority_color       char(6),
@@ -1310,7 +1257,6 @@ CREATE TABLE IncidentStatus (
   incidentstatus_timecreate  timestamp(14),
   incidentstatus_userupdate  int(8) default NULL,
   incidentstatus_usercreate  int(8) default NULL,
-  incidentstatus_domain_id   int(8) default 0,
   incidentstatus_code       varchar(10) default '',
   incidentstatus_label       varchar(32) default NULL,
   PRIMARY KEY (incidentstatus_id)
@@ -1326,7 +1272,6 @@ CREATE TABLE IncidentCategory1 (
   incidentcategory1_timecreate  timestamp(14),
   incidentcategory1_userupdate  int(8) default NULL,
   incidentcategory1_usercreate  int(8) default NULL,
-  incidentcategory1_domain_id   int(8) default 0,
   incidentcategory1_code        varchar(10) default '',
   incidentcategory1_label       varchar(32) default NULL,
 PRIMARY KEY (incidentcategory1_id)
@@ -1342,7 +1287,6 @@ CREATE TABLE IncidentCategory2 (
   incidentcategory2_timecreate  timestamp(14),
   incidentcategory2_userupdate  int(8) default NULL,
   incidentcategory2_usercreate  int(8) default NULL,
-  incidentcategory2_domain_id   int(8) default 0,
   incidentcategory2_code        varchar(10) default '',
   incidentcategory2_label       varchar(32) default NULL,
 PRIMARY KEY (incidentcategory2_id)
@@ -1361,7 +1305,6 @@ CREATE TABLE Invoice (
   invoice_timecreate        timestamp(14),
   invoice_userupdate        int(8),
   invoice_usercreate        int(8),
-  invoice_domain_id         int(8) default 0,
   invoice_company_id        int(8) NOT NULL,
   invoice_deal_id           int(8) default NULL,
   invoice_project_id        int(8) default NULL,
@@ -1388,7 +1331,6 @@ CREATE TABLE InvoiceStatus (
   invoicestatus_payment  int(1) DEFAULT 0 NOT NULL,
   invoicestatus_created  int(1) DEFAULT 0 NOT NULL,
   invoicestatus_archive  int(1) DEFAULT 0 NOT NULL,
-	invoicestatus_domain_id int(8) default 0,
   invoicestatus_label    varchar(24) default '' NOT NULL,
   PRIMARY KEY (invoicestatus_id)
 );
@@ -1403,7 +1345,6 @@ CREATE TABLE Payment (
   payment_timecreate      timestamp(14),
   payment_userupdate      int(8),
   payment_usercreate      int(8),
-  payment_domain_id       int(8) default 0,
   payment_company_id      int(8) NOT NULL,
   payment_account_id      int(8),
   payment_paymentkind_id  int(8) NOT NULL,
@@ -1423,7 +1364,6 @@ CREATE TABLE Payment (
 CREATE TABLE PaymentKind (
   paymentkind_id          int(8) auto_increment,
   paymentkind_shortlabel  varchar(3) NOT NULL DEFAULT '',
-  paymentkind_domain_id   int(8) default 0,
   paymentkind_label       varchar(40) NOT NULL DEFAULT '',
   PRIMARY KEY (paymentkind_id)
 );
@@ -1439,7 +1379,6 @@ CREATE TABLE PaymentInvoice (
   paymentinvoice_timecreate  timestamp(14),
   paymentinvoice_userupdate  int(8),
   paymentinvoice_usercreate  int(8),
-  paymentinvoice_domain_id   int(8) default 0,
   paymentinvoice_amount      double (10,2) NOT NULL DEFAULT '0',
   PRIMARY KEY (paymentinvoice_invoice_id,paymentinvoice_payment_id)
 );
@@ -1454,7 +1393,6 @@ CREATE TABLE Account (
   account_timecreate  timestamp(14),
   account_userupdate  int(8),
   account_usercreate  int(8),
-  account_domain_id   int(8) default 0,
   account_bank	      varchar(60) DEFAULT '' NOT NULL,
   account_number      varchar(11) DEFAULT '0' NOT NULL,
   account_balance     double(15,2) DEFAULT '0.00' NOT NULL,
@@ -1477,7 +1415,6 @@ CREATE TABLE UGroup (
   group_timecreate  timestamp(14),
   group_userupdate  int(8),
   group_usercreate  int(8),
-  group_domain_id   int(8) default 0,
   group_system      int(1) DEFAULT 0,
   group_privacy     int(2) NULL DEFAULT 0, 
   group_local       int(1) DEFAULT 1,
@@ -1521,7 +1458,6 @@ CREATE TABLE Import (
   import_timecreate           timestamp(14),
   import_userupdate           int(8),
   import_usercreate           int(8),
-  import_domain_id             int(8) default 0,
   import_name                 varchar(64) NOT NULL,
   import_datasource_id        int(8) DEFAULT 0,
   import_marketingmanager_id  int(8),
@@ -1592,7 +1528,6 @@ CREATE TABLE Resource (
   resource_timecreate        timestamp(14),
   resource_userupdate        int(8),
   resource_usercreate        int(8),
-  resource_domain_id         int(8) default 0,
   resource_name              varchar(32) DEFAULT '' NOT NULL,
   resource_description       varchar(255),
   resource_qty               int(8) DEFAULT 0,
@@ -1609,7 +1544,6 @@ CREATE TABLE RGroup (
   rgroup_timecreate  timestamp(14),
   rgroup_userupdate  int(8),
   rgroup_usercreate  int(8),
-  rgroup_domain_id   int(8) default 0,
   rgroup_privacy     int(2) NULL DEFAULT 0,
   rgroup_name        varchar(32) NOT NULL,
   rgroup_desc        varchar(128),
@@ -1624,22 +1558,3 @@ CREATE TABLE ResourceGroup (
   resourcegroup_resource_id  int(8) DEFAULT 0 NOT NULL
 );
 
-
--------------------------------------------------------------------------------
--- Tables needed for Domain module
--------------------------------------------------------------------------------
---
--- Table structure for table 'Domain'
---
-CREATE TABLE Domain (
-  domain_id             int(8) auto_increment,
-  domain_timeupdate     timestamp(14),
-  domain_timecreate     timestamp(14),
-  domain_usercreate     int(8),
-  domain_userupdate     int(8),
-  domain_label          varchar(32) NOT NULL,
-  domain_description    varchar(255),
-  domain_domain_name    varchar(128),
-  domain_alias          text,
-  PRIMARY KEY (domain_id)
-);

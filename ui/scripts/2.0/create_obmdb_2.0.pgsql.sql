@@ -679,7 +679,6 @@ CREATE TABLE CalendarCategory1 (
 -- Table structure for table 'EntityRight'
 --
 CREATE TABLE EntityRight (
-  entityright_domain_id    integer default 0,
   entityright_entity       varchar(32) NOT NULL DEFAULT '',
   entityright_entity_id    integer NOT NULL DEFAULT 0,
   entityright_consumer     varchar(32) NOT NULL DEFAULT '',

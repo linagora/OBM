@@ -80,8 +80,6 @@ ALTER TABLE CalendarException ADD Column calendarexception_domain_id integer;
 ALTER TABLE CalendarException ALTER COLUMN calendarexception_domain_id SET DEFAULT 0;
 ALTER TABLE CalendarCategory1 ADD Column calendarcategory1_domain_id integer;
 ALTER TABLE CalendarCategory1 ALTER COLUMN calendarcategory1_domain_id SET DEFAULT 0;
-ALTER TABLE EntityRight ADD Column entityright_domain_id integer;
-ALTER TABLE EntityRight ALTER COLUMN entityright_domain_id SET DEFAULT 0;
 ALTER TABLE Todo ADD Column todo_domain_id integer;
 ALTER TABLE Todo ALTER Column todo_domain_id SET default 0;
 ALTER TABLE Publication ADD Column publication_domain_id integer;
