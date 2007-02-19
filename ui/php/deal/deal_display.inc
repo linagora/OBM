@@ -506,7 +506,7 @@ function html_deal_parentdeal_search_form($deal, $pmanager_q) {
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_search_list($deal) {
-  global $display, $auth, $l_found, $l_no_found;
+  global $display, $obm, $l_found, $l_no_found;
 
   $obm_q = run_query_deal_search($deal, 0);
   $nb_deal = $obm_q->num_rows_total();
@@ -514,7 +514,7 @@ function dis_deal_search_list($deal) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
     $display["msg"] .= display_info_msg("$nb_deal $l_found");
-    $prefs = get_display_pref($auth->auth["uid"], "deal", 0);
+    $prefs = get_display_pref($obm["uid"], "deal", 0);
     $block = html_deal_search_list($obm_q, $prefs, $deal);
   }
 
@@ -602,7 +602,7 @@ function html_deal_links($deal_q) {
   global $l_module_project, $l_module_invoice;
   global $l_module_document,$ico_document, $l_deal;
   global $l_document_add;
-  global $path, $auth, $cgp_show, $popup_height,$popup_width;
+  global $path, $cgp_show, $popup_height,$popup_width;
 
   $id = $deal_q->f("deal_id");
   $pid = $deal_q->f("deal_parentdeal_id");
@@ -790,7 +790,7 @@ function html_deal_consult($deal_q, $dc="") {
   global $l_tt, $l_status,$l_archive,$l_comment;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_quarter;
   global $l_parentdeal,$l_todo, $l_deal, $l_source;
-  global $display, $path, $auth, $c_yes, $c_no;
+  global $display, $path, $c_yes, $c_no;
 
   $id = $deal_q->f("deal_id");
   $pid = $deal_q->f("deal_parentdeal_id");
@@ -870,134 +870,132 @@ function html_deal_consult($deal_q, $dc="") {
 
 
   $block = "
-    <div class=\"detail infos\">
-    <h1>$l_deal</h1>
+  <div class=\"detail infos\">
+  <h1>$l_deal</h1>
 
-      <table>
-      <tr>
-        <th>$l_label</th>
-        <td>$label</td>
-      </tr>
-      <tr>
-        <th>$l_number</th>
-        <td>$num</td>
-      </tr>
-      <tr>
-        <th>$l_kind</th>
-        <td>$kind</td>
-      </tr>
-      <tr>
-        <th>$l_tt</th>
-        <td>$tt_label</td>
-      </tr>
-      <tr>
-        <th>$l_region</th>
-        <td>$region_label</td>
-      </tr>
-      <tr>
-        <th>$l_source</th>
-        <td>$source_label : $source</td>
-      </tr>
-      <tr>
-        <th>$l_commission_p</th>
-        <td>$commission</td>
-      </tr><tr>
-        <th>$l_marketing_manager</th>
-        <td>$market</td>
-      </tr><tr>
-        <th>$l_technical_manager</th>
-        <td>$tech</td>
-      </tr>
-      </table>
-      </div>
-
-    <div class=\"detail infos\">
-    <h1>$l_dates</h1>
-
-      <table>
-      <tr>
-        <th>$l_begin</th>
-        <td>$datebegin</td>
-      </tr><tr>
-        <th>$l_proposal</th>
-        <td>$datepro</td>
-      </tr><tr>
-        <th>$l_expected</th>
-        <td>$dateexpected $quarter_exp</td>
-      </tr>
-      <tr>
-        <th>$l_end</th>
-        <td>$dateend $quarter_end</td>
-      </tr>
-      <tr>
-        <th>$l_sale_delay</th>
-        <td>$sale_delay</td>
-      </tr>
-      </table>
-      </div>
-
-     <div class=\"detail infos\">
-     <h1>$l_relation</h1>
-
-      <table>
-      <tr>
-        <th>$l_company</th>
-        <td><a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id")."\">
-        <img src=\"$ico_company\" alt=\"[details]\" /></a> $comp<br />$ad1<br/>$zip $town</td>
-      </tr><tr>
-        <th>$l_contact 1</th>
-        <td><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1") . "\">
-        <img src=\"$ico_contact\" alt=\"[details]\" /></a> $dis_con1 - $phone_con1
-        </td>
-      </tr><tr>
-        <th>$l_contact 2</th>
-        <td><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2") . "\">
-        <img src=\"$ico_contact\" alt=\"[details]\" /></a> $dis_con2 - $phone_con2
-        </td>
-      </tr>
-      <tr>
-        <th>$l_other_relation</th>
-        <td>$dis_dc</td>
-      </tr>
-      </table>
-      </div>
-
-     <div class=\"detail extra\">
-     <h1>$l_status</h1>
-
-      <table>
-      <tr>
-        <th>$l_archive</th>
-        <td>$archive</td>
-      </tr><tr>
-        <th>$l_alarm</th>
-        <td>$datealarm</td>
-      </tr><tr>
-        <th>$l_status</th>
-        <td>$status</td>
-      </tr><tr>
-        <th>$l_hitrate</th>
-        <td>$hitrate %</td>
-      </tr><tr>
-        <th>$l_amount</th>
-        <td>$amount</td>
-      </tr><tr>
-        <th>$l_todo</th>
-        <td>$todo</td>
-      </tr>
-      </table>
-     </div>
-
-      <div class=\"detail infos\"> 
-      $block_userdata
-      </div>
-      
-
-    <div class=\"detail extra\">
-    <h1>$l_comment</h1>
-      $com
+    <table>
+    <tr>
+      <th>$l_label</th>
+      <td>$label</td>
+    </tr>
+    <tr>
+      <th>$l_number</th>
+      <td>$num</td>
+    </tr>
+    <tr>
+      <th>$l_kind</th>
+      <td>$kind</td>
+    </tr>
+    <tr>
+      <th>$l_tt</th>
+      <td>$tt_label</td>
+    </tr>
+    <tr>
+      <th>$l_region</th>
+      <td>$region_label</td>
+    </tr>
+    <tr>
+      <th>$l_source</th>
+      <td>$source_label : $source</td>
+    </tr>
+    <tr>
+      <th>$l_commission_p</th>
+      <td>$commission</td>
+    </tr><tr>
+      <th>$l_marketing_manager</th>
+      <td>$market</td>
+    </tr><tr>
+      <th>$l_technical_manager</th>
+      <td>$tech</td>
+    </tr>
+    </table>
     </div>
-    ";
+
+  <div class=\"detail infos\">
+  <h1>$l_dates</h1>
+
+    <table>
+    <tr>
+      <th>$l_begin</th>
+      <td>$datebegin</td>
+    </tr><tr>
+      <th>$l_proposal</th>
+      <td>$datepro</td>
+    </tr><tr>
+      <th>$l_expected</th>
+      <td>$dateexpected $quarter_exp</td>
+    </tr>
+    <tr>
+      <th>$l_end</th>
+      <td>$dateend $quarter_end</td>
+    </tr>
+    <tr>
+      <th>$l_sale_delay</th>
+      <td>$sale_delay</td>
+    </tr>
+    </table>
+    </div>
+
+   <div class=\"detail infos\">
+   <h1>$l_relation</h1>
+
+    <table>
+    <tr>
+      <th>$l_company</th>
+      <td><a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id")."\">
+      <img src=\"$ico_company\" alt=\"[details]\" /></a> $comp<br />$ad1<br/>$zip $town</td>
+    </tr><tr>
+      <th>$l_contact 1</th>
+      <td><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1") . "\">
+      <img src=\"$ico_contact\" alt=\"[details]\" /></a> $dis_con1 - $phone_con1
+      </td>
+    </tr><tr>
+      <th>$l_contact 2</th>
+      <td><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2") . "\">
+      <img src=\"$ico_contact\" alt=\"[details]\" /></a> $dis_con2 - $phone_con2
+      </td>
+    </tr>
+    <tr>
+      <th>$l_other_relation</th>
+      <td>$dis_dc</td>
+    </tr>
+    </table>
+    </div>
+
+   <div class=\"detail extra\">
+   <h1>$l_status</h1>
+
+    <table>
+    <tr>
+      <th>$l_archive</th>
+      <td>$archive</td>
+    </tr><tr>
+      <th>$l_alarm</th>
+      <td>$datealarm</td>
+    </tr><tr>
+      <th>$l_status</th>
+      <td>$status</td>
+    </tr><tr>
+      <th>$l_hitrate</th>
+      <td>$hitrate %</td>
+    </tr><tr>
+      <th>$l_amount</th>
+      <td>$amount</td>
+    </tr><tr>
+      <th>$l_todo</th>
+      <td>$todo</td>
+    </tr>
+    </table>
+   </div>
+
+   <div class=\"detail infos\"> 
+   $block_userdata
+   </div>
+    
+  <div class=\"detail extra\">
+  <h1>$l_comment</h1>
+    $com
+  </div>";
 
   return $block;
 }
@@ -1010,20 +1008,20 @@ function html_deal_consult($deal_q, $dc="") {
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_form($deal) {
-  global $display, $uid, $action, $ctt_sales, $cg_com, $cg_prod;
+  global $display, $obm, $action, $ctt_sales, $cg_com, $cg_prod;
 
   if ($action == "detailupdate") {
     $deal_q = run_query_deal_detail($deal["deal_id"]);
     $display["detailInfo"] = display_record_info($deal_q);
     $deal["company_id"] = $deal_q->f("deal_company_id");
-    $users = array($uid, $deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"), );
+    $users = array($obm["uid"], $deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"), );
     $dc = get_deal_dealcompany_info($deal["deal_id"]);
   } else if ($action == "update") {
-    $users = array($uid, $deal["market"], $deal["tech"]);
+    $users = array($obm["uid"], $deal["market"], $deal["tech"]);
     $deal_q = "";
   } else {
     $deal_q = "";
-    $users = array($uid);
+    $users = array($obm["uid"]);
     $dc = array();
   }
   
@@ -1091,11 +1089,11 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_source;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
-  global $path, $action, $auth, $popup;
+  global $path, $action, $obm, $popup;
   global $c_all, $l_all, $c_undef, $l_undef;
 
   $ext_target = $deal["ext_target"];
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $comp_id = $deal["company_id"];
 
   // if update mode and first time, values are taken from db
@@ -1391,20 +1389,20 @@ $js_status_loop
   //  if (($action == "detailupdate") || ($action == "update")) {
   if ($comment != "") {
     $dis_comment = "
-        $l_upd_comment
-        <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>
-    ";
+    $l_upd_comment
+    <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>";
   }
 
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action == "detailupdate") || ($action == "update")) && 
          ($usercreate == $uid) ) ) {
      $dis_button1 = "
+      <input type=\"hidden\" name=\"lead_id\" value=\"$deal[lead_id]\" />
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert \" />";
     $dis_priv = "
-             <th>$l_private</th>
-             <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
+      <th>$l_private</th>
+      <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
     if ($priv == 1) $dis_priv .= "checked = \"checked\"";
     $dis_priv .= " /></td></tr><tr>";
   }
@@ -1419,20 +1417,20 @@ $js_status_loop
   }
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button1 = "<input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
-        <input type=\"hidden\" name=\"parentdeal_id\" value=\"$pid\" />
-        <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp\" />
-        <input type=\"hidden\" name=\"hd_company_ad1\" value=\"$ad1\" />
-        <input type=\"hidden\" name=\"hd_company_zip\" value=\"$zip\" />
-        <input type=\"hidden\" name=\"hd_company_town\" value=\"$town\" />
-        <input type=\"hidden\" name=\"action\" value=\"update\" />
-        <input type=\"hidden\" name=\"deal_id\" value=\"$id\" />
-        <input type=\"submit\" value=\"$l_update\" />
-      ";
+      <input type=\"hidden\" name=\"parentdeal_id\" value=\"$pid\" />
+      <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp\" />
+      <input type=\"hidden\" name=\"hd_company_ad1\" value=\"$ad1\" />
+      <input type=\"hidden\" name=\"hd_company_zip\" value=\"$zip\" />
+      <input type=\"hidden\" name=\"hd_company_town\" value=\"$town\" />
+      <input type=\"hidden\" name=\"action\" value=\"update\" />
+      <input type=\"hidden\" name=\"deal_id\" value=\"$id\" />
+      <input type=\"submit\" value=\"$l_update\" />";
   }
  
   else {
     $dis_button1 = "<input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"hidden\" name=\"lead_id\" value=\"$deal[lead_id]\" />
       <input type=\"hidden\" name=\"parentdeal_id\" value=\"$pid\" />
       <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp\" />
       <input type=\"hidden\" name=\"hd_company_ad1\" value=\"$ad1\" />
@@ -1442,10 +1440,10 @@ $js_status_loop
   }
 
   $block = "
-    $js_status
-    <form method=\"post\" name=\"f_entity\" 
-      onsubmit=\"if (check_form(this)) return true; else return false;\"
-      action=\"".url_prepare("deal_index.php")."\">
+  $js_status
+  <form method=\"post\" name=\"f_entity\" 
+    onsubmit=\"if (check_form(this)) return true; else return false;\"
+    action=\"".url_prepare("deal_index.php")."\">
 
   <fieldset class=\"detail infos\">
   <legend>$l_relation</legend>
@@ -1580,10 +1578,10 @@ $js_status_loop
   </fieldset>
  
 
-    <fieldset class=\"buttons\">
-      $dis_button1   
-    </fieldset>
-    </form>
+  <fieldset class=\"buttons\">
+    $dis_button1   
+  </fieldset>
+  </form>
 ";
 
   return $block;
@@ -1597,12 +1595,12 @@ $js_status_loop
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_quick_form($deal) {
-  global $display, $uid, $action;
+  global $display, $obm, $action;
 
   if ($deal["deal_id"] > 0) {
     $deal_q = run_query_deal_detail($deal["deal_id"]);
     $display["detailInfo"] = display_record_info($deal_q);
-    $usrc_q = run_query_all_users_from_group($cg_com, array($uid));
+    $usrc_q = run_query_all_users_from_group($cg_com, array($obm["uid"]));
     $sta_q = run_query_deal_status_list();
     $block = html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal);
   }
@@ -1627,9 +1625,9 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
   global $l_expected, $l_alarm, $l_status, $l_hitrate, $l_todo;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
-  global $path, $display, $action, $auth;
+  global $path, $display, $action, $obm;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   $id = $deal_q->f("deal_id");
   $label = $deal_q->f("deal_label");
@@ -2420,7 +2418,7 @@ function dis_deal_dashboard_year_detail($deal) {
 //   - $deal[] : hash values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_dashboard_list($deal) {
-  global $display, $set_theme, $uid;
+  global $display, $set_theme, $obm;
   global $l_module_deal;
 
   $date_after = $deal["date_after"];
@@ -2443,7 +2441,7 @@ function dis_deal_dashboard_list($deal) {
   <div class=\"detailHead\">$l_module_deal</div>";
 
   $deal_q = run_query_deal_dashboard_list($deal, $users_id);
-  $prefs = get_display_pref($uid, "deal", 0);
+  $prefs = get_display_pref($obm["uid"], "deal", 0);
 
   $url = url_prepare("deal_index.php?action=dashboard_list&amp;cba_archive=1&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before$url_sel_manager");
     
@@ -2882,7 +2880,7 @@ function dis_deal_display_pref($prefs, $prefs_parent) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_parentdeal_search_list($deal) {
   global $l_no_found_parent;
-  global $display, $auth;
+  global $display, $obm;
 
   $obm_q = run_query_deal_search_parentdeal($deal);
   
@@ -2890,7 +2888,7 @@ function dis_deal_parentdeal_search_list($deal) {
   if ($nb_parent == 0) {
     $display["msg"] .= display_warn_msg($l_no_found_parent);
   } else {
-    $prefs = get_display_pref($auth->auth["uid"], "parentdeal");
+    $prefs = get_display_pref($obm["uid"], "parentdeal");
     $block = html_deal_parentdeal_search_list($obm_q, $prefs, $nb_parent, $deal);
   }
   return $block;
@@ -2936,12 +2934,12 @@ function html_deal_parentdeal_search_list($obm_q, $prefs, $nb_parentdeals, $deal
 //     keys used : forwarded to html_deal_search_form and $url for OBM_DISPLAY
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_parentdeal_consult($deal) {
-  global $ctt_sales, $uid;
+  global $ctt_sales, $obm;
   
   $archive = $deal["archive"];
 
   $obm_q = run_query_deal_parentdeal_detail($deal["parentdeal_id"]);
-  $prefs = get_display_pref ($uid, "deal");
+  $prefs = get_display_pref ($obm["uid"], "deal");
   $deal_q = run_query_deal_search($deal, 0);
   $num_rows = $deal_q->num_rows();
   $kind_q = run_query_deal_type();
@@ -3085,7 +3083,7 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
 //     keys used : forwarded to html_deal_search_form and $url for OBM_DISPLAY
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_parentdeal_form($action, $deal) {
-  global $display, $ctt_sales, $cg_com, $cg_prod, $uid, $l_no_found;
+  global $display, $ctt_sales, $cg_com, $cg_prod, $obm, $l_no_found;
 
   $users = array();
 
@@ -3095,7 +3093,7 @@ function dis_deal_parentdeal_form($action, $deal) {
       $display["msg"] .= display_err_msg($l_no_found);
       return;
     } else {
-      $users = array($uid, $obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
+      $users = array($obm["uid"], $obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
       $display["detailInfo"] = display_record_info($obm_q);
     }
   }
@@ -3211,12 +3209,11 @@ function html_deal_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
 // Display the deal list from an externam module
 ///////////////////////////////////////////////////////////////////////////////
 function ext_dis_deal_list($params, $entity, $id) {
+  global $display, $obm, $l_no_found;
   global $path;
 
   $params["$entity"] = $id;
   $block = dis_deal_search_list($params);
-
-  global $display, $auth, $l_no_found;
 
   $deal_q = run_query_deal_search($deal, 0);
   $nb_deal = $deal_q->num_rows_total();
@@ -3225,7 +3222,7 @@ function ext_dis_deal_list($params, $entity, $id) {
     return;
   }
 
-  $prefs = get_display_pref($auth->auth["uid"], "deal", 0);
+  $prefs = get_display_pref($obm["uid"], "deal", 0);
   
   $url = url_prepare("$path/$entity/${entity}_index.php?action=detailconsult&amp;view=deal&amp;param_$entity=$id");
 

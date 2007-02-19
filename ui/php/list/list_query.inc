@@ -158,7 +158,7 @@ function list_add_slashes_array(&$item, $key) {
 //   - $list[] : list hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_insert($list) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $priv = ($list["privacy"]==1) ? 1 : 0;
   $name = $list["name"];
@@ -199,7 +199,7 @@ function run_query_list_insert($list) {
     null,
     '" . date("Y-m-d H:i:s") ."',
     null,
-    '" . $auth->auth["uid"] . "',
+    '" . $obm["uid"] . "',
     '$priv',
     '$name',
     '$subject',
@@ -279,7 +279,7 @@ function get_list_id($list) {
 //   - $list[] : list hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_update($list) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $id = $list["list_id"];
   $priv = ($list["privacy"]==1) ? 1 : 0;
@@ -302,7 +302,7 @@ function run_query_list_update($list) {
   
   $query = "UPDATE List SET
     list_timeupdate='". date("Y-m-d H:i:s")."',
-    list_userupdate='".$auth->auth["uid"]."',
+    list_userupdate='".$obm["uid"]."',
     list_privacy='$priv',
     list_name='$name',
     list_subject='$subject',
@@ -330,7 +330,7 @@ function run_query_list_update($list) {
 //   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_update_sql($id) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $multidomain = sql_multidomain("list");
 
@@ -348,7 +348,7 @@ function run_query_list_update_sql($id) {
 
     $query = "UPDATE List SET
       list_timeupdate='". date("Y-m-d H:i:s")."',
-      list_userupdate='".$auth->auth["uid"]."',
+      list_userupdate='".$obm["uid"]."',
       list_query='$list_query'
     WHERE list_id='$id'";
 
@@ -392,7 +392,7 @@ function run_query_list_delete($p_id) {
 // Return: number of contact inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_contactlist_insert($list) {
-  global $auth, $cdg_sql;
+  global $cdg_sql;
 
   $id = $list["list_id"];
 	
@@ -443,7 +443,7 @@ function run_query_list_contactlist_insert($list) {
 //   - $list[] : list hash info : keys used : id, con_nb, conX
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_contactlist_delete($list) {
-  global $auth, $cdg_sql;
+  global $cdg_sql;
 
   $id = $list["list_id"];
   $cpt = 0;
@@ -1273,7 +1273,7 @@ function run_query_list_subscriptionreception() {
 // $ret array [query] full query, [where] where clause, [from] from clause
 ///////////////////////////////////////////////////////////////////////////////
 function make_list_query_from_db(&$list_q) {
-  global $auth, $cdg_sql;
+  global $cdg_sql;
 
   if (is_object($list_q)) {
     $id = $list_q->f("list_id");
@@ -1380,7 +1380,7 @@ function prepare_list_criteria(&$criteria) {
 // $ret array [query] full query, [where] where clause, [from] from clause
 ///////////////////////////////////////////////////////////////////////////////
 function make_list_query_from_criteria($list) {
-  global $cdg_sql, $c_private, $cgp_user, $uid;
+  global $cdg_sql, $c_private, $cgp_user, $obm;
 
   $id = $list["list_id"];
   $criteria = $list["criteria"]["modules"];
@@ -1830,7 +1830,7 @@ function make_list_query_from_criteria($list) {
 
   // Handle the privacy
   if ($privacy == $c_private) {
-    $where = " (contact_privacy = '0' or contact_usercreate = '$uid') AND ($where) ";
+    $where = " (contact_privacy = '0' or contact_usercreate = '$obm[uid]') AND ($where) ";
   } else {
     $where = " (contact_privacy = '0') AND ($where) ";
   }

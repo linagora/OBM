@@ -19,8 +19,6 @@ require("vacation_display.inc");
 require("vacation_query.inc");
 require("vacation_js.inc");
 
-$uid = $auth->auth["uid"];
-
 if ($action == "") $action = "index";
 get_vacation_action();
 $perm->check_permissions($module, $action);
@@ -28,7 +26,7 @@ $perm->check_permissions($module, $action);
 
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_vacation_detail($uid);
+  $obm_q = run_query_vacation_detail($obm["uid"]);
   if ($obm_q->num_rows() == 1) {
     $display["detailInfo"] = display_record_info($obm_q);
     $display["detail"] = html_vacation_consult($obm_q) ;
@@ -38,7 +36,7 @@ if (($action == "index") || ($action == "")) {
   
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_vacation_detail($uid);
+  $obm_q = run_query_vacation_detail($obm["uid"]);
   if ($obm_q->num_rows() == 1) {
     $display["detailInfo"] = display_record_info($obm_q);
     $display["detail"] = html_vacation_form($obm_q, $params);
@@ -49,14 +47,14 @@ if (($action == "index") || ($action == "")) {
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_vacation_data_form($params)) {
-    $obm_q = run_query_vacation_detail($uid);
+    $obm_q = run_query_vacation_detail($obm["uid"]);
     if (update_vacation($params, $obm_q)) {
       $display["msg"] .= display_ok_msg("$l_vacation : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_vacation : $l_update_error : " . $err["msg"]);
     }
   
-    $obm_q = run_query_vacation_detail($uid);
+    $obm_q = run_query_vacation_detail($obm["uid"]);
     $display["detailInfo"] = display_record_info($obm_q);
     $display["detail"] = html_vacation_consult($obm_q) ;
     

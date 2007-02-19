@@ -38,11 +38,10 @@ require("user_js.inc");
 require("$obminclude/lib/right.inc"); // needed by call from calendar
 
 // detailconsult can be accessed without user_id (-> display current user)
-if (($action == "detailconsult") && (! $params["user_id"])) $params["user_id"] = $uid;
+if (($action == "detailconsult") && (! $params["user_id"])) $params["user_id"] = $obm["uid"];
 
 get_user_action();
 $perm->check_permissions($module, $action);
-$uid = $auth->auth["uid"];
 
 update_last_visit("user", $params["user_id"], $action);
 
@@ -211,19 +210,19 @@ if ($action == "ext_get_ids") {
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($auth->auth["uid"], "user", 1);
+  $prefs = get_display_pref($obm["uid"], "user", 1);
   $display["detail"] = dis_user_display_pref($prefs);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($auth->auth["uid"], "user", 1);
+  $prefs = get_display_pref($obm["uid"], "user", 1);
   $display["detail"] = dis_user_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($auth->auth["uid"], "user", 1);
+  $prefs = get_display_pref($obm["uid"], "user", 1);
   $display["detail"] = dis_user_display_pref($prefs);
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////

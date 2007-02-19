@@ -1,7 +1,7 @@
 <?php
 /**
 * @filesource cv_index.php  cv Index File  
-* @copyright 2006-05-22 : Aliacom  
+* @copyright 2006-05-22 : AliaSource  
 */
 
 //  $Id$
@@ -24,6 +24,7 @@
 // External API ---------------------------------------------------------------
 // - ext_get_id      -- $title          -- select a cv (return id) 
 ///////////////////////////////////////////////////////////////////////////////
+
 $path = "..";
 $module = "cv";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -37,7 +38,6 @@ require_once("cv_js.inc");
 $params = get_cv_params();
 require_once("$obminclude/of/of_defaultodttemplate.inc");
 require_once("$obminclude/of/of_category.inc");
-$uid = $auth->auth["uid"];
 
 get_cv_action();
 if ($action == "") $action = "index";
@@ -209,19 +209,19 @@ if ($action == "ext_get_id") {
   $display["detail"] = dis_admin_index();
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($auth->auth["uid"], "cv", 1);
+  $prefs = get_display_pref($obm["uid"], "cv", 1);
   $display["detail"] = dis_cv_display_pref($prefs);
   
 } elseif ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($auth->auth["uid"], "cv", 1);
+  $prefs = get_display_pref($obm["uid"], "cv", 1);
   $display["detail"] = dis_cv_display_pref($prefs);
  
  } elseif ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($auth->auth["uid"], "cv", 1);
+  $prefs = get_display_pref($obm["uid"], "cv", 1);
   $display["detail"] = dis_cv_display_pref($prefs);
  } 
 

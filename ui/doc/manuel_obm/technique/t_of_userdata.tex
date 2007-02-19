@@ -76,7 +76,7 @@ function get_module_actions() {
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($auth->auth["uid"], "document", 1);
+  $prefs = get_display_pref($obm["uid"], "document", 1);
   $display["detail"] = dis_document_display_pref($prefs);
 }
 

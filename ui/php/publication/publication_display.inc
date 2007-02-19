@@ -137,12 +137,11 @@ function html_publication_search_form ($type_q,$publication) {
 //     keys used  : name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
 function dis_publication_search_list($publication) {
-  global $display, $l_found, $l_no_found;
-  global $auth;
+  global $obm, $display, $l_found, $l_no_found;
 
   $popup = $publication["popup"];
 
-  $prefs = get_display_pref($auth->auth["uid"], "publication");
+  $prefs = get_display_pref($obm["uid"], "publication");
   $obm_q = run_query_publication_search($publication);
   $nb_pub = $obm_q->num_rows_total();
   if ($nb_pub == 0) {
@@ -368,7 +367,7 @@ function dis_publication_form($action, $publication) {
 //   - $list_q    : lists
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, $list_q) {
-  global $display, $auth, $set_dsrc, $l_none, $ico_add;
+  global $display, $set_dsrc, $l_none, $ico_add;
   global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_publication_title, $l_type, $l_year, $l_lang, $l_desc;
   global $l_insert,$l_update,$l_checkdelete, $l_publication, $l_list;
@@ -501,7 +500,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
 //   - $publication[] : default values
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_group_subscription_form($action,$pub_q, $publication) {
-  global $display, $auth, $set_dsrc;
+  global $display, $set_dsrc;
   global $set_theme,$l_category;
   global $l_publication, $l_contact_category1, $l_auto_sub, $public_contact_cat;
 
@@ -564,7 +563,7 @@ function html_publication_group_subscription_form($action,$pub_q, $publication) 
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_subscription_form($action,$sub_q, $recept_q, $publication) {
-  global $display, $authd;
+  global $display;
   global $set_theme,$ico_publication_new,$popup_height,$popup_width;
   global $l_subscription,$l_quantity, $l_renew, $l_recept, $l_lang, $l_desc;
   global $l_insert_sub,$l_update_sub,$l_checkdelete_sub, $l_publication;
@@ -1257,7 +1256,6 @@ function dis_publication_display_pref($prefs) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_publication_subscription_external_list($hash_table) {
   global $display,$l_subscription, $l_no_found_subscription;
-  global $auth;
   
   $obm_q = run_query_publication_subscription_external_search($hash_table);
   $nb_subscription = $obm_q->num_rows();
@@ -1268,7 +1266,6 @@ function dis_publication_subscription_external_list($hash_table) {
     $block .= html_publication_subscription_list_result($obm_q,$nb_subscription);
   }
 
-  
   return $block;
 }
 
@@ -1283,7 +1280,7 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
   global $set_theme, $ico_update, $ico_delete, $ico_crow;
   global $l_yes,$l_no, $l_timecreate, $l_timeupdate,$l_publication_title;
   global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
-  global $path, $auth, $popup_height, $popup_width;
+  global $path, $popup_height, $popup_width;
   global $cright_write, $module, $perm;
 
   if ($perm->check_right($module, $cright_write)) {  
@@ -1304,8 +1301,8 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
     <td class=\"resultHead\">$l_timecreate</td>    
     <td class=\"resultHead\">$l_timeupdate</td>
     $display_write
-   </tr>
-   ";
+   </tr>";
+
   while($sub_q->next_record()) {
     $c_id = $sub_q->f("subscription_contact_id");
     $p_id = $sub_q->f("subscription_publication_id");

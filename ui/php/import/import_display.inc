@@ -136,9 +136,9 @@ function html_import_search_form ($import, $dsrc_q, $usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_import_search_list($import, $popup=false) {
   global $l_no_found;
-  global $display, $auth;
+  global $display, $obm;
 
-  $prefs = get_display_pref($auth->auth["uid"], "import");
+  $prefs = get_display_pref($obm["uid"], "import");
   $obm_q = run_query_import_search($import);
   $nb = $obm_q->num_rows_total();
   if ($nb == 0) {
@@ -516,6 +516,12 @@ function html_import_file_import($import_q, $import) {
 	$userdata["company"]["category"][$cat_name] = $hash;
       }
     }
+    if (is_array($cgp_user["contact"]["category"])) {
+      foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+	$hash = get_import_category_user_hash($cat_name);
+	$userdata["contact"]["category"][$cat_name] = $hash;
+      }
+    }
   }
     
   $map = get_import_field_mapping($import_q);
@@ -559,7 +565,7 @@ function html_import_file_import($import_q, $import) {
 
       // If contact, insert
       if (import_row_has_contact($fields)) {
-	run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions);
+	run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions, $userdata);
 	$nb_con_ins++;
       }
 
@@ -598,7 +604,7 @@ function html_import_file_import($import_q, $import) {
 	  if ($fields["con_ln"] == "") {
 	    $log["res"] .= $l_contact_defaultname;
 	  }
-	  run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions);
+	  run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions, $userdata);
 	  $nb_con_ins++;
 	}
 
@@ -608,11 +614,11 @@ function html_import_file_import($import_q, $import) {
 
       // Update the existing contact
     } else if ($conflict_action == "contact_update") {
-      run_query_import_contact_update($import_q, $fields, $map["default"], $countries, $kinds, $functions, $contact_id);
+      run_query_import_contact_update($import_q, $fields, $map["default"], $countries, $kinds, $functions, $userdata, $contact_id);
       $nb_con_upd++;
 
     } else if ($conflict_action == "contact_insert") {
-      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions);
+      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions, $userdata);
       $nb_con_ins++;
 
     } else if ($conflict_action == "contact_nothing") {
@@ -676,7 +682,7 @@ function html_import_file_import($import_q, $import) {
 	      if ($fields["con_ln"] == "") {
 		$log["res"] .= $l_contact_defaultname;
 	      }
-	      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions);
+	      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions, $userdata);
 	      $nb_con_ins++;
 	    }
 	  }
@@ -720,12 +726,12 @@ function html_import_file_import($import_q, $import) {
 	  if (import_row_has_contact($fields)) {
 	    // We insert If lastname filled, or if lastname empty but default
 	    if ($fields["con_ln"] != "") {
-	      run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions);
+	      run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions, $userdata);
 	      $nb_con_ins++;
 	    } else if ($fields["con_ln"] == "") {
 	      if ($map["default"]["con_ln"] != "") {
 		$log["res"] .= $l_contact_defaultname;
-		run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions);
+		run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions, $userdata);
 		$nb_con_ins++;
 	      }
 	    }
@@ -1039,11 +1045,31 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
       global ${"l_$cat_name"};
       $cat_label = ${"l_$cat_name"};
 
-      $dis_userdata .= "
+      $dis_userdata_company .= "
   <tr>
     <td>
       <input type=\"text\" size=\"3\" name=\"tf_$field\" value=\"$value\" /></td>
-    <th>$cat_label</th>
+    <td>$cat_label</td>
+    <td>
+      <input type=\"text\" name=\"tf_${field}_d\" value=\"$value_d\" /></td>
+  </tr>";
+    }
+  }
+
+  if (is_array($cgp_user["contact"]["category"])) {
+    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+      $field = "con_${cat_name}";
+      $value = $$field;
+      $field_d = "con_${cat_name}_d";
+      $value_d = $$field_d;
+      global ${"l_$cat_name"};
+      $cat_label = ${"l_$cat_name"};
+
+      $dis_userdata_contact .= "
+  <tr>
+    <td>
+      <input type=\"text\" size=\"3\" name=\"tf_$field\" value=\"$value\" /></td>
+    <td>$cat_label</td>
     <td>
       <input type=\"text\" name=\"tf_${field}_d\" value=\"$value_d\" /></td>
   </tr>";
@@ -1198,7 +1224,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
     <td>
       <input type=\"text\" name=\"tf_comp_com_d\" value=\"$comp_com_d\" /></td>
   </tr>
-  $dis_userdata
+  $dis_userdata_company
 
   <tr>
     <td colspan=\"3\"><h1 class=\"title\">$l_contact</h1></td>
@@ -1337,6 +1363,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
     <td>
       <input type=\"text\" name=\"tf_con_com_d\" value=\"$con_com_d\" /></td>
   </tr>
+  $dis_userdata_contact
   </table>
   </fieldset>
 ";

@@ -23,8 +23,6 @@ include("$obminclude/global_pref.inc");
 require("mailforward_display.inc");
 require("mailforward_query.inc");
 
-$uid = $auth->auth["uid"];
-
 if ($action == "") $action = "index";
 get_forward_action();
 $perm->check_permissions($module, $action);
@@ -32,7 +30,7 @@ $perm->check_permissions($module, $action);
 
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_mailforward_detail($uid);
+  $obm_q = run_query_mailforward_detail($obm["uid"]);
   if ($obm_q->num_rows() == 1) {
     $display["detailInfo"] = display_record_info($obm_q); 
     $display["detail"] = html_forward_consult($obm_q);
@@ -42,7 +40,7 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_mailforward_detail($uid);
+  $obm_q = run_query_mailforward_detail($obm["uid"]);
   if ($obm_q->num_rows() == 1) {
     $display["detail"] = html_forward_form($obm_q, $params);
   } else {
@@ -51,13 +49,13 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_mailforward_detail($uid);
+  $obm_q = run_query_mailforward_detail($obm["uid"]);
   if (check_mailforward_data_form($obm_q, $params)) {
-    $retour = run_query_mailforward_update($params, $uid);
+    $retour = run_query_mailforward_update($params, $obm["uid"]);
     if ($retour) {
       exec_change_alias($obm_q, $params);
       $display["msg"] .= display_ok_msg("$l_mailforward : $l_update_ok");
-      $obm_q = run_query_mailforward_detail($uid);
+      $obm_q = run_query_mailforward_detail($obm["uid"]);
       $display["detail"] = html_forward_consult($obm_q);
     } else {
       $display["msg"] .= display_err_msg("$l_mailforward : $l_update_error");
@@ -65,7 +63,7 @@ if (($action == "index") || ($action == "")) {
     }
   } else {
     $display["msg"] .= display_err_msg($err["msg"]);
-    $display["detail"] = html_forward_form($obm_q, $params, $err);
+    $display["detail"] = html_forward_form($obm_q, $params, $err["field"]);
   }
 }
 

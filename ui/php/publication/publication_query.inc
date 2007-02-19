@@ -154,7 +154,7 @@ function run_query_publication_list() {
 //     keys used  : num, archive, title, type, ad1, ad2, ad3, zip, town, cdx
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_insert($publication) {
-  global $auth, $obm, $cdg_sql, $public_contact_cat;
+  global $obm, $cdg_sql, $public_contact_cat;
 
   $title = $publication["title"];
   $type = $publication["type"];
@@ -180,7 +180,7 @@ function run_query_publication_insert($publication) {
   VALUES (null,
     '$time',
     null,
-    '" . $auth->auth["uid"] . "',
+    '" . $obm["uid"] . "',
     '$domain_id',
     '$title',
     '$type',
@@ -195,7 +195,7 @@ function run_query_publication_insert($publication) {
   $query = "SELECT publication_id
     FROM Publication
     WHERE publication_timecreate = '$time'
-      AND publication_usercreate = '" . $auth->auth["uid"] . "'
+      AND publication_usercreate = '" . $obm["uid"] . "'
       AND publication_title = '$title'
       AND publication_year = '$year'";
   $obm_q = new DB_OBM;
@@ -217,7 +217,7 @@ function run_query_publication_insert($publication) {
 //   - $publication[] : List of contact_type to subscribe
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_auto_insert($publication) {
-  global $auth, $obm, $cdg_sql;
+  global $obm, $cdg_sql;
   
   $id = $publication["publication_id"];
   $id_orig = $publication["id_orig"];
@@ -239,7 +239,7 @@ function run_query_publication_auto_insert($publication) {
     null,
     '" . date("Y-m-d H:i:s") . "',
     null,
-    '" . $auth->auth["uid"] . "',
+    '" . $obm["uid"] . "',
     '$domain_id',
     subscription_contact_id,
     '$id',
@@ -266,7 +266,7 @@ function run_query_publication_auto_insert($publication) {
 //   - $p_id        :  Id of the subscription
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_auto_subscription($publication, $p_id){
-  global $auth, $cdg_sql, $c_focsys, $public_contact_cat;
+  global $obm, $cdg_sql, $c_focsys, $public_contact_cat;
   
   $cats1 = $publication[$public_contact_cat];
   $list_sub = $publication["list_sub"];
@@ -295,7 +295,7 @@ function run_query_publication_auto_subscription($publication, $p_id){
       null,
       '" . date("Y-m-d H:i:s") . "',
       null,
-      '" . $auth->auth["uid"] . "',
+      '" . $obm["uid"] . "',
       '$domain_id',
       contact_id,
       '$p_id',
@@ -363,7 +363,7 @@ function run_query_publication_auto_subscription($publication, $p_id){
             null,
             '" . date("Y-m-d H:i:s") . "',
             null,
-            '" . $auth->auth["uid"] . "',
+            '" . $obm["uid"] . "',
             '$domain_id',
             '$c_id',
             '$p_id',
@@ -389,7 +389,7 @@ function run_query_publication_auto_subscription($publication, $p_id){
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_insert_subscription($publication) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $c_id = $publication["contact_id"];
   $quantity = $publication["quantity"];
@@ -422,7 +422,7 @@ function run_query_publication_insert_subscription($publication) {
   VALUES (null,
     '" . date("Y-m-d H:i:s") . "',
     null,
-    " . $auth->auth["uid"] . ",
+    " . $obm["uid"] . ",
     '$domain_id',
     '$c_id',
     '$p_id',
@@ -445,7 +445,7 @@ function run_query_publication_insert_subscription($publication) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_update_subscription($publication) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $s_id = $publication["subscription_id"];
   $quantity = $publication["quantity"];
@@ -455,7 +455,7 @@ function run_query_publication_update_subscription($publication) {
   
   $query = "UPDATE Subscription SET 
       subscription_timeupdate = '". date("Y-m-d H:i:s") ."',
-      subscription_userupdate='". $auth->auth["uid"] ."',
+      subscription_userupdate='". $obm["uid"] ."',
       subscription_renewal='$renewal',
       subscription_reception_id='$recept',
       subscription_quantity='$quantity'
@@ -476,7 +476,7 @@ function run_query_publication_update_subscription($publication) {
 //   - $publication[] : Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_update($pid, $publication) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $title = $publication["title"];
   $type = $publication["type"];
@@ -487,7 +487,7 @@ function run_query_publication_update($pid, $publication) {
 
   $query = "UPDATE Publication SET
       publication_timeupdate='". date("Y-m-d H:i:s") ."',
-      publication_userupdate='". $auth->auth["uid"] ."',
+      publication_userupdate='". $obm["uid"] ."',
       publication_title='$title',
       publication_lang='$lang',
       publication_year='$year',
@@ -642,17 +642,17 @@ function run_query_publication_subscription_reception() {
 //   - $publication : publication hash info : keys used : type_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_type_insert($publication) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $type = $publication["type_label"];
   $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO PublicationType (
     publicationtype_timecreate,
     publicationtype_usercreate,
-		publicationtype_domain_id,
+    publicationtype_domain_id,
     publicationtype_label)
   VALUES (
     '$timecreate',
@@ -674,12 +674,12 @@ function run_query_publication_type_insert($publication) {
 //   - $publication : publication hash info : keys used : recept_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_recept_insert($publication) {
-  global $auth, $obm, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $recept = $publication["recept_label"];
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO SubscriptionReception (
     subscriptionreception_timecreate,
@@ -706,10 +706,10 @@ function run_query_publication_recept_insert($publication) {
 //   - $publication : publication hash info : keys used : type, type_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_type_update($publication) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $id = $publication["type"];
   $type = $publication["type_label"];
   $multidomain = sql_multidomain("publicationtype");
@@ -735,10 +735,10 @@ function run_query_publication_type_update($publication) {
 //   - $publication : publication hash info : keys used : recept, recept_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_recept_update($publication) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $id = $publication["recept"];
   $recept = $publication["recept_label"];
   $multidomain = sql_multidomain("subscriptionreception");

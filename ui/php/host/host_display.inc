@@ -134,9 +134,9 @@ function html_host_search_form($host) {
 //     keys used : name, ip, email
 ///////////////////////////////////////////////////////////////////////////////
 function dis_host_search_list($host) {
-  global $l_no_found, $display, $auth;
+  global $l_no_found, $display, $obm;
 
-  $prefs = get_display_pref($auth->auth["uid"], "host");
+  $prefs = get_display_pref($obm["uid"], "host");
   $obm_q = run_query_host_search($host);
 
   $nb_host = $obm_q->num_rows_total();
@@ -367,7 +367,7 @@ function html_host_consult($host_q) {
 function html_host_consult_web($host_q) {
   global $l_lastname, $l_firstname, $l_restrict;
   global $l_disable;
-  global $action, $sess, $c_yes, $c_no;
+  global $action, $c_yes, $c_no;
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
 
   $height_sep = "10";

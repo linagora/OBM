@@ -521,12 +521,11 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_search_list($contact) {
-  global $display, $l_found, $l_no_found;
-  global $auth;
+  global $display, $l_found, $l_no_found, $obm;
 
   $popup = $contact["popup"];
 
-  $prefs = get_display_pref($auth->auth["uid"], "contact");
+  $prefs = get_display_pref($obm["uid"], "contact");
   $obm_q = run_query_contact_search($contact);
   $nb_contact = $obm_q->num_rows_total();
   if ($nb_contact == 0) {
@@ -661,7 +660,7 @@ function html_contact_header($co_q, $funcs) {
   global $l_company, $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title;
   global $l_contact, $l_market, $l_archive, $l_date, $l_no_date;
   global $cgp_show, $cgp_hide, $c_yes, $c_no, $set_theme;
-  global $display, $path, $action, $auth;
+  global $display, $path, $action;
 
   $c_id = $co_q->f("contact_company_id");
   $c_name = $co_q->f("company_name");
@@ -1173,14 +1172,14 @@ function html_contact_links($id) {
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_form($action, $co_q, $contact) {
-  global $display, $cg_com, $cgp_hide, $uid;
+  global $display, $cg_com, $cgp_hide, $obm;
 
   $cid = $contact["contact_id"];
   $dsrc_q = run_query_global_datasource();
   $kind_q = run_query_contact_kind();
   $funcs = of_category_get_ordered("contact", "function");
 
-  $users = array($uid);
+  $users = array($obm["uid"]);
 
   if ($contact["market"] > 0) {
     $users[] = $contact["market"];
@@ -1223,9 +1222,9 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
-  global $display, $path, $auth, $cgp_show, $cgp_hide, $c_undef, $l_undef;
+  global $display, $path, $obm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -1283,7 +1282,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   // New form and first time
   } elseif ($action == "new") {
     $dsrc = $set_dsrc;
-    $mark = $auth->auth["uid"];
+    $mark = $obm["uid"];
     $date = date("Y-m-d");
     $usercomment = $uid;
     $datecomment = of_isodate_format();
@@ -1622,7 +1621,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   // If new contact or contact update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action == "detailupdate") || ($action == "update")) &&
-         ($usercreate == $auth->auth["uid"]) ) ) {
+         ($usercreate == $obm["uid"]) ) ) {
     if ($priv == '1') {
       $private_c = " checked";
     }
@@ -2125,7 +2124,6 @@ function dis_contact_display_pref($prefs) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_vcard_export($contact) {
   global $display, $path, $l_err_reference;
-  global $auth;
 
   $contact_id = $contact["contact_id"];
   $con_q = run_query_contact_detail($contact_id);
@@ -2142,7 +2140,7 @@ function dis_contact_vcard_export($contact) {
 // Parameters:
 //   - $con_q : : DBO : information about the contact
 ///////////////////////////////////////////////////////////////////////////////
-function export_contact_vcard($co_q,$com_q) {
+function export_contact_vcard($co_q, $com_q) {
 
   $id = $co_q->f("contact_id");
   $kind_header = $co_q->f("kind_header");

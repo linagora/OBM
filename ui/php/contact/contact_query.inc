@@ -441,10 +441,10 @@ function run_query_contact_kind() {
 //               : com, com2, com3 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_insert($contact) {
-  global $auth, $cgp_show, $cdg_sql, $obm;
+  global $cgp_show, $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 	
   $comp_id = $contact["company_new_id"];
   if ($comp_id < 1) {
@@ -628,8 +628,9 @@ function run_query_contact_insert($contact) {
 //                : com, com2, com3
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_update($contact) {
-  global $auth, $cgp_show, $cdg_sql;
+  global $obm, $cgp_show, $cdg_sql;
 
+  $multidomain = sql_multidomain("contact");
   $id = $contact["contact_id"];
   $comp_old_id = $contact["company_id"];
   $comp_new_id = $contact["company_new_id"];
@@ -698,12 +699,11 @@ function run_query_contact_update($contact) {
   }
   $archive = ($contact["archive"] == "1" ? "1" : "0");
   $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
-  $multidomain = sql_multidomain("contact");
   $dsrc = ($contact["datasource"] ? $contact["datasource"] : 0);
 
   $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
-    contact_userupdate='".$auth->auth["uid"]."',
+    contact_userupdate='".$obm["uid"]."',
     contact_datasource_id='$dsrc',
     contact_company_id='$comp_id',
     contact_company='$company',
@@ -1097,16 +1097,16 @@ function get_contact_info($con_id) {
 //                keys used : kind_label, kind_lang, kind_header
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_kind_insert($contact) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $label = $contact["kind_label"];
   $lang = $contact["kind_lang"];
   $header = $contact["kind_header"];
   //$default = ($contact["kind_default"] == 1 ? 1 : 0);
   $default = (isset($contact["kind_default"]) ? $contact["kind_default"] : '0');
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
@@ -1146,7 +1146,7 @@ function run_query_contact_kind_insert($contact) {
 function run_query_contact_kind_clear_default($lang) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("kind");
+  $multidomain = sql_multidomain("kind");
 
   $query = "UPDATE Kind
     SET kind_default=0
@@ -1167,10 +1167,10 @@ function run_query_contact_kind_clear_default($lang) {
 //                keys used : kind_label, kind_lang, kind_header
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_kind_update($contact) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $id = $contact["kind"];
   $label = $contact["kind_label"];
   $lang = $contact["kind_lang"];

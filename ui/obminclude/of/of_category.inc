@@ -837,11 +837,11 @@ function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_query_insert($entity, $catu, $params) {
-  global $auth, $cdg_sql, $obm;
+  global $obm, $cdg_sql, $obm;
 
   $cat = strtolower($catu);
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $cat_label = $params["${cat}_label"];
   $cat_code = $params["${cat}_code"];
   $table = ucfirst($entity) . ucfirst($catu);
@@ -917,11 +917,11 @@ function of_category_query_insert_link($entity, $cat, $entity_id, $cat_id) {
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_query_update($entity, $catu, $params) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $cat = strtolower($catu);
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $cat_id = $params["${cat}_id"];
   if (! ($cat_id > 0)) {
     $cat_id = $params["${cat}"];
@@ -1114,7 +1114,7 @@ function of_category_get_entitycategories($entity, $cat, $entity_id, $mode="mult
       ORDER BY $field_id";
   }
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "of_category_get_entitycategories()");
   $cat_q = new DB_OBM;
   if ($entity_id != "") {
     $cat_q->query($query);
@@ -1400,7 +1400,7 @@ function _of_category_get_entity_count($entity) {
 
 
 //=============================================================================
-// OF USER API
+// OF USERDATA API
 //=============================================================================
 
 
@@ -1449,21 +1449,20 @@ function of_userdata_dis_entity_consult($entity, $ent_id) {
   if (is_array($cgp_user[$entity]["category"])) {
     foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
       $cats = of_category_user_get_entitycategories($entity, "$cat_name", $ent_id);
-      if($one_cat["mode"] == "mono") {
+      if ($one_cat["mode"] == "mono") {
         $mono .= of_category_dis_block_consult($entity, $cat_name, $cats, $one_cat["mode"]);
       } else {
         $multi .= of_category_dis_block_consult($entity, $cat_name, $cats, $one_cat["mode"]);
       }
     }
-    if($mono != "") {;
+    if ($mono != "") {;
       $block_user .= "
         <div class=\"detail infos\">
         <h1>$l_properties</h1>
         <table>
         $mono
         </table>
-        </div>
-        ";
+        </div>";
     }
     $block_user .= $multi;
   }
@@ -1576,7 +1575,7 @@ function of_userdata_dis_admin_form($entity) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// User Data update query execution
+// User Data search query execution
 // Parameters:
 //   - $entity : user category for this entity
 //   - $params : array with parameters
@@ -2292,11 +2291,11 @@ function of_category_user_get_entitycategories($entity, $category, $entity_id) {
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_user_query_insert($params) {
-  global $auth, $cdg_sql, $obm;
+  global $obm, $cdg_sql, $obm;
 
   $category = $params["category"];
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $cat_label = $params["category_label"];
   $cat_code = $params["category_code"];
   $domain_id = $obm["domain_id"];
@@ -2336,11 +2335,11 @@ function of_category_user_query_insert($params) {
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_user_query_update($params) {
-  global $auth, $cdg_sql, $obm;
+  global $obm, $cdg_sql, $obm;
 
   $category = $params["category"];
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $cat_id = $params["category_id"];
   $cat_label = $params["category_label"];
   $cat_code = $params["category_code"];

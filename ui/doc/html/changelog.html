@@ -30,47 +30,56 @@ To do
 - sous vue d'un module : via ajax !!! 
 - templates : pour personnaliser vues !
 - responsable de ressource ? processus quand reservation d'une res sans les droits
-- supprimer rep et fichiers agenda_ et lang/agenda
-
 - calendarcategory1 => calendarcategory : partout (code + lang + bd) [pas urgent]
 - publication : category de contact en dur (pourrait etre generique sur toutes)
+
+- supprimer rep et fichiers agenda_ et lang/agenda
+- supprimer crloginform
+- md5.js -> obminclude/javascript (ou resources/javascript ?)
+=> suppression de auth/
+
 - password : requetes et BD pas en adequation (password_plain)
-- password : traiter champ err_field
-- mailforward : ok sauf exec et err_field
-- traiter les commentaires marques "Aliamin"
-- mailshare: gestion des droits 
+- traiter les commentaires marques "Aliamin" : exec
 - displaypref : group_user, group_group encore actualite ?
 - traiter les email des users 1.2->2.0 le "@" + dans affichage (mailshare,...)
+- UTF8
+- register_global : finir + traiter $perm
+- saisie des dates dans calendar
+- bug : impossible de suppimer ressource dans selection ressource (ds creneaux)
 
-
-2007-01-30 : version 2.0.0<br>
+2007-02-20 : version 2.0.0<br>
 
 <ul>
+<li> BUG#624 : contact select for new deals now put archived contact at the end
 <li> BUG#623 : Domain info now displayed on user detail page
 <li> BUG#622 : Profile labels are already configurables
+<li> BUG#618 : Document sorting in search results fixed
+<li> BUG#617 : Lead manager search selection now OK
 <li> BUG#611 : Project : fixed bug in search query for current projects
 <li> BUG#610 : Duplicate of #582
 <li> BUG#607 : incident date search are OK
 <li> BUG#586 : Calendar : day links from planning view added
 <li> BUG#582 : Calendar : add rights restrictions to planning view
 <li> BUG#537 : script to migrate document (from 0.9 to 1.0) in bugzilla
+<li> BUG#521 : User labels now ok thanks to OBM-Aliamin merge in OBM 2
 <li> BUG#122 : event description now preserved on the insert conflict form
-<li> Agenda : fixed a warning whith group membership on a new event on PHP5
+<li> Calendar : fixed a warning whith group membership on a new event on PHP5
 <li> Contract : fixed inserting / updating contract type
 <li> Incident : fixed wrong message (and bogus email) when inserting incident
 <li> Incident : fixed archive info on insert with some MySQL versions
 <li> Category : User configurable categories (one conf line)
 <li> Stats : adapted to new user categories. Auto provided for all categories
-<li> new module cv : to manage user (worker) cv with project references
-<li> new module odt : to generate OpenDocument documents
-<li> OBM is now multi-domains
+<li> Cv : new module : to manage user (worker) cv with project references
+<li> Odt : new module : to generate OpenDocument documents
+<li> OBM is now multi-domains (new module : Domain)
 <li> Tests : add non regression tests for Lists
 <li> Deal : Kind and status administration now ok
 <li> Group : access to group popup selection now only need "read rights"
 <li> Lead : new portlet on home page
-<li> Agenda : many navigation fixes (eg returning always on the current week)
-<li> Agenda : fixed cases where month view last days events where not displayed
+<li> Calendar : many navigation fixes (eg returning always on the current week)
+<li> Calendar : fixed case where month view last days events were not displayed
 <li> Import : automatically manage same companies (!= similar)
+<li> Import : user categories handle in import (company and contact)
 <li> Contact : statistics enhancements
 <li> Fixed some SQL error with PostgreSQL (contact, company insertion)
 <li> Change some date handling to allow PHP 5.2 compatibility
@@ -80,6 +89,23 @@ To do
 <li> Resource : Correctly delete all Resource group membership on deletion
 <li> Contract : fixed search by date expiration
 <li> Contract : fixed wrong error message on contract insertion
+<li> Lead : Automatically delete a lead successfully converted to a deal
+<li> Login page now totally configurable
+<li> OBM now works with register_globals = Off !!!
+<li> OBM : display totally rewritten, new default theme, icons, DHTML,...
+<li> Calendar : Display totally rewriten ! Did you hear about buzzword AJAX ?
+<li> Calendar : views no more limited to 6 users
+<li> Calendar : display now spread to all the available space
+<li> OBM now show the field in error when submitting, user and tools data
+<li> OF : authentication rewrite (getting rid of $auth,..)
+<li> OBM : Aliamin merge !
+<li> Password : new module : to allow users to change their password
+<li> OBM-Mail : OBM now can handle the postfix MTA and Cyrus IMAP server
+<li> Mailforward (OBM-Mail) : new module : allow users to redirect their emails
+<li> Vacation (OBM-Mail) : new module : allow users to set up the vacation msg
+<li> Mailshare (OBM-Mail) : new module : handle Cyrus shared mailbbox
+<li> Host (OBM-Ldap) : new module : handle hosts database (Windows PDC, Samba)
+<li> OBM-Ldap : OBM now can handle an OpenLdap directory
 </ul>
 
 2006-09-21 : version 1.2.4<br>
@@ -237,27 +263,6 @@ To do
 <li> Time : New planning view (monthly) with time for each project
 <li> Project : New view displaying the time usage on the project
 <li> Project : Short label
-</ul>
-
-2006-03-02 : version 1.1.2<br>
-
-<ul>
-<li> BUG#554 : Contract : Wrong error message on insert with long labels
-<li> BUG#553 : Company : Activity and Type can now be select on new form
-<li> BUG#552 : Contact : fixed a Postgres SQL ambigus query on country sort
-<li> BUG#551 : List : fixed the list csv export
-<li> BUG#550 : Calendar : mini-calendar popup now start at corresponding date
-<li> BUG#549 : Incident : can be searched by Id, and Id displayed
-<li> BUG#548 : Incident : incident creation now require a status and a priority
-<li> BUG#547 : Time : Task type label corrected
-<li> BUG#543 : Contact : Title field can be disabled
-<li> Contact : adresses fields sorting according to contact and company infos
-<li> List : Fixed some case where dynamic # were != with publication infos
-<li> Mail : Charset fixes
-<li> Added mobile, email and web on clipboard address copy
-<li> Invoice : Fixes invoices links in payments dashboard table
-<li> List : Fixed multiple dataset display on same screen with same entity
-<li> Spanish translation updated (thank you Jaime !)
 </ul>
 
 <p/>

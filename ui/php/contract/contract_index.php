@@ -41,12 +41,10 @@ require("contract_query.inc");
 require("contract_display.inc");
 require("contract_js.inc");
 
-$uid = $auth->auth["uid"];
-
 get_contract_action();
 $perm->check_permissions($module, $action);
 
-if (! check_privacy($module, "Contract", $action, $params["contract_id"], $uid)) {
+if (! check_privacy($module, "Contract", $action, $params["contract_id"], $obm["uid"])) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
@@ -251,19 +249,19 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($auth->auth["uid"], "contract", 1);
+  $prefs = get_display_pref($obm["uid"], "contract", 1);
   $display["detail"] = dis_contract_display_pref($prefs);
   
 } elseif ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($auth->auth["uid"], "contract", 1);
+  $prefs = get_display_pref($obm["uid"], "contract", 1);
   $display["detail"] = dis_contract_display_pref($prefs);
   
 } elseif ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($auth->auth["uid"], "contract", 1);
+  $prefs = get_display_pref($obm["uid"], "contract", 1);
   $display["detail"] = dis_contract_display_pref($prefs);
   
 } elseif ($action == "admin")  {

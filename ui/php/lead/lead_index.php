@@ -157,19 +157,19 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($auth->auth["uid"], "lead", 1);
+  $prefs = get_display_pref($obm["uid"], "lead", 1);
   $display["detail"] = dis_lead_display_pref($prefs);
 
 } elseif ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($auth->auth["uid"], "lead", 1);
+  $prefs = get_display_pref($obm["uid"], "lead", 1);
   $display["detail"] = dis_lead_display_pref($prefs);
 
 } elseif ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($auth->auth["uid"], "lead", 1);
+  $prefs = get_display_pref($obm["uid"], "lead", 1);
   $display["detail"] = dis_lead_display_pref($prefs);
 }
 

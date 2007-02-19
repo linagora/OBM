@@ -72,7 +72,6 @@ include("import_display.inc");
 include("import_query.inc");
 require("import_js.inc");
 
-$uid = $auth->auth["uid"];
 get_import_action();
 $perm->check_permissions($module, $action);
 
@@ -409,6 +408,19 @@ function get_import_desc($import) {
       $desc .= '\$comp["'.$field.'"]["value"] ="'.$import["$field"] . '";';
       $desc .= '\$comp["'.$field.'"]["label"] = "l_'.$cat_name.'";';
       $desc .= '\$comp["'.$field.'"]["default"]="'.$import["$field_d"] . '";';
+    }
+  }
+  if (is_array($cgp_user["contact"]["category"])) {
+    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+      $field = "con_${cat_name}";
+      $field_d = "con_${cat_name}_d";
+
+      $desc .= '\$'.$field.'="'.$import["$field"] . '";';
+      $desc .= '\$'.$field_d.'="'.$import["$field_d"] . '";';
+
+      $desc .= '\$con["'.$field.'"]["value"] ="'.$import["$field"] . '";';
+      $desc .= '\$con["'.$field.'"]["label"] = "l_'.$cat_name.'";';
+      $desc .= '\$con["'.$field.'"]["default"]="'.$import["$field_d"] . '";';
     }
   }
   

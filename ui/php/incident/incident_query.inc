@@ -236,10 +236,10 @@ function run_query_incident_detail($id) {
 //                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_insert($incident) {
-  global $auth, $cdg_sql, $cgp_host, $obm;
+  global $cdg_sql, $cgp_host, $obm;
   global $cmail_incident, $l_mail_incident_new_subject, $l_status, $l_contract;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $now = date("Y-m-d H:i:s");
   $domain_id = $obm["domain_id"];
 	
@@ -397,7 +397,7 @@ function run_query_incident_id($incident) {
 //                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_update($incident) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $contract_id = $incident["contract_new_id"];
   if ($contract_id < 1) {
@@ -430,7 +430,7 @@ function run_query_incident_update($incident) {
   
   $query = "UPDATE Incident SET
       incident_timeupdate='". date("Y-m-d H:i:s")."',
-      incident_userupdate='".$auth->auth["uid"]."',
+      incident_userupdate='".$obm["uid"]."',
       incident_logger $logger,
       incident_owner $owner,
       incident_label='$lincident',
@@ -464,13 +464,14 @@ function run_query_incident_update($incident) {
 //   - $i_id : incident id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_delete($i_id) {
-  global $auth, $cdg_sql;
+  global $cdg_sql;
  
   $ret = of_userdata_query_delete("incident", $i_id);
-
   $multidomain = sql_multidomain("incident");
+
   $query = "DELETE FROM Incident 
-    WHERE incident_id='$i_id' $multidomain";
+    WHERE incident_id='$i_id'
+      $multidomain";
 
   $i_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_incident_delete()");

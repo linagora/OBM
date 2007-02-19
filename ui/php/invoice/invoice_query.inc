@@ -11,7 +11,7 @@
 // Invoice search query :
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_search ($invoice) {
-  global $auth, $cdg_sql, $c_all, $ctu_sql_limit;
+  global $cdg_sql, $c_all, $ctu_sql_limit;
 
   $sql_order_dir = $invoice["sql_order_dir"];
   $sql_order_field = $invoice["sql_order_field"];
@@ -214,10 +214,10 @@ function run_query_invoice_detail($p_invoice_id) {
 // Insertion query construction
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_insert($invoice) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $domain_id = $obm["domain_id"];
 	
   $label = $invoice["label"];
@@ -303,10 +303,10 @@ function run_query_invoice_insert($invoice) {
 // invoice update 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_update($invoice) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   $id = $invoice["invoice_id"];
   $label = $invoice["label"];

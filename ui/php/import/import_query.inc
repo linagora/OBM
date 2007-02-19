@@ -19,6 +19,7 @@ function run_query_import_search($import) {
   
   $sql_order_dir = $company["sql_order_dir"];
   $sql_order_field = $company["sql_order_field"];
+  $multidomain = sql_multidomain("import");
   
   $name = sql_search_text_parse($import["name"]);
   $dsrc = $import["datasource"];
@@ -41,7 +42,7 @@ function run_query_import_search($import) {
     $where .= " AND import_marketingmanager_id='$market'";
   }
 
-  $whereq = "WHERE $where";
+  $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "import_name";
@@ -74,11 +75,11 @@ function run_query_import_search($import) {
   }
 
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "import_search()");
+    display_debug_msg($query, $cdg_sql, "run_query_import_search()");
     $obm_q->query($query);
   }
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_search()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -95,6 +96,7 @@ function run_query_import_detail($id) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  $multidomain = sql_multidomain("import");
 
   $timeupdate = sql_date_format($db_type, "import_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "import_timecreate", "timecreate");
@@ -112,9 +114,10 @@ function run_query_import_detail($id) {
        LEFT JOIN UserObm as c ON import_usercreate=c.userobm_id
        LEFT JOIN UserObm as u ON import_userupdate=u.userobm_id
        LEFT JOIN UserObm as m ON import_marketingmanager_id=m.userobm_id
-  WHERE import_id = '$id'";
+  WHERE import_id = '$id'
+    $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_detail()");
   $obm_q->query($query) ;
   $obm_q->next_record();
 
@@ -128,8 +131,9 @@ function run_query_import_detail($id) {
 //   - $import[] : import hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_insert($import) {
-  global $auth, $cdg_sql;
+  global $cdg_sql, $obm;
 
+  $domain_id = $obm["domain_id"];
   $id = $import["import_id"];
   $name = $import["name"];
   $dsrc = $import["datasource"];
@@ -138,7 +142,9 @@ function run_query_import_insert($import) {
   $enc = $import["enclosed"];
   $desc = get_import_desc($import);
 
-  $query = "INSERT INTO Import (import_timeupdate,
+  $query = "INSERT INTO Import (
+    import_domain_id,
+    import_timeupdate,
     import_timecreate,
     import_userupdate,
     import_usercreate,
@@ -148,10 +154,12 @@ function run_query_import_insert($import) {
     import_separator,
     import_enclosed,
     import_desc)
-  VALUES (null,
+  VALUES (
+    '$domain_id',
+    null,
     '" . date("Y-m-d H:i:s") ."',
     null,
-    '" . $auth->auth["uid"] . "',
+    '" . $obm["uid"] . "',
     '$name',
     '$dsrc',
     '$market',
@@ -159,7 +167,7 @@ function run_query_import_insert($import) {
     '$enc',
     '$desc')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -173,8 +181,9 @@ function run_query_import_insert($import) {
 //   - $import[] : import hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_update($import) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
+  $multidomain = sql_multidomain("import");
   $id = $import["import_id"];
   $name = $import["name"];
   $dsrc = $import["datasource"];
@@ -182,18 +191,19 @@ function run_query_import_update($import) {
   $sep = $import["sep"];
   $enc = $import["enclosed"];
   $desc = get_import_desc($import);
-  
+
   $query = "UPDATE Import SET import_timeupdate='". date("Y-m-d H:i:s")."',
-    import_userupdate='".$auth->auth["uid"]."',
+    import_userupdate='".$obm["uid"]."',
     import_name='$name',
     import_datasource_id='$dsrc',
     import_marketingmanager_id='$market',
     import_separator='$sep',
     import_enclosed='$enc',
     import_desc='$desc'
-  WHERE import_id='$id'";
+  WHERE import_id='$id'
+    $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -209,9 +219,13 @@ function run_query_import_update($import) {
 function run_query_import_delete($p_id) {
   global $cdg_sql;
 
+  $multidomain = sql_multidomain("import");
+
   // Delete the Import
-  $query = "DELETE FROM Import WHERE import_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
+  $query = "DELETE
+    FROM Import
+    WHERE import_id='$p_id' $multidomain";
+  display_debug_msg($query, $cdg_sql, "run_query_import_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -230,6 +244,8 @@ function run_query_import_delete($p_id) {
 function get_import_name_exists($name, $id="") {
   global $cdg_sql;
 
+  $multidomain = sql_multidomain("import");
+
   if ($id != "") {
     $where_id = "AND import_id != '$id'";
   }
@@ -237,9 +253,10 @@ function get_import_name_exists($name, $id="") {
   $query = "SELECT import_id, import_name
     FROM Import
     WHERE import_name='$name'
-      $where_id";
+      $where_id
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_import_name_exists()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -260,6 +277,7 @@ function get_import_name_exists($name, $id="") {
 function run_query_import_check($import) {
   global $cdg_sql;
 
+  $multidomain = sql_multidomain("import");
   $id = $import["import_id"];
   $name = $import["name"];
   $dsrc = $import["datasource"];
@@ -269,7 +287,7 @@ function run_query_import_check($import) {
   $like = sql_casei_like($db_type);
 
   if ($id != "") {
-    $where_id = "import_id != '$id' and ";
+    $where_id = "AND import_id != '$id'";
   }
 
   // We search for a similar name (as same name is already excluded)
@@ -285,10 +303,12 @@ function run_query_import_check($import) {
        datasource_name
      FROM Import
           LEFT JOIN DataSource ON import_datasource_id=datasource_id
-     WHERE $where_id
-       ($wname and $wdsrc)";
+     WHERE
+       ($wname AND $wdsrc)
+       $where_id
+       $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_check()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -516,6 +536,7 @@ function get_import_similar_company($fields, $map) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  $multidomain = sql_multidomain("import");
 
   $name = $fields["comp_name"];
   if ($name == "") {
@@ -528,7 +549,8 @@ function get_import_similar_company($fields, $map) {
   $query = "SELECT distinct company_id, company_name, company_zipcode 
     FROM Company
     WHERE (company_name $like '$name%' OR company_aka $like '%$name%')
-      AND (company_zipcode $like '$zip' OR company_town $like '$town')";
+      AND (company_zipcode $like '$zip' OR company_town $like '$town')
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_import_similar_company()");
   $obm_q->query($query);
@@ -563,14 +585,15 @@ function get_import_similar_company($fields, $map) {
 //   - $fields[]    : Company and Contact Entry's values
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
-//   - $userdata[]  : Userdata hash array [company|contact][category][$cat_name]
+//   - $userdata[]  : Userdata hash array[company|contact][category][$cat_name]
 // Returns
 //   Id of the company inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_company_insert(&$import_q, $fields, $defaults, &$countries, &$userdata) {
-  global $auth, $cdg_sql, $field_size;
+  global $cdg_sql, $obm, $field_size;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
+  $domain_id = $obm["domain_id"];
 
   // Set default values when needed
   if (is_array($defaults)) {
@@ -615,6 +638,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $com = addslashes($fields["comp_com"]);
 
   $query = "INSERT INTO Company (
+    company_domain_id,
     company_timeupdate,
     company_timecreate,
     company_userupdate,
@@ -638,7 +662,9 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     company_web,
     company_email,
     company_comment)
-  VALUES (null,
+  VALUES (
+    '$domain_id',
+    null,
     '" . date("Y-m-d H:i:s") . "',
     null,
     '$uid',
@@ -670,10 +696,11 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $query = "SELECT company_id as id
       FROM Company
       WHERE company_name = '$name'
-        and company_phone = '$phone'
-        and company_address1 = '$ad1'
-        and company_zipcode = '$zip'
-        and company_town = '$town'";
+        AND company_domain_id = '$domain_id'
+        AND company_phone = '$phone'
+        AND company_address1 = '$ad1'
+        AND company_zipcode = '$zip'
+        AND company_town = '$town'";
   
   display_debug_msg($query, $cdg_sql, "run_query_import_company_insert(2)");
   $obm_q->query($query);
@@ -701,13 +728,13 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
 //   - $fields[]    : Company and Contact Entry's values
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
-//   - $userdata[]  : Userdata hash array [company|contact][category][$cat_name]
+//   - $userdata[]  : Userdata hash array[company|contact][category][$cat_name]
 //   - $company_id  : Company id to update
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_company_update(&$import_q, $fields, $defaults, &$countries, &$userdata, $company_id) {
-  global $auth, $cdg_sql, $field_size;
+  global $obm, $cdg_sql, $field_size;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   // Set default values when needed
   if (is_array($defaults)) {
@@ -830,11 +857,14 @@ function get_import_similar_contact($fields, $cid) {
 //   - $countries[] : Country hash
 //   - $kinds[]     : Kinds hash (from lang)
 //   - $functions[] : Functions hash
+//   - $userdata[]  : Userdata hash array[company|contact][category][$cat_name]
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $defaults, &$countries, &$kinds, &$functions) {
-  global $auth, $cdg_sql;
+function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $defaults, &$countries, &$kinds, &$functions, &$userdata) {
+  global $obm, $cdg_sql;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
+  $domain_id = $obm["domain_id"];
+  $now = date("Y-m-d H:i:s");
   $mailoks = array("X",'x','1',"1","Y","y");
 
   // Set default values when needed
@@ -895,7 +925,8 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $arch = '0';
   $priv = '0';
 
-  $query = "INSERT INTO Contact (contact_timeupdate,
+  $query = "INSERT INTO Contact (
+    contact_domain_id,
     contact_timecreate,
     contact_userupdate,
     contact_usercreate,
@@ -923,8 +954,10 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_archive,
     contact_privacy,
     contact_comment)
-  VALUES (null,
-    '" . date("Y-m-d H:i:s") . "',
+  VALUES (
+    '$domain_id',
+    null,
+    '$now',
     null,
     '$uid',
     '$dsrc',
@@ -952,16 +985,39 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     '$priv',
     '$com')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_import_contact_insert()");
+  display_debug_msg($query, $cdg_sql, "run_query_import_contact_insert(1)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+  // Get the contact Id
+  $query = "SELECT contact_id as id
+      FROM Contact
+      WHERE contact_timecreate = '$now'
+        and contact_lastname = '$lname'
+        and contact_firstname = '$fname'
+        and contact_company_id = '$comp_id'
+        and contact_datasource_id = '$dsrc'
+        and contact_phone = '$phone'";
   
-  if ($retour) {
+  display_debug_msg($query, $cdg_sql, "run_query_import_contact_insert(2)");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $id = $obm_q->f("id");
+
+  if ($id > 0) {
+
     run_query_global_company_contact_number_update($comp_id);
+
+    // User data handling
+    if (is_array($userdata["contact"]["category"])) {
+      foreach($userdata["contact"]["category"] as $cat_name => $hash) {
+	$param_values[$cat_name] = $hash[$fields["con_$cat_name"]];
+      }
+      $ret = of_userdata_query_update("contact", $id, $param_values);
+    }
   }
 
-  return $retour;
+  return $id;
 }
 
 
@@ -974,12 +1030,13 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
 //   - $countries[] : Country hash
 //   - $kinds[]     : Kind hash
 //   - $functions[] : Functions hash
+//   - $userdata[]  : Userdata hash array[company|contact][category][$cat_name]
 //   - $contact_id  : Contact id to update
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_contact_update(&$import_q, $fields, $defaults, &$countries, &$kinds, &$functions, $contact_id) {
-  global $auth, $cdg_sql;
+function run_query_import_contact_update(&$import_q, $fields, $defaults, &$countries, &$kinds, &$functions, &$userdata, $contact_id) {
+  global $obm, $cdg_sql;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $mailoks = array("X",'x','1',"1","Y","y");
 
   // Set default values when needed
@@ -1067,9 +1124,17 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_comment='$com'
   WHERE contact_id='$contact_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_contact_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+
+  // User data handling
+  if (is_array($userdata["contact"]["category"])) {
+    foreach($userdata["contact"]["category"] as $cat_name => $hash) {
+      $param_values[$cat_name] = $hash[$fields["con_$cat_name"]];
+    }
+    $ret = of_userdata_query_update("contact", $contact_id, $param_values, false);
+  }
 
   return $retour;
 }
@@ -1168,7 +1233,7 @@ function run_query_import_kind() {
     FROM Kind
     ORDER BY kind_lang, kind_default DESC";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_kind()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 

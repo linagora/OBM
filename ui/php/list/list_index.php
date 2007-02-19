@@ -40,10 +40,9 @@ include("list_display.inc");
 include("list_query.inc");
 include("$obminclude/of/of_category.inc");
 
-$uid = $auth->auth["uid"];
 get_list_action();
 $perm->check_permissions($module, $action);
-if (! check_privacy($module, "List", $action, $params["list_id"], $uid)) {
+if (! check_privacy($module, "List", $action, $params["list_id"], $obm["uid"])) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
@@ -230,22 +229,22 @@ else if ($action == "new_criterion") {
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($uid, "list", 1);
-  $prefs_con = get_display_pref($uid, "list_contact", 1);
+  $prefs = get_display_pref($obm["uid"], "list", 1);
+  $prefs_con = get_display_pref($obm["uid"], "list_contact", 1);
   $display["detail"] = dis_list_display_pref($prefs, $prefs_con);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($uid, "list", 1);
-  $prefs_con = get_display_pref($uid, "list_contact", 1);
+  $prefs = get_display_pref($obm["uid"], "list", 1);
+  $prefs_con = get_display_pref($obm["uid"], "list_contact", 1);
   $display["detail"] = dis_list_display_pref($prefs, $prefs_con);
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($uid, "list", 1);
-  $prefs_con = get_display_pref($uid, "list_contact", 1);
+  $prefs = get_display_pref($obm["uid"], "list", 1);
+  $prefs_con = get_display_pref($obm["uid"], "list_contact", 1);
   $display["detail"] = dis_list_display_pref($prefs, $prefs_con);
 
 ///////////////////////////////////////////////////////////////////////////////

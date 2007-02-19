@@ -57,7 +57,7 @@ if (($action == "index") || ($action == "")) {
     $query = preg_replace("/(limit .*)$/i", "", $query);
   }
   
-  $prefs = get_display_pref($auth->auth["uid"], $entity);
+  $prefs = get_display_pref($obm["uid"], $entity);
   
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

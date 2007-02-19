@@ -20,7 +20,7 @@ if (($set_lang == "")  && ($mode != "txt")) {
     global_session_load_user_todos($set_todo); 
 
   // We update the last login date for the user
-  run_query_userobm_update_lastaccess($auth->auth["uid"]);
+  run_query_userobm_update_lastaccess($obm["uid"]);
 }
 
 // Display parameters if debug level is set
@@ -62,10 +62,6 @@ if ($set_debug == "") $set_debug = $set_debug_default;
 if ($set_cal_interval == "") $set_cal_interval = $set_cal_interval_default;
 
 
-$obm["domain_id"] = $auth->auth["domain_id"];
-$obm["uid"] = $auth->auth["uid"];
-$obm["perm"] = $auth->auth["perm"];
-
 if($obm["domain_id"] == 0) {
   $profiles["domain"] = array (
     'section' => array (
@@ -85,6 +81,7 @@ if($obm["domain_id"] == 0) {
     )
   );
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Theme.                                           //
 ///////////////////////////////////////////////////////////////////////////////

@@ -357,11 +357,10 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
 //     keys used  : name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_list($company) {
-  global $display, $l_found, $l_no_found;
-  global $auth;
+  global $display, $l_found, $l_no_found, $obm;
 
   $popup = $company["popup"];
-  $prefs = get_display_pref($auth->auth["uid"], "company");
+  $prefs = get_display_pref($obm["uid"], "company");
   $obm_q = run_query_company_search($company);
   $nb_company = $obm_q->num_rows_total();
   if ($nb_company == 0) {
@@ -451,7 +450,7 @@ function html_company_links($co_q) {
   global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
   global $l_module_lead, $l_module_contract, $l_module_invoice;
   global $l_module_document, $l_module_payment, $l_document_add;
-  global $l_company, $path, $auth, $cgp_show, $popup_height,$popup_width;
+  global $l_company, $path, $cgp_show, $popup_height,$popup_width;
 
   $id = $co_q->f("company_id");
   $name = $co_q->f("company_name");
@@ -934,7 +933,7 @@ function html_company_consult_address($co_q) {
 //   - $company[] : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_form($action, $company) {
-  global $display, $cg_com, $cgp_hide, $uid, $l_err_reference;
+  global $display, $cg_com, $cgp_hide, $obm, $l_err_reference;
 
   // of: type, activity
   $show_naf = (! $cgp_hide["company"]["nafcode"]);
@@ -956,7 +955,7 @@ function dis_company_form($action, $company) {
     $naf_q = run_query_companynafcode();
   }
  
-  $users = array($uid);
+  $users = array($obm["uid"]);
   if ($company["market"] > 0) {
     $users[] = $company["market"];
   }
@@ -988,7 +987,7 @@ function dis_company_form($action, $company) {
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company) {
-  global $display, $auth, $cgp_hide, $set_dsrc, $c_undef, $l_undef;
+  global $display, $obm, $cgp_hide, $set_dsrc, $c_undef, $l_undef;
   global $set_theme,$ico_web,$ico_mail,$ico_add,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
@@ -996,7 +995,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   global $l_number, $l_vat, $l_siret, $l_market, $l_coord;
   global $l_insert, $l_update, $l_internal, $l_company, $l_archive;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $lang = get_lang();
 
   // if update mode and first display values are taken from database
@@ -1030,7 +1029,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     $usercomment = $uid;
     $datecomment = of_isodate_format();
   } else if ($action == "new") {
-    $mark = $auth->auth["uid"];
+    $mark = $obm["uid"];
     $dsrc = $set_dsrc;
     $usercomment = $uid;
     $datecomment = of_isodate_format();

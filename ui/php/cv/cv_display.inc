@@ -178,11 +178,11 @@ function html_cv_search_form($cv) {
 
 function dis_cv_search_list($cv) {
  global $l_found, $l_no_found;
-  global $display, $auth, $new_order, $order_dir;
+  global $display, $obm;
 
   $popup = $cv["popup"];
-  $prefs = get_display_pref($auth->auth["uid"], "cv");
-  $obm_q = run_query_cv_search($cv, $new_order, $order_dir);
+  $prefs = get_display_pref($obm["uid"], "cv");
+  $obm_q = run_query_cv_search($cv);
   $nb_cv = $obm_q->num_rows_total();
   if ($nb_cv == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -250,20 +250,21 @@ function html_cv_search_list($cv_q, $prefs, $cv, $popup) {
   return $block;
 }
 
+
 /**
 * Display the CV consult
 * @param array $cv[]    
 * @return string $block html cv consult form to display
 */
-
 function dis_cv_consult($params) {
-  global $display, $auth;
+  global $display, $obm;
+
   $id = $params["cv_id"];
   if ($id > 0) {
     $cv_q = run_query_cv_detail($id);
     $display["detailInfo"] = display_record_info($cv_q);
-    $refs_q = run_query_cv_refs_detail($id, $cv["new_order"], $cv["order_dir"]);
-    $prefs = get_display_pref($auth->auth["uid"], "cv_reference");
+    $refs_q = run_query_cv_refs_detail($id);
+    $prefs = get_display_pref($obm["uid"], "cv_reference");
     $block = html_cv_consult($cv, $cv_q, $refs_q, $prefs);
   }
 
@@ -478,9 +479,9 @@ function dis_cv_form($action, $cv) {
 * @param array $cv[] default values
 * @return string $block html cv form to display
 */
-
 function html_cv_form($action, $cv, $cv_q="", $refs_q="",$u_com_q) {
-  global $display, $auth, $set_dsrc, $l_none, $set_theme, $path, $popup_height, $popup_width;
+  global $display, $set_dsrc, $l_none, $set_theme, $path, $popup_height, $popup_width;
+
   global $l_update, $l_insert, $l_delete;
   global $l_cv, $l_title, $l_comment, $l_user, $l_select_user, $l_duplicate;
   global $l_lastname, $l_firstname, $l_location, $l_phone, $l_education, $l_personal;
@@ -684,12 +685,12 @@ function html_cv_form($action, $cv, $cv_q="", $refs_q="",$u_com_q) {
   return $block;
 }
 
+
 /**
 * Display the cv delete validation screen
 * @param integer $p_id cv id
 * @return string $block html cv form delete to display
 */
-
 function dis_can_delete_cv($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display;
@@ -726,7 +727,6 @@ function dis_can_delete_cv($p_id) {
 * @param $prefs Display preferences
 * @return string $block html cv form preferences to display
 */
-
 function dis_cv_display_pref($prefs) {
   global $l_cv_display;
   
@@ -741,17 +741,19 @@ function dis_cv_display_pref($prefs) {
   return $block;
 }
 
+
 /**
 * Display the CV Export parameters screen
 * @param array $params
 * @return string $block html cv export form to display
 */
-
 function dis_cv_export($params) {
+
   $defaults_q = of_get_defaultodttemplates("cv");
   $block = html_cv_export($params["cv_id"], $defaults_q);
   return $block;
 }
+
 
 /**
 * Display the CV Export parameters screen (html)
@@ -759,7 +761,6 @@ function dis_cv_export($params) {
 * @param object $default_q DB OBM object
 * @return string $block html cv export form to display
 */
-
 function html_cv_export($cv_id, $defaults_q) {
   global $popup_height, $popup_width, $path;
   global $l_export, $l_anonymous, $patch, $l_template, $l_select_template, $l_template_selection;
@@ -810,7 +811,7 @@ function html_cv_export($cv_id, $defaults_q) {
       $style_other_template = "style=\"display: none;\"";
   }
   
-  $block .="<tr $style_other_template id =\"other_template\">
+  $block .= "<tr $style_other_template id =\"other_template\">
               <th>$l_template_selection</th>
               <td>
                 <input readonly=\"readonly\" type=\"text\" name=\"tf_other_template_name\" size=\"50\" maxlength=\"255\" value=\"\" /> 
@@ -849,6 +850,7 @@ function dis_admin_index() {
   return $block;
 }
 
+
 /**
 * Display the CV Hidden Export screen
 * @param array $params
@@ -866,31 +868,32 @@ function dis_cv_hidden_export($params) {
   return $block;
 }
 
+
 /**
 * Display the CV Hidden Export screen (html call to the odt module)
 * @param integer template id of template choosen
 * @param string $data
 * @return string $block html export form to display
 */
-
 function html_cv_hidden_export($template, $data) {
   global $path;
   global $l_loading, $l_loaded;
   
   $submiter = "<script type=\"text/javascript\">
-                 window.onload = function() {
-                   document.f_hidden_export.submit();
-                   document.getElementById('message').innerHTML = '$l_loaded !';
-                 }
-               </script>";
+     window.onload = function() {
+       document.f_hidden_export.submit();
+       document.getElementById('message').innerHTML = '$l_loaded !';
+     }
+     </script>";
   
   $block = "<div class=\"messageInfo\" id=\"message\"> $l_loading </div>
-            <form name=\"f_hidden_export\" method=\"post\" action=\"$path/odt/odt_index.php\">
-                <input type=\"hidden\" name=\"template\" value=\"$template\"/>
-                <input type=\"hidden\" name=\"data\" value=\"$data\"/>
-                <input type=\"hidden\" name=\"action\" value=\"export\"/>
-            </form>
-            $submiter";
+     <form name=\"f_hidden_export\" method=\"post\" action=\"$path/odt/odt_index.php\">
+     <input type=\"hidden\" name=\"template\" value=\"$template\"/>
+     <input type=\"hidden\" name=\"data\" value=\"$data\"/>
+     <input type=\"hidden\" name=\"action\" value=\"export\"/>
+     </form>
+     $submiter";
+
   return $block;
 }
 

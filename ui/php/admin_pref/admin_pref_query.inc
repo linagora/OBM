@@ -21,7 +21,7 @@ function get_admin_pref_default_user_pref() {
             WHERE userobmpref_user_id = '0'
             ORDER BY userobmpref_option";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_admin_pref_default_user_pref()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   
@@ -37,15 +37,15 @@ function get_admin_pref_default_user_pref() {
 //   - $value : of the preference
 ///////////////////////////////////////////////////////////////////////////////
 function get_admin_pref_userpref_value($option) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $query = "SELECT userobmpref_value
             FROM UserObmPref
             WHERE userobmpref_user_id = '$uid'
               AND userobmpref_option = '$option'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_admin_pref_userpref_value()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();

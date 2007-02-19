@@ -57,18 +57,18 @@ function show_hide_write_right(field) {
 //   - $entity_id : entity id
 ///////////////////////////////////////////////////////////////////////////////
 function of_right_dis_admin($entity, $entity_id) {
-  global $display, $auth, $l_of_right_err_empty;
+  global $display, $obm, $l_of_right_err_empty;
 
   if (!isset($entity_id) || ($entity_id == "")) {
     $display["msg"] .= display_err_msg($l_of_right_err_empty);
     return;
   }
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $consumer = "user";
   $consumer_id = "$uid";
-    $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write");
-    $display["features"] = html_entitywritable_bar($writable_entity ,$entity_id, $entity);
+  $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write");
+  $display["features"] = html_entitywritable_bar($writable_entity ,$entity_id, $entity);
 
   $consumers = of_right_consumer_for_entity($entity, $entity_id, $consumer);
 
@@ -441,7 +441,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="al
 //   - $entity : entity type to update
 ///////////////////////////////////////////////////////////////////////////////
 function of_right_update_right($param, $entity) {
-  global $cdg_sql, $auth, $err_msg, $l_of_right_err_auth,$obm;
+  global $cdg_sql, $obm, $err_msg, $l_of_right_err_auth,$obm;
 
   $consumer = "user";
 
@@ -459,7 +459,7 @@ function of_right_update_right($param, $entity) {
   }
 
   // Check the user have the sufficient right to update rights
-  if (($eid != $auth->auth["uid"]) && ($entity == "calendar")) {
+  if (($eid != $obm["uid"]) && ($entity == "calendar")) {
     $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write");
     if (!in_array($eid, $writable_entity["ids"])) {
       $err_msg = $l_of_right_err_auth;

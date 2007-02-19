@@ -33,10 +33,10 @@ function html_admin_ref_country_form($ctry_q) {
   $char_title = '=';
   $key = 0;
   while ($ctry_q->next_record()) {
-      $iso = $ctry_q->f("country_iso3166");
-      $lang = $ctry_q->f("country_lang");
-      $name = $ctry_q->f("country_name");
-      $phone = $ctry_q->f("country_phone");
+    $iso = $ctry_q->f("country_iso3166");
+    $lang = $ctry_q->f("country_lang");
+    $name = $ctry_q->f("country_name");
+    $phone = $ctry_q->f("country_phone");
     
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
@@ -254,7 +254,7 @@ function html_admin_ref_datasource_form($dsrc_q) {
     <a href=\"?action=datasource_checklink&amp;category=datasource&amp;dsrc=$id\">
     <img src=\"$ico_delete\" alt=\"$l_dsrc_checkdelete\" title=\"$l_dsrc_checkdelete\" />
     </a></td>
-    <td><input type=\"text\" id=\"tf_dsrcname_$id\" value=\"$name\" size=\"30\" /></td>
+    <td><input type=\"text\" id=\"tf_dsrc_name_$id\" value=\"$name\" size=\"30\" /></td>
     <td>
     <a href=\"#\" onclick=\"return updateLine($id,'datasource');\">
     <img src=\"$ico_ok\" alt=\"$l_dsrc_update\" title=\"$l_dsrc_update\" />
@@ -269,7 +269,7 @@ function html_admin_ref_datasource_form($dsrc_q) {
   <div class=\"detail admin\" >
   <form id=\"form_datasource_update\" action=\"?action=datasource_update\" method=\"post\">
   <input type=\"hidden\" name=\"dsrc\" value=\"\" />
-  <input type=\"hidden\" name=\"tf_dsrcname\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_dsrc_name\" value=\"\" />
   </form>    
   <h1>$l_dsrc_manage</h1>
   <div class=\"overflow\">

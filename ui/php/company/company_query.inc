@@ -256,9 +256,9 @@ function run_query_company_detail($p_id) {
 //                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_insert($company) {
-  global $auth, $obm, $cdg_sql;
+  global $obm, $cdg_sql;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $now = date("Y-m-d H:i:s");
   $domain_id = $obm["domain_id"];
 	
@@ -412,7 +412,7 @@ function run_query_company_insert($company) {
 //                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_update($cid, $company) {
-  global $auth, $cdg_sql, $cgp_hide;
+  global $obm, $cdg_sql, $cgp_hide;
 
   $num = $company["num"];
   $vat = $company["vat"];
@@ -458,7 +458,7 @@ function run_query_company_update($cid, $company) {
 	
   $query = "UPDATE Company SET
     company_timeupdate='". date("Y-m-d H:i:s") ."',
-    company_userupdate='". $auth->auth["uid"] ."',
+    company_userupdate='". $obm["uid"] ."',
     company_datasource_id='$dsrc',
     company_number='$num',
     company_vat='$vat',
@@ -585,26 +585,26 @@ function run_query_companynafcode() {
 //   - $company : company hash info : keys used : naf_code, naf_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_nafcode_insert($company) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $title = (isset($company["naf_title"]) ? $company["naf_title"] : '0');
   $code = $company["naf_code"];
   $label = $company["naf_label"];
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 
   $query = "INSERT INTO CompanyNafCode (
       companynafcode_timecreate,
       companynafcode_usercreate,
-			companynafcode_domain_id,
+      companynafcode_domain_id,
       companynafcode_title,
       companynafcode_code,
       companynafcode_label)
     VALUES (
       '$timecreate',
       '$usercreate',
-			'$domain_id',
+      '$domain_id',
       '$title',
       '$code',
       '$label')";
@@ -623,15 +623,15 @@ function run_query_company_nafcode_insert($company) {
 //   - $company : company hash info : keys used : naf_code, naf_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_nafcode_update($company) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $id = $company["naf"];
   $code = $company["naf_code"];
   $title = (isset($company["naf_title"]) ? $company["naf_title"] : '0');
   $label = $company["naf_label"];
-	$multidomain = sql_multidomain("companynafcode");
+  $multidomain = sql_multidomain("companynafcode");
 	
   $query = "UPDATE CompanyNafCode SET
       companynafcode_code='$code',

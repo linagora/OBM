@@ -1,8 +1,8 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : mailserver_index.php                                           //
+// OBM - File : mailserver_index.php                                         //
 //     - Desc : Calendar Index File                                          //
-// 2007-02-08 - Mehdi Rande                                                  //
+// 2007-02-08 - AliaSource - Mehdi Rande                                     //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,6 @@ include("$obminclude/global.inc");
 $params = get_mailserver_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-$uid = $auth->auth["uid"];
 
 require("mailserver_query.inc");
 require("mailserver_display.inc");

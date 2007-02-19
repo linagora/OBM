@@ -412,9 +412,9 @@ function html_list_search_form ($list, $usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_search_list($list, $popup=false) {
   global $l_found, $l_no_found;
-  global $display, $auth;
+  global $display, $obm;
 
-  $prefs = get_display_pref($auth->auth["uid"], "list");
+  $prefs = get_display_pref($obm["uid"], "list");
   $obm_q = run_query_list_search($list);
   $nb_list = $obm_q->num_rows_total();
   if ($nb_list == 0) {
@@ -486,13 +486,13 @@ function html_list_search_list($obm_q, $prefs, $list, $popup) {
 //   - $list[] : list parameters
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_consult($list) {
-  global $uid, $l_err_reference;
+  global $obm, $l_err_reference;
 
   $id = $list["list_id"];
 
   if ($id > 0) {
     $list_q = run_query_list_detail($id);
-    $prefs_con = get_display_pref($uid, "list_contact");
+    $prefs_con = get_display_pref($obm["uid"], "list_contact");
     $con_q = run_query_list_contacts_list($list, "list_contact");
     $block = html_list_consult($list_q, $prefs_con, $con_q);
   } else {
@@ -755,7 +755,7 @@ function html_list_form($action, $list_q, $list) {
   global $l_name,$l_subject,$l_email,$l_mailing,$l_contact_archive,$l_info_pub;
   global $l_query, $l_list, $l_private;
   global $cgp_show,$clist_mode_normal, $clist_mode_expert, $l_expert,$l_normal;
-  global $action, $display, $uid;
+  global $action, $display, $obm;
 
   // if update mode and first time, values are taken from db
   if (($action == "detailupdate") || ($action == "detailduplicate")) {
@@ -790,7 +790,7 @@ function html_list_form($action, $list_q, $list) {
   if ( ($action == "new") || ($action == "insert")
        || ($action == "detailduplicate")
        || ( (($action == "detailupdate") || ($action == "update")) && 
-	    ($usercreate == $uid) ) ) {
+	    ($usercreate == $obm["uid"]) ) ) {
     $dis_priv = "
       <th>$l_private</th>
       <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";

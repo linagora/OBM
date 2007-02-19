@@ -39,7 +39,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/global.inc");
 $params = get_time_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
-$uid = $auth->auth["uid"];
 update_time_session_params();
 include("$obminclude/global_pref.inc");
 require("time_display.inc");
@@ -135,19 +134,19 @@ if ($action == "index") {
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($auth->auth["uid"], "time", 1);
+  $prefs = get_display_pref($obm["uid"], "time", 1);
   $display["detail"] = dis_time_display_pref($prefs);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($auth->auth["uid"], "time", 1);
+  $prefs = get_display_pref($obm["uid"], "time", 1);
   $display["detail"] = dis_time_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($auth->auth["uid"], "time", 1);
+  $prefs = get_display_pref($obm["uid"], "time", 1);
   $display["detail"] = dis_time_display_pref($prefs);
 }  
 
@@ -168,7 +167,6 @@ display_page($display);
 // returns : $task hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_time_params() {
-  global $uid;
 
   // Get global params
   $params = get_global_params();
@@ -193,25 +191,24 @@ function get_time_params() {
 // Update session and parameters
 ///////////////////////////////////////////////////////////////////////////////
 function update_time_session_params() {
-  global $sess, $sess_users, $params, $uid;
+  global $params, $obm;
 
   // We retrieve the selected users if any, else we get them from sessiom
   // or from selected user (alone) or we set it to uid
   if (! isset($params["user_ids"])) {
-    if (isset($sess_users)) {
-      if (is_array($sess_users)) {
-	$params["user_ids"] = $sess_users;
+    if (isset($_SESSION['sess_users'])) {
+      if (is_array($_SESSION['sess_users'])) {
+	$params["user_ids"] = $_SESSION['sess_users'];
       } else {
-	$params["user_ids"] = array($sess_users);
+	$params["user_ids"] = array($_SESSION['sess_users']);
       }
     } else if (isset($params["user_id"])) {
       $params["user_ids"] = array($params["user_id"]);
     } else {      
-      $params["user_ids"] = array($uid);
+      $params["user_ids"] = array($obm["uid"]);
     }
   }
-  $sess_users = $params["user_ids"];
-  $sess->register("sess_users");
+  $_SESSION['sess_users'] = $params["user_ids"];
 
 
   // We retrieve the selected user if set, else we set it them from multi select
@@ -220,7 +217,7 @@ function update_time_session_params() {
     if (is_array($params["user_ids"]) && (count($params["user_ids"]) == 1) ) {
       $params["user_id"] = $params["user_ids"][0];
     } else {
-      $params["user_id"] = $uid;
+      $params["user_id"] = $obm["uid"];
     }
   }
 

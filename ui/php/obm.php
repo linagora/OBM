@@ -14,15 +14,18 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 $params = get_obm_params();
+//echo "action2=$action --";
 include_once("obm_query.inc");
 require("$obminclude/lib/right.inc");
-
-
 
 $OBM_Session = $params["OBM_Session"];
 if ($action == "") { $action = "home"; }
 //print_r($params);
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+
+//echo "<p>----from obm.php--";
+//print_r($obm);
+//echo "<p>----";
 
 if ($action == "logout") {
   include("$obminclude/global_pref.inc");
@@ -30,14 +33,14 @@ if ($action == "logout") {
   $display["end"] = display_end();
   $display["detail"] = dis_logout_detail();
   run_query_logout();
-  $auth->logout();
+  $_SESSION['obm'] = "";
   $sess->delete();
   $action = "";
   display_page($display);
   exit;
 } else {
   include("$obminclude/global_pref.inc");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 }
 
 $extra_css[] = $css_portal;
@@ -158,7 +161,7 @@ function dis_logout_detail() {
 function dis_calendar_portal() {
   global $ico_big_calendar,$path;
   global $l_module_calendar,$l_daysofweekfirst,$l_my_calendar,$l_waiting_events;
-  global $auth, $ccalendar_weekstart;
+  global $obm, $ccalendar_weekstart;
 
   $obm_q = run_query_calendar_waiting_events() ;
   $num = $obm_q->num_rows();
@@ -170,7 +173,7 @@ function dis_calendar_portal() {
   $end_time = strtotime("+1 month +6 days", $start_time);
 
   $current_time = $start_time; 
-  $calendar_entity["user"] = array($auth->auth["uid"] => array("dummy"));
+  $calendar_entity["user"] = array($obm["uid"] => array("dummy"));
   $occurrences = calendar_events_model($start_time,$end_time, $calendar_entity);
   $whole_month = TRUE;
   $num_of_events = 0;
@@ -346,31 +349,37 @@ function dis_deal_portal() {
 
   $block = "
   <div class=\"summaryBox\"> 
-   <h1>
+  <h1>
    <img src=\"$ico_big_deal\" alt=\"Deal\" />$l_module_deal
-   </h1>
-   <dl>
-   <dt><a href=\"$path/deal/deal_index.php?action=dashboard&amp;sel_manager=$uid\">$l_my_deal_current</a></dt>
-   <dd>$m_nb_potential / $t_nb_potential</dd>
-   <dt>$l_deal_total</dt>
-   <dd>$m_amount</dd>
-   <dt>$l_deal_balanced</dt>
-   <dd>$m_balanced</dd>
-    <table>
-    <tr>
-      <td></td>
-      <td class=\"number\"></td>
-    </tr><tr>
-      <td></td>
-      <td class=\"number\">&nbsp; </td>
-    </tr><tr>
-      <td></td>
-      <td class=\"number\"></td>
-    </tr>
-    <tr><td>&nbsp;</td><td></td></tr>
-    $dis_status
-    </table>
-   <a class=\"link\" href=\"$path/deal/deal_index.php?action=search&amp;sel_manager=$uid\">$l_my_deal</a>
+  </h1>
+  <dl>
+  <dt><a href=\"$path/deal/deal_index.php?action=dashboard&amp;sel_manager=$uid\">$l_my_deal_current</a></dt>
+  <dd>$m_nb_potential / $t_nb_potential</dd>
+  <dt>$l_deal_total</dt>
+  <dd>$m_amount</dd>
+  <dt>$l_deal_balanced</dt>
+  <dd>$m_balanced</dd>
+
+  <table>
+  <tr>
+    <td></td>
+    <td class=\"number\"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class=\"number\">&nbsp; </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class=\"number\"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td></td>
+  </tr>
+  $dis_status
+  </table>
+  <a class=\"link\" href=\"$path/deal/deal_index.php?action=search&amp;sel_manager=$uid\">$l_my_deal</a>
   </div>";
 
   return $block;

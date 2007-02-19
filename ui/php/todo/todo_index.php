@@ -26,8 +26,6 @@ require("todo_query.inc");
 require("todo_display.inc");
 require_once("todo_js.inc");
 
-$uid = $auth->auth["uid"];
-
 get_todo_action();
 $perm->check_permissions($module, $action);
 
@@ -116,19 +114,19 @@ if ($action == "index" || $action == "") {
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($auth->auth["uid"], "todo", 1);
+  $prefs = get_display_pref($obm["uid"], "todo", 1);
   $display["detail"] = dis_todo_display_pref($prefs);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($auth->auth["uid"], "todo", 1);
+  $prefs = get_display_pref($obm["uid"], "todo", 1);
   $display["detail"] = dis_todo_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($auth->auth["uid"], "todo", 1);
+  $prefs = get_display_pref($obm["uid"], "todo", 1);
   $display["detail"] = dis_todo_display_pref($prefs);
 }
 

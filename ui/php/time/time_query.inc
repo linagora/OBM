@@ -118,7 +118,7 @@ function run_query_time_stat_project($time) {
       AND timetask_user_id in $uid_tab
     GROUP BY project_id
     having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
-    ";
+";
 
   display_debug_msg($query, $cdg_sql, "run_query_time_stat_project_by_month");
 
@@ -264,7 +264,7 @@ function run_query_time_get_task($id) {
 //     keys used  : tasktype, project, time, label, date
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_time_insert($task) {
-  global $uid, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $valid_date = run_query_time_valid_search($task);
   $day = $task["day"];
@@ -295,7 +295,7 @@ function run_query_time_insert($task) {
          null,
          '" . date("Y-m-d H:i:s") . "',
          null,
-         '$uid',
+         '$obm[uid]',
          '$user_id',
          '$key',
          $projecttask,
@@ -326,7 +326,7 @@ function run_query_time_insert($task) {
          null,
          '" . date("Y-m-d H:i:s") . "',
          null,
-         '$uid',
+         '$obm[uid]',
          '$user_id',
          '$date',
          $projecttask,
@@ -705,8 +705,8 @@ function run_query_time_user_month_planning($time) {
       AND timetask_date <= '$month_end'
       AND timetask_user_id IN $uid_tab
     GROUP BY  date, timetask_status, id, label,userobm_id,userobm_lastname,userobm_firstname,type
-    ORDER by type,label    
-    ";
+    ORDER by type,label
+";
   
   display_debug_msg($query, $cdg_sql, "run_query_time_task_one_month");
   $obm_db = new DB_OBM;
@@ -800,20 +800,9 @@ function run_query_time_used_tasktype($uid = 0) {
   return $obm_q;
 }
 
-//     $query = "
-//       select distinct TaskType.*
-//       from TaskType
-//         left join Deal on (tasktype_id = deal_tasktype_id
-//                            and deal_archive = 0
-//                            and deal_project_status != 0)
-//         left join ProjectUser on (deal_id=projectuser_project_id
-//                                   and projectuser_projectedtime != 0)
-//       where (tasktype_internal in (0,1) and (projectuser_user_id=$uid))
-//         or tasktype_internal='$ctt_others'
-//       order by tasktype_internal, tasktype_label";
 
 ///////////////////////////////////////////////////////////////////////////////
-// Timemanager: Project select query execution                              //
+// Timemanager: Project select query execution
 // Returns : DB object result with project satisfying criteria
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_time_project($time) {
@@ -822,21 +811,21 @@ function run_query_time_project($time) {
   $uid = $time["user_id"];
 
   $query = "
-    select distinct
+    SELECT distinct
       project_id,
       project_company_id,
       project_name,
       company_name,
       project_tasktype_id
-    from Project
-      left join Company on company_id = project_company_id,
+    FROM Project
+      LEFT JOIN Company ON company_id = project_company_id,
       ProjectTask, ProjectUser
-    where project_archive='0'
-      and projectuser_projecttask_id = projecttask_id
-      and projecttask_project_id = project_id
-      and projectuser_user_id = '$uid'
-      and projectuser_projectedtime != '0'
-      order by project_tasktype_id, company_name, project_name";
+    WHERE project_archive='0'
+      AND projectuser_projecttask_id = projecttask_id
+      AND projecttask_project_id = project_id
+      AND projectuser_user_id = '$uid'
+      AND projectuser_projectedtime != '0'
+      ORDER BY project_tasktype_id, company_name, project_name";
 
   display_debug_msg($query, $cdg_sql, "run_query_time_project");
   $obm_q= new DB_OBM;
@@ -869,17 +858,17 @@ function run_query_time_projecttask($time) {
   $sql_if = sql_if($db_type, "a.projecttask_parenttask_id = 0", "a.projecttask_label", $concat);
 
   $query = "
-    select
+    SELECT
       a.projecttask_id,
       $sql_if as projecttask_label,
       a.projecttask_project_id
-    from ProjectTask a left join ProjectTask b 
-       on a.projecttask_parenttask_id = b.projecttask_id,
+    FROM ProjectTask a left join ProjectTask b 
+       ON a.projecttask_parenttask_id = b.projecttask_id,
        ProjectUser
-    where projectuser_projecttask_id = a.projecttask_id
-      and projectuser_user_id = $uid
-      and projectuser_projectedtime != 0
-      order by a.projecttask_project_id, a.projecttask_label";
+    WHERE projectuser_projecttask_id = a.projecttask_id
+      AND projectuser_user_id = $uid
+      AND projectuser_projectedtime != 0
+      ORDER BY a.projecttask_project_id, a.projecttask_label";
 
   display_debug_msg($query, $cdg_sql, "run_query_time_projecttask");
   $obm_q = new DB_OBM;

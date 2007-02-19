@@ -14,16 +14,16 @@
 //   - $ctry : data source hash info : keys used : name
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_country_insert($ctry) {
-  global $auth, $cdg_sql,$obm;
+  global $obm, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $name = $ctry["ctry_name"];
   $iso = $ctry["ctry_code"];
   $lang = $ctry["ctry_lang"];
   $phone = $ctry["ctry_phone"];
 
-  $query = "insert into Country (
+  $query = "INSERT INTO Country (
       country_timecreate,
       country_usercreate,
       country_iso3166,
@@ -31,17 +31,16 @@ function run_query_admin_ref_country_insert($ctry) {
       country_lang,
       country_phone,
       country_domain_id
-    )
-    values (
-      '$timecreate',
-      '$usercreate',
-      '$iso',
-      '$name',
-      '$lang',
-      '$phone',
-      '$obm[domain_id]')";
+    ) VALUES (
+     '$timecreate',
+     '$usercreate',
+     '$iso',
+     '$name',
+     '$lang',
+     '$phone',
+     '$obm[domain_id]')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_country_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -55,10 +54,10 @@ function run_query_admin_ref_country_insert($ctry) {
 //   - $ctry : data source hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_country_update($ctry) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $name = $ctry["ctry_name"];
   $iso = $ctry["ctry_code"];
   $lang = $ctry["ctry_lang"];
@@ -67,19 +66,20 @@ function run_query_admin_ref_country_update($ctry) {
   $old_lang = $ctry["ctry_old_lang"];
 
   $multidomain = sql_multidomain("country");
-  $query = "update Country set
+
+  $query = "UPDATE Country SET
       country_iso3166='$iso',
       country_name='$name',
       country_lang='$lang',
       country_phone='$phone',
       country_timeupdate='$timeupdate',
       country_userupdate='$userupdate'
-    where
+    WHERE
       country_iso3166='$old_iso'
-      and country_lang='$old_lang'
+      AND country_lang='$old_lang'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_country_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -97,14 +97,14 @@ function run_query_admin_ref_country_delete($ctry) {
 
   $iso = $ctry["ctry_code"];
   $lang = $ctry["ctry_lang"];
-
   $multidomain = sql_multidomain("country");
-  $query = "delete from Country
-    where country_iso3166='$iso'
-    and country_lang='$lang'
-    $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  $query = "DELETE FROM Country
+    WHERE country_iso3166='$iso'
+      AND country_lang='$lang'
+      $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_country_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -121,13 +121,14 @@ function run_query_admin_ref_country_company_links($iso) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("company");
-  $query = "select company_id,
+  $query = "SELECT company_id,
       company_name,
       company_country_iso3166
-    from Company
-    where company_country_iso3166='$iso' $multidomain";
+    FROM Company
+    WHERE company_country_iso3166='$iso'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_country_company_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -142,14 +143,17 @@ function run_query_admin_ref_country_company_links($iso) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_country_contact_links($iso) {
   global $cdg_sql;
+
   $multidomain = sql_multidomain("contact");
-  $query = "select contact_id,
+  $query = "SELECT contact_id,
       contact_lastname,
       contact_firstname,
       contact_country_iso3166
-    from Contact where contact_country_iso3166='$iso' $multidomain";
+    FROM Contact
+    WHERE contact_country_iso3166='$iso'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_country_contact_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -167,13 +171,13 @@ function get_admin_ref_country_name($iso, $lang) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("country");
-  $query = "select country_name
-    from Country
-    where country_iso3166='$iso'
-    and country_lang='$lang'
-    $multidomain";
+  $query = "SELECT country_name
+    FROM Country
+    WHERE country_iso3166='$iso'
+      AND country_lang='$lang'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_admin_ref_country_name()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -189,10 +193,10 @@ function get_admin_ref_country_name($iso, $lang) {
 //   - $dsrc : data source hash info : keys used : name
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_datasource_insert($dsrc) {
-  global $auth, $cdg_sql, $obm;
+  global $obm, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $name = $dsrc["dsrc_name"];
 
   $query = "INSERT INTO DataSource (
@@ -208,7 +212,7 @@ function run_query_admin_ref_datasource_insert($dsrc) {
       '$obm[domain_id]'
     )";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_datasource_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -222,12 +226,12 @@ function run_query_admin_ref_datasource_insert($dsrc) {
 //   - $dsrc : data source hash info : keys used : act, name
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_datasource_update($dsrc) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $id = $dsrc["dsrc"];
-  $name = $dsrc["dsrcname"];
+  $name = $dsrc["dsrc_name"];
   $multidomain = sql_multidomain("datasource");
 
   $query = "UPDATE DataSource SET
@@ -235,9 +239,10 @@ function run_query_admin_ref_datasource_update($dsrc) {
       datasource_timeupdate='$timeupdate',
       datasource_userupdate='$userupdate'
     WHERE
-      datasource_id='$id' $multidom";
+      datasource_id='$id'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_datasource_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -258,7 +263,7 @@ function run_query_admin_ref_datasource_delete($dsrc) {
 
   $query = "DELETE FROM DataSource WHERE datasource_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_datasource_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -283,7 +288,7 @@ function run_query_admin_ref_datasource_company_links($dsrc) {
     FROM Company
     WHERE company_datasource_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_datasource_company_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -309,7 +314,7 @@ function run_query_admin_ref_datasource_contact_links($dsrc) {
     FROM Contact
     WHERE contact_datasource_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_datasource_contact_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -318,7 +323,7 @@ function run_query_admin_ref_datasource_contact_links($dsrc) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the name of a Data Source from its id                                 //
+// Get the name of a Data Source from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
@@ -326,11 +331,12 @@ function get_admin_ref_datasource_name($id) {
   global $cdg_sql;
   $multidomain = sql_multidomain("datasource");
 
-  $query = "select datasource_name
-    from DataSource
-    where datasource_id='$id' $multidomain";
+  $query = "SELECT datasource_name
+    FROM DataSource
+    WHERE datasource_id='$id'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_admin_ref_datasource_name()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -346,21 +352,20 @@ function get_admin_ref_datasource_name($id) {
 //   - $tt : task type hash info : keys used : label, internal
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_tasktype_insert($tt) {
-  global $auth, $cdg_sql, $obm;
+  global $obm, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $label = $tt["tt_label"];
   $int = $tt["internal"];
 
-  $query = "insert into TaskType (
+  $query = "INSERT INTO TaskType (
       tasktype_timecreate,
       tasktype_usercreate,
       tasktype_label,
       tasktype_internal,
       tasktype_domain_id
-    )
-    values (
+    ) VALUES (
       '$timecreate',
       '$usercreate',
       '$label',
@@ -368,7 +373,7 @@ function run_query_admin_ref_tasktype_insert($tt) {
       '$obm[domain_id]'
     )";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_tasktype_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -382,24 +387,24 @@ function run_query_admin_ref_tasktype_insert($tt) {
 //   - $tt : task type hash info : keys used : tasktype, label, int
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_tasktype_update($tt) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $multidomain = sql_multidomain("tasktype");
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $id = $tt["tasktype"];
   $label = $tt["tt_label"];
   $int = $tt["internal"];
 
-  $query = "update TaskType set
+  $query = "UPDATE TaskType SET
       tasktype_label='$label',
       tasktype_timeupdate='$timeupdate',
       tasktype_userupdate='$userupdate'
-    where
-    tasktype_id='$id'
-    $multidomain";
+    WHERE
+      tasktype_id='$id'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_tasktype_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -418,9 +423,9 @@ function run_query_admin_ref_tasktype_delete($tt) {
   $id = $tt["tasktype"];
   $multidomain = sql_multidomain("tasktype");
 
-  $query = "delete from TaskType where tasktype_id='$id' $multidomain";
+  $query = "DELETE FROM TaskType WHERE tasktype_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_tasktype_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -439,13 +444,14 @@ function run_query_admin_ref_tasktype_deal_links($tt) {
   $id = $tt["tasktype_id"];
   $multidomain = sql_multidomain("deal");
 
-  $query = "select deal_id,
+  $query = "SELECT deal_id,
       deal_label,
       deal_tasktype_id
-    from Deal
-    where deal_tasktype_id='$id' $multidomain";
+    FROM Deal
+    WHERE deal_tasktype_id='$id'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_tasktype_deal_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -464,12 +470,14 @@ function run_query_admin_ref_tasktype_project_links($tt) {
   $id = $tt["tasktype_id"];
   $multidomain = sql_multidomain("project");
 
-  $query = "select project_id,
+  $query = "SELECT project_id,
       project_name,
       project_tasktype_id
-    from Project where project_tasktype_id='$id' $multidomain";
+    FROM Project
+    WHERE project_tasktype_id='$id'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_tasktype_project_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -492,17 +500,18 @@ function run_query_admin_ref_tasktype_timetask_links($tt) {
   $db_type = $obm_q->type;
   $timedate = sql_date_format($db_type, "timetask_date", "date");
 
-  $query = "select timetask_id,
+  $query = "SELECT timetask_id,
       timetask_user_id,
       $timedate,
       userobm_lastname as lastname,
       userobm_firstname as firstname,
       timetask_tasktype_id
-    from TimeTask
-         left join UserObm on timetask_user_id=userobm_id
-    where timetask_tasktype_id='$id' $multidomain";
+    FROM TimeTask
+         LEFT JOIN UserObm ON timetask_user_id=userobm_id
+    WHERE timetask_tasktype_id='$id'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_admin_ref_tasktype_timetask_links()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -516,13 +525,15 @@ function run_query_admin_ref_tasktype_timetask_links($tt) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_admin_ref_tasktype_label($id) {
   global $cdg_sql;
+
   $multidomain = sql_multidomain("tasktype");
 
-  $query = "select tasktype_label
-    from TaskType
-    where tasktype_id='$id' $multidomain";
+  $query = "SELECT tasktype_label
+    FROM TaskType
+    WHERE tasktype_id='$id'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_admin_ref_tasktype_label()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();

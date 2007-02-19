@@ -17,7 +17,7 @@
 //   - $restriction : if and which restriction to set (eg calendar readable)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_search($user) {
-  global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
+  global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $sql_order_dir = $user["sql_order_dir"];
   $sql_order_field = $user["sql_order_field"];
@@ -41,8 +41,7 @@ function run_query_user_search($user) {
   $multidomain = sql_multidomain("userobm");
 
   if ($restriction == "calendar") {
-    $uid = $auth->auth["uid"];
-    $users = of_right_entity_for_consumer("calendar", "user", $uid, "read");
+    $users = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "read");
     if ((is_array($users["ids"])) && (count($users["ids"]) > 0)) {
       $where_restriction = " AND (userobm_id IN (";
       foreach($users["ids"] as $u_id) {
@@ -217,11 +216,11 @@ function run_query_user_detail($p_id) {
 //   $id : new user id if ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_insert($user) {
-  global $auth, $cdg_sql, $cgp_use, $obm, $password_encryption, $perms_admin;
+  global $obm, $cdg_sql, $cgp_use, $obm, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $login = $user["login"];
   $passwd = $user["passwd"];
   if ($passwd != "") {
@@ -524,7 +523,7 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
 //     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_update($p_id, $user) {
-  global $auth, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
+  global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
   $login = $user["login"];
@@ -648,7 +647,7 @@ function run_query_user_update($p_id, $user) {
 
   $query = "UPDATE UserObm SET
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
-    userobm_userupdate=". $auth->auth["uid"] .",
+    userobm_userupdate='". $obm["uid"] ."',
     userobm_login='$login',
     $passwd_update
     userobm_perms='$perms',
@@ -726,13 +725,13 @@ function run_query_user_delete($p_id) {
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_user_group($p_id) {
-  global $cdg_sql, $uid;
+  global $cdg_sql, $obm;
 
   $query = "SELECT *
     FROM UGroup
       LEFT JOIN UserObmGroup ON group_id = userobmgroup_group_id
     WHERE userobmgroup_userobm_id='$p_id'
-      AND (group_privacy=0 OR group_usercreate='$uid')";
+      AND (group_privacy=0 OR group_usercreate='$obm[uid]')";
 
   display_debug_msg($query, $cdg_sql, "run_query_user_user_group()");
   $obm_q = new DB_OBM;
@@ -766,7 +765,7 @@ function run_query_user_unsubscribe_all_groups($p_id) {
 // Groups query execution
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_group() {
-  global $cdg_sql, $uid;
+  global $cdg_sql;
 
   $multidomain = sql_multidomain("group");
 

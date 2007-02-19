@@ -38,7 +38,8 @@ class OBM_DISPLAY {
                               //   "string" if ->f["string"] == 0 -> visible
   var $data_form_head = "";   // Form header
   var $data_form_end = "";    // Form end
-  var $delimiter = '"';        // CVS field delimiter (enclosed by)
+  var $delimiter = '"';       // CVS field delimiter (enclosed by)
+  var $sql_order_dir = "ASC"; // SQL Sorting direction
 
   /////////////////////////////////////////////////////////////////////////////
   // OBM_DISPLAY Constructor
@@ -50,6 +51,8 @@ class OBM_DISPLAY {
   //   - $name   : dataset name
   /////////////////////////////////////////////////////////////////////////////
   function OBM_DISPLAY($type, $pref, $module, $entity="", $name="") {
+    global $params;
+
     if ( ($type != "PREFERENCES") && 
 	($type != "DATA") ) {
       die("ERROR: the type MUST be PREFERENCES or DATA");
@@ -70,6 +73,7 @@ class OBM_DISPLAY {
     if (isset($name)) {
       $this->display_name = $name;
     }
+    $this->sql_order_dir = ($params["sql_order_dir"] == "ASC" ? "DESC" : "ASC");
   }
   
   /////////////////////////////////////////////////////////////////////////////
@@ -490,7 +494,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call (module formatting fields)
   /////////////////////////////////////////////////////////////////////////////
     function dis_data_index($url, $dis_data_entity) {
-    global $path, $page, $sql_order_field, $sql_order_dir, $entity, $of_display_name, $ctu_sql_limit;
+    global $path, $page, $sql_order_field, $entity, $of_display_name, $ctu_sql_limit;
     global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
     global $set_rows, $set_rows_default;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
@@ -499,6 +503,7 @@ class OBM_DISPLAY {
     $nb_page_dis = 10;
     $this_entity = $this->display_entity;
     $this_name = $this->display_name;
+    $sql_order_dir = $this->sql_order_dir;
 
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {
@@ -624,7 +629,7 @@ class OBM_DISPLAY {
   //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
-    global $of_display_name, $page, $sql_order_dir, $sql_order_field;
+    global $of_display_name, $page, $sql_order_field;
     global $fieldnames, $cgp_hide, $cdg_id, $set_debug, $l_id;
     global $ico_arrow_up, $ico_arrow_down, $ico_arrow_off;
 
@@ -635,6 +640,8 @@ class OBM_DISPLAY {
 
     $entity = $this->display_entity;
     $this_name = $this->display_name;
+    $sql_order_dir = $this->sql_order_dir;
+
     $block = "
       <thead>
     <tr>";
@@ -666,14 +673,13 @@ class OBM_DISPLAY {
 	     || $cgp_hide[$entity][$fieldname_base])) {
 	$label = $fieldnames[$fieldname];
   
-  $order = ($sql_order_dir == "DESC" ? "ASC" : "DESC");
         $img = "";
         $onclick = ""; 
 	if ($this->data_order) {
 	  $furl = $url;
           if ($url != "") {
-            if($sql_order_field == $fieldname) {
-              if($sql_order_dir == "DESC") {
+            if ($sql_order_field == $fieldname) {
+              if ($sql_order_dir == "DESC") {
                 $img = "<img src='$ico_arrow_up' alt='sort' />";
               } else {
                 $img = "<img src='$ico_arrow_down' alt='sort' />";
@@ -681,9 +687,9 @@ class OBM_DISPLAY {
             }
 	    // If action on this dataset
 	    if ($this_name == $of_display_name) {
-	      $furl .= "&amp;page=$page&amp;sql_order_field=$fieldname&amp;sql_order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
+	      $furl .= "&amp;page=$page&amp;sql_order_field=$fieldname&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
 	    } else {
-	      $furl .= "&amp;page=1&amp;sql_order_field=$fieldname&amp;sql_order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
+	      $furl .= "&amp;page=1&amp;sql_order_field=$fieldname&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
 	    }
           }
           $onclick = "onclick=\"window.location.href='$furl'\" onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\" ";

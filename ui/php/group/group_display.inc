@@ -207,12 +207,12 @@ function html_group_search_form ($group) {
 //     keys used  : name, description, email
 ///////////////////////////////////////////////////////////////////////////////
 function dis_group_search_group($group) {
-  global $display, $l_found, $l_no_found, $auth;
+  global $obm, $display, $l_found, $l_no_found;
 
   $child_res = $group["children_restriction"];
   $widget = $group["ext_widget"];
 
-  $prefs = get_display_pref($auth->auth["uid"], "group");
+  $prefs = get_display_pref($obm["uid"], "group");
   if ($child_res) {
     $obm_q = run_query_group_search_possible_children($group);
   }  else {
@@ -315,7 +315,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
 function html_group_form($action, $group_q, $group) {
   global $cgroup_private_default, $l_group, $l_name, $l_desc, $l_email, $l_mailing;
   global $l_private, $l_insert, $l_update, $l_back;
-  global $auth;
+  global $obm;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -344,7 +344,7 @@ function html_group_form($action, $group_q, $group) {
   // If new group or group update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action == "detailupdate") || ($action == "update")) &&
-         ($usercreate == $auth->auth["uid"]) ) ) {
+         ($usercreate == $obm["uid"]) ) ) {
     if ($priv == '1') {
       $private_c = " checked";
       $mail_class = "H";
@@ -467,7 +467,6 @@ function dis_group_consult($group, $uid) {
 //   - $g_q      : group database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
-  global $auth;
   global $l_yes, $l_no, $ico_mail;
   global $l_group, $l_name, $l_desc, $l_email, $l_mailing, $l_no_user, $l_no_group_group;
   global $l_system, $l_local, $l_ext_id;

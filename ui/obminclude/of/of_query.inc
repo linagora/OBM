@@ -230,11 +230,11 @@ function sql_limit($db_type, $number="", $p_offset="", $name="") {
 // Returns true if entity is visible, else false
 ///////////////////////////////////////////////////////////////////////////////
 function sql_obm_entity_privacy($entity, $p_uid="") {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   // Set uid if not given
   if ($p_uid == "") {
-    $uid = $auth->auth["uid"];
+    $uid = $obm["uid"];
   } else {
     $uid = $p_uid;
   }
@@ -357,6 +357,7 @@ function of_domain_get_domain_infos($d_id) {
   } else {
     $domain["id"] = "0";
     $domain["label"] = "Global";
+    $domain["name"] = "global.local";
   }
 
   return $domain;
@@ -601,9 +602,9 @@ function get_one_display_pref($u_id, $entity, $fieldname) {
 //   - $sql_order_field  : new display order; "" if not updated
 ///////////////////////////////////////////////////////////////////////////////
 function update_display_pref($entity, $fieldname, $new_status, $sql_order_field="") {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $prefs = get_one_display_pref($uid, $entity, $fieldname);
   $default_order = $prefs[0]["order"];
   $default_status = $prefs[0]["status"];
@@ -1051,12 +1052,12 @@ function run_query_user_pref_update($user_id, $option, $value) {
 // This must be called in an open session (between page_open and page_close )
 ///////////////////////////////////////////////////////////////////////////////
 function session_load_user_prefs() {
-  global $sess, $auth, $last_v;
+  global $obm, $last_v;
 
   // We reset $last_v in case of session persistence (changing user)
   $last_v = array();
 
-  $prefs = get_user_pref($auth->auth["uid"]);
+  $prefs = get_user_pref($obm["uid"]);
   while ( list($option, $info) = each($prefs) ) {
     $value = $info["value"];
     global $$option;
@@ -1072,11 +1073,11 @@ function session_load_user_prefs() {
       }
       // Other preferences
     } else {
-      $sess->register("$option");
+      $_SESSION["$option"] = $value;
     }
   }
 
-  $sess->register("last_v");
+  $_SESSION["last_v"] = $last_v;
 }
 
 
@@ -1192,14 +1193,14 @@ function run_query_log_session($obm_q) {
 //   - $action : action called 
 ///////////////////////////////////////////////////////////////////////////////
 function update_last_visit($entity, $id, $action) {
-  global $auth, $last_v;
+  global $obm, $last_v;
 
   if ( ($id == $last_v[$entity]["id"]) && (strcmp($action,"delete")==0) ) {
     $last_v[$entity]["id"] = 0;
     $last_v[$entity]["text"] = 0;
   } else if ( ($id > 0 ) && ($last_v[$entity]["id"] != $id) ) {
     $last_v[$entity]["id"] = $id;
-    update_user_pref($auth->auth["uid"], "last_$entity", $id);
+    update_user_pref($obm["uid"], "last_$entity", $id);
     $function_get_last_text = "get_last_${entity}_text";
     $last_v[$entity]["text"] = $function_get_last_text($id);
   }
@@ -1325,13 +1326,13 @@ function get_user_id($login) {
 // Used by: time only !!
 ///////////////////////////////////////////////////////////////////////////////
 function get_user_info($id="") {
-  global $cdg_sql, $auth;
+  global $cdg_sql, $obm;
 
   $obm_q = new DB_OBM ;
   $db_type = $obm_q->type;
   $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
 
-  if ($id == "") $id = $auth->auth["uid"];
+  if ($id == "") $id = $obm["uid"];
 
   $query = "SELECT *,
       $datebegin
@@ -1778,9 +1779,9 @@ function run_query_get_resources_info($resources) {
 // Get sender mail address
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_sender() {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $query = "SELECT userobm_email, userobm_lastname, userobm_firstname
     FROM UserObm
     WHERE userobm_id = '$uid'";
@@ -1789,6 +1790,7 @@ function run_query_get_sender() {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
+
   return $obm_q;
 }
 

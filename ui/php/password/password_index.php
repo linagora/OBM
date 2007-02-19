@@ -22,8 +22,6 @@ include("$obminclude/global_pref.inc");
 require("password_display.inc");
 require("password_query.inc");
 
-$uid = $auth->auth["uid"];
-
 if ($action == "") $action = "index";
 get_password_action();
 $perm->check_permissions($module, $action);
@@ -31,7 +29,7 @@ $perm->check_permissions($module, $action);
 
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_password($uid);
+  $obm_q = run_query_password($obm["uid"]);
   if ($obm_q->num_rows() == 1) {
     $display["detail"] = html_password_form($obm_q, $params);
   } else {
@@ -40,20 +38,20 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_password($uid);
+  $obm_q = run_query_password($obm["uid"]);
   if (check_data_form($obm_q, $params)) {
-    $retour = run_query_password_update($params, $uid, $obm_q);
+    $retour = run_query_password_update($params, $obm["uid"], $obm_q);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_password : $l_update_ok");
-      $obm_q = run_query_password($uid);
+      $obm_q = run_query_password($obm["uid"]);
       $display["detail"] = html_password_form($obm_q, $params);
     } else {
       $display["msg"] = display_err_msg("$l_password : $l_update_error");
       $display["detail"] = html_password_form($obm_q, $params);
     }
   } else {
-    $display["msg"] = display_err_msg("$l_password : $err_msg");
-    $display["detail"] = html_password_form($obm_q, $params, $err_field);
+    $display["msg"] = display_err_msg("$l_password : $err[msg]");
+    $display["detail"] = html_password_form($obm_q, $params, $err["field"]);
   }
 }
 

@@ -21,12 +21,19 @@
 \hline
 \$obminclude & nom du répertoire ``obminclude'' & défini en tête des modules \\ 
 \hline
+\$obm & informations globales
+\begin{itemize}
+\item[->[uid]] : id de l'utilisateur
+\item[->[profile]] : profil de l'utilisateur
+\item[->[domain\_id]] : domaine de l'utilisateur
+\item[->[domain\_label]] : nom du domaine de l'utilisateur
+\end{itemize}
+ & remplace les variables de l'ancien \$auth\\ 
+\hline
 \$auth & informations d'authentification
 \begin{itemize}
-\item[->auth[uid]] : id de l'utilisateur
-\item[->auth[perm]] : profil de l'utilisateur
-\item[->auth[domain\_id]] : domaine de l'utilisateur
-\item[->auth[domain\_lqbel]] : nom du domaine de l'utilisateur
+\item[->auth[exp]] : domaine de l'utilisateur
+\item[->auth[refresh]] : nom du domaine de l'utilisateur
 \end{itemize}
  & hérité de phplib. A faire évoluer \\ 
 \hline

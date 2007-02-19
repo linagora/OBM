@@ -214,10 +214,9 @@ function html_payment_search_form($params, $kinds, $accs) {
 //   - $params[] : params (search criteria)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_payment_search_list($params) {
-  global $display, $l_found, $l_no_found;
-  global $auth;
+  global $obm, $display, $l_found, $l_no_found;
 
-  $prefs = get_display_pref($auth->auth["uid"], "payment");
+  $prefs = get_display_pref($obm["uid"], "payment");
   $obm_q = run_query_payment_search($params);
   $nb_payment = $obm_q->num_rows_total();
   if ($nb_payment == 0) {
@@ -613,9 +612,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   global $l_update, $l_checkdelete, $l_insert;
   global $popup_width, $popup_height;
   global $l_header_new, $ico_mini_cal;
-  global $display, $path, $auth, $c_undef, $l_undef;
-
-  $uid = $auth->auth["uid"];
+  global $display, $path, $c_undef, $l_undef;
 
   // if update mode and first time values are taken from database
   if (($action == "detailupdate") || ($action == "detailduplicate")) {

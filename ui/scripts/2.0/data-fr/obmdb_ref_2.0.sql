@@ -192,6 +192,7 @@ INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_created, invoice
 INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES ('1', '1', '1', 'Payée');
 INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES ('0', '1', '1', 'Annulée');
 INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES ('0', '1', '1', 'Pertes et profits');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES ('1', '1', '0', 'Reçue');
 
 
 --

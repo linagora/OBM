@@ -304,10 +304,10 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_search_list($contract) {
   global $l_found, $l_no_found;
-  global $display, $auth;
+  global $display, $obm;
   
   $popup = $contract["popup"];
-  $prefs = get_display_pref($auth->auth["uid"], "contract");
+  $prefs = get_display_pref($obm["uid"], "contract");
   $obm_q = run_query_contract_search($contract);
   $nb_contract = $obm_q->num_rows_total();
   if ($nb_contract == 0) {
@@ -400,7 +400,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   global $l_module_incident, $l_incident_list, $l_incident_new, $l_last;
   global $l_module_deal, $l_module_document, $l_contract;
   global $l_document_new,$l_document_add,$l_add_document,$l_deal;
-  global $path, $auth, $cgp_show,$popup_height,$popup_width;
+  global $path, $cgp_show,$popup_height,$popup_width;
   
   $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;contract_id=$id");
   $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;contract_id=$id&amp;sel_owner=$tech_id&amp;tf_lcontract=$con_label");
@@ -781,7 +781,7 @@ function dis_contract_form($action,$contract,$param_company) {
 function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp_q,$contact_q, $contract,$pri_q,$sta_q){
   // - Themes
   global $cgp_show;
-  global $uid, $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
+  global $obm, $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
   global $path, $c_php_isodate_format, $c_undef, $l_undef, $l_update,$l_insert;
   global $l_label, $l_begin, $l_type, $l_marketing_manager, $l_archive;
   global $l_signature, $l_begin, $l_exp, $l_renew,$l_date_cancel,$l_dates;
@@ -790,7 +790,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   global $l_comment,$l_add_comment,$l_upd_comment;
   global $l_contract_select_deal,$l_client_manager,$l_deal,$l_contract,$l_company;
   global $l_contract_kind,$l_format,$l_autorenewal;
-  global $l_ticket_nb,$l_private,$uid,$l_duration; 
+  global $l_ticket_nb,$l_private, $l_duration; 
   global $cck_customer, $cck_supplier, $l_cck_customer,$l_cck_supplier;
   global $ccf_period, $ccf_ticket, $ccf_duration, $cgp_show;
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
@@ -822,7 +822,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $tech = $contract_q->f("contract_techmanager_id");
     $clause = $contract_q->f("contract_clause");
     $comment = $contract_q->f("contract_comment");
-    $usercomment = $uid;
+    $usercomment = $obm["uid"];
     $datecomment = of_isodate_format();
     $archive = $contract_q->f("contract_archive");
    
@@ -846,7 +846,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $datebegin = date($c_php_isodate_format);
     $dateexp = date($c_php_isodate_format, time() + 31536000);
 
-    $usercomment = $uid;
+    $usercomment = $obm["uid"];
     $datecomment = of_isodate_format();
   }
 
@@ -892,7 +892,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action == "detailupdate") || ($action == "update")) && 
-         ($usercreate == $uid) ) ) {
+         ($usercreate == $obm["uid"]) ) ) {
     $dis_vis = "<tr>
       <th>$l_private</th>
       <td><input name=\"cba_vis\" type=\"checkbox\" value=\"1\" ";
@@ -1290,7 +1290,6 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_export($param_contract) {
   global $display, $path, $l_err_reference;
-  global $auth;
 
   $con_q = run_query_contract_detail($param_contract);
   $company_id = $con_q->f("company_id");

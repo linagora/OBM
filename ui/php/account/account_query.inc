@@ -17,7 +17,7 @@
 // it's hard to compute the account at the same time...
 //////////////////////////////////////////////////////////////////////////////
 function run_query_account_search ($account) {
-  global $auth, $cdg_sql, $ctu_sql_limit;
+  global $cdg_sql, $ctu_sql_limit;
   
   $sql_order_dir = $account["sql_order_dir"];
   $sql_order_field = $account["sql_order_field"];
@@ -25,7 +25,7 @@ function run_query_account_search ($account) {
   $label = sql_search_text_parse($account["label"]);
   $bank = sql_search_text_parse($account["bank"]);
   $number = sql_search_text_parse($account["number"]);
-	$multidomain = sql_multidomain("account");
+  $multidomain = sql_multidomain("account");
 	
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -110,11 +110,11 @@ function run_query_account_detail($id) {
 //   - $account[] : Entry's values
 //////////////////////////////////////////////////////////////////////////////
 function run_query_account_insert ($account) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
-	$domain_id = $obm["domain_id"];
+  $uid = $obm["uid"];
+  $domain_id = $obm["domain_id"];
 	
   $label = $account["label"];
   $bank = $account["bank"];
@@ -127,7 +127,7 @@ function run_query_account_insert ($account) {
     account_timecreate,
     account_userupdate,
     account_usercreate,
-		account_domain_id,
+    account_domain_id,
     account_bank,
     account_label,
     account_number,
@@ -139,7 +139,7 @@ function run_query_account_insert ($account) {
     '$now',
     null,
     '$uid',
-		'$domain_id',
+    '$domain_id',
     '$bank',
     '$label',
     '$number',
@@ -159,10 +159,10 @@ function run_query_account_insert ($account) {
 //   - $account[] : Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_account_update($account) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   $label = $account["label"];
   $bank = $account["bank"];
@@ -170,8 +170,7 @@ function run_query_account_update($account) {
   $balance = $account["balance"];
   $comment = $account["comment"];
   $account_id = $account["account_id"];
-
-	$multidomain = sql_multidomain("account");
+  $multidomain = sql_multidomain("account");
 
  $query = "UPDATE Account SET 
      account_label='$label',

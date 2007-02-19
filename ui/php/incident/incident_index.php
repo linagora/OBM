@@ -45,8 +45,6 @@ require("incident_display.inc");
 require_once("incident_js.inc");
 require_once("$obminclude/of/of_category.inc");
 
-$uid = $auth->auth["uid"];
-
 update_last_visit("incident", $params["incident_id"], $action);
 get_incident_action();
 $perm->check_permissions($module, $action);
@@ -276,19 +274,19 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($uid, "incident", 1);
+  $prefs = get_display_pref($obm["uid"], "incident", 1);
   $display["detail"] = dis_incident_display_pref($prefs); 
 
 } else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($uid, "incident", 1);
+  $prefs = get_display_pref($obm["uid"], "incident", 1);
   $display["detail"] = dis_incident_display_pref($prefs);
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($uid, "incident", 1);
+  $prefs = get_display_pref($obm["uid"], "incident", 1);
   $display["detail"] = dis_incident_display_pref($prefs);
 }
 

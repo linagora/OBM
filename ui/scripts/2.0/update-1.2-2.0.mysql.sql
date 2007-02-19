@@ -311,10 +311,11 @@ CREATE TABLE ProjectCV (
 ----------------------------------------------------------------------------
 
 CREATE TABLE DefaultOdtTemplate (
-  defaultodttemplate_id                  int(8) auto_increment,
-  defaultodttemplate_entity              varchar(32),
-  defaultodttemplate_document_id         int(8) NOT NULL,
-  defaultodttemplate_label               varchar(64) DEFAULT '',
+  defaultodttemplate_id           int(8) auto_increment,
+  defaultodttemplate_domain_id    int(8) DEFAULT 1,
+  defaultodttemplate_entity       varchar(32),
+  defaultodttemplate_document_id  int(8) NOT NULL,
+  defaultodttemplate_label        varchar(64) DEFAULT '',
   PRIMARY KEY(defaultodttemplate_id)
 );
 

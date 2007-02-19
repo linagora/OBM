@@ -294,10 +294,9 @@ function html_invoice_search_form($invoice, $sta, $tts) {
 //   - $invoice[] : invoice search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_search_list($invoice) {
-  global $display, $l_found, $l_no_found;
-  global $auth;
+  global $obm, $display, $l_found, $l_no_found;
 
-  $prefs = get_display_pref($auth->auth["uid"], "invoice");
+  $prefs = get_display_pref($obm["uid"], "invoice");
   $inv_q = run_query_invoice_search($invoice);
   $nb_inv = $inv_q->num_rows_total();
   if ($nb_inv == 0) {
@@ -401,10 +400,10 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 //   - $invoice[] : invoice hash parameters
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_consult($invoice) {
-  global $auth, $display, $l_no_found, $l_err_reference;
+  global $obm, $display, $l_no_found, $l_err_reference;
 
   $id = $invoice["invoice_id"];
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   if ($id > 0) {
     $inv_q = run_query_invoice_detail($id);
     if ($inv_q->num_rows() != 1) {
@@ -499,7 +498,7 @@ function html_invoice_links($inv_q) {
   global $set_theme, $ico_document, $ico_add, $ico_payment;
   global $l_invoice, $l_new, $l_module_document, $l_module_payment;
   global $l_document_add;
-  global $path, $auth, $cgp_show, $popup_height, $popup_width;
+  global $path, $cgp_show, $popup_height, $popup_width;
 
   $id = $inv_q->f("invoice_id");
   $name = $inv_q->f("invoice_label");
@@ -685,7 +684,6 @@ function dis_invoice_detail($inv_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_form($action, $invoice) {
   global $display, $l_no_found;
-  global $auth;
 
   $id = $invoice["invoice_id"];
   if ($id > 0) {
@@ -712,7 +710,7 @@ function dis_invoice_form($action, $invoice) {
 //   - $usr_q     : userobm database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
-  global $auth, $path, $display, $set_theme;
+  global $obm, $path, $display, $set_theme;
   global $ico_company, $ico_deal, $ico_project;
   global $l_label, $l_number, $l_comment, $l_add_comment, $l_upd_comment;
   global $l_amount_ht, $l_amount_ttc;
@@ -722,7 +720,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   global $default_invoice_numbering, $c_php_isodate_format;
   global $default_tax, $l_tax_rate, $l_compute_tax; 
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   // if update mode and first time values are taken from database
   if (($action == "detailupdate") || ($action == "duplicate")) {
@@ -778,7 +776,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   if (isset($invoice["payment_date"])) { $payment_date = $invoice["payment_date"]; }
   if (isset($invoice["status"])) { $status = $invoice["status"]; }
   if (isset($invoice["inout"])) { $inout = $invoice["inout"]; }
-  if (isset($invoice["ht"])) { $ht = $invoice["ht"]; }
+  if (isset($invoice["amount_ht"])) { $ht = $invoice["amount_ht"]; }
   if (isset($invoice["amount_ttc"])) { $ttc = $invoice["amount_ttc"]; }
   if (isset($invoice["comment"])) { $comment = stripslashes($invoice["comment"]); }
   if (isset($invoice["add_comment"])) { $add_comment = stripslashes($invoice["add_comment"]); }
@@ -1097,6 +1095,8 @@ function dis_invoice_dashboard($invoice) {
       <th>$label</th>";
   }
 
+  $url_plus = urlencode("+");
+
   // Billed infos -------------------------------------------------------------
 
   $status_pay = get_invoicestatus("payment");
@@ -1131,7 +1131,7 @@ function dis_invoice_dashboard($invoice) {
 	$dis_amount_ht = number_format($amount_ht, 2, ",", " ");
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
-        $dis_bil_row .= "<td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
+        $dis_bil_row .= "<td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_plus&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
       } else {
         $dis_bil_row .= "<td></td>";
       }
@@ -1157,7 +1157,7 @@ function dis_invoice_dashboard($invoice) {
       $month_start = "$year_month-01";
       $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
       $dis_bil_row_total .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search$total_status_param&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search$total_status_param&amp;inout=$url_plus&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
     } else {
       $dis_bil_row_total .= "
           <td>&nbsp;$dis_amount_ht</td>";
@@ -1219,7 +1219,7 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_pot_row .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_plus&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
       } else {
         $dis_pot_row .= "
           <td> </td>";
@@ -1275,7 +1275,7 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_pay_row .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cba_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_plus&amp;cba_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
       } else {
         $dis_pay_row .= "
           <td></td>";
@@ -1303,7 +1303,7 @@ function dis_invoice_dashboard($invoice) {
       $month_start = "$year_month-01";
       $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
       $dis_pay_row_total .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;cba_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;inout=$url_plus&amp;cba_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
     } else {
       $dis_pay_row_total .= "
           <td>&nbsp;$dis_amount_ttc</td>";

@@ -226,10 +226,10 @@ function run_query_contract_detail($id) {
 // Insertion query construction
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_insert($contract) {
-  global $display, $cdg_sql, $auth, $cgp_show, $obm;
+  global $display, $cdg_sql, $cgp_show, $obm;
 
   $vis = ($contract["privacy"]==1)?1:0;
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $domain_id = $obm["domain_id"];
   $label = $contract["label"];
   $comp_id = $contract["company_id"];
@@ -273,7 +273,7 @@ function run_query_contract_insert($contract) {
       contract_timecreate,
       contract_userupdate,
       contract_usercreate,
-			contract_domain_id,
+      contract_domain_id,
       contract_privacy,
       contract_label,
       contract_deal_id, 
@@ -304,7 +304,7 @@ function run_query_contract_insert($contract) {
       '". date("Y-m-d H:i:s") ."', 
       '$uid',
       '$uid',
-			'$domain_id',
+      '$domain_id',
       '$vis',  
       '$label',
       '$deal_id',
@@ -345,7 +345,7 @@ function run_query_contract_insert($contract) {
 // Update query construction
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_update($contract) {
-  global $auth, $cdg_sql, $ccf_ticket, $ccf_duration;
+  global $obm, $cdg_sql, $ccf_ticket, $ccf_duration;
 
   $vis = ($contract["privacy"]==1)?1:0;
   $id = $contract["contract_id"];
@@ -398,7 +398,7 @@ function run_query_contract_update($contract) {
 	  
   $query = "UPDATE Contract SET
       contract_timeupdate = '". date("Y-m-d H:i:s")."',
-      contract_userupdate = '".$auth->auth["uid"]."',
+      contract_userupdate = '".$obm["uid"]."',
       contract_privacy = '$vis',
       contract_number = '$num',
       contract_label = '$label',
@@ -569,25 +569,25 @@ function run_query_contract_status() {
 //   - $contract[] : contract hash info : keys used : pri_label, pri_code
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_priority_insert($contract) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 	
   $code = $contract["priority_code"];
   $color = $contract["priority_color"];
   $label = $contract["priority_label"];
-	$domain_id = $obm["domaini_id"];
+  $domain_id = $obm["domaini_id"];
 	
   $query = "INSERT INTO ContractPriority (
     contractpriority_timeupdate,
     contractpriority_timecreate,
     contractpriority_usercreate,
-		contractpriority_domain_id,
+    contractpriority_domain_id,
     contractpriority_code,
     contractpriority_color,
     contractpriority_label)
 	values ('null',
     '".date("Y-m-d H:i:s")."',
-    ".$auth->auth["uid"].",
-		'$domain_id',
+    ".$obm["uid"].",
+    '$domain_id',
     '$code',
     '$color',
     '$label')";
@@ -607,18 +607,18 @@ function run_query_contract_priority_insert($contract) {
 //     keys used : priority, pri_label, pri_code
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_priority_update($contract) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $priority = $contract["priority"];
   $code = $contract["priority_code"];
   $color = $contract["priority_color"];
   $label = $contract["priority_label"];
-	$multidomain = sql_multidomain("contractpriority");
+  $multidomain = sql_multidomain("contractpriority");
 	
   $query = "UPDATE ContractPriority SET
     contractpriority_label='$label',
     contractpriority_timeupdate='".date("Y-m-d H:i:s")."',
-    contractpriority_userupdate='".$auth->auth["uid"]."',
+    contractpriority_userupdate='".$obm["uid"]."',
     contractpriority_code='$code',
     contractpriority_color='$color'
   WHERE contractpriority_id='$priority' $multidomain";
@@ -682,10 +682,10 @@ function run_query_contract_priority_links($p_id) {
 //   - $contract[] : contract hash info : keys used : sta_label, sta_code
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_status_insert($contract) {
-  global $auth, $cdg_sql,$obm;
+  global $cdg_sql, $obm;
 
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $label = $contract["status_label"];
   $code = $contract["status_code"];
   $domain_id = $obm["domain_id"];
@@ -718,21 +718,22 @@ function run_query_contract_status_insert($contract) {
 //     keys used : status, sta_label, sta_code
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_status_update($contract) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $status = $contract["status"];
   $label = $contract["status_label"];
   $code = $contract["status_code"];
-	$multidomain = sql_multidomain("contractstatus");
+  $multidomain = sql_multidomain("contractstatus");
 	
   $query = "UPDATE ContractStatus SET
     contractstatus_label='$label',
     contractstatus_timeupdate='$timeupdate',
     contractstatus_userupdate='$userupdate',
     contractstatus_code='$code'
-  WHERE contractstatus_id='$status' $multidomain";
+  WHERE contractstatus_id='$status'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_status_update()");
   $obm_q = new DB_OBM;
@@ -862,7 +863,7 @@ function run_query_contract_type() {
 function run_query_company_info($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain("company");
 
   $query = "SELECT
       company_name, 
@@ -942,7 +943,7 @@ function run_query_contract($archive=false) {
 //   - $contract[] : contract hash info : keys used : type_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_type_insert($contract) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 	
   $label = $contract["type_label"];
   $domain_id = $obm["domain_id"];
@@ -955,7 +956,7 @@ function run_query_contract_type_insert($contract) {
     contracttype_label)
   VALUES (null,
     '".date("Y-m-d H:i:s")."',
-    ".$auth->auth["uid"].",
+    '".$obm["uid"]."',
     '$domain_id',
     '$label')";
 
@@ -973,7 +974,7 @@ function run_query_contract_type_insert($contract) {
 //   - $contract[] : contract hash info : keys used : type, type_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_type_update($contract) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $type = $contract["type"];
   $label = $contract["type_label"];
@@ -982,7 +983,7 @@ function run_query_contract_type_update($contract) {
   $query = "UPDATE ContractType SET 
       contracttype_label='$label',
       contracttype_timeupdate='".date("Y-m-d H:i:s")."',
-      contracttype_userupdate='".$auth->auth["uid"]."'
+      contracttype_userupdate='".$obm["uid"]."'
     WHERE contracttype_id='$type'
       $multidomain";
 

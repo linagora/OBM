@@ -16,7 +16,7 @@
 //   - $p_view        : view selected "year", "month", "week" or "day"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") {
-  global $display, $path, $max_display,$uid;
+  global $display, $path, $max_display, $obm;
 
   $group_view = $calendar["entity"]["group_view"];
   $entity_readable = get_calendar_entity_readable();
@@ -31,7 +31,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") 
   $sel_entity_id["group_view"] = $group_view;
 
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
-  $writable_entity = of_right_entity_for_consumer("calendar", "user", $uid, "write");
+  $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
   $display["features"] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable);
   $block = "<div id=\"ajaxMessage\" style=\"height:4em;position:absolute;\"></div>";
   if ($p_view == "year") {
@@ -144,7 +144,7 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
 //   - $entity_readable : array of readable entities (["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable) {
-  global $path, $uid,$c_all, $set_theme, $popup_height, $popup_width, $ico_add;
+  global $path, $obm, $c_all, $set_theme, $popup_height, $popup_width, $ico_add;
   global $ccalendar_resource;
   global $l_selection, $l_users,$l_resources, $l_validate;
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
@@ -206,11 +206,10 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" /> </a>
     </legend>       
-
-    ";
+";
   }
 
-  $dis_back_myview = "<a href=\"calendar_index.php?action=$new_action&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$uid&amp;date=$iso_date\">$l_back_mono</a>";
+  $dis_back_myview = "<a href=\"calendar_index.php?action=$new_action&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_back_mono</a>";
 
   $block = "
     <div class=\"portlet\" id=\"calendarSelection\">
@@ -896,7 +895,6 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
 }
 
 
-
 /**
  * Perform HTML and javascript code for events. 
  * 
@@ -906,19 +904,20 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
  * @return event HTML and javascript code
  */
 function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entity, $options=array()) {
-  global $ccalendar_first_hour, $ccalendar_last_hour;
-  global $ico_resize, $ico_periodic, $ico_meeting, $auth;
+  global $obm, $ccalendar_first_hour, $ccalendar_last_hour;
+  global $ico_resize, $ico_periodic, $ico_meeting;
   global $l_user, $l_resource, $l_task, $l_private;
 
   $event = $occurrence->event;
   $owner = $event->owner;
-  if($owner == $auth->auth["uid"] || in_array($owner,$writable_entity["ids"])) {
+
+  if ($owner == $obm["uid"] || in_array($owner,$writable_entity["ids"])) {
     $updatable =  true;
     $ed[] = "updatable:true";
   }
 
   $attendee = $event->attendee;
-  if($event->privacy == 1 && !($updatable || in_array($auth->auth["uid"],$attendee["user"]))) {
+  if($event->privacy == 1 && !($updatable || in_array($obm["uid"],$attendee["user"]))) {
     $title = phpStringToJsString($l_private);
     $description = $title;
   } else {
@@ -1068,7 +1067,7 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
             $haveevent = true;
             foreach ($occurences as $occurence) {
               $event = &$occurence->event;
-              if ($event->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
+              if ($event->privacy == 1 && $obm["uid"] != $properties["id"]) {
                 $today_events[] = "$l_private : $l_all_day";
               } else {
                 $today_events[] = $event->title." : $l_all_day";
@@ -1272,7 +1271,7 @@ function dis_calendar_event_consult($id) {
 //   - $entities : entities linked to the event ["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_event_consult($event_q, $entities) {
-  global $auth, $display, $ccalendar_weekstart, $ccalendar_resource;
+  global $obm, $display, $ccalendar_weekstart, $ccalendar_resource;
   global $l_users, $l_resources, $l_title, $l_location, $l_priority, $l_private, $l_desc,$l_high;
   global $l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
@@ -1335,7 +1334,7 @@ function html_calendar_event_consult($event_q, $entities) {
     foreach ($attendee["entity"] as $u_id => $entity) {
       $label = $entity["label"];
       $state = $entity["state"];
-      if ($auth->auth["uid"] == $u_id) {
+      if ($obm["uid"] == $u_id) {
 	$$state = "checked=\"checked\"";
         $dis_decision_radio = "
         <form method=\"get\" name=\"f_mod_decision\" class=\"detail extra\">
@@ -1501,6 +1500,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   return $block;
 }
 
+
 /**
  * HTML for the quick form popup in the calendar view.
  * The quick form popup is set to quickly add, update or consult
@@ -1511,7 +1511,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
  * @return HTML
  */
 function dis_calendar_quick_form($calendar) {
-  global $uid, $ico_popup_close,$l_validate,$popup_queue,$l_title;
+  global $ico_popup_close,$l_validate,$popup_queue,$l_title;
   global $l_advanced,$l_desc,$l_confirm_delete,$l_c_delete,$l_category1;
   global $l_location,$l_members,$l_carac;
 
@@ -1582,7 +1582,7 @@ function dis_calendar_quick_form($calendar) {
 //   - $cats1        : Array : Calendar categories1
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $groups,$tasks, $cats1) {
-  global $path, $display, $auth;
+  global $obm, $path, $display;
   global $ccalendar_resource, $ccalendar_weekstart, $set_cal_interval,$ico_project;
   global $ico_mini_cal, $ico_add,$ico_delete;
   global $ccalendar_first_hour, $ccalendar_last_hour,$ico_project;
@@ -1843,7 +1843,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
         }
       }
       if(uri == '') 
-        uri = '&user_ids[]=".$auth->auth["uid"]."';
+        uri = '&user_ids[]=".$obm["uid"]."';
       return uri;
     }
     </script>
@@ -2190,7 +2190,7 @@ function html_calendar_waiting_events($obm_wait) {
 //   - $calendar:
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_dis_delete($calendar) {
-  global $uid, $perm, $ico_validate,$ico_cancel,$ico_confirm_mail;
+  global $obm, $perm, $ico_validate,$ico_cancel,$ico_confirm_mail;
   global $display, $l_confirm_delete,$l_confirm,$l_cancel,$l_confirm_mail;
   global $l_event_cant_delete, $module, $cright_write_admin;
 
@@ -2199,7 +2199,7 @@ function html_calendar_dis_delete($calendar) {
   $e = get_calendar_event_info($event_id);
   $usercreate = $e["usercreate"];
 
-  if (($uid != $usercreate) && (! $perm->check_right($module, $cright_write_admin))) {
+  if (($obm["uid"] != $usercreate) && (! $perm->check_right($module, $cright_write_admin))) {
     $display["msg"] = display_warn_msg($l_event_cant_delete);
     return;
   }
@@ -2641,10 +2641,10 @@ function dis_calendar_free_interval($calendar, $entity_store) {
  * @return mixed xhtml display
  */
 function dis_calendar_right_dis_admin($id="") {
-  global $uid, $display, $l_calendar;
+  global $obm, $display, $l_calendar;
 
   if ($id == "") {
-    $id = $uid;
+    $id = $obm["uid"];
   }
   $infos = get_user_info($id);
   $name = $infos["firstname"] . " " . $infos["lastname"];
@@ -2704,15 +2704,15 @@ function dis_calendar_admin_index() {
 //   - $label : category label
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_export_handle($calendar) {
-  global $obm_version,$ccalendar_weekstart,$auth;
+  global $obm, $obm_version, $ccalendar_weekstart;
 
   $iso_date = $calendar["date"];
-  $ts_date = strtotime($iso_date);  
- 
+  $ts_date = strtotime($iso_date);
+
   $start_time = strtotime("-1 year", $ts_date);
   $end_time = strtotime("+1 year", $ts_date);
 
-  $calendar_user["user"] = array ($auth->auth["uid"] => "dummy");  
+  $calendar_user["user"] = array ($obm["uid"] => "dummy");
   $ev_q = run_query_calendar_no_repeat_events($start_time,$end_time,$calendar_user);
 
   header("Content-Type: text/x-vCalendar");
@@ -2721,7 +2721,7 @@ function dis_calendar_export_handle($calendar) {
 VERSION:2.0
 PRODID:-//OBM/OBM V$obm_version Calendar//EN
 METHOD:PUBLISH";
-  while($ev_q->next_record()) {
+  while ($ev_q->next_record()) {
     $id = $ev_q->f("calendarevent_id");
     $title = "SUMMARY:" . $ev_q->f("calendarevent_title");
     $title = wordwrap($title,74,"\n ",1);
@@ -2885,6 +2885,7 @@ function json_error_msg($msg) {
 
 }
 
+
 /**
  * Build a JSON message with all the event data
  * the respone is a table of event objects.
@@ -2894,9 +2895,9 @@ function json_error_msg($msg) {
  * @return void
  */
 function json_event_data($id,$calendar) {
-  global $display,$ccalendar_first_hour,$ccalendar_last_hour;
+  global $obm, $display,$ccalendar_first_hour,$ccalendar_last_hour;
   global $max_display, $cal_entity_id;
-  global $uid;
+
   $context = $calendar["context"];
   $element_id = $calendar["element_id"];
   $ent_q = run_query_get_events_attendee(array($id));
@@ -2953,7 +2954,7 @@ function json_event_data($id,$calendar) {
         $info[] = "entity_id:$entity_id";
         $info[] = "klass:'".$entity_data["class"]."'";
         $info[] = "state:'".$entities[$entity]["entity"][$entity_id]["state"]."'";
-        if($entity_id = $uid && $entity = 'user') {
+        if($entity_id = $obm["uid"] && $entity = 'user') {
           $opt = array_merge($opt,$updatable);
         }
         if($json != '') {

@@ -190,7 +190,7 @@ function run_query_group_detail($id) {
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_insert($group) {
-  global $uid, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $id = $group["group_id"];
   $system = ($group["system"] == 1) ? 1 : 0;
@@ -200,7 +200,7 @@ function run_query_group_insert($group) {
   $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
   $mailing = (isset($group["mailing"]) ? $group["mailing"] : '0');
   $now = date("Y-m-d H:i:s");
-	$domain_id = $obm["domain_id"];	
+  $domain_id = $obm["domain_id"];	
 
   $query = "INSERT INTO UGroup (
     group_timeupdate,
@@ -218,7 +218,7 @@ function run_query_group_insert($group) {
     null,
     '$now',
     null,
-    '$uid',
+    '$obm[uid]',
     '$domain_id',
     '$system',
     '$priv',
@@ -289,7 +289,7 @@ function run_query_group_id($group) {
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_update($group) {
-  global $uid, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $id = $group["group_id"];
   $name = $group["name"];
@@ -302,7 +302,7 @@ function run_query_group_update($group) {
   
   $query = "UPDATE UGroup SET
     group_timeupdate='$now',
-    group_userupdate='$uid',
+    group_userupdate='$obm[uid]',
     group_privacy='$priv',
     group_name='$name',
     group_desc='$desc',
@@ -360,7 +360,7 @@ function run_query_group_delete($p_id) {
 // Return: number of users inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_usergroup_insert($group) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $id = $group["group_id"];
   $cpt = 0;
@@ -401,7 +401,7 @@ function run_query_group_usergroup_insert($group) {
 // Return: number of users deleted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_usergroup_delete($group) {
-  global $auth, $cdg_sql;
+  global $cdg_sql;
 
   $id = $group["group_id"];
   $cpt = 0;
@@ -432,7 +432,7 @@ function run_query_group_usergroup_delete($group) {
 // Return: number of groups inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_group_insert($group) {
-  global $auth, $cdg_sql;
+  global $cdg_sql;
 
   $id = $group["group_id"];
   $cpt = 0;
@@ -479,7 +479,7 @@ function run_query_group_group_insert($group) {
 // Return: number of groups deleted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_group_delete($group) {
-  global $auth, $cdg_sql;
+  global $cdg_sql;
 
   $id = $group["group_id"];
   $cpt = 0;
@@ -625,7 +625,7 @@ function get_group_info($id) {
   if ($id == "") {
     return false;
   }
-	$multidomain = sql_multidomain("group");
+  $multidomain = sql_multidomain("group");
 	
   $query = "SELECT * FROM UGroup WHERE group_id='$id' $multidomain";
 
@@ -651,18 +651,18 @@ function get_group_info($id) {
 //   - true (if a group exists) or false
 ///////////////////////////////////////////////////////////////////////////////
 function get_group_name_exists($name, $id="") {
-  global $cdg_sql, $uid;
+  global $cdg_sql, $obm;
 
   if ($id != "") {
     $where_id = "and group_id!='$id'";
   }
 	
-	$multidomain = sql_multidomain("group");
+  $multidomain = sql_multidomain("group");
 	
   $query = "SELECT group_id, group_name
     FROM UGroup
     WHERE group_name='$name'
-      AND (group_privacy=0 OR group_usercreate='$uid')
+      AND (group_privacy=0 OR group_usercreate='$obm[uid]')
       $where_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_group_name_exists()");
@@ -686,7 +686,7 @@ function get_group_name_exists($name, $id="") {
 //   - $desc : group desc
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_check($id, $name, $desc) {
-  global $cdg_sql, $uid;
+  global $cdg_sql, $obm;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -713,16 +713,16 @@ function run_query_group_check($id, $name, $desc) {
   }
   if ($wdesc != "") $wdesc = "or $wdesc";
 
-	$multidomain = sql_multidomain("group");
+  $multidomain = sql_multidomain("group");
 
   $query = "SELECT distinct group_id, group_name, group_desc
      FROM UGroup
      WHERE
-       (group_privacy=0 OR group_usercreate='$uid')
+       (group_privacy=0 OR group_usercreate='$obm[uid]')
        AND ($wname $wdesc)
        $where_id $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_group_check()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -760,7 +760,7 @@ function check_group_context($id, $group) {
 function check_group_data_form($group) {
   global $php_regexp_email_name, $php_regexp_email, $l_fill_name;
   global $l_group_exists, $l_email_exist;
-  global $uid, $err_msg, $l_j_check_email, $l_system_no_priv, $l_only_owner_priv;
+  global $obm, $err_msg, $l_j_check_email, $l_system_no_priv, $l_only_owner_priv;
 
   $id = $group["group_id"];
   $name = $group["name"];
@@ -803,7 +803,7 @@ function check_group_data_form($group) {
   }
 
   // A public group can only be private if user = owner
-  if ($priv && ($usercreate > 0) && ($usercreate != $uid)) {
+  if ($priv && ($usercreate > 0) && ($usercreate != $obm["uid"])) {
     $err_msg = "$l_only_owner_priv";
     return false;
   }
@@ -827,7 +827,7 @@ function check_group_data_form($group) {
 //   true if the group can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_group_can_delete($p_id) {
-  global $uid, $err_msg, $ok_msg;
+  global $obm, $err_msg, $ok_msg;
   global $l_warn_delete, $l_cant_delete_system, $l_cant_delete_public;
 
   $delete_ok = true;
@@ -836,7 +836,7 @@ function check_group_can_delete($p_id) {
   if ($lgroup["system"] != "0") {
     $err_msg .= "$l_cant_delete_system";
     $delete_ok = false;
-  } else if (($lgroup["privacy"] == "0") && ($lgroup["usercreate"] != "$uid")) {
+  } else if (($lgroup["privacy"] == "0") && ($lgroup["usercreate"] != $obm["uid"])) {
     $err_msg .= $l_cant_delete_public;
     $delete_ok = false;
   } else {

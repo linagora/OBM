@@ -135,12 +135,12 @@ function html_resource_search_form($resource) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resource_search_list($resource) {
   global $l_found, $l_no_found;
-  global $display, $auth;
+  global $display, $obm;
 
   $popup = $resource["popup"];
   $restriction = $resource["restriction"];
 
-  $prefs = get_display_pref($auth->auth["uid"], "resource");
+  $prefs = get_display_pref($obm["uid"], "resource");
   $obm_q = run_query_resource_search($resource);
   $nb_resource = $obm_q->num_rows_total();
   if ($nb_resource == 0) {

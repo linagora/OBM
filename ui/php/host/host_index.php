@@ -166,19 +166,19 @@ if ($action == "ext_get_id") {
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($uid, "host", 1);
+  $prefs = get_display_pref($obm["uid"], "host", 1);
   $display["detail"] = dis_host_display_pref($prefs);
 
 } else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($uid, "host", 1);
+  $prefs = get_display_pref($obm["uid"], "host", 1);
   $display["detail"] = dis_host_display_pref($prefs);
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($uid, "host", 1);
+  $prefs = get_display_pref($obm["uid"], "host", 1);
   $display["detail"] = dis_host_display_pref($prefs);
 }
 

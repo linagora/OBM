@@ -219,9 +219,9 @@ function html_project_search_form ($tts, $member_q, $project) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_search_list($project) {
-  global $display, $auth, $l_found, $l_no_found;
+  global $display, $obm, $l_found, $l_no_found;
 
-  $prefs = get_display_pref($auth->auth["uid"], "project", 0);
+  $prefs = get_display_pref($obm["uid"], "project", 0);
   $obm_q = run_query_project_search($project);
   $nb_project = $obm_q->num_rows_total();
 
@@ -325,7 +325,7 @@ function dis_project_planning($project) {
 //   - $time : parameter hash
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_nav_date($project) {
-  global $cdg_param, $auth, $set_theme, $c_dst_err, $l_monthsofyear,$action;
+  global $cdg_param, $set_theme, $c_dst_err, $l_monthsofyear, $action;
   global $ico_previous,$ico_next;
 
   $id = $project["project_id"];
@@ -484,7 +484,7 @@ function html_project_links($p_q) {
   global $set_theme, $ico_document, $ico_add, $ico_invoice;
   global $l_new, $l_module_invoice, $l_module_document;
   global $l_document_add, $l_project;
-  global $path, $auth, $cgp_show, $popup_height, $popup_width;
+  global $path, $cgp_show, $popup_height, $popup_width;
 
   $id = $p_q->f("project_id");
   $name = $p_q->f("project_name");
@@ -1065,11 +1065,11 @@ function html_project_form($action, $project_q, $project) {
   global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive,$l_project_date,$l_project_duration,$l_project_tech,$l_project_desc;
   global $l_datebegin, $l_dateend, $c_undef, $l_undef,$l_tasks;
   global $l_comment, $l_add_comment, $l_upd_comment,$ico_project,$popup_width;
-  global $uid, $cg_prod, $c_php_isodate_format,$l_shortname,$popup_height;
+  global $obm, $cg_prod, $c_php_isodate_format,$l_shortname,$popup_height;
   global $ctt_sales, $ctt_research, $ctt_others,$set_theme,$l_other;
   global $l_tt_sales, $l_tt_research, $l_tt_others,$path;
 
-  $usr_q = run_query_all_users_from_group($cg_prod, array($uid));
+  $usr_q = run_query_all_users_from_group($cg_prod, array($obm["uid"]));
 
   if ($action == "detailupdate") {
     $pid = $project_q->f("project_id");
@@ -1090,7 +1090,7 @@ function html_project_form($action, $project_q, $project) {
     $reference_tech =  $project_q->f("project_reference_tech");
     $comment = $project_q->f("project_comment");
     $shortname = $project_q->f("project_shortname");
-    $usercomment = $uid;
+    $usercomment = $obm["uid"];
     $datecomment = of_isodate_format();
   } else {
     if ($action == "new") {
@@ -1098,7 +1098,7 @@ function html_project_form($action, $project_q, $project) {
       // We pre-fill datebegin and dateend with current date
       $datebegin = date($c_php_isodate_format); 
       $dateend = $datebegin;
-      $usercomment = $uid;
+      $usercomment = $obm["uid"];
       $datecomment = of_isodate_format();
     }
   }

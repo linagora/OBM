@@ -104,13 +104,13 @@ function display_page(&$display) {
 //   - $module : module selected
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu($module) {
-  global $path, $auth, $display, $obm_version, $cgp_show,$set_lang, $set_theme;
+  global $path, $obm, $display, $obm_version, $cgp_show,$set_lang, $set_theme;
   global $l_logout, $l_profile,$ico_logout,$modules,$ico_login, $ico_obm,$ico_print;
 
-  $uid = $auth->auth["uid"];
-  $login = $auth->auth["uname"];
-  $profil = $auth->auth["perm"];
-  $domain = $auth->auth["domain_label"];
+  $uid = $obm["uid"];
+  $login = $obm["login"];
+  $profil = $obm["profile"];
+  $domain = $obm["domain_label"];
   $section = $cgp_show["module"][$module];
   $display["section"] = display_sections($section);
 //  $display["module"] = display_modules($section, $module);

@@ -114,47 +114,59 @@ function dis_statistic_resp_stats($cont_q,$comp_q) {
       $max = $comp_q->f("comp_stat");
     }
   } 
-  $block .= "<table class=\"detail\" >";
+  $block .= "<table class=\"spreadSheet\" style=\"width:100%;\">";
 
   if (is_array($stat)) {
     foreach($stat as $id => $value) {
-      $cont = round(($value["contact"]/$max)*90);
-      $comp = round(($value["company"]/$max)*90);
-      $block .= "<tr>
-    <td class=\"detailLabel\" rowspan =\"2\">".$value["name"]."</td>
-    <td class=\"detailForm\">
-     <table style=\"width:100%;\">
-      <tr><td style=\"width:".$cont."%; background-color:#DE5B5B;\"></td><td>".$value["contact"]."</td></tr>
-     </table>
-    </td>
-   </tr>
-   <tr>
-    <td class=\"detailForm\">
+      $cont = round(($value["contact"]/$max)*90)+0.1;
+      $comp = round(($value["company"]/$max)*90)+0.1;
+      $block .= "
+  <tr>
+    <th rowspan=\"2\" width=\"150px\">".$value["name"]."</th>
+    <td>
     <table style=\"width:100%;\">
-    <tr><td style=\"width:".$comp."%; background-color:#5C8CBC;\"></td><td>".$value["company"]."</td></tr>
+    <tr>
+      <td style=\"width:".$cont."%; background-color:#DE5B5B;\"></td>
+      <td>".$value["contact"]."</td>
+    </tr>
+    </table>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <table style=\"width:100%;\">
+    <tr>
+      <td style=\"width:".$comp."%; background-color:#5C8CBC;\"></td>
+      <td>".$value["company"]."</td>
+    </tr>
     </table>   
     </td>
-   </tr>";    
+  </tr>";
     }
   }
    
   $block .= "
   <tr>
-    <td class=\"detailLabel\" class=\"detailLabel\" rowspan =\"2\">$l_key</td>
-    <td class=\"detailForm\">
-     <table>
-      <tr><td
-      style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td><td>$l_module_contact</td></tr>
-     </table>
-    </td>
-   </tr>
-   <tr>
-    <td class=\"detailForm\">
+    <td rowspan=\"2\">$l_key</td>
+    <td>
     <table>
-    <tr><td style=\"width:20px;background-color:#5C8CBC;\">&nbsp;</td><td>$l_module_company</td></tr>
+    <tr>
+      <td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td>
+      <td>$l_module_contact</td>
+    </tr>
+    </table>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <table>
+    <tr>
+      <td style=\"width:20px;background-color:#5C8CBC;\">&nbsp;</td>
+      <td>$l_module_company</td>
+    </tr>
     </table>   
     </td>
-   </tr>
+  </tr>
   </table>"; 
 
   return $block;
@@ -170,7 +182,7 @@ function dis_statistic_resp_stats($cont_q,$comp_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_statistic_cat_stats($comp_q, $tot) {
   global $path, $set_theme;
-  global $l_null,$l_totals, $l_header_country,$l_contcat;
+  global $l_null,$l_totals, $l_header_country, $l_category;
 
   while ($comp_q->next_record()) {
     if ($comp_q->f("category_id") == NULL) {
@@ -230,13 +242,12 @@ function dis_statistic_cat_stats($comp_q, $tot) {
     $percent = round(($cat_count[$cat_id])*100/$cat_link_total,1);    
     $cat_percent .= "<td>$percent</td>";
     $cat_tots .= "<td>".$cat_count[$cat_id]."</td>";
-    $infos .= "<span id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
   }
 
   $pair = 0;
   $block .= "$cat_label<th>$l_totals</th><th>%</th></tr></thead>";
   foreach ($stat as $cty_iso => $data) {
-    if($cty_iso != "") {
+    if ($cty_iso != "") {
       $onOver = "    onMouseOver=\"show(event,'cty_$cty_iso'); return true;\"
     onMouseOut=\"hide('cty_$cty_iso'); return true;\"";
       $infos .= "<span class=\"hiddenLegend\" id=\"cty_$cty_iso\">".$cty_desc[$cty_iso]."</span>";
@@ -277,11 +288,11 @@ function dis_statistic_cat_stats($comp_q, $tot) {
    </div>
    <br />
   <div class=\"detail infos\">
-  <h1> x = $l_contcat </h1>
+  <h1> x = $l_category </h1>
   <h1> y = $l_header_country</h1>
   </div>
   $infos
-  ";
+";
   return $block;
 }
 

@@ -125,10 +125,10 @@ function html_account_search_form ($p_action, $account) {
 //     keys used   : label, bank, number
 ///////////////////////////////////////////////////////////////////////////////
 function dis_account_search_list($account) {
+  global $obm, $display;
   global $l_no_found;
-  global $auth, $display;
 
-  $prefs = get_display_pref($auth->auth["uid"], "account");
+  $prefs = get_display_pref($obm["uid"], "account");
   $obm_q = run_query_account_search($account);
   $nb_account = $obm_q->num_rows_total();
   if ($nb_account == 0) {
@@ -180,7 +180,7 @@ function html_account_consult($obm_q_account, $p_action){
   global $l_account, $l_update,$l_delete,$l_insert;
   global $col_balance_neg, $col_balance_pos;
   global $l_label,$l_comment,$l_bank, $l_number, $l_balance,$l_compute_balance;
-  global $auth, $perms_user,$l_perms_user;
+  global $perms_user,$l_perms_user;
   global $border, $cellspacing;
 
   $label = $obm_q_account->f("account_label");
@@ -223,44 +223,6 @@ function html_account_consult($obm_q_account, $p_action){
       $comment
     </div>";
 
-//   // we display buttons only if we need them :
-//   if ($p_action == "detailconsult") {
-//     // update/ compute balance of the account
-//     $block .= "
-//      <table border=$border cellspacing=$cellspacing width=\"100%\">
-//       <tr><td align=\"center\" valign=\"top\">";
-//     // if ($auth->auth["perm"] != $perms_user) {
-//     $block .= "
-//        <form method=\"post\" action=\"\">";
-//     $url_upd = url_prepare("account_index.php?action=detailupdate".
-// 			   "&amp;account_id=".
-// 			   $obm_q_account->f("account_id"));
-//     $url_comp = url_prepare("account_index.php?action=compute_balance".
-// 			   "&amp;account_id=".
-// 			   $obm_q_account->f("account_id"));
-    
-//     $block .= " 
-//         <input type=\"button\" value=\"$l_update\" ".
-//       "onClick=\"this.form.action='$url_upd' ; this.form.submit ();\">";
-
-//     // compute the balance 
-//     // useless ?
-// //        <input type=hidden name=hd_balance value=\"".
-// //      $obm_q_account->f("account_balance")."\">
-//     $block .= "
-//       </td><td align=\"center\" valign=\"top\">
-//         <input type=\"button\" value=\"$l_compute_balance\" ".
-//       "onClick=\"this.form.action='$url_comp' ; this.form.submit ();\">
-//        </form>
-//       </td></tr>
-//      </table>";
-//     //}
-//     $block .= "
-//     </td></tr>";
-//   }
-//   $block .= "
-//    </table>
-//   </center>";
   return $block;
 
 }

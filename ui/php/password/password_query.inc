@@ -42,7 +42,7 @@ function run_query_password($u_id) {
 //   - $usr_q      : User Password database result
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_password_update($password, $uid, $usr_q) {
-  global $auth, $cdg_sql, $cdg_exe, $cgp_use, $cmd_ldap_passwd, $password_encryption;
+  global $cdg_sql, $cdg_exe, $cgp_use, $cmd_ldap_passwd, $password_encryption;
 
   $login = $usr_q->f("userobm_login");
   $old_pass = trim($password["old_password"]);
@@ -96,7 +96,7 @@ function run_query_password_update($password, $uid, $usr_q) {
 function check_data_form($usr_q, $password) {
   global $l_fill_password, $l_wrong_password, $l_new_password_differ, $l_password_invalid;
   global $php_regexp_password, $password_encryption;
-  global $err_msg, $err_field, $action, $cdg_sql;
+  global $err, $action, $cdg_sql;
 
   $id = $usr_q->f("userobm_id");
   $login = $usr_q->f("userobm_login");
@@ -109,13 +109,15 @@ function check_data_form($usr_q, $password) {
   if ($action == "update") {
     // Verifie que les mots de passe sont saisis
     if (($old_pass == "") || ($new_pass == "")) {
-      $err_msg = "$l_fill_password";
+      $err["msg"] = "$l_fill_password";
+      $err["field"] = "new_password";
       return false;
     }
 
     // Verifie que les 2 mots de passe nouveaux sont identiques
     if ($new_pass != $new_pass_bis) {
-      $err_msg = "$l_new_password_differ";
+      $err["msg"] = "$l_new_password_differ";
+      $err["field"] = "new_password_bis";
       return false;
     }
 
@@ -128,15 +130,16 @@ function check_data_form($usr_q, $password) {
       $old_passwd_crypt = $old_pass;
     }
     if ($pass != $old_passwd_crypt) {
-      $err_msg = "$l_wrong_password";
+      $err["msg"] = "$l_wrong_password";
+      $err["field"] = "old_password";
       return false;
     }
 
     // Password is correct
     if ( (trim($new_pass) == "")
 	 || (preg_match($php_regexp_password, $new_pass) == false) ) {
-      $err_msg = "$l_password_invalid";
-      $err_field = "new_password";
+      $err["msg"] = "$l_password_invalid";
+      $err["field"] = "new_password";
       return false;
     }
   }

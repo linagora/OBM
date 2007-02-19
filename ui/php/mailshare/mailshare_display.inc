@@ -142,9 +142,9 @@ function html_mailshare_search_form($mailshare) {
 //   - $mailshare[]   : mailshare search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_mailshare_search_list($mailshare) {
-  global $l_no_found, $display, $auth;
+  global $l_no_found, $display, $obm;
 
-  $prefs = get_display_pref($auth->auth["uid"], "mailshare");
+  $prefs = get_display_pref($obm["uid"], "mailshare");
   $obm_q = run_query_mailshare_search($mailshare);
 
   $nb_mailshare = $obm_q->num_rows_total();

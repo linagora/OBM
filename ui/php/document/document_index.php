@@ -26,7 +26,7 @@ require_once("$obminclude/of/of_category.inc");
 
 get_document_action();
 $perm->check_permissions($module, $action);
-if (! check_privacy($module, "Document", $action, $params["document_id"], $uid)) {
+if (! check_privacy($module, "Document", $action, $params["document_id"], $obm["uid"])) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
@@ -41,19 +41,16 @@ if ($action == "ext_get_path") {
 $display["detail"] = html_document_tree($params, $ext_disp_file);
 
 } elseif ($action == "ext_get_id_from_path") {
-///////////////////////////////////////////////////////////////////////////////  
-  
+///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
   $display["detail"] = html_document_tree($params, $ext_disp_file);
 
-//////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "accessfile") {
-
 ///////////////////////////////////////////////////////////////////////////////
-    if ($params["document_id"] > 0) {
+  if ($params["document_id"] > 0) {
     $doc_q = run_query_document_detail($params["document_id"]);
 
-if ($doc_q->num_rows() == 1) {
+    if ($doc_q->num_rows() == 1) {
       dis_document_file($doc_q);
       exit();
     }
@@ -278,19 +275,19 @@ elseif ($action == "ext_get_ids") {
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($auth->auth["uid"], "document", 1);
+  $prefs = get_display_pref($obm["uid"], "document", 1);
   $display["detail"] = dis_document_display_pref($prefs);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($auth->auth["uid"], "document", 1);
+  $prefs = get_display_pref($obm["uid"], "document", 1);
   $display["detail"] = dis_document_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($auth->auth["uid"], "document", 1);
+  $prefs = get_display_pref($obm["uid"], "document", 1);
   $display["detail"] = dis_document_display_pref($prefs);
 }
 

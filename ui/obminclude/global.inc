@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0pre16";
+$obm_version = "2.0pre18";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -184,7 +184,8 @@ $profiles["user"] = array (
     'default' => 0,
     'com' => 1,
     'prod' => 1,
-    'user' => 1),
+    'user' => 1,
+    'my' => 1),
   'module' => array (
     'default' => $perm_user)
 );
@@ -194,7 +195,8 @@ $profiles["editor"] = array (
     'default' => 0,
     'com' => 1,
     'prod' => 1,
-    'user' => 1),
+    'user' => 1,
+    'my' => 1),
   'module' => array (
     'default' => $perm_editor)
 );
@@ -940,8 +942,9 @@ function get_global_params($table="") {
 
     // sql_order_dir value control
     if ($key == "sql_order_dir") {
-      if (!in_array($value, $order_dir_values))
+      if (!in_array($value, $order_dir_values)) {
         $value = $c_order_dir[0];
+      }
     }
 
     // XXXX SQL_order below can't access here $fieldnames...
@@ -1102,7 +1105,7 @@ function beautify_comment($com, $p_order="") {
 // Returns true if entity is visible, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_privacy($module, $table, $action, $id="", $p_uid="") {
-  global $actions, $auth, $cdg_sql;
+  global $actions, $obm, $cdg_sql;
 
   // If action does not require privacy, grant access
   if (! $actions[$module][$action]["Privacy"]) {
@@ -1116,7 +1119,7 @@ function check_privacy($module, $table, $action, $id="", $p_uid="") {
 
   // Set uid if not given
   if ($p_uid == "") {
-    $uid = $auth->auth["uid"];
+    $uid = $obm["uid"];
   } else {
     $uid = $p_uid;
   }

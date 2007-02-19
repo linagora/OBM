@@ -568,9 +568,9 @@ function run_query_global_insert_documents($ids, $entity) {
 // This must be called in an open session (between page_open and page_close )
 ///////////////////////////////////////////////////////////////////////////////
 function global_session_load_user_todos($set_todo="todo_priority") {
-  global $cdg_sql, $cgp_todo_nb, $todos, $sess, $auth;
+  global $cdg_sql, $cgp_todo_nb, $todos, $obm;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   $limit = sql_limit($db_type, $cgp_todo_nb, 0);
   $order = ($set_todo != "" ? $set_todo : "todo_priority");
@@ -607,7 +607,7 @@ function global_session_load_user_todos($set_todo="todo_priority") {
     $todos[$rank]["title"] = $t_title; 
   }
 
-  $sess->register("todos");
+  $_SESSION['todos'] = $todos;
 }
 
 

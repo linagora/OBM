@@ -217,10 +217,9 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $reso, $incid
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_search_list($incident) {
-  global $display, $l_found, $l_no_found;
-  global $auth;
+  global $obm, $display, $l_found, $l_no_found;
 
-  $prefs = get_display_pref($auth->auth["uid"], "incident");
+  $prefs = get_display_pref($obm["uid"], "incident");
   $obm_q = run_query_incident_search($incident);
   $nb_incident = $obm_q->num_rows_total();
   if ($nb_incident == 0) {
@@ -463,7 +462,7 @@ function html_incident_consult($inc_q) {
 function html_incident_links($inc_q) {
   global $set_theme, $ico_document, $ico_add;
   global $l_new, $l_incident, $l_module_document, $l_document_add;
-  global $path, $auth, $cgp_show, $popup_height, $popup_width;
+  global $path, $cgp_show, $popup_height, $popup_width;
 
   $id = $inc_q->f("incident_id");
   $entity = "incident";
@@ -550,7 +549,7 @@ function dis_incident_form($action, $incident) {
 //   - $resos      : array with incident resolution types
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $resos) {
-  global $display, $path, $uid, $set_theme, $ico_contract;
+  global $display, $path, $obm, $set_theme, $ico_contract;
   global $c_php_isodate_format;
   global $l_label,$l_contract,$l_status, $l_find,$l_reference;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
@@ -608,7 +607,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   $block_userdata = of_userdata_dis_entity_form("incident", $id, $incident);
 
   // Owner select
-  if (! isset($owner)) { $owner = $uid; }
+  if (! isset($owner)) { $owner = $obm["uid"]; }
   $dis_sel_owner="<select name=\"sel_owner\">";
   while ($usrp_q->next_record()) {
     $dis_sel_owner.="\n<option value=\"".$usrp_q->f("userobm_id")."\"";
@@ -620,7 +619,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   $dis_sel_owner .= "</select>";
 
   // Logger select
-  if (! isset($logger)) { $logger = $uid; }
+  if (! isset($logger)) { $logger = $obm["uid"]; }
   $dis_sel_logger="<select name=\"sel_logger\">";
   while ($usr_q->next_record()) {
     $dis_sel_logger.="\n<option value=\"".$usr_q->f("userobm_id")."\"";
@@ -660,7 +659,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   if ($usr_q->nf()>0 ) {
     $usr_q->seek(0);
   }
-  if (! isset($usercomment)) { $usercomment = $uid; }
+  if (! isset($usercomment)) { $usercomment = $obm["uid"]; }
   $sel_usercomment = "<select name=\"sel_usercomment\">";
   while ($usr_q->next_record()) {
     $cid = $usr_q->f("userobm_id");

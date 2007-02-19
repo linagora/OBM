@@ -1,0 +1,37 @@
+<html>
+<head>
+     <title><?php echo "Login - OBM Version $obm_version"; ?></title>
+<?php print "$login_javascript_header"; ?>
+</head>
+
+<body>
+<h1>My OBM : <?php print "$obm_version"; ?></h1>
+
+<?php print "$login_form_header"; ?>
+<table>
+<tr>
+  <td>LOGIN : </td>
+  <td><?php print "$login_form_login"; ?></td>
+</tr>
+<tr>
+  <td>PASSWORD : </td>
+  <td><?php print "$login_form_password"; ?></td>
+</tr>
+<tr>
+  <td>DOMAIN : </td>
+  <td><?php print $login_form_domain ?></td>
+</tr>
+<tr>
+  <td colspan="2"><input name="imageField" type="image" src="<?php echo C_IMAGE_PATH; ?>/../images/bouton_login.gif" onclick="doChallengeResponse()"></td>
+</tr>
+</table>
+<?php print "$login_form_values"; ?>
+</form>
+
+<?php print "$login_error_msg"; ?>
+<a href="http://www.aliasource.fr" target="_blank">AliaSource</a> : 1998 - 2007
+
+<?php print "$login_javascript_footer"; ?>
+
+</body>
+</html>

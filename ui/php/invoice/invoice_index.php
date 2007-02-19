@@ -36,8 +36,6 @@ require("invoice_query.inc");
 require_once("invoice_js.inc");
 require_once("$obminclude/of/of_select.inc");
 
-$uid = $auth->auth["uid"];
-
 get_invoice_action();
 $perm->check_permissions($module, $action);
 
@@ -164,19 +162,19 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($uid, "invoice", 1);
+  $prefs = get_display_pref($obm["uid"], "invoice", 1);
   $display["detail"] = dis_invoice_display_pref($prefs);
   
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($uid, "invoice", 1);
+  $prefs = get_display_pref($obm["uid"], "invoice", 1);
   $display["detail"] = dis_invoice_display_pref($prefs);
   
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($uid, "invoice", 1);
+  $prefs = get_display_pref($obm["uid"], "invoice", 1);
   $display["detail"] = dis_invoice_display_pref($prefs);
 }
   

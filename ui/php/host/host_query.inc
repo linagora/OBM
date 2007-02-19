@@ -119,7 +119,7 @@ function run_query_host_detail($id) {
 //   - $host[] : host hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_host_insert($host) {
-  global $uid, $obm, $cdg_sql, $cg_gid_smb_host;
+  global $obm, $cdg_sql, $cg_gid_smb_host;
 
   $domain_id = $obm["domain_id"];
   $name = $host["name"];
@@ -153,7 +153,7 @@ function run_query_host_insert($host) {
   VALUES (null,
     '$now',
     null,
-    '$uid',
+    '$obm[uid]',
     '$host_uid',
     '$host_gid',
     '$samba',
@@ -184,7 +184,7 @@ function run_query_host_insert($host) {
     WHERE
       host_timecreate='$now' and
       host_userupdate is null and
-      host_usercreate='$uid' and
+      host_usercreate='$obm[uid]' and
       host_uid='$host_uid' and
       host_gid='$host_gid' and
       host_samba='$samba' and
@@ -205,7 +205,7 @@ function run_query_host_insert($host) {
 
       $query = "UPDATE UserObm 
       SET userobm_timeupdate='$now',
-          userobm_userupdate='$uid',
+          userobm_userupdate='$obm[uid]',
           userobm_host_id='$host_id'
       WHERE
           userobm_id='$user_id'";
@@ -225,7 +225,7 @@ function run_query_host_insert($host) {
 //   - $host[] : host hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_host_update($host) {
-  global $uid, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $id = $host["host_id"];
   $name = $host["name"];
@@ -241,7 +241,7 @@ function run_query_host_update($host) {
   
   $query = "UPDATE Host SET
     host_timeupdate='$now',
-    host_userupdate='$uid',
+    host_userupdate='$obm[uid]',
     host_samba='$samba',
     host_name='$name',
     host_ip='$ip',
@@ -264,7 +264,7 @@ function run_query_host_update($host) {
     // Suppression de l'ancien lien user=>host
     $query = "UPDATE UserObm 
     SET userobm_timeupdate='$now',
-        userobm_userupdate='$uid',
+        userobm_userupdate='$obm[uid]',
         userobm_host_id='0'
     WHERE
         userobm_host_id='$id'";
@@ -277,7 +277,7 @@ function run_query_host_update($host) {
       // Creation du nouveau lien user=>host
       $query = "UPDATE UserObm 
       SET userobm_timeupdate='$now',
-          userobm_userupdate='$uid',
+          userobm_userupdate='$obm[uid]',
           userobm_host_id='$id'
       WHERE
           userobm_id='$user_id'";
@@ -297,7 +297,7 @@ function run_query_host_update($host) {
 //   - $p_id : host id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_host_delete($p_id) {
-  global $cdg_sql;
+  global $obm, $cdg_sql;
 
   // Delete the Host
   $query = "DELETE FROM Host WHERE host_id='$p_id'";
@@ -313,7 +313,7 @@ function run_query_host_delete($p_id) {
 
     $query = "UPDATE UserObm
     SET userobm_timeupdate='$now',
-        userobm_userupdate='$uid',
+        userobm_userupdate='$obm[uid]',
         userobm_host_id='0'
     WHERE
         userobm_host_id='$p_id'";

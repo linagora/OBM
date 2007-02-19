@@ -48,7 +48,7 @@ if ($action == "index") {
   
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {
+  if ($obm["profile"] != $perms_user) {
     require("account_js.inc");
     $display["detail"] = html_account_form($obm_q_accounts, $action);
   } else {
@@ -118,8 +118,8 @@ if ($action == "index") {
     $q_payments = run_query_account_search_payments($params["account_id"], date ("Y-m-d"));
     // used to compute balance on $tf_balance_date :
     $q_expected_payments = run_query_account_search_expected_payments ($params["account_id"], $tf_balance_date);
-    $payments_options = run_query_display_options ($auth->auth["uid"], "payment");
-    $expected_payments_options = run_query_display_options ($auth->auth["uid"], "payment");
+    $payments_options = run_query_display_options ($obm["uid"], "payment");
+    $expected_payments_options = run_query_display_options ($obm["uid"], "payment");
     html_account_compute_balance ($q_account, $q_payments, $q_expected_payments, $payments_options, $expected_payments_options, $tf_balance_date);
   } else{
     display_err_msg($l_error_permission);
@@ -130,8 +130,8 @@ if ($action == "index") {
     require ("account_js.inc");
     $display["msg"] = display_ok_msg ("FIXME PERMISSIONS");
     //$q_account = run_query_account_detail ($params["account_id"]);
-    //    $payments_options = run_query_display_options ($auth->auth["uid"],"payment");
-    $payments_prefs = get_display_pref ($auth->auth["uid"], "payment");
+    //    $payments_options = run_query_display_options ($obm["uid"],"payment");
+    $payments_prefs = get_display_pref ($obm["uid"], "payment");
 
     $display["detail"] = html_account_compute_balance ($params["account_id"], $payments_prefs, $tf_balance_date);
 
@@ -151,7 +151,7 @@ $q_account = run_query_account_detail ($params["account_id"]);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {  
+  if ($obm["profile"] != $perms_user) {  
     $display["msg"] = "<center>Nothing here for now</center><br />";
   } else {
     $display["msg"] = display_err_msg($l_error_permission);
@@ -159,22 +159,22 @@ $q_account = run_query_account_detail ($params["account_id"]);
     
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($auth->auth["uid"], "account",1);
-  $prefs_p = get_display_pref ($auth->auth["uid"], "payment",1);
+  $prefs = get_display_pref($obm["uid"], "account",1);
+  $prefs_p = get_display_pref ($obm["uid"], "payment",1);
   $display["detail"] = dis_account_display_pref ($prefs, $prefs_p); 
 
 } else if($action =="dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($auth->auth["uid"], "account",1);
-  $prefs_p = get_display_pref ($auth->auth["uid"], "payment",1);
+  $prefs = get_display_pref($obm["uid"], "account",1);
+  $prefs_p = get_display_pref ($obm["uid"], "payment",1);
   $display["detail"] = dis_account_display_pref ($prefs, $prefs_p); 
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($auth->auth["uid"], "account",1);
-  $prefs_p = get_display_pref ($auth->auth["uid"], "payment",1);
+  $prefs = get_display_pref($obm["uid"], "account",1);
+  $prefs_p = get_display_pref ($obm["uid"], "payment",1);
   $display["detail"] = dis_account_display_pref ($prefs, $prefs_p); 
 }
 

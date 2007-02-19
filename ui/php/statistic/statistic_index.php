@@ -23,8 +23,6 @@ require("statistic_display.inc");
 require("statistic_query.inc");
 require("statistic_js.inc");
  
-$uid = $auth->auth["uid"];
-
 get_statistic_action();
 $perm->check_permissions($module, $action);
 

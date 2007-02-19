@@ -17,7 +17,7 @@
 //   - $restriction : if and which restriction to set (eg user (who can read))
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_search($resource) {
-  global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
+  global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $name = sql_search_text_parse($resource["name"]);
   $desc = sql_search_text_parse($resource["desc"]);
@@ -34,7 +34,7 @@ function run_query_resource_search($resource) {
 	$multidomain = sql_multidomain("resource");
 	
   if ($restriction == "user") {
-    $uid = $auth->auth["uid"];
+    $uid = $obm["uid"];
     $rs = of_right_entity_for_consumer("Resource", "user", $uid, "read");
     if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
       $where_restriction = " AND (resource_id IN (";
@@ -128,7 +128,7 @@ function run_query_resource_detail($p_id) {
 //     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_insert($resource) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $name = $resource["name"];
   $desc = $resource["desc"];
@@ -136,14 +136,14 @@ function run_query_resource_insert($resource) {
   if ($qty == "") {
     $qty = "0";
   }
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO Resource (
      resource_timeupdate,
      resource_timecreate,
      resource_userupdate,
      resource_usercreate,
-		 resource_domain_id,
+     resource_domain_id,
      resource_name,
      resource_description,
      resource_qty
@@ -151,8 +151,8 @@ function run_query_resource_insert($resource) {
     null,
     '" . date("Y-m-d H:i:s") . "',
     null,
-    ". $auth->auth["uid"] . ",
-		'$domain_id',
+    ". $obm["uid"] . ",
+    '$domain_id',
     '$name',
     '$desc',
     '$qty'
@@ -224,22 +224,23 @@ function run_query_resource_right_init($resource_id) {
 //     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_update($p_id, $resource) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $name = $resource["name"];
   $desc = $resource["desc"];
   $qty = $resource["qty"];
-	$multidomain = sql_multidomain("resource");
+  $multidomain = sql_multidomain("resource");
 	
   $query = "UPDATE Resource SET
     resource_timeupdate='". date("Y-m-d H:i:s")."',
-    resource_userupdate=". $auth->auth["uid"] .",
+    resource_userupdate=". $obm["uid"] .",
     resource_name='$name',
     resource_description='$desc',
     resource_qty='$qty'
-  WHERE resource_id='$p_id' $multidomain";
+  WHERE resource_id='$p_id'
+    $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_resource_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 

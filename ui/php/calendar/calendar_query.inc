@@ -226,9 +226,9 @@ function run_query_calendar_update_occurence_state($event_id, $user_id, $state){
 // Select All waiting Events
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_waiting_events() {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   
   $multidomain = sql_multidomain("calendarevent");
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
@@ -304,11 +304,11 @@ function run_query_calendar_delete_event_entity($calendar) {
 //   - $event_id      : var to get the id to be returned
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
-  global $uid, $l_from, $l_to, $l_date;
+  global $obm, $l_from, $l_to, $l_date;
   global $l_add_event_mail_head,$l_add_event_mail_subject;
   global $ccalendar_resource_admin, $l_resource_allocated;
 
-  $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
+  $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
   $mail  = $calendar["mail"];
   $groups = $sel_entity_id["group"];
   $mail_title = stripslashes($calendar["title"]);
@@ -335,7 +335,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
 
   // Insert Event users
   foreach ($users_array as $user_id) {
-    if ($user_id == $uid || in_array($user_id, $writable_cal["ids"])) {
+    if ($user_id == $obm["uid"] || in_array($user_id, $writable_cal["ids"])) {
       run_query_calendar_insert_entity_event("user", $user_id, $event_id, 'A');
     } else {
       run_query_calendar_insert_entity_event("user", $user_id, $event_id, 'W');
@@ -354,7 +354,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
   $resources_array = $sel_entity_id["resource"];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
-    $writable_res = of_right_entity_for_consumer("Resource", "user", $uid, "write");
+    $writable_res = of_right_entity_for_consumer("Resource", "user", $obm["uid"], "write");
     foreach ($resources_array as $res_id) {
       if (in_array($res_id, $writable_res["ids"])) {
 	run_query_calendar_insert_entity_event("resource", $res_id, $event_id, 'A');
@@ -375,7 +375,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
   $subject = "$l_add_event_mail_subject" . $mail_title;
   $message = "$l_add_event_mail_head $mail_title $l_date : $l_from $datebegin $l_to $dateend $message_resource";
   if (is_array($users_array)) {
-    $recipient_array = array_diff($users_array, array($uid));
+    $recipient_array = array_diff($users_array, array($obm["uid"]));
   } else {
     $recipient_array = array();
   }
@@ -403,7 +403,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
 // Returns: Event id inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_event_data($calendar) {
-  global $cdg_sql, $uid,$obm;
+  global $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
@@ -444,8 +444,8 @@ function run_query_calendar_insert_event_data($calendar) {
   VALUES (
     '$now',
     '$now',
-    '$uid',
-    '$uid',
+    '$obm[uid]',
+    '$obm[uid]',
     '$title',
     '$datebegin',
     '$description',
@@ -484,9 +484,9 @@ function run_query_calendar_insert_event_data($calendar) {
 //   - $state     :
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $state) {
-  global $cdg_sql,$auth;
+  global $cdg_sql, $obm;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $query = "INSERT INTO EventEntity (
     evententity_timecreate,
     evententity_usercreate,
@@ -497,7 +497,7 @@ function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $
     evententity_state) 
   VALUES (
     NOW(),
-    $uid,
+    '$uid',
     '$event_id',
     '$entity_id',
     '$entity',
@@ -517,7 +517,7 @@ function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $
 //   - $calendar : calendar hash values
 ///////////////////////////////////////////////////////////////////////////////
 function create_calendar_ics_meeting_file($calendar, $event_id, $attendees, $resources, $filename) {
-  global $obm_version,$ccalendar_weekstart,$auth;
+  global $obm, $obm_version,$ccalendar_weekstart;
   global $l_file_error, $l_write_error, $l_read_error;
   global $l_resource_allocated;
 
@@ -532,7 +532,7 @@ function create_calendar_ics_meeting_file($calendar, $event_id, $attendees, $res
   $start_time = strtotime("-1 year", $ts_date);
   $end_time = strtotime("+1 year", $ts_date);
 
-  $calendar_user = array ($auth->auth["uid"] => "dummy");  
+  $calendar_user = array ($obm["uid"] => "dummy");  
   $obm_event = run_query_calendar_detail($event_id);
 
   $msg =  "
@@ -750,7 +750,7 @@ function check_calendar_decision_conflict($calendar) {
 //   - $sel_entity_id : List entitis id ["user"] ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) {
-  global $c_use_connectors, $uid, $l_date;
+  global $c_use_connectors, $obm, $l_date;
   global $l_update_event_mail_head,$l_update_event_mail_subject,$l_update_event_mail_body,$l_to,$l_from;
   global $ccalendar_resource_admin, $l_resource_allocated;
 
@@ -760,7 +760,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
   $groups = $calendar["group"];
   $mail = $calendar["mail"];
   $mail_title = stripslashes($calendar["title"]);
-  $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
+  $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
 
   if($calendar["task_new_id"]) $task_id = $calendar["task_new_id"]; 
   else $task_id = $calendar["task_id"];
@@ -782,7 +782,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
   $resources_array = $sel_entity_id["resource"];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
-    $writable_res = of_right_entity_for_consumer("Resource", "user", $uid, "write");
+    $writable_res = of_right_entity_for_consumer("Resource", "user", $obm["uid"], "write");
   }    
 
   $event_data = run_query_calendar_detail($event_id);
@@ -837,7 +837,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
 
   // User insertion
   foreach($users_array as $user_id) {
-    if ($user_id == $uid || in_array($user_id, $writable_cal["ids"])) {
+    if ($user_id == $obm["uid"] || in_array($user_id, $writable_cal["ids"])) {
       run_query_calendar_insert_entity_event("user", $user_id, $event_id, 'A');	
     } else {
       run_query_calendar_insert_entity_event("user", $user_id, $event_id, 'W');	
@@ -877,7 +877,7 @@ $l_update_event_mail_body $l_from $old_begin $l_to $old_end";
   }
   $message .= $message_resource; 
 
-  $recipient_array = array_diff($users_array, array($uid));
+  $recipient_array = array_diff($users_array, array($obm["uid"]));
   send_mail($subject, $message, $recipient_array, $resources_address, $mail);
 }
 
@@ -888,7 +888,7 @@ $l_update_event_mail_body $l_from $old_begin $l_to $old_end";
 //   - $calendar : Calendar params
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_update_event_data($calendar) {
-  global $cdg_sql, $uid;
+  global $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
@@ -909,7 +909,7 @@ function run_query_calendar_update_event_data($calendar) {
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
     calendarevent_timeupdate = '$now',
-    calendarevent_userupdate = '$uid', 
+    calendarevent_userupdate = '$obm[uid]', 
     calendarevent_title = '$title', 
     calendarevent_date = '$datebegin',     
     calendarevent_description = '$description',
@@ -930,6 +930,7 @@ function run_query_calendar_update_event_data($calendar) {
   $obm_q->query($query);
 }
 
+
 /**
  * Event Data Update Execution for ajax client 
  * 
@@ -938,7 +939,8 @@ function run_query_calendar_update_event_data($calendar) {
  * @return void
  */
 function run_query_calendar_quick_event_update($calendar) {
-  global $cdg_sql, $uid;
+  global $cdg_sql, $obm;
+
   $multidomain = sql_multidomain("calendarevent");
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
@@ -948,7 +950,7 @@ function run_query_calendar_quick_event_update($calendar) {
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
     calendarevent_timeupdate = '$now',
-    calendarevent_userupdate = '$uid', 
+    calendarevent_userupdate = '$obm[uid]', 
     calendarevent_title = '$title', 
     calendarevent_date = '$datebegin',     
     calendarevent_duration = '$event_duration'
@@ -958,6 +960,7 @@ function run_query_calendar_quick_event_update($calendar) {
   $obm_q->query($query);  
 }
 
+
 /**
  * Event Data  Execution for ajax client 
  * 
@@ -966,8 +969,7 @@ function run_query_calendar_quick_event_update($calendar) {
  * @return void
  */
 function run_query_calendar_quick_event_insert($calendar) {
-  global $cdg_sql, $uid,$obm;
-
+  global $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
@@ -993,8 +995,8 @@ function run_query_calendar_quick_event_insert($calendar) {
    )
   VALUES (
     '$now',
-    '$uid', 
-    '$uid', 
+    '$obm[uid]', 
+    '$obm[uid]', 
     '$title', 
     '$datebegin',     
     '$event_duration',
@@ -1013,9 +1015,11 @@ function run_query_calendar_quick_event_insert($calendar) {
   $obm_q->query($query);
   $obm_q->next_record(); 
   $event_id = $obm_q->f("max_id"); 
-  run_query_calendar_insert_entity_event("user", $uid, $event_id, 'A');
+  run_query_calendar_insert_entity_event("user", $obm["uid"], $event_id, 'A');
+
   return $event_id;
 }
+
 
 /**
  * Create an exception for an event 
@@ -1026,15 +1030,14 @@ function run_query_calendar_quick_event_insert($calendar) {
  * @return void
  */
 function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
-  global $cdg_sql, $uid,$obm;
+  global $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
   $id = $calendar["calendar_id"];
   $olddatebegin = $calendar["old_date_begin"];
   $event_duration = $calendar["duration"];
-  
-  
+
   $obm_q = new DB_OBM;
   $query = "INSERT INTO CalendarException (
       calendarexception_usercreate,
@@ -1044,9 +1047,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
       calendarexception_event_id,
       calendarexception_date)
       VALUES (
-        '$uid',
+        '$obm[uid]',
         '$now',
-        '$uid',
+        '$obm[uid]',
         '$now',
         '$id',
         '$olddatebegin'
@@ -1089,8 +1092,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
     VALUES (
       '$now',
       '$now',
-      '$uid',
-      '$uid',
+      '$obm[uid]',
+      '$obm[uid]',
       '$title',
       '$datebegin',
       '$description',
@@ -1221,7 +1224,7 @@ function run_query_calendar_delete($calendar) {
 
   $message = $l_delete_event_mail_head.$title.$message_resource;   
   $subject = "$l_delete_event_mail_subject" . $title;
-  $recipient_array = array_diff($users_array, array($uid));
+  $recipient_array = array_diff($users_array, array($obm["uid"]));
   send_mail($subject, $message, $recipient_array, $resources_address, $mail);
 }
 
@@ -1249,9 +1252,9 @@ function get_calendar_entity_readable() {
 // Get the list of readable calendar users for the current user
 ///////////////////////////////////////////////////////////////////////////////
 function get_calendar_user_readable() {
-  global $cdg_sql, $auth, $calendar, $c_all;
+  global $cdg_sql, $obm, $calendar, $c_all;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $gusers = "";
   if ( (isset($calendar["entity"]["group_view"]))
        && ($calendar["entity"]["group_view"] != $c_all) ) {
@@ -1275,9 +1278,9 @@ function get_calendar_user_readable() {
 // Get the list of readable calendar group for the current user
 ///////////////////////////////////////////////////////////////////////////////
 function get_calendar_group_readable() {
-  global $cdg_sql, $auth, $ccalendar_public_groups;
+  global $cdg_sql, $obm, $ccalendar_public_groups;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $where = sql_obm_entity_privacy("group");
   if (! $ccalendar_public_groups) {
     $where .= " AND group_privacy=1";
@@ -1302,9 +1305,9 @@ function get_calendar_group_readable() {
 // Get the list of readable calendar group for the current user
 ///////////////////////////////////////////////////////////////////////////////
 function get_calendar_resource_readable() {
-  global $cdg_sql, $auth, $ccalendar_public_groups;
+  global $cdg_sql, $obm, $ccalendar_public_groups;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $entity = of_right_entity_for_consumer("Resource", "user", $uid, "read");
 
   return $entity;
@@ -1396,7 +1399,7 @@ function get_calendar_group_from_ids($groups) {
 function store_calendar_entities($entities_q) {
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
   global $ico_calendar_user3,$ico_calendar_user4,$ico_calendar_user5;
-  global $display, $uid;
+  global $display, $obm;
 
   $i = 0;
   $entity_tab = array();
@@ -1405,7 +1408,7 @@ function store_calendar_entities($entities_q) {
     while ($user_q->next_record()) {
       $id = $user_q->f("userobm_id");
       $name = $user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname");
-      if($uid == $id) {
+      if ($obm["uid"] == $id) {
       $entity_tab["user"][$id] = array(
         "name"  => $name,
         "class" => "eventOwner",
@@ -1805,7 +1808,7 @@ function get_calendar_date_day_of_week($timestamp, $day) {
 //   - $entity_readable : if given, entities eligibles
 ///////////////////////////////////////////////////////////////////////////////
 function slice_calendar_entities($sel_entity_id, $nb_max, $entity_readable="") {
-  global $auth;
+  global $obm;
 
   $sel_user_id = $sel_entity_id["user"];
   $sel_group_id = $sel_entity_id["group"];
@@ -1853,7 +1856,7 @@ function slice_calendar_entities($sel_entity_id, $nb_max, $entity_readable="") {
   }
   $nb_res = count($res_resource_id);
   if (($nb_user == 0) && ($nb_res == 0)) {
-    $res_user_id = array($auth->auth["uid"]);
+    $res_user_id = array($obm["uid"]);
   }
 
   return array(
@@ -1890,7 +1893,7 @@ function get_calendar_week_num($date) {
 //   - $calendar       : calendar params
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id) {
-  global $cdg_sql, $uid;
+  global $cdg_sql;
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -1988,7 +1991,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
 //   - $calendar_entity : array of entities elements to display
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_no_repeat_events($start,$end, $calendar_entity) {
-  global $cdg_sql, $uid;
+  global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -2116,7 +2119,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity) {
 //   - $calendar_entity : array of entities elements to display
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_repeat_events($start, $end, $calendar_entity) {
-  global $cdg_sql, $uid;
+  global $cdg_sql;
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;

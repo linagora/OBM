@@ -51,8 +51,6 @@ include("$obminclude/of/of_category.inc");
 
 require("company_js.inc");
 
-$uid = $auth->auth["uid"];
-
 get_company_action();
 $perm->check_permissions($module, $action);
 update_last_visit("company", $params["company_id"], $action);
@@ -292,19 +290,19 @@ if ($action == "ext_get_id") {
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($uid, "company", 1);
+  $prefs = get_display_pref($obm["uid"], "company", 1);
   $display["detail"] = dis_company_display_pref($prefs);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($uid, "company", 1);
+  $prefs = get_display_pref($obm["uid"], "company", 1);
   $display["detail"] = dis_company_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($uid, "company", 1);
+  $prefs = get_display_pref($obm["uid"], "company", 1);
   $display["detail"] = dis_company_display_pref($prefs);
 
 } elseif ($action == "document_add") {

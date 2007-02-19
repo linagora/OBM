@@ -41,10 +41,10 @@ function run_query_mailforward_detail($u_id) {
 // Parameters:
 //   - $forward[] : entry values
 //     keys used  : email_nomade, nomade_enable
-//   - $uid       : user id
+//   - $u_id       : user id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_mailforward_update($forward, $uid) {
-  global $auth, $cdg_sql;
+function run_query_mailforward_update($forward, $u_id) {
+  global $cdg_sql;
 
   $email_nomade = $forward["email_nomade"];
   $nomade_enable = $forward["nomade_enable"];
@@ -54,7 +54,7 @@ function run_query_mailforward_update($forward, $uid) {
     userobm_email_nomade    = '$email_nomade',
     userobm_nomade_enable   = '$nomade_enable',
     userobm_nomade_local_copy='$nomade_local_copy'    
-  WHERE userobm_id = '$uid'";
+  WHERE userobm_id = '$u_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_mailforward_update()");
   // Update database update
@@ -144,18 +144,25 @@ function check_mailforward_data_form($usr_q, $forward) {
     return false;
   }
 
-  // Email nomade : correct
-  if ( (trim($email_nomade) == "")
-       || (preg_match($php_regexp_email, $email_nomade) == false) ) {
+  // Email nomade must be filled if nomade activated
+  if ( ($nomade_enable) && (trim($email_nomade) == "")) {
     $err["msg"] = "$email_nomade : $l_err_email";
     $err["field"] = "email_nomade";
     return false;
   }
+
+  // Email nomade : correct if filled
+  if ( (trim($email_nomade) != "")
+       && (preg_match($php_regexp_email, $email_nomade) == false) ) {
+    $err["msg"] = "$email_nomade : $l_err_email";
+    $err["field"] = "email_nomade";
+    return false;
+  }
+
   // User nomade local copy only if autorized and activated
-  if ( ($nomade_local_copy) && ((! $nomade_perms) || (! $nomade_enable)) )
-  {
+  if ( ($nomade_local_copy) && ((! $nomade_perms) || (! $nomade_enable)) ) {
     $err["msg"] = $l_err_nomade_local_copy;
-    $err["field"] = "nlocalcopy";
+    $err["field"] = "nomade_local_copy";
     return false;
   }
   

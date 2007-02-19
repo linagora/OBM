@@ -51,7 +51,7 @@ function dis_mailserver_list($ms_q) {
 //   - $mailserver[] : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
-  global $display, $cgp_hide, $uid,$l_mailserver;
+  global $display, $cgp_hide, $l_mailserver;
   global $l_networks, $l_host, $l_ip,$l_none,$l_update,$l_insert;
   global $ico_add, $ico_delete,$l_relayhost,$php_regexp_network,$php_regexp_ip;
 
@@ -268,9 +268,8 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
 // Display Mail Server Consult
 ///////////////////////////////////////////////////////////////////////////////
 function dis_mailserver_consult($ms_q,$net_q) {
-  global $uid,$l_mailserver;
+  global $l_mailserver, $l_relayhost;
   global $l_network, $l_host, $l_ip,$l_none,$l_update,$l_insert;
-  global $l_relayhost;
 
   $relayhost = $ms_q->f("relayhost_name");
   $relayhost_ip = $ms_q->f("relayhost_ip");

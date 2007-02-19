@@ -62,11 +62,10 @@ require("deal_display.inc");
 require("deal_js.inc");
 require_once("$obminclude/of/of_select.inc");
 require_once("$obminclude/of/of_category.inc");
-$uid = $auth->auth["uid"];
 
 get_deal_action();
 $perm->check_permissions($module, $action);
-if (! check_privacy($module, "Deal", $action, $params["deal_id"], $uid)) {
+if (! check_privacy($module, "Deal", $action, $params["deal_id"], $obm["uid"])) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
@@ -450,22 +449,22 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($uid,"deal",1);
-  $prefs_parent = get_display_pref($uid,"parentdeal",1);
+  $prefs = get_display_pref($obm["uid"],"deal",1);
+  $prefs_parent = get_display_pref($obm["uid"],"parentdeal",1);
   $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
   
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($uid,"deal",1);
-  $prefs_parent = get_display_pref($uid,"parentdeal",1);
+  $prefs = get_display_pref($obm["uid"],"deal",1);
+  $prefs_parent = get_display_pref($obm["uid"],"parentdeal",1);
   $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($uid,"deal",1);
-  $prefs_parent = get_display_pref($uid,"parentdeal",1);
+  $prefs = get_display_pref($obm["uid"],"deal",1);
+  $prefs_parent = get_display_pref($obm["uid"],"parentdeal",1);
   $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
 }
 

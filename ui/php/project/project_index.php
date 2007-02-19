@@ -53,9 +53,6 @@ require("project_display.inc");
 require("project_js.inc");
 include("$obminclude/of/of_category.inc");
 
-$uid = $auth->auth["uid"];
-$perms = $auth->auth["perm"];
-
 update_last_visit("project", $params["project_id"], $action);
 
 get_project_action();
@@ -431,19 +428,19 @@ if ($action == "ext_get_id") {
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($uid, "project", 1);
+  $prefs = get_display_pref($obm["uid"], "project", 1);
   $display["detail"] = dis_project_display_pref($prefs);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($uid, "project", 1);
+  $prefs = get_display_pref($obm["uid"], "project", 1);
   $display["detail"] = dis_project_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($uid, "project", 1);
+  $prefs = get_display_pref($obm["uid"], "project", 1);
   $display["detail"] = dis_project_display_pref($prefs);
 }
 

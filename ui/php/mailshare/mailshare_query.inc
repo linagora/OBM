@@ -118,7 +118,7 @@ function run_query_mailshare_detail($id) {
 //   - $mailshare[] : mailshare hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_mailshare_insert($mailshare) {
-  global $uid, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $name = $mailshare["name"];
   $quota = $mailshare["quota"];
@@ -142,7 +142,7 @@ function run_query_mailshare_insert($mailshare) {
     null,
     '$now',
     null,
-    '$uid',
+    '$obm[uid]',
     '$name',
     '$quota',
     '$desc',
@@ -160,7 +160,7 @@ function run_query_mailshare_insert($mailshare) {
     WHERE
       mailsharedir_timecreate = '$now'
       AND mailsharedir_userupdate is null
-      AND mailsharedir_usercreate = '$uid'
+      AND mailsharedir_usercreate = '$obm[uid]'
       AND mailsharedir_domain_id = '$domain_id'
       AND mailsharedir_name = '$name'
       AND mailsharedir_quota = '$quota'
@@ -185,7 +185,7 @@ function run_query_mailshare_insert($mailshare) {
 //   - $mailshare[] : mailshare hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_mailshare_update($mailshare) {
-  global $uid, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $id = $mailshare["mailshare_id"];
   $name = $mailshare["name"];
@@ -197,7 +197,7 @@ function run_query_mailshare_update($mailshare) {
   
   $query = "UPDATE MailShareDir set
     mailsharedir_timeupdate = '$now',
-    mailsharedir_userupdate = '$uid',
+    mailsharedir_userupdate = '$obm[uid]',
     mailsharedir_name = '$name',
     mailsharedir_quota = '$quota',
     mailsharedir_description = '$desc',

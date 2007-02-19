@@ -159,12 +159,12 @@ function html_resourcegroup_search_form ($group) {
 //     keys used  : name, description
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resourcegroup_search_resourcegroup($group) {
-  global $display, $l_found, $l_no_found, $auth;
+  global $obm, $display, $l_found, $l_no_found;
 
   $child_res = $group["children_restriction"];
   $widget = $group["ext_widget"];
 
-  $prefs = get_display_pref($auth->auth["uid"], "resourcegroup");
+  $prefs = get_display_pref($obm["uid"], "resourcegroup");
   if ($child_res) {
     $obm_q = run_query_resourcegroup_search_possible_children($group);
   }  else {
@@ -266,7 +266,7 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
 function html_resourcegroup_form($action, $group_q, $group) {
   global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_private;
   global $cgroup_private_default, $l_insert, $l_update, $l_back;
-  global $auth;
+  global $obm;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -290,7 +290,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
   // If new group or group update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action=="detailupdate") || ($action=="update")) &&
-         ($usercreate == $auth->auth["uid"]) ) ) {
+         ($usercreate == $obm["uid"]) ) ) {
     if ($priv == '1') {
       $private_c = " checked";
     }
@@ -393,7 +393,7 @@ function dis_resourcegroup_consult($group, $uid) {
 //   - $r_q      : user database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
-  global $display, $auth, $perm, $module, $action, $cright_write;
+  global $display, $perm, $module, $action, $cright_write;
   global $l_yes, $l_no, $ico_mail;
   global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_visibility, $l_no_user, $l_no_resourcegroup_resourcegroup;
   global $l_system, $l_local, $l_ext_id;
@@ -508,10 +508,10 @@ function dis_resourcegroup_display_pref($pref_group_q, $pref_r_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resourcegroup_warn_delete($id) {
   global $display, $l_warn_delete, $l_delete, $l_back, $l_cant_delete_system;
-  global $uid, $l_cant_delete_public;
+  global $obm, $l_cant_delete_public;
 
   $lgroup = get_resourcegroup_info($id);
-  if (($lgroup["privacy"] == "0") && ($lgroup["usercreate"] != "$uid")) {
+  if (($lgroup["privacy"] == "0") && ($lgroup["usercreate"] != $obm["uid"])) {
     $display["msg"] .= display_warn_msg($l_cant_delete_public);
     $dis_delete = "";
   } else {

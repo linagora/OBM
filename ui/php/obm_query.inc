@@ -13,10 +13,10 @@
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_days_unfilled() {
-  global $cdg_sql, $cdg_param, $auth;
+  global $cdg_sql, $cdg_param, $obm;
   global $c_day_fraction, $c_working_days;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   $u = get_user_info($uid);
   $unix_ts = $u["datebegin"]["unix_timestamp"];

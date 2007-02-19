@@ -15,9 +15,9 @@
 //     keys used       archive, name, phone, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_search($document) {
-  global $c_all, $cdg_sql, $auth, $ctu_sql_limit, $cdoc_kind_dir;
+  global $c_all, $cdg_sql, $obm, $ctu_sql_limit, $cdoc_kind_dir;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   $sql_order_dir = $document["sql_order_dir"];
   $sql_order_field = $document["sql_order_field"];
@@ -40,7 +40,7 @@ function run_query_document_search($document) {
   $where .= sql_obm_entity_privacy("document");
   $where .= " AND document_kind != '$cdoc_kind_dir'";
 
-  if ($entity != "") {
+  if (($entity != "") && ($entity != "document")) {
     $join_ent = "LEFT JOIN DocumentEntity on document_id = documententity_document_id";
     $where .= " AND documententity_entity = '$entity'
                 AND documententity_entity_id = '$entity_id'";
@@ -148,11 +148,11 @@ function run_query_document_detail($p_id) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_insert(&$document) {
-  global $auth, $cdg_sql, $c_auto, $obm;
+  global $cdg_sql, $c_auto, $obm;
   global $err_msg, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $now = date("Y-m-d H:i:s");
   $domain_id = $obm["domain_id"];
 	
@@ -283,7 +283,7 @@ function run_query_document_id($document) {
       AND document_size='$size'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_document_id()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -304,11 +304,11 @@ function run_query_document_id($document) {
 //   - $document[] : Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_update(&$document) {
-  global $auth, $cdg_sql, $c_auto;
+  global $obm, $cdg_sql, $c_auto;
   global $err_msg, $l_delete_file_error, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $now = date("Y-m-d H:i:s");
 
   $id = $document["document_id"];
@@ -767,10 +767,10 @@ function check_document_data_form($cid, $document) {
 //   - $document : document hash info
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_mime_insert($document) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
+  $usercreate = $obm["uid"];
   $mime = $document["mime_label"];
   $extension = $document["extension"];
   $mimetype = $document["mimetype"];
@@ -805,10 +805,10 @@ function run_query_document_mime_insert($document) {
 //   - $document : document hash info : keys used : act, act_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_mime_update($document) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
+  $userupdate = $obm["uid"];
   $id = $document["mime"];
   $mime = $document["mime_label"];
   $extension = $document["extension"];
@@ -906,9 +906,9 @@ function run_query_document_mime_delete($id) {
 //   - $id : Mime Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_insert_dir($document) {
-  global $cdg_sql, $auth, $cdoc_kind_dir, $obm;
+  global $cdg_sql, $cdoc_kind_dir, $obm;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $now = date("Y-m-d H:i:s");
   $domain_id = $obm["domain_id"];
 	
@@ -957,9 +957,9 @@ function run_query_document_insert_dir($document) {
 //   - $id : Mime Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_update_dir($document) {
-  global $cdg_sql, $auth, $cdoc_kind_dir;
+  global $cdg_sql, $obm, $cdoc_kind_dir;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $now = date("Y-m-d H:i:s");
   $path = $document["path"].$document["name"];
   $old_path = $document["path"].$document["old_name"];
@@ -1118,7 +1118,7 @@ function check_document_can_delete_dir($id) {
 //   - $display_file : bolean
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_get_tree($display_file) {
-  global $cdg_sql, $auth, $cdoc_kind_dir;
+  global $cdg_sql, $cdoc_kind_dir;
 
   $where .= sql_obm_entity_privacy("document");
   $multidomain = sql_multidomain("document");

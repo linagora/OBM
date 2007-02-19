@@ -49,11 +49,9 @@ require("contact_query.inc");
 require_once("contact_js.inc");
 require_once("$obminclude/of/of_category.inc");
 
-$uid = $auth->auth["uid"];
-
 get_contact_action();
 $perm->check_permissions($module, $action);
-if (! check_privacy($module, "Contact", $action, $params["contact_id"], $uid)) {
+if (! check_privacy($module, "Contact", $action, $params["contact_id"], $obm["uid"])) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
@@ -292,19 +290,19 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($uid, "contact", 1);
+  $prefs = get_display_pref($obm["uid"], "contact", 1);
   $display["detail"] = dis_contact_display_pref($prefs); 
   
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($uid, "contact", 1);
+  $prefs = get_display_pref($obm["uid"], "contact", 1);
   $display["detail"] = dis_contact_display_pref($prefs);
   
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($uid, "contact", 1);
+  $prefs = get_display_pref($obm["uid"], "contact", 1);
   $display["detail"] = dis_contact_display_pref($prefs);
 
 } elseif ($action == "document_add")  {

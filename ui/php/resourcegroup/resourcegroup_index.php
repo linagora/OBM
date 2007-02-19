@@ -43,8 +43,6 @@ require("resourcegroup_js.inc");
 get_resourcegroup_action();
 $perm->check_permissions($module, $action);
 
-$uid = $auth->auth["uid"];
-
 if (! check_privacy($module, "RGroup", $action, $params["resourcegroup_id"], 0)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
@@ -79,7 +77,7 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_resourcegroup_consult($params, $uid);
+  $display["detail"] = dis_resourcegroup_consult($params, $obm["uid"]);
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,7 +93,7 @@ if (($action == "index") || ($action == "")) {
       $params["resourcegroup_id"] = run_query_resourcegroup_insert($params);
       if ($params["resourcegroup_id"]) {
 	$display["msg"] .= display_ok_msg("$l_resourcegroup : $l_insert_ok");
-	$display["detail"] = dis_resourcegroup_consult($params, $uid);
+	$display["detail"] = dis_resourcegroup_consult($params, $obm["uid"]);
       } else {
 	$display["msg"] .= display_err_msg("$l_resourcegroup : $l_insert_error");
 	$display["detail"] = html_resourcegroup_form($action, "", $params);
@@ -110,7 +108,7 @@ if (($action == "index") || ($action == "")) {
 	$params["resourcegroup_id"] = run_query_resourcegroup_insert($params);
 	if ($params["resourcegroup_id"] > 0) {
 	  $display["msg"] .= display_ok_msg("$l_resourcegroup : $l_insert_ok");
-	  $display["detail"] = dis_resourcegroup_consult($params, $uid);
+	  $display["detail"] = dis_resourcegroup_consult($params, $obm["uid"]);
 	} else {
 	  $display["msg"] .= display_err_msg("$l_resourcegroup : $l_insert_error");
 	  $display["detail"] = html_resourcegroup_form($action, "", $params);
@@ -133,7 +131,7 @@ if (($action == "index") || ($action == "")) {
     } else {
       $display["msg"] .= display_err_msg("$l_resourcegroup : $l_update_error");
     }
-    $display["detail"] = dis_resourcegroup_consult($params, $uid);
+    $display["detail"] = dis_resourcegroup_consult($params, $obm["uid"]);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
     $params_q = run_query_resourcegroup_detail($params["resourcegroup_id"]);
@@ -162,7 +160,7 @@ if (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_err_msg($l_no_resource_added);
   }
-  $display["detail"] = dis_resourcegroup_consult($params, $uid);
+  $display["detail"] = dis_resourcegroup_consult($params, $obm["uid"]);
 
 } elseif ($action == "resource_del") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -172,7 +170,7 @@ if (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_err_msg($l_no_resource_deleted);
   }
-  $display["detail"] = dis_resourcegroup_consult($params, $uid);
+  $display["detail"] = dis_resourcegroup_consult($params, $obm["uid"]);
 
 } elseif ($action == "resourcegroup_add") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -182,7 +180,7 @@ if (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_err_msg($l_no_resourcegroup_added);
   }
-  $display["detail"] = dis_resourcegroup_consult($params, $uid);
+  $display["detail"] = dis_resourcegroup_consult($params, $obm["uid"]);
 
 } elseif ($action == "resourcegroup_del") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -192,26 +190,26 @@ if (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_err_msg($l_no_resourcegroup_deleted);
   }
-  $display["detail"] = dis_resourcegroup_consult($params, $uid);
+  $display["detail"] = dis_resourcegroup_consult($params, $obm["uid"]);
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($uid, "resourcegroup", 1);
-  $prefs_r = get_display_pref($uid, "resourcegroup_resource", 1);
+  $prefs = get_display_pref($obm["uid"], "resourcegroup", 1);
+  $prefs_r = get_display_pref($obm["uid"], "resourcegroup_resource", 1);
   $display["detail"] = dis_resourcegroup_display_pref($prefs, $prefs_r);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($uid, "resourcegroup", 1);
-  $prefs_r = get_display_pref($uid, "resourcegroup_resource", 1);
+  $prefs = get_display_pref($obm["uid"], "resourcegroup", 1);
+  $prefs_r = get_display_pref($obm["uid"], "resourcegroup_resource", 1);
   $display["detail"] = dis_resourcegroup_display_pref($prefs, $prefs_r);
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($uid, "resourcegroup", 1);
-  $prefs_r = get_display_pref($uid, "resourcegroup_resource", 1);
+  $prefs = get_display_pref($obm["uid"], "resourcegroup", 1);
+  $prefs_r = get_display_pref($obm["uid"], "resourcegroup_resource", 1);
   $display["detail"] = dis_resourcegroup_display_pref($prefs, $prefs_r);
 
 ///////////////////////////////////////////////////////////////////////////////

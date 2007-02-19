@@ -12,7 +12,7 @@ Pour ce faire les options de configurations et les données spécifiques d'un site
 
 \begin{tabular}{|p{7cm}|p{5cm}|}
 \hline
-Répertoire de configuration & obminclude/conf \\
+Répertoire de configuration & conf/ \\
 \hline
 Fichier de configuration & conf/obm\_conf.inc \\
 \hline
@@ -181,7 +181,66 @@ serveur. Utilisé seulement si le mode d'authentification est "CAS".\\
   détaillée dans la documentation Aliamin. En attendant l'unification
   entre ces deux documentations, merci de vous référer à cette dernière.}
 
+\clearpage
+%%----------------------------------------------------------------------------
+\subsection{La page de login}
+\label{login_page}
 
+La page de login est configurable depuis \obm 2.0.0
+
+Pour définir une page de login spécifique, il faut créer la page html :
+\fichier{conf/themes/login.html} (un exemple basique est disponible : \fichier{conf/themes/login.html.sample}).\\
+
+Il est possible d'utiliser des images spécifiques dans cette page.
+Les images sont à positionner dans le répertoire \fichier{conf/themes/images}.
+Pour les référencer ils faut utiliser des liens de type (le répertoire \fichier{resources/conf} est un lien vers \fichier{conf/themes/images}) :
+\begin{verbatim}
+<\?php echo C\_IMAGE\_PATH; \?>/../conf/my\_image.png);\\
+\end{verbatim}
+
+\begin{tabular}{|p{7cm}|p{5cm}|}
+\hline
+Page de login spécifique & conf/themes/login.html \\
+\hline
+Répertoire des images spécifiques & conf/themes/images/ \\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Pour que le login soit fonctionnel, un certain nombre de variables sont à positionner dans la page de login spécifique :\\
+
+
+\begin{tabular}{|p{4cm}|p{9cm}|}
+\hline
+\$login\_javascript\_header & en-tête javascript à positionner dans head (<head></head>) \\
+\hline
+\$login\_form\_header & en-tête du formulaire d'authentification\\
+\hline
+\$login\_form\_login & champ de login\\
+\hline
+\$login\_form\_password & champ de mot de passe\\
+\hline
+\$login\_form\_domain & champ de domaine\\
+\hline
+\$login\_form\_values & autres champs à positionner (nécessaires à OBM)\\
+\hline
+\$login\_error\_msg & message d'erreur si présent\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+D'autres variables sont disponibles pour une utilisation dans la page de login spécifique :\\
+
+\begin{tabular}{|p{4cm}|p{9cm}|}
+\hline
+\$login\_form\_footer & code javascript exécuté en fin de page (ex: positionnement du curseur)\\
+\hline
+\$obm\_version & Version d'\obm\\
+\hline
+\end{tabular}
+
+
+%%----------------------------------------------------------------------------
 \subsection{La définition des sections}
 \label{cgp_show_section}
 
@@ -253,6 +312,7 @@ $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
 \end{itemize}
 
 
+%%----------------------------------------------------------------------------
 \subsection{La définition des modules affichés}
 \label{cgp_show_module}
 
@@ -389,6 +449,7 @@ Liste des modules dépendants :\\
 \end{tabular}
 
 
+%%----------------------------------------------------------------------------
 \subsection{Le paramétrage des champs visibles}
 \label{cgp_hide}
 

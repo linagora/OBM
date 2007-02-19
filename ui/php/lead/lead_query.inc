@@ -24,7 +24,7 @@ function run_query_lead_search($params) {
   $date_before = $params["date_before"];
   $date_field = $params["date_field"] ? $params["date_field"] : "date";
   $source = $params["source"];
-  $manager = $params["manager_id"];
+  $manager = $params["manager"];
   $archive = $params["archive"];
 
   $obm_q = new DB_OBM;
@@ -95,6 +95,7 @@ function run_query_lead_search($params) {
     lead_todo,
     company_name,
     company_zipcode,
+    company_phone,
     leadsource_label,
     $concat_manager as manager
   FROM Lead
@@ -138,7 +139,7 @@ function run_query_lead_detail($p_id) {
   $manager_name[] = array("type" => "string", "value" => " ");
   $manager_name[] = array("type" => "field", "value" => "m.userobm_firstname");
   $concat_manager = sql_string_concat($db_type, $manager_name);
-	$multidomain = sql_multidomain("lead");
+  $multidomain = sql_multidomain("lead");
 	
   $query = "SELECT Lead.*,
       $timeupdate,
@@ -157,7 +158,8 @@ function run_query_lead_detail($p_id) {
          LEFT JOIN UserObm as c ON lead_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON lead_userupdate=u.userobm_id
          LEFT JOIN UserObm as m ON lead_manager_id=m.userobm_id
-    WHERE lead_id='$p_id' $multidomain";
+    WHERE lead_id='$p_id'
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_lead_detail()");
   $obm_q->query($query);
@@ -173,10 +175,10 @@ function run_query_lead_detail($p_id) {
 //   - $params[]: Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_lead_insert($params) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 	
   $company_id = $params["company_new_id"];
   if ($company_id < 1) {
@@ -252,7 +254,7 @@ function run_query_lead_insert($params) {
       AND lead_date $datep
       AND lead_name = '$name'
       AND lead_comment = '$comment'
-			AND lead_domain_id='$domain_id'";
+      AND lead_domain_id='$domain_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_lead_insert(2)");
   $obm_q->query($query);
@@ -270,10 +272,10 @@ function run_query_lead_insert($params) {
 //   - $params[]  : Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_lead_update($pid, $params) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   $company_id = $params["company_new_id"];
   if ($company_id < 1) {
@@ -307,7 +309,7 @@ function run_query_lead_update($pid, $params) {
     lead_timeupdate='$now',
     lead_userupdate='$uid',
     lead_source_id='$source_id',
-		lead_domain_id='$domain_id',
+    lead_domain_id='$domain_id',
     lead_company_id='$company_id',
     lead_manager_id='$manager_id',
     lead_name='$name',
@@ -317,7 +319,8 @@ function run_query_lead_update($pid, $params) {
     lead_archive='$archive',
     lead_privacy='$privacy',
     lead_comment='$comment'
-  WHERE lead_id='$pid' $multidomain";
+  WHERE lead_id='$pid'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_lead_update()");
   $obm_q = new DB_OBM;
@@ -347,7 +350,7 @@ function get_lead_managers($archive = false) {
   	$where = "WHERE 1=1 $multidomain";
   }
   
-	$multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain("userobm");
 	
   $query = "SELECT DISTINCT
       userobm_id,
@@ -356,7 +359,7 @@ function get_lead_managers($archive = false) {
     FROM Lead
       JOIN UserObm ON lead_manager_id=userobm_id
     $where
-  ORDER BY userobm_lastname";
+    ORDER BY userobm_lastname";
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);

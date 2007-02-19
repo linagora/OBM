@@ -270,13 +270,13 @@ function html_user_search_form($user) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_search_list($user) {
   global $l_found, $l_no_found;
-  global $display, $auth;
+  global $display, $obm;
 
   $popup = $user["popup"];
   $restriction = $user["restriction_calendar"];
   $obm_q = run_query_user_search($user);
 
-  $prefs = get_display_pref($auth->auth["uid"], "user");
+  $prefs = get_display_pref($obm["uid"], "user");
   $nb_user = $obm_q->num_rows_total();
   if ($nb_user == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -848,7 +848,7 @@ function html_user_group_consult($usr_q) {
 // Parameters:
 //   - $usr_q : user database result
 //   - $user  : default values or updated values (if error)
-//   - $field : field in error
+//   - $field : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($usr_q, $user, $field="") {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname, $l_title;

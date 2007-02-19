@@ -80,7 +80,6 @@ function html_backup_search_form($backup) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_backup_search_list($backup) {
   global $display, $l_no_found;
-  global $auth;
 
   $files = get_backup_list($backup);
   $nb_files = count($files);

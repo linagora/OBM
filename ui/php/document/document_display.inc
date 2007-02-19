@@ -137,10 +137,9 @@ function html_document_search_form ($document, $mime_q) {
 //   - $document[] : document search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_search_list($document) {
-  global $display, $l_found, $l_no_found;
-  global $auth;
+  global $obm, $display, $l_found, $l_no_found;
 
-  $prefs = get_display_pref($auth->auth["uid"], "document");
+  $prefs = get_display_pref($obm["uid"], "document");
   $obm_q = run_query_document_search($document);
   $nb_document = $obm_q->num_rows_total();
   if ($nb_document == 0) {
@@ -360,10 +359,10 @@ function dis_document_form($action, $document, $doc_q) {
 //   - $mime_q     : Mime types database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_form($action, $document, $doc_q, $mime_q) {
-  global $display, $path, $default_path;
+  global $obm, $display, $path, $default_path;
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
-  global $l_name, $l_author, $l_path, $l_kind,$auth,$l_browse; 
+  global $l_name, $l_author, $l_path, $l_kind, $l_browse; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto;
   global $popup_width, $popup_height;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
@@ -405,7 +404,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
     <div id=\"file_update\" style=\"display: none\">";
     $update_file_end = "</div>";
   } elseif($action == "new") {
-    $usr_q = get_user_info($auth->auth["uid"]);
+    $usr_q = get_user_info($obm["uid"]);
     $author = $usr_q["lastname"]." ".$usr_q["firstname"];
   }
   // If parameters have been given, they supercede the default action value

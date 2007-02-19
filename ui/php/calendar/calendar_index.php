@@ -32,7 +32,6 @@ include("$obminclude/global.inc");
 $params = get_calendar_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-$uid = $auth->auth["uid"];
 
 $extra_css[] = $css_calendar;
 $extra_js_include[] = "calendar.js";
@@ -109,7 +108,7 @@ if ( ( (! is_array($cal_entity_id["user"]))
        || (count($cal_entity_id["user"]) == 0) )
      && ( (! is_array($cal_entity_id["resource"]))
 	  || (count($cal_entity_id["resource"]) == 0)) ) {
-  $cal_entity_id["user"] = array($uid);
+  $cal_entity_id["user"] = array($obm["uid"]);
 }
 
 //print_r($cal_entity_id);
@@ -254,8 +253,8 @@ if ($action == "index") {
   if (check_calendar_data_quick_form($params)) {
     $id = $params["calendar_id"];
     $eve_q = run_query_calendar_detail($id);
-    if($uid != $eve_q->f("calendarevent_owner")) {
-      $writable = of_right_entity_for_consumer("calendar", "user", $uid, "write",array($eve_q->f("calendarevent_owner")));
+    if ($obm["uid"] != $eve_q->f("calendarevent_owner")) {
+      $writable = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write",array($eve_q->f("calendarevent_owner")));
       if(count($writable["ids"]) != 1) {
         json_error_msg($l_invalid_data . " : " . $l_rights );
         echo "({".$display['json']."})";
@@ -296,8 +295,8 @@ if ($action == "index") {
   $id = $params["calendar_id"];
   if (check_calendar_can_delete($id)) {
     $eve_q = run_query_calendar_detail($id);    
-    if($uid != $eve_q->f("calendarevent_owner")) {
-      $writable = of_right_entity_for_consumer("calendar", "user", $uid, "write",array($eve_q->f("calendarevent_owner")));
+    if ($obm["uid"] != $eve_q->f("calendarevent_owner")) {
+      $writable = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write",array($eve_q->f("calendarevent_owner")));
       if(count($writable["ids"]) != 1) {
         json_error_msg($l_invalid_data . " : " . $l_rights );
         echo "({".$display['json']."})";
@@ -323,7 +322,7 @@ if ($action == "index") {
 
 } elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_calendar_update_occurence_state($params["calendar_id"],$uid,$params["decision_event"]);
+  run_query_calendar_update_occurence_state($params["calendar_id"], $obm["uid"],$params["decision_event"]);
   $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
   $display["detail"] = dis_calendar_calendar_view($params, $cal_entity_id);
 
@@ -426,10 +425,10 @@ if ($action == "index") {
   $display["detail"] .= dis_calendar_admin_index();
 }
 
-$sess->register("cal_entity_id");
+$_SESSION['cal_entity_id'] = $cal_entity_id;
 //echo "<p>";
 //print_r($cal_entity_id);
-if(!$params["ajax"]) {
+if (!$params["ajax"]) {
   $display["head"] = display_head($l_calendar);
   $display["header"] = display_menu($module);
   $display["end"] = display_end();

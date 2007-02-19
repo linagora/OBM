@@ -79,14 +79,14 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 //   - $todo[]    : todo search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_search_list($todo) {
-  global $display, $auth, $l_no_found;
+  global $display, $obm, $l_no_found;
 
   $todo_q = run_query_todo_todolist($todo);
   $nb_todo = $todo_q->num_rows_total();
   if ($nb_todo == 0) {
     $display["msg"] .= display_info_msg($l_no_found);
   } else {
-    $prefs = get_display_pref($auth->auth["uid"], "todo", 0);
+    $prefs = get_display_pref($obm["uid"], "todo", 0);
     $display["result"] .= html_todo_search_list($todo, $todo_q, $prefs);
   }
 
@@ -102,9 +102,9 @@ function dis_todo_search_list($todo) {
 //   - $prefs  : fields to display in the todo list
 ///////////////////////////////////////////////////////////////////////////////
 function html_todo_search_list($todo, $todo_q, $prefs) {
-  global $auth, $l_del, $l_delete;
+  global $obm, $l_del, $l_delete;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $title = $todo["title"];
   $users = $todo["userid"];
   $user = $users[0];
@@ -216,9 +216,9 @@ function dis_todo_detail($todo, $todo_q) {
 //   - $todo_q : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_form($todo, $todo_q = 0) {
-  global $path, $uid;
+  global $path, $obm;
   global $set_theme, $set_date, $ico_mini_cal, $ico_add_user,$ico_delete;
-  global $popup_width, $popup_height, $auth;
+  global $popup_width, $popup_height;
   global $l_add, $l_update, $l_close,$display,$l_todo,$l_user;
   global $l_deadline, $l_priority, $l_todotitle, $l_percent, $l_content;
 
@@ -236,7 +236,7 @@ function dis_todo_form($todo, $todo_q = 0) {
     $deadline = $todo_q->f("date_deadline");
     $deadline = ($deadline != 0) ? of_date_format($deadline, 1) : $l_no_deadline;
   } else {
-    $u_id = $auth->auth["uid"];
+    $u_id = $obm["uid"];
     $priority = intval(($max_priority+1)/2);
     $deadline = date("Y-m-d");
   }
@@ -253,7 +253,7 @@ function dis_todo_form($todo, $todo_q = 0) {
   } else if ($u_id > 0) {
     $p_user_array = array($u_id);
   } else {
-    $p_user_array = array($uid);
+    $p_user_array = array($obm["uid"]);
   }
 
   $users = get_userobm_from_ids($p_user_array);

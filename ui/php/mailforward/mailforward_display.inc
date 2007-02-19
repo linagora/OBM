@@ -17,7 +17,7 @@ function html_forward_consult($usr_q) {
   global $l_mailforward, $l_internal_email;
   global $l_nomade_not_allowed,$l_local_copy;
   global $l_email_nomade, $l_enable, $l_disable, $l_forbid, $l_state;
-  global $c_yes, $c_no;
+  global $obm, $c_yes, $c_no;
 
   $id = $usr_q->f("userobm_id");
   $email = $usr_q->f("userobm_email");
@@ -26,8 +26,7 @@ function html_forward_consult($usr_q) {
   $nomade_enable = $usr_q->f("userobm_nomade_enable");
   $nomade_local_copy = $usr_q->f("userobm_nomade_local_copy");    
 
-  $mail = get_mail_info();
-  $domain = $mail["main_domain"];
+  $domain = $obm["domain_name"];
 
   if (! $nomade_perms) {
     $dis_nomade = "<td class=\"detailLabel\">$l_nomade_not_allowed</td>";
@@ -72,19 +71,18 @@ function html_forward_consult($usr_q) {
 // Parameters:
 //   - $usr_q   : User mail forwarding database result
 //   - $forward : default values or updated values (if error)
-//   - $err     : error array
+//   - $field   : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
-function html_forward_form($usr_q, $forward, $err) {
+function html_forward_form($usr_q, $forward, $field="") {
   global $l_mailforward, $l_internal_email, $l_nomade_not_allowed;
   global $l_email_nomade, $l_enable,$l_local_copy;
-  global $action, $c_yes, $c_no, $l_update;
+  global $obm, $action, $c_yes, $c_no, $l_update;
 
   $id = $usr_q->f("userobm_id");
   $email = $usr_q->f("userobm_email");
   $nomade_perms = $usr_q->f("userobm_nomade_perms");
 
-  $mail = get_mail_info();
-  $domain = $mail["main_domain"];
+  $domain = $obm["domain_name"];
   
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
@@ -98,6 +96,11 @@ function html_forward_form($usr_q, $forward, $err) {
   if (isset($forward["nomade_enable"])) { $nomade_enable = $forward["nomade_enable"]; }
   if (isset($forward["nomade_local_copy"])) { $nomade_local_copy = $forward["nomade_local_copy"]; }
 
+  // Mark the error field
+  if ($field != "") {
+    $class[$field] = "error";
+  }
+
   // Nomad enable chekbox checked value
   if ($nomade_enable) $nomade_enable_c = " checked";
   if ($nomade_local_copy) $nomade_local_copy_c = " checked";
@@ -110,11 +113,11 @@ function html_forward_form($usr_q, $forward, $err) {
 
     $dis_nomade = "
     <tr>
-      <th>$l_enable</th>
+      <th class=\"$class[nomade_enable]\">$l_enable</th>
       <td><input name=\"cb_nomade_enable\" type=\"checkbox\" value=\"1\" $nomade_enable_c></td>
     </tr>
     <tr>
-      <th>$l_email_nomade</th>
+      <th class=\"$class[email_nomade]\">$l_email_nomade</th>
       <td><input name=\"tf_email_nomade\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\"></td>
     </tr>";
   }
@@ -135,10 +138,10 @@ function html_forward_form($usr_q, $forward, $err) {
     </tr>
     $dis_nomade      
     <tr>
-      <th>$l_local_copy</th>
+      <th class=\"$class[nomade_local_copy]\">$l_local_copy</th>
       <td><input name=\"cb_nomade_local_copy\" type=\"checkbox\" value=\"1\" $nomade_local_copy_c /></td>
     </tr>
-    
+
     </table>
     </fieldset>
 

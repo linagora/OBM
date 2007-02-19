@@ -24,13 +24,21 @@ if ($obmdb_dbtype == $db_type_pgsql) {
 
 require_once("$obminclude/phplib/ct_sql.inc");
 require_once("$obminclude/of/of_session.inc");
-require_once("$obminclude/phplib/auth.inc");
+//require_once("$obminclude/phplib/auth.inc");
 require_once("$obminclude/of/of_query.inc");
 require_once("$obminclude/of/of_display.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
 // OBM Classes                                                               //
 ///////////////////////////////////////////////////////////////////////////////
+
+class OBM_Session extends Session {
+}
+
+
+class OBM_Perm extends Perm {
+}
+
 
 class DB_OBM extends DB_Sql {
   var $Host     = "";
@@ -52,12 +60,12 @@ class DB_OBM extends DB_Sql {
     $this->query($query);
   }
 
-  // Aliacom : Set the total rows number (case query is constraint by limit)
+  // AliaSource : Set the total rows number (case query is constraint by limit)
   function set_num_rows_total ($total) {
     $this->Rows_nolimit = $total;
   }
 
-  // Aliacom : Get the total rows number (case query is constraint by limit)
+  // AliaSource : Get the total rows number (case query is constraint by limit)
   function num_rows_total () {
     if ($this->Rows_nolimit != "")
       return $this->Rows_nolimit;
@@ -65,7 +73,6 @@ class DB_OBM extends DB_Sql {
       return $this->num_rows();
   }
 }
-
 
 
 class OBM_User_Sql extends CT_Sql {
@@ -132,58 +139,34 @@ class OBM_User_Sql extends CT_Sql {
 }
 
 
-class OBM_Session extends Session {
-}
-
-
 class OBM_Challenge_Auth extends Auth {
-  var $classname      = "OBM_Challenge_Auth";
+
   var $lifetime       =  86400;
   var $magic          = "Simsalabim";  // Challenge seed
   var $database_class = "DB_OBM";
   var $database_table = "UserObm";
 
-  function auth_loginform() {
-    global $sess, $obminclude, $obm_version, $module, $path, $login_action;
+  function of_session_dis_login_page() {
+    global $obminclude, $obm_version, $module, $path, $login_action;
     global $obmdb_dbtype, $challenge, $auth_encryption, $password_encryption;
-    global $params, $c_multidomain, $c_default_domain,$set_theme_default;
-    global $set_lang_default,$sel_domain;
+    global $params, $c_multidomain, $c_default_domain;
 
-    $theme_file = "resources/themes/$set_theme_default/theme.inc";
-    include($theme_file);
-
-    $conf_login_page = "$path/../conf/themes/login.html";
-    if(file_exists($conf_login_page)) {
-      $lp = $conf_login_page;
-    } else {
-      $lp = $login_template;
-    }
-    
-    $lang_file = "obminclude/lang/$set_lang_default/login.inc";
-    include($lang_file);
-
-    if ($c_multidomain) {
-      $sel_domain = of_domain_dis_select();
-      $domain = $l_domain;
-    }
-    
-    if (isset($params["login"])) {
-      $error = $l_error;
-    }
+    $login_page = "$path/../$obminclude/themes/login.inc";
     $challenge = md5(uniqid($this->magic));
-    $sess->register("challenge");
-    $login = $this->auth[uname];
-    $template = get_template($lp);
-    eval ("\$template = \"$template\";");
-    echo $template;
+    $_SESSION['challenge'] = $challenge;
+    include($login_page);
   }
   
   function auth_validatelogin() {
-    global $params, $login, $password, $challenge, $response;
-    global $auth_encryption, $password_encryption, $c_default_domain;
+    global $obm, $params, $login, $password, $challenge, $response;
+    global $auth_encryption, $password_encryption, $c_multidomain, $c_default_domain;
 
+    //    echo "<br>*** auth_validate_login :";
+    //    print_r($params);
     $login = $params["login"];
     $password = $params["password"];
+    $challenge = $params["challenge"];
+    $response = $params["response"];
     $domain = $params["domain"];
     // if no domain set, set the default domain
     if ((! isset($domain)) || ($domain == "")) {
@@ -191,10 +174,14 @@ class OBM_Challenge_Auth extends Auth {
     }
 
     // If multidomain, add domain clause
-    $where_domain = "AND userobm_domain_id='$domain'";
+    if ($c_multidomain) {
+      $where_domain = "AND userobm_domain_id='$domain'";
+    }
+
+    //    echo "auth_validatelogin:domain=$domain, login=$login";
 
     if (isset($login)) {
-      $this->auth["uname"] = $login; // provides access for loginform.ihtml
+      $obm["login"] = $login; // provides access for loginform.ihtml
     }
 
     $user_table = $this->database_table;
@@ -204,52 +191,94 @@ class OBM_Challenge_Auth extends Auth {
         userobm_id,
         userobm_perms,
         userobm_password,
-        userobm_password_type,
         userobm_domain_id
       FROM $user_table
       WHERE userobm_login = '$user_login'
         AND userobm_archive = '0'
         $where_domain";
 
+    $class = $this->database_class;
+    $this->db = new $class;
+
     $this->db->query($query_login);
     while ($this->db->next_record()) {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
       $pass = $this->db->f("userobm_password");
-      $crypt = $this->db->f("userobm_password_type");
-      $udomain = $this->db->f("userobm_domain_id");
+      $domain_id = $this->db->f("userobm_domain_id");
     }
 
-    switch($crypt) {
-      case "md5": 
-        $encrypted = md5($password);
-        break;
-      case "crypt":
-        $encrypted = crypt($password);
-        break;
-      default:
-        $encrypted = $password;
-        break;
-    }
+    if ($auth_encryption) {
+      if ($password_encryption == "md5") {
 
-    if ($encrypted == $pass) {
-      $this->auth["perm"] = $perm;
-      return $uid;
+        // Cas md5
+        $expected_response = md5("$login:$pass:$challenge");
+        // True when JS is disabled
+        if ($response == "") {
+          if ($password != $pass) {
+            return false;
+          } else {
+            $obm["profile"] = $perm;
+            $obm["domain_id"] = $domain_id;
+            return $uid;
+          }
+        }
+        
+        // Response is set, JS is enabled
+        if ($expected_response != $response) {
+          return false;
+        } else {
+	  $obm["profile"] = $perm;
+	  $obm["domain_id"] = $domain_id;
+          return $uid;
+        }
+      }
+
+      // No auth_encryption, password is given as plain
     } else {
-      return false;
-    }     
-  } 
+      if ($password_encryption == "crypt") {
+        // cas crypt
+        $encrypted = crypt($password, $pass);
+        if ($encrypted == $pass) {
+	  $obm["profile"] = $perm;
+	  $obm["domain_id"] = $domain_id;
+          return $uid;
+        } else {
+          return false;
+        }      
+      } else if ($password_encryption == "md5") {
+        $encrypted = md5($password);
+        if ($encrypted == $pass) {
+	  $obm["profile"] = $perm;
+	  $obm["domain_id"] = $domain_id;
+          return $uid;
+        } else {
+          return false;
+        }      
+      } else {
+        $encrypted = $password;
+        if ($encrypted == $pass) {
+	  $obm["profile"] = $perm;
+	  $obm["domain_id"] = $domain_id;
+          return $uid;
+        } else {
+          return false;
+        }      
+      }
+    }
+
+  }
 }
+
 
 class CAS_Auth extends Auth {
 
-  var $classname      = "CAS_Auth";
   var $lifetime       =  0;
   var $magic          = "CASSimsalabim";  ## Challenge seed
   var $database_class = "DB_OBM";
   var $database_table = "UserObm";
 
-  function auth_loginform() {
+  function of_session_dis_login_page() {
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri,$lock;
 
     include_once("obmCAS.inc");
@@ -262,9 +291,9 @@ class CAS_Auth extends Auth {
   }
 
   function is_authenticated() {
-    global $ticket;
+    global $ticket, $obm;
     if (
-      $this->auth["uid"] 
+      $obm["uid"] 
         && 
       (($this->lifetime <= 0) || (time() < $this->auth["exp"]))
     ) {
@@ -284,7 +313,7 @@ class CAS_Auth extends Auth {
           return false;
         }
       }
-      return $this->auth["uid"] ;
+      return $obm["uid"] ;
     } elseif (isset($ticket)) {
       return "form" ;
     } else {
@@ -293,10 +322,11 @@ class CAS_Auth extends Auth {
   }
 
   function auth_validatelogin () {
-    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri,$lock;
+    global $obm, $lock;
+    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
 
     include_once("obmCAS.inc");
-    if(!$lock) {
+    if (!$lock) {
       obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
       $lock = "true";
     }
@@ -306,7 +336,10 @@ class CAS_Auth extends Auth {
     }
     $login = obmCAS::getUser();
     // NTLM authentication hack - prerequisite: login do not contain \
-    if(ereg("[\\]", $login)){$tmp = split("[\\]", $login);$login = $tmp[1];}
+    if (ereg("[\\]", $login)){$tmp = split("[\\]", $login);$login = $tmp[1];}
+
+    $class = $this->database_class;
+    $this->db = new $class;
 
     $this->db->query(sprintf("select userobm_id,
         userobm_perms
@@ -319,22 +352,22 @@ class CAS_Auth extends Auth {
       $perm = $this->db->f("userobm_perms");
     }
 
-    $this->auth["perm"] = $perm;
-    $this->auth["uname"] = $login;
+    $obm["profile"] = $perm;
+    $obm["login"] = $login;
 
     return $uid;
   }
    
-   function logout($nobody = "") {
-    global $sess,$lock;
+  function logout($nobody = "") {
+    global $lock;
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
     
     include_once("obmCAS.inc");
-    $sess->unregister("auth");
+    $_SESSION['auth'] = "";
     unset($this->auth["uname"]);
     $this->unauth($nobody == "" ? $this->nobody : $nobody);
     
-    if(!$lock) {
+    if (!$lock) {
       obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
       $lock = "true";
     }
@@ -342,385 +375,7 @@ class CAS_Auth extends Auth {
     obmCAS::logout();
   }
   
-##
-## Initialization
-##
-  function start() {
-    $cl = $this->cancel_login;
-    global $sess, $$cl;
-
-    ## This is for performance, I guess but I'm not sure if it could
-    ## be safely removed -- negro
-    if (! $this->in) {
-      $sess->register("auth");
-      $this->in = true;
-    }
-    
-    ## back compatibility: if d_c is set, create db object
-    if(isset($this->database_class)) {
-      $class = $this->database_class;
-      $this->db = new $class;
-    }
-
-    # Check current auth state. Should be one of
-    #  1) Not logged in (no valid auth info or auth expired)
-    #  2) Logged in (valid auth info)
-    #  3) Login in progress (if $$cl, revert to state 1)
-    // seule modif par rapport à Auth::start()
-    if ($uid = $this->is_authenticated()) {
-
-      switch ($uid) {
-        case "form":
-          # Login in progress
-          if ($$cl) {
-            # If $$cl is set, delete all auth info 
-            # and set state to "Not logged in", so eventually
-            # default or automatic authentication may take place
-            $this->unauth();
-            $state = 1;
-          } else {
-            # Set state to "Login in progress"
-            $state = 3;
-          }
-          break;
-        default:
-          # User is authenticated and auth not expired
-          $state = 2;
-          break;
-      }
-    } else {
-      # User is not (yet) authenticated
-      $this->unauth();
-      $state = 1;
-    }
-
-    switch ($state) {
-      case 1:
-        # No valid auth info or auth is expired
-        
-        # Check for user supplied automatic login procedure 
-        if ( $uid = $this->auth_preauth() ) {
-          $this->auth["uid"] = $uid;
-          $this->auth["exp"] = time() + (60 * $this->lifetime);
-          $this->auth["refresh"] = time() + (60 * $this->refresh);
-          return true;
-        }
-        
-        # Check for "log" vs. "reg" mode
-        switch ($this->mode) {
-          case "yes":
-          case "log":
-            if ($this->nobody) {
-              # Authenticate as nobody
-              $this->auth["uid"] = "nobody";
-              # $this->auth["uname"] = "nobody";
-              $this->auth["exp"] = 0x7fffffff;
-              $this->auth["refresh"] = 0x7fffffff;
-              return true;
-            } else {
-              # Show the login form
-              $this->auth_loginform();
-              $this->auth["uid"] = "form";
-              $this->auth["exp"] = 0x7fffffff;
-              $this->auth["refresh"] = 0x7fffffff;
-              exit;
-            }
-            break;
-          case "reg":
-            # Show the registration form
-            $this->auth_registerform();
-            $this->auth["uid"] = "form";
-            $this->auth["exp"] = 0x7fffffff;
-            $this->auth["refresh"] = 0x7fffffff;
-            exit;
-            break;
-          default:
-            # This should never happen. Complain.
-            echo "Error in auth handling: no valid mode specified.\n";
-            exit;
-        }
-        break;
-      case 2:
-        # Valid auth info
-        # Refresh expire info
-        ## DEFAUTH handling: do not update exp for nobody.
-        if ($uid != "nobody")
-          $this->auth["exp"] = time() + (60 * $this->lifetime);
-        break;
-      case 3:
-        # Login in progress, check results and act accordingly
-        switch ($this->mode) {
-          case "yes":
-          case "log":
-            if ( $uid = $this->auth_validatelogin() ) {
-              $this->auth["uid"] = $uid;
-              $this->auth["exp"] = time() + (60 * $this->lifetime);
-              $this->auth["refresh"] = time() + (60 * $this->refresh);
-              return true;
-            } else {
-              $this->auth_loginform();
-              $this->auth["uid"] = "form";
-              $this->auth["exp"] = 0x7fffffff;
-              $this->auth["refresh"] = 0x7fffffff;
-              exit;
-            }
-            break;
-          case "reg":
-            if ($uid = $this->auth_doregister()) {
-              $this->auth["uid"] = $uid;
-              $this->auth["exp"] = time() + (60 * $this->lifetime);
-              $this->auth["refresh"] = time() + (60 * $this->refresh);
-              return true;
-            } else {
-              $this->auth_registerform();
-              $this->auth["uid"] = "form";
-              $this->auth["exp"] = 0x7fffffff;
-              $this->auth["refresh"] = 0x7fffffff;
-              exit;
-            }
-            break;
-          default:
-            # This should never happen. Complain.
-            echo "Error in auth handling: no valid mode specified.\n";
-            exit;
-            break;
-        }
-        break;
-      default:
-        # This should never happen. Complain.
-        echo "Error in auth handling: invalid state reached.\n";
-        exit;
-        break;
-    }
-  }
-
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// OBM_Perm Class                                                            //
-// Profile and right definitions                                             //
-///////////////////////////////////////////////////////////////////////////////
-class OBM_Perm {
-  var $classname      = "OBM_Perm";
-
-  function OBM_Perm () {
-    global $profiles;
-
-    if (! isset($profiles["admin"])) {
-      $profiles["admin"] = array (
-        'section' => array (
-          'default' => 1),
-        'module' => array (
-          'default' => "1D")
-      );
-    }
-  }
-
-  //-------------------------------------------------------------------------//
-  // Return the profile access right of the section given as parameter       //
-  // Parameters:
-  //   - $section : section to return the right
-  //-------------------------------------------------------------------------//
-  function get_section_rights($section) {
-    global $profiles, $auth;
-
-    $profile = $auth->auth["perm"];
-
-    if (isset($profiles[$profile]['section'][$section])) {
-      return $profiles[$profile]['section'][$section];
-    } else {
-      return $profiles[$profile]['section']['default'];
-    }
- 
-    return $section_right;
-  }
-
-  //-------------------------------------------------------------------------//
-  // Return the profile access right of the module given as parameter        //
-  // Parameters:
-  //   - $module : module to return the right
-  //-------------------------------------------------------------------------//
-  function get_module_rights($module) {
-    global $profiles, $auth;
-
-    $profile = $auth->auth["perm"];
-
-    if (isset($profiles[$profile]['module'][$module])) {
-      return hexdec($profiles[$profile]['module'][$module]);
-    } else {
-      return hexdec($profiles[$profile]['module']['default']);
-    }
- 
-    return $module_right;
-  }
-
-  //-------------------------------------------------------------------------//
-  // Check profile permissions for the module and action given as parameters //
-  // Parameters:
-  //   - $module : module to check
-  //   - $action : action right to check in the module
-  //-------------------------------------------------------------------------//
-  function check_permissions($module, $action) {
-    global $actions;
-
-    $module_right = $this->get_module_rights($module);
-    $action_right = $actions[$module][$action]["Right"];
-
-    // If action right not defined or user has not access rights
-    if ( ( ($module_right & $action_right) != $action_right)
-         || ($action_right == "") ) {
-      echo "<p>check_perm : ACCESS DENIED action=$action, mod_right=$module_right, ac=$action_right";
-      exit();
-    }
-  }
-
-  //-------------------------------------------------------------------------//
-  // Check if the current profile has the module right given as parameter    //
-  // Parameters:
-  //   - $module : module to check
-  //   - $right  : right to check in the module
-  //-------------------------------------------------------------------------//
-  function check_right($module, $right) {
-    global $actions;
-
-    $module_right = $this->get_module_rights($module);
-
-    // If action right not defined or user has not access rights
-    if ( ( ($module_right & $right) != $right)
-         || ($right == "") ) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-}
-
-
-//---------------------------------------------------------------------------//
-// Database sessions
-//---------------------------------------------------------------------------//
-if ($cgp_sess_db) {
-
-  function sess_db_open($save_path, $session_name) {
-    global $sess_save_path, $sess_session_name;
-    
-    $sess_save_path = $save_path;
-    $sess_session_name = $session_name;
-    return true;
-  }
-
-  function sess_db_close() {
-    return(true);
-  }
-
-  function sess_db_read ($id) {
-    global $sess_save_path, $sess_session_name;
-    
-    $s_q = new DB_OBM;
-    $query = "select obmsession_data
-    from ObmSession
-    where obmsession_sid = '$id'";
-    
-    if ($s_q->query($query)) {
-      $s_q->next_record();
-      $ret = $s_q->f("obmsession_data");
-    } else {
-      $ret = "";
-    }
-    
-    return $ret;
-  }
-
-  function sess_db_destroy ($id) {
-    global $sess_save_path, $sess_session_name;
-    
-    $s_q = new DB_OBM;
-    $query = "DELETE from ObmSession
-    where
-      obmsession_sid = '$id'
-      and obmsession_name = '$sess_session_name'";
-    
-    $ret = $s_q->query($query);
-    return $ret;
-  }
-  
-  /*********************************************
-   * WARNING - You will need to implement some *
-   * sort of garbage collection routine here.  *
-   *********************************************/
-  function sess_db_gc ($maxlifetime) {
-    return true;
-  }
-
-  //-------------------------------------------------------------------------//
-  // Mysql specific Session function Handler
-  //-------------------------------------------------------------------------//
-  if ($obmdb_dbtype == $db_type_mysql) {
-
-    function sess_db_write ($id, $sess_data) {
-      global $sess_save_path, $sess_session_name;
-    
-      $now = date("Y-m-d H:i:s");
-      $s_q = new DB_OBM;
-      $query = "REPLACE ObmSession ( 
-      obmsession_sid,
-      obmsession_timeupdate,
-      obmsession_name,
-      obmsession_data)
-    VALUES (
-      '$id',
-      '$now',
-      '$sess_session_name',
-      '".addslashes($sess_data)."')";
-      
-      $ret = $s_q->query($query);
-
-      return $ret;
-    }
-  }
-
-  //-------------------------------------------------------------------------//
-  // Postgres specific Session function Handler
-  //-------------------------------------------------------------------------//
-  if ($obmdb_dbtype == $db_type_pgsql) {
-
-    function sess_db_write ($id, $sess_data) {
-      global $sess_save_path, $sess_session_name;
-    
-      $now = date("Y-m-d H:i");
-      $s_q = new DB_OBM;
-      $query = "UPDATE ObmSession set
-        obmsession_timeupdate='$now',
-        obmsession_name='$sess_session_name',
-        obmsession_data='".addslashes($sess_data)."'
-      where
-        obmsession_sid='$id'";
-      
-      $ret = $s_q->query($query);
-
-      if ($s_q->affected_rows() == 0) {
-	$query = "INSERT INTO ObmSession ( 
-          obmsession_sid,
-          obmsession_timeupdate,
-          obmsession_name,
-          obmsession_data)
-        VALUES (
-          '$id',
-          '$now',
-          '$sess_session_name',
-          '".addslashes($sess_data)."')";
-      $ret = $s_q->query($query);
-      }
-    
-      return $ret;
-    }
-  }
-  
-
-  session_set_save_handler ("sess_db_open", "sess_db_close", "sess_db_read", "sess_db_write", "sess_db_destroy", "sess_db_gc");
-
-}
 
 </script>

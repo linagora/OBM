@@ -84,7 +84,7 @@ function dis_time_data(&$OD, $fieldname, $link_ok) {
 //   - $time[] : time search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_index($time) {
-  global $uid, $display, $perm, $cright_write_admin;
+  global $display, $perm, $cright_write_admin;
 
   $time["interval"] = "week";
   $display["result"] = dis_time_nav_date($time);
@@ -106,7 +106,7 @@ function dis_time_index($time) {
 //   - $time : parameter hash
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_nav_date($time) {
-  global $cdg_param, $auth, $c_dst_err, $l_monthsofyear;
+  global $cdg_param, $c_dst_err, $l_monthsofyear;
   global $ico_previous,$ico_next;
 
   $action = $time["action"];
@@ -356,7 +356,7 @@ function dis_time_planning_month($obm_q, $time) {
 //   - $time[] : time hash
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_planning($time) {
-  global $auth, $cdg_param;
+  global $cdg_param;
 
   if ($time["interval"] == "week") {
     $task_q = run_query_time_task_one_week($time, '');
@@ -495,7 +495,6 @@ function dis_time_user_planning($obm_q, $time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_select($time, $usr_q, $multi=false) {
   global $l_see, $l_user, $l_all;
-  global $uid;
 
   $sel_user_ids = $time["user_ids"];
 
@@ -565,13 +564,13 @@ function dis_user_select($time, $usr_q, $multi=false) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_task_list($time) {
-  global $uid, $display;
+  global $obm, $display;
 
   $task_q = run_query_time_task_list($time);
   $nb_task = $task_q->num_rows();
 
   if ($nb_task != 0) {
-    $prefs = get_display_pref($uid, "time");
+    $prefs = get_display_pref($obm["uid"], "time");
     $block .= dis_time_list_result($task_q, $prefs, $time);
   }
 
@@ -617,11 +616,11 @@ function dis_time_list_result($task_q,$prefs,$time) {
     <input name=\"submit\" type=\"submit\" value=\"$l_delete\" />";
 
   $block .= "
-     <fieldset class=\"buttons\" >
-      $dis_button
-     </fieldset>
+    <fieldset class=\"buttons\" >
+     $dis_button
+    </fieldset>
 
-     </form>
+    </form>
 ";
 
   return $block;
@@ -638,7 +637,7 @@ function dis_time_list_result($task_q,$prefs,$time) {
 //   - $validate_days : array of validated days (not to be shown)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_form_addtask($time, $validate_days) {
-  global $auth, $extra_js, $l_add, $l_update, $c_undef, $l_undef, $l_close;
+  global $extra_js, $l_add, $l_update, $c_undef, $l_undef, $l_close;
   global $l_fill_addtask, $l_comment, $l_date, $l_project, $l_duration;
   global $l_header_tasktype, $l_intern;
   global $c_day_fraction, $c_working_days, $c_week_first_day;
@@ -1032,8 +1031,6 @@ function html_time_month_users_total($time, $array_res) {
 
 
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Stats TimeManager result page
 // Parameters:
@@ -1041,12 +1038,12 @@ function html_time_month_users_total($time, $array_res) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_statsuser($statproj_q, $stattt_q, $time) {
-  global $cdg_param, $auth;
+  global $cdg_param, $obm;
   global $l_proj_stats, $l_no_proj_stats;
   global $l_tt_stats, $l_no_tt_stats;
 
   if ($statproj_q->num_rows() != 0) {
-    $prefs_p = get_display_pref($auth->auth["uid"], "time_proj");
+    $prefs_p = get_display_pref($obm["uid"], "time_proj");
 
     $dis_projuser_list = new OBM_DISPLAY("DATA", $prefs_p, "time", "time_proj");
     $dis_projuser_list->data_set = $statproj_q;
@@ -1061,7 +1058,7 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
   }
   
   if ($stattt_q->num_rows() != 0) {
-    $prefs_t = get_display_pref($auth->auth["uid"], "time_tt");
+    $prefs_t = get_display_pref($obm["uid"], "time_tt");
 
     $dis_ttuser_list = new OBM_DISPLAY("DATA", $prefs_t, "time", "time_tt");
     $dis_ttuser_list->data_set = $stattt_q;

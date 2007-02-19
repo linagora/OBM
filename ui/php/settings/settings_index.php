@@ -12,97 +12,96 @@ $module = "settings";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude="obminclude";
 include("$obminclude/global.inc");
+$params = get_settings_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
-$uid = $auth->auth["uid"];
 
-if ($param_lang != "") {
-  $set_lang = $param_lang;
-  $sess->register("set_lang");
-  update_user_pref($uid, "set_lang", $set_lang);
+if ($params["lang"] != "") {
+  $set_lang = $params["lang"];
+  $_SESSION['set_lang'] = $set_lang;
+  update_user_pref($obm["uid"], "set_lang", $set_lang);
 }
-if ($param_theme != "") {
-  $set_theme = $param_theme;
-  $sess->register("set_theme");
-  update_user_pref($uid, "set_theme", $set_theme);
+if ($params["theme"] != "") {
+  $set_theme = $params["theme"];
+  $_SESSION['set_theme'] = $set_theme;
+  update_user_pref($obm["uid"], "set_theme", $set_theme);
 }
 
 // Validate user preferences
-if ($form_user_pref) {
+if ($params["form_user_pref"]) {
 
-  $param_debug = $param_debug_id | $param_debug_param | $param_debug_sess | $param_debug_sql | $param_debug_exe;
-  $set_debug = $param_debug;
-  $sess->register("set_debug");
-  update_user_pref($uid, "set_debug", $set_debug);
-  if ($param_menu != "") {
-    $set_menu = $param_menu;
-    $sess->register("set_menu");
-    update_user_pref($uid, "set_menu", $set_menu);
+  $set_debug = $params["debug_id"] | $params["debug_param"] | $params["debug_sess"] | $params["debug_sql"] | $params["debug_exe"];
+  $_SESSION['set_debug'] = $set_debug;
+  update_user_pref($obm["uid"], "set_debug", $set_debug);
+
+  if ($params["menu"] != "") {
+    $set_menu = $params["menu"];
+    $_SESSION['set_menu'] = $set_menu;
+    update_user_pref($obm["uid"], "set_menu", $set_menu);
   }
 
-  if ($param_display == "yes") {
+  if ($params["display"] == "yes") {
     $set_display = "yes";
   } else {
     $set_display = "no";
   }
-  $sess->register("set_display");
-  update_user_pref($uid, "set_display", $set_display);
+  $_SESSION['set_display'] = $set_display;
+  update_user_pref($obm["uid"], "set_display", $set_display);
 
-  if ($param_rows != "") {
-    $set_rows = $param_rows;
+  if ($params["rows"] != "") {
+    $set_rows = $params["rows"];
     $_SESSION['set_rows'] = $set_rows;
-    //    $sess->register("set_rows");
-    update_user_pref($uid, "set_rows", $set_rows);
+    update_user_pref($obm["uid"], "set_rows", $set_rows);
   }
 
-  if (($param_todo != "") && ($param_todo != "$set_todo")) {
-    $set_todo = $param_todo;
-    $sess->register("set_todo");
-    update_user_pref($uid, "set_todo", $set_todo);
+  if (($params["todo"] != "") && ($paramz["todo"] != "$set_todo")) {
+    $set_todo = $params["todo"];
+    $_SESSION['set_todo'] = $set_todo;
+    update_user_pref($obm["uid"], "set_todo", $set_todo);
     global_session_load_user_todos($set_todo);
   }
 
-  if ($param_dsrc != "") {
-    $set_dsrc = $param_dsrc;
-    $sess->register("set_dsrc");
-    update_user_pref($uid, "set_dsrc", $set_dsrc);
+  if ($params["dsrc"] != "") {
+    $set_dsrc = $params["dsrc"];
+    $_SESSION['set_dsrc'] = $set_dsrc;
+    update_user_pref($obm["uid"], "set_dsrc", $set_dsrc);
   }
 
-  if ($param_date != "") {
-    $set_date = $param_date;
-    $sess->register("set_date");
-    update_user_pref($uid, "set_date", $set_date);
+  if ($params["date"] != "") {
+    $set_date = $params["date"];
+    $_SESSION['set_date'] = $set_date;
+    update_user_pref($obm["uid"], "set_date", $set_date);
   }
   
-  if ($param_date_upd != "") {
-    $set_date_upd = $param_date_upd;
-    $sess->register("$set_date_upd");
-    update_user_pref($uid, "set_date_upd", $set_date_upd);
+  if ($params["date_upd"] != "") {
+    $set_date_upd = $params["date_upd"];
+    $_SESSION['set_date_upd'] = $set_date_upd;
+    update_user_pref($obm["uid"], "set_date_upd", $set_date_upd);
   }
   
-  if ($param_commentorder != "") {
-    $set_commentorder = $param_commentorder;
-    $sess->register("set_commentorder");
-    update_user_pref($uid, "set_commentorder", $set_commentorder);
+  if ($params["commentorder"] != "") {
+    $set_commentorder = $params["commentorder"];
+    $_SESSION['set_commentorder'] = $set_commentorder;
+    update_user_pref($obm["uid"], "set_commentorder", $set_commentorder);
   }
 
-  if ($param_mail == "yes") {
+  if ($params["mail"] == "yes") {
     $set_mail = "yes";
   } else {
     $set_mail = "no";
   }
-  $sess->register("set_mail");
-  update_user_pref($uid, "set_mail", $set_mail);
+  $_SESSION['set_mail'] = $set_mail;
+  update_user_pref($obm["uid"], "set_mail", $set_mail);
 
-  if ($param_cal_interval != "") {
-    $set_cal_interval = $param_cal_interval;
-    $sess->register("set_cal_interval");
-    update_user_pref($uid, "set_cal_interval", $set_cal_interval, 1);
+  if ($params["cal_interval"] != "") {
+    $set_cal_interval = $params["cal_interval"];
+    $_SESSION['set_cal_interval'] = $set_cal_interval;
+    update_user_pref($obm["uid"], "set_cal_interval", $set_cal_interval, 1);
   }
 
-  if ($param_csv_sep != "") {
-    $set_csv_sep = $param_csv_sep;
-    $sess->register("set_csv_sep");
-    update_user_pref($uid, "set_csv_sep", $set_csv_sep);
+  if ($params["csv_sep"] != "") {
+    $set_csv_sep = $params["csv_sep"];
+    $_SESSION['set_csv_sep'] = $set_csv_sep;
+    update_user_pref($obm["uid"], "set_csv_sep", $set_csv_sep);
   }
 
 }
@@ -159,7 +158,7 @@ $sel_todo = "<select name=\"todo_id\" id=\"todo_id\">
 
 // Data source select
 $dsrc_q = run_query_global_datasource();
-$sel_dsrc = "<select name=\"param_dsrc\" id=\"param_dsrc\">
+$sel_dsrc = "<select name=\"dsrc\" id=\"dsrc\">
   <option value=\"$c_undef\">$l_undef</option>";
 while ($dsrc_q->next_record()) {
   $d_id = $dsrc_q->f("datasource_id");
@@ -179,11 +178,11 @@ $sel_dsrc .= "</select>";
   <tr>
     <th>$l_set_debug ($set_debug)</th>
     <td>
-      <input type=\"checkbox\" name=\"param_debug_id\" value=\"$cdg_id\" $dg_id />$l_dg_id
-      <input type=\"checkbox\" name=\"param_debug_param\" value=\"$cdg_param\" $dg_param />$l_dg_param
-      <input type=\"checkbox\" name=\"param_debug_sess\" value=\"$cdg_sess\" $dg_sess />$l_dg_sess
-      <input type=\"checkbox\" name=\"param_debug_sql\" value=\"$cdg_sql\" $dg_sql />$l_dg_sql
-      <input type=\"checkbox\" name=\"param_debug_exe\" value=\"$cdg_exe\" $dg_exe />$l_dg_exe
+      <input type=\"checkbox\" name=\"debug_id\" value=\"$cdg_id\" $dg_id />$l_dg_id
+      <input type=\"checkbox\" name=\"debug_param\" value=\"$cdg_param\" $dg_param />$l_dg_param
+      <input type=\"checkbox\" name=\"debug_sess\" value=\"$cdg_sess\" $dg_sess />$l_dg_sess
+      <input type=\"checkbox\" name=\"debug_sql\" value=\"$cdg_sql\" $dg_sql />$l_dg_sql
+      <input type=\"checkbox\" name=\"debug_exe\" value=\"$cdg_exe\" $dg_exe />$l_dg_exe
     </td>
   </tr>";
 //}
@@ -197,7 +196,7 @@ while ($entry=$lang_dir->read()) {
   if (strcmp($entry, ".") && strcmp($entry,"..") && strcmp($entry,"CVS")
       && is_dir($lang_dir->path."/".$entry)) {
         $dis_lang .= "
-      <a href=\"settings_index.php?param_lang=$entry\">
+      <a href=\"settings_index.php?lang=$entry\">
         <img src=\"".${"flag_$entry"}."\" alt=\"[Language $entry]\"/></a>
       ";
   }
@@ -216,12 +215,11 @@ while ($entry = $theme_dir->read()) {
   if (strcmp($entry, ".") && strcmp($entry,"..") && strcmp($entry,"CVS")
        && strcmp($entry,"images") && is_dir($theme_dir->path."/".$entry)) {
     $dis_theme .= "
-      <a href=\"settings_index.php?param_theme=$entry\">
+      <a href=\"settings_index.php?theme=$entry\">
       <img src=\"".${"preview_".$entry}."\" alt=\"[Theme $entry]\" style=\"height:20%;width:20%;\"
       onmouseover=\"\" 
       onmouseout=\"\"/>
-      </a>
-      ";
+      </a>";
   }
 }
 $theme_dir->close();
@@ -244,20 +242,20 @@ $display["detail"] .= "
   <tr>
     <th>$l_set_menu</th>
     <td>
-      <input type=\"radio\" name=\"param_menu\" value=\"$cme_txt\" $me_txt />$l_me_txt
-      <input type=\"radio\" name=\"param_menu\" value=\"$cme_ico\" $me_ico />$l_me_ico
-      <input type=\"radio\" name=\"param_menu\" value=\"$cme_both\" $me_both />$l_me_both
+      <input type=\"radio\" name=\"menu\" value=\"$cme_txt\" $me_txt />$l_me_txt
+      <input type=\"radio\" name=\"menu\" value=\"$cme_ico\" $me_ico />$l_me_ico
+      <input type=\"radio\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both
     </td>
   </tr><tr>
     <th>$l_auto_display</th>
     <td>
-      <input type=\"checkbox\" name=\"param_display\" value=\"yes\" ";
+      <input type=\"checkbox\" name=\"display\" value=\"yes\" ";
 if ($set_display == "yes") $display["detail"] .= "checked = \"checked\"";
 $display["detail"] .= " /></td>
   </tr><tr>
     <th>$l_set_rows</th>
     <td>
-      <input size=\"3\" name=\"param_rows\" value=\"$set_rows\" /></td>
+      <input size=\"3\" name=\"rows\" value=\"$set_rows\" /></td>
   </tr>";
 
 if ($cgp_show["module"]["todo"]) {
@@ -287,13 +285,13 @@ $display["detail"] .= "
   <tr>
     <th>$l_set_commentorder</th>
     <td>
-      <input type=\"radio\" name=\"param_commentorder\" value=\"$cco_chro\" $co_chro />$l_co_chro
-      <input type=\"radio\" name=\"param_commentorder\" value=\"$cco_rev\" $co_rev />$l_co_rev
+      <input type=\"radio\" name=\"commentorder\" value=\"$cco_chro\" $co_chro />$l_co_chro
+      <input type=\"radio\" name=\"commentorder\" value=\"$cco_rev\" $co_rev />$l_co_rev
     </td>
   </tr><tr>
     <th>$l_send_mail</th>
     <td class=\"adminText\">
-      <input type=\"checkbox\" name=\"param_mail\" value=\"yes\" ";
+      <input type=\"checkbox\" name=\"mail\" value=\"yes\" ";
 if ($set_mail == "yes") $display["detail"] .= "checked";
 
 $display["detail"] .= " /></td>
@@ -304,9 +302,9 @@ if ($cgp_show["module"]["calendar"]) {
   <tr>
     <th>$l_set_cal_interval</th>
     <td>
-      <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4
-      <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2
-      <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1
+      <input type=\"radio\" name=\"cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4
+      <input type=\"radio\" name=\"cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2
+      <input type=\"radio\" name=\"cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1
     </td>
   </tr>";
 }
@@ -315,8 +313,8 @@ $display["detail"] .= "
   <tr>
   <th>$l_set_csv_sep</th>
   <td>
-    <input type=\"radio\" name=\"param_csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc
-    <input type=\"radio\" name=\"param_csv_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab
+    <input type=\"radio\" name=\"csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc
+    <input type=\"radio\" name=\"csv_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab
   </td>
   </tr>
   $dis_debug
@@ -328,15 +326,15 @@ $display["detail"] .= "
   <tr>
   <td>$l_set_date_upd</td>
   <td>
-    <input type=\"radio\" name=\"param_date_upd\" value=\"$cda_upd_dmy\" $da_dmy />$l_da_dmy
-    <input type=\"radio\" name=\"param_date_upd\" value=\"$cda_upd_mdy\" $da_mdy />$l_da_mdy
+    <input type=\"radio\" name=\"date_upd\" value=\"$cda_upd_dmy\" $da_dmy />$l_da_dmy
+    <input type=\"radio\" name=\"date_upd\" value=\"$cda_upd_mdy\" $da_mdy />$l_da_mdy
   </td>
   <td>$l_set_date</td>
   <td>
-    <input type=\"radio\" name=\"param_date\" value=\"$cda_iso\" $da_iso />$l_da_iso
-    <input type=\"radio\" name=\"param_date\" value=\"$cda_en\" $da_en />$l_da_en
-    <input type=\"radio\" name=\"param_date\" value=\"$cda_fr\" $da_fr />$l_da_fr
-    <input type=\"radio\" name=\"param_date\" value=\"$cda_txt\" $da_txt />$l_da_txt
+    <input type=\"radio\" name=\"date\" value=\"$cda_iso\" $da_iso />$l_da_iso
+    <input type=\"radio\" name=\"date\" value=\"$cda_en\" $da_en />$l_da_en
+    <input type=\"radio\" name=\"date\" value=\"$cda_fr\" $da_fr />$l_da_fr
+    <input type=\"radio\" name=\"date\" value=\"$cda_txt\" $da_txt />$l_da_txt
   </td>
   </tr>
   </table>
@@ -362,8 +360,7 @@ $display["detail"] .= "
   </div>
 
 <!-- Display available configs -->
-
-  ";
+";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -373,6 +370,19 @@ $display["head"] = display_head($l_settings);
 $display["end"] = display_end();
 
 display_page($display);
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Stores Settings parameters transmited in $params hash
+// returns : $params hash with parameters set
+///////////////////////////////////////////////////////////////////////////////
+function get_settings_params() {
+  
+  // Get global params
+  $params = get_global_params("Settings");
+  
+  return $params;
+}
 
 
 //////////////////////////////////////////////////////////////////////////////

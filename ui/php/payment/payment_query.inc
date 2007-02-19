@@ -173,10 +173,10 @@ function run_query_payment_detail($p_id) {
 //   - $params[]: Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_payment_insert($params) {
-  global $auth, $obm, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   $company_id = $params["company_new_id"];
   if ($company_id < 1) {
@@ -199,7 +199,7 @@ function run_query_payment_insert($params) {
     payment_timecreate,
     payment_userupdate,
     payment_usercreate,
-		payment_domain_id,
+    payment_domain_id,
     payment_company_id,
     payment_account_id,
     payment_paymentkind_id,    
@@ -213,7 +213,7 @@ function run_query_payment_insert($params) {
     '$now',
     null,
     '$uid',
-		'$domain_id',
+    '$domain_id',
     '$company_id',
     '$account_id',
     '$kind',
@@ -274,10 +274,10 @@ function run_query_payment_insert($params) {
 //   - $params[]  : Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_payment_update($pid, $params) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   $company_id = $params["company_new_id"];
   if ($company_id < 1) {
@@ -292,7 +292,7 @@ function run_query_payment_update($pid, $params) {
   $inout = $params["inout"];
   $checked = ($params["checked"] == "1" ? "1" : "0");
   $comment = $params["comment"];
-	$multidomain = sql_multidomain("payment");
+  $multidomain = sql_multidomain("payment");
 	
   $query = "UPDATE Payment SET
     payment_timeupdate='$now',
@@ -306,7 +306,8 @@ function run_query_payment_update($pid, $params) {
     payment_number='$number',
     payment_checked='$checked',
     payment_comment='$comment'
-  WHERE payment_id='$pid' $multidomain";
+  WHERE payment_id='$pid'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_payment_update()");
   $obm_q = new DB_OBM;
@@ -425,19 +426,19 @@ function get_payment_amount_info($id) {
 //   - $params[]: Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_payment_invoice_insert($params) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $id = $params["payment_id"];
   $amount = $params["amount"];
   $invoice_id = $params["invoice_id"];
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO PaymentInvoice (
     paymentinvoice_invoice_id,
     paymentinvoice_payment_id,
-		paymentinvoice_domain_id,
+    paymentinvoice_domain_id,
     paymentinvoice_timeupdate,
     paymentinvoice_timecreate,
     paymentinvoice_userupdate,
@@ -445,7 +446,7 @@ function run_query_payment_invoice_insert($params) {
     paymentinvoice_amount)
    VALUES (
     '$invoice_id',
-		'$domain_id',
+    '$domain_id',
     '$id',
     null,
     '$now',
@@ -468,12 +469,12 @@ function run_query_payment_invoice_insert($params) {
 //   - $params[] : Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_payment_invoice_update($pid, $params) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $invs = $params["invoice"];
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
-	$multidomain = sql_multidomain("paymentinvoice");
+  $uid = $obm["uid"];
+  $multidomain = sql_multidomain("paymentinvoice");
 	
   foreach($invs as $i_id=>$amount) {
     $query = "UPDATE PaymentInvoice SET
@@ -482,7 +483,8 @@ function run_query_payment_invoice_update($pid, $params) {
     paymentinvoice_amount = '$amount'
   WHERE
     paymentinvoice_payment_id='$pid'
-    AND paymentinvoice_invoice_id='$i_id' $multidomain";
+    AND paymentinvoice_invoice_id='$i_id'
+    $multidomain";
   
     display_debug_msg($query, $cdg_sql, "run_query_payment_invoice_update()");
     $obm_q = new DB_OBM;

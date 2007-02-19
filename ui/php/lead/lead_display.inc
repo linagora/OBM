@@ -18,6 +18,7 @@ $fieldnames["date"] = $l_date;
 $fieldnames["datealarm"] = $l_alarm;
 $fieldnames["company_name"] = $l_company;
 $fieldnames["company_zipcode"] = $l_postcode;
+$fieldnames["company_phone"] = $l_phone;
 $fieldnames["lead_todo"] = $l_todo;
 $fieldnames["manager"] = $l_manager;
 
@@ -170,8 +171,7 @@ function html_lead_search_form($params, $sources, $managers) {
 //   - $params[] : params (search criteria)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_lead_search_list($params) {
-  global $display, $l_found, $l_no_found;
-  global $auth;
+  global $obm, $display, $l_found, $l_no_found;
 
   $obm_q = run_query_lead_search($params);
   $nb = $obm_q->num_rows_total();
@@ -179,7 +179,7 @@ function dis_lead_search_list($params) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
     $display["msg"] .= display_info_msg("$nb $l_found");
-    $prefs = get_display_pref($auth->auth["uid"], "lead");
+    $prefs = get_display_pref($obm["uid"], "lead");
     $block = html_lead_search_list($obm_q, $prefs, $params);
   }
 
@@ -275,12 +275,13 @@ function dis_lead_consult($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_lead_consult($l_q) {
   global $path, $display, $set_theme, $ico_company, $c_yes, $c_no;
-  global $l_company, $l_comment;
+  global $l_company, $l_comment, $l_phone;
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
 
   $id = $l_q->f("lead_id");
   $c_id = $l_q->f("lead_company_id");
   $c_name = $l_q->f("company_name");
+  $c_phone = $l_q->f("company_phone");
   $source_label = $l_q->f("leadsource_label");
   $manager = $l_q->f("manager");
   $date = of_date_format($l_q->f("date"));
@@ -305,7 +306,7 @@ function html_lead_consult($l_q) {
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\">
       <img src=\"$ico_company\" alt=\"[details]\" /></a>
       </th>
-      <td>$c_name<br />$ad1<br/>$zip $town</td>
+      <td>$c_name<br/>$c_phone<br />$ad1<br/>$zip $town</td>
     </tr>
     <tr>
       <th>$l_source</th>
@@ -358,14 +359,14 @@ function html_lead_consult($l_q) {
 //   - $params[]  : parameters : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_lead_form($action, $params) {
-  global $display, $uid, $cg_com;
+  global $display, $obm, $cg_com;
 
   $p_id = $params["lead_id"];
   if ($p_id > 0) {
     $l_q = run_query_lead_detail($p_id);
-    $users = array($uid, $l_q->f("lead_manager_id"));
+    $users = array($obm["uid"], $l_q->f("lead_manager_id"));
   } else {
-    $users = array($uid);
+    $users = array($obm["uid"]);
   }
 
   $sources = get_global_lead_sources();
@@ -387,7 +388,7 @@ function dis_lead_form($action, $params) {
 //   - $params[]  : parameters : form values
 ///////////////////////////////////////////////////////////////////////////////
 function html_lead_form($action, $l_q, $sources, $managers, $params) {
-  global $display, $path, $auth, $c_undef, $l_undef;
+  global $obm, $display, $path, $c_undef, $l_undef;
   global $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
   global $l_update, $l_checkdelete, $l_insert;
@@ -395,7 +396,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   global $l_no, $l_members, $l_group;
   global $popup_width, $popup_height, $l_header_new, $ico_mini_cal;
 
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {

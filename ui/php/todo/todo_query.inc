@@ -15,12 +15,12 @@
 //     keys used       uid
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_todolist($todo) {
-  global $auth, $cdg_sql, $ctu_sql_limit;
+  global $obm, $cdg_sql, $ctu_sql_limit;
 
   $sql_order_dir = $todo["sql_order_dir"];
   $sql_order_field = $todo["sql_order_field"];
 
-  $uid = $auth->auth["uid"];;
+  $uid = $obm["uid"];;
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "todo_priority";
   $sql_order_dir = (strcmp($sql_order_dir,"") != 0) ? $sql_order_dir : "desc";
 
@@ -122,10 +122,10 @@ function run_query_todo_detail($todo) {
 //     keys used       uid, title, sel_user, priority, deadline, content
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_insert($todo) {
-  global $auth, $cdg_sql, $obm;
+  global $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $title = $todo["title"];
   $users = $todo["userid"];
   $priority = $todo["priority"];
@@ -147,7 +147,7 @@ function run_query_todo_insert($todo) {
         todo_timecreate,
         todo_userupdate,
         todo_usercreate,
-				todo_domain_id,
+        todo_domain_id,
         todo_user,
         todo_date,
         todo_deadline,
@@ -160,7 +160,7 @@ function run_query_todo_insert($todo) {
         '$now',
         '$uid',
         '$uid',
-				'$domain_id',
+        '$domain_id',
         '$user',
         '$now',
         '$deadline',
@@ -185,12 +185,12 @@ function run_query_todo_insert($todo) {
 //     keys used       id, uid, title, sel_user, priority, deadline, content
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_update($todo) {
-  global $auth, $cdg_sql;
+  global $obm, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
 
   $t_id = $todo["todo_id"];
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $title = $todo["title"];
   $users = $todo["userid"];
   $user = $users[0];
@@ -202,7 +202,7 @@ function run_query_todo_update($todo) {
     $percent = "0";
   }
 
-	$multidomain = sql_multidomain("todo");
+  $multidomain = sql_multidomain("todo");
 		
   $query = "UPDATE Todo SET
     todo_timeupdate = '$now',
@@ -298,10 +298,10 @@ function run_query_todo_delete_unique($t_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_todo_data_form($todo) {
   global $php_regexp_percent, $l_err_percent, $l_j_fill_title;
-  global $err_msg, $auth;
+  global $err_msg, $obm;
 
   $t_id = $todo["todo_id"];
-  $uid = $auth->auth["uid"];
+  $uid = $obm["uid"];
   $title = $todo["title"];
   $users = $todo["userid"];
   $user = $users[0];
