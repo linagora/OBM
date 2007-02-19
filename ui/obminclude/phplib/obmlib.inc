@@ -195,7 +195,7 @@ class OBM_Challenge_Auth extends Auth {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
       $pass = $this->db->f("userobm_password");
-      $crypt = $this->db->f("userobm_password_type");      
+      $crypt = strtolower($this->db->f("userobm_password_type"));      
       $domain_id = $this->db->f("userobm_domain_id");
     }
 
