@@ -32,7 +32,7 @@ $fieldnames["project_archive"] = $l_archive_first;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_project(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail, $ico_web;
+  global $path,  $ico_mail, $ico_web;
   
   if ($fieldname == "project_name") {
     if ($OD->display_ext == "get_id") {
@@ -325,7 +325,7 @@ function dis_project_planning($project) {
 //   - $time : parameter hash
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_nav_date($project) {
-  global $cdg_param, $set_theme, $c_dst_err, $l_monthsofyear, $action;
+  global $cdg_param,  $c_dst_err, $l_monthsofyear, $action;
   global $ico_previous,$ico_next;
 
   $id = $project["project_id"];
@@ -481,7 +481,7 @@ function html_project_planning($obm_q, $params) {
 //   $r : string with XHTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_links($p_q) {
-  global $set_theme, $ico_document, $ico_add, $ico_invoice;
+  global  $ico_document, $ico_add, $ico_invoice;
   global $l_new, $l_module_invoice, $l_module_document;
   global $l_document_add, $l_project;
   global $path, $cgp_show, $popup_height, $popup_width;
@@ -582,7 +582,7 @@ function dis_project_consult($pid) {
 //      keys used : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_consult($project_q, $tasks_q, $members_q, $times) {
-  global $path, $set_theme, $display, $action, $ico_company, $ico_deal;
+  global $path,  $display, $action, $ico_company, $ico_deal;
   global $l_name, $l_tasktype, $l_company, $l_total, $l_datebegin, $l_dateend;
   global $l_deal, $l_project, $l_progress, $l_progressinfos,$l_shortname;
   global $l_used, $l_missing, $l_sold, $l_estimated, $l_comment;
@@ -1066,7 +1066,7 @@ function html_project_form($action, $project_q, $project) {
   global $l_datebegin, $l_dateend, $c_undef, $l_undef,$l_tasks;
   global $l_comment, $l_add_comment, $l_upd_comment,$ico_project,$popup_width;
   global $obm, $cg_prod, $c_php_isodate_format,$l_shortname,$popup_height;
-  global $ctt_sales, $ctt_research, $ctt_others,$set_theme,$l_other;
+  global $ctt_sales, $ctt_research, $ctt_others,$l_other;
   global $l_tt_sales, $l_tt_research, $l_tt_others,$path;
 
   $usr_q = run_query_all_users_from_group($cg_prod, array($obm["uid"]));
@@ -1396,7 +1396,7 @@ function dis_can_delete_project($p_id) {
 function html_project_task_form($ptask_q, $project) {
   global $display, $c_undef, $l_undef,$popup_height,$ico_project;
   global $l_name, $l_parent, $l_task_new, $l_task_add, $l_project;
-  global $l_task_update, $l_task_upd, $l_task,$l_tasks,$set_theme;
+  global $l_task_update, $l_task_upd, $l_task,$l_tasks;
   global $popup_width,$path;
   
   $pid = $project["project_id"];
@@ -1556,7 +1556,7 @@ function html_project_task_form($ptask_q, $project) {
 //     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_tasklist($tasks_q, $project) {
-  global $set_theme,$ico_hierarchy;
+  global $ico_hierarchy;
   global $l_task_list, $l_task_del, $l_no_tasks;
 
   $pid = $project["project_id"];
@@ -1724,7 +1724,7 @@ function html_project_member_form($members_q, $project) {
 //     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
-  global $display, $set_theme;
+  global $display ;
   global $l_memberstimeinfos, $l_validate;
   global $l_no_members, $l_project,$ico_hierarchy;
 
@@ -1861,7 +1861,7 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
 //     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
-  global $display, $set_theme,$ico_hierarchy;
+  global $display, $ico_hierarchy;
   global $l_fill_advance_form, $l_validate;
   global $l_no_members, $l_project;
 
@@ -2023,7 +2023,7 @@ function dis_project_dashboard($project) {
 //      keys used : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
-  global $path, $set_theme, $display, $action;
+  global $path,  $display, $action;
   global $l_board_no_data, $l_total;
   global $l_project, $l_progress, $l_progressinfos;
   global $l_used, $l_missing,$ico_hierarchy;
@@ -2420,7 +2420,7 @@ function html_project_task_selector($project,$project_q,$tasktype_q) {
   }
 
   $block .= "
-    <form method=\"post\ name=\"f_add_task\" action=\"$url\"  
+    <form method=\"post\" name=\"f_add_task\" action=\"$url\"  
     onsubmit=\"check_get_task_id(this.sel_project.value,this.sel_projecttask.value,this.sel_tasktype.value);return false\">
     <table class=\"detail\" width=\"100%\">
     <tr>

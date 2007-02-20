@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-if (($ext_element != "")
+if (($params["ext_element"] != "")
     || (true)) {
   $extra_js .= "
 
@@ -29,14 +29,14 @@ function of_select_fill_from_checkbox(int_form, entity) {
     if (int_form.elements[i].type == 'checkbox') {
       if (int_form.elements[i].checked == true) {
         id = int_form.elements[i].name;
-        div_id = '$ext_element'+'-data-'+entity+'-'+id;
+        div_id = '$params[ext_element]'+'-data-'+entity+'-'+id;
         // If the element not already present in the caller window
         if (! get_elem(window.opener.document, div_id )) {
  	  sel_id = 'data-'+entity+'-'+id;
           // Get the label associated to the id from the int_form row
           // hidden in an hidden span
 	  span = get_elem(window.document, sel_id);
-	  of_select_add_element(window.opener.document, '$ext_element', sel_id, span.innerHTML);
+	  of_select_add_element(window.opener.document, '$params[ext_element]', sel_id, span.innerHTML);
         }
       }
     }

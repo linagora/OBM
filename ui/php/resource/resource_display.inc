@@ -28,12 +28,12 @@ $fieldnames["resource_id"] = $l_update;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_resource(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ext_element;
+  global $path, ,$ico_update;
 
   if (($fieldname == "resource_name") && $link_ok) {
     $res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$OD->data_set->f("resource_id");
   }
-  if (($fieldname == "data_element") && $ext_element != "") {
+  if (($fieldname == "data_element") && $params["ext_element"] != "") {
     $res["name"] = "<span id=\"data-resource-".$OD->data_set->f("resource_id")."\" style=\"display:none;\">".
     $OD->data_set->f("resource_name").
     "</span>";
@@ -41,7 +41,7 @@ function dis_data_resource(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "resource_id") {
     $t_id = $OD->data_set->f("resource_id");
     $res["url"] = "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=$t_id";
-    $res["name"] = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" />";
+    $res["name"] = "<img src=\"$ico_update\" alt=\"\" />";
     $res["txt_name"] = " ";
   }
 

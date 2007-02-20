@@ -30,7 +30,7 @@ $fieldnames["todo_update"] = $l_update;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_todo(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme;
+  global $path,$ico_update ;
 
   if ($fieldname == "date_deadline") {
     $deadline = $OD->data_set->f("date_deadline");
@@ -65,7 +65,7 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
     $res["popup_width"] = 700;
     $res["popup_height"] = 260;
     $res["url"] = "todo_index.php?action=detailupdate&amp;todo_id=$t_id&amp;popup=1";
-    $res["name"] = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" />";
+    $res["name"] = "<img src=\"$ico_update\" alt=\"\" />";
     $res["txt_name"] = " ";
   }
 
@@ -217,7 +217,7 @@ function dis_todo_detail($todo, $todo_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_form($todo, $todo_q = 0) {
   global $path, $obm;
-  global $set_theme, $set_date, $ico_mini_cal, $ico_add_user,$ico_delete;
+  global $set_date, $ico_mini_cal, $ico_add_user,$ico_delete;
   global $popup_width, $popup_height;
   global $l_add, $l_update, $l_close,$display,$l_todo,$l_user;
   global $l_deadline, $l_priority, $l_todotitle, $l_percent, $l_content;

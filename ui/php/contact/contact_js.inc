@@ -157,11 +157,11 @@ function fill_contact_select_header(source)
 }
 ";
 
-if (isset($ext_target) && $ext_target!="") {
+if (isset($params["ext_target"]) && $params["ext_target"]!="") {
   $extra_js .= "
 
   function fill_ext_form(dir_path) {
-    ext_field = window.opener.document.$ext_target;
+    ext_field = window.opener.document.$params[ext_target];
     ext_field.value = dir_path;
     window.close();
   } 

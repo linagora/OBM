@@ -40,7 +40,7 @@ $fieldnames["invoice_deal"] = $l_deal;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_payment(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $col_frs, $col_client;
+  global $path,  $col_frs, $col_client;
 
   if ($fieldname == "payment_date") {
     $date = $OD->data_set->f($fieldname);
@@ -329,7 +329,7 @@ function dis_payment_consult($params) {
 //   - $invs : array : invoices connected to the payment
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_consult($p_q, $invs) {
-  global $path, $display, $set_theme, $ico_company;
+  global $path, $display,  $ico_company;
   global $l_payment, $l_invoice, $l_company, $l_received, $l_emitted;
   global $l_comment, $l_number, $l_amount, $l_date, $l_label, $l_no_invoice;
   global $l_account, $l_kind, $l_inout, $l_total;
@@ -482,7 +482,7 @@ function dis_payment_invoice($params) {
 //   - $params[] : payment values
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_invoice($amounts, $params) {
-  global $display, $set_theme, $l_update, $l_no_invoice;
+  global $display,  $l_update, $l_no_invoice;
   global $l_payment, $l_invoice, $l_company, $l_received, $l_emitted;
   global $l_comment, $l_number, $l_amount, $l_date, $l_label, $l_already_paid;
   global $l_total;
@@ -606,7 +606,7 @@ function dis_payment_form($action, $params) {
 //   - $params[]  : parameters : form values
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_form($action, $p_q, $kinds, $accs, $params) {
-  global $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
+  global $ico_company, $l_company,$ico_add,$ico_crow;
   global $l_payment, $l_invoice, $l_account, $l_kind, $l_date, $l_number;
   global $l_amount, $l_inout, $l_received, $l_emitted, $l_comment;
   global $l_update, $l_checkdelete, $l_insert;
@@ -811,7 +811,6 @@ function dis_can_delete_payment($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_payment_display_pref ($prefs) {
   global $l_payment_options, $l_invoice_options, $l_et_options;
-  global $set_theme ;
  
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "payment");
   $dis_pref->pref_title = $l_payment_options;

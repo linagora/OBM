@@ -104,7 +104,7 @@ function display_page(&$display) {
 //   - $module : module selected
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu($module) {
-  global $path, $obm, $display, $obm_version, $cgp_show,$set_lang, $set_theme;
+  global $path, $obm, $display, $obm_version, $cgp_show,$set_lang;
   global $l_logout, $l_profile,$ico_logout,$modules,$ico_login, $ico_obm,$ico_print;
 
   $uid = $obm["uid"];
@@ -188,7 +188,7 @@ function display_sections_theme($section) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_modules_theme($section) {
-  global $set_theme, $set_menu, $cme_txt, $cme_ico, $cme_both;
+  global $set_menu, $cme_txt, $cme_ico, $cme_both;
   global $path, $perm, $modules, $cgp_show;
 
   if (($set_menu == $cme_ico) || ($set_menu == $cme_both))
@@ -236,7 +236,7 @@ function display_modules_theme($section) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_actions_theme($section, $module) {
-  global $set_theme, $modules, $action, $popup_height;
+  global $modules, $action, $popup_height;
   global $actions, $popup_width, $perm;
 
 

@@ -82,11 +82,11 @@ function show ( name ) {
 
 ";
 
-if (isset($ext_element) && $ext_element!="") {
+if (isset($params["ext_element"]) && $params["ext_element"]!="") {
   $extra_js .= "
 
 /*function fill_ext_form(dir_path) {
-  ext_field = window.opener.document.$ext_element;
+  ext_field = window.opener.document.$params[ext_element];
   ext_field.value = dir_path;
   window.close();
 } */
@@ -97,11 +97,11 @@ function fill_ext_cat_element(int_form) {
     if (int_form.elements[i].type == 'checkbox') {
       if (int_form.elements[i].checked == true) {
         id = int_form.elements[i].name;
-	elemid = '$ext_element-data-'+id;
+	elemid = '$params[ext_element]-data-'+id;
         if (!get_elem(window.opener.document, elemid)) {
           elemid = 'data'+id;
 	  span = get_elem(window.document,elemid);
-	  of_select_add_element(window.opener.document, '$ext_element', id, span.innerHTML);
+	  of_select_add_element(window.opener.document, '$params[ext_element]', id, span.innerHTML);
         }
       }
     }
@@ -112,9 +112,9 @@ function fill_ext_cat_element(int_form) {
 // Select the category with the code given
 /*
 function fill_category_ext_code_form(value) {
-  ext_field = window.opener.document.$ext_element;
+  ext_field = window.opener.document.$params[ext_element];
   ext_size = ext_field.length;
-  ext_field = window.opener.document.$ext_element;
+  ext_field = window.opener.document.$params[ext_element];
   bool= false;
   for(j=0; j< ext_size && bool == false; j++) {
     if (ext_field.options[j].value == value) {

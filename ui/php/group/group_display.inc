@@ -42,12 +42,12 @@ $fieldnames["group_user_email"] = $l_email;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_group(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new,$ext_element;
+  global $path, $ico_mail, $ico_web, $ico_contact_new,$params;
 
   if (($fieldname == "group_name") && $link_ok) {
     $res["url"] = "$path/group/group_index.php?action=detailconsult&amp;group_id=".$OD->data_set->f("group_id");
   }
-  if (($fieldname == "data_element") && $ext_element != "") {
+  if (($fieldname == "data_element") && $params["ext_element"] != "") {
     $res["name"] = "<span id=\"data-group-".$OD->data_set->f("group_id")."\" style=\"display:none;\">".
     $OD->data_set->f("group_name")."</span>";
   }  
@@ -87,7 +87,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
     $id = $OD->data_set->f("group_id");
     $query = "select count(*) from UserObmGroup where userobmgroup_group_id='$id'";
     $nb_q->query($query);
-    $nb_q->next_record();
+    $nb_q->nxt_record();
     $res["name"] = $nb_q->f(0);
     $res["align"] = "center";
   }

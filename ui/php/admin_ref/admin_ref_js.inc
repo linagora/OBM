@@ -9,7 +9,7 @@
 
 
 require("$obminclude/javascript/check_js.inc");
-if ($ext_element != "") {
+if ($params["ext_element"] != "") {
   require_once("$obminclude/of/of_select.inc");
 }
 

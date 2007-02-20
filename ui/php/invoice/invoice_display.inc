@@ -40,7 +40,7 @@ $fieldnames["payment_amount"] = $l_amount;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_invoice(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $col_frs, $col_client, $l_supplier, $l_client;
+  global $path, $col_frs, $col_client, $l_supplier, $l_client;
   global $invoice;
 
   if ($fieldname == "invoice_deal") {
@@ -154,7 +154,7 @@ function dis_invoice_search_form($invoice="") {
 //   - $tts     : Task Type aray
 //////////////////////////////////////////////////////////////////////////////
 function html_invoice_search_form($invoice, $sta, $tts) {
-  global $display, $path, $set_theme, $popup, $c_all, $l_all, $ctt_sales;
+  global $display, $path, $popup, $c_all, $l_all, $ctt_sales;
   global $l_label_start, $l_number, $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_tt, $l_date, $l_after, $l_before, $l_inout;
   global $l_company, $l_include_archive, $l_select_invoice;
@@ -427,7 +427,7 @@ function dis_invoice_consult($invoice) {
 //   - $pays  : array : payments for the invoice
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_consult($inv_q, $pays) {
-  global $path, $display, $set_theme;
+  global $path, $display ;
   global $l_delete, $l_invoice, $l_payment, $l_no_payment, $l_total;
   global $l_list_payment, $l_company, $l_date, $l_number, $l_amount, $l_payments_todel;
 
@@ -495,7 +495,7 @@ function html_invoice_consult($inv_q, $pays) {
 //   $r : string with XHTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_links($inv_q) {
-  global $set_theme, $ico_document, $ico_add, $ico_payment;
+  global  $ico_document, $ico_add, $ico_payment;
   global $l_invoice, $l_new, $l_module_document, $l_module_payment;
   global $l_document_add;
   global $path, $cgp_show, $popup_height, $popup_width;
@@ -561,7 +561,7 @@ function html_invoice_links($inv_q) {
 // XHTML Display invoice detail info part
 //////////////////////////////////////////////////////////////////////////////
 function dis_invoice_detail($inv_q) {
-  global $display, $set_theme, $path, $ico_company, $ico_deal, $ico_project;
+  global $display,  $path, $ico_company, $ico_deal, $ico_project;
   global $l_company, $l_deal, $l_project,$l_amount_ht, $l_amount_ttc;
   global $l_date, $l_label, $l_number, $l_inout, $l_supplier, $l_client;
   global $l_archive, $l_status, $l_comment, $l_invoice;
@@ -710,7 +710,7 @@ function dis_invoice_form($action, $invoice) {
 //   - $usr_q     : userobm database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
-  global $obm, $path, $display, $set_theme;
+  global $obm, $path, $display ;
   global $ico_company, $ico_deal, $ico_project;
   global $l_label, $l_number, $l_comment, $l_add_comment, $l_upd_comment;
   global $l_amount_ht, $l_amount_ttc;
@@ -1026,7 +1026,7 @@ function dis_can_delete_invoice($p_id) {
 //   - $invoice : invoice hash infos
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_dashboard_index($invoice) {
-  global $display, $set_theme, $path;
+  global $display,  $path;
   global $l_year_detail, $l_year_to_year;
 
   $view = $invoice["dash_view"];
@@ -1055,11 +1055,11 @@ function dis_invoice_dashboard_index($invoice) {
 //   - $invoice : invoice hash infos
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_dashboard($invoice) {
-  global $display, $set_theme, $path, $ctt_sales;
+  global $display,  $path, $ctt_sales;
   global $l_status, $l_total, $l_invoice, $l_date, $l_amount_ht, $l_amount_ttc;
   global $l_billed, $l_order_no_bill, $l_potential, $l_monthsofyear;
   global $l_payment, $l_amount_ht, $l_amount_ttc, $l_paid, $l_waiting;
-  global $l_execute;
+  global $l_execute,$ico_next,$ico_previous;
 
   if (isset($invoice["year"])) {
     $year = $invoice["year"];
@@ -1345,7 +1345,7 @@ function dis_invoice_dashboard($invoice) {
                     yearfield.innerHTML=newyear;
                     document.forms.f_search.year.value=newyear;
                     return false;\">
-        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/previous.png\" alt=\"\" /></a>
+        <img border=\"0\" src=\"$ico_previous\" alt=\"\" /></a>
       
       
      
@@ -1355,7 +1355,7 @@ function dis_invoice_dashboard($invoice) {
                     yearfield.innerHTML=newyear;
                     document.forms.f_search.year.value=newyear;
                     return false;\">
-        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/next.png\" alt=\"\" /></a>
+        <img border=\"0\" src=\"$ico_next\" alt=\"\" /></a>
       
 
       $block_tt
@@ -1441,11 +1441,11 @@ function dis_invoice_dashboard($invoice) {
 //   - $invoice : invoice hash infos
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_dashboard_year_to_year($invoice) {
-  global $display, $set_theme, $path, $ctt_sales;
+  global $display,  $path, $ctt_sales;
   global $l_status, $l_total, $l_invoice, $l_date, $l_amount_ht, $l_amount_ttc;
   global $l_billed, $l_order_no_bill, $l_potential, $l_monthsofyear;
   global $l_payment, $l_amount_ht, $l_amount_ttc, $l_paid, $l_waiting;
-  global $l_execute;
+  global $l_execute,$ico_previous,$ico_next;
 
   if (isset($invoice["year"])) {
     $year = $invoice["year"];
@@ -1529,7 +1529,7 @@ function dis_invoice_dashboard_year_to_year($invoice) {
                     yearfield.innerHTML=newyear;
                     document.forms.f_search.year.value=newyear;
                     return false;\">
-        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/previous.png\" alt=\"\" /></a>
+        <img border=\"0\" src=\"$ico_previous\" alt=\"\" /></a>
       </div>
       <div class=\"searchLabel\" id=\"year\">$year</div>
       <div class=\"searchLabel\">
@@ -1539,7 +1539,7 @@ function dis_invoice_dashboard_year_to_year($invoice) {
                     yearfield.innerHTML=newyear;
                     document.forms.f_search.year.value=newyear;
                     return false;\">
-        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/next.png\" alt=\"\" /></a>
+        <img border=\"0\" src=\"$ico_next\" alt=\"\" /></a>
       </div>
 
       <div class=\"detailText\">$block_tt</div>

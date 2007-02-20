@@ -28,7 +28,7 @@ $fieldnames["domain_timecreate"] = $l_timecreate;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_domain_data(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail,$ext_element;
+  global $path, $ico_mail;
 
   if (($fieldname == "domain_label") && $link_ok) {
     $res["url"] = "$path/domain/domain_index.php?action=detailconsult&amp;domain_id=".$OD->data_set->f("domain_id");

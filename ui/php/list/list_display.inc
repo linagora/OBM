@@ -59,7 +59,7 @@ $fieldnames["publication_lang"] = $l_publication." ".$l_lang;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_list(&$OD, $fieldname, $link_ok) {
-  global $path, $params, $set_theme, $clist_mode_normal, $clist_mode_expert;
+  global $path, $params,  $clist_mode_normal, $clist_mode_expert;
   global $l_normal, $l_expert;
 
   // We set an indicator to tell if the contact has an address
@@ -904,7 +904,7 @@ function html_list_form($action, $list_q, $list) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_normal_criteria_form($action, $list_q, $list) {
-  global $cgp_user,$popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow;
+  global $cgp_user,$popup_height,$popup_width,$ico_updated,$ico_crow;
   global $l_add_criterion, $l_criterion;
   global $l_and, $l_or, $l_not, $l_empty, $l_exclude;
   global $l_company, $l_country,$l_postcode,$l_town;
@@ -1292,7 +1292,7 @@ function dis_list_add_criterion_form($list) {
 //   - $list[]    : default or transmitted values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_add_criterion_userdata_form($entity) {
-  global $cgp_user, $set_theme, $ico_add, $popup_height, $popup_width, $l_all;
+  global $cgp_user,  $ico_add, $popup_height, $popup_width, $l_all;
   global $ico_add, $ico_crow, $l_none;
 
   // User data categories handling
@@ -1344,7 +1344,7 @@ function dis_list_add_criterion_userdata_form($entity) {
 function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
   global $l_company,$l_country,$l_postcode,$l_town,$l_timebefore,$l_timeafter;
   global $l_all,$l_market,$l_datasource;
-  global $set_theme,$ico_mini_cal,$ico_add,$popup_height,$popup_width;
+  global $ico_mini_cal,$ico_add,$popup_height,$popup_width;
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while ($cty_q->next_record()) {
@@ -1419,7 +1419,7 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q) {
   global $l_all,$l_timebefore,$l_timeafter,$l_market,$l_datasource;  
   global $l_function,$l_lang;
   global $l_yes,$l_no;
-  global $set_theme,$ico_mini_cal;  
+  global $ico_mini_cal;  
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while ($cty_q->next_record()) {
@@ -1529,7 +1529,7 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_publication_criterion($rec_q,$pub_q) {
-  global $path, $l_all, $l_undef, $l_yes, $l_no, $set_theme, $ico_mini_cal;
+  global $path, $l_all, $l_undef, $l_yes, $l_no,  $ico_mini_cal;
   global $l_publication, $l_title, $l_lang, $l_year;
   global $l_renew,$l_recept, $l_after, $l_before;
 

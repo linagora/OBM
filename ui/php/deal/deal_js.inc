@@ -10,7 +10,7 @@
 require("$obminclude/javascript/check_js.inc");
 
 // to avoid a javascript error when ext_widget or ext_widget_label not defined
-if (($ext_widget != "") || ($ext_widget_text != "")) {
+if (($params["ext_widget"] != "") || ($params["ext_widget_text"] != "")) {
   $extra_js .= "
 
 function check_get_id(valeur,text) {
@@ -18,8 +18,8 @@ function check_get_id(valeur,text) {
     alert (\"$l_select_deal\");
     return false;
   } else {
-    window.opener.document.$ext_widget.value=valeur;
-    window.opener.document.$ext_widget_text.value=text;
+    window.opener.document.$params[$ext_widget].value=valeur;
+    window.opener.document.$params[$ext_widget_text].value=text;
     window.close();
     return true;
   }
@@ -213,7 +213,7 @@ function check_kind_new(form) {
 ///////////////////////////////////////////////////////////////////////////////
 function fill_ext_form2(int_form) {
    size = int_form.length;
-   ext_field = get_elem(window.opener.document, '$ext_target' );
+   ext_field = get_elem(window.opener.document, '$params[ext_target]' );
    for(i=0; i <size; i++) {
      if(int_form.elements[i].type == 'checkbox'){
        if(int_form.elements[i].checked == true) {
@@ -290,7 +290,7 @@ function add_DC_line() {
   eval('document.f_entity.data_dccnewid_'+cpt+' = ipt');
   span = document.createElement('span');
   onclick= \"window.open('$path/company/company_index.php?action=ext_get_id&popup=1&ext_widget=f_entity.data_dccnewid_\"+cpt+\"&ext_widget_text=f_entity.data_dccnewname_\"+cpt+\"','Company','height=,width=,scrollbars=yes'); return false;\";
-  span.innerHTML = '<a href=\"\" onclick=\"'+onclick+'\"> <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>';
+  span.innerHTML = '<a href=\"\" onclick=\"'+onclick+'\"> <img src=\"$ico_company\" alt=\"\" /></a>';
   div.appendChild(span);
   ipt = document.createElement('input');
   ipt.type = 'text';

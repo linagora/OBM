@@ -41,7 +41,7 @@ $fieldnames["timetask_id"] = "";
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_data(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $params;
+  global $path,  $params, $ico_update;
 
   $res["style"] = "";
   
@@ -68,7 +68,7 @@ function dis_time_data(&$OD, $fieldname, $link_ok) {
       $res["popup_width"] = 700;
       $res["popup_height"] = 210;
       $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;user_id=".$OD->data_set->f("timetask_user_id")."&amp;date=".$params["date"];
-      $res["name"] = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" />";
+      $res["name"] = "<img border=\"0\" src=\"$ico_update\" alt=\"\" />";
     } else {
       $res["name"] = "&nbsp;";
     }
@@ -967,7 +967,7 @@ function dis_time_month_users_total($time) {
 //   - 
 ///////////////////////////////////////////////////////////////////////////////
 function html_time_month_users_total($time, $array_res) {
-  global $set_theme, $c_working_days, $c_day_fraction;
+  global  $c_working_days, $c_day_fraction;
   global $l_see, $l_fill, $l_valid, $l_unvalid, $l_admin_valid;
   global $ico_update,$ico_nok,$ico_ok;
 

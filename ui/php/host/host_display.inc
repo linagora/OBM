@@ -31,7 +31,7 @@ $fieldnames["timeupdate"] = $l_date_last_update;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_host(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme;
+  global $path ;
 
   if (($fieldname == "host_name") && $link_ok) {
     if ($OD->display_ext == "get_id") {

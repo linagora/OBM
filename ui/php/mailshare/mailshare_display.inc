@@ -31,7 +31,7 @@ $fieldnames["timeupdate"] = $l_date_last_update;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_mailshare(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail;
+  global $path, $ico_mail;
 
   if (($fieldname == "mailsharedir_name") && $link_ok) {
     if ($OD->display_ext == "get_id") {
@@ -58,7 +58,7 @@ function dis_data_mailshare(&$OD, $fieldname, $link_ok) {
       $emails = explode("\n",$email);
       $email = trim($emails[0])."@$main_domain";
       $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\"/>$email";
+      $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\"/>$email";
       $res["txt_name"] = "$email";
     }
   }

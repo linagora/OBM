@@ -34,7 +34,7 @@ $fieldnames["resourcegroup_resource_qty"] = $l_qty;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new,$ext_element;
+  global $path, $ico_mail, $ico_web, $ico_contact_new,$params;
 
   if (($fieldname == "rgroup_name") && $link_ok) {
     $res["url"] = "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;resourcegroup_id=".$OD->data_set->f("rgroup_id");
@@ -50,7 +50,7 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if (($fieldname == "data_element") && $ext_element != "") {
+  else if (($fieldname == "data_element") && $params["ext_element"] != "") {
     $res["name"] = "<span id=\"data-resourcegroup-".$OD->data_set->f("rgroup_id")."\" style=\"display:none;\">".
     $OD->data_set->f("rgroup_name")."</span>";
   } else if ($fieldname == "rgroup_nb_resource") {

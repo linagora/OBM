@@ -783,7 +783,7 @@ function dis_deal_consult($deal) {
 //   - $dc      : array DealCompany infos
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_consult($deal_q, $dc="") {
-  global $set_theme, $ico_company, $ico_contact, $display;
+  global $ico_company, $ico_contact, $display;
   global $l_dates, $l_company, $l_contact, $l_other_relation, $l_relation;
   global $l_label, $l_kind,$l_region,$l_marketing_manager,$l_technical_manager;
   global $l_number, $l_amount,$l_hitrate, $l_commission_p, $l_sale_delay;
@@ -1080,7 +1080,7 @@ function dis_deal_form($deal) {
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,$usrp_q,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
-  global $set_theme,$ico_company,$ico_contact,$ico_add;
+  global $ico_company,$ico_contact,$ico_add;
   global $c_php_isodate_format,$l_deal,$l_update,$l_insert, $l_private;
   global $l_dates, $l_company, $l_other_relation, $l_relation, $l_label;
   global $l_number, $l_kind, $l_region;
@@ -1863,7 +1863,7 @@ function html_deal_affect($parent_q, $p_deal_id) {
 //   - $deal : deal hash infos
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_dashboard_index($deal) {
-  global $display, $set_theme, $path;
+  global $display, $path;
   global $l_deal, $l_header_dashboard, $l_potential, $l_year_detail;
 
   $view = $deal["dash_view"];
@@ -1908,7 +1908,7 @@ function dis_deal_dashboard_view($deal) {
 //   - $deal[] : hash values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_dashboard_potential($deal) {
-  global $display, $set_theme, $l_deal, $l_module_deal, $l_total, $l_deal_total;
+  global $display, $l_deal, $l_module_deal, $l_total, $l_deal_total;
   global $l_forecast, $l_deal_balanced, $l_commission, $l_commission_balanced;
   global $l_marketing_manager, $l_technical_manager, $l_help_deal_forecast;
 
@@ -2041,7 +2041,7 @@ function dis_deal_dashboard_potential($deal) {
 //   - $deal     : deal hash infos
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_dashboard_year_detail($deal) {
-  global $display, $set_theme, $path, $ctt_sales;
+  global $display, $path, $ctt_sales;
   global $l_total, $l_date, $l_amount_ht, $l_amount_ttc;
   global $l_potential, $l_expected, $l_monthsofyearshort;
   global $l_amount, $l_deal_balanced, $l_commission, $l_commission_balanced;
@@ -2418,7 +2418,7 @@ function dis_deal_dashboard_year_detail($deal) {
 //   - $deal[] : hash values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_dashboard_list($deal) {
-  global $display, $set_theme, $obm;
+  global $display, $obm;
   global $l_module_deal;
 
   $date_after = $deal["date_after"];

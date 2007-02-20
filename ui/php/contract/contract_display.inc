@@ -36,7 +36,7 @@ $fieldnames["contract_archive"] = $l_archive_first;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_contract(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $contract;
+  global $path,  $contract;
   global $ccf_period, $ccf_ticket, $ccf_duration;
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
   global $cck_customer, $cck_supplier, $l_cck_customer, $l_cck_supplier;
@@ -396,7 +396,7 @@ function html_contract_search_list($contract_q, $prefs, $contract, $popup) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last) {
-  global $set_theme, $ico_incident, $ico_deal, $ico_document,$ico_add;
+  global  $ico_incident, $ico_deal, $ico_document,$ico_add;
   global $l_module_incident, $l_incident_list, $l_incident_new, $l_last;
   global $l_module_deal, $l_module_document, $l_contract;
   global $l_document_new,$l_document_add,$l_add_document,$l_deal;
@@ -513,7 +513,7 @@ function dis_contract_consult($contract) {
 //   - $last_inc      : Last incident id created
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, $last_inc) {
-  global $path, $display, $set_theme, $ico_company,$ico_contact, $ico_deal;
+  global $path, $display,  $ico_company,$ico_contact, $ico_deal;
   global $l_yes, $l_no, $l_contract, $l_company, $l_deal;
   global $l_client_manager,$l_marketing_manager,$l_technical_manager;
   global $l_manager, $l_label, $l_comment, $l_number, $l_clause, $l_archive;
@@ -781,7 +781,7 @@ function dis_contract_form($action,$contract,$param_company) {
 function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp_q,$contact_q, $contract,$pri_q,$sta_q){
   // - Themes
   global $cgp_show;
-  global $obm, $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
+  global $obm, $ico_mail,$ico_company,$ico_deal,$ico_contact;
   global $path, $c_php_isodate_format, $c_undef, $l_undef, $l_update,$l_insert;
   global $l_label, $l_begin, $l_type, $l_marketing_manager, $l_archive;
   global $l_signature, $l_begin, $l_exp, $l_renew,$l_date_cancel,$l_dates;

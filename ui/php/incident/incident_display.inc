@@ -37,7 +37,7 @@ $fieldnames["incident_company_name"] = $l_company;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_incident(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme;
+  global $path;
   global $col_inc_redhot, $col_inc_hot, $col_inc_closed;
 
   if ($fieldname == "incident_label") {
@@ -308,7 +308,7 @@ function dis_incident_consult($incident) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_consult($inc_q) {
   global $display, $path, $l_yes, $l_no, $cmail_incident;
-  global $set_theme, $ico_contract, $ico_company, $ico_mail;
+  global  $ico_contract, $ico_company, $ico_mail;
   global $l_incident, $l_contract, $l_company;
   global $l_label, $l_logger, $l_owner, $l_priority, $l_status, $l_archive;
   global $l_duration, $l_solution, $l_date,$l_reference;
@@ -460,7 +460,7 @@ function html_incident_consult($inc_q) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_links($inc_q) {
-  global $set_theme, $ico_document, $ico_add;
+  global  $ico_document, $ico_add;
   global $l_new, $l_incident, $l_module_document, $l_document_add;
   global $path, $cgp_show, $popup_height, $popup_width;
 
@@ -549,7 +549,7 @@ function dis_incident_form($action, $incident) {
 //   - $resos      : array with incident resolution types
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $resos) {
-  global $display, $path, $obm, $set_theme, $ico_contract;
+  global $display, $path, $obm,  $ico_contract;
   global $c_php_isodate_format;
   global $l_label,$l_contract,$l_status, $l_find,$l_reference;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;

@@ -36,7 +36,7 @@ $fieldnames["project_reference_tech"] = $l_project_tech;
 */
 
 function dis_data_cv(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $params;
+  global $path, $params;
   global $ccf_period, $ccf_ticket, $ccf_duration;
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
   global $cck_customer, $cck_supplier, $l_cck_customer, $l_cck_supplier;
@@ -281,7 +281,7 @@ function dis_cv_consult($params) {
 */
 
 function html_cv_consult($cv, $cv_q, $refs_q, $prefs){
-  global $path, $display, $set_theme;
+  global $path, $display;
   global $l_yes, $l_no, $l_cv;
   global $l_personal, $l_lastname, $l_firstname, $l_education, $l_location, $l_phone, $l_additionalrefs, $l_comment;
   global $l_ref, $l_refs,  $l_project_date, $l_project_duration, $l_project_desc, $l_project_tech, $l_role, $l_project ,$l_project_duration;
@@ -480,7 +480,7 @@ function dis_cv_form($action, $cv) {
 * @return string $block html cv form to display
 */
 function html_cv_form($action, $cv, $cv_q="", $refs_q="",$u_com_q) {
-  global $display, $set_dsrc, $l_none, $set_theme, $path, $popup_height, $popup_width;
+  global $display, $set_dsrc, $l_none,  $path, $popup_height, $popup_width;
 
   global $l_update, $l_insert, $l_delete;
   global $l_cv, $l_title, $l_comment, $l_user, $l_select_user, $l_duplicate;

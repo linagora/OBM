@@ -29,7 +29,7 @@ $fieldnames["import_enclosed"] = $l_enclosed;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_import(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme;
+  global $path;
 
   if (($fieldname == "import_name")  && $link_ok) {
     $res["url"] = "import_index.php?action=detailconsult&amp;import_id=".$OD->data_set->f("import_id");

@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-if ($ext_element != "") {
+if ($params["ext_element"] != "") {
   $extra_js .= "
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,14 +28,14 @@ function of_select_fill_from_checkbox(int_form, entity) {
     if (int_form.elements[i].type == 'checkbox') {
       if (int_form.elements[i].checked == true) {
         id = int_form.elements[i].name;
-        div_id = '$ext_element'+'-data-'+entity+'-'+id;
+        div_id = '$params[ext_element]'+'-data-'+entity+'-'+id;
         // If the element not already present in the caller window
         if (! get_elem(window.opener.document, div_id )) {
  	  sel_id = 'data-'+entity+'-'+id;
           // Get the label associated to the id from the int_form row
           // hidden in an hidden span
 	  span = get_elem(window.document, sel_id);
-	  of_extmod_add_element('$ext_element', sel_id, span.innerHTML);
+	  of_extmod_add_element('$params[ext_element]', sel_id, span.innerHTML);
         }
       }
     }
@@ -52,11 +52,11 @@ function of_select_fill_from_checkbox(int_form, entity) {
 ///////////////////////////////////////////////////////////////////////////////
 function of_extmod_add_element(element_name, sel_id, fieldLabel) {
   target = window.opener.document;
-  container = get_elem(target, '$ext_element');
+  container = get_elem(target, '$params[ext_element]');
 
   // Create the div row
   row = target.createElement('div');
-  row.id = '$ext_element-'+sel_id;
+  row.id = '$params[ext_element]-'+sel_id;
   row.className = 'elementRow';
 
   // Create the input field
@@ -67,7 +67,7 @@ function of_extmod_add_element(element_name, sel_id, fieldLabel) {
 
   // Create the link associated to the div
   link = target.createElement('a');
-  link.href = 'javascript: remove_element(\'$ext_element-'+sel_id+'\',\'$ext_element\');';
+  link.href = 'javascript: remove_element(\'$params[ext_element]-'+sel_id+'\',\'$params[ext_element]\');';
 //alert (link.href);
   link.onclick = '';
 

@@ -29,7 +29,7 @@ $fieldnames["publicationtype_label"] = $l_type;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_publication(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
+  global $path,  $ico_mail, $ico_web, $ico_contact_new;
   
   if ($fieldname == "publication_title") {
     if($OD->display_ext == "get_id") {
@@ -368,7 +368,7 @@ function dis_publication_form($action, $publication) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, $list_q) {
   global $display, $set_dsrc, $l_none, $ico_add;
-  global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
+  global $ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_publication_title, $l_type, $l_year, $l_lang, $l_desc;
   global $l_insert,$l_update,$l_checkdelete, $l_publication, $l_list;
   global $l_contact_category1,$l_auto_sub, $public_contact_cat;
@@ -501,7 +501,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_group_subscription_form($action,$pub_q, $publication) {
   global $display, $set_dsrc;
-  global $set_theme,$l_category;
+  global $l_category;
   global $l_publication, $l_contact_category1, $l_auto_sub, $public_contact_cat;
 
   $title = $pub_q->f("publication_title");
@@ -564,7 +564,7 @@ function html_publication_group_subscription_form($action,$pub_q, $publication) 
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_subscription_form($action,$sub_q, $recept_q, $publication) {
   global $display;
-  global $set_theme,$ico_publication_new,$popup_height,$popup_width;
+  global $ico_publication_new,$popup_height,$popup_width;
   global $l_subscription,$l_quantity, $l_renew, $l_recept, $l_lang, $l_desc;
   global $l_insert_sub,$l_update_sub,$l_checkdelete_sub, $l_publication;
 
@@ -699,7 +699,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publication) {
   global $display,$ico_publication_new;
-  global $set_theme,$popup_height,$popup_width,$l_insert;
+  global $popup_height,$popup_width,$l_insert;
   global $l_publication,$l_quantity, $l_renew, $l_recept,$l_year;
   global $l_publication_dest,$l_publication_orig;
   
@@ -1277,7 +1277,7 @@ function dis_publication_subscription_external_list($hash_table) {
 //   - $nb_sub  : nb subscriptions
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_subscription_list_result($sub_q,$nb_subscription) {
-  global $set_theme, $ico_update, $ico_delete, $ico_crow;
+  global  $ico_update, $ico_delete, $ico_crow;
   global $l_yes,$l_no, $l_timecreate, $l_timeupdate,$l_publication_title;
   global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
   global $path, $popup_height, $popup_width;

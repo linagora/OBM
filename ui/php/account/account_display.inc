@@ -37,7 +37,7 @@ $fieldnames["payment_amount"] = $l_amount;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_account(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme,$col_balance_pos, $col_balance_neg;
+  global $path, $col_balance_pos, $col_balance_neg;
 
   if ($fieldname == "account_label") {
     $res["url"] = "$path/account/account_index.php?action=detailconsult&amp;account_id=".$OD->data_set->f("account_id");
@@ -175,7 +175,7 @@ function html_account_search_list ($acc_q, $prefs, $nb_account, $account) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_account_consult($obm_q_account, $p_action){
   // -- Themes
-  global $display, $set_theme,$col_label,$col_ok;
+  global $display, $col_label,$col_ok;
   // - Labels
   global $l_account, $l_update,$l_delete,$l_insert;
   global $col_balance_neg, $col_balance_pos;
@@ -236,7 +236,7 @@ function html_account_consult($obm_q_account, $p_action){
 ///////////////////////////////////////////////////////////////////////////////
 function html_account_form($obm_q_account, $action) {
   // - Themes :
-  global $set_theme,$col_label,$col_ok,$ico_company,$ico_contact;
+  global $col_label,$col_ok,$ico_company,$ico_contact;
   // -- Labels
   global $l_label, $l_owner, $l_bank, $l_number, $l_account;
   global $l_initial_balance, $l_comment;
@@ -371,7 +371,6 @@ function html_account_form($obm_q_account, $action) {
 ///////////////////////////////////////////////////////////////////////////
 function dis_account_display_pref ($prefs, $prefs_p) {
   global $l_account_options, $l_payment_options;
-  global $set_theme;
 
  
  

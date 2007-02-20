@@ -144,7 +144,7 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
 //   - $entity_readable : array of readable entities (["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable) {
-  global $path, $obm, $c_all, $set_theme, $popup_height, $popup_width, $ico_add;
+  global $path, $obm, $c_all,  $popup_height, $popup_width, $ico_add;
   global $ccalendar_resource;
   global $l_selection, $l_users,$l_resources, $l_validate;
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
@@ -397,7 +397,7 @@ function html_calendar_bar_date_selector($calendar) {
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_year_planning($calendar, $calendar_entity,$writable_entity) {
-  global $set_theme,$ico_left_day,$ico_right_day;
+  global $ico_left_day,$ico_right_day;
   global $ccalendar_weekstart;
   global $l_daysofweek,$l_daysofweekshort,$ico_calendar_nouser;  
   global $l_private;
@@ -473,9 +473,9 @@ function dis_calendar_year_planning($calendar, $calendar_entity,$writable_entity
 	    }
 	    if (is_array($events_data) || is_array($days_events[$type][$id])) {
 	      $dis_event_cal .= "<td class=\"calendarEventYear\">";
-	      $dis_event_cal .= "<img src=\"".C_IMAGE_PATH."/$set_theme/".$data["image"]."\" alt=\"\"/></td>";
+	      $dis_event_cal .= "<img src=\"".$data["image"]."\" alt=\"\"/></td>";
 	    } else {
-	      $dis_event_cal .= "<td class=\"calendarEventYear\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_nouser\" alt=\"\"/></td>";		
+	      $dis_event_cal .= "<td class=\"calendarEventYear\"><img src=\"$ico_calendar_nouser\" alt=\"\"/></td>";		
 	    }
 	    $tr_users++;	   
 	  }
@@ -543,13 +543,13 @@ function dis_calendar_year_planning($calendar, $calendar_entity,$writable_entity
   <table class=\"calendarCalYear\">
   <tr>
     <td class=\"calendarHead\">
-      <a href=\"calendar_index.php?action=view_year&amp;date=$prev_year\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"Previous Month\" /></a>
+      <a href=\"calendar_index.php?action=view_year&amp;date=$prev_year\"><img src=\"$ico_left_day\" alt=\"Previous Month\" /></a>
     </td>
     <td class=\"calendarHead\" colspan=\"3\">
       $this_year
     </td>
     <td class=\"calendarHead\">
-      <a href=\"calendar_index.php?action=view_year&amp;date=$next_year\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"Next Month\" /></a>
+      <a href=\"calendar_index.php?action=view_year&amp;date=$next_year\"><img src=\"$ico_right_day\" alt=\"Next Month\" /></a>
     </td>
   </tr> 
   <tr>
@@ -1015,7 +1015,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_plain_month_planning($calendar, $calendar_entity) { 
-  global $set_theme,$ico_previous,$ico_next;
+  global $ico_previous,$ico_next;
   global $ccalendar_weekstart, $ico_new_event,$l_all_day;
   global $ccalendar_first_hour, $ccalendar_last_hour;
   global $l_private,$l_daysofweekfirst,$l_daysofweek;

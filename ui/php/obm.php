@@ -126,13 +126,13 @@ function get_obm_params() {
 // Display detail of logout page
 ///////////////////////////////////////////////////////////////////////////////
 function dis_logout_detail() {
-  global $l_connection_end, $l_reconnect;
+  global $l_connection_end, $l_reconnect,$obm_version;
 
   $block = "
 <table width=\"100%\">
 <tr>
   <td width=\"20%\">
-    <a href=\"http://www.aliacom.fr/\"><img align=\"middle\" border=\"0\" src=\"".C_IMAGE_PATH."/standard/standard.jpg\"></a>$obm_version</td>
+    <a href=\"http://www.aliacom.fr/\">$obm_version</a></td>
   <td width=\"5%\">&nbsp;</td>
   <td width=\"50%\" align=\"center\">
     <h1>OBM : $l_connection_end</h1></td>
@@ -245,7 +245,7 @@ function dis_calendar_portal() {
 // Display The Time Management specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_portal() {
-  global $ico_big_time, $set_theme,$path;
+  global $ico_big_time, $path;
   global $l_module_time, $l_my_time, $l_unfilled;
 
   $num = run_query_days_unfilled();
@@ -456,7 +456,7 @@ function dis_incident_portal() {
 // Display The Contract specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_portal() {
-  global $uid, $ico_big_contract, $set_theme;
+  global $uid, $ico_big_contract ;
   global $l_total, $l_module_contract, $l_my_contract, $l_my_contract_current;
   global $l_cr_date, $cr_date_ended, $path;
   global $cr_date_tosign, $cr_date_tobegin, $cr_date_current, $cr_date_torenew;

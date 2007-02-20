@@ -44,10 +44,11 @@ $fieldnames["userobm_description"] = $l_desc;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_data(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail,$ext_element, $params;
+  global $path,  $ico_mail, $params;
   global $l_enabled, $l_disabled, $l_forbidden, $l_perms;
 
   $ext_url = $params["ext_url"];
+  $ext_element = $params["ext_element"];
 
   if (($fieldname == "userobm_login")) {
     if ($OD->display_ext == "get_id") {

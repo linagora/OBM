@@ -444,7 +444,7 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_links($co_q) {
-  global $set_theme,$ico_contact;
+  global $ico_contact;
   global $ico_document,$ico_add, $ico_project, $ico_contract, $ico_lead;
   global $ico_invoice, $ico_payment;
   global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
@@ -677,7 +677,7 @@ function dis_company_consult($params) {
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult($co_q) {
-  global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
+  global $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   global $l_name, $l_aka, $l_number, $l_nafcode, $l_vat, $l_siret, $l_market;
   global $l_company, $l_archive;
   global $display, $l_yes, $l_no, $cgp_hide;
@@ -802,7 +802,7 @@ function html_company_consult($co_q) {
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult_address($co_q) {
-  global $set_theme, $ico_contact, $ico_contact_new;
+  global $ico_contact, $ico_contact_new;
   global $l_name, $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment;
   global $l_company, $l_coord,$ico_mail,$ico_web;
@@ -988,7 +988,7 @@ function dis_company_form($action, $company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company) {
   global $display, $obm, $cgp_hide, $set_dsrc, $c_undef, $l_undef;
-  global $set_theme,$ico_web,$ico_mail,$ico_add,$popup_height,$popup_width;
+  global $ico_web,$ico_mail,$ico_add,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_add_comment,$l_upd_comment;

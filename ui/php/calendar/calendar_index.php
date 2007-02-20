@@ -126,7 +126,6 @@ if ($popup) {
 ///////////////////////////////////////////////////////////////////////////////
   if ($action == "calendar") {
     display_head($l_calendar);
-    require("$obminclude/calendar.inc");
     display_end();
   } elseif ($action == "export") {
     dis_calendar_export_handle($params);

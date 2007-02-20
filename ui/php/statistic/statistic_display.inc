@@ -13,7 +13,7 @@
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_statistic_index() {
-  global $path, $cgp_user, $set_theme, $action, $actions, $module, $perm;
+  global $path, $cgp_user,  $action, $actions, $module, $perm;
   global $l_stats, $l_company, $l_contact, $l_stats_manager;
   global $l_stats_contact_date_evolution;
 
@@ -96,8 +96,8 @@ function dis_statistic_category_index_item($entity, $category, $title) {
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_statistic_resp_stats($cont_q,$comp_q) {
-  global $path, $set_theme;
-  global $set_theme, $l_module_company, $l_module_contact, $l_key;
+  global $path;
+  global $l_module_company, $l_module_contact, $l_key;
 
   $max = 1;
   while($cont_q->next_record()) {
@@ -181,7 +181,7 @@ function dis_statistic_resp_stats($cont_q,$comp_q) {
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_statistic_cat_stats($comp_q, $tot) {
-  global $path, $set_theme;
+  global $path;
   global $l_null,$l_totals, $l_header_country, $l_category;
 
   while ($comp_q->next_record()) {
@@ -305,7 +305,7 @@ function dis_statistic_cat_stats($comp_q, $tot) {
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function export_statistic_cat_stats($comp_q,$tot) {
-  global $path, $set_theme;
+  global $path;
   global $l_null,$l_totals, $l_header_country,$l_compcat;
   global $set_csv_sep;
 

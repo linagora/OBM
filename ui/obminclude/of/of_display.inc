@@ -843,16 +843,18 @@ class OBM_DISPLAY {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_head($p_module) { 
-  global $l_obm_title, $set_theme, $extra_css, $extra_js, $extra_file_js;
+  global $l_obm_title, $extra_css, $extra_js, $extra_file_js,$css_obm;
 
   // If a theme specif function is provided
   if (function_exists("display_head_theme")) {
     return display_head_theme($p_module);
   }
-
-  // Else
-  if (isset($extra_css)) {
-    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/$extra_css\" />";
+  if (is_array($extra_css)) {
+    foreach($extra_css as $css_file) {
+      $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\" />";
+    }
+  } elseif (isset($extra_css)) {
+    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$extra_css\" />";
   }
 
   $headers_e = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
@@ -867,7 +869,7 @@ function display_head($p_module) {
 <head>
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
   <title>$l_obm_title - $p_module</title>
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/style.css\" />
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_obm\" />
   $dis_extra_css
   $file_js
 <script type=\"text/javascript\">
@@ -929,7 +931,7 @@ function display_sections($section) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_modules($section, $module) {
-  global $set_theme, $set_menu, $cme_txt, $cme_ico, $cme_both;
+  global  $set_menu, $cme_txt, $cme_ico, $cme_both;
   global $path, $perm, $modules, $cgp_show;
 
   // If a theme specif function is provided
@@ -937,7 +939,7 @@ function display_modules($section, $module) {
     return display_modules_theme($section, $module);
   }
 
-  global $set_theme, $set_menu, $cme_txt, $cme_ico, $cme_both;
+  global  $set_menu, $cme_txt, $cme_ico, $cme_both;
   global $path, $modules, $perm, $cgp_show;
 
   if (($set_menu == $cme_ico) || ($set_menu == $cme_both))
@@ -965,7 +967,7 @@ function display_modules($section, $module) {
           if ($fico) {
 	    $ico = $modules[$mod]["Ico"];
 	    if ($ico) {
-	      $block .= "<a href='".$modules[$mod]["Url"]."' class='ico'><img src='".C_IMAGE_PATH."/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
+	      $block .= "<a href='".$modules[$mod]["Url"]."' class='ico'><img src='$ico' alt='$module_name' /></a> ";
 	    }
 	  }
 	  $block .= "<a href='".$modules[$mod]["Url"]."'>";
@@ -988,7 +990,7 @@ function display_modules($section, $module) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_actions($section, $module) {
-  global $set_theme, $modules, $action, $popup_height;
+  global  $modules, $action, $popup_height;
   global $actions, $popup_width, $perm;
 
   // If a theme specif function is provided
@@ -999,7 +1001,7 @@ function display_actions($section, $module) {
   $name = $modules[$module]["Name"];
   $ico = $modules[$module]["Ico"];
   if ($ico != "")
-    $dico = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico\" alt=\"\" />&nbsp;";
+    $dico = "<img src=\"$ico\" alt=\"\" />&nbsp;";
   else
     $dico = "";
 
@@ -1134,7 +1136,7 @@ function display_todos($path="..") {
 //          usercreate userupdate timecreate timeupdate datasource_name privacy
 ///////////////////////////////////////////////////////////////////////////////
 function display_record_info($obm_q) {
-  global $set_theme, $l_infos , $l_public, $l_private;
+  global  $l_infos , $l_public, $l_private;
 
   if (is_object($obm_q)) {
     $usercreate = $obm_q->f("usercreate");

@@ -33,7 +33,7 @@ $fieldnames["manager"] = $l_manager;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_lead(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $col_frs, $col_client;
+  global $path,  $col_frs, $col_client;
 
   if ($fieldname == "lead_name") {
     $name = $OD->data_set->f($fieldname);
@@ -274,7 +274,7 @@ function dis_lead_consult($params) {
 //   - $l_q  : lead database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_lead_consult($l_q) {
-  global $path, $display, $set_theme, $ico_company, $c_yes, $c_no;
+  global $path, $display,  $ico_company, $c_yes, $c_no;
   global $l_company, $l_comment, $l_phone;
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
 
@@ -389,7 +389,7 @@ function dis_lead_form($action, $params) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_lead_form($action, $l_q, $sources, $managers, $params) {
   global $obm, $display, $path, $c_undef, $l_undef;
-  global $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
+  global  $ico_company, $l_company,$ico_add,$ico_crow;
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
   global $l_update, $l_checkdelete, $l_insert;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
@@ -639,7 +639,6 @@ function dis_lead_admin_index() {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_lead_display_pref ($prefs) {
   global $l_lead_display;
-  global $set_theme ;
  
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "lead");
   $dis_pref->pref_title = $l_lead_display;

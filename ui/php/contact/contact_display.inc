@@ -50,7 +50,7 @@ $fieldnames["company_name"] = $l_company;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_contact(&$OD, $fieldname, $link_ok) {
-  global $path, $cgp_show, $set_theme, $ico_mail;
+  global $path, $cgp_show, $ico_mail;
 
   $show_date = (! $cgp_hide["contact"]["contact_date"]);
 
@@ -659,7 +659,7 @@ function dis_contact_consult($contact) {
 function html_contact_header($co_q, $funcs) {
   global $l_company, $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title;
   global $l_contact, $l_market, $l_archive, $l_date, $l_no_date;
-  global $cgp_show, $cgp_hide, $c_yes, $c_no, $set_theme;
+  global $cgp_show, $cgp_hide, $c_yes, $c_no;
   global $display, $path, $action;
 
   $c_id = $co_q->f("contact_company_id");
@@ -777,7 +777,7 @@ function html_contact_view_main($co_q) {
   global $l_town, $l_country, $l_email, $l_mailing_ok, $l_expresspostal;
   global $l_comment1, $l_comment2, $l_comment3, $l_email_other;
   global $l_service, $l_coord, $ico_clipboard;
-  global $c_yes, $c_no, $set_theme, $ico_mail;
+  global $c_yes, $c_no,  $ico_mail;
   global $display, $cgp_show, $cgp_hide, $cclipboard_address;
 
   $id = $co_q->f("contact_id");
@@ -1050,7 +1050,7 @@ function html_contact_view_main($co_q) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_links($id) {
-  global $set_theme, $ico_document, $ico_add, $ico_deal,$ico_contract;
+  global  $ico_document, $ico_add, $ico_deal,$ico_contract;
   global $ico_list, $ico_publication;
   global $l_module_document, $l_contact;
   global $l_module_deal, $l_module_list, $l_module_contract;
@@ -1210,7 +1210,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact) {
-  global $set_dsrc, $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
+  global $set_dsrc,  $ico_company, $l_company,$ico_add,$ico_crow;
   global $cgp_mailing_default, $ccontact_private_default;
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
