@@ -1,6 +1,6 @@
-\section{Installation pas à pas d'OBM 1.2.x}
+\section{Installation pas à pas d'OBM 2.0.x}
 
-Cette documentation est valide pour la version 1.2.0. Seules les
+Cette documentation est valide pour la version 2.0. Seules les
 manipulations spécifiques à OBM sont décrites. Pour l'installation de
 PHP, MySQL, PostgreSQL, Apache ou autres composants libres, des exemples sont proposés correspondant à la version Debian mais il est préférable de vous référer à la documentation de votre distribution.
 
@@ -284,7 +284,19 @@ php\_value include\_path ".:/var/www/obm"
 
 \subsubsection*{Alias pour les images}
 
-Il faut installer un alias images vers le répertoire de themes : 
+Il faut installer un alias images vers le répertoire de themes. Depuis 
+la version 2.0, cet alias doit pointer vers le chemin 
+\fichier{/var/www/obm/ressources} : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+Alias /images /var/www/obm/ressources
+\end{verbatim}
+  \end{minipage}
+}
+
+Pour les versions précédentes d'obm, l'alias est le suivant :
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -338,7 +350,7 @@ NameVirtualHost 192.168.1.5
  ErrorLog /var/log/apache/obm-error.log
  CustomLog /var/log/apache/obm-access.log common
  SetEnv OBM_INCLUDE_VAR obminclude
- Alias /images /var/www/obm/obminclude/themes
+ Alias /images /var/www/obm/ressources
  DirectoryIndex obm.php
 </VirtualHost>
 \end{verbatim}
@@ -348,35 +360,50 @@ NameVirtualHost 192.168.1.5
 
 \subsection{Configuration d'\obm}
 
-La configuration d'\obm se trouve dans le fichier \fichier{obminclude/obm\_conf.inc}.
+Depuis la version 2.0, la configuration d'\obm se trouve dans les 
+fichiers \fichier{conf/obm\_conf.ini} et \fichier{conf/obm\_conf.inc} 
+(Pour les versions précédentes, il s'agit du fichier 
+\fichier{obminclude/obm\_conf.inc}).
 
-Pour le créer, copier le fichier \fichier{obminclude/obm\_conf.inc.sample} dans le nouveau fichier \fichier{obminclude/obm\_conf.inc}, et éditer ce dernier.
+Pour créer ces fichiers, copier \fichier{conf/obm\_conf.ini.sample} et 
+\fichier{conf/obm\_conf.inc.sample} vers dans les nouveaux fichiers 
+\fichier{conf/obm\_conf.ini} et \fichier{conf/obm\_conf.inc}, puis éditer 
+ces derniers.
 
 
 \subsubsection{Configuration initiale pour la base de données OBM}
 
-Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
+Éditer le fichier \fichier{obm\_conf.ini} dans \fichier{conf} et
 
 \begin{itemize}
 \item choisir la base de données à utiliser ; 
 \item la déclarer ;
 \item déclarer le nom d'utilisateur et le mot de passe à utiliser.
 \item déclarer l'url d'accès à OBM (\$cgp\_host).
-\item déclarer le dépôt de documents (voir \ref{install_doc}).
 \end{itemize}
-
-Il est également possible de modifier des préférences globales dans ce
-fichier, comme cgp\_mail\_enabled par exemple.
 
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-// Database infos
-$obmdb_host = "localhost";
-$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
-$obmdb_db = "obm";
-$obmdb_user = "obm";
-$obmdb_password = "obm";
+; Information sur les bases de données
+host = localhost
+dbtype = MYSQL
+db = obm
+user = obm
+; Le mot de passe DOIT etre entre "
+password = "aliacom"
+
+\end{verbatim}
+  \end{minipage}
+}
+
+Pour modifier des préférences globales (comme cgp\_mail\_enabled par 
+exemple) et déclarer le dépôt de documents (voir \ref{install_doc}), 
+il faut éditer le fichier \fichier{obm\_conf.inc}.
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
 
 $cgp_host = "http://obm/";
 ...
@@ -392,7 +419,8 @@ $cgp_mail_enabled = false;
 \subsubsection{Configurer le dépôt de documents}
 \label{install_doc}
 
-Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude}.
+Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{conf} (ou 
+dans \fichier{obminclude} pour les versions antérieures à la 2.0).
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -418,24 +446,21 @@ chown www-data:www-data /var/www/obmdocuments
 \subsubsection{Configuration et création de la base de données}
 
 Les scripts de création de la base de données se trouvent dans le
-répertoire \fichier{scripts/1.2}.
+répertoire \fichier{scripts/2.0}.
 
 \subsubsection*{Langue par défaut des données}
 
 Certaines valeurs de références sont insérées par défaut. Ces valeurs
 peuvent être en français (par défaut) ou en anglais. Pour passer de
 l'un à l'autre, il faut éditer le fichier
-\fichier{scripts/1.2/install\_obmdb\_1.2.mysql.sh} (ou
-\fichier{scripts/1.2/install\_obmdb\_1.2.pgsql.sh}) pour changer la
+\fichier{scripts/2.0/install\_obmdb\_2.0.mysql.sh} (ou
+\fichier{scripts/2.0/install\_obmdb\_2.0.pgsql.sh}) pour changer la
 valeur de DATA\_LANG à \texttt{en} : 
 
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-# Mysql User, Password and Data lang var definition 
-U=obm 
-P="obm" 
-DB="obm" 
+# Data lang var definition 
 DATA_LANG="en"
 \end{verbatim}
   \end{minipage}
@@ -445,7 +470,7 @@ DATA_LANG="en"
 
 Pré-requis : disposer d'un login/mot de passe valide pour MySQL.
 
-Exemple de création d'un utilisation MySQL : 
+Exemple de création d'un utilisateur MySQL : 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -465,16 +490,18 @@ GRANT ALL ON obm.* TO obm@localhost IDENTIFIED BY 'obm';
   \end{minipage}
 }
 
-Le script \fichier{install\_obmdb\_1.2.mysql.sh} gère les différentes
+Le script \fichier{install\_obmdb\_2.0.mysql.sh} gère les différentes
 étapes de création de la base de données. Positionner les bonnes
-valeurs de login/mot de passe dans ce script et le lancer :
+valeurs de login/mot de passe dans le fichier \fichier{conf/obm\_conf.ini} 
+avant de lancer le script :
 
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-cd obm/scripts/1.2
-emacs install_obmdb_1.2.mysql.sh
-./install_obmdb_1.2.mysql.sh
+cd obm
+gedit conf/obm\_conf.ini
+cd scripts/2.0
+./install_obmdb_2.0.mysql.sh
 \end{verbatim}
   \end{minipage}
 }
@@ -497,7 +524,7 @@ create database obm with owner = obm;
 \subsubsection*{Jeux de caractères}
 
 Si votre server PostgreSQL n'est pas configuré pour le jeu de
-caractères latin1, éditez le fichier \fichier{scripts/1.2/postgres-pre.sql}
+caractères latin1, éditez le fichier \fichier{scripts/2.0/postgres-pre.sql}
 et décommentez la ligne :
 
 \shadowbox{
@@ -510,18 +537,18 @@ et décommentez la ligne :
 
 \subsubsection*{Création de la base Postgres}
 
-Le script \fichier{install\_obmdb\_1.2.pgsql.sh} gère toutes les
-étapes de création de la base de données.
-
-Ajoutez les informations login/mot de passe (et base de données) dans
-ce script et lancez-le :
+Le script \fichier{install\_obmdb\_2.0.pgsql.sh} gère toutes les 
+étapes de création de la base de données. Positionner les bonnes
+valeurs de login/mot de passe dans le fichier \fichier{conf/obm\_conf.ini} 
+avant de lancer le script :
 
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-cd obm/scripts/1.2
-emacs install_obmdb_1.2_pgsql.sh
-./install_obmdb_1.2_pgsql.sh
+cd obm
+gedit conf/obm\_conf.ini
+cd scripts/2.0
+./install_obmdb_2.0.pgsql.sh
 \end{verbatim}
   \end{minipage}
 }
