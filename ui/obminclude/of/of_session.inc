@@ -373,16 +373,35 @@ class Auth {
 class Perm {
 
   function Perm () {
-    global $profiles;
-
+    global $profiles,$obm,$perm_admin;
     if (! isset($profiles["admin"])) {
       $profiles["admin"] = array (
         'section' => array (
           'default' => 1),
         'module' => array (
-          'default' => "1D")
+          'default' => $perm_admin)
       );
     }
+    if($obm["domain_id"] == 0) {
+      $profiles[$obm["profile"]] = 
+         array (
+          'section' => array (
+            'default' => 0,
+            'user' => 1,
+            'admin' => 1,
+            'my' => 1 
+          ),
+          'module' => array (
+            'default' => 0,
+            'user' => $perm_admin,
+            'mailserver' => $perm_admin,
+            'host' => $perm_admin,
+            'domain' => $perm_admin,
+            'password' => $perm_admin,
+            'settings' => $perm_admin
+          )
+        );
+    }    
   }
 
   //-------------------------------------------------------------------------//
@@ -394,7 +413,6 @@ class Perm {
     global $profiles, $obm;
 
     $profile = $obm["profile"];
-
     if (isset($profiles[$profile]['section'][$section])) {
       return $profiles[$profile]['section'][$section];
     } else {

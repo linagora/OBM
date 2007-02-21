@@ -62,26 +62,6 @@ if ($set_debug == "") $set_debug = $set_debug_default;
 if ($set_cal_interval == "") $set_cal_interval = $set_cal_interval_default;
 
 
-if($obm["domain_id"] == 0) {
-  $profiles["domain"] = array (
-    'section' => array (
-      'default' => 0,
-      'user' => 1,
-      'admin' => 1,
-      'my' => 1 
-    ),
-    'module' => array (
-      'default' => 0,
-      'user' => $perm_admin,
-      'mailserver' => $perm_admin,
-      'host' => $perm_admin,
-      'domain' => $perm_admin,
-      'password' => $perm_admin,
-      'settings' => $perm_admin
-    )
-  );
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Theme.                                           //
 ///////////////////////////////////////////////////////////////////////////////
