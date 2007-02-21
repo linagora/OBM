@@ -26,7 +26,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$extra_css = "resource.css";
 $module = "resource";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

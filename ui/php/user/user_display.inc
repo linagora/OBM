@@ -44,7 +44,7 @@ $fieldnames["userobm_description"] = $l_desc;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_data(&$OD, $fieldname, $link_ok) {
-  global $path,  $ico_mail, $params;
+  global $path,  $ico_mail, $params,$obm,$cgp_use;
   global $l_enabled, $l_disabled, $l_forbidden, $l_perms;
 
   $ext_url = $params["ext_url"];
@@ -74,15 +74,6 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
       $res["name"] = "X";
     } else {
       $res["name"] = " ";
-    }
-  } 
-
-  else if ($fieldname == "userobm_email") {
-    $email = $OD->data_set->f("userobm_email");
-    if (strcmp($email ,"") != 0) {
-      $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\">$email";
-      $res["txt_name"] = $email;
     }
   } 
 
@@ -116,8 +107,11 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "userobm_email") {
     $email = $OD->data_set->f("userobm_email");
     if (strcmp($email ,"") != 0) {
-      $emails = explode("\n",$email);
-      $email = trim($emails[0])."@$main_domain";
+      if ($cgp_use["service"]["mail"]) {
+        $main_domain = $obm["domain_name"];
+        $emails = explode("\n",$email);
+        $email = trim($emails[0])."@$main_domain";
+      }
       $res["url"] = "mailto:$email";
       $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\">$email";
       $res["txt_name"] = "$email";
@@ -417,7 +411,7 @@ function html_user_consult($obm_q) {
   global $l_vacation, $l_vacation_message, $l_mail_server;
   global $l_enabled, $l_disabled, $l_web_consult_list;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
-  global $path, $display, $cgp_use, $c_yes, $c_no;
+  global $path, $display, $cgp_use, $c_yes, $c_no,$obm;
 
   $id = $obm_q->f("userobm_id");
   $domain_name = ($obm_q->f("domain_name") != "" ? $obm_q->f("domain_name") : "GLOBAL");
@@ -473,9 +467,8 @@ function html_user_consult($obm_q) {
   $nomade_local_copy = ($nomade_local_copy ? $c_yes : $c_no);
   $vacation_enable = ($vacation_enable ? $c_yes : $c_no);
   $vacation_message = ($vacation_enable ? nl2br($vacation_message) : "---");
-
   //  $mail = get_mail_info();
-  $main_domain = $mail["main_domain"];
+  $main_domain = $obm["domain_name"];
   if ($host_name == '') {
     $dis_host = $l_empty;
   } else {

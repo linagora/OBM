@@ -2319,7 +2319,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>      
       </th>
-     <td>
+     <td id=\"sel_resource_id\">
        $dis_sel_resource
      </td>      
     </tr>";

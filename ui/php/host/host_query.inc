@@ -48,6 +48,7 @@ function run_query_host_search($host) {
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "host_name";
   $orderq .= " ORDER BY $order $sql_order_dir";
 
+  $multidomain = sql_multidomain("host");
   $query = "SELECT DISTINCT Host.*,
       host_id as id,
       $timecreate,
@@ -57,12 +58,12 @@ function run_query_host_search($host) {
     FROM Host
       LEFT JOIN UserObm as A ON host_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON host_userupdate=B.userobm_id
-    $whereq 
+    $whereq $multidomain 
     $orderq
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Host $whereq");
+    $count = get_query_count("SELECT count(*) FROM Host $whereq $multidomain");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -97,12 +98,12 @@ function run_query_host_detail($id) {
       uo.userobm_login as userobm_login,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
-      mail_name
+      mailserver_id
     FROM Host
          LEFT JOIN UserObm as c ON host_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON host_userupdate=u.userobm_id
          LEFT JOIN UserObm as uo ON host_id=uo.userobm_host_id
-         LEFT JOIN Mail ON host_id=mail_value AND mail_name LIKE '%mailserver'
+         LEFT JOIN MailServer ON host_id=mailserver_host_id
     WHERE host_id = '$id'
       $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_host_detail()");
@@ -139,6 +140,7 @@ function run_query_host_insert($host) {
     host_timecreate,
     host_userupdate,
     host_usercreate,
+    host_domain_id,
     host_uid,
     host_gid,
     host_samba,
@@ -154,6 +156,7 @@ function run_query_host_insert($host) {
     '$now',
     null,
     '$obm[uid]',
+    '$obm[domain_id]'
     '$host_uid',
     '$host_gid',
     '$samba',
@@ -178,6 +181,7 @@ function run_query_host_insert($host) {
     
   if ($retour && $user_id != 0) {
 
+  $multidomain = sql_multidomain("host");
     // On recupere l'ID de l'hôte qu'on vient d'ajouter
     $query = "SELECT host_id
     FROM Host
@@ -193,7 +197,8 @@ function run_query_host_insert($host) {
       host_description='$desc' and
       host_web_perms='$web_perms' and
       host_ftp_perms='$ftp_perms' and
-      host_firewall_perms='$firewall_perms'";
+      host_firewall_perms='$firewall_perms'
+      $multidomain";
 
     display_debug_msg($query, $cdg_sql, "run_query_host_insert(2)");
     $retour = $obm_q->query($query);
@@ -208,7 +213,7 @@ function run_query_host_insert($host) {
           userobm_userupdate='$obm[uid]',
           userobm_host_id='$host_id'
       WHERE
-          userobm_id='$user_id'";
+          userobm_id='$user_id' $multidomain";
 
       display_debug_msg($query, $cdg_sql, "run_query_host_insert(3)");
       $retour = $obm_q->query($query);
@@ -238,7 +243,8 @@ function run_query_host_update($host) {
   $firewall_perms = $host["firewall_perms"];
   $desc = $host["desc"];
   $now = date("Y-m-d H:i:s");
-  
+  $multidomain = sql_multidomain("host");
+
   $query = "UPDATE Host SET
     host_timeupdate='$now',
     host_userupdate='$obm[uid]',
@@ -251,7 +257,7 @@ function run_query_host_update($host) {
     host_web_list='$web_list',    
     host_ftp_perms='$ftp_perms',
     host_firewall_perms='$firewall_perms'
-  WHERE host_id='$id'";
+  WHERE host_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_host_update()");
   $obm_q = new DB_OBM;
@@ -300,7 +306,8 @@ function run_query_host_delete($p_id) {
   global $obm, $cdg_sql;
 
   // Delete the Host
-  $query = "DELETE FROM Host WHERE host_id='$p_id'";
+  $multidomain = sql_multidomain("host");
+  $query = "DELETE FROM Host WHERE host_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_host_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -316,7 +323,7 @@ function run_query_host_delete($p_id) {
         userobm_userupdate='$obm[uid]',
         userobm_host_id='0'
     WHERE
-        userobm_host_id='$p_id'";
+        userobm_host_id='$p_id' $multidomain";
 
     display_debug_msg($query, $cdg_sql, "run_query_host_delete()");
     $retour = $obm_q->query($query);
@@ -338,10 +345,11 @@ function get_host_info($id) {
     return false;
   }
 
+  $multidomain = sql_multidomain("host");
   $query = "SELECT *
     FROM Host
-      LEFT JOIN Mail ON mail_value=$id AND mail_name LIKE '%mailserver'
-    WHERE host_id='$id'";
+      LEFT JOIN MailServer ON mailserver_host_id = host_id
+    WHERE host_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_host_info()");
   $obm_q = new DB_OBM;
@@ -372,9 +380,10 @@ function get_host_name_exists($name, $id="") {
     $where_id = "host_id!='$id' and";
   }
 
+  $multidomain = sql_multidomain("host");
   $query = "SELECT host_id, host_name
     FROM Host
-    WHERE $where_id host_name='$name'";
+    WHERE $where_id host_name='$name' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_host_name_exists()");
   $obm_q = new DB_OBM;
@@ -424,10 +433,11 @@ function run_query_check_host($id, $name, $desc) {
   }
   if ($wdesc != "") $wdesc = "or $wdesc";
 
+  $multidomain = sql_multidomain("host");
   $query = "select distinct host_id, host_name, host_description
      from Host
      where $where_id
-       ($wname $wdesc)";
+       ($wname $wdesc) $multidomain ";
 
   display_debug_msg($query, $cdg_sql, "run_query_check_host()");
   $obm_q->query($query);

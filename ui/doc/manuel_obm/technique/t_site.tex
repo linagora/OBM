@@ -108,8 +108,6 @@ si le mode d'authentification est "CAS". \\
 \$cas\_server\_uri & & aucune  &  URI du service CAS sur le
 serveur. Utilisé seulement si le mode d'authentification est "CAS".\\  
 \hline
-\$auth\_encryption & & true & Indique si la page de login doit chiffrer le mot de passe transmis (support de md5 uniquement) \\ 
-\hline
 \$password\_encryption & & md5 & Indique le format de stockage des mots de passe en base de données (plain | md5 | crypt) \\ 
 \hline
 \$c\_use\_connectors & & false & Indique l'utilisation de connecteurs (Evolution, Outlook) qui engendre des traitements supplémentaires \\ 
@@ -212,23 +210,17 @@ Pour que le login soit fonctionnel, un certain nombre de variables sont à positi
 
 \begin{tabular}{|p{4cm}|p{9cm}|}
 \hline
-\$login\_javascript\_header & en-tête javascript à positionner dans head (<head></head>) \\
+\$login\_action & URL permettant d'executer l'action de login, a positionner par exemple dans le champ action du formulaire\\
 \hline
-\$login\_form\_header & en-tête du formulaire d'authentification\\
+\$sel\_domain & Liste déroulante des domaines existants \\
 \hline
-\$login\_form\_login & champ de login\\
-\hline
-\$login\_form\_password & champ de mot de passe\\
-\hline
-\$login\_form\_domain & champ de domaine\\
-\hline
-\$login\_form\_values & autres champs à positionner (nécessaires à OBM)\\
-\hline
-\$login\_error\_msg & message d'erreur si présent\\
+\$error & message d'erreur si présent\\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
+A noter que la page de login devra envoyer au serveur le login dans une variable \textbf{login} et le mot
+de passe dans une variable \textbf{password}.
 D'autres variables sont disponibles pour une utilisation dans la page de login spécifique :\\
 
 \begin{tabular}{|p{4cm}|p{9cm}|}
@@ -236,6 +228,12 @@ D'autres variables sont disponibles pour une utilisation dans la page de login s
 \$login\_form\_footer & code javascript exécuté en fin de page (ex: positionnement du curseur)\\
 \hline
 \$obm\_version & Version d'\obm\\
+\hline
+\$login & Dernier login tapé par l'utilisateur \\
+\hline
+\$login & Dernier login tapé par l'utilisateur \\
+\hline
+\$img\_home & Image de la page d'accueil \\
 \hline
 \end{tabular}
 

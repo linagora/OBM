@@ -11,19 +11,19 @@
 require("$obminclude/javascript/check_js.inc");
 
 // to avoid a javascript error when ext_widget is not defined
-if ($ext_widget != "") {
+if ($params["ext_widget"] != "") {
   $extra_js .= "
 
 function fill_ext_form(int_form) {
    size = int_form.length;
-   ext_field = window.opener.document.$ext_widget;
+   ext_field = window.opener.document.$params[ext_widget];
    for(i=0; i <size ; i++) {
      if(int_form.elements[i].type == 'checkbox'){
        if(int_form.elements[i].checked == true) {
 	 ext_size = ext_field.length;
 	 for(j=0; j< ext_size; j++) {
 	   if('data-u-' + ext_field.options[j].value == int_form.elements[i].name) {
-	     window.opener.document.$ext_widget.options[j].selected =true;
+	     window.opener.document.$params[ext_widget].options[j].selected =true;
 	   }
 	 }
        }
@@ -32,7 +32,7 @@ function fill_ext_form(int_form) {
 }";
 }
 
-if ($ext_widget != "" && $ext_widget_text != ""){
+if ($params["ext_widget"] != "" && $params["ext_widget_text"] != ""){
 
   $extra_js .= "
   function check_user_get_id(valeur,text) {
@@ -40,8 +40,8 @@ if ($ext_widget != "" && $ext_widget_text != ""){
       alert (\"$l_j_select_user\");
       return false;
     } else {
-      window.opener.document.$ext_widget.value=valeur;
-      window.opener.document.$ext_widget_text.value=text;
+      window.opener.document.$params[ext_widget].value=valeur;
+      window.opener.document.$params[ext_widget_text].value=text;
       window.close();
       return true;
     }
@@ -63,7 +63,7 @@ $extra_js .="
 ";
 
 
-if ($ext_element != "") {
+if ($params["ext_element"] != "") {
   require_once("$obminclude/of/of_select.inc");
 }
 

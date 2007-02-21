@@ -28,7 +28,7 @@ $fieldnames["resource_id"] = $l_update;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_resource(&$OD, $fieldname, $link_ok) {
-  global $path, ,$ico_update;
+  global $path,$ico_update,$params;
 
   if (($fieldname == "resource_name") && $link_ok) {
     $res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$OD->data_set->f("resource_id");

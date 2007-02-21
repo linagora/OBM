@@ -248,7 +248,7 @@ function html_host_consult($host_q) {
   $firewall_perms = $host_q->f("host_firewall_perms");
   $user_id = $host_q->f("userobm_id");
   $user_login = $host_q->f("userobm_login");
-  $mail_server = $host_q->f("mail_name");
+  $mail_server = $host_q->f("mailserver_id");
 
   // Formatage des informations de la BD
   if ($samba) $samba = $c_yes; else $samba = $c_no;

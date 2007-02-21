@@ -38,12 +38,12 @@ page_close();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_path") {
-$display["detail"] = html_document_tree($params, $ext_disp_file);
+$display["detail"] = html_document_tree($params, $params["ext_disp_file"]);
 
 } elseif ($action == "ext_get_id_from_path") {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  $display["detail"] = html_document_tree($params, $ext_disp_file);
+  $display["detail"] = html_document_tree($params, $params["ext_disp_file"]);
 
 } elseif ($action == "accessfile") {
 ///////////////////////////////////////////////////////////////////////////////

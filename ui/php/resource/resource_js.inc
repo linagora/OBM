@@ -11,19 +11,19 @@
 require("$obminclude/javascript/check_js.inc");
 
 // to avoid a javascript error when ext_widget is not defined
-if ($ext_widget != "") {
+if ($params["ext_widget"] != "") {
   $extra_js .= "
 
 function fill_ext_form(int_form) {
    size = int_form.length;
    target = window.opener.document;
-   ext_field = window.opener.document.$ext_widget;
+   ext_field = window.opener.document.$params[ext_widget];
    ext_form = window.opener.document.frm_sel_resource;
    for (i=0; i <size ; i++) {
      if (int_form.elements[i].type == 'checkbox'){
        if (int_form.elements[i].checked == true) {
 	 ext_size = ext_field.length;
-         elemid = '$ext_element'+int_form.elements[i].name;
+         elemid = '$params[ext_element]'+int_form.elements[i].name;
  	 elemid = 'data'+int_form.elements[i].name.substring(4);
 	 span = window.document.getElementById(elemid);
          j = ext_size; is_present = false;
@@ -48,7 +48,7 @@ function fill_ext_form(int_form) {
 ";
 }
 
-if ($ext_element != "") {
+if ($params["ext_element"] != "") {
   require_once("$obminclude/of/of_select.inc");
 }
 

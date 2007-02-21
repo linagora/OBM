@@ -87,7 +87,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
     $id = $OD->data_set->f("group_id");
     $query = "select count(*) from UserObmGroup where userobmgroup_group_id='$id'";
     $nb_q->query($query);
-    $nb_q->nxt_record();
+    $nb_q->next_record();
     $res["name"] = $nb_q->f(0);
     $res["align"] = "center";
   }

@@ -18,8 +18,8 @@ function check_get_id(valeur,text) {
     alert (\"$l_select_deal\");
     return false;
   } else {
-    window.opener.document.$params[$ext_widget].value=valeur;
-    window.opener.document.$params[$ext_widget_text].value=text;
+    window.opener.document.$params[ext_widget].value=valeur;
+    window.opener.document.$params[ext_widget_text].value=text;
     window.close();
     return true;
   }
