@@ -1312,7 +1312,7 @@ function html_project_form($action, $project_q, $project) {
     <table>
     <tr>
       <th> $l_project_date </th>
-      <td><input type=\"text\" name=\"tf_reference_date\" size=\"16\" maxlength=\"32\" value=\"$reference_date\" /></td>
+      <td><input type=\"text\" name=\"tf_reference_date\" value=\"$reference_date\" class=\"datePicker\"/></td>
     </tr>
     <tr>
       <th> $l_project_duration </th>
@@ -2579,7 +2579,7 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     <input type=\"hidden\" id=\"reftask_$projectreftask_id\" value=\"$projectreftask_id\" />
     <input type=\"hidden\" id=\"tasktype_$tt_id\" value=\"$tt_id\" />
     <a href=\"?action=reftask_delete&amp;category=reftask&amp;reftask=$projectreftask_id\">
-    <img src=\"$ico_delete\" alt=\"$l_reftask_delete\" title=\"$l_delete_reftask\" />
+    <img src=\"$ico_delete\" alt=\"$l_reftask_delete\" title=\"$l_reftask_delete\" />
     </a></td>
     <td><input type=\"text\" id=\"tf_reftask_label_$projectreftask_id\" value=\"$projectreftask_name\" /></td>
     <td>

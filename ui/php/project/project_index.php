@@ -408,7 +408,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "reftask_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_project_reftask_update( $params);
+  $retour = run_query_project_reftask_update($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_reftask : $l_update_ok");
   } else {
@@ -418,7 +418,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "reftask_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_project_reftask_delete( $params);
+  $retour = run_query_project_reftask_delete($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_reftask : $l_delete_ok");
   } else {
