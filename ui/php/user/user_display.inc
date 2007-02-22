@@ -996,7 +996,7 @@ function html_user_form($usr_q, $user, $field="") {
 
   // Domain (can't be updated, so only on insert)
   if (($action == "new" || $action == "insert")
-      && $obm["domain_id"] == $c_default_domain) {
+      && $obm["domain_id"] == 0 ) {
     $sel_domain = of_domain_dis_select($domain_id);
     $dis_domain = "<tr>
       <th>$l_domain</th>

@@ -373,6 +373,7 @@ function run_query_user_insert($user) {
     userobm_usercreate,
     userobm_login,
     userobm_password,
+    userobm_password_type,
     userobm_perms,
     userobm_uid,
     userobm_gid,
@@ -409,6 +410,7 @@ function run_query_user_insert($user) {
     '$uid',
     '$login',
     '$passwd_crypt',
+    '$password_encryption',
     '$perms',
     '$user_uid',
     '$gid',
@@ -536,7 +538,7 @@ function run_query_user_update($p_id, $user) {
     } else {
       $passwd_crypt = $passwd;
     }
-    $passwd_update = "userobm_password='$passwd_crypt',";
+    $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type = '$password_encryption'";
   }
 
   // infos
