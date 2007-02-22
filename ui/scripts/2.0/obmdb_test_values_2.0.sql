@@ -1,4 +1,4 @@
--/////////////////////////////////////////////////////////////////////////////
+--/////////////////////////////////////////////////////////////////////////////
 -- OBM - File : obmdb_test_values_1.2.sql                                    //
 --     - Desc : Insertion of Test values (database independant)              //
 -- 2005-06-08 Pierre Baudracco                                               //
@@ -12,11 +12,11 @@
 -------------------------------------------------------------------------------
 DELETE FROM UserObm;
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_typ,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uadmin','padmin','plain','admin', 'Admin Lastname', 'Firstname', '0', '1000', '512');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uadmin','padmin','plain','admin', 'Admin Lastname', 'Firstname', '0', '1000', '512');
 
 INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('ueditor','peditor','plain','editor', 'Itor', 'Ed', '1', '1001', '513');
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_typ,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uuser','puser','plain','user', 'User', 'John', '1', '1002', '513');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uuser','puser','plain','user', 'User', 'John', '1', '1002', '513');
 
 
 
