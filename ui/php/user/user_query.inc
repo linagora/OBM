@@ -148,13 +148,13 @@ function run_query_user_search($user) {
 function run_query_user_get_mailserver() {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("host");
+  $multidomain = sql_multidomain("host",false,true);
   $query = "SELECT
     mailserver_id,
     ms.host_name as host_name
     FROM MailServer 
     JOIN Host ms ON mailserver_host_id = ms.host_id
-    WHERE 1=1 $multidomain";
+    WHERE $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_mailserver_count())");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
@@ -1222,7 +1222,7 @@ function check_user_data_form($p_id, $user) {
   } else {
     $domain_id = $obm["domain_id"];
   }
-  $where_multidomain = "AND userobm_domain_id = '$domain_id'";
+  $where_multidomain = "AND (userobm_domain_id = '$domain_id' OR userobm_domain_id = 0)";
   $query = "SELECT * FROM UserObm WHERE userobm_login='$login' $where_multidomain ";
   if ($p_id > 0) {
     $query .= " AND userobm_id!='$p_id'";

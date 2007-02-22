@@ -253,10 +253,11 @@ function sql_obm_entity_privacy($entity, $p_uid="") {
 // Parameters:
 //   - $entity : entity to add clause
 //   - $and    : if true (default) add AND before the clause
+//   - $extended : include domain 0 datas
 // Returns:
 //   - sql where clause for domain (empty for superadmin)
 ///////////////////////////////////////////////////////////////////////////////
-function sql_multidomain($entity, $and=true) {
+function sql_multidomain($entity, $and=true, $extended=false) {
   global $obm;
 
   $where = "";
@@ -270,7 +271,10 @@ function sql_multidomain($entity, $and=true) {
   if ($and) {
     $wand = "AND";
   }
-  $where = "$wand (${entity}_domain_id='$domain_id' OR ${entity}_domain_id=0)";
+  if ($extended) {
+    $wext = "OR ${entity}_domain_id=0";
+  }
+  $where = "$wand (${entity}_domain_id='$domain_id' $wext)";
 
   return $where;
 }

@@ -175,22 +175,22 @@ function refreshDatePicker(dateFieldName, year, month, day)
   }
 
   var title = new Element('h1').adopt(
-                                   new Element('a').setProperty('href','')
-                                                 .setProperty('onclick',getGoToSource(dateFieldName, thisDay, -12))
-                                                 .appendText('<<'))
-                               .adopt(
-                                   new Element('a').setProperty('href','')
-                                                 .setProperty('onclick',getGoToSource(dateFieldName, thisDay, -1))
-                                                 .appendText('<'))
-                               .appendText(obm.vars.labels.months[thisDay.getMonth()] + ' ' + thisDay.getFullYear())
-                               .adopt(
-                                 new Element('a').setProperty('href','')
-                                                 .setProperty('onclick',getGoToSource(dateFieldName, thisDay, +1))
-                                                 .appendText('>'))
-                               .adopt(
-                                 new Element('a').setProperty('href','')
-                                                 .setProperty('onclick',getGoToSource(dateFieldName, thisDay, +12))
-                                                 .appendText('>>'));
+    new Element('a').setProperty('href','')
+     .setProperty('onclick',getGoToSource(dateFieldName, thisDay, -12))
+     .appendText('<<'))
+   .adopt(
+      new Element('a').setProperty('href','')
+       .setProperty('onclick',getGoToSource(dateFieldName, thisDay, -1))
+       .appendText('<'))
+   .appendText(obm.vars.labels.months[thisDay.getMonth()] + ' ' + thisDay.getFullYear())
+   .adopt(
+     new Element('a').setProperty('href','')
+       .setProperty('onclick',getGoToSource(dateFieldName, thisDay, +1))
+       .appendText('>'))
+   .adopt(
+     new Element('a').setProperty('href','')
+       .setProperty('onclick',getGoToSource(dateFieldName, thisDay, +12))
+       .appendText('>>'));
   
   var labels = new Element('tr');
   for(i = 0; i < obm.vars.labels.dayShort.length; i++) {
@@ -200,8 +200,7 @@ function refreshDatePicker(dateFieldName, year, month, day)
   var line = new Element('tr').injectInside(content);
 
   for (i = 0; i < thisDay.getDay(); i++) {
-    new Element('td').addClassName('downlight')
-                     .injectInside(line);
+    new Element('td').addClassName('downlight').injectInside(line);
   }
   
   do {
@@ -390,14 +389,14 @@ function updateDateField(dateFieldName, dateString)
   var targetDateField = document.getElementsByName (dateFieldName).item(0);
   if (dateString)
     targetDateField.value = dateString;
-
+  
   var pickerDiv = document.getElementById("datepicker");
   pickerDiv.style.visibility = "hidden";
   pickerDiv.style.display = "none";
 
   adjustiFrame();
   targetDateField.focus();
-
+  targetDateField.onchange();
   // after the datepicker has closed, optionally run a user-defined function called
   // datePickerClosed, passing the field that was just updated as a parameter
   // (note that this will only run if the user actually selected a date from the datepicker)
