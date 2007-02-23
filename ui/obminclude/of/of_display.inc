@@ -73,7 +73,7 @@ class OBM_DISPLAY {
     if (isset($name)) {
       $this->display_name = $name;
     }
-    $this->sql_order_dir = ($params["sql_order_dir"] == "ASC" ? "DESC" : "ASC");
+    $this->sql_order_dir = ($params["sql_order_dir"] == "ASC" ? "ASC" : "DESC");
   }
   
   /////////////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ class OBM_DISPLAY {
       if ($i != $nb_field) {
         $sql_order_field = $fieldorder + 1;
 	$block .= "
-        <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$sql_order_field")."\">
+        <a href=\"$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$sql_order_field\">
         <img alt=\"$l_down\" src=\"$ico_arrow_umount\" /></a>";
       }
       
@@ -232,7 +232,7 @@ class OBM_DISPLAY {
       if ($i != 0) {
         $sql_order_field = $fieldorder - 1;
 	$block .= "
-          <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$sql_order_field")."\">
+          <a href=\"$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$sql_order_field\">
           <img alt=\"$l_up\" src=\"$ico_arrow_mount\" /></a>";
       }
       $block .= "
@@ -494,7 +494,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call (module formatting fields)
   /////////////////////////////////////////////////////////////////////////////
     function dis_data_index($url, $dis_data_entity) {
-    global $path, $page, $sql_order_field, $entity, $of_display_name, $ctu_sql_limit;
+    global $path, $params, $of_display_name, $ctu_sql_limit;
     global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
     global $set_rows, $set_rows_default;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
@@ -512,10 +512,10 @@ class OBM_DISPLAY {
 
     // Page display management
     // If page not set or page not for this display (this entity)
-    if ((!isset($page)) || ($page == "") || ($of_display_name != $this_name)) {
+    if ((!isset($params["page"])) || ($params["page"] == "") || ($of_display_name != $this_name)) {
       $lpage = 1;
     } else {
-      $lpage = $page;
+      $lpage = $params["page"];
     }
 
     if ($set_rows < 1) $set_rows = $set_rows_default;
@@ -562,26 +562,26 @@ class OBM_DISPLAY {
 
     // Rewind to 1st page
     if ($lpage > 1) {
-      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">|&lt;&lt;</a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;sql_order_field=$params[sql_order_field]&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">|&lt;&lt;</a>&nbsp;&nbsp;";
     }
 
     // Rewind nb_page_dis page
     if ($start_page > 1) {
       $i = $start_page - $nb_page_dis;
-      $content .= "<a accesskey=\"$cak_page_prev\" href=\"$url&amp;page=$i&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_page_prev\" href=\"$url&amp;page=$i&amp;sql_order_field=$params[sql_order_field]&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;";
     }
 
     // Previous page
     if ($lpage > 1) {
       $tmppage = $lpage - 1;
-      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">&lt;</a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;sql_order_field=$params[sql_order_field]&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">&lt;</a>&nbsp;&nbsp;";
     }
 
     $i = $start_page;
     // Pages display
     while ($i <= $end_page) {
       if ($i != $lpage) {
-	$content .= "<a href=\"$url&amp;page=$i&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">$i</a> | \n";
+	$content .= "<a href=\"$url&amp;page=$i&amp;sql_order_field=$params[sql_order_field]&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">$i</a> | \n";
       } else {
 	$content .= "$i | \n";
       }
@@ -591,19 +591,19 @@ class OBM_DISPLAY {
     // Next page
     if ($lpage < $nb_page) {
       $tmppage = $lpage + 1;
-      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">&gt;</a>";
+      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;sql_order_field=$params[sql_order_field]&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">&gt;</a>";
     }
 
     // Go to next $nb_page_dis pages
     if ($end_page < $nb_page) {
       $i = $end_page + 1;
-      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_page_next\" href=\"$url&amp;page=$i&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">+$nb_page_dis</a>";
+      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_page_next\" href=\"$url&amp;page=$i&amp;sql_order_field=$params[sql_order_field]&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">+$nb_page_dis</a>";
     }
 
     // Go to last page
     if ($lpage < $nb_page) {
       $content .= "&nbsp;&nbsp;
-      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">&gt;&gt;|</a>";
+      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;sql_order_field=$params[sql_order_field]&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">&gt;&gt;|</a>";
     }
 
     // Export - Uses forms to allow big queries to be transmitted
@@ -629,7 +629,7 @@ class OBM_DISPLAY {
   //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
-    global $of_display_name, $page, $sql_order_field;
+    global $of_display_name, $params;
     global $fieldnames, $cgp_hide, $cdg_id, $set_debug, $l_id;
     global $ico_arrow_up, $ico_arrow_down, $ico_arrow_off;
 
@@ -678,7 +678,7 @@ class OBM_DISPLAY {
 	if ($this->data_order) {
 	  $furl = $url;
           if ($url != "") {
-            if ($sql_order_field == $fieldname) {
+            if ($params["sql_order_field"] == $fieldname) {
               if ($sql_order_dir == "DESC") {
                 $img = "<img src='$ico_arrow_up' alt='sort' />";
               } else {
@@ -687,7 +687,7 @@ class OBM_DISPLAY {
             }
 	    // If action on this dataset
 	    if ($this_name == $of_display_name) {
-	      $furl .= "&amp;page=$page&amp;sql_order_field=$fieldname&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
+	      $furl .= "&amp;page=$params[page]&amp;sql_order_field=$fieldname&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
 	    } else {
 	      $furl .= "&amp;page=1&amp;sql_order_field=$fieldname&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
 	    }

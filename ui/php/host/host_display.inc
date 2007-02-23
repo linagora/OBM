@@ -250,6 +250,11 @@ function html_host_consult($host_q) {
   $user_login = $host_q->f("userobm_login");
   $mail_server = $host_q->f("mailserver_id");
 
+  $dis_user =   
+    "<tr>
+      <th>$l_user</th>
+      <td>$dis_user</td>
+    </tr>";
   // Formatage des informations de la BD
   if ($samba) $samba = $c_yes; else $samba = $c_no;
   $web_state  = ($web_perms ? $l_enable : $l_disable);
@@ -330,10 +335,7 @@ function html_host_consult($host_q) {
       <th>$l_desc</th>
       <td>$desc</td>
     </tr>
-    <tr>
-      <th>$l_user</th>
-      <td>$dis_user</td>
-    </tr>
+
     $block_mail
     </table>
     </div>
@@ -513,6 +515,22 @@ function html_host_form($action, $host_q, $host, $field="") {
   </tr>";
   }
 
+  $dis_user = "
+  <tr>
+  <th class=\"$class[user]\">
+  $l_user
+  <a href=\"\" onclick=\"window.open('$path/user/user_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_host_select_user)."&amp;ext_widget=f_host.user_id&amp;ext_widget_text=f_host.tf_user_login','User','height=$popup_height,width=$popup_width'); return false;\">
+   <img src=\"$ico_user\" alt=\"\" /></a>
+  </th>
+   
+    <td>
+    <input type=\"hidden\" name=\"user_id\" value=\"$u_id\" />
+    <input type=\"text\" name=\"tf_user_login\" value=\"$u_login\" readonly=\"readonly\" onfocus=\"this.blur();\" />
+    <input type=\"button\" value=\"$l_clear\" onclick=\"this.form.user_id.value='';this.form.tf_user_login.value='';\" />
+    </td>
+  </tr>    
+    
+  ";
   $block = "
   <form method=\"get\" name=\"f_host\" action=\"host_index.php\">
 
@@ -538,19 +556,7 @@ function html_host_form($action, $host_q, $host, $field="") {
       <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"128\" />
     </td>
   </tr>
-  <tr>
-  <th class=\"$class[user]\">
-  $l_user
-  <a href=\"\" onclick=\"window.open('$path/user/user_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_host_select_user)."&amp;ext_widget=f_host.user_id&amp;ext_widget_text=f_host.tf_user_login','User','height=$popup_height,width=$popup_width'); return false;\">
-   <img src=\"$ico_user\" alt=\"\" /></a>
-  </th>
-   
-    <td>
-    <input type=\"hidden\" name=\"user_id\" value=\"$u_id\" />
-    <input type=\"text\" name=\"tf_user_login\" value=\"$u_login\" readonly=\"readonly\" onfocus=\"this.blur();\" />
-    <input type=\"button\" value=\"$l_clear\" onclick=\"this.form.user_id.value='';this.form.tf_user_login.value='';\" />
-    </td>
-  </tr>
+
 
   </table>
   </fieldset>

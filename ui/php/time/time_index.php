@@ -32,7 +32,6 @@
 
 $path = "..";
 $module = "time";
-$extra_css = "time.css";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

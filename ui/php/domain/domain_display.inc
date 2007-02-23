@@ -151,10 +151,12 @@ function html_domain_form($dom_q, $domain) {
 
   // Buttons
   if (($domain["action"] == "new") || ($domain["action"] == "insert")) {
+    $dis_domain_name = "<input name=\"tf_domain_name\" size=\"48\" maxlength=\"128\" value=\"$domain_name\" />";
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
           <input type=\"submit\" value=\"$l_insert\" />";
 
   } elseif (($domain["action"]=="detailupdate") || ($domain["action"]=="update")) {
+    $dis_domain_name = $domain_name;
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\">
           <input type=\"hidden\" name=\"domain_id\" value=\"$id\">
           <input type=\"submit\" value=\"$l_update\">";
@@ -181,7 +183,7 @@ function html_domain_form($dom_q, $domain) {
     </tr>
     <tr>
       <th>$l_domain_name</th>
-      <td><input name=\"tf_domain_name\" size=\"48\" maxlength=\"128\" value=\"$domain_name\" /></td>
+      <td>$dis_domain_name</td>
     </tr>
     </table>
     </fieldset>

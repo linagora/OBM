@@ -148,13 +148,13 @@ function run_query_user_search($user) {
 function run_query_user_get_mailserver() {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("host",false,true);
+  $multidomain = sql_multidomain("host",true,true);
   $query = "SELECT
     mailserver_id,
     ms.host_name as host_name
     FROM MailServer 
     JOIN Host ms ON mailserver_host_id = ms.host_id
-    WHERE $multidomain";
+    WHERE 1=1 $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_mailserver_count())");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
@@ -766,14 +766,15 @@ function run_query_user_unsubscribe_all_groups($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Groups query execution
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_group() {
+function run_query_user_group($uid) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("group");
 
   $query = "SELECT *
     FROM UGroup
-    WHERE 1=1 $multidomain
+    JOIN UserObm ON group_domain_id = userobm_domain_id
+    WHERE 
+    userobm_id = '$uid'
     ORDER by group_name";
 
   display_debug_msg($query, $cdg_sql, "run_query_user_group()");

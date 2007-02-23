@@ -826,7 +826,7 @@ function run_query_deal_potential($users_id="") {
     $where_tech_uid .= ")";
   }
 	
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 	
   $query = "SELECT
       deal_marketingmanager_id AS uid,
@@ -987,7 +987,7 @@ function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpe
     }
     $where_market_uid .= ")";
   }
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
   $query = "SELECT
       $dexp,
       $dend,
@@ -1108,7 +1108,7 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
       $where_date .= " AND deal_dateexpected <= '$date_before'";
     }
   }
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 
   // Tasktype filter
   if (is_array($deal["tasktype"])) {
@@ -1210,7 +1210,7 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
 function run_query_deal_manager($archive = false) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain("deal");
 
   if (! $archive) {
     $where_arch .= " deal_archive=0";
@@ -1479,7 +1479,7 @@ function get_deal_dealcompany_info($deal_id) {
 function get_lead_info($lead_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("lead");
+  $multidomain = sql_multidomain("lead");
 
   $query = "SELECT *
     FROM Lead
@@ -1512,7 +1512,7 @@ function get_lead_info($lead_id) {
 function get_deal_company_id($deal_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 
   $query = "SELECT deal_company_id FROM Deal WHERE deal_id='$deal_id' $multidomain";
 
@@ -1588,7 +1588,7 @@ function run_query_deal_kind_update($deal) {
   $kind = $deal["kind"];
   $inout = $deal["kind_inout"];
   //$inout = (($deal["kind_inout"]) == "+" ? $deal["kind_inout"] : '-');
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("dealtype");
 	
   $query = "UPDATE DealType SET
       dealtype_label='$label',
@@ -1614,7 +1614,7 @@ function run_query_deal_kind_update($deal) {
 function run_query_deal_kind_delete($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("dealtype");
 
   $query = "DELETE FROM DealType WHERE dealtype_id='$id' $multidomain";
 
@@ -1634,7 +1634,7 @@ function run_query_deal_kind_delete($id) {
 function run_query_deal_kind_links($k_id) {
   global $cdg_sql;
 	
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 
   $query = "SELECT deal_id, deal_label FROM Deal 
 		WHERE deal_type_id='$k_id' $multidomain";
@@ -1653,7 +1653,7 @@ function run_query_deal_kind_links($k_id) {
 function run_query_deal_status_list() {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("dealstatus");
+  $multidomain = sql_multidomain("dealstatus");
 
   $query = "SELECT * FROM DealStatus WHERE 1=1 $multidomain 
 			ORDER BY dealstatus_order ASC";
@@ -2034,7 +2034,7 @@ function check_deal_can_delete_parentdeal($p_id) {
   global $l_link_deal;
 
   $delete_ok = true;
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
   // Check if the parentdeal has any deals
 
   $query = "SELECT count(*) FROM Deal 
@@ -2421,7 +2421,7 @@ function get_deal_parent_status($p_id) {
 function get_deal_parent_dateproposal($p_id)  {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 
   $query = "SELECT deal_dateproposal
     FROM Deal
@@ -2449,7 +2449,7 @@ function get_deal_parent_dateproposal($p_id)  {
 function get_deal_parent_datealarm($p_id)  {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 
   $query = "SELECT deal_datealarm
     FROM Deal
@@ -2474,7 +2474,7 @@ function get_deal_parent_datealarm($p_id)  {
 function get_deal_parent_expense($p_id)  {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 
   $query = "SELECT sum(deal_amount) as res
     FROM Deal, DealType
@@ -2503,7 +2503,7 @@ function get_deal_parent_expense($p_id)  {
 function get_deal_parent_income($p_id)  {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 
   $query = "SELECT sum(deal_amount) as res
     FROM Deal, DealType
@@ -2532,7 +2532,7 @@ function get_deal_parent_income($p_id)  {
 function get_deal_parent_potential($p_id)  {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 
   $query = "SELECT sum(deal_amount * deal_hitrate / 100) as res_balanced,
       sum(deal_amount) as res

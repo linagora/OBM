@@ -288,7 +288,7 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "kind_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_kind_links($params["kind_id"]);
+  $display["detail"] = dis_deal_kind_links($params["kind"]);
   
 } elseif ($action == "kind_delete") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -322,7 +322,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_status_links($params["status_id"]);
+  $display["detail"] = dis_deal_status_links($params["status"]);
 
 } elseif ($action == "status_delete") {
 ///////////////////////////////////////////////////////////////////////////////

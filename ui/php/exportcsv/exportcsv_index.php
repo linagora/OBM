@@ -19,7 +19,6 @@ include("$obminclude/global.inc");
 $params = get_param_export();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-
 page_close();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,16 +85,10 @@ if (($action == "index") || ($action == "")) {
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_export() {
-  global $first_row, $nb_rows, $query, $call_module, $entity, $func_data;
-  global $cdg_param;
+  $params = get_global_params("ExportCSV");
 
-  if (isset ($first_row)) $params["first_row"] = $first_row;
-  if (isset ($nb_rows)) $params["nb_rows"] = $nb_rows;
-  if (isset ($query)) $params["query"] = $query;
-  if (isset ($call_module)) $params["module"] = $call_module;
-  if (isset ($entity)) $params["entity"] = $entity;
-  if (isset ($func_data)) $params["function"] = $func_data;
-
+  if (isset ($params["call_module"])) $params["module"] = $params["call_module"];
+  if (isset ($params["func_data"])) $params["function"] = $params["func_data"];
   return $params;
 }
 

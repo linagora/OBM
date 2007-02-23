@@ -2577,7 +2577,7 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     <tr>
     <td>
     <input type=\"hidden\" id=\"reftask_$projectreftask_id\" value=\"$projectreftask_id\" />
-    <input type=\"hidden\" id=\"tasktype_$tt_id\" value=\"$tt_id\" />
+    <input type=\"hidden\" id=\"tasktype_$projectreftask_id\" value=\"$tt_id\" />
     <a href=\"?action=reftask_delete&amp;category=reftask&amp;reftask=$projectreftask_id\">
     <img src=\"$ico_delete\" alt=\"$l_reftask_delete\" title=\"$l_reftask_delete\" />
     </a></td>
@@ -2595,6 +2595,7 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
   
   
   $sel_tasktype = "<select size=\"8\" name=\"sel_tasktype\">";
+  $selected = "selected='selected'";
   while($tasktype_q->next_record()) {
     $tt_internal = $tasktype_q->f("tasktype_internal");
     $tt_label = $tasktype_q->f("tasktype_label");
@@ -2607,7 +2608,8 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
       $sel_tasktype .= "<optgroup label=\"".$task_list[$tt_internal]."\">";      
       $type_prec = $tt_internal;
     }    
-    $sel_tasktype .= "\n<option value=\"$tt_id\">$tt_label</option>";
+    $sel_tasktype .= "\n<option $selected value=\"$tt_id\">$tt_label</option>";
+    $selected = ""; 
 
   }
   $sel_tasktype .= "</optgroup>";

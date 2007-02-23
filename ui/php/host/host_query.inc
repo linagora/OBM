@@ -156,7 +156,7 @@ function run_query_host_insert($host) {
     '$now',
     null,
     '$obm[uid]',
-    '$obm[domain_id]'
+    '$obm[domain_id]',
     '$host_uid',
     '$host_gid',
     '$samba',

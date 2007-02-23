@@ -34,7 +34,8 @@ if(file_exists($conf_login_page)) {
 }
 
 if ($c_multidomain) {
-  $sel_domain = of_domain_dis_select();
+  $domain_id = isset($_REQUEST["sel_domain"])?$_REQUEST["sel_domain"]:$c_default_domain;
+  $sel_domain = of_domain_dis_select($domain_id);
   $domain = $l_domain;
 }
 

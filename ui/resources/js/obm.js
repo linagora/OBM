@@ -14,7 +14,7 @@ Obm.Menu = new Class({
   },  
 
   addItem: function(item) {
-    slide = new Fx.Slide(item +'-items', {duration: 150});
+    slide = new Fx.Slide(item +'-items', {duration: 150,onComplete:this.menuListBoxFix});
     sectionItem = $(item +'-items-wrapper');
     sectionBlock = $(item);
     sectionItem.style.top = sectionBlock.getTop() + sectionBlock.offsetHeight + 'px';
@@ -40,7 +40,7 @@ Obm.Menu = new Class({
     sectionBlock = $(item);
     sectionItem.style.top = sectionBlock.getTop() + sectionBlock.offsetHeight + 'px';
     sectionItem.style.left = sectionBlock.getLeft() + 'px';
-    this.menuItems[item].toggle();  
+    this.menuItems[item].toggle(); 
     this.hideMenuBut(item);
   },
 
@@ -56,8 +56,15 @@ Obm.Menu = new Class({
     for(var i in this.menuItems) {
       this.menuItems[i].hide();
     }
-  }
+  },
 
+  menuListBoxFix: function(element) {
+    if (this.wrapper['offset'+this.layout.capitalize()] > 0) {
+      overListBoxFix(element,'block');
+    } else {
+      overListBoxFix(element,'none');
+    }
+  }
 });
 
 
@@ -206,4 +213,35 @@ function showMessage(klass, message) {
                   .appendText(message)
                   .injectInside(content);
   setTimeout(function () {content.innerHTML = ''}, 5000);
+}
+
+function overListBoxFix(overObject, forceDisplay) {
+  
+  if (navigator.userAgent.toLowerCase().indexOf("msie") == -1)
+    return;
+  
+  try {
+    if (!$('listBoxHider')) {
+      
+      new Element("iframe").setProperty('id','listBoxHider')
+        .setProperty("src", "javascript:false;")
+        .setProperty("scrolling", "no")
+        .setProperty ("frameborder", "0")
+        .injectInside($(document.body));
+    }
+    overObject = $(overObject);
+    $('listBoxHider').setStyles({
+      position : "absolute",
+      width : overObject.offsetWidth ,
+      height : overObject.offsetHeight,
+      top : overObject.getTop(),
+      left : overObject.getLeft(),
+      zIndex : overObject.getStyle("zIndex") == 0 ? "999" : overObject.getStyle("zIndex"),
+      visibility : overObject.getStyle("visibility") == "hidden" ? "hidden" : "visible",
+      display : (forceDisplay) ? forceDisplay : overObject.getStyle("display") 
+    });
+  } catch (ee) {
+    alert(ee);
+  }
+
 }

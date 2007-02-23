@@ -236,7 +236,7 @@ function refreshDatePicker(dateFieldName, year, month, day)
 
   $("datepicker").setHTML('');
   $("datepicker").adopt(title).adopt(table).adopt(today);
-  adjustiFrame();
+  overListBoxFix("datepicker");
 }
 
 
@@ -390,11 +390,11 @@ function updateDateField(dateFieldName, dateString)
   if (dateString)
     targetDateField.value = dateString;
   
-  var pickerDiv = document.getElementById("datepicker");
+  var pickerDiv = $("datepicker");
   pickerDiv.style.visibility = "hidden";
   pickerDiv.style.display = "none";
 
-  adjustiFrame();
+  overListBoxFix("datepicker");
   targetDateField.focus();
   targetDateField.onchange();
   // after the datepicker has closed, optionally run a user-defined function called
@@ -404,60 +404,3 @@ function updateDateField(dateFieldName, dateString)
     datePickerClosed(targetDateField);
 }
 
-
-/**
-  Use an "iFrame shim" to deal with problems where the datepicker shows up behind
-  selection list elements, if they're below the datepicker. The problem and solution are
-  described at:
-
-http://dotnetjunkies.com/WebLog/jking/archive/2003/07/21/488.aspx
-http://dotnetjunkies.com/WebLog/jking/archive/2003/10/30/2975.aspx
- */
-function adjustiFrame(pickerDiv, iFrameDiv)
-{
-  // we know that Opera doesn't like something about this, so if we
-  // think we're using Opera, don't even try
-
-  //var is_opera = (navigator.userAgent.toLowerCase().indexOf("opera") != -1);
-  //if (is_opera)
-  //  return;
-  if (navigator.userAgent.toLowerCase().indexOf("msie") != -1) is_ie = true;
-  else is_ie = false;
-  if (!is_ie) 
-    return;
-
-  // put a try/catch block around the whole thing, just in case
-  try {
-    if (!document.getElementById(iFrameDivID)) {
-      // don't use innerHTML to update the body, because it can cause global variables
-      // that are currently pointing to objects on the page to have bad references
-      //document.body.innerHTML += "<iframe id='" + iFrameDivID + "' src='javascript:false;' scrolling='no' frameborder='0'>";
-      var newNode = document.createElement("iFrame");
-      newNode.setAttribute("id", iFrameDivID);
-      newNode.setAttribute("src", "javascript:false;");
-      newNode.setAttribute("scrolling", "no");
-      newNode.setAttribute ("frameborder", "0");
-      document.body.appendChild(newNode);
-    }
-
-    if (!pickerDiv)
-      pickerDiv = document.getElementById("datepicker");
-    if (!iFrameDiv)
-      iFrameDiv = document.getElementById(iFrameDivID);
-
-    try {
-      iFrameDiv.style.position = "absolute";
-      iFrameDiv.style.width = pickerDiv.offsetWidth;
-      iFrameDiv.style.height = pickerDiv.offsetHeight ;
-      iFrameDiv.style.top = pickerDiv.style.top;
-      iFrameDiv.style.left = pickerDiv.style.left;
-      iFrameDiv.style.zIndex = pickerDiv.style.zIndex - 1;
-      iFrameDiv.style.visibility = pickerDiv.style.visibility ;
-      iFrameDiv.style.display = pickerDiv.style.display;
-    } catch(e) {
-    }
-
-  } catch (ee) {
-  }
-
-}

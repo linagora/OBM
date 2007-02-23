@@ -39,7 +39,6 @@
 
 $path = "..";
 $module = "project";
-$extra_css = "project.css";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -582,7 +581,7 @@ function get_project_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/project/project_index.php?action=detailconsult&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+    'Condition'=> array ('all','!reftask_checklink','!reftask_delete','!reftask_update','!reftask_insert','!admin','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
   );
 
 
@@ -591,7 +590,7 @@ function get_project_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/project/project_index.php?action=detailupdate&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+    'Condition'=> array ('all','!reftask_checklink','!reftask_delete','!reftask_update','!reftask_insert','!admin','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
     );
 
 // Insert
@@ -613,7 +612,7 @@ function get_project_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/project/project_index.php?action=check_delete&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+    'Condition'=> array ('all','!reftask_checklink','!reftask_delete','!reftask_update','!reftask_insert','!admin','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                      	      );
 
 // Delete
@@ -628,7 +627,7 @@ function get_project_action() {
     'Name'     => $l_header_man_task,
     'Url'      => "$path/project/project_index.php?action=task&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+    'Condition'=> array ('all','!reftask_checklink','!reftask_delete','!reftask_update','!reftask_insert','!admin','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
     );
 
 // Add a task
@@ -657,7 +656,7 @@ function get_project_action() {
     'Name'     => $l_header_man_member,
     'Url'      => "$path/project/project_index.php?action=member&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+    'Condition'=> array ('all','!reftask_checklink','!reftask_delete','!reftask_update','!reftask_insert','!admin','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                      );
 
 // Select members : Lists selection
@@ -667,7 +666,7 @@ function get_project_action() {
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_project,
-    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+    'Condition'=> array ('all','!reftask_checklink','!reftask_delete','!reftask_update','!reftask_insert','!admin','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                     	  );
 
 // Add a member
@@ -696,7 +695,7 @@ function get_project_action() {
     'Name'     => $l_header_man_affect,
     'Url'      => "$path/project/project_index.php?action=allocate&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+    'Condition'=> array ('all','!reftask_checklink','!reftask_delete','!reftask_update','!reftask_insert','!admin','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                      );
 
 // Time allocation Update
@@ -711,7 +710,7 @@ function get_project_action() {
     'Name'     => $l_header_advance,
     'Url'      => "$path/project/project_index.php?action=advance&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+    'Condition'=> array ('all','!reftask_checklink','!reftask_delete','!reftask_update','!reftask_insert','!admin','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                      );
 
 // Advance Update
@@ -726,14 +725,14 @@ function get_project_action() {
      'Name'     => $l_header_dashboard,
      'Url'      => "$path/project/project_index.php?action=dashboard&amp;project_id=".$params["project_id"],
      'Right'    => $cright_read,
-    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+    'Condition'=> array ('all','!reftask_checklink','!reftask_delete','!reftask_update','!reftask_insert','!admin','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                        	 );
 // Planning
   $actions["project"]["planning"]  = array (
     'Name'     => $l_header_planning,
     'Url'      => "$path/project/project_index.php?action=planning&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+    'Condition'=> array ('all','!reftask_checklink','!reftask_delete','!reftask_update','!reftask_insert','!admin','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
   );
 
 // Admin
