@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
     <title>Login - OBM $obm_version</title>
-    <link rel="stylesheet" type="text/css" href="http://obm/images/themes/default/styles/style.css" />
+    <link rel="stylesheet" type="text/css" href="$css_obm" />
     <style>
       body {
         text-align: center;
