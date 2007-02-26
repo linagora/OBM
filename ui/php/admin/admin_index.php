@@ -27,7 +27,6 @@ require("admin_query.inc");
 ///////////////////////////////////////////////////////////////////////////////
 $params = get_admin_params();
 
-
 switch ($params["mode"]) {
  case "txt":
    $retour = parse_admin_arg($argv);
@@ -118,7 +117,7 @@ Ex: php4 admin_index.php -a clear_sess
 ///////////////////////////////////////////////////////////////////////////////
 function parse_admin_arg($argv) {
   global $debug, $acts, $target_modules;
-  global $action, $module;
+  global $params, $action, $module;
 
   // We skip the program name [0]
   next($argv);
@@ -126,13 +125,13 @@ function parse_admin_arg($argv) {
     switch($val) {
     case '-h':
     case '--help':
-      $action = "help";
+      $params["action"] = "help";
       return true;
       break;
     case '-a':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $acts)) {
-        $action = $val2;
+        $params["action"] = $val2;
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       }
       else {
@@ -143,7 +142,8 @@ function parse_admin_arg($argv) {
     }
   }
 
-  if (! $action) $action = "clear_sess";
+  if (! $params["action"]) $params["action"] = "clear_sess";
+  $action = $params["action"];
 }
 
 

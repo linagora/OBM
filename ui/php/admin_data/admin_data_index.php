@@ -34,9 +34,9 @@ $acts = array ('help', 'index', 'data_show', 'data_update', 'sound_aka_update');
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-if ($mode == "") $mode = "txt";
+$params = get_admin_data_params();
 
-switch ($mode) {
+switch ($params["mode"]) {
  case "txt":
    // Check that this is not a fake txt attempt from a browser
    if (isset($_SERVER["SERVER_PROTOCOL"]) && ($_SERVER["SERVER_PROTOCOL"] != "")) {
@@ -63,19 +63,19 @@ switch ($mode) {
 
 switch ($action) {
   case "help":
-    dis_admin_data_help($mode);
+    dis_admin_data_help($params["mode"]);
     break;
   case "index":
-    dis_admin_data_index($mode, $acts, $target_modules, $target_upd_modules);
+    dis_admin_data_index($params["mode"], $acts, $target_modules, $target_upd_modules);
     break;
   case "data_show":
-    dis_admin_data($action, $mode, $target_module);
+    dis_admin_data($action, $params["mode"], $params["target_module"]);
     break;
   case "data_update":
-    dis_admin_data($action, $mode, $target_module);
+    dis_admin_data($action, $params["mode"], $params["target_module"]);
     break;
   case "sound_aka_update":
-    dis_admin_data_sound_aka_update($mode);
+    dis_admin_data_sound_aka_update($params["mode"]);
     break;
   default:
     echo "No action specified !";
@@ -83,7 +83,7 @@ switch ($action) {
 }
 
 // Program End
-switch ($mode) {
+switch ($params["mode"]) {
  case "txt":
    echo "bye...\n";
    break;
@@ -92,6 +92,22 @@ switch ($mode) {
    $display["end"] = display_end();
    echo $display["end"];
    break;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Stores Admin parameters transmited in $params hash
+// returns : $params hash with parameters set
+///////////////////////////////////////////////////////////////////////////////
+function get_admin_data_params() {
+
+  $params = get_global_params("admin_data");
+
+  if (($params["mode"] == "") || ($params["mode"] != "html")) {
+    $params["mode"] = "txt";
+  }
+
+  return $params;
 }
 
 
@@ -127,7 +143,7 @@ Ex: php4 admin_data_index.php -a data_show -m company
 ///////////////////////////////////////////////////////////////////////////////
 function parse_admin_data_arg($argv) {
   global $debug, $acts, $target_modules;
-  global $action, $target_module;
+  global $action, $params, $target_module;
 
   // We skip the program name [0]
   next($argv);
@@ -135,13 +151,14 @@ function parse_admin_data_arg($argv) {
     switch($val) {
     case '-h':
     case '--help':
-      $action = "help";
+      $params["action"] = "help";
+      dis_admin_data_help($params["mode"]);
       return true;
       break;
     case '-m':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $target_modules)) {
-        $target_module = $val2;
+        $params["target_module"] = $val2;
         if ($debug > 0) { echo "-m -> \$target_module=$val2\n"; }
       }
       else {
@@ -152,7 +169,7 @@ function parse_admin_data_arg($argv) {
     case '-a':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $acts)) {
-        $action = $val2;
+        $params["action"] = $val2;
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       }
       else {
@@ -163,8 +180,9 @@ function parse_admin_data_arg($argv) {
     }
   }
 
-  if (! $target_module) $target_module = "company";
-  if (! $action) $action = "data_show";
+  if (! $params["target_module"]) $params["target_module"] = "company";
+  if (! $params["action"]) $params["action"] = "data_show";
+  $action = $params["action"];
 }
 
 

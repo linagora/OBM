@@ -29,9 +29,9 @@ $actions = array ('help', 'index', 'user_pref_reset', 'user_pref_update_one');
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-if ($mode == "") $mode = "txt";
+$params = get_admin_pref_params();
 
-switch ($mode) {
+switch ($params["mode"]) {
  case "txt":
    // Check that this is not a fake txt attempt from a browser
    if (isset($_SERVER["SERVER_PROTOCOL"]) && ($_SERVER["SERVER_PROTOCOL"] != "")) {
@@ -41,10 +41,8 @@ switch ($mode) {
    include("$obminclude/global_pref.inc");
    $retour = parse_admin_pref_arg($argv);
    if (! $retour) { end; }
-   $pref = get_admin_pref_param_pref();
    break;
  case "html":
-   $pref = get_admin_pref_param_pref();
    page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc"); 
    if ($action == "") $action = "index";
@@ -61,29 +59,28 @@ switch ($mode) {
 
 switch ($action) {
   case "help":
-    dis_admin_pref_help($mode);
+    dis_admin_pref_help($params["mode"]);
     break;
   case "index":
-    dis_admin_pref_index($mode);
+    dis_admin_pref_index($params["mode"]);
     break;
   case "user_pref_reset":
-    dis_admin_pref_user_pref_reset($mode);
+    dis_admin_pref_user_pref_reset($params["mode"]);
+    dis_admin_pref_index($params["mode"]);
     break;
   case "user_pref_update_one":
-    $option = $pref["up_option"];
-    $value = $pref["up_value"];
-    if (! $value) $value = get_admin_pref_userpref_value($option); 
-    dis_admin_pref_user_pref_update_one($mode, $option, $value);
+    dis_admin_pref_user_pref_update_one($params["mode"], $params["userpref"], $params["pref_value"]);
+    dis_admin_pref_index($params["mode"]);
     break;
   default:
     $msg = "$action : Action not implemented !";
     $display["msg"] .= display_err_msg("$msg");
-    echo (($mode == "txt") ? $msg : $display["msg"]);
+    echo (($params["mode"] == "txt") ? $msg : $display["msg"]);
     break;
 }
 
 // Program End
-switch ($mode) {
+switch ($params["mode"]) {
  case "txt":
    echo "bye...\n";
    break;
@@ -92,6 +89,22 @@ switch ($mode) {
    $display["end"] = display_end();
    echo $display["end"];
    break;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Stores Admin parameters transmited in $params hash
+// returns : $params hash with parameters set
+///////////////////////////////////////////////////////////////////////////////
+function get_admin_pref_params() {
+
+  $params = get_global_params("admin_pref");
+
+  if (($params["mode"] == "") || ($params["mode"] != "html")) {
+    $params["mode"] = "txt";
+  }
+
+  return $params;
 }
 
 
@@ -114,8 +127,8 @@ where Options:
 -o option, --option option
 -v value, --value value
 
-Ex: php4 admin_pref_index.php -a user_pref_reset
-Ex: php4 admin_pref_index.php -a user_pref_update_one -o last_account -v 0
+Ex: php admin_pref_index.php -a user_pref_reset
+Ex: php admin_pref_index.php -a user_pref_update_one -o last_account -v 0
 ";
 }
 
@@ -125,7 +138,7 @@ Ex: php4 admin_pref_index.php -a user_pref_update_one -o last_account -v 0
 ///////////////////////////////////////////////////////////////////////////////
 function parse_admin_pref_arg($argv) {
   global $cdg_param, $actions, $action;
-  global $sel_userpref, $tf_pref_value;
+  global $params, $sel_userpref, $tf_pref_value;
 
   // We skip the program name [0]
   next($argv);
@@ -133,13 +146,14 @@ function parse_admin_pref_arg($argv) {
     switch($val) {
     case '-h':
     case '--help':
-      $action = "help";
+      $params["action"] = "help";
+      dis_admin_pref_help($params["mode"]);
       return true;
       break;
     case '-a':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $actions)) {
-        $action = $val2;
+        $params["action"] = $val2;
 	if (debug_level_isset($cdg_param)) {
 	  echo "-a -> \$action=$val2\n";
 	}
@@ -152,7 +166,7 @@ function parse_admin_pref_arg($argv) {
     case '-o':
     case '--option':
       list($nb2, $val2) = each ($argv);
-      $sel_userpref = $val2;
+      $params["userpref"] = $val2;
       if (debug_level_isset($cdg_param)) {
 	echo "-o -> \$sel_userpref=$val2\n";
       }
@@ -160,37 +174,16 @@ function parse_admin_pref_arg($argv) {
     case '-v':
     case '--value':
       list($nb2, $val2) = each ($argv);
-      $tf_pref_value = $val2;
+      $params["pref_value"] = $val2;
       if (debug_level_isset($cdg_param)) {
-	echo "-v -> \$tf_pref_value=$val2\n";
+	echo "-v -> \$pref_value=$val2\n";
       }
       break;
     }
   }
 
-  if (! $action) $action = "user_pref_reset";
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Stores Admin preferences parameters transmited in $pref hash
-// returns : $pref hash with parameters set
-///////////////////////////////////////////////////////////////////////////////
-function get_admin_pref_param_pref() {
-  global $cdg_param, $sel_userpref, $tf_pref_value;
-
-  if (isset ($sel_userpref)) $pref["up_option"] = $sel_userpref;
-  if (isset ($tf_pref_value)) $pref["up_value"] = $tf_pref_value;
-
-  if (debug_level_isset($cdg_param)) {
-    if ( $pref ) {
-      while ( list( $key, $val ) = each( $pref ) ) {
-        echo "<br>pref[$key]=$val";
-      }
-    }
-  }
-
-  return $pref;
+  if (! $params["action"]) $params["action"] = "user_pref_reset";
+  $action = $params["action"];
 }
 
 

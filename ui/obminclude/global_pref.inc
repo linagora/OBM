@@ -9,11 +9,11 @@
 
 // Update the cookie expires time : now + lifetime or session wide
 // but not in txt mode or if headers have already been sent
-if ( (! headers_sent()) && ($mode != "txt"))
+if ( (! headers_sent()) && ($params["mode"] != "txt"))
   $sess->setcookie();
 
 // if prefs have not been loaded (we check the var set_lang) - Login Phase
-if (($set_lang == "")  && ($mode != "txt")) {
+if (($set_lang == "")  && ($params["mode"] != "txt")) {
   // We Load and make session variables from User preferences
   session_load_user_prefs();
   if ($cgp_show["module"]["todo"]) 
