@@ -184,7 +184,7 @@ function run_query_user_detail($p_id) {
       $lastaccess,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
-      domain_domain_name as domain_name,
+      domain_name,
       ms.host_name as mailserver_hostname,
       mailserver_id,
       ms.host_id as mailserver_host_id,

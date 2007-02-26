@@ -13,7 +13,7 @@
 // Direct fields
 $fieldnames["domain_label"] = $l_label;
 $fieldnames["domain_description"] = $l_desc;
-$fieldnames["domain_domain_name"] = $l_domain_name;
+$fieldnames["domain_name"] = $l_domain_name;
 $fieldnames["domain_alias"] = $l_alias;
 $fieldnames["domain_timecreate"] = $l_timecreate;
 
@@ -138,7 +138,7 @@ function html_domain_form($dom_q, $domain) {
     $id = $dom_q->f("domain_id");
     $label = $dom_q->f("domain_label");
     $desc = $dom_q->f("domain_description");
-    $domain_name = $dom_q->f("domain_domain_name");
+    $domain_name = $dom_q->f("domain_name");
     $alias = $dom_q->f("domain_alias");
   }
 
@@ -240,7 +240,7 @@ function html_domain_consult($obm_q) {
   $id = $obm_q->f("domain_id");
   $label = $obm_q->f("domain_label");
   $desc = $obm_q->f("domain_description");
-  $domain_name = $obm_q->f("domain_domain_name");
+  $domain_name = $obm_q->f("domain_name");
   $alias = $obm_q->f("domain_alias");
 
   $display["detailInfo"] = display_record_info($obm_q);

@@ -25,9 +25,10 @@ require("admin_query.inc");
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-if ($mode == "") $mode = "txt";
+$params = get_admin_params();
 
-switch ($mode) {
+
+switch ($params["mode"]) {
  case "txt":
    $retour = parse_admin_arg($argv);
    include("$obminclude/global_pref.inc");
@@ -41,20 +42,19 @@ switch ($mode) {
    $perm->check_permissions($module, $action);
    $display["head"] = display_head($module);
    $display["header"] = display_menu($module);
-   echo $display["head"] . $display["header"] . $display["action"];
    break;
 }
 
 
 switch ($action) {
   case "help":
-    dis_admin_help($mode);
+    dis_admin_help($params["mode"]);
     break;
   case "index":
-    dis_admin_index($mode, $cs_lifetime);
+    $display['detail'] = dis_admin_index($params["mode"], $cs_lifetime);
     break;
   case "clear_sess":
-    dis_admin_clear_sess($mode, $cs_lifetime);
+    dis_admin_clear_sess($params["mode"], $cs_lifetime);
     break;
   default:
     echo "No action specified !";
@@ -63,15 +63,31 @@ switch ($action) {
 
 
 // Program End
-switch ($mode) {
+switch ($params["mode"]) {
  case "txt":
    echo "bye...\n";
    break;
  case "html":
    page_close();
    $display["end"] = display_end();
-   echo $display["end"];
+   display_page($display);
    break;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Stores Admin parameters transmited in $params hash
+// returns : $params hash with parameters set
+///////////////////////////////////////////////////////////////////////////////
+function get_admin_params() {
+
+  $params = get_global_params("admin");
+
+  if (($params["mode"] == "") || ($params["mode"] != "html")) {
+    $params["mode"] = "txt";
+  }
+
+  return $params;
 }
 
 

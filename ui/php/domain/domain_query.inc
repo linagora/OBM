@@ -110,7 +110,7 @@ function run_query_domain_insert($domain) {
     domain_usercreate,
     domain_label,
     domain_description,
-    domain_domain_name,
+    domain_name,
     domain_alias)
   VALUES (
     null,
@@ -165,7 +165,7 @@ function run_query_domain_update($d_id, $domain) {
     domain_userupdate='$uid',
     domain_label='$label',
     domain_description='$desc',
-    domain_domain_name='$domain_name',
+    domain_name='$domain_name',
     domain_alias='$alias'
   WHERE domain_id='$d_id'";
 

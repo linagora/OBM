@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
+$l_smb = "Windows";
 $l_system = "Systeme";
 $l_email = "E-mail";
 $l_mailing = "Liste de diffusion";
@@ -28,8 +29,6 @@ $l_firstname = "Prénom";
 $l_function = "Fonction";
 
 // Actions
-$l_insert = "Enregistrer le groupe";
-$l_delete = "Supprimer le groupe";
 $l_add = "Ajouter ces groupes";
 
 // Messages
@@ -65,5 +64,6 @@ $l_cant_delete_system = "Les groupes système ne peuvent être supprimés !";
 $l_cant_delete_public = "Les groupes publics ne peuvent être supprimés que par leur créateur !";
 $l_can_delete = "Le groupe peut être supprimé.";
 $l_cant_delete = "Le groupe ne peut être supprimé !";
-
+$l_err_system_samba = "La modification des droits windows d'un groupe système n'est pas autorisée.";
+$l_cant_update_smb_group = "Les groupes Windows par défaut sont gérés automatiquement par Aliamin et ne peuvent être modifiés par l'interface.";
 $l_add_groups = "Ajouter des groupes";

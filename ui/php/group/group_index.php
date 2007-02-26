@@ -108,6 +108,8 @@ if (($action == "index") || ($action == "")) {
       } else {
 	$params["group_id"] = run_query_group_insert($params);
 	if ($params["group_id"] > 0) {
+	  // ALIAMIN
+	  // update_update_state();
 	  $display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");
 	  $display["detail"] = dis_group_consult($params, $obm["uid"]);
 	} else {
@@ -119,8 +121,8 @@ if (($action == "index") || ($action == "")) {
     
     // Form data are not valid
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"] = html_group_form($action, "", $params);
+    $display["msg"] .= display_err_msg($err["msg"]);
+    $display["detail"] = html_group_form($action, "", $params, $err["field"]);
   }
 
 } elseif ($action == "update") {
@@ -128,15 +130,17 @@ if (($action == "index") || ($action == "")) {
   if (check_group_data_form($params)) {
     $retour = run_query_group_update($params);
     if ($retour) {
+      // ALIAMIN
+      // update_update_state();
       $display["msg"] .= display_ok_msg("$l_group : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_group : $l_update_error");
     }
     $display["detail"] = dis_group_consult($params, $obm["uid"]);
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err["msg"]);
     $params_q = run_query_group_detail($params["group_id"]);
-    $display["detail"] = html_group_form($action, $params_q, $params);
+    $display["detail"] = html_group_form($action, $params_q, $params, $err["field"]);
   }
 
 } elseif ($action == "check_delete") {
@@ -145,7 +149,7 @@ if (($action == "index") || ($action == "")) {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_group_can_delete($params["group_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_group_consult($params, $obm["uid"]);
   }
@@ -156,54 +160,92 @@ if (($action == "index") || ($action == "")) {
   if (check_group_can_delete($params["group_id"])) {
     $retour = run_query_group_delete($params["group_id"]);
     if ($retour) {
+      // ALIAMIN
+      // update_update_state();
       $display["msg"] .= display_ok_msg("$l_group : $l_delete_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_group : $l_delete_error");
     }
     $display["search"] = html_group_search_form("");
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_group_consult($params, $obm["uid"]);
   }
 
 } elseif ($action == "user_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params["user_nb"] > 0) {
-    $nb = run_query_group_usergroup_insert($params);
-    $display["msg"] .= display_ok_msg("$nb $l_user_added");
+  // We forbid to update Window system groups
+  $g = get_group_info($params["group_id"]);
+  $gid = $g["gid"];
+  if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
+    $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
   } else {
-    $display["msg"] .= display_err_msg($l_no_user_added);
+    if ($params["user_nb"] > 0) {
+      $nb = run_query_group_usergroup_insert($params);
+      // ALIAMIN
+      // update_update_state();
+      $display["msg"] .= display_ok_msg("$nb $l_user_added");
+    } else {
+      $display["msg"] .= display_err_msg($l_no_user_added);
+    }
   }
   $display["detail"] = dis_group_consult($params, $obm["uid"]);
 
 } elseif ($action == "user_del") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params["user_nb"] > 0) {
-    $nb = run_query_group_usergroup_delete($params);
-    $display["msg"] .= display_ok_msg("$nb $l_user_removed");
+  // We forbid to update Window system groups
+  $g = get_group_info($params["group_id"]);
+  $gid = $g["gid"];
+  if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
+    $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
   } else {
-    $display["msg"] .= display_err_msg($l_no_user_deleted);
+    if ($params["user_nb"] > 0) {
+      $nb = run_query_group_usergroup_delete($params);
+      // ALIAMIN
+      // update_update_state();
+      $display["msg"] .= display_ok_msg("$nb $l_user_removed");
+    } else {
+      $display["msg"] .= display_err_msg($l_no_user_deleted);
+    }
   }
   $display["detail"] = dis_group_consult($params, $obm["uid"]);
 
 } elseif ($action == "group_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params["group_nb"] > 0) {
-    $nb = run_query_group_group_insert($params);
-    $display["msg"] .= display_ok_msg("$nb $l_group_added");
+  // We forbid to update Window system groups
+  $g = get_group_info($params["group_id"]);
+  $gid = $g["gid"];
+  if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
+    $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
   } else {
-    $display["msg"] .= display_err_msg($l_no_group_added);
+    if ($params["group_nb"] > 0) {
+      $nb = run_query_group_group_insert($params);
+      // ALIAMIN
+      // update_update_state();
+      $display["msg"] .= display_ok_msg("$nb $l_group_added");
+    } else {
+      $display["msg"] .= display_err_msg($l_no_group_added);
+    }
   }
   $display["detail"] = dis_group_consult($params, $obm["uid"]);
 
 } elseif ($action == "group_del") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params["group_nb"] > 0) {
-    $nb = run_query_group_group_delete($params);
-    $display["msg"] .= display_ok_msg("$nb $l_group_removed");
+  // We forbid to update Window system groups
+  $g = get_group_info($params["group_id"]);
+  $gid = $g["gid"];
+  if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
+    $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
   } else {
-    $display["msg"] .= display_err_msg($l_no_group_deleted);
+    if ($params["group_nb"] > 0) {
+      $nb = run_query_group_group_delete($params);
+      // ALIAMIN
+      // update_update_state();
+      $display["msg"] .= display_ok_msg("$nb $l_group_removed");
+    } else {
+      $display["msg"] .= display_err_msg($l_no_group_deleted);
+    }
   }
   $display["detail"] = dis_group_consult($params, $obm["uid"]);
 
@@ -230,15 +272,25 @@ if (($action == "index") || ($action == "")) {
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_group_admin_index();
+
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 } else if ($action == "ext_get_ids") {
-  $display["search"] = html_group_search_form($params);
-  if ($set_display == "yes") {
-    $display["result"] = dis_group_search_group($params);
+  // We forbid to update Window system groups XXXX this test here ???
+  $g = get_group_info($params["id"]);
+  $gid = $g["gid"];
+  if (( $params["ext_action"] == "group_add") &&
+      (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) ) {
+    $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
+    $display["detail"] = "<a href=\"\" onclick='window.close();'>$l_close</a>";
   } else {
-    $display["msg"] .= display_info_msg($l_no_display);
+    $display["search"] = html_group_search_form($params);
+    if ($set_display == "yes") {
+      $display["result"] = dis_group_search_group($params);
+    } else {
+      $display["msg"] .= display_info_msg($l_no_display);
+    }
   }
 }
 

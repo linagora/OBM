@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
     <title>Login - OBM $obm_version</title>
-    <link rel="stylesheet" type="text/css" href="http://jaguar.aliacom.local//o/images/themes/default/styles/style.css" />
+    <link rel="stylesheet" type="text/css" href="http://obm/images/themes/default/styles/style.css" />
     <style>
       body {
         text-align: center;
@@ -32,15 +32,18 @@
       <fieldset class="detail">
         <legend class="error" >$error</legend>
         <table>
-          <tr>
-            <th>$l_login </th><td><input type="text" name="login" value="$login" /></td>
-          </tr>
-          <tr>
-            <th>$l_password </th><td><input type="password" name="password" value="" /></td>
-          </tr>
-          <tr>
-            <th>$domain </th><td>$sel_domain</td>
-          </tr>        
+        <tr>
+          <th>$l_login </th>
+          <td><input type="text" name="login" value="$login" /></td>
+        </tr>
+        <tr>
+          <th>$l_password </th>
+          <td><input type="password" name="password" value="" /></td>
+        </tr>
+        <tr>
+          <th>$domain </th>
+          <td>$sel_domain</td>
+        </tr>        
         </table>
       </fieldset>
       <fieldset class="buttons">
@@ -48,7 +51,7 @@
       </fieldset>
     </form>
     <p id="aliasource">
-    <a href="http://www.aliasource.fr">Aliasource</a>
+    <a href="http://www.aliasource.fr">AliaSource</a>
     </p>
     $login_javascript_footer  
   </body>

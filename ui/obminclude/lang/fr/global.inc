@@ -178,7 +178,7 @@ $l_down = "Déscendre le champ d'une ligne";
 $l_up = "Monter le champ d'une ligne";
 
 // Global display
-$l_last_visit = "Bookmarks";
+$l_last_visit = "Dernières visites";
 
 // OBM_DISPLAY help screen
 $l_help = "Aide";
@@ -226,7 +226,8 @@ $l_section_prod   = "Production";
 $l_section_compta = "Comptabilité";
 $l_section_user   = "Annuaire";
 $l_section_admin  = "Administration";
-$l_section_my = "Mon compte";
+$l_section_dic    = "Dictionnaire";
+$l_section_my     = "Mon compte";
 
 $l_module_company = "Sociétés";
 $l_module_contact = "Contacts";
@@ -254,20 +255,21 @@ $l_module_user = "Utilisateurs";
 $l_module_resource = "Ressources";
 $l_module_group = "Groupes";
 $l_module_resourcegroup = "Groupes de ressources";
-$l_module_host = "Hôte";
+$l_module_host = "Hôtes";
 $l_module_mailshare = "Partages Mail";
 
-$l_module_admin = "Administration";
 $l_module_admin_lang = "Langue";
 $l_module_admin_data = "Données";
 $l_module_admin_pref = "Préférences";
 $l_module_admin_code = "Code";
 $l_module_admin_ref = "Référentiel";
+
+$l_module_control = "Tableau de bord système";
+$l_module_admin = "Connexions";
 $l_module_import = "Import";
 $l_module_backup = "Sauvegarde";
-$l_module_control = "Tableau de bord";
-$l_module_host = "Hôtes";
 $l_module_mailserver = "Serveurs de mail";
+$l_module_samba = "Serveur Samba (Windows PDC)";
 
 $l_module_settings = "Configuration";
 $l_module_password = "Mot de passe";

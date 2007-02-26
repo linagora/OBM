@@ -31,7 +31,7 @@ function run_query_mailshare_search($mailshare) {
   $limit = sql_limit($db_type);
   $timeupdate = sql_date_format($db_type,"mailsharedir_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"mailsharedir_timecreate", "timecreate");
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain("mailsharedir");
 
   $where = "(1=1)";
   if ($name != '') {

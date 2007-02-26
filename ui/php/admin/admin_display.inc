@@ -43,11 +43,13 @@ function dis_admin_index($mode, $lifetime) {
   case "html":
     $nb_user_ses = get_admin_usersession_number();
     $obm_u = run_query_admin_active_user($lifetime);
-    html_admin_status($lifetime, $nb_user_ses, $obm_u);
+    $block = html_admin_status($lifetime, $nb_user_ses, $obm_u);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
   }
+
+  return $block;
 }
 
 
@@ -92,9 +94,9 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
       </tr>";
   }
   
-	$multidomain = $c_multidomain == true ? "Multi" : "Single";
+  $multidomain = $c_multidomain == true ? "Multi" : "Single";
 	 
-  echo "
+  $block = "
     <div class=\"detail infos\">
     <h1>$l_check</h1>
     <table>
@@ -137,9 +139,6 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     </div>
     </form>
        
-       
- 
-
     <div class=\"detail extra\">
     <h1>$l_session_stats</h1>
     <table class=\"spreadSheet\">
@@ -175,8 +174,9 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     </tbody>
     </table>
     </div>
-
 ";
+
+  return $block;
 }
 
 

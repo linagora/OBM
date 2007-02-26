@@ -237,10 +237,6 @@ if ($cgp_show["module"]["document"]) {
                                'Right'=> $cright_read);
 }
 
-$modules["admin"] = array('Name'=> $l_module_admin,
-                  'Ico' => "$ico_admin",
-                  'Url' => "$path/admin/admin_index.php?mode=html",
-                  'Right'=> $cright_read_admin);
 $modules["admin_code"] = array('Name'=> $l_module_admin_code,
                   'Ico' => "$ico_code",
 		  'Url' => "$path/admin_code/admin_code_index.php?mode=html",
@@ -261,6 +257,15 @@ $modules["admin_ref"] = array('Name'=> $l_module_admin_ref,
                   'Ico' => "$ico_ref",
                   'Url' => "$path/admin_ref/admin_ref_index.php",
                   'Right'=> $cright_read_admin);
+
+$modules["admin"] = array('Name'=> $l_module_admin,
+                  'Ico' => "$ico_admin",
+                  'Url' => "$path/admin/admin_index.php?mode=html",
+                  'Right'=> $cright_read_admin);
+$modules["control"] = array('Name'=> $l_module_control,
+                  'Ico' => "$ico_control",
+                  'Url' => "$path/control/control_index.php",
+                  'Right'=> $cright_read_admin);
 $modules["import"] = array('Name'=> $l_module_import,
                   'Ico' => "$ico_import",
                   'Url' => "$path/import/import_index.php",
@@ -276,6 +281,10 @@ $modules["domain"] = array('Name'=> $l_module_domain,
 $modules["mailserver"] = array('Name'=> $l_module_mailserver,
                   'Ico' => "$ico_mailserver",
                   'Url' => "$path/mailserver/mailserver_index.php",
+                  'Right'=> $cright_read_admin);
+$modules["samba"] = array('Name'=> $l_module_samba,
+                  'Ico' => "$ico_samba",
+                  'Url' => "$path/samba/samba_index.php",
                   'Right'=> $cright_read_admin);
 
 if ($cgp_show["module"]["account"]) {

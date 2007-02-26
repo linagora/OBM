@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0pre19";
+$obm_version = "2.0pre20";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -218,6 +218,7 @@ $cgp_show["section"]["prod"]["url"] = "$path/time/time_index.php";
 $cgp_show["section"]["compta"]["url"] = "$path/invoice/invoice_index.php";
 $cgp_show["section"]["user"]["url"] = "$path/settings/settings_index.php";
 $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
+$cgp_show["section"]["dic"]["url"] = "$path/admin_ref/admin_ref_index.php?mode=html";
 $cgp_show["section"]["my"]["url"] = "$path/settings/settings_index.php";
 //$cgp_show["section"]["aliamin"]["url"] = "http://aliamin/";
 
@@ -246,15 +247,17 @@ $cgp_show["module"]["resource"] = "user";
 $cgp_show["module"]["resourcegroup"] = "user";
 $cgp_show["module"]["host"] = "user";
 $cgp_show["module"]["mailshare"] = "user";
+$cgp_show["module"]["control"] = "admin";
 $cgp_show["module"]["admin"] = "admin";
-$cgp_show["module"]["admin_pref"] = "admin";
-$cgp_show["module"]["admin_data"] = "admin";
-$cgp_show["module"]["admin_lang"] = "admin";
-$cgp_show["module"]["admin_code"] = "admin";
-$cgp_show["module"]["admin_ref"] = "admin";
 $cgp_show["module"]["import"] = "admin";
 $cgp_show["module"]["backup"] = "admin";
 $cgp_show["module"]["mailserver"] = "admin";
+$cgp_show["module"]["samba"] = "admin";
+$cgp_show["module"]["admin_pref"] = "dic";
+$cgp_show["module"]["admin_data"] = "dic";
+$cgp_show["module"]["admin_lang"] = "dic";
+$cgp_show["module"]["admin_code"] = "dic";
+$cgp_show["module"]["admin_ref"] = "dic";
 $cgp_show["module"]["settings"] = "my";
 $cgp_show["module"]["password"] = "my";
 $cgp_show["module"]["mailforward"] = "my";

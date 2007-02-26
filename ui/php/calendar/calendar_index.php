@@ -45,6 +45,8 @@ require_once("$obminclude/of/of_category.inc");
 get_calendar_action();
 $perm->check_permissions($module, $action);
 
+$cal_entity_id = $_SESSION['cal_entity_id'];
+
 page_close();
 $max_display = 200;
 // If a group has just been selected, automatically select all its members

@@ -314,7 +314,7 @@ function of_domain_get_list() {
   $obm_q = new DB_OBM;
   $query = "SELECT domain_id,
       domain_label,
-      domain_domain_name
+      domain_name
     FROM Domain";
   display_debug_msg($query, $cdg_sql, "of_domain_get_list()");
   $obm_q->query($query);
@@ -348,7 +348,7 @@ function of_domain_get_domain_infos($d_id) {
   if ($d_id > 0) {
     $query = "SELECT domain_id,
       domain_label,
-      domain_domain_name
+      domain_name
     FROM Domain
     WHERE domain_id = '$d_id'";
     display_debug_msg($query, $cdg_sql, "of_domain_get_domain_infos()");

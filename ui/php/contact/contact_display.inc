@@ -1658,25 +1658,32 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     <tr>
       <th>$l_lastname</th>
       <td><input type=\"text\" name=\"tf_lname\" size=\"30\" maxlength=\"64\" value=\"$lname\" /></td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_firstname</th>
       <td><input type=\"text\" name=\"tf_fname\" size=\"30\" maxlength=\"64\" value=\"$fname\" /></td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_aka</th>
       <td><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_kind</th>
       <td> $sel_kind_lang $sel_kind_label $l_letter : $sel_kind_header </td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_datasource</th> 
       <td>$sel_dsrc</td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_private</th>
       <td>$display_private</td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_archive</th>
       <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_company</th>
       <td>$dis_company</td>
     </tr>
@@ -1738,7 +1745,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     <fieldset class=\"detail extra\">
     <legend>$l_comment1</legend>
       $l_add_comment1
-      
+
       <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>$sel_usercomment
       <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
       $dis_comment

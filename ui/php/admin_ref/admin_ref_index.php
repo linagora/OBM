@@ -37,7 +37,7 @@ $module = "admin_ref";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc"); 
-$params = get_admin_ref_param();
+$params = get_admin_ref_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 
@@ -232,7 +232,7 @@ display_page($display);
 // Stores Admin Ref parameters transmited in $params hash
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_admin_ref_param() {
+function get_admin_ref_params() {
 
   $params = get_global_params("admin_ref");
 

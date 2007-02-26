@@ -26,6 +26,7 @@ function html_forward_consult($usr_q) {
   $nomade_enable = $usr_q->f("userobm_nomade_enable");
   $nomade_local_copy = $usr_q->f("userobm_nomade_local_copy");    
 
+  print_r($obm);
   $domain = $obm["domain_name"];
 
   if (! $nomade_perms) {
@@ -57,7 +58,7 @@ function html_forward_consult($usr_q) {
     <table>
     <tr>
       <th>$l_internal_email</th>
-      <td>$email (@$domain)</td>
+      <td>$email (@$obm[domain_name])</td>
     </tr>
     $dis_nomade
     </table>";

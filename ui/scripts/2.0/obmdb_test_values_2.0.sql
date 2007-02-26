@@ -110,8 +110,8 @@ INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALU
 -------------------------------------------------------------------------------
 DELETE FROM Domain;
 
-INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 1', '', 'aliacom.fr', NULL );
-INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 2', '', 'test1.aliacom.fr', 'test2.aliacom.fr\r\ntest3.aliacom.com' );
+INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 1', '', 'aliacom.fr', NULL );
+INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 2', '', 'test1.aliacom.fr', 'test2.aliacom.fr\r\ntest3.aliacom.com' );
 
 
 -------------------------------------------------------------------------------

@@ -1481,7 +1481,7 @@ CREATE TABLE Domain (
   domain_userupdate     int(8),
   domain_label          varchar(32) NOT NULL,
   domain_description    varchar(255),
-  domain_domain_name    varchar(128),
+  domain_name           varchar(128),
   domain_alias          text,
   PRIMARY KEY (domain_id)
 );

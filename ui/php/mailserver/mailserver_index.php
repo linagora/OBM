@@ -29,9 +29,9 @@ require("mailserver_display.inc");
 require_once("$obminclude/of/of_category.inc");
 
 get_mailserver_action();
-if($action == "index") {
+if ($action == "index") {
   $mode = run_query_mailserver_count();
-  if($mode->nf() == 0) {
+  if ($mode->nf() == 0) {
     $action = "new";
   } elseif($mode->nf() == 1) {
     $params["id"] = $mode->f("mailserver_id");
@@ -45,38 +45,43 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $ms_q = run_query_mailserver_getall();
   $display["result"] = dis_mailserver_list($ms_q);
-} elseif($action == "new") {
+
+} elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_mailserver_form($action, $params);
-} elseif($action == "insert") {
+
+} elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_mailserver_data_form($params)) {
     $params["id"] =  run_query_mailserver_insert($params);
     $ms_q = run_query_mailserver_details($params["id"]);
     $net_q = run_query_mailserver_networks($params["id"]);
-    $display["detail"] = dis_mailserver_consult($ms_q,$net_q);
+    $display["detail"] = dis_mailserver_consult($ms_q, $net_q);
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_mailserver_form($action, $params, null);
   }
-} elseif($action == "detailconsult") {
+
+} elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $ms_q = run_query_mailserver_details($params["id"]);
   $net_q = run_query_mailserver_networks($params["id"]);
   $display["detail"] = dis_mailserver_consult($ms_q,$net_q);    
-} elseif($action == "checkdelete") {
+
+} elseif ($action == "checkdelete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_change_mailserver($params["id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_mailserver($params["id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $ms_q = run_query_mailserver_details($params["id"]);
     $net_q = run_query_mailserver_networks($params["id"]);
     $display["detail"] = dis_mailserver_consult($ms_q,$net_q);      
   }
-} elseif($action == "delete") {
+
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_change_mailserver($params["id"])) {
     $retour = run_query_mailserver_delete($params["id"]);
@@ -88,18 +93,20 @@ if ($action == "index") {
     $ms_q = run_query_mailserver_getall();
     $display["result"] = dis_mailserver_list($ms_q);    
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $ms_q = run_query_mailserver_details($params["id"]);
     $net_q = run_query_mailserver_networks($params["id"]);
     $display["detail"] = dis_mailserver_consult($ms_q,$net_q);  
   }
-} elseif($action == "detailupdate") {
+
+} elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $ms_q = run_query_mailserver_details($params["id"]);
   $net_q = run_query_mailserver_networks($id);
   $display["detail"] = dis_mailserver_form($action, $params, $ms_q, $net_q);
-}elseif($action == "update") {
+
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_mailserver_data_form($params)) {
     run_query_mailserver_update($params);
@@ -107,10 +114,11 @@ if ($action == "index") {
     $net_q = run_query_mailserver_networks($params["id"]);
     $display["detail"] = dis_mailserver_consult($ms_q,$net_q);
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_mailserver_form($action, $params, null);
   }
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
@@ -123,12 +131,14 @@ $display["header"] = display_menu($module);
 display_page($display);
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores in $params hash, Calendar parameters transmited
+// Stores in $params hash, Mailserver parameters transmited
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_mailserver_params() {
+
   // Get global params
-  $params = get_global_params("Entity");
+  $params = get_global_params("mailserver");
+
   return $params;
 }
 

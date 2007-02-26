@@ -21,12 +21,12 @@ function dis_mailserver_list($ms_q) {
     $rip = $ms_q->f("relayhost_ip");
     ($i++%2==0)?$class="pair":$class="";
     $dis_mailserver .= "
-      <tr class=\"$class\">
+    <tr class=\"$class\">
       <td><a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&amp;id=$id\">$name</a></td>
       <td>$ip</td> 
       <td>$rname</a></td>
-      <td>$rip</td></tr>  
-    ";
+      <td>$rip</td>
+    </tr>";
   }
   $block = "
   <div class=\"result\">
@@ -40,9 +40,11 @@ function dis_mailserver_list($ms_q) {
   $dis_mailserver
   </tbody>
   </table>
-  ";
+";
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Mail Server Form
 // Parameters:
@@ -55,57 +57,58 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
   global $l_networks, $l_host, $l_ip,$l_none,$l_update,$l_insert;
   global $ico_add, $ico_delete,$l_relayhost,$php_regexp_network,$php_regexp_ip;
 
-  if($action == "detailupdate") {
+  if ($action == "detailupdate") {
     $id = $ms_q->f("mailserver_id");
     $host_id = $ms_q->f("mailserver_host_id");
     $relayhost_id = $ms_q->f("mailserver_relayhost_id");
     while($net_q->next_record()) {
-      if($net_q->f("mailservernetwork_host_id") == $host_id) {
+      if ($net_q->f("mailservernetwork_host_id") == $host_id) {
         $dis_mailserver_networks .= "
-        <tr>
+      <tr>
         <td><img src=\"$ico_delete\" alt=\"Remove\" onclick=\"deleteIpRow(this)\"/></td>
         <td>
         <input type=\"text\" onkeyup=\"checkIp(this)\" onblur=\"transformIp(this)\"  name=\"mailserver_networks[]\" value=\"".$net_q->f("mailservernetwork_ip")."\" />
-        </td></tr>
-        ";
+        </td>
+      </tr>";
       } else {
         $dis_relayhost_networks .= "
-        <tr>
+      <tr>
         <td><img src=\"$ico_delete\" alt=\"Remove\" onclick=\"deleteIpRow(this)\"/></td>
         <td>
         <input type=\"text\" onkeyup=\"checkIp(this)\" onblur=\"transformIp(this)\" name=\"relayhost_networks[]\" value=\"".$net_q->f("mailservernetwork_ip")."\" />
-        </td></tr>
-        ";
+        </td>
+      </tr>
+";
 
       }
     }
   }
-  if(isset($mailserver["id"])) $id = $mailserver["id"] ;
-  if(isset($mailserver["host_id"])) $host_id = $mailserver["host_id"] ;
-  if(isset($mailserver["relayhost_id"])) $relayhost_id = $mailserver["relayhost_id"];
-  if(isset($mailserver["mailserver_networks"])) {
+  if (isset($mailserver["id"])) $id = $mailserver["id"] ;
+  if (isset($mailserver["host_id"])) $host_id = $mailserver["host_id"] ;
+  if (isset($mailserver["relayhost_id"])) $relayhost_id = $mailserver["relayhost_id"];
+  if (isset($mailserver["mailserver_networks"])) {
     foreach($mailserver["mailserver_networks"] as $network) {
-      if($network != "") {
+      if ($network != "") {
         $dis_mailserver_networks .= "
-        <tr>
+      <tr>
         <td><img src=\"$ico_delete\" alt=\"Remove\" onclick=\"deleteIpRow(this)\"/></td>
         <td>
         <input type=\"text\" onkeyup=\"checkIp(this)\" onblur=\"transformIp(this)\"  name=\"mailserver_networks[]\" value=\"$network\" />
-        </td></tr>
-        ";
+        </td>
+      </tr>";
       }
     }
   }
-  if(isset($mailserver["relayhost_networks"])) {
+  if (isset($mailserver["relayhost_networks"])) {
     foreach($mailserver["relayhost_networks"] as $network) {
-      if($network != "") {
+      if ($network != "") {
         $dis_relayhost_networks .= "
-        <tr>
+      <tr>
         <td><img src=\"$ico_delete\" alt=\"Remove\" onclick=\"deleteIpRow(this)\"/></td>
         <td>
         <input type=\"text\" onkeyup=\"checkIp(this)\" onblur=\"transformIp(this)\" name=\"relayhost_networks[]\" value=\"$network\" />
-        </td></tr>
-        ";
+        </td>
+      </tr>";
       }
     }
   }
@@ -125,10 +128,10 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
   $host_q = run_query_mailserver_server_host($id);
   $ms_select = "<select name=\"host_id\">";
   while($host_q->next_record()) {
-    if($host_id == $host_q->f("host_id")) {
+    if ($host_id == $host_q->f("host_id")) {
       $selected = "selected=\"selected\"";
       $host_label = $host_q->f("host_name");
-    }else {
+    } else {
       $selected="";
     }   
     $ms_select .= "<option $selected value=\"".$host_q->f("host_id")."\">".$host_q->f("host_name")."</option>";
@@ -144,21 +147,19 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
   }
   $rh_select .= "</select>";
 
-  if(isset($id) && !check_can_change_mailserver($id)) {
+  if (isset($id) && !check_can_change_mailserver($id)) {
     $dis_host = "
     <tr>
       <th>$l_host</th>
       <td>$host_label</td>
-    </tr>
-    ";
+    </tr>";
       
   } else {
     $dis_host = "
     <tr>
       <th>$l_host</th>
       <td>$ms_select</td>
-    </tr>
-    ";
+    </tr>";
   }
 
   $block = "
@@ -260,10 +261,12 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
         return true;
       }
     </script>
-    ";
+";
   
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Mail Server Consult
 ///////////////////////////////////////////////////////////////////////////////
@@ -279,22 +282,22 @@ function dis_mailserver_consult($ms_q,$net_q) {
   $mailserver_host_id = $ms_q->f("mailserver_host_id");
 
   while($net_q->next_record()) {
-    if($net_q->f("mailservernetwork_host_id") == $mailserver_host_id) {
+    if ($net_q->f("mailservernetwork_host_id") == $mailserver_host_id) {
       $dis_mailserver_networks .= "
-      <tr>
+    <tr>
       <th>$l_network</th>
       <td>
       ".$net_q->f("mailservernetwork_ip")."
-      </td></tr>
-      ";
+      </td>
+    </tr>";
     } else {
       $dis_relayhost_networks .= "
-      <tr>
+    <tr>
       <th>$l_network</th>
       <td>
       ".$net_q->f("mailservernetwork_ip")."
-      </td></tr>
-      ";        
+      </td>
+    </tr>";        
     }
   }
   $block = "
@@ -307,8 +310,8 @@ function dis_mailserver_consult($ms_q,$net_q) {
     </tr>
     $dis_mailserver_networks
     </table>
-    </div>" ;
-  if($relayhost_host_id) {
+    </div>";
+  if ($relayhost_host_id) {
     $block .="
     <div class=\"detail infos\">
     <h1>$l_relayhost</h1>
@@ -320,11 +323,13 @@ function dis_mailserver_consult($ms_q,$net_q) {
     $dis_relayhost_networks
     </table>
     </div>
-  ";
+";
   }
-  return $block;
 
+  return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Mail Server Delete
 ///////////////////////////////////////////////////////////////////////////////

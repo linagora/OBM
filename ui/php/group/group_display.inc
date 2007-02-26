@@ -16,6 +16,7 @@ $fieldnames["group_system"] = $l_system;
 $fieldnames["group_privacy"] = $l_private;
 $fieldnames["group_local"] = $l_local;
 $fieldnames["group_ext_id"] = $l_ext_id;
+$fieldnames["group_samba"] = $l_smb;
 $fieldnames["group_desc"] = $l_desc;
 $fieldnames["group_email"] = $l_email;
 $fieldnames["group_mailing"] = $l_mailing;
@@ -42,7 +43,7 @@ $fieldnames["group_user_email"] = $l_email;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_group(&$OD, $fieldname, $link_ok) {
-  global $path, $ico_mail, $ico_web, $ico_contact_new,$params;
+  global $path, $obm, $params, $ico_mail;
 
   if (($fieldname == "group_name") && $link_ok) {
     $res["url"] = "$path/group/group_index.php?action=detailconsult&amp;group_id=".$OD->data_set->f("group_id");
@@ -72,6 +73,16 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
     }
   }
 
+  else if ($fieldname == "group_samba") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
+  }
+
   else if ($fieldname == "group_local") {
     $res["align"] = "center";
     if ($OD->data_set->f($fieldname)) {
@@ -85,22 +96,22 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "group_nb_user") {
     $nb_q = new DB_OBM;
     $id = $OD->data_set->f("group_id");
-    $query = "select count(*) from UserObmGroup where userobmgroup_group_id='$id'";
+    $query = "SELECT count(*) FROM UserObmGroup WHERE userobmgroup_group_id='$id'";
     $nb_q->query($query);
     $nb_q->next_record();
     $res["name"] = $nb_q->f(0);
     $res["align"] = "center";
   }
+
   // For User member lists
-  elseif (($fieldname == "group_user_lastname")  && $link_ok) {
-    if ($cgp_show["module"]["user"]) { 
-      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("group_user_id");
-    }
+  elseif (($fieldname == "group_user_lastname") && $link_ok) {
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("group_user_id");
   }
 
   else if ($fieldname == "group_email") {
     $email = $OD->data_set->f("group_email");
     if (strcmp($email,"") != 0) {
+      $email .= "@".$obm["domain_name"];
       $res["url"] = "mailto:$email";
       $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\" />";
       $res["txt_name"] = $email;
@@ -305,123 +316,6 @@ function html_group_search_group($obm_q, $prefs, $group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Group Form
-// Parameters :
-//   - $action    : action called
-//   - $group_q   : DBO : information about the group (null for new group)
-//   - $group[]   : default or transmitted values
-//     keys used  : name, desc, usercreate
-///////////////////////////////////////////////////////////////////////////////
-function html_group_form($action, $group_q, $group) {
-  global $cgroup_private_default, $l_group, $l_name, $l_desc, $l_email, $l_mailing;
-  global $l_private, $l_insert, $l_update, $l_back;
-  global $obm;
-  
-  // if update mode and first time, values are taken from db
-  if ($action == "detailupdate") {
-    $id = $group_q->f("group_id");
-    $usercreate = $group_q->f("group_usercreate");
-    $name = $group_q->f("group_name");
-    $desc = $group_q->f("group_desc");
-    $email = $group_q->f("group_email");
-    $priv = $group_q->f("privacy");
-    $mailing = $group_q->f("group_mailing");
-  } elseif ($action == "new") {
-    if ($cgroup_private_default) {
-      $private_c = " checked";
-      $mail_class = "H";
-    }
-  }
-
-  // If parameters have been given, they supercede the default action value
-  if (isset($group["group_id"])) { $id = $group["group_id"]; }
-  if (isset($group["name"])) { $name = stripslashes($group["name"]); }
-  if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
-  if (isset($group["email"])) { $email = stripslashes($group["email"]); }
-  if (isset($group["privacy"])) { $priv = stripslashes($group["privacy"]); }
-  if (isset($group["mailing"])) { $mailing = stripslashes($group["mailing"]); }
-
-  // If new group or group update and user is owner, display visibility
-  if ( ($action == "new") || ($action == "insert") ||
-       ( (($action == "detailupdate") || ($action == "update")) &&
-         ($usercreate == $obm["uid"]) ) ) {
-    if ($priv == '1') {
-      $private_c = " checked";
-      $mail_class = "H";
-    }
-    if ($mailing == '1') {
-      $mailing_c = " checked";
-    }
-    $dis_private = "
-  <tr>
-    <th>$l_private</th>
-    <td><input name=\"cba_privacy\" type=\"checkbox\" onchange=\"($(this).getValue())?$('emailGroup').addClassName('H'):$('emailGroup').removeClassName('H')\" value=\"1\" $private_c /></td>
-  </tr>";
-  } 
-
-  $dis_mailing = "
-  <tr>
-    <th>$l_mailing</th>
-    <td><input name=\"cba_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
-  </tr>";
-  $block_userdata = of_userdata_dis_entity_form("group", $id, $group);
-
-  $block = "
-  <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
-<fieldset class=\"detail infos\">
-  <legend>$l_group</legend>
-
-  <table>
-  <tr>
-    <th>$l_name</th>
-    <td>
-      <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
-  </tr>
-  $dis_private
-  <tr id=\"emailGroup\" class=\"$mail_class\">
-    <th>$l_email</th>
-    <td>
-      <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
-  </tr>
-  $dis_mailing
-  </table>
-  </fieldset>
-
-<fieldset class=\"detail infos\">
-  <legend>$l_desc</legend>
-
-<table>
- <tr>
-    <th>$l_desc</th>
-    <td>
-      <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
-  </tr>
-  $block_userdata
-  </table>
-  </fieldset>";
-
-
-  if (($action == "detailupdate") || ($action == "update")) {
-    $dis_but = "
-      <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
-      <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"submit\" value=\"$l_update\" />";
-
-  } else {
-    $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\" />";
-  }
-
-  $block .= "<fieldset class=\"buttons\">
-    $dis_but
-    </fieldset>
-    </form>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display Group Consultation
 // Parameters:
 //   - $group[] : group parameters
@@ -469,9 +363,12 @@ function dis_group_consult($group, $uid) {
 function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $l_yes, $l_no, $ico_mail;
   global $l_group, $l_name, $l_desc, $l_email, $l_mailing, $l_no_user, $l_no_group_group;
-  global $l_system, $l_local, $l_ext_id;
+  global $l_system, $l_local, $l_ext_id, $l_smb;
+  global $l_visibility, $l_private, $l_public;  
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
-  global $display, $perm, $module, $action, $cright_write;
+  global $obm, $display, $perm, $module, $action, $cright_write;
+  global $cg_gid_smb_user, $cg_gid_smb_admin;
+  global $cgp_use, $cgp_hide;
 
   $id = $group_q->f("group_id");
   $usercreate = $group_q->f("group_usercreate");
@@ -480,16 +377,36 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $timeupdate = $group_q->f("timeupdate");
   $system = ($group_q->f("group_system") == 1 ? $l_yes : $l_no);
   $local = ($group_q->f("group_local") == 1 ? $l_yes : $l_no);
+  $privacy = ($group_q->f("group_privacy") == 1 ? $l_private : $l_public);
   $ext_id = $group_q->f("group_ext_id");
   $name = $group_q->f("group_name");
   $desc = $group_q->f("group_desc");
   $email = $group_q->f("group_email");
   $mailing = ($group_q->f("group_mailing") == 1 ? $l_yes : $l_no);
-  //$mail = get_mail_info();
-  //$main_domain = $mail["main_domain"];
+
+  if ($email != "") {
+    $dis_email = "$email@$obm[domain_name]";
+  }
+
+  if ($cgp_use["service"]["samba"]) {
+    $samba = ($group_q->f("group_samba") == 1 ? $l_yes : $l_no);
+    $block_samba = "
+    <tr>
+      <th>$l_smb</td>
+      <td>$samba</td>
+    </tr>";
+  }
 
   $block_userdata .= of_userdata_dis_entity_consult("group", $id);
-  // Affichage des groupes membres 
+
+  // Prevent to update samba systems groups
+  $update_group = true;
+  if (($gid == $cg_gid_smb_admin) || ($gid == $cg_gid_smb_user)
+      || (! $perm->check_right($menu, $cright_write))) {
+    $update_group = false;
+  }
+
+  // Display members groups
   $nb_g = $g_q->num_rows_total();
   if ($nb_g == 0) {
     $message = $l_no_group_group;
@@ -497,8 +414,8 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     $message = "$nb_g $l_group_member";
   }
 
-  $block = display_info_msg($message);
-
+  //  $block_mg = display_info_msg($message);
+  $block_mg .= "<h1>$message</h1>";
 
   if ($nb_g != 0) {
     $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
@@ -508,18 +425,18 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "top";
 
-    if ($perm->check_right($module, $cright_write)) {
+    if ($update_group) {
       $dis_infos->data_cb_text = "X";
       $dis_infos->data_idfield = "child_id";
       $dis_infos->data_cb_name = "data-g-";
       $dis_infos->data_cb_field = "";
-      $block .= "<form method=\"get\" action=\"group_index.php\">";
+      $block_mg .= "<form method=\"get\" action=\"group_index.php\">";
     }
 
-    $block .= $dis_infos->display("dis_data_group");
+    $block_mg .= $dis_infos->display("dis_data_group");
 
-    if ($perm->check_right($module, $cright_write)) {
-      $block .= "
+    if ($update_group) {
+      $block_mg .= "
       <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_del_group_sel\" /> 
         <input type=\"hidden\" name=\"group_id\" value=\"$id\" /> 
@@ -529,7 +446,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     }
   }
 
-
   // registered Users display
   $nb_u = $u_q->num_rows_total();
   if ($nb_u == 0) {
@@ -538,7 +454,8 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     $message = "$nb_u $l_user_member";
   }
 
-  $block .= display_info_msg($message);
+  //  $block_mu .= display_info_msg($message);
+  $block_mu .= "<h1>$message</h1>";
 
   if ($nb_u != 0) {
 
@@ -548,18 +465,18 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "both";
 
-    if ($perm->check_right($module, $cright_write)) {
+    if ($update_group) {
       $dis_infos->data_cb_text = "X";
       $dis_infos->data_idfield = "group_user_id";
       $dis_infos->data_cb_name = "data-u-";
       $dis_infos->data_cb_field = "";
-      $block .= "<form method=\"get\" action=\"group_index.php\">";
+      $block_mu .= "<form method=\"get\" action=\"group_index.php\">";
     }
 
-    $block .= $dis_infos->display("dis_data_group");
+    $block_mu .= $dis_infos->display("dis_data_group");
 
-    if ($perm->check_right($module, $cright_write)) {
-      $block .= "
+    if ($update_group) {
+      $block_mu .= "
       <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_del_user_sel\" />
         <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
@@ -580,19 +497,29 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     <tr>
       <th>$l_name</th>
       <td>$name</td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_system</th>
       <td>$system</td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_local</th>
       <td>$local</td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_ext_id</th>
       <td>$ext_id</td>
-    </tr><tr>
+    </tr>
+    $block_samba
+    <tr>
+      <th>$l_visibility</th>
+      <td>$privacy</td>
+    </tr>
+    <tr>
       <th>$l_email</th>
-      <td>$email</td>
-    </tr><tr>
+      <td>$dis_email</td>
+    </tr>
+    <tr>
       <th>$l_mailing</th>
       <td>$mailing</td>
     </tr>
@@ -609,8 +536,148 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       <td>$desc</td>
     </tr>
     </table>
-  </div>";
+  </div>
 
+  <div class=\"detail extra\">
+  $block_mg
+  </div>
+  <div class=\"detail extra\">
+  $block_mu
+  </div>
+";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Group Form
+// Parameters :
+//   - $action   : action called
+//   - $group_q  : DBO : information about the group (null for new group)
+//   - $group[]  : default or transmitted values
+//   - $field    : [optionnal] : field in error
+///////////////////////////////////////////////////////////////////////////////
+function html_group_form($action, $group_q, $group, $field="") {
+  global $obm, $cgroup_private_default, $cgp_use;
+  global $l_group, $l_name, $l_desc, $l_smb, $l_email, $l_mailing;
+  global $l_private, $l_insert, $l_update, $l_back;
+  
+  // if update mode and first time, values are taken from db
+  if ($action == "detailupdate") {
+    $id = $group_q->f("group_id");
+    $usercreate = $group_q->f("group_usercreate");
+    $name = $group_q->f("group_name");
+    $system = $group_q->f("group_system");
+    $samba = $group_q->f("group_samba");
+    $desc = $group_q->f("group_desc");
+    $email = $group_q->f("group_email");
+    $priv = $group_q->f("privacy");
+    $mailing = $group_q->f("group_mailing");
+  } elseif ($action == "new") {
+    if ($cgroup_private_default) {
+      $private_c = " checked";
+      $mail_class = "H";
+    }
+  }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($group["group_id"])) { $id = $group["group_id"]; }
+  if (isset($group["name"])) { $name = stripslashes($group["name"]); }
+  if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
+  if (isset($group["email"])) { $email = stripslashes($group["email"]); }
+  if (isset($group["privacy"])) { $priv = stripslashes($group["privacy"]); }
+  if (isset($group["mailing"])) { $mailing = stripslashes($group["mailing"]); }
+
+  // Mark the error field
+  if ($field != "") {
+    $class[$field] = "error";
+  }
+
+  $block_userdata = of_userdata_dis_entity_form("group", $id, $group);
+
+  // If new group or group update and user is owner, display visibility
+  if ( ($action == "new") || ($action == "insert") ||
+       ( (($action == "detailupdate") || ($action == "update")) &&
+         ($usercreate == $obm["uid"]) ) ) {
+    if ($priv == '1') {
+      $private_c = " checked";
+      $mail_class = "H";
+    }
+    if ($mailing == '1') {
+      $mailing_c = " checked";
+    }
+    $dis_private = "
+  <tr>
+    <th>$l_private</th>
+    <td><input name=\"cba_privacy\" type=\"checkbox\" onchange=\"($(this).getValue())?$('emailGroup').addClassName('H'):$('emailGroup').removeClassName('H')\" value=\"1\" $private_c /></td>
+  </tr>";
+  } 
+
+  if ($cgp_use["service"]["samba"]) {
+    // Samba group checkbox checked value
+    $samba_state  = ($samba ? "checked" : "");
+
+    $block_samba = "
+  <tr>
+    <th class=\"$class[samba]\">$l_smb</th>
+    <td><input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state></td>
+  </tr>";
+  }
+
+  $dis_mailing = "
+  <tr>
+    <th>$l_mailing</th>
+    <td><input name=\"cba_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
+  </tr>";
+
+  $block = "
+  <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
+<fieldset class=\"detail infos\">
+  <legend>$l_group</legend>
+
+  <table>
+  <tr>
+    <th>$l_name</th>
+    <td><input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
+  </tr>
+  $dis_private
+  $block_samba
+  <tr id=\"emailGroup\" class=\"$mail_class\">
+    <th>$l_email</th>
+    <td><input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
+  </tr>
+  $dis_mailing
+  </table>
+  </fieldset>
+
+  <fieldset class=\"detail infos\">
+  <legend>$l_desc</legend>
+
+  <table>
+  <tr>
+    <th>$l_desc</th>
+    <td><input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
+  </tr>
+  $block_userdata
+  </table>
+  </fieldset>";
+
+  if (($action == "detailupdate") || ($action == "update")) {
+    $dis_but = "
+      <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
+      <input type=\"hidden\" name=\"action\" value=\"update\" />
+      <input type=\"submit\" value=\"$l_update\" />";
+
+  } else {
+    $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"submit\" value=\"$l_insert\" />";
+  }
+
+  $block .= "<fieldset class=\"buttons\">
+    $dis_but
+    </fieldset>
+    </form>";
 
   return $block;
 }
@@ -666,6 +733,9 @@ function dis_group_warn_insert($id, $g_q, $group) {
 
   $name = $group["name"];
   $desc = $group["desc"];
+  $samba = $group["samba"];
+  $email = $group["email"];
+  $mailing = $group["mailing"];
 
   $display["msg"] .= display_warn_msg($l_check_samegroup);
   while ($g_q->next_record()) {
@@ -678,6 +748,14 @@ function dis_group_warn_insert($id, $g_q, $group) {
       </li>";
   }
 
+  $hidden_fields = "
+    <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+    <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+    <input type=\"hidden\" name=\"cba_samba\" value=\"$samba\" />
+    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+    <input type=\"hidden\" name=\"cba_mailing\" value=\"$mailing\" />
+";
+
   $block = "
   <div class=\"detail\">
     <ul>
@@ -685,25 +763,24 @@ function dis_group_warn_insert($id, $g_q, $group) {
     </ul> 
   </div>
   <div class=\"buttons\">
-      <form method=\"post\" name=\"form_insert\"
-      action=\"" .url_prepare("group_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-      <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
-      <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
-      </form>
-      <form name=\"form_back\" method=\"get\"
-      action=\"" .url_prepare("group_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"new\" />
-      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-      <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>
+    <form method=\"post\" name=\"form_insert\"
+    action=\"" .url_prepare("group_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"insert\" />
+    <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
+    $hidden_fields
+    <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
+    </form>
+    <form name=\"form_back\" method=\"get\"
+    action=\"" .url_prepare("group_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"new\" />
+    $hidden_fields
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>
   </div>";
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the contact administration index

@@ -211,15 +211,15 @@ function get_group_id_from_gid($gid) {
 // Returns:
 //   - $gid : first free gid
 ///////////////////////////////////////////////////////////////////////////////
-function get_first_group_free_gid2() {
+function get_first_group_free_gid() {
   global $cdg_sql, $c_first_gid_user;
 
-  $query = "select group_gid
-    from UGroup
-    where group_gid >= '$c_first_gid_user'
-    order by group_gid";
+  $query = "SELECT group_gid
+    FROM UGroup
+    WHERE group_gid >= '$c_first_gid_user'
+    ORDER by group_gid";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_first_group_free_gid()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 

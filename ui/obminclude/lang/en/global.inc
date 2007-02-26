@@ -157,7 +157,7 @@ $l_control = "Dashboard";
 $l_host = "Host";
 
 // Global display
-$l_last_visit = "Bookmarks";
+$l_last_visit = "Last visits";
 
 // OBM_DISPLAY
 $l_entries = "Entries";
@@ -217,11 +217,12 @@ $l_daysofweekfirst = array ('S','M','T','W','T','F','S');
 // Theme headers lang files
 //---------------------------------------------------------------------------//
 
-$l_section_com    = "COMMERCIAL";
-$l_section_prod   = "PRODUCTION";
-$l_section_compta = "ACCOUTANCY";
-$l_section_user   = "USERS";
-$l_section_admin  = "ADMINISTRATION";
+$l_section_com    = "Commercial";
+$l_section_prod   = "Production";
+$l_section_compta = "Accoutancy";
+$l_section_user   = "Users";
+$l_section_admin  = "Administration";
+$l_section_dic    = "Dictionnary";
 $l_section_my  = "My account";
 
 $l_module_company = "Companies";
@@ -250,19 +251,21 @@ $l_module_user = "Users";
 $l_module_resource = "Resources";
 $l_module_group = "Groups";
 $l_module_resourcegroup = "Resources group";
+$l_module_host = "Hosts";
 $l_module_mailshare = "Mail shares";
 
-$l_module_admin = "Administration";
 $l_module_admin_lang = "Lang";
 $l_module_admin_data = "Data";
 $l_module_admin_pref = "Prefs";
 $l_module_admin_code = "Code";
 $l_module_admin_ref = "Referential";
+
+$l_module_admin = "Connections";
 $l_module_import = "Import";
 $l_module_backup = "Backup";
 $l_module_control = "Dashboard";
-$l_module_host = "Hosts";
 $l_module_mailserver = "Mail servers";
+$l_module_samba = "Samba Server";
 
 $l_module_settings = "Settings";
 $l_module_password = "Password";

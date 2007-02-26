@@ -25,12 +25,14 @@ CREATE TABLE Domain (
   domain_userupdate     int(8),
   domain_label          varchar(32) NOT NULL,
   domain_description    varchar(255),
-  domain_domain_name    varchar(128),
+  domain_name           varchar(128),
   domain_alias          text,
   PRIMARY KEY (domain_id)
 );
 
 INSERT INTO Domain VALUES (1,NOW(),NOW(),0,0,'Main','Main domain','localdomain','');
+
+
 --
 -- Update All tables to include Domain info
 --
@@ -270,12 +272,13 @@ ALTER TABLE UserObm ADD COLUMN userobm_education varchar(255) DEFAULT '' AFTER u
 
 
 ---------------------------------------------------------------------------
---Update Project table
+-- Update Project table
 ---------------------------------------------------------------------------
 ALTER TABLE Project ADD COLUMN project_reference_date varchar(32) DEFAULT '';
 ALTER TABLE Project ADD COLUMN project_reference_duration varchar(16) DEFAULT '';
 ALTER TABLE Project ADD COLUMN project_reference_desc text DEFAULT '';
 ALTER TABLE Project ADD COLUMN project_reference_tech text DEFAULT '';
+
 
 ----------------------------------------------------------------------------
 --Create CV table
@@ -295,6 +298,7 @@ CREATE TABLE CV (
   PRIMARY KEY(cv_id)
 );
 
+
 ----------------------------------------------------------------------------
 --Create ProjectCV table
 ----------------------------------------------------------------------------
@@ -305,6 +309,7 @@ CREATE TABLE ProjectCV (
   projectcv_role       varchar(128) DEFAULT '',
   PRIMARY KEY(projectcv_project_id, projectcv_cv_id)
 );
+
 
 ----------------------------------------------------------------------------
 --Create DefaultOdtTemplate table
@@ -321,8 +326,12 @@ CREATE TABLE DefaultOdtTemplate (
 
 
 ---------------------------------------------------------------------------
--- Update UserObm table from Aliamin
+-- Update UserObm table from Aliamin and to OBM2
 ---------------------------------------------------------------------------
+-- Update user infos to new datas
+UPDATE UserObm set userobm_theme='default';
+UPDATE UserObm set userobm_password_type='md5';
+
 -- Add existent column which had not been added
 ALTER TABLE UserObm ADD COLUMN userobm_mobile varchar(32) DEFAULT '' AFTER userobm_phone2;
 

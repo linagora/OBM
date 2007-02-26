@@ -27,7 +27,7 @@ $lang_file = "obminclude/lang/$set_lang_default/login.inc";
 include($lang_file);
 
 $conf_login_page = "$path/../conf/themes/login.html";
-if(file_exists($conf_login_page)) {
+if (file_exists($conf_login_page)) {
   $lp = $conf_login_page;
 } else {
   $lp = $login_template;
