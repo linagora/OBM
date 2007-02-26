@@ -151,7 +151,7 @@ if (($action == "index") || ($action == "")) {
 
   // Form data are not valid
   } else {
-    $display["msg"] .= display_warn_msg($err_msg);
+    $display["msg"] .= display_warn_msg($err["msg"]);
     $dsrc_q = run_query_global_datasource();
     $usr_q = run_query_all_users_from_group($cg_com);
     $display["detail"] = html_import_form($action, $params, "", $dsrc_q, $usr_q);
@@ -169,7 +169,7 @@ if (($action == "index") || ($action == "")) {
     $import_q = run_query_import_detail($params["import_id"]);
     $display["detail"] = html_import_consult($import_q);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg);
+    $display["msg"] .= display_warn_msg($err["msg"]);
     $import_q = run_query_import_detail($params["import_id"]);
     $dsrc_q = run_query_global_datasource();
     $usr_q = run_query_all_users_from_group($cg_com);

@@ -142,11 +142,11 @@ if ($action == "ext_get_id") {
       $display["msg"] .= display_ok_msg("$l_deal : $l_insert_ok");
       $display["detail"] = dis_deal_consult($params);
     } else {
-      $display["msg"] .= display_err_msg("$l_deal : $l_insert_error : $err_msg");
+      $display["msg"] .= display_err_msg("$l_deal : $l_insert_error : $err[msg]");
       $display["search"] = dis_deal_index($params);
     }
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err["msg"]);
     $display["detail"] = dis_deal_form($params);
   }
 
@@ -161,7 +161,7 @@ if ($action == "ext_get_id") {
     }
     $display["detail"] = dis_deal_consult($params);
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err["msg"]);
     $display["detail"] = dis_deal_form($params);
   }
 
@@ -176,7 +176,7 @@ if ($action == "ext_get_id") {
     }
     $display["detail"] = dis_deal_consult($params);
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err["msg"]);
     $display["detail"] = dis_deal_quick_form($params);
   }
 
@@ -186,7 +186,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_deal_can_delete_deal($params["deal_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_deal_consult($params);
   }
@@ -202,7 +202,7 @@ if ($action == "ext_get_id") {
     }
     $display["search"] = dis_deal_index();
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_deal_consult($params);
   }
@@ -399,11 +399,11 @@ if ($action == "ext_get_id") {
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_parentdeal : $l_insert_ok"); 
     } else {
-      $display["msg"] .= display_err_msg("$l_parentdeal : $l_insert_error : $err_msg");
+      $display["msg"] .= display_err_msg("$l_parentdeal : $l_insert_error : $err[msg]");
     }
     $display["search"] = html_deal_parentdeal_search_form($params, run_query_deal_manager(1));
   } else {
-    $display["msg"] .= display_warn_msg($err_msg);
+    $display["msg"] .= display_warn_msg($err["msg"]);
     $display["search"] = html_deal_parentdeal_search_form($params, run_query_deal_manager(1));
   }
   
@@ -414,7 +414,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_ok_msg("$l_parentdeal : $l_delete_ok"); 
     $display["search"] = html_deal_parentdeal_search_form($params, run_query_deal_manager(1));
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete_parent, false);
     $display["search"] = dis_deal_parentdeal_consult($params);
   }
@@ -430,7 +430,7 @@ if ($action == "ext_get_id") {
     }
     $display["detail"] = dis_deal_parentdeal_consult($params);
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err["msg"]);
     $display["detail"] = dis_deal_parentdeal_form($action, $params);
   }
 

@@ -768,7 +768,7 @@ function check_list_context($id, $list) {
 //     keys used : $criteria.
 ///////////////////////////////////////////////////////////////////////////////
 function check_list_query_coherence($list) {
-  global $err_msg, $l_err_list_coh_pub;;
+  global $err, $l_err_list_coh_pub;;
 
   $coherence_ok = true;
 
@@ -795,7 +795,7 @@ function check_list_query_coherence($list) {
 		$info_pub_allowed = false;
 		$join_nb[$field] ++;
 		$coherence_ok = false;
-		$err_msg = $l_err_list_coh_pub;
+		$err["msg"] = $l_err_list_coh_pub;
 	      }
 	    }
 	    $old_line = $line;
@@ -819,7 +819,7 @@ function check_list_query_coherence($list) {
 function check_list_data($id, $list) {
   global $php_regexp_email, $l_j_check_email, $l_list_exists, $l_fill_name;
   global $l_banned_word, $l_incoherent_criteria, $l_hungry_query;
-  global $cdg_sql, $err_msg, $cql_max_row, $cql_max_cost, $l_invalid_query;
+  global $cdg_sql, $err, $cql_max_row, $cql_max_cost, $l_invalid_query;
 
   $name = $list["name"];
   $subject = $list["subject"];
@@ -828,19 +828,19 @@ function check_list_data($id, $list) {
 
   // MANDATORY: List name not empty
   if (trim($name) == "") {
-    $err_msg = $l_fill_name;
+    $err["msg"] = $l_fill_name;
     return false;
   }
 
   // MANDATORY: List name unique
   if (get_list_name_exists($name, $id)) {
-    $err_msg = "$l_list_exists ($name)";
+    $err["msg"] = "$l_list_exists ($name)";
     return false;
   }
 
   // List email
   if (($email != "") && (preg_match($php_regexp_email, $email) == 0)) {
-    $err_msg = " $email : $l_j_check_email";
+    $err["msg"] = " $email : $l_j_check_email";
     return false;
   }
 
@@ -850,14 +850,14 @@ function check_list_data($id, $list) {
     $excluded_words = array ('insert', 'update', 'delete', 'create', 'alter', 'drop', 'userobm_password');
     while ( list($key, $value) = each($excluded_words) ) {
       if (preg_match("/\b$value\b/i", $query)) {
-	$err_msg = "$l_invalid_query $l_banned_word : $value";
+	$err["msg"] = "$l_invalid_query $l_banned_word : $value";
 	return false;
       }
     }
 
     // Check that criteria are coherent
     if (! check_list_query_coherence($list)) {
-	$err_msg = "$l_incoherent_criteria : $err_msg";
+	$err["msg"] = "$l_incoherent_criteria : $err[msg]";
       return false;
     }
 
@@ -867,14 +867,14 @@ function check_list_data($id, $list) {
     // 1 indicate to PHPLIB not to report the error if any
     $ret = $obm_q->query("explain $query", 1);
     if (substr($ret, 0,4) == "obm:") {
-      $err_msg = "$l_invalid_query : " . substr($ret,4);
+      $err["msg"] = "$l_invalid_query : " . substr($ret,4);
       return false;
     } else {
       $ret = sql_list_query_resource_high($query);
       if ($ret["ret"]) {
 	$rows = $ret["rows"];
 	$cost = $ret["cost"];
-	$err_msg = "$l_hungry_query (rows=$rows [max=$cql_max_row] cost=$cost [max=$cql_max_cost])";
+	$err["msg"] = "$l_hungry_query (rows=$rows [max=$cql_max_row] cost=$cost [max=$cql_max_cost])";
 	return false;
       }
     }
@@ -891,7 +891,7 @@ function check_list_data($id, $list) {
 //   true if the list can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_list_can_delete($p_id) {
-  global $err_msg, $ok_msg;
+  global $ok_msg;
   global $l_has_contact;
 
   $delete_ok = true;

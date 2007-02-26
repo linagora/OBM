@@ -437,7 +437,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="al
 //   - $entity : entity type to update
 ///////////////////////////////////////////////////////////////////////////////
 function of_right_update_right($param, $entity) {
-  global $cdg_sql, $obm, $err_msg, $l_of_right_err_auth,$obm;
+  global $cdg_sql, $obm, $err, $l_of_right_err_auth,$obm;
 
   $consumer = "user";
 
@@ -458,7 +458,7 @@ function of_right_update_right($param, $entity) {
   if (($eid != $obm["uid"]) && ($entity == "calendar")) {
     $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write");
     if (!in_array($eid, $writable_entity["ids"])) {
-      $err_msg = $l_of_right_err_auth;
+      $err["msg"] = $l_of_right_err_auth;
       return false;
     }
   }

@@ -136,10 +136,10 @@ if ($action == "ext_get_id") {
       $display["msg"] .= display_ok_msg("$l_project : $l_insert_ok");
       $display["detail"] = dis_project_consult($params["project_id"]);
     } else {
-      $display["msg"] .= display_err_msg("$l_project : $l_insert_error : $err_msg");
+      $display["msg"] .= display_err_msg("$l_project : $l_insert_error : $err[msg]");
     }
   } else { 
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = html_project_form($action, "", $params);
   }
 
@@ -155,7 +155,7 @@ if ($action == "ext_get_id") {
       $display["detail"] = dis_project_consult($params["project_id"]);
     }
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = html_project_form($action, "", $params);
   }
 
@@ -165,7 +165,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_project($params["project_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_project_consult($params["project_id"]);
   }
@@ -187,7 +187,7 @@ if ($action == "ext_get_id") {
       $display["detail"] = dis_project_consult($params["project_id"]);
     }
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_project_consult($params["project_id"]);
   }
@@ -213,7 +213,7 @@ if ($action == "ext_get_id") {
     $display["detail"] = html_project_task_form($tasks_q, $params);
     $display["detail"] .= html_project_tasklist($tasks_q, $params);
   } else { 
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $params["name"] = run_query_project_name($params["project_id"]);
     $tasks_q = run_query_project_tasks($params["project_id"]);
     $display["detail"]  = html_project_task_form($tasks_q, $params);
@@ -234,7 +234,7 @@ if ($action == "ext_get_id") {
     $display["detail"] = html_project_task_form($tasks_q, $params);
     $display["detail"] .= html_project_tasklist($tasks_q, $params);
   } else { 
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $params["name"] = run_query_project_name($params["project_id"]);
     $tasks_q = run_query_project_tasks($params["project_id"]);
     $display["detail"]  = html_project_task_form($tasks_q, $params);

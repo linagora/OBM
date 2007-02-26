@@ -733,7 +733,7 @@ function check_invoice_data_form($id, $invoice) {
   global $l_fill_label, $l_fill_company, $l_fill_number, $l_error_number_exist;
   global $l_fill_inout, $l_fill_amount, $l_fill_date, $l_date, $l_invalid_date;
   global $l_expiration_date, $l_payment_date;
-  global $err_msg, $l_exist_error;
+  global $err, $l_exist_error;
 
   $label = $invoice["label"];
   $number = $invoice["number"];
@@ -751,13 +751,13 @@ function check_invoice_data_form($id, $invoice) {
 	
   // MANDATORY: Invoice label
   if (trim($label) == "") {
-    $err_msg = $l_fill_label;
+    $err["msg"] = $l_fill_label;
     return false;
   }
 
   // MANDATORY: Invoice inout must be set
   if (($inout != "+") && ($inout != "-")) {
-    $err_msg = $l_fill_inout;
+    $err["msg"] = $l_fill_inout;
     return false;
   }
 
@@ -765,11 +765,11 @@ function check_invoice_data_form($id, $invoice) {
   if ($date == "") {
     // If invoice in a status "created", exp date must be set
     if ($status_created) {
-      $err_msg = $l_fill_date;
+      $err["msg"] = $l_fill_date;
       return false;
     }
   } else if (preg_match($php_regexp_isodate, $date) == 0) {
-    $err_msg = "$l_date : $date : $l_invalid_date"; 
+    $err["msg"] = "$l_date : $date : $l_invalid_date"; 
     return false;
   }
 
@@ -777,41 +777,41 @@ function check_invoice_data_form($id, $invoice) {
   if ($expiration_date == "") {
     // If invoice in a status "created", exp date must be set
     if ($status_created) {
-      $err_msg = "$l_expiration_date : $l_fill_date";
+      $err["msg"] = "$l_expiration_date : $l_fill_date";
       return false;
     }
   } else if (preg_match($php_regexp_isodate, $expiration_date) == 0) {
-    $err_msg = "$l_expiration_date : $expiration_date : $l_invalid_date"; 
+    $err["msg"] = "$l_expiration_date : $expiration_date : $l_invalid_date"; 
     return false;
   }
 
   // Payment Date check
   if (($payment_date != "") && (preg_match($php_regexp_isodate, $payment_date) == 0)) {
-    $err_msg = "$l_payment_date : $payment_date : $l_invalid_date"; 
+    $err["msg"] = "$l_payment_date : $payment_date : $l_invalid_date"; 
     return false;
   }
 
   // MANDATORY: a company must be set
   if (($c_id < 1) && ($c_new_id < 1)) {
-    $err_msg = $l_fill_company;
+    $err["msg"] = $l_fill_company;
     return false;
   }
 
   // MANDATORY: Amount must be set
   if ( !($ht > 0) || !($ttc > 0)) {
-    $err_msg = $l_fill_amount;
+    $err["msg"] = $l_fill_amount;
     return false;
   }
 
   // MANDATORY: Invoice number, if state not "to be created"
   if ($status_created) {
     if (trim($number) == "") {
-      $err_msg = $l_fill_number;
+      $err["msg"] = $l_fill_number;
       return false;
     } else {
       $nb = get_invoice_nb_having_number($number, $id);
       if ($nb > 0) {
-	$err_msg = $l_error_number_exist;
+	$err["msg"] = $l_error_number_exist;
 	return false;
       }
     }
@@ -829,7 +829,7 @@ function check_invoice_data_form($id, $invoice) {
 //   true if the invoice can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_can_delete_invoice($p_id) {
-  global $err_msg, $ok_msg;
+  global $err, $ok_msg;
   global $l_link_payment, $l_link_payment_no;
 
   $delete_ok = true;
@@ -839,7 +839,7 @@ function check_can_delete_invoice($p_id) {
   $nb = $obm_q->num_rows();
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "$l_link_payment";
+    $err["msg"] .= "$l_link_payment";
   } else {
     $ok_msg .= "$l_link_payment_no";
   }

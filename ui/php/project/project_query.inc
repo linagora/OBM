@@ -1531,7 +1531,7 @@ function project_manager_rights($uid, $params, $project_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_project_form($pid, $params) {
   global $l_fill_name, $l_fill_tt, $l_fill_estimated, $l_fill_soldtime;
-  global $err_msg, $php_regexp_number,$l_tolong_shortname;
+  global $err, $php_regexp_number,$l_tolong_shortname;
 
   $name = $params["name"];
   $company = $params["company_id"];
@@ -1543,37 +1543,37 @@ function check_project_form($pid, $params) {
   $shortname = $params["shortname"];
   // MANDATORY: Project name
   if (trim($name) == "") {
-    $err_msg = $l_fill_name;
+    $err["msg"] = $l_fill_name;
     return false;
   }
 
   if (trim($shortname) != "" && strlen(trim($shortname)) > 10) {
-    $err_msg = $l_tolong_shortname;
+    $err["msg"] = $l_tolong_shortname;
     return false;
   }
 
 
   // MANDATORY: TaskType selection
   if ($tt == 0) {
-    $err_msg = $l_fill_tt;
+    $err["msg"] = $l_fill_tt;
     return false;
   }
 
   // MANDATORY: Soldtime
   if (($company > 0) && (trim($soldtime) == "")) {
-    $err_msg = $l_fill_soldtime;
+    $err["msg"] = $l_fill_soldtime;
     return false;
   }
 
   // MANDATORY: Estimated
   if (trim($estimated) == "") {
-    $err_msg = $l_fill_estimated;
+    $err["msg"] = $l_fill_estimated;
     return false;
   }
 
   // MANDATORY: Soldtime
   //  if (preg_match($php_regexp_number, $soldtime) == 0)) {
-  //     $err_msg = $l_fill_soldnumber ."".$soldtime."".$php_regexp_number;
+  //     $err["msg"] = $l_fill_soldnumber ."".$soldtime."".$php_regexp_number;
   //     return false;
   //   }
 
@@ -1589,7 +1589,7 @@ function check_project_form($pid, $params) {
 //   true if the project can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_project_can_delete($p_id) {
-  global $err_msg, $ok_msg;
+  global $err, $ok_msg;
   global $l_link_timetask, $l_link_timetask_no;
 
   $delete_ok = true;
@@ -1598,7 +1598,7 @@ function check_project_can_delete($p_id) {
   $nb = get_project_linked_project_timetask_nb($p_id);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "$l_link_timetask";
+    $err["msg"] .= "$l_link_timetask";
   } else {
     $ok_msg .= "$l_link_timetask_no";
   }
@@ -1617,7 +1617,7 @@ function check_project_can_delete($p_id) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_project_task_form($pid, $params) {
-  global $err_msg, $l_ptask_same_task, $l_fill_tasklabel, $l_ptask_has_user;
+  global $err, $l_ptask_same_task, $l_fill_tasklabel, $l_ptask_has_user;
   global $l_ptask_has_parent, $l_ptask_and_parent;
 
   $pid = $params["project_id"];
@@ -1627,20 +1627,20 @@ function check_project_task_form($pid, $params) {
   $ref_task = $params["reftask_id"];
   // MANDATORY: task label
   if (trim($tasklabel) == "" && !is_array($ref_task)) {
-    $err_msg = $l_fill_tasklabel;
+    $err["msg"] = $l_fill_tasklabel;
     return false;
   }
 
   // If parent task same has task
   if ( (isset($ptask)) && ($ptask == $task)) {
-    $err_msg = $l_ptask_same_task;
+    $err["msg"] = $l_ptask_same_task;
     return false;
   }
 
   // If parent task is given, it should not have parents
   // Can happen if update from another window simultaneously
   if (project_task_has_parent($ptask)) {
-    $err_msg = $l_ptask_has_parent;
+    $err["msg"] = $l_ptask_has_parent;
     return false;
   }
 
@@ -1652,7 +1652,7 @@ function check_project_task_form($pid, $params) {
   }
 
   if ( ($task > 0) && $task_is_parent && ($ptask > 0)) {
-    $err_msg = $l_ptask_and_parent;
+    $err["msg"] = $l_ptask_and_parent;
     return false;
   }
 
@@ -1665,7 +1665,7 @@ function check_project_task_form($pid, $params) {
   }
 
   if ( ($ptask > 0) && $pt_has_user) {
-    $err_msg = $l_ptask_has_user;
+    $err["msg"] = $l_ptask_has_user;
     return false;
   }
 

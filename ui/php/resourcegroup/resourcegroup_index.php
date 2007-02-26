@@ -118,7 +118,7 @@ if (($action == "index") || ($action == "")) {
     
     // Form data are not valid
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err["msg"]);
     $display["detail"] = html_resourcegroup_form($action, "", $params);
   }
 
@@ -133,7 +133,7 @@ if (($action == "index") || ($action == "")) {
     }
     $display["detail"] = dis_resourcegroup_consult($params, $obm["uid"]);
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err["msg"]);
     $params_q = run_query_resourcegroup_detail($params["resourcegroup_id"]);
     $display["detail"] = html_resourcegroup_form($action, $params_q, $params);
   }

@@ -61,7 +61,7 @@ if ($action == "index") {
   if ($ret) {
     $display["msg"] .= display_ok_msg("$l_backup : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_backup : $l_insert_error $err_msg");
+    $display["msg"] .= display_err_msg("$l_backup : $l_insert_error $err[msg]");
   }
   dis_backup_index();
 
@@ -71,17 +71,17 @@ if ($action == "index") {
   if ($ret) {
     $display["msg"] .= display_ok_msg("$l_backup : $l_restore_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_backup : $l_restore_error $err_msg");
+    $display["msg"] .= display_err_msg("$l_backup : $l_restore_error $err[msg]");
   }
   dis_backup_index();
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_backup_can_delete($backup["filename"])) {
-    $display["msg"] .= display_info_msg($err_msg);
+    $display["msg"] .= display_info_msg($err["msg"]);
     $display["detail"] = dis_can_delete_backup($backup["filename"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg);
+    $display["msg"] .= display_warn_msg($err["msg"]);
     $display["detail"] = dis_backup_index($backup);
   }
 
@@ -92,11 +92,11 @@ if ($action == "index") {
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_backup : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg("$l_backup : $err_msg : $l_delete_error");
+      $display["msg"] .= display_err_msg("$l_backup : $err[msg] : $l_delete_error");
     }
     dis_backup_index($backup);
   } else {
-    $display["msg"] .= display_warn_msg("$err_msg $l_cant_delete");
+    $display["msg"] .= display_warn_msg("$err[msg] $l_cant_delete");
     dis_backup_index($backup);
   }
 }

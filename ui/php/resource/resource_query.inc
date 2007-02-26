@@ -322,7 +322,7 @@ function check_resource_context($p_id, $resource) {
 function check_resource_data_form($p_id, $resource) {
   global $l_exist_error, $l_name_error, $l_desc_error;
   global $l_lname_error;
-  global $err_msg, $action, $cdg_sql;
+  global $err, $action, $cdg_sql;
 
   $id = $resource["resource_id"];
   $name = $resource["name"];
@@ -330,7 +330,7 @@ function check_resource_data_form($p_id, $resource) {
 
   // MANDATORY: name 
   if (trim($name) == "") {
-    $err_msg = $l_name_error." : ". $name;
+    $err["msg"] = $l_name_error." : ". $name;
     return false;
   }
 
@@ -346,7 +346,7 @@ function check_resource_data_form($p_id, $resource) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   if ($obm_q->num_rows() > 0) {
-    $err_msg = "$name : $l_exist_error";
+    $err["msg"] = "$name : $l_exist_error";
     return false;
   }
 
@@ -362,7 +362,7 @@ function check_resource_data_form($p_id, $resource) {
 //   true if the resource can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_resource_can_delete($id) {
-  global $err_msg, $ok_msg;
+  global $ok_msg;
 
   $delete_ok = true;
 

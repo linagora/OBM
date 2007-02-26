@@ -211,7 +211,7 @@ if ($action == "index") {
       $display["detail"] = dis_calendar_calendar_view($params, $cal_entity_id);
     }
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_calendar_event_form($action, $params, "", $cal_entity_id);
   }
 
@@ -245,7 +245,7 @@ if ($action == "index") {
       $display["detail"] = dis_calendar_calendar_view($params, $cal_entity_id);
     }
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_calendar_event_form($action, $params, "", $cal_entity_id);
   }
 
@@ -272,7 +272,7 @@ if ($action == "index") {
     echo "({".$display['json']."})";
     exit();
   } else {
-    json_error_msg($l_invalid_data . " : " . $err_msg );
+    json_error_msg($l_invalid_data . " : " . $err["msg"]);
     echo "({".$display['json']."})";
     exit();
   }
@@ -286,7 +286,7 @@ if ($action == "index") {
     echo "({".$display['json']."})";
     exit();
   } else {
-    json_error_msg($l_invalid_data . " : " . $err_msg);
+    json_error_msg($l_invalid_data . " : " . $err["msg"]);
     echo "({".$display['json']."})";
     exit();
   }
@@ -334,7 +334,7 @@ if ($action == "index") {
       $display["detail"] = html_calendar_dis_delete($params);
     }
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_calendar_event_consult($params["calendar_id"]);
   }
@@ -347,7 +347,7 @@ if ($action == "index") {
     }
     $display["detail"] = dis_calendar_calendar_view($params, $cal_entity_id);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_calendar_event_consult($params["calendar_id"]);
   }
@@ -361,7 +361,7 @@ if ($action == "index") {
   if (of_right_update_right($params, "calendar")) {
     $display["msg"] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
-    $display["msg"] .= display_warn_msg($err_msg);
+    $display["msg"] .= display_warn_msg($err["msg"]);
   }
   $display["detail"] = dis_calendar_right_dis_admin($params["entity_id"]);
 

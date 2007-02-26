@@ -203,13 +203,13 @@ function run_query_domain_delete($p_id) {
 //     keys used : name, passwd, email
 ///////////////////////////////////////////////////////////////////////////////
 function check_domain_data_form($d_id, $domain) {
-  global $err_msg, $l_label_error;
+  global $err, $l_label_error;
 
   $label = $domain["label"];
 
   // MANDATORY: Label
   if (trim($label) == "") {
-    $err_msg = $l_label_error." : ". $label;
+    $err["msg"] = $l_label_error." : ". $label;
     return false;
   }
   
@@ -226,7 +226,7 @@ function check_domain_data_form($d_id, $domain) {
 //   true if the domain can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_domain_can_delete($p_id) {
-  global $err_msg, $ok_msg;
+  global $err, $ok_msg;
   global $l_link_user, $l_link_user_no;
 
   $delete_ok = true;
@@ -235,7 +235,7 @@ function check_domain_can_delete($p_id) {
   $nb = get_linked_user_domain($p_id);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "$l_link_user";
+    $err["msg"] .= "$l_link_user";
   } else {
     $ok_msg .= "$l_link_user_no";
   }

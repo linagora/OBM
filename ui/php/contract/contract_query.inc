@@ -1208,7 +1208,7 @@ function check_contract_context($c_id, $contract) {
 // Return : true if check ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_form($cid, $contract) {
-  global $err_msg, $ccf_ticket, $ccf_duration;
+  global $err, $ccf_ticket, $ccf_duration;
   global $php_regexp_isodate, $l_invalid_date, $l_err_fill;
   global $l_err_label_empty, $l_err_ticket_empty, $l_err_duration_empty;
   global $l_err_date, $l_err_daterenew, $l_err_datecancel;
@@ -1224,21 +1224,21 @@ function check_contract_form($cid, $contract) {
 
   // Check if the label is filled
   if (trim($contract["label"]) == "") {
-    $err_msg = $l_err_label_empty;
+    $err["msg"] = $l_err_label_empty;
     return false;
   }
 
   // Check if the Tickets number is filled
   if ($format == $ccf_ticket)
     if (($ticket_nb == "") || ($ticket_nb < 1)) {
-      $err_msg = $l_err_ticket_empty;
+      $err["msg"] = $l_err_ticket_empty;
       return false;
     }
 
   // Check if the Support duration is filled
   if ($format == $ccf_duration)
     if (($duration == "") || ($duration < 1)) {
-      $err_msg = $l_err_duration_empty;
+      $err["msg"] = $l_err_duration_empty;
       return false;
     }
 
@@ -1246,60 +1246,60 @@ function check_contract_form($cid, $contract) {
   // Begin Date check
   if ($datebegin != "") {
     if (preg_match($php_regexp_isodate, $datebegin) == 0) {
-      $err_msg = "$l_begin : $l_invalid_date"; 
+      $err["msg"] = "$l_begin : $l_invalid_date"; 
       return false;
     }
   } else {
-    $err_msg = "$l_begin : $l_err_fill"; 
+    $err["msg"] = "$l_begin : $l_err_fill"; 
     return false;
   }
 
   // Expiration Date check
   if ($dateexp != "") {
     if (preg_match($php_regexp_isodate, $dateexp) == 0) {
-      $err_msg = "$l_exp : $l_invalid_date"; 
+      $err["msg"] = "$l_exp : $l_invalid_date"; 
       return false;
     }
   } else {
-    $err_msg = "$l_exp : $l_err_fill"; 
+    $err["msg"] = "$l_exp : $l_err_fill"; 
     return false;
   }
 
   // Signature Date check
   if ( ($datesignature != "")
        && (preg_match($php_regexp_isodate, $datesignature) == 0) ) {
-    $err_msg = "$l_signature : $l_invalid_date"; 
+    $err["msg"] = "$l_signature : $l_invalid_date"; 
     return false;
   }
 
   // Renew Date check
   if ( ($daterenew != "")
        && (preg_match($php_regexp_isodate, $daterenew) == 0) ) {
-    $err_msg = "$l_renew : $l_invalid_date"; 
+    $err["msg"] = "$l_renew : $l_invalid_date"; 
     return false;
   }
 
   // Cancel Date check
   if ( ($datecancel != "")
        && (preg_match($php_regexp_isodate, $datecancel) == 0) ) {
-    $err_msg = "$l_date_cancel : $l_invalid_date"; 
+    $err["msg"] = "$l_date_cancel : $l_invalid_date"; 
     return false;
   }
 
 
   if ($dateexp < $datebegin){
-    $err_msg = $l_err_date;
+    $err["msg"] = $l_err_date;
     return false;
   }
   if (!($daterenew == "")) {
     if (($daterenew < $datebegin) || ($daterenew > $dateexp)){
-      $err_msg = $l_err_daterenew;
+      $err["msg"] = $l_err_daterenew;
       return false;
     }
   }
   if (!($datecancel == "")) {
     if (($datecancel < $datebegin) || ($datecancel > $dateexp)){
-      $err_msg = $l_err_datecancel;
+      $err["msg"] = $l_err_datecancel;
       return false;
     }
   }  
@@ -1316,7 +1316,7 @@ function check_contract_form($cid, $contract) {
 //   true if the contract can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_can_delete_contract($p_id) {
-  global $err_msg, $ok_msg;
+  global $err, $ok_msg;
   global $l_link_incident, $l_link_incident_no;
 
   $delete_ok = true;
@@ -1325,7 +1325,7 @@ function check_can_delete_contract($p_id) {
   $nb = get_global_linked_incident_nb($p_id, "contract", true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "$l_link_incident";
+    $err["msg"] .= "$l_link_incident";
   } else {
     $ok_msg .= "$l_link_incident_no";
   }

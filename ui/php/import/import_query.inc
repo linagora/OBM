@@ -343,7 +343,7 @@ function check_import_context($id, $import) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_import_data_form($id, $import) {
   global $l_import_exists, $l_fill_name;
-  global $err_msg;
+  global $err;
 
   $name = $import["name"];
   $dsrc = $import["datasource"];
@@ -351,13 +351,13 @@ function check_import_data_form($id, $import) {
 
   // MANDATORY: Import name not empty
   if (trim($name) == "") {
-    $err_msg = $l_fill_name;
+    $err["msg"] = $l_fill_name;
     return false;
   }
 
   // MANDATORY: Import name unique
   if (get_import_name_exists($name, $id)) {
-    $err_msg = "$l_import_exists ($name)";
+    $err["msg"] = "$l_import_exists ($name)";
     return false;
   }
 

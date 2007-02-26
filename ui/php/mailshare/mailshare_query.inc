@@ -361,7 +361,7 @@ function check_mailshare_context($id, $mailshare) {
 //   true if the mailshare can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_can_delete_mailshare($p_id) {
-  global $err_msg, $ok_msg;
+  global $ok_msg;
 
   $delete_ok = true;
 

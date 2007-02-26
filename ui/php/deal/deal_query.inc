@@ -1781,37 +1781,37 @@ function run_query_deal_status_links($s_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_deal_form($did, $deal) {
   global $php_regexp_isodate, $l_invalid_date, $l_alarm;
-  global $err_msg, $l_err_label_empty, $l_err_hitrate, $l_date_comment;
+  global $err, $l_err_label_empty, $l_err_hitrate, $l_date_comment;
   global $l_begin, $l_expected, $l_proposal, $l_end, $l_date_inconsistency;
   global $l_err_kind_empty, $l_err_task_empty, $l_err_market_empty, $l_err_tech_empty;
 
   // Check if the label is filled
   if (trim($deal["label"]) == "") {
-    $err_msg = $l_err_label_empty;
+    $err["msg"] = $l_err_label_empty;
     return false;
   }
 
   // Check if the kind is filled
   if ($deal["kind_id"] < 1) {
-    $err_msg = $l_err_kind_empty;
+    $err["msg"] = $l_err_kind_empty;
     return false;
   }
 
   // Check if the tasktype is filled
   if ($deal["tasktype"] < 1) {
-    $err_msg = $l_err_task_empty;
+    $err["msg"] = $l_err_task_empty;
     return false;
   }
 
   // Check if the marketing resp. is filled
   if ($deal["market"] < 1) {
-    $err_msg = $l_err_market_empty;
+    $err["msg"] = $l_err_market_empty;
     return false;
   }
 
   // Check if the tech resp. is filled
   if ($deal["tech"] < 1) {
-    $err_msg = $l_err_tech_empty;
+    $err["msg"] = $l_err_tech_empty;
     return false;
   }
 
@@ -1820,7 +1820,7 @@ function check_deal_form($did, $deal) {
        || (trim($deal["hitrate"]) != "") ) {
     if ( ($deal["hitrate"] == "") || (! is_numeric($deal["hitrate"]))
 	 || !( ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) ) {
-      $err_msg = $l_err_hitrate;
+      $err["msg"] = $l_err_hitrate;
       return false;
     }
   }
@@ -1828,35 +1828,35 @@ function check_deal_form($did, $deal) {
   $datebegin = $deal["datebegin"];
   // Begin Date check
   if (($datebegin != "") && (preg_match($php_regexp_isodate, $datebegin) == 0)) {
-    $err_msg = "$l_begin : $l_invalid_date"; 
+    $err["msg"] = "$l_begin : $l_invalid_date"; 
     return false;
   }
 
   $dateprop = $deal["dateproposal"];
   // Expected Date check
   if (($dateprop != "") && (preg_match($php_regexp_isodate, $dateprop) == 0)) {
-    $err_msg = "$l_proposal : $l_invalid_date";
+    $err["msg"] = "$l_proposal : $l_invalid_date";
     return false;
   }
 
   $dateexp = $deal["dateexpected"];
   // Expected Date check
   if (($dateexp != "") && (preg_match($php_regexp_isodate, $dateexp) == 0)) {
-    $err_msg = "$l_expected : $l_invalid_date";
+    $err["msg"] = "$l_expected : $l_invalid_date";
     return false;
   }
 
   $dateend = $deal["dateend"];
   // End Date check
   if (($datend != "") && (preg_match($php_regexp_isodate, $dateend) == 0)) {
-    $err_msg = "$l_end : $l_invalid_date";
+    $err["msg"] = "$l_end : $l_invalid_date";
     return false;
   }
 
   $datealarm = $deal["datealarm"];
   // Alarm Date check
   if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
-    $err_msg = "$l_alarm : $l_invalid_date";
+    $err["msg"] = "$l_alarm : $l_invalid_date";
     return false;
   }
 
@@ -1869,43 +1869,43 @@ function check_deal_form($did, $deal) {
 
   // Begin Date after proposal date
   if (($datebegin != "") && ($dateprop != "") && ($ts_prop < $ts_begin)) {
-    $err_msg = "$l_date_inconsistency : $l_begin > $l_proposal !";
+    $err["msg"] = "$l_date_inconsistency : $l_begin > $l_proposal !";
     return false;
   }
 
   // Begin Date after expected date
   if (($datebegin != "") && ($dateexp != "") && ($ts_exp < $ts_begin)) {
-    $err_msg = "$l_date_inconsistency : $l_begin > $l_expected !";
+    $err["msg"] = "$l_date_inconsistency : $l_begin > $l_expected !";
     return false;
   }
 
   // Begin Date after alarm date
   if (($datebegin != "") && ($datealarm != "") && ($ts_alarm < $ts_begin)) {
-    $err_msg = "$l_date_inconsistency : $l_begin > $l_alarm !";
+    $err["msg"] = "$l_date_inconsistency : $l_begin > $l_alarm !";
     return false;
   }
 
   // Begin Date after end date
   if (($datebegin != "") && ($dateend != "") && ($ts_end < $ts_begin)) {
-    $err_msg = "$l_date_inconsistency : $l_begin > $l_end !";
+    $err["msg"] = "$l_date_inconsistency : $l_begin > $l_end !";
     return false;
   }
 
   // Proposal Date after expected date
   if (($dateprop != "") && ($dateexp != "") && ($ts_exp < $ts_prop)) {
-    $err_msg = "$l_date_inconsistency : $l_proposal > $l_expected !";
+    $err["msg"] = "$l_date_inconsistency : $l_proposal > $l_expected !";
     return false;
   }
 
   // Proposal Date after alarm date
   if (($dateprop != "") && ($datealarm != "") && ($ts_alarm < $ts_prop)) {
-    $err_msg = "$l_date_inconsistency : $l_proposal > $l_alarm !";
+    $err["msg"] = "$l_date_inconsistency : $l_proposal > $l_alarm !";
     return false;
   }
 
   // Proposal Date after end date
   if (($dateprop != "") && ($dateend != "") && ($ts_end < $ts_prop)) {
-    $err_msg = "$l_date_inconsistency : $l_proposal > $l_end !";
+    $err["msg"] = "$l_date_inconsistency : $l_proposal > $l_end !";
     return false;
   }
 
@@ -1913,7 +1913,7 @@ function check_deal_form($did, $deal) {
   $datecomment = $deal["datecomment"];
   // Comment Date check
   if (($datecomment != "") && (preg_match($php_regexp_isodate, $datecomment) == 0)) {
-    $err_msg = "$l_date_comment : $l_invalid_date";
+    $err["msg"] = "$l_date_comment : $l_invalid_date";
     return false;
   }
 
@@ -1929,26 +1929,26 @@ function check_deal_form($did, $deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_deal_quick_form($deal) {
   global $php_regexp_isodate, $l_invalid_date, $l_alarm, $l_date_comment;
-  global $err_msg, $l_expected;
+  global $err, $l_expected;
 
   $dateexp = $deal["dateexpected"];
   // Expected Date check
   if (($dateexp != "") && (preg_match($php_regexp_isodate, $dateexp) == 0)) {
-    $err_msg = "$l_expected : $l_invalid_date";
+    $err["msg"] = "$l_expected : $l_invalid_date";
     return false;
   }
 
   $datealarm = $deal["datealarm"];
   // Alarm Date check
   if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
-    $err_msg = "$l_alarm : $l_invalid_date";
+    $err["msg"] = "$l_alarm : $l_invalid_date";
     return false;
   }
 
   $datecomment = $deal["datecomment"];
   // Comment Date check
   if (($datecomment != "") && (preg_match($php_regexp_isodate, $datecomment) == 0)) {
-    $err_msg = "$l_date_comment : $l_invalid_date";
+    $err["msg"] = "$l_date_comment : $l_invalid_date";
     return false;
   }
 
@@ -1964,7 +1964,7 @@ function check_deal_quick_form($deal) {
 //   true if the deal can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_can_delete_deal($p_id) {
-  global $err_msg, $ok_msg;
+  global $err, $ok_msg;
   global $l_link_contract, $l_link_contract_no, $l_link_project;
   global $l_link_invoice, $l_link_invoice_no, $l_link_project_no;
 
@@ -1974,7 +1974,7 @@ function check_can_delete_deal($p_id) {
   $nb = get_global_linked_contract_nb($p_id, "deal", true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "$l_link_contract";
+    $err["msg"] .= "$l_link_contract";
   } else {
     $ok_msg .= "$l_link_contract_no";
   }
@@ -1983,7 +1983,7 @@ function check_can_delete_deal($p_id) {
   $nb = get_global_linked_project_nb($p_id, "deal", true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "<br />$l_link_project";
+    $err["msg"] .= "<br />$l_link_project";
   } else {
     $ok_msg .= "<br />$l_link_project_no";
   }
@@ -1992,7 +1992,7 @@ function check_can_delete_deal($p_id) {
   $nb = get_global_linked_invoice_nb($p_id, "deal", true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "<br />$l_link_invoice";
+    $err["msg"] .= "<br />$l_link_invoice";
   } else {
     $ok_msg .= "<br />$l_link_invoice_no";
   }
@@ -2010,11 +2010,11 @@ function check_can_delete_deal($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_deal_parent_form($pid, $deal) {
   global $php_regexp_isodate, $l_invalid_date;
-  global $err_msg, $l_err_label_empty;
+  global $err, $l_err_label_empty;
 
   // Check the label is filled
   if (trim($deal["plabel"]) == "") {
-    $err_msg = $l_err_label_empty;
+    $err["msg"] = $l_err_label_empty;
     return false;
   }
 
@@ -2030,7 +2030,7 @@ function check_deal_parent_form($pid, $deal) {
 //   true if the deal can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_deal_can_delete_parentdeal($p_id) {
-  global $cdg_sql, $err_msg, $ok_msg;
+  global $cdg_sql, $err, $ok_msg;
   global $l_link_deal;
 
   $delete_ok = true;
@@ -2047,7 +2047,7 @@ function check_deal_can_delete_parentdeal($p_id) {
   $nb = $obm_q->f(0);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "$l_link_deal";
+    $err["msg"] .= "$l_link_deal";
   }
 
   return $delete_ok;

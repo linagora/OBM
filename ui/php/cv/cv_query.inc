@@ -402,11 +402,11 @@ function run_query_cv_id($cv, $timecreate, $uid) {
 * @return bool true if check ok, else false
 */
 function check_cv_form($cid, $cv) {
-  global $err_msg, $l_err_title_empty;
+  global $err, $l_err_title_empty;
 
   // Check if the title is filled
   if (trim($cv["title"]) == "") {
-    $err_msg = $l_err_title_empty;
+    $err["msg"] = $l_err_title_empty;
     return false;
   }
 
@@ -420,7 +420,7 @@ function check_cv_form($cid, $cv) {
 * @return bool true if the cv can be deleted, else false
 */
 function check_can_delete_cv($p_id) {
-  global $err_msg, $ok_msg;
+  global $ok_msg;
 
   $delete_ok = true;
   

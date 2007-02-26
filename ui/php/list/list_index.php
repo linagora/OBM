@@ -148,7 +148,7 @@ else if ($action == "new_criterion") {
 
   // Form data are not valid
   } else {
-    $display["msg"] .= display_warn_msg($err_msg);
+    $display["msg"] .= display_warn_msg($err["msg"]);
     $display["detail"] = dis_list_form($action, "", $params);
   }
 
@@ -171,7 +171,7 @@ else if ($action == "new_criterion") {
     }
     $display["detail"] = dis_list_consult($params);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg);
+    $display["msg"] .= display_warn_msg($err["msg"]);
     $params_q = run_query_list_detail($params["list_id"]);
     $display["detail"] = dis_list_form($action, $params_q, $params);
   }
@@ -182,7 +182,7 @@ else if ($action == "new_criterion") {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_list_can_delete($params["list_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_list_consult($params);
   }
@@ -198,7 +198,7 @@ else if ($action == "new_criterion") {
     }
     $display["search"] = dis_list_search_form("");
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_list_consult($params);
   }

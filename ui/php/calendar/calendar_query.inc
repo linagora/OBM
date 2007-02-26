@@ -1139,7 +1139,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
 //   true if the event can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_calendar_can_delete($id) {
-  global $err_msg, $ok_msg;
+  global $ok_msg;
 
   $delete_ok = true;
 
@@ -1622,33 +1622,34 @@ function get_calendar_event_entity($calendar_id) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_calendar_data_quick_form($calendar) {
-  global $err_msg, $php_regexp_isodate, $php_regexp_isodatetime;
+  global $err, $php_regexp_isodate, $php_regexp_isodatetime;
   global $l_fill_title, $l_fill_dateend,$l_fill_datebegin,$l_err_begin_end;
 
   $title = $calendar["title"];
   $datebegin = $calendar["date_begin"];
   $duration = $calendar["duration"];
   if (trim($title) == "") {
-    $err_msg = $l_fill_title;
+    $err["msg"] = $l_fill_title;
     return false;
   }
   
   // Begin Date check
   if (trim($datebegin) == "") {
-    $err_msg = $l_fill_datebegin;
+    $err["msg"] = $l_fill_datebegin;
     return false;
   } else if (preg_match($php_regexp_isodatetime, $datebegin) == 0) {
-    $err_msg = "$l_datebegin : $l_invalid_date"; 
+    $err["msg"] = "$l_datebegin : $l_invalid_date"; 
     return false;
   }
   
   // End Date check
   if(!is_numeric($duration) ||  $duration < 1) {
-    $err_msg = $l_err_begin_end;
+    $err["msg"] = $l_err_begin_end;
     return false;
   }
   return true;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Calendar Form Data checking and formatting
@@ -1659,7 +1660,7 @@ function check_calendar_data_quick_form($calendar) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_calendar_data_form($calendar) {
-  global $err_msg, $php_regexp_isodate, $php_regexp_isodatetime;
+  global $err, $php_regexp_isodate, $php_regexp_isodatetime;
   global $l_fill_title, $l_fill_dateend,$l_fill_datebegin,$l_err_weekly_repeat;
   global $l_invalid_date, $l_datebegin, $l_dateend, $l_date_repeatend;
   global $l_err_begin_end, $l_err_end_repeat,$l_err_end_repeat2,$l_err_repeatfrequency;
@@ -1674,25 +1675,25 @@ function check_calendar_data_form($calendar) {
   $repeatfrequency = $calendar["repeatfrequency"];
 
   if (trim($title) == "") {
-    $err_msg = $l_fill_title;
+    $err["msg"] = $l_fill_title;
     return false;
   }
   
   // Begin Date check
   if (trim($datebegin) == "") {
-    $err_msg = $l_fill_datebegin;
+    $err["msg"] = $l_fill_datebegin;
     return false;
   } else if (preg_match($php_regexp_isodatetime, $datebegin) == 0) {
-    $err_msg = "$l_datebegin : $l_invalid_date"; 
+    $err["msg"] = "$l_datebegin : $l_invalid_date"; 
     return false;
   }
   
   // End Date check
   if (trim($dateend) == "") {
-    $err_msg = $l_fill_dateend;
+    $err["msg"] = $l_fill_dateend;
     return false;
   } else if (preg_match($php_regexp_isodatetime, $dateend) == 0) {
-    $err_msg = "$l_dateend : $l_invalid_date"; 
+    $err["msg"] = "$l_dateend : $l_invalid_date"; 
     return false;
   }
   
@@ -1700,40 +1701,40 @@ function check_calendar_data_form($calendar) {
   if ($kind != "none") {
     // End repeat Date check
     if (($repeat_end != "") && (preg_match($php_regexp_isodate, $repeat_end) == 0)) {
-      $err_msg = "$l_date_repeatend : $l_invalid_date"; 
+      $err["msg"] = "$l_date_repeatend : $l_invalid_date"; 
       return false;
     }
   }
   
-  if(!is_numeric($repeatfrequency) ||  $repeatfrequency < 1) {
-    $err_msg = $l_err_repeatfrequency;
+  if (!is_numeric($repeatfrequency) ||  $repeatfrequency < 1) {
+    $err["msg"] = $l_err_repeatfrequency;
     return false;
   }
 
   if ($dateend<$datebegin) {
-    $err_msg = $l_err_begin_end;
+    $err["msg"] = $l_err_begin_end;
     return false;
   } 
   
   if (trim($repeat_end) != "" && $dateend>$repeat_end && $kind != "none") {
-    $err_msg =  $l_err_end_repeat;
+    $err["msg"] =  $l_err_end_repeat;
     return false;
   }
   
   // If repeat kind is weekly, repeat days must be set
   if ($kind == "weekly" && $repeat_days == "0000000") {
-    $err_msg = $l_err_days_repeat;
+    $err["msg"] = $l_err_days_repeat;
     return false;
   }
 
   // If repeat days are set, repeat kind must be weekly
   if ($kind != "weekly" && $repeat_days != "0000000") {
-    $err_msg = $l_err_days_repeat_not_weekly;
+    $err["msg"] = $l_err_days_repeat_not_weekly;
     return false;
   }
 
   if ($kind == "weekly" && strtotime("+ 1 week",strtotime($dateend)) > strtotime($repeat_end)) {
-    $err_msg = $l_err_weekly_repeat;
+    $err["msg"] = $l_err_weekly_repeat;
     return false;
   }
 

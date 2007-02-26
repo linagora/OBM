@@ -62,7 +62,6 @@ function get_admin_pref_userpref_value($option) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_admin_pref_data_form($pref) {
-  global $err_msg;
 
   // Future use to check if user parameter valid ? XXXXX
 

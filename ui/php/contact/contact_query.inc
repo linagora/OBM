@@ -942,7 +942,7 @@ function check_contact_data_form($cid, $contact) {
   global $cgp_show, $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
   global $l_fill_lastname, $l_fill_company, $l_j_check_phone;
   global $l_j_check_hphone,$l_j_check_mphone, $l_j_check_fax, $l_j_check_email;
-  global $err_msg, $l_exist_error;
+  global $err, $l_exist_error;
 
   $lname = $contact["lname"];
   $fname = $contact["fname"];
@@ -958,14 +958,14 @@ function check_contact_data_form($cid, $contact) {
   // MANDATORY: Contact name
   $lname = strtoupper($lname);
   if (trim($lname) == "") {
-    $err_msg = $l_fill_lastname;
+    $err["msg"] = $l_fill_lastname;
     return false;
   }
 
   if ($cgp_show["module"]["company"]) {
     // MANDATORY: a company must be set
     if (($c_id < 1) && ($c_new_id < 1)) {
-      $err_msg = $l_fill_company;
+      $err["msg"] = $l_fill_company;
       return false;
     }
   }
@@ -975,34 +975,34 @@ function check_contact_data_form($cid, $contact) {
 
   // Contact phone
   if (($phone != "") && (preg_match($php_regexp_phone, $phone) == 0)) {
-    $err_msg = $l_j_check_phone . " : $phone";
+    $err["msg"] = $l_j_check_phone . " : $phone";
     return false;
   }
 
   // Contact mobile or personal phone
   if (($hphone != "") && (preg_match($php_regexp_phone, $hphone) == 0)) {
-    $err_msg = $l_j_check_hphone . " : $hphone";
+    $err["msg"] = $l_j_check_hphone . " : $hphone";
     return false;
   }
   if (($mphone != "") && (preg_match($php_regexp_phone, $mphone) == 0)) {
-    $err_msg = $l_j_check_mphone . " : $mphone";
+    $err["msg"] = $l_j_check_mphone . " : $mphone";
     return false;
   }
   // Contact fax
   if (($fax != "") && (preg_match($php_regexp_fax, $fax) == 0)) {
-    $err_msg = $l_j_check_fax . " : $fax";
+    $err["msg"] = $l_j_check_fax . " : $fax";
     return false;
   }
 
   // Contact email
   if (($email != "") && (preg_match($php_regexp_email, $email) == 0)) {
-    $err_msg = $l_j_check_email . " : $email";
+    $err["msg"] = $l_j_check_email . " : $email";
     return false;
   }
 
   // Contact email
   if (($email2 != "") && (preg_match($php_regexp_email, $email2) == 0)) {
-    $err_msg = $l_j_check_email . " : $email2";
+    $err["msg"] = $l_j_check_email . " : $email2";
     return false;
   }
 
@@ -1018,7 +1018,7 @@ function check_contact_data_form($cid, $contact) {
 //   true if the contact can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_can_delete_contact($p_id) {
-  global $err_msg, $ok_msg;
+  global $err, $ok_msg;
   global $l_link_deal, $l_link_deal_no, $l_link_contract, $l_link_contract_no;
   global $l_link_list, $l_link_list_no, $l_link_publication, $l_link_publication_no;
 
@@ -1028,7 +1028,7 @@ function check_can_delete_contact($p_id) {
   $nb = get_global_linked_deal_nb($p_id, "contact1", true, "contact2");
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "$l_link_deal";
+    $err["msg"] .= "$l_link_deal";
   } else {
     $ok_msg .= "$l_link_deal_no";
   }
@@ -1037,7 +1037,7 @@ function check_can_delete_contact($p_id) {
   $nb = get_linked_contact_list_nb($p_id);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "<br />$l_link_list";
+    $err["msg"] .= "<br />$l_link_list";
   } else {
     $ok_msg .= "<br />$l_link_list_no";
   }
@@ -1046,7 +1046,7 @@ function check_can_delete_contact($p_id) {
   $nb = get_global_linked_contract_nb($p_id, "contact1", true, "contact2");
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "<br />$l_link_contract";
+    $err["msg"] .= "<br />$l_link_contract";
   } else {
     $ok_msg .= "<br />$l_link_contract_no";
   }
@@ -1055,7 +1055,7 @@ function check_can_delete_contact($p_id) {
   $nb = get_linked_contact_publication_nb($p_id);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "<br />$l_link_publication";
+    $err["msg"] .= "<br />$l_link_publication";
   } else {
     $ok_msg .= "<br />$l_link_publication_no";
   }

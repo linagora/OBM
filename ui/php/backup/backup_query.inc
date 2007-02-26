@@ -55,7 +55,7 @@ function get_backup_list($backup) {
 // Backup Creation
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_backup_create() {
-  global $err_msg, $l_create_backup_error, $l_err_unknown_db;
+  global $err, $l_create_backup_error, $l_err_unknown_db;
   global $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
   global $db_type_mysql, $db_type_pgsql;
 
@@ -75,12 +75,12 @@ function run_query_backup_create() {
     $cmd = "pg_dump -U $obmdb_user $obmdb_db -f $disk_fullname";
     exec($cmd, $output, $ret);
   } else {
-    $err_msg = "$l_err_unknown_db ($obmdb_dbtype)";
+    $err["msg"] = "$l_err_unknown_db ($obmdb_dbtype)";
     return false;
   }
 
   if ($ret != 0) {
-    $err_msg = $l_create_backup_error;
+    $err["msg"] = $l_create_backup_error;
     return false;
   }
 
@@ -92,7 +92,7 @@ function run_query_backup_create() {
 // Backup Restore
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_backup_restore($filename) {
-  global $err_msg, $l_err_backup_file, $l_err_unknown_db;
+  global $err, $l_err_backup_file, $l_err_unknown_db;
   global $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
   global $db_type_mysql, $db_type_pgsql;
 
@@ -100,7 +100,7 @@ function run_query_backup_restore($filename) {
   $disk_fullname = $disk_path . $filename; 
   
   if ( (! is_file($disk_fullname)) || (! is_readable($disk_fullname) ) ) {
-    $err_msg = "$l_err_backup_file ($disk_fullname)";
+    $err["msg"] = "$l_err_backup_file ($disk_fullname)";
     return;
   }
 
@@ -151,7 +151,7 @@ function run_query_backup_restore($filename) {
     exec($cmd, $output, $ret);
 
   } else {
-    $err_msg = "$l_err_unknown_db ($obmdb_dbtype)";
+    $err["msg"] = "$l_err_unknown_db ($obmdb_dbtype)";
     return false;
   }
 
@@ -169,13 +169,13 @@ function run_query_backup_restore($filename) {
 //   - $filename : backup filename
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_backup_delete($filename) {
-  global $err_msg;
+  global $err;
 
   // Delete the backup file
   $retour = run_query_backup_delete_backup_file($filename);
 
   if (! $retour) {
-    $err_msg = $l_delete_file_error;
+    $err["msg"] = $l_delete_file_error;
   }
 
   return $retour;
@@ -220,13 +220,13 @@ function get_backup_disk_path() {
 //   true if backup can be deleted (for now always), else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_backup_can_delete($filename) {
-  global $err_msg, $php_regexp_backup, $l_err_backup_name;
+  global $err, $php_regexp_backup, $l_err_backup_name;
 
   $delete_ok = true;
 
   // Filename check (to avoid filename corruptions)
   if (preg_match($php_regexp_backup, $filename) == 0) {
-    $err_msg = "$l_err_backup_name : $filename"; 
+    $err["msg"] = "$l_err_backup_name : $filename"; 
     $delete_ok = false;
   }
 

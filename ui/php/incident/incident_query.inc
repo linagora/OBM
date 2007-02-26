@@ -606,7 +606,7 @@ function check_incident_form($incident) {
   global $cdg_sql;
   global $php_regexp_isodate, $l_fill_label, $l_fill_contract,$l_incident_date;
   global $l_fill_status, $l_fill_priority;
-  global $err_msg,$l_length_label,$l_invalid_date;
+  global $err, $l_length_label, $l_invalid_date;
 
   $c_id = $incident["contract_id"];
   $c_new_id = $incident["contract_new_id"];
@@ -614,35 +614,35 @@ function check_incident_form($incident) {
 
   // Check the label is filled
   if (trim($incident["lincident"]) == "") {
-    $err_msg = $l_fill_label;
+    $err["msg"] = $l_fill_label;
     return false;
   }
 
   // Check the status is filled
   if ($incident["status"] < 1) {
-    $err_msg = $l_fill_status;
+    $err["msg"] = $l_fill_status;
     return false;
   }
 
   // Check the priority is filled
   if ($incident["priority"] < 1) {
-    $err_msg = $l_fill_priority;
+    $err["msg"] = $l_fill_priority;
     return false;
   }
 
   // MANDATORY: a contract must be assigned
   if (($c_id < 1) && ($c_new_id < 1)) {
-    $err_msg = $l_fill_contract;
+    $err["msg"] = $l_fill_contract;
     return false;
   }
 
   if (strlen($incident["lincident"]) > 100) {
-    $err_msg = $l_length_label;
+    $err["msg"] = $l_length_label;
     return false;
   }
 
   if (strlen($reference) > 32) {
-    $err_msg = $l_length_reference;
+    $err["msg"] = $l_length_reference;
     return false;
   }
 
@@ -650,7 +650,7 @@ function check_incident_form($incident) {
 
   // Begin Date check
   if (($date == "") || (preg_match($php_regexp_isodate, $date) == 0)) {
-    $err_msg = "$l_incident_date : $l_invalid_date"; 
+    $err["msg"] = "$l_incident_date : $l_invalid_date"; 
     return false;
   }
 
@@ -666,7 +666,7 @@ function check_incident_form($incident) {
 //   true if the incident can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_can_delete_incident($p_id) {
-  global $cdg_sql, $err_msg, $ok_msg;
+  global $cdg_sql, $ok_msg;
 
   $delete_ok = true;
 

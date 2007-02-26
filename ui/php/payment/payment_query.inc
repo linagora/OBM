@@ -558,7 +558,7 @@ function check_payment_data_form($id, $params) {
   global $php_regexp_isodate;
   global $l_fill_company, $l_fill_kind, $l_fill_number, $l_error_number_exist;
   global $l_fill_inout, $l_fill_amount, $l_fill_date, $l_date, $l_invalid_date;
-  global $err_msg, $l_exist_error;
+  global $err, $l_exist_error;
 
   $number = $params["number"];
   $date = $params["date"];
@@ -570,43 +570,43 @@ function check_payment_data_form($id, $params) {
 
   // MANDATORY: a company must be set
   if (($c_id < 1) && ($c_new_id < 1)) {
-    $err_msg = $l_fill_company;
+    $err["msg"] = $l_fill_company;
     return false;
   }
 
   // MANDATORY: Amount must be set
   if (!($amount > 0)) {
-    $err_msg = $l_fill_amount;
+    $err["msg"] = $l_fill_amount;
     return false;
   }
 
   // Date check
   if (preg_match($php_regexp_isodate, $date) == 0) {
-    $err_msg = "$l_date : $date : $l_invalid_date"; 
+    $err["msg"] = "$l_date : $date : $l_invalid_date"; 
     return false;
   }
 
   // MANDATORY: inout must be set
   if (($inout != "+") && ($inout != "-")) {
-    $err_msg = $l_fill_inout;
+    $err["msg"] = $l_fill_inout;
     return false;
   }
 
   // MANDATORY: kind must be set
   if (! ($kind > 0)) {
-    $err_msg = $l_fill_kind;
+    $err["msg"] = $l_fill_kind;
     return false;
   }
 
   // MANDATORY: Invoice number, if state not "to be created"
   if ($status_created) {
     if (trim($number) == "") {
-      $err_msg = $l_fill_number;
+      $err["msg"] = $l_fill_number;
       return false;
     } else {
       $nb = get_invoice_nb_having_number($number, $id);
       if ($nb > 0) {
-	$err_msg = $l_error_number_exist;
+	$err["msg"] = $l_error_number_exist;
 	return false;
       }
     }
@@ -624,7 +624,7 @@ function check_payment_data_form($id, $params) {
 function check_payment_invoice_data_form($params) {
   global $php_regexp_amount;
   global $l_fill_amount, $l_invalid_amount, $l_err_total_payment_affected;
-  global $err_msg, $l_err_affected_invoice;
+  global $err, $l_err_affected_invoice;
 
   $id = $params["payment_id"];
   $invs = $params["invoice"];
@@ -632,10 +632,10 @@ function check_payment_invoice_data_form($params) {
   // check that each amount are correctly filled
   foreach($invs as $i_id=>$amount) {
     if (preg_match($php_regexp_amount, $amount) == 0) {
-      $err_msg = "$amount : $l_invalid_amount"; 
+      $err["msg"] = "$amount : $l_invalid_amount"; 
       return false;
     } elseif (! ($amount > 0)) {
-      $err_msg = "$amount : $l_fill_amount";
+      $err["msg"] = "$amount : $l_fill_amount";
       return false;
     }
   }
@@ -649,7 +649,7 @@ function check_payment_invoice_data_form($params) {
     $total_affected_amount += $affected_amount;
   }
   if ($paid_amount < $total_affected_amount) {
-    $err_msg = "$l_err_total_payment_affected ($total_amount > $paid_amount)";
+    $err["msg"] = "$l_err_total_payment_affected ($total_amount > $paid_amount)";
     return false;
   }
 
@@ -659,7 +659,7 @@ function check_payment_invoice_data_form($params) {
     $invoice_amount = $pinfos["invoices"]["$i_id"]["invoice_amount"];
     $remaining_amount = $invoice_amount - $already_paid;
     if ($affected_amount > $remaining_amount) {
-      $err_msg = "$l_err_affected_invoice ($affected_amount > $remaining_amount)";
+      $err["msg"] = "$l_err_affected_invoice ($affected_amount > $remaining_amount)";
       return false;
     }
   }
@@ -678,7 +678,7 @@ function check_payment_invoice_data_form($params) {
 //   true if the payment can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_can_delete_payment($id) {
-  global $err_msg, $ok_msg;
+  global $ok_msg;
 
   $delete_ok = true;
 

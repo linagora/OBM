@@ -25,6 +25,8 @@ function run_query_mailserver_count() {
 
   return $obm_q;  
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return All mailservers
 // Parameters:
@@ -280,11 +282,13 @@ function run_query_mailserver_delete($id) {
   } 
   return $retour;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check creation form
 ///////////////////////////////////////////////////////////////////////////////
 function check_mailserver_data_form($mailserver) {
-  global $php_regexp_network,$err_msg;
+  global $php_regexp_network, $err;
   global $l_invalid_mailserver,$l_invalid_relayhost,$l_invalid_ip;
 
 
@@ -293,32 +297,32 @@ function check_mailserver_data_form($mailserver) {
   $relayhost_id = $mailserver["relayhost_id"];
   $mailserver_networks = $mailserver["mailserver_networks"];
 
-  if(!is_numeric($host_id)) {
-    $err_msg = $l_invalid_mailserver;
+  if (!is_numeric($host_id)) {
+    $err["msg"] = $l_invalid_mailserver;
     return false;
   }
 
   $check = run_query_mailserver_check_server($host_id,$id);
-  if(!$check) {
-    $err_msg = $l_invalid_mailserver;
+  if (!$check) {
+    $err["msg"] = $l_invalid_mailserver;
     return false;
   }
-  if(is_numeric($relayhost_id)) {
-    if($relayhost_id == $host_id) {
-      $err_msg = $l_invalid_relayhost;
+  if (is_numeric($relayhost_id)) {
+    if ($relayhost_id == $host_id) {
+      $err["msg"] = $l_invalid_relayhost;
       return false;    
     }
     $check = run_query_mailserver_check_server($relayhost_id,$id);
-    if(!$check) {
-      $err_msg = $l_invalid_relayhost;
+    if (!$check) {
+      $err["msg"] = $l_invalid_relayhost;
       return false;    
     } 
   }
   
-  if(is_array($mailserver_networks)) {
+  if (is_array($mailserver_networks)) {
     foreach($mailserver_networks as $net) {
-      if($net != "" && preg_match($php_regexp_network, $net) == 0) {
-        $err_msg = "$l_invalid_ip : $net";
+      if ($net != "" && preg_match($php_regexp_network, $net) == 0) {
+        $err["msg"] = "$l_invalid_ip : $net";
         return false;    
       }
     }

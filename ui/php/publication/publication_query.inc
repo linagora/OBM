@@ -927,7 +927,7 @@ function check_publication_context($cid, $publication) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_publication_data($cid, $publication) {
   global $l_fill_title, $l_j_check_year,$l_j_fill_lang, $php_regexp_pub_lang;
-  global $err_msg, $l_j_check_lang;
+  global $err, $l_j_check_lang;
 
   $title = $publication["title"];
   $year = $publication["year"];
@@ -936,20 +936,20 @@ function check_publication_data($cid, $publication) {
   $type = $publication["type"];
 
   if (trim($title) == "") {
-    $err_msg = $l_fill_title;
+    $err["msg"] = $l_fill_title;
     return false;
   }
 
   if (($year == "") || ($year < 1900 || $year > 2200)) {
-    $err_msg = $l_j_check_year. " : $year";
+    $err["msg"] = $l_j_check_year. " : $year";
     return false;
   }
 
   if ($lang == "") {
-    $err_msg = $l_j_fill_lang;
+    $err["msg"] = $l_j_fill_lang;
     return false;
   } else if (preg_match($php_regexp_pub_lang, $lang) == 0) {
-    $err_msg = $l_j_check_lang . " : $lang";
+    $err["msg"] = $l_j_check_lang . " : $lang";
     return false;
   }
 
@@ -968,17 +968,17 @@ function check_publication_data($cid, $publication) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_publication_data_subscription_form($cid, $publication) {
   global $l_j_check_quantity,$l_j_select_publication ;
-  global $err_msg;
+  global $err;
 
   $quantity = $publication["quantity"];
   $p_id = $publication["publication_id"];
 
   if (($p_id == "") || !($p_id >= 0) ) {
-    $err_msg = $l_j_select_publication;
+    $err["msg"] = $l_j_select_publication;
     return false;
   }
   if (($quantity == "")) {
-    $err_msg = $l_j_check_quantity;
+    $err["msg"] = $l_j_check_quantity;
     return false;
   }
   return true; 
@@ -993,7 +993,7 @@ function check_publication_data_subscription_form($cid, $publication) {
 //   true if the publication can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_publication_can_delete($p_id) {
-  global $err_msg, $ok_msg, $block;
+  global $err, $ok_msg, $block;
   global $path;
   global $l_contact, $l_link_contact, $l_link_contact_no;
 
@@ -1005,7 +1005,7 @@ function check_publication_can_delete($p_id) {
 
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg = $l_link_contact;
+    $err["msg"] = $l_link_contact;
     $display_linkc ="
       <tr>
         <td class=\"detailHead\">$l_contact</td>

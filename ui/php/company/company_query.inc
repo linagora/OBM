@@ -749,7 +749,7 @@ function check_company_context($cid, $company) {
 function check_company_data_form($cid, $company) {
   global $l_fill_name, $l_j_check_phone, $l_j_check_zip, $l_j_check_fax;
   global $l_j_check_email, $l_j_check_web, $l_err_act_empty;
-  global $err_msg;
+  global $err;
   global $php_regexp_zip,$php_regexp_phone,$php_regexp_fax,$php_regexp_email,$php_regexp_web;
 
   $num = $company["num"];
@@ -763,43 +763,43 @@ function check_company_data_form($cid, $company) {
 
   // MANDATORY: Company name
   if (trim($name) == "") {
-    $err_msg = $l_fill_name;
+    $err["msg"] = $l_fill_name;
     return false;
   }
 
   // Company activity filled
   //  if ($company["activity"] < 1) {
-  //    $err_msg = $l_err_act_empty;
+  //    $err["msg"] = $l_err_act_empty;
   //    return false;
   //  }
 
   // Company Zip code
   if (($zip != "") && (preg_match($php_regexp_zip, $zip) == 0)) {
-    $err_msg = $l_j_check_zip . " : $zip";
+    $err["msg"] = $l_j_check_zip . " : $zip";
     return false;
   }
 
   // Company phone
   if (($phone != "") && (preg_match($php_regexp_phone, $phone) == 0)) {
-    $err_msg = $l_j_check_phone . " : $phone";
+    $err["msg"] = $l_j_check_phone . " : $phone";
     return false;
   }
 
   // Company fax
   if (($fax != "") && (preg_match($php_regexp_fax, $fax) == 0)) {
-    $err_msg = $l_j_check_fax . " : $fax";
+    $err["msg"] = $l_j_check_fax . " : $fax";
     return false;
   }
 
   // Company email
   if (($email != "") && (preg_match($php_regexp_email, $email) == 0)) {
-    $err_msg = $l_j_check_email . " : $email";
+    $err["msg"] = $l_j_check_email . " : $email";
     return false;
   }
 
   // Company web
   if (($web != "") && (preg_match($php_regexp_web, $web) == 0)) {
-    $err_msg = $l_j_check_web . " : $web";
+    $err["msg"] = $l_j_check_web . " : $web";
     return false;
   }
 
@@ -815,7 +815,7 @@ function check_company_data_form($cid, $company) {
 //   true if the company can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_can_delete_company($p_id) {
-  global $err_msg, $ok_msg;
+  global $err, $ok_msg;
   global $l_link_deal, $l_link_deal_no, $l_link_contact, $l_link_contact_no;
   global $l_link_contract, $l_link_contract_no, $l_link_project;
   global $l_link_invoice, $l_link_invoice_no, $l_link_project_no;
@@ -826,7 +826,7 @@ function check_can_delete_company($p_id) {
   $nb = get_global_linked_element_nb("Contact", $p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "$l_link_contact";
+    $err["msg"] .= "$l_link_contact";
   } else {
     $ok_msg .= "$l_link_contact_no";
   }
@@ -835,7 +835,7 @@ function check_can_delete_company($p_id) {
   $nb = get_global_linked_element_nb("Deal", $p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "<br />$l_link_deal";
+    $err["msg"] .= "<br />$l_link_deal";
   } else {
     $ok_msg .= "<br />$l_link_deal_no";
   }
@@ -844,7 +844,7 @@ function check_can_delete_company($p_id) {
   $nb = get_global_linked_element_nb("Contract", $p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "<br />$l_link_contract";
+    $err["msg"] .= "<br />$l_link_contract";
   } else {
     $ok_msg .= "<br />$l_link_contract_no";
   }
@@ -853,7 +853,7 @@ function check_can_delete_company($p_id) {
   $nb = get_global_linked_element_nb("Project", $p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "<br />$l_link_project";
+    $err["msg"] .= "<br />$l_link_project";
   } else {
     $ok_msg .= "<br />$l_link_project_no";
   }
@@ -862,7 +862,7 @@ function check_can_delete_company($p_id) {
   $nb = get_global_linked_element_nb("Invoice", $p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "<br />$l_link_invoice";
+    $err["msg"] .= "<br />$l_link_invoice";
   } else {
     $ok_msg .= "<br />$l_link_invoice_no";
   }

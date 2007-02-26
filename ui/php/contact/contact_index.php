@@ -155,7 +155,7 @@ if ($action == "ext_get_ids") {
 
   // Form data are not valid
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_contact_form($action, "", $params);
   }
   
@@ -172,7 +172,7 @@ if ($action == "ext_get_ids") {
       $display["detail"] = dis_contact_consult($params);
     }    
   } else {
-    $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_contact_form($action, "", $params);
   }
   
@@ -182,7 +182,7 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_contact($params["contact_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_contact_consult($params);
   }
@@ -198,7 +198,7 @@ if ($action == "ext_get_ids") {
     }
     $display["search"] = dis_contact_search_form($params);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_contact_consult($params);
   }

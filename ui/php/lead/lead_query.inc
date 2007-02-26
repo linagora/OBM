@@ -385,7 +385,7 @@ function check_lead_data_form($id, $params) {
   global $php_regexp_isodate;
   global $l_fill_name;
   global $l_fill_date, $l_date, $l_alarm, $l_invalid_date;
-  global $err_msg, $l_exist_error;
+  global $err, $l_exist_error;
 
   $name = $params["name"];
   $date = $params["date"];
@@ -396,19 +396,19 @@ function check_lead_data_form($id, $params) {
 
   // MANDATORY: Name must be set
   if (trim($name) == "") {
-    $err_msg = $l_fill_name;
+    $err["msg"] = $l_fill_name;
     return false;
   }
 
   // Date check
   if (preg_match($php_regexp_isodate, $date) == 0) {
-    $err_msg = "$l_date : $date : $l_invalid_date"; 
+    $err["msg"] = "$l_date : $date : $l_invalid_date"; 
     return false;
   }
 
   // Date check
   if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
-    $err_msg = "$l_alarm : $datealarm : $l_invalid_date"; 
+    $err["msg"] = "$l_alarm : $datealarm : $l_invalid_date"; 
     return false;
   }
 
@@ -424,7 +424,7 @@ function check_lead_data_form($id, $params) {
 //   true if the lead can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_can_delete_lead($id) {
-  global $err_msg, $ok_msg;
+  global $ok_msg;
 
   $delete_ok = true;
 

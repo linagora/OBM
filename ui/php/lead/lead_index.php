@@ -57,13 +57,13 @@ if ($action == "index" || $action == "") {
       $display["msg"] = display_ok_msg ("$l_lead : $l_insert_ok");
       $display["detail"] = dis_lead_consult($params);
     } else {
-      $display["msg"] .= display_err_msg("$l_lead : $l_insert_error : $err_msg");
+      $display["msg"] .= display_err_msg("$l_lead : $l_insert_error : $err[msg]");
       $display["detail"] = dis_lead_form($action, $params);
     }
 
   // Form data are not valid
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_lead_form($action, $params);
   }
 
@@ -86,7 +86,7 @@ if ($action == "index" || $action == "") {
     }
     $display["detail"] = dis_lead_consult($params);
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_lead_form($action, $params);
   }
 
@@ -96,7 +96,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_lead($params["lead_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_lead_consult($params);
   }
@@ -112,7 +112,7 @@ if ($action == "index" || $action == "") {
     }
     $display["search"] = dis_lead_search_form($params);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_lead_consult($params);
   }

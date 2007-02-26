@@ -268,7 +268,7 @@ function run_query_todo_delete($parms) {
 function run_query_todo_delete_unique($t_id) {
   global $cdg_sql, $c_use_connectors;
 
-	$multidomain = sql_multidomain("todo");
+  $multidomain = sql_multidomain("todo");
 
   $query = "DELETE FROM Todo WHERE todo_id = '$t_id' $multidomain";
   
@@ -298,7 +298,7 @@ function run_query_todo_delete_unique($t_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_todo_data_form($todo) {
   global $php_regexp_percent, $l_err_percent, $l_j_fill_title;
-  global $err_msg, $obm;
+  global $err, $obm;
 
   $t_id = $todo["todo_id"];
   $uid = $obm["uid"];
@@ -312,13 +312,13 @@ function check_todo_data_form($todo) {
 
   // MANDATORY: Todo title
   if (trim($title) == "") {
-    $err_msg = $l_j_fill_title;
+    $err["msg"] = $l_j_fill_title;
     return false;
   }
 
   // Percent
   if (($percent != "") && (preg_match($php_regexp_percent, $percent) == 0)) {
-    $err_msg = $l_err_percent . " : $percent";
+    $err["msg"] = $l_err_percent . " : $percent";
     return false;
   }
 
@@ -334,7 +334,7 @@ function check_todo_data_form($todo) {
 //   true if the todo can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_todo_can_delete($p_id) {
-  global $err_msg, $ok_msg;
+  global $ok_msg;
 
   $delete_ok = true;
 

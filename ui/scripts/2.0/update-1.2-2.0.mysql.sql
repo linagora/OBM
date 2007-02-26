@@ -328,10 +328,6 @@ CREATE TABLE DefaultOdtTemplate (
 ---------------------------------------------------------------------------
 -- Update UserObm table from Aliamin and to OBM2
 ---------------------------------------------------------------------------
--- Update user infos to new datas
-UPDATE UserObm set userobm_theme='default';
-UPDATE UserObm set userobm_password_type='md5';
-
 -- Add existent column which had not been added
 ALTER TABLE UserObm ADD COLUMN userobm_mobile varchar(32) DEFAULT '' AFTER userobm_phone2;
 
@@ -372,6 +368,11 @@ ALTER TABLE UserObm ADD COLUMN userobm_host_id int(8) default NULL AFTER userobm
 -- add constraint ...
 --  UNIQUE KEY k_login_user (userobm_login),
 --  INDEX k_uid_user (userobm_uid)
+
+-- Update user infos to new datas
+UPDATE UserObmPref set userobmpref_value='default' WHERE userobmpref_option='set_theme';
+UPDATE UserObm set userobm_password_type='md5';
+
 
 
 ---------------------------------------------------------------------------

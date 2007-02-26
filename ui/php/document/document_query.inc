@@ -149,7 +149,7 @@ function run_query_document_detail($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_insert(&$document) {
   global $cdg_sql, $c_auto, $obm;
-  global $err_msg, $l_create_file_error;
+  global $err, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   $uid = $obm["uid"];
@@ -227,7 +227,7 @@ function run_query_document_insert(&$document) {
     // We create the document on disk
     if ($kind == $cdoc_kind_file) {
       if (! run_query_document_create_file($document)) {
-	$err_msg = $l_create_file_error;
+	$err["msg"] = $l_create_file_error;
 	// If error, we delete The document infos to keep bd and rep on sync
 	run_query_document_delete($doc_id);
 	return false;
@@ -305,7 +305,7 @@ function run_query_document_id($document) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_update(&$document) {
   global $obm, $cdg_sql, $c_auto;
-  global $err_msg, $l_delete_file_error, $l_create_file_error;
+  global $err, $l_delete_file_error, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   $uid = $obm["uid"];
@@ -362,11 +362,11 @@ function run_query_document_update(&$document) {
   if (($kind == $cdoc_kind_file) && ($file_update == "yes")) {
 
     if (! run_query_document_delete_file($id)) { 
-      $err_msg = $l_delete_file_error;
+      $err["msg"] = $l_delete_file_error;
       return false;
     }
     if (! run_query_document_create_file($document)) {
-      $err_msg = $l_create_file_error;
+      $err["msg"] = $l_create_file_error;
       return false;
     }
   }
@@ -708,7 +708,7 @@ function check_document_data_form($cid, $document) {
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
   global $l_fill_title, $l_fill_author, $l_fill_path;
   global $l_invalid_file, $l_invalid_existing_file, $l_invalid_url;
-  global $err_msg, $l_invalid_link_file, $l_invalid_dir_path, $l_dir_error;
+  global $err, $l_invalid_link_file, $l_invalid_dir_path, $l_dir_error;
 
   $title = $document["title"];
   $author = $document["author"];
@@ -721,39 +721,39 @@ function check_document_data_form($cid, $document) {
 
   // MANDATORY: Document Title 
   if (trim($title) == "") {
-    $err_msg = $l_fill_title;
+    $err["msg"] = $l_fill_title;
     return false;
   }
 
   // MANDATORY: Document Author 
   if (trim($author) == "") {
-    $err_msg = $l_fill_author;
+    $err["msg"] = $l_fill_author;
     return false;
   }
 
   // If doc is a file, check that name and size are not empty
   if (($kind == $cdoc_kind_file) && $file_update != "no" && ($name == "" || $size == "")) {
-    $err_msg = $l_invalid_file;
+    $err["msg"] = $l_invalid_file;
     return false;
   }
   
   // If doc is a file, check the path exists
   if ( ($kind == $cdoc_kind_file) && $file_update != "no"
        && (! document_path_exists($path)) ) {
-    $err_msg = "$l_invalid_dir_path ($path)";
+    $err["msg"] = "$l_invalid_dir_path ($path)";
     return false;
   }
 
   // If document is a link, check that the url is filled
   if (($kind == $cdoc_kind_link) && ($url == "") && ($file_update != "no")) {
-    $err_msg = $l_invalid_url;
+    $err["msg"] = $l_invalid_url;
     return false;
   } 
 
   // If document is a directory, check that name and path are ok
   if (($kind == $cdoc_kind_dir) && ($name == "") && ($file_update != "no")
        && (! document_path_exists($path)) ) {
-    $err_msg = $l_invalid_dir;
+    $err["msg"] = $l_invalid_dir;
     return false;
   } 
 
@@ -1014,20 +1014,20 @@ function run_query_document_update_dir($document) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_document_dir_data_form($document) {
-  global $err_msg, $l_invalid_dir_path, $l_fill_dir_name;
+  global $err, $l_invalid_dir_path, $l_fill_dir_name;
 
   $name = $document["name"];
   $path = $document["path"];
 
   // MANDATORY: Document Title 
   if (trim($name) == "") {
-    $err_msg = $l_fill_dir_name;
+    $err["msg"] = $l_fill_dir_name;
     return false;
   }
 
   // If doc is a file, check the path exists
   if (! document_path_exists($path)) {
-    $err_msg = "$l_invalid_dir_path ($path)";
+    $err["msg"] = "$l_invalid_dir_path ($path)";
     return false;
   }
 
@@ -1043,7 +1043,7 @@ function check_document_dir_data_form($document) {
 //   true if document can be deleted (for now always), else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_document_can_delete($p_id) {
-  global $err_msg, $l_have_link, $l_have_no_link;
+  global $err, $l_have_link, $l_have_no_link;
 
   $delete_ok = true;
 
@@ -1052,9 +1052,9 @@ function check_document_can_delete($p_id) {
 
   // Warn if document has links
   if ($nb > 0) {
-    $err_msg = $l_have_link;
+    $err["msg"] = $l_have_link;
   } else {
-    $err_msg = $l_have_no_link;
+    $err["msg"] = $l_have_no_link;
   }
  
   return $delete_ok;
@@ -1070,7 +1070,7 @@ function check_document_can_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_document_can_delete_dir($id) {
   global $cdoc_kind_dir, $c_all, $default_path;
-  global $err_msg, $l_err_reference, $l_err_system_path, $l_err_dir_no_empty;
+  global $err, $l_err_reference, $l_err_system_path, $l_err_dir_no_empty;
 
   $delete_ok = true;
 
@@ -1083,20 +1083,20 @@ function check_document_can_delete_dir($id) {
 
   // Forbid to delete Root or path defined as default
   if (($fullname == "/") || ($fullname == $default_path)) {
-    $err_msg .= $l_err_system_path;
+    $err["msg"] .= $l_err_system_path;
     return false;
   }
 
   // Check that document really exists !
   if ($db_id != $id) {
-    $err_msg .= $l_err_reference;
+    $err["msg"] .= $l_err_reference;
     $delete_ok = false;
     return false;
   }
 
   // Check that document is really a directory
   if ($kind != $cdoc_kind_dir) {
-    $err_msg .= $l_cant_delete;
+    $err["msg"] .= $l_cant_delete;
     $delete_ok = false;
     return false;
   }
@@ -1104,7 +1104,7 @@ function check_document_can_delete_dir($id) {
   // Check that directory is empty
   $nb = get_dir_document_nb($fullname, $c_all);
   if ($nb > 0) {
-    $err_msg .= $l_err_dir_no_empty;
+    $err["msg"] .= $l_err_dir_no_empty;
     return false;
   }
 

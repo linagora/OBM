@@ -81,11 +81,12 @@ function run_query_vacation_update($params, $u_id) {
   return $ret;
 }
 
+
 //
 // updates sieve status according to $vacation,
 // ie. upload and activate the new script in sieve
 // returns true if ok,
-// else returns false and sets $err_msg;
+// else returns false and sets $err["msg"];
 //
 function update_sieve($vacation, $u_uid) {  
   global $err, $l_sieve_login_failed, $cmd_vacation;

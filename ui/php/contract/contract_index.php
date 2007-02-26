@@ -128,7 +128,7 @@ if ($action == "ext_get_id") {
       }
     }
   } else {
-    $display["msg"] .= display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err["msg"]);
     $display["detail"] = dis_contract_form($action, $params,"");
   }
 
@@ -143,7 +143,7 @@ if ($action == "ext_get_id") {
       }
     $display["search"] = dis_contract_consult($params);      
   } else {
-      $display["msg"] .= display_err_msg($l_invalid_da. " : " . $err_msg);
+      $display["msg"] .= display_err_msg($l_invalid_da. " : " . $err["msg"]);
       $display["detail"] = dis_contract_form($action, $params,"");
     }
 
@@ -153,7 +153,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_contract($params["contract_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_contract_consult($params);
   }
@@ -174,7 +174,7 @@ if ($action == "ext_get_id") {
       $display["msg"] .= display_info_msg($l_no_display);
     }
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_contract_consult($params);
   }

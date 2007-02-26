@@ -128,12 +128,12 @@ elseif ($action == "ext_get_ids") {
       $display["msg"] .= display_ok_msg("$l_document : $l_insert_ok");
       $display["detail"] = dis_document_consult($params);
     } else {
-      $display["msg"] .= display_err_msg("$l_document : $l_insert_error $err_msg");
+      $display["msg"] .= display_err_msg("$l_document : $l_insert_error $err[msg]");
       $display["detail"] = dis_document_form($action, $params, "");
     }
   // Form data are not valid
   } else {
-    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_document_form($action, $params, "");
   }
 
@@ -149,7 +149,7 @@ elseif ($action == "ext_get_ids") {
     $display["detail"] = html_document_tree($params,true);
   // Form data are not valid
   } else {
-    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = html_document_dir_form($action, $params);
   }
 
@@ -160,13 +160,13 @@ elseif ($action == "ext_get_ids") {
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_document : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg("$l_document : $l_update_error  $err_msg");
+      $display["msg"] .= display_err_msg("$l_document : $l_update_error  $err[msg]");
     }
     $doc_q = run_query_document_detail($params["document_id"]);
     $display["detailInfo"] .= display_record_info($doc_q);
     $display["detail"] = html_document_consult($doc_q);
   } else {
-    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_document_form($action, $params, "");
   }
 
@@ -182,17 +182,17 @@ elseif ($action == "ext_get_ids") {
     $display["detail"] = html_document_tree($params,true);
   // Form data are not valid
   } else {
-    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = html_document_dir_form($action, $params);
   }
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_can_delete($params["document_id"])) {
-    $display["msg"] .= display_info_msg($err_msg);
+    $display["msg"] .= display_info_msg($err["msg"]);
     $display["detail"] = dis_document_can_delete($params["document_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg);
+    $display["msg"] .= display_warn_msg($err["msg"]);
     $display["detail"] = dis_document_consult($params);
   }
 
@@ -208,7 +208,7 @@ elseif ($action == "ext_get_ids") {
     $display["search"] = dis_document_search_form($params);
     $display["result"] = dis_document_search_list($params);
   } else {
-    $display["msg"] .= display_warn_msg("$err_msg $l_cant_delete");
+    $display["msg"] .= display_warn_msg("$err[msg] $l_cant_delete");
     $display["detail"] = dis_document_consult($params);
   }
 
@@ -217,7 +217,7 @@ elseif ($action == "ext_get_ids") {
   if (check_document_can_delete_dir($params["document_id"])) {
     $display["detail"] = dis_document_can_delete_dir($params["document_id"]);
   } else {
-    $display["msg"] .= display_warn_msg("$err_msg $l_dir_cant_delete");
+    $display["msg"] .= display_warn_msg("$err[msg] $l_dir_cant_delete");
     $display["detail"] = html_document_tree($params,"true");
   }
 
@@ -231,7 +231,7 @@ elseif ($action == "ext_get_ids") {
       $display["msg"] .= display_err_msg("$l_dir : $l_delete_error");
     }
   } else {
-    $display["msg"] .= display_warn_msg("$err_msg $l_dir_cant_delete");
+    $display["msg"] .= display_warn_msg("$err[msg] $l_dir_cant_delete");
   }
   $display["detail"] = html_document_tree($params,"true");
 

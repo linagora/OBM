@@ -725,7 +725,7 @@ function check_resourcegroup_context($id, $group) {
 //     keys used : name, desc
 ///////////////////////////////////////////////////////////////////////////////
 function check_resourcegroup_data_form($group) {
-  global $err_msg, $l_fill_name, $l_group_exists;
+  global $err, $l_fill_name, $l_group_exists;
 
   $id = $group["resourcegroup_id"];
   $name = $group["name"];
@@ -735,13 +735,13 @@ function check_resourcegroup_data_form($group) {
 
   // MANDATORY: Group name not empty
   if (trim($name) == "") {
-    $err_msg = $l_fill_name;
+    $err["msg"] = $l_fill_name;
     return false;
   }
 
   // MANDATORY: RGroup name unique
   if (get_resourcegroup_name_exists($name, $id)) {
-    $err_msg = "$l_group_exists ($name)";
+    $err["msg"] = "$l_group_exists ($name)";
     return false;
   }
 

@@ -56,7 +56,7 @@ if ($action == "index" || $action == "") {
     $display["result"] .= dis_todo_search_list($params);
   // Form data are not valid
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_todo_form($params);
   }
 
@@ -78,7 +78,7 @@ if ($action == "index" || $action == "") {
     $display["result"] = dis_todo_form($params);
     $display["result"] .= dis_todo_search_list($params);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $params_q = run_query_todo_detail($params);
     $display["detail"] .= dis_todo_detail($params, $params_q);
@@ -108,7 +108,7 @@ if ($action == "index" || $action == "") {
 
     // Form data are not valid
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_todo_form($params);
   }
 

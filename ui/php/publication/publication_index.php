@@ -149,7 +149,7 @@ if ($action == "ext_get_id") {
 
   // Form data are not valid
   } else {
-    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_publication_form($action, $params);
   }
 
@@ -169,7 +169,7 @@ if ($action == "ext_get_id") {
     }
   // Form data are not valid
   } else {
-    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $recept_q = run_query_publication_subscription_reception();
     $params["lang"] = run_query_publication_get_contact_lang($params["contact_id"]);
     $display["detail"] = html_publication_subscription_form($action,$cont_q, $recept_q, $params);
@@ -217,7 +217,7 @@ if ($action == "ext_get_id") {
     }
     $display["detail"] = dis_publication_consult($params);
   } else {
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_publication_form($action, $params);
   }
 
@@ -239,7 +239,7 @@ if ($action == "ext_get_id") {
     }
   // Form data are not valid
   } else {
-    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $recept_q = run_query_publication_subscription_reception();
     $params["lang"] = run_query_publication_get_contact_lang($params["contact_id"]);
     $display["detail"] = html_publication_subscription_form($action,$cont_q, $recept_q, $params);
@@ -251,7 +251,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_publication_can_delete($params["publication_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = $block;
     $display["detail"] .= dis_publication_consult($params);
@@ -269,7 +269,7 @@ if ($action == "ext_get_id") {
     $type_q = run_query_publication_type();
     $display["search"] = html_publication_search_form($type_q, $params);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_publication_consult($params);
   }

@@ -102,7 +102,7 @@ if ($action == "index" || $action == "") {
       $display["detail"] = dis_incident_form($action,$params);
     }
   } else {
-    $display["msg"] = display_warn_msg($err_msg);
+    $display["msg"] = display_warn_msg($err["msg"]);
     $display["detail"] = dis_incident_form($action,$params);
   }
 
@@ -118,7 +118,7 @@ if ($action == "index" || $action == "") {
       $display["detail"] = dis_incident_form($action,$params);
     }
   } else {
-    $display["msg"] = display_warn_msg($err_msg);
+    $display["msg"] = display_warn_msg($err["msg"]);
     $display["detail"] = dis_incident_form($action,$params);
   }
  
@@ -128,7 +128,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_incident($params["incident_id"]);
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_incident_consult($params);
   }
@@ -150,7 +150,7 @@ if ($action == "index" || $action == "") {
       $display["msg"] .= display_info_msg($l_no_display);
     }
   } else {
-    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_incident_consult($params);
   }
