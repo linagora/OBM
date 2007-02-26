@@ -106,6 +106,7 @@ function display_page(&$display) {
 function display_menu($module) {
   global $path, $obm, $display, $obm_version, $cgp_show,$set_lang;
   global $l_logout, $l_profile,$ico_logout,$modules,$ico_login, $ico_obm,$ico_print;
+  global $ico_scope,$l_scope_update;
 
   $uid = $obm["uid"];
   $login = $obm["login"];
@@ -120,7 +121,7 @@ function display_menu($module) {
   if ($display["print_url"] != "") {
     $dis_printer = "<li><a target=\"top\" href=\"".$display["print_url"]."&amp;output_target=print\"><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
   }
-
+  $dis_scope = "<li><a href=\"\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
   $block = "
 <!-- Bandeau -->
 <div id='banner'>
@@ -129,6 +130,7 @@ function display_menu($module) {
 $display["section"]
 ."
 <ul id='information'>
+$dis_scope
 <li> $login ($domain)</li>
 <li>$l_profile : $profil</li>
 <li><a href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>

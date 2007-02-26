@@ -43,7 +43,7 @@ $fieldnames["group_user_email"] = $l_email;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_group(&$OD, $fieldname, $link_ok) {
-  global $path, $obm, $params, $ico_mail;
+  global $path, $obm, $params, $ico_mail,$cgp_use;
 
   if (($fieldname == "group_name") && $link_ok) {
     $res["url"] = "$path/group/group_index.php?action=detailconsult&amp;group_id=".$OD->data_set->f("group_id");
@@ -111,7 +111,9 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "group_email") {
     $email = $OD->data_set->f("group_email");
     if (strcmp($email,"") != 0) {
-      $email .= "@".$obm["domain_name"];
+      if ($cgp_use["service"]["mail"]) {
+        $email .= "@".$obm["domain_name"];
+      }
       $res["url"] = "mailto:$email";
       $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\" />";
       $res["txt_name"] = $email;
@@ -385,7 +387,10 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $mailing = ($group_q->f("group_mailing") == 1 ? $l_yes : $l_no);
 
   if ($email != "") {
-    $dis_email = "$email@$obm[domain_name]";
+    if ($cgp_use["service"]["mail"]) {
+      $email = "$email@$obm[domain_name]";
+    } 
+    $dis_email = "$email";
   }
 
   if ($cgp_use["service"]["samba"]) {
@@ -396,7 +401,14 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       <td>$samba</td>
     </tr>";
   }
-
+  if($group_q->f("group_privacy") == 0) {
+    $dis_email = "<tr>
+      <th>$l_email</th>
+      <td>$dis_email</td>
+    </tr>";
+  } else {
+    $dis_email = "";
+  }
   $block_userdata .= of_userdata_dis_entity_consult("group", $id);
 
   // Prevent to update samba systems groups
@@ -515,10 +527,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       <th>$l_visibility</th>
       <td>$privacy</td>
     </tr>
-    <tr>
-      <th>$l_email</th>
-      <td>$dis_email</td>
-    </tr>
+    $dis_email
     <tr>
       <th>$l_mailing</th>
       <td>$mailing</td>

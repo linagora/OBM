@@ -31,7 +31,7 @@ $fieldnames["timeupdate"] = $l_date_last_update;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_mailshare(&$OD, $fieldname, $link_ok) {
-  global $path, $ico_mail;
+  global $path, $ico_mail, $obm;
 
   if (($fieldname == "mailsharedir_name") && $link_ok) {
     if ($OD->display_ext == "get_id") {
@@ -50,8 +50,7 @@ function dis_data_mailshare(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "mailsharedir_email") {
-    $mail = get_mail_info();
-    $main_domain = $mail["main_domain"];
+    $main_domain = $obm["domain_name"];
 
     $email = $OD->data_set->f("mailsharedir_email");
     if (strcmp($email ,"") != 0) {
@@ -281,7 +280,7 @@ function html_mailshare_consult($mailshare_q) {
 function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
   global $display, $l_insert, $l_update, $l_back,$l_web_list;
   global $l_mailshare, $l_name, $l_desc, $l_quota, $l_email;
-  global $cgp_use, $cmailshare_default_quota;
+  global $cgp_use, $cmailshare_default_quota,$obm;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -312,8 +311,7 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
   $class_quota = ($field == "quota") ? "detailError" : "detailLabel";
   $class_email =  ($field == "email") ? "detailError" : "detailLabel";
 
-  $mail = get_mail_info();
-  $main_domain = $mail["main_domain"];
+  $main_domain = $obm["domain_name"];
 
   $display["detailInfo"] = display_record_info($mailshare_q);
   $display["title"] = "<div class=\"title\">$l_mailshare : $name</div>";

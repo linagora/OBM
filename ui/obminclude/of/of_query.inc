@@ -357,7 +357,7 @@ function of_domain_get_domain_infos($d_id) {
 
     $domain["id"] = $obm_q->f("domain_id");
     $domain["label"] = $obm_q->f("domain_label");
-    $domain["name"] = $obm_q->f("domain_domain_name");
+    $domain["name"] = $obm_q->f("domain_name");
   } else {
     $domain["id"] = "0";
     $domain["label"] = "Global";

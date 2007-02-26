@@ -304,13 +304,13 @@ class Auth {
     $obm["uid"] = "form";
     $this->auth["exp"] = 0x7fffffff;
     $this->auth["refresh"] = 0x7fffffff;
+    $_SESSION['obm'] = $obm;
     exit;
   }
 
   function unauth($nobody = false) {
 
     $this->auth["exp"]   = 0;
-//    $_SESSION['obm'] = "";
   }
   
 
@@ -373,7 +373,7 @@ class Auth {
 class Perm {
 
   function Perm () {
-    global $profiles,$obm,$perm_admin;
+    global $profiles,$obm,$perm_admin, $perm_user;
     if (! isset($profiles["admin"])) {
       $profiles["admin"] = array (
         'section' => array (
@@ -398,7 +398,8 @@ class Perm {
             'host' => $perm_admin,
             'domain' => $perm_admin,
             'password' => $perm_admin,
-            'settings' => $perm_admin
+            'settings' => $perm_admin,
+            'group' => $perm_user
           )
         );
     }    

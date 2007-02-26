@@ -155,7 +155,7 @@ $l_mail = "Mail";
 $l_vacation = "Mail Vacation";
 $l_control = "Dashboard";
 $l_host = "Host";
-
+$l_scope_update = "Update system";
 // Global display
 $l_last_visit = "Last visits";
 

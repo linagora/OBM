@@ -162,6 +162,7 @@ $l_vacation = "Répondeur";
 $l_control = "Tableau de bord";
 $l_host = "Hôte";
 $l_insufficient_permission = "Permissions insuffisantes";
+$l_scope_update = "Mettre à jour le systeme";
 // OBM_DISPLAY
 $l_entries = "Entrées";
 $l_page_res = "Pages de résultat";

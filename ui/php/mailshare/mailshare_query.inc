@@ -92,7 +92,7 @@ function run_query_mailshare_detail($id) {
 
   $timeupdate = sql_date_format($db_type,"mailsharedir_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"mailsharedir_timecreate", "timecreate");
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain("mailsharedir");
 
   $query = "SELECT *,
       $timecreate,
@@ -193,7 +193,7 @@ function run_query_mailshare_update($mailshare) {
   $email = $mailshare["email"];
   $desc = $mailshare["desc"];
   $now = date("Y-m-d H:i:s");
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain("mailsharedir");
   
   $query = "UPDATE MailShareDir set
     mailsharedir_timeupdate = '$now',
@@ -221,7 +221,7 @@ function run_query_mailshare_update($mailshare) {
 function run_query_mailshare_delete($p_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain("mailsharedir");
 
   // Delete ACL for this mailshare
   $query = "DELETE FROM EntityRight
@@ -254,7 +254,7 @@ function run_query_mailshare_delete($p_id) {
 function get_mailshare_name_exists($name, $id="") {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain("mailsharedir");
 
   if ($id != "") {
     $where_id = "AND mailsharedir_id != '$id'";
@@ -293,7 +293,7 @@ function run_query_check_mailshare($id, $name, $desc) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain("mailsharedir");
 
   if ($id != "") {
     $where_id = "AND mailsharedir_id!='$id'";
@@ -473,7 +473,7 @@ function check_mailshare_data_form($mailshare) {
 function name_in_use($name, $u_id="") {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain("mailsharedir");
 
   $query = "SELECT
     mailsharedir_id,
