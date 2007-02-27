@@ -538,7 +538,7 @@ function run_query_user_update($p_id, $user) {
     } else {
       $passwd_crypt = $passwd;
     }
-    $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type = '$password_encryption'";
+    $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type = '$password_encryption',";
   }
 
   // infos
