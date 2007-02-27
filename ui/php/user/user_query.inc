@@ -664,6 +664,13 @@ function run_query_user_update($p_id, $user) {
     userobm_mobile='$mobile',
     userobm_fax='$fax',
     userobm_fax2='$fax2',
+    userobm_service = '$service',
+    userobm_address1 = '$ad1',
+    userobm_address2 = '$ad2',
+    userobm_address3 = '$ad3',
+    userobm_zipcode = '$zip',
+    userobm_town = '$town',
+    userobm_expresspostal = '$cdx',
     userobm_email='$email',
     userobm_description='$desc'
     $query_web
