@@ -365,6 +365,9 @@ ALTER TABLE UserObm ADD COLUMN userobm_samba_home_drive char(2) default '' AFTER
 ALTER TABLE UserObm ADD COLUMN userobm_samba_logon_script varchar(255) default '' AFTER userobm_samba_home_drive;
 ALTER TABLE UserObm ADD COLUMN userobm_host_id int(8) default NULL AFTER userobm_samba_logon_script;
 
+-- For crypt password
+ALTER TABLE UserObm CHANGE COLUMN userobm_password userobm_password varchar(64);
+
 -- add constraint ...
 --  UNIQUE KEY k_login_user (userobm_login),
 --  INDEX k_uid_user (userobm_uid)

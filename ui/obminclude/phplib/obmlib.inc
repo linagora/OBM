@@ -204,7 +204,7 @@ class OBM_Challenge_Auth extends Auth {
         $encrypted = md5($password);
         break;
       case "crypt":
-        $encrypted = crypt($password);
+        $encrypted = crypt($password,$pass);
         break;
       default:
         $encrypted = $password;
