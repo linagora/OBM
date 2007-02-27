@@ -310,7 +310,7 @@ function get_user_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/user/user_index.php?action=new",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display')
+    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display', 'delete')
                                   );
 
 // Search

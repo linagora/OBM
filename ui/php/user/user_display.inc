@@ -1380,6 +1380,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $email = $user["email"];
   $desc = $user["desc"];
   $archive = $user["archive"];
+  $domain = $user["domain"];
 
   // coord
   $phone = $user["phone"];
@@ -1447,6 +1448,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
   <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
   <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
+  <input type=\"hidden\" name=\"sel_domain\" value=\"$domain\" />
 
   <input type=\"hidden\" name=\"phone\" value=\"$phone\" />
   <input type=\"hidden\" name=\"phone2\" value=\"$phone2\" />
