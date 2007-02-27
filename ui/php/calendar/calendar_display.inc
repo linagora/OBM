@@ -964,7 +964,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       break;
     case "hour" :
       $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
-      $day = $day || (date('H',$date + $duration) <  $ccalendar_first_hour);
+      $day = $day || (date('H',$date) <  $ccalendar_first_hour);
       $day = $day || (date('H',$date) >  $ccalendar_last_hour );
       if($updatable) {
         $options[] = "draggable:true"; 

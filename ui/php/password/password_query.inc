@@ -57,8 +57,7 @@ function run_query_password_update($password, $uid, $usr_q) {
     $new_passwd_crypt = $new_pass;
   }
 
-  $passwd_update = "userobm_password='$new_passwd_crypt',
-    userobm_password_type='$password_encryption'";
+  $passwd_update = "";
 
   // Modification a chaud du mot de passe dans le LDAP
   // XXXX cas user non encore cree (uniquement dans base maj) ?
@@ -72,7 +71,8 @@ function run_query_password_update($password, $uid, $usr_q) {
   exec($cmd);
 
   $query = "UPDATE UserObm SET
-    $passwd_update
+    userobm_password='$new_passwd_crypt',
+    userobm_password_type='$password_encryption'
   WHERE userobm_id = '$uid'";
 
   display_debug_msg("DB_OBM : $query", $cdg_sql, "run_query_password_update()");
@@ -102,6 +102,8 @@ function check_data_form($usr_q, $password) {
   $id = $usr_q->f("userobm_id");
   $login = $usr_q->f("userobm_login");
   $pass = $usr_q->f("userobm_password");
+  $passtype = $usr_q->f("userobm_password_type");
+
 
   $old_pass = trim($password["old_password"]);
   $new_pass = trim($password["new_password"]);
@@ -123,9 +125,9 @@ function check_data_form($usr_q, $password) {
     }
 
     // Verifie que le mot de passe actuel est correct
-    if ($password_encryption == "crypt") {
+    if ($passtype == "crypt") {
       $old_passwd_crypt = crypt($old_pass,$pass);
-    } else if ($password_encryption == "md5") {
+    } else if ($passtype == "md5") {
       $old_passwd_crypt = md5($old_pass);
     } else {
       $old_passwd_crypt = $old_pass;

@@ -1673,6 +1673,7 @@ function check_calendar_data_form($calendar) {
   $kind = $calendar["repeat_kind"];
   $repeat_days = $calendar["repeat_days"];
   $repeatfrequency = $calendar["repeatfrequency"];
+  ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
 
   if (trim($title) == "") {
     $err["msg"] = $l_fill_title;
@@ -1711,7 +1712,7 @@ function check_calendar_data_form($calendar) {
     return false;
   }
 
-  if ($dateend<$datebegin) {
+  if ($dateend < $datebegin || ( $all_day !=  1 && $dateend == $datebegin)) {
     $err["msg"] = $l_err_begin_end;
     return false;
   } 
@@ -2404,7 +2405,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity) {
   if(count($of->events) > 0) {
     $exception_q = run_query_get_events_exception(array_keys($of->events),$start_time,$end_time);
     while($exception_q->next_record()) {
-      $of->RemoveOccurrences($exception_q->f('calendarexception_event_id'), $exception_q->f('calendarexception_date'));
+      $of->removeOccurrences($exception_q->f('calendarexception_event_id'), $exception_q->f('calendarexception_date'));
     }
 
     $attendee_q = run_query_get_events_attendee(array_keys($of->events));
@@ -2427,7 +2428,6 @@ function calendar_events_model($start_time, $end_time, $calendar_entity) {
       $event->add_attendee($entity,$entity_id,$entity_label);
     }
   }
-
   return $of->getOccurrences(); 
 }
 
@@ -2567,7 +2567,6 @@ function calendar_monthlybydate_repeatition($date,$start_time,$end_date,$repeatf
   $min_diff = of_date_get_min($date);
   $ts_date = strtotime(date("Y-m-".date("d",$date),$temp_date));
   $ts_date = strtotime("+$hour_diff hours +$min_diff minutes",$ts_date);
-
   while ($ts_date <= $end_date) {
     $of = &OccurrenceFactory::getInstance();
     $of->addOccurrence($event, $ts_date, $entity, $entity_id);
@@ -2697,7 +2696,7 @@ Class OccurrenceFactory {
     }
   }
 
-  function RemoveOccurrences($id, $date) {
+  function removeOccurrences($id, $date) {
     foreach($this->occurrences[$id] as $key => $occurrence) {
       if(date('Ymd',$date) ==  date('Ymd',$occurrence->date)) {
         unset($this->occurrences[$id][$key]); 
