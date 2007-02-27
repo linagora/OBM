@@ -20,9 +20,9 @@ require("admin_lang_display.inc");
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-if ($mode == "") $mode = "txt";
+$params = get_admin_lang_params();
 
-switch ($mode) {
+switch ($params["mode"]) {
  case "txt":
    // Check that this is not a fake txt attempt from a browser
    if (isset($_SERVER["SERVER_PROTOCOL"]) && ($_SERVER["SERVER_PROTOCOL"] != "")) {
@@ -36,7 +36,7 @@ switch ($mode) {
    $debug = $set_debug;
    page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
-   if($action == "") $action = "index";
+   if ($action == "") $action = "index";
    get_admin_lang_action();
    $perm->check_permissions($module, $action);
    $display["head"] = display_head("$module");
@@ -48,22 +48,22 @@ switch ($mode) {
 
 switch ($action) {
   case "help":
-    dis_admin_lang_help($mode);
+    dis_admin_lang_help($params["mode"]);
     break;
   case "index":
-    dis_admin_lang_index($mode, $actions, $target_modules, $langs, $themes);
+    dis_admin_lang_index($params["mode"], $actions, $target_modules, $langs, $themes);
     break;
   case "show_src":
-    dis_admin_lang_src_vars($mode, $target_module);
+    dis_admin_lang_src_vars($params["mode"], $params["target_module"]);
     break;
   case "show_lang":
-    dis_admin_lang_vars($mode, $target_module, $lang);
+    dis_admin_lang_vars($params["mode"], $params["target_module"], $params["lang"]);
     break;
   case "comp_lang":
-    dis_admin_lang_comp_lang_vars($mode, $target_module, $lang, $lang2);
+    dis_admin_lang_comp_lang_vars($params["mode"], $params["target_module"], $params["lang"], $params["lang2"]);
     break;
   case "comp_global_lang":
-    dis_admin_lang_comp_global_lang_vars($mode, $lang, $lang2);
+    dis_admin_lang_comp_global_lang_vars($params["mode"], $params["lang"], $params["lang2"]);
     break;
   default:
     echo "No action specified !";
@@ -71,7 +71,7 @@ switch ($action) {
 }
 
 // Program End
-switch ($mode) {
+switch ($params["mode"]) {
  case "txt":
    echo "bye...\n";
    break;
@@ -80,6 +80,22 @@ switch ($mode) {
    $display["end"] = display_end();
    echo $display["end"];
    break;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Stores Admin parameters transmited in $params hash
+// returns : $params hash with parameters set
+///////////////////////////////////////////////////////////////////////////////
+function get_admin_lang_params() {
+
+  $params = get_global_params("admin_lang");
+
+  if (($params["mode"] == "") || ($params["mode"] != "html")) {
+    $params["mode"] = "txt";
+  }
+
+  return $params;
 }
 
 
@@ -125,7 +141,7 @@ Ex: php4 admin_lang.php -a show_lang -m deal -l fr
 ///////////////////////////////////////////////////////////////////////////////
 function parse_admin_lang_arg($argv) {
   global $debug, $actions, $target_modules, $langs, $themes;
-  global $action, $target_module, $lang, $theme;
+  global $params, $action, $target_module, $lang, $theme;
 
   // We skip the program name [0]
   next($argv);
@@ -133,13 +149,13 @@ function parse_admin_lang_arg($argv) {
     switch($val) {
     case '-h':
     case '--help':
-      $action = "help";
-      return true;
+      $params["action"] = "help";
+      dis_admin_lang_help($params["mode"]);
       break;
     case '-m':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $target_modules)) {
-        $target_module = $val2;
+        $params["target_module"] = $val2;
         if ($debug > 0) { echo "-m -> \$target_module=$val2\n"; }
       }
       else {
@@ -150,7 +166,7 @@ function parse_admin_lang_arg($argv) {
     case '-l':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $langs)) {
-        $lang = $val2;
+        $params["lang"] = $val2;
         if ($debug > 0) { echo "-l -> \$lang=$val2\n"; }
       }
       else {
@@ -161,7 +177,7 @@ function parse_admin_lang_arg($argv) {
     case '-a':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $actions)) {
-        $action = $val2;
+        $params["action"] = $val2;
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       }
       else {
@@ -172,7 +188,7 @@ function parse_admin_lang_arg($argv) {
     case '-t':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $themes)) {
-        $theme = $val2;
+        $params["theme"] = $val2;
         if ($debug > 0) { echo "-t -> \$theme=$val2\n"; }
       }
       else {
@@ -183,10 +199,11 @@ function parse_admin_lang_arg($argv) {
     }
   }
 
-  if (! $target_module) $target_module = "contact";
-  if (! $lang) $lang = "fr";
-  if (! $action) $action = "show_src";
-  if (! $theme) $theme = "standard";
+  if (! $params["target_module"]) $params["target_module"] = "contact";
+  if (! $params["lang"]) $params["lang"] = "fr";
+  if (! $params["action"]) $params["action"] = "show_src";
+  if (! $params["theme"]) $params["theme"] = "default";
+  $action = $params["action"];
 }
 
 

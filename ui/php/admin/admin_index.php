@@ -126,6 +126,7 @@ function parse_admin_arg($argv) {
     case '-h':
     case '--help':
       $params["action"] = "help";
+      dis_admin_help($params["mode"]);
       return true;
       break;
     case '-a':
@@ -142,7 +143,7 @@ function parse_admin_arg($argv) {
     }
   }
 
-  if (! $params["action"]) $params["action"] = "clear_sess";
+  if (! $params["action"]) $params["action"] = "index";
   $action = $params["action"];
 }
 

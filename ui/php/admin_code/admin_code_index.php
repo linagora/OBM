@@ -29,9 +29,9 @@ $regexp .= '))';
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-if ($mode == "") $mode = "txt";
+$params = get_admin_code_params();
 
-switch ($mode) {
+switch ($params["mode"]) {
  case "txt":
    // Check that this is not a fake txt attempt from a browser
    if (isset($_SERVER["SERVER_PROTOCOL"]) && ($_SERVER["SERVER_PROTOCOL"] != "")) {
@@ -57,19 +57,19 @@ switch ($mode) {
 
 switch ($action) {
   case "help":
-    dis_admin_code_help($mode);
+    dis_admin_code_help($params["mode"]);
     break;
   case "index":
-    dis_admin_code_code_index($mode, $acts, $words);
+    dis_admin_code_code_index($params["mode"], $acts, $words);
     break;
   case "show_amp":
-    dis_admin_code_amp($mode, $words);
+    dis_admin_code_amp($params["mode"], $words);
     break;
   case "func_unused":
-    dis_admin_code_unused_functions($mode, $param_module);
+    dis_admin_code_unused_functions($params["mode"], $params["param_module"]);
     break;
   case "function_uses":
-    dis_admin_code_function_uses($mode, $function);
+    dis_admin_code_function_uses($params["mode"], $params["function"]);
     break;
   default:
     echo "No action specified !";
@@ -77,7 +77,7 @@ switch ($action) {
 }
 
 // Program End
-switch ($mode) {
+switch ($params["mode"]) {
  case "txt":
    echo "bye...\n";
    break;
@@ -86,6 +86,22 @@ switch ($mode) {
    $display["end"] = display_end();
    echo $display["end"];
    break;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Stores Admin parameters transmited in $params hash
+// returns : $params hash with parameters set
+///////////////////////////////////////////////////////////////////////////////
+function get_admin_code_params() {
+
+  $params = get_global_params("admin_code");
+
+  if (($params["mode"] == "") || ($params["mode"] != "html")) {
+    $params["mode"] = "txt";
+  }
+
+  return $params;
 }
 
 
@@ -120,7 +136,7 @@ Ex: php4 admin_code_index.php -a show_amp
 ///////////////////////////////////////////////////////////////////////////////
 function parse_admin_code_arg($argv) {
   global $debug, $acts, $target_modules;
-  global $action, $param_module;
+  global $params, $action;
 
   // We skip the program name [0]
   next($argv);
@@ -128,13 +144,13 @@ function parse_admin_code_arg($argv) {
     switch($val) {
     case '-h':
     case '--help':
-      $action = "help";
-      return true;
+      $params["action"] = "help";
+      dis_admin_code_help($params["mode"]);
       break;
     case '-m':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $target_modules)) {
-        $param_module = $val2;
+        $params["param_module"] = $val2;
         if ($debug > 0) { echo "-m -> \$param_module=$val2\n"; }
       }
       else {
@@ -145,7 +161,7 @@ function parse_admin_code_arg($argv) {
     case '-a':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $acts)) {
-        $action = $val2;
+        $params["action"] = $val2;
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       }
       else {
@@ -156,7 +172,7 @@ function parse_admin_code_arg($argv) {
     case '-f':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $acts)) {
-        $action = $val2;
+        $params["action"] = $val2;
         if ($debug > 0) { echo "-f -> \$function=$val2\n"; }
       }
       else {
@@ -167,9 +183,10 @@ function parse_admin_code_arg($argv) {
     }
   }
 
-  if (! $param_module) $param_module = "contact";
-  if (! $action) $action = "show_amp";
-  if (! $function) $function = "run_query_detail";
+  if (! $params["param_module"]) $params["param_module"] = "contact";
+  if (! $params["action"]) $params["action"] = "show_amp";
+  if (! $params["function"]) $params["function"] = "run_query_detail";
+  $action = $params["action"];
 }
 
 

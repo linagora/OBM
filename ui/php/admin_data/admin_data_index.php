@@ -143,7 +143,7 @@ Ex: php4 admin_data_index.php -a data_show -m company
 ///////////////////////////////////////////////////////////////////////////////
 function parse_admin_data_arg($argv) {
   global $debug, $acts, $target_modules;
-  global $action, $params, $target_module;
+  global $action, $params;
 
   // We skip the program name [0]
   next($argv);

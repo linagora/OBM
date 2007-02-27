@@ -40,7 +40,7 @@ function dis_admin_lang_index($mode, $actions, $modules, $langs, $themes) {
 
   switch ($mode) {
   case "txt":
-    txt_lang_index($actions, $modules, $langs, $themes);
+    //    txt_lang_index($actions, $modules, $langs, $themes);
     break;
   case "html":
     html_admin_lang_index($actions, $modules, $langs, $themes);
