@@ -18,7 +18,8 @@ function run_query_password($u_id) {
 
   $query = "SELECT userobm_id,
       userobm_login,
-      userobm_password
+      userobm_password,
+      userobm_password_type
     FROM UserObm
     WHERE userobm_id='$u_id'";
 
@@ -57,7 +58,7 @@ function run_query_password_update($password, $uid, $usr_q) {
   }
 
   $passwd_update = "userobm_password='$new_passwd_crypt',
-    userobm_password_plain='$new_pass'";
+    userobm_password_type='$password_encryption'";
 
   // Modification a chaud du mot de passe dans le LDAP
   // XXXX cas user non encore cree (uniquement dans base maj) ?
@@ -123,7 +124,7 @@ function check_data_form($usr_q, $password) {
 
     // Verifie que le mot de passe actuel est correct
     if ($password_encryption == "crypt") {
-      $old_passwd_crypt = crypt($old_pass);
+      $old_passwd_crypt = crypt($old_pass,$pass);
     } else if ($password_encryption == "md5") {
       $old_passwd_crypt = md5($old_pass);
     } else {

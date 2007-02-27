@@ -103,7 +103,7 @@ if ($action == "index") {
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $ms_q = run_query_mailserver_details($params["id"]);
-  $net_q = run_query_mailserver_networks($id);
+  $net_q = run_query_mailserver_networks($params["id"]);
   $display["detail"] = dis_mailserver_form($action, $params, $ms_q, $net_q);
 
 } elseif ($action == "update") {

@@ -84,6 +84,7 @@ function run_query_mailserver_check_server($host_id,$id=false) {
   $multidomain = sql_multidomain("host");
   $query = "
     SELECT mailserver_id FROM MailServer
+    JOIN Host ON mailserver_host_id = host_id
     WHERE mailserver_host_id = '$host_id' $where
           $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_mailserver_check_server()");
@@ -139,7 +140,7 @@ function run_query_mailserver_update($mailserver) {
     $relayhost_networks = $mailserver["relayhost_networks"];
   }  
   $id = $mailserver["id"];
-
+  
   $query = "
     UPDATE MailServer SET
       mailserver_host_id = '$host_id',
