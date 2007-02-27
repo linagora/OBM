@@ -230,13 +230,16 @@ function overListBoxFix(overObject, forceDisplay) {
         .injectInside($(document.body));
     }
     overObject = $(overObject);
+    if(overObject.getStyle("zIndex") == 0) {
+      overObject.setStyle("zIndex","1000");
+    }
     $('listBoxHider').setStyles({
       position : "absolute",
       width : overObject.offsetWidth ,
       height : overObject.offsetHeight,
       top : overObject.getTop(),
       left : overObject.getLeft(),
-      zIndex : overObject.getStyle("zIndex") == 0 ? "999" : overObject.getStyle("zIndex"),
+      zIndex : overObject.getStyle("zIndex") - 1,
       visibility : overObject.getStyle("visibility") == "hidden" ? "hidden" : "visible",
       display : (forceDisplay) ? forceDisplay : overObject.getStyle("display") 
     });

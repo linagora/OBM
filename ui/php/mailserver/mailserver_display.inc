@@ -220,13 +220,13 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
            .adopt(new Element('td')
             .adopt(new Element('img')
              .setProperty('src','$ico_delete')
-             .setProperty('onclick','deleteIpRow(this)')
+             .addEvent('click',function () {deleteIpRow(this);})
              .setProperty('alt','Remove')))
            .adopt(new Element('td')
             .adopt(new Element('input')
              .setProperty('name',name + '_networks[]')
-             .setProperty('onkeyup','checkIp(this)')
-             .setProperty('onblur','transformIp(this)')
+             .addEvent('keyup',function () {checkIp(this);})
+             .addEvent('blur',function () {transformIp(this);})
              .setProperty('type','text')))
            );
       }

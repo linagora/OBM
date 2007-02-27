@@ -173,23 +173,25 @@ function refreshDatePicker(dateFieldName, year, month, day)
     day = thisDay.getDate();
     thisDay.setDate(1);
   }
-
+ 
+  var previousMonth = getDateMonthAndYear(thisDay, -1);
+  var nextMonth = getDateMonthAndYear(thisDay, +1);
   var title = new Element('h1').adopt(
-    new Element('a').setProperty('href','')
-     .setProperty('onclick',getGoToSource(dateFieldName, thisDay, -12))
+    new Element('a').setProperty('href','javascript: void(0);')
+     .addEvent('click',refreshDatePicker.pass([dateFieldName,year - 1,month]))
      .appendText('<<'))
    .adopt(
-      new Element('a').setProperty('href','')
-       .setProperty('onclick',getGoToSource(dateFieldName, thisDay, -1))
+      new Element('a').setProperty('href','javascript: void(0);')
+       .addEvent('click',refreshDatePicker.pass([dateFieldName,previousMonth.year,previousMonth.month]))
        .appendText('<'))
    .appendText(obm.vars.labels.months[thisDay.getMonth()] + ' ' + thisDay.getFullYear())
    .adopt(
-     new Element('a').setProperty('href','')
-       .setProperty('onclick',getGoToSource(dateFieldName, thisDay, +1))
+     new Element('a').setProperty('href','javascript: void(0);')
+       .addEvent('click',refreshDatePicker.pass([dateFieldName,nextMonth.year,nextMonth.month]))
        .appendText('>'))
    .adopt(
-     new Element('a').setProperty('href','')
-       .setProperty('onclick',getGoToSource(dateFieldName, thisDay, +12))
+     new Element('a').setProperty('href','javascript: void(0);')
+       .addEvent('click',refreshDatePicker.pass([dateFieldName,year + 1,month]))
        .appendText('>>'));
   
   var labels = new Element('tr');
@@ -206,14 +208,14 @@ function refreshDatePicker(dateFieldName, year, month, day)
   do {
     dayNum = thisDay.getDate();
     var td = new Element('td');
-    td.setProperty("onclick","updateDateField('"+dateFieldName+"','"+getDateString(thisDay)+"')");
+    td.addEvent('click',updateDateField.pass([dateFieldName,getDateString(thisDay)]));
     if (dayNum == day) {
-      td.setProperty("onmouseout","this.className='highlight';");
+      td.addEvent("mouseout",function () {this.className='highlight';});
       td.addClassName('highlight');
     } else {
-      td.setProperty("onmouseout","this.className='';");
+      td.addEvent("mouseout",function () {this.className='';});
     }
-    td.setProperty("onmouseover","this.className='hover';");
+    td.addEvent("mouseover",function () {this.className='hover';});
     td.appendText(dayNum).injectInside(line);
     if (thisDay.getDay() == 6) {
       var line = new Element('tr').injectInside(content);
@@ -228,8 +230,8 @@ function refreshDatePicker(dateFieldName, year, month, day)
     }
   }
 
-  var today = new Element('a').setProperty('href','')
-                              .setProperty("onclick","refreshDatePicker('" + dateFieldName + "');return false;")
+  var today = new Element('a').setProperty('href','javascript:void(0)')
+                              .addEvent('click',refreshDatePicker.pass([dateFieldName]))
                               .appendText(obm.vars.labels.today);
   var table = new Element('table').adopt(new Element('thead').adopt(labels))
                                   .adopt(content);
@@ -237,6 +239,7 @@ function refreshDatePicker(dateFieldName, year, month, day)
   $("datepicker").setHTML('');
   $("datepicker").adopt(title).adopt(table).adopt(today);
   overListBoxFix("datepicker");
+  return false;
 }
 
 
@@ -256,6 +259,16 @@ function getGoToSource(dateFieldName, dateVal, adjust)
   return "refreshDatePicker('" + dateFieldName + "', " + newYear + ", " + newMonth + ");return false;";
 }
 
+function getDateMonthAndYear(dateVal, adjust) {
+  var newMonth = (dateVal.getMonth () + adjust) % 12;
+  var newYear = dateVal.getFullYear() + parseInt((dateVal.getMonth() + adjust) / 12);
+  if (newMonth < 0) {
+    newMonth += 12;
+    newYear += -1;
+  }
+  
+  return {year:newYear,month:newMonth} ;
+}
 
 /**
   Convert a JavaScript Date object to a string, based on the dateFormat 
@@ -396,7 +409,8 @@ function updateDateField(dateFieldName, dateString)
 
   overListBoxFix("datepicker");
   targetDateField.focus();
-  targetDateField.onchange();
+  if(targetDateField.onchange) 
+    targetDateField.onchange();
   // after the datepicker has closed, optionally run a user-defined function called
   // datePickerClosed, passing the field that was just updated as a parameter
   // (note that this will only run if the user actually selected a date from the datepicker)

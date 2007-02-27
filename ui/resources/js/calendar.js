@@ -70,8 +70,8 @@ Obm.CalendarDayEvent = new Class({
     }
     this.setPeriodicity();
     this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
-                                          .setProperty('onclick','if(obm.calendarManager.redrawLock) return false;')
                                           .injectInside(this.dragHandler);
+    this.titleContainer.onclick = function () { if(obm.calendarManager.redrawLock) return false;};
     this.resetTitle();
 
   },
@@ -248,8 +248,8 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     }
     this.titleContainer = new Element('span').injectInside(this.element);
     this.timeContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
-                                         .setProperty('onclick','if(obm.calendarManager.redrawLock) return false;')
                                          .injectInside(this.dragHandler);
+    this.timeContainer.onclick = function () {if(obm.calendarManager.redrawLock) return false;};
     this.resetTitle();
 
   },

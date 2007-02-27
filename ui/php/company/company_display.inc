@@ -34,7 +34,7 @@ $fieldnames["type_label"] = $l_type;
 $fieldnames["activity_label"] = $l_activity;
 $fieldnames["nafcode_code"] = $l_nafcode;
 $fieldnames["company_contact_number"] = "<img src=\"$ico_contact\" alt=\"C\" />";
-$fieldnames["company_new_contact"] = "<img src=\"$ico_contact_new\" alt=\"NC\" />";
+$fieldnames["company_new_contact"] = "<img src=\"$ico_add\" alt=\"New Contact\" />";
 $fieldnames["company_deal_number"] = "<img src=\"$ico_deal\" alt=\"D\" />";
 
 
@@ -48,7 +48,7 @@ $fieldnames["company_deal_number"] = "<img src=\"$ico_deal\" alt=\"D\" />";
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_company(&$OD, $fieldname, $link_ok) {
-  global $path, $params, $ico_mail, $ico_web, $ico_contact_new;
+  global $path, $params, $ico_mail, $ico_web, $ico_add;
 
   $ext_url = $params["ext_url"];
 
@@ -114,7 +114,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("company_email");
     $ctry = $OD->data_set->f("company_country_iso3166");
     $res["url"] = "$path/contact/contact_index.php?action=new&amp;company_id=".$OD->data_set->f("company_id")."&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email";
-    $res["name"] = "<img src=\"$ico_contact_new\" alt=\"\" />";
+    $res["name"] = "<img src=\"$ico_add\" title=\"Add contact\" alt=\"Add Contact\" />";
     $res["txt_name"] = " ";
   }
 
