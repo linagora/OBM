@@ -1573,18 +1573,6 @@ CREATE TABLE Stats (
 
 
 --
--- LDAP tree structure table
---
-CREATE TABLE Ldap (
-  ldap_id         int(11) default NULL,
-  ldap_domain_id  int(8) default 0,
-  ldap_parent_id  int(11) default NULL,
-  ldap_name       varchar(255) default NULL,
-  ldap_value      varchar(255) default NULL
-);
-
-
---
 -- Mail server declaration table
 --
 CREATE TABLE MailServer (
@@ -1705,7 +1693,6 @@ CREATE TABLE P_UserObmGroup like UserObmGroup;
 CREATE TABLE P_GroupGroup like GroupGroup;
 CREATE TABLE P_Host like Host;
 CREATE TABLE P_Samba like Samba;
-CREATE TABLE P_Ldap like Ldap;
 CREATE TABLE P_MailServer like MailServer;
 CREATE TABLE P_MailServerNetwork like MailServerNetwork;
 CREATE TABLE P_MailShareDir like MailShareDir;

@@ -8,15 +8,24 @@
 
 
 -------------------------------------------------------------------------------
+-- Domain creation
+-------------------------------------------------------------------------------
+DELETE FROM Domain;
+
+INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 1', '', 'aliacom.fr', NULL );
+INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 2', '', 'test1.aliacom.fr', 'test2.aliacom.fr\r\ntest3.aliacom.com' );
+
+
+-------------------------------------------------------------------------------
 -- Default User creation
 -------------------------------------------------------------------------------
 DELETE FROM UserObm;
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uadmin','padmin','plain','admin', 'Admin Lastname', 'Firstname', '0', '1000', '512');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uadmin','padmin','PLAIN','admin', 'Admin Lastname', 'Firstname', '0', '1000', '512');
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('ueditor','peditor','plain','editor', 'Itor', 'Ed', '1', '1001', '513');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('ueditor','peditor','PLAIN','editor', 'Itor', 'Ed', (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), '1001', '513');
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uuser','puser','plain','user', 'User', 'John', '1', '1002', '513');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uuser','puser','PLAIN','user', 'User', 'John', (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), '1002', '513');
 
 
 
@@ -36,46 +45,6 @@ INSERT INTO Company (company_timeupdate, company_timecreate, company_userupdate,
 DELETE FROM Contact;
 
 INSERT INTO Contact (contact_company_id, contact_kind_id, contact_lastname, contact_firstname, contact_address1,contact_address2, contact_zipcode, contact_town, contact_title, contact_phone, contact_email, contact_archive,contact_comment) VALUES (1,1,'Rabbit','Roger','ad1','ad2','31520','Ramonville','Manager','01 01 01 02 03','roger@rabbit.com','0','comment');
-
-
--------------------------------------------------------------------------------
--- Remplissage de la table 'Ldap'
--------------------------------------------------------------------------------
-DELETE FROM Ldap;
-
-INSERT INTO Ldap VALUES (0,0,NULL,'rootLdap','dc=<domainName>,dc=local');
-INSERT INTO Ldap VALUES (0,0,NULL,'dataType','sambaDomain sambaFreeUnixId');
-INSERT INTO Ldap VALUES (1,0,0,'organizationalUnitName','users');
-INSERT INTO Ldap VALUES (1,0,0,'organizationalUnitDesc','Users account');
-INSERT INTO Ldap VALUES (1,0,0,'dataType','posixUsers');
-INSERT INTO Ldap VALUES (2,0,0,'organizationalUnitName','sysusers');
-INSERT INTO Ldap VALUES (2,0,0,'organizationalUnitDesc','System users');
-INSERT INTO Ldap VALUES (2,0,0,'dataType','systemUsers');
-INSERT INTO Ldap VALUES (3,0,0,'organizationalUnitName','groups');
-INSERT INTO Ldap VALUES (3,0,0,'organizationalUnitDesc','Security Groups');
-INSERT INTO Ldap VALUES (3,0,0,'dataType','posixGroups');
-INSERT INTO Ldap VALUES (4,0,0,'organizationalUnitName','servicesConfiguration');
-INSERT INTO Ldap VALUES (4,0,0,'organizationalUnitDesc','Services configuration');
-INSERT INTO Ldap VALUES (4,0,0,'dataType','postfixConf');
-INSERT INTO Ldap VALUES (7,0,0,'organizationalUnitName','mailShareDir');
-INSERT INTO Ldap VALUES (7,0,0,'organizationalUnitDesc','Mail Share Directory');
-INSERT INTO Ldap VALUES (7,0,0,'dataType','mailShareDir');
--------------------------------------------------------------------------------
--- Permet de maintenir une branche identique au 'posixGroups' mais utilisant
--- l'ancien objet 'groupOfNames'
---INSERT INTO Ldap VALUES (8,0,0,'organizationalUnitName','groupOfNames');
---INSERT INTO Ldap VALUES (8,0,0,'organizationalUnitDesc','Groups using groupOfNames LDAP object');
---INSERT INTO Ldap VALUES (8,0,0,'dataType','groupOfNames');
--------------------------------------------------------------------------------
--- Valeurs a mettre si module Samba actif
---UPDATE Ldap SET ldap_value='posixUsers sambaUsers' WHERE ldap_name='dataType' AND ldap_id='1';
---UPDATE Ldap SET ldap_value='posixGroups sambaGroups' WHERE ldap_name='dataType' AND ldap_id='3';
---INSERT INTO Ldap VALUES (5,0,0,'organizationalUnitName','computers');
---INSERT INTO Ldap VALUES (5,0,0,'organizationalUnitDesc','Samba WS');
---INSERT INTO Ldap VALUES (5,0,0,'dataType','sambaHosts');
---INSERT INTO Ldap VALUES (6,0,0,'organizationalUnitName','idmap');
---INSERT INTO Ldap VALUES (6,0,0,'organizationalUnitDesc','Samba Idmap');
-
 
 
 -------------------------------------------------------------------------------
@@ -106,15 +75,6 @@ INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALU
 
 
 -------------------------------------------------------------------------------
--- Domain creation
--------------------------------------------------------------------------------
-DELETE FROM Domain;
-
-INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 1', '', 'aliacom.fr', NULL );
-INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 2', '', 'test1.aliacom.fr', 'test2.aliacom.fr\r\ntest3.aliacom.com' );
-
-
--------------------------------------------------------------------------------
 -- Remplissage de la table 'MailServer' : déclaration des serveurs de BALs
 -------------------------------------------------------------------------------
 DELETE FROM MailServer;
@@ -129,12 +89,19 @@ INSERT INTO MailServer (mailserver_host_id) VALUES ( (SELECT host_id FROM Host W
 -- Utilisateur de test :
 --  - appartenant a tous les domaines ;
 --  - ayant le droit mail ;
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_fax, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_description) VALUES ('0', 'test00', 'PLAIN', 'ptest00', 'user', 'User', 'Test 00',  '1050', '512', '23, rue des champs', '31400', 'La ville à Ramon', '05 62 19 24 91', '05 62 19 24 92', '06 55 55 55 55', '1', '1', 'test00\r\nmail.test00', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Utilisateur appartient au domaine global');
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_phone, userobm_fax, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description) VALUES ('0', 'test00', 'PLAIN', 'ptest00', 'user', 'User', 'Test 00',  '1050', '512', '23, rue des champs', 'Nolwen du lac', 'Près de la ferme', '31400', 'La ville à Ramon', '05 62 19 24 91', '05 62 19 24 92', '06 55 55 55 55', '1', '1', 'test00\r\nmail.test00', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Chef', 'Rapide', 'Utilisateur appartient au domaine global');
 
 -- Utilisateur de test :
 --  - appartenant au domaine 1 ;
 --  - ayant le droit mail ;
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_description) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test01', 'PLAIN', 'ptest01', 'user', 'User', 'Test 01', '1051', '512', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test01\r\nmail.test01', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Utilisateur n''appartenant qu''au domaine 1');
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test01', 'PLAIN', 'ptest01', 'user', 'User', 'Test 01', '1051', '512', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test01\r\nmail.test01', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Autan en emporte le vent', 'Compris', 'Utilisateur n''appartenant qu''au domaine 1');
+
+
+-- Utilisateur de test :
+--  - appartenant au domaine 1 ;
+--  - ayant le droit mail ;
+--  - profil administrateur ;
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_description) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test02', 'PLAIN', 'ptest02', 'admin', 'User', 'Test 02', '1052', '512', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test02\r\ntest02.admin', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Utilisateur n''appartenant qu''au domaine 1');
 
 
 -------------------------------------------------------------------------------
@@ -143,10 +110,10 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, us
 DELETE FROM UGroup;
 
 -- Groupe de test SANS e-mail
-INSERT INTO `UGroup` (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (0, 0, 0, 1, NULL, 0, 1000, 'grpTest00', 'Groupe de test 00', '', NULL);
+INSERT INTO `UGroup` (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1000, 'grpTest00', 'Groupe de test 00', '', NULL);
 
 -- Groupe de test AVEC e-mail
-INSERT INTO `UGroup` (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (0, 0, 0, 1, NULL, 0, 1001, 'grpTest01', 'Groupe de test 01 avec e-mail', 'grpTest01', NULL);
+INSERT INTO `UGroup` (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1001, 'grpTest01', 'Groupe de test 01 avec e-mail', 'grpTest01', NULL);
 
 
 -------------------------------------------------------------------------------
