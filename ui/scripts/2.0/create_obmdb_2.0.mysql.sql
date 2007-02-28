@@ -1620,18 +1620,6 @@ CREATE TABLE MailShareDir (
 );
 
 
------------------------------------------------------------------------------
--- Table contenant les parametres generaux et non necessaires pour les 
--- sessions
------------------------------------------------------------------------------
-CREATE TABLE Parameters (
-  parameters_name   varchar(255) NOT NULL default '',
-  parameters_value  varchar(255) NOT NULL default '',
-  PRIMARY KEY (parameters_name),
-  UNIQUE KEY parameters_name (parameters_name)
-);
-
-
 CREATE TABLE UserSystem (
   usersystem_id         int(8) NOT NULL auto_increment,
   usersystem_login      varchar(32) NOT NULL default '',

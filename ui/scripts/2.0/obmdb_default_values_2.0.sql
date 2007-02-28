@@ -14,6 +14,8 @@
 -- Update DB version
 DELETE FROM ObmInfo where obminfo_name='db_version';
 INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('db_version', '2.0.0');
+INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('update_state', '0');
+INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('remote_access', '0');
 
 
 -------------------------------------------------------------------------------

@@ -425,7 +425,7 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
     }
     $display_popup_end = "<a href=\"\" onclick='window.close();'>$l_close</a>";
   }
-  
+
   $comp_d->data_set = $comp_q;
   $comp_d->data_url = $url;
   $comp_d->data_header = "both";

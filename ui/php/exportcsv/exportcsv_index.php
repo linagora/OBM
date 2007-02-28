@@ -16,7 +16,7 @@ $module = "exportcsv";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
-$params = get_param_export();
+$params = get_export_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 page_close();
@@ -58,7 +58,7 @@ if (($action == "index") || ($action == "")) {
   
   $prefs = get_display_pref($obm["uid"], $entity);
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "export()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -84,11 +84,13 @@ if (($action == "index") || ($action == "")) {
 // Stores Export parameters transmited in $params hash
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_export() {
+function get_export_params() {
+
   $params = get_global_params("ExportCSV");
 
   if (isset ($params["call_module"])) $params["module"] = $params["call_module"];
   if (isset ($params["func_data"])) $params["function"] = $params["func_data"];
+
   return $params;
 }
 

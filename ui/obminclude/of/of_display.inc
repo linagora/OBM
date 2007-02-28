@@ -150,8 +150,7 @@ class OBM_DISPLAY {
       <td>$l_field</td>
       <td>$l_move</td>
     </tr>
-    </thead>
-      ";
+    </thead>";
 
     $i = 0;
     $nb_field_hidden = 0;
@@ -504,6 +503,7 @@ class OBM_DISPLAY {
     $this_entity = $this->display_entity;
     $this_name = $this->display_name;
     $sql_order_dir = $this->sql_order_dir;
+    $query = $this->data_set->obm_query;
 
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {
@@ -534,8 +534,8 @@ class OBM_DISPLAY {
     $end_page = min ($end_page, $nb_page); 
 
     $export_url = "$path/exportcsv/exportcsv_index.php";
-    $content = "<div >
-     <form style=\"display: inline;\" method=\"post\" action=\"$export_url\">
+    $content = "<div>
+    <form style=\"display: inline;\" method=\"post\" action=\"$export_url\">
       <input type=\"hidden\" name=\"action\" value=\"export_page\" />
       <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
       <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
@@ -545,8 +545,9 @@ class OBM_DISPLAY {
       <input type=\"hidden\" name=\"query\" value=\"$query\" />
       <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
       <a href='#' onclick='this.parentNode.submit();return false;'>$l_export</a>
+    </form>   
       
-      
+    <form style=\"display: inline;\" method=\"post\" action=\"$export_url\">
       <input type=\"hidden\" name=\"action\" value=\"export_page\" />
       <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
       <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
@@ -556,7 +557,7 @@ class OBM_DISPLAY {
       <input type=\"hidden\" name=\"query\" value=\"$query\" />
       <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
       <a href='#' onclick='this.parentNode.submit();return false;'>$l_export_all</a>
-      </form>   
+    </form>   
       
       $l_entries # $nb_rows | $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
 
@@ -608,7 +609,6 @@ class OBM_DISPLAY {
 
     // Export - Uses forms to allow big queries to be transmitted
     $module = $this->display_module;
-    $query = $this->data_set->obm_query;
 
     $content .= "
     </div>
@@ -785,7 +785,7 @@ class OBM_DISPLAY {
 	  // Global field display disposition
 	  //--------------------------------------------------
 	  // Format dates
-	  if (substr($fieldname,0,5) == "date_") {
+	  if (substr($fieldname,0,4) == "date") {
 	    $txt_name = of_date_format($this->data_set->f($fieldname));
 	  }
 	  elseif ($fieldname == "timeupdate") {

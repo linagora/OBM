@@ -108,11 +108,12 @@ if ($action == "ext_get_ids") {
       $cid = run_query_user_insert($params);
       if ($cid > 0) {
 	$params["user_id"] = $cid;
+	update_update_state();  // Aliamin
         $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
 	$display["detail"] = dis_user_consult($params);
       } else {
 	$display["msg"] .= display_err_msg("$l_user : $l_insert_error");
-	$display["detail"] = html_user_form("",$params);
+	$display["detail"] = html_user_form("", $params);
       }
 
     // If it is the first try, we warn the user if some user seem similar
@@ -123,6 +124,7 @@ if ($action == "ext_get_ids") {
       } else {
         $cid = run_query_user_insert($params);
         if ($cid > 0) {
+	  update_update_state();  // Aliamin
 	  $params["user_id"] = $cid;
           $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
 	  $display["detail"] = dis_user_consult($params);
@@ -151,6 +153,7 @@ if ($action == "ext_get_ids") {
   if (check_user_data_form($params["user_id"], $params)) {
     $retour = run_query_user_update($params["user_id"], $params);
     if ($retour) {
+      update_update_state();  // Aliamin
       $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_user : $l_update_error");
@@ -177,6 +180,7 @@ if ($action == "ext_get_ids") {
   if (check_user_can_delete($params["user_id"])) {
     $retour = run_query_user_delete($params["user_id"]);
     if ($retour) {
+      update_update_state();  // Aliamin
       $display["msg"] .= display_ok_msg("$l_user : $l_delete_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_user : $l_delete_error");
@@ -202,6 +206,7 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_user_update_user_group($params);
   if ($retour >= 0) {
+    update_update_state();  // Aliamin
     $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
   } else {
     $display["msg"] .= display_err_msg("$l_user : $l_update_error");

@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0pre20";
+$obm_version = "2.0pre21";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -77,7 +77,7 @@ $cgp_sess_db = false;
 
 // Cookie name and domain
 $cgp_cookie_name = "OBM_Session";
-$cgp_cookie_domain = "aliacom.local";
+$cgp_cookie_domain = "aliasource.local";
 
 // authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
 // CAS specific parameters are in conf/obm_conf.inc.
@@ -247,6 +247,7 @@ $cgp_show["module"]["resource"] = "user";
 $cgp_show["module"]["resourcegroup"] = "user";
 $cgp_show["module"]["host"] = "user";
 $cgp_show["module"]["mailshare"] = "user";
+$cgp_show["module"]["tools"] = "admin";
 $cgp_show["module"]["control"] = "admin";
 $cgp_show["module"]["admin"] = "admin";
 $cgp_show["module"]["import"] = "admin";
@@ -318,6 +319,22 @@ require_once("conf/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 
 define("C_IMAGE_PATH",$cgp_host."images");
+
+// Automate commands
+$cmd_halt = "sudo /sbin/halt";
+$cmd_update = "$aliamin_path/auto/update.pl";
+$cmd_check_update = "ps aux | grep auto/update.pl | grep -v grep";
+$cmd_db_update = "$aliamin_path/auto/dbUpdate.sh";
+$cmd_db_cancel = "$aliamin_path/auto/dbUpdateCancel.sh";
+$cmd_mailforward = "$aliamin_path/auto/mailChangeAlias.pl";
+if ($cgp_aliasLdap) {
+  $cmd_mailforward .= " --ldap";
+}
+$cmd_ldap_passwd = "$aliamin_path/auto/ldapChangePasswd.pl";
+$cmd_disable_remote = "sudo /sbin/disableSSH.sh";
+$cmd_enable_remote = "sudo /sbin/enableSSH.sh";
+$cmd_vacation = "$aliamin_path/auto/mailChangeSieve.pl";
+
 $section = $cgp_show["module"][$module];
 
 //-----------------------------//

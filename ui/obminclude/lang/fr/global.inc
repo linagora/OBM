@@ -159,10 +159,12 @@ $l_password = "Mot de passe";
 $l_mailforward = "Redirection de messagerie";
 $l_mail = "Messagerie";
 $l_vacation = "Répondeur";
+$l_tools = "Outil Mise à jour";
 $l_control = "Tableau de bord";
 $l_host = "Hôte";
 $l_insufficient_permission = "Permissions insuffisantes";
-$l_scope_update = "Mettre à jour le systeme";
+$l_scope_update = "Mettre à jour le système";
+
 // OBM_DISPLAY
 $l_entries = "Entrées";
 $l_page_res = "Pages de résultat";
@@ -265,6 +267,7 @@ $l_module_admin_pref = "Préférences";
 $l_module_admin_code = "Code";
 $l_module_admin_ref = "Référentiel";
 
+$l_module_tools = "Outils Mise à jour";
 $l_module_control = "Tableau de bord système";
 $l_module_admin = "Connexions";
 $l_module_import = "Import";
@@ -298,6 +301,10 @@ $l_header_upd_group = "Modifier groupes";
 $l_header_convert_deal = "Convertir en Affaire";
 $l_header_add_deal = "Ajouter affaire";
 $l_header_list = "Liste";
+
+$l_header_tools_upd = "Mise à jour";
+$l_header_tools_halt = "Arrêt";
+$l_header_tools_remote = "Contrôle à distance";
 
 $l_header_new_child = "Nouvelle Affaire liée";
 $l_header_new_parent = "Nouvelle SurAffaire";

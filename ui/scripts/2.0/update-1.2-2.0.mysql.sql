@@ -9,6 +9,8 @@
 -- Global Information table
 -------------------------------------------------------------------------------
 UPDATE ObmInfo set obminfo_value='2.0' where obminfo_name='db_version';
+INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('update_state', '0');
+INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('remote_access', '0');
 
 
 -------------------------------------------------------------------------------
@@ -464,18 +466,6 @@ CREATE TABLE MailShareDir (
   mailsharedir_description   varchar(255),
   mailsharedir_email         text default NULL,
   PRIMARY KEY (mailsharedir_id)
-);
-
-
------------------------------------------------------------------------------
--- Table contenant les parametres generaux et non necessaires pour les 
--- sessions
------------------------------------------------------------------------------
-CREATE TABLE Parameters (
-  parameters_name   varchar(255) NOT NULL default '',
-  parameters_value  varchar(255) NOT NULL default '',
-  PRIMARY KEY (parameters_name),
-  UNIQUE KEY parameters_name (parameters_name)
 );
 
 

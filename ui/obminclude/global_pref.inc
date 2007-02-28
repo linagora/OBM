@@ -262,6 +262,10 @@ $modules["admin"] = array('Name'=> $l_module_admin,
                   'Ico' => "$ico_admin",
                   'Url' => "$path/admin/admin_index.php?mode=html",
                   'Right'=> $cright_read_admin);
+$modules["tools"] = array('Name'=> $l_module_tools,
+                  'Ico' => "$ico_tools",
+                  'Url' => "$path/tools/tools_index.php",
+                  'Right'=> $cright_read_admin);
 $modules["control"] = array('Name'=> $l_module_control,
                   'Ico' => "$ico_control",
                   'Url' => "$path/control/control_index.php",
