@@ -66,8 +66,8 @@ $l_link_invoice_no = "La société n'est pas référencée dans les factures";
 $l_cant_delete = "La société ne peut être supprimée !";
 $l_can_delete = "La société peut être supprimée.";
 $l_naf_no = "Pas de codes NAF définis";
-$l_naf_link_company = "Ces sociétés sont de code NAF";
-$l_naf_link_company_no = "Pas de sociétés de code NAF";
+$l_naf_link_company = "Sociétés sont liées à ce code NAF";
+$l_naf_link_company_no = "Pas de sociétés liées à ce code NAF";
 $l_naf_cant_delete = "Le code NAF ne peut être supprimé !";
 $l_naf_can_delete = "Le code NAF peut être supprimé";
 

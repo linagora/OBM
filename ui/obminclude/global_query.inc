@@ -173,27 +173,25 @@ function get_global_lead_sources() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_tasktype($tt_cat="", $tt_ids="") {
   global $cdg_sql, $ctt_sales, $ctt_research;
-
+  $multidomain = sql_multidomain("tasktype");
   $query = "
     SELECT
       tasktype_id,
       tasktype_label, 
       tasktype_internal
-    FROM TaskType ";
+    FROM TaskType";
 
   if (($tt_cat == "") || ($tt_cat == "all")) {
     $query .= "";
   } elseif ($tt_cat == "project") {
-    $where .= "(tasktype_internal = '$ctt_sales'
+    $where .= "AND (tasktype_internal = '$ctt_sales'
                       or tasktype_internal = '$ctt_research')";
   } else {
-    $where .= "tasktype_internal = '$tt_cat'";
+    $where .= "AND tasktype_internal = '$tt_cat'";
   }
 
   if (is_array($tt_ids)) {
-    if ($where != "") {
-      $where .= " AND ";
-    }
+    $where .= " AND ";
     $where .= "(";
     foreach($tt_ids as $id) {
       $where .= "$or tasktype_id = '$id'";
@@ -206,9 +204,8 @@ function get_global_tasktype($tt_cat="", $tt_ids="") {
     }
     $where .= " tasktype_id = '$tt_ids'";
   }
-  if($where != "") {
-     $query .= " WHERE $where ";
-  }
+  
+  $query .= " WHERE 1 = 1 $multidomain $where ";
   
   $query .= "ORDER BY tasktype_internal, tasktype_label";
 

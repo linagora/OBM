@@ -1503,6 +1503,7 @@ function html_company_nafcode_form($naf_q) {
     } else {
       $class = "";
     }
+    $key ++;
     $c_label = htmlentities($one_cat["label"]);
     $nafcode_list .= "
     <tr $class>
@@ -1676,7 +1677,7 @@ function dis_select_company_nafcode($naf_q, $line1, $selected) {
   $show_naf = (! $cgp_hide["company"]["nafcode"]);
 
   if ($show_naf) {
-    $sel_naf = "<select id=\"sel_naf\" name=\"sel_naf\">
+    $sel_naf = "<select name=\"sel_naf\">
     $line1";
     while ($naf_q->next_record()) {
       $n_id = $naf_q->f("companynafcode_id");

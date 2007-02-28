@@ -1743,6 +1743,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
       </div>";
     }
   }
+  if( $datebegin == '' ) {
+    $datebegin =  of_isodate_format(time());
+  }
+  if( $dateend == '' ) {
+    $dateend = $datebegin;
+  }
+  if( $hourend == '' ) {
+    $hourend = $ccalendar_first_hour + 1;
+  }
 
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
    

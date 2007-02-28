@@ -2538,7 +2538,9 @@ function dis_project_admin_index() {
 
   $reftask_q = run_query_project_reftasks();
   $tasktype_q = run_query_project_tasktype();  
-  $block .= dis_project_reftask_form($reftask_q,$tasktype_q);
+  if($tasktype_q->nf() > 0) {
+    $block .= dis_project_reftask_form($reftask_q,$tasktype_q);
+  }
 
   return $block;
 }

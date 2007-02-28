@@ -345,3 +345,22 @@ INSERT INTO Country VALUES (NULL, NULL,NULL, 0, 0, 'IQ', 'Irak', 'EN', '');
 INSERT INTO Country VALUES (NULL, NULL,NULL, 0, 0, 'LT', 'Lituanie ', 'EN', '');
 INSERT INTO Country VALUES (NULL, NULL,NULL, 0, 0, 'FR', 'France ', 'EN', '+33');
 INSERT INTO Country VALUES (NULL, NULL,NULL, 0, 0, 'MK', '« L''ex République Yougoslave de Macedoine »', 'EN', '');
+
+
+UPDATE Country SET country_domain_id = 1;
+UPDATE CompanyType SET companytype_domain_id = 1;
+UPDATE CompanyActivity SET companyactivity_domain_id = 1;
+UPDATE CompanyNafCode SET companynafcode_domain_id = 1;
+UPDATE Kind SET kind_domain_id = 1;
+UPDATE DealStatus SET dealstatus_domain_id = 1;
+UPDATE DealType SET dealtype_domain_id = 1;
+UPDATE CalendarCategory1 SET calendarcategory1_domain_id = 1;
+UPDATE DocumentMimeType SET documentmimetype_domain_id = 1;
+UPDATE TaskType SET tasktype_domain_id = 1;
+UPDATE ContractPriority SET contractpriority_domain_id = 1;
+UPDATE ContractStatus SET contractstatus_domain_id = 1;
+UPDATE IncidentPriority SET incidentpriority_domain_id = 1;
+UPDATE IncidentStatus SET incidentstatus_domain_id = 1;
+UPDATE InvoiceStatus SET invoicestatus_domain_id = 1;
+UPDATE PaymentKind SET paymentkind_domain_id = 1;
+UPDATE UGroup SET group_domain_id = 1;

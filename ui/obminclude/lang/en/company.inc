@@ -68,8 +68,8 @@ $l_cant_delete = "The company can't be deleted !";
 $l_can_delete = "The company can be deleted.";
 
 $l_naf_no = "No Code defined";
-$l_naf_link_company = "These companies are referenced as";
-$l_naf_link_company_no = "No company from Code";
+$l_naf_link_company = "These companies are referenced from this code";
+$l_naf_link_company_no = "No company from this code";
 $l_naf_cant_delete = "Code can't be deleted !";
 $l_naf_can_delete = "Code can be deleted.";
 

@@ -808,3 +808,5 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '970Z', 'Activités indifférenciées des ménages en tant que producteurs de services pour usage propre');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '99', 'Activités extra territoriales');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '990Z', 'Activités extra territoriales');
+
+UPDATE CompanyNafCode SET companynafcode_domain_id = 1;

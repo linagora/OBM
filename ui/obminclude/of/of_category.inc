@@ -516,7 +516,8 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
 
   $block = "
     <div class=\"detail admin\" >
-    <form id=\"form_${cat}_update\" action=\"?action=${cat}_update\" method=\"post\">
+    <form id=\"form_${cat}_update\" action=\"?action=${cat}_update\" method=\"post\"
+     onsubmit=\"return check_category(this.tf_${cat}_label,'$jslabel')\">
     <input type=\"hidden\" name=\"tf_${cat}_code\" value=\"\" size=\"6\"/>
     <input type=\"hidden\" name=\"tf_${cat}_label\" value=\"\" />
     <input type=\"hidden\" name=\"${cat}_id\" value=\"\" />
@@ -538,7 +539,7 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
     </table>
     </div>
     <form id=\"form_${cat}_new\" action=\"\" method=\"post\"
-    onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+    onsubmit=\"return check_category(this.tf_${cat}_label,'$jslabel')\">
     <table>
     <thead>
     <tr>
