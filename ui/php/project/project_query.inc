@@ -1267,7 +1267,7 @@ function run_query_project_statlog($p_id) {
   if ($time_used == "")  $time_used = 0;
   $multidomain = sql_multidomain("userobm");
   $query = "SELECT sum(projectuser_missingtime) as time_left
-            FROM ProjectUser JOIN UserObm ON projectuser_user_id userobm_id
+            FROM ProjectUser JOIN UserObm ON projectuser_user_id = userobm_id
             WHERE projectuser_project_id = '$p_id' $multidomain
             GROUP BY projectuser_project_id";
 
@@ -1949,6 +1949,11 @@ function run_query_project_reftask_insert($params) {
   $tasktype = $params["tasktype"];
   $label = $params["reftask_label"];
 	
+  // TODO faire une fonction check_param_reftask_update
+  if (($tasktype == "") or ($label == "")) {
+  	return false ;
+  }
+
   $query = "INSERT INTO ProjectRefTask (
     projectreftask_timeupdate,
     projectreftask_timecreate,
@@ -1983,6 +1988,11 @@ function run_query_project_reftask_update($params) {
   $label = $params["reftask_label"];
   $id = $params["reftask"];
   
+  // TODO faire une fonction check_param_reftask_update
+  if (($tasktype == "") or ($label == "")) {
+  	return false ;
+  }
+
   $query = "UPDATE ProjectRefTask 
   SET projectreftask_label = '$label',
     projectreftask_tasktype_id = '$tasktype',
