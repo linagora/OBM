@@ -1,6 +1,6 @@
 =head1 NOM
 
-OBM::Ldap::typeSystemUsers - Définition des fonction permettant de gérer le type
+OBM::Ldap::typeSystemUsers - Définition des fonctions permettant de gérer le type
 'SYSTEMUSERS'
 
 =head1 DEPENDANCES

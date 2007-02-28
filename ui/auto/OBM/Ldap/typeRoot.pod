@@ -1,6 +1,6 @@
 =head1 NOM
 
-OBM::Ldap:typeRoot - Définition des fonction permettant de gérer le type
+OBM::Ldap:typeRoot - Définition des fonctions permettant de gérer le type
 'ROOT'
 
 =head1 DEPENDANCES
