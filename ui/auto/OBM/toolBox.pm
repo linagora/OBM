@@ -1,0 +1,941 @@
+#########################################################################
+# OBM           - File : OBM::toolBox.pm (Perl Module)                  #
+#               - Desc : Librairie Perl pour OBM                        #
+#               Les fonctions communes                                  #
+#########################################################################
+# Cree le 2002-07-22                                                    #
+#########################################################################
+# $Id$   #
+#########################################################################
+package OBM::toolBox;
+
+use OBM::Parameters::common;
+use OBM::dbUtils;
+use Sys::Syslog;
+use Storable qw(dclone);
+require Exporter;
+
+@ISA = qw(Exporter);
+@EXPORT_function = qw(execRootCmd execCmd write_log makeConfigFile getLastUid getLastGid getGroupUsersMailEnable getGroupUsers getGroupUsersSID makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains cloneStruct);
+@EXPORT = (@EXPORT_function);
+@EXPORT_OK = qw();
+
+#
+# Necessaire pour le bon fonctionnement du package
+$debug=1;
+
+#------------------------------------------------------------------------------
+# Cette fonction sert a executer un programme en tant qu'utilisateur 'root', 
+# elle bloque le script qui l'a appellee jusqu'a ce que le programme execute
+# se termine.
+#------------------------------------------------------------------------------
+# Parametres :   le programme a executer.
+#------------------------------------------------------------------------------
+# Cette fonction retourne :  -1 si le programme n'a pas put etre execute.
+#                             $? si tout c'est bien passe.
+#------------------------------------------------------------------------------
+# Remarques :  La sortie standart du programme execute est redirige vers
+#             '/dev/null'.
+#------------------------------------------------------------------------------
+sub execRootCmd
+{
+	local( $cmd ) = @_;
+
+	my $pid;
+
+    if( $pid = fork )
+    {
+        waitpid($pid, 0);
+    }else
+    {
+        exec("/usr/bin/sudo ".$cmd." > /dev/null 2>&1") or return -1;
+    }
+
+    # on retourne la valeur retournee par le programme execute
+    my $retour = $? >> 8;
+    return $retour;
+}
+
+#------------------------------------------------------------------------------
+# Cette fonction permet d'executer une commande. Elle bloque le script qui
+# l'appelle jusqu'a ce que le programme execute se termine.
+#------------------------------------------------------------------------------
+# Parametres :  - cmd : le programme a executer.
+#               - verbose : la sortie standart est redirigee vers /dev/null ou
+#               non. 0->non, 1->redirige
+#------------------------------------------------------------------------------
+# Cette fonction retourne :  -1 si le programme n'a pas put etre execute.
+#                             $? si tout c'est bien passe.
+#------------------------------------------------------------------------------
+# Remarques :  La sortie standart du programme execute est redirige vers
+#             '/dev/null'.
+#------------------------------------------------------------------------------
+sub execCmd
+{
+    local( $cmd, $verbose ) = @_;
+
+    my $pid;
+
+    if( $pid = fork )
+    {
+        waitpid($pid, 0);
+    }else
+    {
+        if( $verbose )
+        {
+            exec( $cmd ) or return -1;
+        }else
+        {
+            exec($cmd." > /dev/null 2>&1") or return -1;
+        }
+    }
+
+    # on retourne la valeur retournee par le programme execute
+    my $retour = $? >> 8;
+    return $retour;
+}
+
+#------------------------------------------------------------------------------
+# Sert a ecrire et fermer un fichier log.
+# ATTENTION : il faut que le fichier de log soit ouvert au prealable !
+#------------------------------------------------------------------------------
+# Parametres :  $text :         texte a ecrire dans le fichier de log, ou
+#								prefixe lors de l'ouverture du log.
+#               $action :       -W : ecrit $text dans le fichier log
+#                               -C : ferme le fichier dez log
+#                               -WC : ecrit $text puis ferme le fichier
+#								-O : ouvre le log
+#------------------------------------------------------------------------------
+# Aucun retour.
+#------------------------------------------------------------------------------
+sub write_log {
+    local($text, $action) = @_;
+
+    SWITCH: {
+        if( !defined( $action ) ) {
+            last SWITCH;
+        }
+
+    	if( $action eq "O" ) {
+    		Sys::Syslog::setlogsock("unix");
+	    	openlog( $text, "pid", "$facility_log" );
+
+            last SWITCH;
+        }
+
+        if( ($action eq "W") || ($action eq "WC") ) {
+            syslog( "notice", $text );
+
+            last SWITCH;
+        }
+    
+        if( ($action eq "C") || ($action eq "WC") ) {
+            closelog();
+
+            last SWITCH;
+        }
+    }
+
+    return 0;
+}
+
+#------------------------------------------------------------------------------
+# Cette fonction permet de parcourir le fichier modele et de
+# remplacer les tags <ALIAMIN-...> par la valeur correspondante.
+#------------------------------------------------------------------------------
+# Parametres :
+#	$template : pointeur sur un tableau contenant 1 ligne du modele
+# dans chacune de ses cases.
+#	$data : pointeur sur une table de hachage associant cle/valeurs
+#   $start : indique la première à traiter
+#   $end : indique la dernière ligne à traiter
+#
+# Retour :
+#	1 : tout est ok
+#	0 : manque des valeurs pour completer le fichier
+#------------------------------------------------------------------------------
+sub makeConfigFile
+{
+	my( $template, $data, $start, $end ) = @_;
+
+    #
+    # On determine l'indice de depart et de fin
+    if( not defined($start) )
+    {
+        $start = 0;
+    }
+    if( not defined($end) )
+    {
+        $end = $#$template;
+    }
+
+    # On stocke le resultat dans cette variable
+    my $result = "";
+
+    # On parcours le modele ligne par ligne
+    my $i=$start;
+    while( $i<=$end )
+    {
+        #
+        # On copie la ligne tel quel dans une variable de travail
+        my $tmp = $$template[$i];
+
+        #
+        # On remplace les eventuelle balises
+        while( $tmp =~ /$findTag/ )
+        {
+            #
+            # On recupere la valeur associee a la balise dans la structure de
+            # donnee
+            my $tagValue = $data->{$1};
+
+            #
+            # On teste le type de la valeur
+            if( ref( $tagValue ) eq "ARRAY" )
+            {
+                #
+                # On garde la valeur du tag
+                my $lineBeginLoop = $1;
+
+                #
+                # On vide la variable $tmp, qui ne contient pour l'instant que
+                # la ligne avec le tag de debut de loop
+                $tmp = "";
+
+                #
+                # On passe a la ligne suivante (une ligne contenant un debut de
+                # boucle ne peut contenir autre chose).
+                $i++;
+                #
+                # Si la valeur associe a la balise est un tableau, il va falloir
+                # boucler sur une partie du modele avec les differentes valeurs
+                # du tableau.
+                # On commence par déterminer l'indice de la ligne du modele
+                # specifiant le debut et la fin de la boucle.
+                my $startLoop = $i;
+                #
+                # On cherche la fin de la boucle courante
+                my $foundEndTag = 0;
+                while( !$foundEndTag )
+                {
+                    if( $$template[$i] =~ /$endLoopTag/ )
+                    {
+                        if( $1 eq $lineBeginLoop )
+                        {
+                            $foundEndTag = 1;
+                        }else
+                        {
+                            $i++;
+                        }
+                    }else
+                    {
+                        $i++;
+                    }
+                }
+
+                #
+                # Quand on sort, on a trouve l'indice de la ligne de fin de
+                # boucle, on appelle en recurcif cette fonction sur le template 
+                # en se limitant aux indices de debut et de fin de boucle
+                # On fait ceci pour chacune des valeurs du tableau associe a la
+                # valeur de la balise.
+                for( my $j=0; $j<=$#$tagValue; $j++ )
+                {
+                    $tmp .= makeConfigFile( $template, $$tagValue[$j], $startLoop, $i-1 );
+                }
+
+            }elsif( not defined($tagValue) )
+            {
+                #
+                # Si le tag n'existe pas, on supprime la ligne.
+                $tmp = "";
+            }elsif( not ref( $tagValue ) )
+            {
+                #
+                # Si la valeur est un scalaire on remplace le tag par la valeur
+                # du scalaire
+                $tmp =~ s/$findTag/$tagValue/;
+
+            }
+        }
+
+        #
+        # Si la ligne contient une balise fermante qui n'a jamais ete ouverte,
+        # on supprime la ligne.
+        if(  $tmp =~ /$endLoopTag/ )
+        {
+            $tmp = "";
+        }
+
+        #
+        # Lorsqu'on a remplacee toutes les balises de la ligne, on la concatene
+        # avec le resultat
+        $result .= $tmp;
+        $i++;
+    }
+
+    return $result;
+}
+
+
+#
+# Cherche le premier UID libre
+#
+# Parametres :
+#       - listUsers : tableau contenant une description d'utilisateur par case.
+#
+# Retour :
+#       - l'UID libre
+sub getLastUid {
+    my( $listUsers ) = @_;
+ 
+    my $maxUid = $minUID;
+ 
+    for( my $i=0; $i<=$#$listUsers; $i++ )
+    {
+        if( $listUsers->[$i]->{"user_uid"} > $maxUid )
+        {
+            $maxUid = $listUsers->[$i]->{"user_uid"};
+        }
+    }
+ 
+    return ($maxUid + 1);
+}
+
+
+#
+# Cherche le permier GID libre
+#
+# Parametres :
+#       - listGroups : tableau contenant une description de groupe par case.
+#
+# Retour :
+#       - le GID libre
+sub getLastGid {
+    my( $listGroups ) = @_;
+
+    my $maxGid = $minGID;
+
+    for( my $i=0; $i<=$#$listGroups; $i++ ) {
+        if( defined($listGroups->[$i]->{"group_gid"}) && ($listGroups->[$i]->{"group_gid"} > $maxGid) ) {
+            $maxGid = $listGroups->[$i]->{"group_gid"};
+        }
+    }
+
+    return ($maxGid + 1);
+}
+
+
+#------------------------------------------------------------------------------
+# Cette fonction permet de recuperer le login de tous les utilisateurs ayant
+# droit aux mails et faisant partie du groupe dont l'Id est passe en parametre.
+#------------------------------------------------------------------------------
+# Parametres :
+#	$groupId : ID du groupe dont on souhaite recuperer la liste des logins
+#	$dbHandler : reference a l'objet de gestion de la connexion a la base
+#
+# Retour :
+#	reference a un tableau contenant un login par case.
+#------------------------------------------------------------------------------
+sub getGroupUsersMailEnable {
+    my( $groupId, $dbHandler ) = @_;
+
+    return getGroupUsers( $groupId, $dbHandler, "AND i.userobm_mail_perms=1" );
+}
+
+
+#------------------------------------------------------------------------------
+# Cette fonction permet de recuperer le login de tous les utilisateurs
+# faisant partie du groupe dont l'Id est passe en parametre.
+#------------------------------------------------------------------------------
+# Parametres :
+#	$groupId : ID du groupe dont on souhaite recuperer la liste des logins
+#	$dbHandler : reference a l'objet de gestion de la connexion a la base
+#   $sqlRequest : filter SQL permettant de faire le choix des utilisateurs
+#   a recuperer plus finement
+#
+# Retour :
+#	reference a un tableau contenant un login par case.
+#------------------------------------------------------------------------------
+sub getGroupUsers
+{
+    my( $groupId, $dbHandler, $sqlRequest ) = @_;
+
+    my @tabResult;
+    my $queryResult;
+
+    #
+    # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
+    my $query = "SELECT i.userobm_login FROM UserObm i, UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
+
+    if( defined( $sqlRequest ) && ($sqlRequest ne "") ) {
+        $query .= " ".$sqlRequest;
+    }
+    
+    #
+    # On execute la requete
+    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
+        write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            write_log( $queryResult->err, "W" );
+        }
+
+        write_log( "", "C" );
+        exit 1;
+    }
+    #
+    # On stocke le resultat dans le tableau des resultats
+    while( my( $userLogin ) = $queryResult->fetchrow_array )
+    {
+        push( @tabResult, $userLogin );
+    }
+
+    #
+    # Recuperation de la liste des utilisateurs du groupe id : $groupId.
+    $query = "SELECT groupgroup_child_id FROM GroupGroup WHERE groupgroup_parent_id=".$groupId;
+    #
+    # On execute la requete
+    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
+        write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            write_log( $queryResult->err, "W" );
+        }
+
+        write_log( "", "C" );
+        exit 1;
+    }
+    #
+    # On traite les resultats
+    while( my( $groupGroupId ) = $queryResult->fetchrow_array )
+    {
+        my $userGroupTmp = getGroupUsers( $groupGroupId, $dbHandler, $sqlRequest );
+
+        for( my $i=0; $i<=$#$userGroupTmp; $i++ )
+        {
+            my $j =0;
+            while( ($j<=$#tabResult) && ($$userGroupTmp[$i] ne $tabResult[$j]) )
+            {
+                $j++;
+            }
+
+            if( $j>$#tabResult )
+            {
+                push( @tabResult, $$userGroupTmp[$i] );
+            }
+        }
+    }
+    
+    return \@tabResult;
+}
+
+
+#------------------------------------------------------------------------------
+# Cette fonction permet de recuperer le SID de tous les utilisateurs
+# faisant partie du groupe dont l'Id est passe en parametre.
+#------------------------------------------------------------------------------
+# Parametres :
+#	$groupId : ID du groupe dont on souhaite recuperer la liste des logins
+#	$dbHandler : reference a l'objet de gestion de la connexion a la base
+#   $baseDN : DN de reference pour les groupes
+#
+# Retour :
+#	reference a un tableau contenant un SID par case.
+#------------------------------------------------------------------------------
+sub getGroupUsersSID
+{
+    my( $groupId, $dbHandler, $SID ) = @_;
+
+    my @tabResult;
+    my $queryResult;
+
+    #
+    # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
+    my $query = "SELECT i.userobm_uid FROM UserObm i, UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id= i.userobm_id";
+    #
+    # On execute la requete
+    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
+        write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            write_log( $queryResult->err, "W" );
+        }
+
+        write_log( "", "C" );
+        exit 1;
+    }
+    #
+    # On stocke le resultat dans le tableau des resultats
+    while( my( $userSID ) = $queryResult->fetchrow_array )
+    {
+        push( @tabResult, getUserSID( $SID, $userSID ) );
+    }
+
+    #
+    # Recuperation de la liste des utilisateurs du groupe id : $groupId.
+    $query = "SELECT groupgroup_child_id FROM GroupGroup WHERE groupgroup_parent_id=".$groupId;
+    #
+    # On execute la requete
+    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
+        write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            write_log( $queryResult->err, "W" );
+        }
+
+        write_log( "", "C" );
+        exit 1;
+    }
+    #
+    # On traite les resultats
+    while( my( $groupGroupId ) = $queryResult->fetchrow_array )
+    {
+        my $userGroupTmp = getGroupUsersSID( $groupGroupId, $dbHandler, $SID );
+
+        for( my $i=0; $i<=$#$userGroupTmp; $i++ )
+        {
+            my $j =0;
+            while( ($j<=$#tabResult) && ($$userGroupTmp[$i] ne $tabResult[$j]) )
+            {
+                $j++;
+            }
+
+            if( $j>$#tabResult )
+            {
+                push( @tabResult, $$userGroupTmp[$i] );
+            }
+        }
+    }
+    
+    return \@tabResult;
+}
+
+
+#------------------------------------------------------------------------------
+# Cette fonction permet de construire les adresses mails d'une entite à partir
+# de sa liste de prefix et de la liste de domaines.
+#------------------------------------------------------------------------------
+# Parametres :
+#   - mailPrefix : liste des prefixes de la forme 'pref1\r\npref2...' ;
+#   - mailDomain : reference a un tableau de domaines de messagerie
+#   (1 par case).
+#
+# Retour :
+#   reference tableau contenant les adresses mails de l'entite - 1 adresse
+#   par case.
+#------------------------------------------------------------------------------
+sub makeEntityMailAddress {
+    my( $mailPrefix, $domainList ) = @_;
+    my @mailList;
+
+    my @prefixList = split( "\r\n", $mailPrefix );
+
+    for( my $j=0; $j<=$#$domainList; $j++ ) {
+        for( my $i=0; $i<=$#prefixList; $i++ ) {
+            if( $prefixList[$i] ) {
+                push( @mailList, $prefixList[$i]."@".$$domainList[$j] );
+            }
+        }
+    }
+
+    return \@mailList;
+}
+
+
+#------------------------------------------------------------------------------
+# Gestion de la table des droits
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Définition des types possible pour les entites et les consommateurs
+#------------------------------------------------------------------------------
+sub initRight {
+    my( $entityId, $entityType ) = @_;
+
+    my %rightDef;
+
+    if( $entityType =~ /^($MAILBOXENTITY|$MAILSHAREENTITY)$/ ) {
+        $rightDef{"read"}->{"compute"} = 1;
+        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$entityId." AND j.entityright_entity='".$entityType."'";
+        
+        $rightDef{"writeonly"}->{"compute"} = 1;
+        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$entityId." AND j.entityright_entity='".$entityType."'";
+
+        $rightDef{"write"}->{"compute"} = 1;
+        if( $entityType =~ /^$MAILBOXENTITY$/ ) {
+            $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM UserObm LEFT JOIN EntityRight ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id WHERE (entityright_entity='".$entityType."' AND entityright_entity_id=".$entityId.") OR userobm_id=".$entityId;
+
+        }else {
+            $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=1 AND j.entityright_entity_id=".$entityId." AND j.entityright_entity='".$entityType."'";
+        
+        }
+
+        $rightDef{"public"}->{"compute"} = 0;
+        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM EntityRight WHERE entityright_entity_id=".$entityId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
+    }
+
+
+    return %rightDef;
+}
+
+
+#------------------------------------------------------------------------------
+# Cette fonction permet d'obtenir la liste des droits des consomateurs sur
+# une entité.
+#------------------------------------------------------------------------------
+sub getEntityRight {
+    my ( $entityId, $entityType, $dbHandler ) = @_;
+    my %usersList;
+
+    #
+    # Check parameters
+    if( $entityType !~ /^($MAILBOXENTITY|$MAILSHAREENTITY)$/ ) {
+        write_log( "Type d'entite ".$entityType." inconnu.", "W" );
+        return undef;
+    }
+
+    #
+    # Definition des droits a traiter
+    my %rightDef = initRight( $entityId, $entityType );
+    my %userTemplate = ( "read", 0, "writeonly", 0, "write", 0 );
+
+
+    #
+    # On execute la requete
+    if( !execQuery( $rightDef{"public"}->{"sqlQuery"}, $dbHandler, \$queryResult ) ) {
+        write_log( "Probleme lors de l'execution de la requete.", "WC" );
+        if( defined($queryResult) ) {
+            write_log( $queryResult->err, "W" );
+        }
+
+        write_log( "", "C" );
+        exit 1;
+    }
+    if( my( $read, $write ) = $queryResult->fetchrow_array ) {
+        if( $read && !$write ) {
+            $usersList{"anyone"}->{"read"} = 1;
+            $usersList{"anyone"}->{"writeonly"} = 0;
+            $usersList{"anyone"}->{"write"} = 0;
+
+            # Droit a ne pas traiter car droit public
+            $rightDef{"read"}->{"compute"} = 0;
+
+            # construction d'un template utilisateur
+            $userTemplate{"read"} = 1;
+        }elsif( !$read && $write ) {
+            $usersList{"anyone"}->{"read"} = 0;
+            $usersList{"anyone"}->{"writeonly"} = 1;
+            $usersList{"anyone"}->{"write"} = 0;
+            
+            # Droit a ne pas traiter car droit public
+            $rightDef{"writeonly"}->{"compute"} = 0;
+
+            # construction d'un template utilisateur
+            $userTemplate{"writeonly"} = 1;
+        }elsif( $read && $write ) {
+            $usersList{"anyone"}->{"read"} = 0;
+            $usersList{"anyone"}->{"writeonly"} = 0;
+            $usersList{"anyone"}->{"write"} = 1;
+
+            # Droit a ne pas traiter car droit public
+            $rightDef{"read"}->{"compute"} = 0;
+            $rightDef{"writeonly"}->{"compute"} = 0;
+            $rightDef{"write"}->{"compute"} = 0;
+        }
+    }
+    $queryResult->finish;
+
+    #
+    # Tratitement du droit '$right', cles du hachage '%rightDef'
+    while( my( $right, $rightDesc ) = each( %rightDef ) ) {
+        if( !$rightDesc->{"compute"} ) {
+            next;
+        }
+
+        #
+        # On execute la requete correspondant au droit
+        if( !execQuery( $rightDef{$right}->{"sqlQuery"}, $dbHandler, \$queryResult ) ) {
+            write_log( "Probleme lors de l'execution de la requete.", "W" );
+            if( defined($queryResult) ) {
+                write_log( $queryResult->err, "W" );
+            }
+
+            write_log( "", "C" );
+            exit 1;
+        }
+        while( my( $userLogin ) = $queryResult->fetchrow_array ) {
+            # Si l'utilisateur n'a pas deja ete trouve, on l'initialise
+            # avec les valeurs du template
+            if( !exists( $usersList{$userLogin} ) ) {
+                while( my( $templateRight, $templateValue ) = each( %userTemplate ) ) {
+                    $usersList{$userLogin}->{$templateRight} = $templateValue;
+                }
+            }
+
+            $usersList{$userLogin}->{$right} = 1;
+        }
+
+    }
+
+    #
+    # Normalisation des droits
+    %usersList = computeRight( \%usersList );
+
+    return \%usersList;
+}
+
+
+#------------------------------------------------------------------------------
+# Permet de convertir les droits décrit en base, en droit Aliamin.
+#------------------------------------------------------------------------------
+sub computeRight {
+    my( $usersList ) = @_;
+    my %rightList;
+
+    while( my( $userName, $right ) = each( %$usersList ) ) {
+        if( $right->{"write"} ) {
+            $rightList{"write"}->{$userName} = 1;
+        }elsif( $right->{"read"} && $right->{"writeonly"} ) {
+            $rightList{"write"}->{$userName} = 1;
+        }elsif( $right->{"read"} ) {
+            $rightList{"read"}->{$userName} = 1;
+        }elsif( $right->{"writeonly"} ) {
+            $rightList{"writeonly"}->{$userName} = 1;
+        }
+    }
+
+    return %rightList;
+}
+
+
+#------------------------------------------------------------------------------
+# Permet de savoir si il y a eu mise à jour des ACL ou pas.
+#------------------------------------------------------------------------------
+sub aclUpdated {
+    my( $cyrusAcl, $bdAcl ) = @_;
+    my $returnCode = 0;
+
+    my @cyrusRightList = keys( %$cyrusAcl );
+    my @bdRightList = keys( %$bdAcl );
+
+    if( $#cyrusRightList != $#bdRightList ) {
+        $returnCode = 1;
+
+    }else {
+        while( my( $cyrusRight, $cyrusUsers ) = each( %$cyrusAcl ) ) {
+            if( $returnCode ) {
+                next;
+            }
+
+            if( !exists( $bdAcl->{$cyrusRight} ) ) {
+                $returnCode = 1;
+            }
+
+            my @cyrusUsersList = keys( %$cyrusUsers );
+            my @bdUsersList = keys( %{$bdAcl->{$cyrusRight}} );
+
+            if( $#cyrusUsersList != $#bdUsersList ) {
+                $returnCode = 1;
+            }
+
+            for( my $i=0; $i<=$#cyrusUsersList; $i++ ) {
+                if( $returnCode ) {
+                    next;
+                }
+
+                if( !exists($bdAcl->{$cyrusRight}->{$cyrusUsersList[$i]}) ) {
+                    $returnCode = 1;
+                }
+            }
+        }
+    }
+
+    return $returnCode;
+}
+
+#------------------------------------------------------------------------------
+# Permet d'obtenir l'adresse IP d'un hôte à partir de son identifiant
+#------------------------------------------------------------------------------
+sub getHostIpById {
+    my( $dbHandler, $hostId ) = @_;
+
+    if( !defined($hostId) ) {
+        write_log( "Identifiant de l'hôte non défini !", "W" );
+        return undef;
+    }elsif( $hostId !~ /^[0-9]+$/ ) {
+        write_log( "Identifiant de l'hôte '".$hostId."' incorrect !", "W" );
+        return undef;
+    }elsif( !defined($dbHandler) ) {
+        write_log( "Connection à la base de donnée incorrect !", "W" );
+        return undef;
+    }
+
+    my $query = "SELECT host_ip FROM Host WHERE host_id='".$hostId."'";
+
+    #
+    # On execute la requete
+    my $queryResult;
+    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
+        write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            write_log( $queryResult->err, "W" );
+        }
+
+        return undef;
+    }
+
+    if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
+        write_log( "Identifiant de l'hôte '".$hostId."' inconnu !", "W" );
+
+        $queryResult->finish;
+        return undef;
+    }else{
+        $queryResult->finish;
+        return $hostIp;
+    }
+
+    return undef;
+
+}
+
+#------------------------------------------------------------------------------
+# Permet de récupérer le nom d'un hôte à partir de son identifiant
+#------------------------------------------------------------------------------
+sub getHostNameById {
+    my( $dbHandler, $hostId ) = @_;
+
+    if( !defined($hostId) ) {
+        write_log( "Identifiant de l'hôte non défini !", "W" );
+        return undef;
+    }elsif( $hostId !~ /^[0-9]+$/ ) {
+        write_log( "Identifiant de l'hôte '".$hostId."' incorrect !", "W" );
+        return undef;
+    }elsif( !defined($dbHandler) ) {
+        write_log( "Connection à la base de donnée incorrect !", "W" );
+        return undef;
+    }
+
+    my $query = "SELECT host_name FROM Host WHERE host_id='".$hostId."'";
+
+    #
+    # On execute la requete
+    my $queryResult;
+    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
+        write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            write_log( $queryResult->err, "W" );
+        }
+
+        return undef;
+    }
+
+    if( !(my( $hostName ) = $queryResult->fetchrow_array) ) {
+        write_log( "Identifiant de l'hôte '".$hostId."' inconnu !", "W" );
+
+        $queryResult->finish;
+        return undef;
+    }else{
+        $queryResult->finish;
+        return $hostName;
+    }
+
+    return undef;
+
+}
+
+#------------------------------------------------------------------------------
+# Permet d'obtenir la liste des serveurs de boîtes à lettres
+#------------------------------------------------------------------------------
+sub getMailServerList {
+    my( $dbHandler ) = @_;
+
+    if( !defined($dbHandler) ) {
+        write_log( "Connection à la base de donnée incorrect !", "W" );
+        return undef;
+    }
+
+    my $query = "SELECT mail_value FROM Mail WHERE mail_name LIKE '%mailserver'";
+
+    #
+    # On execute la requete
+    my $queryResult;
+    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
+        write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            write_log( $queryResult->err, "W" );
+        }
+
+        return undef;
+    }
+
+    my @serverList;
+    while( my( $serverId ) = $queryResult->fetchrow_array ) {
+        push( @serverList, $serverId );
+    }
+
+    return \@serverList;
+}
+
+#------------------------------------------------------------------------------
+# Permet d'obtenir la liste des domaines OBM
+#------------------------------------------------------------------------------
+sub getDomains {
+    my( $dbHandler ) = @_;
+    my @domainList;
+
+    # Création du meta-domaine
+    $domainList[0] = {
+        "meta_domain" => 1,
+        "domain_label" => "metadomain",
+        "domain_name" => "metadomain",
+        "domain_desc" => "Informations de l'annuaire ne faisant partie d'aucun domaine"
+    };
+
+
+    if( !defined($dbHandler) ) {
+        write_log( "Connection à la base de donnée incorrect !", "W" );
+        return undef;
+    }
+
+    # Requete de recuperation des informations des domaines
+    my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias FROM Domain";
+
+    #
+    # On execute la requete concernant les domaines
+    my $queryDomainResult;
+    if( !execQuery( $queryDomain, $dbHandler, \$queryDomainResult ) ) {
+        write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryDomainResult) ) {
+            write_log( $queryDomainResult->err, "W" );
+        }
+
+        return undef;
+    }
+
+    while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias ) = $queryDomainResult->fetchrow_array ) {
+        push( @domainList, {    "meta_domain" => 0,
+                                "domain_id" => $domainId, 
+                                "domain_label" => $domainLabel,
+                                "domain_desc" => $domainDesc,
+                                "domain_name" => $domainName,
+                                "domain_dn" => $domainName
+                           }
+
+        );
+
+        if( defined($domainAlias) ) {
+            push( @{$domainList[$#domainList]->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
+        }else {
+            $domainList[$#domainList]->{"domain_alias"} = [];
+        }
+    }
+
+    return \@domainList;
+}
+
+
+#------------------------------------------------------------------------------
+# Permet de cloner une structure complexe
+#------------------------------------------------------------------------------
+sub cloneStruct {
+    my( $structRef ) = @_;
+
+    return dclone($structRef);
+}
