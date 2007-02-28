@@ -28,21 +28,20 @@ sub getDbValues {
         return undef;
     }
 
+    if( defined($main::domainList->[$domainId]->{"domain_id"}) ) {
+        &OBM::toolBox::write_log( "Identifiant de domaine non définie", "WC" );
+        return undef;
+    }
+
     # La requete a executer - obtention des informations sur les repertoires
     # partages de la messagerie
-my $query = "SELECT mailsharedir_name, mailsharedir_description, mailsharedir_email FROM P_MailShareDir WHERE ";
-
-    if( defined($main::domainList->[$domainId]->{"domain_id"}) ) {
-        $query .= " (mailsharedir_domain_id=".$main::domainList->[$domainId]->{"domain_id"}." OR mailsharedir_domain_id=0)";
-    }else {
-        $query .= " mailsharedir_domain_id=0";
-    }
+    my $query = "SELECT mailsharedir_name, mailsharedir_description, mailsharedir_email FROM P_MailShareDir WHERE mailsharedir_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requête
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return undef;
-}
+    }
 
     # On range les resultats dans la structure de données
     my $i = 0;

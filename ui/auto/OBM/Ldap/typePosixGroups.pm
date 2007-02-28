@@ -29,16 +29,13 @@ sub getDbValues {
         return undef;
     }
 
-    # La requete a executer - obtention des informations sur les utilisateurs de
-    # l'organisation.
-    my $query = "SELECT group_id, group_gid, group_name, group_desc, group_email, group_contacts FROM P_UGroup WHERE group_privacy=0";
-
-    if( defined($main::domainList->[$domainId]->{"domain_id"}) ) {
-        $query .= " AND (group_domain_id=".$main::domainList->[$domainId]->{"domain_id"}." OR group_domain_id=0)";
-    }else {
-        $query .= " AND group_domain_id=0";
+    if( !defined($main::domainList->[$domainId]->{"domain_id"}) ) {
+        return undef;
     }
 
+    # La requete a executer - obtention des informations sur les utilisateurs de
+    # l'organisation.
+    my $query = "SELECT group_id, group_gid, group_name, group_desc, group_email, group_contacts FROM P_UGroup WHERE group_privacy=0 AND group_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
