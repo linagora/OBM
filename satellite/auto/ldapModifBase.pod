@@ -1,0 +1,19 @@
+=head1 NOM
+
+ldapModifBase.pl - Script permettant de synchroniser l'annuaire LDAP avec les
+données de la base de données OBM.
+
+=head1 DEPENDANCES
+
+ require OBM::dbUtils;
+ require OBM::toolBox;
+ require OBM::ldap;
+ use OBM::Parameters::common;
+ use OBM::Parameters::ldapConf;
+
+=head1 DESCRIPTION
+
+Ce script permet de gérer les entités définies dans l'annuaire LDAP par rapport
+au contenu de la base de données OBM.
+
+=cut

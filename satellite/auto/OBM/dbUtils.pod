@@ -1,0 +1,57 @@
+=head1 NOM
+
+OBM::dbUtils - Permet de gérer les accès à une base MySql.
+
+=head1 DEPENDANCES
+
+ use OBM::Parameters::common;
+ require DBI;
+
+=head1 DESCRIPTION
+
+    use OBM::dbUtils;
+    
+Ce paquet implémente les fonctions de connexions, déconnexion et intérogation
+d'une base de données MySql.
+
+=head1 API
+
+Description de l'API mise à disposition par ce module.
+
+=over 4
+
+=item B<dbState( $action, *dbh )>
+
+Fonction qui permet de gérer la connexion à la base de production d'Aliamin.
+
+=over 4
+
+=item action : permet de svoir ce que l'on souhaite faire (se connecter ou se
+deconnecter de la base. Valeurs possibles : "connect", "disconnect" ;
+
+=item dbh : une reference au handler de la base.
+
+=back
+
+Retour : vrai si tout c'est bien passé, faux sinon.
+
+=item B<execQuery( $query, $dbh, *sth )>
+
+Fonction qui permet d'exécuter la requête passer en
+paramètre dans la base référencé par le handler passé en paramètre.
+ 
+=over 4
+
+=item query : la requete a executer ;
+
+=item dbh : le database handler ;
+
+=item sth : le statement handle (pointeur sur le resultat de la requete).
+
+=back
+
+Retour : vrai si tout c'est bien passé, faux sinon.
+
+=back
+
+=cut

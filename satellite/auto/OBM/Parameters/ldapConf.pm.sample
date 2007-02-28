@@ -1,0 +1,323 @@
+package OBM::Parameters::ldapConf;
+
+require Exporter;
+
+use OBM::Parameters::common;
+
+@ISA = qw(Exporter);
+@EXPORT_const = qw( $POSIXUSERS $POSIXGROUPS $SAMBAUSERS $SYSTEMUSERS $NODE $ROOT $DOMAINROOT $SAMBADOMAIN $SAMBAFREEUNIXID $SAMBAGROUPS $SAMBAHOSTS $POSTFIXCONF $MAILSHAREDIR $GROUPOFNAMES );
+@EXPORT_struct = qw($attributeDef $ldapStruct);
+@EXPORT = (@EXPORT_const, @EXPORT_struct);
+@EXPORT_OK = qw();
+
+#
+# Necessaire pour le bon fonctionnement du package
+$debug=1;
+
+
+#
+# Declaration des type de donnees LDAP
+#
+# Type de noeuds possibles
+$NODE = "organizationalUnit";
+$ROOT = "rootLdap";
+$DOMAINROOT = "domainRootLdap";
+#
+# Type de donnees possibles
+$POSIXUSERS = "posixUsers";
+$POSIXGROUPS = "posixGroups";
+$SYSTEMUSERS = "systemUsers";
+$SAMBADOMAIN = "sambaDomain";
+$SAMBAFREEUNIXID = "sambaFreeUnixId";
+$SAMBAUSERS = "sambaUsers";
+$SAMBAGROUPS = "sambaGroups";
+$SAMBAHOSTS = "sambaHosts";
+$POSTFIXCONF = "postfixConf";
+$MAILSHAREDIR = "mailShareDir";
+$GROUPOFNAMES = "groupOfNames";
+
+#
+# Déclaration des attributs des différents types
+$attributeDef = {
+    $ROOT => {
+        structural => 1,
+        is_branch => 1,
+        dn_prefix => "dc",
+        objectclass => [ "dcObject", "organization" ],
+        init_struct => sub {
+            my( $ldapStruct, $parentDn ) = @_;
+            require OBM::Ldap::typeRoot;
+            return OBM::Ldap::typeRoot::initStruct( $ldapStruct, $parentDn );
+        },
+        get_db_value => sub {
+            my( $parentDn, $domainId ) = @_;
+            require OBM::Ldap::typeRoot;
+            return OBM::Ldap::typeRoot::getDbValues( $parentDn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeRoot;
+            return OBM::Ldap::typeRoot::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeRoot;
+            return OBM::Ldap::typeRoot::updateLdapEntry( $entry, $ldapEntry );
+        }
+    },
+
+    $DOMAINROOT => {
+        structural => 1,
+        is_branch => 1,
+        dn_prefix => "dc",
+        objectclass => [ "dcObject", "organization" ],
+        init_struct => sub {
+            my( $ldapStruct, $parentDn ) = @_;
+            require OBM::Ldap::typeDomainRoot;
+            return OBM::Ldap::typeDomainRoot::initStruct( $ldapStruct, $parentDn );
+        },
+        get_db_value => sub {
+            my( $parentDn, $domainId ) = @_;
+            require OBM::Ldap::typeDomainRoot;
+            return OBM::Ldap::typeDomainRoot::getDbValues( $parentDn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeDomainRoot;
+            return OBM::Ldap::typeDomainRoot::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub { return 0; }
+    },
+
+    $NODE => {
+        structural => 1,
+        is_branch => 1,
+        dn_prefix => "ou",
+        objectclass => [ "organizationalUnit" ],
+        get_db_value => sub {
+            my( $parentDn, $domainId ) = @_;
+            require OBM::Ldap::typeNode;
+            return OBM::Ldap::typeNode::getDbValues( $parentDn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeNode;
+            return OBM::Ldap::typeNode::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeNode;
+            return OBM::Ldap::typeNode::updateLdapEntry( $entry, $ldapEntry );
+        }
+    },
+
+    $POSIXUSERS => {
+        structural => 1,
+        is_branch => 0,
+        dn_prefix => "uid",
+        dn_value => "user_login",
+        objectclass => [ "posixAccount", "shadowAccount", "inetOrgPerson", "obmUser" ],
+        get_db_value => sub {
+            my( $parentDn, $domainId ) = @_;
+            require OBM::Ldap::typePosixUsers;
+            return OBM::Ldap::typePosixUsers::getDbValues( $parentDn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typePosixUsers;
+            return OBM::Ldap::typePosixUsers::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typePosixUsers;
+            return OBM::Ldap::typePosixUsers::updateLdapEntry( $entry, $ldapEntry );
+        }
+    },
+
+    $SYSTEMUSERS => {
+        structural => 1,
+        is_branch => 0,
+        dn_prefix => "uid",
+        dn_value => "user_login",
+        objectclass => [ "person", "posixAccount" ],
+        get_db_value => sub {
+            my( $parentdn, $domainId ) = @_;
+            require OBM::Ldap::typeSystemUsers;
+            return OBM::Ldap::typeSystemUsers::getDbValues( $parentdn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeSystemUsers;
+            return OBM::Ldap::typeSystemUsers::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeSystemUsers;
+            return OBM::Ldap::typeSystemUsers::updateLdapEntry( $entry, $ldapEntry );
+        }
+    },
+
+    $POSIXGROUPS => {
+        structural => 1,
+        is_branch => 0,
+        dn_prefix => "cn",
+        dn_value => "group_name",
+        objectclass => [ "posixGroup", "obmGroup" ],
+        get_db_value => sub {
+            my( $parentdn, $domainId ) = @_;
+            require OBM::Ldap::typePosixGroups;
+            return OBM::Ldap::typePosixGroups::getDbValues( $parentdn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typePosixGroups;
+            return OBM::Ldap::typePosixGroups::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typePosixGroups;
+            return OBM::Ldap::typePosixGroups::updateLdapEntry( $entry, $ldapEntry );
+        }
+    },
+
+    $MAILSHAREDIR => {
+        structural => 1,
+        is_branch => 0,
+        dn_prefix => "cn",
+        dn_value => "mailsharedir_name",
+        objectclass => [ "obmMailShare" ],
+        get_db_value => sub {
+            my( $parentdn, $domainId ) = @_;
+            require OBM::Ldap::typeMailShareDir;
+            return OBM::Ldap::typeMailShareDir::getDbValues( $parentdn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeMailShareDir;
+            return OBM::Ldap::typeMailShareDir::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeMailShareDir;
+            return OBM::Ldap::typeMailShareDir::updateLdapEntry( $entry, $ldapEntry );
+        }
+    },
+
+    $POSTFIXCONF => {
+        structural => 1,
+        is_branch => 0,
+        dn_prefix => "cn",
+        objectclass => [ "obmPostfix" ]
+    }
+};
+
+
+#
+# Déclaration de la structure
+
+#
+# Déclaration de la racine de l'annuaire
+$ldapStruct = {
+    dn => "",
+    name => "local",
+    node_type => "$ROOT",
+    description => "Racine de l'annuaire",
+    data_type => [],
+    template => [],
+    branch => [],
+    ldap_server => {
+        server => "$ldapServer",
+        login => "",
+        conn => ""
+    }
+};
+
+#
+# Déclaration de la branche des utilisateurs systèmes globaux
+$ldapStruct->{"branch"}->[0] = {
+    dn => "",
+    name => "sysusers",
+    node_type => "$NODE",
+    description => "System users",
+    data_type => [ $SYSTEMUSERS ],
+    template => [],
+    branch => []
+};
+
+#
+# Déclaration de la branche des racines des domaines.
+
+#
+# Ce type de branche sera copier autant de fois qu'il y a de domaines à traiter.
+# Chaque branche contient les informations d'un domaine.
+# Le noeud de type DOMAINROOT peut contenir des informations d'authentifications
+# spécifiques à un serveur LDAP (cf. noeud type ROOT).
+$ldapStruct->{"template"}->[0] = {
+    dn => "",
+    name => "",
+    node_type => "$DOMAINROOT",
+    description => "Racine du domaine",
+    data_type => [],
+    template => [],
+    branch => []
+};
+
+#
+# Banche contenant la déclaration des utilisateurs
+$ldapStruct->{"template"}->[0]->{"branch"}->[0] = {
+    dn => "",
+    name => "users",
+    node_type => "$NODE",
+    description => "Users account",
+    data_type => [ $POSIXUSERS ],
+    template => [],
+    branch => []
+};
+
+#
+# Banche contenant la déclaration des utilisateurs systèmes
+$ldapStruct->{"template"}->[0]->{"branch"}->[1] = {
+    dn => "",
+    name => "sysusers",
+    node_type => "$NODE",
+    description => "System users",
+    data_type => [ $SYSTEMUSERS ],
+    template => [],
+    branch => []
+};
+
+#
+# Banche contenant la déclaration des groupes
+$ldapStruct->{"template"}->[0]->{"branch"}->[2] = {
+    dn => "",
+    name => "groups",
+    node_type => "$NODE",
+    description => "System Groups",
+    data_type => [ $POSIXGROUPS ],
+    template => [],
+    branch => []
+};
+
+#
+# Banche contenant la déclaration des répertoires partagés
+$ldapStruct->{"template"}->[0]->{"branch"}->[3] = {
+    dn => "",
+    name => "mailShareDir",
+    node_type => "$NODE",
+    description => "Share Directory",
+    data_type => [ $MAILSHAREDIR ],
+    template => [],
+    branch => []
+};
+
+#
+# Banche contenant la déclaration de la configuration des services
+$ldapStruct->{"template"}->[0]->{"branch"}->[4] = {
+    dn => "",
+    name => "servicesConfiguration",
+    node_type => "$NODE",
+    description => "Services configuration",
+    data_type => [ $POSTFIXCONF ],
+    template => [],
+    branch => []
+};

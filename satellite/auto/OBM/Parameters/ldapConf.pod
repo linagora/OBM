@@ -1,0 +1,182 @@
+=head1 NOM
+
+OBM::Parameters::ldapConf - Déclaration de différentes valeurs utiles par
+l'ensemble de l'automate.
+
+=head1 DEPENDANCES
+
+ require Exporter;
+
+=head1 DESCRIPTION
+
+    use OBM::Parameters::ldapConf
+
+Ce paquet déclare un ensemble de valeurs (constantes ou variables) utilisées par
+les scripts de mises à jour de l'annuaire LDAP.
+
+=head1 TYPES ALIAMIN
+
+Les types aliamin sont une abstraction d'objets LDAP.
+
+Nous retrouvons au niveaux de ces types, la notion LDAP de type 'structurels'.
+Les types structurels sont constitués d'au moins une et une seule 'objectClass' LDAP
+'STRUCTURAL'.
+
+Les B<types structurels> peuvent être placés n'importe où dans l'arbre LDAP et de façon
+indépendante. B<Attention :> deux type structurels ne peuvent pas être stockés au même
+endroit (même DN) dans l'arbre LDAP.
+
+Les B<types non structurels> doivent complèter un type structurel. Ils doivent partager le
+même DN qu'un type structurel.
+
+Les types Aliamin déclarés sont :
+
+=over 4
+
+=item $ROOT =E<gt> C<organization>, C<dcObject>
+
+B<structurel> - définit le type Aliamin ROOT, représentant la racine de l'arbre LDAP ;
+
+=item $NODE =E<gt> C<organizationalUnit>
+
+B<structurel> - définit le type Aliamin NODE, représentant un noeud de l'arbre LDAP ;
+
+=item $DOMAINROOT =E<gt> C<organizational>, C<dcObject>
+
+B<structurel> - définit le type Aliamin DOMAINROOT, représentant un noeud de
+l'arbre LDAP correspondant à la racine d'un domaine ;
+
+=item $POSIXUSERS =E<gt> C<posixAccount>, C<shadowAccount>, C<inetOrgPerson>, C<aliaminUsers>
+
+B<structurel> - définit le type Aliamin POSIXUSERS, représentant un utilisateur POSIX ;
+
+=item $SAMBAUSERS =E<gt> C<sambaSamAccount>
+
+B<non structurel> - définit le type Aliamin SAMBAUSERS, représentant un utilisateur SAMBA ;
+
+=item $SYSTEMUSER =E<gt> C<"account>, C<posixAccount>
+
+B<structurel> - définit le type Alialin SYSTEMUSER, représentant un utilisateur non POSIX.
+Ce type sert à déclarer des utilisateurs définit lors de l'intégration. Ce ne sont pas
+des utilisateurs créées par l'interface. Ces utilisateurs sont utlisées par diverses applications
+(Samba) ou par Aliamin pour se connecter à certains services (LDAP, MySql) ;
+
+=item $POSIXGROUPS =E<gt> C<posixGroup>
+
+B<structurel> - définit le type Aliamin POSIXGROUPS, représentant un groupe POSIX ;
+
+=item $SAMBAGROUPS =E<gt> C<sambaGroupMapping>
+
+B<non structurel> - définit le type Aliamin SAMBAGROUPS, représentant un groups SAMBA ;
+
+=item $SAMBAHOSTS =E<gt> C<inetOrgPerson>, C<posixAccount>, C<shadowAccount>, C<sambaSamAccount>
+
+B<structurel> - définit le type Aliamin SAMBAHOSTS, représentant un compte machine dans un
+domaine Samba ;
+
+=item $ADDRESSBOOK =E<gt> C<groupOfNames>, C<aliaminGroups>
+
+B<non structurel> - définit le type Aliamin ADDRESSBOOK permettant de stocker des contacts
+dans l'annuaire LDAP - expérimental 20040930 ;
+
+=item $SAMBADOMAIN =E<gt> C<sambaDomain>
+
+B<structurel> - définit le type Aliamin SAMBADOMAIN, représentant un des nombreux objets LDAP
+nécessaires au fonctionnement de Samba en PDC. Il 'sert' à stocker les informations du domaine
+(entre autre) ;
+
+=item $SAMBAFREEUNIXID =E<gt> C<inetOrgPerson>, C<sambaUnixIdPool>
+
+B<structurel> - définit le type Aliamin SAMBAFREEUNIXID, représentant un des nombreux objets LDAP
+nécessaires au fonctionnement de Samba en PDC. Il 'sert' à stocker les prochains UID et GID
+libres - à approfondir 20040930 ;
+
+=item $POSTFIXCONF =E<gt> C<aliaminPostfix>
+
+B<non structurel> - définit le type Aliamin POSTFIXCONF, représentant la
+configuration de postfix dans l'annuaire LDAP ;
+
+=item $MAILSHAREDIR =E<gt> C<mailShareDir>
+
+B<structurel> - définit le type Aliamin MAILSHAREDIR représentant les
+répertoires partagés de messagerie ;
+
+=item $GROUPOFNAME =E<gt> C<groupOfNames>
+
+B<structurel> - définit le type Aliamin GROUPOFNAME représentant les
+groupes POSIX en utilisant les groupes de noms ;
+
+=back
+
+=head1 DESCRIPTION DES TYPES
+
+Les caractèristiques des types sont définies dans la structure de données
+'attributeDef'.
+
+Cette structure de données est une référence à une table de hachage dont
+les clés sont les différents types.
+
+Les valeurs correspondantes sont des références à une table de hachage qui
+définies les clés suivante :
+
+=over 4
+
+=item B<structural> : permet de savoir si ce type est structurel ;
+
+=item B<is_branch> : permet de savoir si ce type décrit une branche ;
+
+=item B<dn_prefix> : permet de connaitre l'attribut utilisé pour définir le DN
+de l'entité LDAP correspondante ;
+
+=item B<dn_value> : permet de connaitre le champs de la base OBM permettant de
+définir la valeur de l'attribut utilisé pour créer le DN de l'entité LDAP ;
+
+=item B<objectclass> : référence à un tableau contenant les différentes classes
+d'objets LDAP associées à ce type ;
+
+=item B<init_struct> : référence à une fonction permettant d'initialiser un
+objet de ce type ;
+
+=item B<get_db_value> : référence à une fonction permettant de charger les
+valeurs depuis la base de données OBM ;
+
+=item B<create_ldap> : référence à une fonction permettant de créer l'objet LDAP
+correpondant aux valeurs de la base OBM ;
+
+=item B<update_ldap> : référence à une fonction permettant de mettre à jour
+l'entité LDAP. 
+
+=back
+
+=head1 STRUCTURE DE L'ANNUAIRE
+
+Le structure de l'annuaire LDAP est décrite par la variable 'ldapStruct'.    
+
+Cette variable est une référence à une table de hachage dont les clés sont :
+
+=over 4
+
+=item B<dn> : contient le DN de l'entité correspondante ;
+
+=item B<name> : contient le nom de l'entité, ce nom est utilisé comme valeur
+pour l'attribut utilisé dans le DN ;
+
+=item B<node_type> : type de l'entité ;
+
+=item B<data_type> : tableau contenant les différents types de deonnées que l'on
+retrouve sous cette structure. Les types utilisés ici ne doivent pas être des
+branches ;
+
+=item B<template> : tableau contenant les différents types de données que l'on
+souhaite voir répliqué pour chacun des domaines OBM. Les types utilisés ici
+doivent être des branches ;
+
+=item B<branch> : tableau contenant les différents types de données. Ces types
+correspondent à des branches de l'annuaire ;
+
+=item B<TYPE> : les structures correspondantes aux types définis dans
+'data_type', sont associées à la clé portant le nom du type concerné ;
+
+=back
+
+=cut
