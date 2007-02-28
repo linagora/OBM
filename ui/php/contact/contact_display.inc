@@ -1473,26 +1473,28 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   <option value=\"$c_undef\">$l_undef</option>";
   $sel_kind_header = "<select name=\"sel_kind\">
   <option value=\"$c_undef\">$l_undef</option>";
-  foreach ($k_kind as $k_lang => $k_kind_label) {
-    $sel_kind_lang .= "\n<option value=\"$k_lang\"";
-    if ($k_lang == $kind_lang) {
-      foreach ($k_kind_label as $k_label => $k_kind_header) {
-	$sel_kind_label .= "\n<option value=\"$k_label\"";
-	if ($k_label == $kind_label) {
-	  foreach ($k_kind_header as $k_header => $k_id) {
-	    $sel_kind_header .= "\n<option value=\"$k_id\"";
-	    if ($k_id == $kind) { 
-	      $sel_kind_lang .= "selected = \"selected\"";
-	      $sel_kind_label .= "selected = \"selected\"";
-	      $sel_kind_header .= "selected = \"selected\""; 
+  if(is_array($k_kind)) {
+    foreach ($k_kind as $k_lang => $k_kind_label) {
+      $sel_kind_lang .= "\n<option value=\"$k_lang\"";
+      if ($k_lang == $kind_lang) {
+        foreach ($k_kind_label as $k_label => $k_kind_header) {
+	  $sel_kind_label .= "\n<option value=\"$k_label\"";
+	  if ($k_label == $kind_label) {
+	    foreach ($k_kind_header as $k_header => $k_id) {
+	      $sel_kind_header .= "\n<option value=\"$k_id\"";
+	      if ($k_id == $kind) { 
+	        $sel_kind_lang .= "selected = \"selected\"";
+	        $sel_kind_label .= "selected = \"selected\"";
+	        $sel_kind_header .= "selected = \"selected\""; 
+	      }
+	      $sel_kind_header .= ">$k_header</option>";
 	    }
-	    $sel_kind_header .= ">$k_header</option>";
 	  }
-	}
-	$sel_kind_label .= ">$k_label</option>";
+	  $sel_kind_label .= ">$k_label</option>";
+        }
       }
+      $sel_kind_lang .= ">$k_lang</option>";
     }
-    $sel_kind_lang .= ">$k_lang</option>";
   }
   $sel_kind_label .= "</select>";
   $sel_kind_lang .= "</select>";
