@@ -93,7 +93,7 @@ sub createLdapEntry {
     if( $entry->{"user_login"} && $entry->{"user_firstname"} && $entry->{"user_lastname"} && $entry->{"user_uid"} && $entry->{"user_gid"} && $entry->{"user_homedir"} && $entry->{"user_password"} ) {
 
         my $longName = $entry->{"user_firstname"}." ".$entry->{"user_lastname"};
-        my $sshaPasswd = &OBM::passwd::toSsha( $entry->{"user_password"} );
+        my $sshaPasswd = "{SSHA}".&OBM::passwd::toSsha( $entry->{"user_password"} );
 
         $ldapEntry->add(
             objectClass => $attributeDef->{$type}->{"objectclass"},
