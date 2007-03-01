@@ -778,7 +778,7 @@ function run_query_project_task_delete($params) {
       WHERE projectuser_projecttask_id = projecttask_id
         AND projecttask_project_id = project_id
         AND (projecttask_id='$tsk_id' OR projecttask_parenttask_id='$tsk_id')
-        AND $multidomain ";
+        $multidomain ";
     
     display_debug_msg($query, $cdg_sql, "run_query_project_task_delete(1)");
     $search_q = new DB_OBM;

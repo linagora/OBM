@@ -121,7 +121,7 @@ else if ($action == "new_criterion") {
   }
   if (check_list_data("", $params)) {
     // If the context (same list) was confirmed ok, we proceed
-    if ($hd_confirm == $c_yes) {
+    if ($params["confirm"] == $c_yes) {
       $params["list_id"] = run_query_list_insert($params);
       if ($params["list_id"] > 0) {
         $display["msg"] .= display_ok_msg("$l_list : $l_insert_ok");
@@ -267,7 +267,7 @@ else if ($action == "new_criterion") {
 update_list_action();
 $display["head"] = display_head($l_list);
 $display["end"] = display_end();
-if (! $popup) {
+if (! $params["popup"]) {
   $display["header"] = display_menu($module);
 }
 

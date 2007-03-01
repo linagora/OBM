@@ -243,9 +243,9 @@ elseif ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_document_mime_insert($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_mime : $l_insert_ok");
+    $display["msg"] .= display_ok_msg("$l_mimetype : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_mime : $l_insert_error");
+    $display["msg"] .= display_err_msg("$l_mimetype : $l_insert_error");
   }
   $display["detail"] .= dis_document_admin_index();
 
@@ -253,9 +253,9 @@ elseif ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_document_mime_update($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_mime : $l_update_ok");
+    $display["msg"] .= display_ok_msg("$l_mimetype : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_mime : $l_update_error");
+    $display["msg"] .= display_err_msg("$l_mimetype : $l_update_error");
   }
   $display["detail"] .= dis_document_admin_index();
 
@@ -267,9 +267,9 @@ elseif ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_document_mime_delete($params["mime"]);
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_mime : $l_delete_ok");
+    $display["msg"] .= display_ok_msg("$l_mimetype : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_mime : $l_delete_error");
+    $display["msg"] .= display_err_msg("$l_mimetype : $l_delete_error");
   }
   $display["detail"] .= dis_document_admin_index();
 
@@ -314,7 +314,8 @@ function get_document_params() {
 
   // Get global params
   $params = get_global_params("Document");
-
+  if (isset ($params["param_entity"])) $params["entity_id"] = $params["param_entity"];
+  
   if (isset ($params["path"])) $params["path"] = format_path(trim($params["path"]));
   if (isset ($_FILES['fi_file'])) {
     $params["file_tmp"] = $_FILES['fi_file']["tmp_name"];

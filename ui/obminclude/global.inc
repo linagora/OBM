@@ -932,7 +932,7 @@ function get_lang() {
 //   $params : hash table which contains form params
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_params($table="") {
-  global $fieldnames, $action;
+  global $fieldnames, $action,$popup;
 
   $order_dir_values = array("ASC", "DESC");
   
@@ -1012,7 +1012,8 @@ function get_global_params($table="") {
 
   $action = $params["action"];
   if ($action == "") $action = "index";
-
+  $popup = $params["popup"];
+  
   return $params;
 }
 

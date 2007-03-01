@@ -659,7 +659,7 @@ function dis_contact_consult($contact) {
 function html_contact_header($co_q, $funcs) {
   global $l_company, $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title;
   global $l_contact, $l_market, $l_archive, $l_date, $l_no_date;
-  global $cgp_show, $cgp_hide, $c_yes, $c_no;
+  global $cgp_show, $cgp_hide, $l_yes, $l_no;
   global $display, $path, $action;
 
   $c_id = $co_q->f("contact_company_id");
@@ -675,7 +675,7 @@ function html_contact_header($co_q, $funcs) {
   $lname = $co_q->f("contact_lastname");
   $fname = $co_q->f("contact_firstname");
   $aka = $co_q->f("contact_aka");
-  $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
+  $archive = ($co_q->f("contact_archive") == 1 ? $l_yes : $l_no);
   $date = $co_q->f("contact_date");
   $date = ($date != 0) ? of_date_format($date) : $l_no_date; 
  
@@ -777,7 +777,7 @@ function html_contact_view_main($co_q) {
   global $l_town, $l_country, $l_email, $l_mailing_ok, $l_expresspostal;
   global $l_comment1, $l_comment2, $l_comment3, $l_email_other;
   global $l_service, $l_coord, $ico_clipboard;
-  global $c_yes, $c_no,  $ico_mail;
+  global $l_yes, $l_no,  $ico_mail;
   global $display, $cgp_show, $cgp_hide, $cclipboard_address;
 
   $id = $co_q->f("contact_id");
@@ -809,7 +809,7 @@ function html_contact_view_main($co_q) {
   $fax = $co_q->f("contact_fax");
   $email = $co_q->f("contact_email");
   $email2 = $co_q->f("contact_email2");
-  $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $c_yes : $c_no);
+  $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $l_yes : $l_no);
   $com  = beautify_comment(nl2br($co_q->f("contact_comment")));
   $com2 = beautify_comment(nl2br($co_q->f("contact_comment2")));
   $com3 = beautify_comment(nl2br($co_q->f("contact_comment3")));
@@ -1950,6 +1950,7 @@ function html_contact_kind_form($kind_q) {
     } else {
       $class = "";
     }
+    $key ++;
     $c_label = htmlentities($one_cat["label"]);
     $kind_list .= "
     <tr $class>
@@ -2058,7 +2059,7 @@ function dis_contact_kind_links($ref) {
   $nb_kind = $obm_q->num_rows();
   if ($nb_kind > 0) {
     $delete_ok = false;
-    $dis_link_head = "<h1>$name : $l_kind_link_contact ($nb_kind)</h1>";
+    $dis_link_head = "<h1> $l_kind_link_contact :$name ($nb_kind)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
@@ -2072,7 +2073,7 @@ function dis_contact_kind_links($ref) {
     }
 
   } else {
-    $dis_link_head = "<h1>$name : $l_kind_link_contact_no</h1>";
+    $dis_link_head = "<h1> $l_kind_link_contact_no $name</h1>";
   }
 
   $block = "<div class=\"detail\">

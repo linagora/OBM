@@ -78,7 +78,7 @@ if ($action == "index" || $action == "") {
   } else {
     $obm_q = run_query_statistic_get_list($params["list_id"]);
     $ext_list_function = "ext_list_get_${entity}_ids";
-    $ent_q = @$ext_list_function($params["list_id"]);
+    $ent_q = $ext_list_function($params["list_id"]);
     $cat_q = run_query_statistic_selected_entity_per_country_per_cat($ent_q, $entity, $category);
     $nb_ent = $ent_q->nf();
   }

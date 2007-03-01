@@ -73,7 +73,7 @@ function list_add_criteria_line(form,index) {
     del_row(criteria.rows.item(index+1));
   }
   labels = criteria.insertRow(index);
-  labels.className = 'detailLabel';
+  labels.className = 'head';
   values = criteria.insertRow(index+1);
   labels.insertCell(0);
   labels.insertCell(1);
@@ -86,7 +86,7 @@ function list_add_criteria_line(form,index) {
   cell = values.insertCell(2);
   cell.style.borderRight = '1px solid #7B9EAD';
   cell.style.paddingRight = '5px';
-  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"$ico_validate\" alt=\"Update\" /></a>';
+  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"$ico_update\" alt=\"Update\" /></a>';
   cell = values.insertCell(3);
   cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
   cell = values.insertCell(4);

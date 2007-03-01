@@ -22,7 +22,7 @@ $fieldnames["userupdate"] = $l_updater;
 $fieldnames["timecreate"] = $l_date_creation;
 $fieldnames["timeupdate"] = $l_date_last_update;
 // Calculated fields
-$fieldnames["list_nb_contact"] = "$l_nb_contact : $l_static / $l_query";
+$fieldnames["list_nb_contact"] = "$l_module_contact : $l_static / $l_query";
 $fieldnames["contact_lastname"] = $l_lastname;
 $fieldnames["contact_firstname"] = $l_firstname;
 $fieldnames["contactfunction_label"] = $l_function;
@@ -878,13 +878,11 @@ function html_list_form($action, $list_q, $list) {
     <input type=\"radio\" $normal_checked name=\"rd_mode\" value=\"$clist_mode_normal\" onclick=\"return show_query_field('none','',this);\" />
     </td>
     </tr>
-    <tr>
-      <td>
-      <textarea id=\"ta_query\" $style_query name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea>
-      $dis_query
-      </td>
-    </tr>
   </table>
+  <div class=\"O FW\">
+  <textarea id=\"ta_query\" $style_query name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea>
+  $dis_query
+  </div>
   </fieldset>";
 
   if (($action == "detailupdate") || ($action == "update")) {
@@ -904,7 +902,7 @@ function html_list_form($action, $list_q, $list) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_normal_criteria_form($action, $list_q, $list) {
-  global $cgp_user,$popup_height,$popup_width,$ico_updated,$ico_crow;
+  global $cgp_user,$popup_height,$popup_width,$ico_update,$ico_delete;
   global $l_add_criterion, $l_criterion;
   global $l_and, $l_or, $l_not, $l_empty, $l_exclude;
   global $l_company, $l_country,$l_postcode,$l_town;
@@ -1171,10 +1169,10 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
       }
     }
 
-    $del_cell = "<th><a href=\"javascript:void(0);\" onclick=\"del_row(this.parentNode.parentNode);return false;\">
-    <img src=\"$ico_crow\" alt=\"Delete\" /></a></th>";
-    $upd_cell = "<th><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
-    <img src=\"$ico_updated\" alt=\"Update\" /></a></th>"; 
+    $del_cell = "<td><a href=\"javascript:void(0);\" onclick=\"del_row(this.parentNode.parentNode);return false;\">
+    <img src=\"$ico_delete\" alt=\"Delete\" /></a></td>";
+    $upd_cell = "<td><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
+    <img src=\"$ico_update\" alt=\"Update\" /></a></td>"; 
 
     if (is_array($structure)) {
       foreach($structure as $key=>$line) {
@@ -1192,14 +1190,14 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	  $not = "";
 	}
 	$logical_criterion;      
-	$dis_no_boolean = "<th><select name=\"sel_log_not[]\">
+	$dis_no_boolean = "<td><select name=\"sel_log_not[]\">
         <option value=\"\" $empty >$l_empty</option>
         <option value=\"NOT\" $not>$l_not</option>
         <option value=\"Exclude\" $exclude>$l_exclude</option>
-      </select></th>";  
+      </select></td>";  
       
        $dis_criteria .="
-	<tr><th colspan=\"5\"></th>".$labels[$key]."</tr>";
+	<tr><td class=\"head\" colspan=\"5\"></td>".$labels[$key]."</tr>";
 	if ($logical_criterion[$key] == "AND") {
 	  $and = "selected =\"true\"";
 	  $or = "";
@@ -1207,7 +1205,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	  $or = "selected =\"true\"";
 	  $and = "";
 	}	
-	$dis_logical = "<th><select name=\"sel_log_and[]\"><option value=\"OR\" $or>$l_or</option><option value=\"AND\" $and>$l_and</option></select>";
+	$dis_logical = "<td><select name=\"sel_log_and[]\"><option value=\"OR\" $or>$l_or</option><option value=\"AND\" $and>$l_and</option></select></td>";
 	$dis_criteria .="<tr><td>".$hid_cell[$key]."</td>$del_cell $upd_cell $dis_logical $dis_no_boolean $line</tr>";      
       }
     }
@@ -1672,6 +1670,7 @@ function dis_list_warn_insert($list_q, $list) {
   $info_pub = ($list["info_pub"] == "1" ? "1" : "0");
   $mode = ($list["mode"] == "1" ? "1" : "0");
   $query = stripslashes($list["query"]);
+  $email = $list["email"];
   if (isset($list["criteria"])) {
     $criteria = urlencode(serialize($list["criteria"]));
   }
@@ -1694,6 +1693,7 @@ function dis_list_warn_insert($list_q, $list) {
       <input type=\"hidden\" name=\"cba_contact_archive\" value=\"$contact_arch\" />
       <input type=\"hidden\" name=\"cba_info_pub\" value=\"$info_pub\" />
       <input type=\"hidden\" name=\"rd_mode\" value=\"$mode\" />
+      <input type=\"hidden\" name=\"email\" value=\"$email\" />
       <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" />
       <input type=\"hidden\" name=\"id_duplicated\" value=\"$id_duplicated\" />";
 

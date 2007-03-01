@@ -239,12 +239,10 @@ function run_query_document_insert(&$document) {
       $query = "INSERT INTO DocumentEntity (
         documententity_entity,
         documententity_entity_id,
-        documententity_domain_id,
         documententity_document_id
       ) VALUES (
         '$entity',
         '$entity_id',
-        '$domain_id',
         '$doc_id'
       )";
       display_debug_msg($query, $cdg_sql, "run_query_document_insert(links)");
@@ -776,6 +774,9 @@ function run_query_document_mime_insert($document) {
   $mimetype = $document["mimetype"];
   $domain_id = $obm["domain_id"];
 	
+  if($mime == "" || $extension == "" || $mimetype == "") {
+    return false;
+  }
   $query = "INSERT INTO DocumentMimeType (
     documentmimetype_domain_id,
     documentmimetype_timecreate,

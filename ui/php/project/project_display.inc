@@ -2024,7 +2024,7 @@ function dis_project_dashboard($project) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
   global $path,  $display, $action;
-  global $l_board_no_data, $l_total;
+  global $l_board_no_data, $l_total,$l_sold ,$l_estimated;
   global $l_project, $l_progress, $l_progressinfos;
   global $l_used, $l_missing,$ico_hierarchy;
   global $l_allotted, $l_progress_update, $l_project, $l_resume;
@@ -2231,7 +2231,14 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
     $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
     $dis_member .= "<td>$tm_label</td>\n";
     $dis_member .= "</tr>\n";
-
+  // Labels are different for sales and R&D projects
+    if ($company > 0) {
+      $text_time = "$l_sold / $l_estimated";
+      $value_time = "$soldtime / $estimated";
+    } else {
+      $text_time = $l_estimated;
+      $value_time = $estimated;
+    }
     // ratios
     $ratio_alloestimated = intval(($allotted/$estimated)*100);
     $ratio_usedestimated = intval(($usedtime/$estimated)*100);

@@ -564,7 +564,7 @@ function html_publication_group_subscription_form($action,$pub_q, $publication) 
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_subscription_form($action,$sub_q, $recept_q, $publication) {
   global $display;
-  global $ico_publication_new,$popup_height,$popup_width;
+  global $ico_add,$popup_height,$popup_width;
   global $l_subscription,$l_quantity, $l_renew, $l_recept, $l_lang, $l_desc;
   global $l_insert_sub,$l_update_sub,$l_checkdelete_sub, $l_publication;
 
@@ -617,7 +617,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
       <input type=\"submit\" value=\"$l_insert_sub\" />";
     $block_publi = "      
     <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-     <img src=\"$ico_publication_new\" alt=\"[New Publication]\" /> 
+     <img src=\"$ico_add\" alt=\"[New Publication]\" /> 
     </a>
     <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$pub_id\" />
     <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"$title\" />
@@ -1262,8 +1262,12 @@ function dis_publication_subscription_external_list($hash_table) {
   if ($nb_subscription == 0) {
     $display["msg"] = display_warn_msg($l_no_found_subscription);
   } else {
-    $block .= "<div class=\"detailHead\">$l_subscription</div>";
+    $block .= "
+      <div class=\"detail extra\">
+      <h1 class=\"detailHead\">$l_subscription</div>
+      ";
     $block .= html_publication_subscription_list_result($obm_q,$nb_subscription);
+    $block .= "</div>";
   }
 
   return $block;
@@ -1280,28 +1284,31 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
   global  $ico_update, $ico_delete, $ico_crow;
   global $l_yes,$l_no, $l_timecreate, $l_timeupdate,$l_publication_title;
   global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
-  global $path, $popup_height, $popup_width;
+  global $path, $popup_height, $popup_width,$ico_delete;
   global $cright_write, $module, $perm;
 
   if ($perm->check_right($module, $cright_write)) {  
     $has_write_right = true;
-    $display_write .= "<td class=\"resultHead\"></td>
-    <td class=\"resultHead\"></td>";
+    $display_write .= "<th></th>
+    <th></th>";
   }
   
   $block = " 
-  <div class=\"result\"><table class=\"resultTable\">
-   <tr>
-    <td class=\"resultHead\">$l_publication_title</td>
-    <td class=\"resultHead\">$l_year</td>
-    <td class=\"resultHead\">$l_lang</td>
-    <td class=\"resultHead\">$l_renewal</td>
-    <td class=\"resultHead\">$l_recept</td>
-    <td class=\"resultHead\">$l_quantity</td>
-    <td class=\"resultHead\">$l_timecreate</td>    
-    <td class=\"resultHead\">$l_timeupdate</td>
-    $display_write
-   </tr>";
+    <table class=\"spreadSheet\">
+    <thead>
+     <tr>
+      <th>$l_publication_title</th>
+      <th>$l_year</th>
+      <th>$l_lang</th>
+      <th>$l_renewal</th>
+      <th>$l_recept</th>
+      <th>$l_quantity</th>
+      <th>$l_timecreate</th>    
+      <th>$l_timeupdate</th>
+      $display_write
+      </tr>
+      </thead>
+      <tbody>";
 
   while($sub_q->next_record()) {
     $c_id = $sub_q->f("subscription_contact_id");
@@ -1326,14 +1333,14 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
       $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_subscription=$s_id&amp;popup=1");
 
       $display_write = "
-    <td class=\"resultText\">
+    <td>
       <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
-      <img src=\"$ico_update\" />
+      <img src=\"$ico_update\" alt=\"Update\" />
       </a>
     </td>    
-    <td class=\"resultText\">
+    <td>
       <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_delete','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
-      <img src=\"$ico_crow\" />
+      <img src=\"$ico_delete\" alt=\"Delete\" />
       </a>
       </td>";
     }
@@ -1344,18 +1351,21 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
       $dis_renew = $l_no;
     }
     $block .= "
+    
     <tr>
-    <td class=\"resultText\"><a href=\"$url_publication_consult\">$title</a></td>
-    <td class=\"resultText\">$year</td>
-    <td class=\"resultText\">$lang</td>
-    <td class=\"resultText\">$dis_renew</td>
-    <td class=\"resultText\">$rec_label</td>
-    <td class=\"resultText\">$quantity</td>
-    <td class=\"resultText\">$timecreate</td>
-    <td class=\"resultText\">$timeupdate</td>    
+    <td><a href=\"$url_publication_consult\">$title</a></td>
+    <td>$year</td>
+    <td>$lang</td>
+    <td>$dis_renew</td>
+    <td>$rec_label</td>
+    <td>$quantity</td>
+    <td>$timecreate</td>
+    <td>$timeupdate</td>    
     $display_write
-    </tr>";
+    </tr>
+    ";
   }
+  $block .= "</tbody></table>";
   return $block;
 }
 

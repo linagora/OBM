@@ -124,6 +124,9 @@ form {
   display: none;
 }
 
+.FW {
+  width: 100%;
+}
 
 /* ------------------------------------------------------------------------- */
 /* Two column layout  */
@@ -696,8 +699,10 @@ input.datePicker {
 
 .search label {
   float: left;
-  margin: 0;
-  padding: 3px;
+  margin: 0px;
+  margin-bottom: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   display: block;
 }
 
@@ -800,7 +805,7 @@ input.datePicker {
     color: red;
 }
 
-.spreadSheet thead th{
+.spreadSheet thead th, .spreadSheet thead .head{
   background-color: #b3b2b2;
   font-weight: bold;
   text-align: center;
@@ -823,7 +828,7 @@ input.datePicker {
   border-bottom: 1px solid #b2b2b2;  
 }
 
-.spreadSheet tbody th{
+.spreadSheet tbody th, .spreadSheet tbody .head{
   background-color: #dbdbdb;
   font-weight: bold;
   text-align: left;
@@ -850,7 +855,7 @@ input.datePicker {
   border-left: 1px solid #fff;
 }
 
-.spreadSheet tfoot th{
+.spreadSheet tfoot th, .spreadSheet tfoot .head {
   background-color: #dbdbdb;
   font-weight: bold;
   text-align: center; 

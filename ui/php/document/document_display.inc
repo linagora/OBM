@@ -764,7 +764,7 @@ function html_document_mime_form($mime_q) {
   </table>
   </div>    
   <form id=\"form_mime_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  onsubmit=\"return check_category(this.tf_mime_label,'$jslabel')\">
   <table>
   <thead>
   <tr>

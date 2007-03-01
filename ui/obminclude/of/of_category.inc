@@ -503,7 +503,7 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
         <td> <input type=\"text\" id=\"tf_${cat}_code_$c_id\" value=\"$c_code\" size=\"6\"/></td>
         <td> <input type=\"text\" id=\"tf_${cat}_label_$c_id\" value=\"$c_label\" /></td>
         <td>
-        <a href=\"#\" onclick=\"updateLine($c_id,'${cat}')\">
+        <a href=\"#\" onclick=\"updateLine($c_id,'$cat_name')\">
         <img src=\"$ico_ok\" alt=\"$l_c_update\" title=\"$l_c_update\" />
         </a>
 	</td>
@@ -516,11 +516,12 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
 
   $block = "
     <div class=\"detail admin\" >
-    <form id=\"form_${cat}_update\" action=\"?action=${cat}_update\" method=\"post\"
+    <form id=\"form_".$cat_name."_update\" action=\"?action=${cat}_update\" method=\"post\"
      onsubmit=\"return check_category(this.tf_${cat}_label,'$jslabel')\">
     <input type=\"hidden\" name=\"tf_${cat}_code\" value=\"\" size=\"6\"/>
     <input type=\"hidden\" name=\"tf_${cat}_label\" value=\"\" />
     <input type=\"hidden\" name=\"${cat}_id\" value=\"\" />
+    <input type=\"hidden\" name=\"category\" value=\"$cat_name\" />
     </form>    
     <h1>$l_c_manage ${$l_cat}</h1>
     <div class=\"overflow\">
@@ -538,7 +539,7 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
     </tbody>
     </table>
     </div>
-    <form id=\"form_${cat}_new\" action=\"\" method=\"post\"
+    <form id=\"form_".$cat_name."_new\" action=\"\" method=\"post\"
     onsubmit=\"return check_category(this.tf_${cat}_label,'$jslabel')\">
     <table>
     <thead>
