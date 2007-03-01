@@ -91,7 +91,7 @@ sub getDbValues {
         $groups[$i]->{"node_type"} = $POSIXGROUPS;
         $groups[$i]->{"name"} = $groups[$i]->{$attributeDef->{$groups[$i]->{"node_type"}}->{"dn_value"}};
         $groups[$i]->{"domain_id"} = $domainId;
-        $groups[$i]->{"dn"} = &OBM::ldap::makeDN( $groups[$i], $parentDn );
+        $groups[$i]->{"dn"} = &OBM::ldap::makeDn( $groups[$i], $parentDn );
 
         $i++;
     }

@@ -51,7 +51,7 @@ if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
 # Construit la structure de l'arbre LDAP en mémoire
 &OBM::toolBox::write_log( "--------", "W" );
 &OBM::toolBox::write_log( "Construction de la structure de l'arbre LDAP depuis la BD", "W" );
-&OBM::ldap::loadTreeFromDb( $ldapStruct, undef, undef );
+&OBM::ldap::initTree( $ldapStruct, undef, undef, 1 );
 
 #
 # Mise a jour des annuaires en fonction des informations de la structure

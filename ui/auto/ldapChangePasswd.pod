@@ -1,0 +1,93 @@
+=head1 NOM
+
+ldapChangePasswd.pl - Script permettant de modifier le mot de passe d'un
+utilisateur.
+
+=head1 DEPENDANCES
+
+ require OBM::toolBox;
+ require OBM::dbUtils;
+ require OBM::ldap;
+ use OBM::Parameters::common;
+ use OBM::Parameters::ldapConf;
+
+=head1 DESCRIPTION
+
+ Ce script permet de modifier le mot de passe d'un utilisateur.
+
+ Il est utilisé à plusieurs niveau :
+
+=over 4
+
+=item B<dans l'interface de modification du mot de passe>.
+
+Lorsqu'un utilisateur désire modifier son propre mot de passe ;
+
+=item B<dans le formulaire de gestion d'un utilisateur>.
+
+Lorsqu'on modifie un utilisateur EXISTANT, et que l'on renseigne le champs mot de passe ;
+
+=item B<via Samba>.
+
+Afin qu'il soit possible de modifier le mot de passe depuis windows.
+
+=back
+
+=head1 PARAMETRES
+
+ Afin de répondre aux différents cas, ce script prend plusieurs paramètres :
+
+=over 4
+
+=item B<login>
+
+spécifie le login de l'utilisateur pour lequel on souhaite modifier le mot de
+passe ;
+
+=item B<domain>
+
+spécifie l'ID du domaine OBM auquel appartient cet utilisateur ;
+
+=item B<passwd>
+
+spécifie le nouveau mot de passe - utile uniquement en mode non-interactif ;
+
+=item B<old-passwd>
+
+spécifié l'ancien mot de passe - utile uniquement en mode non-interactif et si
+le paramètre C<no-old> n'est pas spécifié ;
+
+=item B<no-old>
+
+permet de modifier le mot de passe de l'utilisateur sans vérifier l'ancien ;
+
+=item B<interactiv>
+
+permet de faire fontionner le script en mode interactif.
+
+=back
+
+ Le script est capable de modifier plusieurs types de mot de passe :
+
+=over 4
+
+=item B<unix>
+
+indique qu'il faut modifier le mot de passe C<standart> de l'annuaire LDAP
+(attribut C<userPassword>).
+
+=back
+
+=head1 FONCTIONNEMENT
+
+ Par défaut le script fonctionne en mode non-interactif.
+
+ Le paramètre C<no-old> est prioritaire sur le paramètre C<old-passwd>. Ainsi,
+ si les 2 paramètres sont indiqués, le script ne vérifiera pas la validité de
+ l'ancien mot de passe.
+
+ Par défaut, seul le mot de passe C<unix> est mis à jour. Si aucun type de mot
+ de passe à modifier n'est indiqué, c'est le mot de passe C<unix> qui sera
+ modifié.
+
+=cut

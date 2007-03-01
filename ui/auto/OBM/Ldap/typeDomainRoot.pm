@@ -14,9 +14,20 @@ $debug=1;
 
 sub initStruct {
     my( $ldapStruct, $parentDn ) = @_;
+    my $domainId = $ldapStruct->{"domain_id"};
 
     if( exists($ldapStruct->{"ldap_server"}) ) {
-        $ldapStruct->{"ldap_server"}->{"login"} = $ldapAdminLogin;
+        if( exists($main::domainList->[$domainId]->{"ldap_admin_server"}) && ($main::domainList->[$domainId]->{"ldap_admin_server"} ne "") ) {
+            $ldapStruct->{"ldap_server"}->{"server"} = $main::domainList->[$domainId]->{"ldap_admin_server"};
+        }
+
+        if( exists($main::domainList->[$domainId]->{"ldap_admin_login"}) && ($main::domainList->[$domainId]->{"ldap_admin_login"} ne "") ) {
+            $ldapStruct->{"ldap_server"}->{"login"} = $main::domainList->[$domainId]->{"ldap_admin_login"};
+        }
+
+        if( exists($main::domainList->[$domainId]->{"ldap_admin_passwd"}) && ($main::domainList->[$domainId]->{"ldap_admin_passwd"} ne "") ) {
+            $ldapStruct->{"ldap_server"}->{"passwd"} = $main::domainList->[$domainId]->{"ldap_admin_passwd"};
+        }
     }
 
     return 1;

@@ -29,7 +29,7 @@ $debug=1;
 sub md5sumToMd5 {
     my( $passwdMd5sum ) = @_;
 
-    return "{MD5}".encode_base64( pack( "H*", $passwdMd5sum ) );
+    return encode_base64( pack( "H*", $passwdMd5sum ) );
 }
 
 
@@ -49,7 +49,7 @@ sub toMd5 {
     my $cryptPass = Digest::MD5->new;
     $cryptPass->add($pass);
 
-    return '{MD5}' . encode_base64($cryptPass->digest,'');
+    return encode_base64($cryptPass->digest,'');
 }
 
 
@@ -62,5 +62,5 @@ sub toSsha {
     $cryptPass->add( $passwdPlain );
     $cryptPass->add( $salt );
 
-    return '{SSHA}' . encode_base64($cryptPass->digest . $salt,'');
+    return encode_base64($cryptPass->digest . $salt,'');
 }
