@@ -131,6 +131,11 @@ $attributeDef = {
             my( $entry, $ldapEntry ) = @_;
             require OBM::Ldap::typePosixUsers;
             return OBM::Ldap::typePosixUsers::updateLdapEntry( $entry, $ldapEntry );
+        },
+        update_passwd => sub {
+            my( $ldapEntry, $newPasswd ) = @_;
+            require OBM::Ldap::typePosixUsers;
+            return OBM::Ldap::typePosixUsers::updatePasswd( $ldapEntry, $newPasswd );
         }
     },
 
@@ -226,7 +231,7 @@ $ldapStruct = {
     template => [],
     branch => [],
     ldap_server => {
-        server => "$ldapServer",
+        server => "",
         login => "",
         conn => ""
     }
