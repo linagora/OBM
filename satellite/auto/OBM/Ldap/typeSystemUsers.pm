@@ -68,7 +68,7 @@ sub getDbValues {
         $users[$i]->{"node_type"} = $SYSTEMUSERS;
         $users[$i]->{"name"} = $users[$i]->{$attributeDef->{$users[$i]->{"node_type"}}->{"dn_value"}};
         $users[$i]->{"domain_id"} = $domainId;
-        $users[$i]->{"dn"} = &OBM::ldap::makeDN( $users[$i], $parentDn );
+        $users[$i]->{"dn"} = &OBM::ldap::makeDn( $users[$i], $parentDn );
 
         $i++;
     }

@@ -4,6 +4,7 @@ require Exporter;
 
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
+require OBM::Ldap::utils;
 require OBM::passwd;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
@@ -156,7 +157,7 @@ sub getDbValues {
         $users[$i]->{"node_type"} = $POSIXUSERS;
         $users[$i]->{"name"} = $users[$i]->{$attributeDef->{$users[$i]->{"node_type"}}->{"dn_value"}};
         $users[$i]->{"domain_id"} = $domainId;
-        $users[$i]->{"dn"} = &OBM::ldap::makeDN( $users[$i], $parentDn );
+        $users[$i]->{"dn"} = &OBM::ldap::makeDn( $users[$i], $parentDn );
 
         $i++;
     }
@@ -484,6 +485,20 @@ sub updateLdapEntry {
         if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_mail_alias"}, $ldapEntry, "mailAlias" ) ) {
             $update = 1;
         }
+    }
+
+    return $update;
+}
+
+
+sub updatePasswd {
+    my( $ldapEntry, $newPasswd ) = @_;
+    my $update = 0;
+
+    my $userPasswd = "{SSHA}".&OBM::passwd::toSsha( $newPasswd );
+
+    if( &OBM::Ldap::utils::modifyAttr( $userPasswd, $ldapEntry, "userPassword" ) ) {
+        $update = 1;
     }
 
     return $update;

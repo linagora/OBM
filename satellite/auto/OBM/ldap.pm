@@ -17,7 +17,7 @@ use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 require Exporter;
 
 @ISA = qw(Exporter);
-@EXPORT_function = qw(loadTreeFromDb updateLdap);
+@EXPORT_function = qw(initTree updateLdap getEntityDn updateSelfEntityPasswd updateEntityPasswd);
 @EXPORT = (@EXPORT_function);
 @EXPORT_OK = qw();
 
@@ -26,7 +26,7 @@ require Exporter;
 $debug=1;
 
 
-sub makeDN {
+sub makeDn {
     my( $entry, $parentDn ) = @_;
 
     my $entryDn = $attributeDef->{$entry->{"node_type"}}->{"dn_prefix"}."=".$entry->{"name"};
@@ -40,10 +40,14 @@ sub makeDN {
 
 
 sub initNode {
-    my( $ldapStruct, $parentDn ) = @_;
+    my( $ldapStruct, $parentDn, $domainId ) = @_;
 
     # On construit le DN de l'entité courante
-    $ldapStruct->{"dn"} = makeDN( $ldapStruct, $parentDn );
+    $ldapStruct->{"dn"} = makeDn( $ldapStruct, $parentDn );
+
+    if( !exists($ldapStruct->{"domain_id"}) && defined($domainId) ) {
+        $ldapStruct->{"domain_id"} = $domainId;
+    }
 
     # Si il y a des initialisations spécifiques au type
     if( exists($attributeDef->{$ldapStruct->{"node_type"}}->{"init_struct"}) && defined($attributeDef->{$ldapStruct->{"node_type"}}->{"init_struct"}) ) {
@@ -70,13 +74,8 @@ sub loadDbData {
 }
 
 
-sub loadTreeFromDb {
-    my( $ldapStruct, $parentDn, $domainId ) = @_;
-
-    # On initialise le noeud courant
-    initNode( $ldapStruct, $parentDn );
-
-    &OBM::toolBox::write_log( "Gestion du noeud de type '".$ldapStruct->{"node_type"}."' et de dn : ".$ldapStruct->{"dn"}, "W" );
+sub initTree {
+    my( $ldapStruct, $parentDn, $domainId, $loadDb ) = @_;
 
     # Si le domaine du noeud n'est pas positionné
     if( !exists($ldapStruct->{"domain_id"}) && !defined($domainId) ) {
@@ -85,9 +84,10 @@ sub loadTreeFromDb {
         $domainId = 0;
     }
 
-    if( !exists($ldapStruct->{"domain_id"}) && defined($domainId) ) {
-        $ldapStruct->{"domain_id"} = $domainId;
-    }
+    # On initialise le noeud courant
+    initNode( $ldapStruct, $parentDn, $domainId );
+
+    &OBM::toolBox::write_log( "Gestion du noeud de type '".$ldapStruct->{"node_type"}."' et de dn : ".$ldapStruct->{"dn"}, "W" );
 
     # On cré les branches correspondants aux templates pour chacun des domaines
     # sauf pour le domaine '0'
@@ -110,8 +110,10 @@ sub loadTreeFromDb {
         }
     }
 
-    # On récupère les informations nécessaires en BD
-    loadDbData( $ldapStruct );
+    if( $loadDb ) {
+        # On récupère les informations nécessaires en BD
+        loadDbData( $ldapStruct );
+    }
 
     # On parcours les sous branches
     for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
@@ -120,7 +122,7 @@ sub loadTreeFromDb {
             $currentDomainId = $ldapStruct->{"domain_id"};
         }
 
-        loadTreeFromDb( $ldapStruct->{"branch"}->[$i], $ldapStruct->{"dn"}, $currentDomainId );
+        initTree( $ldapStruct->{"branch"}->[$i], $ldapStruct->{"dn"}, $currentDomainId, $loadDb );
     }
 }
 
@@ -239,16 +241,23 @@ sub connectLdapSrv {
 
     my $errorCode;
     if( $ldapStruct->{"ldap_server"}->{"login"} ) {
-        my @ldapUser;
-        findEntity( $ldapStruct, "local", $SYSTEMUSERS, $ldapStruct->{"ldap_server"}->{"login"}, \@ldapUser );
+        my $ldapAdmin = {
+            node_type => $SYSTEMUSERS,
+            name => $ldapStruct->{"ldap_server"}->{"login"}
+        };
 
-        if( ($#ldapUser >= 0) && ($ldapUser[0]->{"dn"}) && ($ldapUser[0]->{"user_password"}) ) {
-            &OBM::toolBox::write_log( "Connexion a l'annuaire en tant que '".$ldapUser[0]->{"dn"}."'", "W" );
+        my @systemUserDn = ();
+        findTypeParentDn( $ldapStruct, $SYSTEMUSERS, $ldapStruct->{"domain_id"}, \@systemUserDn );
+
+        if( $#systemUserDn == 0 ) {
+            my $ldapAdminDn = makeDn( $ldapAdmin, $systemUserDn[0] );
+            &OBM::toolBox::write_log( "Connexion a l'annuaire en tant que '".$ldapAdminDn."'", "W" );
 
             $errorCode = $ldapStruct->{"ldap_server"}->{"conn"}->bind(
-                $ldapUser[0]->{"dn"},
-                password => $ldapUser[0]->{"user_password"}
+                $ldapAdminDn,
+                password => $ldapStruct->{"ldap_server"}->{"passwd"}
             );
+
         }else {
             &OBM::toolBox::write_log( "Connexion anonyme a l'annuaire LDAP", "W" );
             $errorCode = $ldapStruct->{"ldap_server"}->{"conn"}->bind();
@@ -282,7 +291,7 @@ sub disconnectLdapSrv {
     # La connexion doit être initialisée
     if( exists($ldapStruct->{"ldap_server"}->{"conn"}) && defined($ldapStruct->{"ldap_server"}->{"conn"}) ) {
         &OBM::toolBox::write_log( "Deconnexion de l'annuaire '".$ldapStruct->{"dn"}."'", "W" );
-        $ldapStruct->{"ldap_server"}->{"conn"}->unbind;
+        $ldapStruct->{"ldap_server"}->{"conn"}->unbind();
     }
 
     return 1;
@@ -398,61 +407,6 @@ sub deleteLdapEntry {
 }
 
 
-sub findEntity {
-    my( $ldapStruct, $searchType, $entityType, $value, $result ) = @_;
-
-    # Par defaut, on fait des recherches locales
-    if( !defined( $searchType ) ) {
-        $searchType = "local";
-    }elsif( (lc($searchType) ne "local") || (lc($searchType) ne "global") ) {
-        $searchType = "local";
-    }
-
-    # On cherche dans l'element courant
-    if( $ldapStruct->{"node_type"} eq $entityType ) {
-        if( $ldapStruct->{$attributeDef->{$entityType}->{"dn_value"}} eq $value ) {
-            push( @{$result}, $ldapStruct );
-        }
-    }
-
-    # On cherche dans les éléments attachés
-    if( exists($ldapStruct->{"data_type"}) && defined($ldapStruct->{"data_type"}) ) {
-        for( my $i=0; $i<=$#{$ldapStruct->{"data_type"}}; $i++ ) {
-            if( $ldapStruct->{"data_type"}->[$i] ne $entityType ) {
-                next;
-            }
-
-            # Si le type correspond, on recherche la valeur dans le champs clé
-            if( exists($ldapStruct->{$entityType}) && defined($ldapStruct->{$entityType}) ) {
-                for( my $j=0; $j<=$#{$ldapStruct->{$entityType}}; $j++ ) {
-                    if( $ldapStruct->{$entityType}->[$j]->{$attributeDef->{$entityType}->{"dn_value"}} eq $value ) {
-                        push( @{$result}, $ldapStruct->{$entityType}->[$j] );
-                        last;
-                    }
-                }
-            }
-
-            # On a trouve le type, mais pas d'entree correspondante à la
-            # recherche : on arrete pour le noeud courant
-            last;
-        }
-    }
-
-    # On part dans les sous branches en tenant compte du type de recherche
-    if( exists($ldapStruct->{"branch"}) && defined($ldapStruct->{"branch"}) ) {
-        for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
-            my $type = $ldapStruct->{"branch"}->[$i]->{"node_type"};
-
-            if( (lc($searchType) eq "local") && ($main::attributeDef->{$type}->{"is_branch"}) && (exists($ldapStruct->{"branch"}->[$i]->{"ldap_server"})) ) {
-                next;
-            }
-
-            findEntity( $ldapStruct->{"branch"}->[$i], lc($searchType), $entityType, $value, $result ),
-        }
-    }
-}
-
-
 sub findLdapEntity {
     my( $baseDn, $type, $ldapConn, $ldapEntry ) = @_;
 
@@ -527,3 +481,153 @@ sub findDn {
     return undef;
 }
 
+
+sub getEntityDn {
+    my( $ldapStruct, $type, $dnValue, $domainId, $dn ) = @_;
+
+    if( $main::attributeDef->{$type}->{"is_branch"} ) {
+        return;
+    }
+
+    findTypeParentDn( $ldapStruct, $type, $domainId, $dn );
+
+    my $entity = {
+        "node_type" => $type,
+        "name" => $dnValue
+    };
+
+    for( my $i=0; $i<=$#$dn; $i++ ) {
+        $dn->[$i] = makeDn( $entity, $dn->[$i] );
+    }
+}
+
+
+sub findTypeParentDn {
+    my ( $ldapStruct, $type, $domainId, $entityDn ) = @_;
+
+    if( $main::attributeDef->{$type}->{"is_branch"} ) {
+        return;
+    }
+
+    if( exists($ldapStruct->{"data_type"}) && defined($ldapStruct->{"data_type"}) && exists($ldapStruct->{"domain_id"}) &&  ($ldapStruct->{"domain_id"} == $domainId) ) {
+        for( my $i=0; $i<=$#{$ldapStruct->{"data_type"}}; $i++ ) {
+            if( $ldapStruct->{"data_type"}->[$i] eq $type ) {
+                push( @{$entityDn}, $ldapStruct->{"dn"} );
+                last;
+            }
+        }
+    }
+
+    if( exists($ldapStruct->{"branch"}) && defined($ldapStruct->{"branch"}) ) {
+        for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
+            findTypeParentDn( $ldapStruct->{"branch"}->[$i], $type, $domainId, $entityDn );
+        }
+    }
+}
+
+
+sub getLdapSrv {
+    my( $ldapStruct, $domainId, $ldapSrv ) = @_;
+
+    if( (($ldapStruct->{"domain_id"} == 0) || ($ldapStruct->{"domain_id"} == $domainId)) && exists($ldapStruct->{"ldap_server"}) ) {
+        $$ldapSrv = $ldapStruct;
+    }
+
+    if( exists($ldapStruct->{"branch"}) && defined($ldapStruct->{"branch"}) ) {
+        for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
+            getLdapSrv( $ldapStruct->{"branch"}->[$i], $domainId, $ldapSrv );
+        }
+    }
+
+}
+
+
+sub updateSelfEntityPasswd {
+    my( $ldapSrv, $type, $entityDn, $oldPasswd, $newPasswd ) = @_;
+
+    if( !defined($ldapSrv) ) {
+        return 0;
+    }
+
+    if( !defined($type) || ($type eq "") || !defined($entityDn) || ($entityDn eq "") || !defined($oldPasswd) || ($oldPasswd eq "") || !defined($newPasswd) || ($newPasswd eq "") ) {
+        return 0;
+    }
+
+    if( !exists($attributeDef->{$type}->{"update_passwd"} ) || !defined($attributeDef->{$type}->{"update_passwd"}) ) {
+        return 0;
+    }
+
+    # On se connecte à l'annuaire en utilisant l'ancien mot de passe
+    my $ldapConn = Net::LDAP->new(
+        $ldapSrv->{"ldap_server"}->{"server"},
+        port => "389",
+        debug => "0",
+        timeout => "60",
+        version => "3"
+    ) or &OBM::toolBox::write_log( "Echec de connexion a LDAP : $@", "W" ) && return 0;
+
+    &OBM::toolBox::write_log( "Connexion a l'annuaire en tant que '".$entityDn."'", "W" );
+
+    my $errorCode = $ldapConn->bind(
+        $entityDn,
+        password => $oldPasswd
+    );
+
+    if( $errorCode->code == 49 ) {
+        &OBM::toolBox::write_log( "Ancien mot de passe incorrect", "W" );
+        return 0;
+
+    }elsif( $errorCode->code ) {
+        &OBM::toolBox::write_log( "Echec de connexion : ".$errorCode->error, "W" );
+        return 0;
+
+    }else {
+        &OBM::toolBox::write_log( "Connexion a l'annuaire LDAP etablie", "W" );
+    }
+
+    my $ldapEntry = findDn( $ldapConn, $entityDn );
+    if( defined($ldapEntry) && (&{$attributeDef->{$type}->{"update_passwd"}}( $ldapEntry, $newPasswd )) ) {
+            my $result = $ldapEntry->update( $ldapConn );
+
+            if( $result->is_error() ) {
+                &OBM::toolBox::write_log( "Erreur : ".$result->code." - ".$result->error, "W" );
+                return 0;
+            }
+
+            $ldapConn->unbind();
+            return 1;
+    }
+
+    $ldapConn->unbind();
+    return 0;
+}
+
+
+sub updateEntityPasswd {
+    my( $ldapSrv, $type, $userDn, $newPasswd ) = @_;
+
+    if( !connectLdapSrv( $ldapSrv ) ) {
+        return 0;
+    }
+
+    my $ldapConn = $ldapSrv->{"ldap_server"}->{"conn"};
+
+    for( my $i=0; $i<=$#$userDn; $i++ ) {
+        &OBM::toolBox::write_log( "Mise a jour de l'entite de type '".$type."' et de dn : ".$userDn->[$i], "W" );
+        my $ldapEntry = findDn( $ldapConn, $userDn->[$i] );
+
+        if( defined($ldapEntry) && (&{$attributeDef->{$type}->{"update_passwd"}}( $ldapEntry, $newPasswd )) ) {
+            my $result = $ldapEntry->update( $ldapConn );
+
+            if( $result->is_error() ) {
+                &OBM::toolBox::write_log( "Erreur : ".$result->code." - ".$result->error, "W" );
+            }
+        }else {
+            &OBM::toolBox::write_log( "Entite inexistante : ".$userDn->[$i], "W" );
+        }
+    }
+
+    disconnectLdapSrv( $ldapSrv );
+
+    return 1;
+}

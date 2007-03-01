@@ -68,7 +68,7 @@ sub getDbValues {
         $mailShare[$i]->{"node_type"} = $MAILSHAREDIR;
         $mailShare[$i]->{"name"} = $mailShare[$i]->{$attributeDef->{$mailShare[$i]->{"node_type"}}->{"dn_value"}};
         $mailShare[$i]->{"domain_id"} = $domainId;
-        $mailShare[$i]->{"dn"} = &OBM::ldap::makeDN( $mailShare[$i], $parentDn );
+        $mailShare[$i]->{"dn"} = &OBM::ldap::makeDn( $mailShare[$i], $parentDn );
 
         $i++;
     }

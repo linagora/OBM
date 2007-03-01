@@ -880,24 +880,43 @@ sub getDomains {
     my( $dbHandler ) = @_;
     my @domainList;
 
-    # Création du meta-domaine
-    $domainList[0] = {
-        "meta_domain" => 1,
-        "domain_label" => "metadomain",
-        "domain_name" => "metadomain",
-        "domain_desc" => "Informations de l'annuaire ne faisant partie d'aucun domaine"
-    };
-
-
     if( !defined($dbHandler) ) {
         write_log( "Connection à la base de donnée incorrect !", "W" );
         return undef;
     }
 
+
+    # Création du meta-domaine
+    $domainList[0] = {
+        "meta_domain" => 1,
+        "domain_id" => 0,
+        "domain_label" => "metadomain",
+        "domain_name" => "metadomain",
+        "domain_desc" => "Informations de l'annuaire ne faisant partie d'aucun domaine"
+    };
+
+    my $queryLdapAdmin = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$ldapAdminLogin."'";
+
+    # On execute la requete concernant l'administrateur LDAP associé
+    my $queryLdapAdminResult;
+    if( !execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
+        write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryLdapAdminResult) ) {
+            write_log( $queryDomainResult->err, "W" );
+        }
+
+    }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
+        $domainList[$#domainList]->{"ldap_admin_server"} = $ldapServer;
+        $domainList[$#domainList]->{"ldap_admin_login"} = $ldapAdminLogin;
+        $domainList[$#domainList]->{"ldap_admin_passwd"} = $ldapAdminPasswd;
+
+        $queryLdapAdminResult->finish;
+    }
+
+
     # Requete de recuperation des informations des domaines
     my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias FROM Domain";
 
-    #
     # On execute la requete concernant les domaines
     my $queryDomainResult;
     if( !execQuery( $queryDomain, $dbHandler, \$queryDomainResult ) ) {
@@ -924,6 +943,22 @@ sub getDomains {
             push( @{$domainList[$#domainList]->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
         }else {
             $domainList[$#domainList]->{"domain_alias"} = [];
+        }
+
+        # On execute la requete concernant l'administrateur LDAP associé
+        my $queryLdapAdminResult;
+        if( !execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
+            write_log( "Probleme lors de l'execution de la requete.", "W" );
+            if( defined($queryLdapAdminResult) ) {
+                write_log( $queryDomainResult->err, "W" );
+            }
+
+        }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
+            $domainList[$#domainList]->{"ldap_admin_server"} = $ldapServer;
+            $domainList[$#domainList]->{"ldap_admin_login"} = $ldapAdminLogin;
+            $domainList[$#domainList]->{"ldap_admin_passwd"} = $ldapAdminPasswd;
+
+            $queryLdapAdminResult->finish;
         }
     }
 
