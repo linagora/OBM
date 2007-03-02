@@ -656,10 +656,6 @@ function html_user_consult($obm_q) {
  
   <table>
   <tr>
-    <th>$l_archive</th>
-    <td>$archive</td>
-  </tr>
-  <tr>
     <th>$l_login</th>
     <td>$login</td>
   </tr>
@@ -671,6 +667,10 @@ function html_user_consult($obm_q) {
     <th>$l_local</th>
     <td>$local</td>
   </tr>
+  <tr>
+    <th>$l_archive</th>
+    <td>$archive</td>
+  </tr>    
   <tr>
     <th>$l_ext_id</th>
     <td>$ext_id</td>
@@ -1327,34 +1327,6 @@ $samba_section
 
   return $block;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Cette fonction permet de générer la liste des hôtes dans une boîte de
-// sélection avec prise en compte de l'hôte par défaut
-// Parametre :
-//      mail_server : identifiant du serveur à sélectionner
-///////////////////////////////////////////////////////////////////////////////
-function get_select_host_server($mail_server="") {
-    $mail = run_query_user_get_mailserver();
-
-    // On construit une boite de selection
-    // La valeur par défaut est le serveur par défaut, sauf si $mail_server
-    // est positionné
-    $dis_mailserver = "
-    <select name=\"sel_mail_server\">";
-    while($mail->next_record()) {
-      $name = $mail->f("host_name");
-      $id = $mail->f("mailserver_id");
-      $dis_mailserver .= "<option value=\"$id\">$name</option>";
-      
-    }
-    $dis_mailserver .= "
-    </select>";
-
-    return $dis_mailserver;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the context about a user insertion or update

@@ -130,7 +130,7 @@ function html_domain_search_list($obm_q, $prefs, $domain, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_domain_form($dom_q, $domain) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
-  global $l_insert, $l_update;
+  global $l_insert, $l_update,$l_mail_server;
   global $display;
 
   // if update mode and first time value are taken from database
@@ -235,13 +235,28 @@ function dis_domain_consult($domain) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_domain_consult($obm_q) {
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
-  global $display;
+  global $display, $l_mail_server, $cgp_use;
 
   $id = $obm_q->f("domain_id");
   $label = $obm_q->f("domain_label");
   $desc = $obm_q->f("domain_description");
   $domain_name = $obm_q->f("domain_name");
   $alias = $obm_q->f("domain_alias");
+  $mail_server_id = $obm_q->f("domain_mail_server_id");
+  $mail_server_host_name = $obm_q->f("mailserver_hostname");
+
+  if ($cgp_use["service"]["mail"]) {
+    $dis_mailserver = "<tr>
+      <th>$l_mail_server</th>
+      <td>";
+      if ($mail_server_id) {
+        $mail_section .= "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=".$mail_server_id."\">".$mail_server_host_name."</a>";
+      } else {
+        $mail_section .= "-";
+      }
+      $mail_section .= "</td>
+    </tr>";
+  }
 
   $display["detailInfo"] = display_record_info($obm_q);
   $display["title"] = "<h1 class=\"title\">$l_domain : $label </h1>";
@@ -262,8 +277,9 @@ function html_domain_consult($obm_q) {
       <th>$l_domain_name</th>
       <td>$domain_name</td>
     </tr>
+    $dis_mailserver
     </table>
-    </div>
+  </div>
 
   <div class=\"detail infos\">
   <h1>$l_alias</h1>

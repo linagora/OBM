@@ -455,16 +455,17 @@ CREATE TABLE Samba (
 -- Shared bals table
 --
 CREATE TABLE MailShareDir (
-  mailsharedir_id            int(8) NOT NULL auto_increment,
-  mailsharedir_domain_id     int(8) default 0,
-  mailsharedir_timeupdate    timestamp(14),
-  mailsharedir_timecreate    timestamp(14),
-  mailsharedir_userupdate    int(8),
-  mailsharedir_usercreate    int(8),
-  mailsharedir_name          varchar(32),
-  mailsharedir_quota         int default 0 NOT NULL,
-  mailsharedir_description   varchar(255),
-  mailsharedir_email         text default NULL,
+  mailsharedir_id             int(8) NOT NULL auto_increment,
+  mailsharedir_domain_id      int(8) default 0,
+  mailsharedir_timeupdate     timestamp(14),
+  mailsharedir_timecreate     timestamp(14),
+  mailsharedir_userupdate     int(8),
+  mailsharedir_usercreate     int(8),
+  mailsharedir_name           varchar(32),
+  mailsharedir_quota          int default 0 NOT NULL,
+  mailsharedir_mail_server_id int(8) default 0,  
+  mailsharedir_description    varchar(255),
+  mailsharedir_email          text default NULL,
   PRIMARY KEY (mailsharedir_id)
 );
 

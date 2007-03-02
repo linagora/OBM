@@ -230,7 +230,7 @@ function dis_mailshare_consult($mailshare) {
 //   - $mailshare_q : mailshare database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_mailshare_consult($mailshare_q) {
-  global $c_yes, $c_no;
+  global $c_yes, $c_no, $path,$l_mail_server;
   global $l_mailshare, $l_name, $l_quota, $l_desc, $l_email;
   global $display, $perm, $menu, $action, $cright_write;
 
@@ -238,6 +238,8 @@ function html_mailshare_consult($mailshare_q) {
   $quota = $mailshare_q->f("mailsharedir_quota");
   $desc = $mailshare_q->f("mailsharedir_description");
   $email = $mailshare_q->f("mailsharedir_email");
+  $mail_server_id = $mailshare_q->f("userobm_mail_server_id");
+  $mail_server_host_name = $mailshare_q->f("mailserver_hostname");
 
   $display["detailInfo"] = display_record_info($mailshare_q);
   $display["title"] = "<div class=\"title\">$l_mailshare : $name</div>";
@@ -258,6 +260,12 @@ function html_mailshare_consult($mailshare_q) {
   <tr>
     <th>$l_email</th>
     <td>$email</td>
+    </tr>
+  <tr>
+    <th>$l_mail_server</th>
+    <td>
+      <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server_id\">$mail_server_host_name</a>
+    </td>
   </tr>
   <tr>
     <th>$l_desc</th>
@@ -280,7 +288,7 @@ function html_mailshare_consult($mailshare_q) {
 function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
   global $display, $l_insert, $l_update, $l_back,$l_web_list;
   global $l_mailshare, $l_name, $l_desc, $l_quota, $l_email;
-  global $cgp_use, $cmailshare_default_quota,$obm;
+  global $cgp_use, $cmailshare_default_quota,$obm,$l_mail_server;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -289,6 +297,8 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
     $quota = $mailshare_q->f("mailsharedir_quota");
     $email = $mailshare_q->f("mailsharedir_email");
     $desc = $mailshare_q->f("mailsharedir_description");
+    $mail_server_id = $mailshare_q->f("mailshare_mail_server_id");
+    $mail_server_host_name = $mailshare_q->f("mailserver_hostname");
 
   } else {
     // Values are taken from parameters
@@ -302,10 +312,22 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
     }
   }
 
+
   // If parameters have been given, they supercede the default action value
   if (isset($mailshare["name"])) { $name = $mailshare["name"]; }
   if (isset($mailshare["quota"])) { $quota = $mailshare["quota"]; }
   if (isset($mailshare["email"])) { $email = $mailshare["email"]; }
+  if (isset($user["mail_server"])) { $mail_server = $user["mail_server"]; }
+  if (isset($user["mail_server_hostname"])) { $mail_server_host_name = $user["mail_server_hostname"]; }  
+
+  if (!$mail_server_host_name) {
+    $dis_mailserver = get_select_host_server($mail_server);
+  } else {
+    $dis_mailserver = "
+    <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server\">$mail_server_host_name</a>
+    <input type=\"hidden\" name=\"sel_mail_server\" value=\"$mail_server\" />
+    <input type=\"hidden\" name=\"sel_mail_server_hostname\" value=\"$mail_server_host_name\" />";
+  }
 
   $class_name = ($field == "name") ? "detailError" : "detailLabel";
   $class_quota = ($field == "quota") ? "detailError" : "detailLabel";
@@ -350,6 +372,10 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
     <th>$l_quota</th>
     <td><input name=\"tf_quota\" maxlength=\"8\" size=\"8\" value=\"$quota\" />M</td>
   </tr>
+  <tr>
+    <th class=\"$class[mail_server]\">$l_mail_server</th>
+    <td>$dis_mailserver</td>
+  </tr>    
   <tr>
     <th>$l_desc</th>
     <td><input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"128\" /></td>
@@ -482,5 +508,4 @@ function dis_mailshare_warn_insert($id, $h_q, $mailshare) {
 
   return $block;
 }
-
 </script>

@@ -1325,6 +1325,31 @@ function phpStringToJsString($var) {
   return $jsString;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Cette fonction permet de générer la liste des hôtes dans une boîte de
+// sélection avec prise en compte de l'hôte par défaut
+// Parametre :
+//      mail_server : identifiant du serveur à sélectionner
+///////////////////////////////////////////////////////////////////////////////
+function get_select_host_server($mail_server="") {
+    $mail = run_query_mailshare_get_mailserver();
+
+    // On construit une boite de selection
+    // La valeur par défaut est le serveur par défaut, sauf si $mail_server
+    // est positionné
+    $dis_mailserver = "
+    <select name=\"sel_mail_server\">";
+    while($mail->next_record()) {
+      $name = $mail->f("host_name");
+      $id = $mail->f("mailserver_id");
+      $dis_mailserver .= "<option value=\"$id\">$name</option>";
+      
+    }
+    $dis_mailserver .= "
+    </select>";
+
+    return $dis_mailserver;
+}
 
 
 </script>

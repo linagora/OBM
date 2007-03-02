@@ -99,25 +99,23 @@ function html_entitywritable_bar($writable_entity,$entity_id, $entity) {
     }
     $dis_sel .= "</select>
     <br />
-    <input type=\"hidden\" name=\"action\" value=\"rights_admin\" />
-    $dis_duration
-    <input type=\"submit\" value=\"$l_validate\" />
-    ";
+        $dis_duration
+        ";
 
     $block = "
-    <div class=\"calendarBar\">
-    <table cellpadding=\"0\" cellspacing=\"0\" class=\"calendarCal\">
-    <tr>
-      <td class=\"calendarHead2\">$l_entity_right</td>
-    </tr>
-    <tr>
-      <td class=\"calendarNoEvent\" align=\"left\">
+    <div class=\"portlet\" id=\"rightManagerPortlet\">
+      <h1>$l_entity_right</h1>
+      <div>
       <form action=\"".$_SERVER["PHP_SELF"]."\" method=\"get\" $check_sel_user>
+      <fieldset class=\"detail\">
       $dis_sel
+      </fieldset>
+      <fieldset class=\"buttons\">
+      <input type=\"hidden\" name=\"action\" value=\"rights_admin\" />
+      <input type=\"submit\" value=\"$l_validate\" />
+      </fieldset>
       </form>
-      </td>
-    </tr>
-    </table>
+      </div>  
     </div>";
   }
 

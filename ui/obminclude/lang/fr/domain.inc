@@ -25,3 +25,5 @@ $l_cant_delete = "Le domaine ne peut pas être supprimé !";
 
 // JavaScript Messages
 $l_fill_title = "Vous devez renseigner le Label avant de valider.";
+
+$l_mail_server = "Serveur de mail par défaut";

@@ -698,7 +698,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publication) {
-  global $display,$ico_publication_new;
+  global $display,$ico_add;
   global $popup_height,$popup_width,$l_insert;
   global $l_publication,$l_quantity, $l_renew, $l_recept,$l_year;
   global $l_publication_dest,$l_publication_orig;
@@ -721,7 +721,7 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
   $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang";   
  $block_publi_dest = "      
     <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-     <img src=\"$ico_publication_new\" alt=\"[New Publication]\" /> 
+     <img src=\"$ico_add\" alt=\"[New Publication]\" /> 
     </a>
     <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"\" />
     <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"\" />
@@ -901,7 +901,7 @@ function dis_publication_admin_index() {
 function html_publication_type_form($type_q) {
   global $l_type_manage,$l_type_exist,$ico_delete,$ico_ok;
   global $l_type_checkdelete,$l_type_update,$l_type_new,$l_type_insert;
-  global $l_label,$l_c_new;
+  global $l_label,$l_c_new, $l_type;
 
 $char_title = '=';
 $key = 0;
@@ -960,7 +960,7 @@ while ($type_q->next_record()) {
   </table>
   </div>    
   <form id=\"form_type_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  onsubmit=\"return check_category(this.tf_type_label,'$l_type')\">
   <table>
   <thead>
   <tr>
@@ -1070,7 +1070,7 @@ function dis_publication_type_links($publication) {
 function html_publication_subscription_reception_form($recept_q) {
   global $l_recept_manage,$l_recept_exist,$ico_ok,$ico_delete;
   global $l_recept_checkdelete,$l_recept_update,$l_recept_new,$l_recept_insert;
-  global $l_label,$l_c_new;
+  global $l_label,$l_c_new, $l_recept;
 
  $char_title = '=';
 $key = 0;
@@ -1129,7 +1129,7 @@ while ($recept_q->next_record()) {
   </table>
   </div>    
   <form id=\"form_recept_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  onsubmit=\"return check_category(this.tf_recept_label,'$l_recept')\">
   <table>
   <thead>
   <tr>

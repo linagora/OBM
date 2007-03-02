@@ -36,3 +36,5 @@ $l_err_mailshare_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
 $l_err_mailshare_uemail_exist = "L'adresse E-mail est saisie plusieurs fois !";
 
 $l_check_samemailshare = "Ces partages mail semblent similaires à celui saisi";
+
+$l_mail_server = "Serveur de mail";

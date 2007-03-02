@@ -178,7 +178,7 @@ form {
   line-height: 1ex;
   position: absolute;
   right: 2px;
-  margin: 5px 0 0 0;
+  margin: 0 0 0 0;
   padding:0;
 }
 
@@ -199,7 +199,7 @@ form {
 }
 
 #information img {
-  vertical-align: text-top;
+  vertical-align: text;
 }
 
 /*IE workaround*/
@@ -381,6 +381,9 @@ form {
   padding: 2px 0 0 3px;
 }
 
+.portlet select {
+  width: 14em;
+}
 /* ------------------------------------------------------------------------- */
 /* Page context class */
 /* ------------------------------------------------------------------------- */

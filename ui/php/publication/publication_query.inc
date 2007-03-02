@@ -223,7 +223,9 @@ function run_query_publication_auto_insert($publication) {
   $id_orig = $publication["id_orig"];
   $recept = $publication["recept"];
   $domain_id = $obm["domain_id"];
-  
+  if( $recept == "" || $id_orig == ""  ) {
+    return false;
+  }
   $query = "INSERT INTO Subscription (
     subscription_timeupdate,
     subscription_timecreate,
@@ -1006,29 +1008,9 @@ function check_publication_can_delete($p_id) {
   if ($nb > 0) {
     $delete_ok = false;
     $err["msg"] = $l_link_contact;
-    $display_linkc ="
-      <tr>
-        <td class=\"detailHead\">$l_contact</td>
-      </tr>";
-    while ($obm_q->next_record()) {
-      $cid = $obm_q->f("contact_id");
-      $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
-      $display_linkc .= "
-      <tr>
-        <td class=\"detailLabel\">
-        <a class=\"detailLabel\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a>
-        </td>
-      </tr>";
-    }
   } else {
     $ok_msg = "$l_link_contact_no";
   }
-
-  $block .= "
-  <table class=\"detail\">
-    $display_linkc
-  </table>";
-
 
   return $delete_ok;
 }

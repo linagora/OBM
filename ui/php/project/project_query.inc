@@ -299,6 +299,7 @@ function run_query_project_insert($params) {
   $add_comment = $params["add_comment"];
   $ref_task = $params["reftask_id"];
   $shortname = $params["shortname"];
+  $archive = ($params["archive"] == "1" ? "1" : "0");
 
   if ($add_comment != "") {
     $datecomment = $params["datecomment"];
@@ -341,7 +342,7 @@ function run_query_project_insert($params) {
     $estimated,
     $datebegin,
     $dateend,
-    '0',
+    '$archive',
     '$project_reference_date',
     '$project_reference_duration',
     '$project_reference_desc',

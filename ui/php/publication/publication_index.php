@@ -201,10 +201,16 @@ if ($action == "ext_get_id") {
   $retour = run_query_publication_auto_insert($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_subscription : $l_insert_ok");
+    $display["detail"] = dis_publication_consult($params);
   } else {
     $display["msg"] .= display_err_msg("$l_subscription : $l_insert_error");
+    $recept_q = run_query_publication_subscription_reception();
+    $pub_q = run_query_publication_detail($params["publication_id"]);
+     echo "1;";
+    if ($pub_q->nf() == 1) {
+      $display["detail"] = html_publication_auto_subscription_form($action,$pub_q, $recept_q, $params);
+    }    
   } 
-  $display["detail"] = dis_publication_consult($params);
   
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////

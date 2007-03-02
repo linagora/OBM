@@ -334,7 +334,7 @@ function html_resource_consult($obm_q) {
   $desc = $obm_q->f("resource_description");
   $qty = $obm_q->f("resource_qty");
 
-  $display["deta"] = display_record_info($obm_q);
+  $display["detailInfo"] = display_record_info($obm_q);
   $display["title"] = "<div class=\"title\">$l_resource : $name</div>";
 
   $block = "

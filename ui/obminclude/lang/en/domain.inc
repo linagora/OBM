@@ -31,3 +31,6 @@ $l_cant_delete = "The domain can't be deleted !";
 
 // JavaScript Messages
 $l_fill_title = "You have to fill the Title before submitting.";
+
+
+$l_mail_server = "Default mailserver";

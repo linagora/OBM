@@ -95,11 +95,14 @@ function run_query_mailshare_detail($id) {
   $multidomain = sql_multidomain("mailsharedir");
 
   $query = "SELECT *,
+      host_name as mailserver_hostname,
       $timecreate,
       $timeupdate,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
     FROM MailShareDir
+         LEFT JOIN MailServer ON mailsharedir_mail_server_id = mailserver_id
+         LEFT JOIN Host ON mailserver_host_id = host_id
          LEFT JOIN UserObm as c ON mailsharedir_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON mailsharedir_userupdate=u.userobm_id
     WHERE mailsharedir_id = '$id'
@@ -124,6 +127,7 @@ function run_query_mailshare_insert($mailshare) {
   $quota = $mailshare["quota"];
   $email = $mailshare["email"];
   $desc = $mailshare["desc"];
+  $mail_server = $mailshare["mail_server"];
   $now = date("Y-m-d H:i:s");
   $domain_id = $obm["domain_id"];
 
@@ -134,6 +138,7 @@ function run_query_mailshare_insert($mailshare) {
     mailsharedir_userupdate,
     mailsharedir_usercreate,
     mailsharedir_name,
+    mailsharedir_mail_server_id,
     mailsharedir_quota,
     mailsharedir_description,
     mailsharedir_email)
@@ -144,6 +149,7 @@ function run_query_mailshare_insert($mailshare) {
     null,
     '$obm[uid]',
     '$name',
+    '$mail_server',
     '$quota',
     '$desc',
     '$email')";
@@ -192,6 +198,7 @@ function run_query_mailshare_update($mailshare) {
   $quota = $mailshare["quota"];
   $email = $mailshare["email"];
   $desc = $mailshare["desc"];
+  $mail_server = $mailshare["mail_server"];
   $now = date("Y-m-d H:i:s");
   $multidomain = sql_multidomain("mailsharedir");
   
@@ -200,6 +207,7 @@ function run_query_mailshare_update($mailshare) {
     mailsharedir_userupdate = '$obm[uid]',
     mailsharedir_name = '$name',
     mailsharedir_quota = '$quota',
+    mailsharedir_mail_server_id = '$mail_server',
     mailsharedir_description = '$desc',
     mailsharedir_email = '$email'
   WHERE mailsharedir_id='$id'
@@ -493,5 +501,24 @@ function name_in_use($name, $u_id="") {
     return false;
   }
 }
+///////////////////////////////////////////////////////////////////////////////
+// Available mailservers
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
 
+function run_query_mailshare_get_mailserver() {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain("host",true,true);
+  $query = "SELECT
+    mailserver_id,
+    ms.host_name as host_name
+    FROM MailServer 
+    JOIN Host ms ON mailserver_host_id = ms.host_id
+    WHERE 1=1 $multidomain";
+  display_debug_msg($query, $cdg_sql, "run_query_mailshare_get_mailserver())");
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;    
+}
 </script>
