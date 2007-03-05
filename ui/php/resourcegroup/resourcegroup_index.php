@@ -144,7 +144,7 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_resourcegroup_delete($hd_resourcegroup_id);
+  $retour = run_query_resourcegroup_delete($params["resourcegroup_id"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_resourcegroup : $l_delete_ok");
   } else {
@@ -266,6 +266,7 @@ $nb_resourcegroup++;
   }
   $params["resource_nb"] = $nb_u;
   $params["resourcegroup_nb"] = $nb_resourcegroup;
+
 
   return $params;
 }

@@ -581,7 +581,7 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
 //   - $mode       : ([mono|multi])
 //   - $link_table : [optionnal] to handle special
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_links($entities, $cat, $params, $mode="multi") {
+function of_category_dis_links($entities, $cat, $params, $mode="multi",$table=false) {
   global $l_c_link, $l_c_link_no;
   global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
   global $l_back, $display;
@@ -602,7 +602,7 @@ function of_category_dis_links($entities, $cat, $params, $mode="multi") {
       $l_entity = strtolower("l_${entity}");
       global $$l_entity;
 
-      $obm_q = of_category_query_links($entity, $cat, $id, $mode);
+      $obm_q = of_category_query_links($entity, $cat, $id, $mode,$table);
 
       $nb_cat = $obm_q->num_rows();
       if ($nb_cat > 0) {
@@ -620,8 +620,8 @@ function of_category_dis_links($entities, $cat, $params, $mode="multi") {
     $entity = $entities;
     $l_entity = strtolower("l_${entity}");
     global $$l_entity;
-    $label = of_category_get_label($entity, $cat, $id);
-    $obm_q = of_category_query_links($entity, $cat, $id, $mode);
+    $label = of_category_get_label($entity, $cat, $id,$table);
+    $obm_q = of_category_query_links($entity, $cat, $id, $mode,$table);
 
     $nb_cat = $obm_q->num_rows();
     if ($nb_cat > 0) {
@@ -766,7 +766,7 @@ function of_category_dis_entity_stats($entity, $cat, $cats, $order) {
 // Return:
 //   Array with orderer categories
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
+function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0,$table=false) {
   global $cdg_sql, $cgp_hide;
 
   $cat = strtolower($catu);
@@ -774,13 +774,14 @@ function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
   if ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"]) {
     return $cats;
   }
-
-  $table = ucfirst($entity) . ucfirst($catu);
+  if(!$table) {
+    $table = ucfirst($entity) . ucfirst($catu);
+  }
   $field_prefix = strtolower($entity.$cat."_");
   $field_id = $field_prefix."id";
   $field_code = $field_prefix."code";
   $field_label = $field_prefix."label";
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linktable = $table."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
   $multidomain = sql_multidomain(strtolower($table));
@@ -838,7 +839,7 @@ function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_insert($entity, $catu, $params) {
+function of_category_query_insert($entity, $catu, $params,$table=false) {
   global $obm, $cdg_sql, $obm;
 
   $cat = strtolower($catu);
@@ -846,7 +847,9 @@ function of_category_query_insert($entity, $catu, $params) {
   $usercreate = $obm["uid"];
   $cat_label = $params["${cat}_label"];
   $cat_code = $params["${cat}_code"];
-  $table = ucfirst($entity) . ucfirst($catu);
+  if(!$table) {
+    $table = ucfirst($entity) . ucfirst($catu);
+  }
   $field_prefix = strtolower($entity.$cat."_");
   $field_timecreate = $field_prefix."timecreate";
   $field_usercreate = $field_prefix."usercreate";
@@ -886,11 +889,14 @@ function of_category_query_insert($entity, $catu, $params) {
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_insert_link($entity, $cat, $entity_id, $cat_id) {
+function of_category_query_insert_link($entity, $cat, $entity_id, $cat_id,$table=false) {
   global $cdg_sql;
 
   if ( ($entity_id > 0) && ($cat_id > 0) ) {
-    $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+    if(!$table) {
+      $table = ucfirst($entity) . ucfirst($cat);
+    }
+    $linktable = $table."Link";
     $linkfield_ent = $entity.$cat."link_".$entity."_id";
     $linkfield_cat = $entity.$cat."link_category_id";
 		
@@ -918,7 +924,7 @@ function of_category_query_insert_link($entity, $cat, $entity_id, $cat_id) {
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_update($entity, $catu, $params) {
+function of_category_query_update($entity, $catu, $params,$table=false) {
   global $obm, $cdg_sql;
 
   $cat = strtolower($catu);
@@ -930,7 +936,9 @@ function of_category_query_update($entity, $catu, $params) {
   }
   $cat_label = $params["${cat}_label"];
   $cat_code = $params["${cat}_code"];
-  $table = ucfirst($entity) . ucfirst($catu);
+  if(!$table) {
+    $table = ucfirst($entity) . ucfirst($catu);
+  }
   $field_prefix = $entity.$cat."_";
   $field_timeupdate = $field_prefix."timeupdate";
   $field_userupdate = $field_prefix."userupdate";
@@ -965,11 +973,13 @@ function of_category_query_update($entity, $catu, $params) {
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_delete($entity, $catu, $params) {
+function of_category_query_delete($entity, $catu, $params,$table=false) {
   global $cdg_sql;
 
   $cat = strtolower($catu);
-  $table = ucfirst($entity) . ucfirst($catu);
+  if(!$table) {
+    $table = ucfirst($entity) . ucfirst($catu);
+  }
   $field_prefix = $entity.$cat."_";
   $field_id = $field_prefix."id";
   $id = $params["${cat}_id"];
@@ -1002,10 +1012,13 @@ function of_category_query_delete($entity, $catu, $params) {
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_delete_link($entity, $cat, $entity_id) {
+function of_category_query_delete_link($entity, $cat, $entity_id,$table=false) {
   global $cdg_sql;
-
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  
+  if(!$table) {
+    $table=ucfirst($entity) . ucfirst($cat);
+  }
+  $linktable = $table."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
 
   $query = "DELETE
@@ -1030,12 +1043,14 @@ function of_category_query_delete_link($entity, $cat, $entity_id) {
 // Return:
 //   - database handle
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_links($entity, $cat, $p_id, $mode="multi") {
+function of_category_query_links($entity, $cat, $p_id, $mode="multi",$table=false) {
   global $cdg_sql;
 
-  $table = ucfirst($entity) . ucfirst($cat);
+  if(!$table) {
+    $table = ucfirst($entity) . ucfirst($cat);
+  }
   $linkfield_prefix = strtolower($entity.$cat."link_");
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linktable = $table."Link";
   $linkfield_ent = $linkfield_prefix.$entity."_id";
   $linkfield_cat = $linkfield_prefix."category_id";
   if ($entity == "calendar") {
@@ -1076,20 +1091,21 @@ function of_category_query_links($entity, $cat, $p_id, $mode="multi") {
 // Return:
 //   Array with orderer categories
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_get_entitycategories($entity, $cat, $entity_id, $mode="multi") {
+function of_category_get_entitycategories($entity, $cat, $entity_id, $mode="multi",$table=false) {
   global $cdg_sql, $cgp_hide;
 
   $cats = array();
   if ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"]) {
     return $cats;
   }
-
-  $table = ucfirst($entity) . ucfirst($cat);
+  if(!$table) {
+    $table = ucfirst($entity) . ucfirst($cat);
+  }
   $field_prefix = $entity.$cat."_";
   $field_id = $field_prefix."id";
   $field_code = $field_prefix."code";
   $field_label = $field_prefix."label";
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linktable = $table."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
   if ($entity == "calendar") {
@@ -1149,10 +1165,12 @@ function of_category_get_entitycategories($entity, $cat, $entity_id, $mode="mult
 // Return:
 //   - category label 
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_get_label($entity, $cat, $id) {
+function of_category_get_label($entity, $cat, $id,$table=false) {
   global $cdg_sql;
 
-  $table = ucfirst($entity) . ucfirst($cat);
+  if(!$table) {
+    $table = ucfirst($entity) . ucfirst($cat);
+  }
   $field_prefix = strtolower($entity.$cat."_");
   $field_id = $field_prefix."id";
   $field_label = $field_prefix."label";
@@ -1180,15 +1198,17 @@ function of_category_get_label($entity, $cat, $id) {
 //   - $cat          : target category
 //   - $mode   : ([mono|multi])
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
+function of_category_query_category_per_entity($entity, $cat, $mode="multi",$table=false) {
   global $cdg_sql;
 
-  $table = ucfirst($entity) . ucfirst($cat);
+  if(!$table) {
+    $table = ucfirst($entity) . ucfirst($cat);
+  }
   $field_prefix = $entity.$cat."_";
   $field_id = $field_prefix."id";
   $field_code = $field_prefix."code";
   $field_label = $field_prefix."label";
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linktable = $table."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
   if ($entity == "calendar") {

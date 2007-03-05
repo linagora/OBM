@@ -254,7 +254,7 @@ function run_query_contract_insert($contract) {
   $format = $contract["format"];
   $ticket_nb = ($contract["ticket_nb"] ? $contract["ticket_nb"] : "0");
   $duration = $contract["duration"];
-  $autorenewal = ($contract["autorenewal"] ? $contract["autorenewal"] : "0");
+  $autorenew = ($contract["autorenew"] ? $contract["autorenew"] : "0");
   $sel_type = $contract["type"];
   $con1 = ($contract["con1"] ? $contract["con1"] : "0");
   $con2 = ($contract["con2"] ? $contract["con2"] : "0");
@@ -318,7 +318,7 @@ function run_query_contract_insert($contract) {
       $daterenew,
       $datecancel,
       '$sel_type',
-      '$autorenewal',
+      '$autorenew',
       '$contract_kind',    
       '$format',  
       '$ticket_nb',  
@@ -360,7 +360,7 @@ function run_query_contract_update($contract) {
   $status = $contract["status"];
   $contract_kind = $contract["kind"];
   $type = $contract["type"];
-  $autorenewal = ($contract["autorenewal"] ? $contract["autorenewal"] : "0");
+  $autorenew = ($contract["autorenew"] ? $contract["autorenew"] : "0");
   $format = $contract["format"];
   if ($format == $ccf_ticket) {
     $ticket_nb = ($contract["ticket_nb"] ? $contract["ticket_nb"] : "0");
@@ -407,7 +407,7 @@ function run_query_contract_update($contract) {
       contract_status_id = '$status',
       contract_kind = '$contract_kind',
       contract_format = '$format',
-      contract_autorenewal = '$autorenewal',
+      contract_autorenewal = '$autorenew',
       contract_ticketnumber = '$ticket_nb',
       contract_duration = '$duration',
       contract_datesignature = $datesignature,
@@ -587,7 +587,7 @@ function run_query_contract_priority_insert($contract) {
 	values ('null',
     '".date("Y-m-d H:i:s")."',
     ".$obm["uid"].",
-    '$domain_id',
+    '$obm[domain_id]',
     '$code',
     '$color',
     '$label')";
@@ -1117,7 +1117,6 @@ function run_query_contract_id($contract) {
   $format = $contract["format"];
   $ticket_nb = $contract["ticket_nb"];
   $duration = $contract["duration"];
-  $autorenewal =$contract["autorenewal"];
   $sel_type = $contract["type"];
   $multidomain = sql_multidomain("contract");
 	

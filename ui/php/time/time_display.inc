@@ -1009,7 +1009,7 @@ function html_time_month_users_total($time, $array_res) {
       <td class=\"$class\">$fract / $tot_workingdays</td>
       <th>
        <a href=\"time_index.php?action=viewmonth&amp;date=$date&amp;sel_user_id=$uid\">
-       <imgrc=\"$ico_update\" alt=\"Update\" /> $link_act</a>
+       <img src=\"$ico_update\" alt=\"Update\" /> $link_act</a>
       </th>
       <td>$dis_validlink</td>
      </tr>";

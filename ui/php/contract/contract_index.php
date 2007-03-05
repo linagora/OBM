@@ -143,7 +143,7 @@ if ($action == "ext_get_id") {
       }
     $display["search"] = dis_contract_consult($params);      
   } else {
-      $display["msg"] .= display_err_msg($l_invalid_da. " : " . $err["msg"]);
+      $display["msg"] .= display_err_msg($l_invalid_data. " : " . $err["msg"]);
       $display["detail"] = dis_contract_form($action, $params,"");
     }
 

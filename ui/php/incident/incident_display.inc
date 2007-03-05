@@ -1,6 +1,6 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : incident_display.php                                         //
+// OBM - File :incident_display.php                                         //
 //     - Desc : Incident File                                                //
 // 2002-03-14 : Mehdi Rande                                                  //
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ function dis_incident_search_form($incident) {
 
   $pri = of_category_get_ordered("incident", "priority");
   $sta = of_category_get_ordered("incident", "status");
-  $reso = of_category_get_ordered("incident", "resolutionType");
+  $reso = of_category_get_ordered("incident", "resolutiontype","multi",0,"IncidentResolutionType");
   $block = html_incident_search_form($owner_q, $logger_q, $pri, $sta, $reso, $incident);
 
   return $block;
@@ -344,7 +344,7 @@ function html_incident_consult($inc_q) {
   $email_con = ($email_con1 != "" ? $email_con1 : $email_con2);
 
   // Categories
-  $resos = of_category_get_entitycategories("incident", "ResolutionType", $inc_id, "mono");
+  $resos = of_category_get_entitycategories("incident", "resolutiontype", $inc_id, "mono","IncidentResolutionType");
   $block_reso = of_category_dis_block_consult("incident", "resolutiontype", $resos, "mono");
 
   // User defined data
@@ -528,7 +528,7 @@ function dis_incident_form($action, $incident) {
 
   $pri = of_category_get_ordered("incident", "priority");
   $sta = of_category_get_ordered("incident", "status");
-  $resos = of_category_get_ordered("incident", "ResolutionType");
+  $resos = of_category_get_ordered("incident", "resolutiontype","multi",0,"IncidentResolutionType");
 
   $block = html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $resos);
 
@@ -827,8 +827,8 @@ function dis_incident_admin_index() {
   $sta = of_category_get_ordered("incident", "status");
   $block .= of_category_dis_admin_form("status", $sta);
 
-  $resos = of_category_get_ordered("incident", "resolutionType");
-  $block .= of_category_dis_admin_form("resolutionType", $resos);
+  $resos = of_category_get_ordered("incident", "resolutiontype","multi",0,"IncidentResolutionType");
+  $block .= of_category_dis_admin_form("resolutiontype", $resos);
 
   // User defined data
   $block .= of_userdata_dis_admin_form("incident");

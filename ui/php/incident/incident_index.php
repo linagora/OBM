@@ -229,7 +229,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "resolutiontype_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("incident", "resolutiontype", $params);
+  $retour = of_category_query_insert("incident", "resolutionType", $params,"IncidentResolutionType");
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_resolutiontype : $l_insert_ok");
   } else {
@@ -239,7 +239,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "resolutiontype_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("incident", "resolutiontype", $params);
+  $retour = of_category_query_update("incident", "resolutiontype", $params,"IncidentResolutionType");
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_resolutiontype : $l_update_ok");
   } else {
@@ -249,11 +249,11 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "resolutiontype_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("incident", "resolutiontype", $params, "mono");
+  $display["detail"] .= of_category_dis_links("incident", "resolutiontype", $params, "mono","IncidentResolutionType");
 
 } elseif ($action == "resolutiontype_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("incident", "resolutiontype", $params);
+  $retour = of_category_query_delete("incident", "resolutiontype", $params,"IncidentResolutionType");
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_resolutiontype : $l_delete_ok");
   } else {

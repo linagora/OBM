@@ -668,6 +668,9 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
       <th>$l_label</th>
       <td>$label</td>
     </tr><tr>
+      <th>$l_autorenewal</th>
+      <td>$autorenewal</td>
+    </tr><tr>      
       <th>$l_number</th>
       <td>$number</td>
     </tr><tr>
@@ -686,9 +689,6 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
     <h1>$l_dates</h1>
     <table>
     <tr>
-      <th>$l_autorenewal</th>
-      <td>$autorenewal</td>
-    </tr><tr>
       <th>$l_signature</th>
       <td>$datesignature</td>
     </tr><tr>
@@ -867,7 +867,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (isset($contract["datecancel"])) { $datecancel = $contract["datecancel"]; }
   if (isset($contract["datesignature"])) { $datesignature = $contract["datesignature"]; } 
   if (isset($contract["type"])) { $type_id = $contract["type"]; }
-  if (isset($contract["autorenewal"])) { $autorenewal = $contract["autorenewal"]; }
+  if (isset($contract["autorenew"])) { $autorenewal = $contract["autorenew"]; }
   if (isset($contract["format"])) { $format = $contract["format"]; }
   if (isset($contract["ticket_nb"])) { $ticket_nb = $contract["ticket_nb"]; }
   if (isset($contract["duration"])) { $duration = $contract["duration"]; }
@@ -1439,7 +1439,7 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
   $format =$contract["format"];
   $ticket_nb =$contract["ticket_nb"];
   $duration = $contract["duration"];
-  $autorenewal =$contract["autorenewal"];
+  $autorenewal =$contract["autorenew"];
   $daterenew = $contract["daterenew"];
   $datecancel = $contract["datecancel"];
   $datesignature = $contract["datesignature"];
@@ -1851,10 +1851,10 @@ function dis_contract_status_links($id) {
       $cpt++;
       $stid = $obm_q->f("contract_id");
       $stlabel = $obm_q->f("contract_label");
-      $dis_link.= "<a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$stid") . "\">$stlabel</a>";
+      $dis_link.= "<li><a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$stid") . "\">$stlabel</a></li>";
     }
     if ($cpt < $nb_stat) {
-      $dis_link .= "...";
+      $dis_link .= "<li>...</li>";
     }
 
     $dis_link .="<div class=\"buttons\">$dis_back</div>";
@@ -1870,16 +1870,20 @@ function dis_contract_status_links($id) {
         <input type=\"hidden\" name=\"sel_status\" value=\"$id\" />
         <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_delete\" />
         </form>
-        <form name=\"form_back\" method=\"post\" action=\"" .url_prepare("contract_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>
-	
-	</p>
+        $dis_back	
     </div>";
 
   }
-  return $dis_link;
+  $block = "
+ <div class=\"detail\">
+    <ul>
+    $dis_link
+    </ul>
+    </div>
+  ";
+
+  
+  return $block;
 }
 
 
@@ -2018,7 +2022,7 @@ function dis_contract_type_links($id) {
       $cpt++;
       $typeid = $obm_q->f("contract_id");
       $typelabel = $obm_q->f("contract_label");
-      $dis_link.= "<a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$typeid") . "\">$typelabel</a>";
+      $dis_link.= "<li><a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$typeid") . "\">$typelabel</a></li>";
     }
     if ($cpt < $nb_type) {
       $dis_link .= "...";
@@ -2037,16 +2041,20 @@ function dis_contract_type_links($id) {
         <input type=\"hidden\" name=\"sel_type\" value=\"$id\" />
         <input type=\"submit\" name=\"sub_type\" value=\"$l_type_delete\" />
         </form>
-        <form name=\"form_back\" method=\"post\" action=\"" .url_prepare("contract_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>
-	
-	</p>
+	$dis_back
     </div>";
 
   }
-  return $dis_link;
+  $block = "
+ <div class=\"detail\">
+    <ul>
+    $dis_link
+    </ul>
+    </div>
+  ";
+
+  
+  return $block;
 }
 
 
