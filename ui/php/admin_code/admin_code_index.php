@@ -50,7 +50,7 @@ switch ($params["mode"]) {
    $perm->check_permissions($module, $action);
    $display["head"] = display_head("Admin_Code");
    $display["header"] = display_menu($module);
-   echo $display["head"] . $display["header"] . $display["action"];
+   echo $display["head"] . $display["header"] . "<p>&nbsp;</p>". $display["action"];
    break;
 }
 

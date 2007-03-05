@@ -69,6 +69,7 @@ switch ($params["mode"]) {
  case "html":
    page_close();
    $display["end"] = display_end();
+   $display["header"] = display_menu($module);
    display_page($display);
    break;
 }
