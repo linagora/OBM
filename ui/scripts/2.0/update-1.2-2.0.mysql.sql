@@ -28,7 +28,8 @@ CREATE TABLE Domain (
   domain_label          varchar(32) NOT NULL,
   domain_description    varchar(255),
   domain_name           varchar(128),
-  domain_alias          text,
+  domain_alias          text,  
+  domain_mail_server_id int(8) DEFAULT NULL,
   PRIMARY KEY (domain_id)
 );
 
@@ -459,19 +460,19 @@ CREATE TABLE Samba (
 --
 -- Shared bals table
 --
-CREATE TABLE MailShareDir (
-  mailsharedir_id             int(8) NOT NULL auto_increment,
-  mailsharedir_domain_id      int(8) default 0,
-  mailsharedir_timeupdate     timestamp(14),
-  mailsharedir_timecreate     timestamp(14),
-  mailsharedir_userupdate     int(8),
-  mailsharedir_usercreate     int(8),
-  mailsharedir_name           varchar(32),
-  mailsharedir_quota          int default 0 NOT NULL,
-  mailsharedir_mail_server_id int(8) default 0,  
-  mailsharedir_description    varchar(255),
-  mailsharedir_email          text default NULL,
-  PRIMARY KEY (mailsharedir_id)
+CREATE TABLE MailShare (
+  mailshare_id             int(8) NOT NULL auto_increment,
+  mailshare_domain_id      int(8) default 0,
+  mailshare_timeupdate     timestamp(14),
+  mailshare_timecreate     timestamp(14),
+  mailshare_userupdate     int(8),
+  mailshare_usercreate     int(8),
+  mailshare_name           varchar(32),
+  mailshare_quota          int default 0 NOT NULL,
+  mailshare_mail_server_id int(8) default 0,  
+  mailshare_description    varchar(255),
+  mailshare_email          text default NULL,
+  PRIMARY KEY (mailshare_id)
 );
 
 
@@ -529,6 +530,6 @@ CREATE TABLE P_Host like Host;
 CREATE TABLE P_Samba like Samba;
 CREATE TABLE P_MailServer like MailServer;
 CREATE TABLE P_MailServerNetwork like MailServerNetwork;
-CREATE TABLE P_MailShareDir like MailShareDir;
+CREATE TABLE P_MailShare like MailShare;
 CREATE TABLE P_EntityRight like EntityRight;
 -- CREATE TABLE P_Network like Network;
