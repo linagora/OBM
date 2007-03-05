@@ -283,7 +283,7 @@ ALTER TABLE Project ADD COLUMN project_reference_tech text DEFAULT '';
 
 
 ----------------------------------------------------------------------------
---Create CV table
+-- Create CV table
 ----------------------------------------------------------------------------
 
 CREATE TABLE CV (
@@ -302,9 +302,8 @@ CREATE TABLE CV (
 
 
 ----------------------------------------------------------------------------
---Create ProjectCV table
+-- Create ProjectCV table
 ----------------------------------------------------------------------------
-
 CREATE TABLE ProjectCV (
   projectcv_project_id int(8) NOT NULL,
   projectcv_cv_id      int(8) NOT NULL,
@@ -314,9 +313,8 @@ CREATE TABLE ProjectCV (
 
 
 ----------------------------------------------------------------------------
---Create DefaultOdtTemplate table
+-- Create DefaultOdtTemplate table
 ----------------------------------------------------------------------------
-
 CREATE TABLE DefaultOdtTemplate (
   defaultodttemplate_id           int(8) auto_increment,
   defaultodttemplate_domain_id    int(8) DEFAULT 1,
@@ -325,6 +323,13 @@ CREATE TABLE DefaultOdtTemplate (
   defaultodttemplate_label        varchar(64) DEFAULT '',
   PRIMARY KEY(defaultodttemplate_id)
 );
+
+
+----------------------------------------------------------------------------
+-- Update Contact table
+----------------------------------------------------------------------------
+ALTER TABLE Contact ADD COLUMN contact_newsletter char(1) DEFAULT '0' AFTER contact_mailing_ok;
+
 
 
 ---------------------------------------------------------------------------
@@ -501,7 +506,7 @@ CREATE TABLE MailServer (
 -----------------------------------------------------------------------------
 CREATE TABLE MailServerNetwork (
   mailservernetwork_host_id   int(8) NOT NULL default 0,
-  mailservernetwork_ip              varchar(16) NOT NULL default ''
+  mailservernetwork_ip        varchar(16) NOT NULL default ''
 );
 
 
@@ -519,6 +524,7 @@ CREATE TABLE P_UserObm like UserObm;
 CREATE TABLE P_UGroup like UGroup;
 CREATE TABLE P_UserObmGroup like UserObmGroup;
 CREATE TABLE P_GroupGroup like GroupGroup;
+CREATE TABLE P_of_usergroup like UserObmGroup;
 CREATE TABLE P_Host like Host;
 CREATE TABLE P_Samba like Samba;
 CREATE TABLE P_MailServer like MailServer;

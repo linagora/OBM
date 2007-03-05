@@ -9,6 +9,8 @@
 -- Global Information table
 -------------------------------------------------------------------------------
 UPDATE ObmInfo set obminfo_value='2.0' where obminfo_name='db_version';
+INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('update_state', '0');
+INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('remote_access', '0');
 
 
 -------------------------------------------------------------------------------
@@ -29,6 +31,8 @@ CREATE TABLE Domain (
   domain_alias          text,
   PRIMARY KEY (domain_id)
 );
+
+INSERT INTO Domain VALUES (1,NOW(),NOW(),0,0,'Main','Main domain','localdomain','');
 
 --
 -- Update All tables to include Domain info
@@ -211,7 +215,7 @@ ALTER TABLE UserObm ALTER COLUMN userobm_education SET DEFAULT '';
 
 
 ---------------------------------------------------------------------------
---Update Project table
+-- Update Project table
 ---------------------------------------------------------------------------
 ALTER TABLE Project ADD COLUMN project_reference_date varchar(32);
 ALTER TABLE Project ALTER COLUMN project_reference_date SET DEFAULT '';
@@ -224,7 +228,7 @@ ALTER TABLE Project ALTER COLUMN project_reference_tech SET DEFAULT '';
 
 
 ----------------------------------------------------------------------------
---Create CV table
+-- Create CV table
 ----------------------------------------------------------------------------
 CREATE TABLE CV (
   cv_id              serial,
@@ -241,7 +245,7 @@ CREATE TABLE CV (
 
 
 ----------------------------------------------------------------------------
---Create ProjectCV table
+-- Create ProjectCV table
 ----------------------------------------------------------------------------
 CREATE TABLE ProjectCV (
   projectcv_project_id serial,
@@ -252,7 +256,7 @@ CREATE TABLE ProjectCV (
 
 
 ----------------------------------------------------------------------------
---Create DefaultOdtTemplate table
+-- Create DefaultOdtTemplate table
 ----------------------------------------------------------------------------
 
 CREATE TABLE DefaultOdtTemplate (
@@ -262,6 +266,13 @@ CREATE TABLE DefaultOdtTemplate (
   defaultodttemplate_label               varchar(64) DEFAULT '',
   PRIMARY KEY(defaultodttemplate_id)
 );
+
+
+----------------------------------------------------------------------------
+-- Update Contact table
+----------------------------------------------------------------------------
+ALTER TABLE Contact ADD COLUMN contact_newsletter char(1);
+ALTER TABLE Contact ALTER COLUMN contact_newsletter SET DEFAULT '0';
 
 
 ---------------------------------------------------------------------------

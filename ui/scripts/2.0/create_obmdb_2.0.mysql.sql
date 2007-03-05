@@ -376,6 +376,7 @@ CREATE TABLE Contact (
   contact_email                varchar(128),
   contact_email2               varchar(128),
   contact_mailing_ok           char(1) DEFAULT '0',
+  contact_newsletter           char(1) DEFAULT '0',
   contact_archive              char(1) DEFAULT '0',
   contact_privacy              int(2) NOT NULL DEFAULT 0,
   contact_date                 timestamp(14),
@@ -1348,6 +1349,16 @@ CREATE TABLE GroupGroup (
   groupgroup_parent_id  int(8) DEFAULT 0 NOT NULL,
   groupgroup_child_id   int(8) DEFAULT 0 NOT NULL,
   PRIMARY KEY (groupgroup_parent_id, groupgroup_child_id)
+);
+
+
+--
+-- Table structure for table 'of_usergroup'
+--
+CREATE TABLE of_usergroup (
+  of_usergroup_group_id    int(8) DEFAULT 0 NOT NULL,
+  of_usergroup_userobm_id  int(8) DEFAULT 0 NOT NULL,
+  PRIMARY KEY (of_usergroup_group_id, of_usergroup_userobm_id)
 );
 
 
