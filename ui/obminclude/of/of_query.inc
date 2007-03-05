@@ -348,7 +348,8 @@ function of_domain_get_domain_infos($d_id) {
   if ($d_id > 0) {
     $query = "SELECT domain_id,
       domain_label,
-      domain_name
+      domain_name,
+      domain_mail_server_id
     FROM Domain
     WHERE domain_id = '$d_id'";
     display_debug_msg($query, $cdg_sql, "of_domain_get_domain_infos()");
@@ -358,6 +359,7 @@ function of_domain_get_domain_infos($d_id) {
     $domain["id"] = $obm_q->f("domain_id");
     $domain["label"] = $obm_q->f("domain_label");
     $domain["name"] = $obm_q->f("domain_name");
+    $domain["mailserver"] = $obm_q->f("domain_mail_server_id");
   } else {
     $domain["id"] = "0";
     $domain["label"] = "Global";

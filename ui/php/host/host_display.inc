@@ -235,7 +235,7 @@ function html_host_consult($host_q) {
   global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_mode;
   global $l_enable, $l_disable, $l_empty, $l_web_all, $l_web_list_only, $l_not_assigned;
   global $l_user, $l_consult_web_list, $l_web_access, $l_mailserver;
-  global $l_system, $l_help_system;
+  global $l_system, $l_help_system,$l_domain;
 
   $id = $host_q->f("host_id");
   $samba = $host_q->f("host_samba");
@@ -249,6 +249,7 @@ function html_host_consult($host_q) {
   $user_id = $host_q->f("userobm_id");
   $user_login = $host_q->f("userobm_login");
   $mail_server = $host_q->f("mailserver_id");
+  $domain_name = ($host_q->f("domain_name") != "" ? $host_q->f("domain_name") : "GLOBAL");
 
   $dis_user =   
     "<tr>
@@ -325,6 +326,10 @@ function html_host_consult($host_q) {
     <tr>
       <th>$l_name</th>
       <td>$name</td>
+    </tr>
+    <tr>
+      <th>$l_domain</th>
+      <td>$domain_name</td>
     </tr>
     <tr>
       <th>$l_ip</th>
@@ -444,7 +449,16 @@ function html_host_form($action, $host_q, $host, $field="") {
     $ftp_perms = $host["ftp_perms"];
     $firewall_perms = $host["firewall_perms"];
   }
-
+  if (isset($host["domain"])) { $domain_id = $host["domain"]; }
+  // Domain (can't be updated, so only on insert)
+  if (($action == "new" || $action == "insert")
+      && $obm["domain_id"] == 0 ) {
+    $sel_domain = of_domain_dis_select($domain_id);
+    $dis_domain = "<tr>
+      <th>$l_domain</th>
+      <td>$sel_domain</td>
+    </tr>";
+  }
   // Samba host checkbox checked value
   $samba_state  = ($samba ? "checked" : "");
 
@@ -544,6 +558,7 @@ function html_host_form($action, $host_q, $host, $field="") {
       <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />
     </td>
   </tr>
+  $dis_domain
   <tr>
     <th class=\"$class[ip]\">$l_ip</th>
     <td>

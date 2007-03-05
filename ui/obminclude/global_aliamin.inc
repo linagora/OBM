@@ -57,17 +57,17 @@ function get_email_used($id="", $gid="", $mid="") {
   }
 
   // Mailshares
-  $query = "SELECT mailsharedir_name, mailsharedir_email
-    FROM MailShareDir
-    WHERE mailsharedir_id != '$mid'";
+  $query = "SELECT mailshare_name, mailshare_email
+    FROM MailShare
+    WHERE mailshare_id != '$mid'";
 
   display_debug_msg($query, $cdg_sql, "get_email_used(3)");
   $m_q = new DB_OBM;
   $m_q->query($query);
 
   while ($m_q->next_record()) {
-    $email = $m_q->f("mailsharedir_email");
-    $name = "$l_mailshare : " . $m_q->f("mailsharedir_name");
+    $email = $m_q->f("mailshare_email");
+    $name = "$l_mailshare : " . $m_q->f("mailshare_name");
     $mails["$email"] = "$name";
   }
 
@@ -1231,8 +1231,8 @@ function update_scope_Mailshare() {
   global $cdg_sql;
 
   // Mailshare entries
-  $query = "SELECT * FROM P_MailShareDir ORDER BY mailsharedir_id";
-  $query_upd = "SELECT * FROM MailShareDir ORDER BY mailsharedir_id";
+  $query = "SELECT * FROM P_MailShare ORDER BY mailshare_id";
+  $query_upd = "SELECT * FROM MailShare ORDER BY mailshare_id";
   $sys_q = new DB_OBM;
   $sys_upd_q = new DB_OBM;
 
@@ -1255,17 +1255,17 @@ function update_scope_Mailshare() {
   while ($sys_q->next_record()) {
     $sys_upd_q->next_record();
 
-    $id = $sys_q->f("mailsharedir_id");
-    $name = $sys_q->f("mailsharedir_name");
-    $quota = $sys_q->f("mailsharedir_quota");
-    $email = $sys_q->f("mailsharedir_email");
-    $desc = $sys_q->f("mailsharedir_description");
+    $id = $sys_q->f("mailshare_id");
+    $name = $sys_q->f("mailshare_name");
+    $quota = $sys_q->f("mailshare_quota");
+    $email = $sys_q->f("mailshare_email");
+    $desc = $sys_q->f("mailshare_description");
 
-    $id_upd = $sys_upd_q->f("mailsharedir_id");
-    $name_upd = $sys_upd_q->f("mailsharedir_name");
-    $quota_upd = $sys_upd_q->f("mailsharedir_quota");
-    $email_upd = $sys_upd_q->f("mailsharedir_email");
-    $desc_upd = $sys_upd_q->f("mailsharedir_description");
+    $id_upd = $sys_upd_q->f("mailshare_id");
+    $name_upd = $sys_upd_q->f("mailshare_name");
+    $quota_upd = $sys_upd_q->f("mailshare_quota");
+    $email_upd = $sys_upd_q->f("mailshare_email");
+    $desc_upd = $sys_upd_q->f("mailshare_description");
 
     // Si modif du quota, alors cyrus
     if ($quota != $quota_upd) {

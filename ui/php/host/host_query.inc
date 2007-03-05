@@ -104,6 +104,7 @@ function run_query_host_detail($id) {
          LEFT JOIN UserObm as u ON host_userupdate=u.userobm_id
          LEFT JOIN UserObm as uo ON host_id=uo.userobm_host_id
          LEFT JOIN MailServer ON host_id=mailserver_host_id
+         LEFT JOIN Domain ON host_domain_id = domain_id
     WHERE host_id = '$id'
       $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_host_detail()");
@@ -129,12 +130,18 @@ function run_query_host_insert($host) {
   $web_perms = $host["web_perms"];
   $ftp_perms = $host["ftp_perms"];
   $firewall_perms = $host["firewall_perms"];
-  $web_all = $user["web_all"];  
-  $list = $user["web_list"];
+  $web_all = $host["web_all"];  
+  $list = $host["web_list"];
   $desc = $host["desc"];
   $now = date("Y-m-d H:i:s");
   $host_uid = get_first_user_free_uid();
   $host_gid = $cg_gid_smb_host;
+
+  if (isset($host["domain"]) && $obm["domain"] == 0) {
+    $domain_id = $host["domain"];
+  } else {
+    $domain_id = $obm["domain_id"];
+  }
 
   $query = "INSERT INTO Host (host_timeupdate,
     host_timecreate,
@@ -156,7 +163,7 @@ function run_query_host_insert($host) {
     '$now',
     null,
     '$obm[uid]',
-    '$obm[domain_id]',
+    '$domain_id',
     '$host_uid',
     '$host_gid',
     '$samba',

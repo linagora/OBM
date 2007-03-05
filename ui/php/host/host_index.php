@@ -207,8 +207,8 @@ function get_host_params() {
   $params = get_global_params("Host");
 
   // Group fields
-  if (isset ($ta_firewall_perms)) $params["firewall_perms"] = cleanup($ta_firewall_perms);
-
+  if (isset ($params["firewall_perms"])) $params["firewall_perms"] = cleanup($params["firewall_perms"]);
+  if (isset ($params["id"])) $params["host_id"] = $params["id"];
   return $params;
 }
 

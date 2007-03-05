@@ -29,44 +29,44 @@ function run_query_mailshare_search($mailshare) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $timeupdate = sql_date_format($db_type,"mailsharedir_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($db_type,"mailsharedir_timecreate", "timecreate");
-  $multidomain = sql_multidomain("mailsharedir");
+  $timeupdate = sql_date_format($db_type,"mailshare_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type,"mailshare_timecreate", "timecreate");
+  $multidomain = sql_multidomain("mailshare");
 
   $where = "(1=1)";
   if ($name != '') {
-    $where .= " AND mailsharedir_name $like '$name%'";
+    $where .= " AND mailshare_name $like '$name%'";
   }
   if ($email != '') {
-    $where .= " AND mailsharedir_email $like '%$email%'";
+    $where .= " AND mailshare_email $like '%$email%'";
   }
   if ($quota > 0) {
-    $where .= " AND mailsharedir_quota ='$quota'";
+    $where .= " AND mailshare_quota ='$quota'";
   }
   if ($desc != '') {
-    $where .= " AND mailsharedir_description $like '%$desc%'";
+    $where .= " AND mailshare_description $like '%$desc%'";
   }
   $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
-  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "mailsharedir_name";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "mailshare_name";
   $orderq .= " ORDER BY $order $sql_order_dir";
 
-  $query = "SELECT DISTINCT MailShareDir.*,
-      mailsharedir_id as id,
+  $query = "SELECT DISTINCT MailShare.*,
+      mailshare_id as id,
       $timecreate,
       $timeupdate,
       A.userobm_login as usercreate,
       B.userobm_login as userupdate
-    FROM MailShareDir
-      LEFT JOIN UserObm as A ON mailsharedir_usercreate=A.userobm_id
-      LEFT JOIN UserObm as B ON mailsharedir_userupdate=B.userobm_id
+    FROM MailShare
+      LEFT JOIN UserObm as A ON mailshare_usercreate=A.userobm_id
+      LEFT JOIN UserObm as B ON mailshare_userupdate=B.userobm_id
     $whereq
     $orderq
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM MailShareDir $whereq");
+    $count = get_query_count("SELECT count(*) FROM MailShare $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -90,9 +90,9 @@ function run_query_mailshare_detail($id) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($db_type,"mailsharedir_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($db_type,"mailsharedir_timecreate", "timecreate");
-  $multidomain = sql_multidomain("mailsharedir");
+  $timeupdate = sql_date_format($db_type,"mailshare_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type,"mailshare_timecreate", "timecreate");
+  $multidomain = sql_multidomain("mailshare");
 
   $query = "SELECT *,
       host_name as mailserver_hostname,
@@ -100,12 +100,12 @@ function run_query_mailshare_detail($id) {
       $timeupdate,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
-    FROM MailShareDir
-         LEFT JOIN MailServer ON mailsharedir_mail_server_id = mailserver_id
+    FROM MailShare
+         LEFT JOIN MailServer ON mailshare_mail_server_id = mailserver_id
          LEFT JOIN Host ON mailserver_host_id = host_id
-         LEFT JOIN UserObm as c ON mailsharedir_usercreate=c.userobm_id
-         LEFT JOIN UserObm as u ON mailsharedir_userupdate=u.userobm_id
-    WHERE mailsharedir_id = '$id'
+         LEFT JOIN UserObm as c ON mailshare_usercreate=c.userobm_id
+         LEFT JOIN UserObm as u ON mailshare_userupdate=u.userobm_id
+    WHERE mailshare_id = '$id'
       $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_mailshare_detail()");
   $obm_q->query($query) ;
@@ -131,17 +131,17 @@ function run_query_mailshare_insert($mailshare) {
   $now = date("Y-m-d H:i:s");
   $domain_id = $obm["domain_id"];
 
-  $query = "INSERT INTO MailShareDir (
-    mailsharedir_domain_id,
-    mailsharedir_timeupdate,
-    mailsharedir_timecreate,
-    mailsharedir_userupdate,
-    mailsharedir_usercreate,
-    mailsharedir_name,
-    mailsharedir_mail_server_id,
-    mailsharedir_quota,
-    mailsharedir_description,
-    mailsharedir_email)
+  $query = "INSERT INTO MailShare (
+    mailshare_domain_id,
+    mailshare_timeupdate,
+    mailshare_timecreate,
+    mailshare_userupdate,
+    mailshare_usercreate,
+    mailshare_name,
+    mailshare_mail_server_id,
+    mailshare_quota,
+    mailshare_description,
+    mailshare_email)
   VALUES (
     '$domain_id',
     null,
@@ -161,17 +161,17 @@ function run_query_mailshare_insert($mailshare) {
   if ($retour) {
 
     // On recupere l'ID de l'hôte qu'on vient d'ajouter
-    $query = "SELECT mailsharedir_id as id
-    FROM MailShareDir
+    $query = "SELECT mailshare_id as id
+    FROM MailShare
     WHERE
-      mailsharedir_timecreate = '$now'
-      AND mailsharedir_userupdate is null
-      AND mailsharedir_usercreate = '$obm[uid]'
-      AND mailsharedir_domain_id = '$domain_id'
-      AND mailsharedir_name = '$name'
-      AND mailsharedir_quota = '$quota'
-      AND mailsharedir_email = '$email'
-      AND mailsharedir_description = '$desc'";
+      mailshare_timecreate = '$now'
+      AND mailshare_userupdate is null
+      AND mailshare_usercreate = '$obm[uid]'
+      AND mailshare_domain_id = '$domain_id'
+      AND mailshare_name = '$name'
+      AND mailshare_quota = '$quota'
+      AND mailshare_email = '$email'
+      AND mailshare_description = '$desc'";
 
     display_debug_msg($query, $cdg_sql, "run_query_mailshare_insert(2)");
     $obm_q->query($query);
@@ -200,17 +200,17 @@ function run_query_mailshare_update($mailshare) {
   $desc = $mailshare["desc"];
   $mail_server = $mailshare["mail_server"];
   $now = date("Y-m-d H:i:s");
-  $multidomain = sql_multidomain("mailsharedir");
+  $multidomain = sql_multidomain("mailshare");
   
-  $query = "UPDATE MailShareDir set
-    mailsharedir_timeupdate = '$now',
-    mailsharedir_userupdate = '$obm[uid]',
-    mailsharedir_name = '$name',
-    mailsharedir_quota = '$quota',
-    mailsharedir_mail_server_id = '$mail_server',
-    mailsharedir_description = '$desc',
-    mailsharedir_email = '$email'
-  WHERE mailsharedir_id='$id'
+  $query = "UPDATE MailShare set
+    mailshare_timeupdate = '$now',
+    mailshare_userupdate = '$obm[uid]',
+    mailshare_name = '$name',
+    mailshare_quota = '$quota',
+    mailshare_mail_server_id = '$mail_server',
+    mailshare_description = '$desc',
+    mailshare_email = '$email'
+  WHERE mailshare_id='$id'
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_mailshare_update()");
@@ -229,7 +229,7 @@ function run_query_mailshare_update($mailshare) {
 function run_query_mailshare_delete($p_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("mailsharedir");
+  $multidomain = sql_multidomain("mailshare");
 
   // Delete ACL for this mailshare
   $query = "DELETE FROM EntityRight
@@ -241,8 +241,8 @@ function run_query_mailshare_delete($p_id) {
   $obm_q->query($query);
 
   // Delete the Mailshare
-  $query = "DELETE FROM MailShareDir
-    WHERE mailsharedir_id='$p_id'
+  $query = "DELETE FROM MailShare
+    WHERE mailshare_id='$p_id'
       $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_mailshare_delete(2)");
   $retour = $obm_q->query($query);
@@ -262,16 +262,16 @@ function run_query_mailshare_delete($p_id) {
 function get_mailshare_name_exists($name, $id="") {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("mailsharedir");
+  $multidomain = sql_multidomain("mailshare");
 
   if ($id != "") {
-    $where_id = "AND mailsharedir_id != '$id'";
+    $where_id = "AND mailshare_id != '$id'";
   }
 
-  $query = "SELECT mailsharedir_id, mailsharedir_name
-    FROM MailShareDir
+  $query = "SELECT mailshare_id, mailshare_name
+    FROM MailShare
     WHERE
-      mailsharedir_name = '$name'
+      mailshare_name = '$name'
       $where_id
       $multidomain";
 
@@ -301,33 +301,33 @@ function run_query_check_mailshare($id, $name, $desc) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-  $multidomain = sql_multidomain("mailsharedir");
+  $multidomain = sql_multidomain("mailshare");
 
   if ($id != "") {
-    $where_id = "AND mailsharedir_id!='$id'";
+    $where_id = "AND mailshare_id!='$id'";
   }
 
   // If name is short, we test equality, else similarity
   if (strlen($name) > 2) {
-    $wname = "mailsharedir_name $like '%$name%'";
+    $wname = "mailshare_name $like '%$name%'";
   } else {
-    $wname = "mailsharedir_name = '$name'";
+    $wname = "mailshare_name = '$name'";
   }
 
   // If desc is short, we test equality, else similarity
   if (trim($desc) != "") {
     if (strlen($desc) > 2) {
-      $wdesc = "mailsharedir_description $like '%$desc%'";
+      $wdesc = "mailshare_description $like '%$desc%'";
     } else {
-      $wdesc = "mailsharedir_description = '$desc'";
+      $wdesc = "mailshare_description = '$desc'";
     }
   }
   if ($wdesc != "") $wdesc = "OR $wdesc";
 
-  $query = "SELECT DISTINCT mailsharedir_id,
-      mailsharedir_name,
-      mailsharedir_description
-    FROM MailShareDir
+  $query = "SELECT DISTINCT mailshare_id,
+      mailshare_name,
+      mailshare_description
+    FROM MailShare
     WHERE
       ($wname $wdesc)
       $where_id
@@ -481,14 +481,14 @@ function check_mailshare_data_form($mailshare) {
 function name_in_use($name, $u_id="") {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("mailsharedir");
+  $multidomain = sql_multidomain("mailshare");
 
   $query = "SELECT
-    mailsharedir_id,
-    mailsharedir_name
-  FROM MailShareDir
-  WHERE mailsharedir_name = '$name'
-    AND mailsharedir_id != '$u_id'
+    mailshare_id,
+    mailshare_name
+  FROM MailShare
+  WHERE mailshare_name = '$name'
+    AND mailshare_id != '$u_id'
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, "name_in_use()");
@@ -500,25 +500,5 @@ function name_in_use($name, $u_id="") {
   } else {
     return false;
   }
-}
-///////////////////////////////////////////////////////////////////////////////
-// Available mailservers
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-
-function run_query_mailshare_get_mailserver() {
-  global $cdg_sql;
-
-  $multidomain = sql_multidomain("host",true,true);
-  $query = "SELECT
-    mailserver_id,
-    ms.host_name as host_name
-    FROM MailServer 
-    JOIN Host ms ON mailserver_host_id = ms.host_id
-    WHERE 1=1 $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_mailshare_get_mailserver())");
-  $obm_q= new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;    
 }
 </script>

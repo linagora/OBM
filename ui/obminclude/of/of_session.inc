@@ -261,7 +261,8 @@ class Auth {
 	  // XXXX optimisation, recup domaine_label in auth_vali
 	  $d = of_domain_get_domain_infos($obm["domain_id"]);
 	  $obm["domain_label"] = $d["label"];
-	  $obm["domain_name"] = $d["name"];
+          $obm["domain_name"] = $d["name"];
+          $obm["mailserver"] = $d["mailserver"];
 
 	  // OBM : in OBM each time is in seconds. this->lifetime too.
 	  $this->auth["exp"] = time() + $this->lifetime;

@@ -11,10 +11,10 @@
 // Fields that appear in result lists //
 //------------------------------------//
 // Direct fields
-$fieldnames["mailsharedir_name"] = $l_name;
-$fieldnames["mailsharedir_email"] = $l_email;
-$fieldnames["mailsharedir_quota"] = $l_quota;
-$fieldnames["mailsharedir_description"] = $l_desc;
+$fieldnames["mailshare_name"] = $l_name;
+$fieldnames["mailshare_email"] = $l_email;
+$fieldnames["mailshare_quota"] = $l_quota;
+$fieldnames["mailshare_description"] = $l_desc;
 $fieldnames["usercreate"] = $l_creator;
 $fieldnames["userupdate"] = $l_updater;
 $fieldnames["timecreate"] = $l_date_creation;
@@ -33,15 +33,15 @@ $fieldnames["timeupdate"] = $l_date_last_update;
 function dis_data_mailshare(&$OD, $fieldname, $link_ok) {
   global $path, $ico_mail, $obm;
 
-  if (($fieldname == "mailsharedir_name") && $link_ok) {
+  if (($fieldname == "mailshare_name") && $link_ok) {
     if ($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("mailsharedir_id").",'".addslashes($OD->data_set->f("mailsharedir_name"))."');";
+      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("mailshare_id").",'".addslashes($OD->data_set->f("mailshare_name"))."');";
     } else {
-     $res["url"] = "$path/mailshare/mailshare_index.php?action=detailconsult&amp;mailshare_id=".$OD->data_set->f("mailsharedir_id");
+     $res["url"] = "$path/mailshare/mailshare_index.php?action=detailconsult&amp;mailshare_id=".$OD->data_set->f("mailshare_id");
     }
   }
 
-  else if ($fieldname == "mailsharedir_quota") {
+  else if ($fieldname == "mailshare_quota") {
     $res["align"] = "center";
     if ($OD->data_set->f($fieldname) == "0") {
       $res["name"] = "&nbsp;";
@@ -49,10 +49,10 @@ function dis_data_mailshare(&$OD, $fieldname, $link_ok) {
     }    
   }
 
-  else if ($fieldname == "mailsharedir_email") {
+  else if ($fieldname == "mailshare_email") {
     $main_domain = $obm["domain_name"];
 
-    $email = $OD->data_set->f("mailsharedir_email");
+    $email = $OD->data_set->f("mailshare_email");
     if (strcmp($email ,"") != 0) {
       $emails = explode("\n",$email);
       $email = trim($emails[0])."@$main_domain";
@@ -234,10 +234,10 @@ function html_mailshare_consult($mailshare_q) {
   global $l_mailshare, $l_name, $l_quota, $l_desc, $l_email;
   global $display, $perm, $menu, $action, $cright_write;
 
-  $name = $mailshare_q->f("mailsharedir_name");
-  $quota = $mailshare_q->f("mailsharedir_quota");
-  $desc = $mailshare_q->f("mailsharedir_description");
-  $email = $mailshare_q->f("mailsharedir_email");
+  $name = $mailshare_q->f("mailshare_name");
+  $quota = $mailshare_q->f("mailshare_quota");
+  $desc = $mailshare_q->f("mailshare_description");
+  $email = $mailshare_q->f("mailshare_email");
   $mail_server_id = $mailshare_q->f("userobm_mail_server_id");
   $mail_server_host_name = $mailshare_q->f("mailserver_hostname");
 
@@ -287,16 +287,16 @@ function html_mailshare_consult($mailshare_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
   global $display, $l_insert, $l_update, $l_back,$l_web_list;
-  global $l_mailshare, $l_name, $l_desc, $l_quota, $l_email;
+  global $l_mailshare, $l_name, $l_desc, $l_quota, $l_email,$obm;
   global $cgp_use, $cmailshare_default_quota,$obm,$l_mail_server;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
-    $id = $mailshare_q->f("mailsharedir_id");
-    $name = $mailshare_q->f("mailsharedir_name");
-    $quota = $mailshare_q->f("mailsharedir_quota");
-    $email = $mailshare_q->f("mailsharedir_email");
-    $desc = $mailshare_q->f("mailsharedir_description");
+    $id = $mailshare_q->f("mailshare_id");
+    $name = $mailshare_q->f("mailshare_name");
+    $quota = $mailshare_q->f("mailshare_quota");
+    $email = $mailshare_q->f("mailshare_email");
+    $desc = $mailshare_q->f("mailshare_description");
     $mail_server_id = $mailshare_q->f("mailshare_mail_server_id");
     $mail_server_host_name = $mailshare_q->f("mailserver_hostname");
 
@@ -321,6 +321,9 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
   if (isset($user["mail_server_hostname"])) { $mail_server_host_name = $user["mail_server_hostname"]; }  
 
   if (!$mail_server_host_name) {
+    if(!$mail_server) {
+      $mail_server = $obm["mailserver"];
+    }    
     $dis_mailserver = get_select_host_server($mail_server);
   } else {
     $dis_mailserver = "
@@ -467,9 +470,9 @@ function dis_mailshare_warn_insert($id, $h_q, $mailshare) {
 
   $display["msg"] .= display_warn_msg($l_check_samemailshare);
   while ($h_q->next_record()) {
-    $id = $h_q->f("mailsharedir_id");
-    $samename = $h_q->f("mailsharedir_name");
-    $samedesc = $h_q->f("mailsharedir_description");
+    $id = $h_q->f("mailshare_id");
+    $samename = $h_q->f("mailshare_name");
+    $samedesc = $h_q->f("mailshare_description");
     $dis_same_mailshare .= "
       <tr><td class=\"detailLabel\">
         <a href=\"" .url_prepare("mailshare_index.php?action=detailconsult&amp;mailshare_id=$id") . "\">$samename ($samedesc)</a>

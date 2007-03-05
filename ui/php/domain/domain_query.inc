@@ -75,8 +75,11 @@ function run_query_domain_detail($p_id) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
-  $query = "SELECT Domain.*
+  $query = "SELECT Domain.*,
+    host_name as mailserver_hostname
     FROM Domain
+    LEFT JOIN MailServer ON mailserver_id = domain_mail_server_id
+    LEFT JOIN Host ON host_id = mailserver_host_id
     WHERE domain_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_domain_detail()");
@@ -102,7 +105,8 @@ function run_query_domain_insert($domain) {
   $desc = $domain["desc"];
   $domain_name = $domain["domain_name"];
   $alias = $domain["alias"];
-  
+  $mail_server = $domain["mail_server"];
+
   $query = "INSERT INTO Domain (
     domain_timeupdate,
     domain_timecreate,
@@ -111,6 +115,7 @@ function run_query_domain_insert($domain) {
     domain_label,
     domain_description,
     domain_name,
+    domain_mail_server_id,
     domain_alias)
   VALUES (
     null,
@@ -120,6 +125,7 @@ function run_query_domain_insert($domain) {
     '$label',
     '$desc',
     '$domain_name',
+    '$mail_server',
     '$alias')";
     
   display_debug_msg($query, $cdg_sql, "run_query_domain_insert(1)");
@@ -157,15 +163,15 @@ function run_query_domain_update($d_id, $domain) {
   $now = date("Y-m-d H:i:s");
   $label = $domain["label"];
   $desc = $domain["desc"];
-  $domain_name = $domain["domain_name"];
   $alias = $domain["alias"];
+  $mail_server = $domain["mail_server"];
   
   $query = "UPDATE Domain SET
     domain_timeupdate='$now',
     domain_userupdate='$uid',
     domain_label='$label',
     domain_description='$desc',
-    domain_name='$domain_name',
+    domain_mail_server_id='$mail_server',
     domain_alias='$alias'
   WHERE domain_id='$d_id'";
 

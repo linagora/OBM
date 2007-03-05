@@ -131,7 +131,7 @@ function html_domain_search_list($obm_q, $prefs, $domain, $popup) {
 function html_domain_form($dom_q, $domain) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
   global $l_insert, $l_update,$l_mail_server;
-  global $display;
+  global $display, $cgp_use,$l_mail_server;
 
   // if update mode and first time value are taken from database
   if ($domain["action"] == "detailupdate") {
@@ -161,6 +161,17 @@ function html_domain_form($dom_q, $domain) {
           <input type=\"hidden\" name=\"domain_id\" value=\"$id\">
           <input type=\"submit\" value=\"$l_update\">";
   }
+  
+  if ($cgp_use["service"]["mail"]) {
+    // Mail server selection
+    $dis_mailserver = "
+    <tr>
+      <th class=\"$class[mail_server]\">$l_mail_server</th>
+      <td>
+      ".get_select_host_server($mail_server, ($id == "")?"0":$id)."
+      </td>
+    </tr>";
+  }
 
   $display["title"] = "<div class=\"title\">$l_domain : $label </div>";
 
@@ -185,6 +196,7 @@ function html_domain_form($dom_q, $domain) {
       <th>$l_domain_name</th>
       <td>$dis_domain_name</td>
     </tr>
+    $dis_mailserver
     </table>
     </fieldset>
 
@@ -250,9 +262,9 @@ function html_domain_consult($obm_q) {
       <th>$l_mail_server</th>
       <td>";
       if ($mail_server_id) {
-        $mail_section .= "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=".$mail_server_id."\">".$mail_server_host_name."</a>";
+        $dis_mailserver .= "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=".$mail_server_id."\">".$mail_server_host_name."</a>";
       } else {
-        $mail_section .= "-";
+        $dis_mailserver .= "-";
       }
       $mail_section .= "</td>
     </tr>";

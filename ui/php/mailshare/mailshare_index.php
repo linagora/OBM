@@ -174,15 +174,15 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = of_right_dis_admin("MailShareDir", $params["entity_id"]);
+  $display["detail"] = of_right_dis_admin("MailShare", $params["entity_id"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  of_right_update_right($params, "MailShareDir");
+  of_right_update_right($params, "MailShare");
 	// ALIAMIN
   //  update_update_state();
   $display["msg"] .= display_warn_msg($err["msg"]);
-  $display["detail"] = of_right_dis_admin("MailShareDir", $params["entity_id"]);
+  $display["detail"] = of_right_dis_admin("MailShare", $params["entity_id"]);
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////

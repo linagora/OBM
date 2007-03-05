@@ -1054,6 +1054,9 @@ function html_user_form($usr_q, $user, $field="") {
     $mail_ext_state  = ($mail_ext_perms ? "checked" : "");
     // Mail server selection
     if (!$mail_server_host_name) {
+      if(!$mail_server) {
+        $mail_server = $obm["mailserver"];
+      }
       $dis_mailserver = get_select_host_server($mail_server);
     } else {
       $dis_mailserver = "

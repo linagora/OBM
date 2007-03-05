@@ -88,10 +88,10 @@ function get_control_mailshare_infos($domain_id="") {
   global $cdg_sql;
 
   if ($domain_id > 0) {
-    $where_domain = "WHERE mailsharedir_domain_id='$domain_id'";
+    $where_domain = "WHERE mailshare_domain_id='$domain_id'";
   }
 
-  $query = "SELECT count(*) FROM P_MailShareDir $where_domain";
+  $query = "SELECT count(*) FROM P_MailShare $where_domain";
 
   display_debug_msg($query, $cdg_sql, "get_control_mailshare_infos()");
   $obm_q = new DB_OBM;

@@ -1331,8 +1331,8 @@ function phpStringToJsString($var) {
 // Parametre :
 //      mail_server : identifiant du serveur à sélectionner
 ///////////////////////////////////////////////////////////////////////////////
-function get_select_host_server($mail_server="") {
-    $mail = run_query_mailshare_get_mailserver();
+function get_select_host_server($mail_server="",$domain="") {
+    $mail = run_query_get_mailserver($domain);
 
     // On construit une boite de selection
     // La valeur par défaut est le serveur par défaut, sauf si $mail_server
@@ -1342,8 +1342,11 @@ function get_select_host_server($mail_server="") {
     while($mail->next_record()) {
       $name = $mail->f("host_name");
       $id = $mail->f("mailserver_id");
-      $dis_mailserver .= "<option value=\"$id\">$name</option>";
-      
+      if($id == $mail_server) {
+        $dis_mailserver .= "<option selected=\"selected\" value=\"$id\">$name</option>";
+      } else {
+        $dis_mailserver .= "<option value=\"$id\">$name</option>";
+      }
     }
     $dis_mailserver .= "
     </select>";
