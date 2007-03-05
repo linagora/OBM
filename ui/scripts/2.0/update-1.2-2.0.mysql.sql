@@ -393,6 +393,7 @@ ALTER TABLE UGroup ADD COLUMN group_samba int(1) default 0 AFTER group_ext_id;
 ALTER TABLE UGroup ADD COLUMN group_gid int(8) AFTER group_samba;
 ALTER TABLE UGroup ADD COLUMN group_mailing int(1) AFTER group_gid;
 ALTER TABLE UGroup ADD COLUMN group_contacts text AFTER group_email;
+ALTER TABLE UGroup CHANGE COLUMN group_ext_id group_ext_id varchar(16);
 
 -- add constraint  UNIQUE KEY group_gid (group_gid)
 
