@@ -13,8 +13,9 @@ require Exporter;
 use Config::IniFiles;
 use FindBin qw($Bin);
 
+
 @ISA = qw(Exporter);
-@EXPORT_const = qw($facility_log $securinetMode $enableHook $cyrusSrv $cyrusAdminLogin $cyrusSep $sieveSrv $ldapServer $ldapAdminLogin $sambaSrvHome $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $rsaPrivateKey $rsaPublicKey $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($facility_log $securinetMode $enableHook $sieveSrv $ldapServer $ldapAdminLogin $sambaSrvHome $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $rsaPrivateKey $rsaPublicKey $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateAliamin $templateAliamin $tmpAliamin);
 @EXPORT_files = qw($templatePostfixAliases $tmpPostfixAliases $aliaminPostfixAliases $automateMailAliases $automateMailChangeAlias $automateMailChangeSieve $automateMailStat $automateCyrusAdmin $automateLdapDatabase $automateLdapCommit $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixConf $automateNameServer $automateSquidCache $automateNetwork $automateFirewall $automateVPN $automateAmavis $aliaminMailLog $templateLdapDatabase $tmpLdapDatabase $aliaminSlapdConf $aliaminSlapdConfNew $aliaminSlapdRep $aliaminSlapdRepNew $slapdControl $templateSquidConf $tmpSquidUserURLList $tmpSquidHostURLList $tmpSquidConf $squidUserURLList $squidHostURLList $squidAuthenticateProgram $squidConf $aliaminVPNKernelConf $aliaminPareFeuFirewallsh $aliaminPareFeuFlushfirewallsh $aliaminPareFeuEnablessh);
 @EXPORT_command = qw($ldapPasswdSSHAGenerator $ldapPasswdMD5Generator $aliaminMailStat $ldapMakeNewBase $recode $aliaminPasswd $sambaNTPass $sambaLMPass $automateStateSSHScript $automateSpecificCmd $automateBackup);
@@ -73,20 +74,6 @@ if( $cfgFile->val( 'automate', 'enableHook' ) eq "true" ) {
     $enableHook = 1;
 }else {
     $enableHook = 0;
-}
-
-#
-# L'adresse du serveur IMAP
-$cyrusSrv = $cfgFile->val( 'automate', 'shareDirServer' );
-#
-# Le login de l'administrateur IMAP
-$cyrusAdminLogin = "cyrus";
-#
-# Caractère '.' acceptés dans les login et nom de répertoires partagés
-if( $cfgFile->val( 'global', 'loginDotsEnable' ) eq "true" ) {
-    $cyrusSep = "/";
-}else {
-    $cyrusSep = ".";
 }
 
 #
@@ -258,6 +245,4 @@ $rsaPublicKey = $automateAliamin . "Aliamin/rsaKey/rsaKey.pub";
 # ACL : Definition des entites et des consomateurs
 $MAILBOXENTITY="mailbox";
 $MAILSHAREENTITY="mailshare";
-
 $USERCONSUMER="user";
-

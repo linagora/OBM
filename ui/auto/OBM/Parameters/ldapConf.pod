@@ -54,7 +54,7 @@ B<structurel> - définit le type Aliamin POSIXUSERS, représentant un utilisateu
 
 B<non structurel> - définit le type Aliamin SAMBAUSERS, représentant un utilisateur SAMBA ;
 
-=item $SYSTEMUSER =E<gt> C<"account>, C<posixAccount>
+=item $SYSTEMUSER =E<gt> C<account>, C<posixAccount>
 
 B<structurel> - définit le type Alialin SYSTEMUSER, représentant un utilisateur non POSIX.
 Ce type sert à déclarer des utilisateurs définit lors de l'intégration. Ce ne sont pas
@@ -96,9 +96,9 @@ libres - à approfondir 20040930 ;
 B<non structurel> - définit le type Aliamin POSTFIXCONF, représentant la
 configuration de postfix dans l'annuaire LDAP ;
 
-=item $MAILSHAREDIR =E<gt> C<mailShareDir>
+=item $MAILSHARE =E<gt> C<mailShareDir>
 
-B<structurel> - définit le type Aliamin MAILSHAREDIR représentant les
+B<structurel> - définit le type Aliamin MAILSHARE représentant les
 répertoires partagés de messagerie ;
 
 =item $GROUPOFNAME =E<gt> C<groupOfNames>
@@ -162,6 +162,26 @@ Cette variable est une référence à une table de hachage dont les clés sont :
 pour l'attribut utilisé dans le DN ;
 
 =item B<node_type> : type de l'entité ;
+
+=item B<domain_id> : indice du tableau C<domainList> indiquant à quel domaine
+OBM se rapporte cette entité ;
+
+=item B<ldap_server> : description du serveur LDAP qui héberge le noeud et son
+sous arbre. Cette clé ne peut-être utilisé qu'au niveau d'une entité de type
+C<branche>. Le serveur est décrit par :
+
+=over 4
+
+=item B<server> : nom ou adresse IP du serveur LDAP a contacter ;
+
+=item B<login> : nom de l'utilisateur système administrateur de cet annuaire ;
+
+=item B<passwd> : mot de passe de l'administrateur ;
+
+=item B<conn> : objet de type C<Net::LDAP> qui est la connexion établie avec le
+serveur.
+
+=back
 
 =item B<data_type> : tableau contenant les différents types de deonnées que l'on
 retrouve sous cette structure. Les types utilisés ici ne doivent pas être des

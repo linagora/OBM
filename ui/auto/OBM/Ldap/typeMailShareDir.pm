@@ -5,11 +5,7 @@ require Exporter;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
-
-
-#
-# Necessaire pour le bon fonctionnement du package
-$debug=1;
+use strict;
 
 
 sub initStruct {
@@ -20,16 +16,16 @@ sub initStruct {
 sub getDbValues {
     my( $parentDn, $domainId ) = @_;
 
-    #
-    # On se connecte a la base
-    my $dbHandler;
-    if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+
+    if( !defined($main::domainList->[$domainId]->{"domain_id"}) ) {
+        &OBM::toolBox::write_log( "Identifiant de domaine non définie", "W" );
         return undef;
     }
 
-    if( defined($main::domainList->[$domainId]->{"domain_id"}) ) {
-        &OBM::toolBox::write_log( "Identifiant de domaine non définie", "WC" );
+    # On se connecte a la base
+    my $dbHandler;
+    if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "W" );
         return undef;
     }
 
@@ -38,6 +34,7 @@ sub getDbValues {
     my $query = "SELECT mailsharedir_name, mailsharedir_description, mailsharedir_email FROM P_MailShareDir WHERE mailsharedir_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requête
+    my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return undef;
@@ -47,6 +44,10 @@ sub getDbValues {
     my $i = 0;
     my @mailShare = ();
     while( my( $mailsharedir_name, $mailsharedir_description, $mailsharedir_email ) = $queryResult->fetchrow_array ) {
+
+        &OBM::toolBox::write_log( "Gestion du repertoire partage : '".$mailsharedir_name."'", "W" );
+
+        # On range les resultats dans la structure de donnees des resultats
         $mailShare[$i]->{"mailsharedir_name"} = $mailsharedir_name;
         $mailShare[$i]->{"mailsharedir_mailbox"} = "+".$mailsharedir_name."@".$main::domainList->[$domainId]->{"domain_name"};
         $mailShare[$i]->{"mailsharedir_description"} = $mailsharedir_description;
@@ -65,7 +66,7 @@ sub getDbValues {
         }
 
         # On ajoute les informations de la structure
-        $mailShare[$i]->{"node_type"} = $MAILSHAREDIR;
+        $mailShare[$i]->{"node_type"} = $MAILSHARE;
         $mailShare[$i]->{"name"} = $mailShare[$i]->{$attributeDef->{$mailShare[$i]->{"node_type"}}->{"dn_value"}};
         $mailShare[$i]->{"domain_id"} = $domainId;
         $mailShare[$i]->{"dn"} = &OBM::ldap::makeDn( $mailShare[$i], $parentDn );
