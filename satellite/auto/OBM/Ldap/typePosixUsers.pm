@@ -7,11 +7,7 @@ use OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::passwd;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
-
-
-#
-# Necessaire pour le bon fonctionnement du package
-$debug=1;
+use strict;
 
 
 sub initStruct {
@@ -23,14 +19,15 @@ sub getDbValues {
     my( $parentDn, $domainId ) = @_;
 
 
-    # On se connecte a la base
-    my $dbHandler;
-    if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+    if( !defined($main::domainList->[$domainId]->{"domain_id"}) ) {
+        &OBM::toolBox::write_log( "Identifiant de domaine non définie", "W" );
         return undef;
     }
 
-    if( !defined($main::domainList->[$domainId]->{"domain_id"}) ) {
+    # On se connecte a la base
+    my $dbHandler;
+    if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "W" );
         return undef;
     }
 
@@ -39,8 +36,9 @@ sub getDbValues {
     my $query = "SELECT userobm_id, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_nomade_perms, userobm_nomade_enable, userobm_nomade_local_copy, userobm_email_nomade, userobm_vacation_enable FROM P_UserObm JOIN MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_archive=0 AND userobm_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requete
+    my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete des utilisateurs : ".$dbHandler->err, "WC" );
+        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete des utilisateurs : ".$dbHandler->err, "W" );
         return undef;
     }
 
@@ -414,7 +412,7 @@ sub updateLdapEntry {
     }
 
     # Le mobile
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_mobile"}, $ldapEntry, "mobile" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_mobile"}, $ldapEntry, "mobile" ) ) {
         $update = 1;
     }
 

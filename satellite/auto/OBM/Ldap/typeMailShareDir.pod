@@ -1,7 +1,7 @@
 =head1 NOM
 
 OBM::Ldap:typeMailShareDir - Définition des fonctions permettant de gérer le type
-'MAILSHAREDIR'
+'MAILSHARE'
 
 =head1 DEPENDANCES
 

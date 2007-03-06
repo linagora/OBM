@@ -4,13 +4,10 @@ require Exporter;
 
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
+use OBM::Parameters::cyrusConf;
 require OBM::passwd;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
-
-
-#
-# Necessaire pour le bon fonctionnement du package
-$debug=1;
+use strict;
 
 
 sub initStruct {
@@ -22,35 +19,33 @@ sub getDbValues {
     my( $parentDn, $domainId ) = @_;
 
 
-    #
     # On se connecte a la base
     my $dbHandler;
     if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "W" );
         return undef;
     }
 
-    #
     # La requete a executer - obtention des informations sur les utilisateurs systeme
     my $query = "SELECT usersystem_login, usersystem_password, usersystem_uid, usersystem_gid, usersystem_homedir, usersystem_shell, usersystem_firstname, usersystem_lastname FROM UserSystem";
     #
     # On execute la requete
+    my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete des utilisateurs systemes : ".$dbHandler->err, "W" );
         return undef;
     }
 
-    #
     # On range les resultats dans la structure de donnees des resultats
     my $i = 0;
     my @users = ();
     while( my( $user_login, $user_password, $user_uid, $user_gid, $user_homedir, $user_shell, $user_firstname, $user_lastname ) = $queryResult->fetchrow_array ) {
-        #
+        # L'administrateur Cyrus ne doit être placé que dans le domaine 0
+        if( ($user_login eq OBM::Parameters::cyrusConf::cyrusAdminLogin) && ($domainId != 0) ) {
+            next;
+        }
+
         # On cree la structure correspondante a l'utilisateur
-        # Cette structure est composee des valuers recuperees dans la base +
-        # la valeur de la racine de l'annuaire + la valeur de
-        # l''organizationalUnit' sous laquelle vont etre placee les
-        # utilisateurs ('users' dans notre cas).
         $users[$i] = {
                     "user_login"=>$user_login,
                     "user_password"=>$user_password,
@@ -60,10 +55,8 @@ sub getDbValues {
                     "user_firstname"=>$user_firstname,
                     "user_homedir"=>$user_homedir,
                     "user_shell"=>$user_shell,
-                    "rootLdap"=>$results{"rootLdap"}
         };
 
-        #
         # On ajoute les informations de la structure
         $users[$i]->{"node_type"} = $SYSTEMUSERS;
         $users[$i]->{"name"} = $users[$i]->{$attributeDef->{$users[$i]->{"node_type"}}->{"dn_value"}};

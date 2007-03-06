@@ -10,13 +10,14 @@
 package OBM::toolBox;
 
 use OBM::Parameters::common;
+use OBM::Parameters::toolBoxConf;
 use OBM::dbUtils;
 use Sys::Syslog;
 use Storable qw(dclone);
 require Exporter;
 
 @ISA = qw(Exporter);
-@EXPORT_function = qw(execRootCmd execCmd write_log makeConfigFile getLastUid getLastGid getGroupUsersMailEnable getGroupUsers getGroupUsersSID makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains cloneStruct);
+@EXPORT_function = qw( write_log makeConfigFile getLastUid getLastGid getGroupUsersMailEnable getGroupUsers getGroupUsersSID makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains cloneStruct);
 @EXPORT = (@EXPORT_function);
 @EXPORT_OK = qw();
 
@@ -24,90 +25,7 @@ require Exporter;
 # Necessaire pour le bon fonctionnement du package
 $debug=1;
 
-#------------------------------------------------------------------------------
-# Cette fonction sert a executer un programme en tant qu'utilisateur 'root', 
-# elle bloque le script qui l'a appellee jusqu'a ce que le programme execute
-# se termine.
-#------------------------------------------------------------------------------
-# Parametres :   le programme a executer.
-#------------------------------------------------------------------------------
-# Cette fonction retourne :  -1 si le programme n'a pas put etre execute.
-#                             $? si tout c'est bien passe.
-#------------------------------------------------------------------------------
-# Remarques :  La sortie standart du programme execute est redirige vers
-#             '/dev/null'.
-#------------------------------------------------------------------------------
-sub execRootCmd
-{
-	local( $cmd ) = @_;
 
-	my $pid;
-
-    if( $pid = fork )
-    {
-        waitpid($pid, 0);
-    }else
-    {
-        exec("/usr/bin/sudo ".$cmd." > /dev/null 2>&1") or return -1;
-    }
-
-    # on retourne la valeur retournee par le programme execute
-    my $retour = $? >> 8;
-    return $retour;
-}
-
-#------------------------------------------------------------------------------
-# Cette fonction permet d'executer une commande. Elle bloque le script qui
-# l'appelle jusqu'a ce que le programme execute se termine.
-#------------------------------------------------------------------------------
-# Parametres :  - cmd : le programme a executer.
-#               - verbose : la sortie standart est redirigee vers /dev/null ou
-#               non. 0->non, 1->redirige
-#------------------------------------------------------------------------------
-# Cette fonction retourne :  -1 si le programme n'a pas put etre execute.
-#                             $? si tout c'est bien passe.
-#------------------------------------------------------------------------------
-# Remarques :  La sortie standart du programme execute est redirige vers
-#             '/dev/null'.
-#------------------------------------------------------------------------------
-sub execCmd
-{
-    local( $cmd, $verbose ) = @_;
-
-    my $pid;
-
-    if( $pid = fork )
-    {
-        waitpid($pid, 0);
-    }else
-    {
-        if( $verbose )
-        {
-            exec( $cmd ) or return -1;
-        }else
-        {
-            exec($cmd." > /dev/null 2>&1") or return -1;
-        }
-    }
-
-    # on retourne la valeur retournee par le programme execute
-    my $retour = $? >> 8;
-    return $retour;
-}
-
-#------------------------------------------------------------------------------
-# Sert a ecrire et fermer un fichier log.
-# ATTENTION : il faut que le fichier de log soit ouvert au prealable !
-#------------------------------------------------------------------------------
-# Parametres :  $text :         texte a ecrire dans le fichier de log, ou
-#								prefixe lors de l'ouverture du log.
-#               $action :       -W : ecrit $text dans le fichier log
-#                               -C : ferme le fichier dez log
-#                               -WC : ecrit $text puis ferme le fichier
-#								-O : ouvre le log
-#------------------------------------------------------------------------------
-# Aucun retour.
-#------------------------------------------------------------------------------
 sub write_log {
     local($text, $action) = @_;
 
@@ -508,29 +426,20 @@ sub getGroupUsersSID
 }
 
 
-#------------------------------------------------------------------------------
-# Cette fonction permet de construire les adresses mails d'une entite à partir
-# de sa liste de prefix et de la liste de domaines.
-#------------------------------------------------------------------------------
-# Parametres :
-#   - mailPrefix : liste des prefixes de la forme 'pref1\r\npref2...' ;
-#   - mailDomain : reference a un tableau de domaines de messagerie
-#   (1 par case).
-#
-# Retour :
-#   reference tableau contenant les adresses mails de l'entite - 1 adresse
-#   par case.
-#------------------------------------------------------------------------------
 sub makeEntityMailAddress {
     my( $mailPrefix, $domainList ) = @_;
     my @mailList;
 
     my @prefixList = split( "\r\n", $mailPrefix );
 
-    for( my $j=0; $j<=$#$domainList; $j++ ) {
-        for( my $i=0; $i<=$#prefixList; $i++ ) {
-            if( $prefixList[$i] ) {
-                push( @mailList, $prefixList[$i]."@".$$domainList[$j] );
+    for( my $j=0; $j<=$#prefixList; $j++ ) {
+        if( exists($domain->{"domain_name"}) && ($domain->{"domain_name"} ne "") ) {
+            push( @mailList, $prefixList[$j]."@".$domain->{"domain_name"} );
+        }
+
+        if( exists($domain->{"domain_alias"}) ) {
+            for( my $i=0; $i<=$#{$domain->{"domain_alias"}}; $i++ ) {
+                push( @mailList, $prefixList[$j]."@".$domain->{"domain_alias"}->[$i] );
             }
         }
     }
@@ -587,7 +496,7 @@ sub getEntityRight {
     #
     # Check parameters
     if( $entityType !~ /^($MAILBOXENTITY|$MAILSHAREENTITY)$/ ) {
-        write_log( "Type d'entite ".$entityType." inconnu.", "W" );
+        write_log( "Type d'entite '".$entityType."' inconnu.", "W" );
         return undef;
     }
 
@@ -878,7 +787,7 @@ sub getMailServerList {
 #------------------------------------------------------------------------------
 sub getDomains {
     my( $dbHandler ) = @_;
-    my @domainList;
+    my $domainList = cloneStruct(OBM::Parameters::toolBoxConf::domainList);
 
     if( !defined($dbHandler) ) {
         write_log( "Connection à la base de donnée incorrect !", "W" );
@@ -887,13 +796,12 @@ sub getDomains {
 
 
     # Création du meta-domaine
-    $domainList[0] = {
-        "meta_domain" => 1,
-        "domain_id" => 0,
-        "domain_label" => "metadomain",
-        "domain_name" => "metadomain",
-        "domain_desc" => "Informations de l'annuaire ne faisant partie d'aucun domaine"
-    };
+    $domainList[0] = cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
+    $domainList[0]->{"meta_domain"} = 1;
+    $domainList[0]->{"domain_id"} = 0;
+    $domainList[0]->{"domain_label"} = "metadomain";
+    $domainList[0]->{"domain_name"} = "metadomain";
+    $domainList[0]->{"domain_desc"} = "Informations de l'annuaire ne faisant partie d'aucun domaine";
 
     my $queryLdapAdmin = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$ldapAdminLogin."'";
 
@@ -906,9 +814,9 @@ sub getDomains {
         }
 
     }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
-        $domainList[$#domainList]->{"ldap_admin_server"} = $ldapServer;
-        $domainList[$#domainList]->{"ldap_admin_login"} = $ldapAdminLogin;
-        $domainList[$#domainList]->{"ldap_admin_passwd"} = $ldapAdminPasswd;
+        $domainList[0]->{"ldap_admin_server"} = $ldapServer;
+        $domainList[0]->{"ldap_admin_login"} = $ldapAdminLogin;
+        $domainList[0]->{"ldap_admin_passwd"} = $ldapAdminPasswd;
 
         $queryLdapAdminResult->finish;
     }
@@ -929,20 +837,16 @@ sub getDomains {
     }
 
     while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias ) = $queryDomainResult->fetchrow_array ) {
-        push( @domainList, {    "meta_domain" => 0,
-                                "domain_id" => $domainId, 
-                                "domain_label" => $domainLabel,
-                                "domain_desc" => $domainDesc,
-                                "domain_name" => $domainName,
-                                "domain_dn" => $domainName
-                           }
-
-        );
+        my $currentDomain = cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
+        $currentDomain->{"meta_domain"} = 0;
+        $currentDomain->{"domain_id"} = $domainId;
+        $currentDomain->{"domain_label"} = $domainLabel;
+        $currentDomain->{"domain_desc"} = $domainDesc;
+        $currentDomain->{"domain_name"} = $domainName;
+        $currentDomain->{"domain_dn"} = $domainName;
 
         if( defined($domainAlias) ) {
-            push( @{$domainList[$#domainList]->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
-        }else {
-            $domainList[$#domainList]->{"domain_alias"} = [];
+            push( @{$currentDomain->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
         }
 
         # On execute la requete concernant l'administrateur LDAP associé
@@ -954,12 +858,14 @@ sub getDomains {
             }
 
         }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
-            $domainList[$#domainList]->{"ldap_admin_server"} = $ldapServer;
-            $domainList[$#domainList]->{"ldap_admin_login"} = $ldapAdminLogin;
-            $domainList[$#domainList]->{"ldap_admin_passwd"} = $ldapAdminPasswd;
+            $currentDomain->{"ldap_admin_server"} = $ldapServer;
+            $currentDomain->{"ldap_admin_login"} = $ldapAdminLogin;
+            $currentDomain->{"ldap_admin_passwd"} = $ldapAdminPasswd;
 
             $queryLdapAdminResult->finish;
         }
+
+        push( @{domainList}, $currentDomain );
     }
 
     return \@domainList;

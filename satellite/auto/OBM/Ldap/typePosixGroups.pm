@@ -5,11 +5,7 @@ require Exporter;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
-
-
-#
-# Necessaire pour le bon fonctionnement du package
-$debug=1;
+use strict;
 
 
 sub initStruct {
@@ -21,15 +17,15 @@ sub getDbValues {
     my( $parentDn, $domainId ) = @_;
 
 
-    #
-    # On se connecte a la base
-    my $dbHandler;
-    if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+    if( !defined($main::domainList->[$domainId]->{"domain_id"}) ) {
+        &OBM::toolBox::write_log( "Identifiant de domaine non définie", "W" );
         return undef;
     }
 
-    if( !defined($main::domainList->[$domainId]->{"domain_id"}) ) {
+    # On se connecte a la base
+    my $dbHandler;
+    if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "W" );
         return undef;
     }
 
@@ -38,6 +34,7 @@ sub getDbValues {
     my $query = "SELECT group_id, group_gid, group_name, group_desc, group_email, group_contacts FROM P_UGroup WHERE group_privacy=0 AND group_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requete
+    my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete des groupes : ".$dbHandler->err, "W" );
         return undef;
@@ -46,7 +43,7 @@ sub getDbValues {
     # On range les resultats dans la structure de donnees des resultats
     my $i = 0;
     my @groups = ();
-    while( ( $group_id, $group_gid, $group_name, $group_desc, $group_email, $group_contacts ) = $queryResult->fetchrow_array ) {
+    while( my( $group_id, $group_gid, $group_name, $group_desc, $group_email, $group_contacts ) = $queryResult->fetchrow_array ) {
 
         &OBM::toolBox::write_log( "Gestion du groupe : '".$group_name."'", "W" );
         
@@ -82,7 +79,7 @@ sub getDbValues {
             my $j = 0;
             for( $j=0; $j<=$#email; $j++ ) {
                 if( $email[$j] ) {
-                    push( @{$results{"$POSIXGROUPS"}->[$i]->{"group_contacts"}}, $email[$j] );
+                    push( @{$groups[$i]->{"group_contacts"}}, $email[$j] );
                 }
             }
         }
