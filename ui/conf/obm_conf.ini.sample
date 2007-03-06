@@ -9,14 +9,11 @@
 ; Information generales
 title = OBM
 
-; Répertoire d'installation d'Aliamin
-path = /opt/aliamin
-
 ; Information sur les bases de données
 host = localhost
 dbtype = MYSQL
 db = obm
-user = aliamin
+user = obm
 ; Le mot de passe DOIT etre entre "
 password = "aliacom"
 
