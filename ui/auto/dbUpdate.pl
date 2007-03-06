@@ -97,7 +97,7 @@ my %parameters;
 getParameter( \%parameters );
 
 SWITCH: {
-    my @dbTable = ( 'EntityRight', 'GroupGroup', 'Host', 'MailServer', 'MailServerNetwork', 'MailShareDir', 'Samba', 'UGroup', 'UserObm', 'UserObmGroup' );
+    my @dbTable = ( 'EntityRight', 'GroupGroup', 'Host', 'MailServer', 'MailServerNetwork', 'MailShare', 'Samba', 'UGroup', 'UserObm', 'UserObmGroup' );
 
     if( exists($parameters{"valid"}) ) {
         applyDbModif( \@dbTable, "valid" );
