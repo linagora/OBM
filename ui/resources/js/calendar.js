@@ -838,7 +838,6 @@ Obm.CalendarQuickForm = new Class({
     this.title.setStyle('display','none');
     this.date.setHTML(date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
    
-    this.form.tf_title.focus();
     this.attendees.setHTML('');
 
   },

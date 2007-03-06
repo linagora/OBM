@@ -2090,17 +2090,14 @@ function run_query_deal_search_parentdeal($deal) {
   $multidomain = sql_multidomain("parentdeal");
 	
   if ($plabel != "") {
-    $where .= "parentdeal_label $like '$plabel%'";
-    $and = "AND";
+    $where .= " AND parentdeal_label $like '$plabel%'";
   }
   if ($parchive != 1) {
-    $where .= " $and parentdeal_archive=0";
-    $and = "AND";
+    $where .= " AND parentdeal_archive=0";
   }
   if (($pmanager != $c_all) && ($pmanager != "")) { 
-     $where .= " $and (parentdeal_technicalmanager_id='$pmanager'
+     $where .= " AND (parentdeal_technicalmanager_id='$pmanager'
 		    OR parentdeal_marketingmanager_id='$pmanager') ";
-    $and = "AND";
   }
 
   $whereq = "WHERE 1=1 $where $multidomain";

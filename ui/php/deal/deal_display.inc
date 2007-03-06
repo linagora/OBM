@@ -1927,8 +1927,12 @@ function dis_deal_dashboard_potential($deal) {
   if (is_array($potentials["market"])) {
     foreach($potentials["market"] as $u_id => $pu) {
       if ($u_id != "0") {
-	$cpt++;
-	$data = "data" . ($cpt % 2);
+        $cpt++;
+        if($cpt % 2 == 0) {
+          $class = "class=\"pair\"";
+        } else {
+          $class = "";
+        }        
 	$amount = number_format($pu["amount"]);
 	$balanced = number_format($pu["amount_balanced"]);
 	$commission = number_format($pu["commission"]);
@@ -1936,13 +1940,13 @@ function dis_deal_dashboard_potential($deal) {
 	$nb_potential = $pu["number"];
 	$user = $pu["name"];
 	$dis_market_pot .= "
-      <tr class=\"$data\">
+      <tr $class>
         <td>$user</td>
-        <td style=\"text-align: center;\">$nb_potential&nbsp;</td>
-        <td style=\"text-align: right;\">$amount&nbsp;</td>
-        <td style=\"text-align: right;\">$balanced&nbsp;</td>
-        <td style=\"text-align: right;\">$commission&nbsp;</td>
-        <td style=\"text-align: right;\">$commission_balanced&nbsp;</td>
+        <td>$nb_potential&nbsp;</td>
+        <td>$amount&nbsp;</td>
+        <td>$balanced&nbsp;</td>
+        <td>$commission&nbsp;</td>
+        <td>$commission_balanced&nbsp;</td>
       </tr>";
       }
     }
@@ -1958,7 +1962,12 @@ function dis_deal_dashboard_potential($deal) {
     foreach($potentials["tech"] as $u_id => $pu) {
       if ($u_id != "0") {
 	$cpt++;
-	$data = "data" . ($cpt % 2);
+        if($cpt % 2 == 0) {
+          $class = "class=\"pair\"";
+        } else {
+          $class = "";
+        }
+
 	$amount = number_format($pu["amount"]);
 	$balanced = number_format($pu["amount_balanced"]);
 	$commission = number_format($pu["commission"]);
@@ -1966,13 +1975,13 @@ function dis_deal_dashboard_potential($deal) {
 	$nb_potential = $pu["number"];
 	$user = $pu["name"];
 	$dis_tech_pot .= "
-      <tr class=\"$data\">
+      <tr $class>
         <td>$user</td>
-        <td style=\"text-align: center;\">$nb_potential&nbsp;</td>
-        <td style=\"text-align: right;\">$amount&nbsp;</td>
-        <td style=\"text-align: right;\">$balanced&nbsp;</td>
-        <td style=\"text-align: right;\">$commission&nbsp;</td>
-        <td style=\"text-align: right;\">$commission_balanced&nbsp;</td>
+        <td>$nb_potential&nbsp;</td>
+        <td>$amount&nbsp;</td>
+        <td>$balanced&nbsp;</td>
+        <td>$commission&nbsp;</td>
+        <td>$commission_balanced&nbsp;</td>
       </tr>";
       }
     }
@@ -1985,44 +1994,52 @@ function dis_deal_dashboard_potential($deal) {
   }
 
   $dis_potential = "
-    <table class=\"resultTable\">
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"resultHead\">$l_marketing_manager</td>
-      <td class=\"resultHead\"># $l_module_deal</td>
-      <td class=\"resultHead\">$l_deal_total</td>
-      <td class=\"resultHead\">$l_deal_balanced</td>
-      <td class=\"resultHead\">$l_commission</td>
-      <td class=\"resultHead\">$l_commission_balanced</td>
+      <th>$l_marketing_manager</th>
+      <th># $l_module_deal</th>
+      <th>$l_deal_total</th>
+      <th>$l_deal_balanced</th>
+      <th>$l_commission</th>
+      <th>$l_commission_balanced</th>
     </tr>
+    </thead>
     $dis_market_pot
-    <tr class=\"data2\">
+    <tfoot>
+    <tr>
       <td>$l_total</td>
-      <td style=\"text-align: center;\">$m_nb_potential&nbsp;</td>
-      <td style=\"text-align: right;\">$m_amount&nbsp;</td>
-      <td style=\"text-align: right;\">$m_balanced&nbsp;</td>
-      <td style=\"text-align: right;\">$m_commission&nbsp;</td>
-      <td style=\"text-align: right;\">$m_commission_balanced&nbsp;</td>
+      <td>$m_nb_potential&nbsp;</td>
+      <td>$m_amount&nbsp;</td>
+      <td>$m_balanced&nbsp;</td>
+      <td>$m_commission&nbsp;</td>
+      <td>$m_commission_balanced&nbsp;</td>
     </tr>
+    </tfoot>
     </table>
     <p />
-    <table class=\"resultTable\">
+    <table class=\"spreadSheet\">
+    <thead>
     <tr>
-      <td class=\"resultHead\">$l_technical_manager</td>
-      <td class=\"resultHead\"># $l_module_deal</td>
-      <td class=\"resultHead\">$l_deal_total</td>
-      <td class=\"resultHead\">$l_deal_balanced</td>
-      <td class=\"resultHead\">$l_commission</td>
-      <td class=\"resultHead\">$l_commission_balanced</td>
+      <th>$l_technical_manager</th>
+      <th># $l_module_deal</th>
+      <th>$l_deal_total</th>
+      <th>$l_deal_balanced</th>
+      <th>$l_commission</th>
+      <th>$l_commission_balanced</th>
     </tr>
+    </thead>
     $dis_tech_pot
-    <tr class=\"data2\">
+    <tfoot>
+    <tr>
       <td>$l_total</td>
-      <td style=\"text-align: center;\">$t_nb_potential&nbsp;</td>
-      <td style=\"text-align: right;\">$t_amount&nbsp;</td>
-      <td style=\"text-align: right;\">$t_balanced&nbsp;</td>
-      <td style=\"text-align: right;\">$t_commission&nbsp;</td>
-      <td style=\"text-align: right;\">$t_commission_balanced&nbsp;</td>
+      <td>$t_nb_potential&nbsp;</td>
+      <td>$t_amount&nbsp;</td>
+      <td>$t_balanced&nbsp;</td>
+      <td>$t_commission&nbsp;</td>
+      <td>$t_commission_balanced&nbsp;</td>
     </tr>
+    </tfoot>
     </table>";
   
   $msg = display_info_msg($l_help_deal_forecast);
@@ -2045,7 +2062,7 @@ function dis_deal_dashboard_year_detail($deal) {
   global $l_total, $l_date, $l_amount_ht, $l_amount_ttc;
   global $l_potential, $l_expected, $l_monthsofyearshort;
   global $l_amount, $l_deal_balanced, $l_commission, $l_commission_balanced;
-  global $l_execute,$ico_prev,$ico_next;
+  global $l_execute,$ico_previous,$ico_next;
 
   $users_id = $deal["manager"];
 
@@ -2080,7 +2097,7 @@ function dis_deal_dashboard_year_detail($deal) {
   for ($month = 1; $month < 13; $month++) {
     $label = $l_monthsofyearshort[$month - 1];
     $dis_row_head .= "
-      <td class=\"resultHead\">$label</td>";
+      <th>$label</th>";
   }
 
   if ((is_array($users_id)) && (count($users_id) > 0)) {
@@ -2118,33 +2135,20 @@ function dis_deal_dashboard_year_detail($deal) {
     $tca = 0;
     $tcb = 0;
 
-    $dis_user_row = "<tr class=\"resultHead\">
-      <td class=\"resultHead\" colspan=\"17\">$u_name</td>
+    $dis_user_row = "<tr>
+      <th colspan=\"17\">$u_name</th>
     </tr>";
-    $dis_amount_row = "<tr class=\"data0\">
+    $dis_amount_row = "<tr class=\"pair\">
       <td>$l_amount</td>";
-    $dis_balanced_row = "<tr class=\"data1\">
+    $dis_balanced_row = "<tr>
       <td>$l_deal_balanced</td>";
-    $dis_commission_row = "<tr class=\"data0\">
+    $dis_commission_row = "<tr class=\"pair\">
       <td>$l_commission</td>";
-    $dis_commission_balanced_row = "<tr class=\"data1\">
+    $dis_commission_balanced_row = "<tr>
       <td>$l_commission_balanced</td>";
 
     // Loop through each cols
     foreach ($cols as $month => $col) {
-
-      // special color for "past", "future" and "no_date" cols
-      if (is_numeric($month)) {
-	$class_am = "data0";
-	$class_ab = "data1";
-	$class_ca = "data0";
-	$class_cb = "data1";
-      } else {
-	$class_am = "data0";
-	$class_ab = "data0";
-	$class_ca = "data0";
-	$class_cb = "data0";
-      }
 
       if (is_array($d["$col"][$u_id])) {
 	$am = $d["$col"][$u_id]["amount"];
@@ -2183,18 +2187,18 @@ function dis_deal_dashboard_year_detail($deal) {
 	}
 
 	$dis_amount_row .= "
-          <td class=\"$class_am\" style=\"text-align: right;\">$dis_am</td>";
+          <td>$dis_am</td>";
 	$dis_balanced_row .= "
-          <td class=\"$class_ab\" style=\"text-align: right;\">$dis_ab</td>";
+          <td>$dis_ab</td>";
 	$dis_commission_row .= "
-          <td class=\"$class_ca\" style=\"text-align: right;\">$dis_ca</td>";
+          <td>$dis_ca</td>";
 	$dis_commission_balanced_row .= "
-          <td class=\"$class_cb\" style=\"text-align: right;\">$dis_cb</td>";
+          <td>$dis_cb</td>";
       } else {
-	$dis_amount_row .= "<td class=\"$class_am\"> </td>";
-	$dis_balanced_row .= "<td class=\"$class_ab\"> </td>";
-	$dis_commission_row .= "<td class=\"$class_ca\"> </td>";
-	$dis_commission_balanced_row .= "<td class=\"$class_cb\"> </td>";
+	$dis_amount_row .= "<td $class_am> </td>";
+	$dis_balanced_row .= "<td $class_ab> </td>";
+	$dis_commission_row .= "<td $class_ca> </td>";
+	$dis_commission_balanced_row .= "<td $class_cb> </td>";
       }
     }
 
@@ -2203,13 +2207,13 @@ function dis_deal_dashboard_year_detail($deal) {
     $dis_tca = number_format($tca, 2, ",", " ");
     $dis_tcb = number_format($tcb, 2, ",", " ");
 
-    $dis_amount_row .= "<td class=\"data2\" style=\"text-align: right;\">$dis_tam</td>
+    $dis_amount_row .= "<td >$dis_tam</td>
       </tr>";
-    $dis_balanced_row .= "<td class=\"data2\" style=\"text-align: right;\">$dis_tab</td>
+    $dis_balanced_row .= "<td >$dis_tab</td>
       </tr>";
-    $dis_commission_row .= "<td class=\"data2\" style=\"text-align: right;\">$dis_tca</td>
+    $dis_commission_row .= "<td >$dis_tca</td>
       </tr>";
-    $dis_commission_balanced_row .= "<td class=\"data2\" style=\"text-align: right;\">$dis_tcb</td>
+    $dis_commission_balanced_row .= "<td >$dis_tcb</td>
       </tr>";
 
     $dis_year_detail .= "
@@ -2227,19 +2231,6 @@ function dis_deal_dashboard_year_detail($deal) {
   $tcb = 0;
   // Loop through each cols
   foreach ($cols as $month => $col) {
-
-    // special color for "past", "future" and "no_date" cols
-    if (is_numeric($month)) {
-      $class_am = "data2";
-      $class_ab = "data2";
-      $class_ca = "data2";
-      $class_cb = "data2";
-    } else {
-      $class_am = "data0";
-      $class_ab = "data0";
-      $class_ca = "data0";
-      $class_cb = "data0";
-    }
 
     $am = $d[$col][0]["amount"];
     $ab = $d[$col][0]["amount_balanced"];
@@ -2283,26 +2274,26 @@ function dis_deal_dashboard_year_detail($deal) {
     }
 
     $dis_total_row .= "
-      <td class=\"$class_am\">$dis_am</td>";
+      <td>$dis_am</td>";
     $dis_total_balanced_row .= "
-      <td class=\"$class_ab\">$dis_ab</td>";
+      <td>$dis_ab</td>";
     $dis_total_commission_row .= "
-      <td class=\"$class_ca\">$dis_ca</td>";
+      <td>$dis_ca</td>";
     $dis_total_commission_balanced_row .= "
-      <td class=\"$class_cb\">$dis_cb</td>";
+      <td>$dis_cb</td>";
   }
   $dis_tam = number_format($tam, 2, ",", " ");
   $dis_tab = number_format($tab, 2, ",", " ");
   $dis_tca = number_format($tca, 2, ",", " ");
   $dis_tcb = number_format($tcb, 2, ",", " ");
   $dis_total_row .= "
-      <td class=\"data2\">&nbsp;$dis_tam</td>";
+      <td>&nbsp;$dis_tam</td>";
   $dis_total_balanced_row .= "
-      <td class=\"data2\">&nbsp;$dis_tab</td>";
+      <td>&nbsp;$dis_tab</td>";
   $dis_total_commission_row .= "
-      <td class=\"data2\">&nbsp;$dis_tca</td>";
+      <td>&nbsp;$dis_tca</td>";
   $dis_total_commission_balanced_row .= "
-      <td class=\"data2\">&nbsp;$dis_tcb</td>";
+      <td>&nbsp;$dis_tcb</td>";
 
   // Artichow Chart
   for ($month = 1; $month < 13; $month++) {
@@ -2333,71 +2324,68 @@ function dis_deal_dashboard_year_detail($deal) {
 
   $block = "
     <form method=\"post\" name=\"f_search\" action=\"$url_form\">
-
-    <div class=\"search\">
-      <div class=\"searchLabel\">
-        <a href=\"javascript: return false;\"
-          onclick=\"yearfield=window.document.getElementById('year');
+    <fieldset class=\"detail\">
+    <legend>
+      <a href=\"javascript: return false;\"
+          onclick=\"yearfield=\$('year');
                     newyear=Number(yearfield.innerHTML)-1;
                     yearfield.innerHTML=newyear;
                     document.forms.f_search.year.value=newyear;
                     return false;\">
-        <img border=\"0\" src=\"$ico_prev\" alt=\"\" /></a>
-      </div>
-      <div class=\"searchLabel\" id=\"year\">$year</div>
-      <div class=\"searchLabel\">
-        <a href=\"javascript: return false;\"
-          onclick=\"yearfield=window.document.getElementById('year');
+      <img src=\"$ico_previous\" alt=\"\" /></a>
+        <span id=\"year\">$year</span>
+      <a href=\"javascript: return false;\"
+          onclick=\"yearfield=\$('year');
                     newyear=Number(yearfield.innerHTML)+1;
                     yearfield.innerHTML=newyear;
                     document.forms.f_search.year.value=newyear;
                     return false;\">
-        <img border=\"0\" src=\"$ico_next\" alt=\"\" /></a>
-      </div>
-
-      <div class=\"detailText\">$block_tt</div>
-      <div class=\"searchLabel\">&nbsp;<br>
+        <img src=\"$ico_next\" alt=\"\" /></a>
+      </legend>
+      $block_tt
+      </fieldset>
+      <fieldset class=\"buttons\"
         <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
         <input type=\"hidden\" name=\"year\" value=\"$year\" />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
         <input name=\"dash_view\" id=\"dash_view\" type=\"hidden\" value=\"year_detail\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
-      </div>
-
-      <div class=\"searchEnd\"></div>
-
-    </div>
+      </fieldset>
     </form>
 
-    <div class=\"detailHead\">$l_potential - $l_date $l_expected</div>
+    <h1>$l_potential - $l_date $l_expected</h1>
 
-    <table class=\"resultTable\">
+    <table class=\"spreadSheet\">
+    <colgroup span=\"16\" />
+    <colgroup class=\"highlight\" />
+    <thead>
     <tr>
-      <td class=\"resultHead\"> </td>
-      <td class=\"resultHead\"> ? </td>
-      <td class=\"resultHead\"> < </td>
+      <th> </th>
+      <th> ? </th>
+      <th> &lt; </th>
       $dis_row_head
-      <td class=\"resultHead\"> > </td>
-      <td class=\"resultHead\" style=\"text-align: center;\">$l_total $year</td>
+      <th> &gt; </th>
+      <th>$l_total $year</th>
     </tr>
+    </thead>
     $dis_year_detail
     <tr>
-      <td colspan=\"17\" class=\"resultHead\" style=\"text-align: center;\">----- $l_total -----</td>
+      <th colspan=\"17\">----- $l_total -----</th>
     </tr>
-    <tr class=\"data2\" style=\"text-align: right;\">
-      <td style=\"text-align: left;\">$l_total</td>
+    <tr class=\"highlight\">
+      <td>$l_total</td>
       $dis_total_row
     </tr>
-    <tr class=\"data2\" style=\"text-align: right;\">
-      <td style=\"text-align: left;\">$l_deal_balanced</td>
+    <tr class=\"highlight\">
+      <td>$l_deal_balanced</td>
       $dis_total_balanced_row
     </tr>
-    <tr class=\"data2\" style=\"text-align: right;\">
-      <td style=\"text-align: left;\">$l_commission</td>
+    <tr class=\"highlight\">
+      <td>$l_commission</td>
       $dis_total_commission_row
     </tr>
-    <tr class=\"data2\" style=\"text-align: right;\">
-      <td style=\"text-align: left;\">$l_commission_balanced</td>
+    <tr class=\"highlight\">
+      <td>$l_commission_balanced</td>
       $dis_total_commission_balanced_row
     </tr>
     </table>
@@ -2590,7 +2578,7 @@ function html_deal_admin_form($kind_q, $status_q) {
   </div>  
 
   <form id=\"form_kind_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  onsubmit=\"return check_category(this.tf_kind_label,'$jslabel')\">
   <table>
   <thead>
   <tr>
@@ -2653,7 +2641,7 @@ function html_deal_admin_form($kind_q, $status_q) {
   </div>  
 
   <form id=\"form_status_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  onsubmit=\"return check_category(this.tf_status_label,'$jslabel')\">
   <table>
   <thead>
   <tr>

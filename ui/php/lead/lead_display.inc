@@ -467,7 +467,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"$ico_company\" alt=\"\" /></a>
-      <input type=\"text\" size=\"32\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
+      <input type=\"text\" size=\"30\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 
   // User comment select construction
   $sel_usercomment = "<select name=\"sel_usercomment\">";
