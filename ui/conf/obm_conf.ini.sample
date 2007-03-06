@@ -29,20 +29,11 @@ aliasLdap = true
 ; Aliamin fonctionne en mode sécurinet (true|false)
 securinet = false
 
-; Les '.' sont autorisés dans les logins et le nom des répertoires partagés
-; Si Aliamin fonctionne avec la messagerie (Cyrus), il faut positionner
-; 'unixhierarchysep=true' dans le imapd.conf
-; true : les '.' sont acceptés ; false : les '.' sont interdits
-loginDotsEnable = false
-
 [automate]
 ; Parametrage specifique a l'automate
 
 ; Faut-il executer les hooks
 enableHook = false
-
-; Adresse du serveur hebergeant les repertoires partages
-shareDirServer = localhost
 
 ; Adresse du serveur LDAP
 ldapServer = localhost

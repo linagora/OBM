@@ -147,7 +147,7 @@ INSERT INTO MailServerNetwork (mailservernetwork_host_id, mailservernetwork_ip) 
 DELETE FROM MailShare;
 
 -- Appartenant à tous les domaines
-INSERT INTO MailShare (mailshare_domain_id, mailshare_name, mailshare_description, mailshare_email) VALUES (0, 'mailShare00', 'Répertoire partagé de test 00', 'mailshare00');
+INSERT INTO MailShare (mailshare_domain_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'mailShare00', 'Répertoire partagé de test 00, appartenant au domaine 1', 'mailshare00');
 
 -- Appartenant au domaine 1
-INSERT INTO MailShare (mailshare_domain_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'mailShare01', 'Répertoire partagé de test 01, appartenant au domaine 1', 'mailshare01');
+INSERT INTO MailShare (mailshare_domain_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 2'), 'mailShare01', 'Répertoire partagé de test 01, appartenant au domaine 2', 'mailshare01');

@@ -1,4 +1,4 @@
-package OBM::Ldap::typeMailShareDir;
+package OBM::Ldap::typeMailShare;
 
 require Exporter;
 
@@ -31,7 +31,7 @@ sub getDbValues {
 
     # La requete a executer - obtention des informations sur les repertoires
     # partages de la messagerie
-    my $query = "SELECT mailsharedir_name, mailsharedir_description, mailsharedir_email FROM P_MailShareDir WHERE mailsharedir_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
+    my $query = "SELECT mailshare_name, mailshare_description, mailshare_email FROM P_MailShare WHERE mailshare_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requête
     my $queryResult;
@@ -43,25 +43,25 @@ sub getDbValues {
     # On range les resultats dans la structure de données
     my $i = 0;
     my @mailShare = ();
-    while( my( $mailsharedir_name, $mailsharedir_description, $mailsharedir_email ) = $queryResult->fetchrow_array ) {
+    while( my( $mailshare_name, $mailshare_description, $mailshare_email ) = $queryResult->fetchrow_array ) {
 
-        &OBM::toolBox::write_log( "Gestion du repertoire partage : '".$mailsharedir_name."'", "W" );
+        &OBM::toolBox::write_log( "Gestion du repertoire partage : '".$mailshare_name."'", "W" );
 
         # On range les resultats dans la structure de donnees des resultats
-        $mailShare[$i]->{"mailsharedir_name"} = $mailsharedir_name;
-        $mailShare[$i]->{"mailsharedir_mailbox"} = "+".$mailsharedir_name."@".$main::domainList->[$domainId]->{"domain_name"};
-        $mailShare[$i]->{"mailsharedir_description"} = $mailsharedir_description;
+        $mailShare[$i]->{"mailshare_name"} = $mailshare_name;
+        $mailShare[$i]->{"mailshare_mailbox"} = "+".$mailshare_name."@".$main::domainList->[$domainId]->{"domain_name"};
+        $mailShare[$i]->{"mailshare_description"} = $mailshare_description;
 
-        if( $mailsharedir_email ) {
-            $mailShare[$i]->{"mailsharedir_mailperms"} = 1;
-            push( @{$mailShare[$i]->{"mailsharedir_mail"}}, $mailsharedir_email."@".$main::domainList->[$domainId]->{"domain_name"} );
+        if( $mailshare_email ) {
+            $mailShare[$i]->{"mailshare_mailperms"} = 1;
+            push( @{$mailShare[$i]->{"mailshare_mail"}}, $mailshare_email."@".$main::domainList->[$domainId]->{"domain_name"} );
 
             for( my $j=0; $j<=$#{$main::domainList->[$domainId]->{"domain_alias"}}; $j++ ) {
-                push( @{$mailShare[$i]->{"mailsharedir_mail"}}, $mailsharedir_email."@".$main::domainList->[$domainId]->{"domain_alias"}->[$j] );
+                push( @{$mailShare[$i]->{"mailshare_mail"}}, $mailshare_email."@".$main::domainList->[$domainId]->{"domain_alias"}->[$j] );
             }
 
         }else {
-            $mailShare[$i]->{"mailsharedir_mailperms"} = 0;
+            $mailShare[$i]->{"mailshare_mailperms"} = 0;
 
         }
 
@@ -89,28 +89,28 @@ sub createLdapEntry {
     my $type = $entry->{"node_type"};
 
     # Les parametres necessaires
-    if( $entry->{"mailsharedir_name"} ) {
+    if( $entry->{"mailshare_name"} ) {
         $ldapEntry->add(
             objectClass => $attributeDef->{$type}->{"objectclass"},
-            cn => $entry->{"mailsharedir_name"},
-            mailBox => $entry->{"mailsharedir_mailbox"}
+            cn => $entry->{"mailshare_name"},
+            mailBox => $entry->{"mailshare_mailbox"}
         );
 
     }else {
         return 0;
     }
 
-    if( $entry->{"mailsharedir_description"} ) {
-        $ldapEntry->add( description => to_utf8({ -string => $entry->{"mailsharedir_description"}, -charset => $defaultCharSet }) );
+    if( $entry->{"mailshare_description"} ) {
+        $ldapEntry->add( description => to_utf8({ -string => $entry->{"mailshare_description"}, -charset => $defaultCharSet }) );
     }
 
     # Les adresses mails
-    if( $entry->{"mailsharedir_mail"} ) {
-        $ldapEntry->add( mail => $entry->{"mailsharedir_mail"} );
+    if( $entry->{"mailshare_mail"} ) {
+        $ldapEntry->add( mail => $entry->{"mailshare_mail"} );
     }
 
     # L'acces mail
-    if( $entry->{"mailsharedir_mailperms"} ) {
+    if( $entry->{"mailshare_mailperms"} ) {
         $ldapEntry->add( mailAccess => "PERMIT" );
     }else {
         $ldapEntry->add( mailAccess => "REJECT" );
@@ -126,25 +126,25 @@ sub updateLdapEntry {
     my $update = 0;
 
     # Le nom de la BAL
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailsharedir_mailbox"}, $ldapEntry, "mailbox" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailshare_mailbox"}, $ldapEntry, "mailbox" ) ) {
         $update = 1;
     }
 
     # La description
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailsharedir_description"}, $ldapEntry, "description" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailshare_description"}, $ldapEntry, "description" ) ) {
         $update = 1;
     }
 
     # Le cas des alias mails
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"mailsharedir_mail"}, $ldapEntry, "mail" ) ) {
+    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"mailshare_mail"}, $ldapEntry, "mail" ) ) {
         $update = 1;
     }
 
     # L'acces au mail
-    if( $entry->{"mailsharedir_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
+    if( $entry->{"mailshare_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
         $update = 1;
 
-    }elsif( !$entry->{"mailsharedir_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
+    }elsif( !$entry->{"mailshare_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
         $update = 1;
 
     }
