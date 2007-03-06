@@ -24,50 +24,41 @@ use FindBin qw($Bin);
 @EXPORT = (@EXPORT_const, @EXPORT_db, @EXPORT_files, @EXPORT_command, @EXPORT_regexp, @EXPORT_dir);
 @EXPORT_OK = qw();
 
-#
 # Necessaire pour le bon fonctionnement du package
 $debug=1;
 
-#
 # Lecture du fichier ini
 $cfgFile = Config::IniFiles->new( -file => $Bin."/../conf/obm_conf.ini" );
 
-#
 # Initialisation du moteur de random
 # srand( time ^ $$ ^ unpack "%L*", `ps auwx | gzip` );
 
-#
 # definition du niveau de log
 $facility_log = "local1";
 
-#
 # Fonctionne-t-on enmode Securinet
 $securinetMode = 0;
 if( $cfgFile->val( 'global', 'securinet' ) eq "true" ) {
     $securinetMode = 1;
 }
 
-#
 # racine relative pour les scripts Perl
-$racineAliamin = $cfgFile->val( 'global', 'path' );
+$racineAliamin = $Bin."/..";
 if( !($racineAliamin =~ /\/$/) ) {
     $racineAliamin .= "/";
 }
 
-#
 # Definition des bases de donnees
 $userDb = $cfgFile->val( 'global', 'user' );
 $cfgFile->val( 'global', 'password' ) =~ /^"(.*)"$/;
 $userPasswd = $1;
 
-#
 # La base de travail
 #
 # La base des mises à jours
 $dbName = $cfgFile->val( 'global', 'db' );
 $db = "dbi:".lc( $cfgFile->val( 'global', 'dbtype' )).":database=$dbName;host=".$cfgFile->val( 'global', 'host' );
 
-#
 # Y'a-t-il des operations specifiques a l'installation - utilisation du hook
 # dans le script 'ldapModifBase.pl'
 if( $cfgFile->val( 'automate', 'enableHook' ) eq "true" ) {
@@ -76,47 +67,36 @@ if( $cfgFile->val( 'automate', 'enableHook' ) eq "true" ) {
     $enableHook = 0;
 }
 
-#
 # Le serveur LDAP
 $ldapServer = $cfgFile->val( 'automate', 'ldapServer' );
-#
 # Le login de l'administrateur LDAP
 $ldapAdminLogin = "ldapadmin";
 
-#
 # Les serveurs Samba
 $sambaSrvHome = $cfgFile->val( 'automate', 'sambaHomeServer' );
 
-#
 # Le repertoire pere des repertoires personnels
 # Ne pas mettre le '/' de la fin du chemin
 $baseHomeDir = "/home";
 
-#
 # Definition des fichiers modeles
 #
 # Le repertoire contenant les modeles
 $templateAliamin = $racineAliamin . "template/";
-#
 # Messagerie :
 $templatePostfixAliases = $templateAliamin . "templatePostfixAliases";
-#
 # LDAP :
 $templateLdapDatabase = $templateAliamin . "templateLdapDatabase";  # fichier ldif
 
 # Squid :
 $templateSquidConf = $templateAliamin . "templateSquidConf";
-#
 
-#
 # Definitions des fichiers temporaires.
 #
 # Le repertoire temporaire
 $tmpAliamin = "/tmp/";
-#
 # Messagerie :
 $tmpPostfixAliases = $tmpAliamin . "aliases";
-#
 # LDAP :
 $tmpLdapDatabase = $tmpAliamin . "ldapDatabase.ldif";
 
@@ -125,7 +105,6 @@ $tmpSquidConf = $tmpAliamin . "squid.conf";
 $tmpSquidUserURLList = $tmpAliamin . "UserURLList";
 $tmpSquidHostURLList = $tmpAliamin . "HostURLList";
 
-#
 # Definition des fichiers correspondants aux fichiers modeles.
 #
 # Messagerie :
@@ -138,7 +117,6 @@ $aliaminSlapdRep = "/var/lib/ldap"; # Le repertoire contenant les fichier de l'a
 $aliaminSlapdRepNew = "/var/lib/ldap-new";  # Le repertoire des fichiers contenant le nouvel annuaire
 #
 # Squid
-#
 $squidAuthenticateProgram = "/usr/lib/squid/ldap_auth";
 $squidConf = "/etc/squid/squid.conf";
 $squidUserURLList = "/var/squid/UserURLList";
