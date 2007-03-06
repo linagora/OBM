@@ -1,6 +1,6 @@
 =head1 NOM
 
-OBM::Ldap:typeMailShareDir - Définition des fonctions permettant de gérer le type
+OBM::Ldap:typeMailShare- Définition des fonctions permettant de gérer le type
 'MAILSHARE'
 
 =head1 DEPENDANCES
@@ -11,10 +11,10 @@ OBM::Ldap:typeMailShareDir - Définition des fonctions permettant de gérer le t
 
 =head1 DESCRIPTION
 
-    use OBM::Ldap::typeMailShareDir;
+    use OBM::Ldap::typeMailShare;
     
 Ce paquet implémente les fonctions de manipulations du type de données
-'MAILSHAREDIR'.
+'MAILSHARE'.
 
 Ce paquet défini les fonctions :
 

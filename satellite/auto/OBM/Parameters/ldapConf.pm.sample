@@ -189,22 +189,22 @@ $attributeDef = {
         structural => 1,
         is_branch => 0,
         dn_prefix => "cn",
-        dn_value => "mailsharedir_name",
+        dn_value => "mailshare_name",
         objectclass => [ "obmMailShare" ],
         get_db_value => sub {
             my( $parentdn, $domainId ) = @_;
-            require OBM::Ldap::typeMailShareDir;
-            return OBM::Ldap::typeMailShareDir::getDbValues( $parentdn, $domainId );
+            require OBM::Ldap::typeMailShare;
+            return OBM::Ldap::typeMailShare::getDbValues( $parentdn, $domainId );
         },
         create_ldap => sub {
             my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeMailShareDir;
-            return OBM::Ldap::typeMailShareDir::createLdapEntry( $entry, $ldapEntry );
+            require OBM::Ldap::typeMailShare;
+            return OBM::Ldap::typeMailShare::createLdapEntry( $entry, $ldapEntry );
         },
         update_ldap => sub {
             my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeMailShareDir;
-            return OBM::Ldap::typeMailShareDir::updateLdapEntry( $entry, $ldapEntry );
+            require OBM::Ldap::typeMailShare;
+            return OBM::Ldap::typeMailShare::updateLdapEntry( $entry, $ldapEntry );
         }
     },
 
@@ -308,7 +308,7 @@ $ldapStruct->{"template"}->[0]->{"branch"}->[2] = {
 # Banche contenant la déclaration des répertoires partagés
 $ldapStruct->{"template"}->[0]->{"branch"}->[3] = {
     dn => "",
-    name => "mailShareDir",
+    name => "mailShare",
     node_type => "$NODE",
     description => "Share Directory",
     data_type => [ $MAILSHARE ],

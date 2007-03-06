@@ -96,7 +96,7 @@ libres - à approfondir 20040930 ;
 B<non structurel> - définit le type Aliamin POSTFIXCONF, représentant la
 configuration de postfix dans l'annuaire LDAP ;
 
-=item $MAILSHARE =E<gt> C<mailShareDir>
+=item $MAILSHARE =E<gt> C<mailShare>
 
 B<structurel> - définit le type Aliamin MAILSHARE représentant les
 répertoires partagés de messagerie ;
