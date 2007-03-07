@@ -17,13 +17,34 @@ use Storable qw(dclone);
 require Exporter;
 
 @ISA = qw(Exporter);
-@EXPORT_function = qw( write_log makeConfigFile getLastUid getLastGid getGroupUsersMailEnable getGroupUsers getGroupUsersSID makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains cloneStruct);
+@EXPORT_function = qw( exec_cmd write_log makeConfigFile getLastUid getLastGid getGroupUsersMailEnable getGroupUsers getGroupUsersSID makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains cloneStruct);
 @EXPORT = (@EXPORT_function);
 @EXPORT_OK = qw();
 
 #
 # Necessaire pour le bon fonctionnement du package
 $debug=1;
+
+
+sub execCmd {
+    local( $cmd, $verbose ) = @_;
+
+    my $pid;
+
+    if( $pid = fork ) {
+        waitpid($pid, 0);
+    }else {
+        if( $verbose ) {
+            exec( $cmd ) or return -1;
+        }else {
+            exec($cmd." > /dev/null 2>&1") or return -1;
+        }
+    }
+
+    # on retourne la valeur retournee par le programme execute
+    my $retour = $? >> 8;
+    return $retour;
+}
 
 
 sub write_log {
@@ -427,7 +448,7 @@ sub getGroupUsersSID
 
 
 sub makeEntityMailAddress {
-    my( $mailPrefix, $domainList ) = @_;
+    my( $mailPrefix, $domain ) = @_;
     my @mailList;
 
     my @prefixList = split( "\r\n", $mailPrefix );
