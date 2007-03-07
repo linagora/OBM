@@ -30,7 +30,8 @@ function display_page(&$display) {
 " .
       $display["title"] .
       $display["msg"] .
-      "<div id=\"mainContent\">".
+      "<div id=\"mainContent\">
+      &nbsp;".
       $display["detail"] . "
       </div>
       </div>
@@ -44,7 +45,7 @@ function display_page(&$display) {
     echo $display["head"] . 
       $display["title"] .
       $display["msg"] . 
-      "<div id=\"mainContent\">".
+      "<div id=\"mainContent\">&nbsp;".
       $display["search"] .
       $display["detail"]." 
        <p class=\"LC\" />
@@ -81,7 +82,7 @@ function display_page(&$display) {
     $display[msg]" ;
     if($display["search"] != "" || $display["detail"] != "") {
       echo  
-      "<div id=\"mainContent\">".
+      "<div id=\"mainContent\">&nbsp;".
       $display["search"] .
       $display["detail"] . "
       <p class=\"LC\" />

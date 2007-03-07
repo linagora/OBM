@@ -397,7 +397,6 @@ function dis_statistic_contact_date_evolution_graph($stats) {
   global $obminclude;
 
   require_once "$obminclude/Artichow/LinePlot.class.php";
-
   if (count($stats["data"]) > 0) {
     $graph = new Graph(600, 400);
     $graph->setAntiAliasing(TRUE);

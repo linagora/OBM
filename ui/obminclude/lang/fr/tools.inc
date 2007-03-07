@@ -9,22 +9,22 @@
 
 $l_tools = "Outils d'administration";
 
-$l_upd = "Mise Ã  jour de la configuration du systÃ¨me";
-$l_upd_not_allowed = "Le systÃ¨me est en cours de configuration, veuillez patienter quelques secondes avant de sÃ©lectionner de nouveau l'outil de modification du systÃ¨me...";
-$l_upd_not_needed = "La configuration du systÃ¨me est <b>Ã  jour</b>";
-$l_upd_needed = "La configuration du systÃ¨me a Ã©tÃ© modifiÃ©e";
-$l_upd_run = "Prendre en compte la nouvelle configuration du systÃ¨me";
-$l_upd_cancel = "Annuler les modifications effectuÃ©es";
-$l_upd_ok = "La configuration du systÃ¨me a bien Ã©tÃ© prise en compte";
-$l_upd_error = "La configuration du systÃ¨me a Ã©chouÃ© !";
-$l_upd_cancel_ok = "L'annulation des modifications du systÃ¨me a bien Ã©tÃ© prise en compte";
-$l_upd_cancel_error = "L'annulation des modifications du systÃ¨me a Ã©chouÃ© !";
+$l_upd = "Mise à jour de la configuration du système";
+$l_upd_not_allowed = "Le système est en cours de configuration, veuillez patienter quelques secondes avant de sélectionner de nouveau l'outil de modification du système...";
+$l_upd_not_needed = "La configuration du système est <b>à jour</b>";
+$l_upd_needed = "La configuration du système a été modifiée";
+$l_upd_run = "Prendre en compte la nouvelle configuration du système";
+$l_upd_cancel = "Annuler les modifications effectuées";
+$l_upd_ok = "La configuration du système a bien été prise en compte";
+$l_upd_error = "La configuration du système a échoué !";
+$l_upd_cancel_ok = "L'annulation des modifications du système a bien été prise en compte";
+$l_upd_cancel_error = "L'annulation des modifications du système a échoué !";
 
-$l_halt = "ArrÃªt du systÃ¨me";
-$l_halt_aliamin = "ArrÃ©ter le systÃ¨me";
+$l_halt = "Arrêt du système";
+$l_halt_aliamin = "Arréter le système";
 
-$l_remote_access = "Prise de contrÃ´le Ã  distance";
-$l_remote_allowed = "La prise de contrÃ´le Ã  distance est <em class=\"messageOk\">autorisÃ©e</em>";
-$l_remote_not_allowed = "La prise de contrÃ´le Ã  distance est <em class=\"messageError\">interdite</em>";
-$l_remote_allow = "Autoriser la prise de contrÃ´le Ã  distance";
-$l_remote_not_allow = "Interdire la prise de contrÃ´le Ã  distance";
+$l_remote_access = "Prise de contrôle à distance";
+$l_remote_allowed = "La prise de contrôle à distance est <em class=\"messageOk\">autorisée</em>";
+$l_remote_not_allowed = "La prise de contrôle à distance est <em class=\"messageError\">interdite</em>";
+$l_remote_allow = "Autoriser la prise de contrôle à distance";
+$l_remote_not_allow = "Interdire la prise de contrôle à distance";

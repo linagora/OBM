@@ -78,7 +78,7 @@ if ($action == "index" || $action == "") {
   } else {
     $obm_q = run_query_statistic_get_list($params["list_id"]);
     $ext_list_function = "ext_list_get_${entity}_ids";
-    $ent_q = $ext_list_function($params["list_id"]);
+    $ent_q = @$ext_list_function($params["list_id"]);
     $cat_q = run_query_statistic_selected_entity_per_country_per_cat($ent_q, $entity, $category);
     $nb_ent = $ent_q->nf();
   }
@@ -111,7 +111,6 @@ function get_statistic_params() {
   
   // Get global params
   $params = get_global_params();
-  
   return $params;
 }
 
@@ -146,7 +145,7 @@ function get_statistic_action() {
 					
   $actions["statistic"]["stats_category_export"] = array (
     'Name'     => $l_header_export,
-    'Url'      => "$path/statistic/statistic_index.php?action=stats_category_export&amp;popup=1&amp;sel_list=".$params["list_id"]."",
+    'Url'      => "$path/statistic/statistic_index.php?action=stats_category_export&amp;category=$params[category]&amp;popup=1&amp;list_id=$params[list_id]&amp;entity=$params[entity]",
     'Right'    => $cright_read,
     'Popup'    => 1,
     'Target'   => $l_statistic,

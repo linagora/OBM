@@ -10,19 +10,19 @@
 // consultation labels
 $l_vacation = "Message d'absence" ;
 $l_vacation_enabled = "Le message d'absence est " ;
-//$l_enabled = "activÃ©" ;
-//$l_disabled = "dÃ©sactivÃ©" ;
+//$l_enabled = "activé" ;
+//$l_disabled = "désactivé" ;
 $l_vacation_message = "Message d'absence";
 $l_enable_vacation = "Activer mon message d'absence" ;
 $l_vacation_text="Texte du message d'absence";
 
 // forms and buttons labels
-$l_update = "Mettre Ã  jour";
+$l_update = "Mettre à jour";
 
 // errors 
-$l_empty_message = "Le message d'absence ne peut Ãªtre vide quand l'envoi est activÃ© !" ;
-$l_update_error = "Une erreur est survenue pendant la mise Ã  jour" ;
-$l_sieve_login_failed = "la connexion au serveur de messagerie a Ã©chouÃ©.";
-$l_vacation_not_allowed = "Le message d'absence nÃ©cessite d'avoir le droit d'utiliser la messagerie !";
+$l_empty_message = "Le message d'absence ne peut être vide quand l'envoi est activé !" ;
+$l_update_error = "Une erreur est survenue pendant la mise à jour" ;
+$l_sieve_login_failed = "la connexion au serveur de messagerie a échoué.";
+$l_vacation_not_allowed = "Le message d'absence nécessite d'avoir le droit d'utiliser la messagerie !";
 // successes
-$l_update_ok= "La mise Ã  jour a Ã©tÃ© effectuÃ©e avec succÃ¨s" ;
+$l_update_ok= "La mise à jour a été effectuée avec succès" ;

@@ -43,7 +43,7 @@
     </tr>
   </table>
 </div>
-$block_userdata;
+$block_userdata
 
 <div class="detail extra">
 

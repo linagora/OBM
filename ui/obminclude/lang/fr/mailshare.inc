@@ -8,33 +8,33 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_creator = "CrÃ©ateur";
-$l_date_creation = "CrÃ©ation";
-$l_updater = "Mise Ã  jour par" ;
-$l_date_last_update = "Mise Ã  jour";
+$l_creator = "Créateur";
+$l_date_creation = "Création";
+$l_updater = "Mise à jour par" ;
+$l_date_last_update = "Mise à jour";
 
 // Labels et textes
 $l_mailshare_display = "Options d'affichage des listes de partages mail";
 
 // Messages
-$l_no_display = "Renseigner les critÃ¨res souhaitÃ©s et cliquer sur < Chercher > pour obtenir les partages mail correspondants.";
-$l_found = "partages mail trouvÃ©s.";
-$l_no_found = "Aucun partage mail ne correspond Ã  ces critÃ¨res.";
+$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les partages mail correspondants.";
+$l_found = "partages mail trouvés.";
+$l_no_found = "Aucun partage mail ne correspond à ces critères.";
 
-$l_can_delete = "Le partage mail peut Ãªtre supprimÃ©";
-$l_cant_delete = "Le partage mail ne peut Ãªtre supprimÃ© !";
-$l_can_delete = "Le partage mail peut Ãªtre supprimÃ©.";
-$l_name_error = "Le nom doit Ãªtre correctement renseignÃ© ! Il ne doit pas Ãªtre vide ou contenir de caractÃ¨res spÃ©ciaux";
-$l_name_in_use = "Le nom est dÃ©jÃ  attribuÃ© Ã  un autre rÃ©pertoire partagÃ© !";
+$l_can_delete = "Le partage mail peut être supprimé";
+$l_cant_delete = "Le partage mail ne peut être supprimé !";
+$l_can_delete = "Le partage mail peut être supprimé.";
+$l_name_error = "Le nom doit être correctement renseigné ! Il ne doit pas être vide ou contenir de caractères spéciaux";
+$l_name_in_use = "Le nom est déjà attribué à un autre répertoire partagé !";
 
-$l_err_mailshare_name_empty = "Le nom du partage mail doit Ãªtre renseignÃ©";
-$l_err_mailshare_name_exist = "Le nom du partage mail est dÃ©jÃ  utilisÃ©";
+$l_err_mailshare_name_empty = "Le nom du partage mail doit être renseigné";
+$l_err_mailshare_name_exist = "Le nom du partage mail est déjà utilisé";
 $l_err_mailshare_quota = "Le quota du partage mail est invalide !";
 $l_err_mailshare_email = "L'adresse E-mail saisie n'est pas valide !";
-$l_err_mailshare_email_empty = "L'adresse E-mail doit Ãªtre saisie !";
-$l_err_mailshare_email_exist = "L'adresse E-mail saisie est dÃ©jÃ  utilisÃ©e !";
+$l_err_mailshare_email_empty = "L'adresse E-mail doit être saisie !";
+$l_err_mailshare_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
 $l_err_mailshare_uemail_exist = "L'adresse E-mail est saisie plusieurs fois !";
 
-$l_check_samemailshare = "Ces partages mail semblent similaires Ã  celui saisi";
+$l_check_samemailshare = "Ces partages mail semblent similaires à celui saisi";
 
 $l_mail_server = "Serveur de mail";

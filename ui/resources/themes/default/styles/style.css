@@ -631,7 +631,7 @@ input.datePicker {
 .admin .overflow {
   overflow: auto;
   max-height: 21em;
-  _height: 21em;
+  _height: expression(this.scrollHeight > 150 ? "150px" : "auto");
 }
 
 .admin table {
