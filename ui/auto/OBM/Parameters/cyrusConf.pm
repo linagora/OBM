@@ -88,7 +88,11 @@ $boxTypeDef = {
     SHARE => {
         prefix => "",
         separator => "",
-        get_bd_values => undef
+        get_bd_values => sub {
+            my( $dbHandler, $domain, $srvId ) = @_;
+            require OBM::Cyrus::typeShare;
+            return OBM::Cyrus::typeShare::getBdValues( $dbHandler, $domain, $srvId );
+        }
     }
 };
 
