@@ -1,0 +1,585 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Basic steps to build and install OBM 2.0.x</title>
+</head>
+<!-- $Id$ -->
+<body bgcolor="#FFFFFF">
+
+<a href="javascript:back();">back</a>
+
+<p>These docs are valid for OBM 2.0.x
+
+Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.</p>
+
+<h1>Basic steps to build and install OBM 2.0.x</h1>
+
+<h2> Assumptions</h2>
+
+<p>
+We suppose apache, php and a database server (mysql or postgres) are correctly installed and functionnal.
+<br />
+For pre-packaged distributions, check in your distribution docs.
+<br />
+In Debian, following packages must be installed:
+</p>
+
+<ul>
+<li> php5, php5-cgi, php5-mysql or php5-pgsql (or php4 ones)</li>
+<li> apache2 and apache2-common (or apache ones)</li>
+</ul>
+
+<p />
+We suppose that as an example the obm root is /var/www/obm
+<p />
+
+
+<h2>1: Get the source</H2>
+
+<p>Would be more difficult without it.<br />
+And uncompress it in /var/www (or where your document root will be located).</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td>
+<code>
+wget http://obm.aliacom.fr/obm-archives/obm-2.0.0.tar.gz<br />
+tar -C /var/www -xzvf obm-2.0.0.tar.gz<br />
+cd /var/www<br />
+ln -s obm-2.0.0 obm
+</code>
+  </td>
+</tr>
+</table>
+
+<p>Set the correct files owner to the OBM sources (needed for safe_mode On, in documents)</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td>
+<code>
+cd /var/www/obm<br />
+chown -R www-data:www-data *  (on Debian)<br />
+chown -R apache:apache *  (on Redhat)
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h2>2: PHP (module and command line configuration)</h2>
+
+<p>PHP apache module config file :</p>
+<ul>
+<li><strong>on Debian</strong> /etc/php5/apache2/php.ini (or php4 and apache ones)</li>
+<li><strong>on RedHat</strong> /etc/php.ini</li>
+</ul>
+
+<p>Command line PHP must be configured too (Some tools (install script, admin tools) works or are also available with php in command line mode (php-cli).)</p>
+<ul>
+<li><strong>on Debian</strong> /etc/php5/cgi/php.ini, or /etc/php5/cli/php.ini on recent versions (or php4 ones).</li>
+</ul>
+
+<p>The include_path directive must be set :</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+include_path = ".:/var/www/obm"
+</code>
+  </td>
+</tr>
+</table>
+
+<p>short_open_tag can be set to Off :</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+short_open_tag = On (can be switched to Off since OBM 0.7.3)
+</code>
+  </td>
+</tr>
+</table>
+
+<p>Globals must be registered automatically :</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+register_globals = On
+</code>
+  </td>
+</tr>
+</table>
+
+<p>To avoid some PHP warnings for a previous php version bug, turn on these 2 directives :</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+session.bug_compat_42 = 1<br />
+session.bug_compat_warn = 1
+</code>
+  </td>
+</tr>
+</table>
+<p>
+
+<p>Magic quotes must be On :</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+magic_quotes_gpc = On
+</code>
+  </td>
+</tr>
+</table>
+<p>
+
+and depending on obm file's owner (of course works well with safe_mode turne Off too !):
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+safe_mode = On
+</code>
+  </td>
+</tr>
+</table>
+
+<h3>2.1: Check that php support mysql or postgresql</h3>
+<p>Depending on your database engine, one of these lines must be present in your php.ini (both module and command line if they are separated) :</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+extension=mysql.so<br />
+extension=pgsql.so
+</code>
+  </td>
+</tr>
+</table>
+
+
+
+<h2>3: Apache and PHP configuration</h2>
+
+<p>OBM sources are in the php directory.
+Included files are in the obminclude directory.</p>
+
+<h3>Configure apache to process PHP files</h3>
+
+<p>In recent distribution (Debian,...) this step is automatically done when you install the packages.</p>
+<p>Edit your apache2.conf (or httpd.conf or srm.conf) file and add:</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+    AddType application/x-httpd-php .php
+</code>
+  </td>
+</tr>
+</table>
+
+<p>On RedHat 8 with apache2, check that your /etc/httpd/conf.d/php.conf is correct</p>
+
+<h3>OBM virtual host creation</h3>
+
+<p>We set up a virtual host to handle one occurence of OBM (there can be several on one server).
+In the virtual host section set :</p>
+
+<h3>Document root</h3>
+<p>Set your document root to : /var/www/obm/php</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+    DocumentRoot /var/www/obm/php
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h3>OBM include directory</h3>
+
+<p>The name obminclude is now a variable to allow multiple OBM instances on the same code source base (only obminclude will differ which give different database, themes, langs... for each instances).</p>
+<p>This variable is set through an environment variable in the obm virtual host sites-available/obm file (or in the apache httpd.conf file).</p>
+
+<p>load the env module</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+	LoadModule env_module /usr/lib/apache2/modules/mod_env.so (apache 2 sous Debian)<br />
+    LoadModule env_module /usr/lib/apache/1.3/mod_env.so (apache 1.3 on Debian)<br />
+    LoadModule env_module modules/mod_env.so (apache 2 on Redhat)
+</code>
+  </td>
+</tr>
+</table>
+
+<p>fill the OBM_INCLUDE_VAR with the name of the obminclude dir</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+    Setenv OBM_INCLUDE_VAR obminclude
+</code>
+  </td>
+</tr>
+</table>
+
+<p>The path to php include files must be given.
+As a side note, the obminclude directory can be moved to another location.
+</p>
+<p>fill the php include_path with the location of the obminclude</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+    php_value include_path ".:/var/www/obm"
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h3>Images alias</h3>
+<p>Set an alias to images in the themes directory:</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+    Alias /images /var/www/obm/ressources (since OBM 2.0)<br />
+    Alias /images /var/www/obm/obminclude/themes (before OBM 2.0)
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h3>Directory Index</h3>
+<p>Set the directory index to obm.php</>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+    DirectoryIndex obm.php
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<p>We <strong>strongly</strong> recommend to prevent direct access to .inc files</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+&lt;Files ~ "\.inc$"><br />
+  Order allow,deny<br />
+  Deny from all<br />
+&lt;/Files>
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h3>Default Charset</h3>
+OBM lang files are coded in latin 9.
+Set the charset to ISO-8859-15 (latin 9).
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+  AddDefaultCharset ISO-8859-15
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h3>Complete virtual host block example</h3>
+
+Be sure that your ip is defined as a named virtual host and enter this block
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+NameVirtualHost 127.0.0.1<br />
+<br />
+&lt;VirtualHost 192.168.1.5><br />
+&nbsp;&nbsp;&nbsp;&nbsp;ServerAdmin root@localhost<br />
+&nbsp;&nbsp;&nbsp;&nbsp;DocumentRoot /var/www/obm/php<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ServerName obm<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ErrorLog /var/log/apache/obm-error.log<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CustomLog /var/log/apache/obm-access.log common<br />
+&nbsp;&nbsp;&nbsp;&nbsp;SetEnv OBM_INCLUDE_VAR obminclude<br />
+&nbsp;&nbsp;&nbsp;&nbsp;Alias /images /var/www/obm/ressources<br />
+&nbsp;&nbsp;&nbsp;&nbsp;DirectoryIndex obm.php<br />
+&nbsp;&nbsp;&nbsp;&nbsp;AddDefaultCharset ISO-8859-15<br />
+&lt;/VirtualHost>
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h2>4: OBM configuration</h2>
+
+<p>Since OBM 2.0, the configuration is located in conf/obm_conf.ini and conf/obm_conf.inc files (before obm 2.0, the configuration is in the obminclude/obm_conf.inc file).</p>
+<p>in the conf directory, copy the <i>obm_conf.inc.sample</i> and <i>obm_conf.ini.sample</i> files to <i>obm_conf.inc</i> and <i>obm_conf.ini</i> and edit them.</p>
+
+
+<h3>4.1: Configure the OBM database</h3>
+
+<p>Edit the <i>obm_conf.ini</i> in the conf directory and</p>
+<ul>
+<li>Select the database engine to use,</li>
+<li>declare the database,</li>
+<li>the database user and password.</li>
+<li>Fill in your apache host name too.</li>
+</ul>
+
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+; Information sur les bases de données<br />
+host = localhost<br />
+dbtype = MYSQL<br />
+db = obm<br />
+user = obm<br />
+<br />
+; Le mot de passe DOIT etre entre "<br />
+password = "aliacom"
+</code>
+  </td>
+</tr>
+</table>
+
+<p>To modify global preferences and declare the document repository, edit the <i>obm_conf.inc</i> file.</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+$cgp_host = "http://obm/";<br />
+...<br />
+$cdocument_root = "/var/www/obmdocuments/";<br />
+...<br />
+// is Mail enabled ? (agenda)<br />
+$cgp_mail_enabled = false;
+</code>
+  </td>
+</tr>
+</table>
+
+<h3>4.2: Document repository</h3>
+
+<p>Since OBM 1.1, the document repository is automatically handled by OBM.
+In the install step OBM populate the repository configured with some structured directories for internal storage.</p>
+
+<p>Declare your document repository in the <i>obm_conf.inc</i> file.</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+// Document : Root of the document repository<br />
+$cdocument_root = "/var/www/obmdocuments";
+</code>
+  </td>
+</tr>
+</table>
+
+<p>Make sure this directory is writable by the apache process</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+$ chown www-data:www-data /var/www/obmdocuments<br />
+or<br />
+$ chmod a+rwx /var/www/obmdocuments
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h3>4.3: Database Configuration and Creation</h3>
+<p>The scripts are in the scripts/2.0 directory.</p>
+
+<h4>4.3.1: Default Data language</h4>
+
+<p>Some references values are inserted by default. These values can be in french (by default) or in english.
+To toggle these to english for installation edit the file scripts/2.0/install_obmdb_2.0.mysql.sh (pr pgsql) and change the DATA_LANG value to en :</p>
+
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+# Data lang var definition <br />
+DATA_LANG="en"
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h4>4.3.2: MySQL</h4>
+
+<strong>Requisite :</strong> you must know (or create) a valid mysql login/password
+
+<p>mysql user creation example (user obm / obm)</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE, LOCK TABLES, INDEX ON obm.* TO obm@localhost IDENTIFIED BY 'obm';<br />
+(or simpler GRANT ALL ON obm.* TO obm@localhost IDENTIFIED BY 'obm';)
+</code>
+  </td>
+</tr>
+</table>
+
+<p>The script <i>install_obmdb_2.0.mysql.sh</i> handle all the database creation steps.<br />
+<p>Set the correct User / password (or DB) in this script and run it</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+cd obm/scripts/2.0<br />
+emacs /install_obmdb_2.0.mysql.sh<br />
+./install_obmdb_2.0.mysql.sh
+</code>
+  </td>
+</tr>
+</table>
+
+<h4>4.3.3: PostgreSQL</h4>
+
+<p>Create the obm user and create the obm database :</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+create user obm password 'obm';<br />
+create database obm with owner = obm;
+</code>
+  </td>
+</tr>
+</table>
+
+<h5>4.3.3.1: Encoding</h5>
+<p>If your Postgres server is not configured with latin1 character set:<br />
+ edit the file scripts/2.0/postgres-pre.sql and uncomment the line (now uncommented by default)</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+\encoding latin1
+</code>
+  </td>
+</tr>
+</table>
+
+<p>OBM should in the future be converted to UTF8 by default.</p>
+
+<h5>4.3.3.2: Install</h5>
+<p>The script <i>install_obmdb_2.0.pgsql.sh</i> handle all the database creation steps.<br />
+Edit User / password (or DB) infos in this script and run it</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+cd obm/scripts/2.0<br />
+emacs install_obmdb_2.0_pgsql.sh<br />
+./install_obmdb_2.0_pgsql.sh
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h2>5: Run OBM (access the obm.php from your browser)</h2>
+<p># First restart your apache web server</p>
+
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+/etc/init.d/apache restart
+</code>
+  </td>
+</tr>
+</table>
+
+<p># If all goes well run firefox (or others browsers) and launch the url
+<br />yourvirtualhost/</p>
+
+<p># Log in with the uadmin/padmin account</p>
+
+
+<p>
+<a name="upgrade"><h1>UPGRADE from version 1.1.x to version 1.2.x</h1></a></p>
+
+<h3>Update Database model</h3>
+<p># MySQL</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+mysql -u obm -pobm obm < scripts/1.2/update-1.1-1.2.mysql.sql
+</code>
+  </td>
+</tr>
+</table>
+
+<p>
+# Postgres</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+psql -U obm obm < scripts/1.2/update-1.1-1.2.pgsql.sql
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h3>Insert new default preferences values</h3>
+<p># MySQL</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+mysql -u obm -pobm obm < scripts/1.2/obmdb_default_values_1.2.sql
+</code>
+  </td>
+</tr>
+</table>
+
+<p>
+# Postgres</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+psql -U obm obm < scripts/1.2/obmdb_default_values_1.2.sql
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h3>Update sound signatures for contacts to allow sounding searches</h3>
+
+<p># In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <strong>Data</strong> module and execute the action <strong>sound_aka_update</strong> which update the sound signatures.</p>
+
+
+<p><a name="upgrade-common"><h1>UPGRADE COMMON ACTIONS</h1></a></p>
+
+<h3>Option: Restore default display values for each user</h3>
+<p># In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <strong>Prefs</strong> (or Préférences) module and execute the action <strong>user_pref_update</strong> (which drop preferences for each user, hence leading to default)</p>
+
+<h3>Option: Insert NAF code values</h3>
+<p>A naf code dump is available (french naf codes). It has not been updated from 1.0 one. If you want to insert these reference data :
+<br />
+# MySQL Naf code data</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+mysql -u obm -pobm obm < scripts/1.2/data-fr/obmdb_nafcode_1.2.sql
+</code>
+  </td>
+</tr>
+</table>
+
+<p># Postgres Naf code data</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+psql -U obm obm < scripts/1.2/data-fr/obmdb_nafcode_1.2.sql
+</code>
+  </td>
+</tr>
+</table>
+
+
+<p>&nbsp;</p>
+<p><a href="javascript:back();">back</a></p>
+
+
+</body>
+</html>
