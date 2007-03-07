@@ -22,7 +22,7 @@ sub getBdValues {
     # On execute la requete
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return undef;
     }
 
