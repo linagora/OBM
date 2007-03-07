@@ -7,12 +7,12 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 //include("obminclude/themes/standard/theme.inc");
-$theme_path = C_IMAGE_PATH."/default/images";
+$theme_path = "$resources_path/themes/default/images";
 
 // CSS
-$css_obm = C_IMAGE_PATH."/default/styles/style.css";
-$css_calendar = C_IMAGE_PATH."/default/styles/calendar.css";
-$css_portal = C_IMAGE_PATH."/default/styles/portal.css";
+$css_obm = "$resources_path/themes/default/styles/style.css";
+$css_calendar = "$resources_path/themes/default/styles/calendar.css";
+$css_portal = "$resources_path/themes/default/styles/portal.css";
 
 // Templates 
 $login_template = "$path/../resources/themes/default/templates/login.tpl";

@@ -13,7 +13,9 @@
 
 // OBM host (for mail links)
 $cgp_host = "http://obm/";
-define("C_IMAGE_PATH",$cgp_host."images");
+
+// Resources alias absolute path. (default value is "/images")
+// $resource_path = "$cgp_host/images"; 
 
 // Multi-domain handling
 //$c_multidomain = true;

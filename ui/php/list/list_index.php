@@ -34,7 +34,6 @@ $params = get_list_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 require("$obminclude/global_pref.inc");
 
-require_once("$obminclude/javascript/calendar_js.inc");
 require_once("$obminclude/of/of_select.inc");
 include("list_display.inc");
 include("list_query.inc");

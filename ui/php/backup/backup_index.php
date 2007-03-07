@@ -27,7 +27,6 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("backup_query.inc");
 require("backup_display.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
 
 get_backup_action();
 $perm->check_permissions($module, $action);

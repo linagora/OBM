@@ -23,6 +23,9 @@ $c_focsys = 3;
 // OBM host
 $cgp_host = "http://obmlocal/";
 
+// OBM default resources path
+$resources_path = "/images";
+
 // Multidomain
 $c_multidomain = true;
 

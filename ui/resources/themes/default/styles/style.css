@@ -794,6 +794,7 @@ input.datePicker {
   background-color: #fff;
   border-spacing:0;
   border: 1px solid #959595;
+  border-collapse: collapse;
 }
 
 .spreadSheet td.hover{

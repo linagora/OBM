@@ -289,7 +289,7 @@ function display_head_theme($p_module) {
   global $l_obm_title, $extra_css, $extra_js, $extra_js_include,$ico_minus;
   global $ico_datepicker,$set_date_upd,$l_monthsofyear,$l_daysofweekfirst;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus;
-  global $l_today, $l_close, $css_obm, $popup_height,$popup_width;
+  global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
 
   $monthShort =  phpArrayToJsArray($l_monthsofyearshort);
   $monthLong = phpArrayToJsArray($l_monthsofyear);
@@ -311,7 +311,7 @@ function display_head_theme($p_module) {
 
   if (is_array($extra_js_include)) {
     foreach($extra_js_include as $js_file) {
-      $js_include = "<script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/$js_file\" ></script>\n";
+      $js_include = "<script type=\"text/javascript\" src=\"$resources_path/js/$js_file\" ></script>\n";
     }
   }
 
@@ -321,10 +321,10 @@ function display_head_theme($p_module) {
   <title>$l_obm_title - $p_module</title>
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_obm\" />
   $dis_extra_css
-  <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/mootools.js\" ></script>
-  <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/datepicker.js\" ></script>
-  <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/obm.js\" ></script>
-  <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/utils.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/mootools.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
 
   $js_include
   <script type=\"text/javascript\">
