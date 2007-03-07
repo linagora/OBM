@@ -15,7 +15,7 @@
 $cgp_host = "http://obm/";
 
 // Resources alias absolute path. (default value is "/images")
-// $resource_path = "$cgp_host/images"; 
+// $resources_path = "$cgp_host/images"; 
 
 // Multi-domain handling
 //$c_multidomain = true;
