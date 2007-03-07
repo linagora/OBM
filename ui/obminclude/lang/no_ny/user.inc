@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Norwegian                                                //
 //     - File     : user.inc                                                 //
@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_login = "Brukar";
-$l_user_perms = "Autorisering";
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";
 $l_password = "Passord";

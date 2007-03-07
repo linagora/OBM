@@ -67,6 +67,7 @@ $l_ext_id = "Id ext";
 $l_aka = "Also known as";
 $l_category = "Kategorie";
 $l_aduplicate = "Duplicate";
+$l_profile = "Berechtigung";
 
 // Entities
 $l_company = "Firma";

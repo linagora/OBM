@@ -73,7 +73,7 @@ class OBM_DISPLAY {
     if (isset($name)) {
       $this->display_name = $name;
     }
-    $this->sql_order_dir = ($params["sql_order_dir"] == "ASC" ? "ASC" : "DESC");
+    $this->sql_order_dir = ($params["sql_order_dir"] == "ASC" ? "DESC" : "ASC");
   }
   
   /////////////////////////////////////////////////////////////////////////////

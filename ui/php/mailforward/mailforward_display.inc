@@ -16,7 +16,7 @@
 function html_forward_consult($usr_q) {
   global $l_mailforward, $l_internal_email;
   global $l_nomade_not_allowed,$l_local_copy;
-  global $l_email_nomade, $l_enable, $l_disable, $l_forbid, $l_state;
+  global $l_email_nomade, $l_enabled, $l_disabled, $l_forbid, $l_state;
   global $obm, $c_yes, $c_no;
 
   $id = $usr_q->f("userobm_id");
@@ -26,16 +26,15 @@ function html_forward_consult($usr_q) {
   $nomade_enable = $usr_q->f("userobm_nomade_enable");
   $nomade_local_copy = $usr_q->f("userobm_nomade_local_copy");    
 
-  print_r($obm);
   $domain = $obm["domain_name"];
 
   if (! $nomade_perms) {
     $dis_nomade = "<td class=\"detailLabel\">$l_nomade_not_allowed</td>";
   } else {
-    if ($nomade_enable) $state = $l_enable;
-    else $state = $l_disable;
-    if ($nomade_local_copy) $state_local = $l_enable;
-    else $state_local = $l_disable;
+    if ($nomade_enable) $state = $l_enabled;
+    else $state = $l_disabled;
+    if ($nomade_local_copy) $state_local = $l_enabled;
+    else $state_local = $l_disabled;
  
     $dis_nomade = "
     <tr>
@@ -76,7 +75,7 @@ function html_forward_consult($usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_forward_form($usr_q, $forward, $field="") {
   global $l_mailforward, $l_internal_email, $l_nomade_not_allowed;
-  global $l_email_nomade, $l_enable,$l_local_copy;
+  global $l_email_nomade, $l_enabled, $l_local_copy;
   global $obm, $action, $c_yes, $c_no, $l_update;
 
   $id = $usr_q->f("userobm_id");
@@ -109,12 +108,12 @@ function html_forward_form($usr_q, $forward, $field="") {
     $block = display_ok_msg($l_nomade_not_allowed);
     return $block;
   } else {
-    if ($nomade_enable) $state = $l_enable;
-    else $state = $l_disable;
+    if ($nomade_enable) $state = $l_enabled;
+    else $state = $l_disabled;
 
     $dis_nomade = "
     <tr>
-      <th class=\"$class[nomade_enable]\">$l_enable</th>
+      <th class=\"$class[nomade_enable]\">$l_enabled</th>
       <td><input name=\"cb_nomade_enable\" type=\"checkbox\" value=\"1\" $nomade_enable_c></td>
     </tr>
     <tr>

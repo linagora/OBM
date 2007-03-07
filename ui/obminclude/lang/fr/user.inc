@@ -11,7 +11,6 @@ $l_login = "Login";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_title = "Fonction";
-$l_user_perms = "Permissions";
 $l_password = "Password";
 $l_lastaccess = "Dernier accès";
 $l_phone2 = "$l_phone 2";

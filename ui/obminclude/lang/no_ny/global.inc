@@ -56,7 +56,7 @@ $l_category = "Kategori";
 $l_aduplicate = "Duplicate";
 $l_after = "Etter";
 $l_before = "Før";
-
+$l_profile = "Autorisering";
 
 // OBM_DISPLAY
 $l_entries = "Entries";

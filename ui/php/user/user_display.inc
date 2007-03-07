@@ -16,7 +16,7 @@ $fieldnames["userobm_login"] = $l_login;
 $fieldnames["userobm_system"] = $l_system;
 $fieldnames["userobm_local"] = $l_local;
 $fieldnames["userobm_ext_id"] = $l_ext_id;
-$fieldnames["userobm_perms"] = $l_user_perms;
+$fieldnames["userobm_perms"] = $l_profile;
 $fieldnames["userobm_archive"] = $l_archive;
 $fieldnames["userobm_lastname"] = $l_lastname;
 $fieldnames["userobm_firstname"] = $l_firstname;
@@ -163,7 +163,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 //     keys used : login, lastname, perms, archive, popup
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
-  global $l_login, $l_lastname, $l_user_perms, $l_find, $l_all, $l_archive;
+  global $l_login, $l_lastname, $l_profile, $l_find, $l_all, $l_archive;
   global $l_email, $l_phone, $l_desc, $l_group, $l_add_users;
   global $display, $c_all, $profiles;
   
@@ -218,7 +218,7 @@ function html_user_search_form($user) {
       <input type=\"text\" name=\"tf_lastname\" size=\"16\" maxlength=\"32\"
       value=\"$lname\" />
     </label>
-    <label>$l_user_perms<br />
+    <label>$l_profile<br />
       <select type=\"text\" name=\"sel_perms\">
         <option value=\"$c_all\"> $l_all</option>
         $block_profile
@@ -399,7 +399,7 @@ function dis_user_consult($user) {
 //   - $obm_q : user database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
-  global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname, $l_title;
+  global $l_login, $l_password, $l_profile, $l_lastname, $l_firstname, $l_title;
   global $l_domain, $l_user, $l_lastaccess, $l_archive, $l_datebegin;
   global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal;
   global $l_direction, $l_service;
@@ -676,7 +676,7 @@ function html_user_consult($obm_q) {
     <td>$ext_id</td>
   </tr>
   <tr>
-    <th>$l_user_perms</th>
+    <th>$l_profile</th>
     <td>$perms</td>
   </tr>
   <tr>
@@ -845,7 +845,7 @@ function html_user_group_consult($usr_q) {
 //   - $field : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($usr_q, $user, $field="") {
-  global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname, $l_title;
+  global $l_login, $l_password, $l_profile, $l_lastname, $l_firstname, $l_title;
   global $l_user, $l_archive, $l_datebegin, $l_insert, $l_update;
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
@@ -1227,7 +1227,7 @@ function html_user_form($usr_q, $user, $field="") {
     <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
   </tr>
   <tr>
-    <th class=\"$class[perms]\">$l_user_perms</th>
+    <th class=\"$class[perms]\">$l_profile</th>
     <td><select name=\"sel_perms\">
       $block_profile
       </select>

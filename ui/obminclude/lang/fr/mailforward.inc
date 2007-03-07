@@ -15,10 +15,8 @@ $l_email_nomade = "Adresse E-mail nomade";
 $l_nomade = "Accès E-mail nomade";
 $l_access_nomade = "Accès nomade";
 $l_state = "Etat";
-$l_perms = "Autorisé";
+$l_perms = "Autorisé
 $l_forbidden = "Interdit";
-$l_enable = "Activé";
-$l_disable = "Désactivé";
 $l_local_copy = "Copie locale";
 
 // Messages

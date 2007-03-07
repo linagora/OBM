@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_user_name = "Utente";
-$l_user_perms = "Autorizzazione";
 $l_lastname = "Cognome";
 $l_firstname = "Nome";
 $l_password = "Password";

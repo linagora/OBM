@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : German                                                   //
 //     - File     : user.inc                                                 //
@@ -9,7 +9,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_login = "Benutzer";
-$l_user_perms = "Berechtigung";
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";
 $l_title = "Function";
