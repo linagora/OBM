@@ -35,11 +35,11 @@ sub getBdValues {
         $shareDesc->{"box_name"} = $sharePrefix.$shareSeparator.$shareDesc->{"box_login"};
 
         if( defined($shareQuota) && ($shareQuota ne "") ) {
-            $shareDesc->{"box_quota"} = $shareQuota;
+            $shareDesc->{"box_quota"} = $shareQuota*1000;
         }
 
         # On recupere la definition des ACL
-        $shareDesc->{"box_acl"} = &OBM::toolBox::getEntityRight( $shareId, $MAILBOXENTITY, $dbHandler );
+        $shareDesc->{"box_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domain, initRight( $shareId ), $shareId );
 
 
         if( !exists($shares->{$shareDesc->{"box_login"}}) ) {
@@ -51,4 +51,22 @@ sub getBdValues {
 }
 
 
+sub initRight {
+    my( $shareId ) = @_;
+    my $entityType = "mailshare";
+    my %rightDef;
 
+    $rightDef{"read"}->{"compute"} = 1;
+    $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$shareId." AND j.entityright_entity='".$entityType."'";
+        
+    $rightDef{"writeonly"}->{"compute"} = 1;
+    $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$shareId." AND j.entityright_entity='".$entityType."'";
+
+    $rightDef{"write"}->{"compute"} = 1;
+    $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=1 AND j.entityright_entity_id=".$shareId." AND j.entityright_entity='".$entityType."'";
+        
+    $rightDef{"public"}->{"compute"} = 0;
+    $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM EntityRight WHERE entityright_entity_id=".$shareId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
+
+    return \%rightDef;
+}

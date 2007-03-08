@@ -9,7 +9,6 @@
 package OBM::imapd;
 
 use Cyrus::IMAP::Admin;
-use Cyrus::SIEVE::managesieve;
 use Unicode::MapUTF8 qw(to_utf8 utf8_supported_charset);
 require OBM::toolBox;
 require OBM::dbUtils;
@@ -156,7 +155,8 @@ sub getServerByDomain {
 
 sub loadBdValues {
     my( $dbHandler, $listDomainSrv ) = @_;
-for( my $i=0; $i<=$#$listDomainSrv; $i++ ) {
+
+    for( my $i=0; $i<=$#$listDomainSrv; $i++ ) {
         my $currentDomainSrv = $listDomainSrv->[$i];
         my $domainDesc = $currentDomainSrv->{"domain"};
         my $domainServerList = $currentDomainSrv->{"imap_servers"};
@@ -253,7 +253,7 @@ sub updateServer {
             # Si la bal n'existe pas...
             if( !exists($srvListImapBox->{$boxLogin}) ) {
                 # ... on la crée
-                if( createBox( $srvDesc, $bdImapBox ) ) {
+                if( createBox( $srvDesc, $boxType, $bdImapBox ) ) {
                     $errors++;
                     next;
                 }
@@ -281,28 +281,27 @@ sub imapGetDomainBoxesList {
         my $boxPrefix = $OBM::Parameters::cyrusConf::boxTypeDef->{$boxType}->{"prefix"}.$OBM::Parameters::cyrusConf::boxTypeDef->{$boxType}->{"separator"};
 
         # on recupere la liste des Box de ce type
-        my @balList = $imapSrvConn->listmailbox( '%@'.$domainName, $boxPrefix );
+        my @boxList = $imapSrvConn->listmailbox( '%@'.$domainName, $boxPrefix );
         if( $imapSrvConn->error ) {
             return 1;
         }
 
         my $listImapBox = &OBM::toolBox::cloneStruct( OBM::Parameters::cyrusConf::listImapBox );
-        for( my $i=0; $i<=$#balList; $i++ ) {
-            if( $balList[$i][1] =~ /nonexistent/i ) {
+        for( my $i=0; $i<=$#boxList; $i++ ) {
+            if( $boxList[$i][1] =~ /nonexistent/i ) {
                 next;
             }
 
             my $imapUser = &OBM::toolBox::cloneStruct( OBM::Parameters::cyrusConf::imapBox );  
-            $imapUser->{"box_name"} = $balList[$i][0];
-            $imapUser->{"box_login"} = $balList[$i][0];
+            $imapUser->{"box_name"} = $boxList[$i][0];
+            $imapUser->{"box_login"} = $boxList[$i][0];
             $imapUser->{"box_login"} =~ s/^$boxPrefix//;
             $imapUser->{"box_quota"} = imapGetBoxQuota( $imapSrvConn, $imapUser->{"box_name"} );
-            $imapUser->{"box_acl"} = undef;
+            $imapUser->{"box_acl"} = imapGetBoxAcl( $imapSrvConn, $imapUser->{"box_name"} );
 
             if( !exists($listImapBox->{$imapUser->{"box_login"}}) ) {
                 $listImapBox->{$imapUser->{"box_login"}} = $imapUser;
             }
-#            push( @{$listImapBox}, $imapUser );
         }
 
         $srvDesc->{"SRV_".$boxType} = $listImapBox;
@@ -313,12 +312,17 @@ sub imapGetDomainBoxesList {
 
 
 sub createBox {
-    my( $srvDesc, $imapBox ) = @_;
+    my( $srvDesc, $boxType, $imapBox ) = @_;
+    my $boxTypeDef = $OBM::Parameters::cyrusConf::boxTypeDef;
 
     if( !defined($srvDesc->{"imap_server_conn"}) ) {
         return 1;
     }
     my $imapSrvConn = $srvDesc->{"imap_server_conn"};
+
+    if( !defined($boxType) ) {
+        return 1;
+    }
 
     if( !defined($imapBox->{"box_login"}) ) {
         return 1;
@@ -330,7 +334,6 @@ sub createBox {
     }
     my $boxName = $imapBox->{"box_name"};
 
-
     &OBM::toolBox::write_log( "Creation de la boite '".$boxLogin."'", "W" );
     $imapSrvConn->create( $boxName );
     if( $imapSrvConn->error ) {
@@ -338,7 +341,10 @@ sub createBox {
         return 1;
     }
 
-    updateSieve( $srvDesc, $imapBox );
+
+    if( exists($boxTypeDef->{$boxType}->{"create_box"}) && defined($boxTypeDef->{$boxType}->{"create_box"}) ) {
+        &{$boxTypeDef->{$boxType}->{"create_box"}}( $srvDesc, $imapBox );
+    }
 
     return 0;
 }
@@ -353,15 +359,15 @@ sub updateBox {
     }
     my $imapSrvConn = $srvDesc->{"imap_server_conn"};
 
-    if( !defined($oldImapBoxDesc->{"box_login"}) ) {
+    if( !defined($newImapBoxDesc->{"box_login"}) ) {
         return 1;
     }
-    my $boxLogin = $oldImapBoxDesc->{"box_login"};
+    my $boxLogin = $newImapBoxDesc->{"box_login"};
 
-    if( !defined($oldImapBoxDesc->{"box_name"}) ) {
+    if( !defined($newImapBoxDesc->{"box_name"}) ) {
         return 1;
     }
-    my $boxName = $oldImapBoxDesc->{"box_name"};
+    my $boxName = $newImapBoxDesc->{"box_name"};
 
 
     &OBM::toolBox::write_log( "Mise a jour de la boite '".$boxLogin."'", "W" );
@@ -373,6 +379,19 @@ sub updateBox {
             $errors++;
         }
     }
+
+    # Mise a jour des ACLs
+    print "ACL: ".$boxLogin."\n";
+    if( &OBM::toolBox::aclUpdated( $oldImapBoxDesc->{"box_acl"}, $newImapBoxDesc->{"box_acl"} ) ) {
+        &OBM::toolBox::write_log( "Mise a jour des ACL de la boite '".$boxLogin."'", "W" );
+
+        if( setBoxAcl( $imapSrvConn, $boxName, $oldImapBoxDesc->{"box_acl"}, $newImapBoxDesc->{"box_acl"} ) ) {
+            $errors++;
+        }
+    
+    }
+
+    return $errors;
 }
 
 
@@ -396,7 +415,7 @@ sub deleteBox {
 
 
     &OBM::toolBox::write_log( "Suppression de la boite '".$boxLogin."'", "W" );
-    if( setBoxAcl( $imapSrvConn, $boxName, $srvDesc->{"imap_server_login"}, "admin" ) ) {
+    if( imapSetBoxAcl( $imapSrvConn, $boxName, $srvDesc->{"imap_server_login"}, "admin" ) ) {
         return 1;
     }
 
@@ -410,15 +429,21 @@ sub deleteBox {
 }
 
 
-sub setBoxAcl {
-    my( $imapSrvConn, $boxLogin, $boxRightUser, $boxRight ) = @_;
+sub imapSetBoxAcl {
+    my( $imapSrvConn, $boxName, $boxRightUser, $boxRight ) = @_;
     my $rights = OBM::Parameters::cyrusConf::definedRight;
 
     if( !defined($rights->{$boxRight}) ) {
         return 1;
     }
 
-    $imapSrvConn->setaclmailbox( $boxLogin, $boxRightUser => $rights->{$boxRight} );
+    my $imapRight = $rights->{$boxRight};
+
+    if( ($boxRightUser eq "anyone") && ($boxRight ne "none") ) {
+        $imapRight .= $rights->{"post"};
+    }
+
+    $imapSrvConn->setaclmailbox( $boxName, $boxRightUser => $imapRight );
 
     if( $imapSrvConn->error ) {
         return 1;
@@ -454,7 +479,7 @@ sub imapSetBoxQuota {
     if( !$quota ) {
         $imapSrvConn->setquota( $boxName );
     }else {
-        $imapSrvConn->setquota( $boxName, "STORAGE", $quota*1000 );
+        $imapSrvConn->setquota( $boxName, "STORAGE", $quota );
     }
 
     if( $imapSrvConn->error ) {
@@ -465,156 +490,101 @@ sub imapSetBoxQuota {
 }
 
 
-sub updateSieve {
-    my( $srvDesc, $imapBox ) = @_;
-    my @sieveScript;
+sub imapGetBoxAcl {
+    my ( $imapSrvConn, $boxName ) = @_;
+    my $boxRight = &OBM::toolBox::cloneStruct(OBM::Parameters::cyrusConf::boxRight);
+    my $definedRight = OBM::Parameters::cyrusConf::definedRight;
 
-    if( !defined($imapBox->{"box_login"}) ) {
-        return 1;
-    }
-    my $boxLogin = $imapBox->{"box_login"};
+    my %boxAclList = $imapSrvConn->listacl( $boxName );
+    if( $imapSrvConn->error ) {
+        return undef;
 
-
-    # On met les règles pour le vacation dans le script Sieve
-    mkSieveVacationScript( $imapBox, \@sieveScript );
-
-    if( connectSrvSieve( $srvDesc, $boxLogin ) ) {
-        return 1;
-    }
-
-    my $sieveScriptName = $boxLogin.".sieve";
-    $sieveScriptName =~ s/@/-/g;
-    my $localSieveScriptName = $tmpAliamin.$sieveScriptName;
-
-    &OBM::toolBox::write_log( "Mise a jour du script Sieve pour l'utilisateur : '".$boxLogin."'", "W" );
-
-    # On desactive l'ancien script
-    sieve_activate( $srvDesc->{"imap_sieve_server_conn"}, "" );
-    # On supprime l'ancien script
-    sieve_delete( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName );
-
-    if( $#sieveScript >= 0 ) {
-        # On cree le script Sieve en local
-        open( FIC, ">".$localSieveScriptName ) or return 1;
-        print FIC @sieveScript;
-        close( FIC );
-
-        # On installe le nouveau script
-        if( sieve_put_file_withdest( $srvDesc->{"imap_sieve_server_conn"}, $localSieveScriptName, $sieveScriptName ) ) {
-            my $errstr = sieve_get_error( $srvDesc->{"imap_sieve_server_conn"} );
-            $errstr = "Echec : Sieve - erreur inconnue." if(!defined($errstr));
-
-            &OBM::toolBox::write_log( "Probleme lors du telechargement du script Sieve : ".$errstr , "W" );
-
-            return 1;
-        }
-
-        &OBM::toolBox::write_log( "Activation du script Sieve pour l'utilisateur : ".$boxLogin, "W" );
-
-        # On active le nouveau script
-        if( sieve_activate( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName ) ) {
-            my $errstr = sieve_get_error( $srvDesc->{"imap_sieve_server_conn"} );
-            $errstr = "Echec : Sieve - erreur inconnue." if(!defined($errstr));
-
-            &OBM::toolBox::write_log( "Probleme lors de l'activation du script Sieve : ".$errstr, "W" );
-
-            return 1;
-        }
-
-        # On supprime le script local
-        &OBM::toolBox::execCmd( "/bin/rm -f ".$localSieveScriptName );
-    }
-
-    disconnectSrvSieve( $srvDesc );
-
-    return 0;
-}
-
-
-sub mkSieveVacationScript {
-    my( $imapBox, $sieveScript ) = @_;
-
-    if( !exists($imapBox->{"box_vacation_enable"}) || !$imapBox->{"box_vacation_enable"} ) {
-        return 1;
-    }
-
-    if( !defined($imapBox->{"box_login"}) ) {
-        return 1;
-    }
-    my $boxLogin = $imapBox->{"box_login"};
-
-    &OBM::toolBox::write_log( "Creation du message d'abscence de la boite '".$boxLogin."'", "W" );
-
-    if( !defined( $imapBox->{"box_vacation_message"} ) ) {
-        return 1;
-    }
-    my $boxVacationMessage = $imapBox->{"box_vacation_message"};
-
-    if( !defined( $imapBox->{"box_email"} ) ) {
-        return 1;
-    }
-    my $boxEmails = $imapBox->{"box_email"};
-
-
-    push( @{$sieveScript}, "require \"vacation\";\n" );
-    push( @{$sieveScript}, "\n" );
-
-    push( @{$sieveScript}, "vacation :addresses [ " );
-    for( my $i=0; $i<=$#{$boxEmails}; $i++ ) {
-        if( $i != 0 ) {
-            $sieveScript->[$#{$sieveScript}] .= ", ";
-        }
-        $sieveScript->[$#{$sieveScript}] .= "\"".$boxEmails->[$i]."\"";
-    }
-    $sieveScript->[$#{$sieveScript}] .= " ] \"".to_utf8( { -string => $boxVacationMessage, -charset => $defaultCharSet } )."\";\n";
-
-    return 0;
-}
-
-
-sub connectSrvSieve {
-    my( $srvDesc, $boxLogin ) = @_;
-
-    if( !defined($srvDesc->{"imap_server_ip"}) ) {
-        return 1;
-    }
-    my $imapServerIp = $srvDesc->{"imap_server_ip"};
-
-    if( !defined($srvDesc->{"imap_server_login"}) ) {
-        return 1;
-    }
-    my $imapServerLogin = $srvDesc->{"imap_server_login"};
-
-    if( !defined($srvDesc->{"imap_server_passwd"}) ) {
-        return 1;
-    }
-    my $imapServerPasswd = $srvDesc->{"imap_server_passwd"};
-
-
-    &OBM::toolBox::write_log( "Connexion au serveur SIEVE '".$srvDesc->{"imap_server_name"}."' en tant que '".$srvDesc->{"imap_server_login"}."'", "W" );
-    $srvDesc->{"imap_sieve_server_conn"} = sieve_get_handle( $imapServerIp, sub{return $boxLogin}, sub{return $imapServerLogin}, sub{return $imapServerPasswd}, sub{return undef} );
-
-    if( !defined($srvDesc->{"imap_sieve_server_conn"}) ) {
-        &OBM::toolBox::write_log( "Probleme lors de la connexion au serveur SIEVE", "W" );
-        return 1;
     }else {
-        &OBM::toolBox::write_log( "Connexion au serveur SIEVE etablie", "W" );
+        while( my( $user, $right ) = each( %boxAclList ) ) {
+            # le droit POST est gere de facon transparente
+            $right =~ s/$definedRight->{"post"}//g;
+
+            $right = checkAclRight( $definedRight, $right );
+
+            if( $right ne $definedRight->{"none"} ) {
+                $boxRight->{$right}->{$user} = 1;
+            }
+        }
     }
 
-    return 0;
+    return $boxRight;
 }
 
 
-sub disconnectSrvSieve {
-    my( $srvDesc ) = @_;
+sub checkAclRight {
+    my( $definedRight, $right ) = @_;
+    my $returnedRight = $definedRight->{"none"};
 
-    if( !defined($srvDesc->{"imap_sieve_server_conn"}) ) {
+    if( exists( $definedRight->{$right} ) ) {
+        return $definedRight->{$right};
+    }
+
+    my @obmRight = keys(%{$definedRight});
+    for( my $i=0; $i<=$#obmRight; $i++ ) {
+        if( $right =~ /^$definedRight->{$obmRight[$i]}$/ ) {
+            return $obmRight[$i];
+        }
+    }
+    
+    return $returnedRight;
+}
+
+
+sub setBoxAcl {
+    my( $imapSrvConn, $boxName, $oldAclList, $newAclList ) = @_;
+
+
+    # Recuperation des sous repertoires de la boite
+    my $boxPattern = $boxName;
+    $boxPattern =~ s/(@.*)$/*$1/;
+    my @boxStruct = $imapSrvConn->listmailbox( $boxPattern, '' );
+    if( $imapSrvConn->error ) {
         return 1;
     }
-    my $imapSieveServerConn = $srvDesc->{"imap_sieve_server_conn"};
 
-    &OBM::toolBox::write_log( "Deconnexion du serveur SIEVE.", "W" );
-    sieve_logout( $imapSieveServerConn );
+    my $errors = 0;
+    for( my $i=0; $i<=$#boxStruct; $i++ ) {
+        while( my( $right, $oldUserList ) = each( %$oldAclList ) ) {
+            my $newUserList = $newAclList->{$right};
+
+            while( my( $userName, $value ) = each( %$oldUserList ) ) {
+                if( !defined($newUserList) || !exists( $newUserList->{$userName} ) ) {
+                    if( imapSetBoxAcl( $imapSrvConn, $boxStruct[$i][0], $userName, "none" ) ) {
+                        $errors++;
+                    }
+                }
+            }
+        }
+
+        my $anyoneRight = 0;
+        while( my( $right, $newUserList ) = each( %$newAclList ) ) {
+            my $oldUserList = $oldAclList->{$right};
+
+            while( my( $userName, $value ) = each( %$newUserList ) ) {
+
+                if( !defined($oldUserList) || !exists($oldUserList->{$userName}) ) {
+                    if( imapSetBoxAcl( $imapSrvConn, $boxStruct[$i][0], $userName, $right ) ) {
+                        $errors++;
+                    }
+
+                    if( $userName eq "anyone" ) {
+                        $anyoneRight = 1;
+                    }
+                }
+            }
+        }
+
+        if( !$anyoneRight ) {
+            if( imapSetBoxAcl( $imapSrvConn, $boxStruct[$i][0], "anyone", "post" ) ) {
+                $errors++;
+            }
+        }
+    }
 
     return 0;
 }
