@@ -27,6 +27,14 @@ use constant definedRight => {
     post => "p"
 };
 
+# Les clés des tables de hachage sont les identifiants utilisateurs, les valeurs
+# associés sont 1, si cet utilisateur a ce droit.
+use constant boxRight => {
+    read => {},
+    writeonly => {},
+    write => {}
+};
+
 
 use constant cyrusAdmin => {
     login => cyrusAdminLogin,
@@ -61,11 +69,12 @@ use constant domainSrv => {
 use constant listDomainSrv => [];
 
 
+# Attribut 'box_acl' : type 'boxRight'
 use constant imapBox => {
     box_name => undef,
     box_login => undef,
     box_quota => 0,
-    box_acl => undef,
+    box_acl => {},
     box_vacation_enable => 0,
     box_vacation_message => undef,
     box_email => []
@@ -75,6 +84,7 @@ use constant imapBox => {
 # Les clés sont les logins, les valeurs correspondantes sont de type 'imapBox'
 use constant listImapBox => {};
 
+
 $boxTypeDef = {
     BAL => {
         prefix => "user",
@@ -83,6 +93,11 @@ $boxTypeDef = {
             my( $dbHandler, $domain, $srvId ) = @_;
             require OBM::Cyrus::typeBal;
             return OBM::Cyrus::typeBal::getBdValues( $dbHandler, $domain, $srvId );
+        },
+        create_box => sub {
+            my( $srvDesc, $imapBox ) = @_;
+            require OBM::Cyrus::typeBal;
+            return OBM::Cyrus::typeBal::createBox( $srvDesc, $imapBox );
         }
     },
     SHARE => {
@@ -92,7 +107,8 @@ $boxTypeDef = {
             my( $dbHandler, $domain, $srvId ) = @_;
             require OBM::Cyrus::typeShare;
             return OBM::Cyrus::typeShare::getBdValues( $dbHandler, $domain, $srvId );
-        }
+        },
+        create_box => undef
     }
 };
 

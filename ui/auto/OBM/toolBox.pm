@@ -474,70 +474,26 @@ sub makeEntityMailAddress {
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# Définition des types possible pour les entites et les consommateurs
-#------------------------------------------------------------------------------
-sub initRight {
-    my( $entityId, $entityType ) = @_;
-
-    my %rightDef;
-
-    if( $entityType =~ /^($MAILBOXENTITY|$MAILSHAREENTITY)$/ ) {
-        $rightDef{"read"}->{"compute"} = 1;
-        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$entityId." AND j.entityright_entity='".$entityType."'";
-        
-        $rightDef{"writeonly"}->{"compute"} = 1;
-        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$entityId." AND j.entityright_entity='".$entityType."'";
-
-        $rightDef{"write"}->{"compute"} = 1;
-        if( $entityType =~ /^$MAILBOXENTITY$/ ) {
-            $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM UserObm LEFT JOIN EntityRight ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id WHERE (entityright_entity='".$entityType."' AND entityright_entity_id=".$entityId.") OR userobm_id=".$entityId;
-
-        }else {
-            $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=1 AND j.entityright_entity_id=".$entityId." AND j.entityright_entity='".$entityType."'";
-        
-        }
-
-        $rightDef{"public"}->{"compute"} = 0;
-        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM EntityRight WHERE entityright_entity_id=".$entityId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
-    }
-
-
-    return %rightDef;
-}
-
-
-#------------------------------------------------------------------------------
 # Cette fonction permet d'obtenir la liste des droits des consomateurs sur
 # une entité.
 #------------------------------------------------------------------------------
 sub getEntityRight {
-    my ( $entityId, $entityType, $dbHandler ) = @_;
+    my ( $dbHandler, $domain, $rightDef, $shareId ) = @_;
+    my %entityTemplate = ( "read", 0, "writeonly", 0, "write", 0 );
     my %usersList;
 
-    #
-    # Check parameters
-    if( $entityType !~ /^($MAILBOXENTITY|$MAILSHAREENTITY)$/ ) {
-        write_log( "Type d'entite '".$entityType."' inconnu.", "W" );
+
+    if( !defined($dbHandler) || !defined($rightDef) ||  !defined($shareId) ) {
         return undef;
     }
 
-    #
-    # Definition des droits a traiter
-    my %rightDef = initRight( $entityId, $entityType );
-    my %userTemplate = ( "read", 0, "writeonly", 0, "write", 0 );
 
-
-    #
     # On execute la requete
-    if( !execQuery( $rightDef{"public"}->{"sqlQuery"}, $dbHandler, \$queryResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete.", "WC" );
-        if( defined($queryResult) ) {
-            write_log( $queryResult->err, "W" );
-        }
-
-        write_log( "", "C" );
-        exit 1;
+    if( !execQuery( $rightDef->{"public"}->{"sqlQuery"}, $dbHandler, \$queryResult ) ) {
+        write_log( "Echec : probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+        return undef;
     }
+
     if( my( $read, $write ) = $queryResult->fetchrow_array ) {
         if( $read && !$write ) {
             $usersList{"anyone"}->{"read"} = 1;
@@ -545,56 +501,55 @@ sub getEntityRight {
             $usersList{"anyone"}->{"write"} = 0;
 
             # Droit a ne pas traiter car droit public
-            $rightDef{"read"}->{"compute"} = 0;
+            $rightDef->{"read"}->{"compute"} = 0;
 
             # construction d'un template utilisateur
-            $userTemplate{"read"} = 1;
+            $entityTemplate{"read"} = 1;
         }elsif( !$read && $write ) {
             $usersList{"anyone"}->{"read"} = 0;
             $usersList{"anyone"}->{"writeonly"} = 1;
             $usersList{"anyone"}->{"write"} = 0;
             
             # Droit a ne pas traiter car droit public
-            $rightDef{"writeonly"}->{"compute"} = 0;
+            $rightDef->{"writeonly"}->{"compute"} = 0;
 
             # construction d'un template utilisateur
-            $userTemplate{"writeonly"} = 1;
+            $entityTemplate{"writeonly"} = 1;
         }elsif( $read && $write ) {
             $usersList{"anyone"}->{"read"} = 0;
             $usersList{"anyone"}->{"writeonly"} = 0;
             $usersList{"anyone"}->{"write"} = 1;
 
             # Droit a ne pas traiter car droit public
-            $rightDef{"read"}->{"compute"} = 0;
-            $rightDef{"writeonly"}->{"compute"} = 0;
-            $rightDef{"write"}->{"compute"} = 0;
+            $rightDef->{"read"}->{"compute"} = 0;
+            $rightDef->{"writeonly"}->{"compute"} = 0;
+            $rightDef->{"write"}->{"compute"} = 0;
         }
     }
     $queryResult->finish;
 
-    #
-    # Tratitement du droit '$right', cles du hachage '%rightDef'
-    while( my( $right, $rightDesc ) = each( %rightDef ) ) {
+
+    # Traitement du droit '$right', cles du hachage '%rightDef'
+    while( my( $right, $rightDesc ) = each( %{$rightDef} ) ) {
         if( !$rightDesc->{"compute"} ) {
             next;
         }
 
-        #
-        # On execute la requete correspondant au droit
-        if( !execQuery( $rightDef{$right}->{"sqlQuery"}, $dbHandler, \$queryResult ) ) {
-            write_log( "Probleme lors de l'execution de la requete.", "W" );
-            if( defined($queryResult) ) {
-                write_log( $queryResult->err, "W" );
+        # On execute la requête correspondant au droit
+        if( !execQuery( $rightDef->{$right}->{"sqlQuery"}, $dbHandler, \$queryResult ) ) {
+            write_log( "Echec : probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+            return undef;
+        }
+
+        while( my( $userLogin ) = $queryResult->fetchrow_array ) {
+            if( defined($domain->{"domain_name"}) ) {
+                $userLogin .= "@".$domain->{"domain_name"};
             }
 
-            write_log( "", "C" );
-            exit 1;
-        }
-        while( my( $userLogin ) = $queryResult->fetchrow_array ) {
-            # Si l'utilisateur n'a pas deja ete trouve, on l'initialise
+            # Si l'utilisateur n'a pas déjà été trouvé, on l'initialise
             # avec les valeurs du template
             if( !exists( $usersList{$userLogin} ) ) {
-                while( my( $templateRight, $templateValue ) = each( %userTemplate ) ) {
+                while( my( $templateRight, $templateValue ) = each( %entityTemplate ) ) {
                     $usersList{$userLogin}->{$templateRight} = $templateValue;
                 }
             }
@@ -604,11 +559,8 @@ sub getEntityRight {
 
     }
 
-    #
     # Normalisation des droits
-    %usersList = computeRight( \%usersList );
-
-    return \%usersList;
+    return computeRight( \%usersList );
 }
 
 
@@ -617,21 +569,21 @@ sub getEntityRight {
 #------------------------------------------------------------------------------
 sub computeRight {
     my( $usersList ) = @_;
-    my %rightList;
+    my $rightList = cloneStruct(OBM::Parameters::cyrusConf::boxRight);
 
     while( my( $userName, $right ) = each( %$usersList ) ) {
         if( $right->{"write"} ) {
-            $rightList{"write"}->{$userName} = 1;
+            $rightList->{"write"}->{$userName} = 1;
         }elsif( $right->{"read"} && $right->{"writeonly"} ) {
-            $rightList{"write"}->{$userName} = 1;
+            $rightList->{"write"}->{$userName} = 1;
         }elsif( $right->{"read"} ) {
-            $rightList{"read"}->{$userName} = 1;
+            $rightList->{"read"}->{$userName} = 1;
         }elsif( $right->{"writeonly"} ) {
-            $rightList{"writeonly"}->{$userName} = 1;
+            $rightList->{"writeonly"}->{$userName} = 1;
         }
     }
 
-    return %rightList;
+    return $rightList;
 }
 
 
@@ -639,45 +591,42 @@ sub computeRight {
 # Permet de savoir si il y a eu mise à jour des ACL ou pas.
 #------------------------------------------------------------------------------
 sub aclUpdated {
-    my( $cyrusAcl, $bdAcl ) = @_;
+    my( $oldAcl, $newAcl ) = @_;
     my $returnCode = 0;
 
-    my @cyrusRightList = keys( %$cyrusAcl );
-    my @bdRightList = keys( %$bdAcl );
+    my @oldRightList = keys( %$oldAcl );
+    my @newRightList = keys( %$newAcl );
 
-    if( $#cyrusRightList != $#bdRightList ) {
-        $returnCode = 1;
+    print $#oldRightList." ".$#newRightList."\n";
+    if( $#oldRightList != $#newRightList ) {
+        return 1;
 
     }else {
-        while( my( $cyrusRight, $cyrusUsers ) = each( %$cyrusAcl ) ) {
+        while( my( $oldRight, $oldUsers ) = each( %$oldAcl ) ) {
             if( $returnCode ) {
                 next;
             }
 
-            if( !exists( $bdAcl->{$cyrusRight} ) ) {
-                $returnCode = 1;
+            if( !exists( $newAcl->{$oldRight} ) ) {
+                return 1;
             }
 
-            my @cyrusUsersList = keys( %$cyrusUsers );
-            my @bdUsersList = keys( %{$bdAcl->{$cyrusRight}} );
+            my @oldUsersList = keys( %$oldUsers );
+            my @newUsersList = keys( %{$newAcl->{$oldRight}} );
 
-            if( $#cyrusUsersList != $#bdUsersList ) {
-                $returnCode = 1;
+            if( $#oldUsersList != $#newUsersList ) {
+                return 1;
             }
 
-            for( my $i=0; $i<=$#cyrusUsersList; $i++ ) {
-                if( $returnCode ) {
-                    next;
-                }
-
-                if( !exists($bdAcl->{$cyrusRight}->{$cyrusUsersList[$i]}) ) {
-                    $returnCode = 1;
+            for( my $i=0; $i<=$#oldUsersList; $i++ ) {
+                if( !exists($newAcl->{$oldRight}->{$oldUsersList[$i]}) ) {
+                    return 1;
                 }
             }
         }
     }
 
-    return $returnCode;
+    return 0;
 }
 
 #------------------------------------------------------------------------------

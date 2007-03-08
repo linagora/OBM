@@ -21,11 +21,11 @@ INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, dom
 -------------------------------------------------------------------------------
 DELETE FROM UserObm;
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uadmin','padmin','PLAIN','admin', 'Admin Lastname', 'Firstname', '0', '1000', '512');
+INSERT INTO UserObm (userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uadmin','padmin','PLAIN','admin', 'Admin Lastname', 'Firstname', '0', '1000', '512');
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('ueditor','peditor','PLAIN','editor', 'Itor', 'Ed', (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), '1001', '513');
+INSERT INTO UserObm (userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('ueditor','peditor','PLAIN','editor', 'Itor', 'Ed', (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), '1001', '513');
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_password_type,userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uuser','puser','PLAIN','user', 'User', 'John', (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), '1002', '513');
+INSERT INTO UserObm (userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uuser','puser','PLAIN','user', 'User', 'John', (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), '1002', '513');
 
 
 
@@ -94,7 +94,7 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, us
 -- Utilisateur de test :
 --  - appartenant au domaine 1 ;
 --  - ayant le droit mail ;
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test01', 'PLAIN', 'ptest01', 'user', 'User', 'Test 01', '1051', '512', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test01\r\nmail.test01', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Autan en emporte le vent', 'Compris', 'Utilisateur n''appartenant qu''au domaine 1');
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description, userobm_vacation_enable, userobm_vacation_message) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test01', 'PLAIN', 'ptest01', 'user', 'User', 'Test 01', '1051', '512', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test01\r\nmail.test01', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Autan en emporte le vent', 'Compris', 'Utilisateur n''appartenant qu''au domaine 1', 1, 'Ceci est le message d''absence');
 
 
 -- Utilisateur de test :
@@ -147,7 +147,7 @@ INSERT INTO MailServerNetwork (mailservernetwork_host_id, mailservernetwork_ip) 
 DELETE FROM MailShare;
 
 -- Appartenant à tous les domaines
-INSERT INTO MailShare (mailshare_domain_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'mailShare00', 'Répertoire partagé de test 00, appartenant au domaine 1', 'mailshare00');
+INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare00', 'Répertoire partagé de test 00, appartenant au domaine 1', 'mailshare00');
 
 -- Appartenant au domaine 1
-INSERT INTO MailShare (mailshare_domain_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 2'), 'mailShare01', 'Répertoire partagé de test 01, appartenant au domaine 2', 'mailshare01');
+INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 2'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare01', 'Répertoire partagé de test 01, appartenant au domaine 2', 'mailshare01');
