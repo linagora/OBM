@@ -381,7 +381,6 @@ sub updateBox {
     }
 
     # Mise a jour des ACLs
-    print "ACL: ".$boxLogin."\n";
     if( &OBM::toolBox::aclUpdated( $oldImapBoxDesc->{"box_acl"}, $newImapBoxDesc->{"box_acl"} ) ) {
         &OBM::toolBox::write_log( "Mise a jour des ACL de la boite '".$boxLogin."'", "W" );
 
