@@ -597,7 +597,6 @@ sub aclUpdated {
     my @oldRightList = keys( %$oldAcl );
     my @newRightList = keys( %$newAcl );
 
-    print $#oldRightList." ".$#newRightList."\n";
     if( $#oldRightList != $#newRightList ) {
         return 1;
 
