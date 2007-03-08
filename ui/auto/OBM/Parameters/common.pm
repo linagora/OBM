@@ -188,23 +188,11 @@ $minGID = 1000;
 # Le repertoire contenant les scripts de l'automate
 $automateAliamin = $racineAliamin . "auto/";
 #
-$automateMailAliases = $automateAliamin . "mailAliases.pl";
 $automateMailChangeAlias = $automateAliamin . "mailChangeAlias.pl";
 $automateMailChangeSieve = $automateAliamin . "mailChangeSieve.pl";
-$automateMailMakeStats = $automateAliamin . "mailMakeStats.pl";
-$automateCyrusAdmin = $automateAliamin . "cyrusAdmin.pl";
-$automateLdapDatabase = $automateAliamin . "ldapDatabase.pl";
-$automateLdapCommit = $automateAliamin . "ldapCommitChanges.pl";
+$automateCyrusAdmin = $automateAliamin . "mailCyrusAdmin.pl";
 $automateLdapUpdate = $automateAliamin . "ldapModifBase.pl";
 $automateLdapUpdatePasswd = $automateAliamin . "ldapChangePasswd.pl";
-$automatePostfixConf = $automateAliamin . "postfixConf.pl";
-$automateNameServer = $automateAliamin . "nameServer.pl";
-$automateNetwork = $automateAliamin . "network.pl";
-$automateFirewall = $automateAliamin . "parefeu.pl";
-$automateVPN = $automateAliamin . "vpn.pl";
-$automateSquidCache = $automateAliamin . "squidCache.pl";
-$automateAmavis = $automateAliamin . "mailAmavisConf.pl";
-$automateSpecificCmd = $automateAliamin . "specificCmd.pl";
 #
 # Securinet
 $automateStateSSHScript = $automateAliamin . "securinet/sshState.pl";
@@ -214,10 +202,6 @@ $automateBackup = $automateAliamin . "securinet/backupSecurinet.pl";
 # Calcul du mot de passe NT ou LM
 $sambaNTPass = $automateAliamin . "mkntlmpwd -N";
 $sambaLMPass = $automateAliamin . "mkntlmpwd -L";
-#
-# SSH
-$rsaPrivateKey = $automateAliamin . "Aliamin/rsaKey/rsaKey";
-$rsaPublicKey = $automateAliamin . "Aliamin/rsaKey/rsaKey.pub";
 
 #
 # ACL : Definition des entites et des consomateurs
