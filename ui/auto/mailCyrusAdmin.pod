@@ -1,0 +1,64 @@
+=head1 NOM
+
+mailCyrusAdmin.pl - Script permettant de gérer le serveur Cyrus.
+
+=head1 DEPENDANCES
+
+ require OBM::imapd;
+ require OBM::toolBox;
+ require OBM::dbUtils;
+ use OBM::Parameters::common;
+
+=head1 DESCRIPTION
+
+ Ce script permet de gérer les comptes du serveur Cyrus.
+
+ Il permet de :
+
+=over 4
+
+=item B<Gérer les boîtes à lettres utilisateurs>
+
+=over 4
+
+=item création ;
+
+=item suppression ;
+
+=item gestion du message d'absence ;
+
+=item gestion du quota ;
+
+=item gestion des droits, ainsi que sur la sous-arborescence.
+
+=back
+
+=item B<Gérer les répertoires partagés>
+
+=over 4
+
+=item création ;
+
+=item suppression ;
+
+=item gestion du quota ;
+
+=item gestion des droits, ainsi que sur la sous-arborescence.
+
+=back
+
+=back
+
+=head1 LIMITATION
+
+Actuellement, le droit Cyrus 'B<post>' est traité séparément des autres droits
+car il n'a aucune représentation en BD.
+
+Ainsi, si on supprime une ACL de type 'anyone p' d'une boîte depuis une
+interface d'administration (cyradm par exemple), le script ne verra pas la
+différence et ne rajoutera pas ce droit.
+
+Ce droit est nécessaire sur les répertoires partagés afin de pouvoir délivré du
+courrier.
+
+=cut
