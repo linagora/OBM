@@ -14,7 +14,7 @@ Obm.Menu = new Class({
   },  
 
   addItem: function(item) {
-    slide = new Fx.Slide(item +'-items', {duration: 150,onComplete:this.menuListBoxFix});
+    var slide = new Fx.Slide(item +'-items', {duration: 150,onComplete:this.menuListBoxFix});
     sectionItem = $(item +'-items-wrapper');
     sectionBlock = $(item);
     sectionItem.style.top = sectionBlock.getTop() + sectionBlock.offsetHeight + 'px';
@@ -22,6 +22,7 @@ Obm.Menu = new Class({
 
     slide.hide();
     sectionItem.style.display = 'block';
+    slide.hiddingTimer = new HideTimer(slide.element,{fn:slide.toggle.bind(slide)});
 
     this.menuItems[item] = slide;
     sectionBlock.addEvent('click', function(e){
@@ -40,7 +41,7 @@ Obm.Menu = new Class({
     sectionBlock = $(item);
     sectionItem.style.top = sectionBlock.getTop() + sectionBlock.offsetHeight + 'px';
     sectionItem.style.left = sectionBlock.getLeft() + 'px';
-    this.menuItems[item].toggle(); 
+    this.menuItems[item].toggle();
     this.hideMenuBut(item);
   },
 
@@ -48,8 +49,11 @@ Obm.Menu = new Class({
     for(var i in this.menuItems) {
       if(exception != i) {
         this.menuItems[i].hide();
+        this.menuItems[i].hiddingTimer.clearTimer();
       }
     }
+    var t = this.menuItems[exception].hiddingTimer;
+    t.initTimer.bind(t).delay(180);
   },
 
   hideMenu: function() {
@@ -180,6 +184,7 @@ Obm.Portlets = new Class({
 function datePickerGenerator() {
   elements = $$('.datePicker');
   elements.each(function(element){
+    element.setProperty('autocomplete','off');
     img = $(document.createElement('img'));
     img.setAttribute("src", obm.vars.images.datePicker);
     img.injectAfter(element);

@@ -98,6 +98,7 @@ $ico_minus          = "$theme_path/ico_minus.gif";
 $ico_nav_close      = "$theme_path/ico_nav_close.gif";
 $ico_nav_open       = "$theme_path/ico_nav_open.gif";
 $ico_add            = "$theme_path/ico_add.gif";
+$ico_new            = "$theme_path/ico_add.gif";
 $ico_scope          = "$theme_path/ico_scope.gif";
 
 // OBM Globals images and icons

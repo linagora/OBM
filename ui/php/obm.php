@@ -359,26 +359,7 @@ function dis_deal_portal() {
   <dd>$m_amount</dd>
   <dt>$l_deal_balanced</dt>
   <dd>$m_balanced</dd>
-
-  <table>
-  <tr>
-    <td></td>
-    <td class=\"number\"></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td class=\"number\">&nbsp; </td>
-  </tr>
-  <tr>
-    <td></td>
-    <td class=\"number\"></td>
-  </tr>
-  <tr>
-    <td>&nbsp;</td>
-    <td></td>
-  </tr>
-  $dis_status
-  </table>
+  </dl>
   <a class=\"link\" href=\"$path/deal/deal_index.php?action=search&amp;sel_manager=$uid\">$l_my_deal</a>
   </div>";
 
@@ -410,7 +391,7 @@ function dis_project_portal() {
    <dt>$l_my_project_current</dt>
    <dd>$proj[total]</dd>
     $dis_project
-   </dt>
+   </dl>
    <a class=\"link\" href=\"$path/project/project_index.php?action=search&amp;sel_member=$uid\">$l_my_project</a>
   </div>";
 
@@ -445,6 +426,7 @@ function dis_incident_portal() {
     <dt>$l_my_incident_current</dt>
     <dd>$incs[0]</dd>
     $dis_status
+    </dl>
    <a class=\"link\" href=\"$path/incident/incident_index.php?action=search&amp;sel_owner=$uid\">$l_my_incident</a>
   </div>";
 

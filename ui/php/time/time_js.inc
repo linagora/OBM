@@ -106,11 +106,9 @@ function fill_tasktype(sel_tt, project_id) {
 function fill_projectall(sel_list) {
   var i, j, k;
   k = 0;
-
   proj_array = new Array();
-
-  for (i = 0; i < project.length; i++) {
-    for (j = 1; j < project[i].length; j++) {
+  for (i in project) {
+    for (j = 0 ; j < project[i].length; j++) {
       proj_array[k]=project[i][j];
       k++;
     }
@@ -122,8 +120,8 @@ function fill_projectall(sel_list) {
   sel_list.options[0].value = 0; 
 
   for (i = 0; i < proj_array.length; i++) {
-    sel_list.options[i+1] = new Option(proj_array[i][0]);
-    sel_list.options[i+1].value = proj_array[i][1]; 
+    sel_list.options[i+1] = new Option(proj_array[i].label);
+    sel_list.options[i+1].value = proj_array[i].id; 
   }
 }
 
@@ -148,8 +146,8 @@ function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
 
   } else {
 
-    for (i = 0; i < project.length; i++) {
-      if (project[i][0] == tasktype_id) {
+    for (i in project) {
+      if (i == tasktype_id) {
         tt_location = i; 
       }
     }
@@ -158,15 +156,15 @@ function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
     if (tt_location != -1) {
       // We construct a new array (without the tt id) to sort it case sensitive
       proj_array = new Array();
-      for (i = 1; i < project[tt_location].length; i++) {
-        proj_array[i-1] = project[tt_location][i];
+      for (i = 0; i < project[tt_location].length; i++) {
+        proj_array[i] = project[tt_location][i];
       }
       proj_array.sort();
 
       // Fill the project select widget
       for (i = 0; i < proj_array.length; i++) {
-        sel_list.options[i] = new Option(proj_array[i][0]);
-        sel_list.options[i].value = proj_array[i][1]; 
+        sel_list.options[i] = new Option(proj_array[i].label);
+        sel_list.options[i].value = proj_array[i].id; 
       }
     }
     // there are no projects with the selected tasktype
@@ -202,18 +200,18 @@ function fill_projecttask(sel_list, deal_id) {
     sel_list.options[i] = null; 
   }
 
-  for (i = 0; i < projecttask.length; i++) {
-          if (projecttask[i][0] == deal_id) {
-            dl_location = i; 
+  for (i in projecttask) {
+    if (i == deal_id) {
+      dl_location = i;
     }
   }
 
   // there are projects with the selected tasktype
   if (dl_location != -1) {
     // add new items
-    for (i = 1; i < projecttask[dl_location].length; i++) {
-      sel_list.options[i-1] = new Option(projecttask[dl_location][i][0]);
-      sel_list.options[i-1].value = projecttask[dl_location][i][1]; 
+    for (i = 0; i < projecttask[dl_location].length; i++) {
+      sel_list.options[i] = new Option(projecttask[dl_location][i].label);
+      sel_list.options[i].value = projecttask[dl_location][i].id; 
     }
   }
 

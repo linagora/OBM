@@ -1107,9 +1107,9 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
     $css
   </style>
   <h1>
-    <a href=\"calendar_index.php?action=perform_meeting&amp;date=$prev_week&amp;meeting_duration=$param_duration\"><img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>     
+    <a href=\"calendar_index.php?action=planning&amp;date=$prev_month\"><img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>     
     $display_date
-    <a href=\"calendar_index.php?action=perform_meeting&amp;date=$next_week&amp;meeting_duration=$param_duration\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
+    <a href=\"calendar_index.php?action=planning&amp;date=$next_month\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
   </h1>   
   <table class=\"planning\">
   <colgroup>

@@ -446,7 +446,7 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
 function html_company_links($co_q) {
   global $ico_contact;
   global $ico_document,$ico_add, $ico_project, $ico_contract, $ico_lead;
-  global $ico_invoice, $ico_payment;
+  global $ico_invoice, $ico_payment, $ico_deal;
   global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
   global $l_module_lead, $l_module_contract, $l_module_invoice;
   global $l_module_document, $l_module_payment, $l_document_add;

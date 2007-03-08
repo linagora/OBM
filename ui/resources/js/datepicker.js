@@ -59,7 +59,7 @@ in the style sheet, to make it more clear what the different style elements are 
 
 var datePickerDivID = "datepicker";
 var iFrameDivID = "datepickeriframe";
-
+var datePickerTimer;
 /**
   This is the main function you'll call from the onClick event of a button.
   Normally, you'll have something like this on your HTML page:
@@ -144,6 +144,7 @@ function drawDatePicker(targetDateField, x, y)
     newNode.setAttribute("id", "datepicker");
     newNode.setAttribute("style", "visibility: hidden;");
     document.body.appendChild(newNode);
+    datePickerTimer = new HideTimer(newNode);
   }
 
   // move the datepicker div to the proper x,y coordinate and toggle the visiblity
@@ -157,6 +158,7 @@ function drawDatePicker(targetDateField, x, y)
 
   // draw the datepicker table
   refreshDatePicker(targetDateField.name, dt.getFullYear(), dt.getMonth(), dt.getDate());
+  datePickerTimer.initTimer();
 }
 
 
@@ -408,7 +410,6 @@ function updateDateField(dateFieldName, dateString)
   pickerDiv.style.display = "none";
 
   overListBoxFix("datepicker");
-  targetDateField.focus();
   if(targetDateField.onchange) 
     targetDateField.onchange();
   // after the datepicker has closed, optionally run a user-defined function called

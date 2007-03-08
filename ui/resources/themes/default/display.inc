@@ -323,8 +323,8 @@ function display_head_theme($p_module) {
   $dis_extra_css
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
 
   $js_include
   <script type=\"text/javascript\">

@@ -143,8 +143,8 @@ form {
 #mainPanel {
   z-index:100;
   min-width: 120px;
-  margin: 1em 0px 20px 17.5em;
-  padding: 1em;
+  margin: 0 0px 20px 17.5em;
+  padding: 2em 1em 1em;
 /*IE workaround*/
   _height: 1px;
 }

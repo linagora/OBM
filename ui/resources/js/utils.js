@@ -103,6 +103,53 @@ var Observer = new Class({
   }
 });
 
+
+HideTimer = new Class({
+
+  setOptions: function(options) {
+    this.options = Object.extend({
+      duration: 1000,
+      fn: this.hideElement
+    }, options || {});
+
+  },
+
+  initialize: function(el,options) {
+    this.setOptions(options);
+    this.el = $(el);
+    this.timer = null;
+    this.el.addEvent('mouseover',this.clearTimer.bind(this));
+    this.el.addEvent('mouseout',this.initTimer.bind(this));
+  },
+  
+  initTimer: function() {
+    if(this.el.getStyle('display') != 'none') {
+      if(this.timer != null ) {
+        this.clearTimer();
+      }
+      this.timer = this.options.fn.delay(this.options.duration);
+    }
+  },
+
+  clearTimer: function() {
+    if(this.timer != null) {
+      this.timer = $clear(this.timer);
+    }
+  },
+  
+  toggleTimer: function() {
+    if(this.timer == null) {
+      
+    }
+  },
+
+  hideElement: function() {
+    this.el.setStyle('display','none');
+    this.el.setStyle('visibility','hidden');
+  }
+
+});
+
 String.prototype.pad = function(l, s, t){
     return s || (s = " "), (l -= this.length) > 0 ? (s = new Array(Math.ceil(l / s.length)
         + 1).join(s)).substr(0, t = !t ? l : t == 1 ? 0 : Math.ceil(l / 2))

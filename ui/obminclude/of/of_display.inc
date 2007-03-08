@@ -1137,7 +1137,7 @@ function display_todos($path="..") {
 ///////////////////////////////////////////////////////////////////////////////
 function display_record_info($obm_q) {
   global  $l_infos , $l_public, $l_private, $ico_datasource;
-  global  $ico_private, $ico_public, $ico_new ,$ico_update;
+  global  $ico_privacy, $ico_new ,$ico_update;
 
   if (is_object($obm_q)) {
     $usercreate = $obm_q->f("usercreate");
@@ -1146,7 +1146,6 @@ function display_record_info($obm_q) {
     $timeupdate = of_datetime_format($obm_q->f("timeupdate"), 1);
     $datasource = $obm_q->f("datasource_name");
     $privacy = ($obm_q->f("privacy") == 0 ? $l_public : $l_private);
-    $ico_privacy = ($obm_q->f("privacy") == 0 ? $ico_private : $ico_public);
     $created = "$usercreate : $timecreate";
     $updated = "$userupdate : $timeupdate";
 
@@ -1158,9 +1157,9 @@ function display_record_info($obm_q) {
     
     $block = "<div class=\"portlet\"><h1>$l_infos</h1>
       <ul>
-      <li><img src=\"$ico_new\" alt=\"created by\"/>$created</li>
-      <li><img src=\"$ico_update\" alt=\"updated by\"/>$updated </li>
-      <li><img src=\"$ico_\"$privacy alt=\"privacy\" /></li>
+      <li><img src=\"$ico_new\" alt=\"created by\"/> $created</li>
+      <li><img src=\"$ico_update\" alt=\"updated by\"/> $updated </li>
+      <li><img src=\"$ico_privacy alt=\"privacy\" /> $privacy</li>
       $dis_dsrc
       </ul>
   </div>";

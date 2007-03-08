@@ -60,9 +60,11 @@
   width: 12em;
   overflow: show;
   margin-bottom: 5px;
+  height: 1em;
 }
 
 .summaryBox dd {
-  float: left;
   margin: 0;
+  height: 1em;
+  margin-bottom: 5px;
 }
