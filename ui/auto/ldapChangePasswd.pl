@@ -16,6 +16,9 @@ use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 use Getopt::Long;
 
+$ENV{PATH}=$automateOBM;
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+
 
 # Fonction de verification des parametres du script
 sub getParameter {

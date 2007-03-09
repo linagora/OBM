@@ -18,6 +18,9 @@ require OBM::ldap;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 
+$ENV{PATH}=$automateOBM;
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+
 
 #
 # Debut du main

@@ -22,6 +22,9 @@ require OBM::toolBox;
 use OBM::Parameters::common;
 use Getopt::Long;
 
+$ENV{PATH}=$automateOBM;
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+
 
 #
 # On prepare le log

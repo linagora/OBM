@@ -18,6 +18,9 @@ require OBM::toolBox;
 require OBM::dbUtils;
 use OBM::Parameters::common;
 
+$ENV{PATH}=$automateOBM;
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+
 
 sub exitScript {
     my( $state, $dbHandler ) = @_;
