@@ -158,6 +158,9 @@ $l_tools = "Update tools";
 $l_control = "Dashboard";
 $l_host = "Host";
 $l_scope_update = "Update system";
+$l_insufficient_permission = "Insufficient permissions";
+$l_permission_denied = $l_insufficient_permission;
+
 // Global display
 $l_last_visit = "Last visits";
 

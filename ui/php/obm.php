@@ -61,7 +61,7 @@ $display["head"] = display_head("OBM Version $obm_version");
 $display["header"] = display_menu("");
 switch($params["error"]) {
   case "perms" :
-    $error_msg = $l_insufficient_permission;
+    $error_msg = $l_permission_denied;
     break;
   default: 
     $error_msg = "";
