@@ -1184,7 +1184,7 @@ function dis_contact_form($action, $co_q, $contact) {
   if ($contact["market"] > 0) {
     $users[] = $contact["market"];
   }
-  if ($contact["contact_id"] > 0) {
+  if ($contact["contact_id"] == 0) {
     $users[] = $co_q->f("contact_marketingmanager_id");
   }
   $usr_q = run_query_all_users_from_group($cg_com, $users);
