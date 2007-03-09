@@ -97,6 +97,10 @@ sub updateSieve {
     my( $srvDesc, $imapBox ) = @_;
     my @sieveScript;
 
+    if( !defined($imapBox->{"box_vacation_enable"}) || !$imapBox->{"box_vacation_enable"} ) {
+        return 0;
+    }
+
     if( !defined($imapBox->{"box_login"}) ) {
         return 1;
     }
@@ -112,7 +116,7 @@ sub updateSieve {
 
     my $sieveScriptName = $boxLogin.".sieve";
     $sieveScriptName =~ s/@/-/g;
-    my $localSieveScriptName = $tmpAliamin.$sieveScriptName;
+    my $localSieveScriptName = $tmpOBM.$sieveScriptName;
 
     &OBM::toolBox::write_log( "Mise a jour du script Sieve pour l'utilisateur : '".$boxLogin."'", "W" );
 

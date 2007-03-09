@@ -16,7 +16,7 @@ use FindBin qw($Bin);
 
 @ISA = qw(Exporter);
 @EXPORT_const = qw($facility_log $securinetMode $enableHook $sieveSrv $ldapServer $ldapAdminLogin $sambaSrvHome $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $rsaPrivateKey $rsaPublicKey $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
-@EXPORT_dir = qw($automateAliamin $templateAliamin $tmpAliamin);
+@EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_files = qw($templatePostfixAliases $tmpPostfixAliases $aliaminPostfixAliases $automateMailAliases $automateMailChangeAlias $automateMailChangeSieve $automateMailStat $automateCyrusAdmin $automateLdapDatabase $automateLdapCommit $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixConf $automateNameServer $automateSquidCache $automateNetwork $automateFirewall $automateVPN $automateAmavis $aliaminMailLog $templateLdapDatabase $tmpLdapDatabase $aliaminSlapdConf $aliaminSlapdConfNew $aliaminSlapdRep $aliaminSlapdRepNew $slapdControl $templateSquidConf $tmpSquidUserURLList $tmpSquidHostURLList $tmpSquidConf $squidUserURLList $squidHostURLList $squidAuthenticateProgram $squidConf $aliaminVPNKernelConf $aliaminPareFeuFirewallsh $aliaminPareFeuFlushfirewallsh $aliaminPareFeuEnablessh);
 @EXPORT_command = qw($ldapPasswdSSHAGenerator $ldapPasswdMD5Generator $aliaminMailStat $ldapMakeNewBase $recode $aliaminPasswd $sambaNTPass $sambaLMPass $automateStateSSHScript $automateSpecificCmd $automateBackup);
 @EXPORT_regexp = qw($findTag $endLoopTag $regexp_email $regexp_rootLdap $regexp_login);
@@ -43,9 +43,9 @@ if( $cfgFile->val( 'global', 'securinet' ) eq "true" ) {
 }
 
 # racine relative pour les scripts Perl
-$racineAliamin = $Bin."/..";
-if( !($racineAliamin =~ /\/$/) ) {
-    $racineAliamin .= "/";
+$racineOBM = $Bin."/..";
+if( !($racineOBM =~ /\/$/) ) {
+    $racineOBM .= "/";
 }
 
 # Definition des bases de donnees
@@ -82,28 +82,28 @@ $baseHomeDir = "/home";
 # Definition des fichiers modeles
 #
 # Le repertoire contenant les modeles
-$templateAliamin = $racineAliamin . "template/";
+$templateOBM = $racineOBM . "template/";
 # Messagerie :
-$templatePostfixAliases = $templateAliamin . "templatePostfixAliases";
+$templatePostfixAliases = $templateOBM . "templatePostfixAliases";
 # LDAP :
-$templateLdapDatabase = $templateAliamin . "templateLdapDatabase";  # fichier ldif
+$templateLdapDatabase = $templateOBM . "templateLdapDatabase";  # fichier ldif
 
 # Squid :
-$templateSquidConf = $templateAliamin . "templateSquidConf";
+$templateSquidConf = $templateOBM . "templateSquidConf";
 
 # Definitions des fichiers temporaires.
 #
 # Le repertoire temporaire
-$tmpAliamin = "/tmp/";
+$tmpOBM = "/tmp/";
 # Messagerie :
-$tmpPostfixAliases = $tmpAliamin . "aliases";
+$tmpPostfixAliases = $tmpOBM . "aliases";
 # LDAP :
-$tmpLdapDatabase = $tmpAliamin . "ldapDatabase.ldif";
+$tmpLdapDatabase = $tmpOBM . "ldapDatabase.ldif";
 
 # Squid
-$tmpSquidConf = $tmpAliamin . "squid.conf";
-$tmpSquidUserURLList = $tmpAliamin . "UserURLList";
-$tmpSquidHostURLList = $tmpAliamin . "HostURLList";
+$tmpSquidConf = $tmpOBM . "squid.conf";
+$tmpSquidUserURLList = $tmpOBM . "UserURLList";
+$tmpSquidHostURLList = $tmpOBM . "HostURLList";
 
 # Definition des fichiers correspondants aux fichiers modeles.
 #
@@ -186,22 +186,22 @@ $minGID = 1000;
 # Les scripts de l'automate
 #
 # Le repertoire contenant les scripts de l'automate
-$automateAliamin = $racineAliamin . "auto/";
+$automateOBM = $racineOBM . "auto/";
 #
-$automateMailChangeAlias = $automateAliamin . "mailChangeAlias.pl";
-$automateMailChangeSieve = $automateAliamin . "mailChangeSieve.pl";
-$automateCyrusAdmin = $automateAliamin . "mailCyrusAdmin.pl";
-$automateLdapUpdate = $automateAliamin . "ldapModifBase.pl";
-$automateLdapUpdatePasswd = $automateAliamin . "ldapChangePasswd.pl";
+$automateMailChangeAlias = $automateOBM . "mailChangeAlias.pl";
+$automateMailChangeSieve = $automateOBM . "mailChangeSieve.pl";
+$automateCyrusAdmin = $automateOBM . "mailCyrusAdmin.pl";
+$automateLdapUpdate = $automateOBM . "ldapModifBase.pl";
+$automateLdapUpdatePasswd = $automateOBM . "ldapChangePasswd.pl";
 #
 # Securinet
-$automateStateSSHScript = $automateAliamin . "securinet/sshState.pl";
-$automateBackup = $automateAliamin . "securinet/backupSecurinet.pl";
+$automateStateSSHScript = $automateOBM . "securinet/sshState.pl";
+$automateBackup = $automateOBM . "securinet/backupSecurinet.pl";
 #
 # Samba
 # Calcul du mot de passe NT ou LM
-$sambaNTPass = $automateAliamin . "mkntlmpwd -N";
-$sambaLMPass = $automateAliamin . "mkntlmpwd -L";
+$sambaNTPass = $automateOBM . "mkntlmpwd -N";
+$sambaLMPass = $automateOBM . "mkntlmpwd -L";
 
 #
 # ACL : Definition des entites et des consomateurs
