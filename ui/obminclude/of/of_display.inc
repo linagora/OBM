@@ -1136,7 +1136,7 @@ function display_todos($path="..") {
 //          usercreate userupdate timecreate timeupdate datasource_name privacy
 ///////////////////////////////////////////////////////////////////////////////
 function display_record_info($obm_q) {
-  global  $l_infos , $l_public, $l_private, $ico_datasource;
+  global  $l_infos , $l_public, $l_private, $ico_data;
   global  $ico_privacy, $ico_new ,$ico_update;
 
   if (is_object($obm_q)) {
@@ -1150,7 +1150,7 @@ function display_record_info($obm_q) {
     $updated = "$userupdate : $timeupdate";
 
     if ($datasource != "") {
-      $dis_dsrc = "<li><img src=\"$ico_datasource alt=\"Datasource\" />$datasource</li>";
+      $dis_dsrc = "<li><img src=\"$ico_data\" alt=\"Datasource\" /> : $datasource</li>";
     } else {
       $dis_dsrc = "";
     }
@@ -1159,7 +1159,7 @@ function display_record_info($obm_q) {
       <ul>
       <li><img src=\"$ico_new\" alt=\"created by\"/> $created</li>
       <li><img src=\"$ico_update\" alt=\"updated by\"/> $updated </li>
-      <li><img src=\"$ico_privacy alt=\"privacy\" /> $privacy</li>
+      <li><img src=\"$ico_privacy\" alt=\"privacy\" /> : $privacy</li>
       $dis_dsrc
       </ul>
   </div>";

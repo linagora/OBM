@@ -40,6 +40,7 @@ $ico_group          = "$theme_path/ico_group.gif";
 $ico_host           = "$theme_path/ico_host.gif";
 $ico_lang           = "$theme_path/ico_lang.gif";
 $ico_lead           = "$theme_path/ico_lead.gif";            
+$ico_big_lead       = "$theme_path/ico_big_lead.gif";            
 $ico_list           = "$theme_path/ico_list.gif";    
 $ico_mailshare      = "$theme_path/ico_mailshare.gif";
 $ico_mailforward    = "$theme_path/ico_mailforward.gif";
@@ -85,7 +86,7 @@ $ico_datepicker     = "$theme_path/ico_datepicker.png";
 $ico_delete         = "$theme_path/ico_delete.gif";
 $ico_cancel         = "$theme_path/ico_delete.gif";
 $ico_validate       = "$theme_path/ico_validate.gif";
-$ico_update         = "$theme_path/ico_validate.gif";
+$ico_update         = "$theme_path/ico_update.gif";
 $ico_ok             = "$theme_path/ico_validate.gif";
 $ico_nok            = "$theme_path/ico_delete.gif";
 $ico_lock           = "$theme_path/ico_lock.gif";
@@ -100,7 +101,7 @@ $ico_nav_open       = "$theme_path/ico_nav_open.gif";
 $ico_add            = "$theme_path/ico_add.gif";
 $ico_new            = "$theme_path/ico_add.gif";
 $ico_scope          = "$theme_path/ico_scope.gif";
-
+$ico_privacy        = "$theme_path/ico_privacy.gif";
 // OBM Globals images and icons
 $flag_de            = "$theme_path/flag_de.gif";
 $flag_en            = "$theme_path/flag_en.gif";
