@@ -1184,9 +1184,12 @@ function dis_contact_form($action, $co_q, $contact) {
   if ($contact["market"] > 0) {
     $users[] = $contact["market"];
   }
-  if ($contact["contact_id"] == 0) {
+  if (is_object($co_q)) {
     $users[] = $co_q->f("contact_marketingmanager_id");
+  } elseif($contact["market"]) {
+    $users[] = $contact["market"];
   }
+
   $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_global_country_for_lang();
   $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact);
