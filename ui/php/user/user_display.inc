@@ -108,7 +108,11 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("userobm_email");
     if (strcmp($email ,"") != 0) {
       if ($cgp_use["service"]["mail"]) {
-        $main_domain = $obm["domain_name"];
+        if($OD->data_set->f("domain_name") != "") {
+          $main_domain = $OD->data_set->f("domain_name");
+        } else {
+          $main_domain = $obm["domain_name"];
+        }
         $emails = explode("\n",$email);
         $email = trim($emails[0])."@$main_domain";
       }
@@ -468,7 +472,11 @@ function html_user_consult($obm_q) {
   $vacation_enable = ($vacation_enable ? $c_yes : $c_no);
   $vacation_message = ($vacation_enable ? nl2br($vacation_message) : "---");
   //  $mail = get_mail_info();
-  $main_domain = $obm["domain_name"];
+  if( $obm_q->f("domain_name") != "") {
+    $main_domain = $obm_q->f("domain_name");
+  } else {
+    $main_domain = $obm["domain_name"];
+  }
   if ($host_name == '') {
     $dis_host = $l_empty;
   } else {

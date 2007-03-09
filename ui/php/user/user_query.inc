@@ -113,9 +113,12 @@ function run_query_user_search($user) {
 
   $select = "SELECT distinct UserObm.*,
       userobm_id as id,
+      domain_name,
       $datebegin,
       $lastaccess
-    FROM UserObm $join_grp";
+    FROM UserObm 
+    LEFT JOIN Domain ON userobm_domain_id = domain_id
+    $join_grp";
 
 
   // ORDER construction
