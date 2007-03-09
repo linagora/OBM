@@ -53,7 +53,7 @@ Obm.Menu = new Class({
       }
     }
     var t = this.menuItems[exception].hiddingTimer;
-    t.initTimer.bind(t).delay(180);
+    t.toggleTimer.bind(t).delay(180);
   },
 
   hideMenu: function() {

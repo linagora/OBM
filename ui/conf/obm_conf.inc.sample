@@ -107,6 +107,9 @@ $ccalendar_public_groups = true;
 $ccalendar_first_hour = 8;
 $ccalendar_last_hour = 20;
 
+// Calendar max user displayed in the calendar
+//$ccalendar_max_users = 25;
+
 // Generic E-mail for Incident module
 //$cmail_incident = "support@mydomain";
 

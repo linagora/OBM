@@ -529,7 +529,7 @@ function of_right_update_right($param, $entity) {
             entityright_entity_id,
             entityright_consumer,
             entityright_consumer_id,
-            entityright_read
+            entityright_write
           ) VALUES (
             '$entity',
             '$eid',

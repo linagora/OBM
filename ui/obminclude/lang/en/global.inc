@@ -22,6 +22,7 @@ $l_read_permission = "Read access management";
 $l_write_permission = "Write access management";
 $l_right_validate = "Validate these rights";
 $l_right_update_ok = "New rights validated";
+$l_infos = "Informations";
 
 // Common messages
 $l_yes = "Yes";

@@ -127,27 +127,34 @@ HideTimer = new Class({
       if(this.timer != null ) {
         this.clearTimer();
       }
-      this.timer = this.options.fn.delay(this.options.duration);
+      this.timer = this.exec.bind(this).delay(this.options.duration);
     }
   },
 
   clearTimer: function() {
     if(this.timer != null) {
-      this.timer = $clear(this.timer);
+      $clear(this.timer);
+      this.timer = null;
     }
   },
   
   toggleTimer: function() {
     if(this.timer == null) {
-      
+      this.initTimer();
+    } else {
+      this.clearTimer();
     }
   },
 
   hideElement: function() {
     this.el.setStyle('display','none');
     this.el.setStyle('visibility','hidden');
+  },
+  
+  exec: function() {
+    this.options.fn.delay(1);
+    this.timer = null;
   }
-
 });
 
 String.prototype.pad = function(l, s, t){

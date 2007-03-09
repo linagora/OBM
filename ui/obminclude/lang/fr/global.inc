@@ -25,7 +25,7 @@ $l_read_permission = "Gestion des permissions de lecture";
 $l_write_permission = "Gestion des permissions d'écriture";
 $l_right_validate = "Valider les permissions";
 $l_right_update_ok = "Nouvelles permissions validées";
-
+$l_infos = "Informations";
 // Common messages
 $l_yes = "Oui";
 $l_no = "Non";

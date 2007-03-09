@@ -121,7 +121,8 @@ if($phpversion >= 5) {
 }
 // Calendar : First day of the week (+2h to fix a DST php bug)
 //$ccalendar_weekstart = "monday + 2 hours";
-
+// Calendar max user displayed in the calendar
+$ccalendar_max_users = 25;
 // Calendar first and last hour display
 $ccalendar_first_hour = 8;
 $ccalendar_last_hour = 20;
