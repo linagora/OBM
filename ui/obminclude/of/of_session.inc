@@ -450,15 +450,19 @@ class Perm {
   //   - $action : action right to check in the module
   //-------------------------------------------------------------------------//
   function check_permissions($module, $action) {
-    global $actions;
+    global $actions,$path,$set_debug;
 
     $module_right = $this->get_module_rights($module);
     $action_right = $actions[$module][$action]["Right"];
 
     // If action right not defined or user has not access rights
     if ( ( ($module_right & $action_right) != $action_right)
-         || ($action_right == "") ) {
-      echo "<p>check_perm : ACCESS DENIED action=$action, mod_right=$module_right, ac=$action_right";
+      || ($action_right == "") ) {
+        if($set_debug == 0) {
+          header("location: $path/obm.php?error=perms");
+        } else {
+          echo "<p>check_perm : ACCESS DENIED action=$action, mod_right=$module_right, ac=$action_right";
+        }
       exit();
     }
   }

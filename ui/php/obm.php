@@ -51,7 +51,7 @@ page_close();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // If home page has a redirection
-if ($c_home_redirect != "") {
+if ($c_home_redirect != "" && !$params["error"]) {
   header("Status: 301 OK");
   header("Location: $c_home_redirect");
   exit();
@@ -59,6 +59,17 @@ if ($c_home_redirect != "") {
 
 $display["head"] = display_head("OBM Version $obm_version");
 $display["header"] = display_menu("");
+switch($params["error"]) {
+  case "perms" :
+    $error_msg = $l_insufficient_permission;
+    break;
+  default: 
+    $error_msg = "";
+}
+if($error_msg) {
+  $display["msg"] = display_err_msg($error_msg);
+}
+
 $display["title"] = "
 <h1 class=\"title\">
 OBM version $obm_version - " . date("Y-m-d H:i:s") . "

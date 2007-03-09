@@ -41,145 +41,145 @@ INSERT INTO Domain VALUES (1,NOW(),NOW(),0,0,'Main','Main domain','localdomain',
 --
 
 ALTER TABLE UserObm ADD Column userobm_domain_id int(8) default 0 after userobm_id;
-UPDATE UserObm SET userobm_domain_id = 1;
+UPDATE UserObm SET userobm_timeupdate = userobm_timeupdate, userobm_domain_id = 1;
 
 ALTER TABLE DataSource ADD Column datasource_domain_id int(8) default 0 after datasource_id;
-UPDATE DataSource SET datasource_domain_id = 1;
+UPDATE DataSource SET datasource_timeupdate = datasource_timeupdate, datasource_domain_id = 1;
 
 ALTER TABLE Country ADD Column country_domain_id int(8) default 0 first;
-UPDATE Country SET country_domain_id = 1;
+UPDATE Country SET country_timeupdate = country_timeupdate, country_domain_id = 1;
 
 ALTER TABLE Region ADD Column region_domain_id int(8) default 0 after region_id;
-UPDATE Region SET region_domain_id = 1;
+UPDATE Region SET region_timeupdate = region_timeupdate, region_domain_id = 1;
 
 ALTER TABLE CompanyType ADD Column companytype_domain_id int(8) default 0 after companytype_id;
-UPDATE CompanyType SET companytype_domain_id = 1;
+UPDATE CompanyType SET companytype_timeupdate = companytype_timeupdate, companytype_domain_id = 1;
 
 ALTER TABLE CompanyActivity ADD Column companyactivity_domain_id int(8) default 0 after companyactivity_id;
-UPDATE CompanyActivity SET companyactivity_domain_id = 1;
+UPDATE CompanyActivity SET companyactivity_timeupdate = companyactivity_timeupdate, companyactivity_domain_id = 1;
 
 ALTER TABLE CompanyNafCode ADD Column companynafcode_domain_id int(8) default 0 after companynafcode_id;
-UPDATE CompanyNafCode SET companynafcode_domain_id = 1;
+UPDATE CompanyNafCode SET companynafcode_timeupdate = companynafcode_timeupdate, companynafcode_domain_id = 1;
 
 ALTER TABLE Company ADD Column company_domain_id int(8) default 0 after company_id;
-UPDATE Company SET company_domain_id = 1;
+UPDATE Company SET company_timeupdate = company_timeupdate, company_domain_id = 1;
 
 ALTER TABLE Contact ADD Column contact_domain_id int(8) default 0 after contact_id;
-UPDATE Contact SET contact_domain_id = 1;
+UPDATE Contact SET contact_timeupdate = contact_timeupdate, contact_domain_id = 1;
 
 ALTER TABLE Kind ADD Column kind_domain_id int(8) default 0 after kind_id;
-UPDATE Kind SET kind_domain_id = 1;
+UPDATE Kind SET kind_timeupdate = kind_timeupdate, kind_domain_id = 1;
 
 ALTER TABLE ContactFunction ADD Column contactfunction_domain_id int(8) default 0 after contactfunction_id;
-UPDATE ContactFunction SET contactfunction_domain_id = 1;
+UPDATE ContactFunction SET contactfunction_timeupdate = contactfunction_timeupdate, contactfunction_domain_id = 1;
 
 ALTER TABLE LeadSource ADD Column leadsource_domain_id int(8) default 0 after leadsource_id;
-UPDATE LeadSource SET leadsource_domain_id = 1;
+UPDATE LeadSource SET leadsource_timeupdate = leadsource_timeupdate, leadsource_domain_id = 1;
 
 ALTER TABLE Lead ADD Column lead_domain_id int(8) default 0 after lead_id;
-UPDATE Lead SET lead_domain_id = 1;
+UPDATE Lead SET lead_timeupdate = lead_timeupdate, lead_domain_id = 1;
 
 ALTER TABLE ParentDeal ADD Column parentdeal_domain_id int(8) default 0 after parentdeal_id;
-UPDATE ParentDeal SET parentdeal_domain_id = 1;
+UPDATE ParentDeal SET parentdeal_timeupdate = parentdeal_timeupdate, parentdeal_domain_id = 1;
 
 ALTER TABLE Deal ADD Column deal_domain_id int(8) default 0 after deal_id;
-UPDATE Deal SET deal_domain_id = 1;
+UPDATE Deal SET deal_timeupdate = deal_timeupdate, deal_domain_id = 1;
 
 ALTER TABLE DealStatus ADD Column dealstatus_domain_id int(8) default 0 after dealstatus_id;
-UPDATE DealStatus SET dealstatus_domain_id = 1;
+UPDATE DealStatus SET dealstatus_timeupdate = dealstatus_timeupdate, dealstatus_domain_id = 1;
 
 ALTER TABLE DealType ADD Column dealtype_domain_id int(8) default 0 after dealtype_id;
-UPDATE DealType SET dealtype_domain_id = 1;
+UPDATE DealType SET dealtype_timeupdate = dealtype_timeupdate, dealtype_domain_id = 1;
 
 ALTER TABLE DealCompanyRole ADD Column dealcompanyrole_domain_id int(8) default 0 after dealcompanyrole_id;
-UPDATE DealCompanyRole SET dealcompanyrole_domain_id = 1;
+UPDATE DealCompanyRole SET dealcompanyrole_timeupdate = dealcompanyrole_timeupdate, dealcompanyrole_domain_id = 1;
 
 ALTER TABLE List ADD Column list_domain_id int(8) default 0 after list_id;
-UPDATE List SET list_domain_id = 1;
+UPDATE List SET list_timeupdate = list_timeupdate, list_domain_id = 1;
 
 ALTER TABLE CalendarEvent ADD Column calendarevent_domain_id int(8) default 0 after calendarevent_id;
-UPDATE CalendarEvent SET calendarevent_domain_id = 1;
+UPDATE CalendarEvent SET calendarevent_timeupdate = calendarevent_timeupdate, calendarevent_domain_id = 1;
 
 ALTER TABLE CalendarCategory1 ADD Column calendarcategory1_domain_id int(8) default 0 after calendarcategory1_id;
-UPDATE CalendarCategory1 SET calendarcategory1_domain_id = 1;
+UPDATE CalendarCategory1 SET calendarcategory1_timeupdate = calendarcategory1_timeupdate, calendarcategory1_domain_id = 1;
 
 ALTER TABLE Todo ADD Column todo_domain_id int(8) default 0 after todo_id;
-UPDATE Todo SET todo_domain_id = 1; 
+UPDATE Todo SET todo_timeupdate = todo_timeupdate, todo_domain_id = 1; 
 
 ALTER TABLE Publication ADD Column publication_domain_id int(8) default 0 after publication_id;
-UPDATE Publication SET publication_domain_id = 1;
+UPDATE Publication SET publication_timeupdate = publication_timeupdate, publication_domain_id = 1;
 
 ALTER TABLE PublicationType ADD Column publicationtype_domain_id int(8) default 0 after publicationtype_id;
-UPDATE PublicationType SET publicationtype_domain_id = 1;
+UPDATE PublicationType SET publicationtype_timeupdate = publicationtype_timeupdate, publicationtype_domain_id = 1;
 
 ALTER TABLE Subscription ADD Column subscription_domain_id int(8) default 0 after subscription_id;
-UPDATE Subscription SET subscription_domain_id = 1;
+UPDATE Subscription SET subscription_timeupdate = subscription_timeupdate, subscription_domain_id = 1;
 
 ALTER TABLE SubscriptionReception ADD Column subscriptionreception_domain_id int(8) default 0 after subscriptionreception_id;
-UPDATE SubscriptionReception SET subscriptionreception_domain_id = 1;
+UPDATE SubscriptionReception SET subscriptionreception_timeupdate = subscriptionreception_timeupdate, subscriptionreception_domain_id = 1;
 
 ALTER TABLE Document ADD Column document_domain_id int(8) default 0 after document_id;
-UPDATE Document SET document_domain_id = 1;
+UPDATE Document SET document_timeupdate = document_timeupdate, document_domain_id = 1;
 
 ALTER TABLE DocumentMimeType ADD Column documentmimetype_domain_id int(8) default 0 after documentmimetype_id;
-UPDATE DocumentMimeType SET documentmimetype_domain_id = 1;
+UPDATE DocumentMimeType SET documentmimetype_timeupdate = documentmimetype_timeupdate, documentmimetype_domain_id = 1;
 
 ALTER TABLE Project ADD Column project_domain_id int(8) default 0 after project_id;
-UPDATE Project SET project_domain_id = 1;
+UPDATE Project SET project_timeupdate = project_timeupdate, project_domain_id = 1;
 
 ALTER TABLE TaskType ADD Column tasktype_domain_id int(8) default 0 after tasktype_id;
-UPDATE TaskType SET tasktype_domain_id = 1;
+UPDATE TaskType SET tasktype_timeupdate = tasktype_timeupdate, tasktype_domain_id = 1;
 
 ALTER TABLE Contract ADD Column contract_domain_id int(8) default 0 after contract_id;
-UPDATE Contract SET contract_domain_id = 1;
+UPDATE Contract SET contract_timeupdate = contract_timeupdate, contract_domain_id = 1;
 
 ALTER TABLE ContractType ADD Column contracttype_domain_id int(8) default 0 after contracttype_id;
-UPDATE ContractType SET contracttype_domain_id = 1;
+UPDATE ContractType SET contracttype_timeupdate = contracttype_timeupdate, contracttype_domain_id = 1;
 
 ALTER TABLE ContractPriority ADD Column contractpriority_domain_id int(8) default 0 after contractpriority_id;
-UPDATE ContractPriority SET contractpriority_domain_id = 1;
+UPDATE ContractPriority SET contractpriority_timeupdate = contractpriority_timeupdate, contractpriority_domain_id = 1;
 
 ALTER TABLE ContractStatus ADD Column contractstatus_domain_id int(8) default 0 after contractstatus_id;
-UPDATE ContractStatus SET contractstatus_domain_id = 1;
+UPDATE ContractStatus SET contractstatus_timeupdate = contractstatus_timeupdate, contractstatus_domain_id = 1;
 
 ALTER TABLE Incident ADD Column incident_domain_id int(8) default 0 after incident_id;
-UPDATE Incident SET incident_domain_id = 1;
+UPDATE Incident SET incident_timeupdate = incident_timeupdate, incident_domain_id = 1;
 
 ALTER TABLE IncidentPriority ADD Column incidentpriority_domain_id int(8) default 0 after incidentpriority_id;
-UPDATE IncidentPriority SET incidentpriority_domain_id = 1;
+UPDATE IncidentPriority SET incidentpriority_timeupdate = incidentpriority_timeupdate, incidentpriority_domain_id = 1;
 
 ALTER TABLE IncidentStatus ADD Column incidentstatus_domain_id int(8) default 0 after incidentstatus_id;
-UPDATE IncidentStatus SET incidentstatus_domain_id = 1;
+UPDATE IncidentStatus SET incidentstatus_timeupdate = incidentstatus_timeupdate, incidentstatus_domain_id = 1;
 
 ALTER TABLE Invoice ADD Column invoice_domain_id int(8) default 0 after invoice_id;
-UPDATE Invoice SET invoice_domain_id = 1;
+UPDATE Invoice SET invoice_timeupdate = invoice_timeupdate, invoice_domain_id = 1;
 
 ALTER TABLE InvoiceStatus ADD Column invoicestatus_domain_id int(8) default 0 after invoicestatus_id;
 UPDATE InvoiceStatus SET invoicestatus_domain_id = 1;
 
 ALTER TABLE Payment ADD Column payment_domain_id int(8) default 0 after payment_id;
-UPDATE Payment SET payment_domain_id = 1;
+UPDATE Payment SET payment_timeupdate = payment_timeupdate, payment_domain_id = 1;
 
 ALTER TABLE PaymentKind ADD Column paymentkind_domain_id int(8) default 0 after paymentkind_id;
 UPDATE PaymentKind SET paymentkind_domain_id = 1;
 
 ALTER TABLE PaymentInvoice ADD Column paymentinvoice_domain_id int(8) default 0 first;
-UPDATE PaymentKind SET paymentkind_domain_id = 1;
+UPDATE PaymentInvoice SET paymentinvoice_timeupdate = paymentinvoice_timeupdate, paymentinvoice_domain_id = 1;
 
 ALTER TABLE Account ADD Column account_domain_id int(8) default 0 after account_id;
-UPDATE Account SET account_domain_id = 1;
+UPDATE Account SET account_timeupdate = account_timeupdate, account_domain_id = 1;
 
 ALTER TABLE UGroup ADD Column group_domain_id int(8) default 0 after group_id;
-UPDATE UGroup SET group_domain_id = 1;
+UPDATE UGroup SET group_timeupdate = group_timeupdate, group_domain_id = 1;
 
 ALTER TABLE Import ADD Column import_domain_id int(8) default 0 after import_id;
-UPDATE Import SET import_domain_id = 1;
+UPDATE Import SET import_timeupdate = import_timeupdate, import_domain_id = 1;
 
 ALTER TABLE Resource ADD Column resource_domain_id int(8) default 0 after resource_id;
-UPDATE Resource SET resource_domain_id = 1;
+UPDATE Resource SET resource_timeupdate = resource_timeupdate, resource_domain_id = 1;
 
 ALTER TABLE RGroup ADD Column rgroup_domain_id int(8) default 0 after rgroup_id;
-UPDATE RGroup SET rgroup_domain_id = 1;
+UPDATE RGroup SET rgroup_timeupdate = rgroup_timeupdate, rgroup_domain_id = 1;
 
 -------------------------------------------------------------------------------
 -- Global Category table

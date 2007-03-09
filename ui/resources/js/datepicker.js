@@ -173,6 +173,8 @@ function refreshDatePicker(dateFieldName, year, month, day)
     thisDay = new Date(year, month, 1);
   } else {
     day = thisDay.getDate();
+    month = thisDay.getMonth();
+    year = thisDay.getFullYear();
     thisDay.setDate(1);
   }
  

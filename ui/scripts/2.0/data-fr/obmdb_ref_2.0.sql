@@ -348,21 +348,21 @@ INSERT INTO Country VALUES (NULL, NULL,NULL, 0, 0, 'IQ', 'Irak', 'FR', '');
 INSERT INTO Country VALUES (NULL, NULL,NULL, 0, 0, 'MK', '« L''ex République Yougoslave de Macedoine »', 'FR', '');
 
 
-UPDATE Country SET country_domain_id = 1;
-UPDATE CompanyType SET companytype_domain_id = 1;
-UPDATE CompanyActivity SET companyactivity_domain_id = 1;
-UPDATE CompanyNafCode SET companynafcode_domain_id = 1;
-UPDATE Kind SET kind_domain_id = 1;
-UPDATE DealStatus SET dealstatus_domain_id = 1;
-UPDATE DealType SET dealtype_domain_id = 1;
-UPDATE CalendarCategory1 SET calendarcategory1_domain_id = 1;
-UPDATE DocumentMimeType SET documentmimetype_domain_id = 1;
-UPDATE TaskType SET tasktype_domain_id = 1;
-UPDATE ContractPriority SET contractpriority_domain_id = 1;
-UPDATE ContractStatus SET contractstatus_domain_id = 1;
-UPDATE IncidentPriority SET incidentpriority_domain_id = 1;
-UPDATE IncidentStatus SET incidentstatus_domain_id = 1;
+UPDATE Country SET country_timeupdate = country_timeupdate, country_domain_id = 1;
+UPDATE CompanyType SET companytype_timeupdate = companytype_timeupdate, companytype_domain_id = 1;
+UPDATE CompanyActivity SET companyactivity_timeupdate = companyactivity_timeupdate, companyactivity_domain_id = 1;
+UPDATE CompanyNafCode SET companynafcode_timeupdate = companynafcode_timeupdate, companynafcode_domain_id = 1;
+UPDATE Kind SET kind_timeupdate = kind_timeupdate, kind_domain_id = 1;
+UPDATE DealStatus SET dealstatus_timeupdate = dealstatus_timeupdate, dealstatus_domain_id = 1;
+UPDATE DealType SET dealtype_timeupdate = dealtype_timeupdate, dealtype_domain_id = 1;
+UPDATE CalendarCategory1 SET calendarcategory1_timeupdate = calendarcategory1_timeupdate, calendarcategory1_domain_id = 1;
+UPDATE DocumentMimeType SET documentmimetype_timeupdate = documentmimetype_timeupdate, documentmimetype_domain_id = 1;
+UPDATE TaskType SET tasktype_timeupdate = tasktype_timeupdate, tasktype_domain_id = 1;
+UPDATE ContractPriority SET contractpriority_timeupdate = contractpriority_timeupdate, contractpriority_domain_id = 1;
+UPDATE ContractStatus SET contractstatus_timeupdate = contractstatus_timeupdate, contractstatus_domain_id = 1;
+UPDATE IncidentPriority SET incidentpriority_timeupdate = incidentpriority_timeupdate, incidentpriority_domain_id = 1;
+UPDATE IncidentStatus SET incidentstatus_timeupdate = incidentstatus_timeupdate, incidentstatus_domain_id = 1;
 UPDATE InvoiceStatus SET invoicestatus_domain_id = 1;
 UPDATE PaymentKind SET paymentkind_domain_id = 1;
-UPDATE UGroup SET group_domain_id = 1;
+UPDATE UGroup SET group_timeupdate = group_timeupdate, group_domain_id = 1;
 
