@@ -1271,7 +1271,6 @@ CREATE TABLE PaymentKind (
 -- New table 'PaymentInvoice'
 --
 CREATE TABLE PaymentInvoice (
-  paymentinvoice_domain_id   int(8) default 0,
   paymentinvoice_invoice_id  int(8) NOT NULL,
   paymentinvoice_payment_id  int(8) NOT NULL,
   paymentinvoice_timeupdate  timestamp(14),

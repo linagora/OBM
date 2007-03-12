@@ -1470,6 +1470,7 @@ CREATE TABLE Domain (
   domain_description    varchar(255),
   domain_name           varchar(128),
   domain_alias          text,
+  domain_mail_server_id integer DEFAULT NULL,
   PRIMARY KEY (domain_id)
 );
 

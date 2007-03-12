@@ -33,7 +33,20 @@ CREATE TABLE Domain (
   PRIMARY KEY (domain_id)
 );
 
-INSERT INTO Domain VALUES (1,NOW(),NOW(),0,0,'Main','Main domain','localdomain','');
+INSERT INTO Domain (
+  domain_id,
+  domain_timecreate,
+  domain_usercreate,
+  domain_label,
+  domain_description,
+  domain_name)
+VALUES (
+  1,
+  NOW(),
+  0,
+  'Admin',
+  'Administration domain',
+  'admin.localdomain');
 
 
 --
@@ -163,9 +176,6 @@ UPDATE Payment SET payment_timeupdate = payment_timeupdate, payment_domain_id = 
 ALTER TABLE PaymentKind ADD Column paymentkind_domain_id int(8) default 0 after paymentkind_id;
 UPDATE PaymentKind SET paymentkind_domain_id = 1;
 
-ALTER TABLE PaymentInvoice ADD Column paymentinvoice_domain_id int(8) default 0 first;
-UPDATE PaymentInvoice SET paymentinvoice_timeupdate = paymentinvoice_timeupdate, paymentinvoice_domain_id = 1;
-
 ALTER TABLE Account ADD Column account_domain_id int(8) default 0 after account_id;
 UPDATE Account SET account_timeupdate = account_timeupdate, account_domain_id = 1;
 
@@ -180,6 +190,7 @@ UPDATE Resource SET resource_timeupdate = resource_timeupdate, resource_domain_i
 
 ALTER TABLE RGroup ADD Column rgroup_domain_id int(8) default 0 after rgroup_id;
 UPDATE RGroup SET rgroup_timeupdate = rgroup_timeupdate, rgroup_domain_id = 1;
+
 
 -------------------------------------------------------------------------------
 -- Global Category table
