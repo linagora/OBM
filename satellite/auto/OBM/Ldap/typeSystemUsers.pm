@@ -55,6 +55,7 @@ sub getDbValues {
                     "user_firstname"=>$user_firstname,
                     "user_homedir"=>$user_homedir,
                     "user_shell"=>$user_shell,
+                    "user_domain" => $main::domainList->[$domainId]->{"domain_label"}
         };
 
         # On ajoute les informations de la structure
@@ -82,7 +83,7 @@ sub createLdapEntry {
 
 
     # On construit la nouvelle entree
-    # Les parametres ncecessaires
+    # Les parametres necessaires
     if( $entry->{"user_login"} && $entry->{"user_firstname"} && $entry->{"user_lastname"} && $entry->{"user_uid"} && $entry->{"user_gid"} && $entry->{"user_homedir"} && $entry->{"user_password"} ) {
 
         my $longName = $entry->{"user_firstname"}." ".$entry->{"user_lastname"};
@@ -100,6 +101,11 @@ sub createLdapEntry {
             userpassword => $sshaPasswd
         );
 
+        # Le domaine
+        if( $entry->{"user_domain"} ) {
+            $ldapEntry->add( obmDomain => to_utf8({ -string => $entry->{"user_domain"}, -charset => $defaultCharSet }) );
+        }
+
     }else {
         return 0;
     }
@@ -114,12 +120,17 @@ sub updateLdapEntry {
     my $update = 0;
 
 
-    my $longName = $entry->{"user_firstname"}." ".$entry->{"user_lastname"};
     # Le champs nom, prenom de l'utilisateur
+    my $longName = $entry->{"user_firstname"}." ".$entry->{"user_lastname"};
     if( &OBM::Ldap::utils::modifyAttr( $longName, $ldapEntry, "cn" ) ) {
         # On synchronise le surname
         &OBM::Ldap::utils::modifyAttr( $longName, $ldapEntry, "sn" );
 
+        $update = 1;
+    }
+
+    # Le domaine
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_domain"}, $ldapEntry, "obmDomain") ) {
         $update = 1;
     }
 

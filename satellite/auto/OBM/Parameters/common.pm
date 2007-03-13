@@ -145,8 +145,8 @@ $ldapMakeNewBase = "/usr/sbin/slapadd -c -f $aliaminSlapdConfNew -l";
 #
 # Utilitaire de recodage des caracteres de latin1->UTF8
 # Préciser l'encodage du système (apache)
-#$defaultCharSet = "ISO-8859-1";
-$defaultCharSet = "UTF8";
+$defaultCharSet = "ISO-8859-1";
+#$defaultCharSet = "UTF8";
 $recode = "/usr/bin/recode l1..utf8";
 
 #

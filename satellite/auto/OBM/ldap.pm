@@ -11,6 +11,7 @@ package OBM::ldap;
 
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
+require OBM::utils;
 use Net::LDAP;
 use Net::LDAP::Entry;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
@@ -99,7 +100,7 @@ sub initTree {
             }
 
             &OBM::toolBox::write_log( "Creation de la structure pour le domaine '".$main::domainList->[$j]->{"domain_dn"}."'", "W" );
-            my $currentDomainBranch = &OBM::toolBox::cloneStruct( $ldapStruct->{"template"}->[$i] );
+            my $currentDomainBranch = &OBM::utils::cloneStruct( $ldapStruct->{"template"}->[$i] );
 
             # On positionne le nom en fonction du domaine, afin de
             # pouvoir créer le DN

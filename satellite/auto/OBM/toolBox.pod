@@ -23,36 +23,6 @@ Description de l'API mise à disposition par ce module.
 
 =over 4
 
-=item B<execRootCmd( $cmd )>
-
-Cette fonction sert à exécuter un programme en tant qu'utilisateur 'root',
-elle bloque le script qui l'a appellée jusqu'à ce que le programme exécuté
-se termine.
-
-=over 4
-
-=item cmd : le programme à exécuter.
-
-=back
-
-Retour : le code erreur de l'exécution de la commande.
-
-=item B<execCmd( $cmd, $verbose )>
-
-Cette fonction permet d'exécuter une commande. Elle bloque le script qui
-l'appelle jusqu'à ce que le programme exécuté se termine.
-
-=over 4
-
-=item cmd : le programme a executer ;
-
-=item verbose : la sortie standart est redirigee vers /dev/null (vrai) ou pas
-(faux).
-
-=back
-
-Retour : le code erreur de l'exécution de la commande.
-
 =item B<write_log( $text, $action )>
 
 Sert à écrire et fermer un fichier log.
