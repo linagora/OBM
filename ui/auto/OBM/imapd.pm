@@ -12,6 +12,7 @@ use Cyrus::IMAP::Admin;
 use Unicode::MapUTF8 qw(to_utf8 utf8_supported_charset);
 require OBM::toolBox;
 require OBM::dbUtils;
+require OBM::utils;
 use OBM::Parameters::common;
 use OBM::Parameters::cyrusConf;
 require Exporter;
@@ -77,7 +78,7 @@ sub imapDisconnectSrv {
 
 sub getAdminImapPasswd {
     my( $dbHandler, $srvList ) = @_;
-    my $cyrusAdmin = &OBM::toolBox::cloneStruct(OBM::Parameters::cyrusConf::cyrusAdmin);
+    my $cyrusAdmin = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::cyrusAdmin);
 
     # Le statement handler (pointeur sur le resultat)
     my $queryResult;
@@ -115,14 +116,14 @@ sub getAdminImapPasswd {
 
 sub getServerByDomain {
     my( $dbHandler, $domainList ) = @_;
-    my $srvListByDomain = &OBM::toolBox::cloneStruct(OBM::Parameters::cyrusConf::listDomainSrv);
+    my $srvListByDomain = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::listDomainSrv);
 
     for( my $i=0; $i<=$#$domainList; $i++ ) {
         if( $domainList->[$i]->{"meta_domain"} ) {
             next;
         }
 
-        my $currentDomainSrvList = &OBM::toolBox::cloneStruct(OBM::Parameters::cyrusConf::domainSrv);
+        my $currentDomainSrvList = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::domainSrv);
         $currentDomainSrvList->{"domain"} = $domainList->[$i];
 
         &OBM::toolBox::write_log( "Recuperation des serveurs de courrier pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
@@ -137,7 +138,7 @@ sub getServerByDomain {
 
         my @srvList = ();
         while( my( $hostId, $hostName, $hostIp) = $queryResult->fetchrow_array ) {
-            my $srv = &OBM::toolBox::cloneStruct(OBM::Parameters::cyrusConf::srvDesc);
+            my $srv = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::srvDesc);
             $srv->{"imap_server_id"} = $hostId;
             $srv->{"imap_server_name"} = $hostName;
             $srv->{"imap_server_ip"} = $hostIp;
@@ -286,13 +287,13 @@ sub imapGetDomainBoxesList {
             return 1;
         }
 
-        my $listImapBox = &OBM::toolBox::cloneStruct( OBM::Parameters::cyrusConf::listImapBox );
+        my $listImapBox = &OBM::utils::cloneStruct( OBM::Parameters::cyrusConf::listImapBox );
         for( my $i=0; $i<=$#boxList; $i++ ) {
             if( $boxList[$i][1] =~ /nonexistent/i ) {
                 next;
             }
 
-            my $imapUser = &OBM::toolBox::cloneStruct( OBM::Parameters::cyrusConf::imapBox );  
+            my $imapUser = &OBM::utils::cloneStruct( OBM::Parameters::cyrusConf::imapBox );  
             $imapUser->{"box_name"} = $boxList[$i][0];
             $imapUser->{"box_login"} = $boxList[$i][0];
             $imapUser->{"box_login"} =~ s/^$boxPrefix//;
@@ -491,7 +492,7 @@ sub imapSetBoxQuota {
 
 sub imapGetBoxAcl {
     my ( $imapSrvConn, $boxName ) = @_;
-    my $boxRight = &OBM::toolBox::cloneStruct(OBM::Parameters::cyrusConf::boxRight);
+    my $boxRight = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::boxRight);
     my $definedRight = OBM::Parameters::cyrusConf::definedRight;
 
     my %boxAclList = $imapSrvConn->listacl( $boxName );

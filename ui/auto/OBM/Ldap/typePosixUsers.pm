@@ -71,7 +71,8 @@ sub getDbValues {
             "user_zipcode"=>$user_zipcode,
             "user_town"=>$user_town,
             "user_mobile"=>$user_mobile,
-            "user_vacation_enable"=>$user_vacation_enable
+            "user_vacation_enable"=>$user_vacation_enable,
+            "user_domain" => $main::domainList->[$domainId]->{"domain_label"}
             };
 
         # gestion de l'adresse
@@ -127,7 +128,7 @@ sub getDbValues {
                     push( @{$users[$i]->{"user_email"}}, $email[$j]."@".$main::domainList->[$domainId]->{"domain_name"} );
 
                     for( my $k=0; $k<=$#{$main::domainList->[$domainId]->{"domain_alias"}}; $k++ ) {
-                        push( @{$users[$i]->{"user_mail_alias"}}, $email[$j]."@".$main::domainList->[$domainId]->{"domain_alias"}->[$k] );
+                        push( @{$users[$i]->{"user_email_alias"}}, $email[$j]."@".$main::domainList->[$domainId]->{"domain_alias"}->[$k] );
                     }
                 }
 
@@ -301,8 +302,8 @@ sub createLdapEntry {
     }
 
     # Les adresses mail secondaires
-    if( $entry->{"user_mail_alias"} && ($#{$entry->{"user_mail_alias"}} != -1) ) {
-        $ldapEntry->add( mailAlias => $entry->{"user_mail_alias"} );
+    if( $entry->{"user_email_alias"} && ($#{$entry->{"user_email_alias"}} != -1) ) {
+        $ldapEntry->add( mailAlias => $entry->{"user_email_alias"} );
     }
 
     # L'adresse postale
@@ -320,6 +321,11 @@ sub createLdapEntry {
     # La ville
     if( $entry->{"user_town"} ) {
         $ldapEntry->add( l => to_utf8({ -string => $entry->{"user_town"}, -charset => $defaultCharSet }) );
+    }
+
+    # Le domaine
+    if( $entry->{"user_domain"} ) {
+        $ldapEntry->add( obmDomain => to_utf8({ -string => $entry->{"user_domain"}, -charset => $defaultCharSet }) );
     }
 
     return 1;
@@ -421,6 +427,11 @@ sub updateLdapEntry {
         $update = 1;
     }
 
+    # Le domaine
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_domain"}, $ldapEntry, "obmDomain") ) {
+        $update = 1;
+    }
+
     # L'acces au mail
     if( $entry->{"user_mailperms"} && ( &OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" ) ) ) {
         $update = 1;
@@ -480,7 +491,7 @@ sub updateLdapEntry {
         }
 
         # Adresses secondaires
-        if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_mail_alias"}, $ldapEntry, "mailAlias" ) ) {
+        if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_email_alias"}, $ldapEntry, "mailAlias" ) ) {
             $update = 1;
         }
     }

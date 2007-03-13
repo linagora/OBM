@@ -12,39 +12,18 @@ package OBM::toolBox;
 use OBM::Parameters::common;
 use OBM::Parameters::toolBoxConf;
 use OBM::dbUtils;
+require OBM::utils;
 use Sys::Syslog;
-use Storable qw(dclone);
 require Exporter;
 
 @ISA = qw(Exporter);
-@EXPORT_function = qw( exec_cmd write_log makeConfigFile getLastUid getLastGid getGroupUsersMailEnable getGroupUsers getGroupUsersSID makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains cloneStruct);
+@EXPORT_function = qw( write_log makeConfigFile getLastUid getLastGid getGroupUsersMailEnable getGroupUsers getGroupUsersSID makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains);
 @EXPORT = (@EXPORT_function);
 @EXPORT_OK = qw();
 
 #
 # Necessaire pour le bon fonctionnement du package
 $debug=1;
-
-
-sub execCmd {
-    local( $cmd, $verbose ) = @_;
-
-    my $pid;
-
-    if( $pid = fork ) {
-        waitpid($pid, 0);
-    }else {
-        if( $verbose ) {
-            exec( $cmd ) or return -1;
-        }else {
-            exec($cmd." > /dev/null 2>&1") or return -1;
-        }
-    }
-
-    # on retourne la valeur retournee par le programme execute
-    my $retour = $? >> 8;
-    return $retour;
-}
 
 
 sub write_log {
@@ -569,7 +548,7 @@ sub getEntityRight {
 #------------------------------------------------------------------------------
 sub computeRight {
     my( $usersList ) = @_;
-    my $rightList = cloneStruct(OBM::Parameters::cyrusConf::boxRight);
+    my $rightList = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::boxRight);
 
     while( my( $userName, $right ) = each( %$usersList ) ) {
         if( $right->{"write"} ) {
@@ -756,7 +735,7 @@ sub getMailServerList {
 #------------------------------------------------------------------------------
 sub getDomains {
     my( $dbHandler ) = @_;
-    my $domainList = cloneStruct(OBM::Parameters::toolBoxConf::domainList);
+    my $domainList = &OBM::utils::cloneStruct(OBM::Parameters::toolBoxConf::domainList);
 
     if( !defined($dbHandler) ) {
         write_log( "Connection à la base de donnée incorrect !", "W" );
@@ -765,7 +744,7 @@ sub getDomains {
 
 
     # Création du meta-domaine
-    $domainList[0] = cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
+    $domainList[0] = &OBM::utils::cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
     $domainList[0]->{"meta_domain"} = 1;
     $domainList[0]->{"domain_id"} = 0;
     $domainList[0]->{"domain_label"} = "metadomain";
@@ -806,7 +785,7 @@ sub getDomains {
     }
 
     while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias ) = $queryDomainResult->fetchrow_array ) {
-        my $currentDomain = cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
+        my $currentDomain = &OBM::utils::cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
         $currentDomain->{"meta_domain"} = 0;
         $currentDomain->{"domain_id"} = $domainId;
         $currentDomain->{"domain_label"} = $domainLabel;
@@ -814,6 +793,7 @@ sub getDomains {
         $currentDomain->{"domain_name"} = $domainName;
         $currentDomain->{"domain_dn"} = $domainName;
 
+        $currentDomain->{"domain_alias"} = [];
         if( defined($domainAlias) ) {
             push( @{$currentDomain->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
         }
@@ -838,14 +818,4 @@ sub getDomains {
     }
 
     return \@domainList;
-}
-
-
-#------------------------------------------------------------------------------
-# Permet de cloner une structure complexe
-#------------------------------------------------------------------------------
-sub cloneStruct {
-    my( $structRef ) = @_;
-
-    return dclone($structRef);
 }

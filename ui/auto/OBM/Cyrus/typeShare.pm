@@ -27,9 +27,9 @@ sub getBdValues {
     }
 
     # On tri les resultats dans le tableau
-    my $shares = &OBM::toolBox::cloneStruct(OBM::Parameters::cyrusConf::listImapBox);
+    my $shares = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::listImapBox);
     while( my( $shareId, $shareLogin, $shareQuota ) = $queryResult->fetchrow_array ) {
-        my $shareDesc = &OBM::toolBox::cloneStruct(OBM::Parameters::cyrusConf::imapBox);
+        my $shareDesc = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::imapBox);
 
         $shareDesc->{"box_login"} = $shareLogin."@".$domain->{"domain_name"};
         $shareDesc->{"box_name"} = $sharePrefix.$shareSeparator.$shareDesc->{"box_login"};

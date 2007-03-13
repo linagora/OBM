@@ -28,11 +28,11 @@ sub getBdValues {
     }
 
     # On tri les resultats dans le tableau
-    my $users = &OBM::toolBox::cloneStruct(OBM::Parameters::cyrusConf::listImapBox);
+    my $users = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::listImapBox);
     while( my( $userId, $userLogin, $userQuota, $userVenable, $userVmessage, $userEmail ) = $queryResult->fetchrow_array ) {
-        my $userDesc = &OBM::toolBox::cloneStruct(OBM::Parameters::cyrusConf::imapBox);
+        my $userDesc = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::imapBox);
 
-        $userDesc->{"box_login"} = $userLogin."@".$domain->{"domain_name"};
+        $userDesc->{"box_login"} = lc($userLogin)."@".$domain->{"domain_name"};
         $userDesc->{"box_name"} = $balPrefix.$balSeparator.$userDesc->{"box_login"};
 
         if( defined($userQuota) && ($userQuota ne "") ) {
@@ -154,7 +154,7 @@ sub updateSieve {
         }
 
         # On supprime le script local
-        &OBM::toolBox::execCmd( "/bin/rm -f ".$localSieveScriptName );
+        &OBM::utils::execCmd( "/bin/rm -f ".$localSieveScriptName );
     }
 
     disconnectSrvSieve( $srvDesc );

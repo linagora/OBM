@@ -19,6 +19,7 @@
 
 use strict;
 require OBM::toolBox;
+require OBM::utils;
 use OBM::Parameters::common;
 use Getopt::Long;
 
@@ -51,7 +52,7 @@ if( $parameters{"all"} ) {
 # L'annuaire LDAP a ete modifie
 if( $parameters{"ldap"} ) {
     &OBM::toolBox::write_log( "Mise a jour de l'annuaire LDAP.", "W" );
-    if( &OBM::toolBox::execCmd( "$automateLdapUpdate", 0 ) ) {
+    if( &OBM::utils::execCmd( "$automateLdapUpdate", 0 ) ) {
         &OBM::toolBox::write_log( "Probleme lors de la creation du nouvel annuaire LDAP", "W" );
     }else
     {
@@ -62,7 +63,7 @@ if( $parameters{"ldap"} ) {
 # Configuration du serveur Cyrus IMAP
 if( $parameters{"cyrus"} ) {
     &OBM::toolBox::write_log( "Reconfiguration du serveur Cyrus IMAP", "W" );
-    if( &OBM::toolBox::execCmd( "$automateCyrusAdmin", 0 ) ) {
+    if( &OBM::utils::execCmd( "$automateCyrusAdmin", 0 ) ) {
         &OBM::toolBox::write_log( "Probleme lors de la reconfiguration du serveur Cyrus IMAP", "W" );
     }else
     {

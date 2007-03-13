@@ -52,6 +52,7 @@ sub getDbValues {
         $groups[$i]->{"group_name"} = $group_name;
         $groups[$i]->{"group_desc"} = $group_desc;
         $groups[$i]->{"group_users"} = getGroupUsers( $group_id, $dbHandler );
+        $groups[$i]->{"group_domain"} = $main::domainList->[$domainId]->{"domain_label"};
 
         if( $group_email ) {
             $groups[$i]->{"group_mailperms"} = 1;
@@ -59,8 +60,9 @@ sub getDbValues {
             # L'adresse du groupe
             $group_email = lc($group_email);
             push( @{$groups[$i]->{"group_email"}}, $group_email."@".$main::domainList->[$domainId]->{"domain_name"} );
+
             for( my $j=0; $j<=$#{$main::domainList->[$domainId]->{"domain_alias"}}; $j++ ) {
-                push( @{$groups[$i]->{"group_email"}}, $group_email."@".$main::domainList->[$domainId]->{"domain_alias"}->[$j] );
+                push( @{$groups[$i]->{"group_email_alias"}}, $group_email."@".$main::domainList->[$domainId]->{"domain_alias"}->[$j] );
             }
 
             # Gestion des utilisateurs de la liste
@@ -128,12 +130,6 @@ sub createLdapEntry {
         $ldapEntry->add( description => to_utf8({ -string => $entry->{"group_desc"}, -charset => $defaultCharSet }) );       
     }
 
-    #
-    # Les adresses mails
-    if( $#{$entry->{"group_email"}} != -1 ) {
-        $ldapEntry->add( mail => $entry->{"group_email"} );
-    }
-            
     # L'acces mail
     if( ($entry->{"group_email"}) && ($entry->{"group_mailperms"}) ) {
         $ldapEntry->add( mailAccess => "PERMIT" );
@@ -141,10 +137,24 @@ sub createLdapEntry {
         $ldapEntry->add( mailAccess => "REJECT" );
     }
 
-    #
+    # Les adresses mails
+    if( $#{$entry->{"group_email"}} != -1 ) {
+        $ldapEntry->add( mail => $entry->{"group_email"} );
+    }
+
+    # Les adresses mails secondaires
+    if( $#{$entry->{"group_email_alias"}} != -1 ) {
+        $ldapEntry->add( mailAlias => $entry->{"group_email_alias"} );
+    }
+            
     # Les contacts externes
     if( $#{$entry->{"group_contacts"}} != -1 ) {
         $ldapEntry->add( mailBox => $entry->{"group_contacts"} );
+    }
+
+    # Le domaine
+    if( $entry->{"group_domain"} ) {
+        $ldapEntry->add( obmDomain => to_utf8({ -string => $entry->{"group_domain"}, -charset => $defaultCharSet }) );
     }
 
     return 1;
@@ -171,8 +181,22 @@ sub updateLdapEntry {
         $update = 1;
     }
 
+    # L'acces au mail
+    if( $entry->{"group_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
+        $update = 1;
+
+    }elsif( !$entry->{"group_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "REJECT", $ldapEntry, "mailAccess" )) ) {
+        $update = 1;
+
+    }
+
     # Le cas des alias mails
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"group_email"}, $ldapEntry, "mail" ) ) {
+        $update = 1;
+    }
+
+    # Le cas des alias mails secondaires
+    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"group_email_alias"}, $ldapEntry, "mailAlias" ) ) {
         $update = 1;
     }
 
@@ -181,13 +205,9 @@ sub updateLdapEntry {
         $update = 1;
     }
 
-    # L'acces au mail
-    if( $entry->{"group_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
+    # Le domaine
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"group_domain"}, $ldapEntry, "obmDomain") ) {
         $update = 1;
-
-    }elsif( !$entry->{"group_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "REJECT", $ldapEntry, "mailAccess" )) ) {
-        $update = 1;
-
     }
 
     return $update;
