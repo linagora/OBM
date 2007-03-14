@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. 2.0 ChangeLog</h1>
-version 2.0.0 - 2007-02-17
+version 2.0.0 - 2007-03-14
 <p>
 </center>
 
@@ -32,11 +32,6 @@ To do
 - calendarcategory1 => calendarcategory : partout (code + lang + bd) [pas urgent]
 - publication : category de contact en dur (pourrait etre generique sur toutes)
 
-- supprimer rep et fichiers agenda_ et lang/agenda
-- supprimer crloginform
-- md5.js -> obminclude/javascript (ou resources/javascript ?)
-=> suppression de auth/
-
 - password : requetes et BD pas en adequation (password_plain): saisie un user
 - traiter les commentaires marques "Aliamin" : exec
 - implementer tableau de bord
@@ -46,7 +41,7 @@ To do
 - impossible d'afficher le contenu de la session (set_debug => erreur)
 - verifier activation des services -> impact sur visibilite module
 
-2007-02-20 : version 2.0.0<br>
+2007-03-14 : version 2.0.0<br>
 
 <ul>
 <li> BUG#624 : contact select for new deals now put archived contact at the end
@@ -105,7 +100,8 @@ To do
 <li> Mailshare (OBM-Mail) : new module : handle Cyrus shared mailbbox
 <li> Host (OBM-Ldap) : new module : handle hosts database (Windows PDC, Samba)
 <li> OBM-Ldap : OBM now can handle an OpenLdap directory
-<li> code clean-up: $C_IMAGE_PATH, $set_theme, $auth, $sess removed in the code
+<li> code clean-up: $C_IMAGE_PATH, $set_theme, $auth, $sess removed from code
+<li> user login cant not be update (OBM-Mail constraint)
 </ul>
 
 2006-09-21 : version 1.2.4<br>

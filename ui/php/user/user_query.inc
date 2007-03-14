@@ -862,15 +862,18 @@ function get_nb_user_admin() {
 function check_user_login_in_use($login, $u_id="") {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
+
   $query = "SELECT
       userobm_id,
       userobm_login
     FROM UserObm
-    WHERE userobm_login = '$login'
+    WHERE userobm_login $like '$login'
       AND userobm_id != '$u_id'";
 
   display_debug_msg($query, $cdg_sql, "check_user_login_in_use()");
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {

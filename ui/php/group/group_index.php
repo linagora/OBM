@@ -108,8 +108,7 @@ if (($action == "index") || ($action == "")) {
       } else {
 	$params["group_id"] = run_query_group_insert($params);
 	if ($params["group_id"] > 0) {
-	  // ALIAMIN
-	  // update_update_state();
+	  update_update_state();
 	  $display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");
 	  $display["detail"] = dis_group_consult($params, $obm["uid"]);
 	} else {
@@ -130,8 +129,7 @@ if (($action == "index") || ($action == "")) {
   if (check_group_data_form($params)) {
     $retour = run_query_group_update($params);
     if ($retour) {
-      // ALIAMIN
-      // update_update_state();
+      update_update_state();
       $display["msg"] .= display_ok_msg("$l_group : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_group : $l_update_error");
@@ -160,8 +158,7 @@ if (($action == "index") || ($action == "")) {
   if (check_group_can_delete($params["group_id"])) {
     $retour = run_query_group_delete($params["group_id"]);
     if ($retour) {
-      // ALIAMIN
-      // update_update_state();
+      update_update_state();
       $display["msg"] .= display_ok_msg("$l_group : $l_delete_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_group : $l_delete_error");
@@ -183,8 +180,7 @@ if (($action == "index") || ($action == "")) {
   } else {
     if ($params["user_nb"] > 0) {
       $nb = run_query_group_usergroup_insert($params);
-      // ALIAMIN
-      // update_update_state();
+      update_update_state();
       $display["msg"] .= display_ok_msg("$nb $l_user_added");
     } else {
       $display["msg"] .= display_err_msg($l_no_user_added);
@@ -202,8 +198,7 @@ if (($action == "index") || ($action == "")) {
   } else {
     if ($params["user_nb"] > 0) {
       $nb = run_query_group_usergroup_delete($params);
-      // ALIAMIN
-      // update_update_state();
+      update_update_state();
       $display["msg"] .= display_ok_msg("$nb $l_user_removed");
     } else {
       $display["msg"] .= display_err_msg($l_no_user_deleted);
@@ -221,8 +216,7 @@ if (($action == "index") || ($action == "")) {
   } else {
     if ($params["group_nb"] > 0) {
       $nb = run_query_group_group_insert($params);
-      // ALIAMIN
-      // update_update_state();
+      update_update_state();
       $display["msg"] .= display_ok_msg("$nb $l_group_added");
     } else {
       $display["msg"] .= display_err_msg($l_no_group_added);
@@ -240,8 +234,7 @@ if (($action == "index") || ($action == "")) {
   } else {
     if ($params["group_nb"] > 0) {
       $nb = run_query_group_group_delete($params);
-      // ALIAMIN
-      // update_update_state();
+      update_update_state();
       $display["msg"] .= display_ok_msg("$nb $l_group_removed");
     } else {
       $display["msg"] .= display_err_msg($l_no_group_deleted);

@@ -1648,7 +1648,7 @@ CREATE TABLE UserSystem (
 
 
 -----------------------------------------------------------------------------
--- Table contenant les diffÃ©rents types de rÃ©seau gÃ©rables
+-- Table contenant les différents types de réseau gérables
 -- en, gros : externe, interne avec patte dessus, interne autre, VPN
 -----------------------------------------------------------------------------
 -- CREATE TABLE Network_kind (
@@ -1676,11 +1676,11 @@ CREATE TABLE UserSystem (
 --  network_psk varchar(255) default NULL
 --);
 -- network_kind : 
--- 0 => rÃ©seau externe
--- 1 => rÃ©seau interne sur lequel le securinet a une patte
--- 2 => rÃ©seau interne sur lequel securinet n'a pas de pattes
--- 3 => rÃ©seau accessible par VPN 
--- network_psk : preshared key, secret partagÃ© pour les VPNs
+-- 0 => réseau externe
+-- 1 => réseau interne sur lequel le securinet a une patte
+-- 2 => réseau interne sur lequel securinet n'a pas de pattes
+-- 3 => réseau accessible par VPN 
+-- network_psk : preshared key, secret partagé pour les VPNs
 
 
 -------------------------------------------------------------------------------

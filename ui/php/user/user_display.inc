@@ -1002,6 +1002,13 @@ function html_user_form($usr_q, $user, $field="") {
     $class[$field] = "error";
   }
 
+  // login (can't be updated, so only on insert)
+  if (($action == "new") || ($action == "insert")) {
+    $dis_login = "<input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />";
+  } else {
+    $dis_login = $login;
+  }
+
   // Domain (can't be updated, so only on insert)
   if (($action == "new" || $action == "insert")
       && $obm["domain_id"] == 0 ) {
@@ -1111,7 +1118,7 @@ function html_user_form($usr_q, $user, $field="") {
     </tr>
     </table>
     </fieldset>
-    ";
+";
 
   }
 
@@ -1223,7 +1230,7 @@ function html_user_form($usr_q, $user, $field="") {
   <table>
   <tr>
     <th class=\"$class[login]\">$l_login</th>
-    <td><input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" /></td>
+    <td>$dis_login</td>
   </tr>
   <tr>
     <th class=\"$class[password]\">$l_password</th>
