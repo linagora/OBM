@@ -305,7 +305,7 @@ sub createLdapEntry {
     my $ldapEntry = Net::LDAP::Entry->new;
 
     if( !exists( $attributeDef->{$ldapStruct->{"node_type"}}->{"create_ldap"} ) || !defined( $attributeDef->{$ldapStruct->{"node_type"}}->{"create_ldap"}) ) {
-        &OBM::toolBox::write_log( "Erreur : la fonction de creation des entitee de type '".$ldapStruct->{"node_type"}."' n'est pas definie.", "W" );
+        &OBM::toolBox::write_log( "Erreur : la fonction de creation des entitees de type '".$ldapStruct->{"node_type"}."' n'est pas definie.", "W" );
         return 0;
     }
 
@@ -332,7 +332,7 @@ sub updateLdapEntry {
     my( $ldapStruct, $ldapEntry, $ldapConn ) = @_;
 
     if( !exists( $attributeDef->{$ldapStruct->{"node_type"}}->{"update_ldap"} ) || !defined( $attributeDef->{$ldapStruct->{"node_type"}}->{"update_ldap"}) ) {
-        &OBM::toolBox::write_log( "Erreur : la fonction de mise a jour des entitee de type '".$ldapStruct->{"node_type"}."' n'est pas definie.", "W" );
+        &OBM::toolBox::write_log( "Erreur : la fonction de mise a jour des entitees de type '".$ldapStruct->{"node_type"}."' n'est pas definie.", "W" );
         return 0;
     }
 

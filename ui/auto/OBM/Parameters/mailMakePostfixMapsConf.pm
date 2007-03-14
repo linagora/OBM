@@ -18,7 +18,8 @@ $postfixMapsDesc = {
         postfix_map => "/etc/postfix/virtual_mailbox",
         postfix_map_type => "hash",
         postfix_map_separator => "\t",
-        postfix_map_generate => 1,
+        postfix_map_process => 1,
+        postfix_map_postmap => 1,
         ldap_filter => "(&(|(objectclass=obmuser)(objectclass=obmmailshare))(obmdomain=<obmDomain>))",
         ldap_attibute => [ "mailbox" ],
         make_map => sub {
@@ -31,7 +32,8 @@ $postfixMapsDesc = {
         postfix_map => "/etc/postfix/virtual_alias",
         postfix_map_type => "hash",
         postfix_map_separator => "\t",
-        postfix_map_generate => 1,
+        postfix_map_process => 1,
+        postfix_map_postmap => 1,
         ldap_filter => "(&(mailAccess=PERMIT)(obmdomain=<obmDomain>))",
         ldap_attibute => [ "mailbox", "mail", "mailAlias" ],
         make_map => sub {
@@ -44,8 +46,9 @@ $postfixMapsDesc = {
         postfix_map => "/etc/postfix/transport",
         postfix_map_type => "hash",
         postfix_map_separator => "\t",
-        postfix_map_generate => 1,
-        ldap_filter => "(&(|(objectclass=obmUser)(objectclass=obmMailShare))(mailAccess=PERMIT)(obmdomain=<obmDomain>))",
+        postfix_map_process => 1,
+        postfix_map_postmap => 1,
+        ldap_filter => "(&(|(objectClass=obmUser)(objectClass=obmMailShare))(mailAccess=PERMIT)(obmDomain=<obmDomain>))",
         ldap_attibute => [ "mailbox", "mailBoxServer" ],
         make_map => sub {
             my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;
@@ -54,7 +57,18 @@ $postfixMapsDesc = {
         }
     },
     domain => {
-        postfix_map => "/etc/postfix/virtual_domains"
+        postfix_map => "/etc/postfix/virtual_domains",
+        postfix_map_type => "hash",
+        postfix_map_separator => "\t",
+        postfix_map_process => 1,
+        postfix_map_postmap => 1,
+        ldap_filter => "(&(objectClass=obmPostfix)(obmDomain=<obmDomain>))",
+        ldap_attibute => [ "myDestination" ],
+        make_map => sub {
+            my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;
+            require OBM::MakePostfixMaps::mapDomains;
+            return &OBM::MakePostfixMaps::mapDomains::makeDomainsMap( $daemonRef, $mailBoxMapFile, $obmDomains );
+        }
     },
     networks => {
         postfix_map => "/etc/postfix/networks"

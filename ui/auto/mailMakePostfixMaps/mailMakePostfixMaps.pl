@@ -43,7 +43,14 @@ sub configure_hook {
         user => [],
         group => [],
         postmap_cmd => [],
-        mailbox_map => []
+        process_mailbox => [],
+        mailbox_map => [],
+        process_alias => [],
+        alias_map => [],
+        process_transport => [],
+        transport_map => [],
+        process_domain => [],
+        domain_map => []
     };
     $self->configure( $daemonOptions );
 
@@ -74,9 +81,38 @@ sub configure_hook {
         $self->{server}->{log_level} = 0;
     }
 
+    # La table des BALs
+    if( $daemonOptions->{process_mailbox}->[0] =~ /^[01]$/ ) {
+        $self->{postfix_maps}->{mailbox}->{postfix_map_process} = $daemonOptions->{process_mailbox}->[0];
+    }
     if( defined($daemonOptions->{mailbox_map}->[0]) ) {
         $self->{postfix_maps}->{mailbox}->{postfix_map} = $daemonOptions->{mailbox_map}->[0];
     }
+
+    # La table des alias
+    if( $daemonOptions->{process_alias}->[0] =~ /^[01]$/ ) {
+        $self->{postfix_maps}->{alias}->{postfix_map_process} = $daemonOptions->{process_alias}->[0];
+    }
+    if( defined($daemonOptions->{alias_map}->[0]) ) {
+        $self->{postfix_maps}->{alias}->{postfix_map} = $daemonOptions->{alias_map}->[0];
+    }
+
+    # La table de transport
+    if( $daemonOptions->{process_transport}->[0] =~ /^[01]$/ ) {
+        $self->{postfix_maps}->{transport}->{postfix_map_process} = $daemonOptions->{process_transport}->[0];
+    }
+    if( defined($daemonOptions->{transport_map}->[0]) ) {
+        $self->{postfix_maps}->{transport}->{postfix_map} = $daemonOptions->{transport_map}->[0];
+    }
+
+    # La table des domaines
+    if( $daemonOptions->{process_domain}->[0] =~ /^[01]$/ ) {
+        $self->{postfix_maps}->{domain}->{postfix_map_process} = $daemonOptions->{process_domain}->[0];
+    }
+    if( defined($daemonOptions->{domain_map}->[0]) ) {
+        $self->{postfix_maps}->{domain}->{postfix_map} = $daemonOptions->{domain_map}->[0];
+    }
+
 
     $self->{server}->{user} = $daemonOptions->{user}->[0];
     $self->{server}->{group} = $daemonOptions->{group}->[0];
@@ -292,7 +328,7 @@ sub process_domains {
     }
 
     foreach my $map ( keys(%{$self->{postfix_maps}}) ) {
-        if( defined($self->{postfix_maps}->{$map}->{make_map}) ) {
+        if( ($self->{postfix_maps}->{$map}->{postfix_map_process}) && defined($self->{postfix_maps}->{$map}->{make_map}) ) {
             $self->logMessage( "Traitement de la map de type : '".$map."'" );
 
             if( &{$self->{postfix_maps}->{$map}->{make_map}}( $self, $self->{postfix_maps}->{$map}, \@domainList ) ) {
@@ -302,7 +338,7 @@ sub process_domains {
                 last;
             }
         }else {
-            $self->{postfix_maps}->{$map}->{postfix_map_generate} = 0;
+            $self->{postfix_maps}->{$map}->{postfix_map_postmap} = 0;
         }
     }
 
@@ -314,7 +350,7 @@ sub process_domains {
         $self->logMessage( "Generation des maps" );
 
         foreach my $map ( keys(%{$self->{postfix_maps}}) ) {
-            if( $self->{postfix_maps}->{$map}->{postfix_map_generate} ) {
+            if( $self->{postfix_maps}->{$map}->{postfix_map_postmap} ) {
                 my $mapName = $self->{postfix_maps}->{$map}->{postfix_map};
                 my $mapType = $self->{postfix_maps}->{$map}->{postfix_map_type};
 

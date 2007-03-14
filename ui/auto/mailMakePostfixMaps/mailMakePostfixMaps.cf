@@ -1,19 +1,26 @@
 # Adresse du serveur LDAP referent
-ldap_server    cyrus.aliamin.local
+ldap_server         cyrus.aliamin.local
 
 # Options communement modifiees
-log_level       4   # de 0 a 4
-log_file        /var/log/aliamin/mailMakePostfix.log
-pid_file        /var/run/aliamin/mailMakePostfix.pid
+log_level           4   # de 0 a 4
+log_file            /var/log/aliamin/mailMakePostfix.log
+pid_file            /var/run/aliamin/mailMakePostfix.pid
 
 # IP ayant droit a ce connecter
-cidr_allow      127.0.0.1/32
+cidr_allow          127.0.0.1/32
 
 # Attention a la modifications de ces options
-max_badrequest  2
-user            postfix     # valeur par defaut
-group           postfix     # valeur par defaut
+max_badrequest      2
+user                postfix     # valeur par defaut
+group               postfix     # valeur par defaut
 
-postmap_cmd     /usr/sbin/postmap
+postmap_cmd         /usr/sbin/postmap
 # Le nom des map postfix
-mailbox_map     /etc/postfix/virtual_mailbox     # valeur par defaut
+process_mailbox     1                                   # 1 ou 0 - 1 par defaut
+mailbox_map         /etc/postfix/virtual_mailbox        # valeur par defaut
+process_alias       1                                   # 1 ou 0 - 1 par defaut
+alias_map           /etc/postfix/virtual_alias          # valeur par defaut
+process_transport   1                                   # 1 ou 0 - 1 par defaut
+transport_map       /etc/postfix/transport              # valeur par defaut
+process_domain      1                                   # 1 ou 0 - 1 par defaut
+domain_map          /etc/postfix/virtual_domains        # valeur par defaut
