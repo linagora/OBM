@@ -59,6 +59,7 @@ sub disconnectLdapSrv {
 sub ldapSearch {
     my( $ldapSrv, $ldapEntries, $ldapFilter, $ldapAttributes ) = @_;
     use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
+    use Net::LDAP::Util qw(escape_filter_value);
     require Net::LDAP;
 
     if( !defined($ldapSrv->{"ldap_server"}->{conn}) ) {
@@ -78,7 +79,7 @@ sub ldapSearch {
         base => "dc=local",
         filter => to_utf8( { -string => $ldapFilter, -charset => "ISO-8859-1"} ),
         scope => "sub",
-        attrs => @{$ldapAttributes}
+        attrs => $ldapAttributes
     );
 
     if( !defined($ldapResult) || $ldapResult->is_error() ) {
