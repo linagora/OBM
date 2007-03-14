@@ -573,33 +573,25 @@ sub aclUpdated {
     my( $oldAcl, $newAcl ) = @_;
     my $returnCode = 0;
 
-    my @oldRightList = keys( %$oldAcl );
-    my @newRightList = keys( %$newAcl );
+    while( my( $oldRight, $oldUsers ) = each( %$oldAcl ) ) {
+        if( $returnCode ) {
+            next;
+        }
 
-    if( $#oldRightList != $#newRightList ) {
-        return 1;
+        if( !exists( $newAcl->{$oldRight} ) ) {
+            return 1;
+        }
 
-    }else {
-        while( my( $oldRight, $oldUsers ) = each( %$oldAcl ) ) {
-            if( $returnCode ) {
-                next;
-            }
+        my @oldUsersList = keys( %$oldUsers );
+        my @newUsersList = keys( %{$newAcl->{$oldRight}} );
 
-            if( !exists( $newAcl->{$oldRight} ) ) {
+        if( $#oldUsersList != $#newUsersList ) {
+            return 1;
+        }
+
+        for( my $i=0; $i<=$#oldUsersList; $i++ ) {
+            if( !exists($newAcl->{$oldRight}->{$oldUsersList[$i]}) ) {
                 return 1;
-            }
-
-            my @oldUsersList = keys( %$oldUsers );
-            my @newUsersList = keys( %{$newAcl->{$oldRight}} );
-
-            if( $#oldUsersList != $#newUsersList ) {
-                return 1;
-            }
-
-            for( my $i=0; $i<=$#oldUsersList; $i++ ) {
-                if( !exists($newAcl->{$oldRight}->{$oldUsersList[$i]}) ) {
-                    return 1;
-                }
             }
         }
     }
