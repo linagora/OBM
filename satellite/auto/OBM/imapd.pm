@@ -254,14 +254,14 @@ sub updateServer {
             # Si la bal n'existe pas...
             if( !exists($srvListImapBox->{$boxLogin}) ) {
                 # ... on la crée
-                if( createBox( $srvDesc, $boxType, $bdImapBox ) ) {
+                if( createBox( $srvDesc, $bdImapBox ) ) {
                     $errors++;
                     next;
                 }
             }
 
             # ... sinon on la met simplement à jour
-            if( updateBox( $srvDesc, $srvListImapBox->{$boxLogin}, $bdImapBox ) ) {
+            if( updateBox( $srvDesc, $boxType, $srvListImapBox->{$boxLogin}, $bdImapBox ) ) {
                 $errors++
             }
         }
@@ -313,17 +313,12 @@ sub imapGetDomainBoxesList {
 
 
 sub createBox {
-    my( $srvDesc, $boxType, $imapBox ) = @_;
-    my $boxTypeDef = $OBM::Parameters::cyrusConf::boxTypeDef;
+    my( $srvDesc, $imapBox ) = @_;
 
     if( !defined($srvDesc->{"imap_server_conn"}) ) {
         return 1;
     }
     my $imapSrvConn = $srvDesc->{"imap_server_conn"};
-
-    if( !defined($boxType) ) {
-        return 1;
-    }
 
     if( !defined($imapBox->{"box_login"}) ) {
         return 1;
@@ -342,18 +337,19 @@ sub createBox {
         return 1;
     }
 
-
-    if( exists($boxTypeDef->{$boxType}->{"create_box"}) && defined($boxTypeDef->{$boxType}->{"create_box"}) ) {
-        &{$boxTypeDef->{$boxType}->{"create_box"}}( $srvDesc, $imapBox );
-    }
-
     return 0;
 }
 
 
 sub updateBox {
-    my( $srvDesc, $oldImapBoxDesc, $newImapBoxDesc ) = @_;
+    my( $srvDesc, $boxType, $oldImapBoxDesc, $newImapBoxDesc ) = @_;
+    my $boxTypeDef = $OBM::Parameters::cyrusConf::boxTypeDef;
     my $errors = 0;
+
+    if( !defined($boxType) ) {
+        return 1;
+    }
+
 
     if( !defined($srvDesc->{"imap_server_conn"}) ) {
         return 1;
@@ -370,11 +366,16 @@ sub updateBox {
     }
     my $boxName = $newImapBoxDesc->{"box_name"};
 
+    my $newBox = 0;
+    if( !defined($oldImapBoxDesc) ) {
+        $newBox = 1;
+    }
+
 
     &OBM::toolBox::write_log( "Mise a jour de la boite '".$boxLogin."'", "W" );
 
     # Mise a jour du quota
-    if( exists($oldImapBoxDesc->{"box_quota"}) && exists($newImapBoxDesc->{"box_quota"}) && ($oldImapBoxDesc->{"box_quota"}!=$newImapBoxDesc->{"box_quota"}) ) {
+    if( ($newBox && ($newImapBoxDesc->{"box_quota"} != 0)) || ($oldImapBoxDesc->{"box_quota"} != $newImapBoxDesc->{"box_quota"}) ) {
         &OBM::toolBox::write_log( "Mise a jour du quota de la boite '".$boxLogin."'", "W" );
         if( imapSetBoxQuota( $imapSrvConn, $boxName, $newImapBoxDesc->{"box_quota"} ) ) {
             $errors++;
@@ -389,6 +390,16 @@ sub updateBox {
             $errors++;
         }
     
+    }
+
+    # Gestion du Sieve
+    if( exists($boxTypeDef->{$boxType}->{"create_box"}) && defined($boxTypeDef->{$boxType}->{"create_box"}) ) {
+        if( !$newBox || ($newBox && $newImapBoxDesc->{"box_vacation_enable"}) ) {
+            &OBM::toolBox::write_log( "Gestion du script Sieve de la boite '".$boxLogin."'", "W" );
+            if( &{$boxTypeDef->{$boxType}->{"create_box"}}( $srvDesc, $newImapBoxDesc ) ) {
+                $errors++;
+            }
+        }
     }
 
     return $errors;

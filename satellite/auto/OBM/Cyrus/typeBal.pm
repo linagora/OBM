@@ -86,8 +86,10 @@ sub createBox {
     my( $srvDesc, $imapBox ) = @_;
     my $errors = 0;
 
-    if( updateSieve( $srvDesc, $imapBox ) ) {
-        $errors++;
+    if( defined($imapBox->{"box_vacation_enable"}) && $imapBox->{"box_vacation_enable"} ) {
+        if( updateSieve( $srvDesc, $imapBox ) ) {
+            $errors++;
+        }
     }
 
     return $errors;
@@ -97,18 +99,12 @@ sub updateSieve {
     my( $srvDesc, $imapBox ) = @_;
     my @sieveScript;
 
-    if( !defined($imapBox->{"box_vacation_enable"}) || !$imapBox->{"box_vacation_enable"} ) {
-        return 0;
-    }
 
     if( !defined($imapBox->{"box_login"}) ) {
         return 1;
     }
     my $boxLogin = $imapBox->{"box_login"};
 
-
-    # On met les règles pour le vacation dans le script Sieve
-    mkSieveVacationScript( $imapBox, \@sieveScript );
 
     if( connectSrvSieve( $srvDesc, $boxLogin ) ) {
         return 1;
@@ -125,36 +121,41 @@ sub updateSieve {
     # On supprime l'ancien script
     sieve_delete( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName );
 
-    if( $#sieveScript >= 0 ) {
-        # On cree le script Sieve en local
-        open( FIC, ">".$localSieveScriptName ) or return 1;
-        print FIC @sieveScript;
-        close( FIC );
+    if( $imapBox->{"box_vacation_enable"} ) {
+        # On met les règles pour le vacation dans le script Sieve
+        mkSieveVacationScript( $imapBox, \@sieveScript );
 
-        # On installe le nouveau script
-        if( sieve_put_file_withdest( $srvDesc->{"imap_sieve_server_conn"}, $localSieveScriptName, $sieveScriptName ) ) {
-            my $errstr = sieve_get_error( $srvDesc->{"imap_sieve_server_conn"} );
-            $errstr = "Echec : Sieve - erreur inconnue." if(!defined($errstr));
+        if( $#sieveScript >= 0 ) {
+            # On cree le script Sieve en local
+            open( FIC, ">".$localSieveScriptName ) or return 1;
+            print FIC @sieveScript;
+            close( FIC );
 
-            &OBM::toolBox::write_log( "Probleme lors du telechargement du script Sieve : ".$errstr , "W" );
+            # On installe le nouveau script
+            if( sieve_put_file_withdest( $srvDesc->{"imap_sieve_server_conn"}, $localSieveScriptName, $sieveScriptName ) ) {
+                my $errstr = sieve_get_error( $srvDesc->{"imap_sieve_server_conn"} );
+                $errstr = "Echec : Sieve - erreur inconnue." if(!defined($errstr));
 
-            return 1;
+                &OBM::toolBox::write_log( "Probleme lors du telechargement du script Sieve : ".$errstr , "W" );
+
+                return 1;
+            }
+
+            &OBM::toolBox::write_log( "Activation du script Sieve pour l'utilisateur : ".$boxLogin, "W" );
+
+            # On active le nouveau script
+            if( sieve_activate( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName ) ) {
+                my $errstr = sieve_get_error( $srvDesc->{"imap_sieve_server_conn"} );
+                $errstr = "Echec : Sieve - erreur inconnue." if(!defined($errstr));
+
+                &OBM::toolBox::write_log( "Probleme lors de l'activation du script Sieve : ".$errstr, "W" );
+
+                return 1;
+            }
+
+            # On supprime le script local
+            &OBM::utils::execCmd( "/bin/rm -f ".$localSieveScriptName );
         }
-
-        &OBM::toolBox::write_log( "Activation du script Sieve pour l'utilisateur : ".$boxLogin, "W" );
-
-        # On active le nouveau script
-        if( sieve_activate( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName ) ) {
-            my $errstr = sieve_get_error( $srvDesc->{"imap_sieve_server_conn"} );
-            $errstr = "Echec : Sieve - erreur inconnue." if(!defined($errstr));
-
-            &OBM::toolBox::write_log( "Probleme lors de l'activation du script Sieve : ".$errstr, "W" );
-
-            return 1;
-        }
-
-        # On supprime le script local
-        &OBM::utils::execCmd( "/bin/rm -f ".$localSieveScriptName );
     }
 
     disconnectSrvSieve( $srvDesc );
@@ -175,7 +176,7 @@ sub mkSieveVacationScript {
     }
     my $boxLogin = $imapBox->{"box_login"};
 
-    &OBM::toolBox::write_log( "Creation du message d'abscence de la boite '".$boxLogin."'", "W" );
+    &OBM::toolBox::write_log( "Creation du message d'absence de la boite '".$boxLogin."'", "W" );
 
     if( !defined( $imapBox->{"box_vacation_message"} ) ) {
         return 1;
