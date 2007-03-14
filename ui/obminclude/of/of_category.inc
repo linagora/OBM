@@ -2038,7 +2038,6 @@ function of_category_user_dis_tree($entity, $cat, $params, $action) {
     $multi_select = true;
   }
 
-  echo "of_category_user_dis_tree";
   // For multiple select we set a form
   if ($multi_select) {
     $block .= "

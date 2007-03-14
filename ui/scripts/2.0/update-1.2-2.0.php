@@ -341,7 +341,7 @@ function process_category_list($table, $entityu, $c_q, $mode="multi", $cat_field
       category_code,
       category_label
     ) VALUES (
-      0,
+      1,
       '$tu',
       '$tc',
       $uu_value
@@ -355,6 +355,7 @@ function process_category_list($table, $entityu, $c_q, $mode="multi", $cat_field
     $query = "SELECT category_id
       FROM Category
       WHERE category_category = '$category'
+        AND category_domain_id = 1
         AND category_timecreate = '$tc'
         AND category_code = '$code'
         AND category_label  ='$label'";

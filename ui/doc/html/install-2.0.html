@@ -229,7 +229,7 @@ As a side note, the obminclude directory can be moved to another location.
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-    Alias /images /var/www/obm/ressources (beware, this has changed in OBM 2.0)<br />
+    Alias /images /var/www/obm/resources (beware, this has changed in OBM 2.0)<br />
 </pre>
   </td>
 </tr>
@@ -281,7 +281,7 @@ Be sure that your ip is defined as a named virtual host and enter this block
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-NameVirtualHost 127.0.0.1<br />
+NameVirtualHost 102.168.1.5<br />
 <br />
 &lt;VirtualHost 192.168.1.5><br />
 &nbsp;&nbsp;&nbsp;&nbsp;ServerAdmin root@localhost<br />
@@ -290,7 +290,7 @@ NameVirtualHost 127.0.0.1<br />
 &nbsp;&nbsp;&nbsp;&nbsp;ErrorLog /var/log/apache/obm-error.log<br />
 &nbsp;&nbsp;&nbsp;&nbsp;CustomLog /var/log/apache/obm-access.log common<br />
 &nbsp;&nbsp;&nbsp;&nbsp;SetEnv OBM_INCLUDE_VAR obminclude<br />
-&nbsp;&nbsp;&nbsp;&nbsp;Alias /images /var/www/obm/ressources<br />
+&nbsp;&nbsp;&nbsp;&nbsp;Alias /images /var/www/obm/resources<br />
 &nbsp;&nbsp;&nbsp;&nbsp;DirectoryIndex obm.php<br />
 &nbsp;&nbsp;&nbsp;&nbsp;AddDefaultCharset ISO-8859-15<br />
 &lt;/VirtualHost>
@@ -302,7 +302,7 @@ NameVirtualHost 127.0.0.1<br />
 
 <h2>4: OBM configuration</h2>
 
-<p>Since OBM 2.0, the configuration is located in conf/obm_conf.ini and conf/obm_conf.inc files (before obm 2.0, the configuration is in the obminclude/obm_conf.inc file).</p>
+<p>Since OBM 2.0, the configuration is located in conf/obm_conf.ini and conf/obm_conf.inc files (before obm 2.0, the configuration was in the obminclude/obm_conf.inc file).</p>
 <p>in the conf directory, copy the <i>obm_conf.inc.sample</i> and <i>obm_conf.ini.sample</i> files to <i>obm_conf.inc</i> and <i>obm_conf.ini</i> and edit them.</p>
 
 
@@ -368,7 +368,7 @@ $ chmod a+rwx /var/www/obmdocuments
 <h3>4.2: OBM application configuration (can be tuned after install)</h3>
 
 <p>edit the <i>obm_conf.inc</i> file.</p>
-Set the $cgp_host :
+Set the $cgp_host with the acces url, then you can set tune here your conf.
 <p />
 <table bgcolor="#CCCCCC" border="1">
 <tr>
@@ -522,9 +522,105 @@ psql -U obm obm < scripts/2.0/obmdb_default_values_2.0.sql
 </table>
 
 
-<h3>Update sound signatures for contacts to allow sounding searches</h3>
+<h3>Update data to new database model</h3>
 
-<p># In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <strong>Data</strong> module and execute the action <strong>sound_aka_update</strong> which update the sound signatures.</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+cd scripts/2.0
+php update-1.2-2.0.php
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h3>Update OBM configuration</h3>
+
+OBM configuration has evolved.
+<table border="1">
+<tr>
+  <td>conf /</td>
+  <td>all conf is now in conf/ config directory</td>
+</tr>
+<tr>
+  <td>conf/obm_conf.ini</td>
+  <td>Set database host, engine, user, password here</td>
+</tr>
+<tr>
+  <td>conf/obm_conf.inc</td>
+  <td>Move obminclude/obm_conf.inc in conf/obm_conf.inc</td>
+</tr>
+<tr>
+  <td>obminclude/site/lang</td>
+  <td>Move it to conf/lang</td>
+</tr>
+<tr>
+  <th colspan="2">obm_conf.inc config</th>
+</tr>
+<tr>
+  <td>C_IMAGE_PATH</td>
+  <td>not needed anymore : to delete</td>
+</tr>
+<tr>
+  <td>$cgp_site_include</td>
+  <td>has become : $conf_lang</td>
+</tr>
+<tr>
+  <td>$obmdb_host,...</td>
+  <td>delete obmdb_host, $obmdb_db, $obmdb_user,... (are in obm_conf.ini)</td>
+</tr>
+<tr>
+  <th colspan="2">Categories update</th>
+</tr>
+<tr>
+  <td colspan="2">OBM now offers user defined categories. Lines belows are to update previous Categories to user defined ones. Then you can apply the principle to define your own categories</td>
+</tr>
+<tr>
+  <td>companycategory1</td>
+  <td>If you where using CompanyCategory1, add :
+<br />$cgp_user["company"]["category"]["companycategory1"] = array("mode"=>"multi");
+<br />$l_companycategory1 = "Category"; // or replace by the name you want</td>
+</tr>
+<tr>
+  <td>contactcategory1</td>
+  <td>If you where using ContactCategory1, add :
+<br />$cgp_user["contact"]["category"]["contactcategory1"] = array("mode"=>"multi");
+<br />$l_contactcategory1 = "ContactCat1";</td>
+</tr>
+<tr>
+  <td>contactcategory2</td>
+  <td>If you where using ContactCategory2, add :
+<br />$cgp_user["contact"]["category"]["contactcategory2"] = array("mode"=>"multi");
+<br />$l_contactcategory2 = "ContactCat2";</td>
+</tr>
+<tr>
+  <td>contactcategory2, 3, 4</td>
+  <td>Idem contactcategory1</td>
+</tr>
+<tr>
+  <td>contactcategory5</td>
+  <td>If you where using ContactCategory5, add :
+<br />$cgp_user["contact"]["category"]["contactcategory5"] = array("mode"=>"mono");
+<br />$l_contactcategory5 = "ContactCat5";</td>
+</tr>
+<tr>
+  <td>dealcategory1</td>
+  <td>idem : multi</td>
+</tr>
+<tr>
+  <td>incidentcategory2</td>
+  <td>idem : mono</td>
+</tr>
+<tr>
+  <td>documentcategory1</td>
+  <td>idem : mono</td>
+</tr>
+<tr>
+  <td>documentcategory2</td>
+  <td>idem : mono</td>
+</tr>
+</table>
 
 
 <p><a name="upgrade-common"><h1>UPGRADE COMMON ACTIONS</h1></a></p>
