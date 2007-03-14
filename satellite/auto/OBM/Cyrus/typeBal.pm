@@ -32,7 +32,7 @@ sub getBdValues {
     while( my( $userId, $userLogin, $userQuota, $userVenable, $userVmessage, $userEmail ) = $queryResult->fetchrow_array ) {
         my $userDesc = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::imapBox);
 
-        $userDesc->{"box_login"} = lc($userLogin)."@".$domain->{"domain_name"};
+        $userDesc->{"box_login"} = lc($userLogin)."@".lc($domain->{"domain_name"});
         $userDesc->{"box_name"} = $balPrefix.$balSeparator.$userDesc->{"box_login"};
 
         if( defined($userQuota) && ($userQuota ne "") ) {
