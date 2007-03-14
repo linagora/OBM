@@ -12,8 +12,8 @@
 -------------------------------------------------------------------------------
 DELETE FROM Domain;
 
-INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 1', '', 'aliacom.fr', NULL );
-INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '', 'Domain 2', '', 'test1.aliacom.fr', 'test2.aliacom.fr\r\ntest3.aliacom.com' );
+INSERT INTO Domain (domain_id, domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES (1, NULL, '2006-09-07 11:45:59', NULL, '0', 'Domain 1', '', 'aliasource.fr', NULL );
+--INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '0', 'Domain 2', '', 'test1.aliasource.fr', 'test2.aliasource.fr\r\ntest3.aliasource.com' );
 
 
 -------------------------------------------------------------------------------
@@ -21,12 +21,17 @@ INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, dom
 -------------------------------------------------------------------------------
 DELETE FROM UserObm;
 
-INSERT INTO UserObm (userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uadmin','padmin','PLAIN','admin', 'Admin Lastname', 'Firstname', '0', '1000', '512');
+-- Global ADMIN
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid) VALUES (0, 'admin0','admin','PLAIN','admin', 'Admin Lastname', 'Firstname', '1000', '512');
 
-INSERT INTO UserObm (userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('ueditor','peditor','PLAIN','editor', 'Itor', 'Ed', (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), '1001', '513');
+-- USER domain 1
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid) VALUES (1, 'user1','user','PLAIN','user', 'Zizou', 'John', '1001', '513');
 
-INSERT INTO UserObm (userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_domain_id, userobm_uid, userobm_gid) VALUES ('uuser','puser','PLAIN','user', 'User', 'John', (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), '1002', '513');
+-- EDITOR domain 1
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid) VALUES (1, 'editor1','editor','PLAIN','editor', 'Itor', 'Ed', '1002', '513');
 
+-- ADMIN domain 1
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid) VALUES (1, 'admin1','admin','PLAIN','admin', 'Chief', 'James', '1003', '513');
 
 
 -------------------------------------------------------------------------------
@@ -110,10 +115,10 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, us
 DELETE FROM UGroup;
 
 -- Groupe de test SANS e-mail
-INSERT INTO `UGroup` (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1000, 'grpTest00', 'Groupe de test 00', '', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1000, 'grpTest00', 'Groupe de test 00', '', NULL);
 
 -- Groupe de test AVEC e-mail
-INSERT INTO `UGroup` (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1001, 'grpTest01', 'Groupe de test 01 avec e-mail', 'grpTest01', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1001, 'grpTest01', 'Groupe de test 01 avec e-mail', 'grpTest01', NULL);
 
 
 -------------------------------------------------------------------------------

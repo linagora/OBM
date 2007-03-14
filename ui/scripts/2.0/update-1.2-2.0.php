@@ -321,6 +321,12 @@ function process_category_list($table, $entityu, $c_q, $mode="multi", $cat_field
       $uu_value = "'$uu',";
     }
     $uc = $c_q->f("${category}_usercreate");
+    $uc_into = "";
+    $uc_value = "";
+    if ($uc != "") {
+      $uc_into = "category_usercreate,";
+      $uc_value = "'$uc',";
+    }
     $code = $c_q->f("${category}_code");
     $label = $c_q->f("${category}_label");
 
@@ -330,7 +336,7 @@ function process_category_list($table, $entityu, $c_q, $mode="multi", $cat_field
       category_timeupdate,
       category_timecreate,
       $uu_into
-      category_usercreate,
+      $uc_into
       category_category,
       category_code,
       category_label
@@ -339,7 +345,7 @@ function process_category_list($table, $entityu, $c_q, $mode="multi", $cat_field
       '$tu',
       '$tc',
       $uu_value
-      '$uc',
+      $uc_value
       '$category',
       '$code',
       '$label')";

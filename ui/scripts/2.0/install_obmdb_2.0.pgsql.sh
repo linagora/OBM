@@ -2,7 +2,7 @@
 ###############################################################################
 # OBM - File : install_obmdb_1.2.pgsql.sh                                     #
 #     - Desc : PostgreSQL Database 1.2 installation script                    #
-# 2005-06-08 ALIACOM                                                          #
+# 2005-06-08 AliaSource                                                       #
 ###############################################################################
 # $Id$
 ###############################################################################
@@ -11,7 +11,7 @@
 # Code repris du fichier www/scripts/2.4/install_db_2.4.sh d'Aliamin
 function getVal () {
    echo Recherche $1
-   VALUE=`grep ^$1\ *= /u/vincenta/cvs/obm2/conf/obm_conf.ini | cut -d= -f2 | tr -d '^ ' | tr -d '" '`
+   VALUE=`grep ^$1\ *= ../../conf/obm_conf.ini | cut -d= -f2 | tr -d '^ ' | tr -d '" '`
    echo $VALUE
 }
 
@@ -25,8 +25,15 @@ P=$VALUE
 getVal db
 DB=$VALUE
 
-# Mysql User, Password and Data lang var definition
-DATA_LANG="fr"
+getVal lang
+OBM_LANG=$VALUE
+
+echo "*** Parameters used : PostgreSQL"
+echo "database = $DB"
+echo "database user = $U"
+echo "database password = $DB"
+echo "install lang = $OBM_LANG"
+
 
 # We search for PHP interpreter (different name on Debian, RedHat, Mandrake)
 PHP=`which php4 2> /dev/null`
@@ -51,13 +58,13 @@ $PHP install_document_2.0.php || (echo $?; exit $?)
 
 echo "*** Database creation"
 
-echo "  Delete old database if exists"
-psql -U $U template1 -c "DROP DATABASE $DB"
+#echo "  Delete old database if exists"
+#psql -U $U template1 -c "DROP DATABASE $DB"
 
 ## XXXXXX obm postgres user creation ?
 
-echo "  Create new $DB database"
-psql -U $U template1 -c "CREATE DATABASE $DB with owner = $U"
+#echo "  Create new $DB database"
+#psql -U $U template1 -c "CREATE DATABASE $DB with owner = $U"
 
 echo "  Create new $DB database model"
 psql -U $U $DB < create_obmdb_2.0.pgsql.sql
@@ -67,11 +74,11 @@ echo "*** Database filling"
 
 # Dictionnary data insertion
 echo "  Dictionnary data insertion"
-cat postgres-pre.sql data-$DATA_LANG/obmdb_ref_2.0.sql | psql -U $U $DB
+cat postgres-pre.sql data-$OBM_LANG/obmdb_ref_2.0.sql | psql -U $U $DB
 
 # Company Naf Code data insertion
 echo "  Company Naf Code data insertion"
-cat postgres-pre.sql data-$DATA_LANG/obmdb_nafcode_2.0.sql | psql -U $U $DB
+cat postgres-pre.sql data-$OBM_LANG/obmdb_nafcode_2.0.sql | psql -U $U $DB
 
 # Test data insertion
 echo "  Test data insertion"
@@ -80,6 +87,10 @@ cat postgres-pre.sql obmdb_test_values_2.0.sql | psql -U $U $DB
 # Default preferences data insertion
 echo "Default preferences data insertion"
 cat postgres-pre.sql obmdb_default_values_2.0.sql | psql -U $U $DB 
+
+# Update default lang to .ini value
+echo "Default preferences data insertion"
+echo "UPDATE UserObmPref set userobmpref_value='$OBM_LANG' where userobmpref_option='set_lang'" | psql -U $U $DB 
 
 
 echo "*** Data checking and validation"

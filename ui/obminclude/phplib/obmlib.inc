@@ -24,7 +24,6 @@ if ($obmdb_dbtype == $db_type_pgsql) {
 
 require_once("$obminclude/phplib/ct_sql.inc");
 require_once("$obminclude/of/of_session.inc");
-//require_once("$obminclude/phplib/auth.inc");
 require_once("$obminclude/of/of_query.inc");
 require_once("$obminclude/of/of_display.inc");
 
@@ -195,7 +194,8 @@ class OBM_Challenge_Auth extends Auth {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
       $pass = $this->db->f("userobm_password");
-      $crypt = strtolower($this->db->f("userobm_password_type"));      
+      // This trim for a strange behaviour while testing oea db
+      $crypt = trim(strtolower($this->db->f("userobm_password_type")));
       $domain_id = $this->db->f("userobm_domain_id");
     }
 
@@ -217,7 +217,7 @@ class OBM_Challenge_Auth extends Auth {
       return $uid;
     } else {
       return false;
-    }      
+    }
 
   }
 }

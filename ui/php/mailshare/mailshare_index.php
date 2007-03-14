@@ -89,8 +89,7 @@ if ($action == "ext_get_id") {
       $id = run_query_mailshare_insert($params);
       if ($id > 0) {
 	$params["mailshare_id"] = $id;
-	// ALIAMIN
-	//        update_update_state();
+	update_update_state();
         $display["msg"] .= display_ok_msg("$l_mailshare : $l_insert_ok");
       } else {
         $display["msg"] .= display_err_msg("$l_mailshare : $l_insert_error");
@@ -107,8 +106,7 @@ if ($action == "ext_get_id") {
 
 	if ($id > 0) {
 	  $params["mailshare_id"] = $id;
-	// ALIAMIN
-          //update_update_state();
+          update_update_state();
           $display["msg"] .= display_ok_msg("$l_mailshare : $l_insert_ok");
 	} else {
 
@@ -130,8 +128,7 @@ if ($action == "ext_get_id") {
   if (check_mailshare_data_form($params)) {
     $retour = run_query_mailshare_update($params);
     if ($retour) {
-	// ALIAMIN
-      //      update_update_state();
+      update_update_state();
       $display["msg"] .= display_ok_msg("$l_mailshare : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_mailshare : $l_update_error");
@@ -159,8 +156,7 @@ if ($action == "ext_get_id") {
   if (check_can_delete_mailshare($params["mailshare_id"])) {
     $retour = run_query_mailshare_delete($params["mailshare_id"]);
     if ($retour) {
-	// ALIAMIN
-      //      update_update_state();
+      update_update_state();
       $display["msg"] .= display_ok_msg("$l_mailshare : $l_delete_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_mailshare : $l_delete_error");
@@ -179,8 +175,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
   of_right_update_right($params, "MailShare");
-	// ALIAMIN
-  //  update_update_state();
+  update_update_state();
   $display["msg"] .= display_warn_msg($err["msg"]);
   $display["detail"] = of_right_dis_admin("MailShare", $params["entity_id"]);
 

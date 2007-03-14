@@ -33,6 +33,9 @@ CREATE TABLE Domain (
   PRIMARY KEY (domain_id)
 );
 
+--
+-- Create first user domain
+--
 INSERT INTO Domain (
   domain_id,
   domain_timecreate,
@@ -44,9 +47,9 @@ VALUES (
   1,
   NOW(),
   0,
-  'Admin',
-  'Administration domain',
-  'admin.localdomain');
+  'Main',
+  'Main domain',
+  'localdomain.local');
 
 
 --
@@ -329,7 +332,7 @@ CREATE TABLE ProjectCV (
 ----------------------------------------------------------------------------
 CREATE TABLE DefaultOdtTemplate (
   defaultodttemplate_id           int(8) auto_increment,
-  defaultodttemplate_domain_id    int(8) DEFAULT 1,
+  defaultodttemplate_domain_id    int(8) DEFAULT 0,
   defaultodttemplate_entity       varchar(32),
   defaultodttemplate_document_id  int(8) NOT NULL,
   defaultodttemplate_label        varchar(64) DEFAULT '',
@@ -387,14 +390,13 @@ ALTER TABLE UserObm ADD COLUMN userobm_host_id int(8) default NULL AFTER userobm
 -- For crypt password
 ALTER TABLE UserObm CHANGE COLUMN userobm_password userobm_password varchar(64);
 
--- add constraint ...
---  UNIQUE KEY k_login_user (userobm_login),
---  INDEX k_uid_user (userobm_uid)
-
 -- Update user infos to new datas
 UPDATE UserObmPref set userobmpref_value='default' WHERE userobmpref_option='set_theme';
 UPDATE UserObm set userobm_password_type='md5';
 
+-- add constraint ...
+--  UNIQUE KEY k_login_user (userobm_login),
+--  INDEX k_uid_user (userobm_uid)
 
 
 ---------------------------------------------------------------------------
@@ -402,9 +404,9 @@ UPDATE UserObm set userobm_password_type='md5';
 ---------------------------------------------------------------------------
 ALTER TABLE UGroup ADD COLUMN group_samba int(1) default 0 AFTER group_ext_id;
 ALTER TABLE UGroup ADD COLUMN group_gid int(8) AFTER group_samba;
-ALTER TABLE UGroup ADD COLUMN group_mailing int(1) AFTER group_gid;
+ALTER TABLE UGroup ADD COLUMN group_mailing int(1) DEFAULT 0 AFTER group_gid;
 ALTER TABLE UGroup ADD COLUMN group_contacts text AFTER group_email;
-ALTER TABLE UGroup CHANGE COLUMN group_ext_id group_ext_id varchar(16);
+ALTER TABLE UGroup CHANGE COLUMN group_ext_id group_ext_id varchar(24);
 
 -- add constraint  UNIQUE KEY group_gid (group_gid)
 
@@ -434,7 +436,7 @@ CREATE TABLE Host (
   host_ftp_perms        int(1) default 0,
   host_firewall_perms   varchar(128),
   PRIMARY KEY (host_id),
-  UNIQUE host_name (host_name),
+  UNIQUE KEY host_name (host_name),
   UNIQUE KEY k_uid_host (host_uid)
 );
 
@@ -446,16 +448,6 @@ CREATE TABLE Stats (
   stats_name   varchar(32) NOT NULL default '',
   stats_value  varchar(255) NOT NULL default '',
   PRIMARY KEY (stats_name)
-);
-
-
---
--- Mail parameters table
---
-CREATE TABLE Mail (
-  mail_domain_id  int(8) default 0,
-  mail_name       varchar(255) NOT NULL default '',
-  mail_value      varchar(255) NOT NULL default ''
 );
 
 
@@ -480,7 +472,7 @@ CREATE TABLE MailShare (
   mailshare_userupdate     int(8),
   mailshare_usercreate     int(8),
   mailshare_name           varchar(32),
-  mailshare_quota          int default 0 NOT NULL,
+  mailshare_quota          varchar(8) default '0' NOT NULL,
   mailshare_mail_server_id int(8) default 0,  
   mailshare_description    varchar(255),
   mailshare_email          text default NULL,
@@ -507,9 +499,9 @@ CREATE TABLE UserSystem (
 -- Mail server declaration table
 -----------------------------------------------------------------------------
 CREATE TABLE MailServer (
-  mailserver_id             int(8) NOT NULL auto_increment,
-  mailserver_host_id        int(8) NOT NULL default 0,
-  mailserver_relayhost_id   int(8) default NULL,
+  mailserver_id            int(8) NOT NULL auto_increment,
+  mailserver_host_id       int(8) NOT NULL default 0,
+  mailserver_relayhost_id  int(8) default NULL,
   PRIMARY KEY (mailserver_id)
 );
 
@@ -518,15 +510,9 @@ CREATE TABLE MailServer (
 -- Mail server network declaration table
 -----------------------------------------------------------------------------
 CREATE TABLE MailServerNetwork (
-  mailservernetwork_host_id   int(8) NOT NULL default 0,
-  mailservernetwork_ip        varchar(16) NOT NULL default ''
+  mailservernetwork_host_id  int(8) NOT NULL default 0,
+  mailservernetwork_ip       varchar(16) NOT NULL default ''
 );
-
-
--------------------------------------------------------------------------------
--- Suppression de l'ancienne table Mail
--------------------------------------------------------------------------------
-DROP TABLE IF EXISTS Mail;
 
 
 -------------------------------------------------------------------------------
@@ -544,4 +530,3 @@ CREATE TABLE P_MailServer like MailServer;
 CREATE TABLE P_MailServerNetwork like MailServerNetwork;
 CREATE TABLE P_MailShare like MailShare;
 CREATE TABLE P_EntityRight like EntityRight;
--- CREATE TABLE P_Network like Network;

@@ -2,7 +2,7 @@
 ###############################################################################
 # OBM - File : install_obmdb_2.0.sh                                           #
 #     - Desc : MySQL Database 2.0 installation script                         #
-# 2005-06-08 ALIACOM                                                          #
+# 2005-06-08 AliaSource                                                       #
 ###############################################################################
 # $Id$
 ###############################################################################
@@ -25,8 +25,15 @@ P=$VALUE
 getVal db
 DB=$VALUE
 
-# Mysql User, Password and Data lang var definition
-DATA_LANG="fr"
+getVal lang
+OBM_LANG=$VALUE
+
+echo "*** Parameters used : MySQL"
+echo "database = $DB"
+echo "database user = $U"
+echo "database password = $DB"
+echo "install lang = $OBM_LANG"
+
 
 # We search for PHP interpreter (different name on Debian, RedHat, Mandrake)
 PHP=`which php4 2> /dev/null`
@@ -65,11 +72,11 @@ echo "*** Database filling"
 
 # Dictionnary data insertion
 echo "  Dictionnary data insertion"
-mysql -u $U -p$P $DB < data-$DATA_LANG/obmdb_ref_2.0.sql
+mysql -u $U -p$P $DB < data-$OBM_LANG/obmdb_ref_2.0.sql
 
 # Company Naf Code data insertion
 echo "  Company Naf Code data insertion"
-mysql -u $U -p$P $DB < data-$DATA_LANG/obmdb_nafcode_2.0.sql
+mysql -u $U -p$P $DB < data-$OBM_LANG/obmdb_nafcode_2.0.sql
 
 # Test data insertion
 echo "  Test data insertion"
@@ -78,6 +85,10 @@ mysql -u $U -p$P $DB < obmdb_test_values_2.0.sql
 # Default preferences data insertion
 echo "  Default preferences data insertion"
 mysql -u $U -p$P $DB < obmdb_default_values_2.0.sql
+
+# Update default lang to .ini value
+echo "Default preferences data insertion"
+echo "UPDATE UserObmPref set userobmpref_value='$OBM_LANG' where userobmpref_option='set_lang'" | mysql -u $U -p$P $DB 
 
 
 echo "*** Data checking and validation"

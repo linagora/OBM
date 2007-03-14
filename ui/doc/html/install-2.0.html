@@ -43,7 +43,7 @@ And uncompress it in /var/www (or where your document root will be located).</p>
 <tr>
   <td>
 <code>
-wget http://obm.aliacom.fr/obm-archives/obm-2.0.0.tar.gz<br />
+wget http://obm.aliasource.org/obm-archives/obm-2.0.0.tar.gz<br />
 tar -C /var/www -xzvf obm-2.0.0.tar.gz<br />
 cd /var/www<br />
 ln -s obm-2.0.0 obm
@@ -99,17 +99,7 @@ short_open_tag = On (can be switched to Off since OBM 0.7.3)
 </tr>
 </table>
 
-<p>Globals must be registered automatically :</p>
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><code>
-register_globals = On
-</code>
-  </td>
-</tr>
-</table>
-
-<p>To avoid some PHP warnings for a previous php version bug, turn on these 2 directives :</p>
+<p>To avoid some PHP warnings for a previous php version bug, turn on these 2 directives (and now OBM works with register_globals set toi Off) :</p>
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
@@ -239,8 +229,7 @@ As a side note, the obminclude directory can be moved to another location.
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-    Alias /images /var/www/obm/ressources (since OBM 2.0)<br />
-    Alias /images /var/www/obm/obminclude/themes (before OBM 2.0)
+    Alias /images /var/www/obm/ressources (beware, this has changed in OBM 2.0)<br />
 </pre>
   </td>
 </tr>
@@ -317,50 +306,39 @@ NameVirtualHost 127.0.0.1<br />
 <p>in the conf directory, copy the <i>obm_conf.inc.sample</i> and <i>obm_conf.ini.sample</i> files to <i>obm_conf.inc</i> and <i>obm_conf.ini</i> and edit them.</p>
 
 
-<h3>4.1: Configure the OBM database</h3>
+<h3>4.1: Global OBM system configuration (needed before install)</h3>
 
-<p>Edit the <i>obm_conf.ini</i> in the conf directory and</p>
+<h4>4.1.1: Database configuration</h4>
+
+<p>Edit the <i>obm_conf.ini</i> in the conf/ directory and</p>
 <ul>
 <li>Select the database engine to use,</li>
-<li>declare the database,</li>
-<li>the database user and password.</li>
-<li>Fill in your apache host name too.</li>
+<li>declare the database, the database host, user and password.</li>
+<li>Set the default lang for install</li>
 </ul>
 
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-; Information sur les bases de données<br />
+; Database infos
 host = localhost<br />
 dbtype = MYSQL<br />
 db = obm<br />
 user = obm<br />
+; Password must be enclosed with "<br />
+password = "aliasource"<br />
 <br />
-; Le mot de passe DOIT etre entre "<br />
-password = "aliacom"
+; Default language<br />
+lang = fr
 </code>
   </td>
 </tr>
 </table>
 
-<p>To modify global preferences and declare the document repository, edit the <i>obm_conf.inc</i> file.</p>
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><code>
-$cgp_host = "http://obm/";<br />
-...<br />
-$cdocument_root = "/var/www/obmdocuments/";<br />
-...<br />
-// is Mail enabled ? (agenda)<br />
-$cgp_mail_enabled = false;
-</code>
-  </td>
-</tr>
-</table>
 
-<h3>4.2: Document repository</h3>
+<h4>4.1.2: Document repository</h4>
 
-<p>Since OBM 1.1, the document repository is automatically handled by OBM.
+<p>The document repository is automatically handled by OBM.
 In the install step OBM populate the repository configured with some structured directories for internal storage.</p>
 
 <p>Declare your document repository in the <i>obm_conf.inc</i> file.</p>
@@ -387,26 +365,31 @@ $ chmod a+rwx /var/www/obmdocuments
 </table>
 
 
-<h3>4.3: Database Configuration and Creation</h3>
-<p>The scripts are in the scripts/2.0 directory.</p>
+<h3>4.2: OBM application configuration (can be tuned after install)</h3>
 
-<h4>4.3.1: Default Data language</h4>
-
-<p>Some references values are inserted by default. These values can be in french (by default) or in english.
-To toggle these to english for installation edit the file scripts/2.0/install_obmdb_2.0.mysql.sh (pr pgsql) and change the DATA_LANG value to en :</p>
-
+<p>edit the <i>obm_conf.inc</i> file.</p>
+Set the $cgp_host :
+<p />
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-# Data lang var definition <br />
-DATA_LANG="en"
+$cgp_host = "http://obm/";<br />
+...<br />
+$cdocument_root = "/var/www/obmdocuments/";<br />
+...<br />
+// is Mail enabled ? (agenda)<br />
+$cgp_mail_enabled = false;
 </code>
   </td>
 </tr>
 </table>
 
 
-<h4>4.3.2: MySQL</h4>
+<h3>4.3: Database Configuration and Creation</h3>
+<p>The scripts are in the scripts/2.0 directory.</p>
+
+
+<h4>4.3.1: MySQL</h4>
 
 <strong>Requisite :</strong> you must know (or create) a valid mysql login/password
 
@@ -422,19 +405,17 @@ GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE, LOCK TABLES, INDEX ON obm.* 
 </table>
 
 <p>The script <i>install_obmdb_2.0.mysql.sh</i> handle all the database creation steps.<br />
-<p>Set the correct User / password (or DB) in this script and run it</p>
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
 cd obm/scripts/2.0<br />
-emacs /install_obmdb_2.0.mysql.sh<br />
 ./install_obmdb_2.0.mysql.sh
 </code>
   </td>
 </tr>
 </table>
 
-<h4>4.3.3: PostgreSQL</h4>
+<h4>4.3.2: PostgreSQL</h4>
 
 <p>Create the obm user and create the obm database :</p>
 <table bgcolor="#CCCCCC" border="1">
@@ -447,7 +428,7 @@ create database obm with owner = obm;
 </tr>
 </table>
 
-<h5>4.3.3.1: Encoding</h5>
+<h5>4.3.2.1: Encoding</h5>
 <p>If your Postgres server is not configured with latin1 character set:<br />
  edit the file scripts/2.0/postgres-pre.sql and uncomment the line (now uncommented by default)</p>
 <table bgcolor="#CCCCCC" border="1">
@@ -463,12 +444,10 @@ create database obm with owner = obm;
 
 <h5>4.3.3.2: Install</h5>
 <p>The script <i>install_obmdb_2.0.pgsql.sh</i> handle all the database creation steps.<br />
-Edit User / password (or DB) infos in this script and run it</p>
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
 cd obm/scripts/2.0<br />
-emacs install_obmdb_2.0_pgsql.sh<br />
 ./install_obmdb_2.0_pgsql.sh
 </code>
   </td>
@@ -495,14 +474,14 @@ emacs install_obmdb_2.0_pgsql.sh<br />
 
 
 <p>
-<a name="upgrade"><h1>UPGRADE from version 1.1.x to version 1.2.x</h1></a></p>
+<a name="upgrade"><h1>UPGRADE from version 1.2.x to version 2.0.x</h1></a></p>
 
 <h3>Update Database model</h3>
 <p># MySQL</p>
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-mysql -u obm -pobm obm < scripts/1.2/update-1.1-1.2.mysql.sql
+mysql -u obm -pobm obm < scripts/2.0/update-1.2-2.0.mysql.sql
 </code>
   </td>
 </tr>
@@ -513,7 +492,7 @@ mysql -u obm -pobm obm < scripts/1.2/update-1.1-1.2.mysql.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-psql -U obm obm < scripts/1.2/update-1.1-1.2.pgsql.sql
+psql -U obm obm < scripts/2.0/update-1.2-2.0.pgsql.sql
 </code>
   </td>
 </tr>
@@ -525,7 +504,7 @@ psql -U obm obm < scripts/1.2/update-1.1-1.2.pgsql.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-mysql -u obm -pobm obm < scripts/1.2/obmdb_default_values_1.2.sql
+mysql -u obm -pobm obm < scripts/2.0/obmdb_default_values_2.0.sql
 </code>
   </td>
 </tr>
@@ -536,7 +515,7 @@ mysql -u obm -pobm obm < scripts/1.2/obmdb_default_values_1.2.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-psql -U obm obm < scripts/1.2/obmdb_default_values_1.2.sql
+psql -U obm obm < scripts/2.0/obmdb_default_values_2.0.sql
 </code>
   </td>
 </tr>
@@ -551,7 +530,7 @@ psql -U obm obm < scripts/1.2/obmdb_default_values_1.2.sql
 <p><a name="upgrade-common"><h1>UPGRADE COMMON ACTIONS</h1></a></p>
 
 <h3>Option: Restore default display values for each user</h3>
-<p># In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <strong>Prefs</strong> (or Préférences) module and execute the action <strong>user_pref_update</strong> (which drop preferences for each user, hence leading to default)</p>
+<p># In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <strong>Prefs</strong> (or Preferences) module and execute the action <strong>user_pref_update</strong> (which drop preferences for each user, hence leading to default)</p>
 
 <h3>Option: Insert NAF code values</h3>
 <p>A naf code dump is available (french naf codes). It has not been updated from 1.0 one. If you want to insert these reference data :

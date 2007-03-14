@@ -72,36 +72,68 @@ CREATE TABLE UserObm_SessionLog (
 -- Table structure for table 'UserObm'
 --
 CREATE TABLE UserObm (
-  userobm_id              serial,
-  userobm_domain_id       integer DEFAULT 0,
-  userobm_timeupdate      TIMESTAMP,
-  userobm_timecreate      TIMESTAMP,
-  userobm_userupdate      integer,
-  userobm_usercreate      integer,
-  userobm_local           integer DEFAULT 1,
-  userobm_ext_id          varchar(16),
-  userobm_login           varchar(32) DEFAULT '' NOT NULL,
-  userobm_password        varchar(64) DEFAULT '' NOT NULL,
-  userobm_perms           varchar(254),
-  userobm_calendar_version  timestamp,
-  userobm_archive         char(1) not null DEFAULT '0',
-  userobm_datebegin       date,
-  userobm_lastname        varchar(32) DEFAULT '',
-  userobm_firstname       varchar(48) DEFAULT '',
-  userobm_phone           varchar(32) DEFAULT '',
-  userobm_phone2          varchar(32) DEFAULT '',
-  userobm_mobile          varchar(32) DEFAULT '',
-  userobm_fax             varchar(32) DEFAULT '',
-  userobm_fax2            varchar(32) DEFAULT '',
-  userobm_email           varchar(64) DEFAULT '',
-  userobm_description     varchar(255),
-  userobm_location        varchar(255),
-  userobm_education       varchar(255),
-  userobm_timelastaccess  TIMESTAMP,
-  PRIMARY KEY (userobm_id),
-  UNIQUE (userobm_login)
+  userobm_id                  serial,
+  userobm_domain_id           integer DEFAULT 0,
+  userobm_timeupdate          timestamp,
+  userobm_timecreate          timestamp,
+  userobm_userupdate          integer,
+  userobm_usercreate          integer,
+  userobm_local               integer DEFAULT 1,
+  userobm_ext_id              varchar(16),
+  userobm_system              integer default 0,
+  userobm_archive             char(1) not null DEFAULT '0',
+  userobm_timelastaccess      timestamp,
+  userobm_login               varchar(32) DEFAULT '' NOT NULL,
+  userobm_password_type       varchar(6) DEFAULT 'PLAIN' NOT NULL,
+  userobm_password            varchar(64) DEFAULT '' NOT NULL,
+  userobm_perms               varchar(254),
+  userobm_calendar_version    timestamp,
+  userobm_uid                 integer,
+  userobm_gid                 integer,
+  userobm_datebegin           date,
+  userobm_lastname            varchar(32) DEFAULT '',
+  userobm_firstname           varchar(48) DEFAULT '',
+  userobm_title               varchar(64) DEFAULT '',
+  userobm_sound               varchar(48),
+  userobm_service             varchar(64),
+  userobm_address1            varchar(64),
+  userobm_address2            varchar(64),
+  userobm_address3            varchar(64),
+  userobm_zipcode             varchar(14),
+  userobm_town                varchar(64),
+  userobm_expresspostal       varchar(16),
+  userobm_country_iso3166     char(2) DEFAULT '0',
+  userobm_phone               varchar(32) DEFAULT '',
+  userobm_phone2              varchar(32) DEFAULT '',
+  userobm_mobile              varchar(32) DEFAULT '',
+  userobm_fax                 varchar(32) DEFAULT '',
+  userobm_fax2                varchar(32) DEFAULT '',
+  userobm_web_perms           integer default NULL,
+  userobm_web_list 	      text default NULL,  
+  userobm_web_all	      integer default 0,
+  userobm_mail_perms          integer default NULL,
+  userobm_mail_ext_perms      integer default NULL,
+  userobm_email               text DEFAULT '',
+  userobm_mail_server_id      integer default NULL,
+  userobm_mail_quota          varchar(8) default NULL,
+  userobm_nomade_perms        integer default 0,
+  userobm_nomade_enable       integer default 0,
+  userobm_nomade_local_copy   integer default 0,
+  userobm_email_nomade        varchar(64) default '',
+  userobm_vacation_enable     integer default 0,
+  userobm_vacation_message    text default '',
+  userobm_samba_perms         integer default 0,
+  userobm_samba_home          varchar(255) default '',
+  userobm_samba_home_drive    char(2) default '',
+  userobm_samba_logon_script  varchar(128) default '',
+  userobm_host_id             integer default 0,
+  userobm_description         varchar(255),
+  userobm_location            varchar(255),
+  userobm_education           varchar(255),
+  PRIMARY KEY (userobm_id)
 );
 CREATE UNIQUE INDEX k_login_user_UserObm_index ON UserObm (userobm_login);
+CREATE UNIQUE INDEX k_uid_user_UserObm_index ON UserObm (userobm_uid);
 
 
 --
@@ -155,7 +187,7 @@ CREATE TABLE CategoryLink (
   categorylink_entity_id   integer,
   categorylink_category    varchar(24) NOT NULL default '',
   categorylink_entity      varchar(32) NOT NULL default '',
-  PRIMARY KEY (categorylink_category_id, categorylink_entity_id, categorylink_category, categorylink_entity)
+  PRIMARY KEY (categorylink_category_id, categorylink_entity_id)
 );
 CREATE INDEX catl_idx_entid ON CategoryLink (categorylink_entity_id);
 CREATE INDEX catl_idx_cat ON CategoryLink (categorylink_category);
@@ -582,7 +614,7 @@ CREATE TABLE List (
   list_static_nb   	 integer DEFAULT 0,
   list_query_nb    	 integer DEFAULT 0,
   list_query       	 text,
-  list_structure   	 text, 
+  list_structure   	 text,
   PRIMARY KEY (list_id),
   UNIQUE (list_name)
 );
@@ -632,7 +664,6 @@ CREATE TABLE CalendarEvent (
 -- Table structure for the table  'EventEntity'
 --
 CREATE TABLE EventEntity (
-  evententity_domain_id    integer default 0,
   evententity_timeupdate   timestamp,
   evententity_timecreate   timestamp,
   evententity_userupdate   integer default NULL,
@@ -649,7 +680,6 @@ CREATE TABLE EventEntity (
 -- Table structure for the table  'CalendarException'
 --
 CREATE TABLE CalendarException (
-  calendarexception_domain_id    integer default 0,
   calendarexception_timeupdate   timestamp,
   calendarexception_timecreate   timestamp,
   calendarexception_userupdate   integer default NULL,
@@ -844,7 +874,6 @@ CREATE TABLE DocumentMimeType (
 -- Table structure for table 'DocumentEntity'
 --
 CREATE TABLE DocumentEntity (
-  documententity_domain_id    integer default 0,
   documententity_document_id  integer NOT NULL,
   documententity_entity_id    integer NOT NULL,
   documententity_entity       varchar(255) NOT NULL,
@@ -891,7 +920,6 @@ create INDEX project_idx_deal ON Project (project_deal_id);
 --
 CREATE TABLE ProjectTask (
   projecttask_id             serial,
-  projecttask_domain_id      integer default 0,
   projecttask_project_id     integer NOT NULL,
   projecttask_timeupdate     timestamp,
   projecttask_timecreate     timestamp,
@@ -910,7 +938,6 @@ create INDEX pt_idx_pro ON ProjectTask (projecttask_project_id);
 --
 CREATE TABLE ProjectRefTask (
   projectreftask_id           serial,
-  projectreftask_domain_id    integer default 0,
   projectreftask_timeupdate   timestamp,
   projectreftask_timecreate   timestamp,
   projectreftask_userupdate   integer default NULL,
@@ -927,7 +954,6 @@ CREATE TABLE ProjectRefTask (
 --
 CREATE TABLE ProjectUser (
   projectuser_id              serial,
-  projectuser_domain_id       integer default 0,
   projectuser_project_id      integer NOT NULL,
   projectuser_user_id         integer NOT NULL,
   projectuser_projecttask_id  integer,
@@ -951,13 +977,54 @@ create INDEX pu_idx_pt ON ProjectUser (projectuser_projecttask_id);
 -- Table structure for table 'ProjectStat'
 --
 CREATE TABLE ProjectStat (
-  projectstat_domain_id      integer default 0,
   projectstat_project_id     integer NOT NULL,
   projectstat_usercreate     integer NOT NULL,
   projectstat_date           timestamp NOT NULL,
   projectstat_useddays       integer default NULL,
   projectstat_remainingdays  integer default NULL,
   PRIMARY KEY (projectstat_project_id, projectstat_usercreate, projectstat_date)
+);
+
+
+----------------------------------------------------------------------------
+-- Create CV table
+----------------------------------------------------------------------------
+CREATE TABLE CV (
+  cv_id              serial,
+  cv_domain_id       integer default 0,
+  cv_timeupdate      TIMESTAMP,
+  cv_timecreate      TIMESTAMP,
+  cv_userupdate      integer,
+  cv_usercreate      integer,
+  cv_userobm_id      integer,
+  cv_title           varchar(255),
+  cv_additionnalrefs text,
+  cv_comment         text,
+  PRIMARY KEY(cv_id)
+);
+
+
+----------------------------------------------------------------------------
+-- Create ProjectCV table
+----------------------------------------------------------------------------
+CREATE TABLE ProjectCV (
+  projectcv_project_id integer NOT NULL,
+  projectcv_cv_id      integer NOT NULL,
+  projectcv_role       varchar(128),
+  PRIMARY KEY(projectcv_project_id, projectcv_cv_id)
+);
+
+
+----------------------------------------------------------------------------
+-- Create DefaultOdtTemplate table
+----------------------------------------------------------------------------
+CREATE TABLE DefaultOdtTemplate (
+  defaultodttemplate_id           serial,
+  defaultodttemplate_domain_id    integer DEFAULT 0,
+  defaultodttemplate_entity       varchar(32),
+  defaultodttemplate_document_id  integer NOT NULL,
+  defaultodttemplate_label        varchar(64) DEFAULT '',
+  PRIMARY KEY(defaultodttemplate_id)
 );
 
 
@@ -969,7 +1036,6 @@ CREATE TABLE ProjectStat (
 --
 CREATE TABLE TimeTask (
   timetask_id              serial,
-  timetask_domain_id       integer default 0,
   timetask_timeupdate      timestamp,
   timetask_timecreate      timestamp,
   timetask_userupdate      integer DEFAULT NULL,
@@ -1253,7 +1319,6 @@ CREATE TABLE PaymentKind (
 -- New table 'PaymentInvoice'
 --
 CREATE TABLE PaymentInvoice (
-  paymentinvoice_domain_id   integer default 0,
   paymentinvoice_invoice_id  integer NOT NULL,
   paymentinvoice_payment_id  integer NOT NULL,
   paymentinvoice_timeupdate  timestamp,
@@ -1298,14 +1363,19 @@ CREATE TABLE UGroup (
   group_timecreate  timestamp,
   group_userupdate  integer,
   group_usercreate  integer,
-  group_local       integer DEFAULT 1,
-  group_ext_id      integer,
   group_system      integer DEFAULT 0,
   group_privacy     integer DEFAULT 0,
+  group_local       integer DEFAULT 1,
+  group_ext_id      integer,
+  group_samba       integer DEFAULT 0,
+  group_gid         integer,
+  group_mailing     integer DEFAULT 0,
   group_name        varchar(32) NOT NULL,
   group_desc        varchar(128),
   group_email       varchar(128),
-  PRIMARY KEY (group_id)
+  group_contacts    text,
+  PRIMARY KEY (group_id),
+  UNIQUE (group_gid)
 );
 
 
@@ -1428,7 +1498,7 @@ CREATE TABLE Resource (
   PRIMARY KEY (resource_id),
   UNIQUE (resource_name)
 );
-CREATE UNIQUE INDEX k_label_resource_Resource_index ON Resource (resource_name);
+CREATE UNIQUE INDEX k_name_resource_Resource_index ON Resource (resource_name);
 
 --
 -- Table structure for table 'RGroup'
@@ -1454,6 +1524,7 @@ CREATE TABLE ResourceGroup (
   resourcegroup_resource_id  integer DEFAULT 0 NOT NULL
 );
 
+
 -------------------------------------------------------------------------------
 -- Tables needed for Domain module
 -------------------------------------------------------------------------------
@@ -1474,5 +1545,124 @@ CREATE TABLE Domain (
   PRIMARY KEY (domain_id)
 );
 
-COMMIT;
 
+-------------------------------------------------------------------------------
+-- OBM-Mail, OBM-LDAP tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Host'
+--
+CREATE TABLE Host (
+  host_id               serial,
+  host_domain_id        integer default 0,
+  host_timeupdate       timestamp,
+  host_timecreate       timestamp,
+  host_userupdate       integer,
+  host_usercreate       integer,
+  host_uid              integer,
+  host_gid              integer,
+  host_samba            integer DEFAULT 0,
+  host_name             varchar(32) NOT NULL,
+  host_ip               varchar(16),
+  host_description      varchar(128),
+  host_web_perms        integer default 0,
+  host_web_list         text default '',
+  host_web_all		integer default 0,
+  host_ftp_perms        integer default 0,
+  host_firewall_perms   varchar(128),
+  PRIMARY KEY (host_id),
+  UNIQUE (host_name),
+  UNIQUE (host_uid)
+);
+
+
+--
+-- Storage for stats
+--
+CREATE TABLE Stats (
+  stats_name   varchar(32) NOT NULL default '',
+  stats_value  varchar(255) NOT NULL default '',
+  PRIMARY KEY (stats_name)
+);
+
+
+--
+-- Samba parameters table
+--
+CREATE TABLE Samba (
+  samba_domain_id  integer default 0,
+  samba_name       varchar(255) NOT NULL default '',
+  samba_value      varchar(255) NOT NULL default ''
+);
+
+
+--
+-- Shared bals table
+--
+CREATE TABLE MailShare (
+  mailshare_id             serial,
+  mailshare_domain_id      integer default 0,
+  mailshare_timeupdate     timestamp,
+  mailshare_timecreate     timestamp,
+  mailshare_userupdate     integer,
+  mailshare_usercreate     integer,
+  mailshare_name           varchar(32),
+  mailshare_quota          varchar(8) default '0' NOT NULL,
+  mailshare_mail_server_id integer default 0,
+  mailshare_description    varchar(255),
+  mailshare_email          text default NULL,
+  PRIMARY KEY (mailshare_id)
+);
+
+
+CREATE TABLE UserSystem (
+  usersystem_id         serial,
+  usersystem_login      varchar(32) NOT NULL default '',
+  usersystem_password   varchar(32) NOT NULL default '',
+  usersystem_uid        varchar(6) default NULL,
+  usersystem_gid        varchar(6) default NULL,
+  usersystem_homedir    varchar(32) NOT NULL default '/tmp',
+  usersystem_lastname   varchar(32) default NULL,
+  usersystem_firstname  varchar(32) default NULL,
+  usersystem_shell      varchar(32) default NULL,
+  PRIMARY KEY (usersystem_id),
+  UNIQUE (usersystem_login)
+);
+
+
+-----------------------------------------------------------------------------
+-- Mail server declaration table
+-----------------------------------------------------------------------------
+CREATE TABLE MailServer (
+  mailserver_id            serial,
+  mailserver_host_id       integer NOT NULL default 0,
+  mailserver_relayhost_id  integer default NULL,
+  PRIMARY KEY (mailserver_id)
+);
+
+
+-----------------------------------------------------------------------------
+-- Mail server network declaration table
+-----------------------------------------------------------------------------
+CREATE TABLE MailServerNetwork (
+  mailservernetwork_host_id  integer NOT NULL default 0,
+  mailservernetwork_ip       varchar(16) NOT NULL default ''
+);
+
+
+-------------------------------------------------------------------------------
+-- OBM-Mail, OBM-LDAP Production tables (used by automate)
+-------------------------------------------------------------------------------
+CREATE TABLE P_UserObm (like UserObm);
+CREATE TABLE P_UGroup (like UGroup);
+CREATE TABLE P_UserObmGroup (like UserObmGroup);
+CREATE TABLE P_GroupGroup (like GroupGroup);
+CREATE TABLE P_of_usergroup (like UserObmGroup);
+CREATE TABLE P_Host (like Host);
+CREATE TABLE P_Samba (like Samba);
+CREATE TABLE P_MailServer (like MailServer);
+CREATE TABLE P_MailServerNetwork (like MailServerNetwork);
+CREATE TABLE P_MailShare (like MailShare);
+CREATE TABLE P_EntityRight (like EntityRight);
+
+COMMIT;

@@ -1,7 +1,7 @@
 --/////////////////////////////////////////////////////////////////////////////
 --// OBM - File : create_obmdb_2.0.mysql.sql                                 //
 --//     - Desc : MySQL Database 2.0 creation script                         //
---// 2006-09-25 ALIACOM                                                      //
+--// 2006-09-25 AliaSource                                                   //
 --/////////////////////////////////////////////////////////////////////////////
 -- $Id$
 --/////////////////////////////////////////////////////////////////////////////
@@ -81,6 +81,7 @@ CREATE TABLE UserObm (
   userobm_local               int(1) default 1,
   userobm_ext_id              varchar(16),
   userobm_system              int(1) default 0,
+  userobm_archive             int(1) not null default 0,
   userobm_timelastaccess      timestamp(14),
   userobm_login               varchar(32) DEFAULT '' NOT NULL,
   userobm_password_type       char(6) DEFAULT 'PLAIN' NOT NULL,
@@ -108,8 +109,8 @@ CREATE TABLE UserObm (
   userobm_fax                 varchar(32) DEFAULT '',
   userobm_fax2                varchar(32) DEFAULT '',
   userobm_web_perms           int(1) default NULL,
-  userobm_web_list 	          text default NULL,  
-  userobm_web_all	          int(1) default 0,
+  userobm_web_list 	      text default NULL,  
+  userobm_web_all	      int(1) default 0,
   userobm_mail_perms          int(1) default NULL,
   userobm_mail_ext_perms      int(1) default NULL,
   userobm_email               text DEFAULT '',
@@ -126,7 +127,6 @@ CREATE TABLE UserObm (
   userobm_samba_home_drive    char(2) default '',
   userobm_samba_logon_script  varchar(128) default '',
   userobm_host_id             int(8) default 0,
-  userobm_archive             int(1) not null default 0,
   userobm_description         varchar(255),
   userobm_location            varchar(255),
   userobm_education           varchar(255),
@@ -980,6 +980,51 @@ CREATE TABLE ProjectStat (
 );
 
 
+----------------------------------------------------------------------------
+-- CV table
+----------------------------------------------------------------------------
+
+CREATE TABLE CV (
+  cv_id              int(8) auto_increment,
+  cv_domain_id       int(8) default 0,
+  cv_timeupdate      timestamp(14),
+  cv_timecreate      timestamp(14),
+  cv_userupdate      int(8),
+  cv_usercreate      int(8),
+  cv_userobm_id      int(8) NOT NULL,
+  cv_title           varchar(255),
+  cv_additionnalrefs text,
+  cv_comment         text,
+  PRIMARY KEY(cv_id)
+);
+
+
+----------------------------------------------------------------------------
+-- ProjectCV table
+----------------------------------------------------------------------------
+
+CREATE TABLE ProjectCV (
+  projectcv_project_id  int(8) NOT NULL,
+  projectcv_cv_id       int(8) NOT NULL,
+  projectcv_role        varchar(128) DEFAULT '',
+  PRIMARY KEY(projectcv_project_id, projectcv_cv_id)
+);
+
+
+----------------------------------------------------------------------------
+-- DefaultOdtTemplate table
+----------------------------------------------------------------------------
+
+CREATE TABLE DefaultOdtTemplate (
+  defaultodttemplate_id           int(8) auto_increment,
+  defaultodttemplate_domain_id    int(8) DEFAULT 0,
+  defaultodttemplate_entity       varchar(32),
+  defaultodttemplate_document_id  int(8) NOT NULL,
+  defaultodttemplate_label        varchar(64) DEFAULT '',
+  PRIMARY KEY(defaultodttemplate_id)
+);
+
+
 -------------------------------------------------------------------------------
 -- Timemanagement tables
 -------------------------------------------------------------------------------
@@ -1318,7 +1363,7 @@ CREATE TABLE UGroup (
   group_system      int(1) DEFAULT 0,
   group_privacy     int(2) NULL DEFAULT 0, 
   group_local       int(1) DEFAULT 1,
-  group_ext_id      varchar(16),
+  group_ext_id      varchar(24),
   group_samba       int(1) DEFAULT 0,
   group_gid         int(8),
   group_mailing     int(1) DEFAULT 0,
@@ -1495,51 +1540,6 @@ CREATE TABLE Domain (
   domain_alias          text,
   domain_mail_server_id int(8) DEFAULT NULL,
   PRIMARY KEY (domain_id)
-);
-
-
-----------------------------------------------------------------------------
--- CV table
-----------------------------------------------------------------------------
-
-CREATE TABLE CV (
-  cv_id              int(8) auto_increment,
-  cv_domain_id       int(8) default 0,
-  cv_timeupdate      timestamp(14),
-  cv_timecreate      timestamp(14),
-  cv_userupdate      int(8),
-  cv_usercreate      int(8),
-  cv_userobm_id      int(8) NOT NULL,
-  cv_title           varchar(255),
-  cv_additionnalrefs text,
-  cv_comment         text,
-  PRIMARY KEY(cv_id)
-);
-
-
-----------------------------------------------------------------------------
--- ProjectCV table
-----------------------------------------------------------------------------
-
-CREATE TABLE ProjectCV (
-  projectcv_project_id  int(8) NOT NULL,
-  projectcv_cv_id       int(8) NOT NULL,
-  projectcv_role        varchar(128) DEFAULT '',
-  PRIMARY KEY(projectcv_project_id, projectcv_cv_id)
-);
-
-
-----------------------------------------------------------------------------
--- DefaultOdtTemplate table
-----------------------------------------------------------------------------
-
-CREATE TABLE DefaultOdtTemplate (
-  defaultodttemplate_id           int(8) auto_increment,
-  defaultodttemplate_domain_id    int(8) DEFAULT 1,
-  defaultodttemplate_entity       varchar(32),
-  defaultodttemplate_document_id  int(8) NOT NULL,
-  defaultodttemplate_label        varchar(64) DEFAULT '',
-  PRIMARY KEY(defaultodttemplate_id)
 );
 
 

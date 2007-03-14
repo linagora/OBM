@@ -23,7 +23,7 @@ $cgp_host = "http://obm/";
 // Home page redirection
 //$c_home_redirect = "$cgp_host" . "calendar/calendar_index.php";
 
-// Use specific langs
+// Use specific langs (was $cgp_site_include)
 //$conf_lang = true;
 
 // Todo lines to display
@@ -51,9 +51,6 @@ $cgp_sql_star = true;
 
 // is Demo enabled (login screen array with default account)
 $cgp_demo_enabled = true;
-
-// submit button in the beginning of the form
-$cgp_submit_form_begin_enabled = false;
 
 // Session Cookie lifetime (in seconds, 0=session cookie)
 $cs_lifetime = 0;

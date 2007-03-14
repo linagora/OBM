@@ -1,21 +1,26 @@
-; Fichier de configuration global d'Aliamin. Copier ce fichier sans l'extension ".sample"
-; Placer dans ce fichier les paramètres communs à la partie automate (Perl) et www (PHP)
+; OBM system configuration file
+; Copy it to obm_conf.ini (without ".sample")
+; Set here Common global parameteres
 ; 
-; Les paramètres sont de type clef = valeur
-; Les commentaires commencent par ";"
-; Il est nécessaire d'avoir la section [global] pour le côté perl (attention : php est permissif)
+; Parameters are set like : key = value
+; Comments are lines beginning with ";"
+; OBM Automate need the [global] for the perl section (beware : php is permissive)
 
 [global]
 ; Information generales
 title = OBM
 
-; Information sur les bases de données
+; Database infos
 host = localhost
+; dbtype = PGSQL
 dbtype = MYSQL
 db = obm
 user = obm
-; Le mot de passe DOIT etre entre "
-password = "aliacom"
+; Password must be enclosed with "
+password = "aliasource"
+
+; Default language
+lang = fr
 
 ; Gestion de la configuration de postfix ldap, file, ou false
 postfixConf = ldap
