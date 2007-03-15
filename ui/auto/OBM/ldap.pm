@@ -27,6 +27,38 @@ require Exporter;
 $debug=1;
 
 
+sub getServerByDomain {
+    my( $dbHandler, $domainList ) = @_;
+
+    if( !defined($ldapAdminLogin) ) {
+        return 0;
+    }
+
+    for( my $i=0; $i<=$#$domainList; $i++ ) {
+        &OBM::toolBox::write_log( "Recuperation du serveur LDAP pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
+
+        my $queryLdapAdmin = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$ldapAdminLogin."'";
+
+        # On execute la requete concernant l'administrateur LDAP associé
+        my $queryLdapAdminResult;
+        if( !&OBM::toolBox::execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
+            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
+            if( defined($queryLdapAdminResult) ) {
+                &OBM::toolBox::write_log( $queryDomainResult->err, "W" );
+            }
+        }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
+            $domainList->[$i]->{"ldap_admin_server"} = $ldapServer;
+            $domainList->[$i]->{"ldap_admin_login"} = $ldapAdminLogin;
+            $domainList->[$i]->{"ldap_admin_passwd"} = $ldapAdminPasswd;
+
+            $queryLdapAdminResult->finish;
+        }
+    }
+
+    return 0;
+}
+
+
 sub makeDn {
     my( $entry, $parentDn ) = @_;
 

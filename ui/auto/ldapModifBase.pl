@@ -44,6 +44,8 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 local $main::domainList = undef;
 $main::domainList = &OBM::toolBox::getDomains( $dbHandler );
 
+&OBM::ldap::getServerByDomain( $dbHandler, $main::domainList );
+
 #
 # On referme la connexion a la base
 if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
