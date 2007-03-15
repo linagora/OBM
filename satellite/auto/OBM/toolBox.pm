@@ -743,24 +743,6 @@ sub getDomains {
     $domainList[0]->{"domain_name"} = "metadomain";
     $domainList[0]->{"domain_desc"} = "Informations de l'annuaire ne faisant partie d'aucun domaine";
 
-    my $queryLdapAdmin = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$ldapAdminLogin."'";
-
-    # On execute la requete concernant l'administrateur LDAP associé
-    my $queryLdapAdminResult;
-    if( !execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete.", "W" );
-        if( defined($queryLdapAdminResult) ) {
-            write_log( $queryDomainResult->err, "W" );
-        }
-
-    }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
-        $domainList[0]->{"ldap_admin_server"} = $ldapServer;
-        $domainList[0]->{"ldap_admin_login"} = $ldapAdminLogin;
-        $domainList[0]->{"ldap_admin_passwd"} = $ldapAdminPasswd;
-
-        $queryLdapAdminResult->finish;
-    }
-
 
     # Requete de recuperation des informations des domaines
     my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias FROM Domain";
@@ -788,22 +770,6 @@ sub getDomains {
         $currentDomain->{"domain_alias"} = [];
         if( defined($domainAlias) ) {
             push( @{$currentDomain->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
-        }
-
-        # On execute la requete concernant l'administrateur LDAP associé
-        my $queryLdapAdminResult;
-        if( !execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
-            write_log( "Probleme lors de l'execution de la requete.", "W" );
-            if( defined($queryLdapAdminResult) ) {
-                write_log( $queryDomainResult->err, "W" );
-            }
-
-        }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
-            $currentDomain->{"ldap_admin_server"} = $ldapServer;
-            $currentDomain->{"ldap_admin_login"} = $ldapAdminLogin;
-            $currentDomain->{"ldap_admin_passwd"} = $ldapAdminPasswd;
-
-            $queryLdapAdminResult->finish;
         }
 
         push( @{domainList}, $currentDomain );

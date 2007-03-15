@@ -13,15 +13,15 @@ sub initStruct {
     my $domainId = $ldapStruct->{"domain_id"};
 
     if( exists($ldapStruct->{"ldap_server"}) ) {
-        if( exists($main::domainList->[$domainId]->{"ldap_admin_server"}) && ($main::domainList->[$domainId]->{"ldap_admin_server"} ne "") ) {
+        if( exists($main::domainList->[$domainId]->{"ldap_admin_server"}) && defined($main::domainList->[$domainId]->{"ldap_admin_server"}) ) {
             $ldapStruct->{"ldap_server"}->{"server"} = $main::domainList->[$domainId]->{"ldap_admin_server"};
         }
 
-        if( exists($main::domainList->[$domainId]->{"ldap_admin_login"}) && ($main::domainList->[$domainId]->{"ldap_admin_login"} ne "") ) {
+        if( exists($main::domainList->[$domainId]->{"ldap_admin_login"}) && defined($main::domainList->[$domainId]->{"ldap_admin_login"}) ) {
             $ldapStruct->{"ldap_server"}->{"login"} = $main::domainList->[$domainId]->{"ldap_admin_login"};
         }
 
-        if( exists($main::domainList->[$domainId]->{"ldap_admin_passwd"}) && ($main::domainList->[$domainId]->{"ldap_admin_passwd"} ne "") ) {
+        if( exists($main::domainList->[$domainId]->{"ldap_admin_passwd"}) && defined($main::domainList->[$domainId]->{"ldap_admin_passwd"}) ) {
             $ldapStruct->{"ldap_server"}->{"passwd"} = $main::domainList->[$domainId]->{"ldap_admin_passwd"};
         }
     }
