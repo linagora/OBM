@@ -284,7 +284,7 @@ sub getGroupUsers
 
     #
     # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = "SELECT i.userobm_login FROM UserObm i, UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
+    my $query = "SELECT i.userobm_login FROM P_UserObm i, P_UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
 
     if( defined( $sqlRequest ) && ($sqlRequest ne "") ) {
         $query .= " ".$sqlRequest;
@@ -310,7 +310,7 @@ sub getGroupUsers
 
     #
     # Recuperation de la liste des utilisateurs du groupe id : $groupId.
-    $query = "SELECT groupgroup_child_id FROM GroupGroup WHERE groupgroup_parent_id=".$groupId;
+    $query = "SELECT groupgroup_child_id FROM P_GroupGroup WHERE groupgroup_parent_id=".$groupId;
     #
     # On execute la requete
     if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -368,7 +368,7 @@ sub getGroupUsersSID
 
     #
     # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = "SELECT i.userobm_uid FROM UserObm i, UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id= i.userobm_id";
+    my $query = "SELECT i.userobm_uid FROM P_UserObm i, P_UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id= i.userobm_id";
     #
     # On execute la requete
     if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -389,7 +389,7 @@ sub getGroupUsersSID
 
     #
     # Recuperation de la liste des utilisateurs du groupe id : $groupId.
-    $query = "SELECT groupgroup_child_id FROM GroupGroup WHERE groupgroup_parent_id=".$groupId;
+    $query = "SELECT groupgroup_child_id FROM P_GroupGroup WHERE groupgroup_parent_id=".$groupId;
     #
     # On execute la requete
     if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -548,6 +548,7 @@ sub getEntityRight {
 #------------------------------------------------------------------------------
 sub computeRight {
     my( $usersList ) = @_;
+    use OBM::Parameters::cyrusConf;
     my $rightList = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::boxRight);
 
     while( my( $userName, $right ) = each( %$usersList ) ) {
@@ -616,7 +617,7 @@ sub getHostIpById {
         return undef;
     }
 
-    my $query = "SELECT host_ip FROM Host WHERE host_id='".$hostId."'";
+    my $query = "SELECT host_ip FROM P_Host WHERE host_id='".$hostId."'";
 
     #
     # On execute la requete
@@ -661,7 +662,7 @@ sub getHostNameById {
         return undef;
     }
 
-    my $query = "SELECT host_name FROM Host WHERE host_id='".$hostId."'";
+    my $query = "SELECT host_name FROM P_Host WHERE host_id='".$hostId."'";
 
     #
     # On execute la requete
@@ -726,7 +727,7 @@ sub getMailServerList {
 # Permet d'obtenir la liste des domaines OBM
 #------------------------------------------------------------------------------
 sub getDomains {
-    my( $dbHandler ) = @_;
+    my( $dbHandler, $obmDomainId ) = @_;
     my $domainList = &OBM::utils::cloneStruct(OBM::Parameters::toolBoxConf::domainList);
 
     if( !defined($dbHandler) ) {
@@ -746,6 +747,9 @@ sub getDomains {
 
     # Requete de recuperation des informations des domaines
     my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias FROM Domain";
+    if( defined($obmDomainId) && $obmDomainId =~ /^\d+$/ ) {
+        $queryDomain .= " WHERE domain_id=".$obmDomainId;
+    }
 
     # On execute la requete concernant les domaines
     my $queryDomainResult;

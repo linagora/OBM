@@ -163,11 +163,7 @@ $regexp_email = "^([a-z0-9_\\-]{1,16}(\\.[a-z0-9_\\-]{1,16}){0,3})@([a-z0-9\\-]{
 $regexp_rootLdap = "^dc=(.+),dc=.+\$";
 #
 # Login regexp
-if( $loginDotsEnable ) {
-    $regexp_login = "^[A-Za-z0-9][A-Za-z0-9-._]{1,31}\$";
-}else {
-    $regexp_login = "^[A-Za-z0-9][A-Za-z0-9-_]{1,31}\$";
-}
+$regexp_login = "^[A-Za-z0-9][A-Za-z0-9-._]{1,31}\$";
 
 #
 # Definitions des parametres Samba

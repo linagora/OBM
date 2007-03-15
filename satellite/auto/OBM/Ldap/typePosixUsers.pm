@@ -33,7 +33,7 @@ sub getDbValues {
 
     # La requete a executer - obtention des informations sur les utilisateurs de
     # l'organisation.
-    my $query = "SELECT userobm_id, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_nomade_perms, userobm_nomade_enable, userobm_nomade_local_copy, userobm_email_nomade, userobm_vacation_enable FROM P_UserObm JOIN MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_archive=0 AND userobm_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
+    my $query = "SELECT userobm_id, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_nomade_perms, userobm_nomade_enable, userobm_nomade_local_copy, userobm_email_nomade, userobm_vacation_enable FROM P_UserObm JOIN P_MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_archive=0 AND userobm_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requete
     my $queryResult;

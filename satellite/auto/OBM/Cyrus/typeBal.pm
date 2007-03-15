@@ -10,15 +10,23 @@ use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 use strict;
 
 
-sub getBdValues {
-    my( $dbHandler, $domain, $srvId ) = @_;
+sub getDbValues {
+    my( $dbHandler, $domain, $obmSrvId, $obmUserLogin ) = @_;
     my $domainId = $domain->{"domain_id"};
     my $balPrefix = $OBM::Parameters::cyrusConf::boxTypeDef->{"BAL"}->{"prefix"};
     my $balSeparator = $OBM::Parameters::cyrusConf::boxTypeDef->{"BAL"}->{"separator"};
 
     # La requete a executer - obtention des informations sur les utilisateurs
     # mails de l'organisation.
-    my $query = "SELECT userobm_id, userobm_login, userobm_mail_quota, userobm_vacation_enable, userobm_vacation_message, userobm_email FROM UserObm WHERE userobm_mail_perms=1 AND userobm_domain_id=".$domainId." AND userobm_mail_server_id=".$srvId ;
+    my $query = "SELECT userobm_id, userobm_login, userobm_mail_quota, userobm_mail_server_id, userobm_vacation_enable, userobm_vacation_message, userobm_email FROM P_UserObm WHERE userobm_mail_perms=1 AND userobm_domain_id=".$domainId;
+
+    if( defined($obmSrvId) && ( $obmSrvId =~ /^\d+$/ ) ) {
+        $query .= " AND userobm_mail_server_id=".$obmSrvId;
+    }
+
+    if( defined($obmUserLogin) && ( $obmUserLogin =~ /$regexp_login/ ) ) {
+        $query .= " AND userobm_login='".$obmUserLogin."'";
+    }
 
     # On execute la requete
     my $queryResult;
@@ -29,11 +37,12 @@ sub getBdValues {
 
     # On tri les resultats dans le tableau
     my $users = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::listImapBox);
-    while( my( $userId, $userLogin, $userQuota, $userVenable, $userVmessage, $userEmail ) = $queryResult->fetchrow_array ) {
+    while( my( $userId, $userLogin, $userQuota, $userSrvId, $userVenable, $userVmessage, $userEmail ) = $queryResult->fetchrow_array ) {
         my $userDesc = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::imapBox);
 
         $userDesc->{"box_login"} = lc($userLogin)."@".lc($domain->{"domain_name"});
         $userDesc->{"box_name"} = $balPrefix.$balSeparator.$userDesc->{"box_login"};
+        $userDesc->{"box_srv_id"} = $userSrvId;
 
         if( defined($userQuota) && ($userQuota ne "") ) {
             $userDesc->{"box_quota"} = $userQuota*1000;
@@ -51,7 +60,6 @@ sub getBdValues {
         # On recupere la definition des ACL
         $userDesc->{"box_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domain, initRight( $userId ), $userId );
 
-
         if( !exists($users->{$userDesc->{"box_login"}}) ) {
             $users->{$userDesc->{"box_login"}} = $userDesc;
         }
@@ -67,16 +75,16 @@ sub initRight {
     my %rightDef;
 
     $rightDef{"read"}->{"compute"} = 1;
-    $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+    $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM P_UserObm i, P_EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
         
     $rightDef{"writeonly"}->{"compute"} = 1;
-    $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+    $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM P_UserObm i, P_EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
 
     $rightDef{"write"}->{"compute"} = 1;
-    $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM UserObm LEFT JOIN EntityRight ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id WHERE (entityright_entity='".$entityType."' AND entityright_entity_id=".$userId.") OR userobm_id=".$userId;
+    $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM P_UserObm LEFT JOIN P_EntityRight ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id WHERE (entityright_entity='".$entityType."' AND entityright_entity_id=".$userId.") OR userobm_id=".$userId;
 
     $rightDef{"public"}->{"compute"} = 0;
-    $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM EntityRight WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
+    $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM P_EntityRight WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
 
     return \%rightDef;
 }
@@ -85,7 +93,6 @@ sub initRight {
 sub updateSieve {
     my( $srvDesc, $imapBox ) = @_;
     my @sieveScript;
-
 
     if( !defined($imapBox->{"box_vacation_enable"}) ) {
         $imapBox->{"box_vacation_enable"} = 0;
@@ -114,6 +121,7 @@ sub updateSieve {
 
     if( !$imapBox->{"box_vacation_enable"} ) {
         &OBM::toolBox::write_log( "Suppression du script Sieve pour l'utilisateur : '".$boxLogin."'", "W" );
+
     }else {
         # On met les règles pour le vacation dans le script Sieve
         mkSieveVacationScript( $imapBox, \@sieveScript );

@@ -170,8 +170,8 @@ sub loadBdValues {
                 # Récupération des informations attachées à ce domaine et ce serveur
                 &OBM::toolBox::write_log( "Chargement des informations de type '".$boxType."' depuis la base de donnees OBM", "W" );
 
-                if( defined($currentBoxTypeDef->{"get_bd_values"}) ) {
-                    $srvDesc->{"BD_".$boxType} = &{$currentBoxTypeDef->{"get_bd_values"}}( $dbHandler, $domainDesc, $srvDesc->{"imap_server_id"} );
+                if( defined($currentBoxTypeDef->{"get_db_values"}) ) {
+                    $srvDesc->{"BD_".$boxType} = &{$currentBoxTypeDef->{"get_db_values"}}( $dbHandler, $domainDesc, $srvDesc->{"imap_server_id"}, undef );
                 }
             }
         }
@@ -590,6 +590,42 @@ sub setBoxAcl {
             }
         }
     }
+
+    return 0;
+}
+
+
+sub updateSieve {
+    my( $dbHandler, $domainDesc, $userLogin ) = @_;
+
+    # Obtention de la description de l'utilisateur
+    my $box;
+    if( defined($OBM::Parameters::cyrusConf::boxTypeDef->{BAL}->{get_db_values}) ) {
+        $box = &{$OBM::Parameters::cyrusConf::boxTypeDef->{BAL}->{get_db_values}}( $dbHandler, $domainDesc, undef, $userLogin );
+    }else {
+        return 1;
+    }
+
+    while( my($boxLogin, $boxDesc) = each(%{$box}) ) {
+        my $srvList = $domainDesc->{imap_servers};
+        my $i=0;
+        while( ( $i<=$#{$srvList} ) && ( $srvList->[$i]->{imap_server_id}!=$boxDesc->{box_srv_id} ) ) {
+            $i++;
+        }
+
+        if( $i > $#{$srvList} ) {
+            return 1;
+        }
+
+        my $srvDesc = $srvList->[$i];
+        if( defined( $OBM::Parameters::cyrusConf::boxTypeDef->{BAL}->{update_sieve} ) ) {
+            return &{$OBM::Parameters::cyrusConf::boxTypeDef->{BAL}->{update_sieve}}( $srvDesc, $boxDesc );
+        }else {
+            return 1;
+        }
+    }
+
+    print "-->ici\n";
 
     return 0;
 }

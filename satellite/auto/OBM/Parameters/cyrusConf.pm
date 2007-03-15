@@ -62,6 +62,7 @@ use constant imapBox => {
     box_name => undef,
     box_login => undef,
     box_quota => 0,
+    box_srv_id => undef,
     box_acl => {},
     box_vacation_enable => 0,
     box_vacation_message => undef,
@@ -77,10 +78,10 @@ $boxTypeDef = {
     BAL => {
         prefix => "user",
         separator => "/",
-        get_bd_values => sub {
-            my( $dbHandler, $domain, $srvId ) = @_;
+        get_db_values => sub {
+            my( $dbHandler, $domain, $obmSrvId, $obmUserLogin ) = @_;
             require OBM::Cyrus::typeBal;
-            return OBM::Cyrus::typeBal::getBdValues( $dbHandler, $domain, $srvId );
+            return OBM::Cyrus::typeBal::getDbValues( $dbHandler, $domain, $obmSrvId, $obmUserLogin );
         },
         update_sieve => sub {
             my( $srvDesc, $imapBox ) = @_;
@@ -91,10 +92,10 @@ $boxTypeDef = {
     SHARE => {
         prefix => "",
         separator => "",
-        get_bd_values => sub {
-            my( $dbHandler, $domain, $srvId ) = @_;
+        get_db_values => sub {
+            my( $dbHandler, $domain, $obmSrvId, $obmMaishareName ) = @_;
             require OBM::Cyrus::typeShare;
-            return OBM::Cyrus::typeShare::getBdValues( $dbHandler, $domain, $srvId );
+            return OBM::Cyrus::typeShare::getDbValues( $dbHandler, $domain, $obmSrvId, $obmMaishareName );
         },
     }
 };
