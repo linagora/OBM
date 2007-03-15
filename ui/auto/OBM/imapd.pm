@@ -69,7 +69,7 @@ sub imapDisconnectSrv {
 
     if( exists($srvDesc->{"imap_server_conn"}) && defined($srvDesc->{"imap_server_conn"}) ) {
         &OBM::toolBox::write_log( "Deconnexion du serveur '".$srvDesc->{"imap_server_name"}."'", "W" );
-        undef $srvDesc->{"conn"};
+        undef $srvDesc->{"imap_server_conn"};
     }
 
     return 0;
@@ -77,7 +77,7 @@ sub imapDisconnectSrv {
 
 
 sub getAdminImapPasswd {
-    my( $dbHandler, $srvList ) = @_;
+    my( $dbHandler, $domainList ) = @_;
     my $cyrusAdmin = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::cyrusAdmin);
 
     # Le statement handler (pointeur sur le resultat)
@@ -103,10 +103,10 @@ sub getAdminImapPasswd {
 
     # On positionne le login et mot de passe au niveau de la description des
     # serveurs
-    for( my $i=0; $i<=$#$srvList; $i++ ) {
-        for( my $j=0; $j<=$#{$srvList->[$i]->{"imap_servers"}}; $j++ ) {
-            $srvList->[$i]->{"imap_servers"}->[$j]->{"imap_server_login"} = $cyrusAdmin->{"login"};
-            $srvList->[$i]->{"imap_servers"}->[$j]->{"imap_server_passwd"} = $cyrusAdmin->{"passwd"};
+    for( my $i=0; $i<=$#$domainList; $i++ ) {
+        for( my $j=0; $j<=$#{$domainList->[$i]->{"imap_servers"}}; $j++ ) {
+            $domainList->[$i]->{"imap_servers"}->[$j]->{"imap_server_login"} = $cyrusAdmin->{"login"};
+            $domainList->[$i]->{"imap_servers"}->[$j]->{"imap_server_passwd"} = $cyrusAdmin->{"passwd"};
         }
     }
 
@@ -116,15 +116,11 @@ sub getAdminImapPasswd {
 
 sub getServerByDomain {
     my( $dbHandler, $domainList ) = @_;
-    my $srvListByDomain = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::listDomainSrv);
 
     for( my $i=0; $i<=$#$domainList; $i++ ) {
         if( $domainList->[$i]->{"meta_domain"} ) {
             next;
         }
-
-        my $currentDomainSrvList = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::domainSrv);
-        $currentDomainSrvList->{"domain"} = $domainList->[$i];
 
         &OBM::toolBox::write_log( "Recuperation des serveurs de courrier pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
         my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM P_Host i, P_MailServer j WHERE (i.host_domain_id=0 OR i.host_domain_id=".$domainList->[$i]->{"domain_id"}.") AND i.host_id=j.mailserver_host_id";
@@ -143,24 +139,21 @@ sub getServerByDomain {
             $srv->{"imap_server_name"} = $hostName;
             $srv->{"imap_server_ip"} = $hostIp;
 
-            push( @srvList, $srv );
+            push( @{$domainList->[$i]->{"imap_servers"}}, $srv );
         }
-        $currentDomainSrvList->{"imap_servers"} = \@srvList;
-
-        push( @{$srvListByDomain}, $currentDomainSrvList );
     }
 
-    return $srvListByDomain;
+    return 0;
 }
 
 
 sub loadBdValues {
-    my( $dbHandler, $listDomainSrv ) = @_;
+    my( $dbHandler, $domainList ) = @_;
 
-    for( my $i=0; $i<=$#$listDomainSrv; $i++ ) {
-        my $currentDomainSrv = $listDomainSrv->[$i];
-        my $domainDesc = $currentDomainSrv->{"domain"};
-        my $domainServerList = $currentDomainSrv->{"imap_servers"};
+    for( my $i=0; $i<=$#$domainList; $i++ ) {
+        my $currentDomain = $domainList->[$i];
+        my $domainDesc = $currentDomain;
+        my $domainServerList = $currentDomain->{"imap_servers"};
 
         # On parcourt les domaines
         &OBM::toolBox::write_log( "Traitement du domaine '".$domainDesc->{"domain_name"}."'", "W" );
@@ -189,17 +182,17 @@ sub loadBdValues {
 
 
 sub updateServers {
-    my( $listDomainSrv ) = @_;
+    my( $domainList ) = @_;
     my $errors = 0;
 
-    for( my $i=0; $i<=$#$listDomainSrv; $i++ ) {
-        my $domainDesc = $listDomainSrv->[$i]->{"domain"};
+    for( my $i=0; $i<=$#$domainList; $i++ ) {
+        my $domainDesc = $domainList->[$i];
 
-        if( !exists($listDomainSrv->[$i]->{"imap_servers"}) || !defined($listDomainSrv->[$i]->{"imap_servers"}) ) {
+        if( !exists($domainList->[$i]->{"imap_servers"}) || !defined($domainList->[$i]->{"imap_servers"}) ) {
             next;
         }
 
-        my $domainServerList = $listDomainSrv->[$i]->{"imap_servers"};
+        my $domainServerList = $domainList->[$i]->{"imap_servers"};
 
         for( my $j=0; $j<=$#{$domainServerList}; $j++ ) {
             my $srvDesc = $domainServerList->[$j];
