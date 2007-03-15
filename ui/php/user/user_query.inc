@@ -246,8 +246,8 @@ function run_query_user_insert($user) {
     // Web access
     $host_name = $user["host_name"];
     $host_id = $user["host_id"];
-    $web_perms = $user["web_perms"];
-    $web_all = $user["web_all"];
+    $web_perms = ($user["web_perms"] == "" ? "0" : $user["web_perms"]);
+    $web_all = ($user["web_all"] == "" ? "0" : $user["web_all"]);
     $web_list = $user["web_list"];
     $query_insert_web = ",
     userobm_web_perms,
@@ -261,9 +261,9 @@ function run_query_user_insert($user) {
 
   // Section Mail
   if ($cgp_use["service"]["mail"]) {
-    $mail_perms = $user["mail_perms"];
-    $mail_ext_perms = $user["mail_ext_perms"];
-    $mail_server = $user["mail_server"];
+    $mail_perms = ($user["mail_perms"] == "" ? "0" : $user["mail_perms"]);
+    $mail_ext_perms = ($user["mail_ext_perms"] == "" ? "0" : $user["mail_ext_perms"]);
+    $mail_server = ($user["mail_server"] == "" ? "0" : $user["mail_server"]);
     $mail_quota = $user["mail_quota"];
     $query_insert_mail = ",
     userobm_mail_perms,
@@ -279,9 +279,9 @@ function run_query_user_insert($user) {
 
   // Section Mail Nomad
   if ($cgp_use["service"]["mail_nomad"]) {
-    $nomade_perms = $user["nomade_perms"];
-    $nomade_enable = $user["nomade_enable"];
-    $nomade_local_copy = $user["nomade_local_copy"];
+    $nomade_perms = ($user["nomade_perms"] == "" ? "0" : $user["nomade_perms"]);
+    $nomade_enable = ($user["nomade_enable"] == "" ? "0" : $user["nomade_enable"]);
+    $nomade_local_copy = ($user["nomade_local_copy"] == "" ? "0" : $user["nomade_local_copy"]);
     $nomad_email = $user["email_nomade"];
     $query_insert_mail_nomad = ",
     userobm_email_nomade,
@@ -297,7 +297,7 @@ function run_query_user_insert($user) {
 
   // Section Mail Vacation
   if ($cgp_use["service"]["mail_vacation"]) {
-    $vacation_enable = $user["vacation_enable"];
+    $vacation_enable = ($user["vacation_enable"] == "" ? "0" : $user["vacation_enable"]);
     $vacation_message = $user["vacation_message"];
     $query_insert_mail_vacation = ",
     userobm_vacation_enable,
@@ -309,7 +309,7 @@ function run_query_user_insert($user) {
 
   // Section Samba
   if ($cgp_use["service"]["samba"]) {
-    $smb_perms = $user["smb_perms"];
+    $smb_perms = ($user["smb_perms"] == "" ? "0" : $user["smb_perms"]);
     $smb_home = $user["smb_home"];
     $smb_home_drive = $user["smb_home_drive"];
     $smb_logon = $user["smb_logon"];
@@ -554,8 +554,8 @@ function run_query_user_update($p_id, $user) {
     // Web access
     $host_name = $user["host_name"];
     $host_id = $user["host_id"];
-    $web_perms = $user["web_perms"];
-    $web_all = $user["web_all"];
+    $web_perms = ($user["web_perms"] == "" ? "0" : $user["web_perms"]);
+    $web_all = ($user["web_all"] == "" ? "0" : $user["web_all"]);
     $web_list = $user["web_list"];
     $query_web = ",
     userobm_web_perms='$web_perms',
@@ -565,9 +565,9 @@ function run_query_user_update($p_id, $user) {
 
   // Section Mail
   if ($cgp_use["service"]["mail"]) {
-    $mail_perms = $user["mail_perms"];
-    $mail_ext_perms = $user["mail_ext_perms"];
-    $mail_server = $user["mail_server"];
+    $mail_perms = ($user["mail_perms"] == "" ? "0" : $user["mail_perms"]);
+    $mail_ext_perms = ($user["mail_ext_perms"] == "" ? "0" : $user["mail_ext_perms"]);
+    $mail_server = ($user["mail_server"] == "" ? "0" : $user["mail_server"]);
     $mail_quota = $user["mail_quota"];
     $query_mail = ",
     userobm_mail_perms='$mail_perms',
@@ -578,9 +578,9 @@ function run_query_user_update($p_id, $user) {
 
   // Section Mail Nomad
   if ($cgp_use["service"]["mail_nomad"]) {
-    $nomade_perms = $user["nomade_perms"];
-    $nomade_enable = $user["nomade_enable"];
-    $nomade_local_copy = $user["nomade_local_copy"];
+    $nomade_perms = ($user["nomade_perms"] == "" ? "0" : $user["nomade_perms"]);
+    $nomade_enable = ($user["nomade_enable"] == "" ? "0" : $user["nomade_enable"]);
+    $nomade_local_copy = ($user["nomade_local_copy"] == "" ? "0" : $user["nomade_local_copy"]);
     $nomad_email = $user["email_nomade"];
     $query_mail_nomad = ",
     userobm_email_nomade='$nomad_email',
@@ -591,7 +591,7 @@ function run_query_user_update($p_id, $user) {
 
   // Section Mail Vacation
   if ($cgp_use["service"]["mail_vacation"]) {
-    $vacation_enable = $user["vacation_enable"];
+    $vacation_enable = ($user["vacation_enable"] == "" ? "0" : $user["vacation_enable"]);
     $vacation_message = $user["vacation_message"];
     $query_mail_vacation = ",
     userobm_vacation_enable='$vacation_enable',
@@ -600,7 +600,7 @@ function run_query_user_update($p_id, $user) {
 
   // Section Samba
   if ($cgp_use["service"]["samba"]) {
-    $smb_perms = $user["smb_perms"];
+    $smb_perms = ($user["smb_perms"] == "" ? "0" : $user["smb_perms"]);
     $smb_home = $user["smb_home"];
     $smb_home_drive = $user["smb_home_drive"];
     $smb_logon = $user["smb_logon"];
@@ -961,6 +961,7 @@ function check_user_data_form($p_id, $user) {
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
   global $c_multidomain, $obm, $cgp_use;
 
+  $action = $user["action"];
   $id = $user["user_id"];
   $login = $user["login"];
   $passwd = $user["passwd"];
@@ -1015,22 +1016,25 @@ function check_user_data_form($p_id, $user) {
     }
   }
 
-  // MANDATORY: User login, not empty and unique
-  if (trim($login) == "") {
-    $err["msg"] = "$login : $l_login_error";
-    $err["field"] = "login";
-    return false;
-  } else {
-    if (! preg_match($php_regexp_login, $login)) {
-      $err["msg"] .= "$login : $l_login_error";
+  // login (can't be updated, so only on insert)
+  if (($action == "new") || ($action == "insert")) {
+    // MANDATORY: User login, not empty and unique
+    if (trim($login) == "") {
+      $err["msg"] = "$login : $l_login_error";
       $err["field"] = "login";
       return false;
-    }
-    // Login not already in use
-    if (check_user_login_in_use($login, $id)) {
-      $err["msg"] = "$login : $l_login_in_use";
-      $err["field"] = "login";
-      return false;
+    } else {
+      if (! preg_match($php_regexp_login, $login)) {
+	$err["msg"] .= "$login : $l_login_error";
+	$err["field"] = "login";
+	return false;
+      }
+      // Login not already in use
+      if (check_user_login_in_use($login, $id)) {
+	$err["msg"] = "$login : $l_login_in_use";
+	$err["field"] = "login";
+	return false;
+      }
     }
   }
 

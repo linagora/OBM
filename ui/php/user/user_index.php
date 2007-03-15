@@ -155,10 +155,11 @@ if ($action == "ext_get_ids") {
     if ($retour) {
       update_update_state();  // Aliamin
       $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
+      $display["detail"] = dis_user_consult($params);
     } else {
       $display["msg"] .= display_err_msg("$l_user : $l_update_error");
+      $display["detail"] = html_user_form("", $params, $err["field"]);
     }
-    $display["detail"] = dis_user_consult($params);
   } else {
     $display["msg"] .= display_err_msg($err["msg"]);
     $display["detail"] = html_user_form("", $params, $err["field"]);

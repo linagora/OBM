@@ -22,10 +22,13 @@ function get_email_used($id="", $gid="", $mid="") {
 
   $mails = array();
 
+  if ($id != "") {
+    $where_user = "WHERE userobm_id != '$id'";
+  }
   // Users
   $query = "SELECT userobm_lastname, userobm_firstname, userobm_email
     FROM UserObm
-    WHERE userobm_id != '$id'";
+    $where_user";
 
   display_debug_msg($query, $cdg_sql, "get_email_used(1)");
   $obm_q = new DB_OBM;
@@ -42,9 +45,12 @@ function get_email_used($id="", $gid="", $mid="") {
   }
 
   // Groups
+  if ($gid != "") {
+    $where_group = "WHERE group_id != '$gid'";
+  }
   $query = "SELECT group_name, group_email
     FROM UGroup
-    WHERE group_id != '$gid'";
+    $where_group";
 
   display_debug_msg($query, $cdg_sql, "get_email_used(2)");
   $g_q = new DB_OBM;
@@ -57,9 +63,12 @@ function get_email_used($id="", $gid="", $mid="") {
   }
 
   // Mailshares
+  if ($mid != "") {
+    $where_mailshare = "WHERE mailshare_id != '$mid'";
+  }
   $query = "SELECT mailshare_name, mailshare_email
     FROM MailShare
-    WHERE mailshare_id != '$mid'";
+    $where_mailshare";
 
   display_debug_msg($query, $cdg_sql, "get_email_used(3)");
   $m_q = new DB_OBM;

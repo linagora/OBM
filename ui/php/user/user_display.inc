@@ -1006,7 +1006,7 @@ function html_user_form($usr_q, $user, $field="") {
   if (($action == "new") || ($action == "insert")) {
     $dis_login = "<input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />";
   } else {
-    $dis_login = $login;
+    $dis_login = "$login<input type=\"hidden\" name=\"tf_login\" value=\"$login\" />";
   }
 
   // Domain (can't be updated, so only on insert)
