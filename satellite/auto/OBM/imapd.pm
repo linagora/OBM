@@ -393,10 +393,11 @@ sub updateBox {
     }
 
     # Gestion du Sieve
-    if( exists($boxTypeDef->{$boxType}->{"create_box"}) && defined($boxTypeDef->{$boxType}->{"create_box"}) ) {
+    if( exists($boxTypeDef->{$boxType}->{"update_sieve"}) && defined($boxTypeDef->{$boxType}->{"update_sieve"}) ) {
         if( !$newBox || ($newBox && $newImapBoxDesc->{"box_vacation_enable"}) ) {
             &OBM::toolBox::write_log( "Gestion du script Sieve de la boite '".$boxLogin."'", "W" );
-            if( &{$boxTypeDef->{$boxType}->{"create_box"}}( $srvDesc, $newImapBoxDesc ) ) {
+            
+            if( &{$boxTypeDef->{$boxType}->{"update_sieve"}}( $srvDesc, $newImapBoxDesc ) ) {
                 $errors++;
             }
         }

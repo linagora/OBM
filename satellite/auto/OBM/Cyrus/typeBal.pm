@@ -82,23 +82,14 @@ sub initRight {
 }
 
 
-sub createBox {
-    my( $srvDesc, $imapBox ) = @_;
-    my $errors = 0;
-
-    if( defined($imapBox->{"box_vacation_enable"}) && $imapBox->{"box_vacation_enable"} ) {
-        if( updateSieve( $srvDesc, $imapBox ) ) {
-            $errors++;
-        }
-    }
-
-    return $errors;
-}
-
 sub updateSieve {
     my( $srvDesc, $imapBox ) = @_;
     my @sieveScript;
 
+
+    if( !defined($imapBox->{"box_vacation_enable"}) ) {
+        $imapBox->{"box_vacation_enable"} = 0;
+    }
 
     if( !defined($imapBox->{"box_login"}) ) {
         return 1;
@@ -121,7 +112,9 @@ sub updateSieve {
     # On supprime l'ancien script
     sieve_delete( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName );
 
-    if( $imapBox->{"box_vacation_enable"} ) {
+    if( !$imapBox->{"box_vacation_enable"} ) {
+        &OBM::toolBox::write_log( "Suppression du script Sieve pour l'utilisateur : '".$boxLogin."'", "W" );
+    }else {
         # On met les règles pour le vacation dans le script Sieve
         mkSieveVacationScript( $imapBox, \@sieveScript );
 
@@ -189,6 +182,7 @@ sub mkSieveVacationScript {
     my $boxEmails = $imapBox->{"box_email"};
 
 
+    push( @{$sieveScript}, "/* Message d'absence */\n" );
     push( @{$sieveScript}, "require \"vacation\";\n" );
     push( @{$sieveScript}, "\n" );
 
@@ -200,6 +194,7 @@ sub mkSieveVacationScript {
         $sieveScript->[$#{$sieveScript}] .= "\"".$boxEmails->[$i]."\"";
     }
     $sieveScript->[$#{$sieveScript}] .= " ] \"".to_utf8( { -string => $boxVacationMessage, -charset => $defaultCharSet } )."\";\n";
+    push( @{$sieveScript}, "/* Fin du message d'absence */\n" );
 
     return 0;
 }

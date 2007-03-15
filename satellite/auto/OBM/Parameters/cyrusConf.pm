@@ -94,10 +94,10 @@ $boxTypeDef = {
             require OBM::Cyrus::typeBal;
             return OBM::Cyrus::typeBal::getBdValues( $dbHandler, $domain, $srvId );
         },
-        create_box => sub {
+        update_sieve => sub {
             my( $srvDesc, $imapBox ) = @_;
             require OBM::Cyrus::typeBal;
-            return OBM::Cyrus::typeBal::createBox( $srvDesc, $imapBox );
+            return OBM::Cyrus::typeBal::updateSieve( $srvDesc, $imapBox );
         }
     },
     SHARE => {
@@ -108,7 +108,6 @@ $boxTypeDef = {
             require OBM::Cyrus::typeShare;
             return OBM::Cyrus::typeShare::getBdValues( $dbHandler, $domain, $srvId );
         },
-        create_box => undef
     }
 };
 
