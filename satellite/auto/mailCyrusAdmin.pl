@@ -65,18 +65,18 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 my $domainList = &OBM::toolBox::getDomains( $dbHandler );
 
 # Récupération des serveurs de courrier par domaine
-my $listDomainSrv = &OBM::imapd::getServerByDomain( $dbHandler, $domainList );
+&OBM::imapd::getServerByDomain( $dbHandler, $domainList );
 
 # Recuperation du mot de passe de l'administrateur IMAP 
 &OBM::toolBox::write_log( "Recuperation des informations de l'administrateur.", "W" );
-if( !&OBM::imapd::getAdminImapPasswd( $dbHandler, $listDomainSrv ) ) {
+if( !&OBM::imapd::getAdminImapPasswd( $dbHandler, $domainList ) ) {
     exitScript( "1", $dbHandler );
 }
 
 # Chargement des informations depuis la BD OBM
-&OBM::imapd::loadBdValues( $dbHandler, $listDomainSrv );
+&OBM::imapd::loadBdValues( $dbHandler, $domainList );
 
 # Traitement domaine/domaine - serveur/serveur
-&OBM::imapd::updateServers( $listDomainSrv );
+&OBM::imapd::updateServers( $domainList );
 
 exitScript( "0", $dbHandler );

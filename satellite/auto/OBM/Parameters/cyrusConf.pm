@@ -57,18 +57,6 @@ use constant srvDesc => {
 };
 
 
-# Attribut 'domain' : type 'domainDesc'
-# Attribut 'imap_server' : tableau de 'srvDesc'
-use constant domainSrv => {
-    domain => undef,
-    imap_servers => []
-};
-
-
-# Tableau de 'domainSrv'
-use constant listDomainSrv => [];
-
-
 # Attribut 'box_acl' : type 'boxRight'
 use constant imapBox => {
     box_name => undef,
