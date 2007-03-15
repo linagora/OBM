@@ -201,7 +201,9 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 
 # Recuperation des domaines
 local $main::domainList = undef;
-$main::domainList = &OBM::toolBox::getDomains( $dbHandler );
+$main::domainList = &OBM::toolBox::getDomains( $dbHandler, undef );
+
+&OBM::ldap::getServerByDomain( $dbHandler, $main::domainList );
 
 # Traitement des parametres
 &OBM::toolBox::write_log( "Analyse des parametres du script", "W" );

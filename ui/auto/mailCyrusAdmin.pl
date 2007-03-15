@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -w -T
 ###############################################################################
 # OBM       - File : mailCyrusAdmin.pl                                        #
 #           - Desc : script d'amdinistration du serveur Cyrus IMAP et SIEVE   #
@@ -18,8 +18,7 @@ require OBM::toolBox;
 require OBM::dbUtils;
 use OBM::Parameters::common;
 
-$ENV{PATH}=$automateOBM;
-delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
 
 sub exitScript {
@@ -33,7 +32,7 @@ sub exitScript {
         # On referme la connexion a la base
         &OBM::toolBox::write_log( "Deconnexion de la base de donnees OBM", "W" );
         if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "WC" );
+            &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "W" );
         }
     }
 
@@ -62,7 +61,7 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 
 # Recuperation des domaines a traiter
 &OBM::toolBox::write_log( "Recuperation de la liste des domaines a traiter", "W" );
-my $domainList = &OBM::toolBox::getDomains( $dbHandler );
+my $domainList = &OBM::toolBox::getDomains( $dbHandler, undef );
 
 # Récupération des serveurs de courrier par domaine
 &OBM::imapd::getServerByDomain( $dbHandler, $domainList );

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -w -T
 ###############################################################################
 # Aliamin   - File : ldapModifBase.pl                                         #
 #           - Desc : Modification de la base LDAP en fonction des infos       #
@@ -18,8 +18,7 @@ require OBM::ldap;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 
-$ENV{PATH}=$automateOBM;
-delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
 
 #
@@ -42,7 +41,7 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 # Recuperation des domaines a traiter
 &OBM::toolBox::write_log( "Recuperation de la liste des domaines a traiter", "W" );
 local $main::domainList = undef;
-$main::domainList = &OBM::toolBox::getDomains( $dbHandler );
+$main::domainList = &OBM::toolBox::getDomains( $dbHandler, undef );
 
 &OBM::ldap::getServerByDomain( $dbHandler, $main::domainList );
 

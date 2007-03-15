@@ -230,7 +230,7 @@ sub getGroupUsers {
     my $queryResult;
 
     # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = "SELECT i.userobm_login FROM UserObm i, UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
+    my $query = "SELECT i.userobm_login FROM P_UserObm i, P_UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
 
     if( defined( $sqlRequest ) && ($sqlRequest ne "") ) {
         $query .= " ".$sqlRequest;
@@ -248,7 +248,7 @@ sub getGroupUsers {
     }
 
     # Recuperation de la liste des utilisateurs du groupe id : $groupId.
-    $query = "SELECT groupgroup_child_id FROM GroupGroup WHERE groupgroup_parent_id=".$groupId;
+    $query = "SELECT groupgroup_child_id FROM P_GroupGroup WHERE groupgroup_parent_id=".$groupId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
