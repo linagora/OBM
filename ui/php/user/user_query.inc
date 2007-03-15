@@ -510,7 +510,6 @@ function run_query_user_update($p_id, $user) {
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
-  $login = $user["login"];
   $passwd = $user["passwd"];
   if ($passwd != "") {
     if ($password_encryption == "crypt") {
@@ -632,7 +631,6 @@ function run_query_user_update($p_id, $user) {
   $query = "UPDATE UserObm SET
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
     userobm_userupdate='". $obm["uid"] ."',
-    userobm_login='$login',
     $passwd_update
     userobm_perms='$perms',
     userobm_gid='$gid',
