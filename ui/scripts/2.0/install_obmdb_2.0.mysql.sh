@@ -31,7 +31,7 @@ OBM_LANG=$VALUE
 echo "*** Parameters used : MySQL"
 echo "database = $DB"
 echo "database user = $U"
-echo "database password = $DB"
+echo "database password = $P"
 echo "install lang = $OBM_LANG"
 
 

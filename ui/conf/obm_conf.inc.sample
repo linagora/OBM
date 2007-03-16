@@ -129,7 +129,7 @@ $profiles["editor"] = array (
     'com' => 1,
     'prod' => 1,
     'user' => 1,
-    'settings' => 1),
+    'my' => 1),
   'module' => array (
     'default' => $perm_editor)
 );

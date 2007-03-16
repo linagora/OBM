@@ -508,59 +508,16 @@ cd obm/scripts/2.0<br />
 <p>
 <a name="upgrade-2.0"><h1>UPGRADE from version 1.2.x to version 2.0.x</h1></a></p>
 
-<h3>Update Database model</h3>
-<p># MySQL</p>
+
+<h3>Replace your current archive with the new one</h3>
+
+
+Recreate the Artichow library link
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-mysql -u obm -pobm obm < scripts/2.0/update-1.2-2.0.mysql.sql
-</code>
-  </td>
-</tr>
-</table>
-
-<p>
-# Postgres</p>
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><code>
-psql -U obm obm < scripts/2.0/update-1.2-2.0.pgsql.sql
-</code>
-  </td>
-</tr>
-</table>
-
-
-<h3>Insert new default preferences values</h3>
-<p># MySQL</p>
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><code>
-mysql -u obm -pobm obm < scripts/2.0/obmdb_default_values_2.0.sql
-</code>
-  </td>
-</tr>
-</table>
-
-<p>
-# Postgres</p>
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><code>
-psql -U obm obm < scripts/2.0/obmdb_default_values_2.0.sql
-</code>
-  </td>
-</tr>
-</table>
-
-
-<h3>Update data to new database model</h3>
-
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><code>
-cd scripts/2.0
-php update-1.2-2.0.php
+cd obminclude
+mv Artichow-1.06-php4+5/ Artichow
 </code>
   </td>
 </tr>
@@ -651,6 +608,65 @@ OBM configuration has evolved.
 <tr>
   <td>documentcategory2</td>
   <td>idem : mono</td>
+</tr>
+</table>
+
+
+<h3>Update Database model</h3>
+<p># MySQL</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+mysql -u obm -pobm obm < scripts/2.0/update-1.2-2.0.mysql.sql
+</code>
+  </td>
+</tr>
+</table>
+
+<p>
+# Postgres</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+psql -U obm obm < scripts/2.0/update-1.2-2.0.pgsql.sql
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h3>Insert new default preferences values</h3>
+<p># MySQL</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+mysql -u obm -pobm obm < scripts/2.0/obmdb_default_values_2.0.sql
+</code>
+  </td>
+</tr>
+</table>
+
+<p>
+# Postgres</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+psql -U obm obm < scripts/2.0/obmdb_default_values_2.0.sql
+</code>
+  </td>
+</tr>
+</table>
+
+
+<h3>Update data to new database model</h3>
+
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><code>
+cd scripts/2.0
+php update-1.2-2.0.php
+</code>
+  </td>
 </tr>
 </table>
 
