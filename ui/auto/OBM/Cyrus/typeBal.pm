@@ -201,6 +201,10 @@ sub updateSieveScript {
     push( @{$newSieveScript}, @headers );
     push( @{$newSieveScript}, @vacation );
     push( @{$newSieveScript}, @nomade );
+
+    for( my $i=0; $i<=$#{$oldSieveScript}; $i++ ) {
+        $oldSieveScript->[$i] .="\n";
+    }
     push( @{$newSieveScript}, @{$oldSieveScript} );
     push( @{$newSieveScript}, @defaultAction );
 
@@ -267,38 +271,6 @@ sub updateSieveNomade {
 
     # On supprime le nomade de l'ancien script
     &OBM::Cyrus::utils::sieveDeleteMark( $oldSieveScript, $nomadeMark );
-
-    return 0;
-}
-
-
-sub findBeginEndScript {
-    my( $sieveScript, $mark, $begin, $end ) = @_;
-
-    my $i=0;
-    while( ( $i<=$#{$sieveScript} ) && ( $sieveScript->[$i] !~ /^$mark$/ ) ) {
-        $i++;
-    }
-
-    if( $i > $#{$sieveScript} ) {
-        $$begin = undef;
-        $$end = undef;
-        return 0;
-    }else {
-        $$begin = $i;
-        $i++;
-        $$end = $i;
-    }
-
-    while( ( $i<=$#{$sieveScript} ) && ( $sieveScript->[$i] !~ /^$mark$/ ) ) {
-        $i++;
-    }
-
-    if( $i > $#{$sieveScript} ) {
-        $$end = $#{$sieveScript};
-    }else {
-        $$end = $i;
-    }
 
     return 0;
 }
