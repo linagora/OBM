@@ -66,7 +66,11 @@ use constant imapBox => {
     box_acl => {},
     box_vacation_enable => 0,
     box_vacation_message => undef,
-    box_email => []
+    box_email => [],
+    box_nomade_perms => 0,
+    box_nomade_enable => undef,
+    box_nomade_local_copy => undef,
+    box_nomade_dst => undef
 };
 
 # Tableau de type 'imapBox'
