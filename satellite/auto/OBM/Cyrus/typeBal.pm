@@ -18,7 +18,7 @@ sub getDbValues {
 
     # La requete a executer - obtention des informations sur les utilisateurs
     # mails de l'organisation.
-    my $query = "SELECT userobm_id, userobm_login, userobm_mail_quota, userobm_mail_server_id, userobm_vacation_enable, userobm_vacation_message, userobm_email FROM P_UserObm WHERE userobm_mail_perms=1 AND userobm_domain_id=".$domainId;
+    my $query = "SELECT userobm_id, userobm_login, userobm_mail_quota, userobm_mail_server_id, userobm_vacation_enable, userobm_vacation_message, userobm_email, userobm_nomade_perms, userobm_nomade_enable, userobm_nomade_local_copy, userobm_email_nomade FROM P_UserObm WHERE userobm_mail_perms=1 AND userobm_domain_id=".$domainId;
 
     if( defined($obmSrvId) && ( $obmSrvId =~ /^\d+$/ ) ) {
         $query .= " AND userobm_mail_server_id=".$obmSrvId;
@@ -37,7 +37,7 @@ sub getDbValues {
 
     # On tri les resultats dans le tableau
     my $users = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::listImapBox);
-    while( my( $userId, $userLogin, $userQuota, $userSrvId, $userVenable, $userVmessage, $userEmail ) = $queryResult->fetchrow_array ) {
+    while( my( $userId, $userLogin, $userQuota, $userSrvId, $userVenable, $userVmessage, $userEmail, $userNomadePerms, $userNomadeEnable, $userNomadeLocalCopy, $userNomadeDst ) = $queryResult->fetchrow_array ) {
         my $userDesc = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::imapBox);
 
         $userDesc->{"box_login"} = lc($userLogin)."@".lc($domain->{"domain_name"});
@@ -56,6 +56,11 @@ sub getDbValues {
         if( $userVenable ) {
             $userDesc->{"box_email"} = &OBM::toolBox::makeEntityMailAddress( $userEmail, $domain );
         }
+
+        $userDesc->{"box_nomade_perms"} = $userNomadePerms;
+        $userDesc->{"box_nomade_enable"} = $userNomadeEnable;
+        $userDesc->{"box_nomade_local_copy"} = $userNomadeLocalCopy;
+        $userDesc->{"box_nomade_dst"} = $userNomadeDst;
 
         # On recupere la definition des ACL
         $userDesc->{"box_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domain, initRight( $userId ), $userId );
@@ -92,7 +97,8 @@ sub initRight {
 
 sub updateSieve {
     my( $srvDesc, $imapBox ) = @_;
-    my @sieveScript;
+    my @newSieveScript;
+    my $sieveErrorCode;
 
     if( !defined($imapBox->{"box_vacation_enable"}) ) {
         $imapBox->{"box_vacation_enable"} = 0;
@@ -113,50 +119,54 @@ sub updateSieve {
     my $localSieveScriptName = $tmpOBM.$sieveScriptName;
 
     &OBM::toolBox::write_log( "Mise a jour du script Sieve pour l'utilisateur : '".$boxLogin."'", "W" );
+    my $currentScriptString = "";
+    sieve_get( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName, $currentScriptString );
+    my @oldSieveScript;
+    if( defined($currentScriptString) ) {
+        @oldSieveScript = split( /\n/, $currentScriptString );
+    }
+
 
     # On desactive l'ancien script
-    sieve_activate( $srvDesc->{"imap_sieve_server_conn"}, "" );
+    $sieveErrorCode = sieve_activate( $srvDesc->{"imap_sieve_server_conn"}, "" );
     # On supprime l'ancien script
-    sieve_delete( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName );
+    $sieveErrorCode = sieve_delete( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName );
 
-    if( !$imapBox->{"box_vacation_enable"} ) {
-        &OBM::toolBox::write_log( "Suppression du script Sieve pour l'utilisateur : '".$boxLogin."'", "W" );
+    # On met les règles pour le vacation dans le script Sieve
+    updateSieveScript( $imapBox, \@oldSieveScript, \@newSieveScript );
 
-    }else {
-        # On met les règles pour le vacation dans le script Sieve
-        mkSieveVacationScript( $imapBox, \@sieveScript );
+    if( $#newSieveScript >= 0 ) {
+        # On cree le script Sieve en local
+        open( FIC, ">".$localSieveScriptName ) or return 1;
+        print FIC @newSieveScript;
+        close( FIC );
 
-        if( $#sieveScript >= 0 ) {
-            # On cree le script Sieve en local
-            open( FIC, ">".$localSieveScriptName ) or return 1;
-            print FIC @sieveScript;
-            close( FIC );
+        # On installe le nouveau script
+        if( sieve_put_file_withdest( $srvDesc->{"imap_sieve_server_conn"}, $localSieveScriptName, $sieveScriptName ) ) {
+            my $errstr = sieve_get_error( $srvDesc->{"imap_sieve_server_conn"} );
+            $errstr = "Echec : Sieve - erreur inconnue." if(!defined($errstr));
 
-            # On installe le nouveau script
-            if( sieve_put_file_withdest( $srvDesc->{"imap_sieve_server_conn"}, $localSieveScriptName, $sieveScriptName ) ) {
-                my $errstr = sieve_get_error( $srvDesc->{"imap_sieve_server_conn"} );
-                $errstr = "Echec : Sieve - erreur inconnue." if(!defined($errstr));
-
-                &OBM::toolBox::write_log( "Probleme lors du telechargement du script Sieve : ".$errstr , "W" );
-
-                return 1;
-            }
-
-            &OBM::toolBox::write_log( "Activation du script Sieve pour l'utilisateur : ".$boxLogin, "W" );
-
-            # On active le nouveau script
-            if( sieve_activate( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName ) ) {
-                my $errstr = sieve_get_error( $srvDesc->{"imap_sieve_server_conn"} );
-                $errstr = "Echec : Sieve - erreur inconnue." if(!defined($errstr));
-
-                &OBM::toolBox::write_log( "Probleme lors de l'activation du script Sieve : ".$errstr, "W" );
-
-                return 1;
-            }
-
-            # On supprime le script local
-            &OBM::utils::execCmd( "/bin/rm -f ".$localSieveScriptName );
+            &OBM::toolBox::write_log( "Echec: lors du telechargement du script Sieve : ".$errstr , "W" );
+            disconnectSrvSieve( $srvDesc );
+            return 1;
         }
+
+        &OBM::toolBox::write_log( "Activation du script Sieve pour l'utilisateur : ".$boxLogin, "W" );
+
+        # On active le nouveau script
+        if( sieve_activate( $srvDesc->{"imap_sieve_server_conn"}, $sieveScriptName ) ) {
+            my $errstr = sieve_get_error( $srvDesc->{"imap_sieve_server_conn"} );
+            $errstr = "Echec : Sieve - erreur inconnue." if(!defined($errstr));
+
+            &OBM::toolBox::write_log( "Probleme lors de l'activation du script Sieve : ".$errstr, "W" );
+            disconnectSrvSieve( $srvDesc );
+            return 1;
+        }
+
+        # On supprime le script local
+        &OBM::utils::execCmd( "/bin/rm -f ".$localSieveScriptName );
+    }else {
+        &OBM::toolBox::write_log( "Suppression du script Sieve pour l'utilisateur : ".$boxLogin, "W" );
     }
 
     disconnectSrvSieve( $srvDesc );
@@ -165,44 +175,130 @@ sub updateSieve {
 }
 
 
-sub mkSieveVacationScript {
-    my( $imapBox, $sieveScript ) = @_;
+sub updateSieveScript {
+    my( $imapBox, $oldSieveScript, $newSieveScript ) = @_;
+    require OBM::Cyrus::utils;
 
-    if( !exists($imapBox->{"box_vacation_enable"}) || !$imapBox->{"box_vacation_enable"} ) {
-        return 1;
+    # Recuperation des en-tetes 'require' de l'ancien script
+    my @headers;
+    &OBM::Cyrus::utils::sieveGetHeaders( $oldSieveScript, \@headers );
+
+    my @vacation;
+    updateSieveVacation( $imapBox, \@headers, $oldSieveScript, \@vacation );
+
+    my @nomade;
+    updateSieveNomade( $imapBox, \@headers, $oldSieveScript, \@nomade );
+
+    my @defaultAction;
+    &OBM::Cyrus::utils::sieveDefaultAction( $imapBox, \@headers, $oldSieveScript, \@defaultAction );
+
+    splice( @{$newSieveScript}, 0 );
+
+    if( ( $#vacation < 0 ) && ( $#nomade < 0 ) && ($#{$oldSieveScript} < 0) ) {
+        return 0;
     }
 
-    if( !defined($imapBox->{"box_login"}) ) {
-        return 1;
-    }
-    my $boxLogin = $imapBox->{"box_login"};
+    push( @{$newSieveScript}, @headers );
+    push( @{$newSieveScript}, @vacation );
+    push( @{$newSieveScript}, @nomade );
+    push( @{$newSieveScript}, @{$oldSieveScript} );
+    push( @{$newSieveScript}, @defaultAction );
 
-    &OBM::toolBox::write_log( "Creation du message d'absence de la boite '".$boxLogin."'", "W" );
-
-    if( !defined( $imapBox->{"box_vacation_message"} ) ) {
-        return 1;
-    }
-    my $boxVacationMessage = $imapBox->{"box_vacation_message"};
-
-    if( !defined( $imapBox->{"box_email"} ) ) {
-        return 1;
-    }
-    my $boxEmails = $imapBox->{"box_email"};
+    return 0;
+}
 
 
-    push( @{$sieveScript}, "/* Message d'absence */\n" );
-    push( @{$sieveScript}, "require \"vacation\";\n" );
-    push( @{$sieveScript}, "\n" );
+sub updateSieveVacation {
+    my( $imapBox, $headers, $oldSieveScript, $newSieveScript ) = @_;
+    my $vacationMark = "# OBM2 - Vacation";
 
-    push( @{$sieveScript}, "vacation :addresses [ " );
-    for( my $i=0; $i<=$#{$boxEmails}; $i++ ) {
-        if( $i != 0 ) {
-            $sieveScript->[$#{$sieveScript}] .= ", ";
+
+    if( exists($imapBox->{"box_vacation_enable"}) && $imapBox->{"box_vacation_enable"} && defined($imapBox->{"box_login"}) && defined($imapBox->{"box_vacation_message"}) && defined($imapBox->{"box_email"}) && ( $#{$imapBox->{"box_email"}}>=0 ) ) {
+        # On verifie que l'en-tête necessaire soit bien placé
+        my $i=0;
+        while( ( $i<=$#{$headers} ) && ( $headers->[$i] !~ /[^#]*require \"vacation\";/) ) {
+            $i++;
         }
-        $sieveScript->[$#{$sieveScript}] .= "\"".$boxEmails->[$i]."\"";
+
+        if( $i > $#{$headers} ) {
+            unshift( @{$headers}, "require \"vacation\";\n" );
+        }
+
+        my $boxLogin = $imapBox->{"box_login"};
+        &OBM::toolBox::write_log( "Creation du message d'absence de la boite '".$boxLogin."'", "W" );
+
+        my $boxVacationMessage = $imapBox->{"box_vacation_message"};
+        my $boxEmails = $imapBox->{"box_email"};
+
+        push( @{$newSieveScript}, $vacationMark."\n" );
+    
+        push( @{$newSieveScript}, "vacation :addresses [ " );
+        for( my $i=0; $i<=$#{$boxEmails}; $i++ ) {
+            if( $i != 0 ) {
+                $newSieveScript->[$#{$newSieveScript}] .= ", ";
+            }
+            $newSieveScript->[$#{$newSieveScript}] .= "\"".$boxEmails->[$i]."\"";
+        }
+        $newSieveScript->[$#{$newSieveScript}] .= " ] \"".to_utf8( { -string => $boxVacationMessage, -charset => $defaultCharSet } )."\";\n";
+        push( @{$newSieveScript}, $vacationMark."\n" );
     }
-    $sieveScript->[$#{$sieveScript}] .= " ] \"".to_utf8( { -string => $boxVacationMessage, -charset => $defaultCharSet } )."\";\n";
-    push( @{$sieveScript}, "/* Fin du message d'absence */\n" );
+
+    # On supprime le vacation de l'ancien script
+    &OBM::Cyrus::utils::sieveDeleteMark( $oldSieveScript, $vacationMark );
+
+    return 0;
+}
+
+
+sub updateSieveNomade {
+    my( $imapBox, $headers, $oldSieveScript, $newSieveScript ) = @_;
+    my $nomadeMark = "# OBM2 - Nomade";
+
+    if( defined($imapBox->{"box_nomade_perms"}) && $imapBox->{"box_nomade_perms"} && defined($imapBox->{"box_nomade_enable"}) && $imapBox->{"box_nomade_enable"} && defined($imapBox->{"box_nomade_dst"}) ) {
+        push( @{$newSieveScript}, $nomadeMark."\n" );
+        push( @{$newSieveScript}, "redirect \"".$imapBox->{"box_nomade_dst"}."\";\n" );
+
+        if( defined($imapBox->{"box_nomade_local_copy"}) && !$imapBox->{"box_nomade_local_copy"} ) {
+            push( @{$newSieveScript}, "discard;\n" );
+        }
+
+        push( @{$newSieveScript}, $nomadeMark."\n" );
+    }
+
+    # On supprime le nomade de l'ancien script
+    &OBM::Cyrus::utils::sieveDeleteMark( $oldSieveScript, $nomadeMark );
+
+    return 0;
+}
+
+
+sub findBeginEndScript {
+    my( $sieveScript, $mark, $begin, $end ) = @_;
+
+    my $i=0;
+    while( ( $i<=$#{$sieveScript} ) && ( $sieveScript->[$i] !~ /^$mark$/ ) ) {
+        $i++;
+    }
+
+    if( $i > $#{$sieveScript} ) {
+        $$begin = undef;
+        $$end = undef;
+        return 0;
+    }else {
+        $$begin = $i;
+        $i++;
+        $$end = $i;
+    }
+
+    while( ( $i<=$#{$sieveScript} ) && ( $sieveScript->[$i] !~ /^$mark$/ ) ) {
+        $i++;
+    }
+
+    if( $i > $#{$sieveScript} ) {
+        $$end = $#{$sieveScript};
+    }else {
+        $$end = $i;
+    }
 
     return 0;
 }
