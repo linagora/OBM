@@ -24,7 +24,8 @@ use constant domainDesc => {
     domain_dn => undef,
     ldap_admin_server => undef,
     ldap_admin_login => undef,
-    ldap_admin_passwd => undef
+    ldap_admin_passwd => undef,
+    imap_servers => []
 };
 
 
