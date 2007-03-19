@@ -73,7 +73,7 @@ $cgp_cookie_domain = "aliacom.local";
 $auth_encryption = 1;
 
 // encyption used to store password : "plain", "md5" or "crypt"
-$password_encryption = "md5";
+$password_encryption = "plain";
 
 // Modules specific parameters ----------------------------------------------//
 

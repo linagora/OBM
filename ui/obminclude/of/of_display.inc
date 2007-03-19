@@ -73,7 +73,7 @@ class OBM_DISPLAY {
     if (isset($name)) {
       $this->display_name = $name;
     }
-    $this->sql_order_dir = ($params["sql_order_dir"] == "ASC" ? "DESC" : "ASC");
+    $this->sql_order_dir = ($params["sql_order_dir"] == "DESC" ? "DESC" : "ASC");
   }
   
   /////////////////////////////////////////////////////////////////////////////
@@ -493,9 +493,9 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call (module formatting fields)
   /////////////////////////////////////////////////////////////////////////////
     function dis_data_index($url, $dis_data_entity) {
-    global $path, $params, $of_display_name, $ctu_sql_limit;
+    global $path, $params, $ctu_sql_limit;
     global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
-    global $set_rows, $set_rows_default;
+    global $set_rows, $set_rows_default,$module;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
     global $ico_export, $ico_export_all, $ico_begin, $ico_end, $ico_previous, $ico_next;
 
@@ -509,10 +509,9 @@ class OBM_DISPLAY {
     if (! $this->display_link) {
       $url .= "&amp;popup=1";
     }
-
     // Page display management
     // If page not set or page not for this display (this entity)
-    if ((!isset($params["page"])) || ($params["page"] == "") || ($of_display_name != $this_name)) {
+    if ((!isset($params["page"])) || ($params["page"] == "") || ($params["of_display_name"] != $this_name)) {
       $lpage = 1;
     } else {
       $lpage = $params["page"];
@@ -629,7 +628,7 @@ class OBM_DISPLAY {
   //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
-    global $of_display_name, $params;
+    global $params;
     global $fieldnames, $cgp_hide, $cdg_id, $set_debug, $l_id;
     global $ico_arrow_up, $ico_arrow_down, $ico_arrow_off;
 
@@ -641,7 +640,7 @@ class OBM_DISPLAY {
     $entity = $this->display_entity;
     $this_name = $this->display_name;
     $sql_order_dir = $this->sql_order_dir;
-
+    $new_sql_order_dir = ($sql_order_dir == "ASC" ? "DESC" : "ASC"); 
     $block = "
       <thead>
     <tr>";
@@ -686,10 +685,10 @@ class OBM_DISPLAY {
               }
             }
 	    // If action on this dataset
-	    if ($this_name == $of_display_name) {
-	      $furl .= "&amp;page=$params[page]&amp;sql_order_field=$fieldname&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
+	    if ($this_name == $params["of_display_name"]) {
+	      $furl .= "&amp;page=$params[page]&amp;sql_order_field=$fieldname&amp;sql_order_dir=$new_sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
 	    } else {
-	      $furl .= "&amp;page=1&amp;sql_order_field=$fieldname&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
+	      $furl .= "&amp;page=1&amp;sql_order_field=$fieldname&amp;sql_order_dir=$new_sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
 	    }
           }
           $onclick = "onclick=\"window.location.href='$furl'\" onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\" ";

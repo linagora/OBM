@@ -90,7 +90,7 @@ $auth_kind = "standalone";
 $auth_encryption = 1;
 
 // Encyption used to store password : "plain", "md5" or "crypt"
-$password_encryption = "md5";
+$password_encryption = "plain";
 
 // Handle connectors data
 $c_use_connectors = true;
@@ -323,6 +323,9 @@ require_once("conf/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 
 define("C_IMAGE_PATH",$cgp_host."images");
+
+// Update password encryptation in uppercase
+$password_encryption = strtoupper($password_encryption);
 
 // Automate commands
 $cmd_halt = "sudo /sbin/halt";
@@ -952,7 +955,8 @@ function get_global_params($table="") {
   */
 
   $replace = array("/^tf_/", "/^sel_/", "/^cb_/", "/^ta_/", "/^rd_/", "/^hd_/");
-  foreach($_REQUEST as $var => $value) {
+  $parameters = array_merge($_POST, $_GET);
+  foreach($parameters as $var => $value) {
 
     // Handle automatic checkbox (1,0) paramaters (cba_)
     $key = preg_replace("/^cba_/", "", $var);
@@ -1031,7 +1035,8 @@ function get_global_params($table="") {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_params_document(&$mod_params) {
   $nb_d = 0;
-  foreach($_REQUEST as $key => $value) {
+  $parameters = array_merge($_POST, $_GET);
+  foreach($parameters as $key => $value) {
     if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
       $nb_d++;
       $d_num = substr($key, 4);

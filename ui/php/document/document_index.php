@@ -122,7 +122,6 @@ elseif ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_data_form("", $params)) {
     $params["document_id"] = run_query_document_insert($params);
-    echo "p1=".$params["document_id"];
     if ($params["document_id"]) {
       update_last_visit("document", $params["document_id"], $action);
       $display["msg"] .= display_ok_msg("$l_document : $l_insert_ok");
