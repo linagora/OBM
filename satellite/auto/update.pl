@@ -38,7 +38,7 @@ my %parameters;
 
 #
 # Analyse de la ligne de commande
-&GetOptions( \%parameters, "ldap", "cyrus", "all" );
+&GetOptions( \%parameters, "ldap", "postfix", "cyrus", "all" );
 
 
 # Si l'option 'all' est presente, on force l'execution de tout
@@ -46,6 +46,7 @@ if( $parameters{"all"} ) {
     &OBM::toolBox::write_log( "Mise a jour de tous les services", "W" );
     $parameters{"ldap"} = "1";
     $parameters{"cyrus"} = "1";
+    $parameters{"postfix"} = "1";
 }
 
 
@@ -68,6 +69,17 @@ if( $parameters{"cyrus"} ) {
     }else
     {
         &OBM::toolBox::write_log( "Reconfiguration du serveur Cyrus IMAP terminee", "W" );
+    }
+}
+
+# Configuration des services Postfix - contact des services
+# 'mailMakePostfixMaps'
+if( $parameters{"postfix"} ) {
+    &OBM::toolBox::write_log( "Reconfiguration des services MTA Postfix", "W" );
+    if( &OBM::utils::execCmd( "$automatePostfixUpdate", 0 ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de la reconfiguration des services MTA Postfix", "W" );
+    }else {
+        &OBM::toolBox::write_log( "Reconfiguration des services MTA Postfix", "W" );
     }
 }
 

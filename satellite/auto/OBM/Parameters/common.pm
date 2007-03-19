@@ -15,11 +15,11 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($facility_log $securinetMode $enableHook $sieveSrv $ldapServer $sambaSrvHome $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $rsaPrivateKey $rsaPublicKey $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($facility_log $enableHook $sieveSrv $ldapServer $sambaSrvHome $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
-@EXPORT_files = qw($templatePostfixAliases $tmpPostfixAliases $aliaminPostfixAliases $automateMailAliases $automateMailChangeAlias $automateMailChangeSieve $automateMailStat $automateCyrusAdmin $automateLdapDatabase $automateLdapCommit $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixConf $automateNameServer $automateSquidCache $automateNetwork $automateFirewall $automateVPN $automateAmavis $aliaminMailLog $templateLdapDatabase $tmpLdapDatabase $aliaminSlapdConf $aliaminSlapdConfNew $aliaminSlapdRep $aliaminSlapdRepNew $slapdControl $templateSquidConf $tmpSquidUserURLList $tmpSquidHostURLList $tmpSquidConf $squidUserURLList $squidHostURLList $squidAuthenticateProgram $squidConf $aliaminVPNKernelConf $aliaminPareFeuFirewallsh $aliaminPareFeuFlushfirewallsh $aliaminPareFeuEnablessh);
-@EXPORT_command = qw($ldapPasswdSSHAGenerator $ldapPasswdMD5Generator $aliaminMailStat $ldapMakeNewBase $recode $aliaminPasswd $sambaNTPass $sambaLMPass $automateStateSSHScript $automateSpecificCmd $automateBackup);
-@EXPORT_regexp = qw($findTag $endLoopTag $regexp_email $regexp_rootLdap $regexp_login);
+@EXPORT_files = qw($automateMailChangeAlias $automateMailChangeSieve $automateCyrusAdmin $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixUpdate);
+@EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
+@EXPORT_regexp = qw($regexp_email $regexp_rootLdap $regexp_login);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db);
 @EXPORT = (@EXPORT_const, @EXPORT_db, @EXPORT_files, @EXPORT_command, @EXPORT_regexp, @EXPORT_dir);
 @EXPORT_OK = qw();
@@ -35,12 +35,6 @@ $cfgFile = Config::IniFiles->new( -file => $Bin."/../conf/obm_conf.ini" );
 
 # definition du niveau de log
 $facility_log = "local1";
-
-# Fonctionne-t-on enmode Securinet
-$securinetMode = 0;
-if( $cfgFile->val( 'global', 'securinet' ) eq "true" ) {
-    $securinetMode = 1;
-}
 
 # racine relative pour les scripts Perl
 $racineOBM = $Bin."/..";
@@ -81,65 +75,20 @@ $baseHomeDir = "/home";
 #
 # Le repertoire contenant les modeles
 $templateOBM = $racineOBM . "template/";
-# Messagerie :
-$templatePostfixAliases = $templateOBM . "templatePostfixAliases";
-# LDAP :
-$templateLdapDatabase = $templateOBM . "templateLdapDatabase";  # fichier ldif
-
-# Squid :
-$templateSquidConf = $templateOBM . "templateSquidConf";
 
 # Definitions des fichiers temporaires.
 #
 # Le repertoire temporaire
 $tmpOBM = "/tmp/";
-# Messagerie :
-$tmpPostfixAliases = $tmpOBM . "aliases";
-# LDAP :
-$tmpLdapDatabase = $tmpOBM . "ldapDatabase.ldif";
-
-# Squid
-$tmpSquidConf = $tmpOBM . "squid.conf";
-$tmpSquidUserURLList = $tmpOBM . "UserURLList";
-$tmpSquidHostURLList = $tmpOBM . "HostURLList";
 
 # Definition des fichiers correspondants aux fichiers modeles.
 #
 # Messagerie :
 $aliaminPostfixAliases = "/etc/aliases";
-#
-# LDAP :
-$aliaminSlapdConf = "/etc/ldap/slapd.conf"; # Fichier de configuration du service
-$aliaminSlapdConfNew = "/etc/ldap/slapd.conf-new";    # Fichier de configuration utilise pour creer un nouvel annuaire
-$aliaminSlapdRep = "/var/lib/ldap"; # Le repertoire contenant les fichier de l'annuaire de production
-$aliaminSlapdRepNew = "/var/lib/ldap-new";  # Le repertoire des fichiers contenant le nouvel annuaire
-#
-# Squid
-$squidAuthenticateProgram = "/usr/lib/squid/ldap_auth";
-$squidConf = "/etc/squid/squid.conf";
-$squidUserURLList = "/var/squid/UserURLList";
-$squidHostURLList = "/var/squid/HostURLList";
-#
-# VPN et Reseau
-$aliaminVPNKernelConf = "/sbin/enableVPN.sh";
-$aliaminPareFeuFirewallsh = "/sbin/firewall.sh";
-$aliaminPareFeuFlushfirewallsh = "/sbin/flushFirewall.sh";
-$aliaminPareFeuEnablessh =  "/sbin/enableSSH.sh";
 
 
 #
 # Definition des divers programmes utiles.
-#
-# Les statistiques de messageries
-$aliaminMailStat = "/usr/sbin/pflogsumm.pl";
-$aliaminMailLog = "/var/log/mail.log";
-$aliaminPasswd = "/usr/sbin/saslpasswd2";
-#
-# Les utilitaires LDAP
-$slapdControl = "/etc/init.d/slapd";
-$ldapPasswdSSHAGenerator = "/usr/sbin/slappasswd -h {SSHA}";
-$ldapPasswdMD5Generator = "/usr/sbin/slappasswd -h {MD5}";
-$ldapMakeNewBase = "/usr/sbin/slapadd -c -f $aliaminSlapdConfNew -l";
 #
 # Utilitaire de recodage des caracteres de latin1->UTF8
 # Préciser l'encodage du système (apache)
@@ -149,12 +98,6 @@ $recode = "/usr/bin/recode l1..utf8";
 
 #
 # Definitions des expressions regulieres
-#
-# Recherche des balises dans les fichiers template
-$findTag = "<ALIAMIN-([0-9a-zA-Z_]*)>";
-#
-# Balise de fin de boucle dans les fichiers template
-$endLoopTag = "<ALIAMIN-END-([0-9a-zA-Z_]*)>";
 #
 # Balise email
 $regexp_email = "^([a-z0-9_\\-]{1,16}(\\.[a-z0-9_\\-]{1,16}){0,3})@([a-z0-9\\-]{1,16}\\.){1,3}[a-z]{2,3}\$";
@@ -185,12 +128,9 @@ $automateOBM = $racineOBM . "auto/";
 $automateMailChangeAlias = $automateOBM . "mailChangeAlias.pl";
 $automateMailChangeSieve = $automateOBM . "mailChangeSieve.pl";
 $automateCyrusAdmin = $automateOBM . "mailCyrusAdmin.pl";
+$automatePostfixUpdate = $automateOBM . "mailPostfixMapsUpdate.pl";
 $automateLdapUpdate = $automateOBM . "ldapModifBase.pl";
 $automateLdapUpdatePasswd = $automateOBM . "ldapChangePasswd.pl";
-#
-# Securinet
-$automateStateSSHScript = $automateOBM . "securinet/sshState.pl";
-$automateBackup = $automateOBM . "securinet/backupSecurinet.pl";
 #
 # Samba
 # Calcul du mot de passe NT ou LM

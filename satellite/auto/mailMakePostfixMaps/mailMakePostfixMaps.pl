@@ -187,6 +187,7 @@ sub process_request {
             # Suppression du délai de réception d'une requête durant son
             # traitement
             alarm(0);
+            $self->logMessage( $currentRequest );
 
             if( !$self->checkClientRequest( \$currentRequest ) ) {
                 if( $currentRequest =~ /^quit$/i ) {
@@ -232,7 +233,15 @@ sub post_process_request_hook {
     my $self = shift;
 
     $self->sendMessage( "BYE" );
-    $self->logMessage( "Deconnexion de : ".$self->{server}->{client}->peerhost() );
+
+    my $peer = $self->{server}->{client}->peerhost();
+    my $logMessage = "Deconnexion";
+
+    if( defined($peer) ) {
+        $logMessage .= " de : ".$peer;
+    }
+
+    $self->logMessage( $logMessage );
 }
 
 #
@@ -241,8 +250,10 @@ sub post_process_request_hook {
 sub logMessage {
     my( $self, $msg ) = @_;
 
-    if( defined( $self->{server}->{client} ) ) {
-        $self->log( 2, $self->log_time ." - ".$self->{server}->{client}->peerhost()." - ".$msg );
+    my $peer = $self->{server}->{client}->peerhost();
+
+    if( defined($peer) ) {
+        $self->log( 2, $self->log_time ." - ".$peer." - ".$msg );
     }else {
         $self->log( 2, $self->log_time ." - ".$msg );
     }
