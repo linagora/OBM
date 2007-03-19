@@ -80,7 +80,7 @@ function run_query_password_update($password, $uid, $usr_q) {
   $usr_q = new DB_OBM;
   $retour = $usr_q->query($query);
 
-  $usr_q = new DB_OBM_Prod;
+  $usr_q = new DB_OBM;
   $retour = $usr_q->query($query);
 
   return $retour;
