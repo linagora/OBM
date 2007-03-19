@@ -80,6 +80,11 @@ function run_query_password_update($password, $uid, $usr_q) {
   $usr_q = new DB_OBM;
   $retour = $usr_q->query($query);
 
+  $query = "UPDATE P_UserObm SET
+    userobm_password='$new_passwd_crypt',
+    userobm_password_type='$password_encryption'
+  WHERE userobm_id = '$uid'";
+
   $usr_q = new DB_OBM;
   $retour = $usr_q->query($query);
 
