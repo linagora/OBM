@@ -1113,13 +1113,12 @@ function display_todos($path="..") {
   }
 
   if ($nb >= 1) {
-    $block = "
-    <div class=\"block\"> 
-    <div class=\"blockTitle\">:: $l_module_todo</div>
-      <ul class=\"blockItem\">
+    $block = "<div class=\"portlet\" id=\"todoPortlet\">
+      <h1>$l_module_todo</h1>
+      <ul>
       $block_todo
      </ul>
-    </div>";
+      </div>";
   } else {
     $block = "";
   }
@@ -1307,6 +1306,31 @@ function display_err_msg($msg, $special=true) {
   }
   
   return $ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display document form
+// Parameters:
+//   - $params[] : 
+//   - $label    :  
+///////////////////////////////////////////////////////////////////////////////
+function display_document_form($params, $label="") {
+  global $l_document;
+
+  if($label == "") {
+    $label = $l_document;
+  }
+
+  if (isset($params["file"])) { $file = $params["file"]; }
+
+  $block = "<tr>
+    <th class=\"$class[file]\">$label</th>
+    <td>
+      <input type=\"file\" name=\"fi_file\" size=\"30\" value=\"$file\" /></td>
+  </tr>";
+
+  return $block;
+
 }
 
 

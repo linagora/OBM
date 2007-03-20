@@ -70,6 +70,7 @@ function display_page(&$display) {
       </div>         
      <div id=\"portlets\">          
       $display[last]
+      $display[todo]
       $display[features] 
       $display[link] 
       $display[detailInfo] 
