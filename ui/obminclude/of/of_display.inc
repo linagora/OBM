@@ -1109,7 +1109,7 @@ function display_todos($path="..") {
     $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;todo_id=$t_id");
     $todo_title = substr($t_title, 0, 30);
     $block_todo .= "
-      <li class=\"blockItem\"><a href=\"$todo_url\">$todo_title</a></li>";
+      <li><a href=\"$todo_url\">$todo_title</a></li>";
   }
 
   if ($nb >= 1) {
@@ -1153,7 +1153,7 @@ function display_record_info($obm_q) {
       $dis_dsrc = "";
     }
     
-    $block = "<div class=\"portlet\"><h1>$l_infos</h1>
+    $block = "<div class=\"portlet\" id=\"recordPortlet\"><h1>$l_infos</h1>
       <ul>
       <li><img src=\"$ico_new\" alt=\"created by\"/> $created</li>
       <li><img src=\"$ico_update\" alt=\"updated by\"/> $updated </li>

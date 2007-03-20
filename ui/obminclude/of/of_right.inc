@@ -535,7 +535,7 @@ function of_right_update_right($param, $entity) {
             '$eid',
             '$consumer',
             '$id',
-            '0')";
+            '1')";
 	  display_debug_msg($query, $cdg_sql, "of_right_update_right(4)");
 	  $obm_q->query($query);
 	}
