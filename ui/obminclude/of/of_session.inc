@@ -400,6 +400,7 @@ class Perm {
             'domain' => $perm_admin,
             'password' => $perm_admin,
             'settings' => $perm_admin,
+            'tools' => $perm_admin,
             'group' => $perm_user
           )
         );
