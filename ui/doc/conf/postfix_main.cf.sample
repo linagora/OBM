@@ -1,0 +1,72 @@
+# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+
+smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+#delay_warning_time = 4h
+
+#
+# Nom de l'hôte
+myhostname = aliamin.aliamin.local
+# Domaine utilisé dans les mails générés localement ;
+# Indique aussi le domaine ajoutés aux adresses des destinataires n'ayant pas de
+# domaine.
+# Un mail envoyé à 'toto@$mydestination', et qui correspond à l'alias 'toto'
+# dans 'alias_maps' sera en fait redirigé à 'toto@$myorigin' et délivré localement
+# si '$myorigin' est listé dans '$mydestination'.
+myorigin = $myhostname
+
+#
+# Le relais vers l'extérieur.
+relayhost = mygale.aliacom.local
+
+#
+# Liste des bases d'alias consultées par l'agent de livraison 'local'
+alias_maps = hash:/etc/aliases
+# Listes des base d'alias mise à jour par 'newaliases'
+alias_database = hash:/etc/aliases
+# On ne considère que les utilisateurs définits par un alias (et pas les
+# utilisateurs système comme c'est la cas par défaut)
+local_recipient_maps = $alias_maps
+
+#
+# Acces aux BAL des utilisateurs
+# A VOIR : Les BAL de $mydestination ?...
+#mailbox_transport_maps = hash:/etc/postfix/mailbox_transport
+#mailbox_transport = lmtp:unix:/var/run/cyrus/socket/lmtp
+
+
+# Les domaines a concidérer comme locaux
+mydestination = localhost, $myhostname
+mynetworks = /etc/postfix/mynetworks
+
+# Test multi-domaines
+# Le moyen de transport par defaut pour les BAL des domaines virtuels
+#virtual_transport = lmtp:unix:/var/run/cyrus/socket/lmtp
+#virtual_transport = lmtp:10.0.0.101:24
+virtual_transport = error:mailbox does not exist
+# Les domaines virtuels
+virtual_mailbox_domains = hash:/etc/postfix/virtual_domains
+# Les BAL existantes
+virtual_mailbox_maps = hash:/etc/postfix/virtual_mailbox
+# Les alias des domaines virtuels
+virtual_alias_maps = hash:/etc/postfix/virtual_alias
+# Comment délivrer le courier dans la bonne BAL
+transport_maps = hash:/etc/postfix/transport
+
+#
+# Authentification LMTP
+#lmtp_sasl_auth_enable = yes
+#lmtp_sasl_password_maps = hash:/etc/postfix/lmtp_sasl_passwd
+#lmtp_sasl_security_options = noanonymous
+
+mailbox_command = procmail -a "$EXTENSION"
+mailbox_size_limit = 0
+recipient_delimiter = +
+
+# Ecoute uniquement sur l'interface locale
+#inet_interfaces = loopback-only

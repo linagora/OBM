@@ -1,0 +1,8 @@
+ldap_servers: ldap://localhost/
+ldap_version: 3
+ldap_search_base: dc=local
+ldap_verbose: off
+ldap_debug: 0
+#ldap_filter: (&(uid=%U)(|(&(objectClass=aliaminUsers)(mailAccess=PERMIT))(&(cn=Administrator Cyrus)(objectClass=posixAccount))))
+#ldap_filter: (&(mailBox=%U@%r)(objectClass=aliaminUsers)(mailAccess=PERMIT))
+ldap_filter: (|(&(mailBox=%U@%d)(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus)(objectClass=posixAccount)))
