@@ -87,7 +87,7 @@ sub applyDbModif {
 
 #
 # On prepare le log
-&OBM::toolBox::write_log( "dbUpdate.pl: ", "O" );
+&OBM::toolBox::write_log( "dbUpdate: ", "O" );
 &OBM::toolBox::write_log( "Traitement des tables de la BD.", "W" );
 
 #
