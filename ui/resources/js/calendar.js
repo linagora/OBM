@@ -510,6 +510,7 @@ Obm.CalendarManager = new Class({
       eventData.calendar_id = evt.event.id;
       eventData.element_id = id;
       eventData.date_begin = new Date(evt.event.time * 1000).format('Y-m-d H:i:s');
+      eventData.old_date_begin = eventData.date_begin;
       eventData.duration = size*evt.options.yUnit;
       eventData.title = evt.event.title;
       eventData.all_day = evt.event.all_day;
@@ -867,6 +868,7 @@ Obm.CalendarQuickForm = new Class({
     if(action) {
       this.gotoURI += '&action='+action;
     }
+    this.gotoURI += '&date_begin='+this.eventData.date_begin+'&duration='+this.eventData.duration+'&title='+this.form.tf_title.value;
     window.location.href = 'calendar_index.php?'+this.gotoURI;
   }
 });

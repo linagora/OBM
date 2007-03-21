@@ -496,7 +496,9 @@ function get_calendar_params() {
   } else {
     $params["event_duration"] = 0;
   }
-
+  if (($params["date_begin"]) && $params["date_end"] == "" && $params["duration"]) {
+    $params["date_end"] = date("Y-m-d H:i:s",strtotime($params["date_begin"]) + $params["duration"]);
+  } 
   // repeat days
   for ($i=0; $i<7; $i++) {
     if (isset($params["repeatday_$i"])) {

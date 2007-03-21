@@ -284,7 +284,11 @@ $cgp_use["service"]["mail"] = false;
 $cgp_use["service"]["mail_nomad"] = false;
 $cgp_use["service"]["mail_vacation"] = false;
 $cgp_use["service"]["samba"] = false;
-
+$cgp_use["service"]["ldap"] = false;
+$cgp_use["service"]["dns"] = false;
+$cgp_use["service"]["firewall"] = false;
+$cgp_use["service"]["network"]  = false;
+	   
 // UID : First User
 $c_first_uid = 1001;
 // First GID for simple users - first GID for group creation
