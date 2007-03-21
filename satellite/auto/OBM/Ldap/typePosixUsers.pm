@@ -33,7 +33,7 @@ sub getDbValues {
 
     # La requete a executer - obtention des informations sur les utilisateurs de
     # l'organisation.
-    my $query = "SELECT userobm_id, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_nomade_perms, userobm_nomade_enable, userobm_nomade_local_copy, userobm_email_nomade, userobm_vacation_enable FROM P_UserObm JOIN P_MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_archive=0 AND userobm_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
+    my $query = "SELECT userobm_id, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile FROM P_UserObm JOIN P_MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_archive=0 AND userobm_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requete
     my $queryResult;
@@ -45,7 +45,7 @@ sub getDbValues {
     # On range les resultats dans la structure de donnees des resultats
     my $i = 0;
     my @users = ();
-    while( my( $user_id, $user_login, $user_passwd_type, $user_passwd, $user_uid, $user_gid, $user_lastname, $user_firstname, $user_address1, $user_address2, $user_address3, $user_zipcode, $user_town, $user_title, $user_service, $user_description, $user_mail_perms, $user_mail_ext_perms, $user_email, $user_mail_server_id, $user_web_perms, $user_phone, $user_phone2, $user_fax, $user_fax2, $user_mobile, $user_nomade_perms, $user_nomade_enable, $user_nomade_local_copy, $email_nomade, $user_vacation_enable ) = $queryResult->fetchrow_array ) {
+    while( my( $user_id, $user_login, $user_passwd_type, $user_passwd, $user_uid, $user_gid, $user_lastname, $user_firstname, $user_address1, $user_address2, $user_address3, $user_zipcode, $user_town, $user_title, $user_service, $user_description, $user_mail_perms, $user_mail_ext_perms, $user_email, $user_mail_server_id, $user_web_perms, $user_phone, $user_phone2, $user_fax, $user_fax2, $user_mobile ) = $queryResult->fetchrow_array ) {
 
         &OBM::toolBox::write_log( "Gestion de l'utilisateur '".$user_login."'", "W" );
         
@@ -71,7 +71,6 @@ sub getDbValues {
             "user_zipcode"=>$user_zipcode,
             "user_town"=>$user_town,
             "user_mobile"=>$user_mobile,
-            "user_vacation_enable"=>$user_vacation_enable,
             "user_domain" => $main::domainList->[$domainId]->{"domain_label"}
             };
 
@@ -132,20 +131,8 @@ sub getDbValues {
                     }
                 }
 
-                # Gestion de la redirection et des BAL destination
-                my @userMailbox;
-                if( $user_nomade_perms && $user_nomade_enable && $email_nomade ) {
-                    push( @userMailbox, $email_nomade );
-
-                    if( $user_nomade_local_copy ) {
-                        push( @userMailbox, $users[$i]->{"user_login"}."@".$main::domainList->[$domainId]->{"domain_name"} );
-                    }
-
-                }else {
-                    push( @userMailbox, $users[$i]->{"user_login"}."@".$main::domainList->[$domainId]->{"domain_name"} );
-
-                }
-                $users[$i]->{"user_mailbox"} = \@userMailbox;
+                # Gestion des BAL destination
+                $users[$i]->{"user_mailbox"} = $users[$i]->{"user_login"}."@".$main::domainList->[$domainId]->{"domain_name"};
 
                 # On ajoute le serveur de mail associé
                 $users[$i]->{"user_mailLocalServer"} = "lmtp:".$localServerIp.":24";
@@ -443,11 +430,11 @@ sub updateLdapEntry {
 
     # La boite a lettres de l'utilisateur
     if( !$entry->{"user_mailperms"} ) {
-        if( &OBM::Ldap::utils::modifyAttrList( undef, $ldapEntry, "mailBox" ) ) {
+        if( &OBM::Ldap::utils::modifyAttr( undef, $ldapEntry, "mailBox" ) ) {
             $update = 1;
         }
 
-    }elsif( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_mailbox"}, $ldapEntry, "mailBox" ) ) {
+    }elsif( &OBM::Ldap::utils::modifyAttr( $entry->{"user_mailbox"}, $ldapEntry, "mailBox" ) ) {
         $update = 1;
     }
 
