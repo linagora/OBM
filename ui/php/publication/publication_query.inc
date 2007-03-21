@@ -162,7 +162,7 @@ function run_query_publication_insert($publication) {
   $year = $publication["year"];
   $desc = $publication["desc"];
   $cats1 = $publication[$public_contact_cat];
-  $list_sub = $publication["list_sub"];
+  $list_sub = $publication["list"];
   $time = date("Y-m-d H:i:s");
   $domain_id = $obm["domain_id"];
   
@@ -271,7 +271,7 @@ function run_query_publication_auto_subscription($publication, $p_id){
   global $obm, $cdg_sql, $c_focsys, $public_contact_cat;
   
   $cats1 = $publication[$public_contact_cat];
-  $list_sub = $publication["list_sub"];
+  $list_sub = $publication["list"];
   $recept = $c_focsys;
   $lang = $publication["lang"];
   $lang_array = split("-", $lang);
@@ -346,7 +346,7 @@ function run_query_publication_auto_subscription($publication, $p_id){
 
 	// If subscription not already set for this contact
 	if (! in_array($c_id, $contacts)) {
-	  $c_lang = run_query_get_contact_lang($c_id);
+	  $c_lang = run_query_publication_get_contact_lang($c_id);
 	  if ((in_array($c_lang, $lang_array))
 	      || (in_array(strtoupper($c_lang), $lang_array))) {
 	    $contacts[] = $c_id;

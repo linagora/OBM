@@ -78,13 +78,13 @@ function run_query_tools_update_update($tools) {
     if ($scope["ldap"]) $cmd .= " --ldap";
     if ($scope["cyrus"]) $cmd .= " --cyrus";
     if ($scope["postfix"]) $cmd .= " --postfix";
-    if ($scope["amavis"]) $cmd .= " --amavis";
-    if ($scope["alias"]) $cmd .= " --alias";
-    if ($scope["squid"]) $cmd .= " --squid";
-    if ($scope["dns"]) $cmd .= " --dns";
-    if ($scope["network"]) $cmd .= " --network";
-    if ($scope["vpn"]) $cmd .= " --vpn";
-    if ($scope["firewall"]) $cmd .= " --firewall";
+//    if ($scope["amavis"]) $cmd .= " --amavis";
+//    if ($scope["alias"]) $cmd .= " --alias";
+//    if ($scope["squid"]) $cmd .= " --squid";
+//    if ($scope["dns"]) $cmd .= " --dns";
+//    if ($scope["network"]) $cmd .= " --network";
+//    if ($scope["vpn"]) $cmd .= " --vpn";
+//    if ($scope["firewall"]) $cmd .= " --firewall";
   }
 
   //  $cmd .= " 2>/dev/null >&- <&- >/dev/null &";
@@ -99,6 +99,7 @@ function run_query_tools_update_update($tools) {
 
   display_debug_msg($cmd, $cdg_exe, "run_query_tools_update_update(2)");
   unset($tmp);
+  echo $cmd;
   exec($cmd, $tmp, $ret);
 
   return $ret;

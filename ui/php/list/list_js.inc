@@ -139,9 +139,9 @@ function get_list_critria_from_query(form) {
   } else {
     criteria = target.all['list_criterion'];
   }
-  row = criteria.rows.item(".($row_index+1).");
+  row = criteria.rows.item(".($params["row_index"]+1).");
   cells = row.cells;
-  for (i=4;i<cells.length;i++) {
+  for (i=5;i<cells.length;i++) {
     name = cells.item(i).lastChild.name;
     field = eval('form.'+name.substr(0,name.length-2));
     try {

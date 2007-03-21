@@ -735,8 +735,7 @@ function run_query_contact_update($contact) {
     contact_date=$date,
     contact_comment='$comment',
     contact_comment2='$comment2',
-    contact_comment3='$comment3',
-    contact_datasource_id = '$dsrc'
+    contact_comment3='$comment3'
   WHERE contact_id='$id'
     $multidomain";
 

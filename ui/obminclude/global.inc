@@ -329,11 +329,11 @@ $password_encryption = strtoupper($password_encryption);
 
 // Automate commands
 $cmd_halt = "sudo /sbin/halt";
-$cmd_update = "$aliamin_path/auto/update.pl";
+$cmd_update = "../$path/auto/update.pl";
 $cmd_check_update = "ps aux | grep auto/update.pl | grep -v grep";
-$cmd_db_update = "$aliamin_path/auto/dbUpdate.sh";
-$cmd_db_cancel = "$aliamin_path/auto/dbUpdateCancel.sh";
-$cmd_mailforward = "$aliamin_path/auto/mailChangeAlias.pl";
+$cmd_db_update = "../$path/auto/dbUpdate.pl --valid";
+$cmd_db_cancel = "../$path/auto/dbUpdate.pl --cancel";
+$cmd_mailforward = "../$path/auto/mailChangeSieve.pl";
 if ($cgp_aliasLdap) {
   $cmd_mailforward .= " --ldap";
 }
@@ -649,7 +649,7 @@ function display_debug_param($params) {
     $global_dis_debug_param .= "action=$action";
     if ( $params ) {
       foreach ($params as $key => $val) {
-	if (is_array($val)) {
+        if (is_array($val)) {
           $global_dis_debug_param .= "<br />params[$key]=";
 	  $global_dis_debug_param .= print_r($val, true);
 	} else {

@@ -123,7 +123,7 @@ if ($action == "ext_get_id") {
   if (check_publication_data("", $params)) {
 
     // If the context (same publications) was confirmed ok, we proceed
-    if ($hd_confirm == $c_yes) {
+    if ($params["confirm"] == $c_yes) {
       $params["publication_id"] = run_query_publication_insert($params);
       if ($params["publication_id"]) {
         $display["msg"] .= display_ok_msg("$l_publication : $l_insert_ok");

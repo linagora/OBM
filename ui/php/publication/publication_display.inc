@@ -391,7 +391,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
   if (isset($publication["lang"])) { $lang = stripslashes($publication["lang"]); }
   if (isset($publication["desc"])) { $desc = stripslashes($publication["desc"]); }
   if (isset($publication[$public_contact_cat])) { $cats1 = $publication[$public_contact_cat]; }
-  if (isset($publication["list_sub"])) { $list_sub = $publication["list_sub"]; }
+  if (isset($publication["list"])) { $list_sub = $publication["list"]; }
 
   // type select
   $sel_type = "<select name=\"sel_type\" id=\"sel_type\">";
@@ -440,10 +440,6 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
     <tr>
       <th>$l_list</th>
       <td>$sel_list</td>
-    </tr>
-    <tr>
-      <th></td>
-      <td>$sel_recept</td>
     </tr>
     </table>
     </fieldset>";      
@@ -831,6 +827,7 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
   $year = $publication["year"];
   $lang = $publication["lang"];
   $desc = $publication["desc"];
+  $list = $publication["list"];
 
   $display["msg"] .= display_warn_msg($l_check_samepublication);
 
@@ -856,22 +853,24 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
     action=\"" .url_prepare("publication_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-    <input type=\"hidden\" name=\"tf-title\" value=\"$title\" />
+    <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
     <input type=\"hidden\" name=\"sel_type\" value=\"$type\" />
     <input type=\"hidden\" name=\"tf_year\" value=\"$year\" />
     <input type=\"hidden\" name=\"tf_lang\" value=\"$lang\" />
     <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+    <input type=\"hidden\" name=\"sel_list\" value=\"$list\" />
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
     <form name=\"form_back\" method=\"post\"
     action=\"" .url_prepare("publication_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-    <input type=\"hidden\" name=\"tf-title\" value=\"$title\" />
+    <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
     <input type=\"hidden\" name=\"sel_type\" value=\"$type\" />
     <input type=\"hidden\" name=\"tf_year\" value=\"$year\" />
     <input type=\"hidden\" name=\"tf_lang\" value=\"$lang\" />
     <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+    <input type=\"hidden\" name=\"sel_list\" value=\"$list\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>
    </div>";
