@@ -1687,6 +1687,7 @@ CREATE TABLE UserSystem (
 -- OBM-Mail, OBM-LDAP Production tables (used by automate)
 -------------------------------------------------------------------------------
 
+CREATE TABLE P_Domain like Domain;
 CREATE TABLE P_UserObm like UserObm;
 CREATE TABLE P_UGroup like UGroup;
 CREATE TABLE P_UserObmGroup like UserObmGroup;

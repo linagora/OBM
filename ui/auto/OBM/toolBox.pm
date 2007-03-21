@@ -746,7 +746,7 @@ sub getDomains {
 
 
     # Requete de recuperation des informations des domaines
-    my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias FROM Domain";
+    my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias FROM P_Domain";
     if( defined($obmDomainId) && $obmDomainId =~ /^\d+$/ ) {
         $queryDomain .= " WHERE domain_id=".$obmDomainId;
     }
