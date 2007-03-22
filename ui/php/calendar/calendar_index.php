@@ -279,7 +279,7 @@ if ($action == "index") {
 } elseif ($action == "quick_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_quick_form($params)) {
-    $id = run_query_calendar_quick_event_insert($params, $event_id);
+    $id = run_query_calendar_quick_event_insert($params, $cal_entity_id);
     json_ok_msg("$l_event : $l_insert_ok");
     json_event_data($id, $params);
     echo "({".$display['json']."})";

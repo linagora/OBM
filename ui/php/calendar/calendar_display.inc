@@ -23,7 +23,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") 
   if ($p_view == "planning") {
     $visible_entities_id = slice_calendar_entities($sel_entity_id, 500, $entity_readable);
   } else {
-    $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users, $ccalendar_max_users, $entity_readable);
+    $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users, $entity_readable);
   }
 
   $sel_entity_id = $visible_entities_id;
@@ -953,7 +953,6 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $attendees[] = "{label:'".$label_entity."', entities:['".implode("','",$ent)."']}"; 
   }
   $ed[] = "attendees:[".implode(',',$attendees)."]";
-
 
   switch($unit)  {
     case "day" :
@@ -2248,8 +2247,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   $dis_button = "
      <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"perform_meeting\" />
-     <input type=\"submit\" value=\"$l_meeting_perform\" /> 
-";
+     <input type=\"submit\" value=\"$l_meeting_perform\" />";
 
   $users_id = $sel_entity_id["user"];
   if (count($users_id > 0)) {
@@ -2906,6 +2904,7 @@ function json_error_msg($msg) {
 function json_event_data($id,$calendar) {
   global $obm, $display,$ccalendar_first_hour,$ccalendar_last_hour;
   global $ccalendar_max_users, $cal_entity_id;
+  global $l_user, $l_resource, $l_task;
 
   $context = $calendar["context"];
   $element_id = $calendar["element_id"];
@@ -2916,14 +2915,40 @@ function json_event_data($id,$calendar) {
   $duration = $calendar['duration'];
   $title = $calendar['title'];
 
+  while($ent_q->next_record()) {
+    $entity = $ent_q->f("evententity_entity");
+    $entity_id = $ent_q->f("evententity_entity_id");
+    switch($entity) {
+      case "user":
+        $name = $ent_q->f("userobm_lastname")." ".$ent_q->f("userobm_firstname");
+      break;
+      case "resource":
+        $name = $ent_q->f("resource_name");
+      break;
+      default: break;
+    }
+    $attendee[$entity][$entity_id] .= $name;
+  }
+  if(is_array($attendee)) { 
+    foreach ($attendee as $att_entity => $att_entities) {
+      $label_entity = phpStringToJsString(${"l_$att_entity"});
+      foreach($att_entities as $at) {
+        $ent[] = phpStringToJsString($at);
+      }
+      $attendees[] = "{label:'".$label_entity."', entities:['".implode("','",$ent)."']}"; 
+    }
+  }
+
   $ed[] = "id:".$id;
   $ed[] = "duration:".$duration;
   $ed[] = "time:".$date;
   $ed[] = "all_day:".$all_day;
   $ed[] = "title:'".$title."'";
-  
+  $ed[] = "attendees:[".implode(',',$attendees)."]";
+  $ed[] = "updatable:true";
+
   $entity_readable = get_calendar_entity_readable();
-  $sel_entity_id = slice_calendar_entities($cal_entity_id, $ccalendar_max_users, $ccalendar_max_users, $entity_readable);
+  $sel_entity_id = slice_calendar_entities($cal_entity_id, $ccalendar_max_users, $entity_readable);
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($cal_entity_id));
   
   switch($context)  {
@@ -2949,12 +2974,13 @@ function json_event_data($id,$calendar) {
       $options = array();
       break; 
   }
+
   $updatable[] = "draggable:'true'"; 
   if(!$day) {
     $updatable[] = "resizable:'true'"; 
   }
-  foreach ($calendar_entity as $entity => $data) {
 
+  foreach ($calendar_entity as $entity => $data) {
     foreach ($data as $entity_id => $entity_data) {
       if($entities[$entity]["entity"][$entity_id]) {
         $info = $ed;
@@ -2973,6 +2999,7 @@ function json_event_data($id,$calendar) {
       }
     }
   }
+
   if($display['json'] != '') {
     $display['json'] .= ',';
   }
@@ -2983,5 +3010,4 @@ function json_event_data($id,$calendar) {
     $display['json'] .= "elementId:'$element_id',";
   }
   $display['json'] .=  "eventsData:[$json]";
-
 }

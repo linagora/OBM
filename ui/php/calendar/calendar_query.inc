@@ -968,9 +968,10 @@ function run_query_calendar_quick_event_update($calendar) {
  * @access public
  * @return void
  */
-function run_query_calendar_quick_event_insert($calendar) {
+function run_query_calendar_quick_event_insert($calendar, $sel_entity_id) {
   global $cdg_sql, $obm;
 
+  $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
   $datebegin = $calendar["date_begin"];
@@ -1015,6 +1016,7 @@ function run_query_calendar_quick_event_insert($calendar) {
   $obm_q->query($query);
   $obm_q->next_record(); 
   $event_id = $obm_q->f("max_id"); 
+
   run_query_calendar_insert_entity_event("user", $obm["uid"], $event_id, 'A');
 
   return $event_id;
