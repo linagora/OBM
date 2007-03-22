@@ -657,14 +657,21 @@ Obm.CalendarManager = new Class({
     var events = resp.eventsData;
     if(resp.error == 0) {
       showOkMessage(resp.message);
-      obm.calendarManager.lock();
       if(resp.day == 1) {
-        e = obm.calendarManager.newDayEvent(events[0].event,events[0].options);
+        for(var i=0;i< events.length;i++) {
+          obm.calendarManager.lock();
+          var e = obm.calendarManager.newDayEvent(events[0].event,events[0].options);
+          obm.calendarManager.unlock();
+          e.redraw();          
+        }
       } else {
-        e = obm.calendarManager.newEvent(events[0].event,events[0].options);
+        for(var i=0;i< events.length;i++) {        
+          obm.calendarManager.lock();
+          var e = obm.calendarManager.newEvent(events[0].event,events[0].options);
+          obm.calendarManager.unlock();
+          e.redraw();                
+        }
       }
-      obm.calendarManager.unlock();
-      e.redraw();
       obm.calendarManager.redrawAllEvents();      
     } else {
       showErrorMessage(resp.message);
@@ -768,13 +775,13 @@ Obm.CalendarQuickForm = new Class({
       this.setFormValues(evt,context);
     }
     this.show();    
-    this.form.tf_title.focus();
     var left = target.getLeft() - Math.round((this.popup.offsetWidth - target.offsetWidth)/2);
     var top = target.getTop() - this.popup.offsetHeight + Math.round(target.offsetHeight/2);;
     this.popup.setStyles({
       'top':  top + 'px',
       'left': left  + 'px'
     });    
+    this.form.tf_title.focus();
   }, 
   
   setFormValues: function(evt, context) {
