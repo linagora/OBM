@@ -271,7 +271,7 @@ FROM IncidentCategory1;
 
 
 ALTER TABLE Incident ADD COLUMN incident_resolutiontype_id int(8) DEFAULT 0 after incident_status_id;
-UPDATE Incident set incident_resolutiontype_id=incident_category1_id;
+UPDATE Incident set incident_resolutiontype_id=incident_category1_id, incident_timeupdate = incident_timeupdate;
 ALTER TABLE Incident DROP COLUMN incident_category1_id;
 DROP TABLE IncidentCategory1;
 

@@ -346,7 +346,9 @@ function run_query_user_insert($user) {
   } else {
     $domain_id = $obm["domain_id"];
   }
-
+  if ($domain_id == 0) {
+    $perms == "admin";
+  }
   $query = "INSERT INTO UserObm (
     userobm_domain_id,
     userobm_timeupdate,
@@ -626,6 +628,9 @@ function run_query_user_update($p_id, $user) {
     } else {
       $gid = $c_first_gid_user;
     }
+  }
+  if ($domain_id == 0) {
+    $perms == "admin";
   }
 
   $query = "UPDATE UserObm SET

@@ -61,35 +61,19 @@ function run_query_tools_remote_update($tools) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_tools_update_update($tools) {
   global $cdg_sql, $cdg_exe, $cmd_update, $cmd_db_update;
-
-  $update = $tools["update"];
-  $scope = update_scope();
-
-  // Si pas de modifications trouvées ! (on ne devrait pas arriver ici !)
-  if ( (! is_array($scope)) || (count($scope) == 0) )
+  $state = get_update_state();
+  if ($state != 1) {
     return false;
+  }     
+  
+  $update = $tools["update"];
 
   // Creation de la commande d'execution de l'automate de mise a jour
-  $cmd = $cmd_update;
-
-  if ($scope["all"]) {
-    $cmd .= " --all";
-  } else {
-    if ($scope["ldap"]) $cmd .= " --ldap";
-    if ($scope["cyrus"]) $cmd .= " --cyrus";
-    if ($scope["postfix"]) $cmd .= " --postfix";
-//    if ($scope["amavis"]) $cmd .= " --amavis";
-//    if ($scope["alias"]) $cmd .= " --alias";
-//    if ($scope["squid"]) $cmd .= " --squid";
-//    if ($scope["dns"]) $cmd .= " --dns";
-//    if ($scope["network"]) $cmd .= " --network";
-//    if ($scope["vpn"]) $cmd .= " --vpn";
-//    if ($scope["firewall"]) $cmd .= " --firewall";
-  }
-
+  $cmd = $cmd_update." --all";
+  
   //  $cmd .= " 2>/dev/null >&- <&- >/dev/null &";
   $cmd .= " >/dev/null 2>&1 &";
-
+  
   // Basculement des données de mise à jour en production
   display_debug_msg($cmd_db_update, $cdg_exe, "run_query_tools_update_update(1)");
   $ret = exec($cmd_db_update);
@@ -99,7 +83,6 @@ function run_query_tools_update_update($tools) {
 
   display_debug_msg($cmd, $cdg_exe, "run_query_tools_update_update(2)");
   unset($tmp);
-  echo $cmd;
   exec($cmd, $tmp, $ret);
 
   return $ret;

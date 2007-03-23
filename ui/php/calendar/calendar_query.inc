@@ -1823,7 +1823,7 @@ function slice_calendar_entities($sel_entity_id, $nb_max, $entity_readable="") {
     $res_user_id = array();
     if ($action != "perform_meeting") {
       foreach ($sel_user_id as $u_id) {
-	if (is_array($entity_readable)) {
+        if (is_array($entity_readable)) {
 	    if (in_array($u_id, $entity_readable["user"]["ids"])) {
 	      $res_user_id[] = $u_id;
 	    }

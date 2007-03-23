@@ -482,10 +482,11 @@ Obm.CalendarManager = new Class({
   },
 
   moveEventTo: function(id,left,top) {
-    evt = this.events.get(id);
+    var evt = this.events.get(id);
     xDelta = Math.round((left-evt.options.context.left)/this.defaultWidth);
     yDelta = Math.floor((top-evt.options.context.top)/this.defaultHeight);
     time = this.startTime + xDelta*evt.options.xUnit + yDelta*evt.options.yUnit;
+    console.log(new Date((new Date).getMin() + 61));
     if(evt.event.time != time) {
       eventData = new Object();
       eventData.calendar_id = evt.event.id;

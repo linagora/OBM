@@ -21,9 +21,9 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") 
   $group_view = $calendar["entity"]["group_view"];
   $entity_readable = get_calendar_entity_readable();
   if ($p_view == "planning") {
-    $visible_entities_id = slice_calendar_entities($sel_entity_id, 500, $entity_readable);
-  } else {
     $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users, $entity_readable);
+  } else {
+    $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users,  $entity_readable);
   }
 
   $sel_entity_id = $visible_entities_id;
@@ -2946,7 +2946,7 @@ function json_event_data($id,$calendar) {
   $ed[] = "title:'".$title."'";
   $ed[] = "attendees:[".implode(',',$attendees)."]";
   $ed[] = "updatable:true";
-
+  
   $entity_readable = get_calendar_entity_readable();
   $sel_entity_id = slice_calendar_entities($cal_entity_id, $ccalendar_max_users, $entity_readable);
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($cal_entity_id));
