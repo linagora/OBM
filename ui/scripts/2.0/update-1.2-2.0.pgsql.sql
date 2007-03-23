@@ -457,7 +457,7 @@ ALTER TABLE UserObm RENAME COLUMN temp_email TO userobm_email;
 
 ALTER TABLE UserObm ADD COLUMN userobm_mail_server_id integer;
 
-ALTER TABLE UserObm ADD COLUMN userobm_mail_quota varchar(8);
+ALTER TABLE UserObm ADD COLUMN userobm_mail_quota integer DEFAULT 0;
 
 ALTER TABLE UserObm ADD COLUMN userobm_nomade_perms integer;
 ALTER TABLE UserObm ALTER COLUMN userobm_nomade_perms SET DEFAULT 0;

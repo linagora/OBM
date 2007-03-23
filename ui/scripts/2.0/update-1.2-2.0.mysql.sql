@@ -381,7 +381,7 @@ ALTER TABLE UserObm ADD COLUMN userobm_mail_perms int(1) default 0 AFTER userobm
 ALTER TABLE UserObm ADD COLUMN userobm_mail_ext_perms int(1) default 0 AFTER userobm_mail_perms;
 ALTER TABLE UserObm CHANGE COLUMN userobm_email userobm_email text default NULL;
 ALTER TABLE UserObm ADD COLUMN userobm_mail_server_id int(8) default NULL AFTER userobm_email;
-ALTER TABLE UserObm ADD COLUMN userobm_mail_quota varchar(8) default NULL AFTER userobm_mail_server_id;
+ALTER TABLE UserObm ADD COLUMN userobm_mail_quota int(8) default 0 AFTER userobm_mail_server_id;
 ALTER TABLE UserObm ADD COLUMN userobm_nomade_perms int(1) default 0 AFTER userobm_mail_quota;
 ALTER TABLE UserObm ADD COLUMN userobm_nomade_enable int(1) default 0 AFTER userobm_nomade_perms;
 ALTER TABLE UserObm ADD COLUMN userobm_nomade_local_copy int(1) default 0 AFTER userobm_nomade_enable;

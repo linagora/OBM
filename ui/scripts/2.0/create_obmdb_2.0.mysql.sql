@@ -115,7 +115,7 @@ CREATE TABLE UserObm (
   userobm_mail_ext_perms      int(1) default NULL,
   userobm_email               text DEFAULT '',
   userobm_mail_server_id      int(8) default NULL,
-  userobm_mail_quota          varchar(8) default NULL,
+  userobm_mail_quota          int(8) default 0,
   userobm_nomade_perms        int(1) default 0,
   userobm_nomade_enable       int(1) default 0,
   userobm_nomade_local_copy   int(1) default 0,
