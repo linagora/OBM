@@ -19,6 +19,8 @@ $l_mphone = "Cell.";
 $l_minimphone = "(minitel)";
 $l_email = "E-Mail";
 $l_mailing_ok = "Email abilitata";
+$l_newsletter = "Newsletter";
+$l_news = "News";
 
 // Labels and texts
 $l_contact_name = "Nome Contatto";

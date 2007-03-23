@@ -18,6 +18,7 @@ $fieldnames["incident_reference"] = $l_reference;
 $fieldnames["incident_priority"] = $l_priority;
 $fieldnames["incident_date"] = $l_date;
 $fieldnames["incident_duration"] = $l_duration;
+$fieldnames["incident_archive"] = $l_archive;
 $fieldnames["resolutiontype_label"] = $l_resolutiontype;
 
 // Calculate fields
@@ -65,6 +66,16 @@ function dis_data_incident(&$OD, $fieldname, $link_ok) {
     $col = $OD->data_set->f("incidentpriority_color");
     $res["name"] = $pri;
     $res["style"] = "style=\"color: #$col; font-family: sans-serif; font-size: 10px; background-color: #ffffff;\"";
+  }
+
+  else if ($fieldname == "incident_archive") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   return $res;

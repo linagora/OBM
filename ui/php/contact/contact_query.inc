@@ -35,6 +35,7 @@ function run_query_contact_search($contact) {
   $dateafter = $contact["date_after"];
   $datebefore = $contact["date_before"];
   $mailing_ok_only = $contact["mailing_ok_only"];
+  $newsletter = $contact["newsletter"];
   $archive = $contact["archive"];
   $lang = get_lang();
 
@@ -165,6 +166,9 @@ function run_query_contact_search($contact) {
   if ($mailing_ok_only == "1") {
     $where .= " AND contact_mailing_ok=1";
   }
+  if ($newsletter == "1") {
+    $where .= " AND contact_newsletter=1";
+  }
   // Get only not archived by default
   if ($archive != "1") {
     $where .= " AND contact_archive=0";
@@ -229,6 +233,7 @@ function run_query_contact_search($contact) {
       contact_fax,
       contact_email,
       contact_mailing_ok,
+      contact_newsletter,
       contact_archive,
       contact_privacy,
       $date,
@@ -487,7 +492,8 @@ function run_query_contact_insert($contact) {
   $fax = $contact["fax"];
   $email = $contact["email"];
   $email2 = $contact["email2"];
-  $mailok = $contact["mailok"];
+  $mailok = ($contact["mailok"] == "1" ? "1" : "0");
+  $newsletter = ($contact["newsletter"] == "1" ? "1" : "0");
   $date = ($contact["date"] ? "'".$contact["date"]."'" : "null");
   $add_comment = $contact["add_comment"];
   if ($add_comment != "") {
@@ -542,6 +548,7 @@ function run_query_contact_insert($contact) {
     contact_email,
     contact_email2,
     contact_mailing_ok,
+    contact_newsletter,
     contact_archive,
     contact_privacy,
     contact_date,
@@ -579,6 +586,7 @@ function run_query_contact_insert($contact) {
     '$email',
     '$email2',
     '$mailok',
+    '$newsletter',
     '$archive',
     '$priv',
     $date,
@@ -674,7 +682,8 @@ function run_query_contact_update($contact) {
   $fax = $contact["fax"];
   $email = $contact["email"];
   $email2 = $contact["email2"];
-  $mailok = $contact["mailok"];
+  $mailok = ($contact["mailok"] == "1" ? "1" : "0");
+  $newsletter = ($contact["newsletter"] == "1" ? "1" : "0");
   $date = ($contact["date"] ? "'".$contact["date"]."'" : "null");
   $comment = $contact["comment"];
   $add_comment = $contact["add_comment"];
@@ -730,6 +739,7 @@ function run_query_contact_update($contact) {
     contact_email='$email',
     contact_email2='$email2',
     contact_mailing_ok='$mailok',
+    contact_newsletter='$newsletter',
     contact_archive='$archive',
     contact_privacy='$priv',
     contact_date=$date,

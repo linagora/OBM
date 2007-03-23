@@ -37,6 +37,7 @@ $fieldnames["contact_email"] = $l_email;
 $fieldnames["contact_archive"] = $l_archive_first;
 $fieldnames["contact_date"] = $l_date;
 $fieldnames["contact_mailing_ok"] = $l_mailing_ok_first;
+$fieldnames["contact_newsletter"] = $l_news;
 // Calculated fields
 $fieldnames["company_name"] = $l_company;
 
@@ -89,7 +90,8 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if ($fieldname == "contact_mailing_ok") {
+  else if (($fieldname == "contact_mailing_ok")
+	   || ($fieldname == "contact_newsletter")) {
     $res["align"] = "center";
     if ($OD->data_set->f($fieldname)) {
       $res["name"] = "X";
@@ -347,7 +349,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   global $action, $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
   global $csearch_advanced_default, $l_fuzzy;
   global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_datasource;
-  global $l_after, $l_before, $l_mailing_ok_only, $l_archive;
+  global $l_after, $l_before, $l_mailing_ok_only, $l_newsletter, $l_archive;
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
 
   $lname = stripslashes($contact["lname"]);
@@ -365,6 +367,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   $dateafter = stripslashes($contact["date_after"]);
   $datebefore = stripslashes($contact["date_before"]);
   $mailing_ok_only = ($contact["mailing_ok_only"] == "1" ? "checked = \"checked\"" : "");
+  $newsletter = ($contact["newsletter"] == "1" ? "checked = \"checked\"" : "");
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
   if (($contact["fuzzy"] == "1") ||
       ($csearch_advanced_default && $action != "search") ) {
@@ -493,6 +496,9 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>$l_mailing_ok_only<br />
       <input type=\"checkbox\" name=\"cba_mailing_ok_only\" value=\"1\" $mailing_ok_only />
     </label>
+    <label>$l_newsletter<br />
+      <input type=\"checkbox\" name=\"cba_newsletter\" value=\"1\" $newsletter />
+    </label>
     $block_userdata
     <label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
@@ -582,7 +588,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params("contact", $contact);
 
-  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
 
   $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
@@ -774,10 +780,10 @@ function html_contact_header($co_q, $funcs) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_view_main($co_q) {
   global $l_phone, $l_hphone, $l_mphone, $l_fax, $l_address, $l_postcode;
-  global $l_town, $l_country, $l_email, $l_mailing_ok, $l_expresspostal;
-  global $l_comment1, $l_comment2, $l_comment3, $l_email_other;
-  global $l_service, $l_coord, $ico_clipboard;
-  global $l_yes, $l_no,  $ico_mail;
+  global $l_service, $l_coord, $l_town, $l_country;
+  global $l_expresspostal, $l_comment1, $l_comment2, $l_comment3;
+  global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter;
+  global $ico_clipboard, $l_yes, $l_no,  $ico_mail;
   global $display, $cgp_show, $cgp_hide, $cclipboard_address;
 
   $id = $co_q->f("contact_id");
@@ -810,6 +816,7 @@ function html_contact_view_main($co_q) {
   $email = $co_q->f("contact_email");
   $email2 = $co_q->f("contact_email2");
   $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $l_yes : $l_no);
+  $newsletter = ($co_q->f("contact_newsletter") == 1 ? $l_yes : $l_no);
   $com  = beautify_comment(nl2br($co_q->f("contact_comment")));
   $com2 = beautify_comment(nl2br($co_q->f("contact_comment2")));
   $com3 = beautify_comment(nl2br($co_q->f("contact_comment3")));
@@ -1026,6 +1033,9 @@ function html_contact_view_main($co_q) {
     </tr><tr>
       <th>$l_mailing_ok</th>
       <td>$mailok</td>
+    </tr><tr>
+      <th>$l_newsletter</th>
+      <td>$newsletter</td>
     </tr>
     </table>
     </div>
@@ -1217,12 +1227,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   global $cgp_mailing_default, $ccontact_private_default;
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
-  global $l_market, $l_address, $l_town, $l_country,$l_email,$l_mailing_ok, $l_date, $l_no_date;
+  global $l_address, $l_town, $l_country, $l_service,$l_date, $l_no_date;
+  global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter; 
   global $l_comment1, $l_add_comment1, $l_upd_comment1;
   global $l_comment2, $l_add_comment2, $l_upd_comment2;
   global $l_comment3, $l_add_comment3, $l_upd_comment3;
-  global $l_service, $l_email_other;
-  global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact;
+  global $l_datasource, $l_archive, $l_private, $l_coord, $l_contact, $l_market;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
   global $display, $path, $obm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
@@ -1260,6 +1270,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $email = $co_q->f("contact_email");
     $email2 = $co_q->f("contact_email2");
     $mailok = ($co_q->f("contact_mailing_ok") == 1 ? " checked" : "");
+    $newsletter = ($co_q->f("contact_newsletter") == 1 ? " checked" : "");
     $archive = ($co_q->f("contact_archive") == 1 ? " checked" : "");
     $priv = $co_q->f("privacy");
     $comment = $co_q->f("contact_comment");
@@ -1298,6 +1309,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     }
     if ($cgp_mailing_default) {
       $mailok = " checked";
+      $newsletter = " checked";
     }
     // if company given
     if (is_object($co_q)) {
@@ -1743,6 +1755,9 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     </tr><tr>
     <th>$l_mailing_ok</th>
     <td><input type=\"checkbox\" name=\"cba_mailok\" value=\"1\" $mailok /></td>
+    </tr><tr>
+    <th>$l_newsletter</th>
+    <td><input type=\"checkbox\" name=\"cba_newsletter\" value=\"1\" $newsletter /></td>
     </tr>
     </table>
     </fieldset>
