@@ -720,7 +720,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
   $day_duration = 86400;
   $k = 0; 
   // Week Days headers : loop day by day
-  for ($ts = $start_week_time; $ts < $end_week_time; $ts += $day_duration ) {
+  for ($ts = $start_week_time; $ts < $end_week_time; $ts = strtotime("+1 day",$ts) ) {
     $iso_date = of_isodate_format($ts);
     $this_date_l = calendar_localizeDate("week_list", $ts);
     $week_day_list .= "

@@ -173,6 +173,12 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
     <table>
     $dis_host
     </table>
+    </fieldset>    
+    </form>
+    
+    ";    
+  /*
+    
     <h1>$l_networks</h1>
     <table>
     <thead>    
@@ -181,12 +187,10 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
     <td>$l_ip</td>
     </tr>    
     </thead>    
-    $dis_mailserver_networks    
     <tbody id=\"mailserverIpTable\">
     </tbody>
     </table>
     </fieldset>
-
     <fieldset class=\"detail infos\">
     <legend>$l_relayhost</legend>
     <table>
@@ -262,7 +266,7 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
       }
     </script>
 ";
-  
+   */
   return $block;
 }
 
@@ -308,9 +312,9 @@ function dis_mailserver_consult($ms_q,$net_q) {
     <th>$l_host</th>
     <td><a href=\"$path/host/host_index.php?action=detailconsult&id=$mailserver_host_id\">$mailserver</a> ($mailserver_ip)</td>
     </tr>
-    $dis_mailserver_networks
     </table>
     </div>";
+/*
   if ($relayhost_host_id) {
     $block .="
     <div class=\"detail infos\">
@@ -325,7 +329,7 @@ function dis_mailserver_consult($ms_q,$net_q) {
     </div>
 ";
   }
-
+ */
   return $block;
 }
 

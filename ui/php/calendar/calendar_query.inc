@@ -1630,6 +1630,7 @@ function check_calendar_data_quick_form($calendar) {
   $title = $calendar["title"];
   $datebegin = $calendar["date_begin"];
   $duration = $calendar["duration"];
+  $all_day = $calendar["all_day"];
   if (trim($title) == "") {
     $err["msg"] = $l_fill_title;
     return false;
@@ -1645,7 +1646,7 @@ function check_calendar_data_quick_form($calendar) {
   }
   
   // End Date check
-  if(!is_numeric($duration) ||  $duration < 1) {
+  if((!is_numeric($duration) ||  $duration < 1) && !$all_day) {
     $err["msg"] = $l_err_begin_end;
     return false;
   }

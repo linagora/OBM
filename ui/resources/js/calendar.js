@@ -95,16 +95,14 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setTime: function(time) {
-    origin = (time - obm.calendarManager.startTime) - (time - obm.calendarManager.startTime)%(this.options.xUnit||1);
+    var myDate = new Date(time * 1000);
+    var startDate = new Date(obm.calendarManager.startTime * 1000);
+    myDate.setHours(startDate.getHours());
+    myDate.setMinutes(startDate.getMinutes());
+    myDate.setSeconds(startDate.getSeconds());
+    origin = Math.floor((myDate.getTime() - startDate.getTime())/1000);
     if(this.setOrigin(origin)) {
-      if(this.event.time) {
-        time = new Date(time * 1000);
-        d = new Date(this.event.time * 1000);
-        time.setHours(d.format('H'));
-        time.setMinutes(d.format('i'));
-        time = time.getTime()/1000;
-      };
-      this.event.time = time;
+      this.event.time = this.guessEventTime(time);
     } else {
       if(obm.calendarManager.lock()) {
         this.redraw();
@@ -112,6 +110,18 @@ Obm.CalendarDayEvent = new Class({
       }
     }
   },
+  
+  guessEventTime: function(time) {
+    if(this.event.time) {
+      var time = new Date(time * 1000);
+      d = new Date(this.event.time * 1000);
+      time.setHours(d.getHours());
+      time.setMinutes(d.getMinutes());
+      time = Math.floor(time.getTime()/1000);
+    } 
+    return time;
+  },
+
 
   setOrigin: function(origin) {
     if(origin < 0) {   
@@ -312,7 +322,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   setTime: function(time) {
     origin = time - (time - obm.calendarManager.startTime)%this.options.yUnit;
     if(this.setOrigin(origin)) {
-      this.event.time = time;
+      this.event.time = this.guessEventTime(time);
       this.timeContainer.setHTML(new Date(this.event.time * 1000).format("H:i"));
     } else {
       if(obm.calendarManager.lock()) {
@@ -320,6 +330,10 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
         obm.calendarManager.unlock();
       }
     }
+  },
+
+  guessEventTime: function(time) {
+    return time;
   },
 
   setOrigin: function(origin) {
@@ -483,15 +497,27 @@ Obm.CalendarManager = new Class({
 
   moveEventTo: function(id,left,top) {
     var evt = this.events.get(id);
-    xDelta = Math.round((left-evt.options.context.left)/this.defaultWidth);
-    yDelta = Math.floor((top-evt.options.context.top)/this.defaultHeight);
-    time = this.startTime + xDelta*evt.options.xUnit + yDelta*evt.options.yUnit;
-    console.log(new Date((new Date).getMin() + 61));
-    if(evt.event.time != time) {
+    var xDelta = Math.round((left-evt.options.context.left)/this.defaultWidth);
+    var yDelta = Math.floor((top-evt.options.context.top)/this.defaultHeight);
+    var secDelta = xDelta*evt.options.xUnit + yDelta*evt.options.yUnit;
+    var dayDelta = Math.floor(secDelta / 86400);
+    secDelta = secDelta - (dayDelta * 86400);
+    var hourDelta = Math.floor(secDelta / 3600);
+    secDelta = secDelta - (hourDelta * 3600);
+    var minDelta = Math.floor(secDelta / 60);
+    secDelta = secDelta - (minDelta * 60);
+    var startDate = new Date(this.startTime * 1000);
+    startDate.setDate(startDate.getDate() + dayDelta);
+    startDate.setHours(startDate.getHours() + hourDelta);
+    startDate.setMinutes(startDate.getMinutes() + minDelta);
+    startDate.setSeconds(startDate.getSeconds() + secDelta);
+    time = Math.floor(startDate.getTime() / 1000);
+    guessedTime = evt.guessEventTime(time);
+    if(evt.event.time != guessedTime) {
       eventData = new Object();
       eventData.calendar_id = evt.event.id;
       eventData.element_id = id;
-      eventData.date_begin = new Date(time * 1000).format('Y-m-d H:i:s');
+      eventData.date_begin = new Date(guessedTime * 1000).format('Y-m-d H:i:s');
       eventData.old_date_begin = new Date(evt.event.time * 1000).format('Y-m-d H:i:s');
       eventData.duration = evt.event.duration;
       eventData.title = evt.event.title;
