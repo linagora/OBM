@@ -1,0 +1,49 @@
+#!/bin/bash
+###############################################################################
+# Script de gestion du serveur mailMakePostfixMaps.pl
+###############################################################################
+
+ALIAMINPATH="/opt/aliamin/current"
+
+daemon_path="$ALIAMINPATH/auto/mailMakePostfixMaps/mailMakePostfixMaps.pl"
+daemon_pid="/var/run/aliamin/mailMakePostfix.pid"
+
+case "$1" in
+    start)
+        echo -n "Starting mailMakePostfixMaps : "
+        if [ ! -e $daemon_pid ]; then
+            $daemon_path
+            echo "done."
+        else
+            echo "Le fichier PID $daemon_pid existe, le serveur est en cours d'execution."
+            echo "failed."
+        fi
+        ;;
+    stop)
+        echo -n "Stopping mailMakePostfixMaps : "
+        if [ -e $daemon_pid ]; then
+            kill -TERM `cat $daemon_pid`
+            rm -f $daemon_pid
+            echo "done."
+        else
+            echo "Le serveur n'est pas en cours d'execution"
+            echo "failed."
+        fi
+        ;;
+    reload)
+        if [ -e $daemon_pid ]; then
+            kill -HUP `cat $daemon_pid`
+        else
+            echo "Le serveur n'est pas en cours d'execution"
+        fi
+        ;;
+    restart)
+        $0 stop
+        $0 start
+        ;;
+    *)
+        echo "Usage : $0 start|stop|reload|restart"
+        ;;
+esac
+
+exit 0
