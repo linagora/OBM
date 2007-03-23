@@ -43,6 +43,7 @@ $l_weekly = "settimanale";
 $l_monthlybydate = "mensile (data)";
 $l_monthlybyday = "mensile (giorno)";
 $l_yearly = "annuale";
+$l_exception = "Exceptions";
 
 $l_from = "da";
 $l_to = "al";

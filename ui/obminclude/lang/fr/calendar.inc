@@ -54,6 +54,7 @@ $l_short_accepted = "A";
 $l_short_rejected = "R";
 $l_short_waiting  = "Att";
 $l_wait = "En attente";
+$l_exception = "Exceptions";
 
 $l_daily = "quotidienne";
 $l_weekly = "hebdomadaire";

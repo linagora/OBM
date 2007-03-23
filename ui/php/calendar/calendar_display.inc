@@ -1372,8 +1372,9 @@ function dis_calendar_event_consult($id) {
     $eve_q = run_query_calendar_detail($id);
     if ($eve_q->num_rows() == 1) {
       $entities = get_calendar_event_entity($id);
+      $exception_q = run_query_get_one_event_exception($id);
       $display["detailInfo"] = display_record_info($eve_q);
-      $block = html_calendar_event_consult($eve_q, $entities);
+      $block = html_calendar_event_consult($eve_q, $exception_q, $entities);
     } else {
       $display["msg"] .= display_err_msg($l_err_reference);
     }
@@ -1391,14 +1392,14 @@ function dis_calendar_event_consult($id) {
 //   - $event_q  : event_query result
 //   - $entities : entities linked to the event ["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_consult($event_q, $entities) {
+function html_calendar_event_consult($event_q, $exception_q, $entities) {
   global $obm, $display, $ccalendar_weekstart, $ccalendar_resource;
   global $l_users, $l_resources, $l_title, $l_location, $l_priority, $l_private, $l_desc,$l_high;
   global $l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_insert,$l_update,$l_repeat;
   global $l_change_state,$l_groups,$l_all_day;
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend, $l_daily, $l_weekly;
-  global $l_wait,$l_task;
+  global $l_wait, $l_task, $l_exception, $l_yes, $l_no;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
@@ -1419,13 +1420,16 @@ function html_calendar_event_consult($event_q, $entities) {
     $datebegin = of_datetime_format($event_q->f("calendarevent_date"));
     $dateend = of_datetime_format($event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration"));
   }
-  $privacy = $event_q->f("calendarevent_privacy");
+  $privacy = $event_q->f("calendarevent_privacy") == 1? $l_yes : $l_no;
   $kind = ${"l_".$event_q->f("calendarevent_repeatkind")};
   $repeat_days =$event_q->f("calendarevent_repeatdays"); 
   if ($kind != "none") {
     $repeat_end = of_date_format($event_q->f("calendarevent_endrepeat"));
   }
 
+  while($exception_q->next_record()) {
+    $date_exception[] = of_isodate_format($exception_q->f("calendarexception_date")); 
+  }
 
   $block_category1 = of_category_dis_block_consult("calendar", "category1", $cats1, "mono");
   switch ($priority ) {
@@ -1499,8 +1503,14 @@ function html_calendar_event_consult($event_q, $entities) {
   <tr>
     <th>$l_resources :</th>
     <td>$dis_resource_list</td>
-  </tr>
-";
+  </tr>";
+  }
+
+  // Exception
+  if(is_array($date_exception)) {
+    foreach($date_exception as $key => $value) {
+     $block_exception_detail .= "$value <br />";
+    }
   }
 
   $display["title"] = "<div class=\"title\">$l_module_calendar : $title</div>";
@@ -1567,6 +1577,10 @@ function html_calendar_event_consult($event_q, $entities) {
      <th>$l_repeatdays :</th>
      <td>$dis_repeat_days</td>
     </tr>
+    <tr>
+      <th>$l_exception :</th>
+      <td>$block_exception_detail</td>
+    </tr>
    </table>
    </div>
    <div class=\"detail extra\">
@@ -1594,6 +1608,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
     $users = $entities["user"];
     $resources = $entities["resource"];
     $tasks = $entities["task"];
+    $exception_q = run_query_get_one_event_exception($calendar["calendar_id"]);
   } else {
     $users_id = $entities["user"];
     if (count($users_id > 0)) {
@@ -1616,7 +1631,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   }
 
   $cats1 = of_category_get_ordered("calendar", "category1");
-  $block = html_calendar_event_form($action, $calendar, $event_q, $users, $resources, $groups,$tasks, $cats1);
+  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $resources, $groups,$tasks, $cats1);
 
   return $block;
 }
@@ -1702,7 +1717,7 @@ function dis_calendar_quick_form($calendar) {
 //   - $groups       : Array : selected groups [ids] [entity]
 //   - $cats1        : Array : Calendar categories1
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $groups,$tasks, $cats1) {
+function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $res, $groups,$tasks, $cats1) {
   global $obm, $path, $display;
   global $ccalendar_resource, $ccalendar_weekstart, $set_cal_interval,$ico_project;
   global $ico_mini_cal, $ico_add,$ico_delete;
@@ -1715,7 +1730,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
   global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_task;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
-  global $l_resources,$l_format,$l_daysofweekshort,$l_task;
+  global $l_resources,$l_format,$l_daysofweekshort,$l_task, $l_exception;
 
   $time_unit = 60 / $set_cal_interval;  
   $repeatfrequency = 1;
@@ -1745,6 +1760,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
     $t_id = $tasks["ids"][0];
     $t_name = $tasks["entity"][$t_id]["label"];
     $id = $event_q->f("calendarevent_id");
+
+    while($exception_q->next_record()) {
+      $date_exception[] = of_isodate_format($exception_q->f("calendarexception_date")); 
+    }
 
   } elseif ($action == "new") {
     $repeat_end = of_isodate_format(strtotime("+1 year"));
@@ -1785,6 +1804,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
   if (isset($calendar["task_name"])) { $t_name = stripslashes($calendar["task_name"]); }
   if (isset($calendar["task_new_id"])) { $t_new_id = $calendar["task_new_id"]; }
   if (isset($calendar["task_new_name"])) { $t_new_name = stripslashes($calendar["task_new_name"]); }
+  if (isset($calendar["date_exception"])) { $date_exception = $calendar["date_exception"]; }
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
@@ -2043,6 +2063,19 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[5]";
   $url2 = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[6]&amp;ext_title=" . urlencode($l_calendar_select_group);
 
+  // Exception
+  if(is_array($date_exception)) {
+    foreach($date_exception as $key => $value) {
+     $block_exception_detail .= "<div class=\"elementRow\" id=\"date_exception-$key\">
+         <a href=\"javascript: remove_element('date_exception-$key','celldate');\">
+         <img src=\"$ico_delete\" alt=\"[Delete]\">
+         </a>
+         <input type=\"text\" name=\"tf_date_exception[$key]\" value=\"$value\" class=\"datePicker\" />
+       </div>";
+    }
+  }
+  $block_exception_detail .= "<input type=\"hidden\" name=\"last_exception_nb\" value=\"$key\"/>";
+  $add_date = "<a href=\"javascript: add_exdate();\"><img src=\"$ico_add\" alt=\"[Date]\" /></a>";
 
   // --- HTML Template --------------------------------------------------------
   $block = "
@@ -2136,6 +2169,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $users, $res, $g
   <tr>  
     <th>$l_repeatdays</th>
     <td>$dis_repeat_day</td>
+  </tr>
+  <tr>
+    <th> $l_exception $add_date</th>
+    <td id=\"celldate\">$block_exception_detail</td>
   </tr>
   </table>
   </fieldset>

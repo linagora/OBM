@@ -153,6 +153,49 @@ function calendar_check_meeting(form) {
   return true;
 } 
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Add date picker form for exception date
+///////////////////////////////////////////////////////////////////////////////
+function add_exdate() {
+
+  var target = window.document;
+  var container = get_elem(target, 'celldate');
+
+  var exception_nb = ++window.document.f_entity.last_exception_nb.value;
+
+  // Create the div
+  var div = target.createElement('div');
+  div.id = 'date_exception-'+exception_nb;
+  div.className = 'elementRow';
+
+  // Create the delete link
+  var delete_link = target.createElement('a');
+  delete_link.href = 'javascript: remove_element(\"date_exception-'+exception_nb+'\",\"celldate\");';
+  var delete_img = target.createElement('img');
+  delete_img.src = '$ico_delete';
+  delete_link.appendChild(delete_img);
+
+  // Create the date field
+  var field = target.createElement('input');
+  field.type = 'text';
+  field.name = 'tf_date_exception['+exception_nb+']';
+  field.className = 'datePicker';
+
+  div.appendChild(delete_link);
+  div.appendChild(field);
+
+  container.appendChild(div);
+
+  field.setProperty('autocomplete','off');
+  var img = $(document.createElement('img'));
+  img.setAttribute(\"src\", obm.vars.images.datePicker);
+  img.injectAfter(field);
+  img.addEvent('click', function(e){
+    displayDatePicker(field.name);
+  });
+}
+
 ";
 
 ?>

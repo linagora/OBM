@@ -43,6 +43,7 @@ require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 
 get_calendar_action();
+update_calendar_action();
 $perm->check_permissions($module, $action);
 
 $cal_entity_id = $_SESSION['cal_entity_id'];
@@ -838,6 +839,33 @@ function get_calendar_action() {
                                        );
 
 }
-  
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Calendar Actions updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_calendar_action() {
+  global $actions, $params, $path, $obm;
+
+  $id = $params["calendar_id"];
+  if($id) {
+    $event_info = get_calendar_event_info($id);
+    $owner = $event_info["owner"];
+    $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
+    if ($owner != $obm["uid"] && !in_array($owner,$writable_entity["ids"])) {
+      // Detail Update
+      unset($actions["calendar"]["detailupdate"]);
+
+      // Update
+      unset($actions["calendar"]["update"]);
+    
+      // Check Delete
+      unset($actions["calendar"]["check_delete"]);
+    
+      // Delete
+      unset($actions["calendar"]["delete"]);
+    }
+  }
+}
 
 ?>

@@ -43,6 +43,7 @@ $l_weekly = "weekly";
 $l_monthlybyday = "monthly(day)";
 $l_monthlybydate = "monthly(date)";
 $l_yearly = "yearly";
+$l_exception = "Exceptions";
 
 $l_from = "from";
 $l_to = "to";

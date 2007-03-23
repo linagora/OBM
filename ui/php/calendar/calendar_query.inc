@@ -420,6 +420,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $repeat_days = $calendar["repeat_days"]; 
   $repeat_end = $calendar["repeat_end"];
   $repeatfrequency = $calendar["repeatfrequency"];  
+  $date_exception = $calendar["date_exception"];
   
   $obm_q = new DB_OBM;
   $query = "INSERT INTO CalendarEvent (
@@ -470,6 +471,15 @@ function run_query_calendar_insert_event_data($calendar) {
   $obm_q->next_record(); 
   $max_id = $obm_q->f("max_id");
 
+  // Exception
+  if($repeat_kind != "none" && is_array($date_exception)) {
+    foreach(array_unique($date_exception) as $key => $value) {
+      if($value != "") {
+        $calendar["old_date_begin"] = $value." ".$calendar["time_begin"].":".$calendar["min_begin"].":00";
+        run_query_calendar_event_exception_insert($calendar); 
+      }
+    }
+  }
 
   return $max_id;
 }
@@ -905,7 +915,8 @@ function run_query_calendar_update_event_data($calendar) {
   $repeat_days = $calendar["repeat_days"];
   $repeat_end = $calendar["repeat_end"];
   $frequency = $calendar["repeatfrequency"];  
-   
+  $date_exception = $calendar["date_exception"];
+
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
     calendarevent_timeupdate = '$now',
@@ -928,6 +939,19 @@ function run_query_calendar_update_event_data($calendar) {
 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_update_event_data()");
   $obm_q->query($query);
+
+  $query = "DELETE FROM CalendarException WHERE calendarexception_event_id = '$event_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_update_event_data(2)");
+  $obm_q->query($query);
+
+  if($repeat_kind != "none" && is_array($date_exception)) {
+    foreach(array_unique($date_exception) as $key => $value) {
+      if($value != "") {
+        $calendar["old_date_begin"] = $value." ".$calendar["time_begin"].":".$calendar["min_begin"].":00";
+        run_query_calendar_event_exception_insert($calendar); 
+      }
+    }
+  }
 }
 
 
@@ -1056,6 +1080,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
         '$id',
         '$olddatebegin'
       )";
+
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_event_exception_insert(1)");
   $obm_q->query($query);
 
   if(is_object($event_q)) {
@@ -1112,7 +1138,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
       '$obm[domain_id]'
     )";
 
-    display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data()");
+    display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data(2)");
     $obm_q->query($query);
     
     $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
@@ -2317,6 +2343,34 @@ function run_query_get_events_exception($events,$start_time,$end_time) {
    AND $calendarexception_date < $end_time";
   display_debug_msg($query, $cdg_sql, "run_query_get_events_exception()");
   $obm_q->query($query);
+  return $obm_q;
+}
+
+
+/**
+ * Get all exceptions for an event
+ * 
+ * @param  $event_id
+ * @access public
+ * @return void
+ */
+
+function run_query_get_one_event_exception($calendar_id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $calendarexception_date = sql_date_format($obm_q->type,"calendarexception_date");
+  $calendarexception_date_l = sql_date_format($obm_q->type,"calendarexception_date","calendarexception_date");  
+
+  $query = "SELECT
+    calendarexception_event_id,
+    $calendarexception_date_l
+   FROM CalendarException
+   WHERE calendarexception_event_id='$calendar_id'"; 
+
+  display_debug_msg($query, $cdg_sql, "run_query_get_one_event_exception()");
+  $obm_q->query($query);
+
   return $obm_q;
 }
 

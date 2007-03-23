@@ -44,6 +44,7 @@ $l_possible = "Libre";
 $l_occupied = "No disponible";
 $l_meeting_legend = "Leyenda";
 $l_selection = "Selección";
+$l_exception = "Exceptions";
 
 $l_accepted = "Aceptar";
 $l_rejected = "Rechazar";

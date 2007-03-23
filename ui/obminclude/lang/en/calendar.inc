@@ -26,6 +26,7 @@ $l_hour = "Hour";
 $l_occupied_day = "Whole day";
 $l_user_right = "Manage rights for";
 
+$l_exception = "Exceptions";
 $l_format = "(AAAA-MM-JJ)";
 $l_repeat = "Repeatition";
 $l_periodicity = "Frequency";

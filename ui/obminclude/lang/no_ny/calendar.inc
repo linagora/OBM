@@ -33,6 +33,7 @@ $l_waiting_events = "Waiting events";
 $l_calendar_visible = "Select calendars";
 $l_calendar_displayed = "Calendars displayed";
 $l_repeatdays2 = "Repeatition days";
+$l_exception = "Exceptions";
 
 $l_link_events = "linked events with this category.";
 $l_accepted = "Accept";
