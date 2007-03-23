@@ -341,7 +341,7 @@ class Auth {
       
       return $obm["uid"];
     } else {
-      return false;
+      return "form";
     }
   }
     
