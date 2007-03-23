@@ -1174,7 +1174,7 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
 
     $empty = !$of->periodHaveOccurrences($current_time,$day_duration);
     $line0 .= "<th>$day_label</th>\n";
-    $line1 .= "<td>$this_day</td>\n";
+    $line1 .= "<th><a href=\"calendar_index.php?action=view_day&amp;date=$iso_day\">$this_day</a></th>\n";
     foreach ($calendar_entity as $type => $entity) {
       foreach ($entity as $id => $properties) {
         $haveevent = false;
