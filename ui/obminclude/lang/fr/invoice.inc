@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : invoice.inc                                              //
-// 2001-08-02 Aliacom - Nicolas Roman                                        //
+// 2001-08-02 - AliaSource - Pierre Baudracco                                //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,7 @@ $l_amount_ht = "Montant HT";
 $l_amount_ttc = "Montant TTC";
 $l_expiration_date = "Date d'échéance";
 $l_payment_date = "Date de paiment";
-$l_expected_date = "Date Prévisionnelle";
+$l_expiration = "Echéance";
 $l_paid = "Payé";
 $l_waiting = "En attente";
 $l_pick_deal = "Choisissez une affaire";
@@ -93,9 +93,5 @@ $l_invoice_display = "Options d'affichage pour les listes de Factures";
 // default invoice numbering policy :
 // this is used as a date format
 $default_invoice_numbering = "Y"; // we use only year
-
-// default tax rate 
-// used like that : TTC = HT * $default_tax
-$default_tax= 1.196;
 
 $l_j_select_invoice = "Vous devez sélectionner une facture !";

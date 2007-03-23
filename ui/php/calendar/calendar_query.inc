@@ -2078,8 +2078,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity) {
       AND $calendarevent_date >= $start - calendarevent_duration
       AND $calendarevent_date <= $end
       AND $where_grp
-      $multidomain
-    ";
+      $multidomain";
   }
   
   $query = "SELECT
@@ -2108,7 +2107,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity) {
       $multidomain
       $union
       ORDER BY calendarevent_date
-      "; 
+";
 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_no_repeat_events()");
   $obm_q->query($query);
@@ -2253,6 +2252,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity) {
   return $obm_q;
 }
 
+
 /**
  * Get all attendees of an array of events
  *  
@@ -2292,6 +2292,7 @@ function run_query_get_events_attendee($events) {
   return $obm_q;
 }
 
+
 /**
  * Get all exceptions for an array of events
  * 
@@ -2299,7 +2300,6 @@ function run_query_get_events_attendee($events) {
  * @access public
  * @return void
  */
-
 function run_query_get_events_exception($events,$start_time,$end_time) {
   global $cdg_sql;
   $event_list = implode(",",$events) ;
@@ -2318,6 +2318,8 @@ function run_query_get_events_exception($events,$start_time,$end_time) {
   $obm_q->query($query);
   return $obm_q;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return a table of Events between two dates
 // Parameters: 
@@ -2327,6 +2329,7 @@ function run_query_get_events_exception($events,$start_time,$end_time) {
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_events_model($start_time, $end_time, $calendar_entity) {
   global $day_duration;
+
   $day_duration = 86400;
   $nr_q = run_query_calendar_no_repeat_events($start_time,$end_time,$calendar_entity);
   $of = &OccurrenceFactory::getInstance();
@@ -2339,13 +2342,14 @@ function calendar_events_model($start_time, $end_time, $calendar_entity) {
     $description = $nr_q->f("calendarevent_description"); 
     $location = $nr_q->f("calendarevent_location"); 
     $category1 = $nr_q->f("calendarcategory1_label");
+    $priority = $nr_q->f("calendarevent_priority");
     $date = $nr_q->f("calendarevent_date");
     $duration = $nr_q->f("calendarevent_duration");
     $all_day = $nr_q->f("calendarevent_allday");
     $entity = $nr_q->f("evententity_entity");
     $entity_id = $nr_q->f("evententity_entity_id");
     $owner = $nr_q->f("calendarevent_owner");
-    if(isset($of->events[$id])) {
+    if (isset($of->events[$id])) {
       $event = &$of->events[$id];
     } else {
       $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,'none',$owner);
@@ -2375,7 +2379,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity) {
     if (!$endrepeat) {
       $endrepeat = $end_time;
     }
-    if(isset($of->events[$id])) {
+    if (isset($of->events[$id])) {
       $event = &$of->events[$id];
     } else {
       $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,$repeatkind,$owner);
@@ -2404,7 +2408,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity) {
 	break;	
     }
   }
-  if(count($of->events) > 0) {
+  if (count($of->events) > 0) {
     $exception_q = run_query_get_events_exception(array_keys($of->events),$start_time,$end_time);
     while($exception_q->next_record()) {
       $of->removeOccurrences($exception_q->f('calendarexception_event_id'), $exception_q->f('calendarexception_date'));
@@ -2692,7 +2696,7 @@ Class OccurrenceFactory {
   }
 
   function addOccurrence(&$event, $date, $entity, $id) {
-    if($date < $this->end && ($date + $event->duration) > $this->begin) {
+    if ($date < $this->end && ($date + $event->duration) > $this->begin) {
       $this->occurrences[$event->id][] = &new Occurrence($event, $date, $entity, $id);
       $this->events[$event->id] = &$event;
     }
@@ -2716,7 +2720,7 @@ Class OccurrenceFactory {
 
   function &getInstance() {
     static $singleton = null;
-    if(is_null($singleton)) {
+    if (is_null($singleton)) {
       $singleton = new OccurrenceFactory();
     }
     return $singleton;

@@ -458,7 +458,7 @@ class OBM_DISPLAY {
 	    $cb_check = "";
 	  }
 	  $block .= "<td class=\"resultText\">
-                <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check /></td>";
+            <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check /></td>";
 	}
 	else
 	  $block .= "<td class=\"resultText\">&nbsp;</td>";
@@ -803,7 +803,7 @@ class OBM_DISPLAY {
 
 	  if ($res["txt_name"] != "") {
 	    $name = $res["txt_name"];
-	  } else if ($res["name"] != ""){
+	  } else if ($res["name"] != "") {
 	    $name = $res["name"];
 	  } else {
 	    $name = $txt_name;

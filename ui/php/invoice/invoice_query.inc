@@ -22,10 +22,9 @@ function run_query_invoice_search ($invoice) {
   $ttc = $invoice["amount_ttc"];
   $status = $invoice["status"];
   $sel_tt = $invoice["tasktype"];
+  $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
-  $dateexp_after = $invoice["dateexp_after"];
-  $dateexp_before = $invoice["dateexp_before"];
   $inout = $invoice["inout"];
   $company = sql_search_text_parse($invoice["company"]);
   $archive = $invoice["archive"];
@@ -37,8 +36,9 @@ function run_query_invoice_search ($invoice) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $date = sql_date_format($db_type, "invoice_date", "date");
-  $dateexp = sql_date_format($db_type, "invoice_expiration_date", "expiration_date");
+  $date = sql_date_format($db_type, "invoice_date", "invoice_date");
+  $dateexp = sql_date_format($db_type, "invoice_expiration_date", "invoice_expiration_date");
+  $datepay = sql_date_format($db_type, "invoice_payment_date", "invoice_payment_date");
   $multidomain = sql_multidomain("invoice");
 	
   $where = "1=1 $multidomain";
@@ -67,16 +67,10 @@ function run_query_invoice_search ($invoice) {
     $where .= " AND invoice_status_id = '$status'";
   }
   if ($date_after != "") {
-    $where .= " AND invoice_date >= '$date_after'";
+    $where .= " AND invoice_$date_field >= '$date_after'";
   }
   if ($date_before != "") {
-    $where .= " AND invoice_date <= '$date_before'";
-  }
-  if ($dateexp_after != "") {
-    $where .= " AND invoice_expiration_date >= '$dateexp_after'";
-  }
-  if ($dateexp_before != "") {
-    $where .= " AND invoice_expiration_date <= '$dateexp_before'";
+    $where .= " AND invoice_$date_field <= '$date_before'";
   }
   if (($inout != "") && ($inout != "$c_all")) {
     $where .= " AND invoice_inout = '$inout'";
@@ -120,6 +114,7 @@ function run_query_invoice_search ($invoice) {
       invoice_id as id,
       $date,
       $dateexp,
+      $datepay,
       company_id,
       company_name as invoice_company,
       deal_id,
@@ -225,9 +220,9 @@ function run_query_invoice_insert($invoice) {
   $ht = $invoice["amount_ht"];
   $ttc = $invoice["amount_ttc"];
   $status = $invoice["status"];
-  $date = $invoice["date"];
-  $expiration_date = $invoice["expiration_date"];
-  $payment_date = $invoice["payment_date"];
+  $date = ($invoice["date"] ? "'".$invoice["date"]."'" : "null");
+  $expiration_date = ($invoice["expiration_date"] ? "'".$invoice["expiration_date"]."'" : "null");
+  $payment_date = ($invoice["payment_date"] ? "'".$invoice["payment_date"]."'" : "null");
   $inout = $invoice["inout"];
   $add_comment = $invoice["add_comment"];
   if ($add_comment != "") {
@@ -285,9 +280,9 @@ function run_query_invoice_insert($invoice) {
      '$ttc',
      '$status',
      '$comment',
-     '$date',
-     '$expiration_date',
-     '$payment_date',
+     $date,
+     $expiration_date,
+     $payment_date,
      '$inout',
      '$arch')"; 
 
@@ -315,9 +310,9 @@ function run_query_invoice_update($invoice) {
   $ht = $invoice["amount_ht"];
   $ttc = $invoice["amount_ttc"];
   $status = $invoice["status"];
-  $date = $invoice["date"];
-  $expiration_date = $invoice["expiration_date"];
-  $payment_date = $invoice["payment_date"];
+  $date = ($invoice["date"] ? "'".$invoice["date"]."'" : "null");
+  $expiration_date = ($invoice["expiration_date"] ? "'".$invoice["expiration_date"]."'" : "null");
+  $payment_date = ($invoice["payment_date"] ? "'".$invoice["payment_date"]."'" : "null");
   $inout = $invoice["inout"];
   if ($status == ""){
     $status = "0";
@@ -353,9 +348,9 @@ function run_query_invoice_update($invoice) {
       invoice_amount_ttc='$ttc',
       invoice_status_id='$status',
       invoice_comment='$comment',
-      invoice_date='$date',
-      invoice_expiration_date='$expiration_date',
-      invoice_payment_date='$payment_date',
+      invoice_date=$date,
+      invoice_expiration_date=$expiration_date,
+      invoice_payment_date=$payment_date,
       invoice_inout='$inout',
       invoice_archive='$arch'
     WHERE invoice_id='$id' $multidomain";
@@ -430,7 +425,7 @@ function get_invoice_payment ($p_invoice, $not_paid=0) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $date = sql_date_format($db_type, "payment_date", "payment_date");
-  $multidomain = sql_multidomain("paymentinvoice");
+  $multidomain = sql_multidomain("payment");
 	
   $query = "SELECT
       paymentinvoice_amount,
@@ -442,7 +437,8 @@ function get_invoice_payment ($p_invoice, $not_paid=0) {
     FROM PaymentInvoice
       LEFT JOIN Payment ON paymentinvoice_payment_id=payment_id
       LEFT JOIN Company ON payment_company_id=company_id
-    WHERE paymentinvoice_invoice_id = '$p_invoice' $multidomain";
+    WHERE paymentinvoice_invoice_id = '$p_invoice'
+      $multidomain";
 
   if ($not_paid == 1) {
     $query .= " AND paymentinvoice_amount = 0.0 ";

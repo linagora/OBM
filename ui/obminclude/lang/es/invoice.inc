@@ -99,10 +99,6 @@ $l_invoice_display = "Opciones de despliegue de listas de facturas";
 // default invoice numbering policy :
 $default_invoice_numbering = "Y"; // we use only year
 
-// default tax rate 
-// used like that : TTC = HT * $default_tax
-$default_tax= 1.16;
-
 // Otros Skina 
 
 $l_inout = "Clase";

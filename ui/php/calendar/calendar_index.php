@@ -156,7 +156,6 @@ if ($action == "index") {
     $display["detail"] = dis_calendar_calendar_view($params, $cal_entity_id);
   }
 
-
 } elseif ($action == "decision") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params["force"] && $conflicts = check_calendar_decision_conflict($params)) {
@@ -190,6 +189,10 @@ if ($action == "index") {
 } elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_calendar_calendar_view($params, $cal_entity_id, "year");
+
+} elseif ($action == "view_list") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_calendar_calendar_view($params, $cal_entity_id, "list");
 
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -593,7 +596,8 @@ function get_calendar_params() {
 function get_calendar_action() {
   global $actions, $path, $params;
   global $l_header_consult, $l_header_update,$l_header_right,$l_header_meeting;
-  global $l_header_day,$l_header_week,$l_header_year,$l_header_delete,$l_header_planning;
+  global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
+  global $l_header_planning, $l_header_list;
   global $l_header_month,$l_header_new_event,$l_header_admin, $l_header_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $l_header_waiting_events;
@@ -628,8 +632,8 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
        'update_decision','decision','update','delete', 'new_meeting',
-       'view_month','view_week','view_day','view_year',
-		  'rights_admin','rights_update', 'waiting_events',"planning")
+       'view_month','view_week','view_day','view_year', 'view_list',
+       'rights_admin','rights_update', 'waiting_events',"planning")
 		);
 
   // Detail Consult
@@ -704,6 +708,14 @@ function get_calendar_action() {
   $actions["calendar"]["view_day"] = array (
     'Name'     => $l_header_day,
     'Url'      => "$path/calendar/calendar_index.php?action=view_day&amp;date=$date",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all')
+                                    	 );
+
+  // View List
+  $actions["calendar"]["view_list"] = array (
+    'Name'     => $l_header_list,
+    'Url'      => "$path/calendar/calendar_index.php?action=view_list&amp;date=$date",
     'Right'    => $cright_read,
     'Condition'=> array ('all')
                                     	 );

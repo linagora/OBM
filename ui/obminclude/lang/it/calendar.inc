@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
-//     - File     : calendar.inc                                               //
+//     - File     : calendar.inc                                             //
 // 2002-08-13 Augusto Fagioli - augusto@fagioli.biz                          //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -18,8 +18,6 @@ $l_high = "Alta";
 $l_low = "Bassa";
 $l_medium = "Normale";
 
-$l_timebegin = "Ora inizio";
-$l_timeend = "Ora fine ";
 $l_occupied_day = "Giorno occupato";
 
 $l_repeat = "Ripatizione";

@@ -2,12 +2,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : calendar.inc                                             //
-// 2001-06-28 by Francois Bloque                                             //
+// 2001-06-28 by AliaSource                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 //////////////////////////////////////////////////////////////////////////////
 
 $l_calendar = "Calendrier";
+$l_attendees = "Participants";
 $l_users = "Utilisateurs";
 $l_resources = "Ressources";
 $l_free_resources = "Resources libres : ";
@@ -19,10 +20,6 @@ $l_high = "Haute";
 $l_low = "Basse";
 $l_medium = "Normale";
 $l_go = "Voir";
-$l_timebegin = "Heure de début (HH:MM)";
-$l_timebegin2 = "Heure de début";
-$l_timeend = "Heure de fin (HH:MM)";
-$l_timeend2 = "Heure de fin";
 $l_hour = "Heure";
 $l_occupied_day = "Journée entière";
 $l_event_duration = "Durée de la réunion";

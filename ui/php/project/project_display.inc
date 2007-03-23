@@ -325,7 +325,7 @@ function dis_project_planning($project) {
 //   - $time : parameter hash
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_nav_date($project) {
-  global $cdg_param,  $c_dst_err, $l_monthsofyear, $action;
+  global $cdg_param, $l_monthsofyear, $action;
   global $ico_previous,$ico_next;
 
   $id = $project["project_id"];

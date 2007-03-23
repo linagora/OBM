@@ -284,7 +284,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
   $role = $deal["role"];
   $status = $deal["status_id"];
   $manager = $deal["manager"];
-  $date_field = ( $deal["date_field"] ? $deal["date_field"] : "datealarm");
+  $date_field = ($deal["date_field"] ? $deal["date_field"] : "datealarm");
   $date_after = stripslashes($deal["date_after"]);
   $date_before = stripslashes($deal["date_before"]);
   $company_id = $deal["company_id"];
@@ -352,7 +352,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
   }
   $sel_manager .= "</select>";
 
-  // Manager select construction
+  // Selected date field
   $s_date_field[$date_field] = "selected=\"selected\"";
 
   $url = url_prepare("deal_index.php");

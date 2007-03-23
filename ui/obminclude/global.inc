@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0.0rc2";
+$obm_version = "2.0.0rc3";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -44,6 +44,9 @@ $cak_page_prev = "4";
 $cak_page_next = "6";
 $cak_begin = "B";
 $cak_end = "E";
+
+// Default domain id
+$c_default_domain = 1;
 
 // OBM System groups (groups id)
 $cg_adm = 1;
@@ -86,9 +89,6 @@ $cgp_cookie_domain = "aliasource.local";
 // CAS specific parameters are in conf/obm_conf.inc.
 $auth_kind = "standalone"; 
 
-// Shall the login page encrypt authentication password
-$auth_encryption = 1;
-
 // Encyption used to store password : "plain", "md5" or "crypt"
 $password_encryption = "plain";
 
@@ -114,7 +114,7 @@ $ccontact_private_default = false;
 $ccalendar_public_groups = true;
 // Calendar : First day of the week
 $phpversion = substr(phpversion(),0,1);
-if($phpversion >= 5) {
+if ($phpversion >= 5) {
   $ccalendar_weekstart = "monday";
 } else {
   $ccalendar_weekstart = "monday + 2 hours"; // +2h to fix a DST php4 bug //
@@ -152,11 +152,8 @@ $cgroup_private_default = true;
 // Import : temporary path
 $tmp_path = "/tmp";
 
-// DST (Daily Saving Time) correction to avoid dates problems (2h)
-$c_dst_err = 7200;
-
-// Default domain id
-$c_default_domain = 1;
+// default taxes values
+$cdefault_tax = array ("TVA 19,6" => 1.196, "TVA 5,5" => 1.055, "Pas de TVA" => 1);
 
 //---------------------------------------------------------------------------//
 // Default access rights bits meanings
@@ -520,6 +517,9 @@ $cdoc_kind_link = 2;
 $perms_user = "user";
 $perms_editor = "editor";
 $perms_admin = "admin";
+
+// DST (Daily Saving Time) correction to avoid dates problems (2h)
+$c_dst_err = 7200;
 
 // Default preferences data
 $set_lang_default = "en";

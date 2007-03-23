@@ -16,10 +16,6 @@ $l_high = "High";
 $l_low = "Low";
 $l_medium = "Medium";
 
-$l_timebegin = "Hour begin (HH:MM)";
-$l_timebegin2 = "Hour begin";
-$l_timeend = "Hour end (HH:MM)";
-$l_timeend2 = "Hour end";
 $l_occupied_day = "All day";
 
 $l_format = "(AAAA-MM-JJ)";

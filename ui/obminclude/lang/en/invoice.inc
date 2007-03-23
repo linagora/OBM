@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : invoice.inc                                              //
-// 2001-08-02 - Aliacom - Nicolas Roman                                      //
+// 2001-08-02 - AliaSource - Pierre Baudracco                                //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,7 @@ $l_amount_ht = "HT amount";
 $l_amount_ttc = "TTC Amount";
 $l_expiration_date = "Expiration date";
 $l_payment_date = "Payment date";
-$l_expected_date = "Expected Date";
+$l_expiration = "Expiration";
 $l_paid = "Paid";
 $l_waiting = "Waiting";
 $l_pick_deal = "Choose a deal";

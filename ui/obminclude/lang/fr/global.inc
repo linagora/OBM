@@ -55,6 +55,8 @@ $l_datebegin = "Date de début";
 $l_end = "Fin";
 $l_dateend = "Date de fin";
 $l_alarm = "Alarme";
+$l_previous = "Précédent";
+$l_next = "Suivant";
 $l_text = "Texte";
 $l_name = "Nom";
 $l_label = "Label";
@@ -127,6 +129,7 @@ $l_hide = "Masquer";
 $l_show = "Afficher";
 $l_advanced = "Avancé";
 $l_properties = "Propriétés";
+
 // Entities
 $l_company = "Société";
 $l_contact = "Contact";

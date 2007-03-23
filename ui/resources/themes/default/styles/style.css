@@ -146,7 +146,7 @@ form {
   margin: 0 0px 20px 17.5em;
   padding: 2em 1em 1em;
 /*IE workaround*/
-  _height: 1px;
+  height: 1px;
 }
 
 #mainContent {
@@ -631,7 +631,7 @@ input.datePicker {
 .admin .overflow {
   overflow: auto;
   max-height: 21em;
-  _height: expression(this.scrollHeight > 150 ? "150px" : "auto");
+  height: expression(this.scrollHeight > 150 ? "150px" : "auto");
 }
 
 .admin table {

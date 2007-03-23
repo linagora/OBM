@@ -346,6 +346,13 @@ CREATE TABLE DefaultOdtTemplate (
 ALTER TABLE Contact ADD COLUMN contact_newsletter char(1) DEFAULT '0' AFTER contact_mailing_ok;
 
 
+----------------------------------------------------------------------------
+-- Update Invoice data
+----------------------------------------------------------------------------
+UPDATE Invoice SET invoice_expiration_date = NULL where invoice_expiration_date = '0000-00-00';
+UPDATE Invoice SET invoice_payment_date = NULL where invoice_payment_date = '0000-00-00';
+
+
 
 ---------------------------------------------------------------------------
 -- Update UserObm table from Aliamin and to OBM2

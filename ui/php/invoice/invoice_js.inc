@@ -99,7 +99,7 @@ function valider_suppression() {
 // TODO : if result is NaN, popup an alert and give focus 
 // back to HT or rate...
 function compute_tax (form, auto) {
-  var rate = parseFloat(form.tf_tax_rate.value);
+  var rate = parseFloat(form.sel_tax.options[form.sel_tax.selectedIndex].value);
   var ht   = parseFloat(form.tf_amount_ht.value);
 
   if (auto && (isNaN(ht) || isNaN(rate))) {

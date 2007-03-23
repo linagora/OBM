@@ -1,7 +1,7 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Norvegian                                                //
-//     - File     : calendar.inc                                               //
+//     - File     : calendar.inc                                             //
 // 2001-06-28 by Francois Bloque                                             //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -19,8 +19,6 @@ $l_high = "High";
 $l_low = "Low";
 $l_medium = "Medium";
 
-$l_timebegin = "Begin time";
-$l_timeend = "End time";
 $l_occupied_day = "Whole day";
 $l_user_right = "Manage rights for";
 
@@ -56,8 +54,6 @@ $l_repeatkind = "Repeatition kind";
 $l_from = "from";
 $l_to = "to";
 $l_event_duration = "Meeting duration";
-$l_timebegin2 = "Begin time";
-$l_timeend2 = "End time";
 $l_conflicts = "Conflict(s) found";
 $l_date = "Date";
 $l_user = "User";

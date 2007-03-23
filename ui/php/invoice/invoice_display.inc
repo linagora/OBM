@@ -103,11 +103,16 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "invoice_date") {
-    $res["name"] = of_date_format($OD->data_set->f("date"));
+    $res["name"] = of_date_format($OD->data_set->f($fieldname), 1);
   }
 
-  else if ($fieldname == "payment_date") {
-    $res["name"] = of_date_format($OD->data_set->f("payment_date"));
+  else if ($fieldname == "invoice_expiration_date") {
+    $res["name"] = of_date_format($OD->data_set->f($fieldname), 1);
+  }
+
+  else if ($fieldname == "invoice_payment_date") {
+    $date = of_date_format($OD->data_set->f($fieldname), 1);
+    $res["name"] = $date;
   }
 
   else if ($fieldname == "payment_amount") {
@@ -158,17 +163,16 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   global $l_label_start, $l_number, $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_tt, $l_date, $l_after, $l_before, $l_inout;
   global $l_company, $l_include_archive, $l_select_invoice;
-  global $l_find, $l_both, $l_client, $l_supplier;
+  global $l_find, $l_both, $l_client, $l_supplier, $l_expiration, $l_payment;
 
   $label = $invoice["label"];
   $number = $invoice["number"];
   $ht = $invoice["amount_ht"];
   $ttc = $invoice["amount_ttc"];
   $status = $invoice["status"];
+  $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
-  $dateexp_after = $invoice["dateexp_after"];
-  $dateexp_before = $invoice["dateexp_before"];
   $inout = $invoice["inout"];
   $tt = $invoice["tt"];
   $deal_id = $invoice["deal_id"];
@@ -220,6 +224,9 @@ function html_invoice_search_form($invoice, $sta, $tts) {
     $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
 
+  // Selected date field
+  $s_date_field[$date_field] = "selected=\"selected\"";
+
   $block = "
     <form method=\"post\" name=\"f_search\"
         onSubmit=\"if (check_search_form(this) == false) return false;
@@ -245,12 +252,20 @@ function html_invoice_search_form($invoice, $sta, $tts) {
       $sel_status
     </label>
 
+    <label>$l_date<br />
+      <select name=\"sel_date_field\">
+        <option value=\"date\" $s_date_field[date]>$l_date</option>
+        <option value=\"expiration_date\" $s_date_field[expiration_date]>$l_expiration</option>
+        <option value=\"payment_date\" $s_date_field[payment_date]>$l_payment</option>
+      </select>
+    </label>
+
     <label>$l_date $l_after<br />
-    <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
+    <input type=\"text\" name=\"tf_date_after\" value=\"$date_after\" class=\"datePicker\"/>
     </label>
 
     <label>$l_date $l_before<br />
-    <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
+    <input type=\"text\" name=\"tf_date_before\" value=\"$date_before\" class=\"datePicker\"/>
     </label>
 
     <label>$l_include_archive<br />
@@ -718,7 +733,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   global $l_insert, $l_update, $l_archive, $l_expiration_date;
   global $l_invoice, $l_company, $l_deal, $l_project, $l_payment_date;
   global $default_invoice_numbering, $c_php_isodate_format;
-  global $default_tax, $l_tax_rate, $l_compute_tax; 
+  global $cdefault_tax, $l_tax_rate, $l_compute_tax; 
 
   $uid = $obm["uid"];
 
@@ -776,6 +791,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   if (isset($invoice["payment_date"])) { $payment_date = $invoice["payment_date"]; }
   if (isset($invoice["status"])) { $status = $invoice["status"]; }
   if (isset($invoice["inout"])) { $inout = $invoice["inout"]; }
+  if (isset($invoice["tax"])) { $tax = $invoice["tax"]; }
   if (isset($invoice["amount_ht"])) { $ht = $invoice["amount_ht"]; }
   if (isset($invoice["amount_ttc"])) { $ttc = $invoice["amount_ttc"]; }
   if (isset($invoice["comment"])) { $comment = stripslashes($invoice["comment"]); }
@@ -820,6 +836,23 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       <input type=\"radio\" name=\"rd_inout\" value=\"+\" $inout_c /> $l_client
       <input type=\"radio\" name=\"rd_inout\" value=\"-\" $inout_s /> $l_supplier
       </td>";
+
+  // tax select
+  if (is_array($cdefault_tax)) {
+    $taxes = $cdefault_tax;
+  } else {
+    $taxes = array($cdefault_tax);
+  }
+  $sel_tax = "<select name=\"sel_tax\" onChange=\"compute_tax(this.form, true);\">"; 
+  foreach ($taxes as $tax_label => $tax_value) {
+    $sel_tax .= "<option value=\"$tax_value\""; 
+    if ($tax_value == $tax) {
+      $sel_tax .= " selected ";
+    }
+    $sel_tax .= ">$tax_label</option>"; 
+  }
+  $sel_tax .= "</select>";
+  
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
@@ -952,9 +985,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     </td>
   </tr><tr>
     <th>$l_tax_rate</th>
-    <td><input name=\"tf_tax_rate\" type=\"text\" value=\"$default_tax\" size=\"8\" />
-      <input type=\"button\" name=\"b_compute\" value=\"$l_compute_tax\" onClick=\"compute_tax(this.form);\" />
-    </td>
+    <td>$sel_tax</td>
   </tr><tr>
     <th>$l_amount_ttc</th>
     <td>
