@@ -52,8 +52,7 @@ function run_query_time_task_list($time) {
       projecttask_label,
       company_name as timetask_company_name,
       timetask_status,
-      $if_status as test_status,
-      SUBSTRING(timetask_date,8,1) as date_parity
+      $if_status as test_status
     FROM TimeTask
       LEFT JOIN ProjectTask ON timetask_projecttask_id = projecttask_id
       LEFT JOIN Project ON projecttask_project_id = project_id

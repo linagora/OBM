@@ -957,12 +957,11 @@ function get_global_params($table="") {
     hd_  = hidden
     data-= external call
   */
-  $params = array();
+  if (!is_array($params)) $params = array();
   $replace = array("/^tf_/", "/^sel_/", "/^cb_/", "/^ta_/", "/^rd_/", "/^hd_/");
-  $parameters = array_merge($_POST, $_GET);
+  $parameters = array_merge($_GET,$_POST);
   foreach($parameters as $var => $value) {
-
-    if($parameters["ajax"] == 1 && is_string($value)) {
+    if ($parameters["ajax"] == 1 && is_string($value)) {
       $value = utf8_decode($value);
     }
     // Handle automatic checkbox (1,0) paramaters (cba_)

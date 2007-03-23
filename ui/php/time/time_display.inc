@@ -46,12 +46,12 @@ function dis_time_data(&$OD, $fieldname, $link_ok) {
   $res["style"] = "";
   
   if (($fieldname == "row_style") && ($OD->data_set->f("timetask_id"))) {
-    $parity = $OD->data_set->f("date_parity") % 2;
+    (date("d",$OD->data_set->f("date_task")) % 2 == 0)?$parity = "pair":$parity = "";
 
     if ($OD->data_set->f("timetask_status") == 0)
-      $res["style"] = "class=\"timeUnvalid\"";
+      $res["style"] = "class=\"highlight\"";
     else
-      $res["style"] = "class=\"timeValid$parity\"";
+      $res["style"] = "class=\"$parity\"";
   }
 
   if ($fieldname == "timetask_project_name") {

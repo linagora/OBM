@@ -781,6 +781,10 @@ input.datePicker {
   background-color: #eef0f1 ;
 }
 
+.result tbody tr.highlight {
+  background-color: #f4f3c5;
+}
+
 .result tbody tr.pair{
   background-color: #fafafa;
 }

@@ -46,6 +46,7 @@ function run_query_password_update($password, $uid, $usr_q) {
   global $cdg_sql, $cdg_exe, $cgp_use, $cmd_ldap_passwd, $password_encryption;
 
   $login = $usr_q->f("userobm_login");
+  $domain_id = $usr_q->f("userobm_domain_id");;
   $old_pass = trim($password["old_password"]);
   $new_pass = trim($password["new_password"]);
 
@@ -61,11 +62,7 @@ function run_query_password_update($password, $uid, $usr_q) {
 
   // Modification a chaud du mot de passe dans le LDAP
   // XXXX cas user non encore cree (uniquement dans base maj) ?
-  if ($cgp_use["service"]["samba"]) {
-    $cmd = "$cmd_ldap_passwd --samba --unix --login $login --passwd-plain $new_pass --old-passwd $old_pass";
-  }else {
-    $cmd = "$cmd_ldap_passwd --unix --login $login --passwd-plain $new_pass --old-passwd $old_pass";
-  }
+  $cmd = "$cmd_ldap_passwd --unix --login $login --passwd-plain $new_pass --old-passwd $old_pass --domain $domain_id";
 
   display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
   exec($cmd);
