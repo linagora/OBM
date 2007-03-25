@@ -745,6 +745,7 @@ function dis_group_warn_insert($id, $g_q, $group) {
   $samba = $group["samba"];
   $email = $group["email"];
   $mailing = $group["mailing"];
+  $privacy = $group["privacy"];
 
   $display["msg"] .= display_warn_msg($l_check_samegroup);
   while ($g_q->next_record()) {
@@ -763,6 +764,7 @@ function dis_group_warn_insert($id, $g_q, $group) {
     <input type=\"hidden\" name=\"cba_samba\" value=\"$samba\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"cba_mailing\" value=\"$mailing\" />
+    <input type=\"hidden\" name=\"cba_privacy\" value=\"$privacy\" />
 ";
 
   $block = "

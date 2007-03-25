@@ -90,7 +90,7 @@ if (($action == "index") || ($action == "")) {
   if (check_group_data_form($params)) {
 
     // If the context (same group) was confirmed ok, we proceed
-    if ($hd_confirm == $c_yes) {
+    if ($params["confirm"] == $c_yes) {
       $params["group_id"] = run_query_group_insert($params);
       if ($params["group_id"]) {
 	$display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");

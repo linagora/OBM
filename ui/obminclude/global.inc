@@ -575,8 +575,8 @@ if ($cgp_loginDotsEnable) {
 // Email
 $php_regexp_domain = "/^([a-z0-9-]+\.)+[a-z]{2,6}$/"; // Domain
 $php_regexp_localdomain = "/^([a-z0-9-]+\.)+[a-z]{2,6}$/"; // Local Domain
-$php_regexp_email_name = "/^[a-z0-9_&\'-]+(\.[a-z0-9_\'-]+)*$/";
-$php_regexp_email = "/^[a-z0-9_&\'-]+(\.[a-z0-9_\'-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/";
+$php_regexp_email_name = "/^[a-zA-Z0-9_&\'-]+(\.[a-zA-Z0-9_\'-]+)*$/";
+$php_regexp_email = "/^[a-zA-Z0-9_&\'-]+(\.[a-zA-Z0-9_\'-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/";
 $js_regexp_email="/^\w([\.'\w-_&]+)?@([\w'\-]+\.)+[A-Za-z]{2,4}$/";  // Email
 $php_regexp_quota = "/^[0-9]{1,6}$/";
 
