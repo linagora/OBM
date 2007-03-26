@@ -1,13 +1,13 @@
 # Adresse du serveur LDAP referent
-ldap_server         cyrus.aliamin.local
+ldap_server         aliamin.aliamin.local
 
 # Options communement modifiees
 log_level           4   # de 0 a 4
 log_file            /var/log/aliamin/mailMakePostfix.log
 pid_file            /var/run/aliamin/mailMakePostfix.pid
 
-# IP ayant droit a ce connecter
-cidr_allow          127.0.0.1/32
+# IP ayant droit de se connecter
+cidr_allow          10.0.0.100/32
 
 # Attention a la modifications de ces options
 max_badrequest      2
