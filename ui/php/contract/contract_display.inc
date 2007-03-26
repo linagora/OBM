@@ -111,7 +111,7 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
     $pri = $OD->data_set->f($fieldname);
     $col = $OD->data_set->f("contractpriority_color");
     $res["name"] = $pri;
-    $res["style"] = "style=\"color: #$col; font-family: sans-serif; font-size: 10px; background-color: #ffffff;\"";
+    $res["style"] = "style=\"color: #$col;\"";
   }
 
   return $res;

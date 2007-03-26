@@ -861,7 +861,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
         if (($tm_used + $tm_miss) > (1.10 * $tm_proj))
 	  $class = "error";
         elseif (($tm_used + $tm_miss) < (0.90 * $tm_proj))
-	  $class = "info";        
+	  $class = "ok";        
 	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
 	$dis_member .= "<td class=\"$class\">$tm_label</td>\n";
 
@@ -2194,7 +2194,7 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
 	if (($tm_used + $tm_miss) > (1.10 * $tm_proj))
           $class = "error";
         elseif (($tm_used + $tm_miss) < (0.90 * $tm_proj))
-          $class = "info";
+          $class = "ok";
 
 	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
 	$dis_member .= "<td class=\"$class\">$tm_label</td>\n";

@@ -65,7 +65,7 @@ function dis_data_incident(&$OD, $fieldname, $link_ok) {
     $pri = $OD->data_set->f($fieldname);
     $col = $OD->data_set->f("incidentpriority_color");
     $res["name"] = $pri;
-    $res["style"] = "style=\"color: #$col; font-family: sans-serif; font-size: 10px; background-color: #ffffff;\"";
+    $res["style"] = "style=\"color: #$col;\"";
   }
 
   else if ($fieldname == "incident_archive") {

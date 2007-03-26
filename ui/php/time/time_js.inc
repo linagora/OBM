@@ -84,11 +84,10 @@ function check_sel_tasktype(form) {
 function fill_tasktype(sel_tt, project_id) {
   var i, j, k;
   var tt;
-
-  for (i = 0; i < project.length; i++) {
-    for (j = 1; j < project[i].length; j++) {
-      if (project[i][j][1] == project_id) {
-        tt = project[i][0];
+  for (i in project) {
+    for (j = 0; j < project[i].length; j++) {
+      if (project[i][j]['id'] == project_id) {
+        tt = i;
       }
     }
   }
@@ -125,6 +124,9 @@ function fill_projectall(sel_list) {
   }
 }
 
+/////////////////////////////////////
+// project dynamic list generation //
+/////////////////////////////////////
 function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
   var i, j, k;
   var tt_location = -1;

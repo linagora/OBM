@@ -158,9 +158,9 @@ function dis_time_nav_date($time) {
 
     $block = "
     <h1>
-    <a href=\"$url_prev\"><img src=\"$ico_previous\" alt=\"[Previous Month]\" /></a>     
+    <a href=\"$url_prev\"><img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>     
     $title
-    <a href=\"$url_next\"><img src=\"$ico_next\" alt=\"[Next Month]\" /></a>     
+    <a href=\"$url_next\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
     </h1> 
     ";    
 

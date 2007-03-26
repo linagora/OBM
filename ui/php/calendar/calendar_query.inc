@@ -148,7 +148,9 @@ function run_query_calendar_get_allusers($users_array,$groups_array) {
       $r_array = array_merge($r_array, get_all_users_id_from_group($group_id));
     }
   }
-  $r_array = array_merge($users_array,$r_array);
+  if(is_array($users_array)) {
+    $r_array = array_merge($users_array,$r_array);
+  }
   $r_array = array_unique($r_array);
 
   return $r_array;

@@ -180,11 +180,11 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
     $datealarm = of_date_format($date);
     $time = time();
     if ($time > ($date + 86400)) {
-      $col = $col_error;
+      $col = "error";
     } else if ($time > $date) {
-      $col = $col_ok;
+      $col = "";
     }
-    $res["style"] = "style=\"color: #$col; font-family: sans-serif; font-size: 10px; background-color: #ffffff;\"";
+    $res["style"] = "class=\"$col\"";
     $res["name"] = $datealarm;
   }
 

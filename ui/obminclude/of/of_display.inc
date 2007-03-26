@@ -177,9 +177,7 @@ class OBM_DISPLAY {
       if ($cgp_hide[$entity][$fieldname]
 	  || $cgp_hide[$entity][$fieldname_base]) {
 	$td_class = "resultPrefHide";
-      } else {
-	$td_class = "resultTextC";
-      }
+      } 
       if($i%2 == 0) {
         $class = "class=\"pair\"";
       } else {
@@ -324,11 +322,8 @@ class OBM_DISPLAY {
       // If debug level Id is set, display the entity id
       if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
 	$dg_id = $this->data_set->f("id");
-	$block .= "<td class=\"resultText\">$dg_id</td>";
+	$block .= "<td>$dg_id</td>";
       }
-
-      if ($rowstyle == "")
-	$style = "class=\"resultText\"";
 
       // If a left checkbox has to be displayed
       if (($this->data_cb_side == "left") && ($this->data_cb_text != "")) {
@@ -413,23 +408,21 @@ class OBM_DISPLAY {
 	  $content = "";
 	  
 	  // Set the style
-	  if ($rowstyle != "") {
-	    $td = "<td>";
-	  } else if ($style != "") {
+	  if ($style != "") {
 	    $td = "<td $style>";
 	  } else if ($align == "center") {
-	    $td = "<td class=\"resultTextC\">";
+	    $td = "<td class=\"C\">";
 	  } else {
 	    $td = "<td>";
 	  }
 	  
 	  // Pre cell display (open popup, link)
 	  if ($popup) {
-	    $content = "<a class=\"resultText\" href=\"#\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
+	    $content = "<a href=\"#\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
 	  } else if ($window) {
-	    $content = "<a class=\"resultText\" href=\"#\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes,toolbar=yes,menubar=yes,location=yes,resizable=yes'); return false;\">";
+	    $content = "<a href=\"#\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes,toolbar=yes,menubar=yes,location=yes,resizable=yes'); return false;\">";
 	  } else if ($url != "") {
-	    $content = "<a class=\"resultText\" href=\"".url_prepare("$url")."\">";
+	    $content = "<a href=\"".url_prepare("$url")."\">";
 	  }
 	
 	  // Cell display
@@ -457,11 +450,11 @@ class OBM_DISPLAY {
 	  } else {
 	    $cb_check = "";
 	  }
-	  $block .= "<td class=\"resultText\">
+	  $block .= "<td>
             <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check /></td>";
 	}
 	else
-	  $block .= "<td class=\"resultText\">&nbsp;</td>";
+	  $block .= "<td>&nbsp;</td>";
       }
 
       reset($this->display_pref);

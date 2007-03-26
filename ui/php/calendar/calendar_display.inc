@@ -1038,14 +1038,18 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $updatable =  true;
     $ed[] = "updatable:true";
   }
-
+  
   $attendee = $event->attendee;
   if ($event->privacy == 1 && !($updatable || in_array($obm["uid"],$attendee["user"]))) {
     $title = phpStringToJsString($l_private);
     $description = $title;
+    $location = $title;
+    $category = $title;      
   } else {
     $title = phpStringToJsString($event->title);
     $description = phpStringToJsString($event->description);
+    $location = phpStringToJsString($event->location);
+    $category = phpStringToJsString($event->category1);  
   }
   $duration = $event->duration;
   $date = $occurrence->date;
@@ -1053,9 +1057,8 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $entity_id = $occurrence->id;
   $entity = $occurrence->entity;
   $all_day = $event->all_day;
-  $location = phpStringToJsString($event->location);
-  $category = phpStringToJsString($event->category1);
   $entityClass = $calendar_entity[$entity][$entity_id]["class"];
+
   $ed[] = "id:$id";
   $ed[] = "entity:'$entity'";
   $ed[] = "entity_id:$entity_id"; 
@@ -1403,13 +1406,57 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
+
+  //$writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
   $id = $event_q->f("calendarevent_id");
-  $title = $event_q->f("calendarevent_title");
-  $location = $event_q->f("calendarevent_location");
-  $cats1 = of_category_get_entitycategories("calendar", "category1", $id, "mono");
-  $priority = $event_q->f("calendarevent_priority"); 
-  $description = $event_q->f("calendarevent_description");
+  $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
   
+  if ($event_q->f("calendarevent_privacy") == 0 || 
+      $event_q->f("calendarevent_owner") == $obm["uid"] ||
+      in_array($event_q->f("calendarevent_owner"),$writable_entity["ids"])) {
+
+    $title = $event_q->f("calendarevent_title");
+    $location = $event_q->f("calendarevent_location");
+    $cats1 = of_category_get_entitycategories("calendar", "category1", $id, "mono");
+    $priority = $event_q->f("calendarevent_priority"); 
+    $description = $event_q->f("calendarevent_description");
+    $block_category1 = of_category_dis_block_consult("calendar", "category1", $cats1, "mono");
+    switch ($priority ) {
+      case 1 :
+        $priority = $l_low;
+        break;
+      case 2 :
+        $priority = $l_medium;
+        break;
+      case 3 :
+        $priority = $l_high;
+        break;
+    }  
+    $tasks = $entities["task"];
+    if (is_array($tasks["entity"])) {
+      foreach ($tasks["entity"] as $u_id => $entity) {
+        $label = $entity["label"];
+        $state = $entity["state"];
+        $dis_task_list .= "$label<br />";
+      }
+      $dis_task_block = "
+        <tr>
+          <th>$l_task :</th>
+          <td>$dis_task_list</td>
+        </tr>
+      ";
+    }
+    $display["title"] = "<div class=\"title\">$l_module_calendar : $title</div>";
+  } else {
+    $title = $l_private; 
+    $location = $l_private;
+    $priority = $l_private;
+    $description = $l_private;
+    $priority = $l_private;
+    $display["title"] = "<div class=\"title\">$l_module_calendar : $l_private</div>";
+
+  }
+
   $repeatfrequency = $event_q->f("calendarevent_repeatfrequence");
   $all_day = $event_q->f("calendarevent_allday");
   if ($all_day) {
@@ -1431,18 +1478,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     $date_exception[] = of_isodate_format($exception_q->f("calendarexception_date")); 
   }
 
-  $block_category1 = of_category_dis_block_consult("calendar", "category1", $cats1, "mono");
-  switch ($priority ) {
-    case 1 :
-      $priority = $l_low;
-      break;
-    case 2 :
-      $priority = $l_medium;
-      break;
-    case 3 :
-      $priority = $l_high;
-      break;
-  }
+
  
   $start_week_day = strtotime($ccalendar_weekstart);
   for ($i=0; $i<7; $i++) {
@@ -1475,20 +1511,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     }
   }
 
-  $tasks = $entities["task"];
-  if (is_array($tasks["entity"])) {
-    foreach ($tasks["entity"] as $u_id => $entity) {
-      $label = $entity["label"];
-      $state = $entity["state"];
-      $dis_task_list .= "$label<br />";
-    }
-    $dis_task_block = "
-      <tr>
-        <th>$l_task :</th>
-        <td>$dis_task_list</td>
-      </tr>
-    ";
-  }
 
   if ($ccalendar_resource) {
     $res = $entities["resource"];
@@ -1513,7 +1535,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     }
   }
 
-  $display["title"] = "<div class=\"title\">$l_module_calendar : $title</div>";
   // --- HTML Template --------------------------------------------------------
   $block = "
   <div class=\"detail infos\">

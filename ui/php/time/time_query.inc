@@ -941,7 +941,7 @@ function time_first_day_week($date) {
   $day = date("d", $date_int);
   $dow = date("w", $date_int);
   $obm_dow = ($dow - $c_week_first_day + 7) % 7;
-  $weekstart = mktime(0, 0, 0, $month, $day - $obm_dow, $year);
+  $weekstart = mktime(6, 0, 0, $month, $day - $obm_dow, $year);
 
   return ($weekstart); 
 }

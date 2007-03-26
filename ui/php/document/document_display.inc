@@ -298,10 +298,10 @@ function html_document_consult($doc_q) {
      <th>$l_private</th>
      <td>$privacy</td>
    </tr>
-   $block_userdata
    </table>
    </div>
 
+   $block_userdata
    <div class=\"detail infos\"> 
    <h1>$l_file</h1>
 
