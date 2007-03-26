@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0.0rc3";
+$obm_version = "2.0.0rc4";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -351,6 +351,18 @@ $section = $cgp_show["module"][$module];
 if (! $cgp_use["service"]["mail"]) {
   $cgp_use["service"]["mail_nomad"] = false;
   $cgp_use["service"]["mail_vacation"] = false;
+  $cgp_show["module"]["mailserver"] = false;
+  $cgp_show["module"]["mailforward"] = false;
+  $cgp_show["module"]["vacation"] = false;
+  $cgp_show["module"]["mailshare"] = false;
+}
+
+if (! $cgp_use["service"]["samba"]) {
+  $cgp_show["module"]["samba"] = false;
+}
+
+if ((! $cgp_use["service"]["mail"]) && (! $cgp_use["service"]["samba"])) {
+  $cgp_show["module"]["host"] = false;
 }
 
 if (! $cgp_use["service"]["web"]) {

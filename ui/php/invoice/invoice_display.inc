@@ -1377,7 +1377,7 @@ function dis_invoice_dashboard($invoice) {
   $block = "
     <form method=\"post\"  name=\"f_search\" action=\"$url_form\">
       <div class=\"detail extra\">
-       <h1>$year</h1>
+       <h1 id=\"year\">$year</h1>
        <a href=\"javascript: return false;\"
           onclick=\"yearfield=window.document.getElementById('year');
                     newyear=Number(yearfield.innerHTML)-1;
@@ -1385,8 +1385,6 @@ function dis_invoice_dashboard($invoice) {
                     document.forms.f_search.year.value=newyear;
                     return false;\">
         <img border=\"0\" src=\"$ico_previous\" alt=\"\" /></a>
-      
-      
      
         <a href=\"javascript: return false;\"
           onclick=\"yearfield=window.document.getElementById('year');
@@ -1395,7 +1393,6 @@ function dis_invoice_dashboard($invoice) {
                     document.forms.f_search.year.value=newyear;
                     return false;\">
         <img border=\"0\" src=\"$ico_next\" alt=\"\" /></a>
-      
 
       $block_tt
       &nbsp;<br />
@@ -1409,6 +1406,21 @@ function dis_invoice_dashboard($invoice) {
 
 
     <div class=\"detail extra\">
+    <h1>$l_order_no_bill ($l_amount_ht)</h1>
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr>
+      <th>$l_status</th>
+      $dis_row_head
+      <th>$l_total $year</th>
+    </tr>
+    </thead>
+    <tbody>
+    $dis_pot_row
+    </tbody>
+    </table>
+    <p>&nbsp;</p>
+
     <h1>$l_billed ($l_amount_ht)</h1>
     <table class=\"spreadSheet\">
     <thead>
@@ -1427,21 +1439,6 @@ function dis_invoice_dashboard($invoice) {
     </tbody>
     </table>
     <p>&nbsp;</p> 
-
-    <h1>$l_order_no_bill ($l_amount_ht)</h1>
-    <table class=\"spreadSheet\">
-    <thead>
-    <tr>
-      <th>$l_status</th>
-      $dis_row_head
-      <th>$l_total $year</th>
-    </tr>
-    </thead>
-    <tbody>
-    $dis_pot_row
-    </tbody>
-    </table>
-    <p>&nbsp;</p>
 
     <h1>$l_payment ($l_amount_ttc)</h1>
     <table class=\"spreadSheet\">
@@ -1463,9 +1460,9 @@ function dis_invoice_dashboard($invoice) {
     <p>&nbsp;</p>
     </div>
     
-    <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar$chart_bil_params\" alt=\"\" />
-    <br />
     <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pot_params\" alt=\"\" />
+    <br />
+    <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar$chart_bil_params\" alt=\"\" />
     <br />
     <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pay_params\" alt=\"\" />
 ";

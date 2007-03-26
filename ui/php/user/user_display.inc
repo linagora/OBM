@@ -1542,7 +1542,8 @@ function dis_user_can_delete($p_id) {
     $table = $tables[$i]["table_name"];
 
     // We exclude POSTGRES meta table (sql_xxxx)
-    if (! (substr($table, 0, 4) == "sql_")) {
+    if ((! (substr($table, 0, 4) == "sql_"))
+	&& (! (substr($table, 0, 2) == "P_"))) {
       $usercreate = $table . "_usercreate";
       $userupdate = $table . "_userupdate";
 

@@ -931,9 +931,9 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
       $ocs[$d] = $occurrence;
     }
   }
-  ksort($ocs);
 
   if (is_array($ocs)) {
+    ksort($ocs);
     foreach($ocs as $occurrence) {
 
       $event = $occurrence->event;
@@ -988,32 +988,29 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
   }
   // --- HTML Template --------------------------------------------------------
 
-  // Display the last block
-  if ($dis_events != "") {
+  $block .= "
+    <h1>
+      <a href=\"calendar_index.php?action=view_list&amp;date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+      $list_title
+      <a href=\"calendar_index.php?action=view_list&amp;date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    </h1>
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr>
+      <th>$l_title</th>
+      <th>$l_attendees</th>
+      <th>$l_location</th>
+      <th>$l_category</th>
+      <th>$l_repeat</th>
+      <th>$l_datebegin</th>
+      <th>$l_dateend</th>
+    </tr>
+    </thead>
+    <tbody>
+    $dis_events
+    </tbody>
+    </table>";
 
-    $block .= "
-      <h1>
-        <a href=\"calendar_index.php?action=view_list&amp;date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-        $list_title
-        <a href=\"calendar_index.php?action=view_list&amp;date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-      </h1>
-      <table class=\"spreadSheet\">
-      <thead>
-      <tr>
-        <th>$l_title</th>
-        <th>$l_attendees</th>
-        <th>$l_location</th>
-        <th>$l_category</th>
-        <th>$l_repeat</th>
-        <th>$l_datebegin</th>
-        <th>$l_dateend</th>
-      </tr>
-      </thead>
-      <tbody>
-      $dis_events
-      </tbody>
-      </table>";
-  }
   return $block;
 }
 

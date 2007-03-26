@@ -326,7 +326,7 @@ DROP TABLE IncidentCategory1;
 -- Update UserObm table
 ---------------------------------------------------------------------------
 -- Add existent column which had not been added
-ALTER TABLE UserObm ADD COLUMN userobm_location varchar(255);
+--ALTER TABLE UserObm ADD COLUMN userobm_location varchar(255);
 ALTER TABLE UserObm ALTER COLUMN userobm_location SET DEFAULT '';
 ALTER TABLE UserObm ADD COLUMN userobm_education varchar(255);
 ALTER TABLE UserObm ALTER COLUMN userobm_education SET DEFAULT '';

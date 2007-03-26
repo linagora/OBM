@@ -761,7 +761,6 @@ function run_query_user_unsubscribe_all_groups($p_id) {
 function run_query_user_group($uid) {
   global $cdg_sql;
 
-
   $query = "SELECT *
     FROM UGroup
     JOIN UserObm ON group_domain_id = userobm_domain_id
@@ -841,8 +840,8 @@ function get_nb_user_admin() {
   global $cdg_sql, $perms_admin;
 
   $query = "SELECT count(*)
-            FROM UserObm
-            WHERE userobm_perms='$perms_admin'";
+    FROM UserObm
+    WHERE userobm_perms='$perms_admin'";
 
   display_debug_msg($query, $cdg_sql, "get_nb_user_admin()");
   $obm_q = new DB_OBM;
