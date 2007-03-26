@@ -327,8 +327,8 @@ function process_category_list($table, $entityu, $c_q, $mode="multi", $cat_field
       $uc_into = "category_usercreate,";
       $uc_value = "'$uc',";
     }
-    $code = $c_q->f("${category}_code");
-    $label = $c_q->f("${category}_label");
+    $code = addslashes($c_q->f("${category}_code"));
+    $label = addslashes($c_q->f("${category}_label"));
 
     $nb++;
     $query = "INSERT INTO Category (
