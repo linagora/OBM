@@ -827,7 +827,8 @@ input.datePicker {
   border-right: 1px solid #aeaeae;
   border-left: 1px solid #fff;
   border-top: 1px solid #fff;
-  border-bottom: 1px solid #a0a0a0;  
+  border-bottom: 1px solid #a0a0a0; 
+  width: auto;
 }
 
 .spreadSheet thead td{
@@ -838,6 +839,7 @@ input.datePicker {
   border-left: 1px solid #fff;
   border-top: 1px solid #fff;
   border-bottom: 1px solid #b2b2b2;  
+  width: auto;
 }
 
 .spreadSheet tbody th, .spreadSheet tbody .head{
@@ -849,6 +851,7 @@ input.datePicker {
   border-left: 1px solid #fff;
   border-top: 1px solid #fff;
   border-bottom: 1px solid #c9c9c9;   
+  width: auto;
 }
 
 .spreadSheet tbody tr.highlight {
@@ -865,6 +868,7 @@ input.datePicker {
   border-bottom: 1px solid #ececec;
   border-right: 1px solid #d3d1d6;
   border-left: 1px solid #fff;
+  width: auto;
 }
 
 .spreadSheet tfoot th, .spreadSheet tfoot .head {
@@ -875,6 +879,7 @@ input.datePicker {
   border-left: 1px solid #fff;
   border-top: 1px solid #fff;
   border-bottom: 1px solid #c2c2c2;    
+  width: auto;
 }
 
 .spreadSheet tfoot td{
@@ -885,6 +890,7 @@ input.datePicker {
   border-left: 1px solid #fff;
   border-top: 1px solid #fff;
   border-bottom: 1px solid #c2c2c2;      
+  width: auto;
 }
 
 .spreadSheet colgroup.highlight, .spreadSheet col.highlight {

@@ -357,15 +357,19 @@ function html_payment_consult($p_q, $invs) {
   if (count($invs) > 0) {
     $l_invoice_title = $l_invoice;
     $block_invoice = "
-<table class=\"resultTable\">
-<tr>
-  <td class=\"resultHead\">$l_date</td>
-  <td class=\"resultHead\">$l_company</td>
-  <td class=\"resultHead\">$l_label</td>
-  <td class=\"resultHead\">$l_amount</td>
-  <td class=\"resultHead\">$l_payment : $l_amount</td>
-</tr>";
+      <table class=\"spreadSheet\">
+      <thead>
+      <tr>
+        <th>$l_date</th>
+        <th>$l_company</th>
+        <th>$l_label</th>
+        <th>$l_amount</th>
+        <th>$l_payment : $l_amount</th>
+      </tr>
+      </thead> 
+      <tbody> ";
     $affected_amount_total = 0;
+    $k = 0;
     foreach ($invs as $one_inv) {
       $id = $one_inv["id"];
       $affected_amount = $one_inv["affected_amount"];
@@ -373,25 +377,27 @@ function html_payment_consult($p_q, $invs) {
       $company = $one_inv["company"];
       $label = $one_inv["label"];
       $date = $one_inv["date"];
-      
+      $k ++;
+      ($k % 2 == 0)?$class="pair":$class="";
       $affected_amount_total += $affected_amount;
 
       $block_invoice .= "
-<tr class=\"data0\">
-  <td style=\"text-align:center;\">$date</td>
-  <td style=\"text-align:center;\">$company</td>
-  <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$id\">$label</a></td>
-  <td style=\"text-align:right;\">$inv_amount </td>
-  <td class=\"data2\" style=\"text-align:right;\">$affected_amount </td>
-</tr>";
+      <tr class=\"$class\">
+        <td>$date</td>
+        <td>$company</td>
+        <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$id\">$label</a></td>
+        <td>$inv_amount </td>
+        <td>$affected_amount </td>
+      </tr>";
     }
 
     $block_invoice .= "
-<tr class=\"data0\">
-  <td colspan=\"4\" style=\"text-align:center;\">$l_total</td>
-  <td class=\"resultHead\" style=\"text-align:right;\">$affected_amount_total</td>
-</tr>
-</table>";
+      <tr class=\"highlight\">
+        <th colspan=\"4\">$l_total</th>
+        <td>$affected_amount_total</td>
+      </tr>
+      </tbody>
+      </table>";
 
   } else {
     $l_invoice_title = $l_no_invoice;
@@ -494,17 +500,18 @@ function html_payment_invoice($amounts, $params) {
   if (count($invs) > 0) {
     $l_invoice_title = $l_invoice;
     $block_invoice = "
-<table class=\"spreadSheet\">
-<thead>
-<tr>
-  <th>$l_date</th>
-  <th>$l_company</th>
-  <th>$l_label</th>
-  <th>$l_amount</th>
-  <th>$l_already_paid</th>
-  <th>$l_payment : $l_amount</th>
-</tr>
-</thead>";
+      <table class=\"spreadSheet\">
+      <thead>
+      <tr>
+        <th>$l_date</th>
+        <th>$l_company</th>
+        <th>$l_label</th>
+        <th>$l_amount</th>
+        <th>$l_already_paid</th>
+        <th>$l_payment : $l_amount</th>
+      </tr>
+      </thead>";
+    $k = 0;
     $affected_amount_total = 0;
     foreach ($invs as $one_inv) {
       $i_id = $one_inv["id"];
@@ -521,24 +528,27 @@ function html_payment_invoice($amounts, $params) {
       $already_paid = $one_inv["alreadydate"];
       
       $affected_amount_total += $affected_amount;
-
+      $k++;
+      ($k % 2 == 0)?$class="pair":$class="";
       $block_invoice .= "
-<tr class=\"data1\">
-  <td style=\"text-align:center;\">$date</td>
-  <td style=\"text-align:center;\">$company</td>
-  <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$label</a></td>
-  <td style=\"text-align:right;\">$inv_amount </td>
-  <td style=\"text-align:right;\">$already_paid </td>
-  <td class=\"data0\" style=\"text-align:right;\"><input type=\"text\" name=\"data-inv-$i_id\" value=\"$affected_amount\" /></td>
-</tr>";
+        <tr class=\"$class\">
+          <td>$date</td>
+          <td>$company</td>
+          <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$label</a></td>
+          <td>$inv_amount </td>
+          <td>$already_paid </td>
+          <td><input type=\"text\" name=\"data-inv-$i_id\" value=\"$affected_amount\" /></td>
+        </tr>";
     }
 
+
     $block_invoice .= "
-<tr class=\"data0\">
-  <td colspan=\"5\" style=\"text-align:center;\">$l_total</td>
-  <td class=\"resultHead\" style=\"text-align:right;\">$affected_amount_total</td>
-</tr>
-</table>";
+        <tr class=\"highlight\">
+        <th colspan=\"5\">$l_total</th>
+        <td>$affected_amount_total</td>
+        </tr>
+        </tbody>
+      </table>";
 
     $dis_invoice = "
   <form method=\"post\" name=\"f_inv\" action=\"payment_index.php\">

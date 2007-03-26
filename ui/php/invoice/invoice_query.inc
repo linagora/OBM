@@ -500,8 +500,7 @@ function run_query_invoice_delete($p_id) {
 function run_query_linked_invoice_payment($p_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("paymentinvoice");
-
+  $multidomain = sql_multidomain("payment");
   $query = "SELECT distinct payment_id 
     FROM Payment
       LEFT JOIN PaymentInvoice ON payment_id=paymentinvoice_payment_id

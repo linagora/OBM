@@ -327,7 +327,7 @@ function run_query_payment_update($pid, $params) {
 function get_payment_invoices($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("paymentinvoice");
+  $multidomain = sql_multidomain("invoice");
 
   $query = "SELECT
     invoice_id,
@@ -433,12 +433,10 @@ function run_query_payment_invoice_insert($params) {
   $id = $params["payment_id"];
   $amount = $params["amount"];
   $invoice_id = $params["invoice_id"];
-  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO PaymentInvoice (
     paymentinvoice_invoice_id,
     paymentinvoice_payment_id,
-    paymentinvoice_domain_id,
     paymentinvoice_timeupdate,
     paymentinvoice_timecreate,
     paymentinvoice_userupdate,
@@ -446,7 +444,6 @@ function run_query_payment_invoice_insert($params) {
     paymentinvoice_amount)
    VALUES (
     '$invoice_id',
-    '$domain_id',
     '$id',
     null,
     '$now',
@@ -474,7 +471,6 @@ function run_query_payment_invoice_update($pid, $params) {
   $invs = $params["invoice"];
   $now = date("Y-m-d H:i:s");
   $uid = $obm["uid"];
-  $multidomain = sql_multidomain("paymentinvoice");
 	
   foreach($invs as $i_id=>$amount) {
     $query = "UPDATE PaymentInvoice SET
@@ -484,7 +480,7 @@ function run_query_payment_invoice_update($pid, $params) {
   WHERE
     paymentinvoice_payment_id='$pid'
     AND paymentinvoice_invoice_id='$i_id'
-    $multidomain";
+    ";
   
     display_debug_msg($query, $cdg_sql, "run_query_payment_invoice_update()");
     $obm_q = new DB_OBM;
@@ -696,13 +692,13 @@ function run_query_payment_delete($p_id) {
 
   $obm_q = new DB_OBM;
 
-	$multidomain_paymentinvoice = sql_multidomain("paymentinvoice");
+  $multidomain_paymentinvoice = sql_multidomain("paymentinvoice");
   $query = "DELETE FROM PaymentInvoice
     WHERE paymentinvoice_payment_id='$p_id' $multidomain_paymentinvoice";
   display_debug_msg($query, $cdg_sql, "run_query_payment_delete(invoice link)");
   $obm_q->query($query);
 
-	$multidomain = sql_multidomain("payment");
+  $multidomain = sql_multidomain("payment");
   $query = "DELETE FROM Payment WHERE payment_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_payment_delete()");
   $retour = $obm_q->query($query);

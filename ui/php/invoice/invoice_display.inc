@@ -56,7 +56,6 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("invoice_id").",'".addslashes($OD->data_set->f("invoice_label"))."');";
     } else if ($OD->display_ext == "get_id_url") {
       $ext_url = $invoice["ext_url"];
-      var_dump($ext_url);
       $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("invoice_id").");";
     } elseif($link_ok) {
       $res["url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=".$OD->data_set->f("invoice_id");
@@ -454,14 +453,18 @@ function html_invoice_consult($inv_q, $pays) {
   if (count($pays) > 0) {
     $l_payment_title = $l_list_payment;
     $block_payment = "
-<table class=\"resultTable\">
-<tr>
-  <td class=\"resultHead\">$l_date</td>
-  <td class=\"resultHead\">$l_company</td>
-  <td class=\"resultHead\">$l_number</td>
-  <td class=\"resultHead\">$l_amount</td>
-  <td class=\"resultHead\">$l_invoice : $l_amount</td>
-</tr>";
+      <table class=\"spreadSheet\">
+      <thead>
+      <tr>
+        <th>$l_date</th>
+        <th>$l_company</th>
+        <th>$l_number</th>
+        <th>$l_amount</th>
+        <th>$l_invoice : $l_amount</th>
+      </tr>
+      </thead>
+      <tbody>";
+    $k = 0;
     $affected_amount_total = 0;
     foreach ($pays as $one_pay) {
       $id = $one_pay["invoice_id"];
@@ -470,25 +473,27 @@ function html_invoice_consult($inv_q, $pays) {
       $company = $one_pay["company"];
       $number = $one_pay["number"];
       $date = $one_pay["date"];
-      
+      $k ++;
+      ($k % 2 == 0)?$class="pair":$class=""; 
       $affected_amount_total += $affected_amount;
-
+      
       $block_payment .= "
-<tr class=\"data0\">
-  <td style=\"text-align:center;\"><a href=\"$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id\">$date</a></td>
-  <td style=\"text-align:center;\">$company</td>
-  <td><a href=\"$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id\">$number</a></td>
-  <td style=\"text-align:right;\">$amount </td>
-  <td class=\"data2\" style=\"text-align:right;\">$affected_amount </td>
-</tr>";
+        <tr class=\"$class\">
+        <td><a href=\"$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id\">$date</a></td>
+        <td>$company</td>
+        <td><a href=\"$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id\">$number</a></td>
+        <td>$amount </td>
+        <td>$affected_amount </td>
+      </tr>";
     }
 
     $block_payment .= "
-<tr class=\"data0\">
-  <td colspan=\"4\" style=\"text-align:center;\">$l_total</td>
-  <td class=\"resultHead\" style=\"text-align:right;\">$affected_amount_total</td>
-</tr>
-</table>";
+      <tr class=\"highlight\">
+        <th colspan=\"4\">$l_total</th>
+        <td>$affected_amount_total</td>
+      </tr>
+      </tbody>
+    </table>";
 
   } else {
     $l_payment_title = $l_no_payment;
