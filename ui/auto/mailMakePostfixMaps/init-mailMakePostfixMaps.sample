@@ -30,19 +30,13 @@ case "$1" in
             echo "failed."
         fi
         ;;
-    reload)
-        if [ -e $daemon_pid ]; then
-            kill -HUP `cat $daemon_pid`
-        else
-            echo "Le serveur n'est pas en cours d'execution"
-        fi
         ;;
     restart)
         $0 stop
         $0 start
         ;;
     *)
-        echo "Usage : $0 start|stop|reload|restart"
+        echo "Usage : $0 start|stop|restart"
         ;;
 esac
 

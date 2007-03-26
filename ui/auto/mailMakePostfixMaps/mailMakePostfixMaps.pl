@@ -143,7 +143,6 @@ sub configure_hook {
 
     # Securisation du service
     $self->{server}->{commandline}->[0] = $Bin."/".$self->{server}->{name}.".pl";
-
 }
 
 sub pre_loop_hook {
