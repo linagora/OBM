@@ -274,12 +274,15 @@ function html_invoice_search_form($invoice, $sta, $tts) {
     <label>$l_inout<br />
       <input type=\"radio\" name=\"rd_inout\" value=\"$c_all\" $rb_both />
       $l_both &nbsp;
+    </label>
+    <label><br />
       <input type=\"radio\" name=\"rd_inout\" value=\"+\" $rb_client />
       $l_client &nbsp;
+    </label>
+    <label><br />
       <input type=\"radio\" name=\"rd_inout\" value=\"-\" $rb_four />
       $l_supplier &nbsp;
     </label>
-
     $block_tt
 
     <label>$l_company<br />

@@ -124,8 +124,12 @@ function html_payment_search_form($params, $kinds, $accs) {
 
   $rd_inout = "
     <input type=\"radio\" name=\"rd_inout\" value=\"$c_all\" $bcheck />$l_both &nbsp;
+    </label>
+    <label><br />
     <input type=\"radio\" name=\"rd_inout\" value=\"+\" $pcheck />(+) $l_received &nbsp;
+    </label><label><br />
     <input type=\"radio\" name=\"rd_inout\" value=\"-\" $mcheck />(-) $l_emitted &nbsp;
+    </label>
     ";
 
   // Account select
