@@ -1,26 +1,26 @@
 # Adresse du serveur LDAP referent
-ldap_server         aliamin.aliamin.local
+ldap_server         nom.server.ldap
 
 # Options communement modifiees
-log_level           4   # de 0 a 4
-log_file            /var/log/aliamin/mailMakePostfix.log
-pid_file            /var/run/aliamin/mailMakePostfix.pid
+log_level           0                                       # de 0 a 4 - 0 par defaut
+log_file            /var/log/aliamin/mailMakePostfix.log    # /var/log/aliamin/mailMakePostfix.log par defaut
+pid_file            /var/run/aliamin/mailMakePostfix.pid    # /var/run/aliamin/mailMakePostfix.pid par defaut
 
 # IP ayant droit de se connecter
-cidr_allow          10.0.0.100/32
+cidr_allow          127.0.0.1/32                        # Vide par defaut
 
 # Attention a la modifications de ces options
-max_badrequest      2
-user                postfix     # valeur par defaut
-group               postfix     # valeur par defaut
+max_badrequest      2                                   # 2 par defaut
+user                postfix                             # postfix par defaut
+group               postfix                             # postfix par defaut
 
 postmap_cmd         /usr/sbin/postmap
 # Le nom des map postfix
 process_mailbox     1                                   # 1 ou 0 - 1 par defaut
-mailbox_map         /etc/postfix/virtual_mailbox        # valeur par defaut
+mailbox_map         /etc/postfix/virtual_mailbox        # /etc/postfix/virtual_mailbox par defaut
 process_alias       1                                   # 1 ou 0 - 1 par defaut
-alias_map           /etc/postfix/virtual_alias          # valeur par defaut
+alias_map           /etc/postfix/virtual_alias          # /etc/postfix/virtual_alias par defaut
 process_transport   1                                   # 1 ou 0 - 1 par defaut
-transport_map       /etc/postfix/transport              # valeur par defaut
+transport_map       /etc/postfix/transport              # /etc/postfix/transport par defaut
 process_domain      1                                   # 1 ou 0 - 1 par defaut
-domain_map          /etc/postfix/virtual_domains        # valeur par defaut
+domain_map          /etc/postfix/virtual_domains        # /etc/postfix/virtual_domains par defaut
