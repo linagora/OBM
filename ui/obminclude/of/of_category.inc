@@ -1877,7 +1877,7 @@ function of_category_user_dis_search_select($cat, $cats, $cat_id, $first_element
   $block_cat = "
     <label>${$l_cat}<br />
       $sel_cat
-    </label";
+    </label>";
 
   return $block_cat;
 }
