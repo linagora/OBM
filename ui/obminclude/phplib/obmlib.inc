@@ -195,15 +195,15 @@ class OBM_Challenge_Auth extends Auth {
       $perm = $this->db->f("userobm_perms");
       $pass = $this->db->f("userobm_password");
       // This trim for a strange behaviour while testing oea db
-      $crypt = trim(strtolower($this->db->f("userobm_password_type")));
+      $crypt = trim(strtoupper($this->db->f("userobm_password_type")));
       $domain_id = $this->db->f("userobm_domain_id");
     }
 
     switch($crypt) {
-      case "md5": 
+      case "MD5": 
         $encrypted = md5($password);
         break;
-      case "crypt":
+      case "CRYPT":
         $encrypted = crypt($password,$pass);
         break;
       default:

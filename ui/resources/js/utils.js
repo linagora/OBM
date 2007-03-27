@@ -109,7 +109,8 @@ HideTimer = new Class({
   setOptions: function(options) {
     this.options = Object.extend({
       duration: 1000,
-      fn: this.hideElement
+      fn: this.hideElement,
+      elems: null
     }, options || {});
 
   },
@@ -118,6 +119,12 @@ HideTimer = new Class({
     this.setOptions(options);
     this.el = $(el);
     this.timer = null;
+    if(this.options.elems.length > 0) {
+      this.options.elems.each(function (element) {
+        element.addEvent('mouseover',this.clearTimer.bind(this));
+        element.addEvent('mouseout',this.initTimer.bind(this));
+      }.bind(this));
+    }
     this.el.addEvent('mouseover',this.clearTimer.bind(this));
     this.el.addEvent('mouseout',this.initTimer.bind(this));
   },

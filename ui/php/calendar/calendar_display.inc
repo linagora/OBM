@@ -1248,8 +1248,9 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
   </table>
   <script type=\"text/javascript\">
     function toggleInfo(container,id) {
-      resource = \$(id);
-      if(resource) 
+      var resource = \$(id);
+      var container = \$(container);
+      if(resource) {
         if(resource.getStyle('display') == 'block') {
           resource.setStyle('display','none');       
         } else {
@@ -1257,6 +1258,7 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
           resource.setStyle('top',(container.getTop()+container.offsetHeight)+'px')   
           resource.setStyle('display','block');
         }
+      } 
     }
   </script>  
   $hidden_div
@@ -2803,6 +2805,7 @@ function dis_calendar_free_interval($calendar, $entity_store) {
   <script type=\"text/javascript\">
     function toggleResource(container,time) {
       resource = \$('resource-'+time);
+      container = \$(container);
       if(resource) 
         if(resource.getStyle('display') == 'block')
           resource.setStyle('display','none');
@@ -3113,6 +3116,7 @@ function json_event_data($id,$calendar) {
   if(is_array($attendee)) { 
     foreach ($attendee as $att_entity => $att_entities) {
       $label_entity = phpStringToJsString(${"l_$att_entity"});
+      $ent = array();
       foreach($att_entities as $at) {
         $ent[] = phpStringToJsString($at);
       }
@@ -3160,7 +3164,6 @@ function json_event_data($id,$calendar) {
   if(!$day) {
     $updatable[] = "resizable:'true'"; 
   }
-
   foreach ($calendar_entity as $entity => $data) {
     foreach ($data as $entity_id => $entity_data) {
       if($entities[$entity]["entity"][$entity_id]) {
@@ -3170,7 +3173,7 @@ function json_event_data($id,$calendar) {
         $info[] = "entity_id:$entity_id";
         $info[] = "klass:'".$entity_data["class"]."'";
         $info[] = "state:'".$entities[$entity]["entity"][$entity_id]["state"]."'";
-        if($entity_id = $obm["uid"] && $entity = 'user') {
+        if($entity_id = $obm["uid"] && $entity == 'user') {
           $opt = array_merge($opt,$updatable);
         }
         if($json != '') {

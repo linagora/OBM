@@ -50,9 +50,9 @@ function run_query_password_update($password, $uid, $usr_q) {
   $old_pass = trim($password["old_password"]);
   $new_pass = trim($password["new_password"]);
 
-  if ($password_encryption == "crypt") {
+  if ($password_encryption == "CRYPT") {
     $new_passwd_crypt = crypt($new_pass);
-  } else if ($password_encryption == "md5") {
+  } else if ($password_encryption == "MD5") {
     $new_passwd_crypt = md5($new_pass);
   } else {
     $new_passwd_crypt = $new_pass;

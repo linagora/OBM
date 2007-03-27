@@ -15,14 +15,20 @@ Obm.Menu = new Class({
 
   addItem: function(item) {
     var slide = new Fx.Slide(item +'-items', {duration: 150,onComplete:this.menuListBoxFix});
-    sectionItem = $(item +'-items-wrapper');
-    sectionBlock = $(item);
+    var sectionItem = $(item +'-items-wrapper');
+    var sectionBlock = $(item);
     sectionItem.style.top = sectionBlock.getTop() + sectionBlock.offsetHeight + 'px';
     sectionItem.style.left = sectionBlock.getLeft() + 'px';
 
     slide.hide();
     sectionItem.style.display = 'block';
-    slide.hiddingTimer = new HideTimer(slide.element,{fn:slide.toggle.bind(slide)});
+    var chain = new Chain();
+    slide.boxFix = this.menuListBoxFix.bind(slide);
+    slide.xHide = function () {
+      this.hide();
+      this.boxFix(this.element);
+    }
+    slide.hiddingTimer = new HideTimer(slide.element,{fn:slide.xHide.bind(slide),elems:[sectionBlock]});
 
     this.menuItems[item] = slide;
     sectionBlock.addEvent('click', function(e){
@@ -46,12 +52,9 @@ Obm.Menu = new Class({
   },
 
   hideMenuBut: function(exception) {
-    var t = this.menuItems[exception].hiddingTimer;
-    t.toggleTimer.bind(t).delay(1);
     for(var i in this.menuItems) {
       if(exception != i) {
         this.menuItems[i].hide();
-        this.menuItems[i].hiddingTimer.clearTimer();
       }
     }
   },
@@ -61,7 +64,7 @@ Obm.Menu = new Class({
       this.menuItems[i].hide();
     }
   },
-
+  
   menuListBoxFix: function(element) {
     if (this.wrapper['offset'+this.layout.capitalize()] > 0) {
       overListBoxFix(element,'block');

@@ -1071,7 +1071,7 @@ table.planning {
 }
 table.planning th{
   white-space: nowrap;
-  font-size: 70%;
+  font-size: 100%;
   text-align: center;
   padding-right: 2px;
   background-color: white;
@@ -1086,14 +1086,14 @@ table.planning colgroup.total {
 }
 
 table.planning div {
-  height: 20px;
+  height: 2em;
 }
 
 table.planning td {
   border: 1px solid blue;
-  width: 20px;
-  height: 20px;
-  font-size: 70%;
+  width: 2.5em;
+  height: 2em;
+  font-size: 90%;
   text-align: left;
 }
 
@@ -1106,7 +1106,7 @@ table.planning thead {
 }
 
 table.planning thead td{
-  font-size: 70%;
+  font-size: 90%;
 }
   
 table.planning thead th {

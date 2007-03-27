@@ -206,9 +206,9 @@ function run_query_user_insert($user) {
   $login = $user["login"];
   $passwd = $user["passwd"];
   if ($passwd != "") {
-    if ($password_encryption == "crypt") {
+    if ($password_encryption == "CRYPT") {
       $passwd_crypt = crypt($passwd);
-    } else if ($password_encryption == "md5") {
+    } else if ($password_encryption == "MD5") {
       $passwd_crypt = md5($passwd);
     } else {
       $passwd_crypt = $passwd;
@@ -514,9 +514,9 @@ function run_query_user_update($p_id, $user) {
 
   $passwd = $user["passwd"];
   if ($passwd != "") {
-    if ($password_encryption == "crypt") {
+    if ($password_encryption == "CRYPT") {
       $passwd_crypt = crypt($passwd);
-    } else if ($password_encryption == "md5") {
+    } else if ($password_encryption == "MD5") {
       $passwd_crypt = md5($passwd);
     } else {
       $passwd_crypt = $passwd;

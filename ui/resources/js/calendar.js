@@ -173,7 +173,7 @@ Obm.CalendarDayEvent = new Class({
   setSize: function(size) {
     this.size = size + this.hidden;
     if(obm.calendarManager.lock()) {
-      this.setWidth(this.size * obm.calendarManager.defaultWidth);
+      this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
       if(this.drag) {
         this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;
       }
@@ -187,7 +187,7 @@ Obm.CalendarDayEvent = new Class({
       'top':  hr.getTop() + hr.getStyle('padding-top').toInt() + 'px',
       'left': hr.getLeft() + 'px'
     });
-    this.setWidth(this.size * obm.calendarManager.defaultWidth);
+    this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
     if(this.options.draggable) {
       this.drag.options.xMin = this.options.context.left;
       this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;

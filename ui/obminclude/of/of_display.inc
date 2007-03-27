@@ -527,30 +527,24 @@ class OBM_DISPLAY {
 
     $export_url = "$path/exportcsv/exportcsv_index.php";
     $content = "<div>
-    <form style=\"display: inline;\" method=\"post\" action=\"$export_url\">
-      <input type=\"hidden\" name=\"action\" value=\"export_page\" />
-      <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
-      <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
-      <input type=\"hidden\" name=\"entity\" value=\"$this_entity\" />
-      <input type=\"hidden\" name=\"first_row\" value=\"$first_row\" />
-      <input type=\"hidden\" name=\"nb_rows\" value=\"$set_rows\" />
-      <input type=\"hidden\" name=\"query\" value=\"$query\" />
-      <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
-      <a href='#' onclick='this.parentNode.submit();return false;'>$l_export</a>
-    </form>   
-      
-    <form style=\"display: inline;\" method=\"post\" action=\"$export_url\">
-      <input type=\"hidden\" name=\"action\" value=\"export_page\" />
-      <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
-      <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
-      <input type=\"hidden\" name=\"entity\" value=\"$this_entity\" />
-      <input type=\"hidden\" name=\"first_row\" value=\"0\" />
-      <input type=\"hidden\" name=\"nb_rows\" value=\"$nb_rows\" />
-      <input type=\"hidden\" name=\"query\" value=\"$query\" />
-      <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
-      <a href='#' onclick='this.parentNode.submit();return false;'>$l_export_all</a>
-    </form>   
-      
+      <script type=\"text/javascript\">
+        function exportResultSet(firstRow,nbRows) {
+          form = new Object();
+          form.action = 'export_page';
+          form.call_module = '$module';
+          form.of_display_name = '$this_name';
+          form.entity = '$this_entity';
+          form.first_row = firstRow;
+          form.nb_rows = nbRows;
+          form.query = '".phpStringToJsString($query)."';
+          form.func_data = '$dis_data_entity';
+          window.location.href = '$export_url?' + Object.toQueryString(form);
+          return false;
+        }
+      </script>
+    <a href=\"#\" onclick=\"return exportResultSet('$first_row','$set_rows');\" >$l_export</a>      
+    <a href=\"#\" onclick=\"return exportResultSet('0','$nb_rows');\" >$l_export_all</a>   
+            
       $l_entries # $nb_rows | $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
 
     // Rewind to 1st page
