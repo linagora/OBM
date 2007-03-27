@@ -30,13 +30,21 @@ case "$1" in
             echo "failed."
         fi
         ;;
+    reload)
+        echo -n "Reload mailMakePostfixMaps : "
+        if [ -e $daemon_pid ]; then
+            kill -HUP `cat $daemon_pid`
+            echo "done."
+        else
+            echo "failed."
+        fi
         ;;
     restart)
         $0 stop
         $0 start
         ;;
     *)
-        echo "Usage : $0 start|stop|restart"
+        echo "Usage : $0 start|stop|reload|restart"
         ;;
 esac
 

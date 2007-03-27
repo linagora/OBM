@@ -143,6 +143,28 @@ sub configure_hook {
 
     # Securisation du service
     $self->{server}->{commandline}->[0] = $Bin."/".$self->{server}->{name}.".pl";
+
+    for( my $i=0; $i<=$#{$self->commandline}; $i++ ) {
+        print $self->commandline->[$i]."\n";
+
+        my $perlOpt = "^(-w -T)\$";
+        if( $self->commandline->[$i] =~ /$perlOpt/ ) {
+            $self->commandline->[$i] = $1;
+        }
+
+        my $regexpPath = "^(\/[\-_\.\/A-Za-z0-9]*\/".$self->{server}->{name}."\.pl)\$";
+        if( $self->commandline->[$i] =~ /$regexpPath/ ) {
+            $self->commandline->[$i] = $1;
+        }
+
+        if( is_tainted($self->commandline->[$i]) ) {
+            print "tainted\n";
+        }
+    }
+}
+
+sub is_tainted {
+        return ! eval { eval("#" . substr(join("", @_), 0, 0)); 1 };
 }
 
 sub pre_loop_hook {
