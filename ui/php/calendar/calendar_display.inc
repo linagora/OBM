@@ -676,13 +676,15 @@ function dis_calendar_month_planning($calendar, $calendar_entity,$writable_entit
     obm.vars.images.resize = '$ico_resize';
     obm.vars.images.periodic = '$ico_periodic';
     obm.vars.images.meeting = '$ico_meeting';
-    obm.calendarManager = new Obm.CalendarManager($start_time);
-    obm.calendarManager.lock();
-  </script>
-  $dis_event
-  <script type=\"text/javascript\">
-    obm.calendarManager.unlock();
-    obm.calendarManager.resizeWindow();
+    showWaitingPanel('calendarBody');
+    obm.initialize.chain(function () {
+      obm.calendarManager = new Obm.CalendarManager($start_time);
+      obm.calendarManager.lock();
+      $dis_event
+      obm.calendarManager.unlock();
+      obm.calendarManager.resizeWindow();
+      discardWaitingPanel();
+    });
   </script>";
 
   return $block;
@@ -791,13 +793,13 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
     obm.vars.images.periodic = '$ico_periodic';
     obm.vars.images.meeting = '$ico_meeting';
     obm.vars.consts.timeUnit = $time_unit_sec;
-    obm.calendarManager = new Obm.CalendarManager($start_week_time);
-    obm.calendarManager.lock();
-  </script>
-  $dis_event
-  <script type=\"text/javascript\">
-    obm.calendarManager.unlock();
-    obm.calendarManager.resizeWindow();
+    obm.initialize.chain(function () {
+      obm.calendarManager = new Obm.CalendarManager($start_week_time);
+      obm.calendarManager.lock();
+      $dis_event
+      obm.calendarManager.unlock();
+      obm.calendarManager.resizeWindow();
+    });
   </script>";
   return $block;
 }
@@ -883,13 +885,13 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
     obm.vars.images.periodic = '$ico_periodic';
     obm.vars.images.meeting = '$ico_meeting';
     obm.vars.consts.timeUnit = $time_unit_sec;
-    obm.calendarManager = new Obm.CalendarManager($start_time);
-    obm.calendarManager.lock()
-  </script>
-  $dis_event
-  <script type=\"text/javascript\">
-    obm.calendarManager.unlock();
-    obm.calendarManager.resizeWindow();
+    obm.initialize.chain(function () {
+      obm.calendarManager = new Obm.CalendarManager($start_time);
+      obm.calendarManager.lock()
+      $dis_event
+      obm.calendarManager.unlock();
+      obm.calendarManager.resizeWindow();
+    });
   </script>";
 
   return $block;
@@ -1070,6 +1072,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   
   foreach ($attendee as $entity => $entities) {
     $label_entity = phpStringToJsString(${"l_$entity"});
+    $ent = array();
     foreach($entities as $at) {
       $ent[] = phpStringToJsString($at);
     }
@@ -1115,14 +1118,12 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $event_data =  "{".implode(',',$ed)."}";
   if($day) {
     $display_events = "        
-      <script type=\"text/javascript\">
         obm.calendarManager.newDayEvent($event_data,$opt);
-      </script>";
+      ";
   } else {
     $display_events = "
-      <script type=\"text/javascript\">
         obm.calendarManager.newEvent($event_data,$opt);
-      </script>";
+      ";
   }
   return $display_events;
 } 

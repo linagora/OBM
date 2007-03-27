@@ -35,7 +35,7 @@ Obm.CalendarDayEvent = new Class({
       xMin: this.options.context.left,
       xMax: this.options.context.right - obm.calendarManager.defaultWidth,
       yMin: this.options.context.top,
-      yMax: this.options.context.bottom - this.element.offsetHeight,
+      yMax: this.options.context.bottom,
 
       onSnap:function() {
         obm.calendarManager.lock();
@@ -138,18 +138,29 @@ Obm.CalendarDayEvent = new Class({
     if(obm.calendarManager.lock()) {
       this.redraw();
       obm.calendarManager.unlock();
-    }
-    var thead = $(hr.parentNode).getFirst();
-    var size = 0;
-    do {
-      if(thead.childNodes.length > size) size = thead.childNodes.length;
-    } while(thead = thead.getNext());
-    size = size * this.element.offsetHeight + 5;
-    if(hr.parentNode.offsetHeight != size) {
-      hr.parentNode.setStyle('height', size + 'px');    
-      obm.calendarManager.resizeWindow();
+      if(this.resizeLine()) {
+        obm.calendarManager.resizeWindow();
+      }      
     }
     return true;
+  },
+
+  resizeLine: function(lineElem) {
+      if(!$(lineElem)) {
+        var hr = $(this.options.type + '-' + this.origin);
+        var lineElem = hr.parentNode;
+      }
+      var thead = $(lineElem).getFirst();
+      var size = 0;
+      do {
+        if(thead.childNodes.length > size) size = thead.childNodes.length;
+      } while(thead = thead.getNext());
+      size = size * this.element.offsetHeight + 5;
+      if(hr.parentNode.offsetHeight != size) {
+        hr.parentNode.setStyle('height', size + 'px');    
+        return true
+      }        
+      return false;
   },
 
   setDuration: function(duration) {
@@ -161,9 +172,12 @@ Obm.CalendarDayEvent = new Class({
 
   setSize: function(size) {
     this.size = size + this.hidden;
-    this.setWidth(this.size * obm.calendarManager.defaultWidth);
-    if(this.drag) {
-      this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;
+    if(obm.calendarManager.lock()) {
+      this.setWidth(this.size * obm.calendarManager.defaultWidth);
+      if(this.drag) {
+        this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;
+      }
+      obm.calendarManager.unlock();
     }
   },
 
@@ -179,7 +193,7 @@ Obm.CalendarDayEvent = new Class({
       this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;
       this.drag.options.yMin = this.options.context.top;
       this.drag.options.yMax = this.options.context.bottom - this.element.offsetHeight;
-    }
+    }    
   },
 
   setWidth: function(width) {
@@ -272,18 +286,20 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
 
   setSize: function(size) {
     this.size = size;
-    height = size * obm.calendarManager.defaultHeight;
-    this.setHeight(height);
-    if(this.resize) {
-      this.resize.options.yMax = this.options.context.bottom - this.element.getTop();
-    }
-    if(this.drag) {
-      this.drag.options.yMax = this.options.context.bottom - this.element.offsetHeight;
+    if(obm.calendarManager.lock()) {  
+      height = size * obm.calendarManager.defaultHeight;
+      this.setHeight(height);
+      if(this.resize) {
+        this.resize.options.yMax = this.options.context.bottom - this.element.getTop();
+      }
+      if(this.drag) {
+        this.drag.options.yMax = this.options.context.bottom - this.element.offsetHeight;
+      }
+      obm.calendarManager.unlock();
     }
   },
 
   setHeight: function(height) {
-    var wkx = height;
     if((this.element.getTop() + height) > this.options.context.bottom) {
       height = this.options.context.bottom - this.element.getTop();
     }
@@ -296,7 +312,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
       xMin: obm.calendarManager.defaultWidth,
       xMax: obm.calendarManager.defaultWidth,
       yMin: obm.calendarManager.defaultHeight,
-      yMax: this.options.context.bottom - this.element.getTop(),
+      yMax: this.options.context.bottom ,
 
       onStart:function() {
         obm.calendarManager.lock();
@@ -350,6 +366,10 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     } else {
       return false;
     }
+  },
+
+  resizeLine: function(lineElem) {
+    return false;
   },
 
   redraw: function() {
@@ -422,7 +442,7 @@ Obm.CalendarManager = new Class({
     this.defaultWidth = this.evidence.clientWidth;
     this.defaultHeight = this.evidence.offsetHeight; 
   },
-
+  
   lock: function() {
     if(!this.redrawLock)
       return (this.redrawLock = true);
@@ -470,6 +490,10 @@ Obm.CalendarManager = new Class({
       
       this.defaultWidth = this.evidence.clientWidth;
       this.defaultHeight = this.evidence.offsetHeight;    
+
+      this.events.each(function(key,evt) {
+        evt.resizeLine(); 
+      });
 
       this.events.each(function(key,evt) {
         evt.redraw(); 

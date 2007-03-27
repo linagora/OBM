@@ -253,3 +253,25 @@ function overListBoxFix(overObject, forceDisplay) {
   }
 
 }
+
+function showWaitingPanel(el) {
+  return false; 
+  el = $(el);
+  obm.waitingPanel = new Element('div')
+                      .setStyles({
+                          'backgroundColor' : 'gray',
+                          'opacity' : '0.5',
+                          'position' : 'absolute',
+                          'left' : el.getLeft() + 'px',
+                          'top' : el.getTop() + 'px',
+                          'height' : el.offsetHeight + 'px',
+                          'width' : el.offsetWidth + 'px'})
+                        .injectInside(document.body)
+                        .adopt(new Element('img').setProperty('src',''));
+}
+
+function discardWaitingPanel() {;
+  if(obm.waitingPanel) {
+    obm.waitingPanel.remove();
+  }
+}
