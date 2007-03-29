@@ -11,10 +11,6 @@
 $l_ip = "IP";
 $l_smb = "Windows";
 $l_smb_only = "Windows seul.";
-$l_creator = "Créateur";
-$l_date_creation = "Création";
-$l_updater = "Mise à jour par" ;
-$l_date_last_update = "Mise à jour" ;
 $l_host_select_user = "Choix de l'utilisateur de la machine";
 $l_user = "Utilisateur";
 $l_web = "Accès Web";
@@ -33,6 +29,7 @@ $l_mailserver = "Serveur de mail";
 // Labels et textes
 $l_host_display = "Options d'affichage des listes d'hôtes";
 $l_consult_web_list = "Consulter la liste d'url";
+
 // Actions
 $l_clear = "Rompre l'association";
 

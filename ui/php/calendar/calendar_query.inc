@@ -233,7 +233,7 @@ function run_query_calendar_waiting_events() {
   $uid = $obm["uid"];
   
   $multidomain = sql_multidomain("calendarevent");
-  $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
+  $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write", "", "userobm");
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat"); 
@@ -310,7 +310,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
   global $l_add_event_mail_head,$l_add_event_mail_subject;
   global $ccalendar_resource_admin, $l_resource_allocated;
 
-  $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
+  $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
   $mail  = $calendar["mail"];
   $groups = $sel_entity_id["group"];
   $mail_title = stripslashes($calendar["title"]);
@@ -772,7 +772,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
   $groups = $calendar["group"];
   $mail = $calendar["mail"];
   $mail_title = stripslashes($calendar["title"]);
-  $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
+  $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
 
   if($calendar["task_new_id"]) $task_id = $calendar["task_new_id"]; 
   else $task_id = $calendar["task_id"];
@@ -997,7 +997,7 @@ function run_query_calendar_quick_event_update($calendar) {
 function run_query_calendar_quick_event_insert($calendar, $sel_entity_id) {
   global $cdg_sql, $obm;
 
-  $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
+  $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
   $now = date("Y-m-d H:i:s");
   $title = $calendar["title"];
   $datebegin = $calendar["date_begin"];
@@ -1290,7 +1290,7 @@ function get_calendar_user_readable() {
        && ($calendar["entity"]["group_view"] != $c_all) ) {
     $gusers = get_all_users_id_from_group($calendar["entity"]["group_view"]);
   }
-  $entity = of_right_entity_for_consumer("calendar", "user", $uid, "read", $gusers);
+  $entity = of_right_entity_for_consumer("calendar", "user", $uid, "read", $gusers, "userobm");
 
   // Add the user own calendar
   $entity["ids"][] = $uid;

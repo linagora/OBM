@@ -16,6 +16,16 @@ $l_validate = "Valida";
 $l_execute = "Esegui azione";
 $l_confirm = "Conferma azione";
 $l_add = "Aggiungi";
+$l_home = "Casa";
+$l_entity_right = "Manage rights for";
+$l_read_permission = "Leggi gestione accessi";
+$l_write_permission = "Scrivi gestione accessi";
+$l_right_validate = "Validate Rights";
+$l_right_update_ok = "New rights OK";
+$l_creator = "Creatore";
+$l_date_creation = "Creazione";
+$l_updater = "Aggiornato da ";
+$l_date_last_update = "Ultima modifica";
 
 // Common messages
 $l_yes = "Si";
@@ -50,6 +60,8 @@ $l_text = "Texto";
 $l_name = "Nome";
 $l_label = "Etichetta";
 $l_number = "Numero";
+$l_email = "E-mail";
+$l_quota = "Quota";
 $l_invalid_data = "Dati non valida";
 $l_insert_ok = "Inserimento OK";
 $l_insert_error = "Inserimento fallito!";

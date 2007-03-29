@@ -31,7 +31,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") 
   $sel_entity_id["group_view"] = $group_view;
 
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
-  $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
+  $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
   $display["features"] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable);
   $block = "<div id=\"ajaxMessage\" style=\"height:4em;position:absolute;\"></div>";
   if ($p_view == "year") {
@@ -1406,10 +1406,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
-
-  //$writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
   $id = $event_q->f("calendarevent_id");
-  $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
+  $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
   
   if ($event_q->f("calendarevent_privacy") == 0 || 
       $event_q->f("calendarevent_owner") == $obm["uid"] ||
@@ -2828,7 +2826,6 @@ function dis_calendar_free_interval($calendar, $entity_store) {
  * Display calendar rights admin form
  *
  * @param mixed $id calendar(user) id to admin
- * @access public
  * @return mixed xhtml display
  */
 function dis_calendar_right_dis_admin($id="") {
@@ -2840,7 +2837,7 @@ function dis_calendar_right_dis_admin($id="") {
   $infos = get_user_info($id);
   $name = $infos["firstname"] . " " . $infos["lastname"];
   $display["title"] = "<h1 class=\"title\">$l_calendar : $name</h1>";
-  $block = of_right_dis_admin("calendar", $id);
+  $block = of_right_dis_admin("calendar", $id, "userobm");
 
   return $block;
 }

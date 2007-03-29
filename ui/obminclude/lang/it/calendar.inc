@@ -100,15 +100,13 @@ $l_conflicts			= "sono stati trovati conflitti";
 $l_user				= "utente";
 $l_confirm_delete		= "questa operazione elimina i legami dell&#039;evento.confermi?";
 $l_confirm_mail			= "conferma+forza norifica";
-$l_confirm			="conferma";
-$l_cancel			="elimina";
+$l_confirm			= "conferma";
+$l_cancel			= "elimina";
 $l_user_right			= "gestisci i diritti per";
-$l_read_permission		= "leggi gestione accessi";
 $l_denie_list			= "persone non autorizzate";
 $l_authorize_list		= "persone autorizzate";
 $l_deny				= "nega";
 $l_authorize			= "autorizza";
-$l_write_permission		= "scrivi gestione accessi";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $mj_fill_title_event = "\\n Scegli un titolo per l'appuntamento.";

@@ -264,6 +264,7 @@ $cgp_show["module"]["settings"] = "my";
 $cgp_show["module"]["password"] = "my";
 $cgp_show["module"]["mailforward"] = "my";
 $cgp_show["module"]["vacation"] = "my";
+$cgp_show["module"]["mailbox"] = "my";
 
 // Display domain module only when multidomain is activate
 if ($c_multidomain) {
@@ -355,6 +356,7 @@ if (! $cgp_use["service"]["mail"]) {
   $cgp_show["module"]["mailforward"] = false;
   $cgp_show["module"]["vacation"] = false;
   $cgp_show["module"]["mailshare"] = false;
+  $cgp_show["module"]["mailbox"] = false;
 }
 
 if (! $cgp_use["service"]["samba"]) {

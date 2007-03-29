@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. 2.0 ChangeLog</h1>
-version 2.0.0 - 2007-03-27
+version 2.0.0 - 2007-03-30
 <p>
 </center>
 
@@ -32,14 +32,12 @@ To do
 - calendarcategory1 => calendarcategory : partout (code + lang + bd) [pas urgent]
 - publication : category de contact en dur (pourrait etre generique sur toutes)
 
-- implementer tableau de bord
 - displaypref : group_user, group_group encore actualite ?
 - traiter les email des users 1.2->2.0 le "@" + dans affichage (mailshare,...)
 - verifier traitement des email dans group
 - impossible d'afficher le contenu de la session (set_debug => erreur)
-- verifier activation des services -> impact sur visibilite module
 
-2007-03-27 : version 2.0.0<br>
+2007-03-30 : version 2.0.0<br>
 
 <ul>
 <li> BUG#626 : Incident : call time recorded correctly (Worksforme)
@@ -95,9 +93,10 @@ To do
 <li> OBM : display totally rewritten, new default theme, icons, DHTML,...
 <li> Calendar : Display totally rewritten ! Did you hear about buzzword AJAX ?
 <li> Calendar : views no more limited to 6 users
-<li> Calendar : display now spread to all the available space
+<li> Calendar : display now spread to all available space
 <li> OBM now show the field in error when submitting, user and tools data
 <li> OF : authentication rewrite (getting rid of $auth,..)
+<li> OF : password can be of differents types (PLAIN, MD5, CRYPT) by user
 <li> OBM : Aliamin merge !
 <li> Password : new module : to allow users to change their password
 <li> OBM-Mail : OBM now can handle the postfix MTA and Cyrus IMAP server
@@ -112,6 +111,8 @@ To do
 <li> Invoice : multiple tax rates can be configured
 <li> Calendar : event list view added
 <li> Calendar : added exception handling on recurring event
+<li> Mailbox (OBM-Mail) : new module : allow to set up rights on its mailbox
+<li> OF : of_right improvement : no more calendar specific handling !
 </ul>
 
 2006-09-21 : version 1.2.4<br>

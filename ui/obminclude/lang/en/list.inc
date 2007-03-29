@@ -2,19 +2,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : list.inc                                                 //
-// 2001-02-16 Aliacom                                                        //
+// 2001-02-16 AliaSource                                                     //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
 $l_subject = "Subject";
-$l_email = "E-mail";
 $l_query = "Query";
-$l_creator = "Creator";
-$l_date_creation = "Creation";
-$l_updater = "Last updater";
-$l_date_last_update = "Last update";
 $l_static = "Static";
 $l_mode = "Mode";
 
@@ -27,9 +22,6 @@ $l_criterion = "Search criteria";
 $l_timeafter = "Updated after";
 $l_timebefore = "Updated before";
 $l_market = "Responsible";
-$l_company_cat1 = "Category 1";
-$l_contact_cat1 = "Category 1";
-$l_contact_cat2 = "Category 2";
 $l_expert = "Expert";
 $l_normal = "Normal";
 $l_renew = "Automatic renewal";
@@ -37,6 +29,7 @@ $l_recept = "Reception mode";
 $l_mailing = "Mailing enabled only";
 $l_contact_archive = "Archived contacts";
 $l_info_pub = "Publications information";
+
 // Contact
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";

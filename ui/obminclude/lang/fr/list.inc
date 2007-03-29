@@ -2,19 +2,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : list.inc                                                 //
-// 2001-02-16 Vincent MARGUERIT                                              //
+// 2001-02-16 AliaSource                                                     //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
 $l_subject = "Sujet";
-$l_email = "E-mail";
 $l_query = "Requête";
-$l_creator = "Créateur";
-$l_date_creation = "Création";
-$l_updater = "Mise à jour par" ;
-$l_date_last_update = "Mise à jour" ;
 $l_static = "Statique";
 $l_mode = "Mode";
 
@@ -28,9 +23,6 @@ $l_criterion = "Critères de recherche";
 $l_timebefore = "Mis à jour avant";
 $l_timeafter = "Mis à jour après";
 $l_market = "Responsable";
-$l_company_cat1 = "Catégorie 1";
-$l_contact_cat1 = "Categorie 1";
-$l_contact_cat2 = "Categorie 2";
 $l_expert = "Expert";
 $l_normal = "Normal";
 $l_renew = "Renouvellement auto";

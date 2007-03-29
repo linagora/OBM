@@ -10,12 +10,7 @@
 // Database fields
 $l_smb = "Windows";
 $l_system = "Systeme";
-$l_email = "E-mail";
 $l_mailing = "Liste de diffusion";
-$l_creator = "Créateur";
-$l_date_creation = "Création";
-$l_updater = "Mise à jour par";
-$l_date_last_update = "Mise à jour";
 
 // Labels et textes
 $l_nb_user = "# Utilisateurs";

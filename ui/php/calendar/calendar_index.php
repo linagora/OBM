@@ -258,7 +258,7 @@ if ($action == "index") {
     $id = $params["calendar_id"];
     $eve_q = run_query_calendar_detail($id);
     if ($obm["uid"] != $eve_q->f("calendarevent_owner")) {
-      $writable = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write",array($eve_q->f("calendarevent_owner")));
+      $writable = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", array($eve_q->f("calendarevent_owner")), "userobm");
       if(count($writable["ids"]) != 1) {
         json_error_msg($l_invalid_data . " : " . $l_rights );
         echo "({".$display['json']."})";
@@ -300,7 +300,7 @@ if ($action == "index") {
   if (check_calendar_can_delete($id)) {
     $eve_q = run_query_calendar_detail($id);    
     if ($obm["uid"] != $eve_q->f("calendarevent_owner")) {
-      $writable = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write",array($eve_q->f("calendarevent_owner")));
+      $writable = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", array($eve_q->f("calendarevent_owner")), "userobm");
       if(count($writable["ids"]) != 1) {
         json_error_msg($l_invalid_data . " : " . $l_rights );
         echo "({".$display['json']."})";
@@ -361,7 +361,7 @@ if ($action == "index") {
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (of_right_update_right($params, "calendar")) {
+  if (of_right_update_right($params, "calendar", "userobm")) {
     $display["msg"] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
     $display["msg"] .= display_warn_msg($err["msg"]);
@@ -851,7 +851,7 @@ function update_calendar_action() {
   if($id) {
     $event_info = get_calendar_event_info($id);
     $owner = $event_info["owner"];
-    $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write");
+    $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
     if ($owner != $obm["uid"] && !in_array($owner,$writable_entity["ids"])) {
       // Detail Update
       unset($actions["calendar"]["detailupdate"]);

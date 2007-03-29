@@ -251,6 +251,38 @@ function run_query_mailshare_delete($p_id) {
 }
 
 
+/**
+ * get_mailshare_infos
+ * Get one mailshare infos as an array
+ *
+ * @param mixed $id mailshare id
+ * @return mixed infos array
+ */
+function get_mailshare_info($id="") {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain("mailshare");
+  $obm_q = new DB_OBM ;
+  $db_type = $obm_q->type;
+
+  $query = "SELECT *
+    FROM MailShare
+    WHERE mailshare_id='$id'
+      $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "get_mailshare_infos()");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  if (is_array($obm_q->Record)) {
+    $m["name"] = $obm_q->f("mailshare_name");
+    $m["quota"] = $obm_q->f("mailshare_quota");
+    $m["email"] = $obm_q->f("mailshare_email");
+  }  
+
+  return $m;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if Mailshare (except with id given) with the name given already exists
 // Parameters:

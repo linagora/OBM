@@ -23,6 +23,10 @@ $l_read_permission = "Administración de permiso de lectura";
 $l_write_permission = "Administración de permiso de escritura";
 $l_right_validate = "Validar estos permisos";
 $l_right_update_ok = "Nuevos permisos han sido validados";
+$l_creator = "Creador";
+$l_date_creation = "Creación";
+$l_updater = "Actualizado por";
+$l_date_last_update = "Última Actualización";
 
 // Common messages
 $l_yes = "Si";
@@ -56,6 +60,8 @@ $l_text = "Text";
 $l_name = "Nombre";
 $l_label = "Etiqueta";
 $l_number = "Número";
+$l_email = "E-mail";
+$l_quota = "Quota";
 $l_invalid_data = "Datos Inválidos";
 $l_insert_ok = "Ingreso OK";
 $l_insert_error = "Ingreso ha fallado !";

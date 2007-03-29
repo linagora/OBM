@@ -17,6 +17,10 @@ $l_validate = "übernehmen";
 $l_execute = "Ausführen";
 $l_confirm = "Bestätigung";
 $l_add = "Hinzufügen";
+$l_creator = "Ersteller" ;
+$l_date_creation = "Erstellungsdatum";
+$l_updater = "Updated by";
+$l_date_last_update = "Last Update";
 
 // Common messages
 $l_yes = "Ja";

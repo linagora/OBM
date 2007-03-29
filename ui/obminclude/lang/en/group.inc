@@ -10,12 +10,7 @@
 // Database fields
 $l_smb = "Windows";
 $l_system = "System";
-$l_email = "E-mail";
 $l_mailing = "Mailing address";
-$l_creator = "Creator";
-$l_date_creation = "Creation";
-$l_updater = "Updated by";
-$l_date_last_update = "Last Update";
 
 // Labels et textes
 $l_nb_user = "# Users";

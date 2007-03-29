@@ -7,9 +7,6 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-  // XXXXX to update : remove references to Calendar or resource in
-  // of_right_entity_for_consumer and of_right_update_right
-
 $extra_js .= "
 function remove_allelements(parentId) {
   // Remove all elements in the list form
@@ -55,8 +52,9 @@ function show_hide_write_right(field) {
 // Parameters:
 //   - $entity    : entity to admminister the right for
 //   - $entity_id : entity id
+//   - $real_entity : [optionnal] if set, real data entity (eg mailbox->user)
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_dis_admin($entity, $entity_id) {
+function of_right_dis_admin($entity, $entity_id, $real_entity="") {
   global $display, $obm, $l_of_right_err_empty;
 
   if (!isset($entity_id) || ($entity_id == "")) {
@@ -67,7 +65,7 @@ function of_right_dis_admin($entity, $entity_id) {
   $uid = $obm["uid"];
   $consumer = "user";
   $consumer_id = "$uid";
-  $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write");
+  $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write","", $real_entity);
   $display["features"] = html_entitywritable_bar($writable_entity ,$entity_id, $entity);
 
   $consumers = of_right_consumer_for_entity($entity, $entity_id, $consumer);
@@ -77,7 +75,7 @@ function of_right_dis_admin($entity, $entity_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// User selection for calendar management admin panel
+// User selection for management admin panel
 // Parameters:
 //   - $writable_user : Array of user on who you can manage the calandar
 ///////////////////////////////////////////////////////////////////////////////
@@ -266,18 +264,24 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 //   - $consumer_id : consumer id
 //   - $right       : right to get and select from : "read" or "write"
 //   - $ids_set     : array of ids restricting the result
+//   - $real_entity : real data entity (eg: userobm for entity calendar)
 // Returns:
 //   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2)))
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_entity_for_consumer($entityu, $consumer, $consumer_id, $right="read", $ids_set="") {
+function of_right_entity_for_consumer($entityu, $consumer, $consumer_id, $right="read", $ids_set="", $real_entity="") {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
   $entity = strtolower($entityu);
+  if ($real_entity != "") {
+    $r_entity = $real_entity;
+  } else {
+    $r_entity = $entity;
+  }
 
-  if ($entity == "calendar") {
+  if ($r_entity == "userobm") {
     $table_entity = "UserObm";
     $e_id = "e.userobm_id";
     $ctt[0]["type"] = "field";
@@ -429,12 +433,13 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="al
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update the list of the rights give to users.
+// Update Rights given to users.
 // Parameters:
 //   - $param  : hash entry with entity and right values
 //   - $entity : entity type to update
+//   - $real_entity : [optionnal] if set, real data entity (eg mailbox->user)
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_update_right($param, $entity) {
+function of_right_update_right($param, $entity, $real_entity="") {
   global $cdg_sql, $obm, $err, $l_of_right_err_auth,$obm;
 
   $consumer = "user";
@@ -452,9 +457,12 @@ function of_right_update_right($param, $entity) {
     $accept_write = array();
   }
 
-  // Check the user have the sufficient right to update rights
-  if (($eid != $obm["uid"]) && ($entity == "calendar")) {
-    $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write");
+  // Rights on external objects : defined by module access
+  // Rights on userobm entity : user need write right on the entity
+  // XXXX could be cool to separate "write" and "admin" rights
+  // If user manipulating NOT its own data, check if he has rights
+  if (($eid != $obm["uid"]) && ($real_entity == "userobm")) {
+    $writable_entity = of_right_entity_for_consumer($entity, "user", $obm["uid"], "write", "", $real_entity);
     if (!in_array($eid, $writable_entity["ids"])) {
       $err["msg"] = $l_of_right_err_auth;
       return false;

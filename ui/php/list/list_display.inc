@@ -1341,7 +1341,7 @@ function dis_list_add_criterion_userdata_form($entity) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
   global $l_company,$l_country,$l_postcode,$l_town,$l_timebefore,$l_timeafter;
-  global $l_all,$l_market,$l_datasource;
+  global $l_all,$l_market,$l_datasource, $l_category;
   global $ico_mini_cal,$ico_add,$popup_height,$popup_width;
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
@@ -1395,7 +1395,7 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
     <th>$l_town</th>
     <td><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td>
     </tr><tr>
-    <th>$l_company_cat1</th>
+    <th>$l_category</th>
     <td>$dis_cat</td>
     </tr><tr>
     <th>$l_datasource</th>
@@ -1415,7 +1415,7 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
 function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q) {
   global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
   global $l_all,$l_timebefore,$l_timeafter,$l_market,$l_datasource;  
-  global $l_function,$l_lang;
+  global $l_function,$l_lang, $l_category;
   global $l_yes,$l_no;
   global $ico_mini_cal;  
 
@@ -1508,7 +1508,7 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q) {
     <td><select name=\"sel_contact_function_id\">$sel_fct</select></td>
   </tr>
   <tr>
-    <th></th>
+    <th>$l_category</th>
     <td>$dis_cat</td> 
   </tr>
   <tr> 

@@ -9,12 +9,7 @@
 
 // Database fields
 $l_subject = "Oggetto";
-$l_email = "E-mail";
 $l_query = "Query";
-$l_creator = "Creato da";
-$l_date_creation = "Creazione";
-$l_updater = "Ultima modificatore";
-$l_date_last_update = "Ultima Modifica";
 $l_static = "Static";
 
 // Labels and texts
@@ -22,14 +17,12 @@ $l_list_contact = "con contatto : ";
 $l_list_display = "Opzioni visualizzazione dell'elenco liste";
 $l_contact_display = "Opzioni visualizzazione dell'elenco contatti";
 $l_list_set = "Imposta Lista";
-$l_desc = "Descrizione";
 
 // Contact
 $l_lastname = "Cognome";
 $l_firstname = "Nome";
 $l_function = "Funzione";
 $l_hphone = "Tel. casa";
-$l_town = "Città";
 
 // Actions
 $l_insert = "Inserisci lista";

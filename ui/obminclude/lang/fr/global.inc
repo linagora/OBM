@@ -26,6 +26,11 @@ $l_write_permission = "Gestion des permissions d'écriture";
 $l_right_validate = "Valider les permissions";
 $l_right_update_ok = "Nouvelles permissions validées";
 $l_infos = "Informations";
+$l_creator = "Créateur";
+$l_date_creation = "Création";
+$l_updater = "Mise à jour par";
+$l_date_last_update = "Mise à jour";
+
 // Common messages
 $l_yes = "Oui";
 $l_no = "Non";
@@ -154,6 +159,7 @@ $l_resource = "Ressource";
 $l_group = "Groupe";
 $l_resourcegroup = "Groupe de ressources";
 $l_mailshare = "Partage mail";
+$l_host = "Hôte";
 $l_settings = "Configuration";
 $l_backup = "Sauvegarde";
 $l_domain = "Domaine";
@@ -162,9 +168,9 @@ $l_password = "Mot de passe";
 $l_mailforward = "Redirection de messagerie";
 $l_mail = "Messagerie";
 $l_vacation = "Répondeur";
+$l_mailbox = "Boîte aux lettres";
 $l_tools = "Outil Mise à jour";
 $l_control = "Tableau de bord";
-$l_host = "Hôte";
 $l_insufficient_permission = "Permissions insuffisantes";
 $l_scope_update = "Mettre à jour le système";
 
@@ -283,6 +289,7 @@ $l_module_settings = "Configuration";
 $l_module_password = "Mot de passe";
 $l_module_mailforward = "Redirection messagerie";
 $l_module_vacation = "Répondeur messagerie";
+$l_module_mailbox = "Boîte aux lettres";
 
 $l_header_admin = "Administration";
 $l_header_new_f = "Nouvelle";

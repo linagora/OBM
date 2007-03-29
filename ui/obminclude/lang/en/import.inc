@@ -2,16 +2,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : import.inc                                               //
-// 2004-01-17 Aliacom - Pierre Baudracco                                     //
+// 2004-01-17 AliaSource - Pierre Baudracco                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
-
-// Database fields
-$l_creator = "Creator";
-$l_date_creation = "Creation";
-$l_updater = "Last updater";
-$l_date_last_update = "Last update";
 
 // Title
 $l_import = "Import";

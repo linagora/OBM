@@ -281,7 +281,7 @@ function html_mailshare_consult($mailshare_q) {
 // Display Mailshare Form
 // Parameters :
 //   - $action      : action called
-//   - $mailshare_q : DBO : information about the mailshare (null for new mailshare)
+//   - $mailshare_q : DBO : (null for new mailshare)
 //   - $mailshare[] : default or transmitted values
 //   - $field       : field in error
 ///////////////////////////////////////////////////////////////////////////////
@@ -390,6 +390,28 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
   </fieldset>
   </form>
 ";
+
+  return $block;
+}
+
+
+/**
+ * dis_mailshare_right_dis_admin
+ * Display mailshare rights admin form
+ *
+ * @param mixed $id mailshare id to admin
+ * @return mixed xhtml display
+ */
+function dis_mailshare_right_dis_admin($id="") {
+  global $obm, $display, $l_mailshare;
+
+  if ($id == "") {
+    return false;
+  }
+  $infos = get_mailshare_info($id);
+  $name = $infos["name"];
+  $display["title"] = "<h1 class=\"title\">$l_mailshare : $name</h1>";
+  $block = of_right_dis_admin("MailShare", $id);
 
   return $block;
 }

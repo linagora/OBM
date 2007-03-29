@@ -9,11 +9,6 @@
 
 // Database fields
 $l_system = "Sistema";
-$l_email = "E-mail";
-$l_creator = "Creador";
-$l_date_creation = "Fecha de Creación";
-$l_updater = "Actualizado por";
-$l_date_last_update = "Última actualización";
 
 // Labels et textes
 $l_nb_user = "# Usuarios";

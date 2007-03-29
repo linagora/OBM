@@ -1,19 +1,11 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                   //
+// OBM - Language : English                                                  //
 //     - File     : group.inc                                                //
 // 2003-08-22 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-
-// Database fields
-$l_name = "Name";
-$l_desc = "Description";
-$l_creator = "Creator";
-$l_date_creation = "Creation";
-$l_updater = "Updated by";
-$l_date_last_update = "Last Update";
 
 // Labels et textes
 $l_nb_resource = "# Resources";
@@ -26,7 +18,6 @@ $l_resourcegroup = "Resources group";
 $l_resourcegroups = "Resources group";
 
 // Resources 
-$l_label = "Label";
 $l_qty = "Quantity";
 
 // Actions

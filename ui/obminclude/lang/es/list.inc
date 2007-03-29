@@ -9,12 +9,7 @@
 
 // Database fields
 $l_subject = "Asunto";
-$l_email = "E-mail";
 $l_query = "Pregunta";
-$l_creator = "Creador";
-$l_date_creation = "Creación";
-$l_updater = "Último en actualizar";
-$l_date_last_update = "Última actualización";
 $l_static = "Estáticos";
 $l_mode = "Modo";
 

@@ -7,14 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-// Database fields
-$l_desc = "Descripción";
-$l_email = "E-mail";
-$l_creator = "Creador";
-$l_date_creation = "Creación";
-$l_updater = "Actualizado por";
-$l_date_last_update = "Última Actualización";
-
 // Labels et textes
 $l_nb_resource = "# Recursos";
 $l_resourcegroup_resource = "Tenido como recurso";

@@ -28,7 +28,6 @@ $l_no_contact_found = "No contact found matching the query " ;
 $l_list_found = "lists found.";
 $l_subject = "Subject" ;
 $l_date_creation = "Date creation" ;
-$l_creator = "Creator" ;
 $l_add_contact = "Add contacts" ;
 $l_del_contact = "Remove contacts" ;
 $l_new_contact1 = "NC" ;

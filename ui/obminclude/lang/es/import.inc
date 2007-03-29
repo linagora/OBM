@@ -7,12 +7,6 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-// Database fields
-$l_creator = "Creador";
-$l_date_creation = "Creación";
-$l_updater = "Último en actualizar";
-$l_date_last_update = "Última actualización";
-
 // Title
 $l_import = "Importar";
 

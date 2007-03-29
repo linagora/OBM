@@ -7,12 +7,6 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-// Database fields
-$l_creator = "Créateur";
-$l_date_creation = "Création";
-$l_updater = "Mise à jour par" ;
-$l_date_last_update = "Mise à jour";
-
 // Labels et textes
 $l_mailshare_display = "Options d'affichage des listes de partages mail";
 

@@ -1,5 +1,5 @@
 % Documentation technique d'OBM : Gestion des droits ACL
-% ALIACOM Pierre Baudracco
+% AliaSource Pierre Baudracco
 % $Id$
 
 
@@ -64,14 +64,16 @@ En résumé, si l'indicateur public est positionné sur un droit, il définit ce dro
 
 \subsubsection{Type d'entité et consommateur définis}
 
-Types d'entités définis (version 1.0) :\\
+Types d'entités définis (version 2.0) :\\
 \begin{itemize}
 \item \textbf{calendar} : calendrier d'un utilisateur (entity\_id est l'id d'un utilisateur)
 \item \textbf{resource} : Ressource
+\item \textbf{mailshare} : Boîte aux lettres partagée
+\item \textbf{mailbox} : Partage de sa propre boîte aux lettres
 \end{itemize}
 \vspace{0.3cm}
 
-Types de consommateurs définis (version 1.0) :\\
+Types de consommateurs définis (version 2.0) :\\
 \begin{itemize}
 \item \textbf{user} : Utilisateurs
 \item \textbf{group} : Groupe (Non implémenté encore)
@@ -84,12 +86,13 @@ Types de consommateurs définis (version 1.0) :\\
 \begin{minipage}{13cm}
 \begin{verbatim}
 function of_right_entity_for_consumer($entity, $consumer, $consumer_id,
-$right="read", $ids_set="") {
+$right="read", $ids_set="", $real_entity="") {
 \end{verbatim}
 \end{minipage}
 }
 Récupération des entités du type \$entity dont le consommateur \$consumer\_id de type \$consumer a le droit \$right.
-Le résultat peut être restreint à un sous ensemble (\$ids\_set).
+Le résultat peut être restreint à un sous ensemble et(\$ids\_set).
+Pour les entités ``virtuelles'' (n'ayant pas de d'objet propre, comme les calendriers ou les mailbox), le paramètre optionnel \$real\_entity doit être renseigné afin de permettre la génération de requètes correctes (pour les entités calendar et mailbox, l'entité réelle est ``userobm'').
 Exemple: Liste des agendas visibles par l'utilisateur pierre, liste restreinte aux membres du groupe commercial.\\
 
 
@@ -107,20 +110,20 @@ Exemple: Liste des utilisateurs qui ont le droit de voir l'agenda d'un utilisate
 \shadowbox{
 \begin{minipage}{13cm}
 \begin{verbatim}
-function of_right_dis_admin($entity, $entity_id) {
+function of_right_dis_admin($entity, $entity_id, $real_entity="") {
 \end{verbatim}
 \end{minipage}
 }
-
-Fonction d'affichage de l'écran de modification des droits pour l'entité \$entity\_id du type \$entity.\\
+Fonction d'affichage de l'écran de modification des droits pour l'entité \$entity\_id du type \$entity.
+Renseigner l'entité réelle (\$real\_entity) pour les entités n'ayant pas d'objet propre, comme les entités calendar et mailbox.\\
 
 
 \shadowbox{
 \begin{minipage}{13cm}
 \begin{verbatim}
-function of_right_update_right($param, $entity) {
+function of_right_update_right($param, $entity, $real_entity="") {
 \end{verbatim}
 \end{minipage}
 }
-
 Fonction de mise à jour des droits en base de données.
+Renseigner l'entité réelle (\$real\_entity) pour les entités n'ayant pas d'objet propre, comme les entités calendar et mailbox.\\

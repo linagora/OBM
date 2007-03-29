@@ -16,6 +16,8 @@
 // - update          -- form fields      -- update the mailshare
 // - check_delete    -- $mailshare_id    -- check the mailshare
 // - delete          -- $mailshare_id    -- delete the mailshare
+// - rights_admin    --                  -- see mailshare rights
+// - rights_update   --                  -- update mailshare rights
 // - display         --                  -- display and set display parameters
 // - dispref_display --                  -- update one field display value
 // - dispref_level   --                  -- update one field display position 
@@ -45,6 +47,7 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
+// XXXXXXX ????
 if ($action == "ext_get_id") {
   $display["search"] = html_host_search_form($params);
   if ($set_display == "yes") {
@@ -170,14 +173,17 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = of_right_dis_admin("MailShare", $params["entity_id"]);
+  $display["detail"] = dis_mailshare_right_dis_admin($params["entity_id"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  of_right_update_right($params, "MailShare");
-  update_update_state();
-  $display["msg"] .= display_warn_msg($err["msg"]);
-  $display["detail"] = of_right_dis_admin("MailShare", $params["entity_id"]);
+  if (of_right_update_right($params, "mailshare")) {
+    update_update_state();
+    $display["msg"] .= display_ok_msg("$l_rights : $l_update_ok");
+  } else {
+    $display["msg"] .= display_warn_msg($err["msg"]);
+  }
+  $display["detail"] = dis_mailshare_right_dis_admin($params["entity_id"]);
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -212,7 +218,7 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores in $params hash, Host parameters transmited
+// Stores in $params hash, parameters transmited
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_mailshare_params() {
@@ -220,7 +226,7 @@ function get_mailshare_params() {
   global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read;
 
   // Get global params
-  $params = get_global_params("UserObm");
+  $params = get_global_params("MailShare");
 
   if ((isset ($params["entity_id"])) && (! isset($params["mailshare_id"]))) {
     $params["mailshare_id"] = $params["entity_id"];
@@ -231,7 +237,7 @@ function get_mailshare_params() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// MailSahre Action 
+// MailShare Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_mailshare_action() {
   global $params, $actions, $path, $l_mailshare;
@@ -266,7 +272,7 @@ function get_mailshare_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/mailshare/mailshare_index.php?action=detailconsult&amp;mailshare_id=".$params["mailshare_id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'showlist', 'update') 
+    'Condition'=> array ('detailupdate', 'showlist', 'update', 'rights_admin', 'rights_update') 
                                   );
 
 // Detail Update

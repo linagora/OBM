@@ -328,17 +328,23 @@ if ($cgp_show["module"]["group"]) {
                                     'Url' => "$path/group/group_index.php",
 			            'Right'=> $cright_read);
 }
+if ($cgp_show["module"]["resourcegroup"]) {
+  $modules["resourcegroup"] = array('Name'=> $l_module_resourcegroup,
+                                    'Ico' => "$ico_resourcegroup",
+                                    'Url' => "$path/resourcegroup/resourcegroup_index.php",
+			            'Right'=> $cright_read);
+}
 if ($cgp_show["module"]["mailshare"]) {
   $modules["mailshare"] = array('Name'=> $l_module_mailshare,
                                     'Ico' => "$ico_mailshare",
                                     'Url' => "$path/mailshare/mailshare_index.php",
 			            'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["resourcegroup"]) {
-  $modules["resourcegroup"] = array('Name'=> $l_module_resourcegroup,
-                                    'Ico' => "$ico_resourcegroup",
-                                    'Url' => "$path/resourcegroup/resourcegroup_index.php",
-			            'Right'=> $cright_read);
+if ($cgp_show["module"]["host"]) {
+  $modules["host"] = array('Name'=> $l_module_host,
+                               'Ico' => "$ico_host",
+                               'Url' => "$path/host/host_index.php",
+                               'Right'=> $cright_read);
 }
 
 if ($cgp_show["module"]["settings"]) {
@@ -373,9 +379,10 @@ if ($cgp_show["module"]["vacation"]) {
 			       'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["host"]) {
-  $modules["host"] = array('Name'=> $l_module_host,
-                               'Ico' => "$ico_host",
-                               'Url' => "$path/host/host_index.php",
-                               'Right'=> $cright_read);
+if ($cgp_show["module"]["mailbox"]) {
+  $modules["mailbox"] = array(
+                               'Name'=> $l_module_mailbox,
+                               'Ico' => "$ico_mailbox",
+		               'Url' => "$path/mailbox/mailbox_index.php",
+			       'Right'=> $cright_read);
 }

@@ -23,6 +23,10 @@ $l_write_permission = "Write access management";
 $l_right_validate = "Validate these rights";
 $l_right_update_ok = "New rights validated";
 $l_infos = "Informations";
+$l_creator = "Creator";
+$l_date_creation = "Creation";
+$l_updater = "Updated by";
+$l_date_last_update = "Last Update";
 
 // Common messages
 $l_yes = "Yes";
@@ -156,6 +160,7 @@ $l_password = "Password";
 $l_mailforward = "Mail forwarding";
 $l_mail = "Mail";
 $l_vacation = "Mail Vacation";
+$l_mailbox = "Mailbox";
 $l_tools = "Update tools";
 $l_control = "Dashboard";
 $l_host = "Host";
@@ -279,6 +284,7 @@ $l_module_settings = "Settings";
 $l_module_password = "Password";
 $l_module_mailforward = "Mail Forward";
 $l_module_vacation = "Mail Vacation";
+$l_module_mailbox = "Mailbox";
 
 $l_header_admin = "Administration";
 $l_header_new_f = "New";
