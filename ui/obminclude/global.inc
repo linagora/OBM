@@ -336,13 +336,8 @@ $cmd_check_update = "ps aux | grep auto/update.pl | grep -v grep";
 $cmd_db_update = "../$path/auto/dbUpdate.pl --valid";
 $cmd_db_cancel = "../$path/auto/dbUpdate.pl --cancel";
 $cmd_mailforward = "../$path/auto/mailChangeSieve.pl";
-if ($cgp_aliasLdap) {
-  $cmd_mailforward .= " --ldap";
-}
-$cmd_ldap_passwd = "$aliamin_path/auto/ldapChangePasswd.pl";
-$cmd_disable_remote = "sudo /sbin/disableSSH.sh";
-$cmd_enable_remote = "sudo /sbin/enableSSH.sh";
-$cmd_vacation = "$aliamin_path/auto/mailChangeSieve.pl";
+$cmd_vacation = "../$path/auto/mailChangeSieve.pl";
+$cmd_ldap_passwd = "../$path/auto/ldapChangePasswd.pl";
 
 $section = $cgp_show["module"][$module];
 

@@ -17,6 +17,7 @@ function run_query_vacation_detail($u_id) {
   global $cdg_sql;
     
   $query = "SELECT userobm_id,
+    userobm_domain_id,
     userobm_login,
     userobm_mail_perms,
     userobm_vacation_enable,
@@ -43,7 +44,7 @@ function update_vacation($params, $vac_q) {
   $retVal = run_query_vacation_update($params, $vac_q->f("userobm_id"));
 
   if ($retVal == 1) {
-    $retVal = update_sieve($params, $vac_q->f("userobm_login"));
+    $retVal = update_sieve($params, $vac_q->f("userobm_login"), $vac_q->f("userobm_domain_id"));
   }
 
   return $retVal;
@@ -64,6 +65,8 @@ function run_query_vacation_update($params, $u_id) {
     $message_update = "";
   }
 
+
+  // Update done in real-time, so updating UserObm AND P_UserObm
   $query = "UPDATE UserObm
     SET userobm_vacation_enable = '$enabled'
     $message_update
@@ -73,11 +76,15 @@ function run_query_vacation_update($params, $u_id) {
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
 
-  // Aliamin
-  //  display_debug_msg($query, $cdg_sql, "run_query_vacation_update()");
-  //  $obm_q = new DB_OBM_Prod;
-  //  $obm_q->query($query);
-  
+  $query = "UPDATE P_UserObm
+    SET userobm_vacation_enable = '$enabled'
+    $message_update
+    WHERE userobm_id = '$u_id'";
+
+  display_debug_msg($query, $cdg_sql, "run_query_vacation_update()");
+  $obm_q = new DB_OBM;
+  $ret = $obm_q->query($query);
+ 
   return $ret;
 }
 
@@ -88,10 +95,10 @@ function run_query_vacation_update($params, $u_id) {
 // returns true if ok,
 // else returns false and sets $err["msg"];
 //
-function update_sieve($vacation, $u_uid) {  
+function update_sieve($vacation, $u_uid, $u_domain_id) {  
   global $err, $l_sieve_login_failed, $cmd_vacation;
 
-  $cmd = "$cmd_vacation --uid ".$u_uid;
+  $cmd = "$cmd_vacation --login ".$u_uid." --domain ".$u_domain_id;
   
   display_debug_msg($cmd, $cdg_exe, "update_sieve()");
   exec($cmd);
