@@ -234,8 +234,7 @@ function run_query_mailshare_delete($p_id) {
   // Delete ACL for this mailshare
   $query = "DELETE FROM EntityRight
     WHERE entityright_entity='mailshare'
-      AND entityright_entity_id='$p_id'
-      $multidomain";
+      AND entityright_entity_id='$p_id'";
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_mailshare_delete(1)");
   $obm_q->query($query);
