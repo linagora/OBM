@@ -5,7 +5,7 @@ require Exporter;
 use OBM::Parameters::common;
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw( $POSIXUSERS $POSIXGROUPS $SAMBAUSERS $SYSTEMUSERS $NODE $ROOT $DOMAINROOT $SAMBADOMAIN $SAMBAFREEUNIXID $SAMBAGROUPS $SAMBAHOSTS $POSTFIXCONF $MAILSHARE $GROUPOFNAMES );
+@EXPORT_const = qw( $ldapAdminLogin $POSIXUSERS $POSIXGROUPS $SAMBAUSERS $SYSTEMUSERS $NODE $ROOT $DOMAINROOT $SAMBADOMAIN $SAMBAFREEUNIXID $SAMBAGROUPS $SAMBAHOSTS $POSTFIXCONF $MAILSHARE $GROUPOFNAMES );
 @EXPORT_struct = qw($attributeDef $ldapStruct);
 @EXPORT = (@EXPORT_const, @EXPORT_struct);
 @EXPORT_OK = qw();
@@ -13,6 +13,13 @@ use OBM::Parameters::common;
 #
 # Necessaire pour le bon fonctionnement du package
 $debug=1;
+
+
+#
+# delaration de variables
+#
+# Le login de l'administrateur LDAP
+$ldapAdminLogin = "ldapadmin";
 
 
 #
@@ -133,9 +140,9 @@ $attributeDef = {
             return OBM::Ldap::typePosixUsers::updateLdapEntry( $entry, $ldapEntry );
         },
         update_passwd => sub {
-            my( $ldapEntry, $newPasswd ) = @_;
+            my( $ldapEntry, $passwdType, $newPasswd ) = @_;
             require OBM::Ldap::typePosixUsers;
-            return OBM::Ldap::typePosixUsers::updatePasswd( $ldapEntry, $newPasswd );
+            return OBM::Ldap::typePosixUsers::updatePasswd( $ldapEntry, $passwdType, $newPasswd );
         }
     },
 
@@ -144,7 +151,7 @@ $attributeDef = {
         is_branch => 0,
         dn_prefix => "uid",
         dn_value => "user_login",
-        objectclass => [ "person", "posixAccount" ],
+        objectclass => [ "person", "posixAccount", "obmSystemUser" ],
         get_db_value => sub {
             my( $parentdn, $domainId ) = @_;
             require OBM::Ldap::typeSystemUsers;
@@ -212,7 +219,23 @@ $attributeDef = {
         structural => 1,
         is_branch => 0,
         dn_prefix => "cn",
-        objectclass => [ "obmPostfix" ]
+        dn_value => "postfixconf_name",
+        objectclass => [ "obmPostfix" ],
+        get_db_value => sub {
+            my( $parentdn, $domainId ) = @_;
+            require OBM::Ldap::typePostfixConf;
+            return OBM::Ldap::typePostfixConf::getDbValues( $parentdn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typePostfixConf;
+            return OBM::Ldap::typePostfixConf::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typePostfixConf;
+            return OBM::Ldap::typePostfixConf::updateLdapEntry( $entry, $ldapEntry );
+        }
     }
 };
 
