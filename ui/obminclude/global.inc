@@ -89,8 +89,8 @@ $cgp_cookie_domain = "aliasource.local";
 // CAS specific parameters are in conf/obm_conf.inc.
 $auth_kind = "standalone"; 
 
-// Encyption used to store password : "plain", "md5" or "crypt"
-$password_encryption = "plain";
+// Encyption used to store password : "PLAIN", "MD5" or "CRYPT"
+$password_encryption = "PLAIN";
 
 // Handle connectors data
 $c_use_connectors = true;
@@ -264,7 +264,7 @@ $cgp_show["module"]["settings"] = "my";
 $cgp_show["module"]["password"] = "my";
 $cgp_show["module"]["mailforward"] = "my";
 $cgp_show["module"]["vacation"] = "my";
-$cgp_show["module"]["mailbox"] = "my";
+$cgp_show["module"]["mailbox"] = "false";
 
 // Display domain module only when multidomain is activate
 if ($c_multidomain) {

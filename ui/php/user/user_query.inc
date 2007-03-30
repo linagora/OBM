@@ -208,7 +208,7 @@ function run_query_user_insert($user) {
   if ($passwd != "") {
     if ($password_encryption == "CRYPT") {
       $passwd_crypt = crypt($passwd);
-    } else if ($password_encryption == "MD5") {
+    } else if ($password_encryption == "MD5SUM") {
       $passwd_crypt = md5($passwd);
     } else {
       $passwd_crypt = $passwd;
@@ -511,17 +511,34 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
 function run_query_user_update($p_id, $user) {
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
+  global $cmd_ldap_passwd;
+
+  // Coonect to the BD
+  $obm_q = new DB_OBM;
 
   $passwd = $user["passwd"];
   if ($passwd != "") {
     if ($password_encryption == "CRYPT") {
       $passwd_crypt = crypt($passwd);
-    } else if ($password_encryption == "MD5") {
+    } else if ($password_encryption == "MD5SUM") {
       $passwd_crypt = md5($passwd);
     } else {
       $passwd_crypt = $passwd;
     }
-    $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type = '$password_encryption',";
+    $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type='$password_encryption'";
+
+    if( $cgp_use["service"]["ldap"] ) {
+        $query="UPDATE P_UserObm SET
+            $passwd_update
+            WHERE userobm_id='$p_id' $multidomain";
+
+        display_debug_msg($query, $cdg_sql, "run_query_user_update()");
+        $retour = $obm_q->query($query);
+
+        $cmd = "$cmd_ldap_passwd --login ".$user["login"]." --domain ".$obm["domain_id"]." --type ".$password_encryption." --no-old --passwd ".$passwd;
+        display_debug_msg($cmd, $cdg_exe, "update_sieve()");
+        exec($cmd);
+    }
   }
 
   // infos
@@ -636,7 +653,7 @@ function run_query_user_update($p_id, $user) {
   $query = "UPDATE UserObm SET
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
     userobm_userupdate='". $obm["uid"] ."',
-    $passwd_update
+    $passwd_update,
     userobm_perms='$perms',
     userobm_gid='$gid',
     userobm_archive='$archive',
@@ -666,7 +683,6 @@ function run_query_user_update($p_id, $user) {
   WHERE userobm_id='$p_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_user_update()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // If the user is archived, we unsubscribe it from all Groups

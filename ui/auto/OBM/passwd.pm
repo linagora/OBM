@@ -64,3 +64,34 @@ sub toSsha {
 
     return encode_base64($cryptPass->digest . $salt,'');
 }
+
+
+sub convertPasswd {
+    my( $passwdType, $passwd ) = @_;
+    my $userPasswd;
+
+    if( !defined($passwdType) || !defined($passwd) ) {
+        return undef;
+    }
+
+    SWITCH: {
+        if( uc($passwdType) eq "PLAIN" ) {
+            $userPasswd = "{SSHA}".&OBM::passwd::toSsha( $passwd );
+            last SWITCH;
+        }
+
+        if( uc($passwdType) eq "MD5SUM" ) {
+            $userPasswd = "{MD5}".&OBM::passwd::md5sumToMd5( $passwd );
+            last SWITCH;
+        }
+
+        if( uc($passwdType) eq "CRYPT" ) {
+            $userPasswd = "{CRYPT}".$passwd;
+            last SWITCH;
+        }
+
+        return undef;
+    }
+
+    return $userPasswd;
+}

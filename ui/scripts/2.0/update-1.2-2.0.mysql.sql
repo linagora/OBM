@@ -399,7 +399,7 @@ ALTER TABLE UserObm CHANGE COLUMN userobm_password userobm_password varchar(64);
 
 -- Update user infos to new datas
 UPDATE UserObmPref set userobmpref_value='default' WHERE userobmpref_option='set_theme';
-UPDATE UserObm set userobm_password_type='md5';
+UPDATE UserObm set userobm_password_type='MD5SUM';
 
 -- add constraint ...
 --  UNIQUE KEY k_login_user (userobm_login),

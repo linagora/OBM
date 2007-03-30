@@ -164,25 +164,13 @@ sub createLdapEntry {
 
     #
     # Gestion du mot de passe
-    my $userPasswd;
-
     if( !defined( $entry->{"user_passwd_type"} ) || ($entry->{"user_passwd_type"} eq "") ) {
         return 0;
     }
 
-
-    SWITCH: {
-        if( uc($entry->{"user_passwd_type"}) eq "PLAIN" ) {
-            $userPasswd = "{SSHA}".&OBM::passwd::toSsha( $entry->{"user_passwd"} );
-        }
-
-        if( uc($entry->{"user_passwd_type"}) eq "MD5SUM" ) {
-            $userPasswd = "{MD5}".&OBM::passwd::md5sumToMd5( $entry->{"user_passwd"} );
-        }
-
-        if( uc($entry->{"user_passwd_type"}) eq "CRYPT" ) {
-            $userPasswd = "{CRYPT}".$entry->{"user_passwd"};
-        }
+    my $userPasswd = &OBM::passwd::convertPasswd( $entry->{"user_passwd_type"}, $entry->{"user_passwd"} );
+    if( !defined( $userPasswd ) ) {
+        return 0;
     }
 
 
@@ -488,10 +476,13 @@ sub updateLdapEntry {
 
 
 sub updatePasswd {
-    my( $ldapEntry, $newPasswd ) = @_;
+    my( $ldapEntry, $passwdType, $newPasswd ) = @_;
     my $update = 0;
 
-    my $userPasswd = "{SSHA}".&OBM::passwd::toSsha( $newPasswd );
+    my $userPasswd = &OBM::passwd::convertPasswd( $passwdType, $newPasswd );
+    if( !defined( $userPasswd ) ) {
+        return 0;
+    }
 
     if( &OBM::Ldap::utils::modifyAttr( $userPasswd, $ldapEntry, "userPassword" ) ) {
         $update = 1;

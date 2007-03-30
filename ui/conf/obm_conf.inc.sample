@@ -69,7 +69,7 @@ $cgp_cookie_domain = "aliacom.local";
 //$cas_server_port = 8443;
 //$cas_server_uri = "";
 
-// encyption used to store password : "plain", "md5" or "crypt"
+// encyption used to store password : "PLAIN", "MD5SUM" or "CRYPT"
 $password_encryption = "PLAIN";
 
 // Modules specific parameters ----------------------------------------------//

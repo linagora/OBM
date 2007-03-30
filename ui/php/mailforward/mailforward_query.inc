@@ -17,6 +17,7 @@ function run_query_mailforward_detail($u_id) {
   global $cdg_sql;
 
   $query = "SELECT userobm_id,
+      userobm_domain_id,
       userobm_login,
       userobm_email,
       userobm_nomade_perms,
@@ -50,6 +51,7 @@ function run_query_mailforward_update($forward, $u_id) {
   $nomade_enable = $forward["nomade_enable"];
   $nomade_local_copy = $forward["nomade_local_copy"];  
 
+  // Update done in real-time, so updating UserObm AND P_UserObm
   $query = "UPDATE UserObm set
     userobm_email_nomade    = '$email_nomade',
     userobm_nomade_enable   = '$nomade_enable',
@@ -57,14 +59,20 @@ function run_query_mailforward_update($forward, $u_id) {
   WHERE userobm_id = '$u_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_mailforward_update()");
-  // Update database update
   $usr_q = new DB_OBM;
   $retour = $usr_q->query($query);
 
-  // Aliamin
-  // Production database update
-  //  $usr_q = new DB_OBM_Prod;
-  //  $retour = $usr_q->query($query);
+  $query = "UPDATE P_UserObm set
+    userobm_email_nomade    = '$email_nomade',
+    userobm_nomade_enable   = '$nomade_enable',
+    userobm_nomade_local_copy='$nomade_local_copy'    
+  WHERE userobm_id = '$u_id'";
+
+  display_debug_msg($query, $cdg_sql, "run_query_mailforward_update()");
+  $usr_q = new DB_OBM;
+  $retour = $usr_q->query($query);
+
+
 
   return $retour;
 }
@@ -101,7 +109,8 @@ function nomade_is_allowed($u_id) {
 function exec_change_alias($usr_q, $forward) {
   global $cmd_mailforward, $cdg_exe;
 
-  $alias = $usr_q->f("userobm_login");
+  $login = $usr_q->f("userobm_login");
+  $domain = $usr_q->f("userobm_domain_id");
 
   // Si le forward est autorisé et activé
   if ( ($usr_q->f("userobm_nomade_perms")) && ($forward["nomade_enable"]) ) {
@@ -111,10 +120,7 @@ function exec_change_alias($usr_q, $forward) {
     $dst = $usr_q->f("userobm_login");
   }
 
-  if ( $forward["nomade_local_copy"] ) {
-    $cmd_ext = " --local $alias ";
-  }
-  $cmd = "$cmd_mailforward --alias $alias --dst $dst $cmd_ext";
+  $cmd = "$cmd_mailforward --login $login --domain $domain";
   display_debug_msg($cmd, $cdg_exe);
   exec($cmd);
 

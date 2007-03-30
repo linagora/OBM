@@ -25,7 +25,32 @@ sub getParameter {
     my( $parameters, $dbHandler ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "login=s", "domain=s", "passwd=s", "old-passwd=s", "unix", "interactiv", "no-old" );
+    &GetOptions( $parameters, "login=s", "domain=s", "type=s", "passwd=s", "old-passwd=s", "unix", "interactiv", "no-old" );
+
+
+    if( !$$parameters{"login"} ) {
+        &OBM::toolBox::write_log( "Parametre --login manquant", "WC" );
+        exit 1;
+
+    }else {
+        if( !($$parameters{"login"} =~ /$regexp_login/) ) {
+            &OBM::toolBox::write_log( "Parametre --login invalide", "W" );
+            exit 1;
+        }
+    }
+
+
+    # Verification du type du mot de passe
+    SWITCH: {
+        $$parameters{"type"} = uc( $$parameters{"type"} );
+
+        if( !$$parameters{"type"} ) {
+            &OBM::toolBox::write_log( "Type du mot de passe non specifie.", "WC" );
+            exit 1;
+        }else {
+            &OBM::toolBox::write_log( "Type du mot de passe : ".$$parameters{"type"}, "W" );
+        }
+    }
 
     # Verification des parametres
     if( !$$parameters{"domain"} ) {
@@ -54,18 +79,7 @@ sub getParameter {
 
         $$parameters{"domain_id"} = $i;
     }
- 
 
-    if( !$$parameters{"login"} ) {
-        &OBM::toolBox::write_log( "Parametre --login manquant", "WC" );
-        exit 1;
-
-    }else {
-        if( !($$parameters{"login"} =~ /$regexp_login/) ) {
-            &OBM::toolBox::write_log( "Parametre --login invalide", "W" );
-            exit 1;
-        }
-    }
 
     if( !$$parameters{"no-old"} ) {
         # Verification de l'ancien mot de passe
@@ -226,10 +240,10 @@ if( $parameters{"unix"} ) {
         for( my $i=0; $i<=$#userDn; $i++ ) {
             &OBM::toolBox::write_log( "Mise a jour du mot de passe pour l'entite de type '".$POSIXUSERS."' et de dn : ".$userDn[$i], "W" );
 
-            &OBM::ldap::updateSelfEntityPasswd( $ldapSrv, $POSIXUSERS, $userDn[$i], $parameters{"old-passwd"}, $parameters{"passwd"} ); 
+            &OBM::ldap::updateSelfEntityPasswd( $ldapSrv, $POSIXUSERS, $userDn[$i], $parameters{"type"}, $parameters{"old-passwd"}, $parameters{"passwd"} ); 
         }
     }else {
-        &OBM::ldap::updateEntityPasswd( $ldapSrv, $POSIXUSERS, \@userDn, $parameters{"passwd"} );
+        &OBM::ldap::updateEntityPasswd( $ldapSrv, $POSIXUSERS, \@userDn, $parameters{"type"}, $parameters{"passwd"} );
     }
 }
 

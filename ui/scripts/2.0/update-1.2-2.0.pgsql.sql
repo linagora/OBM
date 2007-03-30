@@ -498,7 +498,7 @@ ALTER TABLE UserObm RENAME COLUMN temp_password TO userobm_password;
 
 -- Update user infos to new datas
 UPDATE UserObmPref set userobmpref_value='default' WHERE userobmpref_option='set_theme';
-UPDATE UserObm set userobm_password_type='md5';
+UPDATE UserObm set userobm_password_type='MD5SUM';
 
 -- add constraint UNIQUE KEY userobm_uid (userobm_uid)
 CREATE UNIQUE INDEX k_uid_userobm_index ON UserObm (userobm_uid);
