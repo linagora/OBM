@@ -539,6 +539,8 @@ function run_query_user_update($p_id, $user) {
         display_debug_msg($cmd, $cdg_exe, "update_sieve()");
         exec($cmd);
     }
+
+    $passwd_update .= ",";
   }
 
   // infos
@@ -653,7 +655,7 @@ function run_query_user_update($p_id, $user) {
   $query = "UPDATE UserObm SET
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
     userobm_userupdate='". $obm["uid"] ."',
-    $passwd_update,
+    $passwd_update
     userobm_perms='$perms',
     userobm_gid='$gid',
     userobm_archive='$archive',
