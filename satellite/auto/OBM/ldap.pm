@@ -576,7 +576,7 @@ sub getLdapSrv {
 
 
 sub updateSelfEntityPasswd {
-    my( $ldapSrv, $type, $entityDn, $oldPasswd, $newPasswd ) = @_;
+    my( $ldapSrv, $type, $entityDn, $passwdType, $oldPasswd, $newPasswd ) = @_;
 
     if( !defined($ldapSrv) ) {
         return 0;
@@ -619,7 +619,7 @@ sub updateSelfEntityPasswd {
     }
 
     my $ldapEntry = findDn( $ldapConn, $entityDn );
-    if( defined($ldapEntry) && (&{$attributeDef->{$type}->{"update_passwd"}}( $ldapEntry, $newPasswd )) ) {
+    if( defined($ldapEntry) && (&{$attributeDef->{$type}->{"update_passwd"}}( $ldapEntry, $passwdType, $newPasswd )) ) {
             my $result = $ldapEntry->update( $ldapConn );
 
             if( $result->is_error() ) {
@@ -637,7 +637,7 @@ sub updateSelfEntityPasswd {
 
 
 sub updateEntityPasswd {
-    my( $ldapSrv, $type, $userDn, $newPasswd ) = @_;
+    my( $ldapSrv, $type, $userDn, $passwdType, $newPasswd ) = @_;
 
     if( !connectLdapSrv( $ldapSrv ) ) {
         return 0;
@@ -649,7 +649,7 @@ sub updateEntityPasswd {
         &OBM::toolBox::write_log( "Mise a jour de l'entite de type '".$type."' et de dn : ".$userDn->[$i], "W" );
         my $ldapEntry = findDn( $ldapConn, $userDn->[$i] );
 
-        if( defined($ldapEntry) && (&{$attributeDef->{$type}->{"update_passwd"}}( $ldapEntry, $newPasswd )) ) {
+        if( defined($ldapEntry) && (&{$attributeDef->{$type}->{"update_passwd"}}( $ldapEntry, $passwdType, $newPasswd )) ) {
             my $result = $ldapEntry->update( $ldapConn );
 
             if( $result->is_error() ) {
