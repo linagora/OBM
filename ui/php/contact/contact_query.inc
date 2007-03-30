@@ -51,20 +51,29 @@ function run_query_contact_search($contact) {
   // If company module used (external from Contact)
   if ($cgp_show["module"]["company"]) {
 
-    // To allow sorting on contact and company addresses infos
-    $if_ad1 = sql_if($db_type, "(contact_address1 != '')", "contact_address1", "company_address1") . " as contact_address1,";
-    $if_ad2 = sql_if($db_type, "(contact_address2 != '')", "contact_address2", "company_address2") . " as contact_address2,";
-    $if_ad3 = sql_if($db_type, "(contact_address3 != '')", "contact_address3", "company_address3") . " as contact_address3,";
-    $if_zip = sql_if($db_type, "(contact_zipcode != '')", "contact_zipcode", "company_zipcode") . " as contact_zipcode,";
+   // To allow sorting on contact and company addresses infos
+   $if_condition = "(
+      contact_address1 != '' ||
+      contact_address2 != '' || 
+      contact_address3 != '' || 
+      contact_zipcode != '' || 
+      contact_town != '' || 
+      contact_expresspostal != '')";
+
+    $if_ad1 = sql_if($db_type, $if_condition, "contact_address1 ", "company_address1") . " as contact_address1,";
+    $if_ad2 = sql_if($db_type, $if_condition, "contact_address2 ", "company_address2") . " as contact_address2,";
+    $if_ad3 = sql_if($db_type, $if_condition, "contact_address3 ", "company_address3") . " as contact_address3,";
+    $if_zip = sql_if($db_type, $if_condition, "contact_zipcode ", "company_zipcode") . " as contact_zipcode,";
     $where_zip = "(contact_zipcode $like '$zip%' OR contact_zipcode='' AND company_zipcode $like '$zip%')";
-    $if_town = sql_if($db_type, "(contact_town != '')", "contact_town", "company_town") . " as contact_town,";
+    $if_town = sql_if($db_type, $if_condition, "contact_town ", "company_town") . " as contact_town,";
     $where_town = "(contact_town $like '$town%' OR contact_town='' AND company_town $like '$town%')";
-    $if_express = sql_if($db_type, "(contact_expresspostal != '')", "contact_expresspostal", "company_expresspostal") . " as contact_expresspostal,";
-    $if_country = sql_if($db_type, "(ctry1.country_name != '')", "ctry1.country_name", "ctry2.country_name") . " as country_name,";
+    $if_express = sql_if($db_type, $if_condition, "contact_expresspostal ", "company_expresspostal") . " as contact_expresspostal,";
+    $if_express = sql_if($db_type, $if_condition, "ctry1.country_name ", "ctry2.country_name") . " as country_name,";
     $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
     $join_ctry2 = "LEFT JOIN Country as ctry2 ON
                   Company.company_country_iso3166 = ctry2.country_iso3166
                   AND ctry2.country_lang='$lang'";
+
     $company_fields = "company_name,
       company_phone,
       company_fax,
@@ -75,6 +84,7 @@ function run_query_contact_search($contact) {
       company_town,
       company_expresspostal,
       ctry2.country_name as company_country,";
+
   } else {
     $if_ad1 = "contact_address1,";
     $if_ad2 = "contact_address2,";
