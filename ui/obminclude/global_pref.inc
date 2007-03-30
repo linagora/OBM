@@ -32,7 +32,10 @@ if (($set_debug & $cdg_sess) == $cdg_sess) {
     if (is_array($val)) {
       $val = var_export($val, true);
     }
-    $dis_session .= "$key = $val<br />\n";
+    if(is_object($val)) {
+      $val = "Object";
+    }
+    $dis_session .= "<b>$key</b> : $val<br />\n";
   }
 }
 
