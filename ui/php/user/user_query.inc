@@ -528,16 +528,29 @@ function run_query_user_update($p_id, $user) {
     $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type='$password_encryption'";
 
     if( $cgp_use["service"]["ldap"] ) {
-        $query="UPDATE P_UserObm SET
-            $passwd_update
-            WHERE userobm_id='$p_id' $multidomain";
+      $query="UPDATE P_UserObm SET
+        $passwd_update
+        WHERE userobm_id='$p_id' $multidomain";
 
-        display_debug_msg($query, $cdg_sql, "run_query_user_update()");
-        $retour = $obm_q->query($query);
+      display_debug_msg($query, $cdg_sql, "run_query_user_update()");
+      $retour = $obm_q->query($query);
 
-        $cmd = "$cmd_ldap_passwd --login ".$user["login"]." --domain ".$obm["domain_id"]." --type ".$password_encryption." --no-old --passwd ".$passwd;
+      if( $retour ) {
+        if( (!isset($obm["domain_id"])) || ($obm["domain_id"] == "") || ($obm["domain_id"] == "0") ) {
+          $query="SELECT userobm_domain_id FROM UserObm WHERE userobm_id='$p_id'";
+          display_debug_msg($query, $cdg_sql, "run_query_user_update()");
+          $retour = $obm_q->query($query);
+
+          $obm_q->next_record();
+          $user_domain = $obm_q->f("userobm_domain_id");
+        }else {
+          $user_domain = $obm["domain_id"];
+        }
+        echo "-->".$user_domain;
+        $cmd = "$cmd_ldap_passwd --login ".$user["login"]." --domain ".$user_domain." --type ".$password_encryption." --no-old --passwd ".$passwd;
         display_debug_msg($cmd, $cdg_exe, "update_sieve()");
         exec($cmd);
+      }
     }
 
     $passwd_update .= ",";
