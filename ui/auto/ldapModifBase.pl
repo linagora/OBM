@@ -33,7 +33,11 @@ delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 # On se connecte a la base
 my $dbHandler;
 if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+    if( defined($dbHandler) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+    }else {
+        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : erreur inconnue", "WC" );
+    }
     exit 1;
 }
 
