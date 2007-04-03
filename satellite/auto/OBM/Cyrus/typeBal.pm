@@ -86,7 +86,7 @@ sub initRight {
     $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM P_UserObm i, P_EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
 
     $rightDef{"write"}->{"compute"} = 1;
-    $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM P_UserObm LEFT JOIN P_EntityRight ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id WHERE (entityright_entity='".$entityType."' AND entityright_entity_id=".$userId.") OR userobm_id=".$userId;
+    $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM P_UserObm LEFT JOIN P_EntityRight ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
 
     $rightDef{"public"}->{"compute"} = 0;
     $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM P_EntityRight WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
@@ -189,9 +189,6 @@ sub updateSieveScript {
     my @nomade;
     updateSieveNomade( $imapBox, \@headers, $oldSieveScript, \@nomade );
 
-    my @defaultAction;
-    &OBM::Cyrus::utils::sieveDefaultAction( $imapBox, \@headers, $oldSieveScript, \@defaultAction );
-
     splice( @{$newSieveScript}, 0 );
 
     if( ( $#vacation < 0 ) && ( $#nomade < 0 ) && ($#{$oldSieveScript} < 0) ) {
@@ -206,7 +203,6 @@ sub updateSieveScript {
         $oldSieveScript->[$i] .="\n";
     }
     push( @{$newSieveScript}, @{$oldSieveScript} );
-    push( @{$newSieveScript}, @defaultAction );
 
     return 0;
 }
@@ -264,6 +260,9 @@ sub updateSieveNomade {
 
         if( defined($imapBox->{"box_nomade_local_copy"}) && !$imapBox->{"box_nomade_local_copy"} ) {
             push( @{$newSieveScript}, "discard;\n" );
+            push( @{$newSieveScript}, "stop;\n" );
+        }else {
+            push( @{$newSieveScript}, "keep;\n" );
         }
 
         push( @{$newSieveScript}, $nomadeMark."\n" );
