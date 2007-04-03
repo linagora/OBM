@@ -1,6 +1,6 @@
 #########################################################################
 # OBM           - File : OBM::passwd.pm (Perl Module)                   #
-#               - Desc : Librairie Perl pour aliamin                    #
+#               - Desc : Librairie Perl pour OBM                        #
 #               Les fonctions implementant les différents algortihmes   #
 #               de chiffrage necessaires                                #
 #########################################################################

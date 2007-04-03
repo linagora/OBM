@@ -81,11 +81,6 @@ $templateOBM = $racineOBM . "template/";
 # Le repertoire temporaire
 $tmpOBM = "/tmp/";
 
-# Definition des fichiers correspondants aux fichiers modeles.
-#
-# Messagerie :
-$aliaminPostfixAliases = "/etc/aliases";
-
 
 #
 # Definition des divers programmes utiles.

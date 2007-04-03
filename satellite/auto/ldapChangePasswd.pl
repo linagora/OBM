@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #####################################################################
-# Aliamin           - File : ldapChangePasswd.pl                    #
+# OBM               - File : ldapChangePasswd.pl                    #
 #                   - Desc : Script permettant de modifier le mot   #
 #                   de passe de l'utilisateur dont le login est     #
 #                   passe en parametre                              #
