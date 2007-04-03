@@ -389,8 +389,7 @@ function update_scope_all() {
   }
 
   // Scope : Host
-  if ( ($scope["dns"] != "1") || ($scope["ldap"] != "1")
-       || ($scope["firewall"] != "1") || ($scope["squid"] != "1") ) {
+  if ( $scope["ldap"] != "1" ) {
     $scope_host = update_scope_Host();
     if (is_array($scope_host))
       $scope = array_merge ($scope, $scope_host);
@@ -398,19 +397,8 @@ function update_scope_all() {
       return $scope;
   }
 
-  // Scope : Network
-  // if ( ($scope["dns"] != "1") || ($scope["network"] != "1")
-  //       || ($scope["firewall"] != "1") || ($scope["vpn"] != "1") ) {
-  //    $scope_network = update_scope_Network();
-  //    if (is_array($scope_network))
-  //      $scope = array_merge ($scope, $scope_network);
-  //    if ((is_array($scope)) && (scope_is_max($scope)))
-  //      return $scope;
-  //  }
-
   // Scope : Mail
-  if ( ($scope["ldap"] != "1") || ($scope["firewall"] != "1")
-       || ($scope["postfix"] != "1") || ($scope["amavis"] != "1") ) {
+  if ( $scope["ldap"] != "1" ) {
     $scope_mail = update_scope_Mail();
     if (is_array($scope_mail))
       $scope = array_merge ($scope, $scope_mail);
@@ -450,11 +438,6 @@ function scope_is_max($scope) {
 	 ( ((! $cgp_use["service"]["ldap"]) || ($scope["ldap"] == "1"))
 	   && ((! $cgp_use["service"]["mail"]) || ($scope["cyrus"] == "1"))
 	   && ((! $cgp_use["service"]["mail"]) || ($scope["amavis"] == "1"))
-	   && ((! $cgp_use["service"]["web"]) || ($scope["squid"] == "1"))
-	   && ((! $cgp_use["service"]["dns"]) || ($scope["dns"] == "1"))
-	   && ((! $cgp_use["service"]["firewall"]) || ($scope["firewall"] == "1"))
-	   && ((! $cgp_use["service"]["network"]) || ($scope["network"] == "1"))
-	   && ((! $cgp_use["service"]["network"]) || ($scope["vpn"] == "1"))
 	   ) ) {
       return true;
     } else {
@@ -466,13 +449,7 @@ function scope_is_max($scope) {
 	 ( ((! $cgp_use["service"]["ldap"]) || ($scope["ldap"] == "1"))
 	   && ((! $cgp_use["service"]["mail"]) || ($scope["cyrus"] == "1"))
 	   && ((! $cgp_use["service"]["mail"]) || ($scope["postfix"] == "1"))
-	   && ((! $cgp_use["service"]["mail"]) || ($scope["amavis"] == "1"))
 	   && ((! $cgp_use["service"]["mail_nomad"]) || ($scope["alias"] == "1"))
-	   && ((! $cgp_use["service"]["web"]) || ($scope["squid"] == "1"))
-	   && ((! $cgp_use["service"]["dns"]) || ($scope["dns"] == "1"))
-	   && ((! $cgp_use["service"]["firewall"]) || ($scope["firewall"] == "1"))
-	   && ((! $cgp_use["service"]["network"]) || ($scope["network"] == "1"))
-	   && ((! $cgp_use["service"]["network"]) || ($scope["vpn"] == "1"))
 	   ) ) {
       return true;
     } else {
@@ -604,8 +581,6 @@ function update_scope_UserObm() {
     }
 
     // Passwd in Changed on live
-    // if ($sys_q->f("userobm_password") != $sys_upd_q->f("userobm_password"))
-    //  $scope["ldap"] = 1;
 
     if ($sys_q->f("userobm_uid") != $sys_upd_q->f("userobm_uid")) {
       $scope["ldap"] = 1;
@@ -673,15 +648,6 @@ function update_scope_UserObm() {
 
     if ($sys_q->f("userobm_web_perms") != $sys_upd_q->f("userobm_web_perms")) {
       $scope["ldap"] = 1;
-      $scope["squid"] = 1;
-    }
-
-    if ($sys_q->f("userobm_web_list") != $sys_upd_q->f("userobm_web_list")) {
-      $scope["squid"] = 1;
-    }
-
-    if ($sys_q->f("userobm_web_all") != $sys_upd_q->f("userobm_web_all")) {
-      $scope["squid"] = 1;
     }
 
     if ($sys_q->f("userobm_mail_perms") != $sys_upd_q->f("userobm_mail_perms")) {
@@ -706,39 +672,48 @@ function update_scope_UserObm() {
     }
 
     if ($sys_q->f("userobm_nomade_perms") != $sys_upd_q->f("userobm_nomade_perms")) {
-      $scope["alias"] = 1;
+      $scope["cyrus"] = 1;
     }
+
     if ($sys_q->f("userobm_nomade_enable") != $sys_upd_q->f("userobm_nomade_enable")) {
-      $scope["ldap"] = 1;
-      $scope["alias"] = 1;
+      $scope["cyrus"] = 1;
     }
+
     if ($sys_q->f("userobm_nomade_local_copy") != $sys_upd_q->f("userobm_nomade_local_copy")) {
-      $scope["ldap"] = 1;
-      $scope["alias"] = 1;
+      $scope["cyrus"] = 1;
     }
+
     if ($sys_q->f("userobm_email_nomade") != $sys_upd_q->f("userobm_email_nomade")) {
-      $scope["ldap"] = 1;
-      $scope["alias"] = 1;
+      $scope["cyrus"] = 1;
+    }
+
+    if ($sys_q->f("userobm_vacation_enable") != $sys_upd_q->f("userobm_vacation_enable")) {
+      $scope["cyrus"] = 1;
+    }
+
+    if ($sys_q->f("userobm_vacation_message") != $sys_upd_q->f("userobm_vacation_message")) {
+      $scope["cyrus"] = 1;
     }
 
     if ($sys_q->f("userobm_samba_perms") != $sys_upd_q->f("userobm_samba_perms")) {
       $scope["ldap"] = 1;
     }
+
     if ($sys_q->f("userobm_samba_home") != $sys_upd_q->f("userobm_samba_home")) {
       $scope["ldap"] = 1;
     }
+
     if ($sys_q->f("userobm_samba_home_drive") != $sys_upd_q->f("userobm_samba_home_drive")) {
       $scope["ldap"] = 1;
     }
+
     if ($sys_q->f("userobm_samba_logon_script") != $sys_upd_q->f("userobm_samba_logon_script")) {
       $scope["ldap"] = 1;
     }
 
-
     // Si portée deja maximale pour les users, on retourne directement
     if ( ($scope["ldap"] == 1)
 	 && ($scope["cyrus"] == 1)
-	 && ($scope["squid"] == 1)
 	 && ($scope["postfix"] == 1)
 	 && ($scope["alias"] == 1) ) {
       return $scope;
@@ -955,10 +930,7 @@ function update_scope_Host() {
 
   // S'il n'y a pas le meme nombre d'enregistrement (ajout ou suppresion)
   if ($sys_q->num_rows() != $sys_upd_q->num_rows()) {
-    $scope["dns"] = 1;
     $scope["ldap"] = 1;
-    $scope["firewall"] = 1;
-    $scope["squid"] = 1;
     return $scope;
   }
 
@@ -971,150 +943,29 @@ function update_scope_Host() {
     if ($sys_q->f("host_uid") != $sys_upd_q->f("host_uid")) {
       $scope["ldap"] = 1;
     }
+    
     if ($sys_q->f("host_gid") != $sys_upd_q->f("host_gid")) {
       $scope["ldap"] = 1;
     }
+
     if ($sys_q->f("host_samba") != $sys_upd_q->f("host_samba")) {
       $scope["ldap"] = 1;
     }
+
     if ($sys_q->f("host_name") != $sys_upd_q->f("host_name")) {
-      $scope["dns"] = 1;
       $scope["ldap"] = 1;
     }
+
     if ($sys_q->f("host_ip") != $sys_upd_q->f("host_ip")) {
-      $scope["dns"] = 1;
       $scope["ldap"] = 1;
-      $scope["firewall"] = 1;
-      $scope["squid"] = 1;
     }
+
     if ($sys_q->f("host_description") != $sys_upd_q->f("host_description")) {
       $scope["ldap"] = 1;
     }
-    if ($sys_q->f("host_web_perms") != $sys_upd_q->f("host_web_perms")) {
-      $scope["squid"] = 1;
-    }
-    if ($sys_q->f("host_web_list") != $sys_upd_q->f("host_web_list")) {
-      $scope["squid"] = 1;
-    }
-    if ($sys_q->f("host_web_all") != $sys_upd_q->f("host_web_all")) {
-      $scope["squid"] = 1;
-    }
-    if ($sys_q->f("host_ftp_perms") != $sys_upd_q->f("host_ftp_perms")) {
-      $scope["firewall"] = 1;
-    }
-    if ($sys_q->f("host_firewall_perms") != $sys_upd_q->f("host_firewall_perms")) {
-      $scope["firewall"] = 1;
-    }
 
     // Si portée deja maximale pour les hotes, on retourne directement
-    if ( ($scope["ldap"] == 1)
-	 && ($scope["dns"] == 1)
-	 && ($scope["firewall"] == 1)
-	 && ($scope["squid"] == 1) ) {
-      return $scope;
-    }
-  }
-
-  return $scope;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Updates detection between Production (aliamin) and update (aliaminUpd)
-// database for table Network
-// Returns:
-//   - $scope[] hash with scopes keys $scope[$key] = 1 if $key in scope
-//     keys : all, ldap, cyrus, postfix, alias
-///////////////////////////////////////////////////////////////////////////////
-function update_scope_Network() {
-  global $cdg_sql;
-
-  $query = "SELECT * FROM P_Network ORDER BY network_interface, network_ip";
-  $query_upd = "SELECT * FROM Network ORDER BY network_interface, network_ip";
-  $sys_q = new DB_OBM;
-  $sys_upd_q = new DB_OBM;
-
-  display_debug_msg($query, $cdg_sql, "update_scope_Network(1)");
-  $sys_q->query($query);
-  display_debug_msg($query_upd, $cdg_sql, "update_scope_Network(2)");
-  $sys_upd_q->query($query_upd);
-
-  // S'il n'y a pas le meme nombre d'enregistrement (ajout ou suppresion)
-  if ($sys_q->num_rows() != $sys_upd_q->num_rows()) {
-    $scope["dns"] = 1;
-    $scope["network"] = 1;
-    $scope["firewall"] = 1;
-    $scope["vpn"] = 1;
-    return $scope;
-  }
-
-  // Pour toutes les lignes network
-
-  while ($sys_q->next_record()) {
-    $sys_upd_q->next_record();
-
-    // Si une ligne est differente
-    if ($sys_q->f("network_kind") != $sys_upd_q->f("network_kind")) {
-      $scope["network"] = 1;
-      $scope["firewall"] = 1;
-      $scope["vpn"] = 1;
-    }
-    if ($sys_q->f("network_interface") != $sys_upd_q->f("network_interface")) {
-      $scope["network"] = 1;
-      $scope["firewall"] = 1;
-      $scope["vpn"] = 1;
-    }
-    if ($sys_q->f("network_hostname") != $sys_upd_q->f("network_hostname")) {
-      $scope["dns"] = 1;
-      $scope["network"] = 1;
-      $scope["firewall"] = 1;
-      $scope["vpn"] = 1;
-    }
-    if ($sys_q->f("network_localdomain") != $sys_upd_q->f("network_localdomain")) {
-      $scope["dns"] = 1;
-      $scope["network"] = 1;
-      $scope["vpn"] = 1;
-    }
-    if ($sys_q->f("network_ip") != $sys_upd_q->f("network_ip")) {
-      $scope["dns"] = 1;
-      $scope["network"] = 1;
-      $scope["firewall"] = 1;
-      $scope["vpn"] = 1;
-    }
-    if ($sys_q->f("network_network") != $sys_upd_q->f("network_network")) {
-      $scope["dns"] = 1;
-      $scope["network"] = 1;
-      $scope["firewall"] = 1;
-      $scope["vpn"] = 1;
-    }
-    if ($sys_q->f("network_mask") != $sys_upd_q->f("network_mask")) {
-      $scope["dns"] = 1;
-      $scope["network"] = 1;
-      $scope["firewall"] = 1;
-      $scope["vpn"] = 1;
-    }
-    if ($sys_q->f("network_gateway") != $sys_upd_q->f("network_gateway")) {
-      $scope["dns"] = 1;
-      $scope["network"] = 1;
-      $scope["vpn"] = 1;
-    }
-    if ($sys_q->f("network_dns") != $sys_upd_q->f("network_dns")) {
-      $scope["dns"] = 1;
-    }
-    if ($sys_q->f("network_name") != $sys_upd_q->f("network_name")) {
-      $scope["network"] = 1;
-      $scope["vpn"] = 1;
-    }
-    if ($sys_q->f("network_psk") != $sys_upd_q->f("network_psk")) {
-      $scope["firewall"] = 1;
-      $scope["vpn"] = 1;
-    }
-
-    // Si portée deja maximale pour le network, on retourne directement
-    if ( ($scope["dns"] == 1)
-	 && ($scope["network"] == 1)
-	 && ($scope["firewall"] == 1)
-	 && ($scope["vpn"] == 1) ) {
+    if ( $scope["ldap"] == 1 ) {
       return $scope;
     }
   }
@@ -1146,9 +997,7 @@ function update_scope_Mail() {
   // S'il n'y a pas le meme nombre d'enregistrement (ajout ou suppresion)
   if ($sys_q->num_rows() != $sys_upd_q->num_rows()) {
     $scope["ldap"] = 1;
-    $scope["firewall"] = 1;
     $scope["postfix"] = 1;
-    $scope["amavis"] = 1;
     return $scope;
   }
 
@@ -1166,9 +1015,7 @@ function update_scope_Mail() {
 
     if (($m_id != $mu_id) || ($m_host_id != $mu_host_id) || ($m_relayhost_id != $mu_relayhost_id)) {
       $scope["ldap"] = 1;
-      $scope["firewall"] = 1;
       $scope["postfix"] = 1;
-      $scope["amavis"] = 1;
       return $scope;
     }
   }
@@ -1201,7 +1048,6 @@ function update_scope_Samba() {
   // S'il n'y a pas le meme nombre d'enregistrement (ajout ou suppresion)
   if ($sys_q->num_rows() != $sys_upd_q->num_rows()) {
     $scope["ldap"] = 1;
-    $scope["firewall"] = 1;
     $scope["postfix"] = 1;
     return $scope;
   }
@@ -1218,7 +1064,6 @@ function update_scope_Samba() {
 
     if (($samba_name != $samba_name_upd) || ($samba_value != $samba_value_upd)) {
       $scope["ldap"] = 1;
-      $scope["firewall"] = 1;
       $scope["postfix"] = 1;
       return $scope;
     }

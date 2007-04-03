@@ -153,7 +153,7 @@ if ($action == "ext_get_ids") {
   if (check_user_data_form($params["user_id"], $params)) {
     $retour = run_query_user_update($params["user_id"], $params);
     if ($retour) {
-      update_update_state();  // Aliamin
+      update_update_state();  // OBM-Ldap, OBM-Mail, OBM-Samba
       $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
       $display["detail"] = dis_user_consult($params);
     } else {
