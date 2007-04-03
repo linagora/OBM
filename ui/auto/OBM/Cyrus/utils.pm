@@ -41,28 +41,3 @@ sub sieveDeleteMark {
     return 0;
 }
 
-
-sub sieveDefaultAction {
-    my( $imapBox, $headers, $oldSieveScript, $newSieveScript ) = @_;
-    my $defaultMark = "# OBM2 - Default Action";
-
-    # On verifie que l'en-tête necessaire soit bien placé
-    my $i=0;
-    while( ( $i<=$#{$headers} ) && ( $headers->[$i] !~ /[^#]*require \"fileinto\";/) ) {
-        $i++;
-    }
-
-    if( $i > $#{$headers} ) {
-        unshift( @{$headers}, "require \"fileinto\";\n" );
-    }
-
-
-    push( @{$newSieveScript}, $defaultMark."\n" );
-    push( @{$newSieveScript}, "fileinto \"INBOX\";\n" );
-    push( @{$newSieveScript}, $defaultMark."\n" );
-
-    # On supprime le vacation de l'ancien script
-    sieveDeleteMark( $oldSieveScript, $defaultMark );
-
-    return 0;
-}
