@@ -229,7 +229,7 @@ As a side note, the obminclude directory can be moved to another location.
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-    Alias /images /var/www/obm/resources (beware, this has changed in OBM 2.0)<br />
+Alias /images /var/www/obm/resources (beware, this has changed in OBM 2.0)
 </pre>
   </td>
 </tr>
@@ -560,6 +560,10 @@ OBM configuration has evolved.
   <td>delete obmdb_host, $obmdb_db, $obmdb_user,... (are in obm_conf.ini)</td>
 </tr>
 <tr>
+  <td>$password_encryption</td>
+  <td>set it to MD5SUM (instead of MD5)</td>
+</tr>
+<tr>
   <th colspan="2">Categories update</th>
 </tr>
 <tr>
@@ -666,6 +670,17 @@ psql -U obm obm < scripts/2.0/obmdb_default_values_2.0.sql
 cd scripts/2.0
 php update-1.2-2.0.php
 </code>
+  </td>
+</tr>
+</table>
+
+<h3>Update the images alias apache conf</h3>
+<p>In your apache virtual configuration, update the alias to images to :</p>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+Alias /images /var/www/obm/resources
+</pre>
   </td>
 </tr>
 </table>
