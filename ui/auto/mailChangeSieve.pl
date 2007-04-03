@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w -T
 #####################################################################
-# Aliamin           - File : mailChangeSieve.pl                     #
+# OBM               - File : mailChangeSieve.pl                     #
 #                   - Desc : Script permettant de gerer le filtre   #
 #                   sieve d'un utilisateur                          #
 #                   - Parametres :                                  #

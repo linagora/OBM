@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w -T
 ###############################################################################
-# Aliamin   - File : ldapModifBase.pl                                         #
+# OBM       - File : ldapModifBase.pl                                         #
 #           - Desc : Modification de la base LDAP en fonction des infos       #
 #           de la base SQL                                                    #
 ###############################################################################
