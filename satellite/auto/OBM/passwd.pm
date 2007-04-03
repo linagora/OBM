@@ -68,7 +68,7 @@ sub toSsha {
 
 sub convertPasswd {
     my( $passwdType, $passwd ) = @_;
-    my $userPasswd;
+    my $userPasswd = undef;
 
     if( !defined($passwdType) || !defined($passwd) ) {
         return undef;
@@ -89,8 +89,6 @@ sub convertPasswd {
             $userPasswd = "{CRYPT}".$passwd;
             last SWITCH;
         }
-
-        return undef;
     }
 
     return $userPasswd;
