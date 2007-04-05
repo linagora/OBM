@@ -76,15 +76,15 @@ sub getDbValues {
 
         # gestion de l'adresse
         if( defined($user_address1) && ($user_address1 ne "") ) {
-            push( @{$users[$i]->{"user_address"}}, $user_address1 );
+            $users[$i]->{"user_address"} = $user_address1;
         }
         
         if( defined($user_address2) && ($user_address2 ne "") ) {
-            push( @{$users[$i]->{"user_address"}}, $user_address2 );
+            $users[$i]->{"user_address"} .= "\r\n".$user_address2;
         }
         
         if( defined($user_address3) && ($user_address3 ne "") ) {
-            push( @{$users[$i]->{"user_address"}}, $user_address3 );
+            $users[$i]->{"user_address"} .= "\r\n".$user_address3;
         }
         
 
@@ -236,7 +236,7 @@ sub createLdapEntry {
 
     # Le service
     if( $entry->{"user_service"} ) {
-        $ldapEntry->add( departmentNumber => to_utf8({ -string => $entry->{"user_service"}, -charset => $defaultCharSet }) );
+        $ldapEntry->add( ou => to_utf8({ -string => $entry->{"user_service"}, -charset => $defaultCharSet }) );
     }
 
     # La description
@@ -283,9 +283,11 @@ sub createLdapEntry {
 
     # L'adresse postale
     if( $entry->{"user_address"} ) {
-        for( my $i=0; $i<=$#{$entry->{"user_address"}}; $i++ ) {
-            $ldapEntry->add( street => to_utf8({ -string => $entry->{"user_address"}->[$i], -charset => $defaultCharSet }) );
-        }
+        # Thunderbird, IceDove... : ne comprennent que cet attribut
+        $ldapEntry->add( street => to_utf8({ -string => $entry->{"user_address"}, -charset => $defaultCharSet }) );
+        # Outlook : ne comprend que cet attribut
+        # Outlook Express : préfère celui-là à 'street'
+        $ldapEntry->add( postalAddress => to_utf8({ -string => $entry->{"user_address"}, -charset => $defaultCharSet }) );
     }
 
     # Le code postal
@@ -343,7 +345,7 @@ sub updateLdapEntry {
     }
 
     # Le service
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_service"}, $ldapEntry, "departmentNumber" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_service"}, $ldapEntry, "ou" ) ) {
         $update = 1;
     }
 
@@ -353,7 +355,8 @@ sub updateLdapEntry {
     }
 
     # L'adresse
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_address"}, $ldapEntry, "street" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_address"}, $ldapEntry, "street" ) ) {
+        &OBM::Ldap::utils::modifyAttr( $entry->{"user_address"}, $ldapEntry, "postalAddress" );
         $update = 1;
     }
 
