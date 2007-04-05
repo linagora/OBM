@@ -1511,11 +1511,12 @@ function of_userdata_dis_entity_form($entity, $ent_id, $params) {
 	$cats = of_category_user_get_ordered($cat_name, $entity);
 	if ($ent_id > 0) {
 	  if (isset($params["$cat_name"])) {
-	    $cats_sel = of_category_user_get_infos($params["$cat_name"]);
-	  } else {
-	    $cats_sel = of_category_user_get_ordered($cat_name, $entity, $ent_id);
+            $cats_sel = of_category_user_get_infos($params["$cat_name"]);
+            $cat_id = $cats_sel[$params["$cat_name"]]["id"];
+          } else {
+            $cats_sel = of_category_user_get_ordered($cat_name, $entity, $ent_id);
+	    $cat_id = $cats_sel[0]["id"];
 	  }
-	  $cat_id = $cats_sel[$params["$cat_name"]]["id"];
 	} else {
 	  if (isset($params["$cat_name"])) {
 	    $cats_sel = of_category_user_get_infos($params["$cat_name"]);

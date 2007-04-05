@@ -188,9 +188,12 @@ function datePickerGenerator() {
   elements = $$('.datePicker');
   elements.each(function(element){
     element.setProperty('autocomplete','off');
-    img = $(document.createElement('img'));
+    var span = new Element('span').injectBefore(element).addClassName('NW');
+    element.remove();
+    element.injectInside(span);
+    var img = new Element('img');
     img.setAttribute("src", obm.vars.images.datePicker);
-    img.injectAfter(element);
+    img.injectInside(span);
     img.addEvent('click', function(e){
       displayDatePicker(element.name);
     });

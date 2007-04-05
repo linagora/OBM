@@ -436,8 +436,8 @@ function html_incident_consult($inc_q) {
     <td>$archive</td>
   </tr>
   </table>
-  $block_userdata
 </div>
+  $block_userdata
 
 <div class=\"detail extra\">
   <h1>$l_solution <a href=\"mailto:$email_con?subject=$l_incident $label : $l_solution&cc=$cmail_incident&body=$inc_reso\"><img src=\"$ico_mail\" alt=\"[Mail]\" /></a>

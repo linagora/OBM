@@ -82,7 +82,7 @@ input {
 
 select {
   color: #636466;
-  font-size: 100%;
+  font-size: 90%;
   border: 1px solid #d2d2d2;
   font-weight: bold;
 }
@@ -128,6 +128,10 @@ form {
   width: 100%;
 }
 
+.NW {
+  white-space: nowrap;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Two column layout  */
 /* ------------------------------------------------------------------------- */
@@ -146,12 +150,14 @@ form {
   margin: 0 0px 20px 17.5em;
   padding: 2em 1em 1em;
 /*IE workaround*/
+  height: auto!important;
   height: 1px;
 }
 
 #mainContent {
   background-color: #eff0f2;
   padding-bottom: 5px; 
+  padding-top: 0;
 }
 /* ------------------------------------------------------------------------- */
 /* Banner */
@@ -255,7 +261,7 @@ form {
 /* ------------------------------------------------------------------------- */
 
 .module {
-  position:absolute;
+  position: absolute;
   z-index: 10000;
   display: none;
 }
@@ -397,6 +403,16 @@ form {
   margin: 0;
 }
 
+#ajaxMessage {
+  width: 100%;
+  height: 1.5em;
+  position:relative;
+  margin-bottom: -1.5em;
+}
+
+#ajaxMessage *{
+  position: absolute;
+}
 
 /* ------------------------------------------------------------------------- */
 /* Debug */
@@ -1000,7 +1016,7 @@ input.datePicker {
 .elementRow {
   color: #666666;
   background-color: #ffffff;  
-  overflow: auto;
+  overflow: hidden;
   width: 15em;
   float: left; 
   white-space: nowrap;

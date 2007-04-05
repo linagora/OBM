@@ -110,7 +110,7 @@ HideTimer = new Class({
     this.options = Object.extend({
       duration: 1000,
       fn: this.hideElement,
-      elems: null
+      elems: new Array()
     }, options || {});
 
   },
@@ -156,6 +156,7 @@ HideTimer = new Class({
   hideElement: function() {
     this.el.setStyle('display','none');
     this.el.setStyle('visibility','hidden');
+    overListBoxFix(this.el,'none');
   },
   
   exec: function() {

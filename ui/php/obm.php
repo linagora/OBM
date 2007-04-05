@@ -137,8 +137,8 @@ function get_obm_params() {
 // Display detail of logout page
 ///////////////////////////////////////////////////////////////////////////////
 function dis_logout_detail() {
-  global $l_connection_end, $l_reconnect,$obm_version;
-
+  global $l_connection_end, $l_reconnect,$obm_version,$path;
+  header("location: $_SERVER[PHP_SELF]");
   $block = "
 <table width=\"100%\">
 <tr>

@@ -425,6 +425,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $date_exception = $calendar["date_exception"];
   
   $obm_q = new DB_OBM;
+  
   $query = "INSERT INTO CalendarEvent (
     calendarevent_timeupdate,                         
     calendarevent_timecreate,                         
@@ -1017,6 +1018,10 @@ function run_query_calendar_quick_event_insert($calendar, $sel_entity_id) {
      calendarevent_privacy,
      calendarevent_repeatkind,
      calendarevent_repeatfrequence,
+     calendarevent_endrepeat,
+     calendarevent_repeatdays,
+     calendarevent_location, 
+     calendarevent_category1_id,
      calendarevent_priority,
      calendarevent_domain_id
    )
@@ -1032,6 +1037,10 @@ function run_query_calendar_quick_event_insert($calendar, $sel_entity_id) {
     '0',
     'none',
     '1',
+    'NOW()',
+    '',
+    '',
+    NULL,
     '2',
     '$obm[domain_id]'
   )";

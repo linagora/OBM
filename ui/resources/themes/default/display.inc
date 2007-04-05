@@ -31,6 +31,7 @@ function display_page(&$display) {
       $display["title"] .
       $display["msg"] .
       "<div id=\"mainContent\">
+      <div id=\"ajaxMessage\"></div>
       &nbsp;".
       $display["detail"] . "
       </div>
@@ -45,7 +46,9 @@ function display_page(&$display) {
     echo $display["head"] . 
       $display["title"] .
       $display["msg"] . 
-      "<div id=\"mainContent\">&nbsp;".
+      "<div id=\"mainContent\">
+      <div id=\"ajaxMessage\"></div>
+      &nbsp;".
       $display["search"] .
       $display["detail"]." 
        <p class=\"LC\" />
@@ -83,7 +86,9 @@ function display_page(&$display) {
     $display[msg]" ;
     if($display["search"] != "" || $display["detail"] != "") {
       echo  
-      "<div id=\"mainContent\">&nbsp;".
+        "<div id=\"mainContent\">
+         <div id=\"ajaxMessage\"></div>
+        &nbsp;".
       $display["search"] .
       $display["detail"] . "
       <p class=\"LC\" />

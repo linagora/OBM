@@ -33,9 +33,9 @@ $fieldnames["company_web"] = $l_web;
 $fieldnames["type_label"] = $l_type;
 $fieldnames["activity_label"] = $l_activity;
 $fieldnames["nafcode_code"] = $l_nafcode;
-$fieldnames["company_contact_number"] = "<img src=\"$ico_contact\" alt=\"C\" />";
+$fieldnames["company_contact_number"] = "<img src=\"$ico_contact\" alt=\"Contact\" />";
 $fieldnames["company_new_contact"] = "<img src=\"$ico_add\" alt=\"New Contact\" />";
-$fieldnames["company_deal_number"] = "<img src=\"$ico_deal\" alt=\"D\" />";
+$fieldnames["company_deal_number"] = "<img src=\"$ico_deal\" alt=\"Deal\" />";
 
 
 ///////////////////////////////////////////////////////////////////////////////

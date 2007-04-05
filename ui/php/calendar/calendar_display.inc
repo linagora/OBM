@@ -33,7 +33,6 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") 
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
   $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
   $display["features"] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable);
-  $block = "<div id=\"ajaxMessage\" style=\"height:4em;position:absolute;\"></div>";
   if ($p_view == "year") {
     $block .= dis_calendar_year_planning($calendar, $calendar_entity,$writable_entity);
   } else if ($p_view == "month") {
@@ -2152,14 +2151,14 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     <th>$l_datebegin</th>
     <td>
       <input type=\"text\" name=\"tf_date_begin\" value=\"$datebegin\" class=\"datePicker\" onchange=\"this.form.tf_date_end.value=this.value\"/>
-      <span id=\"hour_begin\" style=\"$style\" >$l_hour : $dis_hour_b : $dis_min_b</span>
+      <span id=\"hour_begin\" style=\"$style\" class=\"NW\">$l_hour : $dis_hour_b : $dis_min_b</span>
     </td>
   </tr>
   <tr>
     <th>$l_dateend</th>
     <td>
       <input type=\"text\" name=\"tf_date_end\" value=\"$dateend\" class=\"datePicker\" />
-      <span id=\"hour_end\" style=\"$style\" >$l_hour : $dis_hour_e : $dis_min_e</span>
+      <span id=\"hour_end\" style=\"$style\"  class=\"NW\">$l_hour : $dis_hour_e : $dis_min_e</span>
     </td>       
   </tr>
   <tr>
@@ -3128,6 +3127,10 @@ function json_event_data($id,$calendar) {
   $ed[] = "title:'".$title."'";
   $ed[] = "attendees:[".implode(',',$attendees)."]";
   $ed[] = "updatable:true";
+  $ed[] = "description:''";
+  $ed[] = "location:''";
+  $ed[] = "category:''";
+    
   
   $entity_readable = get_calendar_entity_readable();
   $sel_entity_id = slice_calendar_entities($cal_entity_id, $ccalendar_max_users, $entity_readable);

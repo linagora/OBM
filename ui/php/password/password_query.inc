@@ -153,6 +153,20 @@ function check_data_form($usr_q, $password) {
       return false;
     }
 
+    // Verifie que le mot de passe actuel est correct
+    if ($passtype == "CRYPT") {
+      $old_passwd_crypt = crypt($old_pass,$pass);
+    } else if ($passtype == "MD5") {
+      $old_passwd_crypt = md5($old_pass);
+    } else {
+      $old_passwd_crypt = $old_pass;
+    }
+    if ($pass != $old_passwd_crypt) {
+      $err["msg"] = "$l_wrong_password";
+      $err["field"] = "old_password";
+      return false;
+    }
+
     // Password is correct
     if ( (trim($new_pass) == "")
 	 || (preg_match($php_regexp_password, $new_pass) == false) ) {

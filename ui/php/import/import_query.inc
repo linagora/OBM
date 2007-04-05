@@ -536,7 +536,7 @@ function get_import_similar_company($fields, $map) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-  $multidomain = sql_multidomain("import");
+  $multidomain = sql_multidomain("company");
 
   $name = $fields["comp_name"];
   if ($name == "") {

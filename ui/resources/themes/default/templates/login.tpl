@@ -8,7 +8,7 @@
     <style>
       body {
         text-align: center;
-        margin-top: 4em;
+        margin-top: 1em;
       }
       form {
         margin: auto;
@@ -18,13 +18,16 @@
         width: 50%;
       }
       #aliasource {
-        position :absolute;
-        top: 1px;
+        margin-top:0;
+        margin-bottom:0;
         width: 100%;
       }
     </style>
   </head>
   <body>
+    <p id="aliasource">
+    <a href="http://www.aliasource.fr">AliaSource</a>
+    </p>
     <h1>OBM $obm_version</h1>
     <img src="$img_home" alt="OBM $obm_version" />
     <p class="error"></p>
@@ -50,9 +53,6 @@
         <input type="submit" value="$l_validate" />
       </fieldset>
     </form>
-    <p id="aliasource">
-    <a href="http://www.aliasource.fr">AliaSource</a>
-    </p>
     $login_javascript_footer  
   </body>
 </html>
