@@ -114,7 +114,7 @@ function dis_statistic_resp_stats($cont_q,$comp_q) {
       $max = $comp_q->f("comp_stat");
     }
   } 
-  $block .= "<table class=\"spreadSheet\" style=\"width:100%;\">";
+  $block .= "<table class=\"spreadSheet\">";
 
   if (is_array($stat)) {
     foreach($stat as $id => $value) {
@@ -122,7 +122,7 @@ function dis_statistic_resp_stats($cont_q,$comp_q) {
       $comp = round(($value["company"]/$max)*90)+0.1;
       $block .= "
   <tr>
-    <th rowspan=\"2\" width=\"150px\">".$value["name"]."</th>
+    <th rowspan=\"2\" style=\"width:150px;\">".$value["name"]."</th>
     <td>
     <table style=\"width:100%;\">
     <tr>
@@ -147,11 +147,11 @@ function dis_statistic_resp_stats($cont_q,$comp_q) {
    
   $block .= "
   <tr>
-    <td rowspan=\"2\">$l_key</td>
+    <th rowspan=\"2\">$l_key</th>
     <td>
     <table>
     <tr>
-      <td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td>
+      <th style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td>
       <td>$l_module_contact</td>
     </tr>
     </table>
@@ -232,13 +232,11 @@ function dis_statistic_cat_stats($comp_q, $tot) {
 
   foreach($cat as $cat_id =>$cat_name) {
     if ($cat_id != 0) {
-      $onOver = "    onMouseOver=\"show(event,'cat_$cat_id'); return true;\"
-    onMouseOut=\"hide('cat_$cat_id'); return true;\"";
-      $infos .= "<span class=\"hiddenLegend\" id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
+      $title = "title=\"$cat_desc[$cat_id]\"";
     } else {
       $onOver = "";
     }
-    $cat_label .= "<th $onOver>$cat_name</th>";
+    $cat_label .= "<th $title>$cat_name</th>";
     $percent = round(($cat_count[$cat_id])*100/$cat_link_total,1);    
     $cat_percent .= "<td>$percent</td>";
     $cat_tots .= "<td>".$cat_count[$cat_id]."</td>";
@@ -248,9 +246,7 @@ function dis_statistic_cat_stats($comp_q, $tot) {
   $block .= "$cat_label<th>$l_totals</th><th>%</th></tr></thead>";
   foreach ($stat as $cty_iso => $data) {
     if ($cty_iso != "") {
-      $onOver = "    onMouseOver=\"show(event,'cty_$cty_iso'); return true;\"
-    onMouseOut=\"hide('cty_$cty_iso'); return true;\"";
-      $infos .= "<span class=\"hiddenLegend\" id=\"cty_$cty_iso\">".$cty_desc[$cty_iso]."</span>";
+      $title = "title=\"$cty_desc[$cty_iso]\"";
     } else {
       $onOver = "";
     }
@@ -261,7 +257,7 @@ function dis_statistic_cat_stats($comp_q, $tot) {
       $pair = 0;
       $block .= "<tr class=\"impair\">";
     }
-    $block .= "<th $onOver>$cty_iso</th>";
+    $block .= "<th $title>$cty_iso</th>";
     foreach($cat as $cat_id => $cat_name) {
       $block .= "<td>".$data[$cat_id]."</td >";
     }
@@ -282,8 +278,8 @@ function dis_statistic_cat_stats($comp_q, $tot) {
   </th>$cat_tots<td>$cat_link_total</td><td></td></tr>
   <tr><th>%</th>$cat_percent<td></td><td>100</td></tr>
   <tr><th></th>$cat_label<th>$l_totals</th><th>%</th></tr>
-  <tr><th></th>$super_cat<th></th></th><th><th></th></tr>
-  <tr><th>%</th>$super_cat_p<th></th></th><th><th></th></tr>
+  <tr><th></th>$super_cat<th></th><th></th></tr>
+  <tr><th>%</th>$super_cat_p<th></th><th></th></tr>
    </table>
    </div>
    <br />
@@ -291,7 +287,6 @@ function dis_statistic_cat_stats($comp_q, $tot) {
   <h1> x = $l_category </h1>
   <h1> y = $l_header_country</h1>
   </div>
-  $infos
 ";
   return $block;
 }

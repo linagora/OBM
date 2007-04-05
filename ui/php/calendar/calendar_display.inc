@@ -1188,10 +1188,15 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
             $haveevent = true;
             foreach ($occurences as $occurence) {
               $event = &$occurence->event;
-              if ($event->privacy == 1 && $obm["uid"] != $properties["id"]) {
-                $today_events[] = "$l_private : $l_all_day";
+              if($event->all_day) {
+                $ad = ": $l_all_day";
               } else {
-                $today_events[] = $event->title." : $l_all_day";
+                $ad = "";
+              }
+              if ($event->privacy == 1 && $obm["uid"] != $properties["id"]) {
+                $today_events[] = "$l_private $ad";
+              } else {
+                $today_events[] = $event->title." $ad";
               }
             }            
           }
@@ -1300,29 +1305,34 @@ function html_calendar_dis_conflict($calendar, $c_q) {
     }       
     $dis_conflict .= "
       <tr>
-        <td class=\"detailForm\">$title</td>
-        <td class=\"detailForm\">$location</td>
-        <td class=\"detailForm\">$date_b</td>
-        <td class=\"detailForm\">$date_e</td>
-        <td class=\"detailForm\">$name</td>";
+        <td>$title</td>
+        <td>$location</td>
+        <td>$date_b</td>
+        <td>$date_e</td>
+        <td>$name</td>";
 
      $dis_conflict .= "</tr>";
   }
   $block = "
   $dis_form_begin
-  <div class=\"detailHead\">$l_conflicts</div>
-  <table class=\"detail\">
+  <div class=\"detail extra\">
+  <h1>$l_conflicts</h1>
+  <table class=\"spreadSheet\">
+  <thead>
    <tr>
-    <td class=\"detailText\">$l_title</td>
-    <td class=\"detailText\">$l_location</td>
-    <td class=\"detailText\">$l_datebegin</td>
-    <td class=\"detailText\">$l_dateend</td>
-    <td class=\"detailText\">$l_user</td>    
-   </tr>
-   $dis_conflict
+    <th>$l_title</th>
+    <th>$l_location</th>
+    <th>$l_datebegin</th>
+    <th>$l_dateend</th>
+    <th>$l_user</th>    
+    </tr>
+    </thead>
+    <tbody>
+    $dis_conflict
+    </tbody>
   </table>
-  <div class=\"detailButton\">
-   <p class=\"detailButtons\">$dis_form_button</p>
+  <div class=\"buttons\">
+   $dis_form_button
   </div>
 
   $dis_form_end";

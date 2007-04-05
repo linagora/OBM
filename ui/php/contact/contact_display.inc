@@ -324,7 +324,7 @@ function dis_contact_search_form($contact="") {
   if ($cgp_hide["contact"]["responsible"]) {
     $usr_q = "";
   } else {
-    $usr_q = run_query_userobm_active();
+    $usr_q = run_query_userobm_responsable("Contact",array("contact_marketingmanager_id"));
   }
   $funcs = of_category_get_ordered("contact", "function");
   $ctry_q = run_query_global_country_for_lang();
@@ -2291,12 +2291,10 @@ function dis_html_contact_date_graph_stats($entity) {
 
   $url = url_prepare("$path/statistic/statistic_index.php?action=contact_date_evolution_graph");
 
-  $block = "<div class=\"detailHead\">".ucfirst($l_contact_date_evolution_graph)."</div>
-   <table class=\"detail\" >
-     <tr>
-       <td class=\"detailLabel\" class=\"detailForm\"><img src=\"$url\" /></td>
-     </tr>
-   </table>";
+  $block = "<div class=\"detail extra\">
+   <h1>".ucfirst($l_contact_date_evolution_graph)."</h1>
+       <img src=\"$url\" />
+   </div>";
  
   return $block; 
 }
@@ -2331,16 +2329,19 @@ function dis_category_contact_stats($params) {
     foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
       global ${"l_$cat_name"};
       $l_cat = ${"l_$cat_name"};
-      $block_contact .= "<div class=\"detailText\"><a href=\"?action=statistics&amp;stat=$cat_name\">$l_cat</a></div>";
+      $block_contact .= "<li><a href=\"?action=statistics&amp;stat=$cat_name\">$l_cat</a></li>";
     }
   }
 
 
   $block = "
-    <div class=\"detailText\"><a href=\"?action=statistics&amp;stat=function\">$l_function</a></div>
-    <div class=\"detailText\"><a href=\"?action=statistics&amp;stat=contact_date_evolution\">$l_contact_date_evolution_graph;</a></div>
+    <div class=\"detail extra\">
+    <ul>
+    <li><a href=\"?action=statistics&amp;stat=function\">$l_function</a></li>
+    <li><a href=\"?action=statistics&amp;stat=contact_date_evolution\">$l_contact_date_evolution_graph;</a></li>
     $block_contact
-    <p />
+    </ul>
+    </div>
     $block_stat
 ";
 

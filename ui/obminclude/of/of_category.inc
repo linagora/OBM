@@ -709,26 +709,28 @@ function of_category_dis_entity_stats($entity, $cat, $cats, $order) {
     }
   }
 
-  $block .= "<div class=\"detailHead\">$title</div>
-  <table class=\"detail\" >
-  <tr>
-    <td class=\"detailLabel\" class=\"detailLabel\"><a href=\"?action=statistics&amp;stat=$cat&amp;order=code\">$title</a><br/></td>
-    <td class=\"detailForm\">
-      <table>
-      <tr><td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td>
+  $block .= "<div class=\"detail extra\">
+    <h1>$title</h1>
+    <table class=\"spreadSheet\" >
+    <thead>
+    <tr>
+      <th><a href=\"?action=statistics&amp;stat=$cat&amp;order=code\">$title</a><br/></th>
+      <td>
+        <table>
+        <tr><td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td>
         <td><a href=\"?action=statistics&amp;stat=$cat&amp;order=nb\">${$l_entity}</a> ($l_totals : $count_entity)</td>
-      </tr>
-      </table>
-      <br/>
-    </td>
-  </tr>";
+        </tr>
+        </table>
+      </td>
+    </tr>
+    </thead>";
 
   if (is_array($stat)) {
     foreach($stat as $id => $value) {
-      $ents = round(($value["$cat"]/$max)*90);
+      $ents = ceil(($value["$cat"]/$max)*90);
       $block .= "<tr>
-    <td class=\"detailLabel\">".$value["name"]."</td>
-    <td class=\"detailForm\">
+    <th>".$value["name"]."</th>
+    <td>
      <table style=\"width:100%;\">
       <tr><td style=\"width:".$ents."%; background-color:#DE5B5B;align:left\"></td><td>".$value["$cat"]."</td></tr>
      </table>
@@ -738,15 +740,16 @@ function of_category_dis_entity_stats($entity, $cat, $cats, $order) {
   }
 
   $block .= "
+  <tfoot>
   <tr>
-    <td class=\"detailLabel\" class=\"detailLabel\"><br/>$title</td>
-    <td class=\"detailForm\">
-     <br/>
+    <th><br/>$title</th>
+    <td>
      <table>
       <tr><td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td><td>${$l_entity} ($l_totals : $count_entity)</td></tr>
      </table>
     </td>
   </tr>
+  </tfoot>
   </table>";
 
   return $block;

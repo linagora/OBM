@@ -1575,7 +1575,7 @@ function html_project_tasklist($tasks_q, $project) {
           <td >
 	   <input type=\"checkbox\" name=\"data-task-$t_id\" />
 	  </td>
-	  <td class=\"detailText\" colspan=\"2\">$t_label</td>
+	  <td  colspan=\"2\">$t_label</td>
          </tr>";
       } else {
 	$dis_task .= "
@@ -2519,20 +2519,24 @@ function html_project_reftask_selector($project,$projectreftask_q) {
   $block .= "
     <form method=\"post\ name=\"f_add_task\" action=\"$url\"  
     onsubmit=\"of_select_fill_from_checkbox(this,'task');window.close();return false\">
+    <fieldset>
     <table class=\"detail\" width=\"100%\">
     <tr>
       <td class=\"detailLabel\">$l_header_tasktype :</td>
       <td class=\"detailForm\" colspan=\"4\">$sel_tt</td>
     </tr>
     </table>  
-    <div class=\"detailHead\">$l_task</div>
+    </fieldset>
+    <fieldset>
+    <legend>$l_task</legend>
     <table  class=\"detail\" width=\"100%\" id=\"task_checkbox\">
     </table>  
     <table  class=\"detail\" width=\"100%\">
       <tr>
       <td colspan=\"2\" class=\"detailLabel\"><input type=\"submit\" value=\"$l_add\"></td>
       </tr>
-    </table>
+      </table>
+    </fieldset>
   </form>
   "; 
 

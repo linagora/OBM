@@ -172,7 +172,7 @@ function dis_company_search_form($company="") {
   $types = of_category_get_ordered("company", "type");
   $acts = of_category_get_ordered("company", "activity");
   $naf_q = run_query_companynafcode();
-  $usr_q = run_query_userobm_active();
+  $usr_q = run_query_userobm_responsable("Company",array("company_marketingmanager_id"));
   $ctry_q = run_query_global_country_for_lang();
   $dsrc_q = run_query_global_datasource();
   $block .= html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
@@ -887,7 +887,7 @@ function html_company_consult_address($co_q) {
     $block_cdx = "
   <tr>
     <th>$l_expresspostal</th>
-    <td class=\"detailText\">$cdx</td>
+    <td>$cdx</td>
   </tr>";
   }
 

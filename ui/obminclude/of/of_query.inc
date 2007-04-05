@@ -1394,7 +1394,7 @@ function run_query_userobm($id="") {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_userobm_active($ids="") {
   global $cdg_sql;
-
+  $multidomain = sql_multidomain("userobm");
   if (is_array($ids)) {
     $where_add = "";
     $nb_add = count($ids);
@@ -1409,12 +1409,48 @@ function run_query_userobm_active($ids="") {
       userobm_lastname,
       userobm_firstname
     FROM UserObm
-    WHERE userobm_archive != '1'
-      $where_add
+    WHERE userobm_archive != '1' 
+    $where_add
+    $multidomain
     ORDER BY userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql, "run_query_userobm_active()");
+
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Active Userobm query execution : All users not archived
+// Parameters:
+//   - $ids (optionnal) : array of UserObm Id to add to the result
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_userobm_responsable($table="",$fields="") {
+  global $cdg_sql;
+  $multidomain = sql_multidomain("userobm");
+  if(is_array($fields)) {
+    $join = "JOIN $table ON 1=0 ";
+    foreach ($fields as $field) {
+      $join .= "OR userobm_id = $field ";
+    }
+  }
+  $query = "SELECT userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    FROM UserObm
+    $join
+    WHERE
+    1=1 
+    $multidomain
+    GROUP BY  userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    ORDER BY userobm_lastname"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql, "run_query_userobm_responsable()");
 
   return $obm_q;
 }

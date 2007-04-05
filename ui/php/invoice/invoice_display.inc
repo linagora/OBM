@@ -503,8 +503,10 @@ function html_invoice_consult($inv_q, $pays) {
   }
 
   //  payments data :
-  $block .= "<div class=\"detailHead\">$l_payment_title</div>
-  $block_payment";
+  $block .= "<div class=\"detail extra\">
+    <h1>$l_payment_title</h1>
+    $block_payment
+    </div>";
 
   return $block;
 }

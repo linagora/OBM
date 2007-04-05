@@ -1552,7 +1552,7 @@ $js_status_loop
       <td><input type=\"text\" name=\"tf_datealarm\" value=\"$datealarm\" class=\"datePicker\"/></td>
     </tr><tr>
       <th>$l_status</th>
-      <td class=\"detailForm\">$sel_status</td>
+      <td>$sel_status</td>
     </tr><tr>
       <th>$l_todo</th>
       <td><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
@@ -1870,11 +1870,13 @@ function dis_deal_dashboard_index($deal) {
   $url_total = url_prepare("deal_index.php?action=dashboard");
   $url_year = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail");
 
-  $display["title"] = "<div class=\"title\">$l_deal : $l_header_dashboard</div>";
+  $display["title"] = "<h1 class=\"title\">$l_deal : $l_header_dashboard</h1";
 
   $block = "
-    <div class=\"detailText\"><a href=\"$url_total\">$l_potential</a></div>
-    <div class=\"detailText\"><a href=\"$url_year\">$l_year_detail</a></div>
+    <ul>
+    <li><a href=\"$url_total\">$l_potential</a></li>
+    <li><a href=\"$url_year\">$l_year_detail</a></li>
+    </ul>
 ";
 
    return $block;
@@ -2426,7 +2428,9 @@ function dis_deal_dashboard_list($deal) {
   }
 
   $block .= "
-  <div class=\"detailHead\">$l_module_deal</div>";
+    <div class=\"detail extra\">
+    <h1>$l_module_deal</h1>
+    </div>";
 
   $deal_q = run_query_deal_dashboard_list($deal, $users_id);
   $prefs = get_display_pref($obm["uid"], "deal", 0);

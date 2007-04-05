@@ -50,14 +50,15 @@ function html_tools_update_index() {
 
 
   $block = "
-    <div class=\"detailHead\">$l_upd</div>
+    <div class=\"detail extra\">
+    <h1>$l_upd</h1>>
     <table class=\"detail\">
     <tr>
       $dis_update
     </tr>
     </table>
     <p>
-
+    </div>
     $dis_form
 ";
 

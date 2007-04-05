@@ -186,10 +186,14 @@ function process_list_list($l_q) {
       $criteria = unserialize($structure);
       // Convert contactcategory1link_category_id => contactcategory1
       if (is_array($criteria["modules"]["contact"]["contactcategory1link_category_id"])) {
-	foreach($criteria["modules"]["contact"]["contactcategory1link_category_id"] as $value) {
-	  $new_val = $hash_c1[$value];
-	  $criteria["modules"]["contact"]["contactcategory1"][] = $new_val;
-	  $criteria["modules"]["contact"]["contactcategory1_tree"][] = "false";
+        foreach($criteria["modules"]["contact"]["contactcategory1link_category_id"] as $value) {
+          $values = explode(",",$value);
+          $new_val = array();
+          foreach($values as $val) {
+            $new_val[] = $hash_c1[$val];
+          }
+          $criteria["modules"]["contact"]["contactcategory1"][] = implode(",",$new_val);
+          $criteria["modules"]["contact"]["contactcategory1_tree"][] = "false";
 	}
 	unset($criteria["modules"]["contact"]["contactcategory1link_category_id"]);
       }
@@ -197,9 +201,13 @@ function process_list_list($l_q) {
       // Convert contactcategory2link_category_id => contactcategory1
       if (is_array($criteria["modules"]["contact"]["contactcategory2link_category_id"])) {
 
-	foreach($criteria["modules"]["contact"]["contactcategory2link_category_id"] as $value) {
-	  $new_val = $hash_c2[$value];
-	  $criteria["modules"]["contact"]["contactcategory2"][] = $new_val;
+        foreach($criteria["modules"]["contact"]["contactcategory2link_category_id"] as $value) {
+          $values = explode(",",$value);
+          $new_val = array();
+          foreach($values as $val) {
+            $new_val[] = $hash_c1[$val];
+          }          
+	  $criteria["modules"]["contact"]["contactcategory2"][] = implode(",",$new_val);
 	  $criteria["modules"]["contact"]["contactcategory2_tree"][] = "false";
 	}
 	unset($criteria["modules"]["contact"]["contactcategory2link_category_id"]);

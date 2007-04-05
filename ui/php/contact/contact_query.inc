@@ -53,12 +53,12 @@ function run_query_contact_search($contact) {
 
    // To allow sorting on contact and company addresses infos
    $if_condition = "(
-      contact_address1 != '' ||
-      contact_address2 != '' || 
-      contact_address3 != '' || 
-      contact_zipcode != '' || 
-      contact_town != '' || 
-      contact_expresspostal != '')";
+      (contact_address1 != '') OR
+      (contact_address2 != '') OR 
+      (contact_address3 != '') OR 
+      (contact_zipcode != '') OR 
+      (contact_town != '') OR 
+      (contact_expresspostal != ''))";
 
     $if_ad1 = sql_if($db_type, $if_condition, "contact_address1 ", "company_address1") . " as contact_address1,";
     $if_ad2 = sql_if($db_type, $if_condition, "contact_address2 ", "company_address2") . " as contact_address2,";
