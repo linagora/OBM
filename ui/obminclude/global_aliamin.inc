@@ -606,6 +606,14 @@ function update_scope_UserObm() {
       $scope["ldap"] = 1;
     }
 
+    if ($sys_q->f("userobm_address2") != $sys_upd_q->f("userobm_address2")) {
+      $scope["ldap"] = 1;
+    }
+
+    if ($sys_q->f("userobm_address3") != $sys_upd_q->f("userobm_address3")) {
+      $scope["ldap"] = 1;
+    }
+
     if ($sys_q->f("userobm_zipcode") != $sys_upd_q->f("userobm_zipcode")) {
       $scope["ldap"] = 1;
     }
@@ -635,6 +643,10 @@ function update_scope_UserObm() {
     }
 
     if ($sys_q->f("userobm_direction") != $sys_upd_q->f("userobm_direction")) {
+      $scope["ldap"] = 1;
+    }
+
+    if ($sys_q->f("userobm_title") != $sys_upd_q->f("userobm_title")) {
       $scope["ldap"] = 1;
     }
 
