@@ -187,8 +187,8 @@ function get_mailserver_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/mailserver/mailserver_index.php?action=detailupdate&amp;id=".$params["id"],
     'Right'    => $cright_read_admin,
-    //'Condition'=> array ('detailconsult','insert','update') 
-    'Condition'=> array ('none') 
+    'Condition'=> array ('detailconsult','insert','update') 
+    //'Condition'=> array ('none') 
   );
 
   $actions["mailserver"]["detailconsult"] = array (
