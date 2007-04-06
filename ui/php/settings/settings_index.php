@@ -9,6 +9,7 @@
 
 $path = "..";
 $module = "settings";
+$display = array();
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude="obminclude";
 include("$obminclude/global.inc");
