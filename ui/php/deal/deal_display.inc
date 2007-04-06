@@ -178,11 +178,12 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "deal_datealarm") {
     $date = $OD->data_set->f($fieldname);
     $datealarm = of_date_format($date);
-    $time = time();
-    if ($time > ($date + 86400)) {
+    $date = date("Ymd",$OD->data_set->f($fieldname));
+    $time = date("Ymd");
+    if ($time > $date) {
       $col = "error";
-    } else if ($time > $date) {
-      $col = "";
+    } else if ($time == $date) {
+      $col = "highlight";
     }
     $res["style"] = "class=\"$col\"";
     $res["name"] = $datealarm;

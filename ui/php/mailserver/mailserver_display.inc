@@ -174,6 +174,10 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
     $dis_host
     </table>
     </fieldset>    
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>    
+    </form>    
     </form>
     
     ";    
@@ -212,10 +216,7 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
     </tbody>
     </table>
     </fieldset>
-    <fieldset class=\"buttons\">
-    $dis_button
-    </fieldset>    
-    </form>
+
 
     <script type=\"text/javascript\">
       function addIpRow(name) {

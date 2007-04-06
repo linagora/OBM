@@ -41,7 +41,7 @@ function run_query_user_search($user) {
   $multidomain = sql_multidomain("userobm");
 
   if ($restriction == "calendar") {
-    $users = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "read");
+    $users = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "read","","userobm");
     if ((is_array($users["ids"])) && (count($users["ids"]) > 0)) {
       $where_restriction = " AND (userobm_id IN ($obm[uid], ";
       foreach($users["ids"] as $u_id) {
