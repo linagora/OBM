@@ -12,11 +12,9 @@ $regexp_used_func = '/^.*([a-z_]{1,96})\s{0,3}\(.*$/Us';
 $regexp_used_func_not_def = '/^\s*(function|\/\/).*$/Us';
 $regexp_used_func_not_debug = '/display_debug_msg.*([a-z_]{1,96})\s{0,3}\(.*$/Us';
 
-$modules = get_modules_array();
-array_unshift($modules, $c_all);
 $acts = array ('help', 'index', 'show_amp', 'func_unused', 'function_uses');
 $words = array ('amp;', 'nbsp;', ' ', '&', '\(', '\)', '\\n', '\$', '\'', '\|', 'eacute;', 'egrave;', 'agrave;', 'middot;');
-$exclude = array('.', '..', 'CVS', 'doc', 'scripts', 'contrib', 'www');
+$exclude = array('doc', 'scripts', 'contrib', 'www');
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,7 +33,7 @@ function get_admin_code_def_func_directory($dir) {
 
     $long_entry = $obm_dir->path."/".$entry;
 
-    if (! in_array ($entry, $exclude)) {
+    if (! in_array ($entry, $exclude) && !preg_match("/^\..*$/",$entry)) {
       if (is_dir($long_entry)) {
 	$table2 = get_admin_code_def_func_directory($long_entry);
       } else {
@@ -109,7 +107,7 @@ function get_admin_code_used_functions($dir) {
 
     $long_entry = $obm_dir->path."/".$entry;
 
-    if (! in_array ($entry, $exclude)) {
+    if (! in_array ($entry, $exclude) && !preg_match("/^\..*$/",$entry)) {
       if (is_dir($long_entry)) {
 	get_admin_code_used_func_directory($long_entry);
       } else {
@@ -141,7 +139,7 @@ function get_admin_code_used_func_directory($dir) {
 
     $long_entry = $obm_dir->path."/".$entry;
 
-    if (! in_array ($entry, $exclude)) {
+    if (! in_array ($entry, $exclude) && !preg_match("/^\..*$/",$entry)) {
       if (is_dir($long_entry)) {
 	get_admin_code_used_func_directory($long_entry);
       } else {

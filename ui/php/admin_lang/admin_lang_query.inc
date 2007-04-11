@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $actions = array ('help', 'index', 'show_src', 'show_lang', 'comp_lang', 'comp_header_lang');
-$target_modules = get_modules_array();
 $langs = get_admin_lang_langs_array();
 $themes = get_admin_lang_themes_array();
 
@@ -21,12 +20,11 @@ function get_admin_lang_langs_array() {
   global $obminclude, $path;
 
   // Lang dirs to exclude
-  $exclude = array('.', '..', 'CVS');
   $langs = array();
 
   $lang_dir = dir("$path/../$obminclude/lang");
   while($entry=$lang_dir->read()) {
-    if (! in_array ($entry, $exclude) && is_dir($lang_dir->path."/".$entry)) {
+    if (!preg_match("/^\..*$/",$entry) && is_dir($lang_dir->path."/".$entry)) {
       array_push($langs, $entry);
     }
   }
@@ -41,15 +39,15 @@ function get_admin_lang_langs_array() {
 // Return : $themes : array of themes
 ///////////////////////////////////////////////////////////////////////////////
 function get_admin_lang_themes_array() {
-  global $obminclude, $path;
+  global $path;
 
   // Themes dirs to exclude
-  $exclude = array('.', '..', 'CVS', 'images');
+  $exclude = array('images');
   $themes = array();
 
-  $theme_dir = dir("$path/../$obminclude/themes");
+  $theme_dir = dir("$path/../resources/themes");
   while($entry=$theme_dir->read()) {
-    if (! in_array ($entry, $exclude) && is_dir($theme_dir->path."/".$entry)) {
+    if (! in_array ($entry, $exclude) && !preg_match("/^\..*$/",$entry) && is_dir($theme_dir->path."/".$entry)) {
       array_push($themes, $entry);
     }
   }
@@ -253,17 +251,17 @@ function get_admin_lang_src_used_vars_file($myfile) {
 // Returns the list of all vars used in OBM modules                          //
 ///////////////////////////////////////////////////////////////////////////////
 function get_admin_lang_all_src_used_vars() {
-  global $debug, $obminclude, $path, $target_modules;
+  global $debug, $obminclude, $path, $modules;
 
   $all_vars = array();
   $vars = array();
 
-  while (list($key, $mod) = each($target_modules)) {
+  while (list($key, $mod) = each($modules)) {
     if ($debug > 0) {
-      echo "All Source used vars : module : $mod";
+      echo "All Source used vars : module : $mod[Name]";
     }
 
-    $vars = get_admin_lang_src_used_vars($mod);
+    $vars = get_admin_lang_src_used_vars($key);
     $all_vars = array_merge($all_vars, $vars);
   }
 

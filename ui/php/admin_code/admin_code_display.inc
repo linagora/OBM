@@ -56,12 +56,13 @@ function dis_admin_code_code_index($mode, $actions, $words) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_admin_code_index($actions, $words) {
-  global $modules, $l_execute;
+  global $modules, $l_execute,$l_all,$c_all;
 
   // modules SELECT
   $sel_module = "<select name=\"param_module\">";
+    $sel_module .= "<option value=\"$c_all\">$l_all</option>";
   while (list ($key, $val) = each ($modules)) {
-    $sel_module .= "<option value=\"$val\">$val</option>";
+    $sel_module .= "<option value=\"$key\">$val[Name]</option>";
   }
   $sel_module .= "</select>";
 

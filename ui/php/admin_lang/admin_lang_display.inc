@@ -62,7 +62,7 @@ function html_admin_lang_index($actions, $modules, $langs, $themes) {
   // modules SELECT
   $sel_module = "<select name=\"target_module\">";
   while (list ($key, $val) = each ($modules)) {
-    $sel_module .= "<option value=\"$val\">$val</option>";
+    $sel_module .= "<option value=\"$key\">$val[Name]</option>";
   }
   $sel_module .= "</select>";
 

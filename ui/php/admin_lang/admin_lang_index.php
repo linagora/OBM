@@ -51,7 +51,7 @@ switch ($action) {
     dis_admin_lang_help($params["mode"]);
     break;
   case "index":
-    dis_admin_lang_index($params["mode"], $actions, $target_modules, $langs, $themes);
+    dis_admin_lang_index($params["mode"], $actions, $modules, $langs, $themes);
     break;
   case "show_src":
     dis_admin_lang_src_vars($params["mode"], $params["target_module"]);
@@ -103,15 +103,15 @@ function get_admin_lang_params() {
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_lang_command_use($msg="") {
-  global $argv, $actions, $target_modules, $langs, $themes;
+  global $argv, $actions, $modules,$langs, $themes;
 
   while (list($nb, $val) = each ($actions)) {
     if ($nb == 0) $lactions .= "$val";
     else $lactions .= ", $val";
   }
-  while (list($nb, $val) = each ($target_modules)) {
-    if ($nb == 0) $lmodules .= "$val";
-    else $lmodules .= ", $val";
+  while (list($nb, $val) = each ($modules)) {
+    if ($nb == 0) $lmodules .= "$key";
+    else $lmodules .= ", $key";
   }
   while (list($nb, $val) = each ($langs)) {
     if ($nb == 0) $llangs .= "$val";
@@ -140,8 +140,8 @@ Ex: php4 admin_lang.php -a show_lang -m deal -l fr
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function parse_admin_lang_arg($argv) {
-  global $debug, $actions, $target_modules, $langs, $themes;
-  global $params, $action, $target_module, $lang, $theme;
+  global $debug, $actions, $modules, $langs, $themes;
+  global $params, $action, $lang, $theme;
 
   // We skip the program name [0]
   next($argv);
@@ -154,7 +154,7 @@ function parse_admin_lang_arg($argv) {
       break;
     case '-m':
       list($nb2, $val2) = each ($argv);
-      if (in_array($val2, $target_modules)) {
+      if (in_array($val2, $modules)) {
         $params["target_module"] = $val2;
         if ($debug > 0) { echo "-m -> \$target_module=$val2\n"; }
       }

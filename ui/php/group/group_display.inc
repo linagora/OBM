@@ -432,7 +432,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   if ($nb_g != 0) {
     $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
     
-    $dis_infos = new OBM_DISPLAY("DATA", $prefs_g, "group", "group_group");
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_g, "group", "group_group","group_group");
     $dis_infos->data_set = $g_q;
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "top";
@@ -472,7 +472,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   if ($nb_u != 0) {
 
     $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
-    $dis_infos = new OBM_DISPLAY("DATA", $prefs_u, "group", "group_user");
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_u, "group", "group_user","group_user");
     $dis_infos->data_set = $u_q;
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "both";
