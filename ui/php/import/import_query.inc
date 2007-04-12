@@ -956,7 +956,6 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_comment)
   VALUES (
     '$domain_id',
-    null,
     '$now',
     null,
     '$uid',
