@@ -87,6 +87,11 @@ select {
   font-weight: bold;
 }
 
+option[disabled="disabled"] {
+  background-color: #509cbc;
+  color: #fff;
+}
+
 h1 {
   text-align: center;
   font-size: 130%;
