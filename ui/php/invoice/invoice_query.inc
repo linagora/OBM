@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : invoice_query.inc
 //     - Desc : invoice query File
-// 2001-07-30 - Aliacom - Nicolas Roman
+// 2001-07-30 - AliaSource
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -364,7 +364,7 @@ function run_query_invoice_update($invoice) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get invoice status list with coditions
+// Get invoice status list with conditions
 // Parameters:
 //   - $target : "payment" : get status where invoice should have a payment
 //             : "tocreate" : get status where invoice ahs not been cretated
@@ -374,7 +374,7 @@ function run_query_invoice_update($invoice) {
 function get_invoicestatus($target="") {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("invoicestatus");
+  $multidomain = sql_multidomain("invoicestatus");
 	
   if ($target == "payment") {
     $wtarget = "WHERE invoicestatus_payment='1' $multidomain";
@@ -419,7 +419,7 @@ function get_invoicestatus($target="") {
 // if $not_paid == -1, we return only paid payments
 // ie. lines having paymetinvoice_amoount != 0.0
 ///////////////////////////////////////////////////////////////////////////////
-function get_invoice_payment ($p_invoice, $not_paid=0) {
+function get_invoice_payment($p_invoice, $not_paid=0) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -574,14 +574,14 @@ function get_invoice_nb_having_number ($number, $id="") {
 function get_invoice_status_info($p_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("invoicestatus");
+  $multidomain = sql_multidomain("invoicestatus");
 
   if ($p_id > 0) {
     $query = "SELECT *
       FROM InvoiceStatus
       WHERE invoicestatus_id='$p_id' $multidomain";
 
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "get_invoice_status_info()");
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $obm_q->next_record();
@@ -604,11 +604,12 @@ function get_invoice_status_info($p_id) {
 //   - $date_ranges : array [range1] : [date_start, date_end]
 //   - $target_date : invoice_date, invoice_expiration_date : date to sort
 //   - $sel_tt      : [optionnal] tasktype array filter
+//   - $inout       : [optionnal] (+ || -) to get client or supplier invoices
 // Returns:
-//     $res : array[date]([billed]|[paid]|[potential])([status]|[total])[$infos]
+//   $res : array[date]([billed]|[paid]|[potential])([status]|[total])[$infos]
 //            $infos = label, amount_ht, amount_ttc, nb
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_amounts($date_ranges, $target_date="invoice_date", $sel_tt="") {
+function run_query_invoice_amounts($date_ranges, $target_date="invoice_date", $sel_tt="", $inout="+") {
   global $cdg_sql, $cdg_param;
   global $l_total;
 
@@ -656,11 +657,11 @@ function run_query_invoice_amounts($date_ranges, $target_date="invoice_date", $s
       LEFT JOIN InvoiceStatus on invoice_status_id=invoicestatus_id
       $join_project
       $join_deal
-    WHERE invoice_inout = '+' 
+    WHERE invoice_inout = '$inout' 
       AND (invoicestatus_payment=1 OR invoicestatus_created=0)
       $w_date
       $w_tt 
-			$multidomain
+      $multidomain
     ORDER BY invoice_status_id
 ";
   
