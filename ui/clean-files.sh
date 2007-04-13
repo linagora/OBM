@@ -9,4 +9,4 @@ rm `find . -name '*~'`
 rm `find . -name '.#*'`
 
 
-rm `find . -name '.*.s*'`
+rm `find . -name '.*.s*' | grep -v .svn`

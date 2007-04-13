@@ -466,7 +466,7 @@ function html_invoice_consult($inv_q, $pays) {
     $k = 0;
     $affected_amount_total = 0;
     foreach ($pays as $one_pay) {
-      $id = $one_pay["invoice_id"];
+      $id = $one_pay["id"];
       $affected_amount = $one_pay["affected_amount"];
       $amount = $one_pay["amount"];
       $company = $one_pay["company"];
@@ -555,7 +555,7 @@ function html_invoice_links($inv_q) {
   // Payment
   if ($cgp_show["module"]["payment"]) {
     $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;sel_invoice=$id");
-    $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;sel_invoice=$id&amp;invoice_name=$uname&amp;company_id=$company_id&amp;company_name=$company_name&amp;tf_amount=$amount");
+    $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;invoice_id=$id&amp;invoice_name=$uname&amp;company_id=$company_id&amp;company_name=$company_name&amp;tf_amount=$amount");
     $nb_pay = get_global_linked_payment_nb($id, "invoice");
     $block_payment = "
   <div class=\"portlet\" id=\"invoicePayment\">
@@ -621,8 +621,8 @@ function dis_invoice_detail($inv_q) {
   }
 
   $block .= "
-<div class=\"detail infos\">
-    <h1>$title</h1>
+ <div class=\"detail infos\">
+   <h1>$title</h1>
 
     <table>
     <tr>

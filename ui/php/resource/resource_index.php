@@ -173,13 +173,13 @@ if ($action == "ext_get_ids") {
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "resource", 1);
   $display["detail"] = dis_resource_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "resource", 1);
   $display["detail"] = dis_resource_display_pref($prefs);
 }

@@ -250,14 +250,14 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "group", 1);
   $prefs_u = get_display_pref($obm["uid"], "group_user", 1);
   $display["detail"] = dis_group_display_pref($prefs, $prefs_u);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "group", 1);
   $prefs_u = get_display_pref($obm["uid"], "group_user", 1);
   $display["detail"] = dis_group_display_pref($prefs, $prefs_u);

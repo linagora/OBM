@@ -455,14 +455,14 @@ if ($action == "ext_get_id") {
   
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"],"deal",1);
   $prefs_parent = get_display_pref($obm["uid"],"parentdeal",1);
   $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"],"deal",1);
   $prefs_parent = get_display_pref($obm["uid"],"parentdeal",1);
   $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);

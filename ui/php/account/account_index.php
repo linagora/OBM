@@ -164,14 +164,14 @@ $q_account = run_query_account_detail ($params["account_id"]);
 
 } else if($action =="dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "account",1);
   $prefs_p = get_display_pref ($obm["uid"], "payment",1);
   $display["detail"] = dis_account_display_pref ($prefs, $prefs_p); 
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "account",1);
   $prefs_p = get_display_pref ($obm["uid"], "payment",1);
   $display["detail"] = dis_account_display_pref ($prefs, $prefs_p); 

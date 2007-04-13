@@ -34,11 +34,13 @@ function run_query_payment_search($payment) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-	$multidomain = sql_multidomain("payment");
+  $multidomain = sql_multidomain("payment");
 	
   $date = sql_date_format($db_type, "payment_date", "payment_date");
 
   // search criterias :
+  $where = "1=1";
+  $and = "AND";
   if ($comment != "") {
     $where .= "$and payment_comment $like '%$comment%'";
     $and = "AND";
@@ -139,7 +141,7 @@ function run_query_payment_detail($p_id) {
   $timeupdate = sql_date_format($db_type, "payment_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "payment_timecreate", "timecreate");
   $date = sql_date_format($db_type, "payment_date", "date");
-	$multidomain = sql_multidomain("payment");
+  $multidomain = sql_multidomain("payment");
 	
   $query = "SELECT Payment.*,
       $timeupdate,
@@ -157,7 +159,8 @@ function run_query_payment_detail($p_id) {
          LEFT JOIN Account ON payment_account_id=account_id
          LEFT JOIN UserObm as c ON payment_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON payment_userupdate=u.userobm_id
-    WHERE payment_id='$p_id' $multidomain";
+    WHERE payment_id='$p_id'
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_payment_detail()");
   $obm_q->query($query);
@@ -192,7 +195,7 @@ function run_query_payment_insert($params) {
   $inout = $params["inout"];
   $checked = ($params["checked"] == "1" ? "1" : "0");
   $comment = $params["comment"];
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO Payment (
     payment_timeupdate,

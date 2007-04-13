@@ -221,13 +221,13 @@ if ($action == "ext_get_ids") {
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "user", 1);
   $display["detail"] = dis_user_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "user", 1);
   $display["detail"] = dis_user_display_pref($prefs);
 } elseif ($action == "admin") {
@@ -316,7 +316,7 @@ function get_user_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/user/user_index.php?action=new",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display', 'delete')
+    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display','dispref_display','dispref_level', 'delete')
                                   );
 
 // Search

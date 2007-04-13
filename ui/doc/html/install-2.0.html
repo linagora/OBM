@@ -89,15 +89,6 @@ include_path = ".:/var/www/obm"
 </tr>
 </table>
 
-<p>short_open_tag can be set to Off :</p>
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><code>
-short_open_tag = On (can be switched to Off since OBM 0.7.3)
-</code>
-  </td>
-</tr>
-</table>
 
 <p>To avoid some PHP warnings for a previous php version bug, turn on these 2 directives (and now OBM works with register_globals set toi Off) :</p>
 <table bgcolor="#CCCCCC" border="1">
@@ -680,6 +671,19 @@ php update-1.2-2.0.php
 <tr>
   <td><pre>
 Alias /images /var/www/obm/resources
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h3>Update the lists</h3>
+<p>If you use the List module, as categories (used by List) have changed, lists must be regenerated
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+# As an admin, log into obm and :
+Dictionnary -> data -> action "data_update" on the list module
 </pre>
   </td>
 </tr>

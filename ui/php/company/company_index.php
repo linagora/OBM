@@ -295,13 +295,13 @@ if ($action == "ext_get_id") {
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "company", 1);
   $display["detail"] = dis_company_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "company", 1);
   $display["detail"] = dis_company_display_pref($prefs);
 
@@ -404,7 +404,7 @@ function get_company_action() {
     'Name'     => $l_header_new_f,
     'Url'      => "$path/company/company_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index','detailconsult','insert','update','delete','admin','display') 
+    'Condition'=> array ('search','index','detailconsult','insert','update','delete','admin','display','dispref_display','dispref_level') 
                                      );
 
 // Detail Consult

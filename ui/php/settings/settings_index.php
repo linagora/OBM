@@ -189,8 +189,8 @@ $sel_dsrc .= "</select>";
 //}
 
 ///////////////////////////////////////////////////////////////////////////////
-// For each LANGUAGE directory in the lang direcory (but .*)         //
-// display en entry                                                          //
+// For each LANGUAGE directory in the lang direcory (but .*)
+// display en entry
 ///////////////////////////////////////////////////////////////////////////////
 $lang_dir = dir("$path/../$obminclude/lang");
 while ($entry=$lang_dir->read()) {
@@ -205,14 +205,14 @@ $lang_dir->close();
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// For each THEME directory in the themes direcory (but .*)          //
-// display en entry                                                          //
+// For each THEME directory in the themes direcory (but .*)
+// display en entry
 ///////////////////////////////////////////////////////////////////////////////
 $theme_dir = dir("../$path/resources/themes");
 $dis_theme = "";
 while ($entry = $theme_dir->read()) {
   $dotcase = strcmp($entry, "."); 
-  if (!preg_match("/^\..*$/",$entry) &&  && strcmp($entry,"images") && is_dir($theme_dir->path."/".$entry)) {
+  if (!preg_match("/^\..*$/",$entry) && strcmp($entry,"images") && is_dir($theme_dir->path."/".$entry)) {
     $dis_theme .= "
       <a href=\"settings_index.php?theme=$entry\">
       <img src=\"".${"preview_".$entry}."\" alt=\"[Theme $entry]\" style=\"height:20%;width:20%;\"

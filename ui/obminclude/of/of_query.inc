@@ -602,13 +602,19 @@ function get_one_display_pref($u_id, $entity, $fieldname) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution - Store the new display value for the entity, field
 // Parameters:
-//   - $entity     : entity affected
-//   - $fieldname  : fieldname to change the display value
-//   - $new_status : new display status value; "" if not updated
-//   - $sql_order_field  : new display order; "" if not updated
+//   - $params : hash with :
+//        entity      : entity affected
+//        fieldname   : fieldname to change the display value
+//        fieldstatus : new display status value; "" if not updated
+//        fieldorder  : new display order; "" if not updated
 ///////////////////////////////////////////////////////////////////////////////
-function update_display_pref($entity, $fieldname, $new_status, $sql_order_field="") {
+function update_display_pref($params) {
   global $obm, $cdg_sql;
+
+  $entity = $params["entity"];
+  $fieldname = $params["fieldname"];
+  $new_status = $params["fieldstatus"];
+  $sql_order_field = $params["fieldorder"];
 
   $uid = $obm["uid"];
   $prefs = get_one_display_pref($uid, $entity, $fieldname);

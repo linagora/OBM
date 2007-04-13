@@ -75,7 +75,7 @@ function get_module_actions() {
 \begin{verbatim}
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "document", 1);
   $display["detail"] = dis_document_display_pref($prefs);
 }

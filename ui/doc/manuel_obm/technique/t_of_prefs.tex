@@ -1,5 +1,5 @@
 % Documentation technique d'OBM : Gestion des preferences utilisateur et affichage
-% ALIACOM Pierre Baudracco
+% AliaSource Pierre Baudracco
 % $Id$
 
 \subsection{Gestion des préférences utilisateurs}
@@ -199,11 +199,11 @@ Récupération des préférences d'affichage de l'utilisateur \$u\_id pour l'entité 
 \shadowbox{
 \begin{minipage}{15cm}
 \begin{verbatim}
-function update_display_pref($entity, $fieldname, $new_status, $sql_order_field="") {
+function update_display_pref($params) {
 \end{verbatim}
 \end{minipage}
 }
-Mises à jour d'une préférence d'affichage (champ \$fieldname) de l'utilisateur connecté pour l'entité \$entity.
+Mises à jour d'une préférence d'affichage (champs \$params[] : fieldname, fieldstatus, fieldorder) de l'utilisateur connecté pour l'entité \$entity.
 
 \subsubsection{Implémentation : fonctions utilitaires internes}
 
@@ -268,13 +268,13 @@ Gestion des préférences d'affichage du module \company.\\
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus);
+  update_display_pref($params);
   $prefs = get_display_pref($uid, "company", 1);
   $display["detail"] = dis_company_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  update_display_pref($params);
   $prefs = get_display_pref($uid, "company", 1);
   $display["detail"] = dis_company_display_pref($prefs);
 \end{verbatim}

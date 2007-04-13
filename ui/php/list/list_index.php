@@ -234,14 +234,14 @@ else if ($action == "new_criterion") {
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "list", 1);
   $prefs_con = get_display_pref($obm["uid"], "list_contact", 1);
   $display["detail"] = dis_list_display_pref($prefs, $prefs_con);
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "list", 1);
   $prefs_con = get_display_pref($obm["uid"], "list_contact", 1);
   $display["detail"] = dis_list_display_pref($prefs, $prefs_con);

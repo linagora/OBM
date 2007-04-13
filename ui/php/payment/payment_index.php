@@ -163,13 +163,13 @@ if ($action == "index") {
 
 }elseif ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "payment", 1);
   $display["detail"] = dis_payment_display_pref($prefs);
 
 }elseif ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "payment", 1);
   $display["detail"] = dis_payment_display_pref($prefs);
 }

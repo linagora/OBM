@@ -54,7 +54,7 @@ function dis_data_payment(&$OD, $fieldname, $link_ok) {
   }
 
   elseif ($fieldname == "company_name") {
-    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;payment_id=".$OD->data_set->f("payment_company_id");
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f("payment_company_id");
   }
 
   // amount column color 
@@ -682,12 +682,12 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   $sel_account ="
     <select name=\"sel_account\">
      <option value=\"$c_undef\">$l_undef</option>\n";
-     if(is_array($accs))
-			  foreach($accs as $a_id => $one_acc) {
-			    $alabel = $one_acc["label"];
-			    $aselect = ($a_id == $account) ? "selected" : "";
-			    $sel_account .= "<option value=\"$a_id\" $aselect>$alabel</option>";
-			  }
+  if (is_array($accs))
+    foreach($accs as $a_id => $one_acc) {
+      $alabel = $one_acc["label"];
+      $aselect = ($a_id == $account) ? "selected" : "";
+      $sel_account .= "<option value=\"$a_id\" $aselect>$alabel</option>";
+    }
   $sel_account .= "</select>";
 
   // Type radio
@@ -718,7 +718,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   // INSERT
   } elseif (($action=="new") || ($action=="insert") || ($action=="detailduplicate")) {
     $dis_button = "
-      <input type=\"hidden\" name=\"sel_invoice\" value=\"$invoice_id\" />
+      <input type=\"hidden\" name=\"invoice_id\" value=\"$invoice_id\" />
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
   }
