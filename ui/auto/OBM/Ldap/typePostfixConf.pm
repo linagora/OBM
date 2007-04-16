@@ -21,7 +21,7 @@ sub getDbValues {
 
 
     if( !defined($currentDomain->{"domain_id"}) ) {
-        &OBM::toolBox::write_log( "Identifiant de domaine non définie", "W" );
+        &OBM::toolBox::write_log( "Identifiant de domaine OBM non définie", "W" );
         return undef;
     }
 

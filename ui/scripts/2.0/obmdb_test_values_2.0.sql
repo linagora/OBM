@@ -13,7 +13,6 @@
 DELETE FROM Domain;
 
 INSERT INTO Domain (domain_id, domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES (1, NULL, '2006-09-07 11:45:59', NULL, '0', 'Domain 1', '', 'aliasource.fr', NULL );
---INSERT INTO Domain (domain_timeupdate, domain_timecreate, domain_userupdate, domain_usercreate, domain_label, domain_description, domain_name, domain_alias) VALUES ( NULL, '2006-09-07 11:45:59', NULL, '0', 'Domain 2', '', 'test1.aliasource.fr', 'test2.aliasource.fr\r\ntest3.aliasource.com' );
 
 
 -------------------------------------------------------------------------------
@@ -156,3 +155,15 @@ INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_
 
 -- Appartenant au domaine 1
 INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 2'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare01', 'Répertoire partagé de test 01, appartenant au domaine 2', 'mailshare01');
+
+-------------------------------------------------------------------------------
+-- Remplissage de la table 'Samba' : Création d'un domaine windows
+-------------------------------------------------------------------------------
+DELETE FROM Samba;
+
+INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( "1", "samba_domain", "TEST-DOMAIN" );
+INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( "1", "samba_sid", "S-1-5-21-735385164-1086204177-245137893" );
+INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( "1", "samba_pdc", "PDCTEST" );
+INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( "1", "samba_profile", "\\\\PDCTEST\\%u\\.profiles" );
+INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( "1", "samba_home_def", "\\\\PDCTEST\\%u" );
+INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( "1", "samba_home_drive_def", "P" );

@@ -127,7 +127,7 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.3
     NAME 'obmMailShare'
     DESC 'OBM Mail Share Directory description'
     STRUCTURAL
-    MUST ( cn )
+        MUST ( cn )
     MAY ( mailBox $ mailBoxServer $ mail $ description $ mailAlias $ mailAccess $ obmDomain ) )
 
 ###############################################################################
@@ -197,4 +197,11 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.4
     DESC 'Postfix configuration object'
     SUP top STRUCTURAL
         MUST ( cn )
-    MAY ( myDestination $ localRestrictionSender $ toLocalDomain $ myNetwork $ relayhost $ smarthost $ obmDomain ) )
+    MAY ( myDestination $ obmDomain ) )
+
+# Definition de l'objet 'obmSamba'
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.6
+    NAME 'obmSamba'
+    DESC 'Samba OBM informations'
+    SUP top AUXILIARY
+    MAY ( obmDomain ) )

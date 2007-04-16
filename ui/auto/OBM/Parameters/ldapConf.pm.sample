@@ -215,6 +215,52 @@ $attributeDef = {
         }
     },
 
+    $SAMBADOMAIN => {
+        structural => 1,
+        is_branch => 0,
+        dn_prefix => "sambaDomainName",
+        dn_value => "samba_domain",
+        objectclass => [ "sambaDomain", "obmSamba" ],
+        get_db_value => sub {
+            my( $parentdn, $domainId ) = @_;
+            require OBM::Ldap::typeSambaDomain;
+            return OBM::Ldap::typeSambaDomain::getDbValues( $parentdn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeSambaDomain;
+            return OBM::Ldap::typeSambaDomain::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeSambaDomain;
+            return OBM::Ldap::typeSambaDomain::updateLdapEntry( $entry, $ldapEntry );
+        }
+    },
+
+    $SAMBAHOSTS => {
+        structural => 1,
+        is_branch => 0,
+        dn_prefix => "uid",
+        dn_value => "host_login",
+        objectclass => [ "person", "sambaSamAccount", "obmSamba" ],
+        get_db_value => sub {i
+            my( $parentdn, $domainId ) = @_;
+            require OBM::Ldap::typeSambaHosts;
+            return OBM::Ldap::typeSambaHosts::getDbValues( $parentdn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeSambaHosts;
+            return OBM::Ldap::typeSambaHosts::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeSambaHosts;
+            return OBM::Ldap::typeSambaHosts::updateLdapEntry( $entry, $ldapEntry );
+        }
+    },
+
     $POSTFIXCONF => {
         structural => 1,
         is_branch => 0,
@@ -286,7 +332,7 @@ $ldapStruct->{"template"}->[0] = {
     name => "",
     node_type => "$DOMAINROOT",
     description => "Racine du domaine",
-    data_type => [],
+    data_type => [ $SAMBADOMAIN ],
     template => [],
     branch => []
 };
@@ -340,8 +386,20 @@ $ldapStruct->{"template"}->[0]->{"branch"}->[3] = {
 };
 
 #
-# Banche contenant la déclaration de la configuration des services
+# Banche contenant la déclaration des hôtes du domaine windows
 $ldapStruct->{"template"}->[0]->{"branch"}->[4] = {
+    dn => "",
+    name => "mailShare",
+    node_type => "$NODE",
+    description => "Samba hosts",
+    data_type => [ $SAMBAHOSTS ],
+    template => [],
+    branch => []
+};
+
+#
+# Banche contenant la déclaration de la configuration des services
+$ldapStruct->{"template"}->[0]->{"branch"}->[5] = {
     dn => "",
     name => "servicesConfiguration",
     node_type => "$NODE",

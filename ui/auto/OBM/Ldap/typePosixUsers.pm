@@ -20,7 +20,7 @@ sub getDbValues {
 
 
     if( !defined($main::domainList->[$domainId]->{"domain_id"}) ) {
-        &OBM::toolBox::write_log( "Identifiant de domaine non définie", "W" );
+        &OBM::toolBox::write_log( "Identifiant de domaine OBM non définie", "W" );
         return undef;
     }
 
@@ -49,7 +49,6 @@ sub getDbValues {
 
         &OBM::toolBox::write_log( "Gestion de l'utilisateur '".$user_login."'", "W" );
         
-        #
         # On cree la structure correspondante a l'utilisateur
         # Cette structure est composee des valeurs recuperees dans la base +
         # la valeur de la racine de l'annuaire
