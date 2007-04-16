@@ -2,8 +2,6 @@ package OBM::Ldap::utils;
 
 require Exporter;
 
-use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 use strict;
 

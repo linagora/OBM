@@ -21,6 +21,13 @@ sub getDbValues {
         return undef;
     }
 
+    if( defined($main::domainList->[$domainId]->{"domain_label"}) ) {
+        $sambaDomain[$i]->{"samba_domain_sid"} = $main::domainList->[$domainId]->{"domain_samba_sid"};
+    }else {
+        &OBM::toolBox::write_log( "SID du domaine windows non defini", "W" );
+        return undef;
+    }
+
     # On se connecte a la base
     my $dbHandler;
     if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
@@ -56,13 +63,6 @@ sub getDbValues {
 
     if( defined($dbSambaDomain{"samba_pdc"}) ) {
         $sambaDomain[$i]->{"samba_pdc"} = $dbSambaDomain{"samba_pdc"};
-    }
-
-    if( defined($dbSambaDomain{"samba_sid"}) ) {
-        $sambaDomain[$i]->{"samba_sid"} = $dbSambaDomain{"samba_sid"};
-    }else {
-        &OBM::toolBox::write_log( "SID du domaine windows non defini", "W" );
-        return undef;
     }
 
     if( defined($dbSambaDomain{"samba_profile"}) ) {
