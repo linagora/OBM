@@ -89,7 +89,7 @@ nécessaires au fonctionnement de Samba en PDC. Il 'sert' à stocker les informa
 
 B<structurel> - définit le type Aliamin SAMBAFREEUNIXID, représentant un des nombreux objets LDAP
 nécessaires au fonctionnement de Samba en PDC. Il 'sert' à stocker les prochains UID et GID
-libres - à approfondir 20040930 ;
+libres - à approfondir 20040930 -- non implémenté 20070414 ;
 
 =item $POSTFIXCONF =E<gt> C<aliaminPostfix>
 
@@ -135,16 +135,19 @@ définir la valeur de l'attribut utilisé pour créer le DN de l'entité LDAP ;
 d'objets LDAP associées à ce type ;
 
 =item B<init_struct> : référence à une fonction permettant d'initialiser un
-objet de ce type ;
+objet de ce type - facultative ;
 
 =item B<get_db_value> : référence à une fonction permettant de charger les
-valeurs depuis la base de données OBM ;
+valeurs depuis la base de données OBM - nécessaire ;
 
 =item B<create_ldap> : référence à une fonction permettant de créer l'objet LDAP
-correpondant aux valeurs de la base OBM ;
+correpondant aux valeurs de la base OBM - nécessaire ;
 
 =item B<update_ldap> : référence à une fonction permettant de mettre à jour
-l'entité LDAP. 
+l'entité LDAP - nécessaire ;
+
+=item B<update_passwd> : référence à une fonction permettant de mettre à jour le
+mot de passe de l'entité LDAP - facultative.
 
 =back
 

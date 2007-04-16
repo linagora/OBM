@@ -70,6 +70,7 @@ sub getDbValues {
 }
 
 
+##### TODO ######
 sub createLdapEntry {
     my( $entry, $ldapEntry ) = @_;
     my $type = $entry->{"node_type"};
@@ -95,6 +96,7 @@ sub createLdapEntry {
 }
 
 
+##### TODO ######
 sub updateLdapEntry {
     my( $entry, $ldapEntry ) = @_;
     my $type = $entry->{"node_type"};

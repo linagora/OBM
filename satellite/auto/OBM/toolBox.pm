@@ -746,7 +746,7 @@ sub getDomains {
 
 
     # Requete de recuperation des informations des domaines
-    my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias FROM P_Domain";
+    my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias, samba_value FROM P_Domain LEFT JOIN Samba ON samba_name="samba_sid" AND samba_domain_id=domain_id";
     if( defined($obmDomainId) && $obmDomainId =~ /^\d+$/ ) {
         $queryDomain .= " WHERE domain_id=".$obmDomainId;
     }
@@ -762,7 +762,7 @@ sub getDomains {
         return undef;
     }
 
-    while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias ) = $queryDomainResult->fetchrow_array ) {
+    while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias, $domainSambaSid ) = $queryDomainResult->fetchrow_array ) {
         my $currentDomain = &OBM::utils::cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
         $currentDomain->{"meta_domain"} = 0;
         $currentDomain->{"domain_id"} = $domainId;
@@ -775,6 +775,8 @@ sub getDomains {
         if( defined($domainAlias) ) {
             push( @{$currentDomain->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
         }
+
+        $currentDomain->{"domain_samba_sid"} = $domainSambaSid;
 
         push( @{domainList}, $currentDomain );
     }
