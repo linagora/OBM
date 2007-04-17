@@ -126,11 +126,6 @@ $automateCyrusAdmin = $automateOBM . "mailCyrusAdmin.pl";
 $automatePostfixUpdate = $automateOBM . "mailPostfixMapsUpdate.pl";
 $automateLdapUpdate = $automateOBM . "ldapModifBase.pl";
 $automateLdapUpdatePasswd = $automateOBM . "ldapChangePasswd.pl";
-#
-# Samba
-# Calcul du mot de passe NT ou LM
-$sambaNTPass = $automateOBM . "mkntlmpwd -N";
-$sambaLMPass = $automateOBM . "mkntlmpwd -L";
 
 #
 # ACL : Definition des entites et des consomateurs

@@ -2,6 +2,7 @@ package OBM::Ldap::sambaUtils;
 
 require Exporter;
 
+use Crypt::SmbHash;
 use strict;
 
 
@@ -62,19 +63,14 @@ sub getGroupSID {
 }
 
 
-sub getNTPasswd {
-    my( $plainPasswd ) = @_;
-    require OBM::Parameters::common;
+sub getNTLMPasswd {
+    my( $plainPasswd, $lmPasswd, $ntPasswd ) = @_;
 
-print $OBM::Parameters::common::sambaLMPass."\n";
-#    return `$OBM::Parameters::common::sambaLMPass '$plainPasswd'`;
-}
+    if( !defined($plainPasswd) ) {
+        return 1;
+    }
 
+    ( $$lmPasswd, $$ntPasswd ) = ntlmgen( $plainPasswd );
 
-sub getLMPasswd {
-    my( $plainPasswd ) = @_;
-    require OBM::Parameters::common;
-
-print $OBM::Parameters::common::sambaNTPass."\n";
-#    return `$OBM::Parameters::common::sambaNTPass '$plainPasswd'`;
+    return 0;
 }
