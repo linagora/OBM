@@ -244,7 +244,7 @@ $attributeDef = {
         dn_prefix => "uid",
         dn_value => "host_login",
         objectclass => [ "person", "sambaSamAccount", "obmSamba" ],
-        get_db_value => sub {i
+        get_db_value => sub {
             my( $parentdn, $domainId ) = @_;
             require OBM::Ldap::typeSambaHosts;
             return OBM::Ldap::typeSambaHosts::getDbValues( $parentdn, $domainId );
@@ -389,7 +389,7 @@ $ldapStruct->{"template"}->[0]->{"branch"}->[3] = {
 # Banche contenant la déclaration des hôtes du domaine windows
 $ldapStruct->{"template"}->[0]->{"branch"}->[4] = {
     dn => "",
-    name => "mailShare",
+    name => "hosts",
     node_type => "$NODE",
     description => "Samba hosts",
     data_type => [ $SAMBAHOSTS ],

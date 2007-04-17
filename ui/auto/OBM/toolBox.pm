@@ -746,7 +746,7 @@ sub getDomains {
 
 
     # Requete de recuperation des informations des domaines
-    my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias, samba_value FROM P_Domain LEFT JOIN Samba ON samba_name="samba_sid" AND samba_domain_id=domain_id";
+    my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias, samba_value FROM P_Domain LEFT JOIN Samba ON samba_name=\"samba_sid\" AND samba_domain_id=domain_id";
     if( defined($obmDomainId) && $obmDomainId =~ /^\d+$/ ) {
         $queryDomain .= " WHERE domain_id=".$obmDomainId;
     }

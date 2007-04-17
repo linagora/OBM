@@ -8,6 +8,7 @@ use strict;
 
 sub modifyAttr {
     my( $newValue, $ldapEntry, $attr ) = @_;
+    require OBM::Parameters::common;
     my $update = 0;
 
     # L'attribut n'est plus renseigné
@@ -22,7 +23,7 @@ sub modifyAttr {
     }elsif( !defined($ldapEntry->get_value($attr)) ) {
         # L'attribut n'existe pas
         if( defined( $newValue ) && ($newValue ne "") ) {
-            $ldapEntry->add( $attr => to_utf8({ -string => $newValue, -charset => $defaultCharSet }) );
+            $ldapEntry->add( $attr => to_utf8({ -string => $newValue, -charset => $OBM::Parameters::common::defaultCharSet }) );
 
             # Il y a eu modification
             $update = 1;
@@ -30,8 +31,8 @@ sub modifyAttr {
             
     }else {
         # La valeur de l'attribut doit être mise à jour
-        if( from_utf8( { -string => $ldapEntry->get_value($attr), -charset => $defaultCharSet } ) ne $newValue ){
-            $ldapEntry->replace( $attr => to_utf8({ -string => $newValue, -charset => $defaultCharSet }) );
+        if( from_utf8( { -string => $ldapEntry->get_value($attr), -charset => $OBM::Parameters::common::defaultCharSet } ) ne $newValue ){
+            $ldapEntry->replace( $attr => to_utf8({ -string => $newValue, -charset => $OBM::Parameters::common::defaultCharSet }) );
                     
             # Il y a eu modification
             $update = 1;

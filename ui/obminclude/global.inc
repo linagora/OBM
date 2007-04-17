@@ -575,11 +575,7 @@ $php_regexp_port_list ='/^[0-9]+(-[0-9]*){0,1}$/'; // Une liste de ports TCP/IP 
 $php_regexp_network_port_list = '/^([1-2]?[0-9]{1,2}.){3}[1-2]?[0-9]{1,2}:[0-9]+(-[0-9]*){0,1}$/'; // IP[:num[-num]]
 
 // Login
-if ($cgp_loginDotsEnable) {
-  $php_regexp_login = "/^[A-Za-z0-9][A-Za-z0-9-._]{1,31}$/";
-} else {
-  $php_regexp_login = "/^[A-Za-z0-9][A-Za-z0-9-_]{1,31}$/";
-}
+$php_regexp_login = "/^[A-Za-z0-9][A-Za-z0-9-._]{1,31}$/";
 
 // Email
 $php_regexp_domain = "/^([a-z0-9-]+\.)+[a-z]{2,6}$/"; // Domain
