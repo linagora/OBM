@@ -42,7 +42,17 @@ sub getDbValues {
     my $i = 0;
     my @sambaHosts = ();
     while( my( $host_id, $host_uid, $host_gid, $host_name, $host_description ) = $queryResult->fetchrow_array ) {
+        if( !defined($host_name) ) {
+            next;
+        }
+
         &OBM::toolBox::write_log( "Gestion de l'hote '".$host_name."'", "W" );
+
+        my $errorCode = &OBM::Ldap::sambaUtils::getNTLMPasswd( $host_name, \$sambaHosts[$i]->{"host_lm_passwd"}, \$sambaHosts[$i]->{"host_nt_passwd"} );
+        if( $errorCode ) {
+            &OBM::toolBox::write_log( "Erreur: lors de la generation du mot de passe de l'hote : '".$host_name."'", "W" );
+            next;
+        }
 
         $sambaHosts[$i]->{"host_uid"} = $host_uid;
         $sambaHosts[$i]->{"host_gid"} = $host_gid;
@@ -52,8 +62,6 @@ sub getDbValues {
 
         $sambaHosts[$i]->{"host_sid"} = $main::domainList->[$domainId]->{"domain_samba_sid"}."-".$host_uid;
         $sambaHosts[$i]->{"host_group_sid"} = $main::domainList->[$domainId]->{"domain_samba_sid"}."-".$host_gid;
-        $sambaHosts[$i]->{"host_nt_passwd"} = &OBM::Ldap::sambaUtils::getNTPasswd( $host_name );
-        $sambaHosts[$i]->{"host_lm_passwd"} = &OBM::Ldap::sambaUtils::getLMPasswd( $host_name );
         $sambaHosts[$i]->{"host_acct_flags"} = "[W]";
 
         $sambaHosts[$i]->{"host_obm_domain"} = $main::domainList->[$domainId]->{"domain_label"};
@@ -63,6 +71,8 @@ sub getDbValues {
         $sambaHosts[$i]->{"name"} = $sambaHosts[$i]->{$attributeDef->{$sambaHosts[$i]->{"node_type"}}->{"dn_value"}};
         $sambaHosts[$i]->{"domain_id"} = $domainId;
         $sambaHosts[$i]->{"dn"} = &OBM::ldap::makeDn( $sambaHosts[$i], $parentDn );
+
+        $i++;
     }
 
     # On referme la connexion a la base
