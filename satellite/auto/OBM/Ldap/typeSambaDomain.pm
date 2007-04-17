@@ -15,6 +15,8 @@ sub initStruct {
 
 sub getDbValues {
     my( $parentDn, $domainId ) = @_;
+    my $i = 0;
+    my @sambaDomain = ();
 
     if( !defined($main::domainList->[$domainId]->{"domain_id"}) ) {
         &OBM::toolBox::write_log( "Identifiant de domaine OBM non définie", "W" );
@@ -51,8 +53,6 @@ sub getDbValues {
     }
 
 
-    my $i = 0;
-    my @sambaDomain = ();
     if( defined($dbSambaDomain{"samba_domain"}) ) {
         &OBM::toolBox::write_log( "Gestion du domaine windows : '".$dbSambaDomain{"samba_domain"}."'", "W" );
         $sambaDomain[$i]->{"samba_domain"} = $dbSambaDomain{"samba_domain"};
@@ -100,11 +100,11 @@ sub createLdapEntry {
     my $type = $entry->{"node_type"};
 
     # Les parametres nececessaires
-    if( $entry->{"samba_domain"} && $entry->{"samba_sid"} ) {
+    if( $entry->{"samba_domain"} && $entry->{"samba_domain_sid"} ) {
         $ldapEntry->add(
             objectClass => $attributeDef->{$type}->{"objectclass"},
             sambaDomainName => to_utf8({ -string => $entry->{"samba_domain"}, -charset => $defaultCharSet }),
-            sambaSID => $entry->{"samba_sid"}
+            sambaSID => $entry->{"samba_domain_sid"}
         );
 
     }else {
@@ -131,7 +131,7 @@ sub updateLdapEntry {
     };
 
     # Vérification du SID
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"samba_sid"}, $ldapEntry, "sambaSID" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"samba_domain_sid"}, $ldapEntry, "sambaSID" ) ) {
         $update = 1;
     };
 
