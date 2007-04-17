@@ -41,7 +41,7 @@ $fieldnames["payment_amount"] = $l_amount;
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_invoice(&$OD, $fieldname, $link_ok) {
   global $path, $col_frs, $col_client, $l_supplier, $l_client;
-  global $invoice;
+  global $params;
 
   if ($fieldname == "invoice_deal") {
     $res["url"] = "$path/deal/deal_index.php?action=detailconsult&amp;deal_id=".$OD->data_set->f("deal_id");
@@ -55,7 +55,7 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
     if ($OD->display_ext == "get_id") {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("invoice_id").",'".addslashes($OD->data_set->f("invoice_label"))."');";
     } else if ($OD->display_ext == "get_id_url") {
-      $ext_url = $invoice["ext_url"];
+      $ext_url = $params["ext_url"];
       $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("invoice_id").");";
     } elseif($link_ok) {
       $res["url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=".$OD->data_set->f("invoice_id");
@@ -442,13 +442,15 @@ function dis_invoice_consult($invoice) {
 function html_invoice_consult($inv_q, $pays) {
   global $path, $display ;
   global $l_delete, $l_invoice, $l_payment, $l_no_payment, $l_total;
-  global $l_list_payment, $l_company, $l_date, $l_number, $l_amount, $l_payments_todel;
+  global $l_list_payment, $l_company, $l_date, $l_number, $l_amount, $l_inout;
+  global $l_amount_remaining;
 
   $i_id = $inv_q->f('invoice_id');
+  $amount_ttc = $inv_q->f("invoice_amount_ttc");
+  $amount_remaining = $amount_ttc;
 
-  $display["link"] = html_invoice_links($inv_q);
   $block = dis_invoice_detail ($inv_q);
-  
+
   if (count($pays) > 0) {
     $l_payment_title = $l_list_payment;
     $block_payment = "
@@ -459,7 +461,8 @@ function html_invoice_consult($inv_q, $pays) {
         <th>$l_company</th>
         <th>$l_number</th>
         <th>$l_amount</th>
-        <th>$l_invoice : $l_amount</th>
+        <th>$l_inout</th>
+        <th>$l_amount / $l_invoice</th>
       </tr>
       </thead>
       <tbody>";
@@ -469,12 +472,20 @@ function html_invoice_consult($inv_q, $pays) {
       $id = $one_pay["id"];
       $affected_amount = $one_pay["affected_amount"];
       $amount = $one_pay["amount"];
+      $inout = $one_pay["inout"];
       $company = $one_pay["company"];
       $number = $one_pay["number"];
       $date = $one_pay["date"];
       $k ++;
-      ($k % 2 == 0)?$class="pair":$class=""; 
-      $affected_amount_total += $affected_amount;
+      ($k % 2 == 0)?$class="pair":$class="";
+
+      if ($inout == "+") {
+	$dis_inout = $l_received;
+	$affected_amount_total += $affected_amount;
+      } else {
+	$dis_inout = $l_emitted;
+	$affected_amount_total -= $affected_amount;
+      }
       
       $block_payment .= "
         <tr class=\"$class\">
@@ -482,14 +493,26 @@ function html_invoice_consult($inv_q, $pays) {
         <td>$company</td>
         <td><a href=\"$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id\">$number</a></td>
         <td>$amount </td>
+        <td>$inout </td>
         <td>$affected_amount </td>
       </tr>";
     }
 
+    $amount_remaining = $amount_ttc - $affected_amount_total;
+    if ($affected_amount_total == $amount_ttc) {
+      $class_r = "class=\"ok\"";
+    } else {
+      $class_r = "class=\"error\"";
+    }
+
     $block_payment .= "
       <tr class=\"highlight\">
-        <th colspan=\"4\">$l_total</th>
-        <td>$affected_amount_total</td>
+        <th colspan=\"5\">$l_total</th>
+        <td><b>$affected_amount_total</b></td>
+      </tr>
+      <tr class=\"highlight\">
+        <th colspan=\"5\">$l_amount_remaining</th>
+        <td $class_r><b>$amount_remaining</b> &nbsp;/&nbsp; $amount_ttc</td>
       </tr>
       </tbody>
     </table>";
@@ -504,6 +527,8 @@ function html_invoice_consult($inv_q, $pays) {
     $block_payment
     </div>";
 
+  $display["link"] = html_invoice_links($inv_q, $amount_remaining);
+
   return $block;
 }
 
@@ -511,11 +536,12 @@ function html_invoice_consult($inv_q, $pays) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Invoice links menu
 // Parameters:
-//   - $p_q : invoice database result 
+//   - $inv_q            : invoice database result 
+//   - $amount_remaining : [optionnal]amount remaining to pay
 // Returns:
 //   $r : string with XHTML code
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_links($inv_q) {
+function html_invoice_links($inv_q, $amount_remaining="") {
   global  $ico_document, $ico_add, $ico_payment;
   global $l_invoice, $l_new, $l_module_document, $l_module_payment;
   global $l_document_add;
@@ -525,7 +551,11 @@ function html_invoice_links($inv_q) {
   $name = $inv_q->f("invoice_label");
   $company_id = $inv_q->f("invoice_company_id");
   $company_name = urlencode($inv_q->f("company_name"));
-  $amount = $inv_q->f("invoice_amount_ttc");
+  if ($amount_remaining > 0) {
+    $amount = $amount_remaining;
+  } else {
+    $amount = $inv_q->f("invoice_amount_ttc");
+  }
 
   $uname = urlencode($name);
 
@@ -554,7 +584,7 @@ function html_invoice_links($inv_q) {
 
   // Payment
   if ($cgp_show["module"]["payment"]) {
-    $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;sel_invoice=$id");
+    $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;sel_invoice_id=$id");
     $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;invoice_id=$id&amp;invoice_name=$uname&amp;company_id=$company_id&amp;company_name=$company_name&amp;tf_amount=$amount");
     $nb_pay = get_global_linked_payment_nb($id, "invoice");
     $block_payment = "
@@ -689,8 +719,8 @@ function dis_invoice_detail($inv_q) {
   </div>
     
   <div class=\"detail extra\">
-     <h1>$l_comment</h1>
-      $comment
+    <h1>$l_comment</h1>
+    $comment
   </div>";
 
   return $block;
@@ -1492,7 +1522,7 @@ function dis_invoice_dashboard($invoice) {
   </table>
   <p>&nbsp;</p>
   </div>
-  
+
   <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pot_params\" alt=\"\" />
   <br />
   <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar$chart_bil_params\" alt=\"\" />

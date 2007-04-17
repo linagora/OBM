@@ -562,7 +562,7 @@ function get_project_linked_project_timetask_nb($p_id) {
   $obm_q = new DB_OBM;
   $query = "SELECT count(timetask_id) as nb
     FROM TimeTask,
-    ProjectTask
+    ProjectTask,
     Project
     WHERE projecttask_project_id = '$p_id'
       AND projecttask_project_id = project_id

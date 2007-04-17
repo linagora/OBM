@@ -23,7 +23,7 @@ $l_both = "Tous";
 $l_tax_rate = "Taux TVA";
 $l_compute_tax = "Calculer le montant TTC";
 $l_include_archive = "Inclure les archives";
-
+$l_amount_remaining = "Restant du";
 $l_select_invoice = "Sélectionner la facture";
 
 // payment

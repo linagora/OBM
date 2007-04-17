@@ -430,6 +430,7 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
   $query = "SELECT
       paymentinvoice_amount,
       payment_id,
+      payment_inout,
       payment_number,
       $date,
       payment_amount,
@@ -455,12 +456,14 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
     $company = $obm_q->f("company_name");
     $date = of_date_format($obm_q->f("payment_date"));
     $amount = $obm_q->f("payment_amount");
+    $inout = $obm_q->f("payment_inout");
     $affected_amount = $obm_q->f("paymentinvoice_amount");
     $p[$id] = array ("id" => $id,
 		     "date" => $date,
 		     "number" => $number,
 		     "company" => $company,
 		     "amount" => $amount,
+		     "inout" => $inout,
 		     "affected_amount" => $affected_amount);
   }
 

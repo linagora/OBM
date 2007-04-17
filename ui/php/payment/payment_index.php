@@ -194,6 +194,18 @@ function get_payment_params() {
   // Get global params
   $params = get_global_params("Payment");
 
+  if (isset($params)) {
+    $nb_inv = 0;
+    while ( list( $key, $value ) = each($params) ) {
+      if (strcmp(substr($key, 0, 9),"data-inv-") == 0) {
+        $nb_inv++;
+        $inv_num = substr($key, 9);
+        $params["invoices"][$inv_num] = $value;
+      }
+    }
+    $params["invoices_nb"] = $nb_inv;
+  }
+
   return $params;
 }
 
@@ -238,7 +250,7 @@ function get_payment_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=".$params["payment_id"],
     'Right'    => $cright_read,
-    'Condition'=> array ('detail_invoice', 'detailupdate', 'invoice_add', 'invoice_update')
+    'Condition'=> array ('detail_invoice', 'detailupdate', 'invoice_add', 'invoice_update', 'update')
                                         );
 
 // Detail Consult Invoice
@@ -246,13 +258,13 @@ function get_payment_action() {
     'Name'     => $l_module_invoice,
     'Url'      => "$path/payment/payment_index.php?action=detail_invoice&amp;payment_id=".$params["payment_id"],
     'Right'    => $cright_read,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'invoice_add', 'invoice_update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'invoice_add', 'invoice_update', 'update') 
                                         );
 
 // Sel invoice : Invoice selection (menu)
   $actions["payment"]["sel_invoice"] = array (
     'Name'     => $l_header_link_invoice,
-    'Url'      => "$path/invoice/invoice_index.php?action=ext_get_id&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice=")."&amp;ext_id=".$params["payment_id"]."&amp;ext_target=$l_payment",
+    'Url'      => "$path/invoice/invoice_index.php?action=ext_get_id&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice_id=")."&amp;ext_id=".$params["payment_id"]."&amp;ext_target=$l_payment",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_payment,
@@ -373,7 +385,7 @@ function update_payment_action() {
     $actions["payment"]["detailconsult"]['Condition'][] = 'insert';
 
     // Sel invoice : Invoice selection (menu)
-    $actions["payment"]["sel_invoice"]["Url"] = "$path/invoice/invoice_index.php?action=ext_get_id&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice=")."&amp;ext_id=$id&amp;ext_target=$l_payment";
+    $actions["payment"]["sel_invoice"]["Url"] = "$path/invoice/invoice_index.php?action=ext_get_id&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice_id=")."&amp;ext_id=$id&amp;ext_target=$l_payment";
     $actions["payment"]["sel_invoice"]['Condition'][] = 'insert';
 
     // Invoice

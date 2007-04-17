@@ -333,10 +333,10 @@ function dis_payment_consult($params) {
 //   - $invs : array : invoices connected to the payment
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_consult($p_q, $invs) {
-  global $path, $display,  $ico_company;
+  global $path, $display, $ico_company;
   global $l_payment, $l_invoice, $l_company, $l_received, $l_emitted;
   global $l_comment, $l_number, $l_amount, $l_date, $l_label, $l_no_invoice;
-  global $l_account, $l_kind, $l_inout, $l_total;
+  global $l_account, $l_kind, $l_inout, $l_total, $l_invoice_list;
 
   $id = $p_q->f("payment_id");
   $c_id = $p_q->f("payment_company_id");
@@ -359,7 +359,7 @@ function html_payment_consult($p_q, $invs) {
   }
 
   if (count($invs) > 0) {
-    $l_invoice_title = $l_invoice;
+    $l_invoice_title = $l_invoice_list;
     $block_invoice = "
       <table class=\"spreadSheet\">
       <thead>
@@ -375,23 +375,23 @@ function html_payment_consult($p_q, $invs) {
     $affected_amount_total = 0;
     $k = 0;
     foreach ($invs as $one_inv) {
-      $id = $one_inv["id"];
-      $affected_amount = $one_inv["affected_amount"];
-      $inv_amount = $one_inv["invoice_amount"];
-      $company = $one_inv["company"];
-      $label = $one_inv["label"];
-      $date = $one_inv["date"];
+      $i_id = $one_inv["id"];
+      $i_affected_amount = $one_inv["affected_amount"];
+      $i_inv_amount = $one_inv["invoice_amount"];
+      $i_company = $one_inv["company"];
+      $i_label = $one_inv["label"];
+      $i_date = $one_inv["date"];
       $k ++;
       ($k % 2 == 0)?$class="pair":$class="";
-      $affected_amount_total += $affected_amount;
+      $affected_amount_total += $i_affected_amount;
 
       $block_invoice .= "
       <tr class=\"$class\">
-        <td>$date</td>
-        <td>$company</td>
-        <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$id\">$label</a></td>
-        <td>$inv_amount </td>
-        <td>$affected_amount </td>
+        <td>$i_date</td>
+        <td>$i_company</td>
+        <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$i_label</a></td>
+        <td>$i_inv_amount </td>
+        <td>$i_affected_amount </td>
       </tr>";
     }
 
@@ -454,12 +454,16 @@ function html_payment_consult($p_q, $invs) {
 
    </table>
 </div>
+
+<div class=\"detail extra\">
+  <h1>$l_invoice_title</h1>
+  $block_invoice
+</div>
  
 <div class=\"detail extra\">
-<h1>$l_comment</h1>
+  <h1>$l_comment</h1>
       $comment
-  $block_invoice
-  </div>
+</div>
 ";
 
   return $block;
@@ -495,14 +499,14 @@ function html_payment_invoice($amounts, $params) {
   global $display,  $l_update, $l_no_invoice;
   global $l_payment, $l_invoice, $l_company, $l_received, $l_emitted;
   global $l_comment, $l_number, $l_amount, $l_date, $l_label, $l_already_paid;
-  global $l_total;
+  global $l_total, $l_invoice_list;
 
   $id = $params["payment_id"];
+  $pay = get_payment_info($id);
   $invs = $amounts["invoices"];
-  $paid = $amounts["paid_amount"];
 
   if (count($invs) > 0) {
-    $l_invoice_title = $l_invoice;
+    $l_invoice_title = $l_invoice_list;
     $block_invoice = "
       <table class=\"spreadSheet\">
       <thead>
@@ -525,22 +529,22 @@ function html_payment_invoice($amounts, $params) {
       } else {
 	$affected_amount = $one_inv["affected_amount"];
       }
-      $inv_amount = $one_inv["invoice_amount"];
-      $company = $one_inv["company"];
-      $label = $one_inv["label"];
-      $date = $one_inv["date"];
-      $already_paid = $one_inv["alreadydate"];
+      $i_inv_amount = $one_inv["invoice_amount"];
+      $i_company = $one_inv["company"];
+      $i_label = $one_inv["label"];
+      $i_date = $one_inv["date"];
+      $i_already_paid = $one_inv["already_paid"];
       
       $affected_amount_total += $affected_amount;
       $k++;
-      ($k % 2 == 0)?$class="pair":$class="";
+      ($k % 2 == 0) ? $class="pair" : $class="";
       $block_invoice .= "
         <tr class=\"$class\">
-          <td>$date</td>
-          <td>$company</td>
-          <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$label</a></td>
-          <td>$inv_amount </td>
-          <td>$already_paid </td>
+          <td>$i_date</td>
+          <td>$i_company</td>
+          <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$i_label</a></td>
+          <td>$i_inv_amount </td>
+          <td>$i_already_paid </td>
           <td><input type=\"text\" name=\"data-inv-$i_id\" value=\"$affected_amount\" /></td>
         </tr>";
     }
@@ -571,13 +575,13 @@ function html_payment_invoice($amounts, $params) {
     $l_invoice_title = $l_no_invoice;
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_payment : $date $c_name $paid</h1>";
+  $display["title"] = "<h1 class=\"title\">$l_payment : $pay[date] $pay[company] $pay[amount]</h1>";
 
   $block = "
-<legend>$title</legend>
-
-<legend>$l_invoice_title</legend>
+<div class=\"detail extra\">
+  <h1>$l_invoice_title</h1>
   $dis_invoice
+</div>
 ";
 
   return $block;
@@ -675,6 +679,10 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
     <tr>
       <th>$l_invoice</th>
       <td>".$params["invoice_name"]."</td>
+    </tr>
+    <tr>
+      <th>$l_invoice / $l_amount</th>
+      <td><input type=\"text\" id=\"tf_amount_invoice\" name=\"tf_amount_invoice\" size=\"13\" maxlength=\"13\" value=\"$amount\" /></td>
     </tr>";
   }
 
@@ -729,26 +737,24 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   $block .= "
     <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_payment(this)) return true; else return false;\" action=\"".url_prepare("payment_index.php")."\">
  
- <fieldset class=\"detail infos\"> 
+  <fieldset class=\"detail infos\"> 
     <legend>$l_company</legend>
- <table>
- <tr>
-      <th>$l_company</th>
-      <td>$dis_company</td>
-    </tr>
- </table>
- </fieldset>
+  <table>
+  <tr>
+    <th>$l_company</th>
+    <td>$dis_company</td>
+  </tr>
+  </table>
+  </fieldset>
 
-
-
- <fieldset class=\"detail infos\"> 
+  <fieldset class=\"detail infos\"> 
     <legend>$l_payment</legend>
     <table>
-    $dis_invoice
     <tr>
       <th>$l_amount</th>
-      <td><input type=\"text\" id=\"tf_amount\" name=\"tf_amount\" size=\"13\" maxlength=\"13\" value=\"$amount\" /></td>
+      <td><input type=\"text\" id=\"tf_amount\" name=\"tf_amount\" size=\"13\" maxlength=\"13\" value=\"$amount\" onChange=\"this.form.tf_amount_invoice.value=this.value;\" /></td>
     </tr>
+    $dis_invoice
     <tr>
       <th>$l_date</th>
       <td>

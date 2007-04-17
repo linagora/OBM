@@ -20,16 +20,11 @@ $l_pick_account = "choose an account";
 $l_payment_account = "Account ";
 $l_paid = "Paid";
 $l_unpaid = "Not Paid";
-// invoice connected :
-$l_invoice_label = "Invoice Label";
-$l_invoice_date = "Invoice Date";
-$l_invoice_ttc = "Invoice Amount";
-$l_invoice_number = "Invoice Number"; 
-$l_invoice_not_paid_yet = "Amount not paid BEFORE";
-$l_invoice_still_not_paid = "Amount not paid NOW";
-$l_invoice_share = "Share affected";
-$l_invoice_inout = "Invoice Kind";
-$l_invoice_paid = "Paid TTC Amount";
+
+// invoice
+$l_no_invoice = "No invoices related to this payment";
+$l_invoice_list = "Invoices related to this payment";
+
 $l_already_used_share = "Part of the Payment already used ";
 
 $l_payment_infos = "Informations about the payment ";

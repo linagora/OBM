@@ -17,7 +17,7 @@ $module = "chart";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
-$chart = get_param_chart();
+$params = get_chart_params();
 
 if ($action == "") $action = "index";
 
@@ -33,12 +33,12 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "bar") {
 ///////////////////////////////////////////////////////////////////////////////
   include_once("$obminclude/Artichow/BarPlot.class.php");
-  $display["detail"] = dis_chart_bar($chart);
+  $display["detail"] = dis_chart_bar($params);
 
 } elseif ($action == "bar_multiple") {
 ///////////////////////////////////////////////////////////////////////////////
   include_once("$obminclude/Artichow/BarPlot.class.php");
-  $display["detail"] = dis_chart_bar_multiple($chart);
+  $display["detail"] = dis_chart_bar_multiple($params);
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ function dis_chart_bar($chart) {
   // Labels infos
   $label = new Label($labels);
   $label->setFont(new Tuffy(8));
-  $label->setAlign(NULL, LABEL_TOP_HIGH);
+  $label->setAlign(NULL, LABEL_TOP);
   $plot->label = $label;
 
   // X axis Labels infos
@@ -145,7 +145,7 @@ function dis_chart_bar_multiple($chart) {
       // Labels infos
       $label = new Label($labels[$num_plot]);
       $label->setFont(new Tuffy(8));
-      $label->setAlign(NULL, LABEL_TOP_HIGH);
+      $label->setAlign(NULL, LABEL_TOP);
       $plot->label = $label;
     }
     $group->add($plot);
@@ -156,21 +156,24 @@ function dis_chart_bar_multiple($chart) {
   $graph->draw();
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stores Chart parameters transmitted in $chart hash
 // returns : $chart hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_chart() {
-  global $title, $values, $plots, $labels, $xlabels;
+function get_chart_params() {
 
-  if (isset ($title)) $chart["title"] = stripslashes($title);
-  if (isset ($values)) $chart["values"] = unserialize(stripslashes($values));
-  if (isset ($labels)) $chart["labels"] = unserialize(stripslashes($labels));
-  if (isset ($xlabels)) $chart["xlabels"] = unserialize(stripslashes($xlabels));
+  // Get global params
+  $params = get_global_params("Chart");
 
-  if (isset ($plots)) $chart["plots"] = unserialize(stripslashes($plots));
+  if (isset ($params["title"])) $params["title"] = stripslashes($params["title"]);
+  if (isset ($params["values"])) $params["values"] = unserialize(stripslashes($params["values"]));
+  if (isset ($params["labels"])) $params["labels"] = unserialize(stripslashes($params["labels"]));
+  if (isset ($params["xlabels"])) $params["xlabels"] = unserialize(stripslashes($params["xlabels"]));
 
-  return $chart;
+  if (isset ($params["plots"])) $params["plots"] = unserialize(stripslashes($params["plots"]));
+
+  return $params;
 }
 
 ?>

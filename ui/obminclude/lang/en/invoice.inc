@@ -23,6 +23,7 @@ $l_both = "All";
 $l_tax_rate = "Tax rate";
 $l_compute_tax = "Calculate the taxed amount";
 $l_include_archive = "Include archives";
+$l_amount_remaining = "Amount remaining";
 
 $l_select_invoice = "Select the invoice";
 

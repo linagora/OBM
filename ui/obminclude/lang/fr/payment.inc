@@ -2,13 +2,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : payment.inc                                              //
-// 2001-08-02 Nicolas Roman                                                  //
+// 2001-08-02 AliaSource                                                     //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-// payment only stuff
 $l_label_start = "Début du Label";
 $l_amount = "Montant"; 
 $l_expected_date = "Date Prévisionnelle";
@@ -27,6 +26,10 @@ $l_include_checked = "Inclure les Paiements pointés";
 
 $l_received = "Reçu";
 $l_emitted = "Emis";
+
+// invoice
+$l_no_invoice = "Aucune facture associée à ce paiement";
+$l_invoice_list = "Factures associées à ce paiement";
 
 // Actions 
 $l_insert = "Insérer le Paiement";
