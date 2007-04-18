@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0.1pre1";
+$obm_version = "2.0.1pre2";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -1014,7 +1014,12 @@ function get_global_params($table="") {
     if (is_array($value)) {
       $params[$key] = $value;
     } else if ($value != "") {
-      $params[$key] = trim(strip_tags($value));
+      // some tags can be in queries; eg: <
+      if ($key == "query") {
+	$params[$key] = trim($value);
+      } else {
+	$params[$key] = trim(strip_tags($value));
+      }
     }
   }
 

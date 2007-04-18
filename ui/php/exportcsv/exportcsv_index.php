@@ -51,6 +51,7 @@ if (($action == "index") || ($action == "")) {
   $first_row = $params["first_row"];
   $nb_rows = $params["nb_rows"];
   $query = stripslashes($params["query"]);
+
   if ($ctu_sql_limit && ($nb_rows > $set_rows)) {
     // We remove the limit clause
     $query = preg_replace("/(limit .*)$/i", "", $query);

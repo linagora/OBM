@@ -525,6 +525,12 @@ class OBM_DISPLAY {
     $end_page = $start_page + $nb_page_dis - 1;
     $end_page = min ($end_page, $nb_page); 
 
+    if ($nb_rows < $set_rows) {
+      $export_rows = $nb_rows;
+    } else {
+      $export_rows = $set_rows;
+    }
+
     $export_url = "$path/exportcsv/exportcsv_index.php";
     $content = "<div>
       <script type=\"text/javascript\">
@@ -542,7 +548,7 @@ class OBM_DISPLAY {
           return false;
         }
       </script>
-    <a href=\"#\" onclick=\"return exportResultSet('$first_row','$set_rows');\" >$l_export</a>      
+    <a href=\"#\" onclick=\"return exportResultSet('$first_row','$export_rows');\" >$l_export</a>      
     <a href=\"#\" onclick=\"return exportResultSet('0','$nb_rows');\" >$l_export_all</a>   
             
       $l_entries # $nb_rows | $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";

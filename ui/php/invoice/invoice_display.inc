@@ -358,6 +358,7 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
   } else if ($status != '') {
     $param_status .= "&amp;sel_status=$status";
   }
+  $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
   $inout = $invoice["inout"];
@@ -373,6 +374,7 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 		    "&amp;tf_amount_ht=$ht". 
 		    "&amp;tf_amount_ttc=$ttc".
 		    "$param_status".
+		    "&amp;date_field=$date_field".
 		    "&amp;tf_date_after=$date_after".
 		    "&amp;tf_date_before=$date_before".
 		    "&amp;rd_inout=$inout".
