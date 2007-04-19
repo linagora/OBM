@@ -922,7 +922,7 @@ Obm.CalendarQuickForm = new Class({
     this.hide();
   },
 
-  goto: function(action) {
+  goTo: function(action) {
     if(action) {
       this.gotoURI += '&action='+action;
     }

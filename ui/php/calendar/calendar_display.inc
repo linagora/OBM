@@ -1688,7 +1688,7 @@ function dis_calendar_quick_form($calendar) {
       <span id=\"calendarQuickFormDate\"></span>
       </h1>
       <h2>
-      <a id=\"calendarQuickFormTitle\" href=\"\" onclick=\"obm.calendarQuickForm.goto('detailconsult'); return false\">
+      <a id=\"calendarQuickFormTitle\" href=\"\" onclick=\"obm.calendarQuickForm.goTo('detailconsult'); return false\">
       </a>
       </h2> 
       <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
@@ -1696,7 +1696,7 @@ function dis_calendar_quick_form($calendar) {
         $l_title : <input type=\"text\" name=\"tf_title\" /> <input class=\"button\" type=\"submit\" value=\"$l_validate\" />
       </fieldset> 
       <fieldset class=\"buttons\"> 
-        <input type=\"button\" onclick=\"obm.calendarQuickForm.goto();\" value=\"$l_advanced\" />
+        <input type=\"button\" onclick=\"obm.calendarQuickForm.goTo();\" value=\"$l_advanced\" />
       <input type=\"button\" 
       onclick=\"if(confirm('$l_confirm_delete')) obm.calendarQuickForm.submit('quick_delete');\"
       value=\"$l_c_delete\" />
