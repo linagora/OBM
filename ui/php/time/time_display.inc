@@ -504,13 +504,13 @@ function dis_user_select($time, $usr_q, $multi=false) {
     $alt = "[]";
     $dis_button_all = "
       <input type=\"submit\" name=\"submit\" value=\"$l_all\"
-             onclick=\"select_all(f_time)\" />";
+             onclick=\"select_all(this.form)\" />";
   } else {
     $size = 6;
   }
   
   // UserObm Select
-  $sel_user = "<select name=\"sel_user_id$alt\" $type>";
+  $sel_user = "<select id=\"sel_user_id\" name=\"sel_user_id$alt\" $type>";
   $selected = false;
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");

@@ -442,7 +442,7 @@ function html_incident_consult($inc_q) {
 <div class=\"detail extra\">
   <h1>$l_solution <a href=\"mailto:$email_con?subject=$l_incident $label : $l_solution&cc=$cmail_incident&body=$inc_reso\"><img src=\"$ico_mail\" alt=\"[Mail]\" /></a>
 </h1>
-    $inc_reso</td>
+    $inc_reso
  </div>
 
 <div class=\"detail extra\">

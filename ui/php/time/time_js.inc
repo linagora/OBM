@@ -19,8 +19,7 @@ function confirm_del() {
 }
 
 function select_all(form) {
-  data = form.elements[0];
-
+  data = \$('sel_user_id') ;
   longueur=data.length;
   for (i=0;i<longueur;i++) {
     data.options[i].selected = 1;

@@ -108,7 +108,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_deal_index();
   if ($set_display == "yes") {
-    $display["detail"] = dis_deal_search_list($params);
+    $display["result"] = dis_deal_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }

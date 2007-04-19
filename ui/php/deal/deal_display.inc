@@ -963,7 +963,7 @@ function html_deal_consult($deal_q, $dc="") {
     </table>
     </div>
 
-   <div class=\"detail extra\">
+   <div class=\"detail infos\">
    <h1>$l_status</h1>
 
     <table>

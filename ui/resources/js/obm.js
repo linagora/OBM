@@ -219,11 +219,12 @@ function showErrorMessage(message) {
 
 function showMessage(klass, message) {
   var content = $('ajaxMessage');
+  content.setStyle('display','block');
   new Element('p').addClassName('message')
                   .addClassName(klass)
                   .appendText(message)
                   .injectInside(content);
-  setTimeout(function () {content.innerHTML = ''}, 5000);
+  setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, 5000);
 }
 
 function overListBoxFix(overObject, forceDisplay) {
