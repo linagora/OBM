@@ -1518,7 +1518,8 @@ function of_userdata_dis_entity_form($entity, $ent_id, $params) {
             $cat_id = $cats_sel[$params["$cat_name"]]["id"];
           } else {
             $cats_sel = of_category_user_get_ordered($cat_name, $entity, $ent_id);
-	    $cat_id = $cats_sel[0]["id"];
+            $fcat = reset($cats_sel);
+	    $cat_id = $fcat["id"];
 	  }
 	} else {
 	  if (isset($params["$cat_name"])) {
