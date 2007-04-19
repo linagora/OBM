@@ -61,7 +61,7 @@ if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_resourcegroup_search_form($params);
   if ($set_display == "yes") {
-    $display["msg"] .= dis_resourcegroup_search_resourcegroup("");
+    $display["result"] .= dis_resourcegroup_search_resourcegroup("");
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
