@@ -48,7 +48,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 		try {
 			manager.logIn(
 					context.getPrincipal().getUser().getUsername(),
-					MD5Helper.encryptPassword( context.getPrincipal().getUser().getPassword() ) );
+					context.getPrincipal().getUser().getPassword() );
 			manager.initUserEmail();
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
