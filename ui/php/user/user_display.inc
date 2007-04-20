@@ -547,10 +547,10 @@ function html_user_consult($obm_q) {
       <th>$l_mail</th>
       <td>$mail_state</td>
     </tr>
-    <tr>
+<!--    <tr>
       <th>$l_mail_ext</th>
       <td>$mail_ext_state</td>
-    </tr>
+    </tr> -->
     <tr>
       <th>$l_mail_server</th>
       <td>";
@@ -1089,10 +1089,10 @@ function html_user_form($usr_q, $user, $field="") {
     <th class=\"$class[mail_perms]\">$l_mail</th>
     <td><input name=\"cb_mail_perms\" type=\"checkbox\" value=\"1\" $mail_state /></td>
   </tr>
-  <tr>
+<!--  <tr>
     <th class=\"$class[mail_ext_perms]\">$l_mail_ext</th>
     <td><input name=\"cb_mail_ext_perms\" type=\"checkbox\" value=\"1\" $mail_ext_state /></td>
-  </tr>
+  </tr> -->
   <tr>
     <th class=\"$class[mail_server]\">$l_mail_server</th>
     <td>$dis_mailserver</td>
