@@ -86,7 +86,7 @@ switch ($action) {
 // Program End
 switch ($params["mode"]) {
  case "txt":
-   echo "bye...\n";
+   // echo "bye...\n";
    break;
  case "html":
    page_close();

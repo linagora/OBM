@@ -11,8 +11,8 @@
 <a href="javascript:back();">back</A>
     
 <center>
-<h1>O.B.M. 2.0 ChangeLog</h1>
-version 2.0.1 - 2007-04-20
+<h1>O.B.M. 2.1 ChangeLog</h1>
+version 2.1.0 - 2007-04-23
 <p>
 </center>
 
@@ -37,6 +37,13 @@ To do
 - verifier traitement des email dans group
 
 
+2007-05-20 : version 2.1.0<br>
+
+<ul>
+<li> BUG#
+<li> Install scripts improvements (database independant)
+</ul>
+
 2007-04-20 : version 2.0.1<br>
 
 <ul>
@@ -50,241 +57,7 @@ To do
 <li> User data : fixed special case un category update form
 <li> Display : many IE6 and IE7 fixes
 <li> Time : all user select is now working again
-</ul>
-
-2007-04-07 : version 2.0.0<br>
-
-<ul>
-<li> BUG#626 : Incident : call time recorded correctly (Worksforme)
-<li> BUG#624 : contact select for new deals now put archived contact at the end
-<li> BUG#623 : Domain info now displayed on user detail page
-<li> BUG#622 : Profile labels are already configurables
-<li> BUG#618 : Document sorting in search results fixed
-<li> BUG#617 : Lead manager search selection now OK
-<li> BUG#616 : Group : correct insertion after warning and confirmation
-<li> BUG#611 : Project : fixed bug in search query for current projects
-<li> BUG#610 : Duplicate of #582
-<li> BUG#608 : Calendar : Event update rights on an event now clear
-<li> BUG#607 : incident date search are OK
-<li> BUG#602 : no more Aliasuite theme in 2.0.0
-<li> BUG#586 : Calendar : day links from planning view added
-<li> BUG#582 : Calendar : add rights restrictions to planning view
-<li> BUG#564 : Calendar : day view now allow direct event creation too
-<li> BUG#561 : User : local and ext_id fields shown on user detail : a feature
-<li> BUG#537 : script to migrate document (from 0.9 to 1.0) in bugzilla
-<li> BUG#521 : User labels now ok thanks to OBM-Aliamin merge in OBM 2
-<li> BUG#515 : no more Aliasuite theme in 2.0.0
-<li> BUG#515 : parameters handling : no more need to PHP register_globals
-<li> BUG#122 : event description now preserved on the insert conflict form
-<li> Calendar : fixed a warning whith group membership on a new event on PHP5
-<li> Contract : fixed inserting / updating contract type
-<li> Incident : fixed wrong message (and bogus email) when inserting incident
-<li> Incident : fixed archive info on insert with some MySQL versions
-<li> Category : User configurable categories (one conf line)
-<li> Stats : adapted to new user categories. Auto provided for all categories
-<li> Cv : new module : to manage user (worker) cv with project references
-<li> Odt : new module : to generate OpenDocument documents
-<li> OBM is now multi-domains (new module : Domain)
-<li> Tests : add non regression tests for Lists
-<li> Deal : Kind and status administration now ok
-<li> Group : access to group popup selection now only need "read rights"
-<li> Lead : new portlet on home page
-<li> Calendar : many navigation fixes (eg returning always on the current week)
-<li> Calendar : fixed case where month view last days events were not displayed
-<li> Import : automatically manage same companies (!= similar)
-<li> Import : user categories handle in import (company and contact)
-<li> Contact : statistics enhancements
-<li> Fixed some SQL error with PostgreSQL (contact, company insertion)
-<li> Change some date handling to allow PHP 5.2 compatibility
-<li> Security : prevent admin script to being called in txt mode from a browser
-<li> Calendar : fixed an error looking for availability with user & resources
-<li> Postgres : fixed error message when inserting a group on Postgres
-<li> Resource : Correctly delete all Resource group membership on deletion
-<li> Contract : fixed search by date expiration
-<li> Contract : fixed wrong error message on contract insertion
-<li> Lead : Automatically delete a lead successfully converted to a deal
-<li> Login page now totally configurable
-<li> OBM now works with register_globals = Off !!!
-<li> OBM : display totally rewritten, new default theme, icons, DHTML,...
-<li> Calendar : Display totally rewritten ! Did you hear about buzzword AJAX ?
-<li> Calendar : views no more limited to 6 users
-<li> Calendar : display now spread to all available space
-<li> OBM now show the field in error when submitting, user and tools data
-<li> OF : authentication rewrite (getting rid of $auth,..)
-<li> OF : password can be of differents types (PLAIN, MD5, CRYPT) by user
-<li> OBM : Aliamin merge !
-<li> Password : new module : to allow users to change their password
-<li> OBM-Mail : OBM now can handle the postfix MTA and Cyrus IMAP server
-<li> Mailforward (OBM-Mail) : new module : allow users to redirect their emails
-<li> Vacation (OBM-Mail) : new module : allow users to set up the vacation msg
-<li> Mailshare (OBM-Mail) : new module : handle Cyrus shared mailbbox
-<li> Host (OBM-Ldap) : new module : handle hosts database (Windows PDC, Samba)
-<li> OBM-Ldap : OBM now can handle an OpenLdap directory
-<li> code clean-up: $C_IMAGE_PATH, $set_theme, $auth, $sess removed from code
-<li> user login cant not be update (OBM-Mail constraint)
-<li> Invoice : expiration and payment dates search added
-<li> Invoice : multiple tax rates can be configured
-<li> Calendar : event list view added
-<li> Calendar : added exception handling on recurring event
-<li> Mailbox (OBM-Mail) : new module : allow to set up rights on its mailbox
-<li> OF : of_right improvement : no more calendar specific handling !
-</ul>
-
-2006-09-21 : version 1.2.4<br>
-
-<ul>
-<li> BUG#597 : deal : zip code search now fixed
-<li> BUG#596 : deal : expexted date keep on quick update
-<li> BUG#595 : Duplicate of 566
-<li> Import : import available again (security rights check now ok)
-<li> Project : mail notification now displays more and correct infos
-<li> Contract : fixed company selection rights on new contract
-<li> Incident : fixed wrong error message on incident deletion
-<li> Incident : archive flag correctly handled on search
-<li> of_category : Back button after a deletion check now correct
-<li> Time : short project names (not short names) now displayed in planning
-<li> Time : fixed some user selection problems when navigating through views
-<li> Time : update rights check to conform to obm rights model
-<li> Home page : Deal, Time, Contract, Incident portlets now need write right
-<li> Project : correct some case where project stats where wrong
-<li> Contact : search from a redundant company name now preserve company
-<li> Contact : search by datasource and datasource preserved on contact update
-<li> Import : country_code now default to 0 if empty
-<li> Deal : deal relations (with others companies) now displayed in results
-<li> Contact : fixed a case where comment in reverse order would not appear
-<li> Agenda : fixed handling username in decision for delegated users
-</ul>
-
-2006-09-10 : version 1.2.3<br>
-
-<ul>
-<li> BUG#594 : Deal insertion no more give error message if ok in some case
-<li> BUG#593 : results sets sorting and navigation fixed
-<li> BUG#592 : duplicate of #581
-<li> BUG#591 : user and group last visit bookmark updated correctly
-<li> BUG#590 : user's groups updates from the user screen fixed
-<li> BUG#589 : adding user or removing user / task from a project fixed
-<li> BUG#588 : Project : projects can now be archived again
-<li> BUG#584 : Company : specific bug to our install
-<li> BUG#581 : Project : Indicators now calculated and displayed again
-<li> BUG#575 : Project : menu links ok after adding a member (was ok in 1.2.2)
-<li> BUG#565 : Incident : display correctly solution even with >, quote,... 
-</ul>
-
-2006-09-08 : version 1.2.2<br>
-
-<ul>
-<li> BUG#585 : Re-connexion OK after a disconnect or pointing to internal url
-<li> BUG#583 : Agenda : event comment now saved
-<li> BUG#580 : Explicit error message when accessing an unexisting element
-<li> BUG#416 : Categories are now sorted either by code or by label (alpha)
-<li> Deal : fixed a case where a comment could be lost after an update warning
-<li> Deal : search by company relation fixed
-<li> Deal : hitrate set to 0 keep the 0 value (and not null !)
-<li> List : fixed some insert and update problems due to parameters handling
-<li> Contact : fixed Kind insert and update
-<li> Admin code : improved unused function detection
-<li> Rights management enhancements in Agenda and Resource
-<li> Deal : search by date criteria for all dates (alarm, begin, expected, end)
-<li> Lead to Deal conversion fixed
-<li> Company : added links to company leads
-<li> Stats : fixed statistics from a selected company list
-<li> Incident : added reference in result list (reload obmdb_default_values)
-<li> Project : planning view now display project shortname if available
-<li> Project and Time planning views : label enhancements (size, ...,)
-<li> Deal : tasktype criteria now preserved in year detail dashboard views
-</ul>
-
-2006-08-10 : version 1.2.1<br>
-
-<ul>
-<li> BUG#579 : Incident : search by Id now ok
-<li> BUG#577 : Incident : global text search added to allow knowledge database
-<li> BUG#576 : Contract resolution duration now correctly displayed
-<li> BUG#574 : Contract relation search parameter correctly preserved on search
-<li> BUG#573 : Project : correct a missing label after advance update
-<li> BUG#558 : Email on new project
-<li> Incident : resolution field now kept on insert
-<li> Project : planning and allocation links ok after adding a member
-<li> Agenda : Event rollover blinking is fixed
-<li> Project : broken link corrected
-<li> Document : Adding a document for other modules now work correctly
-<li> Project : Reference task can be added in the first Task type
-<li> Document : author now defaults with current user name
-<li> Incident : Search by reference is now available
-<li> Project : Reference task in project creation work correctly
-<li> Contract : update now fixed
-<li> Import : Fix php5 compatibility
-<li> Deal : Tasktype criteria correctly preserved in search
-<li> Comment reverse order display now ok
-<li> Agenda : Daily view display attendees information too.
-<li> Agenda : Attendees and task infos now on full day events roll-overs too
-<li> Agenda : task name automatically set the event title if empty
-<li> Group : adding a user now fixed
-<li> Comments updates now fixed on Company, Deal, Contract
-<li> Deal : mail on new deal now displays all the infos
-<li> Publication : fixed some warnings and problems on subscriptions handling
-<li> Categories : Correct messages (references,...) on delete checks
-<li> Deal : source fields correctly updated
-<li> Payment : fixes a company selection problem
-<li> Backup : restore and delete backups fixed
-</ul>
-
-2006-07-19 : version 1.2.0<br>
-
-<ul>
-<li> BUG#572 : Agenda Display successive event
-<li> BUG#570 : Agenda Self conflicting repeating event
-<li> BUG#569 : Agenda day view broken on multi-user 
-<li> BUG#568 : List can't update in expert mode
-<li> BUG#567 : Agenda visible Debug message
-<li> BUG#563 : Invoice dashboard links fixes
-<li> BUG#562 : Invoice search navigations fixes (with company criteria)
-<li> BUG#538 : User profile select no more hardcoded !
-<li> BUG#535 : A mini calendar popup help fill all dates fields
-<li> BUG#527 : Wrong display of recurring event weekly
-<li> Home page can redirect on a given url
-<li> TaskType handling code improvements
-<li> Contact : Added title on clipboard address copy
-<li> Contact : title search parameter now kept in result list navigation
-<li> List : some page navigation fixed when ctu_sql_limit is on
-<li> Invoice : Dashboard link from Billed invoice total corrected
-<li> List : Tel and fax inherited from Company if empty for static contacts
-<li> Publication : Automatic List subscription now handle contact lang
-<li> Admin : Clear Session now clear even if session lifetime illimited (0)
-<li> Backup : backup deletion fixed (filename problem)
-<li> Backup : Enable backup search by date and DB version
-<li> Invoice : added dashboard year to year comparison
-<li> Invoice : Dashboard scope can be limited to some task types
-<li> List : Fixed an SQL error on special case with AND NOT operator
-<li> Agenda : fixed a Postgres SQL error on event insertion
-<li> Database : drop deprecated EntryTemp and PaymentTemp tables
-<li> List : search navigation fixes with email criteria
-<li> List : query generation more consistent with null entries on exclusion
-<li> Company : search navigation fixes with category tree criteria
-<li> Payment module total rewrite
-<li> Document : directories can now be renamed
-<li> Entity privacy : entity privacy improved and fixes in deal, group, rgroup
-<li> Deal : added commission, end date fields
-<li> List : normal dynamic public lists now don't include private contacts
-<li> Contract : search navigation fixes with manager criteria
-<li> Deal : added deal amount in automatic mail info
-<li> Deal : added expected quarter, calculated sale delay infos
-<li> Deal : added source fields
-<li> comments timestamp now display time too
-<li> New module : Lead
-<li> Deal : dashboard "year detail" by user and tasktype : amounts, balanced
-<li> of_category : Handling of categories with uppercase (eg: CompanyRole)
-<li> of_category : Handle tree display even if no code in the category
-<li> Deal : a deal can now be linked to multiple companies with roles
-<li> Lang : language simplications with categories and main actions
-<li> Incident : documents can now be linked to an incident
-<li> Deal : added region field, with region in the referential
-<li> Company : added French SIRET code
-<li> Agenda : New planning view (illimited users)
-<li> Time : New planning view (monthly) with time for each project
-<li> Project : New view displaying the time usage on the project
-<li> Project : Short label
+<li> OBM-LDAP, OBM-Mail updates and fixes
 </ul>
 
 <p/>

@@ -2,18 +2,18 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Basic steps to build and install OBM 2.0.x</title>
+<title>Basic steps to build and install OBM 2.1.x</title>
 </head>
 <!-- $Id$ -->
 <body bgcolor="#FFFFFF">
 
 <a href="javascript:back();">back</a>
 
-<p>These docs are valid for OBM 2.0.x
+<p>These docs are valid for OBM 2.1.x
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.</p>
 
-<h1>Basic steps to build and install OBM 2.0.x</h1>
+<h1>Basic steps to build and install OBM 2.1.x</h1>
 
 <h2> Assumptions</h2>
 
@@ -43,10 +43,10 @@ And uncompress it in /var/www (or where your document root will be located).</p>
 <tr>
   <td>
 <code>
-wget http://obm.aliasource.org/obm-archives/obm-2.0.0.tar.gz<br />
-tar -C /var/www -xzvf obm-2.0.0.tar.gz<br />
+wget http://obm.aliasource.org/obm-archives/obm-2.1.0.tar.gz<br />
+tar -C /var/www -xzvf obm-2.1.0.tar.gz<br />
 cd /var/www<br />
-ln -s obm-2.0.0 obm
+ln -s obm-2.1.0 obm
 </code>
   </td>
 </tr>
@@ -90,7 +90,7 @@ include_path = ".:/var/www/obm"
 </table>
 
 
-<p>To avoid some PHP warnings for a previous php version bug, turn on these 2 directives (and now OBM works with register_globals set toi Off) :</p>
+<p>To avoid some PHP warnings for a previous php version bug, turn on these 2 directives (and now OBM works with register_globals set to Off) :</p>
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
@@ -220,7 +220,7 @@ As a side note, the obminclude directory can be moved to another location.
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-Alias /images /var/www/obm/resources (beware, this has changed in OBM 2.0)
+Alias /images /var/www/obm/resources
 </pre>
   </td>
 </tr>
@@ -295,6 +295,21 @@ NameVirtualHost 102.168.1.5<br />
 
 <p>Since OBM 2.0, the configuration is located in conf/obm_conf.ini and conf/obm_conf.inc files (before obm 2.0, the configuration was in the obminclude/obm_conf.inc file).</p>
 <p>in the conf directory, copy the <i>obm_conf.inc.sample</i> and <i>obm_conf.ini.sample</i> files to <i>obm_conf.inc</i> and <i>obm_conf.ini</i> and edit them.</p>
+
+<table border="1">
+<tr>
+  <td>conf /</td>
+  <td>all conf is in conf/ config directory</td>
+</tr>
+<tr>
+  <td>conf/obm_conf.ini</td>
+  <td>Set database host, engine, user, password here</td>
+</tr>
+<tr>
+  <td>conf/obm_conf.inc</td>
+  <td>OBM application configuration</td>
+</tr>
+</table>
 
 
 <h3>4.1: Global OBM system configuration (needed before install)</h3>
@@ -377,7 +392,7 @@ $cgp_mail_enabled = false;
 
 
 <h3>4.3: Database Configuration and Creation</h3>
-<p>The scripts are in the scripts/2.0 directory.</p>
+<p>The scripts are in the scripts/2.1 directory.</p>
 
 
 <h4>4.3.1: MySQL</h4>
@@ -395,12 +410,12 @@ GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE, LOCK TABLES, INDEX ON obm.* 
 </tr>
 </table>
 
-<p>The script <i>install_obmdb_2.0.mysql.sh</i> handle all the database creation steps.<br />
+<p>The script <i>install_obmdb_2.1.sh</i> handle all the database creation steps.<br />
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-cd obm/scripts/2.0<br />
-./install_obmdb_2.0.mysql.sh
+cd obm/scripts/2.1<br />
+./install_obmdb_2.1.sh
 </code>
   </td>
 </tr>
@@ -421,7 +436,7 @@ create database obm with owner = obm;
 
 <h5>4.3.2.1: Encoding</h5>
 <p>If your Postgres server is not configured with latin1 character set:<br />
- edit the file scripts/2.0/postgres-pre.sql and uncomment the line (now uncommented by default)</p>
+ edit the file scripts/2.1/postgres-pre.sql and uncomment the line (now uncommented by default)</p>
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
@@ -434,12 +449,12 @@ create database obm with owner = obm;
 <p>OBM should in the future be converted to UTF8 by default.</p>
 
 <h5>4.3.3.2: Install</h5>
-<p>The script <i>install_obmdb_2.0.pgsql.sh</i> handle all the database creation steps.<br />
+<p>The script <i>install_obmdb_2.1.sh</i> handle all the database creation steps.<br />
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-cd obm/scripts/2.0<br />
-./install_obmdb_2.0_pgsql.sh
+cd obm/scripts/2.1<br />
+./install_obmdb_2.1.sh
 </code>
   </td>
 </tr>
@@ -497,18 +512,18 @@ cd obm/scripts/2.0<br />
 
 
 <p>
-<a name="upgrade-2.0"><h1>UPGRADE from version 1.2.x to version 2.0.x</h1></a></p>
+<a name="upgrade-2.1"><h1>UPGRADE from version 2.0.x to version 2.1.x</h1></a></p>
 
 
 <h3>Replace your current archive with the new one</h3>
 
 
-Recreate the Artichow library link
+Recreate the Artichow library link (should not be needed anymore as the link is now handled by subversion)
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
 cd obminclude
-mv Artichow-1.06-php4+5/ Artichow
+ln -s Artichow-1.1.0-php4+5/ Artichow
 </code>
   </td>
 </tr>
@@ -518,93 +533,6 @@ mv Artichow-1.06-php4+5/ Artichow
 <h3>Update OBM configuration</h3>
 
 OBM configuration has evolved.
-<table border="1">
-<tr>
-  <td>conf /</td>
-  <td>all conf is now in conf/ config directory</td>
-</tr>
-<tr>
-  <td>conf/obm_conf.ini</td>
-  <td>Set database host, engine, user, password here</td>
-</tr>
-<tr>
-  <td>conf/obm_conf.inc</td>
-  <td>Move obminclude/obm_conf.inc in conf/obm_conf.inc</td>
-</tr>
-<tr>
-  <td>obminclude/site/lang</td>
-  <td>Move it to conf/lang</td>
-</tr>
-<tr>
-  <th colspan="2">obm_conf.inc config</th>
-</tr>
-<tr>
-  <td>C_IMAGE_PATH</td>
-  <td>not needed anymore : to delete</td>
-</tr>
-<tr>
-  <td>$cgp_site_include</td>
-  <td>has become : $conf_lang</td>
-</tr>
-<tr>
-  <td>$obmdb_host,...</td>
-  <td>delete obmdb_host, $obmdb_db, $obmdb_user,... (are in obm_conf.ini)</td>
-</tr>
-<tr>
-  <td>$password_encryption</td>
-  <td>set it to MD5SUM (instead of MD5)</td>
-</tr>
-<tr>
-  <th colspan="2">Categories update</th>
-</tr>
-<tr>
-  <td colspan="2">OBM now offers user defined categories. Lines belows are to update previous Categories to user defined ones. Then you can apply the principle to define your own categories</td>
-</tr>
-<tr>
-  <td>companycategory1</td>
-  <td>If you where using CompanyCategory1, add :
-<br />$cgp_user["company"]["category"]["companycategory1"] = array("mode"=>"multi");
-<br />$l_companycategory1 = "Category"; // or replace by the name you want</td>
-</tr>
-<tr>
-  <td>contactcategory1</td>
-  <td>If you where using ContactCategory1, add :
-<br />$cgp_user["contact"]["category"]["contactcategory1"] = array("mode"=>"multi");
-<br />$l_contactcategory1 = "ContactCat1";</td>
-</tr>
-<tr>
-  <td>contactcategory2</td>
-  <td>If you where using ContactCategory2, add :
-<br />$cgp_user["contact"]["category"]["contactcategory2"] = array("mode"=>"multi");
-<br />$l_contactcategory2 = "ContactCat2";</td>
-</tr>
-<tr>
-  <td>contactcategory2, 3, 4</td>
-  <td>Idem contactcategory1</td>
-</tr>
-<tr>
-  <td>contactcategory5</td>
-  <td>If you where using ContactCategory5, add :
-<br />$cgp_user["contact"]["category"]["contactcategory5"] = array("mode"=>"mono");
-<br />$l_contactcategory5 = "ContactCat5";</td>
-</tr>
-<tr>
-  <td>dealcategory1</td>
-  <td>idem : multi</td>
-</tr>
-<tr>
-  <td>incidentcategory2</td>
-  <td>idem : mono</td>
-</tr>
-<tr>
-  <td>documentcategory1</td>
-  <td>idem : mono</td>
-</tr>
-<tr>
-  <td>documentcategory2</td>
-  <td>idem : mono</td>
-</tr>
-</table>
 
 
 <h3>Update Database model</h3>
@@ -612,7 +540,7 @@ OBM configuration has evolved.
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-mysql -u obm -pobm obm < scripts/2.0/update-1.2-2.0.mysql.sql
+mysql -u obm -pobm obm < scripts/2.1/update-2.0-2.1.mysql.sql
 </code>
   </td>
 </tr>
@@ -623,7 +551,7 @@ mysql -u obm -pobm obm < scripts/2.0/update-1.2-2.0.mysql.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-psql -U obm obm < scripts/2.0/update-1.2-2.0.pgsql.sql
+psql -U obm obm < scripts/2.1/update-2.0-2.1.pgsql.sql
 </code>
   </td>
 </tr>
@@ -631,11 +559,12 @@ psql -U obm obm < scripts/2.0/update-1.2-2.0.pgsql.sql
 
 
 <h3>Insert new default preferences values</h3>
+<b>The default preferences SQL file name has changed in 2.1</b>
 <p># MySQL</p>
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-mysql -u obm -pobm obm < scripts/2.0/obmdb_default_values_2.0.sql
+mysql -u obm -pobm obm < scripts/2.1/obmdb_prefs_values_2.1.sql
 </code>
   </td>
 </tr>
@@ -646,7 +575,7 @@ mysql -u obm -pobm obm < scripts/2.0/obmdb_default_values_2.0.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-psql -U obm obm < scripts/2.0/obmdb_default_values_2.0.sql
+psql -U obm obm < scripts/2.1/obmdb_prefs_values_2.1.sql
 </code>
   </td>
 </tr>
@@ -658,8 +587,8 @@ psql -U obm obm < scripts/2.0/obmdb_default_values_2.0.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-cd scripts/2.0
-php update-1.2-2.0.php
+cd scripts/2.1
+php update-2.0-2.1.php
 </code>
   </td>
 </tr>
@@ -702,7 +631,7 @@ Dictionnary -> data -> action "data_update" on the list module
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-mysql -u obm -pobm obm < scripts/1.2/data-fr/obmdb_nafcode_1.2.sql
+mysql -u obm -pobm obm < scripts/2.1/data-fr/obmdb_nafcode_2.1.sql
 </code>
   </td>
 </tr>
@@ -712,7 +641,7 @@ mysql -u obm -pobm obm < scripts/1.2/data-fr/obmdb_nafcode_1.2.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><code>
-psql -U obm obm < scripts/1.2/data-fr/obmdb_nafcode_1.2.sql
+psql -U obm obm < scripts/2.1/data-fr/obmdb_nafcode_2.1.sql
 </code>
   </td>
 </tr>

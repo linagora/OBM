@@ -307,7 +307,7 @@ function dis_lead_portal() {
     <img src=\"$ico_big_lead\" alt=\"Lead\" />$l_module_lead
    </h1>
    <dl>
-   <dt><a href=\"$path/lead/lead_index.php?action=search&amp;sel_manager_id=$uid\">$l_my_lead</a></dt>
+   <dt><a href=\"$path/lead/lead_index.php?action=search&amp;sel_manager=$uid\">$l_my_lead</a></dt>
    <dd>$leads[total]</dd>
    <dt>- 7 $l_days</dt>
    <dd>$leads_date[0]</dd>
@@ -323,7 +323,7 @@ function dis_lead_portal() {
    </dt>
    <dd>$leads[alarm] / $leads[no_alarm]</dd>
    </dl>
-   <a class=\"link\" href=\"$path/lead/lead_index.php?action=search&amp;sel_manager_id=$uid\">$l_my_lead</a>
+   <a class=\"link\" href=\"$path/lead/lead_index.php?action=search&amp;sel_manager=$uid\">$l_my_lead</a>
   </div>";
 
   return $block;

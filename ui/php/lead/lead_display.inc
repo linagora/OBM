@@ -274,14 +274,16 @@ function dis_lead_consult($params) {
 //   - $l_q  : lead database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_lead_consult($l_q) {
-  global $path, $display,  $ico_company, $c_yes, $c_no;
-  global $l_company, $l_comment, $l_phone;
+  global $path, $display, $ico_company, $ico_contact, $c_yes, $c_no;
+  global $l_company, $l_contact, $l_comment, $l_phone;
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
 
   $id = $l_q->f("lead_id");
-  $c_id = $l_q->f("lead_company_id");
-  $c_name = $l_q->f("company_name");
-  $c_phone = $l_q->f("company_phone");
+  $company_id = $l_q->f("lead_company_id");
+  $company_name = $l_q->f("company_name");
+  $company_phone = $l_q->f("company_phone");
+  $contact_id = $l_q->f("lead_contact_id");
+  $contact_name = $l_q->f("contact_lastname") . " " . $l_q->f("contact_firstname") . " - " . $l_q->f("contact_phone");
   $source_label = $l_q->f("leadsource_label");
   $manager = $l_q->f("manager");
   $date = of_date_format($l_q->f("date"));
@@ -294,7 +296,16 @@ function html_lead_consult($l_q) {
   $zip = $l_q->f("company_zipcode");
   $town = $l_q->f("company_town");
 
-  $display["title"] = "<div class=\"title\">$l_lead : $date $c_name</div>";
+  if ($company_id > 0) {
+    $link_company = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$company_id")."\">
+      <img src=\"$ico_company\" alt=\"[details]\" /></a>";
+  }
+  if ($contact_id > 0) {
+    $link_contact = "<a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$contact_id")."\">
+      <img src=\"$ico_contact\" alt=\"[details]\" /></a>";
+  }
+
+  $display["title"] = "<div class=\"title\">$l_lead : $date $company_name</div>";
 
   $block = "
 <h1>$title</h1>
@@ -302,31 +313,24 @@ function html_lead_consult($l_q) {
   <h1>$l_lead</h1>
     <table class=\"detail\">
     <tr>
-      <th>$l_company 
-      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\">
-      <img src=\"$ico_company\" alt=\"[details]\" /></a>
-      </th>
-      <td>$c_name<br/>$c_phone<br />$ad1<br/>$zip $town</td>
+      <th>$l_name</th>
+      <td>$name</td>
+    </tr>
+    <tr>
+      <th>$l_company $link_company</th>
+      <td>$company_name<br/>$company_phone<br />$ad1<br/>$zip $town</td>
+    </tr>
+    <tr>
+      <th>$l_contact $link_contact</th>  
+      <td>$contact_name</td>
     </tr>
     <tr>
       <th>$l_source</th>
       <td>$source_label</td>
     </tr>
     <tr>
-      <th>$l_manager</th>
-      <td>$manager</td>
-    </tr>
-    <tr>
-      <th>$l_name</th>
-      <td>$name</td>
-    </tr>
-    <tr>
       <th>$l_date</th>
       <td>$date</td>
-    </tr>
-    <tr>
-      <th>$l_alarm</th>
-      <td>$datealarm</td>
     </tr>
     </table>
     </div>
@@ -337,6 +341,14 @@ function html_lead_consult($l_q) {
     <tr>
       <th>$l_todo</th>
       <td>$todo</td>
+    </tr>
+    <tr>
+      <th>$l_manager</th>
+      <td>$manager</td>
+    </tr>
+    <tr>
+      <th>$l_alarm</th>
+      <td>$datealarm</td>
     </tr>
     </table>
 </div>
@@ -389,9 +401,9 @@ function dis_lead_form($action, $params) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_lead_form($action, $l_q, $sources, $managers, $params) {
   global $obm, $display, $path, $c_undef, $l_undef;
-  global  $ico_company, $l_company,$ico_add,$ico_crow;
+  global $ico_company, $ico_contact, $ico_add, $ico_crow;
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
-  global $l_update, $l_checkdelete, $l_insert;
+  global $l_update, $l_checkdelete, $l_insert, $l_company, $l_contact;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
   global $popup_width, $popup_height, $l_header_new, $ico_mini_cal;
@@ -405,6 +417,9 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
     $manager_id = $l_q->f("lead_manager_id");
     $c_id = $l_q->f("lead_company_id");
     $c_name = $l_q->f("company_name");
+    $contact_id = $l_q->f("lead_contact_id");
+    $contact_lname = $l_q->f("contact_lastname");
+    $contact_fname = $l_q->f("contact_firstname");
     $name = $l_q->f("lead_name");
     $date = $l_q->f("date");
     $date = ($date != 0) ? of_date_format($date, 1) : "";
@@ -429,6 +444,10 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   if (isset($params["company_name"])) { $c_name = $params["company_name"]; }
   if (isset($params["company_new_id"])) { $c_new_id = $params["company_new_id"]; }
   if (isset($params["company_new_name"])) { $c_new_name = $params["company_new_name"]; }
+  if (isset($params["contact_id"])) { $contact_id = $params["contact_id"]; }
+  if (isset($params["contact_name"])) { $contact_name = $params["contact_name"]; }
+  if (isset($params["contact_new_id"])) { $contact_new_id = $params["contact_new_id"]; }
+  if (isset($params["contact_new_name"])) { $contact_new_name = $params["contact_new_name"]; }
   if (isset($params["lead_id"])) { $id = $params["lead_id"]; }
   if (isset($params["source"])) { $source_id = $params["source"]; }
   if (isset($params["manager"])) { $manager_id = $params["manager"]; }
@@ -468,6 +487,16 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" size=\"30\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
+
+  // Contact Display
+  $dis_contact = "<a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$contact_id") . "\">
+      $contact_name
+      </a><input type=\"hidden\" name=\"contact_id\" value=\"$contact_id\" />
+      <input type=\"hidden\" name=\"contact_name\" value=\"$contact_name\" />
+      <input type=\"hidden\" name=\"contact_new_id\" value=\"$contact_new_id\" />
+      <a href=\"\" onclick=\"window.open('$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=f_entity.contact_new_id&amp;ext_widget_text=f_entity.contact_new_name','Contact','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <img src=\"$ico_contact\" alt=\"\" /></a>
+      <input type=\"text\" size=\"30\" name=\"contact_new_name\" value=\"$contact_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 
   // User comment select construction
   $sel_usercomment = "<select name=\"sel_usercomment\">";
@@ -523,29 +552,23 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
     <legend>$l_lead</legend>
     <table>
     <tr>
-      <th>$l_company</th>
-      <td>$dis_company</td>
-    </tr>
-    $block_source
-    <tr>
-      <th>$l_manager</th>
-      <td>$sel_manager</td>
-    </tr>
-    <tr>
       <th>$l_name</th>
       <td><input type=\"text\" name=\"tf_name\" size=\"32\" maxlength=\"64\" value=\"$name\" /></td>
     </tr>
+    <tr>
+      <th>$l_company</th>
+      <td>$dis_company</td>
+    </tr>
+    <tr>
+      <th>$l_contact</th>
+      <td>$dis_contact</td>
+    </tr>
+    $block_source
     <tr>
       <th>$l_date</th>
      <td>
        <input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>
      </td>
-    </tr>
-    <tr>
-      <th>$l_alarm</th>
-      <td>
-       <input type=\"text\" name=\"tf_datealarm\" value=\"$datealarm\" class=\"datePicker\"/>
-      </td>
     </tr>
     </table>
     </fieldset>
@@ -557,6 +580,16 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
     <tr>
       <th>$l_todo</th>
       <td><input type=\"text\" name=\"tf_todo\" size=\"32\" maxlength=\"128\" value=\"$todo\" /></td>
+    </tr>
+    <tr>
+      <th>$l_manager</th>
+      <td>$sel_manager</td>
+    </tr>
+    <tr>
+      <th>$l_alarm</th>
+      <td>
+       <input type=\"text\" name=\"tf_datealarm\" value=\"$datealarm\" class=\"datePicker\"/>
+      </td>
     </tr>
     </table>
 </fieldset>

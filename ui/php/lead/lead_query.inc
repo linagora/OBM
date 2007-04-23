@@ -149,12 +149,14 @@ function run_query_lead_detail($p_id) {
       leadsource_label,
       company_name, company_address1, company_zipcode, company_town,
       company_phone,
+      contact_lastname, contact_firstname, contact_phone,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
       $concat_manager as manager
     FROM Lead
          LEFT JOIN LeadSource ON lead_source_id=leadsource_id
          LEFT JOIN Company ON lead_company_id=company_id
+         LEFT JOIN Contact ON lead_contact_id=contact_id
          LEFT JOIN UserObm as c ON lead_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON lead_userupdate=u.userobm_id
          LEFT JOIN UserObm as m ON lead_manager_id=m.userobm_id
@@ -183,6 +185,10 @@ function run_query_lead_insert($params) {
   $company_id = $params["company_new_id"];
   if ($company_id < 1) {
     $company_id = $params["company_id"];
+  }
+  $contact_id = $params["contact_new_id"];
+  if ($contact_id < 1) {
+    $contact_id = $params["contact_id"];
   }
   $source_id = $params["source"];
   $manager_id = $params["manager"];
@@ -215,6 +221,7 @@ function run_query_lead_insert($params) {
     lead_source_id,
     lead_manager_id,
     lead_company_id,
+    lead_contact_id,
     lead_privacy,    
     lead_name,
     lead_date,
@@ -231,6 +238,7 @@ function run_query_lead_insert($params) {
     '$source_id',
     '$manager_id',
     '$company_id',
+    '$contact_id',
     '$privacy',
     '$name',
     $date,
@@ -249,6 +257,7 @@ function run_query_lead_insert($params) {
   $query = "SELECT lead_id
     FROM Lead
     WHERE lead_company_id = '$company_id'
+      AND lead_contact_id = '$contact_id'
       AND lead_source_id = '$source_id'
       AND lead_manager_id = '$manager_id'
       AND lead_date $datep
@@ -281,6 +290,10 @@ function run_query_lead_update($pid, $params) {
   if ($company_id < 1) {
     $company_id = $params["company_id"];
   }
+  $contact_id = $params["contact_new_id"];
+  if ($contact_id < 1) {
+    $contact_id = $params["contact_id"];
+  }
   $source_id = $params["source"];
   $manager_id = $params["manager"];
   $name = $params["name"];
@@ -311,6 +324,7 @@ function run_query_lead_update($pid, $params) {
     lead_source_id='$source_id',
     lead_domain_id='$domain_id',
     lead_company_id='$company_id',
+    lead_contact_id='$contact_id',
     lead_manager_id='$manager_id',
     lead_name='$name',
     lead_date=$date,
@@ -347,7 +361,7 @@ function get_lead_managers($archive = false) {
   if ($where_arch != "") {
     $where = "WHERE $where_arch $multidomain";
   } else {
-  	$where = "WHERE 1=1 $multidomain";
+    $where = "WHERE 1=1 $multidomain";
   }
   
   $multidomain = sql_multidomain("userobm");
@@ -392,6 +406,8 @@ function check_lead_data_form($id, $params) {
   $datealarm = $params["datealarm"];
   $c_id = $params["company_id"];
   $c_new_id = $params["company_new_id"];
+  $contact_id = $params["contact_id"];
+  $contact_new_id = $params["contact_new_id"];
   $kind = $params["kind"];
 
   // MANDATORY: Name must be set
@@ -441,7 +457,7 @@ function run_query_lead_delete($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-	$multidomain = sql_multidomain("lead");
+  $multidomain = sql_multidomain("lead");
 	
   $query = "DELETE FROM Lead WHERE lead_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_lead_delete()");

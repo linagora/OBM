@@ -202,8 +202,7 @@ function dis_admin_data_company($action, $mode) {
     echo "
 ------------------------------------------------------------------------------
 *** Company : $nb_comp to parse
-------------------------------------------------------------------------------
-";
+------------------------------------------------------------------------------";
   } else {
     if ($action == "data_update") {
       $update = "<th>Update</th>";
@@ -337,8 +336,7 @@ function dis_admin_data_deal($action, $mode) {
     echo "
 ------------------------------------------------------------------------------
 *** Deal : $nb_deal to parse
-------------------------------------------------------------------------------
-";
+------------------------------------------------------------------------------";
   } else {
     if ($action == "data_update") {
       $update = "<th>Update</th>";
@@ -471,8 +469,7 @@ function dis_admin_data_list($action, $mode) {
     echo "
 ------------------------------------------------------------------------------
 *** List : $nb_l to parse
-------------------------------------------------------------------------------
-";
+------------------------------------------------------------------------------";
   } else {
     if ($action == "data_update") {
       $update = "<td class=\"adminLabel\">Update</td>";
@@ -793,9 +790,8 @@ function dis_admin_data_sound_aka_update_company($mode) {
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
-*** Sound Update : $l_module_company : $nb_comp to process
-------------------------------------------------------------------------------
-";
+*** Sound update : $l_module_company : $nb_comp to process
+------------------------------------------------------------------------------";
   } else {
 
     echo "
@@ -839,7 +835,7 @@ function dis_admin_data_sound_aka_update_company($mode) {
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
-*** Sound update : $l_module_company $nb_comp processed
+*** Sound update : $l_module_company : $nb_comp processed
 ------------------------------------------------------------------------------
 ";
   } else {
@@ -872,9 +868,8 @@ function dis_admin_data_sound_aka_update_contact($mode) {
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
-*** Sound Update : Contact : $nb to process
-------------------------------------------------------------------------------
-";
+*** Sound update : $l_module_contact : $nb to process
+------------------------------------------------------------------------------";
   } else {
 
     echo "
@@ -925,7 +920,7 @@ function dis_admin_data_sound_aka_update_contact($mode) {
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
-*** Sound update : $l_module_contact $cpt_c processed
+*** Sound update : $l_module_contact : $cpt_c processed
 ------------------------------------------------------------------------------
 ";
   } else {
