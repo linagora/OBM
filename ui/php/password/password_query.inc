@@ -123,7 +123,6 @@ function check_data_form($usr_q, $password) {
   $old_pass = trim($password["old_password"]);
   $new_pass = trim($password["new_password"]);
   $new_pass_bis = trim($password["new_password_bis"]);
-
   if ($action == "update") {
     // Verifie que le mot de passe actuel est correct
     if ($passtype == "CRYPT") {
@@ -150,20 +149,6 @@ function check_data_form($usr_q, $password) {
     if ($new_pass != $new_pass_bis) {
       $err["msg"] = "$l_new_password_differ";
       $err["field"] = "new_password_bis";
-      return false;
-    }
-
-    // Verifie que le mot de passe actuel est correct
-    if ($passtype == "CRYPT") {
-      $old_passwd_crypt = crypt($old_pass,$pass);
-    } else if ($passtype == "MD5") {
-      $old_passwd_crypt = md5($old_pass);
-    } else {
-      $old_passwd_crypt = $old_pass;
-    }
-    if ($pass != $old_passwd_crypt) {
-      $err["msg"] = "$l_wrong_password";
-      $err["field"] = "old_password";
       return false;
     }
 
