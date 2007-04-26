@@ -172,7 +172,7 @@ function dis_logout_detail() {
 function dis_calendar_portal() {
   global $ico_big_calendar,$path;
   global $l_module_calendar,$l_daysofweekfirst,$l_my_calendar,$l_waiting_events;
-  global $obm, $ccalendar_weekstart;
+  global $obm, $ccalendar_weekstart, $day_duration;
 
   $obm_q = run_query_calendar_waiting_events() ;
   $num = $obm_q->num_rows();
@@ -185,7 +185,8 @@ function dis_calendar_portal() {
 
   $current_time = $start_time; 
   $calendar_entity["user"] = array($obm["uid"] => array("dummy"));
-  $occurrences = calendar_events_model($start_time,$end_time, $calendar_entity);
+  calendar_events_model($start_time,$end_time, $calendar_entity);
+	$of = &OccurrenceFactory::getInstance();
   $whole_month = TRUE;
   $num_of_events = 0;
 
@@ -196,21 +197,26 @@ function dis_calendar_portal() {
     $day = date ("j", $current_time);
     $iso_day = of_isodate_format($current_time);
     $check_month = of_date_get_month($current_time);
-
+		$have_occurrence = $of->periodHaveOccurrences(strtotime($iso_day), $day_duration);
+		if($have_occurrence) {
+			$klass = "have_occurrence ";
+		} else {
+			$klass = "";
+		}
     if ($check_month != $this_month) {
-      $dis_minical .= "<td class=\"downlight\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\"
-        onmouseout=\"this.className='downlight'\" onmouseover=\"this.className='hover'\">
+      $dis_minical .= "<td class=\"downlight $klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\"
+        onmouseout=\"this.className='downlight $klass'\" onmouseover=\"this.className='hover'\">
         $day
         </td>";
     } else {
       if (of_isodate_format() == $iso_day) {
-        $dis_minical .= "<td class=\"highlight\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\" 
-          onmouseout=\"this.className='highlight'\" onmouseover=\"this.className='hover'\">
+        $dis_minical .= "<td class=\"highlight $klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\" 
+          onmouseout=\"this.className='highlight $klass'\" onmouseover=\"this.className='hover'\">
           $day
           </td>";
       } else {
-        $dis_minical .= "<td onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\" 
-          onmouseout=\"this.className=''\" onmouseover=\"this.className='hover'\">
+        $dis_minical .= "<td class=\"$klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\" 
+          onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\">
           $day
           </td>";
       }

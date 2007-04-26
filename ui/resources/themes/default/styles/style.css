@@ -624,6 +624,11 @@ input.datePicker {
 #datepicker table tbody td.hover a, .miniCalendar tbody td.hover a {
   color: #fff;  
 }
+
+#datepicker td.have_occurrence, .miniCalendar tbody td.have_occurrence {
+  background-color: #ffcc00;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Comments layout */
 /* ------------------------------------------------------------------------- */
