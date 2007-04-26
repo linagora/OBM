@@ -2274,8 +2274,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity) {
       LEFT JOIN CalendarCategory1
         ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
-                               AND evententity_state = 'A'
     WHERE calendarevent_repeatkind != 'none'
+      AND evententity_state = 'A'
       AND $calendarevent_date <= $end 
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
       OR $calendarevent_endrepeat = '0')
