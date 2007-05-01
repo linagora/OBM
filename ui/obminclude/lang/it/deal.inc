@@ -103,7 +103,6 @@ $l_fill_number = "Scrivi prima numero.";
 $l_fill_datealarm = "Scrivi prima Data Avviso.";
 $l_fill_datebegin = "Scrivi prima Data inizio.";
 $l_confirm_datealarm = "Data Avviso e passata ! Valida ?";
-$l_j_select_company = "Scegli una azienda!";
 $l_invalid_date = "Formato data non valido (MM/GG/AAAA or AAAA-MM-GG).";
 $l_delete_confirm = "Confermi impegno Eliminazione ?";
 $l_j_kind_delete = "Inserisci un Tipo per controllo o eliminazione!";

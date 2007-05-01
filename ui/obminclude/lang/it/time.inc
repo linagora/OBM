@@ -72,7 +72,6 @@ $l_update_error = "Modifica contatto fallita!";
 $l_fill_lastname = "Inserisci prima il nome.";
 $l_fill_phone = "Inserisci prima il telefono.";
 $l_delete_confirm = "Confermi eliminazione tasks?";
-$l_j_select_company = "Seleziona un'azienda!";
 $l_j_check_phone = "Il numero di telefono non è corretto.";
 $l_j_check_hphone = "Il numero di telefono personale non è corretto.";
 $l_j_check_mphone = "Il numero di cellulare  non è corretto.";

@@ -58,7 +58,6 @@ $l_no_found = "Ingen kontaktar passa søket!";
 $l_fill_lastname = "\\n Du må fylle inn etternamn før du legg inn.";
 $l_fill_phone = "\\n Du må fylle inn telefonnummer før du legg inn.";
 $l_delete_confirm = "Slett kontakten?";
-$l_j_select_company =  "Du må velge eit firma!";
 $lj_check_phone = "Telefonnummeret er ugyldig.";
 $lj_check_pphone = "Privatnummeret er ugyldig.";
 $lj_check_mphone = "Mobilnummeret er ugyldig.";

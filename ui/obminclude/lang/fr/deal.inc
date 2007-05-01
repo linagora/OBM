@@ -127,7 +127,6 @@ $l_fill_number = "Vous devez renseigner le Numero avant de valider.";
 $l_fill_datealarm = "Vous devez renseigner la date alarme avant de valider.";
 $l_fill_datebegin = "Vous devez renseigner la date de début avant de valider.";
 $l_confirm_datealarm = "La date Alarme est dans le passé ! Confirmer l'action ?";
-$l_j_select_company = "Vous devez sélectionner une société !";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 $l_delete_confirm = "Confirmer la suppression de l'affaire ?";
 

@@ -119,7 +119,6 @@ $l_fill_number = "Debe ingresar el Número antes de enviar.";
 $l_fill_datealarm = "Debe ingresar la Fecha de Alarma date antes de enviar.";
 $l_fill_datebegin = "Debe ingresar Fecha de Inicio antes de enviar.";
 $l_confirm_datealarm = "Fecha de Alarma esta en el pasado ! Confirma la acción ?";
-$l_j_select_company = "Debe seleccionar una compañía!";
 $l_invalid_date = "Formato de fecha inválido (MM/JJ/AAAA or AAAA-MM-JJ).";
 $l_delete_confirm = "Confirma eliminación del negocio ?";
 

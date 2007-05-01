@@ -1492,6 +1492,7 @@ function get_lead_info($lead_id) {
 
   $res["name"] = $obm_q->f("lead_name");
   $res["company_id"] = $obm_q->f("lead_company_id");
+  $res["contact_id"] = $obm_q->f("lead_contact_id");
   $res["source_id"] = $obm_q->f("lead_source_id");
   $res["manager"] = $obm_q->f("lead_manager_id");
   $res["date"] = $obm_q->f("lead_date");

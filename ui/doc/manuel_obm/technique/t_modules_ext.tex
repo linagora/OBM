@@ -37,6 +37,15 @@ ext\_get\_id\_url & Voir difference reelle avec ext\_get\_id ? uniquement param 
 \hline
 \end{tabular}
 
+
+\subsubsection{Différenciation des types d'action (ext\_type)}
+
+Afin de permettre aux fonctions d'affichage d'un module de différencier les affichages en fonction du type de retour (sélection d'une seule entrée, par lien, ou de plusieurs par case à cocher), les modules offrant les 2 possibilités doivent renseigner la variable \variable{ext\_type}.
+Ceci s'effectue dans l'action en question, et doit être propagé dans les fonctions d'affichage (formulaire de recherche et affichage de liste de résultats).
+
+\paragraph{Exemple} : le module contact offre des appels externes pour sélectionner un seul contact (sélection d'un contact pour un lead) ou plusieurs (cas de l'ajout de contacts à une liste).
+
+
 \subsubsection{Spécifications de l'action ext\_get\_ids}
 
 L'exemple donné est l'ajout d'utilisateurs à un groupe.
@@ -177,7 +186,8 @@ Exemple : Ajouter des groupes au rendez-vous courant.\\
 \hline
 \company & ext\_get\_id & 0.7 \\
 \hline
-\contact & ext\_get\_ids & 0.7 \\
+\multirow{2}{5cm}{\contact} & ext\_get\_ids & 0.7 \\
+ & ext\_get\_id & 2.1.0 \\
 \hline
 \deal & ext\_get\_id & 0.8.6 \\
 \hline

@@ -51,9 +51,10 @@ $fieldnames["company_name"] = $l_company;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_contact(&$OD, $fieldname, $link_ok) {
-  global $path, $cgp_show, $ico_mail;
+  global $path, $params, $cgp_show, $ico_mail;
 
   $show_date = (! $cgp_hide["contact"]["contact_date"]);
+  $ext_url = $params["ext_url"];
 
   // We set an indicator to tell if the contact has an address
   if ( ($OD->data_set->f("contact_address1") != "")
@@ -68,8 +69,16 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     $contact_has_address = false;
   }
 
-  if (($fieldname == "contact_lastname") && $link_ok) {
-    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f("contact_id");
+  //  if (($fieldname == "contact_lastname") && $link_ok) {
+  if ($fieldname == "contact_lastname") {
+    echo "AA".$OD->display_ext;
+    if ($OD->display_ext == "get_id") {
+      $res["url"] = "javascript:check_contact_get_id(".$OD->data_set->f("contact_id").",'".addslashes($OD->data_set->f("contact_lastname"))."');";
+    } else if ($OD->display_ext == "get_id_url") {
+      $res["url"] = "javascript:check_contact_get_id_url('$ext_url',".$OD->data_set->f("contact_id").");";
+    } else {
+      $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f("contact_id");
+    }
   }
 
   else if (($fieldname == "company_name") && $link_ok) {
@@ -439,14 +448,20 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
+    $ext_type = $contact["ext_type"];
     $ext_url = $contact["ext_url"];
     $ext_id = $contact["ext_id"];
     $ext_title = $contact["ext_title"];
     $ext_target = $contact["ext_target"];
+    $ext_widget = $contact["ext_widget"];
+    $ext_widget_text = $contact["ext_widget_text"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_type\" type=\"hidden\" value=\"$ext_type\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
+            <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
     $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
@@ -559,10 +574,13 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
+    $ext_type = $contact["ext_type"];
     $ext_url = $contact["ext_url"];
     $ext_id = $contact["ext_id"];
     $ext_target = $contact["ext_target"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
+    $ext_widget = $contact["ext_widget"];
+    $ext_widget_text = $contact["ext_widget_text"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_type=$ext_type&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
   }
 
   // we urlencode to avoid breakage for space char
@@ -593,12 +611,13 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
     $dis_contact->display_link = false;
-    $dis_contact->data_cb_text = "X";
-    $dis_contact->data_idfield = "contact_id";
-    $dis_contact->data_cb_name = "cb_con";
-    $dis_contact->data_form_head = "
+    if ($contact["ext_type"] == "multi") {
+      $dis_contact->data_cb_text = "X";
+      $dis_contact->data_idfield = "contact_id";
+      $dis_contact->data_cb_name = "cb_con";
+      $dis_contact->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
-    $dis_contact->data_form_end = "
+      $dis_contact->data_form_end = "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_add\" />
@@ -612,7 +631,16 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";
+    } else {
+      if ($ext_url != "") {
+	$dis_contact->display_ext = "get_id_url";
+      } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+	$dis_contact->display_ext = "get_id";
+      }
+      $display_popup_end = "<a href=\"\" onclick='window.close();'>$l_close</a>";
+    }
   }
+
   $dis_contact->data_set = $obm_q;
   $dis_contact->data_url = $url;
   $dis_contact->data_header = "both";

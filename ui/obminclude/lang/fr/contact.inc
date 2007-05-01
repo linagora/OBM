@@ -91,12 +91,12 @@ $l_fill_lastname = "Vous devez renseigner le Nom avant de valider.";
 $l_fill_company = "Vous devez sélectionner une société avant de valider.";
 $l_fill_phone = "Vous devez renseigner le telephone avant de valider.";
 $l_delete_confirm = "Confirmer la suppression du contact ?";
-$l_j_select_company = "Vous devez sélectionner une société !";
 $l_j_check_phone = "Le numéro de téléphone n'est pas correct.";
 $l_j_check_hphone = "Le numéro de téléphone personnel n'est pas correct.";
 $l_j_check_mphone = "Le numéro de téléphone mobile n'est pas correct.";
 $l_j_check_fax = "Le numéro de fax n'est pas correct.";
 $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
+$l_j_select_contact = "Vous devez sélectionner un contact !";
 // JavaScript Messages - Kind
 $l_j_kind_delete = "Sélectionnez un genre pour le vérifier ou supprimer !";
 $l_j_kind_update = "Vous devez sélectionner un genre et entrer une modification avant de valider !";

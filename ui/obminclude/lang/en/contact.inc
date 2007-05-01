@@ -87,12 +87,12 @@ $l_fill_lastname = "You have to fill the Lastname before submitting.";
 $l_fill_company = "You have to select a company before submitting.";
 $l_fill_phone = "You have to fill the Phone before submitting.";
 $l_delete_confirm = "Really delete the contact ?";
-$l_j_select_company =  "You must select a company !";
 $l_j_check_phone = "The phone number is not valid.";
 $l_j_check_hphone = "The personal phone number is not valid.";
 $l_j_check_mphone = "The mobile phone number is not valid.";
 $l_j_check_fax = "The fax number is not valid.";
 $l_j_check_email = "The email adress is not valid.";
+$l_j_select_contact = "You have to select a contact !";
 // JavaScript messages - Kind
 $l_j_kind_delete = "You have to select a kind to check or delete it !";
 $l_j_kind_update = "You have to select a kind and enter a new name to update it !";

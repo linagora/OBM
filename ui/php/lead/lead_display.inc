@@ -494,7 +494,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       </a><input type=\"hidden\" name=\"contact_id\" value=\"$contact_id\" />
       <input type=\"hidden\" name=\"contact_name\" value=\"$contact_name\" />
       <input type=\"hidden\" name=\"contact_new_id\" value=\"$contact_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=f_entity.contact_new_id&amp;ext_widget_text=f_entity.contact_new_name','Contact','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/contact/contact_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.contact_new_id&amp;ext_widget_text=f_entity.contact_new_name','Contact','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"$ico_contact\" alt=\"\" /></a>
       <input type=\"text\" size=\"30\" name=\"contact_new_name\" value=\"$contact_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 

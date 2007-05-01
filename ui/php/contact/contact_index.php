@@ -31,7 +31,8 @@
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
 // External API ---------------------------------------------------------------
-// - ext_get_ids     --                -- select multiple contacts (return id) 
+// - ext_get_ids        --                -- select multiple contacts (ret id) 
+// - ext_get_id         -- $title         -- select a contact (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
 // XXXXXXX dis_contact_form ? pourquoi param co_q et pas fait a l'interieur a la company ??
@@ -63,7 +64,12 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "ext_get_ids") {
+if (($action == "ext_get_ids") || ($action == "ext_get_id")) {
+  if ($action == "ext_get_ids") {
+    $params["ext_type"] = "multi";
+  } else {
+    $params["ext_type"] = "mono";
+  }
   $display["search"] = dis_contact_search_form($params);
   if ($set_display == "yes") {
     $display["result"] = dis_contact_search_list($params);
@@ -365,6 +371,12 @@ function get_contact_action() {
 
 // ext_get_ids
   $actions["contact"]["ext_get_ids"] = array (
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                        );
+
+// ext_get_id
+  $actions["contact"]["ext_get_id"] = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                         );

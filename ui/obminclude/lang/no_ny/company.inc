@@ -64,6 +64,7 @@ $l_fill_postcode = "\\n Du må fylle inn postnummer før du legg inn.";
 $l_fill_address = "\\n Du må fylle inn adressa før du legg inn.";
 $l_fill_phone = "\\n Du må fylle inn telefonnummer før du legg inn.";
 $l_delete_confirm = "Slett firmaet?"; 
+$l_j_select_company =  "Du må velge eit firma!";
 $lj_check_zip = "Postnummeret er ugyldig.";
 $lj_check_phone = "Telefonnummeret er ugyldig.";
 $lj_check_pphone = "Privatnummeret er ugyldig.";

@@ -93,12 +93,12 @@ $l_fill_lastname = "Debe ingresar el Apellido antes de enviar.";
 $l_fill_company = "Debe seleccionar una compañía antes de enviar.";
 $l_fill_phone = "Debe ingresar el teléfono antes de enviar.";
 $l_delete_confirm = "Realmente desea borrar el contacto ?";
-$l_j_select_company =  "Debe seleccionar una compañía !";
 $l_j_check_phone = "El número de teléfono no es válido.";
 $l_j_check_hphone = "El número de teléfono personal no es válido.";
 $l_j_check_mphone = "El número de teléfono celular no es válido.";
 $l_j_check_fax = "El número de fax no es válido.";
 $l_j_check_email = "El correo electrónico no es válido.";
+$l_j_select_contact = "Debe seleccionar un contacto !";
 // JavaScript Messages - Kind
 $l_j_kind_delete = "Debe seleccionar un tipo a seleccionar o borrar !";
 $l_j_kind_update = "Debe seleccionar un tipo e ingresar un nuevo nombre para actualizarlo !";

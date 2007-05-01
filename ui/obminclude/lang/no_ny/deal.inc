@@ -97,7 +97,6 @@ $l_fill_parentdeal = "\\n You have to select a parentdeal before submitting.";
 $l_fill_label = "\\n Du må fylle inn namn før du legg inn.";
 $l_fill_number = "\\n You have to fill the Number before submitting.";
 $l_fill_date = "\\n Du må fylle inn dato før du legg inn.";
-$l_j_select_company = "Du må velge eit firma.";
 $l_invalid_date = "Ugyldig datoformat (MM/DD/YYYY eller YYYY-MM-DD).";
 $l_delete_confirm = "Slette avtale?";
 

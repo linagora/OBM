@@ -43,5 +43,4 @@ $l_archive_error = "Err.3v6987g  nella query ";
 $l_archive_number = "affari registrati negli archivi";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_j_select_company = "Scegli una azienda";
 $l_delete_confirm = "Confermi l'eliminazione dell'affare?";

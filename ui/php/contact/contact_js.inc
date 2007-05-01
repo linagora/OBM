@@ -10,6 +10,23 @@
 
 require("$obminclude/javascript/check_js.inc");
 
+// to avoid a javascript error when ext_widget or ext_widget_label not defined
+if (($params["ext_widget"] != "") || ($params["ext_widget_text"] != "")) {
+  $extra_js .= "
+
+function check_contact_get_id(valeur,text) {
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_j_select_contact\");
+    return false;
+  } else {
+    window.opener.document.$params[ext_widget].value=valeur;
+    window.opener.document.$params[ext_widget_text].value=text;
+    window.close();
+    return true;
+  }
+}";
+}
+
 $extra_js .= "
 function confirm_contact_del() {
   if (confirm (\"$l_delete_confirm\"))

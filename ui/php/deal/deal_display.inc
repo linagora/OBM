@@ -1029,6 +1029,7 @@ function dis_deal_form($deal) {
   if (($action == "new") && ($deal["lead_id"] > 0)) {
     $lead = get_lead_info($deal["lead_id"]);
     $deal["company_id"] = $lead["company_id"];
+    $deal["contact1"] = $lead["contact_id"];
     $deal["market"] = $lead["manager"];
     $deal["source_id"] = $lead["source_id"];
     $deal["label"] = $lead["name"];
