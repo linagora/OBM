@@ -314,6 +314,8 @@ $l_header_add_deal = "Ajouter affaire";
 $l_header_list = "Liste";
 
 $l_header_tools_upd = "Mise à jour";
+$l_header_tools_upd_admin = "Mes modifications";
+$l_header_tools_upd_domain = "Modifications du domaine";
 $l_header_tools_halt = "Arrêt";
 $l_header_tools_remote = "Contrôle à distance";
 

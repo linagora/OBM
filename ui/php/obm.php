@@ -57,7 +57,7 @@ if ($c_home_redirect != "" && !$params["error"]) {
   exit();
 }
 
-$display["head"] = display_head("OBM Version $obm_version");
+$display["head"] = display_head("$l_obm_title Version $obm_version");
 $display["header"] = display_menu("");
 switch($params["error"]) {
   case "perms" :
@@ -72,7 +72,7 @@ if($error_msg) {
 
 $display["title"] = "
 <h1 class=\"title\">
-OBM version $obm_version - " . date("Y-m-d H:i:s") . "
+$l_obm_title version $obm_version - " . date("Y-m-d H:i:s") . "
 </h1>";
 
 if ($cgp_show["module"]["calendar"] && $perm->check_right("calendar", $cright_read)) { 
@@ -137,7 +137,7 @@ function get_obm_params() {
 // Display detail of logout page
 ///////////////////////////////////////////////////////////////////////////////
 function dis_logout_detail() {
-  global $l_connection_end, $l_reconnect,$obm_version,$path;
+  global $l_connection_end, $l_reconnect, $l_obm_title, $obm_version,$path;
   header("location: $_SERVER[PHP_SELF]");
   $block = "
 <table width=\"100%\">
@@ -146,7 +146,7 @@ function dis_logout_detail() {
     <a href=\"http://www.aliacom.fr/\">$obm_version</a></td>
   <td width=\"5%\">&nbsp;</td>
   <td width=\"50%\" align=\"center\">
-    <h1>OBM : $l_connection_end</h1></td>
+    <h1>$l_obm_title : $l_connection_end</h1></td>
   <td width=\"25%\" align=\"center\">&nbsp;</td>
 </tr>
 <tr>
@@ -159,7 +159,7 @@ function dis_logout_detail() {
 
 <P>
 <center>
-<a href=\"obm.php\">OBM : $l_reconnect</a>
+<a href=\"obm.php\">$l_obm_title : $l_reconnect</a>
 </center>";
 
   return $block;

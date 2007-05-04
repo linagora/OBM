@@ -51,12 +51,102 @@ function html_tools_update_index() {
 
   $block = "
     <div class=\"detail extra\">
-    <h1>$l_upd</h1>>
+    <h1>$l_upd</h1>
     <table class=\"detail\">
     <tr>
       $dis_update
     </tr>
     </table>
+    <p>
+    </div>
+    $dis_form
+";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Update detail for an admin
+///////////////////////////////////////////////////////////////////////////////
+function dis_tools_update_admin() {
+  global $l_upd, $l_upd_needed, $l_upd_not_needed, $l_upd_not_allowed;
+  global $l_created, $l_updated, $l_deleted;
+  global $l_user, $l_group;
+  global $l_upd_run, $l_upd_cancel;
+  global $l_validate, $l_cancel;
+
+  $update_state = get_update_state();
+
+  // No update, display this and return
+  if (! $update_state) {
+    $block = "
+    <div class=\"detail extra\">
+    <h1>$l_upd</h1>
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_upd_not_needed</td>
+    </tr>
+    </table>
+    <p>
+    </div>
+";
+    return $block;
+  }
+
+  $has_update = false;
+
+  //  $nb = get_update_numbers("UserObm", "admin");
+  if ($nb['move'] > 0) {
+    $has_update = true;
+  }
+  $dis_row_update .= "
+    <tr>
+      <tD>$l_user</td>
+      <td>$nb[created]</td>
+      <td>$nb[updated]</td>
+      <td>$nb[deleted]</td>
+    </tr>";
+
+  $nb = get_update_numbers("UGroup", "admin");
+  if ($nb['move'] > 0) {
+    $has_update = true;
+  }
+  $dis_row_update .= "
+    <tr>
+      <tD>$l_group</td>
+      <td>$nb[created]</td>
+      <td>$nb[updated]</td>
+      <td>$nb[deleted]</td>
+    </tr>";
+
+  // Si une mise a jour est autorisee (non deja en cours)
+  if (check_tools_update_context()) {
+
+    if ($has_update) {
+
+    }
+    //button
+  } else {
+    $dis_update = "<td class=\"detailText\">$l_upd_not_allowed</td>";
+  }
+
+
+  $block = "
+    <div class=\"detail extra\">
+    <h1>$l_upd</h1>
+
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr>
+      <th>&nbsp;</th>
+      <th>$l_created</th>
+      <th>$l_updated</th>
+      <th>$l_deleted</th>
+    </tr>
+    $dis_row_update
+    </table>
+
     <p>
     </div>
     $dis_form

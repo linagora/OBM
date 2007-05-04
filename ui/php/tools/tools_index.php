@@ -10,6 +10,7 @@
 // - update_index  --         -- show the Update screen
 // - update_update --         -- run the config update
 // - update_cancel --         -- cancel the config update
+// - update_detail --         -- display the updates
 // - halt_index    --         -- show the shutdown tool
 // - halt_halt     --         -- Halt the system
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,6 +34,10 @@ $perm->check_permissions($module, $action);
 if (($action == "update_index") || ($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_tools_update_index();
+
+} elseif ($action == "update_detail_admin") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_tools_update_admin();
 
 } elseif ($action == "update_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,6 +76,7 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["msg"] .= display_debug_msg($cmd_halt, $cdg_exe);
   $ret = exec($cmd_halt);
+
 } elseif ($action == "remote_index") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_tools_remote_index();
@@ -125,6 +131,7 @@ function get_tools_params() {
 function get_tools_action() {
   global $params, $actions, $path;
   global $l_header_tools_upd, $l_header_tools_halt,$l_header_tools_remote;
+  global $l_header_tools_upd_admin, $l_header_tools_upd_domain;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $cgp_securinet;
 
@@ -133,6 +140,22 @@ function get_tools_action() {
     'Name'     => $l_header_tools_upd,
     'Url'      => "$path/tools/tools_index.php?action=update_index",
     'Right'    => $cright_write_admin,
+    'Condition'=> array ('all') 
+                                    );
+
+// Display Admin Update
+  $actions["tools"]["update_detail_admin"] = array (
+    'Name'     => $l_header_tools_upd_admin,
+    'Right'    => $cright_read_admin,
+    'Url'      => "$path/tools/tools_index.php?action=update_detail_admin",
+    'Condition'=> array ('all') 
+                                    );
+
+// Display Domain Update
+  $actions["tools"]["update_detail_domain"] = array (
+    'Name'     => $l_header_tools_upd_domain,
+    'Right'    => $cright_read_admin,
+    'Url'      => "$path/tools/tools_index.php?action=update_detail_domain",
     'Condition'=> array ('all') 
                                     );
 
@@ -147,6 +170,7 @@ function get_tools_action() {
     'Right'    => $cright_write_admin,
     'Condition'=> array ('none') 
                                     );
+
 // Tool Remote
   if( $cgp_securinet ) {
     $actions["tools"]["remote_index"] = array (

@@ -126,8 +126,77 @@ function check_tools_update_context() {
 
   if ($ps)
     $update_ok = false;
-
+  
   return $update_ok;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get update types number for an entity
+// Parameters:
+//   - $table  : table to check
+//   - $target : target to check ("admin" | "domain")
+///////////////////////////////////////////////////////////////////////////////
+function get_update_numbers($table, $target="admin") {
+  global $cdg_sql;
+
+  $nb_add = 0;
+  $nb_upd = 0;
+  $nb_del = 0;
+  $e1 = array();
+  $e2 = array();
+  $obm_q = new DB_OBM;
+
+  // Update infos
+  $query = "SELECT * FROM $table";
+  display_debug_msg($query, $cdg_sql, "get_update_numbers()");
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $id = $obm_q->f("0");  // Id
+    $e = $obm_q->Record;
+    foreach ($e as $fname => $fvalue) {
+      // optimiser : verifier que fname pas un chiffre ?
+      $e1[$id]["$fname"] = $fvalue;
+    }
+  }
+
+  // Prod infos
+  $table_prod = "P_$table";
+  $query = "SELECT * FROM $table_prod";
+  display_debug_msg($query, $cdg_sql, "get_update_numbers()");
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $id = $obm_q->f("0");  // Id
+    $e = $obm_q->Record;
+    foreach ($e as $fname => $fvalue) {
+      // optimiser : verifier que fname pas un chiffre ?
+      $e2[$id]["$fname"] = $fvalue;
+    }
+  }
+
+  foreach ($e1 as $id => $row) {
+    if (! array_key_exists($id, $e2)) {
+      $nb_add++;
+    } else {
+      foreach($row as $fname => $fvalue) {
+	if ($e2[$id][$fname] != $fvalue) {
+	  $nb_upd++;
+	  break;
+	}
+      }
+    }
+  }
+
+  
+  $nb["created"] = $nb_add;
+  $nb["updated"] = $nb_upd;
+  $nb["deleted"] = $nb_del;
+  $nb["move"] = $nb_add + $nb_upd + $nb_del;
+
+  return $nb;
+}
+
 
 </script>

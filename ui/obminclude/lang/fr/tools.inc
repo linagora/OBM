@@ -20,6 +20,10 @@ $l_upd_error = "La configuration du système a échoué !";
 $l_upd_cancel_ok = "L'annulation des modifications du système a bien été prise en compte";
 $l_upd_cancel_error = "L'annulation des modifications du système a échoué !";
 
+$l_created = "Créés";
+$l_updated = "Modifiés";
+$l_deleted = "Supprimés";
+
 $l_halt = "Arrêt du système";
 $l_halt_aliamin = "Arréter le système";
 
