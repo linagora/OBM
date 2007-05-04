@@ -1069,6 +1069,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "location:'$location'";
   $ed[] = "category:'$category'";
   
+  $attendees = array();
   foreach ($attendee as $entity => $entities) {
     $label_entity = phpStringToJsString(${"l_$entity"});
     $ent = array();
