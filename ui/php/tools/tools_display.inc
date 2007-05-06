@@ -69,11 +69,13 @@ function html_tools_update_index() {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Update detail for an admin
 ///////////////////////////////////////////////////////////////////////////////
-function dis_tools_update_admin() {
+function dis_tools_update_detail() {
+  global $display, $cgp_show, $profiles, $obm;
   global $l_upd, $l_upd_needed, $l_upd_not_needed, $l_upd_not_allowed;
-  global $l_created, $l_updated, $l_deleted;
-  global $l_user, $l_group;
-  global $l_upd_run, $l_upd_cancel;
+  global $l_upd_run, $l_upd_cancel, $l_created, $l_updated, $l_deleted;
+  global $l_user, $l_group, $l_host, $l_mailshare;
+  global $l_header_tools_upd;
+  global $l_header_tools_upd_admin, $l_header_tools_upd_domain;
   global $l_validate, $l_cancel;
 
   $update_state = get_update_state();
@@ -94,47 +96,72 @@ function dis_tools_update_admin() {
     return $block;
   }
 
-  $has_update = false;
-
-  //  $nb = get_update_numbers("UserObm", "admin");
-  if ($nb['move'] > 0) {
-    $has_update = true;
+  if (! isset($profiles[$obm['profile']]['conf']['admin_realm'])) {
+    $block = "No admin rights... !!";
+    return $block;
   }
-  $dis_row_update .= "
-    <tr>
-      <tD>$l_user</td>
-      <td>$nb[created]</td>
-      <td>$nb[updated]</td>
-      <td>$nb[deleted]</td>
-    </tr>";
 
-  $nb = get_update_numbers("UGroup", "admin");
-  if ($nb['move'] > 0) {
-    $has_update = true;
-  }
-  $dis_row_update .= "
-    <tr>
-      <tD>$l_group</td>
-      <td>$nb[created]</td>
-      <td>$nb[updated]</td>
-      <td>$nb[deleted]</td>
-    </tr>";
+  $entities = array("user" => "UserObm",
+		    "group" => "UGroup",
+		    "host" => "Host",
+		    "mailshare" => "MailShare");
 
-  // Si une mise a jour est autorisee (non deja en cours)
-  if (check_tools_update_context()) {
+  // Loop through all udpates "realms" (own updates, target updates, domain)
+  foreach ($profiles[$obm['profile']]['conf']['admin_realm'] as $realm) {
+    if ($realm == 'target') {
+      $target = $profiles[$obm['profile']]['conf']['admin_target'];
+    }
 
-    if ($has_update) {
+    $has_update = false;
+    $dis_row_update = "";
+    $detail_title = "l_upd_$realm";
+    global $$detail_title;
+    $dis_detail_title = $$detail_title;
+
+    foreach ($entities as $entity=>$table) { 
+      $dis_entity = ${"l_$entity"};
+      if ($cgp_show["module"]["$entity"]) {
+	$nb = get_update_numbers($table, $entity, $realm, $target);
+	if ($nb['move'] > 0) {
+	  $has_update = true;
+	}
+	$class_cre = ($nb['created'] > 0 ? " class=\"highlight\"" : "");
+	$class_upd = ($nb['updated'] > 0 ? " class=\"highlight\"" : "");
+	$class_del = ($nb['deleted'] > 0 ? " class=\"highlight\"" : "");
+	$dis_row_update .= "
+      <tr>
+        <td>$dis_entity</td>
+        <td$class_cre>$nb[created]</td>
+        <td$class_upd>$nb[updated]</td>
+        <td$class_del>$nb[deleted]</td>
+      </tr>";
+      }
 
     }
-    //button
-  } else {
-    $dis_update = "<td class=\"detailText\">$l_upd_not_allowed</td>";
-  }
 
+    if ($has_update) {
+  
+      // Si une mise a jour est autorisee (non deja en cours)
+      if (check_tools_update_context()) {
+	$dis_button = "
+      <form method=\"post\" action=\"tools/tools_index.php\">
+      <fieldset class=\"buttons\">
+      <input type=\"hidden\" name=\"action\" value=\"update_update\" />
+      <input type=\"submit\" value=\"$l_validate\" />
+      </fieldset>
+      </form>";
+	
+	//button
+      } else {
+	$dis_button = "<td class=\"detailText\">$l_upd_not_allowed</td>";
+      }
+    } else {
+      $dis_button = "<td class=\"detailText\">$l_upd_not_needed</td>";
+    }
 
-  $block = "
+    $dis_realm .= "
     <div class=\"detail extra\">
-    <h1>$l_upd</h1>
+    <h1>$dis_detail_title</h1>
 
     <table class=\"spreadSheet\">
     <thead>
@@ -149,7 +176,14 @@ function dis_tools_update_admin() {
 
     <p>
     </div>
-    $dis_form
+    $dis_button
+";
+  }
+
+  $display["title"] = "<h1 class=\"title\">$l_header_tools_upd</h1>";
+
+  $block = "
+    $dis_realm
 ";
 
   return $block;

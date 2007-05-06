@@ -37,7 +37,7 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
 
 } elseif ($action == "update_detail_admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_tools_update_admin();
+  $display["detail"] = dis_tools_update_detail();
 
 } elseif ($action == "update_update")  {
 ///////////////////////////////////////////////////////////////////////////////

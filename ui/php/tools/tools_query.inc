@@ -134,11 +134,13 @@ function check_tools_update_context() {
 ///////////////////////////////////////////////////////////////////////////////
 // Get update types number for an entity
 // Parameters:
-//   - $table  : table to check
-//   - $target : target to check ("admin" | "domain")
+//   - $table  : table where to check
+//   - $entity : entity to check
+//   - $realm  : realm space to check updates (my | domain | target)
+//   - $target : target to check for realm target
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_numbers($table, $target="admin") {
-  global $cdg_sql;
+function get_update_numbers($table, $entity, $realm, $target="") {
+  global $cdg_sql, $obm;
 
   $nb_add = 0;
   $nb_upd = 0;
@@ -147,7 +149,18 @@ function get_update_numbers($table, $target="admin") {
   $e2 = array();
   $obm_q = new DB_OBM;
 
-  // Update infos
+  // Restrict updates to the realm selected (my, domain, target)
+  if ($realm == "my") {
+    $uid = $obm["uid"];
+    $where_upd = "WHERE $entity_userupdate=$uid OR ($entity_usercreate=$uid AND $entity_usercreate is NULL)";
+    $where_prod = "WHERE $entity_userupdate=$uid OR ($entity_usercreate=$uid AND $entity_userupdate is NULL)";
+  } else if ($realm == "target") {
+
+  } else {
+
+  }
+
+  // Get infos from Update table
   $query = "SELECT * FROM $table";
   display_debug_msg($query, $cdg_sql, "get_update_numbers()");
   $retour = $obm_q->query($query);
@@ -161,7 +174,7 @@ function get_update_numbers($table, $target="admin") {
     }
   }
 
-  // Prod infos
+  // Get infos from Production table
   $table_prod = "P_$table";
   $query = "SELECT * FROM $table_prod";
   display_debug_msg($query, $cdg_sql, "get_update_numbers()");
@@ -176,6 +189,7 @@ function get_update_numbers($table, $target="admin") {
     }
   }
 
+  // Get infos for created and updated entities
   foreach ($e1 as $id => $row) {
     if (! array_key_exists($id, $e2)) {
       $nb_add++;
@@ -189,6 +203,12 @@ function get_update_numbers($table, $target="admin") {
     }
   }
 
+  // Get infos for deleted entities
+  foreach ($e2 as $id => $row) {
+    if (! array_key_exists($id, $e1)) {
+      $nb_del++;
+    }
+  }
   
   $nb["created"] = $nb_add;
   $nb["updated"] = $nb_upd;
