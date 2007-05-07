@@ -1700,3 +1700,34 @@ CREATE TABLE P_MailServerNetwork like MailServerNetwork;
 CREATE TABLE P_MailShare like MailShare;
 CREATE TABLE P_EntityRight like EntityRight;
 -- CREATE TABLE P_Network like Network;
+
+
+-------------------------------------------------------------------------------
+-- Tables needed for Automate work
+-------------------------------------------------------------------------------
+--
+-- Table structure for the table 'Deleted'
+--
+CREATE TABLE Deleted (
+  deleted_id         int(8) auto_increment,
+  deleted_domain_id  int(8),
+  deleted_entity     varchar(32),
+  deleted_entity_id  int(8),
+  deleted_user_id    int(8),
+  deleted_timestamp  timestamp(14),
+  PRIMARY KEY (deleted_id)
+);
+
+
+--
+-- Table structure for the table 'Updated'
+--
+CREATE TABLE Updated (
+  updated_id         int(8) auto_increment,
+  updated_domain_id  int(8),
+  updated_entity     varchar(32),
+  updated_entity_id  int(8),
+  updated_user_id    int(8),
+  updated_type       char(1),
+  PRIMARY KEY (updated_id)
+);

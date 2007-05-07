@@ -718,7 +718,7 @@ function run_query_user_update($p_id, $user) {
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_delete($p_id) {
-  global $cdg_sql, $c_use_connectors;
+  global $cdg_sql, $obm, $c_use_connectors;
 
   $multidomain = sql_multidomain("userobm");
   $ret = of_userdata_query_delete("user", $p_id);
@@ -729,6 +729,32 @@ function run_query_user_delete($p_id) {
   display_debug_msg($query, $cdg_sql, "run_query_user_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+
+  // If this mailshare exists in Prod table, Insert it in Deleted table
+  $query = "SELECT userobm_id FROM P_UserObm WHERE userobm_id='$p_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+    $uid = $obm["uid"];
+    $domain_id = $obm["domain_id"];
+    $now = date("Y-m-d H:i:s");
+
+    $query = "INSERT INTO Deleted (
+      deleted_domain_id,
+      deleted_entity,
+      deleted_entity_id,
+      deleted_user_id,
+      deleted_timestamp)
+    VALUES (
+      '$domain_id',
+      'user',
+      '$p_id',
+      '$uid',
+      '$now')";
+    display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
+    $retour = $obm_q->query($query);
+  }
 
   // If connectors in use
   if ($c_use_connectors) {

@@ -339,7 +339,7 @@ function run_query_group_update($group) {
 //   - $p_id : group id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_delete($p_id) {
-  global $cdg_sql;
+  global $cdg_sql, $obm;
 
   $ret = of_userdata_query_delete("group", $p_id);
 
@@ -361,6 +361,32 @@ function run_query_group_delete($p_id) {
   $query = "DELETE FROM UGroup WHERE group_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_group_delete(3)");
   $retour = $obm_q->query($query);
+
+  // If this Group exists in Prod table, Insert it in Deleted table
+  $query = "SELECT group_id FROM P_UGroup WHERE group_id='$p_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_group_delete(auto)");
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+    $uid = $obm["uid"];
+    $domain_id = $obm["domain_id"];
+    $now = date("Y-m-d H:i:s");
+
+    $query = "INSERT INTO Deleted (
+      deleted_domain_id,
+      deleted_entity,
+      deleted_entity_id,
+      deleted_user_id,
+      deleted_timestamp)
+    VALUES (
+      '$domain_id',
+      'group',
+      '$p_id',
+      '$uid',
+      '$now')";
+    display_debug_msg($query, $cdg_sql, "run_query_group_delete(auto)");
+    $retour = $obm_q->query($query);
+  }
 
   return $retour;
 }

@@ -227,7 +227,7 @@ function run_query_mailshare_update($mailshare) {
 //   - $p_id : mailshare id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_mailshare_delete($p_id) {
-  global $cdg_sql;
+  global $cdg_sql, $obm;
 
   $multidomain = sql_multidomain("mailshare");
 
@@ -245,6 +245,32 @@ function run_query_mailshare_delete($p_id) {
       $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_mailshare_delete(2)");
   $retour = $obm_q->query($query);
+
+  // If this mailshare exists in Prod table, Insert it in Deleted table
+  $query = "SELECT mailshare_id FROM P_MailShare WHERE mailshare_id='$p_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_mailshare_delete(auto)");
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+    $uid = $obm["uid"];
+    $domain_id = $obm["domain_id"];
+    $now = date("Y-m-d H:i:s");
+    
+    $query = "INSERT INTO Deleted (
+      deleted_domain_id,
+      deleted_entity,
+      deleted_entity_id,
+      deleted_user_id,
+      deleted_timestamp)
+    VALUES (
+      '$domain_id',
+      'mailshare',
+      '$p_id',
+      '$uid',
+      '$now')";
+    display_debug_msg($query, $cdg_sql, "run_query_mailshare_delete(auto)");
+    $retour = $obm_q->query($query);
+  }
 
   return $retour;
 }

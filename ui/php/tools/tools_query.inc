@@ -61,6 +61,7 @@ function run_query_tools_remote_update($tools) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_tools_update_update($tools) {
   global $cdg_sql, $cdg_exe, $cmd_update, $cmd_db_update;
+
   $state = get_update_state();
   if ($state != 1) {
     return false;
@@ -135,11 +136,11 @@ function check_tools_update_context() {
 // Get update types number for an entity
 // Parameters:
 //   - $table  : table where to check
-//   - $entity : entity to check
+//   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (my | domain | target)
 //   - $target : target to check for realm target
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_numbers($table, $entity, $realm, $target="") {
+function get_update_numbers($table, $field="", $realm, $target="") {
   global $cdg_sql, $obm;
 
   $nb_add = 0;
@@ -149,19 +150,32 @@ function get_update_numbers($table, $entity, $realm, $target="") {
   $e2 = array();
   $obm_q = new DB_OBM;
 
+  if ($field != "") {
+    $f = $field;
+    $uc = "${field}_usercreate";
+    $uu = "${field}_userupdate";
+  } else {
+    $f = strtolower($table);
+    $uc = "${f}_usercreate";
+    $uu = "${f}_userupdate";
+  }
+
+  $multidomain = sql_multidomain("$f");
+
   // Restrict updates to the realm selected (my, domain, target)
   if ($realm == "my") {
     $uid = $obm["uid"];
-    $where_upd = "WHERE $entity_userupdate=$uid OR ($entity_usercreate=$uid AND $entity_usercreate is NULL)";
-    $where_prod = "WHERE $entity_userupdate=$uid OR ($entity_usercreate=$uid AND $entity_userupdate is NULL)";
+    $where_upd = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
+    $where_prod = "WHERE 1=1 $multidomain";
   } else if ($realm == "target") {
 
   } else {
-
+    $where_upd = "WHERE 1=1 $multidomain";
+    $where_prod = "WHERE 1=1 $multidomain";
   }
 
   // Get infos from Update table
-  $query = "SELECT * FROM $table";
+  $query = "SELECT * FROM $table $where_upd";
   display_debug_msg($query, $cdg_sql, "get_update_numbers()");
   $retour = $obm_q->query($query);
 
@@ -176,7 +190,7 @@ function get_update_numbers($table, $entity, $realm, $target="") {
 
   // Get infos from Production table
   $table_prod = "P_$table";
-  $query = "SELECT * FROM $table_prod";
+  $query = "SELECT * FROM $table_prod $where_prod";
   display_debug_msg($query, $cdg_sql, "get_update_numbers()");
   $retour = $obm_q->query($query);
 
@@ -189,7 +203,7 @@ function get_update_numbers($table, $entity, $realm, $target="") {
     }
   }
 
-  // Get infos for created and updated entities
+  // Process infos for created and updated entities
   foreach ($e1 as $id => $row) {
     if (! array_key_exists($id, $e2)) {
       $nb_add++;
@@ -204,9 +218,25 @@ function get_update_numbers($table, $entity, $realm, $target="") {
   }
 
   // Get infos for deleted entities
-  foreach ($e2 as $id => $row) {
-    if (! array_key_exists($id, $e1)) {
-      $nb_del++;
+  if ($realm == "my") {
+
+    // Get the delete from the Deleted table
+    $query = "SELECT count(*) as nb FROM Deleted
+     WHERE deleted_user_id=$uid
+       AND deleted_entity='user'";
+    display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
+    $retour = $obm_q->query($query);
+    $obm_q->next_record();
+    $nb_del = $obm_q->f("nb");
+
+  } else if ($realm == "target") {
+
+  } else {
+    // Case domain, just count lines present in prod, but not present in upd
+    foreach ($e2 as $id => $row) {
+      if (! array_key_exists($id, $e1)) {
+	$nb_del++;
+      }
     }
   }
   

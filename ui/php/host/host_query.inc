@@ -323,7 +323,6 @@ function run_query_host_delete($p_id) {
   if ($retour) {
     $obm_q->next_record();
     $host_id = $obm_q->f("host_id");
-    $user_id = $host["user_id"];
 
     $query = "UPDATE UserObm
     SET userobm_timeupdate='$now',
@@ -333,6 +332,32 @@ function run_query_host_delete($p_id) {
         userobm_host_id='$p_id' $multidomain";
 
     display_debug_msg($query, $cdg_sql, "run_query_host_delete()");
+    $retour = $obm_q->query($query);
+  }
+
+  // If this host exists in Prod table, Insert it in Deleted table
+  $query = "SELECT host_id FROM P_Host WHERE host_id='$p_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_host_delete(auto)");
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+    $uid = $obm["uid"];
+    $domain_id = $obm["domain_id"];
+    $now = date("Y-m-d H:i:s");
+
+    $query = "INSERT INTO Deleted (
+      deleted_domain_id,
+      deleted_entity,
+      deleted_entity_id,
+      deleted_user_id,
+      deleted_timestamp)
+    VALUES (
+      '$domain_id',
+      'host',
+      '$p_id',
+      '$uid',
+      '$now')";
+    display_debug_msg($query, $cdg_sql, "run_query_host_delete(auto)");
     $retour = $obm_q->query($query);
   }
 

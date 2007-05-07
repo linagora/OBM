@@ -1,0 +1,87 @@
+% Documentation technique d'OBM : gestion des mises a jour
+% AliaSource Pierre Baudracco
+% $Id$
+
+\section{Gestion des mises à jour - automate}
+\label{update}
+
+\obm permet d'alimenter (créer, modifier, supprimer) les données qui sont utilisées par les services (LDAP, messagerie,...).
+Ces données sont :\\
+\begin{itemize}
+\item Les utilisateurs
+\item Les groupes
+\item Les machines
+\item Les boîtes aux lettres partagées
+\item Les tables de liaisons entre ces entités
+\end{itemize}
+\vspace{0.3cm}
+
+\obm stocke ces données en base, et la modification des services afférents n'est pas immédiate.
+Pour appliquer les modifications il faut explicitement appliquer les mises à jour.
+
+
+\subsection{Principe des modifications, tables de production : P\_*}
+
+
+\subsection{Les portées ou domaines de mise à jour}
+
+Les cibles de mises à jour indiquent la portée des mises à jour qui vont être prises en compte.
+Les droits sur ces portées sont définis dans les profils.
+3 portées sont définies :\\
+\begin{itemize}
+\item ``my'' : les modifications de l'utilisateur connecté
+\item ``domain'' : les modifications du domaine \obm
+\item ``target'' : les modifications selon un critère donné (ex: région toulouse)
+\end{itemize}
+
+
+\subsubsection{La portée ``my''}
+
+Portée des modifications de l'utilisateur connecté.\\
+
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Considéré comme} & \textbf{Description}\\
+\hline
+Créé &
+Tout enregistrement nouveau (non présent dans Prod) dont :
+\begin{itemize}
+\item le créateur est l'utilisateur et pas de modifications
+\item l'auteur de modification est l'utilisateur
+\end{itemize}
+Comparaison : les enregistrements avec ces critères dans la table de mise à jour avec tous les enregistrements (du domaine) de la table de Production.
+\\
+\hline
+Modifié &
+Tout enregistrement présent dans les 2 tables avec une différence, dont la modification a pour auteur l'utilisateur
+\\
+\hline
+Supprimé &
+Tout enregistrement de la table \textbf{Deleted} référençant l'utilisateur
+\\
+\hline
+\end{tabular}
+
+
+\subsubsection{La portée ``domain''}
+
+Portée des modifications du domaine (de l'utilisateur connecté).\\
+
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Considéré comme} & \textbf{Description}\\
+\hline
+Créé &
+Tout enregistrement nouveau (non présent dans Prod) dans le domaine
+Comparaison : les enregistrements du domaine des tables de mise à jour et de production
+\\
+\hline
+Modifié &
+Tout enregistrement du domaine présent dans les 2 tables avec une différence
+\\
+\hline
+Supprimé &
+Tout enregistrement de la table \textbf{Deleted} référençant le domaine
+\\
+\hline
+\end{tabular}

@@ -91,8 +91,8 @@ function dis_tools_update_detail() {
     </tr>
     </table>
     <p>
-    </div>
-";
+    </div>";
+
     return $block;
   }
 
@@ -101,10 +101,10 @@ function dis_tools_update_detail() {
     return $block;
   }
 
-  $entities = array("user" => "UserObm",
-		    "group" => "UGroup",
-		    "host" => "Host",
-		    "mailshare" => "MailShare");
+  $entities = array("user" => array("UserObm", "userobm"),
+		    "group" => array("UGroup", "group"),
+		    "host" => array("Host", "host"),
+		    "mailshare" => array("MailShare", "mailshare"));
 
   // Loop through all udpates "realms" (own updates, target updates, domain)
   foreach ($profiles[$obm['profile']]['conf']['admin_realm'] as $realm) {
@@ -118,10 +118,12 @@ function dis_tools_update_detail() {
     global $$detail_title;
     $dis_detail_title = $$detail_title;
 
-    foreach ($entities as $entity=>$table) { 
+    foreach ($entities as $entity=>$db_info) {
+      $table = $db_info[0];
+      $field = $db_info[1];
       $dis_entity = ${"l_$entity"};
       if ($cgp_show["module"]["$entity"]) {
-	$nb = get_update_numbers($table, $entity, $realm, $target);
+	$nb = get_update_numbers($table, $field, $realm, $target);
 	if ($nb['move'] > 0) {
 	  $has_update = true;
 	}
