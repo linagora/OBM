@@ -1,56 +1,3 @@
-var Hash = new Class({
-    length: 0,
-    initialize: function(obj) {
-        this.obj = {};
-        for (var property in obj) {
-            this.obj[property] = obj[property];
-            this.length++;
-        }
-    },
-    get: function(key) {
-        return this.obj[key];
-    },
-    put: function(key, value) {
-        if (value == null) throw 'Cannot put null values in the map';
-        if (this.obj[key] == undefined) this.length++;
-        this.obj[key] = value;
-        return this;
-    },
-    remove: function(key) {
-        if (this.obj[key] == undefined) return;
-        var obj = {};
-        this.length--;
-        for (var property in this.obj)
-            if (property != key) obj[property] = this.obj[property];
-        this.obj = obj;
-        return this;
-    },
-    each: function(fn, bind) {
-        for (var property in this.obj)
-            fn.call(bind, property, this.obj[property]);
-    },
-    empty: function() {
-        return (this.length == 0);
-    },
-    keys: function() {
-        var keys = [];
-        for (var property in this.obj)
-            keys.push(property);
-        return keys;
-    },
-    values: function() {
-        var values = [];
-        for (var property in this.obj)
-            values.push(this.obj[property]);
-        return values;
-    }
-});
-
-function $H(obj) {
-    return new Hash(obj);
-}
-    
-
 Element.extend({
   observe: function(options) {
     return new Observer(this, options); 
@@ -109,7 +56,7 @@ HideTimer = new Class({
   setOptions: function(options) {
     this.options = Object.extend({
       duration: 1000,
-      fn: this.hideElement,
+      fn: this.hideElement.bind(this),
       elems: new Array()
     }, options || {});
 

@@ -141,7 +141,7 @@ function drawDatePicker(targetDateField, x, y)
     // that are currently pointing to objects on the page to have bad references
     //document.body.innerHTML += "<div id='" + datePickerDivID + "' class='dpDiv'></div>";
     var newNode = document.createElement("div");
-    newNode.setAttribute("id", "datepicker");
+    newNode.setAttribute("id", datePickerDivID);
     newNode.setAttribute("style", "visibility: hidden;");
     document.body.appendChild(newNode);
     datePickerTimer = new HideTimer(newNode);
@@ -206,7 +206,7 @@ function refreshDatePicker(dateFieldName, year, month, day)
   var line = new Element('tr').injectInside(content);
 
   for (i = 0; i < thisDay.getDay(); i++) {
-    new Element('td').addClassName('downlight').injectInside(line);
+    new Element('td').addClass('downlight').injectInside(line);
   }
   
   do {
@@ -215,7 +215,7 @@ function refreshDatePicker(dateFieldName, year, month, day)
     td.addEvent('click',updateDateField.pass([dateFieldName,getDateString(thisDay)]));
     if (dayNum == day) {
       td.addEvent("mouseout",function () {this.className='highlight';});
-      td.addClassName('highlight');
+      td.addClass('highlight');
     } else {
       td.addEvent("mouseout",function () {this.className='';});
     }
@@ -229,7 +229,7 @@ function refreshDatePicker(dateFieldName, year, month, day)
 
   if (thisDay.getDay() > 0) {
     for (i = 7; i > thisDay.getDay(); i--) {
-      new Element('td').addClassName('downlight')
+      new Element('td').addClass('downlight')
                        .injectInside(line);
     }
   }

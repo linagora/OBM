@@ -667,7 +667,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity,$writable_entit
     <tr><td></td>$dis_day_head</tr>
     </tr>    
     </thead>
-    <tbody id=\"calendarBody\"  onclick=\"obm.calendarQuickForm.compute(event, 'month');\">
+    <tbody id=\"calendarBody\"  onmouseup=\"obm.calendarQuickForm.compute(event, 'month');\">
     $dis_month_cal
     </tbody>
   </table>
@@ -773,7 +773,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
   <table class=\"calendar week\">
     <colgroup />
     <colgroup span=\"7\" id=\"calendarEventContext\" />
-    <thead onclick=\"obm.calendarQuickForm.compute(event, 'week');\">
+    <thead onmouseup=\"obm.calendarQuickForm.compute(event, 'week');\">
     <tr>
     <td>$week_num</td>
     $week_day_list
@@ -783,7 +783,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
     $week_day_event_list
     </tr>    
     </thead>
-    <tbody id=\"calendarBody\" onclick=\"obm.calendarQuickForm.compute(event, 'week');\">
+    <tbody id=\"calendarBody\" onmouseup=\"obm.calendarQuickForm.compute(event, 'week');\">
     $week_cal
     </tbody>
   </table>
@@ -870,12 +870,12 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
   <table class=\"calendar day\">
     <colgroup span=\"1\" />
     <colgroup span=\"1\" id=\"calendarEventContext\" />
-    <thead onclick=\"obm.calendarQuickForm.compute(event, 'day');\">
+    <thead onmouseup=\"obm.calendarQuickForm.compute(event, 'day');\">
     <tr id=\"calendarHead\">
     <td>$week_num</td><th id=\"day-0\"></th>
     </tr>    
     </thead>
-    <tbody id=\"calendarBody\" onclick=\"obm.calendarQuickForm.compute(event, 'day');\">
+    <tbody id=\"calendarBody\" onmouseup=\"obm.calendarQuickForm.compute(event, 'day');\">
     $day_cal
     </tbody>
   </table>

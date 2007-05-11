@@ -619,7 +619,7 @@ function html_group_form($action, $group_q, $group, $field="") {
     $dis_private = "
   <tr>
     <th>$l_private</th>
-    <td><input name=\"cba_privacy\" type=\"checkbox\" onchange=\"($(this).getValue())?$('emailGroup').addClassName('H'):$('emailGroup').removeClassName('H')\" value=\"1\" $private_c /></td>
+    <td><input name=\"cba_privacy\" type=\"checkbox\" onchange=\"($(this).getValue())?$('emailGroup').addClass('H'):$('emailGroup').removeClass('H')\" value=\"1\" $private_c /></td
   </tr>";
   } 
 

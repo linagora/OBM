@@ -58,8 +58,8 @@ Obm.CalendarDayEvent = new Class({
 
   buildEvent: function() {
     id = this.event.id+'-'+this.event.entity+'-'+this.event.entity_id+'-'+this.event.time;
-    this.element = new Element('div').addClassName('event')
-                                     .addClassName(this.event.klass)
+    this.element = new Element('div').addClass('event')
+                                     .addClass(this.event.klass)
                                      .setProperty('id','event-'+id)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
@@ -254,8 +254,8 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   
   buildEvent: function() {
     id = this.event.id+'-'+this.event.entity+'-'+this.event.entity_id+'-'+this.event.time;
-    this.element = new Element('div').addClassName('event')
-                                     .addClassName(this.event.klass)
+    this.element = new Element('div').addClass('event')
+                                     .addClass(this.event.klass)
                                      .setProperty('id','event-'+id)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
@@ -267,7 +267,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     this.setPeriodicity();
     if(this.options.resizable) {
       this.resizeHandler = new Element('img').setProperty('src',obm.vars.images.resize)
-                                             .addClassName('handle')
+                                             .addClass('handle')
                                              .injectInside(this.element);
     }
     this.titleContainer = new Element('span').injectInside(this.element);
@@ -456,14 +456,14 @@ Obm.CalendarManager = new Class({
 
   newDayEvent: function(eventData,options) {
     obmEvent = new Obm.CalendarDayEvent(eventData,options);
-    this.events.put(obmEvent.element.id,obmEvent);
+    this.events.set(obmEvent.element.id,obmEvent);
     this.register(obmEvent.element.id);
     return obmEvent;
   },
 
   newEvent: function(eventData,options) {
     obmEvent = new Obm.CalendarEvent(eventData,options);
-    this.events.put(obmEvent.element.id,obmEvent);
+    this.events.set(obmEvent.element.id,obmEvent);
     this.register(obmEvent.element.id);
     return obmEvent;
   },
@@ -491,11 +491,11 @@ Obm.CalendarManager = new Class({
       this.defaultWidth = this.evidence.clientWidth;
       this.defaultHeight = this.evidence.offsetHeight;    
 
-      this.events.each(function(key,evt) {
+      this.events.each(function(evt, key) {
         evt.resizeLine(); 
       });
 
-      this.events.each(function(key,evt) {
+      this.events.each(function(evt, key) {
         evt.redraw(); 
       });
       
@@ -578,7 +578,7 @@ Obm.CalendarManager = new Class({
     for(var i=0;i < size;i++) {
       t = evt.origin + i*evt.options.unit;
       if(!this.times.get(t)) {
-        this.times.put(t.toInt(),new Array());
+        this.times.set(t.toInt(),new Array());
       }
       this.times.get(t).push(evt);
     }   
@@ -683,7 +683,7 @@ Obm.CalendarManager = new Class({
       obm.calendarManager.redrawAllEvents();      
     } else {
       showErrorMessage(resp.message);
-      obm.calendarManager.events.each(function(key,evt) {
+      obm.calendarManager.events.each(function(evt, key) {
         evt.redraw(); 
       });      
       obm.calendarManager.redrawAllEvents();      
@@ -761,7 +761,7 @@ Obm.CalendarManager = new Class({
       obm.calendarManager.redrawAllEvents();      
     } else {
       showErrorMessage(resp.message);
-      obm.calendarManager.events.each(function(key,evt) {
+      obm.calendarManager.events.each(function(evt, key) {
         evt.redraw(); 
       });      
     }
@@ -936,7 +936,7 @@ Obm.TabbedPane = new Class({
     this.element = el;
     this.tabs = new Array();
     var tab = this.element.getFirst();
-    this.tabsContainer = new Element('p').injectBefore(tab).addClassName('tabs');
+    this.tabsContainer = new Element('p').injectBefore(tab).addClass('tabs');
 
     do {
       this.tabs.push(tab);
@@ -952,16 +952,16 @@ Obm.TabbedPane = new Class({
       if(index != 0) {
         tabContent.setStyle('display','none');
       } else {
-        title.addClassName('current');
+        title.addClass('current');
         this.current = title;
       }
 
       title.addEvent('click', function(ivent) {
         var target = ivent.currentTarget || ivent.srcElement;
         this.tabs[this.current.tabIndex].setStyle('display','none');
-        this.current.removeClassName('current');
+        this.current.removeClass('current');
         this.current = target;
-        this.current.addClassName('current');
+        this.current.addClass('current');
         this.tabs[this.current.tabIndex].setStyle('display','block');
       }.bind(this));
       

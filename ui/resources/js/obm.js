@@ -35,10 +35,10 @@ Obm.Menu = new Class({
       obm.menu.toggle(this.id)
     });   
     sectionBlock.addEvent('mouseover', function(e){
-       this.addClassName('hover');
+       this.addClass('hover');
     });  
     sectionBlock.addEvent('mouseout', function(e){
-        this.removeClassName('hover');
+        this.removeClass('hover');
     });      
   },
 
@@ -163,18 +163,18 @@ Obm.Portlets = new Class({
     }
 
     if(Cookie.get("portletHidden")  != "true") {
-      Cookie.set("portletHidden", "true");
+      Cookie.set("portletHidden", "true",{path: '/'});
     } else {
-      Cookie.set("portletHidden", "false");
+      Cookie.set("portletHidden", "false",{path: '/'});
     }
   },
 
   toggleElement: function(item) {
     this.portlets[item].toggle();
     if(Cookie.get(item + "Hidden")  != "true") {
-      Cookie.set(item + "Hidden", "true");
+      Cookie.set(item + "Hidden", "true",{path: '/'});
     } else {
-      Cookie.set(item + "Hidden", "false");
+      Cookie.set(item + "Hidden", "false",{path: '/'});
     }    
   }
 
@@ -188,7 +188,7 @@ function datePickerGenerator() {
   elements = $$('.datePicker');
   elements.each(function(element){
     element.setProperty('autocomplete','off');
-    var span = new Element('span').injectBefore(element).addClassName('NW');
+    var span = new Element('span').injectBefore(element).addClass('NW');
     element.remove();
     element.injectInside(span);
     var img = new Element('img');
@@ -220,8 +220,8 @@ function showErrorMessage(message) {
 function showMessage(klass, message) {
   var content = $('ajaxMessage');
   content.setStyle('display','block');
-  new Element('p').addClassName('message')
-                  .addClassName(klass)
+  new Element('p').addClass('message')
+                  .addClass(klass)
                   .appendText(message)
                   .injectInside(content);
   setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, 5000);
