@@ -545,10 +545,11 @@ function get_import_similar_company($fields, $map) {
   $name = addslashes($name);
   $zip = addslashes($fields["comp_zip"]);
   $town = addslashes($fields["comp_town"]);
+  $short_name = substr($name, 0, 10);
 
   $query = "SELECT distinct company_id, company_name, company_zipcode 
     FROM Company
-    WHERE (company_name $like '$name%' OR company_aka $like '%$name%')
+    WHERE (company_name $like '$short_name%' OR company_aka $like '%$name%')
       AND (company_zipcode $like '$zip' OR company_town $like '$town')
       $multidomain";
 
@@ -572,6 +573,11 @@ function get_import_similar_company($fields, $map) {
       $comps["similar"][$cpt_similar]["comp_zip"] = $db_zip;
       $cpt_similar++;
     }
+  }
+
+  // If there is a same company, we delete the similar ones (no use, cause pb)
+  if (count($comps["same"]) > 0) {
+    unset($comps["similar"]);
   }
 
   return $comps;
@@ -881,8 +887,8 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $lname = addslashes($fields["con_ln"]);
   $fname = addslashes($fields["con_fn"]);
   // If a lang has been found we get the corresponding kind
-  if (isset($kinds[$fields["con_lang"]])) {
-    $kind_id = $kinds[$fields["con_lang"]];
+  if (isset($kinds[strtoupper($fields["con_lang"])])) {
+    $kind_id = $kinds[strtoupper($fields["con_lang"])];
   } else {
     $kind_id = "0";
   }
@@ -1052,8 +1058,8 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $lname = addslashes($fields["con_ln"]);
   $fname = addslashes($fields["con_fn"]);
   // If a lang has been found we get the corresponding kind
-  if (isset($kinds[$fields["con_lang"]])) {
-    $kind_id = $kinds[$fields["con_lang"]];
+  if (isset($kinds[strtoupper($fields["con_lang"])])) {
+    $kind_id = $kinds[strtoupper($fields["con_lang"])];
     $q_kind = "contact_kind_id='$kind_id',";
   }
 
@@ -1110,7 +1116,6 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_town='$town',
     contact_expresspostal='$cdx',
     contact_country_iso3166='$ctry',
-    contact_function_id='$function_id',
     contact_title='$title',
     contact_phone='$phone',
     contact_homephone='$hphone',

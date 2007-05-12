@@ -146,8 +146,8 @@ class OBM_Challenge_Auth extends Auth {
   var $database_table = "UserObm";
 
   function of_session_dis_login_page() {
-    global $obminclude, $obm_version, $module, $path, $login_action;
-    global $obmdb_dbtype, $password_encryption;
+    global $obminclude, $l_obm_title, $obm_version, $module, $path;
+    global $login_action, $obmdb_dbtype, $password_encryption;
     global $params, $c_multidomain, $c_default_domain;
 
     $login_page = "$path/../$obminclude/login.inc";
