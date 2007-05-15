@@ -650,9 +650,9 @@ Obm.CalendarManager = new Class({
     ajax.request();
   },
   
-  receiveUpdateEvent: function(request) {
+  receiveUpdateEvent: function(response) {
     try {
-      var resp = eval(request);
+      var resp = eval(response);
     } catch (e) {
       resp = new Object();
       resp.error = 1;
@@ -697,9 +697,9 @@ Obm.CalendarManager = new Class({
     ajax.request();
   },
 
-  receiveCreateEvent: function(request) {
+  receiveCreateEvent: function(response) {
     try {
-      var resp = eval(request);
+      var resp = eval(response);
     } catch (e) {
       resp = new Object();
       resp.error = 1;
@@ -735,9 +735,9 @@ Obm.CalendarManager = new Class({
     ajax.request();
   },
   
-  receiveDeleteEvent: function(request) {
+  receiveDeleteEvent: function(response) {
     try {
-      var resp = eval(request);
+      var resp = eval(response);
     } catch (e) {
       resp = new Object();
       resp.error = 1;

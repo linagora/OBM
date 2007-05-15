@@ -1638,5 +1638,25 @@ function dis_user_display_pref($prefs) {
   return $block;
 }
 
+/**
+ * Build a JSON array with all search results 
+ * 
+ * @param DB $user_q User search query results
+ * @access public
+ * @return void
+ */
+function json_search_users($user,$user_q) {
+  global $display;
+  $limit = $user['limit'];
+  $users = array();
+  if(isset($user["first_row"])) $user_q->seek($user["first_row"] - 1);
+  while($user_q->next_record() && count($users) < $limit ) {
+    $id = $user_q->f("userobm_id");
+    $label = phpStringToJsString($user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname"));
+    $extra = phpStringToJsString($user_q->f("userobm_email"));
+    $users[] = "{id:'data-user-$id', label:'$label', extra:'$extra'}";
+  }
+  $display["json"] = "{length:".$user_q->nf().", datas:[".implode(",",$users)."]}";
+}
 
 ?>

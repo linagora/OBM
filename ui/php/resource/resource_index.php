@@ -73,7 +73,12 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_resource_search_form($params);
   $display["result"] = dis_resource_search_list($params);
-
+} elseif ($action == "ext_search") {
+///////////////////////////////////////////////////////////////////////////////
+  $res_q = run_query_resource_ext_search($params);
+  json_search_resources($params, $res_q);
+  echo "(".$display['json'].")";
+  exit();
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_resource_form("",$params);
@@ -254,8 +259,15 @@ function get_resource_action() {
     'Url'      => "$path/resource/resource_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
-                                  );
-  
+  );
+
+  $actions["resource"]["ext_search"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=ext_search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+
+  );  
+
   // Get resource id from external window (js)
   $actions["resource"]["getsearch"] = array (
     'Url'      => "$path/resource/resource_index.php?action=search",

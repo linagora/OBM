@@ -296,6 +296,7 @@ function display_head_theme($p_module) {
   global $ico_datepicker,$set_date_upd,$l_monthsofyear,$l_daysofweekfirst;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
+  global $ico_delete;
 
   $monthShort =  phpArrayToJsArray($l_monthsofyearshort);
   $monthLong = phpArrayToJsArray($l_monthsofyear);
@@ -331,6 +332,7 @@ function display_head_theme($p_module) {
   <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js\" ></script>
 
   $js_include
   <script type=\"text/javascript\">
@@ -338,6 +340,7 @@ function display_head_theme($p_module) {
   obm.vars.images.minus = '$ico_minus';
   obm.vars.images.plus = '$ico_plus';
   obm.vars.images.datePicker = '$ico_datepicker';
+  obm.vars.images.del = '$ico_delete';
   obm.vars.regexp.dateFormat = '$set_date_upd';
   obm.vars.consts.popupHeight = '$popup_height';
   obm.vars.consts.popupWidth = '$popup_width';

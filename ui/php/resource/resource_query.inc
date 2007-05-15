@@ -31,7 +31,7 @@ function run_query_resource_search($resource) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-	$multidomain = sql_multidomain("resource");
+  $multidomain = sql_multidomain("resource");
 	
   if ($restriction == "user") {
     $uid = $obm["uid"];
@@ -85,6 +85,53 @@ function run_query_resource_search($resource) {
   }
 
   return $obm_q;
+}
+
+/**
+ * Search resources from a single field 
+ * 
+ * @param mixed $resource 
+ * @access public
+ * @return DB Search results
+ */
+function run_query_resource_ext_search($resource) {
+  global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
+  $pattern = $resource["pattern"];
+  $restriction = $resource["restriction"];
+  $obm_q = new DB_OBM;
+  $multidomain = sql_multidomain("Resource");
+	
+  if ($restriction == "user") {
+    $uid = $obm["uid"];
+    $rs = of_right_entity_for_consumer("Resource", "user", $uid, "read");
+    if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
+      $where_restriction = " AND (resource_id IN (";
+      foreach($rs["ids"] as $r_id) {
+	$where_restriction .= "$coma'$r_id'";
+	$coma = ",";
+      }
+      $where_restriction .= "))";
+    }
+  }
+
+  $query = "SELECT 
+      resource_id,
+      resource_name,
+      resource_qty
+    FROM Resource
+    WHERE 
+      resource_name LIKE '$pattern%' 
+      $multidomain
+      $where_restriction
+    ORDER BY resource_name
+      ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_ext_search()");
+  $obm_q->query($query);
+
+  return $obm_q;
+      
+
 }
 
 

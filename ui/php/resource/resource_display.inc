@@ -427,6 +427,27 @@ function dis_resource_display_pref($prefs) {
 
   return $block;
 }
+/**
+ * Build a JSON array with all search results 
+ * 
+ * @param DB $res_q Resources search query results
+ * @access public
+ * @return void
+ */
+function json_search_resources($resource,$res_q) {
+  global $display, $l_qty;
+  $limit = $resource['limit'];
+  $resources = array();
+  if(isset($resource["first_row"])) $res_q->seek($resource["first_row"] - 1);
+  while($res_q->next_record() && count($users) < $limit ) {
+    $id = $res_q->f("resource_id");
+    $label = phpStringToJsString($res_q->f("resource_name"));
+    $extra = phpStringToJsString("$l_qty : ".$res_q->f("resource_qty"));
+    $resources[] = "{id:'data-resource-$id', label:'$label', extra:'$extra'}";
+  }
+  $display["json"] = "{length:".$res_q->nf().", datas:[".implode(",",$resources)."]}";
+}
+
 
 
 ?>

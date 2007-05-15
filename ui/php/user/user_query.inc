@@ -142,6 +142,59 @@ function run_query_user_search($user) {
 
   return $obm_q;
 }
+
+/**
+ * Search users from a single field 
+ * 
+ * @param mixed $user 
+ * @access public
+ * @return void
+ */
+function run_query_user_ext_search($user) {
+  global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
+  $pattern = $user["pattern"];
+  $restriction = $user["restriction"];
+  $obm_q = new DB_OBM;
+  $multidomain = sql_multidomain("UserObm.userobm");
+
+
+  if ($restriction == "calendar") {
+    $users = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "read","","userobm");
+    if ((is_array($users["ids"])) && (count($users["ids"]) > 0)) {
+      $where_restriction = " AND (userobm_id IN ($obm[uid], ";
+      foreach($users["ids"] as $u_id) {
+	$where_restriction .= "$coma'$u_id'";
+	$coma = ",";
+      }
+      $where_restriction .= "))";
+    } else {
+      // If no users have given $uid with read right, return empty set
+      $where_restriction = " AND userobm_id < 0";
+    }
+  }
+
+  $query = "SELECT 
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname,
+      userobm_email
+    FROM UserObm
+    WHERE (
+      userobm_lastname LIKE '$pattern%' 
+      OR userobm_firstname LIKE '$pattern%' 
+      OR userobm_email LIKE '$pattern%' )
+      $multidomain
+      $where_restriction
+    ORDER BY  userobm_lastname, userobm_firstname
+      ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_user_ext_search()");
+  $obm_q->query($query);
+
+  return $obm_q;
+      
+
+}
 ///////////////////////////////////////////////////////////////////////////////
 // User detail query execution
 // Parameters:

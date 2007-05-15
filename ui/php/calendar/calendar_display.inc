@@ -207,7 +207,9 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" /> </a>
     </legend>       
-";
+    <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />
+    ";
+    $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_ent', 'resource', {restriction:'user'});";
   }
 
   $dis_back_myview = "<a href=\"calendar_index.php?action=$new_action&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_back_mono</a>";
@@ -222,7 +224,6 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
     $sel_group
     </select>
-    $dis_back_all_users
     </fieldset>
     </form>
 
@@ -234,6 +235,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     onclick=\"window.open('$url_user','','height=$popup_height,width=$popup_width,scrollbars=yes');
   return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
     </legend>
+    <input type=\"text\" name=\"\" value=\"\" id=\"user\" autocomplete=\"off\" />
     <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
     <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
     <input type=\"hidden\" name=\"new_group\" value=\"1\" />
@@ -249,8 +251,16 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     </fieldset>
     $dis_back_myview
     </form>
-    </div>
-   </div>";
+   </div>
+  </div>
+  <script type=\"text/javascript\">
+    obm.initialize.chain(function () {
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_ent', 'user', {restriction:'calendar'});
+      $resource_js
+    });
+    </script>    
+    
+    ";
 
   return $block;
 }

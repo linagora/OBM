@@ -81,6 +81,12 @@ if ($action == "ext_get_ids") {
   $display["search"] = html_user_search_form($params);
   $display["result"] = dis_user_search_list($params);
 
+} elseif ($action == "ext_search") {
+///////////////////////////////////////////////////////////////////////////////
+  $user_q = run_query_user_ext_search($params);
+  json_search_users($params, $user_q);
+  echo "(".$display['json'].")";
+  exit();
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_user_form("",$params);
@@ -325,7 +331,13 @@ function get_user_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                   );
-  
+// Search
+  $actions["user"]["ext_search"] = array (
+    'Url'      => "$path/user/user_index.php?action=ext_search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+  );  
+
 // Get user id from external window (js)
   $actions["user"]["getsearch"] = array (
     'Url'      => "$path/user/user_index.php?action=search",

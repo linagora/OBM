@@ -267,7 +267,7 @@ form {
 
 .module {
   position: absolute;
-  z-index: 10000;
+  z-index: 1000;
   display: none;
 }
 
@@ -1069,6 +1069,106 @@ input.datePicker {
   border-bottom: 1px solid #358399;
   background-color: #ebebeb;
 }
+
+/*-------------------------------------------------------------------------- */
+/* AutoComplete styles
+/* ------------------------------------------------------------------------- */
+/*
+.module ul{
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+  list-style-type: none;  
+  background: #e0e1e3;    
+  border: 1px solid #368397;
+  width: 25em;
+}
+
+.module ul li  {
+  line-height: 1ex;
+  display: block;
+  margin: 0;
+  padding: 0.3em 2px;
+  text-align: left;
+  border: 0;
+  color: #368397;
+  border-bottom: 1px solid #b7b8ba;
+*/
+.autoCompleteResultBox {
+  position: absolute;
+  list-style-type: none;  
+  background: #e0e1e3;    
+  border: 1px solid #368397; 
+  z-index: 1000;
+  padding: 0 5px;
+}
+
+.autoCompleteResultBox div {
+  border-bottom: 1px solid #b7b8ba;
+  color: #368397;
+  text-align: left;
+  cursor: pointer;
+}
+
+.autoCompleteResultBox div span {
+  font-weight: bold;
+  display: block;
+  white-space: nowrap;
+}
+
+.autoCompleteResultBox .highlight {
+  background-color: #aaddff;
+}
+
+.autoCompleteResultBox div em {
+  
+}
+
+.autoCompleteResultBox h2 {
+ background-color: #EFF0F2;
+ text-align: center;
+ min-width: 18em;
+ font-size: 80%;
+ margin: 0;
+}
+
+
+div.aas_liste div strong {
+ background-color: #aaddff;
+ font-weight: inherit;
+}
+
+span.aas_previousBtn {
+ position: absolute;
+ left: 0px;
+ cursor: pointer;
+}
+
+span.aas_nextBtn {
+ position: absolute;
+ right: 0px;
+ cursor: pointer;
+}
+
+
+
+/* styles propres à la liste des choix */
+
+div.utilisateurs {
+ background-color: #fff;
+ border: 1px solid #888;
+ padding: 2px;
+ width: 250px ;
+ height: 86px;
+ font-weight: bold;
+ overflow: auto;
+}
+
+div.utilisateurs div {
+ padding: 3px;
+ border: 0;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
