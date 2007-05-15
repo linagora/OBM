@@ -103,7 +103,8 @@ obm.AutoComplete.Search = new Class({
       chars: 1,
       results: 8,
       delay: 400,
-      restriction: null
+      restriction: null,
+      extension: null
     }, options || {});
   },
 
@@ -210,7 +211,7 @@ initialize: function(url, selectedBox, input, options) {
       this.reinitListe();
       new Ajax(this.url, {
         method: 'post',
-        postBody: 'pattern='+this.currentValue+'&limit='+(this.options.results*3)+'&restriction='+this.options.restriction,
+        postBody: 'pattern='+this.currentValue+'&limit='+(this.options.results*3)+'&restriction='+this.options.restriction+'&extension'+this.options.extension,
         onFailure:this.onFailure.bindAsEventListener(this),
         onComplete:this.onNewRequestSuccess.bindAsEventListener(this)
       }).request();
@@ -224,7 +225,7 @@ initialize: function(url, selectedBox, input, options) {
         var nbRecherche = ((this.options.results*2)>nbElemRestant ? nbElemRestant : this.options.results*2);
         new Ajax(this.url, {
           method: 'post',
-          postBody: 'text='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+nbRecherche+'&restriction='+this.options.restriction,
+          postBody: 'text='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+nbRecherche+'&restriction='+this.options.restriction+'&extension'+this.options.extension,
           onFailure:this.onFailure.bindAsEventListener(this),
           onComplete:this.onCacheRequestSuccess.bindAsEventListener(this)
         }).request();
@@ -277,9 +278,15 @@ initialize: function(url, selectedBox, input, options) {
                                        .appendText(data.extra)                                   
                                   );
       this.cache.addElement(res);
-      res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-         .addEvent('mousedown', function() {this.addChoice(res);}.bindAsEventListener(this))
-         .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this));
+      if($type(data.extension)) {
+        res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
+           .addEvent('mousedown', function() {this.addChoice(res,data.extension);}.bindAsEventListener(this))
+           .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this));
+      } else {
+        res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
+           .addEvent('mousedown', function() {this.addChoice(res);}.bindAsEventListener(this))
+           .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this));
+      }
     }.bind(this));
     this.nbTotal = results.length;
     this.view.setElementNb(this.nbTotal);
@@ -415,7 +422,7 @@ initialize: function(url, selectedBox, input, options) {
   ///////////////////////////////////////////////////////////////////////////
   // (un)choose elements
   // FIXME NAME
-  addChoice: function(element) {
+  addChoice: function(element, extension) {
     var item_id = element.getProperty('id');
     var id = item_id.substr(('item_').length,item_id.length);
     var div_id = this.name + id;
@@ -431,7 +438,9 @@ initialize: function(url, selectedBox, input, options) {
                         function() {remove_element(div_id,this.name);}.bind(this)
                       ).injectInside(result);
       result.appendText(text);
-
+      if($type(extension)) {
+        result.adopt(extension)
+      }
       new Element('input').setProperty('type','hidden')
                           .setProperty('name',this.name+'[]')
                           .setProperty('value',id)
