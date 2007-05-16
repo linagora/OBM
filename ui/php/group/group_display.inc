@@ -828,4 +828,26 @@ function dis_group_display_pref($prefs_g, $prefs_u) {
   return $block;
 }
 
+
+/**
+ * Build a JSON array with all search results 
+ * 
+ * @param DB $res_q Group search query results
+ * @access public
+ * @return void
+ */
+function json_search_group($group,$grp_q) {
+  global $display, $l_desc;
+
+  $limit = $group['limit'];
+  $groups = array();
+  if(isset($group["first_row"])) $grp_q->seek($group["first_row"] - 1);
+  while($grp_q->next_record() && count($groups) < $limit ) {
+    $id = $grp_q->f("resource_id");
+    $label = phpStringToJsString($grp_q->f("group_name"));
+    $extra = phpStringToJsString("$l_desc : ".$grp_q->f("group_desc"));
+    $groups[] = "{id:'data-group-$id', label:'$label', extra:'$extra'}";
+  }
+  $display["json"] = "{length:".$grp_q->nf().", datas:[".implode(",",$groups)."]}";
+}
 ?>

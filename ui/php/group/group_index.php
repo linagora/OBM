@@ -72,6 +72,13 @@ if (($action == "index") || ($action == "")) {
   $display["search"] = html_group_search_form($params);
   $display["result"] = dis_group_search_group($params);
 
+} elseif ($action == "ext_search") {
+///////////////////////////////////////////////////////////////////////////////
+  $grp_q = run_query_group_ext_search($params);
+  json_search_group($params, $grp_q);
+  echo "(".$display['json'].")";
+  exit();
+
 } else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_group_form($action, "", $params);
@@ -361,6 +368,13 @@ function get_group_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                   );
+
+  $actions["group"]["ext_search"] = array (
+    'Url'      => "$path/group/group_index.php?action=ext_search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+
+  );  
 
 // New
   $actions["group"]["new"] = array (

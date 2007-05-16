@@ -939,5 +939,49 @@ function get_group_parents($id) {
   return array_unique($parents);
 }
 
+/**
+ * Search group from a single field 
+ * 
+ * @param mixed $resource 
+ * @access public
+ * @return DB Search results
+ */
+function run_query_group_ext_search($group) {
+  global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
+  $pattern = $group["pattern"];
+  $restriction = $group["restriction"];
+  $obm_q = new DB_OBM;
+  $multidomain = sql_multidomain("Group");
+	
+  if ($restriction == "user") {
+    $uid = $obm["uid"];
+    $rs = of_right_entity_for_consumer("Group", "user", $uid, "read");
+    if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
+      $where_restriction = " AND (group_id IN (";
+      foreach($rs["ids"] as $r_id) {
+	$where_restriction .= "$coma'$r_id'";
+	$coma = ",";
+      }
+      $where_restriction .= "))";
+    }
+  }
+
+  $query = "SELECT 
+      group_id,
+      group_name,
+      group_desc
+    FROM UGroup
+    WHERE 
+      group_name LIKE '$pattern%' 
+      $multidomain
+      $where_restriction
+    ORDER BY group_name
+      ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_group_ext_search()");
+  $obm_q->query($query);
+
+  return $obm_q;
+}
 ?>
