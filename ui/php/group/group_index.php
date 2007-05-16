@@ -222,7 +222,7 @@ if (($action == "index") || ($action == "")) {
     $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
   } else {
     if ($params["group_nb"] > 0) {
-      $nb = run_query_group_group_insert($params);
+      $nb = run_query_group_group_insert($params, $g["privacy"]);
       update_update_state();
       $display["msg"] .= display_ok_msg("$nb $l_group_added");
     } else {

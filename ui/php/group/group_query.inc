@@ -206,7 +206,11 @@ function run_query_group_insert($group) {
   $now = date("Y-m-d H:i:s");
   $gid = get_first_group_free_gid();
   $domain_id = $obm["domain_id"];	
-
+  if( $priv == 1 ) {
+    $mailing = 0;
+    $samba = 0;
+    $email = "";
+  }
   $query = "INSERT INTO UGroup (
     group_timeupdate,
     group_timecreate,
@@ -309,7 +313,11 @@ function run_query_group_update($group) {
   $mailing = (isset($group["mailing"]) ? $group["mailing"] : '0');
   $now = date("Y-m-d H:i:s");
   $multidomain = sql_multidomain("group");
-  
+  if( $priv == 1 ) {
+    $mailing = 0;
+    $samba = 0;
+    $email = "";
+  }  
   $query = "UPDATE UGroup SET
     group_timeupdate='$now',
     group_userupdate='$obm[uid]',
@@ -469,7 +477,7 @@ function run_query_group_usergroup_delete($group) {
 //   - $group[] : group hash info : keys used : id, group_nb, group_X
 // Return: number of groups inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_group_group_insert($group) {
+function run_query_group_group_insert($group, $privacy) {
   global $cdg_sql;
 
   $id = $group["group_id"];
@@ -482,17 +490,19 @@ function run_query_group_group_insert($group) {
     $cpt++;
     $g_id = $group["group_$cpt"];
 
-    $query = "SELECT * FROM GroupGroup
-      WHERE groupgroup_parent_id='$id'
-        AND groupgroup_child_id='$g_id'";
+    $query = "SELECT group_privacy, groupgroup_child_id FROM 
+      UGroup
+      LEFT JOIN GroupGroup ON groupgroup_parent_id='$id' AND groupgroup_child_id = group_id
+      WHERE group_id='$g_id'";
     display_debug_msg($query, $cdg_sql, "run_query_group_group_insert(1)");
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
-    
+    $test_q->next_record(); 
     // If the entry doesn't already exist and doesn't create a loop, insert it
-    if ( ($test_q->num_rows() == 0)
+    if ( (!$test_q->f("groupgroup_child_id"))
          && (! in_array($g_id, $parents))
          && ($id != $g_id)
+         && ($privacy == 1 || $test_q->f("group_privacy") != 1)
        ) {
         $query = "INSERT INTO GroupGroup (
           groupgroup_parent_id,

@@ -180,25 +180,6 @@ Obm.Portlets = new Class({
 
 });
 
-// This will generate a datePicker widget for all element with
-// the css class "datePicker".
-// The element with the class datePicker must have a name attribute.
-
-function datePickerGenerator() {
-  elements = $$('.datePicker');
-  elements.each(function(element){
-    element.setProperty('autocomplete','off');
-    var span = new Element('span').injectBefore(element).addClass('NW');
-    element.remove();
-    element.injectInside(span);
-    var img = new Element('img');
-    img.setAttribute("src", obm.vars.images.datePicker);
-    img.injectInside(span);
-    img.addEvent('click', function(e){
-      displayDatePicker(element.name);
-    });
-  });
-}
 
 function popup(url,name,height,width) {
   if(!width)

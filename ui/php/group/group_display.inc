@@ -393,21 +393,28 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     $dis_email = "$email";
   }
 
-  if ($cgp_use["service"]["samba"]) {
-    $samba = ($group_q->f("group_samba") == 1 ? $l_yes : $l_no);
-    $block_samba = "
-    <tr>
-      <th>$l_smb</td>
-      <td>$samba</td>
-    </tr>";
-  }
   if($group_q->f("group_privacy") == 0) {
     $dis_email = "<tr>
       <th>$l_email</th>
       <td>$dis_email</td>
-    </tr>";
+      </tr>
+      <tr>
+        <th>$l_mailing</th>
+        <td>$mailing</td>
+      </tr>      
+      ";
+
+    if ($cgp_use["service"]["samba"]) {
+      $samba = ($group_q->f("group_samba") == 1 ? $l_yes : $l_no);
+      $block_samba = "
+      <tr>
+        <th>$l_smb</td>
+        <td>$samba</td>
+      </tr>";
+    }    
   } else {
     $dis_email = "";
+    $samba = "";
   }
   $block_userdata .= of_userdata_dis_entity_consult("group", $id);
 
@@ -528,10 +535,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       <td>$privacy</td>
     </tr>
     $dis_email
-    <tr>
-      <th>$l_mailing</th>
-      <td>$mailing</td>
-    </tr>
     </table>
     </div>
   
@@ -619,7 +622,22 @@ function html_group_form($action, $group_q, $group, $field="") {
     $dis_private = "
   <tr>
     <th>$l_private</th>
-    <td><input name=\"cba_privacy\" type=\"checkbox\" onchange=\"($(this).getValue())?$('emailGroup').addClass('H'):$('emailGroup').removeClass('H')\" value=\"1\" $private_c /></td
+    <td>
+    <script type=\"text/javascript\">
+      function privacyShowHide(input) {
+        if($(input).getValue()) {
+          $('emailGroup').addClass('H');
+          $('sambaGroup').addClass('H');
+          $('mailingGroup').addClass('H');
+        } else {
+          $('emailGroup').removeClass('H')
+          $('sambaGroup').removeClass('H');
+          $('mailingGroup').removeClass('H');
+        }
+      }
+    </script>
+    <input name=\"cba_privacy\" type=\"checkbox\" 
+    onchange=\"privacyShowHide(this)\" value=\"1\" $private_c /></td
   </tr>";
   } 
 
@@ -628,14 +646,14 @@ function html_group_form($action, $group_q, $group, $field="") {
     $samba_state  = ($samba ? "checked" : "");
 
     $block_samba = "
-  <tr>
+  <tr id=\"sambaGroup\"  class=\"$mail_class\">
     <th class=\"$class[samba]\">$l_smb</th>
     <td><input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state></td>
   </tr>";
   }
 
   $dis_mailing = "
-  <tr>
+  <tr id=\"mailingGroup\"  class=\"$mail_class\">
     <th>$l_mailing</th>
     <td><input name=\"cba_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
   </tr>";

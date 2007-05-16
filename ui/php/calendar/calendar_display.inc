@@ -145,7 +145,7 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
 //   - $entity_readable : array of readable entities (["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable) {
-  global $path, $obm, $c_all,  $popup_height, $popup_width, $ico_add;
+  global $path, $obm, $c_all,  $popup_height, $popup_width;
   global $ccalendar_resource;
   global $l_selection, $l_users,$l_resources, $l_validate;
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
@@ -193,23 +193,17 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     }
   }
 
-  $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction_calendar=calendar";
 
   if ($ccalendar_resource) {
-    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction=user";
     $dis_block_resource = "
     </fieldset>
     <fieldset class=\"detail extra\">
     <legend>           
       $l_resources
-      <a href=\"javascript: return false;\"
-      onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
-      return false;\">
-      <img src=\"$ico_add\" alt=\"[Add]\" /> </a>
     </legend>       
     <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />
     ";
-    $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_ent', 'resource', {restriction:'user'});";
+    $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {restriction:'user'});";
   }
 
   $dis_back_myview = "<a href=\"calendar_index.php?action=$new_action&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_back_mono</a>";
@@ -231,9 +225,6 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <fieldset class=\"detail extra\">
     <legend>
     $l_users
-    <a href=\"javascript: return false;\" 
-    onclick=\"window.open('$url_user','','height=$popup_height,width=$popup_width,scrollbars=yes');
-  return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
     </legend>
     <input type=\"text\" name=\"\" value=\"\" id=\"user\" autocomplete=\"off\" />
     <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
@@ -255,7 +246,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   </div>
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_ent', 'user', {restriction:'calendar'});
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {restriction:'calendar'});
       $resource_js
     });
     </script>    
