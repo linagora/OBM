@@ -843,7 +843,7 @@ function json_search_group($group,$grp_q) {
   $groups = array();
   if(isset($group["first_row"])) $grp_q->seek($group["first_row"] - 1);
   while($grp_q->next_record() && count($groups) < $limit ) {
-    $id = $grp_q->f("resource_id");
+    $id = $grp_q->f("group_id");
     $label = phpStringToJsString($grp_q->f("group_name"));
     $extra = phpStringToJsString("$l_desc : ".$grp_q->f("group_desc"));
     $groups[] = "{id:'data-group-$id', label:'$label', extra:'$extra'}";
