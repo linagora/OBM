@@ -32,10 +32,10 @@ Obm.CalendarDayEvent = new Class({
   makeDraggable: function() {
     var dragOptions = {
       handle: this.dragHandler,
-      xMin: this.options.context.left,
-      xMax: this.options.context.right - obm.calendarManager.defaultWidth,
-      yMin: this.options.context.top,
-      yMax: this.options.context.bottom,
+      limit: {
+        'x': [this.options.context.left,this.options.context.right - obm.calendarManager.defaultWidth],
+        'y': [this.options.context.top,this.options.context.bottom]
+      },
 
       onSnap:function() {
         obm.calendarManager.lock();
@@ -189,10 +189,9 @@ Obm.CalendarDayEvent = new Class({
     });
     this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
     if(this.options.draggable) {
-      this.drag.options.xMin = this.options.context.left;
-      this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;
-      this.drag.options.yMin = this.options.context.top;
-      this.drag.options.yMax = this.options.context.bottom - this.element.offsetHeight;
+      this.drag.options.limit = {
+        'x': [this.options.context.left,this.options.context.right - obm.calendarManager.defaultWidth],
+        'y': [this.options.context.top,this.options.context.bottom - this.element.offsetHeight]};      
     }    
   },
 
@@ -309,10 +308,10 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   makeResizable: function() {
     var resizeOptions = {
       handle: this.resizeHandler,
-      xMin: obm.calendarManager.defaultWidth,
-      xMax: obm.calendarManager.defaultWidth,
-      yMin: obm.calendarManager.defaultHeight,
-      yMax: this.options.context.bottom ,
+      limit: {
+        'x': [obm.calendarManager.defaultWidth,obm.calendarManager.defaultWidth],
+        'y': [obm.calendarManager.defaultHeight,this.options.context.bottom]
+      },
 
       onStart:function() {
         obm.calendarManager.lock();
@@ -380,16 +379,14 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     });
     this.setHeight(this.size * obm.calendarManager.defaultHeight);
     if(this.options.draggable) {
-      this.drag.options.xMin = this.options.context.left;
-      this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;
-      this.drag.options.yMin = this.options.context.top;
-      this.drag.options.yMax = this.options.context.bottom - this.element.offsetHeight;
+      this.drag.options.limit = {
+        'x': [this.options.context.left,this.options.context.right - obm.calendarManager.defaultWidth],
+        'y': [this.options.context.top,this.options.context.bottom - this.element.offsetHeight]};         
     }    
     if(this.options.resizable) {
-      this.resize.options.xMin = obm.calendarManager.defaultWidth;
-      this.resize.options.xMax = obm.calendarManager.defaultWidth;
-      this.resize.options.yMin = obm.calendarManager.defaultHeight;
-      this.resize.options.yMax = this.options.context.bottom - this.element.getTop();
+      this.resize.options.limit = {
+        'x': [obm.calendarManager.defaultWidth,obm.calendarManager.defaultWidth],
+        'y': [obm.calendarManager.defaultHeight,this.options.context.bottom - this.element.getTop()]};      
     }
   },
 

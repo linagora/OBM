@@ -5,14 +5,14 @@
 // unusefull code
 // unadapted function names
 // dangerous Element.extend 
-// Style and class names
+// comments
 
 //FIXME Must be set with the other constants 
 AAS_PGUP = 33;
 AAS_PGDOWN = 34;
 
 obm.AutoComplete = obm.autocomplete = {};
-
+//FIXME Not usefull, replace buy getStyle and setStyle
 Element.extend({
   hide: function() {
     this.style.display = 'none';
@@ -28,8 +28,8 @@ Element.extend({
   }
 });
 
-// FIXME Name
-var AAS_Cache = new Class({
+obm.AutoComplete.Cache = new Class({
+
   initialize: function() {
     this.flush();
     this.EmptyItem = new Element('h2');
@@ -50,6 +50,7 @@ var AAS_Cache = new Class({
   getElementAt: function(index) {
     return ( index<this.realCache.length ? this.realCache[index] : this.loadingCache[index-this.realCache.length]);
   },
+
   getIndexOf: function(elt) {
     var index = this.realCache.indexOf(elt);
     return (index != -1 ? index : this.loadingCache.indexOf(elt) ) ;
@@ -59,7 +60,7 @@ var AAS_Cache = new Class({
     return this.realCache.length + this.loadingCache.length;
   },
 
-  getEltNb: function() {
+  getCacheSize: function() {
     return this.realCache.length;
   },
 
@@ -68,32 +69,43 @@ var AAS_Cache = new Class({
     this.realCache = new Array();
     this.loadingCache = new Array();
   }
+
 });
 
-// FIXME Name
-var AAS_View = new Class({
+//FIXME Improve algorythm
+obm.AutoComplete.View = new Class({
+
   initialize: function(visibleNb) {
     this.visibleNb = visibleNb;
     this.elementNb = 0;
     this.first = 0;
   },
+
   setElementNb: function(elementNb) {
     this.elementNb = elementNb;
   },
-  getFirstVisible: function() {
+
+  getFirst: function() {
     return this.first;
   },
-  getLastVisible: function() {
+
+  getLast: function() {
     return Math.min(this.elementNb, this.first+this.visibleNb)-1;
   },
-  moveUp: function(nb) {
-    this.first = Math.max(this.first-nb,0);
+
+  inView: function(index) {
+    return ( index >= this.first && index <= this.getLast() );
   },
-  moveDown: function(nb) {
-    this.first = Math.min(this.first+nb,this.elementNb-this.visibleNb);
-    if (this.first<0)
+  
+  move: function(offset) {
+    this.first += offset;
+    if ( this.first > (this.elementNb - this.visibleNb)) {
+      this.first = (this.elementNb - this.visibleNb);
+    } else if ( this.first < 0 ) {
       this.first = 0;
+    }
   }
+
 });
 
 obm.AutoComplete.Search = new Class({
@@ -103,6 +115,7 @@ obm.AutoComplete.Search = new Class({
       chars: 1,
       results: 8,
       delay: 400,
+      mode: 'multiple',
       restriction: null,
       extension: null
     }, options || {});
@@ -112,22 +125,18 @@ obm.AutoComplete.Search = new Class({
 initialize: function(url, selectedBox, input, options) {
     this.setOptions(options);
 
-    
     this.url = url;
-
     this.input = $(input);
     this.name = selectedBox;
     this.selectedBox = $(selectedBox);
-    this.prefix = this.input.id;
 
     this.toClear = false;
-
+   // FIXME OnBlur event to be rethink
     this.input.addEvent('keyup', this.onTextChange.bindAsEventListener(this))
               .addEvent('keydown', this.onKeyDown.bindWithEvent(this))
               .addEvent('keypress', this.onKeyPress.bindWithEvent(this))
               .addEvent('blur',this.reset.bindAsEventListener(this));
 
-// FIXME French
     var inputCoords = this.input.getCoordinates();
     this.resultBox = new Element('div').addClass('autoCompleteResultBox')
                                        .injectInside($(document.body))
@@ -135,19 +144,17 @@ initialize: function(url, selectedBox, input, options) {
                                          'top':(inputCoords.top + inputCoords.height + 2) + 'px',
                                          'left':inputCoords.left + 'px'
                                        });
-                                      
     this.infos = new Element('h2').injectInside(this.resultBox)
                                   .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this));
 
-    this.previousBtn = new Element('span').addEvent('mousedown', function() {this.jumpSelectionPreviousPage();}.bindAsEventListener(this))
+    //FIXME Name of those 3 vars                                       
+    this.previousBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(-this.options.results);}.bindAsEventListener(this))
                                           .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this))
                                           .setHTML('&lt;&lt;&lt;')
                                           .hide()
                                           .injectInside(this.infos);
-
     this.text = new Element('span').injectInside(this.infos);
-
-    this.nextBtn = new Element('span').addEvent('mousedown', function() {this.jumpSelectionNextPage();}.bindAsEventListener(this))
+    this.nextBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(this.options.results);}.bindAsEventListener(this))
                                       .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this))
                                       .setHTML('&gt;&gt;&gt;')
                                       .hide()
@@ -157,6 +164,8 @@ initialize: function(url, selectedBox, input, options) {
   },
   ///////////////////////////////////////////////////////////////////////////
   // keyboard selection management (up, down, enter, esc., page up, page down)
+
+  //Key pressed should manage up down page up and page down to
   onKeyPress: function(e) {
     if (e.key == 'enter') {
       if (this.resultBox.isVisible()) {
@@ -169,6 +178,7 @@ initialize: function(url, selectedBox, input, options) {
     }
     return true;
   },
+  //FIXME Switch case?
   onKeyDown: function(e) {
     if (e.key == 'esc') { // Echap : on reinitialise le champs
       this.input.blur();
@@ -177,19 +187,19 @@ initialize: function(url, selectedBox, input, options) {
       return false;
 
     } else if (e.key == 'up' && this.resultBox.isVisible()) { // Haut : on déplace la sélection vers le haut
-      this.jumpSelectionPreviousOne();
+      this.jumpTo(-1);
       return false;
 
     } else if (e.key == 'down' && this.resultBox.isVisible()) { // Bas : on déplace la sélection vers le bas
-      this.jumpSelectionNextOne();
+      this.jumpTo(1);
       return false;
 
     } else if (e.code == AAS_PGUP && this.resultBox.isVisible()) { // Page précédente : on charge les résultats précédents
-      this.jumpSelectionPreviousPage();
+      this.jumpTo(-this.options.results);
       return false;
 
     } else if (e.code == AAS_PGDOWN && this.resultBox.isVisible()) { // Page suivante : on charge les résultats suivants
-      this.jumpSelectionNextPage();
+      this.jumpTo(this.options.results);
       return false;
     }
     return true;
@@ -202,6 +212,7 @@ initialize: function(url, selectedBox, input, options) {
     }
     this.fetchDelay = this.newRequest.delay(this.options.delay, this);
   },
+
   newRequest: function() {
     if (this.input.value.clean().length < this.options.chars) {
       this.currentValue = this.input.value;
@@ -217,9 +228,10 @@ initialize: function(url, selectedBox, input, options) {
       }).request();
     }
   },
+
   cacheRequest: function() { // update the cache when it needs to be (call it after the view moved forward)
     if (this.input.value == this.currentValue) {
-      if (this.view.getFirstVisible()+this.options.results*2>=this.cache.getSize() && this.cache.getSize()<this.nbTotal) {
+      if (this.view.getFirst()+this.options.results*2>=this.cache.getSize() && this.cache.getSize()<this.nbTotal) {
         var nbElemRestant = this.nbTotal-this.cache.getSize();
         //FIXME French
         var nbRecherche = ((this.options.results*2)>nbElemRestant ? nbElemRestant : this.options.results*2);
@@ -233,9 +245,11 @@ initialize: function(url, selectedBox, input, options) {
       }
     }
   },
+
   onFailure: function(response) {
     showErrorMessage('Fatal server error, please reload');
   },
+
   onNewRequestSuccess: function(response) {
     if (response.trim() == '' || this.toClear) {
       this.hideListe();
@@ -249,11 +263,12 @@ initialize: function(url, selectedBox, input, options) {
       this.showListe();
     }
   },
+
   onCacheRequestSuccess: function(response) {
     if (response.trim() != '') {
-      var oldCacheLength = this.cache.getEltNb();
+      var oldCacheLength = this.cache.getCacheSize();
       this.parseResponse(response);
-      if (this.view.getLastVisible()>=oldCacheLength) {
+      if (this.view.getLast()>=oldCacheLength) {
         this.flushView();
         this.drawView();
         this.showSelection();
@@ -261,6 +276,7 @@ initialize: function(url, selectedBox, input, options) {
       this.updateInfo();
     }
   },
+
   parseResponse: function(response) {
     try {
       var results = eval(response);
@@ -291,6 +307,7 @@ initialize: function(url, selectedBox, input, options) {
     this.nbTotal = results.length;
     this.view.setElementNb(this.nbTotal);
   },
+
   ///////////////////////////////////////////////////////////////////////////
   // selection
   selectElement: function(element) {
@@ -300,59 +317,30 @@ initialize: function(url, selectedBox, input, options) {
       element.addClass('highlight');
     }
   },
-  jumpSelectionPreviousOne: function() {
-    if (this.selection>0) {
-      this.hideSelection();
-      this.selection--;
-      if (this.selection<this.view.getFirstVisible()) {
+  
+  jumpTo: function(offset) {
+    if( this.cache.getSize() <= 0) {
+      return false;
+    }
+    this.hideSelection();
+    this.selection += offset;
+    if( this.selection < 0) {
+      this.selection = this.view.getFirst();
+    } else if (this.selection >= this.cache.getSize()) {
+      this.selection = this.view.getLast();
+    } 
+    if(!this.view.inView(this.selection)) {
         this.flushView();
-        this.view.moveUp(1);
+        this.view.move(offset);
         this.drawView();
         this.updateInfo();
-      }
-      this.showSelection();
     }
-  },
-  jumpSelectionPreviousPage: function() {
-    this.hideSelection();
-    if (this.view.getFirstVisible()>0) {
-      this.flushView();
-      this.view.moveUp(this.options.results);
-      this.drawView();
-      this.updateInfo();
-    }
-    this.selection = Math.max(this.selection-this.options.results,this.view.getFirstVisible());
     this.showSelection();
-  },
-  jumpSelectionNextOne: function() {
-    if (this.selection==-1 && this.cache.getSize()>0) {
-      this.selection = this.view.getFirstVisible();
-      this.showSelection();
-    } else if (this.selection+1<this.nbTotal) {
-      this.hideSelection();
-      this.selection++;
-      if (this.selection>this.view.getLastVisible()) {
-        this.flushView();
-        this.view.moveDown(1);
-        this.drawView();
-        this.updateInfo();
-      }
-      this.showSelection();
+    if(offset > 0) {
+      this.cacheRequest()
     }
-    this.cacheRequest();
   },
-  jumpSelectionNextPage: function() {
-    this.hideSelection();
-    if (this.view.getLastVisible()+1<this.nbTotal) {
-      this.flushView();
-      this.view.moveDown(this.options.results);
-      this.drawView();
-      this.updateInfo();
-    }
-    this.selection = Math.min(this.selection+this.options.results,this.view.getLastVisible());
-    this.showSelection();
-    this.cacheRequest();
-  },
+
   unselect: function() {
     this.hideSelection();
     this.selection = -1;
@@ -369,6 +357,7 @@ initialize: function(url, selectedBox, input, options) {
   },
   ///////////////////////////////////////////////////////////////////////////
   // liste element functions
+  //FIXME French
   hideListe: function() {
     this.resultBox.hide();
   },
@@ -383,8 +372,8 @@ initialize: function(url, selectedBox, input, options) {
   // view (fenêtre des résultats visibles)
   drawView: function() {
     if (this.nbTotal>0) {
-      var topLimit = this.view.getLastVisible();
-      for (var i=this.view.getFirstVisible(); i<=topLimit; i++) {
+      var topLimit = this.view.getLast();
+      for (var i=this.view.getFirst(); i<=topLimit; i++) {
         this.cache.getElementAt(i).injectBefore(this.infos);
       }
     }
@@ -401,7 +390,7 @@ initialize: function(url, selectedBox, input, options) {
     if (this.nbTotal<=1) {
       this.text.setHTML(this.nbTotal);
     } else {
-      this.text.setHTML((this.view.getFirstVisible()+1)+' - '+(this.view.getLastVisible()+1)+' / '+this.nbTotal);
+      this.text.setHTML((this.view.getFirst()+1)+' - '+(this.view.getLast()+1)+' / '+this.nbTotal);
       this.updateNavBtns();
     }
   },
@@ -412,10 +401,10 @@ initialize: function(url, selectedBox, input, options) {
     this.updateNavBtns();
   },
   updateNavBtns: function() {
-    if (this.nbTotal>this.view.getLastVisible()+1) {
+    if (this.nbTotal>this.view.getLast()+1) {
       this.nextBtn.show();
     }
-    if (this.view.getFirstVisible()>0) {
+    if (this.view.getFirst()>0) {
       this.previousBtn.show();
     }
   },
@@ -458,8 +447,8 @@ initialize: function(url, selectedBox, input, options) {
     this.input.value = '';
     this.currentValue = '';
     this.nbTotal = 0;
-    this.cache = new AAS_Cache();
-    this.view = new AAS_View(this.options.results);
+    this.cache = new obm.AutoComplete.Cache();
+    this.view = new obm.AutoComplete.View(this.options.results);
     this.view.setElementNb(0);
     this.selection = -1;
   },
@@ -467,8 +456,8 @@ initialize: function(url, selectedBox, input, options) {
   reinitListe: function() {
     this.hideListe();
     this.flushView();
-    this.cache = new AAS_Cache();
-    this.view = new AAS_View(this.options.results);
+    this.cache = new obm.AutoComplete.Cache();
+    this.view = new obm.AutoComplete.View(this.options.results);
     this.view.setElementNb(0);
     this.selection = -1;
   }

@@ -180,7 +180,8 @@ function run_query_user_ext_search($user) {
       userobm_email
     FROM UserObm
     WHERE (
-      userobm_lastname LIKE '$pattern%' 
+      userobm_lastname LIKE '$pattern%'
+      OR userobm_login LIKE '$pattern%' 
       OR userobm_firstname LIKE '$pattern%' 
       OR userobm_email LIKE '$pattern%' )
       $multidomain
