@@ -806,6 +806,47 @@ function check_group_context($id, $group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Group specific rights checking (eg : public group needs write_admin)
+// Parameters:
+//   - $params[] : group values
+// Returns:
+//   - true if OK, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_group_update_rights($params) {
+  global $actions, $perm, $err, $cright_write_admin;
+  global $cg_gid_smb_user, $cg_gid_smb_admin, $l_cant_update_smb_group;
+  global $l_err_public_rights, $l_error_permission;
+
+  $id = $params["group_id"];
+  if ($id > 0) {
+    $g = get_group_info($id);
+
+    // Check update right is set
+    if (! $perm->check_right("group", $actions['group']['update']['Right'])) {
+      $err['msg'] .= $l_error_permission;
+      return false;
+    }
+
+    // Allow public group handling only if write_admin right
+    if (($g['privacy'] != 1)
+	&& (! $perm->check_right("group", $cright_write_admin))) {
+      $err['msg'] .= $l_err_public_rights;
+      return false;
+    }
+  
+    // We forbid to update Window system groups
+    $gid = $g["gid"];
+    if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
+      $err['msg'] .= $l_cant_update_smb_group;
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Group Form Data checking and formatting
 // Parameters:
 //   - $group[]  : values checked
@@ -814,8 +855,9 @@ function check_group_context($id, $group) {
 function check_group_data_form($group) {
   global $php_regexp_email_name, $php_regexp_email, $l_fill_name;
   global $l_group_exists, $l_email_exist;
-  global $obm, $err, $action;
-  global $l_j_check_email, $l_system_no_priv, $l_only_owner_priv, $l_err_system_samba;
+  global $obm, $perm, $err, $action, $cright_write_admin;
+  global $l_j_check_email, $l_system_no_priv, $l_err_system_samba;
+  global $l_only_owner_priv, $l_err_public_rights, $l_err_private_email;
 
   $id = $group["group_id"];
   $name = $group["name"];
@@ -861,10 +903,24 @@ function check_group_data_form($group) {
     }
   }
 
+  // Allow public group handling only if write_admin right
+  if (($priv != 1) && (! $perm->check_right("group", $cright_write_admin))) {
+    $err["msg"] = "$l_err_public_rights";
+    $err["field"] = "privacy";
+    return false;
+  }
+
   // A public group can only be private if user = owner
   if ($priv && ($usercreate > 0) && ($usercreate != $obm["uid"])) {
     $err["msg"] = "$l_only_owner_priv";
     $err["field"] = "privacy";
+    return false;
+  }
+
+  // A private group can't have an email address
+  if ($priv == 1 && ($email != "")) {
+    $err["msg"] = "$l_err_private_email";
+    $err["field"] = "email";
     return false;
   }
 

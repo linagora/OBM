@@ -19,6 +19,14 @@ ALTER TABLE Lead ADD COLUMN lead_contact_id int(8) NOT NULL DEFAULT 0 AFTER lead
 
 
 -------------------------------------------------------------------------------
+-- Update UserObm table
+-------------------------------------------------------------------------------
+-- Add delegation field (for delegated admin)
+ALTER TABLE UserObm ADD COLUMN userobm_delegation_target varchar(64) DEFAULT '' AFTER userobm_perms;
+ALTER TABLE UserObm ADD COLUMN userobm_delegation varchar(64) DEFAULT '' AFTER userobm_delegation;
+
+
+-------------------------------------------------------------------------------
 -- Tables needed for Automate work
 -------------------------------------------------------------------------------
 --

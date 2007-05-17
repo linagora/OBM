@@ -179,12 +179,7 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "user_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  // We forbid to update Window system groups
-  $g = get_group_info($params["group_id"]);
-  $gid = $g["gid"];
-  if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
-    $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
-  } else {
+  if (check_group_update_rights($params)) {
     if ($params["user_nb"] > 0) {
       $nb = run_query_group_usergroup_insert($params);
       update_update_state();
@@ -192,17 +187,14 @@ if (($action == "index") || ($action == "")) {
     } else {
       $display["msg"] .= display_err_msg($l_no_user_added);
     }
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg']);
   }
   $display["detail"] = dis_group_consult($params, $obm["uid"]);
 
 } elseif ($action == "user_del") {
 ///////////////////////////////////////////////////////////////////////////////
-  // We forbid to update Window system groups
-  $g = get_group_info($params["group_id"]);
-  $gid = $g["gid"];
-  if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
-    $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
-  } else {
+  if (check_group_update_rights($params)) {
     if ($params["user_nb"] > 0) {
       $nb = run_query_group_usergroup_delete($params);
       update_update_state();
@@ -210,17 +202,14 @@ if (($action == "index") || ($action == "")) {
     } else {
       $display["msg"] .= display_err_msg($l_no_user_deleted);
     }
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg']);
   }
   $display["detail"] = dis_group_consult($params, $obm["uid"]);
 
 } elseif ($action == "group_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  // We forbid to update Window system groups
-  $g = get_group_info($params["group_id"]);
-  $gid = $g["gid"];
-  if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
-    $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
-  } else {
+  if (check_group_update_rights($params)) {
     if ($params["group_nb"] > 0) {
       $nb = run_query_group_group_insert($params, $g["privacy"]);
       update_update_state();
@@ -228,17 +217,14 @@ if (($action == "index") || ($action == "")) {
     } else {
       $display["msg"] .= display_err_msg($l_no_group_added);
     }
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg']);
   }
   $display["detail"] = dis_group_consult($params, $obm["uid"]);
 
 } elseif ($action == "group_del") {
 ///////////////////////////////////////////////////////////////////////////////
-  // We forbid to update Window system groups
-  $g = get_group_info($params["group_id"]);
-  $gid = $g["gid"];
-  if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
-    $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
-  } else {
+  if (check_group_update_rights($params)) {
     if ($params["group_nb"] > 0) {
       $nb = run_query_group_group_delete($params);
       update_update_state();
@@ -246,6 +232,8 @@ if (($action == "index") || ($action == "")) {
     } else {
       $display["msg"] .= display_err_msg($l_no_group_deleted);
     }
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg']);
   }
   $display["detail"] = dis_group_consult($params, $obm["uid"]);
 
@@ -277,20 +265,11 @@ if (($action == "index") || ($action == "")) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 } else if ($action == "ext_get_ids") {
-  // We forbid to update Window system groups XXXX this test here ???
-  $g = get_group_info($params["id"]);
-  $gid = $g["gid"];
-  if (( $params["ext_action"] == "group_add") &&
-      (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) ) {
-    $display["msg"] .= display_warn_msg($l_cant_update_smb_group);
-    $display["detail"] = "<a href=\"\" onclick='window.close();'>$l_close</a>";
+  $display["search"] = html_group_search_form($params);
+  if ($set_display == "yes") {
+    $display["result"] = dis_group_search_group($params);
   } else {
-    $display["search"] = html_group_search_form($params);
-    if ($set_display == "yes") {
-      $display["result"] = dis_group_search_group($params);
-    } else {
-      $display["msg"] .= display_info_msg($l_no_display);
-    }
+    $display["msg"] .= display_info_msg($l_no_display);
   }
 }
 
@@ -531,9 +510,28 @@ function get_group_action() {
 ///////////////////////////////////////////////////////////////////////////////
 function update_group_action() {
   global $params, $actions, $path, $l_add_user, $l_add_group, $l_group;
+  global $cright_write_admin;
 
   $id = $params["group_id"];
+
   if ($id > 0) {
+    $g = get_group_info($id);
+
+    // Allow public group handling only if write_admin right
+    if ($g['privacy'] != 1) {
+      $actions['group']['detailupdate']['Right'] = $cright_write_admin;
+      $actions['group']['update']['Right'] = $cright_write_admin;
+      $actions['group']['insert']['Right'] = $cright_write_admin;
+      $actions['group']['check_delete']['Right'] = $cright_write_admin;
+      $actions['group']['delete']['Right'] = $cright_write_admin;
+      $actions['group']['sel_user_add']['Right'] = $cright_write_admin;
+      $actions['group']['user_add']['Right'] = $cright_write_admin;
+      $actions['group']['user_del']['Right'] = $cright_write_admin;
+      $actions['group']['sel_group_add']['Right'] = $cright_write_admin;
+      $actions['group']['group_add']['Right'] = $cright_write_admin;
+      $actions['group']['group_del']['Right'] = $cright_write_admin;
+    }
+
     // Detail Consult
     $actions["group"]["detailconsult"]['Url'] = "$path/group/group_index.php?action=detailconsult&amp;group_id=$id";
     $actions["group"]["detailconsult"]['Condition'][] = 'insert';

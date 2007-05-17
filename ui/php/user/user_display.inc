@@ -14,6 +14,7 @@
 // Direct fields
 $fieldnames["userobm_login"] = $l_login;
 $fieldnames["userobm_system"] = $l_system;
+$fieldnames["domain_label"] = $l_domain;
 $fieldnames["userobm_local"] = $l_local;
 $fieldnames["userobm_ext_id"] = $l_ext_id;
 $fieldnames["userobm_perms"] = $l_profile;
@@ -173,6 +174,7 @@ function html_user_search_form($user) {
   
   $login = $user["login"];
   $perms = $user["perms"];
+  $domain_id = $user["domain"];
   $lname = stripslashes($user["lastname"]);
   $email = $user["email"];
   $phone = $user["phone"];
@@ -210,6 +212,13 @@ function html_user_search_form($user) {
       <option value=\"$profile\"> $profile</option>";
   }
 
+  if ($obm["domain_id"] == 0) {
+    $sel_domain = of_domain_dis_select($domain_id, "all");
+    $dis_domain = "<label>$l_domain<br />
+      $sel_domain
+    </label>";
+  }
+
   $block = "
   <form method=\"get\" name=\"f_search\"
     action=\"". url_prepare("user_index.php")."\" class=\"search\"> 
@@ -222,6 +231,7 @@ function html_user_search_form($user) {
       <input type=\"text\" name=\"tf_lastname\" size=\"16\" maxlength=\"32\"
       value=\"$lname\" />
     </label>
+    $dis_domain
     <label>$l_profile<br />
       <select type=\"text\" name=\"sel_perms\">
         <option value=\"$c_all\"> $l_all</option>

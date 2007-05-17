@@ -87,6 +87,8 @@ CREATE TABLE UserObm (
   userobm_password_type       char(6) DEFAULT 'PLAIN' NOT NULL,
   userobm_password            varchar(64) DEFAULT '' NOT NULL,
   userobm_perms               varchar(254),
+  userobm_delegation_target   varchar(64) DEFAULT '',
+  userobm_delegation          varchar(64) DEFAULT '',
   userobm_calendar_version    timestamp(14),
   userobm_uid                 int(8),
   userobm_gid                 int(8),

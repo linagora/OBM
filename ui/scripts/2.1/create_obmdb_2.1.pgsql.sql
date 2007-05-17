@@ -87,6 +87,8 @@ CREATE TABLE UserObm (
   userobm_password_type       varchar(6) DEFAULT 'PLAIN' NOT NULL,
   userobm_password            varchar(64) DEFAULT '' NOT NULL,
   userobm_perms               varchar(254),
+  userobm_delegation_target   varchar(64) DEFAULT '',
+  userobm_delegation          varchar(64) DEFAULT '',
   userobm_calendar_version    timestamp,
   userobm_uid                 integer,
   userobm_gid                 integer,
@@ -1666,5 +1668,37 @@ CREATE TABLE P_MailServer (like MailServer);
 CREATE TABLE P_MailServerNetwork (like MailServerNetwork);
 CREATE TABLE P_MailShare (like MailShare);
 CREATE TABLE P_EntityRight (like EntityRight);
+
+
+-------------------------------------------------------------------------------
+-- Tables needed for Automate work
+-------------------------------------------------------------------------------
+--
+-- Table structure for the table 'Deleted'
+--
+CREATE TABLE Deleted (
+  deleted_id         serial,
+  deleted_domain_id  integer,
+  deleted_entity     varchar(32),
+  deleted_entity_id  integer,
+  deleted_user_id    integer,
+  deleted_timestamp  timestamp,
+  PRIMARY KEY (deleted_id)
+);
+
+
+--
+-- Table structure for the table 'Updated'
+--
+CREATE TABLE Updated (
+  updated_id         serial,
+  updated_domain_id  integer,
+  updated_entity     varchar(32),
+  updated_entity_id  integer,
+  updated_user_id    integer,
+  updated_type       char(1),
+  PRIMARY KEY (updated_id)
+);
+
 
 COMMIT;

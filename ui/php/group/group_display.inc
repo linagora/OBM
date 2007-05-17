@@ -368,7 +368,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $l_system, $l_local, $l_ext_id, $l_smb;
   global $l_visibility, $l_private, $l_public;  
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
-  global $obm, $display, $perm, $module, $action, $cright_write;
+  global $obm, $display, $module, $action, $cright_write;
   global $cg_gid_smb_user, $cg_gid_smb_admin;
   global $cgp_use, $cgp_hide;
 
@@ -379,7 +379,8 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $timeupdate = $group_q->f("timeupdate");
   $system = ($group_q->f("group_system") == 1 ? $l_yes : $l_no);
   $local = ($group_q->f("group_local") == 1 ? $l_yes : $l_no);
-  $privacy = ($group_q->f("group_privacy") == 1 ? $l_private : $l_public);
+  $privacy = $group_q->f("group_privacy");
+  $dis_privacy = ($privacy == 1 ? $l_private : $l_public);
   $ext_id = $group_q->f("group_ext_id");
   $name = $group_q->f("group_name");
   $desc = $group_q->f("group_desc");
@@ -393,7 +394,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     $dis_email = "$email";
   }
 
-  if($group_q->f("group_privacy") == 0) {
+  if ($privacy == 0) {
     $dis_email = "<tr>
       <th>$l_email</th>
       <td>$dis_email</td>
@@ -418,12 +419,9 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   }
   $block_userdata .= of_userdata_dis_entity_consult("group", $id);
 
-  // Prevent to update samba systems groups
-  $update_group = true;
-  if (($gid == $cg_gid_smb_admin) || ($gid == $cg_gid_smb_user)
-      || (! $perm->check_right($menu, $cright_write))) {
-    $update_group = false;
-  }
+  // Check update rights to allow to remove users
+  $g = array('group_id' => $id, 'privacy' => $privacy, '$gid' => $gid); 
+  $update_group = check_group_update_rights($g);
 
   // Display members groups
   $nb_g = $g_q->num_rows_total();
@@ -532,7 +530,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     $block_samba
     <tr>
       <th>$l_visibility</th>
-      <td>$privacy</td>
+      <td>$dis_privacy</td>
     </tr>
     $dis_email
     </table>

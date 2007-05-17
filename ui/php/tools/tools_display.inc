@@ -76,7 +76,7 @@ function dis_tools_update_detail() {
   global $l_user, $l_group, $l_host, $l_mailshare;
   global $l_header_tools_upd;
   global $l_header_tools_upd_admin, $l_header_tools_upd_domain;
-  global $l_validate, $l_cancel;
+  global $l_validate, $l_cancel, $l_error_permission;
 
   $update_state = get_update_state();
 
@@ -97,7 +97,7 @@ function dis_tools_update_detail() {
   }
 
   if (! isset($profiles[$obm['profile']]['conf']['admin_realm'])) {
-    $block = "No admin rights... !!";
+    $display["msg"] = display_warn_msg("$l_error_permission");
     return $block;
   }
 

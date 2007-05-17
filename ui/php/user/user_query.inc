@@ -25,6 +25,7 @@ function run_query_user_search($user) {
   $restriction = $user["restriction_calendar"];
   $login = sql_search_text_parse($user["login"]);
   $perms = $user["perms"];
+  $domain_id = $user["domain"];
   $lname = sql_search_text_parse($user["lastname"]);
   $email = sql_search_text_parse($user["email"]);
   $desc = sql_search_text_parse($user["desc"]);
@@ -66,6 +67,12 @@ function run_query_user_search($user) {
   if (($perms != $c_all) && ($perms != "")) {
      if (trim($where) != "") $where .= " AND";
      $where .= " userobm_perms='$perms'";
+  }
+
+  // If a user domain indication has been specified, get it
+  if (($domain_id != $c_all) && ($domain_id != "")) {
+     if (trim($where) != "") $where .= " AND";
+     $where .= " userobm_domain_id='$domain_id'";
   }
 
   // If a lastname indication has been specified, get it
