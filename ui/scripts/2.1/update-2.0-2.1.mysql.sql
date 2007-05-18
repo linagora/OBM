@@ -35,9 +35,10 @@ ALTER TABLE UserObm ADD COLUMN userobm_delegation varchar(64) DEFAULT '' AFTER u
 CREATE TABLE Deleted (
   deleted_id         int(8) auto_increment,
   deleted_domain_id  int(8),
+  deleted_user_id    int(8),
+  deleted_delegation varchar(64),
   deleted_entity     varchar(32),
   deleted_entity_id  int(8),
-  deleted_user_id    int(8),
   deleted_timestamp  timestamp(14),
   PRIMARY KEY (deleted_id)
 );

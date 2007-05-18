@@ -8,7 +8,7 @@
 ###############################################################################
 
 # Get obm_conf.ini parameters
-function getVal () {
+getVal () {
    echo Recherche $1
    VALUE=`grep ^$1\ *= ../../conf/obm_conf.ini | cut -d= -f2 | tr -d '^ ' | tr -d '" '`
    echo $VALUE

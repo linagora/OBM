@@ -38,9 +38,10 @@ ALTER TABLE UserObm ALTER COLUMN userobm_delegation SET DEFAULT '';
 CREATE TABLE Deleted (
   deleted_id         serial,
   deleted_domain_id  integer,
+  deleted_user_id    integer,
+  deleted_delegation varchar(64),
   deleted_entity     varchar(32),
   deleted_entity_id  integer,
-  deleted_user_id    integer,
   deleted_timestamp  timestamp,
   PRIMARY KEY (deleted_id)
 );
