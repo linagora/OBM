@@ -27,6 +27,7 @@ $l_creator = "Creador";
 $l_date_creation = "Creación";
 $l_updater = "Actualizado por";
 $l_date_last_update = "Última Actualización";
+$l_delegation = "Delegation";
 
 // Common messages
 $l_yes = "Si";

@@ -18,6 +18,7 @@ $fieldnames["domain_label"] = $l_domain;
 $fieldnames["userobm_local"] = $l_local;
 $fieldnames["userobm_ext_id"] = $l_ext_id;
 $fieldnames["userobm_perms"] = $l_profile;
+$fieldnames["userobm_delegation"] = $l_delegation;
 $fieldnames["userobm_archive"] = $l_archive;
 $fieldnames["userobm_lastname"] = $l_lastname;
 $fieldnames["userobm_firstname"] = $l_firstname;
@@ -168,18 +169,19 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 //     keys used : login, lastname, perms, archive, popup
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
-  global $l_login, $l_lastname, $l_profile, $l_find, $l_all, $l_archive;
-  global $l_email, $l_phone, $l_desc, $l_group, $l_add_users;
+  global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
+  global $l_group, $l_email, $l_phone, $l_desc, $l_delegation, $l_find, $l_all;
   global $display, $c_all, $profiles;
   
   $login = $user["login"];
-  $perms = $user["perms"];
+  $profile = $user["profile"];
   $domain_id = $user["domain"];
   $lname = stripslashes($user["lastname"]);
   $email = $user["email"];
   $phone = $user["phone"];
   $desc = $user["desc"];
   $group = $user["group"];
+  $delegation = $user["delegation"];
   $archive = ($user["archive"] == "1" ? "checked" : "");
   $popup = $user["popup"];
   if ($user["restriction_calendar"]) {
@@ -207,9 +209,9 @@ function html_user_search_form($user) {
     $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
 
-  foreach ($profiles as $profile => $one_profile) {
+  foreach ($profiles as $k_profile => $one_profile) {
     $block_profile .= "
-      <option value=\"$profile\"> $profile</option>";
+      <option value=\"$k_profile\"> $k_profile</option>";
   }
 
   if ($obm["domain_id"] == 0) {
@@ -233,10 +235,14 @@ function html_user_search_form($user) {
     </label>
     $dis_domain
     <label>$l_profile<br />
-      <select type=\"text\" name=\"sel_perms\">
+      <select type=\"text\" name=\"sel_profile\">
         <option value=\"$c_all\"> $l_all</option>
         $block_profile
       </select>
+    </label>
+    <label>$l_delegation<br />
+      <input type=\"text\" name=\"tf_delegation\" size=\"16\" maxlength=\"64\"
+      value=\"$delegation\" />
     </label>
     <label>$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" maxlength=\"32\"
@@ -312,8 +318,9 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
 
   $login = urlencode($user["login"]);
   $lname = urlencode($user["lastname"]);
-  $perms = $user["perms"];
+  $profile = $user["profile"];
   $email = $user["email"];
+  $delegation = urlencode($user["delegation"]);
   $desc = urlencode($user["desc"]);
   $group = urlencode($user["group"]);
   $archive = $user["archive"];
@@ -329,7 +336,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
   }
 
-  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;tf_email=$email&amp;tf_desc=$desc&amp;tf_group=$group&amp;cba_archive=$archive$url_ext");
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_group=$group&amp;cba_archive=$archive$url_ext");
 
   $user_d = new OBM_DISPLAY("DATA", $prefs, "user");
   if ($popup) {
@@ -416,7 +423,7 @@ function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_profile, $l_lastname, $l_firstname, $l_title;
   global $l_domain, $l_user, $l_lastaccess, $l_archive, $l_datebegin;
   global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal;
-  global $l_direction, $l_service;
+  global $l_delegation_target, $l_delegation, $l_direction, $l_service;
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_email, $l_desc;
   global $l_group_member, $l_group, $l_local, $l_ext_id;
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
@@ -433,10 +440,12 @@ function html_user_consult($obm_q) {
   $login = $obm_q->f("userobm_login");
   $local = ($obm_q->f("userobm_local") == 1 ? $c_yes : $c_no);
   $ext_id = $obm_q->f("userobm_ext_id");
-  $perms = $obm_q->f("userobm_perms");
+  $profile = $obm_q->f("userobm_perms");
   $lname = $obm_q->f("userobm_lastname");
   $fname = $obm_q->f("userobm_firstname");
   $title = $obm_q->f("userobm_title");
+  $delegation_target = $obm_q->f("userobm_delegation_target");
+  $delegation = $obm_q->f("userobm_delegation");
   $desc = $obm_q->f("userobm_description");
   $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
@@ -500,6 +509,7 @@ function html_user_consult($obm_q) {
   $smb_state  = ($smb_perms ? $l_enabled : $l_disabled);
 
   $block_userdata .= of_userdata_dis_entity_consult("user", $id);
+
   // Liste des groupes de l'utilisateur
   $g_q = run_query_user_user_group($id);
   if ($g_q->num_rows() > 0) {
@@ -519,6 +529,18 @@ function html_user_consult($obm_q) {
     $dis_group .= "
     </tr>
     </table></div>";
+  }
+
+  // Target Delegation handling (if user as delegation admin realm)
+  $admin_realm = $profiles[$profile]['properties']['admin_realm'];
+  if (is_array($admin_realm)) {
+    if (in_array('delegation', $admin_realm)) {
+      $dis_delegation_target = "
+  <tr>
+    <th>$l_delegation_target</th>
+    <td>$tf_delegation_target</td>
+  </tr>";
+    }
   }
 
   // Section Web
@@ -695,7 +717,11 @@ function html_user_consult($obm_q) {
   </tr>
   <tr>
     <th>$l_profile</th>
-    <td>$perms</td>
+    <td>$profile</td>
+  </tr>
+  <tr>
+    <th>$l_delegation_target</th>
+    <td>$delegation_target</td>
   </tr>
   <tr>
     <th>$l_lastname</th>
@@ -704,6 +730,10 @@ function html_user_consult($obm_q) {
   <tr>
     <th>$l_firstname</th>
     <td>$fname</td>
+  </tr>
+  <tr>
+    <th>$l_delegation</th>
+    <td>$delegation</td>
   </tr>
   <tr>
     <th>$l_title</th>
@@ -863,8 +893,9 @@ function html_user_group_consult($usr_q) {
 //   - $field : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($usr_q, $user, $field="") {
-  global $l_login, $l_password, $l_profile, $l_lastname, $l_firstname, $l_title;
-  global $l_user, $l_archive, $l_datebegin, $l_insert, $l_update;
+  global $l_login, $l_password, $l_profile, $l_lastname, $l_firstname;
+  global $l_user, $l_title, $l_archive, $l_datebegin, $l_insert, $l_update;
+  global $l_delegation, $l_delegation_target;
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
@@ -883,11 +914,13 @@ function html_user_form($usr_q, $user, $field="") {
     $id = $usr_q->f("userobm_id");
     $login = $usr_q->f("userobm_login");
     $passwd = "";
-    $perms = $usr_q->f("userobm_perms");
+    $profile = $usr_q->f("userobm_perms");
     $lastaccess = $usr_q->f("lastaccess");
     $lname = $usr_q->f("userobm_lastname");
     $fname = $usr_q->f("userobm_firstname");
     $title = $usr_q->f("userobm_title");
+    $delegation_target = $usr_q->f("userobm_delegation_target");
+    $delegation = $usr_q->f("userobm_delegation");
     $desc = $usr_q->f("userobm_description");
     $datebegin = $usr_q->f("userobm_datebegin");
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
@@ -950,12 +983,14 @@ function html_user_form($usr_q, $user, $field="") {
   if (isset($user["domain"])) { $domain_id = $user["domain"]; }
   if (isset($user["login"])) { $login = $user["login"]; }
   if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
-  if (isset($user["perms"])) { $perms = $user["perms"]; }
+  if (isset($user["profile"])) { $profile = $user["profile"]; }
   if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
   if (isset($user["title"])) { $title = stripslashes($user["title"]); }
   if (isset($user["email"])) { $email = $user["email"]; }
   if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
+  if (isset($user["delegation_target"])) { $delegation_target = stripslashes($user["delegation_target"]); }
+  if (isset($user["delegation"])) { $delegation = stripslashes($user["delegation"]); }
   if (isset($user["desc"])) { $desc = $user["desc"]; }
   if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
 
@@ -1030,14 +1065,14 @@ function html_user_form($usr_q, $user, $field="") {
   }
 
   // Profiles
-  foreach ($profiles as $profile => $one_profile) {
-    if ($perms == $profile) {
+  foreach ($profiles as $k_profile => $one_profile) {
+    if ($profile == $k_profile) {
       $selected = " selected";
     } else {
       $selected = "";
     }
     $block_profile .= "
-      <option value=\"$profile\"$selected> $profile</option>";
+      <option value=\"$k_profile\"$selected> $k_profile</option>";
   }
 
   // Section Web
@@ -1127,9 +1162,7 @@ function html_user_form($usr_q, $user, $field="") {
       <td><input type=\"text\" name=\"ta_email\" value=\"$email\" /></td>
     </tr>
     </table>
-    </fieldset>
-";
-
+    </fieldset>";
   }
 
   if ($cgp_use["service"]["mail_nomad"]) {
@@ -1223,6 +1256,35 @@ function html_user_form($usr_q, $user, $field="") {
       <input type=\"submit\" value=\"$l_update\" />";
   }
 
+  // Target Delegation handling (if updated user as delegation admin realm)
+  $admin_realm = $profiles[$profile]['properties']['admin_realm'];
+  if (is_array($admin_realm)) {
+    if (in_array('delegation', $admin_realm)) {
+      $dis_delegation_target = "
+  <tr>
+    <th class=\"$class[delegation_target]\">$l_delegation_target</th>
+    <td><input name=\"tf_delegation_target\" size=\"32\" maxlength=\"64\" value=\"$delegation_target\" /></td>
+  </tr>";
+    }
+  }
+
+  // Delegation handling
+  $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
+  if (is_array($admin_realm)) {
+    if (in_array('delegation', $admin_realm)) {
+      $delegation = $obm['delegation'];
+      $input_delegation = $delegation;
+    }
+    if (in_array('domain', $admin_realm)) {
+      $input_delegation = "<input name=\"tf_delegation\" size=\"32\" maxlength=\"64\" value=\"$delegation\" />";
+    }
+    $dis_delegation = "
+  <tr>
+    <th class=\"$class[delegation]\">$l_delegation</th>
+    <td>$input_delegation</td>
+  </tr>";
+  }
+
   // some constants
   $csize_add = "48";
   $cmax_add = "64";
@@ -1252,12 +1314,13 @@ function html_user_form($usr_q, $user, $field="") {
     <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
   </tr>
   <tr>
-    <th class=\"$class[perms]\">$l_profile</th>
-    <td><select name=\"sel_perms\">
+    <th class=\"$class[profile]\">$l_profile</th>
+    <td><select name=\"sel_profile\">
       $block_profile
       </select>
     </td>
   </tr>
+  $dis_delegation_target
   <tr>
     <th class=\"$class[lastname]\">$l_lastname</th>
     <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"32\" value=\"$lname\" /></td>
@@ -1266,6 +1329,7 @@ function html_user_form($usr_q, $user, $field="") {
     <th class=\"$class[firstname]\">$l_firstname</th>
     <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
   </tr>
+  $dis_delegation
   <tr>
     <th class=\"$class[title]\">$l_title</th>
     <td><input name=\"tf_title\" size=\"32\" maxlength=\"32\" value=\"$title\" /></td>

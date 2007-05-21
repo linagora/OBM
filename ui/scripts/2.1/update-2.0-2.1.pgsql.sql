@@ -20,13 +20,35 @@ ALTER TABLE Lead ALTER COLUMN lead_contact_id SET DEFAULT 0;
 
 
 -------------------------------------------------------------------------------
--- Update UserObm table
+-- Add delegation fields
 -------------------------------------------------------------------------------
--- Add delegation fields (for delegated admin)
+-- UserObm (delegation + delegation target)
 ALTER TABLE UserObm ADD COLUMN userobm_delegation_target varchar(64);
 ALTER TABLE UserObm ALTER COLUMN userobm_delegation_target SET DEFAULT '';
+ALTER TABLE P_UserObm ADD COLUMN userobm_delegation_target varchar(64);
+ALTER TABLE P_UserObm ALTER COLUMN userobm_delegation_target SET DEFAULT '';
 ALTER TABLE UserObm ADD COLUMN userobm_delegation varchar(64);
 ALTER TABLE UserObm ALTER COLUMN userobm_delegation SET DEFAULT '';
+ALTER TABLE P_UserObm ADD COLUMN userobm_delegation varchar(64);
+ALTER TABLE P_UserObm ALTER COLUMN userobm_delegation SET DEFAULT '';
+
+-- UGroup
+ALTER TABLE UGroup ADD COLUMN group_delegation varchar(64);
+ALTER TABLE UGroup ALTER COLUMN group_delegation SET DEFAULT '';
+ALTER TABLE P_UGroup ADD COLUMN group_delegation varchar(64);
+ALTER TABLE P_UGroup ALTER COLUMN group_delegation SET DEFAULT '';
+
+-- MailShare
+ALTER TABLE MailShare ADD COLUMN mailshare_delegation varchar(64);
+ALTER TABLE MailShare ALTER COLUMN mailshare_delegation SET DEFAULT '';
+ALTER TABLE P_MailShare ADD COLUMN mailshare_delegation varchar(64);
+ALTER TABLE P_MailShare ALTER COLUMN mailshare_delegation SET DEFAULT '';
+
+-- MailShare
+ALTER TABLE Host ADD COLUMN host_delegation varchar(64);
+ALTER TABLE Host ALTER COLUMN host_delegation SET DEFAULT '';
+ALTER TABLE P_Host ADD COLUMN host_delegation varchar(64);
+ALTER TABLE P_Host ALTER COLUMN host_delegation SET DEFAULT '';
 
 
 -------------------------------------------------------------------------------
@@ -39,7 +61,7 @@ CREATE TABLE Deleted (
   deleted_id         serial,
   deleted_domain_id  integer,
   deleted_user_id    integer,
-  deleted_delegation varchar(64),
+  deleted_delegation varchar(64) DEFAULT '',
   deleted_entity     varchar(32),
   deleted_entity_id  integer,
   deleted_timestamp  timestamp,
@@ -54,7 +76,7 @@ CREATE TABLE Updated (
   updated_id         serial,
   updated_domain_id  integer,
   updated_user_id    integer,
-  updated_delegation varchar(64),
+  updated_delegation varchar(64) DEFAULT '',
   updated_entity     varchar(32),
   updated_entity_id  integer,
   updated_type       char(1),

@@ -135,40 +135,47 @@ function check_tools_update_context() {
 ///////////////////////////////////////////////////////////////////////////////
 // Get update types number for an entity
 // Parameters:
+//   - $entity : entity to get numbers
 //   - $table  : table where to check
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (my | domain | target)
-//   - $target : target to check for realm target
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_numbers($table, $field="", $realm, $target="") {
+function get_update_numbers($entity, $table, $field="", $realm) {
   global $cdg_sql, $obm;
+
+  $uid = $obm["uid"];
 
   $nb_add = 0;
   $nb_upd = 0;
   $nb_del = 0;
   $e1 = array();
   $e2 = array();
+  $delegation = $obm['delegation'];
   $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   if ($field != "") {
     $f = $field;
     $uc = "${field}_usercreate";
     $uu = "${field}_userupdate";
+    $dg = "${field}_delegation";
   } else {
     $f = strtolower($table);
     $uc = "${f}_usercreate";
     $uu = "${f}_userupdate";
+    $dg = "${f}_delegation";
   }
 
   $multidomain = sql_multidomain("$f");
 
   // Restrict updates to the realm selected (my, domain, target)
   if ($realm == "my") {
-    $uid = $obm["uid"];
     $where_upd = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
     $where_prod = "WHERE 1=1 $multidomain";
-  } else if ($realm == "target") {
-
+  } else if ($realm == "delegation") {
+    $where_upd = "WHERE ($dg $like '$delegation%') $multidomain";
+    $where_prod = "WHERE 1=1 $multidomain";
   } else {
     $where_upd = "WHERE 1=1 $multidomain";
     $where_prod = "WHERE 1=1 $multidomain";
@@ -223,13 +230,22 @@ function get_update_numbers($table, $field="", $realm, $target="") {
     // Get the delete from the Deleted table
     $query = "SELECT count(*) as nb FROM Deleted
      WHERE deleted_user_id=$uid
-       AND deleted_entity='user'";
+       AND deleted_entity='$entity'";
     display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
     $retour = $obm_q->query($query);
     $obm_q->next_record();
     $nb_del = $obm_q->f("nb");
 
-  } else if ($realm == "target") {
+  } else if ($realm == "delegation") {
+
+    // Get the delete from the Deleted table
+    $query = "SELECT count(*) as nb FROM Deleted
+     WHERE deleted_delegation $like '$delegation%'
+       AND deleted_entity='$entity'";
+    display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
+    $retour = $obm_q->query($query);
+    $obm_q->next_record();
+    $nb_del = $obm_q->f("nb");
 
   } else {
     // Case domain, just count lines present in prod, but not present in upd

@@ -180,7 +180,8 @@ class OBM_Challenge_Auth extends Auth {
         userobm_perms,
         userobm_password,
         userobm_password_type,
-        userobm_domain_id
+        userobm_domain_id,
+        userobm_delegation_target
       FROM $user_table
       WHERE userobm_login = '$user_login'
         AND userobm_archive = '0'
@@ -197,6 +198,7 @@ class OBM_Challenge_Auth extends Auth {
       // This trim for a strange behaviour while testing oea db
       $crypt = trim(strtoupper($this->db->f("userobm_password_type")));
       $domain_id = $this->db->f("userobm_domain_id");
+      $delegation = $this->db->f("userobm_delegation_target");
     }
 
     switch($crypt) {
@@ -216,6 +218,7 @@ class OBM_Challenge_Auth extends Auth {
     if ($encrypted == $pass) {
       $obm["profile"] = $perm;
       $obm["domain_id"] = $domain_id;
+      $obm["delegation"] = $delegation;
       return $uid;
     } else {
       return false;

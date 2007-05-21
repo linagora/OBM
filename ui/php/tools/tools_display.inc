@@ -78,7 +78,7 @@ function dis_tools_update_detail() {
   global $l_header_tools_upd_admin, $l_header_tools_upd_domain;
   global $l_validate, $l_cancel, $l_error_permission;
 
-  $update_state = get_update_state();
+  /*  $update_state = get_update_state();
 
   // No update, display this and return
   if (! $update_state) {
@@ -95,8 +95,9 @@ function dis_tools_update_detail() {
 
     return $block;
   }
+  */
 
-  if (! isset($profiles[$obm['profile']]['conf']['admin_realm'])) {
+  if (! isset($profiles[$obm['profile']]['properties']['admin_realm'])) {
     $display["msg"] = display_warn_msg("$l_error_permission");
     return $block;
   }
@@ -106,24 +107,25 @@ function dis_tools_update_detail() {
 		    "host" => array("Host", "host"),
 		    "mailshare" => array("MailShare", "mailshare"));
 
-  // Loop through all udpates "realms" (own updates, target updates, domain)
-  foreach ($profiles[$obm['profile']]['conf']['admin_realm'] as $realm) {
-    if ($realm == 'target') {
-      $target = $profiles[$obm['profile']]['conf']['admin_target'];
-    }
+  // Loop through all udpates "realms" (my, delegation, domain)
+  foreach ($profiles[$obm['profile']]['properties']['admin_realm'] as $realm) {
 
     $has_update = false;
     $dis_row_update = "";
     $detail_title = "l_upd_$realm";
     global $$detail_title;
     $dis_detail_title = $$detail_title;
+    if ($realm == 'delegation') {
+      $dis_detail_title .= " (". $obm['delegation'] . ") ";
+    }
+
 
     foreach ($entities as $entity=>$db_info) {
       $table = $db_info[0];
       $field = $db_info[1];
       $dis_entity = ${"l_$entity"};
       if ($cgp_show["module"]["$entity"]) {
-	$nb = get_update_numbers($table, $field, $realm, $target);
+	$nb = get_update_numbers($entity, $table, $field, $realm);
 	if ($nb['move'] > 0) {
 	  $has_update = true;
 	}

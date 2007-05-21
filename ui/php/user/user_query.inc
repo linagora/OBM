@@ -24,9 +24,10 @@ function run_query_user_search($user) {
 
   $restriction = $user["restriction_calendar"];
   $login = sql_search_text_parse($user["login"]);
-  $perms = $user["perms"];
+  $profile = $user["profile"];
   $domain_id = $user["domain"];
   $lname = sql_search_text_parse($user["lastname"]);
+  $delegation = sql_search_text_parse($user["delegation"]);
   $email = sql_search_text_parse($user["email"]);
   $desc = sql_search_text_parse($user["desc"]);
   $group = sql_search_text_parse($user["group"]);
@@ -63,10 +64,10 @@ function run_query_user_search($user) {
      $where .= " userobm_login $like '$login%'";
   }
 
-  // If a user perms indication has been specified, get it
-  if (($perms != $c_all) && ($perms != "")) {
+  // If a user profile indication has been specified, get it
+  if (($profile != $c_all) && ($profile != "")) {
      if (trim($where) != "") $where .= " AND";
-     $where .= " userobm_perms='$perms'";
+     $where .= " userobm_perms='$profile'";
   }
 
   // If a user domain indication has been specified, get it
@@ -79,6 +80,12 @@ function run_query_user_search($user) {
   if (trim($lname) != "") {
      if (trim($where) != "") $where .= " AND";
      $where .= " userobm_lastname $like '$lname%'";
+  }
+
+  // If a delegation indication has been specified, get it
+  if (trim($delegation) != "") {
+     if (trim($where) != "") $where .= " AND";
+     $where .= " userobm_delegation $like '$delegation%'";
   }
 
   // If an email indication has been specified, get it
@@ -200,9 +207,9 @@ function run_query_user_ext_search($user) {
   $obm_q->query($query);
 
   return $obm_q;
-      
-
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // User detail query execution
 // Parameters:
@@ -259,7 +266,7 @@ function run_query_user_detail($p_id) {
 //   $id : new user id if ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_insert($user) {
-  global $obm, $cdg_sql, $cgp_use, $obm, $password_encryption, $perms_admin;
+  global $obm, $profiles, $cdg_sql, $cgp_use, $obm, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
   $now = date("Y-m-d H:i:s");
@@ -277,7 +284,7 @@ function run_query_user_insert($user) {
   }
 
   // infos
-  $perms = $user["perms"];
+  $profile = $user["profile"];
   $archive = ($user["archive"] == "1" ? "1" : "0");
   $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
   $lname = $user["lastname"];
@@ -285,6 +292,30 @@ function run_query_user_insert($user) {
   $title = $user["title"];
   $email = $user["email"];
   $desc = $user["desc"];
+
+  // Target Delegation handling (if updated user as delegation admin realm)
+  $admin_realm = $profiles[$profile]['properties']['admin_realm'];
+  if (is_array($admin_realm)) {
+    if (in_array('delegation', $admin_realm)) {
+      $delegation_target = stripslashes($user["delegation_target"]);
+      $q_insert_delegation_target = ",
+    userobm_delegation_target";
+      $q_value_delegation_target = ",
+    '$delegation_target'";
+    }
+  }
+
+  // Delegation handling
+  $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
+  if (is_array($admin_realm)) {
+    if (in_array('delegation', $admin_realm)) {
+      $delegation = stripslashes($user["delegation"]);
+      $q_insert_delegation = ",
+    userobm_delegation";
+      $q_value_delegation = ",
+    '$delegation'";
+    }
+  }
 
   // Coord
   $phone = $user["phone"];
@@ -388,7 +419,7 @@ function run_query_user_insert($user) {
 
   // Uid, gid
   $user_uid = get_first_user_free_uid();
-  if ($perms == "$perms_admin") {
+  if ($profile == "$perms_admin") {
     if ($cgp_use["service"]["samba"]) {
       $gid = $cg_gid_smb_admin;
     } else {
@@ -408,7 +439,7 @@ function run_query_user_insert($user) {
     $domain_id = $obm["domain_id"];
   }
   if ($domain_id == 0) {
-    $perms == "admin";
+    $profile == "admin";
   }
   $query = "INSERT INTO UserObm (
     userobm_domain_id,
@@ -442,6 +473,8 @@ function run_query_user_insert($user) {
     userobm_fax2,
     userobm_email,
     userobm_description
+    $q_insert_delegation_target
+    $q_insert_delegation
     $query_insert_web
     $query_insert_mail
     $query_insert_mail_nomad
@@ -456,7 +489,7 @@ function run_query_user_insert($user) {
     '$login',
     '$passwd_crypt',
     '$password_encryption',
-    '$perms',
+    '$profile',
     '$user_uid',
     '$gid',
     '$archive',
@@ -479,6 +512,8 @@ function run_query_user_insert($user) {
     '$fax2',
     '$email',
     '$desc'
+    $q_value_delegation_target
+    $q_value_delegation
     $query_values_web
     $query_values_mail
     $query_values_mail_nomad
@@ -570,7 +605,7 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
 //     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_update($p_id, $user) {
-  global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
+  global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
   global $cmd_ldap_passwd;
 
@@ -588,7 +623,7 @@ function run_query_user_update($p_id, $user) {
     }
     $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type='$password_encryption'";
 
-    if( $cgp_use["service"]["ldap"] ) {
+    if ($cgp_use["service"]["ldap"]) {
       $query="UPDATE P_UserObm SET
         $passwd_update
         WHERE userobm_id='$p_id' $multidomain";
@@ -618,7 +653,7 @@ function run_query_user_update($p_id, $user) {
   }
 
   // infos
-  $perms = $user["perms"];
+  $profile = $user["profile"];
   $archive = ($user["archive"] == "1" ? "1" : "0");
   $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
   $lname = $user["lastname"];
@@ -627,6 +662,26 @@ function run_query_user_update($p_id, $user) {
   $email = $user["email"];
   $desc = $user["desc"];
   $multidomain = sql_multidomain("userobm");
+
+  // Target Delegation handling (if updated user as delegation admin realm)
+  $admin_realm = $profiles[$profile]['properties']['admin_realm'];
+  if (is_array($admin_realm)) {
+    if (in_array('delegation', $admin_realm)) {
+      $delegation_target = stripslashes($user["delegation_target"]);
+      $q_delegation_target = ",
+    userobm_delegation_target='$delegation_target'";
+    }
+  }
+
+  // Delegation handling
+  $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
+  if (is_array($admin_realm)) {
+    if (in_array('delegation', $admin_realm)) {
+      $delegation = stripslashes($user["delegation"]);
+      $q_delegation = ",
+    userobm_delegation='$delegation'";
+    }
+  }
 
   // Coord
   $phone = $user["phone"];
@@ -723,14 +778,14 @@ function run_query_user_update($p_id, $user) {
     }
   }
   if ($domain_id == 0) {
-    $perms == "admin";
+    $profile == "admin";
   }
 
   $query = "UPDATE UserObm SET
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
     userobm_userupdate='". $obm["uid"] ."',
     $passwd_update
-    userobm_perms='$perms',
+    userobm_perms='$profile',
     userobm_gid='$gid',
     userobm_archive='$archive',
     userobm_datebegin=$datebegin,
@@ -751,6 +806,8 @@ function run_query_user_update($p_id, $user) {
     userobm_expresspostal = '$cdx',
     userobm_email='$email',
     userobm_description='$desc'
+    $q_delegation_target
+    $q_delegation
     $query_web
     $query_mail
     $query_mail_nomad
@@ -1016,7 +1073,7 @@ function check_user_context($p_id, $user) {
 
   $login = $user["login"];
   $passwd = $user["passwd"];
-  $perms = $user["perms"];
+  $profile = $user["profile"];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $phone = $user["phone"];
@@ -1087,7 +1144,7 @@ function check_user_data_form($p_id, $user) {
   $id = $user["user_id"];
   $login = $user["login"];
   $passwd = $user["passwd"];
-  $perms = $user["perms"];
+  $profile = $user["profile"];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $title = $user["title"];
@@ -1119,12 +1176,12 @@ function check_user_data_form($p_id, $user) {
   if ($action == "update") {
     $u = get_user_info($id);
     // MANDATORY: we do not allow to update last admin'perms
-    $usr_perm = $u["perms"];
-    if (($usr_perm == $perms_admin) && ($perms != $perms_admin)) {
+    $usr_profile = $u["perms"];
+    if (($usr_profile == $perms_admin) && ($profile != $perms_admin)) {
       $nb_admin = get_nb_user_admin();
       if ($nb_admin < 2) {
 	$err["msg"] = "$l_last_admin_error";
-	$err["field"] = "perms";
+	$err["field"] = "profile";
 	return false;
       }
     }

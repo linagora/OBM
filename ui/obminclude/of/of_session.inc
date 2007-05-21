@@ -383,7 +383,7 @@ class Perm {
           'default' => $perm_admin)
       );
     }
-    if($obm["domain_id"] == 0) {
+    if ($obm["domain_id"] == 0) {
       $profiles[$obm["profile"]] = 
          array (
           'section' => array (

@@ -19,11 +19,25 @@ ALTER TABLE Lead ADD COLUMN lead_contact_id int(8) NOT NULL DEFAULT 0 AFTER lead
 
 
 -------------------------------------------------------------------------------
--- Update UserObm table
+-- Add delegation fields
 -------------------------------------------------------------------------------
--- Add delegation field (for delegated admin)
+-- UserObm (delegation + delegation target)
 ALTER TABLE UserObm ADD COLUMN userobm_delegation_target varchar(64) DEFAULT '' AFTER userobm_perms;
-ALTER TABLE UserObm ADD COLUMN userobm_delegation varchar(64) DEFAULT '' AFTER userobm_delegation;
+ALTER TABLE P_UserObm ADD COLUMN userobm_delegation_target varchar(64) DEFAULT '' AFTER userobm_perms;
+ALTER TABLE UserObm ADD COLUMN userobm_delegation varchar(64) DEFAULT '' AFTER userobm_delegation_target;
+ALTER TABLE P_UserObm ADD COLUMN userobm_delegation varchar(64) DEFAULT '' AFTER userobm_delegation_target;
+
+-- UGroup
+ALTER TABLE UGroup ADD COLUMN group_delegation varchar(64) DEFAULT '' AFTER group_mailing;
+ALTER TABLE P_UGroup ADD COLUMN group_delegation varchar(64) DEFAULT '' AFTER group_mailing;
+
+-- MailShare
+ALTER TABLE MailShare ADD COLUMN mailshare_delegation varchar(64) DEFAULT '' AFTER mailshare_mail_server_id;
+ALTER TABLE P_MailShare ADD COLUMN mailshare_delegation varchar(64) DEFAULT '' AFTER mailshare_mail_server_id;
+
+-- Host
+ALTER TABLE Host ADD COLUMN host_delegation varchar(64) DEFAULT '' AFTER host_ip;
+ALTER TABLE P_Host ADD COLUMN host_delegation varchar(64) DEFAULT '' AFTER host_ip;
 
 
 -------------------------------------------------------------------------------
@@ -36,7 +50,7 @@ CREATE TABLE Deleted (
   deleted_id         int(8) auto_increment,
   deleted_domain_id  int(8),
   deleted_user_id    int(8),
-  deleted_delegation varchar(64),
+  deleted_delegation varchar(64) DEFAULT '',
   deleted_entity     varchar(32),
   deleted_entity_id  int(8),
   deleted_timestamp  timestamp(14),
@@ -51,7 +65,7 @@ CREATE TABLE Updated (
   updated_id         int(8) auto_increment,
   updated_domain_id  int(8),
   updated_user_id    int(8),
-  updated_delegation varchar(64),
+  updated_delegation varchar(64) DEFAULT '',
   updated_entity     varchar(32),
   updated_entity_id  int(8),
   updated_type       char(1),
