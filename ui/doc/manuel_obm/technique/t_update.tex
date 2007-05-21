@@ -5,7 +5,7 @@
 \section{Gestion des mises à jour - automate}
 \label{update}
 
-\obm permet d'alimenter (créer, modifier, supprimer) les données qui sont utilisées par les services (LDAP, messagerie,...).
+\obm permet de saisir (créer, modifier, supprimer) les données qui sont utilisées par les services (LDAP, messagerie,...) et de gérer automatiquement ces services.
 Ces données sont :\\
 \begin{itemize}
 \item Les utilisateurs
@@ -19,20 +19,389 @@ Ces données sont :\\
 \obm stocke ces données en base, et la modification des services afférents n'est pas immédiate.
 Pour appliquer les modifications il faut explicitement appliquer les mises à jour.
 
+L'application des mises à jour appelle la partie ``automate'' d'\obm qui s'occupe de gérer les services (peuplement du ldap, création des bals, quotas,..).
 
-\subsection{Principe des modifications, tables de production : P\_*}
+
+\subsection{Modèle de données pour la mise à jour}
+
+\subsubsection{Tables utilisées pour la mise à jour}
+
+Les tables de production (\db{P\_*}) sont des copies des tables standards équivalentes.\\
+
+\begin{tabular}{|p{5cm}|p{8cm}|}
+\hline
+\textbf{Table} & \textbf{Description} \\
+\hline
+P\_Domain & Production : Domain \\
+\hline
+P\_EntityRight & Production : EntityRight \\
+\hline
+P\_GroupGroup & Production : GroupGroup \\
+\hline
+P\_Host & Production : Host \\
+\hline
+P\_MailServer & Production : MailServer \\
+\hline
+P\_MailServerNetwork & Production : MailServerNetwork \\
+\hline
+P\_MailShare & Production : MailShare \\
+\hline
+P\_Samba & Production : Samba \\
+\hline
+P\_UGroup & Production : UGroup \\
+\hline
+P\_UserObm & Production : UserObm \\
+\hline
+P\_UserObmGroup & Production : UserObmGroup \\
+\hline
+P\_of\_usergroup & Production : of\_usergroup \\
+\hline
+\hline
+Deleted & stockage (temps réel) des entités supprimées \\
+\hline
+Updated & stockage (à la validation de mise à jour) des entités créées ou modifiées \\
+\hline
+Updatedlinks & stockage (à la validation de mise à jour) des liaisons créées ou modifiées \\
+\hline
+\end{tabular}
 
 
-\subsection{Les portées ou domaines de mise à jour}
+\subsubsection{Tables de production : P\_*}
 
-Les cibles de mises à jour indiquent la portée des mises à jour qui vont être prises en compte.
-Les droits sur ces portées sont définis dans les profils.
-3 portées sont définies :\\
+\obm utilise des tables :\\
 \begin{itemize}
-\item ``my'' : les modifications de l'utilisateur connecté
-\item ``domain'' : les modifications du domaine \obm
-\item ``target'' : les modifications selon un critère donné (ex: région toulouse)
+\item ``standards'' pour stocker les données traitées par l'IHM
+\item dites ``de production'' pour gérer et stocker l'état du système en production. Ces tables sont préfixées de \db{P\_}, exemple : \db{P\_UserObm}. 
 \end{itemize}
+
+\paragraph{Règles :} l'IHM n'écrit JAMAIS dans les tables de production, celles-ci sont gérées par l'automate. L'automate n'accède jamais aux tables standards.
+
+
+\subsubsection{Table Updated}
+
+La table \db{Updated} est re-initialisée à la validation d'une mise à jour avec le différentiel calculé entre les tables de mise à jour et les tables de production pour les données créées et modifiées, dans le cas de mise à jour non globale.\\
+
+\begin{tabular}{|p{3cm}|c|p{8cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} \\
+\hline
+\_id & int 8 & Identifiant, clé primaire \\
+\hline
+\_domain\_id & int 8 & Domaine d'appartenance de l'entité modifiée \\
+\hline
+\_user\_id & int 8 & Utilisateur ayant fait la modification \\
+\hline
+\_delegation & varchar 64 & Délégation (portée) de la modification \\
+\hline
+\_entity & varchar 32 & Entité modifiée (ex: company) \\
+\hline
+\_entity\_id & int 8 & Id de l'entité modifiée \\
+\hline
+\_type & char 1 & C=Création, U=modification \\
+\hline
+\end{tabular}
+
+
+\subsubsection{Table Updatedlinks}
+
+La table \db{Updatedlinks} est re-initialisée à la validation d'une mise à jour avec le différentiel calculé entre les tables de mise à jour et les tables de production pour les données de liaisons créées et modifiées, dans le cas de mise à jour non globale.\\
+
+\begin{tabular}{|p{3cm}|c|p{8cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} \\
+\hline
+\_id & int 8 & Identifiant, clé primaire \\
+\hline
+\_domain\_id & int 8 & Domaine d'appartenance de l'entité liée \\
+\hline
+\_user\_id & int 8 & Utilisateur ayant fait la modification \\
+\hline
+\_delegation & varchar 64 & Délégation (portée) de la modification (cas user)\\
+\hline
+\_table & varchar 32 & table modifiée (ex: UserObmGroup) \\
+\hline
+\_entity & varchar 32 & Entité modifiée (pour EntityRight) \\
+\hline
+\_entity\_id & int 8 & Id de l'entité modifiée \\
+\hline
+\end{tabular}
+\vspace{0,3cm}
+
+Le type de modification n'est pas enregistré car pour les liaisons, des que l'entité à une différence de liaison, toutes les liaisons de l'entité sont recréées.
+
+
+\subsubsection{Table Deleted}
+
+La table \db{Deleted} est renseignée au fur et à mesure des suppressions des données. L'intérêt est de permettre de stocker l'auteur de la suppression.\\
+
+Dans le cas d'une mise à jour globale, les données de cette table sont supprimées.
+Dans le cas d'une mise à jour avec portée non globale, l'automate supprime individuellement les lignes traitées.\\
+
+\begin{tabular}{|p{3cm}|c|p{8cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} \\
+\hline
+\_id & int 8 & Identifiant, clé primaire \\
+\hline
+\_domain\_id & int 8 & Domaine d'appartenance de l'entité supprimée \\
+\hline
+\_user\_id & int 8 & Utilisateur ayant supprimé l'entité \\
+\hline
+\_delegation & varchar 64 & Délégation (portée) de l'entité supprimée \\
+\hline
+\_entity & varchar 32 & Entité supprimée (ex: company) \\
+\hline
+\_entity\_id & int 8 & Id de l'entité supprimée \\
+\hline
+\_timestamp & timestamp & Date de suppression \\
+\hline
+\end{tabular}
+
+
+\subsection{Méthode d'application des modifications}
+
+A partir de la version 2.1 \obm propose 2 méthodes d'application des modifications :\\
+
+\begin{tabular}{|p{2,5cm}|p{4cm}|p{6,5cm}|}
+\hline
+\textbf{Méthode Maj} & \textbf{Description} & \textbf{Caractéristiques} \\
+\hline
+Selon portée
+& Calcul et application des différences entre tables standards et de production, selon la portée de la mise à jour.
+& \begin{itemize}
+\item Modifications incrémentales
+\item Rapide, selon nombre de modifications
+\item Modifications transactionnelles (résiste à une erreur de l'automate)
+\item Ne résiste pas à une désynchronisation tables de production <-> système
+\end{itemize}
+\\
+\hline
+Globale
+& Copie des tables de mises à jour dans les tables de production, calcul et application des différences entre tables de production et système réel
+& \begin{itemize}
+\item Modification totale, exhaustive
+\item Longue, traite l'ensemble des données
+\item Ne résiste pas à une erreur de l'automate
+\item Assure la pérennité du système : remet le système selon les données d'\obm
+\end{itemize}
+\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Mise à jour selon portée}
+
+
+\begin{tabular}{|p{2,5cm}|p{2,5cm}|p{8,5cm}|}
+\hline
+\textbf{Etape} & \textbf{stockage} & \textbf{actions} \\
+\hline
+Saisie de données & tables standards (UserObm,..) &
+Renseignement des tables standards (ex: UserObm)
+\\
+\hline
+Clic outil mise à jour & aucun &
+Comparaison des tables standards et de production pour affichage des différences selon portées disponibles pour l'utilisateur
+\\
+\hline
+Validation mises à jour & table \db{Updated} &
+Possible que si (pas de modification en cours d'exé.) :
+\begin{itemize}
+\item verrou IHM est OK (\db{ObmInfo.update\_state} = 0)
+\item l'automate n'est pas en cours d'exécution
+\end{itemize}
+
+Actions :
+\begin{itemize}
+\item Comparaison des tables standards et de production,
+\item Suppressions des données de la table \db{Updated}
+\item Stockage des différences (créations, mises à jours) dans table \db{Updated}
+\item Affichage des différences
+\item Appel de l'automate avec la portée sélectionnée
+\end{itemize}
+\\
+\hline
+Automate & tables \db{Updated}, \db{Deleted}, de production (\db{P\_}) &
+\begin{itemize}
+\item Parcourt la table \db{Updated} et pour chaque entrée
+  \begin{itemize}
+  \item Applique la modification système
+  \item Met à jour la table de Production \db{P\_} associée
+  \item Supprime la ligne de \db{Update}
+  \end{itemize}
+\item Parcourt la table \db{Deleted} et pour chaque entrée correspondant à la portée donnée en paramètre
+  \begin{itemize}
+  \item Supprime l'entité du système
+  \item Met à jour la table de Production \db{P\_} associée
+  \item Supprime la ligne de \db{Deleted}
+  \end{itemize}
+\item Traitement des tables de liaisons
+\item Déclenchement actions globales (regénération des maps postfix,...)
+\end{itemize}
+\\
+\hline
+\end{tabular}
+
+
+\subsubsection*{Gestion des tables de liaison}
+
+Pour les liaisons, le travail est effectué au niveau de l'entité.
+On considère l'entité de la liaison. Dans la comparaison des liaisons entre tables standards et de production, dès que l'entité à une différence de liaison, toutes les liaisons de l'entité sont recréées.
+
+\paragraph{Exemple :} Un utilisateur a été rajouté dans les droits de lecture sur un ``mailshare''. Le calcul des différences fait donc apparaitre cette ligne de droit dans \db{EntityRight}. On ne détaille pas au niveau ligne cette modification, mais au niveau entité, uniquement l'entité est stockée dans \db{Updatedlinks}. Donc l'ensemble des liaisons (\db{EntityRight}) de cette mailshare est regénéré (supprimé dans Production, puis copié de standard vers Production).\\
+
+Calcul des différences : \\
+
+\begin{tabular}{|p{2,5cm}|p{5cm}|p{6cm}|}
+\hline
+\textbf{Table} & \textbf{Liaisons} & \textbf{Actions} \\
+\hline
+P\_EntityRight &
+critères : 
+\begin{itemize}
+\item entity = mailshare
+\item ET consumer = user || group
+\item ET mailshare.portee correspond (domaine, usercreate || userupdate)
+\end{itemize}
+&
+stocké dans \db{Updatedlinks}
+\begin{itemize}
+\item table = EntityRight,
+\item entity = mailshare
+\item id = id de la mailshare
+\end{itemize}
+Automate : regénération des liaisons du mailshare
+\\
+\hline
+P\_EntityRight &
+critères : 
+\begin{itemize}
+\item entity = mailbox
+\item ET consumer = user || group
+\item ET mailbox.portee correspond (mailbox = user)
+\end{itemize}
+&
+stocké dans \db{Updatedlinks}
+\begin{itemize}
+\item table = EntityRight,
+\item entity = mailbox
+\item id = id de la mailbox (user)
+\end{itemize}
+Automate : regénération des liaisons de la mailbox
+\\
+\hline
+P\_GroupGroup & toutes &
+stocké dans \db{Updatedlinks}
+\begin{itemize}
+\item table = GroupGroup,
+\item entity = -
+\item id = id du groupe parent
+\end{itemize}
+Automate : regénération des liaisons du groupe père
+\\
+\hline
+P\_UserObmGroup & toutes &
+stocké dans \db{Updatedlinks}
+\begin{itemize}
+\item table = UserObmGroup,
+\item entity = -
+\item id = id de l'utilisateur
+\end{itemize}
+Automate : regénération des liaisons de l'utilisateur
+\\
+\hline
+P\_of\_usergroup & toutes &
+stocké dans \db{Updatedlinks}
+\begin{itemize}
+\item table = of\_usergroup,
+\item entity = -
+\item id = id de l'utilisateur
+\end{itemize}
+Automate : regénération des liaisons de l'utilisateur
+\\
+\hline
+\end{tabular}
+
+
+
+\subsubsection{Mise à jour globale}
+
+
+\begin{tabular}{|p{2,5cm}|p{2,5cm}|p{8,5cm}|}
+\hline
+\textbf{Etape} & \textbf{stockage} & \textbf{actions} \\
+\hline
+Saisie de données & tables standards (UserObm,..) &
+Renseignement des tables standards (ex: UserObm)
+\\
+\hline
+Clic outil mise à jour & aucun &
+Comparaison des tables standards et de production pour affichage des différences selon portées disponibles pour l'utilisateur
+\\
+\hline
+Validation mises à jour Globale & tables \db{Updated}, \db{Deleted}, de production (\db{P\_}) &
+Possible que si (pas de modification en cours d'exé.) :
+\begin{itemize}
+\item verrou IHM est OK (\db{ObmInfo.update\_state} = 0)
+\item l'automate n'est pas en cours d'exécution
+\end{itemize}
+
+Actions :
+\begin{itemize}
+\item Suppressions des données de la table \db{Updated}
+\item Suppressions des données de la table \db{Deleted}
+\item Copie des tables standards dans tables \db{P\_}
+\item Appel de l'automate avec option --all
+\end{itemize}
+\\
+\hline
+Automate & aucun &
+\begin{itemize}
+\item Calcul des modifications entre base de production et système
+\item Application des modifications au système
+\end{itemize}
+\\
+\hline
+\end{tabular}
+\vspace{0,3cm}
+
+Code d'application des modifications :\\
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+  # copie tables de mise à jour dans tables de production
+  $ret = exec($cmd_db_update);
+
+  # appel de l'automate, portée globale
+  $cmd = $cmd_update." --all";
+  exec($cmd, $tmp, $ret);
+\end{verbatim}
+\end{minipage}
+}
+
+
+\subsection{Les portées de mise à jour}
+
+Les portées de mises à jour indiquent la portée des modifications qui vont être prises en compte.
+Les droits sur ces portées sont définis dans les profils.
+Outre la mise à jour globale, 3 portées sont définies :\\
+
+\begin{tabular}{|p{2cm}|p{7cm}|p{4cm}|}
+\hline
+\textbf{Portée} & \textbf{Modifications prises en compte} & \textbf{Appel automate} \\
+\hline
+globale & Toutes, comparaison directe avec système & --all \\
+\hline
+my & de l'utilisateur connecté (dans domaine) & --user \$id
+\\
+\hline
+domain & du domaine \obm & --domain \$id
+\\
+\hline
+delegation & des entités sous la délégation (dans domaine) & --delegation \$txt
+\\
+\hline
+\end{tabular}
 
 
 \subsubsection{La portée ``my''}
@@ -61,6 +430,9 @@ Tout enregistrement de la table \textbf{Deleted} référençant l'utilisateur
 \\
 \hline
 \end{tabular}
+\vspace{0,3cm}
+
+Les suppressions prises en compte (table \db{Deleted}) sont celles dont l'auteur (\db{deleted\_user\_id}) est l'utilisateur connecté.
 
 
 \subsubsection{La portée ``domain''}
@@ -72,7 +444,7 @@ Portée des modifications du domaine (de l'utilisateur connecté).\\
 \textbf{Considéré comme} & \textbf{Description}\\
 \hline
 Créé &
-Tout enregistrement nouveau (non présent dans Prod) dans le domaine
+Tout enregistrement nouveau (non présent dans Prod) dans le domaine.
 Comparaison : les enregistrements du domaine des tables de mise à jour et de production
 \\
 \hline
@@ -85,3 +457,64 @@ Tout enregistrement de la table \textbf{Deleted} référençant le domaine
 \\
 \hline
 \end{tabular}
+\vspace{0,3cm}
+
+Les suppressions prises en compte (table \db{Deleted}) sont celles dont le domaine (\db{deleted\_domain\_id}) est celui de l'utilisateur connecté.
+
+
+\subsubsection{La portée ``delegation''}
+
+Portée des modifications du critère de délégation (dans le domaine de l'utilisateur connecté).\\
+
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Considéré comme} & \textbf{Description}\\
+\hline
+Créé &
+Tout enregistrement nouveau (non présent dans Prod) dont :
+\begin{itemize}
+\item la délégation correspond à la délégation cible de l'utilisateur connecté
+\item le domaine correspond au domaine de l'utilisateur connecté
+\end{itemize}
+Comparaison : les enregistrements avec ces critères dans la table de mise à jour avec tous les enregistrements (du domaine) de la table de Production.
+\\
+\hline
+Modifié &
+Tout enregistrement présent dans les 2 tables avec une différence, dont la délégation correspond à la délégation cible de l'utilisateur connecté
+\\
+\hline
+Supprimé &
+Tout enregistrement de la table \textbf{Deleted} dont la délégation et le domaine correspondent à la délégation cible et au domaine de l'utilisateur connecté
+\\
+\hline
+\end{tabular}
+\vspace{0,3cm}
+
+Les suppressions prises en compte (table \db{Deleted}) sont celles dont l'auteur (\db{deleted\_user\_id}) est l'utilisateur connecté.
+
+
+\subsection{La gestion des verrous et reprises de mise à jour}
+
+\obm permet une seule application des mises à jour simultanée. Afin d'assurer cette règle, des verrous sont mis en place.
+
+2 verrous sont implémentés :\\
+
+\begin{tabular}{|p{1,5cm}|p{2cm}|p{2cm}|p{7,5cm}|}
+\hline
+\textbf{Verrou} & \textbf{Création} & \textbf{Suppression} & \textbf{Description}\\
+\hline
+IHM PHP &
+Clic sur valider les modifications &
+Automate lancé &
+Donnée en base de donnée : \db{ObmInfo.update\_state} (1=en cours, 0 sinon)
+Empécher un autre utilisateur de cliquer sur ``valider les modifications'', avant que l'automate soit lancé (verrou 2). Au lancement de l'automate, PHP reprend la main de suite, l'automate étant exécuté en tâche de fond, le verrou est supprimé (peu importe le résultat de l'automate).
+\\
+\hline
+Automate &
+Lancement de l'automate &
+Fin d'exécution de l'automate &
+Test de vérification d'automate en cours d'exécution (ps).
+\\
+\hline
+\end{tabular}
+\vspace{0,3cm}

@@ -53,9 +53,25 @@ CREATE TABLE Deleted (
 CREATE TABLE Updated (
   updated_id         serial,
   updated_domain_id  integer,
+  updated_user_id    integer,
+  updated_delegation varchar(64),
   updated_entity     varchar(32),
   updated_entity_id  integer,
-  updated_user_id    integer,
   updated_type       char(1),
   PRIMARY KEY (updated_id)
+);
+
+
+--
+-- Table structure for the table 'Updatedlinks'
+--
+CREATE TABLE Updatedlinks (
+  updatedlinks_id         serial,
+  updatedlinks_domain_id  integer,
+  updatedlinks_user_id    integer,
+  updatedlinks_delegation varchar(64),
+  updatedlinks_table      varchar(32),
+  updatedlinks_entity     varchar(32),
+  updatedlinks_entity_id  integer,
+  PRIMARY KEY (updatedlinks_id)
 );

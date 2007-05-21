@@ -1728,9 +1728,25 @@ CREATE TABLE Deleted (
 CREATE TABLE Updated (
   updated_id         int(8) auto_increment,
   updated_domain_id  int(8),
+  updated_user_id    int(8),
+  updated_delegation varchar(64),
   updated_entity     varchar(32),
   updated_entity_id  int(8),
-  updated_user_id    int(8),
   updated_type       char(1),
   PRIMARY KEY (updated_id)
+);
+
+
+--
+-- Table structure for the table 'Updatedlinks'
+--
+CREATE TABLE Updatedlinks (
+  updatedlinks_id         int(8) auto_increment,
+  updatedlinks_domain_id  int(8),
+  updatedlinks_user_id    int(8),
+  updatedlinks_delegation varchar(64),
+  updatedlinks_table      varchar(32),
+  updatedlinks_entity     varchar(32),
+  updatedlinks_entity_id  int(8),
+  PRIMARY KEY (updatedlinks_id)
 );
