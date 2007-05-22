@@ -236,11 +236,7 @@ if ($action == "ext_get_ids") {
   }
   $display["detail"] .= dis_resource_admin_index($params);
 
-} elseif ($action == "ritem_checklink") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_resource_links($params, "ritem");
-
-} elseif ($action == "ritem_delete") {
+}  elseif ($action == "ritem_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_resource_ritem_delete($params);
   if ($retour) {
@@ -480,13 +476,6 @@ function get_resource_action() {
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
-
-// Resource Item Check Link
-  $actions["resource"]["ritem_checklink"] = array (
-    'Url'      => "$path/resource/resource_index.php?action=ritem_checklink",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
 
 // Resource Item Delete
   $actions["resource"]["ritem_delete"] = array (

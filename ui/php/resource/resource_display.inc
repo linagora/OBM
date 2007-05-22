@@ -679,7 +679,7 @@ function html_resource_resourcetype_form($rt_q) {
 function html_resource_resourceitem_form($ri_q) {
   global $l_ritem_manage, $l_label, $l_desc, $l_rtype;
   global $l_c_new, $l_ritem_insert;
-  global $ico_ok, $ico_delete;
+  global $ico_ok, $ico_delete, $l_confirm_delete_item;
 
   $key = 0;
   while($ri_q->next_record()) {
@@ -714,7 +714,7 @@ function html_resource_resourceitem_form($ri_q) {
     <tr $class>
     <td>
     <input type=\"hidden\" id=\"ritem_$id\" value=\"$id\" />
-    <a href=\"?action=ritem_checklink&amp;ritem=$id\">
+    <a href=\"?action=ritem_delete&amp;ritem=$id\" onclick=\" return confirm('$l_confirm_delete_item');\">
     <img src=\"$ico_delete\"/>
     </a></td>
     <td> <input type=\"text\" id=\"tf_ritem_label_$id\" value=\"$label\" size=\"16\"/></td>

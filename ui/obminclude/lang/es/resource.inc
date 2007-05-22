@@ -19,6 +19,22 @@ $l_resource = "Recurso";
 $l_resources = "Recursos";
 $l_users = "Usuarios";
 
+// Item & Property
+$l_rtype = "Resource type";
+$l_rtype_manage = "Manage resource type";
+$l_rtype_property = "Property";
+$l_rtype_kind = "Kind";
+$l_rtype_insert = "Insert resource type";
+$l_rtype_update = "Update resource type";
+$l_rtype_checkdelete = "Check resource type";
+$l_ritem = "Item";
+$l_ritem_add = "Insert item";
+$l_ritem_manage = "Manage item";
+$l_ritem_insert = "Insert item";
+$l_ritem_update = "Update item";
+$l_no_item_available = "No item available for this resource";
+$l_confirm_delete_item = "Do you realy want to delete this item ?";
+
 // Actions
 $l_insert = "Insert el recurso";
 $l_update = "Update el recurso";
