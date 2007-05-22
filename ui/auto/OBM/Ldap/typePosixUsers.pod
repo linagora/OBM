@@ -1,7 +1,7 @@
 =head1 NOM
 
-OBM::Ldap:typePosixUsers - Définition des fonctions permettant de gérer le type
-'POSIXUSERS'
+OBM::Ldap::typePosixUsers - Définition des fonctions permettant de gérer le type
+'POSIXUSERS'.
 
 =head1 DEPENDANCES
 
@@ -36,6 +36,11 @@ Retour : 1 si tout est ok, 0 sinon ;
 =item B<updateLdapEntry( $entry, $ldapEntry )> : permet de mettre à jour une
 entité LDAP par rapport à une structure.
 Retour : 1 si tout est ok, 0 sinon ;
+
+=item B<updatePasswd( $ldapEntry, $passwdType, $newPasswd )> : permet de
+modifier
+le mot de passe de l'entité.
+Retour : 1 si tout est ok, 0 sinon.
 
 =back
 

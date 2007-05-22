@@ -37,7 +37,7 @@ sub getDbValues {
         return undef;
     }
 
-    my $query = "SELECT samba_name, samba_value FROM Samba WHERE samba_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
+    my $query = "SELECT samba_name, samba_value FROM P_Samba WHERE samba_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requete
     my $queryResult;

@@ -1,7 +1,7 @@
 =head1 NOM
 
-OBM::Ldap:typeNode - Définition des fonctions permettant de gérer le type
-'NODE'
+OBM::Ldap::typeNode - Définition des fonctions permettant de gérer le type
+'NODE'.
 
 =head1 DEPENDANCES
 
@@ -35,7 +35,7 @@ Retour : 1 si tout est ok, 0 sinon ;
 
 =item B<updateLdapEntry( $entry, $ldapEntry )> : permet de mettre à jour une
 entité LDAP par rapport à une structure.
-Retour : 1 si tout est ok, 0 sinon ;
+Retour : 1 si tout est ok, 0 sinon.
 
 =back
 

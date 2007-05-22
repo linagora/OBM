@@ -5,7 +5,6 @@ require Exporter;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
-require OBM::passwd;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 use strict;
 
@@ -25,27 +24,6 @@ sub getDbValues {
         return undef;
     }
 
-    # On se connecte a la base
-#    my $dbHandler;
-#    if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-#        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "W" );
-#        return undef;
-#    }
-
-    # La requete a executer - obtention des informations sur les utilisateurs de
-    # l'organisation.
-    my $query = "";
-
-    # On execute la requete
-#    my $queryResult;
-#    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-#        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete des utilisateurs : ".$dbHandler->err, "W" );
-#        return undef;
-#    }
-
-    # On range les resultats dans la structure de donnees des resultats
-#    my $i = 0;
-#    while( my( $user_id, $user_login, $user_passwd_type, $user_passwd, $user_uid, $user_gid, $user_lastname, $user_firstname, $user_address1, $user_address2, $user_address3, $user_zipcode, $user_town, $user_title, $user_service, $user_description, $user_mail_perms, $user_mail_ext_perms, $user_email, $user_mail_server_id, $user_web_perms, $user_phone, $user_phone2, $user_fax, $user_fax2, $user_mobile, $user_nomade_perms, $user_nomade_enable, $user_nomade_local_copy, $email_nomade, $user_vacation_enable ) = $queryResult->fetchrow_array ) {
 
     if( !defined($currentDomain->{"domain_label"}) ) {
         return undef;
@@ -72,11 +50,6 @@ sub getDbValues {
     $postfixConfs[0]->{"domain_id"} = $domainId;
     $postfixConfs[0]->{"dn"} = &OBM::ldap::makeDn( $postfixConfs[0], $parentDn );
 
-    #
-    # On referme la connexion a la base
-#    if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
-#        &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "W" );
-#    }
 
     return \@postfixConfs;
 }

@@ -1,20 +1,21 @@
 =head1 NOM
 
-OBM::Ldap::typeMailShare- Définition des fonctions permettant de gérer le type
-'MAILSHARE'.
+OBM::Ldap::typeSambaHosts - Définition des fonctions permettant de gérer le type
+'SAMBAHOSTS'.
 
 =head1 DEPENDANCES
 
  use OBM::Parameters::common;
  use OBM::Parameters::ldapConf;
+ require OBM::passwd;
  use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 =head1 DESCRIPTION
 
-    use OBM::Ldap::typeMailShare;
+    use OBM::Ldap::typeSambaHosts;
     
 Ce paquet implémente les fonctions de manipulations du type de données
-'MAILSHARE'.
+'SAMBAHOSTS'.
 
 Ce paquet défini les fonctions :
 

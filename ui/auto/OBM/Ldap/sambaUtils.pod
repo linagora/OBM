@@ -1,0 +1,30 @@
+=head1 NOM
+
+OBM::Ldap::sambaUtils - Définition de fonctions utilles dans la gestion de plusieurs
+types.
+
+=head1 DEPENDANCES
+
+
+=head1 DESCRIPTION
+
+    use OBM::Ldap::sambaUtils;
+    
+Ce paquet implémente les fonctions de manipulations communes à la gestion de
+plusieurs type utilisés pour l'implémentation du support Samba.
+
+Ce paquet défini les fonctions :
+
+=over 4
+
+=item B<getUserSID( $SID, $userUID )> : permet de construire le 'B<SID>' d'un
+utilisateur à partir de son UID 'B<userUID>' et du SID du domaine NT 'B<SID>'.
+Retour : undef si il y a un problème, le SID de l'utilisateur sinon ;
+
+=item B<getGroupSID( $SID, $groupGID )> : permet de construire le 'B<SID>' d'un
+groupe à partir de son GID 'B<userGID>' et du SID du domaine NT 'B<SID>'.
+Retour : undef si il y a un problème, le SID du groupe sinon ;
+
+=back
+
+=cut

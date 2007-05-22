@@ -11,14 +11,14 @@ package OBM::ldap;
 
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
-require OBM::utils;
 use Net::LDAP;
 use Net::LDAP::Entry;
+require OBM::utils;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 require Exporter;
 
 @ISA = qw(Exporter);
-@EXPORT_function = qw(initTree updateLdap getEntityDn updateSelfEntityPasswd updateEntityPasswd);
+@EXPORT_function = qw(initTree updateLdap getEntityDn checkOldEntityPasswd updateEntityPasswd);
 @EXPORT = (@EXPORT_function);
 @EXPORT_OK = qw();
 
@@ -176,13 +176,18 @@ sub updateLdap {
     }
 
     # On cré ou met a jour l'entree courante
-    my $ldapEntry = findDn( $ldapConn, $ldapStruct->{"dn"} );
+    my $ldapEntry = findDn( $ldapConn, $ldapStruct->{"dn"}, $ldapStruct->{"node_type"} );
     if( defined( $ldapEntry ) ) {
         &OBM::toolBox::write_log( "Mise a jour de l'entree '".$ldapStruct->{"dn"}."' - Type '".$ldapStruct->{"node_type"}."'", "W" );
         updateLdapEntry( $ldapStruct, $ldapEntry, $ldapConn );
 
     }else {
         &OBM::toolBox::write_log( "Creation de l'entree '".$ldapStruct->{"dn"}."' - Type '".$ldapStruct->{"node_type"}."'", "W" );
+
+        if( !$attributeDef->{$ldapStruct->{"node_type"}}->{"structural"} ) {
+            &OBM::toolBox::write_log( "Erreur: objet non structurel - creation impossible", "W" );
+            return 0;
+        }
 
         if( !createLdapEntry( $ldapStruct, $ldapConn ) ) {
             # si la création echoue, on ne traite pas les sous-types et
@@ -389,7 +394,7 @@ sub deleteLdapEntries {
     my @ldapEntry = ();
 
     # Les entitées definies en BD
-    if( !exists($ldapStruct->{$type}) || !defined($ldapStruct->{$type}) || ($#{$ldapStruct->{$type}} < 0) ) {
+    if( !exists($ldapStruct->{$type}) ) {
         return 1;
     }
     my $entry = $ldapStruct->{$type};
@@ -424,11 +429,110 @@ sub deleteLdapEntries {
 
 sub deleteLdapEntry {
     my( $ldapEntry, $type, $ldapConn ) = @_;
-    my $result;
+    my $deleteAll = 0;
 
     # Si le type est un type structurel, on détruit l'objet LDAP complet
     if( $main::attributeDef->{$type}->{"structural"} ) {
+        $deleteAll = 1;
+    }else {
+        # Initialise les objectClass attendus en fonction du type
+        my @objectClassType = sort( @{$main::attributeDef->{$type}->{"objectclass"}} );
+
+        # Recupere les objectClass de l'entite courante
+        my @curentObjectClass = sort( @{$ldapEntry->get_value( "objectClass", asref => 1 )} );
+
+        # On compare les objectClass de l'objet LDAP avec ceux de son type
+        my $i=0;
+        while( ($i<=$#objectClassType) && ($objectClassType[$i] eq $curentObjectClass[$i]) ) { $i++; }
+
+        if( $i > $#objectClassType ) {
+            # Si on a uniquement les mêmes classes d'objets, on peut détruire tout l'objet
+            $deleteAll = 1;
+        }else {
+            # Sinon il faut supprimer tous les attributs must ou may des
+            # objectClass du type $type, qui ne sont pas must ou may d'un
+            # objectClass restant.
+
+            # Obtention de la description des objets depuis le serveur LDAP
+            my $schema = $ldapConn->schema;
+
+            # On recupere tous les attributs des objets du types a detruire
+            my @attrsType;
+            for( $i=0; $i<=$#objectClassType; $i++ ) {
+                my @attrs = $schema->may( $objectClassType[$i] );
+                push( @attrs, $schema->must( $objectClassType[$i] ) );
+
+                for( my $j=0; $j<=$#attrs; $j++ ) {
+                    if( lc($attrs[$j]->{name}) ne "objectclass" ) {
+                        push( @attrsType, $attrs[$j]->{name} );
+                    }
+                }
+            }
+            @attrsType = sort( @attrsType );
+
+            # On cherche les objectClass de l'entite LDAP courante qui ne font
+            # pas partie du type a detruire
+            my @diffObjectClass;
+            for( $i=0; $i<=$#curentObjectClass; $i++ ) {
+                my $j = 0;
+                while( ( $j<=$#objectClassType ) && ( lc( $objectClassType[$j]) ne lc( $curentObjectClass[$i] ) ) ) {
+                    $j++;
+                }
+
+                if( $j > $#objectClassType ) {
+                    push( @diffObjectClass, $curentObjectClass[$i] );
+                }
+            }
+
+            # On recupere tous les attributs des objectClass de l'entite LDAP
+            # courante et qui ne font pas partie du type a detruire
+            my @attrsCurrent;
+            for( $i=0; $i<=$#diffObjectClass; $i++ ) {
+                my @attrs = $schema->may( $diffObjectClass[$i] );
+                push( @attrs, $schema->must( $diffObjectClass[$i] ) );
+
+                for( my $j=0; $j<=$#attrs; $j++ ) {
+                    if( lc($attrs[$j]->{name}) ne "objectclass" ) {
+                        push( @attrsCurrent, $attrs[$j]->{name} );
+                    }
+                }
+            }
+            @attrsCurrent = sort( @attrsCurrent );
+
+            # On cherche les elements de @attrsType qui ne font pas partie de
+            # @attrsCurrent
+            my @diffAttrs;
+            for( $i=0; $i<=$#attrsType; $i++ ) {
+                my $j = 0;
+                while( ( $j<=$#attrsCurrent ) && ( lc( $attrsType[$i] ) ne lc( $attrsCurrent[$j] ) ) ) {
+                    $j++;
+                }
+
+                if( $j == $#attrsCurrent+1 ) {
+                    push( @diffAttrs, $attrsType[$i] );
+                }
+            }
+
+
+            # On detruit les objectClass du type a supprimer
+            $ldapEntry->delete( "objectClass" => \@objectClassType );
+            # On detruit tous les attributs de ces objectClass
+            for( $i=0; $i<=$#diffAttrs; $i++ ) {
+                # Si l'attribut a detruire est present dans l'entite on demande
+                # sa suppression
+                if( defined( $ldapEntry->get_value( $diffAttrs[$i] ) ) ) {
+                    $ldapEntry->delete( $diffAttrs[$i] => [ ] );
+                }
+            }
+        }
+    }
+
+
+    my $result;
+    if( $deleteAll ) {
         $result = $ldapConn->delete( $ldapEntry->dn );
+    }else {
+        $result = $ldapEntry->update( $ldapConn );
     }
 
     if( $result->is_error() ) {
@@ -465,7 +569,7 @@ sub findLdapEntity {
         return undef;
 
     }elsif( ($result->code != 32) && $result->is_error() ) {
-        # L'erreur 'No such object' n'est, dans ce cas, pas considérée comme un
+        # L'erreur 'No such object' n'est, dans ce cas, pas considérée comme une
         # erreur.
         &OBM::toolBox::write_log( "Probleme lors d'une requête LDAP : ".$result->code." - ".$result->error, "W" );
         return undef;
@@ -481,9 +585,10 @@ sub findLdapEntity {
 
 
 sub findDn {
-    my( $ldapConn, $dn ) = @_;
+    my( $ldapConn, $dn, $type ) = @_;
 
     my $scope="base";
+    my $ldapFilter = "(objectclass=*)";
 
     if( !defined($ldapConn) ) {
         return undef;
@@ -492,7 +597,7 @@ sub findDn {
     my $result = $ldapConn->search(
                     base => to_utf8( { -string => $dn, -charset => $defaultCharSet } ),   
                     scope => $scope,
-                    filter => "(objectclass=*)"
+                    filter => $ldapFilter
                     );
 
     if( !defined($result) ) {
@@ -519,7 +624,8 @@ sub getEntityDn {
     my( $ldapStruct, $type, $dnValue, $domainId, $dn ) = @_;
 
     if( $main::attributeDef->{$type}->{"is_branch"} ) {
-        return;
+        $dn = undef;
+        return 1;
     }
 
     findTypeParentDn( $ldapStruct, $type, $domainId, $dn );
@@ -532,6 +638,8 @@ sub getEntityDn {
     for( my $i=0; $i<=$#$dn; $i++ ) {
         $dn->[$i] = makeDn( $entity, $dn->[$i] );
     }
+
+    return 0;
 }
 
 
@@ -575,18 +683,10 @@ sub getLdapSrv {
 }
 
 
-sub updateSelfEntityPasswd {
-    my( $ldapSrv, $type, $entityDn, $passwdType, $oldPasswd, $newPasswd ) = @_;
-
-    if( !defined($ldapSrv) ) {
-        return 0;
-    }
-
-    if( !defined($type) || ($type eq "") || !defined($entityDn) || ($entityDn eq "") || !defined($oldPasswd) || ($oldPasswd eq "") || !defined($newPasswd) || ($newPasswd eq "") ) {
-        return 0;
-    }
-
-    if( !exists($attributeDef->{$type}->{"update_passwd"} ) || !defined($attributeDef->{$type}->{"update_passwd"}) ) {
+sub checkOldEntityPasswd {
+    my( $ldapSrv, $entityDn, $oldPasswd ) = @_;
+     
+    if( !defined($ldapSrv) || !defined($entityDn) || ($entityDn eq "") || !defined($oldPasswd) || ($oldPasswd eq "") ) {
         return 0;
     }
 
@@ -597,7 +697,7 @@ sub updateSelfEntityPasswd {
         debug => "0",
         timeout => "60",
         version => "3"
-    ) or &OBM::toolBox::write_log( "Echec de connexion a LDAP : $@", "W" ) && return 0;
+    ) or &OBM::toolBox::write_log( "Erreur: echec de connexion a LDAP : $@", "W" ) && return 0;
 
     &OBM::toolBox::write_log( "Connexion a l'annuaire en tant que '".$entityDn."'", "W" );
 
@@ -607,37 +707,28 @@ sub updateSelfEntityPasswd {
     );
 
     if( $errorCode->code == 49 ) {
-        &OBM::toolBox::write_log( "Ancien mot de passe incorrect", "W" );
+        &OBM::toolBox::write_log( "Erreur: ancien mot de passe incorrect", "W" );
         return 0;
 
     }elsif( $errorCode->code ) {
-        &OBM::toolBox::write_log( "Echec de connexion : ".$errorCode->error, "W" );
+        &OBM::toolBox::write_log( "Erreur: echec de connexion : ".$errorCode->error, "W" );
         return 0;
 
     }else {
-        &OBM::toolBox::write_log( "Connexion a l'annuaire LDAP etablie", "W" );
+        &OBM::toolBox::write_log( "Ancien mot de passe correct", "W" );
     }
-
-    my $ldapEntry = findDn( $ldapConn, $entityDn );
-    if( defined($ldapEntry) && (&{$attributeDef->{$type}->{"update_passwd"}}( $ldapEntry, $passwdType, $newPasswd )) ) {
-            my $result = $ldapEntry->update( $ldapConn );
-
-            if( $result->is_error() ) {
-                &OBM::toolBox::write_log( "Erreur : ".$result->code." - ".$result->error, "W" );
-                return 0;
-            }
-
-            $ldapConn->unbind();
-            return 1;
-    }
-
+  
     $ldapConn->unbind();
-    return 0;
+    return 1;
 }
 
 
 sub updateEntityPasswd {
     my( $ldapSrv, $type, $userDn, $passwdType, $newPasswd ) = @_;
+
+    if( !exists($attributeDef->{$type}->{"update_passwd"} ) || !defined($attributeDef->{$type}->{"update_passwd"}) ) {
+        return 0;
+    }
 
     if( !connectLdapSrv( $ldapSrv ) ) {
         return 0;
@@ -647,7 +738,7 @@ sub updateEntityPasswd {
 
     for( my $i=0; $i<=$#$userDn; $i++ ) {
         &OBM::toolBox::write_log( "Mise a jour de l'entite de type '".$type."' et de dn : ".$userDn->[$i], "W" );
-        my $ldapEntry = findDn( $ldapConn, $userDn->[$i] );
+        my $ldapEntry = findDn( $ldapConn, $userDn->[$i], undef );
 
         if( defined($ldapEntry) && (&{$attributeDef->{$type}->{"update_passwd"}}( $ldapEntry, $passwdType, $newPasswd )) ) {
             my $result = $ldapEntry->update( $ldapConn );

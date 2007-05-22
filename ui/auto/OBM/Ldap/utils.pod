@@ -5,8 +5,6 @@ types.
 
 =head1 DEPENDANCES
 
- use OBM::Parameters::common;
- use OBM::Parameters::ldapConf;
  use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 =head1 DESCRIPTION
@@ -23,7 +21,7 @@ Ce paquet défini les fonctions :
 =item B<modifyAttr( $newValue, $ldapEntry, $attr )> : permet de modifier
 l'attribut 'B<attr>' de l'entité LDAP 'B<ldapEntry>' pour y placer si nécessaire
 la valeur 'B<newValue>'.
-Retour : 1 si il y a eu mise à jour, 0 sinon.
+Retour : 1 si il y a eu mise à jour, 0 sinon ;
 
 =item B<modifyAttrList( $newValue, $ldapEntry, $attr )> : permet de modifier
 l'attribut B<multi-évalué> 'B<attr>', de l'entité LDAP 'B<ldapEntry>', pour y

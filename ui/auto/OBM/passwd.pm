@@ -14,18 +14,12 @@ use OBM::Parameters::common;
 use MIME::Base64;
 use Digest::SHA1;
 use Digest::MD5;
+use Crypt::SmbHash;
+
 require Exporter;
+use strict;
 
-@ISA = qw(Exporter);
-@EXPORT_const = qw();
-@EXPORT_function = qw( md5sumToMd5 toMd5 toSsha plainToMd5sum );
-@EXPORT = (@EXPORT_function, @EXPORT_const);
-@EXPORT_OK = qw();
 
-# Necessaire pour le bon fonctionnement du package
-$debug=1;
-
-    
 sub md5sumToMd5 {
     my( $passwdMd5sum ) = @_;
 
@@ -47,7 +41,7 @@ sub toMd5 {
     my( $passwdPlain ) = @_;
 
     my $cryptPass = Digest::MD5->new;
-    $cryptPass->add($pass);
+    $cryptPass->add($passwdPlain);
 
     return encode_base64($cryptPass->digest,'');
 }
@@ -92,4 +86,17 @@ sub convertPasswd {
     }
 
     return $userPasswd;
+}
+
+
+sub getNTLMPasswd {
+    my( $plainPasswd, $lmPasswd, $ntPasswd ) = @_;
+
+    if( !defined($plainPasswd) ) {
+        return 1;
+    }
+
+    ( $$lmPasswd, $$ntPasswd ) = ntlmgen( $plainPasswd );
+
+    return 0;
 }

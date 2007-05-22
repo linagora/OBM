@@ -238,6 +238,57 @@ $attributeDef = {
         }
     },
 
+    $SAMBAUSERS => {
+        structural => 0,
+        is_branch => 0,
+        dn_prefix => "uid",
+        dn_value => "user_login",
+        objectclass => [ "sambaSamAccount" ],
+        get_db_value => sub {
+            my( $parentdn, $domainId ) = @_;
+            require OBM::Ldap::typeSambaUsers;
+            return OBM::Ldap::typeSambaUsers::getDbValues( $parentdn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeSambaUsers;
+            return OBM::Ldap::typeSambaUsers::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeSambaUsers;
+            return OBM::Ldap::typeSambaUsers::updateLdapEntry( $entry, $ldapEntry );
+        },
+        update_passwd => sub {
+            my( $ldapEntry, $passwdType, $newPasswd ) = @_;
+            require OBM::Ldap::typeSambaUsers;
+            return OBM::Ldap::typeSambaUsers::updatePasswd( $ldapEntry, $passwdType, $newPasswd );
+        }
+    },
+
+    $SAMBAGROUPS => {
+        structural => 0,
+        is_branch => 0,
+        dn_prefix => "cn",
+        dn_value => "group_name",
+        objectclass => [ "sambaGroupMapping" ],
+        get_db_value => sub {
+            my( $parentdn, $domainId ) = @_;
+            require OBM::Ldap::typeSambaGroups;
+            return OBM::Ldap::typeSambaGroups::getDbValues( $parentdn, $domainId );
+        },
+        create_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeSambaGroups;
+            return OBM::Ldap::typeSambaGroups::createLdapEntry( $entry, $ldapEntry );
+        },
+        update_ldap => sub {
+            my( $entry, $ldapEntry ) = @_;
+            require OBM::Ldap::typeSambaGroups;
+            return OBM::Ldap::typeSambaGroups::updateLdapEntry( $entry, $ldapEntry );
+        }
+    },
+
     $SAMBAHOSTS => {
         structural => 1,
         is_branch => 0,
@@ -344,7 +395,7 @@ $ldapStruct->{"template"}->[0]->{"branch"}->[0] = {
     name => "users",
     node_type => "$NODE",
     description => "Users account",
-    data_type => [ $POSIXUSERS ],
+    data_type => [ $POSIXUSERS, $SAMBAUSERS ],
     template => [],
     branch => []
 };
@@ -368,7 +419,7 @@ $ldapStruct->{"template"}->[0]->{"branch"}->[2] = {
     name => "groups",
     node_type => "$NODE",
     description => "System Groups",
-    data_type => [ $POSIXGROUPS ],
+    data_type => [ $POSIXGROUPS, $SAMBAGROUPS ],
     template => [],
     branch => []
 };

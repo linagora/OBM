@@ -33,7 +33,7 @@ sub getDbValues {
 
     # La requete a executer - obtention des informations sur les utilisateurs de
     # l'organisation.
-    my $query = "SELECT userobm_id, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile FROM P_UserObm JOIN P_MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_archive=0 AND userobm_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
+    my $query = "SELECT userobm_id, userobm_perms, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile FROM P_UserObm LEFT JOIN P_MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_archive=0 AND userobm_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requete
     my $queryResult;
@@ -45,9 +45,15 @@ sub getDbValues {
     # On range les resultats dans la structure de donnees des resultats
     my $i = 0;
     my @users = ();
-    while( my( $user_id, $user_login, $user_passwd_type, $user_passwd, $user_uid, $user_gid, $user_lastname, $user_firstname, $user_address1, $user_address2, $user_address3, $user_zipcode, $user_town, $user_title, $user_service, $user_description, $user_mail_perms, $user_mail_ext_perms, $user_email, $user_mail_server_id, $user_web_perms, $user_phone, $user_phone2, $user_fax, $user_fax2, $user_mobile ) = $queryResult->fetchrow_array ) {
+    while( my( $user_id, $user_perms, $user_login, $user_passwd_type, $user_passwd, $user_uid, $user_gid, $user_lastname, $user_firstname, $user_address1, $user_address2, $user_address3, $user_zipcode, $user_town, $user_title, $user_service, $user_description, $user_mail_perms, $user_mail_ext_perms, $user_email, $user_mail_server_id, $user_web_perms, $user_phone, $user_phone2, $user_fax, $user_fax2, $user_mobile ) = $queryResult->fetchrow_array ) {
 
         &OBM::toolBox::write_log( "Gestion de l'utilisateur '".$user_login."'", "W" );
+
+        # Gestion de l'UID
+        my $user_real_uid = $user_uid;
+        if( lc($user_perms) eq "admin" ) {
+            $user_real_uid = 0;
+        }
         
         # On cree la structure correspondante a l'utilisateur
         # Cette structure est composee des valeurs recuperees dans la base +
@@ -55,7 +61,7 @@ sub getDbValues {
         $users[$i] = {
             "user_id"=>$user_id,
             "user_login"=>$user_login,
-            "user_uid"=>$user_uid,
+            "user_uid"=>$user_real_uid,
             "user_gid"=>$user_gid,
             "user_lastname"=>$user_lastname,
             "user_firstname"=>$user_firstname,
@@ -189,7 +195,7 @@ sub createLdapEntry {
                 
         $ldapEntry->add(
             objectClass => $attributeDef->{$type}->{"objectclass"},
-            uid => $entry->{"user_login"},
+            uid => to_utf8({ -string => $entry->{"user_login"}, -charset => $defaultCharSet }),
             cn => to_utf8({ -string => $longName, -charset => $defaultCharSet }),
             sn => to_utf8({ -string => $entry->{"user_lastname"}, -charset => $defaultCharSet }),
             displayName => to_utf8({ -string => $longName, -charset => $defaultCharSet }),
@@ -483,7 +489,7 @@ sub updatePasswd {
 
     my $userPasswd = &OBM::passwd::convertPasswd( $passwdType, $newPasswd );
     if( !defined( $userPasswd ) ) {
-        return 0;
+        return $update;
     }
 
     if( &OBM::Ldap::utils::modifyAttr( $userPasswd, $ldapEntry, "userPassword" ) ) {

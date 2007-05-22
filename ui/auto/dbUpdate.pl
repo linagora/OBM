@@ -120,16 +120,3 @@ SWITCH: {
 # Tout c'est bien passe
 exit 0
 
-__END__
-
-=head1 NOM
-
-    dbUpdate.pl - permet de valider ou d'annuler les modifications en attente.
-
-=head1 DESCRIPTION
-
-    Ce script permet de valider ou d'annuler les modifications en attente en BD.
-
-    Ce script a besoin des paramètres :
-        - valid : permet de valider les modifications en attente ;
-        - cancel : permet d'annuler les modifications en attente.

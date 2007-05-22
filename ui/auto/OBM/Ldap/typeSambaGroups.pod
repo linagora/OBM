@@ -1,20 +1,21 @@
 =head1 NOM
 
-OBM::Ldap::typeMailShare- Définition des fonctions permettant de gérer le type
-'MAILSHARE'.
+OBM::Ldap::typeSambaGroups - Définition des fonctions permettant de gérer le type
+'SAMBAGROUPS'.
 
 =head1 DEPENDANCES
 
  use OBM::Parameters::common;
  use OBM::Parameters::ldapConf;
+ require OBM::passwd;
  use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 =head1 DESCRIPTION
 
-    use OBM::Ldap::typeMailShare;
+    use OBM::Ldap::typeSambaGroups;
     
 Ce paquet implémente les fonctions de manipulations du type de données
-'MAILSHARE'.
+'SAMBAGROUPS'.
 
 Ce paquet défini les fonctions :
 
@@ -34,7 +35,12 @@ Retour : 1 si tout est ok, 0 sinon ;
 
 =item B<updateLdapEntry( $entry, $ldapEntry )> : permet de mettre à jour une
 entité LDAP par rapport à une structure.
-Retour : 1 si tout est ok, 0 sinon.
+Retour : 1 si tout est ok, 0 sinon ;
+
+=item B<getGroupUsersSid( $dbHandler, $groupId, $sambaSid )> : permet d'obtenir
+la liste
+des SID des utilisateurs windows de ce groupe.
+Retour : référence à un tableau contenant les différents SID.
 
 =back
 

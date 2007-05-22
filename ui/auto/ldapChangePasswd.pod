@@ -90,4 +90,11 @@ indique qu'il faut modifier le mot de passe C<standart> de l'annuaire LDAP
  de passe à modifier n'est indiqué, c'est le mot de passe C<unix> qui sera
  modifié.
 
+ Par défaut et en mode interactif, le ot de passe est de type 'PLAIN'.
+
+ La vérification de l'ancien mot de passe se fait en s'authentifiant auprés de
+ l'annuaire LDAP en tant que l'utilisateur souhaitant modifier son mot de passe.
+ Par la suite les modifications de l'annuaire se font en tant qu'administrateur
+ de celui-ci.
+
 =cut

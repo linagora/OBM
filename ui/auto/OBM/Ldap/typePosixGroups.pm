@@ -245,7 +245,7 @@ sub getGroupUsers {
         push( @tabResult, $userLogin );
     }
 
-    # Recuperation de la liste des utilisateurs du groupe id : $groupId.
+    # Recuperation de la liste des groupes du groupe id : $groupId.
     $query = "SELECT groupgroup_child_id FROM P_GroupGroup WHERE groupgroup_parent_id=".$groupId;
 
     # On execute la requete

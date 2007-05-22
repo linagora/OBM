@@ -141,11 +141,14 @@ function get_samba_info() {
 // Returns:
 //   - $uid : first free uid
 ///////////////////////////////////////////////////////////////////////////////
-function get_first_user_free_uid() {
+function get_first_user_free_uid($first_id=false) {
   global $cdg_sql, $c_first_uid;
-  
   $uids = array();
 
+  if( $first_id===false ) {
+    $first_id = $c_first_uid;
+  }
+  
   $query = "
     SELECT host_uid as uid
     FROM Host
@@ -159,7 +162,8 @@ function get_first_user_free_uid() {
     $uids[] = $obm_q->f("uid");
   }
 
-  $query = "SELECT userobm_uid as uid
+  $query = "
+    SELECT userobm_uid as uid
     FROM UserObm
     WHERE userobm_uid >= '$c_first_uid'
     ORDER BY uid";
@@ -167,6 +171,24 @@ function get_first_user_free_uid() {
   $obm_q->query($query);
   
   while ($obm_q->next_record()) {
+    $uids[] = $obm_q->f("uid");
+  }
+
+  // Avec Samba, les UID et GID doivent être unique car le SID en est déduit
+  // directement en concaténant l'UID ou le GID au SID du domaine.
+  // Or il faut éviter les doublons de SID, y compris entre
+  // utilisateurs/hôtes/groupes.
+  // Le mappage direct est intéressant dans le cadre de migration NT->Samba
+  $query = "
+    SELECT group_gid as uid
+    FROM UGroup
+    WHERE group_gid >= '$first_id'
+    ORDER BY group_gid";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  while( $obm_q->next_record() ) {
     $uids[] = $obm_q->f("uid");
   }
   
@@ -205,7 +227,7 @@ function get_group_id_from_gid($gid) {
     FROM UGroup
     WHERE group_gid='$gid'";
 
-  display_debug_msg($query, $cdg_sql, "get_group_id_from_gid()");
+  display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -222,23 +244,9 @@ function get_group_id_from_gid($gid) {
 //   - $gid : first free gid
 ///////////////////////////////////////////////////////////////////////////////
 function get_first_group_free_gid() {
-  global $cdg_sql, $c_first_gid_user;
+  global $c_first_gid_user;
 
-  $query = "SELECT group_gid
-    FROM UGroup
-    WHERE group_gid >= '$c_first_gid_user'
-    ORDER by group_gid";
-
-  display_debug_msg($query, $cdg_sql, "get_first_group_free_gid()");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  $cpt = $c_first_gid_user;
-  while (($obm_q->next_record()) && ($obm_q->f("group_gid") == $cpt)) {
-    $cpt++;
-  }
-
-  return $cpt;
+  return get_first_user_free_uid($c_first_gid_user);
 }
 
 
