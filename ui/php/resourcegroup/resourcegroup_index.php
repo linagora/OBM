@@ -71,6 +71,13 @@ if (($action == "index") || ($action == "")) {
   $display["search"] = html_resourcegroup_search_form($params);
   $display["result"] = dis_resourcegroup_search_resourcegroup($params);
 
+} elseif ($action == "ext_search") {
+///////////////////////////////////////////////////////////////////////////////
+  $res_q = run_query_resourcegroup_ext_search($params);
+  json_search_resourcegroups($params, $res_q);
+  echo "(".$display['json'].")";
+  exit();
+
 } else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_resourcegroup_form($action, "", $params);
@@ -295,7 +302,10 @@ function get_resourcegroup_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                   );
-
+  $actions["resourcegroup"]["ext_search"] = array (
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+                                  );
 // New
   $actions["resourcegroup"]["new"] = array (
     'Name'     => $l_header_new,

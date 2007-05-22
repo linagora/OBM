@@ -600,4 +600,28 @@ function dis_resourcegroup_warn_insert($id, $g_q, $group) {
 }
 
 
+/**
+ * Build a JSON array with all search results 
+ * 
+ * @param DB $res_q ResourceGroup search query results
+ * @access public
+ * @return void
+ */
+function json_search_resourcegroups($rgroups,$rgroup_q) {
+  global $display, $l_desc;
+
+  $limit = $rgroups['limit'];
+  $form = $rgroups['form'];
+
+  $resourcegroups = array();
+  if(isset($rgroups["first_row"])) $rgroup_q->seek($rgroups["first_row"] - 1);
+  while($rgroup_q->next_record() && count($users) < $limit ) {
+    $id = $rgroup_q->f("rgroup_id");
+    $label = phpStringToJsString($rgroup_q->f("rgroup_name"));
+    $extra = phpStringToJsString("$l_desc : ".$rgroup_q->f("rgroup_desc"));
+    $resourcegroups[] = "{id:'data-resourcegroup-$id', label:'$label', extra:'$extra'}";
+  }
+  $display["json"] = "{length:".$rgroup_q->nf().", datas:[".implode(",",$resourcegroups)."]}";
+}
+
 ?>

@@ -82,6 +82,51 @@ function run_query_resourcegroup_search($group) {
 }
 
 
+/**
+ * Search resourcegroups from a single field 
+ * 
+ * @param mixed $resource 
+ * @access public
+ * @return DB Search results
+ */
+function run_query_resourcegroup_ext_search($resourcegroup) {
+  global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
+  $pattern = $resourcegroup["pattern"];
+  $restriction = $resourcegroup["restriction"];
+  $obm_q = new DB_OBM;
+  $multidomain = sql_multidomain("RGroup");
+	
+  if ($restriction == "user") {
+    $uid = $obm["uid"];
+    $rs = of_right_entity_for_consumer("RGroup", "user", $uid, "read");
+    if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
+      $where_restriction = " AND (rgroup_id IN (";
+      foreach($rs["ids"] as $r_id) {
+	      $where_restriction .= "$coma'$r_id'";
+	      $coma = ",";
+      }
+      $where_restriction .= "))";
+    }
+  }
+
+  $query = "SELECT 
+      rgroup_id,
+      rgroup_name,
+      rgroup_desc
+    FROM RGroup
+    WHERE 
+      rgroup_name LIKE '$pattern%' 
+      $multidomain
+      $where_restriction
+    ORDER BY rgroup_name";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_ext_search()");
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Possible children RGroup Search query execution 
 // Parameters :
