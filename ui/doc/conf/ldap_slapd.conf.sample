@@ -12,8 +12,8 @@ include         /etc/ldap/schema/core.schema
 include         /etc/ldap/schema/cosine.schema
 include         /etc/ldap/schema/nis.schema
 include         /etc/ldap/schema/inetorgperson.schema
-include         /etc/ldap/schema/obm.schema
-include         /etc/ldap/schema/samba.schema
+include		    /etc/ldap/schema/obm.schema
+include		    /etc/ldap/schema/samba.schema
 
 # Where the pid file is put. The init.d script
 # will not stop the server if you change this.
@@ -26,26 +26,32 @@ argsfile        /var/run/slapd/slapd.args
 loglevel        0
 
 # Where the dynamically loaded modules are stored
-modulepath      /usr/lib/ldap
-moduleload      back_bdb
+modulepath	/usr/lib/ldap
+moduleload	back_bdb
 
 # The maximum number of entries that is returned for a search operation
-sizelimit       500
+sizelimit 500
 
 # The tool-threads parameter sets the actual amount of cpu's that is used
 # for indexing.
-tool-threads    1
+tool-threads 1
 
 #
 # Default database
-defaultsearchbase   "dc=local"
+defaultsearchbase "dc=local"
 
 #######################################################################
 # Specific Backend Directives for bdb:
 # Backend specific directives apply to this backend until another
 # 'backend' directive occurs
-backend		    bdb
-checkpoint      512 30
+backend		bdb
+checkpoint 512 30
+
+#######################################################################
+# Specific Backend Directives for 'other':
+# Backend specific directives apply to this backend until another
+# 'backend' directive occurs
+#backend		<other>
 
 #######################################################################
 # Specific Directives for database #1, of type bdb:
@@ -55,29 +61,30 @@ database        bdb
 
 # The base of your directory in database #1
 suffix          "dc=local"
+overlay glue
 
 # rootdn directive for specifying a superuser on the database. This is needed
 # for syncrepl.
 rootdn          "uid=ldapadmin,ou=sysusers,dc=local"
-rootpw          {SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
+rootpw		{SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
 
 # Where the database file are physically stored for database #1
 directory       "/var/lib/ldap"
 
 # For the Debian package we use 2MB as default but be sure to update this
 # value if you have plenty of RAM
-dbconfig        set_cachesize 0 2097152 0
+dbconfig set_cachesize 0 2097152 0
 
 # Sven Hartge reported that he had to set this value incredibly high
 # to get slapd running at all. See http://bugs.debian.org/303057
 # for more information.
 
 # Number of objects that can be locked at the same time.
-dbconfig        set_lk_max_objects 1500
+dbconfig set_lk_max_objects 1500
 # Number of locks (both requested and granted)
-dbconfig        set_lk_max_locks 1500
+dbconfig set_lk_max_locks 1500
 # Number of lockers
-dbconfig        set_lk_max_lockers 1500
+dbconfig set_lk_max_lockers 1500
 
 # Indexing options for database #1
 index           objectClass eq
@@ -94,10 +101,24 @@ lastmod         on
 # admin entry below
 # These access lines apply to database #1 only
 access to attrs=userPassword,shadowLastChange
-        by anonymous auth
-        by self write
-        by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-        by * none
+	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+    by anonymous auth
+    by self write
+    by * none
+
+access to attrs=sambaNTPassword
+	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+	by dn="uid=samba,ou=sysusers,dc=<domaine>,dc=local" write
+	by anonymous auth
+	by self write
+	by * none
+
+access to attrs=sambaLMPassword
+	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+	by dn="uid=samba,ou=sysusers,dc=<domaine>,dc=local" write
+	by anonymous auth
+	by self write
+	by * none
 
 # Ensure read access to the base for things like
 # supportedSASLMechanisms.  Without this you may
@@ -109,13 +130,15 @@ access to attrs=userPassword,shadowLastChange
 # want SASL (and possible other things) to work 
 # happily.
 access to dn.base=""
-        by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-        by * read
+	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+	by * read
 
 # The admin dn has full write access, everyone else
 # can read everything.
 access to *
-        by * read
+	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+	by dn="uid=samba,ou=sysusers,dc=<domaine>,dc=local" write
+    by * read
 
 # For Netscape Roaming support, each user gets a roaming
 # profile for which they have write access to
