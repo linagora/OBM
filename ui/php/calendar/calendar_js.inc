@@ -195,7 +195,6 @@ function add_exdate() {
     displayDatePicker(field.name);
   });
 }
-
 ";
 
 ?>

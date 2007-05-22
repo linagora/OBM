@@ -135,6 +135,7 @@ $l_hide = "Masquer";
 $l_show = "Afficher";
 $l_advanced = "Avancé";
 $l_properties = "Propriétés";
+$l_items = "Accessoires";
 
 // Entities
 $l_company = "Société";

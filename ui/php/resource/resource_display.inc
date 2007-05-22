@@ -15,6 +15,7 @@
 $fieldnames["resource_name"] = $l_name;
 $fieldnames["resource_description"] = $l_desc; // description 
 $fieldnames["resource_qty"] = $l_qty; // quantity 
+$fieldnames["resourcetype_label"] = $l_rtype; 
 $fieldnames["resource_id"] = $l_update;
 
 
@@ -58,13 +59,16 @@ function dis_data_resource(&$OD, $fieldname, $link_ok) {
 function html_resource_search_form($resource) {
   global $l_name, $l_desc, $l_qty, $l_find, $l_all;
   global $l_add_resources;
-  global $display, $c_all;
+  global $display, $c_all, $l_rtype;
+  global $l_undef, $c_undef;
 
   $lname = $resource["name"];
   $ldesc = stripslashes($resource["desc"]);
   $qtyinf = $resource["qtyinf"];
   $qtysup = $resource["qtysup"];
   $popup = $resource["popup"];
+  $sel_rtype = $resource["rtype"];
+
   if ($resource["restriction"]) {
     $dis_restriction = "<input name=\"restriction\" type=\"hidden\" value=\"user\">";
   }
@@ -82,13 +86,29 @@ function html_resource_search_form($resource) {
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
-	    <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">
+	          <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
     if ($ext_title == "") {
       $ext_title = $l_add_resources;
     }
     $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
+
+  // Resource Type
+  $resourcetype_q = run_query_resourcetype();
+  $block_resourcetype = "<select name=\"sel_rtype\" id=\"sel_rtype\">
+    <option value=\"$c_undef\">$l_undef</option>";
+  while($resourcetype_q->next_record()) {
+    $id = $resourcetype_q->f("resourcetype_id");
+    $label = $resourcetype_q->f("resourcetype_label");
+    if ($id == $sel_rtype) {
+      $selected = "selected";
+    } else {
+      $selected = "";
+    }
+    $block_resourcetype .= "<option value=\"$id\" $selected>$label</option>";
+  }
+  $block_resourcetype .= "</select>";
 
   $block = "
   <form method=\"get\" name=\"f_search\"
@@ -101,6 +121,9 @@ function html_resource_search_form($resource) {
     <label>$l_desc<br />
       <input type=\"text\" name=\"tf_desc\" size=\"30\" maxlength=\"32\"
       value=\"$ldesc\" />
+    </label>
+    <label>$l_rtype<br />
+      $block_resourcetype
     </label>
     <label>&nbsp;&nbsp;<br />
     </label>
@@ -192,10 +215,10 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
     if ($ext_widget != "") {
       $resource_d->data_form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";
-    } elseif ($ext_element != "") {
+    } elseif ($ext_element != "")  {
       $resource_d->data_cb_name = "";
       $resource_d->data_form_head = "
-      <form onsubmit=\"of_select_fill_from_checkbox(this); return false;\">";
+      <form onsubmit=\"of_select_fill_from_checkbox(this);return false;\">";
     } else {
       $resource_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
@@ -235,13 +258,15 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
 function html_resource_form($usr_q, $resource) {
   global $l_name, $l_desc, $l_qty;
   global $l_resource, $l_insert, $l_update;
-  global $action;
+  global $action, $l_rtype;
+  global $l_undef, $c_undef;
 
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
     $id = $usr_q->f("resource_id");
     $name = $usr_q->f("resource_name");
     $desc = $usr_q->f("resource_description");
+    $rtype = $usr_q->f("resource_rtype_id");
     $qty = $usr_q->f("resource_qty");
   }
 
@@ -249,6 +274,23 @@ function html_resource_form($usr_q, $resource) {
   if (isset($resource["resource_id"])) { $id = $resource["resource_id"]; }
   if (isset($resource["name"])) { $name = $resource["name"]; }
   if (isset($resource["qty"])) { $qty = $resource["qty"]; }
+  if (isset($resource["rtype"])) { $rtype = $resource["rtype"]; }
+
+  // Resource Type
+  $resourcetype_q = run_query_resourcetype();
+  $block_resourcetype = "<select name=\"sel_rtype\" id=\"sel_rtype\">
+    <option value=\"$c_undef\">$l_undef</option>";
+  while($resourcetype_q->next_record()) {
+    $rtype_id = $resourcetype_q->f("resourcetype_id");
+    $label = $resourcetype_q->f("resourcetype_label");
+    if ($rtype_id == $rtype) {
+      $selected = "selected";
+    } else {
+      $selected = "";
+    }
+    $block_resourcetype .= "<option value=\"$rtype_id\" $selected>$label</option>";
+  }
+  $block_resourcetype .= "</select>";
 
   // Buttons
   if (($action == "new") || ($action == "insert")) {
@@ -273,6 +315,9 @@ function html_resource_form($usr_q, $resource) {
     <tr>
       <th>$l_name</th>
       <td><input id=\"tf_name\" name=\"tf_name\" size=\"40\" maxlength=\"120\" value=\"$name\" /></td>
+    </tr><tr>
+      <th>$l_rtype</th>
+      <td>$block_resourcetype</td>
     </tr><tr>
       <th>$l_qty</th>
       <td><input id=\"tf_qty\" name=\"tf_qty\" size=\"4\" maxlength=\"8\" value=\"$qty\" /></td>
@@ -326,13 +371,14 @@ function dis_resource_consult($resource) {
 //   - $obm_q : Resource database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_resource_consult($obm_q) {
-  global $l_resource, $l_name, $l_desc, $l_qty;
+  global $l_resource, $l_name, $l_desc, $l_qty, $l_rtype;
   global $path, $display, $c_yes, $c_no;
 
   $id = $obm_q->f("resource_id");
   $name = $obm_q->f("resource_name");
   $desc = $obm_q->f("resource_description");
   $qty = $obm_q->f("resource_qty");
+  $rtype = ucfirst($obm_q->f("resourcetype_label"));
 
   $display["detailInfo"] = display_record_info($obm_q);
   $display["title"] = "<div class=\"title\">$l_resource : $name</div>";
@@ -345,6 +391,9 @@ function html_resource_consult($obm_q) {
       <th>$l_name</th>
       <td>$name</td>
     </tr><tr>
+      <th>$l_rtype</th>
+      <td>$rtype</td>
+    </tr><tr>
       <th>$l_qty</th>
       <td>$qty</td>
     </tr>
@@ -354,8 +403,7 @@ function html_resource_consult($obm_q) {
   <div class=\"detail extra\">
   <h1>$l_desc</h1>
       $desc
-    </div>
-";
+    </div>";
 
   return $block;
 }
@@ -427,6 +475,8 @@ function dis_resource_display_pref($prefs) {
 
   return $block;
 }
+
+
 /**
  * Build a JSON array with all search results 
  * 
@@ -435,19 +485,450 @@ function dis_resource_display_pref($prefs) {
  * @return void
  */
 function json_search_resources($resource,$res_q) {
-  global $display, $l_qty;
+  global $display, $l_qty, $l_ritem;
+  global $popup_height, $popup_width;
+
   $limit = $resource['limit'];
+  $form = $resource['form'];
+
   $resources = array();
   if(isset($resource["first_row"])) $res_q->seek($resource["first_row"] - 1);
   while($res_q->next_record() && count($users) < $limit ) {
     $id = $res_q->f("resource_id");
+    $resourcetype_id = $res_q->f("resource_rtype_id");
     $label = phpStringToJsString($res_q->f("resource_name"));
     $extra = phpStringToJsString("$l_qty : ".$res_q->f("resource_qty"));
-    $resources[] = "{id:'data-resource-$id', label:'$label', extra:'$extra'}";
+    $property = $res_q->f("resourcetype_property");
+
+    if ($form == "event" && $resourcetype_id != "") {
+      // Display resource item
+      // TODO : Afficher le lien seulement si des accessoires sont dispo. 
+      $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&resource_id=$id";
+      $extension = "new Element('div').adopt(new Element('a').
+        setProperties({'id' : 'a[$id]', 'href' : 'javascript: void(0);'}).
+        setProperty('onclick', 'window.open(\"$url_item\", \"\", \"height=$popup_height,width=$popup_width,scrollbars=yes\")').
+        appendText('$l_ritem').adopt(
+        new Element('textarea').
+          setProperties({'id':'list-item[$id]', 'name':'list-item[$id]', 'readonly':'readonly'}).
+          setStyle('display', 'block')).adopt(
+        new Element('input').
+          setProperties({'id':'list-item-id[$id]', 'name':'list-item-id[$id]', 'type':'hidden'})).adopt(
+        new Element('input').
+          setProperties({'id':'res-name[$id]', 'name':'res-name[$id]', 'type':'hidden', 'value':'$label'})).adopt(
+        new Element('input').
+          setProperties({'id':'res-id[$id]', 'name':'res-id[$id]', 'type':'hidden', 'value':'$id'})))";
+
+      // Display resource property if exists
+      if ($property != "") {
+        $l_property = phpStringToJsString(ucfirst($property));
+        $extension .= ".
+          adopt(
+            new Element('div').
+              adopt(new Element('input').
+                setProperties(
+                  {'type': 'hidden',
+                  'name': 'property-name[$id]',
+                  'value': '$property'})).
+              adopt(new Element('input').
+                setProperties(
+                  {'type': 'text',
+                  'name': 'property[$id]',
+                  'value': '$l_property'}).
+                addEvent('click', function(){ if(this.value=='$l_property') this.value=\"\"; })
+              )
+          )";
+      } else {
+        $extension .= "";
+      }
+    } else {
+      $extension = "''";
+    }
+    $resources[] = "{id:'data-resource-$id', label:'$label', extra:'$extra', extension: $extension}";
   }
   $display["json"] = "{length:".$res_q->nf().", datas:[".implode(",",$resources)."]}";
 }
 
 
+/**
+ * Display the resource administration index
+ * @param mixed $params
+ * @access public
+ * @return Resource Admin HTML code
+ */
+function dis_resource_admin_index($params) {
+
+  $rt_q = run_query_resourcetype();
+  $block .= html_resource_resourcetype_form($rt_q);
+
+  $ri_q = run_query_resourceitem();
+  $block .= html_resource_resourceitem_form($ri_q);
+  
+  return $block;
+}
+
+
+/**
+ * Display: Resource Type Code section
+ * @param $rt_q
+ * @access public
+ * @return Resource Type HTML code
+ */
+function html_resource_resourcetype_form($rt_q) {
+  global $l_rtype_manage;
+  global $l_label, $l_rtype_property, $l_rtype_kind;
+  global $l_c_new, $l_rtype_insert, $l_rtype_update, $l_rtype_checkdelete; 
+  global $ico_delete, $ico_ok;
+
+  $key = 0;
+  while($rt_q->next_record()) {
+    $id = $rt_q->f("resourcetype_id");
+    $label = $rt_q->f("resourcetype_label");
+    $property = $rt_q->f("resourcetype_property");
+    $kind = $rt_q->f("resourcetype_kind");
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
+    }
+    $key ++;
+
+    $rtype_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"rtype_$id\" value=\"$id\" />
+    <a href=\"?action=rtype_checklink&amp;rtype=$id\">
+    <img src=\"$ico_delete\"/>
+    </a></td>
+    <td> <input type=\"text\" id=\"tf_rtype_label_$id\" value=\"$label\" size=\"16\"/></td>
+    <td> <input type=\"text\" id=\"tf_rtype_property_$id\" value=\"$property\" size=\"16\"/></td>
+    <td> <input type=\"text\" id=\"tf_rtype_kind_$id\" value=\"$kind\" size=\"6\"/></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'rtype');\">
+    <img src=\"$ico_ok\"/>
+    </a>
+    </td>
+    </tr>";
+  }
+
+  // --- HTML Template --------------------------------------------------------
+  $block = "
+  <div class=\"detail admin\" >
+  <form id=\"form_rtype_update\" action=\"?action=rtype_update\" method=\"post\">
+  <input type=\"hidden\" name=\"rtype\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_rtype_label\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_rtype_property\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_rtype_kind\" value=\"\" />
+  </form>    
+  <h1>$l_rtype_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_label</td>
+  <td>$l_rtype_property</td>
+  <td>$l_rtype_kind</td>
+  <td>&nbsp;</td>        
+  </tr>    
+  </thead>
+  <tbody>
+  $rtype_list
+  </tbody>
+  </table>
+  </div>    
+  <form id=\"form_rtype_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category(this.tf_rtype_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_c_new</td>
+  </tr>
+  </thead>
+  <tbody>   
+  <tr>
+  <td>$l_label</td>    
+  <td>$l_rtype_property</td>
+  <td>$l_rtype_kind</td>    
+  </tr>       
+  <tr>
+  <td><input type=\"text\" name=\"tf_rtype_label\" value=\"\" size=\"16\"/></td>
+  <td><input type=\"text\" name=\"tf_rtype_property\" value=\"\" size=\"16\"/></td>
+  <td><input type=\"text\" name=\"tf_rtype_kind\" value=\"\" size=\"6\"/></td>
+  </tr>  
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_rtype_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"rtype_insert\" />
+  </form>
+  </div>";
+
+  return $block;
+}
+
+
+/**
+ * Display: Resource Item Code section
+ * @param $ri_q
+ * @access public
+ * @return Resource Item HTML code
+ */
+function html_resource_resourceitem_form($ri_q) {
+  global $l_ritem_manage, $l_label, $l_desc, $l_rtype;
+  global $l_c_new, $l_ritem_insert;
+  global $ico_ok, $ico_delete;
+
+  $key = 0;
+  while($ri_q->next_record()) {
+    $id = $ri_q->f("resourceitem_id");
+    $label = $ri_q->f("resourceitem_label");
+    $desc = $ri_q->f("resourceitem_description"); 
+    $type_id = $ri_q->f("resourceitem_resourcetype_id");
+
+    $rt_q = run_query_resourcetype();
+    $sel_type = "<select name=\"sel_rtype\" id=\"sel_rtype_$id\">";
+    while($rt_q->next_record()) {
+      $rtype_id = $rt_q->f("resourcetype_id");
+      $rtype_label = $rt_q->f("resourcetype_label");
+      if ($type_id == $rtype_id) {
+        $selected = "selected";
+      } else {
+        $selected = "";
+      }
+      $sel_type .= "<option value=\"$rtype_id\" $selected>$rtype_label</option>";
+  
+    } 
+    $sel_type .= "</select>";
+
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
+    }
+    $key ++;
+
+    $ritem_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"ritem_$id\" value=\"$id\" />
+    <a href=\"?action=ritem_checklink&amp;ritem=$id\">
+    <img src=\"$ico_delete\"/>
+    </a></td>
+    <td> <input type=\"text\" id=\"tf_ritem_label_$id\" value=\"$label\" size=\"16\"/></td>
+    <td> <textarea name=\"tf_ritem_desc\" id=\"tf_ritem_desc_$id\" rows=\"2\"/>$desc</textarea></td>
+    <td> $sel_type </td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'ritem');\">
+    <img src=\"$ico_ok\"/>
+    </a>
+    </td>
+    </tr>";
+  }
+
+  $rt_q = run_query_resourcetype();
+  $sel_type = "<select name=\"sel_rtype\" id=\"sel_rtype_$id\">";
+  while($rt_q->next_record()) {
+    $rtype_id = $rt_q->f("resourcetype_id");
+    $rtype_label = $rt_q->f("resourcetype_label");
+    if ($type_id == $rtype_id) {
+      $selected = "selected";
+    } else {
+      $selected = "";
+    }
+    $sel_type .= "<option value=\"$rtype_id\">$rtype_label</option>";
+  
+  } 
+  $sel_type .= "</select>";
+
+  // --- HTML Template --------------------------------------------------------
+  $block = "
+  <div class=\"detail admin\" >
+  <form id=\"form_ritem_update\" action=\"?action=ritem_update\" method=\"post\">
+  <input type=\"hidden\" name=\"ritem\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_ritem_label\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_ritem_desc\" value=\"\" />
+  <input type=\"hidden\" name=\"sel_rtype\" value=\"\" />
+  </form>    
+  <h1>$l_ritem_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_label</td>
+  <td>$l_desc</td>
+  <td>$l_rtype</td>
+  <td>&nbsp;</td>        
+  </tr>    
+  </thead>
+  <tbody>
+  $ritem_list
+  </tbody>
+  </table>
+  </div>    
+  <form id=\"form_ritem_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category(this.tf_ritem_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_c_new</td>
+  </tr>
+  </thead>
+  <tbody>   
+  <tr>
+  <td>$l_label</td>    
+  <td>$l_desc</td>    
+  <td>$l_rtype</td>    
+  </tr>       
+  <tr>
+  <td><input type=\"text\" name=\"tf_ritem_label\" value=\"\" size=\"16\"/></td>
+  <td><textarea name=\"tf_ritem_desc\" value=\"\" rows=\"2\"/></textarea></td>
+  <td>$sel_type</td>
+  </tr>  
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_ritem_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"ritem_insert\" />
+  </form>
+  </div>";
+
+  return $block;
+}
+
+
+/**
+ * Display: Resource Links
+ * @param mixed $params
+ * @param $kind
+ * @access public
+ * @return Resource link HTML code
+ */
+function dis_resource_links($params, $kind) {
+  global $display;
+  global $l_c_cant_delete, $l_c_can_delete;
+  global $l_back, $l_c_delete;
+  $l_kind = "l_${kind}"; 
+  global $$l_kind;
+
+  $id = $params["${kind}"];
+  
+  if ($kind == "rtype") {
+    $obm_q = run_query_resource_rtype_links($params);
+  } else {
+    $obm_q = run_query_resource_ritem_links($params); 
+  } 
+
+  $nb = $obm_q->num_rows();
+  if ($nb > 0) {
+    $display["msg"] .= display_warn_msg("${$l_kind} : $l_c_cant_delete");    
+  } else {
+    $display["msg"] .= display_ok_msg("${$l_kind} : $l_c_can_delete");
+    $dis_buttons .= "<a href=\"?action=${kind}_delete&amp;${kind}=$id\">$l_c_delete</a>";
+  }
+
+  $dis_buttons .= "<a href=\"?action=admin\">$l_back</a>";
+
+  $block = "
+  <div class=\"buttons\">
+    $dis_buttons
+  </div>";
+
+  return $block;
+}
+
+
+/**
+ * Display: Resource Item Popup
+ * @param mixed $params
+ * @access public
+ * @return Resource code
+ */
+function dis_ritem_popup($params) {
+
+  // ResourceItem
+  $r_id = $params["resource_id"];
+  $ri_q = run_query_resourceitem($r_id);
+  $block .= html_resource_resourceitem_popup($ri_q, $params);
+
+  return $block;
+}
+
+
+/**
+ * Display: Resource Item Popup
+ * @param $ri_q
+ * @param mixed $params
+ * @access public
+ * @return Resource Item popup HTML code
+ */
+function html_resource_resourceitem_popup($ri_q, $params) {
+  global $display;
+  global $l_close, $l_ritem, $l_ritem_add, $l_add;
+  global $l_no_item_available;
+
+  $res_id = $params["resource_id"];
+  
+  while($ri_q->next_record()) {
+    $id = $ri_q->f("resourceitem_id");
+    $label = $ri_q->f("resourceitem_label");
+    $desc = $ri_q->f("resourceitem_description");
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
+    }
+    $key ++;
+    $ritem_list .= "
+    <tr $class>
+    <td id=\"item-$id\">
+     <input type=\"checkbox\" id=\"$id\" name=\"$id\" />
+     <span id=\"data-ritem-$id\" name=\"data-ritem-$id\" style=\"display: none;\">$label</span>
+    </td>
+    <td> $label </td>
+    <td>".nl2br($desc)."</td>
+    </tr>";
+  }
+
+  $display["title"] = "<h1 class=\"title\">$l_ritem</h1>";
+
+  // If no item, display error message
+  if ($ritem_list == "") {
+    return display_err_msg($l_no_item_available);
+  } else {
+
+  // --- HTML Template --------------------------------------------------------
+  $block = "
+    <div class=\"detail admin\">
+      <form onsubmit=\"select_ritem_fill_from_checkbox(this, '$res_id');return false;\">
+      <table>
+        $ritem_list
+      </table>  
+      <fieldset class=\"buttons\">
+        <input type=\"submit\" value=\"$l_ritem_add\" />
+      </fieldset>
+      </form>
+      <p><a href=\"\" onclick='window.close();'>$l_close</a></p>
+    </div>
+    <script> 
+     item_id = window.opener.document.getElementById('list-item-id['+$res_id+']').value;
+     item_arr = item_id.split(',');
+     item_arr.each(function(item,index) {
+       if(item != '') {
+         ckbox = window.document.getElementById(item);
+         ckbox.checked = 'true';
+       }
+     });
+    </script>";
+  }
+
+  return $block;
+}
 
 ?>

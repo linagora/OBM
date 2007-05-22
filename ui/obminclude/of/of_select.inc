@@ -76,6 +76,7 @@ function of_select_add_element(target, element_name, sel_id, fieldLabel) {
   image = target.createElement('img');
   image.src = '$ico_delete';
   link.appendChild(image);
+  l_ritem= document.createTextNode(\"$l_ritem \");
 
   // Create the label
   content = target.createTextNode(fieldLabel);

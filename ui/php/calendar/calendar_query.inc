@@ -112,6 +112,30 @@ function run_query_calendar_get_resource_label($resources) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return all the property of resources
+// Parameters:
+//   - $r_id : resource id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_get_resource_property($r_id) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain("resource");
+  $obm_q = new DB_OBM;
+  $query = "SELECT resourcetype_property 
+    FROM ResourceType 
+    LEFT JOIN Resource ON resource_rtype_id=resourcetype_id
+    WHERE resource_id='$r_id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_get_resource_propertyl()");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $return = $obm_q->f("resourcetype_property");
+
+  return $return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return all the label of entities 
 // Parameters:
 //   - $entities : entity id array, the event is assigned to
@@ -411,7 +435,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $title = $calendar["title"];
   $category1_id = $calendar["category1"];
   $priority = $calendar["priority"];
-  $description = $calendar["description"];
+  $description = $calendar["description"]."|<extended_desc>";
   $location = $calendar["location"];
   ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
   $datebegin = $calendar["date_begin"];
@@ -423,7 +447,32 @@ function run_query_calendar_insert_event_data($calendar) {
   $repeat_end = $calendar["repeat_end"];
   $repeatfrequency = $calendar["repeatfrequency"];  
   $date_exception = $calendar["date_exception"];
-  
+  $item = $calendar["list-item"];
+  $item_id = $calendar["list-item-id"];
+  $res_name = $calendar["res-name"];
+  $res_id = $calendar["res-id"];
+  $property = $calendar["property"];
+  $property_name = $calendar["property-name"];
+  if (is_array($res_name)) {
+    foreach($res_name as $key=>$res) {
+      $description .= "<resource>
+         <res_name>$res</res_name>
+         <res_id>$res_id[$key]</res_id>";
+
+      if (is_array($item) && isset($item[$key])) {
+        $description .= "<item>$item[$key]</item>
+          <item_id>$item_id[$key]</item_id>";
+      }
+
+      if (is_array($property_name) && isset($property_name[$key])) {
+        $description .= "<property_name>$property_name[$key]</property_name>
+                         <property_value>$property[$key]</property_value>";                       
+      }
+      $description .= "</resource>";
+    }
+  }
+  $description .= "</extended_desc>";
+
   $obm_q = new DB_OBM;
   
   $query = "INSERT INTO CalendarEvent (
@@ -907,7 +956,7 @@ function run_query_calendar_update_event_data($calendar) {
   $title = $calendar["title"];
   $category1_id = $calendar["category1"];
   $priority = $calendar["priority"];
-  $description = $calendar["description"];
+  $description = $calendar["description"]."|<extended_desc>";
   $location = $calendar["location"];
   $datebegin = $calendar["date_begin"];
   $event_duration = $calendar["event_duration"];
@@ -919,6 +968,31 @@ function run_query_calendar_update_event_data($calendar) {
   $repeat_end = $calendar["repeat_end"];
   $frequency = $calendar["repeatfrequency"];  
   $date_exception = $calendar["date_exception"];
+  $item = $calendar["list-item"];
+  $item_id = $calendar["list-item-id"];
+  $res_name = $calendar["res-name"];
+  $res_id = $calendar["res-id"];
+  $property = $calendar["property"];
+  $property_name = $calendar["property-name"];
+  if (is_array($res_name)) {
+    foreach($res_name as $key=>$res) {
+      $description .= "<resource>
+         <res_name>$res</res_name>
+         <res_id>$res_id[$key]</res_id>";
+
+      if (is_array($item) && isset($item[$key])) {
+        $description .= "<item>$item[$key]</item>
+          <item_id>$item_id[$key]</item_id>";
+      }
+
+      if (is_array($property_name) && isset($property_name[$key])) {
+        $description .= "<property_name>$property_name[$key]</property_name>
+                         <property_value>$property[$key]</property_value>";                       
+      }
+      $description .= "</resource>";
+    }
+  }
+  $description .= "</extended_desc>";
 
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
@@ -2418,7 +2492,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity) {
     if (isset($of->events[$id])) {
       $event = &$of->events[$id];
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,'none',$owner);
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description, $all_day,'none',$owner);
     }
     $of->addOccurrence($event, $date, $entity, $entity_id);
   }
@@ -2448,7 +2522,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity) {
     if (isset($of->events[$id])) {
       $event = &$of->events[$id];
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,$repeatkind,$owner);
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description, $all_day,$repeatkind,$owner);
     }
     $event_start =  $start_time ;
     $delta = date("H",$date) * 3600 + date("i",$date) * 60 + date("s",$date) + $duration;

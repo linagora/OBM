@@ -21,7 +21,8 @@ function run_query_resource_search($resource) {
 
   $name = sql_search_text_parse($resource["name"]);
   $desc = sql_search_text_parse($resource["desc"]);
-  
+  $rtype = $resource["rtype"];
+ 
   $sql_order_dir = $resource["sql_order_dir"];
   $sql_order_field = $resource["sql_order_field"];
   
@@ -46,8 +47,9 @@ function run_query_resource_search($resource) {
     }
   }
 
-  $select = "SELECT Resource.*, resource_id as id
-    FROM Resource";
+  $select = "SELECT Resource.*, resource_id as id, resourcetype_label
+    FROM Resource
+    LEFT JOIN ResourceType ON resourcetype_id = resource_rtype_id";
 
   $where = " 1=1 $multidomain";
 
@@ -59,6 +61,11 @@ function run_query_resource_search($resource) {
   // If a description indication has been specified, get it
   if (trim($desc) != "") {
      $where .= " AND resource_description like '%$desc%'";
+  }
+  
+  // If a resource type has been specified, get it
+  if ($rtype != "0") {
+     $where .= " AND resource_rtype_id='$rtype'";   
   }
 
   if ((trim($where) != "") || (trim($where_restriction) != "")) {
@@ -86,6 +93,7 @@ function run_query_resource_search($resource) {
 
   return $obm_q;
 }
+
 
 /**
  * Search resources from a single field 
@@ -117,21 +125,22 @@ function run_query_resource_ext_search($resource) {
   $query = "SELECT 
       resource_id,
       resource_name,
-      resource_qty
+      resource_qty,
+      resource_rtype_id,
+      resourcetype_property,
+      resourcetype_pkind
     FROM Resource
+    LEFT JOIN ResourceType ON resource_rtype_id = resourcetype_id
     WHERE 
       resource_name LIKE '$pattern%' 
       $multidomain
       $where_restriction
-    ORDER BY resource_name
-      ";
+    ORDER BY resource_name";
 
   display_debug_msg($query, $cdg_sql, "run_query_resource_ext_search()");
   $obm_q->query($query);
 
   return $obm_q;
-      
-
 }
 
 
@@ -154,10 +163,12 @@ function run_query_resource_detail($p_id) {
       $timeupdate,
       $timecreate,
       c.userobm_login as usercreate,
-      u.userobm_login as userupdate
+      u.userobm_login as userupdate,
+      resourcetype_label
     FROM Resource 
          LEFT JOIN UserObm as c ON Resource.resource_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON Resource.resource_userupdate=u.userobm_id
+         LEFT JOIN ResourceType ON resource_rtype_id=resourcetype_id
     WHERE Resource.resource_id='$p_id' $multidomain";
 
   $obm_q->query($query);
@@ -180,6 +191,7 @@ function run_query_resource_insert($resource) {
   $name = $resource["name"];
   $desc = $resource["desc"];
   $qty = $resource["qty"];
+  $rtype = $resource["rtype"];
   if ($qty == "") {
     $qty = "0";
   }
@@ -191,6 +203,7 @@ function run_query_resource_insert($resource) {
      resource_userupdate,
      resource_usercreate,
      resource_domain_id,
+     resource_rtype_id,
      resource_name,
      resource_description,
      resource_qty
@@ -200,6 +213,7 @@ function run_query_resource_insert($resource) {
     null,
     ". $obm["uid"] . ",
     '$domain_id',
+    '$rtype',
     '$name',
     '$desc',
     '$qty'
@@ -276,6 +290,8 @@ function run_query_resource_update($p_id, $resource) {
   $name = $resource["name"];
   $desc = $resource["desc"];
   $qty = $resource["qty"];
+  $rtype = $resource["rtype"];
+
   $multidomain = sql_multidomain("resource");
 	
   $query = "UPDATE Resource SET
@@ -283,7 +299,8 @@ function run_query_resource_update($p_id, $resource) {
     resource_userupdate=". $obm["uid"] .",
     resource_name='$name',
     resource_description='$desc',
-    resource_qty='$qty'
+    resource_qty='$qty',
+    resource_rtype_id='$rtype'
   WHERE resource_id='$p_id'
     $multidomain";
 
@@ -468,5 +485,263 @@ function get_resource_infos($id) {
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : get resource type infos
+// Parameters:
+// Returns:
+//   - array
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resourcetype () {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM ;
+  $multidomain = sql_multidomain("resourcetype");
+  $query = "SELECT * FROM ResourceType WHERE 1=1 $multidomain ORDER BY resourcetype_label";
+  display_debug_msg($query, $cdg_sql, "run_query_resourcetype()");
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : get resource item infos
+// Parameters:
+// Returns:
+//   - array
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resourceitem ($r_id="") {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM ;
+  $multidomain = sql_multidomain("resourceitem");
+
+  if ($r_id != "") {
+    $left_join = "LEFT JOIN Resource ON resource_rtype_id=resourceitem_resourcetype_id";
+    $where = "AND resource_id='$r_id'";
+  }
+
+  $query = "SELECT * FROM ResourceItem $left_join WHERE 1=1 $multidomain $where ORDER BY resourceitem_label";
+  display_debug_msg($query, $cdg_sql, "run_query_resourceitem()");
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Resource Type insertion query construction and execution
+// Parameters:
+//   - $params       : hash
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resource_rtype_insert($params) {
+  global $cdg_sql, $obm;
+
+  $domain_id = $obm["domain_id"];
+  $label = $params["rtype_label"];
+  $property = $params["rtype_property"];
+
+  $query = "INSERT INTO ResourceType (
+    resourcetype_domain_id,
+    resourcetype_label,
+    resourcetype_property) VALUES (
+    '$domain_id', 
+    '$label', 
+    '$property')";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_rtype_insert()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Resource Type insertion query construction and execution
+// Parameters:
+//   - $params       : hash
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resource_ritem_insert($params) {
+  global $cdg_sql, $obm;
+
+  $domain_id = $obm["domain_id"];
+  $label = $params["ritem_label"];
+  $desc = $params["ritem_desc"];
+  $type = $params["rtype"];
+
+  $query = "INSERT INTO ResourceItem (
+    resourceitem_domain_id,
+    resourceitem_label,
+    resourceitem_resourcetype_id,
+    resourceitem_description) VALUES (
+    '$domain_id', 
+    '$label', 
+    '$type',
+    '$desc')";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_ritem_insert()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Resource Type insertion query construction and execution
+// Parameters:
+//   - $params       : hash
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resource_rtype_update($params) {
+  global $cdg_sql, $obm;
+  
+  $domain_id = $obm["domain_id"];
+  $id = $params["rtype"];
+  $label = $params["rtype_label"];
+  $property = $params["rtype_property"];
+  $multidomain = sql_multidomain("resourcetype");
+
+  $query = "UPDATE ResourceType SET 
+    resourcetype_label = '$label',
+    resourcetype_property = '$property'
+    WHERE resourcetype_id='$id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_rtype_update()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Resource Type insertion query construction and execution
+// Parameters:
+//   - $params       : hash
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resource_ritem_update($params) {
+  global $cdg_sql, $obm;
+  
+  $domain_id = $obm["domain_id"];
+  $id = $params["ritem"];
+  $label = $params["ritem_label"];
+  $desc = $params["ritem_desc"];
+  $rtype_id = $params["rtype"];
+  $multidomain = sql_multidomain("resourceitem");
+
+  $query = "UPDATE ResourceItem SET 
+    resourceitem_label = '$label',
+    resourceitem_description = '$desc',
+    resourceitem_resourcetype_id = '$rtype_id'
+    WHERE resourceitem_id='$id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_ritem_update()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Resource Type - Resource links query execution
+// Parameters:
+// Return:
+//   - database handle
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resource_rtype_links($params) {
+  global $cdg_sql;
+
+  $id = $params["rtype"];
+  $multidomain = sql_multidomain("resource");
+
+  $query = "SELECT resource_id FROM Resource WHERE resource_rtype_id='$id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_rtype_links()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Resource Type deletion query construction and execution
+// Parameters:
+//   - $params       : hash
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resource_rtype_delete($params) {
+  global $cdg_sql, $obm;
+  
+  $id = $params["rtype"];
+  $multidomain = sql_multidomain("resourcetype");
+
+  $query = "DELETE FROM ResourceType
+    WHERE resourcetype_id='$id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_rtype_delete()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Resource Type - Resource links query execution
+// Parameters:
+// Return:
+//   - database handle
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resource_ritem_links($params) {
+  global $cdg_sql;
+
+  $id = $params["ritem"];
+  $multidomain = sql_multidomain("resource");
+
+  $query = "SELECT resource_id FROM Resource WHERE resource_rtype_id='$id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_rtype_links()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Resource Type deletion query construction and execution
+// Parameters:
+//   - $params       : hash
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resource_ritem_delete($params) {
+  global $cdg_sql, $obm;
+  
+  $id = $params["ritem"];
+  $multidomain = sql_multidomain("resourceitem");
+
+  $query = "DELETE FROM ResourceItem
+    WHERE resourceitem_id='$id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_ritem_delete()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
 
 ?>

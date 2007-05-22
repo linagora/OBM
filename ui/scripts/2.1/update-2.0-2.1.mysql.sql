@@ -12,11 +12,22 @@ UPDATE ObmInfo set obminfo_value='2.1' where obminfo_name='db_version';
 
 
 -------------------------------------------------------------------------------
+-- Update DisplayPref table
+-------------------------------------------------------------------------------
+-- Add Resource Type
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resource', 'resourcetype_label', 4, 1);
+
+-------------------------------------------------------------------------------
 -- Update Lead table
 -------------------------------------------------------------------------------
 -- Add contact link
 ALTER TABLE Lead ADD COLUMN lead_contact_id int(8) NOT NULL DEFAULT 0 AFTER lead_company_id;
 
+-------------------------------------------------------------------------------
+-- Update Resource table
+-------------------------------------------------------------------------------
+-- Add ResourceType link
+ALTER TABLE Resource ADD COLUMN resource_rtype_id int(8) AFTER resource_domain_id;
 
 -------------------------------------------------------------------------------
 -- Add delegation fields
@@ -72,7 +83,31 @@ CREATE TABLE Updated (
   PRIMARY KEY (updated_id)
 );
 
+--
+-- Table structure for the table 'ResourceType'
+--
+CREATE TABLE ResourceType (
+  resourcetype_id					int(8) auto_increment,
+  resourcetype_domain_id	int(8) DEFAULT 0,	
+  resourcetype_label			varchar(32) NOT NULL,
+  resourcetype_property		varchar(32),
+  resourcetype_pkind				int(1) DEFAULT 0 NOT NULL,
+  PRIMARY KEY (resourcetype_id)
+);
 
+--
+-- Table structure for the table 'ResourceItem'
+--
+CREATE TABLE ResourceItem (
+  resourceitem_id								int(8) auto_increment,
+  resourceitem_domain_id				int(8) DEFAULT 0,
+  resourceitem_label						varchar(32) NOT NULL,
+  resourceitem_resourcetype_id	int(8) NOT NULL,
+  resourceitem_description			text,
+  PRIMARY KEY (resourceitem_id)
+);
+
+--
 --
 -- Table structure for the table 'Updatedlinks'
 --
@@ -86,3 +121,4 @@ CREATE TABLE Updatedlinks (
   updatedlinks_entity_id  int(8),
   PRIMARY KEY (updatedlinks_id)
 );
+

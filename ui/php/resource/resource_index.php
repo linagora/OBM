@@ -37,6 +37,7 @@ require("resource_display.inc");
 require("resource_query.inc");
 require("resource_js.inc");
 require("$obminclude/of/of_right.inc");
+include("$obminclude/of/of_category.inc");
 
 get_resource_action();
 $perm->check_permissions($module, $action);
@@ -60,6 +61,10 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
+} elseif ($action == "ext_ritem") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_ritem_popup($params);
+
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_resource_search_form($params);
@@ -73,12 +78,14 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_resource_search_form($params);
   $display["result"] = dis_resource_search_list($params);
+
 } elseif ($action == "ext_search") {
 ///////////////////////////////////////////////////////////////////////////////
   $res_q = run_query_resource_ext_search($params);
   json_search_resources($params, $res_q);
   echo "(".$display['json'].")";
   exit();
+
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_resource_form("",$params);
@@ -171,7 +178,79 @@ if ($action == "ext_get_ids") {
   }
   $display["detail"] = dis_resource_right_dis_admin($params["entity_id"]);
 
-}  elseif ($action == "display") {
+}  elseif ($action == "admin") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_resource_admin_index($params);
+
+} elseif ($action == "rtype_insert") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_resource_rtype_insert($params);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_rtype : $l_insert_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_rtype : $l_insert_error");
+  }
+  $display["detail"] .= dis_resource_admin_index($params);
+
+} elseif ($action == "rtype_update") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_resource_rtype_update($params);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_rtype : $l_update_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_rtype : $l_update_error");
+  }
+  $display["detail"] .= dis_resource_admin_index($params);
+
+} elseif ($action == "rtype_checklink") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_resource_links($params, "rtype");
+
+} elseif ($action == "rtype_delete") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_resource_rtype_delete($params);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_rtype : $l_delete_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_rtype : $l_delete_error");
+  }
+  $display["detail"] .= dis_resource_admin_index($params);
+
+} elseif ($action == "ritem_insert") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_resource_ritem_insert($params);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_ritem : $l_insert_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_ritem : $l_insert_error");
+  }
+  $display["detail"] .= dis_resource_admin_index($params);
+
+} elseif ($action == "ritem_update") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_resource_ritem_update($params);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_ritem : $l_update_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_ritem : $l_update_error");
+  }
+  $display["detail"] .= dis_resource_admin_index($params);
+
+} elseif ($action == "ritem_checklink") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_resource_links($params, "ritem");
+
+} elseif ($action == "ritem_delete") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_resource_ritem_delete($params);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_ritem : $l_delete_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_ritem : $l_delete_error");
+  }
+  $display["detail"] .= dis_resource_admin_index($params);
+
+} elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $prefs = get_display_pref($obm["uid"], "resource", 1);
   $display["detail"] = dis_resource_display_pref($prefs);
@@ -226,9 +305,9 @@ function get_resource_params() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_resource_action() {
   global $params, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
+  global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin,$l_header_reset,$l_header_right;
-  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin, $l_header_admin;
 
 // Index
   $actions["resource"]["index"] = array (
@@ -248,10 +327,10 @@ function get_resource_action() {
 
 // New
   $actions["resource"]["new"] = array (
-    'Name'     => $l_header_new,
+    'Name'     => $l_header_new_f,
     'Url'      => "$path/resource/resource_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display','rights_admin','rights_update') 
+    'Condition'=> array ('all') 
                                   );
 
 // Search
@@ -352,6 +431,75 @@ function get_resource_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                          );
+// Admin
+  $actions["resource"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/resource/resource_index.php?action=admin",
+    'Right'    => $cright_read_admin,
+    'Condition'=> array ('all') 
+                                       );
+
+// Resource Type Insert
+  $actions["resource"]["rtype_insert"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=rtype_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Resource Type Update
+  $actions["resource"]["rtype_update"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=rtype_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Resource Type Check Link
+  $actions["resource"]["rtype_checklink"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=rtype_checklink",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Resource Type Delete
+  $actions["resource"]["rtype_delete"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=rtype_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	       );
+
+// Resource Item Insert
+  $actions["resource"]["ritem_insert"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=ritem_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Resource Item Update
+  $actions["resource"]["ritem_update"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=ritem_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Resource Item Check Link
+  $actions["resource"]["ritem_checklink"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=ritem_checklink",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Resource Item Delete
+  $actions["resource"]["ritem_delete"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=ritem_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	       );
+// Add Resource Item
+  $actions["resource"]["ext_ritem"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=ext_ritem",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	       );
 
 }
 

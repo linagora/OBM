@@ -48,8 +48,51 @@ function fill_ext_form(int_form) {
 ";
 }
 
+
 if ($params["ext_element"] != "") {
-  require_once("$obminclude/of/of_select.inc");
+   require_once("$obminclude/of/of_select.inc");
+
+$extra_js .= "
+///////////////////////////////////////////////////////////////////////////////
+// Fill the of_select from checked checkboxes from a form result set
+// Parameters:
+//   - int_form : source form where to get values (eg: from popup windows)
+//   - entity   : [optionnal] entity to select [default to $module]
+///////////////////////////////////////////////////////////////////////////////
+function select_ritem_fill_from_checkbox(int_form, resource_id) {
+
+  target = window.opener.document;
+
+  var list_item = target.getElementById('list-item['+resource_id+']');
+  var list_item_id = target.getElementById('list-item-id['+resource_id+']');
+  var item_link = target.getElementById('a['+resource_id+']');
+
+  // reset actual value
+  list_item.value = '';
+  list_item_id.value = '';
+  item_link.title = '';
+
+  size = int_form.length;
+  for (i=0; i <size; i++) {
+    // For each checkbox of the form, if filled we send the value
+    if (int_form.elements[i].type == 'checkbox') {
+      if (int_form.elements[i].checked == true) {
+        id = int_form.elements[i].name;
+        div_id = '$params[ext_element]'+'-data-ritem-'+id;
+        // If the element not already present in the caller window
+        if (! get_elem(window.opener.document, div_id )) {
+          sel_id = 'data-ritem-'+id;
+	        span = get_elem(window.document, sel_id);
+          list_item_id.value += id +',';
+          list_item.value += span.innerHTML+'\\n';
+          item_link.title += span.innerHTML+', ';
+        }
+      }
+    }
+  }
+}
+";
+
 }
 
 

@@ -10,6 +10,11 @@
 -------------------------------------------------------------------------------
 UPDATE ObmInfo set obminfo_value='2.1' where obminfo_name='db_version';
 
+-------------------------------------------------------------------------------
+-- Update DisplayPref table
+-------------------------------------------------------------------------------
+-- Add Resource Type
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resource', 'resourcetype_label', 4, 1);
 
 -------------------------------------------------------------------------------
 -- Update Lead table
@@ -18,6 +23,11 @@ UPDATE ObmInfo set obminfo_value='2.1' where obminfo_name='db_version';
 ALTER TABLE Lead ADD COLUMN lead_contact_id integer;
 ALTER TABLE Lead ALTER COLUMN lead_contact_id SET DEFAULT 0;
 
+-------------------------------------------------------------------------------
+-- Update Resource table
+-------------------------------------------------------------------------------
+-- Add ResourceType link
+ALTER TABLE Resource ADD COLUMN resource_rtype_id integer AFTER resource_domain_id;
 
 -------------------------------------------------------------------------------
 -- Add delegation fields
@@ -83,6 +93,30 @@ CREATE TABLE Updated (
   PRIMARY KEY (updated_id)
 );
 
+
+--
+-- Table structure for the table 'ResourceType'
+--
+CREATE TABLE ResourceType (
+  resourcetype_id					  serial,
+  resourcetype_domain_id	  integer DEFAULT 0,	
+  resourcetype_label			  varchar(32) NOT NULL,
+  resourcetype_property		  varchar(32),
+  resourcetype_pkind				integer DEFAULT 0 NOT NULL,
+  PRIMARY KEY (resourcetype_id)
+);
+
+--
+-- Table structure for the table 'ResourceItem'
+--
+CREATE TABLE ResourceItem (
+  resourceitem_id								serial,
+  resourceitem_domain_id				integer DEFAULT 0,
+  resourceitem_label						varchar(32) NOT NULL,
+  resourceitem_resourcetype_id	integer NOT NULL,
+  resourceitem_description			text,
+  PRIMARY KEY (resourceitem_id)
+);
 
 --
 -- Table structure for the table 'Updatedlinks'

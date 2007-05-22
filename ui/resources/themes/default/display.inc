@@ -296,7 +296,7 @@ function display_head_theme($p_module) {
   global $ico_datepicker,$set_date_upd,$l_monthsofyear,$l_daysofweekfirst;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
-  global $ico_delete;
+  global $css_print_obm, $ico_delete;
 
   $monthShort =  phpArrayToJsArray($l_monthsofyearshort);
   $monthLong = phpArrayToJsArray($l_monthsofyear);
@@ -327,6 +327,7 @@ function display_head_theme($p_module) {
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
   <title>$l_obm_title - $p_module</title>
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_obm\" />
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_print_obm\" media=\"print\" />
   $dis_extra_css
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>

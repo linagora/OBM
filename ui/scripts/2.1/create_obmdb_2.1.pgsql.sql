@@ -659,6 +659,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_repeatdays   varchar(7) default NULL,
   calendarevent_endrepeat    timestamp NOT NULL,
   calendarevent_description  text,
+  calendarevent_item         text,
   PRIMARY KEY (calendarevent_id)
 );
 
@@ -1492,6 +1493,7 @@ CREATE TABLE DeletedTodo (
 CREATE TABLE Resource (
   resource_id                serial,
   resource_domain_id         integer default 0,
+  resource_rtype_id          integer,
   resource_timeupdate        timestamp,
   resource_timecreate        timestamp,
   resource_userupdate        integer,
@@ -1526,6 +1528,30 @@ CREATE TABLE RGroup (
 CREATE TABLE ResourceGroup (
   resourcegroup_rgroup_id    integer DEFAULT 0 NOT NULL,
   resourcegroup_resource_id  integer DEFAULT 0 NOT NULL
+);
+
+--
+-- Table structure for the table 'ResourceType'
+--
+CREATE TABLE ResourceType (
+  resourcetype_id				  serial,
+  resourcetype_domain_id	integer DEFAULT 0,	
+  resourcetype_label			varchar(32) NOT NULL,
+  resourcetype_property		varchar(32),
+  resourcetype_pkind				int(1) DEFAULT 0 NOT NULL,
+  PRIMARY KEY (resourcetype_id)
+);
+
+--
+-- Table structure for the table 'ResourceItem'
+--
+CREATE TABLE ResourceItem (
+  resourceitem_id								serial,
+  resourceitem_domain_id				integer DEFAULT 0,
+  resourceitem_label						varchar(32) NOT NULL,
+  resourceitem_resourcetype_id	integer NOT NULL,
+  resourceitem_description			text,
+  PRIMARY KEY (resourceitem_id)
 );
 
 
