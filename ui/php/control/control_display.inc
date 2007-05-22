@@ -106,10 +106,6 @@ function html_control_consult($domain_id="") {
   //  $system_update = get_update_state();
   $sys_update = ($system_update ? $c_yes : $c_no);
 
-  if ($cgp_use["service"]["web_local"]) {
-    $block_proxy_stats = display_proxy_stats();
-  }
-
   if( $cgp_securinet ) {
     $block_virus_stats = display_virus_stats();
   }
@@ -223,64 +219,6 @@ function display_virus_stats() {
     </tr>
     </table>
     </div>";
-
-  return $block;
-}
-
-
-function display_proxy_stats() {
-  global $proxystatspath, $l_download_csv;
-  global $l_daily_csv_proxy_stats;
-  global $l_weekly_csv_proxy_stats,$l_change_password;
-  global $l_monthly_csv_proxy_stats,$path,$l_validate;
-  global $l_web_stats, $l_proxy_stats,  $l_view_proxy_stats;
-
-  $block = "
-    <div class=\"detail infos\">
-    <h1>$l_web_stats</h1>
-
-    <table>
-    <tr>
-      <th>$l_proxy_stats</th>
-      <td>
-        <a href=\"\" onclick=\"window.name='root';window.open('$proxystatspath/index.html','$l_proxy_stats','height=$popup_height,width=$popup_width,scrollbars=yes,toolbar=yes,menubar=yes');return false;\">
-          $l_view_proxy_stats
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <th>$l_change_password</th>
-      <form method=\"post\" action=\"$path/control/control_index.php\">
-      <td> 
-      <input type=\"password\" name=\"tf_ht_passwd\" value=\"\" />
-      <input type=\"hidden\" name=\"action\" value=\"update_htpasswd\" />
-      <input type=\"submit\" value=\"$l_validate\" />
-      </td>
-      </form>
-    </tr>
-";
-
-  // CSV file downloads
-  $block.="
-    <tr>
-      <th>$l_download_csv</th>
-      <td>
-        <a href=\"$proxystatspath/csv/daily/stats.csv\">
-          $l_daily_csv_proxy_stats
-        </a>
-        &nbsp;|&nbsp;
-        <a href=\"$proxystatspath/csv/weekly/stats.csv\">
-          $l_weekly_csv_proxy_stats
-        </a>
-        &nbsp;|&nbsp;
-        <a href=\"$proxystatspath/csv/monthly/stats.csv\">
-          $l_monthly_csv_proxy_stats
-        </a>
-      </td>
-    </tr>
-    </table>
-    </div>
-";
 
   return $block;
 }

@@ -566,14 +566,6 @@ function check_host_data_form($host) {
     }
   }
  
-  if ($cgp_use["service"]["web_local"]) {
-    // web_all must be 0 or 1
-    if (($web_all != "0") && ($web_all != "1")) {
-      $err["msg"] = $l_err_web_all;
-      return false;
-    }
-  }
- 
   if ($cgp_use["service"]["firewall"]) {
     $firewall_perms = $host["firewall_perms"];
     

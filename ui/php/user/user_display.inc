@@ -545,15 +545,6 @@ function html_user_consult($obm_q) {
 
   // Section Web
   if ($cgp_use["service"]["web"]) {
-    // Affichage uniquement si acces web ET mode web_local
-    // sinon il n'y a pas generation de squid.conf donc pas d'ACL
-    if ($web_perms == 1 && $cgp_use["service"]["web_local"]) {
-      $dis_access = "
-      <tr>
-        <th>$l_web_mode</th>
-        <td>$web_access (<a href=\"$path/user/user_index.php?action=showlist&amp;user_id=$id\" >$l_web_consult_list</a>)</td>
-      </tr>";
-    }
     $web_section = "
     <div class=\"detail infos\">
     <h1>$l_access</h1>
@@ -1084,15 +1075,6 @@ function html_user_form($usr_q, $user, $field="") {
     if ($web_all == "0") $web_all_c0 = " checked";
     else $web_all_c1 = " checked";
     
-    // Affichage uniquement si acces web ET mode web_local
-    // sinon il n'y a pas generation de squid.conf donc pas d'ACL
-    if ($web_perms == "1" && $cgp_use["service"]["web_local"]) {
-      $dis_access = "
-      <tr>
-        <th>$l_web_mode</th>
-        <td>$web_access (<a href=\"$path/user/user_index.php?action=showlist&amp;user_id=$id\" >$l_web_consult_list</a>)</td>
-      </tr>";
-    }
     $web_section = "
   <fieldset class=\"detail infos\">
   <legend>$l_access</legend>

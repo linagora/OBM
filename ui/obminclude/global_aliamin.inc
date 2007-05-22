@@ -512,11 +512,6 @@ function reduce_scope_from_used_services(&$scope) {
     $scope["amavis"] = false;
     $scope["alias"] = false;
   }
-  // Avec web (et pas web_local), pas besoin de regénérer la conf de SQUID
-  // car les acces sont dans le LDAP
-  if ($cgp_use["service"]["web_local"] == false) {
-    $scope["squid"] = false;
-  }
   if ($cgp_use["service"]["dns"] == false) {
     $scope["dns"] = false;
   }
@@ -558,6 +553,7 @@ function update_scope_UserObm() {
   $query_upd = "SELECT * FROM UserObm ORDER BY userobm_id";
   $sys_q = new DB_OBM;
   $sys_upd_q = new DB_OBM;
+  $scope = array();
 
   display_debug_msg($query, $cdg_sql, "update_scope_UserObm(1)");
   $sys_q->query($query);
@@ -568,7 +564,6 @@ function update_scope_UserObm() {
   if ($sys_q->num_rows() != $sys_upd_q->num_rows()) {
     $scope["ldap"] = 1;
     $scope["cyrus"] = 1;
-    $scope["squid"] = 1;
     $scope["postfix"] = 1;
     $scope["alias"] = 1;
 
@@ -584,7 +579,6 @@ function update_scope_UserObm() {
     if ($sys_q->f("userobm_login") != $sys_upd_q->f("userobm_login")) {
       $scope["ldap"] = 1;
       $scope["cyrus"] = 1;
-      $scope["squid"] = 1;
       $scope["alias"] = 1;
     }
 

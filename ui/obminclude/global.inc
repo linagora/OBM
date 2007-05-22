@@ -277,7 +277,6 @@ if ($c_multidomain) {
 // Services enabled //
 //------------------//
 $cgp_use["service"]["web"] = false;
-$cgp_use["service"]["web_local"] = false;
 $cgp_use["service"]["mail"] = false;
 $cgp_use["service"]["mail_nomad"] = false;
 $cgp_use["service"]["mail_vacation"] = false;
@@ -360,10 +359,6 @@ if (! $cgp_use["service"]["samba"]) {
 
 if ((! $cgp_use["service"]["mail"]) && (! $cgp_use["service"]["samba"])) {
   $cgp_show["module"]["host"] = false;
-}
-
-if (! $cgp_use["service"]["web"]) {
-  $cgp_use["service"]["web_local"] = false;
 }
 
 //----------------------------//
