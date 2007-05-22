@@ -45,6 +45,8 @@ sub getDbValues {
             next;
         }
 
+        &OBM::toolBox::write_log( "Gestion de l'utilisateur '".$user_login."'", "W" );
+
         # On cree la structure correspondante a l'utilisateur
         $users[$i] = {
                     "user_login"=>$user_login,

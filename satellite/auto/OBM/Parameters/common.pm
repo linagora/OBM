@@ -15,7 +15,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($facility_log $enableHook $sieveSrv $ldapServer $sambaSrvHome $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($facility_log $enableHook $sieveSrv $ldapServer $sambaSrvHome $sambaOldSidMapping $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_files = qw($automateMailChangeAlias $automateMailChangeSieve $automateCyrusAdmin $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixUpdate);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
@@ -55,7 +55,7 @@ $db = "dbi:".lc( $cfgFile->val( 'global', 'dbtype' )).":database=$dbName;host=".
 
 # Y'a-t-il des operations specifiques a l'installation - utilisation du hook
 # dans le script 'ldapModifBase.pl'
-if( $cfgFile->val( 'automate', 'enableHook' ) eq "true" ) {
+if( lc($cfgFile->val( 'automate', 'enableHook' )) eq "true" ) {
     $enableHook = 1;
 }else {
     $enableHook = 0;
@@ -66,6 +66,13 @@ $ldapServer = $cfgFile->val( 'automate', 'ldapServer' );
 
 # Les serveurs Samba
 $sambaSrvHome = $cfgFile->val( 'automate', 'sambaHomeServer' );
+
+# Le mapping des UID<->SID
+if( lc($cfgFile->val( 'automate', 'oldSidMapping' )) eq "true" ) {
+    $sambaOldSidMapping = 1;
+}else {
+    $sambaOldSidMapping = 0;
+}
 
 # Le repertoire pere des repertoires personnels
 # Ne pas mettre le '/' de la fin du chemin

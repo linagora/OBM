@@ -1,7 +1,7 @@
 =head1 NOM
 
-OBM::Ldap:typePosixGroups - Définition des fonctions permettant de gérer le type
-'POSIXGROUPS'
+OBM::Ldap::typePosixGroups - Définition des fonctions permettant de gérer le type
+'POSIXGROUPS'.
 
 =head1 DEPENDANCES
 
@@ -35,6 +35,16 @@ Retour : 1 si tout est ok, 0 sinon ;
 =item B<updateLdapEntry( $entry, $ldapEntry )> : permet de mettre à jour une
 entité LDAP par rapport à une structure.
 Retour : 1 si tout est ok, 0 sinon ;
+
+=item B<getGroupUsersMailEnable( $groupId, $dbHandler )> : permet d'obtenir la
+liste des
+utilisateurs du groupe ayant le droit de messagerie.
+Retour : référence à un tableau contenant les différents login utilisateurs ;
+
+=item B<getGroupUsers( $groupId, $dbHandler, $sqlRequest )> : permet d'obtenir
+la liste des
+utilisateurs POSIX du groupe.
+Retour : référence à un tableau contenant les différents login utilisateurs.
 
 =back
 

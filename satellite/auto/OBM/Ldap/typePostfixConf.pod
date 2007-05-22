@@ -1,20 +1,21 @@
 =head1 NOM
 
-OBM::Ldap::typeMailShare- Définition des fonctions permettant de gérer le type
-'MAILSHARE'.
+OBM::Ldap::typePostfixConf - Définition des fonctions permettant de gérer le
+type 'POSTFIXCONF'.
 
 =head1 DEPENDANCES
 
  use OBM::Parameters::common;
  use OBM::Parameters::ldapConf;
+ require OBM::Ldap::utils;
  use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 =head1 DESCRIPTION
 
-    use OBM::Ldap::typeMailShare;
+    use OBM::Ldap::typePostfixConf;
     
 Ce paquet implémente les fonctions de manipulations du type de données
-'MAILSHARE'.
+'POSTFIXCONF'.
 
 Ce paquet défini les fonctions :
 

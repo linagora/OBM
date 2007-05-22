@@ -2,7 +2,7 @@ package OBM::Ldap::sambaUtils;
 
 require Exporter;
 
-use Crypt::SmbHash;
+use OBM::Parameters::common;
 use strict;
 
 
@@ -13,15 +13,34 @@ sub getUserSID {
         return undef;
     }
 
-    my $userSID = "";
+    my $userSID;
 
     SWITCH: {
-        if( $userUID == 0 ) {
+        # Si nouvelle génération du SID et UID=0
+        if( !$sambaOldSidMapping && ($userUID == 0) ) {
+            $userSID = $SID."-500";
+            last SWITCH;
+        }
+
+        # Si nouvelle génération du SID
+        if( !$sambaOldSidMapping ) {
+            $userSID = $SID."-".$userUID;
+            last SWITCH;
+        }
+
+        # Si ancienne génération du SID et UID=0
+        if( $sambaOldSidMapping && ($userUID == 0) ) {
             $userSID = $SID."-2996";
             last SWITCH;
         }
 
-        $userSID = $SID."-".(2*$userUID+1000);
+        # Si ancienne génération du SID
+        if( $sambaOldSidMapping ) {
+            $userSID = $SID."-".(2*$userUID+1000);
+            last SWITCH;
+        }
+
+        $userSID = undef;
     }
 
     return $userSID;
@@ -56,21 +75,18 @@ sub getGroupSID {
             last SWITCH;
         }
 
-        $groupSID = $SID."-".(2*$groupGID+1001);
+        # Si nouvelle génération du SID
+        if( !$sambaOldSidMapping ) {
+            $groupSID = $SID."-".$groupGID;
+        }
+
+        # Si ancienne génération du SID
+        if( $sambaOldSidMapping ) {
+            $groupSID = $SID."-".(2*$groupGID+1001);
+        }
+
+        $groupSID = undef;
     }
 
     return $groupSID;
-}
-
-
-sub getNTLMPasswd {
-    my( $plainPasswd, $lmPasswd, $ntPasswd ) = @_;
-
-    if( !defined($plainPasswd) ) {
-        return 1;
-    }
-
-    ( $$lmPasswd, $$ntPasswd ) = ntlmgen( $plainPasswd );
-
-    return 0;
 }

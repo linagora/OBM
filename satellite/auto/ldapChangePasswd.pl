@@ -25,7 +25,7 @@ sub getParameter {
     my( $parameters, $dbHandler ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "login=s", "domain=s", "type=s", "passwd=s", "old-passwd=s", "unix", "interactiv", "no-old" );
+    &GetOptions( $parameters, "login=s", "domain=s", "type=s", "passwd=s", "old-passwd=s", "unix", "samba", "sql", "interactiv", "no-old" );
 
 
     if( !$$parameters{"login"} ) {
@@ -41,14 +41,18 @@ sub getParameter {
 
 
     # Verification du type du mot de passe
+    $$parameters{"type"} = uc( $$parameters{"type"} );
     SWITCH: {
-        $$parameters{"type"} = uc( $$parameters{"type"} );
+        if( $$parameters{"interactiv"} ) {
+            $$parameters{"type"} = "PLAIN";
+        }
 
         if( !$$parameters{"type"} ) {
             &OBM::toolBox::write_log( "Type du mot de passe non specifie.", "WC" );
             exit 1;
         }else {
             &OBM::toolBox::write_log( "Type du mot de passe : ".$$parameters{"type"}, "W" );
+            last SWITCH;
         }
     }
 
@@ -175,10 +179,10 @@ sub getParameter {
 
         # Traite seulement les attributs correspondants aux comptes Samba
         if( $$parameters{"samba"} ) {
-            if( $$parameters{"passwd-plain"} ) {
+            if( uc($$parameters{"type"}) eq "PLAIN" ) {
                 &OBM::toolBox::write_log( "Modification du mot de passe Samba", "W" );
             }else {
-                &OBM::toolBox::write_log( "Pour pouvoir modifier les mots de passes Samba, le mot de passe doit etre indique en PLAIN", "W" );
+                &OBM::toolBox::write_log( "Erreur: pour pouvoir modifier les mots de passes Samba, le mot de passe doit etre disponible en PLAIN", "W" );
                 exit 1;
             }
         }else {
@@ -188,12 +192,7 @@ sub getParameter {
 
         # Traite seulement les mots de passes stockés en base SQL
         if( $$parameters{"sql"} ) {
-            if( $$parameters{"passwd-plain"} ) {
-                &OBM::toolBox::write_log( "Modification du mot de passe Sql", "W" );
-            }else {
-                &OBM::toolBox::write_log( "Pour pouvoir modifier les mots de passes Sql, le mot de passe doit etre indique en PLAIN", "W" );
-                exit 1;
-            }
+            &OBM::toolBox::write_log( "Modification du mot de passe Sql", "W" );
         }else {
             &OBM::toolBox::write_log( "Pas de modification du mot de passe Sql", "W" );
         }
@@ -209,8 +208,8 @@ sub getParameter {
 &OBM::toolBox::write_log( "Connexion a la base de donnees OBM", "W" );
 my $dbHandler;
 if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee de production", "WC" );
-    exit 1;
+    &OBM::toolBox::write_log( "Erreur: probleme lors de l'ouverture de la base de donnee de production", "WC" );
+    exit 2;
 }
 
 # Recuperation des domaines
@@ -227,31 +226,86 @@ getParameter( \%parameters, $dbHandler );
 # On initialise la structure de l'arbre LDAP sans les valeurs de la BD
 &OBM::ldap::initTree( $ldapStruct, undef, undef, 0 );
 
-# On récupère les information d serveur LDAP du domaine
+# On récupère les information du serveur LDAP du domaine
 my $ldapSrv;
 &OBM::ldap::getLdapSrv( $ldapStruct, $parameters{"domain_id"}, \$ldapSrv );
+
+if( !$parameters{"no-old"} ) {
+    # On verifie que l'encien mot de passe fourni corresponde bien au mot de
+    # passe de l'entite LDAP (attribut 'userPasswd')
+    my @userDn = ();
+    if( &OBM::ldap::getEntityDn( $ldapStruct, $POSIXUSERS, $parameters{"login"}, $parameters{"domain_id"}, \@userDn ) ) {
+        &OBM::toolBox::write_log( "Erreur: type '".$POSIXUSERS."' inconnu", "WC" );
+        exit 3;
+    }
+
+    for( my $i=0; $i<=$#userDn; $i++ ) {
+        &OBM::toolBox::write_log( "Verification de l'ancien mot de passe de l'entite de type '".$POSIXUSERS."' et de dn : ".$userDn[$i], "W" );
+        if( !&OBM::ldap::checkOldEntityPasswd( $ldapSrv, $userDn[$i], $parameters{"old-passwd"} ) ) {
+            &OBM::toolBox::write_log( "Erreur: lors de la verification de l'ancien mot de passe", "WC" );
+            exit 4;
+        }
+    }
+}
 
 if( $parameters{"unix"} ) {
     # On cherche dans l'annuaire le ou les DN de l'utilisateur
     my @userDn = ();
     &OBM::ldap::getEntityDn( $ldapStruct, $POSIXUSERS, $parameters{"login"}, $parameters{"domain_id"}, \@userDn );
 
-    if( !$parameters{"no-old"} ) {
-        for( my $i=0; $i<=$#userDn; $i++ ) {
-            &OBM::toolBox::write_log( "Mise a jour du mot de passe pour l'entite de type '".$POSIXUSERS."' et de dn : ".$userDn[$i], "W" );
+    if( !&OBM::ldap::updateEntityPasswd( $ldapSrv, $POSIXUSERS, \@userDn, $parameters{"type"}, $parameters{"passwd"} ) ) {
+        &OBM::toolBox::write_log( "Erreur: lors de la mise a jour du mot de passe de l'entite de type '".$POSIXUSERS."'", "W" );
+    }
+}
 
-            &OBM::ldap::updateSelfEntityPasswd( $ldapSrv, $POSIXUSERS, $userDn[$i], $parameters{"type"}, $parameters{"old-passwd"}, $parameters{"passwd"} ); 
-        }
+if( $parameters{"samba"} ) {
+    # On cherche dans l'annuaire le ou les DN de l'utilisateur
+    my @userDn = ();
+    &OBM::ldap::getEntityDn( $ldapStruct, $SAMBAUSERS, $parameters{"login"}, $parameters{"domain_id"}, \@userDn );
+
+    if( !&OBM::ldap::updateEntityPasswd( $ldapSrv, $SAMBAUSERS, \@userDn, $parameters{"type"}, $parameters{"passwd"} ) ) {
+        &OBM::toolBox::write_log( "Erreur: lors de la mise a jour du mot de passe de l'entite de type '".$SAMBAUSERS."'", "W" );
+    }
+}
+
+if( $parameters{"sql"} ) {
+    # On met a jour les 2 tables de la BD si l'utilisateur existe
+    my $query = "SELECT count(*) FROM UserObm WHERE userobm_domain_id=".$parameters{"domain_id"}." AND userobm_login='".$parameters{"login"}."'";
+
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "Erreur: probleme lors de l'execution de la requete : ".$dbHandler->err, "WC" );
+        exit 2;
+    }
+    my( $count ) = $queryResult->fetchrow_array;
+
+    if( $count != 1 ) {
+        &OBM::toolBox::write_log( "Erreur: l'utilisateur de login '".$parameters{"login"}."' appartenant au domain '".$parameters{"domain_id"}."' n'existe pas en BD", "W" );
     }else {
-        &OBM::ldap::updateEntityPasswd( $ldapSrv, $POSIXUSERS, \@userDn, $parameters{"type"}, $parameters{"passwd"} );
+        $query = "UPDATE UserObm SET userobm_password_type='".$parameters{"type"}."', userobm_password='".$parameters{"passwd"}."' WHERE userobm_domain_id=".$parameters{"domain_id"}." AND userobm_login='".$parameters{"login"}."'";
+        # On execute la requete
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "Erreur: probleme lors de l'execution de la requete de mise a jour du mot de passe : ".$dbHandler->err, "WC" );
+            exit 2;
+        }
+
+
+        $query = "UPDATE P_UserObm SET userobm_password_type='".$parameters{"type"}."', userobm_password='".$parameters{"passwd"}."' WHERE userobm_domain_id=".$parameters{"domain_id"}." AND userobm_login='".$parameters{"login"}."'";
+        # On execute la requete
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "Erreur: probleme lors de l'execution de la requete de mise a jour du mot de passe : ".$dbHandler->err, "WC" );
+            exit 2;
+        }
+
+        &OBM::toolBox::write_log( "Mise a jour du mot de passe SQL de l'utilisateur ".$parameters{"login"}." correctement effectuee.", "W" );
     }
 }
 
 # On referme la connexion a la base
 &OBM::toolBox::write_log( "Deconnexion de la base de donnees OBM", "W" );
 if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees OBM...", "WC" );
-    exit 1;
+    &OBM::toolBox::write_log( "Erreur: probleme lors de la fermeture de la base de donnees OBM...", "WC" );
+    exit 2;
 }
 
 # On ferme le log

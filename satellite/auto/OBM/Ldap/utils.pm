@@ -47,6 +47,10 @@ sub modifyAttrList {
     my( $newValue, $ldapEntry, $attr ) = @_;
     my $update = 0;
 
+    if( !defined($newValue) || (defined($newValue) && (uc(ref($newValue)) ne "ARRAY" )) ) {
+        return $update;
+    }
+
     my $ldapValues = $ldapEntry->get_value( $attr, asref => 1);
     if( $newValue && !defined( $ldapValues ) ) {
         # cet attribut n'est pas defini dans LDAP mais est defini dans la
@@ -57,8 +61,7 @@ sub modifyAttrList {
             # Il y a eu modification
             $update = 1;
         }
-    }elsif( $newValue && defined( $ldapValues ) ) {
-
+    }elsif( ($#{$newValue} >= 0) && defined( $ldapValues ) ) {
         # Cet attribut est defini dans LDAP et dans la description de l'utilisateur
         if( $#$ldapValues != $#$newValue ) {
             $ldapEntry->delete( $attr => [ ] );
@@ -95,6 +98,38 @@ sub modifyAttrList {
 
         # Il y a eu modification
         $update = 1;
+    }
+
+    return $update;
+}
+
+
+sub addAttrList { 
+    my( $newAttrList, $ldapEntry, $attr ) = @_;
+    my $update = 2;
+
+    if( !ref($newAttrList) || (uc(ref($newAttrList)) ne "ARRAY") ) {
+        return $update;
+    }
+
+    $update = 1;
+    my $ldapValues = $ldapEntry->get_value( $attr, asref => 1);
+    for( my $i=0; $i<=$#{$newAttrList}; $i++ ) {
+        my $j = 0;
+
+        while( ($j<=$#{$ldapValues}) && (lc($newAttrList->[$i]) ne lc($ldapValues->[$j])) ) {
+            $j++;
+        }
+
+        if( $j>$#{$ldapValues} ) {
+            push( @{$ldapValues}, $newAttrList->[$i] );
+            $update = 0;
+        }
+    }
+
+    if( !$update ) {
+        $ldapEntry->delete( $attr => [ ] );
+        $ldapEntry->add( $attr => $ldapValues );
     }
 
     return $update;

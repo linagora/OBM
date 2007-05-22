@@ -4,7 +4,7 @@ require Exporter;
 
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
-require OBM::Ldap::sambaUtils;
+require OBM::passwd;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 use strict;
 
@@ -29,7 +29,7 @@ sub getDbValues {
         return undef;
     }
 
-    my $query = "SELECT host_id, host_uid, host_gid, host_name, host_description FROM Host WHERE host_samba='1' AND host_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
+    my $query = "SELECT host_id, host_uid, host_gid, host_name, host_description FROM P_Host WHERE host_samba='1' AND host_domain_id=".$main::domainList->[$domainId]->{"domain_id"};
 
     # On execute la requete
     my $queryResult;
@@ -48,7 +48,8 @@ sub getDbValues {
 
         &OBM::toolBox::write_log( "Gestion de l'hote '".$host_name."'", "W" );
 
-        my $errorCode = &OBM::Ldap::sambaUtils::getNTLMPasswd( $host_name, \$sambaHosts[$i]->{"host_lm_passwd"}, \$sambaHosts[$i]->{"host_nt_passwd"} );
+        # Gestion du mot de passe
+        my $errorCode = &OBM::passwd::getNTLMPasswd( $host_name, \$sambaHosts[$i]->{"host_lm_passwd"}, \$sambaHosts[$i]->{"host_nt_passwd"} );
         if( $errorCode ) {
             &OBM::toolBox::write_log( "Erreur: lors de la generation du mot de passe de l'hote : '".$host_name."'", "W" );
             next;
@@ -88,7 +89,7 @@ sub createLdapEntry {
     my( $entry, $ldapEntry ) = @_;
     my $type = $entry->{"node_type"};
 
-    # Les parametres nececessaires
+    # Les parametres nécéssaires
     if( $entry->{"host_uid"} && $entry->{"host_gid"} && $entry->{"host_name"} && $entry->{"host_sid"} && $entry->{"host_group_sid"} && $entry->{"host_lm_passwd"} && $entry->{"host_nt_passwd"} ) {
 
         $ldapEntry->add(

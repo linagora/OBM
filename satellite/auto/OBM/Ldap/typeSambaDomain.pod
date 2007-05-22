@@ -1,7 +1,7 @@
 =head1 NOM
 
-OBM::Ldap::typeMailShare- Définition des fonctions permettant de gérer le type
-'MAILSHARE'.
+OBM::Ldap::typeSambaDomain - Définition des fonctions permettant de gérer le type
+'SAMBADOMAIN'.
 
 =head1 DEPENDANCES
 
@@ -11,10 +11,10 @@ OBM::Ldap::typeMailShare- Définition des fonctions permettant de gérer le type
 
 =head1 DESCRIPTION
 
-    use OBM::Ldap::typeMailShare;
+    use OBM::Ldap::typeSambaDomain;
     
 Ce paquet implémente les fonctions de manipulations du type de données
-'MAILSHARE'.
+'SAMBADOMAIN'.
 
 Ce paquet défini les fonctions :
 
