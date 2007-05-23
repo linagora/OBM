@@ -55,7 +55,11 @@ function run_query_organizationalchart_search($organizationalchart) {
         OR (u.userobm_id=userobmgroup_userobm_id)";
     $where .= " $and (userobm_lastname $like '$user%' OR userobm_firstname $like '$user%')";
   }
-  
+ 
+  if ($where == "") {
+    $where = "1=1";
+  } 
+
   $whereq = "WHERE $where $multidomain";	
 
   // ORDER construction

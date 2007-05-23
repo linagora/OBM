@@ -953,7 +953,18 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
 	      $description = $title;
       } else {
 	      $title = $event->title;
-	      $description = nl2br($event->description);
+	      $explode_desc = explode("|", $event->description);
+        $description = $explode_desc[0];
+        $charset = mb_internal_encoding();
+        $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
+        if ($item != "") {
+          $xml = simplexml_load_string($item);
+          if (is_object($xml)) {
+            foreach($xml->resource as $key => $value) {
+              $description .= "<br/><b>$value->res_name:</b><br/>".nl2br($value->item)."$value->property_name:$value->property_value";
+            }
+          }
+        }
       }
       $dis_attendees = "";
       $br = "";
@@ -1058,15 +1069,17 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $description = phpStringToJsString($explode_desc[0]);
     $charset = mb_internal_encoding();
     $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
-    $xml = simplexml_load_string($item);
-    if (is_object($xml)) {
-      foreach($xml->resource as $key => $value) {
-        $item_list .= "
-          <b>$value->res_name: </b><br/>
-          ".nl2br($value->item)."<br/>";
+    if ($item != "") {
+      $xml = simplexml_load_string($item);
+      if (is_object($xml)) {
+        foreach($xml->resource as $key => $value) {
+          $item_list .= "
+            <b>$value->res_name: </b><br/>
+            ".nl2br($value->item)."<br/>";
+        }
       }
+      $item_list = phpStringToJsString(str_replace("\n\r", "<br>", $item_list));
     }
-    $item_list = phpStringToJsString(str_replace("\n\r", "<br>", $item_list));
     $location = phpStringToJsString($event->location);
     $category = phpStringToJsString($event->category1);  
   }
@@ -1549,15 +1562,17 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
 
 
     // item
-    $xml = simplexml_load_string($item);
-    if (is_object($xml)) {
-      foreach($xml->resource as $key => $value) {
-        $property["$value->res_id"] = "$value->property_name : $value->property_value";
-        $dis_item_list .= "
-        <tr>
-          <th>$value->res_name :</th>
-          <td>".nl2br($value->item)."</td>
-        </tr>";
+    if ($item != "") {
+      $xml = simplexml_load_string($item);
+      if (is_object($xml)) {
+        foreach($xml->resource as $key => $value) {
+          $property["$value->res_id"] = "$value->property_name : $value->property_value";
+          $dis_item_list .= "
+          <tr>
+            <th>$value->res_name :</th>
+            <td>".nl2br($value->item)."</td>
+          </tr>";
+        }
       }
     }
 
@@ -2034,7 +2049,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
 
         // Item & Property
         $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&amp;resource_id=$r_id";
-        $xml = simplexml_load_string($item);
+
+        if ($item != "") {
+          $xml = simplexml_load_string($item);
+        }
         if (is_object($xml) && ($action == "detailupdate" || $action == "update" )) {
           foreach($xml->resource as $key => $value) {
             if ($value->res_id == $r_id) {
