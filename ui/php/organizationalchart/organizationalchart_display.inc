@@ -453,13 +453,23 @@ function draw_consult($node_q) {
       $userobm_id = $usr_q->f("userobm_id");
       $userobm_url = "$path/user/user_index.php?action=detailconsult&amp;user_id=$userobm_id";
       $userobm_name = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
-      $manager = $g_manager== $userobm_id ? "<img src=\"$ico_manager\" />" : "";
       $item_id = "item-${level}-${userobm_id}";
-      $block_detail_entities .= "<li id=\"item-${level}-${userobm_id}\">
+
+      if ($userobm_id != $g_manager) {
+        $block_detail_entities .= "<li id=\"item-${level}-${userobm_id}\">
+          <a href=\"$userobm_url\" 
+			      onmouseover=\"obm.userDetail.compute($userobm_id, event);return false;\"
+            onmouseout=\"obm.userDetail.compute($userobm_id, event);return false;\">$userobm_name</a>
+          </li>";
+      } else {
+        $manager = "<img src=\"$ico_manager\" />";
+        $block_detail_entities_boss = "<li id=\"item-${level}-${userobm_id}\">
         <a href=\"$userobm_url\" 
 			    onmouseover=\"obm.userDetail.compute($userobm_id, event);return false;\"
-          onmouseout=\"obm.userDetail.compute($userobm_id, event);return false;\">$manager$userobm_name</a>
+          onmouseout=\"obm.userDetail.compute($userobm_id, event);return false;\">$manager&nbsp;<b>$userobm_name</b></a>
         </li>";
+      }
+
     }
   }
  
@@ -520,7 +530,10 @@ function draw_consult($node_q) {
       $node_head
       <div id=\"node-$node_id\" class=\"node toggle\">
         <h1>$node_name</h1>
-        <ul>$block_detail_entities</ul>
+        <ul>
+          $block_detail_entities_boss
+          $block_detail_entities
+        </ul>
       </div>
       $node_queue
       $block_detail_child
