@@ -400,7 +400,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   global $l_module_incident, $l_incident_list, $l_incident_new, $l_last;
   global $l_module_deal, $l_module_document, $l_contract;
   global $l_document_new,$l_document_add,$l_add_document,$l_deal;
-  global $path, $cgp_show,$popup_height,$popup_width;
+  global $path, $cgp_show;
   
   $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;contract_id=$id");
   $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;contract_id=$id&amp;sel_owner=$tech_id&amp;tf_lcontract=$con_label");
@@ -443,9 +443,9 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
     <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 
-	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 onclick=\"popup('$url_doc_add',''); return false;
 	 \"><img src=\"$ico_add\" alt=\"\" /></a>
-	<a href=\"\" onclick=\"window.name='$l_contract'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	<a href=\"\" onclick=\"window.name='$l_contract'; popup('$url_doc_add',''); return false;\">
 	 $l_document_add</a></li>
   </ul>
   </div>";
@@ -786,7 +786,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   global $l_label, $l_begin, $l_type, $l_marketing_manager, $l_archive;
   global $l_signature, $l_begin, $l_exp, $l_renew,$l_date_cancel,$l_dates;
   global $l_technical_manager,$l_manager;
-  global $popup_height,$popup_width,$l_number,$l_clause,$l_priority, $l_status;
+  global $l_number,$l_clause,$l_priority, $l_status;
   global $l_comment,$l_add_comment,$l_upd_comment;
   global $l_contract_select_deal,$l_client_manager,$l_deal,$l_contract,$l_company;
   global $l_contract_kind,$l_format,$l_autorenewal;
@@ -909,7 +909,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       </th>
       <td>
         <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id")."\">$deal_label</a>
-        <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
+        <a href=\"\" onclick=\"popup('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract'); return false;\">
         <img src=\"$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>
@@ -1135,7 +1135,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       </th>
       <td>
         <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id")."\">$deal_label</a>
-        <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
+        <a href=\"\" onclick=\"popup('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract'); return false;\">
         <img src=\"$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>

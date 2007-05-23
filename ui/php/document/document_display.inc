@@ -364,7 +364,6 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
   global $l_name, $l_author, $l_path, $l_kind, $l_browse; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto;
-  global $popup_width, $popup_height;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   // if update mode and first display values are taken from database
@@ -533,7 +532,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
       <td>
       <input type=\"text\" id=\"tf_path\" name=\"tf_path\" size=\"30\" value=\"$fi_path\" />
       <span id=\"browse_img\" $dis_img>
-      <input type=\"button\" value=\"$l_browse\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <input type=\"button\" value=\"$l_browse\" onclick=\"popup('$url1',''); return false;\">
       </span>
       </td>
     </tr> 
@@ -569,8 +568,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
 //     keys used  : uri, name
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_dir_form($action, $document,$doc_q=null) {
-  global $display,$popup_height,$popup_width;
-  global $l_document;
+  global $display, $l_document;
   global $l_path, $l_name,$path,$l_browse;
   global $l_dir, $l_add_dir,$l_update_dir;
 
@@ -593,7 +591,7 @@ function html_document_dir_form($action, $document,$doc_q=null) {
     ";    
     $dis_path = "
      <input type=\"text\" id=\"tf_path\" name=\"tf_path\" value=\"$re_path\" size=\"50\"/>
-      <input type=\"button\" value=\"$l_browse\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <input type=\"button\" value=\"$l_browse\" onclick=\"popup('$url',''); return false;\">
      ";
   } else {
     $dis_button = "

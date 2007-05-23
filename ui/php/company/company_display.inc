@@ -450,7 +450,7 @@ function html_company_links($co_q) {
   global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
   global $l_module_lead, $l_module_contract, $l_module_invoice;
   global $l_module_document, $l_module_payment, $l_document_add;
-  global $l_company, $path, $cgp_show, $popup_height,$popup_width;
+  global $l_company, $path, $cgp_show;
 
   $id = $co_q->f("company_id");
   $name = $co_q->f("company_name");
@@ -530,9 +530,9 @@ function html_company_links($co_q) {
   <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
       <a href=\"$url_doc_new\">$l_new</a></li>
   <li><a href=\"\" 
-       onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+       onclick=\"popup('$url_doc_add',''); return false;
        \"><img src=\"$ico_add\" /></a>
-      <a href=\"\" onclick=\"window.name='$l_company'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"window.name='$l_company'; popup('$url_doc_add',''); return false;\">
        $l_document_add</a></li>
 </ul>
 </div>";
@@ -988,7 +988,7 @@ function dis_company_form($action, $company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company) {
   global $display, $obm, $cgp_hide, $set_dsrc, $c_undef, $l_undef;
-  global $ico_web,$ico_mail,$ico_add,$popup_height,$popup_width;
+  global $ico_web,$ico_mail,$ico_add;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_add_comment,$l_upd_comment;

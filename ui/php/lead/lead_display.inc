@@ -406,7 +406,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   global $l_update, $l_checkdelete, $l_insert, $l_company, $l_contact;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
-  global $popup_width, $popup_height, $l_header_new, $ico_mini_cal;
+  global $l_header_new, $ico_mini_cal;
 
   $uid = $obm["uid"];
 
@@ -484,7 +484,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       </a><input type=\"hidden\" name=\"company_id\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"popup('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company'); return false;\">
       <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" size=\"30\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 
@@ -494,7 +494,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       </a><input type=\"hidden\" name=\"contact_id\" value=\"$contact_id\" />
       <input type=\"hidden\" name=\"contact_name\" value=\"$contact_name\" />
       <input type=\"hidden\" name=\"contact_new_id\" value=\"$contact_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/contact/contact_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.contact_new_id&amp;ext_widget_text=f_entity.contact_new_name','Contact','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"popup('$path/contact/contact_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.contact_new_id&amp;ext_widget_text=f_entity.contact_new_name','Contact'); return false;\">
       <img src=\"$ico_contact\" alt=\"\" /></a>
       <input type=\"text\" size=\"30\" name=\"contact_new_name\" value=\"$contact_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 

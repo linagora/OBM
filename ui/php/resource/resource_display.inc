@@ -486,7 +486,6 @@ function dis_resource_display_pref($prefs) {
  */
 function json_search_resources($resource,$res_q) {
   global $display, $l_qty, $l_ritem;
-  global $popup_height, $popup_width;
 
   $limit = $resource['limit'];
   $form = $resource['form'];
@@ -506,7 +505,7 @@ function json_search_resources($resource,$res_q) {
       $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&resource_id=$id";
       $extension = "new Element('div').adopt(new Element('a').
         setProperties({'id' : 'a[$id]', 'href' : 'javascript: void(0);'}).
-        setProperty('onclick', 'window.open(\"$url_item\", \"\", \"height=$popup_height,width=$popup_width,scrollbars=yes\")').
+        setProperty('onclick', 'popup(\"$url_item\", \"\")').
         appendText('$l_ritem').adopt(
         new Element('textarea').
           setProperties({'id':'list-item[$id]', 'name':'list-item[$id]', 'readonly':'readonly'}).

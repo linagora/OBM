@@ -64,7 +64,7 @@ function dis_statistic_index() {
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_statistic_category_index_item($entity, $category, $title) {
-  global $path, $popup_height, $popup_width, $c_all;
+  global $path, $c_all;
   global $l_stats_from_list, $l_stats_from_all;
 
   $url = "$path/list/list_index.php?action=ext_get_id&amp;popup=1&amp;ext_url=".urlencode($path."/statistic/statistic_index.php?action=stats_category&amp;category=$category&amp;entity=$entity&amp;list_id=")."&amp;ext_target=$l_statistc";
@@ -74,7 +74,7 @@ function dis_statistic_category_index_item($entity, $category, $title) {
   <h1>$title</h1>
   <div class=\"buttons\">
   <input type=\"button\"
-  onclick=\"window.open('$url','$l_statistc','height=$popup_height,width=$popup_width,scrollbars=yes'); return false; \" value=\"$l_stats_from_list\" />
+  onclick=\"popup('$url','$l_statistc'); return false; \" value=\"$l_stats_from_list\" />
   <input type=\"hidden\" name=\"action\" value=\"stats_category\" />
   <input type=\"hidden\" name=\"category\" value=\"$category\" />
   <input type=\"hidden\" name=\"entity\" value=\"$entity\" />

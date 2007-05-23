@@ -120,7 +120,7 @@ function del_row(row) {
 function open_window(row) {
 
   i = row.rowIndex-1;
-  window.open(window.location+my_url+i,'','height=650,width=$popup_width,scrollbars=yes,status=yes');
+  popup(window.location+my_url+i,'','650');
 }
 
 

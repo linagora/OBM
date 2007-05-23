@@ -368,7 +368,7 @@ function dis_publication_form($action, $publication) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, $list_q) {
   global $display, $set_dsrc, $l_none, $ico_add;
-  global $ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
+  global $ico_web,$ico_mail,$l_category;
   global $l_publication_title, $l_type, $l_year, $l_lang, $l_desc;
   global $l_insert,$l_update,$l_checkdelete, $l_publication, $l_list;
   global $l_contact_category1,$l_auto_sub, $public_contact_cat;
@@ -559,8 +559,7 @@ function html_publication_group_subscription_form($action,$pub_q, $publication) 
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_subscription_form($action,$sub_q, $recept_q, $publication) {
-  global $display;
-  global $ico_add,$popup_height,$popup_width;
+  global $display, $ico_add;
   global $l_subscription,$l_quantity, $l_renew, $l_recept, $l_lang, $l_desc;
   global $l_insert_sub,$l_update_sub,$l_checkdelete_sub, $l_publication;
 
@@ -612,7 +611,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_subscription\" />
       <input type=\"submit\" value=\"$l_insert_sub\" />";
     $block_publi = "      
-    <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+    <a href=\"\" onclick=\"popup('$url',''); return false;\">
      <img src=\"$ico_add\" alt=\"[New Publication]\" /> 
     </a>
     <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$pub_id\" />
@@ -694,8 +693,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publication) {
-  global $display,$ico_add;
-  global $popup_height,$popup_width,$l_insert;
+  global $display,$ico_add, $l_insert;
   global $l_publication,$l_quantity, $l_renew, $l_recept,$l_year;
   global $l_publication_dest,$l_publication_orig;
   
@@ -716,7 +714,7 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
   $sel_recept .= "</select>";
   $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang";   
  $block_publi_dest = "      
-    <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+    <a href=\"\" onclick=\"popup('$url',''); return false;\">
      <img src=\"$ico_add\" alt=\"[New Publication]\" /> 
     </a>
     <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"\" />
@@ -1283,7 +1281,7 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
   global  $ico_update, $ico_delete, $ico_crow;
   global $l_yes,$l_no, $l_timecreate, $l_timeupdate,$l_publication_title;
   global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
-  global $path, $popup_height, $popup_width,$ico_delete;
+  global $path,$ico_delete;
   global $cright_write, $module, $perm;
 
   if ($perm->check_right($module, $cright_write)) {  
@@ -1333,12 +1331,12 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
 
       $display_write = "
     <td>
-      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
+      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; popup('$url_subscription_update',''); return false;\" alt=\"Update Subscription\">
       <img src=\"$ico_update\" alt=\"Update\" />
       </a>
     </td>    
     <td>
-      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_delete','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
+      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; popup('$url_subscription_delete',''); return false;\" alt=\"Update Subscription\">
       <img src=\"$ico_delete\" alt=\"Delete\" />
       </a>
       </td>";

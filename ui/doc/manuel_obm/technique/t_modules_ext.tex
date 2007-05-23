@@ -163,8 +163,8 @@ Exemple : Ajouter des groupes au rendez-vous courant.\\
 &amp;ext_title=" . urlencode($l_agenda_select_group);
   ...
   $block = ``
-     <a href=\"javascript: return false;\" onclick=\"window.open('$url2',
-'','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+     <a href=\"javascript: return false;\" onclick=\"popup('$url2',
+''); return false;\">
 <img src=\"/images/$set_theme/$ico_add_group\" /></a></td>
   ...``;
 \end{verbatim}

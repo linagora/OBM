@@ -248,8 +248,8 @@ function display_modules_theme($section) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_actions_theme($section, $module) {
-  global $modules, $action, $popup_height;
-  global $actions, $popup_width, $perm;
+  global $modules, $action;
+  global $actions, $perm;
 
 
   if (is_array($actions[$module])) {
@@ -269,7 +269,7 @@ function display_actions_theme($section, $module) {
 	    }
 	    $content = "
               <a href=\"\" 
-              onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+              onclick=\"$wtarget popup('".$value['Url']."',''); return false;\">
 	      ".$value["Name"]."</a> &nbsp;";
 	  } else {
 	    $content = "

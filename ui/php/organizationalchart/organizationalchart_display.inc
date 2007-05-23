@@ -205,7 +205,7 @@ function dis_organizationalchart_form($action, $organizationalchart) {
 //   - $organizationalchart : default values
 ///////////////////////////////////////////////////////////////////////////////
 function html_organizationalchart_form($action, $oc_q, $organizationalchart, $root_node) {
-  global $obm, $display, $popup_height, $popup_width;
+  global $obm, $display;
   global $ico_user, $ico_group, $ico_add, $ico_delete;
   global $l_organizationalchart, $l_name, $l_desc, $l_archive, $l_update, $l_insert;
   global $l_detail;
@@ -228,11 +228,11 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
         <input type=\"hidden\" id=\"tf_parent_level[1]\" name=\"tf_parent_level[1]\" value=\"0\" />
         <!-- user extmod -->
         <a href=\"javascript: return false;\"
-          onclick=\"window.open('$url_user','','height=$popup_height,width=$popup_width,scrollbars=yes');return false;\">
+          onclick=\"popup('$url_user','');return false;\">
           <img src=\"$ico_user\" alt=\"[User]\" /></a>
         <!-- group extmod -->
           <a href=\"javascript: return false;\"
-          onclick=\"window.open('$url_group','','height=$popup_height,width=$popup_width,scrollbars=yes');return false;\">
+          onclick=\"popup('$url_group','');return false;\">
           <img src=\"$ico_group\" alt=\"[Group]\" /></a>
         <a href=\"javascript: add_entity('1');\"> <img src=\"$ico_add\" alt=\"[Add]\" /> </a>
         <input type=\"hidden\" name=\"nb_child\" id=\"nb_child\" value=\"1\" />
@@ -551,7 +551,6 @@ function draw_consult($node_q) {
 function draw_form($node_q) {
   global $f, $l; 
   global $ico_delete, $ico_add, $ico_user, $ico_group;
-  global $popup_height, $popup_width;
 
   $node_name = $node_q->f("ogroup_name");
   $node_id = $node_q->f("ogroup_id");
@@ -640,13 +639,13 @@ function draw_form($node_q) {
         value=\"$parent_level\" />
       <!-- user extmod -->
       <a href=\"javascript: return false;\"
-        onclick=\"window.open('$url_user','','height=$popup_height,width=$popup_width,scrollbars=yes');
+        onclick=\"popup('$url_user','');
         return false;\">
         <img src=\"$ico_user\" alt=\"[User]\" />
       </a>
       <!-- group extmod -->
       <a href=\"javascript: return false;\"
-        onclick=\"window.open('$url_group','','height=$popup_height,width=$popup_width,scrollbars=yes');
+        onclick=\"popup('$url_group','');
         return false;\">
        <img src=\"$ico_group\" alt=\"[Group]\" />
       </a>

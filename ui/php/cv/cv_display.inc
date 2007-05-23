@@ -480,8 +480,7 @@ function dis_cv_form($action, $cv) {
 * @return string $block html cv form to display
 */
 function html_cv_form($action, $cv, $cv_q="", $refs_q="",$u_com_q) {
-  global $display, $set_dsrc, $l_none,  $path, $popup_height, $popup_width;
-
+  global $display, $set_dsrc, $l_none,  $path;
   global $l_update, $l_insert, $l_delete;
   global $l_cv, $l_title, $l_comment, $l_user, $l_select_user, $l_duplicate;
   global $l_lastname, $l_firstname, $l_location, $l_phone, $l_education, $l_personal;
@@ -596,7 +595,7 @@ function html_cv_form($action, $cv, $cv_q="", $refs_q="",$u_com_q) {
   // --- HTML Template --------------------------------------------------------
   
   $url = "$path/project/project_index.php?action=ext_get_id_cv&amp;ext_action=ext_get_id_cv&amp;popup=1";
-  $js_project = "window.open('$url','$l_select_ref','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;";
+  $js_project = "popup('$url','$l_select_ref'); return false;";
 
   $block = "
     <form method=\"post\" name=\"f_cv\"
@@ -762,12 +761,12 @@ function dis_cv_export($params) {
 * @return string $block html cv export form to display
 */
 function html_cv_export($cv_id, $defaults_q) {
-  global $popup_height, $popup_width, $path;
+  global $path;
   global $l_export, $l_anonymous, $patch, $l_template, $l_select_template, $l_template_selection;
   global $l_template_kind, $l_default_template, $l_other_template, $l_unreferenced_template;
   
   $url_sel_document = "$path/document/document_index.php?action=ext_get_id_from_path&amp;popup=1&amp;ext_widget=f_export.tf_other_template&amp;ext_widget_text=f_export.tf_other_template_name&amp;ext_disp_file=true&amp;ext_title=".urlencode($l_select_template);
-  $ext_sel_document = "<a href=\"\" onclick=\"window.open('$url_sel_document','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">$l_select_template</a>";
+  $ext_sel_document = "<a href=\"\" onclick=\"popup('$url_sel_document',''); return false;\">$l_select_template</a>";
   
   $sel_default_template = "<select name=\"sel_default_template\">";
   while ($defaults_q->next_record()){

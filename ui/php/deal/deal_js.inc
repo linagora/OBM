@@ -289,7 +289,7 @@ function add_DC_line() {
   div.appendChild(ipt);
   eval('document.f_entity.data_dccnewid_'+cpt+' = ipt');
   span = document.createElement('span');
-  onclick= \"window.open('$path/company/company_index.php?action=ext_get_id&popup=1&ext_widget=f_entity.data_dccnewid_\"+cpt+\"&ext_widget_text=f_entity.data_dccnewname_\"+cpt+\"','Company','height=,width=,scrollbars=yes'); return false;\";
+  onclick= \"popup('$path/company/company_index.php?action=ext_get_id&popup=1&ext_widget=f_entity.data_dccnewid_\"+cpt+\"&ext_widget_text=f_entity.data_dccnewname_\"+cpt+\"','Company'); return false;\";
   span.innerHTML = '<a href=\"\" onclick=\"'+onclick+'\"> <img src=\"$ico_company\" alt=\"\" /></a>';
   div.appendChild(span);
   ipt = document.createElement('input');

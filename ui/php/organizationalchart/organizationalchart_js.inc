@@ -68,7 +68,7 @@ function add_entity(level) {
   // Create the add user link
   add_user_link = target.createElement('a');
   add_user_link.href= '#';
-  add_user_link.onclick = function() { window.open('$url_user'+new_child_id,'','height=$popup_height,width=$popup_width,scrollbars=yes'); };
+  add_user_link.onclick = function() { popup('$url_user'+new_child_id,''); };
   add_user = target.createElement('img');
   add_user.src = '$ico_user';
   add_user_link.appendChild(add_user);
@@ -76,7 +76,7 @@ function add_entity(level) {
   // Create the add group link
   add_group_link = target.createElement('a');
   add_group_link.href= '#';
-  add_group_link.onclick = function() { window.open('$url_group'+new_child_id,'','height=$popup_height,width=$popup_width,scrollbars=yes'); };
+  add_group_link.onclick = function() { popup('$url_group'+new_child_id,''); };
   add_group = target.createElement('img');
   add_group.src = '$ico_group';
   add_group_link.appendChild(add_group);

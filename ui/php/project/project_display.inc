@@ -484,7 +484,7 @@ function html_project_links($p_q) {
   global  $ico_document, $ico_add, $ico_invoice;
   global $l_new, $l_module_invoice, $l_module_document;
   global $l_document_add, $l_project;
-  global $path, $cgp_show, $popup_height, $popup_width;
+  global $path, $cgp_show;
 
   $id = $p_q->f("project_id");
   $name = $p_q->f("project_name");
@@ -511,9 +511,9 @@ function html_project_links($p_q) {
     <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"#\" 
-	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 onclick=\"popup('$url_doc_add',''); return false;
 	 \"><img src=\"$ico_add\" /></a>
-	<a href=\"#\" onclick=\"window.name='$l_project'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	<a href=\"#\" onclick=\"window.name='$l_project'; popup('$url_doc_add',''); return false;\">
 	 $l_document_add</a></li>
   </ul>
   </div>";
@@ -1064,8 +1064,8 @@ function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
   global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive,$l_project_date,$l_project_duration,$l_project_tech,$l_project_desc;
   global $l_datebegin, $l_dateend, $c_undef, $l_undef,$l_tasks;
-  global $l_comment, $l_add_comment, $l_upd_comment,$ico_project,$popup_width;
-  global $obm, $cg_prod, $c_php_isodate_format,$l_shortname,$popup_height;
+  global $l_comment, $l_add_comment, $l_upd_comment,$ico_project;
+  global $obm, $cg_prod, $c_php_isodate_format,$l_shortname;
   global $ctt_sales, $ctt_research, $ctt_others,$l_other;
   global $l_tt_sales, $l_tt_research, $l_tt_others,$path;
 
@@ -1159,7 +1159,7 @@ function html_project_form($action, $project_q, $project) {
   </tr><tr>
   <th>$l_tasks
     <a href=\"javascript: return false;\" 
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      onclick=\"popup('$url','');
       return false;\">
        <img src=\"$ico_project\" alt=\"[Add]\" />
       </a>  
@@ -1394,10 +1394,9 @@ function dis_can_delete_project($p_id) {
 //     keys used  : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_task_form($ptask_q, $project) {
-  global $display, $c_undef, $l_undef,$popup_height,$ico_project;
+  global $display, $c_undef, $l_undef,$ico_project, $path;
   global $l_name, $l_parent, $l_task_new, $l_task_add, $l_project;
   global $l_task_update, $l_task_upd, $l_task,$l_tasks;
-  global $popup_width,$path;
   
   $pid = $project["project_id"];
   $pname = $project["name"];
@@ -1486,7 +1485,7 @@ function html_project_task_form($ptask_q, $project) {
     </tr><tr>
     <th>$l_tasks
       <a href=\"javascript: return false;\" 
-        onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+        onclick=\"popup('$url','');
         return false;\">
          <img src=\"$ico_project\" alt=\"[Add]\" />
         </a>  

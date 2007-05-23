@@ -25,7 +25,6 @@ function html_control_consult($domain_id="") {
   global $l_web_stats, $l_proxy_stats, $l_view_proxy_stats;
   global $l_maintenance, $l_sys_update, $l_allowed,$l_forbid;
   global $c_yes, $c_no, $c_virus_log;
-  global $popup_width, $popup_height;
   global $obm, $cgp_use, $display;
   global $l_download_log;
   global $cgp_securinet;

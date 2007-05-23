@@ -218,7 +218,6 @@ function dis_todo_detail($todo, $todo_q) {
 function dis_todo_form($todo, $todo_q = 0) {
   global $path, $obm;
   global $set_date, $ico_mini_cal, $ico_add, $ico_delete;
-  global $popup_width, $popup_height;
   global $l_add, $l_update, $l_close,$display,$l_todo,$l_user;
   global $l_deadline, $l_priority, $l_todotitle, $l_percent, $l_content;
 
@@ -280,8 +279,7 @@ function dis_todo_form($todo, $todo_q = 0) {
     <th>
       $l_users
       <a href=\"javascript: return false;\" 
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
-      return false;\">
+      onclick=\"popup('$url',''); return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>
     </th>    

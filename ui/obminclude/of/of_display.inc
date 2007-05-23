@@ -418,9 +418,9 @@ class OBM_DISPLAY {
 	  
 	  // Pre cell display (open popup, link)
 	  if ($popup) {
-	    $content = "<a href=\"#\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
+	    $content = "<a href=\"#\" onclick=\"window.name='root';popup('$url',''); return false;\">";
 	  } else if ($window) {
-	    $content = "<a href=\"#\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes,toolbar=yes,menubar=yes,location=yes,resizable=yes'); return false;\">";
+	    $content = "<a href=\"#\" onclick=\"window.name='root';popup('$url',''); return false;\">";
 	  } else if ($url != "") {
 	    $content = "<a href=\"".url_prepare("$url")."\">";
 	  }
@@ -982,8 +982,8 @@ function display_modules($section, $module) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_actions($section, $module) {
-  global  $modules, $action, $popup_height;
-  global $actions, $popup_width, $perm;
+  global  $modules, $action;
+  global $actions, $perm;
 
   // If a theme specif function is provided
   if (function_exists("display_actions_theme")) {
@@ -1019,7 +1019,7 @@ function display_actions($section, $module) {
 	    }
 	    $ret .= "
               <a href=\"#\" class=\"action\" 
-              onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+              onclick=\"$wtarget popup('".$value['Url']."',''); return false;\">
 	      ".$value["Name"]."</a> &nbsp;";
 	  } else {
 	    $ret .= "

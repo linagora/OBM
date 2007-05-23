@@ -547,7 +547,7 @@ function html_invoice_links($inv_q, $amount_remaining="") {
   global  $ico_document, $ico_add, $ico_payment;
   global $l_invoice, $l_new, $l_module_document, $l_module_payment;
   global $l_document_add;
-  global $path, $cgp_show, $popup_height, $popup_width;
+  global $path, $cgp_show;
 
   $id = $inv_q->f("invoice_id");
   $name = $inv_q->f("invoice_label");
@@ -576,9 +576,9 @@ function html_invoice_links($inv_q, $amount_remaining="") {
     <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
-	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 onclick=\"popup('$url_doc_add',''); return false;
 	 \"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
-	<a href=\"\" onclick=\"window.name='$l_invoice'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	<a href=\"\" onclick=\"window.name='$l_invoice'; popup('$url_doc_add',''); return false;\">
 	 $l_document_add</a></li>
   </ul>
   </div>";
@@ -947,7 +947,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       </a><input type=\"hidden\" name=\"company_id\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"popup('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company'); return false;\">
       <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
@@ -959,7 +959,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       </a><input type=\"hidden\" name=\"deal_id\" value=\"$d_id\" />
       <input type=\"hidden\" name=\"deal_label\" value=\"$d_label\" />
       <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_new_label','Deal','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"popup('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_new_label','Deal'); return false;\">
       <img src=\"$ico_deal\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"deal_new_label\" value=\"$d_new_label\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
@@ -971,7 +971,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       </a><input type=\"hidden\" name=\"project_id\" value=\"$p_id\" />
       <input type=\"hidden\" name=\"project_name\" value=\"$p_name\" />
       <input type=\"hidden\" name=\"project_new_id\" value=\"$p_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.project_new_id&amp;ext_widget_text=f_entity.project_new_name','Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"popup('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.project_new_id&amp;ext_widget_text=f_entity.project_new_name','Project'); return false;\">
       <img src=\"$ico_project\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"project_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>

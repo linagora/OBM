@@ -176,8 +176,7 @@ function of_select_dis_search_select($data_array, $data_name, $url, $tree=false)
   $block = "
     <div class=\"searchLabel\">${$l_name}
       <a href=\"javascript: return false;\"
-      onclick=\"window.open('$url','','height=360,width=240,scrollbars=yes');
-      return false;\">
+      onclick=\"popup('$url','','360','240'); return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" /></a>
       &nbsp;$dis_tree&nbsp;
       <a href=\"javascript: return false;\"

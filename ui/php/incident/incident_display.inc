@@ -465,7 +465,7 @@ function html_incident_consult($inc_q) {
 function html_incident_links($inc_q) {
   global  $ico_document, $ico_add;
   global $l_new, $l_incident, $l_module_document, $l_document_add;
-  global $path, $cgp_show, $popup_height, $popup_width;
+  global $path, $cgp_show;
 
   $id = $inc_q->f("incident_id");
   $entity = "incident";
@@ -485,9 +485,9 @@ function html_incident_links($inc_q) {
     <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
-	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 onclick=\"popup('$url_doc_add',''); return false;
 	 \"><img src=\"$ico_add\" /></a>
-	<a href=\"\" onclick=\"window.name='$l_incident'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	<a href=\"\" onclick=\"window.name='$l_incident'; popup('$url_doc_add',''); return false;\">
 	 $l_document_add</a></li>
   </ul></div>";
   }
@@ -559,7 +559,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   global $l_logger,$l_owner,$l_priority,$l_incident;
   global $l_update, $l_insert;
   global $l_duration,$l_solution,$l_date, $l_archive_new,$l_res_duration;
-  global $popup_height, $popup_width, $l_select_contract,$l_comment,$l_upd_comment,$l_add_comment;
+  global $l_select_contract,$l_comment,$l_upd_comment,$l_add_comment;
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -712,7 +712,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
       <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$param_contract")."\">$c_label</a>
       <input type=\"hidden\" name=\"contract_id\" value=\"$param_contract\" />
       <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=f_entity.contract_new_id&amp;ext_widget_text=f_entity.contract_new_name','contract','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"popup('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=f_entity.contract_new_id&amp;ext_widget_text=f_entity.contract_new_name','contract'); return false;\">
       <img src=\"$ico_contract\" alt=\"[Contract]\" /></a>
       <input type=\"text\" name=\"contract_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>

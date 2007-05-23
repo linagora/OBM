@@ -1094,7 +1094,7 @@ function html_contact_links($id) {
   global $l_module_deal, $l_module_list, $l_module_contract;
   global $l_document_new,$l_document_add;
   global $l_subscription_new, $l_subscription, $l_subscription_list;
-  global $path, $cgp_show, $popup_height,$popup_width;
+  global $path, $cgp_show;
 
   // Deal
   if ($cgp_show["module"]["deal"]) {
@@ -1161,9 +1161,9 @@ function html_contact_links($id) {
     <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 
-	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 onclick=\"popup('$url_doc_add',''); return false;
 	 \"><img src=\"$ico_add\" alt=\"\" /></a>
-	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	<a href=\"\" onclick=\"window.name='$l_contact'; popup('$url_doc_add',''); return false;\">
 	 $l_document_add</a></li>
   </ul>
   </div>";
@@ -1181,8 +1181,8 @@ function html_contact_links($id) {
   <ul>
     <li><a href=\"$url_subscription\"><img src=\"$ico_publication\" alt=\"\" /></a>
         <a href=\"$url_subscription\">$l_subscription_list ($nb_subscription)</a></li>
-    <li><a href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"$ico_add\" alt=\"\" /></a>
-	<a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> $l_subscription_new</a></li>
+    <li><a href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; popup('$url_subscription_new',''); return false;\"><img src=\"$ico_add\" alt=\"\" /></a>
+	<a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; popup('$url_subscription_new',''); return false;\"> $l_subscription_new</a></li>
   </ul>
   </div>";
   }
@@ -1262,7 +1262,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   global $l_comment3, $l_add_comment3, $l_upd_comment3;
   global $l_datasource, $l_archive, $l_private, $l_coord, $l_contact, $l_market;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
-  global $popup_width, $popup_height;
   global $display, $path, $obm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
 
   $uid = $obm["uid"];
@@ -1656,7 +1655,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
       </a><input type=\"hidden\" name=\"company_id\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width'); return false;\">
+      <a href=\"\" onclick=\"popup('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company'); return false;\">
       <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
   } else {

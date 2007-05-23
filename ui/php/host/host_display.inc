@@ -419,7 +419,7 @@ function html_host_form($action, $host_q, $host, $field="") {
   global $l_module_host, $l_name, $l_desc, $l_ip, $l_smb,$l_web_mode;
   global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_access;
   global $l_host_select_user, $l_user, $l_clear,$l_web_all, $l_web_list_only;
-  global $popup_height, $popup_width, $ico_user,$l_domain,$obm;
+  global $ico_user,$l_domain,$obm;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -533,7 +533,7 @@ function html_host_form($action, $host_q, $host, $field="") {
   <tr>
   <th class=\"$class[user]\">
   $l_user
-  <a href=\"\" onclick=\"window.open('$path/user/user_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_host_select_user)."&amp;ext_widget=f_host.user_id&amp;ext_widget_text=f_host.tf_user_login','User','height=$popup_height,width=$popup_width'); return false;\">
+  <a href=\"\" onclick=\"popup('$path/user/user_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_host_select_user)."&amp;ext_widget=f_host.user_id&amp;ext_widget_text=f_host.tf_user_login','User'); return false;\">
    <img src=\"$ico_user\" alt=\"\" /></a>
   </th>
    

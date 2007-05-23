@@ -37,7 +37,7 @@ function of_get_defaultodttemplates($entity){
 //  - HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function of_defaultodttemplates_dis_admin_form($entity, $defaults_q) {
-  global $path, $popup_height, $popup_width, $l_select_template;
+  global $path, $l_select_template;
   global $l_defaultodttemplate_manage, $l_defaultodttemplate_exist;
   global $l_defaultodttemplate_document, $l_defaultodttemplate_label;
   global $l_template_delete, $l_template_update, $l_template_insert,$l_c_new,$ico_ok,$ico_delete;
@@ -76,7 +76,7 @@ function of_defaultodttemplates_dis_admin_form($entity, $defaults_q) {
  
   $url_sel_document = "$path/document/document_index.php?action=ext_get_id_from_path&amp;popup=1&amp;ext_widget=form_defaultodttemplate_new.tf_defaultodttemplate_document_id&amp;";
   $url_sel_document .= "ext_widget_text=form_defaultodttemplate_new.tf_defaultodttemplate_document_name&amp;ext_disp_file=true&amp;ext_title=".urlencode($l_select_template);
-  $ext_sel_document = "<a href=\"\" onclick=\"window.open('$url_sel_document','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">$l_select_template</a>";
+  $ext_sel_document = "<a href=\"\" onclick=\"popup('$url_sel_document',''); return false;\">$l_select_template</a>";
  
   
   $block = "

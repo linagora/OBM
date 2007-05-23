@@ -178,7 +178,7 @@ function of_category_dis_search_select($entity, $cat, $cats, $cat_id, $first_ele
 //   XHTML display of category form part
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="", $first="") {
-  global  $ico_add, $ico_delete, $popup_height, $popup_width;
+  global  $ico_add, $ico_delete;
   global $cgp_hide, $l_none;
   
   $show_cat = (! $cgp_hide["$entity"]["${cat}"]);
@@ -208,8 +208,7 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
       }
       $url = "${entity}_index.php?action=ext_get_${cat}_ids&amp;popup=1&amp;ext_element=sel_${cat}&amp;ext_title=${$l_cat}";
       $link="<a href=\"javascript: return false;\" style=\"float:right;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
-      return false;\">
+      onclick=\"popup('$url', ''); return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
       $class = "detail";
@@ -1966,7 +1965,7 @@ function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel
 //   XHTML display of category form part
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="", $first="") {
-  global  $ico_add, $ico_delete, $popup_height, $popup_width, $l_none;
+  global  $ico_add, $ico_delete, $l_none;
   
   if ($mode == "mono") {
     $sel_cat = of_category_user_html_select($cat, $cats, $cat_id, $first);
@@ -1990,8 +1989,7 @@ function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $
     }
     $url = "../$entity/${entity}_index.php?action=ext_get_category_ids&amp;category=$cat&amp;popup=1&amp;ext_element=sel_${cat}&amp;ext_title=${$l_cat}";
     $link = "<a href=\"javascript: return false;\" style=\"float:right;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
-      return false;\">
+      onclick=\"popup('$url', ''); return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
     $class = "detail";

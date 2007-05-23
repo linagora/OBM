@@ -603,7 +603,7 @@ function html_deal_links($deal_q) {
   global $l_module_project, $l_module_invoice;
   global $l_module_document,$ico_document, $l_deal;
   global $l_document_add;
-  global $path, $cgp_show, $popup_height,$popup_width;
+  global $path, $cgp_show;
 
   $id = $deal_q->f("deal_id");
   $pid = $deal_q->f("deal_parentdeal_id");
@@ -720,9 +720,9 @@ function html_deal_links($deal_q) {
     <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
 	<li><a href=\"\" 
-	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 onclick=\"popup('$url_doc_add',''); return false;
 	 \"><img src=\"$ico_add\" alt=\"\" /></a>
-	<a href=\"\" onclick=\"window.name='$l_deal'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	<a href=\"\" onclick=\"window.name='$l_deal'; popup('$url_doc_add',''); return false;\">
 	 $l_document_add</a></li>
   </ul>";
   }
@@ -1306,7 +1306,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
       <input type=\"hidden\" name=\"data_dccid_$cpt\" value=\"$dc_cid\" />
       <input type=\"hidden\" name=\"data_dccname_$cpt\" value=\"$dc_cname\" />
       <input type=\"hidden\" name=\"data_dccnewid_$cpt\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.data_dccnewid_$cpt&amp;ext_widget_text=f_entity.data_dccnewname_$cpt','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"popup('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.data_dccnewid_$cpt&amp;ext_widget_text=f_entity.data_dccnewname_$cpt','Company'); return false;\">
       <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"data_dccnewname_$cpt\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </div>";
@@ -1321,7 +1321,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
       <input type=\"hidden\" name=\"data_dccid_$cpt\" value=\"\" />
       <input type=\"hidden\" name=\"data_dccname_$cpt\" value=\"\" />
       <input type=\"hidden\" name=\"data_dccnewid_$cpt\" value=\"\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.data_dccnewid_$cpt&amp;ext_widget_text=f_entity.data_dccnewname_$cpt','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"popup('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.data_dccnewid_$cpt&amp;ext_widget_text=f_entity.data_dccnewname_$cpt','Company'); return false;\">
       <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"data_dccnewname_$cpt\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </div>";
@@ -2966,8 +2966,7 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   global $display, $path;
   global $l_parentdeal_deals,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_proposal,$l_alarm,$l_amount_in,$l_amount_out,$l_potential_balanced,$l_comment,$l_marketing_manager,$l_status;
-  global $l_infos;
-  global $popup_width, $popup_height, $l_deal_select_company;
+  global $l_infos, $l_deal_select_company;
 
   $parent = $parent_q->f("parentdeal_id");
   $plabel = $parent_q->f("parentdeal_label");

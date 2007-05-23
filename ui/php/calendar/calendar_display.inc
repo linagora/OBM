@@ -88,7 +88,7 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
 //   - $calendar_entity : array of entities elements to display
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
-  global $ico_user, $ico_resource, $popup_width, $popup_height;
+  global $ico_user, $ico_resource;
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
   global $l_calendar_displayed, $l_resource_displayed,$c_all;
   global $action,$ico_delete;
@@ -145,7 +145,7 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
 //   - $entity_readable : array of readable entities (["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable) {
-  global $path, $obm, $c_all,  $popup_height, $popup_width;
+  global $path, $obm, $c_all;
   global $ccalendar_resource;
   global $l_selection, $l_users,$l_resources, $l_validate;
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
@@ -1822,7 +1822,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   global $ccalendar_first_hour, $ccalendar_last_hour,$ico_project;
   // -- Labels
   global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_desc;
-  global $l_high,$l_low,$l_medium,$l_datebegin,$popup_height,$popup_width;
+  global $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_insert,$l_update,$l_repeat;
   global $l_repeatkind,$l_repeatdays, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
@@ -2089,7 +2089,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
             $r_name
             <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
             <div>
-              <a id=\"a[$r_id]\" href=\"javascript: void(0);\" onclick=\"window.open('$url_item', '', 'height=$popup_height,width=$popup_width,scrollbars=yes')\"> 
+              <a id=\"a[$r_id]\" href=\"javascript: void(0);\" onclick=\"popup('$url_item', '')\"> 
               $l_items</a><br />
               <textarea id=\"list-item[$r_id]\" name=\"list-item[$r_id]\" readonly>$list_item</textarea>
               <input type=\"hidden\" id=\"list-item-id[$r_id]\" name=\"list-item-id[$r_id]\" value=\"$list_item_id\" />
@@ -2120,7 +2120,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   
   $block_task = "
     <th>$l_task     
-    <a href=\"\" onclick=\"url = get_selected_users_url();window.open('$path/project/project_index.php?action=ext_get_task_id&amp;popup=1&amp;ext_widget=f_entity.task_new_id&amp;ext_widget_text=f_entity.task_new_name'+url,'Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+    <a href=\"\" onclick=\"url = get_selected_users_url();popup('$path/project/project_index.php?action=ext_get_task_id&amp;popup=1&amp;ext_widget=f_entity.task_new_id&amp;ext_widget_text=f_entity.task_new_name'+url,'Project'); return false;\">
     <img src=\"$ico_project\" alt=\"[Add]\" /></a>
     </th>
     <td>
@@ -2545,7 +2545,7 @@ function html_calendar_dis_delete($calendar) {
 function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   global $display, $path, $set_cal_interval;
   global $ico_delete, $ico_mini_cal;
-  global $popup_height,$popup_width,$ccalendar_resource;
+  global $ccalendar_resource;
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
   global $l_groups,$l_resources,$l_module_resourcegroup;
