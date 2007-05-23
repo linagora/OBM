@@ -147,9 +147,9 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
 function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable) {
   global $path, $obm, $c_all;
   global $ccalendar_resource;
-  global $l_selection, $l_users,$l_resources, $l_validate;
+  global $l_selection, $l_users,$l_resources, $l_validate,$l_search_users;
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
-  global $ico_calendar_user3,$ico_calendar_user4,$ico_calendar_user5;
+  global $ico_calendar_user3,$ico_calendar_user4,$ico_calendar_user5,$l_search_resources;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
 
   $iso_date = $calendar["date"];
@@ -194,7 +194,10 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   }
 
 
+  $user_text = phpStringToJsString($l_search_users);
+
   if ($ccalendar_resource) {
+    $resource_text = phpStringToJsString($l_search_resources);
     $dis_block_resource = "
     </fieldset>
     <fieldset class=\"detail extra\">
@@ -203,7 +206,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     </legend>       
     <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />
     ";
-    $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {restriction:'user'});";
+    $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {restriction:'user', defaultText:'$resource_text'});";
   }
 
   $dis_back_myview = "<a href=\"calendar_index.php?action=$new_action&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_back_mono</a>";
@@ -226,7 +229,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <legend>
     $l_users
     </legend>
-    <input type=\"text\" name=\"\" value=\"\" id=\"user\" autocomplete=\"off\" />
+    <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"user\" autocomplete=\"off\" />
     <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
     <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
     <input type=\"hidden\" name=\"new_group\" value=\"1\" />
@@ -246,7 +249,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   </div>
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {restriction:'calendar'});
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {restriction:'calendar', defaultText:'$user_text'})
       $resource_js
     });
     </script>    
@@ -2653,7 +2656,11 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
 
        $dis_sel_resource_group
      </td>      
-    </tr>";
+     </tr>";
+    $resource_js = "
+      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resource');
+      new obm.AutoComplete.Search('$path/resourcegroup/resourcegroup_index.php?action=ext_search', 'sel_resource_group_id', 'resourcegroup');  
+    ";
   }
   
   // group select
@@ -2742,9 +2749,8 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'user');
-      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resource');
       new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'group');
-      new obm.AutoComplete.Search('$path/resourcegroup/resourcegroup_index.php?action=ext_search', 'sel_resource_group_id', 'resourcegroup');
+      $resource_js
     });
   </script>";
 

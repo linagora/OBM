@@ -197,12 +197,12 @@ function dis_calendar_portal() {
     $day = date ("j", $current_time);
     $iso_day = of_isodate_format($current_time);
     $check_month = of_date_get_month($current_time);
-		$have_occurrence = $of->periodHaveOccurrences(strtotime($iso_day), $day_duration);
-		if($have_occurrence) {
-			$klass = "have_occurrence ";
-		} else {
-			$klass = "";
-		}
+    $have_occurrence = $of->periodHaveOccurrences(strtotime($iso_day), $day_duration);
+    if($have_occurrence) {
+      $klass = "hyperlight";
+    } else {
+      $klass = "";
+    }
     if ($check_month != $this_month) {
       $dis_minical .= "<td class=\"downlight $klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\"
         onmouseout=\"this.className='downlight $klass'\" onmouseover=\"this.className='hover'\">

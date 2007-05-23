@@ -513,6 +513,10 @@ fieldset.detail {
   width: auto;
 }
 
+.infos input {
+  width: expression(this.type == "checkbox" || this.type == "radio" ? "auto" : ""); /*IE Crappy hack 2*/ 
+}
+
 .extra {
   clear: left;
 }
@@ -631,7 +635,7 @@ input.datePicker {
   color: #fff;  
 }
 
-#datepicker td.have_occurrence, .miniCalendar tbody td.have_occurrence {
+#datepicker td.hyperlight, .miniCalendar tbody td.hyperlight {
   background-color: #ffcc00;
 }
 
@@ -1079,27 +1083,6 @@ input.datePicker {
 /*-------------------------------------------------------------------------- */
 /* AutoComplete styles
 /* ------------------------------------------------------------------------- */
-/*
-.module ul{
-  margin: 0;
-  padding: 0;
-  font-weight: bold;
-  list-style-type: none;  
-  background: #e0e1e3;    
-  border: 1px solid #368397;
-  width: 25em;
-}
-
-.module ul li  {
-  line-height: 1ex;
-  display: block;
-  margin: 0;
-  padding: 0.3em 2px;
-  text-align: left;
-  border: 0;
-  color: #368397;
-  border-bottom: 1px solid #b7b8ba;
-*/
 .autoCompleteResultBox {
   position: absolute;
   list-style-type: none;  
@@ -1138,44 +1121,9 @@ input.datePicker {
  margin: 0;
 }
 
-
-div.aas_liste div strong {
- background-color: #aaddff;
- font-weight: inherit;
+input.downlight {
+  color: #ddd;
 }
-
-span.aas_previousBtn {
- position: absolute;
- left: 0px;
- cursor: pointer;
-}
-
-span.aas_nextBtn {
- position: absolute;
- right: 0px;
- cursor: pointer;
-}
-
-
-
-/* styles propres à la liste des choix */
-
-div.utilisateurs {
- background-color: #fff;
- border: 1px solid #888;
- padding: 2px;
- width: 250px ;
- height: 86px;
- font-weight: bold;
- overflow: auto;
-}
-
-div.utilisateurs div {
- padding: 3px;
- border: 0;
-}
-
-
 /* ------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------- */

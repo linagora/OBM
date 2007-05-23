@@ -39,7 +39,7 @@ include("$obminclude/global_pref.inc");
 require("resourcegroup_display.inc");
 require("resourcegroup_query.inc");
 require("resourcegroup_js.inc");
-
+require("$obminclude/of/of_right.inc");
 get_resourcegroup_action();
 $perm->check_permissions($module, $action);
 

@@ -6,10 +6,10 @@
 // unadapted function names
 // dangerous Element.extend 
 // comments
+// Implement mono mode
 
-//FIXME Must be set with the other constants 
-AAS_PGUP = 33;
-AAS_PGDOWN = 34;
+obm.vars.consts.pgup = 33;
+obm.vars.consts.pgdown = 34;
 
 obm.AutoComplete = obm.autocomplete = {};
 //FIXME Not usefull, replace buy getStyle and setStyle
@@ -73,6 +73,7 @@ obm.AutoComplete.Cache = new Class({
 });
 
 //FIXME Improve algorythm
+//FIXME Refactor
 obm.AutoComplete.View = new Class({
 
   initialize: function(visibleNb) {
@@ -117,6 +118,7 @@ obm.AutoComplete.Search = new Class({
       delay: 400,
       mode: 'multiple',
       restriction: null,
+      defaultText: 'Search...',
       extension: null
     }, options || {});
   },
@@ -132,10 +134,12 @@ initialize: function(url, selectedBox, input, options) {
 
     this.toClear = false;
    // FIXME OnBlur event to be rethink
+   // FIXME Rename input on field.. input can have many means
     this.input.addEvent('keyup', this.onTextChange.bindAsEventListener(this))
               .addEvent('keydown', this.onKeyDown.bindWithEvent(this))
               .addEvent('keypress', this.onKeyPress.bindWithEvent(this))
-              .addEvent('blur',this.reset.bindAsEventListener(this));
+              .addEvent('blur',this.reset.bindAsEventListener(this))
+              .addEvent('focus',function(){this.input.value='';this.input.removeClass('downlight');}.bindAsEventListener(this));
 
     var inputCoords = this.input.getCoordinates();
     this.resultBox = new Element('div').addClass('autoCompleteResultBox')
@@ -164,8 +168,9 @@ initialize: function(url, selectedBox, input, options) {
   },
   ///////////////////////////////////////////////////////////////////////////
   // keyboard selection management (up, down, enter, esc., page up, page down)
-
-  //Key pressed should manage up down page up and page down to
+  // return is useless, use e.stop() to prevent event propagation
+  //TODO Key pressed should manage up down page up and page down to
+  //TODO Tab key mightbe usefull to
   onKeyPress: function(e) {
     if (e.key == 'enter') {
       if (this.resultBox.isVisible()) {
@@ -173,12 +178,13 @@ initialize: function(url, selectedBox, input, options) {
         if (currentSel) {
           this.addChoice(currentSel);
         }
+        e.stop();
       }
       return false;
     }
     return true;
   },
-  //FIXME Switch case?
+  //FIXME Switch case? French
   onKeyDown: function(e) {
     if (e.key == 'esc') { // Echap : on reinitialise le champs
       this.input.blur();
@@ -194,11 +200,11 @@ initialize: function(url, selectedBox, input, options) {
       this.jumpTo(1);
       return false;
 
-    } else if (e.code == AAS_PGUP && this.resultBox.isVisible()) { // Page précédente : on charge les résultats précédents
+    } else if (e.code == obm.vars.consts.pgup && this.resultBox.isVisible()) { // Page précédente : on charge les résultats précédents
       this.jumpTo(-this.options.results);
       return false;
 
-    } else if (e.code == AAS_PGDOWN && this.resultBox.isVisible()) { // Page suivante : on charge les résultats suivants
+    } else if (e.code == obm.vars.consts.pgdown && this.resultBox.isVisible()) { // Page suivante : on charge les résultats suivants
       this.jumpTo(this.options.results);
       return false;
     }
@@ -444,7 +450,8 @@ initialize: function(url, selectedBox, input, options) {
   // reinit functions
   reset: function() {
     this.hideListe();
-    this.input.value = '';
+    this.input.value = this.options.defaultText;
+    this.input.addClass('downlight')
     this.currentValue = '';
     this.nbTotal = 0;
     this.cache = new obm.AutoComplete.Cache();
