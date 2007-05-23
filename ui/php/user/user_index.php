@@ -277,6 +277,13 @@ function get_user_params() {
     $params["group_nb"] = $nb_group;
   }
   
+  if (isset ($_FILES['fi_file'])) {
+    $params["file_tmp"] = $_FILES['fi_file']["tmp_name"];
+    $params["file_name"] = $_FILES['fi_file']['name'];
+    $params["size"] = $_FILES['fi_file']['size'];
+    $params["type"] = $_FILES['fi_file']['type'];
+  }
+
   return $params;
 }
 

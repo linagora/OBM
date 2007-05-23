@@ -1005,10 +1005,11 @@ function get_group_parents($id) {
   return array_unique($parents);
 }
 
+
 /**
  * Search group from a single field 
  * 
- * @param mixed $resource 
+ * @param mixed $group
  * @access public
  * @return DB Search results
  */
@@ -1046,6 +1047,30 @@ function run_query_group_ext_search($group) {
       ";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_ext_search()");
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+/**
+ * Set group manager
+ * 
+ * @param mixed $group 
+ * @access public
+ * @return DB Search results
+ */
+function run_query_group_setmanager($group) {
+  global $cdg_sql;
+
+  $group_id = $group["group_id"];
+  $manager = $group["manager"];
+  $obm_q = new DB_OBM;
+
+  $query = "UPDATE UGroup SET 
+    group_manager_id='$manager'
+    WHERE group_id='$group_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_group_setmanager()");
   $obm_q->query($query);
 
   return $obm_q;

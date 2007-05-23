@@ -430,7 +430,7 @@ function html_user_consult($obm_q) {
   global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
   global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
   global $l_vacation, $l_vacation_message, $l_mail_server;
-  global $l_enabled, $l_disabled, $l_web_consult_list;
+  global $l_enabled, $l_disabled, $l_web_consult_list, $l_photo;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $path, $display, $cgp_use, $c_yes, $c_no,$obm;
 
@@ -450,6 +450,7 @@ function html_user_consult($obm_q) {
   $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
   $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
+  $photo_id = $obm_q->f("userobm_photo_id");
 
   $phone = $obm_q->f("userobm_phone");
   $phone2 = $obm_q->f("userobm_phone2");
@@ -678,6 +679,13 @@ function html_user_consult($obm_q) {
     </div>";
   }
 
+  // Photo
+  if($photo_id > 0) {
+    $block_photo = "<img src=\"$path/document/document_index.php?action=accessfile&document_id=$photo_id\" alt=\"[Photo]\"/ />";
+  } else {
+    $block_photo = "";
+  }
+  
   $display["detailInfo"] = display_record_info($obm_q);
   $display["title"] = "<h1 class=\"title\">$l_user : $fname $lname</h1>";
 
@@ -737,6 +745,10 @@ function html_user_consult($obm_q) {
   <tr>
     <th>$l_lastaccess</th>
     <td>$lastaccess</td>
+  </tr>
+  <tr>
+    <th>$l_photo</th>
+    <td>$block_photo</td>
   </tr>
 </table>
 </div>
@@ -896,7 +908,7 @@ function html_user_form($usr_q, $user, $field="") {
   global $l_enabled, $l_disabled, $l_web_consult_list,$path;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $path, $display, $cgp_use, $action, $profiles, $c_yes, $c_no;
-  global $obm, $c_default_domain, $l_domain;
+  global $obm, $c_default_domain, $l_domain, $l_photo;
 
   
   // if update mode and first time value are taken from database
@@ -915,6 +927,7 @@ function html_user_form($usr_q, $user, $field="") {
     $desc = $usr_q->f("userobm_description");
     $datebegin = $usr_q->f("userobm_datebegin");
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
+    $photo_id = $usr_q->f("userobm_photo_id");
 
     // coord
     $phone = $usr_q->f("userobm_phone");
@@ -1227,6 +1240,9 @@ function html_user_form($usr_q, $user, $field="") {
   </fieldset>";
   }
 
+  // Input file (photo)
+  $block_photo = display_document_form($user, $l_photo);
+
   // Buttons
   if (($action == "new") || ($action == "insert")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
@@ -1236,6 +1252,18 @@ function html_user_form($usr_q, $user, $field="") {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"user_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_update\" />";
+  }
+
+  // Photo
+  if($photo_id > 0) {
+    $block_photo_detail = "<tr>
+    <th>&nbsp;</th>
+    <td>
+      <img src=\"$path/document/document_index.php?action=accessfile&document_id=$photo_id\" alt=\"\"/ />
+      <input type=\"hidden\" name=\"document_id\" value=\"$photo_id\" />
+    </td></tr>";
+  } else {
+    $block_photo_detail = "";
   }
 
   // Target Delegation handling (if updated user as delegation admin realm)
@@ -1275,6 +1303,7 @@ function html_user_form($usr_q, $user, $field="") {
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"post\" name=\"f_entity\"
+    enctype=\"multipart/form-data\"
     onsubmit=\"if (check_user(this)) return true; else return false;\"
     action=\"" . url_prepare("user_index.php") . "\">
 
@@ -1320,11 +1349,12 @@ function html_user_form($usr_q, $user, $field="") {
     <th class=\"$class[datebegin]\">$l_datebegin</th>
     <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
   </tr>
+  $block_photo
+  $block_photo_detail
   $block_userdata 
   </table>
   </fieldset>
 
-  
   <fieldset class=\"detail infos\">
   <legend>$l_coord</legend>
   <table>
@@ -1714,5 +1744,4 @@ function json_search_users($user,$user_q) {
   }
   $display["json"] = "{length:".$user_q->nf().", datas:[".implode(",",$users)."]}";
 }
-
 ?>

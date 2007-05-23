@@ -16,6 +16,12 @@ UPDATE ObmInfo set obminfo_value='2.1' where obminfo_name='db_version';
 -- Add Resource Type
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resource', 'resourcetype_label', 4, 1);
 
+-- Add OrganizationalChart pref
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'organizationalchart', 'organizationalchart_name', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'organizationalchart', 'organizationalchart_description', 2, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'organizationalchart', 'organizationalchart_archive', 3, 2);
+
+
 -------------------------------------------------------------------------------
 -- Update Lead table
 -------------------------------------------------------------------------------
@@ -45,8 +51,10 @@ ALTER TABLE P_UserObm ALTER COLUMN userobm_delegation SET DEFAULT '';
 -- UGroup
 ALTER TABLE UGroup ADD COLUMN group_delegation varchar(64);
 ALTER TABLE UGroup ALTER COLUMN group_delegation SET DEFAULT '';
+ALTER TABLE UGroup ADD COLUMN group_manager_id integer SET DEFAULT 0;
 ALTER TABLE P_UGroup ADD COLUMN group_delegation varchar(64);
 ALTER TABLE P_UGroup ALTER COLUMN group_delegation SET DEFAULT '';
+ALTER TABLE P_UGroup ADD COLUMN group_manager_id integer SET DEFAULT 0;
 
 -- MailShare
 ALTER TABLE MailShare ADD COLUMN mailshare_delegation varchar(64);
@@ -131,3 +139,57 @@ CREATE TABLE Updatedlinks (
   updatedlinks_entity_id  integer,
   PRIMARY KEY (updatedlinks_id)
 );
+
+
+--
+-- Table structure for the table 'OrganizationalChart'
+--
+CREATE TABLE OrganizationalChart (
+  organizationalchart_id			      serial,
+  organizationalchart_domain_id     integer default 0,
+  organizationalchart_timeupdate    timestamp,
+  organizationalchart_timecreate		timestamp,
+  organizationalchart_userupdate    integer,
+  organizationalchart_usercreate    integer,
+  organizationalchart_name          varchar(32) not null,
+  organizationalchart_description   varchar(64),
+  organizationalchart_archive       integer not null default 0,
+  PRIMARY KEY (organizationalchart_id)
+);
+
+
+--
+-- Table structure for the table 'OGroup'
+--
+CREATE TABLE OGroup (
+  ogroup_id					               serial,
+  ogroup_domain_id                 integer default 0,
+  ogroup_timeupdate	             	 timestamp,
+  ogroup_timecreate	             	 timestamp,
+  ogroup_userupdate                integer,
+  ogroup_usercreate                integer,
+  ogroup_organizationalchart_id    integer not null,
+  ogroup_parent_id                 integer not null,
+  ogroup_name                      varchar(32) not null,
+  ogroup_level                     varchar(16),
+  PRIMARY KEY (ogroup_id)
+);
+
+
+--
+-- Table structure for the table 'OGroupEntity'
+--
+CREATE TABLE OGroupEntity (
+  ogroupentity_id                  serial,
+  ogroupentity_domain_id           integer default 0,
+  ogroupentity_timeupdate          timestamp,
+  ogroupentity_timecreate          timestamp,
+  ogroupentity_userupdate          integer,
+  ogroupentity_usercreate          integer,
+  ogroupentity_ogroup_id           integer not null,
+  ogroupentity_entity_id           integer not null,
+  ogroupentity_entity              varchar(32) not null,
+  PRIMARY KEY (ogroupentity_id)
+);
+
+

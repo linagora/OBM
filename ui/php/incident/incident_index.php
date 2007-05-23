@@ -265,7 +265,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $params["incident_id"] = $params["ext_id"];
   if ($params["doc_nb"] > 0) {
-    $nb = run_query_global_insert_documents($params, "incident");
+    $nb = run_query_global_insert_documents_links($params, "incident");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);

@@ -283,11 +283,17 @@ if ($action == "index") {
 } elseif ($action == "quick_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_quick_form($params)) {
-    $id = run_query_calendar_quick_event_insert($params, $cal_entity_id);
-    json_ok_msg("$l_event : $l_insert_ok");
-    json_event_data($id, $params);
-    echo "({".$display['json']."})";
-    exit();
+    if (!check_calendar_conflict($params, $cal_entity_id)) {
+      $id = run_query_calendar_quick_event_insert($params, $cal_entity_id);
+      json_ok_msg("$l_event : $l_insert_ok");
+      json_event_data($id, $params);
+      echo "({".$display['json']."})";
+      exit();
+    } else {
+      json_error_msg($l_invalid_data . " : " . $l_insert_error);
+      echo "({".$display['json']."})";
+      exit();
+    }
   } else {
     json_error_msg($l_invalid_data . " : " . $err["msg"]);
     echo "({".$display['json']."})";

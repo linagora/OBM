@@ -1260,6 +1260,26 @@ function get_last_group_text($id) {
   return;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Get the organizational chart text from the organizational chart id
+// Parameters:
+//   - $id : organizational chart id 
+///////////////////////////////////////////////////////////////////////////////
+function get_last_organizationalchart_text($id) {
+  global $cdg_sql;
+
+  if ($id > 0) {
+    $query = "SELECT organizationalchart_name 
+      FROM OrganizationalChart WHERE organizationalchart_id='$id'";
+    display_debug_msg($query, $cdg_sql, "get_last_organizationalchart_text()");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("organizationalchart_name");
+  }
+  return;
+}
+
 
 //--- User and group global functions ---------------------------------------//
 
@@ -1526,7 +1546,8 @@ function run_query_all_users_from_group($g_id, $ids="") {
     }
   }
 
-  $query = "SELECT userobm_id,
+  $query = "SELECT 
+      userobm_id,
       userobm_lastname,
       userobm_firstname
     FROM UserObm
@@ -1535,9 +1556,30 @@ function run_query_all_users_from_group($g_id, $ids="") {
     ORDER BY userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg("run_query_all_users_from_group() : $query", $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_all_users_from_group()");
 
   return $obm_q;
+}
+
+
+/**
+ * Get the group manager
+ * @param $g_id group id
+ * @return integer group_manager_id
+ * @access public
+ */
+function run_query_global_group_manager($g_id) {
+  global $cdg_sql;
+
+  $query = "SELECT group_manager_id FROM UGroup
+    WHERE group_id='$g_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_all_users_from_group()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $return = $obm_q->f("group_manager_id");
+ 
+  return $return;
 }
 
 

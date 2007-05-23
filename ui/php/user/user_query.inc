@@ -544,7 +544,18 @@ function run_query_user_insert($user) {
 
   if ($id > 0) {
     $ret = of_userdata_query_update("user", $id, $user);
+    // Insert user's photo
+    if(isset($user["file_tmp"]) && $user["file_tmp"] != "") {
+      $doc_id = run_query_global_insert_document($user, $id, "user");
+      if($doc_id > 0) {
+        // Update userobm_photo_id
+        $query = "UPDATE UserObm SET userobm_photo_id='$doc_id' WHERE userobm_id='$id'"; 
+        display_debug_msg($query, $cdg_sql, "run_query_user_insert(3)");
+        $obm_q->query($query);
+      }
+    }
   }
+
   // Subscribe the user to his default group
   run_query_user_init_group($user_id, $gid, NULL);
 
@@ -662,6 +673,7 @@ function run_query_user_update($p_id, $user) {
   $email = $user["email"];
   $desc = $user["desc"];
   $multidomain = sql_multidomain("userobm");
+  $photo_id = $user["document_id"];
 
   // Target Delegation handling (if updated user as delegation admin realm)
   $admin_realm = $profiles[$profile]['properties']['admin_realm'];
@@ -823,6 +835,27 @@ function run_query_user_update($p_id, $user) {
     $retour = run_query_user_unsubscribe_all_groups($p_id);    
   }
 
+  // Update photo
+  if(isset($user["file_tmp"]) && $user["file_tmp"] != "") {
+    // Select user photo
+    $query = "SELECT userobm_photo_id FROM UserObm WHERE userobm_id='$p_id'";
+    $obm_q->query($query);
+    $obm_q->next_record();
+    if($obm_q->f("userobm_photo_id") == "") {
+      // Insert
+      $doc_id = run_query_global_insert_document($user, $p_id, "user");
+      if($doc_id > 0) {
+        // Update userobm_photo_id
+        $query = "UPDATE UserObm SET userobm_photo_id='$doc_id' WHERE userobm_id='$p_id'"; 
+        display_debug_msg($query, $cdg_sql, "run_query_user_update(2)");
+        $obm_q->query($query);
+      }
+    } else {
+      // Update a photo
+      run_query_global_update_document($user, $photo_id);
+    }
+  }
+
   if ($retour) {
     $ret = of_userdata_query_update("user", $p_id, $user);
   }
@@ -840,12 +873,22 @@ function run_query_user_delete($p_id) {
 
   $multidomain = sql_multidomain("userobm");
   $ret = of_userdata_query_delete("user", $p_id);
+  $obm_q = new DB_OBM;
 
+  // Remove user's photo (document & documententity)
+  $query = "SELECT userobm_photo_id FROM UserObm WHERE userobm_id='$p_id' $multidomain";
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $photo_id = $obm_q->f("userobm_photo_id");
+  if($photo_id > 0) {
+    run_query_global_delete_document($photo_id);
+  }
+
+  // Remove user
   $query = "DELETE FROM UserObm
     WHERE userobm_id='$p_id'
       $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_user_delete()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // If this mailshare exists in Prod table, Insert it in Deleted table
@@ -1128,8 +1171,9 @@ function run_query_user_check_user($p_id, $user) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_user_data_form($p_id, $user) {
   global $l_exist_error,$l_login_error, $l_login_in_use, $l_password_error;
-  global $l_lname_error, $l_last_admin_error;
-  global $l_email_error, $l_mail_server_error, $l_email_exist, $l_uemail_exist;
+  global $l_lname_error, $l_last_admin_error, $l_image_type_error;
+  global $l_image_size_error, $l_email_error, $l_mail_server_error;
+  global $l_email_exist, $l_uemail_exist;
   global $l_quota_error, $l_nomade_perms_error, $l_nomade_without_mail_perms;
   global $l_nomade_local_copy_error, $l_err_system_samba,$l_err_web_all;
   global $l_email_empty, $l_mail_perms_error, $l_email_nomad_error;
@@ -1138,7 +1182,8 @@ function check_user_data_form($p_id, $user) {
   global $php_regexp_email, $php_regexp_email_name, $php_regexp_quota;
   global $php_regexp_home, $php_regexp_drive, $l_err_home, $l_err_drive;
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
-  global $c_multidomain, $obm, $cgp_use;
+  global $c_multidomain, $obm, $cgp_use, $c_imagetype;
+  global $c_max_image_size;
 
   $action = $user["action"];
   $id = $user["user_id"];
@@ -1172,6 +1217,7 @@ function check_user_data_form($p_id, $user) {
   $smb_home = stripslashes($user["smb_home"]);
   $smb_home_drive = $user["smb_home_drive"];
   $smb_logon = $user["smb_logon"];
+  $file = $user["file_tmp"];
 
   if ($action == "update") {
     $u = get_user_info($id);
@@ -1261,25 +1307,25 @@ function check_user_data_form($p_id, $user) {
       // All email addresses given are valid and not already used
       $em = strtok($email, "\r\n");
       while ($em) {
-	if (! preg_match($php_regexp_email_name, $em)) {
-	  $err["msg"] .= "$em : $l_email_error";
-	  $err["field"] = "email";
-	  return false;
-	}
-	// Email address not already used
-	if (array_key_exists($em, $mails)) {
-	  $err["msg"] = "$l_email_exist : $em (" . $mails["$em"] . ")";
-	  $err["field"] = "email";
-	  return false;
-	}
-	// Email address not already used by this user
-	if (in_array($em, $um)) {
-	  $err["msg"] = "$l_uemail_exist : $em";
-	  $err["field"] = "email";
-	  return false;
-	}
-	array_push($um, $em);
-	$em = strtok("\r\n");
+	      if (! preg_match($php_regexp_email_name, $em)) {
+	        $err["msg"] .= "$em : $l_email_error";
+	        $err["field"] = "email";
+	        return false;
+	      }
+	      // Email address not already used
+	      if (array_key_exists($em, $mails)) {
+	        $err["msg"] = "$l_email_exist : $em (" . $mails["$em"] . ")";
+	        $err["field"] = "email";
+	        return false;
+	      }
+	      // Email address not already used by this user
+	      if (in_array($em, $um)) {
+	        $err["msg"] = "$l_uemail_exist : $em";
+	        $err["field"] = "email";
+	        return false;
+	      }
+	      array_push($um, $em);
+	      $em = strtok("\r\n");
       }
     }
   } else {
@@ -1386,6 +1432,31 @@ function check_user_data_form($p_id, $user) {
       $err["msg"] = $l_err_web_all;
       return false;
     }
+  }
+
+  // Photo
+  if($file != "") {
+    // Test image mime-type
+    $image_type = exif_imagetype($file);
+    if(!$image_type || !array_key_exists($image_type, $c_imagetype)) {
+      $err["msg"] = $l_image_type_error;
+      $err["field"] = "file";
+      return false;
+    }
+
+    // Test image size
+    $max_width = $c_max_image_size["width"];
+    $max_height = $c_max_image_size["height"];
+    $max_size = $c_max_image_size["size"];
+    $image_info = getimagesize($file); 
+    $width = $image_info["0"];
+    $height = $image_info["1"];
+    $size  = $user["img_size"];
+    if($width > $max_width || $height > $max_height || $size > $max_size) {
+      $err["msg"] = $l_image_size_error;
+      $err["field"] = "file";
+      return false;
+    } 
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -1556,7 +1627,97 @@ function run_query_user_delete_profile($user_id)  {
     WHERE timetask_user_id = '$user_id'"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(TimeTask)");
   $obm_q->query($query);
+
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Executions - Insert UserObm's photo
+// Insert user's photo in document module
+// Write photo on disk
+// Insert links between user and document
+// Parameters:
+//   - $user[] : user's value
+//   - $user_id : user's id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_user_insert_photo($user, $user_id) {
+  global $cdg_sql, $obm;
+
+  $uid = $obm["uid"];
+  $now = date("Y-m-d H:i:s");
+  $domain_id = $obm["domain_id"];
+
+  $title = "";
+  $author = get_last_user_text($uid);
+  $mime = "";
+  $name = $user["name"];
+  $path = "";
+  $size = $user["size"];
+  $kind = "";
+  $url = "";
+  $privacy = "0";
+  $entity = "user";
+  $entity_id = $user_id;
+  
+  $query = "INSERT INTO Document (
+    document_timeupdate,
+    document_timecreate,
+    document_userupdate,
+    document_usercreate,
+    document_domain_id,
+    document_title,
+    document_author,
+    document_name,
+    document_path,
+    document_kind,
+    document_size,
+    document_mimetype_id,
+    document_privacy
+  ) VALUES (
+    null,
+    '$now',
+    null,
+    '$uid',
+    '$domain_id',
+    '$title',
+    '$author',
+    '$name',
+    '$path',
+    '$kind',
+    '$size',
+    '$mime',
+    '$privacy')";
+
+  display_debug_msg($query, $cdg_sql, "run_query_user_insert_photo(1)");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  $doc_id_q = "SELECT document_id
+    FROM Document
+    WHERE 
+      document_title='$title'
+      AND document_author='$author'
+      AND document_name='$name'
+      AND document_size='$size'";  
+
+  display_debug_msg($query, $cdg_sql, "run_query_user_insert_photo(2)");
+  $obm_q = new DB_OBM;
+  $obm_q->query($doc_id_q);
+  
+  // If the document is correctly inserted in database
+  if ($obm_q->num_rows() > 0) {
+    $obm_q->next_record();
+    $doc_id = $obm_q->f("document_id");
+
+    // Create document on disk
+    if (! run_query_document_create_file($document)) {
+    	$err_msg = $l_create_file_error;
+    	// If error, we delete The document infos to keep bd and rep on sync
+    	run_query_document_delete($doc_id);
+    	return false;
+    }
+  }   
+
+}
 
 ?>

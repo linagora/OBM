@@ -344,7 +344,10 @@ function dis_group_consult($group, $uid) {
       $count = get_query_count("SELECT count(*) FROM GroupGroup WHERE groupgroup_parent_id=$g_id");
       $g_q->set_num_rows_total($count);
     }
-    $block = html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q);
+
+    $all_usr_q = run_query_all_users_from_group($g_id);
+    $g_manager = run_query_global_group_manager($g_id);
+    $block = html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q, $g_manager);
   } else {
     $display["msg"] .= display_err_msg($l_err_reference);
   }
@@ -362,11 +365,11 @@ function dis_group_consult($group, $uid) {
 //   - $prefs_g  : group group preference display
 //   - $g_q      : group database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
-  global $l_yes, $l_no, $ico_mail;
+function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q, $g_manager) {
+  global $l_yes, $l_no, $ico_mail, $l_undef, $c_undef;
   global $l_group, $l_name, $l_desc, $l_email, $l_mailing, $l_no_user, $l_no_group_group;
   global $l_system, $l_local, $l_ext_id, $l_smb;
-  global $l_visibility, $l_private, $l_public;  
+  global $l_visibility, $l_private, $l_public, $l_manager;  
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
   global $obm, $display, $module, $action, $cright_write;
   global $cg_gid_smb_user, $cg_gid_smb_admin;
@@ -502,6 +505,24 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       </form>";
     }
   }
+  
+  // Manager select
+  $sel_manager = "<form id=\"f_manager\" name=\"f_manager\" method=\"post\" action=\"?action=set_manager\">
+    <select name=\"sel_manager\" id=\"sel_manager\" onchange=\"document.f_manager.submit()\">
+      <option value=\"$c_undef\">$l_undef</option>";
+  while($all_usr_q->next_record()) {
+    $userobm_id = $all_usr_q->f("userobm_id");
+    $userobm_name = $all_usr_q->f("userobm_lastname")." ".$all_usr_q->f("userobm_firstname");
+    if ($userobm_id == $g_manager) {
+      $selected = "selected";
+    } else {
+      $selected = "";
+    }
+    $sel_manager .= "<option value=\"$userobm_id\" $selected> $userobm_name </option>";
+  }
+  $sel_manager .= "</select>
+    <input type=\"hidden\" id=\"group_id\" name=\"group_id\" value=\"$id\"/>
+  </form>";
 
   $display["detailInfo"] = display_record_info($group_q);
   $display["title"] = "<h1 class=\"title\">$l_group : $name</h1>";
@@ -514,6 +535,10 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     <tr>
       <th>$l_name</th>
       <td>$name</td>
+    </tr>
+    <tr>
+      <th>$l_manager</th>
+      <td>$sel_manager</td>
     </tr>
     <tr>
       <th>$l_system</th>

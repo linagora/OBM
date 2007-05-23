@@ -73,6 +73,8 @@ $ico_big_time       = "$theme_path/ico_big_time.gif";
 $ico_todo           = "$theme_path/ico_todo.gif";
 $ico_user           = "$theme_path/ico_user.gif";
 $ico_vacation       = "$theme_path/ico_vacation.gif";
+$ico_organizationalchart = "$theme_path/ico_organizational_chart.gif";
+$ico_load            = "$theme_path/ico_load.gif";
 
 // Globals Icons
 $ico_arrow_up       = "$theme_path/arrow_up.gif";       
@@ -104,6 +106,9 @@ $ico_add            = "$theme_path/ico_add.gif";
 $ico_new            = "$theme_path/ico_add.gif";
 $ico_scope          = "$theme_path/ico_scope.gif";
 $ico_privacy        = "$theme_path/ico_privacy.gif";
+$ico_manager        = "$theme_path/ico_manager.gif";
+$ico_nophoto        = "$theme_path/ico_nophoto.png";
+
 // OBM Globals images and icons
 $flag_de            = "$theme_path/flag_de.gif";
 $flag_en            = "$theme_path/flag_en.gif";

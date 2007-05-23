@@ -174,7 +174,8 @@ $l_mailbox = "Boîte aux lettres";
 $l_tools = "Outil Mise à jour";
 $l_control = "Tableau de bord";
 $l_insufficient_permission = "Permissions insuffisantes";
-$l_scope_update = "Mettre à jour le système";
+$l_scope_update = "Mettre à jour le systeme";
+$l_organizationalchart = "Organigramme";
 
 $l_permission_denied = $l_insufficient_permission;
 // OBM_DISPLAY
@@ -272,6 +273,7 @@ $l_module_group = "Groupes";
 $l_module_resourcegroup = "Groupes de ressources";
 $l_module_host = "Hôtes";
 $l_module_mailshare = "Partages Mail";
+$l_module_organizationalchart = "Organigramme";
 
 $l_module_admin_lang = "Langue";
 $l_module_admin_data = "Données";

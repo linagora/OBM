@@ -167,6 +167,8 @@ $l_control = "Dashboard";
 $l_host = "Host";
 $l_scope_update = "Update system";
 $l_insufficient_permission = "Insufficient permissions";
+$l_organizationalchart = "Organizational chart";
+
 $l_permission_denied = $l_insufficient_permission;
 
 // Global display
@@ -266,6 +268,7 @@ $l_module_group = "Groups";
 $l_module_resourcegroup = "Resources group";
 $l_module_host = "Hosts";
 $l_module_mailshare = "Mail shares";
+$l_module_organizationalchart = "Organizational chart";
 
 $l_module_admin_lang = "Lang";
 $l_module_admin_data = "Data";

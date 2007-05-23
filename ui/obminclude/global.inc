@@ -155,6 +155,16 @@ $tmp_path = "/tmp";
 // default taxes values
 $cdefault_tax = array ("TVA 19,6" => 1.196, "TVA 5,5" => 1.055, "Pas de TVA" => 1);
 
+// Imagetype constants
+$c_imagetype = array("1" => "GIF",
+                     "2" => "JPEG",
+                     "3" => "PNG");
+
+// Max image size
+$c_max_image_size = array("width" => "96",
+                          "height" => "96",
+                          "size" => "100000");
+
 //---------------------------------------------------------------------------//
 // Default access rights bits meanings
 // 0 - read  : data
@@ -248,6 +258,7 @@ $cgp_show["module"]["resource"] = "user";
 $cgp_show["module"]["resourcegroup"] = "user";
 $cgp_show["module"]["host"] = "user";
 $cgp_show["module"]["mailshare"] = "user";
+$cgp_show["module"]["organizationalchart"] = "user";
 $cgp_show["module"]["tools"] = "admin";
 $cgp_show["module"]["control"] = "admin";
 $cgp_show["module"]["admin"] = "admin";
@@ -1374,5 +1385,73 @@ function get_select_host_server($mail_server="",$domain="") {
     return $dis_mailserver;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Create File query execution
+// Parameters:
+//   - $document[] : Entry's values
+//     keys used  : 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_create_document($params) {
+
+  $id = $params["document_id"];
+  $file = $params["file_tmp"];
+
+  $disk_path = get_global_document_disk_path($id);
+  $disk_fullname = $disk_path . $id; 
+
+  // Ensure that the final path is a directory
+  if (! is_dir($disk_path)) {
+    return false;
+  }
+
+  if (is_writable($disk_path)) {
+    if (!move_uploaded_file($file, $disk_fullname)) {
+      return false;
+    }
+  } else {
+    return false;
+  }
+
+  return true; 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Delete File from Disk
+// Parameters:
+//   - $id : id of file to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_remove_document($id) {
+
+  $disk_path = get_global_document_disk_path($id);
+  $disk_fullname = $disk_path . $id; 
+
+  @rmdir($disk_fullname);
+  @unlink($disk_fullname);
+
+  return true;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Calculate the real disk document path for a document
+// Parameters:
+//   - $id   : document id
+// Returns:
+//   real disk path
+///////////////////////////////////////////////////////////////////////////////
+function get_global_document_disk_path($id) {
+  global $cdocument_root;
+
+  // The document disk path set in the subdirectory named "last id number"
+  // Get the last number from Id
+  $rel = substr($id, -1, 1);
+
+  $disk_path = $cdocument_root . "/" . $rel . "/";
+  
+  return $disk_path; 
+}
 
 </script>

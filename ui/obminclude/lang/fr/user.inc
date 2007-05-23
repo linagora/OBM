@@ -25,6 +25,7 @@ $l_check_usercreate = " entrées créées par cet utilisateur.";
 $l_check_userupdate = " entrées modifiées par cet utilisateur.";
 $l_no_user = "Pas de champs utilisateurs dans cette table";
 $l_group = "Groupe";
+$l_photo = "Photo";
 $l_delegation_target = "Zone de délégation";
 
 $l_mail_ext = "Messagerie externe";
@@ -98,7 +99,8 @@ $l_err_home = "Le répertoire Home Windows est incorrect !";
 $l_err_drive = "Le lecteur Home WIndows est incorrect !";
 $l_err_system_samba = "La modification des droits windows d'un utilisateur système n'est pas autorisée.";
 $l_err_host_already_used_by = "La machine est déjà affectée à l'utilisateur ";
-
+$l_image_type_error = "La photo doit être un fichier de type image (gif, jpeg ou png)";
+$l_image_size_error = "La photo ne doit pas dépasser 96px x 96px et avoir un poids supérieur à 100ko";
 $l_add_users = "Ajouter des utilisateurs";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

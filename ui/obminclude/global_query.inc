@@ -451,6 +451,8 @@ function get_global_linked_payment_nb($id, $entity) {
   return $obm_q->f("nb");
 }
 
+// Document "API"
+// of_document ?
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : number of documents linked to an entity
@@ -508,6 +510,53 @@ function run_query_global_delete_document_links($ent_id, $entity, $doc_id="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// query execution : Delete document with an entity
+// Parameters:
+//   - $id     : entity Id
+//   - $entity : Type of entity (deal, company..)
+//   - $doc_id : [optionnal] document Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_delete_document($doc_id) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain("document");
+
+  // Delete all links to documents
+  run_query_global_delete_document_links("", "", $doc_id);
+
+  // Delete the file
+  run_query_global_document_delete_file($doc_id);
+
+  // Delete the database entry
+  $query = "DELETE FROM Document 
+		WHERE document_id='$doc_id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "run_query_global_delete_document()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Delete File from Disk
+// Parameters:
+//   - $id : id of file to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_document_delete_file($id) {
+
+  $disk_path = get_global_document_disk_path($id);
+  $disk_fullname = $disk_path . $id; 
+
+  @rmdir($disk_fullname);
+  @unlink($disk_fullname);
+
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // query execution : Insert document linked with a entity
 // Parameters:
 //   - $id  :  Id of entity
@@ -515,7 +564,7 @@ function run_query_global_delete_document_links($ent_id, $entity, $doc_id="") {
 // Return:
 //   - $cpt_ins : # documents inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_insert_documents($ids, $entity) {
+function run_query_global_insert_documents_links($ids, $entity) {
   global $cdg_sql;
 
   $id = $ids[$entity."_id"];
@@ -533,23 +582,22 @@ function run_query_global_insert_documents($ids, $entity) {
       WHERE documententity_entity='$entity'
         AND documententity_entity_id='$id'
         AND documententity_document_id = '$d_id'";
-    display_debug_msg($query, $cdg_sql, "run_query_global_insert_documents(1)");
+    display_debug_msg($query, $cdg_sql, "run_query_global_insert_documents_links(1)");
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
     
     // If the entry doesn't already exist, we insert it
     if ($test_q->num_rows() == 0) {
       $query = "INSERT INTO DocumentEntity (
-       	documententity_entity,
-	documententity_entity_id,
-	documententity_document_id
-      )
-      VALUES (    
-	'$entity',
-	'$id',
-	'$d_id'
+        	documententity_entity,
+	       documententity_entity_id,
+	       documententity_document_id
+       )VALUES (    
+	       '$entity',
+	       '$id',
+	       '$d_id'
       )";
-      display_debug_msg($query, $cdg_sql, "run_query_global_insert_documents(2)");
+      display_debug_msg($query, $cdg_sql, "run_query_global_insert_documents_links(2)");
       $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
       $cpt_ins++;
@@ -557,6 +605,148 @@ function run_query_global_insert_documents($ids, $entity) {
   }
 
   return $cpt_ins;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// query execution : Insert document
+// Parameters:
+//   - $id  :  Id of entity
+//   - $entity  :  Type of entity (deal, company..)
+// Return:
+//   - $cpt_ins : # documents inserted
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_insert_document($params, $id, $entity) {
+  global $cdg_sql, $obm, $l_create_file_error;
+
+  $uid = $obm["uid"];
+  $now = date("Y-m-d H:i:s");
+  
+  $title = "fixme";
+  $usr_q = get_user_info($uid);
+  $author = $usr_q["lastname"]." ".$usr_q["firstname"];
+  $mime = $params["type"];
+  $name = $params["file_name"];
+  $path = "/";
+  $size = $params["size"];
+  $kind = "1"; // 1 means upload file
+  $url = "";
+  $privacy = "0";
+
+  if (isset($params["domain"]) && $obm["domain"] == 0) {
+    $domain_id = $params["domain"];
+  } else {
+    $domain_id = $obm["domain_id"];
+  }
+
+  $query = "INSERT INTO Document (
+      document_timeupdate,
+      document_timecreate,
+      document_userupdate,
+      document_usercreate,
+      document_domain_id,
+      document_title,
+      document_author,
+      document_name,
+      document_path,
+      document_kind,
+      document_size,
+      document_mimetype_id,
+      document_privacy
+    ) VALUES (
+      null,
+      '$now',
+      null,
+      '$uid',
+      '$domain_id',
+      '$title',
+      '$author',
+      '$name',
+      '$path',
+      '$kind',
+      '$size',
+      '$mime',
+      '$privacy'
+    )";
+
+  display_debug_msg($query, $cdg_sql, "run_query_global_insert_document(1)");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  // Get document id
+  $query = "SELECT document_id
+    FROM Document
+    WHERE document_title='$title'
+      AND document_author='$author'
+      AND document_name='$name'
+      AND document_path='$path'
+      AND document_size='$size'"; 
+
+  display_debug_msg($query, $cdg_sql, "run_query_global_insert_document(2)");
+  $obm_q->query($query); 
+ 
+  if ($obm_q->num_rows() > 0) {
+    // Document is correctly inserted in db
+    $obm_q->next_record();
+    $id = $obm_q->f("document_id");
+    $params["document_id"] = $id;
+
+    // Create the document on the disk
+    if(!run_query_global_create_document($params)) {
+      $err_msg = $l_create_file_error;
+      // If error, delete file
+      run_query_global_delete_document($id); // todo
+    } else {
+      // Insert links
+      run_query_global_insert_documents_links($id, $entity);
+      return $id;
+    }
+  }
+
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// query execution : Update document
+// Parameters:
+//   - $params[]  : Entry's values
+//   - $id        : $document_id
+//   - $entity    : Type of entity (deal, company..)
+// Return:
+//   - $cpt_ins : # documents inserted
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_update_document($params, $id) {
+  global $obm, $cdg_sql;
+  global  $l_delete_file_error, $l_create_file_error;
+
+  $uid = $obm["uid"];
+  $now = date("Y-m-d H:i:s");
+  
+  $mime = $params["type"];
+  $name = $params["file_name"];
+  $path = "/";
+  $size = $params["size"];
+  
+  $query = "UPDATE Document SET
+     document_timeupdate='$now',
+     document_userupdate='$uid',
+     document_size='$size',
+     document_name='$name'
+   WHERE document_id='$id'";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_document_update()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  // Delete old file
+  if(!run_query_global_remove_document($id)) {
+    $err_msg = $l_delete_file_error;
+  }
+
+  // Insert new file
+  if(!run_query_global_create_document($params)) {
+    $err_msg = $l_create_file_error;
+  }
 }
 
 
@@ -955,6 +1145,28 @@ function get_last_payment_text($id) {
     $obm_q->query($query);
     $obm_q->next_record();
     return $obm_q->f("payment_amount")." (".of_date_format($obm_q->f("date")).")";
+  }
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the Domain label from the domain Id
+// Parameters:
+//   - $id : domain id 
+///////////////////////////////////////////////////////////////////////////////
+function get_last_domain_text($id) {
+  global $cdg_sql;
+  
+  if ($id > 0) {
+    $obm_q = new DB_OBM;
+    $db_type = $obm_q->type;
+
+    $query = "SELECT domain_name FROM Domain WHERE domain_id='$id'";
+    display_debug_msg($query, $cdg_sql, "get_last_domain_text()");
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("domain_name");
   }
   return;
 }

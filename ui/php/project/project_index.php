@@ -384,7 +384,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $params["project_id"] = $params["ext_id"];
   if ($params["doc_nb"] > 0) {
-    $nb = run_query_global_insert_documents($params, "project");
+    $nb = run_query_global_insert_documents_links($params, "project");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);

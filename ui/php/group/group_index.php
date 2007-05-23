@@ -237,6 +237,16 @@ if (($action == "index") || ($action == "")) {
   }
   $display["detail"] = dis_group_consult($params, $obm["uid"]);
 
+} else if ($action == "set_manager") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_group_setmanager($params);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_group : $l_update_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_group : $l_update_error");
+  }
+  $display["detail"] = dis_group_consult($params, $obm["uid"]);
+
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $prefs = get_display_pref($obm["uid"], "group", 1);
@@ -378,7 +388,7 @@ function get_group_action() {
     'Url'      => "$path/group/group_index.php?action=detailupdate&amp;group_id=".$params["group_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
+    'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'group_add', 'group_del', 'update', 'set_manager')
                                      	   );
 
 // Insert
@@ -403,7 +413,7 @@ function get_group_action() {
     'Url'      => "$path/group/group_index.php?action=check_delete&amp;group_id=".$params["group_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'user_add', 'user_del', 'group_add', 'group_del', 'update', 'set_manager')
                                      	   );
 
 // Delete
@@ -428,7 +438,7 @@ function get_group_action() {
     'Popup'    => 1,
     'Target'   => $l_group,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'update')
+    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'update', 'set_manager')
                                     	  );
 
 // Sel user add : Users selection
@@ -439,7 +449,7 @@ function get_group_action() {
     'Popup'    => 1,
     'Target'   => $l_group,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'update')
+    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'update', 'set_manager')
                                     	  );
 
 // User add
@@ -469,6 +479,14 @@ function get_group_action() {
 // Group del
   $actions["group"]["group_del"] = array (
     'Url'      => "$path/group/group_index.php?action=group_del",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None')
+                                     );
+
+// Manager add
+  $actions["group"]["set_manager"] = array (
+    'Url'      => "$path/group/group_index.php?action=set_manager",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None')
