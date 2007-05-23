@@ -955,9 +955,9 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
 	      $title = $event->title;
 	      $explode_desc = explode("|", $event->description);
         $description = $explode_desc[0];
-        $charset = mb_internal_encoding();
-        $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
-        if ($item != "") {
+        if ($explode_desc[1] != "") {    
+          $charset = mb_internal_encoding();
+          $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
           $xml = simplexml_load_string($item);
           if (is_object($xml)) {
             foreach($xml->resource as $key => $value) {
@@ -1067,9 +1067,9 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $title = phpStringToJsString($event->title);
     $explode_desc = explode("|", $event->description);
     $description = phpStringToJsString($explode_desc[0]);
-    $charset = mb_internal_encoding();
-    $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
-    if ($item != "") {
+    if ($explode_desc[1] != "") {
+      $charset = mb_internal_encoding();
+      $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
       $xml = simplexml_load_string($item);
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
@@ -1465,8 +1465,12 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     $priority = $event_q->f("calendarevent_priority"); 
     $explode_desc = explode("|", $event_q->f("calendarevent_description"));
     $description = $explode_desc[0];
-    $charset = mb_internal_encoding();
-    $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
+    if ($explode_desc[1] != "") {
+      $charset = mb_internal_encoding();
+      $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
+    } else {
+      $item = "";
+    }
 
     $block_category1 = of_category_dis_block_consult("calendar", "category1", $cats1, "mono");
     switch ($priority ) {
@@ -1836,9 +1840,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     $priority = $event_q->f("calendarevent_priority");
     $explode_desc = explode("|", $event_q->f("calendarevent_description"));
     $desc = $explode_desc[0];
-    $charset = mb_internal_encoding();
-    $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
-
+    if ($explode_desc[1] != "") {
+      $charset = mb_internal_encoding();
+      $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
+    } else {
+      $item = "";
+    }
     $datebegin = $event_q->f("calendarevent_date");
     $hourbegin = date("H",$datebegin);
     $minbegin = date("i",$datebegin);
