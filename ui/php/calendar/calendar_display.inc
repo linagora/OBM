@@ -961,7 +961,7 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
         if ($explode_desc[1] != "") {    
           $charset = mb_internal_encoding();
           $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
-          $xml = simplexml_load_string($item);
+//          $xml = simplexml_load_string($item);
           if (is_object($xml)) {
             foreach($xml->resource as $key => $value) {
               $description .= "<br/><b>$value->res_name:</b><br/>".nl2br($value->item)."$value->property_name:$value->property_value";
@@ -1073,7 +1073,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     if ($explode_desc[1] != "") {
       $charset = mb_internal_encoding();
       $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
-      $xml = simplexml_load_string($item);
+//      $xml = simplexml_load_string($item);
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
           $item_list .= "
@@ -1570,7 +1570,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
 
     // item
     if ($item != "") {
-      $xml = simplexml_load_string($item);
+//      $xml = simplexml_load_string($item);
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
           $property["$value->res_id"] = "$value->property_name : $value->property_value";
@@ -2061,7 +2061,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
         $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&amp;resource_id=$r_id";
 
         if ($item != "") {
-          $xml = simplexml_load_string($item);
+//          $xml = simplexml_load_string($item);
         }
         if (is_object($xml) && ($action == "detailupdate" || $action == "update" )) {
           foreach($xml->resource as $key => $value) {
