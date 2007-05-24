@@ -31,6 +31,12 @@ aliasLdap = true
 ; Aliamin fonctionne en mode sécurinet (true|false)
 securinet = false
 
+; Modules OBM fonctionnels
+obm-ldap = true
+obm-mail = true
+obm-samba = true
+obm-web = true
+
 [automate]
 ; Parametrage specifique a l'automate
 
