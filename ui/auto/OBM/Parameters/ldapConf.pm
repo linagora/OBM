@@ -383,10 +383,14 @@ $ldapStruct->{"template"}->[0] = {
     name => "",
     node_type => "$DOMAINROOT",
     description => "Racine du domaine",
-    data_type => [ $SAMBADOMAIN ],
+    data_type => [],
     template => [],
     branch => []
 };
+
+if( $obmModules->{"samba"} ) {
+    push( @{$ldapStruct->{"template"}->[0]->{"data_type"}}, $SAMBADOMAIN );
+}
 
 #
 # Banche contenant la déclaration des utilisateurs
@@ -395,10 +399,14 @@ $ldapStruct->{"template"}->[0]->{"branch"}->[0] = {
     name => "users",
     node_type => "$NODE",
     description => "Users account",
-    data_type => [ $POSIXUSERS, $SAMBAUSERS ],
+    data_type => [ $POSIXUSERS ],
     template => [],
     branch => []
 };
+
+if( $obmModules->{"samba"} ) {
+    push( @{$ldapStruct->{"template"}->[0]->{"branch"}->[0]->{"data_type"}}, $SAMBAUSERS );
+}
 
 #
 # Banche contenant la déclaration des utilisateurs systèmes
@@ -419,43 +427,61 @@ $ldapStruct->{"template"}->[0]->{"branch"}->[2] = {
     name => "groups",
     node_type => "$NODE",
     description => "System Groups",
-    data_type => [ $POSIXGROUPS, $SAMBAGROUPS ],
+    data_type => [ $POSIXGROUPS ],
     template => [],
     branch => []
 };
 
-#
-# Banche contenant la déclaration des répertoires partagés
-$ldapStruct->{"template"}->[0]->{"branch"}->[3] = {
-    dn => "",
-    name => "mailShare",
-    node_type => "$NODE",
-    description => "Share Directory",
-    data_type => [ $MAILSHARE ],
-    template => [],
-    branch => []
-};
+if( $obmModules->{"samba"} ) {
+    push( @{$ldapStruct->{"template"}->[0]->{"branch"}->[2]->{"data_type"}}, $SAMBAGROUPS );
+}
 
-#
-# Banche contenant la déclaration des hôtes du domaine windows
-$ldapStruct->{"template"}->[0]->{"branch"}->[4] = {
-    dn => "",
-    name => "hosts",
-    node_type => "$NODE",
-    description => "Samba hosts",
-    data_type => [ $SAMBAHOSTS ],
-    template => [],
-    branch => []
-};
+if( $obmModules->{"mail"} ) {
+    #
+    # Banche contenant la déclaration des répertoires partagés
+    my $mailShareDesc = {
+        dn => "",
+        name => "mailShare",
+        node_type => "$NODE",
+        description => "Share Directory",
+        data_type => [ $MAILSHARE ],
+        template => [],
+        branch => []
+    };
 
-#
-# Banche contenant la déclaration de la configuration des services
-$ldapStruct->{"template"}->[0]->{"branch"}->[5] = {
-    dn => "",
-    name => "servicesConfiguration",
-    node_type => "$NODE",
-    description => "Services configuration",
-    data_type => [ $POSTFIXCONF ],
-    template => [],
-    branch => []
-};
+    push( @{$ldapStruct->{"template"}->[0]->{"branch"}}, $mailShareDesc );
+}
+
+if( $obmModules->{"samba"} ) {
+    #
+    # Banche contenant la déclaration des hôtes du domaine windows
+    my $hostDesc = {
+        dn => "",
+        name => "hosts",
+        node_type => "$NODE",
+        description => "Samba hosts",
+        data_type => [ $SAMBAHOSTS ],
+        template => [],
+        branch => []
+    };
+
+    push( @{$ldapStruct->{"template"}->[0]->{"branch"}}, $hostDesc );
+}
+
+if( $obmModules->{"mail"} ) {
+    #
+    # Banche contenant la déclaration de la configuration des services
+    my $postConf = {
+        dn => "",
+        name => "servicesConfiguration",
+        node_type => "$NODE",
+        description => "Services configuration",
+        data_type => [ $POSTFIXCONF ],
+        template => [],
+        branch => []
+    };
+
+    push( @{$ldapStruct->{"template"}->[0]->{"branch"}}, $postConf );
+}
+
+return 1;

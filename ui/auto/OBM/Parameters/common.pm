@@ -15,7 +15,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($facility_log $enableHook $sieveSrv $ldapServer $sambaSrvHome $sambaOldSidMapping $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($facility_log $enableHook $sieveSrv $ldapServer $sambaSrvHome $sambaOldSidMapping $obmModules $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_files = qw($automateMailChangeAlias $automateMailChangeSieve $automateCyrusAdmin $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixUpdate);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
@@ -72,6 +72,40 @@ if( lc($cfgFile->val( 'automate', 'oldSidMapping' )) eq "true" ) {
     $sambaOldSidMapping = 1;
 }else {
     $sambaOldSidMapping = 0;
+}
+
+# Les modules OBM actifs
+$obmModules = {
+    ldap => 0,
+    mail => 0,
+    samba => 0,
+    web => 0
+};
+
+if( lc($cfgFile->val( 'global', 'obm-ldap' )) eq "true" ) {
+    $obmModules->{"ldap"} = 1;
+}else {
+    $obmModules->{"ldap"} = 0;
+}
+
+if( $obmModules->{"ldap"} ) {
+    if( lc($cfgFile->val( 'global', 'obm-mail' )) eq "true" ) {
+        $obmModules->{"mail"} = 1;
+    }else {
+        $obmModules->{"mail"} = 0;
+    }
+
+    if( lc($cfgFile->val( 'global', 'obm-samba' )) eq "true" ) {
+        $obmModules->{"samba"} = 1;
+    }else {
+        $obmModules->{"samba"} = 0;
+    }
+
+    if( lc($cfgFile->val( 'global', 'obm-web' )) eq "true" ) {
+        $obmModules->{"web"} = 1;
+    }else {
+        $obmModules->{"web"} = 0;
+    }
 }
 
 # Le repertoire pere des repertoires personnels
