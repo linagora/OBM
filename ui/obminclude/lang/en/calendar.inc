@@ -76,6 +76,9 @@ $l_meeting_legend = "Legend";
 $l_selection = "Selection";
 $l_task = "Task";
 
+$l_collapse_all = "Collapse all";
+$l_expand_all = "Expand all";
+
 // actions 
 $l_insert = "Insert the event";
 $l_update = "Update the event";

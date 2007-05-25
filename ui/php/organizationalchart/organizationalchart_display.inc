@@ -523,12 +523,24 @@ function draw_consult($node_q) {
     $wrap_width = $nb_leaves * 150;
   }
 
+	$js .= "
+	    div = $('node-$node_id');
+      title = div.getFirst();
+      content = title.getNext();
+      title.slide = new Fx.Slide(content, {duration: 150,wait:false});
+	    title.addEvent('click', function(e){
+	    	 this.slide.toggle();
+      });
+	";
+
+  // --- HTML Template --------------------------------------------------------
+
   $block = "
     <div id=\"node-wrap-$node_id\" class=\"node_wrap\"
       style=\"width: ${wrap_width}px; $border_top\">
       $node_edge
       $node_head
-      <div id=\"node-$node_id\" class=\"node toggle\">
+      <div id=\"node-$node_id\" class=\"node\">
         <h1>$node_name</h1>
         <ul>
           $block_detail_entities_boss
@@ -537,7 +549,11 @@ function draw_consult($node_q) {
       </div>
       $node_queue
       $block_detail_child
-    </div>";
+    </div>
+    <script type='text/javascript'>
+		  $js
+	  </script>
+";
 
   return $block;
 }

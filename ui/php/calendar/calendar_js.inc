@@ -1,6 +1,6 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : calendar_js.inc                                               //
+// OBM - File  : calendar_js.inc                                             //
 //     - Desc  : Agenda javascript functions File                            //
 // 2005-01-13 Aliacom                                                        //
 ///////////////////////////////////////////////////////////////////////////////
@@ -10,6 +10,18 @@
 require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
+
+function display_list_detail(display) {
+
+  slides.each(function(slide) {
+    if (display == 'show') {
+      slide.show();
+    } else {
+      slide.hide();
+    }
+  });
+}
+
 
 function check_calendar_calendar(form) {
   if (trim(form.tf_title.value) == \"\") {

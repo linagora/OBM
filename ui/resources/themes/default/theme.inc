@@ -108,6 +108,7 @@ $ico_scope          = "$theme_path/ico_scope.gif";
 $ico_privacy        = "$theme_path/ico_privacy.gif";
 $ico_manager        = "$theme_path/ico_manager.gif";
 $ico_nophoto        = "$theme_path/ico_nophoto.png";
+$ico_search         = "$theme_path/ico_search.gif";
 
 // OBM Globals images and icons
 $flag_de            = "$theme_path/flag_de.gif";

@@ -113,35 +113,33 @@ Obm.Portlets = new Class({
       this.handle.set(0);
     }
 
-    elems = new Array($ES('.portlet',this.panel), $ES('.toggle', document.getElementById('detailconsult')));
+    elements = $ES('.portlet',this.panel);
   
-    for(j=0;j<elems.length;j++) {
-      elements = elems[j];
-      for(i=0;i<elements.length;i++) {
-        el = elements[i];      
-        title = el.getFirst();
-        content = title.getNext();
-        this.portlets[el.id] = new Fx.Slide(content, {duration: 150,wait:false});
-        
-        img = new Element('img');
-        if(Cookie.get(el.id + "Hidden")  == "true") {
-          this.portlets[el.id].hide();
-          img.src = this.open;
-        } else {
-          img.src = this.close;
-        }
-        title.insertBefore(img,title.firstChild);
-        img.className = 'handle';
-        img = $(img);
-        img.addEvent('click', function(e){
-          if(this.getAttribute("src") == obm.portlets.close) 
-            this.setAttribute("src", obm.portlets.open);
-          else 
-            this.setAttribute("src", obm.portlets.close);
-          obm.portlets.toggleElement(this.parentNode.parentNode.id);
-        });
+    for(i=0;i<elements.length;i++) {
+      el = elements[i];      
+      title = el.getFirst();
+      content = title.getNext();
+      this.portlets[el.id] = new Fx.Slide(content, {duration: 150,wait:false});
+      
+      img = new Element('img');
+      if(Cookie.get(el.id + "Hidden")  == "true") {
+        this.portlets[el.id].hide();
+        img.src = this.open;
+      } else {
+        img.src = this.close;
       }
+      title.insertBefore(img,title.firstChild);
+      img.className = 'handle';
+      img = $(img);
+      img.addEvent('click', function(e){
+        if(this.getAttribute("src") == obm.portlets.close) 
+          this.setAttribute("src", obm.portlets.open);
+        else 
+          this.setAttribute("src", obm.portlets.close);
+        obm.portlets.toggleElement(this.parentNode.parentNode.id);
+      });
     }
+
   },
 
   toggle: function() {

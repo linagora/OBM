@@ -933,6 +933,39 @@ function of_date_get_min($timestamp="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return full hour (ie. 08:00:00)
+// Parameters:
+//   - $timestamp : Unix timestamp
+// Returns:
+//   hour
+///////////////////////////////////////////////////////////////////////////////
+function of_date_get_full_hour($timestamp) {
+
+  $hour = of_date_get_hour($timestamp).":".of_date_get_min($timestamp);
+
+  return $hour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return date in letter
+// Parameters:
+//   - $timestamp : Unix timestamp
+// Returns:
+//   date
+///////////////////////////////////////////////////////////////////////////////
+function of_date_in_letter($timestamp) {
+  global $l_daysofweek, $l_monthsofyear;
+
+  $date = $l_daysofweek[date("N", $timestamp)%7]." ".
+          date("d", $timestamp)." ".
+          $l_monthsofyear[date("n", $timestamp)-1];
+
+  return $date;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return the current lang used by the user
 // Returns:
 //   $lang

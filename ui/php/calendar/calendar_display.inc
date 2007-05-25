@@ -910,9 +910,11 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
  */
 function dis_calendar_list_planning($calendar, $calendar_entity) {
   global $ico_previous, $ico_next, $l_previous, $l_next, $l_desc;
-  global $l_monthsofyear, $l_attendees, $l_title, $l_location, $l_private;
-  global $l_category,$l_high,$l_low,$l_medium,$l_datebegin, $l_dateend;
-  global $l_repeat, $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
+  global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
+  global $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
+  global $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
+  global $l_date, $l_resource, $l_event, $ico_search;
+  global $l_expand_all, $l_collapse_all;
 
   $iso_date = $calendar["date"];
   $ts_date = strtotime($iso_date);
@@ -932,108 +934,152 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
   // Sort occurrences by date (cause repeat and no repeat events)
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
-      $d = $occurrence->date;
-      $ocs[$d] = $occurrence;
+      $d = strtotime(date("Y-m-d", $occurrence->date));
+      if(!is_array($ocs[$d])) { $ocs[$d] = array();}
+      array_push($ocs[$d],$occurrence);
     }
   }
-
   if (is_array($ocs)) {
     ksort($ocs);
-    $key = 0;
-    foreach($ocs as $occurrence) {
-      if ($key%2 == 0) {
+    foreach($ocs as $key => $occurrence) {
+      if ($i%2 == 0) {
         $class = "class=\"pair\"";
       } else {
         $class = "";
       }
-      $key ++;
-      $event = $occurrence->event;
-      $ev_id = $event->id;
-      $owner = $event->owner;
-      $attendee = $event->attendee;
-      if ($event->privacy == 1 && !($updatable || in_array($obm["uid"],$attendee["user"]))) {
-	      $title = $l_private;
-	      $description = $title;
-      } else {
-	      $title = $event->title;
-	      $explode_desc = explode("|", $event->description);
-        $description = $explode_desc[0];
-        if ($explode_desc[1] != "") {    
-          $charset = mb_internal_encoding();
-          $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
-//          $xml = simplexml_load_string($item);
-          if (is_object($xml)) {
-            foreach($xml->resource as $key => $value) {
-              $description .= "<br/><b>$value->res_name:</b><br/>".nl2br($value->item)."$value->property_name:$value->property_value";
-            }
-          }
-        }
-      }
-      $dis_attendees = "";
-      $br = "";
-      foreach($attendee["user"] as $at_id => $at_name) {
-	      $dis_attendees .= "$br$at_name";
-	      $br = "<br />";
-      }
-      $duration = $event->duration;
-      $date = $occurrence->date;
-      $entity_id = $occurrence->id;
-      $entity = $occurrence->entity;
-      $all_day = $event->all_day;
-      $location = $event->location;
-      $category = $event->category1;
-      $repeat = $event->repeat;
-      if ($repeat == "none") {
-	      $dis_repeat = "";
-      } else {
-	      $dis_repeat = ${"l_$repeat"};
-      }
-      $date_begin = of_datetime_format($date);
-      $date_end = of_datetime_format($date+$duration);
-      $today = time();
-      if (! $today_mark && ($date >= $today)) {
-	      $today_mark = true;
-	      $dis_events .= "<tr><th colspan=\"9\">Today</th></tr>";
+      $i ++;
+      
+      $day_text_evt = of_date_in_letter($key);
+      $day_evt = date("Y-m-d", $key);
+      $today = strtotime(date("Y-m-d"));
+      if ($today == $key) {
+        $class="class=\"highlight\"";
       }
 
       $dis_events .= "
-    <tr $class>
-      <td><a href=\"calendar_index.php?action=detailconsult&amp;calendar_id=$ev_id\">$title</a></td>
-      <td>$dis_attendees</td>
-      <td>$location</td>
-      <td>$category</td>
-      <td>$dis_repeat</td>
-      <td>$date_begin</td>
-      <td>$date_end</td>
-      <td>$description</td>
-    </tr>";
+        <tr $class>
+          <td><a href=\"calendar_index.php?action=view_day&date=$day_evt\">$day_text_evt</a></td>
+          <td>";
+
+      foreach($occurrence as $k => $v) {
+        $event = $v->event;
+        $date = $v->date;
+        $hour_begin = of_date_get_full_hour($date);
+        $ev_id = $event->id;
+	      $title = $event->title;
+        $duration = $event->duration;
+        $location = $event->location;
+        $attendee = $event->attendee;
+        $category = $event->category1;
+        $repeat = $event->repeat;
+        if ($repeat == "none") {
+	        $dis_repeat = "";
+        } else {
+	        $dis_repeat = ${"l_$repeat"};
+        }
+
+        if ($event->privacy == 1 && !($updatable || in_array($obm["uid"],$attendee["user"]))) {
+	        $title = $l_private;
+	        $description = $title;
+        } else {
+	        $title = $event->title;
+	        $explode_desc = explode("|", $event->description);
+
+	        $explode_desc = explode("|", $event->description);
+          $description = $explode_desc[0];
+          if ($explode_desc[1] != "") {    
+            $charset = mb_internal_encoding();
+            $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
+//            $xml = simplexml_load_string($item);
+            if (is_object($xml)) {
+              foreach($xml->resource as $key => $value) {
+                $description .= "<br/><b>$value->res_name:</b><br/>".nl2br($value->item)."$value->property_name:$value->property_value";
+              }
+            }
+          }
+        }
+
+        $dis_attendees = "";
+        $br = "";
+        foreach($attendee["user"] as $at_id => $at_name) {
+	        $dis_attendees .= "$br$at_name";
+	        $br = "<br />";
+        }
+        $date_begin = of_datetime_format($date);
+        $date_end = of_datetime_format($date+$duration); 
+        $j++;
+				$js .= "
+					div = $('evt-$date-$ev_id');
+					a = div.getFirst();
+					info = $('eventDetail-$date-$ev_id');
+					slides[$j] = new Fx.Slide(info, {duration: 150,wait:false});	
+					slides[$j].hide();
+					info.setStyle('display','block');	
+					a.addEvent('click', function(e){
+						slides[$j].toggle();
+     			});
+				";
+        $dis_events .= "<div id=\"evt-$date-$ev_id\" >
+          <a href=\"javascript: void(0);\">$hour_begin - $title</a>
+          <div id=\"eventDetail-$date-$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
+            <table>
+              <tr>
+                <th>$l_datebegin</th><td>$date_begin</td>
+              </tr>
+              <tr>
+                <th>$l_dateend</th><td>$date_end</td>
+              </tr>
+              <tr>
+                <th>$l_repeat</th><td>$dis_repeat</td>
+              </tr>
+              <tr>
+                <th>$l_category</th><td>$category</td>
+              </tr>
+              <tr>
+                <th>$l_location</th><td>$location</td>
+              </tr>
+              <tr>
+                <th>$l_desc</th><td>$description</td>
+              </tr>
+              <tr>
+                <th>$l_attendees</th><td>$dis_attendees</td>
+              </tr>
+              <tr>
+                <th>$l_resource</th><td>$item_list</td>
+              </tr>
+            </table>
+            <a href=\"calendar_index.php?action=detailconsult&amp;calendar_id=$ev_id\"><img src=\"$ico_search\" title=\"[Info]\"/></a>
+          </div>
+          </div>";
+      }
+      $dis_events .= "</td></tr>";
     }
   }
+
   // --- HTML Template --------------------------------------------------------
 
-  $block .= "
-    <h1>
-      <a href=\"calendar_index.php?action=view_list&amp;date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-      $list_title
-      <a href=\"calendar_index.php?action=view_list&amp;date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    </h1>
-    <table class=\"spreadSheet\">
+  $block = "
+  <h1>
+    <a href=\"calendar_index.php?action=view_list&amp;date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $list_title
+    <a href=\"calendar_index.php?action=view_list&amp;date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+  </h1>
+  <a href=\"#\" onclick=\"display_list_detail('show'); return false;\">$l_expand_all</a> - 
+  <a href=\"#\" onclick=\"display_list_detail('hide'); return false;\">$l_collapse_all</a>
+  <table class=\"spreadSheet eventList\">
     <thead>
     <tr>
-      <th>$l_title</th>
-      <th>$l_attendees</th>
-      <th>$l_location</th>
-      <th>$l_category</th>
-      <th>$l_repeat</th>
-      <th>$l_datebegin</th>
-      <th>$l_dateend</th>
-      <th>$l_desc</th>
+      <th>$l_date</th>
+      <th>$l_event</th>
     </tr>
     </thead>
-    <tbody>
     $dis_events
-    </tbody>
-    </table>";
+  </table>
+	<script type='text/javascript'>
+		var slides = new Array();
+		$js
+	</script>
+";
 
   return $block;
 }

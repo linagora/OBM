@@ -387,3 +387,35 @@ li.freeBusy {
 .infoPopup li{
   padding-left: 1.5em;
 }
+
+/* Planning list view */
+.eventList td {
+  vertical-align: top;
+}
+
+.eventDetail {
+  margin-left: 4em;
+  margin-bottom: 1em;
+  padding-left: 1em;
+  border-left: 4px solid #B3B3B3;
+}
+
+.eventDetail table {
+  border-spacing:0;
+}
+
+.eventDetail tbody th {
+  border-bottom: 1px solid #B3B3B3;
+  border-right: none;
+  border-top: none;
+  border-left: none;
+  background-color: transparent;
+}
+
+.eventDetail tbody td {
+  border-bottom: 1px solid #B3B3B3;
+  border-right: none;
+  border-left: none;
+  text-align: left;
+}
+
