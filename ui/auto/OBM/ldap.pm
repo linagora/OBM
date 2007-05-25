@@ -44,7 +44,7 @@ sub getServerByDomain {
         if( !&OBM::toolBox::execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
             &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
             if( defined($queryLdapAdminResult) ) {
-                &OBM::toolBox::write_log( $queryDomainResult->err, "W" );
+                &OBM::toolBox::write_log( $queryLdapAdminResult->err, "W" );
             }
         }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
             $domainList->[$i]->{"ldap_admin_server"} = $ldapServer;
@@ -103,7 +103,7 @@ sub loadDbData {
 
     }
 
-    return $result;
+    return 0;
 }
 
 
