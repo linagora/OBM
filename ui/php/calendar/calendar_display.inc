@@ -1518,11 +1518,12 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
   $id = $event_q->f("calendarevent_id");
-  $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
+  $writable_users = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
+  $writable_resources = of_right_entity_for_consumer("Resource", "user", $obm["uid"], "write");
   
   if ($event_q->f("calendarevent_privacy") == 0 || 
       $event_q->f("calendarevent_owner") == $obm["uid"] ||
-      in_array($event_q->f("calendarevent_owner"),$writable_entity["ids"])) {
+      in_array($event_q->f("calendarevent_owner"),$writable_users["ids"])) {
 
     $title = $event_q->f("calendarevent_title");
     $location = $event_q->f("calendarevent_location");
@@ -1610,19 +1611,22 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     foreach ($attendee["entity"] as $u_id => $entity) {
       $label = $entity["label"];
       $state = $entity["state"];
-      if ($obm["uid"] == $u_id) {
-	$$state = "checked=\"checked\"";
-        $dis_decision_radio = "
-        <form method=\"get\" name=\"f_mod_decision\" class=\"detail extra\">
-        <h1>$l_change_state</h1>
-	<input type=\"hidden\" name=\"action\" value=\"update_decision\" />
-	<input type=\"hidden\" name=\"calendar_id\" value=\"$id\" />
-	<input $A type=\"radio\" name=\"rd_decision_event\" value=\"A\" onclick=\"this.form.submit()\" />$l_accept
-	<input $W type=\"radio\" name=\"rd_decision_event\" value=\"W\" onclick=\"this.form.submit()\" />$l_wait
-	<input $R type=\"radio\" name=\"rd_decision_event\" value=\"R\" onclick=\"this.form.submit()\" />$l_refuse
-      ";
+      if ($obm["uid"] == $u_id || in_array($u_id,$writable_users["ids"])) {
+        $$state = "checked=\"checked\"";
+        $url= "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
+        $dis_user_list .= "
+        <span class=\"B I RF\">
+        <input $A type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"A\" onclick=\"window.location='$url&rd_decision_event=A'\" />A
+	<input $W type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"W\" onclick=\"window.location='$url&rd_decision_event=W'\" />W
+        <input $R type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"R\" onclick=\"window.location='$url&rd_decision_event=R'\" />R
+        </span>
+        <span class=\"RC\">$label</span>
+        <hr />
+        ";
+        $$state = "";
+      } else {
+        $dis_user_list .= "<span class=\"B I RF\">$state</span><span class=\"RC\">$label</span><hr />";
       }
-      $dis_user_list .= "$label ($state)<br />";
     }
   }
 
@@ -1648,9 +1652,24 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     $res = $entities["resource"];
     if (is_array($res["entity"])) {
       foreach ($res["entity"] as $r_id => $entity) {
-	      $label = $entity["label"];
-	      $state = $entity["state"];
-	      $dis_resource_list .= "$label ($property[$r_id])<br />";
+        $label = $entity["label"];
+        $state = $entity["state"];
+        if (in_array($r_id,$writable_resources["ids"])) {
+          $$state = "checked=\"checked\"";
+          $url= "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
+          $dis_resource_list .= "
+          <span class=\"B I RF\">
+          <input $A type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"A\" onclick=\"window.location='$url&rd_decision_event=A'\" />A
+          <input $W type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"W\" onclick=\"window.location='$url&rd_decision_event=W'\" />W
+          <input $R type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"R\" onclick=\"window.location='$url&rd_decision_event=R'\" />R
+          </span>
+          <span class=\"RC\">$label($property[$r_id])</span>
+          <hr />
+        ";
+          $$state = "";
+        } else {
+          $dis_resource_list .= "<span class=\"B I RF\">$state</span><span class=\"RC\">$label($property[$r_id])</span><hr />";
+        }
       }
     }
     $dis_resource_block = "
@@ -2423,14 +2442,16 @@ function html_calendar_waiting_events($obm_wait) {
       if ($dis_events != "") {
 
 	// set title row according to event content
-	if ($is_periodic) {
+        if ($is_periodic) {
 	  $dis_kind = "<th>$l_repeatkind</th>";
 	  $dis_day = "<th>$l_repeatdays2</th>";
-	  $dis_end = "<th>$l_date_repeatend</th>";
-	} else {
+          $dis_end = "<th>$l_date_repeatend</th>";
+          $dis_events = str_replace("__NO_REPEAT__","<td></td><td></td><td></td>",$dis_events);
+        } else {
 	  $dis_kind = "";
 	  $dis_day = ""; 
-	  $dis_end = "";
+          $dis_end = "";
+          $dis_events = str_replace("__NO_REPEAT__","",$dis_events);
 	}
 
         $block .= "
@@ -2438,7 +2459,7 @@ function html_calendar_waiting_events($obm_wait) {
         <table class=\"spreadSheet\">
         <thead>
 	 <tr>
-	  <th >$l_title</th>
+	  <th>$l_title</th>
 	  <th>$l_location</th>
 	  <th>$l_category</th>
 	  <th>$l_priority</th>
@@ -2475,9 +2496,14 @@ function html_calendar_waiting_events($obm_wait) {
     }
 	
     $start_week_day = strtotime($ccalendar_weekstart);
-    if ($obm_wait->f("calendarevent_repeatkind") != "none") {$is_periodic = true;}
-    if($is_periodic) {
-      $dis_repeat_days = "<td>";
+
+    if ($obm_wait->f("calendarevent_repeatkind") != "none") {
+      $is_periodic = true;
+      $repeat = true;
+    } else {
+      $repeat = false;
+    }
+    if($repeat) {
       for ($i=0; $i<7; $i++) {
         $day_num = date("w", $start_week_day);
         $day = $l_daysofweekshort[$day_num];
@@ -2486,11 +2512,11 @@ function html_calendar_waiting_events($obm_wait) {
         }
         $start_week_day = strtotime("+1 day", $start_week_day); 
       }
-      $dis_repeat_days = "</td>";
+      $dis_repeat_days = "<td>$dis_repeat_days</td>";
       $date_repeat = "<td>".of_date_format($obm_wait->f("calendarevent_endrepeat"))."</td>";
       $kind = "<td>".${"l_".$obm_wait->f("calendarevent_repeatkind")}."</td>";
     } else {
-      $date_repeat = "";
+      $date_repeat = "__NO_REPEAT__";
       $dis_repeat_days = "";
       $kind = "";
     }
@@ -2532,10 +2558,12 @@ function html_calendar_waiting_events($obm_wait) {
       $dis_kind = "<th>$l_repeatkind</th>";
       $dis_day = "<th>$l_repeatdays2</th>";
       $dis_end = "<th>$l_date_repeatend</th>";
+      $dis_events = str_replace("__NO_REPEAT__","<td></td><td></td><td></td>",$dis_events);
     } else {
       $dis_kind = "";
       $dis_day = ""; 
       $dis_end = "";
+      $dis_events = str_replace("__NO_REPEAT__","",$dis_events);
     }
     
     $block .= "

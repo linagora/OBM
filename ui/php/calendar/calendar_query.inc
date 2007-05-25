@@ -217,11 +217,12 @@ function run_query_resource_resourcegroup($group) {
 //   - $calendar : Calendar params
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_decision($calendar) {
-
-  $user = $calendar["user_id"];
+  $entity_id = $calendar["entity_id"];
+  $entity = $calendar["entity_kind"];
   $event_id = $calendar["calendar_id"];
   $state = $calendar["decision_event"];
-  run_query_calendar_update_occurence_state($event_id,$user,$state);
+
+  run_query_calendar_update_occurence_state($event_id,$entity,$entity_id,$state);
 }
 
 
@@ -232,19 +233,33 @@ function run_query_calendar_insert_decision($calendar) {
 //   - $user_id  : User id
 //   - $state    : New state to set (A, W or R)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_update_occurence_state($event_id, $user_id, $state){
+function run_query_calendar_update_occurence_state($event_id, $entity, $entity_id,$state){
   global $cdg_sql;
+  global $obm, $err, $l_of_right_err_auth;
+  if($obm["uid"] != $entity_id || $entity != "user") {
+    if( $entity == "user") {
+      $writable = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
+    } elseif($entity == "resource") {
+      $writable = of_right_entity_for_consumer("Resource", "user", $obm["uid"], "write");
+    }
+    
+    if (!in_array($entity_id, $writable["ids"])) {
+      $err["msg"] = $l_of_right_err_auth;  
+      return false;
+    } 
+  }
 
   $query = "UPDATE EventEntity 
             SET evententity_state = '$state'
-            WHERE evententity_entity_id = $user_id
+            WHERE evententity_entity_id = $entity_id
+              AND evententity_entity = '$entity'
               AND evententity_event_id = '$event_id'
-              AND evententity_entity = 'user'";
+              ";
 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_update_occurence_state()");  
   $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;    
+  $retour = $obm_q->query($query);
+  return $retour;    
 }
 
 
@@ -384,8 +399,10 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
     foreach ($resources_array as $res_id) {
       if (in_array($res_id, $writable_res["ids"])) {
 	run_query_calendar_insert_entity_event("resource", $res_id, $event_id, 'A');
-        array_push($resources_writable, $res_id);
+      } else {
+	run_query_calendar_insert_entity_event("resource", $res_id, $event_id, 'W');
       }
+      array_push($resources_writable, $res_id);
     }
   }    
   if ((count($resources_writable) > 0) && ($ccalendar_resource_admin != "")) {
@@ -913,8 +930,10 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
     foreach ($resources_array as $res_id) {
       if (in_array($res_id, $writable_res["ids"])) {
 	run_query_calendar_insert_entity_event("resource", $res_id, $event_id, 'A');
-	array_push($resources_writable, $res_id);
+      } else {
+	run_query_calendar_insert_entity_event("resource", $res_id, $event_id, 'W');
       }
+      array_push($resources_writable, $res_id);
     }
   }
   if ((count($resources_writable) > 0) && ($ccalendar_resource_admin != "")) {
@@ -1148,7 +1167,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
   $id = $calendar["calendar_id"];
   $olddatebegin = $calendar["old_date_begin"];
   $event_duration = $calendar["duration"];
-
+  
   $obm_q = new DB_OBM;
   $query = "INSERT INTO CalendarException (
       calendarexception_usercreate,
@@ -1167,6 +1186,14 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
       )";
 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_event_exception_insert(1)");
+  $obm_q->query($query);
+  $query = "Update CalendarEvent SET
+    calendarevent_userupdate = '$obm[uid]',
+    calendarevent_timeupdate = NOW()
+    WHERE
+    calendarevent_id = '$id'";
+
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_event_exception_insert(2)");
   $obm_q->query($query);
 
   if(is_object($event_q)) {
@@ -1223,7 +1250,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
       '$obm[domain_id]'
     )";
 
-    display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data(2)");
+    display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data(3)");
     $obm_q->query($query);
     
     $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";

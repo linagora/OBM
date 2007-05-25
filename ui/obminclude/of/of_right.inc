@@ -460,7 +460,7 @@ function of_right_update_right($param, $entity, $real_entity="") {
   // Rights on userobm entity : user need write right on the entity
   // XXXX could be cool to separate "write" and "admin" rights
   // If user manipulating NOT its own data, check if he has rights
-  if (($eid != $obm["uid"]) && ($real_entity == "userobm")) {
+  if (($eid != $obm["uid"])) {
     $writable_entity = of_right_entity_for_consumer($entity, "user", $obm["uid"], "write", "", $real_entity);
     if (!in_array($eid, $writable_entity["ids"])) {
       $err["msg"] = $l_of_right_err_auth;

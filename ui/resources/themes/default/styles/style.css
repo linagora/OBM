@@ -114,6 +114,14 @@ form {
   clear: right;
 }
 
+.LF {
+  float: left;
+}
+
+.RF {
+  float: right;
+}
+
 .O {
   overflow: auto;
 }

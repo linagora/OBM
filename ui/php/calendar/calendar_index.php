@@ -341,9 +341,14 @@ if ($action == "index") {
 
 } elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_calendar_update_occurence_state($params["calendar_id"], $obm["uid"],$params["decision_event"]);
-  $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
-  $display["detail"] = dis_calendar_calendar_view($params, $cal_entity_id);
+  $retour = run_query_calendar_update_occurence_state($params["calendar_id"], $params["entity_kind"], $params["entity_id"],$params["decision_event"]);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_event  : $err[msg]");
+  }
+  $display["detail"] = dis_calendar_event_consult($params["calendar_id"]);
+  //$display["detail"] = dis_calendar_calendar_view($params, $cal_entity_id);
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
