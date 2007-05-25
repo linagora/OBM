@@ -225,55 +225,11 @@ function run_query_resource_insert($resource) {
 
   if ($retour) {
     $id = get_resource_id($name);
-    run_query_resource_right_init($id);
+    $resource["entity_id"] = $id;
+    of_right_update_right($resource, "Resource", "",false) ;
   }
 
   return $id;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : Insert user Right for one ressource
-// Parameters:
-//   - $user_id : user id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_resource_right_init($resource_id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $line_q = new DB_OBM;
-	
-  $query = " DELETE
-    FROM EntityRight 
-    WHERE 
-      entityright_entity = 'resource'
-      AND entityright_entity_id = '$resource_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_resource_right_init(1)");
-  $line_q->query($query);
-
-  //---------------------------------------------------------------------------
-  // we give public read and right permission
-  //---------------------------------------------------------------------------
-  $query = "INSERT INTO EntityRight (
-    entityright_entity,
-    entityright_entity_id,
-    entityright_consumer,
-    entityright_consumer_id,
-    entityright_read,
-    entityright_write
-  ) values (
-    'resource',
-    '$resource_id',
-    'user',
-    '0',
-    '1',
-    '1'
-  )";
-
-  display_debug_msg($query, $cdg_sql, "run_query_resource_right_init(2)");
-  $line_q->query($query);
-
-  return true;
 }
 
 

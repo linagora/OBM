@@ -438,7 +438,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="al
 //   - $entity : entity type to update
 //   - $real_entity : [optionnal] if set, real data entity (eg mailbox->user)
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_update_right($param, $entity, $real_entity="") {
+function of_right_update_right($param, $entity, $real_entity="",$check_perms=true) {
   global $cdg_sql, $obm, $err, $l_of_right_err_auth,$obm;
 
   $consumer = "user";
@@ -460,7 +460,7 @@ function of_right_update_right($param, $entity, $real_entity="") {
   // Rights on userobm entity : user need write right on the entity
   // XXXX could be cool to separate "write" and "admin" rights
   // If user manipulating NOT its own data, check if he has rights
-  if (($eid != $obm["uid"])) {
+  if (($eid != $obm["uid"]) && $check_perms) {
     $writable_entity = of_right_entity_for_consumer($entity, "user", $obm["uid"], "write", "", $real_entity);
     if (!in_array($eid, $writable_entity["ids"])) {
       $err["msg"] = $l_of_right_err_auth;

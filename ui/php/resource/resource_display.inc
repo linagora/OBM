@@ -258,8 +258,8 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
 function html_resource_form($usr_q, $resource) {
   global $l_name, $l_desc, $l_qty;
   global $l_resource, $l_insert, $l_update;
-  global $action, $l_rtype;
-  global $l_undef, $c_undef;
+  global $action, $l_rtype,$obm;
+  global $l_undef, $c_undef,$l_write_permission;
 
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
@@ -295,7 +295,24 @@ function html_resource_form($usr_q, $resource) {
   // Buttons
   if (($action == "new") || ($action == "insert")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-          <input type=\"submit\" value=\"$l_insert\" />";
+      <input type=\"submit\" value=\"$l_insert\" />";
+
+    $right_manager = "
+      <fieldset class=\"detail extra\">
+      <legend>$l_write_permission : <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" /></legend>
+      <input type=\"hidden\" name=\"sel_accept_write[]\" value=\"data-user-$obm[uid]\" />
+      <input type=\"hidden\" name=\"sel_read_public\" value=\"1\" />
+      <div id=\"sel_accept_write\">     
+      </div>
+      </fieldset>
+      ";
+    $js = "
+    <script type=\"text/javascript\">
+    obm.initialize.chain(function () {
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_write', 'userSearch');
+    });
+    </script>     
+    ";
 
   } elseif (($action=="detailupdate") || ($action=="update")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
@@ -324,7 +341,7 @@ function html_resource_form($usr_q, $resource) {
     </tr>
     </table>
     </fieldset>
-
+    $right_manager
     <fieldset class=\"detail extra\">
     <legend>$l_desc</legend>
       <textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"3\" cols=\"80\">$desc</textarea>
@@ -334,7 +351,8 @@ function html_resource_form($usr_q, $resource) {
     $dis_button
     </fieldset>
     
-    </form>";
+    </form>
+    $js";
 
   return $block;
 }

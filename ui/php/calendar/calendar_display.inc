@@ -2691,7 +2691,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     $l_users
     </th>    
     <td id=\"sel_user_id\">
-      <input type=\"text\" name=\"\" value=\"\" id=\"user\" autocomplete=\"off\" />
+      <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
       $dis_sel_user
     </td>
   ";
@@ -2717,7 +2717,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
       $l_resources
       </th>
      <td id=\"sel_resource_id\">
-      <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />
+      <input type=\"text\" name=\"\" value=\"\" id=\"resourceSearch\" autocomplete=\"off\" />
        $dis_sel_resource
      </td>      
     </tr>";
@@ -2743,14 +2743,14 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
       $l_module_resourcegroup
       </th>
       <td id=\"sel_resource_group_id\">
-      <input type=\"text\" name=\"\" value=\"\" id=\"resourcegroup\" autocomplete=\"off\" />
+      <input type=\"text\" name=\"\" value=\"\" id=\"resourcegroupSearch\" autocomplete=\"off\" />
 
        $dis_sel_resource_group
      </td>      
      </tr>";
     $resource_js = "
-      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resource');
-      new obm.AutoComplete.Search('$path/resourcegroup/resourcegroup_index.php?action=ext_search', 'sel_resource_group_id', 'resourcegroup');  
+      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch');
+      new obm.AutoComplete.Search('$path/resourcegroup/resourcegroup_index.php?action=ext_search', 'sel_resource_group_id', 'resourcegroupSearch');  
     ";
   }
   
@@ -2839,8 +2839,8 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   </form>
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'user');
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'group');
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch');
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');
       $resource_js
     });
   </script>";
