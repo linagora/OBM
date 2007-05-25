@@ -2425,19 +2425,20 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_waiting_events($obm_wait) {
   global $l_users, $l_title, $l_location, $l_priority, $l_category,$l_high,$l_low,$l_medium,$l_datebegin;
-  global $l_dateend,$l_repeat,$l_change_state,$l_validate,$l_from;
+  global $l_dateend,$l_repeat,$l_change_state,$l_validate,$l_from, $l_user, $l_resource;
   global $l_repeatkind,$l_repeatdays2,$l_date_repeatend,$l_daily,$l_weekly,$ccalendar_weekstart,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
    
   while ($obm_wait->next_record()) {
-    $old_user = $current_user;
-    $old_lname = $current_lname;
-    $old_fname = $current_fname;
-    $current_user = $obm_wait->f("userobm_id");
-
+    $old_entity = $current_entity;
+    $old_entity_entity = $current_entity_entity;
+    $old_label = $current_label;
+    $current_entity = $obm_wait->f("entity_id");
+    $current_entity_entity = $obm_wait->f("entity_entity");
+    
     // If event for a new calendar (delegation), display the previous block
-    if ($current_user != $old_user) {
-
+    if ($current_entity != $old_entity || $current_entity_entity != $old_entity_entity) {
+      $type = ${"l_".$current_entity_entity};
       // if previous block had events (true except first block)
       if ($dis_events != "") {
 
@@ -2455,7 +2456,7 @@ function html_calendar_waiting_events($obm_wait) {
 	}
 
         $block .= "
-        <h1>$current_fname $current_lname</h1>
+        <h1>$type : $current_label</h1>
         <table class=\"spreadSheet\">
         <thead>
 	 <tr>
@@ -2481,8 +2482,7 @@ function html_calendar_waiting_events($obm_wait) {
       $dis_events = "";
     }
 
-    $current_lname = $obm_wait->f("userobm_lastname");
-    $current_fname = $obm_wait->f("userobm_firstname");
+    $current_label = $obm_wait->f("entity_label");
     switch ($obm_wait->f("calendarevent_priority") ) {;
       case 1 : 
 	$priority = $l_low;
@@ -2540,7 +2540,8 @@ function html_calendar_waiting_events($obm_wait) {
       <form method=\"get\" action=\"calendar_index.php\">
        <input type=\"hidden\" name=\"action\" value=\"decision\" />      
        <input type=\"hidden\" name=\"calendar_id\" value=\"".$obm_wait->f("calendarevent_id")."\" />
-       <input type=\"hidden\" name=\"user_id\" value=\"$current_user\" />
+       <input type=\"hidden\" name=\"entity_kind\" value=\"$current_entity_entity\" />
+       <input type=\"hidden\" name=\"entity_id\" value=\"$current_entity\" />
        <input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onclick=\"this.form.submit()\" />$l_accept<br />
        <input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onclick=\"this.form.submit()\" />$l_wait<br />
        <input type=\"radio\" name=\"rd_decision_event\" value=\"R\" onclick=\"this.form.submit()\" />$l_refuse
@@ -2567,7 +2568,7 @@ function html_calendar_waiting_events($obm_wait) {
     }
     
     $block .= "
-      <h1>$current_fname $current_lname :</h1>
+      <h1>$type : $current_label</h1>
       <table class=\"spreadSheet\">
       <thead>
       <tr>
