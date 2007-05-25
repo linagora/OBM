@@ -147,14 +147,14 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
 function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable) {
   global $path, $obm, $c_all;
   global $ccalendar_resource;
-  global $l_selection, $l_users,$l_resources, $l_validate,$l_search_users;
+  global $l_selection, $l_users,$l_resources, $l_validate,$l_search_users,$l_category_filter;
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
   global $ico_calendar_user3,$ico_calendar_user4,$ico_calendar_user5,$l_search_resources;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
 
   $iso_date = $calendar["date"];
   $this_group = $calendar["entity"]["group_view"];
-
+  $category_filter = $calendar["category_filter"];
   //-- Group selection
   if ($this_group == $c_all) {
     $sel_group = "<option selected=\"selected\">$l_select_group</option>";
@@ -208,13 +208,23 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     ";
     $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {restriction:'user', defaultText:'$resource_text'});";
   }
+  $cats1 = of_category_get_ordered("calendar", "category1");
+  $sel_cat1 = of_category_html_select("calendar", "category1", $cats1, $category_filter,"all_f","onchange=\"this.form.submit()\"","category_filter");
 
-  $dis_back_myview = "<a href=\"calendar_index.php?action=$new_action&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_back_mono</a>";
+  $dis_back_myview = "<a href=\"calendar_index.php?action=$new_action&amp;sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_back_mono</a>";
 
   $block = "
     <div class=\"portlet\" id=\"calendarSelection\">
     <h1>$l_selection</h1>
     <div>
+    <form action=\"\">
+    <fieldset class=\"detail extra\">
+    <legend>$l_category_filter</legend>
+      $sel_cat1 
+      <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
+      <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
+    </fieldset>
+    </form>
     <form action=\"\" onsubmit=\"return false;\">
     <fieldset class=\"detail extra\">
     <legend>$l_group_members</legend>
@@ -408,6 +418,7 @@ function dis_calendar_year_planning($calendar, $calendar_entity,$writable_entity
   global $l_private, $l_previous, $l_next;
 
   $iso_date = $calendar["date"];
+  $category_filter = $calendar["category_filter"];
   $ts_date = strtotime($iso_date);  
   $this_year = of_date_get_year($ts_date);
   $start_time = strtotime("$this_year-01-01", $ts_date);
@@ -418,7 +429,7 @@ function dis_calendar_year_planning($calendar, $calendar_entity,$writable_entity
    
   $display_date = calendar_localizeDate("month", $ts_date);  
   
-  $events = calendar_events_model($start_time,$end_time, $calendar_entity);
+  $events = calendar_events_model($start_time,$end_time, $calendar_entity,$category_filter);
   
   for ($i=0; $i<7; $i++) {
     $day_num = date("w","$start_day");
@@ -585,6 +596,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity,$writable_entit
   global $l_private,$l_daysofweek, $l_previous, $l_next;
 
   $iso_date = $calendar["date"];
+  $category_filter = $calendar["category_filter"];
   $ts_date = strtotime($iso_date);
   $this_month = of_date_get_month($ts_date);
   $this_year = of_date_get_year($ts_date);
@@ -647,7 +659,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity,$writable_entit
     }
   } while ($whole_month == TRUE);   
 
-  $occurrences = calendar_events_model($start_time, $current_time, $calendar_entity);
+  $occurrences = calendar_events_model($start_time, $current_time, $calendar_entity,$category_filter);
   
   if (is_array($occurrences)) {
     $week_duration = 86400*7;
@@ -707,6 +719,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
   global $ccalendar_first_hour, $ccalendar_last_hour;
  
   $ts_date = strtotime($calendar["date"]);
+  $category_filter = $calendar["category_filter"];
   $time_unit = 60 / $set_cal_interval;
   $time_unit_sec = 3600 / $set_cal_interval;
   $week_num = get_calendar_week_num($ts_date);
@@ -760,7 +773,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
       $week_cal .= "</tr>";
     }
   }
-  $occurrences = calendar_events_model($start_week_day,strtotime("+7 days",$start_week_day),$calendar_entity);
+  $occurrences = calendar_events_model($start_week_day,strtotime("+7 days",$start_week_day),$calendar_entity,$category_filter);
   
   if(is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
@@ -821,6 +834,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
   global $l_private, $l_all_day, $l_previous, $l_next;
 
   $iso_date = $calendar["date"];
+  $category_filter = $calendar["category_filter"];
   $ts_date = strtotime($iso_date);
 
   $tomorrow_date = of_isodate_format(strtotime("+1 day", $ts_date));
@@ -858,7 +872,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
     }
   }
 
-  $occurrences = calendar_events_model($ts_date,strtotime("+1 day", $ts_date), $calendar_entity);
+  $occurrences = calendar_events_model($ts_date,strtotime("+1 day", $ts_date), $calendar_entity,$category_filter);
   if(is_array($occurrences)) {
     $options = array();
     foreach($occurrences as $occurrence) {
@@ -917,6 +931,7 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
   global $l_expand_all, $l_collapse_all;
 
   $iso_date = $calendar["date"];
+  $category_filter = $calendar["category_filter"];
   $ts_date = strtotime($iso_date);
   $this_month = of_date_get_month($ts_date);
   $this_year = of_date_get_year($ts_date);
@@ -928,7 +943,7 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
   $prev_month = of_isodate_format(strtotime("-1 month",$ts_date));
 
   $list_title = calendar_localizeDate("month", $ts_date);
-  $occurrences = calendar_events_model($start_month, $end_month,$calendar_entity);
+  $occurrences = calendar_events_model($start_month, $end_month,$calendar_entity,$category_filter);
   $today_mark = false;
 
   // Sort occurrences by date (cause repeat and no repeat events)
@@ -1227,6 +1242,7 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
   global $l_private,$l_daysofweekfirst,$l_daysofweek, $l_previous, $l_next;
 
   $iso_date = $calendar["date"];
+  $category_filter = $calendar["category_filter"];
   $ts_date = strtotime($iso_date);  
   $this_month = of_date_get_month($ts_date);
   $this_year = of_date_get_year($ts_date);
@@ -1245,7 +1261,7 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
    
   $day_duration = 86400;
 
-  $events = calendar_events_model($start_time,$end_time, $calendar_entity);
+  $events = calendar_events_model($start_time,$end_time, $calendar_entity,$category_filter);
   $of = &OccurrenceFactory::getInstance();
 
   $current_time = $start_time;

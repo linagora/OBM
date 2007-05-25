@@ -75,6 +75,7 @@ $l_user = "User";
 $l_meeting_legend = "Legend";
 $l_selection = "Selection";
 $l_task = "Task";
+$l_category_filter = "Filter by category";
 
 $l_collapse_all = "Collapse all";
 $l_expand_all = "Expand all";

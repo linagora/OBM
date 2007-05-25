@@ -47,7 +47,7 @@ update_calendar_action();
 $perm->check_permissions($module, $action);
 
 $cal_entity_id = $_SESSION['cal_entity_id'];
-
+$cal_category_filter = $_SESSION["cal_category_filter"];
 page_close();
 // If a group has just been selected, automatically select all its members
 if ( ($params["new_group"] == "1")
@@ -86,6 +86,7 @@ if (($params["new_sel"]) || (is_array($params["sel_user_id"]))) {
   // If event creation (form submission) we set session even if selection empty
   $cal_entity_id["user"] = $params["sel_user_id"];
 }
+
 // If resources selection present we override session content
 if ($action == "new" && (is_array($params["sel_resource_id"]))) {
   // Join resources from group with normal resources.
@@ -113,10 +114,18 @@ if ( ( (! is_array($cal_entity_id["user"]))
   $cal_entity_id["user"] = array($obm["uid"]);
 }
 
+// Category Filter 
+if(($action == "insert") || ($action == "update") 
+  || ($action == "perform_meeting") ) {
+  $cal_category_filter = "";
+} elseif ( isset($params["category_filter"])) {
+  $cal_category_filter = str_replace($c_all,"",$params["category_filter"]);
+}
+  
 //print_r($cal_entity_id);
 // We copy the entity array structure to the parameter hash
 $params["entity"] = $cal_entity_id;
-
+$params["category_filter"] = $cal_category_filter;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -436,6 +445,7 @@ if ($action == "index") {
 }
 
 $_SESSION['cal_entity_id'] = $cal_entity_id;
+$_SESSION['cal_category_filter'] = $cal_category_filter;
 //echo "<p>";
 //print_r($cal_entity_id);
 if (!$params["ajax"]) {

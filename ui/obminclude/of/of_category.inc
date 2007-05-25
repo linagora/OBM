@@ -238,7 +238,7 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
 //   - $first_element : scalar or array : (["all"|"none"])
 //   - $sel_append    : string (eg javascript code) to append at select
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append="") {
+function of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append="",$name="") {
   global $cgp_hide;
 
   if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
@@ -270,7 +270,10 @@ function of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, 
     }
 
     // Category select
-    $sel_cat = "<select id=\"sel_${cat}\" name=\"sel_${cat}\" $sel_append>
+    if( $name == "" ) {
+      $name = ${cat};
+    }
+    $sel_cat = "<select id=\"sel_$name\" name=\"sel_$name\" $sel_append>
       $first_option";
     if (is_array($cats)) {
       $has_code = false;

@@ -63,7 +63,7 @@ $l_monthlybyday = "mensuelle(jour)";
 $l_monthlybydate = "mensuelle(date)";
 $l_yearly = "annuelle";
 $l_task = "Tache";
-
+$l_category_filter = "Filtrer par catégorie";
 $l_from = "du";
 $l_to = "au";
 
