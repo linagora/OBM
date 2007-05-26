@@ -266,7 +266,7 @@ function run_query_user_detail($p_id) {
 //   $id : new user id if ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_insert($user) {
-  global $obm, $profiles, $cdg_sql, $cgp_use, $obm, $password_encryption, $perms_admin;
+  global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
   $now = date("Y-m-d H:i:s");
@@ -306,16 +306,7 @@ function run_query_user_insert($user) {
   }
 
   // Delegation handling
-  $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
-  if (is_array($admin_realm)) {
-    if (in_array('delegation', $admin_realm)) {
-      $delegation = stripslashes($user["delegation"]);
-      $q_insert_delegation = ",
-    userobm_delegation";
-      $q_value_delegation = ",
-    '$delegation'";
-    }
-  }
+  $q_delegation = of_delegation_query_insert_clauses('userobm_delegation', stripslashes($user["delegation"]));
 
   // Coord
   $phone = $user["phone"];
@@ -472,9 +463,9 @@ function run_query_user_insert($user) {
     userobm_fax,
     userobm_fax2,
     userobm_email,
-    userobm_description
     $q_insert_delegation_target
-    $q_insert_delegation
+    $q_delegation[field]
+    userobm_description
     $query_insert_web
     $query_insert_mail
     $query_insert_mail_nomad
@@ -511,9 +502,9 @@ function run_query_user_insert($user) {
     '$fax',
     '$fax2',
     '$email',
-    '$desc'
     $q_value_delegation_target
-    $q_value_delegation
+    $q_delegation[value]
+    '$desc'
     $query_values_web
     $query_values_mail
     $query_values_mail_nomad
@@ -686,14 +677,7 @@ function run_query_user_update($p_id, $user) {
   }
 
   // Delegation handling
-  $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
-  if (is_array($admin_realm)) {
-    if (in_array('delegation', $admin_realm)) {
-      $delegation = stripslashes($user["delegation"]);
-      $q_delegation = ",
-    userobm_delegation='$delegation'";
-    }
-  }
+  $q_delegation = of_delegation_query_update_clause('userobm_delegation', stripslashes($user["delegation"]));
 
   // Coord
   $phone = $user["phone"];

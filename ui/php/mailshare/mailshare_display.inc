@@ -14,6 +14,7 @@
 $fieldnames["mailshare_name"] = $l_name;
 $fieldnames["mailshare_email"] = $l_email;
 $fieldnames["mailshare_quota"] = $l_quota;
+$fieldnames["mailshare_delegation"] = $l_delegation;
 $fieldnames["mailshare_description"] = $l_desc;
 $fieldnames["usercreate"] = $l_creator;
 $fieldnames["userupdate"] = $l_updater;
@@ -101,9 +102,12 @@ function html_mailshare_search_form($mailshare) {
   // --- Var preparation ------------------------------------------------------
 
   $name = stripslashes($mailshare["name"]);
+  $delegation = stripslashes($mailshare["delegation"]);
   $quota = stripslashes($mailshare["quota"]);
   $email = stripslashes($mailshare["email"]);
   $desc = stripslashes($mailshare["description"]);
+
+  $dis_delegation = of_delegation_dis_search_form($delegation);
 
   // --- HTML Page display ----------------------------------------------------
 
@@ -116,6 +120,7 @@ function html_mailshare_search_form($mailshare) {
   <label>$l_email<br />
     <input type=\"text\" name=\"tf_email\" size=\"24\" maxlength=\"32\" value=\"$email\" />
   </label>
+  $dis_delegation
   <label>$l_quota<br />
     <input name=\"tf_quota\" size=\"8\" maxlength=\"8\" value=\"$quota\" />
   </label>
@@ -184,8 +189,9 @@ function html_mailshare_search_list($obm_q, $pref_q, $nb_mailshare, $mailshare) 
 
   $name = urlencode(stripslashes($mailshare["name"]));
   $email = urlencode(stripslashes($mailshare["email"]));
+  $delegation = urlencode(stripslashes($mailshare["delegation"]));
 
-  $url = url_prepare("mailshare_index.php?action=search&amp;tf_name=$name&amp;tf_email=$email$url_ext");
+  $url = url_prepare("mailshare_index.php?action=search&amp;tf_name=$name&amp;tf_email=$email&amp;tf_delegation=$delegation$url_ext");
   
   $dis_mailshare = new OBM_DISPLAY("DATA", $pref_q, $module);
   
@@ -238,8 +244,11 @@ function html_mailshare_consult($mailshare_q) {
   $quota = $mailshare_q->f("mailshare_quota");
   $desc = $mailshare_q->f("mailshare_description");
   $email = $mailshare_q->f("mailshare_email");
+  $delegation = $mailshare_q->f("mailshare_delegation");
   $mail_server_id = $mailshare_q->f("userobm_mail_server_id");
   $mail_server_host_name = $mailshare_q->f("mailserver_hostname");
+
+  $block_delegation = of_delegation_dis_block_consult($delegation);
 
   $display["detailInfo"] = display_record_info($mailshare_q);
   $display["title"] = "<div class=\"title\">$l_mailshare : $name</div>";
@@ -253,6 +262,7 @@ function html_mailshare_consult($mailshare_q) {
     <th>$l_name</th>
     <td>$name</td>
   </tr>
+  $block_delegation
   <tr>
     <th>$l_quota</th>
     <td>$quota</td>
@@ -296,32 +306,35 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
     $name = $mailshare_q->f("mailshare_name");
     $quota = $mailshare_q->f("mailshare_quota");
     $email = $mailshare_q->f("mailshare_email");
+    $delegation = $mailshare_q->f("mailshare_delegation");
     $desc = $mailshare_q->f("mailshare_description");
     $mail_server_id = $mailshare_q->f("mailshare_mail_server_id");
     $mail_server_host_name = $mailshare_q->f("mailserver_hostname");
 
-  } else {
-    // Values are taken from parameters
-    $id = $mailshare["mailshare_id"];
-    $name = stripslashes($mailshare["name"]);
-    $quota = $mailshare["quota"];
-    $email = $mailshare["email"];
-    $desc = stripslashes($mailshare["desc"]);
-    if ($action == "new") {
-      $quota = $cmailshare_default_quota;
-    }
+  } else if ($action == "new") {
+    $quota = $cmailshare_default_quota;
   }
 
 
   // If parameters have been given, they supercede the default action value
-  if (isset($mailshare["name"])) { $name = $mailshare["name"]; }
+  if (isset($mailshare["mailshare_id"])) { $id = $mailshare["mailshare_id"]; }
+  if (isset($mailshare["name"])) { $name = stripslashes($mailshare["name"]); }
+  if (isset($mailshare["delegation"])) { $delegation = stripslashes($mailshare["delegation"]); }
   if (isset($mailshare["quota"])) { $quota = $mailshare["quota"]; }
   if (isset($mailshare["email"])) { $email = $mailshare["email"]; }
+  if (isset($mailshare["desc"])) { $desc = stripslashes($mailshare["desc"]); }
   if (isset($user["mail_server"])) { $mail_server = $user["mail_server"]; }
   if (isset($user["mail_server_hostname"])) { $mail_server_host_name = $user["mail_server_hostname"]; }  
 
-  if (!$mail_server_host_name) {
-    if(!$mail_server) {
+  // Mark the error field
+  if ($field != "") {
+    $class[$field] = "error";
+  }
+
+  $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
+
+  if (! $mail_server_host_name) {
+    if (! $mail_server) {
       $mail_server = $obm["mailserver"];
     }    
     $dis_mailserver = get_select_host_server($mail_server);
@@ -331,10 +344,6 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
     <input type=\"hidden\" name=\"sel_mail_server\" value=\"$mail_server\" />
     <input type=\"hidden\" name=\"sel_mail_server_hostname\" value=\"$mail_server_host_name\" />";
   }
-
-  $class_name = ($field == "name") ? "detailError" : "detailLabel";
-  $class_quota = ($field == "quota") ? "detailError" : "detailLabel";
-  $class_email =  ($field == "email") ? "detailError" : "detailLabel";
 
   $main_domain = $obm["domain_name"];
 
@@ -364,15 +373,16 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
 
   <table>
   <tr>
-    <th>$l_name</th>
+    <th class=\"$class[name]\">$l_name</th>
     <td>$dis_name</td>
   </tr>
   <tr>
-    <th>$l_email</th>
+    <th class=\"$class[email]\">$l_email</th>
     <td><textarea name=\"ta_email\" cols=\"32\" rows=\"3\">$email</textarea>@$main_domain</td>
   </tr>
+  $block_delegation
   <tr>
-    <th>$l_quota</th>
+    <th class=\"$class[quota]\">$l_quota</th>
     <td><input name=\"tf_quota\" maxlength=\"8\" size=\"8\" value=\"$quota\" />M</td>
   </tr>
   <tr>
@@ -486,6 +496,7 @@ function dis_mailshare_warn_insert($id, $h_q, $mailshare) {
   global $c_yes, $c_no;
 
   $name = $mailshare["name"];
+  $delegation = $mailshare["delegation"];
   $desc = $mailshare["desc"];
   $email = $mailshare["email"];
   $quota = $mailshare["quota"];
@@ -512,6 +523,7 @@ function dis_mailshare_warn_insert($id, $h_q, $mailshare) {
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
       <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+      <input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />
       <input type=\"hidden\" name=\"ta_email\" value=\"$email\" />
       <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
       <input type=\"hidden\" name=\"tf_quota\" value=\"$quota\" />

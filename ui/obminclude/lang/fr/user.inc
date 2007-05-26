@@ -25,8 +25,8 @@ $l_check_usercreate = " entrées créées par cet utilisateur.";
 $l_check_userupdate = " entrées modifiées par cet utilisateur.";
 $l_no_user = "Pas de champs utilisateurs dans cette table";
 $l_group = "Groupe";
+$l_delegation_target = "Administration déléguée";
 $l_photo = "Photo";
-$l_delegation_target = "Zone de délégation";
 
 $l_mail_ext = "Messagerie externe";
 $l_mail_server = "Serveur de boîte à lettres";

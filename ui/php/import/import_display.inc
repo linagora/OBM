@@ -811,11 +811,10 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
   $file_name = $import["file_name"];
   $file_saved = $import["file_saved"];
   $comp_id = $import["company_id"];
-  //  if ($comp_id == "") {
+  // Case same company was found, id is in $comps array
+  if ($comp_id == "") {
     $comp_id = $comps["same"][0]["comp_id"];
-    //    echo "cid0=$comp_id";
-    //  }
-    //  echo "cid1=$comp_id";
+  }
 
   $num_line = $log["num_line"];
 

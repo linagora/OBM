@@ -170,7 +170,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
-  global $l_group, $l_email, $l_phone, $l_desc, $l_delegation, $l_find, $l_all;
+  global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all;
   global $display, $c_all, $profiles;
   
   $login = $user["login"];
@@ -181,7 +181,7 @@ function html_user_search_form($user) {
   $phone = $user["phone"];
   $desc = $user["desc"];
   $group = $user["group"];
-  $delegation = $user["delegation"];
+  $delegation = stripslashes($user["delegation"]);
   $archive = ($user["archive"] == "1" ? "checked" : "");
   $popup = $user["popup"];
   if ($user["restriction_calendar"]) {
@@ -221,6 +221,8 @@ function html_user_search_form($user) {
     </label>";
   }
 
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
   $block = "
   <form method=\"get\" name=\"f_search\"
     action=\"". url_prepare("user_index.php")."\" class=\"search\"> 
@@ -240,10 +242,7 @@ function html_user_search_form($user) {
         $block_profile
       </select>
     </label>
-    <label>$l_delegation<br />
-      <input type=\"text\" name=\"tf_delegation\" size=\"16\" maxlength=\"64\"
-      value=\"$delegation\" />
-    </label>
+    $dis_delegation
     <label>$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" maxlength=\"32\"
       value=\"$email\" />
@@ -432,7 +431,7 @@ function html_user_consult($obm_q) {
   global $l_vacation, $l_vacation_message, $l_mail_server;
   global $l_enabled, $l_disabled, $l_web_consult_list, $l_photo;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
-  global $path, $display, $cgp_use, $c_yes, $c_no,$obm;
+  global $obm, $profiles, $path, $display, $c_yes, $c_no;
 
   $id = $obm_q->f("userobm_id");
   $domain_name = ($obm_q->f("domain_name") != "" ? $obm_q->f("domain_name") : "GLOBAL");
@@ -543,6 +542,8 @@ function html_user_consult($obm_q) {
   </tr>";
     }
   }
+
+  $dis_delegation = of_delegation_dis_block_consult($delegation);
 
   // Section Web
   if ($cgp_use["service"]["web"]) {
@@ -718,10 +719,7 @@ function html_user_consult($obm_q) {
     <th>$l_profile</th>
     <td>$profile</td>
   </tr>
-  <tr>
-    <th>$l_delegation_target</th>
-    <td>$delegation_target</td>
-  </tr>
+  $dis_delegation_target
   <tr>
     <th>$l_lastname</th>
     <td>$lname</td>
@@ -730,10 +728,7 @@ function html_user_consult($obm_q) {
     <th>$l_firstname</th>
     <td>$fname</td>
   </tr>
-  <tr>
-    <th>$l_delegation</th>
-    <td>$delegation</td>
-  </tr>
+  $dis_delegation
   <tr>
     <th>$l_title</th>
     <td>$title</td>
@@ -898,7 +893,7 @@ function html_user_group_consult($usr_q) {
 function html_user_form($usr_q, $user, $field="") {
   global $l_login, $l_password, $l_profile, $l_lastname, $l_firstname;
   global $l_user, $l_title, $l_archive, $l_datebegin, $l_insert, $l_update;
-  global $l_delegation, $l_delegation_target;
+  global $l_delegation_target;
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
@@ -1278,22 +1273,7 @@ function html_user_form($usr_q, $user, $field="") {
     }
   }
 
-  // Delegation handling
-  $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
-  if (is_array($admin_realm)) {
-    if (in_array('delegation', $admin_realm)) {
-      $delegation = $obm['delegation'];
-      $input_delegation = $delegation;
-    }
-    if (in_array('domain', $admin_realm)) {
-      $input_delegation = "<input name=\"tf_delegation\" size=\"32\" maxlength=\"64\" value=\"$delegation\" />";
-    }
-    $dis_delegation = "
-  <tr>
-    <th class=\"$class[delegation]\">$l_delegation</th>
-    <td>$input_delegation</td>
-  </tr>";
-  }
+  $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
   // some constants
   $csize_add = "48";
@@ -1340,7 +1320,7 @@ function html_user_form($usr_q, $user, $field="") {
     <th class=\"$class[firstname]\">$l_firstname</th>
     <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
   </tr>
-  $dis_delegation
+  $block_delegation
   <tr>
     <th class=\"$class[title]\">$l_title</th>
     <td><input name=\"tf_title\" size=\"32\" maxlength=\"32\" value=\"$title\" /></td>
@@ -1457,6 +1437,8 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $desc = $user["desc"];
   $archive = $user["archive"];
   $domain = $user["domain"];
+  $delegation = $user["delegation"];
+  $delegation_target = $user["delegation_target"];
 
   // coord
   $phone = $user["phone"];
@@ -1525,6 +1507,8 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
   <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
   <input type=\"hidden\" name=\"sel_domain\" value=\"$domain\" />
+  <input type=\"hidden\" name=\"delegation\" value=\"$delegation\" />
+  <input type=\"hidden\" name=\"delegation_target\" value=\"$delegation_target\" />
 
   <input type=\"hidden\" name=\"phone\" value=\"$phone\" />
   <input type=\"hidden\" name=\"phone2\" value=\"$phone2\" />
@@ -1665,15 +1649,13 @@ function dis_user_can_delete($p_id) {
        <ul>
         <li><b>$nbc</b> $l_check_usercreate</li>
         <li><b>$nbu</b> $l_check_userupdate</li>
-	</ul>
-      ";
+	</ul>";
       } else {
 	$dis_user .= "
         <h1>$table</h1>
 	<ul>
         <li>$l_no_user</li>
-	</ul>
-	";
+	</ul>";
       }
       $dis_user .= "<hr />";
     }
@@ -1723,6 +1705,7 @@ function dis_user_display_pref($prefs) {
 
   return $block;
 }
+
 
 /**
  * Build a JSON array with all search results 

@@ -478,6 +478,135 @@ function of_domain_html_select($domains, $domain_id="", $first_element="", $sel_
 }
 
 
+//--- Delegation handling ---------------------------------------------------//
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Delegation : Display search form field
+// Parameters :
+//   - $value : default displayed value
+///////////////////////////////////////////////////////////////////////////////
+function of_delegation_dis_search_form($value) {
+  global $cgp_use, $l_delegation;
+
+  $block = "";
+  if ($cgp_use['property']['delegation']) {
+    $block = "
+    <label>$l_delegation<br />
+      <input type=\"text\" name=\"tf_delegation\" size=\"16\" maxlength=\"64\"
+      value=\"$value\" />
+    </label>";
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Delegation : Display block consult
+// Parameters:
+//   - $value : value displayed
+// Returns : XHTML consult display block
+///////////////////////////////////////////////////////////////////////////////
+function of_delegation_dis_block_consult($value) {
+  global $cgp_use, $l_delegation;
+
+  $block = "";
+  if ($cgp_use['property']['delegation']) {
+    $block = "<tr>
+    <th>$l_delegation</th>
+    <td>$value</td>
+  </tr>";
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Delegation : Display update block
+// Parameters:
+//   - $value : value displayed
+// Returns : XHTML consult display block
+///////////////////////////////////////////////////////////////////////////////
+function of_delegation_dis_block_update($value, $class) {
+  global $obm, $cgp_use, $profiles, $l_delegation;
+
+  $block = "";
+  if ($cgp_use['property']['delegation']) {
+    $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
+    if (is_array($admin_realm)) {
+      if (in_array('delegation', $admin_realm)) {
+	$delegation = $obm['delegation'];
+	$input_delegation = $delegation;
+      }
+      if (in_array('domain', $admin_realm)) {
+	$input_delegation = "<input name=\"tf_delegation\" size=\"32\" maxlength=\"64\" value=\"$delegation\" />";
+      } else {
+	$input_delegation .= "<input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />";
+      }
+      $block = "
+  <tr>
+    <th class=\"$class\">$l_delegation</th>
+    <td>$input_delegation</td>
+  </tr>";
+    }
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Delegation : get query insert clauses
+// Parameters:
+//   - $field : Db field
+//   - $value : value to insert
+// Returns : XHTML consult display block
+///////////////////////////////////////////////////////////////////////////////
+function of_delegation_query_insert_clauses($field, $value) {
+  global $obm, $cgp_use, $profiles;
+
+  $q = array();
+  if ($cgp_use['property']['delegation']) {
+    $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
+    if (is_array($admin_realm)) {
+      if (in_array('delegation', $admin_realm)) {
+	$q['field'] = "$field,";
+	$q['value'] = "'$value',";
+      }
+    }
+  }
+
+  return $q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Delegation : get query update clause
+// Parameters:
+//   - $field : Db field
+//   - $value : value to insert
+// Returns : XHTML consult display block
+///////////////////////////////////////////////////////////////////////////////
+function of_delegation_query_update_clause($field, $value) {
+  global $obm, $cgp_use, $profiles;
+
+  $q = array();
+  if ($cgp_use['property']['delegation']) {
+    $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
+    if (is_array($admin_realm)) {
+      if (in_array('delegation', $admin_realm)) {
+	$q = ",
+    $field='$value'";
+      }
+    }
+  }
+
+  return $q;
+}
+
+
 //--- User and Display preferences handling----------------------------------//
 
 

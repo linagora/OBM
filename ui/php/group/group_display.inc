@@ -12,6 +12,7 @@
 //------------------------------------//
 // Direct fields
 $fieldnames["group_name"] = $l_name;
+$fieldnames["group_delegation"] = $l_delegation;
 $fieldnames["group_system"] = $l_system;
 $fieldnames["group_privacy"] = $l_private;
 $fieldnames["group_local"] = $l_local;
@@ -175,12 +176,15 @@ function html_group_search_form ($group) {
   // --- Var preparation ------------------------------------------------------
 
   $name = stripslashes($group["name"]);
+  $delegation = stripslashes($group["delegation"]);
   $email = stripslashes($group["email"]);
   $user = stripslashes($group["user"]);
   $privacy = $group["privacy"];
   $mailing = $group["mailing"];
 
   $sel_privacy = dis_privacy_search_select($privacy);
+
+  $dis_delegation = of_delegation_dis_search_form($delegation);
 
   // --- HTML Page display ----------------------------------------------------
 
@@ -190,6 +194,7 @@ function html_group_search_form ($group) {
     <label>$l_name<br />
       <input name=\"tf_name\" size=\"16\" maxlength=\"16\" value=\"$name\" />
     </label>
+    $dis_delegation
     <label>$l_group_user<br />
       <input name=\"tf_user\" size=\"16\" maxlength=\"16\" value=\"$user\" />
     </label>
@@ -271,9 +276,10 @@ function html_group_search_group($obm_q, $prefs, $group) {
   }
 
   $name = urlencode(stripslashes($group["name"]));
+  $delegation = urlencode(stripslashes($group["delegation"]));
   $user = urlencode(stripslashes($group["user"]));
 
-  $url = url_prepare("group_index.php?action=search&amp;tf_name=$namet&amp;tf_user=$user$url_ext");
+  $url = url_prepare("group_index.php?action=search&amp;tf_name=$namet&amp;tf_user=$user&amp;tf_delegation=$delegation$url_ext");
   
   $dis_group = new OBM_DISPLAY("DATA", $prefs, "group");
   if ($popup) {
@@ -386,6 +392,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q
   $dis_privacy = ($privacy == 1 ? $l_private : $l_public);
   $ext_id = $group_q->f("group_ext_id");
   $name = $group_q->f("group_name");
+  $delegation = $group_q->f("group_delegation");
   $desc = $group_q->f("group_desc");
   $email = $group_q->f("group_email");
   $mailing = ($group_q->f("group_mailing") == 1 ? $l_yes : $l_no);
@@ -405,10 +412,9 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q
       <tr>
         <th>$l_mailing</th>
         <td>$mailing</td>
-      </tr>      
-      ";
+      </tr>";
 
-    if ($cgp_use["service"]["samba"]) {
+    if ($cgp_use['service']['samba']) {
       $samba = ($group_q->f("group_samba") == 1 ? $l_yes : $l_no);
       $block_samba = "
       <tr>
@@ -420,7 +426,9 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q
     $dis_email = "";
     $samba = "";
   }
+
   $block_userdata .= of_userdata_dis_entity_consult("group", $id);
+  $block_delegation = of_delegation_dis_block_consult($delegation);
 
   // Check update rights to allow to remove users
   $g = array('group_id' => $id, 'privacy' => $privacy, '$gid' => $gid); 
@@ -536,6 +544,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q
       <th>$l_name</th>
       <td>$name</td>
     </tr>
+    $block_delegation
     <tr>
       <th>$l_manager</th>
       <td>$sel_manager</td>
@@ -603,6 +612,7 @@ function html_group_form($action, $group_q, $group, $field="") {
     $id = $group_q->f("group_id");
     $usercreate = $group_q->f("group_usercreate");
     $name = $group_q->f("group_name");
+    $delegation = $group_q->f("group_delegation");
     $system = $group_q->f("group_system");
     $samba = $group_q->f("group_samba");
     $desc = $group_q->f("group_desc");
@@ -619,6 +629,7 @@ function html_group_form($action, $group_q, $group, $field="") {
   // If parameters have been given, they supercede the default action value
   if (isset($group["group_id"])) { $id = $group["group_id"]; }
   if (isset($group["name"])) { $name = stripslashes($group["name"]); }
+  if (isset($group["delegation"])) { $delegation = stripslashes($group["delegation"]); }
   if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
   if (isset($group["email"])) { $email = stripslashes($group["email"]); }
   if (isset($group["privacy"])) { $priv = stripslashes($group["privacy"]); }
@@ -630,6 +641,8 @@ function html_group_form($action, $group_q, $group, $field="") {
   }
 
   $block_userdata = of_userdata_dis_entity_form("group", $id, $group);
+
+  $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
   // If new group or group update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
@@ -676,7 +689,7 @@ function html_group_form($action, $group_q, $group, $field="") {
   }
 
   $dis_mailing = "
-  <tr id=\"mailingGroup\"  class=\"$mail_class\">
+  <tr id=\"mailingGroup\" class=\"$mail_class\">
     <th>$l_mailing</th>
     <td><input name=\"cba_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
   </tr>";
@@ -691,6 +704,7 @@ function html_group_form($action, $group_q, $group, $field="") {
     <th>$l_name</th>
     <td><input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
   </tr>
+  $block_delegation
   $dis_private
   $block_samba
   <tr id=\"emailGroup\" class=\"$mail_class\">
@@ -782,6 +796,7 @@ function dis_group_warn_insert($id, $g_q, $group) {
   global $c_yes, $c_no;
 
   $name = $group["name"];
+  $delegation = $group["delegation"];
   $desc = $group["desc"];
   $samba = $group["samba"];
   $email = $group["email"];
@@ -801,6 +816,7 @@ function dis_group_warn_insert($id, $g_q, $group) {
 
   $hidden_fields = "
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+    <input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />
     <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
     <input type=\"hidden\" name=\"cba_samba\" value=\"$samba\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />

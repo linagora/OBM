@@ -680,7 +680,7 @@ function of_category_dis_entity_stats($entity, $cat, $cats, $order) {
   if (is_array($cats)) {
     $has_code = false;
     foreach ($cats as $one_cat) {
-      if ($one_cat["code"] != "") {
+      if ($one_cat['code'] != "") {
 	$has_code = true;
 	break;
       }
@@ -701,9 +701,9 @@ function of_category_dis_entity_stats($entity, $cat, $cats, $order) {
     foreach($cats as $cat_id=>$one_cat) {
       $stat[$cat_id]["$cat"] = $one_cat["nb"];
       if ($has_code) {
-	$stat[$cat_id]["name"] = $one_cat["code"]." - ".$one_cat["label"];
+	$stat[$cat_id]['name'] = $one_cat['code']." - ".$one_cat['label'];
       } else {
-	$stat[$cat_id]["name"] = $one_cat["label"];
+	$stat[$cat_id]['name'] = $one_cat['label'];
       }
       if ($one_cat["nb"] > $max) {
 	$max = $one_cat["nb"];

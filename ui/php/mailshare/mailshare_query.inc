@@ -21,6 +21,7 @@ function run_query_mailshare_search($mailshare) {
   $sql_order_field = $user["sql_order_field"];
 
   $name = sql_search_text_parse($mailshare["name"]);
+  $delegation = sql_search_text_parse($mailshare["delegation"]);
   $email = sql_search_text_parse($mailshare["email"]);
   $quota = sql_search_text_parse($mailshare["quota"]);
   $desc = sql_search_text_parse($mailshare["desc"]);
@@ -36,6 +37,10 @@ function run_query_mailshare_search($mailshare) {
   $where = "(1=1)";
   if ($name != '') {
     $where .= " AND mailshare_name $like '$name%'";
+  }
+  // If a delegation indication has been specified, get it
+  if (trim($delegation) != "") {
+    $where .= " AND mailshare_delegation $like '$delegation%'";
   }
   if ($email != '') {
     $where .= " AND mailshare_email $like '%$email%'";
@@ -131,6 +136,9 @@ function run_query_mailshare_insert($mailshare) {
   $now = date("Y-m-d H:i:s");
   $domain_id = $obm["domain_id"];
 
+  // Delegation handling
+  $q_delegation = of_delegation_query_insert_clauses('mailshare_delegation', stripslashes($mailshare["delegation"]));
+
   $query = "INSERT INTO MailShare (
     mailshare_domain_id,
     mailshare_timeupdate,
@@ -138,6 +146,7 @@ function run_query_mailshare_insert($mailshare) {
     mailshare_userupdate,
     mailshare_usercreate,
     mailshare_name,
+    $q_delegation[field]
     mailshare_mail_server_id,
     mailshare_quota,
     mailshare_description,
@@ -149,6 +158,7 @@ function run_query_mailshare_insert($mailshare) {
     null,
     '$obm[uid]',
     '$name',
+    $q_delegation[value]
     '$mail_server',
     '$quota',
     '$desc',
@@ -201,6 +211,9 @@ function run_query_mailshare_update($mailshare) {
   $mail_server = $mailshare["mail_server"];
   $now = date("Y-m-d H:i:s");
   $multidomain = sql_multidomain("mailshare");
+
+  // Delegation handling
+  $q_delegation = of_delegation_query_update_clause('mailshare_delegation', stripslashes($mailshare["delegation"]));
   
   $query = "UPDATE MailShare set
     mailshare_timeupdate = '$now',
@@ -210,6 +223,7 @@ function run_query_mailshare_update($mailshare) {
     mailshare_mail_server_id = '$mail_server',
     mailshare_description = '$desc',
     mailshare_email = '$email'
+    $q_delegation
   WHERE mailshare_id='$id'
     $multidomain";
 
