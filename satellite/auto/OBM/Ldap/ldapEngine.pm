@@ -8,6 +8,7 @@ use 5.006_001;
 require Exporter;
 require overload;
 use Carp;
+use strict;
 
 use Net::LDAP;
 use Net::LDAP::Entry;
@@ -44,9 +45,9 @@ sub new {
 
     $ldapEngineAttr{"ldapStruct"} = &OBM::utils::cloneStruct($OBM::Parameters::ldapConf::ldapStruct),
 
-    my $self = \%ldapEngineAttr ;
-
+    my $self = \%ldapEngineAttr;
     bless( $self, $obj );
+
     return $self;
 }
 
@@ -63,16 +64,14 @@ sub init {
     $self->{"ldapConn"}->{"ldapPasswd"} = $self->{"domainList"}->[0]->{"ldap_admin_passwd"};
 
     # Etabli la connexion à l'annuaire
-    return !$self->_connectLdapSrv();
+    return $self->_connectLdapSrv();
 }
 
 
 sub destroy {
     my $self = shift;
 
-    return !$self->_disconnectLdapSrv();
-
-    return 1;
+    return $self->_disconnectLdapSrv();
 }
 
 
