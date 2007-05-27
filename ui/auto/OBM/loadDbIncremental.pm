@@ -1,4 +1,4 @@
-package OBM::loadDb;
+package OBM::loadDbIncremental;
 
 $VERSION = "1.0";
 
@@ -15,7 +15,7 @@ require OBM::toolBox;
 
 
 # Definition des attributs de l'objet
-my %loadDbAttr = (
+my %loadDbIncrementalAttr = (
     filter => undef,
     user => undef,
     domain => undef,
@@ -35,11 +35,11 @@ sub new {
 
     SWITCH: {
         if( defined($parameters->{"user"}) ) {
-            $loadDbAttr{"user"} = $parameters->{"user"};
+            $loadDbIncrementalAttr{"user"} = $parameters->{"user"};
 
             # On recupere l'id du domaine de l'utilisateur
             my $queryResult;
-            my $query = "SELECT userobm_domain_id FROM P_UserObm WHERE userobm_id=".$loadDbAttr{"user"};
+            my $query = "SELECT userobm_domain_id FROM P_UserObm WHERE userobm_id=".$loadDbIncrementalAttr{"user"};
             if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
                 &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
                 if( defined($queryResult) ) {
@@ -51,33 +51,28 @@ sub new {
                     &OBM::toolBox::write_log( "lodaDb: utilisateur inexistant", "W" );
                     return undef;
                 }else {
-                    $loadDbAttr{"domain"} = $results->[0]->[0];
+                    $loadDbIncrementalAttr{"domain"} = $results->[0]->[0];
                 }
             }
 
-            $loadDbAttr{"filter"} = "user";
+            $loadDbIncrementalAttr{"filter"} = "user";
             last SWITCH;
         }
 
         if( defined($parameters->{"domain"}) ) {
-            $loadDbAttr{"domain"} = $parameters->{"domain"};
-            $loadDbAttr{"filter"} = "domain";
+            $loadDbIncrementalAttr{"domain"} = $parameters->{"domain"};
+            $loadDbIncrementalAttr{"filter"} = "domain";
             last SWITCH;
         }
 
         if( defined($parameters->{"delegation"}) ) {
-            $loadDbAttr{"delegation"} = $parameters->{"delegation"};
-            $loadDbAttr{"filter"} = "delegation";
+            $loadDbIncrementalAttr{"delegation"} = $parameters->{"delegation"};
+            $loadDbIncrementalAttr{"filter"} = "delegation";
             last SWITCH;
         }
     }
 
-    print $loadDbAttr{"user"}."\n";
-    print $loadDbAttr{"domain"}."\n";
-    print $loadDbAttr{"delegation"}."\n";
-    print $loadDbAttr{"filter"}."\n";
-
-    my $self = \%loadDbAttr ;
+    my $self = \%loadDbIncrementalAttr ;
 
     bless( $self, $obj );
     return $self;

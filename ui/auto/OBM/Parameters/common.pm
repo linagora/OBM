@@ -88,24 +88,25 @@ if( lc($cfgFile->val( 'global', 'obm-ldap' )) eq "true" ) {
     $obmModules->{"ldap"} = 0;
 }
 
-if( $obmModules->{"ldap"} ) {
-    if( lc($cfgFile->val( 'global', 'obm-mail' )) eq "true" ) {
-        $obmModules->{"mail"} = 1;
-    }else {
-        $obmModules->{"mail"} = 0;
-    }
+if( lc($cfgFile->val( 'global', 'obm-mail' )) eq "true" ) {
+    $obmModules->{"ldap"} = 1;
+    $obmModules->{"mail"} = 1;
+}else {
+    $obmModules->{"mail"} = 0;
+}
 
-    if( lc($cfgFile->val( 'global', 'obm-samba' )) eq "true" ) {
-        $obmModules->{"samba"} = 1;
-    }else {
-        $obmModules->{"samba"} = 0;
-    }
+if( lc($cfgFile->val( 'global', 'obm-samba' )) eq "true" ) {
+    $obmModules->{"ldap"} = 1;
+    $obmModules->{"samba"} = 1;
+}else {
+    $obmModules->{"samba"} = 0;
+}
 
-    if( lc($cfgFile->val( 'global', 'obm-web' )) eq "true" ) {
-        $obmModules->{"web"} = 1;
-    }else {
-        $obmModules->{"web"} = 0;
-    }
+if( lc($cfgFile->val( 'global', 'obm-web' )) eq "true" ) {
+    $obmModules->{"ldap"} = 1;
+    $obmModules->{"web"} = 1;
+}else {
+    $obmModules->{"web"} = 0;
 }
 
 # Le repertoire pere des repertoires personnels

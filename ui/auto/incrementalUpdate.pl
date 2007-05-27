@@ -9,8 +9,9 @@
 
 use strict;
 require OBM::toolBox;
-require OBM::loadDb;
+require OBM::loadDbIncremental;
 require OBM::Ldap::ldapEngine;
+require OBM::Ldap::posixUser;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 use Getopt::Long;
@@ -84,13 +85,17 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 }
 
 
-my $loadDb = OBM::loadDb->new( $dbHandler, \%parameters );
+my $loadDbIncremental = OBM::loadDbIncremental->new( $dbHandler, \%parameters );
 
 #
 # Recuperation des domaines a traiter
 &OBM::toolBox::write_log( "Recuperation de la liste des domaines a traiter", "W" );
 local $main::domainList = undef;
-$main::domainList = &OBM::toolBox::getDomains( $dbHandler, $parameters{"domain"} );
+if( defined($parameters{"domain"}) ) {
+    $main::domainList = &OBM::toolBox::getDomains( $dbHandler, $parameters{"domain"} );
+}else {
+    $main::domainList = &OBM::toolBox::getDomains( $dbHandler, undef );
+}
 
 
 #
