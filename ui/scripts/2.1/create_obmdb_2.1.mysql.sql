@@ -1744,7 +1744,7 @@ CREATE TABLE Deleted (
   deleted_domain_id  int(8),
   deleted_user_id    int(8),
   deleted_delegation varchar(64) DEFAULT '',
-  deleted_entity     varchar(32),
+  deleted_table      varchar(32),
   deleted_entity_id  int(8),
   deleted_timestamp  timestamp(14),
   PRIMARY KEY (deleted_id)
@@ -1759,7 +1759,7 @@ CREATE TABLE Updated (
   updated_domain_id  int(8),
   updated_user_id    int(8),
   updated_delegation varchar(64) DEFAULT '',
-  updated_entity     varchar(32),
+  updated_table      varchar(32),
   updated_entity_id  int(8),
   updated_type       char(1),
   PRIMARY KEY (updated_id)
