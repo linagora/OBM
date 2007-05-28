@@ -620,8 +620,8 @@ function run_query_global_insert_document($params, $id, $entity) {
 
   $uid = $obm["uid"];
   $now = date("Y-m-d H:i:s");
-  
-  $title = "fixme";
+
+  $title = $params["title"];
   $usr_q = get_user_info($uid);
   $author = $usr_q["lastname"]." ".$usr_q["firstname"];
   $mime = $params["type"];
@@ -726,7 +726,7 @@ function run_query_global_update_document($params, $id) {
   $name = $params["file_name"];
   $path = "/";
   $size = $params["size"];
-  
+   
   $query = "UPDATE Document SET
      document_timeupdate='$now',
      document_userupdate='$uid',

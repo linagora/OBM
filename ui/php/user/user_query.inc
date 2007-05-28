@@ -537,6 +537,7 @@ function run_query_user_insert($user) {
     $ret = of_userdata_query_update("user", $id, $user);
     // Insert user's photo
     if(isset($user["file_tmp"]) && $user["file_tmp"] != "") {
+      $user["title"] = $login;
       $doc_id = run_query_global_insert_document($user, $id, "user");
       if($doc_id > 0) {
         // Update userobm_photo_id
