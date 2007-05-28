@@ -21,8 +21,8 @@ function run_query_payment_search($payment) {
   $comment = sql_search_text_parse($payment["comment"]);
   $number = sql_search_text_parse($payment["number"]);
   $amount = $payment["amount"];
-  $date_after = $payment["date_after"];
-  $date_before = $payment["date_before"];
+  $date_after = of_isodate_convert($payment["date_after"]);
+  $date_before = of_isodate_convert($payment["date_before"]);
   $inout = $payment["inout"];
   $kind = $payment["kind"];
   $account = $payment["account"];
@@ -191,7 +191,7 @@ function run_query_payment_insert($params) {
   $invoice_id = $params["invoice_id"];
   $kind = $params["kind"];
   $number = $params["number"];
-  $date = ($params["date"] ? "'".$params["date"]."'" : "null");
+  $date = ($params["date"] ? "'".of_isodate_convert($params["date"])."'" : "null");
   $amount = $params["amount"];
   $amount_invoice = $params["amount_invoice"];
   $inout = $params["inout"];
@@ -233,7 +233,7 @@ function run_query_payment_insert($params) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  $datep = ($params["date"] ? "='".$params["date"]."'" : "is null");
+  $datep = ($params["date"] ? "='".of_isodate_convert($params["date"])."'" : "is null");
 
   // Get the payment id inserted
   $query = "SELECT payment_id
@@ -292,7 +292,7 @@ function run_query_payment_update($pid, $params) {
   $account_id = $params["account"];
   $kind = $params["kind"];
   $number = $params["number"];
-  $date = ($params["date"] ? "'".$params["date"]."'" : "null");
+  $date = ($params["date"] ? "'".of_isodate_convert($params["date"])."'" : "null");
   $amount = $params["amount"];
   $inout = $params["inout"];
   $checked = ($params["checked"] == "1" ? "1" : "0");
@@ -615,7 +615,7 @@ function check_payment_data_form($id, $params) {
   global $err, $l_exist_error;
 
   $number = $params["number"];
-  $date = $params["date"];
+  $date = of_isodate_convert($params["date"]);
   $inout = $params["inout"];
   $amount = $params["amount"];
   $c_id = $params["company_id"];

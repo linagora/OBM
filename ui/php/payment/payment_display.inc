@@ -44,7 +44,7 @@ function dis_data_payment(&$OD, $fieldname, $link_ok) {
 
   if ($fieldname == "payment_date") {
     $date = $OD->data_set->f($fieldname);
-    $date = of_date_format($date);
+    $date = of_date_upd_format($date);
     $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=".$OD->data_set->f("payment_id");
     $res["name"] = $date;
   }
@@ -109,8 +109,8 @@ function html_payment_search_form($params, $kinds, $accs) {
   $comment = $params["comment"];
   $number = $params["number"];
   $amount = $params["amount"];
-  $date_after = $params["date_after"];
-  $date_before = $params["date_before"];
+  $date_after = of_date_upd_format($params["date_after"]);
+  $date_before = of_date_upd_format($params["date_before"]);
   $inout = $params["inout"];
   $kind = $params["kind"];
   $account = $params["account"];
@@ -248,8 +248,8 @@ function html_payment_search_list($obm_q, $prefs, $params) {
   $comment = urlencode($payment["comment"]);
   $number = urlencode($payment["number"]);
   $amount = urlencode($payment["amount"]);
-  $date_after = $payment["date_after"];
-  $date_before = $payment["date_before"];
+  $date_after = of_date_upd_format($payment["date_after"]);
+  $date_before = of_date_upd_format($payment["date_before"]);
   $inout = $payment["inout"];
   $kind = $payment["kind"];
   $account = $payment["account"];
@@ -342,7 +342,7 @@ function html_payment_consult($p_q, $invs) {
   $c_id = $p_q->f("payment_company_id");
   $c_name = $p_q->f("company_name");
   $kind = $p_q->f("paymentkind_label");
-  $date = of_date_format($p_q->f("date"));
+  $date = of_date_upd_format($p_q->f("date"));
   $number = $p_q->f("payment_number");
   $amount = $p_q->f("payment_amount");
   $inout = $p_q->f("payment_inout");
@@ -638,7 +638,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
     $c_name = $p_q->f("company_name");
     $kind = $p_q->f("payment_paymentkind_id");
     $date = $p_q->f("date");
-    $date = ($date != 0) ? of_date_format($date, 1) : "";
+    $date = ($date != 0) ? of_date_upd_format($date, 1) : "";
     $number = $p_q->f("payment_number");
     $amount = $p_q->f("payment_amount");
     $inout = $p_q->f("payment_inout");
@@ -649,7 +649,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   // New form and first time
   } elseif ($action == "new") {
     $title = $l_header_new;
-    $date = date("Y-m-d");
+    $date = of_date_upd_format();
     $inout = '+';
   }
 
