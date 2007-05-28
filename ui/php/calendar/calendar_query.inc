@@ -456,13 +456,13 @@ function run_query_calendar_insert_event_data($calendar) {
   $description = $calendar["description"]."|<extended_desc>";
   $location = $calendar["location"];
   ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
-  $datebegin = $calendar["date_begin"];
-  $dateend = $calendar["date_end"];
+  $datebegin = of_isodate_convert($calendar["date_begin"]);
+  $dateend = of_isodate_convert($calendar["date_end"]);
   $event_duration = $calendar["event_duration"];
   if ($calendar["privacy"]!=1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar["repeat_kind"];
   $repeat_days = $calendar["repeat_days"]; 
-  $repeat_end = $calendar["repeat_end"];
+  $repeat_end = of_isodate_convert($calendar["repeat_end"]);
   $repeatfrequency = $calendar["repeatfrequency"];  
   $date_exception = $calendar["date_exception"];
   $item = $calendar["list-item"];
@@ -545,6 +545,7 @@ function run_query_calendar_insert_event_data($calendar) {
   if($repeat_kind != "none" && is_array($date_exception)) {
     foreach(array_unique($date_exception) as $key => $value) {
       if($value != "") {
+        $value = of_isodate_convert($value);
         $calendar["old_date_begin"] = $value." ".$calendar["time_begin"].":".$calendar["min_begin"].":00";
         run_query_calendar_event_exception_insert($calendar); 
       }
@@ -978,14 +979,14 @@ function run_query_calendar_update_event_data($calendar) {
   $priority = $calendar["priority"];
   $description = $calendar["description"]."|<extended_desc>";
   $location = $calendar["location"];
-  $datebegin = $calendar["date_begin"];
+  $datebegin = of_isodate_convert($calendar["date_begin"]);
   $event_duration = $calendar["event_duration"];
   ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
   $event_id = $calendar["calendar_id"]; 
   if ($calendar["privacy"] != 1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar["repeat_kind"];
   $repeat_days = $calendar["repeat_days"];
-  $repeat_end = $calendar["repeat_end"];
+  $repeat_end = of_isodate_convert($calendar["repeat_end"]);
   $frequency = $calendar["repeatfrequency"];  
   $date_exception = $calendar["date_exception"];
   $item = $calendar["list-item"];
@@ -1044,6 +1045,7 @@ function run_query_calendar_update_event_data($calendar) {
   if($repeat_kind != "none" && is_array($date_exception)) {
     foreach(array_unique($date_exception) as $key => $value) {
       if($value != "") {
+        $value = of_isodate_convert($value);
         $calendar["old_date_begin"] = $value." ".$calendar["time_begin"].":".$calendar["min_begin"].":00";
         run_query_calendar_event_exception_insert($calendar); 
       }

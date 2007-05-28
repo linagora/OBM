@@ -479,7 +479,9 @@ function get_calendar_params() {
   if (! isset ($params["date"])) {
     $params["date"] = of_isodate_format();
   }
-  
+  $params["date_begin"] = of_isodate_convert($params["date_begin"],true);
+  $params["date_end"] = of_isodate_convert($params["date_end"],true);
+  $params["repeat_end"] = of_isodate_convert($params["repeat_end"],true);
   // New meeting event duration
   if (isset($params["time_duration"])) {
     $params["meeting_duration"] = $params["time_duration"];

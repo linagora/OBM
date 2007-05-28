@@ -1972,29 +1972,29 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     $datebegin = $event_q->f("calendarevent_date");
     $hourbegin = date("H",$datebegin);
     $minbegin = date("i",$datebegin);
-    $datebegin = of_isodate_format($datebegin);
+    $datebegin = of_date_upd_format($datebegin);
     $dateend = $event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration");
     $hourend = date("H",$dateend);
     $minend = date("i",$dateend);
-    $dateend = of_isodate_format($dateend);
+    $dateend = of_date_upd_format($dateend);
     $all_day = $event_q->f("calendarevent_allday");
     $privacy = $event_q->f("calendarevent_privacy");
     $repeat_kind = $event_q->f("calendarevent_repeatkind");
     $repeat_days = $event_q->f("calendarevent_repeatdays");
     $repeatfrequency = $event_q->f("calendarevent_repeatfrequence");
     if ($event_q->f("calendarevent_endrepeat")) {
-      $repeat_end = of_isodate_format($event_q->f("calendarevent_endrepeat"));
+      $repeat_end = of_date_upd_format($event_q->f("calendarevent_endrepeat"));
     }
     $t_id = $tasks["ids"][0];
     $t_name = $tasks["entity"][$t_id]["label"];
     $id = $event_q->f("calendarevent_id");
 
     while($exception_q->next_record()) {
-      $date_exception[] = of_isodate_format($exception_q->f("calendarexception_date")); 
+      $date_exception[] = of_date_upd_format($exception_q->f("calendarexception_date")); 
     }
 
   } elseif ($action == "new") {
-    $repeat_end = of_isodate_format(strtotime("+1 year"));
+    $repeat_end = of_date_upd_format(strtotime("+1 year"));
   }
 
   // If parameters have been given, they supercede the default action value
@@ -2008,14 +2008,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   if (isset($calendar["repeatfrequency"])) { $repeatfrequency = $calendar["repeatfrequency"]; }  
   if (isset($calendar["item"])) { $item = $calendar["item"]; }  
   if (isset($calendar["date_begin"])) {
+    echo $calendar["date_begin"];
     $ts = isodatetime_to_timestamp($calendar["date_begin"]);
-    $datebegin = of_isodate_format($ts);
+    $datebegin = of_date_upd_format($ts);
     $hourbegin = of_date_get_hour($ts);
     $minbegin = date("i", $ts);
   }
   if (isset($calendar["date_end"])) {
     $ts = isodatetime_to_timestamp($calendar["date_end"]);
-    $dateend = of_isodate_format($ts);
+    $dateend = of_date_upd_format($ts);
     $hourend = of_date_get_hour($ts);
     $minend = date("i", $ts);
   }
@@ -2118,7 +2119,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     }
   }
   if( $datebegin == '' ) {
-    $datebegin =  of_isodate_format(time());
+    $datebegin =  of_date_upd_format(time());
   }
   if( $dateend == '' ) {
     $dateend = $datebegin;
@@ -2331,7 +2332,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   // Exception
   if(is_array($date_exception)) {
     foreach($date_exception as $key => $value) {
-     $block_exception_detail .= "<div class=\"elementRow\" id=\"date_exception-$key\">
+      $value = of_date_upd_format($value,true);
+      $block_exception_detail .= "<div class=\"elementRow\" id=\"date_exception-$key\">
          <a href=\"javascript: remove_element('date_exception-$key','celldate');\">
          <img src=\"$ico_delete\" alt=\"[Delete]\">
          </a>
@@ -2685,7 +2687,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   global $l_groups,$l_resources,$l_module_resourcegroup;
 
   $time_unit = 60 / $set_cal_interval;
-  $datebegin = $calendar["date"];
+  $datebegin = of_date_upd_format($calendar["date"]);
   $dis_button = "
      <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"perform_meeting\" />
