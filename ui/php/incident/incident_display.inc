@@ -131,8 +131,8 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $reso, $incid
   $status = $incident["status"];
   $resolutiontype = $incident["resolutiontype"];
   $owner = $incident["owner"];
-  $dateafter = $incident["date_after"];
-  $datebefore = $incident["date_before"];
+  $dateafter = of_date_upd_format($incident["date_after"],true);
+  $datebefore = of_date_upd_format($incident["date_before"],true);
   $archive = ($incident["archive"] == "1" ? "checked=\"checked\"" : "");
 
   // User defined data
@@ -574,16 +574,16 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
     $priority = $inc_q->f("incident_priority_id");
     $status = $inc_q->f("incident_status_id");
     $reso = $inc_q->f("incident_resolutiontype_id");
-    $datecomment = of_isodate_format();
-    $date = of_isodate_format($inc_q->f("date"));
+    $datecomment = of_date_upd_format();
+    $date = of_date_upd_format($inc_q->f("date"));
     $hour = of_date_get_hour($inc_q->f("date"));
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
     $id = $inc_q->f("incident_id");
     $c_label = $inc_q->f("contract_label");
   } elseif ($action == "new") {
     // We pre-fill date with current date
-    $date = date($c_php_isodate_format);
-    $datecomment = of_isodate_format();
+    $date = of_date_upd_format();
+    $datecomment = of_date_upd_format();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -596,14 +596,14 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   if (isset($incident["priority"])) { $priority = $incident["priority"]; }
   if (isset($incident["status"])) { $status = $incident["status"]; }
   if (isset($incident["reso"])) { $reso = $incident["resolutiontype"]; }
-  if (isset($incident["date"])) { $date = $incident["date"]; }
+  if (isset($incident["date"])) { $date = of_date_upd_format($incident["date"]); }
   if (isset($incident["hour"])) { $hour = $incident["hour"]; }
   if (isset($incident["archive"])) { $archive = ($incident["archive"] == 1 ? "checked" : ""); }
   if (isset($incident["lcontract"])) { $c_label = stripslashes($incident["lcontract"]); }
   if (isset($incident["comment"])) { $comment = stripslashes($incident["comment"]); }
   if (isset($incident["add_comment"])) { $add_comment = stripslashes($incident["add_comment"]); }
   if (isset($incident["usercomment"])) { $usercomment = $incident["usercomment"]; }
-  if (isset($incident["datecomment"])) { $datecomment = $incident["datecomment"]; }
+  if (isset($incident["datecomment"])) { $datecomment = of_date_upd_format($incident["datecomment"]); }
   if (isset($incident["reference"])) { $reference = $incident["reference"]; }
 
   // User defined data

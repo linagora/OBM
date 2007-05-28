@@ -31,8 +31,8 @@ function run_query_incident_search($incident) {
   $contract_id =  $incident["contract_id"];
   $owner = $incident["owner"];
   $logger = $incident["logger"];
-  $dateafter = $incident["date_after"];
-  $datebefore = $incident["date_before"];
+  $dateafter = of_isodate_convert($incident["date_after"],true);
+  $datebefore = of_isodate_convert($incident["date_before"],true);
   $archive = $incident["archive"];
   $reference = $incident["reference"];
   $multidomain = sql_multidomain("incident");
@@ -257,13 +257,13 @@ function run_query_incident_insert($incident) {
   $priority = $incident["priority"];
   $status = $incident["status"];
   $reso = $incident["resolutiontype"];
-  $date = $incident["date"];
+  $date = of_isodate_convert($incident["date"]);
   $hour = $incident["hour"];
   $add_duration = $incident["add_duration"];
   $call_date = "$date $hour:0:0";
   $add_comment = $incident["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $incident["datecomment"];
+    $datecomment = of_isodate_convert($incident["datecomment"]);
     $usercomment = $incident["usercomment"];
     $comment = "$datecomment:$usercomment:$add_comment";
   }
@@ -353,11 +353,10 @@ function run_query_incident_id($incident) {
   $lincident = $incident["lincident"];
   $owner = ($incident["owner"] ? "='".$incident["owner"]."'" : " is null");
   $logger = ($incident["logger"] ? "='".$incident["logger"]."'" : " is null");
-  $date = ($incident["date"] ? "='".$incident["date"]."'" : "is null");
+  $date = of_isodate_convert($incident["date"]);
   $pri = ($incident["priority"] ? "='".$incident["priority"]."'" : " is null");
   $status = ($incident["status"] ? "='".$incident["status"]."'" : " is null");
   $hour = $incident["hour"];
-  $date = $incident["date"];
   $call_date = "$date $hour:0:0";
   $archive = ($incident["archive"] == "1" ? "1" : "0");
   $multidomain = sql_multidomain("incident");
@@ -412,7 +411,7 @@ function run_query_incident_update($incident) {
   $priority = $incident["priority"];
   $status = $incident["status"];
   $reso = $incident["resolutiontype"];
-  $date = $incident["date"];
+  $date = of_isodate_convert($incident["date"]);
   $hour = $incident["hour"];
   $duration = $incident["duration"];
   $archive = ($incident["archive"] == "1" ? "1" : "0");
@@ -646,7 +645,7 @@ function check_incident_form($incident) {
     return false;
   }
 
-  $date = $incident["date"];
+  $date = of_isodate_convert($incident["date"],true);
 
   // Begin Date check
   if (($date == "") || (preg_match($php_regexp_isodate, $date) == 0)) {
