@@ -592,7 +592,7 @@ function of_delegation_query_insert_clauses($field, $value) {
 function of_delegation_query_update_clause($field, $value) {
   global $obm, $cgp_use, $profiles;
 
-  $q = array();
+  $q = "";
   if ($cgp_use['property']['delegation']) {
     $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
     if (is_array($admin_realm)) {

@@ -351,7 +351,7 @@ function run_query_group_update($group) {
     group_desc='$desc',
     group_email='$email',
     group_mailing='$mailing',
-    group_manager_id='$manager',
+    group_manager_id='$manager'
     $q_delegation
   WHERE group_id='$id'
     $multidomain";
