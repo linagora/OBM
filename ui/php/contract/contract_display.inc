@@ -156,8 +156,8 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   $label = $contract["label"];
   $comp = $contract["company"];
   $type_id = $contract["type"];
-  $dateafter = $contract["date_after"];
-  $datebefore = $contract["date_before"];
+  $dateafter = of_date_upd_format($contract["date_after"], true);
+  $datebefore = of_date_upd_format($contract["date_before"], true);
   $manager = $contract["manager"];
   $num = $contract["number"]; 
   $archive = ($contract["archive"] == "1" ? "checked=\"checked\"" : ""); 
@@ -300,7 +300,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
 // display the contract search result
 // parameters:
 //   - $contract[] : contract search criteria
-//     keys used   : label,...
+//     keys used   : label,...of_isodate_convert
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_search_list($contract) {
   global $l_found, $l_no_found;
@@ -810,11 +810,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $duration = $contract_q->f("contract_duration");
     $format = $contract_q->f("contract_format");
     $autorenewal = $contract_q->f("contract_autorenewal");
-    $datebegin = of_isodate_format($contract_q->f("datebegin"), 1);
-    $dateexp = of_isodate_format($contract_q->f("dateexp"), 1);
-    $daterenew = of_isodate_format($contract_q->f("daterenew"), 1);
-    $datecancel = of_isodate_format($contract_q->f("datecancel"), 1);
-    $datesignature = of_isodate_format($contract_q->f("datesignature"), 1);
+    $datebegin = of_date_upd_format($contract_q->f("datebegin"), true);
+    $dateexp = of_date_upd_format($contract_q->f("dateexp"), true);
+    $daterenew = of_date_upd_format($contract_q->f("daterenew"), true);
+    $datecancel = of_date_upd_format($contract_q->f("datecancel"), true);
+    $datesignature = of_date_upd_format($contract_q->f("datesignature"), true);
     $type_id = $contract_q->f("contract_type_id");
     $con1_id = $contract_q->f("contract_contact1_id");
     $con2_id = $contract_q->f("contract_contact2_id");
@@ -843,11 +843,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $kind = $cck_customer;
         
     // We pre-fill date with current date     
-    $datebegin = date($c_php_isodate_format);
-    $dateexp = date($c_php_isodate_format, time() + 31536000);
+    $datebegin = of_date_upd_format();
+    $dateexp = of_date_upd_format(time() + 31536000);
 
     $usercomment = $obm["uid"];
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -861,11 +861,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (isset($contract["priority"])) { $priority = $contract["priority"]; }
   if (isset($contract["privacy"])) { $vis = $contract["privacy"]; }
   if (isset($contract["status"])) { $status = $contract["status"]; }
-  if (isset($contract["datebegin"])) { $datebegin = $contract["datebegin"]; }
-  if (isset($contract["dateexp"])) { $dateexp = $contract["dateexp"]; }
-  if (isset($contract["daterenew"])) { $daterenew = $contract["daterenew"]; }
-  if (isset($contract["datecancel"])) { $datecancel = $contract["datecancel"]; }
-  if (isset($contract["datesignature"])) { $datesignature = $contract["datesignature"]; } 
+  if (isset($contract["datebegin"])) { $datebegin = of_date_upd_format($contract["datebegin"]); }
+  if (isset($contract["dateexp"])) { $dateexp = of_date_upd_format($contract["dateexp"]); }
+  if (isset($contract["daterenew"])) { $daterenew = of_date_upd_format($contract["daterenew"]); }
+  if (isset($contract["datecancel"])) { $datecancel = of_date_upd_format($contract["datecancel"]); }
+  if (isset($contract["datesignature"])) { $datesignature = of_date_upd_format($contract["datesignature"]); } 
   if (isset($contract["type"])) { $type_id = $contract["type"]; }
   if (isset($contract["autorenew"])) { $autorenewal = $contract["autorenew"]; }
   if (isset($contract["format"])) { $format = $contract["format"]; }
@@ -880,7 +880,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (isset($contract["comment"])) { $comment = stripslashes($contract["comment"]); }
   if (isset($contract["add_comment"])) { $add_comment = stripslashes($contract["add_comment"]); }
   if (isset($contract["usercomment"])) { $usercomment = $contract["usercomment"]; }
-  if (isset($contract["datecomment"])) { $datecomment = $contract["datecomment"]; }
+  if (isset($contract["datecomment"])) { $datecomment = of_date_upd_format($contract["datecomment"]); }
   if (isset($contract["company"])) { $comp_name = stripslashes($contract["company"]); }
   if (isset($contract["company_ad1"])) { $ad1 = stripslashes($contract["company_ad1"]); }
   if (isset($contract["company_zip"])) { $zip = $contract["company_zip"]; }

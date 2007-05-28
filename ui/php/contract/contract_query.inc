@@ -22,8 +22,8 @@ function run_query_contract_search($contract) {
 
   $label = sql_search_text_parse($contract["label"]);
   $type = $contract["type"];
-  $dateafter = $contract["date_after"];
-  $datebefore = $contract["date_before"];
+  $dateafter = of_isodate_convert($contract["date_after"],true);
+  $datebefore = of_isodate_convert($contract["date_before"],true);
   $comp = sql_search_text_parse($contract["company"]);
   $num = sql_search_text_parse($contract["number"]);
   $manager = $contract["manager"];
@@ -244,10 +244,10 @@ function run_query_contract_insert($contract) {
   $num = $contract["number"];
   $clause = $contract["clause"];
   $datesignature = ($contract["datesignature"] ? "'".$contract["datesignature"]."'" : "null");
-  $datebegin = ($contract["datebegin"] ? "'".$contract["datebegin"]."'" : "null");
-  $dateexp = ($contract["dateexp"] ? "'".$contract["dateexp"]."'" : "null");
-  $daterenew = ($contract["daterenew"] ? "'".$contract["daterenew"]."'" : "null");
-  $datecancel = ($contract["datecancel"] ? "'".$contract["datecancel"]."'" : "null");
+  $datebegin = ($contract["datebegin"] ? "'".of_isodate_convert($contract["datebegin"])."'" : "null");
+  $dateexp = ($contract["dateexp"] ? "'".of_isodate_convert($contract["dateexp"])."'" : "null");
+  $daterenew = ($contract["daterenew"] ? "'".of_isodate_convert($contract["daterenew"])."'" : "null");
+  $datecancel = ($contract["datecancel"] ? "'".of_isodate_convert($contract["datecancel"])."'" : "null");
   $priority = ($contract["priority"] ? $contract["priority"] : "0");
   $status = $contract["status"];
   $contract_kind = $contract["kind"];
@@ -351,11 +351,11 @@ function run_query_contract_update($contract) {
   $id = $contract["contract_id"];
   $num = $contract["number"];
   $label = $contract["label"];
-  $datesignature = ($contract["datesignature"] ? "'".$contract["datesignature"]."'" : "null");
-  $datebegin = ($contract["datebegin"] ? "'".$contract["datebegin"]."'" : "null");
-  $dateexp = ($contract["dateexp"] ? "'".$contract["dateexp"]."'" : "null");
-  $daterenew = ($contract["daterenew"] ? "'".$contract["daterenew"]."'" : "null");
-  $datecancel = ($contract["datecancel"] ? "'".$contract["datecancel"]."'" : "null");
+  $datesignature = ($contract["datesignature"] ? "'".of_isodate_convert($contract["datesignature"])."'" : "null");
+  $datebegin = ($contract["datebegin"] ? "'".of_isodate_convert($contract["datebegin"])."'" : "null");
+  $dateexp = ($contract["dateexp"] ? "'".of_isodate_convert($contract["dateexp"])."'" : "null");
+  $daterenew = ($contract["daterenew"] ? "'".of_isodate_convert($contract["daterenew"])."'" : "null");
+  $datecancel = ($contract["datecancel"] ? "'".of_isodate_convert($contract["datecancel"])."'" : "null");
   $priority = ($contract["priority"] ? $contract["priority"] : "0");
   $status = $contract["status"];
   $contract_kind = $contract["kind"];
@@ -1109,8 +1109,8 @@ function run_query_contract_id($contract) {
   $comp_id = $contract["company_id"];
   $num = $contract["number"];
   $clause = $contract["clause"];
-  $datebegin = $contract["datebegin"];
-  $dateexp = $contract["dateexp"];
+  $datebegin = of_isodate_convert($contract["datebegin"],true);
+  $dateexp = of_isodate_convert($contract["dateexp"],true);
   $priority = $contract["priority"];
   $status = $contract["status"];
   $contract_kind = $contract["kind"];
@@ -1213,10 +1213,10 @@ function check_contract_form($cid, $contract) {
   global $l_err_date, $l_err_daterenew, $l_err_datecancel;
   global $l_date, $l_signature,$l_begin,$l_exp,$l_renew,$l_date_cancel;
 
-  $datebegin = $contract["datebegin"];
-  $dateexp = $contract["dateexp"];
-  $daterenew = $contract["daterenew"];
-  $datecancel = $contract["datecancel"];
+  $datebegin = of_isodate_convert($contract["datebegin"],true);
+  $dateexp = of_isodate_convert($contract["dateexp"],true);
+  $daterenew = of_isodate_convert($contract["daterenew"],true);
+  $datecancel = of_isodate_convert($contract["datecancel"],true);
   $format = $contract["format"];
   $ticket_nb = $contract["ticket_nb"];
   $duration = $contract["duration"];
