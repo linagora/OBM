@@ -58,12 +58,12 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "project_datebegin") {
     $date = $OD->data_set->f($fieldname);
-    $res["name"] = of_date_upd_format($date);
+    $res["name"] = of_date_format($date);
   }
 
   else if ($fieldname == "project_dateend") {
     $date = $OD->data_set->f($fieldname);
-    $res["name"] = of_date_upd_format($date);
+    $res["name"] = of_date_format($date);
   }
 
   return $res;
@@ -107,7 +107,7 @@ function html_project_search_form ($tts, $member_q, $project) {
   $tt = $project["tt"];
   $member = $project["member"];
   $archive = $project["archive"];
-  $date = of_date_upd_format($project["datebegin"]);
+  $date = of_date_upd_format($project["datebegin"],true);
   $company_id = $project["company_id"];
   $deal_id = $project["deal_id"];
 
