@@ -314,6 +314,7 @@ function get_mailshare_info($id="") {
   $obm_q->next_record();
   if (is_array($obm_q->Record)) {
     $m["name"] = $obm_q->f("mailshare_name");
+    $m["delegation"] = $obm_q->f("mailshare_delegation");
     $m["quota"] = $obm_q->f("mailshare_quota");
     $m["email"] = $obm_q->f("mailshare_email");
   }  
@@ -445,6 +446,35 @@ function check_can_delete_mailshare($p_id) {
   $delete_ok = true;
 
   return $delete_ok;
+}
+
+
+/**
+ * check_mailshare_update_rights
+ * Mailshare specific rights checking (eg: delegation)
+ *
+ * @param array $params paramaters hash
+ * @return bool true or false
+ */
+function check_mailshare_update_rights($params) {
+  global $err, $cgp_use, $l_error_delegation;
+
+  $id = $params["mailshare_id"];
+
+  if ($id > 0) {
+
+    // Check if delegation is used
+    if ($cgp_use['property']['delegation']) {
+      $m = get_mailshare_info($id);
+      // Check delegation update right
+      if (! of_delegation_check_update_rights($params, $m['delegation'])) {
+	$err['msg'] .= $l_error_delegation;
+	return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 

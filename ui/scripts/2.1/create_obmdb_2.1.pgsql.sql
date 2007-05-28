@@ -1415,6 +1415,58 @@ CREATE TABLE of_usergroup (
 );
 
 
+--
+-- Table structure for the table 'OrganizationalChart'
+--
+CREATE TABLE OrganizationalChart (
+  organizationalchart_id			      serial,
+  organizationalchart_domain_id     integer default 0,
+  organizationalchart_timeupdate    timestamp,
+  organizationalchart_timecreate		timestamp,
+  organizationalchart_userupdate    integer,
+  organizationalchart_usercreate    integer,
+  organizationalchart_name          varchar(32) not null,
+  organizationalchart_description   varchar(64),
+  organizationalchart_archive       integer not null default 0,
+  PRIMARY KEY (organizationalchart_id)
+);
+
+
+--
+-- Table structure for the table 'OGroup'
+--
+CREATE TABLE OGroup (
+  ogroup_id					               serial,
+  ogroup_domain_id                 integer default 0,
+  ogroup_timeupdate	             	 timestamp,
+  ogroup_timecreate	             	 timestamp,
+  ogroup_userupdate                integer,
+  ogroup_usercreate                integer,
+  ogroup_organizationalchart_id    integer not null,
+  ogroup_parent_id                 integer not null,
+  ogroup_name                      varchar(32) not null,
+  ogroup_level                     varchar(16),
+  PRIMARY KEY (ogroup_id)
+);
+
+
+--
+-- Table structure for the table 'OGroupEntity'
+--
+CREATE TABLE OGroupEntity (
+  ogroupentity_id                  serial,
+  ogroupentity_domain_id           integer default 0,
+  ogroupentity_timeupdate          timestamp,
+  ogroupentity_timecreate          timestamp,
+  ogroupentity_userupdate          integer,
+  ogroupentity_usercreate          integer,
+  ogroupentity_ogroup_id           integer not null,
+  ogroupentity_entity_id           integer not null,
+  ogroupentity_entity              varchar(32) not null,
+  PRIMARY KEY (ogroupentity_id)
+);
+
+
 -------------------------------------------------------------------------------
 -- Import module tables
 -------------------------------------------------------------------------------
@@ -1747,57 +1799,6 @@ CREATE TABLE Updatedlinks (
   PRIMARY KEY (updatedlinks_id)
 );
 
-
---
--- Table structure for the table 'OrganizationalChart'
---
-CREATE TABLE OrganizationalChart (
-  organizationalchart_id			      serial,
-  organizationalchart_domain_id     integer default 0,
-  organizationalchart_timeupdate    timestamp,
-  organizationalchart_timecreate		timestamp,
-  organizationalchart_userupdate    integer,
-  organizationalchart_usercreate    integer,
-  organizationalchart_name          varchar(32) not null,
-  organizationalchart_description   varchar(64),
-  organizationalchart_archive       integer not null default 0,
-  PRIMARY KEY (organizationalchart_id)
-);
-
-
---
--- Table structure for the table 'OGroup'
---
-CREATE TABLE OGroup (
-  ogroup_id					               serial,
-  ogroup_domain_id                 integer default 0,
-  ogroup_timeupdate	             	 timestamp,
-  ogroup_timecreate	             	 timestamp,
-  ogroup_userupdate                integer,
-  ogroup_usercreate                integer,
-  ogroup_organizationalchart_id    integer not null,
-  ogroup_parent_id                 integer not null,
-  ogroup_name                      varchar(32) not null,
-  ogroup_level                     varchar(16),
-  PRIMARY KEY (ogroup_id)
-);
-
-
---
--- Table structure for the table 'OGroupEntity'
---
-CREATE TABLE OGroupEntity (
-  ogroupentity_id                  serial,
-  ogroupentity_domain_id           integer default 0,
-  ogroupentity_timeupdate          timestamp,
-  ogroupentity_timecreate          timestamp,
-  ogroupentity_userupdate          integer,
-  ogroupentity_usercreate          integer,
-  ogroupentity_ogroup_id           integer not null,
-  ogroupentity_entity_id           integer not null,
-  ogroupentity_entity              varchar(32) not null,
-  PRIMARY KEY (ogroupentity_id)
-);
 
 
 COMMIT;

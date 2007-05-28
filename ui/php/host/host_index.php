@@ -39,7 +39,6 @@ update_last_visit("host", $params["host_id"], $action);
 
 page_close();
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,8 +79,12 @@ if ($action == "ext_get_id") {
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_host_detail($params["host_id"]);
-  $display["detail"] = html_host_form($action, $obm_q, $params);
+  if (check_host_update_rights($params)) {
+    $obm_q = run_query_host_detail($params["host_id"]);
+    $display["detail"] = html_host_form($action, $obm_q, $params);
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg']);
+  }
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -208,6 +211,7 @@ function get_host_params() {
   return $params;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Clean up a string coming from a textarea : 
 //  + remove empty lines
@@ -219,24 +223,6 @@ function get_host_params() {
 // Returns:
 //   - The string cleaned up  
 ///////////////////////////////////////////////////////////////////////////////
-// Vieille implementation pas terrible (trop de regexp, pas simple)
-// function cleanup($str) {
-//   //echo "AVANT : <pre>$str<pre>\n";
-//   // Espaces en fin de ligne
-//   $str = preg_replace("/  *\r\n/", "\r\n", $str);
-//   // Espaces en debut de ligne
-//   $str = preg_replace("/\r\n  */", "\r\n", $str);
-//   // Lignes vides
-//   $str = preg_replace("/(\r\n)(\r\n)*/", "\r\n", $str);
-//   // Premiere ligne vide
-//   $str = preg_replace("/^ *\r\n/", '', $str);
-//   // Derniere ligne vide
-//   $str = preg_replace("/ *\r\n$/", '', $str);
-//   //echo "APRES : <pre>$str<pre>";
-//       
-//   return $str;
-// }
-
 function cleanup($str) {
   $result = '';
   $lines = explode("\r\n", $str);
@@ -254,6 +240,7 @@ function cleanup($str) {
   $result = preg_replace("/\r\n$/", '', $result);
   return $result;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Host Action 

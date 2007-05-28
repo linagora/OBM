@@ -706,16 +706,17 @@ function get_group_info($id) {
 	
   $query = "SELECT * FROM UGroup WHERE group_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_group_info()");
+  display_debug_msg($query, $cdg_sql, 'get_group_info()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $g["usercreate"] = $obm_q->f("group_usercreate");
-  $g["name"] = $obm_q->f("group_name");
-  $g["system"] = $obm_q->f("group_system");
-  $g["gid"] = $obm_q->f("group_gid");
-  $g["privacy"] = $obm_q->f("group_privacy");
-  $g["samba"] = $obm_q->f("group_samba");
+  $g['usercreate'] = $obm_q->f('group_usercreate');
+  $g['name'] = $obm_q->f('group_name');
+  $g['system'] = $obm_q->f('group_system');
+  $g['gid'] = $obm_q->f('group_gid');
+  $g['privacy'] = $obm_q->f('group_privacy');
+  $g['samba'] = $obm_q->f('group_samba');
+  $g['delegation'] = $obm_q->f('group_delegation');
 
   return $g;
 }
@@ -729,10 +730,10 @@ function get_group_info($id) {
 // Returns:
 //   - true (if a group exists) or false
 ///////////////////////////////////////////////////////////////////////////////
-function get_group_name_exists($name, $id="") {
+function get_group_name_exists($name, $id='') {
   global $cdg_sql, $obm;
 
-  if ($id != "") {
+  if ($id != '') {
     $where_id = "and group_id!='$id'";
   }
 	
@@ -834,34 +835,44 @@ function check_group_context($id, $group) {
 ///////////////////////////////////////////////////////////////////////////////
 // Group specific rights checking (eg : public group needs write_admin)
 // Parameters:
-//   - $params[] : group values
+//   - $params[] : parameters values
+//   - $g[]      : current group values
 // Returns:
 //   - true if OK, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_group_update_rights($params) {
+function check_group_update_rights($params, $g='') {
   global $actions, $perm, $err, $cright_write_admin;
   global $cg_gid_smb_user, $cg_gid_smb_admin, $l_cant_update_smb_group;
-  global $l_err_public_rights, $l_error_permission;
+  global $l_err_public_rights, $l_error_permission, $l_error_delegation;
 
-  $id = $params["group_id"];
+  $id = $params['group_id'];
   if ($id > 0) {
-    $g = get_group_info($id);
+    // Get current group info if not given
+    if (! is_array($g)) {
+      $g = get_group_info($id);
+    }
+
+    // Check delegation update right
+    if (! of_delegation_check_update_rights($params, $g['delegation'])) {
+      $err['msg'] .= $l_error_delegation;
+      return false;
+    }
 
     // Check update right is set
-    if (! $perm->check_right("group", $actions['group']['update']['Right'])) {
+    if (! $perm->check_right('group', $actions['group']['update']['Right'])) {
       $err['msg'] .= $l_error_permission;
       return false;
     }
 
     // Allow public group handling only if write_admin right
     if (($g['privacy'] != 1)
-	&& (! $perm->check_right("group", $cright_write_admin))) {
+	&& (! $perm->check_right('group', $cright_write_admin))) {
       $err['msg'] .= $l_err_public_rights;
       return false;
     }
   
     // We forbid to update Window system groups
-    $gid = $g["gid"];
+    $gid = $g['gid'];
     if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
       $err['msg'] .= $l_cant_update_smb_group;
       return false;
@@ -891,9 +902,10 @@ function check_group_data_form($group) {
   $desc = $group["desc"];
   $email = $group["email"];
   $priv = $group["privacy"];
-  $lgroup = get_group_info($id);
-  $usercreate = $lgroup["usercreate"];
-  $system = $lgroup["system"];
+  $g = get_group_info($id);
+  $usercreate = $g["usercreate"];
+  $system = $g["system"];
+  $gsamba = $g["samba"];
 
   // MANDATORY: Group name not empty
   if (trim($name) == "") {
@@ -958,10 +970,7 @@ function check_group_data_form($group) {
   }
 
   if ($action == "update") {
-    $g = get_group_info($id);
     // MANDATORY: we do not allow to delete samba perms for a system user
-    $system = $g["system"];
-    $gsamba = $g["samba"];
     if (($system) && ($gsamba == "1") && ($samba != "1")) {
       $err["msg"] = "$l_err_system_samba";
       $err["field"] = "samba";

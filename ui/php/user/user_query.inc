@@ -875,7 +875,7 @@ function run_query_user_delete($p_id) {
   display_debug_msg($query, $cdg_sql, "run_query_user_delete()");
   $retour = $obm_q->query($query);
 
-  // If this mailshare exists in Prod table, Insert it in Deleted table
+  // If this user exists in Prod table, Insert it in Deleted table
   $query = "SELECT userobm_id FROM P_UserObm WHERE userobm_id='$p_id'";
   display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
   $obm_q->query($query);
@@ -1109,6 +1109,7 @@ function check_user_context($p_id, $user) {
 
   // if a user with same name exists, return false
   $co_q = run_query_user_check_user($p_id, $user);
+
   return $co_q;
 }
 
@@ -1143,6 +1144,35 @@ function run_query_user_check_user($p_id, $user) {
   $obm_q->query($query);
 
   return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User specific rights checking (eg : delegation)
+// Parameters:
+//   - $params[] : user values
+// Returns:
+//   - true if OK, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_user_update_rights($params) {
+  global $err, $cgp_use, $l_error_delegation;
+
+  $id = $params["user_id"];
+
+  if ($id > 0) {
+
+    // Check if delegation is used
+    if ($cgp_use['property']['delegation']) {
+      $u = get_user_info($id);
+      // Check delegation update right
+      if (! of_delegation_check_update_rights($params, $u['delegation'])) {
+	$err['msg'] .= $l_error_delegation;
+	return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 

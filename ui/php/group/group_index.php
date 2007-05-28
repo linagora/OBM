@@ -89,8 +89,12 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_group_detail($params["group_id"]);
-  $display["detail"] = html_group_form($action, $obm_q, $params);
+  if (check_group_update_rights($params)) {
+    $obm_q = run_query_group_detail($params["group_id"]);
+    $display["detail"] = html_group_form($action, $obm_q, $params);
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg']);
+  }
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,7 +162,6 @@ if (($action == "index") || ($action == "")) {
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_group_consult($params, $obm["uid"]);
   }
-  //  $display["detail"] = dis_group_warn_delete($params["group_id"]);
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -352,7 +355,6 @@ function get_group_action() {
     'Url'      => "$path/group/group_index.php?action=ext_search",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
-
   );  
 
 // New
@@ -535,21 +537,33 @@ function update_group_action() {
     $actions["group"]["detailconsult"]['Url'] = "$path/group/group_index.php?action=detailconsult&amp;group_id=$id";
     $actions["group"]["detailconsult"]['Condition'][] = 'insert';
 
-    // Detail Update
-    $actions["group"]["detailupdate"]['Url'] = "$path/group/group_index.php?action=detailupdate&amp;group_id=$id";
-    $actions["group"]["detailupdate"]['Condition'][] = 'insert';
+    // If user has update right on the group
+    if (check_group_update_rights($params, $g)) {
 
-    // Check Delete
-    $actions["group"]["check_delete"]['Url'] = "$path/group/group_index.php?action=check_delete&amp;group_id=$id";
-    $actions["group"]["check_delete"]['Condition'][] = 'insert';
+      // Detail Update
+      $actions["group"]["detailupdate"]['Url'] = "$path/group/group_index.php?action=detailupdate&amp;group_id=$id";
+      $actions["group"]["detailupdate"]['Condition'][] = 'insert';
 
-    // Sel User add
-    $actions["group"]["sel_user_add"]['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group";
-    $actions["group"]["sel_user_add"]['Condition'][] = 'insert';
+      // Check Delete
+      $actions["group"]["check_delete"]['Url'] = "$path/group/group_index.php?action=check_delete&amp;group_id=$id";
+      $actions["group"]["check_delete"]['Condition'][] = 'insert';
 
-    // Sel group add : Groups selection
-  $actions["group"]["sel_group_add"]['Url'] = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group&amp;child_res=1";
-    $actions["group"]["sel_group_add"]['Condition'][] = 'insert';
+      // Sel User add
+      $actions["group"]["sel_user_add"]['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group";
+      $actions["group"]["sel_user_add"]['Condition'][] = 'insert';
+
+      // Sel group add : Groups selection
+      $actions["group"]["sel_group_add"]['Url'] = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group&amp;child_res=1";
+      $actions["group"]["sel_group_add"]['Condition'][] = 'insert';
+
+    } else {
+      // User does not have update rights
+      $actions["group"]["detailupdate"]['Condition'] = array('None');
+      $actions["group"]["check_delete"]['Condition'] = array('None');
+      $actions["group"]["sel_user_add"]['Condition'] = array('None');
+      $actions["group"]["sel_group_add"]['Condition'] = array('None');
+    }
+
   }
 }
 

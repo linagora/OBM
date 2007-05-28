@@ -538,7 +538,7 @@ function html_user_consult($obm_q) {
       $dis_delegation_target = "
   <tr>
     <th>$l_delegation_target</th>
-    <td>$tf_delegation_target</td>
+    <td>$delegation_target</td>
   </tr>";
     }
   }

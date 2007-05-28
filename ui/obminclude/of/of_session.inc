@@ -459,7 +459,7 @@ class Perm {
     // If action right not defined or user has not access rights
     if ( ( ($module_right & $action_right) != $action_right)
       || ($action_right == "") ) {
-        if($set_debug == 0) {
+        if ($set_debug == 0) {
           header("location: $path/obm.php?error=perms");
         } else {
           echo "<p>check_perm : ACCESS DENIED action=$action, mod_right=$module_right, ac=$action_right";

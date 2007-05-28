@@ -535,9 +535,14 @@ function of_delegation_dis_block_update($value, $class) {
   $block = "";
   if ($cgp_use['property']['delegation']) {
     $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
+    $delegation = $value;
+
     if (is_array($admin_realm)) {
       if (in_array('delegation', $admin_realm)) {
-	$delegation = $obm['delegation'];
+	// Default to admin target if empty
+	if ($delegation == '') {
+	  $delegation = $obm['delegation'];
+	}
 	$input_delegation = $delegation;
       }
       if (in_array('domain', $admin_realm)) {
@@ -569,13 +574,8 @@ function of_delegation_query_insert_clauses($field, $value) {
 
   $q = array();
   if ($cgp_use['property']['delegation']) {
-    $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
-    if (is_array($admin_realm)) {
-      if (in_array('delegation', $admin_realm)) {
-	$q['field'] = "$field,";
-	$q['value'] = "'$value',";
-      }
-    }
+    $q['field'] = "$field,";
+    $q['value'] = "'$value',";
   }
 
   return $q;
@@ -594,16 +594,49 @@ function of_delegation_query_update_clause($field, $value) {
 
   $q = "";
   if ($cgp_use['property']['delegation']) {
+    $q = ", $field='$value'";
+  }
+
+  return $q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Delegation : Check update rights
+// Parameters:
+//   - $value : value displayed
+// Returns : XHTML consult display block
+///////////////////////////////////////////////////////////////////////////////
+function of_delegation_check_update_rights($params, $current_delegation) {
+  global $obm, $cgp_use, $profiles;
+
+  if ($cgp_use['property']['delegation']) {
+    $id = $params['id'];
+    $action = $params['action'];
+    $delegation = $params['delegation'];
     $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
+
+    // If admin is restricted to his delegation target, check it
     if (is_array($admin_realm)) {
-      if (in_array('delegation', $admin_realm)) {
-	$q = ",
-    $field='$value'";
+      if ((in_array('delegation', $admin_realm))
+	  && (! in_array('domain', $admin_realm))) {
+
+	// Restricted to target delegation
+	if ($current_delegation != $obm['delegation']) {
+	  return false;
+	}
+
+	// Can not update to other delegation
+	if ( (($action == 'insert') || ($action == 'insert'))
+	     && ($delegation != $obm['delegation'])) {
+	  echo "6666";
+	  return false;
+	}
       }
     }
   }
 
-  return $q;
+  return true;
 }
 
 

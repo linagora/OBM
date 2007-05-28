@@ -53,6 +53,20 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
     $display["detail"] = html_tools_update_index();
   }
 
+} elseif ($action == "update_update2")  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_tools_update_context()) {
+    $res = run_query_tools_update_update($params);
+    if ($res == "0") {
+      $display["msg"] .= display_ok_msg($l_upd_ok);
+    } else {
+      $display["msg"] .= display_err_msg("$l_upd_error ($res)");
+    }
+  } else {
+    // Si le contexte ne permet pas une modification de configuration
+    $display["detail"] = html_tools_update_index();
+  }
+
 } elseif ($action == "update_cancel")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_tools_update_context()) {

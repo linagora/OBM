@@ -71,6 +71,7 @@ $l_update_error = "Modifica fallita!";
 $l_delete_ok = "Eliminazione OK";
 $l_delete_error = "Eliminazione fallita!";
 $l_error_permission = "Non hai i permessi di accesso alla pagina.";
+$l_error_delegation = "You are not allowed to update this target";
 $l_error_visibility = "Le informazioni della pagina sono private - Non consultabili";
 $l_color = "Colore";
 $l_phone = "Telefono";

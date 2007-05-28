@@ -97,12 +97,16 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_user_detail($params["user_id"]);
-  if ($obm_q->num_rows() == 1) {
-    $display["detailInfo"] = display_record_info($obm_q);
-    $display["detail"] = html_user_form($obm_q, $params);
+  if (check_user_update_rights($params)) {
+    $obm_q = run_query_user_detail($params["user_id"]);
+    if ($obm_q->num_rows() == 1) {
+      $display["detailInfo"] = display_record_info($obm_q);
+      $display["detail"] = html_user_form($obm_q, $params);
+    } else {
+      $display["msg"] .= display_err_msg($l_err_reference);
+    }
   } else {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display["msg"] .= display_warn_msg($err['msg']);
   }
 
 } elseif ($action == "insert") {

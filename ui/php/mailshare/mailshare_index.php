@@ -80,8 +80,12 @@ if ($action == "ext_get_id") {
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_mailshare_detail($params["mailshare_id"]);
-  $display["detail"] = html_mailshare_form($action, $obm_q, $params);
+  if (check_mailshare_update_rights($params)) {
+    $obm_q = run_query_mailshare_detail($params["mailshare_id"]);
+    $display["detail"] = html_mailshare_form($action, $obm_q, $params);
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg']);
+  }
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////

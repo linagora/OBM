@@ -78,6 +78,7 @@ $l_delete_ok = "Suppression réussie";
 $l_delete_error = "Erreur à la suppression";
 $l_date_inconsistency = "Incohérences de dates";
 $l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
+$l_error_delegation = "Vous n'avez pas la délégation pour cette cible.";
 $l_error_visibility = "Les informations contenues dans la page demandée sont privées. Vous ne pouvez pas y accéder.";
 $l_err_reference = "Erreur de référence. L'entité demandée n'existe pas !";
 $l_err_fill = "Le champ doit être rempli";

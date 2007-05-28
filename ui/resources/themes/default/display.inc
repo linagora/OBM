@@ -251,7 +251,6 @@ function display_actions_theme($section, $module) {
   global $modules, $action;
   global $actions, $perm;
 
-
   if (is_array($actions[$module])) {
     $module_right = $perm->get_module_rights($module); 
     $block = "<ul id=\"action\">"; 

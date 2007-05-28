@@ -21,10 +21,10 @@ $c_focsys = 3;
 // Global parameters --------------------------------------------------------//
 
 // OBM host
-$cgp_host = "http://obmlocal/";
+$cgp_host = 'http://obmlocal/';
 
 // OBM default resources path
-$resources_path = "/images";
+$resources_path = '/images';
 
 // Multidomain
 $c_multidomain = true;
@@ -38,12 +38,12 @@ $popup_height = 480;
 $popup_contact_height = 600;
 
 // Access Keys
-$cak_prev = "P";
-$cak_next = "N";
-$cak_page_prev = "4";
-$cak_page_next = "6";
-$cak_begin = "B";
-$cak_end = "E";
+$cak_prev = 'P';
+$cak_next = 'N';
+$cak_page_prev = '4';
+$cak_page_next = '6';
+$cak_begin = 'B';
+$cak_end = 'E';
 
 // Default domain id
 $c_default_domain = 1;
@@ -64,10 +64,10 @@ $cgp_sql_star = true;
 $ctu_sql_limit = false;
 
 // MySQL (only 4.1+) charset used (for database and files !)
-//$cmy_character_set = "_latin1";
+//$cmy_character_set = '_latin1';
 
 // MySQL (only 4.1+) charset collation used (for database and files !)
-//$cmy_charset_collation = "latin1_general_ci";
+//$cmy_charset_collation = 'latin1_general_ci';
 
 // is Mail enabled (is a mail server configured for OBM)
 $cgp_mail_enabled = false;
@@ -82,15 +82,15 @@ $cs_lifetime = 7200;
 $cgp_sess_db = false;
 
 // Cookie name and domain
-$cgp_cookie_name = "OBM_Session";
-$cgp_cookie_domain = "aliasource.local";
+$cgp_cookie_name = 'OBM_Session';
+$cgp_cookie_domain = 'aliasource.local';
 
 // authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
 // CAS specific parameters are in conf/obm_conf.inc.
-$auth_kind = "standalone"; 
+$auth_kind = 'standalone'; 
 
-// Encyption used to store password : "PLAIN", "MD5" or "CRYPT"
-$password_encryption = "PLAIN";
+// Encyption used to store password : 'PLAIN', 'MD5' or 'CRYPT'
+$password_encryption = 'PLAIN';
 
 // Handle connectors data
 $c_use_connectors = true;
@@ -115,12 +115,12 @@ $ccalendar_public_groups = true;
 // Calendar : First day of the week
 $phpversion = substr(phpversion(),0,1);
 if ($phpversion >= 5) {
-  $ccalendar_weekstart = "monday";
+  $ccalendar_weekstart = 'monday';
 } else {
-  $ccalendar_weekstart = "monday + 2 hours"; // +2h to fix a DST php4 bug //
+  $ccalendar_weekstart = 'monday + 2 hours'; // +2h to fix a DST php4 bug //
 }
 // Calendar : First day of the week (+2h to fix a DST php bug)
-//$ccalendar_weekstart = "monday + 2 hours";
+//$ccalendar_weekstart = 'monday + 2 hours';
 // Calendar max user displayed in the calendar
 $ccalendar_max_users = 25;
 // Calendar first and last hour display
@@ -139,31 +139,31 @@ $c_working_days = array(0,1,1,1,1,1,0);
 $c_week_first_day = 1;
 
 // Incident : Generic E-mail for Incident module
-$cmail_incident = "";
+$cmail_incident = '';
 
 // Document : constants
-$cdocument_root = "/var/www/docs";           // Root of the document repository
-$default_path = "/Default";                  // Default directory
-$default_mime = "application/octet-stream";  // Default Mime Type
+$cdocument_root = '/var/www/docs';           // Root of the document repository
+$default_path = '/Default';                  // Default directory
+$default_mime = 'application/octet-stream';  // Default Mime Type
 
 // Group : is a new group private by default
 $cgroup_private_default = true;
 
 // Import : temporary path
-$tmp_path = "/tmp";
+$tmp_path = '/tmp';
 
 // default taxes values
-$cdefault_tax = array ("TVA 19,6" => 1.196, "TVA 5,5" => 1.055, "Pas de TVA" => 1);
+$cdefault_tax = array ('TVA 19,6' => 1.196, 'TVA 5,5' => 1.055, 'Pas de TVA' => 1);
 
 // Imagetype constants
-$c_imagetype = array("1" => "GIF",
-                     "2" => "JPEG",
-                     "3" => "PNG");
+$c_imagetype = array('1' => 'GIF',
+                     '2' => 'JPEG',
+                     '3' => 'PNG');
 
 // Max image size
-$c_max_image_size = array("width" => "96",
-                          "height" => "96",
-                          "size" => "100000");
+$c_max_image_size = array('width' => '96',
+                          'height' => '96',
+                          'size' => '100000');
 
 //---------------------------------------------------------------------------//
 // Default access rights bits meanings
@@ -182,15 +182,15 @@ $cright_write_admin = 16;
 // user   : 03 (bits 0+1) : can see data + insert or update his own data
 // editor : 05 (bits 0+2) : can see data + write data
 // admin  : 1D (bits 0+2+3+4) : can do everything
-$perm_reader = "01";
-$perm_user = "03";
-$perm_editor = "05";
-$perm_admin = "1D";
+$perm_reader = '01';
+$perm_user = '03';
+$perm_editor = '05';
+$perm_admin = '1D';
 
 //------------------------------//
 // Default Profiles definitions //
 //------------------------------//
-$profiles["user"] = array (
+$profiles['user'] = array (
   'section' => array (
     'default' => 0,
     'com' => 1,
@@ -201,7 +201,7 @@ $profiles["user"] = array (
     'default' => $perm_user)
 );
 
-$profiles["editor"] = array (
+$profiles['editor'] = array (
   'section' => array (
     'default' => 0,
     'com' => 1,
@@ -212,7 +212,7 @@ $profiles["editor"] = array (
     'default' => $perm_editor)
 );
 
-$profiles["admin"] = array (
+$profiles['admin'] = array (
   'section' => array (
     'default' => 1),
   'module' => array (
@@ -224,62 +224,62 @@ $profiles["admin"] = array (
 // Default Displayed Infos //
 //-------------------------//
 // sections -- Urls
-$cgp_show["section"]["com"]["url"] = "$path/company/company_index.php";
-$cgp_show["section"]["prod"]["url"] = "$path/time/time_index.php";
-$cgp_show["section"]["compta"]["url"] = "$path/invoice/invoice_index.php";
-$cgp_show["section"]["user"]["url"] = "$path/settings/settings_index.php";
-$cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
-$cgp_show["section"]["dic"]["url"] = "$path/admin_ref/admin_ref_index.php?mode=html";
-$cgp_show["section"]["my"]["url"] = "$path/settings/settings_index.php";
-//$cgp_show["section"]["aliamin"]["url"] = "http://aliamin/";
+$cgp_show['section']['com']['url'] = "$path/company/company_index.php";
+$cgp_show['section']['prod']['url'] = "$path/time/time_index.php";
+$cgp_show['section']['compta']['url'] = "$path/invoice/invoice_index.php";
+$cgp_show['section']['user']['url'] = "$path/settings/settings_index.php";
+$cgp_show['section']['admin']['url'] = "$path/admin/admin_index.php?mode=html";
+$cgp_show['section']['dic']['url'] = "$path/admin_ref/admin_ref_index.php?mode=html";
+$cgp_show['section']['my']['url'] = "$path/settings/settings_index.php";
+//$cgp_show['section']['aliamin']['url'] = "http://aliamin/";
 
 // modules
-$cgp_show["module"]["company"] = "com";
-$cgp_show["module"]["contact"] = "com";
-$cgp_show["module"]["lead"] = "com";
-$cgp_show["module"]["deal"] = "com";
-$cgp_show["module"]["list"] = "com";
-$cgp_show["module"]["calendar"] = "com";
-$cgp_show["module"]["cv"] = "false";
-$cgp_show["module"]["todo"] = "com";
-$cgp_show["module"]["publication"] = "com";
-$cgp_show["module"]["statistic"] = "com";
-$cgp_show["module"]["time"] = "prod";
-$cgp_show["module"]["project"] = "prod";
-$cgp_show["module"]["contract"] = "prod";
-$cgp_show["module"]["incident"] = "prod";
-$cgp_show["module"]["document"] = "prod";
-$cgp_show["module"]["invoice"] = "compta";
-$cgp_show["module"]["payment"] = "compta";
-$cgp_show["module"]["account"] = "compta";
-$cgp_show["module"]["user"] = "user";
-$cgp_show["module"]["group"] = "user";
-$cgp_show["module"]["resource"] = "user";
-$cgp_show["module"]["resourcegroup"] = "user";
-$cgp_show["module"]["host"] = "user";
-$cgp_show["module"]["mailshare"] = "user";
-$cgp_show["module"]["organizationalchart"] = "user";
-$cgp_show["module"]["tools"] = "admin";
-$cgp_show["module"]["control"] = "admin";
-$cgp_show["module"]["admin"] = "admin";
-$cgp_show["module"]["import"] = "admin";
-$cgp_show["module"]["backup"] = "admin";
-$cgp_show["module"]["mailserver"] = "admin";
-$cgp_show["module"]["samba"] = "admin";
-$cgp_show["module"]["admin_pref"] = "dic";
-$cgp_show["module"]["admin_data"] = "dic";
-$cgp_show["module"]["admin_lang"] = "dic";
-$cgp_show["module"]["admin_code"] = "dic";
-$cgp_show["module"]["admin_ref"] = "dic";
-$cgp_show["module"]["settings"] = "my";
-$cgp_show["module"]["password"] = "my";
-$cgp_show["module"]["mailforward"] = "my";
-$cgp_show["module"]["vacation"] = "my";
-$cgp_show["module"]["mailbox"] = "my";
+$cgp_show['module']['company'] = 'com';
+$cgp_show['module']['contact'] = 'com';
+$cgp_show['module']['lead'] = 'com';
+$cgp_show['module']['deal'] = 'com';
+$cgp_show['module']['list'] = 'com';
+$cgp_show['module']['calendar'] = 'com';
+$cgp_show['module']['cv'] = 'false';
+$cgp_show['module']['todo'] = 'com';
+$cgp_show['module']['publication'] = 'com';
+$cgp_show['module']['statistic'] = 'com';
+$cgp_show['module']['time'] = 'prod';
+$cgp_show['module']['project'] = 'prod';
+$cgp_show['module']['contract'] = 'prod';
+$cgp_show['module']['incident'] = 'prod';
+$cgp_show['module']['document'] = 'prod';
+$cgp_show['module']['invoice'] = 'compta';
+$cgp_show['module']['payment'] = 'compta';
+$cgp_show['module']['account'] = 'compta';
+$cgp_show['module']['user'] = 'user';
+$cgp_show['module']['group'] = 'user';
+$cgp_show['module']['resource'] = 'user';
+$cgp_show['module']['resourcegroup'] = 'user';
+$cgp_show['module']['host'] = 'user';
+$cgp_show['module']['mailshare'] = 'user';
+$cgp_show['module']['organizationalchart'] = 'user';
+$cgp_show['module']['tools'] = 'admin';
+$cgp_show['module']['control'] = 'admin';
+$cgp_show['module']['admin'] = 'admin';
+$cgp_show['module']['import'] = 'admin';
+$cgp_show['module']['backup'] = 'admin';
+$cgp_show['module']['mailserver'] = 'admin';
+$cgp_show['module']['samba'] = 'admin';
+$cgp_show['module']['admin_pref'] = 'dic';
+$cgp_show['module']['admin_data'] = 'dic';
+$cgp_show['module']['admin_lang'] = 'dic';
+$cgp_show['module']['admin_code'] = 'dic';
+$cgp_show['module']['admin_ref'] = 'dic';
+$cgp_show['module']['settings'] = 'my';
+$cgp_show['module']['password'] = 'my';
+$cgp_show['module']['mailforward'] = 'my';
+$cgp_show['module']['vacation'] = 'my';
+$cgp_show['module']['mailbox'] = 'my';
 
 // Display domain module only when multidomain is activate
 if ($c_multidomain) {
-  $cgp_show["module"]["domain"] = "admin";
+  $cgp_show['module']['domain'] = 'admin';
 }
 
 // OBM-LDAP, OBM-Mail, OBM-Windows values
@@ -287,15 +287,15 @@ if ($c_multidomain) {
 //------------------//
 // Services enabled //
 //------------------//
-$cgp_use["service"]["web"] = false;
-$cgp_use["service"]["mail"] = false;
-$cgp_use["service"]["mail_nomad"] = false;
-$cgp_use["service"]["mail_vacation"] = false;
-$cgp_use["service"]["samba"] = false;
-$cgp_use["service"]["ldap"] = false;
-$cgp_use["service"]["dns"] = false;
-$cgp_use["service"]["firewall"] = false;
-$cgp_use["service"]["network"]  = false;
+$cgp_use['service']['web'] = false;
+$cgp_use['service']['mail'] = false;
+$cgp_use['service']['mail_nomad'] = false;
+$cgp_use['service']['mail_vacation'] = false;
+$cgp_use['service']['samba'] = false;
+$cgp_use['service']['ldap'] = false;
+$cgp_use['service']['dns'] = false;
+$cgp_use['service']['firewall'] = false;
+$cgp_use['service']['network']  = false;
 	   
 // UID : First User
 $c_first_uid = 1001;
@@ -321,20 +321,20 @@ $cg_gid_smb_host = 515;
 
 $ini_array = parse_ini_file("$path/../conf/obm_conf.ini");
 
-$obmdb_host = $ini_array["host"];
-$obmdb_dbtype = $ini_array["dbtype"]; 
-$obmdb_db = $ini_array["db"];
-$obmdb_user = $ini_array["user"];
-$obmdb_password = $ini_array["password"];
+$obmdb_host = $ini_array['host'];
+$obmdb_dbtype = $ini_array['dbtype']; 
+$obmdb_db = $ini_array['db'];
+$obmdb_user = $ini_array['user'];
+$obmdb_password = $ini_array['password'];
 
 ///////////////////////////////////////////////////////////////////////////////
 // Fin du chargement
 ///////////////////////////////////////////////////////////////////////////////
 
-require_once("conf/obm_conf.inc");
+require_once('conf/obm_conf.inc');
 require_once("$obminclude/phplib/obmlib.inc");
 
-define("C_IMAGE_PATH",$cgp_host."images");
+define('C_IMAGE_PATH',$cgp_host.'images');
 
 // Update password encryptation in uppercase
 $password_encryption = strtoupper($password_encryption);
@@ -349,76 +349,76 @@ $cmd_mailforward = "../$path/auto/mailChangeSieve.pl";
 $cmd_vacation = "../$path/auto/mailChangeSieve.pl";
 $cmd_ldap_passwd = "../$path/auto/ldapChangePasswd.pl";
 
-$section = $cgp_show["module"][$module];
+$section = $cgp_show['module'][$module];
 
 //-----------------------------//
 // Calculated Enabled services //
 //-----------------------------//
-if (! $cgp_use["service"]["mail"]) {
-  $cgp_use["service"]["mail_nomad"] = false;
-  $cgp_use["service"]["mail_vacation"] = false;
-  $cgp_show["module"]["mailserver"] = false;
-  $cgp_show["module"]["mailforward"] = false;
-  $cgp_show["module"]["vacation"] = false;
-  $cgp_show["module"]["mailshare"] = false;
-  $cgp_show["module"]["mailbox"] = false;
+if (! $cgp_use['service']['mail']) {
+  $cgp_use['service']['mail_nomad'] = false;
+  $cgp_use['service']['mail_vacation'] = false;
+  $cgp_show['module']['mailserver'] = false;
+  $cgp_show['module']['mailforward'] = false;
+  $cgp_show['module']['vacation'] = false;
+  $cgp_show['module']['mailshare'] = false;
+  $cgp_show['module']['mailbox'] = false;
 }
 
-if (! $cgp_use["service"]["samba"]) {
-  $cgp_show["module"]["samba"] = false;
+if (! $cgp_use['service']['samba']) {
+  $cgp_show['module']['samba'] = false;
 }
 
-if ((! $cgp_use["service"]["mail"]) && (! $cgp_use["service"]["samba"])) {
-  $cgp_show["module"]["host"] = false;
+if ((! $cgp_use['service']['mail']) && (! $cgp_use['service']['samba'])) {
+  $cgp_show['module']['host'] = false;
 }
 
 //----------------------------//
 // Calculated Displayed Infos //
 //----------------------------//
-if (! $cgp_show["module"]["company"]) {
-  $cgp_show["module"]["deal"] = false;
-  $cgp_show["module"]["project"] = false;
-  $cgp_show["module"]["contract"] = false;
-  $cgp_show["module"]["invoice"] = false;
+if (! $cgp_show['module']['company']) {
+  $cgp_show['module']['deal'] = false;
+  $cgp_show['module']['project'] = false;
+  $cgp_show['module']['contract'] = false;
+  $cgp_show['module']['invoice'] = false;
 }
 
-if (! $cgp_show["module"]["contact"]) {
-  $cgp_show["module"]["list"] = false;
-  $cgp_hide["company"]["company_contact_number"] = true;
-  $cgp_hide["company"]["company_new_contact"] = true;
+if (! $cgp_show['module']['contact']) {
+  $cgp_show['module']['list'] = false;
+  $cgp_hide['company']['company_contact_number'] = true;
+  $cgp_hide['company']['company_new_contact'] = true;
 }
 
-if (! $cgp_show["module"]["project"]) {
-  $cgp_show["module"]["time"] = false;
+if (! $cgp_show['module']['project']) {
+  $cgp_show['module']['time'] = false;
 }
 
-if (! $cgp_show["module"]["contract"]) {
-  $cgp_show["module"]["incident"] = false;
+if (! $cgp_show['module']['contract']) {
+  $cgp_show['module']['incident'] = false;
 }
 
-if (! $cgp_show["module"]["invoice"]) {
-  $cgp_show["module"]["payment"] = false;
+if (! $cgp_show['module']['invoice']) {
+  $cgp_show['module']['payment'] = false;
 }
 
-if (! $cgp_show["module"]["deal"]) {
-  $cgp_hide["company"]["company_deal_number"] = true;
+if (! $cgp_show['module']['deal']) {
+  $cgp_hide['company']['company_deal_number'] = true;
 }
 
-if ($cgp_hide["company"]["company_address3"]) {
-  $cgp_hide["contact"]["contact_address3"] = true;
-  $cgp_hide["list_contact"]["address3"] = true;
-  $cgp_hide["list_contact_2"]["address3"] = true;
+if ($cgp_hide['company']['company_address3']) {
+  $cgp_hide['contact']['contact_address3'] = true;
+  $cgp_hide['list_contact']['address3'] = true;
+  $cgp_hide['list_contact_2']['address3'] = true;
 }
 
-if ($cgp_hide["company"]["company_expresspostal"]) {
-  $cgp_hide["contact"]["contact_expresspostal"] = true;
-  $cgp_hide["list_contact"]["expresspostal"] = true;
-  $cgp_hide["list_contact_2"]["expresspostal"] = true;
+if ($cgp_hide['company']['company_expresspostal']) {
+  $cgp_hide['contact']['contact_expresspostal'] = true;
+  $cgp_hide['list_contact']['expresspostal'] = true;
+  $cgp_hide['list_contact_2']['expresspostal'] = true;
 }
 
-if ($cgp_hide["contact"]["function"]) {
-  $cgp_hide["list_contact"]["function"] = true;
-  $cgp_hide["list_contact_2"]["function"] = true;
+if ($cgp_hide['contact']['function']) {
+  $cgp_hide['list_contact']['function'] = true;
+  $cgp_hide['list_contact_2']['function'] = true;
 }
 
 // Determine if delegation is used
@@ -427,6 +427,7 @@ foreach ($profiles as $one_pro) {
   if (is_array($one_pro['properties']['admin_realm'])) {
     if (in_array('delegation', $one_pro['properties']['admin_realm'])) {
       $cgp_use['property']['delegation'] = true;
+      break;
     }
   }
 }
@@ -443,13 +444,13 @@ if (! $cgp_use['property']['delegation']) {
 // OBM authentication Management : 
 // Just change $cas_version according to your phpCAS lib
 //---------------------------------------------------------------------------//
-if ($auth_kind == "CAS") {
-  $auth_class_name = "CAS_Auth";
-} elseif ($auth_kind == "standalone") {
-  $auth_class_name = "OBM_Challenge_Auth";
+if ($auth_kind == 'CAS') {
+  $auth_class_name = 'CAS_Auth';
+} elseif ($auth_kind == 'standalone') {
+  $auth_class_name = 'OBM_Challenge_Auth';
 } else {
-  echo "unknown Authentication kind !<br/>";
-  echo "please edit \$auth_kind in conf/obm_conf.inc";
+  echo 'unknown Authentication kind !<br/>';
+  echo 'please edit $auth_kind in conf/obm_conf.inc';
   exit;
 }
 
@@ -458,16 +459,16 @@ if ($auth_kind == "CAS") {
 //---------------------------------------------------------------------------//
 
 // Global Constants
-$c_all = "_ALL_";           // Used in Form select
+$c_all = '_ALL_';           // Used in Form select
 $c_all_f = $c_all;
-$c_undef = "0";             // Used in Form select
-$c_none = "-1";             // Used in Form select
-$c_null = "NULL";           // Used in queries (date is null)
-$c_auto = "_AUTO_";
-$c_yes = "Yes";	            // Maybe stored in database
-$c_no = "No";
-$c_public = "__PUBLIC__";
-$c_private = "__PRIVATE__";
+$c_undef = '0';             // Used in Form select
+$c_none = '-1';             // Used in Form select
+$c_null = 'NULL';           // Used in queries (date is null)
+$c_auto = '_AUTO_';
+$c_yes = 'Yes';	            // Maybe stored in database
+$c_no = 'No';
+$c_public = '__PUBLIC__';
+$c_private = '__PRIVATE__';
 
 // Debug Constants
 $cdg_id = 1;     // id display
@@ -477,40 +478,40 @@ $cdg_sql = 8;    // sql query display
 $cdg_exe = 16;   // program execution
 
 // Date constants
-$c_php_isodate_format = "Y-m-d";  // AAAA-MM-JJ iso format for php date()
-$c_php_isodatetime_format = "Y-m-d H:i:s";  // AAAA-MM-JJ H:m:s iso format
-$cda_iso = "Y-m-d"; // Iso format
-$cda_en = "m/d/Y";  // us format
-$cda_fr = "d/m/Y";  // fr format
-$cda_txt = "d M Y"; // txt format
+$c_php_isodate_format = 'Y-m-d';  // AAAA-MM-JJ iso format for php date()
+$c_php_isodatetime_format = 'Y-m-d H:i:s';  // AAAA-MM-JJ H:m:s iso format
+$cda_iso = 'Y-m-d'; // Iso format
+$cda_en = 'm/d/Y';  // us format
+$cda_fr = 'd/m/Y';  // fr format
+$cda_txt = 'd M Y'; // txt format
 
-$cda_upd_dmy = "dmy";  // day month year format
-$cda_upd_mdy = "mdy"; // month day year format
+$cda_upd_dmy = 'dmy';  // day month year format
+$cda_upd_mdy = 'mdy'; // month day year format
 
 // Menu display options constants
-$cme_txt = "text";  // text
-$cme_ico = "icon";  // icon
-$cme_both = "both"; // both
+$cme_txt = 'text';  // text
+$cme_ico = 'icon';  // icon
+$cme_both = 'both'; // both
 
 // Comment dislay order
 $cco_chro = 0; // Chronological
 $cco_rev = 1;  // Reverse
 
 // Export delimiter constants
-$ccsvd_sc = ";";    // Semi-colon
-$ccsvd_tab = "tab"; // Tab
+$ccsvd_sc = ';';    // Semi-colon
+$ccsvd_tab = 'tab'; // Tab
 
 // Todo sort order options constants
-$cts_pri = "todo_priority";  // Priority
-$cts_dead = "todo_deadline"; // Deadline
+$cts_pri = 'todo_priority';  // Priority
+$cts_dead = 'todo_deadline'; // Deadline
 
 // Calendar Interval display constant
 $ccal_4 = 4;  // 1/4 h
 $ccal_2 = 2;  // 1/2 h
 $ccal_1 = 1;  // 1 h
-$l_cal_4 = "1/4";  // 1/4 h
-$l_cal_2 = "1/2";  // 1/2 h
-$l_cal_1 = "1";    // 1 h
+$l_cal_4 = '1/4';  // 1/4 h
+$l_cal_2 = '1/2';  // 1/2 h
+$l_cal_1 = '1';    // 1 h
 
 // List modes
 $clist_mode_normal = 0;
@@ -548,18 +549,18 @@ $cdoc_kind_file = 1;
 $cdoc_kind_link = 2;
 
 // Perms XXXXX Deprecated : to be removed
-$perms_user = "user";
-$perms_editor = "editor";
-$perms_admin = "admin";
+$perms_user = 'user';
+$perms_editor = 'editor';
+$perms_admin = 'admin';
 
 // DST (Daily Saving Time) correction to avoid dates problems (2h)
 $c_dst_err = 7200;
 
 // Default preferences data
-$set_lang_default = "en";
-$set_theme_default = "default";
+$set_lang_default = 'en';
+$set_theme_default = 'default';
 $set_menu_default = $cme_both;
-$set_display_default = "no";
+$set_display_default = 'no';
 $set_rows_default = 10;
 $set_todo_default = 'todo_priority';
 $set_date_upd_default = $cda_dmy;
