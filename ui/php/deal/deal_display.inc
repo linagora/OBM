@@ -286,8 +286,8 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
   $status = $deal["status_id"];
   $manager = $deal["manager"];
   $date_field = ($deal["date_field"] ? $deal["date_field"] : "datealarm");
-  $date_after = stripslashes($deal["date_after"]);
-  $date_before = stripslashes($deal["date_before"]);
+  $date_after = of_date_upd_format(stripslashes($deal["date_after"]),true);
+  $date_before = of_date_upd_format(stripslashes($deal["date_before"]),true);
   $company_id = $deal["company_id"];
   $role_company = $deal["role_company"];
 
@@ -401,10 +401,10 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
       </select>
     </label>
     <label>$l_after<br />
-      <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
+      <input type=\"text\" name=\"tf_date_after\" value=\"$date_after\" class=\"datePicker\"/>
     </label>
     <label>$l_before<br />
-     <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
+     <input type=\"text\" name=\"tf_date_before\" value=\"$date_before\" class=\"datePicker\"/>
     </label>
     <label>$l_kind<br />
       $sel_kind
@@ -1105,11 +1105,11 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
     $usercreate = $deal_q->f("deal_usercreate");
     $label = $deal_q->f("deal_label");
     $num = $deal_q->f("deal_number");
-    $datebegin = of_isodate_format($deal_q->f("datebegin"), 1);
-    $dateend = of_isodate_format($deal_q->f("dateend"), 1);
-    $dateprop = of_isodate_format($deal_q->f("dateproposal"), 1);
-    $dateexpected = of_isodate_format($deal_q->f("dateexpected"), 1);
-    $datealarm = of_isodate_format($deal_q->f("datealarm"), 1);
+    $datebegin = of_date_upd_format($deal_q->f("datebegin"), true);
+    $dateend = of_date_upd_format($deal_q->f("dateend"), true);
+    $dateprop = of_date_upd_format($deal_q->f("dateproposal"), true);
+    $dateexpected = of_date_upd_format($deal_q->f("dateexpected"), true);
+    $datealarm = of_date_upd_format($deal_q->f("datealarm"), true);
     $kind = $deal_q->f("deal_type_id");
     $region = $deal_q->f("deal_region_id");
     $tt = $deal_q->f("deal_tasktype_id");
@@ -1128,7 +1128,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
     $todo = $deal_q->f("deal_todo");
     $comment = $deal_q->f("deal_comment");
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
     $comp = $deal_q->f("company_name");
     $ad1 = $deal_q->f("company_address1");
     $zip = $deal_q->f("company_zipcode");
@@ -1140,9 +1140,9 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
     $town = $comp_q->f("company_town");
     $market = $comp_q->f("company_marketingmanager_id");
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
     // We pre-fill datebegin and datealarm with current date
-    $datebegin = date($c_php_isodate_format); 
+    $datebegin = of_date_upd_format(); 
     $datealarm = $datebegin;
   }
 
@@ -1153,11 +1153,11 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   if (isset($deal["num"])) { $num = stripslashes($deal["num"]); }
   if (isset($deal["label"])) { $label = stripslashes($deal["label"]); }
   if (isset($deal["privacy"])) { $priv = $deal["privacy"]; }
-  if (isset($deal["datebegin"])) { $datebegin = stripslashes($deal["datebegin"]); }
-  if (isset($deal["dateend"])) { $dateend = stripslashes($deal["dateend"]); }
-  if (isset($deal["dateproposal"])) { $dateprop = stripslashes($deal["dateproposal"]); }
-  if (isset($deal["dateexpected"])) { $dateexpected = stripslashes($deal["dateexpected"]); }
-  if (isset($deal["datealarm"])) { $datealarm = stripslashes($deal["datealarm"]); }
+  if (isset($deal["datebegin"])) { $datebegin = of_date_upd_format(stripslashes($deal["datebegin"]),true); }
+  if (isset($deal["dateend"])) { $dateend = of_date_upd_format(stripslashes($deal["dateend"]),true); }
+  if (isset($deal["dateproposal"])) { $dateprop = of_date_upd_format(stripslashes($deal["dateproposal"]),true); }
+  if (isset($deal["dateexpected"])) { $dateexpected = of_date_upd_format(stripslashes($deal["dateexpected"]),true); }
+  if (isset($deal["datealarm"])) { $datealarm = of_date_upd_format(stripslashes($deal["datealarm"]),true); }
   if (isset($deal["kind"])) { $kind = $deal["kind"]; }
   if (isset($deal["region"])) { $region = $deal["region"]; }
   if (isset($deal["tasktype"])) { $tt = $deal["tasktype"]; }
@@ -1177,7 +1177,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   if (isset($deal["comment"])) { $comment = stripslashes($deal["comment"]); }
   if (isset($deal["add_comment"])) { $add_comment = stripslashes($deal["add_comment"]); }
   if (isset($deal["usercomment"])) { $usercomment = $deal["usercomment"]; }
-  if (isset($deal["datecomment"])) { $datecomment = $deal["datecomment"]; }
+  if (isset($deal["datecomment"])) { $datecomment = of_date_upd_format($deal["datecomment"]); }
   if (isset($deal["mail_comment"])) { $mail_comment = $deal["mail_comment"]; }
   if (isset($deal["company_name"])) { $comp = stripslashes($deal["company_name"]); }
   if (isset($deal["company_ad1"])) { $ad1 = stripslashes($deal["company_ad1"]); }
@@ -1337,8 +1337,9 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
     $sel_status .= ">$slabel</option>\n";
   }
   $sel_status .= "</select>";
-
-  $sta_q->seek(0);
+  if($sta_q->nf() > 0) {
+    $sta_q->seek(0);
+  }
   while ($sta_q->next_record()) {
     $sid = $sta_q->f("dealstatus_id");
     $shitrate = $sta_q->f("dealstatus_hitrate");
@@ -1636,29 +1637,29 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
 
   // if update mode and first time, values are taken from db
   if ($action == "quick_detail") {
-    $dateexp = of_isodate_format($deal_q->f("dateexpected"), 1);
-    $datealarm = of_isodate_format($deal_q->f("datealarm"), 1);
+    $dateexp = of_date_upd_format($deal_q->f("dateexpected"), true);
+    $datealarm = of_date_upd_format($deal_q->f("datealarm"), true);
     $status = $deal_q->f("deal_status_id");
     $hitrate = $deal_q->f("deal_hitrate");
     $todo = $deal_q->f("deal_todo");
     $comment = $deal_q->f("deal_comment");
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
   } elseif ($action == "quick_update") {
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($deal["datealarm"])) { $datealarm = stripslashes($deal["datealarm"]); }
-  if (isset($deal["dateexpected"])) { $dateexp = stripslashes($deal["dateexpected"]); }
+  if (isset($deal["datealarm"])) { $datealarm = of_date_upd_format(stripslashes($deal["datealarm"])); }
+  if (isset($deal["dateexpected"])) { $dateexp = of_date_upd_format(stripslashes($deal["dateexpected"])); }
   if (isset($deal["status_id"])) { $status = $deal["status_id"]; }
   if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
   if (isset($deal["todo"])) { $todo = stripslashes($deal["todo"]); }
   if (isset($deal["comment"])) { $comment = stripslashes($deal["comment"]); }
   if (isset($deal["add_comment"])) { $add_comment = stripslashes($deal["add_comment"]); }
   if (isset($deal["usercomment"])) { $usercomment = $deal["usercomment"]; }
-  if (isset($deal["datecomment"])) { $datecomment = $deal["datecomment"]; }
+  if (isset($deal["datecomment"])) { $datecomment = of_date_upd_format($deal["datecomment"]); }
   if (isset($deal["mail_comment"])) { $mail_comment = $deal["mail_comment"]; }
  
   // status select construction
@@ -1671,16 +1672,17 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
     $sel_status .= ">$slabel</option>\n";
   }
   $sel_status .= "</select>";
-
-  $sta_q->seek(0);
-  while ($sta_q->next_record()) {
-    $sid = $sta_q->f("dealstatus_id");
-    $shitrate = $sta_q->f("dealstatus_hitrate");
-    if (($shitrate != "") && (($shitrate >= 0) && ($shitrate <= 100))) {
-      $js_status_loop .= "
-        if (select.options[pos].value == $sid) {
-          targetField.value = $shitrate;
-        }";
+  if($sta->nf() > 0) {
+    $sta_q->seek(0);
+    while ($sta_q->next_record()) {
+      $sid = $sta_q->f("dealstatus_id");
+      $shitrate = $sta_q->f("dealstatus_hitrate");
+      if (($shitrate != "") && (($shitrate >= 0) && ($shitrate <= 100))) {
+        $js_status_loop .= "
+          if (select.options[pos].value == $sid) {
+            targetField.value = $shitrate;
+          }";
+      }
     }
   }
 
@@ -2913,7 +2915,7 @@ function html_deal_parentdeal_search_list($obm_q, $prefs, $nb_parentdeals, $deal
   $parentdeal_d->data_set = $obm_q;
   $parentdeal_d->data_url = $url;
   $parentdeal_d->data_header = "both";
-  $parentdeal_d->data_idfield = "parentdeal_id"; 
+  $parentdeal_d->data_idfield = "parentdeal_id";
   $parentdeal_d->data_set->seek($first_row);
   $block = $parentdeal_d->display("dis_data_deal");
 
@@ -2977,8 +2979,8 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   $pmarket_name = $parent_q->f("lname1") . " " . $parent_q->f("fname1");
   $ptech_name = $parent_q->f("lname2") . " " . $parent_q->f("fname2");
   $p_status = get_deal_parent_status($parent);
-  $p_dateproposal = get_deal_parent_dateproposal($parent);
-  $p_datealarm = get_deal_parent_datealarm($parent);
+  $p_dateproposal = of_date_format(get_deal_parent_dateproposal($parent));
+  $p_datealarm = of_date_format(get_deal_parent_datealarm($parent));
   $p_expense = get_deal_parent_expense($parent);
   $p_income = get_deal_parent_income($parent);
   $p_potential = get_deal_parent_potential($parent);
@@ -3062,7 +3064,7 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   $dis_list_deal->data_idfield = "deal_id"; 
   $dis_list_deal->data_set->seek($first_row);
 
-  $block .= $dis_list_deal->display("dis_data_deal");
+  $display["result"] = $dis_list_deal->display("dis_data_deal");
 
   return $block;
 }

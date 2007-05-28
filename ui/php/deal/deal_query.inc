@@ -32,8 +32,8 @@ function run_query_deal_search($deal, $all="") {
   $status = $deal["status_id"];
   $manager = $deal["manager"];
   $date_field = ($deal["date_field"] ? $deal["date_field"] : "datealarm");
-  $date_after = $deal["date_after"];
-  $date_before = $deal["date_before"];
+  $date_after = of_isodate_convert($deal["date_after"],true);
+  $date_before = of_isodate_convert($deal["date_before"],true);
   $role_company = sql_search_text_parse($deal["role_company"]);
   $contact_id = $deal["contact_id"];
 
@@ -269,11 +269,11 @@ function run_query_deal_insert($deal) {
   $num = $deal["num"];
   $label = $deal["label"];
   $priv = $deal["privacy"];
-  $datebegin = ($deal["datebegin"] ? "'".$deal["datebegin"]."'" : "null");
-  $dateprop = ($deal["dateproposal"] ? "'".$deal["dateproposal"]."'" : "null");
-  $dateend = ($deal["dateend"] ? "'".$deal["dateend"]."'" : "null");
-  $dateexp = ($deal["dateexpected"] ? "'".$deal["dateexpected"]."'" : "null");
-  $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
+  $datebegin = ($deal["datebegin"] ? "'".of_isodate_convert($deal["datebegin"])."'" : "null");
+  $dateprop = ($deal["dateproposal"] ? "'".of_isodate_convert($deal["dateproposal"])."'" : "null");
+  $dateend = ($deal["dateend"] ? "'".of_isodate_convert($deal["dateend"])."'" : "null");
+  $dateexp = ($deal["dateexpected"] ? "'".of_isodate_convert($deal["dateexpected"])."'" : "null");
+  $datealarm = ($deal["datealarm"] ? "'".of_isodate_convert($deal["datealarm"])."'" : "null");
   $kind = $deal["kind_id"]; 
   $region = $deal["region"]; 
   $tt = $deal["tasktype"];
@@ -298,7 +298,7 @@ function run_query_deal_insert($deal) {
   $comment = $deal["comment"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $deal["datecomment"];
+    $datecomment = of_isodate_convert($deal["datecomment"]);
     $today = date("Y-m-d");
     if ($today == $datecomment) {
       $datecomment = $now;
@@ -430,11 +430,11 @@ function run_query_deal_update($deal) {
   $num = $deal["num"];
   $label = $deal["label"];
   $priv = $deal["privacy"];
-  $datebegin = ($deal["datebegin"] ? "'".$deal["datebegin"]."'" : "null");
-  $dateend = ($deal["dateend"] ? "'".$deal["dateend"]."'" : "null");
-  $dateprop = ($deal["dateproposal"] ? "'".$deal["dateproposal"]."'" : "null");
-  $dateexp = ($deal["dateexpected"] ? "'".$deal["dateexpected"]."'" : "null");
-  $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
+  $datebegin = ($deal["datebegin"] ? "'".of_isodate_convert($deal["datebegin"])."'" : "null");
+  $dateend = ($deal["dateend"] ? "'".of_isodate_convert($deal["dateend"])."'" : "null");
+  $dateprop = ($deal["dateproposal"] ? "'".of_isodate_convert($deal["dateproposal"])."'" : "null");
+  $dateexp = ($deal["dateexpected"] ? "'".of_isodate_convert($deal["dateexpected"])."'" : "null");
+  $datealarm = ($deal["datealarm"] ? "'".of_isodate_convert($deal["datealarm"])."'" : "null");
   $kind = $deal["kind_id"]; 
   $region = $deal["region"]; 
   $tt = $deal["tasktype"];
@@ -459,7 +459,7 @@ function run_query_deal_update($deal) {
   $comment = $deal["comment"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $deal["datecomment"];
+    $datecomment = of_isodate_convert($deal["datecomment"]);
     $today = date("Y-m-d");
     if ($today == $datecomment) {
       $datecomment = $now;
@@ -639,14 +639,14 @@ function run_query_deal_quick_update($deal) {
 
   $id = $deal["deal_id"];
   $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
-  $dateexp = ($deal["dateexpected"] ? "'".$deal["dateexpected"]."'" : "null");
-  $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
+  $dateexp = ($deal["dateexpected"] ? "'".of_isodate_convert($deal["dateexpected"])."'" : "null");
+  $datealarm = ($deal["datealarm"] ? "'".of_isodate_convert($deal["datealarm"])."'" : "null");
   $status = $deal["status_id"];
   $todo = $deal["todo"];
   $comment = $deal["comment"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $deal["datecomment"];
+    $datecomment = of_isodate_convert($deal["datecomment"]);
     $usercomment = $deal["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
@@ -691,19 +691,19 @@ function run_query_deal_id($deal) {
   $num = $deal["num"];
   $label = $deal["label"];
   $priv = $deal["privacy"];
-  $datebegin = ($deal["datebegin"] ? "='".$deal["datebegin"]."'" : "is null");
+  $datebegin = ($deal["datebegin"] ? "='".of_isodate_convert($deal["datebegin"])."'" : "is null");
   $kind = $deal["kind_id"];
   $region = $deal["region"];
   $tt = $deal["tasktype"];
   $comp = $deal["company_id"];
   $market = ($deal["market"] ? "='".$deal["market"]."'" : "is null");
   $tech = ($deal["tech"] ? "='".$deal["tech"]."'" : "is null");
-  $dateprop = ($deal["dateproposal"] ? "='".$deal["dateproposal"]."'" : "is null");
+  $dateprop = ($deal["dateproposal"] ? "='".of_isodate_convert($deal["dateproposal"])."'" : "is null");
   $amount = ($deal["amount"] ? "='".$deal["amount"]."'" : "is null");
   $hitrate = ($deal["hitrate"] ? "='".$deal["hitrate"]."'" : "is null");
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
-  $datealarm = ($deal["datealarm"] ? "='".$deal["datealarm"]."'" : "is null");
+  $datealarm = ($deal["datealarm"] ? "='".of_isodate_convert($deal["datealarm"])."'" : "is null");
   $status = $deal["status_id"];
   $todo = $deal["todo"];
   $archive = ($deal["archive"] == "1" ? "1" : "0");
@@ -1826,35 +1826,35 @@ function check_deal_form($did, $deal) {
     }
   }
 
-  $datebegin = $deal["datebegin"];
+  $datebegin = of_isodate_convert($deal["datebegin"],true);
   // Begin Date check
   if (($datebegin != "") && (preg_match($php_regexp_isodate, $datebegin) == 0)) {
     $err["msg"] = "$l_begin : $l_invalid_date"; 
     return false;
   }
 
-  $dateprop = $deal["dateproposal"];
+  $dateprop = of_isodate_convert($deal["dateproposal"],true);
   // Expected Date check
   if (($dateprop != "") && (preg_match($php_regexp_isodate, $dateprop) == 0)) {
     $err["msg"] = "$l_proposal : $l_invalid_date";
     return false;
   }
 
-  $dateexp = $deal["dateexpected"];
+  $dateexp = of_isodate_convert($deal["dateexpected"],true);
   // Expected Date check
   if (($dateexp != "") && (preg_match($php_regexp_isodate, $dateexp) == 0)) {
     $err["msg"] = "$l_expected : $l_invalid_date";
     return false;
   }
 
-  $dateend = $deal["dateend"];
+  $dateend = of_isodate_convert($deal["dateend"],true);
   // End Date check
   if (($datend != "") && (preg_match($php_regexp_isodate, $dateend) == 0)) {
     $err["msg"] = "$l_end : $l_invalid_date";
     return false;
   }
 
-  $datealarm = $deal["datealarm"];
+  $datealarm = of_isodate_convert($deal["datealarm"],true);
   // Alarm Date check
   if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
     $err["msg"] = "$l_alarm : $l_invalid_date";
@@ -1911,7 +1911,7 @@ function check_deal_form($did, $deal) {
   }
 
 
-  $datecomment = $deal["datecomment"];
+  $datecomment = of_isodate_convert($deal["datecomment"],true);
   // Comment Date check
   if (($datecomment != "") && (preg_match($php_regexp_isodate, $datecomment) == 0)) {
     $err["msg"] = "$l_date_comment : $l_invalid_date";
@@ -1932,21 +1932,21 @@ function check_deal_quick_form($deal) {
   global $php_regexp_isodate, $l_invalid_date, $l_alarm, $l_date_comment;
   global $err, $l_expected;
 
-  $dateexp = $deal["dateexpected"];
+  $dateexp = of_isodate_convert($deal["dateexpected"], true);
   // Expected Date check
   if (($dateexp != "") && (preg_match($php_regexp_isodate, $dateexp) == 0)) {
     $err["msg"] = "$l_expected : $l_invalid_date";
     return false;
   }
 
-  $datealarm = $deal["datealarm"];
+  $datealarm = of_isodate_convert($deal["datealarm"],true);
   // Alarm Date check
   if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
     $err["msg"] = "$l_alarm : $l_invalid_date";
     return false;
   }
 
-  $datecomment = $deal["datecomment"];
+  $datecomment = of_isodate_convert($deal["datecomment"],true);
   // Comment Date check
   if (($datecomment != "") && (preg_match($php_regexp_isodate, $datecomment) == 0)) {
     $err["msg"] = "$l_date_comment : $l_invalid_date";
