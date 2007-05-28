@@ -920,7 +920,7 @@ function html_user_form($usr_q, $user, $field="") {
     $delegation_target = $usr_q->f("userobm_delegation_target");
     $delegation = $usr_q->f("userobm_delegation");
     $desc = $usr_q->f("userobm_description");
-    $datebegin = $usr_q->f("userobm_datebegin");
+    $datebegin = of_date_upd_format($usr_q->f("userobm_datebegin"),true);
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
     $photo_id = $usr_q->f("userobm_photo_id");
 
@@ -987,7 +987,7 @@ function html_user_form($usr_q, $user, $field="") {
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
   if (isset($user["title"])) { $title = stripslashes($user["title"]); }
   if (isset($user["email"])) { $email = $user["email"]; }
-  if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
+  if (isset($user["datebegin"])) { $datebegin = of_date_upd_format($user["datebegin"],true); }
   if (isset($user["delegation_target"])) { $delegation_target = stripslashes($user["delegation_target"]); }
   if (isset($user["delegation"])) { $delegation = stripslashes($user["delegation"]); }
   if (isset($user["desc"])) { $desc = $user["desc"]; }

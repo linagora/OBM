@@ -286,7 +286,7 @@ function run_query_user_insert($user) {
   // infos
   $profile = $user["profile"];
   $archive = ($user["archive"] == "1" ? "1" : "0");
-  $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
+  $datebegin = ($user["datebegin"] ? "'".of_isodate_convert($user["datebegin"])."'" : "null");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $title = $user["title"];
@@ -658,7 +658,7 @@ function run_query_user_update($p_id, $user) {
   // infos
   $profile = $user["profile"];
   $archive = ($user["archive"] == "1" ? "1" : "0");
-  $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
+  $datebegin = ($user["datebegin"] ? "'".of_isodate_convert($user["datebegin"])."'" : "null");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $title = $user["title"];
