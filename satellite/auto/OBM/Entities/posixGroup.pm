@@ -60,18 +60,6 @@ sub new {
 }
 
 
-sub getTableName {
-    my $self = shift;
-    my( $tableName ) = @_;
-
-    if( !$self->{"incremental"} ) {
-        $tableName = "P_".$tableName;
-    }
-
-    return $tableName;
-}
-
-
 sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
@@ -89,7 +77,7 @@ sub getEntity {
     }
 
 
-    my $query = "SELECT COUNT(*) FROM ".$self->getTableName("UGroup")." WHERE group_privacy=0 AND group_id=".$groupId;
+    my $query = "SELECT COUNT(*) FROM ".&OBM::dbUtils::getTableName("UGroup", $self->{"incremental"})." WHERE group_privacy=0 AND group_id=".$groupId;
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -112,7 +100,7 @@ sub getEntity {
 
 
     # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT group_id, group_gid, group_name, group_desc, group_email, group_contacts FROM ".$self->getTableName("UGroup")." WHERE group_privacy=0 AND group_id=".$groupId;
+    $query = "SELECT group_id, group_gid, group_name, group_desc, group_email, group_contacts FROM ".&OBM::dbUtils::getTableName("UGroup", $self->{"incremental"})." WHERE group_privacy=0 AND group_id=".$groupId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -206,7 +194,7 @@ sub _getGroupUsers {
 
 
     # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = "SELECT i.userobm_login FROM ".$self->getTableName("UserObm")." i, ".$self->getTableName("UserObmGroup")." j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
+    my $query = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." i, ".&OBM::dbUtils::getTableName("UserObmGroup", $self->{"incremental"})." j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
 
     if( defined( $sqlRequest ) && ($sqlRequest ne "") ) {
         $query .= " ".$sqlRequest;
@@ -226,7 +214,7 @@ sub _getGroupUsers {
     }
 
     # Recuperation de la liste des groupes du groupe id : $groupId.
-    $query = "SELECT groupgroup_child_id FROM ".$self->getTableName("GroupGroup")." WHERE groupgroup_parent_id=".$groupId;
+    $query = "SELECT groupgroup_child_id FROM ".&OBM::dbUtils::getTableName("GroupGroup", $self->{"incremental"})." WHERE groupgroup_parent_id=".$groupId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {

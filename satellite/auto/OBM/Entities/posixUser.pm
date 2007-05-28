@@ -62,18 +62,6 @@ sub new {
 }
 
 
-sub _getTableName {
-    my $self = shift;
-    my( $tableName ) = @_;
-
-    if( !$self->{"incremental"} ) {
-        $tableName = "P_".$tableName;
-    }
-
-    return $tableName;
-}
-
-
 sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
@@ -91,8 +79,7 @@ sub getEntity {
     }
 
 
-    my $query = "SELECT COUNT(*) FROM ".$self->_getTableName("UserObm")." LEFT
-    JOIN ".$self->_getTableName("MailServer")." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
+    my $query = "SELECT COUNT(*) FROM ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." LEFT JOIN ".&OBM::dbUtils::getTableName("MailServer", $self->{"incremental"})." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -113,7 +100,7 @@ sub getEntity {
 
 
     # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT userobm_id, userobm_archive, userobm_perms, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_mail_quota, userobm_vacation_enable, userobm_vacation_message, userobm_nomade_perms, userobm_nomade_enable, userobm_nomade_local_copy, userobm_email_nomade, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile FROM ".$self->_getTableName("UserObm")." LEFT JOIN ".$self->_getTableName("MailServer")." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
+    $query = "SELECT userobm_id, userobm_archive, userobm_perms, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_mail_quota, userobm_vacation_enable, userobm_vacation_message, userobm_nomade_perms, userobm_nomade_enable, userobm_nomade_local_copy, userobm_email_nomade, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile FROM ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." LEFT JOIN ".&OBM::dbUtils::getTableName("MailServer", $self->{"incremental"})." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -282,16 +269,18 @@ sub _getEntityMailboxAcl {
         my %rightDef;
 
         $rightDef{"read"}->{"compute"} = 1;
-        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".$self->_getTableName("UserObm")." i, ".$self->_getTableName("EntityRight")." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM
+        ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"writeonly"}->{"compute"} = 1;
-        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".$self->_getTableName("UserObm")." i, ".$self->_getTableName("EntityRight")." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"write"}->{"compute"} = 1;
-        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM ".$self->_getTableName("UserObm")." LEFT JOIN ".$self->_getTableName("EntityRight")." ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
+        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM
+        ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." LEFT JOIN ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
 
         $rightDef{"public"}->{"compute"} = 0;
-        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".$self->_getTableName("EntityRight")." WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
+        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
 
         # On recupere la definition des ACL
         $self->{"userDesc"}->{"user_mailbox_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domainDesc, \%rightDef, $userId );

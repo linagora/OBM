@@ -104,14 +104,14 @@ if( defined($parameters{"domain"}) ) {
 &OBM::ldap::getServerByDomain( $dbHandler, $main::domainList );
 
 # Test entite POSIXUSERS
-#my $entity = OBM::Entities::posixUser->new( 0, 6 );
-#$entity->getEntity( $dbHandler, $main::domainList->[1] );
-#$entity->dump();
-
-# Test entite POSIXGROUPS
-my $entity = OBM::Entities::posixGroup->new( 0, 5 );
+my $entity = OBM::Entities::posixUser->new( 0, 6 );
 $entity->getEntity( $dbHandler, $main::domainList->[1] );
 $entity->dump();
+
+# Test entite POSIXGROUPS
+#my $entity = OBM::Entities::posixGroup->new( 0, 5 );
+#$entity->getEntity( $dbHandler, $main::domainList->[1] );
+#$entity->dump();
 
 #my $ldapEngine = OBM::Ldap::ldapEngine->new( $main::domainList );
 #$ldapEngine->init;
