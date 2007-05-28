@@ -1,4 +1,4 @@
-package OBM::Ldap::posixUser;
+package OBM::Entities::posixUser;
 
 $VERSION = "1.0";
 
@@ -15,6 +15,8 @@ use OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::passwd;
 require OBM::toolBox;
+require OBM::dbUtils;
+use URI::Escape;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
@@ -22,6 +24,7 @@ my %ldapEngineAttr = (
     type => undef,
     typeDesc => undef,
     incremental => undef,
+    archive => undef,
     userId => undef,
     domainId => undef,
     userDesc => undef
@@ -34,6 +37,11 @@ sub new {
 
     if( !defined($userId) ) {
         croak( "Usage: PACKAGE->new(USERID)" );
+
+    }elsif( $userId !~ /^\d+$/ ) {
+        &OBM::toolBox::write_log( "posixUser: identifiant d'utilisateur incorrect", "W" );
+        return undef;
+
     }else {
         $ldapEngineAttr{"userId"} = $userId;
     }
@@ -54,11 +62,11 @@ sub new {
 }
 
 
-sub getTableName {
+sub _getTableName {
     my $self = shift;
     my( $tableName ) = @_;
 
-    if( $self->{"incremental"} ) {
+    if( !$self->{"incremental"} ) {
         $tableName = "P_".$tableName;
     }
 
@@ -66,9 +74,10 @@ sub getTableName {
 }
 
 
-sub getDbValue {
+sub getEntity {
     my $self = shift;
-    my( $dbHandler, $domainDesc, $userId ) = @_;
+    my( $dbHandler, $domainDesc ) = @_;
+    my $userId = $self->{"userId"};
 
 
     if( !defined($dbHandler) ) {
@@ -81,47 +90,50 @@ sub getDbValue {
         return 0;
     }
 
-    if( !defined($userId) || ($userId !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "posixUser: identifiant d'utilisateur incorrect", "W" );
-        return 0;
 
-    }else {
-        my $query = "SELECT COUNT(*) FROM FROM ".$self->getTableName("UserObm")." LEFT JOIN ".$self->getTableName("MailServer")." ON userobm_mail_server_id=mailserver_id WHERE userobm_archive=0 AND userobm_id=".$userId;
+    my $query = "SELECT COUNT(*) FROM ".$self->_getTableName("UserObm")." LEFT
+    JOIN ".$self->_getTableName("MailServer")." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
 
-        my $queryResult;
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "posixUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-            return undef;
-        }
-
-        my( $numRows ) = $queryResult->fetchrow_array();
-        $queryResult->finish();
-
-        if( $numRows == 0 ) {
-            &OBM::toolBox::write_log( "posixUser: pas d'utilisateur d'identifiant : ".$userId, "W" );
-            return undef;
-        }elsif( $numRows > 1 ) {
-            &OBM::toolBox::write_log( "posixUser: plusieurs utilisateurs d'identifiant : ".$userId." ???", "W" );
-            return undef;
-        }
-    }
-
-
-    # La requete a executer - obtention des informations sur l'utilisateur
-    my $query = "SELECT userobm_id, userobm_perms, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile FROM P_UserObm LEFT JOIN P_MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_archive=0 AND userobm_id=".$userId;
-
-    # On execute la requete
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "posixUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return undef;
     }
 
-    # On range les resultats dans la structure de donnees des resultats
-    my( $user_id, $user_perms, $user_login, $user_passwd_type, $user_passwd, $user_uid, $user_gid, $user_lastname, $user_firstname, $user_address1, $user_address2, $user_address3, $user_zipcode, $user_town, $user_title, $user_service, $user_description, $user_mail_perms, $user_mail_ext_perms, $user_email, $user_mail_server_id, $user_web_perms, $user_phone, $user_phone2, $user_fax, $user_fax2, $user_mobile ) = $queryResult->fetchrow_array();
+    my( $numRows ) = $queryResult->fetchrow_array();
     $queryResult->finish();
 
-    &OBM::toolBox::write_log( "posixUser: gestion de l'utilisateur '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    if( $numRows == 0 ) {
+        &OBM::toolBox::write_log( "posixUser: pas d'utilisateur d'identifiant : ".$userId, "W" );
+        return undef;
+    }elsif( $numRows > 1 ) {
+        &OBM::toolBox::write_log( "posixUser: plusieurs utilisateurs d'identifiant : ".$userId." ???", "W" );
+        return undef;
+    }
+
+
+    # La requete a executer - obtention des informations sur l'utilisateur
+    $query = "SELECT userobm_id, userobm_archive, userobm_perms, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_mail_quota, userobm_vacation_enable, userobm_vacation_message, userobm_nomade_perms, userobm_nomade_enable, userobm_nomade_local_copy, userobm_email_nomade, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile FROM ".$self->_getTableName("UserObm")." LEFT JOIN ".$self->_getTableName("MailServer")." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
+
+    # On execute la requete
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "posixUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return undef;
+    }
+
+    # On range les resultats dans la structure de donnees des resultats
+    my( $user_id, $user_archive, $user_perms, $user_login, $user_passwd_type, $user_passwd, $user_uid, $user_gid, $user_lastname, $user_firstname, $user_address1, $user_address2, $user_address3, $user_zipcode, $user_town, $user_title, $user_service, $user_description, $user_mail_perms, $user_mail_ext_perms, $user_email, $user_mail_server_id, $user_mail_quota, $user_vacation_enable, $user_vacation_message, $user_nomade_perms, $user_nomade_enable, $user_nomade_local_copy, $user_nomade_email, $user_web_perms, $user_phone, $user_phone2, $user_fax, $user_fax2, $user_mobile ) = $queryResult->fetchrow_array();
+    $queryResult->finish();
+
+    # Positionnement du flag archive
+    $self->{"archive"} = $user_archive;
+    if( $user_archive ) {
+        &OBM::toolBox::write_log( "posixUser: gestion de l'utilisateur archive '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+
+    }else {
+        &OBM::toolBox::write_log( "posixUser: gestion de l'utilisateur '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+
+    }
 
     # Gestion de l'UID
     my $user_real_uid = $user_uid;
@@ -212,14 +224,78 @@ sub getDbValue {
             # Gestion des BAL destination
             $self->{"userDesc"}->{"user_mailbox"} = $self->{"userDesc"}->{"user_login"}."@".$domainDesc->{"domain_name"};
 
-            # On ajoute le serveur de mail associé
+            # Gestion du serveur de mail
+            $self->{"userDesc"}->{"user_mailbox_server"} = $user_mail_server_id;
+
+            # Gestion du quota
+            $self->{"userDesc"}->{"user_mailbox_quota"} = $user_mail_quota;
+
+            # Gestion du message d'absence
+            $self->{"userDesc"}->{"user_vacation_enable"} = $user_vacation_enable;
+            $self->{"userDesc"}->{"user_vacation_message"} = uri_unescape($user_vacation_message);
+
+            # Gestion de la redirection d'adresse
+            $self->{"userDesc"}->{"user_nomade_perms"} = $user_nomade_perms;
+            $self->{"userDesc"}->{"user_nomade_enable"} = $user_nomade_enable;
+            $self->{"userDesc"}->{"user_nomade_local_copy"} = $user_nomade_local_copy;
+            $self->{"userDesc"}->{"user_nomade_email"} = $user_nomade_email;
+
+            # Gestion de la livraison du courrier
             $self->{"userDesc"}->{"user_mailLocalServer"} = "lmtp:".$localServerIp.":24";
         }
     }
 
-    # On ajoute les informations de la structure
-    $self->{"domain_id"} = $domainDesc->{"domain_id"};
+    # On positionne l'identifiant du domaine de l'entité
+    $self->{"domainId"} = $domainDesc->{"domain_id"};
 
+    # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
+    # cette entité
+    if( !$self->{"incremental"} ) {
+        $self->getEntityLinks( $dbHandler, $domainDesc );
+    }
+
+
+    return 1;
+}
+
+
+sub getEntityLinks {
+    my $self = shift;
+    my( $dbHandler, $domainDesc ) = @_;
+
+    $self->_getEntityMailboxAcl( $dbHandler, $domainDesc );
+
+    return 1;
+}
+
+
+sub _getEntityMailboxAcl {
+    my $self = shift;
+    my( $dbHandler, $domainDesc ) = @_;
+    my $userId = $self->{"userId"};
+
+    if( !$self->{"userDesc"}->{"user_mailperms"} ) {
+        $self->{"userDesc"}->{"user_mailbox_acl"} = undef;
+    }else {
+
+        my $entityType = "mailbox";
+        my %rightDef;
+
+        $rightDef{"read"}->{"compute"} = 1;
+        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".$self->_getTableName("UserObm")." i, ".$self->_getTableName("EntityRight")." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+
+        $rightDef{"writeonly"}->{"compute"} = 1;
+        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".$self->_getTableName("UserObm")." i, ".$self->_getTableName("EntityRight")." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+
+        $rightDef{"write"}->{"compute"} = 1;
+        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM ".$self->_getTableName("UserObm")." LEFT JOIN ".$self->_getTableName("EntityRight")." ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
+
+        $rightDef{"public"}->{"compute"} = 0;
+        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".$self->_getTableName("EntityRight")." WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
+
+        # On recupere la definition des ACL
+        $self->{"userDesc"}->{"user_mailbox_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domainDesc, \%rightDef, $userId );
+    }
 
     return 1;
 }
@@ -257,7 +333,7 @@ sub createLdapEntry {
     #
     # On construit la nouvelle entree
     #
-    # Les parametres nececessaires
+    # Les parametres nécessaires
     if( $entry->{"user_login"} && $entry->{"user_lastname"} && defined($entry->{"user_uid"}) && ($entry->{"user_uid"} ne "") && defined($entry->{"user_gid"})  && $entry->{"user_homedir"} ) {
 
         # Creation de la valeur du champs CN
@@ -556,4 +632,15 @@ sub updateLdapEntry {
     }
 
     return $update;
+}
+
+
+sub dump {
+    my $self = shift;
+    my @desc;
+
+    push( @desc, $self );
+    
+    require Data::Dumper;
+    print Data::Dumper->Dump( \@desc );
 }
