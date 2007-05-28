@@ -23,8 +23,8 @@ function run_query_invoice_search ($invoice) {
   $status = $invoice["status"];
   $sel_tt = $invoice["tasktype"];
   $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
-  $date_after = of_isodate_convert($invoice["date_after"]);
-  $date_before = of_isodate_convert($invoice["date_before"]);
+  $date_after = of_isodate_convert($invoice["date_after"],true);
+  $date_before = of_isodate_convert($invoice["date_before"],true);
   $inout = $invoice["inout"];
   $company = sql_search_text_parse($invoice["company"]);
   $archive = $invoice["archive"];
@@ -736,9 +736,9 @@ function check_invoice_data_form($id, $invoice) {
 
   $label = $invoice["label"];
   $number = $invoice["number"];
-  $date = $invoice["date"];
-  $expiration_date = $invoice["expiration_date"];
-  $payment_date = $invoice["payment_date"];
+  $date = of_isodate_convert($invoice["date"],true);
+  $expiration_date = of_isodate_convert($invoice["expiration_date"],true);
+  $payment_date = of_isodate_convert($invoice["payment_date"],true);
   $inout = $invoice["inout"];
   $ht = $invoice["amount_ht"];
   $ttc = $invoice["amount_ttc"];
