@@ -183,10 +183,13 @@ function run_query_group_detail($id) {
       $timecreate,
       $timeupdate,
       c.userobm_login as usercreate,
-      u.userobm_login as userupdate
+      u.userobm_login as userupdate,
+      m.userobm_lastname,
+      m.userobm_firstname
     FROM UGroup
          LEFT JOIN UserObm as c ON group_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON group_userupdate=u.userobm_id
+         LEFT JOIN UserObm as m ON group_manager_id=m.userobm_id
     WHERE group_id = '$id'
       $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_group_detail()");
@@ -325,6 +328,7 @@ function run_query_group_update($group) {
   $samba = ($group["samba"] == 1) ? 1 : 0;
   $desc = $group["desc"];
   $email = $group["email"];
+  $manager = $group["manager"];
   $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
   $mailing = (isset($group["mailing"]) ? $group["mailing"] : '0');
   $now = date("Y-m-d H:i:s");
@@ -346,7 +350,8 @@ function run_query_group_update($group) {
     group_name='$name',
     group_desc='$desc',
     group_email='$email',
-    group_mailing='$mailing'
+    group_mailing='$mailing',
+    group_manager_id='$manager',
     $q_delegation
   WHERE group_id='$id'
     $multidomain";
@@ -1058,7 +1063,7 @@ function run_query_group_ext_search($group) {
   $query = "SELECT 
       group_id,
       group_name,
-      group_desc
+      group_descrun_query_group_detail
     FROM UGroup
     WHERE 
       group_name LIKE '$pattern%' 
@@ -1073,27 +1078,4 @@ function run_query_group_ext_search($group) {
   return $obm_q;
 }
 
-
-/**
- * Set group manager
- * 
- * @param mixed $group 
- * @access public
- * @return DB Search results
- */
-function run_query_group_setmanager($group) {
-  global $cdg_sql;
-
-  $group_id = $group["group_id"];
-  $manager = $group["manager"];
-  $obm_q = new DB_OBM;
-
-  $query = "UPDATE UGroup SET 
-    group_manager_id='$manager'
-    WHERE group_id='$group_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_group_setmanager()");
-  $obm_q->query($query);
-
-  return $obm_q;
-}
 ?>

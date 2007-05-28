@@ -351,9 +351,7 @@ function dis_group_consult($group, $uid) {
       $g_q->set_num_rows_total($count);
     }
 
-    $all_usr_q = run_query_all_users_from_group($g_id);
-    $g_manager = run_query_global_group_manager($g_id);
-    $block = html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q, $g_manager);
+    $block = html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q);
   } else {
     $display["msg"] .= display_err_msg($l_err_reference);
   }
@@ -371,7 +369,7 @@ function dis_group_consult($group, $uid) {
 //   - $prefs_g  : group group preference display
 //   - $g_q      : group database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q, $g_manager) {
+function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $l_yes, $l_no, $ico_mail, $l_undef, $c_undef;
   global $l_group, $l_name, $l_desc, $l_email, $l_mailing, $l_no_user, $l_no_group_group;
   global $l_system, $l_local, $l_ext_id, $l_smb;
@@ -396,6 +394,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q
   $desc = $group_q->f("group_desc");
   $email = $group_q->f("group_email");
   $mailing = ($group_q->f("group_mailing") == 1 ? $l_yes : $l_no);
+  $manager = $group_q->f("userobm_lastname")." ".$group_q->f("userobm_firstname");
 
   if ($email != "") {
     if ($cgp_use["service"]["mail"]) {
@@ -514,24 +513,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q
     }
   }
   
-  // Manager select
-  $sel_manager = "<form id=\"f_manager\" name=\"f_manager\" method=\"post\" action=\"?action=set_manager\">
-    <select name=\"sel_manager\" id=\"sel_manager\" onchange=\"document.f_manager.submit()\">
-      <option value=\"$c_undef\">$l_undef</option>";
-  while($all_usr_q->next_record()) {
-    $userobm_id = $all_usr_q->f("userobm_id");
-    $userobm_name = $all_usr_q->f("userobm_lastname")." ".$all_usr_q->f("userobm_firstname");
-    if ($userobm_id == $g_manager) {
-      $selected = "selected";
-    } else {
-      $selected = "";
-    }
-    $sel_manager .= "<option value=\"$userobm_id\" $selected> $userobm_name </option>";
-  }
-  $sel_manager .= "</select>
-    <input type=\"hidden\" id=\"group_id\" name=\"group_id\" value=\"$id\"/>
-  </form>";
-
   $display["detailInfo"] = display_record_info($group_q);
   $display["title"] = "<h1 class=\"title\">$l_group : $name</h1>";
 
@@ -547,7 +528,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $all_usr_q
     $block_delegation
     <tr>
       <th>$l_manager</th>
-      <td>$sel_manager</td>
+      <td>$manager</td>
     </tr>
     <tr>
       <th>$l_system</th>
@@ -606,7 +587,8 @@ function html_group_form($action, $group_q, $group, $field="") {
   global $obm, $cgroup_private_default, $cgp_use;
   global $l_group, $l_name, $l_desc, $l_smb, $l_email, $l_mailing;
   global $l_private, $l_insert, $l_update, $l_back;
-  
+  global $l_manager, $c_undef, $l_undef; 
+ 
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
     $id = $group_q->f("group_id");
@@ -694,6 +676,33 @@ function html_group_form($action, $group_q, $group, $field="") {
     <td><input name=\"cba_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
   </tr>";
 
+
+  if ($action == "detailupdate" || $action == "update") {
+    // Manager select
+    $manager_id = $group_q->f("group_manager_id");
+    if (isset($group["manager"])) { $manager_id = $group["manager"]; }    
+    $all_usr_q = run_query_all_users_from_group($id);
+    $sel_manager = "<select name=\"sel_manager\" id=\"sel_manager\">
+        <option value=\"$c_undef\">$l_undef</option>";
+    while($all_usr_q->next_record()) {
+      $userobm_id = $all_usr_q->f("userobm_id");
+      $userobm_name = $all_usr_q->f("userobm_lastname")." ".$all_usr_q->f("userobm_firstname");
+      if ($userobm_id == $manager_id) {
+        $selected = "selected";
+      } else {
+        $selected = "";
+      }
+      $sel_manager .= "<option value=\"$userobm_id\" $selected> $userobm_name </option>";
+    }
+    $sel_manager .= "</select>";
+
+    $block_manager = "  <tr>
+    <th>$l_manager</th>
+      <td>$sel_manager</td>
+    </tr>";
+  }
+
+
   $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
 <fieldset class=\"detail infos\">
@@ -704,6 +713,7 @@ function html_group_form($action, $group_q, $group, $field="") {
     <th>$l_name</th>
     <td><input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
   </tr>
+  $block_manager
   $block_delegation
   $dis_private
   $block_samba

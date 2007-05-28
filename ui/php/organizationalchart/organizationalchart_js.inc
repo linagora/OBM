@@ -42,6 +42,7 @@ function check_form(form) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Create new ogroup form 
+// TODO: new Element('input'). ...
 ///////////////////////////////////////////////////////////////////////////////
 function add_entity(level) {
 
@@ -137,83 +138,6 @@ function del_entity(parentId) {
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
-  }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Show or hide user info
-///////////////////////////////////////////////////////////////////////////////
-function entity_display (evt, name) {
-
-  entity_style = document.getElementById(name).style.display;
-  if(entity_style == \"none\") {
-    //document.getElementById(name).style.display = \"block\";
-
-    if (IE4) {
-       evt = window.event;
-     }
-   
-     var currentX, currentY,	
-         x,y,
-         docWidth,docHeight,
-         layerWidth,layerHeight,
-         ele;	
-   
-     if ( W3C ) {
-       ele = document.getElementById(name);
-       currentX = evt.clientX + 10,
-       currentY = evt.clientY + 10;
-       docWidth = document.width;
-       docHeight = document.height;
-       layerWidth = ele.style.width;
-       layerHeight = ele.style.height;
-     } else if ( NS4 ) {
-       ele = document.layers[name];
-       currentX = evt.pageX + 10,
-       currentY = evt.pageY + 10;
-       docWidth = document.width;
-       docHeight = document.height;
-       layerWidth = ele.clip.width;
-       layerHeight = ele.clip.height;
-     } else {
-       ele = document.all[name];
-       currentX = evt.clientX + 10,
-       currentY = evt.clientY + 10;
-       docHeight = document.body.offsetHeight;
-       docWidth = document.body.offsetWidth;
-       layerWidth = 200;
-       layerHeight = ele.offsetHeight;
-     }
-   
-     if ( ( currentX) > docWidth ) {
-       x = ( currentX - layerWidth );
-     } else {
-       x = currentX;
-     }
-   
-     x = x - 125;
-     y = currentY + 10; 
-
-     if ( IE4 ) {
-       x += document.body.scrollLeft;
-       y += document.body.scrollTop;
-     } else {
-       x += window.pageXOffset;
-       y += window.pageYOffset;
-     }
-     if ( NS4 ) {
-       ele.right = parseInt ( x );
-       ele.top = parseInt ( y );
-       ele.display = \"block\";
-     } else {  // IE4 & W3C
-       ele.style.position = 'absolute'
-       ele.style.left = x+'px';
-       ele.style.top = y+'px';
-       ele.style.display = \"block\";
-     }
-  } else {
-    document.getElementById(name).style.display = \"none\"
-
   }
 }
 

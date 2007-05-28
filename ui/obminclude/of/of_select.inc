@@ -57,7 +57,7 @@ function of_select_add_element(target, element_name, sel_id, fieldLabel) {
 
   // Create the div row
   row = target.createElement('div');
-  row.id = element_name+sel_id;
+  row.id = element_name+'-'+sel_id;
   row.className = 'elementRow';
 
   // Create the input field

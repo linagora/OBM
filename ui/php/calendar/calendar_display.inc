@@ -922,13 +922,29 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
  * @param mixed $calendar_entity 
  * @return event list HTML code
  */
-function dis_calendar_list_planning($calendar, $calendar_entity) {
+function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entity) {
   global $ico_previous, $ico_next, $l_previous, $l_next, $l_desc;
   global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
   global $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
   global $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
   global $l_date, $l_resource, $l_event, $ico_search;
   global $l_expand_all, $l_collapse_all;
+
+  $sel_user = $calendar_entity["user"];
+  $sel_user_id = array();
+  if (is_array($sel_user)) {
+    while(list($key, $val) = each($sel_user)) {
+     $sel_user_id[] = $key;
+    }
+  }
+
+  $sel_res = $calendar_entity["resource"];
+  $sel_res_id = array();
+  if (is_array($sel_res)) {
+    while(list($key, $val) = each($sel_res)) {
+     $sel_res_id[] = $key;
+    }
+  }
 
   $iso_date = $calendar["date"];
   $category_filter = $calendar["category_filter"];
@@ -945,6 +961,7 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
   $list_title = calendar_localizeDate("month", $ts_date);
   $occurrences = calendar_events_model($start_month, $end_month,$calendar_entity,$category_filter);
   $today_mark = false;
+  $charset = mb_internal_encoding();
 
   // Sort occurrences by date (cause repeat and no repeat events)
   if (is_array($occurrences)) {
@@ -999,24 +1016,34 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
         } else {
 	        $title = $event->title;
 	        $explode_desc = explode("|", $event->description);
-
-	        $explode_desc = explode("|", $event->description);
           $description = $explode_desc[0];
-          if ($explode_desc[1] != "") {    
-            $charset = mb_internal_encoding();
+          $item_list = "";
+          $dis_res = "";
+          $separator = "";
+          if ($explode_desc[1] != "") {
             $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
-//            $xml = simplexml_load_string($item);
+            $xml = parse_item($item);
+            // $xml = simplexml_load_string($item);
             if (is_object($xml)) {
               foreach($xml->resource as $key => $value) {
-                $description .= "<br/><b>$value->res_name:</b><br/>".nl2br($value->item)."$value->property_name:$value->property_value";
+                if (in_array($value->res_id, $sel_res_id)) {
+                  $dis_res = "$separator$value->res_name";
+                  $separator = ",";
+                }
+                $item_list .= "<b>$value->res_name:</b><br/>".nl2br($value->item)."$value->property_name:$value->property_value";
               }
             }
           }
         }
-
         $dis_attendees = "";
         $br = "";
+        $dis_user = "";
+        $separator = "";
         foreach($attendee["user"] as $at_id => $at_name) {
+          if (in_array($at_id, $sel_user_id)) {
+            $dis_user .= "$separator$at_name";
+            $separator = ",";
+          }
 	        $dis_attendees .= "$br$at_name";
 	        $br = "<br />";
         }
@@ -1035,7 +1062,7 @@ function dis_calendar_list_planning($calendar, $calendar_entity) {
      			});
 				";
         $dis_events .= "<div id=\"evt-$date-$ev_id\" >
-          <a href=\"javascript: void(0);\">$hour_begin - $title</a>
+          <a href=\"javascript: void(0);\">$hour_begin - $title  ($dis_user $dis_res)</a>
           <div id=\"eventDetail-$date-$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
             <table>
               <tr>
@@ -1134,7 +1161,8 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     if ($explode_desc[1] != "") {
       $charset = mb_internal_encoding();
       $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
-//      $xml = simplexml_load_string($item);
+      $xml = parse_item($item);
+//    $xml = simplexml_load_string($item);
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
           $item_list .= "
@@ -1636,6 +1664,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
 
     // item
     if ($item != "") {
+        $xml = parse_item($item);
 //      $xml = simplexml_load_string($item);
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
@@ -2142,6 +2171,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
         $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&amp;resource_id=$r_id";
 
         if ($item != "") {
+            $xml = parse_item($item);
 //          $xml = simplexml_load_string($item);
         }
         if (is_object($xml) && ($action == "detailupdate" || $action == "update" )) {
@@ -3405,3 +3435,31 @@ function json_event_data($id,$calendar) {
   }
   $display['json'] .=  "eventsData:[$json]";
 }
+
+
+
+function parse_item($item) {
+  if ($item == "") {
+    return false;
+  }
+
+  $p = xml_parser_create();
+  xml_parse_into_struct($p, $item, $vals, $index);
+  xml_parser_free($p);
+
+  $match_attribut = array("res_id", "res_name", "item", "item_id", "property_name", "property_value");
+
+  foreach($vals as $key => $value) {
+    $att = strtolower($value["tag"]);
+    if (in_array($att, $match_attribut)) { 
+      $item_detail->resource->$att = $value["value"];
+    }
+  }
+  if ($item_detail != "") {
+    $item_list->resource = $item_detail;
+  }
+
+  return $item_list;
+}
+
+?>
