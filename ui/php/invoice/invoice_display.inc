@@ -359,8 +359,8 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
     $param_status .= "&amp;sel_status=$status";
   }
   $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
-  $date_after = $invoice["date_after"];
-  $date_before = $invoice["date_before"];
+  $date_after = of_date_upd_format($invoice["date_after"]);
+  $date_before = of_date_upd_format($invoice["date_before"]);
   $inout = $invoice["inout"];
   $company = urlencode($invoice["company"]);
   $archive = $invoice["archive"];
@@ -783,9 +783,9 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     $archive = ($inv_q->f("invoice_archive") == 1 ? " checked" : "");
     $comment = $inv_q->f("invoice_comment");
     $status = $inv_q->f("invoice_status_id");
-    $date = of_isodate_format($inv_q->f("date"), 1);
-    $expiration_date = of_isodate_format($inv_q->f("expiration_date"), 1);
-    $payment_date = of_isodate_format($inv_q->f("payment_date"), 1);
+    $date = of_date_upd_format($inv_q->f("date"), 1);
+    $expiration_date = of_date_upd_format($inv_q->f("expiration_date"), 1);
+    $payment_date = of_date_upd_format($inv_q->f("payment_date"), 1);
     $inout = $inv_q->f("invoice_inout");
     $ht = $inv_q->f("invoice_amount_ht");
     $ttc = $inv_q->f("invoice_amount_ttc");
@@ -796,11 +796,11 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     $p_id = $inv_q->f("invoice_project_id");
     $p_name = $inv_q->f("project_name");
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
 
   // New form and first time
   } elseif ($action == "new") {
-    $date = date($c_php_isodate_format); 
+    $date = of_date_upd_format(); 
     $expiration_date = $date;
     $payment_date = $date;
     $number = date ($default_invoice_numbering);
@@ -809,13 +809,13 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       $inout = run_query_invoice_deal_get_inout ($d_id);
     }
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
   }
 
   // if we duplicate we have to modify some fields :
   if ($action == "duplicate") {
     $comment = "duplicata de <$label>\n".$comment;
-    $date = of_isodate_format();
+    $date = of_date_upd_format();
     $label .= "-".date("Y-m-d");
   }
 

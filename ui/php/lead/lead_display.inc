@@ -201,8 +201,8 @@ function html_lead_search_list($obm_q, $prefs, $params) {
 
   $text = urlencode($params["text"]);
   $company = $params["company"];
-  $date_after = $params["date_after"];
-  $date_before = $params["date_before"];
+  $date_after = of_date_upd_format($params["date_after"]);
+  $date_before = of_date_upd_format($params["date_before"]);
   $source = $params["source"];
   $manager = $params["manager"];
   $archive = $params["archive"];
@@ -286,8 +286,8 @@ function html_lead_consult($l_q) {
   $contact_name = $l_q->f("contact_lastname") . " " . $l_q->f("contact_firstname") . " - " . $l_q->f("contact_phone");
   $source_label = $l_q->f("leadsource_label");
   $manager = $l_q->f("manager");
-  $date = of_date_format($l_q->f("date"));
-  $datealarm = of_date_format($l_q->f("datealarm"));
+  $date = of_date_upd_format($l_q->f("date"));
+  $datealarm = of_date_upd_format($l_q->f("datealarm"));
   $name = $l_q->f("lead_name");
   $archive = ($l_q->f("lead_archive") == 1 ? $c_yes : $c_no);
   $todo = $l_q->f("lead_todo");
@@ -434,7 +434,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   // New form and first time
   } elseif ($action == "new") {
     $title = $l_header_new;
-    $date = date("Y-m-d");
+    $date = of_date_upd_format();
     $usercomment = $uid;
     $datecomment = of_isodate_format();
   }

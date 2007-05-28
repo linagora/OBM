@@ -251,7 +251,7 @@ function run_query_lead_insert($params) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  $datep = ($params["date"] ? "='".$params["date"]."'" : "is null");
+  $datep = ($params["date"] ? "='".of_isodate_convert($params["date"])."'" : "is null");
 
   // Get the lead id inserted
   $query = "SELECT lead_id
