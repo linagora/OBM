@@ -778,6 +778,129 @@ function of_date_format($timestamp="", $null_empty="") {
   return $date;
 }
 
+/**
+ * of_date_format 
+ * 
+ * @param string $timestamp 
+ * @param string $null_empty 
+ * @access public
+ * @return void
+ */
+function of_date_upd_format($date="", $null_empty = false) {
+  global $set_date_upd, $cda_upd_dmy, $cda_upd_mdy;
+  
+  if($set_date_upd == $cda_upd_dmy) {
+    $date_upd_format = "d/m/Y";
+  } else {
+    $date_upd_format = "m/d/Y";
+  }
+  if($date) {
+    $type = of_date_guess_format($date);
+  } elseif(!$null_empty) {
+    $date = time();
+    $type = "ts";
+  } else {
+    return null;
+  }
+  switch ($type) {
+  case "iso" :
+    preg_match("/^(\d{4})[-\/](\d{2})[-\/](\d{2})/",$date, $d);
+    $date = date($date_upd_format,mktime(0,0,0,$d[2],$d[3],$d[1]));
+    break;
+  case "ts" :
+    $date = date($date_upd_format, $date);
+    break;
+  case "fr" :
+    if($set_date_upd != $cda_upd_dmy) {
+      preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
+      $date = date($date_upd_format,mktime(0,0,0,$d[2],$d[1],$d[3]));
+    }
+    break;
+  case "us" :
+    if($set_date_upd != $cda_upd_mdy) {
+      preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
+      $date = date($date_upd_format,mktime(0,0,0,$d[1],$d[2],$d[3]));        
+    }    
+    break;
+  case "user" :
+    break;
+  default :
+  }
+  return $date;
+}
+
+/**
+ * Guess the date format 
+ * 
+ * @param mixed $date 
+ * @access public
+ * @return void
+ */
+function of_date_guess_format ($date) {
+
+  $reg = array();
+  $reg['iso'] = "/^[0-9]{4}[-\/][01][0-9][-\/][0123][0-9]$/";
+  $reg['fr'] = "/^[23][0-9][-\/]?[01][0-9][-\/]?[0-9]{4}$/";
+  $reg['us'] = "/^[01][0-9][-\/]?[23][0-9][-\/]?[0-9]{4}$/";
+  $reg['user'] = "/^[0123][0-9][-\/]?[0123][0-9][-\/]?[0-9]{4}$/";
+
+  foreach($reg as $format => $regexp) {
+    if(preg_match($regexp,$date)) {
+      return "$format";
+    }
+  }
+  if(is_numeric($date) && $date > 31130000) {
+    return "ts";
+  }
+  return "unknown";
+}  
+
+/**
+ * of_isodate_convert 
+ * 
+ * @param mixed $date 
+ * @param mixed $null_empty 
+ * @access public
+ * @return void
+ */
+function of_isodate_convert($date, $null_empty=false) {
+  global $set_date_upd, $cda_upd_dmy, $cda_upd_mdy,$c_php_isodate_format;
+  $dmy_upd_format = "d/m/Y";
+  $mdy_upd_format = "m/d/Y";
+  
+  if($date) {
+    $type = of_date_guess_format($date);
+  } elseif(!$null_empty) {
+    $date = time();
+    $type = "ts";
+  } else {
+    return null;
+  }
+  if($type == "user") {
+    if($set_date_upd == $cda_upd_dmy) {
+      $type = "fr";
+    } else {
+      $type = "us";
+    }
+  } 
+  switch ($type) {
+  case "ts" :
+    $date = date($c_php_isodate_format, $date);
+    break;
+  case "fr" :
+    preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
+    $date = date($c_php_isodate_format,mktime(0,0,0,$d[2],$d[1],$d[3]));
+    break;
+  case "us" :
+    preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
+    $date = date($c_php_isodate_format,mktime(0,0,0,$d[1],$d[2],$d[3]));        
+    break;
+  case "iso" :
+    break;
+  default :
+  } 
+  return $date;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Iso Format a date

@@ -373,8 +373,8 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   $func = $contact["function"];
   $title = $contact["title"];
   $mark = $contact["market"];
-  $dateafter = stripslashes($contact["date_after"]);
-  $datebefore = stripslashes($contact["date_before"]);
+  $dateafter = of_date_upd_format(stripslashes($contact["date_after"]),true);
+  $datebefore = of_date_upd_format(stripslashes($contact["date_before"]),true);
   $mailing_ok_only = ($contact["mailing_ok_only"] == "1" ? "checked = \"checked\"" : "");
   $newsletter = ($contact["newsletter"] == "1" ? "checked = \"checked\"" : "");
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
@@ -1276,7 +1276,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $kind = $co_q->f("contact_kind_id");
     $mark = $co_q->f("contact_marketingmanager_id");
     $date = $co_q->f("contact_date");
-    $date = ($date != 0) ? of_date_format($date, 1) : "";
+    $date = of_date_upd_format($date, true);
     $lname = $co_q->f("contact_lastname");
     $fname = $co_q->f("contact_firstname");
     $aka = $co_q->f("contact_aka");
@@ -1302,13 +1302,13 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $priv = $co_q->f("privacy");
     $comment = $co_q->f("contact_comment");
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
     $comment2 = $co_q->f("contact_comment2");
     $usercomment2 = $uid;
-    $datecomment2 = of_isodate_format();
+    $datecomment2 = of_date_upd_format();
     $comment3 = $co_q->f("contact_comment3");
     $usercomment3 = $uid;
-    $datecomment3 = of_isodate_format();
+    $datecomment3 = of_date_upd_format();
     $c_phone = $co_q->f("company_phone");
     $c_fax = $co_q->f("company_fax");
     $c_ad1 = $co_q->f("company_address1");
@@ -1324,13 +1324,13 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   } elseif ($action == "new") {
     $dsrc = $set_dsrc;
     $mark = $obm["uid"];
-    $date = date("Y-m-d");
+    $date = of_date_upd_format();
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
     $usercomment2 = $uid;
-    $datecomment2 = of_isodate_format();
+    $datecomment2 = of_date_upd_format();
     $usercomment3 = $uid;
-    $datecomment3 = of_isodate_format();
+    $datecomment3 = of_date_upd_format();
     if ($ccontact_private_default) {
       $private_c = " checked";
     }
@@ -1367,7 +1367,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   if (isset($contact["datasource"])) { $dsrc = $contact["datasource"]; }
   if (isset($contact["kind"])) { $kind = $contact["kind"]; }
   if (isset($contact["market"])) { $mark = $contact["market"]; }
-  if (isset($contact["date"])) { $mark = $contact["date"]; }
+  if (isset($contact["date"])) { $date = of_date_upd_format($contact["date"],true); }
   if (isset($contact["lname"])) { $lname = stripslashes($contact["lname"]); }
   if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
   if (isset($contact["aka"])) { $aka = stripslashes($contact["aka"]); }
@@ -1391,15 +1391,15 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   if (isset($contact["comment"])) { $comment = stripslashes($contact["comment"]); }
   if (isset($contact["add_comment"])) { $add_comment = stripslashes($contact["add_comment"]); }
   if (isset($contact["usercomment"])) { $usercomment = $contact["usercomment"]; }
-  if (isset($contact["datecomment"])) { $datecomment = $contact["datecomment"]; }
+  if (isset($contact["datecomment"])) { $datecomment = of_date_upd_format($contact["datecomment"]); }
   if (isset($contact["comment2"])) { $comment2 = stripslashes($contact["comment2"]); }
   if (isset($contact["add_comment2"])) { $add_comment2 = stripslashes($contact["add_comment2"]); }
   if (isset($contact["usercomment2"])) { $usercomment2 = $contact["usercomment2"]; }
-  if (isset($contact["datecomment2"])) { $datecomment2 = $contact["datecomment2"]; }
+  if (isset($contact["datecomment2"])) { $datecomment2 = of_date_upd_format($contact["datecomment2"]); }
   if (isset($contact["comment3"])) { $comment3 = stripslashes($contact["comment3"]); }
   if (isset($contact["add_comment3"])) { $add_comment3 = stripslashes($contact["add_comment3"]); }
   if (isset($contact["usercomment3"])) { $usercomment3 = $contact["usercomment3"]; }
-  if (isset($contact["datecomment3"])) { $datecomment3 = $contact["datecomment3"]; }
+  if (isset($contact["datecomment3"])) { $datecomment3 = of_date_upd_format($contact["datecomment3"]); }
   if (isset($contact["privacy"])) { $priv = stripslashes($contact["privacy"]); }
   if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
 

@@ -694,25 +694,25 @@ function run_query_contact_update($contact) {
   $email2 = $contact["email2"];
   $mailok = ($contact["mailok"] == "1" ? "1" : "0");
   $newsletter = ($contact["newsletter"] == "1" ? "1" : "0");
-  $date = ($contact["date"] ? "'".$contact["date"]."'" : "null");
+  $date = ($contact["date"] ? "'".of_isodate_convert($contact["date"])."'" : "null");
   $comment = $contact["comment"];
   $add_comment = $contact["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $contact["datecomment"];
+    $datecomment = of_isodate_convert($contact["datecomment"]);
     $usercomment = $contact["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
   $comment2 = $contact["comment2"];
   $add_comment2 = $contact["add_comment2"];
   if ($add_comment2 != "") {
-    $datecomment2 = $contact["datecomment2"];
+    $datecomment2 = of_isodate_convert($contact["datecomment2"]);
     $usercomment2 = $contact["usercomment2"];
     $comment2 .= "\n$datecomment2:$usercomment2:$add_comment2";
   }
   $comment3 = $contact["comment3"];
   $add_comment3 = $contact["add_comment3"];
   if ($add_comment3 != "") {
-    $datecomment3 = $contact["datecomment3"];
+    $datecomment3 = of_isodate_convert($contact["datecomment3"]);
     $usercomment3 = $contact["usercomment3"];
     $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
   }
