@@ -27,7 +27,7 @@ function run_query_project_search($params) {
   $manager = $params["manager"];
   $member = $params["member"];
   $archive = $params["archive"];
-  $date = $params["datebegin"];
+  $date = of_isodate_convert($params["datebegin"],true);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -290,9 +290,9 @@ function run_query_project_insert($params) {
   $deal = ($params["deal_id"] ? "'".$params["deal_id"]."'" : "null");
   $task = trim($params["tasklabel"]);
   $member = $params["member"];
-  $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
-  $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
-  $project_reference_date = $params["reference_date"];
+  $datebegin = ($params["datebegin"] ? "'".of_isodate_convert($params["datebegin"])."'" : "null");
+  $dateend = ($params["dateend"] ? "'".of_isodate_convert($params["dateend"])."'" : "null");
+  $project_reference_date = of_isodate_convert($params["reference_date"],true);
   $project_reference_duration = $params["reference_duration"];
   $project_reference_desc = $params["reference_desc"];
   $project_reference_tech = $params["reference_tech"];
@@ -302,7 +302,7 @@ function run_query_project_insert($params) {
   $archive = ($params["archive"] == "1" ? "1" : "0");
 
   if ($add_comment != "") {
-    $datecomment = $params["datecomment"];
+    $datecomment = of_isodate_convert($params["datecomment"],true);
     $usercomment = $params["usercomment"];
     $comment = "$datecomment:$usercomment:$add_comment";
   }
@@ -502,9 +502,9 @@ function run_query_project_update($pid, $params) {
   $soldtime = ($params["soldtime"] ? "'".$params["soldtime"]."'" : "null");
   $estimated = ($params["estimated"] ? "'".$params["estimated"]."'" : "null");
   $tt = $params["tt"];
-  $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
-  $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
-  $reference_date = $params["reference_date"];
+  $datebegin = ($params["datebegin"] ? "'".of_isodate_convert($params["datebegin"])."'" : "null");
+  $dateend = ($params["dateend"] ? "'".of_isodate_convert($params["dateend"])."'" : "null");
+  $reference_date = of_isodate_convert($params["reference_date"],true);
   $reference_duration = $params["reference_duration"];
   $reference_desc = $params["reference_desc"];
   $reference_tech = $params["reference_tech"];
@@ -519,7 +519,7 @@ function run_query_project_update($pid, $params) {
   $comment = $params["comment"];
   $add_comment = $params["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $params["datecomment"];
+    $datecomment = of_isodate_convert($params["datecomment"],true);
     $usercomment = $params["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
@@ -2055,8 +2055,8 @@ function project_send_mail($params, $p_id) {
   $company = $p["company"];
   $deal = $p["deal"];
   $tasktype = $p["tasktype"];
-  $datebegin = of_date_format($p["datebegin"], true);
-  $dateend = of_date_format($p["dateend"], true);
+  $datebegin = of_isodate_convert($p["datebegin"], true);
+  $dateend = of_isodate_convert($p["dateend"], true);
   $sold = $p["soldtime"];
   $estimated = $p["estimatedtime"];
   $comment = $p["comment"];
