@@ -32,8 +32,8 @@ function run_query_company_search($company) {
   $market = $company["market"];
   $dsrc = $company["datasource"];
   $zip = sql_search_text_parse($company["zip"]);
-  $dateafter = $company["date_after"];
-  $datebefore = $company["date_before"];
+  $dateafter = of_isodate_convert($company["date_after"],true);
+  $datebefore = of_isodate_convert($company["date_before"],true);
   $lang = get_lang();
 
   $obm_q = new DB_OBM;
@@ -295,7 +295,7 @@ function run_query_company_insert($company) {
   $comment = $company["comment"];
   $add_comment = $company["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $company["datecomment"];
+    $datecomment = of_isodate_convert($company["datecomment"]);
     $today = date("Y-m-d");
     if ($today == $datecomment) {
       $datecomment = $now;
@@ -450,7 +450,7 @@ function run_query_company_update($cid, $company) {
   $comment = $company["comment"];
   $add_comment = $company["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $company["datecomment"];
+    $datecomment = of_isodate_convert($company["datecomment"]);
     $usercomment = $company["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }

@@ -212,8 +212,8 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
   $mark = $company["market"];
   $dsrc = $company["datasource"];
   $zip = stripslashes($company["zip"]);
-  $dateafter = stripslashes($company["date_after"]);
-  $datebefore = stripslashes($company["date_before"]);
+  $dateafter = of_date_upd_format(stripslashes($company["date_after"]),true);
+  $datebefore = of_date_upd_format(stripslashes($company["date_before"]),true);
   if (($company["fuzzy"] == "1") ||
       ($csearch_advanced_default && $action != "search") ) {
     $fuzzy = "checked = \"checked\"";
@@ -1027,12 +1027,12 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     $deal_num = $co_q->f("company_deal_number");
     $comment = $co_q->f("company_comment");
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
   } else if ($action == "new") {
     $mark = $obm["uid"];
     $dsrc = $set_dsrc;
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
   }
   
   // If parameters have been given, they supercede the default action value
@@ -1062,7 +1062,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if (isset($company["comment"])) { $comment = stripslashes($company["comment"]); }
   if (isset($company["add_comment"])) { $add_comment = stripslashes($company["add_comment"]); }
   if (isset($company["usercomment"])) { $usercomment = $company["usercomment"]; }
-  if (isset($company["datecomment"])) { $datecomment = $company["datecomment"]; }
+  if (isset($company["datecomment"])) { $datecomment = of_date_upd_format($company["datecomment"]); }
   
   // Conditionnal fields
   $show_number = (! $cgp_hide["company"]["company_number"]);

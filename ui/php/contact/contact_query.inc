@@ -32,8 +32,8 @@ function run_query_contact_search($contact) {
   $town = sql_search_text_parse($contact["town"]);
   $ctry = $contact["country"];
   $dsrc = $contact["datasource"];
-  $dateafter = $contact["date_after"];
-  $datebefore = $contact["date_before"];
+  $dateafter = of_isodate_convert($contact["date_after"],true);
+  $datebefore = of_isodate_convert($contact["date_before"],true);
   $mailing_ok_only = $contact["mailing_ok_only"];
   $newsletter = $contact["newsletter"];
   $archive = $contact["archive"];

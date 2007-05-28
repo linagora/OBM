@@ -852,7 +852,7 @@ function of_date_guess_format ($date) {
   if(is_numeric($date) && $date > 31130000) {
     return "ts";
   }
-  return "unknown";
+  return false;
 }  
 
 /**

@@ -46,7 +46,7 @@ function html_backup_search_form($backup) {
 
   $filename = stripslashes($backup["filename"]);
   $version = stripslashes($backup["version"]);
-  $date = stripslashes($backup["date"]);
+  $date = of_date_upd_format(stripslashes($backup["date"]));
 
   $url = url_prepare("backup_index.php");
 
