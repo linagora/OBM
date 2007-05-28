@@ -26,7 +26,7 @@ Obm.CalendarDayEvent = new Class({
       this.makeDraggable();    
     this.setTime(this.event.time);
     this.setDuration(this.event.duration);
-    console.log(this);
+    // console.log(this);
   },
 
   makeDraggable: function() {

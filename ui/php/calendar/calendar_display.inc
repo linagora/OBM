@@ -934,7 +934,7 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
   $sel_user_id = array();
   if (is_array($sel_user)) {
     while(list($key, $val) = each($sel_user)) {
-     $sel_user_id[] = $key;
+     $sel_user_id[$key] = $val["class"];
     }
   }
 
@@ -942,8 +942,14 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
   $sel_res_id = array();
   if (is_array($sel_res)) {
     while(list($key, $val) = each($sel_res)) {
-     $sel_res_id[] = $key;
+     $sel_res_id[$key] = $val["class"];
     }
+  }
+
+  foreach ($calendar_entity as $type => $entity) {
+    foreach ($entity as $id => $data) {
+       
+    }    
   }
 
   $iso_date = $calendar["date"];
@@ -959,7 +965,7 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
   $prev_month = of_isodate_format(strtotime("-1 month",$ts_date));
 
   $list_title = calendar_localizeDate("month", $ts_date);
-  $occurrences = calendar_events_model($start_month, $end_month,$calendar_entity,$category_filter);
+  $occurrences = calendar_events_model($start_month, $end_month,$calendar_entity,$category_filter, true);
   $today_mark = false;
   $charset = mb_internal_encoding();
 
@@ -1026,9 +1032,10 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
             // $xml = simplexml_load_string($item);
             if (is_object($xml)) {
               foreach($xml->resource as $key => $value) {
-                if (in_array($value->res_id, $sel_res_id)) {
+                if (array_key_exists($value->res_id, $sel_res_id)) {
                   $dis_res = "$separator$value->res_name";
-                  $separator = ",";
+                  $separator = ", ";
+                  // $dis_res .= "<div style=\"width: 11px; height: 11px; float: left;\" class=\"".$sel_res_id[$value->res_id]."\">&nbsp;</div>";
                 }
                 $item_list .= "<b>$value->res_name:</b><br/>".nl2br($value->item)."$value->property_name:$value->property_value";
               }
@@ -1040,9 +1047,10 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
         $dis_user = "";
         $separator = "";
         foreach($attendee["user"] as $at_id => $at_name) {
-          if (in_array($at_id, $sel_user_id)) {
+          if (array_key_exists($at_id, $sel_user_id)) {
             $dis_user .= "$separator$at_name";
-            $separator = ",";
+            $separator = ", ";
+            // $dis_user .= "<div style=\"width: 11px; height: 11px; float: left;\" class=\"".$sel_user_id[$at_id]."\">&nbsp;</div>";
           }
 	        $dis_attendees .= "$br$at_name";
 	        $br = "<br />";
@@ -1062,7 +1070,8 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
      			});
 				";
         $dis_events .= "<div id=\"evt-$date-$ev_id\" >
-          <a href=\"javascript: void(0);\">$hour_begin - $title  ($dis_user $dis_res)</a>
+          <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_user $dis_res</span>
+          $hour_begin - <b>$title</b></a>
           <div id=\"eventDetail-$date-$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
             <table>
               <tr>
@@ -1094,7 +1103,8 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
           </div>
           </div>";
       }
-      $dis_events .= "</td></tr>";
+      $dis_events .= " </td>
+      </tr>";
     }
   }
 

@@ -2505,7 +2505,7 @@ function run_query_get_one_event_exception($calendar_id) {
 //   - $end_time        : timestamp of end date
 //   - $calendar_entity :
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_events_model($start_time, $end_time, $calendar_entity,$category_filter = "") {
+function calendar_events_model($start_time, $end_time, $calendar_entity,$category_filter = "", $unique=false) {
   global $day_duration;
 
   $day_duration = 86400;
@@ -2529,10 +2529,14 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     $owner = $nr_q->f("calendarevent_owner");
     if (isset($of->events[$id])) {
       $event = &$of->events[$id];
+      if (!$unique) {
+        $of->addOccurrence($event, $date, $entity, $entity_id);
+      }
     } else {
       $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description, $all_day,'none',$owner);
+      $of->addOccurrence($event, $date, $entity, $entity_id);
     }
-    $of->addOccurrence($event, $date, $entity, $entity_id);
+    // $of->addOccurrence($event, $date, $entity, $entity_id);
   }
   
   $r_q = run_query_calendar_repeat_events($start_time,$end_time,$calendar_entity,$category_filter);
