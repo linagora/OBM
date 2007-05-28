@@ -297,6 +297,12 @@ function display_head_theme($p_module) {
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
   global $css_print_obm, $ico_delete;
 
+  if($set_date_upd == $cda_upd_dmy) {
+    $date_upd_format = "fr";
+  } else {
+    $date_upd_format = "us";
+  }
+
   $monthShort =  phpArrayToJsArray($l_monthsofyearshort);
   $monthLong = phpArrayToJsArray($l_monthsofyear);
   $daysShort = phpArrayToJsArray($l_daysofweekfirst);
@@ -341,7 +347,7 @@ function display_head_theme($p_module) {
   obm.vars.images.plus = '$ico_plus';
   obm.vars.images.datePicker = '$ico_datepicker';
   obm.vars.images.del = '$ico_delete';
-  obm.vars.regexp.dateFormat = '$set_date_upd';
+  obm.vars.regexp.dateFormat = '$date_upd_format';
   obm.vars.consts.popupHeight = '$popup_height';
   obm.vars.consts.popupWidth = '$popup_width';
   obm.vars.labels.monthsShort = $monthShort;

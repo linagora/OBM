@@ -13,86 +13,14 @@ http://www.nsftools.com/tips/NotesTips.htm#datepicker
 I've tested this lightly with Internet Explorer 6 and Mozilla Firefox. I have no idea
 how compatible it is with other browsers.
 
-version 1.5
-December 4, 2005
-Julian Robichaux -- http://www.nsftools.com
-
-HISTORY
---  version 1.0 (Sept. 4, 2004):
-Initial release.
-
---  version 1.1 (Sept. 5, 2004):
-Added capability to define the date format to be used, either globally (using the
-defaultDateSeparator and defaultDateFormat variables) or when the displayDatePicker
-function is called.
-
---  version 1.2 (Sept. 7, 2004):
-Fixed problem where datepicker x-y coordinates weren't right inside of a table.
-Fixed problem where datepicker wouldn't display over selection lists on a page.
-Added a call to the datePickerClosed function (if one exists) after the datepicker
-is closed, to allow the developer to add their own custom validation after a date
-has been chosen. For this to work, you must have a function called datePickerClosed
-somewhere on the page, that accepts a field object as a parameter. See the
-example in the comments of the updateDateField function for more details.
-
---  version 1.3 (Sept. 9, 2004)
-Fixed problem where adding the <div> and <iFrame> used for displaying the datepicker
-was causing problems on IE 6 with global variables that had handles to objects on
-the page (I fixed the problem by adding the elements using document.createElement()
-and document.body.appendChild() instead of document.body.innerHTML += ...).
-
---  version 1.4 (Dec. 20, 2004)
-Added "targetDateField.focus();" to the updateDateField function (as suggested
-by Alan Lepofsky) to avoid a situation where the cursor focus is at the top of the
-form after a date has been picked. Added "padding: 0px;" to the dpButton CSS
-style, to keep the table from being so wide when displayed in Firefox.
-
--- version 1.5 (Dec 4, 2005)
-Added display=none when datepicker is hidden, to fix problem where cursor is
-not visible on input fields that are beneath the date picker. Added additional null
-date handling for date errors in Safari when the date is empty. Added additional
-error handling for iFrame creation, to avoid reported errors in Opera. Added
-onMouseOver event for day cells, to allow color changes when the mouse hovers
-over a cell (to make it easier to determine what cell you're over). Added comments
 in the style sheet, to make it more clear what the different style elements are for.
  */
 
 var datePickerDivID = "datepicker";
 var iFrameDivID = "datepickeriframe";
 var datePickerTimer;
-/**
-  This is the main function you'll call from the onClick event of a button.
-  Normally, you'll have something like this on your HTML page:
 
-  Start Date: <input name="StartDate">
-  <input type=button value="select" onclick="displayDatePicker('StartDate');">
-
-  That will cause the datepicker to be displayed beneath the StartDate field and
-  any date that is chosen will update the value of that field. If you'd rather have the
-  datepicker display beneath the button that was clicked, you can code the button
-  like this:
-
-  <input type=button value="select" onclick="displayDatePicker('StartDate', this);">
-
-  So, pretty much, the first argument (dateFieldName) is a string representing the
-  name of the field that will be modified if the user picks a date, and the second
-  argument (displayBelowThisObject) is optional and represents an actual node
-  on the HTML document that the datepicker should be displayed below.
-
-  In version 1.1 of this code, the dtFormat and dtSep variables were added, allowing
-  you to use a specific date format or date separator for a given call to this function.
-  Normally, you'll just want to set these defaults globally with the defaultDateSeparator
-  and defaultDateFormat variables, but it doesn't hurt anything to add them as optional
-  parameters here. An example of use is:
-
-  <input type=button value="select" onclick="displayDatePicker('StartDate', false, 'dmy', '.');">
-
-  This would display the datepicker beneath the StartDate field (because the
-  displayBelowThisObject parameter was false), and update the StartDate field with
-  the chosen value of the datepicker using a date format of dd.mm.yyyy
- */
-function displayDatePicker(dateFieldName, displayBelowThisObject, dtFormat)
-{
+function displayDatePicker(dateFieldName, displayBelowThisObject, dtFormat) {
   var targetDateField = document.getElementsByName (dateFieldName).item(0);
 
   // if we weren't told what node to display the datepicker beneath, just display it
@@ -284,18 +212,35 @@ function getDateString(dateVal)
   var monthString = "00" + (dateVal.getMonth()+1);
   dayString = dayString.substring(dayString.length - 2);
   monthString = monthString.substring(monthString.length - 2);
-  dateSeparator = '-';
-  switch (dateFormat) {
-    case "dmy" :
+  dateSeparator = '/';
+  switch (obm.vars.regexp.dateFormat) {
+    case "fr" :
       return dayString + dateSeparator + monthString + dateSeparator + dateVal.getFullYear();
-    case "ymd" :
-      return dateVal.getFullYear() + dateSeparator + monthString + dateSeparator + dayString;
-    case "mdy" :
-    default :
+    case "us" :
       return monthString + dateSeparator + dayString + dateSeparator + dateVal.getFullYear();
+    case "ymd" :
+    default :
+      return dateVal.getFullYear() + dateSeparator + monthString + dateSeparator + dayString;
   }
 }
 
+function guessDateFormat(fieldDate) {
+  reg = new Object();
+  reg['iso'] = "^[0-9]{4}[-\\/][01][0-9][-\\/][0123][0-9]$";
+  reg['fr'] = "^[23][0-9][-\\/]?[01][0-9][-\\/]?[0-9]{4}$";
+  reg['us'] = "^[01][0-9][-\\/]?[23][0-9][-\\/]?[0-9]{4}$";
+  reg['user'] = "^[0123][0-9][-\\/]?[0123][0-9][-\\/]?[0-9]{4}$";
+
+  for(format in reg) {
+    if(fieldDate.match(reg[format])) {
+      return format;
+    }
+  }
+  if(!isNaN(fieldDate) && fieldDate > 31130000)  {
+    return 'ts';
+  }
+  return false;
+}
 
 /**
   Convert a string to a JavaScript Date object.
@@ -306,43 +251,42 @@ function getFieldDate(dateString)
   var dArray;
   var d, m, y;
 
-  if(dateString.match(/[0-9]{4}-[0-1][0-9]-[0-3][0-9]/)) 
-    dFormat = "ymd";
-  else 
-    dFormat = dateFormat;
-  
-  try {
-    dArray = splitDateString(dateString);
-    if (dArray) {
-      switch (dFormat) {
-        case "dmy" :
-          d = parseInt(dArray[0], 10);
-          m = parseInt(dArray[1], 10) - 1;
-          y = parseInt(dArray[2], 10);
-          break;
-        case "ymd" :
-          d = parseInt(dArray[2], 10);
-          m = parseInt(dArray[1], 10) - 1;
-          y = parseInt(dArray[0], 10);
-          break;
-        case "mdy" :
-        default :
-          d = parseInt(dArray[1], 10);
-          m = parseInt(dArray[0], 10) - 1;
-          y = parseInt(dArray[2], 10);
-          break;
-      }
-      dateVal = new Date(y, m, d);
-    } else if (dateString) {
-      dateVal = new Date(dateString);
-    } else {
-      dateVal = new Date();
-    }
-  } catch(e) {
-    dateVal = new Date();
+  type = guessDateFormat(dateString);
+  if (type == "user") {
+    type = obm.vars.regexp.dateFormat;
   }
-
-  return dateVal;
+  try {
+    switch (type) {
+      case "ts" :
+        return new Date(dateString * 1000);
+        break;
+      case "iso" :
+        dArray = splitDateString(dateString);
+        d = parseInt(dArray[2], 10);
+        m = parseInt(dArray[1], 10) - 1;
+        y = parseInt(dArray[0], 10);
+        return new Date(y, m, d);
+        break;
+      case "fr" :
+        dArray = splitDateString(dateString);
+        d = parseInt(dArray[0], 10);
+        m = parseInt(dArray[1], 10) - 1;
+        y = parseInt(dArray[2], 10);
+        return new Date(y, m, d);
+        break;
+      case "us" :
+        dArray = splitDateString(dateString);
+        d = parseInt(dArray[1], 10);
+        m = parseInt(dArray[0], 10) - 1;
+        y = parseInt(dArray[2], 10);
+        return new Date(y, m, d);
+        break;      
+      default :
+        return new Date();
+    }
+  }catch(e) {
+    return new Date();
+  }
 }
 
 
