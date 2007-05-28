@@ -28,6 +28,7 @@ Element.extend({
   }
 });
 
+// used to manage a cache of results
 obm.AutoComplete.Cache = new Class({
 
   initialize: function() {
@@ -35,36 +36,36 @@ obm.AutoComplete.Cache = new Class({
     this.EmptyItem = new Element('h2');
   },
 
-  setSize: function(size) {
+  setSize: function(size) {     // defines the total results number that will contain the cache
     while (size > this.getSize()) {
       this.loadingCache.push(this.EmptyItem.clone())
     }
   },
 
-  addElement: function(elt) {
+  addElement: function(elt) {   // add a result in the cache
     if (this.loadingCache.length>0)
       this.loadingCache.shift()
     this.realCache.push(elt);
   },
 
-  getElementAt: function(index) {
+  getElementAt: function(index) { // to get the element at the given index
     return ( index<this.realCache.length ? this.realCache[index] : this.loadingCache[index-this.realCache.length]);
   },
 
-  getIndexOf: function(elt) {
+  getIndexOf: function(elt) {   // to get the index of the given element
     var index = this.realCache.indexOf(elt);
     return (index != -1 ? index : this.loadingCache.indexOf(elt) ) ;
   },
 
-  getSize: function() {
+  getSize: function() {         // to get the total cache size
     return this.realCache.length + this.loadingCache.length;
   },
 
-  getCacheSize: function() {
+  getCacheSize: function() {    // number of elements in cache
     return this.realCache.length;
   },
 
-  flush: function() {
+  flush: function() {           // flush cache
     this.size = 0;
     this.realCache = new Array();
     this.loadingCache = new Array();
@@ -72,33 +73,34 @@ obm.AutoComplete.Cache = new Class({
 
 });
 
+// used to manage the visible elements of the result list
 //FIXME Improve algorythm
 //FIXME Refactor
 obm.AutoComplete.View = new Class({
 
   initialize: function(visibleNb) {
-    this.visibleNb = visibleNb;
-    this.elementNb = 0;
-    this.first = 0;
+    this.visibleNb = visibleNb; // maximum number of visible results
+    this.elementNb = 0;         // current number of elements in the list
+    this.first = 0;             // index of the first visible element
   },
 
-  setElementNb: function(elementNb) {
+  setElementNb: function(elementNb) { // used to set the number of elements in the list
     this.elementNb = elementNb;
   },
 
-  getFirst: function() {
+  getFirst: function() {        // index of the first visible element
     return this.first;
   },
 
-  getLast: function() {
+  getLast: function() {         // index of the last visible element
     return Math.min(this.elementNb, this.first+this.visibleNb)-1;
   },
 
-  inView: function(index) {
+  inView: function(index) {     // is it the index of a visible element, or not ?
     return ( index >= this.first && index <= this.getLast() );
   },
-  
-  move: function(offset) {
+
+  move: function(offset) {      // used to move the index of visible elements
     this.first += offset;
     if ( this.first > (this.elementNb - this.visibleNb)) {
       this.first = (this.elementNb - this.visibleNb);
@@ -108,6 +110,7 @@ obm.AutoComplete.View = new Class({
   }
 
 });
+
 
 obm.AutoComplete.Search = new Class({
 
@@ -124,24 +127,24 @@ obm.AutoComplete.Search = new Class({
   },
 
 
-initialize: function(url, selectedBox, input, options) {
+  initialize: function(url, selectedBox, inputField, options) {
     this.setOptions(options);
 
     this.url = url;
-    this.input = $(input);
+    this.inputField = $(inputField);
     this.name = selectedBox;
     this.selectedBox = $(selectedBox);
 
     this.toClear = false;
    // FIXME OnBlur event to be rethink
    // FIXME Rename input on field.. input can have many means
-    this.input.addEvent('keyup', this.onTextChange.bindAsEventListener(this))
-              .addEvent('keydown', this.onKeyDown.bindWithEvent(this))
-              .addEvent('keypress', this.onKeyPress.bindWithEvent(this))
-              .addEvent('blur',this.reset.bindAsEventListener(this))
-              .addEvent('focus',function(){this.input.value='';this.input.removeClass('downlight');}.bindAsEventListener(this));
+    this.inputField.addEvent('keyup', this.onTextChange.bindAsEventListener(this))
+                   .addEvent('keydown', this.onKeyDown.bindWithEvent(this))
+                   .addEvent('keypress', this.onKeyPress.bindWithEvent(this))
+                   .addEvent('blur',this.reset.bindAsEventListener(this))
+                   .addEvent('focus',function(){this.inputField.value='';this.inputField.removeClass('downlight');}.bindAsEventListener(this));
 
-    var inputCoords = this.input.getCoordinates();
+    var inputCoords = this.inputField.getCoordinates();
     this.resultBox = new Element('div').addClass('autoCompleteResultBox')
                                        .injectInside($(document.body))
                                        .setStyles({
@@ -149,17 +152,17 @@ initialize: function(url, selectedBox, input, options) {
                                          'left':inputCoords.left + 'px'
                                        });
     this.infos = new Element('h2').injectInside(this.resultBox)
-                                  .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this));
+                                  .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
 
-    //FIXME Name of those 3 vars                                       
+    //FIXME Name of those 3 vars
     this.previousBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(-this.options.results);}.bindAsEventListener(this))
-                                          .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this))
+                                          .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this))
                                           .setHTML('&lt;&lt;&lt;')
                                           .hide()
                                           .injectInside(this.infos);
     this.text = new Element('span').injectInside(this.infos);
     this.nextBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(this.options.results);}.bindAsEventListener(this))
-                                      .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this))
+                                      .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this))
                                       .setHTML('&gt;&gt;&gt;')
                                       .hide()
                                       .injectInside(this.infos);
@@ -187,9 +190,9 @@ initialize: function(url, selectedBox, input, options) {
   //FIXME Switch case? French
   onKeyDown: function(e) {
     if (e.key == 'esc') { // Echap : on reinitialise le champs
-      this.input.blur();
+      this.inputField.blur();
       this.reset();
-      this.input.focus();
+      this.inputField.focus();
       return false;
 
     } else if (e.key == 'up' && this.resultBox.isVisible()) { // Haut : on déplace la sélection vers le haut
@@ -220,12 +223,12 @@ initialize: function(url, selectedBox, input, options) {
   },
 
   newRequest: function() {
-    if (this.input.value.clean().length < this.options.chars) {
-      this.currentValue = this.input.value;
-      this.reinitListe();
-    } else if (this.input.value != this.currentValue) {
-      this.currentValue = this.input.value;
-      this.reinitListe();
+    if (this.inputField.value.clean().length < this.options.chars) {
+      this.currentValue = this.inputField.value;
+      this.resetResultBox();
+    } else if (this.inputField.value != this.currentValue) {
+      this.currentValue = this.inputField.value;
+      this.resetResultBox();
       new Ajax(this.url, {
         method: 'post',
         postBody: 'pattern='+this.currentValue+'&limit='+(this.options.results*3)+'&restriction='+this.options.restriction+'&extension'+this.options.extension,
@@ -236,8 +239,9 @@ initialize: function(url, selectedBox, input, options) {
   },
 
   cacheRequest: function() { // update the cache when it needs to be (call it after the view moved forward)
-    if (this.input.value == this.currentValue) {
+    if (this.inputField.value == this.currentValue) {
       if (this.view.getFirst()+this.options.results*2>=this.cache.getSize() && this.cache.getSize()<this.nbTotal) {
+        //FIXME French
         var nbElemRestant = this.nbTotal-this.cache.getSize();
         //FIXME French
         var nbRecherche = ((this.options.results*2)>nbElemRestant ? nbElemRestant : this.options.results*2);
@@ -258,15 +262,15 @@ initialize: function(url, selectedBox, input, options) {
 
   onNewRequestSuccess: function(response) {
     if (response.trim() == '' || this.toClear) {
-      this.hideListe();
-      this.reinitListe();
+      this.hideResultBox();
+      this.resetResultBox();
       this.toClear = false;
     }
     if (response.trim() != '') {
       this.parseResponse(response);
       this.drawView();
       this.updateInfo();
-      this.showListe();
+      this.showResultBox();
     }
   },
 
@@ -303,11 +307,11 @@ initialize: function(url, selectedBox, input, options) {
       if($type(data.extension)) {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
            .addEvent('mousedown', function() {this.addChoice(res,data.extension);}.bindAsEventListener(this))
-           .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this));
+           .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
       } else {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
            .addEvent('mousedown', function() {this.addChoice(res);}.bindAsEventListener(this))
-           .addEvent('mouseup', function() {this.input.focus();}.bindAsEventListener(this));
+           .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
       }
     }.bind(this));
     this.nbTotal = results.length;
@@ -362,20 +366,19 @@ initialize: function(url, selectedBox, input, options) {
     }
   },
   ///////////////////////////////////////////////////////////////////////////
-  // liste element functions
-  //FIXME French
-  hideListe: function() {
+  // show/hide resultBox functions
+  hideResultBox: function() {
     this.resultBox.hide();
   },
-  showListe: function() {
-    var inputCoords = this.input.getCoordinates();
+  showResultBox: function() {
+    var inputCoords = this.inputField.getCoordinates();
     this.resultBox.setStyles({                  
       'top':(inputCoords.top + inputCoords.height + 2) + 'px',
       'left':inputCoords.left + 'px'});
     this.resultBox.show();
   },
   ///////////////////////////////////////////////////////////////////////////
-  // view (fenêtre des résultats visibles)
+  // view (visible results from the list of results)
   drawView: function() {
     if (this.nbTotal>0) {
       var topLimit = this.view.getLast();
@@ -444,14 +447,14 @@ initialize: function(url, selectedBox, input, options) {
   },
   removeChoice: function(element) {
     element.getParent().remove();
-    this.input.focus();
+    this.inputField.focus();
   },
   ///////////////////////////////////////////////////////////////////////////
-  // reinit functions
-  reset: function() {
-    this.hideListe();
-    this.input.value = this.options.defaultText;
-    this.input.addClass('downlight')
+  // reset functions
+  reset: function() {          // reset input and result boxes
+    this.hideResultBox();
+    this.inputField.value = this.options.defaultText;
+    this.inputField.addClass('downlight')
     this.currentValue = '';
     this.nbTotal = 0;
     this.cache = new obm.AutoComplete.Cache();
@@ -459,9 +462,8 @@ initialize: function(url, selectedBox, input, options) {
     this.view.setElementNb(0);
     this.selection = -1;
   },
-  //FIXME French
-  reinitListe: function() {
-    this.hideListe();
+  resetResultBox: function() { // reset the result box
+    this.hideResultBox();
     this.flushView();
     this.cache = new obm.AutoComplete.Cache();
     this.view = new obm.AutoComplete.View(this.options.results);

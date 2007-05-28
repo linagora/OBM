@@ -23,8 +23,8 @@ function run_query_invoice_search ($invoice) {
   $status = $invoice["status"];
   $sel_tt = $invoice["tasktype"];
   $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
-  $date_after = $invoice["date_after"];
-  $date_before = $invoice["date_before"];
+  $date_after = of_isodate_convert($invoice["date_after"]);
+  $date_before = of_isodate_convert($invoice["date_before"]);
   $inout = $invoice["inout"];
   $company = sql_search_text_parse($invoice["company"]);
   $archive = $invoice["archive"];
@@ -220,13 +220,13 @@ function run_query_invoice_insert($invoice) {
   $ht = $invoice["amount_ht"];
   $ttc = $invoice["amount_ttc"];
   $status = $invoice["status"];
-  $date = ($invoice["date"] ? "'".$invoice["date"]."'" : "null");
-  $expiration_date = ($invoice["expiration_date"] ? "'".$invoice["expiration_date"]."'" : "null");
-  $payment_date = ($invoice["payment_date"] ? "'".$invoice["payment_date"]."'" : "null");
+  $date = ($invoice["date"] ? "'".of_isodate_convert($invoice["date"])."'" : "null");
+  $expiration_date = ($invoice["expiration_date"] ? "'".of_isodate_convert($invoice["expiration_date"])."'" : "null");
+  $payment_date = ($invoice["payment_date"] ? "'".of_isodate_convert($invoice["payment_date"])."'" : "null");
   $inout = $invoice["inout"];
   $add_comment = $invoice["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $invoice["datecomment"];
+    $datecomment = of_isodate_convert($invoice["datecomment"]);
     $usercomment = $invoice["usercomment"];
     $comment = "$datecomment:$usercomment:$add_comment";
   }
@@ -310,9 +310,9 @@ function run_query_invoice_update($invoice) {
   $ht = $invoice["amount_ht"];
   $ttc = $invoice["amount_ttc"];
   $status = $invoice["status"];
-  $date = ($invoice["date"] ? "'".$invoice["date"]."'" : "null");
-  $expiration_date = ($invoice["expiration_date"] ? "'".$invoice["expiration_date"]."'" : "null");
-  $payment_date = ($invoice["payment_date"] ? "'".$invoice["payment_date"]."'" : "null");
+  $date = ($invoice["date"] ? "'".of_isodate_convert($invoice["date"])."'" : "null");
+  $expiration_date = ($invoice["expiration_date"] ? "'".of_isodate_convert($invoice["expiration_date"])."'" : "null");
+  $payment_date = ($invoice["payment_date"] ? "'".of_isodate_convert($invoice["payment_date"])."'" : "null");
   $inout = $invoice["inout"];
   if ($status == ""){
     $status = "0";
@@ -320,7 +320,7 @@ function run_query_invoice_update($invoice) {
   $comment = $invoice["comment"];
   $add_comment = $invoice["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $invoice["datecomment"];
+    $datecomment = of_isodate_convert($invoice["datecomment"]);
     $usercomment = $invoice["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }

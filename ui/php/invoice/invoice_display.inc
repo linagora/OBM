@@ -170,8 +170,8 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   $ttc = $invoice["amount_ttc"];
   $status = $invoice["status"];
   $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
-  $date_after = $invoice["date_after"];
-  $date_before = $invoice["date_before"];
+  $date_after = of_date_upd_format($invoice["date_after"], true);
+  $date_before = of_date_upd_format($invoice["date_before"], true);
   $inout = $invoice["inout"];
   $tt = $invoice["tt"];
   $deal_id = $invoice["deal_id"];
@@ -824,9 +824,9 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   if (isset($invoice["label"])) { $label = stripslashes($invoice["label"]); }
   if (isset($invoice["number"])) { $number = $invoice["number"]; }
   if (isset($invoice["archive"])) { $archive = ($invoice["archive"] == 1 ? "checked" : ""); }
-  if (isset($invoice["date"])) { $date = $invoice["date"]; }
-  if (isset($invoice["expiration_date"])) { $expiration_date = $invoice["expiration_date"]; }
-  if (isset($invoice["payment_date"])) { $payment_date = $invoice["payment_date"]; }
+  if (isset($invoice["date"])) { $date = of_date_upd_format($invoice["date"]); }
+  if (isset($invoice["expiration_date"])) { $expiration_date = of_date_upd_format($invoice["expiration_date"]); }
+  if (isset($invoice["payment_date"])) { $payment_date = of_date_upd_format($invoice["payment_date"]); }
   if (isset($invoice["status"])) { $status = $invoice["status"]; }
   if (isset($invoice["inout"])) { $inout = $invoice["inout"]; }
   if (isset($invoice["tax"])) { $tax = $invoice["tax"]; }
@@ -835,7 +835,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   if (isset($invoice["comment"])) { $comment = stripslashes($invoice["comment"]); }
   if (isset($invoice["add_comment"])) { $add_comment = stripslashes($invoice["add_comment"]); }
   if (isset($invoice["usercomment"])) { $usercomment = $invoice["usercomment"]; }
-  if (isset($invoice["datecomment"])) { $datecomment = $invoice["datecomment"]; }
+  if (isset($invoice["datecomment"])) { $datecomment = of_date_upd_format($invoice["datecomment"]); }
 
   if (isset($invoice["company_id"])) { $c_id = $invoice["company_id"]; }
   if (isset($invoice["company_name"])) { $c_name = stripslashes($invoice["company_name"]); }

@@ -50,7 +50,7 @@ fi
 echo $PHP : PHP interpreter found
 
 # Create the Artichow library link
-mv ../../obminclude/Artichow-1.06-php4+5/ ../../obminclude/Artichow
+# mv ../../obminclude/Artichow-1.1.0-php4+5/ ../../obminclude/Artichow
 
 echo "*** Document repository creation"
 $PHP install_document_2.0.php || (echo $?; exit $?)
@@ -79,8 +79,8 @@ echo "  Company Naf Code data insertion"
 mysql -u $U -p$P $DB < data-$OBM_LANG/obmdb_nafcode_2.0.sql
 
 # Test data insertion
-echo "  Test data insertion"
-mysql -u $U -p$P $DB < obmdb_test_values_2.0.sql
+#echo "  Test data insertion"
+#mysql -u $U -p$P $DB < obmdb_test_values_2.0.sql
 
 # Default preferences data insertion
 echo "  Default preferences data insertion"
