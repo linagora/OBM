@@ -607,9 +607,9 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   $arc_status = ($project_q->f("project_archive")) ? "$l_yes" : "$l_no";
   $soldtime = $project_q->f("project_soldtime");
   $estimated = $project_q->f("project_estimatedtime");
-  $datebegin = of_date_upd_format($project_q->f("datebegin"), 1);
-  $dateend = of_date_upd_format($project_q->f("dateend"), 1);
-  $reference_date =  of_date_upd_format($project_q->f("project_reference_date"));
+  $datebegin = of_date_format($project_q->f("datebegin"), 1);
+  $dateend = of_date_format($project_q->f("dateend"), 1);
+  $reference_date =  of_date_format($project_q->f("project_reference_date"));
   $reference_duration =  $project_q->f("project_reference_duration");
   $reference_desc =  nl2br($project_q->f("project_reference_desc"));
   $reference_tech =  nl2br($project_q->f("project_reference_tech"));
