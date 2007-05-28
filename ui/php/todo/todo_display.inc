@@ -233,11 +233,11 @@ function dis_todo_form($todo, $todo_q = 0) {
     $priority = $todo_q->f("todo_priority");
     $percent = $todo_q->f("todo_percent");
     $deadline = $todo_q->f("date_deadline");
-    $deadline = ($deadline != 0) ? of_date_format($deadline, 1) : $l_no_deadline;
+    $deadline = ($deadline != 0) ? of_date_upd_format($deadline, true) : $l_no_deadline;
   } else {
     $u_id = $obm["uid"];
     $priority = intval(($max_priority+1)/2);
-    $deadline = date("Y-m-d");
+    $deadline = of_date_upd_format();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -245,7 +245,7 @@ function dis_todo_form($todo, $todo_q = 0) {
   if (isset($todo["title"])) { $title = $todo["title"]; }
   if (isset($todo["priority"])) { $priority = $todo["priority"]; }
   if (isset($todo["percent"])) { $percent = $todo["percent"]; }
-  if (isset($todo["deadline"])) { $deadline = $todo["deadline"]; }
+  if (isset($todo["deadline"])) { $deadline = of_date_upd_format($todo["deadline"],true); };
   if (isset($todo["content"])) { $content = $todo["content"]; }
   if (is_array($todo["userid"])) {
     $p_user_array = $todo["userid"];

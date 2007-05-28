@@ -133,7 +133,7 @@ function run_query_todo_insert($todo) {
   if ($percent == "") {
     $percent = "0";
   }
-  $deadline = $todo["deadline"];
+  $deadline = of_isodate_convert($todo["deadline"],true);
   $content = $todo["content"];
 	$domain_id = $obm["domain_id"];
 
@@ -195,7 +195,7 @@ function run_query_todo_update($todo) {
   $users = $todo["userid"];
   $user = $users[0];
   $priority = $todo["priority"];
-  $deadline = $todo["deadline"];
+  $deadline = of_isodate_convert($todo["deadline"],true);
   $content = $todo["content"];
   $percent = $todo["percent"];
   if ($percent == "") {
