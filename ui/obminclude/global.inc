@@ -811,7 +811,6 @@ function of_date_upd_format($date="", $null_empty=false) {
       $type = "us";
     }
   }
- echo $type ;
   switch ($type) {
   case "iso" :
     preg_match("/^(\d{4})[-\/](\d{2})[-\/](\d{2})/",$date, $d);
