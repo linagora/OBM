@@ -100,6 +100,7 @@ $attributeDef = {
         structural => 1,
         is_branch => 1,
         dn_prefix => "ou",
+        dn_value => "name",
         objectclass => [ "organizationalUnit" ],
         get_db_value => sub {
             my( $parentDn, $domainId ) = @_;
