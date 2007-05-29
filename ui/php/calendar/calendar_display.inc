@@ -2008,7 +2008,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   if (isset($calendar["repeatfrequency"])) { $repeatfrequency = $calendar["repeatfrequency"]; }  
   if (isset($calendar["item"])) { $item = $calendar["item"]; }  
   if (isset($calendar["date_begin"])) {
-    echo $calendar["date_begin"];
     $ts = isodatetime_to_timestamp($calendar["date_begin"]);
     $datebegin = of_date_upd_format($ts);
     $hourbegin = of_date_get_hour($ts);
