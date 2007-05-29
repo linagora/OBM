@@ -97,8 +97,8 @@ function html_lead_search_form($params, $sources, $managers) {
   $company = $params["company"];
   $archive = ($params["archive"] == "1" ? "checked = \"checked\"" : "");
   $text = stripslashes($params["text"]);
-  $date_after = $params["date_after"];
-  $date_before = $params["date_before"];
+  $date_after = of_date_upd_format($params["date_after"],true);
+  $date_before = of_date_upd_format($params["date_before"],true);
 
   // Sources select
   $sel_source = "
@@ -422,21 +422,21 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
     $contact_fname = $l_q->f("contact_firstname");
     $name = $l_q->f("lead_name");
     $date = $l_q->f("date");
-    $date = ($date != 0) ? of_date_format($date, 1) : "";
+    $date = ($date != 0) ? of_date_upd_format($date) : "";
     $datealarm = $l_q->f("datealarm");
-    $datealarm = ($datealarm != 0) ? of_date_format($datealarm, 1) : "";
+    $datealarm = ($datealarm != 0) ? of_date_upd_format($datealarm) : "";
     $todo = $l_q->f("lead_todo");
     $archive = $l_q->f("lead_archive");
     $comment = $l_q->f("lead_comment");
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
 
   // New form and first time
   } elseif ($action == "new") {
     $title = $l_header_new;
     $date = of_date_upd_format();
     $usercomment = $uid;
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -452,13 +452,13 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   if (isset($params["source"])) { $source_id = $params["source"]; }
   if (isset($params["manager"])) { $manager_id = $params["manager"]; }
   if (isset($params["name"])) { $name = $params["name"]; }
-  if (isset($params["date"])) { $date = $params["date"]; }
-  if (isset($params["datealarm"])) { $datealarm = $params["datealarm"]; }
+  if (isset($params["date"])) { $date = of_date_upd_format($params["date"]); }
+  if (isset($params["datealarm"])) { $datealarm = of_date_upd_format($params["datealarm"]); }
   if (isset($params["todo"])) { $todo = stripslashes($params["todo"]); }
   if (isset($params["comment"])) { $comment = stripslashes($params["comment"]); }
   if (isset($params["add_comment"])) { $add_comment = stripslashes($params["add_comment"]); }
   if (isset($params["usercomment"])) { $usercomment = $params["usercomment"]; }
-  if (isset($params["datecomment"])) { $datecomment = $params["datecomment"]; }
+  if (isset($params["datecomment"])) { $datecomment = of_date_upd_format($params["datecomment"]); }
   if (isset($params["mail_comment"])) { $mail_comment = $params["mail_comment"]; }
 
 

@@ -20,8 +20,8 @@ function run_query_lead_search($params) {
 
   $text = sql_search_text_parse($params["text"]);
   $company = sql_search_text_parse($params["company"]);
-  $date_after = $params["date_after"];
-  $date_before = $params["date_before"];
+  $date_after = of_isodate_convert($params["date_after"],true);
+  $date_before = of_isodate_convert($params["date_before"],true);
   $date_field = $params["date_field"] ? $params["date_field"] : "date";
   $source = $params["source"];
   $manager = $params["manager"];
@@ -193,15 +193,15 @@ function run_query_lead_insert($params) {
   $source_id = $params["source"];
   $manager_id = $params["manager"];
   $name = $params["name"];
-  $date = ($params["date"] ? "'".$params["date"]."'" : "null");
-  $datealarm = ($params["datealarm"] ? "'".$params["datealarm"]."'" : "null");
+  $date = ($params["date"] ? "'".of_isodate_convert($params["date"])."'" : "null");
+  $datealarm = ($params["datealarm"] ? "'".of_isodate_convert($params["datealarm"])."'" : "null");
   $todo = $params["todo"];
   $archive = ($params["archive"] == "1" ? "1" : "0");
   $privacy = ($params["privacy"] == "1" ? "1" : "0");
 
   $add_comment = $params["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $params["datecomment"];
+    $datecomment = of_isodate_convert($params["datecomment"],true);
     $today = date("Y-m-d");
     if ($today == $datecomment) {
       $datecomment = $now;
@@ -297,8 +297,8 @@ function run_query_lead_update($pid, $params) {
   $source_id = $params["source"];
   $manager_id = $params["manager"];
   $name = $params["name"];
-  $date = ($params["date"] ? "'".$params["date"]."'" : "null");
-  $datealarm = ($params["datealarm"] ? "'".$params["datealarm"]."'" : "null");
+  $date = ($params["date"] ? "'".of_isodate_convert($params["date"])."'" : "null");
+  $datealarm = ($params["datealarm"] ? "'".of_isodate_convert($params["datealarm"])."'" : "null");
   $todo = $params["todo"];
   $archive = ($params["archive"] == 1 ? "1" : "0");
   $privacy = ($params["privacy"] == 1 ? "1" : "0");
@@ -306,7 +306,7 @@ function run_query_lead_update($pid, $params) {
 
   $add_comment = $params["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $params["datecomment"];
+    $datecomment = of_isodate_convert($params["datecomment"],true);
     $today = date("Y-m-d");
     if ($today == $datecomment) {
       $datecomment = $now;
@@ -402,8 +402,8 @@ function check_lead_data_form($id, $params) {
   global $err, $l_exist_error;
 
   $name = $params["name"];
-  $date = $params["date"];
-  $datealarm = $params["datealarm"];
+  $date = of_isodate_convert($params["date"],true);
+  $datealarm = of_isodate_convert($params["datealarm"],true);
   $c_id = $params["company_id"];
   $c_new_id = $params["company_new_id"];
   $contact_id = $params["contact_id"];
