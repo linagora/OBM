@@ -787,7 +787,7 @@ function of_date_format($timestamp="", $null_empty="") {
  * @access public
  * @return void
  */
-function of_date_upd_format($date="", $null_empty = false) {
+function of_date_upd_format($date="", $null_empty=false) {
   global $set_date_upd, $cda_upd_dmy, $cda_upd_mdy;
   
   if($set_date_upd == $cda_upd_dmy) {
@@ -803,6 +803,15 @@ function of_date_upd_format($date="", $null_empty = false) {
   } else {
     return null;
   }
+
+  if($type == "user") {
+    if($set_date_upd == $cda_upd_dmy) {
+      $type = "fr";
+    } else {
+      $type = "us";
+    }
+  }
+ echo $type ;
   switch ($type) {
   case "iso" :
     preg_match("/^(\d{4})[-\/](\d{2})[-\/](\d{2})/",$date, $d);
@@ -812,18 +821,12 @@ function of_date_upd_format($date="", $null_empty = false) {
     $date = date($date_upd_format, $date);
     break;
   case "fr" :
-    if($set_date_upd != $cda_upd_dmy) {
-      preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
-      $date = date($date_upd_format,mktime(0,0,0,$d[2],$d[1],$d[3]));
-    }
+    preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
+    $date = date($date_upd_format,mktime(0,0,0,$d[2],$d[1],$d[3]));
     break;
   case "us" :
-    if($set_date_upd != $cda_upd_mdy) {
-      preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
+     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
       $date = date($date_upd_format,mktime(0,0,0,$d[1],$d[2],$d[3]));        
-    }    
-    break;
-  case "user" :
     break;
   default :
   }
@@ -850,6 +853,7 @@ function of_date_guess_format ($date) {
       return "$format";
     }
   }
+  // 31130000 is the lowest number which cannot be a date (31129999 => 31/12/9999)
   if(is_numeric($date) && $date > 31130000) {
     return "ts";
   }

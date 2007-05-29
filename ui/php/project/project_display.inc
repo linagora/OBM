@@ -1091,7 +1091,7 @@ function html_project_form($action, $project_q, $project) {
     $comment = $project_q->f("project_comment");
     $shortname = $project_q->f("project_shortname");
     $usercomment = $obm["uid"];
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
   } else {
     if ($action == "new") {
       $name = $project["deal_label"];
