@@ -11,8 +11,10 @@ use strict;
 require OBM::toolBox;
 require OBM::loadDbIncremental;
 require OBM::Ldap::ldapEngine;
-require OBM::Entities::posixUser;
-require OBM::Entities::posixGroup;
+require OBM::Entities::obmNode;
+require OBM::Entities::obmUser;
+require OBM::Entities::obmGroup;
+require OBM::Entities::obmMailshare;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 use Getopt::Long;
@@ -103,19 +105,31 @@ if( defined($parameters{"domain"}) ) {
 # Otention des serveurs LDAP par domaines
 &OBM::ldap::getServerByDomain( $dbHandler, $main::domainList );
 
-# Test entite POSIXUSERS
-my $entity = OBM::Entities::posixUser->new( 0, 6 );
-$entity->getEntity( $dbHandler, $main::domainList->[1] );
+# Test entite NODE
+my $entity = OBM::Entities::obmNode->new( 0 );
+$entity->getEntity( "test", "Node de test", $main::domainList->[1] );
 $entity->dump();
+print $entity->getLdapDnPrefix();
+
+# Test entite POSIXUSERS
+#my $entity = OBM::Entities::obmUser->new( 0, 6 );
+#$entity->getEntity( $dbHandler, $main::domainList->[1] );
+#$entity->dump();
 
 # Test entite POSIXGROUPS
-#my $entity = OBM::Entities::posixGroup->new( 0, 5 );
+#my $entity = OBM::Entities::obmGroup->new( 0, 5 );
+#$entity->getEntity( $dbHandler, $main::domainList->[1] );
+#$entity->dump();
+
+# Test entite MAILSHARE
+#my $entity = OBM::Entities::obmMailshare->new( 0, 1 );
 #$entity->getEntity( $dbHandler, $main::domainList->[1] );
 #$entity->dump();
 
 #my $ldapEngine = OBM::Ldap::ldapEngine->new( $main::domainList );
-#$ldapEngine->init;
-#$ldapEngine->destroy;
+#$ldapEngine->init();
+#$ldapEngine->dump( "ldapstruct" );
+#$ldapEngine->destroy();
 
 #
 # On referme la connexion a la base

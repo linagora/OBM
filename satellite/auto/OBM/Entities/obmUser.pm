@@ -1,4 +1,4 @@
-package OBM::Entities::posixUser;
+package OBM::Entities::obmUser;
 
 $VERSION = "1.0";
 
@@ -36,10 +36,10 @@ sub new {
     $obj = ref($obj) || $obj;
 
     if( !defined($userId) ) {
-        croak( "Usage: PACKAGE->new(USERID)" );
+        croak( "Usage: PACKAGE->new(INCR, USERID)" );
 
     }elsif( $userId !~ /^\d+$/ ) {
-        &OBM::toolBox::write_log( "posixUser: identifiant d'utilisateur incorrect", "W" );
+        &OBM::toolBox::write_log( "obmUser: identifiant d'utilisateur incorrect", "W" );
         return undef;
 
     }else {
@@ -69,13 +69,17 @@ sub getEntity {
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "posixUser: connecteur a la base de donnee invalide", "W" );
+        &OBM::toolBox::write_log( "obmUser: connecteur a la base de donnee invalide", "W" );
         return 0;
     }
 
-    if( !defined($domainDesc->{"domain_id"}) ) {
-        &OBM::toolBox::write_log( "posixUser: description de domaine OBM incorrecte", "W" );
+    if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
+        &OBM::toolBox::write_log( "obmUser: description de domaine OBM incorrecte", "W" );
         return 0;
+
+    }else {
+        # On positionne l'identifiant du domaine de l'entité
+        $self->{"domainId"} = $domainDesc->{"domain_id"};
     }
 
 
@@ -83,7 +87,7 @@ sub getEntity {
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "posixUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return undef;
     }
 
@@ -91,10 +95,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "posixUser: pas d'utilisateur d'identifiant : ".$userId, "W" );
+        &OBM::toolBox::write_log( "obmUser: pas d'utilisateur d'identifiant : ".$userId, "W" );
         return undef;
     }elsif( $numRows > 1 ) {
-        &OBM::toolBox::write_log( "posixUser: plusieurs utilisateurs d'identifiant : ".$userId." ???", "W" );
+        &OBM::toolBox::write_log( "obmUser: plusieurs utilisateurs d'identifiant : ".$userId." ???", "W" );
         return undef;
     }
 
@@ -104,7 +108,7 @@ sub getEntity {
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "posixUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return undef;
     }
 
@@ -115,10 +119,10 @@ sub getEntity {
     # Positionnement du flag archive
     $self->{"archive"} = $user_archive;
     if( $user_archive ) {
-        &OBM::toolBox::write_log( "posixUser: gestion de l'utilisateur archive '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur archive '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     }else {
-        &OBM::toolBox::write_log( "posixUser: gestion de l'utilisateur '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     }
 
@@ -188,7 +192,7 @@ sub getEntity {
         my $localServerIp = &OBM::toolBox::getHostIpById( $dbHandler, $user_mail_server_id );
 
         if( !defined($localServerIp) ) {
-            &OBM::toolBox::write_log( "posixUser: droit mail de l'utilisateur '".$user_login."' annule - Serveur inconnu !", "W" );
+            &OBM::toolBox::write_log( "obmUser: droit mail de l'utilisateur '".$user_login."' annule - Serveur inconnu !", "W" );
             $self->{"userDesc"}->{"user_mailperms"} = 0;
 
         }else {
@@ -232,9 +236,6 @@ sub getEntity {
         }
     }
 
-    # On positionne l'identifiant du domaine de l'entité
-    $self->{"domainId"} = $domainDesc->{"domain_id"};
-
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
     if( !$self->{"incremental"} ) {
@@ -269,15 +270,13 @@ sub _getEntityMailboxAcl {
         my %rightDef;
 
         $rightDef{"read"}->{"compute"} = 1;
-        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM
-        ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"writeonly"}->{"compute"} = 1;
         $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"write"}->{"compute"} = 1;
-        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM
-        ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." LEFT JOIN ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
+        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." LEFT JOIN ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
 
         $rightDef{"public"}->{"compute"} = 0;
         $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
@@ -632,4 +631,6 @@ sub dump {
     
     require Data::Dumper;
     print Data::Dumper->Dump( \@desc );
+
+    return 1;
 }

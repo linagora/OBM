@@ -1,4 +1,4 @@
-package OBM::Entities::posixGroup;
+package OBM::Entities::obmGroup;
 
 $VERSION = "1.0";
 
@@ -34,10 +34,10 @@ sub new {
     $obj = ref($obj) || $obj;
 
     if( !defined($groupId) ) {
-        croak( "Usage: PACKAGE->new(GROUPID)" );
+        croak( "Usage: PACKAGE->new(INCR, GROUPID)" );
 
     }elsif( $groupId !~ /^\d+$/ ) {
-        &OBM::toolBox::write_log( "posixGroup: identifiant d'utilisateur incorrect", "W" );
+        &OBM::toolBox::write_log( "obmGroup: identifiant d'utilisateur incorrect", "W" );
         return undef;
 
     }else {
@@ -67,13 +67,16 @@ sub getEntity {
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "posixGroup: connecteur a la base de donnee invalide", "W" );
+        &OBM::toolBox::write_log( "obmGroup: connecteur a la base de donnee invalide", "W" );
         return 0;
     }
 
-    if( !defined($domainDesc->{"domain_id"}) ) {
-        &OBM::toolBox::write_log( "posixGroup: description de domaine OBM incorrecte", "W" );
+    if( !defined($domainDesc->{"domain_id"} || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) ) {
+        &OBM::toolBox::write_log( "obmGroup: description de domaine OBM incorrecte", "W" );
         return 0;
+    }else {
+        # On positionne l'identifiant du domaine de l'entité
+        $self->{"domainId"} = $domainDesc->{"domain_id"};
     }
 
 
@@ -81,7 +84,7 @@ sub getEntity {
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "posixGroup: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "obmGroup: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return undef;
     }
 
@@ -89,11 +92,11 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "posixGroup: pas de groupe d'identifiant : ".$groupId, "W" );
+        &OBM::toolBox::write_log( "obmGroup: pas de groupe d'identifiant : ".$groupId, "W" );
         return undef;
 
     }elsif( $numRows > 1 ) {
-        &OBM::toolBox::write_log( "posixGroup: plusieurs groupes d'identifiant : ".$groupId." ???", "W" );
+        &OBM::toolBox::write_log( "obmGroup: plusieurs groupes d'identifiant : ".$groupId." ???", "W" );
         return undef;
 
     }
@@ -104,7 +107,7 @@ sub getEntity {
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "posixGroup: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "obmGroup: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return undef;
     }
 
@@ -112,7 +115,7 @@ sub getEntity {
     my( $group_id, $group_gid, $group_name, $group_desc, $group_email, $group_contacts ) = $queryResult->fetchrow_array();
     $queryResult->finish();
 
-    &OBM::toolBox::write_log( "posixGroup: gestion du groupe : '".$group_name."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    &OBM::toolBox::write_log( "obmGroup: gestion du groupe : '".$group_name."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     # On range les resultats dans la structure de donnees des resultats
     $self->{"groupDesc"}->{"group_gid"} = $group_gid;
@@ -145,9 +148,6 @@ sub getEntity {
             }
         }
     }
-
-    # On positionne l'identifiant du domaine de l'entité
-    $self->{"domainId"} = $domainDesc->{"domain_id"};
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
@@ -203,7 +203,7 @@ sub _getGroupUsers {
     # On execute la requete
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "posixGroup: probleme SQL lors de l'obtention des utilisateurs du groupe : ".$queryResult->err, "W" );
+        &OBM::toolBox::write_log( "obmGroup: probleme SQL lors de l'obtention des utilisateurs du groupe : ".$queryResult->err, "W" );
         return undef;
     }
 
@@ -218,7 +218,7 @@ sub _getGroupUsers {
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "posixGroup: probleme SQL lors de l'obtention des utilisateurs du groupe : ".$queryResult->err, "W" );
+        &OBM::toolBox::write_log( "obmGroup: probleme SQL lors de l'obtention des utilisateurs du groupe : ".$queryResult->err, "W" );
         return undef;
     }
 
@@ -246,8 +246,8 @@ sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
 
-    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"userDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
-        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"userDesc"}->{$self->{"typeDesc"}->{"dn_value"}};
+    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"groupDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
+        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"groupDesc"}->{$self->{"typeDesc"}->{"dn_value"}};
     }
 
     return $dnPrefix;
@@ -313,7 +313,7 @@ sub createLdapEntry {
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry ) = @_;
-    my $entry = $self->{"userDesc"};
+    my $entry = $self->{"groupDesc"};
     my $update = 0;
 
     # verification du GID
@@ -372,4 +372,6 @@ sub dump {
     
     require Data::Dumper;
     print Data::Dumper->Dump( \@desc );
+
+    return 1;
 }

@@ -23,6 +23,7 @@ require OBM::ldap;
 my %ldapEngineAttr = (
     ldapStruct => undef,
     domainList => undef,
+    typeDesc => undef,
     ldapConn => {
         ldapServer => undef,
         ldapAdmin => undef,
@@ -44,6 +45,7 @@ sub new {
     }
 
     $ldapEngineAttr{"ldapStruct"} = &OBM::utils::cloneStruct($OBM::Parameters::ldapConf::ldapStruct),
+    $ldapEngineAttr{"typeDesc"} = $OBM::Parameters::ldapConf::attributeDef;
 
     my $self = \%ldapEngineAttr;
     bless( $self, $obj );
@@ -72,6 +74,29 @@ sub destroy {
     my $self = shift;
 
     return $self->_disconnectLdapSrv();
+}
+
+
+sub dump {
+    my $self = shift;
+    my( $what ) = @_;
+    my @desc;
+
+    if( !defined($what) ) {
+        return 0;
+    }
+
+    SWITCH: {
+        if( lc($what) eq "ldapstruct" ) {
+            push( @desc, $self->{"ldapStruct"} );
+            last SWITCH;
+        }
+    }
+
+    require Data::Dumper;
+    print Data::Dumper->Dump( \@desc );
+
+    return 1;
 }
 
 
@@ -205,7 +230,7 @@ sub _findTypeParentDn {
     my $self = shift;
     my ( $ldapStruct, $type, $domainId ) = @_;
 
-    if( $OBM::Parameters::ldapConf::attributeDef->{$type}->{"is_branch"} ) {
+    if( $self->{"typeDesc"}->{$type}->{"is_branch"} ) {
         return 0;
     }
 
@@ -231,7 +256,7 @@ sub _makeDn {
     my $self = shift;
     my( $entry, $parentDn ) = @_;
 
-    my $entryDn = $OBM::Parameters::ldapConf::attributeDef->{$entry->{"node_type"}}->{"dn_prefix"}."=".$entry->{"name"};
+    my $entryDn = $self->{"typeDesc"}->{$entry->{"node_type"}}->{"dn_prefix"}."=".$entry->{"name"};
 
     if( defined($parentDn) ) {
         $entryDn .= ",".$parentDn;
@@ -240,3 +265,8 @@ sub _makeDn {
     return $entryDn;
 }
 
+
+sub checkTree {
+    my $self = shift;
+
+}
