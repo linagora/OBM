@@ -21,6 +21,7 @@ $l_go = "Go";
 $l_high = "High";
 $l_low = "Low";
 $l_medium = "Medium";
+$l_details = "Details";
 
 $l_hour = "Hour";
 $l_occupied_day = "Whole day";

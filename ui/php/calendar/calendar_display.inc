@@ -1865,8 +1865,8 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
  */
 function dis_calendar_quick_form($calendar) {
   global $ico_popup_close,$l_validate,$popup_queue,$l_title;
-  global $l_advanced,$l_desc,$l_confirm_delete,$l_c_delete,$l_category1;
-  global $l_location,$l_members,$l_carac, $l_items;
+  global $l_desc,$l_confirm_delete,$l_c_delete,$l_category1;
+  global $l_location,$l_members,$l_carac, $l_items,$l_details;
 
   $block = "
     <div id=\"calendarQuickForm\">
@@ -1885,7 +1885,7 @@ function dis_calendar_quick_form($calendar) {
         $l_title : <input type=\"text\" name=\"tf_title\" /> <input class=\"button\" type=\"submit\" value=\"$l_validate\" />
       </fieldset> 
       <fieldset class=\"buttons\"> 
-        <input type=\"button\" onclick=\"obm.calendarQuickForm.goTo();\" value=\"$l_advanced\" />
+        <input type=\"button\" onclick=\"obm.calendarQuickForm.goTo();\" value=\"$l_details\" />
       <input type=\"button\" 
       onclick=\"if(confirm('$l_confirm_delete')) obm.calendarQuickForm.submit('quick_delete');\"
       value=\"$l_c_delete\" />

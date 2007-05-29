@@ -59,7 +59,7 @@ function html_admin_pref_index() {
 
   $userpref_q = get_admin_pref_default_user_pref();
   // User preferences SELECT
-  $sel_userpref = "<select name=\"sel_userpref\">";
+  $sel_userpref = "<select style=\"width: 12em;\" name=\"sel_userpref\">";
   while ($userpref_q->next_record()) {
     $option = $userpref_q->f("userobmpref_option");
     $value = $userpref_q->f("userobmpref_value");
@@ -69,8 +69,8 @@ function html_admin_pref_index() {
 
   $block = "
     <form method=\"get\" action=\"" . url_prepare("admin_pref_index.php"). "\">
-    <div class=\"detail infos\">
-    <h1>$l_user_pref</h1>
+    <fieldset class=\"detail infos\">
+    <legend>$l_user_pref</legend>
     <table class=\"spreadSheet\">
     <thead>
     <tr>
@@ -83,23 +83,23 @@ function html_admin_pref_index() {
       </tr>
     </tbody>
     </table>
-    <div class=\"buttons\">
+    <fieldset class=\"buttons\">
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"user_pref_reset\" />
         <input type=\"submit\" value=\"$l_execute\" />
-	</div>
-	</div>
+      </fieldset>
+      </fieldset>
     </form>
 
     <form method=\"get\" action=\"" . url_prepare("admin_pref_index.php"). "\">
-    <div class=\"detail infos\">
-    <h1>Update Preferences</h1>    
+    <fieldset class=\"detail infos\">
+    <legend>Update Preferences</legend>    
     <table class=\"spreadSheet\">
     <thead>
     <tr>
-      <th>action : user_pref_update_one</th>
-      <th>Pref</th>
-      <th>Value</th>
+      <td>action : user_pref_update_one</td>
+      <td>Pref</td>
+      <td>Value</td>
     </tr>
     </thead>
     <tbody>
@@ -108,18 +108,20 @@ function html_admin_pref_index() {
         $l_user_pref_update_one
       </td>
       <td>
-        $sel_userpref</td>
+      $sel_userpref
+      </td>
       <td>
-        <input type=\"text\" name=\"tf_pref_value\" value=\"\" maxlength=\"20\" size=\"8\"/></td>
+      <input type=\"text\" style=\"width: 8em;\" name=\"tf_pref_value\" value=\"\" maxlength=\"20\" size=\"14\"/>
+      </td>
     </tr>
     </tbody>
     </table>
-    <div class=\"buttons\">
+    <fieldset class=\"buttons\">
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"user_pref_update_one\" />
         <input type=\"submit\" value=\"$l_execute\" />
-    </div>
-    </div>
+    </fieldset>
+    </fieldset>
     </form>
 ";
 

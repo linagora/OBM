@@ -187,6 +187,7 @@ $perm_user = '03';
 $perm_editor = '05';
 $perm_admin = '1D';
 
+$set_lang_default = "en";
 //------------------------------//
 // Default Profiles definitions //
 //------------------------------//
