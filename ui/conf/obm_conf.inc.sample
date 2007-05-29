@@ -123,7 +123,7 @@ $cdefault_tax = array ("TVA 19,6" => 1.196, "TVA 5,5" => 1.055, "Pas de TVA" => 
 //----------------------//
 // Profiles definitions //
 //----------------------//
-$profiles["editor"] = array (
+$profiles['editor'] = array (
   'section' => array (
     'default' => 0,
     'com' => 1,
@@ -132,6 +132,16 @@ $profiles["editor"] = array (
     'my' => 1),
   'module' => array (
     'default' => $perm_editor)
+);
+$profiles['admin'] = array (
+  'section' => array (
+    'default' => 1),
+  'module' => array (
+    'default' => $perm_admin,
+    'domain' => 0),
+  'properties' => array (
+    'admin_realm' => array ('user', 'delegation', 'domain')
+    )
 );
 
 //------------------//

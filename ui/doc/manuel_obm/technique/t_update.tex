@@ -93,7 +93,7 @@ La table \db{Updated} est re-initialisée à la validation d'une mise à jour avec 
 \hline
 \_delegation & varchar 64 & Délégation (portée) de la modification \\
 \hline
-\_entity & varchar 32 & Entité modifiée (ex: company) \\
+\_table & varchar 32 & table de l'entité modifiée (ex: UserObm) \\
 \hline
 \_entity\_id & int 8 & Id de l'entité modifiée \\
 \hline
@@ -149,7 +149,7 @@ Dans le cas d'une mise à jour avec portée non globale, l'automate supprime indiv
 \hline
 \_delegation & varchar 64 & Délégation (portée) de l'entité supprimée \\
 \hline
-\_entity & varchar 32 & Entité supprimée (ex: company) \\
+\_table & varchar 32 & Table ed l'entité supprimée (ex: UserObm) \\
 \hline
 \_entity\_id & int 8 & Id de l'entité supprimée \\
 \hline
@@ -167,6 +167,11 @@ A partir de la version 2.1 \obm propose 2 méthodes d'application des modificatio
 \textbf{Méthode Maj} & \textbf{Description} & \textbf{Caractéristiques} \\
 \hline
 Selon portée
+\begin{itemize}
+\item User
+\item Delegation
+\item Domain
+\end{itemize}
 & Calcul et application des différences entre tables standards et de production, selon la portée de la mise à jour.
 & \begin{itemize}
 \item Modifications incrémentales
@@ -177,6 +182,10 @@ Selon portée
 \\
 \hline
 Globale
+\begin{itemize}
+\item à l'application
+\item à un domain
+\end{itemize}
 & Copie des tables de mises à jour dans les tables de production, calcul et application des différences entre tables de production et système réel
 & \begin{itemize}
 \item Modification totale, exhaustive
@@ -184,6 +193,36 @@ Globale
 \item Ne résiste pas à une erreur de l'automate
 \item Assure la pérennité du système : remet le système selon les données d'\obm
 \end{itemize}
+\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Détermination automatique de la portée}
+
+La portée des mises à jour qui vont être effectuées dépend de la sélection de l'administrateur mais aussi du profil de l'administrateur.
+Une mise à jour globale n'est disponible que pour un administrateur de domaine 0 (global).\\
+
+\begin{tabular}{|p{1,5cm}|p{2,6cm}|p{3,5cm}|p{6,5cm}|}
+\hline
+\textbf{Domaine} & \textbf{Interface : Màj} & \textbf{actions} & \textbf{paramètres automate} \\
+\hline
+\multirow{2}{2cm}{0} & Globale & Globale à l'application &
+--all
+\\
+\cline{2-4}
+& Domaine & Globale au domaine &
+--all --domain \$id
+\\
+\hline
+\multirow{3}{2cm}{x (x>0)}
+& Mes & Incrémental utilisateur & --incremental --user \$id
+\\
+\cline{2-4}
+& Ma délégation & Incrémental délégation & --incremental --delegation \$txt --domain \$id
+\\
+\cline{2-4}
+& Mon domaine & Incrémental domaine & --incremental --domain \$id
 \\
 \hline
 \end{tabular}
@@ -392,7 +431,7 @@ Outre la mise à jour globale, 3 portées sont définies :\\
 \hline
 globale & Toutes, comparaison directe avec système & --all \\
 \hline
-my & de l'utilisateur connecté (dans domaine) & --user \$id
+user & de l'utilisateur connecté (dans domaine) & --user \$id
 \\
 \hline
 domain & du domaine \obm & --domain \$id
@@ -404,7 +443,7 @@ delegation & des entités sous la délégation (dans domaine) & --delegation \$txt
 \end{tabular}
 
 
-\subsubsection{La portée ``my''}
+\subsubsection{La portée ``user}
 
 Portée des modifications de l'utilisateur connecté.\\
 

@@ -10,7 +10,7 @@
 $l_tools = "Outils d'administration";
 
 $l_upd = "Mise à jour de la configuration du système";
-$l_upd_my = "Mes mises à jour";
+$l_upd_user = "Mes mises à jour";
 $l_upd_domain = "Mises à jour du domaine";
 $l_upd_delegation = "Mises à jour de ma délégation";
 $l_upd_not_allowed = "Le système est en cours de configuration, veuillez patienter quelques secondes avant de sélectionner de nouveau l'outil de modification du système...";

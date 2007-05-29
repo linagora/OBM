@@ -67,22 +67,22 @@ function run_query_tools_update_update($tools) {
     return false;
   }     
   
-  $update = $tools["update"];
+  $update = $tools['update'];
 
   // Creation de la commande d'execution de l'automate de mise a jour
-  $cmd = $cmd_update." --all";
+  $cmd = $cmd_update.' --all';
   
   //  $cmd .= " 2>/dev/null >&- <&- >/dev/null &";
   $cmd .= " >/dev/null 2>&1 &";
   
   // Basculement des données de mise à jour en production
-  display_debug_msg($cmd_db_update, $cdg_exe, "run_query_tools_update_update(1)");
+  display_debug_msg($cmd_db_update, $cdg_exe, 'run_query_tools_update_update(1)');
   $ret = exec($cmd_db_update);
 
   // Mise a jour de l'indicateur de modifications
   update_update_state();
 
-  display_debug_msg($cmd, $cdg_exe, "run_query_tools_update_update(2)");
+  display_debug_msg($cmd, $cdg_exe, 'run_query_tools_update_update(2)');
   unset($tmp);
   exec($cmd, $tmp, $ret);
 
@@ -97,29 +97,36 @@ function run_query_tools_update_update($tools) {
 //     keys used : update
 ///////////////////////////////////////////////////////////////////////////////
 function exec_tools_update_update($tools) {
-  global $cdg_sql, $cdg_exe, $cmd_update, $cmd_db_update;
+  global $obm, $cdg_sql, $cdg_exe, $cmd_update, $cmd_db_update;
 
   $state = get_update_state();
   if ($state != 1) {
     return false;
   }     
 
-  $update = $tools["update"];
+  $uid = $obm['uid'];
+  $domain_id = $obm['domain_id'];
+  $delegation = $obm['delegation'];
+
+  $update_type = $tools['update_type'];
+  $realm = $tools['realm'];
+  $update = $tools['update'];
 
   // Creation de la commande d'execution de l'automate de mise a jour
-  $cmd = $cmd_update." --all";
+  $cmd = $cmd_update." --incremental --domain $domain_id";
   
-  //  $cmd .= " 2>/dev/null >&- <&- >/dev/null &";
+  if ($realm == 'user') {
+    $cmd .= " --user $uid";
+  } else if ($realm == 'delegation') {
+    $cmd .= " --delegation '$delegation'";
+  }
+
   $cmd .= " >/dev/null 2>&1 &";
   
-  // Basculement des données de mise à jour en production
-  display_debug_msg($cmd_db_update, $cdg_exe, "run_query_tools_update_update(1)");
-  $ret = exec($cmd_db_update);
-
   // Mise a jour de l'indicateur de modifications
   update_update_state();
 
-  display_debug_msg($cmd, $cdg_exe, "run_query_tools_update_update(2)");
+  display_debug_msg($cmd, $cdg_exe, 'exec_tools_update_update()');
   unset($tmp);
   exec($cmd, $tmp, $ret);
 
@@ -174,12 +181,12 @@ function check_tools_update_context() {
 // Parameters:
 //   - $table  : table where to check
 //   - $field  : field prefix (if not from table name) to check
-//   - $realm  : realm space to check updates (my | domain | target)
+//   - $realm  : realm space to check updates (user | domain | delegation)
 ///////////////////////////////////////////////////////////////////////////////
 function get_update_infos(&$e1, &$e2, $table, $field="", $realm) {
   global $cdg_sql, $obm;
 
-  $uid = $obm["uid"];
+  $uid = $obm['uid'];
 
   $delegation = $obm['delegation'];
   $obm_q = new DB_OBM;
@@ -200,8 +207,8 @@ function get_update_infos(&$e1, &$e2, $table, $field="", $realm) {
 
   $multidomain = sql_multidomain("$f");
 
-  // Restrict updates to the realm selected (my, domain, target)
-  if ($realm == "my") {
+  // Restrict updates to the realm selected (user, domain, delegation)
+  if ($realm == "user") {
     $where_upd = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
     $where_prod = "WHERE 1=1 $multidomain";
   } else if ($realm == "delegation") {
@@ -249,7 +256,7 @@ function get_update_infos(&$e1, &$e2, $table, $field="", $realm) {
 // Process update infos to get number for an entity
 // Parameters:
 //   - $entity : entity to get numbers
-//   - $realm  : realm space to check updates (my | domain | target)
+//   - $realm  : realm space to check updates (user | domain | delegation)
 ///////////////////////////////////////////////////////////////////////////////
 function process_update_numbers($e1, $e2, $entity, $realm) {
   global $cdg_sql, $obm;
@@ -258,8 +265,8 @@ function process_update_numbers($e1, $e2, $entity, $realm) {
   $nb_upd = 0;
   $nb_del = 0;
 
-  $uid = $obm["uid"];
-  $domain_id = $obm["domain_id"];
+  $uid = $obm['uid'];
+  $domain_id = $obm['domain_id'];
   $delegation = $obm['delegation'];
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -280,7 +287,7 @@ function process_update_numbers($e1, $e2, $entity, $realm) {
   }
 
   // Get infos for deleted entities
-  if ($realm == "my") {
+  if ($realm == "user") {
 
     // Get the delete from the Deleted table
     $query = "SELECT count(*) as nb FROM Deleted
@@ -327,7 +334,7 @@ function process_update_numbers($e1, $e2, $entity, $realm) {
 //   - $entity : entity to get numbers
 //   - $table  : table where to check
 //   - $field  : field prefix (if not from table name) to check
-//   - $realm  : realm space to check updates (my | domain | target)
+//   - $realm  : realm space to check updates (user | domain | delegation)
 ///////////////////////////////////////////////////////////////////////////////
 function get_update_entity_numbers($entity, $table, $field="", $realm) {
   global $cdg_sql, $obm;
@@ -348,7 +355,7 @@ function get_update_entity_numbers($entity, $table, $field="", $realm) {
 //   - $entity : entity to get numbers
 //   - $table  : table where to check
 //   - $field  : field prefix (if not from table name) to check
-//   - $realm  : realm space to check updates (my | domain | target)
+//   - $realm  : realm space to check updates (user | domain | delegation)
 ///////////////////////////////////////////////////////////////////////////////
 function validate_update_entity($entity, $table, $field="", $realm) {
   global $cdg_sql, $obm;
@@ -357,182 +364,71 @@ function validate_update_entity($entity, $table, $field="", $realm) {
   $e2 = array();
 
   get_update_infos($e1, $e2, $table, $field, $realm);
-  $nb = process_update_numbers($e1, $e2, $entity, $realm);
+  $nb = store_update_infos($e1, $e2, $entity, $table,  $realm);
 
   return $nb;
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Store update infos in Automate tables for an Entity
-// Parameters:
-//   - $entity : entity to get numbers
-//   - $table  : table where to check
-//   - $field  : field prefix (if not from table name) to check
-//   - $realm  : realm space to check updates (my | domain | target)
-///////////////////////////////////////////////////////////////////////////////
-function store_update_infos($e1, $e2, $entity, $table, $field="", $realm) {
+/**
+ * Store update infos in Automate tables for an Entity
+ *
+ * @param $entity : entity to get numbers
+ * @param $table  : table where to check
+ * @param $field  : field prefix (if not from table name) to check
+ * @param $realm  : realm space to check updates (user | domain | delegation)
+ */
+function store_update_infos($e1, $e2, $entity, $table, $realm) {
   global $cdg_sql, $obm;
 
   $nb_add = 0;
   $nb_upd = 0;
   $nb_del = 0;
-  $e1 = array();
-  $e2 = array();
 
-  $uid = $obm["uid"];
-  $domain_id = $obm["domain_id"];
+  $uid = $obm['uid'];
+  $domain_id = $obm['domain_id'];
   $delegation = $obm['delegation'];
   $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
-
-  get_update_infos($e1, $e2, $entity, $table, $field, $realm);
 
   // Process infos for created and updated entities
   foreach ($e1 as $id => $row) {
     if (! array_key_exists($id, $e2)) {
       // INSERT
-    } else {
-      foreach($row as $fname => $fvalue) {
-	if ($e2[$id][$fname] != $fvalue) {
-	  // UPDATE
-	  break;
-	}
-      }
-    }
-  }
-
-  // Get infos for deleted entities
-  if ($realm == "my") {
-
-    // Get the delete from the Deleted table
-    $query = "SELECT count(*) as nb FROM Deleted
-     WHERE deleted_user_id=$uid
-       AND deleted_entity='$entity'";
-    display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
-    $retour = $obm_q->query($query);
-    $obm_q->next_record();
-    $nb_del = $obm_q->f("nb");
-
-  } else if ($realm == "delegation") {
-
-    // Get the delete from the Deleted table
-    $query = "SELECT count(*) as nb FROM Deleted
-     WHERE deleted_delegation $like '$delegation%'
-       AND deleted_entity='$entity'
-       AND deleted_domain_id='$domain_id'";
-    display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
-    $retour = $obm_q->query($query);
-    $obm_q->next_record();
-    $nb_del = $obm_q->f("nb");
-
-  } else {
-    // Case domain, just count lines present in prod, but not present in upd
-    foreach ($e2 as $id => $row) {
-      if (! array_key_exists($id, $e1)) {
-	$nb_del++;
-      }
-    }
-  }
-  
-  $nb["created"] = $nb_add;
-  $nb["updated"] = $nb_upd;
-  $nb["deleted"] = $nb_del;
-  $nb["move"] = $nb_add + $nb_upd + $nb_del;
-
-  return $nb;
-}
-
-
-// -------------------------------------
-
-///////////////////////////////////////////////////////////////////////////////
-// Get update types number for an entity
-// Parameters:
-//   - $entity : entity to get numbers
-//   - $table  : table where to check
-//   - $field  : field prefix (if not from table name) to check
-//   - $realm  : realm space to check updates (my | domain | target)
-///////////////////////////////////////////////////////////////////////////////
-function get_update_numbers2($entity, $table, $field="", $realm) {
-  global $cdg_sql, $obm;
-
-  $uid = $obm["uid"];
-
-  $nb_add = 0;
-  $nb_upd = 0;
-  $nb_del = 0;
-  $e1 = array();
-  $e2 = array();
-  $delegation = $obm['delegation'];
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
-
-  if ($field != "") {
-    $f = $field;
-    $uc = "${field}_usercreate";
-    $uu = "${field}_userupdate";
-    $dg = "${field}_delegation";
-  } else {
-    $f = strtolower($table);
-    $uc = "${f}_usercreate";
-    $uu = "${f}_userupdate";
-    $dg = "${f}_delegation";
-  }
-
-  $multidomain = sql_multidomain("$f");
-
-  // Restrict updates to the realm selected (my, domain, target)
-  if ($realm == "my") {
-    $where_upd = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
-    $where_prod = "WHERE 1=1 $multidomain";
-  } else if ($realm == "delegation") {
-    $where_upd = "WHERE ($dg $like '$delegation%') $multidomain";
-    $where_prod = "WHERE 1=1 $multidomain";
-  } else {
-    $where_upd = "WHERE 1=1 $multidomain";
-    $where_prod = "WHERE 1=1 $multidomain";
-  }
-
-  // Get infos from Update table
-  $query = "SELECT * FROM $table $where_upd";
-  display_debug_msg($query, $cdg_sql, "get_update_numbers()");
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $id = $obm_q->f("0");  // Id
-    $e = $obm_q->Record;
-    foreach ($e as $fname => $fvalue) {
-      // optimiser : verifier que fname pas un chiffre ?
-      $e1[$id]["$fname"] = $fvalue;
-    }
-  }
-
-  // Get infos from Production table
-  $table_prod = "P_$table";
-  $query = "SELECT * FROM $table_prod $where_prod";
-  display_debug_msg($query, $cdg_sql, "get_update_numbers()");
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $id = $obm_q->f("0");  // Id
-    $e = $obm_q->Record;
-    foreach ($e as $fname => $fvalue) {
-      // optimiser : verifier que fname pas un chiffre ?
-      $e2[$id]["$fname"] = $fvalue;
-    }
-  }
-
-
-  // Process infos for created and updated entities
-  foreach ($e1 as $id => $row) {
-    if (! array_key_exists($id, $e2)) {
+      $query = "INSERT INTO Updated (
+        updated_domain_id,
+        updated_user_id,
+        updated_delegation,
+        updated_table,
+        updated_entity_id,
+        updated_type
+      ) VALUES (
+        '$domain_id',
+        '$uid',
+        '$delegation',
+        '$table',
+        '$id',
+        'C')";
+      $retour = $obm_q->query($query);
       $nb_add++;
     } else {
       foreach($row as $fname => $fvalue) {
 	if ($e2[$id][$fname] != $fvalue) {
+	  // UPDATE
+	  $query = "INSERT INTO Updated (
+            updated_domain_id,
+            updated_user_id,
+            updated_delegation,
+            updated_table,
+            updated_entity_id,
+            updated_type
+          ) VALUES (
+            '$domain_id',
+            '$uid',
+            '$delegation',
+            '$table',
+            '$id',
+            'U')";
+	  $retour = $obm_q->query($query);
 	  $nb_upd++;
 	  break;
 	}
@@ -540,44 +436,7 @@ function get_update_numbers2($entity, $table, $field="", $realm) {
     }
   }
 
-  // Get infos for deleted entities
-  if ($realm == "my") {
-
-    // Get the delete from the Deleted table
-    $query = "SELECT count(*) as nb FROM Deleted
-     WHERE deleted_user_id=$uid
-       AND deleted_entity='$entity'";
-    display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
-    $retour = $obm_q->query($query);
-    $obm_q->next_record();
-    $nb_del = $obm_q->f("nb");
-
-  } else if ($realm == "delegation") {
-
-    // Get the delete from the Deleted table
-    $query = "SELECT count(*) as nb FROM Deleted
-     WHERE deleted_delegation $like '$delegation%'
-       AND deleted_entity='$entity'";
-    display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
-    $retour = $obm_q->query($query);
-    $obm_q->next_record();
-    $nb_del = $obm_q->f("nb");
-
-  } else {
-    // Case domain, just count lines present in prod, but not present in upd
-    foreach ($e2 as $id => $row) {
-      if (! array_key_exists($id, $e1)) {
-	$nb_del++;
-      }
-    }
-  }
-  
-  $nb["created"] = $nb_add;
-  $nb["updated"] = $nb_upd;
-  $nb["deleted"] = $nb_del;
-  $nb["move"] = $nb_add + $nb_upd + $nb_del;
-
-  return $nb;
+  return $nb_add;
 }
 
 

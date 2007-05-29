@@ -1716,6 +1716,7 @@ function dis_user_display_pref($prefs) {
  */
 function json_search_users($user,$user_q) {
   global $display;
+
   $limit = $user['limit'];
   $users = array();
   if(isset($user["first_row"])) $user_q->seek($user["first_row"] - 1);

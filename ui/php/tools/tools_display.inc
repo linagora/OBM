@@ -102,23 +102,23 @@ function dis_tools_update_detail() {
     return $block;
   }
 
-  $entities = array("user" => array("UserObm", "userobm"),
-		    "group" => array("UGroup", "group"),
-		    "host" => array("Host", "host"),
-		    "mailshare" => array("MailShare", "mailshare"));
+  $entities = array('user' => array('UserObm', 'userobm'),
+		    'group' => array('UGroup', 'group'),
+		    'host' => array('Host', 'host'),
+		    'mailshare' => array('MailShare', 'mailshare'));
 
-  // Loop through all udpates "realms" (my, delegation, domain)
+  // Loop through all udpates 'realms' (user, delegation, domain)
   foreach ($profiles[$obm['profile']]['properties']['admin_realm'] as $realm) {
 
     $has_update = false;
-    $dis_row_update = "";
+    $dis_realm_board = '';
+    $dis_row_update = '';
     $detail_title = "l_upd_$realm";
     global $$detail_title;
     $dis_detail_title = $$detail_title;
     if ($realm == 'delegation') {
-      $dis_detail_title .= " (". $obm['delegation'] . ") ";
+      $dis_detail_title .= ' ('. $obm['delegation'] . ') ';
     }
-
 
     foreach ($entities as $entity=>$db_info) {
       $table = $db_info[0];
@@ -148,35 +148,39 @@ function dis_tools_update_detail() {
       // Si une mise a jour est autorisee (non deja en cours)
       if (check_tools_update_context()) {
 	$dis_button = "
-      <form method=\"post\" action=\"tools/tools_index.php\">
+      <form method=\"post\" action=\"tools_index.php\">
       <fieldset class=\"buttons\">
       <input type=\"hidden\" name=\"action\" value=\"update_update\" />
+      <input type=\"hidden\" name=\"realm\" value=\"$realm\" />
+      <input type=\"hidden\" name=\"update_type\" value=\"incremental\" />
       <input type=\"submit\" value=\"$l_validate\" />
       </fieldset>
       </form>";
 	
 	//button
       } else {
-	$dis_button = "<td class=\"detailText\">$l_upd_not_allowed</td>";
+	$dis_button = "$l_upd_not_allowed";
       }
+
+      $dis_realm_board = "<table class=\"spreadSheet\">
+      <thead>
+      <tr>
+        <th>&nbsp;</th>
+        <th>$l_created</th>
+        <th>$l_updated</th>
+        <th>$l_deleted</th>
+      </tr>
+      $dis_row_update
+      </table>";
+
     } else {
-      $dis_button = "<td class=\"detailText\">$l_upd_not_needed</td>";
+      $dis_button = "$l_upd_not_needed";
     }
 
     $dis_realm .= "
     <div class=\"detail extra\">
     <h1>$dis_detail_title</h1>
-
-    <table class=\"spreadSheet\">
-    <thead>
-    <tr>
-      <th>&nbsp;</th>
-      <th>$l_created</th>
-      <th>$l_updated</th>
-      <th>$l_deleted</th>
-    </tr>
-    $dis_row_update
-    </table>
+    $dis_realm_board
 
     <p>
     </div>
@@ -192,36 +196,24 @@ function dis_tools_update_detail() {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Update validation
-///////////////////////////////////////////////////////////////////////////////
-function dis_tools_update_validation() {
+/**
+ * Display Update validation
+ *
+ * @param array parameters hash
+ * @return XHTML display
+ */
+function dis_tools_update_validation($params) {
   global $display, $cgp_show, $profiles, $obm;
   global $l_upd, $l_upd_needed, $l_upd_not_needed, $l_upd_not_allowed;
   global $l_upd_run, $l_upd_cancel, $l_created, $l_updated, $l_deleted;
   global $l_user, $l_group, $l_host, $l_mailshare;
   global $l_header_tools_upd;
-  global $l_header_tools_upd_admin, $l_header_tools_upd_domain;
   global $l_validate, $l_cancel, $l_error_permission;
 
-  /*  $update_state = get_update_state();
-
-  // No update, display this and return
-  if (! $update_state) {
-    $block = "
-    <div class=\"detail extra\">
-    <h1>$l_upd</h1>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_upd_not_needed</td>
-    </tr>
-    </table>
-    <p>
-    </div>";
-
-    return $block;
-  }
-  */
+  $realm = $params['realm'];
+  $uid = $obm['uid'];
+  $domain_id = $obm['domain_id'];
+  $delegation = $obm['delegation'];
 
   if (! isset($profiles[$obm['profile']]['properties']['admin_realm'])) {
     $display["msg"] = display_warn_msg("$l_error_permission");
@@ -233,62 +225,41 @@ function dis_tools_update_validation() {
 		    "host" => array("Host", "host"),
 		    "mailshare" => array("MailShare", "mailshare"));
 
-  // Loop through all udpates "realms" (my, delegation, domain)
-  foreach ($profiles[$obm['profile']]['properties']['admin_realm'] as $realm) {
+  $has_update = false;
+  $dis_row_update = "";
+  $detail_title = "l_upd_$realm";
+  global $$detail_title;
+  $dis_detail_title = $$detail_title;
+  if ($realm == 'delegation') {
+    $dis_detail_title .= " (". $obm['delegation'] . ") ";
+  }
 
-    $has_update = false;
-    $dis_row_update = "";
-    $detail_title = "l_upd_$realm";
-    global $$detail_title;
-    $dis_detail_title = $$detail_title;
-    if ($realm == 'delegation') {
-      $dis_detail_title .= " (". $obm['delegation'] . ") ";
-    }
-
-
-    foreach ($entities as $entity=>$db_info) {
-      $table = $db_info[0];
-      $field = $db_info[1];
-      $dis_entity = ${"l_$entity"};
-      if ($cgp_show['module']["$entity"]) {
-	$nb = get_update_entity_numbers($entity, $table, $field, $realm);
-	if ($nb['move'] > 0) {
-	  $has_update = true;
-	}
-	$class_cre = ($nb['created'] > 0 ? " class=\"highlight\"" : "");
-	$class_upd = ($nb['updated'] > 0 ? " class=\"highlight\"" : "");
-	$class_del = ($nb['deleted'] > 0 ? " class=\"highlight\"" : "");
-	$dis_row_update .= "
+  foreach ($entities as $entity=>$db_info) {
+    $table = $db_info[0];
+    $field = $db_info[1];
+    $dis_entity = ${"l_$entity"};
+    if ($cgp_show['module']["$entity"]) {
+      $nb = get_update_entity_numbers($entity, $table, $field, $realm);
+      if ($nb['move'] > 0) {
+	$has_update = true;
+      }
+      $class_cre = ($nb['created'] > 0 ? " class=\"highlight\"" : "");
+      $class_upd = ($nb['updated'] > 0 ? " class=\"highlight\"" : "");
+      $class_del = ($nb['deleted'] > 0 ? " class=\"highlight\"" : "");
+      $dis_row_update .= "
       <tr>
         <td>$dis_entity</td>
         <td$class_cre>$nb[created]</td>
         <td$class_upd>$nb[updated]</td>
         <td$class_del>$nb[deleted]</td>
       </tr>";
-      }
 
+      $ret = validate_update_entity($entity, $table, $field, $realm);
     }
+  }
 
-    if ($has_update) {
-  
-      // Si une mise a jour est autorisee (non deja en cours)
-      if (check_tools_update_context()) {
-	$dis_button = "
-      <form method=\"post\" action=\"tools/tools_index.php\">
-      <fieldset class=\"buttons\">
-      <input type=\"hidden\" name=\"action\" value=\"update_update\" />
-      <input type=\"submit\" value=\"$l_validate\" />
-      </fieldset>
-      </form>";
-	
-	//button
-      } else {
-	$dis_button = "<td class=\"detailText\">$l_upd_not_allowed</td>";
-      }
-    } else {
-      $dis_button = "<td class=\"detailText\">$l_upd_not_needed</td>";
-    }
-
+  if ($has_update) {
+    
     $dis_realm .= "
     <div class=\"detail extra\">
     <h1>$dis_detail_title</h1>
@@ -302,11 +273,7 @@ function dis_tools_update_validation() {
       <th>$l_deleted</th>
     </tr>
     $dis_row_update
-    </table>
-
-    <p>
-    </div>
-    $dis_button";
+    </table>";
   }
 
   $display["title"] = "<h1 class=\"title\">$l_header_tools_upd</h1>";

@@ -35,14 +35,15 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_tools_update_index();
 
-} elseif ($action == "update_detail_admin") {
+} elseif ($action == "update_detail") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_tools_update_detail();
 
 } elseif ($action == "update_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_tools_update_context()) {
-    $res = run_query_tools_update_update($params);
+    $display["detail"] = dis_tools_update_validation($params);
+    $res = exec_tools_update_update($params);
     if ($res == "0") {
       $display["msg"] .= display_ok_msg($l_upd_ok);
     } else {
@@ -53,7 +54,7 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
     $display["detail"] = html_tools_update_index();
   }
 
-} elseif ($action == "update_update2")  {
+} elseif ($action == "update_update.save")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_tools_update_context()) {
     $res = run_query_tools_update_update($params);
@@ -158,18 +159,10 @@ function get_tools_action() {
                                     );
 
 // Display Admin Update
-  $actions["tools"]["update_detail_admin"] = array (
+  $actions["tools"]["update_detail"] = array (
     'Name'     => $l_header_tools_upd_admin,
     'Right'    => $cright_read_admin,
-    'Url'      => "$path/tools/tools_index.php?action=update_detail_admin",
-    'Condition'=> array ('all') 
-                                    );
-
-// Display Domain Update
-  $actions["tools"]["update_detail_domain"] = array (
-    'Name'     => $l_header_tools_upd_domain,
-    'Right'    => $cright_read_admin,
-    'Url'      => "$path/tools/tools_index.php?action=update_detail_domain",
+    'Url'      => "$path/tools/tools_index.php?action=update_detail",
     'Condition'=> array ('all') 
                                     );
 
