@@ -234,7 +234,7 @@ function list_add_company_criteria_line(form,labels,values,i) {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_timeafter'; 
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_company_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timeafter.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_company_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+getFieldIsoDate(form.tf_company_timeafter.value)+'\" />';
     i++;
   } else {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_company_timeafter[]\" value=\"\" />';
@@ -244,7 +244,7 @@ function list_add_company_criteria_line(form,labels,values,i) {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_timebefore'; 
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_company_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timebefore.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_company_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+getFieldIsoDate(form.tf_company_timebefore.value)+'\" />';
     i++;
   } else {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_company_timebefore[]\" value=\"\" />';
@@ -378,7 +378,7 @@ function list_add_contact_criteria_line(form,labels,values,i) {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_timeafter';
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timeafter.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+getFieldIsoDate(form.tf_contact_timeafter.value)+'\" />';
     i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timeafter[]\" value=\"\" />';
@@ -388,7 +388,7 @@ function list_add_contact_criteria_line(form,labels,values,i) {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_timebefore';
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timebefore.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+getFieldIsoDate(form.tf_contact_timebefore.value)+'\" />';
     i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timebefore[]\" value=\"\" />';
@@ -547,7 +547,7 @@ function list_add_publication_criteria_line(form,labels,values,i) {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_publication: $l_after'; 
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_subscription_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_subscription_timeafter.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_subscription_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+getFieldIsoDate(form.tf_subscription_timeafter.value)+'\" />';
     i++;
   } else {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_subscription_timeafter[]\" value=\"\" />';
@@ -557,7 +557,7 @@ function list_add_publication_criteria_line(form,labels,values,i) {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_publication: $l_before'; 
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_subscription_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_subscription_timebefore.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_subscription_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+getFieldIsoDate(form.tf_subscription_timebefore.value)+'\" />';
     i++;
   } else {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_subscription_timebefore[]\" value=\"\" />';

@@ -227,6 +227,18 @@ function guessDateFormat(fieldDate) {
 }
 
 /**
+ Convert a string to a iso date format string
+ */
+function getFieldIsoDate(dateString) {
+  var dateVal = getFieldDate(dateString);
+  var dayString = "00" + dateVal.getDate();
+  var monthString = "00" + (dateVal.getMonth()+1);
+  dayString = dayString.substring(dayString.length - 2);
+  monthString = monthString.substring(monthString.length - 2);
+  return dateVal.getFullYear() + '-' + monthString + '-' + dayString;
+}
+
+/**
   Convert a string to a JavaScript Date object.
  */
 function getFieldDate(dateString)
