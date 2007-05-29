@@ -609,7 +609,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   $estimated = $project_q->f("project_estimatedtime");
   $datebegin = of_date_format($project_q->f("datebegin"), 1);
   $dateend = of_date_format($project_q->f("dateend"), 1);
-  $reference_date =  of_date_format($project_q->f("project_reference_date"));
+  $reference_date =  $project_q->f("project_reference_date");
   $reference_duration =  $project_q->f("project_reference_duration");
   $reference_desc =  nl2br($project_q->f("project_reference_desc"));
   $reference_tech =  nl2br($project_q->f("project_reference_tech"));
@@ -1084,7 +1084,7 @@ function html_project_form($action, $project_q, $project) {
     $deal_label = $project_q->f("deal_label");
     $datebegin = of_date_upd_format($project_q->f("datebegin"), 1);
     $dateend = of_date_upd_format($project_q->f("dateend"), 1);
-    $reference_date =  of_date_upd_format($project_q->f("project_reference_date"));
+    $reference_date =  $project_q->f("project_reference_date");
     $reference_duration =  $project_q->f("project_reference_duration");
     $reference_desc =  $project_q->f("project_reference_desc");
     $reference_tech =  $project_q->f("project_reference_tech");
@@ -1312,7 +1312,7 @@ function html_project_form($action, $project_q, $project) {
     <table>
     <tr>
       <th> $l_project_date </th>
-      <td><input type=\"text\" name=\"tf_reference_date\" value=\"$reference_date\" class=\"datePicker\"/></td>
+      <td><input type=\"text\" name=\"tf_reference_date\" size=\"32\" maxlength=\"32\"  value=\"$reference_date\" /></td>
     </tr>
     <tr>
       <th> $l_project_duration </th>

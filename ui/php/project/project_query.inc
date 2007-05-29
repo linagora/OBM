@@ -292,7 +292,7 @@ function run_query_project_insert($params) {
   $member = $params["member"];
   $datebegin = ($params["datebegin"] ? "'".of_isodate_convert($params["datebegin"])."'" : "null");
   $dateend = ($params["dateend"] ? "'".of_isodate_convert($params["dateend"])."'" : "null");
-  $project_reference_date = of_isodate_convert($params["reference_date"],true);
+  $project_reference_date = $params["reference_date"];
   $project_reference_duration = $params["reference_duration"];
   $project_reference_desc = $params["reference_desc"];
   $project_reference_tech = $params["reference_tech"];
@@ -504,7 +504,7 @@ function run_query_project_update($pid, $params) {
   $tt = $params["tt"];
   $datebegin = ($params["datebegin"] ? "'".of_isodate_convert($params["datebegin"])."'" : "null");
   $dateend = ($params["dateend"] ? "'".of_isodate_convert($params["dateend"])."'" : "null");
-  $reference_date = of_isodate_convert($params["reference_date"],true);
+  $reference_date = $params["reference_date"];
   $reference_duration = $params["reference_duration"];
   $reference_desc = $params["reference_desc"];
   $reference_tech = $params["reference_tech"];
