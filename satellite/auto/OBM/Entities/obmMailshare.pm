@@ -6,8 +6,6 @@ $debug = 1;
 
 use 5.006_001;
 require Exporter;
-require overload;
-use Carp;
 use strict;
 
 use OBM::Parameters::common;
@@ -18,20 +16,20 @@ require OBM::dbUtils;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
-my %ldapEngineAttr = (
-    type => undef,
-    typeDesc => undef,
-    incremental => undef,
-    archive => undef,
-    mailShareId => undef,
-    domainId => undef,
-    mailShareDesc => undef
-);
-
-
 sub new {
-    my( $obj, $incremental, $mailShareId ) = @_;
-    $obj = ref($obj) || $obj;
+    my $self = shift;
+    my( $incremental, $mailShareId ) = @_;
+
+    my %ldapEngineAttr = (
+        type => undef,
+        typeDesc => undef,
+        incremental => undef,
+        archive => undef,
+        mailShareId => undef,
+        domainId => undef,
+        mailShareDesc => undef
+    );
+
 
     if( !defined($mailShareId) ) {
         croak( "Usage: PACKAGE->new(INCR, MAILSHAREID)" );
@@ -53,10 +51,7 @@ sub new {
     $ldapEngineAttr{"type"} = $MAILSHARE;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
 
-    my $self = \%ldapEngineAttr;
-    bless( $self, $obj );
-
-    return $self;
+    bless( \%ldapEngineAttr, $self );
 }
 
 

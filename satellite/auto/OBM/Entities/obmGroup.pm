@@ -6,8 +6,6 @@ $debug = 1;
 
 use 5.006_001;
 require Exporter;
-require overload;
-use Carp;
 use strict;
 
 use OBM::Parameters::common;
@@ -18,20 +16,20 @@ require OBM::dbUtils;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
-my %ldapEngineAttr = (
-    type => undef,
-    typeDesc => undef,
-    incremental => undef,
-    archive => undef,
-    groupId => undef,
-    domainId => undef,
-    groupDesc => undef
-);
-
-
 sub new {
-    my( $obj, $incremental, $groupId ) = @_;
-    $obj = ref($obj) || $obj;
+    my $self = shift;
+    my( $incremental, $groupId ) = @_;
+
+    my %ldapEngineAttr = (
+        type => undef,
+        typeDesc => undef,
+        incremental => undef,
+        archive => undef,
+        groupId => undef,
+        domainId => undef,
+        groupDesc => undef
+    );
+
 
     if( !defined($groupId) ) {
         croak( "Usage: PACKAGE->new(INCR, GROUPID)" );
@@ -53,10 +51,7 @@ sub new {
     $ldapEngineAttr{"type"} = $POSIXGROUPS;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
 
-    my $self = \%ldapEngineAttr;
-    bless( $self, $obj );
-
-    return $self;
+    bless( \%ldapEngineAttr, $self );
 }
 
 
