@@ -823,7 +823,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $clause = $contract_q->f("contract_clause");
     $comment = $contract_q->f("contract_comment");
     $usercomment = $obm["uid"];
-    $datecomment = of_isodate_format();
+    $datecomment = of_date_upd_format();
     $archive = $contract_q->f("contract_archive");
    
     $comp_name = $contract_q->f("company_name");

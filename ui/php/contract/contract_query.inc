@@ -262,7 +262,7 @@ function run_query_contract_insert($contract) {
   $market = ($contract["market"] ? $contract["market"] : "0");
   $add_comment = $contract["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $contract["datecomment"];
+    $datecomment = of_isodate_convert($contract["datecomment"]);
     $usercomment = $contract["usercomment"];
     $comment = "$datecomment:$usercomment:$add_comment";
   }
@@ -380,7 +380,7 @@ function run_query_contract_update($contract) {
   $comment = $contract["comment"];
   $add_comment = $contract["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $contract["datecomment"];
+    $datecomment = of_isodate_convert($contract["datecomment"]);
     $usercomment = $contract["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
