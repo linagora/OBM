@@ -543,7 +543,7 @@ function run_query_calendar_insert_event_data($calendar) {
 
   // Exception
   if($repeat_kind != "none" && is_array($date_exception)) {
-    foreach(array_unique($date_exception) as $key => $value) {
+    foreach(array_unique($date_exception) as $value) {
       if($value != "") {
         $value = of_isodate_convert($value);
         $calendar["old_date_begin"] = $value." ".$calendar["time_begin"].":".$calendar["min_begin"].":00";

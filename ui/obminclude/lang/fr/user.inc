@@ -7,11 +7,11 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_login = "Login";
+$l_login = "Identifiant";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_title = "Fonction";
-$l_password = "Password";
+$l_password = "Mot de passe";
 $l_lastaccess = "Dernier accès";
 $l_phone2 = "$l_phone 2";
 $l_fax2 = "$l_fax 2";

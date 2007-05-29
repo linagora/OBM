@@ -74,9 +74,8 @@ function get_elem(doc, name) {
 ///////////////////////////////////////////////////////////////////////////////
 function remove_element(elemId,parentId) {
 
-  target = window.document;
-  content = target.getElementById(elemId);
-  container = target.getElementById(parentId);
+  content = $(elemId);
+  container = $(parentId);
   try {
     container.removeChild(content);
   } catch (e) {

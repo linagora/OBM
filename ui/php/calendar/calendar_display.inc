@@ -2333,14 +2333,13 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     foreach($date_exception as $key => $value) {
       $value = of_date_upd_format($value,true);
       $block_exception_detail .= "<div class=\"elementRow\" id=\"date_exception-$key\">
-         <a href=\"javascript: remove_element('date_exception-$key','celldate');\">
+         <a href=\"javascript: remove_element(this.parentNode,'exceptionHome');\">
          <img src=\"$ico_delete\" alt=\"[Delete]\">
          </a>
-         <input type=\"text\" name=\"tf_date_exception[$key]\" value=\"$value\" class=\"datePicker\" />
+         <input type=\"text\" name=\"tf_date_exception[]\" value=\"$value\" class=\"datePicker\" />
        </div>";
     }
   }
-  $block_exception_detail .= "<input type=\"hidden\" name=\"last_exception_nb\" value=\"$key\"/>";
   $add_date = "<a href=\"javascript: add_exdate();\"><img src=\"$ico_add\" alt=\"[Date]\" /></a>";
 
   // --- HTML Template --------------------------------------------------------
@@ -2438,7 +2437,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   </tr>
   <tr>
     <th> $l_exception $add_date</th>
-    <td id=\"celldate\">$block_exception_detail</td>
+    <td id=\"exceptionHome\">$block_exception_detail</td>
   </tr>
   </table>
   </fieldset>
@@ -2493,6 +2492,7 @@ function html_calendar_waiting_events($obm_wait) {
 	  $dis_kind = "";
 	  $dis_day = ""; 
           $dis_end = "";
+          $dis_events = str_replace("__NO_REPEAT__","",$dis_events);
           $dis_events = str_replace("__NO_REPEAT__","",$dis_events);
 	}
 

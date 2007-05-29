@@ -171,41 +171,28 @@ function calendar_check_meeting(form) {
 ///////////////////////////////////////////////////////////////////////////////
 function add_exdate() {
 
-  var target = window.document;
-  var container = get_elem(target, 'celldate');
-
-  var exception_nb = ++window.document.f_entity.last_exception_nb.value;
-
+  var exceptionHome = $('exceptionHome');
   // Create the div
-  var div = target.createElement('div');
-  div.id = 'date_exception-'+exception_nb;
-  div.className = 'elementRow';
-
-  // Create the delete link
-  var delete_link = target.createElement('a');
-  delete_link.href = 'javascript: remove_element(\"date_exception-'+exception_nb+'\",\"celldate\");';
-  var delete_img = target.createElement('img');
-  delete_img.src = '$ico_delete';
-  delete_link.appendChild(delete_img);
-
+  var div = new Element('div');
+  div.adopt(
+            new Element('a').addEvent('click', function () {
+              console.log(this);
+              remove_element(this.parentNode,'exceptionHome');
+            }).adopt(new Element('img').setProperty('src','$ico_delete')));
+  exceptionHome.adopt(div);
   // Create the date field
-  var field = target.createElement('input');
-  field.type = 'text';
-  field.name = 'tf_date_exception['+exception_nb+']';
-  field.className = 'datePicker';
+  var f = new Element('input').addClassName('datePicker')
+                                  .setProperty('type','text');
+  div.adopt(f);
+  f.setProperty('autocomplete','off');
+  f.name = 'tf_date_exception[]';
 
-  div.appendChild(delete_link);
-  div.appendChild(field);
+  new Element('img').setProperty('src', obm.vars.images.datePicker)
+                              .injectAfter(f)
+                              .addEvent('click', function(e){
+                                displayDatePicker(f);
+                              });
 
-  container.appendChild(div);
-
-  field.setProperty('autocomplete','off');
-  var img = $(document.createElement('img'));
-  img.setAttribute(\"src\", obm.vars.images.datePicker);
-  img.injectAfter(field);
-  img.addEvent('click', function(e){
-    displayDatePicker(field.name);
-  });
 }
 ";
 

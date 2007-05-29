@@ -295,7 +295,7 @@ function display_head_theme($p_module) {
   global $ico_datepicker,$set_date_upd,$l_monthsofyear,$l_daysofweekfirst;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
-  global $css_print_obm, $ico_delete;
+  global $css_print_obm, $ico_delete,$cda_upd_dmy;
 
   if($set_date_upd == $cda_upd_dmy) {
     $date_upd_format = "fr";

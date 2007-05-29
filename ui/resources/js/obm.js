@@ -181,7 +181,6 @@ Obm.Portlets = new Class({
 
 });
 
-
 function popup(url,name,height,width) {
   if(!width)
     width = obm.vars.consts.popupWidth;

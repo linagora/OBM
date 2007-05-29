@@ -20,8 +20,8 @@ var datePickerDivID = "datepicker";
 var iFrameDivID = "datepickeriframe";
 var datePickerTimer;
 
-function displayDatePicker(dateFieldName, displayBelowThisObject, dtFormat) {
-  var targetDateField = document.getElementsByName (dateFieldName).item(0);
+function displayDatePicker(dateField, displayBelowThisObject, dtFormat) {
+  var targetDateField = $(dateField);
 
   // if we weren't told what node to display the datepicker beneath, just display it
   // beneath the date field we're updating
@@ -85,7 +85,7 @@ function drawDatePicker(targetDateField, x, y)
   pickerDiv.style.zIndex = 10000;
 
   // draw the datepicker table
-  refreshDatePicker(targetDateField.name, dt.getFullYear(), dt.getMonth(), dt.getDate());
+  refreshDatePicker(targetDateField, dt.getFullYear(), dt.getMonth(), dt.getDate());
   datePickerTimer.initTimer();
 }
 
@@ -93,7 +93,7 @@ function drawDatePicker(targetDateField, x, y)
 /**
   This is the function that actually draws the datepicker calendar.
  */
-function refreshDatePicker(dateFieldName, year, month, day)
+function refreshDatePicker(dateField, year, month, day)
 {
   var thisDay = new Date();
 
@@ -110,20 +110,20 @@ function refreshDatePicker(dateFieldName, year, month, day)
   var nextMonth = getDateMonthAndYear(thisDay, +1);
   var title = new Element('h1').adopt(
     new Element('a').setProperty('href','javascript: void(0);')
-     .addEvent('click',refreshDatePicker.pass([dateFieldName,year - 1,month]))
+     .addEvent('click',refreshDatePicker.pass([dateField,year - 1,month]))
      .appendText('<<'))
    .adopt(
       new Element('a').setProperty('href','javascript: void(0);')
-       .addEvent('click',refreshDatePicker.pass([dateFieldName,previousMonth.year,previousMonth.month]))
+       .addEvent('click',refreshDatePicker.pass([dateField,previousMonth.year,previousMonth.month]))
        .appendText('<'))
    .appendText(obm.vars.labels.months[thisDay.getMonth()] + ' ' + thisDay.getFullYear())
    .adopt(
      new Element('a').setProperty('href','javascript: void(0);')
-       .addEvent('click',refreshDatePicker.pass([dateFieldName,nextMonth.year,nextMonth.month]))
+       .addEvent('click',refreshDatePicker.pass([dateField,nextMonth.year,nextMonth.month]))
        .appendText('>'))
    .adopt(
      new Element('a').setProperty('href','javascript: void(0);')
-       .addEvent('click',refreshDatePicker.pass([dateFieldName,year + 1,month]))
+       .addEvent('click',refreshDatePicker.pass([dateField,year + 1,month]))
        .appendText('>>'));
   
   var labels = new Element('tr');
@@ -140,7 +140,7 @@ function refreshDatePicker(dateFieldName, year, month, day)
   do {
     dayNum = thisDay.getDate();
     var td = new Element('td');
-    td.addEvent('click',updateDateField.pass([dateFieldName,getDateString(thisDay)]));
+    td.addEvent('click',updateDateField.pass([dateField,getDateString(thisDay)]));
     if (dayNum == day) {
       td.addEvent("mouseout",function () {this.className='highlight';});
       td.addClass('highlight');
@@ -163,7 +163,7 @@ function refreshDatePicker(dateFieldName, year, month, day)
   }
 
   var today = new Element('a').setProperty('href','javascript:void(0)')
-                              .addEvent('click',refreshDatePicker.pass([dateFieldName]))
+                              .addEvent('click',refreshDatePicker.pass([dateField]))
                               .appendText(obm.vars.labels.today);
   var table = new Element('table').adopt(new Element('thead').adopt(labels))
                                   .adopt(content);
@@ -174,22 +174,6 @@ function refreshDatePicker(dateFieldName, year, month, day)
   return false;
 }
 
-
-/**
-  Convenience function for writing the code for the buttons that bring us back or forward
-  a month.
- */
-function getGoToSource(dateFieldName, dateVal, adjust)
-{
-  var newMonth = (dateVal.getMonth () + adjust) % 12;
-  var newYear = dateVal.getFullYear() + parseInt((dateVal.getMonth() + adjust) / 12);
-  if (newMonth < 0) {
-    newMonth += 12;
-    newYear += -1;
-  }
-
-  return "refreshDatePicker('" + dateFieldName + "', " + newYear + ", " + newMonth + ");return false;";
-}
 
 function getDateMonthAndYear(dateVal, adjust) {
   var newMonth = (dateVal.getMonth () + adjust) % 12;
@@ -345,9 +329,9 @@ endDateField.value = getDateString(dateObj);
 }
 
  */
-function updateDateField(dateFieldName, dateString)
+function updateDateField(dateField, dateString)
 {
-  var targetDateField = document.getElementsByName (dateFieldName).item(0);
+  var targetDateField = $(dateField);
   if (dateString)
     targetDateField.value = dateString;
   
@@ -381,7 +365,7 @@ function datePickerGenerator() {
     img.setAttribute("src", obm.vars.images.datePicker);
     img.injectInside(span);
     img.addEvent('click', function(e){
-      displayDatePicker(element.name);
+      displayDatePicker(element);
     });
   });
 }
