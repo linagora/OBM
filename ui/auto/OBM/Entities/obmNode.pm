@@ -6,8 +6,6 @@ $debug = 1;
 
 use 5.006_001;
 require Exporter;
-require overload;
-use Carp;
 use strict;
 
 use OBM::Parameters::common;
@@ -17,20 +15,18 @@ use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 use strict;
 
 
-my %ldapEngineAttr = (
-    type => undef,
-    typeDesc => undef,
-    incremental => undef,
-    archive => undef,
-    nodeId => undef,
-    domainId => undef,
-    nodeDesc => undef
-);
-
-
 sub new {
-    my( $obj, $incremental ) = @_;
-    $obj = ref($obj) || $obj;
+    my $self = shift;
+    my( $incremental ) = @_;
+
+    my %ldapEngineAttr = (
+        type => undef,
+        typeDesc => undef,
+        incremental => undef,
+        domainId => undef,
+        nodeDesc => undef
+    );
+
 
     if( $incremental ) {
         $ldapEngineAttr{"incremental"} = 1;
@@ -41,10 +37,7 @@ sub new {
     $ldapEngineAttr{"type"} = $NODE;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
 
-    my $self = \%ldapEngineAttr;
-    bless( $self, $obj );
-
-    return $self;
+    bless( \%ldapEngineAttr, $self );
 }
 
 
@@ -90,7 +83,6 @@ sub createLdapEntry {
     my( $ldapEntry ) = @_;
     my $entry = $self->{"nodeDesc"};
 
-    #
     # On construit la nouvelle entree
     if( $entry->{"name"} ) {
         $ldapEntry->add(

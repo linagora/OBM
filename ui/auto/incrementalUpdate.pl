@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -w -T
 #####################################################################
 # OBM               - File : incrementalUpdate.pl                   #
 #                   - Desc : Script permettant de mettre à jour le  #
@@ -8,9 +8,12 @@
 #-------------------------------------------------------------------#
 
 use strict;
+require OBM::ldap;
 require OBM::toolBox;
 require OBM::loadDbIncremental;
 require OBM::Ldap::ldapEngine;
+require OBM::Entities::obmRoot;
+require OBM::Entities::obmDomainRoot;
 require OBM::Entities::obmNode;
 require OBM::Entities::obmUser;
 require OBM::Entities::obmGroup;
@@ -105,31 +108,73 @@ if( defined($parameters{"domain"}) ) {
 # Otention des serveurs LDAP par domaines
 &OBM::ldap::getServerByDomain( $dbHandler, $main::domainList );
 
+# Test entite ROOT
+my $entity = OBM::Entities::obmRoot->new( 0 );
+$entity->getEntity( "local", "Racine de l'annuaire", $main::domainList->[0] );
+$entity->dump();
+print $entity->getLdapDnPrefix()."\n";
+
+# Test entite DOMAINROOT
+$entity = OBM::Entities::obmDomainRoot->new( 0 );
+$entity->getEntity( $main::domainList->[1] );
+$entity->dump();
+print $entity->getLdapDnPrefix()."\n";
+
 # Test entite NODE
-my $entity = OBM::Entities::obmNode->new( 0 );
+print "-------------------------------\n";
+$entity = OBM::Entities::obmNode->new( 0 );
 $entity->getEntity( "test", "Node de test", $main::domainList->[1] );
 $entity->dump();
-print $entity->getLdapDnPrefix();
+print $entity->getLdapDnPrefix()."\n";
 
 # Test entite POSIXUSERS
-#my $entity = OBM::Entities::obmUser->new( 0, 6 );
-#$entity->getEntity( $dbHandler, $main::domainList->[1] );
-#$entity->dump();
+print "-------------------------------\n";
+$entity = OBM::Entities::obmUser->new( 0, 6 );
+$entity->getEntity( $dbHandler, $main::domainList->[1] );
+$entity->dump();
+print $entity->getLdapDnPrefix()."\n";
+
+# Test entite POSIXUSERS en mode incremental
+print "-------------------------------\n";
+$entity = OBM::Entities::obmUser->new( 1, 6 );
+$entity->getEntity( $dbHandler, $main::domainList->[1] );
+$entity->dump();
+print $entity->getLdapDnPrefix()."\n";
 
 # Test entite POSIXGROUPS
-#my $entity = OBM::Entities::obmGroup->new( 0, 5 );
-#$entity->getEntity( $dbHandler, $main::domainList->[1] );
-#$entity->dump();
+print "-------------------------------\n";
+$entity = OBM::Entities::obmGroup->new( 0, 5 );
+print $entity."\n";
+$entity->getEntity( $dbHandler, $main::domainList->[1] );
+$entity->dump();
+print $entity->getLdapDnPrefix()."\n";
+
+# Test entite POSIXGROUPS en mode incremental
+print "-------------------------------\n";
+$entity = OBM::Entities::obmGroup->new( 1, 5 );
+print $entity."\n";
+$entity->getEntity( $dbHandler, $main::domainList->[1] );
+$entity->dump();
+print $entity->getLdapDnPrefix()."\n";
 
 # Test entite MAILSHARE
-#my $entity = OBM::Entities::obmMailshare->new( 0, 1 );
-#$entity->getEntity( $dbHandler, $main::domainList->[1] );
-#$entity->dump();
+print "-------------------------------\n";
+$entity = OBM::Entities::obmMailshare->new( 0, 1 );
+$entity->getEntity( $dbHandler, $main::domainList->[1] );
+$entity->dump();
+print $entity->getLdapDnPrefix()."\n";
 
-#my $ldapEngine = OBM::Ldap::ldapEngine->new( $main::domainList );
-#$ldapEngine->init();
-#$ldapEngine->dump( "ldapstruct" );
-#$ldapEngine->destroy();
+# Test entite MAILSHARE en mode incremental
+print "-------------------------------\n";
+$entity = OBM::Entities::obmMailshare->new( 1, 1 );
+$entity->getEntity( $dbHandler, $main::domainList->[1] );
+$entity->dump();
+print $entity->getLdapDnPrefix()."\n";
+
+my $ldapEngine = OBM::Ldap::ldapEngine->new( $main::domainList );
+$ldapEngine->init();
+$ldapEngine->dump( "ldapstruct" );
+$ldapEngine->destroy();
 
 #
 # On referme la connexion a la base

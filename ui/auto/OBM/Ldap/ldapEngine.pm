@@ -6,37 +6,37 @@ $debug = 1;
 
 use 5.006_001;
 require Exporter;
-require overload;
-use Carp;
 use strict;
 
-use Net::LDAP;
-use Net::LDAP::Entry;
 use OBM::Parameters::common;
-require OBM::Parameters::ldapConf;
+use OBM::Parameters::ldapConf;
+require Net::LDAP;
+require Net::LDAP::Entry;
 require OBM::toolBox;
 require OBM::utils;
-require OBM::ldap;
-
-
-# Definition des attributs de l'objet
-my %ldapEngineAttr = (
-    ldapStruct => undef,
-    domainList => undef,
-    typeDesc => undef,
-    ldapConn => {
-        ldapServer => undef,
-        ldapAdmin => undef,
-        ldapAdminDn => undef,
-        ldapPasswd => undef,
-        conn => undef
-    }
-);
+require OBM::Entities::obmRoot;
+require OBM::Entities::obmDomainRoot;
+require OBM::Entities::obmNode;
 
 
 sub new {
-    my( $obj, $domainList ) = @_;
-    $obj = ref($obj) || $obj;
+    my $self = shift;
+    my( $domainList ) = @_;
+
+    # Definition des attributs de l'objet
+    my %ldapEngineAttr = (
+        ldapStruct => undef,
+        domainList => undef,
+        typeDesc => undef,
+        ldapConn => {
+            ldapServer => undef,
+            ldapAdmin => undef,
+            ldapAdminDn => undef,
+            ldapPasswd => undef,
+            conn => undef
+        }
+    );
+
 
     if( !defined($domainList) ) {
         croak( "Usage: PACKAGE->new(DOMAINLIST)" );
@@ -47,10 +47,7 @@ sub new {
     $ldapEngineAttr{"ldapStruct"} = &OBM::utils::cloneStruct($OBM::Parameters::ldapConf::ldapStruct),
     $ldapEngineAttr{"typeDesc"} = $OBM::Parameters::ldapConf::attributeDef;
 
-    my $self = \%ldapEngineAttr;
-    bless( $self, $obj );
-
-    return $self;
+    bless( \%ldapEngineAttr, $self );
 }
 
 
@@ -180,14 +177,45 @@ sub _initTree {
         $domainId = 0;
     }
 
+    &OBM::toolBox::write_log( "ldapEngine: gestion du noeud de type '".$ldapStruct->{"node_type"}."' et de dn : ".$ldapStruct->{"dn"}, "W" );
+
+
+    # Création de l'objet adéquat
+    SWITCH: {
+        # Obtention de la description du domaine courrant
+        my $domainDesc = $self->_findDomainbyId($domainId);
+
+        if( $ldapStruct->{"node_type"} eq $ROOT ) {
+            my $object = OBM::Entities::obmRoot->new(0);
+            $object->getEntity( $ldapStruct->{"name"}, $ldapStruct->{"description"}, $domainDesc );
+            $ldapStruct->{"object"} = $object;
+
+            last SWITCH;
+        }
+
+        if( $ldapStruct->{"node_type"} eq $DOMAINROOT ) {
+            my $object = OBM::Entities::obmDomainRoot->new(0);
+            $object->getEntity( $domainDesc );
+            $ldapStruct->{"object"} = $object;
+
+            last SWITCH;
+        }
+
+        if( $ldapStruct->{"node_type"} eq $NODE ) {
+            my $object = OBM::Entities::obmNode->new(0);
+            $object->getEntity( $ldapStruct->{"name"}, $ldapStruct->{"description"}, $domainDesc );
+            $ldapStruct->{"object"} = $object;
+
+            last SWITCH;
+        }
+    }
+
 
     # On initialise le noeud courant
     $ldapStruct->{"dn"} = $self->_makeDn( $ldapStruct, $parentDn );
     if( !exists($ldapStruct->{"domain_id"}) && defined($domainId) ) {
         $ldapStruct->{"domain_id"} = $domainId;
     }
-
-    &OBM::toolBox::write_log( "ldapEngine: gestion du noeud de type '".$ldapStruct->{"node_type"}."' et de dn : ".$ldapStruct->{"dn"}, "W" );
 
 
     # On cré les branches correspondants aux templates pour chacun des domaines
@@ -263,6 +291,26 @@ sub _makeDn {
     }
 
     return $entryDn;
+}
+
+
+sub _findDomainbyId {
+    my $self = shift;
+    my( $domainId ) = @_;
+    my $domainDesc = undef;
+
+    if( !defined($domainId) || ($domainId !~ /^\d+$/) ) {
+        return undef;
+    }
+
+    for( my $i=0; $i<=$#{$self->{"domainList"}}; $i++ ) {
+        if( $self->{"domainList"}->[$i]->{"domain_id"} == $domainId ) {
+            $domainDesc = $self->{"domainList"}->[$i];
+            last;
+        }
+    }
+
+    return $domainDesc;
 }
 
 

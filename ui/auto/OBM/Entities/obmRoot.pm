@@ -1,4 +1,4 @@
-package OBM::Entities::obmDomainRoot;
+package OBM::Entities::obmRoot;
 
 $VERSION = "1.0";
 
@@ -24,7 +24,7 @@ sub new {
         typeDesc => undef,
         incremental => undef,
         domainId => undef,
-        domainDesc => undef
+        rootDesc => undef
     );
 
 
@@ -34,7 +34,7 @@ sub new {
         $ldapEngineAttr{"incremental"} = 0;
     }
 
-    $ldapEngineAttr{"type"} = $DOMAINROOT;
+    $ldapEngineAttr{"type"} = $ROOT;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
 
     bless( \%ldapEngineAttr, $self );
@@ -43,17 +43,24 @@ sub new {
 
 sub getEntity {
     my $self = shift;
-    my( $domainDesc ) = @_;
+    my( $name, $description, $domainDesc ) = @_;
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "obmDomainRoot: description de domaine OBM incorrecte", "W" );
+        &OBM::toolBox::write_log( "obmRoot: description de domaine OBM incorrecte", "W" );
         return 0;
     }else {
         # On positionne l'identifiant du domaine de l'entité
         $self->{"domainId"} = $domainDesc->{"domain_id"};
     }
 
-    $self->{"domainDesc"} = $domainDesc;
+    if( defined($name) ) {
+        $self->{"nodeDesc"}->{"name"} = $name;
+    }else {
+        &OBM::toolBox::write_log( "obmRoot: nom de noeud invalide", "W" );
+        return 0;
+    }
+
+    $self->{"nodeDesc"}->{"description"} = $description;
 
     return 1;
 }
@@ -63,8 +70,8 @@ sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
 
-    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"domainDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
-        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"domainDesc"}->{$self->{"typeDesc"}->{"dn_value"}};
+    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"nodeDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
+        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"nodeDesc"}->{$self->{"typeDesc"}->{"dn_value"}};
     }
 
     return $dnPrefix;
@@ -74,17 +81,15 @@ sub getLdapDnPrefix {
 sub createLdapEntry {
     my $self = shift;
     my( $ldapEntry ) = @_;
-    my $entry = $self->{"domainDesc"};
-
+    my $entry = $self->{"nodeDesc"};
 
     # On construit la nouvelle entree
-    if( $entry->{"domain_name"} ) {
+    if( $entry->{"name"} ) {
         $ldapEntry->add(
             objectClass => $self->{"typeDesc"}->{"objectclass"},
-            dc => to_utf8( { -string => $entry->{"domain_name"}, -charset => $defaultCharSet } ),
-            o => to_utf8( { -string => $entry->{"domain_name"}, -charset => $defaultCharSet } )
+            ou => to_utf8({ -string => $entry->{"name"}, -charset => $defaultCharSet })
         );
-
+                
     }else {
         return 0;
     }
@@ -101,10 +106,10 @@ sub createLdapEntry {
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry ) = @_;
-    my $entry = $self->{"domainDesc"};
+    my $entry = $self->{"nodeDesc"};
     my $update = 0;
 
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"domain_desc"}, $ldapEntry, "description" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"description"}, $ldapEntry, "description" ) ) {
         $update = 1;
     }
 
