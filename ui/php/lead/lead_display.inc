@@ -138,11 +138,11 @@ function html_lead_search_form($params, $sources, $managers) {
       </label>
 
       <label>$l_date $l_after<br />
-        <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
+        <input type=\"text\" name=\"tf_date_after\" value=\"$date_after\" class=\"datePicker\"/>
       </label>
 
       <label>$l_date $l_before<br />
-         <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
+         <input type=\"text\" name=\"tf_date_before\" value=\"$date_before\" class=\"datePicker\"/>
       </label>
 
       <label>$l_source<br />
