@@ -52,6 +52,7 @@ sub createLdapEntry {
     return 1;
 }
 
+
 sub updateLdapEntry {
     my( $entry, $ldapEntry ) = @_;
     my $name = lc($entry->{"name"});

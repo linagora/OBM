@@ -23,6 +23,7 @@ sub new {
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        toDelete => undef,
         domainId => undef,
         domainDesc => undef
     );
@@ -36,6 +37,7 @@ sub new {
 
     $ldapEngineAttr{"type"} = $DOMAINROOT;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
+    $ldapEngineAttr{"toDelete"} = 0;
 
     bless( \%ldapEngineAttr, $self );
 }
@@ -59,6 +61,22 @@ sub getEntity {
 }
 
 
+sub setDelete {
+    my $self = shift;
+
+    $self->{"toDelete"} = 1;
+
+    return 1;
+}
+
+
+sub getDelete {
+    my $self = shift;
+
+    return $self->{"toDelete"};
+}
+
+
 sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
@@ -78,7 +96,7 @@ sub createLdapEntry {
 
 
     # On construit la nouvelle entree
-    if( $entry->{"domain_name"} ) {
+    if( $entry->{"domain_label"} ) {
         $ldapEntry->add(
             objectClass => $self->{"typeDesc"}->{"objectclass"},
             dc => to_utf8( { -string => $entry->{"domain_name"}, -charset => $defaultCharSet } ),
@@ -90,8 +108,8 @@ sub createLdapEntry {
     }
 
     # La description
-    if( $entry->{"description"} ) {
-        $ldapEntry->add( description => to_utf8({ -string => $entry->{"description"}, -charset => $defaultCharSet }) );
+    if( $entry->{"domain_desc"} ) {
+        $ldapEntry->add( description => to_utf8({ -string => $entry->{"domain_desc"}, -charset => $defaultCharSet }) );
     }
 
     return 1;

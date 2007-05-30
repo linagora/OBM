@@ -6,6 +6,7 @@ $debug = 1;
 
 use 5.006_001;
 require Exporter;
+use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 use strict;
 
 use OBM::Parameters::common;
@@ -63,7 +64,18 @@ sub init {
     $self->{"ldapConn"}->{"ldapPasswd"} = $self->{"domainList"}->[0]->{"ldap_admin_passwd"};
 
     # Etabli la connexion à l'annuaire
-    return $self->_connectLdapSrv();
+    if( !$self->_connectLdapSrv() ) {
+        return 0;
+    }
+
+    # On vérifie l'arborescence
+    &OBM::toolBox::write_log( "ldapEngine: verification de l'arborescence de l'annuaire LDAP", "W" );
+    if( !$self->checkLdapTree( $self->{"ldapStruct"} ) ) {
+        $self->destroy();
+        return 0;
+    }
+
+    return 1;
 }
 
 
@@ -128,7 +140,7 @@ sub _connectLdapSrv {
         name => $ldapConn->{"ldapAdmin"}
     };
 
-    my $parentDn = $self->_findTypeParentDn( $ldapStruct, $OBM::Parameters::ldapConf::SYSTEMUSERS, 0 );
+    my $parentDn = $self->_findTypeParentDn( $ldapStruct, $SYSTEMUSERS, 0 );
     if( defined( $parentDn ) ) {
         $ldapConn->{"ldapAdminDn"} = $self->_makeDn( $ldapAdmin, $parentDn );
         &OBM::toolBox::write_log( "ldapEngine: connexion a l'annuaire en tant que '".$ldapConn->{"ldapAdminDn"}."'", "W" );
@@ -166,16 +178,23 @@ sub _disconnectLdapSrv {
     return 1;
 }
 
+
 sub _initTree {
     my $self = shift;
     my( $ldapStruct, $parentDn, $domainId ) = @_;
 
-    # Si le domaine du noeud n'est pas positionné
-    if( !exists($ldapStruct->{"domain_id"}) && !defined($domainId) ) {
-        # Si il n'y a pas de domaine précisé et que le domaine du noeud n'est
-        # pas positionné, on attache les informations au meta-domaine
+    if( !defined($domainId) ) {
+        # Si le domaine du noeud n'est pas transmit
         $domainId = 0;
+    }elsif( $ldapStruct->{"domain_id"} ) {
+        # Si le noeud est déjà asigné à un domaine
+        $domainId = $ldapStruct->{"domain_id"};
     }
+
+
+    # On initialise le noeud courant
+    $ldapStruct->{"dn"} = $self->_makeDn( $ldapStruct, $parentDn );
+    $ldapStruct->{"domain_id"} = $domainId;
 
     &OBM::toolBox::write_log( "ldapEngine: gestion du noeud de type '".$ldapStruct->{"node_type"}."' et de dn : ".$ldapStruct->{"dn"}, "W" );
 
@@ -211,13 +230,6 @@ sub _initTree {
     }
 
 
-    # On initialise le noeud courant
-    $ldapStruct->{"dn"} = $self->_makeDn( $ldapStruct, $parentDn );
-    if( !exists($ldapStruct->{"domain_id"}) && defined($domainId) ) {
-        $ldapStruct->{"domain_id"} = $domainId;
-    }
-
-
     # On cré les branches correspondants aux templates pour chacun des domaines
     # sauf pour le domaine '0'
     for( my $i=0; $i<=$#{$ldapStruct->{"template"}}; $i++ ) {
@@ -233,7 +245,7 @@ sub _initTree {
             # On positionne le nom en fonction du domaine, afin de
             # pouvoir créer le DN
             $currentDomainBranch->{"name"} = $self->{"domainList"}->[$j]->{"domain_dn"};
-            $currentDomainBranch->{"domain_id"} = $j;
+            $currentDomainBranch->{"domain_id"} = $self->{"domainList"}->[$j]->{"domain_id"};
 
             push( @{$ldapStruct->{"branch"}}, $currentDomainBranch )
         }
@@ -242,15 +254,96 @@ sub _initTree {
 
     # On parcours les sous branches
     for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
-        my $currentDomainId = undef;
-        if( defined( $ldapStruct->{"domain_id"} ) ) {
-            $currentDomainId = $ldapStruct->{"domain_id"};
-        }
-
-        $self->_initTree( $ldapStruct->{"branch"}->[$i], $ldapStruct->{"dn"}, $currentDomainId );
+        $self->_initTree( $ldapStruct->{"branch"}->[$i], $ldapStruct->{"dn"}, $ldapStruct->{"domain_id"} );
     }
 
     return 1;
+}
+
+
+sub checkLdapTree {
+    my $self = shift;
+    my( $ldapStruct ) = @_;
+    my $type = $ldapStruct->{"node_type"};
+
+    if( !$self->{"typeDesc"}->{$type}->{"is_branch"} ) {
+        return 0;
+    }
+
+    if( !defined($ldapStruct->{"object"}) ) {
+        return 0;
+    }
+
+    if( !defined($ldapStruct->{"dn"}) ) {
+        return 0;
+    }
+
+    $self->_doWork( $ldapStruct->{"dn"}, $ldapStruct->{"object"} );
+
+    # On parcours les sous branches
+    for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
+        if( !$self->checkLdapTree( $ldapStruct->{"branch"}->[$i] ) ) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+
+sub updateLdapEntity {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $ldapConn = $self->{"ldapConn"}->{"conn"};
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
+    my $result = $ldapEntry->update( $ldapConn );
+
+    if( $result->is_error() ) {
+        &OBM::toolBox::write_log( "ldapEngine: erreur LDAP : ".$result->code." - ".$result->error, "W" );
+        return 0;
+    }
+
+    return 1;
+}
+
+
+sub findDn {
+    my $self = shift;
+    my( $dn ) = @_;
+
+    my $scope="base";
+    my $ldapFilter = "(objectclass=*)";
+    my $ldapConn = $self->{"ldapConn"}->{"conn"};
+
+    if( !defined($ldapConn) || !defined($dn) ) {
+        return undef;
+    }
+
+    my $result = $ldapConn->search(
+                    base => to_utf8( { -string => $dn, -charset => $defaultCharSet } ),   
+                    scope => $scope,
+                    filter => $ldapFilter
+                    );
+
+    if( !defined($result) ) {
+        return undef;
+
+    }elsif( ($result->code != 32) && $result->is_error() ) {
+        # L'erreur 'No such object' n'est, dans ce cas, pas considérée comme un
+        # erreur.
+        &OBM::toolBox::write_log( "ldapEngine: erreur: probleme lors d'une requête LDAP : ".$result->code." - ".$result->error, "W" );
+        return undef;
+
+    }elsif( $result->count != 1 ) {
+        return undef;
+
+    }
+
+    return $result->entry(0);
 }
 
 
@@ -272,7 +365,10 @@ sub _findTypeParentDn {
 
     if( exists($ldapStruct->{"branch"}) && defined($ldapStruct->{"branch"}) ) {
         for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
-            return $self->_findTypeParentDn( $ldapStruct->{"branch"}->[$i], $type, $domainId );
+            my $parentDn = $self->_findTypeParentDn( $ldapStruct->{"branch"}->[$i], $type, $domainId );
+            if( defined($parentDn) ) {
+                return $parentDn;
+            }
         }
     }
 
@@ -314,7 +410,69 @@ sub _findDomainbyId {
 }
 
 
-sub checkTree {
+sub _doWork {
     my $self = shift;
+    my( $dn, $object ) = @_;
 
+
+    my $ldapEntry = $self->findDn($dn);
+    if( defined($ldapEntry) && $object->getDelete() ) {
+        # Suppression
+        &OBM::toolBox::write_log( "ldapEngine: suppression du noeud : ".$dn, "W" );
+
+        my $result = $self->{"ldapConn"}->{"conn"}->delete( $ldapEntry->dn );
+        if( $result->is_error() ) {
+            &OBM::toolBox::write_log( "ldapEngine: erreur : ".$result->code." - ".$result->error, "W" );
+        }
+
+    }elsif( defined($ldapEntry) && !$object->getDelete() ) {
+        # Mise à jour
+        if( $object->updateLdapEntry($ldapEntry) ) {
+            &OBM::toolBox::write_log( "ldapEngine: mise a jour du noeud : ".$dn, "W" );
+
+            if( !$self->updateLdapEntity($ldapEntry) ) {
+                return 0;
+            }
+        }
+
+    }elsif( !defined($ldapEntry) && !$object->getDelete() ) {
+        # Création
+        my $ldapEntry = Net::LDAP::Entry->new;
+        if( $object->createLdapEntry($ldapEntry) ) {
+            &OBM::toolBox::write_log( "ldapEngine: creation du noeud : ".$dn, "W" );
+
+            # On positionne le DN
+            $ldapEntry->dn( to_utf8( { -string => $dn, -charset => $defaultCharSet } ) );
+
+            if( !$self->updateLdapEntity($ldapEntry) ) {
+                return 0;
+            }
+        }
+    }
+
+
+    return 1;
+}
+
+
+sub update {
+    my $self = shift;
+    my( $object ) = @_;
+
+    if( !defined($object) ) {
+        return 0;
+    }elsif( !defined($object->{"type"}) ) {
+        return 0;
+    }elsif( !defined($object->{"domainId"}) ) {
+        return 0;
+    }
+
+    my $domainDesc = $self->_findDomainbyId($object->{"domainId"});
+
+    my $parentDn = $self->_findTypeParentDn( $self->{"ldapStruct"}, $object->{"type"}, $object->{"domainId"} );
+    my $objectDn = $object->getLdapDnPrefix().",".$parentDn;
+
+    $self->_doWork( $objectDn, $object );
+
+    return 1;
 }
