@@ -3458,19 +3458,44 @@ function parse_item($item) {
   xml_parse_into_struct($p, $item, $vals, $index);
   xml_parser_free($p);
 
-  $match_attribut = array("res_id", "res_name", "item", "item_id", "property_name", "property_value");
+  $match_attribut = array("resource", "res_id", "res_name", "item", "item_id", "property_name", "property_value");
 
   foreach($vals as $key => $value) {
     $att = strtolower($value["tag"]);
     if (in_array($att, $match_attribut)) { 
-      $item_detail->resource->$att = $value["value"];
+      // $item_detail->resource->$att = $value["value"];
+      $${att} = $value["value"];
     }
-  }
-  if ($item_detail != "") {
-    $item_list->resource = $item_detail;
+    if (isset($res_id) && isset($res_name) && isset($item) && isset($item_id) && isset($property_name) && isset($property_value)) {
+      $item_detail = new Item($res_id, $res_name, $item, $item_id, $property_name, $property_value);
+      $item_list->resource[] =  $item_detail;
+      unset($res_id);
+      unset($res_name);
+      unset($item);
+      unset($item_id);
+      unset($property_name);
+      unset($property_value);
+    }
   }
 
   return $item_list;
 }
 
+Class Item {
+  var $res_id;
+  var $res_name;
+  var $item;
+  var $item_id;
+  var $property_name;
+  var $property_value;
+
+  function Item($res_id, $res_name, $item, $item_id, $property_name, $property_value) {
+    $this->res_id = $res_id;
+    $this->res_name = $res_name;
+    $this->item = $item;
+    $this->item_id = $item_id;
+    $this->property_name = $property_name;
+    $this->property_value = $property_value;
+  }
+}
 ?>
