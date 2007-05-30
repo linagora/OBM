@@ -13,7 +13,7 @@ if ( (! headers_sent()) && ($params["mode"] != "txt"))
   $sess->setcookie();
 
 // if prefs have not been loaded (we check the var set_lang) - Login Phase
-if (($set_lang == "")  && ($params["mode"] != "txt")) {
+if (($set_lang == "") && ($params["mode"] != "txt")) {
   // We Load and make session variables from User preferences
   session_load_user_prefs();
   if ($cgp_show["module"]["todo"]) 

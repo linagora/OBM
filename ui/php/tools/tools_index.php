@@ -41,16 +41,19 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
 
 } elseif ($action == "update_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_tools_update_context()) {
+  if (check_tools_update_context_ok()) {
+    set_update_state();
     $display["detail"] = dis_tools_update_validation($params);
     $res = exec_tools_update_update($params);
     if ($res == "0") {
-      $display["msg"] .= display_ok_msg($l_upd_ok);
+      $display["msg"] .= display_ok_msg($l_upd_running);
     } else {
       $display["msg"] .= display_err_msg("$l_upd_error ($res)");
     }
+    unset_update_state();
   } else {
     // Si le contexte ne permet pas une modification de configuration
+    $display['msg'] .= display_warn_msg($err['msg']);
     $display["detail"] = html_tools_update_index();
   }
 
@@ -70,7 +73,7 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
 
 } elseif ($action == "update_cancel")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_tools_update_context()) {
+  if (check_tools_update_context_ok()) {
     $res = run_query_tools_update_cancel();
     if ($res == "0") {
       $display["msg"] .= display_ok_msg($l_upd_cancel_ok);

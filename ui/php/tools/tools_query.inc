@@ -153,25 +153,38 @@ function run_query_tools_update_cancel() {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Check if a global system configuration execution is possible
-// Parameters:
-//   - $tools[]  : entry values
-//     keys used : update
-// Returns:
-//   - (true | false) : true if ok else false
-///////////////////////////////////////////////////////////////////////////////
-function check_tools_update_context() {
-  global $cmd_check_update;
+/**
+ * Check if a global system configuration execution is possible
+ *
+ * @param $tools[] paramateres values
+ * @return (true | false) : true if ok else false
+ */
+function check_tools_update_context_ok() {
+  global $obm, $profiles, $display, $cmd_check_update, $err;
+  global $l_error_permission, $l_upd_already_running;
 
   $update_ok = true;
+
+  // Check user admin rights
+  if (! isset($profiles[$obm['profile']]['properties']['admin_realm'])) {
+    $err['msg'] = $l_error_permission;
+    return false;
+  }
+
+  $update_state = get_update_state();
+  if ($update_state == '1') {
+    $err['msg'] = $l_upd_already_running;
+    return false;
+  }
 
   // Il ne faut pas qu'une mise à jour soit déjà en cours
   $ps = shell_exec("$cmd_check_update");
 
-  if ($ps)
-    $update_ok = false;
-  
+  if ($ps) {
+    $err['msg'] = $l_upd_already_running;
+    return false;
+  }
+
   return $update_ok;
 }
 
@@ -255,10 +268,10 @@ function get_update_infos(&$e1, &$e2, $table, $field="", $realm) {
 ///////////////////////////////////////////////////////////////////////////////
 // Process update infos to get number for an entity
 // Parameters:
-//   - $entity : entity to get numbers
+//   - $table  : table to get numbers
 //   - $realm  : realm space to check updates (user | domain | delegation)
 ///////////////////////////////////////////////////////////////////////////////
-function process_update_numbers($e1, $e2, $entity, $realm) {
+function process_update_numbers($e1, $e2, $table, $realm) {
   global $cdg_sql, $obm;
 
   $nb_add = 0;
@@ -292,7 +305,7 @@ function process_update_numbers($e1, $e2, $entity, $realm) {
     // Get the delete from the Deleted table
     $query = "SELECT count(*) as nb FROM Deleted
      WHERE deleted_user_id=$uid
-       AND deleted_entity='$entity'";
+       AND deleted_table='$table'";
     display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
     $retour = $obm_q->query($query);
     $obm_q->next_record();
@@ -303,7 +316,7 @@ function process_update_numbers($e1, $e2, $entity, $realm) {
     // Get the delete from the Deleted table
     $query = "SELECT count(*) as nb FROM Deleted
      WHERE deleted_delegation $like '$delegation%'
-       AND deleted_entity='$entity'
+       AND deleted_table='$table'
        AND deleted_domain_id='$domain_id'";
     display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
     $retour = $obm_q->query($query);
@@ -331,19 +344,18 @@ function process_update_numbers($e1, $e2, $entity, $realm) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get update types number for an entity
 // Parameters:
-//   - $entity : entity to get numbers
-//   - $table  : table where to check
+//   - $table  : entity table
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_entity_numbers($entity, $table, $field="", $realm) {
+function get_update_entity_numbers($table, $field="", $realm) {
   global $cdg_sql, $obm;
 
   $e1 = array();
   $e2 = array();
 
   get_update_infos($e1, $e2, $table, $field, $realm);
-  $nb = process_update_numbers($e1, $e2, $entity, $realm);
+  $nb = process_update_numbers($e1, $e2, $table, $realm);
 
   return $nb;
 }

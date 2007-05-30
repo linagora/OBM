@@ -1232,7 +1232,8 @@ function session_load_user_prefs() {
   $last_v = array();
 
   $prefs = get_user_pref($obm["uid"]);
-  if( is_array($prefs) ) 
+
+  if (is_array($prefs)) 
   while ( list($option, $info) = each($prefs) ) {
     $value = $info["value"];
     global $$option;
