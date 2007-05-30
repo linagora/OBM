@@ -12,22 +12,8 @@ obm.vars.consts.pgup = 33;
 obm.vars.consts.pgdown = 34;
 
 obm.AutoComplete = obm.autocomplete = {};
-//FIXME Not usefull, replace buy getStyle and setStyle
-Element.extend({
-  hide: function() {
-    this.style.display = 'none';
-    return this;
-  },
 
-  show: function() {
-    this.style.display = '';
-    return this;
-  },
-  isVisible: function() {
-    return (this.style.display=='');
-  }
-});
-
+/////////////////////////////////////////////////////////////////////////////
 // used to manage a cache of results
 obm.AutoComplete.Cache = new Class({
 
@@ -36,43 +22,51 @@ obm.AutoComplete.Cache = new Class({
     this.EmptyItem = new Element('h2');
   },
 
-  setSize: function(size) {     // defines the total results number that will contain the cache
+  // defines the number of results that will contain the cache
+  setSize: function(size) {
     while (size > this.getSize()) {
       this.loadingCache.push(this.EmptyItem.clone())
     }
   },
 
-  addElement: function(elt) {   // add a result in the cache
+  // add a result in the cache
+  addElement: function(elt) {
     if (this.loadingCache.length>0)
       this.loadingCache.shift()
     this.realCache.push(elt);
   },
 
-  getElementAt: function(index) { // to get the element at the given index
+  // to get the element at the given index
+  getElementAt: function(index) {
     return ( index<this.realCache.length ? this.realCache[index] : this.loadingCache[index-this.realCache.length]);
   },
 
-  getIndexOf: function(elt) {   // to get the index of the given element
+  // to get the index of the given element
+  getIndexOf: function(elt) {
     var index = this.realCache.indexOf(elt);
     return (index != -1 ? index : this.loadingCache.indexOf(elt) ) ;
   },
 
-  getSize: function() {         // to get the total cache size
+  // to get the total cache size
+  getSize: function() {
     return this.realCache.length + this.loadingCache.length;
   },
 
-  getCacheSize: function() {    // number of elements in cache
+  // number of elements in cache
+  getCacheSize: function() {
     return this.realCache.length;
   },
 
-  flush: function() {           // flush cache
-    this.size = 0;
-    this.realCache = new Array();
-    this.loadingCache = new Array();
+  // flush cache
+  flush: function() {
+    this.realCache = new Array();    // array of loaded results
+    this.loadingCache = new Array(); // array of unknown results (= results to request)
   }
 
 });
 
+
+/////////////////////////////////////////////////////////////////////////////
 // used to manage the visible elements of the result list
 //FIXME Improve algorythm
 //FIXME Refactor
@@ -84,23 +78,28 @@ obm.AutoComplete.View = new Class({
     this.first = 0;             // index of the first visible element
   },
 
-  setElementNb: function(elementNb) { // used to set the number of elements in the list
+  // used to set the number of elements in the list
+  setElementNb: function(elementNb) {
     this.elementNb = elementNb;
   },
 
-  getFirst: function() {        // index of the first visible element
+  // index of the first visible element
+  getFirst: function() {
     return this.first;
   },
 
-  getLast: function() {         // index of the last visible element
+  // index of the last visible element
+  getLast: function() {
     return Math.min(this.elementNb, this.first+this.visibleNb)-1;
   },
 
-  inView: function(index) {     // is it the index of a visible element, or not ?
+  // is it the index of a visible element, or not ?
+  inView: function(index) {
     return ( index >= this.first && index <= this.getLast() );
   },
 
-  move: function(offset) {      // used to move the index of visible elements
+  // used to move the index of visible elements
+  move: function(offset) {
     this.first += offset;
     if ( this.first > (this.elementNb - this.visibleNb)) {
       this.first = (this.elementNb - this.visibleNb);
@@ -130,91 +129,120 @@ obm.AutoComplete.Search = new Class({
   initialize: function(url, selectedBox, inputField, options) {
     this.setOptions(options);
 
-    this.url = url;
-    this.inputField = $(inputField);
-    this.name = selectedBox;
-    this.selectedBox = $(selectedBox);
+    this.url = url;                    // url used for ajax requests
+    this.inputField = $(inputField);   // field used for the input
+    this.name = selectedBox;           // used as a prefix for results id
+    this.selectedBox = $(selectedBox); // box used to add selected results
+    this.isMouseOver = false;          // is mouse over the resultBox ?
+    this.toClear = false;              // true if the resultBox (and cache) need to be flush
 
-    this.toClear = false;
-   // FIXME OnBlur event to be rethink
-   // FIXME Rename input on field.. input can have many means
     this.inputField.addEvent('keyup', this.onTextChange.bindAsEventListener(this))
                    .addEvent('keydown', this.onKeyDown.bindWithEvent(this))
                    .addEvent('keypress', this.onKeyPress.bindWithEvent(this))
-                   .addEvent('blur',this.reset.bindAsEventListener(this))
-                   .addEvent('focus',function(){this.inputField.value='';this.inputField.removeClass('downlight');}.bindAsEventListener(this));
+                   .addEvent('focus', this.onFocus.bindAsEventListener(this))
+                   .addEvent('blur', this.onBlur.bindAsEventListener(this));
 
     var inputCoords = this.inputField.getCoordinates();
     this.resultBox = new Element('div').addClass('autoCompleteResultBox')
                                        .injectInside($(document.body))
+                                       .addEvent('mouseenter', function() {this.isMouseOver=true;}.bindAsEventListener(this))
+                                       .addEvent('mouseleave', function() {this.isMouseOver=false;}.bindAsEventListener(this))
                                        .setStyles({
                                          'top':(inputCoords.top + inputCoords.height + 2) + 'px',
                                          'left':inputCoords.left + 'px'
                                        });
     this.infos = new Element('h2').injectInside(this.resultBox)
+                                  .addEvent('mousedown', function() {this.inputField.focus();}.bindAsEventListener(this))
                                   .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
 
     //FIXME Name of those 3 vars
-    this.previousBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(-this.options.results);}.bindAsEventListener(this))
+    this.previousResultsBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(-this.options.results);}.bindAsEventListener(this))
                                           .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this))
                                           .setHTML('&lt;&lt;&lt;')
-                                          .hide()
+                                          .setStyle('display', 'none')
                                           .injectInside(this.infos);
-    this.text = new Element('span').injectInside(this.infos);
-    this.nextBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(this.options.results);}.bindAsEventListener(this))
+    this.infoText = new Element('span').injectInside(this.infos);
+    this.nextResultsBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(this.options.results);}.bindAsEventListener(this))
                                       .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this))
                                       .setHTML('&gt;&gt;&gt;')
-                                      .hide()
+                                      .setStyle('display', 'none')
                                       .injectInside(this.infos);
 
     this.reset();
   },
+
+  ///////////////////////////////////////////////////////////////////////////
+  // focus and blur management
+
+  // focus event
+  onFocus: function() {
+    if (this.inputField.value==this.options.defaultText) {
+      this.inputField.value='';
+      this.inputField.removeClass('downlight');
+    }
+  },
+
+  // blur event
+  onBlur: function() {
+    if (this.isMouseOver)
+      this.inputField.focus(); // keep focus is mouse over the resultBox
+    else
+      this.reset();
+  },
+
   ///////////////////////////////////////////////////////////////////////////
   // keyboard selection management (up, down, enter, esc., page up, page down)
   // return is useless, use e.stop() to prevent event propagation
   //TODO Key pressed should manage up down page up and page down to
   //TODO Tab key mightbe usefull to
+
+  // KeyPress event management
   onKeyPress: function(e) {
-    if (e.key == 'enter') {
-      if (this.resultBox.isVisible()) {
-        var currentSel = $E('.highlight', this.resultBox);
-        if (currentSel) {
-          this.addChoice(currentSel);
+  	switch (e.key) {
+      case 'enter' : // Enter : choose the selection
+        if (this.resultBox.getStyle('display')!='none') {
+          var currentSel = $E('.highlight', this.resultBox);
+          if (currentSel) {
+            this.addToSelectedBox(currentSel);
+          }
+          e.stop();
         }
-        e.stop();
-      }
-      return false;
+        break;
+
+      case 'esc' : // Escape : reset the field
+        this.inputField.blur();
+        this.reset();
+        this.inputField.focus();
+        break;
+
     }
-    return true;
   },
-  //FIXME Switch case? French
+
+  // KeyDown event management (because IE will not fire KeyPress for arrow keys)
   onKeyDown: function(e) {
-    if (e.key == 'esc') { // Echap : on reinitialise le champs
-      this.inputField.blur();
-      this.reset();
-      this.inputField.focus();
-      return false;
+    if (this.resultBox.getStyle('display')!='none') {
 
-    } else if (e.key == 'up' && this.resultBox.isVisible()) { // Haut : on déplace la sélection vers le haut
-      this.jumpTo(-1);
-      return false;
+      if (e.key == 'up') {                           // up : moves the selection up
+        this.jumpTo(-1);
 
-    } else if (e.key == 'down' && this.resultBox.isVisible()) { // Bas : on déplace la sélection vers le bas
-      this.jumpTo(1);
-      return false;
+      } else if (e.key == 'down') {                  // down : moves the selection down
+        this.jumpTo(1);
 
-    } else if (e.code == obm.vars.consts.pgup && this.resultBox.isVisible()) { // Page précédente : on charge les résultats précédents
-      this.jumpTo(-this.options.results);
-      return false;
+      } else if (e.code == obm.vars.consts.pgup) {   // Page up : view previous results page
+        this.jumpTo(-this.options.results);
+        e.stop(); // because pgup works like orig. in IE
 
-    } else if (e.code == obm.vars.consts.pgdown && this.resultBox.isVisible()) { // Page suivante : on charge les résultats suivants
-      this.jumpTo(this.options.results);
-      return false;
+      } else if (e.code == obm.vars.consts.pgdown) { // Page down : view next results page
+        this.jumpTo(this.options.results);
+        e.stop(); // because pgdown works like End in IE
+      }
     }
-    return true;
   },
+
   ///////////////////////////////////////////////////////////////////////////
-  // gestion de la saisie et des requetes de recherche
+  // search requests, results and cache management
+
+  // When the text in the input field has changed
   onTextChange: function() {
     if (this.fetchDelay) {
       this.fetchDelay = $clear(this.fetchDelay);
@@ -222,6 +250,7 @@ obm.AutoComplete.Search = new Class({
     this.fetchDelay = this.newRequest.delay(this.options.delay, this);
   },
 
+  // send a new request to get first results
   newRequest: function() {
     if (this.inputField.value.clean().length < this.options.chars) {
       this.currentValue = this.inputField.value;
@@ -238,28 +267,29 @@ obm.AutoComplete.Search = new Class({
     }
   },
 
-  cacheRequest: function() { // update the cache when it needs to be (call it after the view moved forward)
+  // update the cache when it needs to be (call it after the view moved forward)
+  cacheRequest: function() {
     if (this.inputField.value == this.currentValue) {
       if (this.view.getFirst()+this.options.results*2>=this.cache.getSize() && this.cache.getSize()<this.nbTotal) {
-        //FIXME French
-        var nbElemRestant = this.nbTotal-this.cache.getSize();
-        //FIXME French
-        var nbRecherche = ((this.options.results*2)>nbElemRestant ? nbElemRestant : this.options.results*2);
+        var unknownResultsNbr = this.nbTotal-this.cache.getSize();
+        var requestNbr = ((this.options.results*2)>unknownResultsNbr ? unknownResultsNbr : this.options.results*2);
         new Ajax(this.url, {
           method: 'post',
-          postBody: 'text='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+nbRecherche+'&restriction='+this.options.restriction+'&extension'+this.options.extension,
+          postBody: 'text='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+requestNbr+'&restriction='+this.options.restriction+'&extension'+this.options.extension,
           onFailure:this.onFailure.bindAsEventListener(this),
           onComplete:this.onCacheRequestSuccess.bindAsEventListener(this)
         }).request();
-        this.cache.setSize(this.cache.getSize()+nbRecherche);
+        this.cache.setSize(this.cache.getSize()+requestNbr);
       }
     }
   },
 
+  // when an ajax error occurs (during request)
   onFailure: function(response) {
     showErrorMessage('Fatal server error, please reload');
   },
 
+  // when receiving a success response for a new request
   onNewRequestSuccess: function(response) {
     if (response.trim() == '' || this.toClear) {
       this.hideResultBox();
@@ -274,6 +304,7 @@ obm.AutoComplete.Search = new Class({
     }
   },
 
+  // when receiving a success response for a cache update request
   onCacheRequestSuccess: function(response) {
     if (response.trim() != '') {
       var oldCacheLength = this.cache.getCacheSize();
@@ -287,6 +318,7 @@ obm.AutoComplete.Search = new Class({
     }
   },
 
+  // parse a response of a request and add results to cache
   parseResponse: function(response) {
     try {
       var results = eval(response);
@@ -306,11 +338,11 @@ obm.AutoComplete.Search = new Class({
       this.cache.addElement(res);
       if($type(data.extension)) {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-           .addEvent('mousedown', function() {this.addChoice(res,data.extension);}.bindAsEventListener(this))
+           .addEvent('mousedown', function() {this.addToSelectedBox(res,data.extension);}.bindAsEventListener(this))
            .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
       } else {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-           .addEvent('mousedown', function() {this.addChoice(res);}.bindAsEventListener(this))
+           .addEvent('mousedown', function() {this.addToSelectedBox(res);}.bindAsEventListener(this))
            .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
       }
     }.bind(this));
@@ -320,6 +352,8 @@ obm.AutoComplete.Search = new Class({
 
   ///////////////////////////////////////////////////////////////////////////
   // selection
+
+  // select an element
   selectElement: function(element) {
     this.hideSelection();
     this.selection = this.cache.getIndexOf(element);
@@ -327,7 +361,8 @@ obm.AutoComplete.Search = new Class({
       element.addClass('highlight');
     }
   },
-  
+
+  // jump the selection of offset results
   jumpTo: function(offset) {
     if( this.cache.getSize() <= 0) {
       return false;
@@ -335,9 +370,9 @@ obm.AutoComplete.Search = new Class({
     this.hideSelection();
     this.selection += offset;
     if( this.selection < 0) {
-      this.selection = this.view.getFirst();
+      this.selection = 0;
     } else if (this.selection >= this.cache.getSize()) {
-      this.selection = this.view.getLast();
+      this.selection = this.cache.getSize()-1;
     } 
     if(!this.view.inView(this.selection)) {
         this.flushView();
@@ -351,34 +386,47 @@ obm.AutoComplete.Search = new Class({
     }
   },
 
+  // clear the selection
   unselect: function() {
     this.hideSelection();
     this.selection = -1;
   },
+
+  // highlight the selection
   showSelection: function() {
     if (this.selection!=-1 && !this.cache.getElementAt(this.selection).hasClass('highlight')) {
       this.cache.getElementAt(this.selection).addClass('highlight');
     }
   },
+
+  // unhighlight (?) the selection
   hideSelection: function() {
     if (this.selection!=-1 && this.cache.getElementAt(this.selection).hasClass('highlight')) {
       this.cache.getElementAt(this.selection).removeClass('highlight');
     }
   },
+
   ///////////////////////////////////////////////////////////////////////////
   // show/hide resultBox functions
+
+  // hide the Result Box
   hideResultBox: function() {
-    this.resultBox.hide();
+    this.resultBox.setStyle('display', 'none');
   },
+
+  // show the Result Box
   showResultBox: function() {
     var inputCoords = this.inputField.getCoordinates();
     this.resultBox.setStyles({                  
       'top':(inputCoords.top + inputCoords.height + 2) + 'px',
       'left':inputCoords.left + 'px'});
-    this.resultBox.show();
+    this.resultBox.setStyle('display', '');
   },
+
   ///////////////////////////////////////////////////////////////////////////
   // view (visible results from the list of results)
+
+  // add viewable results (=results in the view) to the Result Box
   drawView: function() {
     if (this.nbTotal>0) {
       var topLimit = this.view.getLast();
@@ -387,40 +435,51 @@ obm.AutoComplete.Search = new Class({
       }
     }
   },
+
+  // removes previously viewable results from the Result Box
   flushView: function() {
     this.hideSelection();
     $ES('div', this.resultBox).each(function(elt){ elt.remove();});
   },
+
   ///////////////////////////////////////////////////////////////////////////
   // results information + navigation btns
+
+  // to automatically update the information text
   updateInfo: function() {
-    this.previousBtn.hide();
-    this.nextBtn.hide();
+    this.previousResultsBtn.setStyle('display', 'none');
+    this.nextResultsBtn.setStyle('display', 'none');
     if (this.nbTotal<=1) {
-      this.text.setHTML(this.nbTotal);
+      this.infoText.setHTML(this.nbTotal);
     } else {
-      this.text.setHTML((this.view.getFirst()+1)+' - '+(this.view.getLast()+1)+' / '+this.nbTotal);
+      this.infoText.setHTML((this.view.getFirst()+1)+' - '+(this.view.getLast()+1)+' / '+this.nbTotal);
       this.updateNavBtns();
     }
   },
-  setInfoText: function(str) { // to manually set the information text
-    this.previousBtn.hide();
-    this.nextBtn.hide();
-    this.text.setHTML(str);
+
+  // to manually set the information text
+  setInfoText: function(str) {
+    this.previousResultsBtn.setStyle('display', 'none');
+    this.nextResultsBtn.setStyle('display', 'none');
+    this.infoText.setHTML(str);
     this.updateNavBtns();
   },
+
+  // display navigations buttons if needed
   updateNavBtns: function() {
     if (this.nbTotal>this.view.getLast()+1) {
-      this.nextBtn.show();
+      this.nextResultsBtn.setStyle('display', '');
     }
     if (this.view.getFirst()>0) {
-      this.previousBtn.show();
+      this.previousResultsBtn.setStyle('display', '');
     }
   },
+
   ///////////////////////////////////////////////////////////////////////////
   // (un)choose elements
-  // FIXME NAME
-  addChoice: function(element, extension) {
+
+  // add an element to the box containing selected elements (selectedBox)
+  addToSelectedBox: function(element, extension) {
     var item_id = element.getProperty('id');
     var id = item_id.substr(('item_').length,item_id.length);
     var div_id = this.name + id;
@@ -437,7 +496,7 @@ obm.AutoComplete.Search = new Class({
                       ).injectInside(result);
       result.appendText(text);
       if($type(extension)) {
-        result.adopt(extension)
+        result.adopt(extension);
       }
       new Element('input').setProperty('type','hidden')
                           .setProperty('name',this.name+'[]')
@@ -445,13 +504,19 @@ obm.AutoComplete.Search = new Class({
                           .injectInside(result);
     }
   },
-  removeChoice: function(element) {
+
+  // NOTUSED (remove_element function used instead)
+  // removes an element from the selectedBox
+  removeFromSelectedBox: function(element) {
     element.getParent().remove();
     this.inputField.focus();
   },
+
   ///////////////////////////////////////////////////////////////////////////
   // reset functions
-  reset: function() {          // reset input and result boxes
+
+  // reset input and result box
+  reset: function() {
     this.hideResultBox();
     this.inputField.value = this.options.defaultText;
     this.inputField.addClass('downlight')
@@ -462,7 +527,9 @@ obm.AutoComplete.Search = new Class({
     this.view.setElementNb(0);
     this.selection = -1;
   },
-  resetResultBox: function() { // reset the result box
+
+  // reset the result box
+  resetResultBox: function() {
     this.hideResultBox();
     this.flushView();
     this.cache = new obm.AutoComplete.Cache();
