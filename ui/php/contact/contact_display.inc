@@ -71,7 +71,6 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 
   //  if (($fieldname == "contact_lastname") && $link_ok) {
   if ($fieldname == "contact_lastname") {
-    echo "AA".$OD->display_ext;
     if ($OD->display_ext == "get_id") {
       $res["url"] = "javascript:check_contact_get_id(".$OD->data_set->f("contact_id").",'".addslashes($OD->data_set->f("contact_lastname"))."');";
     } else if ($OD->display_ext == "get_id_url") {

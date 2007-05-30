@@ -193,6 +193,7 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
   $ldesc = urlencode($resource["desc"]);
   $lqtyinf = urlencode($resource["qtyinf"]);
   $lqtysup = urlencode($resource["qtysup"]);
+  $rtype = $resource["rtype"];
 
   if ($popup) {
     $ext_action = $resource["ext_action"];
@@ -204,7 +205,7 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
   }
 
-  $url = url_prepare("resource_index.php?action=search&amp;tf_name=$lname&amp;tf_desc=$ldesc&amp;tf_qtyinf=$lqtyinf&amp;tf_qtysup=$lqtysup$url_ext");
+  $url = url_prepare("resource_index.php?action=search&amp;tf_name=$lname&amp;tf_desc=$ldesc&amp;tf_qtyinf=$lqtyinf&amp;tf_qtysup=$lqtysup&amp;sel_rtype=$rtype$url_ext");
 
   $resource_d = new OBM_DISPLAY("DATA", $prefs, "resource");
   if ($popup) {

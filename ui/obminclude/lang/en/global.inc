@@ -130,6 +130,8 @@ $l_hide = "Hide";
 $l_show = "Show";
 $l_advanced = "Advanced";
 $l_properties = "Properties";
+$l_items = "Items";
+
 // Entities
 $l_company = "Company";
 $l_contact = "Contact";
