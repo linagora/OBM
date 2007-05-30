@@ -2538,7 +2538,6 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
       $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description, $all_day,'none',$owner);
       $of->addOccurrence($event, $date, $entity, $entity_id);
     }
-    // $of->addOccurrence($event, $date, $entity, $entity_id);
   }
   
   $r_q = run_query_calendar_repeat_events($start_time,$end_time,$calendar_entity,$category_filter);
@@ -2563,8 +2562,12 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     if (!$endrepeat) {
       $endrepeat = $end_time;
     }
+    $addOcc = true;
     if (isset($of->events[$id])) {
       $event = &$of->events[$id];
+      if ($unique) { 
+        $addOcc = false;
+      }
     } else {
       $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description, $all_day,$repeatkind,$owner);
     }
@@ -2574,6 +2577,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     $event_start -= $delta * $day_duration;
     $end_date = ($endrepeat < $end_time) ? $endrepeat : $end_time;
     $end_date += $day_duration;
+if ($addOcc) {
     switch ($repeatkind) {
       case "daily" :
         calendar_daily_repeatition($date,$event_start,$end_date,$repeatfrequence,&$event,$entity_id,$entity);	
@@ -2591,6 +2595,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
 	$stored = calendar_yearly_repeatition($date,$event_start,$end_date,$repeatfrequence,&$event,$entity_id,$entity);
 	break;	
     }
+}
   }
   if (count($of->events) > 0) {
     $exception_q = run_query_get_events_exception(array_keys($of->events),$start_time,$end_time);
