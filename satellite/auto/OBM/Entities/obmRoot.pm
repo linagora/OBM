@@ -23,6 +23,7 @@ sub new {
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        toDelete => undef,
         domainId => undef,
         rootDesc => undef
     );
@@ -36,6 +37,7 @@ sub new {
 
     $ldapEngineAttr{"type"} = $ROOT;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
+    $ldapEngineAttr{"toDelete"} = 0;
 
     bless( \%ldapEngineAttr, $self );
 }
@@ -66,6 +68,22 @@ sub getEntity {
 }
 
 
+sub setDelete {
+    my $self = shift;
+
+    $self->{"toDelete"} = 1;
+
+    return 1;
+}
+
+
+sub getDelete {
+    my $self = shift;
+
+    return $self->{"toDelete"};
+}
+
+
 sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
@@ -87,7 +105,8 @@ sub createLdapEntry {
     if( $entry->{"name"} ) {
         $ldapEntry->add(
             objectClass => $self->{"typeDesc"}->{"objectclass"},
-            ou => to_utf8({ -string => $entry->{"name"}, -charset => $defaultCharSet })
+            o => to_utf8({ -string => $entry->{"name"}, -charset => $defaultCharSet }),
+            dc => to_utf8({ -string => $entry->{"name"}, -charset => $defaultCharSet })
         );
                 
     }else {

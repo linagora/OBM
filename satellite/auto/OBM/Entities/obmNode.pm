@@ -23,6 +23,7 @@ sub new {
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        toDelete => undef,
         domainId => undef,
         nodeDesc => undef
     );
@@ -36,6 +37,7 @@ sub new {
 
     $ldapEngineAttr{"type"} = $NODE;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
+    $ldapEngineAttr{"toDelete"} = 0;
 
     bless( \%ldapEngineAttr, $self );
 }
@@ -63,6 +65,22 @@ sub getEntity {
     $self->{"nodeDesc"}->{"description"} = $description;
 
     return 1;
+}
+
+
+sub setDelete {
+    my $self = shift;
+
+    $self->{"toDelete"} = 1;
+
+    return 1;
+}
+
+
+sub getDelete {
+    my $self = shift;
+
+    return $self->{"toDelete"};
 }
 
 

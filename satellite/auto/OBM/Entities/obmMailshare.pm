@@ -24,6 +24,7 @@ sub new {
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        toDelete => undef,
         archive => undef,
         mailShareId => undef,
         domainId => undef,
@@ -40,6 +41,7 @@ sub new {
 
     }else {
         $ldapEngineAttr{"mailShareId"} = $mailShareId;
+
     }
 
     if( $incremental ) {
@@ -50,6 +52,7 @@ sub new {
 
     $ldapEngineAttr{"type"} = $MAILSHARE;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
+    $ldapEngineAttr{"toDelete"} = 0;
 
     bless( \%ldapEngineAttr, $self );
 }
@@ -161,6 +164,22 @@ sub getEntityLinks {
     $self->_getEntityMailShareAcl( $dbHandler, $domainDesc );
 
     return 1;
+}
+
+
+sub setDelete {
+    my $self = shift;
+
+    $self->{"toDelete"} = 1;
+
+    return 1;
+}
+
+
+sub getDelete {
+    my $self = shift;
+
+    return $self->{"toDelete"};
 }
 
 

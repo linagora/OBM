@@ -168,12 +168,13 @@ print $entity->getLdapDnPrefix()."\n";
 print "-------------------------------\n";
 $entity = OBM::Entities::obmMailshare->new( 1, 1 );
 $entity->getEntity( $dbHandler, $main::domainList->[1] );
+$entity->setDelete();
 $entity->dump();
-print $entity->getLdapDnPrefix()."\n";
 
 my $ldapEngine = OBM::Ldap::ldapEngine->new( $main::domainList );
 $ldapEngine->init();
 $ldapEngine->dump( "ldapstruct" );
+$ldapEngine->update( $entity );
 $ldapEngine->destroy();
 
 #
