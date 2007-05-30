@@ -87,7 +87,7 @@ function run_query_resource_search($resource) {
   }
 
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_resource_search()");
     $obm_q->query($query);
   }
 
@@ -173,7 +173,7 @@ function run_query_resource_detail($p_id) {
 
   $obm_q->query($query);
   $obm_q->next_record();
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_resource_detail()");
 
   return $obm_q;
 }
@@ -219,7 +219,7 @@ function run_query_resource_insert($resource) {
     '$qty'
    )";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_resource_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 

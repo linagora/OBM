@@ -66,7 +66,7 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
   // If come from view (eg: month), keep view for links else set to week
   if ( ($action == "view_day") || ($action == "view_week")
     || ($action == "view_month") || ($action == "view_year")
-    || ($action == "planning") ) {
+    || ($action == "planning") || $action == "view_list") {
     $new_action = $action;
   } else {
     $new_action = "view_week";
