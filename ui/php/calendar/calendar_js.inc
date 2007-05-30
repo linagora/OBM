@@ -176,12 +176,11 @@ function add_exdate() {
   var div = new Element('div');
   div.adopt(
             new Element('a').addEvent('click', function () {
-              console.log(this);
               remove_element(this.parentNode,'exceptionHome');
             }).adopt(new Element('img').setProperty('src','$ico_delete')));
   exceptionHome.adopt(div);
   // Create the date field
-  var f = new Element('input').addClassName('datePicker')
+  var f = new Element('input').addClass('datePicker')
                                   .setProperty('type','text');
   div.adopt(f);
   f.setProperty('autocomplete','off');
