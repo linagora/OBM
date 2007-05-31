@@ -611,8 +611,10 @@ function run_query_group_user_group($group) {
     userobm_lastname as group_user_lastname,
     userobm_firstname as group_user_firstname,
     userobm_phone as group_user_phone,
-    userobm_email as group_user_email
+    userobm_email as group_user_email,
+    domain_name
   FROM UserObmGroup LEFT JOIN UserObm ON userobmgroup_userobm_id=userobm_id
+  LEFT JOIN Domain ON domain_id = userobm_domain_id
   WHERE userobmgroup_group_id='$id'
   $order
   $limit";

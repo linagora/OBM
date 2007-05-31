@@ -422,7 +422,7 @@ function dis_calendar_year_planning($calendar, $calendar_entity,$writable_entity
   $ts_date = strtotime($iso_date);  
   $this_year = of_date_get_year($ts_date);
   $start_time = strtotime("$this_year-01-01", $ts_date);
-  $end_time = strtotime("+1 year", $start_time);
+  $end_time = $start_time;
   $prev_year = of_isodate_format(strtotime("-1 year", $start_time));
   $next_year = of_isodate_format($end_time);
   $start_day = strtotime($ccalendar_weekstart);

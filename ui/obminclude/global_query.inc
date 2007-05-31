@@ -771,6 +771,7 @@ function global_session_load_user_todos($set_todo="todo_priority") {
       todo_title
     FROM Todo
     WHERE todo_user = '$uid'
+    AND todo_percent < 100
     ORDER BY $order
     $limit";
 
