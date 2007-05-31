@@ -1,10 +1,8 @@
 // TODO Lot of code cleanup.
 // Some hard coded HTML
-// French vars name
 // unreached code
 // unusefull code
 // unadapted function names
-// dangerous Element.extend 
 // comments
 // Implement mono mode
 
@@ -131,12 +129,25 @@ obm.AutoComplete.Search = new Class({
 
     this.url = url;                    // url used for ajax requests
     this.inputField = $(inputField);   // field used for the input
-    this.name = selectedBox;           // used as a prefix for results id
+    this.name = selectedBox;           // the name of the form validation paramater (also used as a prefix for results id)
     this.selectedBox = $(selectedBox); // box used to add selected results
     this.isMouseOver = false;          // is mouse over the resultBox ?
-    this.toClear = false;              // true if the resultBox (and cache) need to be flush
+    this.requestId = 0;                // current request id
+    this.selection = -1;               // currently selected (=highlighted) element
+
+    if (this.options.mode == 'mono') {
+      this.addToSelectedBoxFunc = this.validateSelection;
+      this.resetFunc = this.monoModeReset;
+      this.textChangedFunc = function() { this.unvalidateSelection(); this.resetResultBox(); };
+    } else {
+      this.addToSelectedBoxFunc = this.addToSelectedBox;
+      this.resetFunc = this.reset;
+      this.textChangedFunc = this.resetResultBox;
+    }
 
     this.inputField.addEvent('keyup', this.onTextChange.bindAsEventListener(this))
+                   .addEvent('input', this.onTextChange.bindAsEventListener(this))
+                   .addEvent('paste', this.onTextChange.bindAsEventListener(this))
                    .addEvent('keydown', this.onKeyDown.bindWithEvent(this))
                    .addEvent('keypress', this.onKeyPress.bindWithEvent(this))
                    .addEvent('focus', this.onFocus.bindAsEventListener(this))
@@ -168,7 +179,7 @@ obm.AutoComplete.Search = new Class({
                                       .setStyle('display', 'none')
                                       .injectInside(this.infos);
 
-    this.reset();
+    this.resetFunc();
   },
 
   ///////////////////////////////////////////////////////////////////////////
@@ -185,15 +196,14 @@ obm.AutoComplete.Search = new Class({
   // blur event
   onBlur: function() {
     if (this.isMouseOver)
-      this.inputField.focus(); // keep focus is mouse over the resultBox
+      this.inputField.focus(); // keep focus if mouse over the resultBox
     else
-      this.reset();
+      this.resetFunc();
   },
 
   ///////////////////////////////////////////////////////////////////////////
   // keyboard selection management (up, down, enter, esc., page up, page down)
   // return is useless, use e.stop() to prevent event propagation
-  //TODO Key pressed should manage up down page up and page down to
   //TODO Tab key mightbe usefull to
 
   // KeyPress event management
@@ -203,7 +213,7 @@ obm.AutoComplete.Search = new Class({
         if (this.resultBox.getStyle('display')!='none') {
           var currentSel = $E('.highlight', this.resultBox);
           if (currentSel) {
-            this.addToSelectedBox(currentSel);
+            this.addToSelectedBoxFunc(currentSel);
           }
           e.stop();
         }
@@ -211,7 +221,7 @@ obm.AutoComplete.Search = new Class({
 
       case 'esc' : // Escape : reset the field
         this.inputField.blur();
-        this.reset();
+        this.resetFunc();
         this.inputField.focus();
         break;
 
@@ -254,15 +264,16 @@ obm.AutoComplete.Search = new Class({
   newRequest: function() {
     if (this.inputField.value.clean().length < this.options.chars) {
       this.currentValue = this.inputField.value;
-      this.resetResultBox();
+      this.textChangedFunc();
     } else if (this.inputField.value != this.currentValue) {
       this.currentValue = this.inputField.value;
-      this.resetResultBox();
+      this.textChangedFunc();
+      this.requestId++;
       new Ajax(this.url, {
         method: 'post',
-        postBody: 'pattern='+this.currentValue+'&limit='+(this.options.results*3)+'&restriction='+this.options.restriction+'&extension'+this.options.extension,
+        postBody: 'pattern='+this.currentValue+'&limit='+(this.options.results*3)+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
         onFailure:this.onFailure.bindAsEventListener(this),
-        onComplete:this.onNewRequestSuccess.bindAsEventListener(this)
+        onComplete:this.onNewRequestSuccess.bindAsEventListener(this,[this.requestId])
       }).request();
     }
   },
@@ -275,7 +286,7 @@ obm.AutoComplete.Search = new Class({
         var requestNbr = ((this.options.results*2)>unknownResultsNbr ? unknownResultsNbr : this.options.results*2);
         new Ajax(this.url, {
           method: 'post',
-          postBody: 'text='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+requestNbr+'&restriction='+this.options.restriction+'&extension'+this.options.extension,
+          postBody: 'text='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+requestNbr+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
           onFailure:this.onFailure.bindAsEventListener(this),
           onComplete:this.onCacheRequestSuccess.bindAsEventListener(this)
         }).request();
@@ -290,13 +301,9 @@ obm.AutoComplete.Search = new Class({
   },
 
   // when receiving a success response for a new request
-  onNewRequestSuccess: function(response) {
-    if (response.trim() == '' || this.toClear) {
-      this.hideResultBox();
-      this.resetResultBox();
-      this.toClear = false;
-    }
-    if (response.trim() != '') {
+  onNewRequestSuccess: function(response,responseId) {
+    this.resetResultBox();
+    if (response.trim() != '' && this.requestId==responseId) {
       this.parseResponse(response);
       this.drawView();
       this.updateInfo();
@@ -338,11 +345,11 @@ obm.AutoComplete.Search = new Class({
       this.cache.addElement(res);
       if($type(data.extension)) {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-           .addEvent('mousedown', function() {this.addToSelectedBox(res,data.extension);}.bindAsEventListener(this))
+           .addEvent('mousedown', function() {this.addToSelectedBoxFunc(res,data.extension);}.bindAsEventListener(this))
            .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
       } else {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-           .addEvent('mousedown', function() {this.addToSelectedBox(res);}.bindAsEventListener(this))
+           .addEvent('mousedown', function() {this.addToSelectedBoxFunc(res);}.bindAsEventListener(this))
            .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
       }
     }.bind(this));
@@ -382,7 +389,7 @@ obm.AutoComplete.Search = new Class({
     }
     this.showSelection();
     if(offset > 0) {
-      this.cacheRequest()
+      this.cacheRequest();
     }
   },
 
@@ -517,15 +524,11 @@ obm.AutoComplete.Search = new Class({
 
   // reset input and result box
   reset: function() {
-    this.hideResultBox();
     this.inputField.value = this.options.defaultText;
-    this.inputField.addClass('downlight')
+    this.inputField.addClass('downlight');
     this.currentValue = '';
     this.nbTotal = 0;
-    this.cache = new obm.AutoComplete.Cache();
-    this.view = new obm.AutoComplete.View(this.options.results);
-    this.view.setElementNb(0);
-    this.selection = -1;
+    this.resetResultBox();
   },
 
   // reset the result box
@@ -536,5 +539,32 @@ obm.AutoComplete.Search = new Class({
     this.view = new obm.AutoComplete.View(this.options.results);
     this.view.setElementNb(0);
     this.selection = -1;
+  },
+
+  ///////////////////////////////////////////////////////////////////////////
+  // "mono" mode specific functions
+
+  // validate the current selection
+  validateSelection: function(element, extension) {
+    var item_id = element.getProperty('id');
+    this.selectedBox.value = item_id.substr(('item_').length,item_id.length);
+    this.currentValue = $(item_id+'_label').innerHTML;
+    this.inputField.value = this.currentValue;
+    this.inputField.setStyle('background-color', '#ffffcc');
+    this.resetResultBox();
+    this.blur();
+  },
+
+  // unvalidate the current validated element
+  unvalidateSelection: function() {
+    this.selectedBox.value = '';
+    this.inputField.setStyle('background-color', '#ffffff');
+  },
+
+  // reset input and result box
+  monoModeReset: function() {
+  	this.unvalidateSelection();
+  	this.reset();
   }
+
 });
