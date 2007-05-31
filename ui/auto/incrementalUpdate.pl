@@ -9,9 +9,11 @@
 
 use strict;
 require OBM::ldap;
+require OBM::imapd;
 require OBM::toolBox;
 require OBM::loadDbIncremental;
 require OBM::Ldap::ldapEngine;
+require OBM::Cyrus::cyrusEngine;
 require OBM::Entities::obmRoot;
 require OBM::Entities::obmDomainRoot;
 require OBM::Entities::obmNode;
@@ -103,6 +105,12 @@ if( defined($parameters{"domain"}) ) {
     $main::domainList = &OBM::toolBox::getDomains( $dbHandler, undef );
 }
 
+# Parametrage des serveurs IMAP par domaine
+&OBM::imapd::getServerByDomain( $dbHandler, $main::domainList );
+if( !&OBM::imapd::getAdminImapPasswd( $dbHandler, $main::domainList ) ) {
+    exit;
+}
+
 
 #
 # Otention des serveurs LDAP par domaines
@@ -111,71 +119,66 @@ if( defined($parameters{"domain"}) ) {
 # Test entite ROOT
 my $entity = OBM::Entities::obmRoot->new( 0 );
 $entity->getEntity( "local", "Racine de l'annuaire", $main::domainList->[0] );
-$entity->dump();
-print $entity->getLdapDnPrefix()."\n";
+#$entity->dump();
 
 # Test entite DOMAINROOT
 $entity = OBM::Entities::obmDomainRoot->new( 0 );
 $entity->getEntity( $main::domainList->[1] );
-$entity->dump();
-print $entity->getLdapDnPrefix()."\n";
+#$entity->dump();
 
 # Test entite NODE
 print "-------------------------------\n";
 $entity = OBM::Entities::obmNode->new( 0 );
 $entity->getEntity( "test", "Node de test", $main::domainList->[1] );
-$entity->dump();
-print $entity->getLdapDnPrefix()."\n";
+#$entity->dump();
 
 # Test entite POSIXUSERS
 print "-------------------------------\n";
 $entity = OBM::Entities::obmUser->new( 0, 6 );
 $entity->getEntity( $dbHandler, $main::domainList->[1] );
-$entity->dump();
-print $entity->getLdapDnPrefix()."\n";
+#$entity->dump();
 
 # Test entite POSIXUSERS en mode incremental
 print "-------------------------------\n";
 $entity = OBM::Entities::obmUser->new( 1, 6 );
 $entity->getEntity( $dbHandler, $main::domainList->[1] );
-$entity->dump();
-print $entity->getLdapDnPrefix()."\n";
+#$entity->dump();
 
 # Test entite POSIXGROUPS
 print "-------------------------------\n";
 $entity = OBM::Entities::obmGroup->new( 0, 5 );
-print $entity."\n";
 $entity->getEntity( $dbHandler, $main::domainList->[1] );
-$entity->dump();
-print $entity->getLdapDnPrefix()."\n";
+#$entity->dump();
 
 # Test entite POSIXGROUPS en mode incremental
 print "-------------------------------\n";
 $entity = OBM::Entities::obmGroup->new( 1, 5 );
-print $entity."\n";
 $entity->getEntity( $dbHandler, $main::domainList->[1] );
-$entity->dump();
-print $entity->getLdapDnPrefix()."\n";
+#$entity->dump();
 
 # Test entite MAILSHARE
 print "-------------------------------\n";
 $entity = OBM::Entities::obmMailshare->new( 0, 1 );
 $entity->getEntity( $dbHandler, $main::domainList->[1] );
-$entity->dump();
-print $entity->getLdapDnPrefix()."\n";
+#$entity->dump();
 
 # Test entite MAILSHARE en mode incremental
 print "-------------------------------\n";
 $entity = OBM::Entities::obmMailshare->new( 1, 1 );
 $entity->getEntity( $dbHandler, $main::domainList->[1] );
 $entity->setDelete();
-$entity->dump();
+#$entity->dump();
 
 my $ldapEngine = OBM::Ldap::ldapEngine->new( $main::domainList );
 $ldapEngine->init();
 $ldapEngine->dump( "ldapstruct" );
 $ldapEngine->update( $entity );
 $ldapEngine->destroy();
+
+my $cyrusEngine = OBM::Cyrus::cyrusEngine->new( $main::domainList );
+$cyrusEngine->init();
+$cyrusEngine->dump();
+$cyrusEngine->destroy();
 
 #
 # On referme la connexion a la base

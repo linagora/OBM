@@ -193,6 +193,7 @@ sub getEntity {
             $self->{"userDesc"}->{"user_mailperms"} = 0;
 
         }else {
+            $self->{"userDesc"}->{"user_mailperms"} = 1;
 
             # Limite la messagerie aux domaines locaux
             if( !$user_mail_ext_perms ) {
@@ -216,7 +217,7 @@ sub getEntity {
             $self->{"userDesc"}->{"user_mailbox_server"} = $user_mail_server_id;
 
             # Gestion du quota
-            $self->{"userDesc"}->{"user_mailbox_quota"} = $user_mail_quota;
+            $self->{"userDesc"}->{"user_mailbox_quota"} = $user_mail_quota*1000;
 
             # Gestion du message d'absence
             $self->{"userDesc"}->{"user_vacation_enable"} = $user_vacation_enable;
@@ -633,6 +634,55 @@ sub updateLdapEntry {
     }
 
     return $update;
+}
+
+
+sub getMailServerRef {
+    my $self = undef;
+    my( $domainId, $mailServerId ) = @_;
+
+    if( $self->{"userDesc"}->{"user_mailperms"} ) {
+        $$domainId = $self->{"domainId"};
+        $$mailServerId = $self->{"userDesc"}->{"user_mailbox_server"};
+
+    }else {
+        $$domainId = undef;
+        $$mailServerId = undef;
+
+    }
+
+    return 1;
+}
+
+
+sub getMailboxPrefix {
+    my $self = shift;
+    
+    return "user.";
+}
+
+
+sub getMailboxName {
+    my $self = shift;
+    my $mailBoxName = undef;
+
+    if( $self->{"userDesc"}->{"user_mailperms"} ) {
+        $mailBoxName = $self->getMailboxPrefix().$self->{"userDesc"}->{"user_mailbox"};
+    }
+
+    return $mailBoxName;
+}
+
+
+sub getMailboxQuota {
+    my $self = shift;
+    my $mailBoxQuota = undef;
+
+    if( $self->{"userDesc"}->{"user_mailperms"} ) {
+        $mailBoxQuota = $self->{"userDesc"}->{"user_mailbox_quota"};
+    }
+
+    return $mailBoxQuota;
 }
 
 
