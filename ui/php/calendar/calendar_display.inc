@@ -422,7 +422,7 @@ function dis_calendar_year_planning($calendar, $calendar_entity,$writable_entity
   $ts_date = strtotime($iso_date);  
   $this_year = of_date_get_year($ts_date);
   $start_time = strtotime("$this_year-01-01", $ts_date);
-  $end_time = $start_time;
+  $end_time = strtotime("+1 year",$start_time);
   $prev_year = of_isodate_format(strtotime("-1 year", $start_time));
   $next_year = of_isodate_format($end_time);
   $start_day = strtotime($ccalendar_weekstart);
@@ -2007,7 +2007,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     }
 
   } elseif ($action == "new") {
-    $repeat_end = of_date_upd_format(strtotime("+1 year"));
+    $repeat_end = of_date_upd_format();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -2036,7 +2036,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   if (isset($calendar["repeat_kind"])) { $repeat_kind = $calendar["repeat_kind"]; }
   if (isset($calendar["repeat_days"]) && $calendar["repeat_days"] != "000000") { $repeat_days = $calendar["repeat_days"];}
   if (isset($calendar["repeat_end"])) {
-    $repeat_end = $calendar["repeat_end"];
+    $repeat_end = of_date_upd_format($calendar["repeat_end"]);
   }
   if (isset($calendar["force"])) { $force = $calendar["force"]; }
   if ($repeat_kind != "weekly") {
