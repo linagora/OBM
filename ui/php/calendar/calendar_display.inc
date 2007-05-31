@@ -1547,12 +1547,12 @@ function dis_calendar_event_consult($id) {
 function html_calendar_event_consult($event_q, $exception_q, $entities) {
   global $obm, $display, $ccalendar_weekstart, $ccalendar_resource, $l_items;
   global $l_users, $l_resources, $l_title, $l_location, $l_priority, $l_private, $l_desc,$l_high;
-  global $l_low,$l_medium,$l_datebegin;
+  global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week;
   global $l_dateend,$l_insert,$l_update,$l_repeat;
-  global $l_change_state,$l_groups,$l_all_day;
-  global $l_repeatkind,$l_repeatdays,$l_date_repeatend, $l_daily, $l_weekly;
+  global $l_change_state,$l_groups,$l_all_day,$l_every;
+  global $l_repeatkind,$l_repeatdays,$l_date_repeatend; 
   global $l_wait, $l_task, $l_exception, $l_yes, $l_no;
-  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
+  global $l_carac,$l_module_calendar;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
   $id = $event_q->f("calendarevent_id");
@@ -1613,7 +1613,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
 
   }
 
-  $repeatfrequency = $event_q->f("calendarevent_repeatfrequence");
   $all_day = $event_q->f("calendarevent_allday");
   if ($all_day) {
     $dis_all_day = "<tr><th>$l_all_day</th><td></td></tr>";
@@ -1624,26 +1623,63 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     $dateend = of_datetime_format($event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration"));
   }
   $privacy = $event_q->f("calendarevent_privacy") == 1? $l_yes : $l_no;
-  $kind = ${"l_".$event_q->f("calendarevent_repeatkind")};
-  $repeat_days =$event_q->f("calendarevent_repeatdays"); 
-  if ($kind != "none") {
+
+
+  if($event_q->f("calendarevent_repeatkind") != "none") {
+    $kind = $GLOBALS["l_".$event_q->f("calendarevent_repeatkind")];
+    $kind_unit = $GLOBALS["l_".$event_q->f("calendarevent_repeatkind")."_unit"];
+    $repeat_days = $event_q->f("calendarevent_repeatdays"); 
     $repeat_end = of_date_format($event_q->f("calendarevent_endrepeat"));
-  }
-
-  while($exception_q->next_record()) {
-    $date_exception[] = of_isodate_format($exception_q->f("calendarexception_date")); 
-  }
- 
-  $start_week_day = strtotime($ccalendar_weekstart);
-  for ($i=0; $i<7; $i++) {
-    $day_num = date("w", $start_week_day);
-    $day = $l_daysofweekshort[$day_num];
-    if (strcmp(substr($repeat_days,$i,1),"1")==0) {
-      $dis_repeat_days .= "$day ";
+    if( $event_q->f("calendarevent_repeatfrequence") == 1 ) {
+      $repeatfrequency = sprintf($kind_unit,"");
+    } else {
+      $repeatfrequency = sprintf($kind_unit,$event_q->f("calendarevent_repeatfrequence"));
     }
-    $start_week_day = strtotime("+1 day", $start_week_day); 
-  }
 
+    while($exception_q->next_record()) {
+      $date_exception[] = of_isodate_format($exception_q->f("calendarexception_date")); 
+    }
+    if($event_q->f("calendarevent_repeatkind") == "weekly") {
+      $start_week_day = strtotime($ccalendar_weekstart);
+      for ($i=0; $i<7; $i++) {
+        $day_num = date("w", $start_week_day);
+        $day = $l_daysofweekshort[$day_num];
+        if (strcmp(substr($repeat_days,$i,1),"1")==0) {
+          $dis_repeat_days .= "$day ";
+        }
+        $start_week_day = strtotime("+1 day", $start_week_day); 
+      }
+      $dis_repeat_days = "
+      <tr>  
+       <th>$l_repeatdays :</th>
+       <td>$dis_repeat_days</td>
+      </tr>        
+      ";
+    }
+    $repeat_block = "
+    <div class=\"detail infos\">
+     <h1>$l_repeat</h1>
+     <table>   
+      <tr>    
+       <th>$l_repeatkind :</th> 
+       <td>$kind</td>
+      </tr>
+      <tr>    
+       <th>$l_repeatfrequency :</th> 
+       <td>$repeatfrequency</td>
+      </tr>
+      <tr>    
+       <th>$l_date_repeatend :</th> 
+       <td>$repeat_end</td>
+      </tr>
+      $dis_repeat_days
+      <tr>
+        <th>$l_exception :</th>
+        <td>$block_exception_detail</td>
+      </tr>
+     </table>
+     </div>";
+  }
   $attendee = $entities["user"];
   if (is_array($attendee["entity"])) {
     foreach ($attendee["entity"] as $u_id => $entity) {
@@ -1775,31 +1811,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     </tr>      
    </table>
   </div>
-  <div class=\"detail infos\">
-   <h1>$l_repeat</h1>
-   <table>   
-    <tr>    
-     <th>$l_repeatkind :</th> 
-     <td>$kind</td>
-    </tr>
-    <tr>    
-     <th>$l_repeatfrequency :</th> 
-     <td>$repeatfrequency</td>
-    </tr>
-    <tr>    
-     <th>$l_date_repeatend :</th> 
-     <td>$repeat_end</td>
-    </tr>
-    <tr>  
-     <th>$l_repeatdays :</th>
-     <td>$dis_repeat_days</td>
-    </tr>
-    <tr>
-      <th>$l_exception :</th>
-      <td>$block_exception_detail</td>
-    </tr>
-   </table>
-   </div>
+  $repeat_block
+
    <div class=\"detail extra\">
    <h1>$l_desc</h1>
    $description
@@ -1947,7 +1960,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_desc;
   global $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_insert,$l_update,$l_repeat;
-  global $l_repeatkind,$l_repeatdays, $l_date_repeatend, $l_daily, $l_weekly;
+  global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
   global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_task;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
@@ -2028,6 +2041,16 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   if (isset($calendar["force"])) { $force = $calendar["force"]; }
   if ($repeat_kind != "weekly") {
     $repeat_days = "000000";
+    $repeatDaysDisplay = "none";
+  } else {
+    $repeatDaysDisplay = "''";
+  }
+  if (isset($repeat_kind) && $repeat_kind != "none") {
+    $repeatDisplay = "''";
+    $frequency_block = sprintf($GLOBALS["l_".$repeat_kind."_unit"], "<input type=\"text\" size=\"4\" style=\"width:3em;\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />");
+  } else {
+    $repeatDisplay = "none";
+    $frequency_block = "<input type=\"text\" size=\"4\" style=\"width:3em;\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />";
   }
   if (isset($calendar["task_id"])) { $t_id = $calendar["task_id"]; }
   if (isset($calendar["task_name"])) { $t_name = stripslashes($calendar["task_name"]); }
@@ -2038,6 +2061,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   if (isset($calendar["list-item-id"])) { $t_list_item_id = $calendar["list-item-id"]; }
   if (isset($calendar["property-name"])) { $t_property_name = $calendar["property-name"]; }
   if (isset($calendar["property"])) { $t_property_value = $calendar["property"]; }
+  
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
@@ -2054,7 +2078,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
 
   $$repeat_kind .= "selected=\"selected\" ";
   $dis_sel_kind .= "
-    <select name=\"sel_repeat_kind\">
+    <select onchange=\"repeat_form($(this).getValue())\" name=\"sel_repeat_kind\">
       <option value=\"none\">$l_none</option>
       <option value=\"daily\" $daily>$l_daily</option>
       <option value=\"weekly\" $weekly>$l_weekly</option>
@@ -2132,7 +2156,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     $l_users
      </th>
      <td>
-       <input type=\"text\" name=\"\" value=\"\" id=\"user\" autocomplete=\"off\" />
+       <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
      </td>
      </tr>
      <tr>
@@ -2161,7 +2185,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     $l_groups
      </th>    
      <td>
-       <input type=\"text\" name=\"\" value=\"\" id=\"group\" autocomplete=\"off\" />       
+       <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />       
      </td>
      </tr>
 
@@ -2233,7 +2257,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     $l_resources
      </th>    
      <td>
-       <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />
+       <input type=\"text\" name=\"\" value=\"\" id=\"resourceSearch\" autocomplete=\"off\" />
      </td>
     </tr>
 
@@ -2420,22 +2444,22 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   <tr>    
     <th>$l_repeatkind</th> 
     <td>$dis_sel_kind</td>
-    </tr>
-  <tr>    
+  </tr>
+  <tr id=\"repeatFrequency\" style=\"display:$repeatDisplay\">    
     <th>$l_repeatfrequency</th> 
-    <td><input type=\"text\" size=\"4\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" /></td>
+    <td>$frequency_block</td>
   </tr>    
-  <tr>    
+  <tr id=\"repeatEnd\" style=\"display:$repeatDisplay\">    
     <th>$l_date_repeatend</th> 
     <td>
       <input type=\"text\" name=\"tf_repeat_end\" value=\"$repeat_end\" class=\"datePicker\" />
     </td>
   </tr>
-  <tr>  
-    <th>$l_repeatdays</th>
+  <tr id=\"repeatDays\" style=\"display:$repeatDaysDisplay\">  
+    <th>$l_repeatdays2</th>
     <td>$dis_repeat_day</td>
   </tr>
-  <tr>
+  <tr id=\"repeatException\" style=\"display:$repeatDisplay\">
     <th> $l_exception $add_date</th>
     <td id=\"exceptionHome\">$block_exception_detail</td>
   </tr>
@@ -2449,9 +2473,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   </form>
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'user');
-      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&form=event', 'sel_resource_id', 'resource');
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'group');
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch');
+      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&form=event', 'sel_resource_id', 'resourceSearch');
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');
     });
   </script>"; 
 
@@ -2817,7 +2841,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     $l_groups
      </th>
      <td id=\"sel_group_id\">
-       <input type=\"text\" name=\"\" value=\"\" id=\"group\" autocomplete=\"off\" />
+       <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />
        $dis_sel_group
      </td>";
 

@@ -59,10 +59,15 @@ $l_exception = "Exceptions";
 $l_items = "Accessoires";
 
 $l_daily = "quotidienne";
+$l_daily_unit = "Tous les %s jours";
 $l_weekly = "hebdomadaire";
+$l_weekly_unit = "Toutes les %s semaines";
 $l_monthlybyday = "mensuelle(jour)";
+$l_monthlybyday_unit = "Tous les %s mois";
 $l_monthlybydate = "mensuelle(date)";
+$l_monthlybydate_unit = "Tous les %s mois";
 $l_yearly = "annuelle";
+$l_yearly_unit = "Tous les %s ans";
 $l_task = "Tache";
 $l_category_filter = "Filtrer par catégorie";
 $l_from = "du";

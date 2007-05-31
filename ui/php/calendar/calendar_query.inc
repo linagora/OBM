@@ -276,6 +276,21 @@ function run_query_calendar_waiting_events() {
   $writable_res = of_right_entity_for_consumer("Resource", "user", $uid, "write");
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  $concat = array (
+    array (
+      'type' => 'field',
+      'value' => 'userobm_lastname'
+      ),
+    array (
+      'type' => 'string',
+      'value' => ' '
+      ),
+    array (
+      'type' => 'field',
+      'value' => 'userobm_firstname'
+      ) 
+    );
+  $entity_label = sql_string_concat($db_type,$concat);
   $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat"); 
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date","calendarevent_date");    
   $query = "SELECT 
@@ -299,7 +314,7 @@ function run_query_calendar_waiting_events() {
       LEFT JOIN CalendarCategory1 ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id  = evententity_event_id
       LEFT JOIN (
-        SELECT CONCAT(userobm_lastname ,' ', userobm_firstname ) AS entity_label, userobm_id AS entity_id, 'user' AS entity_entity FROM UserObm 
+        SELECT $entity_label AS entity_label, userobm_id AS entity_id, 'user' AS entity_entity FROM UserObm 
         UNION SELECT resource_name AS entity_label, resource_id AS entity_id, 'resource' AS entity_entity FROM Resource
       ) AS Entity  ON evententity_entity_id = entity_id AND evententity_entity = entity_entity
       LEFT JOIN UserObm u ON calendarevent_owner = u.userobm_id

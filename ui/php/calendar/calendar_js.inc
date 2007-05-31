@@ -193,6 +193,53 @@ function add_exdate() {
                               });
 
 }
+function repeat_form(value) {
+  switch(value) {
+    case 'none' :
+      $('repeatFrequency').setStyle('display','none');
+      $('repeatEnd').setStyle('display','none');
+      $('repeatDays').setStyle('display','none');
+      $('repeatException').setStyle('display','none');
+      break;
+    case 'daily' : 
+      showRepeatBlockDisplay('".phpStringToJsString($l_daily_unit)."');
+      $('repeatDays').setStyle('display','none');
+      break;           
+    case 'weekly' :
+      showRepeatBlockDisplay('".phpStringToJsString($l_weekly_unit)."');
+      $('repeatDays').setStyle('display','');
+      break;            
+     case 'monthlybydate' :
+      showRepeatBlockDisplay('".phpStringToJsString($l_monthlybydate_unit)."');
+      $('repeatDays').setStyle('display','none');
+      break;      
+    case 'monthlybyday' : 
+      showRepeatBlockDisplay('".phpStringToJsString($l_monthlybyday_unit)."');
+      $('repeatDays').setStyle('display','none');
+      break;
+    case 'yearly' : 
+      $('repeatFrequency').setStyle('display','');
+      showRepeatBlockDisplay('".phpStringToJsString($l_yearly_unit)."');
+      $('repeatDays').setStyle('display','none');
+      break;
+      
+  }
+}
+
+function showRepeatBlockDisplay(label) {
+  $('repeatFrequency').setStyle('display','');
+  $('repeatEnd').setStyle('display','');
+  $('repeatException').setStyle('display','');  
+  frequency = $('repeatFrequency').getFirst().getNext();
+  frequencyField = frequency.getFirst();
+  frequencyLabel = label.split('%s');
+  frequencyField.remove();
+  frequency.empty();
+  frequency.appendText(frequencyLabel[0]);
+  frequency.adopt(frequencyField);
+  frequency.appendText(frequencyLabel[1]);      
+}
+
 ";
 
 ?>
