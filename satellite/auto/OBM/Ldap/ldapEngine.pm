@@ -100,6 +100,11 @@ sub dump {
             push( @desc, $self->{"ldapStruct"} );
             last SWITCH;
         }
+
+        if( lc($what) eq "all" ) {
+            push( @desc, $self );
+            last SWITCH;
+        }
     }
 
     require Data::Dumper;
