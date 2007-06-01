@@ -136,7 +136,7 @@ $entity->getEntity( "test", "Node de test", $main::domainList->[1] );
 print "-------------------------------\n";
 my $userEntity = OBM::Entities::obmUser->new( 0, 6 );
 $userEntity->getEntity( $dbHandler, $main::domainList->[1] );
-#$entity->dump();
+$userEntity->dump();
 
 # Test entite POSIXUSERS en mode incremental
 print "-------------------------------\n";
@@ -178,7 +178,7 @@ $ldapEngine->destroy();
 my $cyrusEngine = OBM::Cyrus::cyrusEngine->new( $main::domainList );
 $cyrusEngine->init();
 $cyrusEngine->dump();
-$userEntity->setDelete();
+#$userEntity->setDelete();
 $cyrusEngine->update($userEntity);
 $cyrusEngine->destroy();
 
