@@ -697,6 +697,18 @@ sub getMailboxQuota {
 }
 
 
+sub getMailboxAcl {
+    my $self = shift;
+    my $mailBoxAcl = undef;
+
+    if( $self->{"userDesc"}->{"user_mailperms"} ) {
+        $mailBoxAcl = $self->{"userDesc"}->{"user_mailbox_acl"};
+    }
+
+    return $mailBoxAcl;
+}
+
+
 sub dump {
     my $self = shift;
     my @desc;

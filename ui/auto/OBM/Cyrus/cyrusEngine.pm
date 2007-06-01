@@ -272,8 +272,12 @@ sub update {
         &OBM::toolBox::write_log( "cyrusEngine: MAJ de la boite", "W" );
 
     }elsif( !$isExist && !$object->getDelete() ) {
-        # On cré
-        &OBM::toolBox::write_log( "cyrusEngine: création de la boite", "W" );
+        # On la cré
+        &OBM::toolBox::write_log( "cyrusEngine: creation de la boite", "W" );
+
+        if( !$self->_createMailbox( $cyrusSrv, $object ) ) {
+            &OBM::toolBox::write_log( "cyrusEngine: echec lors de la creation de la boite", "W" );
+        }
 
     }
 
@@ -311,9 +315,8 @@ sub isMailboxExist {
     $srvBalDesc->{"box_name"} = $mailBox[0][0];
     $srvBalDesc->{"box_login"} = $mailBox[0][0];
     $srvBalDesc->{"box_login"} =~ s/^$mailboxPrefix//;
-    $srvBalDesc->{"box_quota"} = $self->getMailboxQuota( $cyrusSrvConn, $srvBalDesc->{"box_name"} );
-    $srvBalDesc->{"box_acl"} = $self->getMailboxAcl( $cyrusSrvConn, $srvBalDesc->{"box_name"} );
-    
+    $srvBalDesc->{"box_quota"} = $self->getMailboxQuota( $cyrusSrvConn, $object );
+
 
     return 1;
 }
@@ -321,14 +324,22 @@ sub isMailboxExist {
 
 sub getMailboxQuota {
     my $self = shift;
-    my( $cyrusSrvConn, $boxName ) = @_;
+    my( $cyrusSrvConn, $object ) = @_;
     my $mailBoxQuota = 0;
 
-    if( !defined($cyrusSrvConn) || !defined($boxName) ) {
+    if( !defined($cyrusSrvConn) ) {
         return undef;
     }
 
-    my @quotaDesc = $cyrusSrvConn->listquotaroot( $boxName );
+    if( !defined($object) ) {
+        return 0;
+    }
+
+    my $boxName = $object->getMailboxName();
+    my $boxPrefix = $object->getMailboxPrefix();
+
+
+    my @quotaDesc = $cyrusSrvConn->listquotaroot( $boxPrefix.$boxName );
     if( $cyrusSrvConn->error ) {
         return undef;
     }
@@ -341,49 +352,33 @@ sub getMailboxQuota {
 }
 
 
-sub getMailboxAcl {
+sub _imapSetMailboxQuota {
     my $self = shift;
-    my( $cyrusSrvConn, $boxName ) = @_;
-    my $boxRight;
-    my $definedRight = $self->{"rightDefinition"};
+    my( $cyrusSrvConn, $object ) = @_;
 
-    my %boxAclList = $cyrusSrvConn->listacl( $boxName );
-    if( $cyrusSrvConn->error ) {
-        return undef;
+    if( !defined($cyrusSrvConn) ) {
+        return 0;
+    }
 
+    if( !defined($object) ) {
+        return 0;
+    }
+
+    my $boxName = $object->getMailboxName();
+    my $boxPrefix = $object->getMailboxPrefix();
+    my $boxQuota = $object->getMailboxQuota();
+
+    if( !$boxQuota ) {
+        $cyrusSrvConn->setquota( $boxPrefix.$boxName );
     }else {
-        while( my( $user, $right ) = each( %boxAclList ) ) {
-            # le droit POST est gere de facon transparente
-            $right =~ s/$definedRight->{"post"}//g;
-            $right = $self->_checkAclRight( $definedRight, $right );
-
-            if( $right ne $definedRight->{"none"} ) {
-                $boxRight->{$right}->{$user} = 1;
-            }
-        }
+        $cyrusSrvConn->setquota( $boxPrefix.$boxName, "STORAGE", $boxQuota );
     }
 
-    return $boxRight;
-}
-
-
-sub _checkAclRight {
-    my $self = shift;
-    my( $definedRight, $right ) = @_;
-    my $returnedRight = $definedRight->{"none"};
-
-    if( exists( $definedRight->{$right} ) ) {
-        return $definedRight->{$right};
+    if( $cyrusSrvConn->error ) {
+        return 0;
     }
 
-    my @obmRight = keys(%{$definedRight});
-    for( my $i=0; $i<=$#obmRight; $i++ ) {
-        if( $right =~ /^$definedRight->{$obmRight[$i]}$/ ) {
-            return $obmRight[$i];
-        }
-    }
-
-    return $returnedRight;
+    return 1;
 }
 
 
@@ -403,7 +398,7 @@ sub _deleteBox {
     my $boxName = $object->getMailboxName();
     my $boxPrefix = $object->getMailboxPrefix();
 
-    if( !$self->_imapSetBoxAcl( $cyrusSrv, $object, $cyrusSrv->{"imap_server_login"}, "admin" ) ) {
+    if( !$self->_imapSetMailboxAcl( $cyrusSrv, $object, $cyrusSrv->{"imap_server_login"}, "admin" ) ) {
         return 0;
     }
 
@@ -416,7 +411,39 @@ sub _deleteBox {
 }
 
 
-sub _imapSetBoxAcl {
+sub _createMailbox {
+    my $self = shift;
+    my( $cyrusSrv, $object ) = @_;
+
+    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
+        return 0;
+    }
+    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
+
+    if( !defined($object) ) {
+        return 0;
+    }
+
+    my $boxName = $object->getMailboxName();
+    my $boxPrefix = $object->getMailboxPrefix();
+
+    # Création de la boîte
+    $cyrusSrvConn->create( $boxPrefix.$boxName );
+    if( $cyrusSrvConn->error() ) {
+        return 0;
+    }
+
+    # Positionnement du quota
+    if( !$self->_imapSetMailboxQuota() ) {
+        ##### Probleme ICI le quota n'est pas positionne a la creation
+        return 0;
+    }
+
+    return 1;
+}
+
+
+sub _imapSetMailboxAcl {
     my $self = shift;
     my( $cyrusSrv, $object, $boxRightUser, $boxRight ) = @_;
 
