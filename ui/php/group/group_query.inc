@@ -1074,7 +1074,7 @@ function run_query_group_ext_search($group) {
   $query = "SELECT 
       group_id,
       group_name,
-      group_descrun_query_group_detail
+      group_desc
     FROM UGroup
     WHERE 
       group_name LIKE '$pattern%' 
