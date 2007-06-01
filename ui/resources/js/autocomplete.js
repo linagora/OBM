@@ -66,8 +66,6 @@ obm.AutoComplete.Cache = new Class({
 
 /////////////////////////////////////////////////////////////////////////////
 // used to manage the visible elements of the result list
-//FIXME Improve algorythm
-//FIXME Refactor
 obm.AutoComplete.View = new Class({
 
   initialize: function(visibleNb) {
@@ -118,7 +116,7 @@ obm.AutoComplete.Search = new Class({
       delay: 400,
       mode: 'multiple',
       restriction: null,
-      defaultText: 'Search...',
+      fieldText: 'Search...',
       extension: null
     }, options || {});
   },
@@ -135,12 +133,13 @@ obm.AutoComplete.Search = new Class({
     this.requestId = 0;                // current request id
     this.selection = -1;               // currently selected (=highlighted) element
 
+
     if (this.options.mode == 'mono') {
-      this.addToSelectedBoxFunc = this.validateSelection;
+      this.validateResultValue = this.setResultValue;
       this.resetFunc = this.monoModeReset;
       this.textChangedFunc = function() { this.unvalidateSelection(); this.resetResultBox(); };
     } else {
-      this.addToSelectedBoxFunc = this.addToSelectedBox;
+      this.validateResultValue = this.addResultValue;
       this.resetFunc = this.reset;
       this.textChangedFunc = this.resetResultBox;
     }
@@ -187,7 +186,7 @@ obm.AutoComplete.Search = new Class({
 
   // focus event
   onFocus: function() {
-    if (this.inputField.value==this.options.defaultText) {
+    if (this.inputField.value==this.options.fieldText) {
       this.inputField.value='';
       this.inputField.removeClass('downlight');
     }
@@ -213,7 +212,7 @@ obm.AutoComplete.Search = new Class({
         if (this.resultBox.getStyle('display')!='none') {
           var currentSel = $E('.highlight', this.resultBox);
           if (currentSel) {
-            this.addToSelectedBoxFunc(currentSel);
+            this.validateResultValue(currentSel);
           }
           e.stop();
         }
@@ -303,7 +302,7 @@ obm.AutoComplete.Search = new Class({
   // when receiving a success response for a new request
   onNewRequestSuccess: function(response,responseId) {
     this.resetResultBox();
-    if (response.trim() != '' && this.requestId==responseId) {
+    if (response.trim() != '' && this.requestId == responseId) {
       this.parseResponse(response);
       this.drawView();
       this.updateInfo();
@@ -345,11 +344,11 @@ obm.AutoComplete.Search = new Class({
       this.cache.addElement(res);
       if($type(data.extension)) {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-           .addEvent('mousedown', function() {this.addToSelectedBoxFunc(res,data.extension);}.bindAsEventListener(this))
+           .addEvent('mousedown', function() { this.validateResultValue(res,data.extension)}.bindAsEventListener(this))
            .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
       } else {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-           .addEvent('mousedown', function() {this.addToSelectedBoxFunc(res);}.bindAsEventListener(this))
+           .addEvent('mousedown', function() {this.validateResultValue(res);}.bindAsEventListener(this))
            .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
       }
     }.bind(this));
@@ -486,7 +485,7 @@ obm.AutoComplete.Search = new Class({
   // (un)choose elements
 
   // add an element to the box containing selected elements (selectedBox)
-  addToSelectedBox: function(element, extension) {
+  addResultValue: function(element, extension) {
     var item_id = element.getProperty('id');
     var id = item_id.substr(('item_').length,item_id.length);
     var div_id = this.name + id;
@@ -524,7 +523,7 @@ obm.AutoComplete.Search = new Class({
 
   // reset input and result box
   reset: function() {
-    this.inputField.value = this.options.defaultText;
+    this.inputField.value = this.options.fieldText;
     this.inputField.addClass('downlight');
     this.currentValue = '';
     this.nbTotal = 0;
@@ -545,7 +544,7 @@ obm.AutoComplete.Search = new Class({
   // "mono" mode specific functions
 
   // validate the current selection
-  validateSelection: function(element, extension) {
+  setResultValue: function(element, extension) {
     var item_id = element.getProperty('id');
     this.selectedBox.value = item_id.substr(('item_').length,item_id.length);
     this.currentValue = $(item_id+'_label').innerHTML;

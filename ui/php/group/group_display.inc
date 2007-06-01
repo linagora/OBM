@@ -925,10 +925,8 @@ function dis_group_display_pref($prefs_g, $prefs_u) {
 function json_search_group($group,$grp_q) {
   global $display, $l_desc;
 
-  $limit = $group['limit'];
   $groups = array();
-  if(isset($group["first_row"])) $grp_q->seek($group["first_row"] - 1);
-  while($grp_q->next_record() && count($groups) < $limit ) {
+  while($grp_q->next_record()) {
     $id = $grp_q->f("group_id");
     $label = phpStringToJsString($grp_q->f("group_name"));
     $extra = phpStringToJsString("$l_desc : ".$grp_q->f("group_desc"));

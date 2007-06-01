@@ -1057,6 +1057,9 @@ function run_query_group_ext_search($group) {
   $restriction = $group["restriction"];
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("Group");
+  $limit = $group['limit'];
+  if(isset($group["first_row"])) $first_row = $group["first_row"] - 1;
+  else $first_row = 0;
 	
   if ($restriction == "user") {
     $uid = $obm["uid"];
@@ -1081,7 +1084,7 @@ function run_query_group_ext_search($group) {
       $multidomain
       $where_restriction
     ORDER BY group_name
-      ";
+    LIMIT $first_row, $limit";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_ext_search()");
   $obm_q->query($query);

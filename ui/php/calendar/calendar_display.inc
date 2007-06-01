@@ -1058,16 +1058,16 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
         $date_begin = of_datetime_format($date);
         $date_end = of_datetime_format($date+$duration); 
         $j++;
-				$js .= "
-					div = $('evt-$date-$ev_id');
-					a = div.getFirst();
-					info = $('eventDetail-$date-$ev_id');
-					slides[$j] = new Fx.Slide(info, {duration: 150,wait:false});	
-					slides[$j].hide();
-					info.setStyle('display','block');	
-					a.addEvent('click', function(e){
-						slides[$j].toggle();
-     			});
+	$js .= "
+	div = $('evt-$date-$ev_id');
+	a = div.getFirst();
+	info = $('eventDetail-$date-$ev_id');
+	slides[$j] = new Fx.Slide(info, {duration: 150,wait:false});	
+	slides[$j].hide();
+	info.setStyle('display','block');	
+	a.addEvent('click', function(e){
+	  slides[$j].toggle();
+     	});
 				";
         $dis_events .= "<div id=\"evt-$date-$ev_id\" >
           <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_user $dis_res</span>

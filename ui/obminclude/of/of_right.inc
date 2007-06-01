@@ -133,6 +133,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   global $l_public;
   global $ico_add,$l_users,$path;
 
+  $l_userSearch = phpStringToJsString("$l_users...");
   foreach ($consumers["consumer"] as $one_consumer) {
     $id = $one_consumer["id"];
     $label = $one_consumer["label"];
@@ -186,9 +187,15 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>
     </td>
-    <td class=\"detailForm\" id=\"sel_accept_read\">
+    <td>
+    <input type=\"text\" id=\"userReadSearch\" autocomplete=\"off\" /> 
+    </td>
+    </tr>
+    <tr>
+    <td colspan=\"2\" lass=\"detailForm\" id=\"sel_accept_read\">
       $dis_read_ok
-    </td>";
+    </td>
+    </tr>  ";
 
    $block_consumer_write_public = "
     <td class=\"detailLabel\">
@@ -201,14 +208,16 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     $block_consumer_write = "
     <td class=\"detailLabel\" id=\"head_accept_write\">
     $l_users
-      <a style=\"$style_write\" id=\"lnk_accept_write\" href=\"javascript: return false;\"
-      onclick=\"popup('$url', ''); return false;\">
-       <img src=\"$ico_add\" alt=\"[Add]\" />
-     </a>
-     </td>
-     <td class=\"detailForm\" id=\"sel_accept_write\">
+    </td>
+    <td>
+    <input type=\"text\" id=\"userWriteSearch\" autocomplete=\"off\" /> 
+    </td>
+    </tr>
+    <tr>
+    <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_write\">
        $dis_write_ok
-     </td>";
+    </td>
+    </tr>   ";
 
   $block = "
   <form method=\"get\" name=\"f_mod_right\"
@@ -244,6 +253,10 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <input type=\"submit\" value=\"$l_right_validate\" />
   </fieldset>
   </form>
+  <script type=\"text/javascript\">
+    new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_write', 'userWriteSearch',{fieldText:'$l_userSearch'});
+    new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_read', 'userReadSearch',{fieldText:'$l_userSearch'});
+  </script>
 ";
 
   return $block;

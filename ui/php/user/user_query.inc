@@ -171,6 +171,9 @@ function run_query_user_ext_search($user) {
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("UserObm.userobm");
 
+  $limit = $user['limit'];
+  if(isset($user["first_row"])) $first_row = $user["first_row"] - 1;
+  else $first_row = 0;
 
   if ($restriction == "calendar") {
     $users = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "read","","userobm");
@@ -198,9 +201,11 @@ function run_query_user_ext_search($user) {
       OR userobm_login LIKE '$pattern%' 
       OR userobm_firstname LIKE '$pattern%' 
       OR userobm_email LIKE '$pattern%' )
+      AND userobm_archive = '0'
       $multidomain
       $where_restriction
     ORDER BY  userobm_lastname, userobm_firstname
+    LIMIT $first_row, $limit
       ";
 
   display_debug_msg($query, $cdg_sql, "run_query_user_ext_search()");

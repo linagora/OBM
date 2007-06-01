@@ -506,12 +506,10 @@ function dis_resource_display_pref($prefs) {
 function json_search_resources($resource,$res_q) {
   global $display, $l_qty, $l_ritem;
 
-  $limit = $resource['limit'];
   $form = $resource['form'];
 
   $resources = array();
-  if(isset($resource["first_row"])) $res_q->seek($resource["first_row"] - 1);
-  while($res_q->next_record() && count($users) < $limit ) {
+  while($res_q->next_record()) {
     $id = $res_q->f("resource_id");
     $resourcetype_id = $res_q->f("resource_rtype_id");
     $label = phpStringToJsString($res_q->f("resource_name"));
@@ -552,7 +550,9 @@ function json_search_resources($resource,$res_q) {
                   {'type': 'text',
                   'name': 'property[$id]',
                   'value': '$l_property'}).
-                addEvent('click', function(){ if(this.value=='$l_property') this.value=\"\"; })
+                addClass('downlight').  
+                addEvent('click', function(){ if(this.value=='$l_property') { this.value=\"\"; this.removeClass('downlight') }}).
+                addEvent('blur', function() { if(this.value == '') { this.addClass('downlight'); this.value = '$l_property';  } })
               )
           )";
       } else {

@@ -121,7 +121,11 @@ function run_query_resource_ext_search($resource) {
   $restriction = $resource["restriction"];
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("Resource");
-	
+
+  $limit = $resource['limit'];
+  if(isset($resource["first_row"])) $first_row = $resource["first_row"] - 1;
+  else $first_row = 0;
+
   if ($restriction == "user") {
     $uid = $obm["uid"];
     $rs = of_right_entity_for_consumer("Resource", "user", $uid, "read");
@@ -148,7 +152,8 @@ function run_query_resource_ext_search($resource) {
       resource_name LIKE '$pattern%' 
       $multidomain
       $where_restriction
-    ORDER BY resource_name";
+    ORDER BY resource_name
+    LIMIT $first_row, $limit  ";
 
   display_debug_msg($query, $cdg_sql, "run_query_resource_ext_search()");
   $obm_q->query($query);
