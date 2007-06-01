@@ -17,15 +17,14 @@ $fieldnames["organizationalchart_description"] = $l_desc;
 $fieldnames["organizationalchart_archive"] = $l_archive;
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Organizational Chart specific dataset fields
-// Parameters:
-//   - $OD        : OBM_DISPLAY object (passed by reference)
-//   - $fieldname : field to display
-//   - $link_ok   : true if links must be displayed
-// Returns:
-//   - $res : hash with 'name', 'url', 'align' values
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display Organizational Chart specific dataset fields
+ * @param $OD OBM_DISPLAY object (passed by reference)
+ * @param $fieldname field to display
+ * @param $link_ok true if links must be displayed
+ * @access public
+ * @return $res hash with 'name', 'url' values
+ */
 function dis_data_organizationalchart(&$OD, $fieldname, $link_ok) {
 
   if ($fieldname == "organizationalchart_name") {
@@ -40,7 +39,6 @@ function dis_data_organizationalchart(&$OD, $fieldname, $link_ok) {
       $res["txt_name"] = " ";
     }
   }
-
   return $res;
 }
 
@@ -292,22 +290,17 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     </fieldset>
     <fieldset class=\"buttons\">$dis_button</fieldset>
   </form>";
-/*
-  <script type=\"text/javascript\">
-    obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_ent1', 'user');
-    });
-  </script>"; 
-*/
+
   return $block;
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Organizational Chart Detail
-// Parameters:
-//   - $organizationalchart[] : criteria
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display Organizational Chart Detail
+ * @param $organizationalchart 
+ * @access public
+ * @return HTML
+ */
 function dis_organizationalchart_consult($organizationalchart) {
 
   $id = $organizationalchart["organizationalchart_id"];
@@ -321,11 +314,14 @@ function dis_organizationalchart_consult($organizationalchart) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// XHTML Display Organizational Chart Detail
-// Parameters:
-//   - $oc_q : ogroup database result 
-///////////////////////////////////////////////////////////////////////////////
+/**
+ *  XHTML Display Organizational Chart Detail
+ * @param $organizationalchart 
+ * @param $oc_q ogroup database result
+ * @param $root_node database result
+ * @access public
+ * @return HTML
+ */
 function html_organizationalchart_consult($organizationalchart, $oc_q, $root_node) {
   global $display;
   global $l_organizationalchart, $l_detail;
@@ -370,11 +366,12 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display the organizational chart delete validation screen
-// Parameters:
-//   - $id : organizational chart id
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display the organizational chart delete validation screen
+ * @param $id organizational chart id 
+ * @access public
+ * @return HTML
+ */
 function dis_can_delete_organizationalchart($id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display,$path;
@@ -394,11 +391,12 @@ function dis_can_delete_organizationalchart($id) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display: the OrganizationalChart Display preference screen
-// Parameters:
-//   - $prefs : Display preferences
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display OrganizationalChart Display preference screen 
+ * @param $prefs Display preferences 
+ * @access public
+ * @return HTML
+ */
 function dis_organizationalchart_display_pref($prefs) {
   global $l_organizationalchart_display;
 
@@ -412,11 +410,12 @@ function dis_organizationalchart_display_pref($prefs) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display: Draw a node
-// Parameters:
-//    - $node_q : node detail
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Draw a node 
+ * @param $node_q
+ * @access public
+ * @return HTML
+ */
 function draw_consult($node_q) {
   global $f, $l; 
   global $l_title, $l_phone, $l_mphone, $l_email;
@@ -463,7 +462,7 @@ function draw_consult($node_q) {
           </li>";
       } else {
         $manager = "<img src=\"$ico_manager\" />";
-        $block_detail_entities_boss = "<li id=\"item-${level}-${userobm_id}\">
+        $block_detail_entities_boss .= "<li id=\"item-${level}-${userobm_id}\">
         <a href=\"$userobm_url\" 
 			    onmouseover=\"obm.userDetail.compute($userobm_id, event);return false;\"
           onmouseout=\"obm.userDetail.compute($userobm_id, event);return false;\">$manager&nbsp;<b>$userobm_name</b></a>
@@ -559,11 +558,12 @@ function draw_consult($node_q) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display: Draw a node form
-// Parameters:
-//    - $node_q : node detail
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Draw a node form
+ * @param $node_q
+ * @access public
+ * @return HTML
+ */
 function draw_form($node_q) {
   global $f, $l; 
   global $ico_delete, $ico_add, $ico_user, $ico_group;
@@ -678,9 +678,12 @@ function draw_form($node_q) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// User detail popup 
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * User detail popup
+ * @params
+ * @access public
+ * @return HTML
+ */
 function dis_organizationalchart_userdetail() {
   global $l_title, $l_phone, $l_mphone, $l_email;
   global $ico_nophoto, $ico_load, $path; 
@@ -723,7 +726,7 @@ function dis_organizationalchart_userdetail() {
  * Build a JSON message with all the event data
  * the respone is a table of event objects.
  * 
- * @param mixed $id 
+ * @param mixed $usr_q 
  * @access public
  * @return void
  */
