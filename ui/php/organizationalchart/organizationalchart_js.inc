@@ -48,81 +48,45 @@ function add_entity(level) {
 
   var child = window.document.f_entity.nb_child.value;
   var new_child_id = level+'.'+child;
-
   var target = window.document;
   var container = get_elem(target, level);
-
   var num_child = (new_child_id.replace(/[0-9]/g, '').length)%7;
 
-  // Create the div row
-  row = target.createElement('div');
-  row.id = new_child_id;
-  row.className = 'new_level organizational_chart_block';
+  var wrap = new Element('div').addClass('organizational_chart_wrap color'+num_child);
+  var row = new Element('div').addClass('new_level organizational_chart_block').setProperty('id', new_child_id);
 
-  // Create the delete link
-  del_child_link = target.createElement('a');
-  del_child_link.href = 'javascript: del_entity(\"'+new_child_id+'\");';
-  del_child = target.createElement('img');
-  del_child.src = '$ico_delete';
-  del_child_link.appendChild(del_child);
+  // Delete button
+  var delete_button = new Element('a').addEvent('click', function() {
+    del_entity(\"'+new_child_id+'\");
+  }).adopt(new Element('img').setProperty('src', '$ico_delete'));
 
-  // Create the add user link
-  add_user_link = target.createElement('a');
-  add_user_link.href= '#';
-  add_user_link.onclick = function() { popup('$url_user'+new_child_id,''); };
-  add_user = target.createElement('img');
-  add_user.src = '$ico_user';
-  add_user_link.appendChild(add_user);
+  // Add user button
+  var user_button = new Element('a').addEvent('click', function() {
+    popup('$url_user'+new_child_id,'');
+  }).adopt(new Element('img').setProperty('src', '$ico_user'));
 
-  // Create the add group link
-  add_group_link = target.createElement('a');
-  add_group_link.href= '#';
-  add_group_link.onclick = function() { popup('$url_group'+new_child_id,''); };
-  add_group = target.createElement('img');
-  add_group.src = '$ico_group';
-  add_group_link.appendChild(add_group);
+  // Add group button
+  var group_button = new Element('a').addEvent('click', function() {
+    popup('$url_group'+new_child_id,'');
+  }).adopt(new Element('img').setProperty('src', '$ico_group'));
 
-  // Create the add child link
-  add_child_link = target.createElement('a');
-  add_child_link.href = 'javascript: add_entity(\"'+new_child_id+'\");';
-  add_child = target.createElement('img');
-  add_child.src = '$ico_add';
-  add_child_link.appendChild(add_child);
+  // Add child button
+  var child_button = new Element('a').addEvent('click', function() {
+    add_entity(new_child_id);
+  }).adopt(new Element('img').setProperty('src', '$ico_add'));
 
-  // Create the input field
-  field = target.createElement('input');
-  field.type = 'text';
-  field.name = 'tf_ogroup['+new_child_id+']';
-  field.size = '24';
-  field.setAttribute('maxlength', '16');
-  field.value = '';
+  // child name text field
+  var child_name = new Element('input').setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'size':'24', 'maxlength':'16', 'value':''});
 
-  // Create hidden input field
-  parent_id = target.createElement('input');
-  parent_id.type = 'hidden';
-  parent_id.name = 'tf_parent_level['+new_child_id+']';
-  parent_id.value = level;
+  // parent id hidden 
+  var parent_id = new Element('input').setProperties({'type':'hidden', 'name':'tf_parent_level['+new_child_id+']', 'value':level});
+ 
+  // entity div
+  var sel_ent = new Element('div').addClass('organizational_chart_entities').setProperty('id', 'sel_ent'+new_child_id);
 
-  // Create the sel_ent div
-  sel_ent = target.createElement('div');
-  sel_ent.id = 'sel_ent'+new_child_id;
-  sel_ent.className = 'organizational_chart_entities';
+  row.adopt(wrap.adopt(delete_button).adopt(child_name).adopt(parent_id).adopt(user_button).adopt(group_button).adopt(child_button).adopt(sel_ent));
 
-  wraprow = target.createElement('div');
-  wraprow.className = 'organizational_chart_wrap color'+num_child;
-
-  // Add these elements to the div row
-  wraprow.appendChild(del_child_link);
-  wraprow.appendChild(field);
-  wraprow.appendChild(parent_id);
-  wraprow.appendChild(add_user_link);
-  wraprow.appendChild(add_group_link);
-  wraprow.appendChild(add_child_link);
-  wraprow.appendChild(sel_ent);
-  row.appendChild(wraprow);
-
-  // Add the div row to the container
-  container.appendChild(row);
+  container.adopt(row);
 
   window.document.f_entity.nb_child.value ++;
 }
