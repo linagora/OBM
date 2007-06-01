@@ -625,8 +625,6 @@ sub updateSieve {
         }
     }
 
-    print "-->ici\n";
-
     return 0;
 }
 
