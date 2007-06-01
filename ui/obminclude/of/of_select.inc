@@ -69,7 +69,7 @@ function of_select_add_element(target, element_name, sel_id, fieldLabel) {
 
   // Create the delete link associated to the div
   link = target.createElement('a');
-  link.href = 'javascript: remove_element(\''+element_name+sel_id+'\',\''+element_name+'\');';
+  link.href = 'javascript: remove_element(\''+element_name+'-'+sel_id+'\',\''+element_name+'\');';
   link.onclick = '';
 
   // Create the icon image

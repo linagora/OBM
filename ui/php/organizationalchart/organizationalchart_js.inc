@@ -56,7 +56,7 @@ function add_entity(level) {
 
   // Delete button
   var delete_button = new Element('a').addEvent('click', function() {
-    del_entity(\"'+new_child_id+'\");
+    del_entity(new_child_id);
   }).adopt(new Element('img').setProperty('src', '$ico_delete'));
 
   // Add user button

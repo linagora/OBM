@@ -298,7 +298,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
   $delegation = urlencode(stripslashes($group["delegation"]));
   $user = urlencode(stripslashes($group["user"]));
 
-  $url = url_prepare("group_index.php?action=search&amp;tf_name=$namet&amp;tf_user=$user&amp;tf_delegation=$delegation$url_ext");
+  $url = url_prepare("group_index.php?action=search&amp;tf_name=$name&amp;tf_user=$user&amp;tf_delegation=$delegation$url_ext");
   
   $dis_group = new OBM_DISPLAY("DATA", $prefs, "group");
   if ($popup) {
