@@ -212,7 +212,7 @@ obm.AutoComplete.Search = new Class({
         if (this.resultBox.getStyle('display')!='none') {
           var currentSel = $E('.highlight', this.resultBox);
           if (currentSel) {
-            this.validateResultValue(currentSel);
+            currentSel.fireEvent('mousedown');
           }
           e.stop();
         }
