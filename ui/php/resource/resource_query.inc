@@ -22,6 +22,8 @@ function run_query_resource_search($resource) {
   $name = sql_search_text_parse($resource["name"]);
   $desc = sql_search_text_parse($resource["desc"]);
   $rtype = $resource["rtype"];
+  $qtyinf = $resource["qtyinf"];
+  $qtysup = $resource["qtysup"];
  
   $sql_order_dir = $resource["sql_order_dir"];
   $sql_order_field = $resource["sql_order_field"];
@@ -67,6 +69,17 @@ function run_query_resource_search($resource) {
   if ($rtype != "0") {
      $where .= " AND resource_rtype_id='$rtype'";   
   }
+
+  // If a quantity sup has been specified, get it
+  if ($qtysup != "") {
+     $where .= " AND resource_qty<='$qtysup'";   
+  }
+
+  // If a quantity inf has been specified, get it
+  if ($qtyinf != "") {
+     $where .= " AND resource_qty>='$qtyinf'";   
+  }
+
 
   if ((trim($where) != "") || (trim($where_restriction) != "")) {
     $whereq = " WHERE $where $where_restriction";

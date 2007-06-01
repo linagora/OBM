@@ -3479,6 +3479,7 @@ function parse_item($item) {
   }
 
   $p = xml_parser_create();
+  xml_parser_set_option($p, XML_OPTION_TARGET_ENCODING, "ISO-8859-1");
   xml_parse_into_struct($p, $item, $vals, $index);
   xml_parser_free($p);
 
