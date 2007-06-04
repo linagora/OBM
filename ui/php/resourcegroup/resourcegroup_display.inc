@@ -603,12 +603,14 @@ function dis_resourcegroup_warn_insert($id, $g_q, $group) {
 /**
  * Build a JSON array with all search results 
  * 
- * @param DB $res_q ResourceGroup search query results
+ * @param $results array of 'length' => DB query results nb, and 'datas' => DB ResourceGroup search query results
  * @access public
  * @return void
  */
-function json_search_resourcegroups($rgroups,$rgroup_q) {
+function json_search_resourcegroups($rgroups,$results) {
   global $display, $l_desc;
+
+  $rgroup_q = $results['datas'];
 
   $limit = $rgroups['limit'];
   $form = $rgroups['form'];
@@ -621,7 +623,7 @@ function json_search_resourcegroups($rgroups,$rgroup_q) {
     $extra = phpStringToJsString("$l_desc : ".$rgroup_q->f("rgroup_desc"));
     $resourcegroups[] = "{id:'data-resourcegroup-$id', label:'$label', extra:'$extra'}";
   }
-  $display["json"] = "{length:".$rgroup_q->nf().", datas:[".implode(",",$resourcegroups)."]}";
+  $display["json"] = "{length:".$results['length'].", datas:[".implode(",",$resourcegroups)."]}";
 }
 
 ?>

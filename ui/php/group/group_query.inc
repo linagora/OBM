@@ -1048,7 +1048,7 @@ function get_group_parents($id) {
  * 
  * @param mixed $group
  * @access public
- * @return DB Search results
+ * @return array of 'length' => DB query results nb, and 'datas' => DB Search results
  */
 function run_query_group_ext_search($group) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
@@ -1075,6 +1075,21 @@ function run_query_group_ext_search($group) {
   }
 
   $query = "SELECT 
+      count(*) as resultsCount
+    FROM UGroup
+    WHERE 
+      group_name LIKE '$pattern%' 
+      $multidomain
+      $where_restriction
+    ORDER BY group_name
+    LIMIT $first_row, $limit";
+
+  display_debug_msg($query, $cdg_sql, "run_query_group_ext_search()");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $resultsCount = $obm_q->f("resultsCount");
+
+  $query = "SELECT 
       group_id,
       group_name,
       group_desc
@@ -1089,7 +1104,7 @@ function run_query_group_ext_search($group) {
   display_debug_msg($query, $cdg_sql, "run_query_group_ext_search()");
   $obm_q->query($query);
 
-  return $obm_q;
+  return array('length' => $resultsCount, 'datas' => $obm_q);
 }
 
 ?>

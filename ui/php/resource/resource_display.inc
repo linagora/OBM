@@ -499,12 +499,14 @@ function dis_resource_display_pref($prefs) {
 /**
  * Build a JSON array with all search results 
  * 
- * @param DB $res_q Resources search query results
+ * @param $results array of 'length' => DB query results nb, and 'datas' => DB Resources search query results
  * @access public
  * @return void
  */
-function json_search_resources($resource,$res_q) {
+function json_search_resources($resource,$results) {
   global $display, $l_qty, $l_ritem;
+
+  $res_q = $results['datas'];
 
   $form = $resource['form'];
 
@@ -563,7 +565,7 @@ function json_search_resources($resource,$res_q) {
     }
     $resources[] = "{id:'data-resource-$id', label:'$label', extra:'$extra', extension: $extension}";
   }
-  $display["json"] = "{length:".$res_q->nf().", datas:[".implode(",",$resources)."]}";
+  $display["json"] = "{length:".$results['length'].", datas:[".implode(",",$resources)."]}";
 }
 
 

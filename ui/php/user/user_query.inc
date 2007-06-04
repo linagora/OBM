@@ -162,7 +162,7 @@ function run_query_user_search($user) {
  * 
  * @param mixed $user 
  * @access public
- * @return void
+ * @return array of 'length' => DB user results nb, and 'datas' => DB User search query results
  */
 function run_query_user_ext_search($user) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
@@ -191,6 +191,24 @@ function run_query_user_ext_search($user) {
   }
 
   $query = "SELECT 
+      count(*) as resultsCount
+    FROM UserObm
+    WHERE (
+      userobm_lastname LIKE '$pattern%'
+      OR userobm_login LIKE '$pattern%' 
+      OR userobm_firstname LIKE '$pattern%' 
+      OR userobm_email LIKE '$pattern%' )
+      AND userobm_archive = '0'
+      $multidomain
+      $where_restriction
+      ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_user_ext_search()");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $resultsCount = $obm_q->f("resultsCount");
+
+  $query = "SELECT 
       userobm_id,
       userobm_lastname,
       userobm_firstname,
@@ -211,7 +229,7 @@ function run_query_user_ext_search($user) {
   display_debug_msg($query, $cdg_sql, "run_query_user_ext_search()");
   $obm_q->query($query);
 
-  return $obm_q;
+  return array('length' => $resultsCount, 'datas' => $obm_q);
 }
 
 

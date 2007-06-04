@@ -113,7 +113,7 @@ function run_query_resource_search($resource) {
  * 
  * @param mixed $resource 
  * @access public
- * @return DB Search results
+ * @return array of 'length' => DB query results nb, and 'datas' => DB Search results
  */
 function run_query_resource_ext_search($resource) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
@@ -140,6 +140,22 @@ function run_query_resource_ext_search($resource) {
   }
 
   $query = "SELECT 
+      count(*) as resultsCount
+    FROM Resource
+    LEFT JOIN ResourceType ON resource_rtype_id = resourcetype_id
+    WHERE 
+      resource_name LIKE '$pattern%' 
+      $multidomain
+      $where_restriction
+    ORDER BY resource_name
+    LIMIT $first_row, $limit  ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_ext_search()");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $resultsCount = $obm_q->f("resultsCount");
+
+  $query = "SELECT 
       resource_id,
       resource_name,
       resource_qty,
@@ -158,7 +174,7 @@ function run_query_resource_ext_search($resource) {
   display_debug_msg($query, $cdg_sql, "run_query_resource_ext_search()");
   $obm_q->query($query);
 
-  return $obm_q;
+  return array('length' => $resultsCount, 'datas' => $obm_q);
 }
 
 

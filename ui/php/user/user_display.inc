@@ -1710,12 +1710,14 @@ function dis_user_display_pref($prefs) {
 /**
  * Build a JSON array with all search results 
  * 
- * @param DB $user_q User search query results
+ * @param $results array of 'length' => DB user results nb, and 'datas' => DB User search query results
  * @access public
  * @return void
  */
-function json_search_users($user,$user_q) {
+function json_search_users($user,$results) {
   global $display;
+
+  $user_q = $results['datas'];
 
   $users = array();
   while($user_q->next_record()) {
@@ -1724,6 +1726,6 @@ function json_search_users($user,$user_q) {
     $extra = phpStringToJsString($user_q->f("userobm_email"));
     $users[] = "{id:'data-user-$id', label:'$label', extra:'$extra'}";
   }
-  $display["json"] = "{length:".$user_q->nf().", datas:[".implode(",",$users)."]}";
+  $display["json"] = "{length:".$results['length'].", datas:[".implode(",",$users)."]}";
 }
 ?>

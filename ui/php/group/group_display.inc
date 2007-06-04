@@ -918,12 +918,14 @@ function dis_group_display_pref($prefs_g, $prefs_u) {
 /**
  * Build a JSON array with all search results 
  * 
- * @param DB $res_q Group search query results
+ * @param $results array of 'length' => DB query results nb, and 'datas' => DB Group search query results
  * @access public
  * @return void
  */
-function json_search_group($group,$grp_q) {
+function json_search_group($group,$results) {
   global $display, $l_desc;
+
+  $grp_q = $results['datas'];
 
   $groups = array();
   while($grp_q->next_record()) {
@@ -932,6 +934,6 @@ function json_search_group($group,$grp_q) {
     $extra = phpStringToJsString("$l_desc : ".$grp_q->f("group_desc"));
     $groups[] = "{id:'data-group-$id', label:'$label', extra:'$extra'}";
   }
-  $display["json"] = "{length:".$grp_q->nf().", datas:[".implode(",",$groups)."]}";
+  $display["json"] = "{length:".$results['length'].", datas:[".implode(",",$groups)."]}";
 }
 ?>

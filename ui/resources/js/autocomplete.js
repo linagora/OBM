@@ -264,7 +264,7 @@ obm.AutoComplete.Search = new Class({
     if (this.inputField.value.clean().length < this.options.chars) {
       this.currentValue = this.inputField.value;
       this.textChangedFunc();
-    } else if (this.inputField.value != this.currentValue) {
+    } else if (this.inputField.value != this.currentValue && this.inputField.value != this.options.defaultText) {
       this.currentValue = this.inputField.value;
       this.textChangedFunc();
       this.requestId++;
@@ -280,12 +280,12 @@ obm.AutoComplete.Search = new Class({
   // update the cache when it needs to be (call it after the view moved forward)
   cacheRequest: function() {
     if (this.inputField.value == this.currentValue) {
-      if (this.view.getFirst()+this.options.results*2>=this.cache.getSize() && this.cache.getSize()<this.nbTotal) {
-        var unknownResultsNbr = this.nbTotal-this.cache.getSize();
+      if (this.view.getFirst()+this.options.results*2>=this.cache.getSize() && this.cache.getSize()<this.totalNbr) {
+        var unknownResultsNbr = this.totalNbr-this.cache.getSize();
         var requestNbr = ((this.options.results*2)>unknownResultsNbr ? unknownResultsNbr : this.options.results*2);
         new Ajax(this.url, {
           method: 'post',
-          postBody: 'text='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+requestNbr+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
+          postBody: 'pattern='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+requestNbr+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
           onFailure:this.onFailure.bindAsEventListener(this),
           onComplete:this.onCacheRequestSuccess.bindAsEventListener(this)
         }).request();
@@ -352,8 +352,8 @@ obm.AutoComplete.Search = new Class({
            .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
       }
     }.bind(this));
-    this.nbTotal = results.length;
-    this.view.setElementNb(this.nbTotal);
+    this.totalNbr = results.length;
+    this.view.setElementNb(this.totalNbr);
   },
 
   ///////////////////////////////////////////////////////////////////////////
@@ -417,6 +417,7 @@ obm.AutoComplete.Search = new Class({
 
   // hide the Result Box
   hideResultBox: function() {
+    this.isMouseOver = false;
     this.resultBox.setStyle('display', 'none');
   },
 
@@ -434,7 +435,7 @@ obm.AutoComplete.Search = new Class({
 
   // add viewable results (=results in the view) to the Result Box
   drawView: function() {
-    if (this.nbTotal>0) {
+    if (this.totalNbr>0) {
       var topLimit = this.view.getLast();
       for (var i=this.view.getFirst(); i<=topLimit; i++) {
         this.cache.getElementAt(i).injectBefore(this.infos);
@@ -455,10 +456,10 @@ obm.AutoComplete.Search = new Class({
   updateInfo: function() {
     this.previousResultsBtn.setStyle('display', 'none');
     this.nextResultsBtn.setStyle('display', 'none');
-    if (this.nbTotal<=1) {
-      this.infoText.setHTML(this.nbTotal);
+    if (this.totalNbr<=1) {
+      this.infoText.setHTML(this.totalNbr);
     } else {
-      this.infoText.setHTML((this.view.getFirst()+1)+' - '+(this.view.getLast()+1)+' / '+this.nbTotal);
+      this.infoText.setHTML((this.view.getFirst()+1)+' - '+(this.view.getLast()+1)+' / '+this.totalNbr);
       this.updateNavBtns();
     }
   },
@@ -473,7 +474,7 @@ obm.AutoComplete.Search = new Class({
 
   // display navigations buttons if needed
   updateNavBtns: function() {
-    if (this.nbTotal>this.view.getLast()+1) {
+    if (this.totalNbr>this.view.getLast()+1) {
       this.nextResultsBtn.setStyle('display', '');
     }
     if (this.view.getFirst()>0) {
@@ -511,8 +512,8 @@ obm.AutoComplete.Search = new Class({
     }
   },
 
-  // NOTUSED (remove_element function used instead)
   // removes an element from the selectedBox
+  // not used (remove_element function used instead)
   removeFromSelectedBox: function(element) {
     element.getParent().remove();
     this.inputField.focus();
@@ -524,13 +525,13 @@ obm.AutoComplete.Search = new Class({
   // reset input and result box
   reset: function() {
     this.inputField.value = this.options.fieldText;
+    this.currentValue = this.inputField.value;
     this.inputField.addClass('downlight');
-    this.currentValue = '';
-    this.nbTotal = 0;
+    this.totalNbr = 0;
     this.resetResultBox();
   },
 
-  // reset the result box
+  // reset the result box (and so cache, view)
   resetResultBox: function() {
     this.hideResultBox();
     this.flushView();
@@ -551,7 +552,6 @@ obm.AutoComplete.Search = new Class({
     this.inputField.value = this.currentValue;
     this.inputField.setStyle('background-color', '#ffffcc');
     this.resetResultBox();
-    this.blur();
   },
 
   // unvalidate the current validated element
@@ -562,8 +562,12 @@ obm.AutoComplete.Search = new Class({
 
   // reset input and result box
   monoModeReset: function() {
-  	this.unvalidateSelection();
-  	this.reset();
+    if (this.selectedBox.value != '' && this.currentValue == this.inputField.value) {
+      this.resetResultBox();
+    } else {
+      this.unvalidateSelection();
+      this.reset();
+  	}
   }
 
 });

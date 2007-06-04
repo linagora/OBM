@@ -87,7 +87,7 @@ function run_query_resourcegroup_search($group) {
  * 
  * @param mixed $resource 
  * @access public
- * @return DB Search results
+ * @return array of 'length' => DB query results nb, and 'datas' => DB Search results
  */
 function run_query_resourcegroup_ext_search($resourcegroup) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
@@ -110,6 +110,20 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
   }
 
   $query = "SELECT 
+      count(*) as resultsCount
+    FROM RGroup
+    WHERE 
+      rgroup_name LIKE '$pattern%' 
+      $multidomain
+      $where_restriction
+    ORDER BY rgroup_name";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_ext_search()");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $resultsCount = $obm_q->f("resultsCount");
+
+  $query = "SELECT 
       rgroup_id,
       rgroup_name,
       rgroup_desc
@@ -123,7 +137,7 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_ext_search()");
   $obm_q->query($query);
 
-  return $obm_q;
+  return array('length' => $resultsCount, 'datas' => $obm_q);
 }
 
 
