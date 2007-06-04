@@ -116,7 +116,7 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
       rgroup_name LIKE '$pattern%' 
       $multidomain
       $where_restriction
-    ORDER BY rgroup_name";
+    ORDER BY rgroup_name ";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_ext_search()");
   $obm_q->query($query);
