@@ -204,7 +204,7 @@ function dis_organizationalchart_form($action, $organizationalchart) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_organizationalchart_form($action, $oc_q, $organizationalchart, $root_node) {
   global $obm, $display;
-  global $ico_user, $ico_group, $ico_add, $ico_delete;
+  global $ico_add, $ico_delete, $ico_group, $ico_user;
   global $l_organizationalchart, $l_name, $l_desc, $l_archive, $l_update, $l_insert;
   global $l_detail;
 
@@ -218,27 +218,28 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     $block_detail .= "<input type=\"hidden\" id=\"nb_child\" name=\"nb_child\" value=\"$nb_child\" />
       <input type=\"hidden\" id=\"organizationalchart_id\" name=\"organizationalchart_id\" value=\"$id\" /";
   } else {
-    $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent1";
-    $url_group = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent1";
-    $block_detail = "<div id=\"1\" class=\"organizational_chart_node\">
+    $block_detail = "
+      <div id=\"1\" class=\"organizational_chart_node\">
         <div class=\"organizational_chart_wrap\">
-        <input type=\"text\" id=\"tf_ogroup[1]\" name=\"tf_ogroup[1]\" maxlength=\"16\" size=\"24\" value=\"$ogroup\" />
-        <input type=\"hidden\" id=\"tf_parent_level[1]\" name=\"tf_parent_level[1]\" value=\"0\" />
-        <!-- user extmod -->
-        <a href=\"javascript: return false;\"
-          onclick=\"popup('$url_user','');return false;\">
-          <img src=\"$ico_user\" alt=\"[User]\" /></a>
-        <!-- group extmod -->
-          <a href=\"javascript: return false;\"
-          onclick=\"popup('$url_group','');return false;\">
-          <img src=\"$ico_group\" alt=\"[Group]\" /></a>
-        <a href=\"javascript: add_entity('1');\"> <img src=\"$ico_add\" alt=\"[Add]\" /> </a>
-        <input type=\"hidden\" name=\"nb_child\" id=\"nb_child\" value=\"1\" />
-      <div class=\"organizational_chart_entities\" id=\"sel_ent1\">
-        <!-- Entities -->
+          <input type=\"text\" id=\"tf_ogroup[1]\" name=\"tf_ogroup[1]\" maxlength=\"16\" size=\"24\" value=\"$ogroup\" />
+          <input type=\"hidden\" id=\"tf_parent_level[1]\" name=\"tf_parent_level[1]\" value=\"0\" />
+          <br/>
+          <img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user1\" autocomplete=\"off\" />
+          <br/>
+          <img src=\"$ico_group\" /><input type=\"text\" name=\"\" value=\"\" id=\"group1\" autocomplete=\"off\" />
+          <input type=\"hidden\" name=\"nb_child\" id=\"nb_child\" value=\"1\" />
+          <div class=\"organizational_chart_entities\" id=\"sel_ent1\">
+            <!-- Entities -->
+          </div>
+          <a href=\"javascript: add_entity('1');\"><img src=\"$ico_add\" alt=\"[Add]\" style=\"float: right;\" /> </a>
+        </div>
       </div>
-      </div>
-      </div>";
+      <script type=\"text/javascript\">
+        obm.initialize.chain(function () {
+          new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent1', 'user1', {defaultText:'$user_text'})
+          new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent1', 'group1', {defaultText:'$user_text'})
+        });
+      </script>";
   }
 
   // If parameters have been given, they supercede the default action value
@@ -626,7 +627,7 @@ function draw_form($node_q) {
   } 
 
   if ($level > 1) {
-    $ico_del_entity = "<a href='javascript: del_entity(\"$level\");'><img src=\"$ico_delete\"></a>";
+    $ico_del_entity = "<a href='javascript: del_entity(\"$level\");'><img src=\"$ico_delete\" style=\"float: right;\"></a>";
     $stage = strlen($level) - strlen(str_replace(".", "", $level));  
     $last_stage = strlen($parent_level) - strlen(str_replace(".", "", $parent_level));  
     if ($last_stage < $stage) {
@@ -643,36 +644,31 @@ function draw_form($node_q) {
   }
 
   // Urls for extmod
-  $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent$level";
-  $url_group = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent$level";
-
   $block = "<div id=\"$level\" class=\"organizational_chart_node\" $margin>
     <div class=\"organizational_chart_wrap $color\">
       $ico_del_entity
       <input type=\"text\" id=\"tf_ogroup[$level]\" name=\"tf_ogroup[$level]\" 
         maxlength=\"32\" size=\"24\" value=\"$node_name\" />
-      <input type=\"hidden\" id=\"tf_parent_level[$level]\" name=\"tf_parent_level[$level]\"
-        value=\"$parent_level\" />
-      <!-- user extmod -->
-      <a href=\"javascript: return false;\"
-        onclick=\"popup('$url_user','');
-        return false;\">
-        <img src=\"$ico_user\" alt=\"[User]\" />
-      </a>
-      <!-- group extmod -->
-      <a href=\"javascript: return false;\"
-        onclick=\"popup('$url_group','');
-        return false;\">
-       <img src=\"$ico_group\" alt=\"[Group]\" />
-      </a>
-      <a href=\"javascript: add_entity('$level');\"> <img src=\"$ico_add\" alt=\"[Add]\" /></a>
+      <input type=\"hidden\" id=\"tf_parent_level[$level]\" name=\"tf_parent_level[$level]\" value=\"$parent_level\" />
+      <br />
+      <img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user$level\" autocomplete=\"off\" />
+      <br />
+      <img src=\"$ico_group\" /><input type=\"text\" name=\"\" value=\"\" id=\"group$level\" autocomplete=\"off\" />
       <div class=\"organizational_chart_entities\" id=\"sel_ent$level\">
         <!-- Entities -->
         $block_detail_entities
       </div>
+      <a href=\"javascript: add_entity('$level');\"> <img src=\"$ico_add\" alt=\"[Add]\" style=\"float: right;\" /></a>
     </div>
     $block_detail_child
-    </div>";
+    </div>
+      <script type=\"text/javascript\">
+        obm.initialize.chain(function () {
+          new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'user$level', {defaultText:'$user_text'})
+          new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'group$level', {defaultText:'$user_text'})
+        });
+      </script>
+";
 
   return $block;
 }

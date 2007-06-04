@@ -57,22 +57,20 @@ function add_entity(level) {
   // Delete button
   var delete_button = new Element('a').addEvent('click', function() {
     del_entity(new_child_id);
-  }).adopt(new Element('img').setProperty('src', '$ico_delete'));
+  }).setStyle('float','right').adopt(new Element('img').setProperty('src', '$ico_delete'));
 
-  // Add user button
-  var user_button = new Element('a').addEvent('click', function() {
-    popup('$url_user'+new_child_id,'');
-  }).adopt(new Element('img').setProperty('src', '$ico_user'));
+  // Add user
+  var user_input = new Element('input').setProperties({'type':'text','id':'user'+new_child_id, 'name':'', 'value':'', 'autocomplete':'off'});
+  var ico_user = new Element('img').setProperty('src', '$ico_user');
 
-  // Add group button
-  var group_button = new Element('a').addEvent('click', function() {
-    popup('$url_group'+new_child_id,'');
-  }).adopt(new Element('img').setProperty('src', '$ico_group'));
+  // Add group
+  var group_input = new Element('input').setProperties({'type':'text','id':'group'+new_child_id, 'name':'', 'value':'', 'autocomplete':'off'})
+  var ico_group = new Element('img').setProperty('src', '$ico_group');
 
   // Add child button
   var child_button = new Element('a').addEvent('click', function() {
     add_entity(new_child_id);
-  }).adopt(new Element('img').setProperty('src', '$ico_add'));
+  }).setStyle('float','right').adopt(new Element('img').setProperty('src', '$ico_add'));
 
   // child name text field
   var child_name = new Element('input').setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'size':'24', 'maxlength':'16', 'value':''});
@@ -83,9 +81,20 @@ function add_entity(level) {
   // entity div
   var sel_ent = new Element('div').addClass('organizational_chart_entities').setProperty('id', 'sel_ent'+new_child_id);
 
-  row.adopt(wrap.adopt(delete_button).adopt(child_name).adopt(parent_id).adopt(user_button).adopt(group_button).adopt(child_button).adopt(sel_ent));
+  row.adopt(wrap.
+    adopt(delete_button).
+    adopt(child_name).
+    adopt(parent_id).
+    adopt(new Element('br')).adopt(ico_user).adopt(user_input).
+    adopt(new Element('br')).adopt(ico_group).adopt(group_input).
+    adopt(sel_ent).
+    adopt(child_button)
+  );
 
   container.adopt(row);
+
+  new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent'+new_child_id, 'user'+new_child_id, {defaultText:'$user_text'})
+  new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent'+new_child_id, 'group'+new_child_id, {defaultText:'$user_text'})
 
   window.document.f_entity.nb_child.value ++;
 }

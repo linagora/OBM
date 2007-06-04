@@ -16,16 +16,23 @@
 function display_page(&$display) {
   global $output_target, $ico_nav_close;
   global $ico_nav_open, $l_hide, $l_show;
+  global $l_print, $l_cancel;
 
   // If print activated, display only the detail
   if ($output_target == "print") {
     echo $display["head"] . "
       <!-- left panel -->
-      <div  id=\"portlets\">
+      <div id=\"portletsPanel\">
+        <div  id=\"portlets\">
 " .
-      $display["features"] ."
+        $display["features"] ."
+        <form name=\"f_print\">
+          <input type=\"button\" value=\"$l_print\" onClick=\"window.print()\" />
+          <input type=\"button\" value=\"$l_cancel\" onClick=\"window.close()\" />
+        </form>
+        </div>
       </div>
-      <div id=\"mainPanel\"
+      <div id=\"mainPanel\">
       
 " .
       $display["title"] .
@@ -112,10 +119,10 @@ function display_page(&$display) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu($module) {
   global $path, $obm, $display, $obm_version, $cgp_show,$set_lang;
-  global $l_logout, $l_profile,$ico_logout,$modules,$ico_login, $ico_obm,$ico_print;
+  global $l_logout, $l_profile,$ico_logout,$modules,$ico_login, $ico_obm, $ico_print;
   global $ico_scope, $l_scope_update;
 
-  $uid = $obm["uid"];
+  $obm["uid"];
   $login = $obm["login"];
   $profil = $obm["profile"];
   $domain = $obm["domain_label"];
@@ -130,7 +137,9 @@ function display_menu($module) {
     $dis_scope = "<li><a href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
   }
   if ($display["print_url"] != "") {
-    $dis_printer = "<li><a target=\"top\" href=\"".$display["print_url"]."&amp;output_target=print\"><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
+//    $dis_printer = "<li><a target=\"top\" href=\"".$display["print_url"]."&amp;output_target=print\"><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
+    $url = $display["print_url"]."&amp;output_target=print";
+    $dis_printer = "<li><a href=\"#\" onclick=\"popup('$url');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
   }
   $block = "
 <!-- Bandeau -->
@@ -295,12 +304,18 @@ function display_head_theme($p_module) {
   global $ico_datepicker,$set_date_upd,$l_monthsofyear,$l_daysofweekfirst;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
-  global $css_print_obm, $ico_delete,$cda_upd_dmy;
+  global $css_print_obm, $ico_delete, $cda_upd_dmy, $output_target;
 
   if($set_date_upd == $cda_upd_dmy) {
     $date_upd_format = "fr";
   } else {
     $date_upd_format = "us";
+  }
+
+  $css = $css_obm;
+
+  if ($output_target == "print") {
+   $css = $css_print_obm;
   }
 
   $monthShort =  phpArrayToJsArray($l_monthsofyearshort);
@@ -331,8 +346,7 @@ function display_head_theme($p_module) {
 <head>
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
   <title>$l_obm_title - $p_module</title>
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_obm\" />
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_print_obm\" media=\"print\" />
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css\" />
   $dis_extra_css
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>

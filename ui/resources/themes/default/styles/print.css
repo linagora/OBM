@@ -3,12 +3,16 @@
 //     - Desc : CSS style file                                               //
 // 2006-11-27 Mehdi Rande                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id$
+// $Id: style.css 1813 2007-05-29 17:40:14Z mehdi $
 ///////////////////////////////////////////////////////////////////////////////
 
 /* ------------------------------------------------------------------------- */
 /* Global display layout */
 /* ------------------------------------------------------------------------- */
+
+html {
+  width: 24cm;
+}
 
 body {
   background-color: #ffffff;
@@ -1208,10 +1212,9 @@ table.planning thead th {
 
 /* Form */
 .organizational_chart_node {
-  width: 20em;
+  width: 25em;
   margin-top: 10px;
   padding: 2px;
-  clear: left;
 }
 
 .organizational_chart_entities {
@@ -1229,7 +1232,7 @@ table.planning thead th {
 
 .organizational_chart_wrap {
   background-image: url('../images/hatch.gif');
-  width: 20em;
+  width: 24em;
   border: 1px solid #ABABAB;
   background-color: #D2D2D2;
   margin-bottom: 10px;

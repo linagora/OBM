@@ -63,6 +63,8 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
   global $action;
   global $output_target;
 
+  $output_target = $calendar["output_target"];
+
   // If come from view (eg: month), keep view for links else set to week
   if ( ($action == "view_day") || ($action == "view_week")
     || ($action == "view_month") || ($action == "view_year")
@@ -91,7 +93,7 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
   global $ico_user, $ico_resource;
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
   global $l_calendar_displayed, $l_resource_displayed,$c_all;
-  global $action,$ico_delete;
+  global $action,$ico_delete,$output_target;
 
   // Legend
   $iso_date = $calendar["date"];
@@ -108,10 +110,12 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
         $data_id = "data-$type-$id";        
         $dis_legend .= "
           <li class=\"".$data["class"]."\"><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
-          <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />
-          <input type=\"image\" src=\"$ico_delete\" 
-          onclick=\"\$('$data_id').remove(); this.form.submit();\" />
-          &nbsp;".$data["name"]."
+          <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
+        if ($output_target != "print") {
+          $dis_legend .= "<input type=\"image\" src=\"$ico_delete\"
+          onclick=\"\$('$data_id').remove(); this.form.submit();\" />";
+        }
+        $dis_legend .= " &nbsp;".$data["name"]."
           </li>";
       }
     }
@@ -1149,6 +1153,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   global $obm, $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting;
   global $l_user, $l_resource, $l_task, $l_private;
+  global $output_target;
 
   $event = $occurrence->event;
   $owner = $event->owner;
@@ -1158,6 +1163,11 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $ed[] = "updatable:true";
   }
   
+  if ($output_target == "print") {
+    $updatable =  false;
+    $ed[] = "updatable:false";
+  }
+
   $attendee = $event->attendee;
   if ($event->privacy == 1 && !($updatable || in_array($obm["uid"],$attendee["user"]))) {
     $title = phpStringToJsString($l_private);
