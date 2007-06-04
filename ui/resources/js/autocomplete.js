@@ -138,6 +138,17 @@ obm.AutoComplete.Search = new Class({
       this.validateResultValue = this.setResultValue;
       this.resetFunc = this.monoModeReset;
       this.textChangedFunc = function() { this.unvalidateSelection(); this.resetResultBox(); };
+      this.updateBtn = new Element('a').adopt(
+                                         new Element('img')
+                                           .setProperty('src',obm.vars.images.update)
+                                       ).addEvent('mousedown',
+                                         function(){
+                                           this.inputField.focus();
+                                           this.inputField.removeClass('validated');
+                                           this.inputField.removeProperty('readonly');
+                                           this.updateBtn.remove();
+                                         }.bind(this)
+                                       );
     } else {
       this.validateResultValue = this.addResultValue;
       this.resetFunc = this.reset;
@@ -524,9 +535,10 @@ obm.AutoComplete.Search = new Class({
 
   // reset input and result box
   reset: function() {
-    this.inputField.value = this.options.fieldText;
+    this.inputField.setProperty('value', this.options.fieldText);
     this.currentValue = this.inputField.value;
     this.inputField.addClass('downlight');
+    this.requestId++; // invalidate latest request
     this.totalNbr = 0;
     this.resetResultBox();
   },
@@ -550,20 +562,29 @@ obm.AutoComplete.Search = new Class({
     this.selectedBox.value = item_id.substr(('item_').length,item_id.length);
     this.currentValue = $(item_id+'_label').innerHTML;
     this.inputField.value = this.currentValue;
-    this.inputField.setStyle('background-color', '#ffffcc');
     this.resetResultBox();
+    if (this.selectedBox.value != '') {
+      this.displayAsValidated();
+    }
+  },
+
+  // change the display of the field when focus is lost and the selection is validated
+  displayAsValidated: function() {
+    this.inputField.addClass('validated');
+    this.inputField.setProperty('readonly','readonly');
+    this.updateBtn.injectBefore(this.inputField);
   },
 
   // unvalidate the current validated element
   unvalidateSelection: function() {
     this.selectedBox.value = '';
-    this.inputField.setStyle('background-color', '#ffffff');
   },
 
   // reset input and result box
   monoModeReset: function() {
     if (this.selectedBox.value != '' && this.currentValue == this.inputField.value) {
       this.resetResultBox();
+      this.displayAsValidated();
     } else {
       this.unvalidateSelection();
       this.reset();
