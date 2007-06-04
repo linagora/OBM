@@ -51,8 +51,13 @@ function add_entity(level) {
   var container = get_elem(target, level);
   var num_child = (new_child_id.replace(/[0-9]/g, '').length)%7;
 
-  var wrap = new Element('div').addClass('organizational_chart_wrap color'+num_child);
-  var row = new Element('div').addClass('new_level organizational_chart_block').setProperty('id', new_child_id);
+  var row = new Element('div').
+    addClass('organizational_chart_node').
+    setProperty('id', new_child_id).
+    setStyle('margin-left', '3em');
+
+  var wrap = new Element('div').
+    addClass('organizational_chart_wrap color'+num_child);
 
   // Delete button
   var delete_button = new Element('a').addEvent('click', function() {
@@ -60,12 +65,16 @@ function add_entity(level) {
   }).setStyle('float','right').adopt(new Element('img').setProperty('src', '$ico_delete'));
 
   // Add user
-  var user_input = new Element('input').setProperties({'type':'text','id':'user'+new_child_id, 'name':'', 'value':'', 'autocomplete':'off'});
-  var ico_user = new Element('img').setProperty('src', '$ico_user');
+  var user_input = new Element('input').
+    setProperties({'type':'text','id':'user'+new_child_id, 'name':'', 'value':'', 'autocomplete':'off'});
+  var ico_user = new Element('img').
+    setProperty('src', '$ico_user');
 
   // Add group
-  var group_input = new Element('input').setProperties({'type':'text','id':'group'+new_child_id, 'name':'', 'value':'', 'autocomplete':'off'})
-  var ico_group = new Element('img').setProperty('src', '$ico_group');
+  var group_input = new Element('input').
+    setProperties({'type':'text','id':'group'+new_child_id, 'name':'', 'value':'', 'autocomplete':'off'})
+  var ico_group = new Element('img').
+    setProperty('src', '$ico_group');
 
   // Add child button
   var child_button = new Element('a').addEvent('click', function() {
@@ -73,13 +82,16 @@ function add_entity(level) {
   }).setStyle('float','right').adopt(new Element('img').setProperty('src', '$ico_add'));
 
   // child name text field
-  var child_name = new Element('input').setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'size':'24', 'maxlength':'16', 'value':''});
+  var child_name = new Element('input').
+    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'size':'24', 'maxlength':'16', 'value':''});
 
   // parent id hidden 
-  var parent_id = new Element('input').setProperties({'type':'hidden', 'name':'tf_parent_level['+new_child_id+']', 'value':level});
+  var parent_id = new Element('input').
+    setProperties({'type':'hidden', 'name':'tf_parent_level['+new_child_id+']', 'value':level});
  
   // entity div
-  var sel_ent = new Element('div').addClass('organizational_chart_entities').setProperty('id', 'sel_ent'+new_child_id);
+  var sel_ent = new Element('div').
+    setProperty('id', 'sel_ent'+new_child_id);
 
   row.adopt(wrap.
     adopt(delete_button).

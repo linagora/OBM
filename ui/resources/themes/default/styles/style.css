@@ -1214,23 +1214,9 @@ table.planning thead th {
 
 /* Form */
 .organizational_chart_node {
-  width: 20em;
-  margin-top: 10px;
+  width: 30em;
   padding: 2px;
-  clear: left;
-}
-
-.organizational_chart_entities {
-  width: 15em;
-}
-
-.organizational_chart_entities .elementRow{
-  background: inherit;
-  font-weight: bold;
-}
-
-.new_level {
-  margin-left: 30px;
+  float: left;
 }
 
 .organizational_chart_wrap {
@@ -1239,8 +1225,13 @@ table.planning thead th {
   border: 1px solid #ABABAB;
   background-color: #D2D2D2;
   margin-bottom: 10px;
-  float : left;
-  padding: 6px 2px;
+  float: left;
+  padding: 6px;
+}
+
+.elementRow{
+  background: inherit;
+  font-weight: bold;
 }
 
 .color1 {
@@ -1373,3 +1364,4 @@ table.planning thead th {
   font-size: 1px;
   background-color: #646567;
 }
+

@@ -228,7 +228,7 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
           <br/>
           <img src=\"$ico_group\" /><input type=\"text\" name=\"\" value=\"\" id=\"group1\" autocomplete=\"off\" />
           <input type=\"hidden\" name=\"nb_child\" id=\"nb_child\" value=\"1\" />
-          <div class=\"organizational_chart_entities\" id=\"sel_ent1\">
+          <div id=\"sel_ent1\">
             <!-- Entities -->
           </div>
           <a href=\"javascript: add_entity('1');\"><img src=\"$ico_add\" alt=\"[Add]\" style=\"float: right;\" /> </a>
@@ -654,7 +654,7 @@ function draw_form($node_q) {
       <img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user$level\" autocomplete=\"off\" />
       <br />
       <img src=\"$ico_group\" /><input type=\"text\" name=\"\" value=\"\" id=\"group$level\" autocomplete=\"off\" />
-      <div class=\"organizational_chart_entities\" id=\"sel_ent$level\">
+      <div id=\"sel_ent$level\">
         <!-- Entities -->
         $block_detail_entities
       </div>
