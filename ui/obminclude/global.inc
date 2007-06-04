@@ -113,6 +113,9 @@ $ccontact_private_default = false;
 // Calendar : show public groups
 $ccalendar_public_groups = true;
 // Calendar : First day of the week
+
+
+
 $phpversion = substr(phpversion(),0,1);
 if ($phpversion >= 5) {
   $ccalendar_weekstart = 'monday';
@@ -129,14 +132,13 @@ $ccalendar_last_hour = 20;
 // Calendar Resource usage
 $ccalendar_resource = true;
 
+
 // Time : In how many parts we split up a day (Time management)
 $c_day_fraction = 8;
 
 // Time : Worked days in a week (start at sunday)
 $c_working_days = array(0,1,1,1,1,1,0);
 
-// Time : Day beginning a week (0=Sunday, 1=Monday,...)
-$c_week_first_day = 1;
 
 // Incident : Generic E-mail for Incident module
 $cmail_incident = '';
@@ -352,6 +354,8 @@ $cmd_ldap_passwd = "../$path/auto/ldapChangePasswd.pl";
 
 $section = $cgp_show['module'][$module];
 
+// Time : Day beginning a week (0=Sunday, 1=Monday,...)
+$c_week_first_day = date('w', strtotime($ccalendar_weekstart));
 //-----------------------------//
 // Calculated Enabled services //
 //-----------------------------//

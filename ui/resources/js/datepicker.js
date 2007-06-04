@@ -128,12 +128,13 @@ function refreshDatePicker(dateField, year, month, day)
   
   var labels = new Element('tr');
   for(i = 0; i < obm.vars.labels.dayShort.length; i++) {
-    new Element('td').appendText(obm.vars.labels.dayShort[i]).injectInside(labels);
+    j = (i + obm.vars.consts.weekStart) % 7;
+    new Element('td').appendText(obm.vars.labels.dayShort[j]).injectInside(labels);
   }
   var content = new Element('tbody');
   var line = new Element('tr').injectInside(content);
 
-  for (i = 0; i < thisDay.getDay(); i++) {
+  for (i = obm.vars.consts.weekStart; i != thisDay.getDay(); i = (i+1)%7) {
     new Element('td').addClass('downlight').injectInside(line);
   }
   
@@ -149,17 +150,16 @@ function refreshDatePicker(dateField, year, month, day)
     }
     td.addEvent("mouseover",function () {this.className='hover';});
     td.appendText(dayNum).injectInside(line);
-    if (thisDay.getDay() == 6) {
+    if (thisDay.getDay() == ((obm.vars.consts.weekStart + 6) %7)) {
       var line = new Element('tr').injectInside(content);
     }
     thisDay.setDate(thisDay.getDate() + 1);
   } while (thisDay.getDate() > 1)
 
-  if (thisDay.getDay() > 0) {
-    for (i = 7; i > thisDay.getDay(); i--) {
-      new Element('td').addClass('downlight')
-                       .injectInside(line);
-    }
+  while ((thisDay.getDay()) != obm.vars.consts.weekStart) {
+    thisDay.setDate(thisDay.getDate() + 1);
+    new Element('td').addClassName('downlight')
+                     .injectInside(line);
   }
 
   var today = new Element('a').setProperty('href','javascript:void(0)')

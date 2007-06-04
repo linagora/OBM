@@ -293,7 +293,7 @@ function display_actions_theme($section, $module) {
 function display_head_theme($p_module) { 
   global $l_obm_title, $extra_css, $extra_js, $extra_js_include,$ico_minus;
   global $ico_datepicker,$set_date_upd,$l_monthsofyear,$l_daysofweekfirst;
-  global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus;
+  global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
   global $css_print_obm, $ico_delete,$cda_upd_dmy;
 
@@ -350,6 +350,7 @@ function display_head_theme($p_module) {
   obm.vars.regexp.dateFormat = '$date_upd_format';
   obm.vars.consts.popupHeight = '$popup_height';
   obm.vars.consts.popupWidth = '$popup_width';
+  obm.vars.consts.weekStart = $c_week_first_day;
   obm.vars.labels.monthsShort = $monthShort;
   obm.vars.labels.months = $monthLong;
   obm.vars.labels.dayShort = $daysShort;
