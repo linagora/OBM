@@ -1361,8 +1361,8 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
                </ul>
               </div>";            
             $line[$line_id] .= "<td class=\"".$properties["class"]."\"
-               onmouseover=\"toggleInfo(this,'$id-$this_day'); return true;\"
-               onmouseout=\"toggleInfo(this,'$id-$this_day'); return true;\"></td>";
+               onmouseover=\"toggleInfo(this,'$id-$this_day',1); return true;\"
+               onmouseout=\"toggleInfo(this,'$id-$this_day',0); return true;\"></td>";
           } else {
             $line[$line_id] .= "<td></td>";
           }
@@ -1401,14 +1401,14 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
   $d_l
   </table>
   <script type=\"text/javascript\">
-    function toggleInfo(container,id) {
+    function toggleInfo(container,id,display) {
       var resource = \$(id);
       var container = \$(container);
       if(resource) {
-        if(resource.getStyle('display') == 'block') {
+        if(display == 0) {
           resource.setStyle('display','none');       
         } else {
-          resource.setStyle('left',(container.getLeft()+container.offsetWidth)+'px')   
+          resource.setStyle('left',container.getLeft()+'px')   
           resource.setStyle('top',(container.getTop()+container.offsetHeight)+'px')   
           resource.setStyle('display','block');
         }
@@ -3045,8 +3045,8 @@ function dis_calendar_free_interval($calendar, $entity_store) {
         } elseif ($will_have_event) {
           if($have_resource_grp) {
             $week_cal .= "<td class=\"free\" onclick=\"window.location='$goto'\"
-             onmouseover=\"this.className='hover';this.style.cursor = 'pointer';toggleResource(this,'$current_time');\"
-             onmouseout=\"this.className ='free';toggleResource(this,'$current_time');\">&nbsp;</td>\n";
+             onmouseover=\"this.className='hover';this.style.cursor = 'pointer';toggleResource(this,'$current_time',1);\"
+             onmouseout=\"this.className ='free';toggleResource(this,'$current_time',0);\">&nbsp;</td>\n";
           } else {
             $week_cal .= "<td class=\"free\" onclick=\"window.location='$goto'\"
              onmouseover=\"this.className='hover';this.style.cursor = 'pointer';\"
@@ -3055,8 +3055,8 @@ function dis_calendar_free_interval($calendar, $entity_store) {
         } else {
           if($have_resource_grp) {
             $week_cal .= "<td  onclick=\"window.location='$goto'\"
-             onmouseover=\"this.className='hover';this.style.cursor = 'pointer';toggleResource(this,'$current_time');\"
-             onmouseout=\"this.className='';toggleResource(this,'$current_time');\">&nbsp;</td>\n";
+             onmouseover=\"this.className='hover';this.style.cursor = 'pointer';toggleResource(this,'$current_time',1);\"
+             onmouseout=\"this.className='';toggleResource(this,'$current_time',0);\">&nbsp;</td>\n";
           } else {
             $week_cal .= "<td onclick=\"window.location='$goto'\"
              onmouseover=\"this.className='hover';this.style.cursor = 'pointer';\"
@@ -3086,14 +3086,14 @@ function dis_calendar_free_interval($calendar, $entity_store) {
     </tbody>
   </table>
   <script type=\"text/javascript\">
-    function toggleResource(container,time) {
+    function toggleResource(container,time,display) {
       resource = \$('resource-'+time);
       container = \$(container);
       if(resource) 
-        if(resource.getStyle('display') == 'block')
+        if(display == 0)
           resource.setStyle('display','none');
         else {
-          resource.setStyle('left',(container.getLeft()+container.offsetWidth)+'px')   
+          resource.setStyle('left',container.getLeft()+'px')   
           resource.setStyle('top',(container.getTop()+container.offsetHeight)+'px')
           resource.setStyle('display','block');
         } 
