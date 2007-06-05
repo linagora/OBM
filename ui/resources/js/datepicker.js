@@ -158,7 +158,7 @@ function refreshDatePicker(dateField, year, month, day)
 
   while ((thisDay.getDay()) != obm.vars.consts.weekStart) {
     thisDay.setDate(thisDay.getDate() + 1);
-    new Element('td').addClassName('downlight')
+    new Element('td').addClass('downlight')
                      .injectInside(line);
   }
 

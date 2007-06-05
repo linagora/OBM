@@ -717,7 +717,7 @@ function get_calendar_action() {
   // View Month
   $actions["calendar"]["view_month"] = array (
     'Name'     => $l_header_month,
-    'Url'      => "$path/calendar/calendar_index.php?action=view_month&amp;date",
+    'Url'      => "$path/calendar/calendar_index.php?action=view_month&amp;date=$date",
     'Right'    => $cright_read,
     'Condition'=> array ('all')
                                     	    );

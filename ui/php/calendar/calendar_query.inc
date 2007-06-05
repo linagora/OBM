@@ -2039,7 +2039,7 @@ function get_calendar_week_num($date) {
   global $ccalendar_weekstart;
 
   $num = date('w', strtotime($ccalendar_weekstart));
-  $delta_thursday = date("w",strtotime("-$num days",strtotime("thursday")))-date("w",strtotime("-$num days",$data));
+  $delta_thursday = date("w",strtotime("-$num days",strtotime("thursday")))-date("w",strtotime("-$num days",$date));
   $week_num = date("W",strtotime("$delta_thursday days",$date));
   return $week_num;
 }
