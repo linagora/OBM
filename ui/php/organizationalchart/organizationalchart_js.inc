@@ -26,11 +26,11 @@ function check_form(form) {
   }
 
   // MANDATORY : Check that all ogroup name is not empty
-  forms = document.forms[\"f_entity\"].elements;
   var reg = new RegExp(\"tf_ogroup\", \"g\");
-  for(var elem in forms) {
-    name = new String(forms[elem].name);
-    if (name.match(reg) && forms[elem].value == \"\") {
+  var elems = \$ES('.mandatory', 'mainContent')
+  for(i=0;i<elems.length;i++) {
+    node_name = elems[i].value;      
+    if (node_name == \"\") {
       alert('$l_fill_ogroup_name');
       return false;
     }
@@ -47,9 +47,8 @@ function add_entity(level) {
 
   var child = window.document.f_entity.nb_child.value;
   var new_child_id = level+'.'+child;
-  var target = window.document;
-  var container = get_elem(target, level);
-  var num_child = (new_child_id.replace(/[0-9]/g, '').length)%7;
+  var container = $(level);
+  var num_color = (new_child_id.replace(/[0-9]/g, '').length)%7;
 
   var row = new Element('div').
     addClass('organizational_chart_node').
@@ -57,7 +56,7 @@ function add_entity(level) {
     setStyle('margin-left', '3em');
 
   var wrap = new Element('div').
-    addClass('organizational_chart_wrap color'+num_child);
+    addClass('organizational_chart_wrap color'+num_color);
 
   // Delete button
   var delete_button = new Element('a').addEvent('click', function() {
@@ -83,7 +82,8 @@ function add_entity(level) {
 
   // child name text field
   var child_name = new Element('input').
-    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'size':'24', 'maxlength':'16', 'value':''});
+    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'size':'24', 'maxlength':'16', 'value':''}).
+    addClass('mandatory');
 
   // parent id hidden 
   var parent_id = new Element('input').
@@ -96,11 +96,11 @@ function add_entity(level) {
   row.adopt(wrap.
     adopt(delete_button).
     adopt(child_name).
+    adopt(child_button).
     adopt(parent_id).
     adopt(new Element('br')).adopt(ico_user).adopt(user_input).
     adopt(new Element('br')).adopt(ico_group).adopt(group_input).
-    adopt(sel_ent).
-    adopt(child_button)
+    adopt(sel_ent)
   );
 
   container.adopt(row);

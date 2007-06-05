@@ -1214,14 +1214,14 @@ table.planning thead th {
 
 /* Form */
 .organizational_chart_node {
-  width: 30em;
+  width: 25em;
   padding: 2px;
   float: left;
 }
 
 .organizational_chart_wrap {
   background-image: url('../images/hatch.gif');
-  width: 20em;
+  width: 21em;
   border: 1px solid #ABABAB;
   background-color: #D2D2D2;
   margin-bottom: 10px;

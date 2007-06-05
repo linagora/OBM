@@ -221,7 +221,7 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     $block_detail = "
       <div id=\"1\" class=\"organizational_chart_node\">
         <div class=\"organizational_chart_wrap\">
-          <input type=\"text\" id=\"tf_ogroup[1]\" name=\"tf_ogroup[1]\" maxlength=\"16\" size=\"24\" value=\"$ogroup\" />
+          <input type=\"text\" class=\"mandatory\" id=\"tf_ogroup[1]\" name=\"tf_ogroup[1]\" maxlength=\"16\" size=\"24\" value=\"$ogroup\" />
           <input type=\"hidden\" id=\"tf_parent_level[1]\" name=\"tf_parent_level[1]\" value=\"0\" />
           <br/>
           <img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user1\" autocomplete=\"off\" />
@@ -627,7 +627,9 @@ function draw_form($node_q) {
   } 
 
   if ($level > 1) {
-    $ico_del_entity = "<a href='javascript: del_entity(\"$level\");'><img src=\"$ico_delete\" style=\"float: right;\"></a>";
+    $ico_del_entity = "<a href='javascript: del_entity(\"$level\");'>
+      <img src=\"$ico_delete\" alt=\"[Delete]\" style=\"float: right;\">
+    </a>";
     $stage = strlen($level) - strlen(str_replace(".", "", $level));  
     $last_stage = strlen($parent_level) - strlen(str_replace(".", "", $parent_level));  
     if ($last_stage < $stage) {
@@ -647,8 +649,11 @@ function draw_form($node_q) {
   $block = "<div id=\"$level\" class=\"organizational_chart_node\" $margin>
     <div class=\"organizational_chart_wrap $color\">
       $ico_del_entity
-      <input type=\"text\" id=\"tf_ogroup[$level]\" name=\"tf_ogroup[$level]\" 
+      <input type=\"text\" class=\"mandatory\" id=\"tf_ogroup[$level]\" name=\"tf_ogroup[$level]\" 
         maxlength=\"32\" size=\"24\" value=\"$node_name\" />
+      <a href=\"javascript: add_entity('$level');\">
+        <img src=\"$ico_add\" alt=\"[Add]\" style=\"float: right;\">
+      </a>
       <input type=\"hidden\" id=\"tf_parent_level[$level]\" name=\"tf_parent_level[$level]\" value=\"$parent_level\" />
       <br />
       <img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user$level\" autocomplete=\"off\" />
@@ -658,16 +663,15 @@ function draw_form($node_q) {
         <!-- Entities -->
         $block_detail_entities
       </div>
-      <a href=\"javascript: add_entity('$level');\"> <img src=\"$ico_add\" alt=\"[Add]\" style=\"float: right;\" /></a>
     </div>
     $block_detail_child
     </div>
-      <script type=\"text/javascript\">
-        obm.initialize.chain(function () {
-          new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'user$level', {defaultText:'$user_text'})
-          new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'group$level', {defaultText:'$user_text'})
-        });
-      </script>
+    <script type=\"text/javascript\">
+      obm.initialize.chain(function () {
+        new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'user$level', {defaultText:'$user_text'})
+        new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'group$level', {defaultText:'$user_text'})
+      });
+    </script>
 ";
 
   return $block;
