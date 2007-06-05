@@ -66,7 +66,7 @@ function run_query_resource_search($resource) {
   }
   
   // If a resource type has been specified, get it
-  if ($rtype != "0") {
+  if (!empty($rtype)) {
      $where .= " AND resource_rtype_id='$rtype'";   
   }
 
