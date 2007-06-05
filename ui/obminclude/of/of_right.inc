@@ -469,6 +469,9 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
     $accept_write = array();
   }
 
+  $accept_write = array_unique($accept_write);
+  $accept_read = array_unique($accept_read);
+
   // Rights on external objects : defined by module access
   // Rights on userobm entity : user need write right on the entity
   // XXXX could be cool to separate "write" and "admin" rights
