@@ -5,8 +5,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.rpc.ServiceException;
@@ -15,16 +13,16 @@ import com.funambol.foundation.pdi.contact.Address;
 import com.funambol.foundation.pdi.contact.BusinessDetail;
 import com.funambol.framework.logging.Sync4jLogger;
 
+import fr.aliacom.obm.AddressBookLocator;
+import fr.aliacom.obm.ebook.AddressBookBindingStub;
+import fr.aliacom.obm.fault.AuthFault;
+import fr.aliacom.obm.fault.ServerFault;
+import fr.aliacom.obm.wcontact.BookSync;
+import fr.aliacom.obm.wcontact.Contact;
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.engine.source.ObmSyncSource;
 import fr.aliasource.funambol.utils.ContactHelper;
 import fr.aliasource.funambol.utils.Helper;
-import fr.aliasource.obm.AddressBookLocator;
-import fr.aliasource.obm.ebook.AddressBookBindingStub;
-import fr.aliasource.obm.fault.AuthFault;
-import fr.aliasource.obm.fault.ServerFault;
-import fr.aliasource.obm.wcontact.BookSync;
-import fr.aliasource.obm.wcontact.Contact;
 
 public class ContactManager extends ObmManager {
 
@@ -40,6 +38,7 @@ public class ContactManager extends ObmManager {
 		AddressBookBindingStub addressBinding = null;
 		try {
 			AddressBookLocator addressbookLocator = new AddressBookLocator();
+			addressbookLocator.setAddressBookEndpointAddress("http://localhost:8080/obm-sync/services/AddressBook");
 			addressBinding = (AddressBookBindingStub)addressbookLocator.getAddressBook();
 			
 		} catch (ServiceException e) {

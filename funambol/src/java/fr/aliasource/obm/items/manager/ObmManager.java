@@ -1,11 +1,10 @@
 package fr.aliasource.obm.items.manager;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import fr.aliacom.obm.wauth.AccessToken;
 import fr.aliasource.funambol.utils.Helper;
-import fr.aliasource.obm.wauth.AccessToken;
 
 public abstract class ObmManager {
 	

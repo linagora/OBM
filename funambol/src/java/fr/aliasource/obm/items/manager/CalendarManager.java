@@ -12,20 +12,17 @@ import javax.xml.rpc.ServiceException;
 
 import com.funambol.framework.logging.Sync4jLogger;
 
+import fr.aliacom.obm.CalendarServiceLocator;
+import fr.aliacom.obm.ecalendar.CalendarBindingStub;
+import fr.aliacom.obm.fault.AuthFault;
+import fr.aliacom.obm.fault.ServerFault;
+import fr.aliacom.obm.wauth.AccessToken;
+import fr.aliacom.obm.wcalendar.CalendarSync;
+import fr.aliacom.obm.wcalendar.Event;
+import fr.aliacom.obm.wcalendar.EventRecurrence;
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.CalendarHelper;
 import fr.aliasource.funambol.utils.Helper;
-import fr.aliasource.obm.CalendarServiceLocator;
-import fr.aliasource.obm.ecalendar.CalendarBindingStub;
-import fr.aliasource.obm.fault.AuthFault;
-import fr.aliasource.obm.fault.ServerFault;
-import fr.aliasource.obm.wauth.AccessToken;
-import fr.aliasource.obm.wcalendar.Attendee;
-import fr.aliasource.obm.wcalendar.CalendarSync;
-import fr.aliasource.obm.wcalendar.Event;
-import fr.aliasource.obm.wcalendar.EventRecurrence;
-import fr.aliasource.obm.wcontact.BookSync;
-import fr.aliasource.obm.wcontact.Contact;
 
 public class CalendarManager extends ObmManager {
 
@@ -42,6 +39,7 @@ public class CalendarManager extends ObmManager {
 		CalendarBindingStub calendarBinding = null;
 		try {
 			CalendarServiceLocator calendarLocator = new CalendarServiceLocator();
+			calendarLocator.setCalendarEndpointAddress("http://localhost:8080/obm-sync/services/Calendar");
 			calendarBinding = (CalendarBindingStub)calendarLocator.getCalendar();
 			
 		} catch (ServiceException e) {

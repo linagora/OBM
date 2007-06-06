@@ -9,7 +9,7 @@ import com.funambol.foundation.pdi.contact.Note;
 import com.funambol.foundation.pdi.contact.Phone;
 import com.funambol.foundation.pdi.contact.Title;
 
-import fr.aliasource.obm.wcontact.Contact;
+import fr.aliacom.obm.wcontact.Contact;
 
 public class ContactHelper extends Helper {
 

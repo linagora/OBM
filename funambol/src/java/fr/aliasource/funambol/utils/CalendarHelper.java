@@ -3,16 +3,14 @@ package fr.aliasource.funambol.utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
-import com.funambol.foundation.pdi.contact.Note;
 import com.funambol.foundation.pdi.event.RecurrencePattern;
 import com.funambol.foundation.pdi.event.RecurrencePatternException;
 
-import fr.aliasource.obm.wcalendar.Attendee;
-import fr.aliasource.obm.wcalendar.Event;
-import fr.aliasource.obm.wcalendar.EventRecurrence;
+import fr.aliacom.obm.wcalendar.Attendee;
+import fr.aliacom.obm.wcalendar.Event;
+import fr.aliacom.obm.wcalendar.EventRecurrence;
 
 public class CalendarHelper extends Helper {
 
