@@ -1,4 +1,4 @@
-<?html version="1.0" enconding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- $Id: build.xml,v 1.1 2006/01/18 16:04:55 luigiafassina Exp $
 =======================================================
@@ -8,263 +8,174 @@ Build file for funambol-obm module.
 
 <project name="Funambol OBM Connector" default="pack" basedir="..">
 
-    <!-- Pick up the environment variables -->
-    <property environment="ENV"/>
-    <property file="build/build.properties"/>
+  <!-- Pick up the environment variables -->
+  <property environment="ENV"/>
+  <property file="build/build.properties"/>
 
-    <!-- =============================================== -->
-    <!-- Definitions                                     -->
-    <!-- =============================================== -->
-    <property name="dir.lib"             value="lib"               />
-    <property name="dir.src"             value="src"               />
-    <property name="dir.src.sql"         value="src/sql"           />
-    <property name="dir.src.java"        value="src/java"          />
-    <property name="dir.src.bean"        value="src/bean"          />
-    <property name="dir.src.manifest"    value="src/manifest"      />
-    <property name="dir.src.properties"  value="src/properties"    />
-    <property name="dir.src.sql"         value="src/sql"           />
-    <property name="dir.src.xml"         value="src/xml"           />
-    <property name="dir.output"          value="output"            />
-    <property name="dir.output.javadoc"  value="output/javadoc"    />
-    <property name="dir.output.classes"  value="output/classes"    />
-    <property name="file.jar.config"     value="config.jar"        />
-    <property name="funambol-obm.version"	value="${funambol-obm.release.major}.${funambol-obm.release.minor}.${funambol-obm.build.number}"/>
-    <property name="module.name"         value="obm-${funambol-obm.version}"/>
+  <!-- =============================================== -->
+  <!-- Definitions                                     -->
+  <!-- =============================================== -->
+  <property name="dir.lib"             value="lib"               />
+  <property name="dir.src"             value="src"               />
+  <property name="dir.src.sql"         value="src/sql"           />
+  <property name="dir.src.java"        value="src/java"          />
+  <property name="dir.src.bean"        value="src/bean"          />
+  <property name="dir.src.manifest"    value="src/manifest"      />
+  <property name="dir.src.properties"  value="src/properties"    />
+  <property name="dir.src.sql"         value="src/sql"           />
+  <property name="dir.src.xml"         value="src/xml"           />
+  <property name="dir.output"          value="output"            />
+  <property name="dir.output.javadoc"  value="output/javadoc"    />
+  <property name="dir.output.classes"  value="output/classes"    />
+  <property name="file.jar.config"     value="config.jar"        />
+  <property name="funambol-obm.version"	value="${funambol-obm.release.major}.${funambol-obm.release.minor}.${funambol-obm.build.number}"/>
+  <property name="module.name"         value="obm-${funambol-obm.version}"/>
 
-    <!-- =================================================================== -->
-    <!-- =================================================================== -->
+  <!-- =================================================================== -->
+  <!-- =================================================================== -->
 
-    <!-- =============================================== -->
-    <!-- USAGE                                           -->
-    <!-- =============================================== -->
-        <target name="usage" depends="init">
+  <!-- =============================================== -->
+  <!-- USAGE                                           -->
+  <!-- =============================================== -->
+  <target name="usage" depends="init">
 
-        <echo message=""/>
-        <echo message="${project-name-text} build file"/>
-        <echo message="------------------------------------------------------"/>
-        <echo message=""/>
-        <echo message=" Available targets are :"/>
-        <echo message=""/>
-        <echo message=" usage       --> help on usage"/>
-        <echo message=" build       --> builds the project"/>
-        <echo message=" pack        --> generates binary files"/>
-        <echo message=" clean       --> cleans up the build directory"/>
-        <echo message=" env         --> Displays the current environment"/>
-        <echo message=""/>
+    <echo message=""/>
+    <echo message="${project-name-text} build file"/>
+    <echo message="------------------------------------------------------"/>
+    <echo message=""/>
+    <echo message=" Available targets are :"/>
+    <echo message=""/>
+    <echo message=" usage       --> help on usage"/>
+    <echo message=" build       --> builds the project"/>
+    <echo message=" pack        --> generates binary files"/>
+    <echo message=" clean       --> cleans up the build directory"/>
+    <echo message=" env         --> Displays the current environment"/>
+    <echo message=""/>
 
-    </target>
+  </target>
 
-    <!-- =============================================== -->
-    <!-- ENV                                             -->
-    <!-- =============================================== -->
+  <!-- =============================================== -->
+  <!-- ENV                                             -->
+  <!-- =============================================== -->
 
-    <target name="env">
-         <echoproperties/>
-    </target>
+  <target name="env">
+    <echoproperties/>
+  </target>
 
-	
-	
-    <!-- =================================================================== -->
-    <!-- =================================================================== -->
+  
+  
+  <!-- =================================================================== -->
+  <!-- =================================================================== -->
 
-    <!-- =============================================== -->
-    <!-- INIT                                            -->
-    <!-- =============================================== -->
-    <target name="init">
-		
-    	<!-- ======================== -->
-    	<!-- Classpaths               -->
-    	<!-- ======================== -->
-	    <path id="main.classpath">
-	      <pathelement path="${classpath}"/>
-	      <fileset dir="lib">
-	        <include name="**/*.jar"/>
-	      </fileset>
-	    </path>
-    	
-        <!-- Directory set up -->
+  <!-- =============================================== -->
+  <!-- INIT                                            -->
+  <!-- =============================================== -->
+  <target name="init">
+    
+    <!-- ======================== -->
+    <!-- Classpaths               -->
+    <!-- ======================== -->
+    <path id="main.classpath">
+      <pathelement path="${classpath}"/>
+      <fileset dir="lib">
+	<include name="**/*.jar"/>
+      </fileset>
+    </path>
+    
+    <!-- Directory set up -->
 
-        <mkdir dir="${dir.output.classes}"/>
-    	
-    	<!-- ======================== -->
-    	<!-- Tasks definitions        -->
-    	<!-- ======================== -->
-    	
-    	<!-- axis tasks -->
-    	<taskdef classpathref="main.classpath" name="wsdl2java"  classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask"/>
+    <mkdir dir="${dir.output.classes}"/>
+    
+    <!-- ======================== -->
+    <!-- Tasks definitions        -->
+    <!-- ======================== -->
+    
+    <!-- axis tasks -->
+    <taskdef classpathref="main.classpath" name="wsdl2java"  classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask"/>
 
-    </target>
-	
-	<target name="generate-wsdl" depends="init">
-	    <echo>Replacing @tomcat-url@ by '${tomcat.url}'</echo>
-	    <copy file="wsdl/Obm.wsdl.template" tofile="wsdl/Obm.wsdl"/>
-	    <replace dir="wsdl" token="@tomcat-url@" value="${tomcat.url}">
-	      <include name="*.wsdl"/>
-	    </replace>
-	  </target>
+  </target>
+  
+  <!-- =============================================== -->
+  <!-- BUILD                                           -->
+  <!-- =============================================== -->
+  <target name="build" depends="init">
+    <javac debug             = "on"
+	   deprecation       = "true"
+	   srcdir            = "${dir.src.java}"
+	   destdir           = "${dir.output.classes}"
+	   includeAntRuntime = "no"
+	   source            = "1.4"
+	   includes          = "**/*java">
+      <classpath>
+	<fileset dir="lib">
+	  <include name="**/*.jar"/>
+	</fileset>
+      </classpath>
+    </javac>
+  </target>
 
-	  <target name="wsdl" depends="generate-wsdl">
+  <!-- =============================================== -->
+  <!-- PACK                                            -->
+  <!-- =============================================== -->
+  <target name="pack" depends="build">
+    <property name="dir.module" value="${dir.output}/${module.name}"/>
 
+    <!--
+	Create the package directory structure
+    -->
+    <mkdir dir="${dir.module}/config"/>
+    <mkdir dir="${dir.module}/sql"/>
+    <mkdir dir="${dir.module}/lib"/>
+    <!-- -->
 
-		<wsdl2java 
-			url="wsdl/Obm.wsdl"
-			output="${dir.src.java}"
-			deployscope="application"
-			skeletonDeploy="false"
-			noimports="no"
-			verbose="no"
-			debug="no">
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/method" 
-			package="fr.aliasource.obm"/>
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/contact-binding" 
-			package="fr.aliasource.obm.ebook"/>
-		
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/calendar-binding" 
-			package="fr.aliasource.obm.ecalendar"/>
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/categories-binding" 
-			package="fr.aliasource.obm.ecategory"/>
-		
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/task-binding" 
-			package="fr.aliasource.obm.etask"/>
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/time-binding" 
-			package="fr.aliasource.obm.etime"/>
-			
-		<mapping 
-			namespace="http://obm.aliacom.fr/calendar" 
-			package="fr.aliasource.obm.wcalendar"/>
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/contact" 
-			package="fr.aliasource.obm.wcontact"/>
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/calendar" 
-			package="fr.aliasource.obm.wcalendar"/>
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/category" 
-			package="fr.aliasource.obm.wcategory"/>
-	
-		<mapping 
-			namespace="http://obm.aliacom.fr/task" 
-			package="fr.aliasource.obm.wtask"/>
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/auth" 
-			package="fr.aliasource.obm.wauth"/>
-		
-		<mapping 
-			namespace="http://obm.aliacom.fr/calendar" 
-			package="fr.aliasource.obm.wcalendar"/>
-		
-		<mapping
-			namespace="http://obm.aliacom.fr/fault"
-			package="fr.aliasource.obm.fault"/>
-	    	
-	    </wsdl2java>
+    <copy todir = "${dir.module}/sql" preservelastmodified="true">
+      <fileset dir="${dir.src.sql}/"/>
+    </copy>
 
-	  </target>
+    <copy todir = "${dir.module}/lib" file="lib/obm-sync-client.jar"/>
 
-    <!-- =============================================== -->
-    <!-- BUILD                                           -->
-    <!-- =============================================== -->
-    <target name="build" depends="wsdl">
-        <javac debug             = "on"
-               deprecation       = "true"
-               srcdir            = "${dir.src.java}"
-               destdir           = "${dir.output.classes}"
-               includeAntRuntime = "no"
-               source            = "1.4"
-               includes          = "**/*java">
-            <classpath>
-                <fileset dir="lib">
-                  <include name="**/*.jar"/>
-                </fileset>
-            </classpath>
-        </javac>
-    </target>
+    <!--
+	The classes jar
+    -->
+    <jar jarfile  = "${dir.module}/lib/${module.name}.jar"
+	 compress = "true"
+	 update   = "true"
+	 >
+      <fileset dir="${dir.output.classes}">
+	<include name="**/*.class" />
+      </fileset>
+    </jar>
 
-    <!-- =============================================== -->
-    <!-- PACK                                            -->
-    <!-- =============================================== -->
-    <target name="pack" depends="build">
-        <property name="dir.module" value="${dir.output}/${module.name}"/>
+    <!--
+	The module jar
+    -->
+    <jar jarfile  = "${dir.output}/${module.name}.s4j"
+	 compress = "true"
+	 update   = "true"
+	 >
+      <fileset dir="${dir.module}">
+	<include name="**/*" />
+      </fileset>
+    </jar>
 
-        <!--
-            Create the package directory structure
-        -->
-        <mkdir dir="${dir.module}/config"/>
-        <mkdir dir="${dir.module}/sql"/>
-        <mkdir dir="${dir.module}/lib"/>
-        <!-- -->
+    <antcall target="clean-module">
+      <param name="dir.module" value="${dir.module}"/>
+    </antcall>
 
-        <copy todir = "${dir.module}/sql" preservelastmodified="true">
-            <fileset dir="${dir.src.sql}/"/>
-        </copy>
+  </target>
 
-        <!--
-            The classes jar
-        -->
-        <jar jarfile  = "${dir.module}/lib/${module.name}.jar"
-             compress = "true"
-             update   = "true"
-        >
-            <fileset dir="${dir.output.classes}">
-                <include name="**/*.class" />
-            </fileset>
-        </jar>
+  <!-- =============================================== -->
+  <!-- CLEAN                                           -->
+  <!-- =============================================== -->
+  <target name="clean">
+    <delete dir = "${dir.output}"/>
+  </target>
 
-        <!--
-            The module jar
-        -->
-        <jar jarfile  = "${dir.output}/${module.name}.s4j"
-             compress = "true"
-             update   = "true"
-        >
-            <fileset dir="${dir.module}">
-                <include name="**/*" />
-            </fileset>
-        </jar>
-
-        <antcall target="clean-module">
-          <param name="dir.module" value="${dir.module}"/>
-        </antcall>
-
-        <!-- Zip up source files -->
-        <delete file="${dir.output}/funambol-${module.name}.zip"/>
-        <zip zipfile="${dir.output}/funambol-${module.name}.zip">
-            <zipfileset dir="${basedir}"
-                defaultexcludes="yes"
-                includes="**/*"
-                excludes="output/**,changeslog.txt,**/cvshistory.txt"
-                prefix="${obm.pk.prefix}"/>
-        </zip>
-    </target>
-
-    <!-- =============================================== -->
-    <!-- CLEAN                                           -->
-    <!-- =============================================== -->
-    <target name="clean">
-        <delete dir = "${dir.output}"/>
-    </target>
-
-    <!-- =============================================== -->
-    <!-- CLEAN-MODULE                                    -->
-    <!-- =============================================== -->
-    <target name="clean-module" unless="debug">
-        <echo message="Cleaning ${dir.module}"/>
-        <delete dir = "${dir.module}"/>
-    </target>
+  <!-- =============================================== -->
+  <!-- CLEAN-MODULE                                    -->
+  <!-- =============================================== -->
+  <target name="clean-module" unless="debug">
+    <echo message="Cleaning ${dir.module}"/>
+    <delete dir = "${dir.module}"/>
+  </target>
 </project>
