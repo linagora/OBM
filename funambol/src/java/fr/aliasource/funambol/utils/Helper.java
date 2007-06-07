@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.funambol.foundation.pdi.event.Calendar;
-import com.funambol.foundation.pdi.event.Event;
+import com.funambol.common.pim.calendar.Calendar;
+import com.funambol.common.pim.calendar.Event;
 import com.funambol.framework.engine.SyncItem;
 
 /**

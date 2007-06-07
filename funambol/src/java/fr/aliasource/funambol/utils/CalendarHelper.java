@@ -5,8 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import com.funambol.foundation.pdi.event.RecurrencePattern;
-import com.funambol.foundation.pdi.event.RecurrencePatternException;
+import com.funambol.common.pim.calendar.RecurrencePattern;
+import com.funambol.common.pim.calendar.RecurrencePatternException;
 
 import fr.aliacom.obm.wcalendar.Attendee;
 import fr.aliacom.obm.wcalendar.Event;
@@ -24,7 +24,7 @@ public class CalendarHelper extends Helper {
     private static final byte[] foundationWeekDays = {
     	RecurrencePattern.DAY_OF_WEEK_MONDAY,
     	RecurrencePattern.DAY_OF_WEEK_TUESDAY,
-    	RecurrencePattern.DAY_OF_WEEK_WEDNSDAY,
+    	RecurrencePattern.DAY_OF_WEEK_WEDNESDAY,
     	RecurrencePattern.DAY_OF_WEEK_THURSDAY,
     	RecurrencePattern.DAY_OF_WEEK_FRIDAY,
     	RecurrencePattern.DAY_OF_WEEK_SATURDAY,
@@ -183,7 +183,7 @@ public class CalendarHelper extends Helper {
 			result += RecurrencePattern.DAY_OF_WEEK_TUESDAY;
 			break;
 		case java.util.Calendar.WEDNESDAY:
-			result += RecurrencePattern.DAY_OF_WEEK_WEDNSDAY;
+			result += RecurrencePattern.DAY_OF_WEEK_WEDNESDAY;
 			break;
 		default:
 			break;

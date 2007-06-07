@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 
 import javax.xml.rpc.ServiceException;
 
-import com.funambol.foundation.pdi.contact.Address;
-import com.funambol.foundation.pdi.contact.BusinessDetail;
+import com.funambol.common.pim.contact.Address;
+import com.funambol.common.pim.contact.BusinessDetail;
 import com.funambol.framework.logging.Sync4jLogger;
 
 import fr.aliacom.obm.AddressBookLocator;
@@ -134,7 +134,7 @@ public class ContactManager extends ObmManager {
 		return keys;
 	}
 
-	public com.funambol.foundation.pdi.contact.Contact getItemFromId(String key, String type) 
+	public com.funambol.common.pim.contact.Contact getItemFromId(String key, String type) 
 		throws OBMException {
 		
 		Contact contact = null;
@@ -154,7 +154,7 @@ public class ContactManager extends ObmManager {
 			}
 		}
 		
-		com.funambol.foundation.pdi.contact.Contact ret = obmContactTofoundation(contact, type);
+		com.funambol.common.pim.contact.Contact ret = obmContactTofoundation(contact, type);
 		
 		return ret;
 	}
@@ -172,8 +172,8 @@ public class ContactManager extends ObmManager {
 		}
 	}
 
-	public com.funambol.foundation.pdi.contact.Contact updateItem(String key,
-			com.funambol.foundation.pdi.contact.Contact contact, String type)
+	public com.funambol.common.pim.contact.Contact updateItem(String key,
+			com.funambol.common.pim.contact.Contact contact, String type)
 				throws OBMException {
 		
 		Contact c = null;
@@ -190,8 +190,8 @@ public class ContactManager extends ObmManager {
 		return obmContactTofoundation(c, type);
 	}
 
-	public com.funambol.foundation.pdi.contact.Contact addItem(
-			com.funambol.foundation.pdi.contact.Contact contact, String type) 
+	public com.funambol.common.pim.contact.Contact addItem(
+			com.funambol.common.pim.contact.Contact contact, String type) 
 				throws OBMException {
 		
 		Contact c = null;
@@ -209,7 +209,7 @@ public class ContactManager extends ObmManager {
 		return obmContactTofoundation(c, type);
 	}
 	
-	public String[] getContactTwinKeys(com.funambol.foundation.pdi.contact.Contact contact, String type) 
+	public String[] getContactTwinKeys(com.funambol.common.pim.contact.Contact contact, String type) 
 		throws OBMException {
 		
 		String[] keys = null;
@@ -286,8 +286,8 @@ public class ContactManager extends ObmManager {
 	}
 	
 	
-	private com.funambol.foundation.pdi.contact.Contact obmContactTofoundation(Contact obmcontact, String type) {
-    	com.funambol.foundation.pdi.contact.Contact contact = new com.funambol.foundation.pdi.contact.Contact();
+	private com.funambol.common.pim.contact.Contact obmContactTofoundation(Contact obmcontact, String type) {
+    	com.funambol.common.pim.contact.Contact contact = new com.funambol.common.pim.contact.Contact();
     	
     	contact.setUid(""+obmcontact.getUid());
     	
@@ -349,7 +349,7 @@ public class ContactManager extends ObmManager {
     	return contact;
     }
     
-    private Contact foundationContactToObm(com.funambol.foundation.pdi.contact.Contact foundation, String type) {
+    private Contact foundationContactToObm(com.funambol.common.pim.contact.Contact foundation, String type) {
 
     	Contact contact = new Contact();
     	

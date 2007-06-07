@@ -175,7 +175,7 @@ public class CalendarManager extends ObmManager {
 		return keys;
 	}
 
-	public com.funambol.foundation.pdi.event.Calendar getItemFromId(String key, String type) 
+	public com.funambol.common.pim.calendar.Calendar getItemFromId(String key, String type) 
 		throws OBMException {
 		
 		Event event = null;
@@ -195,7 +195,7 @@ public class CalendarManager extends ObmManager {
 			}
 		}
 		
-		com.funambol.foundation.pdi.event.Calendar ret = obmEventToFoundationCalendar(event, type);
+		com.funambol.common.pim.calendar.Calendar ret = obmEventToFoundationCalendar(event, type);
 		
 		return ret;
 	}
@@ -225,8 +225,8 @@ public class CalendarManager extends ObmManager {
 		}
 	}
 
-	public com.funambol.foundation.pdi.event.Calendar updateItem(String key,
-			com.funambol.foundation.pdi.event.Calendar event, String type)
+	public com.funambol.common.pim.calendar.Calendar updateItem(String key,
+			com.funambol.common.pim.calendar.Calendar event, String type)
 				throws OBMException {
 		
 		Event c = null;
@@ -243,8 +243,8 @@ public class CalendarManager extends ObmManager {
 		return obmEventToFoundationCalendar(c, type);
 	}
 
-	public com.funambol.foundation.pdi.event.Calendar addItem(
-			com.funambol.foundation.pdi.event.Calendar event, String type) 
+	public com.funambol.common.pim.calendar.Calendar addItem(
+			com.funambol.common.pim.calendar.Calendar event, String type) 
 				throws OBMException {
 		
 		String uid = null;
@@ -264,7 +264,7 @@ public class CalendarManager extends ObmManager {
 		return obmEventToFoundationCalendar(evt, type);
 	}
 	
-	public String[] getEventTwinKeys(com.funambol.foundation.pdi.event.Calendar event, String type) 
+	public String[] getEventTwinKeys(com.funambol.common.pim.calendar.Calendar event, String type) 
 		throws OBMException {
 		
 		String[] keys = null;
@@ -345,16 +345,16 @@ public class CalendarManager extends ObmManager {
 	
 	
 	/**
-	 * Convert an OBM event in a calendar of type com.funambol.foundation.pdi.event.Calendar
+	 * Convert an OBM event in a calendar of type com.funambol.common.pim.calendar.Calendar
 	 * 
 	 * @param obmevent
 	 * @param type
 	 * @return
 	 */
-	private com.funambol.foundation.pdi.event.Calendar obmEventToFoundationCalendar(Event obmevent, String type) {
+	private com.funambol.common.pim.calendar.Calendar obmEventToFoundationCalendar(Event obmevent, String type) {
     	
-		com.funambol.foundation.pdi.event.Calendar calendar = new com.funambol.foundation.pdi.event.Calendar();
-    	com.funambol.foundation.pdi.event.Event event = calendar.getEvent();
+		com.funambol.common.pim.calendar.Calendar calendar = new com.funambol.common.pim.calendar.Calendar();
+    	com.funambol.common.pim.calendar.Event event = calendar.getEvent();
     	
     	event.getUid().setPropertyValue(obmevent.getUid());
 /* this.uid = uid;
@@ -391,9 +391,9 @@ public class CalendarManager extends ObmManager {
     	event.getLocation().setPropertyValue( obmevent.getLocation() );
     	
     	if (obmevent.getClassification() == 1) {
-    		event.getClassEvent().setPropertyValue("2"); //olPrivate
+    		event.getAccessClass().setPropertyValue("2"); //olPrivate
     	} else {
-    		event.getClassEvent().setPropertyValue("0"); //olNormal
+    		event.getAccessClass().setPropertyValue("0"); //olNormal
     	}
     	event.setBusyStatus( new Short((short) 2) ); //olBusy
     
@@ -415,16 +415,16 @@ public class CalendarManager extends ObmManager {
     }
     
     /**
-     * Convert a calendar of type com.funambol.foundation.pdi.event.Calendar in an OBM event
+     * Convert a calendar of type com.funambol.common.pim.calendar.Calendar in an OBM event
      * 
      * @param calendar
      * @param type
      * @return
      */
-    private Event foundationCalendarToObmEvent(com.funambol.foundation.pdi.event.Calendar calendar, String type) {
+    private Event foundationCalendarToObmEvent(com.funambol.common.pim.calendar.Calendar calendar, String type) {
 
     	Event event = new Event();
-    	com.funambol.foundation.pdi.event.Event foundation = calendar.getEvent();
+    	com.funambol.common.pim.calendar.Event foundation = calendar.getEvent();
     	
     	
     	if (foundation.getUid() != null && foundation.getUid().getPropertyValueAsString() != "") {
@@ -459,7 +459,7 @@ public class CalendarManager extends ObmManager {
     			foundation.getPriority().getPropertyValueAsString()) );
     	
     	if ( Helper.nullToEmptyString(
-    			foundation.getClassEvent().getPropertyValueAsString()).equals("2") ) {
+    			foundation.getAccessClass().getPropertyValueAsString()).equals("2") ) {
     		event.setClassification(1); //private
     	} else {
     		event.setClassification(0);

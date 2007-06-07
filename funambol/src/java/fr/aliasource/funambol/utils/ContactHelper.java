@@ -2,12 +2,12 @@ package fr.aliasource.funambol.utils;
 
 import java.util.List;
 
-import com.funambol.foundation.pdi.contact.BusinessDetail;
-import com.funambol.foundation.pdi.contact.ContactDetail;
-import com.funambol.foundation.pdi.contact.Email;
-import com.funambol.foundation.pdi.contact.Note;
-import com.funambol.foundation.pdi.contact.Phone;
-import com.funambol.foundation.pdi.contact.Title;
+import com.funambol.common.pim.contact.BusinessDetail;
+import com.funambol.common.pim.contact.ContactDetail;
+import com.funambol.common.pim.contact.Email;
+import com.funambol.common.pim.contact.Note;
+import com.funambol.common.pim.contact.Phone;
+import com.funambol.common.pim.contact.Title;
 
 import fr.aliacom.obm.wcontact.Contact;
 
@@ -141,7 +141,7 @@ public class ContactHelper extends Helper {
 		}
 	}
 	
-	public static void setFoundationNote(com.funambol.foundation.pdi.contact.Contact foundation, String note, String type) {
+	public static void setFoundationNote(com.funambol.common.pim.contact.Contact foundation, String note, String type) {
 		
 		if ( !nullToEmptyString(note).equals("") ) {
 			Note nt = new Note();

@@ -2,21 +2,16 @@ package fr.aliasource.funambol.engine.source;
 
 import java.io.ByteArrayInputStream;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
 
+import com.funambol.common.pim.calendar.Calendar;
 import com.funambol.common.pim.converter.CalendarToIcalendar;
 import com.funambol.common.pim.converter.CalendarToSIFE;
 import com.funambol.common.pim.converter.ConverterException;
 import com.funambol.common.pim.converter.VCalendarConverter;
-import com.funambol.common.pim.calendar.Calendar;
 import com.funambol.common.pim.icalendar.ICalendarParser;
 import com.funambol.common.pim.model.VCalendar;
 import com.funambol.common.pim.sif.SIFCalendarParser;
-//import com.funambol.common.pim.utils.SourceUtils;
+import com.funambol.foundation.exception.EntityException;
 import com.funambol.framework.engine.SyncItem;
 import com.funambol.framework.engine.SyncItemImpl;
 import com.funambol.framework.engine.SyncItemKey;
@@ -28,7 +23,6 @@ import com.funambol.framework.tools.Base64;
 
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.Helper;
-import fr.aliasource.funambol.utils.MD5Helper;
 import fr.aliasource.obm.items.manager.CalendarManager;
 
 public class CalendarSyncSource extends ObmSyncSource {
