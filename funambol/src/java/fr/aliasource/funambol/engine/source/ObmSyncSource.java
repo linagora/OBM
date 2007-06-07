@@ -10,9 +10,11 @@ import java.util.logging.Logger;
 
 import com.funambol.framework.engine.SyncItemKey;
 import com.funambol.framework.engine.source.AbstractSyncSource;
+import com.funambol.framework.engine.source.ContentType;
 import com.funambol.framework.engine.source.SyncContext;
 import com.funambol.framework.engine.source.SyncSource;
 import com.funambol.framework.engine.source.SyncSourceException;
+import com.funambol.framework.engine.source.SyncSourceInfo;
 import com.funambol.framework.logging.Sync4jLogger;
 import com.funambol.framework.security.Sync4jPrincipal;
 import com.funambol.framework.server.Sync4jDevice;
@@ -54,6 +56,27 @@ implements SyncSource, Serializable, LazyInitBean {
 		
     
     }
+    
+    
+    /**
+     * Equivalent of deprecated method
+	 * @return syncsource type
+	 */
+   /* public String getType() {
+    	return getInfo().getSupportedTypes()[0].getType();
+    }*/
+    
+    /**
+     * Equivalent of deprecated method
+     * @param type
+     * @param version
+     */
+    /*public void setType(String type, String version) {
+    	ContentType[] contents = new ContentType[1];
+    	ContentType content = new ContentType(type,version);
+    	contents[0] = content;
+    	setInfo(new SyncSourceInfo(contents, 0));
+    }*/
 
     public boolean isEncode() {
     	return encode;
@@ -72,7 +95,7 @@ implements SyncSource, Serializable, LazyInitBean {
         StringBuffer sb = new StringBuffer(super.toString());
 
         sb.append(" - {name: ").append(getName()     );
-        sb.append(" type: "   ).append(getType()     );
+        sb.append(" type: "   ).append(getType()      );
         sb.append(" uri: "    ).append(getSourceURI());
         sb.append("}"         );
         return sb.toString();
@@ -138,7 +161,7 @@ implements SyncSource, Serializable, LazyInitBean {
     	
 		return syncKeys;
 	}
-/**
+    /**
      * Return the device with the given deviceId
      * @param deviceId String
      * @return Sync4jDevice

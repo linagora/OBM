@@ -9,13 +9,13 @@ import org.xml.sax.SAXException;
 import com.funambol.framework.engine.source.SyncSource;
 import com.funambol.framework.tools.beans.LazyInitBean;
 
-import com.funambol.foundation.pdi.contact.Contact;
-import com.funambol.foundation.pdi.converter.ContactToVcard;
-import com.funambol.foundation.pdi.converter.ContactToXML;
-import com.funambol.foundation.pdi.converter.ConverterException;
-import com.funambol.foundation.pdi.parser.VcardParser;
-import com.funambol.foundation.pdi.parser.XMLContactParser;
-import com.funambol.foundation.pdi.utils.SourceUtils;
+import com.funambol.common.pim.contact.Contact;
+import com.funambol.common.pim.converter.ContactToVcard;
+import com.funambol.common.pim.converter.ContactToSIFC;
+import com.funambol.common.pim.converter.ConverterException;
+import com.funambol.common.pim.sif.SIFCParser;
+import com.funambol.common.pim.vcard.VcardParser;
+//import com.funambol.foundation.pdi.utils.SourceUtils;
 import com.funambol.framework.engine.SyncItem;
 import com.funambol.framework.engine.SyncItemImpl;
 import com.funambol.framework.engine.SyncItemKey;
@@ -280,7 +280,7 @@ public final class ContactSyncSource extends ObmSyncSource
 	
 		String key = syncItemKey.getKeyAsString();
 	
-		com.funambol.foundation.pdi.contact.Contact contact = null;
+		com.funambol.common.pim.contact.Contact contact = null;
 		try {
 			contact = manager.getItemFromId(key, this.getType());
 		} catch (OBMException e) {
@@ -323,7 +323,7 @@ public final class ContactSyncSource extends ObmSyncSource
 
 	private String getXMLFromFoundationContact(Contact contact) {
 		String xml = null;
-	    ContactToXML c2xml = new ContactToXML(deviceTimezone, deviceCharset);
+	    ContactToSIFC c2xml = new ContactToSIFC(deviceTimezone, deviceCharset);
 	    try {
 			xml = c2xml.convert(contact);
 		} catch (ConverterException e) {
@@ -368,12 +368,12 @@ public final class ContactSyncSource extends ObmSyncSource
 		Contact result = new Contact();
 		
 		ByteArrayInputStream buffer = null;
-	    XMLContactParser parser = null;
+	    SIFCParser parser = null;
 	
 	    buffer  = new ByteArrayInputStream(content.getBytes());
 	    if ((content.getBytes()).length > 0) {
 	        try {
-				parser = new XMLContactParser(buffer);
+				parser = new SIFCParser(buffer);
 				result = (Contact) parser.parse();
 			} catch (SAXException e) {
 				log.info(e.getMessage());
@@ -390,7 +390,7 @@ public final class ContactSyncSource extends ObmSyncSource
         VcardParser parser = null;
         Contact contact = null;
 
-        content = SourceUtils.handleLineDelimiting(content);
+        //content = SourceUtils.handleLineDelimiting(content);
 
         try {
             contact = new Contact();

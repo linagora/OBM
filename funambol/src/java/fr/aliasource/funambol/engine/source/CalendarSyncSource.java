@@ -8,13 +8,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import com.funambol.foundation.pdi.converter.CalendarToIcalendar;
-import com.funambol.foundation.pdi.converter.CalendarToXML;
-import com.funambol.foundation.pdi.converter.ConverterException;
-import com.funambol.foundation.pdi.event.Calendar;
-import com.funambol.foundation.pdi.parser.ICalendarParser;
-import com.funambol.foundation.pdi.parser.XMLEventParser;
-import com.funambol.foundation.pdi.utils.SourceUtils;
+import com.funambol.common.pim.converter.CalendarToIcalendar;
+import com.funambol.common.pim.converter.CalendarToSIFE;
+import com.funambol.common.pim.converter.ConverterException;
+import com.funambol.common.pim.converter.VCalendarConverter;
+import com.funambol.common.pim.calendar.Calendar;
+import com.funambol.common.pim.icalendar.ICalendarParser;
+import com.funambol.common.pim.model.VCalendar;
+import com.funambol.common.pim.sif.SIFCalendarParser;
+//import com.funambol.common.pim.utils.SourceUtils;
 import com.funambol.framework.engine.SyncItem;
 import com.funambol.framework.engine.SyncItemImpl;
 import com.funambol.framework.engine.SyncItemKey;
@@ -69,9 +71,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 	                       " , "                              +
 	                       syncItem.getKey().getKeyAsString() +
 	                       ")");
-	    Calendar calendar = getFoundationFromSyncItem(syncItem);
+	    com.funambol.common.pim.calendar.Calendar calendar = getFoundationFromSyncItem(syncItem);
 	    //contact.setUid(null);
-	    Calendar created = null;
+	    com.funambol.common.pim.calendar.Calendar created = null;
 		try {
 			created = manager.addItem(calendar, this.getType());
 		} catch (OBMException e) {
@@ -321,30 +323,34 @@ public class CalendarSyncSource extends ObmSyncSource {
 
        ByteArrayInputStream buffer = null;
        ICalendarParser parser = null;
+       VCalendar vcalendar = null;
        Calendar calendar = null;
 
-       content = SourceUtils.handleLineDelimiting(content);
+      // content = SourceUtils.handleLineDelimiting(content);
 
        try {
-           calendar = new Calendar();
+           vcalendar = new VCalendar();
            buffer = new ByteArrayInputStream(content.getBytes());
            if ((content.getBytes()).length > 0) {
-               parser = new ICalendarParser(buffer, deviceTimezoneDescr, deviceCharset);
-               calendar = (Calendar) parser.iCalendar();
+               parser = new ICalendarParser(buffer, deviceCharset);
+               vcalendar = (VCalendar) parser.ICalendar();
            }
 
        } catch (Exception e) {
-           //throw new EntityException(e.getMessage());
+    	   //throw new EntityException(e.getMessage());
        }
 
-       /**
-        * workaround
-        *
-        */
+       VCalendarConverter vconvert = new VCalendarConverter(deviceTimezone, deviceCharset);
+       try {
+    	   calendar =  vconvert.vcalendar2calendar(vcalendar);
+       } catch (ConverterException e) {
+    	   //throw new EntityException(e.getMessage());
+       }
+       /*
        // convert in to XML
        String xml = this.getXMLFromFoundationCalendar(calendar);
        // get content from XML
-       calendar = this.getFoundationCalendarFromXML(xml);
+       calendar = this.getFoundationCalendarFromXML(xml);*/
 
        return calendar;
 
@@ -363,7 +369,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 
        String xml = null;
        try {
-           CalendarToXML c2xml = new CalendarToXML(deviceTimezone, deviceCharset);
+           CalendarToSIFE c2xml = new CalendarToSIFE(deviceTimezone, deviceCharset);
            xml = c2xml.convert(calendar);
        } catch (ConverterException ex) {
            //throw new EntityException("Error converting calendar in xml", ex);
@@ -389,13 +395,13 @@ public class CalendarSyncSource extends ObmSyncSource {
 	   log.info(content);
 	   
        ByteArrayInputStream buffer = null;
-       XMLEventParser parser       = null;
+       SIFCalendarParser parser       = null;
        Calendar calendar           = null;
        try {
            calendar = new Calendar();
            buffer = new ByteArrayInputStream(content.getBytes());
            if ((content.getBytes()).length > 0) {
-               parser = new XMLEventParser(buffer);
+               parser = new SIFCalendarParser(buffer);
                calendar = parser.parse();
            }
        } catch (Exception e) {
