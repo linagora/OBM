@@ -739,12 +739,12 @@ function run_query_global_update_document($params, $id) {
   $retour = $obm_q->query($query);
 
   // Delete old file
-  if(!run_query_global_remove_document($id)) {
+  if (!run_query_global_remove_document($id)) {
     $err_msg = $l_delete_file_error;
   }
 
   // Insert new file
-  if(!run_query_global_create_document($params)) {
+  if (!run_query_global_create_document($params)) {
     $err_msg = $l_create_file_error;
   }
 }
@@ -754,13 +754,13 @@ function run_query_global_update_document($params, $id) {
 // Get and register the user's todo into session
 // This must be called in an open session (between page_open and page_close )
 ///////////////////////////////////////////////////////////////////////////////
-function global_session_load_user_todos($set_todo="todo_priority") {
+function global_session_load_user_todos($p_todo="todo_priority") {
   global $cdg_sql, $cgp_todo_nb, $todos, $obm;
 
   $uid = $obm["uid"];
 
   $limit = sql_limit($db_type, $cgp_todo_nb, 0);
-  $order = ($set_todo != "" ? $set_todo : "todo_priority");
+  $order = ($p_todo != "" ? $p_todo : "todo_priority");
   if ($order == "todo_priority") {
     $order .= " desc";
   }

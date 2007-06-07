@@ -17,7 +17,7 @@ function html_tools_update_index() {
   global $l_validate, $l_cancel;
 
   // Si une mise a jour est autorisee (non deja en cours)
-  if (check_tools_update_context_ok()) {
+  if (check_tools_update_context_ok($params)) {
     $update_state = get_update_state();
 
     if (! $update_state) {
@@ -73,9 +73,8 @@ function dis_tools_update_detail() {
   global $display, $cgp_show, $profiles, $obm;
   global $l_upd, $l_upd_needed, $l_upd_not_needed, $l_upd_running;
   global $l_upd_run, $l_upd_cancel, $l_created, $l_updated, $l_deleted;
-  global $l_user, $l_group, $l_host, $l_mailshare;
+  global $l_upd_need_domain_update, $l_user, $l_group, $l_host, $l_mailshare;
   global $l_header_tools_upd;
-  global $l_header_tools_upd_admin, $l_header_tools_upd_domain;
   global $l_validate, $l_cancel, $l_error_permission;
 
   // If user has no update realm ! XXXX default to domain ??
@@ -84,7 +83,9 @@ function dis_tools_update_detail() {
     return $block;
   }
 
-  $update_ok = check_tools_update_context_ok();
+  $update_ok = check_tools_update_context_ok($params);
+
+  $has_domain_upd = check_tools_update_domain_updated($obm['domain_id']);
 
   $entities = array('user' => array('UserObm', 'userobm'),
 		    'group' => array('UGroup', 'group'),
@@ -113,9 +114,9 @@ function dis_tools_update_detail() {
 	if ($nb['move'] > 0) {
 	  $has_update = true;
 	}
-	$class_cre = ($nb['created'] > 0 ? " class=\"highlight\"" : "");
-	$class_upd = ($nb['updated'] > 0 ? " class=\"highlight\"" : "");
-	$class_del = ($nb['deleted'] > 0 ? " class=\"highlight\"" : "");
+	$class_cre = ($nb['created'] > 0 ? " class=\"highlight\"" : '');
+	$class_upd = ($nb['updated'] > 0 ? " class=\"highlight\"" : '');
+	$class_del = ($nb['deleted'] > 0 ? " class=\"highlight\"" : '');
 	$dis_row_update .= "
       <tr>
         <td>$dis_entity</td>
@@ -124,19 +125,27 @@ function dis_tools_update_detail() {
         <td$class_del>$nb[deleted]</td>
       </tr>";
       }
-
     }
 
-    if ($has_update) {
+    if (($has_update) || ($has_domain_upd)) {
+      set_update_state();
   
-      // Si une mise a jour est autorisee (non deja en cours)
-      if ($update_ok) {
+      $update_type = 'incremental';
+      if ($has_domain_upd) {
+	$update_type = 'global';
+      }
+
+      // If table Domain has been updated allow only for domain update
+      if (($realm != 'domain') && ($has_domain_upd)) {
+	$dis_button = $l_upd_need_domain_update;
+
+      } else if ($update_ok) {
 	$dis_button = "
         <form method=\"post\" action=\"tools_index.php\">
         <fieldset class=\"buttons\">
         <input type=\"hidden\" name=\"action\" value=\"update_update\" />
         <input type=\"hidden\" name=\"realm\" value=\"$realm\" />
-        <input type=\"hidden\" name=\"update_type\" value=\"incremental\" />
+        <input type=\"hidden\" name=\"update_type\" value=\"$update_type\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_validate\" />
         </fieldset>
         </form>";
@@ -158,6 +167,7 @@ function dis_tools_update_detail() {
       </table>";
 
     } else {
+      set_update_state(0);
       $dis_button = "$l_upd_not_needed";
     }
 

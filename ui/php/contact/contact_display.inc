@@ -1250,7 +1250,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact) {
-  global $set_dsrc,  $ico_company, $l_company,$ico_add,$ico_crow;
+  global $ico_company, $l_company,$ico_add,$ico_crow;
   global $cgp_mailing_default, $ccontact_private_default;
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
@@ -1321,7 +1321,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
 
   // New form and first time
   } elseif ($action == "new") {
-    $dsrc = $set_dsrc;
+    $dsrc = $_SESSION['set_dsrc'];
     $mark = $obm["uid"];
     $date = of_date_upd_format();
     $usercomment = $uid;

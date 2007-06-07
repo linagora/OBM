@@ -282,7 +282,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call
   /////////////////////////////////////////////////////////////////////////////
   function dis_data($dis_data_entity) {
-    global $path, $cgp_hide, $cdg_id, $set_debug, $set_rows;
+    global $path, $cgp_hide, $cdg_id;
 
     $link_ok = $this->display_link;
     $entity = $this->display_entity;
@@ -306,7 +306,7 @@ class OBM_DISPLAY {
 
     // Iteration on each data row of dataset
     while ( ($this->data_set->next_record() )
-            && ( ($cpt < $set_rows) || ( ! $this->data_page) ) ) {
+            && ( ($cpt < $_SESSION['set_rows']) || ( ! $this->data_page) ) ) {
 
       if (function_exists($dis_data_entity)) {
 	$res = $dis_data_entity($this, "row_style", $link_ok);
@@ -320,7 +320,7 @@ class OBM_DISPLAY {
       $block .= "<tr $rowstyle>";
 
       // If debug level Id is set, display the entity id
-      if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
+      if (($_SESSION['set_debug'] > 0) && (($_SESSION['set_debug'] & $cdg_id) == $cdg_id)) {
 	$dg_id = $this->data_set->f("id");
 	$block .= "<td>$dg_id</td>";
       }
@@ -488,7 +488,7 @@ class OBM_DISPLAY {
     function dis_data_index($url, $dis_data_entity) {
     global $path, $params, $ctu_sql_limit;
     global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
-    global $set_rows, $set_rows_default,$module;
+    global $set_rows_default,$module;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
     global $ico_export, $ico_export_all, $ico_begin, $ico_end, $ico_previous, $ico_next;
 
@@ -510,25 +510,25 @@ class OBM_DISPLAY {
       $lpage = $params["page"];
     }
 
-    if ($set_rows < 1) $set_rows = $set_rows_default;
+    if ($_SESSION['set_rows'] < 1) $_SESSION['set_rows'] = $set_rows_default;
     $nb_rows = $this->data_set->num_rows_total();
     // If we delete all contacts of the last page, we must go to $page-1 (list)
     if ($lpage > 1) {
-      if ($nb_rows < (($lpage-1)*$set_rows)+1) {
+      if ($nb_rows < (($lpage-1)*$_SESSION['set_rows'])+1) {
          $lpage-- ;
       }
     }
 
-    $nb_page = floor(($nb_rows-1) / $set_rows) + 1;
-    $first_row = ($lpage - 1) * $set_rows;
+    $nb_page = floor(($nb_rows-1) / $_SESSION['set_rows']) + 1;
+    $first_row = ($lpage - 1) * $_SESSION['set_rows'];
     $start_page =  (floor(($lpage - 1) / $nb_page_dis) * $nb_page_dis) + 1;
     $end_page = $start_page + $nb_page_dis - 1;
     $end_page = min ($end_page, $nb_page); 
 
-    if ($nb_rows < $set_rows) {
+    if ($nb_rows < $_SESSION['set_rows']) {
       $export_rows = $nb_rows;
     } else {
-      $export_rows = $set_rows;
+      $export_rows = $_SESSION['set_rows'];
     }
 
     $export_url = "$path/exportcsv/exportcsv_index.php";
@@ -622,7 +622,7 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
     global $params;
-    global $fieldnames, $cgp_hide, $cdg_id, $set_debug, $l_id;
+    global $fieldnames, $cgp_hide, $cdg_id, $l_id;
     global $ico_arrow_up, $ico_arrow_down, $ico_arrow_off;
 
     // If displayed without links (in popup) add this in url
@@ -639,7 +639,7 @@ class OBM_DISPLAY {
     <tr>";
     
     // If debug level Id is set, display the entity id
-    if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
+    if (($_SESSION['set_debug'] > 0) && (($_SESSION['set_debug'] & $cdg_id) == $cdg_id)) {
       $block .= "<td>$l_id</td>";
     }
 
@@ -706,7 +706,7 @@ class OBM_DISPLAY {
   // for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header_file($sep) {
-    global $cgp_hide, $fieldnames, $cdg_id, $set_debug;
+    global $cgp_hide, $fieldnames, $cdg_id;
 
     $entity = $this->display_entity;
 
@@ -741,7 +741,7 @@ class OBM_DISPLAY {
   //   for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_file($first_row, $nb_rows, $sep, $dis_data_entity) {
-    global $cgp_hide, $cdg_id, $set_debug, $ctu_sql_limit;
+    global $cgp_hide, $cdg_id, $ctu_sql_limit;
 
     $entity = $this->display_entity;
     $this->dis_data_header_file($sep);
@@ -923,7 +923,7 @@ function display_sections($section) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_modules($section, $module) {
-  global  $set_menu, $cme_txt, $cme_ico, $cme_both;
+  global $cme_txt, $cme_ico, $cme_both;
   global $path, $perm, $modules, $cgp_show;
 
   // If a theme specif function is provided
@@ -931,14 +931,11 @@ function display_modules($section, $module) {
     return display_modules_theme($section, $module);
   }
 
-  global  $set_menu, $cme_txt, $cme_ico, $cme_both;
-  global $path, $modules, $perm, $cgp_show;
-
-  if (($set_menu == $cme_ico) || ($set_menu == $cme_both))
+  if (($_SESSION['set_menu'] == $cme_ico) || ($_SESSION['set_menu'] == $cme_both))
     $fico = true;
   else $fico = false;
 
-  if (($set_menu == $cme_txt) || ($set_menu == $cme_both))
+  if (($_SESSION['set_menu'] == $cme_txt) || ($_SESSION['set_menu'] == $cme_both))
     $ftext = true;
   else $ftext = false;
 
@@ -1033,7 +1030,7 @@ function display_actions($section, $module) {
    
   $ret .= "
   </ul>
-  ";
+";
 
   return $ret;
 }
@@ -1045,7 +1042,7 @@ function display_actions($section, $module) {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_last_visited($path="..") {
-  global $path, $cgp_show, $last_v, $l_last_visit;
+  global $path, $cgp_show, $l_last_visit;
 
   // If a theme specif function is provided
   if (function_exists("display_last_visited_theme")) {
@@ -1054,9 +1051,9 @@ function display_last_visited($path="..") {
 
   foreach ($cgp_show["module"] as $module => $val) {
 
-    if (($cgp_show["module"][$module]) && ($last_v[$module]["text"] != "")) {
-      $id = $last_v[$module]["id"];
-      $text = substr($last_v[$module]["text"], 0, 30);
+    if (($cgp_show["module"][$module]) && ($_SESSION['last_v'][$module]["text"] != "")) {
+      $id = $_SESSION['last_v'][$module]["id"];
+      $text = substr($_SESSION['last_v'][$module]["text"], 0, 30);
       $l_ico = "ico_$module";
       global ${$l_ico};
       $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;${module}_id=$id");
@@ -1083,7 +1080,7 @@ function display_last_visited($path="..") {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_todos($path="..") {
-  global $cgp_show, $todos, $l_module_todo;
+  global $cgp_show, $l_module_todo;
 
   if (! $cgp_show["module"]["todo"]) {
     return "";
@@ -1094,11 +1091,11 @@ function display_todos($path="..") {
     return display_todos_theme($path);
   }
 
-  $nb = count($todos);
+  $nb = count($_SESSION['todos']);
 
   for ($i = 1; $i <= $nb; $i++) {
-    $t_id = $todos[$i]["id"];
-    $t_title = $todos[$i]["title"];
+    $t_id = $_SESSION['todos'][$i]["id"];
+    $t_title = $_SESSION['todos'][$i]["title"];
     $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;todo_id=$t_id");
     $todo_title = substr($t_title, 0, 30);
     $block_todo .= "
@@ -1178,7 +1175,7 @@ function display_end() {
 function display_debug() {
   global $l_dg_sql, $l_dg_param, $l_dg_sess,$global_dis_debug_custom;
   global $global_dis_debug_msg, $global_dis_debug_param, $dis_session;
-  global $cdg_param, $cdg_sql, $cdg_sess, $set_debug;
+  global $cdg_param, $cdg_sql, $cdg_sess;
 
   if (debug_level_isset($cdg_sql)) {
     $dis_debug_sql = "
@@ -1197,13 +1194,13 @@ function display_debug() {
       <h1>$l_dg_sess</h1>
       $dis_session";
   }
-  if ($set_debug > 0) {
+  if ($_SESSION['set_debug'] > 0) {
     $dis_debug_custom = "
       <h1>=>$l_dg_custom</h1>
       $global_dis_debug_custom";
   }
   
-  if ($set_debug > 0) {
+  if ($_SESSION['set_debug'] > 0) {
     return "
       <div class=\"debug\">".
       $dis_session_content.

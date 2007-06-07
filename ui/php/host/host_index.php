@@ -48,7 +48,7 @@ page_close();
 if ($action == "ext_get_id") {
   require("host_js.inc");  
   $display["search"] = html_host_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_host_search_list($params);
   } else {
     $display["msg"] = display_info_msg($l_no_display);
@@ -57,7 +57,7 @@ if ($action == "ext_get_id") {
 } else if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_host_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_host_search_list("");
   } else {
     $display["msg"] .= display_ok_msg($l_no_display);
@@ -94,7 +94,7 @@ if ($action == "ext_get_id") {
     if ($hd_confirm == $c_yes) {
       $retour = run_query_host_insert($params);
       if ($retour) {
-	update_update_state();
+	set_update_state();
 	$display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
 	$display["msg"] .= display_err_msg($l_insert_error);
@@ -109,7 +109,7 @@ if ($action == "ext_get_id") {
       } else {
 	$retour = run_query_host_insert($params);
 	if ($retour) {
-	  update_update_state();
+	  set_update_state();
 	  $display["msg"] .= display_ok_msg($l_insert_ok);
 	} else {
 	  $display["msg"] .= display_err_msg($l_insert_error);
@@ -129,7 +129,7 @@ if ($action == "ext_get_id") {
   if (check_host_data_form($params)) {
     $retour = run_query_host_update($params);
     if ($retour) {
-      update_update_state();
+      set_update_state();
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
@@ -140,6 +140,7 @@ if ($action == "ext_get_id") {
     $host_q = run_query_host_detail($params["host_id"]);
     $display["detail"] = html_host_form($action, $host_q, $params, $err["field"]);
   }
+
 } elseif ($action == "showlist") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_host_detail($params["host_id"]);
@@ -148,6 +149,7 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
+
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_host_warn_delete($params["host_id"]);
@@ -156,7 +158,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_host_delete($params["host_id"]);
   if ($retour) {
-    update_update_state();
+    set_update_state();
     $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);

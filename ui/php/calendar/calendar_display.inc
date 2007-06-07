@@ -718,14 +718,14 @@ function dis_calendar_month_planning($calendar, $calendar_entity,$writable_entit
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity) {
   global $path, $ico_next, $ico_previous, $l_previous, $l_next;
-  global $ccalendar_weekstart, $set_cal_interval,$ico_meeting;
+  global $ccalendar_weekstart, $ico_meeting;
   global $ico_resize, $ico_periodic, $ico_meeting;
   global $ccalendar_first_hour, $ccalendar_last_hour;
  
   $ts_date = strtotime($calendar["date"]);
   $category_filter = $calendar["category_filter"];
-  $time_unit = 60 / $set_cal_interval;
-  $time_unit_sec = 3600 / $set_cal_interval;
+  $time_unit = 60 / $_SESSION['set_cal_interval'];
+  $time_unit_sec = 3600 / $_SESSION['set_cal_interval'];
   $week_num = get_calendar_week_num($ts_date);
   $next_week = of_isodate_format(strtotime("+1 week", $ts_date));
   $prev_week = of_isodate_format(strtotime("-1 week", $ts_date));
@@ -760,7 +760,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
   for ($j = $ccalendar_first_hour; $j < $ccalendar_last_hour; $j++) {
     
     $delta = $j - $ccalendar_first_hour;
-    for ($k=0; $k<$set_cal_interval; $k++) {
+    for ($k=0; $k<$_SESSION['set_cal_interval']; $k++) {
       if ($k==0) {
         $week_cal .= "\n<tr><th>".($j).":00</th>";
       } else {
@@ -833,7 +833,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity) {
   global $ico_previous, $ico_next,$ico_resize,$ico_meeting;
-  global $ccalendar_first_hour, $ccalendar_last_hour,$set_cal_interval;
+  global $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting;
   global $l_private, $l_all_day, $l_previous, $l_next;
 
@@ -844,8 +844,8 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
   $tomorrow_date = of_isodate_format(strtotime("+1 day", $ts_date));
   $yesterday_date = of_isodate_format(strtotime("-1 day", $ts_date));
 
-  $time_unit = 60 / $set_cal_interval;
-  $time_unit_sec = 3600 / $set_cal_interval;
+  $time_unit = 60 / $_SESSION['set_cal_interval'];
+  $time_unit_sec = 3600 / $_SESSION['set_cal_interval'];
   $week_num = get_calendar_week_num($ts_date);
 
   $start_time = strtotime("+$ccalendar_first_hour hours",$ts_date);
@@ -863,7 +863,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
 
   // Display Calendar
   for ($i = $ccalendar_first_hour; $i < $ccalendar_last_hour; $i++) {
-    for ($k=0; $k<$set_cal_interval; $k++) {
+    for ($k=0; $k<$_SESSION['set_cal_interval']; $k++) {
       if ($k==0) {
 	$day_cal .= "\n<tr><th>$i:00</th>"; 
       } else {
@@ -1963,7 +1963,7 @@ function dis_calendar_quick_form($calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $res, $groups,$tasks, $cats1) {
   global $obm, $path, $display;
-  global $ccalendar_resource, $ccalendar_weekstart, $set_cal_interval,$ico_project;
+  global $ccalendar_resource, $ccalendar_weekstart, $ico_project;
   global $ico_mini_cal, $ico_add,$ico_delete, $l_items;
   global $ccalendar_first_hour, $ccalendar_last_hour,$ico_project;
   // -- Labels
@@ -1976,7 +1976,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_format,$l_daysofweekshort,$l_task, $l_exception, $l_items;
 
-  $time_unit = 60 / $set_cal_interval;  
+  $time_unit = 60 / $_SESSION['set_cal_interval'];  
   $repeatfrequency = 1;
 
   if ($action == "detailupdate") {
@@ -2712,14 +2712,14 @@ function html_calendar_dis_delete($calendar) {
 //   - $sel_entity_id : array of entity Id ["user"] ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_meeting_form($calendar, $sel_entity_id) {
-  global $display, $path, $set_cal_interval;
+  global $display, $path;
   global $ico_delete, $ico_mini_cal;
   global $ccalendar_resource;
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
   global $l_groups,$l_resources,$l_module_resourcegroup;
 
-  $time_unit = 60 / $set_cal_interval;
+  $time_unit = 60 / $_SESSION['set_cal_interval'];
   $datebegin = of_date_upd_format($calendar["date"]);
   $dis_button = "
      <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
@@ -2932,15 +2932,15 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_free_interval($calendar, $entity_store) {
   global $ico_left_day,$ico_right_day;
-  global $set_cal_interval,$cal_entity_id,$ico_previous,$ico_next;
+  global $cal_entity_id,$ico_previous,$ico_next;
   global $ccalendar_weekstart, $ccalendar_first_hour, $ccalendar_last_hour;
   global $l_private,$l_private_description,$display,$l_free_resources,$l_all_f;
   global $l_previous, $l_next;
 
   $iso_date = $calendar["date"];
   $ts_date = strtotime($iso_date);
-  $time_unit = 60 / $set_cal_interval; 
-  $time_unit_sec = 3600 / $set_cal_interval;; 
+  $time_unit = 60 / $_SESSION['set_cal_interval']; 
+  $time_unit_sec = 3600 / $_SESSION['set_cal_interval'];; 
   $duration = $calendar["meeting_duration"] * 3600;
   $param_duration = $calendar["meeting_duration"];
 
@@ -2976,7 +2976,7 @@ function dis_calendar_free_interval($calendar, $entity_store) {
   /* Events of the week */
   for ($j = $ccalendar_first_hour; $j < $ccalendar_last_hour; $j++) {
     $delta = $j - $ccalendar_first_hour;
-    for ($k=0; $k<$set_cal_interval; $k++) {
+    for ($k=0; $k<$_SESSION['set_cal_interval']; $k++) {
       if ($k==0) {
 	$week_cal .= "\n<tr><th>".($j).":00</td>";
       } else {

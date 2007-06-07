@@ -39,7 +39,7 @@ if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $emodule = $params["module"];
   if ($emodule != "") {
-    require_once("$obminclude/lang/$set_lang/${emodule}.inc");
+    require_once("$obminclude/lang/".$_SESSION['set_lang']."/${emodule}.inc");
     require_once("$path/$emodule/${emodule}_display.inc");
   } else {
     $emodule = "obm";
@@ -52,7 +52,7 @@ if (($action == "index") || ($action == "")) {
   $nb_rows = $params["nb_rows"];
   $query = stripslashes($params["query"]);
 
-  if ($ctu_sql_limit && ($nb_rows > $set_rows)) {
+  if ($ctu_sql_limit && ($nb_rows > $_SESSION['set_rows'])) {
     // We remove the limit clause
     $query = preg_replace("/(limit .*)$/i", "", $query);
   }
@@ -64,12 +64,12 @@ if (($action == "index") || ($action == "")) {
   $obm_q->query($query);
 
   // Set separator (if not set in setting => ;)
-  if (($set_csv_sep != $ccsvd_sc) && ($set_csv_sep != $ccsvd_tab)) {
+  if (($_SESSION['set_csv_sep'] != $ccsvd_sc) && ($_SESSION['set_csv_sep'] != $ccsvd_tab)) {
     $sep = ";";
-  } else if ($set_csv_sep == $ccsvd_tab) {
+  } else if ($_SESSION['set_csv_sep'] == $ccsvd_tab) {
     $sep = "\t";
   } else {
-    $sep = $set_csv_sep;
+    $sep = $_SESSION['set_csv_sep'];
   }
 
   $export_d = new OBM_DISPLAY("DATA", $prefs, $emodule);

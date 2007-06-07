@@ -280,23 +280,23 @@ function get_ip_used($id="") {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Get the Update state (1 update to be done, 0 no changes)
-// Returns:
-//   - $state : 1 : update to be done, 0 no changes
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Get the Update state (1 update to be done, 0 no changes)
+ * return $state : 1 : update to be done, 0 no changes
+ */
 function get_update_state() {
-  global $cdg_sql;
+  global $obm, $cdg_sql;
 
-  $query = "SELECT obminfo_name, obminfo_value
-    FROM ObmInfo
-    WHERE obminfo_name = 'update_state'";
+  $query = "SELECT domainpropertyvalue_value as value
+    FROM DomainPropertyValue
+    WHERE domainpropertyvalue_domain_id='$obm[domain_id]'
+     AND domainpropertyvalue_property_key = 'update_state'";
 
   display_debug_msg($query, $cdg_sql, "get_update_state()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $state = $obm_q->f("obminfo_value");
+  $state = $obm_q->f("value");
 
   if ($state == "1") return "1";
   else return "0";
@@ -304,48 +304,51 @@ function get_update_state() {
 
 
 /**
- * Update : set the update state to true
+ * Update : set the update lock
  */
-function set_update_state() {
+function set_update_lock() {
   global $cdg_sql;
 
   $query = "UPDATE ObmInfo
     SET obminfo_value = '1'
-    WHERE obminfo_name = 'update_state'";
+    WHERE obminfo_name = 'update_lock'";
 
-  display_debug_msg($query, $cdg_sql, "set_update_state()");
+  display_debug_msg($query, $cdg_sql, "set_update_lock()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
 
 
 /**
- * Update : set the update state to true
+ * Update : remove the update lock
  */
-function unset_update_state() {
+function remove_update_lock() {
   global $cdg_sql;
 
   $query = "UPDATE ObmInfo
     SET obminfo_value = '0'
-    WHERE obminfo_name = 'update_state'";
+    WHERE obminfo_name = 'update_lock'";
 
-  display_debug_msg($query, $cdg_sql, "unset_update_state()");
+  display_debug_msg($query, $cdg_sql, "remove_update_lock()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// XXXXXX uniquement pour Affichage du post it ? check dans Updated ?
-///////////////////////////////////////////////////////////////////////////////
-function update_update_state() {
-  global $cdg_sql;
+/**
+ * Update : set the update flag to true to allow display update info
+ *
+ * @param $state : 1 set to true (there are update, else 0)
+ */
+function set_update_state($state=1) {
+  global $obm, $cdg_sql;
 
-  $query = "UPDATE ObmInfo
-    SET obminfo_value = '$state'
-    WHERE obminfo_name = 'update_state'";
+  $query = "UPDATE DomainPropertyValue
+    SET domainpropertyvalue_value = '$state'
+    WHERE domainpropertyvalue_domain_id='$obm[domain_id]'
+      AND domainpropertyvalue_property_key = 'update_state'";
 
-  display_debug_msg($query, $cdg_sql, "update_update_state()");
+  display_debug_msg($query, $cdg_sql, "set_update_state($state)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }

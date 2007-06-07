@@ -38,10 +38,9 @@ To do
 - admin delegue : doc + optimisation (x fois get_group_info()), check_group_update_rights
 - maj : table Updated
 - maj : table Updatedlinks
-- maj : gestion des verrous
 - affichage infos apres validation
-- traiter cas modif samba ou domaine -> --all --domain
-- virer partout les update_update_state, scope
+- traiter cas modif samba  -> --all --domain
+
 
 ARgg : pb avec session_load_user_pref reexecute chaque fois !! cause set_lang
 il faut utilisation de _SESSION[toto] a la place de toto pour chaque pref
@@ -53,11 +52,20 @@ il faut utilisation de _SESSION[toto] a la place de toto pour chaque pref
 <li> BUG#
 <li> Install scripts improvements (database independant)
 <li> Calendar : Home page minicalendar now display events in days
-<li> Lead : add contact to a lead
+<li> Lead : a lead can now have a contact
 <li> Contact : new action ext_get_id to select one contact from other module
 <li> Import : some fixes and enhancements on getting similar company, lang
 <li> Group : separation of Public and Private groups management rights
 <li> Admin : added administration delegation
+<li> Todo : 100% complete todos not displayed in todo reminder list
+<li> Calendar : many small UI enhancements (exceptions, repeat)
+<li> Calendar : display fix for events beginning one month and ending next one
+<li> Calendar : allow category filtering in views
+<li> Calendar : event list view greatly enhanced
+<li> Date : filling date format now configurable (iso, french, english,..)
+<li> Display : many IE6 and IE7 fixes (some checkboxes,...)
+<li> User selection enhancements (now uses Ajax everywhere, no more popup)
+<li> new module : Organizational chart
 </ul>
 
 2007-04-20 : version 2.0.1<br>

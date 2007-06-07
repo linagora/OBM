@@ -13,11 +13,11 @@ if ( (! headers_sent()) && ($params["mode"] != "txt"))
   $sess->setcookie();
 
 // if prefs have not been loaded (we check the var set_lang) - Login Phase
-if (($set_lang == "") && ($params["mode"] != "txt")) {
+if (($_SESSION['set_lang'] == "") && ($params["mode"] != "txt")) {
   // We Load and make session variables from User preferences
   session_load_user_prefs();
   if ($cgp_show["module"]["todo"]) 
-    global_session_load_user_todos($set_todo); 
+    global_session_load_user_todos($_SESSION['set_todo']); 
 
   // We update the last login date for the user
   run_query_userobm_update_lastaccess($obm["uid"]);
@@ -27,7 +27,7 @@ if (($set_lang == "") && ($params["mode"] != "txt")) {
 display_debug_param($params);
 
 // Display session content if debug level is set
-if (($set_debug & $cdg_sess) == $cdg_sess) {
+if (($_SESSION['set_debug'] & $cdg_sess) == $cdg_sess) {
   while (list($key, $val) = each ($_SESSION)) {
     if (is_array($val)) {
       $val = var_export($val, true);
@@ -52,23 +52,23 @@ $set_commentorder_default = $cco_chro;
 $set_debug_default = 0;
 $set_cal_interval_default = 2;
 
-if ($set_lang == "") $set_lang = $set_lang_default;
-if ($set_theme == "") $set_theme = $set_theme_default;
-if ($set_menu == "") $set_menu = $set_menu_default;
-if ($set_display == "") $set_display = $set_display_default;
-if ($set_rows == "") $set_rows = $set_rows_default;
-//if ($set_todo == "") $set_todo = $set_todo_default;
-if($set_date_upd == "") $set_date_upd = $set_date_upd_default;
-if ($set_date == "") $set_date = $set_date_default;
-if ($set_commentorder == "") $set_commentorder = $set_commentorder_default;
-if ($set_debug == "") $set_debug = $set_debug_default;
-if ($set_cal_interval == "") $set_cal_interval = $set_cal_interval_default;
+if ($_SESSION['set_lang'] == '') $_SESSION['set_lang'] = $set_lang_default;
+if ($_SESSION['set_theme'] == '') $_SESSION['set_theme'] = $set_theme_default;
+if ($_SESSION['set_menu'] == '') $_SESSION['set_menu'] = $set_menu_default;
+if ($_SESSION['set_display'] == '') $_SESSION['set_display'] = $set_display_default;
+if ($_SESSION['set_rows'] == '') $_SESSION['set_rows'] = $set_rows_default;
+//if ($_SESSION['set_todo'] == '') $_SESSION['set_todo'] = $set_todo_default;
+if ($_SESSION['set_date_upd'] == '') $_SESSION['set_date_upd'] = $set_date_upd_default;
+if ($_SESSION['set_date'] == '') $_SESSION['set_date'] = $set_date_default;
+if ($_SESSION['set_commentorder'] == '') $_SESSION['set_commentorder'] = $set_commentorder_default;
+if ($_SESSION['set_debug'] == "") $_SESSION['set_debug'] = $set_debug_default;
+if ($_SESSION['set_cal_interval'] == '') $_SESSION['set_cal_interval'] = $set_cal_interval_default;
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Theme.                                           //
 ///////////////////////////////////////////////////////////////////////////////
-$theme_file = "resources/themes/$set_theme/theme.inc";
+$theme_file = 'resources/themes/'.$_SESSION['set_theme'].'/theme.inc';
 if (file_exists("$path/../$theme_file")) {
   include("$theme_file");
 } else {
@@ -80,14 +80,14 @@ if (file_exists("$path/../$theme_file")) {
 // Inclusion of the correct Language File, depending from which module this  //
 // page is called and the selected language.                                 //
 ///////////////////////////////////////////////////////////////////////////////
-$lang_file = "$obminclude/lang/$set_lang/global.inc";
+$lang_file = "$obminclude/lang/".$_SESSION['set_lang'].'/global.inc';
 if (file_exists("$path/../".$lang_file)) {
   include("$lang_file");
 }
 
 // Specific conf global lang file
 if ($conf_lang) {
-  $lang_file = "conf/lang/$set_lang/global.inc";
+  $lang_file = "conf/lang/".$_SESSION['set_lang'].'/global.inc';
   if (file_exists("$path/../".$lang_file)) {
     include("$lang_file");
   }
@@ -96,7 +96,7 @@ if ($conf_lang) {
 // Module lang file
 if ($module != "") {
   $lc_module = strtolower($module);
-  $lang_file = "$obminclude/lang/$set_lang/$lc_module.inc";
+  $lang_file = "$obminclude/lang/".$_SESSION['set_lang']."/$lc_module.inc";
   if (file_exists("$path/../".$lang_file)) {
     include("$lang_file");
   } else {
@@ -108,7 +108,7 @@ if ($module != "") {
 
   // Specific conf module lang file
   if ($conf_lang) {
-    $lang_file = "conf/lang/$set_lang/$lc_module.inc";
+    $lang_file = "conf/lang/".$_SESSION['set_lang']."/$lc_module.inc";
     if (file_exists("$path/../".$lang_file)) {
       include("$lang_file");
     } else {
@@ -124,7 +124,7 @@ if ($module != "") {
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Display file (global display functions)          //
 ///////////////////////////////////////////////////////////////////////////////
-$display_include_file = "resources/themes/$set_theme/display.inc";
+$display_include_file = 'resources/themes/'.$_SESSION['set_theme'].'/display.inc';
 include("$display_include_file");
 
 

@@ -10,6 +10,8 @@
 $l_domain_name = "Nom de domaine";
 $l_alias = "Alias";
 
+$l_update_state = "Etat de mise à jour";
+
 // Actions
 $l_insert = "Insérer le domaine";
 $l_update = "Mettre à jour le domaine";

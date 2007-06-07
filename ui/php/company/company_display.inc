@@ -637,7 +637,7 @@ $block_payment";
 //   - $params[] : company criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_consult($params) {
-  global $path, $display, $obminclude, $set_lang, $l_err_reference;
+  global $path, $display, $obminclude, $l_err_reference;
 
   $cid = $params["company_id"];
 
@@ -651,8 +651,8 @@ function dis_company_consult($params) {
       
       if ($view != "") {
 	global $fieldnames;
-	include("$obminclude/lang/$set_lang/global.inc");
-	include("$obminclude/lang/$set_lang/$view.inc");
+	include("$obminclude/lang/".$_SESSION['set_lang']."/global.inc");
+	include("$obminclude/lang/".$_SESSION['set_lang']."/$view.inc");
 	include("$path/$view/".$view."_display.inc");
 	include("$path/$view/".$view."_query.inc");
 	$ext_func = "ext_dis_${view}_list";
@@ -987,7 +987,7 @@ function dis_company_form($action, $company) {
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company) {
-  global $display, $obm, $cgp_hide, $set_dsrc, $c_undef, $l_undef;
+  global $display, $obm, $cgp_hide, $c_undef, $l_undef;
   global $ico_web,$ico_mail,$ico_add;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
@@ -1030,7 +1030,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     $datecomment = of_date_upd_format();
   } else if ($action == "new") {
     $mark = $obm["uid"];
-    $dsrc = $set_dsrc;
+    $dsrc = $_SESSION['set_dsrc'];
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
   }

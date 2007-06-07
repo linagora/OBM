@@ -33,7 +33,7 @@ page_close();
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_payment_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_payment_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);

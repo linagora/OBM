@@ -39,27 +39,27 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 ///////////////////////////////////////////////////////////////////////////////
 // Company and Contact lang files inclusions
 ///////////////////////////////////////////////////////////////////////////////
-$lang_file = "$obminclude/lang/$set_lang/company.inc";
+$lang_file = "$obminclude/lang/".$_SESSION['set_lang']."/company.inc";
 if (file_exists("$path/../".$lang_file)) {
   include("$lang_file");
 }
 
 // Specific conf company lang file
 if ($conf_lang) {
-  $lang_file = "$obminclude/conf/lang/$set_lang/company.inc";
+  $lang_file = "$obminclude/conf/lang/".$_SESSION['set_lang']."/company.inc";
   if (file_exists("$path/../".$lang_file)) {
     include("$lang_file");
   }
 }
 
-$lang_file = "$obminclude/lang/$set_lang/contact.inc";
+$lang_file = "$obminclude/lang/".$_SESSION['set_lang']."/contact.inc";
 if (file_exists("$path/../".$lang_file)) {
   include("$lang_file");
 }
 
 // Specific conf contact lang file
 if ($conf_lang) {
-  $lang_file = "$obminclude/conf/lang/$set_lang/contact.inc";
+  $lang_file = "$obminclude/conf/lang/".$_SESSION['set_lang']."/contact.inc";
   if (file_exists("$path/../".$lang_file)) {
     include("$lang_file");
   }
@@ -91,7 +91,7 @@ if (! $popup) {
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_import_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_import_search_list("", $popup);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);

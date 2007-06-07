@@ -12,6 +12,43 @@ UPDATE ObmInfo set obminfo_value='2.1' where obminfo_name='db_version';
 
 
 -------------------------------------------------------------------------------
+-- Add domain property tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'DomainProperty'
+--
+CREATE TABLE DomainProperty (
+  domainproperty_key       varchar(255) NOT NULL,
+  domainproperty_type      varchar(32),
+  PRIMARY KEY (domainproperty_key)
+);
+
+--
+-- Table structure for table 'DomainPropertyValue'
+--
+CREATE TABLE DomainPropertyValue (
+  domainpropertyvalue_domain_id    int(8) NOT NULL,
+  domainpropertyvalue_property_key varchar(255)  NOT NULL,
+  domainpropertyvalue_value        varchar(255) NOT NULL,
+  PRIMARY KEY (domainpropertyvalue_domain_id, domainpropertyvalue_property_key)
+);
+
+
+-------------------------------------------------------------------------------
+-- Default Domain properties
+-------------------------------------------------------------------------------
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('update_state','integer');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_users','integer');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_mailshares','integer');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_resources','integer');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('quota_mail','integer');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('delegation','text');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('address1','text');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('address2','text');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('town','text');
+
+
+-------------------------------------------------------------------------------
 -- Update DisplayPref table
 -------------------------------------------------------------------------------
 -- Add Resource Type
@@ -97,25 +134,27 @@ CREATE TABLE Updated (
 -- Table structure for the table 'ResourceType'
 --
 CREATE TABLE ResourceType (
-  resourcetype_id					int(8) auto_increment,
-  resourcetype_domain_id	int(8) DEFAULT 0,	
-  resourcetype_label			varchar(32) NOT NULL,
-  resourcetype_property		varchar(32),
-  resourcetype_pkind				int(1) DEFAULT 0 NOT NULL,
+  resourcetype_id         int(8) auto_increment,
+  resourcetype_domain_id  int(8) DEFAULT 0,	
+  resourcetype_label      varchar(32) NOT NULL,
+  resourcetype_property   varchar(32),
+  resourcetype_pkind      int(1) DEFAULT 0 NOT NULL,
   PRIMARY KEY (resourcetype_id)
 );
+
 
 --
 -- Table structure for the table 'ResourceItem'
 --
 CREATE TABLE ResourceItem (
-  resourceitem_id								int(8) auto_increment,
-  resourceitem_domain_id				int(8) DEFAULT 0,
-  resourceitem_label						varchar(32) NOT NULL,
+  resourceitem_id               int(8) auto_increment,
+  resourceitem_domain_id        int(8) DEFAULT 0,
+  resourceitem_label            varchar(32) NOT NULL,
   resourceitem_resourcetype_id	int(8) NOT NULL,
-  resourceitem_description			text,
+  resourceitem_description      text,
   PRIMARY KEY (resourceitem_id)
 );
+
 
 --
 --

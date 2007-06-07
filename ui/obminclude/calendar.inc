@@ -235,7 +235,7 @@ function calendar(month, year)
     }
 
     // we break up the output so it flushes the buffer frequently
-    output += '<form><table border="0" cellspacing="0" cellpadding="3" width="100%"><tr><td align="left"><img src="<?php echo "".C_IMAGE_PATH."/$set_theme/$ico_mini_larrow";?>" id="arrow_left_id" border="0" usemap="#arrow_left_map"></td><td align="center">';
+    output += '<form><table border="0" cellspacing="0" cellpadding="3" width="100%"><tr><td align="left"><img src="<?php echo "".C_IMAGE_PATH."/".$_SESSION['set_theme']."/$ico_mini_larrow";?>" id="arrow_left_id" border="0" usemap="#arrow_left_map"></td><td align="center">';
 	    tmp_text = "&month=";
 	    output += '<select onchange="window.location=window.location + tmp_text + this.options[this.selectedIndex].value ;" title="Month Jump">';
     for (month_cnt = 0; month_cnt < 12; month_cnt++) {
@@ -257,7 +257,7 @@ function calendar(month, year)
     }
 
     output += '</select></td>';
-output += '<td align="right"><img src="<?php echo "".C_IMAGE_PATH."/$set_theme/$ico_mini_rarrow"; ?>" name="arrow_right_id" id="arrow_right_id" border="0" usemap="#arrow_right_map"></td></tr>\n';
+output += '<td align="right"><img src="<?php echo "".C_IMAGE_PATH."/".$_SESSION['set_theme']."/$ico_mini_rarrow"; ?>" name="arrow_right_id" id="arrow_right_id" border="0" usemap="#arrow_right_map"></td></tr>\n';
     output += '<tr><td colspan="3" valign="top"><table border="0" cellspacing="1" cellpadding="0" width="100%">';
     output += '<tr class="dayofweek" style="background-color: '+calendarColors['headerBgColor']+';">';
     // print out the days of the week
@@ -374,10 +374,10 @@ function animate_right(imagename,imageswitch)
 
     if (!document.layers) {
         if (imageswitch == 1) {
-            imagename.src = <?php echo "\"".C_IMAGE_PATH."/$set_theme/$ico_mini_rarrow2\""; ?>;
+            imagename.src = <?php echo "\"".C_IMAGE_PATH."/".$_SESSION['set_theme']."/$ico_mini_rarrow2\""; ?>;
         }
         else {
-            imagename.src = <?php echo "\"".C_IMAGE_PATH."/$set_theme/$ico_mini_rarrow\""; ?>;
+            imagename.src = <?php echo "\"".C_IMAGE_PATH."/".$_SESSION['set_theme']."/$ico_mini_rarrow\""; ?>;
         }
     }
 }
@@ -395,10 +395,10 @@ function animate_left(imagename,imageswitch)
     }
     if (!document.layers) {  
         if (imageswitch == 1) {
-	imagename.src = <?php echo "\"".C_IMAGE_PATH."/$set_theme/$ico_mini_larrow2\""; ?>;
+	imagename.src = <?php echo "\"".C_IMAGE_PATH."/".$_SESSION['set_theme']."/$ico_mini_larrow2\""; ?>;
         }
         else {
-	imagename.src = <?php echo "\"".C_IMAGE_PATH."/$set_theme/$ico_mini_larrow\""; ?>;
+	imagename.src = <?php echo "\"".C_IMAGE_PATH."/".$_SESSION['set_theme']."/$ico_mini_larrow\""; ?>;
         }
     }
 }

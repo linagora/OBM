@@ -63,7 +63,7 @@ elseif ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_document_search_form($params);
 
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_document_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
@@ -72,7 +72,7 @@ elseif ($action == "ext_get_ids") {
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_document_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_document_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);

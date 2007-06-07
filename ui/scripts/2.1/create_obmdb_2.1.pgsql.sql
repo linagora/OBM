@@ -1629,6 +1629,26 @@ CREATE TABLE Domain (
 );
 
 
+--
+-- Table structure for table 'DomainProperty'
+--
+CREATE TABLE DomainProperty (
+  domainproperty_key       varchar(255) NOT NULL,
+  domainproperty_type      varchar(32),
+  PRIMARY KEY (domainproperty_key)
+);
+
+--
+-- Table structure for table 'DomainPropertyValue'
+--
+CREATE TABLE DomainPropertyValue (
+  domainpropertyvalue_domain_id    integer NOT NULL,
+  domainpropertyvalue_property_key varchar(255) NOT NULL,
+  domainpropertyvalue_value        varchar(255) NOT NULL,
+  PRIMARY KEY (domainpropertyvalue_domain_id, domainpropertyvalue_property_key)
+);
+
+
 -------------------------------------------------------------------------------
 -- OBM-Mail, OBM-LDAP tables
 -------------------------------------------------------------------------------

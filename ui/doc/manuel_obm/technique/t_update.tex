@@ -74,7 +74,7 @@ Updatedlinks & stockage (à la validation de mise à jour) des liaisons créées ou 
 \item dites ``de production'' pour gérer et stocker l'état du système en production. Ces tables sont préfixées de \db{P\_}, exemple : \db{P\_UserObm}. 
 \end{itemize}
 
-\paragraph{Règles :} l'IHM n'écrit JAMAIS dans les tables de production, celles-ci sont gérées par l'automate. L'automate n'accède jamais aux tables standards.
+\paragraph{Règles :} l'IHM n'écrit JAMAIS dans les tables de production, celles-ci sont gérées par l'automate. L'automate n'écrit jamais dans les tables standards.
 
 
 \subsubsection{Table Updated}
@@ -158,6 +158,119 @@ Dans le cas d'une mise à jour avec portée non globale, l'automate supprime indiv
 \end{tabular}
 
 
+\subsection{Les portées de mise à jour}
+
+Les portées de mises à jour indiquent la portée des modifications qui vont être prises en compte.
+Les droits sur ces portées sont définis dans les profils.
+Outre la mise à jour globale, 3 portées sont définies :\\
+
+\begin{tabular}{|p{2cm}|p{7cm}|p{4cm}|}
+\hline
+\textbf{Portée} & \textbf{Modifications prises en compte} & \textbf{Appel automate} \\
+\hline
+globale & Toutes, comparaison directe avec système & --all \\
+\hline
+user & de l'utilisateur connecté (dans domaine) & --user \$id
+\\
+\hline
+domain & du domaine \obm & --domain \$id
+\\
+\hline
+delegation & des entités sous la délégation (dans domaine) & --delegation \$txt
+\\
+\hline
+\end{tabular}
+
+
+\subsubsection{La portée ``user''}
+
+Portée des modifications de l'utilisateur connecté.\\
+
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Considéré comme} & \textbf{Description}\\
+\hline
+Créé &
+Tout enregistrement nouveau (non présent dans Prod) dont :
+\begin{itemize}
+\item le créateur est l'utilisateur et pas de modifications
+\item l'auteur de modification est l'utilisateur
+\end{itemize}
+Comparaison : les enregistrements avec ces critères dans la table de mise à jour avec tous les enregistrements (du domaine) de la table de Production.
+\\
+\hline
+Modifié &
+Tout enregistrement présent dans les 2 tables avec une différence, dont la modification a pour auteur l'utilisateur
+\\
+\hline
+Supprimé &
+Tout enregistrement de la table \textbf{Deleted} référençant l'utilisateur
+\\
+\hline
+\end{tabular}
+\vspace{0,3cm}
+
+Les suppressions prises en compte (table \db{Deleted}) sont celles dont l'auteur (\db{deleted\_user\_id}) est l'utilisateur connecté.
+
+
+\subsubsection{La portée ``domain''}
+
+Portée des modifications du domaine (de l'utilisateur connecté).\\
+
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Considéré comme} & \textbf{Description}\\
+\hline
+Créé &
+Tout enregistrement nouveau (non présent dans Prod) dans le domaine.
+Comparaison : les enregistrements du domaine des tables de mise à jour et de production
+\\
+\hline
+Modifié &
+Tout enregistrement du domaine présent dans les 2 tables avec une différence
+\\
+\hline
+Supprimé &
+Tout enregistrement de la table \textbf{Deleted} référençant le domaine
+\\
+\hline
+\end{tabular}
+\vspace{0,3cm}
+
+Les suppressions prises en compte (table \db{Deleted}) sont celles dont le domaine (\db{deleted\_domain\_id}) est celui de l'utilisateur connecté.
+
+
+\subsubsection{La portée ``delegation''}
+
+Portée des modifications du critère de délégation (dans le domaine de l'utilisateur connecté).\\
+
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Considéré comme} & \textbf{Description}\\
+\hline
+Créé &
+Tout enregistrement nouveau (non présent dans Prod) dont :
+\begin{itemize}
+\item la délégation correspond à la délégation cible de l'utilisateur connecté
+\item le domaine correspond au domaine de l'utilisateur connecté
+\end{itemize}
+Comparaison : les enregistrements avec ces critères dans la table de mise à jour avec tous les enregistrements (du domaine) de la table de Production.
+\\
+\hline
+Modifié &
+Tout enregistrement présent dans les 2 tables avec une différence, dont la délégation correspond à la délégation cible de l'utilisateur connecté
+\\
+\hline
+Supprimé &
+Tout enregistrement de la table \textbf{Deleted} dont la délégation et le domaine correspondent à la délégation cible et au domaine de l'utilisateur connecté
+\\
+\hline
+\end{tabular}
+\vspace{0,3cm}
+
+Les suppressions prises en compte (table \db{Deleted}) sont celles dont l'auteur (\db{deleted\_user\_id}) est l'utilisateur connecté.
+
+
 \subsection{Méthode d'application des modifications}
 
 A partir de la version 2.1 \obm propose 2 méthodes d'application des modifications :\\
@@ -203,11 +316,11 @@ Globale
 La portée des mises à jour qui vont être effectuées dépend de la sélection de l'administrateur mais aussi du profil de l'administrateur.
 Une mise à jour globale n'est disponible que pour un administrateur de domaine 0 (global).\\
 
-\begin{tabular}{|p{1,5cm}|p{2,6cm}|p{3,5cm}|p{6,5cm}|}
+\begin{tabular}{|p{1,6cm}|p{2,2cm}|p{3,5cm}|p{6,5cm}|}
 \hline
-\textbf{Domaine} & \textbf{Interface : Màj} & \textbf{actions} & \textbf{paramètres automate} \\
+\textbf{Maj} & \textbf{Interface} & \textbf{actions} & \textbf{paramètres automate} \\
 \hline
-\multirow{2}{2cm}{0} & Globale & Globale à l'application &
+\multirow{2}{2cm}{domaine 0} & Globale & Globale à l'application &
 --all
 \\
 \cline{2-4}
@@ -215,7 +328,7 @@ Une mise à jour globale n'est disponible que pour un administrateur de domaine 0
 --all --domain \$id
 \\
 \hline
-\multirow{3}{2cm}{x (x>0)}
+\multirow{3}{2cm}{domaine x (x>0)}
 & Mes & Incrémental utilisateur & --incremental --user \$id
 \\
 \cline{2-4}
@@ -227,8 +340,11 @@ Une mise à jour globale n'est disponible que pour un administrateur de domaine 0
 \hline
 \end{tabular}
 
+\paragraph{Une modification de table Domain ou Samba} a obligatoirement une portée globale car a un impact sur tous les enregistrements (utilisateurs,...).
+Donc si une modification de ces tables est présente, la validation des modifications n'est possible que pour la portée ``domaine'' et est appelée de façon globale''--all''.
 
-\subsubsection{Mise à jour selon portée}
+
+\subsubsection{Mise à jour selon portée non globale}
 
 
 \begin{tabular}{|p{2,5cm}|p{2,5cm}|p{8,5cm}|}
@@ -246,7 +362,7 @@ Comparaison des tables standards et de production pour affichage des différences
 Validation mises à jour & table \db{Updated} &
 Possible que si (pas de modification en cours d'exé.) :
 \begin{itemize}
-\item verrou IHM est OK (\db{ObmInfo.update\_state} = 0)
+\item verrou IHM est OK (\db{ObmInfo.update\_lock} = 0)
 \item l'automate n'est pas en cours d'exécution
 \end{itemize}
 
@@ -381,7 +497,7 @@ Comparaison des tables standards et de production pour affichage des différences
 Validation mises à jour Globale & tables \db{Updated}, \db{Deleted}, de production (\db{P\_}) &
 Possible que si (pas de modification en cours d'exé.) :
 \begin{itemize}
-\item verrou IHM est OK (\db{ObmInfo.update\_state} = 0)
+\item verrou IHM est OK (\db{ObmInfo.update\_lock} = 0)
 \item l'automate n'est pas en cours d'exécution
 \end{itemize}
 
@@ -419,117 +535,42 @@ Code d'application des modifications :\\
 }
 
 
-\subsection{Les portées de mise à jour}
+\subsection{Indication de mise à jour}
 
-Les portées de mises à jour indiquent la portée des modifications qui vont être prises en compte.
-Les droits sur ces portées sont définis dans les profils.
-Outre la mise à jour globale, 3 portées sont définies :\\
+L'indicateur de modification permet de d'afficher ou non l'icône de mise à jour.
 
-\begin{tabular}{|p{2cm}|p{7cm}|p{4cm}|}
+L'indicateur est spécifique à un domaine et est stocké dans la table des propriétés d'un domaine \variable{DomainPropertyValue}.\\
+
+\begin{tabular}{|p{3cm}|p{3cm}|p{7cm}|}
 \hline
-\textbf{Portée} & \textbf{Modifications prises en compte} & \textbf{Appel automate} \\
+\textbf{\_property\_key} & \textbf{\_value} & \textbf{Description}\\
 \hline
-globale & Toutes, comparaison directe avec système & --all \\
-\hline
-user & de l'utilisateur connecté (dans domaine) & --user \$id
-\\
-\hline
-domain & du domaine \obm & --domain \$id
-\\
-\hline
-delegation & des entités sous la délégation (dans domaine) & --delegation \$txt
-\\
+update\_state & 0 || 1 & 1 = modifications présentes\\
 \hline
 \end{tabular}
+\vspace{0,3cm}
 
 
-\subsubsection{La portée ``user}
+\subsubsection{Mise à jour de l'indicateur de mise à jour}
 
-Portée des modifications de l'utilisateur connecté.\\
+L'indicateur est mis à jour par la fonction :\\
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+  function set_update_state($state=1)
+\end{verbatim}
+\end{minipage}
+}
 
-\begin{tabular}{|p{4cm}|p{10cm}|}
-\hline
-\textbf{Considéré comme} & \textbf{Description}\\
-\hline
-Créé &
-Tout enregistrement nouveau (non présent dans Prod) dont :
+Cette fonction est appelée à :\\
 \begin{itemize}
-\item le créateur est l'utilisateur et pas de modifications
-\item l'auteur de modification est l'utilisateur
+\item la création / modification / suppression d'un utilisateur (\user)
+\item la création / modification / suppression d'une ressource (\resource)
+\item la création / modification / suppression d'un hôte (\host)
+\item la création / modification / suppression d'un partage mail (\mailshare)
+\item la modification du partage mail d'un utilisateur (\mailbox)
+\item l'affichage des modifications (avec mise à 1 ou 0 selon présence de modifications)
 \end{itemize}
-Comparaison : les enregistrements avec ces critères dans la table de mise à jour avec tous les enregistrements (du domaine) de la table de Production.
-\\
-\hline
-Modifié &
-Tout enregistrement présent dans les 2 tables avec une différence, dont la modification a pour auteur l'utilisateur
-\\
-\hline
-Supprimé &
-Tout enregistrement de la table \textbf{Deleted} référençant l'utilisateur
-\\
-\hline
-\end{tabular}
-\vspace{0,3cm}
-
-Les suppressions prises en compte (table \db{Deleted}) sont celles dont l'auteur (\db{deleted\_user\_id}) est l'utilisateur connecté.
-
-
-\subsubsection{La portée ``domain''}
-
-Portée des modifications du domaine (de l'utilisateur connecté).\\
-
-\begin{tabular}{|p{4cm}|p{10cm}|}
-\hline
-\textbf{Considéré comme} & \textbf{Description}\\
-\hline
-Créé &
-Tout enregistrement nouveau (non présent dans Prod) dans le domaine.
-Comparaison : les enregistrements du domaine des tables de mise à jour et de production
-\\
-\hline
-Modifié &
-Tout enregistrement du domaine présent dans les 2 tables avec une différence
-\\
-\hline
-Supprimé &
-Tout enregistrement de la table \textbf{Deleted} référençant le domaine
-\\
-\hline
-\end{tabular}
-\vspace{0,3cm}
-
-Les suppressions prises en compte (table \db{Deleted}) sont celles dont le domaine (\db{deleted\_domain\_id}) est celui de l'utilisateur connecté.
-
-
-\subsubsection{La portée ``delegation''}
-
-Portée des modifications du critère de délégation (dans le domaine de l'utilisateur connecté).\\
-
-\begin{tabular}{|p{4cm}|p{10cm}|}
-\hline
-\textbf{Considéré comme} & \textbf{Description}\\
-\hline
-Créé &
-Tout enregistrement nouveau (non présent dans Prod) dont :
-\begin{itemize}
-\item la délégation correspond à la délégation cible de l'utilisateur connecté
-\item le domaine correspond au domaine de l'utilisateur connecté
-\end{itemize}
-Comparaison : les enregistrements avec ces critères dans la table de mise à jour avec tous les enregistrements (du domaine) de la table de Production.
-\\
-\hline
-Modifié &
-Tout enregistrement présent dans les 2 tables avec une différence, dont la délégation correspond à la délégation cible de l'utilisateur connecté
-\\
-\hline
-Supprimé &
-Tout enregistrement de la table \textbf{Deleted} dont la délégation et le domaine correspondent à la délégation cible et au domaine de l'utilisateur connecté
-\\
-\hline
-\end{tabular}
-\vspace{0,3cm}
-
-Les suppressions prises en compte (table \db{Deleted}) sont celles dont l'auteur (\db{deleted\_user\_id}) est l'utilisateur connecté.
 
 
 \subsection{La gestion des verrous et reprises de mise à jour}
@@ -545,7 +586,7 @@ Les suppressions prises en compte (table \db{Deleted}) sont celles dont l'auteur
 IHM PHP &
 Clic sur valider les modifications &
 Automate lancé &
-Donnée en base de donnée : \db{ObmInfo.update\_state} (1=en cours, 0 sinon)
+Donnée en base de donnée : \db{ObmInfo.update\_lock} (1=en cours, 0 sinon)
 Empécher un autre utilisateur de cliquer sur ``valider les modifications'', avant que l'automate soit lancé (verrou 2). Au lancement de l'automate, PHP reprend la main de suite, l'automate étant exécuté en tâche de fond, le verrou est supprimé (peu importe le résultat de l'automate).
 \\
 \hline

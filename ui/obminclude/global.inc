@@ -189,7 +189,6 @@ $perm_user = '03';
 $perm_editor = '05';
 $perm_admin = '1D';
 
-$set_lang_default = "en";
 //------------------------------//
 // Default Profiles definitions //
 //------------------------------//
@@ -649,9 +648,9 @@ if ($path == "") {
 //   - $debug (opt) : debug flag required
 ///////////////////////////////////////////////////////////////////////////////
 function display_debug_msg($msg, $debug=0, $function_name="") {
-  global $set_debug, $global_dis_debug_msg;
+  global $global_dis_debug_msg;
 
-  if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
+  if (($_SESSION['set_debug'] > 0) && (($_SESSION['set_debug'] & $debug) == $debug)) {
     $global_dis_debug_msg .= "<b>$function_name</b> : $msg<hr />";
   }
   return $global_dis_debug_msg;
@@ -744,9 +743,8 @@ function url_prepare($url) {
 //   - true || false : true is flag set
 ///////////////////////////////////////////////////////////////////////////////
 function debug_level_isset($debug) {
-  global $set_debug;
 
-  if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
+  if (($_SESSION['set_debug'] > 0) && (($_SESSION['set_debug'] & $debug) == $debug)) {
     return true;
   } else {
     return false;
@@ -763,9 +761,9 @@ function debug_level_isset($debug) {
 //   date formated as user settings
 ///////////////////////////////////////////////////////////////////////////////
 function of_date_format($timestamp="", $null_empty="") {
-  global $set_date_default, $set_date;
+  global $set_date_default;
 
-  $format = $set_date;
+  $format = $_SESSION['set_date'];
   if (trim($format) == "") $format = $set_date_default;
   if ($timestamp != "") {
     if ($timestamp == "0") {
@@ -785,7 +783,7 @@ function of_date_format($timestamp="", $null_empty="") {
 }
 
 /**
- * of_date_format 
+ * of_date_format
  * 
  * @param string $timestamp 
  * @param string $null_empty 
@@ -793,9 +791,9 @@ function of_date_format($timestamp="", $null_empty="") {
  * @return void
  */
 function of_date_upd_format($date="", $null_empty=false) {
-  global $set_date_upd, $cda_upd_dmy, $cda_upd_mdy;
+  global $cda_upd_dmy, $cda_upd_mdy;
   
-  if($set_date_upd == $cda_upd_dmy) {
+  if ($_SESSION['set_date_upd'] == $cda_upd_dmy) {
     $date_upd_format = "d/m/Y";
   } else {
     $date_upd_format = "m/d/Y";
@@ -809,8 +807,8 @@ function of_date_upd_format($date="", $null_empty=false) {
     return null;
   }
 
-  if($type == "user") {
-    if($set_date_upd == $cda_upd_dmy) {
+  if ($type == "user") {
+    if ($_SESSION['set_date_upd'] == $cda_upd_dmy) {
       $type = "fr";
     } else {
       $type = "us";
@@ -873,7 +871,7 @@ function of_date_guess_format ($date) {
  * @return void
  */
 function of_isodate_convert($date, $null_empty=false) {
-  global $set_date_upd, $cda_upd_dmy, $cda_upd_mdy,$c_php_isodate_format;
+  global $cda_upd_dmy, $cda_upd_mdy,$c_php_isodate_format;
   $dmy_upd_format = "d/m/Y";
   $mdy_upd_format = "m/d/Y";
   
@@ -885,8 +883,8 @@ function of_isodate_convert($date, $null_empty=false) {
   } else {
     return null;
   }
-  if($type == "user") {
-    if($set_date_upd == $cda_upd_dmy) {
+  if ($type == "user") {
+    if ($_SESSION['set_date_upd'] == $cda_upd_dmy) {
       $type = "fr";
     } else {
       $type = "us";
@@ -955,9 +953,9 @@ function of_isodate_format($timestamp="", $null_empty="", $time_flag=false) {
 //   datetime formated as user settings
 ///////////////////////////////////////////////////////////////////////////////
 function of_datetime_format($timestamp="", $null_empty="") {
-  global $set_date_default, $set_date;
+  global $set_date_default;
 
-  $format = $set_date;
+  $format = $_SESSION['set_date'];
   if (trim($format) == "") $format = $set_date_default;
   if ($timestamp != "") {
     if ($timestamp == "0") {
@@ -1122,10 +1120,9 @@ function of_date_in_letter($timestamp) {
 //   $lang
 ///////////////////////////////////////////////////////////////////////////////
 function get_lang() {
-  global $set_lang;
 
-  if ($set_lang != "")
-    return strtoupper($set_lang);
+  if ($_SESSION['set_lang'] != "")
+    return strtoupper($_SESSION['set_lang']);
   else
     return "EN";
 }
@@ -1267,7 +1264,7 @@ function get_global_params_document(&$mod_params) {
 //              : if not set, take $set_commentorder pref
 ///////////////////////////////////////////////////////////////////////////////
 function beautify_comment($com, $p_order="") {
-  global $cco_chro, $cco_rev, $set_commentorder;
+  global $cco_chro, $cco_rev;
 
   $col0 = "FFFFFF";
   $col1 = "BBBBBB";
@@ -1275,7 +1272,7 @@ function beautify_comment($com, $p_order="") {
   if ($p_order != "") {
     $order = $p_order;
   } else {
-    $order = $set_commentorder;
+    $order = $_SESSION['set_commentorder'];
   }
 
   // Chronological Order

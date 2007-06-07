@@ -39,7 +39,7 @@ page_close();
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_backup_search_form($backup);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_backup_search_list($backup);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);

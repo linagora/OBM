@@ -72,7 +72,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_publication_type();
   $display["search"] = html_publication_search_form($type_q, $params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_publication_search_list($params);
   } else {
     $display["msg"] = display_info_msg($l_no_display);

@@ -143,6 +143,7 @@ function run_query_domain_insert($domain) {
     $obm_q->query($query);
     $obm_q->next_record();
     $id = $obm_q->f("id");
+    run_query_domain_replace_properties($id,$domain);
   } else {
     $id = false;
   }
@@ -151,6 +152,35 @@ function run_query_domain_insert($domain) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// domain insert query execution
+// Parameters:
+//   - $domain[]   : entry values
+// Returns:
+//   $id : new domain id if ok, else false
+///////////////////////////////////////////////////////////////////////////////
+function run_query_domain_replace_properties($domain_id,$domain) {
+  global $cdg_sql;
+  $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id = '$domain_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_domain_replace_properties()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  $prop_q = run_query_domain_properties();
+  while($prop_q->next_record()) {
+    if($domain[$prop_q->f("domainproperty_key")] != "") {
+      $query = "INSERT INTO DomainPropertyValue (
+        domainpropertyvalue_domain_id,
+        domainpropertyvalue_property_key,
+        domainpropertyvalue_value)
+        VALUES (
+          '$domain_id',
+          '".$prop_q->f("domainproperty_key")."',
+          '".$domain[$prop_q->f("domainproperty_key")]."'
+        )";
+      $obm_q->query($query);
+    }
+  }
+}
 ///////////////////////////////////////////////////////////////////////////////
 // domain update query execution
 // Parameters:
@@ -178,6 +208,7 @@ function run_query_domain_update($d_id, $domain) {
   display_debug_msg($query, $cdg_sql, "run_query_domain_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+  run_query_domain_replace_properties($d_id,$domain);
 
   return $retour;
 }
@@ -191,10 +222,14 @@ function run_query_domain_update($d_id, $domain) {
 function run_query_domain_delete($p_id) {
   global $cdg_sql, $c_use_connectors;
 
-  $query = "DELETE FROM Domain WHERE domain_id='$p_id'";
-  
-  display_debug_msg($query, $cdg_sql, "run_query_domain_delete()");
   $obm_q = new DB_OBM;
+
+  $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id='$p_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_domain_delete()");
+  $retour = $obm_q->query($query);
+
+  $query = "DELETE FROM Domain WHERE domain_id='$p_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_domain_delete()");
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -265,6 +300,30 @@ function get_linked_user_domain($domain_id) {
 
   return $nb;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Get a domain properties
+// Parameters:
+//   - $domain_id : domain_id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_domain_properties($domain_id=0) {
+  global $cdg_sql;
+  if($domain_id != 0) {
+    $val = "domainpropertyvalue_value,";
+    $join = " LEFT JOIN DomainPropertyValue ON domainproperty_key = domainpropertyvalue_property_key
+              AND domainpropertyvalue_domain_id = '$domain_id'";
+  }
+  $query = "SELECT 
+    $val
+    domainproperty_key,
+    domainproperty_type
+    FROM DomainProperty $join";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_domain_properties()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
 
+  return $obm_q;
+
+}
 
 ?>

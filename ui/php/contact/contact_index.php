@@ -71,7 +71,7 @@ if (($action == "ext_get_ids") || ($action == "ext_get_id")) {
     $params["ext_type"] = "mono";
   }
   $display["search"] = dis_contact_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_contact_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
@@ -89,7 +89,7 @@ if (($action == "ext_get_ids") || ($action == "ext_get_id")) {
 } else if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_contact_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_contact_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
@@ -211,10 +211,10 @@ if (($action == "ext_get_ids") || ($action == "ext_get_id")) {
 
 } elseif ($action == "statistics") {
 ///////////////////////////////////////////////////////////////////////////////
-  require_once("$obminclude/lang/$set_lang/statistic.inc");
+  require_once("$obminclude/lang/".$_SESSION['set_lang']."/statistic.inc");
   // Specific conf statistics lang file
   if ($conf_lang) {
-    $lang_file = "$obminclude/conf/lang/$set_lang/statistic.inc";
+    $lang_file = "$obminclude/conf/lang/".$_SESSION['set_lang']."/statistic.inc";
     if (file_exists("$path/../".$lang_file)) {
       include("$lang_file");
     }

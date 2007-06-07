@@ -33,7 +33,7 @@ switch ($params["mode"]) {
    if (! $retour) { end; }
    break;
  case "html":
-   $debug = $set_debug;
+   $debug = $_SESSION['set_debug'];
    page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
    if ($action == "") $action = "index";

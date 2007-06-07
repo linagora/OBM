@@ -480,7 +480,7 @@ function dis_cv_form($action, $cv) {
 * @return string $block html cv form to display
 */
 function html_cv_form($action, $cv, $cv_q="", $refs_q="",$u_com_q) {
-  global $display, $set_dsrc, $l_none,  $path;
+  global $display, $l_none,  $path;
   global $l_update, $l_insert, $l_delete;
   global $l_cv, $l_title, $l_comment, $l_user, $l_select_user, $l_duplicate;
   global $l_lastname, $l_firstname, $l_location, $l_phone, $l_education, $l_personal;

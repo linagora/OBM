@@ -60,7 +60,7 @@ page_close();
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_resourcegroup_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] .= dis_resourcegroup_search_resourcegroup("");
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
@@ -224,7 +224,7 @@ if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
 } else if ($action == "ext_get_ids") {
   $display["search"] = html_resourcegroup_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_resourcegroup_search_resourcegroup($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);

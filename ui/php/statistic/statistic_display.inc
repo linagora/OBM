@@ -302,7 +302,6 @@ function dis_statistic_cat_stats($comp_q, $tot) {
 function export_statistic_cat_stats($comp_q,$tot) {
   global $path;
   global $l_null,$l_totals, $l_header_country,$l_compcat;
-  global $set_csv_sep;
 
   while ($comp_q->next_record()) {
     if ($comp_q->f("category_id") == NULL) {
@@ -345,17 +344,17 @@ function export_statistic_cat_stats($comp_q,$tot) {
   natsort($cat); 
   foreach($cat as $cat_id =>$cat_name) {
     if ($cat_id != 0) {
-      $cat_label .= "$set_csv_sep\"$cat_name ".$cat_desc[$cat_id]."\""; 
+      $cat_label .= $_SESSION['set_csv_sep']."\"$cat_name ".$cat_desc[$cat_id]."\""; 
     } else {
-      $cat_label .=  "$set_csv_sep\"$cat_name\"";
+      $cat_label .=  $_SESSION['set_csv_sep']."\"$cat_name\"";
     }
     $percent = round(($cat_count[$cat_id])*100/$cat_link_total,1);    
-    $cat_percent .= "$set_csv_sep\"$percent\"";
-    $cat_tots .= "$set_csv_sep\"".$cat_count[$cat_id]."\"";
+    $cat_percent .= $_SESSION['set_csv_sep']."\"$percent\"";
+    $cat_tots .= $_SESSION['set_csv_sep']."\"".$cat_count[$cat_id]."\"";
   }   
 
   
-  $block .= "\"\"$cat_label$set_csv_sep\"$l_totals\"$set_csv_sep\"%\"\n";
+  $block .= "\"\"$cat_label".$_SESSION['set_csv_sep']."\"$l_totals\"".$_SESSION['set_csv_sep']."\"%\"\n";
   foreach ($stat as $cty_iso => $data) {
     if($cty_iso != $l_null) {
       $block .= "\"$cty_desc[$cty_iso]\"";
@@ -363,16 +362,16 @@ function export_statistic_cat_stats($comp_q,$tot) {
       $block .= "\"$l_null\"";
     }
     foreach($cat as $cat_id => $cat_name) {
-      $block .= "$set_csv_sep\"".$data[$cat_id]."\"";
+      $block .= $_SESSION['set_csv_sep']."\"".$data[$cat_id]."\"";
     }
     $percent = round(($cty_count[$cty_iso])*100/$cat_link_total,1);
-    $block .= "$set_csv_sep\"".$cty_count[$cty_iso]."\"";
-    $block .= "$set_csv_sep\"$percent\"";
+    $block .= $_SESSION['set_csv_sep']."\"".$cty_count[$cty_iso]."\"";
+    $block .= $_SESSION['set_csv_sep']."\"$percent\"";
     $block .= "\n";
   }
 
-  $block .= "\"$l_totals\"$cat_tots$set_csv_sep\"$cat_link_total\"$set_csv_sep\"\"\n";
-  $block .= "\"%\"$cat_percent$set_csv_sep\"\"$set_csv_sep\"100\"\n";
+  $block .= "\"$l_totals\"$cat_tots".$_SESSION['set_csv_sep']."\"$cat_link_total\"".$_SESSION['set_csv_sep']."\"\"\n";
+  $block .= "\"%\"$cat_percent".$_SESSION['set_csv_sep']."\"\"".$_SESSION['set_csv_sep']."\"100\"\n";
   header("Content-Type: text/comma-separated-values");  
   header("Content-Disposition: inline; filename=companies_stats.csv");
   header("charset=utf-8");  

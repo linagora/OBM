@@ -39,9 +39,10 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_tools_update_detail();
 
-} elseif ($action == "update_update")  {
+} elseif ($action == "update_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_tools_update_context_ok()) {
+  if (check_tools_update_context_ok($params)) {
+    set_update_lock();
     set_update_state();
     $display["detail"] = dis_tools_update_validation($params);
     $res = exec_tools_update_update($params);
@@ -50,30 +51,16 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
     } else {
       $display["msg"] .= display_err_msg("$l_upd_error ($res)");
     }
-    unset_update_state();
+    remove_update_lock();
   } else {
     // Si le contexte ne permet pas une modification de configuration
     $display['msg'] .= display_warn_msg($err['msg']);
     $display["detail"] = html_tools_update_index();
   }
 
-} elseif ($action == "update_update.save")  {
+} elseif ($action == "update_cancel") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_tools_update_context()) {
-    $res = run_query_tools_update_update($params);
-    if ($res == "0") {
-      $display["msg"] .= display_ok_msg($l_upd_ok);
-    } else {
-      $display["msg"] .= display_err_msg("$l_upd_error ($res)");
-    }
-  } else {
-    // Si le contexte ne permet pas une modification de configuration
-    $display["detail"] = html_tools_update_index();
-  }
-
-} elseif ($action == "update_cancel")  {
-///////////////////////////////////////////////////////////////////////////////
-  if (check_tools_update_context_ok()) {
+  if (check_tools_update_context_ok($params)) {
     $res = run_query_tools_update_cancel();
     if ($res == "0") {
       $display["msg"] .= display_ok_msg($l_upd_cancel_ok);
@@ -90,7 +77,7 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_tools_halt_index();
 
-} elseif ($action == "halt_halt")  {
+} elseif ($action == "halt_halt") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["msg"] .= display_debug_msg($cmd_halt, $cdg_exe);
   $ret = exec($cmd_halt);
@@ -99,7 +86,7 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_tools_remote_index();
 
-} elseif ($action == "remote_update")  {
+} elseif ($action == "remote_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $res = run_query_tools_remote_update($params);
 
@@ -137,7 +124,7 @@ display_page($display);
 function get_tools_params() {
 
   // Get global params
-  $params = get_global_params("UserObm");
+  $params = get_global_params("Tools");
 
   return $params;
 }

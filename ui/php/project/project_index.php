@@ -65,7 +65,7 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
   $display["search"] = dis_project_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_project_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
@@ -73,7 +73,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "ext_get_id_cv") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_project_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_project_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
@@ -94,7 +94,7 @@ if ($action == "ext_get_id") {
 } else if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_project_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_project_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
@@ -177,7 +177,7 @@ if ($action == "ext_get_id") {
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_project : $l_delete_ok");
       $display["search"] = dis_project_search_form($params);
-      if ($set_display == "yes") {
+      if ($_SESSION['set_display'] == "yes") {
         $display["result"] = dis_project_search_list($params);
       } else {
         $display["msg"] .= display_info_msg($l_no_display);

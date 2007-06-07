@@ -80,7 +80,7 @@ function run_query_tools_update_update($tools) {
   $ret = exec($cmd_db_update);
 
   // Mise a jour de l'indicateur de modifications
-  update_update_state();
+  set_update_state('0'); // XXXXXX a virer
 
   display_debug_msg($cmd, $cdg_exe, 'run_query_tools_update_update(2)');
   unset($tmp);
@@ -90,12 +90,10 @@ function run_query_tools_update_update($tools) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Update system configuration execution
-// Parameters:
-//   - $tools[]  : entry values
-//     keys used : update
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Update system configuration execution
+ * @param $tools[] : entry values
+ */
 function exec_tools_update_update($tools) {
   global $obm, $cdg_sql, $cdg_exe, $cmd_update, $cmd_db_update;
 
@@ -108,12 +106,17 @@ function exec_tools_update_update($tools) {
   $domain_id = $obm['domain_id'];
   $delegation = $obm['delegation'];
 
-  $update_type = $tools['update_type'];
   $realm = $tools['realm'];
   $update = $tools['update'];
+  $update_type = $tools['update_type'];
+
+  // Force global update from Domain 0
+  if ($domain_id == '0') {
+    $update_type == 'all';
+  }
 
   // Creation de la commande d'execution de l'automate de mise a jour
-  $cmd = $cmd_update." --incremental --domain $domain_id";
+  $cmd = $cmd_update." --$update_type --domain $domain_id";
   
   if ($realm == 'user') {
     $cmd .= " --user $uid";
@@ -124,7 +127,7 @@ function exec_tools_update_update($tools) {
   $cmd .= " >/dev/null 2>&1 &";
   
   // Mise a jour de l'indicateur de modifications
-  update_update_state();
+  set_update_state('0'); // XXXXX A virer. qd remet-on l'indic???
 
   display_debug_msg($cmd, $cdg_exe, 'exec_tools_update_update()');
   unset($tmp);
@@ -154,19 +157,31 @@ function run_query_tools_update_cancel() {
 
 
 /**
- * Check if a global system configuration execution is possible
+ * Check if a system configuration execution is possible
  *
  * @param $tools[] paramateres values
+ * @param $params : parameters hash
  * @return (true | false) : true if ok else false
  */
-function check_tools_update_context_ok() {
+function check_tools_update_context_ok($params) {
   global $obm, $profiles, $display, $cmd_check_update, $err;
   global $l_error_permission, $l_upd_already_running;
 
   $update_ok = true;
 
-  // Check user admin rights
-  if (! isset($profiles[$obm['profile']]['properties']['admin_realm'])) {
+  $domain_id = $obm['domain_id'];
+  $update_type = $params['update_type'];
+  $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
+
+  // Check user admin rights (default to domain if not set)
+  if ((! isset($admin_realm)) || ($admin_realm == '')) {
+    $admin_realm = array('domain');
+  }
+
+  // Check update type is allowed (global need domain 0 or 'domain' realm)
+  if (($update_type == 'all')
+     && (($domain_id != 0)
+	 && (! in_array('domain', $admin_realm)))) {
     $err['msg'] = $l_error_permission;
     return false;
   }
@@ -177,7 +192,7 @@ function check_tools_update_context_ok() {
     return false;
   }
 
-  // Il ne faut pas qu'une mise à jour soit déjà en cours
+  // An updated must not already running
   $ps = shell_exec("$cmd_check_update");
 
   if ($ps) {
@@ -186,6 +201,67 @@ function check_tools_update_context_ok() {
   }
 
   return $update_ok;
+}
+
+
+/**
+ * Check if a domain has been updated on fields impacting users
+ * @param $domain_id : Domain id
+ */
+function check_tools_update_domain_updated($domain_id='all') {
+  global $cdg_sql, $obm;
+
+  $e1 = array();
+  $e2 = array();
+
+  $obm_q = new DB_OBM;
+
+  if ($domain_id != 'all') {
+    $where = "WHERE domain_id = '$domain_id'";
+  }
+
+  // Get infos from Update table
+  $query = "SELECT * FROM Domain $where";
+  display_debug_msg($query, $cdg_sql, 'check_tools_update_domain_updated()');
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $id = $obm_q->f('0');  // Id
+    $e = $obm_q->Record;
+    foreach ($e as $fname => $fvalue) {
+      // optimiser : verifier que fname pas un chiffre ?
+      $e1[$id]["$fname"] = $fvalue;
+    }
+  }
+
+  // Get infos from Production table
+  $query = "SELECT * FROM P_Domain $where";
+  display_debug_msg($query, $cdg_sql, 'check_tools_update_domain_updated()');
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $id = $obm_q->f('0');  // Id
+    $e = $obm_q->Record;
+    foreach ($e as $fname => $fvalue) {
+      // optimiser : verifier que fname pas un chiffre ?
+      $e2[$id]["$fname"] = $fvalue;
+    }
+  }
+
+  // Check for differences
+  foreach ($e1 as $id => $row) {
+    if (! array_key_exists($id, $e2)) {
+      return true;
+    } else {
+      foreach($row as $fname => $fvalue) {
+	if ($e2[$id][$fname] != $fvalue) {
+	  return true;
+	}
+      }
+    }
+  }
+
+  return false;
 }
 
 

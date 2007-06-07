@@ -33,7 +33,7 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
   $display["search"] = html_account_search_form ($action, $params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_account_search_list($params);
   } else {
     $display["msg"] = display_ok_msg($l_no_display);

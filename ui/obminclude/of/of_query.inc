@@ -190,15 +190,15 @@ function sql_if($db_type, $expr, $iftrue, $iffalse) {
 ///////////////////////////////////////////////////////////////////////////////
 function sql_limit($db_type, $number="", $p_offset="", $name="") {
   global $db_type_mysql, $db_type_pgsql, $ctu_sql_limit, $of_display_name;
-  global $set_rows, $set_rows_default, $page;
+  global $set_rows_default, $page;
 
   // If limit should not be used, return empty clause
   if (! $ctu_sql_limit) { return ""; }
 
   if ($number != "") {
     $num = $number;
-  } else if ($set_rows != "") {
-    $num = $set_rows;
+  } else if ($_SESSION['set_rows'] != "") {
+    $num = $_SESSION['set_rows'];
   } else {
     $num = $set_rows_default;
   }
@@ -349,6 +349,7 @@ function of_domain_get_domain_infos($d_id) {
     $query = "SELECT domain_id,
       domain_label,
       domain_name,
+      domain_alias,
       domain_mail_server_id
     FROM Domain
     WHERE domain_id = '$d_id'";
@@ -359,6 +360,7 @@ function of_domain_get_domain_infos($d_id) {
     $domain["id"] = $obm_q->f("domain_id");
     $domain["label"] = $obm_q->f("domain_label");
     $domain["name"] = $obm_q->f("domain_name");
+    $domain["alias"] = $obm_q->f("domain_alias");
     $domain["mailserver"] = $obm_q->f("domain_mail_server_id");
   } else {
     $domain["id"] = "0";
@@ -1369,16 +1371,16 @@ function run_query_log_session($obm_q) {
 //   - $action : action called 
 ///////////////////////////////////////////////////////////////////////////////
 function update_last_visit($entity, $id, $action) {
-  global $obm, $last_v;
+  global $obm;
 
-  if ( ($id == $last_v[$entity]["id"]) && (strcmp($action,"delete")==0) ) {
-    $last_v[$entity]["id"] = 0;
-    $last_v[$entity]["text"] = 0;
-  } else if ( ($id > 0 ) && ($last_v[$entity]["id"] != $id) ) {
-    $last_v[$entity]["id"] = $id;
+  if ( ($id == $_SESSION['last_v'][$entity]["id"]) && (strcmp($action,"delete")==0) ) {
+    $_SESSION['last_v'][$entity]["id"] = 0;
+    $_SESSION['last_v'][$entity]["text"] = 0;
+  } else if ( ($id > 0 ) && ($_SESSION['last_v'][$entity]["id"] != $id) ) {
+    $_SESSION['last_v'][$entity]["id"] = $id;
     update_user_pref($obm["uid"], "last_$entity", $id);
     $function_get_last_text = "get_last_${entity}_text";
-    $last_v[$entity]["text"] = $function_get_last_text($id);
+    $_SESSION['last_v'][$entity]["text"] = $function_get_last_text($id);
   }
   
 }

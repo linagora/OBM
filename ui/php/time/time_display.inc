@@ -586,7 +586,6 @@ function dis_time_task_list($time) {
 //   - $time[] : time search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_list_result($task_q,$prefs,$time) {
-  global $set_date;
   global $l_delete, $l_task_del, $l_task_list;
 
   $url = url_prepare("time_index.php");

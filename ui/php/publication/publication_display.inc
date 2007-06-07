@@ -367,7 +367,7 @@ function dis_publication_form($action, $publication) {
 //   - $list_q    : lists
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, $list_q) {
-  global $display, $set_dsrc, $l_none, $ico_add;
+  global $display, $l_none, $ico_add;
   global $ico_web,$ico_mail,$l_category;
   global $l_publication_title, $l_type, $l_year, $l_lang, $l_desc;
   global $l_insert,$l_update,$l_checkdelete, $l_publication, $l_list;
@@ -496,7 +496,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
 //   - $publication[] : default values
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_group_subscription_form($action,$pub_q, $publication) {
-  global $display, $set_dsrc;
+  global $display;
   global $l_category;
   global $l_publication, $l_contact_category1, $l_auto_sub, $public_contact_cat;
 

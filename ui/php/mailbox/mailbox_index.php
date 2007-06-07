@@ -36,7 +36,7 @@ page_close();
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_mailshare_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_mailshare_search_list("");
   } else {
     $display["msg"] .= display_ok_msg($l_no_display);
@@ -49,7 +49,7 @@ if (($action == "index") || ($action == "")) {
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (of_right_update_right($params, "mailbox", "userobm")) {
-    update_update_state();
+    set_update_state();
     $display["msg"] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
     $display["msg"] .= display_warn_msg($err["msg"]);

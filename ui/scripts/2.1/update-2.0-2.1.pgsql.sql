@@ -10,6 +10,44 @@
 -------------------------------------------------------------------------------
 UPDATE ObmInfo set obminfo_value='2.1' where obminfo_name='db_version';
 
+
+-------------------------------------------------------------------------------
+-- Add domain property tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'DomainProperty'
+--
+CREATE TABLE DomainProperty (
+  domainproperty_key       varchar(255) NOT NULL,
+  domainproperty_type      varchar(32),
+  PRIMARY KEY (domainproperty_key)
+);
+
+--
+-- Table structure for table 'DomainPropertyValue'
+--
+CREATE TABLE DomainPropertyValue (
+  domainpropertyvalue_domain_id    integer NOT NULL,
+  domainpropertyvalue_property_key varchar(255) NOT NULL,
+  domainpropertyvalue_value        varchar(255) NOT NULL,
+  PRIMARY KEY (domainpropertyvalue_domain_id, domainpropertyvalue_property_key)
+);
+
+
+-------------------------------------------------------------------------------
+-- Default Domain properties
+-------------------------------------------------------------------------------
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('update_state','integer');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_users','integer');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_mailshares','integer');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_resources','integer');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('quota_mail','integer');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('delegation','text');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('address1','text');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('address2','text');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('town','text');
+
+
 -------------------------------------------------------------------------------
 -- Update DisplayPref table
 -------------------------------------------------------------------------------

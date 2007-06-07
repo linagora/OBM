@@ -65,7 +65,7 @@ if (! $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
   $display["search"] = dis_contract_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_contract_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
@@ -77,7 +77,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_contract_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_contract_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
@@ -168,7 +168,7 @@ if ($action == "ext_get_id") {
       $display["msg"] .= display_err_msg("$l_contract : $l_delete_error");
     }
     $display["search"] = dis_contract_search_form($params);
-    if ($set_display == "yes") {
+    if ($_SESSION['set_display'] == "yes") {
       $display["result"] = dis_contract_search_list($params);
     } else {
       $display["msg"] .= display_info_msg($l_no_display);

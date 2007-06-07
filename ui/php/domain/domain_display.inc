@@ -128,10 +128,10 @@ function html_domain_search_list($obm_q, $prefs, $domain, $popup) {
 //   - $domain      : default values or updated values (if error)
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_form($dom_q, $domain) {
+function html_domain_form($dom_q,$properties_q, $domain) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
   global $l_insert, $l_update,$l_mail_server;
-  global $display, $cgp_use,$l_mail_server;
+  global $display, $cgp_use,$l_properties;
 
   // if update mode and first time value are taken from database
   if ($domain["action"] == "detailupdate") {
@@ -140,6 +140,10 @@ function html_domain_form($dom_q, $domain) {
     $desc = $dom_q->f("domain_description");
     $domain_name = $dom_q->f("domain_name");
     $alias = $dom_q->f("domain_alias");
+    while($properties_q->next_record()) {
+      ${$properties_q->f("domainproperty_key")} = $properties_q->f("domainpropertyvalue_value");
+    }
+    $properties_q->seek(0);
   }
 
   // If parameters have been given, they supercede the default action value
@@ -148,6 +152,30 @@ function html_domain_form($dom_q, $domain) {
   if (isset($domain["desc"])) { $desc = $domain["desc"]; }
   if (isset($domain["domain_name"])) { $domain_name = $domain["domain_name"]; }
   if (isset($domain["alias"])) { $alias = $domain["alias"]; }
+
+  while($properties_q->next_record()) {
+    $name = $properties_q->f("domainproperty_key");
+    $plabel = $GLOBALS["l_$name"];
+    if (isset($domain[$name])) { 
+      ${$name} = $domain[$name]; 
+    }
+    $properties_block .= "
+      <tr>
+      <th>$plabel</th>
+      <td><input type=\"text\" name=\"$name\" value=\"".${$name}."\" /></td>
+      </tr>
+    ";
+  }
+  if($properties_block != "") {
+    $properties_block = "
+     <fieldset class=\"detail infos\">
+     <legend>$l_properties</legend>
+     <table>
+     $properties_block
+     </table>
+     </fieldset>
+";
+  }  
 
   // Buttons
   if (($domain["action"] == "new") || ($domain["action"] == "insert")) {
@@ -209,6 +237,7 @@ function html_domain_form($dom_q, $domain) {
     </tr>
     </table>
     </fieldset>
+    $properties_block
 
     <fieldset class=\"buttons\">
     $dis_button
@@ -230,8 +259,9 @@ function dis_domain_consult($domain) {
   $id = $domain["domain_id"];
 
   $obm_q = run_query_domain_detail($id);
+  $properties_q = run_query_domain_properties($id);
   if ($obm_q->num_rows() == 1) {
-    $block = html_domain_consult($obm_q);
+    $block = html_domain_consult($obm_q, $properties_q);
   } else {
     $display["msg"] .= display_err_msg($l_query_error);
   }
@@ -245,9 +275,9 @@ function dis_domain_consult($domain) {
 // Parameters:
 //   - $obm_q : domain database result
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_consult($obm_q) {
+function html_domain_consult($obm_q, $properties_q) {
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
-  global $display, $l_mail_server, $cgp_use;
+  global $display, $l_mail_server, $cgp_use, $l_propertie;
 
   $id = $obm_q->f("domain_id");
   $label = $obm_q->f("domain_label");
@@ -268,6 +298,24 @@ function html_domain_consult($obm_q) {
       }
       $mail_section .= "</td>
     </tr>";
+  }
+
+  while($properties_q->next_record()) {
+    $plabel = $GLOBALS['l_'.$properties_q->f("domainproperty_key")];
+    $properties_block .= "
+      <tr>
+      <th>$plabel</th>
+      <td>".$properties_q->f("domainpropertyvalue_value")."</td>
+      </tr>";
+  }
+  if($properties_block != "") {
+    $properties_block = "
+     <div class=\"detail infos\">
+     <h1>$l_properties</h1>
+     <table>
+     $properties_block
+     </table>
+     </div>";
   }
 
   $display["detailInfo"] = display_record_info($obm_q);
@@ -302,6 +350,7 @@ function html_domain_consult($obm_q) {
     </tr>
     </table>
     </div>
+$properties_block    
 ";
 
   return $block;

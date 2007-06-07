@@ -118,9 +118,9 @@ function display_page(&$display) {
 //   - $module : module selected
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu($module) {
-  global $path, $obm, $display, $obm_version, $cgp_show,$set_lang;
-  global $l_logout, $l_profile,$ico_logout,$modules,$ico_login, $ico_obm, $ico_print;
-  global $ico_scope, $l_scope_update;
+  global $path, $obm, $display, $obm_version, $cgp_show, $modules;
+  global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope;
+  global $l_logout, $l_profile, $l_scope_update;
 
   $obm["uid"];
   $login = $obm["login"];
@@ -209,14 +209,14 @@ function display_sections_theme($section) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_modules_theme($section) {
-  global $set_menu, $cme_txt, $cme_ico, $cme_both;
+  global $cme_txt, $cme_ico, $cme_both;
   global $path, $perm, $modules, $cgp_show;
 
-  if (($set_menu == $cme_ico) || ($set_menu == $cme_both))
+  if (($_SESSION['set_menu'] == $cme_ico) || ($_SESSION['set_menu'] == $cme_both))
     $fico = true;
   else $fico = false;
 
-  if (($set_menu == $cme_txt) || ($set_menu == $cme_both))
+  if (($_SESSION['set_menu'] == $cme_txt) || ($_SESSION['set_menu'] == $cme_both))
     $ftext = true;
   else $ftext = false;
 
@@ -301,12 +301,12 @@ function display_actions_theme($section, $module) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_head_theme($p_module) { 
   global $l_obm_title, $extra_css, $extra_js, $extra_js_include,$ico_minus;
-  global $ico_datepicker,$set_date_upd,$l_monthsofyear,$l_daysofweekfirst;
+  global $ico_datepicker,$l_monthsofyear,$l_daysofweekfirst;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
   global $css_print_obm, $ico_delete, $ico_update, $cda_upd_dmy, $output_target;
 
-  if($set_date_upd == $cda_upd_dmy) {
+  if ($_SESSION['set_date_upd'] == $cda_upd_dmy) {
     $date_upd_format = "fr";
   } else {
     $date_upd_format = "us";

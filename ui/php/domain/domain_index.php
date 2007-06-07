@@ -44,7 +44,7 @@ page_close();
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_domain_search_form($params);
-  if ($set_display == "yes") {
+  if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_domain_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
@@ -58,7 +58,8 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("domain_js.inc");
-  $display["detail"] = html_domain_form("",$params);
+  $prop_q = run_query_domain_properties();
+  $display["detail"] = html_domain_form("",$prop_q,$params);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,9 +68,10 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_domain_detail($params["domain_id"]);
+  $prop_q = run_query_domain_properties($params["domain_id"]);
   if ($obm_q->num_rows() == 1) {
     $display["detailInfo"] = display_record_info($obm_q);
-    $display["detail"] = html_domain_form($obm_q, $params);
+    $display["detail"] = html_domain_form($obm_q, $prop_q, $params);
   } else {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
@@ -80,17 +82,20 @@ if ($action == "index" || $action == "") {
   if (check_domain_data_form("", $params)) {
     $cid = run_query_domain_insert($params);
     if ($cid > 0) {
-	   $params["domain_id"] = $cid;
-     $display["msg"] .= display_ok_msg($l_insert_ok);
-	   $display["detail"] = dis_domain_consult($params);
+      set_update_state();
+      $params["domain_id"] = $cid;
+      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $display["detail"] = dis_domain_consult($params);
     } else {
-    	$display["msg"] .= display_err_msg($l_insert_error);
-    	$display["detail"] = html_domain_form("",$params);
-      }
+      $display["msg"] .= display_err_msg($l_insert_error);
+      $prop_q = run_query_domain_properties();
+      $display["detail"] = html_domain_form("",$prop_q,$params);
+    }
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
-    $display["detail"] = html_domain_form("", $params);
+    $prop_q = run_query_domain_properties();
+    $display["detail"] = html_domain_form("",$prop_q,$params);
   }
 
 } elseif ($action == "update")  {
@@ -99,6 +104,7 @@ if ($action == "index" || $action == "") {
   if (check_domain_data_form($params["domain_id"], $params)) {
     $retour = run_query_domain_update($params["domain_id"], $params);
     if ($retour) {
+      set_update_state();
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
@@ -106,7 +112,8 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_domain_consult($params);
   } else {
     $display["msg"] .= display_err_msg($err["msg"]);
-    $display["detail"] = html_domain_form("", $params);
+    $prop_q = run_query_domain_properties($params["domain_id"]);
+    $display["detail"] = html_domain_form("", $prop_q, $params);
   }
 
 } elseif ($action == "check_delete")  {
