@@ -622,7 +622,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   $dis_sel_owner .= "</select>";
 
   // Logger select
-  if (! isset($logger)) { $logger = $obm["uid"]; }
+/*  if (! isset($logger)) { $logger = $obm["uid"]; }
   $dis_sel_logger="<select name=\"sel_logger\">";
   while ($usr_q->next_record()) {
     $dis_sel_logger.="\n<option value=\"".$usr_q->f("userobm_id")."\"";
@@ -630,7 +630,17 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
       $dis_sel_logger.=" selected=\"selected\"";
     $dis_sel_logger.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
   }
-  $dis_sel_logger.="</select>";
+  $dis_sel_logger.="</select>";*/
+
+  if (! isset($logger)) { $logger = $obm["uid"]; }
+// FIXME: please, think to clean this !
+  while ($usr_q->next_record()) {
+    if ($usr_q->f("userobm_id") == $logger) 
+      $logger_name = $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname");
+  }
+
+  $dis_sel_logger = "<input type=\"text\" name=\"\" value=\"$logger_name\" id=\"tf_logger\" autocomplete=\"off\" />
+                     <input type=\"hidden\" name=\"sel_logger\" value=\"$logger\" id=\"sel_logger\" />";
 
   $block_priority = of_category_dis_entity_form("incident", "priority", $pri, "mono", $priority);
   $block_status = of_category_dis_entity_form("incident", "status", $sta, "mono", $status);
@@ -777,6 +787,11 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
     $dis_button
   </fieldset>
   </form>
+  <script type=\"text/javascript\">
+    obm.initialize.chain(function () {
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_logger', 'tf_logger', {mode: 'mono', locked: true});
+    });
+  </script>
 ";
 
   return $block;

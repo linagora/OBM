@@ -111,13 +111,14 @@ obm.AutoComplete.Search = new Class({
 
   setOptions: function(options){
     this.options = Object.extend({
-      chars: 1,
-      results: 8,
-      delay: 400,
-      mode: 'multiple',
-      restriction: null,
-      fieldText: 'Search...',
-      extension: null
+      chars: 1,                        // min number of chars to type before requesting
+      results: 8,                      // number of results per page
+      delay: 400,                      // delay before the last key pressed and the request
+      mode: 'multiple',                // 'mono' or 'multiple'
+      locked: 'false',                 // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
+      restriction: null,               // obm needs
+      fieldText: 'Search...',          // default text displayed when empty field
+      extension: null                  // obm needs
     }, options || {});
   },
 
@@ -133,11 +134,12 @@ obm.AutoComplete.Search = new Class({
     this.requestId = 0;                // current request id
     this.selection = -1;               // currently selected (=highlighted) element
 
-
     if (this.options.mode == 'mono') {
+      // 'mono' mode functions
       this.validateResultValue = this.setResultValue;
       this.resetFunc = this.monoModeReset;
       this.textChangedFunc = function() { this.unvalidateSelection(); this.resetResultBox(); };
+      // 'mono' mode elements
       this.updateBtn = new Element('a').adopt(
                                          new Element('img')
                                            .setProperty('src',obm.vars.images.update)
@@ -149,6 +151,13 @@ obm.AutoComplete.Search = new Class({
                                            this.updateBtn.remove();
                                          }.bind(this)
                                        );
+      // 'mono' mode initializations 
+      if (this.selectedBox.value != '')
+        this.currentValue = this.inputField.value;
+      if (this.options.locked) {
+      	this.lockedLabel = this.inputField.value;
+      	this.lockedKey = this.selectedBox.value;
+      }
     } else {
       this.validateResultValue = this.addResultValue;
       this.resetFunc = this.reset;
@@ -562,6 +571,10 @@ obm.AutoComplete.Search = new Class({
     this.selectedBox.value = item_id.substr(('item_').length,item_id.length);
     this.currentValue = $(item_id+'_label').innerHTML;
     this.inputField.value = this.currentValue;
+    if (this.options.locked) {
+      this.lockedLabel = this.inputField.value;
+      this.lockedKey = this.selectedBox.value;
+    }
     this.resetResultBox();
     if (this.selectedBox.value != '') {
       this.displayAsValidated();
@@ -582,6 +595,11 @@ obm.AutoComplete.Search = new Class({
 
   // reset input and result box
   monoModeReset: function() {
+    if (this.options.locked) {
+      this.currentValue = this.lockedLabel;
+      this.inputField.value = this.lockedLabel;
+      this.selectedBox.value = this.lockedKey;
+    }
     if (this.selectedBox.value != '' && this.currentValue == this.inputField.value) {
       this.resetResultBox();
       this.displayAsValidated();
