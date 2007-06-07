@@ -1187,6 +1187,11 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
   $event_duration = $calendar["duration"];
   
   $obm_q = new DB_OBM;
+
+  $query = "UPDATE CalendarEvent SET calendarevent_timeupdate = NOW() WHERE calendarevent_id = $id";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_event_exception_insert(0)");
+  $obm_q->query($query);
+
   $query = "INSERT INTO CalendarException (
       calendarexception_usercreate,
       calendarexception_timecreate ,   

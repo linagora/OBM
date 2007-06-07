@@ -1041,8 +1041,8 @@ function display_actions($section, $module) {
 // Parameters:
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
-function display_last_visited($path="..") {
-  global $path, $cgp_show, $l_last_visit;
+function display_last_visited() {
+  global $path, $cgp_show, $last_v, $l_last_visit, $path;
 
   // If a theme specif function is provided
   if (function_exists("display_last_visited_theme")) {

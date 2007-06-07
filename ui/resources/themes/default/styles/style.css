@@ -224,7 +224,7 @@ form {
 }
 
 #information img {
-  vertical-align: text;
+  vertical-align: middle;
 }
 
 /*IE workaround*/

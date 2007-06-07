@@ -276,19 +276,7 @@ Obm.CalendarDayEvent = new Class({
     this.trashExtensions();
     this.size = size - this.hidden;
     this.length = this.size;
-    dayBegin = (new Date(this.event.time * 1000).getDay() + this.hidden - obm.vars.consts.weekStart + 7) % 7; 
-    dayEnd = (dayBegin + this.size + 6) % 7;
-    while(dayEnd < dayBegin || this.size > 7) {
-      var extensionSize = dayEnd + 1;
-      this.size -= extensionSize;
-      var extensionOrigin = this.origin + this.size * 86400;
-      dayEnd = 6;
-      if($(this.options.type+'-'+extensionOrigin)) {
-        this.extensions.push(new Obm.CalendarDayEventExtension(this,extensionSize, extensionOrigin));
-      } else {
-        this.length -= extensionSize;
-      }
-    }
+    this.drawExtensions();
     if(obm.calendarManager.lock()) {
       this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
       if(this.drag) {
@@ -339,6 +327,22 @@ Obm.CalendarDayEvent = new Class({
     return query;
   },
   
+  drawExtensions: function() {
+    dayBegin = (new Date(this.event.time * 1000).getDay() + this.hidden - obm.vars.consts.weekStart + 7) % 7; 
+    dayEnd = (dayBegin + this.size + 6) % 7;
+    while(dayEnd < dayBegin || this.size > 7) {
+      var extensionSize = dayEnd + 1;
+      this.size -= extensionSize;
+      var extensionOrigin = this.origin + this.size * 86400;
+      dayEnd = 6;
+      if($(this.options.type+'-'+extensionOrigin)) {
+        this.extensions.push(new Obm.CalendarDayEventExtension(this,extensionSize, extensionOrigin));
+      } else {
+        this.length -= extensionSize;
+      }
+    }
+  },
+                 
   trashExtensions: function() {
     this.extensions.each( function (extension) {
       extension.destroy();
@@ -349,10 +353,7 @@ Obm.CalendarDayEvent = new Class({
 
   destroy: function() {
     this.element.remove();
-    this.extensions.each( function (extension) {
-      extension.destroy();
-    }.bind(this));
-    this.extensions = new Array();
+    this.trashExtensions();
   }
 })
 
@@ -684,6 +685,7 @@ Obm.CalendarManager = new Class({
       eventData.all_day = evt.event.all_day;
       this.sendUpdateEvent(eventData);
     } else {
+      evt.setSize(evt.length);
       evt.redraw();
       this.redrawAllEvents(evt.event.time);
     }
@@ -1072,7 +1074,7 @@ Obm.CalendarQuickForm = new Class({
     if(action) {
       this.gotoURI += '&action='+action;
     }
-    this.gotoURI += '&date_begin='+this.eventData.date_begin+'&duration='+this.eventData.duration+'&title='+this.form.tf_title.value;
+    this.gotoURI += '&all_day='+this.eventData.all_day+'&date_begin='+this.eventData.date_begin+'&duration='+this.eventData.duration+'&title='+this.form.tf_title.value;
     window.location.href = 'calendar_index.php?'+this.gotoURI;
   }
 });
