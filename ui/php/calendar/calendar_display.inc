@@ -1666,6 +1666,12 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
       </tr>        
       ";
     }
+  // Exception
+    if(is_array($date_exception)) {
+      foreach($date_exception as $key => $value) {
+       $block_exception_detail .= "$value <br />";
+      }
+    }    
     $repeat_block = "
     <div class=\"detail infos\">
      <h1>$l_repeat</h1>
@@ -1764,12 +1770,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
       </tr>";
   }
 
-  // Exception
-  if(is_array($date_exception)) {
-    foreach($date_exception as $key => $value) {
-     $block_exception_detail .= "$value <br />";
-    }
-  }
 
   // --- HTML Template --------------------------------------------------------
   $block = "
