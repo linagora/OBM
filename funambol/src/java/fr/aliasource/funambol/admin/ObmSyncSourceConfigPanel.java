@@ -51,21 +51,27 @@ public class ObmSyncSourceConfigPanel
     
     public static final String VCARD_TYPE     = "text/x-vcard";
     public static final String VCARD_TYPES    = "text/x-vcard,text/vcard";
+    public static final String VCARD_VERSION  = "2.1";
     public static final String VCARD_VERSIONS = "2.1, 3.0";
     public static final String ICAL_TYPE      = "text/x-vcalendar";
     public static final String ICAL_TYPES     = "text/x-vcalendar";
+    public static final String ICAL_VERSION   = "1.0";
     public static final String ICAL_VERSIONS  = "1.0";
     public static final String SIFC_TYPE      = "text/x-s4j-sifc";
     public static final String SIFC_TYPES     = "text/x-s4j-sifc";
+    public static final String SIFC_VERSION   = "1.0";
     public static final String SIFC_VERSIONS  = "1.0";
     public static final String SIFE_TYPE      = "text/x-s4j-sife";
     public static final String SIFE_TYPES     = "text/x-s4j-sife";
+    public static final String SIFE_VERSION   = "1.0";
     public static final String SIFE_VERSIONS  = "1.0";
     public static final String SIFN_TYPE      = "text/x-s4j-sifn";
     public static final String SIFN_TYPES     = "text/x-s4j-sifn";
+    public static final String SIFN_VERSION   = "1.0";
     public static final String SIFN_VERSIONS  = "1.0";
     public static final String SIFT_TYPE      = "text/x-s4j-sift";
     public static final String SIFT_TYPES     = "text/x-s4j-sift";
+    public static final String SIFT_VERSION   = "1.0";
     public static final String SIFT_VERSIONS  = "1.0";
 
     // ------------------------------------------------------------ Private data
@@ -229,7 +235,7 @@ public class ObmSyncSourceConfigPanel
         if ((syncSource instanceof ContactSyncSource) ||
             (syncSource instanceof CalendarSyncSource)) {
 
-            String cType = ((ObmSyncSource) syncSource).getType();
+            String cType = ((ObmSyncSource) syncSource).getSourceType();
 
             if (VCARD_TYPE.equals(cType) || ICAL_TYPE.equals(cType)) {
                 typeValue.setSelectedIndex(1);
@@ -296,23 +302,23 @@ public class ObmSyncSourceConfigPanel
 
         	syncSource.setEncode (true) ;
             if (syncSource instanceof CalendarSyncSource)        {
-                syncSource.setType(SIFE_TYPE);
+                //syncSource.setSourceType(SIFE_TYPE,SIFE_VERSION);
                 types = new StringTokenizer(SIFE_TYPES       , "," ) ;
                 versions = new StringTokenizer(SIFE_VERSIONS , "," ) ;
             } else if (syncSource instanceof ContactSyncSource ) {
-                syncSource.setType(SIFC_TYPE);
+               // syncSource.setSourceType(SIFC_TYPE,SIFC_VERSION);
                 types = new StringTokenizer(SIFC_TYPES       , "," ) ;
                 versions = new StringTokenizer(SIFC_VERSIONS , "," ) ;
             }
 
         } else if (syncSource instanceof CalendarSyncSource)     {
             syncSource.setEncode (false) ;
-            syncSource.setType(ICAL_TYPE);
+            //syncSource.setSourceType(ICAL_TYPE,ICAL_VERSION);
             types = new StringTokenizer(ICAL_TYPES       , "," ) ;
             versions = new StringTokenizer(ICAL_VERSIONS , "," ) ;
         } else if (syncSource instanceof ContactSyncSource )     {
             syncSource.setEncode (false ) ;
-            syncSource.setType(VCARD_TYPE);
+           // syncSource.setSourceType(VCARD_TYPE,VCARD_VERSION);
             types = new StringTokenizer(VCARD_TYPES       , "," ) ;
             versions = new StringTokenizer(VCARD_VERSIONS , "," ) ;
         }

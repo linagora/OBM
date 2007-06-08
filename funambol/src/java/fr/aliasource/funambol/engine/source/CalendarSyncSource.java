@@ -69,7 +69,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 	    //contact.setUid(null);
 	    com.funambol.common.pim.calendar.Calendar created = null;
 		try {
-			created = manager.addItem(calendar, this.getType());
+			created = manager.addItem(calendar, getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
@@ -170,7 +170,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 		
 	    String[] keys = null;
 	    try {
-			keys = manager.getEventTwinKeys(event, this.getType());
+			keys = manager.getEventTwinKeys(event, this.getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
@@ -243,7 +243,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 	    Calendar event = null;
 	    try {
 			event = manager.updateItem(
-					syncItem.getKey().getKeyAsString(), calendar, this.getType());
+					syncItem.getKey().getKeyAsString(), calendar, getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
@@ -267,7 +267,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 	
 		Calendar calendar = null;
 		try {
-			calendar = manager.getItemFromId(key, this.getType());
+			calendar = manager.getItemFromId(key, getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
@@ -409,7 +409,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 
        String content = Helper.getContentOfSyncItem(item, this.isEncode());
 
-       if (MSG_TYPE_ICAL.equals(this.getType())) {
+       if (MSG_TYPE_ICAL.equals(getSourceType())) {
            foundationCalendar = getFoundationCalendarFromICal(content);
        } else {
            foundationCalendar = getFoundationCalendarFromXML(content);
@@ -423,7 +423,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 
        String content = null;
 
-       if (MSG_TYPE_ICAL.equals(this.getType())) {
+       if (MSG_TYPE_ICAL.equals(getSourceType())) {
            content = getICalFromFoundationCalendar(calendar);
        } else {
            content = getXMLFromFoundationCalendar(calendar);
@@ -435,11 +435,11 @@ public class CalendarSyncSource extends ObmSyncSource {
 
        if (this.isEncode()) {
            syncItem.setContent( Base64.encode(content.getBytes()) );
-           syncItem.setType(this.getType());
+           syncItem.setType(getSourceType());
            syncItem.setFormat("b64");
        } else {
     	   syncItem.setContent( content.getBytes() );
-    	   syncItem.setType(this.getType());
+    	   syncItem.setType(getSourceType());
        }
 
        return syncItem;

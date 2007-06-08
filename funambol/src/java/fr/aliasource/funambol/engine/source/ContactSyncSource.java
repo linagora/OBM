@@ -4,28 +4,26 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
+
 import org.xml.sax.SAXException;
 
-import com.funambol.framework.engine.source.SyncSource;
-import com.funambol.framework.tools.beans.LazyInitBean;
-
 import com.funambol.common.pim.contact.Contact;
-import com.funambol.common.pim.converter.ContactToVcard;
 import com.funambol.common.pim.converter.ContactToSIFC;
+import com.funambol.common.pim.converter.ContactToVcard;
 import com.funambol.common.pim.converter.ConverterException;
 import com.funambol.common.pim.sif.SIFCParser;
 import com.funambol.common.pim.vcard.VcardParser;
-//import com.funambol.foundation.pdi.utils.SourceUtils;
 import com.funambol.framework.engine.SyncItem;
 import com.funambol.framework.engine.SyncItemImpl;
 import com.funambol.framework.engine.SyncItemKey;
 import com.funambol.framework.engine.SyncItemState;
 import com.funambol.framework.engine.source.SyncContext;
+import com.funambol.framework.engine.source.SyncSource;
 import com.funambol.framework.engine.source.SyncSourceException;
+import com.funambol.framework.tools.beans.LazyInitBean;
 
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.Helper;
-import fr.aliasource.funambol.utils.MD5Helper;
 import fr.aliasource.obm.items.manager.ContactManager;
 
 public final class ContactSyncSource extends ObmSyncSource 
@@ -89,7 +87,7 @@ public final class ContactSyncSource extends ObmSyncSource
 	    contact.setUid(null);
 	    Contact created = null;
 		try {
-			created = manager.addItem(contact, this.getType());
+			created = manager.addItem(contact, getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
@@ -188,7 +186,7 @@ public final class ContactSyncSource extends ObmSyncSource
 		
 	    String[] keys = null;
 	    try {
-			keys = manager.getContactTwinKeys(contact, this.getType());
+			keys = manager.getContactTwinKeys(contact, getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
@@ -258,7 +256,7 @@ public final class ContactSyncSource extends ObmSyncSource
 	    Contact contact = getFoundationFromSyncItem(syncItem);
 	    try {
 			contact = manager.updateItem(
-					syncItem.getKey().getKeyAsString(), contact, this.getType());
+					syncItem.getKey().getKeyAsString(), contact, getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
@@ -282,7 +280,7 @@ public final class ContactSyncSource extends ObmSyncSource
 	
 		com.funambol.common.pim.contact.Contact contact = null;
 		try {
-			contact = manager.getItemFromId(key, this.getType());
+			contact = manager.getItemFromId(key, getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
@@ -300,7 +298,7 @@ public final class ContactSyncSource extends ObmSyncSource
 		SyncItem syncItem = null;
         String content    = null;
 
-        if (MSG_TYPE_VCARD.equals(this.getType())) {
+        if (MSG_TYPE_VCARD.equals(getSourceType())) {
             content = getVCardFromFoundationContact(contact);
         } else {
             content = getXMLFromFoundationContact(contact);
@@ -310,11 +308,11 @@ public final class ContactSyncSource extends ObmSyncSource
 
         if (this.isEncode()) {
             syncItem.setContent(com.funambol.framework.tools.Base64.encode(content.getBytes()) );
-            syncItem.setType(this.getType());
+            syncItem.setType(getSourceType());
             syncItem.setFormat("b64");
         } else {
             syncItem.setContent(content.getBytes() );
-            syncItem.setType(this.getType());
+            syncItem.setType(getSourceType());
         }
         
 
@@ -352,7 +350,7 @@ public final class ContactSyncSource extends ObmSyncSource
 		
 		content = Helper.getContentOfSyncItem(item, this.isEncode());
 		
-		if (MSG_TYPE_VCARD.equals(this.getType())) {
+		if (MSG_TYPE_VCARD.equals(getSourceType())) {
             contact = getFoundationContactFromVCard(content);
         } else {
             contact = getFoundationContactFromXML(content);

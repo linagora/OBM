@@ -1,12 +1,8 @@
 package fr.aliasource.funambol.utils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.funambol.common.pim.calendar.Calendar;
-import com.funambol.common.pim.calendar.Event;
 import com.funambol.framework.engine.SyncItem;
 
 /**

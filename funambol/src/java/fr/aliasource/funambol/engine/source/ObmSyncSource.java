@@ -62,16 +62,21 @@ implements SyncSource, Serializable, LazyInitBean {
      * Equivalent of deprecated method
 	 * @return syncsource type
 	 */
-   /* public String getType() {
-    	return getInfo().getSupportedTypes()[0].getType();
-    }*/
+    public String getSourceType() {
+    	if (getInfo() != null 
+    			&& getInfo().getPreferredType() != null ) {
+    		return getInfo().getSupportedTypes()[0].getType();
+    	} else {
+    		return "";
+    	}
+    }
     
     /**
      * Equivalent of deprecated method
      * @param type
      * @param version
      */
-    /*public void setType(String type, String version) {
+    /*public void setSourceType(String type, String version) {
     	ContentType[] contents = new ContentType[1];
     	ContentType content = new ContentType(type,version);
     	contents[0] = content;
@@ -94,8 +99,8 @@ implements SyncSource, Serializable, LazyInitBean {
     public String toString() {
         StringBuffer sb = new StringBuffer(super.toString());
 
-        sb.append(" - {name: ").append(getName()     );
-        sb.append(" type: "   ).append(getType()      );
+        sb.append(" - {name: ").append(getName()      );
+        sb.append(" type: "   ).append(getSourceType());
         sb.append(" uri: "    ).append(getSourceURI());
         sb.append("}"         );
         return sb.toString();
