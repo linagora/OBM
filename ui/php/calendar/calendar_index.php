@@ -478,9 +478,7 @@ function get_calendar_params() {
     $params["group_view"] = $params["group_id"];
   }
 
-  if (! isset ($params["date"])) {
-    $params["date"] = of_isodate_format();
-  }
+  $params["date"] = of_isodate_convert($params["date"]);
   $params["date_begin"] = of_isodate_convert($params["date_begin"],true);
   $params["date_end"] = of_isodate_convert($params["date_end"],true);
   $params["repeat_end"] = of_isodate_convert($params["repeat_end"],true);
