@@ -6,6 +6,7 @@
 // comments
 // Implement mono mode
 
+obm.vars.consts.tab = 9;
 obm.vars.consts.pgup = 33;
 obm.vars.consts.pgdown = 34;
 
@@ -115,7 +116,7 @@ obm.AutoComplete.Search = new Class({
       results: 8,                      // number of results per page
       delay: 400,                      // delay before the last key pressed and the request
       mode: 'multiple',                // 'mono' or 'multiple'
-      locked: 'false',                 // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
+      locked: false,                   // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
       restriction: null,               // obm needs
       fieldText: 'Search...',          // default text displayed when empty field
       extension: null                  // obm needs
@@ -264,6 +265,16 @@ obm.AutoComplete.Search = new Class({
       } else if (e.code == obm.vars.consts.pgdown) { // Page down : view next results page
         this.jumpTo(this.options.results);
         e.stop(); // because pgdown works like End in IE
+
+      } else if (e.code == obm.vars.consts.tab) {    // Tab key : select first result
+        var currentSel = $E('.highlight', this.resultBox);
+        if (currentSel) {
+          currentSel.fireEvent('mousedown');
+          this.resetFunc();
+        } else {
+          this.jumpTo(1);
+          e.stop();
+        }
       }
     }
   },

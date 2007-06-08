@@ -14,8 +14,10 @@
 
 IMPORTANT:
 
+ Le script déplace les données vers une NOUVELLE BD obm2.
+
 Pré-requis:
- - La BD obm2 et toutes ses tables sont créées.
+ - une nouvelle BD obm2 est créée, toutes ses tables sont créées.
  - Les tables suivantes sont vides : Domain, Host, MailServer, MailServerNetwork,
    MailShare, Samba, UGroup, UserObm, UserObmPref, UserObmGroup, GroupGroup,
    UserSystem et EntityRight.
