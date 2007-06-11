@@ -419,7 +419,7 @@ function run_query_incident_update($incident) {
   $comment = $incident["comment"];
   $add_comment = $incident["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $incident["datecomment"];
+    $datecomment = of_isodate_convert($incident["datecomment"]);
     $usercomment = $incident["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
     $add_duration = $incident["add_duration"];

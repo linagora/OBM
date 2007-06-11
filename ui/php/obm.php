@@ -111,6 +111,10 @@ if ($cgp_show["module"]["invoice"] && $perm->check_right("invoice", $cright_read
   $block .= dis_invoice_portal();
 }
 
+if ($cgp_show['module']['settings'] && $perm->check_right('settings', $cright_read)) { 
+  $block .= dis_my_portal();
+}
+
 $display["result"] = "
 $block
 <p style=\"clear:both;\"/>  
@@ -137,7 +141,7 @@ function get_obm_params() {
 // Display detail of logout page
 ///////////////////////////////////////////////////////////////////////////////
 function dis_logout_detail() {
-  global $l_connection_end, $l_reconnect, $l_obm_title, $obm_version,$path;
+  global $l_connection_end, $l_reconnect, $l_obm_title, $obm_version, $path;
   header("location: $_SERVER[PHP_SELF]");
   $block = "
 <table width=\"100%\">
@@ -186,7 +190,7 @@ function dis_calendar_portal() {
   $current_time = $start_time; 
   $calendar_entity["user"] = array($obm["uid"] => array("dummy"));
   calendar_events_model($start_time,$end_time, $calendar_entity);
-	$of = &OccurrenceFactory::getInstance();
+  $of = &OccurrenceFactory::getInstance();
   $whole_month = TRUE;
   $num_of_events = 0;
 
@@ -198,7 +202,7 @@ function dis_calendar_portal() {
     $iso_day = of_isodate_format($current_time);
     $check_month = of_date_get_month($current_time);
     $have_occurrence = $of->periodHaveOccurrences(strtotime($iso_day), $day_duration);
-    if($have_occurrence) {
+    if ($have_occurrence) {
       $klass = "hyperlight";
     } else {
       $klass = "";
@@ -324,8 +328,8 @@ function dis_lead_portal() {
    <dt>- 90 $l_days</dt>
    <dd>$leads_date[3]</dd>   
    <dt>$l_alarm
-   (<a href=\"$path/lead/lead_index.php?action=search&amp;sel_manager_id=$uid&amp;date_field=datealarm&amp;tf_date_before=$today\">$l_late</a> /
-   <a href=\"$path/lead/lead_index.php?action=search&amp;sel_manager_id=$uid&amp;tf_date_field=datealarm&amp;tf_date_after=$c_null\">$l_without</a>)
+   (<a href=\"$path/lead/lead_index.php?action=search&amp;sel_manager=$uid&amp;date_field=datealarm&amp;tf_date_before=$today\">$l_late</a> /
+   <a href=\"$path/lead/lead_index.php?action=search&amp;sel_manager=$uid&amp;tf_date_field=datealarm&amp;tf_date_after=$c_null\">$l_without</a>)
    </dt>
    <dd>$leads[alarm] / $leads[no_alarm]</dd>
    </dl>
@@ -545,6 +549,35 @@ function dis_invoice_portal() {
     $dis_potential
     </dl>
    <a class=\"link\" href=\"$path/invoice/invoice_index.php?action=dashboard\">$l_header_dashboard</a>
+  </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display The 'My' specific portal layer
+///////////////////////////////////////////////////////////////////////////////
+function dis_my_portal() {
+  global $uid, $ico_big_settings, $path, $cgp_show, $perm, $cright_read;
+  global $l_section_my, $l_module_settings;
+
+  $my = array ('password', 'mailforward', 'vacation', 'mailbox');
+
+  foreach ($my as $mod) {
+    if ($cgp_show['module']["$mod"] && $perm->check_right("$mod", $cright_read)) { 
+      $l_mod = "l_module_$mod";
+      global $$l_mod;
+      $dis_my .= "
+   <a class=\"link\" href=\"$path/$mod/${mod}_index.php\">${$l_mod}</a><br />";
+    }
+  }
+
+  $block = "
+  <div class=\"summaryBox\"> 
+  <h1><img src=\"$ico_big_settings\" alt=\"$l_section_my\" />$l_section_my</h1>
+  <a class=\"link\" href=\"$path/settings/settings_index.php\">$l_module_settings</a><br />
+  $dis_my
   </div>";
 
   return $block;

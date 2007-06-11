@@ -42,14 +42,11 @@ To do
 - traiter cas modif samba  -> --all --domain
 
 
-ARgg : pb avec session_load_user_pref reexecute chaque fois !! cause set_lang
-il faut utilisation de _SESSION[toto] a la place de toto pour chaque pref
-(voir aussi branche 2.0)
-
 2007-06-04 : version 2.1.0<br>
 
 <ul>
-<li> BUG#
+<li> BUG#632 : Private group can not have an email address
+<li> BUG#405 : User can change their password (module password)
 <li> Install scripts improvements (database independant)
 <li> Calendar : Home page minicalendar now display events in days
 <li> Lead : a lead can now have a contact
@@ -66,6 +63,7 @@ il faut utilisation de _SESSION[toto] a la place de toto pour chaque pref
 <li> Display : many IE6 and IE7 fixes (some checkboxes,...)
 <li> User selection enhancements (now uses Ajax everywhere, no more popup)
 <li> new module : Organizational chart
+<li> Session handling performance improvement
 </ul>
 
 2007-04-20 : version 2.0.1<br>

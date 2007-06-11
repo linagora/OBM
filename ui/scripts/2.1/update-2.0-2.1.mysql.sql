@@ -64,10 +64,22 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 -------------------------------------------------------------------------------
 -- Add contact link
 ALTER TABLE Lead ADD COLUMN lead_contact_id int(8) NOT NULL DEFAULT 0 AFTER lead_company_id;
+
+
+-------------------------------------------------------------------------------
+-- Update Invoice table
+-------------------------------------------------------------------------------
+-- Add credit memo flag
+ALTER TABLE Invoice ADD COLUMN invoice_credit_memo int(1) NOT NULL DEFAULT 0 AFTER invoice_inout;
+UPDATE Invoice set invoice_credit_memo = 0;
+
+
 -------------------------------------------------------------------------------
 -- Update Incident table
 -------------------------------------------------------------------------------
 ALTER TABLE Incident CHANGE COLUMN incident_date incident_date timestamp(14); 
+
+
 -------------------------------------------------------------------------------
 -- Update Resource table
 -------------------------------------------------------------------------------

@@ -353,7 +353,7 @@ if ($cgp_show["module"]["host"]) {
 if ($cgp_show["module"]["settings"]) {
   $modules["settings"] = array(
                                'Name'=> $l_module_settings,
-                               'Ico' => "$ico_setting",
+                               'Ico' => "$ico_settings",
 		               'Url' => "$path/settings/settings_index.php",
 			       'Right'=> $cright_read);
 }

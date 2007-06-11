@@ -13,6 +13,7 @@
 // Direct fields
 $fieldnames["invoice_archive"] = $l_archive;
 $fieldnames["invoice_number"] = $l_number;
+$fieldnames["invoice_credit_memo"] = $l_credit_memo;
 $fieldnames["invoice_company"] = $l_company;
 $fieldnames["invoice_deal"] = $l_deal;
 $fieldnames["invoice_project"] = $l_project;
@@ -76,6 +77,16 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
   
   elseif ($fieldname == "invoice_pay_label") {
     $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=".$OD->data_set->f("invoice_payment_id");
+  }
+
+  else if ($fieldname == "invoice_credit_memo") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   else if ($fieldname == "invoice_archive") {
@@ -158,11 +169,12 @@ function dis_invoice_search_form($invoice="") {
 //   - $tts     : Task Type aray
 //////////////////////////////////////////////////////////////////////////////
 function html_invoice_search_form($invoice, $sta, $tts) {
-  global $display, $path, $popup, $c_all, $l_all, $ctt_sales;
+  global $display, $path, $popup, $c_all, $l_all, $ctt_sales, $l_invoice;
   global $l_label_start, $l_number, $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_tt, $l_date, $l_after, $l_before, $l_inout;
-  global $l_company, $l_include_archive, $l_select_invoice;
+  global $l_credit_memo, $l_company, $l_include_archive, $l_select_invoice;
   global $l_find, $l_both, $l_client, $l_supplier, $l_expiration, $l_payment;
+  global $l_module_invoice;
 
   $label = $invoice["label"];
   $number = $invoice["number"];
@@ -172,6 +184,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
   $date_after = of_date_upd_format($invoice["date_after"], true);
   $date_before = of_date_upd_format($invoice["date_before"], true);
+  $credit_memo = $invoice["credit_memo"];
   $inout = $invoice["inout"];
   $tt = $invoice["tt"];
   $deal_id = $invoice["deal_id"];
@@ -204,6 +217,16 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   }
   if ($inout == "-") {
     $rb_four = " checked ";
+  }
+
+  if (($credit_memo == "$c_all") || ($credit_memo == '')) {
+    $rb_cm_both = 'checked';
+  }
+  if ($credit_memo == '0') {
+    $rb_cm_invoice = ' checked ';
+  }
+  if ($credit_memo == '1') {
+    $rb_cm_credit_memo = ' checked ';
   }
 
   $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
@@ -282,6 +305,19 @@ function html_invoice_search_form($invoice, $sta, $tts) {
     <label><br />
       <input type=\"radio\" name=\"rd_inout\" value=\"-\" $rb_four />
       $l_supplier &nbsp;
+    </label>
+
+    <label>$l_module_invoice<br />
+      <input type=\"radio\" name=\"rd_credit_memo\" value=\"$c_all\" $rb_cm_both />
+      $l_both &nbsp;
+    </label>
+    <label><br />
+      <input type=\"radio\" name=\"rd_credit_memo\" value=\"0\" $rb_cm_invoice />
+      $l_invoice &nbsp;
+    </label>
+    <label><br />
+      <input type=\"radio\" name=\"rd_credit_memo\" value=\"1\" $rb_cm_credit_memo />
+      $l_credit_memo &nbsp;
     </label>
     $block_tt
 
@@ -362,6 +398,7 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
   $date_after = of_date_upd_format($invoice["date_after"]);
   $date_before = of_date_upd_format($invoice["date_before"]);
   $inout = $invoice["inout"];
+  $credit_memo = $invoice['credit_memo'];
   $company = urlencode($invoice["company"]);
   $archive = $invoice["archive"];
   $deal_id = $invoice["deal_id"];
@@ -378,6 +415,7 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 		    "&amp;tf_date_after=$date_after".
 		    "&amp;tf_date_before=$date_before".
 		    "&amp;rd_inout=$inout".
+		    "&amp;credit_memo=$credit_memo".
 		    "&amp;company_id=$comp_id".
 		    "&amp;deal_id=$deal_id".
 		    "&amp;project_id=$project_new_id".
@@ -445,7 +483,7 @@ function html_invoice_consult($inv_q, $pays) {
   global $path, $display ;
   global $l_delete, $l_invoice, $l_payment, $l_no_payment, $l_total;
   global $l_list_payment, $l_company, $l_date, $l_number, $l_amount, $l_inout;
-  global $l_amount_remaining;
+  global $l_credit_memo, $l_amount_remaining;
 
   $i_id = $inv_q->f('invoice_id');
   $amount_ttc = $inv_q->f("invoice_amount_ttc");
@@ -544,7 +582,7 @@ function html_invoice_consult($inv_q, $pays) {
 //   $r : string with XHTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_links($inv_q, $amount_remaining="") {
-  global  $ico_document, $ico_add, $ico_payment;
+  global $ico_document, $ico_add, $ico_payment;
   global $l_invoice, $l_new, $l_module_document, $l_module_payment;
   global $l_document_add;
   global $path, $cgp_show;
@@ -617,7 +655,7 @@ function dis_invoice_detail($inv_q) {
   global $display,  $path, $ico_company, $ico_deal, $ico_project;
   global $l_company, $l_deal, $l_project,$l_amount_ht, $l_amount_ttc;
   global $l_date, $l_label, $l_number, $l_inout, $l_supplier, $l_client;
-  global $l_archive, $l_status, $l_comment, $l_invoice;
+  global $l_archive, $l_status, $l_comment, $l_invoice, $l_credit_memo;
   global $l_expiration_date, $l_payment_date;
   global $l_yes, $l_no;
 
@@ -628,6 +666,7 @@ function dis_invoice_detail($inv_q) {
   $payment_date = of_date_format($inv_q->f("payment_date"), 1);
   $status = $inv_q->f("invoicestatus_label");
   $inout = ($inv_q->f("invoice_inout") == '-') ? $l_supplier : $l_client;
+  $credit_memo = ($inv_q->f("invoice_credit_memo") == '0') ? $l_invoice : $l_credit_memo;
   $title = $inout;
   $ht = $inv_q->f("invoice_amount_ht");
   $ttc = $inv_q->f("invoice_amount_ttc");
@@ -669,6 +708,14 @@ function dis_invoice_detail($inv_q) {
       <th>$l_project $project_new_link</th>
       <td>$project</td>
     </tr>
+    <tr>
+      <th>$l_inout</th>
+      <td>$inout</td>
+    </tr>
+    <tr>
+      <th>$l_invoice / $l_credit_memo</th>
+      <td>$credit_memo</td>
+    </tr>
     </table>
 </div>
 
@@ -704,10 +751,6 @@ function dis_invoice_detail($inv_q) {
     <tr>
       <th>$l_status</th>
       <td>$status</td>
-    </tr>
-    <tr>
-      <th>$l_inout</th>
-      <td>$inout</td>
     </tr>
     <tr>
       <th>$l_amount_ht</th>
@@ -767,7 +810,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   global $ico_company, $ico_deal, $ico_project;
   global $l_label, $l_number, $l_comment, $l_add_comment, $l_upd_comment;
   global $l_amount_ht, $l_amount_ttc;
-  global $l_status, $l_date, $l_inout, $l_client, $l_supplier;
+  global $l_status, $l_date, $l_inout, $l_credit_memo, $l_client, $l_supplier;
   global $l_insert, $l_update, $l_archive, $l_expiration_date;
   global $l_invoice, $l_company, $l_deal, $l_project, $l_payment_date;
   global $default_invoice_numbering, $c_php_isodate_format;
@@ -787,6 +830,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     $expiration_date = of_date_upd_format($inv_q->f("expiration_date"), 1);
     $payment_date = of_date_upd_format($inv_q->f("payment_date"), 1);
     $inout = $inv_q->f("invoice_inout");
+    $credit_memo = $inv_q->f("invoice_credit_memo");
     $ht = $inv_q->f("invoice_amount_ht");
     $ttc = $inv_q->f("invoice_amount_ttc");
     $c_id = $inv_q->f("invoice_company_id");
@@ -829,6 +873,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   if (isset($invoice["payment_date"])) { $payment_date = of_date_upd_format($invoice["payment_date"]); }
   if (isset($invoice["status"])) { $status = $invoice["status"]; }
   if (isset($invoice["inout"])) { $inout = $invoice["inout"]; }
+  if (isset($invoice['credit_memo'])) { $credit_memo = $invoice['credit_memo']; }
   if (isset($invoice["tax"])) { $tax = $invoice["tax"]; }
   if (isset($invoice["amount_ht"])) { $ht = $invoice["amount_ht"]; }
   if (isset($invoice["amount_ttc"])) { $ttc = $invoice["amount_ttc"]; }
@@ -873,6 +918,16 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     <td>
       <input type=\"radio\" name=\"rd_inout\" value=\"+\" $inout_c /> $l_client
       <input type=\"radio\" name=\"rd_inout\" value=\"-\" $inout_s /> $l_supplier
+      </td>";
+
+  $cm_c = ($credit_memo == '1') ? 'checked' : '';
+  $cm_i = ($credit_memo == '0') ? 'checked' : '';
+
+  $dis_credit_memo = "
+    <th>$l_invoice / $l_credit_memo</th>
+    <td>
+      <input type=\"radio\" name=\"rd_credit_memo\" value=\"0\" $cm_i /> $l_invoice
+      <input type=\"radio\" name=\"rd_credit_memo\" value=\"1\" $cm_c /> $l_credit_memo
       </td>";
 
   // tax select
@@ -976,6 +1031,12 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       <input type=\"text\" size=\"32\" name=\"project_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
   </tr>
+  <tr>
+    $dis_inout
+  </tr>
+  <tr>
+    $dis_credit_memo
+  </tr>
   </table>
   </fieldset>
 
@@ -1014,9 +1075,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   </tr><tr>
     <th>$l_status</th>
     <td>$sel_status</td>
-  </tr><tr>
-    $dis_inout
-  </tr><tr>
+  </tr>
+  <tr>
     <th>$l_amount_ht</th>
     <td>
       <input name=\"tf_amount_ht\" type=\"text\" size=\"15\" value=\"$ht\" onChange=\"compute_tax(this.form, true);\" />

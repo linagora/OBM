@@ -1264,6 +1264,7 @@ CREATE TABLE Invoice (
   invoice_expiration_date  date,
   invoice_payment_date     date,
   invoice_inout            char(1),
+  invoice_credit_memo      integer NOT NULL DEFAULT 0,
   invoice_archive          char(1) NOT NULL DEFAULT '0',
   invoice_comment          text,
   PRIMARY KEY (invoice_id)

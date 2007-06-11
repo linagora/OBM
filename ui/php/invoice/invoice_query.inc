@@ -26,6 +26,7 @@ function run_query_invoice_search ($invoice) {
   $date_after = of_isodate_convert($invoice["date_after"],true);
   $date_before = of_isodate_convert($invoice["date_before"],true);
   $inout = $invoice["inout"];
+  $credit_memo = $invoice['credit_memo'];
   $company = sql_search_text_parse($invoice["company"]);
   $archive = $invoice["archive"];
   $comp_id = $invoice["company_id"];
@@ -74,6 +75,9 @@ function run_query_invoice_search ($invoice) {
   }
   if (($inout != "") && ($inout != "$c_all")) {
     $where .= " AND invoice_inout = '$inout'";
+  }
+  if (($credit_memo != '') && ($credit_memo != "$c_all")) {
+    $where .= " AND invoice_credit_memo = '$credit_memo'";
   }
   if ($comp_id != "") {
     $where .= " AND invoice_company_id = '$comp_id'";
@@ -193,7 +197,7 @@ function run_query_invoice_detail($p_invoice_id) {
       invoice_deal_id, invoice_project_id, invoice_number, invoice_label,
       invoice_amount_ht, invoice_amount_ttc, invoice_status_id, invoice_date,
       invoice_expiration_date, invoice_payment_date, invoice_comment,
-      invoice_inout, invoice_archive,
+      invoice_inout, invoice_credit_memo, invoice_archive,
       invoicestatus_label,
       c.userobm_login, u.userobm_login, company_name, deal_label, project_name";
 
@@ -224,6 +228,7 @@ function run_query_invoice_insert($invoice) {
   $expiration_date = ($invoice["expiration_date"] ? "'".of_isodate_convert($invoice["expiration_date"])."'" : "null");
   $payment_date = ($invoice["payment_date"] ? "'".of_isodate_convert($invoice["payment_date"])."'" : "null");
   $inout = $invoice["inout"];
+  $credit_memo = $invoice['credit_memo'];
   $add_comment = $invoice["add_comment"];
   if ($add_comment != "") {
     $datecomment = of_isodate_convert($invoice["datecomment"]);
@@ -264,6 +269,7 @@ function run_query_invoice_insert($invoice) {
       invoice_expiration_date,
       invoice_payment_date,
       invoice_inout,
+      invoice_credit_memo,
       invoice_archive)
     VALUES (
      '$domain_id',
@@ -284,6 +290,7 @@ function run_query_invoice_insert($invoice) {
      $expiration_date,
      $payment_date,
      '$inout',
+     '$credit_memo',
      '$arch')"; 
 
   display_debug_msg($query, $cdg_sql, "run_query_invoice_insert()");
@@ -314,6 +321,7 @@ function run_query_invoice_update($invoice) {
   $expiration_date = ($invoice["expiration_date"] ? "'".of_isodate_convert($invoice["expiration_date"])."'" : "null");
   $payment_date = ($invoice["payment_date"] ? "'".of_isodate_convert($invoice["payment_date"])."'" : "null");
   $inout = $invoice["inout"];
+  $credit_memo = $invoice['credit_memo'];
   if ($status == ""){
     $status = "0";
   }
@@ -352,6 +360,7 @@ function run_query_invoice_update($invoice) {
       invoice_expiration_date=$expiration_date,
       invoice_payment_date=$payment_date,
       invoice_inout='$inout',
+      invoice_credit_memo='$credit_memo',
       invoice_archive='$arch'
     WHERE invoice_id='$id' $multidomain";
 
@@ -523,7 +532,7 @@ function run_query_linked_invoice_payment($p_id) {
 function run_query_invoice_deal_get_inout($p_deal_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 
   $query = "SELECT dealtype_inout
     FROM Deal, DealType

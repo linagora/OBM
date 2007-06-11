@@ -15,6 +15,7 @@ $l_amount_ttc = "Montant TTC";
 $l_expiration_date = "Date d'échéance";
 $l_payment_date = "Date de paiment";
 $l_expiration = "Echéance";
+$l_credit_memo = "Avoir";
 $l_paid = "Payé";
 $l_waiting = "En attente";
 $l_pick_deal = "Choisissez une affaire";

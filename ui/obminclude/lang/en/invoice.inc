@@ -15,6 +15,7 @@ $l_amount_ttc = "TTC Amount";
 $l_expiration_date = "Expiration date";
 $l_payment_date = "Payment date";
 $l_expiration = "Expiration";
+$l_credit_memo = "Credit memo";
 $l_paid = "Paid";
 $l_waiting = "Waiting";
 $l_pick_deal = "Choose a deal";

@@ -67,6 +67,17 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 ALTER TABLE Lead ADD COLUMN lead_contact_id integer;
 ALTER TABLE Lead ALTER COLUMN lead_contact_id SET DEFAULT 0;
 
+
+-------------------------------------------------------------------------------
+-- Update Invoice table
+-------------------------------------------------------------------------------
+-- Add credit memo flag
+ALTER TABLE Invoice ADD COLUMN invoice_credit_memo integer;
+ALTER TABLE Invoice ALTER COLUMN invoice_credit_memo SET DEFAULT 0;
+UPDATE Invoice set invoice_credit_memo = 0;
+ALTER TABLE Invoice ALTER COLUMN invoice_credit_memo SET NOT NULL;
+
+
 -------------------------------------------------------------------------------
 -- Update Resource table
 -------------------------------------------------------------------------------
