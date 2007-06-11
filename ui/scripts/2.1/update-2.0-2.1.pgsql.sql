@@ -79,6 +79,14 @@ ALTER TABLE Invoice ALTER COLUMN invoice_credit_memo SET NOT NULL;
 
 
 -------------------------------------------------------------------------------
+-- Update CalendarEvent table
+-------------------------------------------------------------------------------
+-- Add ext_id column
+ALTER TABLE CalendarEvent ADD COLUMN calendarevent_ext_id varchar(32);
+ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_ext_id DEFAULT '';
+
+
+-------------------------------------------------------------------------------
 -- Update Resource table
 -------------------------------------------------------------------------------
 -- Add ResourceType link

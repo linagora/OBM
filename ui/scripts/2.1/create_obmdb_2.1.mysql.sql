@@ -647,6 +647,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_userupdate       int(8) default NULL,
   calendarevent_usercreate       int(8) default NULL,
   calendarevent_owner	         int(8) default NULL, 
+  calendarevent_ext_id           varchar(32) DEFAULT '', 
   calendarevent_title            varchar(255) default NULL,
   calendarevent_location         varchar(100) default NULL,
   calendarevent_category1_id     int(8) default 0,

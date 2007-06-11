@@ -645,6 +645,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_timecreate   timestamp,
   calendarevent_userupdate   integer,
   calendarevent_usercreate   integer,
+  calendarevent_ext_id       varchar(32) DEFAULT '', 
   calendarevent_owner        integer default NULL,    
   calendarevent_title        varchar(255) default NULL,
   calendarevent_location     varchar(100) default NULL,

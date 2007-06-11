@@ -75,6 +75,13 @@ UPDATE Invoice set invoice_credit_memo = 0;
 
 
 -------------------------------------------------------------------------------
+-- Update CalendarEvent table
+-------------------------------------------------------------------------------
+-- Add ext_id column
+ALTER TABLE CalendarEvent ADD COLUMN calendarevent_ext_id varchar(32) DEFAULT '' AFTER calendarevent_usercreate;
+
+
+-------------------------------------------------------------------------------
 -- Update Incident table
 -------------------------------------------------------------------------------
 ALTER TABLE Incident CHANGE COLUMN incident_date incident_date timestamp(14); 
