@@ -8,6 +8,7 @@ import java.security.Principal;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
+import com.funambol.foundation.util.Def;
 import com.funambol.framework.engine.SyncItemKey;
 import com.funambol.framework.engine.source.AbstractSyncSource;
 import com.funambol.framework.engine.source.ContentType;
@@ -15,6 +16,8 @@ import com.funambol.framework.engine.source.SyncContext;
 import com.funambol.framework.engine.source.SyncSource;
 import com.funambol.framework.engine.source.SyncSourceException;
 import com.funambol.framework.engine.source.SyncSourceInfo;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
 import com.funambol.framework.logging.Sync4jLogger;
 import com.funambol.framework.security.Sync4jPrincipal;
 import com.funambol.framework.server.Sync4jDevice;
@@ -41,14 +44,15 @@ implements SyncSource, Serializable, LazyInitBean {
     private boolean encode = true;
     
     private int restrictions = 1; //default private
+    private String obmAddress = null;
     
-    Logger log = null;
+    protected FunambolLogger log = FunambolLoggerFactory.getLogger(Def.LOGGER_NAME);
 
     // ------------------------------------------------------------ Constructors
 
     /** Creates a new instance of AbstractSyncSource */
     public ObmSyncSource() {
-        log = Sync4jLogger.getLogger("server");
+    	
     }
 
     // ---------------------------------------------------------- Public methods
@@ -187,6 +191,14 @@ implements SyncSource, Serializable, LazyInitBean {
 	public void setRestrictions(int restrictions) {
 		log.info(" setRestrcitions:"+restrictions);
 		this.restrictions = restrictions;
+	}
+
+	public String getObmAddress() {
+		return obmAddress;
+	}
+
+	public void setObmAddress(String obmAddress) {
+		this.obmAddress = obmAddress;
 	}
 
 }

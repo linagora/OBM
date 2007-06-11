@@ -51,27 +51,21 @@ public class ObmSyncSourceConfigPanel
     
     public static final String VCARD_TYPE     = "text/x-vcard";
     public static final String VCARD_TYPES    = "text/x-vcard,text/vcard";
-    public static final String VCARD_VERSION  = "2.1";
     public static final String VCARD_VERSIONS = "2.1, 3.0";
     public static final String ICAL_TYPE      = "text/x-vcalendar";
     public static final String ICAL_TYPES     = "text/x-vcalendar";
-    public static final String ICAL_VERSION   = "1.0";
     public static final String ICAL_VERSIONS  = "1.0";
     public static final String SIFC_TYPE      = "text/x-s4j-sifc";
     public static final String SIFC_TYPES     = "text/x-s4j-sifc";
-    public static final String SIFC_VERSION   = "1.0";
     public static final String SIFC_VERSIONS  = "1.0";
     public static final String SIFE_TYPE      = "text/x-s4j-sife";
     public static final String SIFE_TYPES     = "text/x-s4j-sife";
-    public static final String SIFE_VERSION   = "1.0";
     public static final String SIFE_VERSIONS  = "1.0";
     public static final String SIFN_TYPE      = "text/x-s4j-sifn";
     public static final String SIFN_TYPES     = "text/x-s4j-sifn";
-    public static final String SIFN_VERSION   = "1.0";
     public static final String SIFN_VERSIONS  = "1.0";
     public static final String SIFT_TYPE      = "text/x-s4j-sift";
     public static final String SIFT_TYPES     = "text/x-s4j-sift";
-    public static final String SIFT_VERSION   = "1.0";
     public static final String SIFT_VERSIONS  = "1.0";
 
     // ------------------------------------------------------------ Private data
@@ -91,6 +85,8 @@ public class ObmSyncSourceConfigPanel
     private JCheckBox	restrictPrivateValue	= new JCheckBox();
     private JLabel		restrictOwnerLabel		= new JLabel() ;
     private	JCheckBox	restrictOwnerValue		= new JCheckBox(); 
+    private JLabel		obmAddressLabel	= new JLabel();
+    private JTextField	obmAddressValue = new JTextField();
     
     private JButton     confirmButton   = new JButton() ;
 
@@ -144,23 +140,29 @@ public class ObmSyncSourceConfigPanel
         typeValue.setBounds(new Rectangle(170, 120, 350, 18));
         
         
+        obmAddressLabel.setText("Obm-Sync address: ");
+        obmAddressLabel.setFont(defaultFont);
+        obmAddressLabel.setBounds(new Rectangle(14, 150, 150, 18));
+        obmAddressValue.setFont(defaultFont);
+        obmAddressValue.setBounds(new Rectangle(170, 150, 350, 18));
+        
         restrictPrivateLabel.setText("No private: ");
         restrictPrivateLabel.setFont(defaultFont);
-        restrictPrivateLabel.setBounds(new Rectangle(12,150,150,18));
+        restrictPrivateLabel.setBounds(new Rectangle(12,180,150,18));
         restrictPrivateValue.setFont(defaultFont);
-        restrictPrivateValue.setBounds(new Rectangle(170,150,350,18));
+        restrictPrivateValue.setBounds(new Rectangle(170,180,350,18));
         
         
         restrictOwnerLabel.setText("Only owner: ");
         restrictOwnerLabel.setFont(defaultFont);
-        restrictOwnerLabel.setBounds(new Rectangle(12,180,150,18));
+        restrictOwnerLabel.setBounds(new Rectangle(12,210,150,18));
         restrictOwnerValue.setFont(defaultFont);
-        restrictOwnerValue.setBounds(new Rectangle(170,180,350,18));
+        restrictOwnerValue.setBounds(new Rectangle(170,210,350,18));
        
         
         confirmButton.setFont(defaultFont);
         confirmButton.setText("Add");
-        confirmButton.setBounds(170, 300, 70, 25);
+        confirmButton.setBounds(170, 350, 70, 25);
 
         confirmButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event ) {
@@ -191,6 +193,9 @@ public class ObmSyncSourceConfigPanel
         this.add(restrictPrivateValue, null);
         this.add(restrictOwnerLabel	, null);
         this.add(restrictOwnerValue, null);
+        
+        this.add(obmAddressLabel, null);
+        this.add(obmAddressValue, null);
         
         this.add(confirmButton  , null);
         
@@ -255,6 +260,8 @@ public class ObmSyncSourceConfigPanel
         		(rs & Helper.RESTRICT_PRIVATE) == Helper.RESTRICT_PRIVATE );
         restrictOwnerValue.setSelected(
         		(rs & Helper.RESTRICT_OWNER) == Helper.RESTRICT_OWNER );
+        
+        obmAddressValue.setText(syncSource.getObmAddress());
     }
 
  // ----------------------------------------------------------- Private methods
@@ -283,6 +290,13 @@ public class ObmSyncSourceConfigPanel
             throw new
             IllegalArgumentException(
             "Field 'Source URI' cannot be empty. Please provide a SyncSource URI.");
+        }
+        
+        value = obmAddressValue.getText();
+        if (StringUtils.isEmpty(value)) {
+        	throw new
+        	IllegalArgumentException(
+        	"Field 'Obm-Sync address' cannot be empty. Please provide a Obm-Sync address.");
         }
     }
 
@@ -340,6 +354,8 @@ public class ObmSyncSourceConfigPanel
         	rs += Helper.RESTRICT_OWNER;
         }
         syncSource.setRestrictions(rs);
+        
+        syncSource.setObmAddress(obmAddressValue.getText().trim());
     }
 
 }

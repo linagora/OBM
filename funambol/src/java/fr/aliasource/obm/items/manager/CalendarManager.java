@@ -10,6 +10,9 @@ import java.util.logging.Logger;
 
 import javax.xml.rpc.ServiceException;
 
+import com.funambol.foundation.util.Def;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
 import com.funambol.framework.logging.Sync4jLogger;
 
 import fr.aliacom.obm.CalendarServiceLocator;
@@ -29,17 +32,15 @@ public class CalendarManager extends ObmManager {
 	private CalendarBindingStub binding;
 	private AccessToken token;
 	private String calendar;
-	private Logger log = null;
+	protected FunambolLogger log = FunambolLoggerFactory.getLogger(Def.LOGGER_NAME);
 	private String userEmail;
 	
-	public CalendarManager() {
-		
-		log = Sync4jLogger.getLogger("server");
+	public CalendarManager(String obmAddress) {
 		
 		CalendarBindingStub calendarBinding = null;
 		try {
 			CalendarServiceLocator calendarLocator = new CalendarServiceLocator();
-			calendarLocator.setCalendarEndpointAddress("http://localhost:8080/obm-sync/services/Calendar");
+			calendarLocator.setCalendarEndpointAddress(obmAddress);
 			calendarBinding = (CalendarBindingStub)calendarLocator.getCalendar();
 			
 		} catch (ServiceException e) {
@@ -354,7 +355,9 @@ public class CalendarManager extends ObmManager {
 	private com.funambol.common.pim.calendar.Calendar obmEventToFoundationCalendar(Event obmevent, String type) {
     	
 		com.funambol.common.pim.calendar.Calendar calendar = new com.funambol.common.pim.calendar.Calendar();
-    	com.funambol.common.pim.calendar.Event event = calendar.getEvent();
+		com.funambol.common.pim.calendar.CalendarContent event = null; 
+    	event = new com.funambol.common.pim.calendar.Event();
+    	calendar.setEvent((com.funambol.common.pim.calendar.Event) event);
     	
     	event.getUid().setPropertyValue(obmevent.getUid());
 /* this.uid = uid;
@@ -424,7 +427,7 @@ public class CalendarManager extends ObmManager {
     private Event foundationCalendarToObmEvent(com.funambol.common.pim.calendar.Calendar calendar, String type) {
 
     	Event event = new Event();
-    	com.funambol.common.pim.calendar.Event foundation = calendar.getEvent();
+    	com.funambol.common.pim.calendar.CalendarContent foundation = calendar.getCalendarContent();
     	
     	
     	if (foundation.getUid() != null && foundation.getUid().getPropertyValueAsString() != "") {

@@ -39,7 +39,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 
 		log.info("- Begin an OBM Calendar sync -");
 		
-		manager = new CalendarManager();
+		manager = new CalendarManager(getObmAddress());
 		
 		try {
 			manager.logIn(
@@ -65,16 +65,16 @@ public class CalendarSyncSource extends ObmSyncSource {
 	                       " , "                              +
 	                       syncItem.getKey().getKeyAsString() +
 	                       ")");
-	    com.funambol.common.pim.calendar.Calendar calendar = getFoundationFromSyncItem(syncItem);
-	    //contact.setUid(null);
 	    com.funambol.common.pim.calendar.Calendar created = null;
-		try {
+	    try {
+		    com.funambol.common.pim.calendar.Calendar calendar = getFoundationFromSyncItem(syncItem);
+		    
 			created = manager.addItem(calendar, getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
 	    
-	    log.info(" created with id : "+created.getEvent().getUid().getPropertyValueAsString());
+	    log.info(" created with id : "+created.getCalendarContent().getUid().getPropertyValueAsString());
 	    
 	    return getSyncItemFromFoundation(created, SyncItemState.SYNCHRONIZED);
 	}
@@ -165,11 +165,10 @@ public class CalendarSyncSource extends ObmSyncSource {
 		log.info("getSyncItemKeysFromTwin(" 	   +
                 principal						   +
                 ")"	);
-		
-		Calendar event = getFoundationFromSyncItem(syncItem);
-		
-	    String[] keys = null;
-	    try {
+		String[] keys = null;
+		try {
+			Calendar event = getFoundationFromSyncItem(syncItem);
+
 			keys = manager.getEventTwinKeys(event, this.getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
@@ -238,10 +237,10 @@ public class CalendarSyncSource extends ObmSyncSource {
 	                       " , "                              	+
 	                       syncItem.getKey().getKeyAsString() 	+
 	                       ")");
-	    
-	    Calendar calendar = getFoundationFromSyncItem(syncItem);
 	    Calendar event = null;
 	    try {
+		    Calendar calendar = getFoundationFromSyncItem(syncItem);
+	    
 			event = manager.updateItem(
 					syncItem.getKey().getKeyAsString(), calendar, getSourceType());
 		} catch (OBMException e) {
@@ -382,29 +381,32 @@ public class CalendarSyncSource extends ObmSyncSource {
     *
     * @param content String
     * @return Calendar
-    * @throws EntityException
+    * @throws OBMException 
     */
-   private Calendar getFoundationCalendarFromXML(String content) {
-	   log.info(" getFoundationCalendarFromXml parse :");
-	   log.info(content);
+   private Calendar getFoundationCalendarFromXML(String content) throws OBMException {
+	   
+       StringBuilder sb = new StringBuilder(content.length() + 60);
+       sb.append("Converting: ").append("SIFE").append(" => Calendar ")
+         .append("\nINPUT = {").append(content).append('}');
+       log.info(sb.toString());
+     
 	   
        ByteArrayInputStream buffer = null;
-       SIFCalendarParser parser       = null;
-       Calendar calendar           = null;
+       Calendar calendar = null;
        try {
            calendar = new Calendar();
            buffer = new ByteArrayInputStream(content.getBytes());
            if ((content.getBytes()).length > 0) {
-               parser = new SIFCalendarParser(buffer);
-               calendar = parser.parse();
+                   SIFCalendarParser parser = new SIFCalendarParser(buffer);
+                   calendar = parser.parse();
            }
-       } catch (Exception e) {
-           //throw new EntityException(e.toString());
+       } catch (Exception e){
+    	   throw new OBMException("Error converting ", e);
        }
        return calendar;
    }
 
-   private Calendar getFoundationFromSyncItem(SyncItem item) {
+   private Calendar getFoundationFromSyncItem(SyncItem item) throws OBMException {
        Calendar foundationCalendar = null;
 
        String content = Helper.getContentOfSyncItem(item, this.isEncode());
@@ -414,7 +416,10 @@ public class CalendarSyncSource extends ObmSyncSource {
        } else {
            foundationCalendar = getFoundationCalendarFromXML(content);
        }
-       foundationCalendar.getEvent().getUid().setPropertyValue(item.getKey().getKeyAsString());
+       log.info("foundation :" +foundationCalendar);
+       log.info("getCalendarContent :" +foundationCalendar.getCalendarContent());
+       log.info("getUid :" +foundationCalendar.getCalendarContent().getUid());
+       foundationCalendar.getCalendarContent().getUid().setPropertyValue(item.getKey().getKeyAsString());
        return foundationCalendar;
    }
 
@@ -430,7 +435,7 @@ public class CalendarSyncSource extends ObmSyncSource {
        }
 
        syncItem = new SyncItemImpl(this,
-                                   calendar.getEvent().getUid().getPropertyValueAsString(),
+                                   calendar.getCalendarContent().getUid().getPropertyValueAsString(),
                                    status);
 
        if (this.isEncode()) {

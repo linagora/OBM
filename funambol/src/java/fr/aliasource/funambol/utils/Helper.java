@@ -44,20 +44,12 @@ public class Helper {
 		
 		String result = null;
 		
-	    // get content of the item
-	
-	    byte[] itemContent = item.getContent();
-	    if (itemContent == null) {
-	        itemContent = new byte[0];
-	    }
-	    result = new String(itemContent);
-	    
-	    if (encode &&
-	    	result != null &&
-	        result.length() > 0) {
-	    	result = new String(com.funambol.framework.tools.Base64.decode(result));
-	    }
-		return result;
+		byte[] itemContent = item.getContent();
+		
+		   // Add content processing here, if needed
+		result = new String(itemContent == null ? new byte[0] : itemContent);
+		
+		return result.trim();
 	}
 
 

@@ -45,7 +45,7 @@ public final class ContactSyncSource extends ObmSyncSource
 
 		log.info("- Begin an OBM Contact sync -");
 		
-		manager = new ContactManager();
+		manager = new ContactManager(getObmAddress());
 		
 		try {
 			manager.logIn(

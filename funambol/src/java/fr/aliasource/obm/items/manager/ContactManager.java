@@ -11,6 +11,9 @@ import javax.xml.rpc.ServiceException;
 
 import com.funambol.common.pim.contact.Address;
 import com.funambol.common.pim.contact.BusinessDetail;
+import com.funambol.foundation.util.Def;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
 import com.funambol.framework.logging.Sync4jLogger;
 
 import fr.aliacom.obm.AddressBookLocator;
@@ -28,17 +31,15 @@ public class ContactManager extends ObmManager {
 
 	private AddressBookBindingStub binding;
 	private String book;
-	private Logger log = null;
+	protected FunambolLogger log = FunambolLoggerFactory.getLogger(Def.LOGGER_NAME);
 	
 	
-	public ContactManager() {
-		
-		log = Sync4jLogger.getLogger("server");
+	public ContactManager(String obmAddress) {
 		
 		AddressBookBindingStub addressBinding = null;
 		try {
 			AddressBookLocator addressbookLocator = new AddressBookLocator();
-			addressbookLocator.setAddressBookEndpointAddress("http://localhost:8080/obm-sync/services/AddressBook");
+			addressbookLocator.setAddressBookEndpointAddress(obmAddress);
 			addressBinding = (AddressBookBindingStub)addressbookLocator.getAddressBook();
 			
 		} catch (ServiceException e) {
