@@ -1173,7 +1173,7 @@ CREATE TABLE Incident (
   incident_contract_id        int(8) NOT NULL,
   incident_label              varchar(100) DEFAULT NULL,
   incident_reference          varchar(32) DEFAULT NULL,
-  incident_date               timestamp(14) default NULL,
+  incident_date               timestamp(14),
   incident_priority_id        int(8) DEFAULT 0,
   incident_status_id          int(8) DEFAULT 0,
   incident_resolutiontype_id  integer DEFAULT 0,
