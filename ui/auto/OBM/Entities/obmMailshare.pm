@@ -53,6 +53,7 @@ sub new {
     $ldapEngineAttr{"type"} = $MAILSHARE;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
     $ldapEngineAttr{"toDelete"} = 0;
+    $ldapEngineAttr{"archive"} = 0;
 
     bless( \%ldapEngineAttr, $self );
 }
@@ -180,6 +181,13 @@ sub getDelete {
     my $self = shift;
 
     return $self->{"toDelete"};
+}
+
+
+sub getArchive {
+    my $self = shift;
+
+    return $self->{"archive"};
 }
 
 

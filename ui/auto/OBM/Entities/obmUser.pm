@@ -200,7 +200,7 @@ sub getEntity {
                 $self->{"userDesc"}->{"user_mailLocalOnly"} = "local_only";
             }
 
-            # Gestions des e-mails des utilisateurs.
+            # Gestions des e-mails de l'utilisateur.
             my @email = split( /\r\n/, $user_email );
             for( my $j=0; $j<=$#email; $j++ ) {
                 push( @{$self->{"userDesc"}->{"user_email"}}, $email[$j]."@".$domainDesc->{"domain_name"} );
@@ -258,6 +258,13 @@ sub getDelete {
     my $self = shift;
 
     return $self->{"toDelete"};
+}
+
+
+sub getArchive {
+    my $self = shift;
+
+    return $self->{"archive"};
 }
 
 
@@ -706,6 +713,75 @@ sub getMailboxAcl {
     }
 
     return $mailBoxAcl;
+}
+
+
+sub getSieveVacation {
+    my $self = shift;
+
+    if( !$self->{"userDesc"}->{"user_vacation_enable"} ) {
+        return undef;
+    }
+
+    if( !$self->{"userDesc"}->{"user_email"} ) {
+        return undef;
+    }
+    my $boxEmails = $self->{"userDesc"}->{"user_email"};
+    my $boxEmailsAlias = $self->{"userDesc"}->{"user_email_alias"};
+
+    if( !$self->{"userDesc"}->{"user_vacation_message"} ) {
+        return undef;
+    }
+    my $boxVacationMessage = $self->{"userDesc"}->{"user_vacation_message"};
+
+    my $vacationMsg = "vacation :addresses [ ";
+    for( my $i=0; $i<=$#{$boxEmails}; $i++ ) {
+        if( $i != 0 ) {
+            $vacationMsg .= ", ";
+        }
+        $vacationMsg .= "\"".$boxEmails->[$i]."\"";
+    }
+
+    for( my $i=0; $i<=$#{$boxEmailsAlias}; $i++ ) {
+        if( $i != 0 ) {
+            $vacationMsg .= ", ";
+        }
+        $vacationMsg .= "\"".$boxEmailsAlias->[$i]."\"";
+    }
+
+    $vacationMsg .= " ] \"".to_utf8( { -string => $boxVacationMessage, -charset => $defaultCharSet } )."\";\n";
+
+
+    return $vacationMsg;
+}
+
+
+sub getSieveNomade {
+    my $self = shift;
+
+    if( !$self->{"userDesc"}->{"user_nomade_perms"} ) {
+        return undef;
+    }
+
+    if( !$self->{"userDesc"}->{"user_nomade_enable"} ) {
+        return undef;
+    }
+
+    if( !$self->{"userDesc"}->{"user_nomade_email"} ) {
+        return undef;
+    }
+    my $nomadeEmail = $self->{"userDesc"}->{"user_nomade_email"};
+
+    my $nomadeMsg = "redirect \"".$nomadeEmail."\";\n";
+
+    if( !$self->{"userDesc"}->{"user_nomade_local_copy"} ) {
+        $nomadeMsg .= "discard;\n";
+        $nomadeMsg .= "stop;\n";
+    }else {
+        $nomadeMsg .= "keep;\n";
+    }
+
+    return $nomadeMsg;
 }
 
 

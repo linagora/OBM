@@ -84,6 +84,13 @@ sub getDelete {
 }
 
 
+sub getArchive {
+    my $self =shift;
+
+    return 0;
+}
+
+
 sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
