@@ -14,6 +14,7 @@ require OBM::toolBox;
 require OBM::loadDbIncremental;
 require OBM::Ldap::ldapEngine;
 require OBM::Cyrus::cyrusEngine;
+require OBM::Cyrus::sieveEngine;
 require OBM::Entities::obmRoot;
 require OBM::Entities::obmDomainRoot;
 require OBM::Entities::obmNode;
@@ -24,8 +25,7 @@ use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 use Getopt::Long;
 
-$ENV{PATH}=$automateOBM;
-delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
 
 # Fonction de verification des parametres du script
@@ -181,6 +181,13 @@ $cyrusEngine->dump();
 #$userEntity->setDelete();
 $cyrusEngine->update($userEntity);
 $cyrusEngine->destroy();
+
+my $sieveEngine = OBM::Cyrus::sieveEngine->new( $main::domainList );
+$sieveEngine->init();
+$sieveEngine->dump();
+#$userEntity->setDelete();
+$sieveEngine->update($userEntity);
+$sieveEngine->destroy();
 
 #
 # On referme la connexion a la base

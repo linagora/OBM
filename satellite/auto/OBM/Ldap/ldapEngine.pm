@@ -299,6 +299,10 @@ sub checkLdapTree {
 sub updateLdapEntity {
     my $self = shift;
     my( $ldapEntry ) = @_;
+
+    if( !defined($self->{"ldapConn"}->{"conn"}) ) {
+        return 0;
+    }
     my $ldapConn = $self->{"ldapConn"}->{"conn"};
 
     if( !defined($ldapEntry) ) {
@@ -310,6 +314,30 @@ sub updateLdapEntity {
     if( $result->is_error() ) {
         &OBM::toolBox::write_log( "ldapEngine: erreur LDAP : ".$result->code." - ".$result->error, "W" );
         return 0;
+    }
+
+    return 1;
+}
+
+
+sub deleteLdapEntity {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+
+    if( !defined($self->{"ldapConn"}->{"conn"}) ) {
+        return 0;
+    }
+    my $ldapConn = $self->{"ldapConn"}->{"conn"};
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
+    my $result = $ldapConn->delete( $ldapEntry->dn );
+
+    if( $result->is_error() ) {
+        &OBM::toolBox::write_log( "ldapEngine: erreur : ".$result->code." - ".$result->error, "W" );
     }
 
     return 1;
@@ -421,16 +449,15 @@ sub _doWork {
 
 
     my $ldapEntry = $self->findDn($dn);
-    if( defined($ldapEntry) && $object->getDelete() ) {
+    if( defined($ldapEntry) && ($object->getDelete() || $object->getArchive()) ) {
         # Suppression
         &OBM::toolBox::write_log( "ldapEngine: suppression du noeud : ".$dn, "W" );
 
-        my $result = $self->{"ldapConn"}->{"conn"}->delete( $ldapEntry->dn );
-        if( $result->is_error() ) {
-            &OBM::toolBox::write_log( "ldapEngine: erreur : ".$result->code." - ".$result->error, "W" );
+        if( !$self->deleteLdapEntity($ldapEntry) ) {
+            return 0;
         }
 
-    }elsif( defined($ldapEntry) && !$object->getDelete() ) {
+    }elsif( defined($ldapEntry) ) {
         # Mise à jour
         if( $object->updateLdapEntry($ldapEntry) ) {
             &OBM::toolBox::write_log( "ldapEngine: mise a jour du noeud : ".$dn, "W" );
@@ -440,7 +467,7 @@ sub _doWork {
             }
         }
 
-    }elsif( !defined($ldapEntry) && !$object->getDelete() ) {
+    }elsif( !defined($ldapEntry) ) {
         # Création
         my $ldapEntry = Net::LDAP::Entry->new;
         if( $object->createLdapEntry($ldapEntry) ) {
@@ -477,7 +504,5 @@ sub update {
     my $parentDn = $self->_findTypeParentDn( $self->{"ldapStruct"}, $object->{"type"}, $object->{"domainId"} );
     my $objectDn = $object->getLdapDnPrefix().",".$parentDn;
 
-    $self->_doWork( $objectDn, $object );
-
-    return 1;
+    return $self->_doWork( $objectDn, $object );
 }

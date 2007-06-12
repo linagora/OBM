@@ -52,6 +52,7 @@ sub new {
     $ldapEngineAttr{"type"} = $POSIXGROUPS;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
     $ldapEngineAttr{"toDelete"} = 0;
+    $ldapEngineAttr{"archive"} = 0;
 
     bless( \%ldapEngineAttr, $self );
 }
@@ -172,6 +173,10 @@ sub getEntityLinks {
         }
     }
 
+    # Du moment qu'on charge les liens de l'entité, cette entité n'est plus en
+    # mode incrémental
+    $self->{"incremental"} = 0;
+
     return 1;
 }
 
@@ -189,6 +194,13 @@ sub getDelete {
     my $self = shift;
 
     return $self->{"toDelete"};
+}
+
+
+sub getArchive {
+    my $self = shift;
+
+    return $self->{"archive"};
 }
 
 
@@ -339,11 +351,6 @@ sub updateLdapEntry {
         $update = 1;
     }
 
-    # Les membres du groupe
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"group_users"}, $ldapEntry, "memberUid" ) ) {
-        $update = 1;
-    }
-
     # L'acces au mail
     if( $entry->{"group_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
         $update = 1;
@@ -363,13 +370,18 @@ sub updateLdapEntry {
         $update = 1;
     }
 
-    # Le cas des contacts
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"group_contacts"}, $ldapEntry, "mailBox" ) ) {
+    # Le domaine
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"group_domain"}, $ldapEntry, "obmDomain") ) {
         $update = 1;
     }
 
-    # Le domaine
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"group_domain"}, $ldapEntry, "obmDomain") ) {
+    # Les membres du groupe
+    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"group_users"}, $ldapEntry, "memberUid" ) ) {
+        $update = 1;
+    }
+
+    # Le cas des contacts
+    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"group_contacts"}, $ldapEntry, "mailBox" ) ) {
         $update = 1;
     }
 
