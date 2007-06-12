@@ -55,6 +55,8 @@ sub new {
 sub init {
     my $self = shift;
 
+    &OBM::toolBox::write_log( "ldapEngine: initialisation du moteur", "W" );
+
     # Creation de l'arbre
     $self->_initTree( $self->{"ldapStruct"}, undef, undef );
 
@@ -81,6 +83,8 @@ sub init {
 
 sub destroy {
     my $self = shift;
+
+    &OBM::toolBox::write_log( "ldapEngine: arret du moteur", "W" );
 
     return $self->_disconnectLdapSrv();
 }

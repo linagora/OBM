@@ -47,6 +47,8 @@ sub new {
 sub init {
     my $self = shift;
 
+    &OBM::toolBox::write_log( "cyrusEngine: initialisation du moteur", "W" );
+
     # Etablissement des connexions
     $self->_cyrusSrvsConn( 1 );
 
@@ -56,6 +58,8 @@ sub init {
 
 sub destroy {
     my $self = shift;
+
+    &OBM::toolBox::write_log( "cyrusEngine: arret du moteur", "W" );
 
     return $self->_cyrusSrvsConn( 0 );
 }

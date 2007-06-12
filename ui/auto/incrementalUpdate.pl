@@ -8,21 +8,7 @@
 #-------------------------------------------------------------------#
 
 use strict;
-require OBM::ldap;
-require OBM::imapd;
-require OBM::toolBox;
-require OBM::loadDbIncremental;
-require OBM::Ldap::ldapEngine;
-require OBM::Cyrus::cyrusEngine;
-require OBM::Cyrus::sieveEngine;
-require OBM::Entities::obmRoot;
-require OBM::Entities::obmDomainRoot;
-require OBM::Entities::obmNode;
-require OBM::Entities::obmUser;
-require OBM::Entities::obmGroup;
-require OBM::Entities::obmMailshare;
-use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
+require OBM::loadDb;
 use Getopt::Long;
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
@@ -33,27 +19,28 @@ sub getParameter {
     my( $parameters ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "help" );
+    &GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "all=s", "help" );
 
     if( exists($parameters->{"user"}) ) {
         if( exists($parameters->{"domain"}) || exists($parameters->{"delegation"}) ) {
-            &OBM::toolBox::write_log( "Trop de parametres de mise a jour incrementale precise", "W" );
+            &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
             $parameters->{"help"} = "";
         }
 
     }elsif( exists($parameters->{"domain"}) ) {
         if( exists($parameters->{"user"}) || exists($parameters->{"delegation"}) ) {
-            &OBM::toolBox::write_log( "Trop de parametres de mise a jour incrementale precise", "W" );
+            &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
             $parameters->{"help"} = "";
         }
 
     }elsif( exists($parameters->{"delegation"}) ) {
         if( exists($parameters->{"domain"}) || exists($parameters->{"user"}) ) {
-            &OBM::toolBox::write_log( "Trop de parametres de mise a jour incrementale precise", "W" );
+            &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
             $parameters->{"help"} = "";
         }
+
     }else {
-        &OBM::toolBox::write_log( "Au moins un parametre de mise a jour incrementale doit etre precise", "W" );
+        &OBM::toolBox::write_log( "Au moins un parametre de mise a jour doit etre precise", "W" );
         $parameters->{"help"} = "";
     }
 
@@ -93,101 +80,9 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 }
 
 
-my $loadDbIncremental = OBM::loadDbIncremental->new( $dbHandler, \%parameters );
+my $loadDb = OBM::loadDb->new( $dbHandler, \%parameters );
+$loadDb->destroy();
 
-#
-# Recuperation des domaines a traiter
-&OBM::toolBox::write_log( "Recuperation de la liste des domaines a traiter", "W" );
-local $main::domainList = undef;
-if( defined($parameters{"domain"}) ) {
-    $main::domainList = &OBM::toolBox::getDomains( $dbHandler, $parameters{"domain"} );
-}else {
-    $main::domainList = &OBM::toolBox::getDomains( $dbHandler, undef );
-}
-
-# Parametrage des serveurs IMAP par domaine
-&OBM::imapd::getServerByDomain( $dbHandler, $main::domainList );
-if( !&OBM::imapd::getAdminImapPasswd( $dbHandler, $main::domainList ) ) {
-    exit;
-}
-
-
-#
-# Otention des serveurs LDAP par domaines
-&OBM::ldap::getServerByDomain( $dbHandler, $main::domainList );
-
-# Test entite ROOT
-my $entity = OBM::Entities::obmRoot->new( 0 );
-$entity->getEntity( "local", "Racine de l'annuaire", $main::domainList->[0] );
-#$entity->dump();
-
-# Test entite DOMAINROOT
-$entity = OBM::Entities::obmDomainRoot->new( 0 );
-$entity->getEntity( $main::domainList->[1] );
-#$entity->dump();
-
-# Test entite NODE
-print "-------------------------------\n";
-$entity = OBM::Entities::obmNode->new( 0 );
-$entity->getEntity( "test", "Node de test", $main::domainList->[1] );
-#$entity->dump();
-
-# Test entite POSIXUSERS
-print "-------------------------------\n";
-my $userEntity = OBM::Entities::obmUser->new( 0, 6 );
-$userEntity->getEntity( $dbHandler, $main::domainList->[1] );
-$userEntity->dump();
-
-# Test entite POSIXUSERS en mode incremental
-print "-------------------------------\n";
-$entity = OBM::Entities::obmUser->new( 1, 6 );
-$entity->getEntity( $dbHandler, $main::domainList->[1] );
-#$entity->dump();
-
-# Test entite POSIXGROUPS
-print "-------------------------------\n";
-$entity = OBM::Entities::obmGroup->new( 0, 5 );
-$entity->getEntity( $dbHandler, $main::domainList->[1] );
-#$entity->dump();
-
-# Test entite POSIXGROUPS en mode incremental
-print "-------------------------------\n";
-$entity = OBM::Entities::obmGroup->new( 1, 5 );
-$entity->getEntity( $dbHandler, $main::domainList->[1] );
-#$entity->dump();
-
-# Test entite MAILSHARE
-print "-------------------------------\n";
-$entity = OBM::Entities::obmMailshare->new( 0, 1 );
-$entity->getEntity( $dbHandler, $main::domainList->[1] );
-#$entity->dump();
-
-# Test entite MAILSHARE en mode incremental
-print "-------------------------------\n";
-$entity = OBM::Entities::obmMailshare->new( 1, 1 );
-$entity->getEntity( $dbHandler, $main::domainList->[1] );
-$entity->setDelete();
-#$entity->dump();
-
-my $ldapEngine = OBM::Ldap::ldapEngine->new( $main::domainList );
-$ldapEngine->init();
-#$ldapEngine->dump( "ldapstruct" );
-$ldapEngine->update( $entity );
-$ldapEngine->destroy();
-
-my $cyrusEngine = OBM::Cyrus::cyrusEngine->new( $main::domainList );
-$cyrusEngine->init();
-$cyrusEngine->dump();
-#$userEntity->setDelete();
-$cyrusEngine->update($userEntity);
-$cyrusEngine->destroy();
-
-my $sieveEngine = OBM::Cyrus::sieveEngine->new( $main::domainList );
-$sieveEngine->init();
-$sieveEngine->dump();
-#$userEntity->setDelete();
-$sieveEngine->update($userEntity);
-$sieveEngine->destroy();
 
 #
 # On referme la connexion a la base
