@@ -35,6 +35,8 @@ sub new {
 
 sub init {
     my $self = shift;
+    
+    &OBM::toolBox::write_log( "sieveEngine: initialisation du moteur", "W" );
 
     return 1;
 }
@@ -42,6 +44,8 @@ sub init {
 
 sub destroy {
     my $self = shift;
+
+    &OBM::toolBox::write_log( "sieveEngine: arret du moteur", "W" );
 
     return 1;
 }
