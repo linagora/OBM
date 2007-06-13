@@ -19,7 +19,7 @@ sub getParameter {
     my( $parameters ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "all=s", "help" );
+    &GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "all", "help" );
 
     if( exists($parameters->{"user"}) ) {
         if( exists($parameters->{"domain"}) || exists($parameters->{"delegation"}) ) {
@@ -81,6 +81,7 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 
 
 my $loadDb = OBM::loadDb->new( $dbHandler, \%parameters );
+$loadDb->update();
 $loadDb->destroy();
 
 

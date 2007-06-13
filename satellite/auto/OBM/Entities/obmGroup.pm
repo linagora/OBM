@@ -400,3 +400,10 @@ sub dump {
 
     return 1;
 }
+
+
+sub getMailboxName {
+    my $self = shift;
+
+    return undef;
+}

@@ -506,6 +506,10 @@ sub update {
     my $domainDesc = $self->_findDomainbyId($object->{"domainId"});
 
     my $parentDn = $self->_findTypeParentDn( $self->{"ldapStruct"}, $object->{"type"}, $object->{"domainId"} );
+    if( !defined($parentDn) ) {
+        return 0;
+    }
+
     my $objectDn = $object->getLdapDnPrefix().",".$parentDn;
 
     return $self->_doWork( $objectDn, $object );
