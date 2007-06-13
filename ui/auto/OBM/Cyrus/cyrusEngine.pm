@@ -285,6 +285,7 @@ sub update {
     if( !defined($cyrusSrv) ) {
         return 0;
     }
+
     # Est-on connecté à ce serveur
     if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
         return 0;
@@ -612,9 +613,12 @@ sub _updateBox {
         return 0;
     }
 
-    # Positionnement des ACL
-    if( !$self->_imapSetMailboxAcls( $cyrusSrv, $object ) ) {
-        return 0;
+    # Uniquement en mode non incrémental
+    if( !$object->isIncremental() ) {
+        # Positionnement des ACL
+        if( !$self->_imapSetMailboxAcls( $cyrusSrv, $object ) ) {
+            return 0;
+        }
     }
     
     return 1;

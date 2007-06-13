@@ -210,7 +210,7 @@ sub getEntity {
                 }
             }
 
-            # Gestion des BAL destination
+            # Gestion de la BAL destination
             $self->{"userDesc"}->{"user_mailbox"} = $self->{"userDesc"}->{"user_login"}."@".$domainDesc->{"domain_name"};
 
             # Gestion du serveur de mail

@@ -100,7 +100,7 @@ sub getEntity {
 
 
     # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT mailshare_name, mailshare_description, mailshare_email, mailshare_mail_server_id FROM ".&OBM::dbUtils::getTableName("MailShare", $self->{"incremental"})." WHERE mailshare_id=".$mailShareId;
+    $query = "SELECT mailshare_name, mailshare_description, mailshare_email, mailshare_quota, mailshare_mail_server_id FROM ".&OBM::dbUtils::getTableName("MailShare", $self->{"incremental"})." WHERE mailshare_id=".$mailShareId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -109,10 +109,10 @@ sub getEntity {
     }
 
     # On range les resultats dans la structure de donnees des resultats
-    my( $mailshare_name, $mailshare_description, $mailshare_email, $mailshare_mail_server_id ) = $queryResult->fetchrow_array();
+    my( $mailshare_name, $mailshare_description, $mailshare_email, $mailshare_quota, $mailshare_mail_server_id ) = $queryResult->fetchrow_array();
     $queryResult->finish();
 
-    &OBM::toolBox::write_log( "obmMailshare: gestion de la BAL partagee : '".$mailshare_name."'", "W" );
+    &OBM::toolBox::write_log( "obmMailshare: gestion de la BAL partagee : '".$mailshare_name."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     # On range les resultats dans la structure de donnees des resultats
     $self->{"mailShareDesc"}->{"mailshare_name"} = $mailshare_name;
@@ -135,8 +135,17 @@ sub getEntity {
                 push( @{$self->{"mailShareDesc"}->{"mailshare_mail_alias"}}, $mailshare_email."@".$domainDesc->{"domain_alias"}->[$j] );
             }
 
+            # Gestion de la BAL destination
+            $self->{"mailShareDesc"}->{"mailShare_mailbox"} = $self->{"mailShareDesc"}->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
+
             # On ajoute le serveur de mail associé
             $self->{"mailShareDesc"}->{"mailShare_mailLocalServer"} = "lmtp:".$localServerIp.":24";
+
+            # Gestion du serveur de mail
+            $self->{"mailShareDesc"}->{"mailShare_server"} = $mailshare_mail_server_id;
+
+            # Gestion du quota
+            $self->{"mailShareDesc"}->{"user_mailbox_quota"} = $mailshare_quota*1000;
         }
 
     }else {
@@ -191,6 +200,13 @@ sub getArchive {
 }
 
 
+sub isIncremental {
+    my $self = shift;
+
+    return $self->{"incremental"};
+}
+
+
 sub _getEntityMailShareAcl {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
@@ -204,16 +220,16 @@ sub _getEntityMailShareAcl {
         my %rightDef;
 
         $rightDef{"read"}->{"compute"} = 1;
-        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"writeonly"}->{"compute"} = 1;
-        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"write"}->{"compute"} = 1;
-        $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->{"incremental"})." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=1 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=1 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"public"}->{"compute"} = 0;
-        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".&OBM::dbUtils::getTableName("EntityRight", $self->{"incremental"})." WHERE entityright_entity_id=".$mailShareId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
+        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." WHERE entityright_entity_id=".$mailShareId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
 
         # On recupere la definition des ACL
         $self->{"mailShareDesc"}->{"user_mailshare_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domainDesc, \%rightDef, $mailShareId );
@@ -347,4 +363,64 @@ sub dump {
     print Data::Dumper->Dump( \@desc );
 
     return 1;
+}
+
+
+sub getMailServerRef {
+    my $self = shift;
+    my( $domainId, $mailServerId ) = @_;
+
+    if( $self->{"mailShareDesc"}->{"mailshare_mailperms"} ) {
+        $$domainId = $self->{"domainId"};
+        $$mailServerId = $self->{"mailShareDesc"}->{"mailShare_server"};
+
+    }else {
+        $$domainId = undef;
+        $$mailServerId = undef;
+
+    }
+
+    return 1;
+}
+
+
+sub getMailboxPrefix {
+    my $self = shift;
+
+    return "";
+}
+
+
+sub getMailboxName {
+    my $self = shift;
+    my $mailShareName = undef;
+
+    if( $self->{"mailShareDesc"}->{"mailshare_mailperms"} ) {
+        $mailShareName = $self->{"mailShareDesc"}->{"mailShare_mailbox"};
+    }
+
+    return $mailShareName;
+}
+
+
+sub getMailboxQuota {
+    my $self = shift;
+    my $mailShareQuota = undef;
+
+    if( $self->{"mailShareDesc"}->{"mailshare_mailperms"} ) {
+        $mailShareQuota = $self->{"mailShareDesc"}->{"user_mailbox_quota"};
+    }
+
+    return $mailShareQuota;
+}
+
+sub getMailboxAcl {
+    my $self = shift;
+    my $mailShareAcl = undef;
+
+    if( $self->{"mailShareDesc"}->{"mailshare_mailperms"} ) {
+        $mailShareAcl = $self->{"mailShareDesc"}->{"user_mailshare_acl"};
+    }
+
+    return $mailShareAcl;
 }

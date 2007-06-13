@@ -171,3 +171,10 @@ INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( 1, 'samb
 INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( 1, 'samba_profile', '\\\\PDCTEST\\%u\\.profiles' );
 INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( 1, 'samba_home_def', '\\\\PDCTEST\\%u' );
 INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( 1, 'samba_home_drive_def', 'P' );
+
+-------------------------------------------------------------------------------
+-- Remplissage de la table 'EntityRight' : Gestion des droits
+-------------------------------------------------------------------------------
+DELETE FROM EntityRight;
+
+INSERT INTO EntityRight ( entityright_entity, entityright_entity_id, entityright_consumer, entityright_consumer_id, entityright_read, entityright_write, entityright_admin ) VALUES ( 'mailshare', (SELECT mailshare_id FROM MailShare WHERE mailshare_name='mailShare00'), 'user', (SELECT userobm_id FROM UserObm WHERE userobm_login='admin1'), 0, 0, 1 );
