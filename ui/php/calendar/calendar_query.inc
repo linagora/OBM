@@ -32,6 +32,7 @@ function run_query_calendar_detail($calendar_id) {
       calendarevent_owner, 
       calendarevent_title, 
       calendarevent_description,
+      calendarevent_properties,
       calendarevent_repeatfrequence,
       calendarevent_location, 
       calendarevent_category1_id,
@@ -468,7 +469,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $title = $calendar["title"];
   $category1_id = $calendar["category1"];
   $priority = $calendar["priority"];
-  $description = $calendar["description"]."|<extended_desc>";
+  $description = $calendar["description"];
   $location = $calendar["location"];
   ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
   $datebegin = of_isodate_convert($calendar["date_begin"]);
@@ -488,23 +489,23 @@ function run_query_calendar_insert_event_data($calendar) {
   $property_name = $calendar["property-name"];
   if (is_array($res_name)) {
     foreach($res_name as $key=>$res) {
-      $description .= "<resource>
+      $properties .= "<resource>
          <res_name>$res</res_name>
          <res_id>$res_id[$key]</res_id>";
 
       if (is_array($item) && isset($item[$key])) {
-        $description .= "<item>$item[$key]</item>
+        $properties .= "<item>$item[$key]</item>
           <item_id>$item_id[$key]</item_id>";
       }
 
       if (is_array($property_name) && isset($property_name[$key])) {
-        $description .= "<property_name>$property_name[$key]</property_name>
+        $properties .= "<property_name>$property_name[$key]</property_name>
                          <property_value>$property[$key]</property_value>";                       
       }
-      $description .= "</resource>";
+      $properties .= "</resource>";
     }
   }
-  $description .= "</extended_desc>";
+  $properties = "<extended_desc>$properties</extended_desc>";
 
   $obm_q = new DB_OBM;
   
@@ -516,6 +517,7 @@ function run_query_calendar_insert_event_data($calendar) {
     calendarevent_title, 
     calendarevent_date,     
     calendarevent_description,
+    calendarevent_properties,
     calendarevent_location, 
     calendarevent_category1_id,
     calendarevent_priority,
@@ -535,6 +537,7 @@ function run_query_calendar_insert_event_data($calendar) {
     '$title',
     '$datebegin',
     '$description',
+    '$properties',
     '$location',
     '$category1_id',
     '$priority',
@@ -992,7 +995,7 @@ function run_query_calendar_update_event_data($calendar) {
   $title = $calendar["title"];
   $category1_id = $calendar["category1"];
   $priority = $calendar["priority"];
-  $description = $calendar["description"]."|<extended_desc>";
+  $description = $calendar["description"];
   $location = $calendar["location"];
   $datebegin = of_isodate_convert($calendar["date_begin"]);
   $event_duration = $calendar["event_duration"];
@@ -1012,23 +1015,23 @@ function run_query_calendar_update_event_data($calendar) {
   $property_name = $calendar["property-name"];
   if (is_array($res_name)) {
     foreach($res_name as $key=>$res) {
-      $description .= "<resource>
+      $properties .= "<resource>
          <res_name>$res</res_name>
          <res_id>$res_id[$key]</res_id>";
 
       if (is_array($item) && isset($item[$key])) {
-        $description .= "<item>$item[$key]</item>
+        $properties .= "<item>$item[$key]</item>
           <item_id>$item_id[$key]</item_id>";
       }
 
       if (is_array($property_name) && isset($property_name[$key])) {
-        $description .= "<property_name>$property_name[$key]</property_name>
+        $properties .= "<property_name>$property_name[$key]</property_name>
                          <property_value>$property[$key]</property_value>";                       
       }
-      $description .= "</resource>";
+      $properties .= "</resource>";
     }
   }
-  $description .= "</extended_desc>";
+  $properties .= "<extended_desc>$properties</extended_desc>";
 
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
@@ -1037,6 +1040,7 @@ function run_query_calendar_update_event_data($calendar) {
     calendarevent_title = '$title', 
     calendarevent_date = '$datebegin',     
     calendarevent_description = '$description',
+    calendarevent_properties = '$properties', 
     calendarevent_location = '$location',
     calendarevent_category1_id = '$category1_id',
     calendarevent_priority = '$priority',
@@ -1126,6 +1130,7 @@ function run_query_calendar_quick_event_insert($calendar, $sel_entity_id) {
      calendarevent_duration,
      calendarevent_allday,
      calendarevent_description,
+     calendarevent_properties,
      calendarevent_privacy,
      calendarevent_repeatkind,
      calendarevent_repeatfrequence,
@@ -1144,6 +1149,7 @@ function run_query_calendar_quick_event_insert($calendar, $sel_entity_id) {
     '$datebegin',     
     '$event_duration',
     '$all_day',
+    '',
     '',
     '0',
     'none',
@@ -1228,6 +1234,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
     $category1_id = $event_q->f("calendarevent_category1_id");
     $priority = $event_q->f("calendarevent_priority");
     $description = $event_q->f("calendarevent_description");
+    $properties = $event_q->f("calendarevent_properties");
     $location = $event_q->f("calendarevent_location");
     ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
     $datebegin = $calendar["date_begin"];
@@ -1240,6 +1247,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
       calendarevent_title, 
       calendarevent_date,     
       calendarevent_description,
+      calendarevent_properties,
       calendarevent_location, 
       calendarevent_category1_id,
       calendarevent_priority,
@@ -1260,6 +1268,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
       '$title',
       '$datebegin',
       '$description',
+      '$properties',
       '$location',
       '$category1_id',
       '$priority',
@@ -2119,6 +2128,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description, 
+      calendarevent_properties, 
       calendarevent_location,
      calendarevent_repeatfrequence, 
       evententity_entity,
@@ -2226,6 +2236,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description,
+      calendarevent_properties,
       calendarevent_location,
       calendarevent_repeatfrequence,
       calendarevent_owner,
@@ -2253,6 +2264,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description,
+      calendarevent_properties,
       calendarevent_location,
       calendarevent_repeatfrequence,
       calendarevent_owner,
@@ -2360,6 +2372,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description, 
+      calendarevent_properties, 
       calendarevent_location, 
       calendarcategory1_label,
       $calendarevent_date_l,
@@ -2391,6 +2404,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description, 
+      calendarevent_properties, 
       calendarevent_location, 
       calendarcategory1_label,
       $calendarevent_date_l,
@@ -2540,6 +2554,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     $title = $nr_q->f("calendarevent_title");
     $privacy = $nr_q->f("calendarevent_privacy");
     $description = $nr_q->f("calendarevent_description"); 
+    $properties = $nr_q->f("calendarevent_properties"); ;
     $location = $nr_q->f("calendarevent_location"); 
     $category1 = $nr_q->f("calendarcategory1_label");
     $priority = $nr_q->f("calendarevent_priority");
@@ -2555,7 +2570,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
         $of->addOccurrence($event, $date, $entity, $entity_id);
       }
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description, $all_day,'none',$owner);
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner);
       $of->addOccurrence($event, $date, $entity, $entity_id);
     }
   }
@@ -2566,6 +2581,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     $title = $r_q->f("calendarevent_title");
     $privacy = $r_q->f("calendarevent_privacy");
     $description = $r_q->f("calendarevent_description"); 
+    $properties = $r_q->f("calendarevent_properties"); 
     $location = $r_q->f("calendarevent_location"); 
     $category1 = $r_q->f("calendarcategory1_label");
     $date = $r_q->f("calendarevent_date");
@@ -2589,7 +2605,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
         $addOcc = false;
       }
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description, $all_day,$repeatkind,$owner);
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner);
     }
     $event_start =  $start_time ;
     $delta = date("H",$date) * 3600 + date("i",$date) * 60 + date("s",$date) + $duration;
@@ -2823,11 +2839,11 @@ function calendar_yearly_repeatition($date,$start_time,$end_date,$repeatfrequenc
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-// Class Event :
-// Describe an event.
-//////////////////////////////////////////////////////////////////////////////
-class Event {
+/**
+ * Describe an Event 
+ * 
+ */
+Class Event {
   
   var $id;
   var $duration;
@@ -2836,12 +2852,30 @@ class Event {
   var $category1;
   var $privacy;
   var $description;
+  var $properties;
   var $attendee;
   var $repeat;
   var $all_day;
   var $owner;
 
-  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$all_day,$repeat,$owner) {;
+  /**
+   * Event 
+   * 
+   * @param mixed $id 
+   * @param mixed $duration 
+   * @param mixed $title 
+   * @param mixed $location 
+   * @param mixed $category1 
+   * @param mixed $privacy 
+   * @param mixed $description 
+   * @param mixed $properties 
+   * @param mixed $all_day 
+   * @param mixed $repeat 
+   * @param mixed $owner 
+   * @access public
+   * @return void
+   */
+  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner) {
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;
@@ -2849,32 +2883,67 @@ class Event {
     $this->category1 = $category1;
     $this->privacy = $privacy;
     $this->description = $description;
+    $this->properties = $properties;
     $this->repeat = $repeat;
     $this->all_day = $all_day;
     $this->attendee = array();
     $this->owner = $owner;
   }
 
+  /**
+   * Return true if the event is a meeting 
+   * 
+   * @access public
+   * @return boolean
+   */
   function isMeeting() {
     return (count($this->attendee["user"]) > 1);
   }
 
+  /**
+   * Return true if the event is periodic 
+   * 
+   * @access public
+   * @return boolean 
+   */
   function isPeriodic() {
     return ($this->repeat != 'none');
   }
 
+  /**
+   * Add an attendee to the event 
+   * 
+   * @param mixed $entity 
+   * @param mixed $entity_id 
+   * @param mixed $entity_label 
+   * @access public
+   * @return void
+   */
   function add_attendee($entity,$entity_id,$entity_label) {
     $this->attendee[$entity][$entity_id] = $entity_label;
   }
 
 }
 
+/**
+ * Describe an occurrence of an event 
+ */
 Class Occurrence {
   var $event;
   var $date;
   var $entity;
   var $id;
 
+  /**
+   * Occurrence 
+   * 
+   * @param mixed $event 
+   * @param mixed $date 
+   * @param mixed $entity 
+   * @param mixed $id 
+   * @access public
+   * @return void
+   */
   function Occurrence(&$event, $date, $entity, $id) {
     $this->event = &$event;
     $this->date = $date;
@@ -2884,6 +2953,9 @@ Class Occurrence {
 
 }
 
+/**
+ * Store all Event/Occurence/Date relations 
+ */
 Class OccurrenceFactory {
 
   var $occurrences;
@@ -2896,14 +2968,38 @@ Class OccurrenceFactory {
     $this->events = array();
   }
   
+  /**
+   * set the beginning of the period 
+   * 
+   * @param timestamp $begin 
+   * @access public
+   * @return void
+   */
   function setBegin($begin) {
     $this->begin = $begin;
   }
 
+  /**
+   * set the end of the period 
+   * 
+   * @param timestamp $end 
+   * @access public
+   * @return void
+   */
   function setEnd($end) {
     $this->end = $end;
   }
 
+  /**
+   * add an occurence for a given event 
+   * 
+   * @param Event $event 
+   * @param timestamp $date 
+   * @param string $entity 
+   * @param id $id 
+   * @access public
+   * @return void
+   */
   function addOccurrence(&$event, $date, $entity, $id) {
     if ($date < $this->end && ($date + $event->duration) > $this->begin) {
       $this->occurrences[$event->id][] = &new Occurrence($event, $date, $entity, $id);
@@ -2911,6 +3007,14 @@ Class OccurrenceFactory {
     }
   }
 
+  /**
+   * remove all occurence of an event 
+   * 
+   * @param event id $id 
+   * @param timestamp $date 
+   * @access public
+   * @return void
+   */
   function removeOccurrences($id, $date) {
     foreach($this->occurrences[$id] as $key => $occurrence) {
       if(date('Ymd',$date) ==  date('Ymd',$occurrence->date)) {
@@ -2919,6 +3023,12 @@ Class OccurrenceFactory {
     }
   }
 
+  /**
+   * Returl all occurence
+   * 
+   * @access public
+   * @return array
+   */
   function getOccurrences() {
     $return = array();
     foreach($this->occurrences as $evtOccurrences) {
@@ -2935,10 +3045,28 @@ Class OccurrenceFactory {
     return $singleton;
   }
 
+  /**
+   * Return true if an event have a least one occurrence 
+   * 
+   * @param event id $id 
+   * @access public
+   * @return boolean
+   */
   function eventHaveOccurences($id) {
     return isset($this->events[$id]);
   }
 
+  /**
+   * Return true if there is at leat one occurrence of an
+   * event in a given time period
+   * 
+   * @param timestamp $time 
+   * @param int $duration 
+   * @param HashMap $entityFilter "entityKind" => [entity_ids,..] if set only
+   * count occurrence of the given entityKind and if set the given ids              
+   * @access public
+   * @return boolean
+   */
   function periodHaveOccurrences($time, $duration, $entityFilter=null) {
     foreach($this->occurrences as $evtOccurrences) {
       foreach($evtOccurrences as $occurence) {
@@ -2957,6 +3085,16 @@ Class OccurrenceFactory {
     return false;
   }
 
+  /**
+   * Return occurrences of an event in a given time period
+   * 
+   * @param timestamp $time 
+   * @param int $duration 
+   * @param HashMap $entityFilter "entityKind" => [entity_ids,..] if set only
+   * count occurrence of the given entityKind and if set the given ids              
+   * @access public
+   * @return boolean
+   */
   function getPeriodOccurrences($time, $duration, $entityFilter=null) {
     foreach($this->occurrences as $evtOccurrences) {
       foreach($evtOccurrences as $occurence) {

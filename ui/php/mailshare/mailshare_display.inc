@@ -296,7 +296,7 @@ function html_mailshare_consult($mailshare_q) {
 //   - $field       : field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
-  global $display, $l_insert, $l_update, $l_back,$l_web_list;
+  global $display, $l_insert, $l_update, $l_back,$l_web_list,$l_admin_permission;
   global $l_mailshare, $l_name, $l_desc, $l_quota, $l_email,$obm;
   global $cgp_use, $cmailshare_default_quota,$obm,$l_mail_server;
   
@@ -356,6 +356,22 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
     $dis_button .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
 
+    $right_manager = "
+      <fieldset class=\"detail extra\">
+      <legend>$l_admin_permission : <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" /></legend>
+      <input type=\"hidden\" name=\"sel_accept_admin[]\" value=\"data-user-$obm[uid]\" />
+      <input type=\"hidden\" name=\"sel_read_public\" value=\"1\" />
+      <div id=\"sel_accept_admin\">     
+      </div>
+      </fieldset>
+      ";
+    $js = "
+    <script type=\"text/javascript\">
+    obm.initialize.chain(function () {
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_admin', 'userSearch');
+    });
+    </script>     
+    ";
   } elseif (($action == "detailupdate") || ($action == "update")) {
     $dis_name = "$name <input name=\"tf_name\" type=\"hidden\" value=\"$name\" />";
 
@@ -394,11 +410,12 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
     <td><input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"128\" /></td>
   </tr>
   </table>
-
+  $right_manager
   <fieldset class=\"buttons\">
   $dis_button
   </fieldset>
   </form>
+$js  
 ";
 
   return $block;

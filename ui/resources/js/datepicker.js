@@ -196,23 +196,22 @@ function getDateString(dateVal)
   var monthString = "00" + (dateVal.getMonth()+1);
   dayString = dayString.substring(dayString.length - 2);
   monthString = monthString.substring(monthString.length - 2);
-  dateSeparator = '/';
   switch (obm.vars.regexp.dateFormat) {
-    case "fr" :
-      return dayString + dateSeparator + monthString + dateSeparator + dateVal.getFullYear();
-    case "us" :
-      return monthString + dateSeparator + dayString + dateSeparator + dateVal.getFullYear();
-    case "ymd" :
+    case "d/m/Y" :
+      return dayString + '/' + monthString + '/' + dateVal.getFullYear();
+    case "m/d/Y" :
+      return monthString + '/' + dayString + '/' + dateVal.getFullYear();
+    case "Y-m-d" :
     default :
-      return dateVal.getFullYear() + dateSeparator + monthString + dateSeparator + dayString;
+      return dateVal.getFullYear() + '-' + monthString + '-' + dayString;
   }
 }
 
 function guessDateFormat(fieldDate) {
   reg = new Object();
-  reg['iso'] = "^[0-9]{4}[-\\/][01][0-9][-\\/][0123][0-9]$";
-  reg['fr'] = "^[23][0-9][-\\/]?[01][0-9][-\\/]?[0-9]{4}$";
-  reg['us'] = "^[01][0-9][-\\/]?[23][0-9][-\\/]?[0-9]{4}$";
+  reg['Y-m-d'] = "^[0-9]{4}[-\\/][01][0-9][-\\/][0123][0-9]$";
+  reg['d/m/Y'] = "^[23][0-9][-\\/]?[01][0-9][-\\/]?[0-9]{4}$";
+  reg['m/d/Y'] = "^[01][0-9][-\\/]?[23][0-9][-\\/]?[0-9]{4}$";
   reg['user'] = "^[0123][0-9][-\\/]?[0123][0-9][-\\/]?[0-9]{4}$";
 
   for(format in reg) {
@@ -221,7 +220,7 @@ function guessDateFormat(fieldDate) {
     }
   }
   if(!isNaN(fieldDate) && fieldDate > 31130000)  {
-    return 'ts';
+    return 't';
   }
   return false;
 }
@@ -241,7 +240,7 @@ function getFieldIsoDate(dateString) {
 /**
   Convert a string to a JavaScript Date object.
  */
-function getFieldDate(dateString)
+function getFieldDate(dateString, exact)
 {
   var dateVal;
   var dArray;
@@ -253,24 +252,24 @@ function getFieldDate(dateString)
   }
   try {
     switch (type) {
-      case "ts" :
+      case "t" :
         return new Date(dateString * 1000);
         break;
-      case "iso" :
+      case "Y-m-d" :
         dArray = splitDateString(dateString);
         d = parseInt(dArray[2], 10);
         m = parseInt(dArray[1], 10) - 1;
         y = parseInt(dArray[0], 10);
         return new Date(y, m, d);
         break;
-      case "fr" :
+      case "d/m/Y" :
         dArray = splitDateString(dateString);
         d = parseInt(dArray[0], 10);
         m = parseInt(dArray[1], 10) - 1;
         y = parseInt(dArray[2], 10);
         return new Date(y, m, d);
         break;
-      case "us" :
+      case "m/d/Y" :
         dArray = splitDateString(dateString);
         d = parseInt(dArray[1], 10);
         m = parseInt(dArray[0], 10) - 1;
@@ -278,10 +277,18 @@ function getFieldDate(dateString)
         return new Date(y, m, d);
         break;      
       default :
-        return new Date();
+        if( exact == true) {
+          return false;
+        } else {
+          return new Date();
+        }
     }
   }catch(e) {
-    return new Date();
+    if( exact == true) {
+      return false;
+    } else {
+      return new Date();
+    }    
   }
 }
 

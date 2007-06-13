@@ -187,6 +187,8 @@ function run_query_mailshare_insert($mailshare) {
     $obm_q->query($query);
     $obm_q->next_record();
     $id = $obm_q->f("id");
+    $mailshare["entity_id"] = $id;
+    of_right_update_right($mailshare, "MailShare", "",false) ;
 
     return $id;
   } else {

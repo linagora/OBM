@@ -661,6 +661,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_repeatdays       varchar(7) default NULL,
   calendarevent_endrepeat        timestamp(14) NOT NULL,
   calendarevent_description      text,
+  calendarevent_properties       text,
   calendarevent_item             text,
   PRIMARY KEY (calendarevent_id)
 );
@@ -721,6 +722,7 @@ CREATE TABLE EntityRight (
   entityright_consumer_id   int(8) NOT NULL default 0,
   entityright_read          int(1) NOT NULL default 0,
   entityright_write         int(1) NOT NULL default 0,
+  entityright_admin         int(1) NOT NULL default 0,
   PRIMARY KEY (entityright_entity, entityright_entity_id, entityright_consumer, entityright_consumer_id),
   INDEX entright_idx_ent_id (entityright_entity_id),
   INDEX entright_idx_ent (entityright_entity),

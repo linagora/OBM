@@ -27,6 +27,7 @@ $fieldnames["timecreate"] = $l_date_creation;
 $fieldnames["timeupdate"] = $l_date_last_update;
 // Calculated fields
 $fieldnames["group_nb_user"] = $l_nb_user;
+$fieldnames["group_user_login"] = $l_login;
 $fieldnames["group_user_lastname"] = $l_lastname;
 $fieldnames["group_user_firstname"] = $l_firstname;
 $fieldnames["group_user_function"] = $l_function;
@@ -105,7 +106,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   }
 
   // For User member lists
-  elseif (($fieldname == "group_user_lastname") && $link_ok) {
+  elseif (($fieldname == "group_user_login") && $link_ok) {
     $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("group_user_id");
   }
 

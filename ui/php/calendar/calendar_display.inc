@@ -210,6 +210,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     </legend>       
     <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />
     ";
+    
     $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {restriction:'user', defaultText:'$resource_text'});";
   }
   $cats1 = of_category_get_ordered("calendar", "category1");
@@ -236,6 +237,13 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     $sel_group
     </select>
     </fieldset>
+    <fieldset class=\"detail extra\">
+    <legend>
+    $l_group_members
+    </legend>
+    <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"group\" autocomplete=\"off\" />    
+    <input type=\"hidden\" name=\"group_view\" value=\"\" id=\"group_view\" />
+    </fieldset>    
     </form>
 
     <form action=\"calendar_index.php\" method=\"get\">
@@ -249,8 +257,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <input type=\"hidden\" name=\"new_group\" value=\"1\" />
     <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
     <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
-    $dis_block_resource
     </fieldset>
+    $dis_block_resource
     <div id=\"sel_ent\">
     </div>
     <fieldset class=\"buttons\">
@@ -264,6 +272,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {restriction:'calendar', defaultText:'$user_text'})
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'group_view', 'group', {defaultText:'$group_text', mode:'mono'})
       $resource_js
     });
     </script>    
@@ -1015,31 +1024,29 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
         $category = $event->category1;
         $repeat = $event->repeat;
         if ($repeat == "none") {
-	        $dis_repeat = "";
+	  $dis_repeat = "";
         } else {
-	        $dis_repeat = ${"l_$repeat"};
+	  $dis_repeat = ${"l_$repeat"};
         }
 
         if ($event->privacy == 1 && !($updatable || in_array($obm["uid"],$attendee["user"]))) {
-	        $title = $l_private;
-	        $description = $title;
+	  $title = $l_private;
+	  $description = $title;
         } else {
-	        $title = $event->title;
-	        $explode_desc = explode("|", $event->description);
-          $description = $explode_desc[0];
+	  $title = $event->title;
+	  $description = $event->description;
+	  $properties = $event->properties;
           $item_list = "";
           $dis_res = "";
           $separator = "";
-          if ($explode_desc[1] != "") {
-            $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
+          if ($properties != "") {
+            $item = "<?xml version='1.0' encoding='$charset'?>$properties";
             $xml = parse_item($item);
-            // $xml = simplexml_load_string($item);
             if (is_object($xml)) {
               foreach($xml->resource as $key => $value) {
                 if (array_key_exists($value->res_id, $sel_res_id)) {
                   $dis_res = "$separator$value->res_name";
                   $separator = ", ";
-                  // $dis_res .= "<div style=\"width: 11px; height: 11px; float: left;\" class=\"".$sel_res_id[$value->res_id]."\">&nbsp;</div>";
                 }
                 $item_list .= "<b>$value->res_name:</b><br/>".nl2br($value->item)."$value->property_name:$value->property_value";
               }
@@ -1176,13 +1183,12 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $category = $title;      
   } else {
     $title = phpStringToJsString($event->title);
-    $explode_desc = explode("|", $event->description);
-    $description = phpStringToJsString($explode_desc[0]);
-    if ($explode_desc[1] != "") {
+    $description = phpStringToJsString($event->description);
+    $properties = $event->properties;
+    if ($properties != "") {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
+      $item = "<?xml version='1.0' encoding='$charset'?>".$properties;
       $xml = parse_item($item);
-//    $xml = simplexml_load_string($item);
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
           $item_list .= "
@@ -1577,11 +1583,11 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     $location = $event_q->f("calendarevent_location");
     $cats1 = of_category_get_entitycategories("calendar", "category1", $id, "mono");
     $priority = $event_q->f("calendarevent_priority"); 
-    $explode_desc = explode("|", $event_q->f("calendarevent_description"));
-    $description = $explode_desc[0];
-    if ($explode_desc[1] != "") {
+    $properties = $event_q->f("calendarevent_properties");
+    $description = $event_q->f("calendarevent_description");
+    if ($properties != "") {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
+      $item = "<?xml version='1.0' encoding='$charset'?>".$properties;
     } else {
       $item = "";
     }
@@ -1984,11 +1990,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     $location = htmlspecialchars($event_q->f("calendarevent_location"));
     $cat1 = $event_q->f("calendarevent_category1_id");
     $priority = $event_q->f("calendarevent_priority");
-    $explode_desc = explode("|", $event_q->f("calendarevent_description"));
-    $desc = $explode_desc[0];
-    if ($explode_desc[1] != "") {
+    $properties = $event_q->f("calendarevent_properties");
+    $desc = $event_q->f("calendarevent_description");
+    if ($properties != "") {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'?>".$explode_desc[1];
+      $item = "<?xml version='1.0' encoding='$charset'?>$properties";
     } else {
       $item = "";
     }

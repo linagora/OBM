@@ -304,13 +304,7 @@ function display_head_theme($p_module) {
   global $ico_datepicker,$l_monthsofyear,$l_daysofweekfirst;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
-  global $css_print_obm, $ico_delete, $ico_update, $cda_upd_dmy, $output_target;
-
-  if ($_SESSION['set_date_upd'] == $cda_upd_dmy) {
-    $date_upd_format = "fr";
-  } else {
-    $date_upd_format = "us";
-  }
+  global $css_print_obm, $ico_delete, $ico_update, $output_target;
 
   $css = $css_obm;
 
@@ -362,7 +356,7 @@ function display_head_theme($p_module) {
   obm.vars.images.datePicker = '$ico_datepicker';
   obm.vars.images.update = '$ico_update';
   obm.vars.images.del = '$ico_delete';
-  obm.vars.regexp.dateFormat = '$date_upd_format';
+  obm.vars.regexp.dateFormat = '$_SESSION[set_date_upd]';
   obm.vars.consts.popupHeight = '$popup_height';
   obm.vars.consts.popupWidth = '$popup_width';
   obm.vars.consts.weekStart = $c_week_first_day;

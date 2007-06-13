@@ -489,9 +489,6 @@ $cda_en = 'm/d/Y';  // us format
 $cda_fr = 'd/m/Y';  // fr format
 $cda_txt = 'd M Y'; // txt format
 
-$cda_upd_dmy = 'dmy';  // day month year format
-$cda_upd_mdy = 'mdy'; // month day year format
-
 // Menu display options constants
 $cme_txt = 'text';  // text
 $cme_ico = 'icon';  // icon
@@ -791,45 +788,36 @@ function of_date_format($timestamp="", $null_empty="") {
  * @return void
  */
 function of_date_upd_format($date="", $null_empty=false) {
-  global $cda_upd_dmy, $cda_upd_mdy;
   
-  if ($_SESSION['set_date_upd'] == $cda_upd_dmy) {
-    $date_upd_format = "d/m/Y";
-  } else {
-    $date_upd_format = "m/d/Y";
-  }
   if($date) {
     $type = of_date_guess_format($date);
   } elseif(!$null_empty) {
     $date = time();
-    $type = "ts";
+    $type = "t";
   } else {
     return null;
   }
 
   if ($type == "user") {
-    if ($_SESSION['set_date_upd'] == $cda_upd_dmy) {
-      $type = "fr";
-    } else {
-      $type = "us";
-    }
+    $type = $_SESSION['set_date_upd'];
   }
   switch ($type) {
-  case "iso" :
+  case "Y-m-d" :
     preg_match("/^(\d{4})[-\/](\d{2})[-\/](\d{2})/",$date, $d);
-    $date = date($date_upd_format,mktime(0,0,0,$d[2],$d[3],$d[1]));
+    $date = date($_SESSION['set_date_upd'],mktime(0,0,0,$d[2],$d[3],$d[1]));
     break;
-  case "ts" :
-    $date = date($date_upd_format, $date);
-    break;
-  case "fr" :
+  case "d/m/Y" :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
-    $date = date($date_upd_format,mktime(0,0,0,$d[2],$d[1],$d[3]));
+    $date = date($_SESSION['set_date_upd'],mktime(0,0,0,$d[2],$d[1],$d[3]));
     break;
-  case "us" :
-     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
-      $date = date($date_upd_format,mktime(0,0,0,$d[1],$d[2],$d[3]));        
+  case "m/d/Y" :
+    preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
+    $date = date($_SESSION['set_date_upd'],mktime(0,0,0,$d[1],$d[2],$d[3]));        
     break;
+  case "t" :
+    $date = date($_SESSION['set_date_upd'], $date);
+    break;
+     
   default :
   }
   return $date;
@@ -837,7 +825,10 @@ function of_date_upd_format($date="", $null_empty=false) {
 
 /**
  * Guess the date format 
- * 
+ *   case "t" :
+    $date = date($_SESSION['set_date_upd'], $date);
+    break;
+
  * @param mixed $date 
  * @access public
  * @return void
@@ -845,9 +836,9 @@ function of_date_upd_format($date="", $null_empty=false) {
 function of_date_guess_format ($date) {
 
   $reg = array();
-  $reg['iso'] = "/^[0-9]{4}[-\/][01][0-9][-\/][0123][0-9]$/";
-  $reg['fr'] = "/^[23][0-9][-\/]?[01][0-9][-\/]?[0-9]{4}$/";
-  $reg['us'] = "/^[01][0-9][-\/]?[23][0-9][-\/]?[0-9]{4}$/";
+  $reg['Y-m-d'] = "/^[0-9]{4}[-\/][01][0-9][-\/][0123][0-9]$/";
+  $reg['d/m/Y'] = "/^[23][0-9][-\/]?[01][0-9][-\/]?[0-9]{4}$/";
+  $reg['m/d/Y'] = "/^[01][0-9][-\/]?[23][0-9][-\/]?[0-9]{4}$/";
   $reg['user'] = "/^[0123][0-9][-\/]?[0123][0-9][-\/]?[0-9]{4}$/";
 
   foreach($reg as $format => $regexp) {
@@ -857,7 +848,7 @@ function of_date_guess_format ($date) {
   }
   // 31130000 is the lowest number which cannot be a date (31129999 => 31/12/9999)
   if(is_numeric($date) && $date > 31130000) {
-    return "ts";
+    return "t";
   }
   return false;
 }  
@@ -871,39 +862,34 @@ function of_date_guess_format ($date) {
  * @return void
  */
 function of_isodate_convert($date, $null_empty=false) {
-  global $cda_upd_dmy, $cda_upd_mdy,$c_php_isodate_format;
-  $dmy_upd_format = "d/m/Y";
-  $mdy_upd_format = "m/d/Y";
-  
+  global $c_php_isodate_format;
+
   if($date) {
     $type = of_date_guess_format($date);
   } elseif(!$null_empty) {
     $date = time();
-    $type = "ts";
+    $type = "t";
   } else {
     return null;
   }
   if ($type == "user") {
-    if ($_SESSION['set_date_upd'] == $cda_upd_dmy) {
-      $type = "fr";
-    } else {
-      $type = "us";
-    }
-  } 
+    $type = $_SESSION['set_date_upd'];
+  }
   switch ($type) {
-  case "ts" :
-    $date = date($c_php_isodate_format, $date);
-    break;
-  case "fr" :
+  case "Y-m-d" :
+    break;    
+  case "d/m/Y" :
     preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
     $date = date($c_php_isodate_format,mktime(0,0,0,$d[2],$d[1],$d[3]));
     break;
-  case "us" :
+  case "m/d/Y" :
     preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
     $date = date($c_php_isodate_format,mktime(0,0,0,$d[1],$d[2],$d[3]));        
     break;
-  case "iso" :
+  case "t" :
+    $date = date($c_php_isodate_format, $date);
     break;
+    
   default :
   } 
   return $date;

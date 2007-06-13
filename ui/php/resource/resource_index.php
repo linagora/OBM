@@ -285,7 +285,9 @@ function get_resource_params() {
   
   // Get global params
   $params = get_global_params("Resource");
-
+  if(is_array($params["accept_admin"])) {
+    $params["accept_write"] = $params["accept_admin"];
+  }
   //Get resource specific params
   if (isset ($params["ext_id"])) $params["resource_id"] = $params["ext_id"];
   if ((isset ($params["entity_id"])) && (! isset($params["resource_id"]))) {
@@ -398,7 +400,7 @@ function get_resource_action() {
     'Name'     => $l_header_right,
     'Url'      => "$path/resource/resource_index.php?action=rights_admin&amp;entity_id=".$params["resource_id"]."",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult')
+    'Condition'=> array ('detailconsult','rights_update','rights_admin','detailupdate','insert','update')
                                      );
 
 // Rights Update
@@ -501,6 +503,9 @@ function update_resource_action() {
 
   // Detail Consult
   $actions["resource"]["detailconsult"]["Url"] = "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$params["resource_id"];
+
+  // Right admin
+  $actions["resource"]["rights_admin"]["Url"] = "$path/resource/resource_index.php?action=rights_admin&amp;entity_id=".$params["resource_id"];
 
   // Detail Update
   $actions["resource"]["detailupdate"]["Url"] = "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=".$params["resource_id"];

@@ -608,6 +608,7 @@ function run_query_group_user_group($group) {
     userobm_timecreate as group_user_timecreate,
     userobm_userupdate as group_user_userupdate,
     userobm_usercreate as group_user_usercreate,
+    userobm_login as group_user_login,
     userobm_lastname as group_user_lastname,
     userobm_firstname as group_user_firstname,
     userobm_phone as group_user_phone,

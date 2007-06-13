@@ -118,8 +118,9 @@ if ($_SESSION['set_date'] == $cda_en) $da_en = "checked";
 if ($_SESSION['set_date'] == $cda_fr) $da_fr = "checked";
 if ($_SESSION['set_date'] == $cda_txt) $da_txt = "checked";
 
-if ($_SESSION['set_date_upd'] == $cda_upd_dmy) $da_dmy = "checked";
-if ($_SESSION['set_date_upd'] == $cda_upd_mdy) $da_mdy = "checked";
+if ($_SESSION['set_date_upd'] == $cda_fr) $da_upd_fr = "checked";
+if ($_SESSION['set_date_upd'] == $cda_en) $da_upd_en = "checked";
+if ($_SESSION['set_date_upd'] == $cda_iso) $da_upd_iso = "checked";
 
 if ($_SESSION['set_commentorder'] == $cco_chro) $co_chro = "checked";
 if ($_SESSION['set_commentorder'] == $cco_rev) $co_rev = "checked";
@@ -312,8 +313,9 @@ $display["detail"] .= "
   <tr>
   <td>$l_set_date_upd</td>
   <td>
-    <input type=\"radio\" name=\"date_upd\" value=\"$cda_upd_dmy\" $da_dmy />$l_da_dmy
-    <input type=\"radio\" name=\"date_upd\" value=\"$cda_upd_mdy\" $da_mdy />$l_da_mdy
+    <input type=\"radio\" name=\"date_upd\" value=\"$cda_fr\" $da_upd_fr />$l_da_fr
+    <input type=\"radio\" name=\"date_upd\" value=\"$cda_en\" $da_upd_en />$l_da_en
+    <input type=\"radio\" name=\"date_upd\" value=\"$cda_iso\" $da_upd_iso />$l_da_iso
   </td>
   <td>$l_set_date</td>
   <td>

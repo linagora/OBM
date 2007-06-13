@@ -79,6 +79,8 @@ UPDATE Invoice set invoice_credit_memo = 0;
 -------------------------------------------------------------------------------
 -- Add ext_id column
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_ext_id varchar(32) DEFAULT '' AFTER calendarevent_usercreate;
+-- Add extension column
+ALTER TABLE CalendarEvent ADD COLUMN calendarevent_properties text AFTER calendarevent_description;
 
 
 -------------------------------------------------------------------------------
@@ -242,4 +244,12 @@ CREATE TABLE OGroupEntity (
   PRIMARY KEY (ogroupentity_id)
 );
 
+--
+-- Table structure for the table 'EntityRight'
+--
+ALTER TABLE EntityRight ADD COLUMN entityright_admin int(1) NOT NULL default 0 AFTER entityright_write;
 
+--
+-- UPDATE EntityRight DATA
+--
+UPDATE EntityRight SET entityright_write = entityright_admin;

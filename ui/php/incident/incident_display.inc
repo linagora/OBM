@@ -621,16 +621,6 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   }
   $dis_sel_owner .= "</select>";
 
-  // Logger select
-/*  if (! isset($logger)) { $logger = $obm["uid"]; }
-  $dis_sel_logger="<select name=\"sel_logger\">";
-  while ($usr_q->next_record()) {
-    $dis_sel_logger.="\n<option value=\"".$usr_q->f("userobm_id")."\"";
-    if ($usr_q->f("userobm_id") == $logger) 
-      $dis_sel_logger.=" selected=\"selected\"";
-    $dis_sel_logger.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
-  }
-  $dis_sel_logger.="</select>";*/
 
   if (! isset($logger)) { $logger = $obm["uid"]; }
 // FIXME: please, think to clean this !

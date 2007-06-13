@@ -181,7 +181,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (of_right_update_right($params, "mailshare")) {
+  if (of_right_update_right($params, "MailShare")) {
     set_update_state();
     $display["msg"] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {

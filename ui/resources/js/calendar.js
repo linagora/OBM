@@ -129,7 +129,7 @@ Obm.CalendarDayEvent = new Class({
 
       onSnap:function() {
         obm.calendarManager.lock();
-        this.drag.mouse.pos = {x: 10, y: 10};
+        this.drag.mouse.pos = {x: obm.calendarManager.defaultWidth/2, y: 10};
         this.element.setStyles({
           'width' : obm.calendarManager.defaultWidth + 'px',
           'margin-left' : 0

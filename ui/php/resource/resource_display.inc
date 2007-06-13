@@ -260,7 +260,7 @@ function html_resource_form($usr_q, $resource) {
   global $l_name, $l_desc, $l_qty;
   global $l_resource, $l_insert, $l_update;
   global $action, $l_rtype,$obm;
-  global $l_undef, $c_undef,$l_write_permission;
+  global $l_undef, $c_undef,$l_admin_permission;
 
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
@@ -300,17 +300,17 @@ function html_resource_form($usr_q, $resource) {
 
     $right_manager = "
       <fieldset class=\"detail extra\">
-      <legend>$l_write_permission : <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" /></legend>
-      <input type=\"hidden\" name=\"sel_accept_write[]\" value=\"data-user-$obm[uid]\" />
+      <legend>$l_admin_permission : <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" /></legend>
+      <input type=\"hidden\" name=\"sel_accept_admin[]\" value=\"data-user-$obm[uid]\" />
       <input type=\"hidden\" name=\"sel_read_public\" value=\"1\" />
-      <div id=\"sel_accept_write\">     
+      <div id=\"sel_accept_admin\">     
       </div>
       </fieldset>
       ";
     $js = "
     <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_write', 'userSearch');
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_admin', 'userSearch');
     });
     </script>     
     ";

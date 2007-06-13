@@ -84,6 +84,8 @@ ALTER TABLE Invoice ALTER COLUMN invoice_credit_memo SET NOT NULL;
 -- Add ext_id column
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_ext_id varchar(32);
 ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_ext_id DEFAULT '';
+-- Add extension column
+ALTER TABLE CalendarEvent ADD COLUMN calendarevent_properties text;
 
 
 -------------------------------------------------------------------------------
@@ -219,10 +221,10 @@ CREATE TABLE OrganizationalChart (
 -- Table structure for the table 'OGroup'
 --
 CREATE TABLE OGroup (
-  ogroup_id					               serial,
+  ogroup_id			   serial,
   ogroup_domain_id                 integer default 0,
-  ogroup_timeupdate	             	 timestamp,
-  ogroup_timecreate	             	 timestamp,
+  ogroup_timeupdate	           timestamp,
+  ogroup_timecreate	           timestamp,
   ogroup_userupdate                integer,
   ogroup_usercreate                integer,
   ogroup_organizationalchart_id    integer not null,
@@ -249,4 +251,17 @@ CREATE TABLE OGroupEntity (
   PRIMARY KEY (ogroupentity_id)
 );
 
+--
+-- Table structure for the table 'EntityRight'
+--
+ALTER TABLE EntityRight ADD COLUMN entityright_admin integer NOT NULL default 0;
+--
+-- UPDATE EntityRight DATA
+--
+UPDATE EntityRight SET entityright_write = entityright_admin;
 
+--
+-- UPDATE Prefs
+--
+UPDATE UserObmPref SET userobmpref_value = 'm/d/y' WHERE userobmpref_value = 'mdy' AND userobmpref_option = 'set_date_upd';
+UPDATE UserObmPref SET userobmpref_value = 'd/m/y' WHERE userobmpref_value = 'dmy' AND userobmpref_option = 'set_date_upd';
