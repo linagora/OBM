@@ -6,19 +6,14 @@ package fr.aliasource.funambol.engine.source;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.TimeZone;
-import java.util.logging.Logger;
 
-import com.funambol.foundation.util.Def;
 import com.funambol.framework.engine.SyncItemKey;
 import com.funambol.framework.engine.source.AbstractSyncSource;
-import com.funambol.framework.engine.source.ContentType;
 import com.funambol.framework.engine.source.SyncContext;
 import com.funambol.framework.engine.source.SyncSource;
 import com.funambol.framework.engine.source.SyncSourceException;
-import com.funambol.framework.engine.source.SyncSourceInfo;
 import com.funambol.framework.logging.FunambolLogger;
 import com.funambol.framework.logging.FunambolLoggerFactory;
-import com.funambol.framework.logging.Sync4jLogger;
 import com.funambol.framework.security.Sync4jPrincipal;
 import com.funambol.framework.server.Sync4jDevice;
 import com.funambol.framework.server.store.PersistentStore;
@@ -46,7 +41,7 @@ implements SyncSource, Serializable, LazyInitBean {
     private int restrictions = 1; //default private
     private String obmAddress = null;
     
-    protected FunambolLogger log = FunambolLoggerFactory.getLogger(Def.LOGGER_NAME);
+    protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
 
     // ------------------------------------------------------------ Constructors
 

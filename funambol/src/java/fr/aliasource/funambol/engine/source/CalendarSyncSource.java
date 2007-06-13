@@ -11,7 +11,6 @@ import com.funambol.common.pim.converter.VCalendarConverter;
 import com.funambol.common.pim.icalendar.ICalendarParser;
 import com.funambol.common.pim.model.VCalendar;
 import com.funambol.common.pim.sif.SIFCalendarParser;
-import com.funambol.foundation.exception.EntityException;
 import com.funambol.framework.engine.SyncItem;
 import com.funambol.framework.engine.SyncItemImpl;
 import com.funambol.framework.engine.SyncItemKey;

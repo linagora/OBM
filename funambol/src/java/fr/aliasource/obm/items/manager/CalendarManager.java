@@ -6,14 +6,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 import javax.xml.rpc.ServiceException;
 
-import com.funambol.foundation.util.Def;
 import com.funambol.framework.logging.FunambolLogger;
 import com.funambol.framework.logging.FunambolLoggerFactory;
-import com.funambol.framework.logging.Sync4jLogger;
 
 import fr.aliacom.obm.CalendarServiceLocator;
 import fr.aliacom.obm.ecalendar.CalendarBindingStub;
@@ -32,7 +29,7 @@ public class CalendarManager extends ObmManager {
 	private CalendarBindingStub binding;
 	private AccessToken token;
 	private String calendar;
-	protected FunambolLogger log = FunambolLoggerFactory.getLogger(Def.LOGGER_NAME);
+	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
 	private String userEmail;
 	
 	public CalendarManager(String obmAddress) {

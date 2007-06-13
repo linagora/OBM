@@ -5,16 +5,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 import javax.xml.rpc.ServiceException;
 
 import com.funambol.common.pim.contact.Address;
 import com.funambol.common.pim.contact.BusinessDetail;
-import com.funambol.foundation.util.Def;
 import com.funambol.framework.logging.FunambolLogger;
 import com.funambol.framework.logging.FunambolLoggerFactory;
-import com.funambol.framework.logging.Sync4jLogger;
 
 import fr.aliacom.obm.AddressBookLocator;
 import fr.aliacom.obm.ebook.AddressBookBindingStub;
@@ -31,7 +28,7 @@ public class ContactManager extends ObmManager {
 
 	private AddressBookBindingStub binding;
 	private String book;
-	protected FunambolLogger log = FunambolLoggerFactory.getLogger(Def.LOGGER_NAME);
+	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
 	
 	
 	public ContactManager(String obmAddress) {
@@ -385,9 +382,10 @@ public class ContactManager extends ObmManager {
     	contact.setTown(
     			ContactHelper.nullToEmptyString(
     					addr.getCity().getPropertyValueAsString()) );
+    	//country_iso_iso3166 char 2 in obm
     	contact.setCountry(
     			ContactHelper.nullToEmptyString(
-    					addr.getCountry().getPropertyValueAsString()) );
+    					addr.getCountry().getPropertyValueAsString().substring(0, 2)) );
     	ContactHelper.constructObmStreet(
     			contact,
     			ContactHelper.nullToEmptyString(
