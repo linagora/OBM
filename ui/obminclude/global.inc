@@ -1621,4 +1621,83 @@ function get_global_document_disk_path($id) {
   return $disk_path; 
 }
 
+/**
+ * Convert an HSV formated color into an RVB
+ * color.
+ * 
+ * @param mixed $H Hue
+ * @param mixed $S Saturation
+ * @param mixed $V Value
+ * @access public
+ * @return array
+ */
+function HSV2RGB($H, $S, $V) {
+  $Hi = floor($H*6);
+
+  $f = ($H*6) - $Hi;
+
+  $p = $V * (1 - $S);
+  $q = $V * (1 - $f*$S);
+  $t = $V * (1 - (1-$f)*$S);
+
+  switch($Hi) {
+  case 0:
+    $R = $V*255;
+    $G = $t*255;
+    $B = $p*255;
+    break;
+
+  case 1:
+    $R = $q*255;
+    $G = $V*255;
+    $B = $p*255;
+    break;
+
+  case 2:
+    $R = $p*255;
+    $G = $V*255;
+    $B = $t*255;
+    break;
+
+  case 3:
+    $R = $p*255;
+    $G = $q*255;
+    $B = $V*255;
+    break;
+
+  case 4:
+    $R = $t*255;
+    $G = $p*255;
+    $B = $V*255;
+    break;
+
+  case 5:
+    $R = $V*255;
+    $G = $p*255;
+    $B = $q*255;
+    break;
+  default:
+    exit("Error");
+  }
+
+  return array('R' => ceil($R), 'G' => ceil($G), 'B' => ceil($B) );
+}
+
+/**
+ * Create an array of color.
+ * 
+ * @param mixed $nb amount of color
+ * @access public
+ * @return void
+ */
+function random_color($nb) {
+  $S = 1;
+  $V = 1;
+  $H = 1;
+  for($i = 0; $i < $nb; $i ++) {
+    $a = HSV2RGB(($H/$nb)*$i, $S, $V);
+    $colors[] = implode(",",$a);
+  } 
+  return $colors;
+}
 </script>

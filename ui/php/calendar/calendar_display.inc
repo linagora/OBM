@@ -103,6 +103,15 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
     <li class=\"freeBusy\">$l_possible</li>
     <li class=\"free\">$l_free</li>
     <li class=\"busy\">$l_occupied</li>";
+  } elseif ( $action == "planning") {
+    $l_legend = $l_meeting_legend;
+    $cats1 = of_category_get_ordered("calendar", "category1");
+    $nb = count($cats1);
+    $colors = random_color($nb);
+    var_dump($colors);
+    foreach($cats1 as $key => $cat_info) {
+      $dis_legend .= "<li style=\"background-color:rgb($colors[$key])\">$cat_info[label]</li>";
+    }
   } else {
     $l_legend = $l_calendar_displayed;
     foreach ($calendar_entity as $type => $entity) {

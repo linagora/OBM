@@ -265,3 +265,10 @@ UPDATE EntityRight SET entityright_write = entityright_admin;
 --
 UPDATE UserObmPref SET userobmpref_value = 'm/d/y' WHERE userobmpref_value = 'mdy' AND userobmpref_option = 'set_date_upd';
 UPDATE UserObmPref SET userobmpref_value = 'd/m/y' WHERE userobmpref_value = 'dmy' AND userobmpref_option = 'set_date_upd';
+
+--
+-- UPDATE TimeTask DATA
+--
+ALTER TABLE TimeTask ALTER COLUMN timetask_length TYPE float;
+ALTER TABLE ProjectUser ALTER COLUMN projectuser_projectedtime TYPE float;
+ALTER TABLE ProjectUser ALTER COLUMN projectuser_missingtime TYPE float;

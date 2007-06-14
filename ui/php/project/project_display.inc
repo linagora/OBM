@@ -862,7 +862,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 	  $class = "error";
         elseif (($tm_used + $tm_miss) < (0.90 * $tm_proj))
 	  $class = "ok";        
-	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
+	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss,1) ."/". number_format($tm_proj,1);
 	$dis_member .= "<td class=\"$class\">$tm_label</td>\n";
 
       } else {
@@ -881,7 +881,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       $tm_proj = $array_memtot["proj"][$m_id];
       $tm_miss = $array_memtot["miss"][$m_id];
       $tm_used = $array_memtot["used"][$m_id];
-      $tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
+      $tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss,1) ."/". number_format($tm_proj,1);
 
       $dis_member .= "<td >$tm_label</td>\n";
     }
@@ -2195,7 +2195,7 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
         elseif (($tm_used + $tm_miss) < (0.90 * $tm_proj))
           $class = "ok";
 
-	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
+	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss,1) ."/". number_format($tm_proj,1);
 	$dis_member .= "<td class=\"$class\">$tm_label</td>\n";
 
       } else {
@@ -2214,7 +2214,7 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
       $tm_proj = $array_memtot["proj"][$m_id];
       $tm_miss = $array_memtot["miss"][$m_id];
       $tm_used = $array_memtot["used"][$m_id];
-      $tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
+      $tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss,1) ."/". number_format($tm_proj,1);
 
       $dis_member .= "<td>$tm_label</td>\n";
     }

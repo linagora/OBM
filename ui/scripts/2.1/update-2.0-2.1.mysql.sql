@@ -253,3 +253,9 @@ ALTER TABLE EntityRight ADD COLUMN entityright_admin int(1) NOT NULL default 0 A
 -- UPDATE EntityRight DATA
 --
 UPDATE EntityRight SET entityright_write = entityright_admin;
+--
+-- UPDATE TimeTask DATA
+--
+ALTER TABLE TimeTask CHANGE COLUMN timetask_length timetask_length float;
+ALTER TABLE ProjectUser CHANGE COLUMN projectuser_projectedtime projectuser_projectedtime float;
+ALTER TABLE ProjectUser CHANGE COLUMN projectuser_missingtime projectuser_missingtime float;
