@@ -29,11 +29,10 @@ import fr.aliasource.obm.items.manager.ContactManager;
 public final class ContactSyncSource extends ObmSyncSource 
 	implements SyncSource, Serializable, LazyInitBean {
 
-	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -6493492575094388992L;
 	private ContactManager manager;
 	
 	public ContactSyncSource() {

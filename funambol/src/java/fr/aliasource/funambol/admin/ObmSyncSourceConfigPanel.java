@@ -36,9 +36,9 @@ public class ObmSyncSourceConfigPanel
 	extends SourceManagementPanel
 	implements Serializable {
 
-    // --------------------------------------------------------------- Constants
+	// --------------------------------------------------------------- Constants
 
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;

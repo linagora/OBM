@@ -1,12 +1,14 @@
 package fr.aliasource.funambol;
 
 public class OBMException extends Exception {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
 	 /**
+	 * 
+	 */
+	private static final long serialVersionUID = -441463969289693752L;
+
+
+	/**
      * Creates a new instance of <code>EntityException</code> without
      * detail message.
      */
