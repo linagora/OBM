@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.5.0" class="java.beans.XMLDecoder">
+    <object class="fr.aliasource.funambol.security.ObmOfficer">
+    
+        <void property="obmAddress">
+            <string>http://localhost:8080/obm-sync/services/Calendar</string>
+        </void>
+        
+    </object>
+</java>
