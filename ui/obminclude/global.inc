@@ -1622,68 +1622,6 @@ function get_global_document_disk_path($id) {
 }
 
 /**
- * Convert an HSV formated color into an RVB
- * color.
- * 
- * @param mixed $H Hue
- * @param mixed $S Saturation
- * @param mixed $V Value
- * @access public
- * @return array
- */
-function HSV2RGB($H, $S, $V) {
-  $Hi = floor($H*6);
-
-  $f = ($H*6) - $Hi;
-
-  $p = $V * (1 - $S);
-  $q = $V * (1 - $f*$S);
-  $t = $V * (1 - (1-$f)*$S);
-
-  switch($Hi) {
-  case 0:
-    $R = $V*255;
-    $G = $t*255;
-    $B = $p*255;
-    break;
-
-  case 1:
-    $R = $q*255;
-    $G = $V*255;
-    $B = $p*255;
-    break;
-
-  case 2:
-    $R = $p*255;
-    $G = $V*255;
-    $B = $t*255;
-    break;
-
-  case 3:
-    $R = $p*255;
-    $G = $q*255;
-    $B = $V*255;
-    break;
-
-  case 4:
-    $R = $t*255;
-    $G = $p*255;
-    $B = $V*255;
-    break;
-
-  case 5:
-    $R = $V*255;
-    $G = $p*255;
-    $B = $q*255;
-    break;
-  default:
-    exit("Error");
-  }
-
-  return array('R' => ceil($R), 'G' => ceil($G), 'B' => ceil($B) );
-}
-
-/**
  * Create an array of color.
  * 
  * @param mixed $nb amount of color
@@ -1691,13 +1629,34 @@ function HSV2RGB($H, $S, $V) {
  * @return void
  */
 function random_color($nb) {
-  $S = 1;
-  $V = 1;
-  $H = 1;
-  for($i = 0; $i < $nb; $i ++) {
-    $a = HSV2RGB(($H/$nb)*$i, $S, $V);
-    $colors[] = implode(",",$a);
-  } 
-  return $colors;
+
+  $colors[] = "238, 136, 0";
+  $colors[] = "221, 68, 119 ";
+  $colors[] = "204, 51, 51";
+  $colors[] = "153, 68, 153";
+  $colors[] = "102, 51, 204";
+  $colors[] = "51, 102, 153";
+  $colors[] = "51, 102, 204";
+  $colors[] = "34, 170, 153";
+  $colors[] = "50, 146, 98";
+  $colors[] = "16, 150, 24";
+  $colors[] = "102, 170, 0";
+  $colors[] = "170, 170, 17";
+  $colors[] = "214, 174, 0";
+  $colors[] = "221, 85, 17";
+  $colors[] = "168, 112, 112";
+  $colors[] = "140, 109, 140";
+  $colors[] = "98, 116, 135";
+  $colors[] = "112, 131, 168";
+  $colors[] = "92, 141, 135";
+  $colors[] = "137, 137, 81";
+  $colors[] = "176, 139, 89";
+  $return = array();
+  do {
+    $return = array_merge($return, array_slice($colors,0,$nb));
+    $nb -= 20;
+  } while ($nb > 0);
+     
+  return $return;
 }
 </script>

@@ -108,9 +108,8 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
     $cats1 = of_category_get_ordered("calendar", "category1");
     $nb = count($cats1);
     $colors = random_color($nb);
-    var_dump($colors);
     foreach($cats1 as $key => $cat_info) {
-      $dis_legend .= "<li style=\"background-color:rgb($colors[$key])\">$cat_info[label]</li>";
+      $dis_legend .= "<li style=\"color:#fff;background-color:rgb($colors[$key])\">$cat_info[label]</li>";
     }
   } else {
     $l_legend = $l_calendar_displayed;
@@ -1327,6 +1326,12 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
   $events = calendar_events_model($start_time,$end_time, $calendar_entity,$category_filter);
   $of = &OccurrenceFactory::getInstance();
 
+  $cats1 = of_category_get_ordered("calendar", "category1");
+  $nb = count($cats1);
+  $colors = random_color($nb);
+  foreach($cats1 as $key => $cat_info) {
+    $cats_color[$cat_info["label"]] = $colors[$key];
+  }
   $current_time = $start_time;
   $day_amount = 0;
   while($current_time < $end_time) {
@@ -1348,31 +1353,42 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
           $line[$line_id] .= "<td></td>";
         } else {
           $today_events = array();
+          $day_content = "";
           $occurences = $of->getPeriodOccurrences($current_time,$day_duration,array($type => array($id)));
           if ($occurences != null) {
             $haveevent = true;
             foreach ($occurences as $occurence) {
               $event = &$occurence->event;
+              $category = $event->category1;
+              $location = $event->location;
               if($event->all_day) {
                 $ad = ": $l_all_day";
               } else {
                 $ad = "";
               }
+
               if ($event->privacy == 1 && $obm["uid"] != $properties["id"]) {
-                $today_events[] = "$l_private $ad";
+                $today_events[] = "<li>$l_private $ad</li>";
               } else {
-                $today_events[] = $event->title." $ad";
+                if($category != "") {
+                  $style = "style=\"color:#fff;background-color:rgb(".$cats_color[$category].")\"";
+                } else {
+                  $style = "";
+                }                
+                if($location != "") {
+                  $today_events[] = "<li $style>".$event->title." ($location) $ad</li>";
+                } else {
+                  $today_events[] = "<li $style>".$event->title." $ad</li>";
+                } 
               }
             }            
           }
           if($haveevent) {
             $hidden_div .= "
-              <div id=\"$id-$this_day\" class=\"infoPopup\">
+              <div id=\"$id-$this_day\" class=\"infoPopup\" style=\"border: 1px solid black\">
                <h1>$day_long_label $this_day</h1>
                <ul>
-               <li>
-               ".implode("</li><li>",$today_events)."
-                </li>
+               ".implode($today_events)."
                </ul>
               </div>";            
             $line[$line_id] .= "<td class=\"".$properties["class"]."\"
