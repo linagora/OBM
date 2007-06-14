@@ -28,6 +28,7 @@ sub new {
         incremental => undef,
         toDelete => undef,
         archive => undef,
+        sieve => undef,
         userId => undef,
         domainId => undef,
         userDesc => undef
@@ -51,6 +52,8 @@ sub new {
     $ldapEngineAttr{"type"} = $SYSTEMUSERS;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
     $ldapEngineAttr{"toDelete"} = 0;
+    $ldapEngineAttr{"archive"} = 0;
+    $ldapEngineAttr{"sieve"} = 0;
 
     bless( \%ldapEngineAttr, $self );
 }
@@ -272,6 +275,13 @@ sub getMailboxName {
     my $self = shift;
 
     return undef;
+}
+
+
+sub getMailboxSieve {
+    my $self = shift;
+
+    return $self->{"sieve"};
 }
 
 
