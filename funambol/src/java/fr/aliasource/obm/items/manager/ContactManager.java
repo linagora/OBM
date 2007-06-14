@@ -388,8 +388,8 @@ public class ContactManager extends ObmManager {
     					addr.getCity().getPropertyValueAsString()) );
     	//country_iso_iso3166 char 2 in obm
     	contact.setCountry(
-    			ContactHelper.nullToEmptyString(
-    					addr.getCountry().getPropertyValueAsString().substring(0, 2)) );
+    			ContactHelper.getCountry(addr)
+    			);
     	ContactHelper.constructObmStreet(
     			contact,
     			ContactHelper.nullToEmptyString(

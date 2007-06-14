@@ -2,6 +2,7 @@ package fr.aliasource.funambol.utils;
 
 import java.util.List;
 
+import com.funambol.common.pim.contact.Address;
 import com.funambol.common.pim.contact.BusinessDetail;
 import com.funambol.common.pim.contact.ContactDetail;
 import com.funambol.common.pim.contact.Email;
@@ -167,5 +168,13 @@ public class ContactHelper extends Helper {
 		return result;
 	}
 	
+	public static String getCountry(Address addr) {
+		String result = nullToEmptyString(addr.getCountry().getPropertyValueAsString());
+		if (result.length()>2) {
+			result = result.substring(0,2);
+		}
+		
+		return result;
+	}
 }
 	
