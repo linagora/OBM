@@ -22,6 +22,7 @@ require OBM::Entities::obmSystemUser;
 require OBM::Entities::obmUser;
 require OBM::Entities::obmGroup;
 require OBM::Entities::obmMailshare;
+require OBM::Entities::obmPostfixConf;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 
@@ -161,7 +162,11 @@ sub update {
 
     if( $self->{"all"} ) {
         $self->_doAll();
+    }else {
+        $self->_doIncremental();
     }
+
+    return 1;
 }
 
 
@@ -219,7 +224,19 @@ sub _doAll {
         while( my( $mailshareId ) = $queryResult->fetchrow_array() ) {
             $self->_doMailShare( 0, $mailshareId );
         }
+
+        # Traitement des entités de type 'postfixConf'
+        $self->_doPostfixConf( 0 );
     }
+
+    return 1;
+}
+
+
+sub _doIncremental {
+    my $self = shift;
+
+    
 
     return 1;
 }
@@ -320,6 +337,22 @@ sub _doMailShare {
     my $mailShareObject = OBM::Entities::obmMailshare->new( $incremental, $mailshareId );
     $mailShareObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
     $self->_runEngines( $mailShareObject );
+
+    return 1;
+}
+
+
+sub _doPostfixConf {
+    my $self = shift;
+    my( $incremental ) = 0;
+
+    if( !defined($incremental) ) {
+        $incremental = 0;
+    }
+
+    my $postfixConfObject = OBM::Entities::obmPostfixConf->new( $incremental );
+    $postfixConfObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    $self->_runEngines( $postfixConfObject );
 
     return 1;
 }

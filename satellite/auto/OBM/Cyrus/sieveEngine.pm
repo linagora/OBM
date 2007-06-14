@@ -342,6 +342,10 @@ sub update {
         return 0;
     }
 
+    if( !$object->getMailboxSieve() ) {
+        return 1;
+    }
+
     # Récupération des identifiants du serveur de la boîte à traiter
     my $mailBoxDomainId;
     my $mailBoxServerId;
