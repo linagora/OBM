@@ -40,7 +40,7 @@ public class ContactManager extends ObmManager {
 			addressBinding = (AddressBookBindingStub)addressbookLocator.getAddressBook();
 			
 		} catch (ServiceException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 		}
 		binding = addressBinding;
 	}
@@ -48,7 +48,9 @@ public class ContactManager extends ObmManager {
 	
 	public void initRestriction(int restrictions) {
 		this.restrictions = restrictions;
-		log.info(" init restrictions: "+restrictions);
+		if (log.isTraceEnabled()) {
+			log.trace(" init restrictions: "+restrictions);
+		}
 	}
 	
 	public void logIn(String user, String pass) throws OBMException {
@@ -214,7 +216,9 @@ public class ContactManager extends ObmManager {
 		
 		Contact c = foundationContactToObm(contact, type);
 		
-		log.info(" look twin of : "+c.getFirstName()+","+c.getLastName()+","+c.getCompany());
+		if (log.isDebugEnabled()) {
+			log.debug(" look twin of : "+c.getFirstName()+","+c.getLastName()+","+c.getCompany());
+		}
 		
 		try {
 			keys = binding.getContactTwinKeys(token,book,c);

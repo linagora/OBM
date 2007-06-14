@@ -78,21 +78,24 @@ public final class ContactSyncSource extends ObmSyncSource
 	 */
 	public SyncItem addSyncItem(SyncItem syncItem) throws SyncSourceException {
 	
-	    log.info("addSyncItem("                     +
+		if (log.isDebugEnabled()) {
+			log.debug("addSyncItem("                     +
 	                       principal                          +
 	                       " , "                              +
 	                       syncItem.getKey().getKeyAsString() +
 	                       ")");
-	    Contact contact = getFoundationFromSyncItem(syncItem);
-	    contact.setUid(null);
+		}
+	    Contact contact = null;
 	    Contact created = null;
 		try {
+			contact = getFoundationFromSyncItem(syncItem);
+			contact.setUid(null);
 			created = manager.addItem(contact, getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
 	    
-	    log.info(" created with id : "+created.getUid());
+	    log.debug(" created with id : "+created.getUid());
 	    
 	    return getSyncItemFromFoundation(created, SyncItemState.SYNCHRONIZED);
 	}
@@ -101,11 +104,11 @@ public final class ContactSyncSource extends ObmSyncSource
 	 * @see SyncSource
 	 */
 	public SyncItemKey[] getAllSyncItemKeys() throws SyncSourceException {
-	
-	    log.info("getAllSyncItemKeys(" +
+		if (log.isDebugEnabled()) {
+			log.debug("getAllSyncItemKeys(" +
 	                       principal   +
 	                       ")");
-	
+		}
 	    String[] keys = null;
 	    try {
 			keys = manager.getAllItemKeys();
@@ -113,8 +116,9 @@ public final class ContactSyncSource extends ObmSyncSource
 			throw new SyncSourceException(e);
 		}
 	    SyncItemKey[] ret = getSyncItemKeysFromKeys(keys);
-	    
-	    log.info(" returning "+ret.length+" key(s)");
+	    if (log.isDebugEnabled()) {
+	    	log.debug(" returning "+ret.length+" key(s)");
+	    }
 	    
 	    return ret;
 	}
@@ -124,14 +128,15 @@ public final class ContactSyncSource extends ObmSyncSource
 	 */
 	public SyncItemKey[] getDeletedSyncItemKeys(Timestamp since, Timestamp until)
 	throws SyncSourceException {
-	
-	    log.info("getDeletedSyncItemKeys(" +
+		if (log.isDebugEnabled()) {
+			log.debug("getDeletedSyncItemKeys(" +
 	                       principal          +
 	                       " , "              +
 	                       since              +
 	                       " , "              +
 	                       until              +
 	                       ")");
+		}
 	    String[] keys = null;
 	    try {
 			keys = manager.getDeletedItemKeys(since);
@@ -139,8 +144,9 @@ public final class ContactSyncSource extends ObmSyncSource
 			throw new SyncSourceException(e);
 		}
 	    SyncItemKey[] ret = getSyncItemKeysFromKeys(keys);
-	    
-	    log.info(" returning "+ret.length+" key(s)");
+	    if (log.isDebugEnabled()) {
+	    	log.debug(" returning "+ret.length+" key(s)");
+	    }
 	    
 	    return ret;
 	}
@@ -150,14 +156,15 @@ public final class ContactSyncSource extends ObmSyncSource
 	 */
 	public SyncItemKey[] getNewSyncItemKeys(Timestamp since, Timestamp until)
 	throws SyncSourceException {
-	
-	    log.info("getNewSyncItemKeys(" +
+		if (log.isDebugEnabled()) {
+			log.debug("getNewSyncItemKeys(" +
 	                       principal   +
 	                       " , "       +
 	                       since       +
 	                       " , "       +
 	                       until       +
 	                       ")");
+		}
 	    
 	    String[] keys = null;
 	    try {
@@ -166,34 +173,38 @@ public final class ContactSyncSource extends ObmSyncSource
 			throw new SyncSourceException(e);
 		}
 	    SyncItemKey[] ret = getSyncItemKeysFromKeys(keys);
+	    if (log.isDebugEnabled()) {
+	    	log.debug(" returning "+ret.length+" key(s)");
+	    }
 	    
-	    log.info(" returning "+ret.length+" key(s)");
-	    
-	    return null;//ret;
+	    return null;
 	}
 
 	/**
+	 * @throws  
 	 * @see SyncSource
 	 */
 	public SyncItemKey[] getSyncItemKeysFromTwin(SyncItem syncItem)
 	throws SyncSourceException {
-		
-		log.info("getSyncItemKeysFromTwin(" 	   +
+		if (log.isDebugEnabled()) {
+			log.debug("getSyncItemKeysFromTwin(" 	   +
                 principal						   +
                 ")"	);
+		}
 		
-		Contact contact = getFoundationFromSyncItem(syncItem);
+		Contact contact = null;
 		
 	    String[] keys = null;
 	    try {
+	    	contact = getFoundationFromSyncItem(syncItem);
 			keys = manager.getContactTwinKeys(contact, getSourceType());
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
 	    SyncItemKey[] ret = getSyncItemKeysFromKeys(keys);
-	    
-	    log.info(" returning "+ret.length+" key(s)");
-	    
+	    if (log.isDebugEnabled()) {
+	    	log.debug(" returning "+ret.length+" key(s)");
+	    }
 	    return ret;
 	}
 
@@ -202,14 +213,15 @@ public final class ContactSyncSource extends ObmSyncSource
 	 */
 	public SyncItemKey[] getUpdatedSyncItemKeys(Timestamp since, Timestamp until)
 	throws SyncSourceException {
-	
-	    log.info("getUpdatedSyncItemKeys(" +
+		if (log.isDebugEnabled()) {
+			log.debug("getUpdatedSyncItemKeys(" +
 	                       principal          +
 	                       " , "              +
 	                       since              +
 	                       " , "              +
 	                       until              +
 	                       ")");
+		}
 	
 	    String[] keys = null;
 	    try {
@@ -218,22 +230,23 @@ public final class ContactSyncSource extends ObmSyncSource
 			throw new SyncSourceException(e);
 		}
 	    SyncItemKey[] ret = getSyncItemKeysFromKeys(keys);
-	    
-	    log.info(" returning "+ret.length+" key(s)");
-	    
+	    if (log.isDebugEnabled()) {
+	    	log.debug(" returning "+ret.length+" key(s)");
+	    }
 	    return ret;
 	}
 
 	public void removeSyncItem(SyncItemKey syncItemKey, Timestamp time, boolean softDelete)
 	throws SyncSourceException {
-	
-	    log.info("removeSyncItem(" +
+		if (log.isDebugEnabled()) {
+			log.debug("removeSyncItem(" +
 	                       principal    +
 	                       " , "        +
 	                       syncItemKey  +
 	                       " , "        +
 	                       time         +
 	                       ")");
+		}
 	    try {
 			manager.removeItem(syncItemKey.getKeyAsString());
 		} catch (OBMException e) {
@@ -246,15 +259,17 @@ public final class ContactSyncSource extends ObmSyncSource
 	 */
 	public SyncItem updateSyncItem(SyncItem syncItem)
 	throws SyncSourceException {
-	
-	    log.info("updateSyncItem("                     			+
+		if (log.isDebugEnabled()) {
+			log.debug("updateSyncItem("                     			+
 	                       principal                         	+
 	                       " , "                              	+
 	                       syncItem.getKey().getKeyAsString() 	+
 	                       ")");
+		}
 	    
-	    Contact contact = getFoundationFromSyncItem(syncItem);
+	    Contact contact = null;
 	    try {
+	    	contact = getFoundationFromSyncItem(syncItem);
 			contact = manager.updateItem(
 					syncItem.getKey().getKeyAsString(), contact, getSourceType());
 		} catch (OBMException e) {
@@ -269,12 +284,13 @@ public final class ContactSyncSource extends ObmSyncSource
 	 */
 	public SyncItem getSyncItemFromId(SyncItemKey syncItemKey)
 	throws SyncSourceException {
-	
-		log.info("getSyncItemFromId(" +
+		if (log.isDebugEnabled()) {
+			log.debug("getSyncItemFromId(" +
 	                       principal             +
 	                       ", "                  +
 	                       syncItemKey           +
 	                       ")");
+		}
 	
 		String key = syncItemKey.getKeyAsString();
 	
@@ -293,7 +309,7 @@ public final class ContactSyncSource extends ObmSyncSource
 	//  -------------------- Private methods ----------------------
 	
 	
-	private SyncItem getSyncItemFromFoundation(Contact contact, char state) {
+	private SyncItem getSyncItemFromFoundation(Contact contact, char state) throws SyncSourceException {
 	
 		SyncItem syncItem = null;
         String content    = null;
@@ -319,13 +335,13 @@ public final class ContactSyncSource extends ObmSyncSource
         return syncItem;
 	}
 
-	private String getXMLFromFoundationContact(Contact contact) {
+	private String getXMLFromFoundationContact(Contact contact) throws SyncSourceException {
 		String xml = null;
 	    ContactToSIFC c2xml = new ContactToSIFC(deviceTimezone, deviceCharset);
 	    try {
 			xml = c2xml.convert(contact);
 		} catch (ConverterException e) {
-			e.printStackTrace();
+			throw new SyncSourceException("Error converting to XML",e);
 		}
 	    
 	    return xml;
@@ -343,7 +359,7 @@ public final class ContactSyncSource extends ObmSyncSource
         return vcard;
 	}
 
-	private Contact getFoundationFromSyncItem(SyncItem item) {
+	private Contact getFoundationFromSyncItem(SyncItem item) throws OBMException {
 		
 		Contact contact = null;
 		String content = null;
@@ -361,7 +377,7 @@ public final class ContactSyncSource extends ObmSyncSource
 	    return contact;
 	}
 
-	private Contact getFoundationContactFromXML(String content) {
+	private Contact getFoundationContactFromXML(String content) throws OBMException {
 		
 		Contact result = new Contact();
 		
@@ -374,15 +390,15 @@ public final class ContactSyncSource extends ObmSyncSource
 				parser = new SIFCParser(buffer);
 				result = (Contact) parser.parse();
 			} catch (SAXException e) {
-				log.info(e.getMessage());
+				throw new OBMException("Error converting from XML", e);
 			} catch (IOException e) {
-				log.info(e.getMessage());
+				throw new OBMException("Error converting from XML", e);
 			}
 	    }
 		return result;
 	}
 
-	private Contact getFoundationContactFromVCard(String content) {
+	private Contact getFoundationContactFromVCard(String content) throws OBMException {
 		 
 		ByteArrayInputStream buffer = null;
         VcardParser parser = null;
@@ -398,17 +414,8 @@ public final class ContactSyncSource extends ObmSyncSource
                 contact = parser.vCard();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new OBMException("Error converting from Vcard",e);
         }
-
-        /**
-         * workaround
-         *
-         */
-        // convert in to XML
-        String xml = this.getXMLFromFoundationContact(contact);
-        // get content from XML
-        contact = this.getFoundationContactFromXML(xml);
 
         return contact;
 	}

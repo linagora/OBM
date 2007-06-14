@@ -59,11 +59,13 @@ public class CalendarSyncSource extends ObmSyncSource {
 	 */
 	public SyncItem addSyncItem(SyncItem syncItem) throws SyncSourceException {
 	
-	    log.info("addSyncItem("                     +
-	                       principal                          +
-	                       " , "                              +
-	                       syncItem.getKey().getKeyAsString() +
-	                       ")");
+		if (log.isDebugEnabled()) {
+		    log.debug("addSyncItem("                     +
+		                       principal                          +
+		                       " , "                              +
+		                       syncItem.getKey().getKeyAsString() +
+		                       ")");
+		}
 	    com.funambol.common.pim.calendar.Calendar created = null;
 	    try {
 		    com.funambol.common.pim.calendar.Calendar calendar = getFoundationFromSyncItem(syncItem);
@@ -72,9 +74,10 @@ public class CalendarSyncSource extends ObmSyncSource {
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
-	    
-	    log.info(" created with id : "+created.getCalendarContent().getUid().getPropertyValueAsString());
-	    
+		
+		if (log.isTraceEnabled()) {
+			log.trace(" created with id : "+created.getCalendarContent().getUid().getPropertyValueAsString());
+		}
 	    return getSyncItemFromFoundation(created, SyncItemState.SYNCHRONIZED);
 	}
 
@@ -83,10 +86,12 @@ public class CalendarSyncSource extends ObmSyncSource {
 	 */
 	public SyncItemKey[] getAllSyncItemKeys() throws SyncSourceException {
 	
-	    log.info("getAllSyncItemKeys(" +
+		if (log.isDebugEnabled()) {
+			log.debug("getAllSyncItemKeys(" +
 	                       principal   +
 	                       ")");
-	
+		}
+		
 	    String[] keys = null;
 	    try {
 			keys = manager.getAllItemKeys();
@@ -95,8 +100,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 		}
 	    SyncItemKey[] ret = getSyncItemKeysFromKeys(keys);
 	    
-	    log.info(" returning "+ret.length+" key(s)");
-	    
+	    if (log.isDebugEnabled()) {
+	    	log.debug(" returning "+ret.length+" key(s)");
+	    }
 	    return ret;
 	}
 
@@ -106,13 +112,15 @@ public class CalendarSyncSource extends ObmSyncSource {
 	public SyncItemKey[] getDeletedSyncItemKeys(Timestamp since, Timestamp until)
 	throws SyncSourceException {
 	
-	    log.info("getDeletedSyncItemKeys(" +
+		if (log.isDebugEnabled()) {
+			log.debug("getDeletedSyncItemKeys(" +
 	                       principal          +
 	                       " , "              +
 	                       since              +
 	                       " , "              +
 	                       until              +
 	                       ")");
+		}
 	    String[] keys = null;
 	 
 	    try {
@@ -123,7 +131,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 		}
 	    SyncItemKey[] ret = getSyncItemKeysFromKeys( keys );
 	    
-	    log.info(" returning "+ret.length+" key(s)");
+	    log.debug(" returning "+ret.length+" key(s)");
 	    
 	    return ret;
 	}
@@ -134,13 +142,15 @@ public class CalendarSyncSource extends ObmSyncSource {
 	public SyncItemKey[] getNewSyncItemKeys(Timestamp since, Timestamp until)
 	throws SyncSourceException {
 	
-	    log.info("getNewSyncItemKeys(" +
-	                       principal   +
-	                       " , "       +
-	                       since       +
-	                       " , "       +
-	                       until       +
-	                       ")");
+		if (log.isDebugEnabled()) {
+		    log.debug("getNewSyncItemKeys(" +
+		                       principal   +
+		                       " , "       +
+		                       since       +
+		                       " , "       +
+		                       until       +
+		                       ")");
+		}
 	    
 	    String[] keys  = null;
 	    try {
@@ -150,9 +160,11 @@ public class CalendarSyncSource extends ObmSyncSource {
 		}
 	    SyncItemKey[] ret = getSyncItemKeysFromKeys(keys);
 	    
-	    log.info(" returning "+ret.length+" key(s)");
+	    if (log.isDebugEnabled() ) {
+	    	log.debug(" returning "+ret.length+" key(s)");
+	    }
 	    
-	    return null;//ret;
+	    return null;
 	}
 
 	/**
@@ -161,9 +173,11 @@ public class CalendarSyncSource extends ObmSyncSource {
 	public SyncItemKey[] getSyncItemKeysFromTwin(SyncItem syncItem)
 	throws SyncSourceException {
 		
-		log.info("getSyncItemKeysFromTwin(" 	   +
+		if (log.isDebugEnabled()) {
+			log.debug("getSyncItemKeysFromTwin(" 	   +
                 principal						   +
                 ")"	);
+		}
 		String[] keys = null;
 		try {
 			Calendar event = getFoundationFromSyncItem(syncItem);
@@ -174,8 +188,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 		}
 	    SyncItemKey[] ret = getSyncItemKeysFromKeys(keys);
 	    
-	    log.info(" returning "+ret.length+" key(s)");
-	    
+	    if (log.isDebugEnabled()) {
+	    	log.debug(" returning "+ret.length+" key(s)");
+	    }
 	    return ret;
 	}
 
@@ -185,14 +200,15 @@ public class CalendarSyncSource extends ObmSyncSource {
 	public SyncItemKey[] getUpdatedSyncItemKeys(Timestamp since, Timestamp until)
 	throws SyncSourceException {
 	
-	    log.info("getUpdatedSyncItemKeys(" +
+		if (log.isDebugEnabled()) {
+			log.debug("getUpdatedSyncItemKeys(" +
 	                       principal          +
 	                       " , "              +
 	                       since              +
 	                       " , "              +
 	                       until              +
 	                       ")");
-
+		}
 	    String[] keys = null;
 	    
 	    try {
@@ -203,7 +219,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 		}
 	    SyncItemKey[] ret = getSyncItemKeysFromKeys( keys );
 	    
-	    log.info(" returning "+ret.length+" key(s)");
+	    if (log.isDebugEnabled()) {
+	    	log.debug(" returning "+ret.length+" key(s)");
+	    }
 	    
 	    return ret;
 	}
@@ -211,13 +229,16 @@ public class CalendarSyncSource extends ObmSyncSource {
 	public void removeSyncItem(SyncItemKey syncItemKey, Timestamp time, boolean softDelete)
 	throws SyncSourceException {
 	
-	    log.info("removeSyncItem(" +
+		if (log.isDebugEnabled()) {
+			log.debug("removeSyncItem(" +
 	                       principal    +
 	                       " , "        +
 	                       syncItemKey  +
 	                       " , "        +
 	                       time         +
 	                       ")");
+		}
+		
 	    try {
 			manager.removeItem(syncItemKey.getKeyAsString());
 		} catch (OBMException e) {
@@ -231,12 +252,14 @@ public class CalendarSyncSource extends ObmSyncSource {
 	public SyncItem updateSyncItem(SyncItem syncItem)
 	throws SyncSourceException {
 	
-	    log.info("updateSyncItem("                     			+
+		if (log.isDebugEnabled()) {
+			log.debug("updateSyncItem("                     			+
 	                       principal                         	+
 	                       " , "                              	+
 	                       syncItem.getKey().getKeyAsString() 	+
 	                       ")");
-	    Calendar event = null;
+		}
+		Calendar event = null;
 	    try {
 		    Calendar calendar = getFoundationFromSyncItem(syncItem);
 	    
@@ -255,11 +278,13 @@ public class CalendarSyncSource extends ObmSyncSource {
 	public SyncItem getSyncItemFromId(SyncItemKey syncItemKey)
 	throws SyncSourceException {
 	
-		log.info("getSyncItemFromId(" +
+		if (log.isDebugEnabled()) {
+			log.debug("getSyncItemFromId(" +
 	                       principal             +
 	                       ", "                  +
 	                       syncItemKey           +
 	                       ")");
+		}
 	
 		String key = syncItemKey.getKeyAsString();
 	
@@ -277,16 +302,14 @@ public class CalendarSyncSource extends ObmSyncSource {
 	
 //  -------------------- Private methods ----------------------
 	
-
-	/**
+    /**
      * Get Data from com.funambol.foundation.pdi.event.Calendar
      * converting the Calendar object into a v-card item
-     *
-     * @param calendar Calendar
-     * @return String
-     * @throws EntityException
+     * @param calendar
+     * @return
+     * @throws SyncSourceException
      */
-    private String getICalFromFoundationCalendar(Calendar calendar) {
+    private String getICalFromFoundationCalendar(Calendar calendar) throws SyncSourceException {
 
         String ical = null;
 
@@ -294,23 +317,22 @@ public class CalendarSyncSource extends ObmSyncSource {
             CalendarToIcalendar c2ical = new CalendarToIcalendar(deviceTimezone, deviceCharset);
             ical = c2ical.convert(calendar);
         } catch (ConverterException ex) {
-            //throw new EntityException("Error converting calendar in iCal", ex);
+            throw new SyncSourceException("Error converting calendar in iCal", ex);
         }
         return ical;
     }
     
     /**
-    *
     * Get Data from ICal message
     * converting the ical item into a Calendar object
     *
-    * the calendar object is a com.funambol.foundation.pdi.event.Calendar
+    * the calendar object is a com.funambol.foundation.pim.calendar.Calendar
     *
     * @param content String
     * @return Calendar
-    * @throws EntityException
+    * @throws OBMException 
     */
-   private Calendar getFoundationCalendarFromICal(String content) {
+   private Calendar getFoundationCalendarFromICal(String content) throws OBMException {
 
 
        ByteArrayInputStream buffer = null;
@@ -329,20 +351,15 @@ public class CalendarSyncSource extends ObmSyncSource {
            }
 
        } catch (Exception e) {
-    	   //throw new EntityException(e.getMessage());
+    	   throw new OBMException("Error converting from ical ", e);
        }
 
        VCalendarConverter vconvert = new VCalendarConverter(deviceTimezone, deviceCharset);
        try {
     	   calendar =  vconvert.vcalendar2calendar(vcalendar);
        } catch (ConverterException e) {
-    	   //throw new EntityException(e.getMessage());
+    	   throw new OBMException("Error converting from ical ", e);
        }
-       /*
-       // convert in to XML
-       String xml = this.getXMLFromFoundationCalendar(calendar);
-       // get content from XML
-       calendar = this.getFoundationCalendarFromXML(xml);*/
 
        return calendar;
 
@@ -355,20 +372,20 @@ public class CalendarSyncSource extends ObmSyncSource {
     *
     * @param calendar Calendar
     * @return String
+    * @throws OBMException 
+ * @throws SyncSourceException 
     * @throws EntityException
     */
-   private String getXMLFromFoundationCalendar(Calendar calendar) {
+   private String getXMLFromFoundationCalendar(Calendar calendar) throws SyncSourceException {
 
        String xml = null;
        try {
            CalendarToSIFE c2xml = new CalendarToSIFE(deviceTimezone, deviceCharset);
            xml = c2xml.convert(calendar);
        } catch (ConverterException ex) {
-           //throw new EntityException("Error converting calendar in xml", ex);
+           throw new SyncSourceException("Error converting calendar in xml", ex);
        }
-       
-       log.info(" getXmlFromFoundation return :");
-       log.info(xml);
+
        return xml;
    }
 
@@ -387,7 +404,7 @@ public class CalendarSyncSource extends ObmSyncSource {
        StringBuilder sb = new StringBuilder(content.length() + 60);
        sb.append("Converting: ").append("SIFE").append(" => Calendar ")
          .append("\nINPUT = {").append(content).append('}');
-       log.info(sb.toString());
+       log.debug(sb.toString());
      
 	   
        ByteArrayInputStream buffer = null;
@@ -405,7 +422,7 @@ public class CalendarSyncSource extends ObmSyncSource {
        return calendar;
    }
 
-   private Calendar getFoundationFromSyncItem(SyncItem item) throws OBMException {
+   private Calendar getFoundationFromSyncItem(SyncItem item) throws OBMException, SyncSourceException {
        Calendar foundationCalendar = null;
 
        String content = Helper.getContentOfSyncItem(item, this.isEncode());
@@ -415,14 +432,12 @@ public class CalendarSyncSource extends ObmSyncSource {
        } else {
            foundationCalendar = getFoundationCalendarFromXML(content);
        }
-       log.info("foundation :" +foundationCalendar);
-       log.info("getCalendarContent :" +foundationCalendar.getCalendarContent());
-       log.info("getUid :" +foundationCalendar.getCalendarContent().getUid());
+
        foundationCalendar.getCalendarContent().getUid().setPropertyValue(item.getKey().getKeyAsString());
        return foundationCalendar;
    }
 
-   private SyncItem getSyncItemFromFoundation(Calendar calendar, char status) {
+   private SyncItem getSyncItemFromFoundation(Calendar calendar, char status) throws SyncSourceException {
        SyncItem syncItem = null;
 
        String content = null;

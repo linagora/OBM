@@ -41,7 +41,7 @@ public class CalendarManager extends ObmManager {
 			calendarBinding = (CalendarBindingStub)calendarLocator.getCalendar();
 			
 		} catch (ServiceException e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 		}
 		binding = calendarBinding;
 	}

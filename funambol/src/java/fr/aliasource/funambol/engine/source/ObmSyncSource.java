@@ -130,7 +130,7 @@ implements SyncSource, Serializable, LazyInitBean {
 
 	         deviceCharset = device.getCharset();
 		} catch (PersistentStoreException e1) {
-			log.info("obm : error getting device");
+			log.error("obm : error getting device");
 		}
 		
     }
@@ -148,7 +148,9 @@ implements SyncSource, Serializable, LazyInitBean {
             message.append("\n- " + keys[i].getKeyAsString());
         }
 
-        log.info(message.toString());
+        if (log.isTraceEnabled()) {
+        	log.info(message.toString());
+        }
     }
 
     public SyncItemKey[] getSyncItemKeysFromKeys(String[] keys) {
@@ -179,12 +181,16 @@ implements SyncSource, Serializable, LazyInitBean {
     }
 
 	public int getRestrictions() {
-		log.info(" getRestrcitions:"+restrictions);
+		if (log.isTraceEnabled()) {
+			log.trace(" getRestrcitions:"+restrictions);
+		}
 		return restrictions;
 	}
 	
 	public void setRestrictions(int restrictions) {
-		log.info(" setRestrcitions:"+restrictions);
+		if (log.isTraceEnabled()) {
+			log.trace(" setRestrcitions:"+restrictions);
+		}
 		this.restrictions = restrictions;
 	}
 
