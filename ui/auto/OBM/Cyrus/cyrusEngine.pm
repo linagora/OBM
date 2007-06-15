@@ -272,7 +272,7 @@ sub update {
     # Récupération du nom de la boîte à traiter
     my $mailBoxName = $object->getMailboxName();
     if( !defined($mailBoxName) ) {
-        return 0;
+        return 1;
     }
 
     # Récupération des identifiants du serveur de la boîte à traiter

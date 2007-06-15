@@ -20,10 +20,11 @@ sub new {
     my $self = shift;
     my( $incremental, $groupId ) = @_;
 
-    my %ldapEngineAttr = (
+    my %obmGroupAttr = (
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        links => undef,
         toDelete => undef,
         archive => undef,
         sieve => undef,
@@ -41,22 +42,24 @@ sub new {
         return undef;
 
     }else {
-        $ldapEngineAttr{"groupId"} = $groupId;
+        $obmGroupAttr{"groupId"} = $groupId;
     }
 
     if( $incremental ) {
-        $ldapEngineAttr{"incremental"} = 1;
+        $obmGroupAttr{"incremental"} = 1;
+        $obmGroupAttr{"links"} = 0;
     }else {
-        $ldapEngineAttr{"incremental"} = 0;
+        $obmGroupAttr{"incremental"} = 0;
+        $obmGroupAttr{"links"} = 1;
     }
 
-    $ldapEngineAttr{"type"} = $POSIXGROUPS;
-    $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
-    $ldapEngineAttr{"toDelete"} = 0;
-    $ldapEngineAttr{"archive"} = 0;
-    $ldapEngineAttr{"sieve"} = 0;
+    $obmGroupAttr{"type"} = $POSIXGROUPS;
+    $obmGroupAttr{"typeDesc"} = $attributeDef->{$obmGroupAttr{"type"}};
+    $obmGroupAttr{"toDelete"} = 0;
+    $obmGroupAttr{"archive"} = 0;
+    $obmGroupAttr{"sieve"} = 0;
 
-    bless( \%ldapEngineAttr, $self );
+    bless( \%obmGroupAttr, $self );
 }
 
 
@@ -151,7 +154,7 @@ sub getEntity {
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
-    if( !$self->{"incremental"} ) {
+    if( $self->{"links"} ) {
         $self->getEntityLinks( $dbHandler, $domainDesc );
     }
 
@@ -175,9 +178,8 @@ sub getEntityLinks {
         }
     }
 
-    # Du moment qu'on charge les liens de l'entité, cette entité n'est plus en
-    # mode incrémental
-    $self->{"incremental"} = 0;
+    # On précise que les liens de l'entité sont aussi à mettre à jour.
+    $self->{"links"} = 1;
 
     return 1;
 }
@@ -203,6 +205,13 @@ sub getArchive {
     my $self = shift;
 
     return $self->{"archive"};
+}
+
+
+sub isIncremental {
+    my $self = shift;
+
+    return $self->{"incremental"};
 }
 
 

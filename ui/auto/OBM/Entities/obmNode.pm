@@ -19,27 +19,26 @@ sub new {
     my $self = shift;
     my( $incremental ) = @_;
 
-    my %ldapEngineAttr = (
+    my %obmNodeAttr = (
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        links => undef,
         toDelete => undef,
         domainId => undef,
         nodeDesc => undef
     );
 
 
-    if( $incremental ) {
-        $ldapEngineAttr{"incremental"} = 1;
-    }else {
-        $ldapEngineAttr{"incremental"} = 0;
-    }
+    # Pas de mode incrémental pour ce type
+    $obmNodeAttr{"incremental"} = 0;
+    $obmNodeAttr{"links"} = 1;
 
-    $ldapEngineAttr{"type"} = $NODE;
-    $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
-    $ldapEngineAttr{"toDelete"} = 0;
+    $obmNodeAttr{"type"} = $NODE;
+    $obmNodeAttr{"typeDesc"} = $attributeDef->{$obmNodeAttr{"type"}};
+    $obmNodeAttr{"toDelete"} = 0;
 
-    bless( \%ldapEngineAttr, $self );
+    bless( \%obmNodeAttr, $self );
 }
 
 

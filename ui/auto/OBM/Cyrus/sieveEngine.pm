@@ -110,7 +110,7 @@ sub _disconnectSrvSieve {
     &OBM::toolBox::write_log( "sieveEngine: deconnexion du serveur SIEVE.", "W" );
     sieve_logout( $imapSieveServerConn );
 
-    return 0;
+    return 1;
 }
 
 
@@ -339,7 +339,7 @@ sub update {
     # Récupération du nom de la boîte à traiter
     my $mailBoxName = $object->getMailboxName();
     if( !defined($mailBoxName) ) {
-        return 0;
+        return 1;
     }
 
     if( !$object->getMailboxSieve() ) {
