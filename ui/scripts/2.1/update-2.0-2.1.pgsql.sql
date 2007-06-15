@@ -21,6 +21,7 @@ CREATE TABLE DomainProperty (
   domainproperty_key       varchar(255) NOT NULL,
   domainproperty_type      varchar(32),
   domainproperty_default   varchar(64),
+  domainproperty_readonly  int(1) DEFAULT 0,
   PRIMARY KEY (domainproperty_key)
 );
 
@@ -38,7 +39,7 @@ CREATE TABLE DomainPropertyValue (
 -------------------------------------------------------------------------------
 -- Default Domain properties
 -------------------------------------------------------------------------------
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('update_state','integer', 1);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default,domainproperty_readonly) VALUES ('update_state','integer', 1,1);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_users','integer', 0);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_mailshares','integer', 0);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_resources','integer', 0);

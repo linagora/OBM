@@ -1638,6 +1638,7 @@ CREATE TABLE DomainProperty (
   domainproperty_key       varchar(255) NOT NULL,
   domainproperty_type      varchar(32),
   domainproperty_default   varchar(64),
+  domainproperty_readonly  int(1) DEFAULT 0,
   PRIMARY KEY (domainproperty_key)
 );
 

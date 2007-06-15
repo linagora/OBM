@@ -316,7 +316,8 @@ function run_query_domain_properties($domain_id=0) {
     $val
     domainproperty_key,
     domainproperty_type
-    FROM DomainProperty $join";
+    FROM DomainProperty $join
+    WHERE domainproperty_readonly = 0";
   
   display_debug_msg($query, $cdg_sql, "run_query_domain_properties()");
   $obm_q = new DB_OBM;
