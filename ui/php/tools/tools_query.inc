@@ -1,8 +1,8 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OB - File : tools_query.inc                                               //
-//    - Desc : Tools query & db File                                         //
-// 2002-09-26 Pierre Baudracco                                               //
+// OBM - File : tools_query.inc                                              //
+//     - Desc : Tools query file                                             //
+// 2007-05-26 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,43 +50,6 @@ function run_query_tools_remote_update($tools) {
   $retour = $usr_q->query($query);
 
   return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Update system configuration execution
-// Parameters:
-//   - $tools[]  : entry values
-//     keys used : update
-///////////////////////////////////////////////////////////////////////////////
-function run_query_tools_update_update($tools) {
-  global $cdg_sql, $cdg_exe, $cmd_update, $cmd_db_update;
-
-  $state = get_update_state();
-  if ($state != 1) {
-    return false;
-  }     
-  
-  $update = $tools['update'];
-
-  // Creation de la commande d'execution de l'automate de mise a jour
-  $cmd = $cmd_update.' --all';
-  
-  //  $cmd .= " 2>/dev/null >&- <&- >/dev/null &";
-  $cmd .= " >/dev/null 2>&1 &";
-  
-  // Basculement des données de mise à jour en production
-  display_debug_msg($cmd_db_update, $cdg_exe, 'run_query_tools_update_update(1)');
-  $ret = exec($cmd_db_update);
-
-  // Mise a jour de l'indicateur de modifications
-  set_update_state('0'); // XXXXXX a virer
-
-  display_debug_msg($cmd, $cdg_exe, 'run_query_tools_update_update(2)');
-  unset($tmp);
-  exec($cmd, $tmp, $ret);
-
-  return $ret;
 }
 
 
@@ -185,14 +148,15 @@ function check_tools_update_context_ok($params) {
     $err['msg'] = $l_error_permission;
     return false;
   }
-
-  $update_state = get_update_state();
-  if ($update_state == '1') {
+  
+  // Check if update is locked
+  $update_lock = get_update_lock();
+  if ($update_lock == '1') {
     $err['msg'] = $l_upd_already_running;
     return false;
   }
 
-  // An updated must not already running
+  // An update must not already running
   $ps = shell_exec("$cmd_check_update");
 
   if ($ps) {
@@ -204,11 +168,13 @@ function check_tools_update_context_ok($params) {
 }
 
 
-/**
- * Check if a domain has been updated on fields impacting users
+/******************************************************************************
+ * Check if a domain has been updated so update must be global
+ * check on Domain and Samba table, on fields impacting users
  * @param $domain_id : Domain id
+ * @return (true | false) : true if global update needed
  */
-function check_tools_update_domain_updated($domain_id='all') {
+function check_tools_update_need_global_update($domain_id=0) {
   global $cdg_sql, $obm;
 
   $e1 = array();
@@ -216,34 +182,40 @@ function check_tools_update_domain_updated($domain_id='all') {
 
   $obm_q = new DB_OBM;
 
-  if ($domain_id != 'all') {
+  if ($domain_id != 0) {
     $where = "WHERE domain_id = '$domain_id'";
   }
 
+  // Domain table check
+  $select = "SELECT domain_id,
+      domain_name,
+      domain_alias,
+      domain_mail_server_id";
+
   // Get infos from Update table
-  $query = "SELECT * FROM Domain $where";
-  display_debug_msg($query, $cdg_sql, 'check_tools_update_domain_updated()');
+  $query = "$select FROM Domain $where";
+  display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
   $retour = $obm_q->query($query);
 
   while($obm_q->next_record()) {
     $id = $obm_q->f('0');  // Id
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
-      // optimiser : verifier que fname pas un chiffre ?
+      // XXXXXX optimiser : verifier que fname pas un chiffre ?
       $e1[$id]["$fname"] = $fvalue;
     }
   }
 
   // Get infos from Production table
-  $query = "SELECT * FROM P_Domain $where";
-  display_debug_msg($query, $cdg_sql, 'check_tools_update_domain_updated()');
+  $query = "$select FROM P_Domain $where";
+  display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
   $retour = $obm_q->query($query);
 
   while($obm_q->next_record()) {
     $id = $obm_q->f('0');  // Id
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
-      // optimiser : verifier que fname pas un chiffre ?
+      // XXXXXXX optimiser : verifier que fname pas un chiffre ?
       $e2[$id]["$fname"] = $fvalue;
     }
   }
@@ -261,6 +233,55 @@ function check_tools_update_domain_updated($domain_id='all') {
     }
   }
 
+
+  // Samba table check
+
+  if ($domain_id != 0) {
+    $where = "WHERE samba_domain_id = '$domain_id'";
+  }
+
+  // Get infos from Update table
+  $query = "SELECT * FROM Samba $where ORDER BY samba_domain_id, samba_name";
+  display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $id = $obm_q->f('0');  // Id
+    $e = $obm_q->Record;
+    foreach ($e as $fname => $fvalue) {
+      // XXXXXX optimiser : verifier que fname pas un chiffre ?
+      $e1[$id]["$fname"] = $fvalue;
+    }
+  }
+
+  // Get infos from Production table
+  $query = "SELECT * FROM P_Samba $where ORDER BY samba_domain_id, samba_name";
+  display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $id = $obm_q->f('0');  // Id
+    $e = $obm_q->Record;
+    foreach ($e as $fname => $fvalue) {
+      // XXXXXXX optimiser : verifier que fname pas un chiffre ?
+      $e2[$id]["$fname"] = $fvalue;
+    }
+  }
+
+  // Check for differences
+  foreach ($e1 as $id => $row) {
+    if (! array_key_exists($id, $e2)) {
+      return true;
+    } else {
+      foreach($row as $fname => $fvalue) {
+	if ($e2[$id][$fname] != $fvalue) {
+	  return true;
+	}
+      }
+    }
+  }
+
+
   return false;
 }
 
@@ -272,7 +293,7 @@ function check_tools_update_domain_updated($domain_id='all') {
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_infos(&$e1, &$e2, $table, $field="", $realm) {
+function get_update_entity_infos(&$e1, &$e2, $table, $field="", $realm) {
   global $cdg_sql, $obm;
 
   $uid = $obm['uid'];
@@ -430,10 +451,67 @@ function get_update_entity_numbers($table, $field="", $realm) {
   $e1 = array();
   $e2 = array();
 
-  get_update_infos($e1, $e2, $table, $field, $realm);
+  get_update_entity_infos($e1, $e2, $table, $field, $realm);
   $nb = process_update_numbers($e1, $e2, $table, $realm);
 
   return $nb;
+}
+
+
+/******************************************************************************
+ * Store update data in update tables
+ *
+ * @param $params : array parameters hash
+ * @return true (has update), else false
+ */
+function store_update_data($params) {
+  global $cgp_show;
+
+  $realm = $params['realm'];
+
+  $entities = array('user' => array('UserObm', 'userobm'),
+                    'group' => array('UGroup', 'group'),
+                    'host' => array('Host', 'host'),
+                    'mailshare' => array('MailShare', 'mailshare'));
+
+  $has_update = false;
+
+  // Process entities
+
+  foreach ($entities as $entity=>$db_info) {
+    $table = $db_info[0];
+    $field = $db_info[1];
+    if ($cgp_show['module']["$entity"]) {
+      $nb = get_update_entity_numbers($table, $field, $realm);
+      if ($nb['move'] > 0) {
+        $has_update = true;
+      }
+
+      $ret = validate_update_entity($entity, $table, $field, $realm);
+    }
+  }
+
+  // Process links ICI XXXXXXXX
+
+  $links = array('groupuser' => array('UserObmGroup', 'UGroup'),
+		 'group' => array('UGroup', 'group'),
+		 'host' => array('Host', 'host'),
+		 'mailshare' => array('MailShare', 'mailshare'));
+
+  foreach ($entities as $entity=>$db_info) {
+    $table = $db_info[0];
+    $field = $db_info[1];
+    if ($cgp_show['module']["$entity"]) {
+      $nb = get_update_entity_numbers($table, $field, $realm);
+      if ($nb['move'] > 0) {
+        $has_update = true;
+      }
+
+      $ret = validate_update_entity($entity, $table, $field, $realm);
+    }
+  }
+
+  return $has_update;
 }
 
 
@@ -451,8 +529,8 @@ function validate_update_entity($entity, $table, $field="", $realm) {
   $e1 = array();
   $e2 = array();
 
-  get_update_infos($e1, $e2, $table, $field, $realm);
-  $nb = store_update_infos($e1, $e2, $entity, $table,  $realm);
+  get_update_entity_infos($e1, $e2, $table, $field, $realm);
+  $nb = store_update_entity_infos($e1, $e2, $entity, $table,  $realm);
 
   return $nb;
 }
@@ -466,7 +544,7 @@ function validate_update_entity($entity, $table, $field="", $realm) {
  * @param $field  : field prefix (if not from table name) to check
  * @param $realm  : realm space to check updates (user | domain | delegation)
  */
-function store_update_infos($e1, $e2, $entity, $table, $realm) {
+function store_update_entity_infos($e1, $e2, $entity, $table, $realm) {
   global $cdg_sql, $obm;
 
   $nb_add = 0;

@@ -37,7 +37,6 @@ $l_warn_delete = "users registered in this group";
 $l_email_exist = "This email is already used !";
 $l_system_no_priv = "A system group can't be private !";
 $l_only_owner_priv = "Only the group owner can set a group privacy !";
-$l_err_public_rights = "Insufficients rights to manage public groups !";
 $l_err_private_email = "Private group can't have an email !";
 
 $l_no_display = "Fill the search fields and press < Find > to retrieve the groups";
@@ -61,7 +60,6 @@ $l_no_group_added = "No group to add";
 $l_no_group_deleted = "No group to remove";
 $l_check_samegroup = "These groups seem similar to the filled group";
 $l_cant_delete_system = "System groups can't be deleted !";
-$l_cant_delete_public = "Public groups can only be deleted by the group creator !";
 $l_can_delete = "The group can be deleted.";
 $l_cant_delete = "The group can't be deleted !";
 

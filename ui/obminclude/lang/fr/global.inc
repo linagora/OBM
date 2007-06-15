@@ -82,6 +82,7 @@ $l_date_inconsistency = "Incohérences de dates";
 $l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
 $l_error_delegation = "Vous n'avez pas la délégation pour cette cible.";
 $l_error_visibility = "Les informations contenues dans la page demandée sont privées. Vous ne pouvez pas y accéder.";
+$l_err_public_rights = "Droits insuffisants pour gérer cette donnée publique !";
 $l_err_reference = "Erreur de référence. L'entité demandée n'existe pas !";
 $l_err_fill = "Le champ doit être rempli";
 $l_color = "Couleur";
@@ -321,8 +322,6 @@ $l_header_add_deal = "Ajouter affaire";
 $l_header_list = "Liste";
 
 $l_header_tools_upd = "Mise à jour";
-$l_header_tools_upd_admin = "Mes modifications";
-$l_header_tools_upd_domain = "Modifications du domaine";
 $l_header_tools_halt = "Arrêt";
 $l_header_tools_remote = "Contrôle à distance";
 

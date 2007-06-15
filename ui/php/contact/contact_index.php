@@ -115,14 +115,19 @@ if (($action == "ext_get_ids") || ($action == "ext_get_id")) {
   
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params["contact_id"] > 0) {
-    $con_q = run_query_contact_detail($params["contact_id"]);
-    if ($con_q->num_rows() == 1) {
-      $display["detailInfo"] = display_record_info($con_q);
-      $display["detail"] = dis_contact_form($action, $con_q, $params);
-    } else {
-      $display["msg"] .= display_err_msg($l_err_reference);
+  if (check_contact_update_rights($params)) {
+    if ($params["contact_id"] > 0) {
+      $con_q = run_query_contact_detail($params["contact_id"]);
+      if ($con_q->num_rows() == 1) {
+	$display["detailInfo"] = display_record_info($con_q);
+	$display["detail"] = dis_contact_form($action, $con_q, $params);
+      } else {
+	$display["msg"] .= display_err_msg($l_err_reference);
+      }
     }
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg']);
+    $display["detail"] = dis_contact_consult($params);
   }
 
 } elseif ($action == "insert") {
@@ -571,10 +576,21 @@ function get_contact_action() {
 // Contact Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_contact_action() {
-  global $params, $actions, $path;
+  global $params, $actions, $path, $cright_write_admin;
 
-  $id = $params["contact_id"];
+  $id = $params['contact_id'];
   if ($id > 0) {
+    $c = get_contact_info($id);
+
+    // Allow public contact handling only if write_admin right
+    if ($c['privacy'] != 1) {
+      $actions['contact']['detailupdate']['Right'] = $cright_write_admin;
+      $actions['contact']['update']['Right'] = $cright_write_admin;
+      $actions['contact']['insert']['Right'] = $cright_write_admin;
+      $actions['contact']['check_delete']['Right'] = $cright_write_admin;
+      $actions['contact']['delete']['Right'] = $cright_write_admin;
+    }
+
     // Detail Consult
     $actions["contact"]["detailconsult"]["Url"] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$id";
     

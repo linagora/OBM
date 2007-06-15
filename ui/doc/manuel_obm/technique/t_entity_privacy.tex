@@ -4,16 +4,34 @@
 
 
 %%\clearpage
-\subsection{Gestion des entités privées et visibilité}
+\subsection{Gestion des entités privées, visibilité et droits sur entité}
+révision : \obm 2.1.0\\
 
 OBM permet de créer des entités privées, soit non visibles par tout le monde.\\
 
 La gestion des entités privées est standardisée afin de permettre une évolution possible des règles de visibilité des entités.
-Elle a été repensée et rendue non intrusive depuis \obm 0.8.5.
+Elle a été repensée et rendue non intrusive depuis \obm 0.8.5.\\
+
+Depuis \obm 2.0.2 certains modules implémentent une séparation des droits entre les entités publiques et privées (gérer des données publiques nécessite des droits plus importants).
+
 
 \subsubsection{Spécifications de la notion de visibilité}
 
-Actuellement une entité est visible par un utilisateur si l'entité est publique (privacy == 0) ou que l'utilisateur en est le créateur.\\
+Actuellement une entité est visible par un utilisateur si l'entité est publique (privacy == 0) ou que l'utilisateur en est le créateur.
+
+\paragraph{Base de données :} La table de l'entité doit contenir un champ : \textbf{entite\_privacy} défini comme un entier.
+Les valeurs définies sont :\\
+
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Valeur} & \textbf{Description} \\
+\hline
+0 & entité publique \\
+\hline
+1 & entité privée \\
+\hline
+\end{tabular}
+%%\vspace{0.3cm}
 
 \paragraph{Implémentation du test de visibilité}
 \begin{verbatim}
@@ -53,21 +71,6 @@ Exemple : ``Contact''... Attention ce n'est pas toujours le module (ex: ParenDea
 
 
 \subsubsection{Implémentation dans un module}
-
-\paragraph{Base de données :} La table de l'entité doit contenir un champ : \textbf{entite\_privacy} défini comme un entier.
-Les valeurs définies sont :\\
-
-\begin{tabular}{|c|c|}
-\hline
-\textbf{Valeur} & \textbf{Description} \\
-\hline
-0 & entité publique \\
-\hline
-1 & entité privée \\
-\hline
-\end{tabular}
-\vspace{0.3cm}
-
 
 \paragraph{Actions soumises au test d'accès :}
 Tout accès à une entité doit être validé (passer le test de visibilité).
@@ -110,7 +113,7 @@ function sql_obm_entity_privacy($entity, $p_uid="") {
 \end{minipage}
 }
 \begin{itemize}
- \item \textbf{\$table} : entité à vérifier.\\
+ \item \textbf{\$entity} : entité à vérifier.\\
 Exemple : ``contact'', ``deal''
  \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilité doit être vérifié. Si non donné, l'utilisateur courant est utilisé.
 \end{itemize}
@@ -140,6 +143,53 @@ Exemple d'utilisation :
 \end{verbatim}
 
 
+\subsubsection{Séparation de droits de gestion public / privé}
+
+Pour certains modules, il est important de séparer les droits de gestion des données publiques des droits de gestion des données privées (exemple : gérer les groupes publics demande des privilèges supérieurs à la gestion de ses groupes privés).\\
+
+Les modules implémentant cette séparation sont listés plus bas.
+Cette séparation implique l'ajout de tests d'autorisation sur les actions detailupdate, update, check\_delete, delete, (user\_add,...).
+
+Ces tests d'autorisation sont effectués :
+\begin{itemize}
+\item directement dans les fonctions \fonction{check\_module\_data\_form()}
+\item à l'aide d'une fonction définie dans le module en question, du type \fonction{check\_module\_update\_rights()}
+\end{itemize}
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function check_group_update_rights($params) {
+\end{verbatim}
+\end{minipage}
+}
+\begin{itemize}
+ \item \textbf{\$params} : tableau de paramètres.
+ \item \textbf{Retourne true || false} : true si les droits sont suffisants
+\end{itemize}
+\vspace{0.3cm}
+
+Cette fonction doit être appelée :
+\begin{itemize}
+\item dans toute action nécessitant la vérification détaillée des droits
+\item dans la fonction (\fonction{update\_module\_action()}) qui met à jour les menus contextuels
+\end{itemize}
+
+
+\paragraph{Exemple d'utilisation (\fichier{module\_index.php})} :
+\begin{verbatim}
+} else if ($action == "detailupdate") {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_group_update_rights($params)) {
+    $obm_q = run_query_group_detail($params["group_id"]);
+    $display["detail"] = html_group_form($action, $obm_q, $params);
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg']);
+  }
+
+\end{verbatim}
+
+
 \subsubsection{Gestion de la notion de visibilité et conséquences}
 
 Une entité créée en tant que privée n'est visible que par son créateur.
@@ -150,18 +200,28 @@ Ces entités peuvent être supprimées ou rendues publiques (la fonction run\_query
 
 \subsubsection{Modules gérant la notion de visibilité}
 
-\begin{tabular}{|p{5cm}|c|}
+\begin{tabular}{|p{3cm}|c|c|c|}
 \hline
-\textbf{Module} & \textbf{Depuis version OBM} \\
+\textbf{Module} & \textbf{Depuis version} & \textbf{Séparation droits} & \textbf{Depuis version} \\
 \hline
-contact & 0.4.0 \\
+contact & 0.4.0 & X & 2.1.0\\
 \hline
-deal & 0.4.0 \\
+lead & 1.2 & & \\
 \hline
-list & 0.8.2 \\
+deal & 0.4.0 & &\\
 \hline
-contract & 0.9.0 \\
+list & 0.8.2 & &\\
 \hline
-document & 0.7.0 \\
+calendarevent & 0.5.0 & &\\
+\hline
+todo & 1.0 & &\\
+\hline
+contract & 0.9.0 & &\\
+\hline
+document & 0.7.0 & &\\
+\hline
+group & 0.9.0 & X & 2.0.2 \\
+\hline
+rgroup & 1.0 & &\\
 \hline
 \end{tabular}

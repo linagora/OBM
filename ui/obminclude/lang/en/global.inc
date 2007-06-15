@@ -79,6 +79,7 @@ $l_date_incionsistency = "Dates inconsistency";
 $l_error_permission = "You are not allowed to execute this action";
 $l_error_delegation = "You are not allowed to update this target";
 $l_error_visibility = "You can't access this information, it is private.";
+$l_err_public_rights = "Insufficients rights to manage this public data !";
 $l_err_reference = "Wrong reference. This entity does not exist.";
 $l_err_fill = "The field must be filled";
 $l_color = "Color";

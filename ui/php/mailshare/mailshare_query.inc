@@ -274,13 +274,13 @@ function run_query_mailshare_delete($p_id) {
     
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
-      deleted_entity,
+      deleted_table,
       deleted_entity_id,
       deleted_user_id,
       deleted_timestamp)
     VALUES (
       '$domain_id',
-      'mailshare',
+      'MailShare',
       '$p_id',
       '$uid',
       '$now')";

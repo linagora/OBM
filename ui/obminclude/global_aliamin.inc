@@ -304,6 +304,47 @@ function get_update_state() {
 
 
 /**
+ * Update : set the update flag to true to allow display update info
+ *
+ * @param $state : 1 set to true (there are update, else 0)
+ */
+function set_update_state($state=1) {
+  global $obm, $cdg_sql;
+
+  $query = "UPDATE DomainPropertyValue
+    SET domainpropertyvalue_value = '$state'
+    WHERE domainpropertyvalue_domain_id='$obm[domain_id]'
+      AND domainpropertyvalue_property_key = 'update_state'";
+
+  display_debug_msg($query, $cdg_sql, "set_update_state($state)");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+}
+
+
+/**
+ * Get the Update lock
+ * return $lock : 1 locked, 0 no lock
+ */
+function get_update_lock() {
+  global $obm, $cdg_sql;
+
+  $query = "SELECT obminfo_value as value
+    FROM ObmInfo
+    WHERE obminfo_name='update_lock'";
+
+  display_debug_msg($query, $cdg_sql, 'get_update_lock()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $lock = $obm_q->f('value');
+
+  if ($lock == '1') return '1';
+  else return '0';
+}
+
+
+/**
  * Update : set the update lock
  */
 function set_update_lock() {
@@ -313,7 +354,7 @@ function set_update_lock() {
     SET obminfo_value = '1'
     WHERE obminfo_name = 'update_lock'";
 
-  display_debug_msg($query, $cdg_sql, "set_update_lock()");
+  display_debug_msg($query, $cdg_sql, 'set_update_lock()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
@@ -329,26 +370,7 @@ function remove_update_lock() {
     SET obminfo_value = '0'
     WHERE obminfo_name = 'update_lock'";
 
-  display_debug_msg($query, $cdg_sql, "remove_update_lock()");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-}
-
-
-/**
- * Update : set the update flag to true to allow display update info
- *
- * @param $state : 1 set to true (there are update, else 0)
- */
-function set_update_state($state=1) {
-  global $obm, $cdg_sql;
-
-  $query = "UPDATE DomainPropertyValue
-    SET domainpropertyvalue_value = '$state'
-    WHERE domainpropertyvalue_domain_id='$obm[domain_id]'
-      AND domainpropertyvalue_property_key = 'update_state'";
-
-  display_debug_msg($query, $cdg_sql, "set_update_state($state)");
+  display_debug_msg($query, $cdg_sql, 'remove_update_lock()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }

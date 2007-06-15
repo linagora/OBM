@@ -949,6 +949,49 @@ function check_contact_context($cid, $contact) {
 }
 
 
+/*
+ * Contact specific rights checking (eg : public contact needs write_admin)
+ * Parameters:
+ * @param $params : parameters values
+ * @param $c[]    : current contact values
+ * @return true if OK, else false
+ */
+function check_contact_update_rights($params, $c='') {
+  global $actions, $perm, $err, $cright_write_admin;
+  global $l_err_public_rights, $l_error_permission, $l_error_delegation;
+
+  $id = $params['contact_id'];
+  if ($id > 0) {
+    // Get current group info if not given
+    if (! is_array($c)) {
+      $c = get_contact_info($id);
+    }
+
+    /*    // Check delegation update right
+    if (! of_delegation_check_update_rights($params, $g['delegation'])) {
+      $err['msg'] .= $l_error_delegation;
+      return false;
+    }*/
+
+    // Check update right is set
+    if (! $perm->check_right('contact', $actions['contact']['update']['Right'])) {
+      $err['msg'] .= $l_error_permission;
+      return false;
+    }
+
+    // Allow public contact handling only if write_admin right
+    if (($c['privacy'] != 1)
+	&& (! $perm->check_right('contact', $cright_write_admin))) {
+      $err['msg'] .= $l_err_public_rights;
+      return false;
+    }
+  
+  }
+
+  return true;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Contact Form Data checking and formatting
 // Parameters:
@@ -958,33 +1001,34 @@ function check_contact_context($cid, $contact) {
 //                  company_id, comp_new_id
 ///////////////////////////////////////////////////////////////////////////////
 function check_contact_data_form($cid, $contact) {
-  global $cgp_show, $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
+  global $perm, $cgp_show, $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
   global $l_fill_lastname, $l_fill_company, $l_j_check_phone;
   global $l_j_check_hphone,$l_j_check_mphone, $l_j_check_fax, $l_j_check_email;
-  global $err, $l_exist_error;
+  global $err, $l_exist_error, $l_err_public_rights;
 
-  $lname = $contact["lname"];
-  $fname = $contact["fname"];
-  $phone = $contact["phone"];
-  $hphone = $contact["hphone"];
-  $mphone = $contact["mphone"];
-  $fax = $contact["fax"];
-  $email = stripslashes($contact["email"]);
-  $email2 = stripslashes($contact["email2"]);
-  $c_id = $contact["company_id"];
-  $c_new_id = $contact["company_new_id"];
+  $lname = $contact['lname'];
+  $fname = $contact['fname'];
+  $phone = $contact['phone'];
+  $hphone = $contact['hphone'];
+  $mphone = $contact['mphone'];
+  $fax = $contact['fax'];
+  $email = stripslashes($contact['email']);
+  $email2 = stripslashes($contact['email2']);
+  $priv = $contact['privacy'];
+  $c_id = $contact['company_id'];
+  $c_new_id = $contact['company_new_id'];
   
   // MANDATORY: Contact name
   $lname = strtoupper($lname);
-  if (trim($lname) == "") {
-    $err["msg"] = $l_fill_lastname;
+  if (trim($lname) == '') {
+    $err['msg'] = $l_fill_lastname;
     return false;
   }
 
-  if ($cgp_show["module"]["company"]) {
+  if ($cgp_show['module']['company']) {
     // MANDATORY: a company must be set
     if (($c_id < 1) && ($c_new_id < 1)) {
-      $err["msg"] = $l_fill_company;
+      $err['msg'] = $l_fill_company;
       return false;
     }
   }
@@ -993,35 +1037,42 @@ function check_contact_data_form($cid, $contact) {
   $fname = ucfirst($fname);
 
   // Contact phone
-  if (($phone != "") && (preg_match($php_regexp_phone, $phone) == 0)) {
-    $err["msg"] = $l_j_check_phone . " : $phone";
+  if (($phone != '') && (preg_match($php_regexp_phone, $phone) == 0)) {
+    $err['msg'] = $l_j_check_phone . " : $phone";
     return false;
   }
 
   // Contact mobile or personal phone
-  if (($hphone != "") && (preg_match($php_regexp_phone, $hphone) == 0)) {
-    $err["msg"] = $l_j_check_hphone . " : $hphone";
+  if (($hphone != '') && (preg_match($php_regexp_phone, $hphone) == 0)) {
+    $err['msg'] = $l_j_check_hphone . " : $hphone";
     return false;
   }
-  if (($mphone != "") && (preg_match($php_regexp_phone, $mphone) == 0)) {
-    $err["msg"] = $l_j_check_mphone . " : $mphone";
+  if (($mphone != '') && (preg_match($php_regexp_phone, $mphone) == 0)) {
+    $err['msg'] = $l_j_check_mphone . " : $mphone";
     return false;
   }
   // Contact fax
-  if (($fax != "") && (preg_match($php_regexp_fax, $fax) == 0)) {
-    $err["msg"] = $l_j_check_fax . " : $fax";
+  if (($fax != '') && (preg_match($php_regexp_fax, $fax) == 0)) {
+    $err['msg'] = $l_j_check_fax . " : $fax";
     return false;
   }
 
   // Contact email
-  if (($email != "") && (preg_match($php_regexp_email, $email) == 0)) {
-    $err["msg"] = $l_j_check_email . " : $email";
+  if (($email != '') && (preg_match($php_regexp_email, $email) == 0)) {
+    $err['msg'] = $l_j_check_email . " : $email";
     return false;
   }
 
   // Contact email
-  if (($email2 != "") && (preg_match($php_regexp_email, $email2) == 0)) {
-    $err["msg"] = $l_j_check_email . " : $email2";
+  if (($email2 != '') && (preg_match($php_regexp_email, $email2) == 0)) {
+    $err['msg'] = $l_j_check_email . " : $email2";
+    return false;
+  }
+
+  // Allow public contact handling only if write_admin right
+  if (($priv != 1) && (! $perm->check_right('contact', $cright_write_admin))) {
+    $err['msg'] = $l_err_public_rights;
+    $err['field'] = 'privacy';
     return false;
   }
 
@@ -1037,17 +1088,27 @@ function check_contact_data_form($cid, $contact) {
 //   true if the contact can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_can_delete_contact($p_id) {
-  global $err, $ok_msg;
+  global $err, $perm, $cright_write_admin, $ok_msg;
   global $l_link_deal, $l_link_deal_no, $l_link_contract, $l_link_contract_no;
   global $l_link_list, $l_link_list_no, $l_link_publication, $l_link_publication_no;
+  global $l_err_public_rights;
 
   $delete_ok = true;
 
+  // Allow public contact handling only if write_admin right
+  $lc = get_contact_info($p_id);
+  if (($lc['privacy'] == '0') &&
+      (! $perm->check_right('contact', $cright_write_admin))) {
+    $err['msg'] .= $l_err_public_rights;
+    $delete_ok = false;
+    return false;
+  }
+
   // Links from deals
-  $nb = get_global_linked_deal_nb($p_id, "contact1", true, "contact2");
+  $nb = get_global_linked_deal_nb($p_id, 'contact1', true, 'contact2');
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] .= "$l_link_deal";
+    $err['msg'] .= "$l_link_deal";
   } else {
     $ok_msg .= "$l_link_deal_no";
   }
@@ -1056,16 +1117,16 @@ function check_can_delete_contact($p_id) {
   $nb = get_linked_contact_list_nb($p_id);
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] .= "<br />$l_link_list";
+    $err['msg'] .= "<br />$l_link_list";
   } else {
     $ok_msg .= "<br />$l_link_list_no";
   }
 
   // Links from Contract
-  $nb = get_global_linked_contract_nb($p_id, "contact1", true, "contact2");
+  $nb = get_global_linked_contract_nb($p_id, 'contact1', true, 'contact2');
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] .= "<br />$l_link_contract";
+    $err['msg'] .= "<br />$l_link_contract";
   } else {
     $ok_msg .= "<br />$l_link_contract_no";
   }
@@ -1074,7 +1135,7 @@ function check_can_delete_contact($p_id) {
   $nb = get_linked_contact_publication_nb($p_id);
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] .= "<br />$l_link_publication";
+    $err['msg'] .= "<br />$l_link_publication";
   } else {
     $ok_msg .= "<br />$l_link_publication_no";
   }
@@ -1092,18 +1153,20 @@ function check_can_delete_contact($p_id) {
 function get_contact_info($con_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain('contact');
 
   $query = "SELECT
-      contact_company_id
+      contact_company_id,
+      contact_privacy
     FROM Contact
     WHERE contact_id='$con_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_contact_info()");
+  display_debug_msg($query, $cdg_sql, 'get_contact_info()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $c["company_id"] = $obm_q->f("contact_company_id");
+  $c['company_id'] = $obm_q->f('contact_company_id');
+  $c['privacy'] = $obm_q->f('contact_privacy');
 
   return $c;
 }

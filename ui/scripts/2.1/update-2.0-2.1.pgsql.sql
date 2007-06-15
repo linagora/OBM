@@ -20,6 +20,7 @@ UPDATE ObmInfo set obminfo_value='2.1' where obminfo_name='db_version';
 CREATE TABLE DomainProperty (
   domainproperty_key       varchar(255) NOT NULL,
   domainproperty_type      varchar(32),
+  domainproperty_default   varchar(64),
   PRIMARY KEY (domainproperty_key)
 );
 
@@ -37,15 +38,15 @@ CREATE TABLE DomainPropertyValue (
 -------------------------------------------------------------------------------
 -- Default Domain properties
 -------------------------------------------------------------------------------
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('update_state','integer');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_users','integer');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_mailshares','integer');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_resources','integer');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('quota_mail','integer');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('delegation','text');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('address1','text');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('address2','text');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('town','text');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('update_state','integer', 1);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_users','integer', 0);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_mailshares','integer', 0);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_resources','integer', 0);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('quota_mail','integer', 100);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('delegation','text', '');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('address1','text', '');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('address2','text', '');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('town','text', '');
 
 
 -------------------------------------------------------------------------------
@@ -86,6 +87,15 @@ ALTER TABLE CalendarEvent ADD COLUMN calendarevent_ext_id varchar(32);
 ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_ext_id DEFAULT '';
 -- Add extension column
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_properties text;
+
+
+-------------------------------------------------------------------------------
+-- Update UserObm table
+-------------------------------------------------------------------------------
+-- Add mail_quota_use, last login date
+ALTER TABLE UserObm ADD COLUMN userobm_mail_quota_use int(8);
+ALTER TABLE UserObm ALTER COLUMN userobm_mail_quota_use SET DEFAULT 0;
+ALTER TABLE UserObm ADD COLUMN userobm_mail_login_date timestamp;
 
 
 -------------------------------------------------------------------------------

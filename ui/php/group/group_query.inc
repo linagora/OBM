@@ -408,13 +408,13 @@ function run_query_group_delete($p_id) {
 
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
-      deleted_entity,
+      deleted_table,
       deleted_entity_id,
       deleted_user_id,
       deleted_timestamp)
     VALUES (
       '$domain_id',
-      'group',
+      'UGroup',
       '$p_id',
       '$uid',
       '$now')";
@@ -835,14 +835,13 @@ function check_group_context($id, $group) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Group specific rights checking (eg : public group needs write_admin)
-// Parameters:
-//   - $params[] : parameters values
-//   - $g[]      : current group values
-// Returns:
-//   - true if OK, else false
-///////////////////////////////////////////////////////////////////////////////
+/*
+ * Group specific rights checking (eg : public group needs write_admin)
+ * Parameters:
+ * @param $params : parameters values
+ * @param $g[]    : current group values
+ * @return true if OK, else false
+ */
 function check_group_update_rights($params, $g='') {
   global $actions, $perm, $err, $cright_write_admin;
   global $cg_gid_smb_user, $cg_gid_smb_admin, $l_cant_update_smb_group;
@@ -899,84 +898,84 @@ function check_group_data_form($group) {
   global $l_j_check_email, $l_system_no_priv, $l_err_system_samba;
   global $l_only_owner_priv, $l_err_public_rights, $l_err_private_email;
 
-  $id = $group["group_id"];
-  $name = $group["name"];
-  $samba = $group["samba"];
-  $desc = $group["desc"];
-  $email = $group["email"];
-  $priv = $group["privacy"];
+  $id = $group['group_id'];
+  $name = $group['name'];
+  $samba = $group['samba'];
+  $desc = $group['desc'];
+  $email = $group['email'];
+  $priv = $group['privacy'];
   $g = get_group_info($id);
-  $usercreate = $g["usercreate"];
-  $system = $g["system"];
-  $gsamba = $g["samba"];
+  $usercreate = $g['usercreate'];
+  $system = $g['system'];
+  $gsamba = $g['samba'];
 
   // MANDATORY: Group name not empty
-  if (trim($name) == "") {
-    $err["msg"] = $l_fill_name;
-    $err["field"] = "name";
+  if (trim($name) == '') {
+    $err['msg'] = $l_fill_name;
+    $err['field'] = 'name';
     return false;
   }
 
   // MANDATORY: Group name unique
   if (get_group_name_exists($name, $id)) {
-    $err["msg"] = "$l_group_exists ($name)";
-    $err["field"] = "name";
+    $err['msg'] = "$l_group_exists ($name)";
+    $err['field'] = 'name';
     return false;
   }
 
   // Group email
-  if (($email != "") && (! preg_match($php_regexp_email_name, $email))
+  if (($email != '') && (! preg_match($php_regexp_email_name, $email))
       && (! preg_match($php_regexp_email, $email))) {
-    $err["msg"] = " $email : $l_j_check_email";
-    $err["field"] = "email";
+    $err['msg'] = " $email : $l_j_check_email";
+    $err['field'] = 'email';
     return false;
   }
 
   // If email not empty, must not already exists
-  if ($email != "") {
-    $mails = get_global_email_used("", $id);
+  if ($email != '') {
+    $mails = get_global_email_used('', $id);
 
     // Email address not already used
     if (array_key_exists($email, $mails)) {
-      $err["msg"] = "$l_email_exist : $email (" . $mails["$email"] . ")";
-      $err["field"] = "email";
+      $err['msg'] = "$l_email_exist : $email (" . $mails["$email"] . ')';
+      $err['field'] = 'email';
       return false;
     }
   }
 
   // Allow public group handling only if write_admin right
-  if (($priv != 1) && (! $perm->check_right("group", $cright_write_admin))) {
-    $err["msg"] = "$l_err_public_rights";
-    $err["field"] = "privacy";
+  if (($priv != 1) && (! $perm->check_right('group', $cright_write_admin))) {
+    $err['msg'] = "$l_err_public_rights";
+    $err['field'] = 'privacy';
     return false;
   }
 
   // A public group can only be private if user = owner
   if ($priv && ($usercreate > 0) && ($usercreate != $obm["uid"])) {
-    $err["msg"] = "$l_only_owner_priv";
-    $err["field"] = "privacy";
+    $err['msg'] = "$l_only_owner_priv";
+    $err['field'] = 'privacy';
     return false;
   }
 
   // A private group can't have an email address
-  if ($priv == 1 && ($email != "")) {
-    $err["msg"] = "$l_err_private_email";
-    $err["field"] = "email";
+  if ($priv == 1 && ($email != '')) {
+    $err['msg'] = "$l_err_private_email";
+    $err['field'] = 'email';
     return false;
   }
 
   // A system group can't be private
   if ($system && $priv) {
-    $err["msg"] = "$l_system_no_priv";
-    $err["field"] = "system";
+    $err['msg'] = "$l_system_no_priv";
+    $err['field'] = 'system';
     return false;
   }
 
-  if ($action == "update") {
+  if ($action == 'update') {
     // MANDATORY: we do not allow to delete samba perms for a system user
-    if (($system) && ($gsamba == "1") && ($samba != "1")) {
-      $err["msg"] = "$l_err_system_samba";
-      $err["field"] = "samba";
+    if (($system) && ($gsamba == '1') && ($samba != '1')) {
+      $err['msg'] = "$l_err_system_samba";
+      $err['field'] = 'samba';
       return false;
     }
   }
@@ -993,8 +992,8 @@ function check_group_data_form($group) {
 //   true if the group can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_group_can_delete($p_id) {
-  global $obm, $err, $ok_msg;
-  global $l_warn_delete, $l_cant_delete_system, $l_cant_delete_public;
+  global $obm, $perm, $err, $cright_write_admin, $ok_msg;
+  global $l_warn_delete, $l_cant_delete_system, $l_err_public_rights;
 
   $delete_ok = true;
 
@@ -1002,8 +1001,10 @@ function check_group_can_delete($p_id) {
   if ($lgroup["system"] != "0") {
     $err["msg"] .= "$l_cant_delete_system";
     $delete_ok = false;
-  } else if (($lgroup["privacy"] == "0") && ($lgroup["usercreate"] != $obm["uid"])) {
-    $err["msg"] .= $l_cant_delete_public;
+  } else if (($lgroup["privacy"] == "0") &&
+	     (! $perm->check_right('group', $cright_write_admin))) {
+    $err["msg"] .= $l_err_public_rights;
+    $err['field'] = 'privacy';
     $delete_ok = false;
   } else {
     $nb_u = get_group_nb_user($p_id);

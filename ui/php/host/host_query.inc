@@ -362,13 +362,13 @@ function run_query_host_delete($p_id) {
 
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
-      deleted_entity,
+      deleted_table,
       deleted_entity_id,
       deleted_user_id,
       deleted_timestamp)
     VALUES (
       '$domain_id',
-      'host',
+      'Host',
       '$p_id',
       '$uid',
       '$now')";

@@ -11,28 +11,28 @@
 // Fields that appear in result lists //
 //------------------------------------//
 // Direct fields
-$fieldnames["group_name"] = $l_name;
-$fieldnames["group_delegation"] = $l_delegation;
-$fieldnames["group_system"] = $l_system;
-$fieldnames["group_privacy"] = $l_private;
-$fieldnames["group_local"] = $l_local;
-$fieldnames["group_ext_id"] = $l_ext_id;
-$fieldnames["group_samba"] = $l_smb;
-$fieldnames["group_desc"] = $l_desc;
-$fieldnames["group_email"] = $l_email;
-$fieldnames["group_mailing"] = $l_mailing;
-$fieldnames["usercreate"] = $l_creator;
-$fieldnames["userupdate"] = $l_updater;
-$fieldnames["timecreate"] = $l_date_creation;
-$fieldnames["timeupdate"] = $l_date_last_update;
+$fieldnames['group_name'] = $l_name;
+$fieldnames['group_delegation'] = $l_delegation;
+$fieldnames['group_system'] = $l_system;
+$fieldnames['group_privacy'] = $l_private;
+$fieldnames['group_local'] = $l_local;
+$fieldnames['group_ext_id'] = $l_ext_id;
+$fieldnames['group_samba'] = $l_smb;
+$fieldnames['group_desc'] = $l_desc;
+$fieldnames['group_email'] = $l_email;
+$fieldnames['group_mailing'] = $l_mailing;
+$fieldnames['usercreate'] = $l_creator;
+$fieldnames['userupdate'] = $l_updater;
+$fieldnames['timecreate'] = $l_date_creation;
+$fieldnames['timeupdate'] = $l_date_last_update;
 // Calculated fields
-$fieldnames["group_nb_user"] = $l_nb_user;
-$fieldnames["group_user_login"] = $l_login;
-$fieldnames["group_user_lastname"] = $l_lastname;
-$fieldnames["group_user_firstname"] = $l_firstname;
-$fieldnames["group_user_function"] = $l_function;
-$fieldnames["group_user_phone"] = $l_phone;
-$fieldnames["group_user_email"] = $l_email;
+$fieldnames['group_nb_user'] = $l_nb_user;
+$fieldnames['group_user_login'] = $l_login;
+$fieldnames['group_user_lastname'] = $l_lastname;
+$fieldnames['group_user_firstname'] = $l_firstname;
+$fieldnames['group_user_function'] = $l_function;
+$fieldnames['group_user_phone'] = $l_phone;
+$fieldnames['group_user_email'] = $l_email;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,107 +47,107 @@ $fieldnames["group_user_email"] = $l_email;
 function dis_data_group(&$OD, $fieldname, $link_ok) {
   global $path, $obm, $params, $ico_mail,$cgp_use;
 
-  if (($fieldname == "group_name") && $link_ok) {
-    $res["url"] = "$path/group/group_index.php?action=detailconsult&amp;group_id=".$OD->data_set->f("group_id");
+  if (($fieldname == 'group_name') && $link_ok) {
+    $res['url'] = "$path/group/group_index.php?action=detailconsult&amp;group_id=".$OD->data_set->f('group_id');
   }
-  if (($fieldname == "data_element") && $params["ext_element"] != "") {
-    $res["name"] = "<span id=\"data-group-".$OD->data_set->f("group_id")."\" style=\"display:none;\">".
-    $OD->data_set->f("group_name")."</span>";
+  if (($fieldname == 'data_element') && $params['ext_element'] != '') {
+    $res['name'] = '<span id=\"data-group-'.$OD->data_set->f('group_id').'\" style=\"display:none;\">'.
+    $OD->data_set->f('group_name').'</span>';
   }  
 
-  else if ($fieldname == "group_system") {
-    $res["align"] = "center";
+  else if ($fieldname == 'group_system') {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
-  else if ($fieldname == "group_privacy") {
-    $res["align"] = "center";
+  else if ($fieldname == 'group_privacy') {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
-  else if ($fieldname == "group_samba") {
-    $res["align"] = "center";
+  else if ($fieldname == 'group_samba') {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
-  else if ($fieldname == "group_local") {
-    $res["align"] = "center";
+  else if ($fieldname == 'group_local') {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
-  else if ($fieldname == "group_nb_user") {
+  else if ($fieldname == 'group_nb_user') {
     $nb_q = new DB_OBM;
-    $id = $OD->data_set->f("group_id");
+    $id = $OD->data_set->f('group_id');
     $query = "SELECT count(*) FROM UserObmGroup WHERE userobmgroup_group_id='$id'";
     $nb_q->query($query);
     $nb_q->next_record();
-    $res["name"] = $nb_q->f(0);
-    $res["align"] = "center";
+    $res['name'] = $nb_q->f(0);
+    $res['align'] = 'center';
   }
 
   // For User member lists
-  elseif (($fieldname == "group_user_login") && $link_ok) {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("group_user_id");
+  elseif (($fieldname == 'group_user_login') && $link_ok) {
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f('group_user_id');
   }
 
-  else if ($fieldname == "group_user_email") {
-    $email = $OD->data_set->f("group_user_email");
-    if (strcmp($email ,"") != 0) {
-      if ($cgp_use["service"]["mail"]) {
-        if($OD->data_set->f("domain_name") != "") {
-          $main_domain = $OD->data_set->f("domain_name");
+  else if ($fieldname == 'group_user_email') {
+    $email = $OD->data_set->f('group_user_email');
+    if (strcmp($email ,'') != 0) {
+      if ($cgp_use['service']['mail']) {
+        if($OD->data_set->f('domain_name') != '') {
+          $main_domain = $OD->data_set->f('domain_name');
         } else {
-          $main_domain = $obm["domain_name"];
+          $main_domain = $obm['domain_name'];
         }
-        $emails = explode("\n",$email);
+        $emails = explode('\n',$email);
         $email = trim($emails[0])."@$main_domain";
       }
-      $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\">$email";
-      $res["txt_name"] = "$email";
+      $res['url'] = "mailto:$email";
+      $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\">$email";
+      $res['txt_name'] = "$email";
     }
     
   }
 
-  else if ($fieldname == "group_email") {
-    $email = $OD->data_set->f("group_email");
-    if (strcmp($email,"") != 0) {
-      if ($cgp_use["service"]["mail"]) {
-        $email .= "@".$obm["domain_name"];
+  else if ($fieldname == 'group_email') {
+    $email = $OD->data_set->f('group_email');
+    if (strcmp($email,'') != 0) {
+      if ($cgp_use['service']['mail']) {
+        $email .= '@'.$obm['domain_name'];
       }
-      $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\" />";
-      $res["txt_name"] = $email;
+      $res['url'] = "mailto:$email";
+      $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\" />";
+      $res['txt_name'] = $email;
     }
   }
 
-  else if ($fieldname == "group_mailing") {
-    $res["align"] = "center";
+  else if ($fieldname == 'group_mailing') {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
@@ -165,20 +165,20 @@ function html_group_search_form ($group) {
   global $display, $l_name, $l_group_user, $l_email, $l_find, $l_add_groups;
   global $l_visibility, $l_mailing;
  
-  $popup = $group["popup"];
+  $popup = $group['popup'];
 
-  if ($group["children_restriction"]) {
+  if ($group['children_restriction']) {
     $child_res = "<input name=\"child_res\" type=\"hidden\" value=\"1\">";
   }
 
   if ($popup) {
-    $ext_action = $group["ext_action"];
-    $ext_target = $group["ext_target"];
-    $ext_widget = $group["ext_widget"];
-    $ext_url = $group["ext_url"];
-    $ext_id = $group["ext_id"];
-    $ext_title = stripslashes($group["ext_title"]);
-    $ext_element =  $group["ext_element"];
+    $ext_action = $group['ext_action'];
+    $ext_target = $group['ext_target'];
+    $ext_widget = $group['ext_widget'];
+    $ext_url = $group['ext_url'];
+    $ext_id = $group['ext_id'];
+    $ext_title = stripslashes($group['ext_title']);
+    $ext_element =  $group['ext_element'];
 
     $ext = "<input name=\"ext_action\" type=\"hidden\" VALUE=\"$ext_action\">
       <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
@@ -187,20 +187,20 @@ function html_group_search_form ($group) {
       <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
       <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">      
       <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    if ($ext_title == "") {
+    if ($ext_title == '') {
       $ext_title = $l_add_groups;
     }
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
+    $display['title'] = "<h1 class=\"title\">$ext_title</h1>";
   }
   
   // --- Var preparation ------------------------------------------------------
 
-  $name = stripslashes($group["name"]);
-  $delegation = stripslashes($group["delegation"]);
-  $email = stripslashes($group["email"]);
-  $user = stripslashes($group["user"]);
-  $privacy = $group["privacy"];
-  $mailing = $group["mailing"];
+  $name = stripslashes($group['name']);
+  $delegation = stripslashes($group['delegation']);
+  $email = stripslashes($group['email']);
+  $user = stripslashes($group['user']);
+  $privacy = $group['privacy'];
+  $mailing = $group['mailing'];
 
   $sel_privacy = dis_privacy_search_select($privacy);
 
@@ -247,10 +247,10 @@ function html_group_search_form ($group) {
 function dis_group_search_group($group) {
   global $obm, $display, $l_found, $l_no_found;
 
-  $child_res = $group["children_restriction"];
-  $widget = $group["ext_widget"];
+  $child_res = $group['children_restriction'];
+  $widget = $group['ext_widget'];
 
-  $prefs = get_display_pref($obm["uid"], "group");
+  $prefs = get_display_pref($obm['uid'], 'group');
   if ($child_res) {
     $obm_q = run_query_group_search_possible_children($group);
   }  else {
@@ -259,9 +259,9 @@ function dis_group_search_group($group) {
 
   $nb_group = $obm_q->num_rows_total();
   if ($nb_group == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found);
+    $display['msg'] .= display_warn_msg($l_no_found);
   } else {
-    $display["msg"] .= display_info_msg("$nb_group $l_found");
+    $display['msg'] .= display_info_msg("$nb_group $l_found");
     $block = html_group_search_group($obm_q, $prefs, $group);
   }
 
@@ -280,39 +280,39 @@ function dis_group_search_group($group) {
 function html_group_search_group($obm_q, $prefs, $group) {
   global $l_add, $l_close;
 
-  $child_res = $group["children_restriction"];
-  $popup = $group["popup"];
-  $widget = $group["ext_widget"];
+  $child_res = $group['children_restriction'];
+  $popup = $group['popup'];
+  $widget = $group['ext_widget'];
 
   if ($popup) {
-    $ext_action = $group["ext_action"];
-    $ext_url = $group["ext_url"];
-    $ext_target = $group["ext_target"];
-    $ext_widget = $group["ext_widget"];
-    $ext_id = $group["ext_id"];
-    $ext_element = $group["ext_element"];
-    $ext_title = urlencode(stripslashes($group["ext_title"]));
+    $ext_action = $group['ext_action'];
+    $ext_url = $group['ext_url'];
+    $ext_target = $group['ext_target'];
+    $ext_widget = $group['ext_widget'];
+    $ext_id = $group['ext_id'];
+    $ext_element = $group['ext_element'];
+    $ext_title = urlencode(stripslashes($group['ext_title']));
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_titled&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;child_res=$child_res";
   }
 
-  $name = urlencode(stripslashes($group["name"]));
-  $delegation = urlencode(stripslashes($group["delegation"]));
-  $user = urlencode(stripslashes($group["user"]));
+  $name = urlencode(stripslashes($group['name']));
+  $delegation = urlencode(stripslashes($group['delegation']));
+  $user = urlencode(stripslashes($group['user']));
 
   $url = url_prepare("group_index.php?action=search&amp;tf_name=$name&amp;tf_user=$user&amp;tf_delegation=$delegation$url_ext");
   
-  $dis_group = new OBM_DISPLAY("DATA", $prefs, "group");
+  $dis_group = new OBM_DISPLAY('DATA', $prefs, 'group');
   if ($popup) {
     $dis_group->display_link = false;
-    $dis_group->data_cb_text = "X";
-    $dis_group->data_idfield = "group_id";
-    $dis_group->data_cb_name = "data-g-";
-    if ($ext_element != "") {
-      $dis_group->data_cb_name = "";
+    $dis_group->data_cb_text = 'X';
+    $dis_group->data_idfield = 'group_id';
+    $dis_group->data_cb_name = 'data-g-';
+    if ($ext_element != '') {
+      $dis_group->data_cb_name = '';
       $form_attr = "
       onsubmit=\"of_select_fill_from_checkbox(this); return false;\" ";
     }
-    elseif ($widget == "") {
+    elseif ($widget == '') {
       $form_attr = "target=\"$ext_target\" method=\"get\" action=\"$ext_url\"";
     } else {
       $form_attr = "onsubmit=\"fill_ext_form(this);return false;\"";
@@ -336,7 +336,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
   $dis_group->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  $block .= $dis_group->display("dis_data_group");
+  $block .= $dis_group->display('dis_data_group');
   $block .= $display_popup_end;
 
   return $block;
@@ -352,19 +352,19 @@ function html_group_search_group($obm_q, $prefs, $group) {
 function dis_group_consult($group, $uid) {
   global $ctu_sql_limit, $l_err_reference;
 
-  $g_id = $group["group_id"];
+  $g_id = $group['group_id'];
 
   if ($g_id > 0) {
     $group_q = run_query_group_detail($g_id);
 
-    $prefs_u = get_display_pref($uid, "group_user");
+    $prefs_u = get_display_pref($uid, 'group_user');
     $u_q = run_query_group_user_group($group);
     if ($ctu_sql_limit) {
       $count = get_query_count("SELECT count(*) FROM UserObmGroup WHERE userobmgroup_group_id=$g_id");
       $u_q->set_num_rows_total($count);
     }
 
-    $prefs_g = get_display_pref($uid, "group_group");
+    $prefs_g = get_display_pref($uid, 'group_group');
     $g_q = run_query_group_group($group);
     if ($ctu_sql_limit) {
       $count = get_query_count("SELECT count(*) FROM GroupGroup WHERE groupgroup_parent_id=$g_id");
@@ -373,7 +373,7 @@ function dis_group_consult($group, $uid) {
 
     $block = html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q);
   } else {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_err_msg($l_err_reference);
   }
 
   return $block;
@@ -399,25 +399,25 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $cg_gid_smb_user, $cg_gid_smb_admin;
   global $cgp_use, $cgp_hide;
 
-  $id = $group_q->f("group_id");
-  $usercreate = $group_q->f("group_usercreate");
-  $userupdate = $group_q->f("group_userupdate");
-  $timecreate = $group_q->f("timecreate");
-  $timeupdate = $group_q->f("timeupdate");
-  $system = ($group_q->f("group_system") == 1 ? $l_yes : $l_no);
-  $local = ($group_q->f("group_local") == 1 ? $l_yes : $l_no);
-  $privacy = $group_q->f("group_privacy");
+  $id = $group_q->f('group_id');
+  $usercreate = $group_q->f('group_usercreate');
+  $userupdate = $group_q->f('group_userupdate');
+  $timecreate = $group_q->f('timecreate');
+  $timeupdate = $group_q->f('timeupdate');
+  $system = ($group_q->f('group_system') == 1 ? $l_yes : $l_no);
+  $local = ($group_q->f('group_local') == 1 ? $l_yes : $l_no);
+  $privacy = $group_q->f('group_privacy');
   $dis_privacy = ($privacy == 1 ? $l_private : $l_public);
-  $ext_id = $group_q->f("group_ext_id");
-  $name = $group_q->f("group_name");
-  $delegation = $group_q->f("group_delegation");
-  $desc = $group_q->f("group_desc");
-  $email = $group_q->f("group_email");
-  $mailing = ($group_q->f("group_mailing") == 1 ? $l_yes : $l_no);
-  $manager = $group_q->f("userobm_lastname")." ".$group_q->f("userobm_firstname");
+  $ext_id = $group_q->f('group_ext_id');
+  $name = $group_q->f('group_name');
+  $delegation = $group_q->f('group_delegation');
+  $desc = $group_q->f('group_desc');
+  $email = $group_q->f('group_email');
+  $mailing = ($group_q->f('group_mailing') == 1 ? $l_yes : $l_no);
+  $manager = $group_q->f('userobm_lastname').' '.$group_q->f('userobm_firstname');
 
-  if ($email != "") {
-    if ($cgp_use["service"]["mail"]) {
+  if ($email != '') {
+    if ($cgp_use['service']['mail']) {
       $email = "$email@$obm[domain_name]";
     } 
     $dis_email = "$email";
@@ -434,7 +434,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       </tr>";
 
     if ($cgp_use['service']['samba']) {
-      $samba = ($group_q->f("group_samba") == 1 ? $l_yes : $l_no);
+      $samba = ($group_q->f('group_samba') == 1 ? $l_yes : $l_no);
       $block_samba = "
       <tr>
         <th>$l_smb</td>
@@ -442,11 +442,11 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       </tr>";
     }    
   } else {
-    $dis_email = "";
-    $samba = "";
+    $dis_email = '';
+    $samba = '';
   }
 
-  $block_userdata .= of_userdata_dis_entity_consult("group", $id);
+  $block_userdata .= of_userdata_dis_entity_consult('group', $id);
   $block_delegation = of_delegation_dis_block_consult($delegation);
 
   // Check update rights to allow to remove users
@@ -467,20 +467,20 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   if ($nb_g != 0) {
     $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
     
-    $dis_infos = new OBM_DISPLAY("DATA", $prefs_g, "group", "group_group","group_group");
+    $dis_infos = new OBM_DISPLAY('DATA', $prefs_g, 'group', 'group_group','group_group');
     $dis_infos->data_set = $g_q;
     $dis_infos->data_url = $url;
-    $dis_infos->data_header = "top";
+    $dis_infos->data_header = 'top';
 
     if ($update_group) {
-      $dis_infos->data_cb_text = "X";
-      $dis_infos->data_idfield = "child_id";
-      $dis_infos->data_cb_name = "data-g-";
-      $dis_infos->data_cb_field = "";
+      $dis_infos->data_cb_text = 'X';
+      $dis_infos->data_idfield = 'child_id';
+      $dis_infos->data_cb_name = 'data-g-';
+      $dis_infos->data_cb_field = '';
       $block_mg .= "<form method=\"get\" action=\"group_index.php\">";
     }
 
-    $block_mg .= $dis_infos->display("dis_data_group");
+    $block_mg .= $dis_infos->display('dis_data_group');
 
     if ($update_group) {
       $block_mg .= "
@@ -507,20 +507,20 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   if ($nb_u != 0) {
 
     $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
-    $dis_infos = new OBM_DISPLAY("DATA", $prefs_u, "group", "group_user","group_user");
+    $dis_infos = new OBM_DISPLAY('DATA', $prefs_u, 'group', 'group_user','group_user');
     $dis_infos->data_set = $u_q;
     $dis_infos->data_url = $url;
-    $dis_infos->data_header = "both";
+    $dis_infos->data_header = 'both';
 
     if ($update_group) {
-      $dis_infos->data_cb_text = "X";
-      $dis_infos->data_idfield = "group_user_id";
-      $dis_infos->data_cb_name = "data-u-";
-      $dis_infos->data_cb_field = "";
+      $dis_infos->data_cb_text = 'X';
+      $dis_infos->data_idfield = 'group_user_id';
+      $dis_infos->data_cb_name = 'data-u-';
+      $dis_infos->data_cb_field = '';
       $block_mu .= "<form method=\"get\" action=\"group_index.php\">";
     }
 
-    $block_mu .= $dis_infos->display("dis_data_group");
+    $block_mu .= $dis_infos->display('dis_data_group');
 
     if ($update_group) {
       $block_mu .= "
@@ -533,8 +533,8 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     }
   }
   
-  $display["detailInfo"] = display_record_info($group_q);
-  $display["title"] = "<h1 class=\"title\">$l_group : $name</h1>";
+  $display['detailInfo'] = display_record_info($group_q);
+  $display['title'] = "<h1 class=\"title\">$l_group : $name</h1>";
 
   $block .= "
   <div class=\"detail infos\">
@@ -603,64 +603,64 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
 //   - $group[]  : default or transmitted values
 //   - $field    : [optionnal] : field in error
 ///////////////////////////////////////////////////////////////////////////////
-function html_group_form($action, $group_q, $group, $field="") {
-  global $obm, $cgroup_private_default, $cgp_use;
+function html_group_form($action, $group_q, $group, $field='') {
+  global $obm, $perm, $cgroup_private_default, $cgp_use, $cright_write_admin;
   global $l_group, $l_name, $l_desc, $l_smb, $l_email, $l_mailing;
   global $l_private, $l_insert, $l_update, $l_back;
   global $l_manager, $c_undef, $l_undef; 
  
   // if update mode and first time, values are taken from db
-  if ($action == "detailupdate") {
-    $id = $group_q->f("group_id");
-    $usercreate = $group_q->f("group_usercreate");
-    $name = $group_q->f("group_name");
-    $delegation = $group_q->f("group_delegation");
-    $system = $group_q->f("group_system");
-    $samba = $group_q->f("group_samba");
-    $desc = $group_q->f("group_desc");
-    $email = $group_q->f("group_email");
-    $priv = $group_q->f("privacy");
-    $mailing = $group_q->f("group_mailing");
-  } elseif ($action == "new") {
+  if ($action == 'detailupdate') {
+    $id = $group_q->f('group_id');
+    $usercreate = $group_q->f('group_usercreate');
+    $name = $group_q->f('group_name');
+    $delegation = $group_q->f('group_delegation');
+    $system = $group_q->f('group_system');
+    $samba = $group_q->f('group_samba');
+    $desc = $group_q->f('group_desc');
+    $email = $group_q->f('group_email');
+    $priv = $group_q->f('privacy');
+    $mailing = $group_q->f('group_mailing');
+  } elseif ($action == 'new') {
     if ($cgroup_private_default) {
-      $private_c = " checked";
-      $mail_class = "H";
+      $private_c = ' checked';
+      $mail_class = 'H';
     }
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($group["group_id"])) { $id = $group["group_id"]; }
-  if (isset($group["name"])) { $name = stripslashes($group["name"]); }
-  if (isset($group["delegation"])) { $delegation = stripslashes($group["delegation"]); }
-  if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
-  if (isset($group["email"])) { $email = stripslashes($group["email"]); }
-  if (isset($group["privacy"])) { $priv = stripslashes($group["privacy"]); }
-  if (isset($group["mailing"])) { $mailing = stripslashes($group["mailing"]); }
+  if (isset($group['group_id'])) { $id = $group['group_id']; }
+  if (isset($group['name'])) { $name = stripslashes($group['name']); }
+  if (isset($group['delegation'])) { $delegation = stripslashes($group['delegation']); }
+  if (isset($group['desc'])) { $desc = stripslashes($group['desc']); }
+  if (isset($group['email'])) { $email = stripslashes($group['email']); }
+  if (isset($group['privacy'])) { $priv = stripslashes($group['privacy']); }
+  if (isset($group['mailing'])) { $mailing = stripslashes($group['mailing']); }
 
   // Mark the error field
-  if ($field != "") {
-    $class[$field] = "error";
+  if ($field != '') {
+    $class[$field] = 'error';
   }
 
-  $block_userdata = of_userdata_dis_entity_form("group", $id, $group);
+  $block_userdata = of_userdata_dis_entity_form('group', $id, $group);
 
   $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
-  // If new group or group update and user is owner, display visibility
-  if ( ($action == "new") || ($action == "insert") ||
-       ( (($action == "detailupdate") || ($action == "update")) &&
-         ($usercreate == $obm["uid"]) ) ) {
+  if (! $perm->check_right('group', $cright_write_admin)) {
+    $dis_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_private";
+
+    // if new group or group update and user is owner, display visibility
+  } else if ( ($action == 'new') || ($action == 'insert') ||
+	      ( (($action == 'detailupdate') || ($action == 'update')) &&
+		($usercreate == $obm['uid']) ) ) {
     if ($priv == '1') {
-      $private_c = " checked";
-      $mail_class = "H";
+      $private_c = ' checked';
+      $mail_class = 'H';
     }
     if ($mailing == '1') {
-      $mailing_c = " checked";
+      $mailing_c = ' checked';
     }
     $dis_private = "
-  <tr>
-    <th>$l_private</th>
-    <td>
     <script type=\"text/javascript\">
       function privacyShowHide(input) {
         if($(input).getValue()) {
@@ -675,16 +675,15 @@ function html_group_form($action, $group_q, $group, $field="") {
       }
     </script>
     <input name=\"cba_privacy\" type=\"checkbox\" 
-    onchange=\"privacyShowHide(this)\" value=\"1\" $private_c /></td
-  </tr>";
+    onchange=\"privacyShowHide(this)\" value=\"1\" $private_c />";
   } 
 
-  if ($cgp_use["service"]["samba"]) {
+  if ($cgp_use['service']['samba']) {
     // Samba group checkbox checked value
-    $samba_state  = ($samba ? "checked" : "");
+    $samba_state  = ($samba ? 'checked' : '');
 
     $block_samba = "
-  <tr id=\"sambaGroup\"  class=\"$mail_class\">
+  <tr id=\"sambaGroup\" class=\"$mail_class\">
     <th class=\"$class[samba]\">$l_smb</th>
     <td><input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state></td>
   </tr>";
@@ -697,24 +696,24 @@ function html_group_form($action, $group_q, $group, $field="") {
   </tr>";
 
 
-  if ($action == "detailupdate" || $action == "update") {
+  if ($action == 'detailupdate' || $action == 'update') {
     // Manager select
-    $manager_id = $group_q->f("group_manager_id");
-    if (isset($group["manager"])) { $manager_id = $group["manager"]; }    
+    $manager_id = $group_q->f('group_manager_id');
+    if (isset($group['manager'])) { $manager_id = $group['manager']; }    
     $all_usr_q = run_query_all_users_from_group($id);
     $sel_manager = "<select name=\"sel_manager\" id=\"sel_manager\">
         <option value=\"$c_undef\">$l_undef</option>";
     while($all_usr_q->next_record()) {
-      $userobm_id = $all_usr_q->f("userobm_id");
-      $userobm_name = $all_usr_q->f("userobm_lastname")." ".$all_usr_q->f("userobm_firstname");
+      $userobm_id = $all_usr_q->f('userobm_id');
+      $userobm_name = $all_usr_q->f('userobm_lastname').' '.$all_usr_q->f('userobm_firstname');
       if ($userobm_id == $manager_id) {
-        $selected = "selected";
+        $selected = 'selected';
       } else {
-        $selected = "";
+        $selected = '';
       }
       $sel_manager .= "<option value=\"$userobm_id\" $selected> $userobm_name </option>";
     }
-    $sel_manager .= "</select>";
+    $sel_manager .= '</select>';
 
     $block_manager = "  <tr>
     <th>$l_manager</th>
@@ -735,7 +734,10 @@ function html_group_form($action, $group_q, $group, $field="") {
   </tr>
   $block_manager
   $block_delegation
-  $dis_private
+  <tr>
+    <th>$l_private</th>
+    <td>$dis_private</td>
+  </tr>
   $block_samba
   <tr id=\"emailGroup\" class=\"$mail_class\">
     <th>$l_email</th>
@@ -757,7 +759,7 @@ function html_group_form($action, $group_q, $group, $field="") {
   </table>
   </fieldset>";
 
-  if (($action == "detailupdate") || ($action == "update")) {
+  if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_but = "
       <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" value=\"update\" />
@@ -786,7 +788,7 @@ function dis_group_can_delete($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display;
 
-  $url = url_prepare("group_index.php");
+  $url = url_prepare('group_index.php');
 
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
@@ -800,7 +802,7 @@ function dis_group_can_delete($p_id) {
     <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 
-  $display["msg"] .= display_ok_msg($l_can_delete);
+  $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
     <div class=\"buttons\">
@@ -825,19 +827,19 @@ function dis_group_warn_insert($id, $g_q, $group) {
   global $display, $l_check_samegroup, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
-  $name = $group["name"];
-  $delegation = $group["delegation"];
-  $desc = $group["desc"];
-  $samba = $group["samba"];
-  $email = $group["email"];
-  $mailing = $group["mailing"];
-  $privacy = $group["privacy"];
+  $name = $group['name'];
+  $delegation = $group['delegation'];
+  $desc = $group['desc'];
+  $samba = $group['samba'];
+  $email = $group['email'];
+  $mailing = $group['mailing'];
+  $privacy = $group['privacy'];
 
-  $display["msg"] .= display_warn_msg($l_check_samegroup);
+  $display['msg'] .= display_warn_msg($l_check_samegroup);
   while ($g_q->next_record()) {
-    $id = $g_q->f("group_id");
-    $samename = $g_q->f("group_name");
-    $samedesc = $g_q->f("group_desc");
+    $id = $g_q->f('group_id');
+    $samename = $g_q->f('group_name');
+    $samedesc = $g_q->f('group_desc');
     $dis_same_group .= "
       <li>
         <a href=\"" .url_prepare("group_index.php?action=detailconsult&amp;group_id=$id") . "\">$samename ($samedesc)</a>
@@ -885,7 +887,7 @@ function dis_group_warn_insert($id, $g_q, $group) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_group_admin_index() {
 
-  $block = of_userdata_dis_admin_form("group");
+  $block = of_userdata_dis_admin_form('group');
 
   return $block;
 }
@@ -900,14 +902,14 @@ function dis_group_admin_index() {
 function dis_group_display_pref($prefs_g, $prefs_u) {
   global $l_group_display, $l_user_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_g, "group");
+  $dis_pref = new OBM_DISPLAY('PREFERENCES', $prefs_g, 'group');
   $dis_pref->pref_title = $l_group_display;
   $dis_pref->pref_dis_help = 1;
 
   $block = $dis_pref->display();
 
   $dis_pref->display_pref = $prefs_u;
-  $dis_pref->display_entity = "group_user";
+  $dis_pref->display_entity = 'group_user';
   $dis_pref->pref_title = $l_user_display;
 
   $block .= $dis_pref->display();
@@ -930,11 +932,11 @@ function json_search_group($group,$results) {
 
   $groups = array();
   while($grp_q->next_record()) {
-    $id = $grp_q->f("group_id");
-    $label = phpStringToJsString($grp_q->f("group_name"));
-    $extra = phpStringToJsString("$l_desc : ".$grp_q->f("group_desc"));
+    $id = $grp_q->f('group_id');
+    $label = phpStringToJsString($grp_q->f('group_name'));
+    $extra = phpStringToJsString("$l_desc : ".$grp_q->f('group_desc'));
     $groups[] = "{id:'data-group-$id', label:'$label', extra:'$extra'}";
   }
-  $display["json"] = "{length:".$results['length'].", datas:[".implode(",",$groups)."]}";
+  $display['json'] = '{length:'.$results['length'].', datas:['.implode(',',$groups).']}';
 }
 ?>

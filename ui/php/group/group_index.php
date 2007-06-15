@@ -27,28 +27,28 @@
 // - ext_get_ids     --                -- select multiple groups (url or sel) 
 ///////////////////////////////////////////////////////////////////////////////
 
-$path = "..";
-$module = "group";
-$obminclude = getenv("OBM_INCLUDE_VAR");
-if ($obminclude == "") $obminclude = "obminclude";
+$path = '..';
+$module = 'group';
+$obminclude = getenv('OBM_INCLUDE_VAR');
+if ($obminclude == "") $obminclude = 'obminclude';
 include("$obminclude/global.inc");
 $params = get_group_params();
-page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 
-require("group_display.inc");
-require("group_query.inc");
-require("group_js.inc");
+require('group_display.inc');
+require('group_query.inc');
+require('group_js.inc');
 require_once("$obminclude/of/of_category.inc");
 
 get_group_action();
 $perm->check_permissions($module, $action);
 
-if (! check_privacy($module, "UGroup", $action, $params["group_id"])) {
-  $display["msg"] = display_err_msg($l_error_visibility);
-  $action = "index";
+if (! check_privacy($module, 'UGroup', $action, $params['group_id'])) {
+  $display['msg'] = display_err_msg($l_error_visibility);
+  $action = 'index';
 } else {
-  update_last_visit("group", $params["group_id"], $action);
+  update_last_visit('group', $params['group_id'], $action);
 }
 
 page_close();
@@ -58,19 +58,19 @@ page_close();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-if (($action == "index") || ($action == "")) {
+if (($action == 'index') || ($action == '')) {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_group_search_form($params);
-  if ($_SESSION['set_display'] == "yes") {
-    $display["result"] .= dis_group_search_group("");
+  $display['search'] = html_group_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] .= dis_group_search_group('');
   } else {
-    $display["msg"] .= display_info_msg($l_no_display);
+    $display['msg'] .= display_info_msg($l_no_display);
   }
 
-} else if ($action == "search") {
+} else if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_group_search_form($params);
-  $display["result"] = dis_group_search_group($params);
+  $display['search'] = html_group_search_form($params);
+  $display['result'] = dis_group_search_group($params);
 
 } elseif ($action == "ext_search") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -513,7 +513,7 @@ function update_group_action() {
   global $params, $actions, $path, $l_add_user, $l_add_group, $l_group;
   global $cright_write_admin;
 
-  $id = $params["group_id"];
+  $id = $params['group_id'];
 
   if ($id > 0) {
     $g = get_group_info($id);
@@ -534,34 +534,34 @@ function update_group_action() {
     }
 
     // Detail Consult
-    $actions["group"]["detailconsult"]['Url'] = "$path/group/group_index.php?action=detailconsult&amp;group_id=$id";
-    $actions["group"]["detailconsult"]['Condition'][] = 'insert';
+    $actions['group']['detailconsult']['Url'] = "$path/group/group_index.php?action=detailconsult&amp;group_id=$id";
+    $actions['group']['detailconsult']['Condition'][] = 'insert';
 
     // If user has update right on the group
     if (check_group_update_rights($params, $g)) {
 
       // Detail Update
-      $actions["group"]["detailupdate"]['Url'] = "$path/group/group_index.php?action=detailupdate&amp;group_id=$id";
-      $actions["group"]["detailupdate"]['Condition'][] = 'insert';
+      $actions['group']['detailupdate']['Url'] = "$path/group/group_index.php?action=detailupdate&amp;group_id=$id";
+      $actions['group']['detailupdate']['Condition'][] = 'insert';
 
       // Check Delete
-      $actions["group"]["check_delete"]['Url'] = "$path/group/group_index.php?action=check_delete&amp;group_id=$id";
-      $actions["group"]["check_delete"]['Condition'][] = 'insert';
+      $actions['group']['check_delete']['Url'] = "$path/group/group_index.php?action=check_delete&amp;group_id=$id";
+      $actions['group']['check_delete']['Condition'][] = 'insert';
 
       // Sel User add
-      $actions["group"]["sel_user_add"]['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group";
-      $actions["group"]["sel_user_add"]['Condition'][] = 'insert';
+      $actions['group']['sel_user_add']['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group";
+      $actions['group']['sel_user_add']['Condition'][] = 'insert';
 
       // Sel group add : Groups selection
-      $actions["group"]["sel_group_add"]['Url'] = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group&amp;child_res=1";
-      $actions["group"]["sel_group_add"]['Condition'][] = 'insert';
+      $actions['group']['sel_group_add']['Url'] = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group&amp;child_res=1";
+      $actions['group']['sel_group_add']['Condition'][] = 'insert';
 
     } else {
       // User does not have update rights
-      $actions["group"]["detailupdate"]['Condition'] = array('None');
-      $actions["group"]["check_delete"]['Condition'] = array('None');
-      $actions["group"]["sel_user_add"]['Condition'] = array('None');
-      $actions["group"]["sel_group_add"]['Condition'] = array('None');
+      $actions['group']['detailupdate']['Condition'] = array('None');
+      $actions['group']['check_delete']['Condition'] = array('None');
+      $actions['group']['sel_user_add']['Condition'] = array('None');
+      $actions['group']['sel_group_add']['Condition'] = array('None');
     }
 
   }

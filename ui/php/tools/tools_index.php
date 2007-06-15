@@ -26,16 +26,12 @@ include("$obminclude/global_pref.inc");
 require("tools_display.inc");
 require("tools_query.inc");
 
-if ($action == "index") $action = "update_index";
+if ($action == "update_index") $action = "update_detail";
 get_tools_action();
 $perm->check_permissions($module, $action);
 
 
-if (($action == "update_index") || ($action == "index") || ($action == "")) {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_tools_update_index();
-
-} elseif ($action == "update_detail") {
+if ($action == "update_detail") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_tools_update_detail();
 
@@ -44,18 +40,19 @@ if (($action == "update_index") || ($action == "index") || ($action == "")) {
   if (check_tools_update_context_ok($params)) {
     set_update_lock();
     set_update_state();
-    $display["detail"] = dis_tools_update_validation($params);
+    store_update_data($params);
     $res = exec_tools_update_update($params);
     if ($res == "0") {
       $display["msg"] .= display_ok_msg($l_upd_running);
     } else {
       $display["msg"] .= display_err_msg("$l_upd_error ($res)");
     }
+    $display["detail"] = dis_tools_update_detail();
     remove_update_lock();
   } else {
     // Si le contexte ne permet pas une modification de configuration
     $display['msg'] .= display_warn_msg($err['msg']);
-    $display["detail"] = html_tools_update_index();
+    $display["detail"] = dis_tools_update_detail();
   }
 
 } elseif ($action == "update_cancel") {
@@ -136,21 +133,13 @@ function get_tools_params() {
 function get_tools_action() {
   global $params, $actions, $path;
   global $l_header_tools_upd, $l_header_tools_halt,$l_header_tools_remote;
-  global $l_header_tools_upd_admin, $l_header_tools_upd_domain;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $cgp_securinet;
 
-// Tool Update
-  $actions["tools"]["update_index"] = array (
-    'Name'     => $l_header_tools_upd,
-    'Url'      => "$path/tools/tools_index.php?action=update_index",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('all') 
-                                    );
 
-// Display Admin Update
+// Tool Update
   $actions["tools"]["update_detail"] = array (
-    'Name'     => $l_header_tools_upd_admin,
+    'Name'     => $l_header_tools_upd,
     'Right'    => $cright_read_admin,
     'Url'      => "$path/tools/tools_index.php?action=update_detail",
     'Condition'=> array ('all') 

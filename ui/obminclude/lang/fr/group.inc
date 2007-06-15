@@ -34,7 +34,6 @@ $l_warn_delete = "utilisateurs enregistrés dans ce groupe";
 $l_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
 $l_system_no_priv = "Un groupe système ne peut être privé !";
 $l_only_owner_priv = "Seul le propriétaire d'un groupe peut le définir privé !";
-$l_err_public_rights = "Droits insuffisants pour gérer les groupes publics !";
 $l_err_private_email = "Les groupes privés ne peuvent pas avoir d'adresse E-mail !";
 
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les groupes correspondants.";
@@ -58,7 +57,6 @@ $l_no_group_added = "Pas de groupes à ajouter";
 $l_no_group_deleted = "Pas de groupes à supprimer";
 $l_check_samegroup = "Ces groupes sembles similaires au groupe saisi. Voulez-vous confirmer la création de ce groupe?";
 $l_cant_delete_system = "Les groupes système ne peuvent être supprimés !";
-$l_cant_delete_public = "Les groupes publics ne peuvent être supprimés que par leur créateur !";
 $l_can_delete = "Le groupe peut être supprimé.";
 $l_cant_delete = "Le groupe ne peut être supprimé !";
 $l_err_system_samba = "La modification des droits windows d'un groupe système n'est pas autorisée.";

@@ -118,6 +118,8 @@ CREATE TABLE UserObm (
   userobm_email               text DEFAULT '',
   userobm_mail_server_id      integer default NULL,
   userobm_mail_quota          integer default 0,
+  userobm_mail_quota_use      integer default 0,
+  userobm_mail_login_date     timestamp,
   userobm_nomade_perms        integer default 0,
   userobm_nomade_enable       integer default 0,
   userobm_nomade_local_copy   integer default 0,
@@ -1639,6 +1641,7 @@ CREATE TABLE Domain (
 CREATE TABLE DomainProperty (
   domainproperty_key       varchar(255) NOT NULL,
   domainproperty_type      varchar(32),
+  domainproperty_default   varchar(64),
   PRIMARY KEY (domainproperty_key)
 );
 

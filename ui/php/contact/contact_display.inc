@@ -1250,8 +1250,8 @@ function dis_contact_form($action, $co_q, $contact) {
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact) {
-  global $ico_company, $l_company,$ico_add,$ico_crow;
-  global $cgp_mailing_default, $ccontact_private_default;
+  global $ico_company, $l_company, $ico_add, $ico_crow;
+  global $cgp_mailing_default, $ccontact_private_default, $cright_write_admin;
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
   global $l_address, $l_town, $l_country, $l_service,$l_date, $l_no_date;
@@ -1261,7 +1261,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   global $l_comment3, $l_add_comment3, $l_upd_comment3;
   global $l_datasource, $l_archive, $l_private, $l_coord, $l_contact, $l_market;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
-  global $display, $path, $obm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
+  global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
 
   $uid = $obm["uid"];
 
@@ -1605,19 +1605,16 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
         $l_upd_comment1
-        <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>
-    ";
+        <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>";
     if ($show_comment2) {
       $dis_comment2 = "
         $l_upd_comment2
-        <textarea name=\"ta_comment2\" rows=\"6\" cols=\"78\">$comment2</textarea>
-      ";
+        <textarea name=\"ta_comment2\" rows=\"6\" cols=\"78\">$comment2</textarea>";
     }
     if ($show_comment3) {
       $dis_comment3 = "
         $l_upd_comment3
-        <textarea name=\"ta_comment3\" rows=\"6\" cols=\"78\">$comment3</textarea>
-      ";
+        <textarea name=\"ta_comment3\" rows=\"6\" cols=\"78\">$comment3</textarea>";
     }
   }
 
@@ -1661,8 +1658,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $dis_company = "<input type=\"text\" name=\"tf_company\" size=\"30\" maxlength=\"64\" value=\"$c_name\" />";
   }
 
+  // Check
+  if (! $perm->check_right('contact', $cright_write_admin)) {
+    $display_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_private";
+
   // If new contact or contact update and user is owner, display visibility
-  if ( ($action == "new") || ($action == "insert") ||
+  } else if ( ($action == "new") || ($action == "insert") ||
        ( (($action == "detailupdate") || ($action == "update")) &&
          ($usercreate == $obm["uid"]) ) ) {
     if ($priv == '1') {

@@ -36,12 +36,12 @@ INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyva
 -------------------------------------------------------------------------------
 -- Default Domain properties
 -------------------------------------------------------------------------------
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('update_state','integer');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_users','integer');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_mailshares','integer');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('max_resources','integer');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('quota_mail','integer');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('delegation','text');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('address1','text');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('address2','text');
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type) VALUES ('town','text');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('update_state','integer', 1);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_users','integer', 0);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_mailshares','integer', 0);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_resources','integer', 0);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('quota_mail','integer', 100);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('delegation','text', '');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('address1','text', '');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('address2','text', '');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('town','text', '');

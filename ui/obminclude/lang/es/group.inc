@@ -56,7 +56,6 @@ $l_no_group_added = "No hay grupo para adicionar";
 $l_no_group_deleted = "No hay grupos para remover";
 $l_check_samegroup = "Estos grupos lucen similar al grupo ingresado";
 $l_cant_delete_system = "Grupos del sistema no puede ser borrado !";
-$l_cant_delete_public = "Grupos públicos solo pueden ser borrados por el grupo creador !";
 $l_can_delete = "El grupo puede ser borrado !";
 $l_cant_delete = "El grupo NO puede ser borrado !";
 

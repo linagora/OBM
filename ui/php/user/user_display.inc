@@ -32,6 +32,8 @@ $fieldnames["datebegin"] = $l_datebegin;
 $fieldnames["timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_web_perms"] = $l_web;
 $fieldnames["userobm_email"] = $l_email;
+$fieldnames["userobm_email_quota"] = $l_quota."aa";
+$fieldnames["userobm_email_login_date"] = $l_date;
 $fieldnames["userobm_nomade"] = $l_access_nomade;
 $fieldnames["userobm_samba_perms"] = $l_smb_perms;
 $fieldnames["userobm_description"] = $l_desc;
@@ -110,7 +112,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("userobm_email");
     if (strcmp($email ,"") != 0) {
       if ($cgp_use["service"]["mail"]) {
-        if($OD->data_set->f("domain_name") != "") {
+        if ($OD->data_set->f("domain_name") != "") {
           $main_domain = $OD->data_set->f("domain_name");
         } else {
           $main_domain = $obm["domain_name"];

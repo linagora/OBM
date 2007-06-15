@@ -629,9 +629,8 @@ function of_delegation_check_update_rights($params, $current_delegation) {
 	}
 
 	// Can not update to other delegation
-	if ( (($action == 'insert') || ($action == 'insert'))
+	if ( (($action == 'insert') || ($action == 'update'))
 	     && ($delegation != $obm['delegation'])) {
-	  echo "6666";
 	  return false;
 	}
       }
