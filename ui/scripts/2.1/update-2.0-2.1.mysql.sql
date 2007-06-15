@@ -265,8 +265,21 @@ ALTER TABLE EntityRight ADD COLUMN entityright_admin int(1) NOT NULL default 0 A
 --
 UPDATE EntityRight SET entityright_write = entityright_admin;
 --
--- UPDATE TimeTask DATA
+-- UPDATE TimeTask Structure
 --
 ALTER TABLE TimeTask CHANGE COLUMN timetask_length timetask_length float;
 ALTER TABLE ProjectUser CHANGE COLUMN projectuser_projectedtime projectuser_projectedtime float;
 ALTER TABLE ProjectUser CHANGE COLUMN projectuser_missingtime projectuser_missingtime float;
+
+--
+-- UPDATE Prefs
+--
+UPDATE UserObmPref SET userobmpref_value = 'm/d/y' WHERE userobmpref_value = 'mdy' AND userobmpref_option = 'set_date_upd';
+UPDATE UserObmPref SET userobmpref_value = 'd/m/y' WHERE userobmpref_value = 'dmy' AND userobmpref_option = 'set_date_upd';
+
+--
+-- UPDATE CalendarCategory Structure
+--
+
+ALTER TABLE CalendarCategory1 ADD COLUMN calendarcategory1_color char(6) AFTER calendarcategory1_label;
+

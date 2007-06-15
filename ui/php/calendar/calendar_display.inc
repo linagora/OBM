@@ -245,13 +245,6 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     $sel_group
     </select>
     </fieldset>
-    <fieldset class=\"detail extra\">
-    <legend>
-    $l_group_members
-    </legend>
-    <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"group\" autocomplete=\"off\" />    
-    <input type=\"hidden\" name=\"group_view\" value=\"\" id=\"group_view\" />
-    </fieldset>    
     </form>
 
     <form action=\"calendar_index.php\" method=\"get\">
@@ -280,7 +273,6 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {restriction:'calendar', defaultText:'$user_text'})
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'group_view', 'group', {defaultText:'$group_text', mode:'mono'})
       $resource_js
     });
     </script>    
@@ -1300,7 +1292,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
 function dis_calendar_plain_month_planning($calendar, $calendar_entity) { 
   global $ico_previous,$ico_next;
   global $ccalendar_weekstart, $ico_new_event,$l_all_day;
-  global $ccalendar_first_hour, $ccalendar_last_hour;
+  global $ccalendar_first_hour, $ccalendar_last_hour,$obm;
   global $l_private,$l_daysofweekfirst,$l_daysofweek, $l_previous, $l_next;
 
   $iso_date = $calendar["date"];
@@ -1371,29 +1363,35 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
                 $today_events[] = "<li>$l_private $ad</li>";
               } else {
                 if($category != "") {
-                  $style = "style=\"color:#fff;background-color:rgb(".$cats_color[$category].")\"";
+                  $style = "color:#fff;background-color:rgb(".$cats_color[$category].")";
+                  $day_content .= "<td style=\"border:0;width:auto;height:auto;$style;\"></td>";
                 } else {
                   $style = "";
                 }                
                 if($location != "") {
-                  $today_events[] = "<li $style>".$event->title." ($location) $ad</li>";
+                  $today_events[] = "<li style=\"$style\">".$event->title." ($location) $ad</li>";
                 } else {
-                  $today_events[] = "<li $style>".$event->title." $ad</li>";
+                  $today_events[] = "<li style=\"$style\">".$event->title." $ad</li>";
                 } 
               }
             }            
           }
+          $day_content = "
+            <table style=\"border:0;margin:0;width:100%;height:100%;border:0;border-spacing:0;border-collapse:collapse\">
+            <tr style=\"height:100%;\">$day_content</tr>
+            </tbody>
+            </table>";
           if($haveevent) {
             $hidden_div .= "
-              <div id=\"$id-$this_day\" class=\"infoPopup\" style=\"border: 1px solid black\">
+              <div id=\"$id-$this_day\" class=\"infoPopup\" style=\"border: 1px solid black;\">
                <h1>$day_long_label $this_day</h1>
                <ul>
                ".implode($today_events)."
                </ul>
               </div>";            
-            $line[$line_id] .= "<td class=\"".$properties["class"]."\"
+            $line[$line_id] .= "<td class=\"eventOwner\"
                onmouseover=\"toggleInfo(this,'$id-$this_day',1); return true;\"
-               onmouseout=\"toggleInfo(this,'$id-$this_day',0); return true;\"></td>";
+               onmouseout=\"toggleInfo(this,'$id-$this_day',0); return true;\">$day_content</td>";
           } else {
             $line[$line_id] .= "<td></td>";
           }

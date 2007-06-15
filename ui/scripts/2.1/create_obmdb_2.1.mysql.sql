@@ -711,6 +711,7 @@ CREATE TABLE CalendarCategory1 (
   calendarcategory1_usercreate  int(8) default NULL,
   calendarcategory1_code        varchar(10) default '',
   calendarcategory1_label       varchar(128) default NULL,
+  calendarcategory1_color       char(6),
   PRIMARY KEY (calendarcategory1_id)
 );
 

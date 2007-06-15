@@ -141,8 +141,8 @@ Obm.CalendarDayEvent = new Class({
       onComplete:function() {
         if(obm.calendarManager.redrawLock) {
           this.element.setOpacity(1);
-          obm.calendarManager.moveEventTo(this.element.id,this.element.getLeft(),this.element.getTop());
           obm.calendarManager.unlock();
+          obm.calendarManager.moveEventTo(this.element.id,this.element.getLeft(),this.element.getTop());
         }
       }.bind(this)     
     };   

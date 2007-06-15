@@ -282,3 +282,9 @@ UPDATE UserObmPref SET userobmpref_value = 'd/m/y' WHERE userobmpref_value = 'dm
 ALTER TABLE TimeTask ALTER COLUMN timetask_length TYPE float;
 ALTER TABLE ProjectUser ALTER COLUMN projectuser_projectedtime TYPE float;
 ALTER TABLE ProjectUser ALTER COLUMN projectuser_missingtime TYPE float;
+
+--
+-- UPDATE CalendarCategory Structure
+--
+
+ALTER TABLE CalendarCategory1 ADD COLUMN calendarcategory1_color char(6);

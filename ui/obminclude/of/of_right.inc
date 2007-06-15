@@ -7,59 +7,6 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-function remove_allelements(parentId) {
-  // Remove all elements in the list form
-  target = window.document;
-  container = target.getElementById(parentId)
-  while(container.hasChildNodes()==true){
-    var ChildN=container.childNodes[0];
-    container.removeChild(ChildN);
-  }
-}
-
-
-function show_hide_read_right(field) {
-  // Show/Hide read rights
-  target = window.document;
-  lnk_read = target.getElementById('lnk_accept_read');
-  sel_read = target.getElementById('sel_accept_read');
-  if (field.checked) {
-    remove_allelements('sel_accept_read');
-    lnk_read.style.display = 'none';
-  } else {
-    lnk_read.style.display = 'inline';
-  }
-}
-
-function show_hide_write_right(field) {
-  // Show/Hide write rights 
-  target = window.document;
-  lnk_write = target.getElementById('lnk_accept_write');
-  sel_write = target.getElementById('sel_accept_write');
-  if (field.checked) {
-    remove_allelements('sel_accept_write');
-    lnk_write.style.display = 'none';
-  } else {
-    lnk_write.style.display = 'inline';
-  }
-}
-
-function show_hide_admin_right(field) {
-  // Show/Hide write rights 
-  target = window.document;
-  lnk_admin = target.getElementById('lnk_accept_admin');
-  sel_admin = target.getElementById('sel_accept_admin');
-  if (field.checked) {
-    remove_allelements('sel_accept_admin');
-    lnk_admin.style.display = 'none';
-  } else {
-    lnk_admin.style.display = 'inline';
-  }
-}
-";
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display Rights admin panel
 // Parameters:
@@ -156,11 +103,11 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 
     if ($id == 0) {
       if ($read == 1) {
-        $style_read = "display:none;";
+        $style_read = "visibility:hidden;";
         $public_read_checked = "checked=\"checked\"";
       }
       if ($write == 1) {
-        $style_write = "display:none;";
+        $style_write = "visibility:hidden;";
         $public_write_checked = "checked=\"checked\"";
       }
     } else {
@@ -199,7 +146,8 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     $l_public
     </td>
     <td class=\"detailForm\" id=\"cb_read_public\">
-      <input onchange=\"show_hide_read_right(this)\" onclick=\"show_hide_read_right(this)\" name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
+    <input onchange=\"togglePrivacy(this,'readRightBox');\" onclick=\"togglePrivacy(this,'readRightBox')\"
+    name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
     </td>";
     $block_consumer_read = "
     <td class=\"detailLabel\" id=\"head_accept_read\">
@@ -220,7 +168,8 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     $l_public
     </td>
     <td class=\"detailForm\" id=\"cb_write_public\">
-      <input onchange=\"show_hide_write_right(this)\" onclick=\"show_hide_write_right(this)\" name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked />
+    <input onchange=\"togglePrivacy(this,'writeRightBox');\" onclick=\"togglePrivacy(this,'writeRightBox')\"
+    name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked />
     </td>";
     $block_consumer_write = "
     <td class=\"detailLabel\" id=\"head_accept_write\">
@@ -252,6 +201,15 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     
 
   $block = "
+  <script type=\"text/javascript\">
+    function togglePrivacy(formElement, dataElement) {
+      if(formElement.checked) {
+        $(dataElement).setStyle('visibility','hidden');
+      } else {
+        $(dataElement).setStyle('visibility','');
+      }
+    }
+  </script>
   <form method=\"get\" name=\"f_mod_right\"
     action=\"".url_prepare($_SERVER["PHP_SELF"])."\">
 
@@ -261,7 +219,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   <tr>
     $block_consumer_read_public
   </tr>
-  <tr>
+  <tr style=\"$style_read\" id=\"readRightBox\">
     $block_consumer_read
   </tr>
   </table>
@@ -273,7 +231,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   <tr>
     $block_consumer_write_public
   </tr>
-  <tr>
+  <tr style=\"$style_write\" id=\"writeRightBox\">
     $block_consumer_write
   </tr>
   </table>
@@ -295,9 +253,11 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   </fieldset>
   </form>
   <script type=\"text/javascript\">
-    new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_admin', 'userAdminSearch',{fieldText:'$l_userSearch'});
-    new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_write', 'userWriteSearch',{fieldText:'$l_userSearch'});
-    new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_read', 'userReadSearch',{fieldText:'$l_userSearch'});
+    obm.initialize.chain(function () {
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_admin', 'userAdminSearch');
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_write', 'userWriteSearch');
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_read', 'userReadSearch');
+    });
   </script>
 ";
 
