@@ -21,10 +21,11 @@ sub new {
     my $self = shift;
     my( $incremental ) = @_;
 
-    my %ldapEngineAttr = (
+    my %obmPostfixConfAttr = (
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        links => undef,
         toDelete => undef,
         archive => undef,
         sieve => undef,
@@ -39,13 +40,14 @@ sub new {
     }
 
     # Pas de mode incrémental pour ce type
-    $ldapEngineAttr{"incremental"} = 0;
+    $obmPostfixConfAttr{"incremental"} = 0;
+    $obmPostfixConfAttr{"links"} = 1;
 
-    $ldapEngineAttr{"type"} = $POSTFIXCONF;
-    $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
-    $ldapEngineAttr{"toDelete"} = 0;
+    $obmPostfixConfAttr{"type"} = $POSTFIXCONF;
+    $obmPostfixConfAttr{"typeDesc"} = $attributeDef->{$obmPostfixConfAttr{"type"}};
+    $obmPostfixConfAttr{"toDelete"} = 0;
 
-    bless( \%ldapEngineAttr, $self );
+    bless( \%obmPostfixConfAttr, $self );
 }
 
 

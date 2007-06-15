@@ -20,10 +20,11 @@ sub new {
     my $self = shift;
     my( $incremental, $mailShareId ) = @_;
 
-    my %ldapEngineAttr = (
+    my %obmMailshareAttr = (
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        links => undef,
         toDelete => undef,
         archive => undef,
         sieve => undef,
@@ -41,23 +42,25 @@ sub new {
         return undef;
 
     }else {
-        $ldapEngineAttr{"mailShareId"} = $mailShareId;
+        $obmMailshareAttr{"mailShareId"} = $mailShareId;
 
     }
 
     if( $incremental ) {
-        $ldapEngineAttr{"incremental"} = 1;
+        $obmMailshareAttr{"incremental"} = 1;
+        $obmMailshareAttr{"links"} = 0;
     }else {
-        $ldapEngineAttr{"incremental"} = 0;
+        $obmMailshareAttr{"incremental"} = 0;
+        $obmMailshareAttr{"links"} = 1;
     }
 
-    $ldapEngineAttr{"type"} = $MAILSHARE;
-    $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
-    $ldapEngineAttr{"toDelete"} = 0;
-    $ldapEngineAttr{"archive"} = 0;
-    $ldapEngineAttr{"sieve"} = 0;
+    $obmMailshareAttr{"type"} = $MAILSHARE;
+    $obmMailshareAttr{"typeDesc"} = $attributeDef->{$obmMailshareAttr{"type"}};
+    $obmMailshareAttr{"toDelete"} = 0;
+    $obmMailshareAttr{"archive"} = 0;
+    $obmMailshareAttr{"sieve"} = 0;
 
-    bless( \%ldapEngineAttr, $self );
+    bless( \%obmMailshareAttr, $self );
 }
 
 
@@ -160,7 +163,7 @@ sub getEntity {
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
-    if( !$self->{"incremental"} ) {
+    if( $self->{"links"} ) {
         $self->getEntityLinks( $dbHandler, $domainDesc );
     }
 
@@ -174,6 +177,9 @@ sub getEntityLinks {
     my( $dbHandler, $domainDesc ) = @_;
 
     $self->_getEntityMailShareAcl( $dbHandler, $domainDesc );
+
+    # On précise que les liens de l'entité sont aussi à mettre à jour.
+    $self->{"links"} = 1;
 
     return 1;
 }

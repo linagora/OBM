@@ -64,7 +64,7 @@ sub new {
 
             # On recupere l'id du domaine de l'utilisateur
             my $queryResult;
-            my $query = "SELECT userobm_domain_id FROM P_UserObm WHERE userobm_id=".$loadDbAttr{"user"};
+            my $query = "SELECT userobm_domain_id, userobm_login FROM P_UserObm WHERE userobm_id=".$loadDbAttr{"user"};
             if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
                 &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
                 if( defined($queryResult) ) {
@@ -77,6 +77,7 @@ sub new {
                     return undef;
                 }else {
                     $loadDbAttr{"domain"} = $results->[0]->[0];
+                    $loadDbAttr{"user_name"} = $results->[0]->[1];
                 }
             }
 
@@ -116,15 +117,21 @@ sub new {
     # initialisation des moteurs nécessaires
     if( $OBM::Parameters::common::obmModules->{"ldap"} || $OBM::Parameters::common::obmModules->{"web"} ) {
         $loadDbAttr{"engine"}->{"ldapEngine"} = OBM::Ldap::ldapEngine->new( $loadDbAttr{"domainList"} );
-        $loadDbAttr{"engine"}->{"ldapEngine"}->init();
+        if( !$loadDbAttr{"engine"}->{"ldapEngine"}->init() ) {
+            delete( $loadDbAttr{"engine"}->{"ldapEngine"} );
+        }
     }
 
     if( $OBM::Parameters::common::obmModules->{"mail"} ) {
         $loadDbAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $loadDbAttr{"domainList"} );
-        $loadDbAttr{"engine"}->{"cyrusEngine"}->init();
+        if( !$loadDbAttr{"engine"}->{"cyrusEngine"}->init() ) {
+            delete( $loadDbAttr{"engine"}->{"cyrusEngine"} );
+        }
 
         $loadDbAttr{"engine"}->{"sieveEngine"} = OBM::Cyrus::sieveEngine->new( $loadDbAttr{"domainList"} );
-        $loadDbAttr{"engine"}->{"sieveEngine"}->init();
+        if( !$loadDbAttr{"engine"}->{"sieveEngine"}->init() ) {
+            delete( $loadDbAttr{"engine"}->{"sieveEngine"} );
+        }
     }
 
 
@@ -159,14 +166,15 @@ sub dump {
 
 sub update {
     my $self = shift;
+    my $return = 1;
 
     if( $self->{"all"} ) {
-        $self->_doAll();
+        $return = $self->_doAll();
     }else {
-        $self->_doIncremental();
+        $return = $self->_doIncremental();
     }
 
-    return 1;
+    return $return;
 }
 
 
@@ -174,26 +182,32 @@ sub _doAll {
     my $self = shift;
     my $queryResult;
 
-    if( !defined($self->{"domain"}) ) {
+    if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
         &OBM::toolBox::write_log( "loadDb: pas de domaine indique pour la MAJ totale", "W" );
         return 0;
     }
+    my $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
 
-    # Traitement des entités de type 'utilisateur système'
-    my $query = "SELECT usersystem_id FROM UserSystem";
-    if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
-        return 0;
-    }
 
-    while( my( $systemUserId ) = $queryResult->fetchrow_array() ) {
-        $self->_dosystemUser( 0, $systemUserId );
+    &OBM::toolBox::write_log( "loadDb: MAJ totale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
+
+    if( $self->{"domain"} == 0 ) {
+       # Traitement des entités de type 'utilisateur système'
+       my $query = "SELECT usersystem_id FROM UserSystem";
+        if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+            return 0;
+        }
+
+        while( my( $systemUserId ) = $queryResult->fetchrow_array() ) {
+            $self->_dosystemUser( 0, $systemUserId );
+        }
     }
 
 
     if( $self->{"domain"} != 0 ) {
         # Traitemtent des entités de type 'utilisateur'
-        $query = "SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"};
+        my $query = "SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"};
         if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
             &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
             return 0;
@@ -235,8 +249,178 @@ sub _doAll {
 
 sub _doIncremental {
     my $self = shift;
+    my $return = 1;
+    my $domainDesc;
 
+
+    if( defined($self->{"domain"}) ) {
+        $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
+    }
+
+    my $sqlFilter;
+    if( defined($self->{"user"}) ) {
+        # Si le paramètre utilisateur est indiqué, on fait une MAJ incrémentale par
+        # utilisateur
+        &OBM::toolBox::write_log( "loadDb: MAJ incrementale pour l'utilisateur '".$self->{"user_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        $sqlFilter = "updated_user_id=".$self->{"user"};
+
+    }elsif( defined($self->{"delegation"}) ) {
+        # Si le paramètre délégation est indiqué, on fait une MAJ incrémentale
+        # par délégation
+        &OBM::toolBox::write_log( "loadDb: MAJ incrementale pour la delegation '".$self->{"delegation"}."'", "W" );
+        $sqlFilter = "updated_delegation='".$self->{"delegation"}."'";
     
+    }elsif( defined($self->{"domain"}) ) {
+        # Si le paramètre domaine est indiqué, on fait une MAJ incrémentale
+        # par domaine
+        &OBM::toolBox::write_log( "loadDb: MAJ incrementale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        $sqlFilter = "updated_domain_id='".$self->{"domain"}."'";
+        
+    }
+
+    $return = $self->_incremental( $sqlFilter );
+
+    return $return;
+}
+
+
+sub _incremental {
+    my $self = shift;
+    my( $sqlFilter ) = @_;
+    my $globalReturn = 1;
+
+    if( !defined($sqlFilter) ) {
+        return 0;
+    }
+
+    my $dbHandler = $self->{"dbHandler"};
+    my $queryResult;
+    my $sqlQuery = "SELECT updated_id, updated_table, updated_entity_id, updated_type FROM Updated WHERE ".$sqlFilter;
+    if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+        if( defined($queryResult) ) {
+            &OBM::toolBox::write_log( $queryResult->err, "W" );
+        }
+    }
+
+    while( my( $updatedId, $updatedTable, $updatedEntityId ) = $queryResult->fetchrow_array() ) {
+        if( !defined($updatedId) || !defined($updatedTable) || !defined($updatedEntityId) ) {
+            next;
+        }
+
+        my $return = 1;
+        SWITCH: {
+            if( lc($updatedTable) eq "userobm" ) {
+                $return = $self->_doUser( 1, $updatedEntityId );
+                last SWITCH;
+            }
+
+            next;
+        }
+
+        if( $return ) {
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # travail
+            $return = $self->_updateDbEntity( $updatedTable, $updatedEntityId );
+
+            if( $return ) {
+                # MAJ de la BD de travail ok, on nettoie les tables de MAJ
+                # incrémentales
+                $return = $self->_updateIncrementalTable( "Updated", $updatedId );
+                
+            }
+        }
+
+        if( !$return ) {
+            $globalReturn = 0;
+        }
+    }
+
+print $globalReturn."\n";
+    return $globalReturn;
+}
+
+
+sub _updateDbEntity {
+    my $self = shift;
+    my( $table, $id ) = @_;
+
+    if( !defined($table) ) {
+        return 0;
+    }
+
+    if( !defined($id) || ($id !~ /^\d+$/) )  {
+        return 0;
+    }
+
+
+    # On copie les informations de l'entité de la table de travail vers la table
+    # de production
+    my $dbHandler = $self->{"dbHandler"};
+    my $queryResult;
+    my $query = "SELECT * FROM ".$table." WHERE ".lc($table)."_id=".$id;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+        if( defined($queryResult) ) {
+            &OBM::toolBox::write_log( $queryResult->err, "W" );
+        }
+    }
+
+    while( my $hashResult = $queryResult->fetchrow_hashref() ) {
+        my $updateQuery = "UPDATE P_".$table." SET ";
+
+        my $first = 1;
+        while( my( $key, $value ) = each(%{$hashResult}) ) {
+            if( !$first ) {
+                $updateQuery .= ", ";
+            }
+
+            $updateQuery .= $key."=".$dbHandler->quote($value);
+
+            $first = 0;
+        }
+
+        $updateQuery .= " WHERE ".lc($table)."_id=".$id;
+
+        # On exécute la requête
+        my $updateQueryResult;
+        if( !&OBM::dbUtils::execQuery( $updateQuery, $dbHandler, \$updateQueryResult ) ) {
+            &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+            if( defined($updateQueryResult) ) {
+                &OBM::toolBox::write_log( $updateQueryResult->err, "W" );
+            }
+
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+
+sub _updateIncrementalTable {
+    my $self = shift;
+    my( $table, $id ) = @_;
+
+    if( !defined($table) ) {
+        return 0;
+    }
+
+    if( !defined($id) || ($id !~ /^\d+$/) ) {
+        return 0;
+    }
+
+    my $dbHandler = $self->{"dbHandler"};
+    my $deleteQueryResult;
+    my $query = "DELETE FROM ".$table." WHERE ".lc($table)."_id=".$id;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$deleteQueryResult ) ) {
+        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+        if( defined($deleteQueryResult) ) {
+            &OBM::toolBox::write_log( $deleteQueryResult->err, "W" );
+        }
+
+        return 0;
+    }
 
     return 1;
 }
@@ -265,6 +449,7 @@ sub _findDomainbyId {
 sub _dosystemUser {
     my $self = shift;
     my( $incremental, $systemUserId ) = @_;
+    my $return = 1;
 
     if( !defined($systemUserId) || $systemUserId !~ /^\d+$/ ) {
         return 0;
@@ -276,17 +461,18 @@ sub _dosystemUser {
 
     my $systemUserObject = OBM::Entities::obmSystemUser->new( $incremental, $systemUserId );
     $systemUserObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
-    $self->_runEngines( $systemUserObject );
+    $return = $self->_runEngines( $systemUserObject );
 
-    return 1;
+    return $return;
 }
 
 
 sub _doUser {
     my $self = shift;
     my( $incremental, $userId ) = @_;
+    my $return = 1;
 
-    if( !defined($userId) || $userId !~ /^\d+$/ ) {
+    if( !defined($userId) || ($userId !~ /^\d+$/) ) {
         return 0;
     }
 
@@ -296,15 +482,16 @@ sub _doUser {
 
     my $userObject = OBM::Entities::obmUser->new( $incremental, $userId );
     $userObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
-    $self->_runEngines( $userObject );
+    $return = $self->_runEngines( $userObject );
 
-    return 1;
+    return $return;
 }
 
 
 sub _doGroup {
     my $self = shift;
     my( $incremental, $groupId ) = @_;
+    my $return = 1;
 
     if( !defined($groupId) || $groupId !~ /^\d+$/ ) {
         return 0;
@@ -316,15 +503,16 @@ sub _doGroup {
 
     my $groupObject = OBM::Entities::obmGroup->new( $incremental, $groupId );
     $groupObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
-    $self->_runEngines( $groupObject );
+    $return = $self->_runEngines( $groupObject );
 
-    return 1;
+    return $return;
 }
 
 
 sub _doMailShare {
     my $self =shift;
     my( $incremental, $mailshareId ) = @_;
+    my $return = 1;
 
     if( !defined($mailshareId) || $mailshareId !~ /^\d+$/ ) {
         return 0;
@@ -336,15 +524,16 @@ sub _doMailShare {
 
     my $mailShareObject = OBM::Entities::obmMailshare->new( $incremental, $mailshareId );
     $mailShareObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
-    $self->_runEngines( $mailShareObject );
+    $return = $self->_runEngines( $mailShareObject );
 
-    return 1;
+    return $return;
 }
 
 
 sub _doPostfixConf {
     my $self = shift;
     my( $incremental ) = 0;
+    my $return = 1;
 
     if( !defined($incremental) ) {
         $incremental = 0;
@@ -352,24 +541,25 @@ sub _doPostfixConf {
 
     my $postfixConfObject = OBM::Entities::obmPostfixConf->new( $incremental );
     $postfixConfObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
-    $self->_runEngines( $postfixConfObject );
+    $return = $self->_runEngines( $postfixConfObject );
 
-    return 1;
+    return $return;
 }
 
 
 sub _runEngines {
     my $self = shift;
     my( $object ) = @_;
+    my $return = 1;
 
     if( !defined($object) ) {
         return 0;
     }
 
     my $engines = $self->{"engine"};
-    while( my( $engineType, $engine ) = each(%{$engines}) ) {
-        $engine->update( $object );
+    while( (my( $engineType, $engine ) = each(%{$engines})) && $return ) {
+        $return = $engine->update( $object );
     }
 
-    return 1;
+    return $return;
 }

@@ -22,10 +22,11 @@ sub new {
     my $self = shift;
     my( $incremental, $userId ) = @_;
 
-    my %ldapEngineAttr = (
+    my %obmUserAttr = (
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        links => undef,
         toDelete => undef,
         archive => undef,
         sieve => undef,
@@ -43,22 +44,24 @@ sub new {
         return undef;
 
     }else {
-        $ldapEngineAttr{"userId"} = $userId;
+        $obmUserAttr{"userId"} = $userId;
     }
 
     if( $incremental ) {
-        $ldapEngineAttr{"incremental"} = 1;
+        $obmUserAttr{"incremental"} = 1;
+        $obmUserAttr{"links"} = 0;
     }else {
-        $ldapEngineAttr{"incremental"} = 0;
+        $obmUserAttr{"incremental"} = 0;
+        $obmUserAttr{"links"} = 1;
     }
 
-    $ldapEngineAttr{"type"} = $POSIXUSERS;
-    $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
-    $ldapEngineAttr{"toDelete"} = 0;
-    $ldapEngineAttr{"archive"} = 0;
-    $ldapEngineAttr{"sieve"} = 1;
+    $obmUserAttr{"type"} = $POSIXUSERS;
+    $obmUserAttr{"typeDesc"} = $attributeDef->{$obmUserAttr{"type"}};
+    $obmUserAttr{"toDelete"} = 0;
+    $obmUserAttr{"archive"} = 0;
+    $obmUserAttr{"sieve"} = 1;
 
-    bless( \%ldapEngineAttr, $self );
+    bless( \%obmUserAttr, $self );
 }
 
 
@@ -239,7 +242,7 @@ sub getEntity {
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
-    if( !$self->isIncremental() ) {
+    if( $self->{"links"} ) {
         $self->getEntityLinks( $dbHandler, $domainDesc );
     }
 
@@ -284,9 +287,8 @@ sub getEntityLinks {
 
     $self->_getEntityMailboxAcl( $dbHandler, $domainDesc );
 
-    # Du moment qu'on charge les liens de l'entité, cette entité n'est plus en
-    # mode incrémental
-    $self->{"incremental"} = 0;
+    # On précise que les liens de l'entité sont aussi à mettre à jour.
+    $self->{"links"} = 1;
 
     return 1;
 }

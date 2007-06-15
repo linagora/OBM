@@ -22,10 +22,11 @@ sub new {
     my $self = shift;
     my( $incremental, $userId ) = @_;
 
-    my %ldapEngineAttr = (
+    my %obmSystemUserAttr = (
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        links => undef,
         toDelete => undef,
         archive => undef,
         sieve => undef,
@@ -43,19 +44,20 @@ sub new {
         return undef;
 
     }else {
-        $ldapEngineAttr{"userId"} = $userId;
+        $obmSystemUserAttr{"userId"} = $userId;
     }
 
     # Pas de mode incrémental pour ce type
-    $ldapEngineAttr{"incremental"} = 0;
+    $obmSystemUserAttr{"incremental"} = 0;
+    $obmSystemUserAttr{"links"} = 1;
 
-    $ldapEngineAttr{"type"} = $SYSTEMUSERS;
-    $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
-    $ldapEngineAttr{"toDelete"} = 0;
-    $ldapEngineAttr{"archive"} = 0;
-    $ldapEngineAttr{"sieve"} = 0;
+    $obmSystemUserAttr{"type"} = $SYSTEMUSERS;
+    $obmSystemUserAttr{"typeDesc"} = $attributeDef->{$obmSystemUserAttr{"type"}};
+    $obmSystemUserAttr{"toDelete"} = 0;
+    $obmSystemUserAttr{"archive"} = 0;
+    $obmSystemUserAttr{"sieve"} = 0;
 
-    bless( \%ldapEngineAttr, $self );
+    bless( \%obmSystemUserAttr, $self );
 }
 
 

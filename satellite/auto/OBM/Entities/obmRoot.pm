@@ -23,17 +23,16 @@ sub new {
         type => undef,
         typeDesc => undef,
         incremental => undef,
+        links => undef,
         toDelete => undef,
         domainId => undef,
         rootDesc => undef
     );
 
 
-    if( $incremental ) {
-        $ldapEngineAttr{"incremental"} = 1;
-    }else {
-        $ldapEngineAttr{"incremental"} = 0;
-    }
+    # Pas de mode incrémental pour ce type
+    $ldapEngineAttr{"incremental"} = 0;
+    $ldapEngineAttr{"links"} = 1;
 
     $ldapEngineAttr{"type"} = $ROOT;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
