@@ -511,7 +511,11 @@ sub update {
         return 0;
     }
 
-    my $objectDn = $object->getLdapDnPrefix().",".$parentDn;
+    my $ldapPrefix = $object->getLdapDnPrefix();
+    if( !defined($ldapPrefix) ) {
+        return 0;
+    }
+    my $objectDn = $ldapPrefix.",".$parentDn;
 
     return $self->_doWork( $objectDn, $object );
 }

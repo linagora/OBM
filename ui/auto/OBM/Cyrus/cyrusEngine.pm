@@ -235,27 +235,30 @@ sub _doWork {
 
     }elsif( $isExist && $object->getDelete() ) {
         # On la supprime
-        &OBM::toolBox::write_log( "cyrusEngine: suppression de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
-        if( !$self->_deleteBox( $cyrusSrv, $object ) ) {
+        if( $self->_deleteBox( $cyrusSrv, $object ) ) {
+            &OBM::toolBox::write_log( "cyrusEngine: suppression de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+        }else {
             &OBM::toolBox::write_log( "cyrusEngine: echec lors de la suppression de la boite", "W" );
         }
 
     }elsif( $isExist && !$object->getDelete() ) {  
         # On met à jour
-        &OBM::toolBox::write_log( "cyrusEngine: MAJ de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
-        if( !$self->_updateBox( $cyrusSrv, $object ) ) {
+        if( $self->_updateBox( $cyrusSrv, $object ) ) {
+            &OBM::toolBox::write_log( "cyrusEngine: MAJ de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+        }else {
             &OBM::toolBox::write_log( "cyrusEngine: echec lors de la MAJ de la boite", "W" );
         }
 
     }elsif( !$isExist && !$object->getDelete() ) {
         # On la cré
-        &OBM::toolBox::write_log( "cyrusEngine: creation de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
-
-        if( !$self->_createMailbox( $cyrusSrv, $object ) ) {
+        if( $self->_createMailbox( $cyrusSrv, $object ) ) {
+            &OBM::toolBox::write_log( "cyrusEngine: creation de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+        }else {
             &OBM::toolBox::write_log( "cyrusEngine: echec lors de la creation de la boite", "W" );
         }
 
     }
+
 
     return 1;
 }
@@ -614,7 +617,7 @@ sub _updateBox {
     }
 
     # Uniquement en mode non incrémental
-    if( !$object->isIncremental() ) {
+    if( !$object->isLinks() ) {
         # Positionnement des ACL
         if( !$self->_imapSetMailboxAcls( $cyrusSrv, $object ) ) {
             return 0;

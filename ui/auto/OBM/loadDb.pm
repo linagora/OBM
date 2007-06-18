@@ -70,6 +70,8 @@ sub new {
                 if( defined($queryResult) ) {
                     &OBM::toolBox::write_log( $queryResult->err, "W" );
                 }
+
+                return 0;
             }else {
                 my $results = $queryResult->fetchall_arrayref();
                 if( $#$results != 0 ) {
@@ -200,7 +202,7 @@ sub _doAll {
         }
 
         while( my( $systemUserId ) = $queryResult->fetchrow_array() ) {
-            $self->_dosystemUser( 0, $systemUserId );
+            $self->_doSystemUser( 0, 0, $systemUserId );
         }
     }
 
@@ -214,7 +216,7 @@ sub _doAll {
         }
 
         while( my( $userId ) = $queryResult->fetchrow_array() ) {
-            $self->_doUser( 0, $userId );
+            $self->_doUser( 0, 0, $userId );
         }
 
         # Traitement des entités de type 'groupe'
@@ -225,7 +227,7 @@ sub _doAll {
         }
 
         while( my( $groupId ) = $queryResult->fetchrow_array() ) {
-            $self->_doGroup( 0, $groupId );
+            $self->_doGroup( 0, 0, $groupId );
         }
 
         # Traitement des entités de type 'mailshare'
@@ -236,11 +238,11 @@ sub _doAll {
         }
 
         while( my( $mailshareId ) = $queryResult->fetchrow_array() ) {
-            $self->_doMailShare( 0, $mailshareId );
+            $self->_doMailShare( 0, 0, $mailshareId );
         }
 
         # Traitement des entités de type 'postfixConf'
-        $self->_doPostfixConf( 0 );
+        $self->_doPostfixConf( 0, 0 );
     }
 
     return 1;
@@ -257,50 +259,62 @@ sub _doIncremental {
         $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
     }
 
-    my $sqlFilter;
+    my %sqlFilter;
     if( defined($self->{"user"}) ) {
         # Si le paramètre utilisateur est indiqué, on fait une MAJ incrémentale par
         # utilisateur
         &OBM::toolBox::write_log( "loadDb: MAJ incrementale pour l'utilisateur '".$self->{"user_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
-        $sqlFilter = "updated_user_id=".$self->{"user"};
+        $sqlFilter{"updated"} = "updated_user_id=".$self->{"user"};
+        $sqlFilter{"deleted"} = "deleted_user_id=".$self->{"user"};
 
     }elsif( defined($self->{"delegation"}) ) {
         # Si le paramètre délégation est indiqué, on fait une MAJ incrémentale
         # par délégation
         &OBM::toolBox::write_log( "loadDb: MAJ incrementale pour la delegation '".$self->{"delegation"}."'", "W" );
-        $sqlFilter = "updated_delegation='".$self->{"delegation"}."'";
+        $sqlFilter{"updated"} = "updated_delegation='".$self->{"delegation"}."'";
+        $sqlFilter{"deleted"} = "deleted_delegation=".$self->{"user"};
     
     }elsif( defined($self->{"domain"}) ) {
         # Si le paramètre domaine est indiqué, on fait une MAJ incrémentale
         # par domaine
         &OBM::toolBox::write_log( "loadDb: MAJ incrementale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
-        $sqlFilter = "updated_domain_id='".$self->{"domain"}."'";
+        $sqlFilter{"updated"} = "updated_domain_id='".$self->{"domain"}."'";
+        $sqlFilter{"deleted"} = "deleted_domain_id=".$self->{"user"};
         
+    }else {
+        return 0;
     }
 
-    $return = $self->_incremental( $sqlFilter );
+    # Mises à jour
+    $return = $return && $self->_incrementalUpdate( $sqlFilter{"updated"} );
+    # Suppression
+    $return = $return && $self->_incrementalDelete( $sqlFilter{"deleted"} );
+
 
     return $return;
 }
 
 
-sub _incremental {
+sub _incrementalUpdate {
     my $self = shift;
     my( $sqlFilter ) = @_;
     my $globalReturn = 1;
 
-    if( !defined($sqlFilter) ) {
-        return 0;
-    }
 
     my $dbHandler = $self->{"dbHandler"};
     my $queryResult;
-    my $sqlQuery = "SELECT updated_id, updated_table, updated_entity_id, updated_type FROM Updated WHERE ".$sqlFilter;
+    my $sqlQuery = "SELECT updated_id, updated_table, updated_entity_id, updated_type FROM Updated";
+    if( defined($sqlFilter) ) {
+        $sqlQuery .= " WHERE ".$sqlFilter;
+    }
+
     if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
         if( defined($queryResult) ) {
             &OBM::toolBox::write_log( $queryResult->err, "W" );
         }
+
+        return 0;
     }
 
     while( my( $updatedId, $updatedTable, $updatedEntityId ) = $queryResult->fetchrow_array() ) {
@@ -311,7 +325,17 @@ sub _incremental {
         my $return = 1;
         SWITCH: {
             if( lc($updatedTable) eq "userobm" ) {
-                $return = $self->_doUser( 1, $updatedEntityId );
+                $return = $self->_doUser( 1, 0, $updatedEntityId );
+                last SWITCH;
+            }
+
+            if( lc($updatedTable) eq "ugroup" ) {
+                $return = $self->_doGroup( 1, 0, $updatedEntityId );
+                last SWITCH;
+            }
+
+            if( lc($updatedTable) eq "mailshare" ) {
+                $return = $self->_doMailShare( 1, 0, $updatedEntityId );
                 last SWITCH;
             }
 
@@ -336,9 +360,77 @@ sub _incremental {
         }
     }
 
-print $globalReturn."\n";
     return $globalReturn;
 }
+
+
+sub _incrementalDelete {
+    my $self = shift;
+    my( $sqlFilter ) = @_;
+    my $globalReturn = 1;
+
+
+    my $dbHandler = $self->{"dbHandler"};
+    my $queryResult;
+    my $sqlQuery = "SELECT deleted_id, deleted_table, deleted_entity_id FROM Deleted";
+    if( defined($sqlFilter) ) {
+        $sqlQuery .= " WHERE ".$sqlFilter;
+    }
+
+    if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+        if( defined($queryResult) ) {
+            &OBM::toolBox::write_log( $queryResult->err, "W" );
+        }
+
+        return 0;
+    }
+
+    while( my( $deletedId, $deletedTable, $deletedEntityId ) = $queryResult->fetchrow_array() ) {
+        if( !defined($deletedId) || !defined($deletedTable) || !defined($deletedEntityId) ) {
+            next;
+        }
+
+        my $return = 1;
+        SWITCH: {
+            if( lc($deletedTable) eq "userobm" ) {
+                $return = $self->_doUser( 1, 1, $deletedEntityId );
+                last SWITCH;
+            }
+
+            if( lc($deletedTable) eq "ugroup" ) {
+                $return = $self->_doGroup( 1, 1, $deletedEntityId );
+                last SWITCH;
+            }
+
+            if( lc($deletedTable) eq "mailshare" ) {
+                $return = $self->_doMailShare( 1, 1, $deletedEntityId );
+                last SWITCH;
+            }
+
+            next;
+        }
+
+        if( $return ) {
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # travail
+            $return = $self->_deleteDbEntity( $deletedTable, $deletedEntityId );
+
+            if( $return ) {
+                # MAJ de la BD de travail ok, on nettoie les tables de MAJ
+                # incrémentales
+                $return = $self->_updateIncrementalTable( "Deleted", $deletedId );
+                
+            }
+        }
+
+        if( !$return ) {
+            $globalReturn = 0;
+        }
+    }
+
+    return $globalReturn;
+ }
 
 
 sub _updateDbEntity {
@@ -354,16 +446,22 @@ sub _updateDbEntity {
     }
 
 
+    # Gestion des ecxeptions
+    my $columnPrefix = $self->_tableNamePrefix( $table );
+
+
     # On copie les informations de l'entité de la table de travail vers la table
     # de production
     my $dbHandler = $self->{"dbHandler"};
     my $queryResult;
-    my $query = "SELECT * FROM ".$table." WHERE ".lc($table)."_id=".$id;
+    my $query = "SELECT * FROM ".$table." WHERE ".$columnPrefix."_id=".$id;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
         if( defined($queryResult) ) {
             &OBM::toolBox::write_log( $queryResult->err, "W" );
         }
+
+        return 0;
     }
 
     while( my $hashResult = $queryResult->fetchrow_hashref() ) {
@@ -380,7 +478,7 @@ sub _updateDbEntity {
             $first = 0;
         }
 
-        $updateQuery .= " WHERE ".lc($table)."_id=".$id;
+        $updateQuery .= " WHERE ".$columnPrefix."_id=".$id;
 
         # On exécute la requête
         my $updateQueryResult;
@@ -398,6 +496,52 @@ sub _updateDbEntity {
 }
 
 
+sub _deleteDbEntity {
+    my $self = shift;
+    my ( $table, $id ) = @_;
+
+    if( !defined($table) ) {
+        return 0;
+    }
+
+    if( !defined($id) || ($id !~ /^\d+$/) )  {
+        return 0;
+    }
+
+
+    # Gestion des ecxeptions
+    my $columnPrefix = $self->_tableNamePrefix( $table );
+
+
+    # On supprime les informations de l'entité de la table de travail
+    my $dbHandler = $self->{"dbHandler"};
+    my $queryResult;
+    my $query = "DELETE FROM ".$table." WHERE ".$columnPrefix."_id=".$id;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+        if( defined($queryResult) ) {
+            &OBM::toolBox::write_log( $queryResult->err, "W" );
+        }
+
+        return 0;
+    }
+
+    # et de la table de production
+    $query = "DELETE FROM P_".$table." WHERE ".$columnPrefix."_id=".$id;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+        if( defined($queryResult) ) {
+            &OBM::toolBox::write_log( $queryResult->err, "W" );
+        }
+
+        return 0;
+    }
+
+
+    return 1;
+}
+
+
 sub _updateIncrementalTable {
     my $self = shift;
     my( $table, $id ) = @_;
@@ -409,6 +553,7 @@ sub _updateIncrementalTable {
     if( !defined($id) || ($id !~ /^\d+$/) ) {
         return 0;
     }
+
 
     my $dbHandler = $self->{"dbHandler"};
     my $deleteQueryResult;
@@ -446,9 +591,9 @@ sub _findDomainbyId {
 }
 
 
-sub _dosystemUser {
+sub _doSystemUser {
     my $self = shift;
-    my( $incremental, $systemUserId ) = @_;
+    my( $incremental, $delete, $systemUserId ) = @_;
     my $return = 1;
 
     if( !defined($systemUserId) || $systemUserId !~ /^\d+$/ ) {
@@ -460,8 +605,17 @@ sub _dosystemUser {
     }
 
     my $systemUserObject = OBM::Entities::obmSystemUser->new( $incremental, $systemUserId );
-    $systemUserObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
-    $return = $self->_runEngines( $systemUserObject );
+    $return = $systemUserObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    if( $return ) {
+        if( $delete ) {
+            $systemUserObject->setDelete();
+        }
+
+        $return = $self->_runEngines( $systemUserObject );
+    }else {
+        $return = 1;
+    }
+
 
     return $return;
 }
@@ -469,7 +623,7 @@ sub _dosystemUser {
 
 sub _doUser {
     my $self = shift;
-    my( $incremental, $userId ) = @_;
+    my( $incremental, $delete, $userId ) = @_;
     my $return = 1;
 
     if( !defined($userId) || ($userId !~ /^\d+$/) ) {
@@ -481,8 +635,16 @@ sub _doUser {
     }
 
     my $userObject = OBM::Entities::obmUser->new( $incremental, $userId );
-    $userObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
-    $return = $self->_runEngines( $userObject );
+    $return = $userObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    if( $return ) {
+        if( $delete ) {
+            $userObject->setDelete();
+        }
+
+        $return = $self->_runEngines( $userObject );
+    }else {
+        $return = 1;
+    }
 
     return $return;
 }
@@ -490,7 +652,7 @@ sub _doUser {
 
 sub _doGroup {
     my $self = shift;
-    my( $incremental, $groupId ) = @_;
+    my( $incremental, $delete, $groupId ) = @_;
     my $return = 1;
 
     if( !defined($groupId) || $groupId !~ /^\d+$/ ) {
@@ -502,8 +664,16 @@ sub _doGroup {
     }
 
     my $groupObject = OBM::Entities::obmGroup->new( $incremental, $groupId );
-    $groupObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
-    $return = $self->_runEngines( $groupObject );
+    $return = $groupObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    if( $return ) {
+        if( $delete ) {
+            $groupObject->setDelete();
+        }
+
+        $return = $self->_runEngines( $groupObject );
+    }else {
+        $return = 1;
+    }
 
     return $return;
 }
@@ -511,7 +681,7 @@ sub _doGroup {
 
 sub _doMailShare {
     my $self =shift;
-    my( $incremental, $mailshareId ) = @_;
+    my( $incremental, $delete, $mailshareId ) = @_;
     my $return = 1;
 
     if( !defined($mailshareId) || $mailshareId !~ /^\d+$/ ) {
@@ -523,8 +693,16 @@ sub _doMailShare {
     }
 
     my $mailShareObject = OBM::Entities::obmMailshare->new( $incremental, $mailshareId );
-    $mailShareObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
-    $return = $self->_runEngines( $mailShareObject );
+    $return = $mailShareObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    if( $return ) {
+        if( $delete ) {
+            $mailShareObject->setDelete();
+        }
+
+        $return = $self->_runEngines( $mailShareObject );
+    }else {
+        $return = 1;
+    }
 
     return $return;
 }
@@ -532,7 +710,7 @@ sub _doMailShare {
 
 sub _doPostfixConf {
     my $self = shift;
-    my( $incremental ) = 0;
+    my( $incremental, $delete ) = 0;
     my $return = 1;
 
     if( !defined($incremental) ) {
@@ -541,7 +719,15 @@ sub _doPostfixConf {
 
     my $postfixConfObject = OBM::Entities::obmPostfixConf->new( $incremental );
     $postfixConfObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
-    $return = $self->_runEngines( $postfixConfObject );
+    if( $return ) {
+        if( $delete ) {
+            $postfixConfObject->setDelete();
+        }
+
+        $return = $self->_runEngines( $postfixConfObject );
+    }else {
+        $return = 1;
+    }
 
     return $return;
 }
@@ -561,5 +747,24 @@ sub _runEngines {
         $return = $engine->update( $object );
     }
 
+    if( !$return ) {
+        keys(%{$engines});
+    }
+
     return $return;
+}
+
+
+sub _tableNamePrefix {
+    my $self = shift;
+    my( $table ) = @_;
+    my $columnPrefix;
+
+    if( lc($table) eq "ugroup" ) {
+        $columnPrefix = "group";
+    }else {
+        $columnPrefix = lc($table);
+    }
+
+    return $columnPrefix;
 }

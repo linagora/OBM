@@ -162,7 +162,7 @@ DELETE FROM MailShare;
 INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare00', 'Répertoire partagé de test 00, appartenant au domaine 1', 'mailshare00');
 
 -- Appartenant au domaine 1
-INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 2'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare01', 'Répertoire partagé de test 01, appartenant au domaine 2', 'mailshare01');
+INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare01', 'Répertoire partagé de test 01, appartenant au domaine 2', 'mailshare01');
 
 -------------------------------------------------------------------------------
 -- Remplissage de la table 'Samba' : Création d'un domaine windows
@@ -182,3 +182,4 @@ INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( 1, 'samb
 DELETE FROM EntityRight;
 
 INSERT INTO EntityRight ( entityright_entity, entityright_entity_id, entityright_consumer, entityright_consumer_id, entityright_read, entityright_write, entityright_admin ) VALUES ( 'mailshare', (SELECT mailshare_id FROM MailShare WHERE mailshare_name='mailShare00'), 'user', (SELECT userobm_id FROM UserObm WHERE userobm_login='admin1'), 0, 0, 1 );
+INSERT INTO EntityRight ( entityright_entity, entityright_entity_id, entityright_consumer, entityright_consumer_id, entityright_read, entityright_write, entityright_admin ) VALUES ( 'mailshare', (SELECT mailshare_id FROM MailShare WHERE mailshare_name='mailShare01'), 'user', (SELECT userobm_id FROM UserObm WHERE userobm_login='admin1'), 0, 0, 1 );
