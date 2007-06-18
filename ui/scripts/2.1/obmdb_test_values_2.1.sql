@@ -29,6 +29,10 @@ VALUES (
   'aliasource.fr');
 
 
+-- Fill the initial update_state for each Domain
+INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) SELECT domain_id, 'update_state', 1 FROM Domain;
+
+
 -------------------------------------------------------------------------------
 -- Test : User
 -------------------------------------------------------------------------------
