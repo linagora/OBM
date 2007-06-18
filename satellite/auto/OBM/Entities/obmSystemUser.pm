@@ -87,7 +87,7 @@ sub getEntity {
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "obmSystemUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-        return undef;
+        return 0;
     }
 
     my( $numRows ) = $queryResult->fetchrow_array();
@@ -95,10 +95,10 @@ sub getEntity {
 
     if( $numRows == 0 ) {
         &OBM::toolBox::write_log( "obmSystemUser: pas d'utilisateur d'identifiant : ".$userId, "W" );
-        return undef;
+        return 0;
     }elsif( $numRows > 1 ) {
         &OBM::toolBox::write_log( "obmSystemUser: plusieurs utilisateurs d'identifiant : ".$userId." ???", "W" );
-        return undef;
+        return 0;
     }
 
 
@@ -108,7 +108,7 @@ sub getEntity {
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "obmSystemUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-        return undef;
+        return 0;
     }
 
     # On range les resultats dans la structure de donnees des resultats
@@ -167,6 +167,13 @@ sub isIncremental {
     my $self = shift;
 
     return $self->{"incremental"};
+}
+
+
+sub isLinks {
+    my $self = shift;
+
+    return $self->{"links"};
 }
 
 

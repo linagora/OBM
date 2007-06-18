@@ -118,6 +118,13 @@ sub isIncremental {
 }
 
 
+sub isLinks {
+    my $self = shift;
+
+    return $self->{"links"};
+}
+
+
 sub getEntityLinks {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
