@@ -645,11 +645,12 @@ if ($path == "") {
 //   - $debug (opt) : debug flag required
 ///////////////////////////////////////////////////////////////////////////////
 function display_debug_msg($msg, $debug=0, $function_name="") {
-  global $global_dis_debug_msg;
+  global $global_dis_debug_msg,$cdg_exe;
 
   if (($_SESSION['set_debug'] > 0) && (($_SESSION['set_debug'] & $debug) == $debug)) {
     $global_dis_debug_msg .= "<b>$function_name</b> : $msg<hr />";
   }
+
   return $global_dis_debug_msg;
 }  
 

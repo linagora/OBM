@@ -1175,9 +1175,9 @@ function display_end() {
 function display_debug() {
   global $l_dg_sql, $l_dg_param, $l_dg_sess,$global_dis_debug_custom;
   global $global_dis_debug_msg, $global_dis_debug_param, $dis_session;
-  global $cdg_param, $cdg_sql, $cdg_sess;
+  global $cdg_param, $cdg_sql, $cdg_exe, $cdg_sess;
 
-  if (debug_level_isset($cdg_sql)) {
+  if (debug_level_isset($cdg_sql) || debug_level_isset($cdg_exe)) {
     $dis_debug_sql = "
       <h1>$l_dg_sql</h1>
       $global_dis_debug_msg";
