@@ -17,7 +17,7 @@ public abstract class ObmManager {
 	protected boolean syncReceived = false;
 	
 	protected String restrictTest = "";
-	protected int restrictions = 1; //default restrict private
+	protected int restrictions = Helper.RESTRICTS_DEFAULT;
 	
 	public abstract void initRestriction(int restrictions);
 

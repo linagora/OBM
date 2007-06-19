@@ -47,7 +47,10 @@ public class CalendarManager extends ObmManager {
 	}
 	
 	public void initRestriction(int restrictions) {
-		this.restrictions = restrictions | Helper.RESTRICT_REFUSED;
+		this.restrictions = restrictions;
+		if (log.isTraceEnabled()) {
+			log.trace(" init restrictions: "+restrictions);
+		}
 	}
 	
 	public String getCalendar() {
@@ -311,21 +314,14 @@ public class CalendarManager extends ObmManager {
 		String[] deleted = new String[0];
 		if (sync.getRemoved() != null) deleted = sync.getRemoved(); 
 		
-		//apply restriction(s)
+		//remove refused events and private events
 		updatedRest = new HashMap();
 		deletedRest = new ArrayList();
-		String owner = "";
 		String user = token.getUser();
 		
 		for (int i=0 ; i < updated.length ; i++) {
-			owner = Helper.nullToEmptyString(updated[i].getOwner());
-			if ( ( ((restrictions & Helper.RESTRICT_PRIVATE) == Helper.RESTRICT_PRIVATE)
-				    && (updated[i].getClassification() == 1 && !calendar.equals(user)) )
-			  || ( ((restrictions & Helper.RESTRICT_OWNER) == Helper.RESTRICT_OWNER)
-					&& (!owner.equals(user)) )
-			  || ( ((restrictions & Helper.RESTRICT_REFUSED) == Helper.RESTRICT_REFUSED)
-			  		&& (CalendarHelper.isUserRefused(userEmail,updated[i].getAttendees()))) )
-			{
+			if ( updated[i].getClassification() == 1 && !calendar.equals(user)
+			  || (CalendarHelper.isUserRefused(userEmail,updated[i].getAttendees()))){
 				if (d != null) {
 					deletedRest.add(  (""+updated[i].getUid()) );
 				}

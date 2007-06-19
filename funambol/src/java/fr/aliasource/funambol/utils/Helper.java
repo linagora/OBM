@@ -14,6 +14,10 @@ public class Helper {
 	public static final int RESTRICT_PRIVATE = 1;
 	public static final int RESTRICT_OWNER 	= 2;
 	public static final int RESTRICT_REFUSED = 4;
+	public static final int RESTRICT_PUBLIC_R = 8;
+	public static final int RESTRICT_PUBLIC_W = 16;
+	
+	public static final int RESTRICTS_DEFAULT = 1;
 	
 	public Helper() {
 		super();

@@ -81,10 +81,12 @@ public class ObmSyncSourceConfigPanel
     private JComboBox	typeValue		= new JComboBox() ;
     private JLabel		sourceUriLabel	= new JLabel() ;
     private JTextField	sourceUriValue	= new JTextField() ;
-    private JLabel		restrictPrivateLabel	= new JLabel() ;
-    private JCheckBox	restrictPrivateValue	= new JCheckBox();
-    private JLabel		restrictOwnerLabel		= new JLabel() ;
-    private	JCheckBox	restrictOwnerValue		= new JCheckBox(); 
+    private JLabel		restrictPrivateLabel = new JLabel() ;
+    private JCheckBox	restrictPrivateValue = new JCheckBox();
+    private JLabel		restrictPublicRLabel = new JLabel() ;
+    private	JCheckBox	restrictPublicRValue = new JCheckBox();
+    private JLabel		restrictPublicWLabel = new JLabel() ;
+    private	JCheckBox	restrictPublicWValue = new JCheckBox(); 
     private JLabel		obmAddressLabel	= new JLabel();
     private JTextField	obmAddressValue = new JTextField();
     
@@ -108,97 +110,106 @@ public class ObmSyncSourceConfigPanel
      * @throws Exception if error occures during creation of the panel
      */
     private void init(){
-        // set layout
-        this.setLayout(null);
+		// set layout
+		this.setLayout(null);
+		
+		// set properties of label, position and border
+		//  referred to the title of the panel
+		titledBorder1 = new TitledBorder("");
+		
+		panelName.setFont(titlePanelFont);
+		panelName.setText("Edit OBM SyncSource");
+		panelName.setBounds(new Rectangle(14, 5, 316, 28));
+		panelName.setAlignmentX(SwingConstants.CENTER);
+		panelName.setBorder(titledBorder1);
+		
+		sourceUriLabel.setText("Source URI: ");
+		sourceUriLabel.setFont(defaultFont);
+		sourceUriLabel.setBounds(new Rectangle(14, 60, 150, 18));
+		sourceUriValue.setFont(defaultFont);
+		sourceUriValue.setBounds(new Rectangle(170, 60, 350, 18));
+		
+		nameLabel.setText("Name: ");
+		nameLabel.setFont(defaultFont);
+		nameLabel.setBounds(new Rectangle(14, 90, 150, 18));
+		nameValue.setFont(defaultFont);
+		nameValue.setBounds(new Rectangle(170, 90, 350, 18));
+		
+		typeLabel.setText("Type: ");
+		typeLabel.setFont(defaultFont);
+		typeLabel.setBounds(new Rectangle(14, 120, 150, 18));
+		typeValue.setFont(defaultFont);
+		typeValue.setBounds(new Rectangle(170, 120, 350, 18));
+		
+		
+		obmAddressLabel.setText("Obm-Sync address: ");
+		obmAddressLabel.setFont(defaultFont);
+		obmAddressLabel.setBounds(new Rectangle(14, 150, 150, 18));
+		obmAddressValue.setFont(defaultFont);
+		obmAddressValue.setBounds(new Rectangle(170, 150, 350, 18));
+		
+		
+		restrictPrivateLabel.setText("Sync private: ");
+		restrictPrivateLabel.setFont(defaultFont);
+		restrictPrivateLabel.setBounds(new Rectangle(12,180,150,18));
+		restrictPrivateValue.setFont(defaultFont);
+		restrictPrivateValue.setBounds(new Rectangle(170,180,350,18));
+	
+		restrictPublicRLabel.setText("Sync public in read mode: ");
+	    restrictPublicRLabel.setFont(defaultFont);
+	    restrictPublicRLabel.setBounds(new Rectangle(12,210,150,18));
+	    restrictPublicRValue.setFont(defaultFont);
+	    restrictPublicRValue.setBounds(new Rectangle(170,210,350,18));
+	   
+	   
+	    restrictPublicWLabel.setText("Sync public in write mode: ");
+	    restrictPublicWLabel.setFont(defaultFont);
+	    restrictPublicWLabel.setBounds(new Rectangle(12,240,150,18));
+	    restrictPublicWValue.setFont(defaultFont);
+	    restrictPublicWValue.setBounds(new Rectangle(170,240,350,18));
+		
+	    
+	    confirmButton.setFont(defaultFont);
+	    confirmButton.setText("Add");
+		confirmButton.setBounds(170, 350, 70, 25);
 
-        // set properties of label, position and border
-        //  referred to the title of the panel
-        titledBorder1 = new TitledBorder("");
+		confirmButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent event ) {
+		        try {
+		            validateValues();
+		            getValues();
+		            if (getState() == STATE_INSERT) {
+		                ObmSyncSourceConfigPanel.this.actionPerformed(new ActionEvent(ObmSyncSourceConfigPanel.this, ACTION_EVENT_INSERT, event.getActionCommand()));
+		            } else {
+		                ObmSyncSourceConfigPanel.this.actionPerformed(new ActionEvent(ObmSyncSourceConfigPanel.this, ACTION_EVENT_UPDATE, event.getActionCommand()));
+		            }
+		        } catch (Exception e) {
+		            notifyError(new AdminException(e.getMessage()));
+		        }
+		    }
+		});
 
-        panelName.setFont(titlePanelFont);
-        panelName.setText("Edit OBM SyncSource");
-        panelName.setBounds(new Rectangle(14, 5, 316, 28));
-        panelName.setAlignmentX(SwingConstants.CENTER);
-        panelName.setBorder(titledBorder1);
+		// add all components to the panel
+		this.add(panelName      , null);
+		this.add(nameLabel      , null);
+		this.add(nameValue      , null);
+		this.add(typeLabel      , null);
+		this.add(typeValue      , null);
+		this.add(sourceUriLabel , null);
+		this.add(sourceUriValue , null);
+		
+		this.add(restrictPrivateLabel, null);
+		this.add(restrictPrivateValue, null);
+		this.add(restrictPublicRLabel, null);
+		this.add(restrictPublicRValue, null);
+		this.add(restrictPublicWLabel, null);
+		this.add(restrictPublicWValue, null);
+		
+		this.add(obmAddressLabel, null);
+		this.add(obmAddressValue, null);
+		
+		this.add(confirmButton  , null);
 
-        sourceUriLabel.setText("Source URI: ");
-        sourceUriLabel.setFont(defaultFont);
-        sourceUriLabel.setBounds(new Rectangle(14, 60, 150, 18));
-        sourceUriValue.setFont(defaultFont);
-        sourceUriValue.setBounds(new Rectangle(170, 60, 350, 18));
-
-        nameLabel.setText("Name: ");
-        nameLabel.setFont(defaultFont);
-        nameLabel.setBounds(new Rectangle(14, 90, 150, 18));
-        nameValue.setFont(defaultFont);
-        nameValue.setBounds(new Rectangle(170, 90, 350, 18));
-
-        typeLabel.setText("Type: ");
-        typeLabel.setFont(defaultFont);
-        typeLabel.setBounds(new Rectangle(14, 120, 150, 18));
-        typeValue.setFont(defaultFont);
-        typeValue.setBounds(new Rectangle(170, 120, 350, 18));
-        
-        
-        obmAddressLabel.setText("Obm-Sync address: ");
-        obmAddressLabel.setFont(defaultFont);
-        obmAddressLabel.setBounds(new Rectangle(14, 150, 150, 18));
-        obmAddressValue.setFont(defaultFont);
-        obmAddressValue.setBounds(new Rectangle(170, 150, 350, 18));
-        
-        restrictPrivateLabel.setText("No private: ");
-        restrictPrivateLabel.setFont(defaultFont);
-        restrictPrivateLabel.setBounds(new Rectangle(12,180,150,18));
-        restrictPrivateValue.setFont(defaultFont);
-        restrictPrivateValue.setBounds(new Rectangle(170,180,350,18));
-        
-        
-        restrictOwnerLabel.setText("Only owner: ");
-        restrictOwnerLabel.setFont(defaultFont);
-        restrictOwnerLabel.setBounds(new Rectangle(12,210,150,18));
-        restrictOwnerValue.setFont(defaultFont);
-        restrictOwnerValue.setBounds(new Rectangle(170,210,350,18));
-       
-        
-        confirmButton.setFont(defaultFont);
-        confirmButton.setText("Add");
-        confirmButton.setBounds(170, 350, 70, 25);
-
-        confirmButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event ) {
-                try {
-                    validateValues();
-                    getValues();
-                    if (getState() == STATE_INSERT) {
-                        ObmSyncSourceConfigPanel.this.actionPerformed(new ActionEvent(ObmSyncSourceConfigPanel.this, ACTION_EVENT_INSERT, event.getActionCommand()));
-                    } else {
-                        ObmSyncSourceConfigPanel.this.actionPerformed(new ActionEvent(ObmSyncSourceConfigPanel.this, ACTION_EVENT_UPDATE, event.getActionCommand()));
-                    }
-                } catch (Exception e) {
-                    notifyError(new AdminException(e.getMessage()));
-                }
-            }
-        });
-
-        // add all components to the panel
-        this.add(panelName      , null);
-        this.add(nameLabel      , null);
-        this.add(nameValue      , null);
-        this.add(typeLabel      , null);
-        this.add(typeValue      , null);
-        this.add(sourceUriLabel , null);
-        this.add(sourceUriValue , null);
-        
-        this.add(restrictPrivateLabel, null);
-        this.add(restrictPrivateValue, null);
-        this.add(restrictOwnerLabel	, null);
-        this.add(restrictOwnerValue, null);
-        
-        this.add(obmAddressLabel, null);
-        this.add(obmAddressValue, null);
-        
-        this.add(confirmButton  , null);
-        
 
     }
 
@@ -254,13 +265,17 @@ public class ObmSyncSourceConfigPanel
         }
         
         //restrictions
-        int rs = syncSource.getRestrictions();
-        
-        restrictPrivateValue.setSelected(
-        		(rs & Helper.RESTRICT_PRIVATE) == Helper.RESTRICT_PRIVATE );
-        restrictOwnerValue.setSelected(
-        		(rs & Helper.RESTRICT_OWNER) == Helper.RESTRICT_OWNER );
-        
+        if (this.syncSource instanceof ContactSyncSource) {
+        	int rs = syncSource.getRestrictions();
+	   
+	        restrictPrivateValue.setSelected(
+	        		(rs & Helper.RESTRICT_PRIVATE) == Helper.RESTRICT_PRIVATE );
+	        restrictPublicRValue.setSelected(
+	        		(rs & Helper.RESTRICT_PUBLIC_R) == Helper.RESTRICT_PUBLIC_R
+	        		|| (rs & Helper.RESTRICT_PUBLIC_W) == Helper.RESTRICT_PUBLIC_W );
+	        restrictPublicWValue.setSelected(
+	        		(rs & Helper.RESTRICT_PUBLIC_W) == Helper.RESTRICT_PUBLIC_W );
+        }
         obmAddressValue.setText(syncSource.getObmAddress());
     }
 
@@ -346,14 +361,20 @@ public class ObmSyncSourceConfigPanel
 
         syncSource.setInfo(new SyncSourceInfo(contentTypes, 0));
         
-        int rs = 0;
-        if (restrictPrivateValue.isSelected()) {
-        	rs += Helper.RESTRICT_PRIVATE;
+        if (syncSource instanceof ContactSyncSource) {
+	        int rs = 0;
+	        if (restrictPrivateValue.isSelected()) {
+	        	rs += Helper.RESTRICT_PRIVATE;
+	        }
+	        if (restrictPublicRValue.isSelected()
+	        		||restrictPublicWValue.isSelected()) {
+	        	rs += Helper.RESTRICT_PUBLIC_R;
+	        }
+	        if (restrictPublicWValue.isSelected()) {
+	        	rs += Helper.RESTRICT_PUBLIC_W;
+	        }
+	        syncSource.setRestrictions(rs);
         }
-        if (restrictOwnerValue.isSelected()) {
-        	rs += Helper.RESTRICT_OWNER;
-        }
-        syncSource.setRestrictions(rs);
         
         syncSource.setObmAddress(obmAddressValue.getText().trim());
     }

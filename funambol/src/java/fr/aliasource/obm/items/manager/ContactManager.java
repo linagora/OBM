@@ -263,21 +263,21 @@ public class ContactManager extends ObmManager {
 		//apply restriction(s)
 		updatedRest = new HashMap();
 		deletedRest = new ArrayList();
-		String owner = "";
-		String user = token.getUser();
+		//String owner = "";
+		//String user = token.getUser();
 		for (int i=0 ; i < updated.length ; i++) {
-			owner = Helper.nullToEmptyString(updated[i].getOwner());
-			if ( ( ((restrictions & Helper.RESTRICT_PRIVATE) == Helper.RESTRICT_PRIVATE)
-				    && (updated[i].getClassification() == 1 && !owner.equals(user)) )
-			  || ( ((restrictions & Helper.RESTRICT_OWNER  ) == Helper.RESTRICT_OWNER)
-					&& (!owner.equals(user)) ) )
-			{
-				if (d != null) {
-					deletedRest.add(  (""+updated[i].getUid()) );
-				}	
-			} else {
+			//owner = Helper.nullToEmptyString(updated[i].getOwner());
+			//if ( ( ((restrictions & Helper.RESTRICT_PRIVATE) == Helper.RESTRICT_PRIVATE)
+			//	    && (updated[i].getClassification() == 1 && !owner.equals(user)) )
+			//  || ( ((restrictions & Helper.RESTRICT_OWNER  ) == Helper.RESTRICT_OWNER)
+			//		&& (!owner.equals(user)) ) )
+			//{
+			//	if (d != null) {
+			//		deletedRest.add(  (""+updated[i].getUid()) );
+			//	}	
+			//} else {
 				updatedRest.put( ""+updated[i].getUid(), updated[i] );
-			}
+			//}
 		}
 		
 		for (int j=0 ; j < deleted.length ; j++) {
