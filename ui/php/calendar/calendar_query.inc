@@ -431,6 +431,11 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
     }
   }
 
+  // Insert My alert if set
+  if (isset($calendar['alert'])) {
+    run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
+  }
+
   // Send mail to users
   $subject = "$l_add_event_mail_subject" . $mail_title;
   $message = "$l_add_event_mail_head $mail_title $l_date : $l_from $datebegin $l_to $dateend $message_resource";
@@ -965,8 +970,13 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
     }
   }
 
-  if($task_id > 0) {
+  if ($task_id > 0) {
     run_query_calendar_insert_entity_event("task", $task_id, $event_id, 'A');
+  }
+
+  // Insert My alert if set
+  if (isset($calendar['alert'])) {
+    run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
   }
 
   $subject = "$l_update_event_mail_subject" . $mail_title;
@@ -1303,6 +1313,76 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
 }
 
 
+/**
+ * Create alerts for an event 
+ * 
+ * @param $event_id 
+ * @param $user_id 
+ * @param mixed $alerts 
+ * @access public
+ * @return void
+ */
+function run_query_calendar_event_alert_insert($event_id, $user_id, $alerts) {
+  global $cdg_sql, $obm;
+
+  $now = date("Y-m-d H:i:s");
+  run_query_calendar_event_alert_delete($event_id, $user_id);
+
+  if (! is_array($alerts) && $alerts > 0) {
+    $alerts = array($alerts => $alerts);
+  }
+
+  if (is_array($alerts) && count($alerts) > 0) {
+    $obm_q = new DB_OBM;
+    foreach ($alerts as $dur => $label) {
+      $query = "INSERT INTO CalendarAlert (
+        calendaralert_timecreate,
+        calendaralert_usercreate,
+        calendaralert_event_id,
+        calendaralert_user_id,
+        calendaralert_duration)
+      VALUES (
+        '$now',
+        '$obm[uid]',
+        '$event_id',
+        '$user_id',
+        '$dur')";
+      display_debug_msg($query, $cdg_sql, "run_query_calendar_event_alert_insert(0)");
+      $obm_q->query($query);
+    }
+  }
+
+  return true;
+}
+
+
+/**
+ * Delete alerts for an (event_id, user_id) 
+ * 
+ * @param $event_id
+ * @param $user_id [Optionnal]
+ * @access public
+ * @return void
+ */
+function run_query_calendar_event_alert_delete($event_id, $user_id='') {
+  global $cdg_sql, $obm;
+
+  $obm_q = new DB_OBM;
+  
+  if ($user_id > 0) {
+    $where_user = "AND calendaralert_user_id = '$user_id'";
+  }
+
+  $query = "DELETE FROM CalendarAlert
+    WHERE calendaralert_event_id = '$event_id'
+      $where_user";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_event_alert_delete()");
+  $obm_q->query($query);
+
+  return true;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the event can be deleted
 // Parameters:
@@ -1370,6 +1450,9 @@ function run_query_calendar_delete($calendar) {
   $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = '$event_id'";
   display_debug_msg($query, $cdg_sql, "run_query_calendar_delete(4)");
   $obm_q->query($query);
+
+  // Alerts
+  run_query_calendar_event_alert_delete($event_id);
 
   // If connectors in use
   if ($c_use_connectors) {
@@ -2513,7 +2596,6 @@ function run_query_get_events_exception($events,$start_time,$end_time) {
  * @access public
  * @return void
  */
-
 function run_query_get_one_event_exception($calendar_id) {
   global $cdg_sql;
 
@@ -2531,6 +2613,39 @@ function run_query_get_one_event_exception($calendar_id) {
   $obm_q->query($query);
 
   return $obm_q;
+}
+
+
+/**
+ * Get all alerts for an (event, user)
+ * 
+ * @param $event_id
+ * @param $user_id
+ * @access public
+ * @return $alerts array ('second" => 'label')
+ */
+function get_one_event_user_alert($event_id, $user_id) {
+  global $cdg_sql;
+
+  $alerts = array();
+  $obm_q = new DB_OBM;
+
+  $query = "SELECT
+     calendaralert_duration
+   FROM CalendarAlert
+   WHERE calendaralert_event_id='$event_id'
+     AND calendaralert_user_id='$user_id'"; 
+
+  display_debug_msg($query, $cdg_sql, "get_one_event_user_alert()");
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $dur = $obm_q->f('calendaralert_duration');
+    $dur_min = $dur / 60;
+    $alerts[$dur] = $dur_min;
+  }
+
+  return $alerts;
 }
 
 

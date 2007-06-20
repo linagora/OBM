@@ -699,6 +699,21 @@ CREATE TABLE CalendarException (
 
 
 --
+-- Table structure for table 'CalendarAlert'
+--
+CREATE TABLE CalendarAlert (
+  calendaralert_timeupdate  timestamp,
+  calendaralert_timecreate  timestamp,
+  calendaralert_userupdate  integer default NULL,
+  calendaralert_usercreate  integer default NULL,
+  calendaralert_event_id    integer,
+  calendaralert_user_id     integer,
+  calendaralert_duration    integer NOT NULL default 0
+);
+CREATE INDEX idx_calendaralert_user ON CalendarAlert (calendaralert_user_id);
+
+
+--
 -- Table structure for table 'CalendarCategory1'
 --
 CREATE TABLE CalendarCategory1 (

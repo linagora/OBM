@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.1.0pre7";
+$obm_version = "2.1.0pre8";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -112,16 +112,18 @@ $ccontact_private_default = false;
 
 // Calendar : show public groups
 $ccalendar_public_groups = true;
+
 // Calendar : First day of the week
-
-
-
 $phpversion = substr(phpversion(),0,1);
 if ($phpversion >= 5) {
   $ccalendar_weekstart = 'monday';
 } else {
   $ccalendar_weekstart = 'wednesday + 2 hours'; // +2h to fix a DST php4 bug //
 }
+
+// calendar alert values (seconds => label or minutes displayed)
+$ccalendar_alerts = array ("300" => "5", "600" => "10", "900" => "15", "1800" => "30");
+
 // Calendar : First day of the week (+2h to fix a DST php bug)
 //$ccalendar_weekstart = 'monday + 2 hours';
 // Calendar max user displayed in the calendar

@@ -90,6 +90,21 @@ ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_ext_id DEFAULT '';
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_properties text;
 
 
+--
+-- Table structure for table 'CalendarAlert'
+--
+CREATE TABLE CalendarAlert (
+  calendaralert_timeupdate  timestamp,
+  calendaralert_timecreate  timestamp,
+  calendaralert_userupdate  integer default NULL,
+  calendaralert_usercreate  integer default NULL,
+  calendaralert_event_id    integer,
+  calendaralert_user_id     integer,
+  calendaralert_duration    integer NOT NULL default 0
+);
+CREATE INDEX idx_calendaralert_user ON CalendarAlert (calendaralert_user_id);
+
+
 -------------------------------------------------------------------------------
 -- Update UserObm table
 -------------------------------------------------------------------------------

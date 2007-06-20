@@ -1564,8 +1564,9 @@ function dis_calendar_event_consult($id) {
     if ($eve_q->num_rows() == 1) {
       $entities = get_calendar_event_entity($id);
       $exception_q = run_query_get_one_event_exception($id);
+      $alerts = get_one_event_user_alert($id, $obm['uid']);
       $display["detailInfo"] = display_record_info($eve_q);
-      $block = html_calendar_event_consult($eve_q, $exception_q, $entities);
+      $block = html_calendar_event_consult($eve_q, $exception_q, $entities, $alerts);
     } else {
       $display["msg"] .= display_err_msg($l_err_reference);
     }
@@ -1582,12 +1583,13 @@ function dis_calendar_event_consult($id) {
 // Parameters:
 //   - $event_q  : event_query result
 //   - $entities : entities linked to the event ["user"], ["resource"]
+//   - $alerts   : alerts array
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_event_consult($event_q, $exception_q, $entities) {
   global $obm, $display, $ccalendar_weekstart, $ccalendar_resource, $l_items;
   global $l_users, $l_resources, $l_title, $l_location, $l_priority, $l_private, $l_desc,$l_high;
   global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week;
-  global $l_dateend,$l_insert,$l_update,$l_repeat;
+  global $l_dateend,$l_insert,$l_update,$l_repeat, $l_alerts, $l_alerts_time;
   global $l_change_state,$l_groups,$l_all_day,$l_every;
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend; 
   global $l_wait, $l_task, $l_exception, $l_yes, $l_no;
@@ -1638,8 +1640,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
         <tr>
           <th>$l_task :</th>
           <td>$dis_task_list</td>
-        </tr>
-      ";
+        </tr>";
     }
     $display["title"] = "<div class=\"title\">$l_module_calendar : $title</div>";
   } else {
@@ -1664,7 +1665,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
   $privacy = $event_q->f("calendarevent_privacy") == 1? $l_yes : $l_no;
 
 
-  if($event_q->f("calendarevent_repeatkind") != "none") {
+  if ($event_q->f("calendarevent_repeatkind") != "none") {
     $kind = $GLOBALS["l_".$event_q->f("calendarevent_repeatkind")];
     $kind_unit = $GLOBALS["l_".$event_q->f("calendarevent_repeatkind")."_unit"];
     $repeat_days = $event_q->f("calendarevent_repeatdays"); 
@@ -1689,13 +1690,13 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
         $start_week_day = strtotime("+1 day", $start_week_day); 
       }
       $dis_repeat_days = "
-      <tr>  
+      <tr>
        <th>$l_repeatdays :</th>
        <td>$dis_repeat_days</td>
-      </tr>        
-      ";
+      </tr>";
     }
-  // Exception
+
+    // Exception
     if(is_array($date_exception)) {
       foreach($date_exception as $key => $value) {
        $block_exception_detail .= "$value <br />";
@@ -1725,6 +1726,24 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
      </table>
      </div>";
   }
+
+  // Alerts
+  if (is_array($alerts) && count($alerts > 0)) {
+    foreach($alerts as $key => $value) {
+      $dis_alerts .= "$value <br />";
+    }
+    $block_alerts = "
+    <div class=\"detail infos\">
+     <h1>$l_alerts</h1>
+     <table>
+      <tr>
+       <th>$l_alerts_time :</th> 
+       <td>$dis_alerts</td>
+      </tr>
+     </table>
+     </div>";
+  }
+
   $attendee = $entities["user"];
   if (is_array($attendee["entity"])) {
     foreach ($attendee["entity"] as $u_id => $entity) {
@@ -1851,6 +1870,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
    </table>
   </div>
   $repeat_block
+  $block_alert
 
    <div class=\"detail extra\">
    <h1>$l_desc</h1>
@@ -1878,6 +1898,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
     $resources = $entities["resource"];
     $tasks = $entities["task"];
     $exception_q = run_query_get_one_event_exception($calendar["calendar_id"]);
+    $alerts = get_one_event_user_alert($calendar["calendar_id"], $obm['uid']);
   } else {
     $users_id = $entities["user"];
     if (count($users_id > 0)) {
@@ -1900,7 +1921,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   }
 
   $cats1 = of_category_get_ordered("calendar", "category1");
-  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $resources, $groups,$tasks, $cats1);
+  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $resources, $groups,$tasks, $cats1, $alerts);
 
   return $block;
 }
@@ -1990,8 +2011,8 @@ function dis_calendar_quick_form($calendar) {
 //   - $groups       : Array : selected groups [ids] [entity]
 //   - $cats1        : Array : Calendar categories1
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $res, $groups,$tasks, $cats1) {
-  global $obm, $path, $display;
+function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $res, $groups,$tasks, $cats1, $alerts) {
+  global $obm, $path, $display, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ico_project;
   global $ico_mini_cal, $ico_add,$ico_delete, $l_items;
   global $ccalendar_first_hour, $ccalendar_last_hour,$ico_project;
@@ -2004,6 +2025,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_task;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_format,$l_daysofweekshort,$l_task, $l_exception, $l_items;
+  global $l_alerts, $l_alerts_time;
 
   $time_unit = 60 / $_SESSION['set_cal_interval'];  
   $repeatfrequency = 1;
@@ -2043,6 +2065,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
 
     while($exception_q->next_record()) {
       $date_exception[] = of_date_upd_format($exception_q->f("calendarexception_date")); 
+    }
+    // Alerts
+    if (is_array($alerts) && count($alerts > 0)) {
+      foreach($alerts as $key => $value) {
+	$selected_alert = $key;
+      }
     }
 
   } elseif ($action == "new") {
@@ -2100,6 +2128,14 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   if (isset($calendar["list-item-id"])) { $t_list_item_id = $calendar["list-item-id"]; }
   if (isset($calendar["property-name"])) { $t_property_name = $calendar["property-name"]; }
   if (isset($calendar["property"])) { $t_property_value = $calendar["property"]; }
+  if (isset($calendar['alert'])) {
+    // handle only one entry for now
+    if (is_array($sel_alert)) {
+      $selected_alert = $calendar['alert'][0];
+    } else {
+      $selected_alert = $calendar['alert'];
+    }
+  }
   
 
   if (($action == "detailupdate") || ($action == "update")) {
@@ -2405,6 +2441,18 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   }
   $add_date = "<a href=\"javascript: add_exdate();\"><img src=\"$ico_add\" alt=\"[Date]\" /></a>";
 
+  // Alerts
+  $sel_alert = "<select name=\"sel_alert\">
+        <option value=\"$c_none\">$l_none</option>";
+  foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
+    $sel_alert .= "<option value=\"$alert_sec\"";
+    if ($selected_alert == $alert_sec) {
+      $sel_alert .= " selected=\"selected\"";
+    }
+    $sel_alert .= ">$alert_label</option>";
+  }
+  $sel_alert .= "</select>";
+
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"get\" name=\"f_entity\"
@@ -2504,6 +2552,17 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   </tr>
   </table>
   </fieldset>
+
+  <fieldset class=\"detail infos\">
+  <legend>$l_alerts</legend>
+  <table>    
+  <tr>    
+    <th>$l_alerts_time</th> 
+    <td>$sel_alert</td>
+  </tr>
+  </table>
+  </fieldset>
+
   <fieldset class=\"detail extra\">    
   <legend>$l_desc</legend>  
   <textarea id=\"ta_description\" name=\"ta_description\" rows=\"3\" cols=\"72\">$desc</textarea> 

@@ -693,12 +693,27 @@ CREATE TABLE CalendarException (
   calendarexception_timecreate  timestamp(14),
   calendarexception_userupdate  int(8) default NULL,
   calendarexception_usercreate  int(8) default NULL,
-  calendarexception_event_id    int(8) auto_increment,
+  calendarexception_event_id    int(8),
   calendarexception_date        timestamp(14) NOT NULL,
   PRIMARY KEY (calendarexception_event_id,calendarexception_date)
 );
 
-  
+
+--
+-- Table structure for table 'CalendarAlert'
+--
+CREATE TABLE CalendarAlert (
+  calendaralert_timeupdate  timestamp(14),
+  calendaralert_timecreate  timestamp(14),
+  calendaralert_userupdate  int(8) default NULL,
+  calendaralert_usercreate  int(8) default NULL,
+  calendaralert_event_id    int(8),
+  calendaralert_user_id     int(8),
+  calendaralert_duration    int(8) NOT NULL default 0,
+  INDEX idx_calendaralert_user (calendaralert_user_id)
+);
+
+
 --
 -- Table structure for table 'CalendarCategory1'
 --

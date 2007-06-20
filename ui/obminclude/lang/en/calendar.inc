@@ -28,6 +28,8 @@ $l_occupied_day = "Whole day";
 $l_user_right = "Manage rights for";
 
 $l_exception = "Exceptions";
+$l_alerts = "Alerts";
+$l_alerts_time = "Alerts (minutes before)";
 $l_format = "(AAAA-MM-JJ)";
 $l_repeat = "Repetition";
 $l_periodicity = "Frequency";
