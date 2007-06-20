@@ -28,7 +28,6 @@ sub getDbValues {
         $query .= " AND i.userobm_login='".$obmUserLogin."'";
     }
 
-    print $query."\n";
 
     # On execute la requete
     my $queryResult;

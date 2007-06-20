@@ -229,6 +229,7 @@ sub _getEntityMailShareAcl {
 
     if( !$self->{"mailShareDesc"}->{"mailshare_mailperms"} ) {
         $self->{"mailShareDesc"}->{"user_mailshare_acl"} = undef;
+
     }else {
 
         my $entityType = "mailshare";

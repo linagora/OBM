@@ -19,16 +19,17 @@ sub getParameter {
     my( $parameters ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "all", "help" );
+    &GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "global", "help" );
 
+
+    if( !exists($parameters->{"domain"}) ) {
+        &OBM::toolBox::write_log( "Parametre '--domain' manquant", "W" );
+        $parameters->{"help"} = "";
+
+    }
+    
     if( exists($parameters->{"user"}) ) {
-        if( exists($parameters->{"domain"}) || exists($parameters->{"delegation"}) ) {
-            &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
-            $parameters->{"help"} = "";
-        }
-
-    }elsif( exists($parameters->{"domain"}) ) {
-        if( exists($parameters->{"user"}) || exists($parameters->{"delegation"}) ) {
+        if( exists($parameters->{"delegation"}) ) {
             &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
             $parameters->{"help"} = "";
         }
@@ -39,19 +40,18 @@ sub getParameter {
             $parameters->{"help"} = "";
         }
 
-    }else {
-        &OBM::toolBox::write_log( "Au moins un parametre de mise a jour doit etre precise", "W" );
-        $parameters->{"help"} = "";
     }
+
 
     if( exists( $parameters->{"help"} ) ) {
         &OBM::toolBox::write_log( "Affichage de l'aide", "WC" );
 
         print "Veuillez indiquer le critere de mise a jour :\n";
-        print "\tuser <val> : utilisateur d'identifiant <val> ;\n";
-        print "\tdomain <val> : domaine d'identifiant <val> ;\n";
-        print "\tdelegation <motcle> : delegation de mot cle <motcle>.\n";
-        print "Un seul de ces parametres doit etre indique.\n";
+        print "\tSyntaxe: script --domain id [--user id | --delegation word] [--global]\n";
+        print "\tuser <id> : utilisateur d'identifiant <id> ;\n";
+        print "\tdomain <id> : domaine d'identifiant <id> ;\n";
+        print "\tdelegation <word> : delegation de mot cle <word>.\n";
+        print "\tglobal : fait une mise a jour globale du domaine.\n";
 
         exit 0;
     }

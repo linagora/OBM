@@ -33,11 +33,10 @@ sub new {
 
     # Definition des attributs de l'objet
     my %loadDbAttr = (
-        filter => undef,
         user => undef,
         domain => undef,
         delegation => undef,
-        all => undef,
+        global => undef,
         dbHandler => undef,
         domainList => undef,
         engine => {
@@ -55,56 +54,33 @@ sub new {
     }
 
     # Initialisation de l'objet
-    $loadDbAttr{"all"} = $parameters->{"all"};
+    $loadDbAttr{"global"} = $parameters->{"global"};
     $loadDbAttr{"dbHandler"} = $dbHandler;
 
     SWITCH: {
         if( defined($parameters->{"user"}) ) {
             $loadDbAttr{"user"} = $parameters->{"user"};
-
-            # On recupere l'id du domaine de l'utilisateur
-            my $queryResult;
-            my $query = "SELECT userobm_domain_id, userobm_login FROM P_UserObm WHERE userobm_id=".$loadDbAttr{"user"};
-            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-                &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
-                if( defined($queryResult) ) {
-                    &OBM::toolBox::write_log( $queryResult->err, "W" );
-                }
-
-                return 0;
-            }else {
-                my $results = $queryResult->fetchall_arrayref();
-                if( $#$results != 0 ) {
-                    &OBM::toolBox::write_log( "lodaDb: utilisateur inexistant", "W" );
-                    return undef;
-                }else {
-                    $loadDbAttr{"domain"} = $results->[0]->[0];
-                    $loadDbAttr{"user_name"} = $results->[0]->[1];
-                }
-            }
-
-            $loadDbAttr{"filter"} = "user";
-            last SWITCH;
-        }
-
-        if( defined($parameters->{"domain"}) ) {
-            $loadDbAttr{"domain"} = $parameters->{"domain"};
-            $loadDbAttr{"filter"} = "domain";
             last SWITCH;
         }
 
         if( defined($parameters->{"delegation"}) ) {
             $loadDbAttr{"delegation"} = $parameters->{"delegation"};
-            $loadDbAttr{"filter"} = "delegation";
             last SWITCH;
+        }
+
+        if( defined($parameters->{"domain"}) ) {
+            $loadDbAttr{"domain"} = $parameters->{"domain"};
+            last SWITCH;
+        }else {
+            croak( "Le parametre domaine doit etre precise" );
         }
     }
 
     # Obtention des informations sur les domaines nécessaires
     if( defined($loadDbAttr{"domain"}) ) {
-        $loadDbAttr{"domainList"} = &OBM::toolBox::getDomains( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domain"} );
+        $loadDbAttr{"domainList"} = $self->getDomains( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domain"} );
     }else {
-        $loadDbAttr{"domainList"} = &OBM::toolBox::getDomains( $loadDbAttr{"dbHandler"}, undef );
+        $loadDbAttr{"domainList"} = $self->getDomains( $loadDbAttr{"dbHandler"}, undef );
     }
 
     # Obtention des serveurs LDAP par domaines
@@ -170,7 +146,7 @@ sub update {
     my $self = shift;
     my $return = 1;
 
-    if( $self->{"all"} ) {
+    if( $self->{"global"} ) {
         $return = $self->_doAll();
     }else {
         $return = $self->_doIncremental();
@@ -190,6 +166,11 @@ sub _doAll {
     }
     my $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
 
+    if( !defined($domainDesc) ) {
+        &OBM::toolBox::write_log( "loadDb: domaine d'identifiant '".$self->{"domain"}."' inexistant", "W" );
+        return 0;
+    }
+
 
     &OBM::toolBox::write_log( "loadDb: MAJ totale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
@@ -208,7 +189,10 @@ sub _doAll {
 
 
     if( $self->{"domain"} != 0 ) {
-        # Traitemtent des entités de type 'utilisateur'
+        # Traitement des informations de domaines
+        $self->_updateDomainTable( $self->{"domain"} );
+
+        # Traitement des entités de type 'utilisateur'
         my $query = "SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"};
         if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
             &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
@@ -257,6 +241,11 @@ sub _doIncremental {
 
     if( defined($self->{"domain"}) ) {
         $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
+
+        if( !defined($domainDesc) ) {
+            &OBM::toolBox::write_log( "loadDb: domaine d'idenfiant '".$self->{"domain"}."'", "W" );
+            return 0;
+        }
     }
 
     my %sqlFilter;
@@ -279,7 +268,7 @@ sub _doIncremental {
         # par domaine
         &OBM::toolBox::write_log( "loadDb: MAJ incrementale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
         $sqlFilter{"updated"} = "updated_domain_id='".$self->{"domain"}."'";
-        $sqlFilter{"deleted"} = "deleted_domain_id=".$self->{"user"};
+        $sqlFilter{"deleted"} = "deleted_domain_id=".$self->{"domain"};
         
     }else {
         return 0;
@@ -767,4 +756,63 @@ sub _tableNamePrefix {
     }
 
     return $columnPrefix;
+}
+
+
+sub getDomains {
+    my $self = shift;
+    my( $dbHandler, $obmDomainId ) = @_;
+    my @domainList;
+
+    if( !defined($dbHandler) ) {
+        write_log( "Connection à la base de donnée incorrect !", "W" );
+        return undef;
+    }
+
+
+    # Création du meta-domaine
+    $domainList[0]->{"meta_domain"} = 1;
+    $domainList[0]->{"domain_id"} = 0;
+    $domainList[0]->{"domain_label"} = "metadomain";
+    $domainList[0]->{"domain_name"} = "metadomain";
+    $domainList[0]->{"domain_desc"} = "Informations de l'annuaire ne faisant partie d'aucun domaine";
+
+
+    # Requete de recuperation des informations des domaines
+    my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias, samba_value FROM Domain LEFT JOIN Samba ON samba_name=\"samba_sid\" AND samba_domain_id=domain_id";
+    if( defined($obmDomainId) && $obmDomainId =~ /^\d+$/ ) {
+        $queryDomain .= " WHERE domain_id=".$obmDomainId;
+    }
+
+    # On execute la requete concernant les domaines
+    my $queryDomainResult;
+    if( !&OBM::dbUtils::execQuery( $queryDomain, $dbHandler, \$queryDomainResult ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryDomainResult) ) {
+            &OBM::toolBox::write_log( $queryDomainResult->err, "W" );
+        }
+
+        return undef;
+    }
+
+    while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias, $domainSambaSid ) = $queryDomainResult->fetchrow_array ) {
+        my $currentDomain;
+        $currentDomain->{"meta_domain"} = 0;
+        $currentDomain->{"domain_id"} = $domainId;
+        $currentDomain->{"domain_label"} = $domainLabel;
+        $currentDomain->{"domain_desc"} = $domainDesc;
+        $currentDomain->{"domain_name"} = $domainName;
+        $currentDomain->{"domain_dn"} = $domainName;
+
+        $currentDomain->{"domain_alias"} = [];
+        if( defined($domainAlias) ) {
+            push( @{$currentDomain->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
+        }
+
+        $currentDomain->{"domain_samba_sid"} = $domainSambaSid;
+
+        push( @domainList, $currentDomain );
+    }
+
+    return \@domainList;
 }
