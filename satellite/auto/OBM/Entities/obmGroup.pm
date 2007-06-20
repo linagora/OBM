@@ -74,9 +74,10 @@ sub getEntity {
         return 0;
     }
 
-    if( !defined($domainDesc->{"domain_id"} || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) ) {
+    if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
         &OBM::toolBox::write_log( "obmGroup: description de domaine OBM incorrecte", "W" );
         return 0;
+
     }else {
         # On positionne l'identifiant du domaine de l'entité
         $self->{"domainId"} = $domainDesc->{"domain_id"};
@@ -141,16 +142,6 @@ sub getEntity {
         $self->{"groupDesc"}->{"group_mailperms"} = 0;
     }
 
-    # Gestion des contacts externes du groupe
-    if( $group_contacts ) {
-        my @email = split( /\r\n/, $group_contacts );
-        my $j = 0;
-        for( $j=0; $j<=$#email; $j++ ) {
-            if( $email[$j] ) {
-                push( @{$self->{"groupDesc"}->{"group_contacts"}}, $email[$j] );
-            }
-        }
-    }
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
@@ -314,10 +305,17 @@ sub createLdapEntry {
         return 0;
     }
 
-    if( $#{$entry->{"group_users"}} != -1 ) {
+    # Les membres
+    if( $self->isLinks() && $#{$entry->{"group_users"}} != -1 ) {
         $ldapEntry->add( memberUid => $entry->{"group_users"} );
     }
 
+    # Les contacts
+    if( $self->isLinks() && $#{$entry->{"group_contacts"}} != -1 ) {
+        $ldapEntry->add( mailBox => $entry->{"group_contacts"} );
+    }
+
+    # La description
     if( $entry->{"group_desc"} ) {
         $ldapEntry->add( description => to_utf8({ -string => $entry->{"group_desc"}, -charset => $defaultCharSet }) );       
     }
@@ -339,11 +337,6 @@ sub createLdapEntry {
         $ldapEntry->add( mailAlias => $entry->{"group_email_alias"} );
     }
             
-    # Les contacts externes
-    if( $#{$entry->{"group_contacts"}} != -1 ) {
-        $ldapEntry->add( mailBox => $entry->{"group_contacts"} );
-    }
-
     # Le domaine
     if( $entry->{"group_domain"} ) {
         $ldapEntry->add( obmDomain => to_utf8({ -string => $entry->{"group_domain"}, -charset => $defaultCharSet }) );

@@ -27,7 +27,6 @@ sub getDbValues {
         $query .= " AND i.mailshare_name='".$obmMailshareName."'"; 
     }
 
-    print $query."\n";
 
     # On execute la requete
     my $queryResult;

@@ -368,7 +368,7 @@ sub updateBox {
     &OBM::toolBox::write_log( "Mise a jour de la boite '".$boxLogin."'", "W" );
 
     # Mise a jour du quota
-    if( ($newBox && ($newImapBoxDesc->{"box_quota"} != 0)) || ($oldImapBoxDesc->{"box_quota"} != $newImapBoxDesc->{"box_quota"}) ) {
+    if( ($newBox && defined($newImapBoxDesc->{"box_quota"}) && ($newImapBoxDesc->{"box_quota"} != 0)) || (!defined($oldImapBoxDesc->{"box_quota"}) || $oldImapBoxDesc->{"box_quota"} != $newImapBoxDesc->{"box_quota"}) ) {
         &OBM::toolBox::write_log( "Mise a jour du quota de la boite '".$boxLogin."'", "W" );
         if( imapSetBoxQuota( $imapSrvConn, $boxName, $newImapBoxDesc->{"box_quota"} ) ) {
             $errors++;
