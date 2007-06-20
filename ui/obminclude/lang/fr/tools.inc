@@ -28,6 +28,7 @@ $l_upd_cancel_error = "L'annulation des modifications du système a échoué !";
 $l_created = "Créés";
 $l_updated = "Modifiés";
 $l_deleted = "Supprimés";
+$l_links = "Liaisons";
 
 $l_halt = "Arrêt du système";
 $l_halt_aliamin = "Arréter le système";

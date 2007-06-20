@@ -14,7 +14,7 @@
 function dis_tools_update_detail() {
   global $display, $cgp_show, $profiles, $obm;
   global $l_upd, $l_upd_needed, $l_upd_not_needed, $l_upd_running;
-  global $l_upd_run, $l_upd_cancel, $l_created, $l_updated, $l_deleted;
+  global $l_upd_run, $l_created, $l_updated, $l_deleted, $l_links;
   global $l_upd_need_domain_update, $l_user, $l_group, $l_host, $l_mailshare;
   global $l_header_tools_upd;
   global $l_validate, $l_cancel, $l_error_permission;
@@ -53,18 +53,22 @@ function dis_tools_update_detail() {
       $dis_entity = ${"l_$entity"};
       if ($cgp_show['module']["$entity"]) {
 	$nb = get_update_entity_numbers($table, $field, $realm);
-	if ($nb['move'] > 0) {
+	$links = get_update_link_entity($entity, $realm);
+	$nb_links = count($links);
+	if (($nb['move'] > 0) || ($nb_links > 0)) {
 	  $has_update = true;
 	}
 	$class_cre = ($nb['created'] > 0 ? " class=\"highlight\"" : '');
 	$class_upd = ($nb['updated'] > 0 ? " class=\"highlight\"" : '');
 	$class_del = ($nb['deleted'] > 0 ? " class=\"highlight\"" : '');
+	$class_lnk = ($nb_links > 0 ? " class=\"highlight\"" : '');
 	$dis_row_update .= "
       <tr>
         <td>$dis_entity</td>
         <td$class_cre>$nb[created]</td>
         <td$class_upd>$nb[updated]</td>
         <td$class_del>$nb[deleted]</td>
+        <td$class_lnk>$nb_links</td>
       </tr>";
       }
     }
@@ -104,6 +108,7 @@ function dis_tools_update_detail() {
         <th>$l_created</th>
         <th>$l_updated</th>
         <th>$l_deleted</th>
+        <th>$l_links</th>
       </tr>
       $dis_row_update
       </table>";

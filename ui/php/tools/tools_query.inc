@@ -428,7 +428,7 @@ function process_update_numbers($e1, $e2, $table, $realm) {
       }
     }
   }
-  
+
   $nb["created"] = $nb_add;
   $nb["updated"] = $nb_upd;
   $nb["deleted"] = $nb_del;
@@ -459,6 +459,250 @@ function get_update_entity_numbers($table, $field="", $realm) {
 
 
 /******************************************************************************
+ * Get Group links updates (from UserObmGroup and GroupGroup)
+ *
+ * @param $realm : realm space to check updates (user | domain | delegation)
+ * @return link array : $link[$group_id] = $group_id
+ */
+function get_update_link_group($realm) {
+  global $cdg_sql, $obm;
+
+  $uid = $obm['uid'];
+  $delegation = $obm['delegation'];
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
+
+  $e1 = array();
+  $e2 = array();
+
+  $eid = "group_id";
+  $uc = "group_usercreate";
+  $uu = "group_userupdate";
+  $dg = "group_delegation";
+
+  $multidomain = sql_multidomain("group");
+
+  // Restrict updates to the realm selected (user, domain, delegation)
+  if ($realm == "user") {
+    $where = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
+  } else if ($realm == "delegation") {
+    $where = "WHERE ($dg $like '$delegation%') $multidomain";
+  } else {
+    $where = "WHERE 1=1 $multidomain";
+  }
+
+  // UserObmGroup Link --------------------------------------------------------
+
+  // Get infos from Update table
+  $query = "SELECT *
+    FROM UserObmGroup
+      LEFT JOIN UGroup ON userobmgroup_group_id=group_id
+    $where
+    ORDER BY userobmgroup_group_id, userobmgroup_userobm_id";
+  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $g_id = $obm_q->f('userobmgroup_group_id');
+    $u_id = $obm_q->f('userobmgroup_userobm_id');
+    $e1[$g_id][] = "u$u_id";
+  }
+
+  // Get infos from Production table
+  $query = "SELECT *
+    FROM P_UserObmGroup
+      LEFT JOIN P_UGroup ON userobmgroup_group_id=group_id
+    $where
+    ORDER BY userobmgroup_group_id, userobmgroup_userobm_id";
+  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $g_id = $obm_q->f('userobmgroup_group_id');
+    $u_id = $obm_q->f('userobmgroup_userobm_id');
+    $e2[$g_id][] = "u$u_id";
+  }
+
+  // GroupGroup Link --------------------------------------------------------
+
+  // Get infos from Update table
+  $query = "SELECT *
+    FROM GroupGroup
+      LEFT JOIN UGroup ON groupgroup_parent_id=group_id
+    $where
+    ORDER BY groupgroup_parent_id, groupgroup_child_id";
+  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $g_id = $obm_q->f('groupgroup_parent_id');
+    $c_id = $obm_q->f('groupgroup_child_id');
+    $e1[$g_id][] = "g$c_id";
+  }
+
+  // Get infos from Production table
+  $query = "SELECT *
+    FROM P_GroupGroup
+      LEFT JOIN P_UGroup ON groupgroup_parent_id=group_id
+    $where
+    ORDER BY groupgroup_parent_id, groupgroup_child_id";
+  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $g_id = $obm_q->f('groupgroup_parent_id');
+    $c_id = $obm_q->f('groupgroup_child_id');
+    $e2[$g_id][] = "g$c_id";
+  }
+
+  // Process and mark each group modified
+  foreach($e1 as $g_id => $users) {
+    if (count($e1[$g_id]) != count($e2[$g_id])) {
+      $res[$g_id] = $g_id;
+    } else {
+      foreach ($users as $u_id) {
+	if (! in_array($u_id, $e2[$g_id])) {
+	  $res[$g_id] = $g_id;
+	  break;
+	}
+      }
+    }
+  }
+
+  // Deleted entries, nothing to do (already handled by entity Update)
+
+  return $res;
+}
+
+
+/******************************************************************************
+ * Get EntityRight links updates for an entity
+ *
+ * @param $entity : entity
+ * @param $table  : entity table
+ * @param $field  : field prefix (if not from table name) to check
+ * @param $realm : realm space to check updates (user | domain | delegation)
+ * @return link array : $link[$entity_id] = $entity_id
+ */
+function get_update_link_entityright($entity, $table, $field, $realm) {
+  global $cdg_sql, $obm;
+
+  $uid = $obm['uid'];
+  $delegation = $obm['delegation'];
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
+
+  $e1 = array();
+  $e2 = array();
+
+  if ($field != "") {
+    $f = $field;
+    $f_id = "${field}_id";
+    $uc = "${field}_usercreate";
+    $uu = "${field}_userupdate";
+    $dg = "${field}_delegation";
+  } else {
+    $f = strtolower($table);
+    $f_id = "${f}_id";
+    $uc = "${f}_usercreate";
+    $uu = "${f}_userupdate";
+    $dg = "${f}_delegation";
+  }
+
+  $multidomain = sql_multidomain("$f");
+
+  // Restrict updates to the realm selected (user, domain, delegation)
+  if ($realm == "user") {
+    $where = "AND ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
+  } else if ($realm == "delegation") {
+    $where = "AND ($dg $like '$delegation%') $multidomain";
+  } else {
+    $where = "$multidomain";
+  }
+
+  // Get infos from Update table
+  $query = "SELECT *
+    FROM EntityRight
+      LEFT JOIN $table ON entityright_entity_id=$f_id
+    WHERE entityright_entity='$entity'
+      $where
+    ORDER BY entityright_entity_id, entityright_consumer, entityright_consumer_id";
+  display_debug_msg($query, $cdg_sql, "get_update_link_entityright()");
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $e_id = $obm_q->f('entityright_entity_id');
+    $cons = $obm_q->f('entityright_consumer');
+    $cons_id = $obm_q->f('entityright_consumer_id');
+    $e1[$e_id][$cons][] = $cons_id;
+  }
+
+  // Get infos from Production table
+  $table_prod = "P_$table";
+  $query = "SELECT *
+    FROM EntityRight
+      LEFT JOIN $table ON entityright_entity_id=$f_id
+    WHERE entityright_entity='$entity'
+      $where
+    ORDER BY entityright_entity_id, entityright_consumer, entityright_consumer_id";
+  display_debug_msg($query, $cdg_sql, "get_update_link_entityright()");
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $e_id = $obm_q->f('entityright_entity_id');
+    $cons = $obm_q->f('entityright_consumer');
+    $cons_id = $obm_q->f('entityright_consumer_id');
+    $e2[$e_id][] = "$cons-$cons_id";
+  }
+
+  // Process and mark each entity modified
+  foreach($e1 as $e_id => $consumers) {
+    if (count($e1[$e_id]) != count($e2[$e_id])) {
+      $res[$e_id] = $e_id;
+    } else {
+      foreach ($consumers as $c_id) {
+	if (! in_array($c_id, $e2[$e_id])) {
+	  $res[$e_id] = $e_id;
+	  break;
+	}
+      }
+    }
+  }
+
+  // Deleted entries, nothing to do (already handled by entity Update)
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get update types number for a link
+// Parameters:
+//   - $entity : entity
+//   - $field  : field prefix (if not from table name) to check
+//   - $realm  : realm space to check updates (user | domain | delegation)
+///////////////////////////////////////////////////////////////////////////////
+function get_update_link_entity($entity, $realm) {
+  global $cdg_sql, $obm;
+
+  if ($entity == 'group') {
+    $links = get_update_link_group($realm);
+  } else if ($entity == 'mailshare') {
+    $links = get_update_link_entityright($entity, 'MailShare', 'mailshare', $realm);
+  } else if ($entity == 'user') {
+    $links = get_update_link_entityright('mailbox', 'UserObm', 'userobm', $realm);
+  }
+
+  echo "<br>$entity :";
+  print_r ($links);
+
+  return $links;
+}
+
+
+/******************************************************************************
  * Store update data in update tables
  *
  * @param $params : array parameters hash
@@ -485,29 +729,23 @@ function store_update_data($params) {
       $nb = get_update_entity_numbers($table, $field, $realm);
       if ($nb['move'] > 0) {
         $has_update = true;
+	$ret = validate_update_entity($entity, $table, $field, $realm);
       }
-
-      $ret = validate_update_entity($entity, $table, $field, $realm);
     }
   }
 
-  // Process links ICI XXXXXXXX
-
-  $links = array('groupuser' => array('UserObmGroup', 'UGroup'),
-		 'group' => array('UGroup', 'group'),
-		 'host' => array('Host', 'host'),
-		 'mailshare' => array('MailShare', 'mailshare'));
+  // Process links
 
   foreach ($entities as $entity=>$db_info) {
     $table = $db_info[0];
     $field = $db_info[1];
     if ($cgp_show['module']["$entity"]) {
-      $nb = get_update_entity_numbers($table, $field, $realm);
-      if ($nb['move'] > 0) {
+      $links = get_update_link_entity($entity, $realm);
+      $nb_links = count($links);
+      if ($nb_links > 0) {
         $has_update = true;
+	$ret = store_update_entity_links_infos($links, $entity);
       }
-
-      $ret = validate_update_entity($entity, $table, $field, $realm);
     }
   }
 
@@ -574,6 +812,7 @@ function store_update_entity_infos($e1, $e2, $entity, $table, $realm) {
         '$table',
         '$id',
         'C')";
+      display_debug_msg($query, $cdg_sql, 'store_update_entity_infos()');
       $retour = $obm_q->query($query);
       $nb_add++;
     } else {
@@ -594,12 +833,67 @@ function store_update_entity_infos($e1, $e2, $entity, $table, $realm) {
             '$table',
             '$id',
             'U')";
+	  display_debug_msg($query, $cdg_sql, 'store_update_entity_infos()');
 	  $retour = $obm_q->query($query);
 	  $nb_upd++;
 	  break;
 	}
       }
     }
+  }
+
+  return $nb_add;
+}
+
+
+/**
+ * Store update infos in Automate tables for Entity link
+ *
+ * @param $entity : entity to get numbers
+ * @param $table  : table where to check
+ * @param $field  : field prefix (if not from table name) to check
+ * @param $realm  : realm space to check updates (user | domain | delegation)
+ */
+function store_update_entity_links_infos($links, $entity) {
+  global $cdg_sql, $obm;
+
+  $nb_add = 0;
+  $nb_upd = 0;
+  $nb_del = 0;
+
+  $uid = $obm['uid'];
+  $domain_id = $obm['domain_id'];
+  $delegation = $obm['delegation'];
+  $obm_q = new DB_OBM;
+
+  if ($entity == 'group') {
+    $table = 'UGroup';
+  } else if ($entity == 'mailshare') {
+    $table = 'MailShare';
+  } else if ($entity == 'user') {
+    $table = 'UserObm';
+  }
+
+  // Process infos for created and updated entities
+  foreach ($links as $id) {
+    // INSERT
+    $query = "INSERT INTO Updatedlinks (
+        updatedlinks_domain_id,
+        updatedlinks_user_id,
+        updatedlinks_delegation,
+        updatedlinks_table,
+        updatedlinks_entity,
+        updatedlinks_entity_id
+      ) VALUES (
+        '$domain_id',
+        '$uid',
+        '$delegation',
+        '$table',
+        '$entity',
+        '$id')";
+    display_debug_msg($query, $cdg_sql, 'store_update_entity_links_infos()');
+    $retour = $obm_q->query($query);
+    $nb_add++;
   }
 
   return $nb_add;

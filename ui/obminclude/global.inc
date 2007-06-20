@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.1.0pre6";
+$obm_version = "2.1.0pre7";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.

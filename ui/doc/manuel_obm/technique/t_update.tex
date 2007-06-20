@@ -449,7 +449,7 @@ P\_GroupGroup & toutes &
 stocké dans \db{Updatedlinks}
 \begin{itemize}
 \item table = GroupGroup,
-\item entity = -
+\item entity = group
 \item id = id du groupe parent
 \end{itemize}
 Automate : regénération des liaisons du groupe père
@@ -459,20 +459,20 @@ P\_UserObmGroup & toutes &
 stocké dans \db{Updatedlinks}
 \begin{itemize}
 \item table = UserObmGroup,
-\item entity = -
-\item id = id de l'utilisateur
+\item entity = group
+\item id = id du groupe
 \end{itemize}
-Automate : regénération des liaisons de l'utilisateur
+Automate : regénération des liaisons du groupe
 \\
 \hline
 P\_of\_usergroup & toutes &
 stocké dans \db{Updatedlinks}
 \begin{itemize}
 \item table = of\_usergroup,
-\item entity = -
-\item id = id de l'utilisateur
+\item entity = group
+\item id = id du groupe
 \end{itemize}
-Automate : regénération des liaisons de l'utilisateur
+Automate : regénération des liaisons du groupe
 \\
 \hline
 \end{tabular}
