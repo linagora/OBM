@@ -636,14 +636,14 @@ function get_update_link_entityright($entity, $table, $field, $realm) {
     $e_id = $obm_q->f('entityright_entity_id');
     $cons = $obm_q->f('entityright_consumer');
     $cons_id = $obm_q->f('entityright_consumer_id');
-    $e1[$e_id][$cons][] = $cons_id;
+    $e1[$e_id][] = "$cons-$cons_id";
   }
 
   // Get infos from Production table
   $table_prod = "P_$table";
   $query = "SELECT *
-    FROM EntityRight
-      LEFT JOIN $table ON entityright_entity_id=$f_id
+    FROM P_EntityRight
+      LEFT JOIN $table_prod ON entityright_entity_id=$f_id
     WHERE entityright_entity='$entity'
       $where
     ORDER BY entityright_entity_id, entityright_consumer, entityright_consumer_id";
@@ -694,9 +694,6 @@ function get_update_link_entity($entity, $realm) {
   } else if ($entity == 'user') {
     $links = get_update_link_entityright('mailbox', 'UserObm', 'userobm', $realm);
   }
-
-  echo "<br>$entity :";
-  print_r ($links);
 
   return $links;
 }
