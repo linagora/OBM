@@ -17,15 +17,17 @@ sub getDbValues {
 
     # La requete a executer - obtention des informations sur les utilisateurs
     # mails de l'organisation.
-    my $query = "SELECT mailshare_id, mailshare_name, mailshare_quota, mailshare_mail_server_id FROM P_MailShare WHERE mailshare_domain_id=".$domainId;
+    my $query = "SELECT i.mailshare_id, i.mailshare_name, i.mailshare_quota, j.mailserver_host_id FROM P_MailShare i, P_MailServer j WHERE mailshare_domain_id=".$domainId." AND i.mailshare_mail_server_id=j.mailserver_id";
 
     if( defined($obmSrvId) && ( $obmSrvId =~ /^\d$/ ) ) {
-        $query .= " AND mailshare_mail_server_id=".$obmSrvId;
+        $query .= " AND j.mailserver_host_id=".$obmSrvId;
     }
 
     if( defined($obmMailshareName) && ( $obmMailshareName =~ /$regexp_login/ ) ) {
-        $query .= " AND mailshare_name='".$obmMailshareName."'"; 
+        $query .= " AND i.mailshare_name='".$obmMailshareName."'"; 
     }
+
+    print $query."\n";
 
     # On execute la requete
     my $queryResult;

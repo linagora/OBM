@@ -18,15 +18,17 @@ sub getDbValues {
 
     # La requete a executer - obtention des informations sur les utilisateurs
     # mails de l'organisation.
-    my $query = "SELECT userobm_id, userobm_login, userobm_mail_quota, userobm_mail_server_id, userobm_vacation_enable, userobm_vacation_message, userobm_email, userobm_nomade_perms, userobm_nomade_enable, userobm_nomade_local_copy, userobm_email_nomade FROM P_UserObm WHERE userobm_mail_perms=1 AND userobm_domain_id=".$domainId;
+    my $query = "SELECT i.userobm_id, i.userobm_login, i.userobm_mail_quota, j.mailserver_host_id, i.userobm_vacation_enable, i.userobm_vacation_message, i.userobm_email, i.userobm_nomade_perms, i.userobm_nomade_enable, i.userobm_nomade_local_copy, i.userobm_email_nomade FROM P_UserObm i, P_MailServer j WHERE i.userobm_mail_perms=1 AND i.userobm_domain_id=".$domainId." AND i.userobm_mail_server_id=j.mailserver_id";
 
     if( defined($obmSrvId) && ( $obmSrvId =~ /^\d+$/ ) ) {
-        $query .= " AND userobm_mail_server_id=".$obmSrvId;
+        $query .= " AND j.mailserver_host_id=".$obmSrvId;
     }
 
     if( defined($obmUserLogin) && ( $obmUserLogin =~ /$regexp_login/ ) ) {
-        $query .= " AND userobm_login='".$obmUserLogin."'";
+        $query .= " AND i.userobm_login='".$obmUserLogin."'";
     }
+
+    print $query."\n";
 
     # On execute la requete
     my $queryResult;
