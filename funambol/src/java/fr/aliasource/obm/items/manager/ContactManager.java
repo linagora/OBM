@@ -221,7 +221,7 @@ public class ContactManager extends ObmManager {
 		}
 		
 		try {
-			keys = binding.getContactTwinKeys(token,book,c);
+			keys = binding.getContactTwinKeys(token,book,c).getKey();
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {

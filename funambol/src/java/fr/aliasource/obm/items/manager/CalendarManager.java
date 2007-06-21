@@ -148,7 +148,7 @@ public class CalendarManager extends ObmManager {
 		String[] keys = null;
 		
 		try {
-			keys = binding.getRefusedKeys(token,calendar,d);
+			keys = binding.getRefusedKeys(token,calendar,d).getKey();
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
@@ -275,7 +275,7 @@ public class CalendarManager extends ObmManager {
 		//log.info(" look twin of : "+c.getFirstName()+","+c.getLastName()+","+c.getCompany());
 		
 		try {
-			keys = binding.getEventTwinKeys(token,calendar,evt);
+			keys = binding.getEventTwinKeys(token,calendar,evt).getKey();
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
