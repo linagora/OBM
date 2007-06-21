@@ -22,6 +22,7 @@ sub new {
 
     my %obmMailshareAttr = (
         type => undef,
+        entityRightType => undef,
         typeDesc => undef,
         incremental => undef,
         links => undef,
@@ -30,7 +31,8 @@ sub new {
         sieve => undef,
         mailShareId => undef,
         domainId => undef,
-        mailShareDesc => undef
+        mailShareDesc => undef,
+        mailShareBdDesc => undef
     );
 
 
@@ -55,6 +57,7 @@ sub new {
     }
 
     $obmMailshareAttr{"type"} = $MAILSHARE;
+    $obmMailshareAttr{"entityRightType"} = "MailShare";
     $obmMailshareAttr{"typeDesc"} = $attributeDef->{$obmMailshareAttr{"type"}};
     $obmMailshareAttr{"toDelete"} = 0;
     $obmMailshareAttr{"archive"} = 0;
@@ -105,7 +108,7 @@ sub getEntity {
 
 
     # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT mailshare_name, mailshare_description, mailshare_email, mailshare_quota, mailshare_mail_server_id FROM ".&OBM::dbUtils::getTableName("MailShare", $self->{"incremental"})." WHERE mailshare_id=".$mailShareId;
+    $query = "SELECT * FROM ".&OBM::dbUtils::getTableName("MailShare", $self->{"incremental"})." LEFT JOIN ".&OBM::dbUtils::getTableName("MailServer", $self->isIncremental())." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -114,30 +117,35 @@ sub getEntity {
     }
 
     # On range les resultats dans la structure de donnees des resultats
-    my( $mailshare_name, $mailshare_description, $mailshare_email, $mailshare_quota, $mailshare_mail_server_id ) = $queryResult->fetchrow_array();
+    my $dbMailShareDesc = $queryResult->fetchrow_hashref();
+#    my( $mailshare_name, $mailshare_description, $mailshare_email, $mailshare_quota, $mailshare_mail_server_id ) = $queryResult->fetchrow_array();
     $queryResult->finish();
 
-    &OBM::toolBox::write_log( "obmMailshare: gestion de la BAL partagee : '".$mailshare_name."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    # On stocke la description BD utile pour la MAJ des tables
+    $self->{"mailShareBdDesc"} = $dbMailShareDesc;
+
+    &OBM::toolBox::write_log( "obmMailshare: gestion de la BAL partagee : '".$dbMailShareDesc->{"mailshare_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     # On range les resultats dans la structure de donnees des resultats
-    $self->{"mailShareDesc"}->{"mailshare_name"} = $mailshare_name;
-    $self->{"mailShareDesc"}->{"mailshare_mailbox"} = "+".$mailshare_name."@".$domainDesc->{"domain_name"};
-    $self->{"mailShareDesc"}->{"mailshare_description"} = $mailshare_description;
+    $self->{"mailShareDesc"}->{"mailshare_name"} = $dbMailShareDesc->{"mailshare_name"};
+    $self->{"mailShareDesc"}->{"mailshare_mailbox"} = "+".$dbMailShareDesc->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
+    $self->{"mailShareDesc"}->{"mailshare_description"} = $dbMailShareDesc->{"mailshare_description"};
     $self->{"mailShareDesc"}->{"mailshare_domain"} = $domainDesc->{"domain_label"};
 
-    if( $mailshare_email ) {
-        my $localServerIp = &OBM::toolBox::getHostIpById( $dbHandler, $mailshare_mail_server_id );
+    if( $dbMailShareDesc->{"mailshare_email"} ) {
+        my $localServerIp = &OBM::toolBox::getHostIpById( $dbHandler, $dbMailShareDesc->{"mailserver_host_id"} );
 
+    #$query = "SELECT mailshare_name, mailshare_description, mailshare_email, mailshare_quota, mailshare_mail_server_id FROM ".&OBM::dbUtils::getTableName("MailShare", $self->{"incremental"})." WHERE mailshare_id=".$mailShareId;
         if( !defined($localServerIp) ) {
-            &OBM::toolBox::write_log( "obmMailshare: droit mail du repertoire partage : '".$mailshare_name."' annule - Serveur inconnu !", "W" );
+            &OBM::toolBox::write_log( "obmMailshare: droit mail du repertoire partage : '".$dbMailShareDesc->{"mailshare_name"}."' annule - Serveur inconnu !", "W" );
             $self->{"mailShareDesc"}->{"mailshare_mailperms"} = 0;
 
         }else {
             $self->{"mailShareDesc"}->{"mailshare_mailperms"} = 1;
-            push( @{$self->{"mailShareDesc"}->{"mailshare_mail"}}, $mailshare_email."@".$domainDesc->{"domain_name"} );
+            push( @{$self->{"mailShareDesc"}->{"mailshare_mail"}}, $dbMailShareDesc->{"mailshare_email"}."@".$domainDesc->{"domain_name"} );
 
             for( my $j=0; $j<=$#{$domainDesc->{"domain_alias"}}; $j++ ) {
-                push( @{$self->{"mailShareDesc"}->{"mailshare_mail_alias"}}, $mailshare_email."@".$domainDesc->{"domain_alias"}->[$j] );
+                push( @{$self->{"mailShareDesc"}->{"mailshare_mail_alias"}}, $dbMailShareDesc->{"mailshare_email"}."@".$domainDesc->{"domain_alias"}->[$j] );
             }
 
             # Gestion de la BAL destination
@@ -147,10 +155,10 @@ sub getEntity {
             $self->{"mailShareDesc"}->{"mailShare_mailLocalServer"} = "lmtp:".$localServerIp.":24";
 
             # Gestion du serveur de mail
-            $self->{"mailShareDesc"}->{"mailShare_server"} = $mailshare_mail_server_id;
+            $self->{"mailShareDesc"}->{"mailShare_server"} = $dbMailShareDesc->{"mailserver_host_id"};
 
             # Gestion du quota
-            $self->{"mailShareDesc"}->{"user_mailbox_quota"} = $mailshare_quota*1000;
+            $self->{"mailShareDesc"}->{"user_mailbox_quota"} = $dbMailShareDesc->{"mailshare_quota"}*1000;
         }
 
     }else {
@@ -167,6 +175,67 @@ sub getEntity {
         $self->getEntityLinks( $dbHandler, $domainDesc );
     }
 
+
+    return 1;
+}
+
+
+sub updateDbEntity {
+    my $self = shift;
+    my( $dbHandler ) = @_;
+
+    if( !defined($dbHandler) ) {
+        return 0;
+    }
+
+    my $dbMailShareDesc = $self->{"mailShareBdDesc"};
+    if( !defined($dbMailShareDesc) ) {
+        return 0;
+    }
+
+    &OBM::toolBox::write_log( "obmMailshare: MAJ de la boite a lettre partagee '".$dbMailShareDesc->{"mailshare_name"}."' dans les tables de production", "W" );
+
+    # MAJ de l'entité dans la table de production
+    my $query = "DELETE FROM P_MailShare WHERE mailshare_id=".$self->{"mailShareId"};
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    # Obtention des noms de colonnes de la table
+    $query = "SELECT * FROM P_MailShare WHERE 0=1";
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+    my $columnList = $queryResult->{NAME};
+
+    $query = "INSERT INTO P_MailShare SET ";
+    my $first = 1;
+    for( my $i=0; $i<=$#$columnList; $i++ ) {
+        if( !$first ) {
+            $query .= ", ";
+        }else {
+            $first = 0;
+        }
+
+        $query .= "$columnList->[$i]=".$dbHandler->quote($dbMailShareDesc->{$columnList->[$i]});
+    }
+
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    # Les liens
+    if( $self->isLinks() ) {
+        # On supprime les liens actuels de la table de production
+        $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"mailShareId"}." AND entityright_entity='"$self->{"entityRightType"}"'";
+        ppppppppppppppppppppp
+        # A compléter
+    
+    }
 
     return 1;
 }
@@ -232,17 +301,17 @@ sub _getEntityMailShareAcl {
 
     }else {
 
-        my $entityType = "mailshare";
+        my $entityType = $self->{"entityRightType"};
         my %rightDef;
 
         $rightDef{"read"}->{"compute"} = 1;
-        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"writeonly"}->{"compute"} = 1;
-        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"write"}->{"compute"} = 1;
-        $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=1 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=1 AND j.entityright_entity_id=".$mailShareId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"public"}->{"compute"} = 0;
         $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." WHERE entityright_entity_id=".$mailShareId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";

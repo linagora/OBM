@@ -520,7 +520,7 @@ sub getEntityRight {
             return undef;
         }
 
-        while( my( $userLogin ) = $queryResult->fetchrow_array ) {
+        while( my( $userId, $userLogin ) = $queryResult->fetchrow_array ) {
             if( defined($domain->{"domain_name"}) ) {
                 $userLogin .= "@".$domain->{"domain_name"};
             }
@@ -528,6 +528,7 @@ sub getEntityRight {
             # Si l'utilisateur n'a pas déjà été trouvé, on l'initialise
             # avec les valeurs du template
             if( !exists( $usersList{$userLogin} ) ) {
+                $usersList{$userLogin}->{"userId"} = $userId;
                 while( my( $templateRight, $templateValue ) = each( %entityTemplate ) ) {
                     $usersList{$userLogin}->{$templateRight} = $templateValue;
                 }

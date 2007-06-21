@@ -63,17 +63,17 @@ sub getDbValues {
 
 sub initRight {
     my( $shareId ) = @_;
-    my $entityType = "mailshare";
+    my $entityType = "MailShare";
     my %rightDef;
 
     $rightDef{"read"}->{"compute"} = 1;
-    $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM P_UserObm i, P_EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$shareId." AND j.entityright_entity='".$entityType."'";
+    $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM P_UserObm i, P_EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$shareId." AND j.entityright_entity='".$entityType."'";
         
     $rightDef{"writeonly"}->{"compute"} = 1;
-    $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM P_UserObm i, P_EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$shareId." AND j.entityright_entity='".$entityType."'";
+    $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM P_UserObm i, P_EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$shareId." AND j.entityright_entity='".$entityType."'";
 
     $rightDef{"write"}->{"compute"} = 1;
-    $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_login FROM P_UserObm i, P_EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=1 AND j.entityright_entity_id=".$shareId." AND j.entityright_entity='".$entityType."'";
+    $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM P_UserObm i, P_EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=1 AND j.entityright_entity_id=".$shareId." AND j.entityright_entity='".$entityType."'";
         
     $rightDef{"public"}->{"compute"} = 0;
     $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM P_EntityRight WHERE entityright_entity_id=".$shareId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
