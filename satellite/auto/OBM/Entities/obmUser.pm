@@ -24,6 +24,7 @@ sub new {
 
     my %obmUserAttr = (
         type => undef,
+        entityRightType => undef,
         typeDesc => undef,
         incremental => undef,
         links => undef,
@@ -32,7 +33,8 @@ sub new {
         sieve => undef,
         userId => undef,
         domainId => undef,
-        userDesc => undef
+        userDesc => undef,
+        userBdDesc => undef
     );
 
 
@@ -56,6 +58,7 @@ sub new {
     }
 
     $obmUserAttr{"type"} = $POSIXUSERS;
+    $obmUserAttr{"entityRightType"} = "MailBox";
     $obmUserAttr{"typeDesc"} = $attributeDef->{$obmUserAttr{"type"}};
     $obmUserAttr{"toDelete"} = 0;
     $obmUserAttr{"archive"} = 0;
@@ -107,7 +110,7 @@ sub getEntity {
 
 
     # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT userobm_id, userobm_archive, userobm_perms, userobm_login, userobm_password_type, userobm_password, userobm_uid, userobm_gid, userobm_lastname, userobm_firstname, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_title, userobm_service, userobm_description, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, mailserver_host_id, userobm_mail_quota, userobm_vacation_enable, userobm_vacation_message, userobm_nomade_perms, userobm_nomade_enable, userobm_nomade_local_copy, userobm_email_nomade, userobm_web_perms, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." LEFT JOIN ".&OBM::dbUtils::getTableName("MailServer", $self->isIncremental())." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
+    $query = "SELECT * FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." LEFT JOIN ".&OBM::dbUtils::getTableName("MailServer", $self->isIncremental())." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -116,98 +119,102 @@ sub getEntity {
     }
 
     # On range les resultats dans la structure de donnees des resultats
-    my( $user_id, $user_archive, $user_perms, $user_login, $user_passwd_type, $user_passwd, $user_uid, $user_gid, $user_lastname, $user_firstname, $user_address1, $user_address2, $user_address3, $user_zipcode, $user_town, $user_title, $user_service, $user_description, $user_mail_perms, $user_mail_ext_perms, $user_email, $user_mail_server_id, $user_mail_quota, $user_vacation_enable, $user_vacation_message, $user_nomade_perms, $user_nomade_enable, $user_nomade_local_copy, $user_nomade_email, $user_web_perms, $user_phone, $user_phone2, $user_fax, $user_fax2, $user_mobile ) = $queryResult->fetchrow_array();
+    my $dbUserDesc = $queryResult->fetchrow_hashref();
     $queryResult->finish();
 
+    # On stocke la description BD utile pour la MAJ des tables
+    $self->{"userBdDesc"} = $dbUserDesc;
+
     # Positionnement du flag archive
-    $self->{"archive"} = $user_archive;
-    if( $user_archive ) {
-        &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur archive '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    $self->{"archive"} = $dbUserDesc->{"userobm_archive"};
+    if( $dbUserDesc->{"userobm_archive"} ) {
+        &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur archive '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     }else {
-        &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     }
 
     # Gestion de l'UID
-    my $user_real_uid = $user_uid;
-    if( lc($user_perms) eq "admin" ) {
+    my $user_real_uid = $dbUserDesc->{"userobm_uid"};
+    if( lc($dbUserDesc->{"userobm_perms"}) eq "admin" ) {
         $user_real_uid = 0;
     }
         
     # On cree la structure correspondante a l'utilisateur
     # Cette structure est composee des valeurs recuperees dans la base
     $self->{"userDesc"} = {
-        "user_id"=>$user_id,
-        "user_login"=>$user_login,
+        "user_id"=>$dbUserDesc->{"userobm_id"},
+        "user_login"=>$dbUserDesc->{"userobm_login"},
         "user_uid"=>$user_real_uid,
-        "user_gid"=>$user_gid,
-        "user_lastname"=>$user_lastname,
-        "user_firstname"=>$user_firstname,
-        "user_homedir"=>"$baseHomeDir/$user_login",
-        "user_mailperms"=>$user_mail_perms,
-        "user_webperms"=>$user_web_perms,
-        "user_passwd_type"=>$user_passwd_type,
-        "user_passwd"=>$user_passwd,
-        "user_title"=>$user_title,
-        "user_service"=>$user_service,
-        "user_description"=>$user_description,
-        "user_zipcode"=>$user_zipcode,
-        "user_town"=>$user_town,
-        "user_mobile"=>$user_mobile,
+        "user_gid"=>$dbUserDesc->{"userobm_gid"},
+        "user_lastname"=>$dbUserDesc->{"userobm_lastname"},
+        "user_firstname"=>$dbUserDesc->{"userobm_firstname"},
+        "user_homedir"=>"$baseHomeDir/".$dbUserDesc->{"userobm_login"},
+        "user_mailperms"=>$dbUserDesc->{"userobm_mail_perms"},
+        "user_webperms"=>$dbUserDesc->{"userobm_web_perms"},
+        "user_passwd_type"=>$dbUserDesc->{"userobm_password_type"},
+        "user_passwd"=>$dbUserDesc->{"userobm_password"},
+        "user_title"=>$dbUserDesc->{"userobm_title"},
+        "user_service"=>$dbUserDesc->{"userobm_service"},
+        "user_description"=>$dbUserDesc->{"userobm_description"},
+        "user_zipcode"=>$dbUserDesc->{"userobm_zipcode"},
+        "user_town"=>$dbUserDesc->{"userobm_town"},
+        "user_mobile"=>$dbUserDesc->{"userobm_mobile"},
         "user_domain" => $domainDesc->{"domain_label"}
     };
 
+
     # gestion de l'adresse
-    if( defined($user_address1) && ($user_address1 ne "") ) {
-        $self->{"userDesc"}->{"user_address"} = $user_address1;
+    if( defined($dbUserDesc->{"userobm_address1"}) && ($dbUserDesc->{"userobm_address1"} ne "") ) {
+        $self->{"userDesc"}->{"user_address"} = $dbUserDesc->{"userobm_address1"};
     }
         
-    if( defined($user_address2) && ($user_address2 ne "") ) {
-        $self->{"userDesc"}->{"user_address"} .= "\r\n".$user_address2;
+    if( defined($dbUserDesc->{"userobm_address2"}) && ($dbUserDesc->{"userobm_address2"} ne "") ) {
+        $self->{"userDesc"}->{"user_address"} .= "\r\n".$dbUserDesc->{"userobm_address2"};
     }
         
-    if( defined($user_address3) && ($user_address3 ne "") ) {
-        $self->{"userDesc"}->{"user_address"} .= "\r\n".$user_address3;
+    if( defined($dbUserDesc->{"userobm_address3"}) && ($dbUserDesc->{"userobm_address3"} ne "") ) {
+        $self->{"userDesc"}->{"user_address"} .= "\r\n".$dbUserDesc->{"userobm_address3"};
     }
         
 
     # Gestion du téléphone
-    if( defined($user_phone) && ($user_phone ne "") ) {
-        push( @{$self->{"userDesc"}->{"user_phone"}}, $user_phone );
+    if( defined($dbUserDesc->{"userobm_phone"}) && ($dbUserDesc->{"userobm_phone"} ne "") ) {
+        push( @{$self->{"userDesc"}->{"user_phone"}}, $dbUserDesc->{"userobm_phone"} );
     }
 
-    if( defined($user_phone2) && ($user_phone2 ne "") ) {
-        push( @{$self->{"userDesc"}->{"user_phone"}}, $user_phone2 );
+    if( defined($dbUserDesc->{"userobm_phone2"}) && ($dbUserDesc->{"userobm_phone2"} ne "") ) {
+        push( @{$self->{"userDesc"}->{"user_phone"}}, $dbUserDesc->{"userobm_phone2"} );
     }
 
     # Gestion du fax
-    if( defined($user_fax) && ($user_fax ne "") ) {
-        push( @{$self->{"userDesc"}->{"user_fax"}}, $user_fax );
+    if( defined($dbUserDesc->{"userobm_fax"}) && ($dbUserDesc->{"userobm_fax"} ne "") ) {
+        push( @{$self->{"userDesc"}->{"user_fax"}}, $dbUserDesc->{"userobm_fax"} );
     }
 
-    if( defined($user_fax2) && ($user_fax2 ne "") ) {
-        push( @{$self->{"userDesc"}->{"user_fax"}}, $user_fax2 );
+    if( defined($dbUserDesc->{"userobm_fax2"}) && ($dbUserDesc->{"userobm_fax2"} ne "") ) {
+        push( @{$self->{"userDesc"}->{"user_fax"}}, $dbUserDesc->{"userobm_fax2"} );
     }
 
     # Gestion du droit de messagerie
-    if( $user_mail_perms ) {
-        my $localServerIp = &OBM::toolBox::getHostIpById( $dbHandler, $user_mail_server_id );
+    if( $dbUserDesc->{"userobm_mail_perms"} ) {
+        my $localServerIp = &OBM::toolBox::getHostIpById( $dbHandler, $dbUserDesc->{"mailserver_host_id"} );
 
         if( !defined($localServerIp) ) {
-            &OBM::toolBox::write_log( "obmUser: droit mail de l'utilisateur '".$user_login."' annule - Serveur inconnu !", "W" );
+            &OBM::toolBox::write_log( "obmUser: droit mail de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' annule - Serveur inconnu !", "W" );
             $self->{"userDesc"}->{"user_mailperms"} = 0;
 
         }else {
             $self->{"userDesc"}->{"user_mailperms"} = 1;
 
             # Limite la messagerie aux domaines locaux
-            if( !$user_mail_ext_perms ) {
+            if( !$dbUserDesc->{"userobm_mail_ext_perms"} ) {
                 $self->{"userDesc"}->{"user_mailLocalOnly"} = "local_only";
             }
 
             # Gestions des e-mails de l'utilisateur.
-            my @email = split( /\r\n/, $user_email );
+            my @email = split( /\r\n/, $dbUserDesc->{"userobm_email"} );
             for( my $j=0; $j<=$#email; $j++ ) {
                 push( @{$self->{"userDesc"}->{"user_email"}}, $email[$j]."@".$domainDesc->{"domain_name"} );
 
@@ -220,20 +227,20 @@ sub getEntity {
             $self->{"userDesc"}->{"user_mailbox"} = $self->{"userDesc"}->{"user_login"}."@".$domainDesc->{"domain_name"};
 
             # Gestion du serveur de mail
-            $self->{"userDesc"}->{"user_mailbox_server"} = $user_mail_server_id;
+            $self->{"userDesc"}->{"user_mailbox_server"} = $dbUserDesc->{"mailserver_host_id"};
 
             # Gestion du quota
-            $self->{"userDesc"}->{"user_mailbox_quota"} = $user_mail_quota*1000;
+            $self->{"userDesc"}->{"user_mailbox_quota"} = $dbUserDesc->{"userobm_mail_quota"}*1000;
 
             # Gestion du message d'absence
-            $self->{"userDesc"}->{"user_vacation_enable"} = $user_vacation_enable;
-            $self->{"userDesc"}->{"user_vacation_message"} = uri_unescape($user_vacation_message);
+            $self->{"userDesc"}->{"user_vacation_enable"} = $dbUserDesc->{"userobm_vacation_enable"};
+            $self->{"userDesc"}->{"user_vacation_message"} = uri_unescape($dbUserDesc->{"userobm_vacation_message"});
 
             # Gestion de la redirection d'adresse
-            $self->{"userDesc"}->{"user_nomade_perms"} = $user_nomade_perms;
-            $self->{"userDesc"}->{"user_nomade_enable"} = $user_nomade_enable;
-            $self->{"userDesc"}->{"user_nomade_local_copy"} = $user_nomade_local_copy;
-            $self->{"userDesc"}->{"user_nomade_email"} = $user_nomade_email;
+            $self->{"userDesc"}->{"user_nomade_perms"} = $dbUserDesc->{"userobm_nomade_perms"};
+            $self->{"userDesc"}->{"user_nomade_enable"} = $dbUserDesc->{"userobm_nomade_enable"};
+            $self->{"userDesc"}->{"user_nomade_local_copy"} = $dbUserDesc->{"userobm_nomade_local_copy"};
+            $self->{"userDesc"}->{"user_nomade_email"} = $dbUserDesc->{"userobm_email_nomade"};
 
             # Gestion de la livraison du courrier
             $self->{"userDesc"}->{"user_mailLocalServer"} = "lmtp:".$localServerIp.":24";
@@ -242,10 +249,72 @@ sub getEntity {
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
-    if( $self->{"links"} ) {
+    if( $self->isLinks() ) {
         $self->getEntityLinks( $dbHandler, $domainDesc );
     }
 
+
+    return 1;
+}
+
+
+sub updateDbEntity {
+    my $self = shift;
+    my( $dbHandler ) = @_;
+
+    if( !defined($dbHandler) ) {
+        return 0;
+    }
+
+    my $dbUserDesc = $self->{"userBdDesc"};
+    if( !defined($dbUserDesc) ) {
+        return 0;
+    }
+
+    &OBM::toolBox::write_log( "obmUser: MAJ de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' dans les tables de production", "W" );
+
+    # MAJ de l'entité dans la table de production
+    my $query = "DELETE FROM P_UserObm WHERE userobm_id=".$self->{"userId"};
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    # Obtention des noms de colonnes de la table
+    $query = "SELECT * FROM P_UserObm WHERE 0=1";
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+    my $columnList = $queryResult->{NAME};
+
+    $query = "INSERT INTO P_UserObm SET ";
+    my $first = 1;
+    for( my $i=0; $i<=$#$columnList; $i++ ) {
+        if( !$first ) {
+            $query .= ", ";
+        }else {
+            $first = 0;
+        }
+
+        if( !defined($dbUserDesc->{$columnList->[$i]}) ) {
+            $query .= "$columnList->[$i]=NULL";
+        }else {
+            $query .= "$columnList->[$i]=".$dbHandler->quote($dbUserDesc->{$columnList->[$i]});
+        }
+    }
+
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    # Les liens
+    if( $self->isLinks() ) {
+    # A compléter
+    
+    }
 
     return 1;
 }
@@ -308,19 +377,19 @@ sub _getEntityMailboxAcl {
 
     if( !$self->{"userDesc"}->{"user_mailperms"} ) {
         $self->{"userDesc"}->{"user_mailbox_acl"} = undef;
-    }else {
 
-        my $entityType = "mailbox";
+    }else {
+        my $entityType = $self->{"entityRightType"};
         my %rightDef;
 
         $rightDef{"read"}->{"compute"} = 1;
-        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"writeonly"}->{"compute"} = 1;
-        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"write"}->{"compute"} = 1;
-        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." LEFT JOIN ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
+        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_id, userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." LEFT JOIN ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
 
         $rightDef{"public"}->{"compute"} = 0;
         $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
