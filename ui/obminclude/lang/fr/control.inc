@@ -13,6 +13,7 @@ $l_network = "Réseau";
 $l_ip_int = "IP interne";
 $l_ip_ext = "IP externe";
 $l_mail_domain = "Domaine de messagerie";
+$l_mail_alias = "Alias de messagerie";
 $l_mail_mode = "Mode de messagerie";
 $l_relay = "Relais";
 $l_server = "Serveur";

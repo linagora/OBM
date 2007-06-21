@@ -337,15 +337,16 @@ function of_domain_get_list() {
 ///////////////////////////////////////////////////////////////////////////////
 // Return a domain infos
 // Parameters:
-//   - $d_id : domain in
+//   - $d_id           : domain in
+//   - $get_properties : flag to get properties
 // Returns:
 //   - array with domain infos
 ///////////////////////////////////////////////////////////////////////////////
-function of_domain_get_domain_infos($d_id) {
+function of_domain_get_domain_infos($d_id, $get_properties=false) {
   global $cdg_sql;
 
-  $obm_q = new DB_OBM;
   if ($d_id > 0) {
+    $obm_q = new DB_OBM;
     $query = "SELECT domain_id,
       domain_label,
       domain_name,
@@ -362,6 +363,19 @@ function of_domain_get_domain_infos($d_id) {
     $domain["name"] = $obm_q->f("domain_name");
     $domain["alias"] = $obm_q->f("domain_alias");
     $domain["mailserver"] = $obm_q->f("domain_mail_server_id");
+
+    if ($get_properties) {
+      $query = "SELECT * FROM DomainPropertyValue
+        WHERE domainpropertyvalue_domain_id='$d_id'";
+      display_debug_msg($query, $cdg_sql, "of_domain_get_domain_infos()");
+      $obm_q->query($query);
+      while ($obm_q->next_record()) {
+	$prop = $obm_q->f('domainpropertyvalue_property_key');
+	$value = $obm_q->f('domainpropertyvalue_value');
+	$domain[$prop] = $value;
+      }
+    }
+
   } else {
     $domain["id"] = "0";
     $domain["label"] = "Global";

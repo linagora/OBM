@@ -127,6 +127,7 @@ function run_query_user_search($user) {
 
   $select = "SELECT distinct UserObm.*,
       userobm_id as id,
+      domain_label,
       domain_name,
       $datebegin,
       $lastaccess
@@ -223,8 +224,7 @@ function run_query_user_ext_search($user) {
       $multidomain
       $where_restriction
     ORDER BY  userobm_lastname, userobm_firstname
-    LIMIT $first_row, $limit
-      ";
+    LIMIT $first_row, $limit";
 
   display_debug_msg($query, $cdg_sql, "run_query_user_ext_search()");
   $obm_q->query($query);
@@ -257,6 +257,7 @@ function run_query_user_detail($p_id) {
       $lastaccess,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
+      domain_label,
       domain_name,
       ms.host_name as mailserver_hostname,
       mailserver_id,

@@ -962,7 +962,7 @@ function check_contact_update_rights($params, $c='') {
 
   $id = $params['contact_id'];
   if ($id > 0) {
-    // Get current group info if not given
+    // Get current contact info if not given
     if (! is_array($c)) {
       $c = get_contact_info($id);
     }
@@ -1001,7 +1001,8 @@ function check_contact_update_rights($params, $c='') {
 //                  company_id, comp_new_id
 ///////////////////////////////////////////////////////////////////////////////
 function check_contact_data_form($cid, $contact) {
-  global $perm, $cgp_show, $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
+  global $perm, $cgp_show, $cright_write_admin;
+  global $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
   global $l_fill_lastname, $l_fill_company, $l_j_check_phone;
   global $l_j_check_hphone,$l_j_check_mphone, $l_j_check_fax, $l_j_check_email;
   global $err, $l_exist_error, $l_err_public_rights;

@@ -436,7 +436,7 @@ function html_user_consult($obm_q) {
   global $obm, $profiles, $path, $display, $c_yes, $c_no;
 
   $id = $obm_q->f("userobm_id");
-  $domain_name = ($obm_q->f("domain_name") != "" ? $obm_q->f("domain_name") : "GLOBAL");
+  $domain_label = ($obm_q->f("domain_label") != "" ? $obm_q->f("domain_label") : "GLOBAL");
   $system = $obm_q->f("userobm_system");
   $login = $obm_q->f("userobm_login");
   $local = ($obm_q->f("userobm_local") == 1 ? $c_yes : $c_no);
@@ -703,7 +703,7 @@ function html_user_consult($obm_q) {
   </tr>
   <tr>
     <th>$l_domain</th>
-    <td>$domain_name</td>
+    <td>$domain_label</td>
   </tr>
   <tr>
     <th>$l_local</th>
@@ -973,9 +973,15 @@ function html_user_form($usr_q, $user, $field="") {
     $smb_home_drive = $usr_q->f("userobm_samba_home_drive");
     $smb_logon = $usr_q->f("userobm_samba_logon_script");
   } elseif ($action == "new") {
+    $dom_infos = of_domain_get_domain_infos($obm['domain_id'], true);
+    $ad1 = $dom_infos['address1'];
+    $ad2 = $dom_infos['address2'];
+    $ad3 = $dom_infos['address3'];
+    $zip = $dom_infos['postcode'];
+    $town = $dom_infos['town'];
     $smb = get_samba_info();
-    $smb_home = $smb["samba_home_def"];
-    $smb_home_drive = $smb["samba_home_drive_def"];
+    $smb_home = $smb['samba_home_def'];
+    $smb_home_drive = $smb['samba_home_drive_def'];
   }
 
   // If parameters have been given, they supercede the default action value

@@ -17,7 +17,7 @@
 function html_control_consult($domain_id="") {
   global $l_control, $l_system, $l_client, $l_model, $l_version;
   global $gp_client, $gp_model, $obm_version;
-  global $l_network, $l_mail_domain;
+  global $l_network, $l_domain, $l_mail_domain, $l_mail_alias;
   global $l_mail_mode, $l_relay, $l_server;
   global $l_global_stats, $l_private, $l_public, $l_archive;
   global $l_nb_user, $l_nb_group, $l_nb_mailshare, $l_disk_space;
@@ -34,7 +34,10 @@ function html_control_consult($domain_id="") {
 
   if ($cgp_use["service"]["mail"]) {
 
-    $domain = $obm["domain_name"];
+    $domain_label = $obm["domain_label"];
+    $domain_name = $obm["domain_name"];
+    $domain = of_domain_get_domain_infos($obm["domain_id"]);
+    $domain_alias = $domain['alias'];
 
     $mode_mail = ($mail_relay ? $l_relay : $l_server);
     if (! $mail_relay) {
@@ -49,12 +52,20 @@ function html_control_consult($domain_id="") {
 
     <table>
     <tr>
+      <th>$l_domain</th>
+      <td>$domain_label</td>
+    </tr>
+    <tr>
       <th>$l_mail_domain</th>
       <td>$domain</td>
     </tr>
     <tr>
       <th>$l_mail_mode</th>
       <td>$mode_mail</td>
+    </tr>
+    <tr>
+      <th>$l_mail_alias</th>
+      <td>$domain_alias</td>
     </tr>
     </table>
 
