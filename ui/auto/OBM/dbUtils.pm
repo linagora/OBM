@@ -76,14 +76,3 @@ sub execQuery {
 		}
 	}
 }
-
-
-sub getTableName {
-    my( $tableName, $incremental ) = @_;
-
-    if( !$incremental ) {
-        $tableName = "P_".$tableName;
-    }
-
-    return $tableName;
-}

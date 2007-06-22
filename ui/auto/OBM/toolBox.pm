@@ -474,6 +474,7 @@ sub getEntityRight {
     }
 
     if( my( $read, $write ) = $queryResult->fetchrow_array ) {
+        $usersList{"anyone"}->{"userId"} = 0;
         if( $read && !$write ) {
             $usersList{"anyone"}->{"read"} = 1;
             $usersList{"anyone"}->{"writeonly"} = 0;
@@ -554,13 +555,13 @@ sub computeRight {
 
     while( my( $userName, $right ) = each( %$usersList ) ) {
         if( $right->{"write"} ) {
-            $rightList->{"write"}->{$userName} = 1;
+            $rightList->{"write"}->{$userName} = $usersList->{$userName}->{"userId"};
         }elsif( $right->{"read"} && $right->{"writeonly"} ) {
-            $rightList->{"write"}->{$userName} = 1;
+            $rightList->{"write"}->{$userName} = $usersList->{$userName}->{"userId"};
         }elsif( $right->{"read"} ) {
-            $rightList->{"read"}->{$userName} = 1;
+            $rightList->{"read"}->{$userName} = $usersList->{$userName}->{"userId"};
         }elsif( $right->{"writeonly"} ) {
-            $rightList->{"writeonly"}->{$userName} = 1;
+            $rightList->{"writeonly"}->{$userName} = $usersList->{$userName}->{"userId"};
         }
     }
 
