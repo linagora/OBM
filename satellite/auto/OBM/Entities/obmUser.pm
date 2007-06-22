@@ -21,6 +21,8 @@ use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 sub new {
     my $self = shift;
     my( $incremental, $userId ) = @_;
+    # SUPPRIMER le parametre incremental au profit du parametre links qui permet
+    # de determiner si les liens de l'entité doivent être chargés ou pas.
 
     my %obmUserAttr = (
         type => undef,
@@ -89,7 +91,7 @@ sub getEntity {
     }
 
 
-    my $query = "SELECT COUNT(*) FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." LEFT JOIN ".&OBM::dbUtils::getTableName("MailServer", $self->isIncremental())." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
+    my $query = "SELECT COUNT(*) FROM UserObm LEFT JOIN MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -110,7 +112,7 @@ sub getEntity {
 
 
     # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT * FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." LEFT JOIN ".&OBM::dbUtils::getTableName("MailServer", $self->isIncremental())." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
+    $query = "SELECT * FROM UserObm LEFT JOIN MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -271,7 +273,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "obmUser: MAJ de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "obmUser: MAJ de l'utilisateur '".$dbUserDesc->{"userobm_login"}."', domaine ".." dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "DELETE FROM P_UserObm WHERE userobm_id=".$self->{"userId"};
@@ -298,11 +300,7 @@ sub updateDbEntity {
             $first = 0;
         }
 
-        if( !defined($dbUserDesc->{$columnList->[$i]}) ) {
-            $query .= "$columnList->[$i]=NULL";
-        }else {
-            $query .= "$columnList->[$i]=".$dbHandler->quote($dbUserDesc->{$columnList->[$i]});
-        }
+        $query .= "$columnList->[$i]=".$dbHandler->quote($dbUserDesc->{$columnList->[$i]});
     }
 
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -312,8 +310,43 @@ sub updateDbEntity {
 
     # Les liens
     if( $self->isLinks() ) {
-    # A compléter
-    
+        # On supprime les liens actuels de la table de production
+        $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"userId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
+
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+
+        # On copie les nouveaux droits
+        $query = "SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"userId"};
+
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+        while( my $rowHash = $queryResult->fetchrow_hashref() ) {
+            $query = "INSERT INTO P_EntityRight SET ";
+
+            my $first = 1;
+            while( my( $column, $value ) = each(%{$rowHash}) ) {
+                if( !$first ) {
+                    $query .= ", ";
+                }else {
+                    $first = 0;
+                }
+
+                $query .= $column."=".$dbHandler->quote($value);
+            }
+
+            my $queryResult2;
+            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
+                &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+                return 0;
+            }
+        }
     }
 
     return 1;
@@ -383,16 +416,16 @@ sub _getEntityMailboxAcl {
         my %rightDef;
 
         $rightDef{"read"}->{"compute"} = 1;
-        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"writeonly"}->{"compute"} = 1;
-        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." i, ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM UserObm i, EntityRight j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
 
         $rightDef{"write"}->{"compute"} = 1;
-        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_id, userobm_login FROM ".&OBM::dbUtils::getTableName("UserObm", $self->isIncremental())." LEFT JOIN ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
+        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_id, userobm_login FROM UserObm LEFT JOIN EntityRight ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
 
         $rightDef{"public"}->{"compute"} = 0;
-        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".&OBM::dbUtils::getTableName("EntityRight", $self->isIncremental())." WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
+        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM EntityRight WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
 
         # On recupere la definition des ACL
         $self->{"userDesc"}->{"user_mailbox_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domainDesc, \%rightDef, $userId );
