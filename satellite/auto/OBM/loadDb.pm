@@ -84,12 +84,12 @@ sub new {
     }
 
     # Obtention des serveurs LDAP par domaines
-    &OBM::ldap::getServerByDomain( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} );
+    $self->getLdapServer( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} );
 
     # Parametrage des serveurs IMAP par domaine
-    &OBM::imapd::getServerByDomain( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} );
-    if( !&OBM::imapd::getAdminImapPasswd( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} ) ) {
-        exit;
+    $self->getCyrusServers( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} );
+    if( !$self->getAdminImapPasswd( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} ) ) {
+        return undef;
     }
 
     # initialisation des moteurs nécessaires
@@ -159,6 +159,7 @@ sub update {
 sub _doAll {
     my $self = shift;
     my $queryResult;
+    my $globalReturn = 1;
 
     if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
         &OBM::toolBox::write_log( "loadDb: pas de domaine indique pour la MAJ totale", "W" );
@@ -183,7 +184,15 @@ sub _doAll {
         }
 
         while( my( $systemUserId ) = $queryResult->fetchrow_array() ) {
-            $self->_doSystemUser( 1, 0, $systemUserId );
+            my $object = $self->_doSystemUser( 1, 0, $systemUserId );
+
+            my $return = $self->_runEngines( $object );
+
+            if( $return ) {
+                # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+                # travail
+                $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            }
         }
     }
 
@@ -202,6 +211,12 @@ sub _doAll {
             $object = $self->_doUser( 1, 0, $userId );
 
             my $return = $self->_runEngines( $object );
+
+            if( $return ) {
+                # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+                # travail
+                $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            }
         }
 
         # Traitement des entités de type 'groupe'
@@ -215,6 +230,12 @@ sub _doAll {
             $object = $self->_doGroup( 1, 0, $groupId );
 
             my $return = $self->_runEngines( $object );
+
+            if( $return ) {
+                # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+                # travail
+                $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            }
         }
 
         # Traitement des entités de type 'mailshare'
@@ -228,14 +249,26 @@ sub _doAll {
             $object = $self->_doMailShare( 1, 0, $mailshareId );
 
             my $return = $self->_runEngines( $object );
+
+            if( $return ) {
+                # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+                # travail
+                $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            }
         }
 
         # Traitement des entités de type 'postfixConf'
         $object = $self->_doPostfixConf( 1, 0 );
         my $return = $self->_runEngines( $object );
+
+        if( $return ) {
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # travail
+            $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        }
     }
 
-    return 1;
+    return $globalReturn; 
 }
 
 
@@ -889,4 +922,112 @@ sub getDomains {
     }
 
     return \@domainList;
+}
+
+
+sub getLdapServer {
+    my $self = shift;
+    my( $dbHandler, $domainList ) = @_;
+
+    if( !defined($ldapAdminLogin) ) {
+        return 0;
+    }
+
+    for( my $i=0; $i<=$#$domainList; $i++ ) {
+        &OBM::toolBox::write_log( "Recuperation du serveur LDAP pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
+
+        my $queryLdapAdmin = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$ldapAdminLogin."'";
+
+        # On execute la requete concernant l'administrateur LDAP associé
+        my $queryLdapAdminResult;
+        if( !&OBM::toolBox::execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
+            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
+            if( defined($queryLdapAdminResult) ) {
+                &OBM::toolBox::write_log( $queryLdapAdminResult->err, "W" );
+            }
+        }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
+            $domainList->[$i]->{"ldap_admin_server"} = $ldapServer;
+            $domainList->[$i]->{"ldap_admin_login"} = $ldapAdminLogin;
+            $domainList->[$i]->{"ldap_admin_passwd"} = $ldapAdminPasswd;
+
+            $queryLdapAdminResult->finish;
+        }
+    }
+
+    return 1;
+
+}
+
+
+sub getCyrusServers {
+    my $self = shift;
+    my( $dbHandler, $domainList ) = @_;
+
+    for( my $i=0; $i<=$#$domainList; $i++ ) {
+        if( $domainList->[$i]->{"meta_domain"} ) {
+            next;
+        }
+
+        &OBM::toolBox::write_log( "Recuperation des serveurs de courrier pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
+        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, MailServer j WHERE (i.host_domain_id=0 OR i.host_domain_id=".$domainList->[$i]->{"domain_id"}.") AND i.host_id=j.mailserver_host_id";
+
+        # On execute la requete
+        my $queryResult;
+        if( !&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            next;
+        }
+
+        my @srvList = ();
+        while( my( $hostId, $hostName, $hostIp) = $queryResult->fetchrow_array ) {
+            my $srv;
+            $srv->{"imap_server_id"} = $hostId;
+            $srv->{"imap_server_name"} = $hostName;
+            $srv->{"imap_server_ip"} = $hostIp;
+
+            push( @{$domainList->[$i]->{"imap_servers"}}, $srv );
+        }
+    }
+
+    return 0;
+}
+
+
+sub getAdminImapPasswd {
+    my $self = shift;
+    my( $dbHandler, $domainList ) = @_;
+    my $cyrusAdmin;
+    $cyrusAdmin->{"login"} = "cyrus";
+
+    # Le statement handler (pointeur sur le resultat)
+    my $queryResult;
+
+    # La requete a executer - obtention des informations sur l'administrateur de
+    # la messagerie.
+    my $query = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$cyrusAdmin->{"login"}."'";
+
+    # On execute la requete
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    if( !(($cyrusAdmin->{"passwd"}) = $queryResult->fetchrow_array) ) {
+        &OBM::toolBox::write_log( "Echec: mot de passe de l'administrateur IMAP inconnu", "W" );
+        return 0;
+    }
+
+    # Si on a recupere un resultat, c'est bon...
+    $queryResult->finish;
+
+    # On positionne le login et mot de passe au niveau de la description des
+    # serveurs
+    for( my $i=0; $i<=$#$domainList; $i++ ) {
+        for( my $j=0; $j<=$#{$domainList->[$i]->{"imap_servers"}}; $j++ ) {
+            $domainList->[$i]->{"imap_servers"}->[$j]->{"imap_server_login"} = $cyrusAdmin->{"login"};
+            $domainList->[$i]->{"imap_servers"}->[$j]->{"imap_server_passwd"} = $cyrusAdmin->{"passwd"};
+        }
+    }
+
+    return 1;
 }

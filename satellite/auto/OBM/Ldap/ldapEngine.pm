@@ -503,7 +503,6 @@ sub update {
         return 0;
     }
 
-
     my $domainDesc = $self->_findDomainbyId($object->{"domainId"});
 
     my $parentDn = $self->_findTypeParentDn( $self->{"ldapStruct"}, $object->{"type"}, $object->{"domainId"} );
