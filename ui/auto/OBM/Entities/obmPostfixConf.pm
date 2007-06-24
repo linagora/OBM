@@ -85,6 +85,13 @@ sub getEntity {
 }
 
 
+sub updateDbEntity {
+    my $self = shift;
+
+    return 1;
+}
+
+
 sub setDelete {
     my $self = shift;
 

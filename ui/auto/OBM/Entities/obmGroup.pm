@@ -149,13 +149,21 @@ sub getEntity {
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
-    if( $self->{"links"} ) {
+    if( $self->isLinks() ) {
         $self->getEntityLinks( $dbHandler, $domainDesc );
     }
 
+    return 1;
+}
+
+
+sub updateDbEntity {
+    my $self = shift;
+    # A completer
 
     return 1;
 }
+
 
 
 sub getEntityLinks {
@@ -224,8 +232,26 @@ sub _getGroupUsers {
     my $groupId = $self->{"groupId"};
 
 
+    if( !defined($dbHandler) ) {
+        return undef;
+    }
+
+    if( !defined($domainDesc) ) {
+        return undef;
+    }
+
+
+    my $userObmTable = "UserObm";
+    my $userObmGroupTable = "UserObmGroup";
+    my $groupGroupTable = "GroupGroup";
+    if( $self->getDelete() ) {
+        $userObmTable = "P_".$userObmTable;
+        $userObmGroupTable = "P_".$userObmGroupTable;
+        $groupGroupTable = "P_".$groupGroupTable;
+    }
+
     # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = "SELECT i.userobm_login FROM UserObm i, UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
+    my $query = "SELECT i.userobm_login FROM ".$userObmTable." i, ".$userObmGroupTable." j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
 
     if( defined( $sqlRequest ) && ($sqlRequest ne "") ) {
         $query .= " ".$sqlRequest;
@@ -245,7 +271,7 @@ sub _getGroupUsers {
     }
 
     # Recuperation de la liste des groupes du groupe id : $groupId.
-    $query = "SELECT groupgroup_child_id FROM GroupGroup WHERE groupgroup_parent_id=".$groupId;
+    $query = "SELECT groupgroup_child_id FROM ".$groupGroupTable." WHERE groupgroup_parent_id=".$groupId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
