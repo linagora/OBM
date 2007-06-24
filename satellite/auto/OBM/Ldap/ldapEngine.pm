@@ -214,7 +214,7 @@ sub _initTree {
         my $domainDesc = $self->_findDomainbyId($domainId);
 
         if( $ldapStruct->{"node_type"} eq $ROOT ) {
-            my $object = OBM::Entities::obmRoot->new(0);
+            my $object = OBM::Entities::obmRoot->new(1, 0);
             $object->getEntity( $ldapStruct->{"name"}, $ldapStruct->{"description"}, $domainDesc );
             $ldapStruct->{"object"} = $object;
 
@@ -222,7 +222,7 @@ sub _initTree {
         }
 
         if( $ldapStruct->{"node_type"} eq $DOMAINROOT ) {
-            my $object = OBM::Entities::obmDomainRoot->new(0);
+            my $object = OBM::Entities::obmDomainRoot->new(1, 0);
             $object->getEntity( $domainDesc );
             $ldapStruct->{"object"} = $object;
 
@@ -230,7 +230,7 @@ sub _initTree {
         }
 
         if( $ldapStruct->{"node_type"} eq $NODE ) {
-            my $object = OBM::Entities::obmNode->new(0);
+            my $object = OBM::Entities::obmNode->new(1, 0);
             $object->getEntity( $ldapStruct->{"name"}, $ldapStruct->{"description"}, $domainDesc );
             $ldapStruct->{"object"} = $object;
 
@@ -461,7 +461,7 @@ sub _doWork {
             return 0;
         }
 
-    }elsif( defined($ldapEntry) ) {
+    }elsif( defined($ldapEntry) && !($object->getDelete() || $object->getArchive()) ) {
         # Mise à jour
         if( $object->updateLdapEntry($ldapEntry) ) {
             &OBM::toolBox::write_log( "ldapEngine: mise a jour du noeud : ".$dn, "W" );
@@ -471,7 +471,7 @@ sub _doWork {
             }
         }
 
-    }elsif( !defined($ldapEntry) ) {
+    }elsif( !defined($ldapEntry) && !($object->getDelete() || $object->getArchive()) ) {
         # Création
         my $ldapEntry = Net::LDAP::Entry->new;
         if( $object->createLdapEntry($ldapEntry) ) {

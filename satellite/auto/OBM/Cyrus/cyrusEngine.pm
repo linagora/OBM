@@ -472,8 +472,8 @@ sub _imapSetMailboxAcls {
         return 0;
     }
 
-    # Si l'objet est en mode incrémental, on ne met pas à jour les ACLs
-    if( $object->isIncremental() ) {
+    # Si l'objet n'est pas chargé avec les liens, on ne met pas à jour les ACLs
+    if( !$object->isLinks() ) {
         return 1;
     }
 

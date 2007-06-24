@@ -336,6 +336,11 @@ sub update {
         return 0;
     }
 
+    # Si l'objet est marqué à effacer, on ne fait rien
+    if( $object->getDelete() ) {
+        return 1;
+    }
+
     # Récupération du nom de la boîte à traiter
     my $mailBoxName = $object->getMailboxName();
     if( !defined($mailBoxName) ) {

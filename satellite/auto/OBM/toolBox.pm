@@ -609,13 +609,13 @@ sub getHostIpById {
     my( $dbHandler, $hostId ) = @_;
 
     if( !defined($hostId) ) {
-        write_log( "Identifiant de l'hôte non défini !", "W" );
+        write_log( "Identifiant de l'hote non défini !", "W" );
         return undef;
     }elsif( $hostId !~ /^[0-9]+$/ ) {
-        write_log( "Identifiant de l'hôte '".$hostId."' incorrect !", "W" );
+        write_log( "Identifiant de l'hote '".$hostId."' incorrect !", "W" );
         return undef;
     }elsif( !defined($dbHandler) ) {
-        write_log( "Connection à la base de donnée incorrect !", "W" );
+        write_log( "Connection à la base de donnee incorrect !", "W" );
         return undef;
     }
 
@@ -634,7 +634,7 @@ sub getHostIpById {
     }
 
     if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
-        write_log( "Identifiant de l'hôte '".$hostId."' inconnu !", "W" );
+        write_log( "Identifiant de l'hote '".$hostId."' inconnu !", "W" );
 
         $queryResult->finish;
         return undef;
@@ -654,10 +654,10 @@ sub getHostNameById {
     my( $dbHandler, $hostId ) = @_;
 
     if( !defined($hostId) ) {
-        write_log( "Identifiant de l'hôte non défini !", "W" );
+        write_log( "Identifiant de l'hote non défini !", "W" );
         return undef;
     }elsif( $hostId !~ /^[0-9]+$/ ) {
-        write_log( "Identifiant de l'hôte '".$hostId."' incorrect !", "W" );
+        write_log( "Identifiant de l'hote '".$hostId."' incorrect !", "W" );
         return undef;
     }elsif( !defined($dbHandler) ) {
         write_log( "Connection à la base de donnée incorrect !", "W" );
@@ -679,7 +679,7 @@ sub getHostNameById {
     }
 
     if( !(my( $hostName ) = $queryResult->fetchrow_array) ) {
-        write_log( "Identifiant de l'hôte '".$hostId."' inconnu !", "W" );
+        write_log( "Identifiant de l'hote '".$hostId."' inconnu !", "W" );
 
         $queryResult->finish;
         return undef;
