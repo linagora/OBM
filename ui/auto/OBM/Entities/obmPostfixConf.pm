@@ -19,12 +19,11 @@ use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 sub new {
     my $self = shift;
-    my( $incremental ) = @_;
+    my( $links, $deleted ) = @_;
 
     my %obmPostfixConfAttr = (
         type => undef,
         typeDesc => undef,
-        incremental => undef,
         links => undef,
         toDelete => undef,
         archive => undef,
@@ -34,18 +33,16 @@ sub new {
     );
 
 
-    if( !defined($incremental) ) {
-        croak( "Usage: PACKAGE->new(INCR)" );
+    if( !defined($links) || !defined($deleted) ) {
+        croak( "Usage: PACKAGE->new(LINKS)" );
 
     }
 
-    # Pas de mode incrémental pour ce type
-    $obmPostfixConfAttr{"incremental"} = 0;
-    $obmPostfixConfAttr{"links"} = 1;
+    $obmPostfixConfAttr{"links"} = $links;
+    $obmPostfixConfAttr{"toDelete"} = $deleted;
 
     $obmPostfixConfAttr{"type"} = $POSTFIXCONF;
     $obmPostfixConfAttr{"typeDesc"} = $attributeDef->{$obmPostfixConfAttr{"type"}};
-    $obmPostfixConfAttr{"toDelete"} = 0;
 
     bless( \%obmPostfixConfAttr, $self );
 }
@@ -108,13 +105,6 @@ sub getArchive {
     my $self = shift;
 
     return $self->{"archive"};
-}
-
-
-sub isIncremental {
-    my $self = shift;
-
-    return $self->{"incremental"};
 }
 
 

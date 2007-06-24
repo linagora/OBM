@@ -18,13 +18,12 @@ use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 sub new {
     my $self = shift;
-    my( $incremental, $mailShareId ) = @_;
+    my( $links, $deleted, $mailShareId ) = @_;
 
     my %obmMailshareAttr = (
         type => undef,
         entityRightType => undef,
         typeDesc => undef,
-        incremental => undef,
         links => undef,
         toDelete => undef,
         archive => undef,
@@ -36,8 +35,8 @@ sub new {
     );
 
 
-    if( !defined($mailShareId) ) {
-        croak( "Usage: PACKAGE->new(INCR, MAILSHAREID)" );
+    if( !defined( $links ) || !defined($deleted) || !defined($mailShareId) ) {
+        croak( "Usage: PACKAGE->new(LINKS, MAILSHAREID)" );
 
     }elsif( $mailShareId !~ /^\d+$/ ) {
         &OBM::toolBox::write_log( "obmMailshare: identifiant de BAL partagee incorrect", "W" );
@@ -48,18 +47,13 @@ sub new {
 
     }
 
-    if( $incremental ) {
-        $obmMailshareAttr{"incremental"} = 1;
-        $obmMailshareAttr{"links"} = 0;
-    }else {
-        $obmMailshareAttr{"incremental"} = 0;
-        $obmMailshareAttr{"links"} = 1;
-    }
+
+    $obmMailshareAttr{"links"} = $links;
+    $obmMailshareAttr{"toDelete"} = $deleted;
 
     $obmMailshareAttr{"type"} = $MAILSHARE;
     $obmMailshareAttr{"entityRightType"} = "MailShare";
     $obmMailshareAttr{"typeDesc"} = $attributeDef->{$obmMailshareAttr{"type"}};
-    $obmMailshareAttr{"toDelete"} = 0;
     $obmMailshareAttr{"archive"} = 0;
     $obmMailshareAttr{"sieve"} = 0;
 
@@ -87,7 +81,14 @@ sub getEntity {
     }
 
 
-    my $query = "SELECT COUNT(*) FROM MailShare WHERE mailshare_id=".$mailShareId;
+    my $mailShareTable = "MailShare";
+    my $mailServerTable = "MailServer";
+    if( $self->getDelete() ) {
+        $mailShareTable = "P_".$mailShareTable;
+        $mailServerTable = "P_".$mailServerTable;
+    }
+
+    my $query = "SELECT COUNT(*) FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -107,8 +108,9 @@ sub getEntity {
     }
 
 
-    # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT * FROM MailShare LEFT JOIN MailServer ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
+    # La requete a executer - obtention des informations sur le répertoire
+    # partagé
+    $query = "SELECT * FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -118,13 +120,18 @@ sub getEntity {
 
     # On range les resultats dans la structure de donnees des resultats
     my $dbMailShareDesc = $queryResult->fetchrow_hashref();
-#    my( $mailshare_name, $mailshare_description, $mailshare_email, $mailshare_quota, $mailshare_mail_server_id ) = $queryResult->fetchrow_array();
     $queryResult->finish();
 
     # On stocke la description BD utile pour la MAJ des tables
     $self->{"mailShareBdDesc"} = $dbMailShareDesc;
 
-    &OBM::toolBox::write_log( "obmMailshare: gestion de la BAL partagee : '".$dbMailShareDesc->{"mailshare_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    if( $self->getDelete() ) {
+        &OBM::toolBox::write_log( "obmMailshare: suppression de la BAL partagee : '".$dbMailShareDesc->{"mailshare_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    
+    }else {
+        &OBM::toolBox::write_log( "obmMailshare: gestion de la BAL partagee : '".$dbMailShareDesc->{"mailshare_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+
+    }
 
     # On range les resultats dans la structure de donnees des resultats
     $self->{"mailShareDesc"}->{"mailshare_name"} = $dbMailShareDesc->{"mailshare_name"};
@@ -133,7 +140,7 @@ sub getEntity {
     $self->{"mailShareDesc"}->{"mailshare_domain"} = $domainDesc->{"domain_label"};
 
     if( $dbMailShareDesc->{"mailshare_email"} ) {
-        my $localServerIp = &OBM::toolBox::getHostIpById( $dbHandler, $dbMailShareDesc->{"mailserver_host_id"} );
+        my $localServerIp = $self->getHostIpById( $dbHandler, $dbMailShareDesc->{"mailserver_host_id"} );
 
         if( !defined($localServerIp) ) {
             &OBM::toolBox::write_log( "obmMailshare: droit mail du repertoire partage : '".$dbMailShareDesc->{"mailshare_name"}."' annule - Serveur inconnu !", "W" );
@@ -305,13 +312,6 @@ sub getArchive {
     my $self = shift;
 
     return $self->{"archive"};
-}
-
-
-sub isIncremental {
-    my $self = shift;
-
-    return $self->{"incremental"};
 }
 
 
@@ -537,6 +537,7 @@ sub getMailboxQuota {
     return $mailShareQuota;
 }
 
+
 sub getMailboxAcl {
     my $self = shift;
     my $mailShareAcl = undef;
@@ -546,4 +547,53 @@ sub getMailboxAcl {
     }
 
     return $mailShareAcl;
+}
+
+
+sub getHostIpById {
+    my $self = shift;
+    my( $dbHandler, $hostId ) = @_;
+
+    if( !defined($hostId) ) {
+        &OBM::toolBox::write_log( "Identifiant de l'hote non défini !", "W" );
+        return undef;
+    }elsif( $hostId !~ /^[0-9]+$/ ) {
+        &OBM::toolBox::write_log( "Identifiant de l'hote '".$hostId."' incorrect !", "W" );
+        return undef;
+    }elsif( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( "Connection à la base de donnee incorrect !", "W" );
+        return undef;
+    }
+
+    my $hostTable = "Host";
+    if( $self->getDelete() ) {
+        $hostTable = "P_".$hostTable;
+    }
+
+    my $query = "SELECT host_ip FROM ".$hostTable." WHERE host_id='".$hostId."'";
+
+    #
+    # On execute la requete
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            &OBM::toolBox::write_log( $queryResult->err, "W" );
+        }
+
+        return undef;
+    }
+
+    if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
+        &OBM::toolBox::write_log( "Identifiant de l'hote '".$hostId."' inconnu !", "W" );
+
+        $queryResult->finish;
+        return undef;
+    }else{
+        $queryResult->finish;
+        return $hostIp;
+    }
+
+    return undef;
+
 }

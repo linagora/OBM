@@ -18,12 +18,11 @@ use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 sub new {
     my $self = shift;
-    my( $incremental, $groupId ) = @_;
+    my( $links, $deleted, $groupId ) = @_;
 
     my %obmGroupAttr = (
         type => undef,
         typeDesc => undef,
-        incremental => undef,
         links => undef,
         toDelete => undef,
         archive => undef,
@@ -34,8 +33,8 @@ sub new {
     );
 
 
-    if( !defined($groupId) ) {
-        croak( "Usage: PACKAGE->new(INCR, GROUPID)" );
+    if( !defined($links) || !defined($deleted) || !defined($groupId) ) {
+        croak( "Usage: PACKAGE->new(LINKS, DELETED, GROUPID)" );
 
     }elsif( $groupId !~ /^\d+$/ ) {
         &OBM::toolBox::write_log( "obmGroup: identifiant d'utilisateur incorrect", "W" );
@@ -45,17 +44,11 @@ sub new {
         $obmGroupAttr{"groupId"} = $groupId;
     }
 
-    if( $incremental ) {
-        $obmGroupAttr{"incremental"} = 1;
-        $obmGroupAttr{"links"} = 0;
-    }else {
-        $obmGroupAttr{"incremental"} = 0;
-        $obmGroupAttr{"links"} = 1;
-    }
+    $obmGroupAttr{"links"} = $links;
+    $obmGroupAttr{"toDelete"} = $deleted;
 
     $obmGroupAttr{"type"} = $POSIXGROUPS;
     $obmGroupAttr{"typeDesc"} = $attributeDef->{$obmGroupAttr{"type"}};
-    $obmGroupAttr{"toDelete"} = 0;
     $obmGroupAttr{"archive"} = 0;
     $obmGroupAttr{"sieve"} = 0;
 
@@ -84,7 +77,12 @@ sub getEntity {
     }
 
 
-    my $query = "SELECT COUNT(*) FROM UGroup WHERE group_privacy=0 AND group_id=".$groupId;
+    my $uGroupTable = "UGroup";
+    if( $self->getDelete() ) {
+        $uGroupTable = "P_".$uGroupTable;
+    }
+
+    my $query = "SELECT COUNT(*) FROM ".$uGroupTable." WHERE group_privacy=0 AND group_id=".$groupId;
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -106,8 +104,8 @@ sub getEntity {
     }
 
 
-    # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT group_id, group_gid, group_name, group_desc, group_email, group_contacts FROM UGroup WHERE group_privacy=0 AND group_id=".$groupId;
+    # La requete a executer - obtention des informations sur le groupe
+    $query = "SELECT group_id, group_gid, group_name, group_desc, group_email, group_contacts FROM ".$uGroupTable." WHERE group_privacy=0 AND group_id=".$groupId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -119,7 +117,13 @@ sub getEntity {
     my( $group_id, $group_gid, $group_name, $group_desc, $group_email, $group_contacts ) = $queryResult->fetchrow_array();
     $queryResult->finish();
 
-    &OBM::toolBox::write_log( "obmGroup: gestion du groupe : '".$group_name."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    if( $self->getDelete() ) {
+        &OBM::toolBox::write_log( "obmGroup: suppression du groupe : '".$group_name."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+
+    }else {
+        &OBM::toolBox::write_log( "obmGroup: gestion du groupe : '".$group_name."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    
+    }
 
     # On range les resultats dans la structure de donnees des resultats
     $self->{"groupDesc"}->{"group_gid"} = $group_gid;
@@ -196,13 +200,6 @@ sub getArchive {
     my $self = shift;
 
     return $self->{"archive"};
-}
-
-
-sub isIncremental {
-    my $self = shift;
-
-    return $self->{"incremental"};
 }
 
 
