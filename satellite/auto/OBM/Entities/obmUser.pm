@@ -20,15 +20,13 @@ use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 sub new {
     my $self = shift;
-    my( $incremental, $userId ) = @_;
-    # SUPPRIMER le parametre incremental au profit du parametre links qui permet
-    # de determiner si les liens de l'entité doivent être chargés ou pas.
+    my( $links, $deleted, $userId ) = @_;
+
 
     my %obmUserAttr = (
         type => undef,
         entityRightType => undef,
         typeDesc => undef,
-        incremental => undef,
         links => undef,
         toDelete => undef,
         archive => undef,
@@ -40,8 +38,8 @@ sub new {
     );
 
 
-    if( !defined($userId) ) {
-        croak( "Usage: PACKAGE->new(INCR, USERID)" );
+    if( !defined($links) || !defined($deleted) || !defined($userId) ) {
+        croak( "Usage: PACKAGE->new(LINKS, DELETED, USERID)" );
 
     }elsif( $userId !~ /^\d+$/ ) {
         &OBM::toolBox::write_log( "obmUser: identifiant d'utilisateur incorrect", "W" );
@@ -51,18 +49,13 @@ sub new {
         $obmUserAttr{"userId"} = $userId;
     }
 
-    if( $incremental ) {
-        $obmUserAttr{"incremental"} = 1;
-        $obmUserAttr{"links"} = 0;
-    }else {
-        $obmUserAttr{"incremental"} = 0;
-        $obmUserAttr{"links"} = 1;
-    }
+
+    $obmUserAttr{"links"} = $links;
+    $obmUserAttr{"toDelete"} = $deleted;
 
     $obmUserAttr{"type"} = $POSIXUSERS;
     $obmUserAttr{"entityRightType"} = "MailBox";
     $obmUserAttr{"typeDesc"} = $attributeDef->{$obmUserAttr{"type"}};
-    $obmUserAttr{"toDelete"} = 0;
     $obmUserAttr{"archive"} = 0;
     $obmUserAttr{"sieve"} = 1;
 
@@ -91,7 +84,15 @@ sub getEntity {
     }
 
 
-    my $query = "SELECT COUNT(*) FROM UserObm LEFT JOIN MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
+    my $userObmTable = "UserObm";
+    my $mailServerTable = "MailServer";
+    if( $self->getDelete() ) {
+        $userObmTable = "P_".$userObmTable;
+        $mailServerTable = "P_".$mailServerTable;
+    }
+
+
+    my $query = "SELECT COUNT(*) FROM ".$userObmTable." LEFT JOIN ".$mailServerTable." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -112,7 +113,7 @@ sub getEntity {
 
 
     # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT * FROM UserObm LEFT JOIN MailServer ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
+    $query = "SELECT * FROM ".$userObmTable." LEFT JOIN ".$mailServerTable." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -129,7 +130,10 @@ sub getEntity {
 
     # Positionnement du flag archive
     $self->{"archive"} = $dbUserDesc->{"userobm_archive"};
-    if( $dbUserDesc->{"userobm_archive"} ) {
+    if( $self->getDelete() ) {
+        &OBM::toolBox::write_log( "obmUser: suppression de l'utilisateur archive '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        
+    }elsif( $dbUserDesc->{"userobm_archive"} ) {
         &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur archive '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     }else {
@@ -201,7 +205,7 @@ sub getEntity {
 
     # Gestion du droit de messagerie
     if( $dbUserDesc->{"userobm_mail_perms"} ) {
-        my $localServerIp = &OBM::toolBox::getHostIpById( $dbHandler, $dbUserDesc->{"mailserver_host_id"} );
+        my $localServerIp = $self->getHostIpById( $dbHandler, $dbUserDesc->{"mailserver_host_id"} );
 
         if( !defined($localServerIp) ) {
             &OBM::toolBox::write_log( "obmUser: droit mail de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' annule - Serveur inconnu !", "W" );
@@ -373,13 +377,6 @@ sub getArchive {
     my $self = shift;
 
     return $self->{"archive"};
-}
-
-
-sub isIncremental {
-    my $self = shift;
-
-    return $self->{"incremental"};
 }
 
 
@@ -917,3 +914,53 @@ sub dump {
 
     return 1;
 }
+
+
+sub getHostIpById {
+    my $self = shift;
+    my( $dbHandler, $hostId ) = @_;
+
+    if( !defined($hostId) ) {
+        &OBM::toolBox::write_log( "Identifiant de l'hote non défini !", "W" );
+        return undef;
+    }elsif( $hostId !~ /^[0-9]+$/ ) {
+        &OBM::toolBox::write_log( "Identifiant de l'hote '".$hostId."' incorrect !", "W" );
+        return undef;
+    }elsif( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( "Connection à la base de donnee incorrect !", "W" );
+        return undef;
+    }
+
+    my $hostTable = "Host";
+    if( $self->getDelete() ) {
+        $hostTable = "P_".$hostTable;
+    }
+
+    my $query = "SELECT host_ip FROM ".$hostTable." WHERE host_id='".$hostId."'";
+
+    #
+    # On execute la requete
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            &ONM::toolBox::write_log( $queryResult->err, "W" );
+        }
+
+        return undef;
+    }
+
+    if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
+        &OBM::toolBox::write_log( "Identifiant de l'hote '".$hostId."' inconnu !", "W" );
+
+        $queryResult->finish;
+        return undef;
+    }else{
+        $queryResult->finish;
+        return $hostIp;
+    }
+
+    return undef;
+
+}
+

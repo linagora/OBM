@@ -17,12 +17,11 @@ use strict;
 
 sub new {
     my $self = shift;
-    my( $incremental ) = @_;
+    my( $links, $deleted ) = @_;
 
     my %ldapEngineAttr = (
         type => undef,
         typeDesc => undef,
-        incremental => undef,
         links => undef,
         toDelete => undef,
         domainId => undef,
@@ -30,13 +29,17 @@ sub new {
     );
 
 
-    # Pas de mode incrémental pour ce type
-    $ldapEngineAttr{"incremental"} = 0;
-    $ldapEngineAttr{"links"} = 1;
+    if( !defined($links) || !defined($deleted) ) {
+        croak( "Usage: PACKAGE->new(LINKS, DELETED)" );
+
+    }
+
+
+    $ldapEngineAttr{"links"} = $links;
+    $ldapEngineAttr{"toDelete"} = $deleted;
 
     $ldapEngineAttr{"type"} = $ROOT;
     $ldapEngineAttr{"typeDesc"} = $attributeDef->{$ldapEngineAttr{"type"}};
-    $ldapEngineAttr{"toDelete"} = 0;
 
     bless( \%ldapEngineAttr, $self );
 }

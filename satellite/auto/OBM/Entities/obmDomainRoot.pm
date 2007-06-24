@@ -17,12 +17,11 @@ use strict;
 
 sub new {
     my $self = shift;
-    my( $incremental ) = @_;
+    my( $links, $deleted ) = @_;
 
     my %obmDomainRootAttr = (
         type => undef,
         typeDesc => undef,
-        incremental => undef,
         links => undef,
         toDelete => undef,
         domainId => undef,
@@ -30,13 +29,16 @@ sub new {
     );
 
 
-    # Pas de mode incrémental pour ce type
-    $obmDomainRootAttr{"incremental"} = 0;
-    $obmDomainRootAttr{"links"} = 1;
+    if( !defined($links) || !defined($deleted) ) {
+        croak( "Usage: PACKAGE->new(LINKS, DELETED)" );
+
+    }
+
+    $obmDomainRootAttr{"links"} = $links;
+    $obmDomainRootAttr{"toDelete"} = $deleted;
 
     $obmDomainRootAttr{"type"} = $DOMAINROOT;
     $obmDomainRootAttr{"typeDesc"} = $attributeDef->{$obmDomainRootAttr{"type"}};
-    $obmDomainRootAttr{"toDelete"} = 0;
 
     bless( \%obmDomainRootAttr, $self );
 }

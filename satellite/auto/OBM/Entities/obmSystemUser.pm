@@ -20,12 +20,11 @@ use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 sub new {
     my $self = shift;
-    my( $incremental, $userId ) = @_;
+    my( $links, $deleted, $userId ) = @_;
 
     my %obmSystemUserAttr = (
         type => undef,
         typeDesc => undef,
-        incremental => undef,
         links => undef,
         toDelete => undef,
         archive => undef,
@@ -36,8 +35,8 @@ sub new {
     );
 
 
-    if( !defined($userId) ) {
-        croak( "Usage: PACKAGE->new(INCR, USERID)" );
+    if( !defined($links) || !defined($deleted) || !defined($userId) ) {
+        croak( "Usage: PACKAGE->new(LINKS, DELETED, USERID)" );
 
     }elsif( $userId !~ /^\d+$/ ) {
         &OBM::toolBox::write_log( "obmSystemUser: identifiant d'utilisateur incorrect", "W" );
@@ -47,13 +46,12 @@ sub new {
         $obmSystemUserAttr{"userId"} = $userId;
     }
 
-    # Pas de mode incrémental pour ce type
-    $obmSystemUserAttr{"incremental"} = 0;
-    $obmSystemUserAttr{"links"} = 1;
+
+    $obmSystemUserAttr{"links"} = $links;
+    $obmSystemUserAttr{"toDelete"} = $deleted;
 
     $obmSystemUserAttr{"type"} = $SYSTEMUSERS;
     $obmSystemUserAttr{"typeDesc"} = $attributeDef->{$obmSystemUserAttr{"type"}};
-    $obmSystemUserAttr{"toDelete"} = 0;
     $obmSystemUserAttr{"archive"} = 0;
     $obmSystemUserAttr{"sieve"} = 0;
 
@@ -82,7 +80,12 @@ sub getEntity {
     }
 
 
-    my $query = "SELECT COUNT(*) FROM UserSystem WHERE usersystem_id=".$userId;
+    my $yserSystemTable = "UserSystem";
+    if( $self->getDelete() ) {
+        $yserSystemTable = "P_".$yserSystemTable;
+    }
+
+    my $query = "SELECT COUNT(*) FROM ".$yserSystemTable." WHERE usersystem_id=".$userId;
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -103,7 +106,7 @@ sub getEntity {
 
 
     # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT usersystem_id, usersystem_login, usersystem_password, usersystem_uid, usersystem_gid, usersystem_homedir, usersystem_lastname, usersystem_firstname, usersystem_shell FROM UserSystem WHERE usersystem_id=".$userId;
+    $query = "SELECT usersystem_id, usersystem_login, usersystem_password, usersystem_uid, usersystem_gid, usersystem_homedir, usersystem_lastname, usersystem_firstname, usersystem_shell FROM ".$yserSystemTable." WHERE usersystem_id=".$userId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -160,13 +163,6 @@ sub getArchive {
     my $self = shift;
 
     return $self->{"archive"};
-}
-
-
-sub isIncremental {
-    my $self = shift;
-
-    return $self->{"incremental"};
 }
 
 
