@@ -143,6 +143,14 @@ sub getEntity {
 }
 
 
+sub updateDbEntity {
+    my $self = shift;
+    # Pas de table de production pour les entités de type utilisateur système
+
+    return 1;
+}
+
+
 sub setDelete {
     my $self = shift;
 
