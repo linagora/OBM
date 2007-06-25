@@ -175,6 +175,10 @@ sub _doAll {
 
     &OBM::toolBox::write_log( "loadDb: MAJ totale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
+    # MAJ des informations de domaine
+    $globalReturn = $self->_updateDbDomain();
+
+    # Uniquement pour le metadomaine
     if( $self->{"domain"} == 0 ) {
        # Traitement des entités de type 'utilisateur système'
        my $query = "SELECT usersystem_id FROM UserSystem";
@@ -197,6 +201,7 @@ sub _doAll {
     }
 
 
+    # Pour tous les domaines
     if( $self->{"domain"} != 0 ) {
         my $object;
 
@@ -1028,6 +1033,147 @@ sub getAdminImapPasswd {
             $domainList->[$i]->{"imap_servers"}->[$j]->{"imap_server_passwd"} = $cyrusAdmin->{"passwd"};
         }
     }
+
+    return 1;
+}
+
+
+sub _updateDbDomain {
+    my $self = shift;
+
+    if( !defined($self->{"dbHandler"}) ) {
+        return 0;
+    }
+    my $dbHandler = $self->{"dbHandler"};
+
+    if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
+        &OBM::toolBox::write_log( "loadDb: pas de domaine indique pour la MAJ totale", "W" );
+        return 0;
+    }
+    my $domainId = $self->{"domain"};
+
+    # MAJ des informations de domaine
+    my $query = "SELECT * FROM Domain WHERE domain_id=".$domainId;
+
+    # On execute la requete
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    while( my $hashResult = $queryResult->fetchrow_hashref() ) {
+        if( $hashResult->{"domain_id"} != $domainId ) {
+            next;
+        }
+        
+        $query = "DELETE FROM P_Domain WHERE Domain_id=".$domainId;
+        my $queryResult2;
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
+            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+        $query = "INSERT INTO P_Domain SET ";
+        my $first = 1;
+        while( my( $column, $value ) = each(%{$hashResult}) ) {
+            if( !$first ) {
+                $query .= ", ";
+            }else {
+                $first = 0;
+            }
+
+            $query .= $column."=".$dbHandler->quote($value);
+        }
+
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
+            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+    }
+
+
+    # MAJ des informations de serveur mail du domaine
+    $query = "SELECT i.mailserver_id, i.mailserver_host_id FROM MailServer i, Host j WHERE i.mailserver_host_id=j.host_id AND (j.host_domain_id=".$domainId." OR j.host_domain_id=0)";
+    # On execute la requete
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    while( my( $mailServerId, $hostId ) = $queryResult->fetchrow_array() ) {
+        my $queryResult2;
+
+        # Les répertoires partagés
+        $query = "DELETE FROM P_MailServer WHERE mailserver_id=".$mailServerId;
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
+            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+        $query = "SELECT * FROM MailServer WHERE mailserver_id=".$mailServerId;
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
+            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+        while( my $hashResult = $queryResult2->fetchrow_hashref() ) {
+            $query = "INSERT INTO P_MailServer SET ";
+
+            my $queryResult3;
+            my $first = 1;
+            while( my( $column, $value ) = each(%{$hashResult}) ) {
+                if( !$first ) {
+                    $query .= ", ";
+                }else {
+                    $first = 0;
+                }
+
+                $query .= $column."=".$dbHandler->quote($value);
+            }
+
+            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult3 ) ) {
+                &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+                return 0;
+            }
+        }
+
+        # Les informations associées à ces répertoires
+        $query = "DELETE FROM P_MailServerNetwork WHERE mailservernetwork_host_id=".$hostId;
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
+            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+        $query = "SELECT * FROM MailServerNetwork WHERE mailservernetwork_host_id=".$hostId;
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
+            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+        while( my $hashResult = $queryResult2->fetchrow_hashref() ) {
+            $query = "INSERT INTO P_MailServerNetwork SET ";
+
+            my $queryResult3;
+            my $first = 1;
+            while( my( $column, $value ) = each(%{$hashResult}) ) {
+                if( !$first ) {
+                    $query .= ", ";
+                }else {
+                    $first = 0;
+                }
+
+                $query .= $column."=".$dbHandler->quote($value);
+            }
+
+            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult3 ) ) {
+                &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+                return 0;
+            }
+        }
+    }
+
 
     return 1;
 }
