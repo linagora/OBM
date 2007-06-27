@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.1.0pre8";
+$obm_version = "2.1.0pre9";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -133,6 +133,8 @@ $ccalendar_first_hour = 8;
 $ccalendar_last_hour = 20;
 // Calendar Resource usage
 $ccalendar_resource = true;
+// Calendar send ics file
+$ccalendar_send_ics = true;
 
 
 // Time : In how many parts we split up a day (Time management)

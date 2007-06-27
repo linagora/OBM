@@ -362,9 +362,9 @@ function run_query_calendar_delete_event_entity($calendar) {
 //   - $event_id      : var to get the id to be returned
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
-  global $obm, $l_from, $l_to, $l_date;
+  global $obm, $ccalendar_resource_admin, $ccalendar_send_ics;
+  global $l_from, $l_to, $l_date, $l_resource_allocated;
   global $l_add_event_mail_head,$l_add_event_mail_subject;
-  global $ccalendar_resource_admin, $l_resource_allocated;
 
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
   $mail  = $calendar["mail"];
@@ -446,17 +446,23 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
   }
   
   if (count($recipient_array) > 0 || count($r_address) > 0) {
-    $tmp_filename = secure_tmpname(".ics","ics_");
-    create_calendar_ics_meeting_file($calendar, $event_id, $recipient_array, $resources_writable, $tmp_filename);
-    $h_file = array(
-		    array (
-			   "filename" => "$tmp_filename",
-			   "name" => "meeting.ics",
-			   "type" => "ics"
-			   )
-		    );
+    if ($ccalendar_send_ics) {
+      $tmp_filename = secure_tmpname(".ics","ics_");
+      create_calendar_ics_meeting_file($calendar, $event_id, $recipient_array, $resources_writable, $tmp_filename);
+      $h_file = array(
+        array (
+	       "filename" => "$tmp_filename",
+	       "name" => "meeting.ics",
+	       "type" => "ics"
+	       )
+        );
+    } else {
+      $h_file = "";
+    }
     send_mail($subject, $message, $recipient_array, $resources_address, $mail, $h_file);
-    unlink($tmp_filename);
+    if ($ccalendar_send_ics) {
+      unlink($tmp_filename);
+    }
   }
 }
 
@@ -558,14 +564,20 @@ function run_query_calendar_insert_event_data($calendar) {
   display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data()");
   $obm_q->query($query);
   
-  $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
+  $query = "SELECT calendarevent_id
+    FROM CalendarEvent
+    WHERE calendarevent_timecreate = '$now'
+      AND calendarevent_title='$title'
+      AND calendarevent_duration='$event_duration'
+      AND calendarevent_domain_id='$obm[domain_id]'";
   display_debug_msg($query, $cdg_sql, "run_query_calendar_insert_event_data()");
   $obm_q->query($query);
-  $obm_q->next_record(); 
-  $max_id = $obm_q->f("max_id");
+  $obm_q->next_record();
+  $id = $obm_q->f("calendarevent_id");
+  $calendar["calendar_id"] = $id;
 
   // Exception
-  if($repeat_kind != "none" && is_array($date_exception)) {
+  if ($repeat_kind != "none" && is_array($date_exception)) {
     foreach(array_unique($date_exception) as $value) {
       if($value != "") {
         $value = of_isodate_convert($value);
@@ -575,7 +587,7 @@ function run_query_calendar_insert_event_data($calendar) {
     }
   }
 
-  return $max_id;
+  return $id;
 }
 
 

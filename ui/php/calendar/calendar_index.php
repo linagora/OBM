@@ -401,6 +401,7 @@ if ($action == "index") {
 } elseif ($action == "planning") {
 ///////////////////////////////////////////////////////////////////////////////
   $entity_readable = get_calendar_entity_readable();
+  $cal_entity_id = slice_calendar_entities($cal_entity_id, $ccalendar_max_users, $entity_readable);
   $cal_entity_id["group_view"] =  $params["entity"]["group_view"];
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($cal_entity_id));
   $display["features"] = html_calendar_planning_bar($params, $calendar_entity, $entity_readable);

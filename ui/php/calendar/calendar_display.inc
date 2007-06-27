@@ -20,11 +20,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") 
 
   $group_view = $calendar["entity"]["group_view"];
   $entity_readable = get_calendar_entity_readable();
-  if ($p_view == "planning") {
-    $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users, $entity_readable);
-  } else {
-    $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users,  $entity_readable);
-  }
+  $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users, $entity_readable);
 
   $sel_entity_id = $visible_entities_id;
   // we restore the selected group for session storage
@@ -1656,8 +1652,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
   $all_day = $event_q->f("calendarevent_allday");
   if ($all_day) {
     $dis_all_day = "<tr><th>$l_all_day</th><td></td></tr>";
-    $datebegin = of_isodate_format($event_q->f("calendarevent_date"));
-    $dateend = of_isodate_format($event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration"));
+    $datebegin = of_date_format($event_q->f("calendarevent_date"));
+    $dateend = of_date_format($event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration"));
   } else {
     $datebegin = of_datetime_format($event_q->f("calendarevent_date"));
     $dateend = of_datetime_format($event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration"));
@@ -1677,7 +1673,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     }
 
     while($exception_q->next_record()) {
-      $date_exception[] = of_isodate_format($exception_q->f("calendarexception_date")); 
+      $date_exception[] = of_date_format($exception_q->f("calendarexception_date")); 
     }
     if($event_q->f("calendarevent_repeatkind") == "weekly") {
       $start_week_day = strtotime($ccalendar_weekstart);
