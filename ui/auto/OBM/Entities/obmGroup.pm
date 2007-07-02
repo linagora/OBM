@@ -29,7 +29,8 @@ sub new {
         sieve => undef,
         groupId => undef,
         domainId => undef,
-        groupDesc => undef
+        groupDesc => undef,
+        groupBdDesc => undef
     );
 
 
@@ -105,7 +106,7 @@ sub getEntity {
 
 
     # La requete a executer - obtention des informations sur le groupe
-    $query = "SELECT group_id, group_gid, group_name, group_desc, group_email, group_contacts FROM ".$uGroupTable." WHERE group_privacy=0 AND group_id=".$groupId;
+    $query = "SELECT * FROM ".$uGroupTable." WHERE group_privacy=0 AND group_id=".$groupId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -114,28 +115,31 @@ sub getEntity {
     }
 
     # On range les resultats dans la structure de donnees des resultats
-    my( $group_id, $group_gid, $group_name, $group_desc, $group_email, $group_contacts ) = $queryResult->fetchrow_array();
+    my $dbGroupDesc = $queryResult->fetchrow_hashref();
     $queryResult->finish();
 
+    # On stocke la description BD utile pour la MAJ des tables
+    $self->{"groupBdDesc"} = $dbGroupDesc;
+
     if( $self->getDelete() ) {
-        &OBM::toolBox::write_log( "obmGroup: suppression du groupe : '".$group_name."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "obmGroup: suppression du groupe : '".$dbGroupDesc->{"group_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     }else {
-        &OBM::toolBox::write_log( "obmGroup: gestion du groupe : '".$group_name."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "obmGroup: gestion du groupe : '".$dbGroupDesc->{"group_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
     
     }
 
     # On range les resultats dans la structure de donnees des resultats
-    $self->{"groupDesc"}->{"group_gid"} = $group_gid;
-    $self->{"groupDesc"}->{"group_name"} = $group_name;
-    $self->{"groupDesc"}->{"group_desc"} = $group_desc;
+    $self->{"groupDesc"}->{"group_gid"} = $dbGroupDesc->{"group_gid"};
+    $self->{"groupDesc"}->{"group_name"} = $dbGroupDesc->{"group_name"};
+    $self->{"groupDesc"}->{"group_desc"} = $dbGroupDesc->{"group_desc"};
     $self->{"groupDesc"}->{"group_domain"} = $domainDesc->{"domain_label"};
 
-    if( $group_email ) {
+    if( $dbGroupDesc->{"group_email"} ) {
         $self->{"groupDesc"}->{"group_mailperms"} = 1;
 
         # L'adresse du groupe
-        $group_email = lc($group_email);
+        my $group_email = lc($dbGroupDesc->{"group_email"});
         push( @{$self->{"groupDesc"}->{"group_email"}}, $group_email."@".$domainDesc->{"domain_name"} );
 
         for( my $j=0; $j<=$#{$domainDesc->{"domain_alias"}}; $j++ ) {
@@ -159,6 +163,12 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
+    my( $dbHandler ) = @_;
+
+    if( !defined($dbHandler) ) {
+        return 0;
+    }
+
     # A completer
 
     return 1;
