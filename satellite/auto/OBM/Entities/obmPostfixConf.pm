@@ -87,6 +87,8 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
+    # Pas de tables de production pour le type obmPostfixConf. Ces informations
+    # font parties des informations de domaines
 
     return 1;
 }
