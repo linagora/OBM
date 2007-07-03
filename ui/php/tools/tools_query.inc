@@ -53,12 +53,12 @@ function run_query_tools_remote_update($tools) {
 }
 
 
-/**
- * Update system configuration execution
- * @param $tools[] : entry values
- */
+///////////////////////////////////////////////////////////////////////////////
+// Update system configuration execution
+// @param $tools[] : entry values
+///////////////////////////////////////////////////////////////////////////////
 function exec_tools_update_update($tools) {
-  global $obm, $cdg_sql, $cdg_exe, $cmd_update, $cmd_db_update;
+  global $obm, $cdg_sql, $cdg_exe, $cmd_update;
 
   $state = get_update_state();
   if ($state != 1) {
@@ -101,31 +101,12 @@ function exec_tools_update_update($tools) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Cancel update system configuration
-// Parameters:
+// Check if a system configuration execution is possible
+//
+// @param $tools[] paramateres values
+// @param $params : parameters hash
+// @return (true | false) : true if ok else false
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tools_update_cancel() {
-  global $cdg_sql, $cdg_exe, $cmd_db_cancel;
-
-  // Basculement des données de mise à jour en production
-  display_debug_msg($cmd_db_cancel, $cdg_exe, "run_query_tools_update_cancel()");
-  unset($tmp);
-  exec($cmd_db_cancel, $tmp, $ret);
-
-  // Mise a jour de l'indicateur de modifications
-  update_update_state();
-
-  return $ret;
-}
-
-
-/**
- * Check if a system configuration execution is possible
- *
- * @param $tools[] paramateres values
- * @param $params : parameters hash
- * @return (true | false) : true if ok else false
- */
 function check_tools_update_context_ok($params) {
   global $obm, $profiles, $display, $cmd_check_update, $err;
   global $l_error_permission, $l_upd_already_running;

@@ -347,10 +347,8 @@ $password_encryption = strtoupper($password_encryption);
 
 // Automate commands
 $cmd_halt = "sudo /sbin/halt";
-$cmd_update = "../$path/auto/update.pl";
+$cmd_update = "../$path/auto/incrementalUpdate.pl";
 $cmd_check_update = "ps aux | grep auto/update.pl | grep -v grep";
-$cmd_db_update = "../$path/auto/dbUpdate.pl --valid";
-$cmd_db_cancel = "../$path/auto/dbUpdate.pl --cancel";
 $cmd_mailforward = "../$path/auto/mailChangeSieve.pl";
 $cmd_vacation = "../$path/auto/mailChangeSieve.pl";
 $cmd_ldap_passwd = "../$path/auto/ldapChangePasswd.pl";

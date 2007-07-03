@@ -9,7 +9,6 @@
 // Actions :
 // - update_index  --         -- show the Update screen
 // - update_update --         -- run the config update
-// - update_cancel --         -- cancel the config update
 // - update_detail --         -- display the updates
 // - halt_index    --         -- show the shutdown tool
 // - halt_halt     --         -- Halt the system
@@ -53,21 +52,6 @@ if ($action == "update_detail") {
     // Si le contexte ne permet pas une modification de configuration
     $display['msg'] .= display_warn_msg($err['msg']);
     $display["detail"] = dis_tools_update_detail();
-  }
-
-} elseif ($action == "update_cancel") {
-///////////////////////////////////////////////////////////////////////////////
-  if (check_tools_update_context_ok($params)) {
-    $res = run_query_tools_update_cancel();
-    if ($res == "0") {
-      $display["msg"] .= display_ok_msg($l_upd_cancel_ok);
-    } else {
-      $display["msg"] .= display_err_msg("$l_upd_cancel_error ($res)");
-    }
-    $display["detail"] = html_tools_update_index();
-  } else {
-    // Si le contexte ne permet pas une modification de configuration
-    $display["detail"] = html_tools_update_index();
   }
 
 } elseif ($action == "halt_index") {
@@ -143,12 +127,6 @@ function get_tools_action() {
     'Right'    => $cright_read_admin,
     'Url'      => "$path/tools/tools_index.php?action=update_detail",
     'Condition'=> array ('all') 
-                                    );
-
-// Cancel Update
-  $actions["tools"]["update_cancel"] = array (
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('none') 
                                     );
 
 // Confirm Update
