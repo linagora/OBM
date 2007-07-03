@@ -19,6 +19,7 @@ case "$1" in
             echo "failed."
         fi
         ;;
+
     stop)
         echo -n "Stopping mailMakePostfixMaps : "
         if [ -e $daemon_pid ]; then
@@ -30,6 +31,7 @@ case "$1" in
             echo "failed."
         fi
         ;;
+
     reload)
         echo -n "Reload mailMakePostfixMaps : "
         if [ -e $daemon_pid ]; then
@@ -39,10 +41,25 @@ case "$1" in
             echo "failed."
         fi
         ;;
+
+    status)
+        if [ -f ${daemon_pid} ] && kill -0 `cat ${daemon_pid}` > /dev/null 2>&1; then
+            echo "Le serveur est en cours d'execution avec le PID `cat ${daemon_pid}`"
+            exit 0
+        else
+            echo "Le serveur n'est pas en cours d'execution"
+            exit 1;
+        fi
+
+        # Ne doit jamais être atteinds, retourne le code UNKNOW STATUS
+        exit 4;
+        ;;
+
     restart)
         $0 stop
         $0 start
         ;;
+
     *)
         echo "Usage : $0 start|stop|reload|restart"
         ;;
