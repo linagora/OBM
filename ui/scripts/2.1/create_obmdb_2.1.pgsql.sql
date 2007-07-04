@@ -134,6 +134,7 @@ CREATE TABLE UserObm (
   userobm_description         varchar(255),
   userobm_location            varchar(255),
   userobm_education           varchar(255),
+  userobm_photo_id            integer,
   PRIMARY KEY (userobm_id)
 );
 CREATE UNIQUE INDEX k_login_user_UserObm_index ON UserObm (userobm_login);

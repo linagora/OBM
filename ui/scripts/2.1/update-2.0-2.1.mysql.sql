@@ -112,6 +112,7 @@ ALTER TABLE Incident CHANGE COLUMN incident_date incident_date timestamp(14);
 -- Add mail_quota_use, last login date
 ALTER TABLE UserObm ADD COLUMN userobm_mail_quota_use int(8) DEFAULT 0 AFTER userobm_mail_quota;
 ALTER TABLE UserObm ADD COLUMN userobm_mail_login_date timestamp(14) AFTER userobm_mail_quota_use;
+ALTER TABLE UserObm ADD COLUMN userobm_photo_id int(8) AFTER 	get_format_company_name;
 
 
 -------------------------------------------------------------------------------

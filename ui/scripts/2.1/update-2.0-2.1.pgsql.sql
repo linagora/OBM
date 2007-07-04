@@ -109,10 +109,10 @@ CREATE INDEX idx_calendaralert_user ON CalendarAlert (calendaralert_user_id);
 -- Update UserObm table
 -------------------------------------------------------------------------------
 -- Add mail_quota_use, last login date
-ALTER TABLE UserObm ADD COLUMN userobm_mail_quota_use int(8);
+ALTER TABLE UserObm ADD COLUMN userobm_mail_quota_use integer;
 ALTER TABLE UserObm ALTER COLUMN userobm_mail_quota_use SET DEFAULT 0;
 ALTER TABLE UserObm ADD COLUMN userobm_mail_login_date timestamp;
-
+ALTER TABLE UserObm ADD COLUMN userobm_photo_id integer;
 
 -------------------------------------------------------------------------------
 -- Update Resource table
