@@ -419,6 +419,15 @@ sub _incrementalUpdate {
                 last SWITCH;
             }
 
+            if( lc($updatedTable) eq "host" ) {
+                if( $numRows ) {
+                    $object = $self->_doHost( 1, 0, $updatedEntityId );
+                }else {
+                    $object = $self->_doHost( 0, 0, $updatedEntityId );
+                }
+                last SWITCH;
+            }
+
             next;
         }
 
@@ -476,6 +485,11 @@ sub _incrementalUpdate {
                 last SWITCH;
             }
 
+            if( lc($updatedlinksTable) eq "host" ) {
+                $object = $self->_doHost( 1, 0, $updatedlinksEntityId );
+                last SWITCH;
+            }
+
             next;
         }
 
@@ -520,7 +534,7 @@ sub _incrementalDelete {
     if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
         if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( $queryResult->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: ".$queryResult->err, "W" );
         }
 
         return 0;
@@ -545,6 +559,11 @@ sub _incrementalDelete {
 
             if( lc($deletedTable) eq "mailshare" ) {
                 $object = $self->_doMailShare( 0, 1, $deletedEntityId );
+                last SWITCH;
+            }
+
+            if( lc($deletedTable) eq "host" ) {
+                $object = $self->_doHost( 0, 1, $deletedEntityId );
                 last SWITCH;
             }
 
@@ -600,7 +619,7 @@ sub _updateDbEntity {
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
         if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( $queryResult->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: ".$queryResult->err, "W" );
         }
 
         return 0;
@@ -627,7 +646,7 @@ sub _updateDbEntity {
         if( !&OBM::dbUtils::execQuery( $updateQuery, $dbHandler, \$updateQueryResult ) ) {
             &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
             if( defined($updateQueryResult) ) {
-                &OBM::toolBox::write_log( $updateQueryResult->err, "W" );
+                &OBM::toolBox::write_log( "loadDb: ".$updateQueryResult->err, "W" );
             }
 
             return 0;
@@ -662,7 +681,7 @@ sub _deleteDbEntity {
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
         if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( $queryResult->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: ".$queryResult->err, "W" );
         }
 
         return 0;
@@ -692,7 +711,7 @@ sub _updateIncrementalTable {
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$deleteQueryResult ) ) {
         &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
         if( defined($deleteQueryResult) ) {
-            &OBM::toolBox::write_log( $deleteQueryResult->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: ".$deleteQueryResult->err, "W" );
         }
 
         return 0;
@@ -887,9 +906,7 @@ sub _runEngines {
     }
 
     my $engines = $self->{"engine"};
-    print $object."\n";
     while( (my( $engineType, $engine ) = each(%{$engines})) && $return ) {
-        print $engine."\n";
         $return = $engine->update( $object );
     }
 
@@ -922,7 +939,7 @@ sub getDomains {
     my @domainList;
 
     if( !defined($dbHandler) ) {
-        write_log( "Connection à la base de donnée incorrect !", "W" );
+        &OBM::toolBox::write_log( "loadDb: connection à la base de donnée incorrect !", "W" );
         return undef;
     }
 
@@ -944,9 +961,9 @@ sub getDomains {
     # On execute la requete concernant les domaines
     my $queryDomainResult;
     if( !&OBM::dbUtils::execQuery( $queryDomain, $dbHandler, \$queryDomainResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
+        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete.", "W" );
         if( defined($queryDomainResult) ) {
-            &OBM::toolBox::write_log( $queryDomainResult->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: ".$queryDomainResult->err, "W" );
         }
 
         return undef;
@@ -984,16 +1001,16 @@ sub getLdapServer {
     }
 
     for( my $i=0; $i<=$#$domainList; $i++ ) {
-        &OBM::toolBox::write_log( "Recuperation du serveur LDAP pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
+        &OBM::toolBox::write_log( "loadDb: recuperation du serveur LDAP pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
 
         my $queryLdapAdmin = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$ldapAdminLogin."'";
 
         # On execute la requete concernant l'administrateur LDAP associé
         my $queryLdapAdminResult;
         if( !&OBM::toolBox::execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete.", "W" );
             if( defined($queryLdapAdminResult) ) {
-                &OBM::toolBox::write_log( $queryLdapAdminResult->err, "W" );
+                &OBM::toolBox::write_log( "loadDb: ".$queryLdapAdminResult->err, "W" );
             }
         }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
             $domainList->[$i]->{"ldap_admin_server"} = $ldapServer;
@@ -1018,13 +1035,13 @@ sub getCyrusServers {
             next;
         }
 
-        &OBM::toolBox::write_log( "Recuperation des serveurs de courrier pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
+        &OBM::toolBox::write_log( "loadDb: recuperation des serveurs de courrier pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
         my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, MailServer j WHERE (i.host_domain_id=0 OR i.host_domain_id=".$domainList->[$i]->{"domain_id"}.") AND i.host_id=j.mailserver_host_id";
 
         # On execute la requete
         my $queryResult;
         if( !&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             next;
         }
 
@@ -1058,12 +1075,12 @@ sub getAdminImapPasswd {
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
     if( !(($cyrusAdmin->{"passwd"}) = $queryResult->fetchrow_array) ) {
-        &OBM::toolBox::write_log( "Echec: mot de passe de l'administrateur IMAP inconnu", "W" );
+        &OBM::toolBox::write_log( "loadDb: mot de passe de l'administrateur IMAP inconnu", "W" );
         return 0;
     }
 
@@ -1103,7 +1120,7 @@ sub _updateDbDomain {
     # On execute la requete
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -1115,7 +1132,7 @@ sub _updateDbDomain {
         $query = "DELETE FROM P_Domain WHERE Domain_id=".$domainId;
         my $queryResult2;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -1132,7 +1149,7 @@ sub _updateDbDomain {
         }
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -1143,7 +1160,7 @@ sub _updateDbDomain {
     $query = "SELECT i.mailserver_id, i.mailserver_host_id FROM MailServer i, Host j WHERE i.mailserver_host_id=j.host_id AND (j.host_domain_id=".$domainId." OR j.host_domain_id=0)";
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -1153,13 +1170,13 @@ sub _updateDbDomain {
         # Les hôtes serveurs de mails
         $query = "DELETE FROM P_MailServer WHERE mailserver_id=".$mailServerId;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
         $query = "SELECT * FROM MailServer WHERE mailserver_id=".$mailServerId;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -1179,7 +1196,7 @@ sub _updateDbDomain {
             }
 
             if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult3 ) ) {
-                &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+                &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
                 return 0;
             }
         }
@@ -1187,13 +1204,13 @@ sub _updateDbDomain {
         # Les informations associées aux hôtes serveurs de mails
         $query = "DELETE FROM P_MailServerNetwork WHERE mailservernetwork_host_id=".$hostId;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
         $query = "SELECT * FROM MailServerNetwork WHERE mailservernetwork_host_id=".$hostId;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -1213,7 +1230,7 @@ sub _updateDbDomain {
             }
 
             if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult3 ) ) {
-                &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+                &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
                 return 0;
             }
         }
