@@ -30,7 +30,7 @@ sub new {
         groupId => undef,
         domainId => undef,
         groupDesc => undef,
-        groupBdDesc => undef
+        groupDbDesc => undef
     );
 
 
@@ -38,7 +38,7 @@ sub new {
         croak( "Usage: PACKAGE->new(LINKS, DELETED, GROUPID)" );
 
     }elsif( $groupId !~ /^\d+$/ ) {
-        &OBM::toolBox::write_log( "obmGroup: identifiant d'utilisateur incorrect", "W" );
+        &OBM::toolBox::write_log( "obmGroup: identifiant de groupe incorrect", "W" );
         return undef;
 
     }else {
@@ -119,7 +119,7 @@ sub getEntity {
     $queryResult->finish();
 
     # On stocke la description BD utile pour la MAJ des tables
-    $self->{"groupBdDesc"} = $dbGroupDesc;
+    $self->{"groupDbDesc"} = $dbGroupDesc;
 
     if( $self->getDelete() ) {
         &OBM::toolBox::write_log( "obmGroup: suppression du groupe : '".$dbGroupDesc->{"group_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
@@ -169,7 +169,124 @@ sub updateDbEntity {
         return 0;
     }
 
-    # A completer
+    my $dbGroupDesc = $self->{"groupDbDesc"};
+    if( !defined($dbGroupDesc) ) {
+        return 0;
+    }
+
+    &OBM::toolBox::write_log( "obmGroup: MAJ du groupe '".$dbGroupDesc->{"group_name"}."' dans les tables de production", "W" );
+
+    # MAJ de l'entité dans la table de production
+    my $query = "DELETE FROM P_UGroup WHERE group_id=".$self->{"groupId"};
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "obmGroup: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    # Obtention des noms de colonnes de la table
+    $query = "SELECT * FROM P_UGroup WHERE 0=1";
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "obmGroup: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+    my $columnList = $queryResult->{NAME};
+
+    $query = "INSERT INTO P_UGroup SET ";
+    my $first = 1;
+    for( my $i=0; $i<=$#$columnList; $i++ ) {
+        if( !$first ) {
+            $query .= ", ";
+        }else {
+            $first = 0;
+        }
+
+        $query .= $columnList->[$i]."=".$dbHandler->quote($dbGroupDesc->{$columnList->[$i]});
+    }
+
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "obmGroup: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    # Les liens
+    if( $self->isLinks() ) {
+        # On supprime les liens actuels de la table de production des liens
+        # utilisateurs/groupes
+        $query = "DELETE FROM P_UserObmGroup WHERE userobmgroup_group_id=".$self->{"groupId"};
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+
+        # On copie les nouveaux droits
+        $query = "SELECT * FROM UserObmGroup WHERE userobmgroup_group_id=".$self->{"groupId"};
+
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "obmGroup: probleme lors de l'execution d' une requete SQL : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+        while( my $rowHash = $queryResult->fetchrow_hashref() ) {
+            $query = "INSERT INTO P_UserObmGroup SET ";
+
+            my $first = 1;
+            while( my( $column, $value ) = each(%{$rowHash}) ) {
+                if( !$first ) {
+                    $query .= ", ";
+                }else {
+                    $first = 0;
+                }
+
+                $query .= $column."=".$dbHandler->quote($value);
+            }
+
+            my $queryResult2;
+            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
+                &OBM::toolBox::write_log( "obmGroup: probleme lors de l'executio n d'une requete SQL : ".$dbHandler->err, "W" );
+                return 0;
+             }
+        }
+
+        # On supprime les liens actuels de la table de production des liens
+        # utilisateurs/groupes
+        $query = "DELETE FROM P_GroupGroup WHERE groupgroup_parent_id=".$self->{"groupId"};
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+
+        # On copie les nouveaux droits
+        $query = "SELECT * FROM GroupGroup WHERE groupgroup_parent_id=".$self->{"groupId"};
+
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "obmGroup: probleme lors de l'execution d' une requete SQL : ".$dbHandler->err, "W" );
+            return 0;
+        }
+
+        while( my $rowHash = $queryResult->fetchrow_hashref() ) {
+            $query = "INSERT INTO P_GroupGroup SET ";
+
+            my $first = 1;
+            while( my( $column, $value ) = each(%{$rowHash}) ) {
+                if( !$first ) {
+                    $query .= ", ";
+                }else {
+                    $first = 0;
+                }
+
+                $query .= $column."=".$dbHandler->quote($value);
+            }
+
+            my $queryResult2;
+            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
+                &OBM::toolBox::write_log( "obmGroup: probleme lors de l'executio n d'une requete SQL : ".$dbHandler->err, "W" );
+                return 0;
+             }
+        }
+    }
 
     return 1;
 }

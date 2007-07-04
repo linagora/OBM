@@ -29,7 +29,7 @@ sub new {
         hostId => undef,
         domainId => undef,
         hostDesc => undef,
-        hostBdDesc => undef
+        hostDbDesc => undef
     );
 
 
@@ -114,7 +114,7 @@ sub getEntity {
     $queryResult->finish();
 
     # On stocke la description BD utile pour la MAJ des tables
-    $self->{"hostBdDesc"} = $dbHostDesc;
+    $self->{"hostDbDesc"} = $dbHostDesc;
 
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
@@ -133,7 +133,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    my $dbHostDesc = $self->{"hostBdDesc"};
+    my $dbHostDesc = $self->{"hostDbDesc"};
     if( !defined($dbHostDesc) ) {
         return 0;
     }
