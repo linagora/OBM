@@ -34,7 +34,7 @@ sub new {
         userId => undef,
         domainId => undef,
         userDesc => undef,
-        userBdDesc => undef
+        userDbDesc => undef
     );
 
 
@@ -126,7 +126,7 @@ sub getEntity {
     $queryResult->finish();
 
     # On stocke la description BD utile pour la MAJ des tables
-    $self->{"userBdDesc"} = $dbUserDesc;
+    $self->{"userDbDesc"} = $dbUserDesc;
 
     # Positionnement du flag archive
     $self->{"archive"} = $dbUserDesc->{"userobm_archive"};
@@ -272,7 +272,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    my $dbUserDesc = $self->{"userBdDesc"};
+    my $dbUserDesc = $self->{"userDbDesc"};
     if( !defined($dbUserDesc) ) {
         return 0;
     }

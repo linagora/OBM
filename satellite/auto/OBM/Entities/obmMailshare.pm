@@ -31,7 +31,7 @@ sub new {
         mailShareId => undef,
         domainId => undef,
         mailShareDesc => undef,
-        mailShareBdDesc => undef
+        mailShareDbDesc => undef
     );
 
 
@@ -123,7 +123,7 @@ sub getEntity {
     $queryResult->finish();
 
     # On stocke la description BD utile pour la MAJ des tables
-    $self->{"mailShareBdDesc"} = $dbMailShareDesc;
+    $self->{"mailShareDbDesc"} = $dbMailShareDesc;
 
     if( $self->getDelete() ) {
         &OBM::toolBox::write_log( "obmMailshare: suppression de la BAL partagee : '".$dbMailShareDesc->{"mailshare_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
@@ -194,7 +194,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    my $dbMailShareDesc = $self->{"mailShareBdDesc"};
+    my $dbMailShareDesc = $self->{"mailShareDbDesc"};
     if( !defined($dbMailShareDesc) ) {
         return 0;
     }
