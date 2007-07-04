@@ -507,12 +507,15 @@ sub update {
 
     my $parentDn = $self->_findTypeParentDn( $self->{"ldapStruct"}, $object->{"type"}, $object->{"domainId"} );
     if( !defined($parentDn) ) {
-##### ICI ########
-        return 0;
+        # Le fait que l'entité n'a pas de DN parent signifie simplement qu'elle n'a pas
+        # de représentation LDAP, ce n'est donc pas une erreur fatale.
+        return 1;
     }
 
     my $ldapPrefix = $object->getLdapDnPrefix();
     if( !defined($ldapPrefix) ) {
+        # Si par contre elle a un DN parent mais pas de DN propre, c'est une
+        # erreur fatale.
         return 0;
     }
     my $objectDn = $ldapPrefix.",".$parentDn;

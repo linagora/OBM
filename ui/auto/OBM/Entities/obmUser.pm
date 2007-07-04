@@ -277,7 +277,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "obmUser: MAJ de l'utilisateur '".$dbUserDesc->{"userobm_login"}."', domaine ".." dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "obmUser: MAJ de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "DELETE FROM P_UserObm WHERE userobm_id=".$self->{"userId"};

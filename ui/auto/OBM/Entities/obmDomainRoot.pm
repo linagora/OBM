@@ -108,7 +108,7 @@ sub createLdapEntry {
         $ldapEntry->add(
             objectClass => $self->{"typeDesc"}->{"objectclass"},
             dc => to_utf8( { -string => $entry->{"domain_name"}, -charset => $defaultCharSet } ),
-            o => to_utf8( { -string => $entry->{"domain_name"}, -charset => $defaultCharSet } )
+            o => to_utf8( { -string => $entry->{"domain_label"}, -charset => $defaultCharSet } )
         );
 
     }else {
@@ -129,6 +129,10 @@ sub updateLdapEntry {
     my( $ldapEntry ) = @_;
     my $entry = $self->{"domainDesc"};
     my $update = 0;
+
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"domain_label"}, $ldapEntry, "o" ) ) {
+        $update = 1;
+    }
 
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"domain_desc"}, $ldapEntry, "description" ) ) {
         $update = 1;

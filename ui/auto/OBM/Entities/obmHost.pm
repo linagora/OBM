@@ -47,7 +47,7 @@ sub new {
     $obmHostAttr{"links"} = $links;
     $obmHostAttr{"toDelete"} = $deleted;
 
-    $obmHostAttr{"type"} = $SAMBAHOSTS;
+    $obmHostAttr{"type"} = $DOMAINHOSTS;
     $obmHostAttr{"typeDesc"} = $attributeDef->{$obmHostAttr{"type"}};
 
     bless( \%obmHostAttr, $self );
@@ -138,7 +138,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "obmHost: MAJ de l'hote '".$dbHostDesc->{"host_name"}."', domaine ".." dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "obmHost: MAJ de l'hote '".$dbHostDesc->{"host_name"}."' dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "DELETE FROM P_Host WHERE host_id=".$self->{"hostId"};
@@ -212,4 +212,11 @@ sub isLinks {
     my $self = shift;
 
     return $self->{"links"};
+}
+
+
+sub getMailboxName {
+    my $self = shift;
+
+    return undef;
 }
