@@ -226,7 +226,7 @@ sub updateDbEntity {
             $first = 0;
         }
 
-        $query .= "$columnList->[$i]=".$dbHandler->quote($dbMailShareDesc->{$columnList->[$i]});
+        $query .= $columnList->[$i]."=".$dbHandler->quote($dbMailShareDesc->{$columnList->[$i]});
     }
 
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {

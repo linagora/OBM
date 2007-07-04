@@ -20,6 +20,7 @@ require OBM::Entities::obmDomainRoot;
 require OBM::Entities::obmNode;
 require OBM::Entities::obmSystemUser;
 require OBM::Entities::obmUser;
+require OBM::Entities::obmHost;
 require OBM::Entities::obmGroup;
 require OBM::Entities::obmMailshare;
 require OBM::Entities::obmPostfixConf;
@@ -191,7 +192,6 @@ sub _doAll {
             my $object = $self->_doSystemUser( 1, 0, $systemUserId );
 
             my $return = $self->_runEngines( $object );
-
             if( $return ) {
                 # La MAJ de l'entité c'est bien passée, on met a jour la BD de
                 # travail
@@ -202,11 +202,30 @@ sub _doAll {
 
 
     # Pour tous les domaines
+    # Traitement des entités de type 'hote'
+    my $query = "SELECT host_id FROM Host WHERE host_domain_id=".$self->{"domain"};
+    if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        return 0;
+    }
+
+    while( my $hostId = $queryResult->fetchrow_array() ) {
+        my $object = $self->_doHost( 1, 0, $hostId );
+
+        my $return = $self->_runEngines( $object );
+        if( $return ) {
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # travail
+            $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        }
+    }
+
+    # Pour tous les domaines sauf le meta-domaine
     if( $self->{"domain"} != 0 ) {
         my $object;
 
         # Traitement des entités de type 'utilisateur'
-        my $query = "SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"};
+        $query = "SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"};
         if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
             &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
             return 0;
@@ -216,7 +235,6 @@ sub _doAll {
             $object = $self->_doUser( 1, 0, $userId );
 
             my $return = $self->_runEngines( $object );
-
             if( $return ) {
                 # La MAJ de l'entité c'est bien passée, on met a jour la BD de
                 # travail
@@ -235,7 +253,6 @@ sub _doAll {
             $object = $self->_doGroup( 1, 0, $groupId );
 
             my $return = $self->_runEngines( $object );
-
             if( $return ) {
                 # La MAJ de l'entité c'est bien passée, on met a jour la BD de
                 # travail
@@ -254,7 +271,6 @@ sub _doAll {
             $object = $self->_doMailShare( 1, 0, $mailshareId );
 
             my $return = $self->_runEngines( $object );
-
             if( $return ) {
                 # La MAJ de l'entité c'est bien passée, on met a jour la BD de
                 # travail
@@ -762,7 +778,7 @@ sub _doGroup {
     my( $links, $delete, $groupId ) = @_;
     my $return = 1;
 
-    if( !defined($groupId) || $groupId !~ /^\d+$/ ) {
+    if( !defined($groupId) || ($groupId !~ /^\d+$/) ) {
         return 0;
     }
 
@@ -789,7 +805,7 @@ sub _doMailShare {
     my( $links, $delete, $mailshareId ) = @_;
     my $return = 1;
 
-    if( !defined($mailshareId) || $mailshareId !~ /^\d+$/ ) {
+    if( !defined($mailshareId) || ($mailshareId !~ /^\d+$/) ) {
         return 0;
     }
 
@@ -808,6 +824,33 @@ sub _doMailShare {
     }
 
     return $mailShareObject;
+}
+
+
+sub _doHost {
+    my $self = shift;
+    my( $links, $delete, $hostId ) = @_;
+    my $return = 1;
+
+    if( !defined($hostId) || ($hostId !~ /^\d+$/) ) {
+        return 0;
+    }
+
+    if( !defined($links) ) {
+        $links = 0;
+    }
+
+    if( !defined($delete) ) {
+        $delete = 0;
+    }
+
+    my $hostObject = OBM::Entities::obmHost->new( $links, $delete, $hostId );
+    $return = $hostObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    if( !$return ) {
+        return undef;
+    }
+
+    return $hostObject;
 }
 
 
@@ -844,7 +887,9 @@ sub _runEngines {
     }
 
     my $engines = $self->{"engine"};
+    print $object."\n";
     while( (my( $engineType, $engine ) = each(%{$engines})) && $return ) {
+        print $engine."\n";
         $return = $engine->update( $object );
     }
 
@@ -1105,7 +1150,7 @@ sub _updateDbDomain {
     while( my( $mailServerId, $hostId ) = $queryResult->fetchrow_array() ) {
         my $queryResult2;
 
-        # Les répertoires partagés
+        # Les hôtes serveurs de mails
         $query = "DELETE FROM P_MailServer WHERE mailserver_id=".$mailServerId;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
             &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
@@ -1139,7 +1184,7 @@ sub _updateDbDomain {
             }
         }
 
-        # Les informations associées à ces répertoires
+        # Les informations associées aux hôtes serveurs de mails
         $query = "DELETE FROM P_MailServerNetwork WHERE mailservernetwork_host_id=".$hostId;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
             &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );

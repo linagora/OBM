@@ -507,6 +507,7 @@ sub update {
 
     my $parentDn = $self->_findTypeParentDn( $self->{"ldapStruct"}, $object->{"type"}, $object->{"domainId"} );
     if( !defined($parentDn) ) {
+##### ICI ########
         return 0;
     }
 
