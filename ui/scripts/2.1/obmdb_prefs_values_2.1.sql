@@ -35,7 +35,7 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_dsrc','0');
 
 -- Date Input
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_date_upd','m/d/y');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_date_upd','m/d/Y');
 
 -- Date
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_date','Y-m-d');

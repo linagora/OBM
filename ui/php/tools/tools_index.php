@@ -25,6 +25,7 @@ include("$obminclude/global_pref.inc");
 require("tools_display.inc");
 require("tools_query.inc");
 
+if ($action == "index") $action = "update_detail";
 if ($action == "update_index") $action = "update_detail";
 get_tools_action();
 $perm->check_permissions($module, $action);
