@@ -1,15 +1,49 @@
 <?php
 
-// vincenta
-// NE PAS UTILISER
-// pas encore complet !!!!
-// reste des corrections à faire !!!!!!
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : update-obm1.2+aliamin2.4-2.0.php                             //
+//     - Desc : Data migration from an obm 1.2 + aliamin 2.4 database to obm2//
+// 2007-04-13 Vincent Alquier                                                //
+///////////////////////////////////////////////////////////////////////////////
+// $Id:
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+   Script de migration de base de données obm 1.2 + aliamin 2.4 vers obm 2.0
+
+IMPORTANT:
+ - Le script modifie la base d'update d'une install aliamin 2.4 + obm 1.2 vers
+   une base de données obm 2.0
+ - Il utilise le script update-1.2-2.0.php
+
+Pré-requis:
+ - BD source en Aliamin version 2.4 et OBM version 2.0
+ - Le script update-1.2-2.0.php doit être présent dans le même répertoire ou 
+   lancé à la main à la fin de l'execution de ce script
+
+Utilisation:
+ - modifier les chemins d'accès aux fichiers de conf d'aliamin (voir 
+   CONFIG FICHIERS CONF.) ou préciser directement les informations de connexion 
+   (voir CONFIG BD ALIAMIN)
+ - php update-obm1.2+aliamin2.4-2.0.php
+
+Précisions:
+ - Le script ne renseigne pas la table MailServerNetwork.
+ - Un domaine est créé à partir des informations récupérées dans la table Mail
+
+*/
 
 
-$aliamin_config_file = '/etc/aliamin/aliamin_conf.ini';
+
+
 
 $default_mailserver_host_id = 2; // id de l'hote qui heberge le serveur de courrier par defaut
 // utile uniquement si le dflt_mailserver n'est pas défini dans la table Mail
+
+
+// CONFIG FICHIERS CONF.
+$aliamin_config_file = '/etc/aliamin/aliamin_conf.ini';
+
 
 // CONFIG BD ALIAMIN
 // informations de connexion à la bd aliamin
@@ -21,11 +55,23 @@ $default_mailserver_host_id = 2; // id de l'hote qui heberge le serveur de courr
 //$aliamin_db		= 'aliamin_db';
 //$aliamin_dbprod	= 'aliamin_dbprod';
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// CONNEXION A LA BD
+
+echo "\n\n******** Connexion a la BD ********\n\n";
+
+
 // Recuperation des informations de connexion à la bd d'aliamin dans le
 // fichier de configuration d'aliamin
 if (    empty($aliamin_db) || empty($aliamin_dbprod)
      || empty($aliamin_user) || empty($aliamin_host)) {
-	echo "Lecture des infos de connexion dans le fichier $aliamin_config_file...";
+	echo "Lecture du fichier $aliamin_config_file...";
 	if (!file_exists($aliamin_config_file))
 		die("Le fichier de config d'aliamin $aliamin_config_file n'existe pas...\n");
 	//else
@@ -43,15 +89,29 @@ if (    empty($aliamin_db) || empty($aliamin_dbprod)
 	echo "OK\n";
 }
 
+echo "host:   $aliamin_host\n";
+echo "user:   $aliamin_user\n";
+echo "db:     $aliamin_db\n";
+echo "dbprod: $aliamin_dbprod\n";
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // aliamin db Connexion
-echo str_pad("connexion a la base de donnees aliamin...",70);
+echo str_pad("Connexion a la base de donnees aliamin...",70);
 $aliamin_link = mysql_connect($aliamin_host, $aliamin_user, $aliamin_pass)
     or die("Echec\nImpossible de se connecter à la base aliamin\n");
 echo "OK\n";
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// DEBUT DES MODIFICATIONS DU SCHEMA BD
+
+echo "\n\n******** Debut des modifications du schema BD ********\n\n";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,6 +123,37 @@ $sql = "INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('update_state'
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK\n";
 
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Mailshare table
+echo str_pad("Renommage de la table MailShareDir en MailShare...",70);
+$sql = "RENAME TABLE MailShareDir TO MailShare";
+my_query($aliamin_db, $sql, $aliamin_link);
+$sql = "ALTER TABLE MailShare
+  CHANGE mailsharedir_id          mailshare_id             INT(8)       NOT NULL AUTO_INCREMENT ,
+  CHANGE mailsharedir_timeupdate  mailshare_timeupdate     TIMESTAMP    ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  CHANGE mailsharedir_timecreate  mailshare_timecreate     TIMESTAMP    NOT NULL DEFAULT '0000-00-00 00:00:00',
+  CHANGE mailsharedir_userupdate  mailshare_userupdate     INT(8)       DEFAULT NULL ,
+  CHANGE mailsharedir_usercreate  mailshare_usercreate     INT(8)       DEFAULT NULL ,
+  CHANGE mailsharedir_name        mailshare_name           VARCHAR(32)  DEFAULT NULL ,
+  CHANGE mailsharedir_quota       mailshare_quota          INT(11)      NOT NULL DEFAULT '0',
+  CHANGE mailsharedir_description mailshare_description    VARCHAR(255) DEFAULT NULL ,
+  CHANGE mailsharedir_email       mailshare_email          TEXT         DEFAULT NULL ,
+  ADD                             mailshare_mail_server_id INT(8)       DEFAULT '0'";
+my_query($aliamin_db, $sql, $aliamin_link);
+echo "OK\n";
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// MODIFICATIONS LIEES AU DOMAINE
+
+echo "\n\n******** Modifications liées au domaine ********\n\n";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,27 +219,6 @@ echo "OK (".get_affected_rows().")\n";
 
 // on récupère l'id du domaine inséré
 $domain_id = get_last_inserted_id ($aliamin_db, $aliamin_link);
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Mailshare table
-echo str_pad("Renommage de la table MailShareDir en MailShare...",70);
-$sql = "RENAME TABLE MailShareDir TO MailShare";
-my_query($aliamin_db, $sql, $aliamin_link);
-$sql = "ALTER TABLE MailShare
-  CHANGE mailsharedir_id          mailshare_id             INT(8)       NOT NULL AUTO_INCREMENT ,
-  CHANGE mailsharedir_timeupdate  mailshare_timeupdate     TIMESTAMP    ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-  CHANGE mailsharedir_timecreate  mailshare_timecreate     TIMESTAMP    NOT NULL DEFAULT '0000-00-00 00:00:00',
-  CHANGE mailsharedir_userupdate  mailshare_userupdate     INT(8)       DEFAULT NULL ,
-  CHANGE mailsharedir_usercreate  mailshare_usercreate     INT(8)       DEFAULT NULL ,
-  CHANGE mailsharedir_name        mailshare_name           VARCHAR(32)  DEFAULT NULL ,
-  CHANGE mailsharedir_quota       mailshare_quota          INT(11)      NOT NULL DEFAULT '0',
-  CHANGE mailsharedir_description mailshare_description    VARCHAR(255) DEFAULT NULL ,
-  CHANGE mailsharedir_email       mailshare_email          TEXT         DEFAULT NULL ,
-  ADD                             mailshare_mail_server_id INT(8)       DEFAULT '0'";
-my_query($aliamin_db, $sql, $aliamin_link);
-echo "OK\n";
 
 
 
@@ -223,6 +293,28 @@ echo "OK (".get_affected_rows().")\n";
 
 
 
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// MODIFICATIONS LIEES AUX SERVEURS DE COURRIER
+
+echo "\n\n******** Modifications liées aux serveurs de courrier ********\n\n";
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Table MailServerNetwork
+echo str_pad("Creation de la table MailServerNetwork...",70);
+$sql = "CREATE TABLE MailServerNetwork (
+  mailservernetwork_host_id  int(8) NOT NULL default 0,
+  mailservernetwork_ip       varchar(16) NOT NULL default ''
+)";
+my_query($aliamin_db, $sql, $aliamin_link);
+echo "OK\n";
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // INSERTION DES SERVEURS DE COURRIER
 
@@ -241,11 +333,12 @@ $sql = "SELECT distinct(userobm_mail_server_id) FROM UserObm";
 $res = my_query($aliamin_db, $sql, $aliamin_link);
 $nb = 0;
 while ($row = mysql_fetch_array($res)) {
-  echo ("\n\n---\n\n".$row[0]."\n\n---\n\n");
-  $sql = "INSERT INTO MailServer (mailserver_host_id, mailserver_relayhost_id)
-    VALUES (".$row[0].", ".(empty($relayhost_id)?0:$relayhost_id)."); ";
-  my_query($aliamin_db, $sql, $aliamin_link);
-  $nb += get_affected_rows();
+  if (!empty($row[0])) {
+    $sql = "INSERT INTO MailServer (mailserver_host_id, mailserver_relayhost_id)
+      VALUES (".$row[0].", ".(empty($relayhost_id)?0:$relayhost_id)."); ";
+    my_query($aliamin_db, $sql, $aliamin_link);
+    $nb += get_affected_rows();
+  }
 }
 
 $sql = "SELECT mailserver_id FROM MailServer WHERE mailserver_host_id=$mailserver_host_id";
@@ -266,27 +359,27 @@ if ($row = mysql_fetch_array($res)) {
 echo "OK ($nb)\n";
 
 // on met à jour le domaine pour lui donner l'id du serveur de courrier par defaut
-echo str_pad("mise a jour du serveur de courrier du domaine... ");
+echo str_pad("mise a jour du serveur de courrier du domaine... ",70);
 $sql = "UPDATE Domain SET domain_mail_server_id = $mailserver_id 
   WHERE domain_id = $domain_id";
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK (".get_affected_rows().")\n";
 
 // on met à jour les mailshares pour leur donner l'id du serveur de courrier par defaut
-echo str_pad("mise a jour du serveur de courrier des domaines... ");
+echo str_pad("mise a jour du serveur de courrier des mailshares... ",70);
 $sql = " UPDATE MailShare SET mailshare_mail_server_id = $mailserver_id";
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK (".get_affected_rows().")\n";
 
 // on met à jour les utilisateurs pour leur donner l'id de leur serveur de courrier
-echo str_pad("mise a jour des utilisateurs : affectation à leur serveur de courrier...");
+echo str_pad("mise a jour des utilisateurs : affectation à leur serveur de courrier...",70);
 $sql = "SELECT mailserver_id, mailserver_host_id FROM MailServer";
 $res = my_query($aliamin_db, $sql, $aliamin_link);
 while ($row = mysql_fetch_array($res)) {
   $sql = "UPDATE UserObm SET userobm_mail_server_id = ".$row[0]."+10000 WHERE userobm_mail_server_id = ".$row[1];
   my_query($aliamin_db, $sql, $aliamin_link);
 }
-$sql = "UPDATE UserObm SET userobm_mail_server_id = $mailserver_id WHERE userobm_mail_server_id < 10000";
+$sql = "UPDATE UserObm SET userobm_mail_server_id = $mailserver_id WHERE userobm_mail_server_id < 10000 OR userobm_mail_server_id IS NULL";
 my_query($aliamin_db, $sql, $aliamin_link);
 $nb = get_affected_rows();
 $sql = "UPDATE UserObm SET userobm_mail_server_id = userobm_mail_server_id-10000 WHERE userobm_mail_server_id >= 10000";
@@ -294,6 +387,16 @@ my_query($aliamin_db, $sql, $aliamin_link);
 $nb += get_affected_rows();
 echo "OK ($nb)\n";
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// MODIFICATIONS LIEES AU PASSAGE OBM 1.2 vers OBM 2.0
+
+echo "\n\n******** Modifications liées au passage obm 1.2 -> 2.0 ********\n\n";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -370,12 +473,12 @@ FROM IncidentCategory1";
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK (".get_affected_rows().")\n";
 
-echo str_pad("Modification de la table Incident : prise en compte du type de resolution...",70);
+echo str_pad("Modif. de la table Incident liee au type de resolution...",70);
 $sql = "ALTER TABLE Incident ADD COLUMN incident_resolutiontype_id int(8) DEFAULT 0 after incident_status_id";
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK (".get_affected_rows().")\n";
 
-echo str_pad("Mise a jours des incidents : prise en compte du IncidentResolutionType...",70);
+echo str_pad("Mise a jours des incidents liee au champ IncidentResolutionType...",70);
 $sql = "UPDATE Incident set incident_resolutiontype_id=incident_category1_id, incident_timeupdate = incident_timeupdate";
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK (".get_affected_rows().")\n";
@@ -394,7 +497,6 @@ echo "OK\n";
 
 ///////////////////////////////////////////////////////////////////////////
 // Add Project reference and cv infos
-
 
 echo str_pad("Ajout de colonnes manquantes a la table Project...",70);
 $sql = "ALTER TABLE Project
@@ -460,6 +562,16 @@ echo "OK ($nb)\n";
 
 
 
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// MODIFICATION DE LA TABLE UserObm
+
+echo "\n\n******** Modifications de la table UserObm ********\n\n";
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Update UserObm table from Aliamin and to OBM2
 
@@ -486,7 +598,7 @@ my_query($aliamin_db, $sql, $aliamin_link);
 $nb = get_affected_rows();
 $sql = "UPDATE UserObm
   SET userobm_password_type = 'PLAIN',
-      userobm_password = userobm_password_plain,
+      userobm_password = userobm_password_plain
   WHERE userobm_password_type <> 'MD5SUM'";
 my_query($aliamin_db, $sql, $aliamin_link);
 $nb += get_affected_rows();
@@ -499,12 +611,12 @@ $sql = "ALTER TABLE UserObm
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK\n";
 
-echo str_pad("mise à jour des préférences utilisateurs...",70);
+echo str_pad("Mise a jour des preferences utilisateurs...",70);
 $sql = "UPDATE UserObmPref set userobmpref_value='default' WHERE userobmpref_option='set_theme';";
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK (".get_affected_rows().")\n";
 
-echo str_pad("creation de la table UserSystem...",70);
+/*echo str_pad("creation de la table UserSystem...",70);
 $sql = "CREATE TABLE UserSystem (
   usersystem_id         int(8) NOT NULL auto_increment,
   usersystem_login      varchar(32) NOT NULL default '',
@@ -551,27 +663,43 @@ while ($row = mysql_fetch_assoc($res)) {
   my_query($aliamin_db, $sql, $aliamin_link);
   $nb++;
 }
-echo "OK ($nb)\n";
+echo "OK ($nb)\n";*/
 
-echo str_pad("creation de la table MailServerNetwork...",70);
-$sql = "CREATE TABLE MailServerNetwork (
-  mailservernetwork_host_id  int(8) NOT NULL default 0,
-  mailservernetwork_ip       varchar(16) NOT NULL default ''
-)";
-my_query($aliamin_db, $sql, $aliamin_link);
-echo "OK\n";
 
-echo str_pad("suppression de la table Mail...",70);
-$sql = "DROP TABLE Mail";
-my_query($aliamin_db, $sql, $aliamin_link);
-echo "OK\n";
 
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// SUPPRESSION DE TABLES ALIAMIN
+
+echo "\n\n******** Suppressions de tables ********\n\n";
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Suppression de tables aliamin
+drop_table($aliamin_db,$aliamin_link,"Mail");
+drop_table($aliamin_db,$aliamin_link,"GlobalPref");
+drop_table($aliamin_db,$aliamin_link,"Ldap");
+drop_table($aliamin_db,$aliamin_link,"Network");
+drop_table($aliamin_db,$aliamin_link,"Parameters");
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// CREATION DES TABLES DE PROD
+
+echo "\n\n******** Creation des tables de production ********\n\n";
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // OBM-Mail, OBM-LDAP Production tables (used by automate)
 
-echo "Creation des tables de production :\n";
 create_production_table($aliamin_db, $aliamin_link, "Domain");
 create_production_table($aliamin_db, $aliamin_link, "UserObm");
 create_production_table($aliamin_db, $aliamin_link, "UGroup");
@@ -583,11 +711,68 @@ create_production_table($aliamin_db, $aliamin_link, "MailServer");
 create_production_table($aliamin_db, $aliamin_link, "MailServerNetwork");
 create_production_table($aliamin_db, $aliamin_link, "MailShare");
 create_production_table($aliamin_db, $aliamin_link, "EntityRight");
-echo str_pad("    creation de la table of_usergroup a partir de la table UserObmGroup...",70);
+echo str_pad("creation de of_usergroup a partir de UserObmGroup...",70);
 //CREATE TABLE P_of_usergroup like UserObmGroup
 $sql = "CREATE TABLE of_usergroup like UserObmGroup";
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK\n";
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// QUELQUES PETITES VERIFICATIONS
+
+echo "\n\n******** Quelques verifications ********\n\n";
+
+// Il existe un domaine...
+$sql = "SELECT count(domain_id) FROM Domain";
+$res = my_query($aliamin_db, $sql, $aliamin_link);
+$row = mysql_fetch_array($res);
+$nb = $row[0];
+if ($nb <= 0)
+  echo "ATTENTION: Il n'existe pas de domaine !!!\n";
+
+// Il existe un serveur de courrier...
+$sql = "SELECT count(mailserver_id) FROM MailServer";
+$res = my_query($aliamin_db, $sql, $aliamin_link);
+$row = mysql_fetch_array($res);
+$nb = $row[0];
+if ($nb <= 0)
+  echo "ATTENTION: Il n'existe pas de serveur de courrier !!!\n";
+
+// Aucun utilisateur n'a de mail_server_id à NULL...
+$sql = "SELECT count(userobm_id) FROM UserObm WHERE userobm_mail_server_id IS NULL";
+$res = my_query($aliamin_db, $sql, $aliamin_link);
+$row = mysql_fetch_array($res);
+$nb = $row[0];
+if ($nb>0)
+  echo "ATTENTION: $nb utilisateurs (table UserObm) ont le mail_server_id à NULL !!!\n";
+
+// Aucun utilisateur n'a un gid ou uid à NULL...
+$sql = "SELECT count(userobm_id) FROM UserObm WHERE userobm_uid IS NULL OR userobm_gid IS NULL";
+$res = my_query($aliamin_db, $sql, $aliamin_link);
+$row = mysql_fetch_array($res);
+$nb = $row[0];
+if ($nb>0)
+  echo "ATTENTION: $nb utilisateurs (table UserObm) ont un uid et/ou gid à NULL !!!\n";
+
+// Aucun groupe n'a un gid à NULL...
+$sql = "SELECT count(group_id) FROM UGroup WHERE group_gid IS NULL";
+$res = my_query($aliamin_db, $sql, $aliamin_link);
+$row = mysql_fetch_array($res);
+$nb = $row[0];
+if ($nb>0)
+  echo "ATTENTION: $nb groupes (table UGroup) ont un gid à NULL !!!\n";
+
+
+
+
+
+exit;
 
 
 
@@ -630,6 +815,13 @@ function get_affected_rows () {
 }
 
 // very specific function
+function drop_table ($db, $link, $table) {
+  echo str_pad("Suppression de la table $table...",70);
+  $sql = "DROP TABLE $table";
+  my_query($db, $sql, $link);
+  echo "OK\n";
+}
+
 function alter_and_update_for_domains ($db, $link, $domain_id, $table, $prefix, $position) {
   echo str_pad("    table $table...",70);
   $sql = "ALTER TABLE $table ADD Column ${prefix}_domain_id int(8) default 0 $position";
@@ -640,7 +832,7 @@ function alter_and_update_for_domains ($db, $link, $domain_id, $table, $prefix, 
 }
 
 function create_production_table ($db, $link, $table) {
-  echo str_pad("    creation de la table P_$table a partir de la table $table...",70);
+  echo str_pad("creation de P_$table a partir de $table...",70);
   $sql = "CREATE TABLE P_$table like $table";
   my_query($db, $sql, $link);
   echo "OK\n";
