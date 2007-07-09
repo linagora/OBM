@@ -553,23 +553,23 @@ Obm.CalendarManager = new Class({
     this.times = new Hash();
     this.redrawLock = false;
 
-    ctx = $('calendarEventContext');
     head = $('calendarHead');
     body = $('calendarBody');
+    zoneWidth = $E('table.calendar').offsetWidth - $('calendarHourCol').offsetWidth ;//$('calendarEventContext').offsetWidth;
     
     this.evidence = $E('td',body);
 
     this.headContext = new Object();
     if(head) {
       this.headContext.top = head.getTop();
-      this.headContext.right = this.evidence.getLeft() + ctx.offsetWidth;
+      this.headContext.right = this.evidence.getLeft() + zoneWidth;
       this.headContext.left = this.evidence.getLeft();
       this.headContext.bottom = head.getTop() + head.offsetHeight;    
     }
 
     this.bodyContext = new Object();
     this.bodyContext.top = body.getTop();
-    this.bodyContext.right = this.evidence.getLeft() + ctx.offsetWidth;
+    this.bodyContext.right = this.evidence.getLeft() + zoneWidth;
     this.bodyContext.left = this.evidence.getLeft();
     this.bodyContext.bottom = body.getTop() + body.offsetHeight;
   
@@ -608,19 +608,19 @@ Obm.CalendarManager = new Class({
   resizeWindow: function() {
     if(this.lock()) {
 
-      ctx = $('calendarEventContext');
       head = $('calendarHead');
       body = $('calendarBody');
+      zoneWidth = $E('table.calendar').offsetWidth - $('calendarHourCol').offsetWidth ;//$('calendarEventContext').offsetWidth;
 
       if(head) {
         this.headContext.top = head.getTop();
-        this.headContext.right = this.evidence.getLeft() + ctx.offsetWidth;
+        this.headContext.right = this.evidence.getLeft() + zoneWidth;
         this.headContext.left = this.evidence.getLeft();
         this.headContext.bottom = head.getTop() + head.offsetHeight;    
       }
 
       this.bodyContext.top = body.getTop();
-      this.bodyContext.right = this.evidence.getLeft() + ctx.offsetWidth;
+      this.bodyContext.right = this.evidence.getLeft() + zoneWidth;
       this.bodyContext.left = this.evidence.getLeft();
       this.bodyContext.bottom = body.getTop() + body.offsetHeight;      
   

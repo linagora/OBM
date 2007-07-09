@@ -689,7 +689,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity,$writable_entit
     <colgroup span=\"1\" />
     <colgroup span=\"7\" id=\"calendarEventContext\" />
     <thead>
-    <tr><td></td>$dis_day_head</tr>
+    <tr><td id=\"calendarHourCol\"></td>$dis_day_head</tr>
     </tr>    
     </thead>
     <tbody id=\"calendarBody\"  onmouseup=\"obm.calendarQuickForm.compute(event, 'month');\">
@@ -801,7 +801,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
     <colgroup span=\"7\" id=\"calendarEventContext\" />
     <thead onmouseup=\"obm.calendarQuickForm.compute(event, 'week');\">
     <tr>
-    <td>$week_num</td>
+    <td id=\"calendarHourCol\">$week_num</td>
     $week_day_list
     </tr>
     <tr id=\"calendarHead\">
@@ -899,7 +899,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
     <colgroup span=\"1\" id=\"calendarEventContext\" />
     <thead onmouseup=\"obm.calendarQuickForm.compute(event, 'day');\">
     <tr id=\"calendarHead\">
-    <td>$week_num</td><th id=\"day-0\"></th>
+    <td id=\"calendarHourCol\">$week_num</td><th id=\"day-0\"></th>
     </tr>    
     </thead>
     <tbody id=\"calendarBody\" onmouseup=\"obm.calendarQuickForm.compute(event, 'day');\">
@@ -3161,7 +3161,7 @@ function dis_calendar_free_interval($calendar, $entity_store) {
   <table class=\"calendar freeBusy\">
     <thead>
     <tr>
-    <td>$week_num</td>
+    <td id=\"calendarHourCol\">$week_num</td>
     $week_day_list
     </tr>
     </thead>
