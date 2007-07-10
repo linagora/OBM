@@ -101,7 +101,6 @@ if ($action == "index" || $action == "") {
        window.close();
       </script>";
     } else {
-      $action = "index";
       $display["result"] = dis_todo_form("");
       $display["result"] .= dis_todo_search_list($params);
     }

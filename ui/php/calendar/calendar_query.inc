@@ -2218,6 +2218,8 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
   }
   $multidomain = sql_multidomain("calendarevent");
 
+  $day_start = strtotime(date("Ymd 00:00:00"),$time);
+  $day_end = strtotime("+1 day",$day_start);
   $query = "SELECT
       calendarevent_id,
       calendarevent_title,
@@ -2240,8 +2242,9 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
       $join_user
       $join_resource
     WHERE evententity_state = 'A'
-      AND $calendarevent_date > $start - calendarevent_duration
-      AND $calendarevent_date < $end 
+      AND 
+      (($calendarevent_date > $start - calendarevent_duration AND $calendarevent_date < $end) 
+        OR (calendarevent_allday = 1 AND $calendarevent_date >= $day_start AND $calendarevent_date < $day_end))
       $where_ent
       $where_event
       $multidomain
@@ -3203,7 +3206,9 @@ Class OccurrenceFactory {
              in_array($occurence->id,$entityFilter[$occurence->entity])))) {
           $eventDuration = $occurence->event->duration;
           $eventDate = $occurence->date;
-          if($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate) {
+          $eventAllDay = $occurence->event->all_day;
+          if(($eventAllDay && date("Ymd",$time) == date("Ymd",$eventDate)) 
+              || ($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate)) {
             return true;
           }
         }
@@ -3231,7 +3236,9 @@ Class OccurrenceFactory {
              in_array($occurence->id,$entityFilter[$occurence->entity])))) {
           $eventDuration = $occurence->event->duration;
           $eventDate = $occurence->date;
-          if($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate) {
+          $eventAllDay = $occurence->event->all_day;
+          if(($eventAllDay && date("Ymd",$time) == date("Ymd",$eventDate)) 
+              || ($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate)) {
             $occurences[] = $occurence;
           }
         }
