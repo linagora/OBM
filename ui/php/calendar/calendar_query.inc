@@ -840,17 +840,18 @@ function run_query_icalendar_insert($params) {
     $line = mb_convert_encoding($line, "ISO-8859-15", "UTF-8, ISO-8859-15");
 
     // if begin with RFC2445_WSP, add to previous line
-    if (strpbrk(RFC2445_WSP, $line[0])) { 
+    if (preg_match("/^[".RFC2445_WSP."]/", $line)) { 
       $line = preg_replace("/^[".RFC2445_WSP."]/",'',$line) ;
       $prevline .= $line ;
       $line = '' ;
+      continue ;
     }
 
     if ($prevline !== '') {
       $new_ics[] = $prevline ;
     }
 
-    $prevline = str_replace(array("\r\n"), '', $line) ;
+    $prevline = preg_replace(array("/\n/","/\r/"),'',$line) ;
   } ;
   if ($prevline !== '') {
     $new_ics[] = $prevline ;
@@ -1092,7 +1093,7 @@ function ics_get_vevent_properties($vevent) {
     if (strpos($line, 'ORGANIZER') === 0) {
       $organizer = substr($line, strlen('ORGANIZER')) ;
       $userobm = ics_get_obmuser_from_icsuser($organizer) ;
-      if (isset($userobm['uid']) and ($userobm['uid'] == $obm['uid'])) {
+      if ((is_array($userobm)) and (isset($userobm['uid'])) and ($userobm['uid'] == $obm['uid'])) {
       	$properties['organizer'] = $userobm ;
       }
       else {
@@ -1108,7 +1109,7 @@ function ics_get_vevent_properties($vevent) {
       $userobm = ics_get_obmuser_from_icsuser($attendee) ;
       // if attendee ROLE is CHAIR, forget it
       // if attendee obm_uid is 0, forget it
-      if (($userobm['params']['ROLE'] != 'CHAIR') and isset($userobm['uid']) and ($userobm['uid'] != $c_none)) {
+      if ((is_array($userobm)) and ($userobm['params']['ROLE'] != 'CHAIR') and isset($userobm['uid']) and ($userobm['uid'] != $c_none)) {
       	$properties['attendees'][] = $userobm ;
       }
     }
