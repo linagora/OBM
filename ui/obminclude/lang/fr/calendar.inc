@@ -107,6 +107,10 @@ $l_sendamail = "Forcer la notification par mail";
 $l_calendar_select_group = "Sélectionner les groupes.";
 $l_view_type = "Type de vue";
 
+$l_ics = "Import" ;
+$l_ics_insert = "Importer" ;
+$l_ics_file = "Fichier ICS à importer" ;
+
 // Messages
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez sélectionner le ou les jours de répétition";

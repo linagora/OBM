@@ -824,6 +824,452 @@ END:VCALENDAR";
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Analyse the imported ics file
+///////////////////////////////////////////////////////////////////////////////
+function run_query_icalendar_insert($params) {
+  global $obm ;
+  global $all_emails ;
+
+  // --- get the unfolding ics
+  $ics = file($params['ics_tmp']) ;
+  $new_ics = array() ; // unfolded $ics
+  $prevline = '' ;
+  $i = -1 ;
+  foreach ($ics as $line) {
+    // use ISO-8859-15
+    $line = mb_convert_encoding($line, "ISO-8859-15", "UTF-8, ISO-8859-15");
+
+    // if begin with RFC2445_WSP, add to previous line
+    if (strpbrk(RFC2445_WSP, $line[0])) { 
+      $line = preg_replace("/^[".RFC2445_WSP."]/",'',$line) ;
+      $prevline .= $line ;
+      $line = '' ;
+    }
+
+    if ($prevline !== '') {
+      $new_ics[] = $prevline ;
+    }
+
+    $prevline = str_replace(array("\r\n"), '', $line) ;
+  } ;
+  if ($prevline !== '') {
+    $new_ics[] = $prevline ;
+  }
+
+  // --- get calendars
+  $vcalendars = ics_get_component('VCALENDAR', $new_ics) ; // return an array of calendar components
+
+  // get events and todos
+  foreach ($vcalendars as $vcalendar) {
+    $vevents = ics_get_component('VEVENT', $vcalendar) ;
+    //$vtodos = ics_get_component('VTODO', $vcalendar) ;
+  }
+
+  // for future use, constructs a hash of all users emails
+  $all_emails = get_all_email_list() ;
+
+  // process events
+  $nb_processed_event = 0 ;
+  foreach($vevents as $vevent) {
+    $properties = array() ;
+    $properties = ics_get_vevent_properties($vevent) ;
+
+    //if no property returned, event is not processed (ex : organizer is set but not equal to current userobm)
+    if (count($properties) == 0) {
+      continue ;
+    }
+
+    $sel_entity_id = array() ;
+
+    // organizer (if none, then current userobm)
+    if (isset($properties['organizer'])) { 
+      $sel_entity_id['user'][] = $properties['organizer']['uid'] ;
+    }
+    else {
+      $sel_entity_id['user'][] = $obm['uid'] ;
+    }
+
+    // attendee(s)
+    if (isset($properties['attendees'])) {
+      foreach($properties['attendees'] as $attendee) {
+        $sel_entity_id["user"][] = $attendee['uid'] ;
+      }
+    }
+
+    run_query_calendar_add_event($properties, $sel_entity_id, &$event_id) ;
+    $nb_processed_event++ ;
+  }
+
+  return array($nb_processed_event) ;
+
+  // process todos
+  //foreach($vtodos as $vtodo) {
+  //  echo "VTODO : " ;
+  //  echo ics_get_property('SUMMARY', $vtodo) ;
+  //  $icsdate = ics_get_property('DTSTART', $vtodo) ;
+  //  $date = date("d/m/Y H:i:s", ics_date_to_timestamp($icsdate)) ;
+  //  echo " (".$icsdate." -> ".$date.")" ;
+  //  echo "<br>\n" ;
+  //}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// get_all_emails_list
+// Constructs a list of all possible users emails in OBM
+///////////////////////////////////////////////////////////////////////////////
+function get_all_email_list() {
+  global $cgp_use, $cdg_sql, $obm ;
+
+  $all_emails = array() ;
+
+  // si mail activé, construire la liste des noms de domaines smtp (+alias) pour le domaine (sens obm) en cours.
+  if ($cgp_use['service']['mail']) {
+    $domain_list = array() ;
+
+    $obm_q = new DB_OBM() ;
+    $query = "SELECT domain_name, domain_alias FROM Domain where domain_id = ".$obm['domain_id'] ;
+    display_debug_msg($query, $cdg_sql, "get_all_emails_list / get domains names and aliases");
+    $result = $obm_q->query($query) ;
+    if ($obm_q->num_rows() > 0) {
+      while ($obm_q->next_record()) {
+        $domain_list[] = $obm_q->f('domain_name') ;
+	array_merge($domain_list, explode("\n", $obm_q->f('domain_alias'))) ;
+      }
+    }
+  }
+
+  // pour chaque utilisateur
+  $query = "SELECT userobm_id, userobm_email FROM UserObm WHERE userobm_domain_id = ".$obm['domain_id'] ;
+  display_debug_msg($query, $cdg_sql, "get_all_emails_list / get user list");
+  $result = $obm_q->query($query) ;
+
+  while ($obm_q->next_record()) {
+    $emails = $obm_q->f('userobm_email') ;
+    $uid = $obm_q->f('userobm_id') ;
+
+    // -- si mail actif, on mixe les parties gauche et les nom de domaines smtp
+    if ($cgp_use['service']['mail']) {
+      // ---- partie gauche
+      $gauche_list = explode("\n", $emails) ;
+      foreach($gauche_list as $email) {
+        if ($email != '') {
+	  $email = rtrim($email, "\r") ;
+          // ---- partie droite
+          foreach ($domain_list as $domain) {
+            $all_emails["$email@$domain"] = $uid ;
+          }
+        }
+      }
+    }
+    // -- si mail inactif, on récupère direct l'adresse
+    else {
+      if ($emails != '') {
+        $all_emails[$emails] = $uid ;
+      }
+    }
+  }
+
+  return $all_emails ;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// ics_get_component
+// params : 
+// 	$keyword	: keyword for searching in vcalendar (BEGIN... and END...)
+//	$cal		: array of lines containing the (unfolded) ics file
+///////////////////////////////////////////////////////////////////////////////
+function ics_get_component($keyword, $cal) {
+  $components = array() ;
+  $flagGet = false ;
+
+  foreach($cal as $line) {
+    if (strpos($line, 'BEGIN:'.$keyword) === 0) {
+      $component = array() ;
+      $component[] = $line ;
+      $flagGet = true ;
+    }
+    if ($flagGet) {
+      $component[] = $line ;
+    }
+    if (strpos($line, 'END:'.$keyword) === 0) {
+      $components[] = $component ;
+      $flagGet = false ;
+    }
+  }
+
+  return $components ;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// ics_get_property
+///////////////////////////////////////////////////////////////////////////////
+function ics_get_property($keyword, $component) {
+  $value = '' ;
+
+  foreach ($component as $line) {
+    if (strpos($line, $keyword) === 0) {
+      $value = substr($line, strlen($keyword)+1) ;
+      break ;
+    }
+  }
+
+  return $value ;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// ics_get_vevent_properties
+///////////////////////////////////////////////////////////////////////////////
+function ics_get_vevent_properties($vevent) {
+  global $c_none, $ics_event_priority_to_obm, $obm ;
+  //$duration = strtotime($date_end) - strtotime($date_begin); 
+
+  $properties = array() ;
+  $properties['attendees'] = array() ;
+  foreach ($vevent as $line) {
+
+    // direct import, no processing
+    $no_process = array('SUMMARY' => 'title', 
+    			'DURATION' => 'event_duration',
+			'DESCRIPTION' => 'description',
+			'LOCATION' => 'location') ;
+    foreach ($no_process as $keyword => $field) {
+      if(strpos($line, $keyword) === 0) {
+        $properties[$field] = addslashes(substr($line, strlen($keyword) + 1)) ;
+        continue ;
+      }
+    }
+
+    // date_begin
+    $date_begin = '' ;
+    if (strpos($line, 'DTSTART') === 0) {
+      $icsdate = substr($line, strlen('DTSTART') + 1) ;
+      $date_begin = ics_date_to_timestamp($icsdate) ;
+      //echo date('Y-m-d H:i:s', $date_begin)."<br>" ;
+      $properties['date_begin'] = date('Y-m-d H:i:s', $date_begin) ;
+      continue ;
+    }
+
+    // duration
+    if (strpos($line, 'DTEND') === 0) {
+      $icsdate = substr($line, strlen('DTEND') + 1) ;
+      $date_end = ics_date_to_timestamp($icsdate) ;
+      // date_begin ?
+      if ($date_begin == '') {
+        $date_begin = ics_date_to_timestamp(ics_get_property('DTSTART', $vevent)) ;
+      }
+      if ($date_begin != '') {
+      	$duration = $date_end - $date_begin ;
+	if ($duration > 0) {
+	  $properties['event_duration'] = $duration ;
+	}
+      }
+      continue ;
+    }
+
+    // priority
+    if (strpos($line, 'PRIORITY') === 0) {
+      $priority = substr($line, strlen('PRIORITY') + 1) ;
+      $properties['priority'] = $ics_event_priority_to_obm[$priority] ;
+      continue ;
+    }
+
+    // privacy
+    if (strpos($line, 'CLASS') === 0) {
+      $class = substr($line, strlen('CLASS') + 1) ;
+      if ($class == 'PUBLIC') {
+        $privacy = 0 ;
+      }
+      else {
+        $privacy = 1 ;
+      }
+      $properties['privacy'] = $privacy ;
+      continue ;
+    }
+
+    // organizer
+    if (strpos($line, 'ORGANIZER') === 0) {
+      $organizer = substr($line, strlen('ORGANIZER')) ;
+      $userobm = ics_get_obmuser_from_icsuser($organizer) ;
+      if (isset($userobm['uid']) and ($userobm['uid'] == $obm['uid'])) {
+      	$properties['organizer'] = $userobm ;
+      }
+      else {
+        // current userobm_id is not organizer for this event, stop all process
+	return array() ;
+      }
+      continue ;
+    }
+
+    // attendees
+    if (strpos($line, 'ATTENDEE') === 0) {
+      $attendee = substr($line, strlen('ATTENDEE')) ;
+      $userobm = ics_get_obmuser_from_icsuser($attendee) ;
+      // if attendee ROLE is CHAIR, forget it
+      // if attendee obm_uid is 0, forget it
+      if (($userobm['params']['ROLE'] != 'CHAIR') and isset($userobm['uid']) and ($userobm['uid'] != $c_none)) {
+      	$properties['attendees'][] = $userobm ;
+      }
+    }
+
+    // recurent events
+
+
+  }
+  
+  //var_dump($properties['attendees']) ;
+
+  if ($properties['priority'] == 0) {
+    $properties['priority'] = 2 ;
+  }
+  if ($properties['repeat_kind'] == '') {
+    $properties['repeat_kind'] = 'none' ;
+  }
+
+  return $properties ;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// ics_get_vtodo_properties
+///////////////////////////////////////////////////////////////////////////////
+function ics_get_vtodo_properties($vtodo) {
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// ics_date_to_timestamp
+///////////////////////////////////////////////////////////////////////////////
+function ics_date_to_timestamp($icsdate) {
+  if ($icsdate == '') {
+    return 0 ;
+  }
+  preg_match('/.*(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})){0,1}/', $icsdate, $result) ;
+  list($all, $year, $month, $day, $time, $hour, $minute, $second) = $result ;
+  return mktime($hour, $minute, $second, $month, $day, $year) ;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// ics_get_obmuser_from_icsuser
+///////////////////////////////////////////////////////////////////////////////
+function ics_get_obmuser_from_icsuser($attendee_line) {
+  global $c_none ;
+
+  $parameters = array() ;
+  $params = array() ;
+  $cal_address = '' ;
+  $attendee = array() ;
+
+  // split parameters from value (cal address)
+  list($all_parameters, $cal_address) = explode(':', $attendee_line, 2) ;
+  if (strpos($parameters, ';') === 0) {
+    $parameters = rtrim($parameters, ';') ; # FIXME utilité du test ?
+  }
+ 
+  if ($cal_address == '') {
+    return $c_none ; // invalid field
+  }
+
+  // get parameters
+  if ($all_parameters != '') {
+    $parameters = split(';', $all_parameters) ;
+    if (count($parameters) > 0) {
+      for ($i = 0; $i < count($parameters) ; $i++) {
+        list($key, $val) = split('=', $parameters[$i]) ;
+        $attendee['params'][$key] = $val ;
+      }
+    }
+  }
+
+  // -- Lotus Note way
+  ics_get_obmuser_from_lotus($attendee, $cal_address) ;
+
+  // -- standard way
+  if (!isset($attendee['uid']) or ($attendee['uid'] == $c_none)) {
+    $attendee['uid'] = ics_get_obmuser_from_smtp($cal_address) ;
+  }
+
+  return $attendee ;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// LOTUS SPECIFIC
+// ics_get_obmuser_from_lotus
+///////////////////////////////////////////////////////////////////////////////
+function ics_get_obmuser_from_lotus(& $attendee, $cal_address) {
+ // recup CN ?
+  if (isset($attendee['params']) and (array_key_exists("CN", $attendee['params']))) {
+    list($firstname, $lastname) = explode(' ', $attendee['params']['CN']) ;
+    $uid = search_user_by_name($lastname, $firstname) ;
+    $attendee['uid'] = $uid ;
+  }
+  else { // try to analyse cal_address 
+    if (preg_match('#^(?:CN=|MAILTO:)([^/]*)/#i', trim($cal_address), $matches)) {
+      // seems that some lotus versions have '_' separator and others versions have ' ' separator
+      if (strpos($matches[1], '_') !== false) {
+        list($firstname, $lastname) = explode('_', $matches[1]) ;
+      }
+      else {
+        list($firstname, $lastname) = explode(' ', $matches[1]) ;
+      }
+      $uid = search_user_by_name($lastname, $firstname) ;
+      $attendee['uid'] = $uid ;
+    }
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// search_user_by_name
+// Parameters:
+//   - $lastname
+//   - $firstname
+// Return
+//   - userobm_id
+///////////////////////////////////////////////////////////////////////////////
+function search_user_by_name($lastname, $firstname) {
+  global $c_none ;
+
+  $sql = "SELECT userobm_id from UserObm " ;
+  $sql .= "WHERE " ;
+  $sql .= "UPPER(userobm_lastname) = '".strtoupper($lastname)."' AND " ;
+  $sql .= "UPPER(userobm_firstname) = '".strtoupper($firstname)."' AND " ;
+  $sql .= "userobm_archive = 0 ;" ;
+
+  $obm_q = new DB_OBM() ;
+  $result = $obm_q->query($sql) ;
+  if ($obm_q->num_rows() == 1) {
+    $obm_q->next_record() ;
+    return $obm_q->f('userobm_id') ;
+  }
+  else { // no result OR more than one result
+    return $c_none ;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// STANDARD : SMTP address
+// ics_get_obmuser_from_smtp
+///////////////////////////////////////////////////////////////////////////////
+function ics_get_obmuser_from_smtp($cal_address) {
+  global $c_none, $all_emails ;
+
+  $uid = $c_none ;
+
+  if (preg_match('#^MAILTO:([^@]*)@(.*)$#i', trim($cal_address), $matches)) {
+    $user = $matches[1];
+    $domain = $matches[2] ;
+
+    if (array_key_exists("$user@$domain", $all_emails)) {
+      $uid = $all_emails["$user@$domain"] ;
+    }
+  }
+
+  return $uid ;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurence of each event,
 // Parameters:
 //   - $calendar       : calendar parameters
@@ -1132,7 +1578,7 @@ function run_query_calendar_quick_event_update($calendar) {
  * @access public
  * @return void
  */
-function run_query_calendar_quick_event_insert($calendar, $sel_entity_id) {
+function run_query_calendar_quick_event_insert($calendar) {
   global $cdg_sql, $obm;
 
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
@@ -1190,7 +1636,6 @@ function run_query_calendar_quick_event_insert($calendar, $sel_entity_id) {
   $obm_q->query($query);
   $obm_q->next_record(); 
   $event_id = $obm_q->f("max_id"); 
-
   run_query_calendar_insert_entity_event("user", $obm["uid"], $event_id, 'A');
 
   return $event_id;

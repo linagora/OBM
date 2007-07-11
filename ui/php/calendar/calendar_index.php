@@ -35,6 +35,16 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 $params = get_calendar_params();
 
+///////////////////////////////////////////////////////////////////////////////
+// specifique import ICS
+///////////////////////////////////////////////////////////////////////////////
+define('RFC2445_CRLF',               "\r\n");
+define('RFC2445_WSP',                "\t ");
+define('RFC2445_FOLDED_LINE_LENGTH', 75);
+$ics_event_priority_to_obm = array(1 => 3, 2 => 3, 3 => 3, 4 => 2, 5 => 2, 6 => 2, 7 => 1, 8 => 1, 9 => 1) ;
+///////////////////////////////////////////////////////////////////////////////
+
+
 $extra_css[] = $css_calendar;
 $extra_js_include[] = "calendar.js";
 
@@ -444,6 +454,17 @@ if ($action == "index") {
     $display["msg"] .= display_err_msg("$l_category1 : $l_delete_error");
   }
   $display["detail"] .= dis_calendar_admin_index();
+
+} elseif ($action == "import")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_icalendar_import($params);
+
+} elseif ($action == "ics_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $result = run_query_icalendar_insert($params) ;
+  $display["msg"] .= display_ok_msg("$l_event : $l_insert_ok");
+  //$params["date"] = $params["date_begin"];
+  $display["detail"] = dis_icalendar_insert($result);
 }
 
 $_SESSION['cal_entity_id'] = $cal_entity_id;
@@ -454,9 +475,8 @@ if (!$params["ajax"]) {
   $display["head"] = display_head($l_calendar);
   $display["header"] = display_menu($module);
   $display["end"] = display_end();
-}
+} 
 display_page($display);
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $params hash, Calendar parameters transmited
@@ -605,6 +625,14 @@ function get_calendar_params() {
     }
   }
 
+  // imported file
+  if (isset ($_FILES['fi_ics'])) {
+    $params["ics_tmp"] = $_FILES['fi_ics']["tmp_name"];
+    $params["ics_name"] = $_FILES['fi_ics']['name'];
+    $params["ics_size"] = $_FILES['fi_ics']['size'];
+    $params["ics_type"] = $_FILES['fi_ics']['type'];
+  }
+
   return $params;
 }
 
@@ -617,7 +645,7 @@ function get_calendar_action() {
   global $l_header_consult, $l_header_update,$l_header_right,$l_header_meeting;
   global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
   global $l_header_planning, $l_header_list;
-  global $l_header_month,$l_header_new_event,$l_header_admin, $l_header_export;
+  global $l_header_month,$l_header_new_event,$l_header_admin, $l_header_export, $l_header_import;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $l_header_waiting_events;
 
@@ -855,6 +883,21 @@ function get_calendar_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                        );
+
+// Import iCalendar (get the file)
+  $actions["calendar"]["import"] = array (
+    'Name'     => $l_header_import,
+    'Url'      => "$path/calendar/calendar_index.php?action=import",
+    'Right'    => $cright_write,
+    'Condition'=> array ('all') 
+                                       );
+// Insert ICalendar (insert the events)
+  $actions["calendar"]["ics_insert"] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=ics_insert",
+    'Right'    => $cright_write,
+    'Condition'=> array ('none') 
+                                       );
+
 
 }
 

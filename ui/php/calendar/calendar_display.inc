@@ -3410,6 +3410,50 @@ END:VEVENT";
 END:VCALENDAR";
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Import iCalendar file
+///////////////////////////////////////////////////////////////////////////////
+function dis_icalendar_import($params) {
+  global $display ;
+  global $l_ics, $l_ics_file, $l_ics_insert, $l_insert, $l_calendar ;
+
+  $display["title"] = "<h1 class=\"title\">$l_calendar : $l_ics</h1>" ;
+
+  // --- HTML Template --------------------------------------------------------
+  $dis_button = "<input type=\"hidden\" name=\"action\" value=\"ics_insert\">
+          <input type=\"submit\" value=\"$l_ics_insert\">";
+
+  $block = "
+    	
+    <form method=\"post\" name=\"f_entity\" enctype=\"multipart/form-data\"
+      action=\"calendar_index.php\">
+    <fieldset class=\"detail extra\">
+      <legend></legend>
+      <table class=\"detail\">
+      <tr>
+        <th class=\"detailLabel\">$l_ics_file</th>
+        <td><input name=\"fi_ics\" type=\"file\" value=\"\"/></td>
+      </tr>
+      </table>
+    </fieldset>
+    <fieldset class=\"buttons\">
+      $dis_button
+    </fieldset>
+    </form>
+    <p class=\"LC\" />" ;
+
+    return $block ;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Import iCalendar file
+///////////////////////////////////////////////////////////////////////////////
+function dis_icalendar_insert($result) {
+  $block = "<div>".$result[0]." event(s) have been inserted.</div>" ;
+  return $block ;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 /**
  * JSON ok Message. 
  * 

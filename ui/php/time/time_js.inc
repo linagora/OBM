@@ -47,7 +47,10 @@ function check_sel_date(form) {
   cb = 0;
 
   for (i = 0; i < form.length; i++) {
-    i_name = form.elements[i].name.substr(0,6);
+    i_name = \"\";
+    if (form.elements[i].name) {
+      i_name = form.elements[i].name.substr(0,6);
+    }
     i_checked = form.elements[i].checked;
     
     if (i_name == \"cb_day\") { 
