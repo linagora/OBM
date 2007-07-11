@@ -47,8 +47,17 @@ sub modifyAttrList {
     my( $newValue, $ldapEntry, $attr ) = @_;
     my $update = 0;
 
-    if( !defined($newValue) || (defined($newValue) && (uc(ref($newValue)) ne "ARRAY" )) ) {
+    if( !defined($newValue) ) {
+        if( $ldapEntry->get_value( $attr, asref => 1) ) {
+            $ldapEntry->delete( $attr => [ ] );
+            $update = 1;
+        }
+
         return $update;
+
+    }elsif( defined($newValue) && (uc(ref($newValue)) ne "ARRAY" ) ) {
+        return $update;
+
     }
 
     my $ldapValues = $ldapEntry->get_value( $attr, asref => 1);
