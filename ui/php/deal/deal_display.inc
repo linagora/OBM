@@ -2397,8 +2397,6 @@ function dis_deal_dashboard_year_detail($deal) {
     </table>
     <p />
 
-    <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar$chart_bil_params\" alt=\"\" />
-    <br />
     <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pot_params\" alt=\"\" />
 ";
 

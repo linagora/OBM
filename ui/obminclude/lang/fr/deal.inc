@@ -98,7 +98,7 @@ $l_cant_delete_parent = "La suraffaire ne peut être supprimée !";
 
 $l_err_label_empty = "Le label doit être renseigné !";
 $l_err_kind_empty = "Le type d'affaire doit être renseigné !";
-$l_err_task_empty = "La catégorie d'affaire doit être renseignée !";
+$l_err_task_empty = "Le type de tâche de l'affaire doit être renseigné !";
 $l_err_market_empty = "Le responsable commercial doit être renseigné !";
 $l_err_tech_empty = "Le responsable technique doit être renseigné !";
 $l_err_hitrate = "Le pourcentage de réussite doit être entre 0 et 100 !";

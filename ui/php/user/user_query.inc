@@ -486,9 +486,9 @@ function run_query_user_insert($user) {
     userobm_mobile,
     userobm_fax,
     userobm_fax2,
-    userobm_email,
+    userobm_email
     $q_insert_delegation_target
-    $q_delegation[field]
+    $q_delegation[field],
     userobm_description
     $query_insert_web
     $query_insert_mail
@@ -525,9 +525,9 @@ function run_query_user_insert($user) {
     '$mobile',
     '$fax',
     '$fax2',
-    '$email',
+    '$email'
     $q_value_delegation_target
-    $q_delegation[value]
+    $q_delegation[value],
     '$desc'
     $query_values_web
     $query_values_mail
@@ -1345,25 +1345,25 @@ function check_user_data_form($p_id, $user) {
       // All email addresses given are valid and not already used
       $em = strtok($email, "\r\n");
       while ($em) {
-	      if (! preg_match($php_regexp_email_name, $em)) {
-	        $err["msg"] .= "$em : $l_email_error";
-	        $err["field"] = "email";
-	        return false;
-	      }
-	      // Email address not already used
-	      if (array_key_exists($em, $mails)) {
-	        $err["msg"] = "$l_email_exist : $em (" . $mails["$em"] . ")";
-	        $err["field"] = "email";
-	        return false;
-	      }
-	      // Email address not already used by this user
-	      if (in_array($em, $um)) {
-	        $err["msg"] = "$l_uemail_exist : $em";
-	        $err["field"] = "email";
-	        return false;
-	      }
-	      array_push($um, $em);
-	      $em = strtok("\r\n");
+	if (! preg_match($php_regexp_email_name, $em)) {
+	  $err["msg"] .= "$em : $l_email_error";
+	  $err["field"] = "email";
+	  return false;
+	}
+	// Email address not already used
+	if (array_key_exists($em, $mails)) {
+	  $err["msg"] = "$l_email_exist : $em (" . $mails["$em"] . ")";
+	  $err["field"] = "email";
+	  return false;
+	}
+	// Email address not already used by this user
+	if (in_array($em, $um)) {
+	  $err["msg"] = "$l_uemail_exist : $em";
+	  $err["field"] = "email";
+	  return false;
+	}
+	array_push($um, $em);
+	$em = strtok("\r\n");
       }
     }
   } else {
@@ -1500,8 +1500,10 @@ function check_user_data_form($p_id, $user) {
   /////////////////////////////////////////////////////////////////////////////
   // if a user with the same name already exists  return false
   /////////////////////////////////////////////////////////////////////////////
-  if (isset($user["domain"])) {
+  if (($action == "insert") && (isset($user["domain"]))) {
     $domain_id = $user["domain"];
+  } else if (($action == "update") && (isset($u["domain_id"]))) {
+    $domain_id = $u["domain_id"];
   } else {
     $domain_id = $obm["domain_id"];
   }

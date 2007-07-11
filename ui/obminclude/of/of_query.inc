@@ -590,8 +590,8 @@ function of_delegation_query_insert_clauses($field, $value) {
 
   $q = array();
   if ($cgp_use['property']['delegation']) {
-    $q['field'] = "$field,";
-    $q['value'] = "'$value',";
+    $q['field'] = ", $field";
+    $q['value'] = ", '$value'";
   }
 
   return $q;
