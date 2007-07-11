@@ -567,6 +567,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $query = "SELECT calendarevent_id
     FROM CalendarEvent
     WHERE calendarevent_timecreate = '$now'
+      AND calendarevent_date='$datebegin' 
       AND calendarevent_title='$title'
       AND calendarevent_duration='$event_duration'
       AND calendarevent_domain_id='$obm[domain_id]'";
