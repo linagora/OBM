@@ -61,6 +61,8 @@ $l_text = "Texto";
 $l_name = "Nome";
 $l_label = "Etichetta";
 $l_number = "Numero";
+$l_format = "Format";
+$l_file_format = "File format";
 $l_email = "E-mail";
 $l_quota = "Quota";
 $l_invalid_data = "Dati non valida";
@@ -217,6 +219,7 @@ $l_module_time = "Gestione del Tempo" ;
 $l_module_calendar = "Calendario";
 
 $l_header_admin = "Amministrazione";
+$l_header_import = "Importa";
 $l_header_new_f = "Nuovo";
 $l_header_new = "Nuovo";
 $l_header_find = "Trova";

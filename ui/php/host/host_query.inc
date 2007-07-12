@@ -160,8 +160,8 @@ function run_query_host_insert($host) {
     host_uid,
     host_gid,
     host_samba,
-    host_name,
-    $q_delegation[field]
+    host_name
+    $q_delegation[field],
     host_ip,
     host_description,
     host_web_perms,
@@ -177,8 +177,8 @@ function run_query_host_insert($host) {
     '$host_uid',
     '$host_gid',
     '$samba',
-    '$name',
-    $q_delegation[value]
+    '$name'
+    $q_delegation[value],
     '$ip',
     '$desc',
     '$web_perms',

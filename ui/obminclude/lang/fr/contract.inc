@@ -14,7 +14,6 @@ $l_after = "Expiration Après";
 $l_before = "Expiration Avant";
 $l_incident_list = "Incidents";
 $l_incident_new = "Nouveau";
-$l_format = "Format";
 $l_ccf_period = "Période";
 $l_ccf_ticket = "Coupons";
 $l_ccf_duration = "Durée";

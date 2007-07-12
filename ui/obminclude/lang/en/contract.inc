@@ -14,7 +14,6 @@ $l_after = "Expiration After";
 $l_before = "Expiration Before";
 $l_incident_list = "Incidents";
 $l_incident_new = "New";
-$l_format = "Format";
 $l_ccf_period = "Period";
 $l_ccf_ticket = "Tickets";
 $l_ccf_duration = "Duration";

@@ -33,7 +33,6 @@ $l_update = "Actualizar la importación";
 $l_delete = "Borrar la importación";
 $l_check_file = "Revisar este archivo";
 $l_test_file = "Probar este archivo";
-$l_import_file = "Importar este archivo";
 $l_comp_nothing = "Mantener la compañía actual";
 $l_comp_insert = "Ingresar this compañía";
 $l_comp_update = "Actualizar compañía existente";

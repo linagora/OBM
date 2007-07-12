@@ -883,13 +883,96 @@ function dis_group_warn_insert($id, $g_q, $group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the contact administration index
+// Display the group administration index
 ///////////////////////////////////////////////////////////////////////////////
 function dis_group_admin_index() {
 
   $block = of_userdata_dis_admin_form('group');
 
   return $block;
+}
+
+
+/**
+ * Display the group csv import index
+ **/
+function dis_group_import_index() {
+  global $display, $l_group, $l_header_import;
+  global $l_name, $l_email, $l_file_format, $l_user_member;
+
+  $display['title'] = "<h1 class=\"title\">$l_group : $l_header_import</h1>";
+
+  $block = "
+  <div class=\"detail extra\">
+    <h1>$l_file_format</h1>
+
+  <table class=\"spreadSheet\">
+  <thead>
+  <tr>
+    <th>$l_name</th>
+    <th>$l_email</th>
+    <th>$l_user_member</th>
+  </tr>
+  </thead>
+  <tr>
+    <td>CO Coteaux</td>
+    <td>coc.football</td>
+    <td>pierre.baudracco,mehdi.rande,anthony.prades</td>
+  </tr>
+  </table>
+  </div>";
+
+  $block .= html_group_import_file();
+
+  return $block;
+}
+
+
+/**
+ * HTML Display Import Consultation File block
+ **/
+function html_group_import_file() {
+  global $l_group, $l_header_import, $l_file, $l_import_file;
+  global $display;
+
+  $url = url_prepare("group_index.php");
+  $display["title"] = "<div class=\"title\">$l_group : $l_header_import</div>";
+
+  $block = "
+    <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
+      <input type=\"hidden\" name=\"action\" value=\"import_file\" />
+    <table>
+    <tr>
+      <th>$l_import_file</th>
+      <td>
+        <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
+        <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
+        <input type=\"submit\" name=\"submit\" value=\"$l_import_file\" /></td>
+    </tr>
+    </table>
+    </form>
+    </div>";
+
+  return $block;
+}
+
+
+/**
+ * Process Import file
+ **/
+function run_group_import_file($params) {
+
+  $file = $params["file_saved"];
+  if ($file == "") {
+    $file = $params["file"];
+  }
+  $file_name = $params["file_name"];
+  $file_size = $params["file_size"];
+  $csv_sep = $_SESSION['set_csv_sep'];
+  if ($csv_sep == $ccsvd_tab) {
+    $csv_sep = "\t";
+  }
+
 }
 
 

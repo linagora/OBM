@@ -145,8 +145,8 @@ function run_query_mailshare_insert($mailshare) {
     mailshare_timecreate,
     mailshare_userupdate,
     mailshare_usercreate,
-    mailshare_name,
-    $q_delegation[field]
+    mailshare_name
+    $q_delegation[field],
     mailshare_mail_server_id,
     mailshare_quota,
     mailshare_description,
@@ -157,8 +157,8 @@ function run_query_mailshare_insert($mailshare) {
     '$now',
     null,
     '$obm[uid]',
-    '$name',
-    $q_delegation[value]
+    '$name'
+    $q_delegation[value],
     '$mail_server',
     '$quota',
     '$desc',

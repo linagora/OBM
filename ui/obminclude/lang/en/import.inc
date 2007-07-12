@@ -33,7 +33,6 @@ $l_update = "Update the import";
 $l_delete = "Delete the import";
 $l_check_file = "Check this file";
 $l_test_file = "Test this file";
-$l_import_file = "Import this file";
 $l_comp_nothing = "Keep the actual company";
 $l_comp_insert = "Insert this company";
 $l_comp_update = "Update the existing company";

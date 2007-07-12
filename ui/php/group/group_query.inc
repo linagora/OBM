@@ -238,8 +238,8 @@ function run_query_group_insert($group) {
     group_samba,
     group_privacy,
     group_gid,
-    group_name,
-    $q_delegation[field]
+    group_name
+    $q_delegation[field],
     group_desc,
     group_email,
     group_mailing
@@ -253,8 +253,8 @@ function run_query_group_insert($group) {
     '$samba',
     '$priv',
     '$gid',
-    '$name',
-    $q_delegation[value]
+    '$name'
+    $q_delegation[value],
     '$desc',
     '$email',
     '$mailing'

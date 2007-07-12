@@ -312,8 +312,7 @@ function html_import_consult($import_q) {
   $mapping
   </table>
   </div>
-  
-  ";
+";
 
   $block .= html_import_consult_file($import_q);
 

@@ -260,6 +260,14 @@ if (($action == 'index') || ($action == '')) {
   $prefs_u = get_display_pref($obm["uid"], "group_user", 1);
   $display["detail"] = dis_group_display_pref($prefs, $prefs_u);
 
+} elseif ($action == "import") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_group_import_index();
+
+} elseif ($action == "import_file") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = run_group_import_file($params);
+
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_group_admin_index();
@@ -331,7 +339,7 @@ function get_group_params() {
 function get_group_action() {
   global $params, $actions, $path, $l_group;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_header_consult,$l_header_display,$l_header_admin;
+  global $l_header_consult,$l_header_display,$l_header_import, $l_header_admin;
   global $l_header_add_user, $l_add_user, $l_header_add_group, $l_add_group;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
@@ -495,6 +503,20 @@ function get_group_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                       	 );
+// Import
+  $actions["group"]["import"] = array (
+    'Name'     => $l_header_import,
+    'Url'      => "$path/group/group_index.php?action=import",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('all')
+                                                 );
+// Import file
+  $actions["group"]["import_file"] = array (
+    'Url'      => "$path/group/group_index.php?action=import_file",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                                 );
+
 // Admin
   $actions["group"]["admin"] = array (
     'Name'     => $l_header_admin,

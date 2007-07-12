@@ -14,7 +14,6 @@ $l_after = "Vencimiento antes de";
 $l_before = "Vencimiento despues de";
 $l_incident_list = "Incidentes";
 $l_incident_new = "Nuevo";
-$l_format = "Formato";
 $l_ccf_period = "Periodo";
 $l_ccf_ticket = "Tiquetes";
 $l_ccf_duration = "Duración";

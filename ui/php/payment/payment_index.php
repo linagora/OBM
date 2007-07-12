@@ -268,7 +268,7 @@ function get_payment_action() {
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_payment,
-    'Condition'=> array ('detailconsult','detail_invoice','update','invoice_add','invoice_del')
+    'Condition'=> array ('detailconsult','detail_invoice','update','invoice_add','invoice_del', 'invoice_update')
                                           );
 
 // Invoice ADD
