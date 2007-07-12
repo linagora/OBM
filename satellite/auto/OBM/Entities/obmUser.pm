@@ -211,7 +211,6 @@ sub getEntity {
             &OBM::toolBox::write_log( "obmUser: droit mail de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' annule - Serveur inconnu !", "W" );
 
             # On invalide le droit mail
-            $user_mail_perms = 0;
             $self->{"userDesc"}->{"user_mailperms"} = 0;
 
         }else {
@@ -256,11 +255,11 @@ sub getEntity {
         }
     }
 
-    if( !$user_mail_perms ) {
+    if( !$self->{"userDesc"}->{"user_mailperms"} ) {
         # Si la personne n'a pas le droit mail, mais a une adresse mail
         # valide, on la positionne dans l'annuaire.
-        if( defined($user_email) && ($user_email =~ /$regexp_email/) ) {
-            push( @{$users[$i]->{"user_email"}}, $user_email );
+        if( defined($self->{"userDesc"}->{"user_email"}) && ($self->{"userDesc"}->{"user_email"} =~ /$regexp_email/) ) {
+            push( @{$users[$i]->{"user_email"}}, $self->{"userDesc"}->{"user_email"} );
         }
     }
 
