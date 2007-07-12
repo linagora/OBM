@@ -209,6 +209,9 @@ sub getEntity {
 
         if( !defined($localServerIp) ) {
             &OBM::toolBox::write_log( "obmUser: droit mail de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' annule - Serveur inconnu !", "W" );
+
+            # On invalide le droit mail
+            $user_mail_perms = 0;
             $self->{"userDesc"}->{"user_mailperms"} = 0;
 
         }else {
@@ -250,6 +253,14 @@ sub getEntity {
 
             # Gestion de la livraison du courrier
             $self->{"userDesc"}->{"user_mailLocalServer"} = "lmtp:".$localServerIp.":24";
+        }
+    }
+
+    if( !$user_mail_perms ) {
+        # Si la personne n'a pas le droit mail, mais a une adresse mail
+        # valide, on la positionne dans l'annuaire.
+        if( defined($user_email) && ($user_email =~ /$regexp_email/) ) {
+            push( @{$users[$i]->{"user_email"}}, $user_email );
         }
     }
 
@@ -748,7 +759,7 @@ sub updateLdapEntry {
     # Le cas des adresses mails
     if( !$entry->{"user_mailperms"} ) {
         # Adresse principales
-        if( &OBM::Ldap::utils::modifyAttrList( undef, $ldapEntry, "mail" ) ) {
+        if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_email"}, $ldapEntry, "mail" ) ) {
             $update = 1;
         }
 
