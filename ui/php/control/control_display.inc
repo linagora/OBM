@@ -57,7 +57,7 @@ function html_control_consult($domain_id="") {
     </tr>
     <tr>
       <th>$l_mail_domain</th>
-      <td>$domain</td>
+      <td>$domain_name</td>
     </tr>
     <tr>
       <th>$l_mail_mode</th>
