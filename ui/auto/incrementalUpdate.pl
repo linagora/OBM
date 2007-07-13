@@ -19,7 +19,7 @@ sub getParameter {
     my( $parameters ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "global", "help" );
+    &GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "global", "incremental", "help" );
 
 
     if( !exists($parameters->{"domain"}) ) {
@@ -35,7 +35,7 @@ sub getParameter {
         }
 
     }elsif( exists($parameters->{"delegation"}) ) {
-        if( exists($parameters->{"domain"}) || exists($parameters->{"user"}) ) {
+        if( exists($parameters->{"user"}) ) {
             &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
             $parameters->{"help"} = "";
         }

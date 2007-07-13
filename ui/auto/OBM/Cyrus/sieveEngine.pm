@@ -67,6 +67,8 @@ sub dump {
 sub _connectSrvSieve {
     my $self = shift;
     my( $srvDesc, $boxLogin ) = @_;
+    # Il faut remplacer le '@' des login utilisateurs par des '%'
+    $boxLogin =~ s/@/%/;
 
     if( !defined($srvDesc->{"imap_server_ip"}) ) {
         return 0;
