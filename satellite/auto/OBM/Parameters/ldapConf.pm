@@ -374,10 +374,9 @@ $ldapStruct->{"branch"}->[0] = {
     branch => []
 };
 
-#
+
 # Déclaration de la branche des racines des domaines.
 
-#
 # Ce type de branche sera copier autant de fois qu'il y a de domaines à traiter.
 # Chaque branche contient les informations d'un domaine.
 # Le noeud de type DOMAINROOT peut contenir des informations d'authentifications
@@ -393,12 +392,12 @@ $ldapStruct->{"template"}->[0] = {
 };
 
 if( $obmModules->{"samba"} ) {
+    # Si module Samba actif, on ajoute le type à cette branche
     push( @{$ldapStruct->{"template"}->[0]->{"data_type"}}, $SAMBADOMAIN );
 }
 
-#
 # Banche contenant la déclaration des utilisateurs
-$ldapStruct->{"template"}->[0]->{"branch"}->[0] = {
+my $usersDesc = {
     dn => "",
     name => "users",
     node_type => "$NODE",
@@ -409,12 +408,15 @@ $ldapStruct->{"template"}->[0]->{"branch"}->[0] = {
 };
 
 if( $obmModules->{"samba"} ) {
-    push( @{$ldapStruct->{"template"}->[0]->{"branch"}->[0]->{"data_type"}}, $SAMBAUSERS );
+    # Si module Samba actif, on ajoute le type à cette branche
+    push( @{$usersDesc->{"data_type"}}, $SAMBAUSERS );
 }
 
-#
+# Ajout dans la structure du type utilisateur
+push( @{$ldapStruct->{"template"}->[0]->{"branch"}}, $usersDesc );
+
 # Banche contenant la déclaration des utilisateurs systèmes
-$ldapStruct->{"template"}->[0]->{"branch"}->[1] = {
+my $systemUsersDesc = {
     dn => "",
     name => "sysusers",
     node_type => "$NODE",
@@ -424,9 +426,11 @@ $ldapStruct->{"template"}->[0]->{"branch"}->[1] = {
     branch => []
 };
 
-#
+# Ajout dans la structure du type utilisateur système
+push( @{$ldapStruct->{"template"}->[0]->{"branch"}}, $systemUsersDesc );
+
 # Banche contenant la déclaration des groupes
-$ldapStruct->{"template"}->[0]->{"branch"}->[2] = {
+my $groupsDesc = {
     dn => "",
     name => "groups",
     node_type => "$NODE",
@@ -437,11 +441,14 @@ $ldapStruct->{"template"}->[0]->{"branch"}->[2] = {
 };
 
 if( $obmModules->{"samba"} ) {
-    push( @{$ldapStruct->{"template"}->[0]->{"branch"}->[2]->{"data_type"}}, $SAMBAGROUPS );
+    # Si module Samba actif, on ajoute le type à cette branche
+    push( @{$groupsDesc->{"data_type"}}, $SAMBAGROUPS );
 }
 
+# Ajout dans la structure du type groupe
+push( @{$ldapStruct->{"template"}->[0]->{"branch"}}, $groupsDesc );
+
 if( $obmModules->{"mail"} ) {
-    #
     # Banche contenant la déclaration des répertoires partagés
     my $mailShareDesc = {
         dn => "",
@@ -453,11 +460,11 @@ if( $obmModules->{"mail"} ) {
         branch => []
     };
 
+    # Ajout dans la structure du type boîte à lettres partagées
     push( @{$ldapStruct->{"template"}->[0]->{"branch"}}, $mailShareDesc );
 }
 
 if( $obmModules->{"samba"} ) {
-    #
     # Banche contenant la déclaration des hôtes du domaine windows
     my $hostDesc = {
         dn => "",
@@ -469,6 +476,7 @@ if( $obmModules->{"samba"} ) {
         branch => []
     };
 
+    # Ajout dans la structure du type hôte
     push( @{$ldapStruct->{"template"}->[0]->{"branch"}}, $hostDesc );
 }
 
@@ -485,6 +493,7 @@ if( $obmModules->{"mail"} ) {
         branch => []
     };
 
+    # Ajout dans la structure du type configuration de postfix
     push( @{$ldapStruct->{"template"}->[0]->{"branch"}}, $postConf );
 }
 
