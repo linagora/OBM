@@ -153,6 +153,10 @@ sub update {
         $return = $self->_doIncremental();
     }
 
+    if( $return ) {
+        $return = $self->_updateState();
+    }
+
     return $return;
 }
 
@@ -181,8 +185,8 @@ sub _doAll {
 
     # Uniquement pour le metadomaine
     if( $self->{"domain"} == 0 ) {
-       # Traitement des entités de type 'utilisateur système'
-       my $query = "SELECT usersystem_id FROM UserSystem";
+        # Traitement des entités de type 'utilisateur système'
+        my $query = "SELECT usersystem_id FROM UserSystem";
         if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
             &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
             return 0;
@@ -220,73 +224,70 @@ sub _doAll {
         }
     }
 
-    # Pour tous les domaines sauf le meta-domaine
-    if( $self->{"domain"} != 0 ) {
-        my $object;
 
-        # Traitement des entités de type 'utilisateur'
-        $query = "SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"};
-        if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
-            return 0;
-        }
+    my $object;
+    # Traitement des entités de type 'utilisateur'
+    $query = "SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"};
+    if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        return 0;
+    }
 
-        while( my( $userId ) = $queryResult->fetchrow_array() ) {
-            $object = $self->_doUser( 1, 0, $userId );
+    while( my( $userId ) = $queryResult->fetchrow_array() ) {
+        $object = $self->_doUser( 1, 0, $userId );
 
-            my $return = $self->_runEngines( $object );
-            if( $return ) {
-                # La MAJ de l'entité c'est bien passée, on met a jour la BD de
-                # travail
-                $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
-            }
-        }
-
-        # Traitement des entités de type 'groupe'
-        $query = "SELECT group_id FROM UGroup WHERE group_domain_id=".$self->{"domain"};
-        if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
-            return 0;
-        }
-
-        while( my( $groupId ) = $queryResult->fetchrow_array() ) {
-            $object = $self->_doGroup( 1, 0, $groupId );
-
-            my $return = $self->_runEngines( $object );
-            if( $return ) {
-                # La MAJ de l'entité c'est bien passée, on met a jour la BD de
-                # travail
-                $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
-            }
-        }
-
-        # Traitement des entités de type 'mailshare'
-        $query = "SELECT mailshare_id FROM MailShare WHERE mailshare_domain_id=".$self->{"domain"};
-        if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
-            return 0;
-        }
-
-        while( my( $mailshareId ) = $queryResult->fetchrow_array() ) {
-            $object = $self->_doMailShare( 1, 0, $mailshareId );
-
-            my $return = $self->_runEngines( $object );
-            if( $return ) {
-                # La MAJ de l'entité c'est bien passée, on met a jour la BD de
-                # travail
-                $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
-            }
-        }
-
-        # Traitement des entités de type 'postfixConf'
-        $object = $self->_doPostfixConf( 1, 0 );
         my $return = $self->_runEngines( $object );
-
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
             $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
         }
+    }
+
+    # Traitement des entités de type 'groupe'
+    $query = "SELECT group_id FROM UGroup WHERE group_domain_id=".$self->{"domain"};
+    if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        return 0;
+    }
+
+    while( my( $groupId ) = $queryResult->fetchrow_array() ) {
+        $object = $self->_doGroup( 1, 0, $groupId );
+
+        my $return = $self->_runEngines( $object );
+        if( $return ) {
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # travail
+            $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        }
+    }
+
+    # Traitement des entités de type 'mailshare'
+    $query = "SELECT mailshare_id FROM MailShare WHERE mailshare_domain_id=".$self->{"domain"};
+    if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        return 0;
+    }
+
+    while( my( $mailshareId ) = $queryResult->fetchrow_array() ) {
+        $object = $self->_doMailShare( 1, 0, $mailshareId );
+
+        my $return = $self->_runEngines( $object );
+        if( $return ) {
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # travail
+            $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        }
+    }
+
+    # Traitement des entités de type 'postfixConf'
+    $object = $self->_doPostfixConf( 1, 0 );
+    my $return = $self->_runEngines( $object );
+
+    if( $return ) {
+        # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+        # travail
+        $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
     }
 
     return $globalReturn; 
@@ -1236,6 +1237,31 @@ sub _updateDbDomain {
         }
     }
 
+
+    return 1;
+}
+
+
+sub _updateState {
+    my $self = shift;
+
+    if( !defined($self->{"dbHandler"}) ) {
+        return 0;
+    }
+    my $dbHandler = $self->{"dbHandler"};
+
+    if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
+        &OBM::toolBox::write_log( "loadDb: pas de domaine indique pour la MAJ totale", "W" );
+        return 0;
+    }
+    my $domainId = $self->{"domain"};
+   
+    my $query = "UPDATE DomainPropertyValue SET domainpropertyvalue_value=0 WHERE domainpropertyvalue_property_key='update_state' AND domainpropertyvalue_domain_id=".$domainId;
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
+    }
 
     return 1;
 }
