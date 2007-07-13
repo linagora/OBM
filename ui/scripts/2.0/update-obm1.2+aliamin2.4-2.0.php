@@ -15,6 +15,7 @@ IMPORTANT:
  - Le script modifie la base d'update d'une install aliamin 2.4 + obm 1.2 vers
    une base de données obm 2.0
  - Il utilise le script update-1.2-2.0.php
+ - Ne pas oublier de faire un dump de la BD avant l'execution du script...
 
 Pré-requis:
  - BD source en Aliamin version 2.4 et OBM version 2.0
@@ -767,6 +768,19 @@ $row = mysql_fetch_array($res);
 $nb = $row[0];
 if ($nb>0)
   echo "ATTENTION: $nb groupes (table UGroup) ont un gid à NULL !!!\n";
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// EXECUTION DU SCRIPT update-1.2-2.0.php
+
+echo "\n\n******** Exécution du script update-1.2-2.0.php ********\n\n";
+
+include("update-1.2-2.0.php");
 
 
 
