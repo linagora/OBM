@@ -76,7 +76,7 @@ sub ldapSearch {
     }
 
     my $ldapResult = $ldapConn->search(
-        base => "dc=local",
+        base => "",
         filter => to_utf8( { -string => $ldapFilter, -charset => "ISO-8859-1"} ),
         scope => "sub",
         attrs => $ldapAttributes
