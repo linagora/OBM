@@ -15,6 +15,7 @@ require OBM::imapd;
 require OBM::Ldap::ldapEngine;
 require OBM::Cyrus::cyrusEngine;
 require OBM::Cyrus::sieveEngine;
+require OBM::Postfix::postfixEngine;
 require OBM::Entities::obmRoot;
 require OBM::Entities::obmDomainRoot;
 require OBM::Entities::obmNode;
@@ -151,6 +152,10 @@ sub update {
         $return = $self->_doAll();
     }else {
         $return = $self->_doIncremental();
+    }
+
+    if( $return ) {
+        $return = $self->_doRemoteConf();
     }
 
     if( $return ) {
@@ -1264,4 +1269,17 @@ sub _updateState {
     }
 
     return 1;
+}
+
+
+sub _doRemoteConf {
+    my $self = shift;
+    my $return = 1;
+
+    # MAJ des map Postfix sur les serveurs entrant
+    my $updateMailSrv = OBM::Postfix::postfixEngine->new( $self->{"domainList"} );
+    $return = $updateMailSrv->update();
+    $updateMailSrv->destroy();
+
+    return $return;
 }
