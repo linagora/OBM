@@ -222,7 +222,7 @@ function run_query_group_insert($group) {
   if ($priv == 1) {
     $mailing = 0;
     $samba = 0;
-    $email = "";
+    $email = '';
   }
 
   // Delegation handling

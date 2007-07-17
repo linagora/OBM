@@ -266,7 +266,7 @@ if (($action == 'index') || ($action == '')) {
 
 } elseif ($action == "import_file") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = run_group_import_file($params);
+  $display["detail"] = dis_group_import_file_run($params);
 
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////

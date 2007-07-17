@@ -234,11 +234,13 @@ function html_invoice_search_form($invoice, $sta, $tts) {
 
   if ($popup) {
     $ext_action = $invoice["ext_action"];
+    $ext_type = $invoice["ext_type"];
     $ext_url = $invoice["ext_url"];
     $ext_id = $invoice["ext_id"];
     $ext_title = ($invoice["ext_title"] ? $invoice["ext_title"] : $l_select_invoice);
     $ext_target = $invoice["ext_target"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_type\" type=\"hidden\" value=\"$ext_type\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
@@ -371,14 +373,15 @@ function dis_invoice_search_list($invoice) {
 //   - $invoice[] : invoice search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_search_list ($inv_q, $prefs, $invoice) {
-  global $l_close;
+  global $l_close, $l_add;
 
-  $popup = $invoice["popup"];
+  $popup = $invoice['popup'];
   if ($popup) {
-    $ext_action = $invoice["ext_action"];
-    $ext_url = $invoice["ext_url"];
-    $ext_id = $invoice["ext_id"];
-    $ext_target = $invoice["ext_target"];
+    $ext_action = $invoice['ext_action'];
+    $ext_type = $invoice['ext_type'];
+    $ext_url = $invoice['ext_url'];
+    $ext_id = $invoice['ext_id'];
+    $ext_target = $invoice['ext_target'];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
   }
 
@@ -426,15 +429,38 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
   $dis_invoice = new OBM_DISPLAY ("DATA", $prefs, "invoice");
   if ($popup) {
     $dis_invoice->display_link = false;
-    if ($ext_url != "") {
-      $dis_invoice->display_ext = "get_id_url";
-    } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
-      $dis_invoice->display_ext = "get_id";
-    }
+    if ($invoice["ext_type"] == "multi") {
+      $dis_invoice->data_cb_text = "X";
+      $dis_invoice->data_idfield = "invoice_id";
+      $dis_invoice->data_cb_name = "cb_inv-";
+      $dis_invoice->data_form_head = "
+      <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+      $dis_invoice->data_form_end = "
+      <p class=\"detailButton\">
+        <p class=\"detailButtons\">
+        <input type=\"submit\" value=\"$l_add\" />
+        <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+        </p>
+      </p>
+      </form>";
+
     $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";
+    } else {
+
+      if ($ext_url != "") {
+	$dis_invoice->display_ext = "get_id_url";
+      } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+	$dis_invoice->display_ext = "get_id";
+      }
+      $display_popup_end = "
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+    }
   }
 
   $dis_invoice->data_set = $inv_q;

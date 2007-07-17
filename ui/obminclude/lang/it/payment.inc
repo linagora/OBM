@@ -39,9 +39,10 @@ $l_payment_infos = "Informazioni sui pagamenti";
 $l_insert= "Inserisci pagamento";
 $l_update = "Aggiorna pagamento";
 $l_delete = "Elimina pagamento";
+$l_delete_invoice = "Elimina";
 $l_bank = "Banca";
 $l_delete_confirm = "Confermi eliminazione del pagamento ?";
-$l_error_which = "Err.5463b : var non impostata correttamente, ... prego,contattare l'amministratore del sistema" ;
+
 $l_payment_infos = "Vedi";
 $l_payment_mod = "Modifica";
 $l_search_invoice ="Cerca fattura";

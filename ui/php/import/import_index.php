@@ -482,14 +482,6 @@ function get_import_params() {
   // Get global params
   $params = get_global_params("Import");
 
-  // File
-  if (isset ($_FILES['fi_file'])) {
-    $params["file"] = $_FILES['fi_file']["tmp_name"];
-    $params["file_name"] = $_FILES['fi_file']['name'];
-    $params["file_size"] = $_FILES['fi_file']['size'];
-    $params["type"] = $_FILES['fi_file']['type'];
-  }
-
   if (($action == "file_import")  && ($params["file"] != "")
       && ($params["file_saved"] == "")) {
     $file_saved = $tmp_path . '/' . $params["file_name"];

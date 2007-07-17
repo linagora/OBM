@@ -46,7 +46,12 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "ext_get_id") {
+if (($action == "ext_get_ids") || ($action == "ext_get_id")) {
+  if ($action == "ext_get_ids") {
+    $params["ext_type"] = "multi";
+  } else {
+    $params["ext_type"] = "mono";
+  }
   $display["search"] = dis_invoice_search_form($params);
   if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_invoice_search_list($params);
@@ -345,7 +350,7 @@ function get_invoice_action() {
   );
 
 // External Invoice Select 
-  $actions["invoice"]["ext_get_id"]  = array (
+  $actions["invoice"]["ext_get_ids"]  = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );

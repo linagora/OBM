@@ -960,19 +960,114 @@ function html_group_import_file() {
 /**
  * Process Import file
  **/
-function run_group_import_file($params) {
+function dis_group_import_file_run($params) {
+  global $obm, $display, $ccscd_tab, $l_group, $l_name, $l_email, $l_header_import;
 
-  $file = $params["file_saved"];
-  if ($file == "") {
-    $file = $params["file"];
+  $display["title"] = "<div class=\"title\">$l_group : $l_header_import</div>";
+
+  $file = $params['file_saved'];
+  if ($file == '') {
+    $file = $params['file'];
   }
-  $file_name = $params["file_name"];
-  $file_size = $params["file_size"];
+  $file_name = $params['file_name'];
+  $file_size = $params['file_size'];
   $csv_sep = $_SESSION['set_csv_sep'];
   if ($csv_sep == $ccsvd_tab) {
     $csv_sep = "\t";
   }
 
+  $dis_import .= "
+  <thead>
+  <tr>
+    <th>$l_name</th>
+    <th>$l_email</th>
+    <th></th>
+  </tr>
+  </thead>";
+  $obm_q = new DB_OBM;
+  $multidomain = sql_multidomain("group");
+  $num_line = 0;
+  $fh = fopen($file, 'r');
+  while ( ($row = fgetcsv($fh, 4000, $csv_sep)) ) {
+    $num_line++;
+
+    $group['name'] = $row[0];
+    $group['email'] = $row[1];
+    $group['users_login'] = $row[2];
+
+    // Test if group name or email exists
+    $query = "SELECT group_id, group_name, group_email
+    FROM UGroup
+    WHERE (group_name='$group[name]' OR group_email='$group[email]')
+      AND (group_privacy=0 OR group_usercreate='$obm[uid]')
+      $multidomain";
+
+    display_debug_msg($query, $cdg_sql, "run_group_import_file()");
+    $obm_q->query($query);
+
+    if ($obm_q->num_rows() > 0) {
+      // Get the existing group
+      $obm_q->next_record();
+      $group['id'] = $obm_q->f('group_id');
+      $group['name'] = $obm_q->f('group_name');
+      $res = "=$group[name]";
+    } else {
+      // Insert the group
+      if (check_group_data_form($group)) {
+	$group['id'] = run_query_group_insert($group);
+	$res = '+';
+      } else {
+	// Group not ok, stop for this row
+	$group['id'] = false;
+	$res = '!';
+      }
+    }
+
+    // Insert group user membership
+    if ($group['id'] > 0) {
+      $login = strtok($group['users_login'],',');
+      while($login) {
+	$user_id = get_user_id($login);
+	if ($user_id > 0) {
+	  // Add user membership if not already there
+	  $query = "SELECT count(*) as nb
+            FROM UserObmGroup
+            WHERE userobmgroup_group_id='$group[id]'
+              AND userobmgroup_userobm_id=$user_id";
+	  display_debug_msg($query, $cdg_sql, "run_group_import_file(2)");
+	  $obm_q->query($query);
+	  $obm_q->next_record();
+	  if ($obm_q->f('nb') == '0') {
+	    $query = "INSERT INTO UserObmGroup (
+              userobmgroup_group_id,
+              userobmgroup_userobm_id)
+            VALUES ($group[id], $user_id)";
+	    display_debug_msg($query, $cdg_sql, "run_group_import_file(3)");
+	    $obm_q->query($query);
+	    $res .= 'u';
+	  } else {
+	    $res .= '.';
+	  }
+	}
+	$login = strtok(',');
+      }
+    }
+
+    $dis_import .= "
+    <tr>
+      <td>$group[name]</td>
+      <td>$group[email]</td>
+      <td>$res</td>
+    </tr>";
+  }
+  fclose($fh);
+
+  $block = "
+  <table class=\"spreadSheet\">
+  $dis_import
+  </table>";
+
+  return $block;
 }
 
 

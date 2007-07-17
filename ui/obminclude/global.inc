@@ -867,7 +867,7 @@ function of_date_guess_format ($date) {
 function of_isodate_convert($date, $null_empty=false) {
   global $c_php_isodate_format;
 
-  if($date) {
+  if ($date) {
     $type = of_date_guess_format($date);
   } elseif(!$null_empty) {
     $date = time();
@@ -1141,6 +1141,15 @@ function get_global_params($table="") {
   if (!is_array($params)) $params = array();
   $replace = array("/^tf_/", "/^sel_/", "/^cb_/", "/^ta_/", "/^rd_/", "/^hd_/");
   $parameters = array_merge($_GET,$_POST);
+
+  // File
+  if (isset ($_FILES['fi_file'])) {
+    $params["file"] = $_FILES['fi_file']["tmp_name"];
+    $params["file_name"] = $_FILES['fi_file']['name'];
+    $params["file_size"] = $_FILES['fi_file']['size'];
+    $params["file_type"] = $_FILES['fi_file']['type'];
+  }
+
   foreach($parameters as $var => $value) {
     if ($parameters["ajax"] == 1 && is_string($value)) {
       $value = utf8_decode($value);

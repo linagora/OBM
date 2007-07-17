@@ -148,9 +148,9 @@ if ($action == "index") {
   
 } elseif ($action == "invoice_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (($params["invoice_id"] > 0) && ($params["payment_id"] > 0)) {
-    run_query_payment_invoice_insert($params);
-    $display["msg"] .= display_ok_msg("$l_invoice_added");
+  if (($params["inv_nb"] > 0) && ($params["payment_id"] > 0)) {
+    $nb = run_query_payment_invoice_insert($params);
+    $display["msg"] .= display_ok_msg("$nb : $l_invoice_added");
   } else {
     $display["msg"] .= display_err_msg("$l_no_invoice_added");
   }
@@ -161,13 +161,13 @@ if ($action == "index") {
   $prefs = get_display_pref($obm["uid"],"payment",1);
   $display["detail"] = dis_payment_display_pref ($prefs);
 
-}elseif ($action == "dispref_display") {
+} elseif ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "payment", 1);
   $display["detail"] = dis_payment_display_pref($prefs);
 
-}elseif ($action == "dispref_level") {
+} elseif ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($params);
   $prefs = get_display_pref($obm["uid"], "payment", 1);
@@ -194,6 +194,7 @@ function get_payment_params() {
   // Get global params
   $params = get_global_params("Payment");
 
+  // Handle payment-invoice associations
   if (isset($params)) {
     $nb_inv = 0;
     while ( list( $key, $value ) = each($params) ) {
@@ -206,6 +207,17 @@ function get_payment_params() {
     $params["invoices_nb"] = $nb_inv;
   }
 
+  // Add Invoices
+  $nb_inv = 0;
+  foreach($_REQUEST as $key => $value ) {
+    if (strcmp(substr($key, 0, 7),"cb_inv-") == 0) {
+      $nb_inv++;
+      $inv_num = substr($key, 7);
+      $params["invo$nb_inv"] = $inv_num;
+    }
+  }
+  $params["inv_nb"] = $nb_inv;
+
   return $params;
 }
 
@@ -214,7 +226,7 @@ function get_payment_params() {
 // Payment actions
 //////////////////////////////////////////////////////////////////////////////
 function get_payment_action() {
-  global $params, $actions, $path;
+  global $params, $actions, $path, $l_payment;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_display, $l_header_admin;
   global $l_header_duplicate, $l_module_invoice, $l_header_link_invoice;
@@ -264,7 +276,7 @@ function get_payment_action() {
 // Sel invoice : Invoice selection (menu)
   $actions["payment"]["sel_invoice"] = array (
     'Name'     => $l_header_link_invoice,
-    'Url'      => "$path/invoice/invoice_index.php?action=ext_get_id&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice_id=")."&amp;ext_id=".$params["payment_id"]."&amp;ext_target=$l_payment",
+    'Url'      => "$path/invoice/invoice_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice_id=")."&amp;ext_id=".$params["payment_id"]."&amp;ext_target=$l_payment",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_payment,
@@ -380,12 +392,15 @@ function update_payment_action() {
 
   $id = $params["payment_id"];
   if ($id > 0) {
+
+    $p = get_payment_info($id);
+    
     // Detail Consult
     $actions["payment"]["detailconsult"]["Url"] = "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id";
     $actions["payment"]["detailconsult"]['Condition'][] = 'insert';
 
     // Sel invoice : Invoice selection (menu)
-    $actions["payment"]["sel_invoice"]["Url"] = "$path/invoice/invoice_index.php?action=ext_get_id&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice_id=")."&amp;ext_id=$id&amp;ext_target=$l_payment";
+    $actions["payment"]["sel_invoice"]["Url"] = "$path/invoice/invoice_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice_id=")."&amp;ext_id=$id&amp;ext_target=$l_payment&amp;company=$p[company]";
     $actions["payment"]["sel_invoice"]['Condition'][] = 'insert';
 
     // Invoice

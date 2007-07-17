@@ -34,7 +34,8 @@ $l_insert= "Insert Payment";
 $l_update = "Update Payment";
 $l_delete = "Delete Payment";
 $l_delete_confirm = "Confirm the deletion of this payment ?";
-$l_error_which = "Error : The which variable is NOT CORRECTLY set... Please Check your administrator" ;
+$l_delete_invoice = "Delete";
+
 $l_payment_infos = "View Payment";
 $l_payment_mod = "Modify Payment";
 $l_search_invoice ="Search Invoices";

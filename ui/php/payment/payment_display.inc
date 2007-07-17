@@ -82,11 +82,12 @@ function dis_data_payment(&$OD, $fieldname, $link_ok) {
 //   - $params[] : hash with parameters values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_payment_search_form($params="") {
-  global $cgp_hide;
+  global $cgp_hide, $display, $l_module_payment;
 
   $kinds = get_payment_kinds();
   $accs = get_accounts();
   $block .= html_payment_search_form($params, $kinds, $accs);
+  $display["title"] = "<h1 class=\"title\">$l_module_payment</h1>";
 
   return $block;
 }
@@ -218,7 +219,7 @@ function html_payment_search_form($params, $kinds, $accs) {
 //   - $params[] : params (search criteria)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_payment_search_list($params) {
-  global $obm, $display, $l_found, $l_no_found;
+  global $obm, $display, $l_found, $l_no_found, $l_payment;
 
   $prefs = get_display_pref($obm["uid"], "payment");
   $obm_q = run_query_payment_search($params);
@@ -496,7 +497,7 @@ function dis_payment_invoice($params) {
 //   - $params[] : payment values
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_invoice($amounts, $params) {
-  global $display,  $l_update, $l_no_invoice;
+  global $display,  $l_update, $l_delete_invoice, $l_no_invoice;
   global $l_payment, $l_invoice, $l_company, $l_received, $l_emitted;
   global $l_comment, $l_number, $l_amount, $l_date, $l_label, $l_already_paid;
   global $l_total, $l_invoice_list;
@@ -517,6 +518,7 @@ function html_payment_invoice($amounts, $params) {
         <th>$l_amount</th>
         <th>$l_already_paid</th>
         <th>$l_payment : $l_amount</th>
+        <th>$l_delete_invoice</th>
       </tr>
       </thead>";
     $k = 0;
@@ -546,6 +548,7 @@ function html_payment_invoice($amounts, $params) {
           <td>$i_inv_amount </td>
           <td>$i_already_paid </td>
           <td><input type=\"text\" name=\"data-inv-$i_id\" value=\"$affected_amount\" /></td>
+          <td><input type=\"checkbox\" name=\"cb_inv-$i_id\" value=\"1\" /></td>
         </tr>";
     }
 
@@ -554,6 +557,7 @@ function html_payment_invoice($amounts, $params) {
         <tr class=\"highlight\">
         <th colspan=\"5\">$l_total</th>
         <td>$affected_amount_total</td>
+        <th></th>
         </tr>
         </tbody>
       </table>";
@@ -569,8 +573,7 @@ function html_payment_invoice($amounts, $params) {
     <input type=\"submit\" value=\"$l_update\" />
   </p>
   </div>
-  </form>
-";
+  </form>";
   } else {
     $l_invoice_title = $l_no_invoice;
   }
@@ -581,8 +584,7 @@ function html_payment_invoice($amounts, $params) {
 <div class=\"detail extra\">
   <h1>$l_invoice_title</h1>
   $dis_invoice
-</div>
-";
+</div>";
 
   return $block;
 }

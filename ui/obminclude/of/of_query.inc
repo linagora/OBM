@@ -1513,8 +1513,10 @@ function get_userobm_from_ids($users) {
 function get_user_id($login) {
   global $cdg_sql;
 
+  $multidomain = sql_multidomain("userobm");
+
   if (isset($login)) {
-    $query = "SELECT userobm_id FROM UserObm WHERE userobm_login='$login'";
+    $query = "SELECT userobm_id FROM UserObm WHERE userobm_login='$login' $multidomain";
 
     display_debug_msg($query, $cdg_sql, "get_user_id()");
     $obm_q = new DB_OBM;

@@ -395,7 +395,7 @@ function run_query_list_contactlist_insert($list) {
   global $cdg_sql;
 
   $id = $list["list_id"];
-	
+
   $multidomain = sql_multidomain("list");
 
   // We check the list still exist (in case popup windows here for long...)

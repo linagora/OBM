@@ -562,7 +562,7 @@ function dis_contact_search_list($contact) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Contact search result
 // Parameters : 
-//   - $obm_q     : list of contacts to display 
+//   - $obm_q     : list of contacts to display
 //   - $prefs     : the fields which have to be displayed
 //   - $contact[] : contact search criteria
 //     keys used  : company_id, name, company

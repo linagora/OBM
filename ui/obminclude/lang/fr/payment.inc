@@ -37,6 +37,7 @@ $l_update = "Mettre à jour le Paiement";
 $l_delete = "Supprimer le Paiement";
 $l_delete_confirm = "Etes vous sur de vouloir supprimer ce Paiement ?";
 $l_duplicate = "Dupliquer ce Paiement";
+$l_delete_invoice = "Supprimer";
 
 // Messages 
 $l_no_display = "Remplissez les critères de recherche et appuyez sur <Chercher> pour lancer la recherche";
