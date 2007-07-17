@@ -259,7 +259,7 @@ sub getEntity {
         # Si la personne n'a pas le droit mail, mais a une adresse mail
         # valide, on la positionne dans l'annuaire.
         if( defined($self->{"userDesc"}->{"user_email"}) && ($self->{"userDesc"}->{"user_email"} =~ /$regexp_email/) ) {
-            push( @{$users[$i]->{"user_email"}}, $self->{"userDesc"}->{"user_email"} );
+            push( @{$self->{"userDesc"}->{"user_email"}}, $dbUserDesc->{"userobm_email"} );
         }
     }
 
