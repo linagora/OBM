@@ -110,6 +110,7 @@ sub update {
         if( !defined($srvCon) || !$srvCon->open() ) {
             &OBM::toolBox::write_log( "Echec : lors de la connexion au serveur : ".$srvList->[$i], "W" );
             $globalReturn = 0;
+            next;
         }
 
         while( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 1)) ) {
