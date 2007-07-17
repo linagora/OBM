@@ -99,7 +99,7 @@ sub update {
     my $cmd = "domains: ".$self->{"incomingMailDomain"};
 
     for( my $i=0; $i<=$#$srvList; $i++ ) {
-        &OBM::toolBox::write_log( "Connexion au serveur : '".$srvList->[$i]."'", "W" );
+        &OBM::toolBox::write_log( "postfixEngine: connexion au serveur : '".$srvList->[$i]."'", "W" );
         my $srvCon = new Net::Telnet(
             Host => $srvList->[$i],
             Port => 30000,
@@ -108,28 +108,28 @@ sub update {
         );
 
         if( !defined($srvCon) || !$srvCon->open() ) {
-            &OBM::toolBox::write_log( "Echec : lors de la connexion au serveur : ".$srvList->[$i], "W" );
+            &OBM::toolBox::write_log( "postfixEngine: echec de connexion au serveur : ".$srvList->[$i], "W" );
             $globalReturn = 0;
             next;
         }
 
         while( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 1)) ) {
             chomp($line);
-            &OBM::toolBox::write_log( "Reponse : '".$line."'", "W" );
+            &OBM::toolBox::write_log( "postfixEngine: reponse : '".$line."'", "W" );
         }
 
-        &OBM::toolBox::write_log( "Envoie de la commande : '".$cmd."'", "W" );
+        &OBM::toolBox::write_log( "postfixEngine: envoie de la commande : '".$cmd."'", "W" );
         $srvCon->print( $cmd );
         if( (!$srvCon->eof()) && (my $line = $srvCon->getline()) ) {
             chomp($line);
-            &OBM::toolBox::write_log( "Reponse : '".$line."'", "W" );
+            &OBM::toolBox::write_log( "postfixEngine: reponse : '".$line."'", "W" );
         }
 
-        &OBM::toolBox::write_log( "Deconnexion du serveur : '".$srvList->[$i]."'", "W" );
+        &OBM::toolBox::write_log( "postfixEngine: deconnexion du serveur : '".$srvList->[$i]."'", "W" );
         $srvCon->print( "quit" );
         while( !$srvCon->eof() && (my $line = $srvCon->getline(Timeout => 1)) ) {
             chomp($line);
-            &OBM::toolBox::write_log( "Reponse : '".$line."'", "W" );
+            &OBM::toolBox::write_log( "postfixEngine: reponse : '".$line."'", "W" );
         }
 
     }

@@ -3,9 +3,9 @@
 # Script de gestion du serveur mailMakePostfixMaps.pl
 ###############################################################################
 
-ALIAMINPATH="/opt/obm/current"
+OBMPATH="/opt/obm/current"
 
-daemon_path="$ALIAMINPATH/auto/mailMakePostfixMaps/mailMakePostfixMaps.pl"
+daemon_path="$OBMPATH/auto/mailMakePostfixMaps/mailMakePostfixMaps.pl"
 daemon_pid="/var/run/obm/mailMakePostfix.pid"
 
 case "$1" in
