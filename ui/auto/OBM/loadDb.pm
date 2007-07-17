@@ -1278,6 +1278,7 @@ sub _doRemoteConf {
 
     # MAJ des map Postfix sur les serveurs entrant
     my $updateMailSrv = OBM::Postfix::postfixEngine->new( $self->{"domainList"} );
+    $updateMailSrv->init();
     $return = $updateMailSrv->update();
     $updateMailSrv->destroy();
 

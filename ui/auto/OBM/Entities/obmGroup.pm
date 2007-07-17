@@ -96,7 +96,7 @@ sub getEntity {
 
     if( $numRows == 0 ) {
         &OBM::toolBox::write_log( "obmGroup: groupe prive ou inexistant d'identifiant : ".$groupId, "W" );
-        return 0;
+        return 1;
 
     }elsif( $numRows > 1 ) {
         &OBM::toolBox::write_log( "obmGroup: plusieurs groupes d'identifiant : ".$groupId." ???", "W" );
