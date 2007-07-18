@@ -177,7 +177,7 @@ sub getEntity {
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
-    if( $self->{"links"} ) {
+    if( $self->isLinks() ) {
         $self->getEntityLinks( $dbHandler, $domainDesc );
     }
 
