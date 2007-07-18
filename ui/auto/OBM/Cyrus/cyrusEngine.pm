@@ -617,7 +617,7 @@ sub _updateBox {
     }
 
     # Uniquement en mode non incrémental
-    if( !$object->isLinks() ) {
+    if( $object->isLinks() ) {
         # Positionnement des ACL
         if( !$self->_imapSetMailboxAcls( $cyrusSrv, $object ) ) {
             return 0;
