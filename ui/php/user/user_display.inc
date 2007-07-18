@@ -32,8 +32,8 @@ $fieldnames["datebegin"] = $l_datebegin;
 $fieldnames["timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_web_perms"] = $l_web;
 $fieldnames["userobm_email"] = $l_email;
-$fieldnames["userobm_email_quota"] = $l_quota."aa";
-$fieldnames["userobm_email_login_date"] = $l_date;
+$fieldnames["userobm_mail_quota"] = $l_quota;
+$fieldnames["userobm_mail_login_date"] = $l_date;
 $fieldnames["userobm_nomade"] = $l_access_nomade;
 $fieldnames["userobm_samba_perms"] = $l_smb_perms;
 $fieldnames["userobm_description"] = $l_desc;
@@ -433,7 +433,7 @@ function html_user_consult($obm_q) {
   global $l_vacation, $l_vacation_message, $l_mail_server;
   global $l_enabled, $l_disabled, $l_web_consult_list, $l_photo;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
-  global $obm, $profiles, $path, $display, $c_yes, $c_no;
+  global $obm, $cgp_use, $profiles, $path, $display, $c_yes, $c_no;
 
   $id = $obm_q->f("userobm_id");
   $domain_label = ($obm_q->f("domain_label") != "" ? $obm_q->f("domain_label") : "GLOBAL");

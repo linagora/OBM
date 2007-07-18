@@ -44,6 +44,7 @@ $default_mailserver_host_id = 2; // id de l'hote qui heberge le serveur de courr
 
 // CONFIG FICHIERS CONF.
 $aliamin_config_file = '/etc/aliamin/aliamin_conf.ini';
+$aliamin_config_file = '/home/pierre/cvs/aliamin/aliamin_conf.ini';
 
 
 // CONFIG BD ALIAMIN
@@ -366,6 +367,12 @@ $sql = "UPDATE Domain SET domain_mail_server_id = $mailserver_id
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK (".get_affected_rows().")\n";
 
+// on met à jour l'IP du serveur de messagerie
+echo str_pad("mise a jour de l'IP du serveur de courrier SMTP... ",70);
+$sql = "UPDATE Host SET host_ip = '10.156.120.20' WHERE host_id = '$default_mailserver_host_id';";
+my_query($aliamin_db, $sql, $aliamin_link);
+echo "OK (".get_affected_rows().")\n";
+
 // on met à jour les mailshares pour leur donner l'id du serveur de courrier par defaut
 echo str_pad("mise a jour du serveur de courrier des mailshares... ",70);
 $sql = " UPDATE MailShare SET mailshare_mail_server_id = $mailserver_id";
@@ -587,7 +594,9 @@ $sql = "ALTER TABLE UserObm
   ADD COLUMN userobm_address2        varchar(64)  AFTER userobm_address1,
   ADD COLUMN userobm_address3        varchar(64)  AFTER userobm_address2,
   ADD COLUMN userobm_expresspostal   varchar(16)  AFTER userobm_town,
-  ADD COLUMN userobm_country_iso3166 char(2)      DEFAULT '0' AFTER userobm_expresspostal";
+  ADD COLUMN userobm_country_iso3166 char(2)      DEFAULT '0' AFTER userobm_expresspostal,
+  CHANGE COLUMN userobm_mail_quota userobm_mail_quota int(8) DEFAULT '0'
+";
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK\n";
 
@@ -612,12 +621,39 @@ $sql = "ALTER TABLE UserObm
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK\n";
 
-echo str_pad("Mise a jour des preferences utilisateurs...",70);
+echo str_pad("Mise a jour des preferences utilisateurs...\n",70);
+echo str_pad("set_theme...",70);
 $sql = "UPDATE UserObmPref set userobmpref_value='default' WHERE userobmpref_option='set_theme';";
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK (".get_affected_rows().")\n";
+echo str_pad("set_rows...",70);
+$sql = "INSERT INTO UserObmPref (userobmpref_user_id, userobmpref_option, userobmpref_value) VALUES (0, 'set_rows', '20');";
+my_query($aliamin_db, $sql, $aliamin_link);
+echo "OK (".get_affected_rows().")\n";
+echo str_pad("set_date_upd...",70);
+$sql = "INSERT INTO UserObmPref (userobmpref_user_id, userobmpref_option, userobmpref_value) VALUES (0, 'set_date_upd', 'd/m/Y');";
+my_query($aliamin_db, $sql, $aliamin_link);
+echo "OK (".get_affected_rows().")\n";
+echo str_pad("set_date...",70);
+$sql = "INSERT INTO UserObmPref (userobmpref_user_id, userobmpref_option, userobmpref_value) VALUES (0, 'set_date', 'd/m/Y');";
+my_query($aliamin_db, $sql, $aliamin_link);
+echo "OK (".get_affected_rows().")\n";
+echo str_pad("set_csv_sep...",70);
+$sql = "INSERT INTO UserObmPref (userobmpref_user_id, userobmpref_option, userobmpref_value) VALUES (0, 'set_csv_sep', ';');";
+my_query($aliamin_db, $sql, $aliamin_link);
+echo "OK (".get_affected_rows().")\n";
+echo str_pad("set_debug_sep...",70);
+$sql = "INSERT INTO UserObmPref (userobmpref_user_id, userobmpref_option, userobmpref_value) VALUES (0, 'set_debug', '0');";
+my_query($aliamin_db, $sql, $aliamin_link);
+echo "OK (".get_affected_rows().")\n";
 
-/*echo str_pad("creation de la table UserSystem...",70);
+echo str_pad("Modification de la structure de la table UGroup...",70);
+$sql = "ALTER TABLE UGroup
+  ADD COLUMN group_mailing int(1) DEFAULT 0 AFTER group_gid";
+my_query($aliamin_db, $sql, $aliamin_link);
+echo "OK\n";
+
+echo str_pad("creation de la table UserSystem...",70);
 $sql = "CREATE TABLE UserSystem (
   usersystem_id         int(8) NOT NULL auto_increment,
   usersystem_login      varchar(32) NOT NULL default '',
@@ -652,20 +688,19 @@ while ($row = mysql_fetch_assoc($res)) {
   )
   VALUES ( ";
   $sql.= "  ".$row["usersystem_id"].", ";
-  $sql.= " '".protect_quote($row["usersystem_login"])."', ";
-  $sql.= " '".protect_quote($row["usersystem_password"])."', ";
-  $sql.= " '".protect_quote($row["usersystem_uid"])."', ";
-  $sql.= " '".protect_quote($row["usersystem_gid"])."', ";
-  $sql.= " '".protect_quote($row["usersystem_homedir"])."', ";
-  $sql.= " '".protect_quote($row["usersystem_lastname"])."', ";
-  $sql.= " '".protect_quote($row["usersystem_firstname"])."', ";
-  $sql.= " '".protect_quote($row["usersystem_shell"])."' ";
+  $sql.= " '".$row["usersystem_login"]."', ";
+  $sql.= " '".$row["usersystem_password"]."', ";
+  $sql.= " '".$row["usersystem_uid"]."', ";
+  $sql.= " '".$row["usersystem_gid"]."', ";
+  $sql.= " '".$row["usersystem_homedir"]."', ";
+  $sql.= " '".$row["usersystem_lastname"]."', ";
+  $sql.= " '".$row["usersystem_firstname"]."', ";
+  $sql.= " '".$row["usersystem_shell"]."' ";
   $sql.= " ); ";
   my_query($aliamin_db, $sql, $aliamin_link);
   $nb++;
 }
-echo "OK ($nb)\n";*/
-
+echo "OK ($nb)\n";
 
 
 
@@ -684,7 +719,7 @@ drop_table($aliamin_db,$aliamin_link,"Mail");
 drop_table($aliamin_db,$aliamin_link,"GlobalPref");
 drop_table($aliamin_db,$aliamin_link,"Ldap");
 drop_table($aliamin_db,$aliamin_link,"Network");
-drop_table($aliamin_db,$aliamin_link,"Parameters");
+//drop_table($aliamin_db,$aliamin_link,"Parameters");
 
 
 
@@ -801,6 +836,7 @@ function my_query ($db, $sql, $link) {
   //else
   die ("ERREUR
   * Erreur MySQL : ".mysql_error()."
+  * BD: $db
   * requete:
   * $sql
 ");

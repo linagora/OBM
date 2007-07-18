@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.1.0pre9";
+$obm_version = "2.1.0pre10";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -1095,7 +1095,7 @@ function of_date_get_full_hour($timestamp) {
 function of_date_in_letter($timestamp) {
   global $l_daysofweek, $l_monthsofyear;
 
-  $date = $l_daysofweek[date("N", $timestamp)%7]." ".
+  $date = $l_daysofweek[date("w", $timestamp)%7]." ".
           date("d", $timestamp)." ".
           $l_monthsofyear[date("n", $timestamp)-1];
 

@@ -1582,14 +1582,14 @@ function dis_calendar_event_consult($id) {
 //   - $alerts   : alerts array
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_event_consult($event_q, $exception_q, $entities) {
-  global $obm, $display, $ccalendar_weekstart, $ccalendar_resource, $l_items;
-  global $l_users, $l_resources, $l_title, $l_location, $l_priority, $l_private, $l_desc,$l_high;
-  global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week;
+  global $obm, $display, $cgp_show, $ccalendar_weekstart, $ccalendar_resource;
+  global $l_users, $l_resources, $l_title, $l_location, $l_priority,$l_private;
+  global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week,$l_desc,$l_high;
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_alerts, $l_alerts_time;
   global $l_change_state,$l_groups,$l_all_day,$l_every;
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend; 
   global $l_wait, $l_task, $l_exception, $l_yes, $l_no;
-  global $l_carac,$l_module_calendar;
+  global $l_carac,$l_module_calendar, $l_items;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
   $id = $event_q->f("calendarevent_id");
@@ -1624,19 +1624,21 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
       case 3 :
         $priority = $l_high;
         break;
-    }  
-    $tasks = $entities["task"];
-    if (is_array($tasks["entity"])) {
-      foreach ($tasks["entity"] as $u_id => $entity) {
-        $label = $entity["label"];
-        $state = $entity["state"];
-        $dis_task_list .= "$label<br />";
-      }
-      $dis_task_block = "
+    }
+    if ($cgp_show['module']['project']) {
+      $tasks = $entities["task"];
+      if (is_array($tasks["entity"])) {
+	foreach ($tasks["entity"] as $u_id => $entity) {
+	  $label = $entity["label"];
+	  $state = $entity["state"];
+	  $dis_task_list .= "$label<br />";
+	}
+	$dis_task_block = "
         <tr>
           <th>$l_task :</th>
           <td>$dis_task_list</td>
         </tr>";
+      }
     }
     $display["title"] = "<div class=\"title\">$l_module_calendar : $title</div>";
   } else {
@@ -1991,7 +1993,7 @@ function dis_calendar_quick_form($calendar) {
     <script type=\"text/javascript\">
       obm.calendarQuickForm = new Obm.CalendarQuickForm();
     </script>
-    ";
+";
 
   return $block;
 }
@@ -2008,7 +2010,7 @@ function dis_calendar_quick_form($calendar) {
 //   - $cats1        : Array : Calendar categories1
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $res, $groups,$tasks, $cats1, $alerts) {
-  global $obm, $path, $display, $ccalendar_alerts;
+  global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ico_project;
   global $ico_mini_cal, $ico_add,$ico_delete, $l_items;
   global $ccalendar_first_hour, $ccalendar_last_hour,$ico_project;
@@ -2020,7 +2022,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
   global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_task;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
-  global $l_resources,$l_format,$l_daysofweekshort,$l_task, $l_exception, $l_items;
+  global $l_resources,$l_format,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time;
 
   $time_unit = 60 / $_SESSION['set_cal_interval'];  
@@ -2336,8 +2338,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     <th>&nbsp;</th>    
     <td id=\"sel_resource_id\">$dis_sel_resource</td>";
   }
-  
-  $block_task = "
+
+  if ($cgp_show['module']['project']) {
+    $block_task = "
     <th>$l_task     
     <a href=\"\" onclick=\"url = get_selected_users_url();popup('$path/project/project_index.php?action=ext_get_task_id&amp;popup=1&amp;ext_widget=f_entity.task_new_id&amp;ext_widget_text=f_entity.task_new_name'+url,'Project'); return false;\">
     <img src=\"$ico_project\" alt=\"[Add]\" /></a>
@@ -2363,6 +2366,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
       <input type=\"hidden\" name=\"task_new_id\" value=\"$t_new_id\" />
       <input type=\"text\" size=\"32\" name=\"task_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>";
+  }
 
   if ($force == 1) {
     $dis_force = "<input type=\"checkbox\" id=\"cba_force\" value=\"1\" checked=\"checked\" name=\"cba_force\" />";

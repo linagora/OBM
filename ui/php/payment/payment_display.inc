@@ -131,7 +131,7 @@ function html_payment_search_form($params, $kinds, $accs) {
     </label><label><br />
     <input type=\"radio\" name=\"rd_inout\" value=\"-\" $mcheck />(-) $l_emitted &nbsp;
     </label>
-    ";
+";
 
   // Account select
   $sel_account = "
@@ -246,14 +246,16 @@ function html_payment_search_list($obm_q, $prefs, $params) {
   global $l_add, $l_close;
 
   $popup = $params["popup"];
-  $comment = urlencode($payment["comment"]);
-  $number = urlencode($payment["number"]);
-  $amount = urlencode($payment["amount"]);
-  $date_after = of_date_format($payment["date_after"]);
-  $date_before = of_date_format($payment["date_before"]);
-  $inout = $payment["inout"];
-  $kind = $payment["kind"];
-  $account = $payment["account"];
+  $comment = urlencode($params["comment"]);
+  $number = urlencode($params["number"]);
+  $amount = urlencode($params["amount"]);
+  $date_after = of_date_format($params["date_after"], true);
+  $date_before = of_date_format($params["date_before"], true);
+  $inout = $params["inout"];
+  $kind = $params["kind"];
+  $account = $params["account"];
+  $company = urlencode($params["company"]);
+
   if ($popup) {
     $ext_action = $params["ext_action"];
     $ext_url = $params["ext_url"];
@@ -266,6 +268,7 @@ function html_payment_search_list($obm_q, $prefs, $params) {
 		    "&amp;tf_comment=$comment".
 		    "&amp;tf_number=$number".
 		    "&amp;tf_amount=$amount".
+		    "&amp;company=$company".
 		    "&amp;tf_date_before=$date_before".
 		    "&amp;tf_date_after=$date_after".
 		    "&amp;sel_kind=$kind".

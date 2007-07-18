@@ -112,7 +112,7 @@ ALTER TABLE Incident CHANGE COLUMN incident_date incident_date timestamp(14);
 -- Add mail_quota_use, last login date
 ALTER TABLE UserObm ADD COLUMN userobm_mail_quota_use int(8) DEFAULT 0 AFTER userobm_mail_quota;
 ALTER TABLE UserObm ADD COLUMN userobm_mail_login_date timestamp(14) AFTER userobm_mail_quota_use;
-ALTER TABLE UserObm ADD COLUMN userobm_photo_id int(8) AFTER 	get_format_company_name;
+ALTER TABLE UserObm ADD COLUMN userobm_photo_id int(8) AFTER userobm_education;
 
 
 -------------------------------------------------------------------------------
@@ -275,11 +275,14 @@ CREATE TABLE OGroupEntity (
 -- Table structure for the table 'EntityRight'
 --
 ALTER TABLE EntityRight ADD COLUMN entityright_admin int(1) NOT NULL default 0 AFTER entityright_write;
+ALTER TABLE P_EntityRight ADD COLUMN entityright_admin int(1) NOT NULL default 0 AFTER entityright_write;
 
 --
 -- UPDATE EntityRight DATA
 --
-UPDATE EntityRight SET entityright_write = entityright_admin;
+UPDATE EntityRight SET entityright_admin = entityright_write;
+UPDATE P_EntityRight SET entityright_admin = entityright_write;
+
 --
 -- UPDATE TimeTask Structure
 --

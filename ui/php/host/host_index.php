@@ -290,7 +290,7 @@ function get_host_action() {
      'Right'    => $cright_write,
      'Condition'=> array ('detailconsult', 'showlist', 'update')
                                      	   );
-			   
+
 // Show List
   $actions["host"]["showlist"] = array (
      'Url'      => "$path/host/host_index.php?action=showlist&amp;host_id=".$obm_user["host_id"]."",

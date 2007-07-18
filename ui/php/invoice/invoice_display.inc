@@ -398,8 +398,8 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
     $param_status .= "&amp;sel_status=$status";
   }
   $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
-  $date_after = of_date_upd_format($invoice["date_after"]);
-  $date_before = of_date_upd_format($invoice["date_before"]);
+  $date_after = of_date_upd_format($invoice["date_after"], true);
+  $date_before = of_date_upd_format($invoice["date_before"], true);
   $inout = $invoice["inout"];
   $credit_memo = $invoice['credit_memo'];
   $company = urlencode($invoice["company"]);

@@ -199,7 +199,7 @@ function run_query_host_insert($host) {
     
   if ($retour && $user_id != 0) {
 
-  $multidomain = sql_multidomain('host');
+    $multidomain = sql_multidomain('host');
     // On recupere l'ID de l'hôte qu'on vient d'ajouter
     $query = "SELECT host_id
     FROM Host
@@ -226,6 +226,7 @@ function run_query_host_insert($host) {
       $obm_q->next_record();
       $host_id = $obm_q->f('host_id');
 
+      $multidomain = sql_multidomain('userobm');
       $query = "UPDATE UserObm 
       SET userobm_timeupdate='$now',
           userobm_userupdate='$obm[uid]',
@@ -339,6 +340,7 @@ function run_query_host_delete($p_id) {
     $obm_q->next_record();
     $host_id = $obm_q->f('host_id');
 
+    $multidomain = sql_multidomain('userobm');
     $query = "UPDATE UserObm
     SET userobm_timeupdate='$now',
         userobm_userupdate='$obm[uid]',
