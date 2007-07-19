@@ -113,7 +113,8 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
       count(*) as resultsCount
     FROM RGroup
     WHERE 
-      rgroup_name LIKE '$pattern%' 
+      rgroup_name LIKE '$pattern%'
+      AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = '$obm[uid]'))
       $multidomain
       $where_restriction
     ORDER BY rgroup_name ";
@@ -130,6 +131,7 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
     FROM RGroup
     WHERE 
       rgroup_name LIKE '$pattern%' 
+      AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = '$obm[uid]'))
       $multidomain
       $where_restriction
     ORDER BY rgroup_name";

@@ -299,18 +299,23 @@ class CAS_Auth extends Auth {
     $this->db = new $class;
 
     $this->db->query(sprintf("select userobm_id,
-        userobm_perms
+      userobm_perms,
+      userobm_domain_id
       from %s
       where userobm_login = '%s'",
 			     $this->database_table,
 			     addslashes($login)));
-    while ($this->db->next_record()) {
+    if ($this->db->next_record()) {
+      $domain_id = $this->db->f("userobm_domain_id");
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
+    } else {
+      header("location:".obmCAS::getServerBaseURL()."?error=1");
     }
 
     $obm["profile"] = $perm;
     $obm["login"] = $login;
+    $obm["domain_id"] = $domain_id;
 
     return $uid;
   }

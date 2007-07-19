@@ -1081,6 +1081,7 @@ function run_query_group_ext_search($group) {
     FROM UGroup
     WHERE 
       group_name LIKE '$pattern%' 
+      AND (group_privacy = 0 OR (group_privacy = 1 AND group_usercreate = '$obm[uid]'))
       $multidomain
       $where_restriction
     ORDER BY group_name  ";
@@ -1097,6 +1098,7 @@ function run_query_group_ext_search($group) {
     FROM UGroup
     WHERE 
       group_name LIKE '$pattern%' 
+      AND (group_privacy = 0 OR (group_privacy = 1 AND group_usercreate = '$obm[uid]'))
       $multidomain
       $where_restriction
     ORDER BY group_name

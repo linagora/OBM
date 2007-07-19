@@ -122,7 +122,9 @@ if (is_array($params["sel_group_id"])) {
 if ( ( (! is_array($cal_entity_id["user"]))
        || (count($cal_entity_id["user"]) == 0) )
      && ( (! is_array($cal_entity_id["resource"]))
-	  || (count($cal_entity_id["resource"]) == 0)) ) {
+	  || (count($cal_entity_id["resource"]) == 0))
+     && ( (! is_array($cal_entity_id["resource_group"]))
+	  || (count($cal_entity_id["resource_group"]) == 0)) ) {
   $cal_entity_id["user"] = array($obm["uid"]);
 }
 

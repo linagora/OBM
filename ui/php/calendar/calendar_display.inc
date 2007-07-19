@@ -6,7 +6,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display the navigation bar
 // Parameters:
@@ -936,7 +935,7 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
   global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
   global $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
   global $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
-  global $l_date, $l_resource, $l_event, $ico_search;
+  global $l_date, $l_resources, $l_items, $l_event, $ico_search;
   global $l_expand_all, $l_collapse_all;
 
   $sel_user = $calendar_entity["user"];
@@ -964,17 +963,24 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
   $iso_date = $calendar["date"];
   $category_filter = $calendar["category_filter"];
   $ts_date = strtotime($iso_date);
+
   $this_month = of_date_get_month($ts_date);
   $this_year = of_date_get_year($ts_date);
   $start_month = strtotime("$this_year-$this_month-01");
   $end_month = strtotime("+1 month", $start_month);
-  $start_time = $start_month;
 
-  $next_month = of_isodate_format(strtotime("+1 month",$ts_date));
-  $prev_month = of_isodate_format(strtotime("-1 month",$ts_date));
+  $start_week_day = get_calendar_date_day_of_week($ts_date, $ccalendar_weekstart);
+  $end_week_time = $start_week_day + ((6 * 24 + $ccalendar_last_hour) * 3600);
+  $start_week_time = strtotime("+$ccalendar_first_hour hours",$start_week_day);
+  
+  $start_week = calendar_localizeDate("week", $start_week_time);
+  $end_week = calendar_localizeDate("week", $end_week_time);
 
-  $list_title = calendar_localizeDate("month", $ts_date);
-  $occurrences = calendar_events_model($start_month, $end_month,$calendar_entity,$category_filter, true);
+  $next_week = of_isodate_format(strtotime("+1 week",$ts_date));
+  $prev_week = of_isodate_format(strtotime("-1 week",$ts_date));
+
+  $list_title = "$start_week - $end_week"; 
+  $occurrences = calendar_events_model($start_week_day,strtotime("+7 days",$start_week_day),$calendar_entity,$category_filter,true);
   $today_mark = false;
   $charset = mb_internal_encoding();
 
@@ -1033,18 +1039,12 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
 	  $description = $event->description;
 	  $properties = $event->properties;
           $item_list = "";
-          $dis_res = "";
-          $separator = "";
           if ($properties != "") {
             $item = "<?xml version='1.0' encoding='$charset'?>$properties";
             $xml = parse_item($item);
             if (is_object($xml)) {
               foreach($xml->resource as $key => $value) {
-                if (array_key_exists($value->res_id, $sel_res_id)) {
-                  $dis_res = "$separator$value->res_name";
-                  $separator = ", ";
-                }
-                $item_list .= "<b>$value->res_name:</b><br/>".nl2br($value->item)."$value->property_name:$value->property_value";
+                $item_list .= "<strong>$value->res_name:</strong><br/>".nl2br($value->item)."$value->property_name:$value->property_value<br/>";
               }
             }
           }
@@ -1053,15 +1053,28 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
         $br = "";
         $dis_user = "";
         $separator = "";
+        if(is_array($attendee["user"]))
         foreach($attendee["user"] as $at_id => $at_name) {
           if (array_key_exists($at_id, $sel_user_id)) {
             $dis_user .= "$separator$at_name";
             $separator = ", ";
-            // $dis_user .= "<div style=\"width: 11px; height: 11px; float: left;\" class=\"".$sel_user_id[$at_id]."\">&nbsp;</div>";
           }
-	        $dis_attendees .= "$br$at_name";
-	        $br = "<br />";
+	  $dis_attendees .= "$br$at_name";
+	  $br = "<br />";
         }
+        $dis_resources = "";
+        $dis_res = "";
+        $br = "";
+        if(is_array($attendee["resource"])) {
+          foreach($attendee["resource"] as $at_id => $at_name) {
+            if (array_key_exists($at_id, $sel_res_id)) {
+              $dis_res .= "$separator$at_name";
+              $separator = ", ";
+            }            
+            $dis_resources .= "$br$at_name";
+            $br = "<br />";
+          }
+        }        
         $date_begin = of_datetime_format($date);
         $date_end = of_datetime_format($date+$duration); 
         $j++;
@@ -1078,7 +1091,7 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
 				";
         $dis_events .= "<div id=\"evt-$date-$ev_id\" >
           <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_user $dis_res</span>
-          $hour_begin - <b>$title</b></a>
+          $hour_begin - <strong>$title</strong></a>
           <div id=\"eventDetail-$date-$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
             <table>
               <tr>
@@ -1103,7 +1116,10 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
                 <th>$l_attendees</th><td>$dis_attendees</td>
               </tr>
               <tr>
-                <th>$l_resource</th><td>$item_list</td>
+                <th>$l_resources</th><td>$dis_resources</td>
+              </tr>
+              <tr>
+                <th>$l_items</th><td>$item_list</td>
               </tr>
             </table>
             <a href=\"calendar_index.php?action=detailconsult&amp;calendar_id=$ev_id\"><img src=\"$ico_search\" title=\"[Info]\"/></a>
@@ -1119,9 +1135,9 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
 
   $block = "
   <h1>
-    <a href=\"calendar_index.php?action=view_list&amp;date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?action=view_list&amp;date=$prev_week\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
     $list_title
-    <a href=\"calendar_index.php?action=view_list&amp;date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?action=view_list&amp;date=$next_week\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
   </h1>
   <a href=\"#\" onclick=\"display_list_detail('show'); return false;\">$l_expand_all</a> - 
   <a href=\"#\" onclick=\"display_list_detail('hide'); return false;\">$l_collapse_all</a>
@@ -1188,7 +1204,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
           $item_list .= "
-            <b>$value->res_name: </b><br/>
+            <strong>$value->res_name: </strong><br/>
             ".nl2br($value->item)."<br/>";
         }
       }
@@ -3033,6 +3049,8 @@ function dis_calendar_free_interval($calendar, $entity_store) {
   $param_duration = $calendar["meeting_duration"];
 
   $nb_group = count($cal_entity_id["resource_group"]);
+  $nb_user = count($cal_entity_id["user"]);
+  $nb_resource = count($cal_entity_id["resource"]);
   $week_num = get_calendar_week_num($ts_date); 
   $next_week = of_isodate_format(strtotime("+1 week", $ts_date));
   $prev_week = of_isodate_format(strtotime("-1 week", $ts_date));
@@ -3079,9 +3097,13 @@ function dis_calendar_free_interval($calendar, $entity_store) {
 	$end_date = urlencode(of_isodate_format($end_time,"",1));
         $goto = "calendar_index.php?action=new&amp;tf_date_begin=$begin_date&amp;tf_date_end=$end_date";
 
-
-        $have_event = $of->periodHaveOccurrences($current_time,$time_unit_sec, array("user" => array(), "resource" => array()));
-        $will_have_event = $of->periodHaveOccurrences($current_time,$duration, array("user" => array(), "resource" => array()));
+        if($nb_resource > 0 || $nb_user > 0) {
+          $have_event = $of->periodHaveOccurrences($current_time,$time_unit_sec, array("user" => array(), "resource" => array()));
+          $will_have_event = $of->periodHaveOccurrences($current_time,$duration, array("user" => array(), "resource" => array()));
+        } else {
+          $have_event = false;
+          $will_have_event = false;
+        }
         // Gestion des groupes de ressources
         if($have_resource_grp && !$have_event ) {
           $possible_ressources = array();
