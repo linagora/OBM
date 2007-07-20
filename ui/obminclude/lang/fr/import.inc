@@ -64,5 +64,15 @@ $l_similar_contact = "Contact similaire";
 $l_company_defaultname = "Société sans Nom";
 $l_contact_defaultname = "Contact sans Nom";
 
+$l_same_company = "L'outils d'import estime que cette société et la société importée sont identiques";
+
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";
+
+$l_auto_resolv = "Résolution automatique des conflits des sociétés.";
+$l_always_ask = "Toujours demander quoi faire en cas de conflits.";
+$l_always_do_nothing = "Ne jamais rien faire si la société est considérée comme identique.";
+$l_always_update_same = "Toujours mettre à jour si la société est considérée comme identique.";
+$l_always_update_similar = "Toujours mettre à jour si une seule société  est considérée comme identique ou semblant correspondre.";
+$l_always_insert = "Toujours créer une nouvelle société s'il n'y a pas de société strictement identique.";
+

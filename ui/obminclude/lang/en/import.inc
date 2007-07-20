@@ -64,5 +64,14 @@ $l_similar_contact = "Similar contact";
 $l_company_defaultname = "Company with no Name";
 $l_contact_defaultname = "Contact with no Lastname";
 
+$l_same_company = "The imported company seems to be exactly the same as these one";
+
+$l_auto_resolv = "Automatic company conflict management.";
+$l_always_ask = "Always ask.";
+$l_always_do_nothing = "Do nothing if a company is identical.";
+$l_always_update_same = "Always updae if the company is identical.";
+$l_always_update_similar = "Alway update if the company is identical or there is only one company which seems similar.";
+$l_always_insert = "Always create a company if there is no company strictly identical.";
+
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";

@@ -498,9 +498,10 @@ function html_import_file_import($import_q, $import) {
   $conflict_action = $import["conflict_action"];
   $company_id = $import["company_id"];
   $contact_id = $import["contact_id"];
-
+  $auto_conflict = $import["auto_conflict"];
   if ($run_mode == "test") {
     $title = "$l_test_file : $file_name";
+    $countries = get_import_country_hash();
   } else {
     $title = "$l_import_file : $file_name";
     // Get the country hash : countries["name"] = $id
@@ -643,10 +644,11 @@ function html_import_file_import($import_q, $import) {
 	$log["res"] = $l_company_defaultname;
       }
 
-      $comps = get_import_similar_company($fields, $map);
-      
-      // Same company exists : we use it ======================================
-      if (is_array($comps["same"])) {
+      $comps = get_import_similar_company($fields, $map,$countries);
+
+      // If auto conflict management is enabled
+      // If same company do not update it
+      if ($auto_conflict == 1 && is_array($comps["same"])) {
 	$company_id = $comps["same"][0]["comp_id"];
 	$log["res"] = $l_used_company;
 
@@ -689,9 +691,141 @@ function html_import_file_import($import_q, $import) {
 	} else {
 	// Row has no contact
 	}
+        
+      // If same company update it
+      } elseif (($auto_conflict == 2 || $auto_conflict == 3) && is_array($comps["same"])) {
+	$company_id = $comps["same"][0]["comp_id"];
+	$log["res"] = $l_used_company;
+	run_query_import_company_update($import_q, $fields, $map["default"], $countries, $userdata, $company_id);
+	$nb_comp_upd++;
 
+	// test for contact
+	if ( (import_row_has_contact($fields)) &&
+	     ( ($fields["con_ln"] != "") || ($map["default"]["con_ln"] != ""))) {
+	
+	  // Test if similar contact exist ------------------------------------
+	  $conts = get_import_similar_contact($fields, $company_id);
+	  if (is_array($conts)) {
+	    $log["display"] = true;
+	    $log["res"] = $l_similar_contact;
+	    // Automatic mode
+	    if ($run_mode == "auto") {
+	      // XXXX action auto
+	      
+	      // Test mode (no database updates) Should never happens here
+	    } else if ($run_mode == "test") {
+	      // Normal mode (Interactive)
+	    } else {
+	      $stop = true;
+	      $conflict_block = display_import_conflict_block($import, $log, $log_head, $fields, $comps, $conts);
+	      $display["msg"] .= display_warn_msg($l_conflict_detected);
+	    }
+	  } else {
+	    // Test mode (no database updates) Do nothing : only log
+	    if ($run_mode == "test") {
+
+	      // Auto or Normal mode (Interactive)
+	    } else {
+	      // No similar contacts exists -----------------------------------
+	      if ($fields["con_ln"] == "") {
+		$log["res"] .= $l_contact_defaultname;
+	      }
+	      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions, $userdata);
+	      $nb_con_ins++;
+	    }
+          }
+	} else {
+	// Row has no contact
+	}   
+      // If same company update it
+      } elseif ($auto_conflict == 3 && is_array($comps["similar"]) && count($comps["similar"]) == 1) {
+	$company_id = $comps["similar"][0]["comp_id"];
+	$log["res"] = $l_used_company;
+	run_query_import_company_update($import_q, $fields, $map["default"], $countries, $userdata, $company_id);
+	$nb_comp_upd++;
+
+	// test for contact
+	if ( (import_row_has_contact($fields)) &&
+	     ( ($fields["con_ln"] != "") || ($map["default"]["con_ln"] != ""))) {
+	
+	  // Test if similar contact exist ------------------------------------
+	  $conts = get_import_similar_contact($fields, $company_id);
+	  if (is_array($conts)) {
+	    $log["display"] = true;
+	    $log["res"] = $l_similar_contact;
+	    // Automatic mode
+	    if ($run_mode == "auto") {
+	      // XXXX action auto
+	      
+	      // Test mode (no database updates) Should never happens here
+	    } else if ($run_mode == "test") {
+	      // Normal mode (Interactive)
+	    } else {
+	      $stop = true;
+	      $conflict_block = display_import_conflict_block($import, $log, $log_head, $fields, $comps, $conts);
+	      $display["msg"] .= display_warn_msg($l_conflict_detected);
+	    }
+	  } else {
+	    // Test mode (no database updates) Do nothing : only log
+	    if ($run_mode == "test") {
+
+	      // Auto or Normal mode (Interactive)
+	    } else {
+	      // No similar contacts exists -----------------------------------
+	      if ($fields["con_ln"] == "") {
+		$log["res"] .= $l_contact_defaultname;
+	      }
+	      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions, $userdata);
+	      $nb_con_ins++;
+	    }
+          }
+	} else {
+	// Row has no contact
+	}   
+      } elseif ($auto_conflict == 4 && !is_array($comps["same"])) {
+        $company_id = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $userdata);
+        $nb_comp_ins++;        
+
+	// test for contact
+	if ( (import_row_has_contact($fields)) &&
+	     ( ($fields["con_ln"] != "") || ($map["default"]["con_ln"] != ""))) {
+	
+	  // Test if similar contact exist ------------------------------------
+	  $conts = get_import_similar_contact($fields, $company_id);
+	  if (is_array($conts)) {
+	    $log["display"] = true;
+	    $log["res"] = $l_similar_contact;
+	    // Automatic mode
+	    if ($run_mode == "auto") {
+	      // XXXX action auto
+	      
+	      // Test mode (no database updates) Should never happens here
+	    } else if ($run_mode == "test") {
+	      // Normal mode (Interactive)
+	    } else {
+	      $stop = true;
+	      $conflict_block = display_import_conflict_block($import, $log, $log_head, $fields, $comps, $conts);
+	      $display["msg"] .= display_warn_msg($l_conflict_detected);
+	    }
+	  } else {
+	    // Test mode (no database updates) Do nothing : only log
+	    if ($run_mode == "test") {
+
+	      // Auto or Normal mode (Interactive)
+	    } else {
+	      // No similar contacts exists -----------------------------------
+	      if ($fields["con_ln"] == "") {
+		$log["res"] .= $l_contact_defaultname;
+	      }
+	      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions, $userdata);
+	      $nb_con_ins++;
+	    }
+          }
+	} else {
+	// Row has no contact
+	}   
       // Similar company exists : conflict ====================================
-      }	else if (is_array($comps["similar"])) {
+      }	else if (is_array($comps["similar"]) || is_array($comps["same"])) {
 	$nb_line_conf++;
 	$log["display"] = true;
 	$log["res"] .= $l_similar_company;
@@ -803,9 +937,13 @@ function html_import_file_import($import_q, $import) {
 function display_import_conflict_block($import, $log, &$log_head, $fields, $comps, $cons="") {
   global $path, $l_validate;
   global $l_conflict, $l_comp_nothing, $l_comp_insert, $l_comp_update;
-  global $l_con_nothing, $l_con_insert, $l_con_update;
+  global $l_con_nothing, $l_con_insert, $l_con_update,$l_same_company;
+  global $l_auto_resolv, $l_always_ask, $l_always_do_nothing;
+  global $l_always_update_same, $l_always_update_similar, $l_always_insert;
 
   $id = $import["import_id"];
+  if(isset($import["auto_conflict"])) $auto_conflict = $import["auto_conflict"];
+  else $auto_conflict = 0;
   $file = $import["file"];
   $file_name = $import["file_name"];
   $file_saved = $import["file_saved"];
@@ -816,7 +954,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
   }
 
   $num_line = $log["num_line"];
-
+  
   $name = $fields["comp_name"];
   $info = $fields["comp_zip"] . " " . $fields["comp_town"] . " " . $fields["comp_cdx"];
   $con = $fields["con_ln"] . " " . $fields["con_fn"];
@@ -829,9 +967,26 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
       <td class=\"detailForm\">$con</td>
       <td class=\"detailForm\">$con_info</td>
       <td class=\"detailForm\">$res";
+  $checked = false;
+  if (is_array($comps["same"])) {
+    while ( list($num, $comp) = each($comps["same"]) ) {
+      $rd_check = ($checked) ? "" : "checked";
+      $checked = true;
+      $comp_id = $comp["comp_id"];
+      $url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id");
+      $line_log .= "<br />
+        <input title=\"$l_same_company\" type=\"radio\" name=\"company_id\" value=\"$comp_id\" $rd_check />
+        <a title=\"$l_same_company\" target=\"New\" href=\"$url\"><em>".$comp["comp_name"] . "</em></a> - " . $comp["comp_zip"];
+    }
+    $lab_nothing = $l_comp_nothing;
+    $lab_insert = $l_comp_insert;
+    $lab_update = $l_comp_update;
+    $act_nothing = "company_nothing";
+    $act_insert = "company_insert";
+    $act_update = "company_update";
 
+  }
   if (is_array($comps["similar"])) {
-    $checked = false;
     while ( list($num, $comp) = each($comps["similar"]) ) {
       $rd_check = ($checked) ? "" : "checked";
       $checked = true;
@@ -873,11 +1028,24 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
   }
 
   $url = url_prepare("import_index.php");
-
+  ${"auto_check_$auto_conflict"} = "checked=\"checked\"";
   $block = "
     <form method=\"post\" name=\"f_file\" action=\"$url\">
-
-    <div class=\"detailHead\">$l_conflict</div>
+    <fieldset class=\"detail extra\">
+    <legend>$l_auto_resolv</legend>
+    <input $auto_check_0 type=\"radio\" name=\"rd_auto_conflict\" id=\"auto_conflict_0\" value=\"0\" />
+    <label for=\"auto_conflict_0\">$l_always_ask</label><br />
+    <input $auto_check_1 type=\"radio\" name=\"rd_auto_conflict\" id=\"auto_conflict_1\" value=\"1\" />
+    <label for=\"auto_conflict_1\">$l_always_do_nothing</label><br />
+    <input $auto_check_2 type=\"radio\" name=\"rd_auto_conflict\" id=\"auto_conflict_2\" value=\"2\" />
+    <label for=\"auto_conflict_2\">$l_always_update_same</label><br />
+    <input $auto_check_3 type=\"radio\" name=\"rd_auto_conflict\" id=\"auto_conflict_3\" value=\"3\" />
+    <label for=\"auto_conflict_3\">$l_always_update_similar</label><br />
+    <input $auto_check_4 type=\"radio\" name=\"rd_auto_conflict\" id=\"auto_conflict_4\" value=\"4\" />
+    <label for=\"auto_conflict_4\">$l_always_insert</label>
+    </fieldset>
+    <fieldset class=\"detail extra\">
+    <legend>$l_conflict </legend>
     <table class=\"detail\">
     <tr>
       $log_head
@@ -888,9 +1056,12 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
     <table class=\"detail\">
     <tr>    
       <td class=\"detailLabel\">
-        <input type=\"radio\" name=\"rd_conflict_action\" value=\"$act_nothing\" checked />$lab_nothing
-        <input type=\"radio\" name=\"rd_conflict_action\" value=\"$act_insert\">$lab_insert</input>
-        <input type=\"radio\" name=\"rd_conflict_action\" value=\"$act_update\" />$lab_update
+      <input type=\"radio\" name=\"rd_conflict_action\" id=\"$act_nothing\" value=\"$act_nothing\" checked />
+      <label accesskey=\"K\" for=\"$act_nothing\">$lab_nothing</label>
+      <input type=\"radio\" name=\"rd_conflict_action\" id=\"$act_insert\" value=\"$act_insert\" />
+      <label accesskey=\"I\" for=\"$act_insert\">$lab_insert</label>
+      <input type=\"radio\" name=\"rd_conflict_action\" id=\"$act_update\" value=\"$act_update\" />
+      <label accesskey=\"U\" for=\"$act_update\">$lab_update</label>
       </td>
     </tr>
     <tr colspan=\"3\">
@@ -905,6 +1076,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
         <input type=\"submit\" name=\"submit\" value=\"$l_validate\" />
       </td> 
     </table>
+    </fieldset>
     </form>";
 
   return $block;

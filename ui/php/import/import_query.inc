@@ -530,8 +530,8 @@ function import_row_has_contact($fields) {
 //   - $fields : company Id not to return
 //   - $map    : import mapping fields (to get default entries)
 ///////////////////////////////////////////////////////////////////////////////
-function get_import_similar_company($fields, $map) {
-  global $cdg_sql;
+function get_import_similar_company($fields, $map, &$countries) {
+  global $cdg_sql, $cgp_import_precision,$field_size;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -542,16 +542,33 @@ function get_import_similar_company($fields, $map) {
   if ($name == "") {
     $name = $map["default"]["comp_name"];
   }
+//FIXME Virer ça.
+//  $zip = addslashes($fields["comp_zip"]);
+//  $town = addslashes($fields["comp_town"]);
+
+  if (isset($countries[$fields["comp_ctry"]])) {
+    $ctry = $countries[$fields["comp_ctry"]];
+  } else {
+    $ctry = substr(trim($fields["comp_ctry"]), 0, $field_size["comp_ctry"]);
+  }
+  if ($ctry == "") {
+    $ctry = "0";
+  }
+  $cgp_import_precision = 3;
+  $short_name = substr($name, 0, $cgp_import_precision);
   $name = addslashes($name);
   $zip = addslashes($fields["comp_zip"]);
   $town = addslashes($fields["comp_town"]);
-  $short_name = substr($name, 0, 10);
-
+  if( $ctry == "") {
+    $zip_query = "OR (company_zipcode $like '$zip' OR company_town $like '$town')";
+  }
   $query = "SELECT distinct company_id, company_name, company_zipcode 
-    FROM Company
+    FROM Company 
     WHERE (company_name $like '$short_name%' OR company_aka $like '%$name%')
-      AND (company_zipcode $like '$zip' OR company_town $like '$town')
+      AND (company_country_iso3166 $like '$ctry' $zip_query)
       $multidomain";
+//FIXME Virer ça.
+//      AND (company_zipcode $like '$zip' OR company_town $like '$town')$multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_import_similar_company()");
   $obm_q->query($query);
@@ -576,10 +593,9 @@ function get_import_similar_company($fields, $map) {
   }
 
   // If there is a same company, we delete the similar ones (no use, cause pb)
-  if (count($comps["same"]) > 0) {
+/*  if (count($comps["same"]) > 0) {
     unset($comps["similar"]);
-  }
-
+}*/
   return $comps;
 }
 

@@ -664,13 +664,28 @@ function html_group_form($action, $group_q, $group, $field='') {
     <script type=\"text/javascript\">
       function privacyShowHide(input) {
         if($(input).getValue()) {
-          $('emailGroup').addClass('H');
-          $('sambaGroup').addClass('H');
-          $('mailingGroup').addClass('H');
+          if($('emailGroup')) {
+            $('emailGroup').addClass('H');
+            input.form.tf_email.value = ''
+          }
+          if($('sambaGroup')) {
+            $('sambaGroup').addClass('H');
+            input.form.cb_samba.checked = false;
+          }
+          if($('mailingGroup')) {
+            $('mailingGroup').addClass('H');
+            input.form.cb_mailing.checked = false;
+          }
         } else {
-          $('emailGroup').removeClass('H')
-          $('sambaGroup').removeClass('H');
-          $('mailingGroup').removeClass('H');
+          if($('emailGroup')) {
+            $('emailGroup').removeClass('H')
+          }
+          if($('sambaGroup')) {
+            $('sambaGroup').removeClass('H');
+          }
+          if($('mailingGroup')) {
+            $('mailingGroup').removeClass('H');
+          }
         }
       }
     </script>
@@ -692,7 +707,7 @@ function html_group_form($action, $group_q, $group, $field='') {
   $dis_mailing = "
   <tr id=\"mailingGroup\" class=\"$mail_class\">
     <th>$l_mailing</th>
-    <td><input name=\"cba_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
+    <td><input name=\"cb_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
   </tr>";
 
 
