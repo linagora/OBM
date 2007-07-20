@@ -302,5 +302,10 @@ ALTER TABLE ProjectUser ALTER COLUMN projectuser_missingtime TYPE float;
 --
 -- UPDATE CalendarCategory Structure
 --
-
 ALTER TABLE CalendarCategory1 ADD COLUMN calendarcategory1_color char(6);
+
+
+--
+-- UPDATE Deal Structure
+--
+ALTER TABLE Deal ADD COLUMN deal_margin decimal(12,2);

@@ -299,6 +299,11 @@ UPDATE UserObmPref SET userobmpref_value = 'd/m/y' WHERE userobmpref_value = 'dm
 --
 -- UPDATE CalendarCategory Structure
 --
-
 ALTER TABLE CalendarCategory1 ADD COLUMN calendarcategory1_color char(6) AFTER calendarcategory1_label;
+
+
+--
+-- UPDATE Deal Structure
+--
+ALTER TABLE Deal ADD COLUMN deal_margin decimal(12,2) AFTER deal_amount;
 

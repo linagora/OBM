@@ -14,6 +14,7 @@ $l_kind = "Kind";
 $l_marketing_manager = "Marketing manager";
 $l_technical_manager = "Technical manager";
 $l_amount = "Amount";
+$l_margin = "Margin";
 $l_hitrate = "Hit Rate";
 $l_commission = "Commission";
 $l_commission_p = "% Commission";

@@ -28,6 +28,7 @@ $fieldnames["deal_source"] = $l_source;
 $fieldnames["deal_marketingmanager"] = $l_marketing_manager;
 $fieldnames["deal_commission"] = $l_commission_p;
 $fieldnames["deal_amount"] = $l_amount;
+$fieldnames["deal_margin"] = $l_margin;
 $fieldnames["deal_hitrate"] = $l_hitrate;
 $fieldnames["deal_relation"] = $l_relation;
 $fieldnames["parentdeal_label"] = $l_label;
@@ -109,7 +110,8 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if ($fieldname == "deal_amount") {
+  else if (($fieldname == "deal_amount")
+	   || ($fieldname == "deal_margin")) {
     $res["align"] = "center";
   }
 
@@ -787,8 +789,8 @@ function html_deal_consult($deal_q, $dc="") {
   global $ico_company, $ico_contact, $display;
   global $l_dates, $l_company, $l_contact, $l_other_relation, $l_relation;
   global $l_label, $l_kind,$l_region,$l_marketing_manager,$l_technical_manager;
-  global $l_number, $l_amount,$l_hitrate, $l_commission_p, $l_sale_delay;
-  global $l_tt, $l_status,$l_archive,$l_comment;
+  global $l_amount, $l_margin, $l_hitrate, $l_commission_p, $l_sale_delay;
+  global $l_number, $l_tt, $l_status,$l_archive,$l_comment;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_quarter;
   global $l_parentdeal,$l_todo, $l_deal, $l_source;
   global $display, $path, $c_yes, $c_no;
@@ -826,6 +828,7 @@ function html_deal_consult($deal_q, $dc="") {
   $commission = $deal_q->f("deal_commission");
   $datepro = of_date_format($deal_q->f("dateproposal"), 1);
   $amount = $deal_q->f("deal_amount");
+  $margin = $deal_q->f("deal_margin");
   $hitrate = $deal_q->f("deal_hitrate");
   $datealarm = of_date_format($deal_q->f("datealarm"), 1);
   $status = $deal_q->f("dealstatus_label");
@@ -983,6 +986,9 @@ function html_deal_consult($deal_q, $dc="") {
       <th>$l_amount</th>
       <td>$amount</td>
     </tr><tr>
+      <th>$l_margin</th>
+      <td>$margin</td>
+    </tr><tr>
       <th>$l_todo</th>
       <td>$todo</td>
     </tr>
@@ -1085,9 +1091,9 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   global $ico_company,$ico_contact,$ico_add;
   global $c_php_isodate_format,$l_deal,$l_update,$l_insert, $l_private;
   global $l_dates, $l_company, $l_other_relation, $l_relation, $l_label;
-  global $l_number, $l_kind, $l_region;
+  global $l_number, $l_kind, $l_region, $l_todo;
   global $l_tt, $l_marketing_manager, $l_technical_manager, $l_commission_p;
-  global $l_amount,$l_hitrate, $l_contact,$l_status, $l_archive, $l_todo;
+  global $l_amount, $l_margin, $l_hitrate, $l_contact,$l_status, $l_archive;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_source;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
@@ -1120,6 +1126,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
     $source = $deal_q->f("deal_source");
     $commission = $deal_q->f("deal_commission");
     $amount = $deal_q->f("deal_amount");
+    $margin = $deal_q->f("deal_margin");
     $hitrate = $deal_q->f("deal_hitrate");
     $con1 = $deal_q->f("deal_contact1_id");
     $con2 = $deal_q->f("deal_contact2_id");
@@ -1167,6 +1174,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   if (isset($deal["source"])) { $source = $deal["source"]; }
   if (isset($deal["commission"])) { $commission = $deal["commission"]; }
   if (isset($deal["amount"])) { $amount = stripslashes($deal["amount"]); }
+  if (isset($deal["margin"])) { $margin = stripslashes($deal["margin"]); }
   if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
   if (isset($deal["contact1"])) { $con1 = $deal["contact1"]; }
   if (isset($deal["contact2"])) { $con2 = $deal["contact2"]; }
@@ -1538,6 +1546,9 @@ $js_status_loop
     </tr><tr>
       <th>$l_amount</th>
       <td><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
+    </tr><tr>
+      <th>$l_margin</th>
+      <td><input name=\"tf_margin\" type=\"text\" size=\"10\" value=\"$margin\" /></td>
     </tr><tr>
       <th>$l_hitrate</th>
       <td><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" />%</td>
@@ -1914,7 +1925,7 @@ function dis_deal_dashboard_view($deal) {
 //   - $deal[] : hash values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_dashboard_potential($deal) {
-  global $display, $l_deal, $l_module_deal, $l_total, $l_deal_total;
+  global $display, $l_deal, $l_module_deal, $l_total, $l_deal_total, $l_margin;
   global $l_forecast, $l_deal_balanced, $l_commission, $l_commission_balanced;
   global $l_marketing_manager, $l_technical_manager, $l_help_deal_forecast;
 
@@ -1940,6 +1951,7 @@ function dis_deal_dashboard_potential($deal) {
           $class = "";
         }        
 	$amount = number_format($pu["amount"]);
+	$margin = number_format($pu["margin"]);
 	$balanced = number_format($pu["amount_balanced"]);
 	$commission = number_format($pu["commission"]);
 	$commission_balanced = number_format($pu["commission_balanced"]);
@@ -1950,6 +1962,7 @@ function dis_deal_dashboard_potential($deal) {
         <td>$user</td>
         <td>$nb_potential&nbsp;</td>
         <td>$amount&nbsp;</td>
+        <td>$margin&nbsp;</td>
         <td>$balanced&nbsp;</td>
         <td>$commission&nbsp;</td>
         <td>$commission_balanced&nbsp;</td>
@@ -1958,6 +1971,7 @@ function dis_deal_dashboard_potential($deal) {
     }
 
     $m_amount = number_format($potentials["market"]["0"]["amount"]);
+    $m_margin = number_format($potentials["market"]["0"]["margin"]);
     $m_balanced = number_format($potentials["market"]["0"]["amount_balanced"]);
     $m_commission = number_format($potentials["market"]["0"]["commission"]);
     $m_commission_balanced = number_format($potentials["market"]["0"]["commission_balanced"]);
@@ -1975,6 +1989,7 @@ function dis_deal_dashboard_potential($deal) {
         }
 
 	$amount = number_format($pu["amount"]);
+	$margin = number_format($pu["margin"]);
 	$balanced = number_format($pu["amount_balanced"]);
 	$commission = number_format($pu["commission"]);
 	$commission_balanced = number_format($pu["commission_balanced"]);
@@ -1985,6 +2000,7 @@ function dis_deal_dashboard_potential($deal) {
         <td>$user</td>
         <td>$nb_potential&nbsp;</td>
         <td>$amount&nbsp;</td>
+        <td>$margin&nbsp;</td>
         <td>$balanced&nbsp;</td>
         <td>$commission&nbsp;</td>
         <td>$commission_balanced&nbsp;</td>
@@ -1993,6 +2009,7 @@ function dis_deal_dashboard_potential($deal) {
     }
 
     $t_amount = number_format($potentials["tech"]["0"]["amount"]);
+    $t_margin = number_format($potentials["tech"]["0"]["margin"]);
     $t_balanced = number_format($potentials["tech"]["0"]["amount_balanced"]);
     $t_commission = number_format($potentials["tech"]["0"]["commission"]);
     $t_commission_balanced = number_format($potentials["tech"]["0"]["commission_balanced"]);
@@ -2006,6 +2023,7 @@ function dis_deal_dashboard_potential($deal) {
       <th>$l_marketing_manager</th>
       <th># $l_module_deal</th>
       <th>$l_deal_total</th>
+      <th>$l_margin</th>
       <th>$l_deal_balanced</th>
       <th>$l_commission</th>
       <th>$l_commission_balanced</th>
@@ -2017,6 +2035,7 @@ function dis_deal_dashboard_potential($deal) {
       <td>$l_total</td>
       <td>$m_nb_potential&nbsp;</td>
       <td>$m_amount&nbsp;</td>
+      <td>$m_margin&nbsp;</td>
       <td>$m_balanced&nbsp;</td>
       <td>$m_commission&nbsp;</td>
       <td>$m_commission_balanced&nbsp;</td>
@@ -2030,6 +2049,7 @@ function dis_deal_dashboard_potential($deal) {
       <th>$l_technical_manager</th>
       <th># $l_module_deal</th>
       <th>$l_deal_total</th>
+      <th>$l_margin</th>
       <th>$l_deal_balanced</th>
       <th>$l_commission</th>
       <th>$l_commission_balanced</th>
@@ -2041,6 +2061,7 @@ function dis_deal_dashboard_potential($deal) {
       <td>$l_total</td>
       <td>$t_nb_potential&nbsp;</td>
       <td>$t_amount&nbsp;</td>
+      <td>$t_margin&nbsp;</td>
       <td>$t_balanced&nbsp;</td>
       <td>$t_commission&nbsp;</td>
       <td>$t_commission_balanced&nbsp;</td>
@@ -2065,7 +2086,7 @@ function dis_deal_dashboard_potential($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_dashboard_year_detail($deal) {
   global $display, $path, $ctt_sales;
-  global $l_total, $l_date, $l_amount_ht, $l_amount_ttc;
+  global $l_total, $l_date, $l_amount_ht, $l_amount_ttc, $l_margin;
   global $l_potential, $l_expected, $l_monthsofyearshort;
   global $l_amount, $l_deal_balanced, $l_commission, $l_commission_balanced;
   global $l_execute,$ico_previous,$ico_next;
@@ -2137,6 +2158,7 @@ function dis_deal_dashboard_year_detail($deal) {
   foreach ($users as $u_id) {
     $u_name = $d["name"][$u_id];
     $tam = 0;
+    $tma = 0;
     $tab = 0;
     $tca = 0;
     $tcb = 0;
@@ -2146,31 +2168,36 @@ function dis_deal_dashboard_year_detail($deal) {
     </tr>";
     $dis_amount_row = "<tr class=\"pair\">
       <td>$l_amount</td>";
-    $dis_balanced_row = "<tr>
+    $dis_margin_row = "<tr>
+      <td>$l_margin</td>";
+    $dis_balanced_row = "<tr class=\"pair\">
       <td>$l_deal_balanced</td>";
-    $dis_commission_row = "<tr class=\"pair\">
+    $dis_commission_row = "<tr>
       <td>$l_commission</td>";
-    $dis_commission_balanced_row = "<tr>
+    $dis_commission_balanced_row = "<tr class=\"pair\">
       <td>$l_commission_balanced</td>";
 
     // Loop through each cols
     foreach ($cols as $month => $col) {
 
       if (is_array($d["$col"][$u_id])) {
-	$am = $d["$col"][$u_id]["amount"];
-	$ab = $d["$col"][$u_id]["amount_balanced"];
-	$ca = $d["$col"][$u_id]["commission"];
-	$cb = $d["$col"][$u_id]["commission_balanced"];
+	$am = $d["$col"][$u_id]['amount'];
+	$ma = $d["$col"][$u_id]['margin'];
+	$ab = $d["$col"][$u_id]['amount_balanced'];
+	$ca = $d["$col"][$u_id]['commission'];
+	$cb = $d["$col"][$u_id]['commission_balanced'];
 
 	// "past", "future" and "no date" not in Total
 	if (is_numeric($month)) {
 	  $tam += $am;
+	  $tma += $ma;
 	  $tab += $ab;
 	  $tca += $ca;
 	  $tcb += $cb;
 	}
 
-	$dis_am = number_format($am, 2, ",", " ");
+	$dis_am = number_format($am, 2, ',', ' ');
+	$dis_ma = number_format($ma, 2, ',', ' ');
 	$dis_ab = number_format($ab, 2, ",", " ");
 	$dis_ca = number_format($ca, 2, ",", " ");
 	$dis_cb = number_format($cb, 2, ",", " ");
@@ -2194,6 +2221,8 @@ function dis_deal_dashboard_year_detail($deal) {
 
 	$dis_amount_row .= "
           <td>$dis_am</td>";
+	$dis_margin_row .= "
+          <td>$dis_ma</td>";
 	$dis_balanced_row .= "
           <td>$dis_ab</td>";
 	$dis_commission_row .= "
@@ -2202,29 +2231,34 @@ function dis_deal_dashboard_year_detail($deal) {
           <td>$dis_cb</td>";
       } else {
 	$dis_amount_row .= "<td $class_am> </td>";
+	$dis_margin_row .= "<td $class_ma> </td>";
 	$dis_balanced_row .= "<td $class_ab> </td>";
 	$dis_commission_row .= "<td $class_ca> </td>";
 	$dis_commission_balanced_row .= "<td $class_cb> </td>";
       }
     }
 
-    $dis_tam = number_format($tam, 2, ",", " ");
+    $dis_tam = number_format($tam, 2, ',', ' ');
+    $dis_tma = number_format($tma, 2, ',', ' ');
     $dis_tab = number_format($tab, 2, ",", " ");
     $dis_tca = number_format($tca, 2, ",", " ");
     $dis_tcb = number_format($tcb, 2, ",", " ");
 
-    $dis_amount_row .= "<td >$dis_tam</td>
+    $dis_amount_row .= "<td>$dis_tam</td>
       </tr>";
-    $dis_balanced_row .= "<td >$dis_tab</td>
+    $dis_margin_row .= "<td>$dis_tma</td>
       </tr>";
-    $dis_commission_row .= "<td >$dis_tca</td>
+    $dis_balanced_row .= "<td>$dis_tab</td>
       </tr>";
-    $dis_commission_balanced_row .= "<td >$dis_tcb</td>
+    $dis_commission_row .= "<td>$dis_tca</td>
+      </tr>";
+    $dis_commission_balanced_row .= "<td>$dis_tcb</td>
       </tr>";
 
     $dis_year_detail .= "
       $dis_user_row
       $dis_amount_row
+      $dis_margin_row
       $dis_balanced_row
       $dis_commission_row
       $dis_commission_balanced_row";
@@ -2232,20 +2266,23 @@ function dis_deal_dashboard_year_detail($deal) {
 
   // Total row
   $tam = 0;
+  $tma = 0;
   $tab = 0;
   $tca = 0;
   $tcb = 0;
   // Loop through each cols
   foreach ($cols as $month => $col) {
 
-    $am = $d[$col][0]["amount"];
-    $ab = $d[$col][0]["amount_balanced"];
-    $ca = $d[$col][0]["commission"];
-    $cb = $d[$col][0]["commission_balanced"];
+    $am = $d[$col][0]['amount'];
+    $ma = $d[$col][0]['margin'];
+    $ab = $d[$col][0]['amount_balanced'];
+    $ca = $d[$col][0]['commission'];
+    $cb = $d[$col][0]['commission_balanced'];
 
     // "past", "future" and "no date" not in Total
     if (is_numeric($month)) {
       $tam += $am;
+      $tma += $ma;
       $tab += $ab;
       $tca += $ca;
       $tcb += $cb;
@@ -2253,8 +2290,9 @@ function dis_deal_dashboard_year_detail($deal) {
 
     if ($am > 0) {
 
-      $dis_am = number_format($am, 2, ",", " ");
-      $dis_ab = number_format($ab, 2, ",", " ");
+      $dis_am = number_format($am, 2, ',', ' ');
+      $dis_ma = number_format($ma, 2, ',', ' ');
+      $dis_ab = number_format($ab, 2, ',', ' ');
       $dis_ca = number_format($ca, 2, ",", " ");
       $dis_cb = number_format($cb, 2, ",", " ");
     
@@ -2273,7 +2311,8 @@ function dis_deal_dashboard_year_detail($deal) {
       }
       $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list$url_sel_manager&amp;cba_archive=1$url_date$url_sel_tt\">$dis_am</a>";
     } else {
-      $dis_am = "";
+      $dis_am = '';
+      $dis_ma = '';
       $dis_ab = "";
       $dis_ca = "";
       $dis_cb = "";
@@ -2281,6 +2320,8 @@ function dis_deal_dashboard_year_detail($deal) {
 
     $dis_total_row .= "
       <td>$dis_am</td>";
+    $dis_total_margin_row .= "
+      <td>$dis_ma</td>";
     $dis_total_balanced_row .= "
       <td>$dis_ab</td>";
     $dis_total_commission_row .= "
@@ -2288,12 +2329,15 @@ function dis_deal_dashboard_year_detail($deal) {
     $dis_total_commission_balanced_row .= "
       <td>$dis_cb</td>";
   }
-  $dis_tam = number_format($tam, 2, ",", " ");
+  $dis_tam = number_format($tam, 2, ',', ' ');
+  $dis_tma = number_format($tma, 2, ',', ' ');
   $dis_tab = number_format($tab, 2, ",", " ");
   $dis_tca = number_format($tca, 2, ",", " ");
   $dis_tcb = number_format($tcb, 2, ",", " ");
   $dis_total_row .= "
       <td>&nbsp;$dis_tam</td>";
+  $dis_total_margin_row .= "
+      <td>&nbsp;$dis_tma</td>";
   $dis_total_balanced_row .= "
       <td>&nbsp;$dis_tab</td>";
   $dis_total_commission_row .= "
@@ -2381,6 +2425,10 @@ function dis_deal_dashboard_year_detail($deal) {
     <tr class=\"highlight\">
       <td>$l_total</td>
       $dis_total_row
+    </tr>
+    <tr class=\"highlight\">
+      <td>$l_margin</td>
+      $dis_total_margin_row
     </tr>
     <tr class=\"highlight\">
       <td>$l_deal_balanced</td>

@@ -16,6 +16,7 @@ $l_kind = "Tipo";
 $l_marketing_manager = "Gerente de Mercadeo";
 $l_technical_manager = "Gerente Técnico";
 $l_amount = "Cantidad";
+$l_margin = "Margin";
 $l_hitrate = "Rata de Exito";
 $l_expected = "Esperada";
 $l_quarter = "Q";

@@ -15,6 +15,7 @@ $l_contacts = "Contatti";
 $l_marketing_manager = "Resp. Marketing";
 $l_technical_manager = "Resp. Tecnico ";
 $l_amount = "Totale";
+$l_margin = "Margin";
 $l_hitrate = "Hit Rate";
 $l_expected = "Objetivo";
 $l_quarter = "Q";

@@ -16,6 +16,7 @@ $l_kind = "Type";
 $l_marketing_manager = "Commercial";
 $l_technical_manager = "Technique";
 $l_amount = "Montant";
+$l_margin = "Marge";
 $l_hitrate = "% Réussite";
 $l_commission = "Commission";
 $l_commission_p = "% Commission";

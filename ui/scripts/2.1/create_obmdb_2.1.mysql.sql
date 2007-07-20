@@ -521,6 +521,7 @@ CREATE TABLE Deal (
   deal_datealarm            date,
   deal_dateend              date,
   deal_amount               decimal(12,2),
+  deal_margin               decimal(12,2),
   deal_commission           decimal(5,2) DEFAULT 0,
   deal_hitrate              int(3) DEFAULT 0,
   deal_status_id            int(2),

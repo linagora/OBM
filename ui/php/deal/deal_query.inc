@@ -143,6 +143,7 @@ function run_query_deal_search($deal, $all="") {
       deal_source,
       deal_commission,
       deal_amount,
+      deal_margin,
       deal_hitrate,
       deal_status_id,
       $datebegin,
@@ -282,7 +283,8 @@ function run_query_deal_insert($deal) {
   $tech = ($deal["tech"] ? "'".$deal["tech"]."'" : "null");
   $source_id = ($deal["source_id"] ? "'".$deal["source_id"]."'" : "0");
   $source = $deal["source"];
-  $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
+  $amount = ($deal['amount'] ? "'".$deal['amount']."'" : 'null');
+  $margin = ($deal['margin'] ? "'".$deal['margin']."'" : 'null');
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
   if (($deal["hitrate"] != "")
       && ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) {
@@ -331,6 +333,7 @@ function run_query_deal_insert($deal) {
     deal_dateexpected,
     deal_dateend,
     deal_amount,
+    deal_margin,
     deal_commission,
     deal_hitrate,
     deal_status_id,
@@ -362,6 +365,7 @@ function run_query_deal_insert($deal) {
     $dateexp,
     $dateend,
     $amount,
+    $margin,
     $commission,
     $hitrate,
     '$status',
@@ -443,7 +447,8 @@ function run_query_deal_update($deal) {
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
   $source_id = ($deal["source_id"] ? $deal["source_id"] : "0");
   $source = $deal["source"];
-  $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
+  $amount = ($deal['amount'] ? "'".$deal['amount']."'" : 'null');
+  $margin = ($deal['margin'] ? "'".$deal['margin']."'" : 'null');
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
   if (($deal["hitrate"] != "")
       && ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) {
@@ -490,6 +495,7 @@ function run_query_deal_update($deal) {
     deal_dateexpected=$dateexp,
     deal_dateend=$dateend,
     deal_amount=$amount,
+    deal_margin=$margin,
     deal_commission=$commission,
     deal_hitrate=$hitrate,
     deal_status_id='$status',
@@ -583,7 +589,7 @@ function run_query_deal_dealcompany_update($deal_id, $dc) {
 function deal_send_mail($deal) {
   global $cdg_sql, $cg_com;
   global $l_no, $l_members, $l_group, $l_obm_title, $l_deal, $l_company;
-  global $l_amount, $l_hitrate, $l_todo, $l_status, $l_alarm, $l_expected, $l_end;
+  global $l_amount, $l_margin, $l_hitrate, $l_todo, $l_status, $l_alarm, $l_expected, $l_end;
 
   $id = $deal["deal_id"];
   $d = get_deal_info($id);
@@ -593,7 +599,8 @@ function deal_send_mail($deal) {
   $company = $d["company"];
   $label = $d["label"];
   $status = $d["status"];
-  $amount = $deal["amount"];
+  $amount = $deal['amount'];
+  $margin = $deal['margin'];
   $hitrate = $deal["hitrate"];
   $dateexp = $deal["dateexpected"];
   $dateend = $deal["dateend"];
@@ -607,6 +614,7 @@ function deal_send_mail($deal) {
   $message = "$l_company: $company
 $l_deal: $label
 $l_amount: $amount
+$l_margin: $margin
 $l_hitrate: $hitrate
 $l_status: $status
 $l_expected: $dateexp
@@ -699,7 +707,8 @@ function run_query_deal_id($deal) {
   $market = ($deal["market"] ? "='".$deal["market"]."'" : "is null");
   $tech = ($deal["tech"] ? "='".$deal["tech"]."'" : "is null");
   $dateprop = ($deal["dateproposal"] ? "='".of_isodate_convert($deal["dateproposal"])."'" : "is null");
-  $amount = ($deal["amount"] ? "='".$deal["amount"]."'" : "is null");
+  $amount = ($deal['amount'] ? "='".$deal['amount']."'" : 'is null');
+  $margin = ($deal['margin'] ? "='".$deal['margin']."'" : 'is null');
   $hitrate = ($deal["hitrate"] ? "='".$deal["hitrate"]."'" : "is null");
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
@@ -726,6 +735,7 @@ function run_query_deal_id($deal) {
     AND deal_technicalmanager_id $tech
     AND deal_dateproposal $dateprop
     AND deal_amount $amount
+    AND deal_margin $margin
     AND deal_status_id='$status'
     AND deal_datealarm $datealarm
     AND deal_archive='$archive'
@@ -832,6 +842,7 @@ function run_query_deal_potential($users_id="") {
       deal_marketingmanager_id AS uid,
       count(*) as nb,
       sum(deal_amount) as amount,
+      sum(deal_margin) as margin,
       sum(deal_amount * deal_hitrate / 100) as amount_balanced,
       sum(deal_amount * deal_commission / 100) as commission,
       sum(deal_amount * deal_commission * deal_hitrate / 10000) as commission_balanced,
@@ -845,7 +856,7 @@ function run_query_deal_potential($users_id="") {
       AND deal_hitrate < 100
       AND deal_archive = '0'
       $where_market_uid
-			$multidomain
+      $multidomain
     GROUP BY deal_marketingmanager_id,
       userobm_lastname,
       userobm_firstname
@@ -856,6 +867,7 @@ function run_query_deal_potential($users_id="") {
   $obm_q->query($query);
 
   $am = 0;
+  $ma = 0;
   $ab = 0;
   $cm = 0;
   $cb = 0;
@@ -863,30 +875,34 @@ function run_query_deal_potential($users_id="") {
 
   while ($obm_q->next_record()) {
     $u_id = $obm_q->f("uid");
-    $res["market"]["$u_id"]["amount"] = $obm_q->f("amount");
+    $res['market']["$u_id"]['amount'] = $obm_q->f('amount');
+    $res['market']["$u_id"]['margin'] = $obm_q->f('margin');
     $res["market"]["$u_id"]["amount_balanced"] = $obm_q->f("amount_balanced");
     $res["market"]["$u_id"]["commission"] = $obm_q->f("commission");
     $res["market"]["$u_id"]["commission_balanced"] = $obm_q->f("commission_balanced");
     $res["market"]["$u_id"]["number"] = $obm_q->f("nb");
     $res["market"]["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
-    $am += $res["market"]["$u_id"]["amount"];
+    $am += $res['market']["$u_id"]['amount'];
+    $ma += $res['market']["$u_id"]['margin'];
     $ab += $res["market"]["$u_id"]["amount_balanced"];
     $cm += $res["market"]["$u_id"]["commission"];
     $cb += $res["market"]["$u_id"]["commission_balanced"];
     $nb += $res["market"]["$u_id"]["number"];
   }
 
-  $res["market"]["0"]["amount"] = $am;
-  $res["market"]["0"]["amount_balanced"] = $ab;
-  $res["market"]["0"]["commission"] = $cm;
-  $res["market"]["0"]["commission_balanced"] = $cb;
-  $res["market"]["0"]["number"] = $nb;
+  $res['market']['0']['amount'] = $am;
+  $res['market']['0']['margin'] = $ma;
+  $res['market']['0']['amount_balanced'] = $ab;
+  $res['market']['0']['commission'] = $cm;
+  $res['market']['0']['commission_balanced'] = $cb;
+  $res['market']['0']['number'] = $nb;
 
   // Tech manager board
   $query = "SELECT
       deal_technicalmanager_id AS uid,
       count(*) as nb,
       sum(deal_amount) as amount,
+      sum(deal_margin) as margin,
       sum(deal_amount * deal_hitrate / 100) as amount_balanced,
       sum(deal_amount * deal_commission / 100) as commission,
       sum(deal_amount * deal_commission * deal_hitrate / 10000) as commission_balanced,
@@ -900,7 +916,7 @@ function run_query_deal_potential($users_id="") {
       AND deal_hitrate < 100
       AND deal_archive = '0'
       $where_tech_uid
-			$multidomain
+      $multidomain
     GROUP BY deal_technicalmanager_id,
       userobm_lastname,
       userobm_firstname
@@ -911,6 +927,7 @@ function run_query_deal_potential($users_id="") {
   $obm_q->query($query);
 
   $am = 0;
+  $ma = 0;
   $ab = 0;
   $cm = 0;
   $cb = 0;
@@ -918,24 +935,27 @@ function run_query_deal_potential($users_id="") {
 
   while ($obm_q->next_record()) {
     $u_id = $obm_q->f("uid");
-    $res["tech"]["$u_id"]["amount"] = $obm_q->f("amount");
+    $res['tech']["$u_id"]['amount'] = $obm_q->f('amount');
+    $res['tech']["$u_id"]['margin'] = $obm_q->f('margin');
     $res["tech"]["$u_id"]["amount_balanced"] = $obm_q->f("amount_balanced");
     $res["tech"]["$u_id"]["commission"] = $obm_q->f("commission");
     $res["tech"]["$u_id"]["commission_balanced"] = $obm_q->f("commission_balanced");
     $res["tech"]["$u_id"]["number"] = $obm_q->f("nb");
     $res["tech"]["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
-    $am += $res["tech"]["$u_id"]["amount"];
+    $am += $res['tech']["$u_id"]['amount'];
+    $ma += $res['tech']["$u_id"]['margin'];
     $ab += $res["tech"]["$u_id"]["amount_balanced"];
     $cm += $res["tech"]["$u_id"]["commission"];
     $cb += $res["tech"]["$u_id"]["commission_balanced"];
     $nb += $res["tech"]["$u_id"]["number"];
   }
 
-  $res["tech"]["0"]["amount"] = $am;
-  $res["tech"]["0"]["amount_balanced"] = $ab;
-  $res["tech"]["0"]["commission"] = $cm;
-  $res["tech"]["0"]["commission_balanced"] = $cb;
-  $res["tech"]["0"]["number"] = $nb;
+  $res['tech']['0']['amount'] = $am;
+  $res['tech']['0']['margin'] = $ma;
+  $res['tech']['0']['amount_balanced'] = $ab;
+  $res['tech']['0']['commission'] = $cm;
+  $res['tech']['0']['commission_balanced'] = $cb;
+  $res['tech']['0']['number'] = $nb;
 
   return $res;
 }
@@ -953,14 +973,14 @@ function run_query_deal_potential($users_id="") {
 //            total in u_id=0
 //                 [users_id] = array(u_id)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpected", $users_id="", $tts="") {
+function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpected', $users_id='', $tts='') {
   global $cdg_sql, $cdg_param;
   global $l_total;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $dexp = sql_date_format($db_type, "deal_dateexpected", "dateexpected");
-  $dend = sql_date_format($db_type, "deal_dateend", "dateend");
+  $dexp = sql_date_format($db_type, 'deal_dateexpected', 'dateexpected');
+  $dend = sql_date_format($db_type, 'deal_dateend', 'dateend');
 
   if (is_array($date_range)) {
     $past = $date_range[0];
@@ -969,8 +989,8 @@ function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpe
 
   // Tasktype filter
   if (is_array($tts)) {
-    $where_tt .= " AND (";
-    $or = "";
+    $where_tt .= ' AND (';
+    $or = '';
     foreach ($tts as $tt_id) {
       $where_tt .= "$or deal_tasktype_id='$tt_id'";
       $or = " OR";
@@ -987,12 +1007,13 @@ function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpe
     }
     $where_market_uid .= ")";
   }
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
   $query = "SELECT
       $dexp,
       $dend,
       deal_marketingmanager_id AS uid,
       deal_amount,
+      deal_margin,
       (deal_amount * deal_hitrate / 100) as amount_balanced,
       (deal_amount * deal_commission / 100) as commission,
       (deal_amount * deal_commission * deal_hitrate / 10000) as commission_balanced,
@@ -1007,7 +1028,7 @@ function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpe
       AND deal_archive = '0'
       $where_market_uid
       $where_tt
-			$multidomain
+      $multidomain
     ORDER BY
       $target_date
 ";
@@ -1017,6 +1038,7 @@ function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpe
 
   $res_users = array();
   $am = 0;
+  $ma = 0;
   $ab = 0;
   $cm = 0;
   $cb = 0;
@@ -1027,42 +1049,45 @@ function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpe
     if (! in_array($u_id, $res_users)) {
       $res_users[] = $u_id;
     }
-    $am = $obm_q->f("deal_amount");
-    $ab = $obm_q->f("amount_balanced");
-    $ca = $obm_q->f("commission");
-    $cb = $obm_q->f("commission_balanced");
-    $end_date = of_isodate_format($obm_q->f("dateend"), 1);
-    $exp_date = of_isodate_format($obm_q->f("dateexpected"), 1);
-    if ($target_date == "deal_dateexpected") {
+    $am = $obm_q->f('deal_amount');
+    $ma = $obm_q->f('deal_margin');
+    $ab = $obm_q->f('amount_balanced');
+    $ca = $obm_q->f('commission');
+    $cb = $obm_q->f('commission_balanced');
+    $end_date = of_isodate_format($obm_q->f('dateend'), 1);
+    $exp_date = of_isodate_format($obm_q->f('dateexpected'), 1);
+    if ($target_date == 'deal_dateexpected') {
       $date_used = $exp_date;
     } else {
       $date_used = $end_date;
     }
-    if ($date_used == "") {
-      $month = "no_date";
+    if ($date_used == '') {
+      $month = 'no_date';
     } else if ($date_used < $past) {
-      $month = "past";
+      $month = 'past';
     } else if ($date_used > $future) {
-      $month = "future";
+      $month = 'future';
     } else {
       $month = substr($date_used, 0, 7);
     }
 
-    $res[$month]["$u_id"]["amount"] += $am;
+    $res[$month]["$u_id"]['amount'] += $am;
+    $res[$month]["$u_id"]['margin'] += $ma;
     $res[$month]["$u_id"]["amount_balanced"] += $ab;
     $res[$month]["$u_id"]["commission"] += $ca;
     $res[$month]["$u_id"]["commission_balanced"] += $cb;
     $res[$month]["$u_id"]["number"] ++;
     $res["name"]["$u_id"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
 
-    $res[$month][0]["amount"] += $am;
-    $res[$month][0]["amount_balanced"] += $ab;
-    $res[$month][0]["commission"] += $ca;
-    $res[$month][0]["commission_balanced"] += $cb;
-    $res[$month][0]["number"] ++;
+    $res[$month][0]['amount'] += $am;
+    $res[$month][0]['margin'] += $ma;
+    $res[$month][0]['amount_balanced'] += $ab;
+    $res[$month][0]['commission'] += $ca;
+    $res[$month][0]['commission_balanced'] += $cb;
+    $res[$month][0]['number'] ++;
   }
 
-  $res["users_id"] = $res_users;
+  $res['users_id'] = $res_users;
 
   return $res;
 }
@@ -1138,6 +1163,7 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
       deal_source,
       deal_commission,
       deal_amount,
+      deal_margin,
       deal_hitrate,
       $datebegin,
       $datealarm,
@@ -1817,8 +1843,8 @@ function check_deal_form($did, $deal) {
   }
 
   // If the amount is filled, Check if the hitrate is between 0 and 100
-  if ( ( ($deal["amount"]) && !($deal["amount"] == 0) )
-       || (trim($deal["hitrate"]) != "") ) {
+  if ( ( ($deal['amount']) && !($deal['amount'] == 0) )
+       || (trim($deal['hitrate']) != '') ) {
     if ( ($deal["hitrate"] == "") || (! is_numeric($deal["hitrate"]))
 	 || !( ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) ) {
       $err["msg"] = $l_err_hitrate;
@@ -2480,10 +2506,10 @@ function get_deal_parent_expense($p_id)  {
       AND deal_hitrate = '100'
       AND deal_type_id=dealtype_id
       AND dealtype_inout='-'
-			$multidomain
+      $multidomain
     GROUP BY deal_parentdeal_id"; 
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, 'get_deal_parent_expense()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -2509,15 +2535,15 @@ function get_deal_parent_income($p_id)  {
       AND deal_hitrate = '100'
       AND deal_type_id=dealtype_id
       AND dealtype_inout='+'
-			$multidomain
+      $multidomain
     GROUP BY deal_parentdeal_id"; 
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, 'get_deal_parent_income()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q->f("res");
+  return $obm_q->f('res');
 }
 
 
@@ -2542,7 +2568,7 @@ function get_deal_parent_potential($p_id)  {
 			$multidomain
     GROUP BY deal_parentdeal_id"; 
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, 'get_deal_parent_potential()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
