@@ -334,6 +334,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
 
   $dis_group->data_set = $obm_q;
   $dis_group->data_url = $url;
+  $dis_group->data_header = "both";
 
   // --- HTML Template --------------------------------------------------------
   $block .= $dis_group->display('dis_data_group');
