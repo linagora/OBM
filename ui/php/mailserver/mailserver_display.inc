@@ -53,7 +53,7 @@ function dis_mailserver_list($ms_q) {
 //   - $mailserver[] : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
-  global $display, $cgp_hide, $l_mailserver;
+  global $display, $cgp_hide, $l_mailserver, $l_header_new;
   global $l_networks, $l_host, $l_ip,$l_none,$l_update,$l_insert;
   global $ico_add, $ico_delete,$l_relayhost,$php_regexp_network,$php_regexp_ip;
 
@@ -82,7 +82,12 @@ function dis_mailserver_form($action, $mailserver, $ms_q=null, $net_q=null) {
 
       }
     }
+  } else if ($action == 'new') {
+    $dis_title = $l_header_new;
   }
+
+  $display["title"] = "<h1 class=\"title\">$l_mailserver : $dis_title</h1>";
+
   if (isset($mailserver["id"])) $id = $mailserver["id"] ;
   if (isset($mailserver["host_id"])) $host_id = $mailserver["host_id"] ;
   if (isset($mailserver["relayhost_id"])) $relayhost_id = $mailserver["relayhost_id"];

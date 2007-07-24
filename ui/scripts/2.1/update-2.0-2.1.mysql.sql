@@ -109,10 +109,17 @@ ALTER TABLE Incident CHANGE COLUMN incident_date incident_date timestamp(14);
 -------------------------------------------------------------------------------
 -- Update UserObm table
 -------------------------------------------------------------------------------
+-- Add hidden field
+ALTER TABLE UserObm ADD COLUMN userobm_hidden int(1) DEFAULT 0 AFTER userobm_datebegin;
+-- Add kind field
+ALTER TABLE UserObm ADD COLUMN userobm_kind varchar(12) AFTER userobm_hidden;
 -- Add mail_quota_use, last login date
 ALTER TABLE UserObm ADD COLUMN userobm_mail_quota_use int(8) DEFAULT 0 AFTER userobm_mail_quota;
 ALTER TABLE UserObm ADD COLUMN userobm_mail_login_date timestamp(14) AFTER userobm_mail_quota_use;
 ALTER TABLE UserObm ADD COLUMN userobm_photo_id int(8) AFTER userobm_education;
+-- Add company, direction field
+ALTER TABLE UserObm ADD COLUMN userobm_company varchar(64) AFTER userobm_sound;
+ALTER TABLE UserObm ADD COLUMN userobm_direction varchar(64) AFTER userobm_company;
 
 
 -------------------------------------------------------------------------------
@@ -319,9 +326,9 @@ INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentk
 --
 UPDATE Invoice set invoice_status_id = 0 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='To create');
 UPDATE Invoice set invoice_status_id = 1 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Sent');
-UPDATE Invoice set invoice_status_id = 2 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Partially paid');
-UPDATE Invoice set invoice_status_id = 3 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Paid');
-UPDATE Invoice set invoice_status_id = 4 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Conflict');
-UPDATE Invoice set invoice_status_id = 5 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Cancelled');
-UPDATE Invoice set invoice_status_id = 6 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Loss');
+UPDATE Invoice set invoice_status_id = 3 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Partially paid');
+UPDATE Invoice set invoice_status_id = 4 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Paid');
+UPDATE Invoice set invoice_status_id = 5 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Conflict');
+UPDATE Invoice set invoice_status_id = 6 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Cancelled');
+UPDATE Invoice set invoice_status_id = 7 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Loss');
 UPDATE Invoice set invoice_status_id = 1 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Received');

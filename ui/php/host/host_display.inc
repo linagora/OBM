@@ -425,11 +425,11 @@ function html_host_consult_web($host_q) {
 //   - $field    : field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_host_form($action, $host_q, $host, $field='') {
-  global $cgp_use, $display, $l_insert, $l_update, $l_back,$l_web_list;
+  global $cgp_use, $l_domain, $l_insert, $l_update, $l_back,$l_web_list;
   global $l_module_host, $l_name, $l_desc, $l_ip, $l_smb,$l_web_mode;
-  global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_access;
+  global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_access, $l_header_new;
   global $l_host_select_user, $l_user, $l_clear,$l_web_all, $l_web_list_only;
-  global $ico_user,$l_domain,$obm;
+  global $ico_user, $display, $obm;
   
   // if update mode and first time, values are taken from db
   if ($action == 'detailupdate') {
@@ -446,6 +446,9 @@ function html_host_form($action, $host_q, $host, $field='') {
     $firewall_perms = $host_q->f('host_firewall_perms');
     $u_login = $host_q->f('userobm_login');
     $u_id = $host_q->f('userobm_id');
+    $dis_title = $name;
+  } else if ($action == 'new') {
+    $dis_title = $l_header_new;
   }
 
   // If parameters have been given, they supercede the default action value
@@ -490,7 +493,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
   $display['detailInfo'] = display_record_info($host_q);
-  $display['title'] = "<h1 class=\"title\">$l_module_host : $name</h1>";
+  $display['title'] = "<h1 class=\"title\">$l_module_host : $dis_title</h1>";
 
   // Section Web, seulement si squid en local pour les machines car 
   // acces geres dans les ACL donc dans squid.conf

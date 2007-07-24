@@ -8,9 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_lastname = "Lastname";
-$l_firstname = "Firstname";
-$l_kind = "Kind";
 $l_market = "Person in charge";
 $l_function = "Function";
 $l_title = "Job Title";

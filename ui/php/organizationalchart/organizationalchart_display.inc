@@ -205,8 +205,8 @@ function dis_organizationalchart_form($action, $organizationalchart) {
 function html_organizationalchart_form($action, $oc_q, $organizationalchart, $root_node) {
   global $obm, $display;
   global $ico_add, $ico_delete, $ico_group, $ico_user;
-  global $l_organizationalchart, $l_name, $l_desc, $l_archive, $l_update, $l_insert;
-  global $l_detail;
+  global $l_organizationalchart, $l_desc, $l_archive, $l_update, $l_insert;
+  global $l_name, $l_detail, $l_header_new;
 
   if ($action == "detailupdate" || $action == "update") {
     $id = $oc_q->f("organizationalchart_id");
@@ -214,10 +214,12 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     $desc = $oc_q->f("organizationalchart_description");
     $archive = $oc_q->f("organizationalchart_archive") == "1" ? "checked" : "";
     $nb_child = ($oc_q->f("node") + 1);
+    $dis_title = $name;
     $block_detail = draw_form($root_node);
     $block_detail .= "<input type=\"hidden\" id=\"nb_child\" name=\"nb_child\" value=\"$nb_child\" />
       <input type=\"hidden\" id=\"organizationalchart_id\" name=\"organizationalchart_id\" value=\"$id\" /";
   } else {
+    $dis_title = $l_header_new;
     $block_detail = "
       <div id=\"1\" class=\"organizational_chart_node\">
         <div class=\"organizational_chart_wrap\">
@@ -261,7 +263,7 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_organizationalchart : $oc_name</h1>";
+  $display["title"] = "<h1 class=\"title\">$l_organizationalchart : $dis_title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 

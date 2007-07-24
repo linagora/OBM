@@ -19,8 +19,6 @@ $l_contact_display = "Opzioni visualizzazione dell'elenco contatti";
 $l_list_set = "Imposta Lista";
 
 // Contact
-$l_lastname = "Cognome";
-$l_firstname = "Nome";
 $l_function = "Funzione";
 $l_hphone = "Tel. casa";
 

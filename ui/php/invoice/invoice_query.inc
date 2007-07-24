@@ -447,7 +447,7 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
     $query .= " AND paymentinvoice_amount <> 0.0 ";
   }
   
-  display_debug_msg($query, $cdg_sql, 'get_invoice_payment');
+  display_debug_msg($query, $cdg_sql, 'get_invoice_payment()');
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
@@ -703,7 +703,7 @@ function check_invoice_data_form($id, $invoice) {
   global $l_fill_label, $l_fill_company, $l_fill_number, $l_error_number_exist;
   global $l_fill_inout, $l_fill_amount, $l_fill_date, $l_date, $l_invalid_date;
   global $l_expiration_date, $l_payment_date;
-  global $cinv_status_tocreate;
+  global $cinv_status;
   global $err, $l_exist_error;
 
   $label = $invoice['label'];
@@ -717,7 +717,7 @@ function check_invoice_data_form($id, $invoice) {
   $c_id = $invoice['company_id'];
   $c_new_id = $invoice['company_new_id'];
   $status = $invoice['status'];
-  if ($status == $cinv_status_tocreate) {
+  if ($status == $cinv_status['tocreate']) {
     $status_created = false;
   } else {
     $status_created = true;
@@ -790,6 +790,8 @@ function check_invoice_data_form($id, $invoice) {
       }
     }
   }
+
+  // Status if invoice has payment
 
   return true;
 }

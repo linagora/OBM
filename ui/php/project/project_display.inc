@@ -1062,10 +1062,11 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
-  global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive,$l_project_date,$l_project_duration,$l_project_tech,$l_project_desc;
+  global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive;
+  global $l_project_date,$l_project_duration,$l_project_tech,$l_project_desc;
   global $l_datebegin, $l_dateend, $c_undef, $l_undef,$l_tasks;
   global $l_comment, $l_add_comment, $l_upd_comment,$ico_project;
-  global $obm, $cg_prod, $c_php_isodate_format,$l_shortname;
+  global $display, $obm, $cg_prod, $c_php_isodate_format,$l_shortname, $l_header_new;
   global $ctt_sales, $ctt_research, $ctt_others,$l_other;
   global $l_tt_sales, $l_tt_research, $l_tt_others,$path;
 
@@ -1092,8 +1093,10 @@ function html_project_form($action, $project_q, $project) {
     $shortname = $project_q->f("project_shortname");
     $usercomment = $obm["uid"];
     $datecomment = of_date_upd_format();
+    $dis_title = $name;
   } else {
     if ($action == "new") {
+      $dis_title = $l_header_new;
       $name = $project["deal_label"];
       // We pre-fill datebegin and dateend with current date
       $datebegin = of_date_upd_format(); 
@@ -1244,12 +1247,9 @@ function html_project_form($action, $project_q, $project) {
 
   // target action
   if (($action == "detailupdate") || ($action == "update")) {
-    $display["title"] = "<h1 class=\"title\">$l_project : $name</h1>";
-
     $dis_comment = "
         $l_upd_comment
-        <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>
-    ";
+        <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>";
 
     $dis_action = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />";
@@ -1265,6 +1265,8 @@ function html_project_form($action, $project_q, $project) {
       <input type=\"hidden\" name=\"company_id\" value=\"$company\" />
       <input type=\"hidden\" name=\"deal_id\" value=\"$deal\" />
       <input type=\"submit\" value=\"$text_button\" />";
+  
+  $display["title"] = "<h1 class=\"title\">$l_project : $dis_title</h1>";
   
   // --- HTML Template --------------------------------------------------------
   

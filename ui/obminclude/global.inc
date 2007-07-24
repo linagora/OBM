@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.1.0pre10";
+$obm_version = "2.1.0pre11";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -552,11 +552,12 @@ $cdoc_kind_link = 2;
 // Invoice status
 $cinv_status['tocreate'] = 0;
 $cinv_status['sent'] = 1;
-$cinv_status['ppaid'] = 2;
-$cinv_status['paid'] = 3;
-$cinv_status['conflict'] = 4;
-$cinv_status['cancelled'] = 5;
-$cinv_status['loss'] = 6;
+$cinv_status['dailly'] = 2;
+$cinv_status['ppaid'] = 3;
+$cinv_status['paid'] = 4;
+$cinv_status['conflict'] = 5;
+$cinv_status['cancelled'] = 6;
+$cinv_status['loss'] = 7;
 
 // Perms XXXXX Deprecated : to be removed
 $perms_user = 'user';

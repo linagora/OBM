@@ -1250,7 +1250,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact) {
-  global $ico_company, $l_company, $ico_add, $ico_crow;
+  global $ico_company, $l_company, $ico_add, $ico_crow, $l_header_new;
   global $cgp_mailing_default, $ccontact_private_default, $cright_write_admin;
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
@@ -1318,9 +1318,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $c_cdx = $co_q->f("company_expresspostal");
     $c_ctry = $co_q->f("company_country_iso3166");
     $c_ctry_name = $co_q->f("company_country_name");
+    $dis_title = "$lname $fname";
 
   // New form and first time
   } elseif ($action == "new") {
+    $dis_title = $l_header_new;
     $dsrc = $_SESSION['set_dsrc'];
     $mark = $obm["uid"];
     $date = of_date_upd_format();
@@ -1687,7 +1689,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_contact : $lname $fname</h1>";
+  $display["title"] = "<h1 class=\"title\">$l_contact : $dis_title</h1>";
 
   // --- HTML Template --------------------------------------------------------
   $block = "$script";

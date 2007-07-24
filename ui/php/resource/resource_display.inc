@@ -257,9 +257,9 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
 function html_resource_form($usr_q, $resource) {
-  global $l_name, $l_desc, $l_qty;
+  global $l_name, $l_desc, $l_qty, $l_rtype, $l_header_new_f;
   global $l_resource, $l_insert, $l_update;
-  global $action, $l_rtype,$obm;
+  global $action, $display, $obm;
   global $l_undef, $c_undef,$l_admin_permission;
 
   // if update mode and first time value are taken from database
@@ -269,6 +269,9 @@ function html_resource_form($usr_q, $resource) {
     $desc = $usr_q->f("resource_description");
     $rtype = $usr_q->f("resource_rtype_id");
     $qty = $usr_q->f("resource_qty");
+    $dis_title = $name;
+  } else if ($action == 'new') {
+    $dis_title = $l_header_new_f;
   }
 
   // If parameters have been given, they supercede the default action value
@@ -305,21 +308,21 @@ function html_resource_form($usr_q, $resource) {
       <input type=\"hidden\" name=\"sel_read_public\" value=\"1\" />
       <div id=\"sel_accept_admin\">     
       </div>
-      </fieldset>
-      ";
+      </fieldset>";
     $js = "
     <script type=\"text/javascript\">
     obm.initialize.chain(function () {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_admin', 'userSearch');
     });
-    </script>     
-    ";
+    </script>";
 
   } elseif (($action=="detailupdate") || ($action=="update")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
           <input type=\"hidden\" name=\"resource_id\" value=\"$id\" />
           <input type=\"submit\" value=\"$l_update\" />";
   }
+
+  $display["title"] = "<h1 class=\"title\">$l_resource : $dis_title</h1>";
 
   // --- HTML Template --------------------------------------------------------
   $block = "

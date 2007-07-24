@@ -202,13 +202,15 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   $archive = ($invoice["archive"]) ? "checked" : "" ;
 
   $url_form = url_prepare("invoice_index.php");
-
+  $sel_status_all = ($status == $c_all ? " selected = \"selected\"" : '');
   $sel_status = "<select name=\"sel_status\">
-      <option value=\"$c_all\">$l_all</option>";
+      <option value=\"$c_all\"$sel_status_all>$l_all</option>";
   if (is_array($sta)) {
     foreach ($sta as $s_id => $s_label) {
       $sel_status .= "<option value=\"$s_id\"";
-      if ($status == $s_id) $sel_status .= " selected = \"selected\"";
+      if ($status == "$s_id") {
+	$sel_status .= " selected = \"selected\"";
+      }
       $sel_status .= ">$s_label</option>";
     }
   }
@@ -697,7 +699,9 @@ function dis_invoice_detail($inv_q) {
   $date = of_date_format($inv_q->f("date"), 1);
   $expiration_date = of_date_format($inv_q->f("expiration_date"), 1);
   $payment_date = of_date_format($inv_q->f("payment_date"), 1);
-  $status = $inv_q->f("invoicestatus_label");
+  $status_id = $inv_q->f("invoice_status_id");
+  $status = get_invoice_status($status_id);
+  $status_label = $status[$status_id];
   $inout = ($inv_q->f("invoice_inout") == '-') ? $l_supplier : $l_client;
   $credit_memo = ($inv_q->f("invoice_credit_memo") == '0') ? $l_invoice : $l_credit_memo;
   $title = $inout;
@@ -783,7 +787,7 @@ function dis_invoice_detail($inv_q) {
     </tr>
     <tr>
       <th>$l_status</th>
-      <td>$status</td>
+      <td>$status_label</td>
     </tr>
     <tr>
       <th>$l_amount_ht</th>
@@ -839,8 +843,8 @@ function dis_invoice_form($action, $invoice) {
 //   - $usr_q     : userobm database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
-  global $obm, $path, $display ;
-  global $ico_company, $ico_deal, $ico_project;
+  global $obm, $path, $display;
+  global $ico_company, $ico_deal, $ico_project, $l_header_new_f;
   global $l_label, $l_number, $l_comment, $l_add_comment, $l_upd_comment;
   global $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_date, $l_inout, $l_credit_memo, $l_client, $l_supplier;
@@ -874,9 +878,11 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     $p_name = $inv_q->f("project_name");
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
+    $dis_title = $label;
 
   // New form and first time
   } elseif ($action == "new") {
+    $dis_title = $l_header_new_f;
     $date = of_date_upd_format(); 
     $expiration_date = $date;
     $payment_date = $date;
@@ -929,7 +935,6 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   if (isset($invoice["project_new_name"])) { $p_new_name = stripslashes($invoice["project_new_name"]); }
 
   $title = ($inout == '-') ? $l_supplier : $l_client;
-
 
   // Status select
   $sel_status = "<select name=\"sel_status\">"; 
@@ -1018,7 +1023,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     <input type=\"hidden\" name=\"action\" value=\"insert\" />";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_invoice : $label</h1>";
+  $display["title"] = "<h1 class=\"title\">$l_invoice : $dis_title</h1>";
 
   $block = "
   <form method=\"post\" name=\"f_entity\" action=\"invoice_index.php\">

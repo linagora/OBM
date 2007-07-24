@@ -367,7 +367,7 @@ function dis_publication_form($action, $publication) {
 //   - $list_q    : lists
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, $list_q) {
-  global $display, $l_none, $ico_add;
+  global $display, $l_none, $ico_add, $l_header_new_f;
   global $ico_web,$ico_mail,$l_category;
   global $l_publication_title, $l_type, $l_year, $l_lang, $l_desc;
   global $l_insert,$l_update,$l_checkdelete, $l_publication, $l_list;
@@ -381,7 +381,11 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
     $year = $pub_q->f("publication_year");
     $desc = $pub_q->f("publication_desc");
     $lang = $pub_q->f("publication_lang");    
+    $dis_title = $title;
+  } else if ($action == 'new') {
+    $dis_title = $l_header_new_f;
   }
+
   $list_sub = array();
   // If parameters have been given, they supercede the default action value
   if (isset($publication["publication_id"])) { $id = $publication["publication_id"]; }
@@ -447,7 +451,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
 
   $url = "publication_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
 
-  $display["title"] = "<h1 class=\"title\">$l_publication : $title</h1>";
+  $display["title"] = "<h1 class=\"title\">$l_publication : $dis_title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 

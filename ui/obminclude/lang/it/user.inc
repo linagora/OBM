@@ -8,8 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_user_name = "Utente";
-$l_lastname = "Cognome";
-$l_firstname = "Nome";
 $l_password = "Password";
 $l_lastaccess = "Ultimo Accesso";
 $l_email = "@M";

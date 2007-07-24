@@ -988,7 +988,7 @@ function dis_company_form($action, $company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company) {
   global $display, $obm, $cgp_hide, $c_undef, $l_undef;
-  global $ico_web,$ico_mail,$ico_add;
+  global $ico_web,$ico_mail,$ico_add, $l_header_new_f;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_add_comment,$l_upd_comment;
@@ -1028,7 +1028,9 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     $comment = $co_q->f("company_comment");
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
+    $dis_title = $name;
   } else if ($action == "new") {
+    $dis_title = $l_header_new_f;
     $mark = $obm["uid"];
     $dsrc = $_SESSION['set_dsrc'];
     $usercomment = $uid;
@@ -1233,7 +1235,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_company : $name</h1>";
+  $display["title"] = "<h1 class=\"title\">$l_company : $dis_title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 

@@ -606,9 +606,9 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_form($action, $group_q, $group, $field='') {
   global $obm, $perm, $cgroup_private_default, $cgp_use, $cright_write_admin;
-  global $l_group, $l_name, $l_desc, $l_smb, $l_email, $l_mailing;
+  global $display, $l_group, $l_name, $l_desc, $l_smb, $l_email, $l_mailing;
   global $l_private, $l_insert, $l_update, $l_back;
-  global $l_manager, $c_undef, $l_undef; 
+  global $l_manager, $c_undef, $l_undef, $l_header_new;
  
   // if update mode and first time, values are taken from db
   if ($action == 'detailupdate') {
@@ -622,7 +622,9 @@ function html_group_form($action, $group_q, $group, $field='') {
     $email = $group_q->f('group_email');
     $priv = $group_q->f('privacy');
     $mailing = $group_q->f('group_mailing');
+    $dis_title = $name;
   } elseif ($action == 'new') {
+    $dis_title = $l_header_new;
     if ($cgroup_private_default) {
       $private_c = ' checked';
       $mail_class = 'H';
@@ -737,6 +739,7 @@ function html_group_form($action, $group_q, $group, $field='') {
     </tr>";
   }
 
+  $display["title"] = "<h1 class=\"title\">$l_group : $dis_title</h1>";
 
   $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">

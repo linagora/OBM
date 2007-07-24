@@ -31,14 +31,11 @@ $l_contact_archive = "Archived contacts";
 $l_info_pub = "Publications information";
 
 // Contact
-$l_lastname = "Lastname";
-$l_firstname = "Firstname";
 $l_function = "Function";
 $l_service = "Service";
 $l_letter = "L. Head";
 
 //Publication
-$l_title = "Title";
 $l_quantity = "Quantity";
 
 // Actions

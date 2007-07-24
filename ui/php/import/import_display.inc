@@ -1148,7 +1148,8 @@ function display_import_log_line($log, $fields, $comps) {
 //   - $usr_q    : database object with userobm list
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
-  global $cgp_user, $display, $c_undef, $l_undef, $l_insert, $l_update, $l_back;
+  global $cgp_user, $display, $c_undef, $l_undef;
+  global $l_insert, $l_update, $l_back, $l_header_new;
   global $l_import, $l_name, $l_datasource, $l_market, $l_csv_sep, $l_enclosed;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
   global $l_mapping, $l_field_num, $l_field, $l_default;
@@ -1167,6 +1168,9 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
     $sep = $import_q->f("import_separator");
     $enc = $import_q->f("import_enclosed");
     $desc = $import_q->f("import_desc");
+    $dis_title = $name;
+  } else if ($action == 'new') {
+    $dis_title = $l_header_new;
   }
 
   // If parameters have been given, they supercede the default action value
@@ -1247,7 +1251,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   }
 
   $url = url_prepare("import_index.php");
-  $display["title"] = "<div class=\"title\">$l_import : $name</div>";
+  $display["title"] = "<div class=\"title\">$l_import : $dis_title</div>";
 
   $block = "
   <form method=\"post\" name=\"f_entity\" action=\"$url\"

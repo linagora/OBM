@@ -552,7 +552,7 @@ function dis_incident_form($action, $incident) {
 //   - $resos      : array with incident resolution types
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $resos) {
-  global $display, $path, $obm,  $ico_contract;
+  global $display, $path, $obm, $ico_contract, $l_header_new;
   global $c_php_isodate_format;
   global $l_label,$l_contract,$l_status, $l_find,$l_reference;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
@@ -580,7 +580,9 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
     $id = $inc_q->f("incident_id");
     $c_label = $inc_q->f("contract_label");
+    $dis_title = $lincident;
   } elseif ($action == "new") {
+    $dis_title = $l_header_new;
     // We pre-fill date with current date
     $date = of_date_upd_format();
     $datecomment = of_date_upd_format();
@@ -696,7 +698,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
     $dis_button .="<input type=\"hidden\" name=\"action\" value=\"insert\" />";
     $dis_button .="<input type=\"submit\" value=\"$l_insert\" />";
   }
-  $display["title"] = "<h1 class=\"title\">$l_incident : $lincident</h1>";
+  $display["title"] = "<h1 class=\"title\">$l_incident : $dis_title</h1>";
 
   // --- html template --------------------------------------------------------
 

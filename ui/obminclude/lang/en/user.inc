@@ -8,9 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_login = "Login";
-$l_lastname = "Lastname";
-$l_firstname = "Firstname";
-$l_tile = "Function";
 $l_password = "Password";
 $l_lastaccess = "Last access";
 $l_phone2 = "$l_phone 2";

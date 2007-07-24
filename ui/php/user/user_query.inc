@@ -201,8 +201,7 @@ function run_query_user_ext_search($user) {
       OR userobm_email LIKE '$pattern%' )
       AND userobm_archive = '0'
       $multidomain
-      $where_restriction
-      ";
+      $where_restriction";
 
   display_debug_msg($query, $cdg_sql, "run_query_user_ext_search()");
   $obm_q->query($query);
@@ -310,6 +309,8 @@ function run_query_user_insert($user) {
   // infos
   $profile = $user["profile"];
   $archive = ($user["archive"] == "1" ? "1" : "0");
+  $hidden = ($user['hidden'] == '1' ? '1' : '0');
+  $kind = $user['kind'];
   $datebegin = ($user["datebegin"] ? "'".of_isodate_convert($user["datebegin"])."'" : "null");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
@@ -338,6 +339,7 @@ function run_query_user_insert($user) {
   $mobile = $user["mobile"];
   $fax = $user["fax"];
   $fax2 = $user["fax2"];
+  $company = stripslashes($user['company']);
   $direction = stripslashes($user["direction"]);
   $service = $user["service"];
   $ad1 = $user["ad1"];
@@ -470,9 +472,13 @@ function run_query_user_insert($user) {
     userobm_gid,
     userobm_archive,
     userobm_datebegin,
+    userobm_hidden,
+    userobm_kind,
     userobm_lastname,
     userobm_firstname,
     userobm_title,
+    userobm_company,
+    userobm_direction,
     userobm_service,
     userobm_address1,
     userobm_address2,
@@ -509,9 +515,13 @@ function run_query_user_insert($user) {
     '$gid',
     '$archive',
     $datebegin,
+    '$hidden',
+    '$kind',
     '$lname',
     '$fname',
     '$title',
+    '$company',
+    '$direction',
     '$service',
     '$ad1',
     '$ad2',
@@ -682,6 +692,8 @@ function run_query_user_update($p_id, $user) {
   $profile = $user["profile"];
   $archive = ($user["archive"] == "1" ? "1" : "0");
   $datebegin = ($user["datebegin"] ? "'".of_isodate_convert($user["datebegin"])."'" : "null");
+  $hidden = ($user['hidden'] == '1' ? '1' : '0');
+  $kind = $user['kind'];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $title = $user["title"];
@@ -709,7 +721,8 @@ function run_query_user_update($p_id, $user) {
   $mobile = $user["mobile"];
   $fax = $user["fax"];
   $fax2 = $user["fax2"];
-  $direction = stripslashes($user["direction"]);
+  $company = stripslashes($user['company']);
+  $direction = stripslashes($user['direction']);
   $service = $user["service"];
   $ad1 = $user["ad1"];
   $ad2 = $user["ad2"];
@@ -809,6 +822,8 @@ function run_query_user_update($p_id, $user) {
     userobm_gid='$gid',
     userobm_archive='$archive',
     userobm_datebegin=$datebegin,
+    userobm_hidden='$hidden',
+    userobm_kind='$kind',
     userobm_lastname='$lname',
     userobm_firstname='$fname',
     userobm_title='$title',
@@ -817,6 +832,8 @@ function run_query_user_update($p_id, $user) {
     userobm_mobile='$mobile',
     userobm_fax='$fax',
     userobm_fax2='$fax2',
+    userobm_company = '$company',
+    userobm_direction = '$direction',
     userobm_service = '$service',
     userobm_address1 = '$ad1',
     userobm_address2 = '$ad2',
@@ -1065,7 +1082,7 @@ function run_query_user_update_user_group($user) {
 function get_nb_user_admin() {
   global $cdg_sql, $perms_admin;
 
-  $query = "SELECT count(*)
+  $query = "SELECT count(*) as nb
     FROM UserObm
     WHERE userobm_perms='$perms_admin'";
 
@@ -1073,7 +1090,7 @@ function get_nb_user_admin() {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $resultat = $obm_q->f("count(*)");
+  $resultat = $obm_q->f('nb');
 
   return $resultat;
 }

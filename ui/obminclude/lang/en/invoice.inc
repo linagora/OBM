@@ -31,6 +31,7 @@ $l_select_invoice = "Select the invoice";
 // Invoice status
 $l_invoicestatus_tocreate = 'To create';
 $l_invoicestatus_sent = 'Sent';
+$l_invoicestatus_dailly = 'Dailly';
 $l_invoicestatus_ppaid = 'Partially paid';
 $l_invoicestatus_paid = 'Paid';
 $l_invoicestatus_conflict = 'Conflict';

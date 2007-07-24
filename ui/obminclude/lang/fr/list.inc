@@ -31,8 +31,6 @@ $l_mailing = "Mailing activé uniquement";
 $l_contact_archive = "Contacts archivés";
 $l_info_pub = "Informations des publications";
 // Contact
-$l_lastname = "Nom";
-$l_firstname = "Prénom";
 $l_function = "Fonction";
 $l_service = "Service";
 $l_status = "Genre";
@@ -40,7 +38,6 @@ $l_letter = "En tête";
 
 //Publication
 $l_publication = "Publication";
-$l_title = "Titre";
 $l_quantity = "Quantité";
 
 //Logical

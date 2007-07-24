@@ -739,6 +739,7 @@ function dis_list_form($action, $list_q, $list) {
     $dis_but 
     </fieldset>
     </form>";
+
   return $block; 
 }
 
@@ -753,7 +754,7 @@ function dis_list_form($action, $list_q, $list) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_form($action, $list_q, $list) {
   global $l_name,$l_subject,$l_email,$l_mailing,$l_contact_archive,$l_info_pub;
-  global $l_query, $l_list, $l_private;
+  global $l_query, $l_list, $l_private, $l_header_new_f;
   global $cgp_show,$clist_mode_normal, $clist_mode_expert, $l_expert,$l_normal;
   global $action, $display, $obm;
 
@@ -772,6 +773,9 @@ function html_list_form($action, $list_q, $list) {
     $mailing_ok = ($list_q->f("list_mailing_ok") == 0 ? "0" : "1");
     $contact_arch = ($list_q->f("list_contact_archive") == 0 ? "0" : "1");
     $info_pub = ($list_q->f("list_info_publication") == 0 ? "0" : "1");
+    $dis_title = $name;
+  } else if ($action == 'new') {
+    $dis_title = $l_header_new_f;
   }
   
   // If parameters have been given, they supercede the default action value
@@ -813,7 +817,7 @@ function html_list_form($action, $list_q, $list) {
 
 
   $url = url_prepare("list_index.php");
-  $display["title"] = "<div class=\"title\">$l_list : $name</div>";
+  $display["title"] = "<div class=\"title\">$l_list : $dis_title</div>";
 
   // If criteria are set, we display the criteria form, else the query
   if ($mode == $clist_mode_expert) {

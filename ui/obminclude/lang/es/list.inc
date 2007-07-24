@@ -34,8 +34,6 @@ $l_mailing = "Solo Correo habilitado";
 $l_contact_archive = "Contactos archivados";
 $l_info_pub = "Información de publicaciones";
 // Contact
-$l_lastname = "Apellido";
-$l_firstname = "Nombre";
 $l_function = "Puesto";
 $l_service = "Servicio";
 $l_status = "Estado";

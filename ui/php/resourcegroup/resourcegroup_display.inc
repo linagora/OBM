@@ -264,9 +264,9 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
 //     keys used  : name, desc, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_resourcegroup_form($action, $group_q, $group) {
-  global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_private;
-  global $cgroup_private_default, $l_insert, $l_update, $l_back;
-  global $obm;
+  global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_header_new;
+  global $cgroup_private_default, $l_insert, $l_update, $l_back, $l_private;
+  global $obm, $display;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -275,7 +275,9 @@ function html_resourcegroup_form($action, $group_q, $group) {
     $name = $group_q->f("rgroup_name");
     $desc = $group_q->f("rgroup_desc");
     $priv = $group_q->f("privacy");
+    $dis_title = $name;
   } elseif ($action == "new") {
+    $dis_title = $l_header_new;
     if ($cgroup_private_default) {
       $private_c = " checked";
     }
@@ -300,6 +302,8 @@ function html_resourcegroup_form($action, $group_q, $group) {
     <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
   </tr>";
   } 
+
+  $display["title"] = "<h1 class=\"title\">$l_resourcegroup : $dis_title</h1>";
 
   $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("resourcegroup_index.php")."\">

@@ -421,11 +421,11 @@ function dis_user_consult($user) {
 //   - $obm_q : user database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
-  global $l_login, $l_password, $l_profile, $l_lastname, $l_firstname, $l_title;
-  global $l_domain, $l_user, $l_lastaccess, $l_archive, $l_datebegin;
-  global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal;
+  global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
+  global $l_domain, $l_user, $l_lastaccess, $l_archive, $l_datebegin, $l_desc;
+  global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal, $l_title;
   global $l_delegation_target, $l_delegation, $l_direction, $l_service;
-  global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_email, $l_desc;
+  global $l_company, $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_email;
   global $l_group_member, $l_group, $l_local, $l_ext_id;
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
   global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
@@ -442,6 +442,8 @@ function html_user_consult($obm_q) {
   $local = ($obm_q->f("userobm_local") == 1 ? $c_yes : $c_no);
   $ext_id = $obm_q->f("userobm_ext_id");
   $profile = $obm_q->f("userobm_perms");
+  $hidden = $obm_q->f("userobm_hidden");
+  $kind = $obm_q->f("userobm_kind");
   $lname = $obm_q->f("userobm_lastname");
   $fname = $obm_q->f("userobm_firstname");
   $title = $obm_q->f("userobm_title");
@@ -458,6 +460,8 @@ function html_user_consult($obm_q) {
   $mobile = $obm_q->f("userobm_mobile");
   $fax = $obm_q->f("userobm_fax");
   $fax2 = $obm_q->f("userobm_fax2");
+  $company = $obm_q->f("userobm_company");
+  $direction = $obm_q->f("userobm_direction");
   $service = $obm_q->f("userobm_service");
   $ad1 = $obm_q->f("userobm_address1");
   $ad2 = $obm_q->f("userobm_address2");
@@ -698,6 +702,18 @@ function html_user_consult($obm_q) {
  
   <table>
   <tr>
+    <th>$l_kind</th>
+    <td>$kind</td>
+  </tr>
+  <tr>
+    <th>$l_lastname</th>
+    <td>$lname</td>
+  </tr>
+  <tr>
+    <th>$l_firstname</th>
+    <td>$fname</td>
+  </tr>
+  <tr>
     <th>$l_login</th>
     <td>$login</td>
   </tr>
@@ -749,6 +765,7 @@ function html_user_consult($obm_q) {
   </tr>
 </table>
 </div>
+
 <div class=\"detail infos\">
   <h1>$l_coord</h1>
   <table>
@@ -771,6 +788,14 @@ function html_user_consult($obm_q) {
   <tr>
     <th>$l_fax2</th>
     <td>$fax2</td>
+  </tr>
+  <tr>
+    <th>$l_company</th>
+    <td>$company</td>
+  </tr>
+  <tr>
+    <th>$l_direction</th>
+    <td>$direction</td>
   </tr>
   <tr>
     <th>$l_service</th>
@@ -893,11 +918,12 @@ function html_user_group_consult($usr_q) {
 //   - $field : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($usr_q, $user, $field="") {
-  global $l_login, $l_password, $l_profile, $l_lastname, $l_firstname;
+  global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
   global $l_user, $l_title, $l_archive, $l_datebegin, $l_insert, $l_update;
-  global $l_delegation_target;
+  global $l_delegation_target, $l_hidden, $l_photo;
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
-  global $l_coord, $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
+  global $l_coord, $l_company, $l_direction, $l_service, $l_address;
+  global $l_postcode, $l_town, $l_expresspostal;
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
   global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
   global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
@@ -905,9 +931,8 @@ function html_user_form($usr_q, $user, $field="") {
   global $l_enabled, $l_disabled, $l_web_consult_list,$path;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $path, $display, $cgp_use, $action, $profiles, $c_yes, $c_no;
-  global $obm, $c_default_domain, $l_domain, $l_photo;
+  global $obm, $c_default_domain, $l_domain, $l_header_new;
 
-  
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
     // infos
@@ -915,7 +940,9 @@ function html_user_form($usr_q, $user, $field="") {
     $login = $usr_q->f("userobm_login");
     $passwd = "";
     $profile = $usr_q->f("userobm_perms");
+    $hidden = $usr_q->f("userobm_hidden");
     $lastaccess = $usr_q->f("lastaccess");
+    $kind = $usr_q->f("userobm_kind");
     $lname = $usr_q->f("userobm_lastname");
     $fname = $usr_q->f("userobm_firstname");
     $title = $usr_q->f("userobm_title");
@@ -932,6 +959,7 @@ function html_user_form($usr_q, $user, $field="") {
     $mobile = $usr_q->f("userobm_mobile");
     $fax = $usr_q->f("userobm_fax");
     $fax2 = $usr_q->f("userobm_fax2");
+    $company = $usr_q->f("userobm_company");
     $direction = $usr_q->f("userobm_direction");
     $service = $usr_q->f("userobm_service");
     $ad1 = $usr_q->f("userobm_address1");
@@ -972,7 +1000,10 @@ function html_user_form($usr_q, $user, $field="") {
     $smb_home = $usr_q->f("userobm_samba_home");
     $smb_home_drive = $usr_q->f("userobm_samba_home_drive");
     $smb_logon = $usr_q->f("userobm_samba_logon_script");
+
+    $dis_title = "$fname $lname";
   } elseif ($action == "new") {
+    $dis_title = $l_header_new;
     $dom_infos = of_domain_get_domain_infos($obm['domain_id'], true);
     $ad1 = $dom_infos['address1'];
     $ad2 = $dom_infos['address2'];
@@ -991,6 +1022,8 @@ function html_user_form($usr_q, $user, $field="") {
   if (isset($user["login"])) { $login = $user["login"]; }
   if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
   if (isset($user["profile"])) { $profile = $user["profile"]; }
+  if (isset($user["hidden"])) { $hidden = $user["hidden"]; }
+  if (isset($user["kind"])) { $kind = $user["kind"]; }
   if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
   if (isset($user["title"])) { $title = stripslashes($user["title"]); }
@@ -1007,7 +1040,8 @@ function html_user_form($usr_q, $user, $field="") {
   if (isset($user["mobile"])) { $mobile = $user["mobile"]; }
   if (isset($user["fax"])) { $fax = $user["fax"]; }
   if (isset($user["fax2"])) { $fax2 = $user["fax2"]; }
-  if (isset($user["direction"])) { $direction = stripslashes($user["direction"]); }
+  if (isset($user["company"])) { $company = stripslashes($user['company']); }
+  if (isset($user["direction"])) { $direction = stripslashes($user['direction']); }
   if (isset($user["service"])) { $service = $user["service"]; }
   if (isset($user["ad1"])) { $ad1 = $user["ad1"]; }
   if (isset($user["ad2"])) { $ad2 = $user["ad2"]; }
@@ -1288,6 +1322,8 @@ function html_user_form($usr_q, $user, $field="") {
   $cmax_add = "64";
   $csize_phone = "24";
 
+  $display["title"] = "<h1 class=\"title\">$l_user : $dis_title</h1>";
+
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"post\" name=\"f_entity\"
@@ -1299,6 +1335,18 @@ function html_user_form($usr_q, $user, $field="") {
   <legend>$l_user</legend>
 
   <table>
+  <tr>
+    <th class=\"$class[kind]\">$l_kind</th>
+    <td><input name=\"tf_kind\" size=\"32\" maxlength=\"32\" value=\"$kind\" /></td>
+  </tr>
+  <tr>
+    <th class=\"$class[lastname]\">$l_lastname</th>
+    <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"32\" value=\"$lname\" /></td>
+  </tr>
+  <tr>
+    <th class=\"$class[firstname]\">$l_firstname</th>
+    <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
+  </tr>
   <tr>
     <th class=\"$class[login]\">$l_login</th>
     <td>$dis_login</td>
@@ -1320,14 +1368,6 @@ function html_user_form($usr_q, $user, $field="") {
     </td>
   </tr>
   $dis_delegation_target
-  <tr>
-    <th class=\"$class[lastname]\">$l_lastname</th>
-    <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"32\" value=\"$lname\" /></td>
-  </tr>
-  <tr>
-    <th class=\"$class[firstname]\">$l_firstname</th>
-    <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
-  </tr>
   $block_delegation
   <tr>
     <th class=\"$class[title]\">$l_title</th>
@@ -1367,8 +1407,16 @@ function html_user_form($usr_q, $user, $field="") {
     <td><input name=\"tf_fax2\" size=\"20\" maxlength=\"20\" value=\"$fax2\" /></td>
   </tr>
   <tr>
+    <th class=\"$class[company]\">$l_company</th>
+    <td><input name=\"tf_company\" size=\"64\" maxlength=\"64\" value=\"$company\" /></td>
+  </tr>
+  <tr>
+    <th class=\"$class[direction]\">$l_direction</th>
+    <td><input name=\"tf_direction\" size=\"64\" maxlength=\"64\" value=\"$direction\" /></td>
+  </tr>
+  <tr>
     <th class=\"$class[service]\">$l_service</th>
-    <td><input name=\"tf_service\" size=\"64\" maxlength=\"65\" value=\"$service\" /></td>
+    <td><input name=\"tf_service\" size=\"64\" maxlength=\"64\" value=\"$service\" /></td>
   </tr>
   <tr>
     <th class=\"$class[address1]\">$l_address 1</th>
@@ -1437,6 +1485,8 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $login = $user["login"];
   $passwd = $user["passwd"];
   $perms = $user["perms"];
+  $hidden = $user["hidden"];
+  $kind = $user["kind"];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $title = $user["title"];
@@ -1454,6 +1504,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $mobile = $user["mobile"];
   $fax = $user["fax"];
   $fax2 = $user["fax2"];
+  $company = $user["company"];
   $direction = $user["direction"];
   $service = $user["service"];
   $ad1 = $user["ad1"];
@@ -1507,6 +1558,8 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />
   <input type=\"hidden\" name=\"tf_passwd\" value=\"$passwd\" />
   <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
+  <input type=\"hidden\" name=\"hidden\" value=\"$hidden\" />
+  <input type=\"hidden\" name=\"tf_kind\" value=\"$kind\" />
   <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
   <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
   <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
@@ -1523,6 +1576,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   <input type=\"hidden\" name=\"mobile\" value=\"$mobile\" />
   <input type=\"hidden\" name=\"fax\" value=\"$fax\" />
   <input type=\"hidden\" name=\"fax2\" value=\"$fax2\" />
+  <input type=\"hidden\" name=\"company\" value=\"$company\" />
   <input type=\"hidden\" name=\"direction\" value=\"$direction\" />
   <input type=\"hidden\" name=\"service\" value=\"$service\" />
   <input type=\"hidden\" name=\"ad1\" value=\"$ad1\" />

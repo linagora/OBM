@@ -8,9 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_lastname = "Cognome";
-$l_firstname = "Nome";
-$l_kind = "Tipo";
 $l_market = "Responsabile";
 $l_function = "Funzione";
 $l_hphone = "Tel. Casa";

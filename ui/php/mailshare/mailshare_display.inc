@@ -238,7 +238,7 @@ function dis_mailshare_consult($mailshare) {
 function html_mailshare_consult($mailshare_q) {
   global $c_yes, $c_no, $path,$l_mail_server;
   global $l_mailshare, $l_name, $l_quota, $l_desc, $l_email;
-  global $display, $perm, $menu, $action, $cright_write;
+  global $display, $action, $cright_write;
 
   $name = $mailshare_q->f("mailshare_name");
   $quota = $mailshare_q->f("mailshare_quota");
@@ -296,9 +296,10 @@ function html_mailshare_consult($mailshare_q) {
 //   - $field       : field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
-  global $display, $l_insert, $l_update, $l_back,$l_web_list,$l_admin_permission;
-  global $l_mailshare, $l_name, $l_desc, $l_quota, $l_email,$obm;
-  global $cgp_use, $cmailshare_default_quota,$obm,$l_mail_server;
+  global $l_insert, $l_update, $l_back, $l_admin_permission, $l_header_new;
+  global $l_mailshare, $l_name, $l_desc, $l_quota, $l_email;
+  global $cmailshare_default_quota,$obm,$l_mail_server;
+  global $display, $obm, $cgp_use;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -310,11 +311,12 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
     $desc = $mailshare_q->f("mailshare_description");
     $mail_server_id = $mailshare_q->f("mailshare_mail_server_id");
     $mail_server_host_name = $mailshare_q->f("mailserver_hostname");
+    $dis_title = $name;
 
   } else if ($action == "new") {
+    $dis_title = $l_header_new;
     $quota = $cmailshare_default_quota;
   }
-
 
   // If parameters have been given, they supercede the default action value
   if (isset($mailshare["mailshare_id"])) { $id = $mailshare["mailshare_id"]; }
@@ -348,7 +350,7 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
   $main_domain = $obm["domain_name"];
 
   $display["detailInfo"] = display_record_info($mailshare_q);
-  $display["title"] = "<div class=\"title\">$l_mailshare : $name</div>";
+  $display["title"] = "<div class=\"title\">$l_mailshare : $dis_title</div>";
 
   if (($action == "new") || ($action == "insert")) {
     $dis_name = "<input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />";
@@ -363,15 +365,13 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
       <input type=\"hidden\" name=\"sel_read_public\" value=\"1\" />
       <div id=\"sel_accept_admin\">     
       </div>
-      </fieldset>
-      ";
+      </fieldset>";
     $js = "
     <script type=\"text/javascript\">
     obm.initialize.chain(function () {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_accept_admin', 'userSearch');
     });
-    </script>     
-    ";
+    </script>";
   } elseif (($action == "detailupdate") || ($action == "update")) {
     $dis_name = "$name <input name=\"tf_name\" type=\"hidden\" value=\"$name\" />";
 

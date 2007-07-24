@@ -30,6 +30,7 @@ $l_select_invoice = "Sélectionner la facture";
 // Invoice status
 $l_invoicestatus_tocreate = 'A Créer';
 $l_invoicestatus_sent = 'Envoyée';
+$l_invoicestatus_dailly = 'Dailly';
 $l_invoicestatus_ppaid = 'Partiellement Payée';
 $l_invoicestatus_paid = 'Payée';
 $l_invoicestatus_conflict = 'En conflit';

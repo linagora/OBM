@@ -8,12 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_lastname = "Nom";
-$l_firstname = "Prénom";
-$l_kind = "Genre";
 $l_market = "Responsable";
 $l_function = "Fonction";
-$l_title = "Titre";
 $l_minihphone = "(Perso)";
 $l_minimphone = "(Mobile)";
 $l_email = "@M";

@@ -643,6 +643,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
     $c_name = $p_q->f("company_name");
     $kind = $p_q->f("payment_paymentkind_id");
     $date = $p_q->f("date");
+    $dis_date = of_date_format($date);
     $date = ($date != 0) ? of_date_upd_format($date, 1) : "";
     $number = $p_q->f("payment_number");
     $amount = $p_q->f("payment_amount");
@@ -650,10 +651,11 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
     $checked = $p_q->f("payment_checked");
     $comment = $p_q->f("payment_comment");
     $title = $params["title"];
+    $dis_title = "$dis_date $c_name $amount";
 
   // New form and first time
   } elseif ($action == "new") {
-    $title = $l_header_new;
+    $dis_title = $l_header_new;
     $date = of_date_upd_format();
     $inout = '+';
   }
@@ -735,7 +737,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_payment : $title</h1>";
+  $display["title"] = "<h1 class=\"title\">$l_payment : $dis_title</h1>";
 
   // --- HTML Template --------------------------------------------------------
   $block .= "

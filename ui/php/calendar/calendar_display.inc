@@ -2028,7 +2028,7 @@ function dis_calendar_quick_form($calendar) {
 function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $res, $groups,$tasks, $cats1, $alerts) {
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ico_project;
-  global $ico_mini_cal, $ico_add,$ico_delete, $l_items;
+  global $ico_mini_cal, $ico_add,$ico_delete, $l_items, $l_header_new;
   global $ccalendar_first_hour, $ccalendar_last_hour,$ico_project;
   // -- Labels
   global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_desc;
@@ -2086,8 +2086,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
 	$selected_alert = $key;
       }
     }
+    $dis_title = $title;
 
   } elseif ($action == "new") {
+    $dis_title = $l_header_new;
     $repeat_end = of_date_upd_format();
   }
 
@@ -2439,7 +2441,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     }
   }
   $dis_min_e .= "</select>";
-  $display["title"] = "<div class=\"title\">$l_module_calendar : $title</div>";
+  $display["title"] = "<div class=\"title\">$l_module_calendar : $dis_title</div>";
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[5]";
   $url2 = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[6]&amp;ext_title=" . urlencode($l_calendar_select_group);
 

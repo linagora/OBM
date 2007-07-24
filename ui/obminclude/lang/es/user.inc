@@ -8,9 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_login = "Login";
-$l_lastname = "Apellido";
-$l_firstname = "Nombre";
-$l_title = "Function";
 $l_password = "Contraseña";
 $l_lastaccess = "Último acceso";
 $l_phone2 = "$l_phone 2";

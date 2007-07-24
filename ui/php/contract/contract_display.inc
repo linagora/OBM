@@ -780,8 +780,8 @@ function dis_contract_form($action,$contract,$param_company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp_q,$contact_q, $contract,$pri_q,$sta_q){
   // - Themes
-  global $cgp_show;
-  global $obm, $ico_mail,$ico_company,$ico_deal,$ico_contact;
+  global $display, $cgp_show, $obm;
+  global $ico_mail,$ico_company,$ico_deal,$ico_contact, $l_header_new;
   global $path, $c_php_isodate_format, $c_undef, $l_undef, $l_update,$l_insert;
   global $l_label, $l_begin, $l_type, $l_marketing_manager, $l_archive;
   global $l_signature, $l_begin, $l_exp, $l_renew,$l_date_cancel,$l_dates;
@@ -833,7 +833,9 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $deal_id = $contract_q->f("deal_id");
     $deal_label = $contract_q->f("deal_label");
 
+    $dis_title = $label;
   } elseif ($action == "new") {
+    $dis_title = $l_header_new;
     $comp_name = $comp_q->f("company_name");
     $ad1 = $comp_q->f("company_address1");
     $zip = $comp_q->f("company_zipcode");
@@ -1142,6 +1144,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </tr>";
   }
 
+  $display["title"] = "<h1 class=\"title\">$l_contract : $dis_title</h1>";
 
   $block = "
   <form method=\"post\" name=\"f_entity\"
@@ -1565,21 +1568,21 @@ function html_contract_priority_form($pri_q) {
   global $l_pri_checkdelete, $l_pri_update, $l_pri_new, $l_pri_insert,$ico_ok,$ico_delete,$l_c_new;
 
  
-$char_title = '=';
-$key = 0;
-while ($pri_q->next_record()) {
-  $id = $pri_q->f("contractpriority_id");
-  $code = $pri_q->f("contractpriority_code");
-  $label = $pri_q->f("contractpriority_label");
-  $color = $pri_q->f("contractpriority_color");
+  $char_title = '=';
+  $key = 0;
+  while ($pri_q->next_record()) {
+    $id = $pri_q->f("contractpriority_id");
+    $code = $pri_q->f("contractpriority_code");
+    $label = $pri_q->f("contractpriority_label");
+    $color = $pri_q->f("contractpriority_color");
 
-  if($key%2 == 0) {
-    $class = "class=\"pair\"";
-  } else {
-    $class = "";
-  }
-  $c_label = htmlentities($one_cat["label"]);
-  $priority_list .= "
+    if($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
+    }
+    $c_label = htmlentities($one_cat["label"]);
+    $priority_list .= "
     <tr $class>
     <td>
     <input type=\"hidden\" id=\"priority_$id\" value=\"$id\" />
@@ -1596,10 +1599,10 @@ while ($pri_q->next_record()) {
     </td>
     </tr>
     ";    
-}
+  }
 
 // --- HTML Template --------------------------------------------------------
-$r = "
+  $r = "
   <div class=\"detail admin\" >
   <form id=\"form_priority_update\" action=\"?action=priority_update\" method=\"post\">
   <input type=\"hidden\" name=\"tf_priority_color\" value=\"\" />

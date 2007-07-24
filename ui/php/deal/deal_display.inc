@@ -1088,7 +1088,7 @@ function dis_deal_form($deal) {
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,$usrp_q,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
-  global $ico_company,$ico_contact,$ico_add;
+  global $ico_company,$ico_contact,$ico_add, $l_header_new_f;
   global $c_php_isodate_format,$l_deal,$l_update,$l_insert, $l_private;
   global $l_dates, $l_company, $l_other_relation, $l_relation, $l_label;
   global $l_number, $l_kind, $l_region, $l_todo;
@@ -1097,7 +1097,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_source;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
-  global $path, $action, $obm, $popup;
+  global $path, $display, $action, $obm, $popup;
   global $c_all, $l_all, $c_undef, $l_undef;
 
   $ext_target = $deal["ext_target"];
@@ -1140,7 +1140,9 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
     $ad1 = $deal_q->f("company_address1");
     $zip = $deal_q->f("company_zipcode");
     $town = $deal_q->f("company_town");
+    $dis_title = $label;
   } elseif (($action == "new") || ($action == "insert")) {
+    $dis_title = $l_header_new_f;
     $comp = $comp_q->f("company_name");
     $ad1 = $comp_q->f("company_address1");
     $zip = $comp_q->f("company_zipcode");
@@ -1450,6 +1452,8 @@ $js_status_loop
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
+  $display["title"] = "<div class=\"title\">$l_deal : $dis_title</div>";
+
   $block = "
   $js_status
   <form method=\"post\" name=\"f_entity\" 
@@ -1645,6 +1649,7 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
 
   $id = $deal_q->f("deal_id");
   $label = $deal_q->f("deal_label");
+  $dis_title = $label;
 
   // if update mode and first time, values are taken from db
   if ($action == "quick_detail") {
@@ -1683,7 +1688,7 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
     $sel_status .= ">$slabel</option>\n";
   }
   $sel_status .= "</select>";
-  if($sta->nf() > 0) {
+  if ($sta_q->nf() > 0) {
     $sta_q->seek(0);
     while ($sta_q->next_record()) {
       $sid = $sta_q->f("dealstatus_id");
@@ -1735,7 +1740,7 @@ $js_status_loop
     $rd_mail_group_c = "checked";
   }
 
-  $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
+  $display["title"] = "<div class=\"title\">$l_deal : $dis_title</div>";
  
   $block = "
     $js_status

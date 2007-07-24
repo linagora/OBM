@@ -274,7 +274,8 @@ function html_document_consult($doc_q) {
   $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
   $url = "document_index.php?action=accessfile&amp;document_id=$id&amp;popup=1";
 
-  $display["title"] = "<h1 class=\"title\">$l_document : $title</h1>";
+  $dname =  ($name != '') ? "($name)" : ''; 
+  $display["title"] = "<h1 class=\"title\">$l_document : $title $dname</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -362,7 +363,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
   global $obm, $display, $path, $default_path;
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
-  global $l_name, $l_author, $l_path, $l_kind, $l_browse; 
+  global $l_name, $l_author, $l_path, $l_kind, $l_browse, $l_header_new;
   global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
@@ -375,6 +376,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
     $author = $doc_q->f("document_author");
     $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype_id");
+    $dis_title = $title;
     if ($kind == $cdoc_kind_link) {
       $fi_path = $doc_q->f("document_path");
       $url_parse = parse_url($name);
@@ -403,9 +405,11 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
     <div id=\"file_update\" style=\"display: none\">";
     $update_file_end = "</div>";
   } elseif($action == "new") {
+    $dis_title = $l_header_new;
     $usr_q = get_user_info($obm["uid"]);
     $author = $usr_q["lastname"]." ".$usr_q["firstname"];
   }
+
   // If parameters have been given, they supercede the default action value
   if (isset($document["document_id"])) { $id = $document["document_id"]; }
   if (isset($document["title"])) { $title = stripslashes($document["title"]); }
@@ -485,8 +489,8 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
 
   $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" id=\"https\" value=\"$cdoc_kind_link\" $checked/><label for=\"https\">$l_links</label>";
 
-  $dname =  ($name != "") ? "($name)" : ""; 
-  $display["title"] = "<div class=\"title\">$l_document : $title $dname</div>";
+  $dname =  ($name != '') ? "($name)" : ''; 
+  $display["title"] = "<div class=\"title\">$l_document : $dis_title $dname</div>";
   $url1 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=false"; 
   $url2 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=true"; 
 

@@ -422,6 +422,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
     $contact_fname = $l_q->f("contact_firstname");
     $name = $l_q->f("lead_name");
     $date = $l_q->f("date");
+    $dis_date = of_date_format($date);
     $date = ($date != 0) ? of_date_upd_format($date) : "";
     $datealarm = $l_q->f("datealarm");
     $datealarm = ($datealarm != 0) ? of_date_upd_format($datealarm) : "";
@@ -430,10 +431,11 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
     $comment = $l_q->f("lead_comment");
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
+    $dis_title = "$dis_date $c_name";
 
   // New form and first time
   } elseif ($action == "new") {
-    $title = $l_header_new;
+    $dis_title = $l_header_new;
     $date = of_date_upd_format();
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
@@ -542,7 +544,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<div class=\"title\">$l_lead : $title</div>";
+  $display["title"] = "<div class=\"title\">$l_lead : $dis_title</div>";
 
   // --- HTML Template --------------------------------------------------------
   $block .= "
