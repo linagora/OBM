@@ -190,7 +190,7 @@ function sql_if($db_type, $expr, $iftrue, $iffalse) {
 ///////////////////////////////////////////////////////////////////////////////
 function sql_limit($db_type, $number="", $p_offset="", $name="") {
   global $db_type_mysql, $db_type_pgsql, $ctu_sql_limit, $of_display_name;
-  global $set_rows_default, $page;
+  global $set_rows_default, $params;
 
   // If limit should not be used, return empty clause
   if (! $ctu_sql_limit) { return ""; }
@@ -206,8 +206,8 @@ function sql_limit($db_type, $number="", $p_offset="", $name="") {
   // Handle cursor only if rigth dataset
   if ($p_offset != "") {
     $off = $p_offset;
-  } else if (($page > 0) && ($name == $of_display_name)) {
-    $off = ($page - 1) * $num;
+  } else if (($params['page'] > 0) && ($name == $of_display_name)) {
+    $off = ($params['page'] - 1) * $num;
   } else {
     $off = "0";
   }

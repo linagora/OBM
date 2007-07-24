@@ -323,8 +323,6 @@ $cg_gid_smb_host = 515;
 ///////////////////////////////////////////////////////////////////////////////
 // Recuperation des parametres du fichier de configuration global obm_conf.ini
 ///////////////////////////////////////////////////////////////////////////////
-// Code repris du fichier www/aliainclude/global.inc d'Aliamin
-
 $ini_array = parse_ini_file("$path/../conf/obm_conf.ini");
 
 $obmdb_host = $ini_array['host'];
@@ -550,6 +548,15 @@ $cr_date_ended = 4;
 $cdoc_kind_dir = 0;
 $cdoc_kind_file = 1;
 $cdoc_kind_link = 2;
+
+// Invoice status
+$cinv_status['tocreate'] = 0;
+$cinv_status['sent'] = 1;
+$cinv_status['ppaid'] = 2;
+$cinv_status['paid'] = 3;
+$cinv_status['conflict'] = 4;
+$cinv_status['cancelled'] = 5;
+$cinv_status['loss'] = 6;
 
 // Perms XXXXX Deprecated : to be removed
 $perms_user = 'user';

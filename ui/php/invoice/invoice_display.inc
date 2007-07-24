@@ -89,6 +89,14 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
     }
   }
 
+  else if ($fieldname == "invoice_status") {
+    $res["align"] = "center";
+    $s_id = $OD->data_set->f('invoice_status_id');
+    echo "s=$s_id";
+    $sta = get_invoice_status($s_id);
+    $res["name"] = $sta[$s_id];
+  }
+
   else if ($fieldname == "invoice_archive") {
     $res["align"] = "center";
     if ($OD->data_set->f($fieldname)) {
@@ -153,7 +161,7 @@ function dis_invoice_search_form($invoice="") {
     $tt_ids = "0";
   }
 
-  $sta = get_invoicestatus();
+  $sta = get_invoice_status();
   $tts = get_global_tasktype($ctt_sales, $tt_ids);
   $block .= html_invoice_search_form($invoice, $sta, $tts);
 
@@ -198,8 +206,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   $sel_status = "<select name=\"sel_status\">
       <option value=\"$c_all\">$l_all</option>";
   if (is_array($sta)) {
-    foreach ($sta as $s_id => $s_status) {
-      $s_label = $s_status["label"];
+    foreach ($sta as $s_id => $s_label) {
       $sel_status .= "<option value=\"$s_id\"";
       if ($status == $s_id) $sel_status .= " selected = \"selected\"";
       $sel_status .= ">$s_label</option>";
@@ -814,7 +821,7 @@ function dis_invoice_form($action, $invoice) {
   } else {
     $inv_q = "";
   }
-  $stat = get_invoicestatus();
+  $stat = get_invoice_status();
   $usr_q = run_query_userobm_active();
   $block = html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q);
 
@@ -926,8 +933,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
 
   // Status select
   $sel_status = "<select name=\"sel_status\">"; 
-  foreach ($stat as $s_id => $s_status) {
-    $s_label = $s_status["label"];
+  foreach ($stat as $s_id => $s_label) {
     $sel_status .= "<option value=\"$s_id\""; 
     if ($s_id == $status) {
       $sel_status .= " selected ";
@@ -1289,14 +1295,13 @@ function dis_invoice_dashboard($invoice) {
 
   // Billed infos -------------------------------------------------------------
 
-  $status_pay = get_invoicestatus("payment");
+  $status_pay = get_invoice_status("payment");
 
   // Loop through status (rows)
-  foreach ($status_pay as $s_id => $s_status) {
+  foreach ($status_pay as $s_id => $s_label) {
     // Get the status list to query for total detail
     $total_status_param .= "&amp;sel_status[]=$s_id";
     
-    $s_label = $s_status["label"];
     $total_amount_ht = 0;
     $cpt++;
     $data = "data" . ($cpt % 2);
@@ -1379,11 +1384,10 @@ function dis_invoice_dashboard($invoice) {
 
   // Potential chart ----------------------------------------------------------
 
-  $status_toc = get_invoicestatus("tocreate");
+  $status_toc = get_invoice_status("tocreate");
 
   // Loop through status (rows)
-  foreach ($status_toc as $s_id => $s_status) { 
-    $s_label = $s_status["label"];
+  foreach ($status_toc as $s_id => $s_label) { 
     $total_amount_ht = 0;
     $cpt++;
     $data = "data" . ($cpt % 2);
@@ -1433,11 +1437,10 @@ function dis_invoice_dashboard($invoice) {
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
   $inv = run_query_invoice_amounts($date_ranges, "invoice_expiration_date", $invoice["taskttype"], $inout);
 
-  $status_pay = get_invoicestatus("payment");
+  $status_pay = get_invoice_status("payment");
 
   // Loop through status (rows)
-  foreach ($status_pay as $s_id => $s_status) { 
-    $s_label = $s_status["label"];
+  foreach ($status_pay as $s_id => $s_label) { 
     //    // If the status tell invoice can be archived, invoice has been paid 
     //    $status_paid = $s_status["archive"] == 1 ? true : false;
     $total_amount_ttc = 0;

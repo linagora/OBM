@@ -309,3 +309,22 @@ ALTER TABLE CalendarCategory1 ADD COLUMN calendarcategory1_color char(6);
 -- UPDATE Deal Structure
 --
 ALTER TABLE Deal ADD COLUMN deal_margin decimal(12,2);
+
+
+--
+-- Add credit card payment kind
+--
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'CB', 'Carte de crédit');
+
+
+--
+-- Move Invoice status id
+--
+UPDATE Invoice set invoice_status_id = 0 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='To create');
+UPDATE Invoice set invoice_status_id = 1 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Sent');
+UPDATE Invoice set invoice_status_id = 2 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Partially paid');
+UPDATE Invoice set invoice_status_id = 3 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Paid');
+UPDATE Invoice set invoice_status_id = 4 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Conflict');
+UPDATE Invoice set invoice_status_id = 5 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Cancelled');
+UPDATE Invoice set invoice_status_id = 6 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Loss');
+UPDATE Invoice set invoice_status_id = 1 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Received');

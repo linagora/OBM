@@ -128,6 +128,11 @@ $display_include_file = 'resources/themes/'.$_SESSION['set_theme'].'/display.inc
 include("$display_include_file");
 
 
+// Default module title
+$mod_title = ${"l_module_$module"};
+$display['title'] = "<h1 class=\"title\">$mod_title</h1>";
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Sections definitions
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,7 +150,7 @@ while (list($sec,$value) = each($cgp_show["section"])) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Modules defintion
+// Modules definition
 ///////////////////////////////////////////////////////////////////////////////
 if ($cgp_show["module"]["company"]) {
   $modules["company"] = array('Name'=> $l_module_company,

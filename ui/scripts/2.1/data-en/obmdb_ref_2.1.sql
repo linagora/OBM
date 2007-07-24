@@ -173,13 +173,14 @@ INSERT INTO InvoiceStatus (invoicestatus_domain_id, invoicestatus_payment, invoi
 --
 -- dump for table  PaymentKind :
 --
-INSERT INTO PaymentKind VALUES (1, 1,'Ch', 'Cheque');
-INSERT INTO PaymentKind VALUES (2, 1, 'C.T', 'credit transfert');
-INSERT INTO PaymentKind VALUES (3, 1, 'TIP', 'Titre Interbancaire de Paiement');
-INSERT INTO PaymentKind VALUES (4, 1, 'PA', 'Prélèvement Automatique');
-INSERT INTO PaymentKind VALUES (5, 1, 'FrB', 'Frais bancaires');
-INSERT INTO PaymentKind VALUES (6, 1, 'BAO', 'Billet à ordre');
-INSERT INTO PaymentKind VALUES (7, 1,'LC', 'Lettre de change');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1,'Ch', 'Cheque');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'C.T', 'credit transfert');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'TIP', 'Titre Interbancaire de Paiement');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'PA', 'Prélèvement Automatique');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'FrB', 'Frais bancaires');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'BAO', 'Billet à ordre');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'LC', 'Lettre de change');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'CC', 'Credit Card');
 
 
 -- Add system Groups

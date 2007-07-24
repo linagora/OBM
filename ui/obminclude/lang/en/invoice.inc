@@ -28,6 +28,15 @@ $l_amount_remaining = "Amount remaining";
 
 $l_select_invoice = "Select the invoice";
 
+// Invoice status
+$l_invoicestatus_tocreate = 'To create';
+$l_invoicestatus_sent = 'Sent';
+$l_invoicestatus_ppaid = 'Partially paid';
+$l_invoicestatus_paid = 'Paid';
+$l_invoicestatus_conflict = 'Conflict';
+$l_invoicestatus_cancelled = 'Cancelled';
+$l_invoicestatus_loss = 'Lost';
+
 // payment
 $l_no_payment = "no payments related to this invoice";
 $l_list_payment = "payments related to this invoice";
