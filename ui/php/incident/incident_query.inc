@@ -88,7 +88,6 @@ function run_query_incident_search($incident) {
   if (($priority != $c_all) && ($priority != "")) { 
     $where .= " AND Incident.incident_priority_id = '$priority'";
   }
-  $join_status = "LEFT JOIN IncidentStatus ON incident_status_id=incidentstatus_id";
   if (($status != $c_all) && ($status != "")) { 
     $where .= " AND Incident.incident_status_id = '$status'";
   }
@@ -112,7 +111,7 @@ function run_query_incident_search($incident) {
   $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
-  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "incidentstatus_code";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "incident_status_id";
   $orderq .= " ORDER BY $order $sql_order_dir, incidentpriority_code";
 
   $select = "SELECT
@@ -126,8 +125,7 @@ function run_query_incident_search($incident) {
       incident_priority_id,
       incidentpriority_label as incident_priority,
       incidentpriority_color,
-      incident_status_id,
-      incidentstatus_label as incident_status,
+      incident_status_id as incident_status,
       incidentresolutiontype_label as resolutiontype_label,
       incident_logger,
       incident_owner,
@@ -187,7 +185,7 @@ function run_query_incident_detail($id) {
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
         incidentpriority_label,
-        incidentstatus_label,
+        incident_status_id,
         incidentresolutiontype_label,
         $date,
         $timeupdate,
@@ -212,7 +210,6 @@ function run_query_incident_detail($id) {
         LEFT JOIN UserObm u1 on incident_logger=u1.userobm_id
         LEFT JOIN UserObm u2 on incident_owner=u2.userobm_id
         LEFT JOIN IncidentPriority on incident_priority_id=incidentpriority_id
-        LEFT JOIN IncidentStatus on incident_status_id=incidentstatus_id
         LEFT JOIN IncidentResolutionType on incident_resolutiontype_id=incidentresolutiontype_id
         LEFT JOIN UserObm as c on incident_usercreate=c.userobm_id
         LEFT JOIN UserObm as u on incident_userupdate=u.userobm_id
@@ -385,6 +382,32 @@ function run_query_incident_id($incident) {
   }
 
   return $id;
+}
+
+/**
+ * get_incident_status 
+ * 
+ * @param string $target 
+ * @access public
+ * @return void
+ */
+function get_incident_status($target='') {
+  global $cdg_sql, $cinc_status;
+
+  $sta = array();
+
+  if ($target != '') {
+    $status_target[$target] = $cinc_status[$target];
+  } else {
+    $status_target = $cinc_status;
+  }
+
+  foreach ($status_target as $status => $s_id) {
+    $s_label = $GLOBALS["l_incidentstatus_$status"];
+    $sta[$s_id] = $s_label;
+  }
+
+  return $sta;
 }
 
 
@@ -571,11 +594,10 @@ function get_incident_info($id) {
   $query = "SELECT
       incident_id,
       incident_label,
-      incidentstatus_label,
+      incident_status_id,
       contract_label,
       company_name
     FROM Incident
-      LEFT JOIN IncidentStatus on incident_status_id=incidentstatus_id
       LEFT JOIN Contract on incident_contract_id=contract_id
       LEFT JOIN Company on contract_company_id=company_id
     WHERE incident_id='$id' $multidomain";
@@ -587,7 +609,8 @@ function get_incident_info($id) {
   
   $res["incident_id"] = $obm_q->f("incident_id");
   $res["label"] = $obm_q->f("incident_label");
-  $res["status"] = $obm_q->f("incidentstatus_label");
+  $status = get_incident_status();
+  $res["status"] = $status[$obm_q->f("incident_status_id")];
   $res["contract"] = $obm_q->f("contract_label");
   $res["company"] = $obm_q->f("company_name");
 

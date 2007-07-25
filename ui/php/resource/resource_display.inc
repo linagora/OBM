@@ -507,7 +507,7 @@ function dis_resource_display_pref($prefs) {
  * @return void
  */
 function json_search_resources($resource,$results) {
-  global $display, $l_qty, $l_ritem;
+  global $display, $l_qty, $l_ritem,$path;
 
   $res_q = $results['datas'];
 

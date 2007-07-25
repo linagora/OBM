@@ -559,6 +559,13 @@ $cinv_status['conflict'] = 5;
 $cinv_status['cancelled'] = 6;
 $cinv_status['loss'] = 7;
 
+// Incident status
+$cinc_status['open'] = 0;
+$cinc_status['call'] = 1;
+$cinc_status['waitforcall'] = 2;
+$cinc_status['paused'] = 3;
+$cinc_status['closed'] = 4;
+
 // Perms XXXXX Deprecated : to be removed
 $perms_user = 'user';
 $perms_editor = 'editor';

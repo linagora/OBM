@@ -58,3 +58,10 @@ $l_fill_contract = "You have to assigned a Contract before submitting.";
 $l_j_select_contract = "You have to select a contract !";
 $l_delete_confirm = "Really delete the Incident ?";
 $l_date_after_js = "Date After";
+
+// Incident
+$l_incidentstatus_open = "Open";
+$l_incidentstatus_call = "Call";
+$l_incidentstatus_waitforcall = "Wait for call";
+$l_incidentstatus_paused = "Paused";
+$l_incidentstatus_closed = "Closed";

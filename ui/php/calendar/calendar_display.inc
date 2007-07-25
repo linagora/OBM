@@ -935,8 +935,8 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
   global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
   global $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
   global $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
-  global $l_date, $l_resources, $l_items, $l_event, $ico_search;
-  global $l_expand_all, $l_collapse_all;
+  global $l_date, $l_resources, $l_items, $l_event, $ico_search,$ccalendar_first_hour;
+  global $l_expand_all, $l_collapse_all,$ccalendar_last_hour,$ccalendar_weekstart;
 
   $sel_user = $calendar_entity["user"];
   $sel_user_id = array();
@@ -963,11 +963,6 @@ function dis_calendar_list_planning($calendar, $calendar_entity, $writable_entit
   $iso_date = $calendar["date"];
   $category_filter = $calendar["category_filter"];
   $ts_date = strtotime($iso_date);
-
-  $this_month = of_date_get_month($ts_date);
-  $this_year = of_date_get_year($ts_date);
-  $start_month = strtotime("$this_year-$this_month-01");
-  $end_month = strtotime("+1 month", $start_month);
 
   $start_week_day = get_calendar_date_day_of_week($ts_date, $ccalendar_weekstart);
   $end_week_time = $start_week_day + ((6 * 24 + $ccalendar_last_hour) * 3600);

@@ -88,6 +88,8 @@ ALTER TABLE CalendarEvent ADD COLUMN calendarevent_ext_id varchar(32);
 ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_ext_id DEFAULT '';
 -- Add extension column
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_properties text;
+-- Add color column
+ALTER TABLE CalendarEvent ADD COLUMN calendarevent_color char(6);
 
 
 --
@@ -328,11 +330,33 @@ INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentk
 --
 -- Move Invoice status id
 --
-UPDATE Invoice set invoice_status_id = 0 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='To create');
-UPDATE Invoice set invoice_status_id = 1 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Sent');
-UPDATE Invoice set invoice_status_id = 3 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Partially paid');
-UPDATE Invoice set invoice_status_id = 4 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Paid');
-UPDATE Invoice set invoice_status_id = 5 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Conflict');
-UPDATE Invoice set invoice_status_id = 6 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Cancelled');
-UPDATE Invoice set invoice_status_id = 7 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Loss');
-UPDATE Invoice set invoice_status_id = 1 WHERE invoice_status_id IN (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Received');
+UPDATE Invoice set invoice_status_id = 0 WHERE invoice_status_id IN 
+(SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='To create' OR invoicestatus_label='A créer');
+UPDATE Invoice set invoice_status_id = 1 WHERE invoice_status_id IN 
+(SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Sent' OR invoicestatus_label='Envoyée');
+UPDATE Invoice set invoice_status_id = 3 WHERE invoice_status_id IN 
+(SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Partially paid' OR invoicestatus_label='Payée partiellement');
+UPDATE Invoice set invoice_status_id = 4 WHERE invoice_status_id IN 
+(SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Paid' OR invoicestatus_label='Payée');
+UPDATE Invoice set invoice_status_id = 5 WHERE invoice_status_id IN 
+(SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Conflict' OR invoicestatus_label='Litige');
+UPDATE Invoice set invoice_status_id = 6 WHERE invoice_status_id IN 
+(SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Cancelled' OR invoicestatus_label='Annulée');
+UPDATE Invoice set invoice_status_id = 7 WHERE invoice_status_id IN 
+(SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Loss' OR invoicestatus_label='Pertes et profits');
+UPDATE Invoice set invoice_status_id = 1 WHERE invoice_status_id IN 
+(SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Received' OR invoicestatus_label='Reçue');
+--
+-- Move Incident status id
+--
+
+UPDATE Incident set incident_status_id = 0 WHERE incident_status_id IN 
+(SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Open' OR incidentstatus_label='Ouvert');
+UPDATE Incident set incident_status_id = 1 WHERE incident_status_id IN 
+(SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Call' OR incidentstatus_label='Appel');
+UPDATE Incident set incident_status_id = 2 WHERE incident_status_id IN 
+(SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Wait for call' OR incidentstatus_label='Attente Appel');
+UPDATE Incident set incident_status_id = 3 WHERE incident_status_id IN 
+(SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Paused' OR incidentstatus_label='En Pause');
+UPDATE Incident set incident_status_id = 4 WHERE incident_status_id IN 
+(SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Closed' OR incidentstatus_label='Cloturé');

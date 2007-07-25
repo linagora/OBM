@@ -700,7 +700,7 @@ function dis_invoice_detail($inv_q) {
   $expiration_date = of_date_format($inv_q->f("expiration_date"), 1);
   $payment_date = of_date_format($inv_q->f("payment_date"), 1);
   $status_id = $inv_q->f("invoice_status_id");
-  $status = get_invoice_status($status_id);
+  $status = get_invoice_status();
   $status_label = $status[$status_id];
   $inout = ($inv_q->f("invoice_inout") == '-') ? $l_supplier : $l_client;
   $credit_memo = ($inv_q->f("invoice_credit_memo") == '0') ? $l_invoice : $l_credit_memo;

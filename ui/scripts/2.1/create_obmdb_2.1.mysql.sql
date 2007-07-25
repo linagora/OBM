@@ -670,7 +670,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_endrepeat        timestamp(14) NOT NULL,
   calendarevent_description      text,
   calendarevent_properties       text,
-  calendarevent_item             text,
+  calendarevent_color            char(6),
   PRIMARY KEY (calendarevent_id)
 );
 
@@ -1292,20 +1292,6 @@ CREATE TABLE Invoice (
   invoice_archive           char(1) NOT NULL DEFAULT '0',
   invoice_comment           text,
   PRIMARY KEY (invoice_id)
-);
-
-
---
--- New table 'InvoiceStatus'
---
-CREATE TABLE InvoiceStatus (
-  invoicestatus_id         int(8) auto_increment,
-  invoicestatus_domain_id  int(8) default 0,
-  invoicestatus_payment    int(1) DEFAULT 0 NOT NULL,
-  invoicestatus_created    int(1) DEFAULT 0 NOT NULL,
-  invoicestatus_archive    int(1) DEFAULT 0 NOT NULL,
-  invoicestatus_label      varchar(24) default '' NOT NULL,
-  PRIMARY KEY (invoicestatus_id)
 );
 
 

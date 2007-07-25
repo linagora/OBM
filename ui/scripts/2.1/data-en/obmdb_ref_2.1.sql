@@ -158,19 +158,6 @@ VALUES (1, 'CSV File','csv','text/c-xsv');
 
 
 --
--- dump for table  InvoiceStatus :
---
-INSERT INTO InvoiceStatus (invoicestatus_domain_id, invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES (1, '0', '0', '0', 'To create');
-INSERT INTO InvoiceStatus (invoicestatus_domain_id, invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES (1, '1', '1', '0', 'Sent');
-INSERT INTO InvoiceStatus (invoicestatus_domain_id, invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES (1, '1', '1', '0', 'Partially paid');
-INSERT INTO InvoiceStatus (invoicestatus_domain_id, invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES (1, '1', '1', '0', 'Conflict');
-INSERT INTO InvoiceStatus (invoicestatus_domain_id, invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES (1, '1', '1', '1', 'Paid');
-INSERT INTO InvoiceStatus (invoicestatus_domain_id, invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES (1, '0', '1', '1', 'Cancelled');
-INSERT INTO InvoiceStatus (invoicestatus_domain_id, invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES (1, '0', '1', '1', 'Loss');
-INSERT INTO InvoiceStatus (invoicestatus_domain_id, invoicestatus_payment, invoicestatus_created, invoicestatus_archive, invoicestatus_label) VALUES (1, '1', '1', '0', 'Received');
-
- 
---
 -- dump for table  PaymentKind :
 --
 INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1,'Ch', 'Cheque');

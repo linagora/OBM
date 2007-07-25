@@ -669,7 +669,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_endrepeat    timestamp NOT NULL,
   calendarevent_description  text,
   calendarevent_properties   text,
-  calendarevent_item         text,
+  calendarevent_color        char(6),
   PRIMARY KEY (calendarevent_id)
 );
 
@@ -1299,20 +1299,6 @@ CREATE TABLE Invoice (
 
 
 --
--- New table 'InvoiceStatus'
---
-CREATE TABLE InvoiceStatus (
-  invoicestatus_id         serial,
-  invoicestatus_domain_id  integer default 0,
-  invoicestatus_payment    integer default 0 not null,
-  invoicestatus_created    integer default 0 not null,
-  invoicestatus_archive    integer default 0 not null,
-  invoicestatus_label      varchar(24) default '' not null,
-  PRIMARY KEY (invoicestatus_id)
-);
-
-
---
 -- New table 'Payment'
 --
 CREATE TABLE Payment (
@@ -1615,11 +1601,11 @@ CREATE TABLE ResourceGroup (
 -- Table structure for the table 'ResourceType'
 --
 CREATE TABLE ResourceType (
-  resourcetype_id				  serial,
+  resourcetype_id		serial,
   resourcetype_domain_id	integer DEFAULT 0,	
-  resourcetype_label			varchar(32) NOT NULL,
+  resourcetype_label		varchar(32) NOT NULL,
   resourcetype_property		varchar(32),
-  resourcetype_pkind				int(1) DEFAULT 0 NOT NULL,
+  resourcetype_pkind		integer DEFAULT 0 NOT NULL,
   PRIMARY KEY (resourcetype_id)
 );
 
@@ -1627,11 +1613,11 @@ CREATE TABLE ResourceType (
 -- Table structure for the table 'ResourceItem'
 --
 CREATE TABLE ResourceItem (
-  resourceitem_id								serial,
-  resourceitem_domain_id				integer DEFAULT 0,
-  resourceitem_label						varchar(32) NOT NULL,
+  resourceitem_id		serial,
+  resourceitem_domain_id	integer DEFAULT 0,
+  resourceitem_label		varchar(32) NOT NULL,
   resourceitem_resourcetype_id	integer NOT NULL,
-  resourceitem_description			text,
+  resourceitem_description	text,
   PRIMARY KEY (resourceitem_id)
 );
 

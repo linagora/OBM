@@ -59,3 +59,10 @@ $l_fill_contract = "Vous devez sélectionner un contrat avant de valider.";
 $l_j_select_contract = "Vous devez sélectionner un Contrat!";
 $l_delete_confirm = "Confirmer la suppression de l'Incident ?";
 $l_date_after_js = "Date Après";
+
+// Incident
+$l_incidentstatus_open = "Ouvert";
+$l_incidentstatus_call = "Appel";
+$l_incidentstatus_waitforcall = "Attente Appel";
+$l_incidentstatus_paused = "En Pause";
+$l_incidentstatus_closed = "Cloturé";
