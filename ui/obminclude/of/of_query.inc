@@ -1831,8 +1831,7 @@ function get_all_users_id_from_group($g_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file="") {
   global $cgp_mail_enabled;
-  global $aliasuite_enabled; 
-  global $obm_version; 
+  global $obm_version, $cgp_use; 
 
   $message = stripslashes($message);
   if (! $cgp_mail_enabled) {
@@ -1847,10 +1846,6 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   $reci_q = run_query_get_recipients($recipients, $force);
 
   // If AliaSuite, get local main mail domain.
-  if ($aliasuite_enabled) {
-    $domain_q = run_query_get_domain();
-    $local_domain = $domain_q->f("mail_value");
-  }
 
   // Construct recipient list
   if (is_object($reci_q)) {
@@ -1858,8 +1853,8 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
       $reci = $reci_q->f("userobm_email");
     
       // If AliaSuite, construct recipient address.
-      if ($aliasuite_enabled) {
-	$reci = strtok($reci, "\r\n")."@".$local_domain;
+      if ($cgp_use["service"]["mail"]) {
+	$reci = strtok($reci, "\r\n")."@".$reci_q->f("domain_name");
       }
     
       if ($reci_list == "") {
@@ -1886,8 +1881,8 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
 
   $headers .= "From: ";
   // If AliaSuite, construct sender address.
-  if( $aliasuite_enabled ) {
-    $headers .= strtok($send_q->f("userobm_email"), "\r\n")."@"."$local_domain\n";
+  if($cgp_use["service"]["mail"]) {
+    $headers .= strtok($send_q->f("userobm_email"), "\r\n")."@".$send_q->f("domain_name")."\n";
   } else {
     $headers .= $send_q->f("userobm_email")."\n";
   }
@@ -1997,8 +1992,11 @@ function run_query_get_recipients($recipients, $force) {
     return false;
   }
 
-  $query = "SELECT userobm_email, userobm_lastname, userobm_firstname
-    FROM UserObm $join
+  $query = "SELECT 
+    userobm_email, userobm_lastname, userobm_firstname, domaine_name
+    FROM UserObm 
+    LEFT JOIN Domain on userobm_domain_id = domain_id
+    $join
     WHERE $user_in
       userobm_email != ''
       $mail_filter";
@@ -2053,8 +2051,10 @@ function run_query_get_sender() {
   global $obm, $cdg_sql;
 
   $uid = $obm["uid"];
-  $query = "SELECT userobm_email, userobm_lastname, userobm_firstname
+  $query = "SELECT 
+    userobm_email, userobm_lastname, userobm_firstname, domain_name
     FROM UserObm
+    LEFT JOIN Domain ON userobm_domain_id = domain_id
     WHERE userobm_id = '$uid'";
 
   display_debug_msg($query, $cdg_sql, "run_query_get_sender()");
@@ -2062,24 +2062,6 @@ function run_query_get_sender() {
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get domain name (aliasuite mode)
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_domain() {
-  global $cdg_sql;
-
-  $query = "SELECT mail_value
-    FROM Mail
-    WHERE mail_name = 'main_domain'";
-
-  display_debug_msg($query, $cdg_sql, "run_query_get_domain()");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
   return $obm_q;
 }
 
