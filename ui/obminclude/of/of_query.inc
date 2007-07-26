@@ -1950,7 +1950,6 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   } else {
     $msg = $message; 
   }
-
   if ($reci_list != "") {
     // as we don't have a mean to encode the subject, we drop its accents
     $subject = format_name($subject, 0, true);
@@ -1993,7 +1992,7 @@ function run_query_get_recipients($recipients, $force) {
   }
 
   $query = "SELECT 
-    userobm_email, userobm_lastname, userobm_firstname, domaine_name
+    userobm_email, userobm_lastname, userobm_firstname, domain_name
     FROM UserObm 
     LEFT JOIN Domain on userobm_domain_id = domain_id
     $join
