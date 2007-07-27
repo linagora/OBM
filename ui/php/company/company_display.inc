@@ -468,7 +468,7 @@ function html_company_links($co_q) {
     $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;company_id=$id&amp;tf_company=$uname");
     $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;company_id=$id&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email");
     $block_contact = "
-<div  class=\"portlet\" id=\"companyContact\">
+<div class=\"portlet\" id=\"companyContact\">
   <h1>$l_module_contact</h1>
   <ul>
   <li><a href=\"$url_con_list\"><img src=\"$ico_contact\" /></a>
@@ -485,7 +485,7 @@ function html_company_links($co_q) {
     $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname&amp;cba_archive=1");
     $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
     $block_deal = "
-<div  class=\"portlet\" id=\"companyDeal\">
+<div class=\"portlet\" id=\"companyDeal\">
 <h1>$l_module_deal</h1>
 <ul>
   <li><a href=\"$url_deal_list\"><img src=\"$ico_deal\" /></a>
@@ -504,7 +504,7 @@ function html_company_links($co_q) {
     $url_lead_list = url_prepare("$path/lead/lead_index.php?action=search&amp;company_id=$id&amp;tf_company=$uname");
     $url_lead_new = url_prepare("$path/lead/lead_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
     $block_lead = "
-<div  class=\"portlet\" id=\"companyLead\">
+<div class=\"portlet\" id=\"companyLead\">
 <h1>$l_module_lead</h1>
 <ul>
   <li><a href=\"$url_lead_list\"><img src=\"$ico_lead\" /></a>
@@ -522,7 +522,7 @@ function html_company_links($co_q) {
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$id&amp;ext_target=$l_company";
     $nb_document = run_query_global_document_nb ($id, "company");
     $block_doc = "
-<div  class=\"portlet\" id=\"companyDocument\">
+<div class=\"portlet\" id=\"companyDocument\">
 <h1>$l_module_document</h1>
 <ul>
   <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
@@ -546,7 +546,7 @@ function html_company_links($co_q) {
     $nb_pro_total = get_global_linked_project_nb ($id, "company", 1);
     $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
     $block_project = "
-<div  class=\"portlet\" id=\"companyProject\">
+<div class=\"portlet\" id=\"companyProject\">
 <h1>$l_module_project</h1>
 <ul>
   <li><a href=\"$url_pro\"><img src=\"$ico_project\" /></a>
@@ -567,7 +567,7 @@ function html_company_links($co_q) {
     $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
     
     $block_contract = "
-<div  class=\"portlet\" id=\"companyContract\">
+<div class=\"portlet\" id=\"companyContract\">
 <h1>$l_module_contract</h1>
 <ul>
   <li><a href=\"$url_ctra\"><img src=\"$ico_contract\" /></a>
@@ -605,7 +605,7 @@ function html_company_links($co_q) {
     $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;company_id=$id&amp;company_name=$uname");
     $nb_pay = get_global_linked_payment_nb($id, "company");
     $block_payment = "
-<div  class=\"portlet\" id=\"companyPayment\">
+<div class=\"portlet\" id=\"companyPayment\">
 <h1>$l_module_payment</h1>
 <ul>
   <li><a href=\"$url_inv\"><img src=\"$ico_payment\" alt=\"\" /></a>
@@ -743,7 +743,7 @@ function html_company_consult($co_q) {
   if ($show_siret) {
     $block_siret = "
   <tr>
-    <th>$l_siret  :</th>
+    <th>$l_siret :</th>
     <td>$siret</td>
   </tr>";
   }

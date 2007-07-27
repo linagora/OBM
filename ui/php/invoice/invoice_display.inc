@@ -11,25 +11,25 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["invoice_archive"] = $l_archive;
-$fieldnames["invoice_number"] = $l_number;
-$fieldnames["invoice_credit_memo"] = $l_credit_memo;
-$fieldnames["invoice_company"] = $l_company;
-$fieldnames["invoice_deal"] = $l_deal;
-$fieldnames["invoice_project"] = $l_project;
-$fieldnames["invoice_label"] = $l_label;
-$fieldnames["invoice_amount_ht"] = $l_amount_ht;
-$fieldnames["invoice_amount_ttc"] = $l_amount_ttc;
-$fieldnames["invoice_status"] = $l_status;
-$fieldnames["invoice_inout"] = $l_inout;
-$fieldnames["invoice_date"] = $l_date;
-$fieldnames["invoice_expiration_date"] = $l_expiration_date;
-$fieldnames["invoice_payment_date"] = $l_payment_date;
-$fieldnames["invoice_paid"] = $l_paid;
-$fieldnames["payment_label"] = $l_label;
-$fieldnames["payment_number"] = $l_number;
-$fieldnames["payment_date"] = $l_date;
-$fieldnames["payment_amount"] = $l_amount;
+$fieldnames['invoice_archive'] = $l_archive;
+$fieldnames['invoice_number'] = $l_number;
+$fieldnames['invoice_credit_memo'] = $l_credit_memo;
+$fieldnames['invoice_company'] = $l_company;
+$fieldnames['invoice_deal'] = $l_deal;
+$fieldnames['invoice_project'] = $l_project;
+$fieldnames['invoice_label'] = $l_label;
+$fieldnames['invoice_amount_ht'] = $l_amount_ht;
+$fieldnames['invoice_amount_ttc'] = $l_amount_ttc;
+$fieldnames['invoice_status'] = $l_status;
+$fieldnames['invoice_inout'] = $l_inout;
+$fieldnames['invoice_date'] = $l_date;
+$fieldnames['invoice_expiration_date'] = $l_expiration_date;
+$fieldnames['invoice_payment_date'] = $l_payment_date;
+$fieldnames['invoice_paid'] = $l_paid;
+$fieldnames['payment_label'] = $l_label;
+$fieldnames['payment_number'] = $l_number;
+$fieldnames['payment_date'] = $l_date;
+$fieldnames['payment_amount'] = $l_amount;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Invoice specific dataset fields
@@ -44,102 +44,102 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
   global $path, $col_frs, $col_client, $l_supplier, $l_client;
   global $params;
 
-  if ($fieldname == "invoice_deal") {
-    $res["url"] = "$path/deal/deal_index.php?action=detailconsult&amp;deal_id=".$OD->data_set->f("deal_id");
+  if ($fieldname == 'invoice_deal') {
+    $res['url'] = "$path/deal/deal_index.php?action=detailconsult&amp;deal_id=".$OD->data_set->f('deal_id');
   }
 
-  elseif ($fieldname == "invoice_project") {
-    $res["url"] = "$path/project/project_index.php?action=detailconsult&amp;project_id=".$OD->data_set->f("project_id");
+  elseif ($fieldname == 'invoice_project') {
+    $res['url'] = "$path/project/project_index.php?action=detailconsult&amp;project_id=".$OD->data_set->f('project_id');
   }
 
-  elseif (($fieldname == "invoice_label")) {
-    if ($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("invoice_id").",'".addslashes($OD->data_set->f("invoice_label"))."');";
-    } else if ($OD->display_ext == "get_id_url") {
-      $ext_url = $params["ext_url"];
-      $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("invoice_id").");";
+  elseif (($fieldname == 'invoice_label')) {
+    if ($OD->display_ext == 'get_id') {
+      $res['url'] = "javascript:check_get_id(".$OD->data_set->f('invoice_id').",'".addslashes($OD->data_set->f('invoice_label'))."');";
+    } else if ($OD->display_ext == 'get_id_url') {
+      $ext_url = $params['ext_url'];
+      $res['url'] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f('invoice_id').");";
     } elseif($link_ok) {
-      $res["url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=".$OD->data_set->f("invoice_id");
+      $res['url'] = "$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=".$OD->data_set->f('invoice_id');
     }    
   }
 
-  elseif ($fieldname == "invoice_company") {
-    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f("company_id");
+  elseif ($fieldname == 'invoice_company') {
+    $res['url'] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f('company_id');
   }
 
-  elseif ($fieldname == "invoice_inout") {
+  elseif ($fieldname == 'invoice_inout') {
     if ($OD->data_set->f($fieldname) == '+') {
-      $res["name"] = $l_client;
+      $res['name'] = $l_client;
     } else {
-      $res["name"] = $l_supplier;
+      $res['name'] = $l_supplier;
     }
   }
   
-  elseif ($fieldname == "invoice_pay_label") {
-    $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=".$OD->data_set->f("invoice_payment_id");
+  elseif ($fieldname == 'invoice_pay_label') {
+    $res['url'] = "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=".$OD->data_set->f('invoice_payment_id');
   }
 
-  else if ($fieldname == "invoice_credit_memo") {
-    $res["align"] = "center";
+  else if ($fieldname == 'invoice_credit_memo') {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
-  else if ($fieldname == "invoice_status") {
-    $res["align"] = "center";
+  else if ($fieldname == 'invoice_status') {
+    $res['align'] = 'center';
     $s_id = $OD->data_set->f('invoice_status_id');
     echo "s=$s_id";
     $sta = get_invoice_status($s_id);
-    $res["name"] = $sta[$s_id];
+    $res['name'] = $sta[$s_id];
   }
 
-  else if ($fieldname == "invoice_archive") {
-    $res["align"] = "center";
+  else if ($fieldname == 'invoice_archive') {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
   // amount column color 
-  elseif (($fieldname == "invoice_amount_ht") 
-	  || ($fieldname == "invoice_amount_ttc")
-	  || ($fieldname == "invoice_paid")) {
+  elseif (($fieldname == 'invoice_amount_ht') 
+	  || ($fieldname == 'invoice_amount_ttc')
+	  || ($fieldname == 'invoice_paid')) {
     $amount = $OD->data_set->f($fieldname);
-    if ($OD->data_set->f("invoice_inout") == '+') {
+    if ($OD->data_set->f('invoice_inout') == '+') {
       $couleur = $col_client;
     } else {
       $couleur = $col_frs;
     }
-    $res["name"] = "$amount";
+    $res['name'] = "$amount";
   }
 
-  else if ($fieldname == "invoice_date") {
-    $res["name"] = of_date_format($OD->data_set->f($fieldname), 1);
+  else if ($fieldname == 'invoice_date') {
+    $res['name'] = of_date_format($OD->data_set->f($fieldname), 1);
   }
 
-  else if ($fieldname == "invoice_expiration_date") {
-    $res["name"] = of_date_format($OD->data_set->f($fieldname), 1);
+  else if ($fieldname == 'invoice_expiration_date') {
+    $res['name'] = of_date_format($OD->data_set->f($fieldname), 1);
   }
 
-  else if ($fieldname == "invoice_payment_date") {
+  else if ($fieldname == 'invoice_payment_date') {
     $date = of_date_format($OD->data_set->f($fieldname), 1);
-    $res["name"] = $date;
+    $res['name'] = $date;
   }
 
-  else if ($fieldname == "payment_amount") {
-    $amount = $OD->data_set->f("payment_amount");
-    $pi_amount = $OD->data_set->f("paymentinvoice_amount");
+  else if ($fieldname == 'payment_amount') {
+    $amount = $OD->data_set->f('payment_amount');
+    $pi_amount = $OD->data_set->f('paymentinvoice_amount');
     if ($amount == $pi_amount) {
-      $res["name"] = $amount;
+      $res['name'] = $amount;
     } else { 
-      $res["name"] = "$pi_amount ($amount)";
+      $res['name'] = "$pi_amount ($amount)";
     }
   }
 
@@ -152,13 +152,13 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 // Parameters:
 //   - $invoice[] : hash with invoice values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_invoice_search_form($invoice="") {
+function dis_invoice_search_form($invoice='') {
   global $ctt_sales;
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
-  $tt_ids = $invoice["tasktype"];
-  if (! is_array($tt_ids) && ($tt_ids == "")) {
-    $tt_ids = "0";
+  $tt_ids = $invoice['tasktype'];
+  if (! is_array($tt_ids) && ($tt_ids == '')) {
+    $tt_ids = '0';
   }
 
   $sta = get_invoice_status();
@@ -184,24 +184,24 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   global $l_find, $l_both, $l_client, $l_supplier, $l_expiration, $l_payment;
   global $l_module_invoice;
 
-  $label = $invoice["label"];
-  $number = $invoice["number"];
-  $ht = $invoice["amount_ht"];
-  $ttc = $invoice["amount_ttc"];
-  $status = $invoice["status"];
-  $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
-  $date_after = of_date_upd_format($invoice["date_after"], true);
-  $date_before = of_date_upd_format($invoice["date_before"], true);
-  $credit_memo = $invoice["credit_memo"];
-  $inout = $invoice["inout"];
-  $tt = $invoice["tt"];
-  $deal_id = $invoice["deal_id"];
-  $company = $invoice["company"];
-  $comp_id = $invoice["company_id"];
-  $project_new_id = $invoice["project_id"];
-  $archive = ($invoice["archive"]) ? "checked" : "" ;
+  $label = $invoice['label'];
+  $number = $invoice['number'];
+  $ht = $invoice['amount_ht'];
+  $ttc = $invoice['amount_ttc'];
+  $status = $invoice['status'];
+  $date_field = ($invoice['date_field'] ? $invoice['date_field'] : 'date');
+  $date_after = of_date_upd_format($invoice['date_after'], true);
+  $date_before = of_date_upd_format($invoice['date_before'], true);
+  $credit_memo = $invoice['credit_memo'];
+  $inout = $invoice['inout'];
+  $tt = $invoice['tt'];
+  $deal_id = $invoice['deal_id'];
+  $company = $invoice['company'];
+  $comp_id = $invoice['company_id'];
+  $project_new_id = $invoice['project_id'];
+  $archive = ($invoice['archive']) ? 'checked' : '' ;
 
-  $url_form = url_prepare("invoice_index.php");
+  $url_form = url_prepare('invoice_index.php');
   $sel_status_all = ($status == $c_all ? " selected = \"selected\"" : '');
   $sel_status = "<select name=\"sel_status\">
       <option value=\"$c_all\"$sel_status_all>$l_all</option>";
@@ -214,18 +214,18 @@ function html_invoice_search_form($invoice, $sta, $tts) {
       $sel_status .= ">$s_label</option>";
     }
   }
-  $sel_status .= "</select>";
+  $sel_status .= '</select>';
 
-  //     $block_status = of_select_dis_search_select($sta, "status", $url_tt);
+  //     $block_status = of_select_dis_search_select($sta, 'status', $url_tt);
 
-  if (($inout == "$c_all") || ($inout == "")) {
-    $rb_both = "checked";
+  if (($inout == "$c_all") || ($inout == '')) {
+    $rb_both = 'checked';
   }
-  if ($inout == "+") {
-    $rb_client = " checked ";
+  if ($inout == '+') {
+    $rb_client = ' checked ';
   }
-  if ($inout == "-") {
-    $rb_four = " checked ";
+  if ($inout == '-') {
+    $rb_four = ' checked ';
   }
 
   if (($credit_memo == "$c_all") || ($credit_memo == '')) {
@@ -239,22 +239,22 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   }
 
   $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
-  $block_tt = of_select_dis_search_select($tts, "tt", $url_tt);
+  $block_tt = of_select_dis_search_select($tts, 'tt', $url_tt);
 
   if ($popup) {
-    $ext_action = $invoice["ext_action"];
-    $ext_type = $invoice["ext_type"];
-    $ext_url = $invoice["ext_url"];
-    $ext_id = $invoice["ext_id"];
-    $ext_title = ($invoice["ext_title"] ? $invoice["ext_title"] : $l_select_invoice);
-    $ext_target = $invoice["ext_target"];
+    $ext_action = $invoice['ext_action'];
+    $ext_type = $invoice['ext_type'];
+    $ext_url = $invoice['ext_url'];
+    $ext_id = $invoice['ext_id'];
+    $ext_title = ($invoice['ext_title'] ? $invoice['ext_title'] : $l_select_invoice);
+    $ext_target = $invoice['ext_target'];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_type\" type=\"hidden\" value=\"$ext_type\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display['title'] = "<div class=\"title\">$ext_title</div>";
   }
 
   // Selected date field
@@ -360,13 +360,13 @@ function html_invoice_search_form($invoice, $sta, $tts) {
 function dis_invoice_search_list($invoice) {
   global $obm, $display, $l_found, $l_no_found;
 
-  $prefs = get_display_pref($obm["uid"], "invoice");
+  $prefs = get_display_pref($obm['uid'], 'invoice');
   $inv_q = run_query_invoice_search($invoice);
   $nb_inv = $inv_q->num_rows_total();
   if ($nb_inv == 0) {
-    $display["msg"] = display_warn_msg($l_no_found);
+    $display['msg'] = display_warn_msg($l_no_found);
   } else {
-    $display["msg"] .= display_info_msg("$nb_inv $l_found");
+    $display['msg'] .= display_info_msg("$nb_inv $l_found");
     $block = html_invoice_search_list($inv_q, $prefs, $invoice);
   }
 
@@ -394,11 +394,11 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
   }
 
-  $label = urlencode($invoice["label"]);
-  $number = urlencode($invoice["number"]);
-  $ht = urlencode($invoice["amount_ht"]);
-  $ttc = urlencode($invoice["amount_ttc"]);
-  $status = $invoice["status"];
+  $label = urlencode($invoice['label']);
+  $number = urlencode($invoice['number']);
+  $ht = urlencode($invoice['amount_ht']);
+  $ttc = urlencode($invoice['amount_ttc']);
+  $status = $invoice['status'];
   if (is_array($status) && (count($status) > 0)) {
     foreach ($status as $s_id) {
       $param_status .= "&amp;sel_status[]=$s_id";
@@ -406,16 +406,16 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
   } else if ($status != '') {
     $param_status .= "&amp;sel_status=$status";
   }
-  $date_field = ($invoice["date_field"] ? $invoice["date_field"] : "date");
-  $date_after = of_date_upd_format($invoice["date_after"], true);
-  $date_before = of_date_upd_format($invoice["date_before"], true);
-  $inout = $invoice["inout"];
+  $date_field = ($invoice['date_field'] ? $invoice['date_field'] : 'date');
+  $date_after = of_date_upd_format($invoice['date_after'], true);
+  $date_before = of_date_upd_format($invoice['date_before'], true);
+  $inout = $invoice['inout'];
   $credit_memo = $invoice['credit_memo'];
-  $company = urlencode($invoice["company"]);
-  $archive = $invoice["archive"];
-  $deal_id = $invoice["deal_id"];
-  $comp_id = $invoice["company_id"];
-  $project_new_id = $invoice["project_id"];
+  $company = urlencode($invoice['company']);
+  $archive = $invoice['archive'];
+  $deal_id = $invoice['deal_id'];
+  $comp_id = $invoice['company_id'];
+  $project_new_id = $invoice['project_id'];
 
   $url = url_prepare("invoice_index.php?action=search".
 		    "&amp;tf_label=$label".
@@ -435,13 +435,13 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 		    "&amp;cba_archive=$archive".
                     "$url_ext"); 
 
-  $dis_invoice = new OBM_DISPLAY ("DATA", $prefs, "invoice");
+  $dis_invoice = new OBM_DISPLAY ('DATA', $prefs, 'invoice');
   if ($popup) {
     $dis_invoice->display_link = false;
-    if ($invoice["ext_type"] == "multi") {
-      $dis_invoice->data_cb_text = "X";
-      $dis_invoice->data_idfield = "invoice_id";
-      $dis_invoice->data_cb_name = "cb_inv-";
+    if ($invoice['ext_type'] == 'multi') {
+      $dis_invoice->data_cb_text = 'X';
+      $dis_invoice->data_idfield = 'invoice_id';
+      $dis_invoice->data_cb_name = 'cb_inv-';
       $dis_invoice->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
       $dis_invoice->data_form_end = "
@@ -460,10 +460,10 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
       </p>";
     } else {
 
-      if ($ext_url != "") {
-	$dis_invoice->display_ext = "get_id_url";
-      } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
-	$dis_invoice->display_ext = "get_id";
+      if ($ext_url != '') {
+	$dis_invoice->display_ext = 'get_id_url';
+      } else if ( ($ext_widget != '') && ($ext_widget_text != '') ) { 
+	$dis_invoice->display_ext = 'get_id';
       }
       $display_popup_end = "
       <p>
@@ -473,9 +473,9 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
   }
 
   $dis_invoice->data_set = $inv_q;
-  $dis_invoice->data_header = "top";
+  $dis_invoice->data_header = 'top';
   $dis_invoice->data_url = $url;
-  $block .= $dis_invoice->display("dis_data_invoice");
+  $block .= $dis_invoice->display('dis_data_invoice');
   $block .= $display_popup_end;  
 
   return $block;
@@ -490,18 +490,18 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 function dis_invoice_consult($invoice) {
   global $obm, $display, $l_no_found, $l_err_reference;
 
-  $id = $invoice["invoice_id"];
-  $uid = $obm["uid"];
+  $id = $invoice['invoice_id'];
+  $uid = $obm['uid'];
   if ($id > 0) {
     $inv_q = run_query_invoice_detail($id);
     if ($inv_q->num_rows() != 1) {
-      $display["msg"] .= display_err_msg($l_err_reference);
+      $display['msg'] .= display_err_msg($l_err_reference);
     }
     $pays = get_invoice_payment($id);
-    $display["detailInfo"] = display_record_info($inv_q);
+    $display['detailInfo'] = display_record_info($inv_q);
     $block = html_invoice_consult($inv_q, $pays);
   } else {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_err_msg($l_err_reference);
   }
 
   return $block;
@@ -521,7 +521,7 @@ function html_invoice_consult($inv_q, $pays) {
   global $l_credit_memo, $l_amount_remaining;
 
   $i_id = $inv_q->f('invoice_id');
-  $amount_ttc = $inv_q->f("invoice_amount_ttc");
+  $amount_ttc = $inv_q->f('invoice_amount_ttc');
   $amount_remaining = $amount_ttc;
 
   $block = dis_invoice_detail ($inv_q);
@@ -544,17 +544,17 @@ function html_invoice_consult($inv_q, $pays) {
     $k = 0;
     $affected_amount_total = 0;
     foreach ($pays as $one_pay) {
-      $id = $one_pay["id"];
-      $affected_amount = $one_pay["affected_amount"];
-      $amount = $one_pay["amount"];
-      $inout = $one_pay["inout"];
-      $company = $one_pay["company"];
-      $number = $one_pay["number"];
-      $date = $one_pay["date"];
+      $id = $one_pay['id'];
+      $affected_amount = $one_pay['affected_amount'];
+      $amount = $one_pay['amount'];
+      $inout = $one_pay['inout'];
+      $company = $one_pay['company'];
+      $number = $one_pay['number'];
+      $date = $one_pay['date'];
       $k ++;
-      ($k % 2 == 0)?$class="pair":$class="";
+      ($k % 2 == 0)?$class='pair':$class='';
 
-      if ($inout == "+") {
+      if ($inout == '+') {
 	$dis_inout = $l_received;
 	$affected_amount_total += $affected_amount;
       } else {
@@ -602,7 +602,7 @@ function html_invoice_consult($inv_q, $pays) {
     $block_payment
     </div>";
 
-  $display["link"] = html_invoice_links($inv_q, $amount_remaining);
+  $display['link'] = html_invoice_links($inv_q, $amount_remaining);
 
   return $block;
 }
@@ -616,30 +616,30 @@ function html_invoice_consult($inv_q, $pays) {
 // Returns:
 //   $r : string with XHTML code
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_links($inv_q, $amount_remaining="") {
+function html_invoice_links($inv_q, $amount_remaining='') {
   global $ico_document, $ico_add, $ico_payment;
   global $l_invoice, $l_new, $l_module_document, $l_module_payment;
   global $l_document_add;
   global $path, $cgp_show;
 
-  $id = $inv_q->f("invoice_id");
-  $name = $inv_q->f("invoice_label");
-  $company_id = $inv_q->f("invoice_company_id");
-  $company_name = urlencode($inv_q->f("company_name"));
+  $id = $inv_q->f('invoice_id');
+  $name = $inv_q->f('invoice_label');
+  $company_id = $inv_q->f('invoice_company_id');
+  $company_name = urlencode($inv_q->f('company_name'));
   if ($amount_remaining > 0) {
     $amount = $amount_remaining;
   } else {
-    $amount = $inv_q->f("invoice_amount_ttc");
+    $amount = $inv_q->f('invoice_amount_ttc');
   }
 
   $uname = urlencode($name);
 
   // Document
-  if ($cgp_show["module"]["document"]) {
+  if ($cgp_show['module']['document']) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=invoice");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=invoice");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/invoice/invoice_index.php")."&amp;ext_id=$id&amp;ext_target=$l_invoice";
-    $nb_document = run_query_global_document_nb ($id, "invoice");
+    $nb_document = run_query_global_document_nb ($id, 'invoice');
     $block_doc = "
   <div class=\"portlet\" id=\"invoiceDocument\">
   <h1>$l_module_document</h1>
@@ -658,10 +658,10 @@ function html_invoice_links($inv_q, $amount_remaining="") {
   }
 
   // Payment
-  if ($cgp_show["module"]["payment"]) {
+  if ($cgp_show['module']['payment']) {
     $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;sel_invoice_id=$id");
     $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;invoice_id=$id&amp;invoice_name=$uname&amp;company_id=$company_id&amp;company_name=$company_name&amp;tf_amount=$amount");
-    $nb_pay = get_global_linked_payment_nb($id, "invoice");
+    $nb_pay = get_global_linked_payment_nb($id, 'invoice');
     $block_payment = "
   <div class=\"portlet\" id=\"invoicePayment\">
   <h1>$l_module_payment</h1>
@@ -694,29 +694,29 @@ function dis_invoice_detail($inv_q) {
   global $l_expiration_date, $l_payment_date;
   global $l_yes, $l_no;
 
-  $label = $inv_q->f("invoice_label");
-  $num = $inv_q->f("invoice_number");
-  $date = of_date_format($inv_q->f("date"), 1);
-  $expiration_date = of_date_format($inv_q->f("expiration_date"), 1);
-  $payment_date = of_date_format($inv_q->f("payment_date"), 1);
-  $status_id = $inv_q->f("invoice_status_id");
+  $label = $inv_q->f('invoice_label');
+  $num = $inv_q->f('invoice_number');
+  $date = of_date_format($inv_q->f('date'), 1);
+  $expiration_date = of_date_format($inv_q->f('expiration_date'), 1);
+  $payment_date = of_date_format($inv_q->f('payment_date'), 1);
+  $status_id = $inv_q->f('invoice_status_id');
   $status = get_invoice_status();
   $status_label = $status[$status_id];
-  $inout = ($inv_q->f("invoice_inout") == '-') ? $l_supplier : $l_client;
-  $credit_memo = ($inv_q->f("invoice_credit_memo") == '0') ? $l_invoice : $l_credit_memo;
+  $inout = ($inv_q->f('invoice_inout') == '-') ? $l_supplier : $l_client;
+  $credit_memo = ($inv_q->f('invoice_credit_memo') == '0') ? $l_invoice : $l_credit_memo;
   $title = $inout;
-  $ht = $inv_q->f("invoice_amount_ht");
-  $ttc = $inv_q->f("invoice_amount_ttc");
-  $comment = beautify_comment(nl2br($inv_q->f("invoice_comment")));
-  $comp_id = $inv_q->f("invoice_company_id");
-  $company = $inv_q->f("company_name");
-  $deal_id = $inv_q->f("invoice_deal_id");
-  $deal = $inv_q->f("deal_label");
-  $project_id = $inv_q->f("invoice_project_id");
-  $project = $inv_q->f("project_name");
-  $archive = ($inv_q->f("invoice_archive") == 1 ? $l_yes : $l_no);
+  $ht = $inv_q->f('invoice_amount_ht');
+  $ttc = $inv_q->f('invoice_amount_ttc');
+  $comment = beautify_comment(nl2br($inv_q->f('invoice_comment')));
+  $comp_id = $inv_q->f('invoice_company_id');
+  $company = $inv_q->f('company_name');
+  $deal_id = $inv_q->f('invoice_deal_id');
+  $deal = $inv_q->f('deal_label');
+  $project_id = $inv_q->f('invoice_project_id');
+  $project = $inv_q->f('project_name');
+  $archive = ($inv_q->f('invoice_archive') == 1 ? $l_yes : $l_no);
 
-  $display["title"] = "<h1 class=\"title\">$l_invoice : $label</h1>";
+  $display['title'] = "<h1 class=\"title\">$l_invoice : $label</h1>";
 
   $url_comp = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id");
   if ($deal_id > 0) {
@@ -814,20 +814,21 @@ function dis_invoice_detail($inv_q) {
 // Parameters:
 //   - $action    : action called
 //   - $invoice[] : invoice hash parameters
+//   - $field : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
-function dis_invoice_form($action, $invoice) {
+function dis_invoice_form($action, $invoice, $field='') {
   global $display, $l_no_found;
 
-  $id = $invoice["invoice_id"];
+  $id = $invoice['invoice_id'];
   if ($id > 0) {
     $inv_q = run_query_invoice_detail($id);
-    $display["detailInfo"] = display_record_info($inv_q);
+    $display['detailInfo'] = display_record_info($inv_q);
   } else {
-    $inv_q = "";
+    $inv_q = '';
   }
   $stat = get_invoice_status();
   $usr_q = run_query_userobm_active();
-  $block = html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q);
+  $block = html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field);
 
   return $block;
 }
@@ -841,8 +842,9 @@ function dis_invoice_form($action, $invoice) {
 //   - $inv_q     : if updating, contains the invoice current info
 //   - $stat      : Array of status list
 //   - $usr_q     : userobm database result 
+//   - $field     : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
+function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') {
   global $obm, $path, $display;
   global $ico_company, $ico_deal, $ico_project, $l_header_new_f;
   global $l_label, $l_number, $l_comment, $l_add_comment, $l_upd_comment;
@@ -853,41 +855,41 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   global $default_invoice_numbering, $c_php_isodate_format;
   global $cdefault_tax, $l_tax_rate, $l_compute_tax; 
 
-  $uid = $obm["uid"];
+  $uid = $obm['uid'];
 
   // if update mode and first time values are taken from database
-  if (($action == "detailupdate") || ($action == "duplicate")) {
-    $id = $inv_q->f("invoice_id");
-    $label = $inv_q->f("invoice_label");
-    $number = $inv_q->f("invoice_number");
-    $archive = ($inv_q->f("invoice_archive") == 1 ? " checked" : "");
-    $comment = $inv_q->f("invoice_comment");
-    $status = $inv_q->f("invoice_status_id");
-    $date = of_date_upd_format($inv_q->f("date"), 1);
-    $expiration_date = of_date_upd_format($inv_q->f("expiration_date"), 1);
-    $payment_date = of_date_upd_format($inv_q->f("payment_date"), 1);
-    $inout = $inv_q->f("invoice_inout");
-    $credit_memo = $inv_q->f("invoice_credit_memo");
-    $ht = $inv_q->f("invoice_amount_ht");
-    $ttc = $inv_q->f("invoice_amount_ttc");
-    $c_id = $inv_q->f("invoice_company_id");
-    $c_name = $inv_q->f("company_name");
-    $d_id = $inv_q->f("invoice_deal_id");
-    $d_label = $inv_q->f("deal_label");
-    $p_id = $inv_q->f("invoice_project_id");
-    $p_name = $inv_q->f("project_name");
+  if (($action == 'detailupdate') || ($action == 'duplicate')) {
+    $id = $inv_q->f('invoice_id');
+    $label = $inv_q->f('invoice_label');
+    $number = $inv_q->f('invoice_number');
+    $archive = ($inv_q->f('invoice_archive') == 1 ? ' checked' : '');
+    $comment = $inv_q->f('invoice_comment');
+    $status = $inv_q->f('invoice_status_id');
+    $date = of_date_upd_format($inv_q->f('date'), 1);
+    $expiration_date = of_date_upd_format($inv_q->f('expiration_date'), 1);
+    $payment_date = of_date_upd_format($inv_q->f('payment_date'), 1);
+    $inout = $inv_q->f('invoice_inout');
+    $credit_memo = $inv_q->f('invoice_credit_memo');
+    $ht = $inv_q->f('invoice_amount_ht');
+    $ttc = $inv_q->f('invoice_amount_ttc');
+    $c_id = $inv_q->f('invoice_company_id');
+    $c_name = $inv_q->f('company_name');
+    $d_id = $inv_q->f('invoice_deal_id');
+    $d_label = $inv_q->f('deal_label');
+    $p_id = $inv_q->f('invoice_project_id');
+    $p_name = $inv_q->f('project_name');
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
     $dis_title = $label;
 
   // New form and first time
-  } elseif ($action == "new") {
+  } elseif ($action == 'new') {
     $dis_title = $l_header_new_f;
     $date = of_date_upd_format(); 
     $expiration_date = $date;
     $payment_date = $date;
     $number = date ($default_invoice_numbering);
-    // when creating from a deal, default to use same "inout" as the dealtype
+    // when creating from a deal, default to use same 'inout' as the dealtype
     if ($d_id >= 1) {
       $inout = run_query_invoice_deal_get_inout ($d_id);
     }
@@ -896,59 +898,64 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   }
 
   // if we duplicate we have to modify some fields :
-  if ($action == "duplicate") {
+  if ($action == 'duplicate') {
     $comment = "duplicata de <$label>\n".$comment;
     $date = of_date_upd_format();
-    $label .= "-".date("Y-m-d");
+    $label .= '-'.date('Y-m-d');
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($invoice["invoice_id"])) { $id = $invoice["invoice_id"]; }
-  if (isset($invoice["label"])) { $label = stripslashes($invoice["label"]); }
-  if (isset($invoice["number"])) { $number = $invoice["number"]; }
-  if (isset($invoice["archive"])) { $archive = ($invoice["archive"] == 1 ? "checked" : ""); }
-  if (isset($invoice["date"])) { $date = of_date_upd_format($invoice["date"]); }
-  if (isset($invoice["expiration_date"])) { $expiration_date = of_date_upd_format($invoice["expiration_date"]); }
-  if (isset($invoice["payment_date"])) { $payment_date = of_date_upd_format($invoice["payment_date"]); }
-  if (isset($invoice["status"])) { $status = $invoice["status"]; }
-  if (isset($invoice["inout"])) { $inout = $invoice["inout"]; }
+  if (isset($invoice['invoice_id'])) { $id = $invoice['invoice_id']; }
+  if (isset($invoice['label'])) { $label = stripslashes($invoice['label']); }
+  if (isset($invoice['number'])) { $number = $invoice['number']; }
+  if (isset($invoice['archive'])) { $archive = ($invoice['archive'] == 1 ? 'checked' : ''); }
+  if (isset($invoice['date'])) { $date = of_date_upd_format($invoice['date']); }
+  if (isset($invoice['expiration_date'])) { $expiration_date = of_date_upd_format($invoice['expiration_date']); }
+  if (isset($invoice['payment_date'])) { $payment_date = of_date_upd_format($invoice['payment_date']); }
+  if (isset($invoice['status'])) { $status = $invoice['status']; }
+  if (isset($invoice['inout'])) { $inout = $invoice['inout']; }
   if (isset($invoice['credit_memo'])) { $credit_memo = $invoice['credit_memo']; }
-  if (isset($invoice["tax"])) { $tax = $invoice["tax"]; }
-  if (isset($invoice["amount_ht"])) { $ht = $invoice["amount_ht"]; }
-  if (isset($invoice["amount_ttc"])) { $ttc = $invoice["amount_ttc"]; }
-  if (isset($invoice["comment"])) { $comment = stripslashes($invoice["comment"]); }
-  if (isset($invoice["add_comment"])) { $add_comment = stripslashes($invoice["add_comment"]); }
-  if (isset($invoice["usercomment"])) { $usercomment = $invoice["usercomment"]; }
-  if (isset($invoice["datecomment"])) { $datecomment = of_date_upd_format($invoice["datecomment"]); }
+  if (isset($invoice['tax'])) { $tax = $invoice['tax']; }
+  if (isset($invoice['amount_ht'])) { $ht = $invoice['amount_ht']; }
+  if (isset($invoice['amount_ttc'])) { $ttc = $invoice['amount_ttc']; }
+  if (isset($invoice['comment'])) { $comment = stripslashes($invoice['comment']); }
+  if (isset($invoice['add_comment'])) { $add_comment = stripslashes($invoice['add_comment']); }
+  if (isset($invoice['usercomment'])) { $usercomment = $invoice['usercomment']; }
+  if (isset($invoice['datecomment'])) { $datecomment = of_date_upd_format($invoice['datecomment']); }
 
-  if (isset($invoice["company_id"])) { $c_id = $invoice["company_id"]; }
-  if (isset($invoice["company_name"])) { $c_name = stripslashes($invoice["company_name"]); }
-  if (isset($invoice["company_new_id"])) { $c_new_id = $invoice["company_new_id"]; }
-  if (isset($invoice["company_new_name"])) { $c_new_name = stripslashes($invoice["company_new_name"]); }
-  if (isset($invoice["deal_id"])) { $d_id = $invoice["deal_id"]; }
-  if (isset($invoice["deal_label"])) { $d_label = stripslashes($invoice["deal_label"]); }
-  if (isset($invoice["deal_new_id"])) { $d_new_id = $invoice["deal_new_id"]; }
-  if (isset($invoice["deal_new_label"])) { $d_new_label = stripslashes($invoice["deal_new_label"]); }
-  if (isset($invoice["project_id"])) { $p_id = $invoice["project_id"]; }
-  if (isset($invoice["project_name"])) { $p_name = stripslashes($invoice["project_name"]); }
-  if (isset($invoice["project_new_id"])) { $p_new_id = $invoice["project_new_id"]; }
-  if (isset($invoice["project_new_name"])) { $p_new_name = stripslashes($invoice["project_new_name"]); }
+  if (isset($invoice['company_id'])) { $c_id = $invoice['company_id']; }
+  if (isset($invoice['company_name'])) { $c_name = stripslashes($invoice['company_name']); }
+  if (isset($invoice['company_new_id'])) { $c_new_id = $invoice['company_new_id']; }
+  if (isset($invoice['company_new_name'])) { $c_new_name = stripslashes($invoice['company_new_name']); }
+  if (isset($invoice['deal_id'])) { $d_id = $invoice['deal_id']; }
+  if (isset($invoice['deal_label'])) { $d_label = stripslashes($invoice['deal_label']); }
+  if (isset($invoice['deal_new_id'])) { $d_new_id = $invoice['deal_new_id']; }
+  if (isset($invoice['deal_new_label'])) { $d_new_label = stripslashes($invoice['deal_new_label']); }
+  if (isset($invoice['project_id'])) { $p_id = $invoice['project_id']; }
+  if (isset($invoice['project_name'])) { $p_name = stripslashes($invoice['project_name']); }
+  if (isset($invoice['project_new_id'])) { $p_new_id = $invoice['project_new_id']; }
+  if (isset($invoice['project_new_name'])) { $p_new_name = stripslashes($invoice['project_new_name']); }
 
   $title = ($inout == '-') ? $l_supplier : $l_client;
+
+  // Mark the error field
+  if ($field != '') {
+    $class[$field] = 'error';
+  }
 
   // Status select
   $sel_status = "<select name=\"sel_status\">"; 
   foreach ($stat as $s_id => $s_label) {
     $sel_status .= "<option value=\"$s_id\""; 
     if ($s_id == $status) {
-      $sel_status .= " selected ";
+      $sel_status .= ' selected ';
     }
     $sel_status .= ">$s_label</option>"; 
   }
-  $sel_status .= "</select>";
+  $sel_status .= '</select>';
 
-  $inout_c = ($inout == "+") ? "checked" : "";
-  $inout_s = ($inout == "-") ? "checked" : "";
+  $inout_c = ($inout == '+') ? 'checked' : '';
+  $inout_s = ($inout == '-') ? 'checked' : '';
 
   $dis_inout = "
     <th>$l_inout</th>
@@ -977,18 +984,17 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   foreach ($taxes as $tax_label => $tax_value) {
     $sel_tax .= "<option value=\"$tax_value\""; 
     if ($tax_value == $tax) {
-      $sel_tax .= " selected ";
+      $sel_tax .= ' selected ';
     }
     $sel_tax .= ">$tax_label</option>"; 
   }
-  $sel_tax .= "</select>";
+  $sel_tax .= '</select>';
   
 
-  if (($action == "detailupdate") || ($action == "update")) {
+  if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_comment = "
       $l_upd_comment
-      <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>
-    ";
+      <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>";
   }
 
   // User comment select construction
@@ -997,8 +1003,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   }
   $sel_usercomment = "<select name=\"sel_usercomment\">";
   while ($usr_q->next_record()) {
-    $cid = $usr_q->f("userobm_id");
-    $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+    $cid = $usr_q->f('userobm_id');
+    $cname = $usr_q->f('userobm_lastname').' '.$usr_q->f('userobm_firstname');
     $sel_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
@@ -1006,24 +1012,24 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     }
     $sel_usercomment .= ">$cname</option>\n";
   }
-  $sel_usercomment .= "</select>";
+  $sel_usercomment .= '</select>';
 
   // Buttons
-  if (($action == "update") || ($action == "detailupdate")) {
+  if (($action == 'update') || ($action == 'detailupdate')) {
     $dis_button .="<input type=\"hidden\" name=\"action\" value=\"update\" />
     <input type=\"hidden\" name=\"invoice_id\" value=\"$id\" />
     <input type=\"hidden\" name=\"hd_rd_inout\" value=\"$inout\" />
     <input type=\"submit\" value=\"$l_update\"
        onClick=\"if (check_invoice(this.form)) return true; else return false;\" />";
-  } elseif (($action == "new") || ($action == "insert")
-            || ($action == "duplicate")) {
+  } elseif (($action == 'new') || ($action == 'insert')
+            || ($action == 'duplicate')) {
     $dis_button .= "
     <input type=\"submit\" value=\"$l_insert\" 
       onClick=\"if(check_invoice(this.form)) return true ; else return false;\" />
     <input type=\"hidden\" name=\"action\" value=\"insert\" />";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_invoice : $dis_title</h1>";
+  $display['title'] = "<h1 class=\"title\">$l_invoice : $dis_title</h1>";
 
   $block = "
   <form method=\"post\" name=\"f_entity\" action=\"invoice_index.php\">
@@ -1109,8 +1115,9 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     <td>
     <input type=\"text\" name=\"tf_payment_date\" value=\"$payment_date\" class=\"datePicker\"/>
     </td>
-  </tr><tr>
-    <th>$l_status</th>
+  </tr>
+  <tr>
+    <th class=\"$class[status]\">$l_status</th>
     <td>$sel_status</td>
   </tr>
   <tr>
@@ -1159,7 +1166,7 @@ function dis_can_delete_invoice($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display;
 
-  $url = url_prepare("invoice_index.php");
+  $url = url_prepare('invoice_index.php');
 
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
@@ -1174,7 +1181,7 @@ function dis_can_delete_invoice($p_id) {
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";
 
-  $display["msg"] .= display_ok_msg($l_can_delete);
+  $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
     <div class=\"buttons\">
@@ -1195,7 +1202,7 @@ function dis_invoice_dashboard_index($invoice) {
   global $display, $path;
   global $l_year_detail, $l_year_to_year, $l_client, $l_supplier;
 
-  $view = $invoice["dash_view"];
+  $view = $invoice['dash_view'];
   $url_client_year_detail = url_prepare("invoice_index.php?action=dashboard&amp;dash_view=year_detail&amp;dash_target=client");
   $url_client_year_to_year = url_prepare("invoice_index.php?action=dashboard&amp;dash_view=year_to_year&amp;dash_target=client");
   $url_supplier_year_detail = url_prepare("invoice_index.php?action=dashboard&amp;dash_view=year_detail&amp;dash_target=supplier");
@@ -1218,27 +1225,27 @@ function dis_invoice_dashboard_index($invoice) {
     </div>
 ";
 
-  if (isset($invoice["year"])) {
-    $year = $invoice["year"];
+  if (isset($invoice['year'])) {
+    $year = $invoice['year'];
   } else {
-    $year = date("Y");
+    $year = date('Y');
   }
   $year_prev = $year - 1;
 
   $label_target = ${"l_$invoice[dash_target]"};
 
-  if (($view == "") || ($view == "client_year_detail")) {
+  if (($view == '') || ($view == 'client_year_detail')) {
     $title = "$l_client : $year";
     $block .= dis_invoice_dashboard($invoice);
-  } else if ($view == "year_detail") {
+  } else if ($view == 'year_detail') {
     $title = "$label_target : $year";
     $block .= dis_invoice_dashboard($invoice);
-  } else if ($view == "year_to_year") {
+  } else if ($view == 'year_to_year') {
     $title = "$label_target : $year_prev / $year";
     $block .= dis_invoice_dashboard_year_to_year($invoice);
   }
 
-  $display["title"] = "<h1 class=\"title\">$title</h1>";
+  $display['title'] = "<h1 class=\"title\">$title</h1>";
  
   return $block;
 }
@@ -1250,36 +1257,36 @@ function dis_invoice_dashboard_index($invoice) {
 //   - $invoice : invoice hash infos
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_dashboard($invoice) {
-  global $display, $path, $ctt_sales;
+  global $display, $path, $ctt_sales, $cinv_status;
   global $l_status, $l_total, $l_invoice, $l_date, $l_amount_ht, $l_amount_ttc;
   global $l_billed, $l_order_no_bill, $l_potential, $l_monthsofyear;
   global $l_payment, $l_amount_ht, $l_amount_ttc, $l_paid, $l_waiting;
   global $l_execute, $ico_next, $ico_previous;
 
-  if (isset($invoice["year"])) {
-    $year = $invoice["year"];
+  if (isset($invoice['year'])) {
+    $year = $invoice['year'];
   } else {
-    $year = date("Y");
+    $year = date('Y');
   }
   $year_prev = $year - 1;
   $year_next = $year + 1;
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
 
-  if ($invoice["dash_target"] == "supplier") {
-    $inout = "-";
+  if ($invoice['dash_target'] == 'supplier') {
+    $inout = '-';
   } else {
-    $inout = "+";
+    $inout = '+';
   }
   $url_inout = urlencode($inout);
 
-  $inv = run_query_invoice_amounts($date_ranges, "invoice_date", $invoice["tasktype"], $inout);
+  $inv = run_query_invoice_amounts($date_ranges, 'invoice_date', $invoice['tasktype'], $inout);
   $url_prev = url_prepare("invoice_index.php?action=dashboard&amp;year=$year_prev");
   $url_next = url_prepare("invoice_index.php?action=dashboard&amp;year=$year_next");
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
-  $tt_ids = $invoice["tasktype"];
-  if (! is_array($tt_ids) && ($tt_ids == "")) {
-    $tt_ids = "0";
+  $tt_ids = $invoice['tasktype'];
+  if (! is_array($tt_ids) && ($tt_ids == '')) {
+    $tt_ids = '0';
   } else {
     foreach ($tt_ids as $tt_id) {
       $url_sel_tt .= "&amp;sel_tt[]=$tt_id";
@@ -1289,7 +1296,7 @@ function dis_invoice_dashboard($invoice) {
   $tts = get_global_tasktype($ctt_sales, $tt_ids);
 
   $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
-  $block_tt = of_select_dis_search_select($tts, "tt", $url_tt);
+  $block_tt = of_select_dis_search_select($tts, 'tt', $url_tt);
 
   // Table header
   for ($month = 1; $month < 13; $month++) {
@@ -1300,7 +1307,7 @@ function dis_invoice_dashboard($invoice) {
 
   // Billed infos -------------------------------------------------------------
 
-  $status_pay = get_invoice_status("payment");
+  $status_pay = get_invoice_status('payment');
 
   // Loop through status (rows)
   foreach ($status_pay as $s_id => $s_label) {
@@ -1309,7 +1316,7 @@ function dis_invoice_dashboard($invoice) {
     
     $total_amount_ht = 0;
     $cpt++;
-    $data = "data" . ($cpt % 2);
+    $data = 'data' . ($cpt % 2);
 
     $dis_bil_row .= "<tr class=\"pair\"><th>$s_label</th>";
 
@@ -1323,20 +1330,20 @@ function dis_invoice_dashboard($invoice) {
 	$year_month = "$year-0$month";
       }
       // Invoice created
-      if (is_array($inv["$year_month"]["billed"]["$s_id"])) {
-	$status_info = $inv["$year_month"]["billed"]["$s_id"];
-	$amount_ht = $status_info["amount_ht"];
-	$nb = $status_info["nb"];
+      if (is_array($inv["$year_month"]['billed']["$s_id"])) {
+	$status_info = $inv["$year_month"]['billed']["$s_id"];
+	$amount_ht = $status_info['amount_ht'];
+	$nb = $status_info['nb'];
 	$total_amount_ht += $amount_ht;
-	$dis_amount_ht = number_format($amount_ht, 2, ",", " ");
+	$dis_amount_ht = number_format($amount_ht, 2, ',', ' ');
 	$month_start = "$year_month-01";
-	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
+	$month_end = date('Y-m-d', mktime(12,0,0,$month+1, 0, $year));
         $dis_bil_row .= "<td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
       } else {
-        $dis_bil_row .= "<td></td>";
+        $dis_bil_row .= '<td></td>';
       }
     }
-    $f_total_amount_ht = number_format($total_amount_ht, 2, ",", " ");
+    $f_total_amount_ht = number_format($total_amount_ht, 2, ',', ' ');
     $dis_bil_row .= "<td>&nbsp;$f_total_amount_ht</td></tr>";
   }
 
@@ -1349,13 +1356,13 @@ function dis_invoice_dashboard($invoice) {
     } else {
       $year_month = "$year-0$month";
     }
-    $status_info = $inv["$year_month"]["billed"]["total"];
-    $amount_ht = $status_info["amount_ht"];
+    $status_info = $inv["$year_month"]['billed']['total'];
+    $amount_ht = $status_info['amount_ht'];
     $total_amount_ht += $amount_ht;
-    $dis_amount_ht = number_format($amount_ht, 2, ",", " ");
+    $dis_amount_ht = number_format($amount_ht, 2, ',', ' ');
     if ($amount_ht > 0) {
       $month_start = "$year_month-01";
-      $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
+      $month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
       $dis_bil_row_total .= "
           <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search$total_status_param&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
     } else {
@@ -1363,7 +1370,7 @@ function dis_invoice_dashboard($invoice) {
           <td>&nbsp;$dis_amount_ht</td>";
     }
   }
-  $f_total_amount_ht = number_format($total_amount_ht, 2, ",", " ");
+  $f_total_amount_ht = number_format($total_amount_ht, 2, ',', ' ');
   $dis_bil_row_total .= "
       <td>&nbsp;$f_total_amount_ht</td>";
 
@@ -1375,13 +1382,13 @@ function dis_invoice_dashboard($invoice) {
     } else {
       $year_month = "$year-0$month";
     }
-    $status_info = $inv["$year_month"]["billed"]["total"];
-    $amount_ht = $status_info["amount_ht"];
+    $status_info = $inv["$year_month"]['billed']['total'];
+    $amount_ht = $status_info['amount_ht'];
     $values[$month-1] = $amount_ht;
-    $labels[$month-1] = number_format($amount_ht, 0, ",", " ");
+    $labels[$month-1] = number_format($amount_ht, 0, ',', ' ');
     $xlabels[$month-1] = $l_monthsofyear[$month-1];
-    $values_pot[$month-1] = $amount_ht + $inv["$year_month"]["potential"]["total"]["amount_ht"];
-    $labels_pot[$month-1] = number_format($values_pot[$month-1], 0, ",", " ");
+    $values_pot[$month-1] = $amount_ht + $inv["$year_month"]['potential']['total']['amount_ht'];
+    $labels_pot[$month-1] = number_format($values_pot[$month-1], 0, ',', ' ');
   }
   $title = "$l_billed $year";
 
@@ -1389,13 +1396,13 @@ function dis_invoice_dashboard($invoice) {
 
   // Potential chart ----------------------------------------------------------
 
-  $status_toc = get_invoice_status("tocreate");
+  $status_toc = get_invoice_status('tocreate');
 
   // Loop through status (rows)
   foreach ($status_toc as $s_id => $s_label) { 
     $total_amount_ht = 0;
     $cpt++;
-    $data = "data" . ($cpt % 2);
+    $data = 'data' . ($cpt % 2);
 
     $dis_pot_row .= "<tr class=\"pair\"><th>$s_label</th>";
 
@@ -1409,48 +1416,46 @@ function dis_invoice_dashboard($invoice) {
 	$year_month = "$year-0$month";
       }
       // Invoice not created
-      if (is_array($inv["$year_month"]["potential"]["$s_id"])) {
-	$status_info = $inv["$year_month"]["potential"]["$s_id"];
-	$amount_ht = $status_info["amount_ht"];
-	$nb = $status_info["nb"];
+      if (is_array($inv["$year_month"]['potential']["$s_id"])) {
+	$status_info = $inv["$year_month"]['potential']["$s_id"];
+	$amount_ht = $status_info['amount_ht'];
+	$nb = $status_info['nb'];
 	$total_amount_ht += $amount_ht;
-	$f_amount_ht = number_format($amount_ht, 2, ",", " ");
+	$f_amount_ht = number_format($amount_ht, 2, ',', ' ');
 	$month_start = "$year_month-01";
-	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
+	$month_end = date('Y-m-d', mktime(12,0,0,$month+1, 0, $year));
         $dis_pot_row .= "
           <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
       } else {
-        $dis_pot_row .= "
-          <td> </td>";
+        $dis_pot_row .= '
+          <td> </td>';
       }
-      $labels[$month-1] = number_format($amount_ht, 0, ",", " ");
+      $labels[$month-1] = number_format($amount_ht, 0, ',', ' ');
     }
-    $f_total_amount_ht = number_format($total_amount_ht, 2, ",", " ");
+    $f_total_amount_ht = number_format($total_amount_ht, 2, ',', ' ');
     $dis_pot_row .= "<td>&nbsp;$f_total_amount_ht</td>
         </tr>";
   }
   $title = "$l_potential $year";
-  $plots["new_bar"] = array(1, 0);
-  $plots["legends"] = array($l_order_no_bill, $l_billed);
-  $plots["values"] = array($values_pot, $values);
-  $plots["labels"] = array($labels_pot);
+  $plots['new_bar'] = array(1, 0);
+  $plots['legends'] = array($l_order_no_bill, $l_billed);
+  $plots['values'] = array($values_pot, $values);
+  $plots['labels'] = array($labels_pot);
 
   $chart_pot_params .= "&amp;title=".urlencode($title)."&amp;plots=".urlencode(serialize($plots))."&amp;xlabels=".urlencode(serialize($xlabels));
 
   // Payment infos ------------------------------------------------------------
 
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges, "invoice_expiration_date", $invoice["taskttype"], $inout);
+  $inv = run_query_invoice_amounts($date_ranges, 'invoice_expiration_date', $invoice['taskttype'], $inout);
 
-  $status_pay = get_invoice_status("payment");
+  $status_pay = get_invoice_status('payment');
 
   // Loop through status (rows)
   foreach ($status_pay as $s_id => $s_label) { 
-    //    // If the status tell invoice can be archived, invoice has been paid 
-    //    $status_paid = $s_status["archive"] == 1 ? true : false;
     $total_amount_ttc = 0;
     $cpt++;
-    $data = "data" . ($cpt % 2);
+    $data = 'data' . ($cpt % 2);
 
     $dis_pay_row .= "<tr class=\"pair\"><th>$s_label</th>";
 
@@ -1464,22 +1469,22 @@ function dis_invoice_dashboard($invoice) {
 	$year_month = "$year-0$month";
       }
       // Invoice created
-      if (is_array($inv["$year_month"]["billed"]["$s_id"])) {
-	$status_info = $inv["$year_month"]["billed"]["$s_id"];
-	$amount_ttc = $status_info["amount_ttc"];
-	$nb = $status_info["nb"];
+      if (is_array($inv["$year_month"]['billed']["$s_id"])) {
+	$status_info = $inv["$year_month"]['billed']["$s_id"];
+	$amount_ttc = $status_info['amount_ttc'];
+	$nb = $status_info['nb'];
 	$total_amount_ttc += $amount_ttc;
-	$dis_amount_ttc = number_format($amount_ttc, 2, ",", " ");
+	$dis_amount_ttc = number_format($amount_ttc, 2, ',', ' ');
 	$month_start = "$year_month-01";
-	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
+	$month_end = date('Y-m-d', mktime(12,0,0,$month+1, 0, $year));
         $dis_pay_row .= "
           <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;date_field=expiration_date&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
       } else {
-        $dis_pay_row .= "
-          <td></td>";
+        $dis_pay_row .= '
+          <td></td>';
       }
     }
-    $f_total_amount_ttc = number_format($total_amount_ttc, 2, ",", " ");
+    $f_total_amount_ttc = number_format($total_amount_ttc, 2, ',', ' ');
     $dis_pay_row .= "<td>&nbsp;$f_total_amount_ttc</td>
         </tr>";
   }
@@ -1493,13 +1498,13 @@ function dis_invoice_dashboard($invoice) {
     } else {
       $year_month = "$year-0$month";
     }
-    $status_info = $inv["$year_month"]["billed"]["total"];
-    $amount_ttc = $status_info["amount_ttc"];
+    $status_info = $inv["$year_month"]['billed']['total'];
+    $amount_ttc = $status_info['amount_ttc'];
     $total_amount_ttc += $amount_ttc;
-    $dis_amount_ttc = number_format($amount_ttc, 2, ",", " ");
+    $dis_amount_ttc = number_format($amount_ttc, 2, ',', ' ');
     if ($amount_ttc > 0) {
       $month_start = "$year_month-01";
-      $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
+      $month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
       $dis_pay_row_total .= "
           <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;inout=$url_inout&amp;cba_archive=1&amp;date_field=expiration_date&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
     } else {
@@ -1507,7 +1512,7 @@ function dis_invoice_dashboard($invoice) {
           <td>&nbsp;$dis_amount_ttc</td>";
     }
   }
-  $f_total_amount_ttc = number_format($total_amount_ttc, 2, ",", " ");
+  $f_total_amount_ttc = number_format($total_amount_ttc, 2, ',', ' ');
   $dis_pay_row_total .= "
       <td>&nbsp;$f_total_amount_ttc</td>";
 
@@ -1520,15 +1525,16 @@ function dis_invoice_dashboard($invoice) {
       $year_month = "$year-0$month";
     }
     $xlabels[$month-1] = $l_monthsofyear[$month-1];
-    $values[$month-1] = $inv["$year_month"]["paid"]["total"]["amount_ttc"];
-    $values_pay[$month-1] = $inv["$year_month"]["billed"]["total"]["amount_ttc"];
-    $labels[$month-1] = number_format($values_pay[$month-1], 0, ",", " ");
+    $values[$month-1] = $inv["$year_month"]['paid']['total']['amount_ttc'];
+    $values[$month-1] = $inv["$year_month"]['billed'][$cinv_status['paid']]['amount_ttc'];
+    $values_pay[$month-1] = $inv["$year_month"]['billed']['total']['amount_ttc'];
+    $labels[$month-1] = number_format($values_pay[$month-1], 0, ',', ' ');
   }
-  $plots["new_bar"] = array(1, 0);
-  $plots["legends"] = array($l_waiting, $l_paid);
+  $plots['new_bar'] = array(1, 0);
+  $plots['legends'] = array($l_waiting, $l_paid);
   $title = "$l_payment $year ($l_amount_ttc)";
-  $plots["values"] = array($values_pay, $values);
-  $plots["labels"] = array($labels);
+  $plots['values'] = array($values_pay, $values);
+  $plots['labels'] = array($labels);
 
   $chart_pay_params .= "&amp;title=".urlencode($title)."&amp;plots=".urlencode(serialize($plots))."&amp;xlabels=".urlencode(serialize($xlabels));
 
@@ -1642,24 +1648,24 @@ function dis_invoice_dashboard_year_to_year($invoice) {
   global $l_payment, $l_amount_ht, $l_amount_ttc, $l_paid, $l_waiting;
   global $l_execute,$ico_previous,$ico_next;
 
-  if (isset($invoice["year"])) {
-    $year = $invoice["year"];
+  if (isset($invoice['year'])) {
+    $year = $invoice['year'];
   } else {
-    $year = date("Y");
+    $year = date('Y');
   }
   $year_prev = $year - 1;
   $year_next = $year + 1;
 
-  if ($invoice["dash_target"] == "supplier") {
-    $inout = "-";
+  if ($invoice['dash_target'] == 'supplier') {
+    $inout = '-';
   } else {
-    $inout = "+";
+    $inout = '+';
   }
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
-  $tt_ids = $invoice["tasktype"];
-  if (! is_array($tt_ids) && ($tt_ids == "")) {
-    $tt_ids = "0";
+  $tt_ids = $invoice['tasktype'];
+  if (! is_array($tt_ids) && ($tt_ids == '')) {
+    $tt_ids = '0';
   } else {
     foreach ($tt_ids as $tt_id) {
       $url_sel_tt .= "&amp;sel_tt[]=$tt_id";
@@ -1669,12 +1675,12 @@ function dis_invoice_dashboard_year_to_year($invoice) {
   $tts = get_global_tasktype($ctt_sales, $tt_ids);
 
   $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
-  $block_tt = of_select_dis_search_select($tts, "tt", $url_tt);
+  $block_tt = of_select_dis_search_select($tts, 'tt', $url_tt);
 
   // Billed infos Year-1 and Year ---------------------------------------------
 
   $date_ranges = array(array("$year_prev-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges, "invoice_date", $invoice["tasktype"], $inout);
+  $inv = run_query_invoice_amounts($date_ranges, 'invoice_date', $invoice['tasktype'], $inout);
 
   // Artichow Chart
   for ($month = 1; $month < 13; $month++) {
@@ -1688,32 +1694,32 @@ function dis_invoice_dashboard_year_to_year($invoice) {
     }
     $xlabels[$month-1] = $l_monthsofyear[$month-1];
 
-    $status_info_prev = $inv["$year_month_prev"]["billed"]["total"];
-    $amount_ht = $status_info_prev["amount_ht"];
+    $status_info_prev = $inv["$year_month_prev"]['billed']['total'];
+    $amount_ht = $status_info_prev['amount_ht'];
     $values_prev[$month-1] = $amount_ht;
-    $labels_prev[$month-1] = number_format($amount_ht/1000, 0, ",", " ");
+    $labels_prev[$month-1] = number_format($amount_ht/1000, 0, ',', ' ');
 
-    $status_info = $inv["$year_month"]["billed"]["total"];
-    $amount_ht = $status_info["amount_ht"];
+    $status_info = $inv["$year_month"]['billed']['total'];
+    $amount_ht = $status_info['amount_ht'];
     $values[$month-1] = $amount_ht;
-    $labels[$month-1] = number_format($amount_ht/1000, 0, ",", " ");
+    $labels[$month-1] = number_format($amount_ht/1000, 0, ',', ' ');
 
-    $status_info_pot = $inv["$year_month"]["potential"]["total"];
-    $amount_ht_pot = $status_info_pot["amount_ht"] + $values[$month-1];
+    $status_info_pot = $inv["$year_month"]['potential']['total'];
+    $amount_ht_pot = $status_info_pot['amount_ht'] + $values[$month-1];
     $values_pot[$month-1] = $amount_ht_pot;
-    $labels_pot[$month-1] = number_format($amount_ht_pot/1000, 0, ",", " ");
+    $labels_pot[$month-1] = number_format($amount_ht_pot/1000, 0, ',', ' ');
   }
   $title = "$l_billed (k€) $year_prev / $year";
-  $plots["new_bar"] = array(1, 1);
-  $plots["legends"] = array("$year_prev", "$year");
-  $plots["values"] = array($values_prev, $values);
-  $plots["labels"] = array($labels_prev, $labels);
+  $plots['new_bar'] = array(1, 1);
+  $plots['legends'] = array("$year_prev", "$year");
+  $plots['values'] = array($values_prev, $values);
+  $plots['labels'] = array($labels_prev, $labels);
 
   $chart_ytoy_params .= "&amp;title=".urlencode($title)."&amp;plots=".urlencode(serialize($plots)) . "&amp;xlabels=".urlencode(serialize($xlabels));
 
   $title = "$l_potential (k€) $year_prev / $year";
-  $plots["values"] = array($values_prev, $values_pot);
-  $plots["labels"] = array($labels_prev, $labels_pot);
+  $plots['values'] = array($values_prev, $values_pot);
+  $plots['labels'] = array($labels_prev, $labels_pot);
 
   $chart_ytoyp_params .= "&amp;title=".urlencode($title)."&amp;plots=".urlencode(serialize($plots)) . "&amp;xlabels=".urlencode(serialize($xlabels));
 
@@ -1765,7 +1771,7 @@ function dis_invoice_dashboard_year_to_year($invoice) {
 function dis_invoice_display_pref($prefs) {
   global $l_invoice_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "invoice");
+  $dis_pref = new OBM_DISPLAY('PREFERENCES', $prefs, 'invoice');
   $dis_pref->pref_title = $l_invoice_display;
   $dis_pref->pref_dis_help = 1;
 

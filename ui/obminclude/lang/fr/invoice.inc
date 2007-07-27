@@ -88,6 +88,10 @@ $l_fill_inout = "Le type doit être sélectionné : $l_client ou $l_supplier !";
 $l_fill_amount = "Les montants doivent être correctement renseignés !";
 $l_error_number_exist = "Ce numéro de facture est déjà attribué !";
 
+$l_err_paid_status = "La facture a été payée, l'état doit être à '$l_invoicestatus_paid' !";
+$l_err_ppaid_status = "La facture a été partiellement payée, l'état doit être à '$l_invoicestatus_ppaid', '$l_invoicestatus_dailly' ou '$l_invoicestatus_conflict' !";
+$l_err_no_payment_status = "La facture n'a pas de paiement, l'état ne peut être '$l_invoicestatus_paid' ou '$l_invoicestatus_ppaid' !";
+
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_check_number = "\\nLe Numéro de la Facture n'est pas valide !";
 $l_check_money_ht = "\\n Le montant HT de la Facture est incorrect !";

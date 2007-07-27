@@ -123,6 +123,8 @@ ALTER TABLE UserObm ADD COLUMN userobm_photo_id integer;
 -- Add company field
 ALTER TABLE UserObm ADD COLUMN userobm_company varchar(64);
 ALTER TABLE UserObm ADD COLUMN userobm_direction varchar(64);
+-- Add vacation_date field
+ALTER TABLE UserObm ADD COLUMN userobm_vacation_date timestamp;
 
 -------------------------------------------------------------------------------
 -- Update Resource table

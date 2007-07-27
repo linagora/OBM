@@ -121,6 +121,8 @@ ALTER TABLE UserObm ADD COLUMN userobm_photo_id int(8) AFTER userobm_education;
 -- Add company, direction field
 ALTER TABLE UserObm ADD COLUMN userobm_company varchar(64) AFTER userobm_sound;
 ALTER TABLE UserObm ADD COLUMN userobm_direction varchar(64) AFTER userobm_company;
+-- Add vacation_date field
+ALTER TABLE UserObm ADD COLUMN userobm_vacation_date timestamp(14) AFTER userobm_vacation_enable;
 
 
 -------------------------------------------------------------------------------

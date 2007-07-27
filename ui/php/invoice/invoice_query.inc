@@ -374,8 +374,9 @@ function run_query_invoice_update($invoice) {
 // Parameters:
 //   - $target : 'payment' : get status where invoice should have a payment
 //             : 'tocreate' : get status where invoice has not been cretated
+//             : a number  : get status where status id = this number
 // Returns:
-//   - $status : array of status [id] [[label][created][payment][archive]]
+//   - $sta : array of status [id] [label]
 ///////////////////////////////////////////////////////////////////////////////
 function get_invoice_status($target='') {
   global $cdg_sql, $cinv_status;
@@ -417,7 +418,7 @@ function get_invoice_status($target='') {
 // if $not_paid = 1, we search only for not paid payments,
 // ie. lines having paymentinvoice_amount = 0.0
 // if $not_paid == -1, we return only paid payments
-// ie. lines having paymetinvoice_amoount != 0.0
+// ie. lines having paymetinvoice_amount != 0.0
 ///////////////////////////////////////////////////////////////////////////////
 function get_invoice_payment($p_invoice, $not_paid=0) {
   global $cdg_sql;
@@ -426,7 +427,7 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
   $db_type = $obm_q->type;
   $date = sql_date_format($db_type, 'payment_date', 'payment_date');
   $multidomain = sql_multidomain('payment');
-	
+
   $query = "SELECT
       paymentinvoice_amount,
       payment_id,
@@ -449,6 +450,7 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
   
   display_debug_msg($query, $cdg_sql, 'get_invoice_payment()');
   $obm_q->query($query);
+  $p = array();
 
   while ($obm_q->next_record()) {
     $id = $obm_q->f('payment_id');
@@ -465,6 +467,8 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
 		     'amount' => $amount,
 		     'inout' => $inout,
 		     'affected_amount' => $affected_amount);
+    $p['total']['amount'] += $amount;
+    $p['total']['affected_amount'] += $affected_amount;
   }
 
   return $p;
@@ -626,11 +630,13 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
   }
 
   $query = "SELECT
+      invoice_id,
       $da,
       $de,
       invoice_amount_ht,
       invoice_amount_ttc,
       invoice_inout,
+      invoice_credit_memo,
       invoice_status_id
     FROM Invoice
       $join_project
@@ -647,9 +653,11 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
   $obm_q->query($query);
   
   while ($obm_q->next_record()) {
+    $id = $obm_q->f('invoice_id');
     $ah = $obm_q->f('invoice_amount_ht');
     $at = $obm_q->f('invoice_amount_ttc');
     $inout = $obm_q->f('invoice_inout');
+    $credit = $obm_q->f('invoice_credit_memo');
     $date = of_isodate_format($obm_q->f('date'));
     $exp_date = of_isodate_format($obm_q->f('expiration_date'));
     if ($target_date == 'invoice_expiration_date') {
@@ -662,27 +670,52 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
 
     // Invoice created
     if ($payment == '1') {
-      $res[$month]['billed']["$status"]['amount_ht'] += $ah;
-      $res[$month]['billed']["$status"]['amount_ttc'] += $at;
+      // Case invoice is a credit memo
+      if ($credit != '1') {
+	$res[$month]['billed']["$status"]['amount_ht'] += $ah;
+	$res[$month]['billed']["$status"]['amount_ttc'] += $at;
+	$res[$month]['billed']['total']['amount_ht'] += $ah;
+	$res[$month]['billed']['total']['amount_ttc'] += $at;
+      } else {
+	$res[$month]['billed']["$status"]['amount_ht'] -= $ah;
+	$res[$month]['billed']["$status"]['amount_ttc'] -= $at;
+	$res[$month]['billed']['total']['amount_ht'] -= $ah;
+	$res[$month]['billed']['total']['amount_ttc'] -= $at;
+      }
       $res[$month]['billed']["$status"]['nb'] ++;
       $res[$month]['billed']['total']['label'] = $l_total;
-      $res[$month]['billed']['total']['amount_ht'] += $ah;
-      $res[$month]['billed']['total']['amount_ttc'] += $at;
       $res[$month]['billed']['total']['nb'] ++;
-      // Il the invoice that need a payment can be archived, it has been paid
-      if ($status == $cinv_status['paid']) {
-	$res[$month]['paid']['total']['amount_ht'] += $ah;
-	$res[$month]['paid']['total']['amount_ttc'] += $at;
+      // Handle partially paid distribution for payment chart
+      // Ici nouveau etat (restant du,..) pour chart paiement ??
+      /*      if (($status == $cinv_status['ppaid']) || ($status == $cinv_status['dailly'])) {
+	$pays = get_invoice_payment($id);
+	
+	// Case invoice is a credit memo
+	if ($credit != '1') {
+	  $res[$month]['paid']['total']['amount_ht'] += $ah;
+	  $res[$month]['paid']['total']['amount_ttc'] += $at;
+	} else {
+	  $res[$month]['paid']['total']['amount_ht'] -= $ah;
+	  $res[$month]['paid']['total']['amount_ttc'] -= $at;
+	}
 	$res[$month]['paid']['total']['nb'] ++;
-      }	
+      }	*/
     } else {
       // Invoice to create
-      $res[$month]['potential']["$status"]['amount_ht'] += $ah;
-      $res[$month]['potential']["$status"]['amount_ttc'] += $at;
+      // Case invoice is a credit memo
+      if ($credit != '1') {
+	$res[$month]['potential']["$status"]['amount_ht'] += $ah;
+	$res[$month]['potential']["$status"]['amount_ttc'] += $at;
+	$res[$month]['potential']['total']['amount_ht'] += $ah;
+	$res[$month]['potential']['total']['amount_ttc'] += $at;
+      } else {
+	$res[$month]['potential']["$status"]['amount_ht'] -= $ah;
+	$res[$month]['potential']["$status"]['amount_ttc'] -= $at;
+	$res[$month]['potential']['total']['amount_ht'] -= $ah;
+	$res[$month]['potential']['total']['amount_ttc'] -= $at;
+      }
       $res[$month]['potential']["$status"]['nb'] ++;
       $res[$month]['potential']['total']['label'] = $l_total;
-      $res[$month]['potential']['total']['amount_ht'] += $ah;
-      $res[$month]['potential']['total']['amount_ttc'] += $at;
       $res[$month]['potential']['total']['nb'] ++;
     }
   }
@@ -703,8 +736,8 @@ function check_invoice_data_form($id, $invoice) {
   global $l_fill_label, $l_fill_company, $l_fill_number, $l_error_number_exist;
   global $l_fill_inout, $l_fill_amount, $l_fill_date, $l_date, $l_invalid_date;
   global $l_expiration_date, $l_payment_date;
-  global $cinv_status;
-  global $err, $l_exist_error;
+  global $l_err_paid_status, $l_err_ppaid_status, $l_err_no_payment_status;
+  global $err, $l_exist_error, $cinv_status;
 
   $label = $invoice['label'];
   $number = $invoice['number'];
@@ -792,6 +825,36 @@ function check_invoice_data_form($id, $invoice) {
   }
 
   // Status if invoice has payment
+  $pays = get_invoice_payment($id);
+  $total_pay_amount = 0;
+  foreach ($pays as $pay_id => $pay) {
+    $total_pay_amount += $pay['affected_amount'];
+  } 
+
+  // If invoice has been paid, status must be 'paid'
+  if (($total_pay_amount == $ttc) && ($status != $cinv_status['paid'])) {
+    $err['msg'] = $l_err_paid_status;
+    return false;
+  }
+
+  // If invoice partially paid, status must be 'ppaid', 'conflict' or 'dailly'
+  if (($total_pay_amount != $ttc) && ($total_pay_amount > 0)
+      && ! (($status == $cinv_status['ppaid'])
+	    || ($status == $cinv_status['conflict'])
+	    || ($status == $cinv_status['dailly']))) {
+    $err['msg'] = $l_err_ppaid_status;
+    $err['field'] = 'status';
+    return false;
+  }
+
+  // If invoice has no payments, status must not be 'ppaid', 'paid'
+  if (($total_pay_amount == 0)
+      && (($status == $cinv_status['ppaid'])
+	  || ($status == $cinv_status['paid']))) {
+    $err['msg'] = $l_err_no_payment_status;
+    $err['field'] = 'status';
+    return false;
+  }
 
   return true;
 }

@@ -129,6 +129,7 @@ CREATE TABLE UserObm (
   userobm_nomade_local_copy   integer default 0,
   userobm_email_nomade        varchar(64) default '',
   userobm_vacation_enable     integer default 0,
+  userobm_vacation_date       timestamp,
   userobm_vacation_message    text default '',
   userobm_samba_perms         integer default 0,
   userobm_samba_home          varchar(255) default '',

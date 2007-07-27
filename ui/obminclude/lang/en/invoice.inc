@@ -74,6 +74,10 @@ $l_fill_date = "The date must be filled (for this status) !";
 $l_fill_amount = "Tha amounts must be correctly filled !";
 $l_error_number_exist = "This invoice number is already used !";
 
+$l_err_paid_status = "The invoice has been paid, status must be '$l_invoicestatus_paid' !";
+$l_err_ppaid_status = "The invoice has been partially paid, status must be '$l_invoicestatus_ppaid', '$l_invoicestatus_dailly' or '$l_invoicestatus_conflict' !";
+$l_err_no_payment_status = "The invoice has no payments, status can't be '$l_invoicestatus_paid' or '$l_invoicestatus_ppaid' !";
+
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_check_number = "\\nThe invoice number is not valid!";
 $lj_check_money_ht = "\\nThe amount without charges is not valid!";
