@@ -535,16 +535,18 @@ class OBM_DISPLAY {
     $content = "<div>
       <script type=\"text/javascript\">
         function exportResultSet(firstRow,nbRows) {
-          form = new Object();
-          form.action = 'export_page';
-          form.call_module = '$module';
-          form.of_display_name = '$this_name';
-          form.entity = '$this_entity';
-          form.first_row = firstRow;
-          form.nb_rows = nbRows;
-          form.query = '".phpStringToJsString($query)."';
-          form.func_data = '$dis_data_entity';
-          window.location.href = '$export_url?' + Object.toQueryString(form);
+          form = new Element('form');
+          form.setProperties({action:'$export_url', method:'POST'});
+          form.adopt(new Element('input').setProperties({type:'hidden', name:'action', value:'export_page'}));
+          form.adopt(new Element('input').setProperties({type:'hidden', name:'call_module', value:'$module'}));
+          form.adopt(new Element('input').setProperties({type:'hidden', name:'of_display_name', value:'$this_name'}));
+          form.adopt(new Element('input').setProperties({type:'hidden', name:'entity', value:'$this_entity'}));
+          form.adopt(new Element('input').setProperties({type:'hidden', name:'first_row', value:firstRow}));
+          form.adopt(new Element('input').setProperties({type:'hidden', name:'nb_rows', value:nbRows}));
+          form.adopt(new Element('input').setProperties({type:'hidden', name:'query', value:'".phpStringToJsString($query)."'}));
+          form.adopt(new Element('input').setProperties({type:'hidden', name:'func_data', value:'$dis_data_entity'}));
+          form.injectInside($(document.body));
+          form.submit();
           return false;
         }
       </script>
