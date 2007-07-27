@@ -1297,7 +1297,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_plain_month_planning($calendar, $calendar_entity) { 
-  global $ico_previous,$ico_next;
+  global $ico_previous,$ico_next,$l_week;
   global $ccalendar_weekstart, $ico_new_event,$l_all_day;
   global $ccalendar_first_hour, $ccalendar_last_hour,$obm;
   global $l_private,$l_daysofweekfirst,$l_daysofweek, $l_previous, $l_next;
@@ -1312,6 +1312,7 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
   $next_month = of_isodate_format(strtotime("+1 month",$ts_date));
   $prev_month = of_isodate_format(strtotime("-1 month",$ts_date));
 
+  $first_day_of_week = date('w', strtotime($ccalendar_weekstart));
   $display_date = calendar_localizeDate("month", $ts_date);  
   $start_week_day = strtotime($ccalendar_weekstart);
 
@@ -1344,12 +1345,21 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
     $empty = !$of->periodHaveOccurrences($current_time,$day_duration);
     $line0 .= "<th>$day_label</th>\n";
     $line1 .= "<th><a href=\"calendar_index.php?action=view_day&amp;date=$iso_day\">$this_day</a></th>\n";
+    if($day_num == $first_day_of_week || $current_time == $start_time) {
+      $week_num = get_calendar_week_num($current_time);  
+      $span = ((($first_day_of_week + 6) - $day_num) % 7) + 1;
+      if($span >= 3) {
+        $line2 .= "<th colspan=\"$span\">$l_week $week_num</th>";
+      } else {
+        $line2 .= "<th colspan=\"$span\">$week_num</th>";
+      }
+    }
     foreach ($calendar_entity as $type => $entity) {
       foreach ($entity as $id => $properties) {
         $haveevent = false;
         $line_id = $type." ".$id;
         if($empty) {
-          $line[$line_id] .= "<td></td>";
+          $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\"></td>";
         } else {
           $today_events = array();
           $day_content = "";
@@ -1396,11 +1406,11 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
                ".implode($today_events)."
                </ul>
               </div>";            
-            $line[$line_id] .= "<td class=\"eventOwner\"
+            $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\" class=\"eventOwner\"
                onmouseover=\"toggleInfo(this,'$id-$this_day',1); return true;\"
                onmouseout=\"toggleInfo(this,'$id-$this_day',0); return true;\">$day_content</td>";
           } else {
-            $line[$line_id] .= "<td></td>";
+            $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?action=view_day&amp;date=$iso_day'\"></td>";
           }
         }
       }
@@ -1433,6 +1443,7 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
   <thead>
   <tr><th></th>$line0</tr>  
   <tr><th></th>$line1</tr>
+  <tr><th></th>$line2</tr>
   </thead>
   $d_l
   </table>
@@ -2283,16 +2294,18 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     // resource select
     if (is_array($res["entity"])) {
       foreach ($res["entity"] as $r_id => $r_ent) {
-	      $r_name = $r_ent["label"];
-	      $sel_id = "data-resource-$r_id";
-	      $div_id = "sel_resource_id-$sel_id";
-
+	$r_name = $r_ent["label"];
+	$sel_id = "data-resource-$r_id";
+        $div_id = "sel_resource_id-$sel_id";
+        $list_item = "";
+        $list_item_id = "";
+        $property_value = "";
+        $property_name = "";
         // Item & Property
         $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&amp;resource_id=$r_id";
 
         if ($item != "") {
             $xml = parse_item($item);
-//          $xml = simplexml_load_string($item);
         }
         if (is_object($xml) && ($action == "detailupdate" || $action == "update" )) {
           foreach($xml->resource as $key => $value) {
@@ -2307,15 +2320,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
           $list_item = $t_list_item[$r_id]; 
           $list_item_id = $t_list_item_id[$r_id]; 
           $property_name = $t_property_name[$r_id];
-          if ($property_name == "") {
-            $property_name = run_query_calendar_get_resource_property($r_id);
-          }
           $property_value = $t_property_value[$r_id];
-          if ($property_value == "") {
-            $property_value = $property_name;
-          }
         }
-	      $dis_sel_resource .= "
+        if ($property_name == "") {
+          $property_name = run_query_calendar_get_resource_property($r_id);
+        }
+        if ($property_value == "") {
+          $property_value = $property_name;
+        }        
+	$dis_sel_resource .= "
           <div class=\"elementRow\" id=\"$div_id\">
             <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
             <img src=\"$ico_delete\" alt=\"[Delete]\" />
@@ -3652,7 +3665,7 @@ function parse_item($item) {
       // $item_detail->resource->$att = $value["value"];
       $${att} = $value["value"];
     }
-    if (isset($res_id) && isset($res_name) && isset($item) && isset($item_id) && isset($property_name) && isset($property_value)) {
+    if (isset($res_id) && isset($res_name) && isset($property_name) && isset($property_value)) {
       $item_detail = new Item($res_id, $res_name, $item, $item_id, $property_name, $property_value);
       $item_list->resource[] =  $item_detail;
       unset($res_id);

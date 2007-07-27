@@ -1501,7 +1501,7 @@ function run_query_calendar_update_event_data($calendar) {
       $properties .= "</resource>";
     }
   }
-  $properties .= "<extended_desc>$properties</extended_desc>";
+  $properties = "<extended_desc>$properties</extended_desc>";
 
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
