@@ -92,7 +92,6 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == 'invoice_status') {
     $res['align'] = 'center';
     $s_id = $OD->data_set->f('invoice_status_id');
-    echo "s=$s_id";
     $sta = get_invoice_status($s_id);
     $res['name'] = $sta[$s_id];
   }

@@ -16,6 +16,7 @@ DELETE FROM ObmInfo where obminfo_name='db_version';
 INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('db_version', '2.1');
 DELETE FROM ObmInfo where obminfo_name='remote_access';
 INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('remote_access', '0');
+DELETE FROM ObmInfo where obminfo_name='update_lock';
 INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('update_lock', '0');
 
 
@@ -31,6 +32,7 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm
 -------------------------------------------------------------------------------
 -- Default Domain properties
 -------------------------------------------------------------------------------
+DELETE FROM DomainProperty;
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default,domainproperty_readonly) VALUES ('update_state','integer', 1, 1);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_users','integer', 0);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_mailshares','integer', 0);
