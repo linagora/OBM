@@ -41,7 +41,11 @@ $l_delete = "Supprimer l'incident";
 
 // Mail
 $l_mail_incident_new_subject = "OBM : N. Incident";
+$l_mail_incident_affected_subject = "OBM : Affectation";
+$l_mail_incident_closed_subject = "OBM : Clôture";
 
+$l_mail_incident_affected_content = "Vous avez été affecté à l'incident";
+$l_mail_incident_closed_content = "a été clos";
 // Message
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des incidents correspondants.";
 $l_found = "incident(s) trouvé(s).";

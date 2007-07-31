@@ -214,22 +214,21 @@ function run_query_incident_status($user_id) {
 
   $query = "SELECT
       count(*) as nb,
-      incidentstatus_label
+      incident_status_id
     FROM Incident
-      LEFT Join IncidentStatus on incident_status_id = incidentstatus_id
     WHERE incident_archive = '0'
       AND incident_owner = '$user_id'
-    GROUP BY incident_status_id, incidentstatus_label
+    GROUP BY incident_status_id 
 ";
   
   display_debug_msg($query, $cdg_sql, "run_query_incident_status");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  
+  $status_label = get_incident_status();
   $tot = 0;
   while ($obm_q->next_record()) {
     $nb = $obm_q->f("nb");
-    $res[$obm_q->f("incidentstatus_label")] = $nb;
+    $res[$status_label[$obm_q->f("incident_status_id")]] = $nb;
     $tot += $nb;
   }
   $res["0"] = $tot;
@@ -237,7 +236,31 @@ function run_query_incident_status($user_id) {
   return $res;
 }
 
+/**
+ * get_incident_status 
+ * 
+ * @param string $target 
+ * @access public
+ * @return void
+ */
+function get_incident_status($target='') {
+  global $cdg_sql, $cinc_status;
 
+  $sta = array();
+
+  if ($target != '') {
+    $status_target[$target] = $cinc_status[$target];
+  } else {
+    $status_target = $cinc_status;
+  }
+
+  foreach ($status_target as $status => $s_id) {
+    $s_label = $GLOBALS["l_incidentstatus_$status"];
+    $sta[$s_id] = $s_label;
+  }
+
+  return $sta;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Get the number of contracts by range of dates (expired,...)
 // Parameters:

@@ -23,7 +23,7 @@ function run_query_incident_search($incident) {
   $text = sql_search_text_parse($incident["text"]);
   $lincident = sql_search_text_parse($incident["lincident"]);
   $lcontract = sql_search_text_parse($incident["lcontract"]);
-  $i_id = $incident["incident_id"];
+  $i_id = sql_search_text_parse($incident["incident_id"]);
   $company = sql_search_text_parse($incident["company"]);
   $priority = $incident["priority"];
   $status = $incident["status"];
@@ -34,7 +34,7 @@ function run_query_incident_search($incident) {
   $dateafter = of_isodate_convert($incident["date_after"],true);
   $datebefore = of_isodate_convert($incident["date_before"],true);
   $archive = $incident["archive"];
-  $reference = $incident["reference"];
+  $reference = sql_search_text_parse($incident["reference"]);
   $multidomain = sql_multidomain("incident");
 	
   $obm_q = new DB_OBM;
@@ -55,10 +55,10 @@ function run_query_incident_search($incident) {
      $where .= " AND Incident.incident_label $like '%$lincident%'";
   }
   if ($reference != "") {
-     $where .= " AND Incident.incident_reference $like '$reference%'";
+     $where .= " AND Incident.incident_reference $like '$reference'";
   }
   if ($i_id != "") {
-     $where .= " AND Incident.incident_id $like '$i_id%'";
+     $where .= " AND Incident.incident_id $like '$i_id'";
   }
   if ($owner != $c_all && ($owner != "")) {
      $where .=" AND (Incident.incident_owner = '$owner') ";
@@ -419,7 +419,9 @@ function get_incident_status($target='') {
 //                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_update($incident) {
-  global $obm, $cdg_sql;
+  global $obm, $cdg_sql, $cinc_status,$l_mail_incident_affected_subject;
+  global $l_mail_incident_closed_subject, $cmail_incident,$cgp_host;
+  global $l_mail_incident_closed_content, $l_mail_incident_affected_content;
 
   $contract_id = $incident["contract_new_id"];
   if ($contract_id < 1) {
@@ -448,6 +450,15 @@ function run_query_incident_update($incident) {
     $add_duration = $incident["add_duration"];
     $duration = $duration + $add_duration;
   }
+  $inc_info = get_incident_info($id);
+  if($inc_info["owner"] != $incident["owner"]) {
+    $owner_changed = true;
+  }
+  if($inc_info["status_id"] != $cinc_status["closed"] 
+    && $status == $cinc_status["closed"]) {
+    $closed = true;  
+  }
+
   $multidomain = sql_multidomain("incident");
   
   $query = "UPDATE Incident SET
@@ -473,6 +484,19 @@ function run_query_incident_update($incident) {
   $ret = $inc_q->query($query);  
 
   if ($ret) {
+    if($owner_changed) {
+      $label_mail = stripslashes($lincident);
+      $subject = "$l_mail_incident_affected_subject : $label_mail";
+      $message = "$l_mail_incident_affected_content : $cgp_host/incident/incident_index.php?action=detailconsult&incident_id=$id";
+      send_mail($subject, $message,  array($incident["owner"]), array(), 1);
+    }
+    if($closed) {
+      $label_mail = stripslashes($lincident);
+      $subject = "$l_mail_incident_closed_subject : $label_mail";
+      $message = "$cgp_host/incident/incident_index.php?action=detailconsult&incident_id=$id $l_mail_incident_closed_content";
+      
+      send_mail($subject, $message, array($incident["owner"]), array("$cmail_incident"), 1);
+    }
     $ret = of_userdata_query_update("incident", $id, $incident);
   }
 
@@ -595,6 +619,7 @@ function get_incident_info($id) {
       incident_id,
       incident_label,
       incident_status_id,
+      incident_owner,
       contract_label,
       company_name
     FROM Incident
@@ -611,8 +636,10 @@ function get_incident_info($id) {
   $res["label"] = $obm_q->f("incident_label");
   $status = get_incident_status();
   $res["status"] = $status[$obm_q->f("incident_status_id")];
+  $res["status_id"] = $obm_q->f("incident_status_id");
   $res["contract"] = $obm_q->f("contract_label");
   $res["company"] = $obm_q->f("company_name");
+  $res["owner"] = $obm_q->f("incident_owner");
 
   return $res;
 }
@@ -641,7 +668,7 @@ function check_incident_form($incident) {
   }
 
   // Check the status is filled
-  if ($incident["status"] < 1) {
+  if (!is_numeric($incident["status"])) {
     $err["msg"] = $l_fill_status;
     return false;
   }

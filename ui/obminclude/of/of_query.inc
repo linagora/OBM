@@ -1725,14 +1725,16 @@ function run_query_all_users_from_group($g_id, $ids="") {
       }
     }
   }
+  $multidomain = sql_multidomain("userobm");
 
   $query = "SELECT 
       userobm_id,
       userobm_lastname,
       userobm_firstname
     FROM UserObm
-    WHERE (userobm_archive != '1' and (1=0 $where_gusers))
-      $where_ids
+    WHERE ((userobm_archive != '1' and (1=0 $where_gusers))
+    $where_ids)
+    $multidomain
     ORDER BY userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);

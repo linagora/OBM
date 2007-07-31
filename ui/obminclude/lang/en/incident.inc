@@ -40,7 +40,11 @@ $l_delete = "Delete the Incident";
 
 // Mail
 $l_mail_incident_new_subject = "OBM : New incident";
+$l_mail_incident_affected_subject = "OBM : Assignment";
+$l_mail_incident_closed_subject = "OBM : Closed";
 
+$l_mail_incident_affected_content = "You've been assigned to this incident";
+$l_mail_incident_closed_content = "is now closed";
 // Message
 $l_no_display = "Fill the search fields and press < Find > to retrieve the incidents";
 $l_found = "incidents found";
