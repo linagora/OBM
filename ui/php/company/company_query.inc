@@ -16,7 +16,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_search($company) {
   global $cgp_user, $c_all, $c_none, $cdg_sql, $ctu_sql_limit;
-
+  global $cgp_archive_only;
+  
   $sql_order_dir = $company["sql_order_dir"];
   $sql_order_field = $company["sql_order_field"];
   
@@ -97,6 +98,9 @@ function run_query_company_search($company) {
   // Get only not archived by default
   if ($archive != "1") {
     $where .= " $and company_archive=0";
+    $and = "AND";
+  } elseif($cgp_archive_only) {
+    $where .= " $and company_archive=1";
     $and = "AND";
   }
 

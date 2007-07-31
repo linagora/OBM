@@ -36,6 +36,8 @@ $cg_prod = 3;
 
 // Allow * in search field
 $cgp_sql_star = true;
+// archive checkbox return only archived results
+//$cgp_archive_only = true;
 
 // Tuning constants
 //$ctu_sql_limit = true;
@@ -47,7 +49,7 @@ $cgp_sql_star = true;
 //$cmy_charset_collation = "latin1_general_ci";
 
 // is Mail enabled for OBM ? (eg: calendar)
-//$cgp_mail_enabled = true;
+$cgp_mail_enabled = true;
 
 // is Demo enabled (login screen array with default account)
 $cgp_demo_enabled = true;

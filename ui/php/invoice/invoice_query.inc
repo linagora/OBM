@@ -12,6 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_search ($invoice) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
+  global $cgp_archive_only;
 
   $sql_order_dir = $invoice['sql_order_dir'];
   $sql_order_field = $invoice['sql_order_field'];
@@ -107,6 +108,8 @@ function run_query_invoice_search ($invoice) {
   }
   if ($archive != '1') {
     $where .= " AND invoice_archive = '0'";
+  } elseif($cgp_archive_only) {
+    $where .= " AND invoice_archive = '1'";
   }
   $whereq = "WHERE $where";
 

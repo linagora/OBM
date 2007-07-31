@@ -15,6 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_project_search($params) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
+  global $cgp_archive_only;
 
   $sql_order_dir = $params["sql_order_dir"];
   $sql_order_field = $params["sql_order_field"];
@@ -67,6 +68,8 @@ function run_query_project_search($params) {
 
   if ($archive != "1") {
     $where .= " AND project_archive = '0'";
+  } elseif($cgp_archive_only) {
+    $where .= " AND project_archive = '1'";
   }
 
   if (($member != "") && ($member != $c_all)) {

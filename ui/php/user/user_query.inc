@@ -18,6 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_search($user) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
+  global $cgp_archive_only;
 
   $sql_order_dir = $user["sql_order_dir"];
   $sql_order_field = $user["sql_order_field"];
@@ -119,6 +120,9 @@ function run_query_user_search($user) {
   if ($archive != "1") {
     if (trim($where) != "") $where .= " AND";
     $where .= " userobm_archive = '0'";
+  } elseif($cgp_archive_only) {
+    if (trim($where) != "") $where .= " AND";
+    $where .= " userobm_archive = '1'";
   }
 
   if ((trim($where) != "") || (trim($where_restriction) != "")) {

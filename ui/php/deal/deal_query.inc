@@ -15,6 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal_search($deal, $all="") {
   global $c_all, $cdg_sql, $ctu_sql_limit;
+  global $cgp_archive_only;
 
   $sql_order_dir = $deal["sql_order_dir"];
   $sql_order_field = $deal["sql_order_field"];
@@ -97,6 +98,8 @@ function run_query_deal_search($deal, $all="") {
   }
   if ($archive != "1") {
     $where .= " AND deal_archive=0";
+  } elseif($cgp_archive_only) {
+    $where .= " AND deal_archive=1";
   }
   if (($manager != $c_all) && ($manager != "")) {
     $where .= " AND (deal_technicalmanager_id='$manager'

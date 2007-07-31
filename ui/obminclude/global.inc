@@ -85,6 +85,9 @@ $cgp_sess_db = false;
 $cgp_cookie_name = 'OBM_Session';
 $cgp_cookie_domain = 'aliasource.local';
 
+// if the archive checkbox is checked search returns ONLY
+// archived results
+$cgp_archive_only = false;
 // authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
 // CAS specific parameters are in conf/obm_conf.inc.
 $auth_kind = 'standalone'; 

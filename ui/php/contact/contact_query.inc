@@ -14,6 +14,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_search($contact) {
   global $cgp_show, $cdg_sql, $c_all, $ctu_sql_limit;
+  global $cgp_archive_only;
 
   $sql_order_dir = $contact["sql_order_dir"];
   $sql_order_field = $contact["sql_order_field"];
@@ -182,6 +183,8 @@ function run_query_contact_search($contact) {
   // Get only not archived by default
   if ($archive != "1") {
     $where .= " AND contact_archive=0";
+  } elseif ($cgp_archive_only) {
+    $where .= " AND contact_archive=1";
   }
 
   // User defined data

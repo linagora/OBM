@@ -16,6 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_search($incident) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
+  global $cgp_archive_only;
 
   $sql_order_dir = $incident["sql_order_dir"];
   $sql_order_field = $incident["sql_order_field"];
@@ -98,6 +99,8 @@ function run_query_incident_search($incident) {
 
   if ($archive != "1") {
     $where .= " AND Incident.incident_archive = '0'";
+  } elseif($cgp_archive_only) {
+    $where .= " AND Incident.incident_archive = '1'";
   }
 
   // User defined data
