@@ -432,10 +432,10 @@ public class ContactManager extends ObmManager {
     	
     	//private
     	if ( Helper.nullToZero(
-    			foundation.getSensitivity() ).shortValue() == 2 ) {
-    		contact.setClassification(1); //private
+    			foundation.getSensitivity() ).shortValue() == 0 ) { //olNormal
+    		contact.setClassification(0); //public
     	} else {
-    		contact.setClassification(0); 
+    		contact.setClassification(1); //private
     	}
     	
     	return contact;

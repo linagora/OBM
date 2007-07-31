@@ -455,10 +455,10 @@ public class CalendarManager extends ObmManager {
     			foundation.getPriority().getPropertyValueAsString()) );
     	
     	if ( Helper.nullToEmptyString(
-    			foundation.getAccessClass().getPropertyValueAsString()).equals("2") ) {
-    		event.setClassification(1); //private
+    			foundation.getAccessClass().getPropertyValueAsString()).equals("0") ) { //olNormal
+    		event.setClassification(0); //public
     	} else {
-    		event.setClassification(0);
+    		event.setClassification(1); //private
     	}
     	
     	EventRecurrence recurrence = null;
