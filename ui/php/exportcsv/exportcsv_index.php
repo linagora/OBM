@@ -77,6 +77,8 @@ if (($action == "index") || ($action == "")) {
   $export_d->data_set = $obm_q;
   header("Content-Type: text/comma-separated-values");
   header("Content-Disposition: attachment; filename=\"$entity.csv\"");
+  header('Cache-Control: maxage=3600'); 
+  header('Pragma: public');
   $export_d->dis_data_file($first_row, $nb_rows, $sep, $params["function"]);
 }
 
