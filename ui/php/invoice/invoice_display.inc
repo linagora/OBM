@@ -444,13 +444,11 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
       $dis_invoice->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
       $dis_invoice->data_form_end = "
-      <p class=\"detailButton\">
-        <p class=\"detailButtons\">
+      <fieldset class=\"buttons\">
         <input type=\"submit\" value=\"$l_add\" />
         <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-        </p>
-      </p>
+      </fieldset>
       </form>";
 
     $display_popup_end = "
@@ -542,27 +540,27 @@ function html_invoice_consult($inv_q, $pays) {
       <tbody>";
     $k = 0;
     $affected_amount_total = 0;
-    foreach ($pays as $one_pay) {
-      $id = $one_pay['id'];
-      $affected_amount = $one_pay['affected_amount'];
-      $amount = $one_pay['amount'];
-      $inout = $one_pay['inout'];
-      $company = $one_pay['company'];
-      $number = $one_pay['number'];
-      $date = $one_pay['date'];
-      $k ++;
-      ($k % 2 == 0)?$class='pair':$class='';
+    foreach ($pays as $id => $one_pay) {
+      if ($id != 'total') {
+        $affected_amount = $one_pay['affected_amount'];
+        $amount = $one_pay['amount'];
+        $inout = $one_pay['inout'];
+        $company = $one_pay['company'];
+        $number = $one_pay['number'];
+        $date = $one_pay['date'];
+        $k ++;
+        ($k % 2 == 0)?$class='pair':$class='';
 
-      if ($inout == '+') {
-	$dis_inout = $l_received;
-	$affected_amount_total += $affected_amount;
-      } else {
-	$dis_inout = $l_emitted;
-	$affected_amount_total -= $affected_amount;
-      }
+        if ($inout == '+') {
+	  $dis_inout = $l_received;
+          $affected_amount_total += $affected_amount;
+        } else {
+	  $dis_inout = $l_emitted;
+          $affected_amount_total -= $affected_amount;
+        }
       
-      $block_payment .= "
-        <tr class=\"$class\">
+        $block_payment .= "
+      <tr class=\"$class\">
         <td><a href=\"$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id\">$date</a></td>
         <td>$company</td>
         <td><a href=\"$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id\">$number</a></td>
@@ -570,6 +568,7 @@ function html_invoice_consult($inv_q, $pays) {
         <td>$inout </td>
         <td>$affected_amount </td>
       </tr>";
+      }
     }
 
     $amount_remaining = $amount_ttc - $affected_amount_total;
@@ -1446,7 +1445,7 @@ function dis_invoice_dashboard($invoice) {
   // Payment infos ------------------------------------------------------------
 
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges, 'invoice_expiration_date', $invoice['taskttype'], $inout);
+  $inv = run_query_invoice_amounts($date_ranges, 'invoice_expiration_date', $invoice['taskttype'], $inout, true);
 
   $status_pay = get_invoice_status('payment');
 

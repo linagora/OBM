@@ -757,7 +757,7 @@ function check_payment_invoice_data_form($params) {
   foreach($invs as $i_id=>$affected_amount) {
     $total_affected_amount += $affected_amount;
   }
-  if ($paid_amount < $total_affected_amount) {
+  if (round($paid_amount,2) < round($total_affected_amount,2)) {
     $err['msg'] = "$l_err_total_payment_affected ($total_amount > $paid_amount)";
     return false;
   }

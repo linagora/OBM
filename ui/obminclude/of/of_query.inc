@@ -559,9 +559,8 @@ function of_delegation_dis_block_update($value, $class) {
 	if ($delegation == '') {
 	  $delegation = $obm['delegation'];
 	}
-	$input_delegation = $delegation;
       }
-      if (in_array('domain', $admin_realm)) {
+      if (in_array('delegation', $admin_realm) || in_array('domain', $admin_realm)) {
 	$input_delegation = "<input name=\"tf_delegation\" size=\"32\" maxlength=\"64\" value=\"$delegation\" />";
       } else {
 	$input_delegation .= "<input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />";

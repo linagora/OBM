@@ -181,13 +181,11 @@ function run_query_invoice_detail($p_invoice_id) {
       company_name,
       deal_label,
       project_name,
-      invoicestatus_label,
       sum(paymentinvoice_amount) as invoice_paid
     FROM Invoice
       LEFT JOIN Company ON invoice_company_id=company_id
       LEFT JOIN Deal ON invoice_deal_id=deal_id
       LEFT JOIN Project ON invoice_project_id=project_id
-      LEFT JOIN InvoiceStatus ON invoice_status_id=invoicestatus_id
       LEFT OUTER join PaymentInvoice ON invoice_id=paymentinvoice_invoice_id
       LEFT JOIN UserObm as c ON invoice_usercreate=c.userobm_id
       LEFT JOIN UserObm as u ON invoice_userupdate=u.userobm_id
@@ -198,7 +196,6 @@ function run_query_invoice_detail($p_invoice_id) {
       invoice_amount_ht, invoice_amount_ttc, invoice_status_id, invoice_date,
       invoice_expiration_date, invoice_payment_date, invoice_comment,
       invoice_inout, invoice_credit_memo, invoice_archive,
-      invoicestatus_label,
       c.userobm_login, u.userobm_login, company_name, deal_label, project_name";
 
   display_debug_msg ($query, $cdg_sql, 'run_query_invoice_detail()'); 
@@ -377,6 +374,7 @@ function run_query_invoice_update($invoice) {
 // Parameters:
 //   - $target : 'payment' : get status where invoice should have a payment
 //             : 'tocreate' : get status where invoice has not been cretated
+//             : 'dashboard' : valid invoices (remove cancelled,...)
 //             : a number  : get status where status id = this number
 // Returns:
 //   - $sta : array of status [id] [label]
@@ -393,6 +391,12 @@ function get_invoice_status($target='') {
     $status_target['conflict'] = $cinv_status['conflict'];
   } else if ($target == 'tocreate') {
     $status_target['tocreate'] = $cinv_status['tocreate'];
+  } else if ($target == 'dashboard') {
+    $status_target['tocreate'] = $cinv_status['tocreate'];
+    $status_target['sent'] = $cinv_status['sent'];
+    $status_target['ppaid'] = $cinv_status['ppaid'];
+    $status_target['paid'] = $cinv_status['paid'];
+    $status_target['conflict'] = $cinv_status['conflict'];
   } else if (is_numeric($target)) {
     foreach ($cinv_status as $label => $id) {
       if ($target == $id) {
@@ -582,11 +586,12 @@ function get_invoice_nb_having_number ($number, $id='') {
 //   - $target_date : invoice_date, invoice_expiration_date : date to sort
 //   - $sel_tt      : [optionnal] tasktype array filter
 //   - $inout       : [optionnal] (+ || -) to get client or supplier invoices
+//   - $partial_pay : [optionnal] (true || false) get payments for ppaid status
 // Returns:
 //   $res : array[date]([billed]|[paid]|[potential])([status]|[total])[$infos]
 //            $infos = label, amount_ht, amount_ttc, nb
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $sel_tt='', $inout='+') {
+function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $sel_tt='', $inout='+', $partial_pay=false) {
   global $cdg_sql, $cdg_param, $cinv_status;
   global $l_total;
 
@@ -620,8 +625,7 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
   }
 
   // Status filter Billed (status payment) OR potential (status created = 0)
-  $status = get_invoice_status('payment');
-  $status .= get_invoice_status('tocreate');
+  $status = get_invoice_status('dashboard');
   if (is_array($status)) {
     $w_st .= ' AND (';
     $or = '';
@@ -688,21 +692,26 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
       $res[$month]['billed']["$status"]['nb'] ++;
       $res[$month]['billed']['total']['label'] = $l_total;
       $res[$month]['billed']['total']['nb'] ++;
-      // Handle partially paid distribution for payment chart
-      // Ici nouveau etat (restant du,..) pour chart paiement ??
-      /*      if (($status == $cinv_status['ppaid']) || ($status == $cinv_status['dailly'])) {
-	$pays = get_invoice_payment($id);
-	
-	// Case invoice is a credit memo
-	if ($credit != '1') {
-	  $res[$month]['paid']['total']['amount_ht'] += $ah;
-	  $res[$month]['paid']['total']['amount_ttc'] += $at;
-	} else {
-	  $res[$month]['paid']['total']['amount_ht'] -= $ah;
-	  $res[$month]['paid']['total']['amount_ttc'] -= $at;
-	}
-	$res[$month]['paid']['total']['nb'] ++;
-      }	*/
+
+      if ($partial_pay) {
+        // Handle partially paid distribution for payment chart
+        // Part paid set to 'paid'
+        // Part not paid paid set to 'ppaid'
+        if (($status == $cinv_status['ppaid']) || ($status == $cinv_status['dailly'])) {
+          $pays = get_invoice_payment($id);
+          $one_pay = $pays['total'];
+          if ($credit != '1') {
+            // cancel the amount just added 
+            $res[$month]['billed'][$cinv_status['ppaid']]['amount_ht'] -= $ah;
+            $res[$month]['billed'][$cinv_status['ppaid']]['amount_ttc'] -= $at;
+            // set the true partial payment done
+            $res[$month]['billed'][$cinv_status['paid']]['amount_ttc'] += $one_pay['affected_amount'];
+            // set the payment remaining value
+            $res[$month]['billed'][$cinv_status['ppaid']]['amount_ttc'] += $at - $one_pay['affected_amount'];
+          }  
+        }
+      }
+
     } else {
       // Invoice to create
       // Case invoice is a credit memo

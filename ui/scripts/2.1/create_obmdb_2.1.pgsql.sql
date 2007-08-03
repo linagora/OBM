@@ -86,6 +86,8 @@ CREATE TABLE UserObm (
   userobm_login               varchar(32) DEFAULT '' NOT NULL,
   userobm_password_type       varchar(6) DEFAULT 'PLAIN' NOT NULL,
   userobm_password            varchar(64) DEFAULT '' NOT NULL,
+  userobm_password_dateexp    date,
+  userobm_account_dateexp     date,
   userobm_perms               varchar(254),
   userobm_delegation_target   varchar(64) DEFAULT '',
   userobm_delegation          varchar(64) DEFAULT '',
@@ -127,9 +129,12 @@ CREATE TABLE UserObm (
   userobm_nomade_perms        integer default 0,
   userobm_nomade_enable       integer default 0,
   userobm_nomade_local_copy   integer default 0,
+  userobm_nomade_datebegin    timestamp,
+  userobm_nomade_dateend      timestamp,
   userobm_email_nomade        varchar(64) default '',
   userobm_vacation_enable     integer default 0,
-  userobm_vacation_date       timestamp,
+  userobm_vacation_datebegin  timestamp,
+  userobm_vacation_dateend    timestamp,
   userobm_vacation_message    text default '',
   userobm_samba_perms         integer default 0,
   userobm_samba_home          varchar(255) default '',
@@ -960,6 +965,7 @@ CREATE TABLE ProjectTask (
   projecttask_label          varchar(128) default NULL,
   projecttask_parenttask_id  integer default 0,
   projecttask_rank           integer default NULL,
+  projecttask_dateend        date,
   PRIMARY KEY (projecttask_id)
 );
 create INDEX pt_idx_pro ON ProjectTask (projecttask_project_id);

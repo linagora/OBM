@@ -569,13 +569,11 @@ function html_payment_invoice($amounts, $params) {
   <form method=\"post\" name=\"f_inv\" action=\"payment_index.php\">
   $block_invoice
 
-  <div class=\"detailButton\">
-  <p class=\"detailButtons\">
+  <fieldset class=\"buttons\">
     <input type=\"hidden\" name=\"action\" value=\"invoice_update\" />
     <input type=\"hidden\" name=\"payment_id\" value=\"$id\" />
     <input type=\"submit\" value=\"$l_update\" />
-  </p>
-  </div>
+  </fieldset>
   </form>";
   } else {
     $l_invoice_title = $l_no_invoice;

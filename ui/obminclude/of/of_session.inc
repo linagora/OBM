@@ -385,7 +385,7 @@ class Perm {
     }
     if ($obm["domain_id"] == 0) {
       $profiles[$obm["profile"]] = 
-         array (
+        array (
           'section' => array (
             'default' => 0,
             'user' => 1,
@@ -402,9 +402,12 @@ class Perm {
             'settings' => $perm_admin,
             'tools' => $perm_admin,
             'group' => $perm_user
+          ),
+          'properties' => array (                                                       
+            'admin_realm' => array ('domain')
           )
         );
-    }    
+    }
   }
 
   //-------------------------------------------------------------------------//

@@ -121,8 +121,14 @@ ALTER TABLE UserObm ADD COLUMN userobm_photo_id int(8) AFTER userobm_education;
 -- Add company, direction field
 ALTER TABLE UserObm ADD COLUMN userobm_company varchar(64) AFTER userobm_sound;
 ALTER TABLE UserObm ADD COLUMN userobm_direction varchar(64) AFTER userobm_company;
--- Add vacation_date field
-ALTER TABLE UserObm ADD COLUMN userobm_vacation_date timestamp(14) AFTER userobm_vacation_enable;
+-- Add vacation_date, nomade fields
+ALTER TABLE UserObm ADD COLUMN userobm_vacation_datebegin timestamp(14) AFTER userobm_vacation_enable;
+ALTER TABLE UserObm ADD COLUMN userobm_vacation_dateend timestamp(14) AFTER userobm_vacation_datebegin;
+ALTER TABLE UserObm ADD COLUMN userobm_nomade_datebegin timestamp(14) AFTER userobm_nomade_local_copy;
+ALTER TABLE UserObm ADD COLUMN userobm_nomade_dateend timestamp(14) AFTER userobm_nomade_datebegin;
+-- user expiration date fields
+ALTER TABLE UserObm ADD COLUMN userobm_password_dateexp date AFTER userobm_password;
+ALTER TABLE UserObm ADD COLUMN userobm_account_dateexp date AFTER userobm_password_dateexp;
 
 
 -------------------------------------------------------------------------------
@@ -359,3 +365,8 @@ UPDATE Incident set incident_status_id = 3 WHERE incident_status_id IN
 UPDATE Incident set incident_status_id = 4 WHERE incident_status_id IN 
 (SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Closed' OR incidentstatus_label='Cloturé');
 
+
+--
+-- UPDATE ProjectTask Structure
+--
+ALTER TABLE ProjectTask ADD COLUMN projecttask_dateend date;
