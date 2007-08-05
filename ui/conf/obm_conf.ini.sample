@@ -28,11 +28,12 @@ obm-mail = true
 obm-samba = true
 obm-web = true
 
+; Paramètre permettant de configurer OBM pour n'utiliser qu'un seul espace de
+; nom pour les entités de ses différents domaines
+singleNameSpace = false
+
 [automate]
 ; Parametrage specifique a l'automate
-
-; Faut-il executer les hooks
-enableHook = false
 
 ; Adresse du serveur LDAP
 ldapServer = localhost

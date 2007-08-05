@@ -15,7 +15,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($facility_log $enableHook $sieveSrv $ldapServer $ldapRoot $sambaSrvHome $sambaOldSidMapping $obmModules $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($facility_log $sieveSrv $singleSpaceName $ldapServer $ldapRoot $sambaSrvHome $sambaOldSidMapping $obmModules $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_files = qw($automateMailChangeAlias $automateMailChangeSieve $automateCyrusAdmin $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixUpdate);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
@@ -53,13 +53,8 @@ $userPasswd = $1;
 $dbName = $cfgFile->val( 'global', 'db' );
 $db = "dbi:".lc( $cfgFile->val( 'global', 'dbtype' )).":database=$dbName;host=".$cfgFile->val( 'global', 'host' );
 
-# Y'a-t-il des operations specifiques a l'installation - utilisation du hook
-# dans le script 'ldapModifBase.pl'
-if( lc($cfgFile->val( 'automate', 'enableHook' )) eq "true" ) {
-    $enableHook = 1;
-}else {
-    $enableHook = 0;
-}
+# Mode d'espace de nom OBM
+$singleSpaceName = $cfgFile->val( 'global', 'singleNameSpace' );
 
 # Le serveur LDAP
 $ldapServer = $cfgFile->val( 'automate', 'ldapServer' );
