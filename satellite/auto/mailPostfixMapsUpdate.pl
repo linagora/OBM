@@ -36,7 +36,7 @@ sub updateServer {
 
     
 
-    &OBM::toolBox::write_log( "Envoie de la commande : '".$cmd."'", "W" );
+    &OBM::toolBox::write_log( "Envoi de la commande : '".$cmd."'", "W" );
     $srvCon->print( $cmd );
     if( (!$srvCon->eof()) && (my $line = $srvCon->getline()) ) {
         chomp($line);
@@ -66,12 +66,23 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
     exit 1;
 }
 
-# Recuperation des domaines a traiter
-&OBM::toolBox::write_log( "Recuperation de la liste des domaines", "W" );
-my $domainList = &OBM::toolBox::getDomains( $dbHandler, undef );
+# Obtention de la liste des serveurs SMTP
+my $query = "SELECT i.host_name, i.host_ip FROM Host i, MailServer j WHERE i.host_id=j.mailserver_host_id";
 
-# Récupération des serveurs de courrier par domaine
-&OBM::imapd::getServerByDomain( $dbHandler, $domainList );
+# On execute la requete
+my $queryResult;
+if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+    &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+    return 0;
+}
+
+while( my( $serverName, $serverIp ) = $queryResult->fetchrow_array() ) {
+    if( !defined($serverName) || !defined($serverIp) ) {
+        next;
+    }
+
+    updateServer( $serverIp, "postfixMaps: ".$serverName );
+}
 
 # Deconnexion de la BD
 &OBM::toolBox::write_log( "Deconnexion de la base de donnees OBM", "W" );
@@ -79,39 +90,6 @@ if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
     &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "W" );
 }
 
-# Obtention de la liste des domaines sous forme de chaine de caractère
-my $domainString;
-for( my $i=0; $i<=$#{$domainList}; $i++ ) {
-    if( $domainList->[$i]->{"meta_domain"} ) {
-        next;
-    }
-    
-    if( defined($domainString) ) {
-        $domainString .= ":";
-    }
-
-    $domainString .= $domainList->[$i]->{"domain_label"};
-}
-
-# MAJ des MTA
-&OBM::toolBox::write_log( "Mise a jour des MTA", "W" );
-
-for( my $i=0; $i<=$#{$domainList}; $i++ ) {
-    my $currentDomain = $domainList->[$i];
-    my %serverOk;
-
-    if( !exists($currentDomain->{imap_servers}) ) {
-        next;
-    }
-
-    for( my $j=0; $j<=$#{$currentDomain->{imap_servers}}; $j++ ) {
-        my $currentServer = $currentDomain->{imap_servers}->[$j];
-        &OBM::toolBox::write_log( "Traitement du serveur '".$currentServer->{imap_server_name}."'", "W" );
-        if( !exists($serverOk{$currentServer->{imap_server_name}}) && !updateServer( $currentServer->{imap_server_ip}, "domains: ".$domainString ) ) {
-            $serverOk{$currentServer->{imap_server_name}} = 1;
-        }
-    }
-}
 
 # Fin de MAJ des MTA
 &OBM::toolBox::write_log( "Fin de mise a jour des MTA", "W" );

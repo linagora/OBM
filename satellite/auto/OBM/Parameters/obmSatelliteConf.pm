@@ -1,4 +1,4 @@
-package OBM::Parameters::mailMakePostfixMapsConf;
+package OBM::Parameters::obmSatelliteConf;
 
 require Exporter;
 
@@ -12,7 +12,6 @@ require Exporter;
 # Necessaire pour le bon fonctionnement du package
 $debug=1;
 
-
 $postfixMapsDesc = {
     mailbox => {
         postfix_map => "/etc/postfix/virtual_mailbox",
@@ -24,8 +23,8 @@ $postfixMapsDesc = {
         ldap_attibute => [ "mailbox" ],
         make_map => sub {
             my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;
-            require OBM::MakePostfixMaps::mapMailbox;
-            return &OBM::MakePostfixMaps::mapMailbox::makeMailboxMap( $daemonRef, $mailBoxMapFile, $obmDomains );
+            require OBM::ObmSatellite::mapMailbox;
+            return &OBM::ObmSatellite::mapMailbox::makeMailboxMap( $daemonRef, $mailBoxMapFile, $obmDomains );
         }
     },
     alias => {
@@ -38,8 +37,8 @@ $postfixMapsDesc = {
         ldap_attibute => [ "mailbox", "mail", "mailAlias" ],
         make_map => sub {
             my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;
-            require OBM::MakePostfixMaps::mapAlias;
-            return &OBM::MakePostfixMaps::mapAlias::makeAliasMap( $daemonRef, $mailBoxMapFile, $obmDomains );
+            require OBM::ObmSatellite::mapAlias;
+            return &OBM::ObmSatellite::mapAlias::makeAliasMap( $daemonRef, $mailBoxMapFile, $obmDomains );
         }
     },
     transport => {
@@ -52,8 +51,8 @@ $postfixMapsDesc = {
         ldap_attibute => [ "mailbox", "mailBoxServer" ],
         make_map => sub {
             my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;
-            require OBM::MakePostfixMaps::mapTransport;
-            return &OBM::MakePostfixMaps::mapTransport::makeTransportMap( $daemonRef, $mailBoxMapFile, $obmDomains );
+            require OBM::ObmSatellite::mapTransport;
+            return &OBM::ObmSatellite::mapTransport::makeTransportMap( $daemonRef, $mailBoxMapFile, $obmDomains );
         }
     },
     domain => {
@@ -66,8 +65,8 @@ $postfixMapsDesc = {
         ldap_attibute => [ "myDestination" ],
         make_map => sub {
             my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;
-            require OBM::MakePostfixMaps::mapDomains;
-            return &OBM::MakePostfixMaps::mapDomains::makeDomainsMap( $daemonRef, $mailBoxMapFile, $obmDomains );
+            require OBM::ObmSatellite::mapDomains;
+            return &OBM::ObmSatellite::mapDomains::makeDomainsMap( $daemonRef, $mailBoxMapFile, $obmDomains );
         }
     },
     networks => {

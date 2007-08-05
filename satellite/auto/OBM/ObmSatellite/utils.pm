@@ -1,14 +1,14 @@
 #########################################################################
-# OBM           - File : OBM::MakePostfixMaps::utils.pm (Perl Module)   #
+# OBM           - File : OBM::ObmSatellite::utils.pm (Perl Module)   #
 #               - Desc : Librairie Perl pour OBM                        #
 #               Les fonctions communes necessaires au service           #
-#               mailMakePostfixMaps                                     #
+#               obmSatellite                                            #
 #########################################################################
 # Cree le 2007-03-12                                                    #
 #########################################################################
-# $Id$   #
+# $Id: utils.pm 1492 2007-03-14 09:26:14Z anthony $   #
 #########################################################################
-package OBM::MakePostfixMaps::utils;
+package OBM::ObmSatellite::utils;
 
 require Exporter;
 use strict;

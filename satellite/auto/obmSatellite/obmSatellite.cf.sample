@@ -2,17 +2,17 @@
 ldap_server         nom.server.ldap
 
 # Options communement modifiees
-log_level           0                                       # de 0 a 4 - 0 par defaut
-log_file            /var/log/obm/mailMakePostfix.log    # /var/log/obm/mailMakePostfix.log par defaut
-pid_file            /var/run/obm/mailMakePostfix.pid    # /var/run/obm/mailMakePostfix.pid par defaut
+log_level           0                                   # de 0 a 4 - 0 par defaut
+log_file            /var/log/obm/obmSatellite.log       # /var/log/obm/obmSatellite.log par defaut
+pid_file            /var/run/obm/obmSatellite.pid       # /var/run/obm/obmSatellite.pid par defaut
 
 # IP ayant droit de se connecter
 cidr_allow          127.0.0.1/32                        # Vide par defaut
 
 # Attention a la modifications de ces options
 max_badrequest      2                                   # 2 par defaut
-user                postfix                             # postfix par defaut
-group               postfix                             # postfix par defaut
+user                root                                # postfix par defaut
+group               root                                # postfix par defaut
 
 postmap_cmd         /usr/sbin/postmap
 # Le nom des map postfix

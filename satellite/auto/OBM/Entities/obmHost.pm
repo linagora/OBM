@@ -85,7 +85,7 @@ sub getEntity {
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "obmHost: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -105,7 +105,7 @@ sub getEntity {
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "obmHost: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -113,8 +113,27 @@ sub getEntity {
     my $dbHostDesc = $queryResult->fetchrow_hashref();
     $queryResult->finish();
 
+    # On stocke les informations utiles dans la structure de donnees des
+    # resultats
+    $self->{"hostDesc"} = $dbHostDesc;
+    $self->{"hostDesc"}->{"host_domain"} = $domainDesc->{"domain_label"};
+
     # On stocke la description BD utile pour la MAJ des tables
     $self->{"hostDbDesc"} = $dbHostDesc;
+
+
+    # Obtention des domaines pour lesquels cet hôte est serveur de courrier
+    $query = "SELECT i.domain_label from Domain i, MailServer j WHERE i.domain_mail_server_id=j.mailserver_id AND j.mailserver_host_id=".$hostId;
+
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "obmHost: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    while( my( $obmDomain ) = $queryResult->fetchrow_array() ) {
+        push( @{$self->{"hostDesc"}->{"smtp_domain"}}, $obmDomain );
+    }
+    $self->{"hostDesc"}->{"cyrus_domain"} = $self->{"hostDesc"}->{"smtp_domain"};
 
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
@@ -212,6 +231,106 @@ sub isLinks {
     my $self = shift;
 
     return $self->{"links"};
+}
+
+
+sub getLdapDnPrefix {
+    my $self = shift;
+    my $dnPrefix = undef;
+
+    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"hostDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
+        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"hostDesc"}->{$self->{"typeDesc"}->{"dn_value"}};
+    }
+
+    return $dnPrefix;
+}
+
+
+sub createLdapEntry {
+    my $self = shift;
+    my ( $ldapEntry ) = @_;
+    my $entry = $self->{"hostDesc"};
+
+    # Les paramètres nécessaires
+    if( $entry->{"host_name"} ) {
+        $ldapEntry->add(
+            objectClass => $self->{"typeDesc"}->{"objectclass"},
+            cn => $entry->{"host_name"}
+        );
+
+    }else {
+        return 0;
+    }
+
+    # La description
+    if( $entry->{"host_description"} ) {
+        $ldapEntry->add( description => to_utf8({ -string => $entry->{"host_description"}, -charset => $defaultCharSet }) );
+    }
+
+    # L'adresse IP
+    if( $entry->{"host_ip"} ) {
+        $ldapEntry->add( ipHostNumber => $entry->{"host_ip"} );
+    }
+
+    # Le domaine OBM
+    if( $entry->{"host_domain"} ) {
+        $ldapEntry->add( obmDomain => to_utf8({ -string => $entry->{"host_domain"}, -charset => $defaultCharSet }) );
+    }
+
+    # Les domaines pour lesquels cet hôte est serveur SMTP
+    if( defined($entry->{"smtp_domain"}) && (ref($entry->{"smtp_domain"}) eq "ARRAY" ) ) {
+        for( my $i=0; $i<=$#{$entry->{"smtp_domain"}}; $i++ ) {
+            $entry->{"smtp_domain"}->[$i] = to_utf8({ -string => $entry->{"smtp_domain"}->[$i], -charset => $defaultCharSet });
+        }
+
+        $ldapEntry->add( smtpDomain => $entry->{"smtp_domain"} );
+    }
+
+    # Les domaines pour lesquels cet hôte est serveur Cyrus
+    if( defined($entry->{"cyrus_domain"}) && (ref($entry->{"cyrus_domain"}) eq "ARRAY" ) ) {
+        for( my $i=0; $i<=$#{$entry->{"cyrus_domain"}}; $i++ ) {
+            $entry->{"cyrus_domain"}->[$i] = to_utf8({ -string => $entry->{"cyrus_domain"}->[$i], -charset => $defaultCharSet });
+        }
+
+        $ldapEntry->add( cyrusDomain => $entry->{"cyrus_domain"} );
+    }
+
+    return 1;
+}
+
+
+sub updateLdapEntry {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $entry = $self->{"hostDesc"};
+    my $update = 0;
+
+    # La description
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"host_description"}, $ldapEntry, "description" ) ) {
+        $update = 1;
+    }
+
+    # L'adresse IP
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"host_ip"}, $ldapEntry, "ipHostNumber" ) ) {
+        $update = 1;
+    }
+
+    # Le domaine OBM
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{"host_domain"}, $ldapEntry, "obmDomain" ) ) {
+        $update = 1;
+    }
+
+    # Les domaines pour lesquels cet hôte est serveur SMTP
+    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"smtp_domain"}, $ldapEntry, "smtpDomain" ) ) {
+        $update = 1;
+    }
+
+    # Les domaines pour lesquels cet hôte est serveur Cyrus
+    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"cyrus_domain"}, $ldapEntry, "cyrusDomain" ) ) {
+        $update = 1;
+    }
+
+    return $update;
 }
 
 

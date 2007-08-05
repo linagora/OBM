@@ -367,6 +367,55 @@ sub getMailboxQuota {
 }
 
 
+sub getMailboxQuotaUse {
+    my $self = shift;
+    my( $object ) = @_;
+
+    if( !defined($object) ) {
+        return undef;
+    }
+
+    # Récupération du nom de la boîte à traiter
+    my $mailBoxName = $object->getMailboxName();
+    if( !defined($mailBoxName) ) {
+        return undef;
+    }
+
+    # Récupération des identifiants du serveur de la boîte à traiter
+    my $mailBoxDomainId;
+    my $mailBoxServerId;
+    $object->getMailServerRef( \$mailBoxDomainId, \$mailBoxServerId );
+
+    # Récupération de la description du serveur de la boîte à traiter
+    my $cyrusSrv = $self->_findCyrusSrvbyId( $mailBoxDomainId, $mailBoxServerId );
+    if( !defined($cyrusSrv) ) {
+        return undef;
+    }
+
+    # Est-on connecté à ce serveur
+    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
+        return undef;
+    }
+
+    # Obtention du quota utilisé
+    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
+    my $mailBoxQuotaUse = 0;
+    my $boxPrefix = $object->getMailboxPrefix();
+
+
+    my @quotaDesc = $cyrusSrvConn->listquotaroot( $boxPrefix.$mailBoxName );
+    if( $cyrusSrvConn->error ) {
+        return undef;
+    }
+
+    if( defined( $quotaDesc[2][1] ) ) {
+        $mailBoxQuotaUse = $quotaDesc[2][0];
+    }
+
+    return $mailBoxQuotaUse;
+}
+
+
 sub _imapSetMailboxQuota {
     my $self = shift;
     my( $cyrusSrv, $object ) = @_;

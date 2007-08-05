@@ -12,7 +12,6 @@ use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
-use strict;
 
 
 sub new {
