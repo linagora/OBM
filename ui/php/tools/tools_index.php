@@ -119,7 +119,6 @@ function get_tools_action() {
   global $params, $actions, $path;
   global $l_header_tools_upd, $l_header_tools_halt,$l_header_tools_remote;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
-  global $cgp_securinet;
 
 
 // Tool Update
@@ -135,16 +134,6 @@ function get_tools_action() {
     'Right'    => $cright_write_admin,
     'Condition'=> array ('none') 
                                     );
-
-// Tool Remote
-  if( $cgp_securinet ) {
-    $actions["tools"]["remote_index"] = array (
-      'Name'     => $l_header_tools_remote,
-      'Url'      => "$path/tools/tools_index.php?action=remote_index",
-      'Right'    => $cright_write_admin,
-      'Condition'=> array ('all') 
-                                    );
-  }
 
 // Tool Remote
   $actions["tools"]["remote_update"] = array (

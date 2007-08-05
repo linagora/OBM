@@ -28,9 +28,6 @@ postfixConf = ldap
 ; Aliamin gere les alias de messagerie dans LDAP
 aliasLdap = true
 
-; Aliamin fonctionne en mode sécurinet (true|false)
-securinet = false
-
 ; Modules OBM fonctionnels
 obm-ldap = true
 obm-mail = true

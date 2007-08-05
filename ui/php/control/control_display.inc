@@ -27,7 +27,6 @@ function html_control_consult($domain_id="") {
   global $c_yes, $c_no, $c_virus_log;
   global $obm, $cgp_use, $display;
   global $l_download_log;
-  global $cgp_securinet;
 
 
   $display["title"] = "<div class=\"title\">$l_control</div>";
@@ -116,10 +115,6 @@ function html_control_consult($domain_id="") {
   //  $system_update = get_update_state();
   $sys_update = ($system_update ? $c_yes : $c_no);
 
-  if( $cgp_securinet ) {
-    $block_virus_stats = display_virus_stats();
-  }
-
   $block = "
     <div class=\"detail infos\">
     <h1>$l_system</h1>
@@ -178,54 +173,6 @@ function html_control_consult($domain_id="") {
     <tr>
       <th>$l_sys_update</th>
       <td>$sys_update</td>
-    </tr>
-    </table>
-    </div>";
-
-  return $block;
-}
-
-
-function display_virus_stats() {
-  global $l_virus_stats, $l_virus_main_db_version, $l_virus_daily_db_version, $l_virus_detected, $l_this_month, $l_last_month;
-
-  $virus_db_version = get_virus_db_version();
-  $virus_daily_db_version = $virus_db_version["daily"];
-  $virus_main_db_version = $virus_db_version["main"];
-  $virus_db_lastupdate = $virus_db_version["lastupdate"];
-  $virus_last_month = $virus_stats["virus_last_month_total"];
-  $virus_this_month = $virus_stats["virus_current_month_total"];
-  if ($virus_last_month > 0) {
-    $download_log_last_month = "( <a href=\"$path/control/control_index.php?action=download_log&amp;log_name=$c_virus_log.0\">$l_download_log</a>)";
-  }
-  if ($virus_this_month > 0) {
-    $download_log_this_month = "( <a href=\"$path/control/control_index.php?action=download_log&amp;log_name=$c_virus_log\">$l_download_log</a>)";
-  }
-
-
-  $block = "
-    <div class=\"detail infos\">
-    <h1>$l_virus_stats</h1>
-
-    <table>
-    <tr>
-      <th colspan=\"2\">$virus_db_lastupdate</th>
-    </tr>
-    <tr>
-      <th>$l_virus_main_db_version</th>
-      <td>$virus_main_db_version</td>
-    </tr>
-    <tr>
-      <th>$l_virus_daily_db_version</th>
-      <td>$virus_daily_db_version</td>
-    </tr>
-    <tr>
-      <th>$l_virus_detected $l_this_month</th>
-      <td>$virus_this_month $download_log_this_month</td>
-    </tr>
-    <tr>
-      <th>$l_virus_detected $l_last_month</th>
-      <td>$virus_last_month $download_log_last_month</td>
     </tr>
     </table>
     </div>";
