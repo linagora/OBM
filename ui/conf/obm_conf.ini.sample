@@ -22,12 +22,6 @@ password = "aliasource"
 ; Default language
 lang = fr
 
-; Gestion de la configuration de postfix ldap, file, ou false
-postfixConf = ldap
-
-; Aliamin gere les alias de messagerie dans LDAP
-aliasLdap = true
-
 ; Modules OBM fonctionnels
 obm-ldap = true
 obm-mail = true
