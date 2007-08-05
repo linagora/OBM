@@ -1,16 +1,16 @@
 #!/bin/bash
 ###############################################################################
-# Script de gestion du serveur mailMakePostfixMaps.pl
+# Script de gestion du serveur obmSatellite.pl
 ###############################################################################
 
-OBMPATH="/opt/obm/current"
+OBMPATH="/var/www/icasso"
 
-daemon_path="$OBMPATH/auto/mailMakePostfixMaps/mailMakePostfixMaps.pl"
-daemon_pid="/var/run/obm/mailMakePostfix.pid"
+daemon_path="$OBMPATH/auto/obmSatellite/obmSatellite.pl"
+daemon_pid="/var/run/obm/obmSatellite.pid"
 
 case "$1" in
     start)
-        echo -n "Starting mailMakePostfixMaps : "
+        echo -n "Starting obm-Satellite : "
         if [ ! -e $daemon_pid ]; then
             $daemon_path
             echo "done."
@@ -21,7 +21,7 @@ case "$1" in
         ;;
 
     stop)
-        echo -n "Stopping mailMakePostfixMaps : "
+        echo -n "Stopping obm-Satellite : "
         if [ -e $daemon_pid ]; then
             kill -TERM `cat $daemon_pid`
             rm -f $daemon_pid
@@ -33,7 +33,7 @@ case "$1" in
         ;;
 
     reload)
-        echo -n "Reload mailMakePostfixMaps : "
+        echo -n "Reload obm-Satellite : "
         if [ -e $daemon_pid ]; then
             kill -HUP `cat $daemon_pid`
             echo "done."

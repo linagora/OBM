@@ -73,7 +73,7 @@ if( $parameters{"cyrus"} ) {
 }
 
 # Configuration des services Postfix - contact des services
-# 'mailMakePostfixMaps'
+# 'obmSatellite'
 if( $parameters{"postfix"} ) {
     &OBM::toolBox::write_log( "Reconfiguration des services MTA Postfix", "W" );
     if( &OBM::utils::execCmd( "$automatePostfixUpdate", 0 ) ) {

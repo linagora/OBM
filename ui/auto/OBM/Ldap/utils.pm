@@ -44,10 +44,10 @@ sub modifyAttr {
 
 
 sub modifyAttrList {
-    my( $newValue, $ldapEntry, $attr ) = @_;
+    my( $newValues, $ldapEntry, $attr ) = @_;
     my $update = 0;
 
-    if( !defined($newValue) ) {
+    if( !defined($newValues) ) {
         if( $ldapEntry->get_value( $attr, asref => 1) ) {
             $ldapEntry->delete( $attr => [ ] );
             $update = 1;
@@ -55,35 +55,40 @@ sub modifyAttrList {
 
         return $update;
 
-    }elsif( defined($newValue) && (uc(ref($newValue)) ne "ARRAY" ) ) {
+    }elsif( defined($newValues) && (uc(ref($newValues)) ne "ARRAY" ) ) {
         return $update;
 
     }
 
+    # On converti les nouvelles valeurs dans le bon encodage
+    for( my $i=0; $i<=$#{$newValues}; $i++ ) {
+        $newValues->[$i] = to_utf8({ -string => $newValues->[$i], -charset => $OBM::Parameters::common::defaultCharSet });
+    }
+
     my $ldapValues = $ldapEntry->get_value( $attr, asref => 1);
-    if( $newValue && !defined( $ldapValues ) ) {
+    if( $newValues && !defined( $ldapValues ) ) {
         # cet attribut n'est pas defini dans LDAP mais est defini dans la
         # description en BD
-        if( $#$newValue != -1 ) {
-            $ldapEntry->add( $attr => $newValue );
+        if( $#$newValues != -1 ) {
+            $ldapEntry->add( $attr => $newValues );
 
             # Il y a eu modification
             $update = 1;
         }
-    }elsif( ($#{$newValue} >= 0) && defined( $ldapValues ) ) {
+    }elsif( ($#{$newValues} >= 0) && defined( $ldapValues ) ) {
         # Cet attribut est defini dans LDAP et dans la description de l'utilisateur
-        if( $#$ldapValues != $#$newValue ) {
+        if( $#$ldapValues != $#$newValues ) {
             $ldapEntry->delete( $attr => [ ] );
 
-            if( $#$newValue != -1 ) {
-                $ldapEntry->add( $attr => $newValue );
+            if( $#$newValues != -1 ) {
+                $ldapEntry->add( $attr => $newValues );
                         
                 # Il y a eu modification
                 $update = 1;
             }
         }else {
             my @ldapValuesSort = sort( @{$ldapValues} );
-            my @userDescSort = sort( @{$newValue} );
+            my @userDescSort = sort( @{$newValues} );
 
             my $i = 0;
             while( ($i<=$#ldapValuesSort) && ($ldapValuesSort[$i] eq $userDescSort[$i]) ) {
@@ -95,7 +100,7 @@ sub modifyAttrList {
             # qu'il y a eu modification...
             if( $i<=$#ldapValuesSort ) {
                 $ldapEntry->delete( $attr => [ ] );
-                $ldapEntry->add( $attr => $newValue );
+                $ldapEntry->add( $attr => $newValues );
 
                 # Il y a eu modification
                 $update = 1;

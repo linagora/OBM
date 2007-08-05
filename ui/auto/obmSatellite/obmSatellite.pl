@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w -T
 
-package mailMakePostfixMaps;
+package obmSatellite;
 
 use vars qw(@ISA);
 use Net::Server::PreForkSimple;
 use URI::Escape;
-require OBM::Parameters::mailMakePostfixMapsConf;
+require OBM::Parameters::obmSatelliteConf;
 use FindBin qw($Bin);
 use strict;
 
@@ -13,7 +13,7 @@ use strict;
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
-mailMakePostfixMaps->run();
+obmSatellite->run();
 exit;
 
 $|=1;
@@ -24,14 +24,14 @@ sub configure_hook {
     my $self = shift;
 
     # Initalisation des maps Postfix
-    if( defined($OBM::Parameters::mailMakePostfixMapsConf::postfixMapsDesc) ) {
-        $self->{postfix_maps} = $OBM::Parameters::mailMakePostfixMapsConf::postfixMapsDesc;
+    if( defined($OBM::Parameters::obmSatelliteConf::postfixMapsDesc) ) {
+        $self->{postfix_maps} = $OBM::Parameters::obmSatelliteConf::postfixMapsDesc;
     }else {
         print "Erreur: aucune map Postfix n'est a gerer !\n";
         exit 1;
     }
 
-    $self->{server}->{name} = "mailMakePostfixMaps";                        # Nom du service
+    $self->{server}->{name} = "obmSatellite";                               # Nom du service
     $self->{server}->{conf_file} = $Bin."/".$self->{server}->{name}.".cf";  # Définition du fichier de configuration du service
 
 
@@ -162,21 +162,19 @@ sub pre_loop_hook {
     my $self = shift;
 }
 
-#
+
 # Process after a new connection was established end before the requests was
 # process
-#
 sub post_accept_hook {
     my $self = shift;
 
     $self->logMessage( "Connexion de : ".$self->{server}->{client}->peerhost()." on port ".$self->{server}->{client}->sockport() );
-    $self->sendMessage( "HELLO" );
+    $self->sendMessage( "HELLO", undef );
 
 }
 
-#
+
 # Process the request
-#
 sub process_request {
     my $self = shift;
 
@@ -184,7 +182,7 @@ sub process_request {
 
         # Configuration de l'alarme
         local $SIG{ALRM} = sub {
-            $self->sendMessage( "TIMEOUT" );
+            $self->sendMessage( "TIMEOUT", undef );
             die "timeOut";
         };
 
@@ -199,24 +197,32 @@ sub process_request {
             # Suppression du délai de réception d'une requête durant son
             # traitement
             alarm(0);
-            $self->logMessage( $currentRequest );
+            $self->logMessage( "Requete recue : ".$currentRequest );
 
             if( !$self->checkClientRequest( \$currentRequest ) ) {
                 if( $currentRequest =~ /^quit$/i ) {
                     last;
                 }
 
-                if( $currentRequest =~ /^domains: (.+:)*.+$/i ) {
-                    my $domains = $currentRequest;
-                    $domains =~ s/^domains: //i;
+                if( $currentRequest =~ /^postfixMaps: ([A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9])$/i ) {
+                    my $hostName = $1;
 
-                    $self->process_domains( $domains );
+                    my $domainList = $self->getServerDomains( "smtp", $hostName );
+                    $self->processPostfixDomains( $domainList );
+                }
+
+                if( $currentRequest =~ /^cyrusPartitions: (add|del):([A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9])$/i ) {
+                    my $action = $1;
+                    my $hostName = $2;
+
+                    my $domainList = $self->getServerDomains( "cyrus", $hostName );
+                    $self->processCyrusPartitions( $action, $domainList );
                 }
             }else {
-                $self->sendMessage( "BADREQUEST" );
+                $self->sendMessage( "BADREQUEST", undef );
                 $current_badrequest++;
                 if( $current_badrequest >= $self->{server}->{max_badrequest} ) {
-                    $self->sendMessage( "BADREQUESTS" );
+                    $self->sendMessage( "BADREQUESTS", undef );
                     die "badRequest";
                 }
             }
@@ -239,12 +245,12 @@ sub process_request {
 
 }
 
-#
+
 # Process after all request was process and before ending connection
 sub post_process_request_hook {
     my $self = shift;
 
-    $self->sendMessage( "BYE" );
+    $self->sendMessage( "BYE", undef );
 
     my $peer = $self->{server}->{client}->peerhost();
     my $logMessage = "Deconnexion";
@@ -256,9 +262,7 @@ sub post_process_request_hook {
     $self->logMessage( $logMessage );
 }
 
-#
-# Log message into log file
-#
+
 sub logMessage {
     my( $self, $msg ) = @_;
 
@@ -271,45 +275,67 @@ sub logMessage {
     }
 }
 
-#
-# Send message to client
-#
+
 sub sendMessage {
-    my( $self, $msg_code ) = @_;
+    my $self = shift;
+    my( $msg_code, $msg ) = @_;
+    my $cmd = undef;
     
     SWITCH: {
-        if( $msg_code !~ /^HELLO|TIMEOUT|BADREQUEST|BADREQUESTS|BYE$/ ) {
+        if( $msg_code !~ /^HELLO|TIMEOUT|BADREQUEST|BADREQUESTS|BYE|OK|ERROR$/ ) {
             $self->logMessage( "Code erreur inconnu : ".$msg_code );
             return 0;
         }
 
         if( $msg_code =~ /^TIMEOUT$/ ) {
-            print "Timed Out!\n";
+            $cmd = "Timed Out!";
+            last SWITCH;
         }
 
         if( $msg_code =~ /^HELLO$/ ) {
-            print $self->{server}->{name}." v.".$self->{server}->{version}."\n";
+            $cmd = $self->{server}->{name}." v.".$self->{server}->{version};
+            last SWITCH;
         }
 
         if( $msg_code =~ /^BADREQUEST$/ ) {
-            print "Mauvaise requete\n";
+            $cmd = "Mauvaise requete";
+            last SWITCH;
         }
 
         if( $msg_code =~ /^BADREQUESTS$/ ) {
-            print "Trop de mauvaises requetes !\n";
+            $cmd = "Trop de mauvaises requetes !";
+            last SWITCH;
         }
 
         if( $msg_code =~ /^BYE$/ ) {
-            print "Bye !\n";
+            $cmd = "Bye !";
+            last SWITCH;
         }
+
+        if( $msg_code =~ /^OK$/ ) {
+            $cmd = "OK";
+            last SWITCH;
+        }
+
+        if( $msg_code =~ /^ERROR$/ ) {
+            $cmd = "Echec";
+
+            if( defined($msg) ) {
+                $cmd .= ": ".$msg;
+            }
+            last SWITCH;
+        }
+    }
+
+    if( defined($cmd) ) {
+        $self->logMessage( "Requete envoyee : ".$cmd );
+        print $cmd."\n";
     }
 
     return 1;
 }
 
-#
-# Check the request syntax
-#
+
 sub checkClientRequest {
     my $self = shift;
     my( $request ) = @_;
@@ -321,7 +347,11 @@ sub checkClientRequest {
             return 0;
         }
         
-        if( $$request =~ /^domains: (.+:)*.+$/i ) {
+        if( $$request =~ /^postfixMaps: (.+:)*.+$/i ) {
+            return 0;
+        }
+        
+        if( $$request =~ /^cyrusPartitions: (.+:)*.+$/i ) {
             return 0;
         }
     }
@@ -331,20 +361,71 @@ sub checkClientRequest {
 }
 
 
-#
-# Process 'domains: ' request
-#
-sub process_domains {
+sub getServerDomains {
     my $self = shift;
-    my ( $domains ) = @_;
-    use OBM::MakePostfixMaps::utils;
+    my( $type, $hostName ) = @_;
+    my $domainList;
 
-    my $errors = 0;
-    my @domainList = split( /:/, $domains );
+    if( !defined($type) || ($type =~ /^$/) ) {
+        return $domainList;
+    }
+
+    my $ldapFilter = "(&(objectclass=obmHost)(cn=".$hostName."))";
+    my $ldapAttributes;
+
+    SWITCH: {
+        if( $type =~ /^smtp$/ ) {
+            $self->logMessage( "Obtention des serveurs de type SMTP" );
+            $ldapAttributes = [ 'smtpDomain' ];
+            last SWITCH;
+        }
+
+        if( $type =~ /^cyrus$/ ) {
+            $self->logMessage( "Obtention des serveurs de type Cyrus" );
+            $ldapAttributes = [ 'cyrusDomain' ];
+            last SWITCH;
+        }
+
+        # Type inconnu
+        $self->logMessage( "Type de serveur inconnu '".$type."'" );
+        return $domainList;
+    }
 
     # LDAP connection
     $self->logMessage( "Connexion anonyme a l'annuaire LDAP" );
-    if( !&OBM::MakePostfixMaps::utils::connectLdapSrv( $self->{ldap_server} ) ) {
+    if( !&OBM::ObmSatellite::utils::connectLdapSrv( $self->{ldap_server} ) ) {
+        $self->logMessage( "Echec: connexion a l'annuaire LDAP" );
+        print "Echec: Impossible de se connecter a l'annuaire LDAP\n";
+        return 1;
+    }
+
+    my @ldapEntries;
+    if( &OBM::ObmSatellite::utils::ldapSearch( $self->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
+        $self->logMessage( "Echec: lors de l'obtention des informations de l'hote '".$hostName."'" );
+        return 1;
+    }
+
+    for( my $i=0; $i<=$#ldapEntries; $i++ ) {
+        $domainList = $ldapEntries[$i]->get_value( $ldapAttributes->[0], asref => 1 );
+    }
+
+    $self->logMessage( "Deconnexion de l'annuaire LDAP" );
+    &OBM::ObmSatellite::utils::disconnectLdapSrv( $self->{ldap_server} );
+
+    return $domainList;
+}
+
+
+sub processPostfixDomains {
+    my $self = shift;
+    my ( $domainList ) = @_;
+    use OBM::ObmSatellite::utils;
+
+    my $errors = 0;
+
+    # LDAP connection
+    $self->logMessage( "Connexion anonyme a l'annuaire LDAP" );
+    if( !&OBM::ObmSatellite::utils::connectLdapSrv( $self->{ldap_server} ) ) {
         $self->logMessage( "Echec: connexion a l'annuaire LDAP" );
         print "Echec: Impossible de se connecter a l'annuaire LDAP\n";
         return 1;
@@ -354,7 +435,7 @@ sub process_domains {
         if( ($self->{postfix_maps}->{$map}->{postfix_map_process}) && defined($self->{postfix_maps}->{$map}->{make_map}) ) {
             $self->logMessage( "Traitement de la map de type : '".$map."'" );
 
-            if( &{$self->{postfix_maps}->{$map}->{make_map}}( $self, $self->{postfix_maps}->{$map}, \@domainList ) ) {
+            if( &{$self->{postfix_maps}->{$map}->{make_map}}( $self, $self->{postfix_maps}->{$map}, $domainList ) ) {
                 $self->logMessage( "Echec lors de la creation du fichier plat de la map : '".$map."'" );
 
                 $errors = 1;
@@ -366,7 +447,7 @@ sub process_domains {
     }
 
     $self->logMessage( "Deconnexion de l'annuaire LDAP" );
-    &OBM::MakePostfixMaps::utils::disconnectLdapSrv( $self->{ldap_server} );
+    &OBM::ObmSatellite::utils::disconnectLdapSrv( $self->{ldap_server} );
 
     if( !$errors ) {
         my $postmapCmd = $self->{postmap_cmd};
@@ -395,17 +476,49 @@ sub process_domains {
     }
 
     if( $errors == 0 ) {
-        print "OK\n";
+        $self->sendMessage( "OK", undef );
     }elsif( $errors == 1 ) {
-        print "Echec: lors de la creation des fichiers plats\n";
+        $self->sendMessage( "ERROR", "lors de la creation des fichiers plats" );
     }elsif( $errors == 2 ) {
-        print "Echec: lors de la generation des map Postfix !\n"
+        $self->sendMessage( "ERROR", "lors de la generation des map Postfix !" );
     }else {
-        print "Echec: erreur inconnue !\n";
+        $self->sendMessage( "ERROR", "erreur inconnue !" );
     }
 
     $self->logMessage( "Fin du traitement" );
 
+    return 0;
+}
+
+
+sub processCyrusPartitions {
+    my $self = shift;
+    my ( $action, $domains ) = @_;
+
+    require OBM::ObmSatellite::cyrusPartitions;
+    my $cyrusPartitions = OBM::ObmSatellite::cyrusPartitions->new( $self, $domains );
+
+    if( !defined($cyrusPartitions) ) {
+        $self->logMessage( "Echec: lors de la creation de l'objet 'cyrusPartitions'" );
+        $self->sendMessage( "ERROR", "mise a jour des partitions Cyrus impossible !" );
+        return 1;
+    }
+
+    SWITCH: {
+        if( $action eq "add" ) {
+            if( $cyrusPartitions->addPartitions() ) {
+                $self->sendMessage( "ERROR", "Probleme lors de l'ajout des partitions" );
+                return 1;
+            }
+            last SWITCH;
+        }
+
+        if( $action eq "del" ) {
+            last SWITCH;
+        }
+    }
+
+    $self->sendMessage( "OK", undef );
     return 0;
 }
 

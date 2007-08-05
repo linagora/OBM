@@ -36,6 +36,7 @@ sub new {
     # Definition des attributs de l'objet
     my %loadDbAttr = (
         user => undef,
+        user_name => undef,
         domain => undef,
         delegation => undef,
         global => undef,
@@ -52,31 +53,40 @@ sub new {
     if( !defined($dbHandler) || !defined($parameters) ) {
         croak( "Usage: PACKAGE->new(DBHANDLER, PARAMLIST)" );
     }elsif( !exists($parameters->{"user"}) && !exists($parameters->{"domain"}) && !exists($parameters->{"delegation" }) ) {
-        croak( "Usage: PARAMLIST: table de hachage avec les cle 'user', 'domain' et 'delegation'" );
+        croak( "Usage: PARAMLIST: table de hachage avec les cles 'user', 'domain' et 'delegation'" );
     }
 
     # Initialisation de l'objet
     $loadDbAttr{"global"} = $parameters->{"global"};
     $loadDbAttr{"dbHandler"} = $dbHandler;
 
-    SWITCH: {
-        if( defined($parameters->{"user"}) ) {
-            $loadDbAttr{"user"} = $parameters->{"user"};
-            last SWITCH;
+    # Identifiant utilisateur
+    if( defined($parameters->{"user"}) ) {
+        $loadDbAttr{"user"} = $parameters->{"user"};
+
+        my $query = "SELECT userobm_login FROM UserObm WHERE userobm_id=".$loadDbAttr{"user"};
+        my $queryResult;
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+            return 0;
         }
 
-        if( defined($parameters->{"delegation"}) ) {
-            $loadDbAttr{"delegation"} = $parameters->{"delegation"};
-            last SWITCH;
-        }
-
-        if( defined($parameters->{"domain"}) ) {
-            $loadDbAttr{"domain"} = $parameters->{"domain"};
-            last SWITCH;
-        }else {
-            croak( "Le parametre domaine doit etre precise" );
-        }
+	( $loadDbAttr{"user_name"} ) = $queryResult->fetchrow_array();
+	$queryResult->finish();
     }
+
+    # Identifiant de délégation
+    if( defined($parameters->{"delegation"}) ) {
+        $loadDbAttr{"delegation"} = $parameters->{"delegation"};
+    }
+
+    # Identifiant de domaine
+    if( defined($parameters->{"domain"}) ) {
+        $loadDbAttr{"domain"} = $parameters->{"domain"};
+    }else {
+        croak( "Le parametre domaine doit etre precise" );
+    }
+
 
     # Obtention des informations sur les domaines nécessaires
     if( defined($loadDbAttr{"domain"}) ) {
@@ -90,7 +100,7 @@ sub new {
 
     # Parametrage des serveurs IMAP par domaine
     $self->getCyrusServers( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} );
-    if( !$self->getAdminImapPasswd( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} ) ) {
+    if( !&OBM::imapd::getAdminImapPasswd( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} ) ) {
         return undef;
     }
 
@@ -1028,7 +1038,6 @@ sub getLdapServer {
     }
 
     return 1;
-
 }
 
 
@@ -1063,46 +1072,6 @@ sub getCyrusServers {
     }
 
     return 0;
-}
-
-
-sub getAdminImapPasswd {
-    my $self = shift;
-    my( $dbHandler, $domainList ) = @_;
-    my $cyrusAdmin;
-    $cyrusAdmin->{"login"} = "cyrus";
-
-    # Le statement handler (pointeur sur le resultat)
-    my $queryResult;
-
-    # La requete a executer - obtention des informations sur l'administrateur de
-    # la messagerie.
-    my $query = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$cyrusAdmin->{"login"}."'";
-
-    # On execute la requete
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
-        return 0;
-    }
-
-    if( !(($cyrusAdmin->{"passwd"}) = $queryResult->fetchrow_array) ) {
-        &OBM::toolBox::write_log( "loadDb: mot de passe de l'administrateur IMAP inconnu", "W" );
-        return 0;
-    }
-
-    # Si on a recupere un resultat, c'est bon...
-    $queryResult->finish;
-
-    # On positionne le login et mot de passe au niveau de la description des
-    # serveurs
-    for( my $i=0; $i<=$#$domainList; $i++ ) {
-        for( my $j=0; $j<=$#{$domainList->[$i]->{"imap_servers"}}; $j++ ) {
-            $domainList->[$i]->{"imap_servers"}->[$j]->{"imap_server_login"} = $cyrusAdmin->{"login"};
-            $domainList->[$i]->{"imap_servers"}->[$j]->{"imap_server_passwd"} = $cyrusAdmin->{"passwd"};
-        }
-    }
-
-    return 1;
 }
 
 

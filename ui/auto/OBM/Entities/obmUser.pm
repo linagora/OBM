@@ -141,18 +141,13 @@ sub getEntity {
 
     }
 
-    # Gestion de l'UID
-    my $user_real_uid = $dbUserDesc->{"userobm_uid"};
-    if( lc($dbUserDesc->{"userobm_perms"}) eq "admin" ) {
-        $user_real_uid = 0;
-    }
         
     # On cree la structure correspondante a l'utilisateur
     # Cette structure est composee des valeurs recuperees dans la base
     $self->{"userDesc"} = {
         "user_id"=>$dbUserDesc->{"userobm_id"},
         "user_login"=>$dbUserDesc->{"userobm_login"},
-        "user_uid"=>$user_real_uid,
+        "user_uid"=>$dbUserDesc->{"userobm_uid"},
         "user_gid"=>$dbUserDesc->{"userobm_gid"},
         "user_lastname"=>$dbUserDesc->{"userobm_lastname"},
         "user_firstname"=>$dbUserDesc->{"userobm_firstname"},
@@ -167,7 +162,7 @@ sub getEntity {
         "user_zipcode"=>$dbUserDesc->{"userobm_zipcode"},
         "user_town"=>$dbUserDesc->{"userobm_town"},
         "user_mobile"=>$dbUserDesc->{"userobm_mobile"},
-        "user_domain" => $domainDesc->{"domain_label"}
+        "user_domain"=>$domainDesc->{"domain_label"}
     };
 
 

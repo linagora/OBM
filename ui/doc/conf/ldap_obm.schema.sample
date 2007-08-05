@@ -79,14 +79,34 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.12
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
 
 #
+# Attribut : smtpDomain
+# Les domaines OBM pour lesquels on est serveur SMTP.
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.14
+    NAME 'smtpDomain'
+    DESC 'SMTP server for the OBM domain'
+    EQUALITY caseIgnoreIA5Match
+    SUBSTR caseIgnoreIA5SubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+
+#
+# Attribut : cyrusDomain
+# Les domaines OBM pour lesquels on est serveur Cyrus.
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.15
+    NAME 'cyrusDomain'
+    DESC 'Cyrus server for the OBM domain'
+    EQUALITY caseIgnoreIA5Match
+    SUBSTR caseIgnoreIA5SubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+
+#
 # Objet : obmUser
 # Definition de l'objet specifique a l'application OBM.
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.1
 	NAME 'obmUser'
 	DESC 'OBM user description'
 	SUP top AUXILIARY
-        MUST uid
-	MAY ( webAccess $ mailAccess $ mailAlias $ mailLocalOnly $ mailBox $ mailBoxServer $ obmDomain ) )
+    MUST uid
+	MAY ( webAccess $ mailAccess $ mailAlias $ mailLocalOnly $ mailBox $ mailBoxServer $ obmDomain $ personalTitle $ organizationName ) )
 #
 #
 # Objet : obmSystemUser
@@ -95,14 +115,8 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.5
 	NAME 'obmSystemUser'
 	DESC 'OBM system user description'
 	SUP top AUXILIARY
-        MUST uid
+    MUST uid
 	MAY ( obmDomain ) )
-
-############################################################################
-# Definition de l'objec LDAP 'obmGroup'.
-#
-# Permet de completer le schema d'un groupe avec des attributs necessaire a
-# OBM.
 
 #
 # Object : obmGroup
@@ -111,13 +125,8 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.2
     NAME 'obmGroup'
     DESC 'OBM special groups description'
     SUP top AUXILIARY
-        MUST cn
+    MUST cn
     MAY ( mailBox $ mail $ mailAlias $ mailAccess $ obmDomain ) )
-
-###############################################################################
-# Definition de l'objet LDAP 'obmMailShare'
-#
-# Permet de stocker la description des partages de répertoires de messagerie.
 
 #
 # Object : obmMailShare
@@ -127,12 +136,19 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.3
     NAME 'obmMailShare'
     DESC 'OBM Mail Share Directory description'
     STRUCTURAL
-        MUST ( cn )
+    MUST ( cn )
     MAY ( mailBox $ mailBoxServer $ mail $ description $ mailAlias $ mailAccess $ obmDomain ) )
 
-###############################################################################
-# Definition de l'objet permettant de stocker les informations de configuration
-# de postfix.
+#
+# Definition de l'objet 'obmHost'
+# Definition de l'objet permettant ed stocker la description des hôtes
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.7
+    NAME 'obmHost'
+    DESC 'OBM special hosts description'
+    SUP top AUXILIARY
+    MUST cn
+    MAY ( smtpDomain $ cyrusDomain $ obmDomain ) )
+
 
 # Permet de stocker la liste des domaines locaux. plusieurs attributs
 # 'myDestination' sont possibles
@@ -196,7 +212,7 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.4
     NAME 'obmPostfix'
     DESC 'Postfix configuration object'
     SUP top STRUCTURAL
-        MUST ( cn )
+    MUST ( cn )
     MAY ( myDestination $ obmDomain ) )
 
 # Definition de l'objet 'obmSamba'

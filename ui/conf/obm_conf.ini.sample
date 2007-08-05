@@ -46,6 +46,10 @@ enableHook = false
 ; Adresse du serveur LDAP
 ldapServer = localhost
 
+; Racine LDAP de l'arbre gérée pas OBM-Ldap
+; exemple : 'aliasource,local' place l'arbre LDAP d'OBM-Ldap sous le DN: 'dc=aliasource,dc=local' 
+ldapRoot = local
+
 ; Adresse du serveur Samba sur lequel les repertoires personnels sont crees
 ; utile dans les hook
 sambaHomeServer = ""

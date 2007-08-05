@@ -1,4 +1,4 @@
-package OBM::MakePostfixMaps::mapAlias;
+package OBM::ObmSatellite::mapAlias;
 
 require Exporter;
 
@@ -26,7 +26,7 @@ sub makeAliasMap {
         $ldapFilter =~ s/<obmDomain>/$obmDomains->[$i]/;
 
         my @ldapEntries;
-        if( &OBM::MakePostfixMaps::utils::ldapSearch( $daemonRef->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
+        if( &OBM::ObmSatellite::utils::ldapSearch( $daemonRef->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
             $daemonRef->logMessage( "Echec: lors de l'obtention des informations du domaine '".$obmDomains->[$i]."'" ) ;
             return 1;
         }
@@ -62,6 +62,5 @@ sub makeAliasMap {
         }
     }
 
-    return &OBM::MakePostfixMaps::utils::writeMap( $mailBoxMapDesc->{postfix_map}, $mailBoxMapDesc->{postfix_map_separator}, \%mapEntries );
-
+    return &OBM::ObmSatellite::utils::writeMap( $mailBoxMapDesc->{postfix_map}, $mailBoxMapDesc->{postfix_map_separator}, \%mapEntries );
 }
