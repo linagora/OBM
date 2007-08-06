@@ -3,4 +3,7 @@ ldap_version: 3
 ldap_search_base: dc=local
 ldap_verbose: off
 ldap_debug: 0
+# Filtre à utiliser lorsque le paramètre 'singleNameSpace' est à 'false'
 ldap_filter: (|(&(mailBox=%U@%d)(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus)(objectClass=posixAccount)))
+# Filtre à utiliser lorsque le paramètre 'singleNameSpace' est à 'true'
+#ldap_filter: (|(&(mailBox=%U)(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus)(objectClass=posixAccount)))

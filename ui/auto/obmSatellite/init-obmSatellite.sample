@@ -2,8 +2,16 @@
 ###############################################################################
 # Script de gestion du serveur obmSatellite.pl
 ###############################################################################
+# init-obmSatellite         Startup script for the obm-satellite Server
+#
+# chkconfig: - 99 10
+# description: OBM-Satellite is a server which do some remote operation needed
+#              by some OBM modules
+# processname: obmSatellite.pl
+# config: /path/to/obm/auto/obmSatellite/obmSatellite.cf
+# pidfile: /var/run/obmSatellite.pid
 
-OBMPATH="/var/www/icasso"
+OBMPATH="/opt/obm/current"
 
 daemon_path="$OBMPATH/auto/obmSatellite/obmSatellite.pl"
 daemon_pid="/var/run/obm/obmSatellite.pid"

@@ -26,6 +26,7 @@ sub new {
         typeDesc => undef,
         links => undef,
         toDelete => undef,
+        sieve => undef,
         hostId => undef,
         domainId => undef,
         hostDesc => undef,
@@ -46,6 +47,7 @@ sub new {
 
     $obmHostAttr{"links"} = $links;
     $obmHostAttr{"toDelete"} = $deleted;
+    $obmHostAttr{"sieve"} = 0;
 
     $obmHostAttr{"type"} = $DOMAINHOSTS;
     $obmHostAttr{"typeDesc"} = $attributeDef->{$obmHostAttr{"type"}};
@@ -338,4 +340,11 @@ sub getMailboxName {
     my $self = shift;
 
     return undef;
+}
+
+
+sub getMailboxSieve {
+    my $self = shift;
+
+    return return $self->{"sieve"};
 }

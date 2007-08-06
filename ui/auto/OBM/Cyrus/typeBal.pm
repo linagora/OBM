@@ -41,7 +41,10 @@ sub getDbValues {
     while( my( $userId, $userLogin, $userQuota, $userSrvId, $userVenable, $userVmessage, $userEmail, $userNomadePerms, $userNomadeEnable, $userNomadeLocalCopy, $userNomadeDst ) = $queryResult->fetchrow_array ) {
         my $userDesc = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::imapBox);
 
-        $userDesc->{"box_login"} = lc($userLogin)."@".lc($domain->{"domain_name"});
+        $userDesc->{"box_login"} = lc($userLogin);
+        if( !$singleSpaceName ) {
+            $userDesc->{"box_login"} .= "@".lc($domain->{"domain_name"});
+        }
         $userDesc->{"box_name"} = $balPrefix.$balSeparator.$userDesc->{"box_login"};
         $userDesc->{"box_srv_id"} = $userSrvId;
 
