@@ -523,7 +523,9 @@ sub getEntityRight {
 
         while( my( $userId, $userLogin ) = $queryResult->fetchrow_array ) {
             if( defined($domain->{"domain_name"}) ) {
-                $userLogin .= "@".$domain->{"domain_name"};
+                if( !$singleSpaceName ) {
+                    $userLogin .= "@".$domain->{"domain_name"};
+                }
             }
 
             # Si l'utilisateur n'a pas déjà été trouvé, on l'initialise

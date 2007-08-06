@@ -67,7 +67,7 @@ sub dump {
 sub _connectSrvSieve {
     my $self = shift;
     my( $srvDesc, $boxLogin ) = @_;
-    # Il faut remplacer le '@' des login utilisateurs par des '%'
+    # Il faut remplacer les éventuels '@' des login utilisateurs par des '%'
     $boxLogin =~ s/@/%/;
 
     if( !defined($srvDesc->{"imap_server_ip"}) ) {
@@ -343,13 +343,14 @@ sub update {
         return 1;
     }
 
-    # Récupération du nom de la boîte à traiter
-    my $mailBoxName = $object->getMailboxName();
-    if( !defined($mailBoxName) ) {
+    # Si ce type d'entité ne peut pas avoir de script Sieve, on ne fait rien
+    if( !$object->getMailboxSieve() ) {
         return 1;
     }
 
-    if( !$object->getMailboxSieve() ) {
+    # Récupération du nom de la boîte à traiter
+    my $mailBoxName = $object->getMailboxName();
+    if( !defined($mailBoxName) ) {
         return 1;
     }
 
