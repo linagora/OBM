@@ -54,7 +54,11 @@ $dbName = $cfgFile->val( 'global', 'db' );
 $db = "dbi:".lc( $cfgFile->val( 'global', 'dbtype' )).":database=$dbName;host=".$cfgFile->val( 'global', 'host' );
 
 # Mode d'espace de nom OBM
-$singleSpaceName = $cfgFile->val( 'global', 'singleNameSpace' );
+if( lc($cfgFile->val( 'global', 'singleNameSpace' )) eq "true" ) {
+    $singleSpaceName = 1;
+}else{
+    $singleSpaceName = 0;
+}
 
 # Le serveur LDAP
 $ldapServer = $cfgFile->val( 'automate', 'ldapServer' );

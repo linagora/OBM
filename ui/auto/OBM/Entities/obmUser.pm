@@ -227,7 +227,10 @@ sub getEntity {
             }
 
             # Gestion de la BAL destination
-            $self->{"userDesc"}->{"user_mailbox"} = $self->{"userDesc"}->{"user_login"}."@".$domainDesc->{"domain_name"};
+            $self->{"userDesc"}->{"user_mailbox"} = $self->{"userDesc"}->{"user_login"};
+            if( !$singleSpaceName ) {
+                $self->{"userDesc"}->{"user_mailbox"} .= "@".$domainDesc->{"domain_name"};
+            }
 
             # Gestion du serveur de mail
             $self->{"userDesc"}->{"user_mailbox_server"} = $dbUserDesc->{"mailserver_host_id"};
@@ -570,17 +573,17 @@ sub createLdapEntry {
     if( $entry->{"user_mailLocalOnly"} ) {
         $ldapEntry->add( mailLocalOnly => $entry->{"user_mailLocalOnly"} );
     }
-
+    
     # Les adresses mails
     if( $entry->{"user_email"} && ($#{$entry->{"user_email"}} != -1) ) {
         $ldapEntry->add( mail => $entry->{"user_email"} );
     }
-
+    
     # Les adresses mail secondaires
     if( $entry->{"user_email_alias"} && ($#{$entry->{"user_email_alias"}} != -1) ) {
         $ldapEntry->add( mailAlias => $entry->{"user_email_alias"} );
     }
-
+    
     # L'adresse postale
     if( $entry->{"user_address"} ) {
         # Thunderbird, IceDove... : ne comprennent que cet attribut
@@ -589,22 +592,22 @@ sub createLdapEntry {
         # Outlook Express : préfère celui-là à 'street'
         $ldapEntry->add( postalAddress => to_utf8({ -string => $entry->{"user_address"}, -charset => $defaultCharSet }) );
     }
-
+    
     # Le code postal
     if( $entry->{"user_zipcode"} ) {
         $ldapEntry->add( postalCode => to_utf8({ -string => $entry->{"user_zipcode"}, -charset => $defaultCharSet }) );
     }
-
+    
     # La ville
     if( $entry->{"user_town"} ) {
         $ldapEntry->add( l => to_utf8({ -string => $entry->{"user_town"}, -charset => $defaultCharSet }) );
     }
-
+    
     # Le domaine
     if( $entry->{"user_domain"} ) {
         $ldapEntry->add( obmDomain => to_utf8({ -string => $entry->{"user_domain"}, -charset => $defaultCharSet }) );
     }
-
+    
     return 1;
 }
 
@@ -614,7 +617,7 @@ sub updateLdapEntry {
     my( $ldapEntry ) = @_;
     my $entry = $self->{"userDesc"};
     my $update = 0;
-
+    
     # Le champs nom, prenom de l'utilisateur
     my $longName;
     if( $entry->{"user_firstname"} ) {
@@ -622,110 +625,109 @@ sub updateLdapEntry {
     }else {
         $longName = $entry->{"user_lastname"};
     }
-
+    
     if( &OBM::Ldap::utils::modifyAttr( $longName, $ldapEntry, "cn" ) ) {
-        # On synchronise le nom affichable
+    # On synchronise le nom affichable
         &OBM::Ldap::utils::modifyAttr( $longName, $ldapEntry, "displayName" );
-
+    
         $update = 1;
     }
-
+    
     # Le nom de famille
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_lastname"}, $ldapEntry, "sn" ) ) {
         $update = 1;
     }
-
+    
     # Le prenom
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_firstname"}, $ldapEntry, "givenName" ) ) {
         $update = 1;
     }
-
+    
     # Le titre
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_title"}, $ldapEntry, "title" ) ) {
         $update = 1;
     }
-
+    
     # Le service
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_service"}, $ldapEntry, "ou" ) ) {
         $update = 1;
     }
-
+    
     # La description
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_description"}, $ldapEntry, "description" ) ) {
         $update = 1;
     }
-
+    
     # L'adresse
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_address"}, $ldapEntry, "street" ) ) {
         &OBM::Ldap::utils::modifyAttr( $entry->{"user_address"}, $ldapEntry, "postalAddress" );
         $update = 1;
     }
-
+    
     # Le code postal
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_zipcode"}, $ldapEntry, "postalCode" ) ) {
         $update = 1;
     }
-
+    
     # La ville
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_town"}, $ldapEntry, "l" ) ) {
         $update = 1;
     }
-
+    
     # Le repertoire personnel
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_homedir"}, $ldapEntry, "homeDirectory" ) ) {
         $update = 1;
     }
-            
+        
     # L'UID
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_uid"}, $ldapEntry, "uidNumber" ) ) {
         $update = 1;
     }
-
+    
     # Le GID
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_gid"}, $ldapEntry, "gidNumber" ) ) {
         $update = 1;
     }
-
+    
     # Le telephone
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_phone"}, $ldapEntry, "telephoneNumber" ) ) {
         $update = 1;
     }
-
+    
     # Le fax
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_fax"}, $ldapEntry, "facsimileTelephoneNumber" ) ) {
         $update = 1;
     }
-
+    
     # Le mobile
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_mobile"}, $ldapEntry, "mobile" ) ) {
         $update = 1;
     }
-
+    
     # L'acces au web
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_webperms"}, $ldapEntry, "webAccess" ) ) {
         $update = 1;
     }
-
+    
     # Le domaine
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_domain"}, $ldapEntry, "obmDomain") ) {
         $update = 1;
     }
-
+    
     # L'acces au mail
     if( $entry->{"user_mailperms"} && ( &OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" ) ) ) {
         $update = 1;
-
+    
     }elsif( !$entry->{"user_mailperms"} && ( &OBM::Ldap::utils::modifyAttr( "REJECT", $ldapEntry, "mailAccess" ) ) ) {
-        $update = 1;
-
+        $update = 1;    
     }
-
+    
     # La boite a lettres de l'utilisateur
     if( !$entry->{"user_mailperms"} ) {
         if( &OBM::Ldap::utils::modifyAttr( undef, $ldapEntry, "mailBox" ) ) {
             $update = 1;
         }
-
+    
     }elsif( &OBM::Ldap::utils::modifyAttr( $entry->{"user_mailbox"}, $ldapEntry, "mailBox" ) ) {
         $update = 1;
     }
@@ -934,13 +936,13 @@ sub getHostIpById {
     my( $dbHandler, $hostId ) = @_;
 
     if( !defined($hostId) ) {
-        &OBM::toolBox::write_log( "Identifiant de l'hote non défini !", "W" );
+        &OBM::toolBox::write_log( "obmUser: identifiant de l'hote non défini !", "W" );
         return undef;
     }elsif( $hostId !~ /^[0-9]+$/ ) {
-        &OBM::toolBox::write_log( "Identifiant de l'hote '".$hostId."' incorrect !", "W" );
+        &OBM::toolBox::write_log( "obmUser: identifiant de l'hote '".$hostId."' incorrect !", "W" );
         return undef;
     }elsif( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "Connection à la base de donnee incorrect !", "W" );
+        &OBM::toolBox::write_log( "obmUser: connection à la base de donnee incorrect !", "W" );
         return undef;
     }
 
@@ -955,7 +957,7 @@ sub getHostIpById {
     # On execute la requete
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
+        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution de la requete.", "W" );
         if( defined($queryResult) ) {
             &ONM::toolBox::write_log( $queryResult->err, "W" );
         }
@@ -964,7 +966,7 @@ sub getHostIpById {
     }
 
     if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
-        &OBM::toolBox::write_log( "Identifiant de l'hote '".$hostId."' inconnu !", "W" );
+        &OBM::toolBox::write_log( "obmUser: identifiant de l'hote '".$hostId."' inconnu !", "W" );
 
         $queryResult->finish;
         return undef;

@@ -19,7 +19,7 @@ $postfixMapsDesc = {
         postfix_map_separator => "\t",
         postfix_map_process => 1,
         postfix_map_postmap => 1,
-        ldap_filter => "(&(|(objectclass=obmuser)(objectclass=obmmailshare))(obmdomain=<obmDomain>))",
+        ldap_filter => "(&(|(objectclass=obmuser)(objectclass=obmmailshare))(mailAccess=PERMIT)(obmdomain=<obmDomain>))",
         ldap_attibute => [ "mailbox" ],
         make_map => sub {
             my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;

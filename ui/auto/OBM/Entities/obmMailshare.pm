@@ -135,7 +135,10 @@ sub getEntity {
 
     # On range les resultats dans la structure de donnees des resultats
     $self->{"mailShareDesc"}->{"mailshare_name"} = $dbMailShareDesc->{"mailshare_name"};
-    $self->{"mailShareDesc"}->{"mailshare_mailbox"} = "+".$dbMailShareDesc->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
+    $self->{"mailShareDesc"}->{"mailshare_mailbox"} = "+".$dbMailShareDesc->{"mailshare_name"};
+    if( !$singleSpaceName ) {
+        $self->{"mailShareDesc"}->{"mailshare_mailbox"} .= "@".$domainDesc->{"domain_name"};
+    }
     $self->{"mailShareDesc"}->{"mailshare_description"} = $dbMailShareDesc->{"mailshare_description"};
     $self->{"mailShareDesc"}->{"mailshare_domain"} = $domainDesc->{"domain_label"};
 
@@ -562,13 +565,13 @@ sub getHostIpById {
     my( $dbHandler, $hostId ) = @_;
 
     if( !defined($hostId) ) {
-        &OBM::toolBox::write_log( "Identifiant de l'hote non défini !", "W" );
+        &OBM::toolBox::write_log( "obmMailShare: identifiant de l'hote non défini !", "W" );
         return undef;
     }elsif( $hostId !~ /^[0-9]+$/ ) {
-        &OBM::toolBox::write_log( "Identifiant de l'hote '".$hostId."' incorrect !", "W" );
+        &OBM::toolBox::write_log( "obmMailShare: identifiant de l'hote '".$hostId."' incorrect !", "W" );
         return undef;
     }elsif( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "Connection à la base de donnee incorrect !", "W" );
+        &OBM::toolBox::write_log( "obmMailShare: connection à la base de donnee incorrect !", "W" );
         return undef;
     }
 
@@ -583,7 +586,7 @@ sub getHostIpById {
     # On execute la requete
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
+        &OBM::toolBox::write_log( "obmMailShare: probleme lors de l'execution de la requete.", "W" );
         if( defined($queryResult) ) {
             &OBM::toolBox::write_log( $queryResult->err, "W" );
         }
@@ -592,7 +595,7 @@ sub getHostIpById {
     }
 
     if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
-        &OBM::toolBox::write_log( "Identifiant de l'hote '".$hostId."' inconnu !", "W" );
+        &OBM::toolBox::write_log( "obmMailShare: identifiant de l'hote '".$hostId."' inconnu !", "W" );
 
         $queryResult->finish;
         return undef;
