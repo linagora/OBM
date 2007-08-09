@@ -198,6 +198,16 @@ sub getEntity {
         push( @{$self->{"userDesc"}->{"user_fax"}}, $dbUserDesc->{"userobm_fax2"} );
     }
 
+    # Gestions des e-mails de l'utilisateur.
+    my @email = split( /\r\n/, $dbUserDesc->{"userobm_email"} );
+    for( my $j=0; $j<=$#email; $j++ ) {
+        push( @{$self->{"userDesc"}->{"user_email"}}, $email[$j]."@".$domainDesc->{"domain_name"} );
+
+        for( my $k=0; $k<=$#{$domainDesc->{"domain_alias"}}; $k++ ) {
+            push( @{$self->{"userDesc"}->{"user_email_alias"}}, $email[$j]."@".$domainDesc->{"domain_alias"}->[$k] );
+        }
+    }
+
     # Gestion du droit de messagerie
     if( $dbUserDesc->{"userobm_mail_perms"} ) {
         my $localServerIp = $self->getHostIpById( $dbHandler, $dbUserDesc->{"mailserver_host_id"} );
@@ -214,16 +224,6 @@ sub getEntity {
             # Limite la messagerie aux domaines locaux
             if( !$dbUserDesc->{"userobm_mail_ext_perms"} ) {
                 $self->{"userDesc"}->{"user_mailLocalOnly"} = "local_only";
-            }
-
-            # Gestions des e-mails de l'utilisateur.
-            my @email = split( /\r\n/, $dbUserDesc->{"userobm_email"} );
-            for( my $j=0; $j<=$#email; $j++ ) {
-                push( @{$self->{"userDesc"}->{"user_email"}}, $email[$j]."@".$domainDesc->{"domain_name"} );
-
-                for( my $k=0; $k<=$#{$domainDesc->{"domain_alias"}}; $k++ ) {
-                    push( @{$self->{"userDesc"}->{"user_email_alias"}}, $email[$j]."@".$domainDesc->{"domain_alias"}->[$k] );
-                }
             }
 
             # Gestion de la BAL destination
