@@ -143,6 +143,14 @@ sub getEntity {
     $self->{"mailShareDesc"}->{"mailshare_domain"} = $domainDesc->{"domain_label"};
 
     if( $dbMailShareDesc->{"mailshare_email"} ) {
+        # Gestion de l'adresse mail principale
+        push( @{$self->{"mailShareDesc"}->{"mailshare_mail"}}, $dbMailShareDesc->{"mailshare_email"}."@".$domainDesc->{"domain_name"} );
+
+        # Gestion des alias
+        for( my $j=0; $j<=$#{$domainDesc->{"domain_alias"}}; $j++ ) {
+            push( @{$self->{"mailShareDesc"}->{"mailshare_mail_alias"}}, $dbMailShareDesc->{"mailshare_email"}."@".$domainDesc->{"domain_alias"}->[$j] );
+        }
+
         my $localServerIp = $self->getHostIpById( $dbHandler, $dbMailShareDesc->{"mailserver_host_id"} );
 
         if( !defined($localServerIp) ) {
@@ -151,11 +159,6 @@ sub getEntity {
 
         }else {
             $self->{"mailShareDesc"}->{"mailshare_mailperms"} = 1;
-            push( @{$self->{"mailShareDesc"}->{"mailshare_mail"}}, $dbMailShareDesc->{"mailshare_email"}."@".$domainDesc->{"domain_name"} );
-
-            for( my $j=0; $j<=$#{$domainDesc->{"domain_alias"}}; $j++ ) {
-                push( @{$self->{"mailShareDesc"}->{"mailshare_mail_alias"}}, $dbMailShareDesc->{"mailshare_email"}."@".$domainDesc->{"domain_alias"}->[$j] );
-            }
 
             # Gestion de la BAL destination
             $self->{"mailShareDesc"}->{"mailShare_mailbox"} = $self->{"mailShareDesc"}->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
