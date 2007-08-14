@@ -296,7 +296,12 @@ function get_update_entity_infos(&$e1, &$e2, $table, $field="", $realm) {
     $dg = "${f}_delegation";
   }
 
-  $multidomain = sql_multidomain("$f");
+  // For domain 0, force clause domain 0
+  if ($obm['domain_id'] == '0') {
+    $multidomain = "AND ${f}_domain_id = 0";
+  } else {
+    $multidomain = sql_multidomain("$f");
+  }
 
   // Restrict updates to the realm selected (user, domain, delegation)
   if ($realm == "user") {
@@ -462,7 +467,12 @@ function get_update_link_group($realm) {
   $uu = "group_userupdate";
   $dg = "group_delegation";
 
-  $multidomain = sql_multidomain("group");
+  // For domain 0, force clause domain 0
+  if ($obm['domain_id'] == '0') {
+    $multidomain = "AND group_domain_id = 0";
+  } else {
+    $multidomain = sql_multidomain('group');
+  }
 
   // Restrict updates to the realm selected (user, domain, delegation)
   if ($realm == "user") {
@@ -592,7 +602,12 @@ function get_update_link_entityright($entity, $table, $field, $realm) {
     $dg = "${f}_delegation";
   }
 
-  $multidomain = sql_multidomain("$f");
+  // For domain 0, force clause domain 0
+  if ($obm['domain_id'] == '0') {
+    $multidomain = "AND ${f}_domain_id = 0";
+  } else {
+    $multidomain = sql_multidomain("$f");
+  }
 
   // Restrict updates to the realm selected (user, domain, delegation)
   if ($realm == "user") {
@@ -689,6 +704,11 @@ function get_update_link_entity($entity, $realm) {
 function store_update_data($params) {
   global $cgp_show;
 
+  // If update type is global, we do not store Updated tables
+  if ($params['update_type'] == 'global') {
+    return true;
+  }
+
   $realm = $params['realm'];
 
   $entities = array('user' => array('UserObm', 'userobm'),
@@ -771,6 +791,20 @@ function store_update_entity_infos($e1, $e2, $entity, $table, $realm) {
   $domain_id = $obm['domain_id'];
   $delegation = $obm['delegation'];
   $obm_q = new DB_OBM;
+
+  // Purge actual values
+  if ($realm == 'user') {
+    $where_purge = "AND updated_user_id='$uid'";
+  } else if ($realm == 'delegation') {
+    $where_purge = "AND updated_delegation like '$delegation%'";
+  }
+  $query = "DELETE FROM Updated
+    WHERE updated_domain_id = '$domain_id'
+      AND updated_table = '$table'
+      $where_purge";
+  display_debug_msg($query, $cdg_sql, 'store_update_entity_infos(purge)');
+  $retour = $obm_q->query($query);
+
 
   // Process infos for created and updated entities
   foreach ($e1 as $id => $row) {

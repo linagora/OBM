@@ -80,6 +80,10 @@ function dis_tools_update_detail() {
       if ($has_domain_upd) {
 	$update_type = 'global';
       }
+      // Domain 0 allow only "global" update
+      if ($obm['domain_id'] == '0') {
+        $update_type = 'global';
+      }
 
       // If table Domain has been updated allow only for domain update
       if (($realm != 'domain') && ($has_domain_upd)) {
