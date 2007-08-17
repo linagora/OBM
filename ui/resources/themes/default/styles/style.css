@@ -1207,7 +1207,24 @@ table.planning thead th {
   color: black;
 }
 
+/* ------------------------------------------------------------------------- */ 
+/* Color Picker */
+/* ------------------------------------------------------------------------- */
 
+input.colorPicker {
+  width: 7em;
+}
+
+#colorPickerWidget {
+  border: 1px solid #aaa;
+  background-color: #D2D2D2;
+  position: absolute;
+  width: 13em;
+}
+#colorPickerWidget li a {
+  background-color : transparent;
+  color: #636466;
+}
 /* ------------------------------------------------------------------------- 
  * Organizational Chart
 /* ------------------------------------------------------------------------- 

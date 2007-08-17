@@ -675,7 +675,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_endrepeat    timestamp NOT NULL,
   calendarevent_description  text,
   calendarevent_properties   text,
-  calendarevent_color        char(6),
+  calendarevent_color        char(7),
   PRIMARY KEY (calendarevent_id)
 );
 

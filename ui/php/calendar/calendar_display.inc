@@ -70,7 +70,7 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
   }
 
   $block = html_calendar_bar_legend($new_action, $calendar_entity,$calendar);
-  if ($action != "perform_meeting"  && $output_target != "print") {
+  if ($action != "perform_meeting" && $output_target != "print") {
     $block .= html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable);
     $block .= html_calendar_bar_date_selector($calendar);
   }
@@ -88,10 +88,14 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
   global $ico_user, $ico_resource;
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
   global $l_calendar_displayed, $l_resource_displayed,$c_all;
-  global $action,$ico_delete,$output_target;
+  global $action,$ico_delete,$output_target,$l_color,$l_users,$l_events;
 
   // Legend
   $iso_date = $calendar["date"];
+  if($_COOKIE['calendarColorTemplate']) {
+    $colorTemplate = $_COOKIE['calendarColorTemplate'];
+  }
+  ${"select_color_".$colorTemplate} = "selected=\"selected\"";
   if ($action == "perform_meeting" || $action == "perform_res_meeting") {
     $l_legend = $l_meeting_legend;
     $dis_legend = "
@@ -107,6 +111,29 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
       $dis_legend .= "<li style=\"color:#fff;background-color:rgb($colors[$key])\">$cat_info[label]</li>";
     }
   } else {
+    $block = "
+      <div class=\"portlet\" id=\"calendarLegend\">
+      <h1>$l_color</h1>
+      <div>
+      <script type=\"text/javascript\">
+         obm.vars.conf.calendarColor = '$colorTemplate';
+         function changeCalendarColorTemplate(selector) {
+           selector = $(selector);
+           Cookie.set('calendarColorTemplate',selector.getValue());
+           obm.vars.conf.calendarColor = selector.getValue();
+           if(obm.calendarManager) {
+             obm.calendarManager.colorize();
+           }
+         }
+       </script>      
+        <select onchange=\"changeCalendarColorTemplate(this)\" >
+         <option $select_color_user value=\"user\">$l_users</option>
+         <option $select_color_event value=\"event\">$l_events</option>
+        </select>
+       </div>
+      </div>
+      ";
+
     $l_legend = $l_calendar_displayed;
     foreach ($calendar_entity as $type => $entity) {
       foreach ($entity as $id => $data) {      
@@ -124,7 +151,7 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
     }
   }
 
-  $block = "
+  $block .= "
   <div class=\"portlet\" id=\"calendarLegend\">
   <h1>$l_legend</h1>
   <form action=\"\" onsubmit=\"return false;\">
@@ -1216,6 +1243,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $entity = $occurrence->entity;
   $all_day = $event->all_day;
   $entityClass = $calendar_entity[$entity][$entity_id]["class"];
+  $eventColor = $event->color;
 
   $ed[] = "id:$id";
   $ed[] = "entity:'$entity'";
@@ -1229,6 +1257,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "description:'$description'";
   $ed[] = "location:'$location'";
   $ed[] = "category:'$category'";
+  $ed[] = "colors: {event:'$eventColor'}";
   
   $attendees = array();
   foreach ($attendee as $entity => $entities) {
@@ -2045,7 +2074,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_task;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_format,$l_daysofweekshort, $l_exception, $l_items;
-  global $l_alerts, $l_alerts_time;
+  global $l_alerts, $l_alerts_time, $l_color;
 
   $time_unit = 60 / $_SESSION['set_cal_interval'];  
   $repeatfrequency = 1;
@@ -2072,6 +2101,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     $minend = date("i",$dateend);
     $dateend = of_date_upd_format($dateend);
     $all_day = $event_q->f("calendarevent_allday");
+    $color = $event_q->f("calendarevent_color");
     $privacy = $event_q->f("calendarevent_privacy");
     $repeat_kind = $event_q->f("calendarevent_repeatkind");
     $repeat_days = $event_q->f("calendarevent_repeatdays");
@@ -2107,6 +2137,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   if (isset($calendar["priority"])) { $priority = $calendar["priority"]; }
   if (isset($calendar["description"])) { $desc = stripslashes($calendar["description"]); }
   if (isset($calendar["all_day"])) { $all_day = $calendar["all_day"]; }
+  if (isset($calendar["color"])) { $color = $calendar["color"]; }
   if (isset($calendar["repeatfrequency"])) { $repeatfrequency = $calendar["repeatfrequency"]; }  
   if (isset($calendar["item"])) { $item = $calendar["item"]; }  
   if (isset($calendar["date_begin"])) {
@@ -2548,7 +2579,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   <tr>
     <th>$l_priority</th>
     <td>$dis_sel_prio</td>
-  </tr>      
+  </tr>     
+  <tr>
+    <th>$l_color</th>
+    <td><input type=\"text\" name=\"tf_color\" value=\"$color\" class=\"colorPicker\" /></td>
+  </tr>     
   </table>
   </fieldset>
   <fieldset class=\"detail infos\">

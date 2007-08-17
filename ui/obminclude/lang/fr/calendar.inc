@@ -59,7 +59,7 @@ $l_exception = "Exceptions";
 $l_alerts = "Alertes";
 $l_alerts_time = "Alertes (minutes avant)";
 $l_items = "Accessoires";
-
+$l_events = "Événements";
 $l_daily = "quotidienne";
 $l_daily_unit = "Tous les %s jours";
 $l_weekly = "hebdomadaire";

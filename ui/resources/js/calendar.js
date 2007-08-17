@@ -82,8 +82,17 @@ Obm.CalendarDayEventExtension = new Class({
 
   conflict: function(size, position) {
     this.element.setStyle('margin-top',position * this.element.offsetHeight + 'px');
-  }
+  },
 
+  setColor: function(color) {
+    if(color) {
+      this.element.setStyle('backgroundColor',color);
+      this.dragHandler.setStyle('backgroundColor',color);
+    } else {
+      this.element.setStyle('backgroundColor','');
+      this.dragHandler.setStyle('backgroundColor','');
+    }
+  }
    
 
 })
@@ -117,6 +126,7 @@ Obm.CalendarDayEvent = new Class({
       this.makeDraggable();    
     this.setTime(this.event.time);
     this.setDuration(this.event.duration);
+    this.switchColor(obm.vars.conf.calendarColor);
   },
 
   makeDraggable: function() {
@@ -354,6 +364,35 @@ Obm.CalendarDayEvent = new Class({
   destroy: function() {
     this.element.remove();
     this.trashExtensions();
+  },
+
+  switchColor: function(colorTemplate) {
+    switch(colorTemplate) {
+      case "event":
+        this.setColor(this.event.colors.event);
+        break;
+      case "priority" :
+        this.setColor(this.event.colors.priority);
+        break;
+      case "category" :
+        this.setColor(this.event.colors.category);
+        break;
+      default :
+        this.setColor();
+    }
+  },
+
+  setColor: function(color) {
+    if(color) {
+      this.element.setStyle('backgroundColor',color);
+      this.dragHandler.setStyle('backgroundColor',color);
+    } else {
+      this.element.setStyle('backgroundColor','');
+      this.dragHandler.setStyle('backgroundColor','');
+    }
+    this.extensions.each(function (extension) {
+      extension.setColor(color);
+    })
   }
 })
 
@@ -382,6 +421,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     this.size = 1;
     this.length = 1;
     this.buildEvent();
+    this.switchColor(obm.vars.conf.calendarColor);
     if(this.options.resizable) 
       this.makeResizable(options);
     if(this.options.draggable)
@@ -536,7 +576,18 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     else
       this.setWidth(obm.calendarManager.defaultWidth);
     this.setMargin((obm.calendarManager.defaultWidth/size)*position);
+  },
+
+  setColor: function(color) {
+    if(color) {
+      this.element.setStyle('backgroundColor',color);
+      this.dragHandler.setStyle('backgroundColor',color);
+    } else {
+      this.element.setStyle('backgroundColor','');
+      this.dragHandler.setStyle('backgroundColor','');
+    }
   }
+
 
 });
 
@@ -782,7 +833,13 @@ Obm.CalendarManager = new Class({
       evt.conflict(resize[i].unit.size,resize[i].position);
     }
   },
-  
+ 
+  colorize: function () {
+    this.events.each(function(evt, key) {
+      evt.switchColor(obm.vars.conf.calendarColor); 
+    });    
+  },
+
   sendUpdateEvent: function(eventData) {
     ajax = new Ajax('calendar_index.php',
     {postBody:'ajax=1&action=quick_update&' + Object.toQueryString(eventData), onComplete: this.receiveUpdateEvent, method: 'post'});
@@ -904,8 +961,6 @@ Obm.CalendarManager = new Class({
         evt.redraw(); 
       });      
     }
-    
-
   }
 });
 

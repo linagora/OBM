@@ -4,6 +4,7 @@ obm.vars.labels = new Object();
 obm.vars.images = new Object();
 obm.vars.regexp = new Object();
 obm.vars.consts = new Object();
+obm.vars.conf = new Object();
 obm.initialize = new Chain();
 obm.resize = new Chain();
 

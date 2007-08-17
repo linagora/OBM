@@ -43,6 +43,7 @@ function run_query_calendar_detail($calendar_id) {
       calendarevent_duration,
       calendarevent_repeatdays,
       calendarevent_allday,
+      calendarevent_color,
       $calendarevent_endrepeat,
       $calendarevent_date
     FROM  
@@ -497,6 +498,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $res_name = $calendar["res-name"];
   $res_id = $calendar["res-id"];
   $property = $calendar["property"];
+  $color = $calendar["color"];
   $property_name = $calendar["property-name"];
   if (is_array($res_name)) {
     foreach($res_name as $key=>$res) {
@@ -538,6 +540,7 @@ function run_query_calendar_insert_event_data($calendar) {
     calendarevent_repeatfrequence,
     calendarevent_repeatdays,
     calendarevent_allday,
+    calendarevent_color,
     calendarevent_endrepeat,
     calendarevent_domain_id)
   VALUES (
@@ -558,6 +561,7 @@ function run_query_calendar_insert_event_data($calendar) {
     '$repeatfrequency',
     '$repeat_days',
     '$all_day',
+    '$color',
     '$repeat_end',
     '$obm[domain_id]')";
 
@@ -1475,7 +1479,8 @@ function run_query_calendar_update_event_data($calendar) {
   $repeat_kind = $calendar["repeat_kind"];
   $repeat_days = $calendar["repeat_days"];
   $repeat_end = of_isodate_convert($calendar["repeat_end"]);
-  $frequency = $calendar["repeatfrequency"];  
+  $frequency = $calendar["repeatfrequency"]; 
+  $color = $calendar["color"]; 
   $date_exception = $calendar["date_exception"];
   $item = $calendar["list-item"];
   $item_id = $calendar["list-item-id"];
@@ -1517,6 +1522,7 @@ function run_query_calendar_update_event_data($calendar) {
     calendarevent_privacy = '$privacy', 
     calendarevent_duration = '$event_duration',
     calendarevent_allday = '$all_day', 
+    calendarevent_color = '$color',
     calendarevent_repeatkind = '$repeat_kind',
     calendarevent_repeatfrequence = '$frequency',
     calendarevent_repeatdays = '$repeat_days',
@@ -1702,6 +1708,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
     $repeatfrequency = $event_q->f("calendarevent_repeatfrequence");  
     $category1_id = $event_q->f("calendarevent_category1_id");
     $priority = $event_q->f("calendarevent_priority");
+    $color = $event_q->f("calendarevent_color");
     $description = $event_q->f("calendarevent_description");
     $properties = $event_q->f("calendarevent_properties");
     $location = $event_q->f("calendarevent_location");
@@ -1726,6 +1733,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
       calendarevent_repeatfrequence,
       calendarevent_repeatdays,
       calendarevent_allday,
+      calendarevent_color,
       calendarevent_endrepeat,
       calendarevent_domain_id
     )
@@ -1747,6 +1755,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = "") {
       '$repeatfrequency',
       '$repeat_days',
       '$all_day',
+      '$color',
       '$repeat_end',
       '$obm[domain_id]'
     )";
@@ -2790,6 +2799,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       calendarcategory1_label,
       $calendarevent_date_l,
       calendarevent_duration,
+      calendarevent_color,
       calendarevent_allday
     FROM CalendarEvent
       LEFT JOIN CalendarCategory1
@@ -2818,6 +2828,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       calendarcategory1_label,
       $calendarevent_date_l,
       calendarevent_duration,
+      calendarevent_color,
       calendarevent_allday
     FROM CalendarEvent
       LEFT JOIN CalendarCategory1
@@ -2929,6 +2940,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       'resourcegroup' as evententity_entity,
       evententity_entity_id,
       calendarevent_repeatdays,
+      calendarevent_color,
       calendarevent_allday
     FROM CalendarEvent
       LEFT JOIN CalendarCategory1
@@ -2961,6 +2973,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       evententity_entity,
       evententity_entity_id,
       calendarevent_repeatdays,
+      calendarevent_color,
       calendarevent_allday
     FROM CalendarEvent
       LEFT JOIN CalendarCategory1
@@ -3136,6 +3149,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     $category1 = $nr_q->f("calendarcategory1_label");
     $priority = $nr_q->f("calendarevent_priority");
     $date = $nr_q->f("calendarevent_date");
+    $color = $nr_q->f("calendarevent_color");
     $duration = $nr_q->f("calendarevent_duration");
     $all_day = $nr_q->f("calendarevent_allday");
     $entity = $nr_q->f("evententity_entity");
@@ -3147,7 +3161,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
         $of->addOccurrence($event, $date, $entity, $entity_id);
       }
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner);
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$color);
       $of->addOccurrence($event, $date, $entity, $entity_id);
     }
   }
@@ -3167,6 +3181,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     $endrepeat = $r_q->f("calendarevent_endrepeat");
     $entity = $r_q->f("evententity_entity");
     $all_day = $r_q->f("calendarevent_allday");     
+    $color = $r_q->f("calendarevent_color");
     $repeatfrequence = $r_q->f("calendarevent_repeatfrequence");
     $repeatdays = $r_q->f("calendarevent_repeatdays");
     $entity_id = $r_q->f("evententity_entity_id");    
@@ -3182,7 +3197,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
         $addOcc = false;
       }
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner);
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$color);
     }
     $event_start =  $start_time ;
     $delta = date("H",$date) * 3600 + date("i",$date) * 60 + date("s",$date) + $duration;
@@ -3434,6 +3449,7 @@ Class Event {
   var $repeat;
   var $all_day;
   var $owner;
+  var $color;
 
   /**
    * Event 
@@ -3452,7 +3468,7 @@ Class Event {
    * @access public
    * @return void
    */
-  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner) {
+  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$color) {
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;
@@ -3465,6 +3481,7 @@ Class Event {
     $this->all_day = $all_day;
     $this->attendee = array();
     $this->owner = $owner;
+    $this->color = $color;
   }
 
   /**

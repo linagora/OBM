@@ -91,7 +91,9 @@ function run_query_contact_search($contact) {
     $if_ad2 = "contact_address2,";
     $if_ad3 = "contact_address3,";
     $if_zip = "contact_zipcode,";
+    $where_zip = "(contact_zipcode $like '$zip%')";
     $if_town = "contact_town,";
+    $where_town = "(contact_town $like '$town%')";
     $if_express = "contact_expresspostal,";
     $if_country = "ctry1.country_name as country_name,";
     $company_fields = "contact_company as company_name,";

@@ -47,6 +47,7 @@ $ics_event_priority_to_obm = array(1 => 3, 2 => 3, 3 => 3, 4 => 2, 5 => 2, 6 => 
 
 $extra_css[] = $css_calendar;
 $extra_js_include[] = "calendar.js";
+$extra_js_include[] = "colorpicker.js";
 
 require("calendar_query.inc");
 require("calendar_display.inc");
@@ -61,6 +62,8 @@ $perm->check_permissions($module, $action);
 $cal_entity_id = $_SESSION['cal_entity_id'];
 $cal_category_filter = $_SESSION["cal_category_filter"];
 page_close();
+
+
 // If a group has just been selected, automatically select all its members
 if ( ($params["new_group"] == "1")
      && ($params["group_view"] != "") ) {

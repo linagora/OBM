@@ -85,7 +85,7 @@ ALTER TABLE CalendarEvent ADD COLUMN calendarevent_ext_id varchar(32) DEFAULT ''
 -- Add extension column
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_properties text AFTER calendarevent_description;
 -- Add color column
-ALTER TABLE CalendarEvent ADD COLUMN  calendarevent_color char(6) AFTER calendarevent_properties;
+ALTER TABLE CalendarEvent ADD COLUMN  calendarevent_color char(7) AFTER calendarevent_properties;
 
 --
 -- Table structure for table 'CalendarAlert'

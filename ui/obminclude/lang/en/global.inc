@@ -31,6 +31,7 @@ $l_updater = "Updated by";
 $l_date_last_update = "Last Update";
 $l_delegation = "Delegation";
 $l_print = "Print";
+$l_transparent = "Transparent";
 
 // Common messages
 $l_yes = "Yes";
