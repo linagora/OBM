@@ -259,6 +259,17 @@ if ($action == "index") {
     $display["msg"] .= display_err_msg($l_err_reference);
   }
 
+} elseif ($action == "duplicate") {
+///////////////////////////////////////////////////////////////////////////////
+  if ($params["calendar_id"] > 0) {  
+    $eve_q = run_query_calendar_detail($params["calendar_id"]);
+    $entities = get_calendar_event_entity($params["calendar_id"]);
+    $display["detailInfo"] = display_record_info($eve_q);
+    $display["detail"] = dis_calendar_event_form($action, $params, $eve_q, $entities);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
+  }
+
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_form($params)) {
@@ -649,7 +660,7 @@ function get_calendar_action() {
   global $actions, $path, $params;
   global $l_header_consult, $l_header_update,$l_header_right,$l_header_meeting;
   global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
-  global $l_header_planning, $l_header_list;
+  global $l_header_planning, $l_header_list, $l_header_duplicate;
   global $l_header_month,$l_header_new_event,$l_header_admin, $l_header_export, $l_header_import;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $l_header_waiting_events;
@@ -700,6 +711,14 @@ function get_calendar_action() {
   $actions["calendar"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id&amp;date=$date",
+    'Right'    => $cright_write,
+    'Condition'=> array ('detailconsult') 
+  );
+
+  // Duplicate
+  $actions["calendar"]["duplicate"] = array (
+    'Name'     => $l_header_duplicate,
+    'Url'      => "$path/calendar/calendar_index.php?action=duplicate&amp;calendar_id=$id&amp;date=$date",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
   );
@@ -921,6 +940,9 @@ function update_calendar_action() {
     if ($owner != $obm["uid"] && !in_array($owner,$writable_entity["ids"])) {
       // Detail Update
       unset($actions["calendar"]["detailupdate"]);
+
+      // Duplicate
+      unset($actions["calendar"]["duplicate"]);
 
       // Update
       unset($actions["calendar"]["update"]);

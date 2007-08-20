@@ -1942,7 +1942,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
 
-  if ($action == "detailupdate") {
+  if (($action == "detailupdate") || ($action == "duplicate")) {
     $users = $entities["user"];
     $resources = $entities["resource"];
     $tasks = $entities["task"];
@@ -2079,7 +2079,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   $time_unit = 60 / $_SESSION['set_cal_interval'];  
   $repeatfrequency = 1;
 
-  if ($action == "detailupdate") {
+  if (($action == "detailupdate") || ($action == "duplicate")) {
     $title = htmlspecialchars($event_q->f("calendarevent_title"));
     $location = htmlspecialchars($event_q->f("calendarevent_location"));
     $cat1 = $event_q->f("calendarevent_category1_id");
@@ -2123,6 +2123,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
       }
     }
     $dis_title = $title;
+
+    if ($action == 'duplicate') {
+      $dis_title = "$title ($l_header_new)";
+      $repeat_end = of_date_upd_format();
+    }
 
   } elseif ($action == "new") {
     $dis_title = $l_header_new;
@@ -2198,7 +2203,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
       ";
-  } elseif (($action == "new") || ($action == "insert")) {
+  } elseif (($action == "new") || ($action == "insert") || ($action == "duplicate")) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
@@ -2338,7 +2343,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
         if ($item != "") {
             $xml = parse_item($item);
         }
-        if (is_object($xml) && ($action == "detailupdate" || $action == "update" )) {
+        if (is_object($xml) && ($action == "detailupdate" || $action == "update"  || $action == "duplicate" )) {
           foreach($xml->resource as $key => $value) {
             if ($value->res_id == $r_id) {
               $list_item = $value->item;
@@ -2480,7 +2485,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     }
   }
   $dis_min_e .= "</select>";
-  $display["title"] = "<div class=\"title\">$l_module_calendar : $dis_title</div>";
+  $display['title'] = "<div class=\"title\">$l_module_calendar : $dis_title</div>";
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[5]";
   $url2 = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[6]&amp;ext_title=" . urlencode($l_calendar_select_group);
 
