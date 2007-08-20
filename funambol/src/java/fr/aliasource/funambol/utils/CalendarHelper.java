@@ -79,11 +79,14 @@ public class CalendarHelper extends Helper {
 	 * @return
 	 */
 	public static String getOneCategory(String categories) {
-		String[] result = null;
-		
-		result = categories.split(";|,", 1);
-		
-		return result[0];
+	    String ret = "";
+	    if (categories != null) {
+		String[] result = categories.split(";|,");
+		if (result.length > 0) {
+		    ret = result[0];
+		}
+	    }
+	    return ret;
 	}
 
 	
