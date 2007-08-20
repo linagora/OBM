@@ -89,7 +89,7 @@ ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_ext_id DEFAULT '';
 -- Add extension column
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_properties text;
 -- Add color column
-ALTER TABLE CalendarEvent ADD COLUMN calendarevent_color char(7);
+ALTER TABLE CalendarEvent ADD COLUMN calendarevent_color varchar(7);
 
 
 --

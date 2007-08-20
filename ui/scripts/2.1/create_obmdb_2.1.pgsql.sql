@@ -673,9 +673,9 @@ CREATE TABLE CalendarEvent (
   calendarevent_repeatfrequence  integer default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,
   calendarevent_endrepeat    timestamp NOT NULL,
+  calendarevent_color        varchar(7),
   calendarevent_description  text,
   calendarevent_properties   text,
-  calendarevent_color        char(7),
   PRIMARY KEY (calendarevent_id)
 );
 
