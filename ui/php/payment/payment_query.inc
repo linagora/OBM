@@ -378,6 +378,7 @@ function get_payment_invoices($id) {
     PI1.paymentinvoice_amount,
     invoice_company_id,
     invoice_amount_ttc,
+    invoice_number,
     invoice_label,
     invoice_date,
     company_name,
@@ -396,6 +397,7 @@ function get_payment_invoices($id) {
     paymentinvoice_amount,
     invoice_company_id,
     invoice_amount_ttc,
+    invoice_number,
     invoice_label,
     invoice_date,
     company_name,
@@ -410,6 +412,7 @@ function get_payment_invoices($id) {
     $id = $obm_q->f('invoice_id');
     $amount = $obm_q->f('paymentinvoice_amount');
     $company = $obm_q->f('company_name');
+    $number = $obm_q->f('invoice_number');
     $inv_amount = $obm_q->f('invoice_amount_ttc');
     $inout = $obm_q->f('payment_inout');
     if (isset($ret[$id]['already_paid'])) {
@@ -429,6 +432,7 @@ function get_payment_invoices($id) {
 		      'invoice_amount' => $inv_amount,
 		      'already_paid' => $already_paid,
 		      'company' => $company,
+		      'number' => $number,
 		      'label' => $label,
 		      'date' => $date);
   }

@@ -370,6 +370,7 @@ function html_payment_consult($p_q, $invs) {
       <tr>
         <th>$l_date</th>
         <th>$l_company</th>
+        <th>$l_number</th>
         <th>$l_label</th>
         <th>$l_amount</th>
         <th>$l_payment : $l_amount</th>
@@ -383,6 +384,7 @@ function html_payment_consult($p_q, $invs) {
       $i_affected_amount = $one_inv["affected_amount"];
       $i_inv_amount = $one_inv["invoice_amount"];
       $i_company = $one_inv["company"];
+      $i_number = $one_inv["number"];
       $i_label = $one_inv["label"];
       $i_date = $one_inv["date"];
       $k ++;
@@ -393,6 +395,7 @@ function html_payment_consult($p_q, $invs) {
       <tr class=\"$class\">
         <td>$i_date</td>
         <td>$i_company</td>
+        <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$i_number</a></td>
         <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$i_label</a></td>
         <td>$i_inv_amount </td>
         <td>$i_affected_amount </td>
@@ -401,7 +404,7 @@ function html_payment_consult($p_q, $invs) {
 
     $block_invoice .= "
       <tr class=\"highlight\">
-        <th colspan=\"4\">$l_total</th>
+        <th colspan=\"5\">$l_total</th>
         <td>$affected_amount_total</td>
       </tr>
       </tbody>
@@ -516,6 +519,7 @@ function html_payment_invoice($amounts, $params) {
       <thead>
       <tr>
         <th>$l_date</th>
+        <th>$l_number</th>
         <th>$l_company</th>
         <th>$l_label</th>
         <th>$l_amount</th>
@@ -536,10 +540,11 @@ function html_payment_invoice($amounts, $params) {
       }
       $i_inv_amount = $one_inv["invoice_amount"];
       $i_company = $one_inv["company"];
+      $i_number = $one_inv["number"];
       $i_label = $one_inv["label"];
       $i_date = $one_inv["date"];
       $i_already_paid = $one_inv["already_paid"];
-      
+
       $affected_amount_total += $affected_amount;
       $k++;
       ($k % 2 == 0) ? $class="pair" : $class="";
@@ -547,6 +552,7 @@ function html_payment_invoice($amounts, $params) {
         <tr class=\"$class\">
           <td>$i_date</td>
           <td>$i_company</td>
+          <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$i_number</a></td>
           <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$i_label</a></td>
           <td>$i_inv_amount </td>
           <td>$i_already_paid </td>
@@ -558,7 +564,7 @@ function html_payment_invoice($amounts, $params) {
 
     $block_invoice .= "
         <tr class=\"highlight\">
-        <th colspan=\"5\">$l_total</th>
+        <th colspan=\"6\">$l_total</th>
         <td>$affected_amount_total</td>
         <th></th>
         </tr>
