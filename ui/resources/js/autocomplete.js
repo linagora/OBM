@@ -215,10 +215,14 @@ obm.AutoComplete.Search = new Class({
 
   // blur event
   onBlur: function() {
-    if (this.isMouseOver)
-      this.inputField.focus(); // keep focus if mouse over the resultBox
-    else
+    if (this.isMouseOver) {
+      if (window.ie) // FIXME because this.inputField.focus.delay(1,this.inputField) doesn't work on ie
+        this.inputField.focus();
+      else           // FIXME because this.inputField.focus() doesn't work on ff
+        this.inputField.focus.delay(1,this.inputField);
+    } else {
       this.resetFunc();
+    }
   },
 
   ///////////////////////////////////////////////////////////////////////////
@@ -377,12 +381,10 @@ obm.AutoComplete.Search = new Class({
       this.cache.addElement(res);
       if($type(data.extension)) {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-           .addEvent('mousedown', function() { this.validateResultValue(res,data.extension)}.bindAsEventListener(this))
-           .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
+           .addEvent('mousedown', function() {this.validateResultValue(res,data.extension);}.bindAsEventListener(this));
       } else {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-           .addEvent('mousedown', function() {this.validateResultValue(res);}.bindAsEventListener(this))
-           .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
+           .addEvent('mousedown', function() {this.validateResultValue(res);}.bindAsEventListener(this));
       }
     }.bind(this));
     this.totalNbr = results.length;
