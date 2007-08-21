@@ -1100,8 +1100,8 @@ input.datePicker {
 }
 
 .autoCompleteResultBox div {
-  border-bottom: 1px solid #b7b8ba;
   color: #368397;
+  border-bottom: 1px solid #b7b8ba;
   text-align: left;
   cursor: pointer;
 }
@@ -1114,6 +1114,15 @@ input.datePicker {
 
 .autoCompleteResultBox .highlight {
   background-color: #aaddff;
+}
+
+.autoCompleteResultBox .selected {
+  color: #777777;
+  font-style: italic;
+}
+
+.autoCompleteResultBox .selected .highlight {
+  background-color: #ccdff0;
 }
 
 .autoCompleteResultBox div em {

@@ -224,7 +224,6 @@ obm.AutoComplete.Search = new Class({
   ///////////////////////////////////////////////////////////////////////////
   // keyboard selection management (up, down, enter, esc., page up, page down)
   // return is useless, use e.stop() to prevent event propagation
-  //TODO Tab key mightbe usefull to
 
   // KeyPress event management
   onKeyPress: function(e) {
@@ -372,6 +371,9 @@ obm.AutoComplete.Search = new Class({
                                      new Element('em')
                                        .appendText(data.extra)                                   
                                   );
+      var item_id = res.getProperty('id');
+      var div_id = this.name + item_id.substr(('item_').length,item_id.length);
+      if ($(div_id)) { res.addClass("selected"); }
       this.cache.addElement(res);
       if($type(data.extension)) {
         res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
@@ -523,6 +525,7 @@ obm.AutoComplete.Search = new Class({
     var div_id = this.name + id;
     var text = $(item_id+'_label').innerHTML;
     if (!$(div_id)) {
+      element.addClass("selected");
       var result = new Element('div').addClass('elementRow');
       result.setProperties({'id': div_id});
       result.injectInside(this.selectedBox);
@@ -530,7 +533,11 @@ obm.AutoComplete.Search = new Class({
                         new Element('img')
                           .setProperty('src',obm.vars.images.del)
                       ).addEvent('mousedown',
-                        function() {remove_element(div_id,this.name);}.bind(this)
+                        function() {
+                          var item = $(item_id);
+                          if (item) { item.removeClass("selected"); }
+                          remove_element(div_id,this.name);
+                        }.bind(this)
                       ).injectInside(result);
       result.appendText(text);
       if($type(extension)) {
