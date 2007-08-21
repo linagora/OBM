@@ -1127,7 +1127,7 @@ function dis_calendar_day_print($calendar, $calendar_entity,$writable_entity) {
       }
       $delta2 = $k * $time_unit;
       $current_time = strtotime("+$i hours +$delta2 minutes",$ts_date);   
-      $occurences = $of->getPeriodOccurrences($current_time,$time_unit,null,1);
+      $occurences = $of->getPeriodOccurrences($current_time,$time_unit_sec,null,1);
       $events_list = "";
       if($occurences != null) {
         foreach($occurences as $occurence) {

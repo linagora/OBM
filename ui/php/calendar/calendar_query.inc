@@ -3672,7 +3672,7 @@ Class OccurrenceFactory {
           $eventDate = $occurence->date;
           $eventAllDay = $occurence->event->all_day;
           if(($eventAllDay && date("Ymd",$time) == date("Ymd",$eventDate)) 
-              || ($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate)) {
+              || ($time < ($eventDate + $eventDuration) && ($time + $duration) > $eventDate)) {
             return true;
           }
         }
@@ -3706,7 +3706,7 @@ Class OccurrenceFactory {
           $eventAllDay = $occurence->event->all_day;
           if(($eventFilter == 0 || ($eventFilter == 1 && !$eventAllDay) || ($eventFilter == 2 && $eventAllDay))
             && (($eventAllDay && date("Ymd",$time) == date("Ymd",$eventDate)) 
-            || ($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate))) {
+            || ($time < ($eventDate + $eventDuration) && ($time + $duration) > $eventDate))) {
             if($eventAllDay) {
               array_unshift($occurences,$occurence);
             } else {
