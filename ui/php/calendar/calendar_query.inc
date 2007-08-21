@@ -3687,11 +3687,14 @@ Class OccurrenceFactory {
    * @param timestamp $time 
    * @param int $duration 
    * @param HashMap $entityFilter "entityKind" => [entity_ids,..] if set only
-   * count occurrence of the given entityKind and if set the given ids              
+   * count occurrence of the given entityKind and if set the given ids     
+   * @param int $eventFilter 0:All events;1:All events but all day events;
+   * 2: Only all day events
    * @access public
    * @return boolean
    */
-  function getPeriodOccurrences($time, $duration, $entityFilter=null) {
+  function getPeriodOccurrences($time, $duration, $entityFilter=null, $eventFilter=0) {
+    $occurences = array();
     foreach($this->occurrences as $evtOccurrences) {
       foreach($evtOccurrences as $occurence) {
         if(!$entityFilter || ( 
@@ -3701,14 +3704,23 @@ Class OccurrenceFactory {
           $eventDuration = $occurence->event->duration;
           $eventDate = $occurence->date;
           $eventAllDay = $occurence->event->all_day;
-          if(($eventAllDay && date("Ymd",$time) == date("Ymd",$eventDate)) 
-              || ($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate)) {
-            $occurences[] = $occurence;
+          if(($eventFilter == 0 || ($eventFilter == 1 && !$eventAllDay) || ($eventFilter == 2 && $eventAllDay))
+            && (($eventAllDay && date("Ymd",$time) == date("Ymd",$eventDate)) 
+            || ($time <= ($eventDate + $eventDuration) && ($time + $duration) > $eventDate))) {
+            if($eventAllDay) {
+              array_unshift($occurences,$occurence);
+            } else {
+              array_push($occurences,$occurence);
+            }
           }
         }
       }
     }
-    return $occurences;
+    if(count($occurence) > 0) {
+      return $occurences;
+    } else {
+      return NULL;
+    }
   }
 }
 

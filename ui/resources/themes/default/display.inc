@@ -16,32 +16,18 @@
 function display_page(&$display) {
   global $output_target, $ico_nav_close;
   global $ico_nav_open, $l_hide, $l_show;
-  global $l_print, $l_cancel;
+  global $l_print, $l_cancel, $params;
 
   // If print activated, display only the detail
-  if ($output_target == "print") {
+  if ($params["output_target"] == "print") {
     echo $display["head"] . "
-      <!-- left panel -->
-      <div id=\"portletsPanel\">
-        <div  id=\"portlets\">
-" .
-        $display["features"] ."
-        <form name=\"f_print\">
-          <input type=\"button\" value=\"$l_print\" onClick=\"window.print()\" />
-          <input type=\"button\" value=\"$l_cancel\" onClick=\"window.close()\" />
-        </form>
-        </div>
-      </div>
-      <div id=\"mainPanel\">
-      
 " .
       $display["title"] .
       $display["msg"] .
-      "<div id=\"mainContent\">
+      "
       <div id=\"ajaxMessage\"></div>
       &nbsp;".
       $display["detail"] . "
-      </div>
       </div>
       " .
       $display["end"];

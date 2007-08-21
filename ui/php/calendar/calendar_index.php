@@ -139,7 +139,6 @@ if(($action == "insert") || ($action == "update")
   $cal_category_filter = str_replace($c_all,"",$params["category_filter"]);
 }
   
-//print_r($cal_entity_id);
 // We copy the entity array structure to the parameter hash
 $params["entity"] = $cal_entity_id;
 $params["category_filter"] = $cal_category_filter;
@@ -485,8 +484,6 @@ if ($action == "index") {
 
 $_SESSION['cal_entity_id'] = $cal_entity_id;
 $_SESSION['cal_category_filter'] = $cal_category_filter;
-//echo "<p>";
-//print_r($cal_entity_id);
 if (!$params["ajax"]) {
   $display["head"] = display_head($l_calendar);
   $display["header"] = display_menu($module);

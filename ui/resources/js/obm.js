@@ -187,7 +187,7 @@ function popup(url,name,height,width) {
     width = obm.vars.consts.popupWidth;
   if(!height)
     height = obm.vars.consts.popupHeight;
-  window.open(url,name,'height='+height+',width='+width+',scrollbars=yes');
+  window.open(url,name,'height='+height+',width='+width+',scrollbars=yes,menubar=yes');
   return false;
 }
 
