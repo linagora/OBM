@@ -275,6 +275,7 @@ public class CalendarManager extends ObmManager {
 		//log.info(" look twin of : "+c.getFirstName()+","+c.getLastName()+","+c.getCompany());
 		
 		try {
+			evt.setUid(null);
 			keys = binding.getEventTwinKeys(token,calendar,evt).getKey();
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
