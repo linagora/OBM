@@ -66,7 +66,6 @@ sub getParameter {
 my %parameters;
 getParameter( \%parameters );
 
-#
 # On se connecte a la base
 my $dbHandler;
 if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {

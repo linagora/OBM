@@ -36,9 +36,9 @@ $postfixMapsDesc = {
         ldap_filter => "(&(mailAccess=PERMIT)(obmdomain=<obmDomain>))",
         ldap_attibute => [ "mailbox", "mail", "mailAlias" ],
         make_map => sub {
-            my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;
+            my( $daemonRef, $aliasMapFile, $obmDomains ) = @_;
             require OBM::ObmSatellite::mapAlias;
-            return &OBM::ObmSatellite::mapAlias::makeAliasMap( $daemonRef, $mailBoxMapFile, $obmDomains );
+            return &OBM::ObmSatellite::mapAlias::makeAliasMap( $daemonRef, $aliasMapFile, $obmDomains );
         }
     },
     transport => {
@@ -50,9 +50,9 @@ $postfixMapsDesc = {
         ldap_filter => "(&(|(objectClass=obmUser)(objectClass=obmMailShare))(mailAccess=PERMIT)(obmDomain=<obmDomain>))",
         ldap_attibute => [ "mailbox", "mailBoxServer" ],
         make_map => sub {
-            my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;
+            my( $daemonRef, $transportMapFile, $obmDomains ) = @_;
             require OBM::ObmSatellite::mapTransport;
-            return &OBM::ObmSatellite::mapTransport::makeTransportMap( $daemonRef, $mailBoxMapFile, $obmDomains );
+            return &OBM::ObmSatellite::mapTransport::makeTransportMap( $daemonRef, $transportMapFile, $obmDomains );
         }
     },
     domain => {
@@ -64,9 +64,9 @@ $postfixMapsDesc = {
         ldap_filter => "(&(objectClass=obmPostfix)(obmDomain=<obmDomain>))",
         ldap_attibute => [ "myDestination" ],
         make_map => sub {
-            my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;
+            my( $daemonRef, $domainMapFile, $obmDomains ) = @_;
             require OBM::ObmSatellite::mapDomains;
-            return &OBM::ObmSatellite::mapDomains::makeDomainsMap( $daemonRef, $mailBoxMapFile, $obmDomains );
+            return &OBM::ObmSatellite::mapDomains::makeDomainsMap( $daemonRef, $domainMapFile, $obmDomains );
         }
     },
     networks => {

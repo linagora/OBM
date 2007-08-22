@@ -18,6 +18,7 @@ sub new {
         daemonRef => undef,
         cyrusConfFile => undef,
         cyrusStartupScript => undef,
+        cyrusPartitionRoot => undef,
         domainList => undef
     );
 
@@ -32,7 +33,7 @@ sub new {
     }
 
     # Fichier de configuration du service
-    $cyrusPartitionAttr{"cyrusConfFile"} = "/etc/imapd.conf";
+    $cyrusPartitionAttr{"cyrusConfFile"} = $daemonRef->{cyrus}->{cyrus_imap_conf};
 
     if( !-w $cyrusPartitionAttr{"cyrusConfFile"} ) {
         $daemonRef->logMessage( "Echec: le fichier de configuration '".$cyrusPartitionAttr{"cyrusConfFile"}."' n'est pas accessible en ecriture. MAJ impossible !" );
@@ -40,11 +41,14 @@ sub new {
     }
 
     # Script de gestion du service
-    $cyrusPartitionAttr{"cyrusStartupScript"} = "/etc/init.d/cyrus2.2";
+    $cyrusPartitionAttr{"cyrusStartupScript"} = $daemonRef->{cyrus}->{cyrus_service};
     if( !-x $cyrusPartitionAttr{"cyrusStartupScript"} ) {
         $daemonRef->logMessage( "Echec: le script de gestion du service Cyrus '".$cyrusPartitionAttr{"cyrusStartupScript"}."' n'est pas executable.  MAJ impossible !" );
         return undef;
     }
+
+    # Racine des partitions Cyrus Imapd
+    $cyrusPartitionAttr{"cyrusPartitionRoot"} = $daemonRef->{cyrus}->{cyrus_partition_root};
 
     # LDAP connection
     $daemonRef->logMessage( "Connexion anonyme a l'annuaire LDAP" );
@@ -120,21 +124,48 @@ sub addPartitions {
         return 1;
     }
 
-    my $file = <FIC>;
+    open( FIC, $self->{"cyrusConfFile"} );
+    my $line = <FIC>;
     close(FIC);
-    my @pp = split( '\n', $file );
-    $self->{"daemonRef"}->logMessage( $#pp );
+    my @file = split( '\n', $line );
+    $line = undef;
 
-    my @currentPartitions;
-    # Parcours du fichier de configuration
-#    for( my $i=0; $i<=$#file; $i++ ) {
-#        if( $file[$i] =~ /^partition-/ ) {
-#            push( @currentPartitions, $file[$i] );
-#            $self->{"daemonRef"}->logMessage( $file[$i] );
-#        }
-#    $self->{"daemonRef"}->logMessage( $i );
-#    }
+    # Parcours du fichier de configuration pour :
+    #   - creer un modele sans definition de partitions
+    #   - reperer les partitions déjà définies.
+    my %currentPartitions;
+    my @template;
+    for( my $i=0; $i<=$#file; $i++ ) {
+        if( $file[$i] =~ /^partition-(.+):(.+)$/ ) {
+            $currentPartitions{$1} = $2;
+        }else {
+            push( @template, $file[$i] );
+        }
+    }
 
+    while( my( $domainLabel, $domainCyrusPartition ) = each(%{$self->{"domainList"}}) ) {
+        if( !exists($currentPartitions{$domainCyrusPartition}) ) {
+            $self->{"daemonRef"}->logMessage( "Ajout de la partition du domaine '".$domainLabel."'" );
+            $currentPartitions{$domainCyrusPartition} = $self->{cyrusPartitionRoot}."/".$domainCyrusPartition;
+        }
+    }
+
+    # On vide le fichier d'origine
+    @file = undef;
+
+    # On parcours le modèle pour remettre la définition des partitions
+    $self->{"daemonRef"}->logMessage( "Re-ecriture du fichier de configuration du service Cyrus Imapd '".$self->{"cyrusConfFile"}."'" );
+    open( FIC, ">".$self->{"cyrusConfFile"} ) or return 1;
+    for( my $i=0; $i<=$#template; $i++ ) {
+        if( $template[$i] =~ /^defaultpartition/ ) {
+            while( my( $partitionName, $partitionPath ) = each(%currentPartitions) ) {
+                print FIC "partition-".$partitionName.": ".$partitionPath."\n";
+            }
+        }
+
+        print FIC $template[$i]."\n";
+    }
+    close(FIC);
 
     return 0;
 }

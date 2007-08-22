@@ -91,7 +91,6 @@ sub update {
     my $srvList = $self->{"incomingMailServerList"};
     my $globalReturn = 1;
 
-#    for( my $i=0; $i<=$#$srvList; $i++ ) {
     while( my( $serverName, $serverDesc ) = each(%{$srvList}) ) {
         &OBM::toolBox::write_log( "postfixEngine: connexion au serveur : '".$serverName."'", "W" );
         my $srvCon = new Net::Telnet(

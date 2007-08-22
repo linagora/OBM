@@ -221,6 +221,17 @@ sub _doAll {
 
 
     # Pour tous les domaines
+    # Traitement des entités de type 'postfixConf'
+    my $object = $self->_doPostfixConf( 1, 0 );
+    my $return = $self->_runEngines( $object );
+
+    if( $return ) {
+        # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+        # travail
+        $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+    }
+
+
     # Traitement des entités de type 'hote'
     my $query = "SELECT host_id FROM Host WHERE host_domain_id=".$self->{"domain"};
     if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
@@ -240,7 +251,6 @@ sub _doAll {
     }
 
 
-    my $object;
     # Traitement des entités de type 'utilisateur'
     $query = "SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"};
     if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
@@ -293,16 +303,6 @@ sub _doAll {
             # travail
             $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
         }
-    }
-
-    # Traitement des entités de type 'postfixConf'
-    $object = $self->_doPostfixConf( 1, 0 );
-    my $return = $self->_runEngines( $object );
-
-    if( $return ) {
-        # La MAJ de l'entité c'est bien passée, on met a jour la BD de
-        # travail
-        $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
     }
 
     return $globalReturn; 
@@ -1001,7 +1001,30 @@ sub getDomains {
 
         $currentDomain->{"domain_samba_sid"} = $domainSambaSid;
 
-        push( @domainList, $currentDomain );
+        # Est-ce un nouveau domaine
+        my $queryNewDomain = "SELECT COUNT(*) FROM P_Domain WHERE domain_id=".$currentDomain->{"domain_id"};
+
+        my $queryNewDomainResult;
+        if( !&OBM::dbUtils::execQuery( $queryNewDomain, $dbHandler, \$queryNewDomainResult ) ) {
+            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete.", "W" );
+            if( defined($queryNewDomainResult) ) {
+                &OBM::toolBox::write_log( "loadDb: ".$queryNewDomainResult->err, "W" );
+
+            }
+        }
+
+        my( $numRows ) = $queryNewDomainResult->fetchrow_array();
+        $queryNewDomainResult->finish();
+
+        if( $numRows == 0 ) {
+            $currentDomain->{"domain_new"} = 1;
+            push( @domainList, $currentDomain );
+        }elsif( $numRows == 1 ) {
+            $currentDomain->{"domain_new"} = 0;
+            push( @domainList, $currentDomain );
+        }else {
+            &OBM::toolBox::write_log( "loadDb: erreur de coherence dans la table 'P_Domain', ID de domaine '".$currentDomain->{"domain_id"}."' non unique !", "W" );
+        }
     }
 
     return \@domainList;

@@ -6,8 +6,8 @@ use strict;
 
 
 sub makeTransportMap {
-    my( $daemonRef, $mailBoxMapDesc, $obmDomains ) = @_;
-    my $ldapAttributes = $mailBoxMapDesc->{ldap_attibute};
+    my( $daemonRef, $transportMapDesc, $obmDomains ) = @_;
+    my $ldapAttributes = $transportMapDesc->{ldap_attibute};
     my %mapEntries;
 
 
@@ -15,14 +15,14 @@ sub makeTransportMap {
         return 1;
     }
 
-    if( !defined($mailBoxMapDesc->{ldap_filter}) || ( $mailBoxMapDesc->{ldap_filter} !~ /<obmDomain>/ ) ) {
+    if( !defined($transportMapDesc->{ldap_filter}) || ( $transportMapDesc->{ldap_filter} !~ /<obmDomain>/ ) ) {
         return 1;
     }
 
     for( my $i=0; $i<=$#{$obmDomains}; $i++ ) {
         $daemonRef->logMessage( "Obtention des informations du domaine : '".$obmDomains->[$i]."'" );
 
-        my $ldapFilter = $mailBoxMapDesc->{ldap_filter};
+        my $ldapFilter = $transportMapDesc->{ldap_filter};
         $ldapFilter =~ s/<obmDomain>/$obmDomains->[$i]/;
 
         my @ldapEntries;
@@ -46,6 +46,6 @@ sub makeTransportMap {
         }
     }
 
-    return &OBM::ObmSatellite::utils::writeMap( $mailBoxMapDesc->{postfix_map}, $mailBoxMapDesc->{postfix_map_separator}, \%mapEntries );
+    return &OBM::ObmSatellite::utils::writeMap( $transportMapDesc->{postfix_map}, $transportMapDesc->{postfix_map_separator}, \%mapEntries );
 
 }
