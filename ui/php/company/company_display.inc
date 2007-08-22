@@ -196,13 +196,14 @@ function dis_company_search_form($company="") {
 function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
   global $action, $display, $c_all, $cgp_hide;
   global $csearch_advanced_default, $l_fuzzy;
-  global $l_company_name, $l_postcode, $l_town, $l_archive, $l_phone;
+  global $l_company_name, $l_postcode, $l_town, $l_archive, $l_phone, $l_number;
   global $l_market, $l_country, $l_after, $l_before, $l_nafcode; 
   global $l_all, $l_find, $l_datasource, $l_select_company;
 
   $popup = $company["popup"];
   $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
   $name = stripslashes($company["name"]);
+  $number = stripslashes($company["number"]);
   $phone = stripslashes($company["phone"]);
   $town = stripslashes($company["town"]);
   $type = $company["type"];
@@ -300,6 +301,10 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
       <input type=\"text\" name=\"tf_name\" size=\"24\"
       value=\"$name\" />
     </label>
+    <label>$l_number<br />
+      <input type=\"text\" name=\"tf_number\" size=\"16\"
+      value=\"$number\" />
+    </label>
     <label>$l_phone<br />
       <input type=\"text\" name=\"tf_phone\" size=\"10\"
       value=\"$phone\" />
@@ -396,6 +401,7 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   }
   // we urlencode to avoid breakage for space char
   $name = urlencode(stripslashes($company["name"]));
+  $number = urlencode(stripslashes($company["number"]));
   $phone = urlencode(stripslashes($company["phone"]));
   $town = stripslashes($company["town"]);
   $ctry = $company["country"];
@@ -413,7 +419,7 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params("company", $company);
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_datasource=$dsrc&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_fuzzy=$fuzzy$url_userdata$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_number=$number&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_datasource=$dsrc&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_fuzzy=$fuzzy$url_userdata$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {
@@ -683,7 +689,7 @@ function html_company_consult($co_q) {
   global $display, $l_yes, $l_no, $cgp_hide;
   
   $id = $co_q->f("company_id");
-  $num = $co_q->f("company_number");
+  $number = $co_q->f("company_number");
   $vat = $co_q->f("company_vat");
   $siret = $co_q->f("company_siret");
   $archive = ($co_q->f("company_archive") == 1 ? $l_yes : $l_no);
@@ -726,7 +732,7 @@ function html_company_consult($co_q) {
     $block_num = "
   <tr>
     <th>$l_number</th>
-    <td>$num</td>
+    <td>$number</td>
   </tr>";
   }
 
@@ -1001,7 +1007,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
     $id = $co_q->f("company_id");
-    $num = $co_q->f("company_number");
+    $number = $co_q->f("company_number");
     $vat = $co_q->f("company_vat");
     $siret = $co_q->f("company_siret");
     $archive = ($co_q->f("company_archive") == 1 ? " checked" : "");
@@ -1039,7 +1045,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   
   // If parameters have been given, they supercede the default action value
   if (isset($company["company_id"])) { $id = $company["company_id"]; }
-  if (isset($company["num"])) { $num = stripslashes($company["num"]); }
+  if (isset($company["number"])) { $number = stripslashes($company["number"]); }
   if (isset($company["vat"])) { $vat = stripslashes($company["vat"]); }
   if (isset($company["siret"])) { $siret = stripslashes($company["siret"]); }
   if (isset($company["archive"])) { $archive = ($company["archive"] == 1 ? "checked" : ""); }
@@ -1087,7 +1093,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     $block_num = "
   </tr><tr>
     <th>$l_number</th>
-    <td><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>";
+    <td><input type=\"text\" id=\"tf_number\" name=\"tf_number\" value=\"$number\" size=\"30\" maxlength=\"32\" /></td>";
   }
 
   // Vat field
@@ -1362,7 +1368,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   global $display, $l_check_samecompany, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
-  $num = $company["num"];
+  $number = $company["number"];
   $vat = $company["vat"];
   $siret = $company["siret"];
   $archive = ($company["archive"] == 1 ? "1" : "0");
@@ -1401,7 +1407,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
 
   $hidden_fields = "
   $userdata
-  <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
+  <input type=\"hidden\" name=\"tf_number\" value=\"$number\" />
   <input type=\"hidden\" name=\"tf_vat\" value=\"$vat\" />
   <input type=\"hidden\" name=\"tf_siret\" value=\"$siret\" />
   <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />

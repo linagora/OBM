@@ -1749,6 +1749,7 @@ CREATE TABLE MailShare (
   mailshare_userupdate     int(8),
   mailshare_usercreate     int(8),
   mailshare_name           varchar(32),
+  mailshare_archive        int(1) not null default 0,
   mailshare_quota          int default 0 NOT NULL,
   mailshare_mail_server_id int(8) default 0,  
   mailshare_delegation     varchar(64) DEFAULT '',

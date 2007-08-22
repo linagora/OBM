@@ -375,3 +375,12 @@ UPDATE Incident set incident_status_id = 4 WHERE incident_status_id IN
 -- UPDATE ProjectTask Structure
 --
 ALTER TABLE ProjectTask ADD COLUMN projecttask_dateend date;
+
+
+--
+-- UPDATE MailShare Structure
+--
+-- Add archive flag
+ALTER TABLE MailShare ADD COLUMN mailshare_archive integer;
+ALTER TABLE MailShare ALTER COLUMN mailshare_archive SET DEFAULT 0;
+ALTER TABLE MailShare ALTER COLUMN mailshare_archive SET NOT NULL;

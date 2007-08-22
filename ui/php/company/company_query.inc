@@ -24,6 +24,7 @@ function run_query_company_search($company) {
   $fuzzy = $company["fuzzy"];
   $archive = $company["archive"];
   $name = sql_search_text_parse($company["name"]);
+  $number = sql_search_text_parse($company["number"]);
   $phone = sql_search_text_parse($company["phone"]);
   $town = sql_search_text_parse($company["town"]);
   $ctry = $company["country"];
@@ -46,6 +47,10 @@ function run_query_company_search($company) {
   $and = "";
   if ($name != "") {
     $where_name = " (company_name $like '$name%' OR company_aka like '$name%')";
+    $and = "AND";
+  }
+  if ($number != '') {
+    $where .= " $and company_number $like '$number%'";
     $and = "AND";
   }
   if (($type != $c_all) && ($type != "")) { 
@@ -266,7 +271,7 @@ function run_query_company_insert($company) {
   $now = date("Y-m-d H:i:s");
   $domain_id = $obm["domain_id"];
 	
-  $num = $company["num"];
+  $number = $company['number'];
   $vat = $company["vat"];
   $siret = $company["siret"];
   $archive = ($company["archive"] == "1" ? "1" : "0");
@@ -345,7 +350,7 @@ function run_query_company_insert($company) {
     null,
     '$uid',
     '$dsrc',
-    '$num',
+    '$number',
     '$vat',
     '$siret',
     '$archive',
@@ -418,7 +423,7 @@ function run_query_company_insert($company) {
 function run_query_company_update($cid, $company) {
   global $obm, $cdg_sql, $cgp_hide;
 
-  $num = $company["num"];
+  $number = $company['number'];
   $vat = $company["vat"];
   $siret = $company["siret"];
   $archive = ($company["archive"] == "1" ? "1" : "0");
@@ -464,7 +469,7 @@ function run_query_company_update($cid, $company) {
     company_timeupdate='". date("Y-m-d H:i:s") ."',
     company_userupdate='". $obm["uid"] ."',
     company_datasource_id='$dsrc',
-    company_number='$num',
+    company_number='$number',
     company_vat='$vat',
     company_siret='$siret',
     company_archive='$archive',
@@ -731,9 +736,8 @@ function get_company_nafcode_label($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_company_context($cid, $company) {
 
-  $num = $company["num"];
-  $name = $company["name"];
-  $zip = $company["zip"];
+  $name = $company['name'];
+  $zip = $company['zip'];
 
   // if a company with same name and zip exists, return false
   $co_q = run_query_check_company($cid, $name, $zip);
@@ -746,7 +750,7 @@ function check_company_context($cid, $company) {
 // Parameters:
 //   - $cid   : company id
 //   - $company[] : values checked
-//     keys used  : num, name, zip, phone, fax, web, email
+//     keys used  : number, name, zip, phone, fax, web, email
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
@@ -756,14 +760,14 @@ function check_company_data_form($cid, $company) {
   global $err;
   global $php_regexp_zip,$php_regexp_phone,$php_regexp_fax,$php_regexp_email,$php_regexp_web;
 
-  $num = $company["num"];
-  $name = $company["name"];
-  $act = $company["activity"];
-  $zip = $company["zip"];
-  $phone = $company["phone"];
-  $fax = $company["fax"];
-  $web = $company["web"];
-  $email = $company["email"];
+  $number = $company['number'];
+  $name = $company['name'];
+  $act = $company['activity'];
+  $zip = $company['zip'];
+  $phone = $company['phone'];
+  $fax = $company['fax'];
+  $web = $company['web'];
+  $email = $company['email'];
 
   // MANDATORY: Company name
   if (trim($name) == "") {
