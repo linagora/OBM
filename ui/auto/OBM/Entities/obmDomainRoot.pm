@@ -89,7 +89,7 @@ sub getLdapDnPrefix {
     my $dnPrefix = undef;
 
     if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"domainDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
-        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"domainDesc"}->{$self->{"typeDesc"}->{"dn_value"}};
+        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"domainDesc"}->{"domain_dn"};
     }
 
     return $dnPrefix;
@@ -106,7 +106,7 @@ sub createLdapEntry {
     if( $entry->{"domain_label"} ) {
         $ldapEntry->add(
             objectClass => $self->{"typeDesc"}->{"objectclass"},
-            dc => to_utf8( { -string => $entry->{"domain_name"}, -charset => $defaultCharSet } ),
+            dc => to_utf8( { -string => $entry->{"domain_dn"}, -charset => $defaultCharSet } ),
             o => to_utf8( { -string => $entry->{"domain_label"}, -charset => $defaultCharSet } )
         );
 

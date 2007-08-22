@@ -14,6 +14,7 @@ max_badrequest      2                                   # 2 par defaut
 user                root                                # postfix par defaut
 group               root                                # postfix par defaut
 
+# Configuration pour le service Postfix
 postmap_cmd         /usr/sbin/postmap
 # Le nom des map postfix
 process_mailbox     1                                   # 1 ou 0 - 1 par defaut
@@ -24,3 +25,8 @@ process_transport   1                                   # 1 ou 0 - 1 par defaut
 transport_map       /etc/postfix/transport              # /etc/postfix/transport par defaut
 process_domain      1                                   # 1 ou 0 - 1 par defaut
 domain_map          /etc/postfix/virtual_domains        # /etc/postfix/virtual_domains par defaut
+
+# configuration pour le service Cyrus
+cyrus_imap_conf     /etc/imapd.conf                     # /etc/imapd.conf par defaut
+cyrus_service       /etc/init.d/cyrus2.2                # /etc/init.d/cyrus par defaut
+cyrus_partition_root    /var/spool/cyrus                # /var/spool/cyrus par defaut

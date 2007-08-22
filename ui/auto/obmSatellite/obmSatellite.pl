@@ -50,7 +50,10 @@ sub configure_hook {
         process_transport => [],
         transport_map => [],
         process_domain => [],
-        domain_map => []
+        domain_map => [],
+        cyrus_service => [],
+        cyrus_imap_conf => [],
+        cyrus_partition_root => []
     };
     $self->configure( $daemonOptions );
 
@@ -111,6 +114,27 @@ sub configure_hook {
     }
     if( defined($daemonOptions->{domain_map}->[0]) ) {
         $self->{postfix_maps}->{domain}->{postfix_map} = $daemonOptions->{domain_map}->[0];
+    }
+
+    # Le script du service Cyrus
+    if( defined($daemonOptions->{cyrus_service}->[0]) ) {
+        $self->{cyrus}->{cyrus_service} = $daemonOptions->{cyrus_service}->[0];
+    }else {
+        $self->{cyrus}->{cyrus_service} = "/etc/init.d/cyrus";
+    }
+
+    # Le fichier de configuration de Cyrus Imapd
+    if( defined($daemonOptions->{cyrus_imap_conf}->[0]) ) {
+        $self->{cyrus}->{cyrus_imap_conf} = $daemonOptions->{cyrus_imap_conf}->[0];
+    }else {
+        $self->{cyrus}->{cyrus_imap_conf} = "/etc/imapd.conf";
+    }
+
+    # Le chemin d'accès aux partitions Cyrus
+    if( defined($daemonOptions->{cyrus_partition_root}->[0]) ) {
+        $self->{cyrus}->{cyrus_partition_root} = $daemonOptions->{cyrus_partition_root}->[0];
+    }else {
+        $self->{cyrus}->{cyrus_partition_root} = "/var/spool/cyrus";
     }
 
 
@@ -208,7 +232,11 @@ sub process_request {
                     my $hostName = $1;
 
                     my $domainList = $self->getServerDomains( "smtp", $hostName );
-                    $self->processPostfixDomains( $domainList );
+                    if( !defined($domainList) || ( ref($domainList) ne "ARRAY" ) ) {
+                        $self->logMessage( "L'hote '".$hostName."' n'est serveur SMTP d'aucun domaine" );
+                    }else {
+                        $self->processPostfixDomains( $domainList );
+                    }
                 }
 
                 if( $currentRequest =~ /^cyrusPartitions: (add|del):([A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9])$/i ) {
@@ -216,7 +244,11 @@ sub process_request {
                     my $hostName = $2;
 
                     my $domainList = $self->getServerDomains( "cyrus", $hostName );
-                    $self->processCyrusPartitions( $action, $domainList );
+                    if( !defined($domainList) || ( ref($domainList) ne "ARRAY" ) ) {
+                        $self->logMessage( "L'hote '".$hostName."' n'est serveur Cyrus d'aucun domaine" );
+                    }else {
+                        $self->processCyrusPartitions( $action, $domainList );
+                    }
                 }
             }else {
                 $self->sendMessage( "BADREQUEST", undef );
@@ -375,13 +407,13 @@ sub getServerDomains {
 
     SWITCH: {
         if( $type =~ /^smtp$/ ) {
-            $self->logMessage( "Obtention des serveurs de type SMTP" );
+            $self->logMessage( "Obtention des serveurs de type SMTP de l'hote '".$hostName."'" );
             $ldapAttributes = [ 'smtpDomain' ];
             last SWITCH;
         }
 
         if( $type =~ /^cyrus$/ ) {
-            $self->logMessage( "Obtention des serveurs de type Cyrus" );
+            $self->logMessage( "Obtention des serveurs de type Cyrus de l'hote '".$hostName."'" );
             $ldapAttributes = [ 'cyrusDomain' ];
             last SWITCH;
         }
@@ -518,7 +550,27 @@ sub processCyrusPartitions {
         }
     }
 
+    # Re-démarrage du service Cyrus Imapd
+    my $cmd = $self->{cyrus}->{cyrus_service}." stop";
+    $self->logMessage( "Execution de : '".$cmd."'" );
+    my $ret = 0xffff & system $cmd;
+
+    if( $ret ) {
+        $self->sendMessage( "ERROR", "Probleme lors de l'arret du service Cyrus Imapd" );
+        return 1;
+    }
+
+    my $cmd = $self->{cyrus}->{cyrus_service}." start";
+    $self->logMessage( "Execution de : '".$cmd."'" );
+    $ret = 0xffff & system $cmd;
+
+    if( $ret ) {
+        $self->sendMessage( "ERROR", "Probleme lors du redemarrage du service Cyrus Imapd" );
+        return 1;
+    }
+
     $self->sendMessage( "OK", undef );
+    $self->logMessage( "Fin du traitement" );
     return 0;
 }
 
