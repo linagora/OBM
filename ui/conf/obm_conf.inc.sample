@@ -162,6 +162,8 @@ $cgp_use["service"]["samba"] = true;
 // sections -- Default is true
 //$cgp_show["section"] = ""; // Needed if module order to change
 //$cgp_show["section"]["com"]["url"] = "$path/calendar/calendar_index.php";
+//$cgp_show["section"]["webmail"]["url"] = "http://webmail";
+//$cgp_show["section"]["webmail"]["target"] = "_blanck";
 
 // modules -- false to hide, otherwise section
 //$cgp_show["module"] = ""; // Needed if module order to change

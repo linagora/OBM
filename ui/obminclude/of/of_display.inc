@@ -902,12 +902,16 @@ function display_sections($section) {
     if ($show) {
       $value = $sections[$key];
       $section_name = $value["Name"];
+      $section_target = $value["Target"];
       $section_right = $perm->get_section_rights($key);
       if ($section_right) {
         if ($key == $section) {
           $ret .= "<p class='actif'>$section_name</p>\n";
         } else {
-	  $ret .= "<p class='inactif'><a href='".$value["Url"]."'>$section_name</a></p>\n";
+	  if (isset($section_target)) {
+	    $target = "target='$section_target'";
+	  }
+	  $ret .= "<p class='inactif'><a $target href='".$value["Url"]."'>$section_name</a></p>\n";
         }
       }
     }

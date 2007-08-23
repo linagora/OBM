@@ -182,8 +182,10 @@ function check_tools_update_need_global_update($domain_id=0) {
     $id = $obm_q->f('0');  // Id
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
-      // XXXXXX optimiser : verifier que fname pas un chiffre ?
-      $e1[$id]["$fname"] = $fvalue;
+      // keep only column name (remove column number entries)
+      if ((int)($fname) !== $fname) {
+	$e1[$id]["$fname"] = $fvalue;
+      }
     }
   }
 
@@ -196,8 +198,10 @@ function check_tools_update_need_global_update($domain_id=0) {
     $id = $obm_q->f('0');  // Id
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
-      // XXXXXXX optimiser : verifier que fname pas un chiffre ?
-      $e2[$id]["$fname"] = $fvalue;
+      // keep only column name (remove column number entries)
+      if ((int)($fname) !== $fname) {
+	$e2[$id]["$fname"] = $fvalue;
+      }
     }
   }
 
@@ -230,8 +234,10 @@ function check_tools_update_need_global_update($domain_id=0) {
     $id = $obm_q->f('0');  // Id
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
-      // XXXXXX optimiser : verifier que fname pas un chiffre ?
-      $e1[$id]["$fname"] = $fvalue;
+      // keep only column name (remove column number entries)
+      if ((int)($fname) !== $fname) {
+	$e1[$id]["$fname"] = $fvalue;
+      }
     }
   }
 
@@ -244,8 +250,10 @@ function check_tools_update_need_global_update($domain_id=0) {
     $id = $obm_q->f('0');  // Id
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
-      // XXXXXXX optimiser : verifier que fname pas un chiffre ?
-      $e2[$id]["$fname"] = $fvalue;
+      // keep only column name (remove column number entries)
+      if ((int)($fname) !== $fname) {
+	$e2[$id]["$fname"] = $fvalue;
+      }
     }
   }
 
@@ -262,7 +270,6 @@ function check_tools_update_need_global_update($domain_id=0) {
     }
   }
 
-
   return false;
 }
 
@@ -273,8 +280,9 @@ function check_tools_update_need_global_update($domain_id=0) {
 //   - $table  : table where to check
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
+//   - $exclude_fields : fields not to take in account for update check
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_entity_infos(&$e1, &$e2, $table, $field="", $realm) {
+function get_update_entity_infos(&$e1, &$e2, $table, $field='', $realm, $exclude_fields=array()) {
   global $cdg_sql, $obm;
 
   $uid = $obm['uid'];
@@ -324,8 +332,10 @@ function get_update_entity_infos(&$e1, &$e2, $table, $field="", $realm) {
     $id = $obm_q->f("0");  // Id
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
-      // optimiser : verifier que fname pas un chiffre ?
-      $e1[$id]["$fname"] = $fvalue;
+      // keep only column name (remove column number entries and exclude fields)
+      if (((int)($fname) !== $fname) && !(in_array($fname, $exclude_fields))) {
+	$e1[$id]["$fname"] = $fvalue;
+      }
     }
   }
 
@@ -339,8 +349,10 @@ function get_update_entity_infos(&$e1, &$e2, $table, $field="", $realm) {
     $id = $obm_q->f("0");  // Id
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
-      // optimiser : verifier que fname pas un chiffre ?
-      $e2[$id]["$fname"] = $fvalue;
+      // keep only column name (remove column number entries and exclude fields)
+      if (((int)($fname) !== $fname) && !(in_array($fname, $exclude_fields))) {
+	$e2[$id]["$fname"] = $fvalue;
+      }
     }
   }
 
@@ -430,14 +442,15 @@ function process_update_numbers($e1, $e2, $table, $realm) {
 //   - $table  : entity table
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
+//   - $exclude_fields : fields not to take in account for update check
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_entity_numbers($table, $field="", $realm) {
+function get_update_entity_numbers($table, $field='', $realm, $exclude_fields) {
   global $cdg_sql, $obm;
 
   $e1 = array();
   $e2 = array();
 
-  get_update_entity_infos($e1, $e2, $table, $field, $realm);
+  get_update_entity_infos($e1, $e2, $table, $field, $realm, $exclude_fields);
   $nb = process_update_numbers($e1, $e2, $table, $realm);
 
   return $nb;
@@ -711,10 +724,10 @@ function store_update_data($params) {
 
   $realm = $params['realm'];
 
-  $entities = array('user' => array('UserObm', 'userobm'),
-                    'group' => array('UGroup', 'group'),
-                    'host' => array('Host', 'host'),
-                    'mailshare' => array('MailShare', 'mailshare'));
+  $entities = array('user' => array('UserObm', 'userobm', array('userobm_timelastaccess', 'userobm_calendar_version')),
+                    'group' => array('UGroup', 'group', array()),
+                    'host' => array('Host', 'host', array()),
+                    'mailshare' => array('MailShare', 'mailshare', array()));
 
   $has_update = false;
 
@@ -723,11 +736,12 @@ function store_update_data($params) {
   foreach ($entities as $entity=>$db_info) {
     $table = $db_info[0];
     $field = $db_info[1];
+    $exclude_fields = $db_info[2];
     if ($cgp_show['module']["$entity"]) {
-      $nb = get_update_entity_numbers($table, $field, $realm);
+      $nb = get_update_entity_numbers($table, $field, $realm, $exclude_fields);
       if ($nb['move'] > 0) {
         $has_update = true;
-	$ret = validate_update_entity($entity, $table, $field, $realm);
+	$ret = validate_update_entity($entity, $table, $field, $realm, $exclude_fields);
       }
     }
   }
@@ -758,15 +772,16 @@ function store_update_data($params) {
 //   - $table  : table where to check
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
+//   - $exclude_fields : fields not to take in account for update check
 ///////////////////////////////////////////////////////////////////////////////
-function validate_update_entity($entity, $table, $field="", $realm) {
+function validate_update_entity($entity, $table, $field="", $realm, $exclude_fields) {
   global $cdg_sql, $obm;
 
   $e1 = array();
   $e2 = array();
 
-  get_update_entity_infos($e1, $e2, $table, $field, $realm);
-  $nb = store_update_entity_infos($e1, $e2, $entity, $table,  $realm);
+  get_update_entity_infos($e1, $e2, $table, $field, $realm, $exclude_fields);
+  $nb = store_update_entity_infos($e1, $e2, $entity, $table, $realm);
 
   return $nb;
 }

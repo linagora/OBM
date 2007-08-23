@@ -157,19 +157,29 @@ $dis_printer
 ///////////////////////////////////////////////////////////////////////////////
 function display_sections_theme($section) {
   global $cgp_show, $sections, $perm;
+
   $ret = "<ul id='section'>\n";
-  foreach ($cgp_show["section"] as $key => $show) {
+  foreach ($cgp_show['section'] as $key => $show) {
     if ($show) {
       $value = $sections[$key];
-      $section_name = $value["Name"];
+      $section_name = $value['Name'];
+      $section_target = $value['Target'];
       $section_right = $perm->get_section_rights($key);
       if ($section_right) {
-        $module_block = display_modules_theme($key);        
-        $mods .= $module_block;
-        $js .= "obm.menu.addItem('section-$key');";
-        if($key == $section) {
+        $section_modules = array_keys($cgp_show["module"],$key);
+        if (count($section_modules) > 0) {
+	  $module_block = display_modules_theme($key);        
+	  $mods .= $module_block;
+	  $js .= "obm.menu.addItem('section-$key');";
+	} else {
+	  if (isset($section_target)) {
+	    $target = "target='$section_target'";
+	  }
+          $section_name = "<a $target href=\"$show[url]\">$section_name</a>";
+        }
+        if ($key == $section) {
           $ret .= "<li class=\"current\" id=\"section-$key\">$section_name</li>\n";
-        }else {
+        } else {
           $ret .= "<li id=\"section-$key\">$section_name</li>\n";
         }
       }
@@ -182,8 +192,7 @@ function display_sections_theme($section) {
       obm.menu = new Obm.Menu();
       $js
     </script>
-  ";
-
+";
 
   return $ret;
 }

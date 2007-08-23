@@ -16,7 +16,7 @@ function dis_tools_update_detail() {
   global $l_upd, $l_upd_needed, $l_upd_not_needed, $l_upd_running;
   global $l_upd_run, $l_created, $l_updated, $l_deleted, $l_links;
   global $l_upd_need_domain_update, $l_user, $l_group, $l_host, $l_mailshare;
-  global $l_header_tools_upd;
+  global $l_header_tools_upd,$l_js_validate_global_update;
   global $l_validate, $l_cancel, $l_error_permission;
 
   // If user has no update realm, default to domain (backward compatibility)
@@ -29,10 +29,10 @@ function dis_tools_update_detail() {
   $update_ok = check_tools_update_context_ok($params);
   $has_domain_upd = check_tools_update_need_global_update($obm['domain_id']);
 
-  $entities = array('user' => array('UserObm', 'userobm'),
-		    'group' => array('UGroup', 'group'),
-		    'host' => array('Host', 'host'),
-		    'mailshare' => array('MailShare', 'mailshare'));
+  $entities = array('user' => array('UserObm', 'userobm', array('userobm_timelastaccess', 'userobm_calendar_version')),
+                    'group' => array('UGroup', 'group', array()),
+                    'host' => array('Host', 'host', array()),
+                    'mailshare' => array('MailShare', 'mailshare', array()));
 
   // Loop through all udpates 'realms' (user, delegation, domain)
   foreach ($admin_realm as $realm) {
@@ -50,9 +50,10 @@ function dis_tools_update_detail() {
     foreach ($entities as $entity=>$db_info) {
       $table = $db_info[0];
       $field = $db_info[1];
+      $exclude_fields = $db_info[2];
       $dis_entity = ${"l_$entity"};
       if ($cgp_show['module']["$entity"]) {
-	$nb = get_update_entity_numbers($table, $field, $realm);
+	$nb = get_update_entity_numbers($table, $field, $realm, $exclude_fields);
 	$links = get_update_link_entity($entity, $realm);
 	$nb_links = count($links);
 	if (($nb['move'] > 0) || ($nb_links > 0)) {
@@ -96,7 +97,7 @@ function dis_tools_update_detail() {
         <input type=\"hidden\" name=\"action\" value=\"update_update\" />
         <input type=\"hidden\" name=\"realm\" value=\"$realm\" />
         <input type=\"hidden\" name=\"update_type\" value=\"$update_type\" />
-        <input type=\"submit\" name=\"submit\" value=\"$l_validate\" />
+        <input type=\"submit\" name=\"submit\" value=\"$l_validate\"/>
         </fieldset>
         </form>";
 	

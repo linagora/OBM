@@ -291,13 +291,23 @@ Pour ne pas utiliser les sections génériques ou redéfinir l'ordre d'affichage de
  
 \paragraph{Définition des urls}
 
-Pour chaque section il est possible de déclarer 1 paramètre, l'url; exemple pour la section ``com'' (définition de \$cgp\_show[``section''][``com'']) :\\
+Pour chaque section il est possible de déclarer 2 paramètres, l'''url'' et la ``target''; exemple pour la section ``com'' (définition de \$cgp\_show[``section''][``com'']) ou la section ``webmail'' :\\
 
 \begin{tabular}{|p{2.5cm}|p{5.5cm}|p{5cm}|}
 \hline
 \textbf{Paramètre} & \textbf{Défaut} & \textbf{Description} \\
 \hline
 url & \$path/company/company\_index.php & url pointée par la section \\ 
+\hline
+\end{tabular}
+
+\begin{tabular}{|p{2.5cm}|p{5.5cm}|p{5cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Défaut} & \textbf{Description} \\
+\hline
+url & http://webmail/ & url pointée par la section \\ 
+\hline
+target & \_blanck & Target (ex: ouvrir dans fenêtre externe) \\ 
 \hline
 \end{tabular}
 

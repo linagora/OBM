@@ -28,9 +28,11 @@ if ($params["theme"] != "") {
 // Validate user preferences
 if ($params["form_user_pref"]) {
 
-  $set_debug = $params["debug_id"] | $params["debug_param"] | $params["debug_sess"] | $params["debug_sql"] | $params["debug_exe"];
-  $_SESSION['set_debug'] = $set_debug;
-  update_user_pref($obm["uid"], "set_debug", $_SESSION['set_debug']);
+  if ($perm->check_right($module, $cright_write_admin)) {
+    $set_debug = $params["debug_id"] | $params["debug_param"] | $params["debug_sess"] | $params["debug_sql"] | $params["debug_exe"];
+    $_SESSION['set_debug'] = $set_debug;
+    update_user_pref($obm["uid"], "set_debug", $_SESSION['set_debug']);
+  }
 
   if ($params["menu"] != "") {
     $_SESSION['set_menu'] = $params["menu"];
@@ -159,9 +161,9 @@ $sel_dsrc .= "</select>";
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Debug block (admin only)
+// Debug block (need cright_write admin right)
 ///////////////////////////////////////////////////////////////////////////////
-//if ($perm->check_right($module, $cright_write_admin)) {
+if ($perm->check_right($module, $cright_write_admin)) {
 
   $dis_debug = "
   <tr>
@@ -174,7 +176,7 @@ $sel_dsrc .= "</select>";
       <input type=\"checkbox\" name=\"debug_exe\" value=\"$cdg_exe\" $dg_exe />$l_dg_exe
     </td>
   </tr>";
-//}
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // For each LANGUAGE directory in the lang direcory (but .*)

@@ -144,6 +144,7 @@ while (list($sec,$value) = each($cgp_show["section"])) {
     }
     $sections[$sec] = array('Name' => ${"l_section_$sec"},
                            'Url'  => $cgp_show["section"][$sec]["url"],
+                           'Target'  => $cgp_show["section"][$sec]['target'],
                            'Right'=> $sec_right);
   }
 }
