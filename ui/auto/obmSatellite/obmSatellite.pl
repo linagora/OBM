@@ -53,6 +53,7 @@ sub configure_hook {
         domain_map => [],
         cyrus_service => [],
         cyrus_imap_conf => [],
+        cyrus_restart => [],
         cyrus_partition_root => []
     };
     $self->configure( $daemonOptions );
@@ -128,6 +129,13 @@ sub configure_hook {
         $self->{cyrus}->{cyrus_imap_conf} = $daemonOptions->{cyrus_imap_conf}->[0];
     }else {
         $self->{cyrus}->{cyrus_imap_conf} = "/etc/imapd.conf";
+    }
+
+    # Le temps attendu avant de considérer le service Cyrus comme redémarré
+    if( defined($daemonOptions->{cyrus_restart}->[0]) ) {
+        $self->{cyrus}->{cyrus_restart} = $daemonOptions->{cyrus_restart}->[0];
+    }else {
+        $self->{cyrus}->{cyrus_restart} = "5";
     }
 
     # Le chemin d'accès aux partitions Cyrus
@@ -527,49 +535,73 @@ sub processCyrusPartitions {
     my $self = shift;
     my ( $action, $domains ) = @_;
 
+    my $errors = 0;
+
     require OBM::ObmSatellite::cyrusPartitions;
     my $cyrusPartitions = OBM::ObmSatellite::cyrusPartitions->new( $self, $domains );
 
     if( !defined($cyrusPartitions) ) {
         $self->logMessage( "Echec: lors de la creation de l'objet 'cyrusPartitions'" );
-        $self->sendMessage( "ERROR", "mise a jour des partitions Cyrus impossible !" );
-        return 1;
+        $errors = 1;
     }
 
-    SWITCH: {
-        if( $action eq "add" ) {
-            if( $cyrusPartitions->addPartitions() ) {
-                $self->sendMessage( "ERROR", "Probleme lors de l'ajout des partitions" );
-                return 1;
+    if( !$errors ) {
+        SWITCH: {
+            if( $action eq "add" ) {
+                if( $cyrusPartitions->addPartitions() ) {
+                    $self->logMessage( "Echec: lors du traitement du fichier de configuration de Cyrus" );
+                    $errors = 2;
+                }
+                last SWITCH;
             }
-            last SWITCH;
+
+            if( $action eq "del" ) {
+                last SWITCH;
+            }
         }
+    }
 
-        if( $action eq "del" ) {
-            last SWITCH;
+    if( !$errors ) {
+        # Re-démarrage du service Cyrus Imapd
+        my $cmd = $self->{cyrus}->{cyrus_service}." stop > /dev/null 2>&1";
+        $self->logMessage( "Execution de : '".$cmd."'" );
+        my $ret = 0xffff & system $cmd;
+    
+        if( $ret ) {
+            $self->logMessage( "Echec: lors de l'arret du service Cyrus" );
+            $errors = 3;
+        }
+    }
+    
+    if( !$errors ) {
+        my $cmd = $self->{cyrus}->{cyrus_service}." start > /dev/null 2>&1";
+        $self->logMessage( "Execution de : '".$cmd."'" );
+        my $ret = 0xffff & system $cmd;
+    
+        if( $ret ) {
+            $self->logMessage( "Echec: lors du redemrrage du service Cyrus" );
+            $errors = 4;
         }
     }
 
-    # Re-démarrage du service Cyrus Imapd
-    my $cmd = $self->{cyrus}->{cyrus_service}." stop";
-    $self->logMessage( "Execution de : '".$cmd."'" );
-    my $ret = 0xffff & system $cmd;
-
-    if( $ret ) {
-        $self->sendMessage( "ERROR", "Probleme lors de l'arret du service Cyrus Imapd" );
-        return 1;
+    if( $errors == 0 ) {
+        # On attend un temps pour s'assurer que le service est correctement
+        # accessible
+        $self->logMessage( "Temporisation de '".$self->{cyrus}->{cyrus_restart}."s' pour laisser le service Cyrus redemarrer correctement" );
+        sleep $self->{cyrus}->{cyrus_restart};
+        $self->sendMessage( "OK", undef );
+    }elsif( $errors == 1 ) {
+        $self->sendMessage( "ERROR", "mise a jour des partitions Cyrus impossible !" );
+    }elsif( $errors == 2 ) {
+        $self->sendMessage( "ERROR", "probleme lors du traitement du fichier de configuration de Cyrus" );
+    }elsif( $errors == 3 ) {
+        $self->sendMessage( "ERROR", "probleme lors de l'arret du service Cyrus Imapd" );
+    }elsif( $errors == 4 ) {
+        $self->sendMessage( "ERROR", "probleme lors du redemarrage du service Cyrus Imapd" );
+    }else {
+        $self->sendMessage( "ERROR", "erreur inconnue !" );
     }
 
-    my $cmd = $self->{cyrus}->{cyrus_service}." start";
-    $self->logMessage( "Execution de : '".$cmd."'" );
-    $ret = 0xffff & system $cmd;
-
-    if( $ret ) {
-        $self->sendMessage( "ERROR", "Probleme lors du redemarrage du service Cyrus Imapd" );
-        return 1;
-    }
-
-    $self->sendMessage( "OK", undef );
     $self->logMessage( "Fin du traitement" );
     return 0;
 }

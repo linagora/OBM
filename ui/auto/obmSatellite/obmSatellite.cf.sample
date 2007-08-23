@@ -29,4 +29,5 @@ domain_map          /etc/postfix/virtual_domains        # /etc/postfix/virtual_d
 # configuration pour le service Cyrus
 cyrus_imap_conf     /etc/imapd.conf                     # /etc/imapd.conf par defaut
 cyrus_service       /etc/init.d/cyrus2.2                # /etc/init.d/cyrus par defaut
+cyrus_restart       10                                  # 5 par defaut - temps attendu avant de considérer le service Cyrus comme redémarré
 cyrus_partition_root    /var/spool/cyrus                # /var/spool/cyrus par defaut
