@@ -54,7 +54,6 @@ if [ $? != 0 ]; then
   fi
 fi
 echo $PHP : PHP interpreter found
-PHP="$PHP -d include_path=.:/home/mehdi/svn/obm/:/usr/share/php"
 # Create the Artichow library link
 # mv ../../obminclude/Artichow-1.1.0-php4+5/ ../../obminclude/Artichow
 

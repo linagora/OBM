@@ -88,6 +88,7 @@ $ico_arrow_off      = "$theme_path/arrow_off.gif";
 $ico_logout         = "$theme_path/logout.png"; 
 $ico_login          = "$theme_path/arrow_off.gif";  
 $ico_datepicker     = "$theme_path/ico_datepicker.png";
+$ico_colorpicker    = "$theme_path/ico_colorpicker.gif";
 $ico_delete         = "$theme_path/ico_delete.gif";
 $ico_cancel         = "$theme_path/ico_delete.gif";
 $ico_validate       = "$theme_path/ico_validate.gif";

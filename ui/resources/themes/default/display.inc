@@ -296,7 +296,7 @@ function display_actions_theme($section, $module) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_head_theme($p_module) { 
   global $l_obm_title, $extra_css, $extra_js, $extra_js_include,$ico_minus;
-  global $ico_datepicker,$l_monthsofyear,$l_daysofweekfirst;
+  global $ico_datepicker,$l_monthsofyear,$l_daysofweekfirst,$ico_colorpicker;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
   global $css_print_obm, $ico_delete, $ico_update, $output_target,$l_transparent;
@@ -349,6 +349,7 @@ function display_head_theme($p_module) {
   obm.vars.images.minus = '$ico_minus';
   obm.vars.images.plus = '$ico_plus';
   obm.vars.images.datePicker = '$ico_datepicker';
+  obm.vars.images.colorPicker = '$ico_colorpicker';
   obm.vars.images.update = '$ico_update';
   obm.vars.images.del = '$ico_delete';
   obm.vars.regexp.dateFormat = '$_SESSION[set_date_upd]';

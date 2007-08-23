@@ -376,7 +376,7 @@ obm.AutoComplete.Search = new Class({
                                        .appendText(data.extra)                                   
                                   );
       var item_id = res.getProperty('id');
-      var div_id = this.name + item_id.substr(('item_').length,item_id.length);
+      var div_id = this.name + '-' +item_id.substr(('item_').length,item_id.length);
       if ($(div_id)) { res.addClass("selected"); }
       this.cache.addElement(res);
       if($type(data.extension)) {
@@ -524,7 +524,7 @@ obm.AutoComplete.Search = new Class({
   addResultValue: function(element, extension) {
     var item_id = element.getProperty('id');
     var id = item_id.substr(('item_').length,item_id.length);
-    var div_id = this.name + id;
+    var div_id = this.name + '-' + id;
     var text = $(item_id+'_label').innerHTML;
     if (!$(div_id)) {
       element.addClass("selected");
@@ -541,7 +541,7 @@ obm.AutoComplete.Search = new Class({
                           remove_element(div_id,this.name);
                         }.bind(this)
                       ).injectInside(result);
-      result.appendText(text);
+      result.appendText(' ' + text);
       if($type(extension)) {
         result.adopt(extension);
       }

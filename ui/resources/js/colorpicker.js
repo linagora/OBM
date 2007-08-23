@@ -17,7 +17,7 @@ Obm.ColorPicker = new Class({
       });
     }
     img = new Element('img');
-    img.setAttribute("src", obm.vars.images.datePicker);
+    img.setAttribute("src", obm.vars.images.colorPicker);
     img.injectInside(span);
     img.addEvent('click', function(e){
       this.toggle(element);
@@ -39,6 +39,7 @@ Obm.ColorPicker = new Class({
     });
     $('colorPickerWidget').setStyle('display','');
     $('colorPickerWidget').setStyle('visibility','');
+    this.timer.initTimer();
     overListBoxFix("colorPickerWidget");
   },
 
@@ -106,7 +107,7 @@ Obm.ColorPicker = new Class({
       }
       this.currentElement.setStyles({
         'color':color.getStyle('color'),
-        'backgroundColor': bgColor,
+        'backgroundColor': bgColor
       }).setProperty('value',bgColor);
     }
     overListBoxFix($('colorPickerWidget'),'none');

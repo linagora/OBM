@@ -844,8 +844,6 @@ function dis_calendar_week_print($calendar, $calendar_entity,$writable_entity) {
 
   $ts_date = strtotime($calendar["date"]);
   $category_filter = $calendar["category_filter"];
-  $time_unit = 60 / $_SESSION['set_cal_interval'];
-  $time_unit_sec = 3600 / $_SESSION['set_cal_interval'];
   $week_num = get_calendar_week_num($ts_date);
   $next_week = of_isodate_format(strtotime("+1 week", $ts_date));
   $prev_week = of_isodate_format(strtotime("-1 week", $ts_date));
@@ -861,66 +859,22 @@ function dis_calendar_week_print($calendar, $calendar_entity,$writable_entity) {
   calendar_events_model($start_week_day,strtotime("+7 days",$start_week_day),$calendar_entity,$category_filter);
   $of = &OccurrenceFactory::getInstance(); 
   $day_duration = 86400;
-  $k = 0; 
-  // Week Days headers : loop day by day
-  for ($ts = $start_week_time; $ts < $end_week_time; $ts = strtotime("+1 day",$ts) ) {
-    $occurences = $of->getPeriodOccurrences($ts,$time_unit,null,2);
-    $iso_date = of_isodate_format($ts);
-    $this_date_l = calendar_localizeDate("week_list", $ts);
-    $events_list = "";
-    if($occurences != null) {
-      foreach($occurences as $occurence) {
-        $attendees = "";
-        $location = "";
-        if ($occurrence->event->privacy == 1 && !(in_array($obm["uid"],$attendee["user"]))) {
-          $title = $l_private;
-        } else {
-          $title = $occurence->event->title;
-          if($occurence->event->location != "") {
-            $location = "<br />$l_location : ".$occurence->event->location;
-          }            
-        }               
-        $entity_id = $occurence->id;
-        $entity = $occurence->entity;
-        $klass = $calendar_entity[$entity][$entity_id]["class"];
-        $attendee = $occurence->event->attendee;
-        foreach ($attendee as $entity => $entities) {
-          $label_entity = (${"l_$entity"});
-          $attendees .= "<br />$label_entity :".implode("','",$entities); 
-        }        
-        $schedule = $l_all_day;
-        $events_list .= "
-          <div class=\"printableEvent $klass\">
-          <h1>$schedule</h1>
-          $title
-          $attendees
-          $location
-          </div>";
-      }
-    }           
-    $week_day_list .= "<td>$this_date_l</td>";
-    $week_day_event_list .= "<th id=\"day-".($ts - $start_week_time)."\">$events_list</th>";
-    $k++;
-  }
-
+  
+  $span = ($ccalendar_last_hour - $ccalendar_first_hour);
   // Week Calendar content
-  for ($j = $ccalendar_first_hour; $j < $ccalendar_last_hour; $j++) {
-    
-    $delta = $j - $ccalendar_first_hour;
-    for ($k=0; $k<$_SESSION['set_cal_interval']; $k++) {
-      if ($k==0) {
-        $week_cal .= "\n<tr><th>".($j).":00</th>";
-      } else {
-        $week_cal .= "\n<tr><th></th>";
-      }
-      $delta2 = $k * $time_unit;
-      for ($i=0; $i<7; $i ++) {
-        $current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);
-        $end_current_period = strtotime("+$time_unit minutes",$current_time);
-        $occurences = $of->getPeriodOccurrences($current_time,$time_unit,null,1);
-        $events_list = "";
-        if($occurences != null) {
-          foreach($occurences as $occurence) {
+  for ($ts = $start_week_time; $ts < $end_week_time; $ts = strtotime("+1 day",$ts) ) {
+    $this_date_l = calendar_localizeDate("day", $ts);  
+    $week_cal .= "<tr><th colspan=\"$span\">$this_date_l</th></tr>";
+    $occurences = $of->getPeriodOccurrences($ts,$day_duration);
+    $time_line = "";
+    $evt_cal = "";
+    for ($j = $ccalendar_first_hour; $j < $ccalendar_last_hour; $j++) {
+      $time_line .= "<th>".($j).":00</th>";
+      $delta = $j - $ccalendar_first_hour;
+      $current_time = strtotime("+$delta hours",$ts);
+      if($occurences != null) {
+        foreach($occurences as $key => $occurence) {
+          if($occurence->date < ($current_time + 3600)) {
             $attendees = "";
             $location = "";
             if ($occurrence->event->privacy == 1 && !(in_array($obm["uid"],$attendee["user"]))) {
@@ -930,32 +884,29 @@ function dis_calendar_week_print($calendar, $calendar_entity,$writable_entity) {
               if($occurence->event->location != "") {
                 $location = "<br />$l_location : ".$occurence->event->location;
               }            
-            }            
+            }
             $entity_id = $occurence->id;
             $entity = $occurence->entity;
             $klass = $calendar_entity[$entity][$entity_id]["class"];
-            $attendee = $occurence->event->attendee;
-            foreach ($attendee as $entity => $entities) {
-              $label_entity = (${"l_$entity"});
-              $attendees .= "<br />$label_entity :".implode("','",$entities); 
-            }        
+            $attendee = "$l_user : ". $calendar_entity[$entity][$entity_id]["name"];
             $schedule = date("H:i",$occurence->date) ."-". date("H:i",$occurence->date + $occurence->event->duration);
-            $events_list .= "
+            $pre_span =  ($j - $ccalendar_first_hour);
+            $evt_span = ceil($occurence->event->duration/3600);
+            $post_span = $span - ($pre_span + $evt_span);
+            $event_data = "
               <div class=\"printableEvent $klass\">
               <h1>$schedule</h1>
-              $title
-              $attendees
+              $title<br />
+              $attendee
               $location
               </div>";
-          }
-        }        
-        $iso_date = of_isodate_format($current_time);
-        $week_cal .= "<td id=\"time-$current_time\">
-          $events_list
-        </td>";
+            $evt_cal .= "<tr><td colspan=\"$pre_span\"></td><td colspan=\"$evt_span\">$event_data</td><td colspan=\"$post_span\"></td></tr>";
+            unset($occurences[$key]);
+          }       
+        }     
       }
-      $week_cal .= "</tr>";
     }
+    $week_cal .= "<tr>$time_line</tr>$evt_cal"; 
   }
   
   $block = "
@@ -965,17 +916,10 @@ function dis_calendar_week_print($calendar, $calendar_entity,$writable_entity) {
     <a href=\"calendar_index.php?action=view_week&amp;date=$next_week\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
   </h1> 
   <table class=\"calendar week\">
-    <colgroup />
-    <colgroup span=\"7\" id=\"calendarEventContext\" />
     <thead>
     <tr>
-    <td id=\"calendarHourCol\">$week_num</td>
-    $week_day_list
+    <td colspan=\"$span\" id=\"calendarHourCol\">$week_num</td>
     </tr>
-    <tr id=\"calendarHead\">
-    <td>&nbsp;</td>
-    $week_day_event_list
-    </tr>    
     </thead>
     <tbody id=\"calendarBody\">
     $week_cal
@@ -1100,8 +1044,6 @@ function dis_calendar_day_print($calendar, $calendar_entity,$writable_entity) {
   $tomorrow_date = of_isodate_format(strtotime("+1 day", $ts_date));
   $yesterday_date = of_isodate_format(strtotime("-1 day", $ts_date));
 
-  $time_unit = 60 / $_SESSION['set_cal_interval'];
-  $time_unit_sec = 3600 / $_SESSION['set_cal_interval'];
   $week_num = get_calendar_week_num($ts_date);
 
   $start_time = strtotime("+$ccalendar_first_hour hours",$ts_date);
@@ -1116,21 +1058,16 @@ function dis_calendar_day_print($calendar, $calendar_entity,$writable_entity) {
 
   calendar_events_model($ts_date,strtotime("+1 day", $ts_date), $calendar_entity,$category_filter);
   $of = &OccurrenceFactory::getInstance(); 
-
+  $occurences = $of->getPeriodOccurrences($start_time,$end_time - $start_time,null,1);
+  $span = $ccalendar_last_hour -$ccalendar_first_hour;
   // Display Calendar
   for ($i = $ccalendar_first_hour; $i < $ccalendar_last_hour; $i++) {
-    for ($k=0; $k<$_SESSION['set_cal_interval']; $k++) {
-      if ($k==0) {
-	$day_cal .= "\n<tr><th>$i:00</th>"; 
-      } else {
-	$day_cal .= "\n<tr><th></th>"; 
-      }
-      $delta2 = $k * $time_unit;
-      $current_time = strtotime("+$i hours +$delta2 minutes",$ts_date);   
-      $occurences = $of->getPeriodOccurrences($current_time,$time_unit_sec,null,1);
-      $events_list = "";
-      if($occurences != null) {
-        foreach($occurences as $occurence) {
+    $day_cal .= "\n<th>$i:00</th>"; 
+    $current_time = strtotime("+$i hours",$ts_date);   
+    $events_list = "";
+    if($occurences != null) {
+      foreach($occurences as $key => $occurence) {
+        if($occurence->date < ($current_time + 3600)) {
           $attendees = "";
           $location = "";
           if ($occurrence->event->privacy == 1 && !(in_array($obm["uid"],$attendee["user"]))) {
@@ -1144,25 +1081,24 @@ function dis_calendar_day_print($calendar, $calendar_entity,$writable_entity) {
           $entity_id = $occurence->id;
           $entity = $occurence->entity;
           $klass = $calendar_entity[$entity][$entity_id]["class"];
-          $attendee = $occurence->event->attendee;
-          foreach ($attendee as $entity => $entities) {
-            $label_entity = (${"l_$entity"});
-            $attendees .= "<br />$label_entity :".implode("','",$entities); 
-          }        
+          $attendee = "$l_user : ". $calendar_entity[$entity][$entity_id]["name"];
           $schedule = date("H:i",$occurence->date) ."-". date("H:i",$occurence->date + $occurence->event->duration);
-          $events_list .= "
+          $pre_span =  $i - $ccalendar_first_hour;
+          $evt_span = ceil($occurence->event->duration/3600);
+          $post_span = $span - ($pre_span + $evt_span);
+          $events_list = "
             <div class=\"printableEvent $klass\">
             <h1>$schedule</h1>
-            $title
-            $attendees
+            $title<br />
+            $attendee
             $location
             </div>";
+          $evt_cal .= "<tr><td colspan=\"$pre_span\"></td><td colspan=\"$evt_span\" id=\"time-$current_time\">$events_list</td><td colspan=\"$post_span\"></td></tr>";
+          unset($occurences[$key]);
         }
       }        
-      $day_cal .= "<td id=\"time-$current_time\">$events_list</td></tr>";
     }
   }
-  $events_list = "";
   $occurences = $of->getPeriodOccurrences($ts_date,$time_unit,null,2);
   if($occurences != null) {
     foreach($occurences as $occurence) {
@@ -1185,7 +1121,9 @@ function dis_calendar_day_print($calendar, $calendar_entity,$writable_entity) {
         $attendees .= "<br />$label_entity :".implode("','",$entities); 
       }        
       $schedule = $l_all_day;
-      $events_list .= "
+      $ad_cal .= "
+        <tr>
+        <td colspan=\"$span\">
         <div class=\"printableEvent $klass\">
         <h1>$schedule</h1>
         $title
@@ -1196,11 +1134,11 @@ function dis_calendar_day_print($calendar, $calendar_entity,$writable_entity) {
   }          
   $block = "
   <h1>
-    <a href=\"calendar_index.php?action=view_day&amp;date=$yesterday_date\"><img src=\"$ico_previous\" alt=\"[$l_Previous]\" /></a>     
+    <a href=\"calendar_index.php?action=view_day&amp;date=$yesterday_date&amp;output_target=print\"><img src=\"$ico_previous\" alt=\"[$l_Previous]\" /></a>     
     $display_date
-    <a href=\"calendar_index.php?action=view_day&amp;date=$tomorrow_date\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?action=view_day&amp;date=$tomorrow_date&amp;output_target=print\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
   </h1> 
-  <table class=\"calendar day\">
+  <table class=\"calendar printableDay\">
     <colgroup span=\"1\" />
     <colgroup span=\"1\" id=\"calendarEventContext\" />
     <thead>
@@ -1209,7 +1147,9 @@ function dis_calendar_day_print($calendar, $calendar_entity,$writable_entity) {
     </tr>    
     </thead>
     <tbody id=\"calendarBody\">
-    $day_cal
+    $ad_cal
+    <tr>$day_cal</tr>
+    $evt_cal
     </tbody>
   </table>";
 

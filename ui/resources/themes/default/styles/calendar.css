@@ -115,7 +115,7 @@
   background-color: #fff;
 }
 
-.day thead th {
+.day thead th, .printableDay thead th {
   background-color: #fff;
   background-image: url('../images/ico_calendar_head_border.png');
   background-repeat: repeat-x;
@@ -123,6 +123,14 @@
   border-left: 1px dotted #ddd; 
   border-top: 1px solid #ccc;
   padding-bottom: 9px;
+}
+
+.printableDay tbody td{
+  height: 1.8em;
+  overflow: visible;
+  margin:0;
+  padding: 0;
+  background-color: #fff;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -140,7 +148,6 @@
   margin: 0;
   padding: 0;
   white-space: nowrap;
-  overflow: hidden;
 }
 
 .event h1 a {
