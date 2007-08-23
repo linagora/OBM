@@ -582,7 +582,6 @@ function dis_calendar_month_planning($calendar, $calendar_entity,$writable_entit
  * @access public
  * @return void
  */
-// FIXME PRIVATE!!!!!
 function dis_calendar_month_print($calendar, $calendar_entity,$writable_entity) {
   global $ico_previous, $ico_next;
   global $ccalendar_weekstart, $obm;
@@ -643,7 +642,7 @@ function dis_calendar_month_print($calendar, $calendar_entity,$writable_entity) 
     $events_list = "";
     if($occurences != null) {
       foreach($occurences as $occurence) {
-        $attendees = "";
+        $attendee = "";
         $location = "";
         if ($occurrence->event->privacy == 1 && !(in_array($obm["uid"],$attendee["user"]))) {
           $title = $l_private;
@@ -656,11 +655,7 @@ function dis_calendar_month_print($calendar, $calendar_entity,$writable_entity) 
         $entity_id = $occurence->id;
         $entity = $occurence->entity;
         $klass = $calendar_entity[$entity][$entity_id]["class"];
-        $attendee = $occurence->event->attendee;
-        foreach ($attendee as $entity => $entities) {
-          $label_entity = (${"l_$entity"});
-          $attendees .= "<br />$label_entity :".implode("','",$entities); 
-        }        
+        $attendee = "$l_user : ". $calendar_entity[$entity][$entity_id]["name"];
         if(!$occurence->event->all_day) {
           $schedule = date("H:i",$occurence->date) ."-". date("H:i",$occurence->date + $occurence->event->duration);
         } else {
@@ -670,7 +665,7 @@ function dis_calendar_month_print($calendar, $calendar_entity,$writable_entity) 
           <div class=\"printableEvent $klass\">
           <h1>$schedule</h1>
           $title
-          $attendees
+          <br />$attendee
           $location
           </div>";
       }
@@ -868,6 +863,7 @@ function dis_calendar_week_print($calendar, $calendar_entity,$writable_entity) {
     $occurences = $of->getPeriodOccurrences($ts,$day_duration);
     $time_line = "";
     $evt_cal = "";
+    $ad_cal = "";
     for ($j = $ccalendar_first_hour; $j < $ccalendar_last_hour; $j++) {
       $time_line .= "<th>".($j).":00</th>";
       $delta = $j - $ccalendar_first_hour;
@@ -889,27 +885,32 @@ function dis_calendar_week_print($calendar, $calendar_entity,$writable_entity) {
             $entity = $occurence->entity;
             $klass = $calendar_entity[$entity][$entity_id]["class"];
             $attendee = "$l_user : ". $calendar_entity[$entity][$entity_id]["name"];
-            $schedule = date("H:i",$occurence->date) ."-". date("H:i",$occurence->date + $occurence->event->duration);
-            $pre_span =  ($j - $ccalendar_first_hour);
-            $evt_span = ceil($occurence->event->duration/3600);
-            $post_span = $span - ($pre_span + $evt_span);
-            $pre_span =  str_repeat("<td></td>",$j - $ccalendar_first_hour);
-            $evt_span = ceil($occurence->event->duration/3600);
-            $post_span =  str_repeat("<td></td>",$span - ($evt_span + $j - $ccalendar_first_hour));            
+            if($occurence->event->all_day == 1) {
+              $schedule = $l_all_day; 
+            } else {
+              $schedule = date("H:i",$occurence->date) ."-". date("H:i",$occurence->date + $occurence->event->duration);
+            }
             $event_data = "
               <div class=\"printableEvent $klass\">
               <h1>$schedule</h1>
               $title<br />
               $attendee
               $location
-              </div>";
-            $evt_cal .= "<tr>$pre_span<td colspan=\"$evt_span\">$event_data</td>$post_span</td></tr>";
+              </div>";            
+            if($occurence->event->all_day == 1) {
+              $ad_cal .= "<tr><td colspan=\"$span\">$event_data</td></tr>";
+            } else {
+              $pre_span =  str_repeat("<td></td>",$j - $ccalendar_first_hour);
+              $evt_span = ceil($occurence->event->duration/3600);
+              $post_span =  str_repeat("<td></td>",$span - ($evt_span + $j - $ccalendar_first_hour));            
+              $evt_cal .= "<tr>$pre_span<td colspan=\"$evt_span\">$event_data</td>$post_span</tr>";
+            }
             unset($occurences[$key]);
           }       
         }     
       }
     }
-    $week_cal .= "<tr>$time_line</tr>$evt_cal"; 
+    $week_cal .= "$ad_cal<tr>$time_line</tr>$evt_cal"; 
   }
   
   $block = "
