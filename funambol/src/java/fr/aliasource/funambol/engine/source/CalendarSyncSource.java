@@ -163,6 +163,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 		}
 		String[] keys = null;
 		try {
+			syncItem.getKey().setKeyValue("");
 			Calendar event = getFoundationFromSyncItem(syncItem);
 
 			keys = manager.getEventTwinKeys(event, this.getSourceType());

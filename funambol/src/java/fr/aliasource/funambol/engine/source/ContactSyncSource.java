@@ -195,6 +195,7 @@ public final class ContactSyncSource extends ObmSyncSource
 		
 	    String[] keys = null;
 	    try {
+	    	syncItem.getKey().setKeyValue("");
 	    	contact = getFoundationFromSyncItem(syncItem);
 			keys = manager.getContactTwinKeys(contact, getSourceType());
 		} catch (OBMException e) {
