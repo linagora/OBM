@@ -15,7 +15,8 @@ require OBM::imapd;
 require OBM::Ldap::ldapEngine;
 require OBM::Cyrus::cyrusEngine;
 require OBM::Cyrus::sieveEngine;
-require OBM::Postfix::postfixEngine;
+require OBM::Postfix::postfixRemoteEngine;
+require OBM::Cyrus::cyrusRemoteEngine;
 require OBM::Entities::obmRoot;
 require OBM::Entities::obmDomainRoot;
 require OBM::Entities::obmNode;
@@ -214,9 +215,30 @@ sub _doAll {
             if( $return ) {
                 # La MAJ de l'entité c'est bien passée, on met a jour la BD de
                 # travail
-                $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+                $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
             }
         }
+    }
+
+    # Pour tous domaines, sauf le metadomaine
+    if( $self->{"domain"} != 0 ) {
+        # Mise a jour des partitions Cyrus
+        my $updateMailSrv = OBM::Cyrus::cyrusRemoteEngine->new( $self->{"domainList"} );
+        $updateMailSrv->init();
+        $globalReturn = $globalReturn && $updateMailSrv->update( "add" );
+        $updateMailSrv->destroy();
+
+        # Si tout c'est bien passé, il faut rétablir les connexions à Cyrus
+        if( $globalReturn  && defined($self->{"engine"}->{"cyrusEngine"}) ) {
+            if( !$self->{"engine"}->{"cyrusEngine"}->init() ) {
+                delete( $self->{"engine"}->{"cyrusEngine"} );
+            }
+        }
+    }
+
+    # Si on a déjà rencontré une erreur, on s'arrête
+    if( !$globalReturn ) {
+        return $globalReturn;
     }
 
 
@@ -228,9 +250,8 @@ sub _doAll {
     if( $return ) {
         # La MAJ de l'entité c'est bien passée, on met a jour la BD de
         # travail
-        $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
     }
-
 
     # Traitement des entités de type 'hote'
     my $query = "SELECT host_id FROM Host WHERE host_domain_id=".$self->{"domain"};
@@ -246,7 +267,7 @@ sub _doAll {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
-            $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
         }
     }
 
@@ -265,7 +286,7 @@ sub _doAll {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
-            $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
         }
     }
 
@@ -283,7 +304,7 @@ sub _doAll {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
-            $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
         }
     }
 
@@ -301,7 +322,7 @@ sub _doAll {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
-            $globalReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
         }
     }
 
@@ -1001,30 +1022,7 @@ sub getDomains {
 
         $currentDomain->{"domain_samba_sid"} = $domainSambaSid;
 
-        # Est-ce un nouveau domaine
-        my $queryNewDomain = "SELECT COUNT(*) FROM P_Domain WHERE domain_id=".$currentDomain->{"domain_id"};
-
-        my $queryNewDomainResult;
-        if( !&OBM::dbUtils::execQuery( $queryNewDomain, $dbHandler, \$queryNewDomainResult ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete.", "W" );
-            if( defined($queryNewDomainResult) ) {
-                &OBM::toolBox::write_log( "loadDb: ".$queryNewDomainResult->err, "W" );
-
-            }
-        }
-
-        my( $numRows ) = $queryNewDomainResult->fetchrow_array();
-        $queryNewDomainResult->finish();
-
-        if( $numRows == 0 ) {
-            $currentDomain->{"domain_new"} = 1;
-            push( @domainList, $currentDomain );
-        }elsif( $numRows == 1 ) {
-            $currentDomain->{"domain_new"} = 0;
-            push( @domainList, $currentDomain );
-        }else {
-            &OBM::toolBox::write_log( "loadDb: erreur de coherence dans la table 'P_Domain', ID de domaine '".$currentDomain->{"domain_id"}."' non unique !", "W" );
-        }
+        push( @domainList, $currentDomain );
     }
 
     return \@domainList;
@@ -1269,7 +1267,7 @@ sub _doRemoteConf {
     my $return = 1;
 
     # MAJ des map Postfix sur les serveurs entrant
-    my $updateMailSrv = OBM::Postfix::postfixEngine->new( $self->{"domainList"} );
+    my $updateMailSrv = OBM::Postfix::postfixRemoteEngine->new( $self->{"domainList"} );
     $updateMailSrv->init();
     $return = $updateMailSrv->update();
     $updateMailSrv->destroy();
