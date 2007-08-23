@@ -49,7 +49,15 @@
   background-color: #fff;
 }
 
-.week thead th {
+.printableWeek tbody td{
+  height: 1.8em;
+  overflow: visible;
+  margin:0;
+  padding: 0;
+  background-color: #fff;
+}
+
+.week thead th,.printableWeek thead th  {
   background-color: #fff;
   background-image: url('../images/ico_calendar_head_border.png');
   background-repeat: repeat-x;

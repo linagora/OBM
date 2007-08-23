@@ -893,6 +893,9 @@ function dis_calendar_week_print($calendar, $calendar_entity,$writable_entity) {
             $pre_span =  ($j - $ccalendar_first_hour);
             $evt_span = ceil($occurence->event->duration/3600);
             $post_span = $span - ($pre_span + $evt_span);
+            $pre_span =  str_repeat("<td></td>",$j - $ccalendar_first_hour);
+            $evt_span = ceil($occurence->event->duration/3600);
+            $post_span =  str_repeat("<td></td>",$span - ($evt_span + $j - $ccalendar_first_hour));            
             $event_data = "
               <div class=\"printableEvent $klass\">
               <h1>$schedule</h1>
@@ -900,7 +903,7 @@ function dis_calendar_week_print($calendar, $calendar_entity,$writable_entity) {
               $attendee
               $location
               </div>";
-            $evt_cal .= "<tr><td colspan=\"$pre_span\"></td><td colspan=\"$evt_span\">$event_data</td><td colspan=\"$post_span\"></td></tr>";
+            $evt_cal .= "<tr>$pre_span<td colspan=\"$evt_span\">$event_data</td>$post_span</td></tr>";
             unset($occurences[$key]);
           }       
         }     
@@ -915,7 +918,7 @@ function dis_calendar_week_print($calendar, $calendar_entity,$writable_entity) {
     $display_date
     <a href=\"calendar_index.php?action=view_week&amp;date=$next_week\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
   </h1> 
-  <table class=\"calendar week\">
+  <table class=\"calendar printableWeek\">
     <thead>
     <tr>
     <td colspan=\"$span\" id=\"calendarHourCol\">$week_num</td>
@@ -1083,9 +1086,9 @@ function dis_calendar_day_print($calendar, $calendar_entity,$writable_entity) {
           $klass = $calendar_entity[$entity][$entity_id]["class"];
           $attendee = "$l_user : ". $calendar_entity[$entity][$entity_id]["name"];
           $schedule = date("H:i",$occurence->date) ."-". date("H:i",$occurence->date + $occurence->event->duration);
-          $pre_span =  $i - $ccalendar_first_hour;
+          $pre_span =  str_repeat("<td></td>",$i - $ccalendar_first_hour);
           $evt_span = ceil($occurence->event->duration/3600);
-          $post_span = $span - ($pre_span + $evt_span);
+          $post_span =  str_repeat("<td></td>",$span - ($evt_span + $i - $ccalendar_first_hour));
           $events_list = "
             <div class=\"printableEvent $klass\">
             <h1>$schedule</h1>
@@ -1093,7 +1096,7 @@ function dis_calendar_day_print($calendar, $calendar_entity,$writable_entity) {
             $attendee
             $location
             </div>";
-          $evt_cal .= "<tr><td colspan=\"$pre_span\"></td><td colspan=\"$evt_span\" id=\"time-$current_time\">$events_list</td><td colspan=\"$post_span\"></td></tr>";
+          $evt_cal .= "<tr>$pre_span<td colspan=\"$evt_span\" id=\"time-$current_time\">$events_list</td>$post_span</tr>";
           unset($occurences[$key]);
         }
       }        
