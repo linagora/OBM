@@ -252,7 +252,7 @@ sub _doWork {
     }elsif( !$isExist && !$object->getDelete() ) {
         # On la cré
         if( $self->_createMailbox( $cyrusSrv, $object ) ) {
-            &OBM::toolBox::write_log( "cyrusEngine: creation de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+            &OBM::toolBox::write_log( "cyrusEngine: creation de la boite '".$object->getMailboxName()."' sur la partition Cyrus '".$object->getMailboxPartition()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
         }else {
             &OBM::toolBox::write_log( "cyrusEngine: echec lors de la creation de la boite", "W" );
         }
@@ -628,9 +628,10 @@ sub _createMailbox {
 
     my $boxName = $object->getMailboxName();
     my $boxPrefix = $object->getMailboxPrefix();
+    my $boxPartition = $object->getMailboxPartition();
 
     # Création de la boîte
-    $cyrusSrvConn->create( $boxPrefix.$boxName );
+    $cyrusSrvConn->create( $boxPrefix.$boxName, $boxPartition );
     if( $cyrusSrvConn->error() ) {
         return 0;
     }

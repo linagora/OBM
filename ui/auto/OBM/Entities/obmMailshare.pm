@@ -163,6 +163,11 @@ sub getEntity {
             # Gestion de la BAL destination
             $self->{"mailShareDesc"}->{"mailShare_mailbox"} = $self->{"mailShareDesc"}->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
 
+            # Partition Cyrus associée à cette BAL
+            $self->{"mailShareDesc"}->{"mailShare_partition"} = $domainDesc->{"domain_dn"};
+            $self->{"mailShareDesc"}->{"mailShare_partition"} =~ s/\./_/g;
+            $self->{"mailShareDesc"}->{"mailShare_partition"} =~ s/-/_/g;
+
             # On ajoute le serveur de mail associé
             $self->{"mailShareDesc"}->{"mailShare_mailLocalServer"} = "lmtp:".$localServerIp.":24";
 
@@ -529,6 +534,18 @@ sub getMailboxName {
     }
 
     return $mailShareName;
+}
+
+
+sub getMailboxPartition {
+    my $self = shift;
+    my $mailSharePartition = undef;
+
+    if( $self->{"mailShareDesc"}->{"mailshare_mailperms"} ) {
+        $mailSharePartition = $self->{"mailShareDesc"}->{"mailShare_partition"};
+    }
+
+    return $mailSharePartition;
 }
 
 
