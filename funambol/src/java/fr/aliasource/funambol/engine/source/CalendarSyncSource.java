@@ -137,18 +137,6 @@ public class CalendarSyncSource extends ObmSyncSource {
 					+ until + ")");
 		}
 
-		String[] keys = null;
-		try {
-			keys = manager.getNewItemKeys(since);
-		} catch (OBMException e) {
-			throw new SyncSourceException(e);
-		}
-		SyncItemKey[] ret = getSyncItemKeysFromKeys(keys);
-
-		if (log.isDebugEnabled()) {
-			log.debug(" returning " + ret.length + " key(s)");
-		}
-
 		return null;
 	}
 
