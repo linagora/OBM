@@ -232,6 +232,11 @@ sub getEntity {
                 $self->{"userDesc"}->{"user_mailbox"} .= "@".$domainDesc->{"domain_name"};
             }
 
+            # Partition Cyrus associée à cette BAL
+            $self->{"userDesc"}->{"user_mailbox_partition"} = $domainDesc->{"domain_dn"};
+            $self->{"userDesc"}->{"user_mailbox_partition"} =~ s/\./_/g;
+            $self->{"userDesc"}->{"user_mailbox_partition"} =~ s/-/_/g;
+
             # Gestion du serveur de mail
             $self->{"userDesc"}->{"user_mailbox_server"} = $dbUserDesc->{"mailserver_host_id"};
 
@@ -822,6 +827,18 @@ sub getMailboxName {
     }
 
     return $mailBoxName;
+}
+
+
+sub getMailboxPartition {
+    my $self = shift;
+    my $mailboxPartition = undef;
+
+    if( $self->{"userDesc"}->{"user_mailperms"} ) {
+        $mailboxPartition = $self->{"userDesc"}->{"user_mailbox_partition"};
+    }
+
+    return $mailboxPartition;
 }
 
 

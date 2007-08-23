@@ -203,6 +203,13 @@ sub getMailboxName {
 }
 
 
+sub getMailboxPartition {
+    my $self = shift;
+
+    return undef;
+}
+
+
 sub getMailboxSieve {
     my $self = shift;
 
