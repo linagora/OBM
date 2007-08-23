@@ -107,10 +107,6 @@ public class CalendarManager extends ObmManager {
 		return extractKeys(updatedRest);
 	}
 
-	public String[] getNewItemKeys(Timestamp since) throws OBMException {
-		return null;
-	}
-
 	public String[] getDeletedItemKeys(Timestamp since) throws OBMException {
 
 		if (!syncReceived) {

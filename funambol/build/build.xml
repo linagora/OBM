@@ -104,7 +104,7 @@ Build file for funambol-obm module.
 	   srcdir            = "${dir.src.java}"
 	   destdir           = "${dir.output.classes}"
 	   includeAntRuntime = "no"
-	   source            = "1.4"
+	   source            = "1.5"
 	   includes          = "**/*java">
       <classpath>
 	<fileset dir="lib">
