@@ -1464,20 +1464,9 @@ function format_name($name, $up, $accent, $dot=false) {
   $res = $name;
 
   if ($accent) {
-    $res = preg_replace("/[����]/i", "e", $name);
-    $res = preg_replace("/[����]/i", "E", $res);
-    $res = preg_replace("/[��]/i", "a", $res);
-    $res = preg_replace("/[��]/i", "A", $res);
-    $res = preg_replace("/[��]/i", "i", $res);
-    $res = preg_replace("/[��]/i", "I", $res);
-    $res = preg_replace("/[��]/i", "o", $res);
-    $res = preg_replace("/[��]/i", "O", $res);
-    $res = preg_replace("/[���]/i", "u", $res);
-    $res = preg_replace("/[���]/i", "U", $res);
-    $res = preg_replace("/[�]/i", "c", $res);
-    $res = preg_replace("/[�]/i", "C", $res);
-    $res = preg_replace("/[�]/i", "s", $res);
-    $res = preg_replace("/[�]/i", "S", $res);
+    $res = htmlentities($res);
+    $res = preg_replace('/&([a-zA-Z])(uml|acute|grave|circ|tilde|cedil|ring);/','$1',$res);
+    $res = html_entity_decode($res);
   }
 
   if ($dot) {
