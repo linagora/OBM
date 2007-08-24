@@ -130,8 +130,10 @@ sub getEntity {
 
     # Positionnement du flag archive
     $self->{"archive"} = $dbUserDesc->{"userobm_archive"};
+
+    # Action effectuee
     if( $self->getDelete() ) {
-        &OBM::toolBox::write_log( "obmUser: suppression de l'utilisateur archive '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur supprime '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
         
     }elsif( $dbUserDesc->{"userobm_archive"} ) {
         &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur archive '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
@@ -151,7 +153,7 @@ sub getEntity {
         "user_gid"=>$dbUserDesc->{"userobm_gid"},
         "user_lastname"=>$dbUserDesc->{"userobm_lastname"},
         "user_firstname"=>$dbUserDesc->{"userobm_firstname"},
-        "user_homedir"=>"$baseHomeDir/".$dbUserDesc->{"userobm_login"},
+        "user_homedir"=>"$baseHoeeDir/".$dbUserDesc->{"userobm_login"},
         "user_mailperms"=>$dbUserDesc->{"userobm_mail_perms"},
         "user_webperms"=>$dbUserDesc->{"userobm_web_perms"},
         "user_passwd_type"=>$dbUserDesc->{"userobm_password_type"},
@@ -261,7 +263,7 @@ sub getEntity {
     if( !$self->{"userDesc"}->{"user_mailperms"} ) {
         # Si la personne n'a pas le droit mail, mais a une adresse mail
         # valide, on la positionne dans l'annuaire.
-        if( defined($self->{"userDesc"}->{"user_email"}) && ($self->{"userDesc"}->{"user_email"} =~ /$regexp_email/) ) {
+        if( defined($dbUserDesc->{"userobm_email"}) && ($dbUserDesc->{"userobm_email"} =~ /$regexp_email/) ) {
             push( @{$self->{"userDesc"}->{"user_email"}}, $dbUserDesc->{"userobm_email"} );
         }
     }

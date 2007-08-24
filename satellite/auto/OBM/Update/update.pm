@@ -1,4 +1,4 @@
-package OBM::loadDb;
+package OBM::Update::update;
 
 $VERSION = "1.0";
 
@@ -12,6 +12,7 @@ use strict;
 require OBM::toolBox;
 require OBM::ldap;
 require OBM::imapd;
+require OBM::Update::utils;
 require OBM::Ldap::ldapEngine;
 require OBM::Cyrus::cyrusEngine;
 require OBM::Cyrus::sieveEngine;
@@ -35,7 +36,7 @@ sub new {
     my( $dbHandler, $parameters ) = @_;
 
     # Definition des attributs de l'objet
-    my %loadDbAttr = (
+    my %updateAttr = (
         user => undef,
         user_name => undef,
         domain => undef,
@@ -58,75 +59,75 @@ sub new {
     }
 
     # Initialisation de l'objet
-    $loadDbAttr{"global"} = $parameters->{"global"};
-    $loadDbAttr{"dbHandler"} = $dbHandler;
+    $updateAttr{"global"} = $parameters->{"global"};
+    $updateAttr{"dbHandler"} = $dbHandler;
 
     # Identifiant utilisateur
     if( defined($parameters->{"user"}) ) {
-        $loadDbAttr{"user"} = $parameters->{"user"};
+        $updateAttr{"user"} = $parameters->{"user"};
 
-        my $query = "SELECT userobm_login FROM UserObm WHERE userobm_id=".$loadDbAttr{"user"};
+        my $query = "SELECT userobm_login FROM UserObm WHERE userobm_id=".$updateAttr{"user"};
         my $queryResult;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
             return 0;
         }
 
-	( $loadDbAttr{"user_name"} ) = $queryResult->fetchrow_array();
+	( $updateAttr{"user_name"} ) = $queryResult->fetchrow_array();
 	$queryResult->finish();
     }
 
     # Identifiant de délégation
     if( defined($parameters->{"delegation"}) ) {
-        $loadDbAttr{"delegation"} = $parameters->{"delegation"};
+        $updateAttr{"delegation"} = $parameters->{"delegation"};
     }
 
     # Identifiant de domaine
     if( defined($parameters->{"domain"}) ) {
-        $loadDbAttr{"domain"} = $parameters->{"domain"};
+        $updateAttr{"domain"} = $parameters->{"domain"};
     }else {
         croak( "Le parametre domaine doit etre precise" );
     }
 
 
     # Obtention des informations sur les domaines nécessaires
-    if( defined($loadDbAttr{"domain"}) ) {
-        $loadDbAttr{"domainList"} = $self->getDomains( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domain"} );
+    if( defined($updateAttr{"domain"}) ) {
+        $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"dbHandler"}, $updateAttr{"domain"} );
     }else {
-        $loadDbAttr{"domainList"} = $self->getDomains( $loadDbAttr{"dbHandler"}, undef );
+        $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"dbHandler"}, undef );
     }
 
     # Obtention des serveurs LDAP par domaines
-    $self->getLdapServer( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} );
+    &OBM::Update::utils::getLdapServer( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
 
     # Parametrage des serveurs IMAP par domaine
-    $self->getCyrusServers( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} );
-    if( !&OBM::imapd::getAdminImapPasswd( $loadDbAttr{"dbHandler"}, $loadDbAttr{"domainList"} ) ) {
+    &OBM::Update::utils::getCyrusServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+    if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} ) ) {
         return undef;
     }
 
     # initialisation des moteurs nécessaires
     if( $OBM::Parameters::common::obmModules->{"ldap"} || $OBM::Parameters::common::obmModules->{"web"} ) {
-        $loadDbAttr{"engine"}->{"ldapEngine"} = OBM::Ldap::ldapEngine->new( $loadDbAttr{"domainList"} );
-        if( !$loadDbAttr{"engine"}->{"ldapEngine"}->init() ) {
-            delete( $loadDbAttr{"engine"}->{"ldapEngine"} );
+        $updateAttr{"engine"}->{"ldapEngine"} = OBM::Ldap::ldapEngine->new( $updateAttr{"domainList"} );
+        if( !$updateAttr{"engine"}->{"ldapEngine"}->init() ) {
+            delete( $updateAttr{"engine"}->{"ldapEngine"} );
         }
     }
 
     if( $OBM::Parameters::common::obmModules->{"mail"} ) {
-        $loadDbAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $loadDbAttr{"domainList"} );
-        if( !$loadDbAttr{"engine"}->{"cyrusEngine"}->init() ) {
-            delete( $loadDbAttr{"engine"}->{"cyrusEngine"} );
+        $updateAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $updateAttr{"domainList"} );
+        if( !$updateAttr{"engine"}->{"cyrusEngine"}->init() ) {
+            delete( $updateAttr{"engine"}->{"cyrusEngine"} );
         }
 
-        $loadDbAttr{"engine"}->{"sieveEngine"} = OBM::Cyrus::sieveEngine->new( $loadDbAttr{"domainList"} );
-        if( !$loadDbAttr{"engine"}->{"sieveEngine"}->init() ) {
-            delete( $loadDbAttr{"engine"}->{"sieveEngine"} );
+        $updateAttr{"engine"}->{"sieveEngine"} = OBM::Cyrus::sieveEngine->new( $updateAttr{"domainList"} );
+        if( !$updateAttr{"engine"}->{"sieveEngine"}->init() ) {
+            delete( $updateAttr{"engine"}->{"sieveEngine"} );
         }
     }
 
 
-    bless( \%loadDbAttr, $self );
+    bless( \%updateAttr, $self );
 }
 
 
@@ -183,18 +184,18 @@ sub _doAll {
     my $globalReturn = 1;
 
     if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "loadDb: pas de domaine indique pour la MAJ totale", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: pas de domaine indique pour la MAJ totale", "W" );
         return 0;
     }
     my $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
 
     if( !defined($domainDesc) ) {
-        &OBM::toolBox::write_log( "loadDb: domaine d'identifiant '".$self->{"domain"}."' inexistant", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: domaine d'identifiant '".$self->{"domain"}."' inexistant", "W" );
         return 0;
     }
 
 
-    &OBM::toolBox::write_log( "loadDb: MAJ totale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    &OBM::toolBox::write_log( "[Update::update]: MAJ totale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     # MAJ des informations de domaine
     $globalReturn = $self->_updateDbDomain();
@@ -204,7 +205,7 @@ sub _doAll {
         # Traitement des entités de type 'utilisateur système'
         my $query = "SELECT usersystem_id FROM UserSystem";
         if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
             return 0;
         }
 
@@ -256,7 +257,7 @@ sub _doAll {
     # Traitement des entités de type 'hote'
     my $query = "SELECT host_id FROM Host WHERE host_domain_id=".$self->{"domain"};
     if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
         return 0;
     }
 
@@ -275,7 +276,7 @@ sub _doAll {
     # Traitement des entités de type 'utilisateur'
     $query = "SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"};
     if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
         return 0;
     }
 
@@ -293,7 +294,7 @@ sub _doAll {
     # Traitement des entités de type 'groupe'
     $query = "SELECT group_id FROM UGroup WHERE group_domain_id=".$self->{"domain"};
     if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
         return 0;
     }
 
@@ -311,7 +312,7 @@ sub _doAll {
     # Traitement des entités de type 'mailshare'
     $query = "SELECT mailshare_id FROM MailShare WHERE mailshare_domain_id=".$self->{"domain"};
     if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
         return 0;
     }
 
@@ -340,7 +341,7 @@ sub _doIncremental {
         $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
 
         if( !defined($domainDesc) ) {
-            &OBM::toolBox::write_log( "loadDb: domaine d'idenfiant '".$self->{"domain"}."'", "W" );
+            &OBM::toolBox::write_log( "[Update::update]: domaine d'idenfiant '".$self->{"domain"}."'", "W" );
             return 0;
         }
     }
@@ -349,7 +350,7 @@ sub _doIncremental {
     if( defined($self->{"user"}) ) {
         # Si le paramètre utilisateur est indiqué, on fait une MAJ incrémentale par
         # utilisateur
-        &OBM::toolBox::write_log( "loadDb: MAJ incrementale pour l'utilisateur '".$self->{"user_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: MAJ incrementale pour l'utilisateur '".$self->{"user_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
         $sqlFilter{"updated"}->[0] = "updated_user_id=".$self->{"user"};
         $sqlFilter{"updated"}->[1] = "updatedlinks_user_id=".$self->{"user"};
         $sqlFilter{"deleted"} = "deleted_user_id=".$self->{"user"};
@@ -357,7 +358,7 @@ sub _doIncremental {
     }elsif( defined($self->{"delegation"}) ) {
         # Si le paramètre délégation est indiqué, on fait une MAJ incrémentale
         # par délégation
-        &OBM::toolBox::write_log( "loadDb: MAJ incrementale pour la delegation '".$self->{"delegation"}."'", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: MAJ incrementale pour la delegation '".$self->{"delegation"}."'", "W" );
         $sqlFilter{"updated"}->[0] = "updated_delegation LIKE '".$self->{"delegation"}."%'";
         $sqlFilter{"updated"}->[1] = "updatedlinks_delegation LIKE '".$self->{"delegation"}."%'";
         $sqlFilter{"deleted"} = "deleted_delegation LIKE '".$self->{"delegation"}."%'";
@@ -365,7 +366,7 @@ sub _doIncremental {
     }elsif( defined($self->{"domain"}) ) {
         # Si le paramètre domaine est indiqué, on fait une MAJ incrémentale
         # par domaine
-        &OBM::toolBox::write_log( "loadDb: MAJ incrementale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: MAJ incrementale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
         $sqlFilter{"updated"}->[0] = "updated_domain_id='".$self->{"domain"}."'";
         $sqlFilter{"updated"}->[1] = "updatedlinks_domain_id='".$self->{"domain"}."'";
         $sqlFilter{"deleted"} = "deleted_domain_id=".$self->{"domain"};
@@ -404,7 +405,7 @@ sub _incrementalUpdate {
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
         return 0;
     }
 
@@ -421,7 +422,7 @@ sub _incrementalUpdate {
 
         my $queryResult2;
         if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
             return 0;
         }
         my( $numRows ) = $queryResult2->fetchrow_array();
@@ -496,7 +497,7 @@ sub _incrementalUpdate {
     }
 
     if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
         return 0;
     }
 
@@ -569,9 +570,9 @@ sub _incrementalDelete {
     }
 
     if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete", "W" );
         if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( "loadDb: ".$queryResult->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: ".$queryResult->err, "W" );
         }
 
         return 0;
@@ -654,9 +655,9 @@ sub _updateDbEntity {
     my $queryResult;
     my $query = "SELECT * FROM ".$table." WHERE ".$columnPrefix."_id=".$id;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete", "W" );
         if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( "loadDb: ".$queryResult->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: ".$queryResult->err, "W" );
         }
 
         return 0;
@@ -681,9 +682,9 @@ sub _updateDbEntity {
         # On exécute la requête
         my $updateQueryResult;
         if( !&OBM::dbUtils::execQuery( $updateQuery, $dbHandler, \$updateQueryResult ) ) {
-            &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete", "W" );
             if( defined($updateQueryResult) ) {
-                &OBM::toolBox::write_log( "loadDb: ".$updateQueryResult->err, "W" );
+                &OBM::toolBox::write_log( "[Update::update]: ".$updateQueryResult->err, "W" );
             }
 
             return 0;
@@ -716,9 +717,9 @@ sub _deleteDbEntity {
     my $queryResult;
     my $query = "DELETE FROM P_".$table." WHERE ".$columnPrefix."_id=".$id;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete", "W" );
         if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( "loadDb: ".$queryResult->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: ".$queryResult->err, "W" );
         }
 
         return 0;
@@ -746,9 +747,9 @@ sub _updateIncrementalTable {
     my $deleteQueryResult;
     my $query = "DELETE FROM ".$table." WHERE ".lc($table)."_id=".$id;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$deleteQueryResult ) ) {
-        &OBM::toolBox::write_log( "lodaDb: probleme lors de l'execution de la requete", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete", "W" );
         if( defined($deleteQueryResult) ) {
-            &OBM::toolBox::write_log( "loadDb: ".$deleteQueryResult->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: ".$deleteQueryResult->err, "W" );
         }
 
         return 0;
@@ -970,132 +971,6 @@ sub _tableNamePrefix {
 }
 
 
-sub getDomains {
-    my $self = shift;
-    my( $dbHandler, $obmDomainId ) = @_;
-    my @domainList;
-
-    if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "loadDb: connection à la base de donnée incorrect !", "W" );
-        return undef;
-    }
-
-
-    # Création du meta-domaine
-    $domainList[0]->{"meta_domain"} = 1;
-    $domainList[0]->{"domain_id"} = 0;
-    $domainList[0]->{"domain_label"} = "metadomain";
-    $domainList[0]->{"domain_name"} = "metadomain";
-    $domainList[0]->{"domain_desc"} = "Informations de l'annuaire ne faisant partie d'aucun domaine";
-
-
-    # Requete de recuperation des informations des domaines
-    my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias, samba_value FROM Domain LEFT JOIN Samba ON samba_name=\"samba_sid\" AND samba_domain_id=domain_id";
-    if( defined($obmDomainId) && $obmDomainId =~ /^\d+$/ ) {
-        $queryDomain .= " WHERE domain_id=".$obmDomainId;
-    }
-
-    # On execute la requete concernant les domaines
-    my $queryDomainResult;
-    if( !&OBM::dbUtils::execQuery( $queryDomain, $dbHandler, \$queryDomainResult ) ) {
-        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete.", "W" );
-        if( defined($queryDomainResult) ) {
-            &OBM::toolBox::write_log( "loadDb: ".$queryDomainResult->err, "W" );
-        }
-
-        return undef;
-    }
-
-    while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias, $domainSambaSid ) = $queryDomainResult->fetchrow_array ) {
-        my $currentDomain;
-        $currentDomain->{"meta_domain"} = 0;
-        $currentDomain->{"domain_id"} = $domainId;
-        $currentDomain->{"domain_label"} = $domainLabel;
-        $currentDomain->{"domain_desc"} = $domainDesc;
-        $currentDomain->{"domain_name"} = $domainName;
-        $currentDomain->{"domain_dn"} = $domainName;
-
-        $currentDomain->{"domain_alias"} = [];
-        if( defined($domainAlias) ) {
-            push( @{$currentDomain->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
-        }
-
-        $currentDomain->{"domain_samba_sid"} = $domainSambaSid;
-
-        push( @domainList, $currentDomain );
-    }
-
-    return \@domainList;
-}
-
-
-sub getLdapServer {
-    my $self = shift;
-    my( $dbHandler, $domainList ) = @_;
-
-    if( !defined($ldapAdminLogin) ) {
-        return 0;
-    }
-
-    for( my $i=0; $i<=$#$domainList; $i++ ) {
-        &OBM::toolBox::write_log( "loadDb: recuperation du serveur LDAP pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
-
-        my $queryLdapAdmin = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$ldapAdminLogin."'";
-
-        # On execute la requete concernant l'administrateur LDAP associé
-        my $queryLdapAdminResult;
-        if( !&OBM::toolBox::execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete.", "W" );
-            if( defined($queryLdapAdminResult) ) {
-                &OBM::toolBox::write_log( "loadDb: ".$queryLdapAdminResult->err, "W" );
-            }
-        }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
-            $domainList->[$i]->{"ldap_admin_server"} = $ldapServer;
-            $domainList->[$i]->{"ldap_admin_login"} = $ldapAdminLogin;
-            $domainList->[$i]->{"ldap_admin_passwd"} = $ldapAdminPasswd;
-
-            $queryLdapAdminResult->finish;
-        }
-    }
-
-    return 1;
-}
-
-
-sub getCyrusServers {
-    my $self = shift;
-    my( $dbHandler, $domainList ) = @_;
-
-    for( my $i=0; $i<=$#$domainList; $i++ ) {
-        if( $domainList->[$i]->{"meta_domain"} ) {
-            next;
-        }
-
-        &OBM::toolBox::write_log( "loadDb: recuperation des serveurs de courrier pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
-        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, MailServer j WHERE (i.host_domain_id=0 OR i.host_domain_id=".$domainList->[$i]->{"domain_id"}.") AND i.host_id=j.mailserver_host_id";
-
-        # On execute la requete
-        my $queryResult;
-        if( !&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
-            next;
-        }
-
-        my @srvList = ();
-        while( my( $hostId, $hostName, $hostIp) = $queryResult->fetchrow_array ) {
-            my $srv;
-            $srv->{"imap_server_id"} = $hostId;
-            $srv->{"imap_server_name"} = $hostName;
-            $srv->{"imap_server_ip"} = $hostIp;
-
-            push( @{$domainList->[$i]->{"imap_servers"}}, $srv );
-        }
-    }
-
-    return 0;
-}
-
-
 sub _updateDbDomain {
     my $self = shift;
 
@@ -1105,7 +980,7 @@ sub _updateDbDomain {
     my $dbHandler = $self->{"dbHandler"};
 
     if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "loadDb: pas de domaine indique pour la MAJ totale", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: pas de domaine indique pour la MAJ totale", "W" );
         return 0;
     }
     my $domainId = $self->{"domain"};
@@ -1116,7 +991,7 @@ sub _updateDbDomain {
     # On execute la requete
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -1128,7 +1003,7 @@ sub _updateDbDomain {
         $query = "DELETE FROM P_Domain WHERE Domain_id=".$domainId;
         my $queryResult2;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -1145,7 +1020,7 @@ sub _updateDbDomain {
         }
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -1156,7 +1031,7 @@ sub _updateDbDomain {
     $query = "SELECT i.mailserver_id, i.mailserver_host_id FROM MailServer i, Host j WHERE i.mailserver_host_id=j.host_id AND (j.host_domain_id=".$domainId." OR j.host_domain_id=0)";
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -1166,13 +1041,13 @@ sub _updateDbDomain {
         # Les hôtes serveurs de mails
         $query = "DELETE FROM P_MailServer WHERE mailserver_id=".$mailServerId;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
         $query = "SELECT * FROM MailServer WHERE mailserver_id=".$mailServerId;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -1192,7 +1067,7 @@ sub _updateDbDomain {
             }
 
             if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult3 ) ) {
-                &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+                &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
                 return 0;
             }
         }
@@ -1200,13 +1075,13 @@ sub _updateDbDomain {
         # Les informations associées aux hôtes serveurs de mails
         $query = "DELETE FROM P_MailServerNetwork WHERE mailservernetwork_host_id=".$hostId;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
         $query = "SELECT * FROM MailServerNetwork WHERE mailservernetwork_host_id=".$hostId;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -1226,7 +1101,7 @@ sub _updateDbDomain {
             }
 
             if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult3 ) ) {
-                &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+                &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
                 return 0;
             }
         }
@@ -1246,7 +1121,7 @@ sub _updateState {
     my $dbHandler = $self->{"dbHandler"};
 
     if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "loadDb: pas de domaine indique pour la MAJ totale", "W" );
+        &OBM::toolBox::write_log( "[Update::update]: pas de domaine indique pour la MAJ totale", "W" );
         return 0;
     }
     my $domainId = $self->{"domain"};
@@ -1254,7 +1129,7 @@ sub _updateState {
     my $query = "UPDATE DomainPropertyValue SET domainpropertyvalue_value=0 WHERE domainpropertyvalue_property_key='update_state' AND domainpropertyvalue_domain_id=".$domainId;
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "loadDb: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
