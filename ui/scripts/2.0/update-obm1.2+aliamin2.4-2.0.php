@@ -51,11 +51,11 @@ $aliamin_config_file = '/home/pierre/cvs/aliamin/aliamin_conf.ini';
 // informations de connexion à la bd aliamin
 // laisser en commentaire pour récupérer ses informations dans le fichier de 
 // configuration d'aliamin - voir (CONFIG FICHIERS CONF.)
-//$aliamin_user	= 'root';
-//$aliamin_pass	= 'pass';
-//$aliamin_host	= 'localhost';
-//$aliamin_db		= 'aliamin_db';
-//$aliamin_dbprod	= 'aliamin_dbprod';
+//$aliamin_user = 'root';
+//$aliamin_pass = 'pass';
+//$aliamin_host = 'localhost';
+//$aliamin_db     = 'aliamin_dbupd';
+//$aliamin_dbprod = 'aliamin_dbprod';
 
 
 
@@ -621,7 +621,7 @@ $sql = "ALTER TABLE UserObm
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK\n";
 
-echo str_pad("Mise a jour des preferences utilisateurs...\n",70);
+echo "Mise a jour des preferences utilisateurs...\n";
 echo str_pad("set_theme...",70);
 $sql = "UPDATE UserObmPref set userobmpref_value='default' WHERE userobmpref_option='set_theme';";
 my_query($aliamin_db, $sql, $aliamin_link);
@@ -747,9 +747,14 @@ create_production_table($aliamin_db, $aliamin_link, "MailServer");
 create_production_table($aliamin_db, $aliamin_link, "MailServerNetwork");
 create_production_table($aliamin_db, $aliamin_link, "MailShare");
 create_production_table($aliamin_db, $aliamin_link, "EntityRight");
-echo str_pad("creation de of_usergroup a partir de UserObmGroup...",70);
-//CREATE TABLE P_of_usergroup like UserObmGroup
-$sql = "CREATE TABLE of_usergroup like UserObmGroup";
+echo str_pad("creation de la table of_usergroup...",70);
+//echo str_pad("creation de of_usergroup a partir de UserObmGroup...",70);
+//$sql = "CREATE TABLE of_usergroup like UserObmGroup";
+$sql = "CREATE TABLE of_usergroup (
+  of_usergroup_group_id int(8) NOT NULL default '0',
+  of_usergroup_userobm_id int(8) NOT NULL default '0',
+  PRIMARY KEY  (of_usergroup_group_id,of_usergroup_userobm_id)
+)";
 my_query($aliamin_db, $sql, $aliamin_link);
 echo "OK\n";
 
