@@ -149,7 +149,7 @@ sub _connectLdapSrv {
         name => $ldapConn->{"ldapAdmin"}
     };
 
-    my $parentDn = $self->_findTypeParentDn( $ldapStruct, $SYSTEMUSERS, 0 );
+    my $parentDn = $self->_findTypeParentDn( undef, $SYSTEMUSERS, 0 );
     if( defined( $parentDn ) ) {
         $ldapConn->{"ldapAdminDn"} = $self->_makeDn( $ldapAdmin, $parentDn );
         &OBM::toolBox::write_log( "ldapEngine: connexion a l'annuaire en tant que '".$ldapConn->{"ldapAdminDn"}."'", "W" );
@@ -388,6 +388,13 @@ sub _findTypeParentDn {
     my $self = shift;
     my ( $ldapStruct, $type, $domainId ) = @_;
 
+    # Si aucune structure d'arbre LDAP n'est passée en paramètre, on part de la
+    # racine
+    if( !defined($ldapStruct) ) {
+        $ldapStruct = $self->{"ldapStruct"};
+    }
+
+    # Si le type demandé est de type 'branche' on stoppe le traitement
     if( $self->{"typeDesc"}->{$type}->{"is_branch"} ) {
         return 0;
     }
@@ -505,9 +512,9 @@ sub update {
 
     my $domainDesc = $self->_findDomainbyId($object->{"domainId"});
 
-    my $parentDn = $self->_findTypeParentDn( $self->{"ldapStruct"}, $object->{"type"}, $object->{"domainId"} );
+    my $parentDn = $self->_findTypeParentDn( undef, $object->{"type"}, $object->{"domainId"} );
     if( !defined($parentDn) ) {
-        # Le fait que l'entité n'a pas de DN parent signifie simplement qu'elle n'a pas
+        # Le fait que l'entité n'ait pas de DN parent signifie simplement qu'elle n'a pas
         # de représentation LDAP, ce n'est donc pas une erreur fatale.
         return 1;
     }

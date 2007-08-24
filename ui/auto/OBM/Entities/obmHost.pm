@@ -18,7 +18,7 @@ use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
 sub new {
-    my $self =shift;
+    my $self = shift;
     my( $links, $deleted, $hostId ) = @_;
 
     my %obmHostAttr = (
@@ -115,13 +115,20 @@ sub getEntity {
     my $dbHostDesc = $queryResult->fetchrow_hashref();
     $queryResult->finish();
 
+    # On stocke la description BD utile pour la MAJ des tables
+    $self->{"hostDbDesc"} = $dbHostDesc;
+
+    # Action effectuee
+    if( $self->getDelete() ) {
+        &OBM::toolBox::write_log( "obmHost: gestion de l'hote supprime '".$dbHostDesc->{"host_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    }else {
+        &OBM::toolBox::write_log( "obmHost: gestion de l'hote '".$dbHostDesc->{"host_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    }
+
     # On stocke les informations utiles dans la structure de donnees des
     # resultats
     $self->{"hostDesc"} = $dbHostDesc;
     $self->{"hostDesc"}->{"host_domain"} = $domainDesc->{"domain_label"};
-
-    # On stocke la description BD utile pour la MAJ des tables
-    $self->{"hostDbDesc"} = $dbHostDesc;
 
 
     # Obtention des domaines pour lesquels cet hôte est serveur de courrier
@@ -143,6 +150,8 @@ sub getEntity {
     if( $self->isLinks() ) {
         $self->getEntityLinks( $dbHandler, $domainDesc );
     }
+
+    return 1;
 }
 
 

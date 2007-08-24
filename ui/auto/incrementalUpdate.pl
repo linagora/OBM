@@ -4,11 +4,9 @@
 #                   - Desc : Script permettant de mettre à jour le  #
 #                   système de façon incrémentale                   #
 #-------------------------------------------------------------------#
-# $Id: ldapChangePasswd.pl 1719 2007-05-22 14:14:13Z anthony $
-#-------------------------------------------------------------------#
 
 use strict;
-require OBM::loadDb;
+require OBM::Update::update;
 use Getopt::Long;
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
@@ -61,7 +59,7 @@ sub getParameter {
 # On prepare le log
 &OBM::toolBox::write_log( "incrementalUpdate.pl: ", "O" );
 
-# Traitement des parametres
+# Traitement des paramètres
 &OBM::toolBox::write_log( "Analyse des parametres du script", "W" );
 my %parameters;
 getParameter( \%parameters );
@@ -79,19 +77,18 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 }
 
 
-my $loadDb = OBM::loadDb->new( $dbHandler, \%parameters );
-$loadDb->update();
-$loadDb->destroy();
+my $update = OBM::Update::update->new( $dbHandler, \%parameters );
+$update->update();
+$update->destroy();
 
 
-#
 # On referme la connexion a la base
 if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
     &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "W" );
 }
 
-#
 # On ferme le log
+&OBM::toolBox::write_log( "Fin du traitement", "W" );
 &OBM::toolBox::write_log( "", "C" );
 
 exit 0
