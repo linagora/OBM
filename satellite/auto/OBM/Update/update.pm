@@ -97,17 +97,11 @@ sub new {
         $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"dbHandler"}, undef );
     }
 
-    # Obtention des serveurs LDAP par domaines
-    &OBM::Update::utils::getLdapServer( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
-
-    # Parametrage des serveurs IMAP par domaine
-    &OBM::Update::utils::getCyrusServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
-    if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} ) ) {
-        return undef;
-    }
-
     # initialisation des moteurs nécessaires
     if( $OBM::Parameters::common::obmModules->{"ldap"} || $OBM::Parameters::common::obmModules->{"web"} ) {
+        # Obtention des serveurs LDAP par domaines
+        &OBM::Update::utils::getLdapServer( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+
         $updateAttr{"engine"}->{"ldapEngine"} = OBM::Ldap::ldapEngine->new( $updateAttr{"domainList"} );
         if( !$updateAttr{"engine"}->{"ldapEngine"}->init() ) {
             delete( $updateAttr{"engine"}->{"ldapEngine"} );
@@ -115,6 +109,12 @@ sub new {
     }
 
     if( $OBM::Parameters::common::obmModules->{"mail"} ) {
+        # Parametrage des serveurs IMAP par domaine
+        &OBM::Update::utils::getCyrusServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+        if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} ) ) {
+            return undef;
+        }
+
         $updateAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $updateAttr{"domainList"} );
         if( !$updateAttr{"engine"}->{"cyrusEngine"}->init() ) {
             delete( $updateAttr{"engine"}->{"cyrusEngine"} );
