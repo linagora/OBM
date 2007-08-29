@@ -760,28 +760,23 @@ sub updateLdapEntry {
     }
 
     # Le cas des adresses mails
-    if( !$entry->{"user_mailperms"} ) {
-        # Adresse principales
-        if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_email"}, $ldapEntry, "mail" ) ) {
-            $update = 1;
-        }
+    # Adresse principales
+    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_email"}, $ldapEntry, "mail" ) ) {
+        $update = 1;
+    }
 
+    if( !$entry->{"user_mailperms"} ) {
         # Adresses secondaires
         if( &OBM::Ldap::utils::modifyAttrList( undef, $ldapEntry, "mailAlias" ) ) {
             $update = 1;
         }
 
-
     }else {
-        # Adresse principales
-        if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_email"}, $ldapEntry, "mail" ) ) {
-            $update = 1;
-        }
-
         # Adresses secondaires
         if( &OBM::Ldap::utils::modifyAttrList( $entry->{"user_email_alias"}, $ldapEntry, "mailAlias" ) ) {
             $update = 1;
         }
+
     }
 
     return $update;
