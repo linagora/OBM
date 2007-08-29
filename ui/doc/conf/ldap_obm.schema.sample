@@ -5,9 +5,9 @@
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.13
     NAME 'obmDomain'
     DESC 'OBM domain for the entity'
-    EQUALITY caseIgnoreIA5Match
-    SUBSTR caseIgnoreIA5SubstringsMatch
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
 # Attribut : webAccess
 # Gestion de l'acces web de l'utilisateur. 
@@ -76,18 +76,18 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.12
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.14
     NAME 'smtpDomain'
     DESC 'SMTP server for the OBM domain'
-    EQUALITY caseIgnoreIA5Match
-    SUBSTR caseIgnoreIA5SubstringsMatch
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
 # Attribut : cyrusDomain
 # Les domaines OBM pour lesquels on est serveur Cyrus.
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.15
     NAME 'cyrusDomain'
     DESC 'Cyrus server for the OBM domain'
-    EQUALITY caseIgnoreIA5Match
-    SUBSTR caseIgnoreIA5SubstringsMatch
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
 # Objet : obmUser
 # Definition de l'objet specifique a l'application OBM.
