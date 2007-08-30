@@ -11,7 +11,6 @@
 $l_author = "Auteur";
 $l_createtime = "Date de création";
 $l_extension = "Extension";
-$l_file = "Fichier";
 $l_mime_label = "Label";
 $l_mime_manage = "Gestion des Types MIME";
 $l_mime_exist = "Types MIME existantes";

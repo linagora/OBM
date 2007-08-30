@@ -11,7 +11,6 @@
 $l_author = "Author";
 $l_createtime = "Create time";
 $l_extension = "Extension";
-$l_file = "File";
 $l_mime_label = "Label : ";
 $l_mime_manage = "Mimes types management";
 $l_mime_exist = "Existing Mimes type";
@@ -22,7 +21,6 @@ $l_path = "Path";
 $l_title = "Title";
 $l_updatetime = "Update time";
 $l_document_display = "Display options for documents list";
-$l_size = "Size";
 $l_bytes = "bytes";
 $l_header_new_dir = "New directory";
 $l_dir = "Directory";

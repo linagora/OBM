@@ -609,7 +609,7 @@ function html_group_form($action, $group_q, $group, $field='') {
   global $display, $l_group, $l_name, $l_desc, $l_smb, $l_email, $l_mailing;
   global $l_private, $l_insert, $l_update, $l_back;
   global $l_manager, $c_undef, $l_undef, $l_header_new;
- 
+
   // if update mode and first time, values are taken from db
   if ($action == 'detailupdate') {
     $id = $group_q->f('group_id');

@@ -107,6 +107,7 @@ function display_menu($module) {
   global $path, $obm, $display, $obm_version, $cgp_show, $modules;
   global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope;
   global $l_logout, $l_profile, $l_scope_update;
+  global $perm, $cright_write_admin;
 
   $obm["uid"];
   $login = $obm["login"];
@@ -119,7 +120,7 @@ function display_menu($module) {
   $display["todo"] = display_todos();
   $display["action"] = display_actions($section, $module);
   $update_state = get_update_state();
-  if ($update_state == 1) {
+  if (($update_state) && ($perm->check_right('tools', $cright_write_admin))) {
     $dis_scope = "<li><a href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
   }
   if ($display["print_url"] != "") {
@@ -168,7 +169,7 @@ function display_sections_theme($section) {
       if ($section_right) {
         $section_modules = array_keys($cgp_show["module"],$key);
         if (count($section_modules) > 0) {
-	  $module_block = display_modules_theme($key);        
+	  $module_block = display_modules_theme($key);
 	  $mods .= $module_block;
 	  $js .= "obm.menu.addItem('section-$key');";
 	} else {
@@ -221,19 +222,26 @@ function display_modules_theme($section) {
     $block .= "
       <div class='module' id='section-$section-items-wrapper'>
       <ul id='section-$section-items'>
-      ";
+";
     foreach ($section_link as $mod) {
       $module_name = $modules[$mod]["Name"];
       $module_right = $perm->get_module_rights($mod); 
       if (($module_right & $modules[$mod]["Right"]) == $modules[$mod]["Right"]) {
+	// XXX specifier une target au lien du module (non configurable
+	// actuellement car cgp_show[module][webmail] = valeur et non tableau
+	// Si tableau pb avec section_link = array_keys(..) 10 l plus haut
+	$module_target = $modules[$mod]['Target'];
+	if (isset($module_target)) {
+	  $target = " target='$module_target'";
+	}
         $block .= "<li>";
         if ($fico) {
-          $ico = $modules[$mod]["Ico"];
+          $ico = $modules[$mod]['Ico'];
           if ($ico) {
-            $block .= "<a href='".$modules[$mod]["Url"]."' class='ico'><img src='$ico' alt='$module_name' /></a> ";
+            $block .= "<a$target href='".$modules[$mod]["Url"]."' class='ico'><img src='$ico' alt='$module_name' /></a> ";
           }
         }
-        $block .= "<a href='".$modules[$mod]["Url"]."'>";
+        $block .= "<a$target href='".$modules[$mod]["Url"]."'>";
         if ($ftext) $block .= $module_name;
         $block .= "</a></li>\n";
       }

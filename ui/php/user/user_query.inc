@@ -1636,6 +1636,11 @@ function check_user_can_delete($p_id) {
     $ok_msg .= "$l_link_timetask_no";
   }
 
+  // Check that user has delegation rights for this user
+  if (! check_user_update_rights($params)) {
+    $delete_ok = false;
+  }
+
   return $delete_ok;
 }
 

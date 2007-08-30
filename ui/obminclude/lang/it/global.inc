@@ -67,6 +67,7 @@ $l_label = "Etichetta";
 $l_number = "Numero";
 $l_format = "Format";
 $l_file_format = "File format";
+$l_file_format = "File";
 $l_email = "E-mail";
 $l_quota = "Quota";
 $l_invalid_data = "Dati non valida";
