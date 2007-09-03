@@ -19,8 +19,8 @@ $module = "tools";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
-$params = get_tools_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+$params = get_tools_params();
 include("$obminclude/global_pref.inc");
 require("tools_display.inc");
 require("tools_query.inc");
@@ -39,7 +39,7 @@ if ($action == "update_detail") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_tools_update_context_ok($params)) {
     set_update_lock();
-    set_update_state();
+    set_update_state($params['domain_id']);
     store_update_data($params);
     $res = exec_tools_update_update($params);
     if ($res == "0") {
@@ -104,9 +104,16 @@ display_page($display);
 // returns : $tools hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_tools_params() {
+  global $obm;
 
   // Get global params
   $params = get_global_params("Tools");
+
+  if ($obm['domain_id'] == '0') {
+    $params['domain_id'] = (isset($params['domain_id']) ? $params['domain_id'] : $obm['domain_id']);
+  } else {
+    $params['domain_id'] = $obm['domain_id'];
+  }
 
   return $params;
 }

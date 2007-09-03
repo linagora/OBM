@@ -109,23 +109,25 @@ function display_menu($module) {
   global $l_logout, $l_profile, $l_scope_update;
   global $perm, $cright_write_admin;
 
-  $obm["uid"];
-  $login = $obm["login"];
-  $profil = $obm["profile"];
-  $domain = $obm["domain_label"];
-  $section = $cgp_show["module"][$module];
-  $display["section"] = display_sections($section);
+  $obm['uid'];
+  $login = $obm['login'];
+  $profil = $obm['profile'];
+  $domain = $obm['domain_label'];
+  $domain_id = $obm['domain_id'];
+  $section = $cgp_show['module'][$module];
+  $display['section'] = display_sections($section);
 //  $display["module"] = display_modules($section, $module);
-  $display["last"] = display_last_visited();
-  $display["todo"] = display_todos();
-  $display["action"] = display_actions($section, $module);
-  $update_state = get_update_state();
+  $display['last'] = display_last_visited();
+  $display['todo'] = display_todos();
+  $display['action'] = display_actions($section, $module);
+  $update_state = get_update_state($domain_id);
+
   if (($update_state) && ($perm->check_right('tools', $cright_write_admin))) {
     $dis_scope = "<li><a href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
   }
-  if ($display["print_url"] != "") {
+  if ($display['print_url'] != "") {
 //    $dis_printer = "<li><a target=\"top\" href=\"".$display["print_url"]."&amp;output_target=print\"><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
-    $url = $display["print_url"]."&amp;output_target=print";
+    $url = $display['print_url']."&amp;output_target=print";
     $dis_printer = "<li><a href=\"#\" onclick=\"popup('$url');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
   }
   $block = "
@@ -133,7 +135,7 @@ function display_menu($module) {
 <div id='banner'>
 <a href=\"$path/obm.php\" id=\"obmLogo\"><img src='$ico_obm' alt='Logo OBM'/></a>
 ".
-$display["section"]
+$display['section']
 ."
 <ul id='information'>
 $dis_scope
@@ -143,7 +145,7 @@ $dis_scope
 $dis_printer
 </ul>
 </div>
-".$display["module"]
+".$display['module']
 ;
 
 //&gt;".$modules[$module]["Name"].

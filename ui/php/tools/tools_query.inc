@@ -60,22 +60,22 @@ function run_query_tools_remote_update($tools) {
 function exec_tools_update_update($tools) {
   global $obm, $cdg_sql, $cdg_exe, $cmd_update;
 
-  $state = get_update_state();
+  $uid = $obm['uid'];
+  $delegation = $obm['delegation'];
+  $domain_id = $tools['domain_id'];
+
+  $state = get_update_state($domain_id);
   if ($state != 1) {
     return false;
   }     
-
-  $uid = $obm['uid'];
-  $domain_id = $obm['domain_id'];
-  $delegation = $obm['delegation'];
 
   $realm = $tools['realm'];
   $update = $tools['update'];
   $update_type = $tools['update_type'];
 
   // Force global update from Domain 0
-  if ($domain_id == '0') {
-    $update_type == 'all';
+  if ($obm['domain_id'] == '0') {
+    $update_type == 'global';
   }
 
   // Creation de la commande d'execution de l'automate de mise a jour
@@ -88,7 +88,7 @@ function exec_tools_update_update($tools) {
   }
 
   $cmd .= " >/dev/null 2>&1 &";
-  
+
   // Mise a jour de l'indicateur de modifications
   set_update_state('0'); // XXXXX A virer. qd remet-on l'indic???
 
@@ -102,7 +102,6 @@ function exec_tools_update_update($tools) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if a system configuration execution is possible
-//
 // @param $tools[] paramateres values
 // @param $params : parameters hash
 // @return (true | false) : true if ok else false
@@ -113,7 +112,8 @@ function check_tools_update_context_ok($params) {
 
   $update_ok = true;
 
-  $domain_id = $obm['domain_id'];
+  $domain_id = $params['domain_id'];
+
   $update_type = $params['update_type'];
   $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
 
@@ -122,8 +122,9 @@ function check_tools_update_context_ok($params) {
     $admin_realm = array('domain');
   }
 
+  // if trying to exec an update
   // Check update type is allowed (global need domain 0 or 'domain' realm)
-  if (($update_type == 'all')
+  if (($update_type == 'global')
      && (($domain_id != 0)
 	 && (! in_array('domain', $admin_realm)))) {
     $err['msg'] = $l_error_permission;
@@ -277,12 +278,13 @@ function check_tools_update_need_global_update($domain_id=0) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get update types number for an entity
 // Parameters:
+//   - $domain_id : domain id to check
 //   - $table  : table where to check
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
 //   - $exclude_fields : fields not to take in account for update check
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_entity_infos(&$e1, &$e2, $table, $field='', $realm, $exclude_fields=array()) {
+function get_update_entity_infos(&$e1, &$e2, $domain_id, $table, $field='', $realm, $exclude_fields=array()) {
   global $cdg_sql, $obm;
 
   $uid = $obm['uid'];
@@ -304,12 +306,7 @@ function get_update_entity_infos(&$e1, &$e2, $table, $field='', $realm, $exclude
     $dg = "${f}_delegation";
   }
 
-  // For domain 0, force clause domain 0
-  if ($obm['domain_id'] == '0') {
-    $multidomain = "AND ${f}_domain_id = 0";
-  } else {
-    $multidomain = sql_multidomain("$f");
-  }
+  $multidomain = "AND (${f}_domain_id='$domain_id')";
 
   // Restrict updates to the realm selected (user, domain, delegation)
   if ($realm == "user") {
@@ -366,7 +363,7 @@ function get_update_entity_infos(&$e1, &$e2, $table, $field='', $realm, $exclude
 //   - $table  : table to get numbers
 //   - $realm  : realm space to check updates (user | domain | delegation)
 ///////////////////////////////////////////////////////////////////////////////
-function process_update_numbers($e1, $e2, $table, $realm) {
+function process_update_numbers($e1, $e2, $domain_id, $table, $realm) {
   global $cdg_sql, $obm;
 
   $nb_add = 0;
@@ -374,7 +371,6 @@ function process_update_numbers($e1, $e2, $table, $realm) {
   $nb_del = 0;
 
   $uid = $obm['uid'];
-  $domain_id = $obm['domain_id'];
   $delegation = $obm['delegation'];
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -439,19 +435,20 @@ function process_update_numbers($e1, $e2, $table, $realm) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get update types number for an entity
 // Parameters:
+//   - $domain_id : domain id to check
 //   - $table  : entity table
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
 //   - $exclude_fields : fields not to take in account for update check
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_entity_numbers($table, $field='', $realm, $exclude_fields) {
+function get_update_entity_numbers($domain_id, $table, $field='', $realm, $exclude_fields) {
   global $cdg_sql, $obm;
 
   $e1 = array();
   $e2 = array();
 
-  get_update_entity_infos($e1, $e2, $table, $field, $realm, $exclude_fields);
-  $nb = process_update_numbers($e1, $e2, $table, $realm);
+  get_update_entity_infos($e1, $e2, $domain_id, $table, $field, $realm, $exclude_fields);
+  $nb = process_update_numbers($e1, $e2, $domain_id, $table, $realm);
 
   return $nb;
 }
@@ -460,10 +457,11 @@ function get_update_entity_numbers($table, $field='', $realm, $exclude_fields) {
 /******************************************************************************
  * Get Group links updates (from UserObmGroup and GroupGroup)
  *
+ * @param $domain_id : domain id to check
  * @param $realm : realm space to check updates (user | domain | delegation)
  * @return link array : $link[$group_id] = $group_id
  */
-function get_update_link_group($realm) {
+function get_update_link_group($domain_id, $realm) {
   global $cdg_sql, $obm;
 
   $uid = $obm['uid'];
@@ -480,12 +478,7 @@ function get_update_link_group($realm) {
   $uu = "group_userupdate";
   $dg = "group_delegation";
 
-  // For domain 0, force clause domain 0
-  if ($obm['domain_id'] == '0') {
-    $multidomain = "AND group_domain_id = 0";
-  } else {
-    $multidomain = sql_multidomain('group');
-  }
+  $multidomain = "AND (group_domain_id='$domain_id')";
 
   // Restrict updates to the realm selected (user, domain, delegation)
   if ($realm == "user") {
@@ -589,7 +582,7 @@ function get_update_link_group($realm) {
  * @param $realm : realm space to check updates (user | domain | delegation)
  * @return link array : $link[$entity_id] = $entity_id
  */
-function get_update_link_entityright($entity, $table, $field, $realm) {
+function get_update_link_entityright($domain_id, $entity, $table, $field, $realm) {
   global $cdg_sql, $obm;
 
   $uid = $obm['uid'];
@@ -615,12 +608,7 @@ function get_update_link_entityright($entity, $table, $field, $realm) {
     $dg = "${f}_delegation";
   }
 
-  // For domain 0, force clause domain 0
-  if ($obm['domain_id'] == '0') {
-    $multidomain = "AND ${f}_domain_id = 0";
-  } else {
-    $multidomain = sql_multidomain("$f");
-  }
+  $multidomain = "AND (${f}_domain_id='$domain_id')";
 
   // Restrict updates to the realm selected (user, domain, delegation)
   if ($realm == "user") {
@@ -689,19 +677,20 @@ function get_update_link_entityright($entity, $table, $field, $realm) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get update types number for a link
 // Parameters:
+//   - $domain_id : domain id to check
 //   - $entity : entity
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_link_entity($entity, $realm) {
+function get_update_link_entity($domain_id, $entity, $realm) {
   global $cdg_sql, $obm;
 
   if ($entity == 'group') {
-    $links = get_update_link_group($realm);
+    $links = get_update_link_group($domain_id, $realm);
   } else if ($entity == 'mailshare') {
-    $links = get_update_link_entityright($entity, 'MailShare', 'mailshare', $realm);
+    $links = get_update_link_entityright($domain_id, $entity, 'MailShare', 'mailshare', $realm);
   } else if ($entity == 'user') {
-    $links = get_update_link_entityright('mailbox', 'UserObm', 'userobm', $realm);
+    $links = get_update_link_entityright($domain_id, 'mailbox', 'UserObm', 'userobm', $realm);
   }
 
   return $links;
@@ -722,6 +711,7 @@ function store_update_data($params) {
     return true;
   }
 
+  $domain_id = $params['domain_id'];
   $realm = $params['realm'];
 
   $entities = array('user' => array('UserObm', 'userobm', array('userobm_timelastaccess', 'userobm_calendar_version')),
@@ -738,10 +728,10 @@ function store_update_data($params) {
     $field = $db_info[1];
     $exclude_fields = $db_info[2];
     if ($cgp_show['module']["$entity"]) {
-      $nb = get_update_entity_numbers($table, $field, $realm, $exclude_fields);
+      $nb = get_update_entity_numbers($domain_id, $table, $field, $realm, $exclude_fields);
       if ($nb['move'] > 0) {
         $has_update = true;
-	$ret = validate_update_entity($entity, $table, $field, $realm, $exclude_fields);
+	$ret = validate_update_entity($domain_id, $entity, $table, $field, $realm, $exclude_fields);
       }
     }
   }
@@ -752,11 +742,11 @@ function store_update_data($params) {
     $table = $db_info[0];
     $field = $db_info[1];
     if ($cgp_show['module']["$entity"]) {
-      $links = get_update_link_entity($entity, $realm);
+      $links = get_update_link_entity($domain_id, $entity, $realm);
       $nb_links = count($links);
       if ($nb_links > 0) {
         $has_update = true;
-	$ret = store_update_entity_links_infos($links, $entity);
+	$ret = store_update_entity_links_infos($domain_id, $links, $entity);
       }
     }
   }
@@ -768,20 +758,21 @@ function store_update_data($params) {
 ///////////////////////////////////////////////////////////////////////////////
 // Validate update for one entity
 // Parameters:
+//   - $domain_id : domain id to validate
 //   - $entity : entity to get numbers
 //   - $table  : table where to check
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
 //   - $exclude_fields : fields not to take in account for update check
 ///////////////////////////////////////////////////////////////////////////////
-function validate_update_entity($entity, $table, $field="", $realm, $exclude_fields) {
+function validate_update_entity($domain_id, $entity, $table, $field="", $realm, $exclude_fields) {
   global $cdg_sql, $obm;
 
   $e1 = array();
   $e2 = array();
 
-  get_update_entity_infos($e1, $e2, $table, $field, $realm, $exclude_fields);
-  $nb = store_update_entity_infos($e1, $e2, $entity, $table, $realm);
+  get_update_entity_infos($e1, $e2, $domain_id, $table, $field, $realm, $exclude_fields);
+  $nb = store_update_entity_infos($e1, $e2, $domain_id, $entity, $table, $realm);
 
   return $nb;
 }
@@ -791,11 +782,12 @@ function validate_update_entity($entity, $table, $field="", $realm, $exclude_fie
  * Store update infos in Automate tables for an Entity
  *
  * @param $entity : entity to get numbers
+ * @param $domain_id : domain id where to check
  * @param $table  : table where to check
  * @param $field  : field prefix (if not from table name) to check
  * @param $realm  : realm space to check updates (user | domain | delegation)
  */
-function store_update_entity_infos($e1, $e2, $entity, $table, $realm) {
+function store_update_entity_infos($e1, $e2, $domain_id, $entity, $table, $realm) {
   global $cdg_sql, $obm;
 
   $nb_add = 0;
@@ -803,7 +795,6 @@ function store_update_entity_infos($e1, $e2, $entity, $table, $realm) {
   $nb_del = 0;
 
   $uid = $obm['uid'];
-  $domain_id = $obm['domain_id'];
   $delegation = $obm['delegation'];
   $obm_q = new DB_OBM;
 
@@ -876,12 +867,11 @@ function store_update_entity_infos($e1, $e2, $entity, $table, $realm) {
 /**
  * Store update infos in Automate tables for Entity link
  *
+ * @param $domain_id : domain id where to check
+ * @param $links  : 
  * @param $entity : entity to get numbers
- * @param $table  : table where to check
- * @param $field  : field prefix (if not from table name) to check
- * @param $realm  : realm space to check updates (user | domain | delegation)
  */
-function store_update_entity_links_infos($links, $entity) {
+function store_update_entity_links_infos($domain_id, $links, $entity) {
   global $cdg_sql, $obm;
 
   $nb_add = 0;
@@ -889,7 +879,6 @@ function store_update_entity_links_infos($links, $entity) {
   $nb_del = 0;
 
   $uid = $obm['uid'];
-  $domain_id = $obm['domain_id'];
   $delegation = $obm['delegation'];
   $obm_q = new DB_OBM;
 
