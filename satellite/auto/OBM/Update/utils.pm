@@ -56,19 +56,12 @@ sub getDomains {
         $currentDomain->{"domain_label"} = $domainLabel;
         $currentDomain->{"domain_desc"} = $domainDesc;
         $currentDomain->{"domain_name"} = $domainName;
+        $currentDomain->{"domain_dn"} = $domainName;
 
         $currentDomain->{"domain_alias"} = [];
         if( defined($domainAlias) ) {
             push( @{$currentDomain->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
         }
-
-        # Le DN de la branche du domaine est construite à partir de l'alias de
-        # domaine et non son nom
-        if( !defined($currentDomain->{"domain_alias"}->[0]) ) {
-            &OBM::toolBox::write_log( "[Update::utils]: un alias doit etre defini pour le domaine d'identifiant '".$currentDomain->{"domain_id"}."'", "W" );
-            next;
-        }
-        $currentDomain->{"domain_dn"} = $currentDomain->{"domain_alias"}->[0];
 
         $currentDomain->{"domain_samba_sid"} = $domainSambaSid;
 
