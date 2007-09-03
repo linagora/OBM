@@ -284,8 +284,12 @@ function get_ip_used($id="") {
  * Get the Update state (1 update to be done, 0 no changes)
  * return $state : 1 : update to be done, 0 no changes
  */
-function get_update_state($domain_id) {
-  global $cdg_sql;
+function get_update_state($domain_id='no') {
+  global $obm, $cdg_sql;
+
+  if ($domain_id == 'no') {
+    $domain_id = $obm['domain_id'];
+  }
 
   $query = "SELECT domainpropertyvalue_value as value
     FROM DomainPropertyValue
@@ -308,8 +312,12 @@ function get_update_state($domain_id) {
  *
  * @param $state : 1 set to true (there are update, else 0)
  */
-function set_update_state($domain_id, $state=1) {
-  global $cdg_sql;
+function set_update_state($domain_id='no', $state=1) {
+  global $obm, $cdg_sql;
+
+  if ($domain_id == 'no') {
+    $domain_id = $obm['domain_id'];
+  }
 
   $query = "UPDATE DomainPropertyValue
     SET domainpropertyvalue_value = '$state'
