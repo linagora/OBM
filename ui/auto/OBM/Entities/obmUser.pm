@@ -153,7 +153,7 @@ sub getEntity {
         "user_gid"=>$dbUserDesc->{"userobm_gid"},
         "user_lastname"=>$dbUserDesc->{"userobm_lastname"},
         "user_firstname"=>$dbUserDesc->{"userobm_firstname"},
-        "user_homedir"=>"$baseHoeeDir/".$dbUserDesc->{"userobm_login"},
+        "user_homedir"=>"$baseHomeDir/".$dbUserDesc->{"userobm_login"},
         "user_mailperms"=>$dbUserDesc->{"userobm_mail_perms"},
         "user_webperms"=>$dbUserDesc->{"userobm_web_perms"},
         "user_passwd_type"=>$dbUserDesc->{"userobm_password_type"},
