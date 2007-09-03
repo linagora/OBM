@@ -301,10 +301,6 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 //  if (check_member_form($params["project_id"], $params)) {
   $ins_err = run_query_project_allocate_update($params);
-  // Create an entry in the ProjectStat log
-  $retour = run_query_project_statlog($params["project_id"]);
-  if (!($retour))
-    $ins_err = 1;
   if (!($ins_err)) {
     $display["msg"] .= display_ok_msg("$l_project : $l_update_ok");
   } else {
@@ -316,10 +312,6 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 //  if (check_member_form($params["project_id"], $params)) {
   $ins_err = run_query_project_advance_update($params);
-  // Create an entry in the ProjectStat log
-  $retour = run_query_project_statlog($params["project_id"]);
-  if (!($retour))
-    $ins_err = 1;
   if (!($ins_err)) {
     $display["msg"] .= display_ok_msg("$l_project : $l_update_ok");
   } else {

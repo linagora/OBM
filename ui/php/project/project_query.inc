@@ -1282,7 +1282,7 @@ function run_query_project_statlog($p_id) {
 
   $time_left = $obm_q->f("time_left");
 	
-  $query = "
+  /*  $query = "
     INSERT INTO ProjectStat (
       projectstat_project_id,
       projectstat_usercreate,
@@ -1300,6 +1300,7 @@ function run_query_project_statlog($p_id) {
    display_debug_msg($query, $cdg_sql, "run_query_project_statlog(4)");
    $obm_q = new DB_OBM;
    $retour = $obm_q->query($query);
+  */
 
   return $retour;
 }

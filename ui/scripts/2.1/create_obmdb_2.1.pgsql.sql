@@ -1012,15 +1012,20 @@ create INDEX pu_idx_pt ON ProjectUser (projectuser_projecttask_id);
 
 
 --
--- Table structure for table 'ProjectStat'
+-- Table structure for table 'ProjectClosing'
 --
-CREATE TABLE ProjectStat (
-  projectstat_project_id     integer NOT NULL,
-  projectstat_usercreate     integer NOT NULL,
-  projectstat_date           timestamp NOT NULL,
-  projectstat_useddays       integer default NULL,
-  projectstat_remainingdays  integer default NULL,
-  PRIMARY KEY (projectstat_project_id, projectstat_usercreate, projectstat_date)
+CREATE TABLE ProjectClosing (
+  projectclosing_id           serial,
+  projectclosing_project_id   integer NOT NULL,
+  projectclosing_timeupdate   timestamp,
+  projectclosing_timecreate   timestamp,
+  projectclosing_userupdate   integer,
+  projectclosing_usercreate   integer NOT NULL,
+  projectclosing_date         timestamp NOT NULL,
+  projectclosing_used         integer NOT NULL,
+  projectclosing_remaining    integer NOT NULL,
+  projectclosing_type         integer,
+  PRIMARY KEY (projectclosing_id)
 );
 
 

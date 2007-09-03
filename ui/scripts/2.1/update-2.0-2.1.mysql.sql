@@ -373,6 +373,30 @@ ALTER TABLE ProjectTask ADD COLUMN projecttask_dateend date;
 
 
 --
+-- Table structure for table 'ProjectClosing'
+--
+CREATE TABLE ProjectClosing (
+  projectclosing_id           int(8) auto_increment,
+  projectclosing_project_id   int(8) NOT NULL,
+  projectclosing_timeupdate   timestamp(14),
+  projectclosing_timecreate   timestamp(14),
+  projectclosing_userupdate   int(8),
+  projectclosing_usercreate   int(8) NOT NULL,
+  projectclosing_date         timestamp(14) NOT NULL,
+  projectclosing_used         int(8) NOT NULL,
+  projectclosing_remaining    int(8) NOT NULL,
+  projectclosing_type         int(8),
+  PRIMARY KEY (projectclosing_id)
+);
+
+
+--
+-- Drop deprecated ProjectStat table
+--
+DROP table ProjectStat;
+
+
+--
 -- UPDATE MailShare Structure
 --
 -- Add archive flag

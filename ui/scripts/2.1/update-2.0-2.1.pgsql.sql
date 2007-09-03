@@ -355,10 +355,11 @@ UPDATE Invoice set invoice_status_id = 7 WHERE invoice_status_id IN
 (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Loss' OR invoicestatus_label='Pertes et profits');
 UPDATE Invoice set invoice_status_id = 1 WHERE invoice_status_id IN 
 (SELECT invoicestatus_id from InvoiceStatus where invoicestatus_label='Received' OR invoicestatus_label='Reçue');
+
+
 --
 -- Move Incident status id
 --
-
 UPDATE Incident set incident_status_id = 0 WHERE incident_status_id IN 
 (SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Open' OR incidentstatus_label='Ouvert');
 UPDATE Incident set incident_status_id = 1 WHERE incident_status_id IN 
@@ -375,6 +376,30 @@ UPDATE Incident set incident_status_id = 4 WHERE incident_status_id IN
 -- UPDATE ProjectTask Structure
 --
 ALTER TABLE ProjectTask ADD COLUMN projecttask_dateend date;
+
+
+--
+-- Table structure for table 'ProjectClosing'
+--
+CREATE TABLE ProjectClosing (
+  projectclosing_id           serial,
+  projectclosing_project_id   integer NOT NULL,
+  projectclosing_timeupdate   timestamp,
+  projectclosing_timecreate   timestamp,
+  projectclosing_userupdate   integer,
+  projectclosing_usercreate   integer NOT NULL,
+  projectclosing_date         timestamp NOT NULL,
+  projectclosing_used         integer NOT NULL,
+  projectclosing_remaining    integer NOT NULL,
+  projectclosing_type         integer,
+  PRIMARY KEY (projectclosing_id)
+);
+
+
+--
+-- Drop deprecated ProjectStat table
+--
+DROP table ProjectStat;
 
 
 --

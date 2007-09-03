@@ -1006,15 +1006,20 @@ CREATE TABLE ProjectUser (
 
 
 --
--- Table structure for table 'ProjectStat'
+-- Table structure for table 'ProjectClosing'
 --
-CREATE TABLE ProjectStat (
-  projectstat_project_id     int(8) NOT NULL,
-  projectstat_usercreate     int(8) NOT NULL,
-  projectstat_date           timestamp(14) NOT NULL,
-  projectstat_useddays       int(8) default NULL,
-  projectstat_remainingdays  int(8) default NULL,
-  PRIMARY KEY (projectstat_project_id, projectstat_usercreate, projectstat_date)
+CREATE TABLE ProjectClosing (
+  projectclosing_id           int(8) auto_increment,
+  projectclosing_project_id   int(8) NOT NULL,
+  projectclosing_timeupdate   timestamp(14),
+  projectclosing_timecreate   timestamp(14),
+  projectclosing_userupdate   int(8),
+  projectclosing_usercreate   int(8) NOT NULL,
+  projectclosing_date         timestamp(14) NOT NULL,
+  projectclosing_used         int(8) NOT NULL,
+  projectclosing_remaining    int(8) NOT NULL,
+  projectclosing_type         int(8),
+  PRIMARY KEY (projectclosing_id)
 );
 
 
