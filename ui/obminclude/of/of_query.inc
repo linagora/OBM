@@ -619,7 +619,8 @@ function of_delegation_query_update_clause($field, $value) {
 ///////////////////////////////////////////////////////////////////////////////
 // Delegation : Check update rights
 // Parameters:
-//   - $value : value displayed
+//   - $params : parameters given (on insert or update action)
+//   - $current_delegation : object current delegation to check right
 // Returns : XHTML consult display block
 ///////////////////////////////////////////////////////////////////////////////
 function of_delegation_check_update_rights($params, $current_delegation) {
@@ -636,8 +637,8 @@ function of_delegation_check_update_rights($params, $current_delegation) {
       if ((in_array('delegation', $admin_realm))
 	  && (! in_array('domain', $admin_realm))) {
 
-	// Restricted to target delegation
-	if ($current_delegation != $obm['delegation']) {
+	// Object (User,..) delegation must be in target delegation
+	if (strpos($current_delegation, $obm['delegation']) !== 0) {
 	  return false;
 	}
 

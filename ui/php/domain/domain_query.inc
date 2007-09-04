@@ -161,26 +161,32 @@ function run_query_domain_insert($domain) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_replace_properties($domain_id,$domain) {
   global $cdg_sql;
+
   $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id = '$domain_id'";
   display_debug_msg($query, $cdg_sql, "run_query_domain_replace_properties()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+
   $prop_q = run_query_domain_properties();
   while($prop_q->next_record()) {
-    if($domain[$prop_q->f("domainproperty_key")] != "") {
+    $key = $prop_q->f('domainproperty_key');
+    $value = $domain[$key];
+    if ($value != '') {
       $query = "INSERT INTO DomainPropertyValue (
         domainpropertyvalue_domain_id,
         domainpropertyvalue_property_key,
         domainpropertyvalue_value)
         VALUES (
           '$domain_id',
-          '".$prop_q->f("domainproperty_key")."',
-          '".$domain[$prop_q->f("domainproperty_key")]."'
+          '$key',
+          '$value'
         )";
       $obm_q->query($query);
     }
   }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // domain update query execution
 // Parameters:
@@ -190,11 +196,11 @@ function run_query_domain_replace_properties($domain_id,$domain) {
 function run_query_domain_update($d_id, $domain) {
   global $uid, $cdg_sql;
 
-  $now = date("Y-m-d H:i:s");
-  $label = $domain["label"];
-  $desc = $domain["desc"];
-  $alias = $domain["alias"];
-  $mail_server = $domain["mail_server"];
+  $now = date('Y-m-d H:i:s');
+  $label = $domain['label'];
+  $desc = $domain['desc'];
+  $alias = $domain['alias'];
+  $mail_server = $domain['mail_server'];
   
   $query = "UPDATE Domain SET
     domain_timeupdate='$now',

@@ -1555,7 +1555,7 @@ function check_user_data_form($p_id, $user) {
         $err["msg"] = "$l_err_delegation_target_outside ($d[delegation])";
         $err["field"] = "delegation_target";
         return false;
-      }                                                                    
+      }
     } else {
       // Sinon la cible de delegation ne doit pas etre remplie !
       if ($delegation_target != '') {
