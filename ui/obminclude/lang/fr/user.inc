@@ -61,6 +61,8 @@ $l_reset = "Préférences par défaut";
 $l_delete = "Supprimer l'utilisateur";
 $l_add = "Ajouter ces utilisateurs";
 
+$l_add_users = "Ajouter des utilisateurs";
+
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des utilisateurs correspondants.";
 $l_found = "utilisateurs trouvés.";
@@ -98,7 +100,8 @@ $l_err_system_samba = "La modification des droits windows d'un utilisateur systè
 $l_err_host_already_used_by = "La machine est déjà affectée à l'utilisateur ";
 $l_image_type_error = "La photo doit être un fichier de type image (gif, jpeg ou png)";
 $l_image_size_error = "La photo ne doit pas dépasser 96px x 96px et avoir un poids supérieur à 100ko";
-$l_add_users = "Ajouter des utilisateurs";
+$l_err_delegation_target_outside = "La délégation d'administration doit être dans la délégation de l'entité !";
+$l_err_delegation_target_profile = "Ce profil d'utilisateur ne peut avoir de délégation d'administration !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";

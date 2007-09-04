@@ -1243,6 +1243,8 @@ function check_user_data_form($p_id, $user) {
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
   global $c_multidomain, $obm, $cgp_use, $c_imagetype;
   global $c_max_image_size;
+  global $l_err_delegation_target_outside, $l_err_delegation_outside_domain;
+  global $l_err_delegation_outside_target, $l_err_delegation_target_profile;
 
   $action = $user["action"];
   $id = $user["user_id"];
@@ -1537,8 +1539,8 @@ function check_user_data_form($p_id, $user) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   if ($obm_q->num_rows() > 0) {
-    $err["msg"] = "$login : $l_exist_error";
-    $err["field"] = "login";
+    $err['msg'] = "$login : $l_exist_error";
+    $err['field'] = "login";
     return false;
   }
 
@@ -1552,8 +1554,8 @@ function check_user_data_form($p_id, $user) {
     if (is_array($profiles[$profile]['properties']['admin_realm'])
         && (in_array('delegation', $profiles[$profile]['properties']['admin_realm']))) {
       if (strpos($delegation_target, $d['delegation']) !== 0) {
-        $err["msg"] = "$l_err_delegation_target_outside ($d[delegation])";
-        $err["field"] = "delegation_target";
+        $err['msg'] = "$l_err_delegation_target_outside ($d[delegation])";
+        $err['field'] = "delegation_target";
         return false;
       }
     } else {
@@ -1565,19 +1567,21 @@ function check_user_data_form($p_id, $user) {
       }
     }
 
-    // Verifier delegation est dans l'arborescence de l'entite
-    if (strpos($delegation, $d['delegation']) !== 0) {
-      $err["msg"] = "$l_err_delegation_outside_domain ($d[delegation])";
-      $err["field"] = "delegation";
-      return false;
+    // Verifier delegation est dans la delegation du domaine
+    if (isset($d['delegation'])) {
+      if (strpos($delegation, $d['delegation']) !== 0) {
+	$err['msg'] = "$l_err_delegation_outside_domain ($d[delegation])";
+	$err['field'] = "delegation";
+	return false;
+      }
     }
 
     // Verifier delegation est dans la cible de delegation
     if (isset($obm['delegation'])
         && ($obm['delegation'] != '')
         && (strpos($delegation, $obm['delegation']) !== 0)) {
-      $err["msg"] = "$l_err_delegation_outside_target ($obm[delegation])";
-      $err["field"] = "delegation";
+      $err['msg'] = "$l_err_delegation_outside_target ($obm[delegation])";
+      $err['field'] = "delegation";
       return false;
     }
   }         
