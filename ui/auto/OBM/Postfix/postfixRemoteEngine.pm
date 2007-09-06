@@ -38,6 +38,10 @@ sub init {
     my $self = shift;
     my $domainsDesc = $self->{"domainList"};
 
+    if( !$OBM::Parameters::common::obmModules->{"mail"} ) {
+        return 0;
+    }
+
     &OBM::toolBox::write_log( "postfixRemoteEngine: initialisation du moteur", "W" );
 
     # Obtention de la liste des serveurs entrant à mettre à jour

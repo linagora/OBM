@@ -35,6 +35,10 @@ sub new {
 
 sub init {
     my $self = shift;
+
+    if( !$OBM::Parameters::common::obmModules->{"mail"} ) {
+        return 0;
+    }
     
     &OBM::toolBox::write_log( "sieveEngine: initialisation du moteur", "W" );
 
@@ -67,7 +71,7 @@ sub dump {
 sub _connectSrvSieve {
     my $self = shift;
     my( $srvDesc, $boxLogin ) = @_;
-    # Il faut remplacer les éventuels '@' des login utilisateurs par des '%'
+    # Il faut remplacer le '@' des login utilisateurs par des '%'
     $boxLogin =~ s/@/%/;
 
     if( !defined($srvDesc->{"imap_server_ip"}) ) {
@@ -343,7 +347,7 @@ sub update {
         return 1;
     }
 
-    # Si ce type d'entité ne peut pas avoir de script Sieve, on ne fait rien
+    # Si cette entité n'est pas compatible Sieve
     if( !$object->getMailboxSieve() ) {
         return 1;
     }
