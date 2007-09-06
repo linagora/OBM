@@ -35,6 +35,7 @@ $l_date_last_update = "Mise à jour";
 $l_delegation = "Délégation";
 $l_print = "Imprimer";
 $l_transparent = "Transparent";
+
 // Common messages
 $l_yes = "Oui";
 $l_no = "Non";
@@ -152,6 +153,8 @@ $l_show = "Afficher";
 $l_advanced = "Avancé";
 $l_properties = "Propriétés";
 $l_items = "Accessoires";
+$l_received = "Reçu";
+$l_emitted = "Emis";
 
 // Entities
 $l_company = "Société";

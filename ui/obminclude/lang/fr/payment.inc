@@ -14,6 +14,7 @@ $l_expected_date = "Date Prévisionnelle";
 $l_type = "Type du Paiement";
 $l_inout = "Type";
 $l_both = "Both"; 
+$l_credit_memo = "Avoir";
 $l_pick_paymentkind = "Choisissez un type de Paiement";
 $l_kind = "Mode";
 $l_pick_account = "Choisissez un Compte";
@@ -23,9 +24,6 @@ $l_unpaid = "Non Payé";
 $l_already_paid = "Déjà payé";
 $l_choose_csv = "Choisir ce fichier";
 $l_include_checked = "Inclure les Paiements pointés";
-
-$l_received = "Reçu";
-$l_emitted = "Emis";
 
 // invoice
 $l_no_invoice = "Aucune facture associée à ce paiement";

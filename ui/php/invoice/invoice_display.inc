@@ -515,11 +515,13 @@ function html_invoice_consult($inv_q, $pays) {
   global $path, $display ;
   global $l_delete, $l_invoice, $l_payment, $l_no_payment, $l_total;
   global $l_list_payment, $l_company, $l_date, $l_number, $l_amount, $l_inout;
-  global $l_credit_memo, $l_amount_remaining;
+  global $l_credit_memo, $l_amount_remaining, $l_received, $l_emitted;
 
   $i_id = $inv_q->f('invoice_id');
   $amount_ttc = $inv_q->f('invoice_amount_ttc');
   $amount_remaining = $amount_ttc;
+  $inv_inout = $inv_q->f('invoice_inout');
+  $credit_memo = $inv_q->f('invoice_credit_memo');
 
   $block = dis_invoice_detail ($inv_q);
 
@@ -553,10 +555,18 @@ function html_invoice_consult($inv_q, $pays) {
 
         if ($inout == '+') {
 	  $dis_inout = $l_received;
-          $affected_amount_total += $affected_amount;
+	  if ($inv_inout == '+') {
+	    $affected_amount_total += $affected_amount;
+	  } else {
+	    $affected_amount_total -= $affected_amount;
+	  }
         } else {
 	  $dis_inout = $l_emitted;
-          $affected_amount_total -= $affected_amount;
+	  if ($inv_inout == '+') {
+	    $affected_amount_total -= $affected_amount;
+	  } else {
+	    $affected_amount_total += $affected_amount;
+	  }
         }
       
         $block_payment .= "
@@ -565,7 +575,7 @@ function html_invoice_consult($inv_q, $pays) {
         <td>$company</td>
         <td><a href=\"$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id\">$number</a></td>
         <td>$amount </td>
-        <td>$inout </td>
+        <td>$dis_inout </td>
         <td>$affected_amount </td>
       </tr>";
       }
@@ -578,6 +588,12 @@ function html_invoice_consult($inv_q, $pays) {
       $class_r = "class=\"error\"";
     }
 
+    if ($amount_remaining == 0) {
+      $dis_remaining = $amount_remaining;
+    } else {
+      $dis_remaining = "$amount_remaining &nbsp;/&nbsp; $amount_ttc";
+    }
+
     $block_payment .= "
       <tr class=\"highlight\">
         <th colspan=\"5\">$l_total</th>
@@ -585,7 +601,7 @@ function html_invoice_consult($inv_q, $pays) {
       </tr>
       <tr class=\"highlight\">
         <th colspan=\"5\">$l_amount_remaining</th>
-        <td $class_r><b>$amount_remaining</b> &nbsp;/&nbsp; $amount_ttc</td>
+        <td $class_r><b>$dis_remaining</td>
       </tr>
       </tbody>
     </table>";

@@ -106,6 +106,9 @@ $ccalendar_last_hour = 20;
 // Calendar max user displayed in the calendar
 //$ccalendar_max_users = 25;
 
+// Calendar send ics file
+$ccalendar_send_ics = true;
+
 // Generic E-mail for Incident module
 //$cmail_incident = "support@mydomain";
 

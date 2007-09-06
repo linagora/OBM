@@ -283,6 +283,8 @@ function check_tools_update_need_global_update($domain_id=0) {
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
 //   - $exclude_fields : fields not to take in account for update check
+// Returns :
+//   fill $e1 (update) and $e2 (production) with table values
 ///////////////////////////////////////////////////////////////////////////////
 function get_update_entity_infos(&$e1, &$e2, $domain_id, $table, $field='', $realm, $exclude_fields=array()) {
   global $cdg_sql, $obm;
@@ -358,13 +360,15 @@ function get_update_entity_infos(&$e1, &$e2, $domain_id, $table, $field='', $rea
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Process update infos to get number for an entity
+// Process update infos : Calculate entries differences for an entity
 // Parameters:
 //   - $table  : table to get numbers
 //   - $realm  : realm space to check updates (user | domain | delegation)
+// Returns:
+//   - differences in an array 'created', 'updated', 'deleted', 'move'
 ///////////////////////////////////////////////////////////////////////////////
 function process_update_numbers($e1, $e2, $domain_id, $table, $realm) {
-  global $cdg_sql, $obm;
+  global $obm, $cdg_sql, $cdg_exe;
 
   $nb_add = 0;
   $nb_upd = 0;
@@ -376,14 +380,17 @@ function process_update_numbers($e1, $e2, $domain_id, $table, $realm) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
 
-  // Process infos for created and updated entities
+  // Process infos for differences (created and updated entries)
   foreach ($e1 as $id => $row) {
     if (! array_key_exists($id, $e2)) {
       $nb_add++;
+      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; $table : new : $id");
     } else {
       foreach($row as $fname => $fvalue) {
 	if ($e2[$id][$fname] != $fvalue) {
 	  $nb_upd++;
+	  $prod_value = $e2[$id][$fname];
+	  display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; $table ; updated id=$id ; $fname (current value=$prod_value, new value=$fvalue)");
 	  break;
 	}
       }
@@ -391,16 +398,17 @@ function process_update_numbers($e1, $e2, $domain_id, $table, $realm) {
   }
 
   // Get infos for deleted entities
-  if ($realm == "user") {
+  if ($realm == 'user') {
 
     // Get the delete from the Deleted table
     $query = "SELECT count(*) as nb FROM Deleted
      WHERE deleted_user_id=$uid
        AND deleted_table='$table'";
-    display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
+    display_debug_msg($query, $cdg_sql, 'run_query_user_delete(auto)');
     $retour = $obm_q->query($query);
     $obm_q->next_record();
-    $nb_del = $obm_q->f("nb");
+    $nb_del = $obm_q->f('nb');
+    display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $table : deleted : $nb_del entries in table Deleted");
 
   } else if ($realm == "delegation") {
 
@@ -409,24 +417,26 @@ function process_update_numbers($e1, $e2, $domain_id, $table, $realm) {
      WHERE deleted_delegation $like '$delegation%'
        AND deleted_table='$table'
        AND deleted_domain_id='$domain_id'";
-    display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
+    display_debug_msg($query, $cdg_sql, 'run_query_user_delete(auto)');
     $retour = $obm_q->query($query);
     $obm_q->next_record();
     $nb_del = $obm_q->f("nb");
+    display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $table : deleted : $nb_del entries in table Deleted");
 
   } else {
     // Case domain, just count lines present in prod, but not present in upd
     foreach ($e2 as $id => $row) {
       if (! array_key_exists($id, $e1)) {
 	$nb_del++;
+	display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $table : deleted : id=$id");
       }
     }
   }
 
-  $nb["created"] = $nb_add;
-  $nb["updated"] = $nb_upd;
-  $nb["deleted"] = $nb_del;
-  $nb["move"] = $nb_add + $nb_upd + $nb_del;
+  $nb['created'] = $nb_add;
+  $nb['updated'] = $nb_upd;
+  $nb['deleted'] = $nb_del;
+  $nb['move'] = $nb_add + $nb_upd + $nb_del;
 
   return $nb;
 }
@@ -462,7 +472,7 @@ function get_update_entity_numbers($domain_id, $table, $field='', $realm, $exclu
  * @return link array : $link[$group_id] = $group_id
  */
 function get_update_link_group($domain_id, $realm) {
-  global $cdg_sql, $obm;
+  global $obm, $cdg_sql, $cdg_exe;
 
   $uid = $obm['uid'];
   $delegation = $obm['delegation'];
@@ -557,10 +567,15 @@ function get_update_link_group($domain_id, $realm) {
   foreach($e1 as $g_id => $users) {
     if (count($e1[$g_id]) != count($e2[$g_id])) {
       $res[$g_id] = $g_id;
+      $nb_link = count($e1[$g_id]);
+      $nb_link_prod = count($e2[$g_id]);
+      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; current #links=$nb_link_prod, new #links=$nb_link");
+
     } else {
       foreach ($users as $u_id) {
 	if (! in_array($u_id, $e2[$g_id])) {
 	  $res[$g_id] = $g_id;
+	  display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; diff=$u_id");
 	  break;
 	}
       }
@@ -583,7 +598,7 @@ function get_update_link_group($domain_id, $realm) {
  * @return link array : $link[$entity_id] = $entity_id
  */
 function get_update_link_entityright($domain_id, $entity, $table, $field, $realm) {
-  global $cdg_sql, $obm;
+  global $obm, $cdg_sql, $cdg_exe;
 
   $uid = $obm['uid'];
   $delegation = $obm['delegation'];
@@ -658,10 +673,14 @@ function get_update_link_entityright($domain_id, $entity, $table, $field, $realm
   foreach($e1 as $e_id => $consumers) {
     if (count($e1[$e_id]) != count($e2[$e_id])) {
       $res[$e_id] = $e_id;
+      $nb_link = count($e1[$e_id]);
+      $nb_link_prod = count($e2[$e_id]);
+      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $entity links ; updated id=$e_id ; current #links=$nb_link_prod, new #links=$nb_link");
     } else {
       foreach ($consumers as $c_id) {
 	if (! in_array($c_id, $e2[$e_id])) {
 	  $res[$e_id] = $e_id;
+	  display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $entity links ; updated id=$e_id ; diff=$c_id");
 	  break;
 	}
       }
@@ -714,7 +733,7 @@ function store_update_data($params) {
   $domain_id = $params['domain_id'];
   $realm = $params['realm'];
 
-  $entities = array('user' => array('UserObm', 'userobm', array('userobm_timelastaccess', 'userobm_calendar_version')),
+  $entities = array('user' => array('UserObm', 'userobm', array('userobm_timeupdate', 'userobm_timelastaccess', 'userobm_calendar_version')),
                     'group' => array('UGroup', 'group', array()),
                     'host' => array('Host', 'host', array()),
                     'mailshare' => array('MailShare', 'mailshare', array()));

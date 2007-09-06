@@ -1523,24 +1523,24 @@ function check_user_data_form($p_id, $user) {
   /////////////////////////////////////////////////////////////////////////////
   // if a user with the same name already exists  return false
   /////////////////////////////////////////////////////////////////////////////
-  if (($action == "insert") && (isset($user["domain"]))) {
-    $domain_id = $user["domain"];
-  } else if (($action == "update") && (isset($u["domain_id"]))) {
-    $domain_id = $u["domain_id"];
+  if (($action == 'insert') && (isset($user['domain']))) {
+    $domain_id = $user['domain'];
+  } else if (($action == 'update') && (isset($u['domain_id']))) {
+    $domain_id = $u['domain_id'];
   } else {
-    $domain_id = $obm["domain_id"];
+    $domain_id = $obm['domain_id'];
   }
   $where_multidomain = "AND (userobm_domain_id = '$domain_id' OR userobm_domain_id = 0)";
   $query = "SELECT * FROM UserObm WHERE userobm_login='$login' $where_multidomain ";
   if ($p_id > 0) {
     $query .= " AND userobm_id!='$p_id'";
   }
-  display_debug_msg($query, $cdg_sql, "check_user_data_form()");
+  display_debug_msg($query, $cdg_sql, 'check_user_data_form()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   if ($obm_q->num_rows() > 0) {
     $err['msg'] = "$login : $l_exist_error";
-    $err['field'] = "login";
+    $err['field'] = 'login';
     return false;
   }
 
@@ -1553,25 +1553,27 @@ function check_user_data_form($p_id, $user) {
     // la cible de delegation est bien dans l'arbo. de l'entite
     if (is_array($profiles[$profile]['properties']['admin_realm'])
         && (in_array('delegation', $profiles[$profile]['properties']['admin_realm']))) {
-      if (strpos($delegation_target, $d['delegation']) !== 0) {
-        $err['msg'] = "$l_err_delegation_target_outside ($d[delegation])";
-        $err['field'] = "delegation_target";
-        return false;
+      if (isset($d['delegation']) && ($d['delegation'] != '')) {
+	if (strpos($delegation_target, $d['delegation']) !== 0) {
+	  $err['msg'] = "$l_err_delegation_target_outside ($d[delegation])";
+	  $err['field'] = 'delegation_target';
+	  return false;
+	}
       }
     } else {
       // Sinon la cible de delegation ne doit pas etre remplie !
       if ($delegation_target != '') {
         $err['msg'] = "$l_err_delegation_target_profile ($delegation_target)";
-        $err['field'] = "delegation_target";
+        $err['field'] = 'delegation_target';
         return false;
       }
     }
 
     // Verifier delegation est dans la delegation du domaine
-    if (isset($d['delegation'])) {
+    if (isset($d['delegation']) && ($d['delegation'] != '')) {
       if (strpos($delegation, $d['delegation']) !== 0) {
 	$err['msg'] = "$l_err_delegation_outside_domain ($d[delegation])";
-	$err['field'] = "delegation";
+	$err['field'] = 'delegation';
 	return false;
       }
     }
@@ -1581,7 +1583,7 @@ function check_user_data_form($p_id, $user) {
         && ($obm['delegation'] != '')
         && (strpos($delegation, $obm['delegation']) !== 0)) {
       $err['msg'] = "$l_err_delegation_outside_target ($obm[delegation])";
-      $err['field'] = "delegation";
+      $err['field'] = 'delegation';
       return false;
     }
   }         

@@ -145,6 +145,8 @@ $l_show = "Show";
 $l_advanced = "Advanced";
 $l_properties = "Properties";
 $l_items = "Items";
+$l_received = "Received";
+$l_emitted = "Emitted";
 
 // Entities
 $l_company = "Company";

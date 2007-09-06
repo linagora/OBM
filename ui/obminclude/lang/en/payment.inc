@@ -14,6 +14,7 @@ $l_expected_date = "Expected Date";
 $l_type = "Kind";
 $l_inout = "Kind";
 $l_both = "Both"; 
+$l_credit_memo = "Credit memo";
 $l_pick_paymentkind = "choose a payment kind";
 $l_kind = "Kind";
 $l_pick_account = "choose an account";
