@@ -47,6 +47,10 @@ sub new {
 sub init {
     my $self = shift;
 
+    if( !$OBM::Parameters::common::obmModules->{"mail"} ) {
+        return 0;
+    }
+
     &OBM::toolBox::write_log( "cyrusEngine: initialisation du moteur", "W" );
 
     # Etablissement des connexions

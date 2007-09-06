@@ -44,11 +44,7 @@ sub new {
         global => undef,
         dbHandler => undef,
         domainList => undef,
-        engine => {
-            ldapEngine => undef,
-            cyrusEngine => undef,
-            sieveEngine => undef
-        }
+        engine => undef
     );
 
 
@@ -73,8 +69,8 @@ sub new {
             return 0;
         }
 
-	( $updateAttr{"user_name"} ) = $queryResult->fetchrow_array();
-	$queryResult->finish();
+	    ( $updateAttr{"user_name"} ) = $queryResult->fetchrow_array();
+	    $queryResult->finish();
     }
 
     # Identifiant de délégation
@@ -97,33 +93,30 @@ sub new {
         $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"dbHandler"}, undef );
     }
 
-    # initialisation des moteurs nécessaires
-    if( $OBM::Parameters::common::obmModules->{"ldap"} || $OBM::Parameters::common::obmModules->{"web"} ) {
-        # Obtention des serveurs LDAP par domaines
-        &OBM::Update::utils::getLdapServer( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+    # initialisation des moteurs
 
-        $updateAttr{"engine"}->{"ldapEngine"} = OBM::Ldap::ldapEngine->new( $updateAttr{"domainList"} );
-        if( !$updateAttr{"engine"}->{"ldapEngine"}->init() ) {
-            delete( $updateAttr{"engine"}->{"ldapEngine"} );
-        }
+    # Obtention des serveurs LDAP par domaines
+    &OBM::Update::utils::getLdapServer( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+
+    $updateAttr{"engine"}->{"ldapEngine"} = OBM::Ldap::ldapEngine->new( $updateAttr{"domainList"} );
+    if( !$updateAttr{"engine"}->{"ldapEngine"}->init() ) {
+        delete( $updateAttr{"engine"}->{"ldapEngine"} );
     }
 
-    if( $OBM::Parameters::common::obmModules->{"mail"} ) {
-        # Parametrage des serveurs IMAP par domaine
-        &OBM::Update::utils::getCyrusServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
-        if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} ) ) {
-            return undef;
-        }
+    # Parametrage des serveurs IMAP par domaine
+    &OBM::Update::utils::getCyrusServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+    if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} ) ) {
+        return undef;
+    }
 
-        $updateAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $updateAttr{"domainList"} );
-        if( !$updateAttr{"engine"}->{"cyrusEngine"}->init() ) {
-            delete( $updateAttr{"engine"}->{"cyrusEngine"} );
-        }
+    $updateAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $updateAttr{"domainList"} );
+    if( !$updateAttr{"engine"}->{"cyrusEngine"}->init() ) {
+        delete( $updateAttr{"engine"}->{"cyrusEngine"} );
+    }
 
-        $updateAttr{"engine"}->{"sieveEngine"} = OBM::Cyrus::sieveEngine->new( $updateAttr{"domainList"} );
-        if( !$updateAttr{"engine"}->{"sieveEngine"}->init() ) {
-            delete( $updateAttr{"engine"}->{"sieveEngine"} );
-        }
+    $updateAttr{"engine"}->{"sieveEngine"} = OBM::Cyrus::sieveEngine->new( $updateAttr{"domainList"} );
+    if( !$updateAttr{"engine"}->{"sieveEngine"}->init() ) {
+        delete( $updateAttr{"engine"}->{"sieveEngine"} );
     }
 
 
@@ -225,8 +218,9 @@ sub _doAll {
     if( $self->{"domain"} != 0 ) {
         # Mise a jour des partitions Cyrus
         my $updateMailSrv = OBM::Cyrus::cyrusRemoteEngine->new( $self->{"domainList"} );
-        $updateMailSrv->init();
-        $globalReturn = $globalReturn && $updateMailSrv->update( "add" );
+        if( $updateMailSrv->init() ) {
+            $globalReturn = $globalReturn && $updateMailSrv->update( "add" );
+        }
         $updateMailSrv->destroy();
 
         # Si tout c'est bien passé, il faut rétablir les connexions à Cyrus
@@ -945,7 +939,9 @@ sub _runEngines {
 
     my $engines = $self->{"engine"};
     while( (my( $engineType, $engine ) = each(%{$engines})) && $return ) {
-        $return = $engine->update( $object );
+        if( defined( $engine ) ) {
+            $return = $engine->update( $object );
+        }
     }
 
     if( !$return ) {
@@ -1143,8 +1139,10 @@ sub _doRemoteConf {
 
     # MAJ des map Postfix sur les serveurs entrant
     my $updateMailSrv = OBM::Postfix::postfixRemoteEngine->new( $self->{"domainList"} );
-    $updateMailSrv->init();
-    $return = $updateMailSrv->update();
+    if( $updateMailSrv->init() ) {
+        $return = $updateMailSrv->update();
+    }
+
     $updateMailSrv->destroy();
 
     return $return;

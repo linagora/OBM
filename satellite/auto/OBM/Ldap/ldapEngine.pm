@@ -55,6 +55,10 @@ sub new {
 sub init {
     my $self = shift;
 
+    if( !$OBM::Parameters::common::obmModules->{"ldap"} && !$OBM::Parameters::common::obmModules->{"web"} ) {
+        return 0;
+    }
+
     &OBM::toolBox::write_log( "ldapEngine: initialisation du moteur", "W" );
 
     # Creation de l'arbre
