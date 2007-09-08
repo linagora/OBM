@@ -401,3 +401,26 @@ DROP table ProjectStat;
 --
 -- Add archive flag
 ALTER TABLE MailShare ADD COLUMN mailshare_archive int(1) not null default 0 AFTER mailshare_name;
+
+
+--
+-- UPDATE MailServer Structure to allow different mail servers roles
+--
+-- Add mailserver_type
+ALTER TABLE MailServer ADD COLUMN mailserver_timeupdate timestamp(14) AFTER mailserver_id;
+ALTER TABLE MailServer ADD COLUMN mailserver_timecreate timestamp(14) AFTER mailserver_timeupdate;
+ALTER TABLE MailServer ADD COLUMN mailserver_userupdate int(8) AFTER mailserver_timecreate;
+ALTER TABLE MailServer ADD COLUMN mailserver_usercreate int(8) AFTER mailserver_userupdate;
+ALTER TABLE MailServer ADD COLUMN mailserver_imap int(1) default 0;
+ALTER TABLE MailServer ADD COLUMN mailserver_smtp_in int(1) default 0;
+ALTER TABLE MailServer ADD COLUMN mailserver_smtp_out int(1) default 0;
+
+
+--
+-- Domain - Mail server link table
+--
+CREATE TABLE DomainMailServer (
+  domainmailserver_domain_id      int(8) NOT NULL default 0,
+  domainmailserver_mailserver_id  int(8) NOT NULL,
+  domainmailserver_role           varchar(16) NOT NULL default 'imap'
+);

@@ -1199,15 +1199,14 @@ function html_contact_links($id) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Contact Form
-// Parameters:
-//   - $action    : action called
-//   - $co_q      : contact database result 
-//   - $contact[] : default values
-//     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
-//                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display Contact Form
+ *
+ * @param mixed $action action called
+ * @param mixed $co_q contact database result 
+ * @param mixed $contact[] : default values
+ * @return string XHTML contact form
+ */
 function dis_contact_form($action, $co_q, $contact) {
   global $display, $cg_com, $cgp_hide, $obm;
 

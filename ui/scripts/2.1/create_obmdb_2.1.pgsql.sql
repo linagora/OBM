@@ -1769,9 +1769,26 @@ CREATE TABLE UserSystem (
 -----------------------------------------------------------------------------
 CREATE TABLE MailServer (
   mailserver_id            serial,
+  mailserver_timeupdate    timestamp,
+  mailserver_timecreate    timestamp,
+  mailserver_userupdate    integer,
+  mailserver_usercreate    integer,
   mailserver_host_id       integer NOT NULL default 0,
   mailserver_relayhost_id  integer default NULL,
+  mailserver_imap          integer default 0,
+  mailserver_smtp_in       integer default 0,
+  mailserver_smtp_out      integer default 0,
   PRIMARY KEY (mailserver_id)
+);
+
+
+--
+-- Domain - Mail server link table
+--
+CREATE TABLE DomainMailServer (
+  domainmailserver_domain_id      integer NOT NULL default 0,
+  domainmailserver_mailserver_id  integer NOT NULL,
+  domainmailserver_role           varchar(16) NOT NULL default 'imap'
 );
 
 

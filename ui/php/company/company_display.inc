@@ -977,21 +977,20 @@ function dis_company_form($action, $company) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// XHTML Display Company Form
-// Parameters:
-//   - $action    : action called
-//   - $co_q      : company database result 
-//   - $dsrc_q    : datasource database result 
-//   - $types     : array of types referenced by the company 
-//   - $acts      : array of activities referenced by the company
-//   - $naf_q     : nafcode database result 
-//   - $usr_q     : userobm database result 
-//   - $ctry_q    : country database result 
-//   - $company[] : default values
-//     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
-//                : ctry, phone, fax, web, email ,com
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * XHTML Display Company Form
+ *
+ * @param mixed $action : action called
+ * @param mixed $co_q      : company database result 
+ * @param mixed $dsrc_q    : datasource database result 
+ * @param mixed $types     : array of types referenced by the company 
+ * @param mixed $acts      : array of activities referenced by the company
+ * @param mixed $naf_q     : nafcode database result 
+ * @param mixed $usr_q     : userobm database result 
+ * @param mixed $ctry_q    : country database result 
+ * @param mixed $company[] : default values
+ * @return string XHTML company form
+ */
 function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company) {
   global $display, $obm, $cgp_hide, $c_undef, $l_undef;
   global $ico_web,$ico_mail,$ico_add, $l_header_new_f;

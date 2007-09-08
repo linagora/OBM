@@ -131,14 +131,14 @@ function html_host_search_form($host) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display the Host search result
-// Parameters:
-//   - $host[]   : host search criteria
-//     keys used : name, ip, email
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display the Host search result
+ *
+ * @param mixed $host[] : host search criteria
+ * @return Search result display
+ */
 function dis_host_search_list($host) {
-  global $l_no_found, $display, $obm;
+  global $l_found, $l_no_found, $display, $obm;
 
   $prefs = get_display_pref($obm['uid'], 'host');
   $obm_q = run_query_host_search($host);
@@ -147,23 +147,23 @@ function dis_host_search_list($host) {
   if ($nb_host == 0) {
     $display['msg'] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_host_search_list($obm_q, $prefs, $nb_host, $host);
+    $display['msg'] .= display_ok_msg("$nb_host $l_found");
+    $block = html_host_search_list($obm_q, $prefs, $host);
   }
 
   return $block;
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Host search result
-// Parameters : 
-//   - $obm_q     : DBO : host list
-//   - $pref_q    : fields that have to be displayed
-//   - $nb_host   : nb hosts returned by the search query 
-//   - $group[]   : host search criteria
-//     keys used  : name, ip, popup
-///////////////////////////////////////////////////////////////////////////////
-function html_host_search_list($obm_q, $pref_q, $nb_host, $host) {
+/**
+ * XHTML Display the Host search result
+ *
+ * @param mixed $obm_q  : database object with host list
+ * @param mixed $pref_q : database object with user display preferences
+ * @param mixed $host[] : host parameters
+ * @return XHTML Display Search result
+ */
+function html_host_search_list($obm_q, $pref_q, $host) {
   global $display, $l_found, $l_close, $module;
 
   $popup = $host['popup'];
@@ -202,18 +202,18 @@ function html_host_search_list($obm_q, $pref_q, $nb_host, $host) {
   $dis_host->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  $display['msg'] .= display_ok_msg("$nb_host $l_found");
   $block .= $dis_host->display('dis_data_host');
 
   return $block;
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Host Consultation
-// Parameters:
-//   - $host[] : host parameters
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display Host Detail
+ *
+ * @param mixed $host[] : host parameters
+ * @return Display block
+ */
 function dis_host_consult($host) {
   global $display, $l_err_reference;
 
@@ -228,11 +228,12 @@ function dis_host_consult($host) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// XHTML Display Host Consultation
-// Parameters:
-//   - $host_q : host database result 
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * XHTML Display Host Detail
+ *
+ * @param mixed $host_q : host database data
+ * @return XHTML Display block
+ */
 function html_host_consult($host_q) {
   global $cgp_use, $c_yes, $c_no;
   global $l_module_host, $l_name, $l_ip, $l_desc, $l_smb;

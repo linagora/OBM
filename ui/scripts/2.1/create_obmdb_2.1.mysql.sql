@@ -1717,10 +1717,27 @@ CREATE TABLE Stats (
 -- Mail server declaration table
 --
 CREATE TABLE MailServer (
-  mailserver_id             int(8) NOT NULL auto_increment,
-  mailserver_host_id        int(8) NOT NULL default 0,
-  mailserver_relayhost_id   int(8) default NULL,
+  mailserver_id            int(8) NOT NULL auto_increment,
+  mailserver_timeupdate    timestamp(14),
+  mailserver_timecreate    timestamp(14),
+  mailserver_userupdate    int(8),
+  mailserver_usercreate    int(8),
+  mailserver_host_id       int(8) NOT NULL default 0,
+  mailserver_relayhost_id  int(8) default NULL,
+  mailserver_imap          int(1) default 0,
+  mailserver_smtp_in       int(1) default 0,
+  mailserver_smtp_out      int(1) default 0,
   PRIMARY KEY (mailserver_id)
+);
+
+
+--
+-- Domain - Mail server link table
+--
+CREATE TABLE DomainMailServer (
+  domainmailserver_domain_id      int(8) NOT NULL default 0,
+  domainmailserver_mailserver_id  int(8) NOT NULL,
+  domainmailserver_role           varchar(16) NOT NULL default 'imap'
 );
 
 
@@ -1879,5 +1896,3 @@ CREATE TABLE Updatedlinks (
   updatedlinks_entity_id  int(8),
   PRIMARY KEY (updatedlinks_id)
 );
-
-

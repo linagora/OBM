@@ -409,3 +409,29 @@ DROP table ProjectStat;
 ALTER TABLE MailShare ADD COLUMN mailshare_archive integer;
 ALTER TABLE MailShare ALTER COLUMN mailshare_archive SET DEFAULT 0;
 ALTER TABLE MailShare ALTER COLUMN mailshare_archive SET NOT NULL;
+
+
+--
+-- UPDATE MailServer Structure to allow different mail servers roles
+--
+-- Add mailserver_type
+ALTER TABLE MailServer ADD COLUMN mailserver_timeupdate timestamp;
+ALTER TABLE MailServer ADD COLUMN mailserver_timecreate timestamp;
+ALTER TABLE MailServer ADD COLUMN mailserver_userupdate integer;
+ALTER TABLE MailServer ADD COLUMN mailserver_usercreate integer;
+ALTER TABLE MailServer ADD COLUMN mailserver_imap integer;
+ALTER TABLE MailServer ALTER COLUMN mailserver_imap SET DEFAULT 0;
+ALTER TABLE MailServer ADD COLUMN mailserver_smtp_in integer default 0;
+ALTER TABLE MailServer ALTER COLUMN mailserver_smtp_in SET DEFAULT 0;
+ALTER TABLE MailServer ADD COLUMN mailserver_smtp_out integer default 0;
+ALTER TABLE MailServer ALTER COLUMN mailserver_smtp_out SET DEFAULT 0;
+
+
+--
+-- Domain - Mail server link table
+--
+CREATE TABLE DomainMailServer (
+  domainmailserver_domain_id      integer NOT NULL default 0,
+  domainmailserver_mailserver_id  integer NOT NULL,
+  domainmailserver_role           varchar(16) NOT NULL default 'imap'
+);

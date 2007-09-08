@@ -8,12 +8,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Host Search query execution 
-// Parameters :
-//   - $host[]   : host search criteria
-//     keys used : name, user
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Host Search query execution 
+ *
+ * @param mixed $host : host search criteria
+ * @return database object with search result
+ */
 function run_query_host_search($host) {
   global $cdg_sql, $ctu_sql_limit;
   
@@ -81,11 +81,12 @@ function run_query_host_search($host) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Host detail query execution
-// Parameters:
-//   - $id : host id
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Host detail query execution
+ *
+ * @param mixed $id : host id
+ * @return database object with host info
+ */
 function run_query_host_detail($id) {
   global $cdg_sql;
 
@@ -120,11 +121,12 @@ function run_query_host_detail($id) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : host insertion
-// Parameters:
-//   - $host[] : host hash info : keys used : all
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Query execution : host insertion
+ *
+ * @param mixed $host : host hash info
+ * @return true if insert ok
+ */
 function run_query_host_insert($host) {
   global $obm, $cdg_sql, $cg_gid_smb_host;
 
@@ -243,11 +245,12 @@ function run_query_host_insert($host) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Host Update query execution
-// Parameters:
-//   - $host[] : host hash info : keys used : all
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Host Update query execution
+ *
+ * @param mixed $host : host hash info
+ * @return true is update OK
+ */
 function run_query_host_update($host) {
   global $obm, $cdg_sql;
 

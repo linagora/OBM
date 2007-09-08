@@ -917,7 +917,7 @@ function html_user_group_consult($usr_q) {
 //   - $user  : default values or updated values (if error)
 //   - $field : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_form($usr_q, $user, $field="") {
+function html_user_form($usr_q, $user, $field='') {
   global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
   global $l_user, $l_title, $l_archive, $l_datebegin, $l_insert, $l_update;
   global $l_delegation_target, $l_hidden, $l_photo;
@@ -1467,6 +1467,7 @@ $samba_section
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the context about a user insertion or update
