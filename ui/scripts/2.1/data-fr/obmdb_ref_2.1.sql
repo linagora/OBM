@@ -3,8 +3,6 @@
 --//     - Desc : French Database Referential 2.1                            //
 --// 2007-04-23 AliaSource - PB                                              //
 --/////////////////////////////////////////////////////////////////////////////
--- $Id$
---/////////////////////////////////////////////////////////////////////////////
 
 
 --
@@ -327,6 +325,5 @@ UPDATE ContractPriority SET contractpriority_domain_id = 1;
 UPDATE ContractStatus SET contractstatus_domain_id = 1;
 UPDATE IncidentPriority SET incidentpriority_domain_id = 1;
 UPDATE IncidentStatus SET incidentstatus_domain_id = 1;
-UPDATE InvoiceStatus SET invoicestatus_domain_id = 1;
 UPDATE PaymentKind SET paymentkind_domain_id = 1;
 UPDATE UGroup SET group_domain_id = 1;
