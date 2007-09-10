@@ -214,7 +214,6 @@ function html_mailserver_search_list($obm_q, $pref_q, $mailserver) {
 function dis_mailserver_consult($params) {
   global $display, $l_err_reference;
 
-  print_r($params);
   $m_q = run_query_mailserver_detail($params['mailserver_id']);
   if ($m_q->num_rows() == 1) {
     $block = html_mailserver_consult($m_q);
@@ -411,31 +410,23 @@ function html_mailserver_form($action, $m_q, $params, $field='') {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Mail Server Delete
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display Mail Server Delete
+ *
+ * @param mixed $id mailserver id
+ **/
 function dis_can_delete_mailserver($id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display, $path;
 
-  $dis_back = "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&amp;id=$id\">$l_back</a>";
+  $dis_back = "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&amp;mailserver_id=$id\">$l_back</a>";
 
   $dis_delete = "
-    <a href=\"$path/mailserver/mailserver_index.php?action=delete&amp;id=$id\">
+    <a href=\"$path/mailserver/mailserver_index.php?action=delete&amp;mailserver_id=$id\">
     $l_delete 
     </a>";
 
-  $display["msg"] .= display_ok_msg($l_can_delete);
+  $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
     <div class=\"buttons\">

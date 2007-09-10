@@ -13,7 +13,7 @@
  *
  * @param mixed $params : mailserver search criteria
  * @return database object with search result
- */
+ **/
 function run_query_mailserver_search($params) {
   global $cdg_sql, $ctu_sql_limit;
   
@@ -88,71 +88,12 @@ function run_query_mailserver_search($params) {
 }
 
 
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the mailserver can be deleted
-///////////////////////////////////////////////////////////////////////////////
-function check_can_change_mailserver($id) {
-  global $cdg_sql;
-  $multidomain = sql_multidomain("userobm");
-  
-  $query = "
-    SELECT
-    userobm_id
-    FROM UserObm
-    JOIN MailServer ON userobm_mail_server_id = mailserver_id
-    WHERE mailserver_id = $id $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_mailserver_count())");
-  $obm_q= new DB_OBM;
-  $obm_q->query($query);
-
-  return !($obm_q->next_record());  
-
-}
-///////////////////////////////////////////////////////////////////////////////
-// Delete th mailserver
-///////////////////////////////////////////////////////////////////////////////
-function run_query_mailserver_delete($id) {
-  global $cdg_sql;
-  $ms_q = run_query_mailserver_details($id);
-  if($ms_q->f('mailserver_relayhost_id') != "")  {
-    $where = "OR mailservernetwork_host_id = '".$ms_q->f('mailserver_relayhost_id')."'";
-  }
-  $obm_q= new DB_OBM;
-  $query = "
-    DELETE 
-    FROM MailServerNetwork
-    WHERE mailservernetwork_host_id = '".$ms_q->f('mailserver_host_id')."'
-    $where
-  ";
-  $retour = $obm_q->query($query); 
-  if($retour) {
-    $query = "
-      DELETE 
-      FROM MailServer
-      WHERE mailserver_id = '$id'
-    ";
-    $retour = $obm_q->query($query); 
-  } 
-  return $retour;
-}
-
-
-
-
-
 /**
  * MailServer detail query execution
  *
  * @param mixed $id : mailserver id
  * @return database object with mailserver info
- */
+ **/
 function run_query_mailserver_detail($id) {
   global $cdg_sql;
 
@@ -190,7 +131,7 @@ function run_query_mailserver_detail($id) {
  *
  * @param mixed $params : mail server hash info
  * @return true if insert ok
- */
+ **/
 function run_query_mailserver_insert($params) {
   global $obm, $cdg_sql;
 
@@ -247,7 +188,7 @@ function run_query_mailserver_insert($params) {
  *
  * @param mixed $params : mailserver hash info
  * @return true is update OK
- */
+ **/
 function run_query_mailserver_update($params) {
   global $obm, $cdg_sql;
 
@@ -274,12 +215,31 @@ function run_query_mailserver_update($params) {
 
 
 /**
+ * Deletion query execution
+ *
+ * @param mixed $m_id : mailserver id
+ * @return true is query is ok
+ **/
+function run_query_mailserver_delete($m_id) {
+  global $cdg_sql;
+
+  $query = "DELETE FROM MailServer
+    WHERE mailserver_id='$m_id'";
+  display_debug_msg($query, $cdg_sql, 'run_query_mailserver_delete()');
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+/**
  * Check a host given is not already a mail server
  *
  * @param mixed $host_id Host id to check
  * @param mixed $id mailserver id to exclude from the check
  * @return true if host is a mailserver
- */
+ **/
 function check_mailserver_host_is_mailserver($host_id, $id=false) {
   global $cdg_sql;
 
@@ -295,7 +255,7 @@ function check_mailserver_host_is_mailserver($host_id, $id=false) {
           $where
           $multidomain";
   display_debug_msg($query, $cdg_sql, 'check_mailserver_host_is_mailserver()');
-  $obm_q= new DB_OBM;
+  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -311,7 +271,7 @@ function check_mailserver_host_is_mailserver($host_id, $id=false) {
  *
  * @param mixed $params parameters
  * @return true if data are correct else false
- */
+ **/
 function check_mailserver_data_form($params) {
   global $err;
   global $l_err_host_invalid, $l_err_host_is_mailserver;
@@ -338,4 +298,61 @@ function check_mailserver_data_form($params) {
   }
 
   return true;
+}
+
+
+/**
+ * Check if the mailserver can be deleted
+ *
+ * @param mixed $m_id : mailserver id
+ * @return true if the mailserver can be deleted, else false
+ **/
+function check_can_delete_mailserver($m_id) {
+  global $err, $cdg_sql, $ok_msg;
+  global $l_link_domain, $l_link_domain_no, $l_link_user, $l_link_user_no;
+
+  $delete_ok = true;
+
+  // Links from Domain
+  $query = "SELECT *
+    FROM DomainMailServer
+    WHERE domainmailserver_mailserver_id='$m_id'";
+  display_debug_msg($query, $cdg_sql, 'check_can_delete_mailserver(1)');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $nb = $obm_q->num_rows();
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err['msg'] .= $l_link_domain;
+  } else {
+    $query = "SELECT *
+    FROM Domain
+    WHERE domain_mail_server_id='$m_id'";
+    display_debug_msg($query, $cdg_sql, 'check_can_delete_mailserver(2)');
+    $obm_q->query($query);
+    $nb = $obm_q->num_rows();
+    if ($nb > 0) {
+      $delete_ok = false;
+      $err['msg'] .= $l_link_domain;
+    } else {
+      $ok_msg .= $l_link_domain_no;
+    }
+  }
+
+  // Links from Users
+  $query = "SELECT count(*) as nb
+    FROM UserObm
+    WHERE userobm_mail_server_id='$m_id'";
+  display_debug_msg($query, $cdg_sql, 'check_can_delete_mailserver(3)');
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $nb = $obm_q->f('nb');
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err['msg'] .= "<br />$l_link_user";
+  } else {
+    $ok_msg .= "<br />$l_link_user_no";
+  }
+
+  return $delete_ok;
 }

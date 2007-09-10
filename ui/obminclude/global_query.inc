@@ -249,10 +249,10 @@ function get_global_linked_element_nb($element, $id, $entity, $arch="") {
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "get_global_linked_element_nb()");
+  display_debug_msg($query, $cdg_sql, 'get_global_linked_element_nb()');
   $obm_q->next_record();
 
-  return $obm_q->f("nb");
+  return $obm_q->f('nb');
 }
 
 
