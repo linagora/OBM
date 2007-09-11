@@ -42,6 +42,13 @@ ldapServer = localhost
 ; exemple : 'aliasource,local' place l'arbre LDAP d'OBM-Ldap sous le DN: 'dc=aliasource,dc=local' 
 ldapRoot = local
 
+; Gestion des partition Cyrus
+; si cette option est active, une partition Cyrus est créée pour chacun des
+; domaines OBM. Cette partition contient toutes les entités du domaine.
+; Attention : l'activation ou la désactivation de cette option après que des
+; entités aient été créés n'est pas transparente !
+cyrusParition = false
+
 ; Adresse du serveur Samba sur lequel les repertoires personnels sont crees
 ; utile dans les hook
 sambaHomeServer = ""

@@ -39,7 +39,7 @@ sub new {
         croak( "Usage: PACKAGE->new(LINKS, DELETED, USERID)" );
 
     }elsif( $userId !~ /^\d+$/ ) {
-        &OBM::toolBox::write_log( "obmSystemUser: identifiant d'utilisateur incorrect", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: identifiant d'utilisateur incorrect", "W" );
         return undef;
 
     }else {
@@ -66,12 +66,12 @@ sub getEntity {
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "obmSystemUser: connecteur a la base de donnee invalide", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: connecteur a la base de donnee invalide", "W" );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "obmSystemUser: description de domaine OBM incorrecte", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: description de domaine OBM incorrecte", "W" );
         return 0;
 
     }else {
@@ -89,7 +89,7 @@ sub getEntity {
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmSystemUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -97,10 +97,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "obmSystemUser: pas d'utilisateur d'identifiant : ".$userId, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: pas d'utilisateur d'identifiant : ".$userId, "W" );
         return 0;
     }elsif( $numRows > 1 ) {
-        &OBM::toolBox::write_log( "obmSystemUser: plusieurs utilisateurs d'identifiant : ".$userId." ???", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: plusieurs utilisateurs d'identifiant : ".$userId." ???", "W" );
         return 0;
     }
 
@@ -110,7 +110,7 @@ sub getEntity {
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmSystemUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -119,7 +119,7 @@ sub getEntity {
     $queryResult->finish();
 
     # Positionnement du flag archive
-        &OBM::toolBox::write_log( "obmSystemUser: gestion de l'utilisateur '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: gestion de l'utilisateur '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
         
     # On cree la structure correspondante a l'utilisateur

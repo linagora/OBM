@@ -39,7 +39,7 @@ sub new {
         croak( "Usage: PACKAGE->new(LINKS, MAILSHAREID)" );
 
     }elsif( $mailShareId !~ /^\d+$/ ) {
-        &OBM::toolBox::write_log( "obmMailshare: identifiant de BAL partagee incorrect", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: identifiant de BAL partagee incorrect", "W" );
         return undef;
 
     }else {
@@ -68,12 +68,12 @@ sub getEntity {
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "obmMailshare: connecteur a la base de donnee invalide", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: connecteur a la base de donnee invalide", "W" );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "obmMailshare: description de domaine OBM incorrecte", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: description de domaine OBM incorrecte", "W" );
         return 0;
     }else {
         # On positionne l'identifiant du domaine de l'entité
@@ -92,7 +92,7 @@ sub getEntity {
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -100,10 +100,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "obmMailshare: pas de BAL partage d'identifiant : ".$mailShareId, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: pas de BAL partage d'identifiant : ".$mailShareId, "W" );
         return 0;
     }elsif( $numRows > 1 ) {
-        &OBM::toolBox::write_log( "obmMailshare: plusieurs BAL partages d'identifiant : ".$mailShareId." ???", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: plusieurs BAL partages d'identifiant : ".$mailShareId." ???", "W" );
         return 0;
     }
 
@@ -114,7 +114,7 @@ sub getEntity {
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -126,17 +126,17 @@ sub getEntity {
     $self->{"mailShareDbDesc"} = $dbMailShareDesc;
 
     if( $self->getDelete() ) {
-        &OBM::toolBox::write_log( "obmMailshare: suppression de la BAL partagee : '".$dbMailShareDesc->{"mailshare_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: suppression de la BAL partagee : '".$dbMailShareDesc->{"mailshare_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
     
     }else {
-        &OBM::toolBox::write_log( "obmMailshare: gestion de la BAL partagee : '".$dbMailShareDesc->{"mailshare_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: gestion de la BAL partagee : '".$dbMailShareDesc->{"mailshare_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     }
 
     # On range les resultats dans la structure de donnees des resultats
     $self->{"mailShareDesc"}->{"mailshare_name"} = $dbMailShareDesc->{"mailshare_name"};
     $self->{"mailShareDesc"}->{"mailshare_mailbox"} = "+".$dbMailShareDesc->{"mailshare_name"};
-    if( !$singleSpaceName ) {
+    if( !$singleNameSpace ) {
         $self->{"mailShareDesc"}->{"mailshare_mailbox"} .= "@".$domainDesc->{"domain_name"};
     }
     $self->{"mailShareDesc"}->{"mailshare_description"} = $dbMailShareDesc->{"mailshare_description"};
@@ -154,7 +154,7 @@ sub getEntity {
         my $localServerIp = $self->getHostIpById( $dbHandler, $dbMailShareDesc->{"mailserver_host_id"} );
 
         if( !defined($localServerIp) ) {
-            &OBM::toolBox::write_log( "obmMailshare: droit mail du repertoire partage : '".$dbMailShareDesc->{"mailshare_name"}."' annule - Serveur inconnu !", "W" );
+            &OBM::toolBox::write_log( "[Entities::obmMailshare]: droit mail du repertoire partage : '".$dbMailShareDesc->{"mailshare_name"}."' annule - Serveur inconnu !", "W" );
             $self->{"mailShareDesc"}->{"mailshare_mailperms"} = 0;
 
         }else {
@@ -164,9 +164,11 @@ sub getEntity {
             $self->{"mailShareDesc"}->{"mailShare_mailbox"} = $self->{"mailShareDesc"}->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
 
             # Partition Cyrus associée à cette BAL
-            $self->{"mailShareDesc"}->{"mailShare_partition"} = $domainDesc->{"domain_dn"};
-            $self->{"mailShareDesc"}->{"mailShare_partition"} =~ s/\./_/g;
-            $self->{"mailShareDesc"}->{"mailShare_partition"} =~ s/-/_/g;
+            if( $OBM::Parameters::common::cyrusDomainPartition ) {
+                $self->{"mailShareDesc"}->{"mailShare_partition"} = $domainDesc->{"domain_dn"};
+                $self->{"mailShareDesc"}->{"mailShare_partition"} =~ s/\./_/g;
+                $self->{"mailShareDesc"}->{"mailShare_partition"} =~ s/-/_/g;
+            }
 
             # On ajoute le serveur de mail associé
             $self->{"mailShareDesc"}->{"mailShare_mailLocalServer"} = "lmtp:".$localServerIp.":24";
@@ -210,20 +212,20 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "obmMailshare: MAJ de la boite a lettre partagee '".$dbMailShareDesc->{"mailshare_name"}."' dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "[Entities::obmMailshare]: MAJ de la boite a lettre partagee '".$dbMailShareDesc->{"mailshare_name"}."' dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "DELETE FROM P_MailShare WHERE mailshare_id=".$self->{"mailShareId"};
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
     # Obtention des noms de colonnes de la table
     $query = "SELECT * FROM P_MailShare WHERE 0=1";
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
     my $columnList = $queryResult->{NAME};
@@ -241,7 +243,7 @@ sub updateDbEntity {
     }
 
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -251,7 +253,7 @@ sub updateDbEntity {
         $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"mailShareId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -260,7 +262,7 @@ sub updateDbEntity {
         $query = "SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"mailShareId"};
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -280,7 +282,7 @@ sub updateDbEntity {
 
             my $queryResult2;
             if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-                &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+                &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
                 return 0;
             }
         }
@@ -500,21 +502,15 @@ sub dump {
 }
 
 
-sub getMailServerRef {
+sub getMailServerId {
     my $self = shift;
-    my( $domainId, $mailServerId ) = @_;
+    my $mailServerId = undef;
 
     if( $self->{"mailShareDesc"}->{"mailshare_mailperms"} ) {
-        $$domainId = $self->{"domainId"};
-        $$mailServerId = $self->{"mailShareDesc"}->{"mailShare_server"};
-
-    }else {
-        $$domainId = undef;
-        $$mailServerId = undef;
-
+        $mailServerId = $self->{"mailShareDesc"}->{"mailShare_server"};
     }
 
-    return 1;
+    return $mailServerId;
 }
 
 

@@ -29,6 +29,7 @@ sub getDomains {
     $domainList[0]->{"domain_id"} = 0;
     $domainList[0]->{"domain_label"} = "metadomain";
     $domainList[0]->{"domain_name"} = "metadomain";
+    $domainList[0]->{"domain_dn"} = "metadomain";
     $domainList[0]->{"domain_desc"} = "Informations de l'annuaire ne faisant partie d'aucun domaine";
 
 

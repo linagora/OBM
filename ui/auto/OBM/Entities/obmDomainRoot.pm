@@ -48,7 +48,7 @@ sub getEntity {
     my( $domainDesc ) = @_;
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "obmDomainRoot: description de domaine OBM incorrecte", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmDomainRoot]: description de domaine OBM incorrecte", "W" );
         return 0;
     }else {
         # On positionne l'identifiant du domaine de l'entité

@@ -42,7 +42,7 @@ sub getDbValues {
         my $userDesc = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::imapBox);
 
         $userDesc->{"box_login"} = lc($userLogin);
-        if( !$singleSpaceName ) {
+        if( !$singleNameSpace ) {
             $userDesc->{"box_login"} .= "@".lc($domain->{"domain_name"});
         }
         $userDesc->{"box_name"} = $balPrefix.$balSeparator.$userDesc->{"box_login"};

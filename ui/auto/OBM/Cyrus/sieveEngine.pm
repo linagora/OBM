@@ -40,7 +40,7 @@ sub init {
         return 0;
     }
     
-    &OBM::toolBox::write_log( "sieveEngine: initialisation du moteur", "W" );
+    &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: initialisation du moteur", "W" );
 
     return 1;
 }
@@ -49,7 +49,7 @@ sub init {
 sub destroy {
     my $self = shift;
 
-    &OBM::toolBox::write_log( "sieveEngine: arret du moteur", "W" );
+    &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: arret du moteur", "W" );
 
     return 1;
 }
@@ -90,14 +90,14 @@ sub _connectSrvSieve {
     my $imapServerPasswd = $srvDesc->{"imap_server_passwd"};
 
 
-    &OBM::toolBox::write_log( "sieveEngine: connexion au serveur SIEVE '".$srvDesc->{"imap_server_name"}."' en tant que '".$srvDesc->{"imap_server_login"}."' pour le compte de '".$boxLogin."'", "W" );
+    &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: connexion au serveur SIEVE '".$srvDesc->{"imap_server_name"}."' en tant que '".$srvDesc->{"imap_server_login"}."' pour le compte de '".$boxLogin."'", "W" );
     $srvDesc->{"imap_sieve_server_conn"} = sieve_get_handle( $imapServerIp, sub{return $boxLogin}, sub{return $imapServerLogin}, sub{return $imapServerPasswd}, sub{return undef} );
 
     if( !defined($srvDesc->{"imap_sieve_server_conn"}) ) {
         &OBM::toolBox::write_log( "sieveEngine : probleme lors de la connexion au serveur SIEVE", "W" );
         return 0;
     }else {
-        &OBM::toolBox::write_log( "sieveEngine: connexion au serveur SIEVE etablie", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: connexion au serveur SIEVE etablie", "W" );
     }
 
     return 1;
@@ -113,7 +113,7 @@ sub _disconnectSrvSieve {
     }
     my $imapSieveServerConn = $srvDesc->{"imap_sieve_server_conn"};
 
-    &OBM::toolBox::write_log( "sieveEngine: deconnexion du serveur SIEVE.", "W" );
+    &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: deconnexion du serveur SIEVE.", "W" );
     sieve_logout( $imapSieveServerConn );
 
     return 1;
@@ -193,7 +193,7 @@ sub _doWork {
     $sieveScriptName =~ s/@/-/g;
     my $localSieveScriptName = $tmpOBM.$sieveScriptName;
 
-    &OBM::toolBox::write_log( "sieveEngine: mise a jour du script Sieve pour l'utilisateur : '".$mailBoxName."'", "W" );
+    &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: mise a jour du script Sieve pour l'utilisateur : '".$mailBoxName."'", "W" );
     my $currentScriptString = "";
     sieve_get( $sieveSrv->{"imap_sieve_server_conn"}, $sieveScriptName, $currentScriptString );
     my @oldSieveScript;
@@ -222,24 +222,24 @@ sub _doWork {
         if( sieve_put_file_withdest( $sieveSrv->{"imap_sieve_server_conn"}, $localSieveScriptName, $sieveScriptName ) ) {
             my $errstr = sieve_get_error( $sieveSrv->{"imap_sieve_server_conn"} );
             $errstr = "Sieve - erreur inconnue." if(!defined($errstr));
-            &OBM::toolBox::write_log( "sieveEngine: echec: lors du telechargement du script Sieve : ".$errstr , "W" );
+            &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: echec: lors du telechargement du script Sieve : ".$errstr , "W" );
             return 0;
         }
 
-        &OBM::toolBox::write_log( "sieveEngine: activation du script Sieve pour l'utilisateur '".$mailBoxName."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: activation du script Sieve pour l'utilisateur '".$mailBoxName."'", "W" );
 
         # On active le nouveau script
         if( sieve_activate( $sieveSrv->{"imap_sieve_server_conn"}, $sieveScriptName ) ) {
             my $errstr = sieve_get_error( $sieveSrv->{"imap_sieve_server_conn"} );
             $errstr = "Sieve - erreur inconnue." if(!defined($errstr));
-            &OBM::toolBox::write_log( "sieveEngine: probleme lors de l'activation du script Sieve : ".$errstr, "W" );
+            &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: probleme lors de l'activation du script Sieve : ".$errstr, "W" );
             return 0;
         }
 
         # On supprime le script local
         &OBM::utils::execCmd( "/bin/rm -f ".$localSieveScriptName );   
     }else {
-        &OBM::toolBox::write_log( "sieveEngine: suppression du script Sieve pour l'utilisateur '".$mailBoxName."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: suppression du script Sieve pour l'utilisateur '".$mailBoxName."'", "W" );
     }
 
     return 1;
@@ -302,7 +302,7 @@ sub _updateSieveVacation {
         }
 
         my $boxLogin = $object->getMailboxName();
-        &OBM::toolBox::write_log( "sieveEngine: gestion du message d'absence de la boite '".$boxLogin."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: gestion du message d'absence de la boite '".$boxLogin."'", "W" );
 
         push( @{$newSieveScript}, $vacationMark."\n" );
         push( @{$newSieveScript}, $vacationMsg );
@@ -339,48 +339,66 @@ sub update {
     my( $object ) = @_;
 
     if( !defined($object) ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: mise a jour d'un objet non definit - Operation annulee !", "W" );
+        return 0;
+    }elsif( !defined($object->{"type"}) ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: mise a jour d'un objet de type non définit - Operation annulee !", "W" );
+        return 0;
+    }elsif( !defined($object->{"domainId"}) ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: mise a jour d'un objet de domaine non definit - Operation annulee !", "W" );
         return 0;
     }
 
-    # Si l'objet est marqué à effacer, on ne fait rien
-    if( $object->getDelete() ) {
-        return 1;
-    }
-
-    # Si cette entité n'est pas compatible Sieve
+    # Si cette entité n'a pas d'interaction avec Sieve
     if( !$object->getMailboxSieve() ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de support SIEVE pour les objets de type '".$object->{"type"}."'", 'W' );
         return 1;
     }
 
     # Récupération du nom de la boîte à traiter
     my $mailBoxName = $object->getMailboxName();
     if( !defined($mailBoxName) ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de support SIEVE pour les objets de type '".$object->{"type"}."'", 'W' );
         return 1;
     }
 
-    # Récupération des identifiants du serveur de la boîte à traiter
-    my $mailBoxDomainId;
-    my $mailBoxServerId;
-    $object->getMailServerRef( \$mailBoxDomainId, \$mailBoxServerId );
+    # Si l'objet est marqué à effacer, on ne fait rien
+    if( $object->getDelete() ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: suppression de l'objet de type '".$object->{"type"}."'", "W" );
+        return 1;
+    }
 
     # Récupération de la description du serveur de la boîte à traiter
-    my $sieveSrv = $self->_findCyrusSrvbyId( $mailBoxDomainId, $mailBoxServerId );
+    my $mailServerId = $object->getMailServerId();
+    if( !defined($mailServerId) ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: serveur SIEVE non definit - Operation annulee !", "W" );
+        return 1;
+    }
+
+    my $sieveSrv = $self->_findCyrusSrvbyId( $object->{"domainId"}, $mailServerId );
     if( !defined($sieveSrv) ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: serveur SIEVE d'identifiant '".$mailServerId."' inconnu - Operation annulee !", "W" );
         return 0;
     }
 
     # Connexion au serveur
     if( !$self->_connectSrvSieve( $sieveSrv, $mailBoxName ) ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: probleme de connexion au serveur SIEVE d'identifiant '".$mailServerId."' - Operation annulee !", "W" );
         return 0;
     }
 
     # Traitement
     if( !$self->_doWork( $sieveSrv, $object ) ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: probleme de traitement de l'objet de type '".$object->{"type"}."' - Operation annulee !", "W" );
+
+        # On se deconnecte de serveur SIEVE
+        $self->_disconnectSrvSieve($sieveSrv);
         return 0;
     }
 
     # Deconnexion du serveur
     if( !$self->_disconnectSrvSieve($sieveSrv) ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: probleme de deconnexion du serveur SIEVE d'identifiant '".$mailServerId."' - Operation annulee !", "W" );
         return 0;
     }
 

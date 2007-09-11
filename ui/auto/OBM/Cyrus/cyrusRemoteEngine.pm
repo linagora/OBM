@@ -39,10 +39,16 @@ sub init {
     my $domainsDesc = $self->{"domainList"};
 
     if( !$OBM::Parameters::common::obmModules->{"mail"} ) {
+        # Pas de support de la messagerie
         return 0;
     }
 
-    &OBM::toolBox::write_log( "cyrusRemoteEngine: initialisation du moteur", "W" );
+    &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: initialisation du moteur", "W" );
+
+    if( !$OBM::Parameters::common::cyrusDomainPartition ) {
+        # Pas de support des partitions Cyrus par domaine
+        return 0;
+    }
 
     # Obtention de la liste des serveurs entrant à mettre à jour
     for( my $i=0; $i<=$#$domainsDesc; $i++ ) {
@@ -69,7 +75,7 @@ sub init {
 sub destroy {
     my $self = shift;
 
-    &OBM::toolBox::write_log( "cyrusRemoteEngine: arret du moteur", "W" );
+    &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: arret du moteur", "W" );
 
     return 1;
 }
@@ -95,12 +101,12 @@ sub update {
     my $globalReturn = 1;
 
     if( !defined($action) || ( $action !~ /^add|del$/ ) ) {
-        &OBM::toolBox::write_log( "cyrusRemoteEngine: Erreur: vous devez indiquer une action [add|del]", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: Erreur: vous devez indiquer une action [add|del]", "W" );
         return 0;
     }
 
     while( my( $serverName, $serverDesc ) = each(%{$srvList}) ) {
-        &OBM::toolBox::write_log( "cyrusRemoteEngine: connexion au serveur : '".$serverName."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: connexion au serveur : '".$serverName."'", "W" );
         my $srvCon = new Net::Telnet(
             Host => $serverDesc->{"imap_server_ip"},
             Port => 30000,
@@ -109,29 +115,29 @@ sub update {
         );
 
         if( !defined($srvCon) || !$srvCon->open() ) {
-            &OBM::toolBox::write_log( "cyrusRemoteEngine: echec de connexion au serveur : ".$serverName, "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: echec de connexion au serveur : ".$serverName, "W" );
             $globalReturn = 0;
             next;
         }
 
         while( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 1)) ) {
             chomp($line);
-            &OBM::toolBox::write_log( "cyrusRemoteEngine: reponse : '".$line."'", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: reponse : '".$line."'", "W" );
         }
 
         my $cmd = "cyrusPartitions: ".$action.":".$serverName;
-        &OBM::toolBox::write_log( "cyrusRemoteEngine: envoie de la commande : '".$cmd."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: envoie de la commande : '".$cmd."'", "W" );
         $srvCon->print( $cmd );
         if( (!$srvCon->eof()) && (my $line = $srvCon->getline()) ) {
             chomp($line);
-            &OBM::toolBox::write_log( "cyrusRemoteEngine: reponse : '".$line."'", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: reponse : '".$line."'", "W" );
         }
 
-        &OBM::toolBox::write_log( "cyrusRemoteEngine: deconnexion du serveur : '".$serverName."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: deconnexion du serveur : '".$serverName."'", "W" );
         $srvCon->print( "quit" );
         while( !$srvCon->eof() && (my $line = $srvCon->getline(Timeout => 1)) ) {
             chomp($line);
-            &OBM::toolBox::write_log( "cyrusRemoteEngine: reponse : '".$line."'", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: reponse : '".$line."'", "W" );
         }
 
     }

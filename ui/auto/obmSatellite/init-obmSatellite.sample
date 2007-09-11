@@ -14,7 +14,13 @@
 OBMPATH="/opt/obm/current"
 
 daemon_path="$OBMPATH/auto/obmSatellite/obmSatellite.pl"
-daemon_pid="/var/run/obm/obmSatellite.pid"
+
+daemon_dir="/var/run/obm"
+daemon_pid=$daemon_dir"/obmSatellite.pid"
+
+if [ ! -d $daemon_dir ]; then
+    /bin/mkdir $daemon_dir
+fi
 
 case "$1" in
     start)
