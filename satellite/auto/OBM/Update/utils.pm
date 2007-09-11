@@ -114,7 +114,7 @@ sub getCyrusServers {
         }
 
         &OBM::toolBox::write_log( "[Update::update]: recuperation des serveurs de courrier pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
-        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, MailServer j WHERE (i.host_domain_id=0 OR i.host_domain_id=".$domainList->[$i]->{"domain_id"}.") AND i.host_id=j.mailserver_host_id";
+        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=1 AND domainmailserver_role='imap' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
 
         # On execute la requete
         my $queryResult;
@@ -131,6 +131,39 @@ sub getCyrusServers {
             $srv->{"imap_server_ip"} = $hostIp;
 
             push( @{$domainList->[$i]->{"imap_servers"}}, $srv );
+        }
+    }
+
+    return 0;
+}
+
+
+sub getSmtpInServers {
+    my( $dbHandler, $domainList ) = @_;
+
+    for( my $i=0; $i<=$#$domainList; $i++ ) {
+        if( $domainList->[$i]->{"meta_domain"} ) {
+            next;
+        }
+
+        &OBM::toolBox::write_log( "[Update::update]: recuperation des serveurs de courrier pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
+        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=1 AND domainmailserver_role='smtp-in' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
+
+        # On execute la requete
+        my $queryResult;
+        if( !&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            next;
+        }
+
+        my @srvList = ();
+        while( my( $hostId, $hostName, $hostIp) = $queryResult->fetchrow_array ) {
+            my $srv;
+            $srv->{"smpt-in_server_id"} = $hostId;
+            $srv->{"smtp-in_server_name"} = $hostName;
+            $srv->{"smtp-in_server_ip"} = $hostIp;
+
+            push( @{$domainList->[$i]->{"smtp-in_servers"}}, $srv );
         }
     }
 

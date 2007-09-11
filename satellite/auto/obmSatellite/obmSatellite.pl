@@ -236,7 +236,7 @@ sub process_request {
                     last;
                 }
 
-                if( $currentRequest =~ /^postfixMaps: ([A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9])$/i ) {
+                if( $currentRequest =~ /^smtpInConf: ([A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9])$/i ) {
                     my $hostName = $1;
 
                     my $domainList = $self->getServerDomains( "smtp-in", $hostName );
@@ -389,7 +389,7 @@ sub checkClientRequest {
             return 0;
         }
         
-        if( $$request =~ /^postfixMaps: (.+:)*.+$/i ) {
+        if( $$request =~ /^smtpInConf: (.+:)*.+$/i ) {
             return 0;
         }
         
@@ -418,7 +418,7 @@ sub getServerDomains {
     SWITCH: {
         if( $type =~ /^smtp-in$/ ) {
             $self->logMessage( "Obtention des domaines du serveur '".$hostName."' de type SMTP-in" );
-            $ldapAttributes = [ 'smtpDomain' ];
+            $ldapAttributes = [ 'smtpInDomain' ];
             last SWITCH;
         }
 

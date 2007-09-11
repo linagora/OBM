@@ -16,7 +16,7 @@ require OBM::Update::utils;
 require OBM::Ldap::ldapEngine;
 require OBM::Cyrus::cyrusEngine;
 require OBM::Cyrus::sieveEngine;
-require OBM::Postfix::postfixRemoteEngine;
+require OBM::Postfix::smtpInRemoteEngine;
 require OBM::Cyrus::cyrusRemoteEngine;
 require OBM::Entities::obmRoot;
 require OBM::Entities::obmDomainRoot;
@@ -108,6 +108,9 @@ sub new {
     if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} ) ) {
         return undef;
     }
+
+    # Parametrage des serveurs SMTP-in par domaine
+    &OBM::Update::utils::getSmtpInServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
 
     $updateAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $updateAttr{"domainList"} );
     if( !$updateAttr{"engine"}->{"cyrusEngine"}->init() ) {
@@ -1139,7 +1142,7 @@ sub _doRemoteConf {
     my $return = 1;
 
     # MAJ des map Postfix sur les serveurs entrant
-    my $updateMailSrv = OBM::Postfix::postfixRemoteEngine->new( $self->{"domainList"} );
+    my $updateMailSrv = OBM::Postfix::smtpInRemoteEngine->new( $self->{"domainList"} );
     if( $updateMailSrv->init() ) {
         $return = $updateMailSrv->update();
     }

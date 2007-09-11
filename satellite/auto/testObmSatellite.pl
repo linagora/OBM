@@ -14,13 +14,13 @@ sub getParameter {
     my( $parameters ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "postfixMap", "cyrusParitionsAdd", "cyrusParitionsDel", "help" );
+    &GetOptions( $parameters, "smtpInConf", "cyrusParitionsAdd", "cyrusParitionsDel", "help" );
 
     my $goodParams = 0;
     my $helpParam = 0;
     while( my( $paramName, $paramValue ) = each(%{$parameters}) ) {
         SWITCH: {
-            if( $paramName eq "postfixMap" ) {
+            if( $paramName eq "smtpInConf" ) {
                 &OBM::toolBox::write_log( "Mise a jour des tables Postfix", "W" );
                 $goodParams++;
                 last SWITCH;
@@ -49,7 +49,7 @@ sub getParameter {
     # Affichage de l'aide
     if( !$goodParams || $helpParam ) {
         print "Vous devez indiquer au moins un des paramètres suivants :\n";
-        print "\tpostfixMap: permet de régénérer les tables Postfix\n";
+        print "\tsmtpInConf: permet de régénérer les tables Postfix\n";
         print "\tcyrusParitionsAdd: permet d'ajouter les partitions Cyrus manquantes - Provoque un redémarrage du/des services Cyrus !\n";
         print "\tcyrusParitionsDel: permet de supprimer les partitions Cyrus non déclarées - Provoque un redémarrage du/des services Cyrus !\n\n";
         return 0;
@@ -141,9 +141,9 @@ while( my( $serverName, $serverIp ) = $queryResult->fetchrow_array() ) {
         my $cmd = undef;
 
         SWITCH: {
-            if( $paramName eq "postfixMap" ) {
+            if( $paramName eq "smtpInConf" ) {
                 &OBM::toolBox::write_log( "Mise a jour des tables Postfix", "W" );
-                $cmd = "postfixMaps: ".$serverName;
+                $cmd = "smtpInConf: ".$serverName;
                 last SWITCH;
             }
 
