@@ -131,8 +131,9 @@ sub getEntity {
     $self->{"hostDesc"}->{"host_domain"} = $domainDesc->{"domain_label"};
 
 
-    # Obtention des domaines pour lesquels cet hôte est serveur de courrier
-    $query = "SELECT i.domain_label from Domain i, MailServer j WHERE i.domain_mail_server_id=j.mailserver_id AND j.mailserver_host_id=".$hostId;
+    # Obtention des domaines pour lesquels cet hôte est serveur SMTP entrant
+    $query = "select distinct(i.domain_label) FROM Domain i, DomainMailServer j, MailServer k WHERE k.mailserver_host_id=".$self->{"hostDesc"}->{"host_id"}." AND k.mailserver_id=j.domainmailserver_mailserver_id AND j.domainmailserver_role='smtp-in' AND j.domainmailserver_domain_id=i.domain_id";
+#    $query = "SELECT i.domain_label from Domain i, MailServer j WHERE i.domain_mail_server_id=j.mailserver_id AND j.mailserver_host_id=".$hostId;
 
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
@@ -140,9 +141,21 @@ sub getEntity {
     }
 
     while( my( $obmDomain ) = $queryResult->fetchrow_array() ) {
-        push( @{$self->{"hostDesc"}->{"smtp_domain"}}, $obmDomain );
+        push( @{$self->{"hostDesc"}->{"smtp-in_domain"}}, $obmDomain );
     }
-    $self->{"hostDesc"}->{"cyrus_domain"} = $self->{"hostDesc"}->{"smtp_domain"};
+
+    # Obtention des domaines pour lesquels cet hôte est serveur de courrier
+    # IMAP
+    $query = "select distinct(i.domain_label) FROM Domain i, DomainMailServer j, MailServer k WHERE k.mailserver_host_id=".$self->{"hostDesc"}->{"host_id"}." AND k.mailserver_id=j.domainmailserver_mailserver_id AND j.domainmailserver_role='imap' AND j.domainmailserver_domain_id=i.domain_id";
+
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    while( my( $obmDomain ) = $queryResult->fetchrow_array() ) {
+        push( @{$self->{"hostDesc"}->{"cyrus_domain"}}, $obmDomain );
+    }
 
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
@@ -288,13 +301,13 @@ sub createLdapEntry {
         $ldapEntry->add( obmDomain => to_utf8({ -string => $entry->{"host_domain"}, -charset => $defaultCharSet }) );
     }
 
-    # Les domaines pour lesquels cet hôte est serveur SMTP
-    if( defined($entry->{"smtp_domain"}) && (ref($entry->{"smtp_domain"}) eq "ARRAY" ) ) {
-        for( my $i=0; $i<=$#{$entry->{"smtp_domain"}}; $i++ ) {
-            $entry->{"smtp_domain"}->[$i] = to_utf8({ -string => $entry->{"smtp_domain"}->[$i], -charset => $defaultCharSet });
+    # Les domaines pour lesquels cet hôte est serveur SMTP entrant
+    if( defined($entry->{"smtp-in_domain"}) && (ref($entry->{"smtp-in_domain"}) eq "ARRAY" ) ) {
+        for( my $i=0; $i<=$#{$entry->{"smtp-in_domain"}}; $i++ ) {
+            $entry->{"smtp-in_domain"}->[$i] = to_utf8({ -string => $entry->{"smtp-in_domain"}->[$i], -charset => $defaultCharSet });
         }
 
-        $ldapEntry->add( smtpDomain => $entry->{"smtp_domain"} );
+        $ldapEntry->add( smtpInDomain => $entry->{"smtp-in_domain"} );
     }
 
     # Les domaines pour lesquels cet hôte est serveur Cyrus
@@ -332,7 +345,7 @@ sub updateLdapEntry {
     }
 
     # Les domaines pour lesquels cet hôte est serveur SMTP
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"smtp_domain"}, $ldapEntry, "smtpDomain" ) ) {
+    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"smtp-in_domain"}, $ldapEntry, "smtpInDomain" ) ) {
         $update = 1;
     }
 

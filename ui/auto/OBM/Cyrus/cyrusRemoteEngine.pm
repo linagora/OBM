@@ -20,7 +20,7 @@ sub new {
     # Definition des attributs de l'objet
     my %cyrusRemoteEngineAttr = (
         domainList => undef,
-        incomingMailServerList => undef
+        cyrusMailServerList => undef
     );
 
 
@@ -64,7 +64,7 @@ sub init {
 
         my $domainSrvList = $currentDomainDesc->{"imap_servers"};
         for( my $j=0; $j<=$#$domainSrvList; $j++ ) {
-            $self->{"incomingMailServerList"}->{$domainSrvList->[$j]->{"imap_server_name"}} = $domainSrvList->[$j];
+            $self->{"cyrusMailServerList"}->{$domainSrvList->[$j]->{"imap_server_name"}} = $domainSrvList->[$j];
         }
     }
 
@@ -97,7 +97,7 @@ sub dump {
 sub update {
     my $self = shift;
     my( $action ) = @_;
-    my $srvList = $self->{"incomingMailServerList"};
+    my $srvList = $self->{"cyrusMailServerList"};
     my $globalReturn = 1;
 
     if( !defined($action) || ( $action !~ /^add|del$/ ) ) {

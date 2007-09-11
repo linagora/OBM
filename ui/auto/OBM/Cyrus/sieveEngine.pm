@@ -351,14 +351,14 @@ sub update {
 
     # Si cette entité n'a pas d'interaction avec Sieve
     if( !$object->getMailboxSieve() ) {
-        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de support SIEVE pour les objets de type '".$object->{"type"}."'", 'W' );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de compte SIEVE definit pour l'objet de type '".$object->{"type"}."'", 'W' );
         return 1;
     }
 
     # Récupération du nom de la boîte à traiter
     my $mailBoxName = $object->getMailboxName();
     if( !defined($mailBoxName) ) {
-        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de support SIEVE pour les objets de type '".$object->{"type"}."'", 'W' );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de support SIEVE pour l'objet de type '".$object->{"type"}."'", 'W' );
         return 1;
     }
 

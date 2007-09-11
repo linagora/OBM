@@ -71,11 +71,11 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.12
     SUBSTR caseIgnoreIA5SubstringsMatch
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
 
-# Attribut : smtpDomain
+# Attribut : smtpInDomain
 # Les domaines OBM pour lesquels on est serveur SMTP.
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.14
-    NAME 'smtpDomain'
-    DESC 'SMTP server for the OBM domain'
+    NAME 'smtpInDomain'
+    DESC 'SMTP-in server for the OBM domain'
     EQUALITY caseIgnoreMatch
     SUBSTR caseIgnoreSubstringsMatch
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
@@ -133,7 +133,7 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.7
     DESC 'OBM special hosts description'
     SUP top AUXILIARY
     MUST cn
-    MAY ( smtpDomain $ cyrusDomain $ obmDomain ) )
+    MAY ( smtpInDomain $ cyrusDomain $ obmDomain ) )
 
 # Permet de stocker la liste des domaines locaux. plusieurs attributs
 # 'myDestination' sont possibles
