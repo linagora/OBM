@@ -42,7 +42,7 @@ sub init {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "postfixRemoteEngine: initialisation du moteur", "W" );
+    &OBM::toolBox::write_log( "[Postfix::postfixRemoteEngine]: initialisation du moteur", "W" );
 
     # Obtention de la liste des serveurs entrant à mettre à jour
     for( my $i=0; $i<=$#$domainsDesc; $i++ ) {
@@ -69,7 +69,7 @@ sub init {
 sub destroy {
     my $self = shift;
 
-    &OBM::toolBox::write_log( "postfixRemoteEngine: arret du moteur", "W" );
+    &OBM::toolBox::write_log( "[Postfix::postfixRemoteEngine]: arret du moteur", "W" );
 
     return 1;
 }
@@ -93,8 +93,13 @@ sub update {
     my $srvList = $self->{"incomingMailServerList"};
     my $globalReturn = 1;
 
+    if( !defined($srvList) ) {
+        &OBM::toolBox::write_log( "[Postfix::postfixRemoteEngine]: pas de serveur SMTP sortant a configurer", "W" );
+        return 1;
+    }
+
     while( my( $serverName, $serverDesc ) = each(%{$srvList}) ) {
-        &OBM::toolBox::write_log( "postfixRemoteEngine: connexion au serveur : '".$serverName."'", "W" );
+        &OBM::toolBox::write_log( "[Postfix::postfixRemoteEngine]: connexion au serveur : '".$serverName."'", "W" );
         my $srvCon = new Net::Telnet(
             Host => $serverDesc->{"imap_server_ip"},
             Port => 30000,
@@ -103,29 +108,29 @@ sub update {
         );
 
         if( !defined($srvCon) || !$srvCon->open() ) {
-            &OBM::toolBox::write_log( "postfixRemoteEngine: echec de connexion au serveur : ".$serverName, "W" );
+            &OBM::toolBox::write_log( "[Postfix::postfixRemoteEngine]: echec de connexion au serveur : ".$serverName, "W" );
             $globalReturn = 0;
             next;
         }
 
         while( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 1)) ) {
             chomp($line);
-            &OBM::toolBox::write_log( "postfixRemoteEngine: reponse : '".$line."'", "W" );
+            &OBM::toolBox::write_log( "[Postfix::postfixRemoteEngine]: reponse : '".$line."'", "W" );
         }
 
         my $cmd = "postfixMaps: ".$serverName;
-        &OBM::toolBox::write_log( "postfixRemoteEngine: envoie de la commande : '".$cmd."'", "W" );
+        &OBM::toolBox::write_log( "[Postfix::postfixRemoteEngine]: envoie de la commande : '".$cmd."'", "W" );
         $srvCon->print( $cmd );
         if( (!$srvCon->eof()) && (my $line = $srvCon->getline()) ) {
             chomp($line);
-            &OBM::toolBox::write_log( "postfixRemoteEngine: reponse : '".$line."'", "W" );
+            &OBM::toolBox::write_log( "[Postfix::postfixRemoteEngine]: reponse : '".$line."'", "W" );
         }
 
-        &OBM::toolBox::write_log( "postfixRemoteEngine: deconnexion du serveur : '".$serverName."'", "W" );
+        &OBM::toolBox::write_log( "[Postfix::postfixRemoteEngine]: deconnexion du serveur : '".$serverName."'", "W" );
         $srvCon->print( "quit" );
         while( !$srvCon->eof() && (my $line = $srvCon->getline(Timeout => 1)) ) {
             chomp($line);
-            &OBM::toolBox::write_log( "postfixRemoteEngine: reponse : '".$line."'", "W" );
+            &OBM::toolBox::write_log( "[Postfix::postfixRemoteEngine]: reponse : '".$line."'", "W" );
         }
 
     }

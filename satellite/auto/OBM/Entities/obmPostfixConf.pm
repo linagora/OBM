@@ -54,12 +54,12 @@ sub getEntity {
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "obmPostfixConf: connecteur a la base de donnee invalide", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmPostfixConf]: connecteur a la base de donnee invalide", "W" );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "obmPostfixConf: description de domaine OBM incorrecte", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmPostfixConf]: description de domaine OBM incorrecte", "W" );
         return 0;
 
     }else {
@@ -68,7 +68,7 @@ sub getEntity {
     }
 
 
-    &OBM::toolBox::write_log( "obmPostfixConf: gestion de la configuration de postfix, domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    &OBM::toolBox::write_log( "[Entities::obmPostfixConf]: gestion de la configuration de postfix, domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     $self->{"postfixConf"}->{"postfixconf_name"} = $domainDesc->{"domain_label"};
     $self->{"postfixConf"}->{"postfixconf_domain"} = $domainDesc->{"domain_label"};

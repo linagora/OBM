@@ -42,7 +42,7 @@ sub new {
         croak( "Usage: PACKAGE->new(LINKS, DELETED, USERID)" );
 
     }elsif( $userId !~ /^\d+$/ ) {
-        &OBM::toolBox::write_log( "obmUser: identifiant d'utilisateur incorrect", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: identifiant d'utilisateur incorrect", "W" );
         return undef;
 
     }else {
@@ -70,12 +70,12 @@ sub getEntity {
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "obmUser: connecteur a la base de donnee invalide", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: connecteur a la base de donnee invalide", "W" );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "obmUser: description de domaine OBM incorrecte", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: description de domaine OBM incorrecte", "W" );
         return 0;
 
     }else {
@@ -96,7 +96,7 @@ sub getEntity {
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -104,10 +104,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "obmUser: pas d'utilisateur d'identifiant : ".$userId, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: pas d'utilisateur d'identifiant : ".$userId, "W" );
         return 0;
     }elsif( $numRows > 1 ) {
-        &OBM::toolBox::write_log( "obmUser: plusieurs utilisateurs d'identifiant : ".$userId." ???", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: plusieurs utilisateurs d'identifiant : ".$userId." ???", "W" );
         return 0;
     }
 
@@ -117,7 +117,7 @@ sub getEntity {
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -133,13 +133,13 @@ sub getEntity {
 
     # Action effectuee
     if( $self->getDelete() ) {
-        &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur supprime '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: chargement de l'utilisateur supprime '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
         
     }elsif( $dbUserDesc->{"userobm_archive"} ) {
-        &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur archive '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: chargement de l'utilisateur archive '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     }else {
-        &OBM::toolBox::write_log( "obmUser: gestion de l'utilisateur '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: chargement de l'utilisateur '".$dbUserDesc->{"userobm_login"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     }
 
@@ -201,12 +201,18 @@ sub getEntity {
     }
 
     # Gestions des e-mails de l'utilisateur.
-    my @email = split( /\r\n/, $dbUserDesc->{"userobm_email"} );
-    for( my $j=0; $j<=$#email; $j++ ) {
-        push( @{$self->{"userDesc"}->{"user_email"}}, $email[$j]."@".$domainDesc->{"domain_name"} );
+    if( !defined($dbUserDesc->{"userobm_email"}) || ( $dbUserDesc->{"userobm_email"} eq "" ) ) {
+        &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' annule - Pas d'adresse mail indiquée !", "W" );
+        $dbUserDesc->{"userobm_mail_perms"} = 0;
 
-        for( my $k=0; $k<=$#{$domainDesc->{"domain_alias"}}; $k++ ) {
-            push( @{$self->{"userDesc"}->{"user_email_alias"}}, $email[$j]."@".$domainDesc->{"domain_alias"}->[$k] );
+    }else {
+        my @email = split( /\r\n/, $dbUserDesc->{"userobm_email"} );
+        for( my $j=0; $j<=$#email; $j++ ) {
+            push( @{$self->{"userDesc"}->{"user_email"}}, $email[$j]."@".$domainDesc->{"domain_name"} );
+
+            for( my $k=0; $k<=$#{$domainDesc->{"domain_alias"}}; $k++ ) {
+                push( @{$self->{"userDesc"}->{"user_email_alias"}}, $email[$j]."@".$domainDesc->{"domain_alias"}->[$k] );
+            }
         }
     }
 
@@ -215,7 +221,7 @@ sub getEntity {
         my $localServerIp = $self->getHostIpById( $dbHandler, $dbUserDesc->{"mailserver_host_id"} );
 
         if( !defined($localServerIp) ) {
-            &OBM::toolBox::write_log( "obmUser: droit mail de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' annule - Serveur inconnu !", "W" );
+            &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' annule - Serveur inconnu !", "W" );
 
             # On invalide le droit mail
             $self->{"userDesc"}->{"user_mailperms"} = 0;
@@ -230,14 +236,16 @@ sub getEntity {
 
             # Gestion de la BAL destination
             $self->{"userDesc"}->{"user_mailbox"} = $self->{"userDesc"}->{"user_login"};
-            if( !$singleSpaceName ) {
+            if( !$singleNameSpace ) {
                 $self->{"userDesc"}->{"user_mailbox"} .= "@".$domainDesc->{"domain_name"};
             }
 
             # Partition Cyrus associée à cette BAL
-            $self->{"userDesc"}->{"user_mailbox_partition"} = $domainDesc->{"domain_dn"};
-            $self->{"userDesc"}->{"user_mailbox_partition"} =~ s/\./_/g;
-            $self->{"userDesc"}->{"user_mailbox_partition"} =~ s/-/_/g;
+            if( $OBM::Parameters::common::cyrusDomainPartition ) {
+                $self->{"userDesc"}->{"user_mailbox_partition"} = $domainDesc->{"domain_dn"};
+                $self->{"userDesc"}->{"user_mailbox_partition"} =~ s/\./_/g;
+                $self->{"userDesc"}->{"user_mailbox_partition"} =~ s/-/_/g;
+            }
 
             # Gestion du serveur de mail
             $self->{"userDesc"}->{"user_mailbox_server"} = $dbUserDesc->{"mailserver_host_id"};
@@ -292,20 +300,20 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "obmUser: MAJ de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "[Entities::obmUser]: MAJ de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "DELETE FROM P_UserObm WHERE userobm_id=".$self->{"userId"};
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
     # Obtention des noms de colonnes de la table
     $query = "SELECT * FROM P_UserObm WHERE 0=1";
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
     my $columnList = $queryResult->{NAME};
@@ -323,7 +331,7 @@ sub updateDbEntity {
     }
 
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -333,7 +341,7 @@ sub updateDbEntity {
         $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"userId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -342,7 +350,7 @@ sub updateDbEntity {
         $query = "SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"userId"};
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
             return 0;
         }
 
@@ -362,7 +370,7 @@ sub updateDbEntity {
 
             my $queryResult2;
             if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-                &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+                &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
                 return 0;
             }
         }
@@ -783,21 +791,15 @@ sub updateLdapEntry {
 }
 
 
-sub getMailServerRef {
+sub getMailServerId {
     my $self = shift;
-    my( $domainId, $mailServerId ) = @_;
+    my $mailServerId = undef;
 
     if( $self->{"userDesc"}->{"user_mailperms"} ) {
-        $$domainId = $self->{"domainId"};
-        $$mailServerId = $self->{"userDesc"}->{"user_mailbox_server"};
-
-    }else {
-        $$domainId = undef;
-        $$mailServerId = undef;
-
+        $mailServerId = $self->{"userDesc"}->{"user_mailbox_server"};
     }
 
-    return 1;
+    return $mailServerId;
 }
 
 
@@ -950,13 +952,13 @@ sub getHostIpById {
     my( $dbHandler, $hostId ) = @_;
 
     if( !defined($hostId) ) {
-        &OBM::toolBox::write_log( "obmUser: identifiant de l'hote non défini !", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: identifiant de l'hote non défini !", "W" );
         return undef;
     }elsif( $hostId !~ /^[0-9]+$/ ) {
-        &OBM::toolBox::write_log( "obmUser: identifiant de l'hote '".$hostId."' incorrect !", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: identifiant de l'hote '".$hostId."' incorrect !", "W" );
         return undef;
     }elsif( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "obmUser: connection à la base de donnee incorrect !", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: connection à la base de donnee incorrect !", "W" );
         return undef;
     }
 
@@ -971,7 +973,7 @@ sub getHostIpById {
     # On execute la requete
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution de la requete.", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution de la requete.", "W" );
         if( defined($queryResult) ) {
             &ONM::toolBox::write_log( $queryResult->err, "W" );
         }
@@ -980,7 +982,7 @@ sub getHostIpById {
     }
 
     if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
-        &OBM::toolBox::write_log( "obmUser: identifiant de l'hote '".$hostId."' inconnu !", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: identifiant de l'hote '".$hostId."' inconnu !", "W" );
 
         $queryResult->finish;
         return undef;

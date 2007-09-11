@@ -51,7 +51,7 @@ sub init {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "cyrusEngine: initialisation du moteur", "W" );
+    &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: initialisation du moteur", "W" );
 
     # Etablissement des connexions
     $self->_cyrusSrvsConn( 1 );
@@ -63,7 +63,7 @@ sub init {
 sub destroy {
     my $self = shift;
 
-    &OBM::toolBox::write_log( "cyrusEngine: arret du moteur", "W" );
+    &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: arret du moteur", "W" );
 
     return $self->_cyrusSrvsConn( 0 );
 }
@@ -103,7 +103,7 @@ sub _cyrusSrvsConn {
             next;
         }
 
-        &OBM::toolBox::write_log( "cyrusEngine: gestion des serveurs IMAP du domaine '".$currentDomainDesc->{"domain_name"}."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: gestion des serveurs IMAP du domaine '".$currentDomainDesc->{"domain_name"}."'", "W" );
         for( my $j=0; $j<=$#$domainSrvList; $j++ ) {
             if( $connect ) {
                 $self->_connectCyrusSrv( $domainSrvList->[$j] );
@@ -129,21 +129,21 @@ sub _connectCyrusSrv {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "cyrusEngine: connexion au serveur IMAP '".$srvDesc->{"imap_server_name"}."' en tant que '".$srvDesc->{"imap_server_login"}."'", "W" );
+    &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: connexion au serveur IMAP '".$srvDesc->{"imap_server_name"}."' en tant que '".$srvDesc->{"imap_server_login"}."'", "W" );
 
     $srvDesc->{"imap_server_conn"} = Cyrus::IMAP::Admin->new($srvDesc->{"imap_server_ip"});
 
     if( !defined( $srvDesc->{"imap_server_conn"} ) ) {
-        &OBM::toolBox::write_log( "cyrusEngine: probleme lors de la connexion au serveur IMAP", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: probleme lors de la connexion au serveur IMAP", "W" );
         $self->_disconnectCyrusSrv( $srvDesc );
         return 0;
 
     }else {
         if( $srvDesc->{"imap_server_conn"}->authenticate( -user=>$srvDesc->{"imap_server_login"}, -password=>$srvDesc->{"imap_server_passwd"}, -mechanism=>"login" ) ) {
-            &OBM::toolBox::write_log( "cyrusEngine: connexion au serveur IMAP etablie", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: connexion au serveur IMAP etablie", "W" );
 
         }else {
-            &OBM::toolBox::write_log( "cyrusEngine: echec de connexion au serveur IMAP", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec de connexion au serveur IMAP", "W" );
             $self->_disconnectCyrusSrv( $srvDesc );
             return 0;
 
@@ -159,7 +159,7 @@ sub _disconnectCyrusSrv {
     my( $srvDesc ) = @_;
 
     if( defined($srvDesc->{"imap_server_conn"}) ) {
-        &OBM::toolBox::write_log( "cyrusEngine: deconnexion du serveur '".$srvDesc->{"imap_server_name"}."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: deconnexion du serveur '".$srvDesc->{"imap_server_name"}."'", "W" );
         undef $srvDesc->{"imap_server_conn"};
     }
 
@@ -234,35 +234,39 @@ sub _doWork {
     my %srvBalDesc;
     my $isExist = $self->isMailboxExist( $cyrusSrv, $object, \%srvBalDesc );
     if( !defined($isExist) ) {
-        &OBM::toolBox::write_log( "cyrusEngine: probleme lors de l'obtention des informations de la boite sur le serveur", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: probleme lors de l'obtention des informations de la boite sur le serveur", "W" );
         return 0;
 
     }elsif( $isExist && $object->getDelete() ) {
         # On la supprime
         if( $self->_deleteBox( $cyrusSrv, $object ) ) {
-            &OBM::toolBox::write_log( "cyrusEngine: suppression de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: suppression de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
         }else {
-            &OBM::toolBox::write_log( "cyrusEngine: echec lors de la suppression de la boite", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec lors de la suppression de la boite", "W" );
         }
 
     }elsif( $isExist && !$object->getDelete() ) {  
         # On met à jour
         if( $self->_updateBox( $cyrusSrv, $object ) ) {
-            &OBM::toolBox::write_log( "cyrusEngine: MAJ de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: MAJ de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
         }else {
-            &OBM::toolBox::write_log( "cyrusEngine: echec lors de la MAJ de la boite", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec lors de la MAJ de la boite", "W" );
         }
 
     }elsif( !$isExist && !$object->getDelete() ) {
         # On la cré
         if( $self->_createMailbox( $cyrusSrv, $object ) ) {
-            &OBM::toolBox::write_log( "cyrusEngine: creation de la boite '".$object->getMailboxName()."' sur la partition Cyrus '".$object->getMailboxPartition()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+            if( !defined( $object->getMailboxPartition() ) ) {
+                &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: creation de la boite '".$object->getMailboxName()."' sur la partition par defaut de Cyrus, du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+            }else {
+                &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: creation de la boite '".$object->getMailboxName()."' sur la partition Cyrus '".$object->getMailboxPartition()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+            }
+
         }else {
-            &OBM::toolBox::write_log( "cyrusEngine: echec lors de la creation de la boite", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec lors de la creation de la boite", "W" );
         }
 
     }
-
 
     return 1;
 }
@@ -273,32 +277,48 @@ sub update {
     my( $object ) = @_;
 
     if( !defined($object) ) {
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: mise a jour d'un objet non definit - Operation annulee !", "W" );
+        return 0;
+    }elsif( !defined($object->{"type"}) ) {
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: mise a jour d'un objet de type non définit - Operation annulee !", "W" );
+        return 0;
+    }elsif( !defined($object->{"domainId"}) ) {
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: mise a jour d'un objet de domaine non definit - Operation annulee !", "W" );
         return 0;
     }
 
     # Récupération du nom de la boîte à traiter
     my $mailBoxName = $object->getMailboxName();
     if( !defined($mailBoxName) ) {
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: pas de support IMAP pour les objets de type '".$object->{"type"}."'", "W" );
         return 1;
     }
 
-    # Récupération des identifiants du serveur de la boîte à traiter
-    my $mailBoxDomainId;
-    my $mailBoxServerId;
-    $object->getMailServerRef( \$mailBoxDomainId, \$mailBoxServerId );
-
     # Récupération de la description du serveur de la boîte à traiter
-    my $cyrusSrv = $self->_findCyrusSrvbyId( $mailBoxDomainId, $mailBoxServerId );
+    my $mailserverId = $object->getMailServerId();
+    if( !defined($mailserverId) ) {
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: serveur de courrier IMAP non definit - Operation annulee", "W" );
+        return 0;
+    }
+
+    my $cyrusSrv = $self->_findCyrusSrvbyId( $object->{"domainId"}, $mailserverId );
     if( !defined($cyrusSrv) ) {
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: serveur de courrier IMAP d'identifiant '".$mailserverId."' inconnu - Operation annulee !", "W" );
         return 0;
     }
 
     # Est-on connecté à ce serveur
     if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: probleme de connexion avec le serveur de courrier IMAP d'identifiant '".$mailBoxName."' - Operation annulee !", "W" );
         return 0;
     }
 
-    return $self->_doWork( $cyrusSrv, $object );
+    if( !$self->_doWork( $cyrusSrv, $object ) ) {
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: probleme de traitement de l'objet de type '".$object->{"type"}."' - Operation annulee !", "W" );
+        return 0;
+    }
+
+    return 1;
 }
 
 

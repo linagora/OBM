@@ -523,7 +523,7 @@ sub getEntityRight {
 
         while( my( $userId, $userLogin ) = $queryResult->fetchrow_array ) {
             if( defined($domain->{"domain_name"}) ) {
-                if( !$singleSpaceName ) {
+                if( !$singleNameSpace ) {
                     $userLogin .= "@".$domain->{"domain_name"};
                 }
             }

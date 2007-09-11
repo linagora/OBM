@@ -239,9 +239,10 @@ sub process_request {
                 if( $currentRequest =~ /^postfixMaps: ([A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9])$/i ) {
                     my $hostName = $1;
 
-                    my $domainList = $self->getServerDomains( "smtp", $hostName );
+                    my $domainList = $self->getServerDomains( "smtp-in", $hostName );
                     if( !defined($domainList) || ( ref($domainList) ne "ARRAY" ) ) {
-                        $self->logMessage( "L'hote '".$hostName."' n'est serveur SMTP d'aucun domaine" );
+                        $self->logMessage( "L'hote '".$hostName."' n'est serveur SMTP entrant d'aucun domaine" );
+                        $self->sendMessage( "ERROR", $hostName." n'est pas un serveur SMTP entrant" );
                     }else {
                         $self->processPostfixDomains( $domainList );
                     }
@@ -251,9 +252,10 @@ sub process_request {
                     my $action = $1;
                     my $hostName = $2;
 
-                    my $domainList = $self->getServerDomains( "cyrus", $hostName );
+                    my $domainList = $self->getServerDomains( "imap", $hostName );
                     if( !defined($domainList) || ( ref($domainList) ne "ARRAY" ) ) {
-                        $self->logMessage( "L'hote '".$hostName."' n'est serveur Cyrus d'aucun domaine" );
+                        $self->logMessage( "L'hote '".$hostName."' n'est serveur IMAP d'aucun domaine" );
+                        $self->sendMessage( "ERROR", $hostName." n'est pas un serveur IMAP" );
                     }else {
                         $self->processCyrusPartitions( $action, $domainList );
                     }
@@ -414,14 +416,14 @@ sub getServerDomains {
     my $ldapAttributes;
 
     SWITCH: {
-        if( $type =~ /^smtp$/ ) {
-            $self->logMessage( "Obtention des serveurs de type SMTP de l'hote '".$hostName."'" );
+        if( $type =~ /^smtp-in$/ ) {
+            $self->logMessage( "Obtention des domaines du serveur '".$hostName."' de type SMTP-in" );
             $ldapAttributes = [ 'smtpDomain' ];
             last SWITCH;
         }
 
-        if( $type =~ /^cyrus$/ ) {
-            $self->logMessage( "Obtention des serveurs de type Cyrus de l'hote '".$hostName."'" );
+        if( $type =~ /^imap$/ ) {
+            $self->logMessage( "Obtention des domaines du serveur '".$hostName."' de type IMAP" );
             $ldapAttributes = [ 'cyrusDomain' ];
             last SWITCH;
         }

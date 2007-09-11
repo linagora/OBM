@@ -154,7 +154,7 @@ sub update {
     my $return = 1;
 
     if( $self->{"global"} ) {
-        $return = $self->_doAll();
+        $return = $self->_doGlobal();
     }else {
         $return = $self->_doIncremental();
     }
@@ -171,7 +171,7 @@ sub update {
 }
 
 
-sub _doAll {
+sub _doGlobal {
     my $self = shift;
     my $queryResult;
     my $globalReturn = 1;
@@ -214,7 +214,7 @@ sub _doAll {
         }
     }
 
-    # Pour tous domaines, sauf le metadomaine
+    # Pour tous les domaines, sauf le metadomaine
     if( $self->{"domain"} != 0 ) {
         # Mise a jour des partitions Cyrus
         my $updateMailSrv = OBM::Cyrus::cyrusRemoteEngine->new( $self->{"domainList"} );
@@ -233,6 +233,7 @@ sub _doAll {
 
     # Si on a déjà rencontré une erreur, on s'arrête
     if( !$globalReturn ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de la mise a jour des partitions Cyrus du domaine '".$self->{"domain"}."' - Operation annulee !", "W" );
         return $globalReturn;
     }
 

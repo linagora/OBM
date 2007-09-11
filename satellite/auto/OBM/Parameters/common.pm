@@ -15,7 +15,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($facility_log $sieveSrv $singleSpaceName $ldapServer $ldapRoot $sambaSrvHome $sambaOldSidMapping $obmModules $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($facility_log $sieveSrv $singleNameSpace $ldapServer $ldapRoot $sambaSrvHome $sambaOldSidMapping $cyrusDomainPartition $obmModules $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_files = qw($automateMailChangeAlias $automateMailChangeSieve $automateCyrusAdmin $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixUpdate);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
@@ -55,9 +55,9 @@ $db = "dbi:".lc( $cfgFile->val( 'global', 'dbtype' )).":database=$dbName;host=".
 
 # Mode d'espace de nom OBM
 if( lc($cfgFile->val( 'global', 'singleNameSpace' )) eq "true" ) {
-    $singleSpaceName = 1;
+    $singleNameSpace = 1;
 }else{
-    $singleSpaceName = 0;
+    $singleNameSpace = 0;
 }
 
 # Le serveur LDAP
@@ -75,6 +75,13 @@ if( lc($cfgFile->val( 'automate', 'oldSidMapping' )) eq "true" ) {
     $sambaOldSidMapping = 1;
 }else {
     $sambaOldSidMapping = 0;
+}
+
+# Gestion d'une partition cyrus par domaine
+if( lc($cfgFile->val( 'automate', 'cyrusParition' )) eq "true" ) {
+    $cyrusDomainPartition = 1;
+}else {
+    $cyrusDomainPartition = 0;
 }
 
 # Les modules OBM actifs

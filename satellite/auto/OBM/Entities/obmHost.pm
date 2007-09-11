@@ -38,7 +38,7 @@ sub new {
         croak( "Usage: PACKAGE->new(LINKS, DELETED, HOSTID)" );
 
     }elsif( $hostId !~ /^\d+$/ ) {
-        &OBM::toolBox::write_log( "obmHost: identifiant d'hote incorrect", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: identifiant d'hote incorrect", "W" );
         return undef;
     }else {
         $obmHostAttr{"hostId"} = $hostId;
@@ -63,12 +63,12 @@ sub getEntity {
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "obmHost: connecteur a la base de donnee invalide", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: connecteur a la base de donnee invalide", "W" );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "obmHost: description de domaine OBM incorrecte", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: description de domaine OBM incorrecte", "W" );
         return 0;
 
     }else {
@@ -87,7 +87,7 @@ sub getEntity {
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmHost: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -95,10 +95,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "obmHost: pas d'hote d'identifiant : ".$hostId, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: pas d'hote d'identifiant : ".$hostId, "W" );
         return 0;
     }elsif( $numRows > 1 ) {
-        &OBM::toolBox::write_log( "obmHost: plusieurs hotes d'identifiant : ".$hostId." ???", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: plusieurs hotes d'identifiant : ".$hostId." ???", "W" );
         return 0;
     }
 
@@ -107,7 +107,7 @@ sub getEntity {
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmHost: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -120,9 +120,9 @@ sub getEntity {
 
     # Action effectuee
     if( $self->getDelete() ) {
-        &OBM::toolBox::write_log( "obmHost: gestion de l'hote supprime '".$dbHostDesc->{"host_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: gestion de l'hote supprime '".$dbHostDesc->{"host_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
     }else {
-        &OBM::toolBox::write_log( "obmHost: gestion de l'hote '".$dbHostDesc->{"host_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: gestion de l'hote '".$dbHostDesc->{"host_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
     }
 
     # On stocke les informations utiles dans la structure de donnees des
@@ -135,7 +135,7 @@ sub getEntity {
     $query = "SELECT i.domain_label from Domain i, MailServer j WHERE i.domain_mail_server_id=j.mailserver_id AND j.mailserver_host_id=".$hostId;
 
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmHost: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -168,20 +168,20 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "obmHost: MAJ de l'hote '".$dbHostDesc->{"host_name"}."' dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "[Entities::obmHost]: MAJ de l'hote '".$dbHostDesc->{"host_name"}."' dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "DELETE FROM P_Host WHERE host_id=".$self->{"hostId"};
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmHost: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
     # Obtention des noms de colonnes de la table
     $query = "SELECT * FROM P_Host WHERE 0=1";
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmHost: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
     my $columnList = $queryResult->{NAME};
