@@ -33,6 +33,7 @@ function run_query_contact_search($contact) {
   $town = sql_search_text_parse($contact["town"]);
   $ctry = $contact["country"];
   $dsrc = $contact["datasource"];
+  $date_field = ($contact['date_field'] ? $contact['date_field'] : 'timeupdate');
   $dateafter = of_isodate_convert($contact["date_after"],true);
   $datebefore = of_isodate_convert($contact["date_before"],true);
   $mailing_ok_only = $contact["mailing_ok_only"];
@@ -44,6 +45,7 @@ function run_query_contact_search($contact) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
+  $date = sql_date_format($db_type, "contact_date", "contact_date");
   $multidomain = sql_multidomain("contact");
 
   // only the one which are allowed (ie. publics )
@@ -166,14 +168,11 @@ function run_query_contact_search($contact) {
   if (($dsrc != $c_all) && ($dsrc != "")) { 
     $where .= " AND contact_datasource_id='$dsrc'";
   }
-  // Date
-  $date = sql_date_format($db_type, "contact_date", "contact_date");
-
   if ($dateafter != "") {
-    $where .= " AND contact_date > '$dateafter'";
+    $where .= " AND contact_$date_field > '$dateafter'";
   }
   if ($datebefore != "") {
-    $where .= " AND contact_date < '$datebefore'";
+    $where .= " AND contact_$date_field < '$datebefore'";
   }
   // Get all by default 
   if ($mailing_ok_only == "1") {

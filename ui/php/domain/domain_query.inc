@@ -12,27 +12,27 @@
 // Parameters:
 //   - $domain[] : domain search criteria
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_domain_search($domain, $restriction="") {
+function run_query_domain_search($domain, $restriction='') {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $sql_order_dir = $domain["sql_order_dir"];
-  $sql_order_field = $domain["sql_order_field"];
-  $text = sql_search_text_parse($incident["text"]);
+  $sql_order_dir = $domain['sql_order_dir'];
+  $sql_order_field = $domain['sql_order_field'];
+  $text = sql_search_text_parse($incident['text']);
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   
-  $where = "";
+  $where = '';
 
   // If a login indication has been specified, get it
-  if (trim($text) != "") {
+  if (trim($text) != '') {
      $where .= " domain_label $like '$text%'
        OR domain_description like '$text%'";
   }
 
-  if ((trim($where) != "") || (trim($where_restriction) != "")) {
+  if ((trim($where) != '') || (trim($where_restriction) != '')) {
     $whereq = " WHERE $where $where_restriction";
   }
 
@@ -42,7 +42,7 @@ function run_query_domain_search($domain, $restriction="") {
 
 
   // ORDER construction
-  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "domain_label";
+  $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'domain_label';
   $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "$select
@@ -56,7 +56,7 @@ function run_query_domain_search($domain, $restriction="") {
   }
 
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "run_query_domain_search()");
+    display_debug_msg($query, $cdg_sql, 'run_query_domain_search()');
     $obm_q->query($query);
   }
 
@@ -82,7 +82,7 @@ function run_query_domain_detail($p_id) {
     LEFT JOIN Host ON host_id = mailserver_host_id
     WHERE domain_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_domain_detail()");
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -100,12 +100,12 @@ function run_query_domain_detail($p_id) {
 function run_query_domain_insert($domain) {
   global $uid, $cdg_sql, $c_cr;
   
-  $now = date("Y-m-d H:i:s");
-  $label = $domain["label"];
-  $desc = $domain["desc"];
-  $domain_name = $domain["domain_name"];
-  $alias = $domain["alias"];
-  $mail_server = $domain["mail_server"];
+  $now = date('Y-m-d H:i:s');
+  $label = $domain['label'];
+  $desc = $domain['desc'];
+  $domain_name = $domain['domain_name'];
+  $alias = $domain['alias'];
+  $mail_server = $domain['mail_server'];
 
   $query = "INSERT INTO Domain (
     domain_timeupdate,
@@ -128,7 +128,7 @@ function run_query_domain_insert($domain) {
     '$mail_server',
     '$alias')";
     
-  display_debug_msg($query, $cdg_sql, "run_query_domain_insert(1)");
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_insert(1)');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -138,11 +138,11 @@ function run_query_domain_insert($domain) {
     FROM Domain
     WHERE domain_label = '$label'";
   
-    display_debug_msg($query, $cdg_sql, "run_query_domain_detail(2)");
+    display_debug_msg($query, $cdg_sql, 'run_query_domain_detail(2)');
     
     $obm_q->query($query);
     $obm_q->next_record();
-    $id = $obm_q->f("id");
+    $id = $obm_q->f('id');
     run_query_domain_replace_properties($id,$domain);
   } else {
     $id = false;
@@ -163,7 +163,7 @@ function run_query_domain_replace_properties($domain_id,$domain) {
   global $cdg_sql;
 
   $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id = '$domain_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_domain_replace_properties()");
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_replace_properties()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -211,7 +211,7 @@ function run_query_domain_update($d_id, $domain) {
     domain_alias='$alias'
   WHERE domain_id='$d_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_domain_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   run_query_domain_replace_properties($d_id,$domain);
@@ -231,11 +231,11 @@ function run_query_domain_delete($p_id) {
   $obm_q = new DB_OBM;
 
   $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_domain_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_delete()');
   $retour = $obm_q->query($query);
 
   $query = "DELETE FROM Domain WHERE domain_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_domain_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_delete()');
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -252,11 +252,11 @@ function run_query_domain_delete($p_id) {
 function check_domain_data_form($d_id, $domain) {
   global $err, $l_label_error;
 
-  $label = $domain["label"];
+  $label = $domain['label'];
 
   // MANDATORY: Label
-  if (trim($label) == "") {
-    $err["msg"] = $l_label_error." : ". $label;
+  if (trim($label) == '') {
+    $err['msg'] = $l_label_error.' : '. $label;
     return false;
   }
   
@@ -282,7 +282,7 @@ function check_domain_can_delete($p_id) {
   $nb = get_linked_user_domain($p_id);
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] .= "$l_link_user";
+    $err['msg'] .= "$l_link_user";
   } else {
     $ok_msg .= "$l_link_user_no";
   }
@@ -306,6 +306,8 @@ function get_linked_user_domain($domain_id) {
 
   return $nb;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get a domain properties
 // Parameters:
@@ -313,24 +315,75 @@ function get_linked_user_domain($domain_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_properties($domain_id=0) {
   global $cdg_sql;
-  if($domain_id != 0) {
-    $val = "domainpropertyvalue_value,";
-    $join = " LEFT JOIN DomainPropertyValue ON domainproperty_key = domainpropertyvalue_property_key
-              AND domainpropertyvalue_domain_id = '$domain_id'";
+
+  if ($domain_id != 0) {
+    $val = 'domainpropertyvalue_value,';
+    $join = " LEFT JOIN DomainPropertyValue
+                ON domainproperty_key = domainpropertyvalue_property_key
+                  AND domainpropertyvalue_domain_id = '$domain_id'";
   }
   $query = "SELECT 
-    $val
-    domainproperty_key,
-    domainproperty_type
+      $val
+      domainproperty_key,
+      domainproperty_type
     FROM DomainProperty $join
     WHERE domainproperty_readonly = 0";
   
-  display_debug_msg($query, $cdg_sql, "run_query_domain_properties()");
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_properties()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;
 
+}
+
+
+/**
+ * Get one domain mailservers
+ *
+ * @param mixed $domain_id : domain_id
+ * @return mailserver array
+ **/
+function get_domain_mailserver($domain_id=0, $role='') {
+  global $cdg_sql;
+
+  if ($domain_id != 0) {
+    $where_domain = "domainmailserver_domain_id='$domain_id'";
+    $and = 'AND';
+  }
+  if ($role != '') {
+    $where_role = "$and domainmailserver_role='$role'";
+    $and = 'AND';
+  }
+
+  $query = "SELECT distinct
+      domainmailserver_domain_id,
+      domainmailserver_mailserver_id,
+      domainmailserver_role,
+      mailserver_host_id,
+      host_name,
+      host_ip
+    FROM DomainMailServer
+      LEFT JOIN MailServer ON domainmailserver_mailserver_id=mailserver_id
+      LEFT JOIN Host ON mailserver_host_id=host_id
+    WHERE $where_domain
+      $where_role";
+  
+  display_debug_msg($query, $cdg_sql, 'get_domain_mailserver()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  $m = array();
+  while ($obm_q->next_record()) {
+    $d_id = $obm_q->f('domainmailserver_domain_id');
+    $m_id = $obm_q->f('domainmailserver_mailserver_id');
+    $role = $obm_q->f('domainmailserver_role');
+    $name = $obm_q->f('host_name');
+    $ip = $obm_q->f('host_ip');
+    $m[$d_id][$m_id][] = array ('name' => $name, 'ip' => $ip, 'role' => $role);
+  }
+
+  return $m;
 }
 
 ?>

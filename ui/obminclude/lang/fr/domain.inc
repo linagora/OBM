@@ -9,6 +9,8 @@
 
 $l_domain_name = "Nom de domaine";
 $l_alias = "Alias";
+$l_mail_server = "Serveur de mail par défaut";
+$l_mail_servers = "Serveurs de mail";
 
 $l_update_state = "Etat de mise à jour";
 
@@ -28,4 +30,10 @@ $l_cant_delete = "Le domaine ne peut pas être supprimé !";
 // JavaScript Messages
 $l_fill_title = "Vous devez renseigner le Label avant de valider.";
 
-$l_mail_server = "Serveur de mail par défaut";
+$l_max_user = "# users max";
+$l_max_resource = "# ressources max";
+$l_max_mailshare = "# bals partagées max";
+$l_mail_quota = "Quota mail";
+$l_address1 = "$l_address 1";
+$l_address2 = "$l_address 2";
+$l_address3 = "$l_address 3";

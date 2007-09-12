@@ -20,112 +20,112 @@ function run_query_user_search($user) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
   global $cgp_archive_only;
 
-  $sql_order_dir = $user["sql_order_dir"];
-  $sql_order_field = $user["sql_order_field"];
+  $sql_order_dir = $user['sql_order_dir'];
+  $sql_order_field = $user['sql_order_field'];
 
-  $restriction = $user["restriction_calendar"];
-  $login = sql_search_text_parse($user["login"]);
-  $profile = $user["profile"];
-  $domain_id = $user["domain"];
-  $lname = sql_search_text_parse($user["lastname"]);
-  $delegation = sql_search_text_parse($user["delegation"]);
-  $email = sql_search_text_parse($user["email"]);
-  $desc = sql_search_text_parse($user["desc"]);
-  $group = sql_search_text_parse($user["group"]);
-  $archive = $user["archive"];
-  $phone = $user["phone"];
+  $restriction = $user['restriction_calendar'];
+  $login = sql_search_text_parse($user['login']);
+  $profile = $user['profile'];
+  $domain_id = $user['domain'];
+  $lname = sql_search_text_parse($user['lastname']);
+  $delegation = sql_search_text_parse($user['delegation']);
+  $email = sql_search_text_parse($user['email']);
+  $desc = sql_search_text_parse($user['desc']);
+  $group = sql_search_text_parse($user['group']);
+  $archive = $user['archive'];
+  $phone = $user['phone'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
-  $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "timelastaccess");
-  $multidomain = sql_multidomain("userobm");
+  $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
+  $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
+  $multidomain = sql_multidomain('userobm');
 
-  if ($restriction == "calendar") {
-    $users = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "read","","userobm");
-    if ((is_array($users["ids"])) && (count($users["ids"]) > 0)) {
+  if ($restriction == 'calendar') {
+    $users = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'read','','userobm');
+    if ((is_array($users['ids'])) && (count($users['ids']) > 0)) {
       $where_restriction = " AND (userobm_id IN ($obm[uid], ";
-      foreach($users["ids"] as $u_id) {
+      foreach($users['ids'] as $u_id) {
 	$where_restriction .= "$coma'$u_id'";
-	$coma = ",";
+	$coma = ',';
       }
-      $where_restriction .= "))";
+      $where_restriction .= '))';
     } else {
       // If no users have given $uid with read right, return empty set
-      $where_restriction = " AND userobm_id < 0";
+      $where_restriction = ' AND userobm_id < 0';
     }
   }
 
-  $where = "";
+  $where = '';
 
   // If a login indication has been specified, get it
-  if (trim($login) != "") {
+  if (trim($login) != '') {
      $where .= " userobm_login $like '$login%'";
   }
 
   // If a user profile indication has been specified, get it
-  if (($profile != $c_all) && ($profile != "")) {
-     if (trim($where) != "") $where .= " AND";
+  if (($profile != $c_all) && ($profile != '')) {
+     if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_perms='$profile'";
   }
 
   // If a user domain indication has been specified, get it
-  if (($domain_id != $c_all) && ($domain_id != "")) {
-     if (trim($where) != "") $where .= " AND";
+  if (($domain_id != $c_all) && ($domain_id != '')) {
+     if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_domain_id='$domain_id'";
   }
 
   // If a lastname indication has been specified, get it
-  if (trim($lname) != "") {
-     if (trim($where) != "") $where .= " AND";
+  if (trim($lname) != '') {
+     if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_lastname $like '$lname%'";
   }
 
   // If a delegation indication has been specified, get it
-  if (trim($delegation) != "") {
-     if (trim($where) != "") $where .= " AND";
+  if (trim($delegation) != '') {
+     if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_delegation $like '$delegation%'";
   }
 
   // If an email indication has been specified, get it
-  if (trim($email) != "") {
-     if (trim($where) != "") $where .= " AND";
+  if (trim($email) != '') {
+     if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_email like '%$email%'";
   }
 
   // If a phone number indication has been specified, get it
-  if (trim($phone) != "") {
-     if (trim($where) != "") $where .= " AND";
+  if (trim($phone) != '') {
+     if (trim($where) != '') $where .= ' AND';
      $where .= " (userobm_phone like '%$phone%'
        OR userobm_phone2 like '%$phone%'
        OR userobm_mobile like '%$phone%')";
   }
 
   // If a description indication has been specified, get it
-  if (trim($desc) != "") {
-     if (trim($where) != "") $where .= " AND";
+  if (trim($desc) != '') {
+     if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_description like '%$desc%'";
   }
 
   // If a group indication has been specified, get it
-  if (trim($group) != "") {
-     if (trim($where) != "") $where .= " AND";
+  if (trim($group) != '') {
+     if (trim($where) != '') $where .= ' AND';
      $where .= " group_name like '%$group%'";
-     $join_grp = "LEFT JOIN UserObmGroup ON userobm_id=userobmgroup_userobm_id
-                  LEFT JOIN UGroup ON userobmgroup_group_id=group_id";
+     $join_grp = 'LEFT JOIN UserObmGroup ON userobm_id=userobmgroup_userobm_id
+                  LEFT JOIN UGroup ON userobmgroup_group_id=group_id';
   }
 
-  if ($archive != "1") {
-    if (trim($where) != "") $where .= " AND";
+  if ($archive != '1') {
+    if (trim($where) != '') $where .= ' AND';
     $where .= " userobm_archive = '0'";
   } elseif($cgp_archive_only) {
-    if (trim($where) != "") $where .= " AND";
+    if (trim($where) != '') $where .= ' AND';
     $where .= " userobm_archive = '1'";
   }
 
-  if ((trim($where) != "") || (trim($where_restriction) != "")) {
+  if ((trim($where) != '') || (trim($where_restriction) != '')) {
     $whereq = " WHERE $where $where_restriction $multidomain";
   }
 
@@ -141,7 +141,7 @@ function run_query_user_search($user) {
 
 
   // ORDER construction
-  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "userobm_login";
+  $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'userobm_login';
   $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "$select
@@ -155,7 +155,7 @@ function run_query_user_search($user) {
   }
 
   if (($count > 0) || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "run_query_user_search()");
+    display_debug_msg($query, $cdg_sql, 'run_query_user_search()');
     $obm_q->query($query);
   }
 
@@ -171,27 +171,27 @@ function run_query_user_search($user) {
  */
 function run_query_user_ext_search($user) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
-  $pattern = $user["pattern"];
-  $restriction = $user["restriction"];
+  $pattern = $user['pattern'];
+  $restriction = $user['restriction'];
   $obm_q = new DB_OBM;
-  $multidomain = sql_multidomain("UserObm.userobm");
+  $multidomain = sql_multidomain('UserObm.userobm');
 
   $limit = $user['limit'];
-  if(isset($user["first_row"])) $first_row = $user["first_row"] - 1;
+  if(isset($user['first_row'])) $first_row = $user['first_row'] - 1;
   else $first_row = 0;
 
-  if ($restriction == "calendar") {
-    $users = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "read","","userobm");
-    if ((is_array($users["ids"])) && (count($users["ids"]) > 0)) {
+  if ($restriction == 'calendar') {
+    $users = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'read','','userobm');
+    if ((is_array($users['ids'])) && (count($users['ids']) > 0)) {
       $where_restriction = " AND (userobm_id IN ($obm[uid], ";
-      foreach($users["ids"] as $u_id) {
+      foreach($users['ids'] as $u_id) {
 	$where_restriction .= "$coma'$u_id'";
-	$coma = ",";
+	$coma = ',';
       }
-      $where_restriction .= "))";
+      $where_restriction .= '))';
     } else {
       // If no users have given $uid with read right, return empty set
-      $where_restriction = " AND userobm_id < 0";
+      $where_restriction = ' AND userobm_id < 0';
     }
   }
 
@@ -207,10 +207,10 @@ function run_query_user_ext_search($user) {
       $multidomain
       $where_restriction";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_ext_search()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->query($query);
   $obm_q->next_record();
-  $resultsCount = $obm_q->f("resultsCount");
+  $resultsCount = $obm_q->f('resultsCount');
 
   $query = "SELECT 
       userobm_id,
@@ -229,7 +229,7 @@ function run_query_user_ext_search($user) {
     ORDER BY  userobm_lastname, userobm_firstname
     LIMIT $first_row, $limit";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_ext_search()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->query($query);
 
   return array('length' => $resultsCount, 'datas' => $obm_q);
@@ -247,11 +247,11 @@ function run_query_user_detail($p_id) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($db_type, "UserObm.userobm_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($db_type, "UserObm.userobm_timecreate", "timecreate");
-  $datebegin = sql_date_format($db_type, "UserObm.userobm_datebegin", "datebegin");
-  $lastaccess = sql_date_format($db_type, "UserObm.userobm_timelastaccess", "userobm_timelastaccess");
-  $multidomain = sql_multidomain("UserObm.userobm");
+  $timeupdate = sql_date_format($db_type, 'UserObm.userobm_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'UserObm.userobm_timecreate', 'timecreate');
+  $datebegin = sql_date_format($db_type, 'UserObm.userobm_datebegin', 'datebegin');
+  $lastaccess = sql_date_format($db_type, 'UserObm.userobm_timelastaccess', 'userobm_timelastaccess');
+  $multidomain = sql_multidomain('UserObm.userobm');
 	
   $query = "SELECT UserObm.*,
       $timeupdate,
@@ -277,7 +277,7 @@ function run_query_user_detail($p_id) {
     WHERE UserObm.userobm_id='$p_id'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_detail()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -296,14 +296,14 @@ function run_query_user_insert($user) {
   global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
-  $now = date("Y-m-d H:i:s");
-  $uid = $obm["uid"];
-  $login = $user["login"];
-  $passwd = $user["passwd"];
-  if ($passwd != "") {
-    if ($password_encryption == "CRYPT") {
+  $now = date('Y-m-d H:i:s');
+  $uid = $obm['uid'];
+  $login = $user['login'];
+  $passwd = $user['passwd'];
+  if ($passwd != '') {
+    if ($password_encryption == 'CRYPT') {
       $passwd_crypt = crypt($passwd);
-    } else if ($password_encryption == "MD5SUM") {
+    } else if ($password_encryption == 'MD5SUM') {
       $passwd_crypt = md5($passwd);
     } else {
       $passwd_crypt = $passwd;
@@ -311,61 +311,61 @@ function run_query_user_insert($user) {
   }
 
   // infos
-  $profile = $user["profile"];
-  $archive = ($user["archive"] == "1" ? "1" : "0");
+  $profile = $user['profile'];
+  $archive = ($user['archive'] == '1' ? '1' : '0');
   $hidden = ($user['hidden'] == '1' ? '1' : '0');
   $kind = $user['kind'];
-  $datebegin = ($user["datebegin"] ? "'".of_isodate_convert($user["datebegin"])."'" : "null");
-  $lname = $user["lastname"];
-  $fname = $user["firstname"];
-  $title = $user["title"];
-  $email = $user["email"];
-  $desc = $user["desc"];
+  $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
+  $lname = $user['lastname'];
+  $fname = $user['firstname'];
+  $title = $user['title'];
+  $email = $user['email'];
+  $desc = $user['desc'];
 
   // Target Delegation handling (if updated user as delegation admin realm)
   $admin_realm = $profiles[$profile]['properties']['admin_realm'];
   if (is_array($admin_realm)) {
     if (in_array('delegation', $admin_realm)) {
-      $delegation_target = $user["delegation_target"];
-      $q_insert_delegation_target = ",
-    userobm_delegation_target";
+      $delegation_target = $user['delegation_target'];
+      $q_insert_delegation_target = ',
+    userobm_delegation_target';
       $q_value_delegation_target = ",
     '$delegation_target'";
     }
   }
 
   // Delegation handling
-  $q_delegation = of_delegation_query_insert_clauses('userobm_delegation', $user["delegation"]);
+  $q_delegation = of_delegation_query_insert_clauses('userobm_delegation', $user['delegation']);
 
   // Coord
-  $phone = $user["phone"];
-  $phone2 = $user["phone2"];
-  $mobile = $user["mobile"];
-  $fax = $user["fax"];
-  $fax2 = $user["fax2"];
+  $phone = $user['phone'];
+  $phone2 = $user['phone2'];
+  $mobile = $user['mobile'];
+  $fax = $user['fax'];
+  $fax2 = $user['fax2'];
   $company = $user['company'];
-  $direction = $user["direction"];
-  $service = $user["service"];
-  $ad1 = $user["ad1"];
-  $ad2 = $user["ad2"];
-  $ad3 = $user["ad3"];
-  $zip = $user["zip"];
-  $town = $user["town"];
-  $cdx = $user["cdx"];
-  $ctry = $user["country"];
+  $direction = $user['direction'];
+  $service = $user['service'];
+  $ad1 = $user['ad1'];
+  $ad2 = $user['ad2'];
+  $ad3 = $user['ad3'];
+  $zip = $user['zip'];
+  $town = $user['town'];
+  $cdx = $user['cdx'];
+  $ctry = $user['country'];
 
   // Section Web
-  if ($cgp_use["service"]["web"]) {
+  if ($cgp_use['service']['web']) {
     // Web access
-    $host_name = $user["host_name"];
-    $host_id = $user["host_id"];
-    $web_perms = ($user["web_perms"] == "" ? "0" : $user["web_perms"]);
-    $web_all = ($user["web_all"] == "" ? "0" : $user["web_all"]);
-    $web_list = $user["web_list"];
-    $query_insert_web = ",
+    $host_name = $user['host_name'];
+    $host_id = $user['host_id'];
+    $web_perms = ($user['web_perms'] == '' ? '0' : $user['web_perms']);
+    $web_all = ($user['web_all'] == '' ? '0' : $user['web_all']);
+    $web_list = $user['web_list'];
+    $query_insert_web = ',
     userobm_web_perms,
     userobm_web_all,
-    userobm_web_list";
+    userobm_web_list';
     $query_values_web = ",
     '$web_perms',
     '$web_all',
@@ -373,16 +373,16 @@ function run_query_user_insert($user) {
   }
 
   // Section Mail
-  if ($cgp_use["service"]["mail"]) {
-    $mail_perms = ($user["mail_perms"] == "" ? "0" : $user["mail_perms"]);
-    $mail_ext_perms = ($user["mail_ext_perms"] == "" ? "0" : $user["mail_ext_perms"]);
-    $mail_server = ($user["mail_server"] == "" ? "0" : $user["mail_server"]);
-    $mail_quota = $user["mail_quota"];
-    $query_insert_mail = ",
+  if ($cgp_use['service']['mail']) {
+    $mail_perms = ($user['mail_perms'] == '' ? '0' : $user['mail_perms']);
+    $mail_ext_perms = ($user['mail_ext_perms'] == '' ? '0' : $user['mail_ext_perms']);
+    $mail_server = ($user['mail_server'] == '' ? '0' : $user['mail_server']);
+    $mail_quota = $user['mail_quota'];
+    $query_insert_mail = ',
     userobm_mail_perms,
     userobm_mail_ext_perms,
     userobm_mail_server_id,
-    userobm_mail_quota";
+    userobm_mail_quota';
     $query_values_mail = ",
     '$mail_perms',
     '$mail_ext_perms',
@@ -391,16 +391,16 @@ function run_query_user_insert($user) {
   }
 
   // Section Mail Nomad
-  if ($cgp_use["service"]["mail_nomad"]) {
-    $nomade_perms = ($user["nomade_perms"] == "" ? "0" : $user["nomade_perms"]);
-    $nomade_enable = ($user["nomade_enable"] == "" ? "0" : $user["nomade_enable"]);
-    $nomade_local_copy = ($user["nomade_local_copy"] == "" ? "0" : $user["nomade_local_copy"]);
-    $nomad_email = $user["email_nomade"];
-    $query_insert_mail_nomad = ",
+  if ($cgp_use['service']['mail_nomad']) {
+    $nomade_perms = ($user['nomade_perms'] == '' ? '0' : $user['nomade_perms']);
+    $nomade_enable = ($user['nomade_enable'] == '' ? '0' : $user['nomade_enable']);
+    $nomade_local_copy = ($user['nomade_local_copy'] == '' ? '0' : $user['nomade_local_copy']);
+    $nomad_email = $user['email_nomade'];
+    $query_insert_mail_nomad = ',
     userobm_email_nomade,
     userobm_nomade_perms,
     userobm_nomade_enable,
-    userobm_nomade_local_copy";
+    userobm_nomade_local_copy';
     $query_values_mail_nomad = ",
     '$nomad_email',
     '$nomade_perms',
@@ -409,28 +409,28 @@ function run_query_user_insert($user) {
   }
 
   // Section Mail Vacation
-  if ($cgp_use["service"]["mail_vacation"]) {
-    $vacation_enable = ($user["vacation_enable"] == "" ? "0" : $user["vacation_enable"]);
-    $vacation_message = $user["vacation_message"];
-    $query_insert_mail_vacation = ",
+  if ($cgp_use['service']['mail_vacation']) {
+    $vacation_enable = ($user['vacation_enable'] == '' ? '0' : $user['vacation_enable']);
+    $vacation_message = $user['vacation_message'];
+    $query_insert_mail_vacation = ',
     userobm_vacation_enable,
-    userobm_vacation_message";
+    userobm_vacation_message';
     $query_values_mail_vacation = ",
     '$vacation_enable',
     '$vacation_message'";
   }
 
   // Section Samba
-  if ($cgp_use["service"]["samba"]) {
-    $smb_perms = ($user["smb_perms"] == "" ? "0" : $user["smb_perms"]);
-    $smb_home = $user["smb_home"];
-    $smb_home_drive = $user["smb_home_drive"];
-    $smb_logon = $user["smb_logon"];
-    $query_insert_samba = ",
+  if ($cgp_use['service']['samba']) {
+    $smb_perms = ($user['smb_perms'] == '' ? '0' : $user['smb_perms']);
+    $smb_home = $user['smb_home'];
+    $smb_home_drive = $user['smb_home_drive'];
+    $smb_logon = $user['smb_logon'];
+    $query_insert_samba = ',
     userobm_samba_perms,
     userobm_samba_home,
     userobm_samba_home_drive,
-    userobm_samba_logon_script";
+    userobm_samba_logon_script';
     $query_values_samba = ",
     '$smb_perms',
     '$smb_home',
@@ -441,26 +441,26 @@ function run_query_user_insert($user) {
   // Uid, gid
   $user_uid = get_first_user_free_uid();
   if ($profile == "$perms_admin") {
-    if ($cgp_use["service"]["samba"]) {
+    if ($cgp_use['service']['samba']) {
       $gid = $cg_gid_smb_admin;
     } else {
       $gid = $c_first_gid_admin;
     }
   } else {
-    if ($cgp_use["service"]["samba"]) {
+    if ($cgp_use['service']['samba']) {
       $gid = $cg_gid_smb_user;
     } else {
       $gid = $c_first_gid_user;
     }
   }
 
-  if (isset($user["domain"]) && $obm["domain"] == 0) {
-    $domain_id = $user["domain"];
+  if (isset($user['domain']) && $obm['domain'] == 0) {
+    $domain_id = $user['domain'];
   } else {
-    $domain_id = $obm["domain_id"];
+    $domain_id = $obm['domain_id'];
   }
   if ($domain_id == 0) {
-    $profile == "admin";
+    $profile == 'admin';
   }
   $query = "INSERT INTO UserObm (
     userobm_domain_id,
@@ -550,7 +550,7 @@ function run_query_user_insert($user) {
     $query_values_samba
     )";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_insert()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -563,24 +563,24 @@ function run_query_user_insert($user) {
       AND userobm_firstname='$fname'
       AND userobm_domain_id='$domain_id'";
   
-    display_debug_msg($query, $cdg_sql, "run_query_user_insert(2)");
+    display_debug_msg($query, $cdg_sql, 'run_query_user_insert(2)');
     $obm_q->query($query);
     $obm_q->next_record();
-    $id = $obm_q->f("id");
+    $id = $obm_q->f('id');
   } else {
     $id = false;
   }
 
   if ($id > 0) {
-    $ret = of_userdata_query_update("user", $id, $user);
+    $ret = of_userdata_query_update('user', $id, $user);
     // Insert user's photo
-    if(isset($user["file_tmp"]) && $user["file_tmp"] != "") {
-      $user["title"] = $login;
-      $doc_id = run_query_global_insert_document($user, $id, "user");
+    if(isset($user['file_tmp']) && $user['file_tmp'] != '') {
+      $user['title'] = $login;
+      $doc_id = run_query_global_insert_document($user, $id, 'user');
       if($doc_id > 0) {
         // Update userobm_photo_id
         $query = "UPDATE UserObm SET userobm_photo_id='$doc_id' WHERE userobm_id='$id'"; 
-        display_debug_msg($query, $cdg_sql, "run_query_user_insert(3)");
+        display_debug_msg($query, $cdg_sql, 'run_query_user_insert(3)');
         $obm_q->query($query);
       }
     }
@@ -610,7 +610,7 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
       WHERE userobmgroup_userobm_id = '$u_id'
       and userobmgroup_group_id = '$group_id'";
 
-    display_debug_msg($query, $cdg_sql, "run_query_user_init_group()");
+    display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
   }
@@ -622,7 +622,7 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
     WHERE userobmgroup_userobm_id = '$u_id'
       and userobmgroup_group_id = '$group_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_init_group()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -630,7 +630,7 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
       userobmgroup_userobm_id)
     VALUES ('$group_id', '$u_id')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_init_group()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -653,97 +653,97 @@ function run_query_user_update($p_id, $user) {
   // Coonect to the BD
   $obm_q = new DB_OBM;
 
-  $passwd = $user["passwd"];
-  if ($passwd != "") {
-    if ($password_encryption == "CRYPT") {
+  $passwd = $user['passwd'];
+  if ($passwd != '') {
+    if ($password_encryption == 'CRYPT') {
       $passwd_crypt = crypt($passwd);
-    } else if ($password_encryption == "MD5SUM") {
+    } else if ($password_encryption == 'MD5SUM') {
       $passwd_crypt = md5($passwd);
     } else {
       $passwd_crypt = $passwd;
     }
     $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type='$password_encryption'";
 
-    if ($cgp_use["service"]["ldap"]) {
+    if ($cgp_use['service']['ldap']) {
       $query="UPDATE P_UserObm SET
         $passwd_update
         WHERE userobm_id='$p_id' $multidomain";
 
-      display_debug_msg($query, $cdg_sql, "run_query_user_update()");
+      display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
       $retour = $obm_q->query($query);
 
       if( $retour ) {
-        if( (!isset($obm["domain_id"])) || ($obm["domain_id"] == "") || ($obm["domain_id"] == "0") ) {
+        if( (!isset($obm['domain_id'])) || ($obm['domain_id'] == '') || ($obm['domain_id'] == '0') ) {
           $query="SELECT userobm_domain_id FROM UserObm WHERE userobm_id='$p_id'";
-          display_debug_msg($query, $cdg_sql, "run_query_user_update()");
+          display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
           $retour = $obm_q->query($query);
 
           $obm_q->next_record();
-          $user_domain = $obm_q->f("userobm_domain_id");
+          $user_domain = $obm_q->f('userobm_domain_id');
         }else {
-          $user_domain = $obm["domain_id"];
+          $user_domain = $obm['domain_id'];
         }
-        $cmd = "$cmd_ldap_passwd --login ".$user["login"]." --domain ".$user_domain." --type ".$password_encryption." --no-old --passwd ".$passwd;
-        display_debug_msg($cmd, $cdg_exe, "update_sieve()");
+        $cmd = "$cmd_ldap_passwd --login ".$user['login'].' --domain '.$user_domain.' --type '.$password_encryption.' --no-old --passwd '.$passwd;
+        display_debug_msg($cmd, $cdg_exe, 'update_sieve()');
         exec($cmd);
       }
     }
 
-    $passwd_update .= ",";
+    $passwd_update .= ',';
   }
 
   // infos
-  $profile = $user["profile"];
-  $archive = ($user["archive"] == "1" ? "1" : "0");
-  $datebegin = ($user["datebegin"] ? "'".of_isodate_convert($user["datebegin"])."'" : "null");
+  $profile = $user['profile'];
+  $archive = ($user['archive'] == '1' ? '1' : '0');
+  $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
   $hidden = ($user['hidden'] == '1' ? '1' : '0');
   $kind = $user['kind'];
-  $lname = $user["lastname"];
-  $fname = $user["firstname"];
-  $title = $user["title"];
-  $email = $user["email"];
-  $desc = $user["desc"];
-  $multidomain = sql_multidomain("userobm");
-  $photo_id = $user["document_id"];
+  $lname = $user['lastname'];
+  $fname = $user['firstname'];
+  $title = $user['title'];
+  $email = $user['email'];
+  $desc = $user['desc'];
+  $multidomain = sql_multidomain('userobm');
+  $photo_id = $user['document_id'];
 
   // Target Delegation handling (if updated user as delegation admin realm)
   $admin_realm = $profiles[$profile]['properties']['admin_realm'];
   if (is_array($admin_realm)) {
     if (in_array('delegation', $admin_realm)) {
-      $delegation_target = $user["delegation_target"];
+      $delegation_target = $user['delegation_target'];
       $q_delegation_target = ",
     userobm_delegation_target='$delegation_target'";
     }
   }
 
   // Delegation handling
-  $q_delegation = of_delegation_query_update_clause('userobm_delegation', $user["delegation"]);
+  $q_delegation = of_delegation_query_update_clause('userobm_delegation', $user['delegation']);
 
   // Coord
-  $phone = $user["phone"];
-  $phone2 = $user["phone2"];
-  $mobile = $user["mobile"];
-  $fax = $user["fax"];
-  $fax2 = $user["fax2"];
+  $phone = $user['phone'];
+  $phone2 = $user['phone2'];
+  $mobile = $user['mobile'];
+  $fax = $user['fax'];
+  $fax2 = $user['fax2'];
   $company = $user['company'];
   $direction = $user['direction'];
-  $service = $user["service"];
-  $ad1 = $user["ad1"];
-  $ad2 = $user["ad2"];
-  $ad3 = $user["ad3"];
-  $zip = $user["zip"];
-  $town = $user["town"];
-  $cdx = $user["cdx"];
-  $ctry = $user["country"];
+  $service = $user['service'];
+  $ad1 = $user['ad1'];
+  $ad2 = $user['ad2'];
+  $ad3 = $user['ad3'];
+  $zip = $user['zip'];
+  $town = $user['town'];
+  $cdx = $user['cdx'];
+  $ctry = $user['country'];
 
   // Section Web
-  if ($cgp_use["service"]["web"]) {
+  if ($cgp_use['service']['web']) {
     // Web access
-    $host_name = $user["host_name"];
-    $host_id = $user["host_id"];
-    $web_perms = ($user["web_perms"] == "" ? "0" : $user["web_perms"]);
-    $web_all = ($user["web_all"] == "" ? "0" : $user["web_all"]);
-    $web_list = $user["web_list"];
+    $host_name = $user['host_name'];
+    $host_id = $user['host_id'];
+    $web_perms = ($user['web_perms'] == '' ? '0' : $user['web_perms']);
+    $web_all = ($user['web_all'] == '' ? '0' : $user['web_all']);
+    $web_list = $user['web_list'];
     $query_web = ",
     userobm_web_perms='$web_perms',
     userobm_web_all='$web_all',
@@ -751,11 +751,11 @@ function run_query_user_update($p_id, $user) {
   }
 
   // Section Mail
-  if ($cgp_use["service"]["mail"]) {
-    $mail_perms = ($user["mail_perms"] == "" ? "0" : $user["mail_perms"]);
-    $mail_ext_perms = ($user["mail_ext_perms"] == "" ? "0" : $user["mail_ext_perms"]);
-    $mail_server = ($user["mail_server"] == "" ? "0" : $user["mail_server"]);
-    $mail_quota = $user["mail_quota"];
+  if ($cgp_use['service']['mail']) {
+    $mail_perms = ($user['mail_perms'] == '' ? '0' : $user['mail_perms']);
+    $mail_ext_perms = ($user['mail_ext_perms'] == '' ? '0' : $user['mail_ext_perms']);
+    $mail_server = ($user['mail_server'] == '' ? '0' : $user['mail_server']);
+    $mail_quota = $user['mail_quota'];
     $query_mail = ",
     userobm_mail_perms='$mail_perms',
     userobm_mail_ext_perms='$mail_ext_perms',
@@ -764,11 +764,11 @@ function run_query_user_update($p_id, $user) {
   }
 
   // Section Mail Nomad
-  if ($cgp_use["service"]["mail_nomad"]) {
-    $nomade_perms = ($user["nomade_perms"] == "" ? "0" : $user["nomade_perms"]);
-    $nomade_enable = ($user["nomade_enable"] == "" ? "0" : $user["nomade_enable"]);
-    $nomade_local_copy = ($user["nomade_local_copy"] == "" ? "0" : $user["nomade_local_copy"]);
-    $nomad_email = $user["email_nomade"];
+  if ($cgp_use['service']['mail_nomad']) {
+    $nomade_perms = ($user['nomade_perms'] == '' ? '0' : $user['nomade_perms']);
+    $nomade_enable = ($user['nomade_enable'] == '' ? '0' : $user['nomade_enable']);
+    $nomade_local_copy = ($user['nomade_local_copy'] == '' ? '0' : $user['nomade_local_copy']);
+    $nomad_email = $user['email_nomade'];
     $query_mail_nomad = ",
     userobm_email_nomade='$nomad_email',
     userobm_nomade_perms='$nomade_perms',
@@ -777,20 +777,20 @@ function run_query_user_update($p_id, $user) {
   }
 
   // Section Mail Vacation
-  if ($cgp_use["service"]["mail_vacation"]) {
-    $vacation_enable = ($user["vacation_enable"] == "" ? "0" : $user["vacation_enable"]);
-    $vacation_message = $user["vacation_message"];
+  if ($cgp_use['service']['mail_vacation']) {
+    $vacation_enable = ($user['vacation_enable'] == '' ? '0' : $user['vacation_enable']);
+    $vacation_message = $user['vacation_message'];
     $query_mail_vacation = ",
     userobm_vacation_enable='$vacation_enable',
     userobm_vacation_message='$vacation_message'";
   }
 
   // Section Samba
-  if ($cgp_use["service"]["samba"]) {
-    $smb_perms = ($user["smb_perms"] == "" ? "0" : $user["smb_perms"]);
-    $smb_home = $user["smb_home"];
-    $smb_home_drive = $user["smb_home_drive"];
-    $smb_logon = $user["smb_logon"];
+  if ($cgp_use['service']['samba']) {
+    $smb_perms = ($user['smb_perms'] == '' ? '0' : $user['smb_perms']);
+    $smb_home = $user['smb_home'];
+    $smb_home_drive = $user['smb_home_drive'];
+    $smb_logon = $user['smb_logon'];
     $query_samba = ",
     userobm_samba_perms='$smb_perms',
     userobm_samba_home='$smb_home',
@@ -800,27 +800,27 @@ function run_query_user_update($p_id, $user) {
 
   // Gid info
   $userDesc = get_user_info($id);
-  $oldGid = $userDesc["gid"];
+  $oldGid = $userDesc['gid'];
   if ($perms == "$perms_admin") {
-    if ($cgp_use["service"]["samba"]) {
+    if ($cgp_use['service']['samba']) {
       $gid = $cg_gid_smb_admin;
     } else {
       $gid = $c_first_gid_admin;
     }
   } else {
-    if ($cgp_use["service"]["samba"]) {
+    if ($cgp_use['service']['samba']) {
       $gid = $cg_gid_smb_user;
     } else {
       $gid = $c_first_gid_user;
     }
   }
   if ($domain_id == 0) {
-    $profile == "admin";
+    $profile == 'admin';
   }
 
   $query = "UPDATE UserObm SET
-    userobm_timeupdate='". date("Y-m-d H:i:s")."',
-    userobm_userupdate='". $obm["uid"] ."',
+    userobm_timeupdate='". date('Y-m-d H:i:s')."',
+    userobm_userupdate='". $obm['uid'] ."',
     $passwd_update
     userobm_perms='$profile',
     userobm_gid='$gid',
@@ -856,27 +856,27 @@ function run_query_user_update($p_id, $user) {
     $query_samba
   WHERE userobm_id='$p_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
   $retour = $obm_q->query($query);
 
   // If the user is archived, we unsubscribe it from all Groups
-  if ($archive == "1") {
+  if ($archive == '1') {
     $retour = run_query_user_unsubscribe_all_groups($p_id);    
   }
 
   // Update photo
-  if(isset($user["file_tmp"]) && $user["file_tmp"] != "") {
+  if(isset($user['file_tmp']) && $user['file_tmp'] != '') {
     // Select user photo
     $query = "SELECT userobm_photo_id FROM UserObm WHERE userobm_id='$p_id'";
     $obm_q->query($query);
     $obm_q->next_record();
-    if($obm_q->f("userobm_photo_id") == "") {
+    if($obm_q->f('userobm_photo_id') == '') {
       // Insert
-      $doc_id = run_query_global_insert_document($user, $p_id, "user");
+      $doc_id = run_query_global_insert_document($user, $p_id, 'user');
       if($doc_id > 0) {
         // Update userobm_photo_id
         $query = "UPDATE UserObm SET userobm_photo_id='$doc_id' WHERE userobm_id='$p_id'"; 
-        display_debug_msg($query, $cdg_sql, "run_query_user_update(2)");
+        display_debug_msg($query, $cdg_sql, 'run_query_user_update(2)');
         $obm_q->query($query);
       }
     } else {
@@ -886,7 +886,7 @@ function run_query_user_update($p_id, $user) {
   }
 
   if ($retour) {
-    $ret = of_userdata_query_update("user", $p_id, $user);
+    $ret = of_userdata_query_update('user', $p_id, $user);
   }
   return $retour;
 }
@@ -900,15 +900,15 @@ function run_query_user_update($p_id, $user) {
 function run_query_user_delete($p_id) {
   global $cdg_sql, $obm, $c_use_connectors;
 
-  $multidomain = sql_multidomain("userobm");
-  $ret = of_userdata_query_delete("user", $p_id);
+  $multidomain = sql_multidomain('userobm');
+  $ret = of_userdata_query_delete('user', $p_id);
   $obm_q = new DB_OBM;
 
   // Remove user's photo (document & documententity)
   $query = "SELECT userobm_photo_id FROM UserObm WHERE userobm_id='$p_id' $multidomain";
   $obm_q->query($query);
   $obm_q->next_record();
-  $photo_id = $obm_q->f("userobm_photo_id");
+  $photo_id = $obm_q->f('userobm_photo_id');
   if($photo_id > 0) {
     run_query_global_delete_document($photo_id);
   }
@@ -917,18 +917,18 @@ function run_query_user_delete($p_id) {
   $query = "DELETE FROM UserObm
     WHERE userobm_id='$p_id'
       $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete()');
   $retour = $obm_q->query($query);
 
   // If this user exists in Prod table, Insert it in Deleted table
   $query = "SELECT userobm_id FROM P_UserObm WHERE userobm_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete(auto)');
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
-    $uid = $obm["uid"];
-    $domain_id = $obm["domain_id"];
-    $now = date("Y-m-d H:i:s");
+    $uid = $obm['uid'];
+    $domain_id = $obm['domain_id'];
+    $now = date('Y-m-d H:i:s');
 
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
@@ -942,17 +942,17 @@ function run_query_user_delete($p_id) {
       '$p_id',
       '$uid',
       '$now')";
-    display_debug_msg($query, $cdg_sql, "run_query_user_delete(auto)");
+    display_debug_msg($query, $cdg_sql, 'run_query_user_delete(auto)');
     $retour = $obm_q->query($query);
   }
 
   // If connectors in use
   if ($c_use_connectors) {
-    $now = date("Y-m-d H:i:s");
+    $now = date('Y-m-d H:i:s');
     $query = "INSERT INTO
       DeletedUser (deleteduser_user_id, deleteduser_timestamp)
       VALUES ('$p_id', '$now')";
-    display_debug_msg($query, $cdg_sql, "run_query_user_delete(connector)");
+    display_debug_msg($query, $cdg_sql, 'run_query_user_delete(connector)');
     $retour = $obm_q->query($query);
   }
 
@@ -974,7 +974,7 @@ function run_query_user_user_group($p_id) {
     WHERE userobmgroup_userobm_id='$p_id'
       AND (group_privacy=0 OR group_usercreate='$obm[uid]')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_user_group()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_user_group()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -994,7 +994,7 @@ function run_query_user_unsubscribe_all_groups($p_id) {
   FROM UserObmGroup
   WHERE userobmgroup_userobm_id = '$p_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_unsubscribe_all_groups()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_unsubscribe_all_groups()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1015,7 +1015,7 @@ function run_query_user_group($uid) {
     userobm_id = '$uid'
     ORDER by group_name";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_group()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_group()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1032,16 +1032,16 @@ function run_query_user_group($uid) {
 function run_query_user_update_user_group($user) {
   global $cdg_sql, $perms_admin, $cg_gid_smb_admin, $cg_gid_smb_user;
 
-  $u_id = $user["user_id"];
+  $u_id = $user['user_id'];
   $query = "DELETE FROM UserObmGroup WHERE userobmgroup_userobm_id = '$u_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_update_user_group()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_update_user_group()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   $cpt = 0;
   $cpt_ins = 0;
-  while ($cpt < $user["group_nb"]) {
+  while ($cpt < $user['group_nb']) {
     $cpt++;
     $g_id = $user["group_$cpt"];
 
@@ -1052,7 +1052,7 @@ function run_query_user_update_user_group($user) {
         $g_id,
         $u_id)";
 
-    display_debug_msg($query, $cdg_sql, "run_query_user_update_user_group()");
+    display_debug_msg($query, $cdg_sql, 'run_query_user_update_user_group()');
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
     if (! $retour) {
@@ -1065,8 +1065,8 @@ function run_query_user_update_user_group($user) {
   // Si c'est un simple user => Domain users 
   // Si c'est un amdin aliamin => Admins aliamin = Domain admins
   $u = get_user_info($u_id);
-  if ($u["samba_perms"] == "1") {
-    if ($u["perms"] == $perms_admin) {
+  if ($u['samba_perms'] == '1') {
+    if ($u['perms'] == $perms_admin) {
       $gid = $cg_gid_smb_admin;
     } else {
       $gid = $cg_gid_smb_user;
@@ -1090,7 +1090,7 @@ function get_nb_user_admin() {
     FROM UserObm
     WHERE userobm_perms='$perms_admin'";
 
-  display_debug_msg($query, $cdg_sql, "get_nb_user_admin()");
+  display_debug_msg($query, $cdg_sql, 'get_nb_user_admin()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1108,7 +1108,7 @@ function get_nb_user_admin() {
 // Returns:
 //   - true if found, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_user_login_in_use($login, $u_id="") {
+function check_user_login_in_use($login, $u_id='') {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -1122,7 +1122,7 @@ function check_user_login_in_use($login, $u_id="") {
     WHERE userobm_login $like '$login'
       AND userobm_id != '$u_id'";
 
-  display_debug_msg($query, $cdg_sql, "check_user_login_in_use()");
+  display_debug_msg($query, $cdg_sql, 'check_user_login_in_use()');
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -1143,14 +1143,14 @@ function check_user_login_in_use($login, $u_id="") {
 ///////////////////////////////////////////////////////////////////////////////
 function check_user_context($p_id, $user) {
 
-  $login = $user["login"];
-  $passwd = $user["passwd"];
-  $profile = $user["profile"];
-  $lname = $user["lastname"];
-  $fname = $user["firstname"];
-  $phone = $user["phone"];
-  $email = $user["email"];
-  $domain_id = $user["domain"];
+  $login = $user['login'];
+  $passwd = $user['passwd'];
+  $profile = $user['profile'];
+  $lname = $user['lastname'];
+  $fname = $user['firstname'];
+  $phone = $user['phone'];
+  $email = $user['email'];
+  $domain_id = $user['domain'];
 
   // if a user with same name exists, return false
   $co_q = run_query_user_check_user($p_id, $user);
@@ -1172,8 +1172,8 @@ function run_query_user_check_user($p_id, $user) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $multidomain = sql_multidomain('userobm');
-  $login = $user["login"];
-  $domain = $user["domain"];
+  $login = $user['login'];
+  $domain = $user['domain'];
   $where_multidomain = " AND userobm_domain_id='$domain'";
 	
   if ($p_id) {
@@ -1185,7 +1185,7 @@ function run_query_user_check_user($p_id, $user) {
     WHERE userobm_login $like '$login%'
     $where_user $where_multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_check_user()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_check_user()');
   $obm_q->query($query);
 
   return $obm_q;
@@ -1202,7 +1202,7 @@ function run_query_user_check_user($p_id, $user) {
 function check_user_update_rights($params) {
   global $err, $cgp_use, $l_error_delegation;
 
-  $id = $params["user_id"];
+  $id = $params['user_id'];
 
   if ($id > 0) {
 
@@ -1246,122 +1246,122 @@ function check_user_data_form($p_id, $user) {
   global $l_err_delegation_target_outside, $l_err_delegation_outside_domain;
   global $l_err_delegation_outside_target, $l_err_delegation_target_profile;
 
-  $action = $user["action"];
-  $id = $user["user_id"];
-  $login = $user["login"];
-  $passwd = $user["passwd"];
-  $profile = $user["profile"];
-  $lname = $user["lastname"];
-  $fname = $user["firstname"];
-  $title = $user["title"];
-  $email = $user["email"];
-  $phone = $user["phone"];
-  $phone2 = $user["phone2"];
-  $mobile = $user["mobile"];
-  $fax = $user["fax"];
-  $fax2 = $user["fax2"];
-  $host_id = $user["host_id"];
-  $web_perms = $user["web_perms"];
-  $web_list = $user["web_list"];
-  $web_all = ($user["web_all"] == "1" ? "1" : "0");
-  $mail_perms = $user["mail_perms"];
-  $mail_ext_perms = $user["mail_ext_perms"];
-  $mail_server = $user["mail_server"];
-  $mail_quota = $user["mail_quota"];
-  $nomade_perms = $user["nomade_perms"];
-  $nomade_enable = $user["nomade_enable"];
-  $nomade_local_copy = $user["nomade_local_copy"];
-  $vacation_enable = $user["vacation_enable"];
-  $vacation_message = stripslashes($user["vacation_message"]);
-  $email_nomade = $user["email_nomade"];
-  $smb_perms = $user["smb_perms"];
-  $smb_home = stripslashes($user["smb_home"]);
-  $smb_home_drive = $user["smb_home_drive"];
-  $smb_logon = $user["smb_logon"];
-  $file = $user["file_tmp"];
+  $action = $user['action'];
+  $id = $user['user_id'];
+  $login = $user['login'];
+  $passwd = $user['passwd'];
+  $profile = $user['profile'];
+  $lname = $user['lastname'];
+  $fname = $user['firstname'];
+  $title = $user['title'];
+  $email = $user['email'];
+  $phone = $user['phone'];
+  $phone2 = $user['phone2'];
+  $mobile = $user['mobile'];
+  $fax = $user['fax'];
+  $fax2 = $user['fax2'];
+  $host_id = $user['host_id'];
+  $web_perms = $user['web_perms'];
+  $web_list = $user['web_list'];
+  $web_all = ($user['web_all'] == '1' ? '1' : '0');
+  $mail_perms = $user['mail_perms'];
+  $mail_ext_perms = $user['mail_ext_perms'];
+  $mail_server = $user['mail_server'];
+  $mail_quota = $user['mail_quota'];
+  $nomade_perms = $user['nomade_perms'];
+  $nomade_enable = $user['nomade_enable'];
+  $nomade_local_copy = $user['nomade_local_copy'];
+  $vacation_enable = $user['vacation_enable'];
+  $vacation_message = stripslashes($user['vacation_message']);
+  $email_nomade = $user['email_nomade'];
+  $smb_perms = $user['smb_perms'];
+  $smb_home = stripslashes($user['smb_home']);
+  $smb_home_drive = $user['smb_home_drive'];
+  $smb_logon = $user['smb_logon'];
+  $file = $user['file_tmp'];
 
-  if ($action == "update") {
+  if ($action == 'update') {
     $u = get_user_info($id);
     // MANDATORY: we do not allow to update last admin'perms
-    $usr_profile = $u["perms"];
+    $usr_profile = $u['perms'];
     if (($usr_profile == $perms_admin) && ($profile != $perms_admin)) {
       $nb_admin = get_nb_user_admin();
       if ($nb_admin < 2) {
-	$err["msg"] = "$l_last_admin_error";
-	$err["field"] = "profile";
+	$err['msg'] = "$l_last_admin_error";
+	$err['field'] = 'profile';
 	return false;
       }
     }
     // MANDATORY: we do not allow to delete samba perms for a system user
-    $system = $u["system"];
-    $usmb_perms = $u["samba_perms"];
-    if (($system) && ($usmb_perms == "1") && ($smb_perms != "1")) {
-      $err["msg"] = "$l_err_system_samba";
-      $err["field"] = "smb_perms";
+    $system = $u['system'];
+    $usmb_perms = $u['samba_perms'];
+    if (($system) && ($usmb_perms == '1') && ($smb_perms != '1')) {
+      $err['msg'] = "$l_err_system_samba";
+      $err['field'] = 'smb_perms';
       return false;
     }
   }
 
   // login (can't be updated, so only on insert)
-  if (($action == "new") || ($action == "insert")) {
+  if (($action == 'new') || ($action == 'insert')) {
     // MANDATORY: User login, not empty and unique
-    if (trim($login) == "") {
-      $err["msg"] = "$login : $l_login_error";
-      $err["field"] = "login";
+    if (trim($login) == '') {
+      $err['msg'] = "$login : $l_login_error";
+      $err['field'] = 'login';
       return false;
     } else {
       if (! preg_match($php_regexp_login, $login)) {
-	$err["msg"] .= "$login : $l_login_error";
-	$err["field"] = "login";
+	$err['msg'] .= "$login : $l_login_error";
+	$err['field'] = 'login';
 	return false;
       }
       // Login not already in use
       if (check_user_login_in_use($login, $id)) {
-	$err["msg"] = "$login : $l_login_in_use";
-	$err["field"] = "login";
+	$err['msg'] = "$login : $l_login_in_use";
+	$err['field'] = 'login';
 	return false;
       }
     }
   }
 
   // MANDATORY: User password on insert
-  if (($action == "insert") && (trim($passwd) == "")) {
-    $err["msg"] = $l_password_error ;
-    $err["field"] = "password";
+  if (($action == 'insert') && (trim($passwd) == '')) {
+    $err['msg'] = $l_password_error ;
+    $err['field'] = 'password';
     return false;
   }
 
   // MANDATORY: Lastname
-  if (trim($lname) == "") {
-    $err["msg"] = $l_lname_error." : ". $lname;
-    $err["field"] = "lastname";
+  if (trim($lname) == '') {
+    $err['msg'] = $l_lname_error.' : '. $lname;
+    $err['field'] = 'lastname';
     return false;
   }
 
   // If external mail access is granted, internal access should be too
   if ($mail_ext_perms && !($mail_perms)) {
-    $err["msg"] = "$l_mail_perms_error";
-    $err["field"] = "mail_ext_perms";
+    $err['msg'] = "$l_mail_perms_error";
+    $err['field'] = 'mail_ext_perms';
     return false;
   }
 
   // If no mail server is set
-  if( ($mail_perms) && ($mail_server == "") ) {
-    $err["msg"] = "$l_mail_server_error";
-    $err["field"] = "mail_server";
+  if( ($mail_perms) && ($mail_server == '') ) {
+    $err['msg'] = "$l_mail_server_error";
+    $err['field'] = 'mail_server';
     //    return false;
   }
 
   // If mail access is granted, there must be at least one email address
-  if ($mail_perms && (trim($email) == "")) {
-    $err["msg"] = "$l_email_empty";
-    $err["field"] = "email";
+  if ($mail_perms && (trim($email) == '')) {
+    $err['msg'] = "$l_email_empty";
+    $err['field'] = 'email';
     return false;
   }
 
-  if ($cgp_use["service"]["mail"]) {
+  if ($cgp_use['service']['mail']) {
     // User email addresses (only the name before @)
-    if ($email != "") {
+    if ($email != '') {
       $mails = get_email_used($id);
       $um = array();
 
@@ -1369,20 +1369,20 @@ function check_user_data_form($p_id, $user) {
       $em = strtok($email, "\r\n");
       while ($em) {
 	if (! preg_match($php_regexp_email_name, $em)) {
-	  $err["msg"] .= "$em : $l_email_error";
-	  $err["field"] = "email";
+	  $err['msg'] .= "$em : $l_email_error";
+	  $err['field'] = 'email';
 	  return false;
 	}
 	// Email address not already used
 	if (array_key_exists($em, $mails)) {
-	  $err["msg"] = "$l_email_exist : $em (" . $mails["$em"] . ")";
-	  $err["field"] = "email";
+	  $err['msg'] = "$l_email_exist : $em (" . $mails["$em"] . ')';
+	  $err['field'] = 'email';
 	  return false;
 	}
 	// Email address not already used by this user
 	if (in_array($em, $um)) {
-	  $err["msg"] = "$l_uemail_exist : $em";
-	  $err["field"] = "email";
+	  $err['msg'] = "$l_uemail_exist : $em";
+	  $err['field'] = 'email';
 	  return false;
 	}
 	array_push($um, $em);
@@ -1391,131 +1391,131 @@ function check_user_data_form($p_id, $user) {
     }
   } else {
     // OBM-Mail disabled, email must be full (user@domain)
-    if (($email != "") && (preg_match($php_regexp_email, $email) == 0)) {
-      $err["msg"] = $l_email_error." : ". $email;
-      $err["field"] = "email";
+    if (($email != '') && (preg_match($php_regexp_email, $email) == 0)) {
+      $err['msg'] = $l_email_error.' : '. $email;
+      $err['field'] = 'email';
       return false;
     }
   }
 
   // Email quota
-  if ( (trim($email)) && ($mail_quota != "")
+  if ( (trim($email)) && ($mail_quota != '')
        && (! preg_match($php_regexp_quota, $mail_quota))) {
-    $err["msg"] = "$mail_quota : $l_quota_error";
-    $err["field"] = "mail_quota";
+    $err['msg'] = "$mail_quota : $l_quota_error";
+    $err['field'] = 'mail_quota';
     return false;
   }
   
   // Email Nomad perms
   if (($nomade_perms) && (!$mail_perms)) {
-    $err["msg"] = $l_nomade_without_mail_perms;
-    $err["field"] = "nomade_perms";
+    $err['msg'] = $l_nomade_without_mail_perms;
+    $err['field'] = 'nomade_perms';
     return false;
   }
 
   // Email Nomad perms
   if (($nomade_enable) && (!$nomade_perms)) {
-    $err["msg"] = $l_nomade_perms_error;
-    $err["field"] = "nomade_perms";
+    $err['msg'] = $l_nomade_perms_error;
+    $err['field'] = 'nomade_perms';
     return false;
   }
 
   // User nomad email not null if active
-  if ( ($email_nomade == "")
+  if ( ($email_nomade == '')
        && ($nomade_enable) ) {
-    $err["msg"] = "$l_email_nomad_error";
-    $err["field"] = "email_noamde";
+    $err['msg'] = "$l_email_nomad_error";
+    $err['field'] = 'email_nomade';
     return false;
   }
 
   // User nomad email
-  if ( ($email_nomade != "")
+  if ( ($email_nomade != '')
        && (! preg_match($php_regexp_email, $email_nomade))) {
-    $err["msg"] = "$email_nomade : $l_email_error";
-    $err["field"] = "email_nomade";
+    $err['msg'] = "$email_nomade : $l_email_error";
+    $err['field'] = 'email_nomade';
     return false;
   }
 
   // User nomade local copy only if autorized and activated
   if ( ($nomade_local_copy) && ((! $nomade_perms) || (! $nomade_enable)) )
   {
-    $err["msg"] = $l_nomade_local_copy_error;
-    $err["field"] = "nomade_local_copy";
+    $err['msg'] = $l_nomade_local_copy_error;
+    $err['field'] = 'nomade_local_copy';
     return false;
   }
 
   if (($vacation_enable) && (!$mail_perms)) {
-    $err["msg"] = $l_vacation_without_mail_perms;
-    $err["field"] = "vacation_enable";
+    $err['msg'] = $l_vacation_without_mail_perms;
+    $err['field'] = 'vacation_enable';
     return false;
   }
 
   // If vacation is enable, the message must be set
   if ($vacation_enable && !$vacation_message) {
-    $err["msg"] = $l_empty_vacation_message;
-    $err["field"] = "vacation_message";
+    $err['msg'] = $l_empty_vacation_message;
+    $err['field'] = 'vacation_message';
     return false;
   }
 
   // Samba checks
-  if ($cgp_use["service"]["samba"]) {
+  if ($cgp_use['service']['samba']) {
     // Samba home correct
-    if (($smb_home != "") && (! preg_match($php_regexp_home, $smb_home))) {
-      $err["msg"] = " $smb_home : $l_err_home";
-      $err["field"] = "smb_home";
+    if (($smb_home != '') && (! preg_match($php_regexp_home, $smb_home))) {
+      $err['msg'] = " $smb_home : $l_err_home";
+      $err['field'] = 'smb_home';
       return false;
     }
 
     // Samba home drive correct
-    if (($smb_home_drive != "") && (! preg_match($php_regexp_drive, $smb_home_drive))) {
-      $err["msg"] = " $smb_home_drive : $l_err_drive";
-      $err["field"] = "smb_home_drive";
+    if (($smb_home_drive != '') && (! preg_match($php_regexp_drive, $smb_home_drive))) {
+      $err['msg'] = " $smb_home_drive : $l_err_drive";
+      $err['field'] = 'smb_home_drive';
       return false;
     }
   }
 
-  if ($host_id != "" && $host_id != 0) {
+  if ($host_id != '' && $host_id != 0) {
     $host_user = host_cannot_be_used_by_user($host_id,$id);
     // La machine existe, on verifie qu'elle n'est pas utilisee par quelqu'un d'autre
     if ($host_user > 0) {
       global $l_err_host_already_used_by;
       $login = get_user_using_host($host_id);
-      $err["msg"] = " $l_err_host_already_used_by $login";
-      $err["field"] = "host_name";
+      $err['msg'] = " $l_err_host_already_used_by $login";
+      $err['field'] = 'host_name';
       return false;
     }
   }
 
   // Gestion d'un poste par utilisateur : Squid local only
-  if ($cgp_use["service"]["web_local"]) {
+  if ($cgp_use['service']['web_local']) {
    // web_all must be 0 or 1
-    if (($web_all != "0") && ($web_all != "1")) {
-      $err["msg"] = $l_err_web_all;
+    if (($web_all != '0') && ($web_all != '1')) {
+      $err['msg'] = $l_err_web_all;
       return false;
     }
   }
 
   // Photo
-  if($file != "") {
+  if($file != '') {
     // Test image mime-type
     $image_type = exif_imagetype($file);
     if(!$image_type || !array_key_exists($image_type, $c_imagetype)) {
-      $err["msg"] = $l_image_type_error;
-      $err["field"] = "file";
+      $err['msg'] = $l_image_type_error;
+      $err['field'] = 'file';
       return false;
     }
 
     // Test image size
-    $max_width = $c_max_image_size["width"];
-    $max_height = $c_max_image_size["height"];
-    $max_size = $c_max_image_size["size"];
+    $max_width = $c_max_image_size['width'];
+    $max_height = $c_max_image_size['height'];
+    $max_size = $c_max_image_size['size'];
     $image_info = getimagesize($file); 
-    $width = $image_info["0"];
-    $height = $image_info["1"];
-    $size  = $user["img_size"];
-    if($width > $max_width || $height > $max_height || $size > $max_size) {
-      $err["msg"] = $l_image_size_error;
-      $err["field"] = "file";
+    $width = $image_info['0'];
+    $height = $image_info['1'];
+    $size  = $user['img_size'];
+    if ($width > $max_width || $height > $max_height || $size > $max_size) {
+      $err['msg'] = $l_image_size_error;
+      $err['field'] = 'file';
       return false;
     } 
   }
@@ -1601,7 +1601,7 @@ function check_user_data_form($p_id, $user) {
 function get_linked_user_timetask_nb($p_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain('userobm');
 
   $obm_q = new DB_OBM;
   $query = "SELECT count(timetask_id) as nb
@@ -1614,7 +1614,7 @@ function get_linked_user_timetask_nb($p_id) {
   display_debug_msg($query, $cdg_sql, "get_linked_user_timetask_nb($p_id)");
   $obm_q->query($query);
   $obm_q->next_record();
-  $nb = $obm_q->f("nb");
+  $nb = $obm_q->f('nb');
 
   return $nb;
 }
@@ -1637,7 +1637,7 @@ function check_user_can_delete($p_id) {
   $nb = get_linked_user_timetask_nb($p_id);
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] .= "$l_link_timetask";
+    $err['msg'] .= "$l_link_timetask";
   } else {
     $ok_msg .= "$l_link_timetask_no";
   }
@@ -1668,11 +1668,11 @@ function run_query_user_delete_profile($user_id)  {
 
   // Delete all user prefs
   $query = "DELETE FROM UserObmPref WHERE userobmpref_user_id='$user_id'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(UserObmPref)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(UserObmPref)');
   $obm_q->query($query);
 
   $query = "DELETE FROM DisplayPref WHERE display_user_id='$user_id'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(DisplayPref)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(DisplayPref)');
   $obm_q->query($query);
 
   // Move all the user contact from private to public
@@ -1680,7 +1680,7 @@ function run_query_user_delete_profile($user_id)  {
       contact_privacy='0'
     WHERE contact_usercreate='$user_id'
       AND contact_privacy != '0'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Contact)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Contact)');
   $obm_q->query($query);
 
   // Move all the user deal from private to public
@@ -1688,7 +1688,7 @@ function run_query_user_delete_profile($user_id)  {
       deal_privacy='0'
     WHERE deal_usercreate='$user_id'
       AND deal_privacy != '0'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Deal)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Deal)');
   $obm_q->query($query);
 
   // Move all the user list from private to public
@@ -1696,7 +1696,7 @@ function run_query_user_delete_profile($user_id)  {
       list_privacy='0'
     WHERE list_usercreate='$user_id'
       AND list_privacy != '0'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(List)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(List)');
   $obm_q->query($query);
 
   // Move all the user events from private to public
@@ -1712,32 +1712,32 @@ function run_query_user_delete_profile($user_id)  {
   $query = "DELETE FROM EventEntity
     WHERE evententity_entity = 'user'
       AND evententity_entity_id = '$user_id'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EventEntity)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(EventEntity)');
   $obm_q->query($query);
 
   // Remove all acl to the user and user's one
   $query = "DELETE FROM EntityRight
     WHERE entityright_entity = 'calendar'
       AND entityright_entity_id = '$user_id'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EntityRight)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(EntityRight)');
   $obm_q->query($query);
   $query = "DELETE FROM EntityRight
     WHERE entityright_consumer = 'user'
       AND entityright_consumer_id = '$user_id'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EntityRight)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(EntityRight)');
   $obm_q->query($query);
 
   // Remove all Project participation
   $query = "DELETE FROM ProjectUser
     WHERE projectuser_user_id = '$user_id'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(ProjectUser)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(ProjectUser)');
   $obm_q->query($query);
 
   // Remove all User Time management data
   // This is dangerous, but forbidden if user has timetask data (check_can..)
   $query = "DELETE FROM TimeTask
     WHERE timetask_user_id = '$user_id'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(TimeTask)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(TimeTask)');
   $obm_q->query($query);
 
 }
@@ -1755,20 +1755,20 @@ function run_query_user_delete_profile($user_id)  {
 function run_query_user_insert_photo($user, $user_id) {
   global $cdg_sql, $obm;
 
-  $uid = $obm["uid"];
-  $now = date("Y-m-d H:i:s");
-  $domain_id = $obm["domain_id"];
+  $uid = $obm['uid'];
+  $now = date('Y-m-d H:i:s');
+  $domain_id = $obm['domain_id'];
 
-  $title = "";
+  $title = '';
   $author = get_last_user_text($uid);
-  $mime = "";
-  $name = $user["name"];
-  $path = "";
-  $size = $user["size"];
-  $kind = "";
-  $url = "";
-  $privacy = "0";
-  $entity = "user";
+  $mime = '';
+  $name = $user['name'];
+  $path = '';
+  $size = $user['size'];
+  $kind = '';
+  $url = '';
+  $privacy = '0';
+  $entity = 'user';
   $entity_id = $user_id;
   
   $query = "INSERT INTO Document (
@@ -1800,7 +1800,7 @@ function run_query_user_insert_photo($user, $user_id) {
     '$mime',
     '$privacy')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_insert_photo(1)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_insert_photo(1)');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1812,14 +1812,14 @@ function run_query_user_insert_photo($user, $user_id) {
       AND document_name='$name'
       AND document_size='$size'";  
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_insert_photo(2)");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_insert_photo(2)');
   $obm_q = new DB_OBM;
   $obm_q->query($doc_id_q);
   
   // If the document is correctly inserted in database
   if ($obm_q->num_rows() > 0) {
     $obm_q->next_record();
-    $doc_id = $obm_q->f("document_id");
+    $doc_id = $obm_q->f('document_id');
 
     // Create document on disk
     if (! run_query_document_create_file($document)) {

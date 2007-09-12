@@ -110,6 +110,9 @@ CREATE INDEX idx_calendaralert_user ON CalendarAlert (calendaralert_user_id);
 -------------------------------------------------------------------------------
 -- Update UserObm table
 -------------------------------------------------------------------------------
+-- Add nb login failed
+ALTER TABLE UserObm ADD COLUMN userobm_nb_login_failed integer;
+ALTER TABLE UserObm ALTER COLUMN userobm_nb_login_failed SET DEFAULT 0;
 -- Add hidden field
 ALTER TABLE UserObm ADD COLUMN userobm_hidden integer;
 ALTER TABLE UserObm ALTER COLUMN userobm_hidden SET DEFAULT 0;
@@ -131,6 +134,32 @@ ALTER TABLE UserObm ADD COLUMN userobm_nomade_dateend timestamp;
 -- user expiration date fields
 ALTER TABLE UserObm ADD COLUMN userobm_password_dateexp date;
 ALTER TABLE UserObm ADD COLUMN userobm_account_dateexp date;
+
+-- Production table
+-- Add nb login failed
+ALTER TABLE P_UserObm ADD COLUMN userobm_nb_login_failed integer;
+ALTER TABLE P_UserObm ALTER COLUMN userobm_nb_login_failed SET DEFAULT 0;
+-- Add hidden field
+ALTER TABLE P_UserObm ADD COLUMN userobm_hidden integer;
+ALTER TABLE P_UserObm ALTER COLUMN userobm_hidden SET DEFAULT 0;
+-- Add kind field
+ALTER TABLE P_UserObm ADD COLUMN userobm_kind varchar(12);
+-- Add mail_quota_use, last login date
+ALTER TABLE P_UserObm ADD COLUMN userobm_mail_quota_use integer;
+ALTER TABLE P_UserObm ALTER COLUMN userobm_mail_quota_use SET DEFAULT 0;
+ALTER TABLE P_UserObm ADD COLUMN userobm_mail_login_date timestamp;
+ALTER TABLE P_UserObm ADD COLUMN userobm_photo_id integer;
+-- Add company field
+ALTER TABLE P_UserObm ADD COLUMN userobm_company varchar(64);
+ALTER TABLE P_UserObm ADD COLUMN userobm_direction varchar(64);
+-- Add vacation_date, nomade fields
+ALTER TABLE P_UserObm ADD COLUMN userobm_vacation_datebegin timestamp;
+ALTER TABLE P_UserObm ADD COLUMN userobm_vacation_dateend timestamp;
+ALTER TABLE P_UserObm ADD COLUMN userobm_nomade_datebegin timestamp;
+ALTER TABLE P_UserObm ADD COLUMN userobm_nomade_dateend timestamp;
+-- user expiration date fields
+ALTER TABLE P_UserObm ADD COLUMN userobm_password_dateexp date;
+ALTER TABLE P_UserObm ADD COLUMN userobm_account_dateexp date;
 
 
 -------------------------------------------------------------------------------
@@ -300,10 +329,12 @@ CREATE TABLE OGroupEntity (
 -- Table structure for the table 'EntityRight'
 --
 ALTER TABLE EntityRight ADD COLUMN entityright_admin integer NOT NULL default 0;
+ALTER TABLE P_EntityRight ADD COLUMN entityright_admin integer NOT NULL default 0;
 --
 -- UPDATE EntityRight DATA
 --
 UPDATE EntityRight SET entityright_write = entityright_admin;
+UPDATE P_EntityRight SET entityright_write = entityright_admin;
 
 --
 -- UPDATE Prefs
@@ -375,6 +406,7 @@ UPDATE Incident set incident_status_id = 4 WHERE incident_status_id IN
 --
 -- UPDATE ProjectTask Structure
 --
+ALTER TABLE ProjectTask ADD COLUMN projecttask_datebegin date;
 ALTER TABLE ProjectTask ADD COLUMN projecttask_dateend date;
 
 
@@ -409,6 +441,9 @@ DROP table ProjectStat;
 ALTER TABLE MailShare ADD COLUMN mailshare_archive integer;
 ALTER TABLE MailShare ALTER COLUMN mailshare_archive SET DEFAULT 0;
 ALTER TABLE MailShare ALTER COLUMN mailshare_archive SET NOT NULL;
+ALTER TABLE P_MailShare ADD COLUMN mailshare_archive integer;
+ALTER TABLE P_MailShare ALTER COLUMN mailshare_archive SET DEFAULT 0;
+ALTER TABLE P_MailShare ALTER COLUMN mailshare_archive SET NOT NULL;
 
 
 --
@@ -425,6 +460,17 @@ ALTER TABLE MailServer ADD COLUMN mailserver_smtp_in integer default 0;
 ALTER TABLE MailServer ALTER COLUMN mailserver_smtp_in SET DEFAULT 0;
 ALTER TABLE MailServer ADD COLUMN mailserver_smtp_out integer default 0;
 ALTER TABLE MailServer ALTER COLUMN mailserver_smtp_out SET DEFAULT 0;
+-- Production table
+ALTER TABLE P_MailServer ADD COLUMN mailserver_timeupdate timestamp;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_timecreate timestamp;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_userupdate integer;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_usercreate integer;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_imap integer;
+ALTER TABLE P_MailServer ALTER COLUMN mailserver_imap SET DEFAULT 0;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_smtp_in integer default 0;
+ALTER TABLE P_MailServer ALTER COLUMN mailserver_smtp_in SET DEFAULT 0;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_smtp_out integer default 0;
+ALTER TABLE P_MailServer ALTER COLUMN mailserver_smtp_out SET DEFAULT 0;
 
 
 --
@@ -435,3 +481,29 @@ CREATE TABLE DomainMailServer (
   domainmailserver_mailserver_id  integer NOT NULL,
   domainmailserver_role           varchar(16) NOT NULL default 'imap'
 );
+
+
+--
+-- Table structure for table 'ObmBookmark'
+--
+CREATE TABLE ObmBookmark (
+  obmbookmark_id          serial,
+  obmbookmark_user_id     integer NOT NULL,
+  obmbookmark_label       varchar(48) NOT NULL default '',
+  obmbookmark_entity      varchar(24) NOT NULL default '',
+  PRIMARY KEY (obmbookmark_id)
+);
+CREATE INDEX bkm_idx_user ON ObmBookmark (obmbookmark_user_id);
+
+
+--
+-- Table structure for table 'ObmBookmarkProperty'
+--
+CREATE TABLE ObmBookmarkProperty (
+  obmbookmarkproperty_id           serial,
+  obmbookmarkproperty_bookmark_id  integer NOT NULL,
+  obmbookmarkproperty_property     varchar(64) NOT NULL default '',
+  obmbookmarkproperty_value        varchar(64) NOT NULL default '',
+  PRIMARY KEY (obmbookmarkproperty_id)
+);
+CREATE INDEX bkmprop_idx_bkm ON ObmBookmarkProperty (obmbookmarkproperty_bookmark_id);

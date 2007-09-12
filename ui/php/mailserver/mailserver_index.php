@@ -36,7 +36,7 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == 'ext_get_id') {
+if ($action == 'ext_get_ids') {
   $display['search'] = html_mailserver_search_form($params);
   if ($_SESSION['set_display'] == 'yes') {
     $display['result'] = dis_mailserver_search_list($params);
@@ -136,9 +136,10 @@ if ($action == 'ext_get_id') {
 ///////////////////////////////////////////////////////////////////////////////
 $display['head'] = display_head($l_mailserver);
 $display['end'] = display_end();
-update_mailserver_action();
-$display['header'] = display_menu($module);
-
+if (! $params["popup"]) {
+  update_mailserver_action();
+  $display['header'] = display_menu($module);
+ }
 display_page($display);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -163,6 +164,14 @@ function get_mailserver_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   $id = $params['mailserver_id'];
+
+// Get Ids
+  $actions['mailserver']['ext_get_ids'] = array (
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids",
+    'Right'    => $cright_read,
+    'Condition'=> array ('none'),
+    'popup' => 1
+                                    );
 
   $actions['mailserver']['index'] = array (
     'Name'     => $l_header_find,

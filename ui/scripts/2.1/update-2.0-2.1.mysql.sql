@@ -110,6 +110,8 @@ ALTER TABLE Incident CHANGE COLUMN incident_date incident_date timestamp(14);
 -------------------------------------------------------------------------------
 -- Update UserObm table
 -------------------------------------------------------------------------------
+-- Add nb login failed
+ALTER TABLE UserObm ADD COLUMN userobm_nb_login_failed int(2) DEFAULT 0 AFTER userobm_login;
 -- Add hidden field
 ALTER TABLE UserObm ADD COLUMN userobm_hidden int(1) DEFAULT 0 AFTER userobm_datebegin;
 -- Add kind field
@@ -129,6 +131,29 @@ ALTER TABLE UserObm ADD COLUMN userobm_nomade_dateend timestamp(14) AFTER userob
 -- user expiration date fields
 ALTER TABLE UserObm ADD COLUMN userobm_password_dateexp date AFTER userobm_password;
 ALTER TABLE UserObm ADD COLUMN userobm_account_dateexp date AFTER userobm_password_dateexp;
+
+-- Production table
+-- Add nb login failed
+ALTER TABLE P_UserObm ADD COLUMN userobm_nb_login_failed int(2) DEFAULT 0 AFTER userobm_login;
+-- Add hidden field
+ALTER TABLE P_UserObm ADD COLUMN userobm_hidden int(1) DEFAULT 0 AFTER userobm_datebegin;
+-- Add kind field
+ALTER TABLE P_UserObm ADD COLUMN userobm_kind varchar(12) AFTER userobm_hidden;
+-- Add mail_quota_use, last login date
+ALTER TABLE P_UserObm ADD COLUMN userobm_mail_quota_use int(8) DEFAULT 0 AFTER userobm_mail_quota;
+ALTER TABLE P_UserObm ADD COLUMN userobm_mail_login_date timestamp(14) AFTER userobm_mail_quota_use;
+ALTER TABLE P_UserObm ADD COLUMN userobm_photo_id int(8) AFTER userobm_education;
+-- Add company, direction field
+ALTER TABLE P_UserObm ADD COLUMN userobm_company varchar(64) AFTER userobm_sound;
+ALTER TABLE P_UserObm ADD COLUMN userobm_direction varchar(64) AFTER userobm_company;
+-- Add vacation_date, nomade fields
+ALTER TABLE P_UserObm ADD COLUMN userobm_vacation_datebegin timestamp(14) AFTER userobm_vacation_enable;
+ALTER TABLE P_UserObm ADD COLUMN userobm_vacation_dateend timestamp(14) AFTER userobm_vacation_datebegin;
+ALTER TABLE P_UserObm ADD COLUMN userobm_nomade_datebegin timestamp(14) AFTER userobm_nomade_local_copy;
+ALTER TABLE P_UserObm ADD COLUMN userobm_nomade_dateend timestamp(14) AFTER userobm_nomade_datebegin;
+-- user expiration date fields
+ALTER TABLE P_UserObm ADD COLUMN userobm_password_dateexp date AFTER userobm_password;
+ALTER TABLE P_UserObm ADD COLUMN userobm_account_dateexp date AFTER userobm_password_dateexp;
 
 
 -------------------------------------------------------------------------------
@@ -369,6 +394,7 @@ UPDATE Incident set incident_status_id = 4 WHERE incident_status_id IN
 --
 -- UPDATE ProjectTask Structure
 --
+ALTER TABLE ProjectTask ADD COLUMN projecttask_datebegin date;
 ALTER TABLE ProjectTask ADD COLUMN projecttask_dateend date;
 
 
@@ -401,6 +427,8 @@ DROP table ProjectStat;
 --
 -- Add archive flag
 ALTER TABLE MailShare ADD COLUMN mailshare_archive int(1) not null default 0 AFTER mailshare_name;
+-- Production table
+ALTER TABLE P_MailShare ADD COLUMN mailshare_archive int(1) not null default 0 AFTER mailshare_name;
 
 
 --
@@ -415,6 +443,15 @@ ALTER TABLE MailServer ADD COLUMN mailserver_imap int(1) default 0;
 ALTER TABLE MailServer ADD COLUMN mailserver_smtp_in int(1) default 0;
 ALTER TABLE MailServer ADD COLUMN mailserver_smtp_out int(1) default 0;
 
+-- Production table
+ALTER TABLE P_MailServer ADD COLUMN mailserver_timeupdate timestamp(14) AFTER mailserver_id;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_timecreate timestamp(14) AFTER mailserver_timeupdate;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_userupdate int(8) AFTER mailserver_timecreate;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_usercreate int(8) AFTER mailserver_userupdate;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_imap int(1) default 0;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_smtp_in int(1) default 0;
+ALTER TABLE P_MailServer ADD COLUMN mailserver_smtp_out int(1) default 0;
+
 
 --
 -- Domain - Mail server link table
@@ -424,3 +461,31 @@ CREATE TABLE DomainMailServer (
   domainmailserver_mailserver_id  int(8) NOT NULL,
   domainmailserver_role           varchar(16) NOT NULL default 'imap'
 );
+
+
+--
+-- Table structure for table 'ObmBookmark'
+--
+CREATE TABLE ObmBookmark (
+  obmbookmark_id          int(8) auto_increment,
+  obmbookmark_user_id     int(8) NOT NULL,
+  obmbookmark_label       varchar(48) NOT NULL default '',
+  obmbookmark_entity      varchar(24) NOT NULL default '',
+  PRIMARY KEY (obmbookmark_id),
+  INDEX bkm_idx_user (obmbookmark_user_id)
+);
+
+
+--
+-- Table structure for table 'ObmBookmarkProperty'
+--
+CREATE TABLE ObmBookmarkProperty (
+  obmbookmarkproperty_id           int(8) auto_increment,
+  obmbookmarkproperty_bookmark_id  int(8) NOT NULL,
+  obmbookmarkproperty_property     varchar(64) NOT NULL default '',
+  obmbookmarkproperty_value        varchar(64) NOT NULL default '',
+  PRIMARY KEY (obmbookmarkproperty_id),
+  INDEX bkmprop_idx_bkm (obmbookmarkproperty_bookmark_id)
+);
+
+

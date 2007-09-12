@@ -84,6 +84,7 @@ CREATE TABLE UserObm (
   userobm_archive             int(1) not null default 0,
   userobm_timelastaccess      timestamp(14),
   userobm_login               varchar(32) DEFAULT '' NOT NULL,
+  userobm_nb_login_failed     int(2) DEFAULT 0,
   userobm_password_type       char(6) DEFAULT 'PLAIN' NOT NULL,
   userobm_password            varchar(64) DEFAULT '' NOT NULL,
   userobm_password_dateexp    date,
@@ -205,6 +206,32 @@ CREATE TABLE CategoryLink (
   PRIMARY KEY (categorylink_category_id, categorylink_entity_id),
   INDEX catl_idx_ent (categorylink_entity_id),
   INDEX catl_idx_cat (categorylink_category)
+);
+
+
+--
+-- Table structure for table 'ObmBookmark'
+--
+CREATE TABLE ObmBookmark (
+  obmbookmark_id          int(8) auto_increment,
+  obmbookmark_user_id     int(8) NOT NULL,
+  obmbookmark_label       varchar(48) NOT NULL default '',
+  obmbookmark_entity      varchar(24) NOT NULL default '',
+  PRIMARY KEY (obmbookmark_id),
+  INDEX bkm_idx_user (obmbookmark_user_id)
+);
+
+
+--
+-- Table structure for table 'ObmBookmarkProperty'
+--
+CREATE TABLE ObmBookmarkProperty (
+  obmbookmarkproperty_id           int(8) auto_increment,
+  obmbookmarkproperty_bookmark_id  int(8) NOT NULL,
+  obmbookmarkproperty_property     varchar(64) NOT NULL default '',
+  obmbookmarkproperty_value        varchar(64) NOT NULL default '',
+  PRIMARY KEY (obmbookmarkproperty_id),
+  INDEX bkmprop_idx_bkm (obmbookmarkproperty_bookmark_id)
 );
 
 
@@ -962,6 +989,7 @@ CREATE TABLE ProjectTask (
   projecttask_label          varchar(128) default NULL,
   projecttask_parenttask_id  int(8) default 0,
   projecttask_rank           int(8) default NULL,
+  projecttask_datebegin      date,
   projecttask_dateend        date,
   PRIMARY KEY (projecttask_id),
   INDEX pt_idx_pro (projecttask_project_id)

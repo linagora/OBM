@@ -70,6 +70,7 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
+
 } elseif ($action == "ext_get_id_cv") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_project_search_form($params);
@@ -517,7 +518,7 @@ function get_project_action() {
   global $l_header_dashboard,$l_header_planning,$l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
-// External call : select one deal
+// External call : select one project
   $actions["project"]["ext_get_id"] = array (
     'Url'      => "$path/project/project_index.php?action=ext_get_id",
     'Right'    => $cright_read,

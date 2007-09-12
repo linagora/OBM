@@ -159,8 +159,8 @@ function dis_mailserver_search_list($params) {
  * @param mixed $params : mailserver parameters
  * @return XHTML Display Search result
  */
-function html_mailserver_search_list($obm_q, $pref_q, $mailserver) {
-  global $display, $l_found, $l_close, $module;
+function html_mailserver_search_list($obm_q, $pref_q, $params) {
+  global $display, $l_found, $l_close, $l_add, $module;
 
   $popup = $params['popup'];
 
@@ -186,10 +186,33 @@ function html_mailserver_search_list($obm_q, $pref_q, $mailserver) {
   $dis_m = new OBM_DISPLAY('DATA', $pref_q, $module);
 
   if ($popup) {
+    $dis_m->display_link = false;
+    $dis_m->data_cb_text = 'X';
+    $dis_m->data_idfield = 'mailserver_id';
+    $dis_m->data_cb_name = "data-m-";
+    if ($ext_element != "") {
+      $dis_m->data_cb_name = "";
+      $dis_m->data_form_head = "
+      <form onsubmit=\"of_select_fill_from_checkbox(this); return false;\">";
+    } elseif ($ext_widget != "") {
+      $dis_m->data_form_head = "
+      <form onsubmit=\"fill_ext_form(this); return false;\">";
+    } else {
+      $dis_m->data_form_head = "
+      <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    }
     if ( ($ext_widget != '') && ($ext_widget_text != '') ) { 
       $dis_m->display_ext = 'get_id';
     }
     $dis_m->data_form_end = "
+      <div class=\"buttons\">
+        <input type=\"submit\" value=\"$l_add\" />
+        <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+      </div>
+      </form>";
+
+    $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";

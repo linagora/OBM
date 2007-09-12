@@ -355,7 +355,7 @@ function dis_contact_search_form($contact="") {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   global $action, $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
-  global $csearch_advanced_default, $l_fuzzy;
+  global $csearch_advanced_default, $l_fuzzy, $l_date, $l_timeupdate;
   global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_datasource;
   global $l_after, $l_before, $l_mailing_ok_only, $l_newsletter, $l_archive;
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
@@ -372,6 +372,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   $func = $contact["function"];
   $title = $contact["title"];
   $mark = $contact["market"];
+  $date_field = ($contact['date_field'] ? $contact['date_field'] : 'timeupdate');
   $dateafter = of_date_upd_format(stripslashes($contact["date_after"]),true);
   $datebefore = of_date_upd_format(stripslashes($contact["date_before"]),true);
   $mailing_ok_only = ($contact["mailing_ok_only"] == "1" ? "checked = \"checked\"" : "");
@@ -388,9 +389,16 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   $show_func = (! $cgp_hide["contact"]["function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
+  $show_date = (! $cgp_hide['contact']['contact_date']);
 
   // User defined data
   $block_userdata .= of_userdata_dis_search("contact", $contact);
+
+  // Selected date field
+  $s_date_field[$date_field] = "selected=\"selected\"";
+  if ($show_date) {
+    $sel_date_date = "<option value=\"date\" $s_date_field[date]>$l_date</option>";
+  }
   
   // Function select
   $block_function = of_category_dis_search_select("contact", "function", $funcs, $func);
@@ -501,6 +509,12 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     $block_function
     $block_title
     $block_resp
+    <label>$l_date<br />
+      <select name=\"sel_date_field\">
+        <option value=\"timeupdate\" $s_date_field[timeupdate]>$l_timeupdate</option>
+        $sel_date_date
+      </select>
+    </label>
     <label>$l_after<br />
       <input type=\"text\" name=\"tf_date_after\" class=\"datePicker\" value=\"$dateafter\" />
     </label>
