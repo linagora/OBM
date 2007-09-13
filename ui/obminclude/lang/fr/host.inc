@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_ip = "IP";
 $l_smb = "Windows";
 $l_smb_only = "Windows seul.";
 $l_host_select_user = "Choix de l'utilisateur de la machine";

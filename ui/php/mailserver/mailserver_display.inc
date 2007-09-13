@@ -160,7 +160,7 @@ function dis_mailserver_search_list($params) {
  * @return XHTML Display Search result
  */
 function html_mailserver_search_list($obm_q, $pref_q, $params) {
-  global $display, $l_found, $l_close, $l_add, $module;
+  global $display, $l_close, $l_add, $module, $l_imap, $l_smtp_in, $l_smtp_out;
 
   $popup = $params['popup'];
 
@@ -205,6 +205,12 @@ function html_mailserver_search_list($obm_q, $pref_q, $params) {
       $dis_m->display_ext = 'get_id';
     }
     $dis_m->data_form_end = "
+      <select name=\"sel_role\">
+        <option value=\"imap\"> $l_imap</option>
+        <option value=\"smtp_in\"> $l_smtp_in</option>
+        <option value=\"smtp_out\"> $l_smtp_out</option>
+      </select>
+        
       <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_add\" />
         <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />

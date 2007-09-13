@@ -277,9 +277,9 @@ function dis_domain_consult($domain) {
 //   - $mailservers : domain mailservers array
 ///////////////////////////////////////////////////////////////////////////////
 function html_domain_consult($obm_q, $mailservers, $properties_q) {
-  global $display, $l_mail_server, $cgp_use, $l_properties;
+  global $display, $ico_delete, $l_mail_server, $cgp_use, $l_properties;
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
-  global $l_host, $l_ip, $l_role, $l_mail_servers;
+  global $l_host, $l_ip, $l_role, $l_mail_servers, $l_header_delete;
 
   $id = $obm_q->f('domain_id');
   $label = $obm_q->f('domain_label');
@@ -302,21 +302,26 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
     </tr>';
     
     // Domain mailservers
+    // Get the domain mailservers
     $ms = $mailservers[$id];
-
+    $block_m = '';
     if (is_array($ms)) {
-      foreach ($ms as $m_id => $server_info) {
-	$name = $server_info['name'];
-	$ip = $server_info['ip'];
-	$role = $server_info['role'];
-	$block_ms .= "
-      <tr>
-      <th>$name</th>
-      <td>$ip</td>
-      <td>$role</td>
-      </tr>";
+      foreach ($ms as $m_id => $mailserver_info) {
+	// $mailserver_info is an array of info rows about this mail server
+	foreach ($mailserver_info as $server_info) {
+	  $name = $server_info['name'];
+	  $ip = $server_info['ip'];
+	  $role = $server_info['role'];
+	  $block_m .= "
+        <tr>
+        <td>$name</td>
+        <td>$ip</td>
+        <td>$role</td>
+        <td><a href=\"$path/domain/domain_index.php?action=mailserver_del&amp;domain_id=$id&amp;mailserver_id=$m_id&amp;role=$role\"><img src=\"$ico_delete\" alt=\"$l_header_delete\" /></a></td>
+        </tr>";
+	}
       }
-      if ($block_ms != '') {
+      if ($block_m != '') {
 	$block_ms = "
       <div class=\"detail infos\">
       <h1>$l_mail_servers</h1>
@@ -327,9 +332,10 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
         <th>$l_host</th>
         <th>$l_ip</th>
         <th>$l_role</th>
+        <th>$l_header_delete</th>
       </tr>
       </thead>
-      $block_ms
+      $block_m
       </table>
       </div>";
       }

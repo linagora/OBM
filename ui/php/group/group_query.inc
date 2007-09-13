@@ -425,12 +425,13 @@ function run_query_group_delete($p_id) {
   return $retour;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : UserObmGroup conditionnal insertion
-// Parameters:
-//   - $group[] : group hash info : keys used : id, user_nb, userX
-// Return: number of users inserted
-///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Query execution : UserObmGroup conditionnal insertion
+ *
+ * @param mixed $group[] : group hash info : keys used : id, user_nb, userX
+ * @result number of users inserted
+**/
 function run_query_group_usergroup_insert($group) {
   global $obm, $cdg_sql;
 

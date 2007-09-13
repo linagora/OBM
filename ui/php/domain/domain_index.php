@@ -25,13 +25,14 @@ $module = 'domain';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
 include("$obminclude/global.inc");
+$params = get_domain_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 require('domain_display.inc');
 require('domain_query.inc');
+require('domain_js.inc');
 
 if ($action == '') $action = 'index';
-$params = get_domain_params();
 get_domain_action();
 $perm->check_permissions($module, $action);
 
@@ -59,7 +60,6 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'new')  {
 ///////////////////////////////////////////////////////////////////////////////
-  require('domain_js.inc');
   $prop_q = run_query_domain_properties();
   $display['detail'] = html_domain_form('',$prop_q,$params);
 
@@ -80,7 +80,6 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'insert')  {
 ///////////////////////////////////////////////////////////////////////////////
-  require('domain_js.inc');
   if (check_domain_data_form('', $params)) {
     $cid = run_query_domain_insert($params);
     if ($cid > 0) {
@@ -102,7 +101,6 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'update')  {
 ///////////////////////////////////////////////////////////////////////////////
-  require('domain_js.inc');
   if (check_domain_data_form($params['domain_id'], $params)) {
     $retour = run_query_domain_update($params['domain_id'], $params);
     if ($retour) {
@@ -145,7 +143,18 @@ if ($action == 'index' || $action == '') {
     $display['detail'] = dis_domain_consult($params);
   }
 
+} elseif ($action == "mailserver_add") {
+///////////////////////////////////////////////////////////////////////////////
+  if ($params['mailserver_nb'] > 0) {
+    $nb = run_query_domain_mailserver_insert($params);
+    //      set_update_state();
+    $display["msg"] .= display_ok_msg("$nb $l_mailserver_added");
+  } else {
+    $display['msg'] .= display_err_msg($l_no_mailserver_added);
+  }
+  $display['detail'] = dis_domain_consult($params);
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
@@ -169,7 +178,17 @@ function get_domain_params() {
   // Get global params
   $params = get_global_params();
 
-  display_debug_param($params);
+  if (isset ($params['ext_id'])) $params['domain_id'] = trim($params['ext_id']);
+
+  $nb_m = 0;
+  foreach ($params as $key => $value) {
+    if (strcmp(substr($key, 0, 7),'data-m-') == 0) {
+      $nb_m++;
+      $m_num = substr($key, 7);
+      $params["mailserver$nb_m"] = $m_num;
+    }
+  }
+  $params['mailserver_nb'] = $nb_m;
 
   return $params;
 }
@@ -200,7 +219,7 @@ function get_domain_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/domain/domain_index.php?action=new",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display')
+    'Condition'=> array ('search','index','insert','update','admin','detailconsult','display', 'mailserver_add', 'mailserver_del')
                                   );
 
 // Search
@@ -215,7 +234,7 @@ function get_domain_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/domain/domain_index.php?action=detailconsult&amp;domain_id=$id",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'group_consult', 'group_update')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'mailserver_add', 'mailserver_del')
                                   );
 
 // Detail Update
@@ -223,18 +242,32 @@ function get_domain_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/domain/domain_index.php?action=detailupdate&amp;domain_id=$id",
      'Right'    => $cright_write_admin,
-     'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update')
+     'Condition'=> array ('detailconsult', 'update', 'mailserver_add', 'mailserver_del')
                                      	   );
 
 // Sel Mailserver add : Mail server selection
   $actions['domain']['sel_mailserver_add'] = array (
     'Name'     => $l_header_add_mailserver,
-    'Url'      => "$path/mailserver/mailserver_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=mailserver_add&amp;ext_url=".urlencode($path."/domain/domain_index.php")."&amp;ext_id=".$params['domain_id']."&amp;ext_target=$l_domain",
+    'Url'      => "$path/mailserver/mailserver_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=mailserver_add&amp;ext_url=".urlencode($path."/domain/domain_index.php")."&amp;ext_id=$id&amp;ext_target=$l_domain",
     'Right'    => $cright_write_admin,
     'Popup'    => 1,
     'Target'   => $l_domain,
     'Condition'=> array ('detailconsult','mailserver_add','mailserver_del', 'update')
                                     	  );
+
+// Mailserver add
+  $actions['domain']['mailserver_add'] = array (
+    'Url'      => "$path/domain/domain_index.php?action=mailserver_add",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+                                     );
+
+// Mailserver del
+  $actions['domain']['mailserver_del'] = array (
+    'Url'      => "$path/domain/domain_index.php?action=mailserver_del",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+                                     );
 
 // Insert
   $actions['domain']['insert'] = array (
@@ -255,7 +288,7 @@ function get_domain_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/domain/domain_index.php?action=check_delete&amp;domain_id=$id",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'mailserver_add', 'mailserver_del') 
                                      	   );
 
 // Delete

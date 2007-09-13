@@ -356,6 +356,10 @@ function get_domain_mailserver($domain_id=0, $role='') {
     $and = 'AND';
   }
 
+  if (($where_domain != '') || ($where_role != '')) {
+    $where = "WHERE $where_domain $where_role";
+  }
+
   $query = "SELECT distinct
       domainmailserver_domain_id,
       domainmailserver_mailserver_id,
@@ -366,8 +370,7 @@ function get_domain_mailserver($domain_id=0, $role='') {
     FROM DomainMailServer
       LEFT JOIN MailServer ON domainmailserver_mailserver_id=mailserver_id
       LEFT JOIN Host ON mailserver_host_id=host_id
-    WHERE $where_domain
-      $where_role";
+    $where";
   
   display_debug_msg($query, $cdg_sql, 'get_domain_mailserver()');
   $obm_q = new DB_OBM;
@@ -384,6 +387,51 @@ function get_domain_mailserver($domain_id=0, $role='') {
   }
 
   return $m;
+}
+
+
+/**
+ * Query execution : DomainMailServer conditionnal insertion
+ *
+ * @param mixed $params[] : parameters
+ * @result number of mailserver inserted
+**/
+function run_query_domain_mailserver_insert($params) {
+  global $obm, $cdg_sql;
+
+  $id = $params['domain_id'];
+  $role = $params['role'];
+  $cpt = 0;
+  $cpt_ins = 0;
+  while ($cpt < $params['mailserver_nb']) {
+    $cpt++;
+    $m_id = $params["mailserver$cpt"];
+
+    $query = "SELECT * FROM DomainMailServer
+      WHERE domainmailserver_domain_id='$id'
+        AND domainmailserver_mailserver_id='$m_id'
+        AND domainmailserver_role='$role'";
+
+    display_debug_msg($query, $cdg_sql, 'run_query_domain_mailserver_insert(1)');
+    $test_q = new DB_OBM;
+    $retour = $test_q->query($query);
+    
+    // If the entry doesn't already exist, we insert it
+    if ($test_q->num_rows() == 0) {
+      $query = "INSERT INTO DomainMailServer (
+        domainmailserver_domain_id,
+        domainmailserver_mailserver_id,
+        domainmailserver_role)
+      VALUES ('$id', '$m_id', '$role')";
+
+      display_debug_msg($query, $cdg_sql, 'run_query_domain_mailserver_insert(2)');
+      $obm_q = new DB_OBM;
+      $retour = $obm_q->query($query);
+      $cpt_ins++;
+    }
+  }
+
+  return $cpt_ins;
 }
 
 ?>

@@ -1141,10 +1141,10 @@ function get_lang() {
 // Returns:
 //   $params : hash table which contains form params
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_params($table="") {
-  global $fieldnames, $action,$popup;
+function get_global_params($table='') {
+  global $fieldnames, $action, $popup;
 
-  $order_dir_values = array("ASC", "DESC");
+  $order_dir_values = array('ASC', 'DESC');
   
   /*
     tf_  = textfield
