@@ -35,10 +35,12 @@ $l_address1 = "$l_address 1";
 $l_address2 = "$l_address 2";
 $l_address3 = "$l_address 3";
 
+$l_link_user_mailserver = "Le serveur de messagerie contient des utilisateurs du domaine";
+$l_link_user_mailserver_no = "Le serveur de messagerie ne contient pas d'utilisateurs du domaine";
 $l_mailserver_added = "Serveurs de messagerie ajoutés";
 $l_mailserver_removed = "Serveur de messagerie enlevé";
 $l_no_mailserver_added = "Pas de serveur de messagerie à ajouter";
-$l_no_mailserver_deleted = "Pas de serveur de messagerie à supprimer";
+$l_mailserver_cant_delete = "Le serveur de messagerie ne peut être supprimé du domaine";
 
 // JavaScript Messages
 $l_fill_title = "Vous devez renseigner le Label avant de valider.";

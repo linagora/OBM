@@ -317,7 +317,7 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
         <td>$name</td>
         <td>$ip</td>
         <td>$role</td>
-        <td><a href=\"$path/domain/domain_index.php?action=mailserver_del&amp;domain_id=$id&amp;mailserver_id=$m_id&amp;role=$role\"><img src=\"$ico_delete\" alt=\"$l_header_delete\" /></a></td>
+        <td style=\"text-align: center;\"><a href=\"$path/domain/domain_index.php?action=mailserver_del&amp;domain_id=$id&amp;mailserver_id=$m_id&amp;role=$role\"><img src=\"$ico_delete\" alt=\"$l_header_delete\" /></a></td>
         </tr>";
 	}
       }

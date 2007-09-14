@@ -265,13 +265,12 @@ function check_domain_data_form($d_id, $domain) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Check if the domain can be deleted
-// Parameters:
-//   - $d_id : domain_id
-// Returns:
-//   true if the domain can be deleted, else false
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Check if the domain can be deleted
+ *
+ * @param mixed $d_id : domain_id
+ * @return true if the domain can be deleted, else false
+ **/
 function check_domain_can_delete($p_id) {
   global $err, $ok_msg;
   global $l_link_user, $l_link_user_no;
@@ -282,27 +281,71 @@ function check_domain_can_delete($p_id) {
   $nb = get_linked_user_domain($p_id);
   if ($nb > 0) {
     $delete_ok = false;
-    $err['msg'] .= "$l_link_user";
+    $err['msg'] .= $l_link_user;
   } else {
-    $ok_msg .= "$l_link_user_no";
+    $ok_msg .= $l_link_user_no;
   }
 
   return $delete_ok;
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Count number of domain in a domain
-// Parameters:
-//   - $domain_id : domain_id
-// Returns:
-//   Number of users in a domain
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Count number of users in a domain
+ *
+ * @param mixed $domain_id : domain_id
+ * @return Number of users in a domain
+ **/
 function get_linked_user_domain($domain_id) {
 
   $nb = get_query_count("SELECT count(userobm_id) as nb
     FROM UserObm
     WHERE userobm_domain_id='$domain_id'");
+
+  return $nb;
+}
+
+
+/**
+ * Check if a mailserver can be removed from a domain
+ *
+ * @param mixed $params : parameters : domain_id, mailserver_id
+ * @return true if the mailserver can be removed from the domain
+ **/
+function check_domain_can_delete_mailserver($params) {
+  global $err, $ok_msg;
+  global $l_link_user_mailserver, $l_link_user_mailserver_no;
+
+  $delete_ok = true;
+  $domain_id = $params['domain_id'];
+  $mailserver_id = $params['mailserver_id'];
+
+  // Links from Users
+  $nb = get_domain_linked_user_mailserver($domain_id, $mailserver_id);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err['msg'] .= $l_link_user_mailserver;
+  } else {
+    $ok_msg .= $l_link_user_mailserver_no;
+  }
+
+  return $delete_ok;
+}
+
+
+/**
+ * Count number of users connected to a mailserver in a domain
+ *
+ * @param mixed $domain_id : domain_id
+ * @param mixed $mailserver_id : mailserver_id
+ * @return Number of users in a domain
+ **/
+function get_domain_linked_user_mailserver($domain_id, $mailserver_id) {
+
+  $nb = get_query_count("SELECT count(userobm_id) as nb
+    FROM UserObm
+    WHERE userobm_domain_id='$domain_id'
+      AND userobm_mail_server_id='$mailserver_id'");
 
   return $nb;
 }
@@ -432,6 +475,31 @@ function run_query_domain_mailserver_insert($params) {
   }
 
   return $cpt_ins;
+}
+
+
+/**
+ * Query execution : DomainMailServer deletion
+ *
+ * @param mixed $params[] : parameters 'domain_id', 'mailserver_id', 'role'
+ * @result number of mailserver inserted
+**/
+function run_query_domain_mailserver_delete($params) {
+  global $obm, $cdg_sql;
+
+  $id = $params['domain_id'];
+  $mailserver_id = $params['mailserver_id'];
+  $role = $params['role'];
+  $query = "DELETE FROM DomainMailServer
+      WHERE domainmailserver_domain_id='$id'
+        AND domainmailserver_mailserver_id='$mailserver_id'
+        AND domainmailserver_role='$role'";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_mailserver_delete()');
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
 }
 
 ?>

@@ -17,7 +17,6 @@
 // - check_delete    -- $domain_id    -- check links before delete
 // - delete          -- $domain_id    -- delete the user
 // External API ---------------------------------------------------------------
-//
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = '..';
@@ -151,6 +150,18 @@ if ($action == 'index' || $action == '') {
     $display["msg"] .= display_ok_msg("$nb $l_mailserver_added");
   } else {
     $display['msg'] .= display_err_msg($l_no_mailserver_added);
+  }
+  $display['detail'] = dis_domain_consult($params);
+
+} elseif ($action == "mailserver_del") {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_domain_can_delete_mailserver($params)) {
+    $nb = run_query_domain_mailserver_delete($params);
+    //      set_update_state();
+    $display["msg"] .= display_ok_msg("$nb $l_mailserver_removed");
+  } else {
+    $display['msg'] .= display_warn_msg($err['msg'], false);
+    $display['msg'] .= display_err_msg($l_mailserver_cant_delete);
   }
   $display['detail'] = dis_domain_consult($params);
 }
