@@ -377,8 +377,11 @@ Obm.CalendarDayEvent = new Class({
       case "category" :
         this.setColor(this.event.colors.category);
         break;
-      default :
+      case "user" :
         this.setColor();
+        break;        
+      default :
+        this.setColor(this.event.colors.event);
     }
   },
 
@@ -1017,7 +1020,6 @@ Obm.CalendarQuickForm = new Class({
     } else {
       var elId = 'event-' + str[1] + '-' + str[2] + '-' + str[3] + '-' + str[4];
       var evt = obm.calendarManager.events.get(elId);
-//      target = evt.element;
       this.setFormValues(evt,context);
     }
     this.show();    
