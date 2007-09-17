@@ -7,8 +7,8 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.1.0pre15";
-$l_obm_title = "OBM";
+$obm_version = '2.1.0rc1';
+$l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
 $c_focsys = 3;
@@ -290,6 +290,9 @@ $cgp_show['module']['mailbox'] = 'my';
 if ($c_multidomain) {
   $cgp_show['module']['domain'] = 'admin';
 }
+
+// Specific user data
+$cgp_user = array();
 
 // OBM-LDAP, OBM-Mail, OBM-Windows values
 

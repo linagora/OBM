@@ -1325,10 +1325,12 @@ function prepare_list_criteria(&$criteria) {
 
   // User data categories handling
   // We stamp each category
-  foreach ($cgp_user as $entity => $entity_info) {
-    if (is_array($cgp_user[$entity]["category"])) {
-      foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
-	$target_fields[$cat_name] = "category";
+  if (is_array($cgp_user)) {
+    foreach ($cgp_user as $entity => $entity_info) {
+      if (is_array($cgp_user[$entity]["category"])) {
+	foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+	  $target_fields[$cat_name] = "category";
+	}
       }
     }
   }

@@ -12,41 +12,41 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["deal_label"] = $l_label;
-$fieldnames["deal_datebegin"] = $l_begin;
-$fieldnames["deal_dateproposal"] = $l_proposal;
-$fieldnames["deal_dateexpected"] = $l_expected;
-$fieldnames["expected_quarter"] = "$l_expected $l_quarter";
-$fieldnames["sale_delay"] = "$l_sale_delay";
-$fieldnames["deal_dateend"] = $l_end;
-$fieldnames["end_quarter"] = "$l_end $l_quarter";
-$fieldnames["deal_datealarm"] = $l_alarm;
-$fieldnames["deal_archive"] = $l_archive_first;
-$fieldnames["deal_todo"] = $l_todo;
-$fieldnames["deal_marketingmanager"] = $l_marketing_manager;
-$fieldnames["deal_source"] = $l_source;
-$fieldnames["deal_marketingmanager"] = $l_marketing_manager;
-$fieldnames["deal_commission"] = $l_commission_p;
-$fieldnames["deal_amount"] = $l_amount;
-$fieldnames["deal_margin"] = $l_margin;
-$fieldnames["deal_hitrate"] = $l_hitrate;
-$fieldnames["deal_relation"] = $l_relation;
-$fieldnames["parentdeal_label"] = $l_label;
-$fieldnames["parentdeal_comment"] = $l_comment;
+$fieldnames['deal_label'] = $l_label;
+$fieldnames['deal_datebegin'] = $l_begin;
+$fieldnames['deal_dateproposal'] = $l_proposal;
+$fieldnames['deal_dateexpected'] = $l_expected;
+$fieldnames['expected_quarter'] = "$l_expected $l_quarter";
+$fieldnames['sale_delay'] = $l_sale_delay;
+$fieldnames['deal_dateend'] = $l_end;
+$fieldnames['end_quarter'] = "$l_end $l_quarter";
+$fieldnames['deal_datealarm'] = $l_alarm;
+$fieldnames['deal_archive'] = $l_archive_first;
+$fieldnames['deal_todo'] = $l_todo;
+$fieldnames['deal_marketingmanager'] = $l_marketing_manager;
+$fieldnames['deal_source'] = $l_source;
+$fieldnames['deal_marketingmanager'] = $l_marketing_manager;
+$fieldnames['deal_commission'] = $l_commission_p;
+$fieldnames['deal_amount'] = $l_amount;
+$fieldnames['deal_margin'] = $l_margin;
+$fieldnames['deal_hitrate'] = $l_hitrate;
+$fieldnames['deal_relation'] = $l_relation;
+$fieldnames['parentdeal_label'] = $l_label;
+$fieldnames['parentdeal_comment'] = $l_comment;
 // Calculated or indirect fields
-$fieldnames["dealstatus_label"] = $l_status;
-$fieldnames["dealtype_label"] = $l_kind;
-$fieldnames["tasktype_label"] = $l_tt;
-$fieldnames["region_label"] = $l_region;
-$fieldnames["deal_company_name"] = $l_company;
-$fieldnames["deal_company_zipcode"] = $l_postcode;
-$fieldnames["parentdeal_marketing_lastname"] = $l_marketing_manager;
-$fieldnames["parentdeal_technical_lastname"] = $l_technical_manager;
-$fieldnames["parentdeal_status"] = $l_status;
-$fieldnames["parentdeal_dateproposal"] = $l_proposal;
-$fieldnames["parentdeal_datealarm"] = $l_alarm;
-$fieldnames["parentdeal_amountprovider"] = $l_amount_out;
-$fieldnames["parentdeal_amountcustomer"] = $l_amount_in;
+$fieldnames['dealstatus_label'] = $l_status;
+$fieldnames['dealtype_label'] = $l_kind;
+$fieldnames['tasktype_label'] = $l_tt;
+$fieldnames['region_label'] = $l_region;
+$fieldnames['deal_company_name'] = $l_company;
+$fieldnames['deal_company_zipcode'] = $l_postcode;
+$fieldnames['parentdeal_marketing_lastname'] = $l_marketing_manager;
+$fieldnames['parentdeal_technical_lastname'] = $l_technical_manager;
+$fieldnames['parentdeal_status'] = $l_status;
+$fieldnames['parentdeal_dateproposal'] = $l_proposal;
+$fieldnames['parentdeal_datealarm'] = $l_alarm;
+$fieldnames['parentdeal_amountprovider'] = $l_amount_out;
+$fieldnames['parentdeal_amountcustomer'] = $l_amount_in;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -61,147 +61,147 @@ $fieldnames["parentdeal_amountcustomer"] = $l_amount_in;
 function dis_data_deal(&$OD, $fieldname, $link_ok) {
   global $path, $deal, $col_ok, $col_error, $col_client, $col_frs, $l_quarter;
 
-  $ext_url = $deal["ext_url"];
+  $ext_url = $deal['ext_url'];
 
-  if ($fieldname == "deal_label") {
-    if ($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("deal_id").",'".addslashes($OD->data_set->f("deal_label"))."');";
-    } else if ($OD->display_ext == "get_id_url") {
-      $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("deal_id").");";
+  if ($fieldname == 'deal_label') {
+    if ($OD->display_ext == 'get_id') {
+      $res['url'] = 'javascript:check_get_id('.$OD->data_set->f('deal_id').",'".addslashes($OD->data_set->f('deal_label'))."');";
+    } else if ($OD->display_ext == 'get_id_url') {
+      $res['url'] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f('deal_id').');';
     } else {
-      $res["url"] = "$path/deal/deal_index.php?action=detailconsult&amp;deal_id=".$OD->data_set->f("deal_id");
+      $res['url'] = "$path/deal/deal_index.php?action=detailconsult&amp;deal_id=".$OD->data_set->f('deal_id');
     }
   }
 
-  else if ($fieldname == "parentdeal_label") {
-    $res["url"] = "$path/deal/deal_index.php?action=parent_detailconsult&amp;parentdeal_id=".$OD->data_set->f("parentdeal_id");
+  else if ($fieldname == 'parentdeal_label') {
+    $res['url'] = "$path/deal/deal_index.php?action=parent_detailconsult&amp;parentdeal_id=".$OD->data_set->f('parentdeal_id');
   }
 
-  else if ($fieldname == "parentdeal_marketing_lastname") {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("parentdeal_marketingmanager_id");
+  else if ($fieldname == 'parentdeal_marketing_lastname') {
+    $res['url'] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f('parentdeal_marketingmanager_id');
   }
 
-  else if ($fieldname == "parentdeal_technical_lastname") {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("parentdeal_technicalmanager_id");
+  else if ($fieldname == 'parentdeal_technical_lastname') {
+    $res['url'] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f('parentdeal_technicalmanager_id');
   }
 
-  else if ($fieldname == "deal_source") {
-    $label = $OD->data_set->f("leadsource_label");
+  else if ($fieldname == 'deal_source') {
+    $label = $OD->data_set->f('leadsource_label');
     $source = $OD->data_set->f("$fieldname");
-    if (($label != "") || ($source != "")) {
-      $res["name"] = "$label : $source";
+    if (($label != '') || ($source != '')) {
+      $res['name'] = "$label : $source";
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
-  else if ($fieldname == "deal_commission") {
-    $res["align"] = "center";
+  else if ($fieldname == 'deal_commission') {
+    $res['align'] = 'center';
   }
 
-  else if ($fieldname == "deal_archive") {
-    $res["align"] = "center";
+  else if ($fieldname == 'deal_archive') {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
-  else if (($fieldname == "deal_amount")
-	   || ($fieldname == "deal_margin")) {
-    $res["align"] = "center";
+  else if (($fieldname == 'deal_amount')
+	   || ($fieldname == 'deal_margin')) {
+    $res['align'] = 'center';
   }
 
-  else if ($fieldname == "deal_hitrate") {
-    $res["align"] = "center";
-    $res["name"] = $OD->data_set->f($fieldname) . " %";
+  else if ($fieldname == 'deal_hitrate') {
+    $res['align'] = 'center';
+    $res['name'] = $OD->data_set->f($fieldname) . ' %';
   }
 
-  else if (($fieldname == "deal_company_name") && $link_ok) {
-    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f("deal_company_id");
+  else if (($fieldname == 'deal_company_name') && $link_ok) {
+    $res['url'] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f('deal_company_id');
   }
   
-  else if ($fieldname == "deal_datebegin") {
+  else if ($fieldname == 'deal_datebegin') {
     $date = of_date_format( $OD->data_set->f($fieldname), 1);
-    $res["name"] = $date;
+    $res['name'] = $date;
   }
 
-  else if ($fieldname == "deal_dateproposal") {
+  else if ($fieldname == 'deal_dateproposal') {
     $date = of_date_format($OD->data_set->f($fieldname), 1);
-    $res["name"] = $date;
+    $res['name'] = $date;
   }
 
-  else if ($fieldname == "deal_dateexpected") {
+  else if ($fieldname == 'deal_dateexpected') {
     $date = of_date_format($OD->data_set->f($fieldname), 1);
-    $res["name"] = $date;
+    $res['name'] = $date;
   }
 
-  else if ($fieldname == "expected_quarter") {
-    $date = $OD->data_set->f("deal_dateexpected");
-    if ($date != "") {
+  else if ($fieldname == 'expected_quarter') {
+    $date = $OD->data_set->f('deal_dateexpected');
+    if ($date != '') {
       $year = of_date_get_year($date);
       $month = of_date_get_month($date);
       $q = floor(($month-1) / 3) + 1;
       $quarter = "$year$l_quarter$q";
-      $res["align"] = "center";
-      $res["name"] = $quarter;
+      $res['align'] = 'center';
+      $res['name'] = $quarter;
     }
   }
 
-  else if ($fieldname == "sale_delay") {
-    $datebegin = $OD->data_set->f("deal_datebegin");
-    $dateexp = $OD->data_set->f("deal_dateexpected");
-    if (($datebegin != "") && ($dateexp != "")) {
+  else if ($fieldname == 'sale_delay') {
+    $datebegin = $OD->data_set->f('deal_datebegin');
+    $dateexp = $OD->data_set->f('deal_dateexpected');
+    if (($datebegin != '') && ($dateexp != '')) {
       $sale_delay = floor(($dateexp - $datebegin) / 86400);
-      $res["align"] = "center";
-      $res["name"] = $sale_delay;
+      $res['align'] = 'center';
+      $res['name'] = $sale_delay;
     }
   }
 
-  else if ($fieldname == "deal_dateend") {
+  else if ($fieldname == 'deal_dateend') {
     $date = of_date_format($OD->data_set->f($fieldname), 1);
-    $res["name"] = $date;
+    $res['name'] = $date;
   }
 
-  else if ($fieldname == "end_quarter") {
-    $date = $OD->data_set->f("deal_dateend");
-    if ($date != "") {
+  else if ($fieldname == 'end_quarter') {
+    $date = $OD->data_set->f('deal_dateend');
+    if ($date != '') {
       $month = of_date_get_month($date);
       $q = floor(($month-1) / 3) + 1;
       $quarter = "$l_quarter$q";
-      $res["align"] = "center";
-      $res["name"] = $quarter;
+      $res['align'] = 'center';
+      $res['name'] = $quarter;
     }
   }
 
-  else if ($fieldname == "deal_datealarm") {
+  else if ($fieldname == 'deal_datealarm') {
     $date = $OD->data_set->f($fieldname);
     $datealarm = of_date_format($date);
-    $date = date("Ymd",$OD->data_set->f($fieldname));
-    $time = date("Ymd");
+    $date = date('Ymd',$OD->data_set->f($fieldname));
+    $time = date('Ymd');
     if ($time > $date) {
-      $col = "error";
+      $col = 'error';
     } else if ($time == $date) {
-      $col = "highlight";
+      $col = 'highlight';
     }
-    $res["style"] = "class=\"$col\"";
-    $res["name"] = $datealarm;
+    $res['style'] = "class=\"$col\"";
+    $res['name'] = $datealarm;
   }
 
-  else if ($fieldname == "deal_relation") {
-    $d_id = $OD->data_set->f("deal_id");
+  else if ($fieldname == 'deal_relation') {
+    $d_id = $OD->data_set->f('deal_id');
     $dc = get_deal_dealcompany_info($d_id);
-    $nl = "";
+    $nl = '';
     if (is_array($dc)) {
       foreach ($dc as $relation) {
-	$name .= $nl . $relation["role_label"]." : ".$relation["company_name"];
-	$nl = "<br />";
+	$name .= $nl . $relation['role_label'].' : '.$relation['company_name'];
+	$nl = '<br />';
       }
     }
-    $res["name"] = $name;
+    $res['name'] = $name;
   }
   
 
@@ -214,16 +214,16 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
 // Parameters:
 //   - $deal[] : hash with deal and parent deal values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_deal_index($deal="") {
+function dis_deal_index($deal='') {
   global $display, $ctt_sales;
 
-  $archive = $deal["archive"];
+  $archive = $deal['archive'];
 
   $usr_q = run_query_deal_manager($archive);
   $type_q = run_query_deal_type();
-  $regions = of_category_get_ordered("", "region");
+  $regions = of_category_get_ordered('', 'region');
   $tts = get_global_tasktype($ctt_sales);
-  $roles = of_category_get_ordered("DealCompany", "role");
+  $roles = of_category_get_ordered('DealCompany', 'role');
   $status_q = run_query_deal_status_list();
   $block .= html_deal_parentdeal_search_form($deal, $usr_q);
   $block .= html_deal_search_form($deal, $type_q, $regions, $tts, $roles, $status_q, $usr_q);
@@ -237,16 +237,16 @@ function dis_deal_index($deal="") {
 // Parameters:
 //   - $deal[] : hash with deal and parent deal values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_deal_search_form($deal="") {
+function dis_deal_search_form($deal='') {
   global $display, $ctt_sales;
 
-  $archive = $deal["archive"];
+  $archive = $deal['archive'];
 
   $usr_q = run_query_deal_manager($archive);
   $type_q = run_query_deal_type();
-  $regions = of_category_get_ordered("", "region");
+  $regions = of_category_get_ordered('', 'region');
   $tts = get_global_tasktype($ctt_sales);
-  $roles = of_category_get_ordered("DealCompany", "role");
+  $roles = of_category_get_ordered('DealCompany', 'role');
   $status_q = run_query_deal_status_list();
   $block .= html_deal_search_form($deal, $type_q, $regions, $tts, $roles, $status_q, $usr_q);
 
@@ -275,70 +275,70 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
 
   // --- Var preparation ------------------------------------------------------
 
-  $popup = $deal["popup"];
-  $parent = $deal["parentdeal_id"];
-  $label = stripslashes($deal["label"]);
-  $name = stripslashes($deal["company_name"]);
-  $zip = stripslashes($deal["zip"]);
-  $archive = ($deal["archive"] == "1" ? "checked = \"checked\"" : "");
-  $kind = $deal["kind"];
-  $region = $deal["region"];
-  $tt = $deal["tasktype"];
-  $role = $deal["role"];
-  $status = $deal["status_id"];
-  $manager = $deal["manager"];
-  $date_field = ($deal["date_field"] ? $deal["date_field"] : "datealarm");
-  $date_after = of_date_upd_format(stripslashes($deal["date_after"]),true);
-  $date_before = of_date_upd_format(stripslashes($deal["date_before"]),true);
-  $company_id = $deal["company_id"];
-  $role_company = $deal["role_company"];
+  $popup = $deal['popup'];
+  $parent = $deal['parentdeal_id'];
+  $label = stripslashes($deal['label']);
+  $name = stripslashes($deal['company_name']);
+  $zip = stripslashes($deal['zip']);
+  $archive = ($deal['archive'] == '1' ? "checked = \"checked\"" : '');
+  $kind = $deal['kind'];
+  $region = $deal['region'];
+  $tt = $deal['tasktype'];
+  $role = $deal['role'];
+  $status = $deal['status_id'];
+  $manager = $deal['manager'];
+  $date_field = ($deal['date_field'] ? $deal['date_field'] : 'datealarm');
+  $date_after = of_date_upd_format(stripslashes($deal['date_after']),true);
+  $date_before = of_date_upd_format(stripslashes($deal['date_before']),true);
+  $company_id = $deal['company_id'];
+  $role_company = $deal['role_company'];
 
   // User defined data
-  $block_userdata .= of_userdata_dis_search("deal", $deal);
+  $block_userdata .= of_userdata_dis_search('deal', $deal);
 
   // Kind select construction
   $sel_kind = "<select name=\"sel_kind_id\">
      <option value=\"$c_all\">$l_all</option>";  
   while ($kind_q->next_record()) {
-    $k_id = $kind_q->f("dealtype_id");
-    $klabel = $kind_q->f("dealtype_label");
+    $k_id = $kind_q->f('dealtype_id');
+    $klabel = $kind_q->f('dealtype_label');
     $sel_kind .= "<option value=\"$k_id\"";
     if ($kind == $k_id) $sel_kind .= " selected = \"selected\"";
     $sel_kind .= ">$klabel</option>";
   }
-  $sel_kind .= "</select>";
+  $sel_kind .= '</select>';
 
   // TaskType select construction
   $sel_tt = "<select name=\"sel_tasktype\">
               <option value=\"$c_all\">$l_all</option>";
   if (is_array($tts)) {
     foreach ($tts as $tt_id=>$one_tt) {
-      $tt_label = $one_tt["label"];
-      $internal = $one_tt["internal"];
+      $tt_label = $one_tt['label'];
+      $internal = $one_tt['internal'];
       $sel_tt .= "\n<option value=\"$tt_id\"";
       if ($tt == $tt_id) $sel_tt .= "selected =\"selected\"";
       $sel_tt .= ">$tt_label</option>\n";
     }
-    $sel_tt .= "</select>";
+    $sel_tt .= '</select>';
   }
 
   // Role select construction
-  $block_role = of_category_dis_search_select("DealCompany", "role", $roles, $role);
+  $block_role = of_category_dis_search_select('DealCompany', 'role', $roles, $role);
 
   // Region select construction
-  $block_region = of_category_dis_search_select("", "region", $regions, $region);
+  $block_region = of_category_dis_search_select('', 'region', $regions, $region);
 
   // Status select construction
   $sel_status = "<select name=\"sel_status_id\">
      <option value=\"$c_all\">$l_all</option>";
   while ($stat_q->next_record()) {
-    $s_id = $stat_q->f("dealstatus_id");
-    $slabel = $stat_q->f("dealstatus_label");
+    $s_id = $stat_q->f('dealstatus_id');
+    $slabel = $stat_q->f('dealstatus_label');
     $sel_status .= "<option value=\"$s_id\"";
     if ($status == $s_id) $sel_status .= "selected =\" selected\"";
     $sel_status .= ">$slabel</option>";
   }
-  $sel_status .= "</select>";
+  $sel_status .= '</select>';
 
   // Manager select construction
   if ($manager_q->num_rows() > 0) {
@@ -347,27 +347,27 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
   $sel_manager = "<select name=\"sel_manager\">
      <option value=\"$c_all\">$l_all</option>";
   while ($manager_q->next_record()) {
-    $m_id = $manager_q->f("userobm_id");
-    $lname = $manager_q->f("userobm_lastname");
+    $m_id = $manager_q->f('userobm_id');
+    $lname = $manager_q->f('userobm_lastname');
     $sel_manager .= "<option value=\"$m_id\"";
     if ($manager == $m_id) $sel_manager .= "selected =\"selected\"";
     $sel_manager .= ">$lname</option>";
   }
-  $sel_manager .= "</select>";
+  $sel_manager .= '</select>';
 
   // Selected date field
   $s_date_field[$date_field] = "selected=\"selected\"";
 
-  $url = url_prepare("deal_index.php");
+  $url = url_prepare('deal_index.php');
 
   if ($popup) {
-    $ext_action = $deal["ext_action"];
-    $ext_url = $deal["ext_url"];
-    $ext_id = $deal["ext_id"];
-    $ext_title = ($deal["ext_title"] ? $deal["ext_title"] : "$l_select_deal");
-    $ext_target = $deal["ext_target"];
-    $ext_widget = $deal["ext_widget"];
-    $ext_widget_text = $deal["ext_widget_text"];
+    $ext_action = $deal['ext_action'];
+    $ext_url = $deal['ext_url'];
+    $ext_id = $deal['ext_id'];
+    $ext_title = ($deal['ext_title'] ? $deal['ext_title'] : "$l_select_deal");
+    $ext_target = $deal['ext_target'];
+    $ext_widget = $deal['ext_widget'];
+    $ext_widget_text = $deal['ext_widget_text'];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\" />
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\" />
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\" />
@@ -375,7 +375,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\" />
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\" />
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\" />";
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
+    $display['title'] = "<h1 class=\"title\">$ext_title</h1>";
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -457,9 +457,9 @@ function html_deal_parentdeal_search_form($deal, $pmanager_q) {
 
   // --- Var preparation ------------------------------------------------------
 
-  $plabel = stripslashes($deal["plabel"]);
-  $parchive = ($deal["parchive"] == "1" ? "checked" : "");
-  $pmanager = $deal["pmanager"];
+  $plabel = stripslashes($deal['plabel']);
+  $parchive = ($deal['parchive'] == '1' ? 'checked' : '');
+  $pmanager = $deal['pmanager'];
 
   // Manager select construction
   if ($pmanager_q->num_rows() > 0) {
@@ -468,13 +468,13 @@ function html_deal_parentdeal_search_form($deal, $pmanager_q) {
   $sel_pmanager = "<select name=\"sel_pmanager\">
      <option value=\"$c_all\">$l_all</option>";
   while($pmanager_q->next_record()) {
-    $m_id = $pmanager_q->f("userobm_id");
-    $lname = $pmanager_q->f("userobm_lastname");
+    $m_id = $pmanager_q->f('userobm_id');
+    $lname = $pmanager_q->f('userobm_lastname');
     $sel_pmanager .= "<option value=\"$m_id\"";
     if ($pmanager == $m_id) $sel_pmanager .= "selected = \"selected\"";
     $sel_pmanager .= ">$lname</option>";
   }
-  $sel_pmanager .= "</select>";
+  $sel_pmanager .= '</select>';
 
   // --- HTML Template --------------------------------------------------------
 
@@ -514,10 +514,10 @@ function dis_deal_search_list($deal) {
   $obm_q = run_query_deal_search($deal, 0);
   $nb_deal = $obm_q->num_rows_total();
   if ($nb_deal == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found);
+    $display['msg'] .= display_warn_msg($l_no_found);
   } else {
-    $display["msg"] .= display_info_msg("$nb_deal $l_found");
-    $prefs = get_display_pref($obm["uid"], "deal", 0);
+    $display['msg'] .= display_info_msg("$nb_deal $l_found");
+    $prefs = get_display_pref($obm['uid'], 'deal', 0);
     $block = html_deal_search_list($obm_q, $prefs, $deal);
   }
 
@@ -535,45 +535,45 @@ function dis_deal_search_list($deal) {
 function html_deal_search_list($deal_q, $prefs, $deal) {
   global $l_close;
 
-  $popup = $deal["popup"];
-  $parent = $deal["parentdeal_id"];
-  $label = urlencode(stripslashes($deal["label"]));
-  $name = urlencode(stripslashes($deal["company_name"]));
-  $zip = urlencode(stripslashes($deal["zip"]));
-  $archive = $deal["archive"];
-  $kind = $deal["kind"];
-  $region = $deal["region"];
-  $tt = $deal["tasktype"];
-  $role = $deal["role"];
-  $role_company = urlencode(stripslashes($deal["role_company"]));
-  $status = $deal["status_id"];
-  $manager = $deal["manager"];
-  $date_after = stripslashes($deal["date_after"]);
-  $date_before = stripslashes($deal["date_before"]);
-  $param_comp = $deal["company_id"];
+  $popup = $deal['popup'];
+  $parent = $deal['parentdeal_id'];
+  $label = urlencode(stripslashes($deal['label']));
+  $name = urlencode(stripslashes($deal['company_name']));
+  $zip = urlencode(stripslashes($deal['zip']));
+  $archive = $deal['archive'];
+  $kind = $deal['kind'];
+  $region = $deal['region'];
+  $tt = $deal['tasktype'];
+  $role = $deal['role'];
+  $role_company = urlencode(stripslashes($deal['role_company']));
+  $status = $deal['status_id'];
+  $manager = $deal['manager'];
+  $date_after = stripslashes($deal['date_after']);
+  $date_before = stripslashes($deal['date_before']);
+  $param_comp = $deal['company_id'];
 
   // User defined data
-  $url_userdata = of_userdata_get_url_search_params("deal", $deal);
+  $url_userdata = of_userdata_get_url_search_params('deal', $deal);
   
   if ($popup) {
-    $ext_action = $deal["ext_action"];
-    $ext_url = $deal["ext_url"];
-    $ext_id = $deal["ext_id"];
-    $ext_target = $deal["ext_target"];
-    $ext_widget = $deal["ext_widget"];
-    $ext_widget_text = $deal["ext_widget_text"];
+    $ext_action = $deal['ext_action'];
+    $ext_url = $deal['ext_url'];
+    $ext_id = $deal['ext_id'];
+    $ext_target = $deal['ext_target'];
+    $ext_widget = $deal['ext_widget'];
+    $ext_widget_text = $deal['ext_widget_text'];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
   $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_kind_id=$kind&amp;sel_region=$region&amp;sel_status_id=$status&amp;sel_tasktype=$tt&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp$url_userdata$url_ext");
 
-  $deal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
+  $deal_d = new OBM_DISPLAY('DATA', $prefs, 'deal');
   if ($popup) {
     $deal_d->display_link = false;
-    if ($ext_url != "") {
-      $deal_d->display_ext = "get_id_url";
-    } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
-      $deal_d->display_ext = "get_id";
+    if ($ext_url != '') {
+      $deal_d->display_ext = 'get_id_url';
+    } else if ( ($ext_widget != '') && ($ext_widget_text != '') ) { 
+      $deal_d->display_ext = 'get_id';
     }
    $display_popup_end = "
       <p>
@@ -583,8 +583,8 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
 
   $deal_d->data_set = $deal_q;
   $deal_d->data_url = $url;
-  $deal_d->data_header = "both";
-  $block = $deal_d->display("dis_data_deal");
+  $deal_d->data_header = 'both';
+  $block = $deal_d->display('dis_data_deal');
   $block .= $display_popup_end;
 
   return $block;
@@ -607,20 +607,20 @@ function html_deal_links($deal_q) {
   global $l_document_add;
   global $path, $cgp_show;
 
-  $id = $deal_q->f("deal_id");
-  $pid = $deal_q->f("deal_parentdeal_id");
-  $cid = $deal_q->f("deal_company_id");
-  $tt_id = $deal_q->f("deal_tasktype_id");
-  $cname = $deal_q->f("company_name");
+  $id = $deal_q->f('deal_id');
+  $pid = $deal_q->f('deal_parentdeal_id');
+  $cid = $deal_q->f('deal_company_id');
+  $tt_id = $deal_q->f('deal_tasktype_id');
+  $cname = $deal_q->f('company_name');
   $uname = urlencode($cname);
-  $label = $deal_q->f("deal_label");
+  $label = $deal_q->f('deal_label');
   $ulabel = urlencode($label);
-  $con1 = $deal_q->f("deal_contact1_id");
-  $con2 = $deal_q->f("deal_contact2_id");
-  $hitrate = $deal_q->f("deal_hitrate");
-  $project = $deal_q->f("deal_project_status");
-  $market = $deal_q->f("deal_marketingmanager_id");
-  $tech = $deal_q->f("deal_technicalmanager_id");
+  $con1 = $deal_q->f('deal_contact1_id');
+  $con2 = $deal_q->f('deal_contact2_id');
+  $hitrate = $deal_q->f('deal_hitrate');
+  $project = $deal_q->f('deal_project_status');
+  $market = $deal_q->f('deal_marketingmanager_id');
+  $tech = $deal_q->f('deal_technicalmanager_id');
 
   // parent deal
   if ($pid > 0) {
@@ -633,9 +633,9 @@ function html_deal_links($deal_q) {
   $url_pdeal_upd = url_prepare("$path/deal/deal_index.php?action=affect&amp;parentdeal_id=$pid&amp;deal_id=$id");
 
   // Project
-  if ($cgp_show["module"]["project"]) {
-    $nb_pro = get_global_linked_project_nb ($id, "deal");
-    $nb_pro_arch = get_global_linked_project_nb ($id, "deal", 1);
+  if ($cgp_show['module']['project']) {
+    $nb_pro = get_global_linked_project_nb ($id, 'deal');
+    $nb_pro_arch = get_global_linked_project_nb ($id, 'deal', 1);
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;deal_id=$id");
     $url_pro_arch = url_prepare("$path/project/project_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
     $dis_ico_project = "
@@ -643,7 +643,7 @@ function html_deal_links($deal_q) {
             $l_module_project (<a href=\"$url_pro\">$nb_pro</a> / <a href=\"$url_pro_arch\">$nb_pro_arch</a>)</li>";
 
     // New project allowed only if hitrate = 100
-    if ($hitrate == "100") {
+    if ($hitrate == '100') {
       $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;deal_id=$id&amp;deal_label=$label&amp;company_id=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
       $dis_ico_project .= "
         <li><a href=\"$url_pro_new\"><img src=\"$ico_add\" alt=\"\" /></a>
@@ -658,9 +658,9 @@ function html_deal_links($deal_q) {
   }
 
   // Contract
-  if ($cgp_show["module"]["contract"]) {
-    $contract_active = get_global_linked_contract_nb($id, "deal");
-    $contract_total = get_global_linked_contract_nb($id, "deal", 1);
+  if ($cgp_show['module']['contract']) {
+    $contract_active = get_global_linked_contract_nb($id, 'deal');
+    $contract_total = get_global_linked_contract_nb($id, 'deal', 1);
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id");
     $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
     $dis_contract = "
@@ -670,7 +670,7 @@ function html_deal_links($deal_q) {
         <a href=\"$url_contract_total\">$contract_total</a> )</li>";
 
     // New Contracts allowed only if hitrate = 100
-    if ($hitrate == "100") {
+    if ($hitrate == '100') {
       $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;deal_id=$id&amp;company_id=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
       $dis_contract .= "
       <li><a href=\"$url_contract_new\"><img src=\"$ico_add\" alt=\"\" /></a>
@@ -684,18 +684,18 @@ function html_deal_links($deal_q) {
   }
 
   // Invoice
-  if ($cgp_show["module"]["invoice"]) {
+  if ($cgp_show['module']['invoice']) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;deal_id=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
-    $nb_inv_tot = get_global_linked_invoice_nb($id, "deal", 1);
-    $nb_inv = get_global_linked_invoice_nb($id, "deal");
+    $nb_inv_tot = get_global_linked_invoice_nb($id, 'deal', 1);
+    $nb_inv = get_global_linked_invoice_nb($id, 'deal');
     $dis_invoice = "
     <li><a href=\"$url_inv\"><img src=\"$ico_invoice\" alt=\"\" /></a>
         $l_module_invoice (<a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a>)</li>";
 
     // New Invoices allowed only if hitrate = 100
-    if ($hitrate == "100") {
+    if ($hitrate == '100') {
       $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;deal_id=$id&amp;deal_label=$ulabel&amp;company_id=$cid&amp;company_name=$uname");
       $dis_invoice .= "
     <li><a href=\"$url_inv_new\"><img src=\"$ico_add\" alt=\"\" /></a>
@@ -709,11 +709,11 @@ function html_deal_links($deal_q) {
   }
 
   // Document
-  if ($cgp_show["module"]["document"]) {
+  if ($cgp_show['module']['document']) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;entity_id=$id&amp;entity=deal");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;entity_id=$id&amp;entity=deal");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";
-    $nb_document = run_query_global_document_nb($id, "deal");
+    $nb_document = run_query_global_document_nb($id, 'deal');
     $block_doc = "
   <h1> $l_module_document</h1>
   <ul>
@@ -766,13 +766,13 @@ function html_deal_links($deal_q) {
 function dis_deal_consult($deal) {
   global $display, $l_err_reference;
 
-  if ($deal["deal_id"] > 0) {
-    $deal_q = run_query_deal_detail($deal["deal_id"]);
-    $dc = get_deal_dealcompany_info($deal["deal_id"]);
-    $display["detailInfo"] = display_record_info($deal_q);
+  if ($deal['deal_id'] > 0) {
+    $deal_q = run_query_deal_detail($deal['deal_id']);
+    $dc = get_deal_dealcompany_info($deal['deal_id']);
+    $display['detailInfo'] = display_record_info($deal_q);
     $block = html_deal_consult($deal_q, $dc);
   } else {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_err_msg($l_err_reference);
   }
   
   return $block;
@@ -785,7 +785,7 @@ function dis_deal_consult($deal) {
 //   - $deal_q  : DBO : information about the deal
 //   - $dc      : array DealCompany infos
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_consult($deal_q, $dc="") {
+function html_deal_consult($deal_q, $dc='') {
   global $ico_company, $ico_contact, $display;
   global $l_dates, $l_company, $l_contact, $l_other_relation, $l_relation;
   global $l_label, $l_kind,$l_region,$l_marketing_manager,$l_technical_manager;
@@ -795,75 +795,75 @@ function html_deal_consult($deal_q, $dc="") {
   global $l_parentdeal,$l_todo, $l_deal, $l_source;
   global $display, $path, $c_yes, $c_no;
 
-  $id = $deal_q->f("deal_id");
-  $pid = $deal_q->f("deal_parentdeal_id");
-  $usercreate = $deal_q->f("deal_usercreate");
-  $label = $deal_q->f("deal_label");
-  $num = $deal_q->f("deal_number");
-  $datebegin = of_date_format($deal_q->f("datebegin"), 1);
-  $dateexpected = of_date_format($deal_q->f("dateexpected"), 1);
-  if ($dateexpected != "") {
-    $month_exp = of_date_get_month($deal_q->f("dateexpected"));
-    $year_exp = of_date_get_year($deal_q->f("dateexpected"));
+  $id = $deal_q->f('deal_id');
+  $pid = $deal_q->f('deal_parentdeal_id');
+  $usercreate = $deal_q->f('deal_usercreate');
+  $label = $deal_q->f('deal_label');
+  $num = $deal_q->f('deal_number');
+  $datebegin = of_date_format($deal_q->f('datebegin'), 1);
+  $dateexpected = of_date_format($deal_q->f('dateexpected'), 1);
+  if ($dateexpected != '') {
+    $month_exp = of_date_get_month($deal_q->f('dateexpected'));
+    $year_exp = of_date_get_year($deal_q->f('dateexpected'));
     $q = floor(($month_exp-1) / 3) + 1;
     $quarter_exp = "($year_exp$l_quarter$q)";
   }
-  if (($datebegin != "") && ($dateexpected != "")) {
-    $sale_delay = floor(($deal_q->f("dateexpected") - $deal_q->f("datebegin")) / 86400);
+  if (($datebegin != '') && ($dateexpected != '')) {
+    $sale_delay = floor(($deal_q->f('dateexpected') - $deal_q->f('datebegin')) / 86400);
   }
-  $dateend = of_date_format($deal_q->f("dateend"), 1);
-  if ($dateend != "") {
-    $month_end = of_date_get_month($deal_q->f("dateend"));
-    $year_end = of_date_get_year($deal_q->f("dateend"));
+  $dateend = of_date_format($deal_q->f('dateend'), 1);
+  if ($dateend != '') {
+    $month_end = of_date_get_month($deal_q->f('dateend'));
+    $year_end = of_date_get_year($deal_q->f('dateend'));
     $q = floor(($month_end-1) / 3) + 1;
     $quarter_end = "($year_end$l_quarter$q)";
   }
-  $kind = $deal_q->f("dealtype_label");
-  $tt_label = $deal_q->f("tasktype_label");
-  $region_label = $deal_q->f("region_label");
-  $market = $deal_q->f("lname1") . " " . $deal_q->f("fname1");
-  $tech = $deal_q->f("lname2") . " " . $deal_q->f("fname2");
-  $source_label = $deal_q->f("leadsource_label");
-  $source = $deal_q->f("deal_source");
-  $commission = $deal_q->f("deal_commission");
-  $datepro = of_date_format($deal_q->f("dateproposal"), 1);
-  $amount = $deal_q->f("deal_amount");
-  $margin = $deal_q->f("deal_margin");
-  $hitrate = $deal_q->f("deal_hitrate");
-  $datealarm = of_date_format($deal_q->f("datealarm"), 1);
-  $status = $deal_q->f("dealstatus_label");
-  $archive = ($deal_q->f("deal_archive") == 1 ? $c_yes : $c_no);
-  $todo = $deal_q->f("deal_todo");
-  $com = beautify_comment(nl2br($deal_q->f("deal_comment")));
-  $comp_id = $deal_q->f("deal_company_id");
-  $comp = $deal_q->f("company_name");
+  $kind = $deal_q->f('dealtype_label');
+  $tt_label = $deal_q->f('tasktype_label');
+  $region_label = $deal_q->f('region_label');
+  $market = $deal_q->f('lname1') . ' ' . $deal_q->f('fname1');
+  $tech = $deal_q->f('lname2') . ' ' . $deal_q->f('fname2');
+  $source_label = $deal_q->f('leadsource_label');
+  $source = $deal_q->f('deal_source');
+  $commission = $deal_q->f('deal_commission');
+  $datepro = of_date_format($deal_q->f('dateproposal'), 1);
+  $amount = $deal_q->f('deal_amount');
+  $margin = $deal_q->f('deal_margin');
+  $hitrate = $deal_q->f('deal_hitrate');
+  $datealarm = of_date_format($deal_q->f('datealarm'), 1);
+  $status = $deal_q->f('dealstatus_label');
+  $archive = ($deal_q->f('deal_archive') == 1 ? $c_yes : $c_no);
+  $todo = $deal_q->f('deal_todo');
+  $com = beautify_comment(nl2br($deal_q->f('deal_comment')));
+  $comp_id = $deal_q->f('deal_company_id');
+  $comp = $deal_q->f('company_name');
   if (strlen($comp) > 25) {
-    $comp = substr($comp, 0, 24) . "...";
+    $comp = substr($comp, 0, 24) . '...';
   }
-  $ad1 = $deal_q->f("company_address1");
-  $zip = $deal_q->f("company_zipcode");
-  $town = $deal_q->f("company_town");
-  $comp_phone = $deal_q->f("company_phone");
-  $comp_phone = (($comp_phone != "") ? "($comp_phone)" : "");
-  $con1 = $deal_q->f("deal_contact1_id");
-  $dis_con1 = $deal_q->f("lnamec1") . " " . $deal_q->f("fnamec1");
-  $phone_con1 = ($deal_q->f("phonec1") ? $deal_q->f("phonec1") : $comp_phone);
-  $con2 = $deal_q->f("deal_contact2_id");
-  $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
-  $phone_con2 = ($deal_q->f("phonec2") ? $deal_q->f("phonec2") : $comp_phone);
+  $ad1 = $deal_q->f('company_address1');
+  $zip = $deal_q->f('company_zipcode');
+  $town = $deal_q->f('company_town');
+  $comp_phone = $deal_q->f('company_phone');
+  $comp_phone = (($comp_phone != '') ? "($comp_phone)" : '');
+  $con1 = $deal_q->f('deal_contact1_id');
+  $dis_con1 = $deal_q->f('lnamec1') . ' ' . $deal_q->f('fnamec1');
+  $phone_con1 = ($deal_q->f('phonec1') ? $deal_q->f('phonec1') : $comp_phone);
+  $con2 = $deal_q->f('deal_contact2_id');
+  $dis_con2 = $deal_q->f('lnamec2') . ' ' . $deal_q->f('fnamec2');
+  $phone_con2 = ($deal_q->f('phonec2') ? $deal_q->f('phonec2') : $comp_phone);
 
   // User defined data
-  $block_userdata .= of_userdata_dis_entity_consult("deal", $id);
+  $block_userdata .= of_userdata_dis_entity_consult('deal', $id);
 
-  $display["link"] = html_deal_links($deal_q);
-  $display["title"] = "<h1 class=\"title\">$l_deal : $label</h1>";
+  $display['link'] = html_deal_links($deal_q);
+  $display['title'] = "<h1 class=\"title\">$l_deal : $label</h1>";
 
   // DealCompany infos
   if ( (is_array($dc)) && (count($dc) > 0) ) {
     foreach ($dc as $one_dc) {
-      $dc_cid = $one_dc["company_id"];
-      $dc_cname = $one_dc["company_name"];
-      $dc_role = $one_dc["role_label"];
+      $dc_cid = $one_dc['company_id'];
+      $dc_cname = $one_dc['company_name'];
+      $dc_role = $one_dc['role_label'];
       $dis_dc .= "
         <div>
           <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$dc_cid")."\">
@@ -1017,38 +1017,38 @@ function html_deal_consult($deal_q, $dc="") {
 function dis_deal_form($deal) {
   global $display, $obm, $action, $ctt_sales, $cg_com, $cg_prod;
 
-  if ($action == "detailupdate") {
-    $deal_q = run_query_deal_detail($deal["deal_id"]);
-    $display["detailInfo"] = display_record_info($deal_q);
-    $deal["company_id"] = $deal_q->f("deal_company_id");
-    $users = array($obm["uid"], $deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"), );
-    $dc = get_deal_dealcompany_info($deal["deal_id"]);
-  } else if ($action == "update") {
-    $users = array($obm["uid"], $deal["market"], $deal["tech"]);
-    $deal_q = "";
+  if ($action == 'detailupdate') {
+    $deal_q = run_query_deal_detail($deal['deal_id']);
+    $display['detailInfo'] = display_record_info($deal_q);
+    $deal['company_id'] = $deal_q->f('deal_company_id');
+    $users = array($obm['uid'], $deal_q->f('deal_marketingmanager_id'), $deal_q->f('deal_technicalmanager_id'), );
+    $dc = get_deal_dealcompany_info($deal['deal_id']);
+  } else if ($action == 'update') {
+    $users = array($obm['uid'], $deal['market'], $deal['tech']);
+    $deal_q = '';
   } else {
-    $deal_q = "";
-    $users = array($obm["uid"]);
+    $deal_q = '';
+    $users = array($obm['uid']);
     $dc = array();
   }
   
-  if (($action == "new") && ($deal["lead_id"] > 0)) {
-    $lead = get_lead_info($deal["lead_id"]);
-    $deal["company_id"] = $lead["company_id"];
-    $deal["contact1"] = $lead["contact_id"];
-    $deal["market"] = $lead["manager"];
-    $deal["source_id"] = $lead["source_id"];
-    $deal["label"] = $lead["name"];
-    $deal["datebegin"] = $lead["date"];
-    $deal["datealarm"] = $lead["datealarm"];
-    $deal["todo"] = $lead["todo"];
-    $deal["comment"] = $lead["comment"];
+  if (($action == 'new') && ($deal['lead_id'] > 0)) {
+    $lead = get_lead_info($deal['lead_id']);
+    $deal['company_id'] = $lead['company_id'];
+    $deal['contact1'] = $lead['contact_id'];
+    $deal['market'] = $lead['manager'];
+    $deal['source_id'] = $lead['source_id'];
+    $deal['label'] = $lead['name'];
+    $deal['datebegin'] = $lead['date'];
+    $deal['datealarm'] = $lead['datealarm'];
+    $deal['todo'] = $lead['todo'];
+    $deal['comment'] = $lead['comment'];
   }
 
-  if (($action == "new") || ($action == "insert")) {
-    $comp_q = run_query_deal_company_info($deal["company_id"]);
+  if (($action == 'new') || ($action == 'insert')) {
+    $comp_q = run_query_deal_company_info($deal['company_id']);
   } else {
-    $comp_q = "";
+    $comp_q = '';
   }
 
   $type_q = run_query_deal_type();
@@ -1057,9 +1057,9 @@ function dis_deal_form($deal) {
   $usrc_q = run_query_all_users_from_group($cg_com, $users);
   $usrp_q = run_query_all_users_from_group($cg_prod, $users);
   $sta_q = run_query_deal_status_list();
-  $con_q = run_query_deal_contact($deal["company_id"]);
-  $regions = of_category_get_ordered("", "region");
-  $roles = of_category_get_ordered("DealCompany", "role");
+  $con_q = run_query_deal_contact($deal['company_id']);
+  $regions = of_category_get_ordered('', 'region');
+  $roles = of_category_get_ordered('DealCompany', 'role');
 
   $block = html_deal_form($action, $deal_q, $type_q, $regions, $tts, $sources, $usrc_q, $usrp_q, $comp_q, $con_q, $dc, $roles, $sta_q, $deal);
 
@@ -1100,54 +1100,54 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   global $path, $display, $action, $obm, $popup;
   global $c_all, $l_all, $c_undef, $l_undef;
 
-  $ext_target = $deal["ext_target"];
-  $uid = $obm["uid"];
-  $comp_id = $deal["company_id"];
+  $ext_target = $deal['ext_target'];
+  $uid = $obm['uid'];
+  $comp_id = $deal['company_id'];
 
   // if update mode and first time, values are taken from db
-  if ($action == "detailupdate") {
-    $id = $deal_q->f("deal_id");
-    $pid = $deal_q->f("deal_parentdeal_id");
-    $usercreate = $deal_q->f("deal_usercreate");
-    $label = $deal_q->f("deal_label");
-    $num = $deal_q->f("deal_number");
-    $datebegin = of_date_upd_format($deal_q->f("datebegin"), true);
-    $dateend = of_date_upd_format($deal_q->f("dateend"), true);
-    $dateprop = of_date_upd_format($deal_q->f("dateproposal"), true);
-    $dateexpected = of_date_upd_format($deal_q->f("dateexpected"), true);
-    $datealarm = of_date_upd_format($deal_q->f("datealarm"), true);
-    $kind = $deal_q->f("deal_type_id");
-    $region = $deal_q->f("deal_region_id");
-    $tt = $deal_q->f("deal_tasktype_id");
-    $priv = ($deal_q->f("privacy") == 0 ? "0" : "1");
-    $market = $deal_q->f("deal_marketingmanager_id");
-    $tech = $deal_q->f("deal_technicalmanager_id");
-    $source_id = $deal_q->f("deal_source_id");
-    $source = $deal_q->f("deal_source");
-    $commission = $deal_q->f("deal_commission");
-    $amount = $deal_q->f("deal_amount");
-    $margin = $deal_q->f("deal_margin");
-    $hitrate = $deal_q->f("deal_hitrate");
-    $con1 = $deal_q->f("deal_contact1_id");
-    $con2 = $deal_q->f("deal_contact2_id");
-    $status = $deal_q->f("deal_status_id");
-    $archive = ($deal_q->f("deal_archive") == 1 ? " checked" : "");
-    $todo = $deal_q->f("deal_todo");
-    $comment = $deal_q->f("deal_comment");
+  if ($action == 'detailupdate') {
+    $id = $deal_q->f('deal_id');
+    $pid = $deal_q->f('deal_parentdeal_id');
+    $usercreate = $deal_q->f('deal_usercreate');
+    $label = $deal_q->f('deal_label');
+    $num = $deal_q->f('deal_number');
+    $datebegin = of_date_upd_format($deal_q->f('datebegin'), true);
+    $dateend = of_date_upd_format($deal_q->f('dateend'), true);
+    $dateprop = of_date_upd_format($deal_q->f('dateproposal'), true);
+    $dateexpected = of_date_upd_format($deal_q->f('dateexpected'), true);
+    $datealarm = of_date_upd_format($deal_q->f('datealarm'), true);
+    $kind = $deal_q->f('deal_type_id');
+    $region = $deal_q->f('deal_region_id');
+    $tt = $deal_q->f('deal_tasktype_id');
+    $priv = ($deal_q->f('privacy') == 0 ? '0' : '1');
+    $market = $deal_q->f('deal_marketingmanager_id');
+    $tech = $deal_q->f('deal_technicalmanager_id');
+    $source_id = $deal_q->f('deal_source_id');
+    $source = $deal_q->f('deal_source');
+    $commission = $deal_q->f('deal_commission');
+    $amount = $deal_q->f('deal_amount');
+    $margin = $deal_q->f('deal_margin');
+    $hitrate = $deal_q->f('deal_hitrate');
+    $con1 = $deal_q->f('deal_contact1_id');
+    $con2 = $deal_q->f('deal_contact2_id');
+    $status = $deal_q->f('deal_status_id');
+    $archive = ($deal_q->f('deal_archive') == 1 ? ' checked' : '');
+    $todo = $deal_q->f('deal_todo');
+    $comment = $deal_q->f('deal_comment');
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
-    $comp = $deal_q->f("company_name");
-    $ad1 = $deal_q->f("company_address1");
-    $zip = $deal_q->f("company_zipcode");
-    $town = $deal_q->f("company_town");
+    $comp = $deal_q->f('company_name');
+    $ad1 = $deal_q->f('company_address1');
+    $zip = $deal_q->f('company_zipcode');
+    $town = $deal_q->f('company_town');
     $dis_title = $label;
-  } elseif (($action == "new") || ($action == "insert")) {
+  } elseif (($action == 'new') || ($action == 'insert')) {
     $dis_title = $l_header_new_f;
-    $comp = $comp_q->f("company_name");
-    $ad1 = $comp_q->f("company_address1");
-    $zip = $comp_q->f("company_zipcode");
-    $town = $comp_q->f("company_town");
-    $market = $comp_q->f("company_marketingmanager_id");
+    $comp = $comp_q->f('company_name');
+    $ad1 = $comp_q->f('company_address1');
+    $zip = $comp_q->f('company_zipcode');
+    $town = $comp_q->f('company_town');
+    $market = $comp_q->f('company_marketingmanager_id');
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
     // We pre-fill datebegin and datealarm with current date
@@ -1156,61 +1156,61 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($deal["deal_id"])) { $id = $deal["deal_id"]; }
-  if (isset($deal["parentdeal_id"])) { $pid = $deal["parentdeal_id"]; }
-  if (isset($deal["usercreate"])) { $usercreate = $deal["usercreate"]; }
-  if (isset($deal["num"])) { $num = stripslashes($deal["num"]); }
-  if (isset($deal["label"])) { $label = stripslashes($deal["label"]); }
-  if (isset($deal["privacy"])) { $priv = $deal["privacy"]; }
-  if (isset($deal["datebegin"])) { $datebegin = of_date_upd_format(stripslashes($deal["datebegin"]),true); }
-  if (isset($deal["dateend"])) { $dateend = of_date_upd_format(stripslashes($deal["dateend"]),true); }
-  if (isset($deal["dateproposal"])) { $dateprop = of_date_upd_format(stripslashes($deal["dateproposal"]),true); }
-  if (isset($deal["dateexpected"])) { $dateexpected = of_date_upd_format(stripslashes($deal["dateexpected"]),true); }
-  if (isset($deal["datealarm"])) { $datealarm = of_date_upd_format(stripslashes($deal["datealarm"]),true); }
-  if (isset($deal["kind"])) { $kind = $deal["kind"]; }
-  if (isset($deal["region"])) { $region = $deal["region"]; }
-  if (isset($deal["tasktype"])) { $tt = $deal["tasktype"]; }
-  if (isset($deal["market"])) { $market = $deal["market"]; }
-  if (isset($deal["tech"])) { $tech = $deal["tech"]; }
-  if (isset($deal["source_id"])) { $source_id = $deal["source_id"]; }
-  if (isset($deal["source"])) { $source = $deal["source"]; }
-  if (isset($deal["commission"])) { $commission = $deal["commission"]; }
-  if (isset($deal["amount"])) { $amount = stripslashes($deal["amount"]); }
-  if (isset($deal["margin"])) { $margin = stripslashes($deal["margin"]); }
-  if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
-  if (isset($deal["contact1"])) { $con1 = $deal["contact1"]; }
-  if (isset($deal["contact2"])) { $con2 = $deal["contact2"]; }
-  if (isset($deal["status_id"])) { $status = $deal["status_id"]; }
-  if (isset($deal["timeupdate"])) { $timeupdate = $deal["timeupdate"]; }
-  if (isset($deal["archive"])) { $archive = ($deal["archive"] == 1 ? "checked" : ""); }
-  if (isset($deal["todo"])) { $todo = stripslashes($deal["todo"]); }
-  if (isset($deal["comment"])) { $comment = stripslashes($deal["comment"]); }
-  if (isset($deal["add_comment"])) { $add_comment = stripslashes($deal["add_comment"]); }
-  if (isset($deal["usercomment"])) { $usercomment = $deal["usercomment"]; }
-  if (isset($deal["datecomment"])) { $datecomment = of_date_upd_format($deal["datecomment"]); }
-  if (isset($deal["mail_comment"])) { $mail_comment = $deal["mail_comment"]; }
-  if (isset($deal["company_name"])) { $comp = stripslashes($deal["company_name"]); }
-  if (isset($deal["company_ad1"])) { $ad1 = stripslashes($deal["company_ad1"]); }
-  if (isset($deal["company_zip"])) { $zip = stripslashes($deal["company_zip"]); }
-  if (isset($deal["company_town"])) { $town = stripslashes($deal["company_town"]); }
-  if (isset($deal["ext_target"])) { $ext_target = $deal["ext_target"]; }
+  if (isset($deal['deal_id'])) { $id = $deal['deal_id']; }
+  if (isset($deal['parentdeal_id'])) { $pid = $deal['parentdeal_id']; }
+  if (isset($deal['usercreate'])) { $usercreate = $deal['usercreate']; }
+  if (isset($deal['num'])) { $num = stripslashes($deal['num']); }
+  if (isset($deal['label'])) { $label = stripslashes($deal['label']); }
+  if (isset($deal['privacy'])) { $priv = $deal['privacy']; }
+  if (isset($deal['datebegin'])) { $datebegin = of_date_upd_format(stripslashes($deal['datebegin']),true); }
+  if (isset($deal['dateend'])) { $dateend = of_date_upd_format(stripslashes($deal['dateend']),true); }
+  if (isset($deal['dateproposal'])) { $dateprop = of_date_upd_format(stripslashes($deal['dateproposal']),true); }
+  if (isset($deal['dateexpected'])) { $dateexpected = of_date_upd_format(stripslashes($deal['dateexpected']),true); }
+  if (isset($deal['datealarm'])) { $datealarm = of_date_upd_format(stripslashes($deal['datealarm']),true); }
+  if (isset($deal['kind'])) { $kind = $deal['kind']; }
+  if (isset($deal['region'])) { $region = $deal['region']; }
+  if (isset($deal['tasktype'])) { $tt = $deal['tasktype']; }
+  if (isset($deal['market'])) { $market = $deal['market']; }
+  if (isset($deal['tech'])) { $tech = $deal['tech']; }
+  if (isset($deal['source_id'])) { $source_id = $deal['source_id']; }
+  if (isset($deal['source'])) { $source = $deal['source']; }
+  if (isset($deal['commission'])) { $commission = $deal['commission']; }
+  if (isset($deal['amount'])) { $amount = stripslashes($deal['amount']); }
+  if (isset($deal['margin'])) { $margin = stripslashes($deal['margin']); }
+  if (isset($deal['hitrate'])) { $hitrate = stripslashes($deal['hitrate']); }
+  if (isset($deal['contact1'])) { $con1 = $deal['contact1']; }
+  if (isset($deal['contact2'])) { $con2 = $deal['contact2']; }
+  if (isset($deal['status_id'])) { $status = $deal['status_id']; }
+  if (isset($deal['timeupdate'])) { $timeupdate = $deal['timeupdate']; }
+  if (isset($deal['archive'])) { $archive = ($deal['archive'] == 1 ? 'checked' : ''); }
+  if (isset($deal['todo'])) { $todo = stripslashes($deal['todo']); }
+  if (isset($deal['comment'])) { $comment = stripslashes($deal['comment']); }
+  if (isset($deal['add_comment'])) { $add_comment = stripslashes($deal['add_comment']); }
+  if (isset($deal['usercomment'])) { $usercomment = $deal['usercomment']; }
+  if (isset($deal['datecomment'])) { $datecomment = of_date_upd_format($deal['datecomment']); }
+  if (isset($deal['mail_comment'])) { $mail_comment = $deal['mail_comment']; }
+  if (isset($deal['company_name'])) { $comp = stripslashes($deal['company_name']); }
+  if (isset($deal['company_ad1'])) { $ad1 = stripslashes($deal['company_ad1']); }
+  if (isset($deal['company_zip'])) { $zip = stripslashes($deal['company_zip']); }
+  if (isset($deal['company_town'])) { $town = stripslashes($deal['company_town']); }
+  if (isset($deal['ext_target'])) { $ext_target = $deal['ext_target']; }
 
   // User defined data
-  $block_userdata = of_userdata_dis_entity_form("deal", $id, $deal);
+  $block_userdata = of_userdata_dis_entity_form('deal', $id, $deal);
  
   // Kind select construction
   $sel_kind = "<select name=\"sel_kind_id\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($kind_q->next_record()) {
-    $kid = $kind_q->f("dealtype_id");
-    $klabel = $kind_q->f("dealtype_label");
+    $kid = $kind_q->f('dealtype_id');
+    $klabel = $kind_q->f('dealtype_label');
     $sel_kind .= "\n<option value=\"$kid\"";
     if ($kind == $kid) $sel_kind .= " selected = \"selected\""; 
     $sel_kind .= ">$klabel</option>";
   }
-  $sel_kind .= "</select>";
+  $sel_kind .= '</select>';
 
-  $sel_region = of_category_html_select("", "region", $regions, "", "none");
+  $sel_region = of_category_html_select('', 'region', $regions, '', 'none');
 
   // Sources select
   $sel_source = "
@@ -1218,67 +1218,67 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
      <option value=\"$c_undef\">$l_undef</option>\n";
   if (is_array($sources) && (count($sources) > 0)) {
     foreach($sources as $s_id => $one_source) {
-      $slabel = $one_source["label"];
-      $sselect = ($s_id == $source_id) ? "selected" : "";
+      $slabel = $one_source['label'];
+      $sselect = ($s_id == $source_id) ? 'selected' : '';
       $sel_source .= "<option value=\"$s_id\" $sselect>$slabel</option>";
     }
   }
-  $sel_source .= "</select>";
+  $sel_source .= '</select>';
 
   // Task type select construction
   $sel_tt = "<select name=\"sel_tasktype\">
     <option value=\"$c_undef\">$l_undef</option>";
   if (is_array($tts)) {
     foreach ($tts as $tt_id=>$one_tt) {
-      $tt_label = $one_tt["label"];
-      $internal = $one_tt["internal"];
+      $tt_label = $one_tt['label'];
+      $internal = $one_tt['internal'];
       $sel_tt .= "\n<option value=\"$tt_id\"";
       if ($tt == $tt_id) $sel_tt .= "selected =\"selected\"";
       $sel_tt .= ">$tt_label</option>\n";
     }
-    $sel_tt .= "</select>";
+    $sel_tt .= '</select>';
   }
  
   // Marketing manager select construction
   $sel_market = "<select name=\"sel_market\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($usrc_q->next_record()) {
-    $cid = $usrc_q->f("userobm_id");
-    $cname = $usrc_q->f("userobm_lastname") . " " .
-             $usrc_q->f("userobm_firstname");
+    $cid = $usrc_q->f('userobm_id');
+    $cname = $usrc_q->f('userobm_lastname') . ' ' .
+             $usrc_q->f('userobm_firstname');
     $sel_market .= "\n<option value=\"$cid\"";
     if ($market == $cid) $sel_market .= " selected = \"selected\""; 
     $sel_market .= ">$cname</option>";
   }
-  $sel_market .= "</select>";
+  $sel_market .= '</select>';
 
   // Technical manager select construction
   $sel_tech = "<select name=\"sel_tech\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($usrp_q->next_record()) {
-    $cid = $usrp_q->f("userobm_id");
-    $cname = $usrp_q->f("userobm_lastname") . " " .
-             $usrp_q->f("userobm_firstname");
+    $cid = $usrp_q->f('userobm_id');
+    $cname = $usrp_q->f('userobm_lastname') . ' ' .
+             $usrp_q->f('userobm_firstname');
     $sel_tech .= "<option value=\"$cid\"";
     if ($tech == $cid) $sel_tech .= " selected = \"selected\""; 
     $sel_tech .= ">$cname</option>\n";
   }
-  $sel_tech .= "</select>";
+  $sel_tech .= '</select>';
 
   // contact 1 select construction
   $sel_con1 = "<select name=\"sel_contact1\">";
   if(is_object($con_q)){
     while ($con_q->next_record()) {
-      $cid = $con_q->f("contact_id");
-      $cinfo = $con_q->f("contact_lastname") . " " .
-               $con_q->f("contact_firstname") . " - " .
-               $con_q->f("contact_phone");
+      $cid = $con_q->f('contact_id');
+      $cinfo = $con_q->f('contact_lastname') . ' ' .
+               $con_q->f('contact_firstname') . ' - ' .
+               $con_q->f('contact_phone');
       $sel_con1 .= "<option value=\"$cid\"";
       if ($con1 == $cid) $sel_con1 .= "  selected = \"selected\""; 
       $sel_con1 .= ">$cinfo</option>\n";
     }
    }
-  $sel_con1 .= "</select>";
+  $sel_con1 .= '</select>';
 
   // contact 2 select construction
   if(is_object($con_q)){
@@ -1289,25 +1289,25 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   $sel_con2 = "<select name=\"sel_contact2\">";
   if (is_object($con_q)){
     while ($con_q->next_record()) {
-      $cid = $con_q->f("contact_id");
-      $cinfo = $con_q->f("contact_lastname") . " " .
-               $con_q->f("contact_firstname") . " - " .
-               $con_q->f("contact_phone");
+      $cid = $con_q->f('contact_id');
+      $cinfo = $con_q->f('contact_lastname') . ' ' .
+               $con_q->f('contact_firstname') . ' - ' .
+               $con_q->f('contact_phone');
       $sel_con2 .= "<option value=\"$cid\"";
       if ($con2 == $cid) $sel_con2 .= " selected = \"selected\""; 
       $sel_con2 .= ">$cinfo</option>\n";
     }
   }
-  $sel_con2 .= "</select>";
+  $sel_con2 .= '</select>';
 
   $cpt = 0;
   // Others companies relations
   if ( (is_array($dc)) && (count($dc) > 0) ) {
     foreach ($dc as $cpt => $one_dc) {
-      $dc_cid = $one_dc["company_id"];
-      $dc_cname = $one_dc["company_name"];
-      $dc_roleid = $one_dc["role_id"];
-      $dis_role = of_category_html_select("DealCompany", "role$cpt", $roles, $dc_roleid, "none");
+      $dc_cid = $one_dc['company_id'];
+      $dc_cname = $one_dc['company_name'];
+      $dc_roleid = $one_dc['role_id'];
+      $dis_role = of_category_html_select('DealCompany', "role$cpt", $roles, $dc_roleid, 'none');
       $dis_dc .= "
       <div>
       $dis_role
@@ -1323,7 +1323,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
     }
     $cpt++;
   }
-  $dis_role = of_category_html_select("DealCompany", "role$cpt", $roles, "", "none");
+  $dis_role = of_category_html_select('DealCompany', "role$cpt", $roles, '', 'none');
   $dis_dc .= "
       <div>
       $dis_role
@@ -1340,20 +1340,20 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   // status select construction
   $sel_status = "<select name=\"sel_status_id\" onChange=\"auto_set_hitrate(this, this.form.tf_hitrate,this.selectedIndex);\">";
   while ($sta_q->next_record()) {
-    $sid = $sta_q->f("dealstatus_id");
-    $slabel = $sta_q->f("dealstatus_label");
+    $sid = $sta_q->f('dealstatus_id');
+    $slabel = $sta_q->f('dealstatus_label');
     $sel_status .= "<option value=\"$sid\"";
     if ($status == $sid) $sel_status .= " selected = \"selected\""; 
     $sel_status .= ">$slabel</option>\n";
   }
-  $sel_status .= "</select>";
+  $sel_status .= '</select>';
   if($sta_q->nf() > 0) {
     $sta_q->seek(0);
   }
   while ($sta_q->next_record()) {
-    $sid = $sta_q->f("dealstatus_id");
-    $shitrate = $sta_q->f("dealstatus_hitrate");
-    if (($shitrate != "") && (($shitrate >= 0) && ($shitrate <= 100))) {
+    $sid = $sta_q->f('dealstatus_id');
+    $shitrate = $sta_q->f('dealstatus_hitrate');
+    if (($shitrate != '') && (($shitrate >= 0) && ($shitrate <= 100))) {
       $js_status_loop .= "
         if (select.options[pos].value == $sid) {
           targetField.value = $shitrate;
@@ -1379,8 +1379,8 @@ $js_status_loop
   }
   $sel_usercomment = "<select name=\"sel_usercomment\">";
   while ($usrc_q->next_record()) {
-    $cid = $usrc_q->f("userobm_id");
-    $cname = $usrc_q->f("userobm_lastname")." ".$usrc_q->f("userobm_firstname");
+    $cid = $usrc_q->f('userobm_id');
+    $cname = $usrc_q->f('userobm_lastname').' '.$usrc_q->f('userobm_firstname');
     $sel_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
@@ -1388,26 +1388,26 @@ $js_status_loop
     }
     $sel_usercomment .= ">$cname</option>\n";
   }
-  $sel_usercomment .= "</select>";
+  $sel_usercomment .= '</select>';
 
   // Mail comment radio
-  if (($mail_comment == "") || ($mail_comment == "$l_no")) {
-    $rd_mail_no_c = "checked";
+  if (($mail_comment == '') || ($mail_comment == "$l_no")) {
+    $rd_mail_no_c = 'checked';
   } else if ($mail_comment == "$l_members") {
-    $rd_mail_members_c = "checked";
+    $rd_mail_members_c = 'checked';
   } else if ($mail_comment == "$l_group") {
-    $rd_mail_group_c = "checked";
+    $rd_mail_group_c = 'checked';
   }
 
-  //  if (($action == "detailupdate") || ($action == "update")) {
-  if ($comment != "") {
+  //  if (($action == 'detailupdate') || ($action == 'update')) {
+  if ($comment != '') {
     $dis_comment = "
     $l_upd_comment
     <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>";
   }
 
-  if ( ($action == "new") || ($action == "insert") ||
-       ( (($action == "detailupdate") || ($action == "update")) && 
+  if ( ($action == 'new') || ($action == 'insert') ||
+       ( (($action == 'detailupdate') || ($action == 'update')) && 
          ($usercreate == $uid) ) ) {
      $dis_button1 = "
       <input type=\"hidden\" name=\"lead_id\" value=\"$deal[lead_id]\" />
@@ -1417,10 +1417,10 @@ $js_status_loop
       <th>$l_private</th>
       <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
     if ($priv == 1) $dis_priv .= "checked = \"checked\"";
-    $dis_priv .= " /></td></tr><tr>";
+    $dis_priv .= ' /></td></tr><tr>';
   }
 
-  if ($action == "detailupdate") {
+  if ($action == 'detailupdate') {
     $dis_contact_2 = "<a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2")."\">
              <img src=\"$ico_contact\" alt=\"[details]\" />
              </a>";
@@ -1428,7 +1428,7 @@ $js_status_loop
              <img src=\"$ico_contact\" alt=\"[details]\" />
              </a>";
   }
-  if (($action == "detailupdate") || ($action == "update")) {
+  if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_button1 = "<input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"parentdeal_id\" value=\"$pid\" />
       <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp\" />
@@ -1452,13 +1452,13 @@ $js_status_loop
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<div class=\"title\">$l_deal : $dis_title</div>";
+  $display['title'] = "<div class=\"title\">$l_deal : $dis_title</div>";
 
   $block = "
   $js_status
   <form method=\"post\" name=\"f_entity\" 
     onsubmit=\"if (check_form(this)) return true; else return false;\"
-    action=\"".url_prepare("deal_index.php")."\">
+    action=\"".url_prepare('deal_index.php')."\">
 
   <fieldset class=\"detail infos\">
   <legend>$l_relation</legend>
@@ -1615,10 +1615,10 @@ $js_status_loop
 function dis_deal_quick_form($deal) {
   global $display, $obm, $action;
 
-  if ($deal["deal_id"] > 0) {
-    $deal_q = run_query_deal_detail($deal["deal_id"]);
-    $display["detailInfo"] = display_record_info($deal_q);
-    $usrc_q = run_query_all_users_from_group($cg_com, array($obm["uid"]));
+  if ($deal['deal_id'] > 0) {
+    $deal_q = run_query_deal_detail($deal['deal_id']);
+    $display['detailInfo'] = display_record_info($deal_q);
+    $usrc_q = run_query_all_users_from_group($cg_com, array($obm['uid']));
     $sta_q = run_query_deal_status_list();
     $block = html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal);
   }
@@ -1645,55 +1645,55 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
   global $l_no, $l_members, $l_group;
   global $path, $display, $action, $obm;
 
-  $uid = $obm["uid"];
+  $uid = $obm['uid'];
 
-  $id = $deal_q->f("deal_id");
-  $label = $deal_q->f("deal_label");
+  $id = $deal_q->f('deal_id');
+  $label = $deal_q->f('deal_label');
   $dis_title = $label;
 
   // if update mode and first time, values are taken from db
-  if ($action == "quick_detail") {
-    $dateexp = of_date_upd_format($deal_q->f("dateexpected"), true);
-    $datealarm = of_date_upd_format($deal_q->f("datealarm"), true);
-    $status = $deal_q->f("deal_status_id");
-    $hitrate = $deal_q->f("deal_hitrate");
-    $todo = $deal_q->f("deal_todo");
-    $comment = $deal_q->f("deal_comment");
+  if ($action == 'quick_detail') {
+    $dateexp = of_date_upd_format($deal_q->f('dateexpected'), true);
+    $datealarm = of_date_upd_format($deal_q->f('datealarm'), true);
+    $status = $deal_q->f('deal_status_id');
+    $hitrate = $deal_q->f('deal_hitrate');
+    $todo = $deal_q->f('deal_todo');
+    $comment = $deal_q->f('deal_comment');
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
-  } elseif ($action == "quick_update") {
+  } elseif ($action == 'quick_update') {
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($deal["datealarm"])) { $datealarm = of_date_upd_format(stripslashes($deal["datealarm"])); }
-  if (isset($deal["dateexpected"])) { $dateexp = of_date_upd_format(stripslashes($deal["dateexpected"])); }
-  if (isset($deal["status_id"])) { $status = $deal["status_id"]; }
-  if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
-  if (isset($deal["todo"])) { $todo = stripslashes($deal["todo"]); }
-  if (isset($deal["comment"])) { $comment = stripslashes($deal["comment"]); }
-  if (isset($deal["add_comment"])) { $add_comment = stripslashes($deal["add_comment"]); }
-  if (isset($deal["usercomment"])) { $usercomment = $deal["usercomment"]; }
-  if (isset($deal["datecomment"])) { $datecomment = of_date_upd_format($deal["datecomment"]); }
-  if (isset($deal["mail_comment"])) { $mail_comment = $deal["mail_comment"]; }
+  if (isset($deal['datealarm'])) { $datealarm = of_date_upd_format(stripslashes($deal['datealarm'])); }
+  if (isset($deal['dateexpected'])) { $dateexp = of_date_upd_format(stripslashes($deal['dateexpected'])); }
+  if (isset($deal['status_id'])) { $status = $deal['status_id']; }
+  if (isset($deal['hitrate'])) { $hitrate = stripslashes($deal['hitrate']); }
+  if (isset($deal['todo'])) { $todo = stripslashes($deal['todo']); }
+  if (isset($deal['comment'])) { $comment = stripslashes($deal['comment']); }
+  if (isset($deal['add_comment'])) { $add_comment = stripslashes($deal['add_comment']); }
+  if (isset($deal['usercomment'])) { $usercomment = $deal['usercomment']; }
+  if (isset($deal['datecomment'])) { $datecomment = of_date_upd_format($deal['datecomment']); }
+  if (isset($deal['mail_comment'])) { $mail_comment = $deal['mail_comment']; }
  
   // status select construction
   $sel_status = "<select name=\"sel_status_id\" onChange=\"auto_set_hitrate(this, this.form.tf_hitrate,this.selectedIndex);\">";
   while ($sta_q->next_record()) {
-    $sid = $sta_q->f("dealstatus_id");
-    $slabel = $sta_q->f("dealstatus_label");
+    $sid = $sta_q->f('dealstatus_id');
+    $slabel = $sta_q->f('dealstatus_label');
     $sel_status .= "<option value=\"$sid\"";
     if ($status == $sid) $sel_status .= " selected = \"selected\""; 
     $sel_status .= ">$slabel</option>\n";
   }
-  $sel_status .= "</select>";
+  $sel_status .= '</select>';
   if ($sta_q->nf() > 0) {
     $sta_q->seek(0);
     while ($sta_q->next_record()) {
-      $sid = $sta_q->f("dealstatus_id");
-      $shitrate = $sta_q->f("dealstatus_hitrate");
-      if (($shitrate != "") && (($shitrate >= 0) && ($shitrate <= 100))) {
+      $sid = $sta_q->f('dealstatus_id');
+      $shitrate = $sta_q->f('dealstatus_hitrate');
+      if (($shitrate != '') && (($shitrate >= 0) && ($shitrate <= 100))) {
         $js_status_loop .= "
           if (select.options[pos].value == $sid) {
             targetField.value = $shitrate;
@@ -1720,8 +1720,8 @@ $js_status_loop
   }
   $sel_usercomment = "<select name=\"sel_usercomment\">";
   while ($usrc_q->next_record()) {
-    $cid = $usrc_q->f("userobm_id");
-    $cname = $usrc_q->f("userobm_lastname")." ".$usrc_q->f("userobm_firstname");
+    $cid = $usrc_q->f('userobm_id');
+    $cname = $usrc_q->f('userobm_lastname').' '.$usrc_q->f('userobm_firstname');
     $sel_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
@@ -1729,18 +1729,18 @@ $js_status_loop
     }
     $sel_usercomment .= ">$cname</option>\n";
   }
-  $sel_usercomment .= "</select>";
+  $sel_usercomment .= '</select>';
 
   // Mail comment radio
-  if (($mail_comment == "") || ($mail_comment == "$l_no")) {
-    $rd_mail_no_c = "checked";
+  if (($mail_comment == '') || ($mail_comment == "$l_no")) {
+    $rd_mail_no_c = 'checked';
   } else if ($mail_comment == "$l_members") {
-    $rd_mail_members_c = "checked";
+    $rd_mail_members_c = 'checked';
   } else if ($mail_comment == "$l_group") {
-    $rd_mail_group_c = "checked";
+    $rd_mail_group_c = 'checked';
   }
 
-  $display["title"] = "<div class=\"title\">$l_deal : $dis_title</div>";
+  $display['title'] = "<div class=\"title\">$l_deal : $dis_title</div>";
  
   $block = "
     $js_status
@@ -1808,7 +1808,7 @@ function dis_deal_can_delete_deal($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display;
 
-  $url = url_prepare("deal_index.php");
+  $url = url_prepare('deal_index.php');
 
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
@@ -1823,7 +1823,7 @@ function dis_deal_can_delete_deal($p_id) {
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";
 
-  $display["msg"] .= display_ok_msg($l_can_delete);
+  $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
     <div class=\"buttons\">
@@ -1847,11 +1847,11 @@ function html_deal_affect($parent_q, $p_deal_id) {
 
     $sel_parent = "<select name=\"sel_parent\" size=\"10\">";
     while ($parent_q->next_record()) {
-	$sel_parent .= "<option value=\"".$parent_q->f("parentdeal_id")."\">".$parent_q->f("parentdeal_label")."</option>";
+	$sel_parent .= "<option value=\"".$parent_q->f('parentdeal_id')."\">".$parent_q->f('parentdeal_label').'</option>';
     }
-    $sel_parent .= "</select>";
+    $sel_parent .= '</select>';
 
-    $display["msg"] .= display_info_msg($l_deal_select_parentdeal);
+    $display['msg'] .= display_info_msg($l_deal_select_parentdeal);
     $block = "
       <form name=\"form_affect_deal\" method=\"get\"
         action=\"" . url_prepare("deal_index.php") . "\">
@@ -1884,18 +1884,20 @@ function html_deal_affect($parent_q, $p_deal_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_dashboard_index($deal) {
   global $display, $path;
-  global $l_deal, $l_header_dashboard, $l_potential, $l_year_detail;
+  global $l_deal, $l_header_dashboard, $l_potential, $l_year_detail, $l_deal_panel;
 
-  $view = $deal["dash_view"];
-  $url_total = url_prepare("deal_index.php?action=dashboard");
-  $url_year = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail");
+  $view = $deal['dash_view'];
+  $url_total = url_prepare('deal_index.php?action=dashboard');
+  $url_year = url_prepare('deal_index.php?action=dashboard&amp;dash_view=year_detail');
+  $url_panel = url_prepare('deal_index.php?action=dashboard&amp;dash_view=panel');
 
-  $display["title"] = "<h1 class=\"title\">$l_deal : $l_header_dashboard</h1";
+  $display['title'] = "<h1 class=\"title\">$l_deal : $l_header_dashboard</h1";
 
   $block = "
     <ul>
     <li><a href=\"$url_total\">$l_potential</a></li>
     <li><a href=\"$url_year\">$l_year_detail</a></li>
+    <li><a href=\"$url_panel\">$l_deal_panel</a></li>
     </ul>
 ";
 
@@ -1911,9 +1913,9 @@ function dis_deal_dashboard_index($deal) {
 function dis_deal_dashboard_view($deal) {
   global $display;
 
-  $view = $deal["dash_view"];
+  $view = $deal['dash_view'];
 
-  if ($view != "") {
+  if ($view != '') {
     $func = "dis_deal_dashboard_$view";
     $block .= $func($deal);
   } else {
@@ -1934,34 +1936,34 @@ function dis_deal_dashboard_potential($deal) {
   global $l_forecast, $l_deal_balanced, $l_commission, $l_commission_balanced;
   global $l_marketing_manager, $l_technical_manager, $l_help_deal_forecast;
 
-  $display["title"] = "<div class=\"title\">$l_deal : $l_forecast</div>";
+  $display['title'] = "<div class=\"title\">$l_deal : $l_forecast</div>";
 
-  if (is_array($deal["manager"])) {
-    $users_id = $deal["manager"];
-  } else if ($deal["manager"] != "") {
-    $users_id = array($deal["manager"]);
+  if (is_array($deal['manager'])) {
+    $users_id = $deal['manager'];
+  } else if ($deal['manager'] != '') {
+    $users_id = array($deal['manager']);
   } else {
-    $users_id = "";
+    $users_id = '';
   }
 
   $cpt = 1;
   $potentials = run_query_deal_potential($users_id);
-  if (is_array($potentials["market"])) {
-    foreach($potentials["market"] as $u_id => $pu) {
-      if ($u_id != "0") {
+  if (is_array($potentials['market'])) {
+    foreach($potentials['market'] as $u_id => $pu) {
+      if ($u_id != '0') {
         $cpt++;
         if($cpt % 2 == 0) {
           $class = "class=\"pair\"";
         } else {
-          $class = "";
+          $class = '';
         }        
-	$amount = number_format($pu["amount"]);
-	$margin = number_format($pu["margin"]);
-	$balanced = number_format($pu["amount_balanced"]);
-	$commission = number_format($pu["commission"]);
-	$commission_balanced = number_format($pu["commission_balanced"]);
-	$nb_potential = $pu["number"];
-	$user = $pu["name"];
+	$amount = number_format($pu['amount']);
+	$margin = number_format($pu['margin']);
+	$balanced = number_format($pu['amount_balanced']);
+	$commission = number_format($pu['commission']);
+	$commission_balanced = number_format($pu['commission_balanced']);
+	$nb_potential = $pu['number'];
+	$user = $pu['name'];
 	$dis_market_pot .= "
       <tr $class>
         <td>$user</td>
@@ -1975,31 +1977,31 @@ function dis_deal_dashboard_potential($deal) {
       }
     }
 
-    $m_amount = number_format($potentials["market"]["0"]["amount"]);
-    $m_margin = number_format($potentials["market"]["0"]["margin"]);
-    $m_balanced = number_format($potentials["market"]["0"]["amount_balanced"]);
-    $m_commission = number_format($potentials["market"]["0"]["commission"]);
-    $m_commission_balanced = number_format($potentials["market"]["0"]["commission_balanced"]);
-    $m_nb_potential = $potentials["market"]["0"]["number"];
+    $m_amount = number_format($potentials['market']['0']['amount']);
+    $m_margin = number_format($potentials['market']['0']['margin']);
+    $m_balanced = number_format($potentials['market']['0']['amount_balanced']);
+    $m_commission = number_format($potentials['market']['0']['commission']);
+    $m_commission_balanced = number_format($potentials['market']['0']['commission_balanced']);
+    $m_nb_potential = $potentials['market']['0']['number'];
   }
 
-  if (is_array($potentials["tech"])) {
-    foreach($potentials["tech"] as $u_id => $pu) {
-      if ($u_id != "0") {
+  if (is_array($potentials['tech'])) {
+    foreach($potentials['tech'] as $u_id => $pu) {
+      if ($u_id != '0') {
 	$cpt++;
         if($cpt % 2 == 0) {
           $class = "class=\"pair\"";
         } else {
-          $class = "";
+          $class = '';
         }
 
-	$amount = number_format($pu["amount"]);
-	$margin = number_format($pu["margin"]);
-	$balanced = number_format($pu["amount_balanced"]);
-	$commission = number_format($pu["commission"]);
-	$commission_balanced = number_format($pu["commission_balanced"]);
-	$nb_potential = $pu["number"];
-	$user = $pu["name"];
+	$amount = number_format($pu['amount']);
+	$margin = number_format($pu['margin']);
+	$balanced = number_format($pu['amount_balanced']);
+	$commission = number_format($pu['commission']);
+	$commission_balanced = number_format($pu['commission_balanced']);
+	$nb_potential = $pu['number'];
+	$user = $pu['name'];
 	$dis_tech_pot .= "
       <tr $class>
         <td>$user</td>
@@ -2013,12 +2015,12 @@ function dis_deal_dashboard_potential($deal) {
       }
     }
 
-    $t_amount = number_format($potentials["tech"]["0"]["amount"]);
-    $t_margin = number_format($potentials["tech"]["0"]["margin"]);
-    $t_balanced = number_format($potentials["tech"]["0"]["amount_balanced"]);
-    $t_commission = number_format($potentials["tech"]["0"]["commission"]);
-    $t_commission_balanced = number_format($potentials["tech"]["0"]["commission_balanced"]);
-    $t_nb_potential = $potentials["tech"]["0"]["number"];
+    $t_amount = number_format($potentials['tech']['0']['amount']);
+    $t_margin = number_format($potentials['tech']['0']['margin']);
+    $t_balanced = number_format($potentials['tech']['0']['amount_balanced']);
+    $t_commission = number_format($potentials['tech']['0']['commission']);
+    $t_commission_balanced = number_format($potentials['tech']['0']['commission_balanced']);
+    $t_nb_potential = $potentials['tech']['0']['number'];
   }
 
   $dis_potential = "
@@ -2096,24 +2098,24 @@ function dis_deal_dashboard_year_detail($deal) {
   global $l_amount, $l_deal_balanced, $l_commission, $l_commission_balanced;
   global $l_execute,$ico_previous,$ico_next;
 
-  $users_id = $deal["manager"];
+  $users_id = $deal['manager'];
 
-  if (isset($deal["year"])) {
-    $year = $deal["year"];
+  if (isset($deal['year'])) {
+    $year = $deal['year'];
   } else {
-    $year = date("Y");
+    $year = date('Y');
   }
   $year_prev = $year - 1;
   $year_next = $year + 1;
   $date_range = array("$year-01-01", "$year-12-31");
-  $d = run_query_deal_dashboard_infos($date_range, "deal_dateexpected", "", $deal["tasktype"]);
+  $d = run_query_deal_dashboard_infos($date_range, 'deal_dateexpected', '', $deal['tasktype']);
   $url_prev = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_prev");
   $url_next = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_next");
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
-  $tt_ids = $deal["tasktype"];
-  if (! is_array($tt_ids) && ($tt_ids == "")) {
-    $tt_ids = "0";
+  $tt_ids = $deal['tasktype'];
+  if (! is_array($tt_ids) && ($tt_ids == '')) {
+    $tt_ids = '0';
   } else {
     foreach ($tt_ids as $tt_id) {
       $url_sel_tt .= "&amp;sel_tt[]=$tt_id";
@@ -2123,7 +2125,7 @@ function dis_deal_dashboard_year_detail($deal) {
   $tts = get_global_tasktype($ctt_sales, $tt_ids);
 
   $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
-  $block_tt = of_select_dis_search_select($tts, "tt", $url_tt);
+  $block_tt = of_select_dis_search_select($tts, 'tt', $url_tt);
 
   // Table header
   for ($month = 1; $month < 13; $month++) {
@@ -2135,18 +2137,18 @@ function dis_deal_dashboard_year_detail($deal) {
   if ((is_array($users_id)) && (count($users_id) > 0)) {
     $users = $users_id;
   } else {
-    $users = $d["users_id"];
+    $users = $d['users_id'];
   }
   if ((is_array($users)) && (count($users) > 0)) {
     foreach ($users as $m_id) {
       $url_sel_manager .= "&amp;sel_manager[]=$m_id";
     }
-  } else if ($users != "") {
+  } else if ($users != '') {
     $url_sel_manager .= "&amp;sel_manager[]=$users";
   }
 
   // prepare columns (no_date, past, monthes 1-12, future)
-  $cols = array ("no_date" => "no_date", "past" => "past");
+  $cols = array ('no_date' => 'no_date', 'past' => 'past');
   for ($month = 1; $month < 13; $month++) {
     // left pad the month
     if ($month > 9) {
@@ -2156,12 +2158,12 @@ function dis_deal_dashboard_year_detail($deal) {
     }
     $cols[$month] = "$year_month";
    }
-  $cols["future"] = "future";
+  $cols['future'] = 'future';
   
 
   // Loop through users (rows)
   foreach ($users as $u_id) {
-    $u_name = $d["name"][$u_id];
+    $u_name = $d['name'][$u_id];
     $tam = 0;
     $tma = 0;
     $tab = 0;
@@ -2192,7 +2194,7 @@ function dis_deal_dashboard_year_detail($deal) {
 	$ca = $d["$col"][$u_id]['commission'];
 	$cb = $d["$col"][$u_id]['commission_balanced'];
 
-	// "past", "future" and "no date" not in Total
+	// 'past', 'future' and 'no date' not in Total
 	if (is_numeric($month)) {
 	  $tam += $am;
 	  $tma += $ma;
@@ -2203,22 +2205,22 @@ function dis_deal_dashboard_year_detail($deal) {
 
 	$dis_am = number_format($am, 2, ',', ' ');
 	$dis_ma = number_format($ma, 2, ',', ' ');
-	$dis_ab = number_format($ab, 2, ",", " ");
-	$dis_ca = number_format($ca, 2, ",", " ");
-	$dis_cb = number_format($cb, 2, ",", " ");
+	$dis_ab = number_format($ab, 2, ',', ' ');
+	$dis_ca = number_format($ca, 2, ',', ' ');
+	$dis_cb = number_format($cb, 2, ',', ' ');
 
 	if ($am >= 0) {
-	  if ($month  == "no_date") {
+	  if ($month  == 'no_date') {
 	    $url_date = "&amp;tf_date_before=0000-00-00";
-	  } else if ($month == "past") {
+	  } else if ($month == 'past') {
 	    $month_start = "$year-01-01";
 	    $url_date = "&amp;tf_date_before=$month_start";
-	  } else if ($month == "future") {
+	  } else if ($month == 'future') {
 	    $month_end = "$year-12-31";
 	    $url_date = "&amp;tf_date_after=$month_end";
 	  } else {
 	    $month_start = "$col-01";
-	    $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
+	    $month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
 	    $url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
 	  }
 	  $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list&amp;sel_manager[]=$u_id&amp;cba_archive=1$url_date$url_sel_tt\">$dis_am</a>";
@@ -2245,9 +2247,9 @@ function dis_deal_dashboard_year_detail($deal) {
 
     $dis_tam = number_format($tam, 2, ',', ' ');
     $dis_tma = number_format($tma, 2, ',', ' ');
-    $dis_tab = number_format($tab, 2, ",", " ");
-    $dis_tca = number_format($tca, 2, ",", " ");
-    $dis_tcb = number_format($tcb, 2, ",", " ");
+    $dis_tab = number_format($tab, 2, ',', ' ');
+    $dis_tca = number_format($tca, 2, ',', ' ');
+    $dis_tcb = number_format($tcb, 2, ',', ' ');
 
     $dis_amount_row .= "<td>$dis_tam</td>
       </tr>";
@@ -2284,7 +2286,7 @@ function dis_deal_dashboard_year_detail($deal) {
     $ca = $d[$col][0]['commission'];
     $cb = $d[$col][0]['commission_balanced'];
 
-    // "past", "future" and "no date" not in Total
+    // 'past', 'future' and 'no date' not in Total
     if (is_numeric($month)) {
       $tam += $am;
       $tma += $ma;
@@ -2298,29 +2300,29 @@ function dis_deal_dashboard_year_detail($deal) {
       $dis_am = number_format($am, 2, ',', ' ');
       $dis_ma = number_format($ma, 2, ',', ' ');
       $dis_ab = number_format($ab, 2, ',', ' ');
-      $dis_ca = number_format($ca, 2, ",", " ");
-      $dis_cb = number_format($cb, 2, ",", " ");
+      $dis_ca = number_format($ca, 2, ',', ' ');
+      $dis_cb = number_format($cb, 2, ',', ' ');
     
-      if ($month  == "no_date") {
+      if ($month  == 'no_date') {
 	$url_date = "&amp;tf_date_before=0000-00-00";
-      } else if ($month == "past") {
+      } else if ($month == 'past') {
 	$month_start = "$year-01-01";
 	$url_date = "&amp;tf_date_before=$month_start";
-      } else if ($month == "future") {
+      } else if ($month == 'future') {
 	$month_end = "$year-12-31";
 	$url_date = "&amp;tf_date_after=$month_end";
       } else {
 	$month_start = "$col-01";
-	$month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
+	$month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
 	$url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
       }
       $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list$url_sel_manager&amp;cba_archive=1$url_date$url_sel_tt\">$dis_am</a>";
     } else {
       $dis_am = '';
       $dis_ma = '';
-      $dis_ab = "";
-      $dis_ca = "";
-      $dis_cb = "";
+      $dis_ab = '';
+      $dis_ca = '';
+      $dis_cb = '';
     }
 
     $dis_total_row .= "
@@ -2336,9 +2338,9 @@ function dis_deal_dashboard_year_detail($deal) {
   }
   $dis_tam = number_format($tam, 2, ',', ' ');
   $dis_tma = number_format($tma, 2, ',', ' ');
-  $dis_tab = number_format($tab, 2, ",", " ");
-  $dis_tca = number_format($tca, 2, ",", " ");
-  $dis_tcb = number_format($tcb, 2, ",", " ");
+  $dis_tab = number_format($tab, 2, ',', ' ');
+  $dis_tca = number_format($tca, 2, ',', ' ');
+  $dis_tcb = number_format($tcb, 2, ',', ' ');
   $dis_total_row .= "
       <td>&nbsp;$dis_tam</td>";
   $dis_total_margin_row .= "
@@ -2358,24 +2360,24 @@ function dis_deal_dashboard_year_detail($deal) {
     } else {
       $year_month = "$year-0$month";
     }
-    $am = $d["$year_month"]["0"]["amount"];
-    $ab = $d["$year_month"]["0"]["amount_balanced"];
+    $am = $d["$year_month"]['0']['amount'];
+    $ab = $d["$year_month"]['0']['amount_balanced'];
     $values[$month-1] = $am;
-    $labels[$month-1] = number_format($am/1000, 0, ",", " ");
+    $labels[$month-1] = number_format($am/1000, 0, ',', ' ');
     $xlabels[$month-1] = $l_monthsofyearshort[$month-1];
     $values_ab[$month-1] = $ab;
-    $labels_ab[$month-1] = number_format($ab/1000, 0, ",", " ");
+    $labels_ab[$month-1] = number_format($ab/1000, 0, ',', ' ');
   }
 
   $title = "$l_potential $year";
-  $plots["new_bar"] = array(1, 1);
-  $plots["legends"] = array($l_amount, $l_deal_balanced);
-  $plots["values"] = array($values, $values_ab);
-  $plots["labels"] = array($labels, $labels_ab);
+  $plots['new_bar'] = array(1, 1);
+  $plots['legends'] = array($l_amount, $l_deal_balanced);
+  $plots['values'] = array($values, $values_ab);
+  $plots['labels'] = array($labels, $labels_ab);
 
   $chart_pot_params .= "&amp;title=".urlencode($title)."&amp;plots=".urlencode(serialize($plots))."&amp;xlabels=".urlencode(serialize($xlabels));
 
-  $url_form = url_prepare("deal_index.php");
+  $url_form = url_prepare('deal_index.php');
 
   $block = "
     <form method=\"post\" name=\"f_search\" action=\"$url_form\">
@@ -2466,20 +2468,20 @@ function dis_deal_dashboard_list($deal) {
   global $display, $obm;
   global $l_module_deal;
 
-  $date_after = $deal["date_after"];
-  $date_before = $deal["date_before"];
+  $date_after = $deal['date_after'];
+  $date_before = $deal['date_before'];
 
-  if (is_array($deal["manager"])) {
-    $users_id = $deal["manager"];
-    foreach ($deal["manager"] as $m_id) {
+  if (is_array($deal['manager'])) {
+    $users_id = $deal['manager'];
+    foreach ($deal['manager'] as $m_id) {
       $url_sel_manager .= "&amp;sel_manager[]=$m_id";
     }
-  } else if ($deal["manager"] != "") {
-    $users_id = array($deal["manager"]);
-    $m_id = $deal["manager"];
+  } else if ($deal['manager'] != '') {
+    $users_id = array($deal['manager']);
+    $m_id = $deal['manager'];
     $url_sel_manager .= "&amp;sel_manager=$m_id";
   } else {
-    $users_id = "";
+    $users_id = '';
   }
 
   $block .= "
@@ -2488,16 +2490,16 @@ function dis_deal_dashboard_list($deal) {
     </div>";
 
   $deal_q = run_query_deal_dashboard_list($deal, $users_id);
-  $prefs = get_display_pref($obm["uid"], "deal", 0);
+  $prefs = get_display_pref($obm['uid'], 'deal', 0);
 
   $url = url_prepare("deal_index.php?action=dashboard_list&amp;cba_archive=1&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before$url_sel_manager");
     
-  $dis_deal = new OBM_DISPLAY("DATA", $prefs, "deal");
+  $dis_deal = new OBM_DISPLAY('DATA', $prefs, 'deal');
   $dis_deal->data_set = $deal_q;
   $dis_deal->data_url = $url;
   $dis_deal->data_order = true;
-  $dis_deal->data_header = "both";
-  $block .= $dis_deal->display("dis_data_deal");
+  $dis_deal->data_header = 'both';
+  $block .= $dis_deal->display('dis_data_deal');
 
   return $block;
 }
@@ -2513,11 +2515,11 @@ function dis_deal_admin_index() {
 
   $block = html_deal_admin_form($kind_q, $status_q);
 
-  $roles = of_category_get_ordered("DealCompany", "role");
-  $block .= of_category_dis_admin_form("role", $roles);
+  $roles = of_category_get_ordered('DealCompany', 'role');
+  $block .= of_category_dis_admin_form('role', $roles);
 
   // User defined data
-  $block .= of_userdata_dis_admin_form("deal");
+  $block .= of_userdata_dis_admin_form('deal');
 
   return $block;
 }
@@ -2544,18 +2546,18 @@ function html_deal_admin_form($kind_q, $status_q) {
   $char_title = '=';
   $key = 0;
   while ($kind_q->next_record()) {
-    $id = $kind_q->f("dealtype_id");
-    //$inout = $kind_q->f("dealtype_inout");
-    $inout_plus = ($kind_q->f("dealtype_inout"))== "+" ? "selected=\"selected\"" : "";
-    $inout_minus = ($kind_q->f("dealtype_inout"))== "-" ? "selected=\"selected\"" : "";
-    $label = $kind_q->f("dealtype_label");
+    $id = $kind_q->f('dealtype_id');
+    //$inout = $kind_q->f('dealtype_inout');
+    $inout_plus = ($kind_q->f('dealtype_inout'))== '+' ? "selected=\"selected\"" : '';
+    $inout_minus = ($kind_q->f('dealtype_inout'))== '-' ? "selected=\"selected\"" : '';
+    $label = $kind_q->f('dealtype_label');
    
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
-      $class = "";
+      $class = '';
     }
-    $c_label = htmlentities($one_cat["label"]);
+    $c_label = htmlentities($one_cat['label']);
     $kind_list .= "
     <tr $class>
     <td>
@@ -2582,17 +2584,17 @@ function html_deal_admin_form($kind_q, $status_q) {
   $key = 0;
   while ($status_q->next_record()) {
 
-    $id = $status_q->f("dealstatus_id");
-    $order = $status_q->f("dealstatus_order");
-    $label = $status_q->f("dealstatus_label");
-    $hitrate = $status_q->f("dealstatus_hitrate");
+    $id = $status_q->f('dealstatus_id');
+    $order = $status_q->f('dealstatus_order');
+    $label = $status_q->f('dealstatus_label');
+    $hitrate = $status_q->f('dealstatus_hitrate');
    
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
-      $class = "";
+      $class = '';
     }
-    $c_label = htmlentities($one_cat["label"]);
+    $c_label = htmlentities($one_cat['label']);
     $sta_list .= "
     <tr $class>
     <td>
@@ -2766,12 +2768,12 @@ function dis_deal_kind_links($id) {
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $did = $obm_q->f("deal_id");
-      $dlabel = $obm_q->f("deal_label");
+      $did = $obm_q->f('deal_id');
+      $dlabel = $obm_q->f('deal_label');
       $dis_link = "<li><a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a></li>";
     }
     if ($cpt < $nb_kind) {
-      $dis_link .= "<li>...</li>";
+      $dis_link .= '<li>...</li>';
     }
 
   } else {
@@ -2786,15 +2788,15 @@ function dis_deal_kind_links($id) {
    </div>";
 
   $dis_back = "<form name=\"form_back\" method=\"get\"
-        action=\"" .url_prepare("deal_index.php") . "\">
+        action=\"" .url_prepare('deal_index.php') . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>";
 
   if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_kind_can_delete);
+    $display['msg'] .= display_ok_msg($l_kind_can_delete);
     $dis_del = "<form name=\"form_kind_delete\".
-          method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
+          method=\"post\" action=\"" . url_prepare('deal_index.php') . "\">
         <input type=\"hidden\" name=\"action\" value=\"kind_delete\" />
         <input type=\"hidden\" name=\"sel_kind_id\" value=\"$id\" />
         <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\" />
@@ -2805,7 +2807,7 @@ function dis_deal_kind_links($id) {
         $dis_back
       </div>";
   } else {
-    $display["msg"] .= display_warn_msg($l_kind_cant_delete);
+    $display['msg'] .= display_warn_msg($l_kind_cant_delete);
     $block .= "
       <div class=\"buttons\">
         $dis_back
@@ -2837,12 +2839,12 @@ function dis_deal_status_links($id) {
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $did = $obm_q->f("deal_id");
-      $dlabel = $obm_q->f("deal_label");
+      $did = $obm_q->f('deal_id');
+      $dlabel = $obm_q->f('deal_label');
       $dis_link.= "<li><a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a></li>";
     }
     if ($cpt < $nb_stat) {
-      $dis_link .= "<li>...</li>";
+      $dis_link .= '<li>...</li>';
     }
 
   } else {
@@ -2857,15 +2859,15 @@ function dis_deal_status_links($id) {
    </div>";
 
   $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("deal_index.php") . "\">
+          action=\"" .url_prepare('deal_index.php') . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>";
 
   if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_status_can_delete);
+    $display['msg'] .= display_ok_msg($l_status_can_delete);
     $dis_del = "<form name=\"form_kind_delete\".
-        method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
+        method=\"post\" action=\"" . url_prepare('deal_index.php') . "\">
       <input type=\"hidden\" name=\"action\" value=\"status_delete\" />
       <input type=\"hidden\" name=\"sel_status_id\" value=\"$id\" />
       <input type=\"submit\" name=\"sub_status\" value=\"$l_status_delete\" />
@@ -2876,7 +2878,7 @@ function dis_deal_status_links($id) {
         $dis_back
       </div>";
   } else {
-    $display["msg"] .= display_warn_msg($l_status_cant_delete);
+    $display['msg'] .= display_warn_msg($l_status_cant_delete);
     $block .= "
       <div class=\"buttons\">
         $dis_back
@@ -2896,14 +2898,14 @@ function dis_deal_status_links($id) {
 function dis_deal_display_pref($prefs, $prefs_parent) {
   global $l_deal_display, $l_parentdeal_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "deal");
+  $dis_pref = new OBM_DISPLAY('PREFERENCES', $prefs, 'deal');
   $dis_pref->pref_title = $l_deal_display;
   $dis_pref->pref_dis_help = 1;
   
   $block = $dis_pref->display();
 
   $dis_pref->display_pref = $prefs_parent;
-  $dis_pref->display_entity = "parentdeal";
+  $dis_pref->display_entity = 'parentdeal';
   $dis_pref->pref_title = $l_parentdeal_display;
 
 
@@ -2933,9 +2935,9 @@ function dis_deal_parentdeal_search_list($deal) {
   
   $nb_parent = $obm_q->num_rows_total();
   if ($nb_parent == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found_parent);
+    $display['msg'] .= display_warn_msg($l_no_found_parent);
   } else {
-    $prefs = get_display_pref($obm["uid"], "parentdeal");
+    $prefs = get_display_pref($obm['uid'], 'parentdeal');
     $block = html_deal_parentdeal_search_list($obm_q, $prefs, $nb_parent, $deal);
   }
   return $block;
@@ -2955,20 +2957,20 @@ function dis_deal_parentdeal_search_list($deal) {
 function html_deal_parentdeal_search_list($obm_q, $prefs, $nb_parentdeals, $deal) {
   global $display, $l_found_parent; 
 
-  $plabel = urlencode(stripslashes($deal["plabel"]));
-  $pmanager = $deal["pmanager"];
-  $parchive = $deal["parchive"];
-  $display["msg"] .= display_info_msg($nb_parentdeals." ".$l_found_parent);
+  $plabel = urlencode(stripslashes($deal['plabel']));
+  $pmanager = $deal['pmanager'];
+  $parchive = $deal['parchive'];
+  $display['msg'] .= display_info_msg($nb_parentdeals.' '.$l_found_parent);
 
   $url = url_prepare("deal_index.php?action=parent_search&amp;tf_plabel=$plabel&amp;sel_pmanager=$pmanager&amp;cba_parchive=$parchive");
 
-  $parentdeal_d = new OBM_DISPLAY("DATA", $prefs, "deal", "parentdeal");
+  $parentdeal_d = new OBM_DISPLAY('DATA', $prefs, 'deal', 'parentdeal');
   $parentdeal_d->data_set = $obm_q;
   $parentdeal_d->data_url = $url;
-  $parentdeal_d->data_header = "both";
-  $parentdeal_d->data_idfield = "parentdeal_id";
+  $parentdeal_d->data_header = 'both';
+  $parentdeal_d->data_idfield = 'parentdeal_id';
   $parentdeal_d->data_set->seek($first_row);
-  $block = $parentdeal_d->display("dis_data_deal");
+  $block = $parentdeal_d->display('dis_data_deal');
 
   return $block;
 }
@@ -2983,10 +2985,10 @@ function html_deal_parentdeal_search_list($obm_q, $prefs, $nb_parentdeals, $deal
 function dis_deal_parentdeal_consult($deal) {
   global $ctt_sales, $obm;
   
-  $archive = $deal["archive"];
+  $archive = $deal['archive'];
 
-  $obm_q = run_query_deal_parentdeal_detail($deal["parentdeal_id"]);
-  $prefs = get_display_pref ($obm["uid"], "deal");
+  $obm_q = run_query_deal_parentdeal_detail($deal['parentdeal_id']);
+  $prefs = get_display_pref ($obm['uid'], 'deal');
   $deal_q = run_query_deal_search($deal, 0);
   $num_rows = $deal_q->num_rows();
   $kind_q = run_query_deal_type();
@@ -3021,14 +3023,14 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   global $l_parentdeal,$l_proposal,$l_alarm,$l_amount_in,$l_amount_out,$l_potential_balanced,$l_comment,$l_marketing_manager,$l_status;
   global $l_infos, $l_deal_select_company;
 
-  $parent = $parent_q->f("parentdeal_id");
-  $plabel = $parent_q->f("parentdeal_label");
-  $pmarket = $parent_q->f("parentdeal_marketingmanager_id");
-  $ptech = $parent_q->f("parentdeal_technicalmanager_id");
-  $pcomment = nl2br($parent_q->f("parentdeal_comment"));
+  $parent = $parent_q->f('parentdeal_id');
+  $plabel = $parent_q->f('parentdeal_label');
+  $pmarket = $parent_q->f('parentdeal_marketingmanager_id');
+  $ptech = $parent_q->f('parentdeal_technicalmanager_id');
+  $pcomment = nl2br($parent_q->f('parentdeal_comment'));
 
-  $pmarket_name = $parent_q->f("lname1") . " " . $parent_q->f("fname1");
-  $ptech_name = $parent_q->f("lname2") . " " . $parent_q->f("fname2");
+  $pmarket_name = $parent_q->f('lname1') . ' ' . $parent_q->f('fname1');
+  $ptech_name = $parent_q->f('lname2') . ' ' . $parent_q->f('fname2');
   $p_status = get_deal_parent_status($parent);
   $p_dateproposal = of_date_format(get_deal_parent_dateproposal($parent));
   $p_datealarm = of_date_format(get_deal_parent_datealarm($parent));
@@ -3095,27 +3097,27 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
     return $block;
   }
 
-  $label = urlencode(stripslashes($deal["label"]));
-  $name = urlencode(stripslashes($deal["company_name"]));
-  $archive = $deal["archive"];
-  $kind = $deal["kind_id"];
-  $tt = $deal["tasktype"];
-  $status = $deal["status_id"];
-  $manager = $deal["manager"];
-  $date_after = stripslashes($deal["date_after"]);
-  $date_before = stripslashes($deal["date_before"]);
+  $label = urlencode(stripslashes($deal['label']));
+  $name = urlencode(stripslashes($deal['company_name']));
+  $archive = $deal['archive'];
+  $kind = $deal['kind_id'];
+  $tt = $deal['tasktype'];
+  $status = $deal['status_id'];
+  $manager = $deal['manager'];
+  $date_after = stripslashes($deal['date_after']);
+  $date_before = stripslashes($deal['date_before']);
 
   $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cba_archive=$archive&amp;sel_kind_id=$kind&amp;sel_status_id=$status&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent");
 
   // Display the list of deals attached to the parentdeal
-  $dis_list_deal = new OBM_DISPLAY("DATA", $prefs, "deal");
+  $dis_list_deal = new OBM_DISPLAY('DATA', $prefs, 'deal');
   $dis_list_deal->data_set = $deal_q;
   $dis_list_deal->data_url = $url;
-  $dis_list_deal->data_header = "both";
-  $dis_list_deal->data_idfield = "deal_id"; 
+  $dis_list_deal->data_header = 'both';
+  $dis_list_deal->data_idfield = 'deal_id'; 
   $dis_list_deal->data_set->seek($first_row);
 
-  $display["result"] = $dis_list_deal->display("dis_data_deal");
+  $display['result'] = $dis_list_deal->display('dis_data_deal');
 
   return $block;
 }
@@ -3133,14 +3135,14 @@ function dis_deal_parentdeal_form($action, $deal) {
 
   $users = array();
 
-  if ($deal["parentdeal_id"] > 0) {
-    $obm_q = run_query_deal_parentdeal_detail($deal["parentdeal_id"]);
+  if ($deal['parentdeal_id'] > 0) {
+    $obm_q = run_query_deal_parentdeal_detail($deal['parentdeal_id']);
     if ($obm_q->num_rows() != 1) {
-      $display["msg"] .= display_err_msg($l_no_found);
+      $display['msg'] .= display_err_msg($l_no_found);
       return;
     } else {
-      $users = array($obm["uid"], $obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
-      $display["detailInfo"] = display_record_info($obm_q);
+      $users = array($obm['uid'], $obm_q->f('parentdeal_marketingmanager_id'), $obm_q->f('parentdeal_technicalmanager_id'));
+      $display['detailInfo'] = display_record_info($obm_q);
     }
   }
 
@@ -3167,40 +3169,40 @@ function html_deal_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
   global $l_parentdeal,$l_technical_manager,$l_comment;
 
   // if update mode and first time, values are taken from db
-  if (($action == "parent_detailupdate") || ($action == "parent_delete")) {
-    $parent = $deal_q->f("parentdeal_id");
-    $plabel = $deal_q->f("parentdeal_label");
-    $pmarket = $deal_q->f("parentdeal_marketingmanager_id");
-    $ptech = $deal_q->f("parentdeal_technicalmanager_id");
-    $pcomment = $deal_q->f("parentdeal_comment");
+  if (($action == 'parent_detailupdate') || ($action == 'parent_delete')) {
+    $parent = $deal_q->f('parentdeal_id');
+    $plabel = $deal_q->f('parentdeal_label');
+    $pmarket = $deal_q->f('parentdeal_marketingmanager_id');
+    $ptech = $deal_q->f('parentdeal_technicalmanager_id');
+    $pcomment = $deal_q->f('parentdeal_comment');
   } else {
     // Values are taken from parameters
-    $parent = $deal["parentdeal_id"];
-    $plabel = stripslashes($deal["plabel"]);
-    $pmarket = $deal["pmarket"];
-    $ptech = $deal["ptech"];
-    $pcomment = stripslashes($deal["pcom"]);
+    $parent = $deal['parentdeal_id'];
+    $plabel = stripslashes($deal['plabel']);
+    $pmarket = $deal['pmarket'];
+    $ptech = $deal['ptech'];
+    $pcomment = stripslashes($deal['pcom']);
   }  
 
   // Marketing manager select
   $sel_market = "<select name=\"sel_pmarket\">";
   while ($usrc_q->next_record()) {
-    $sel_market .= "<option value=\"" . $usrc_q->f("userobm_id") . "\"";
-    if ($usrc_q->f("userobm_id") == $pmarket) $sel_market .= " selected= \" selected \"";
-    $sel_market .= ">" . $usrc_q->f("userobm_lastname") . " " . $usrc_q->f("userobm_firstname")."</option>";
+    $sel_market .= "<option value=\"" . $usrc_q->f('userobm_id') . "\"";
+    if ($usrc_q->f('userobm_id') == $pmarket) $sel_market .= " selected= \" selected \"";
+    $sel_market .= '>' . $usrc_q->f('userobm_lastname') . ' ' . $usrc_q->f('userobm_firstname').'</option>';
   }
-  $sel_market .= "</select>";
+  $sel_market .= '</select>';
 
   // Technical manager select
   $sel_tech = "<select name=\"sel_ptech\">";
   while ($usrp_q->next_record()) {
-    $sel_tech .= "<option value=\"" . $usrp_q->f("userobm_id") . "\"";
-    if ($usrp_q->f("userobm_id") == $ptech) $sel_tech .= "selected= \" selected \"";
-    $sel_tech .= ">" . $usrp_q->f("userobm_lastname") . " " . $usrp_q->f("userobm_firstname")."</option>";
+    $sel_tech .= "<option value=\"" . $usrp_q->f('userobm_id') . "\"";
+    if ($usrp_q->f('userobm_id') == $ptech) $sel_tech .= "selected= \" selected \"";
+    $sel_tech .= '>' . $usrp_q->f('userobm_lastname') . ' ' . $usrp_q->f('userobm_firstname').'</option>';
   }
-  $sel_tech .= "</select>";
+  $sel_tech .= '</select>';
 
-  if (($action == "parent_detailupdate") || ($action == "parent_update")) {
+  if (($action == 'parent_detailupdate') || ($action == 'parent_update')) {
     $dis_button = "
         <input type=\"hidden\" name=\"action\" value=\"parent_update\" />
         <input type=\"hidden\" name=\"parentdeal_id\" value=\"$parent\" />
@@ -3215,7 +3217,7 @@ function html_deal_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
   $block = "
   <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_parentdeal(this)) return true; else return false;\"
-      action=\"" . url_prepare("deal_index.php") . "\">
+      action=\"" . url_prepare('deal_index.php') . "\">
   
   <fieldset class=\"detail extra\">
   <legend>$l_parentdeal</legend>
@@ -3264,20 +3266,20 @@ function ext_dis_deal_list($params, $entity, $id) {
   $deal_q = run_query_deal_search($deal, 0);
   $nb_deal = $deal_q->num_rows_total();
   if ($nb_deal == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found);
+    $display['msg'] .= display_warn_msg($l_no_found);
     return;
   }
 
-  $prefs = get_display_pref($obm["uid"], "deal", 0);
-  
+  $prefs = get_display_pref($obm['uid'], 'deal', 0);
+
   $url = url_prepare("$path/$entity/${entity}_index.php?action=detailconsult&amp;view=deal&amp;param_$entity=$id");
 
-  $deal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
+  $deal_d = new OBM_DISPLAY('DATA', $prefs, 'deal');
   $deal_d->data_set = $deal_q;
   $deal_d->data_url = $url;
-  $deal_d->data_header = "both";
-  $display["msg"] .= display_info_msg("$nb_deal $l_found");
-  $block = $deal_d->display("dis_data_deal");
+  $deal_d->data_header = 'both';
+  $display['msg'] .= display_info_msg("$nb_deal $l_found");
+  $block = $deal_d->display('dis_data_deal');
 
   return $block;
 }

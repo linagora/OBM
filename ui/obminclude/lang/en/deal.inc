@@ -52,6 +52,7 @@ $l_status_exist = "Existing Status";
 $l_status_new = "New Status";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
 $l_forecast = "Forecast";
+$l_deal_panel = "Deal panel";
 
 // Actions
 $l_select_deal = "Select a Deal";

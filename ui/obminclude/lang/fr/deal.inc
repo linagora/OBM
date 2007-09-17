@@ -61,6 +61,7 @@ $l_invoice_status = "Etat";
 $l_invoice_date = "Date";
 $l_parentdeal_deals = "Affaires appartenant à la SurAffaire";
 $l_forecast = "Prévisionnel";
+$l_deal_panel = "Volant d'affaires";
 
 // Actions
 $l_select_deal = "Sélectionner l'Affaire";
