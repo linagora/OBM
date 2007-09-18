@@ -504,7 +504,7 @@ function run_query_group_usergroup_delete($group) {
 //   - $group[] : group hash info : keys used : id, group_nb, group_X
 // Return: number of groups inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_group_group_insert($group, $privacy) {
+function run_query_group_group_insert($group) {
   global $cdg_sql;
 
   $id = $group["group_id"];
@@ -512,6 +512,8 @@ function run_query_group_group_insert($group, $privacy) {
   $cpt_ins = 0;
 
   $parents = get_group_parents($id);
+  $g = get_group_info($id);
+  $privacy = $g["privacy"];
 
   while ($cpt < $group["group_nb"]) {
     $cpt++;
@@ -525,11 +527,12 @@ function run_query_group_group_insert($group, $privacy) {
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
     $test_q->next_record(); 
-    // If the entry doesn't already exist and doesn't create a loop, insert it
+    // If the entry doesn't already exist, doesn't create a loop,
+    // and child group is same privacy as parent, insert it
     if ( (!$test_q->f("groupgroup_child_id"))
          && (! in_array($g_id, $parents))
          && ($id != $g_id)
-         && ($privacy == 1 || $test_q->f("group_privacy") != 1)
+         && ($privacy == $test_q->f('group_privacy'))
        ) {
         $query = "INSERT INTO GroupGroup (
           groupgroup_parent_id,

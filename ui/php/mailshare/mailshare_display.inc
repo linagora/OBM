@@ -452,7 +452,7 @@ function dis_mailshare_right_dis_admin($id="") {
 function dis_mailshare_display_pref($prefs) {
   global $l_mailshare_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, 'mailshare');
   $dis_pref->display_entity = "mailshare"; 
   $dis_pref->pref_title = $l_mailshare_display;
   $dis_pref->pref_dis_help = 1;

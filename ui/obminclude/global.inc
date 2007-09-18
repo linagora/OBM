@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.1.0rc1';
+$obm_version = '2.1.0rc2';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -33,8 +33,8 @@ $c_multidomain = true;
 $cgp_todo_nb = 5;
 
 // Popup Display size
-$popup_width = 620;
-$popup_height = 480;
+$popup_width = 800;
+$popup_height = 600;
 $popup_contact_height = 600;
 
 // Access Keys

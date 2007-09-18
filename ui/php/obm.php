@@ -6,40 +6,35 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
+
 // $module and $action defined for ActiveUser stats
-$module = "obm";
-$path = ".";
-$obminclude = getenv("OBM_INCLUDE_VAR");
-if ($obminclude == "") $obminclude = "obminclude";
+$module = 'obm';
+$path = '.';
+$obminclude = getenv('OBM_INCLUDE_VAR');
+if ($obminclude == '') $obminclude = 'obminclude';
 include("$obminclude/global.inc");
 $params = get_obm_params();
-//echo "action2=$action --";
-include_once("obm_query.inc");
+include_once('obm_query.inc');
 require("$obminclude/of/of_right.inc");
 
-$OBM_Session = $params["OBM_Session"];
-if ($action == "") { $action = "home"; }
-//print_r($params);
-page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+$OBM_Session = $params['OBM_Session'];
+if ($action == '') { $action = 'home'; }
+page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 
-//echo "<p>----from obm.php--";
-//print_r($obm);
-//echo "<p>----";
-
-if ($action == "logout") {
+if ($action == 'logout') {
   include("$obminclude/global_pref.inc");
-  $display["head"] = display_head("OBM Version $obm_version");
-  $display["end"] = display_end();
-  $display["detail"] = dis_logout_detail();
+  $display['head'] = display_head("OBM Version $obm_version");
+  $display['end'] = display_end();
+  $display['detail'] = dis_logout_detail();
   run_query_logout();
-  $_SESSION['obm'] = "";
+  $_SESSION['obm'] = '';
   $sess->delete();
-  $action = "";
+  $action = '';
   display_page($display);
   exit;
 } else {
   include("$obminclude/global_pref.inc");
-  $uid = $obm["uid"];
+  $uid = $obm['uid'];
 }
 
 $extra_css[] = $css_portal;
@@ -50,62 +45,62 @@ page_close();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // If home page has a redirection
-if ($c_home_redirect != "" && !$params["error"]) {
-  header("Status: 301 OK");
+if ($c_home_redirect != '' && !$params['error']) {
+  header('Status: 301 OK');
   header("Location: $c_home_redirect");
   exit();
 }
 
-$display["head"] = display_head("$l_obm_title Version $obm_version");
-$display["header"] = display_menu("");
-switch($params["error"]) {
-  case "perms" :
+$display['head'] = display_head("$l_obm_title Version $obm_version");
+$display['header'] = display_menu('');
+switch($params['error']) {
+  case 'perms' :
     $error_msg = $l_permission_denied;
     break;
   default: 
-    $error_msg = "";
+    $error_msg = '';
 }
 if($error_msg) {
-  $display["msg"] = display_err_msg($error_msg);
+  $display['msg'] = display_err_msg($error_msg);
 }
 
-$display["title"] = "
+$display['title'] = "
 <h1 class=\"title\">
-$l_obm_title version $obm_version - " . date("Y-m-d H:i:s") . "
+$l_obm_title version $obm_version - " . date('Y-m-d H:i:s') . "
 </h1>";
 
-if ($cgp_show["module"]["calendar"] && $perm->check_right("calendar", $cright_read)) { 
+if ($cgp_show['module']['calendar'] && $perm->check_right('calendar', $cright_read)) { 
   require("$path/calendar/calendar_query.inc");
   $block .= dis_calendar_portal();
 }
 
-if ($cgp_show["module"]["time"] && $perm->check_right("time", $cright_write)) { 
+if ($cgp_show['module']['time'] && $perm->check_right('time', $cright_write)) { 
   $block .= dis_time_portal();
 }
 
-if ($cgp_show["module"]["lead"] && $perm->check_right("lead", $cright_write)) { 
+if ($cgp_show['module']['lead'] && $perm->check_right('lead', $cright_write)) { 
   require_once("$path/lead/lead_query.inc");
   $block .= dis_lead_portal();
 }
 
-if ($cgp_show["module"]["deal"] && $perm->check_right("deal", $cright_write)) { 
+if ($cgp_show['module']['deal'] && $perm->check_right('deal', $cright_write)) { 
   require_once("$path/deal/deal_query.inc");
   $block .= dis_deal_portal();
 }
 
-if ($cgp_show["module"]["project"] && $perm->check_right("project", $cright_read)) { 
+if ($cgp_show['module']['project'] && $perm->check_right('project', $cright_read)) { 
   $block .= dis_project_portal();
 }
 
-if ($cgp_show["module"]["incident"] && $perm->check_right("incident", $cright_write)) { 
+if ($cgp_show['module']['incident'] && $perm->check_right('incident', $cright_write)) { 
   $block .= dis_incident_portal();
 }
 
-if ($cgp_show["module"]["contract"] && $perm->check_right("contract", $cright_write)) { 
+if ($cgp_show['module']['contract'] && $perm->check_right('contract', $cright_write)) { 
   $block .= dis_contract_portal();
 }
 
-if ($cgp_show["module"]["invoice"] && $perm->check_right("invoice", $cright_read)) { 
+if ($cgp_show['module']['invoice'] && $perm->check_right('invoice', $cright_read)) { 
   require_once("$path/invoice/invoice_query.inc");
   $block .= dis_invoice_portal();
 }
@@ -114,12 +109,12 @@ if ($cgp_show['module']['settings'] && $perm->check_right('settings', $cright_re
   $block .= dis_my_portal();
 }
 
-$display["result"] = "
+$display['result'] = "
 $block
 <p style=\"clear:both;\"/>  
 ";
 
-$display["end"] = display_end();
+$display['end'] = display_end();
 display_page($display);
 
 
@@ -130,7 +125,7 @@ display_page($display);
 function get_obm_params() {
 
   // Get global params
-  $params = get_global_params("Obm");
+  $params = get_global_params('Obm');
   
   return $params;
 }
@@ -184,10 +179,10 @@ function dis_calendar_portal() {
   $this_month = of_date_get_month($ts_date);
   $this_year = of_date_get_year($ts_date);
   $start_time = get_calendar_date_day_of_week(strtotime("$this_year-$this_month-01"), $ccalendar_weekstart);
-  $end_time = strtotime("+1 month +6 days", $start_time);
+  $end_time = strtotime('+1 month +6 days', $start_time);
 
   $current_time = $start_time; 
-  $calendar_entity["user"] = array($obm["uid"] => array("dummy"));
+  $calendar_entity['user'] = array($obm['uid'] => array('dummy'));
   calendar_events_model($start_time,$end_time, $calendar_entity);
   $of = &OccurrenceFactory::getInstance();
   $whole_month = TRUE;
@@ -196,15 +191,15 @@ function dis_calendar_portal() {
   // Minicalendar
   $i = 0;
   do {
-    if ($i == 0) $dis_minical .= "<tr>\n";
-    $day = date ("j", $current_time);
+    if ($i == 0) $dis_minical .= "<tr>";
+    $day = date ('j', $current_time);
     $iso_day = of_isodate_format($current_time);
     $check_month = of_date_get_month($current_time);
     $have_occurrence = $of->periodHaveOccurrences(strtotime($iso_day), $day_duration);
     if ($have_occurrence) {
-      $klass = "hyperlight";
+      $klass = 'hyperlight';
     } else {
-      $klass = "";
+      $klass = '';
     }
     if ($check_month != $this_month) {
       $dis_minical .= "<td class=\"downlight $klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\"
@@ -224,7 +219,7 @@ function dis_calendar_portal() {
           </td>";
       }
     }
-    $current_time = strtotime("+1 day", $current_time);
+    $current_time = strtotime('+1 day', $current_time);
     $i++;
     if ($i == 7) {
       $dis_minical .= "</tr>\n";
@@ -236,10 +231,10 @@ function dis_calendar_portal() {
   
   // Minicalendar Head
   for ($i=0; $i<7; $i++) {
-    $day_num = date("w", $current_time);
+    $day_num = date('w', $current_time);
     $day = $l_daysofweekfirst[$day_num];
     $dis_minical_head .= "<td class=\"calendarHead\">$day</td>\n";
-    $current_time = strtotime("+1 day", $current_time); 
+    $current_time = strtotime('+1 day', $current_time); 
   } 
   $block = "
    <div class=\"summaryBox\"> 
@@ -270,9 +265,9 @@ function dis_time_portal() {
 
   $num = run_query_days_unfilled();
   if( $num <= 1 ) {
-    $class = "info";
+    $class = 'info';
   } else {
-    $class = "error";
+    $class = 'error';
   }
   $block = "
   <div class=\"summaryBox\"> 
@@ -292,12 +287,12 @@ function dis_lead_portal() {
   global $uid, $ico_big_lead, $c_null,$path;
   global $l_module_lead, $l_my_lead, $l_days, $l_alarm, $l_late, $l_without;
 
-  $today = date("Y-m-d");
+  $today = date('Y-m-d');
   $ts_today = strtotime($today);
-  $ts_7 = strtotime("-7 day", $ts_today);
-  $ts_14 = strtotime("-14 day", $ts_today);
-  $ts_30 = strtotime("-30 day", $ts_today);
-  $ts_90 = strtotime("-90 day", $ts_today);
+  $ts_7 = strtotime('-7 day', $ts_today);
+  $ts_14 = strtotime('-14 day', $ts_today);
+  $ts_30 = strtotime('-30 day', $ts_today);
+  $ts_90 = strtotime('-90 day', $ts_today);
   $iso_7 = of_isodate_format($ts_7);
   $iso_14 = of_isodate_format($ts_14);
   $iso_30 = of_isodate_format($ts_30);
@@ -309,7 +304,7 @@ function dis_lead_portal() {
 );
 
   $leads = run_query_lead_time_range($date_ranges, array($uid));
-  $leads_date = $leads["date"];
+  $leads_date = $leads['date'];
   $block = "
   <div class=\"summaryBox\">
    <h1>
@@ -347,15 +342,15 @@ function dis_deal_portal() {
   global $l_deal_total, $l_module_deal, $l_my_deal, $l_deal_balanced;
 
   $potential = run_query_deal_potential(array($uid));
-  $m_amount = number_format($potential["market"]["$uid"]["amount"]);
-  $m_balanced = number_format($potential["market"]["$uid"]["amount_balanced"]);
-  $m_nb_potential = $potential["market"]["$uid"]["number"];
-  if ($m_nb_potential == "") {
-    $m_nb_potential = "0";
+  $m_amount = number_format($potential['market']["$uid"]['amount']);
+  $m_balanced = number_format($potential['market']["$uid"]['amount_balanced']);
+  $m_nb_potential = $potential['market']["$uid"]['number'];
+  if ($m_nb_potential == '') {
+    $m_nb_potential = '0';
   }
-  $t_nb_potential = $potential["tech"]["$uid"]["number"];
-  if ($t_nb_potential == "") {
-    $t_nb_potential = "0";
+  $t_nb_potential = $potential['tech']["$uid"]['number'];
+  if ($t_nb_potential == '') {
+    $t_nb_potential = '0';
   }
 
   $deals = run_query_deal_status($uid);
@@ -429,7 +424,7 @@ function dis_incident_portal() {
   $incs = run_query_incident_status($uid);
   if (count($incs) > 0) {
     foreach ($incs as $status => $nb) {
-      if ($status != "0") {
+      if ($status != '0') {
         $dis_status .= "
         <dt>$status</dt>
         <dd>$nb</dd>";
@@ -499,21 +494,21 @@ function dis_invoice_portal() {
   global $l_total, $l_module_invoice, $l_billed, $l_order_no_bill;
   global $l_header_dashboard, $path;
 
-  $year = date("Y");
-  $month = date("m");
+  $year = date('Y');
+  $month = date('m');
   $year_month = "$year-$month";
-  $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
+  $month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
   $date_ranges = array(array("$year-$month-01", "$month_end"));
 
   $inv = run_query_invoice_amounts($date_ranges);
 
   // Invoice created
-  if (is_array($inv["$year_month"]["billed"])) {
-    foreach ($inv["$year_month"]["billed"] as $status => $status_info) {
-      if ($status != "total") {
-	$label = $status_info["label"];
-	$amount_ht = $status_info["amount_ht"];
-	$nb = $status_info["nb"];
+  if (is_array($inv["$year_month"]['billed'])) {
+    foreach ($inv["$year_month"]['billed'] as $status => $status_info) {
+      if ($status != 'total') {
+	$label = $status_info['label'];
+	$amount_ht = $status_info['amount_ht'];
+	$nb = $status_info['nb'];
 	$dis_created .= "
         <dt>$label</dt>
         <dd>$amount_ht / $nb</dd>";
@@ -522,12 +517,12 @@ function dis_invoice_portal() {
   }
 
   // Invoice potential
-  if (is_array($inv["$year_month"]["potential"])) {
-    foreach ($inv["$year_month"]["potential"] as $status => $status_info) {
-      if ($status != "total") {
-	$label = $status_info["label"];
-	$amount_ht = $status_info["amount_ht"];
-	$nb = $status_info["nb"];
+  if (is_array($inv["$year_month"]['potential'])) {
+    foreach ($inv["$year_month"]['potential'] as $status => $status_info) {
+      if ($status != 'total') {
+	$label = $status_info['label'];
+	$amount_ht = $status_info['amount_ht'];
+	$nb = $status_info['nb'];
 	$dis_potential .= "          
         <dt>$label</dt>
         <dd>$amount_ht / $nb</dd>";
@@ -541,10 +536,10 @@ function dis_invoice_portal() {
    $l_module_invoice</h1>
    <dl>
    <dt>$l_billed</dt>
-   <dd>".$inv["$year_month"]["billed"]["total"]["amount_ht"]. " / ".$inv["$year_month"]["billed"]["total"]["nb"]."</dd>
+   <dd>".$inv["$year_month"]['billed']['total']['amount_ht']. ' / '.$inv["$year_month"]['billed']['total']['nb']."</dd>
     $dis_created
     <dt>$l_order_no_bill</dt>
-    <dd>".$inv["$year_month"]["potential"]["total"]["amount_ht"]. " / ".$inv["$year_month"]["potential"]["total"]["nb"]."</dd>
+    <dd>".$inv["$year_month"]['potential']['total']['amount_ht']. " / ".$inv["$year_month"]['potential']['total']['nb']."</dd>
     $dis_potential
     </dl>
    <a class=\"link\" href=\"$path/invoice/invoice_index.php?action=dashboard\">$l_header_dashboard</a>

@@ -607,7 +607,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
 function html_group_form($action, $group_q, $group, $field='') {
   global $obm, $perm, $cgroup_private_default, $cgp_use, $cright_write_admin;
   global $display, $l_group, $l_name, $l_desc, $l_smb, $l_email, $l_mailing;
-  global $l_private, $l_insert, $l_update, $l_back;
+  global $l_private, $l_public, $l_insert, $l_update, $l_back;
   global $l_manager, $c_undef, $l_undef, $l_header_new;
 
   // if update mode and first time, values are taken from db
@@ -649,21 +649,20 @@ function html_group_form($action, $group_q, $group, $field='') {
 
   $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
-  if (! $perm->check_right('group', $cright_write_admin)) {
-    $dis_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_private";
+  // Privacy can not be updated !
+  if ($action == 'new' || $action == 'insert') {
+    if (! $perm->check_right('group', $cright_write_admin)) {
+      $dis_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_private";
 
-    // if new group or group update and user is owner, display visibility
-  } else if ( ($action == 'new') || ($action == 'insert') ||
-	      ( (($action == 'detailupdate') || ($action == 'update')) &&
-		($usercreate == $obm['uid']) ) ) {
-    if ($priv == '1') {
-      $private_c = ' checked';
-      $mail_class = 'H';
-    }
-    if ($mailing == '1') {
-      $mailing_c = ' checked';
-    }
-    $dis_private = "
+    } else {
+      if ($priv == '1') {
+	$private_c = ' checked';
+	$mail_class = 'H';
+      }
+      if ($mailing == '1') {
+	$mailing_c = ' checked';
+      }
+      $dis_private = "
     <script type=\"text/javascript\">
       function privacyShowHide(input) {
         if($(input).getValue()) {
@@ -694,7 +693,10 @@ function html_group_form($action, $group_q, $group, $field='') {
     </script>
     <input name=\"cba_privacy\" type=\"checkbox\" 
     onchange=\"privacyShowHide(this)\" value=\"1\" $private_c />";
-  } 
+    }
+  } else {
+    $dis_private = ($priv == '1' ? $l_private : $l_public);
+  }
 
   if ($cgp_use['service']['samba']) {
     // Samba group checkbox checked value

@@ -2086,11 +2086,11 @@ function dis_deal_dashboard_potential($deal) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display the deal dashboard year detail
-// Parameters:
-//   - $deal     : deal hash infos
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display the deal dashboard year detail
+ *
+ * @param mixed $deal : deal hash infos
+ **/
 function dis_deal_dashboard_year_detail($deal) {
   global $display, $path, $ctt_sales;
   global $l_total, $l_date, $l_amount_ht, $l_amount_ttc, $l_margin;
@@ -2503,6 +2503,379 @@ function dis_deal_dashboard_list($deal) {
 
   return $block;
 }
+
+
+/**
+ * Display the deal dashboard deal panel
+ *
+ * @param mixed $deal : deal hash infos
+ **/
+function dis_deal_dashboard_panel($deal) {
+  global $display, $path, $ctt_sales;
+  global $l_total, $l_date, $l_amount_ht, $l_amount_ttc, $l_margin;
+  global $l_potential, $l_expected, $l_monthsofyearshort;
+  global $l_amount, $l_deal_balanced, $l_commission, $l_commission_balanced;
+  global $l_execute,$ico_previous,$ico_next;
+
+  $users_id = $deal['manager'];
+
+  if (isset($deal['year'])) {
+    $year = $deal['year'];
+  } else {
+    $year = date('Y');
+  }
+  $year_prev = $year - 1;
+  $year_next = $year + 1;
+  $date_range = array("$year-01-01", "$year-12-31");
+  $d = run_query_deal_dashboard_infos($date_range, 'deal_dateexpected', '', $deal['tasktype']);
+  $url_prev = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_prev");
+  $url_next = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_next");
+
+  // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
+  $tt_ids = $deal['tasktype'];
+  if (! is_array($tt_ids) && ($tt_ids == '')) {
+    $tt_ids = '0';
+  } else {
+    foreach ($tt_ids as $tt_id) {
+      $url_sel_tt .= "&amp;sel_tt[]=$tt_id";
+    }
+  }
+
+  $tts = get_global_tasktype($ctt_sales, $tt_ids);
+
+  $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
+  $block_tt = of_select_dis_search_select($tts, 'tt', $url_tt);
+
+  // Table header
+  for ($month = 1; $month < 13; $month++) {
+    $label = $l_monthsofyearshort[$month - 1];
+    $dis_row_head .= "
+      <th>$label</th>";
+  }
+
+  if ((is_array($users_id)) && (count($users_id) > 0)) {
+    $users = $users_id;
+  } else {
+    $users = $d['users_id'];
+  }
+  if ((is_array($users)) && (count($users) > 0)) {
+    foreach ($users as $m_id) {
+      $url_sel_manager .= "&amp;sel_manager[]=$m_id";
+    }
+  } else if ($users != '') {
+    $url_sel_manager .= "&amp;sel_manager[]=$users";
+  }
+
+  // prepare columns (no_date, past, monthes 1-12, future)
+  $cols = array ('no_date' => 'no_date', 'past' => 'past');
+  for ($month = 1; $month < 13; $month++) {
+    // left pad the month
+    if ($month > 9) {
+      $year_month = "$year-$month";
+    } else {
+      $year_month = "$year-0$month";
+    }
+    $cols[$month] = "$year_month";
+   }
+  $cols['future'] = 'future';
+  
+
+  // Loop through users (rows)
+  foreach ($users as $u_id) {
+    $u_name = $d['name'][$u_id];
+    $tam = 0;
+    $tma = 0;
+    $tab = 0;
+    $tca = 0;
+    $tcb = 0;
+
+    $dis_user_row = "<tr>
+      <th colspan=\"17\">$u_name</th>
+    </tr>";
+    $dis_amount_row = "<tr class=\"pair\">
+      <td>$l_amount</td>";
+    $dis_margin_row = "<tr>
+      <td>$l_margin</td>";
+    $dis_balanced_row = "<tr class=\"pair\">
+      <td>$l_deal_balanced</td>";
+    $dis_commission_row = "<tr>
+      <td>$l_commission</td>";
+    $dis_commission_balanced_row = "<tr class=\"pair\">
+      <td>$l_commission_balanced</td>";
+
+    // Loop through each cols
+    foreach ($cols as $month => $col) {
+
+      if (is_array($d["$col"][$u_id])) {
+	$am = $d["$col"][$u_id]['amount'];
+	$ma = $d["$col"][$u_id]['margin'];
+	$ab = $d["$col"][$u_id]['amount_balanced'];
+	$ca = $d["$col"][$u_id]['commission'];
+	$cb = $d["$col"][$u_id]['commission_balanced'];
+
+	// 'past', 'future' and 'no date' not in Total
+	if (is_numeric($month)) {
+	  $tam += $am;
+	  $tma += $ma;
+	  $tab += $ab;
+	  $tca += $ca;
+	  $tcb += $cb;
+	}
+
+	$dis_am = number_format($am, 2, ',', ' ');
+	$dis_ma = number_format($ma, 2, ',', ' ');
+	$dis_ab = number_format($ab, 2, ',', ' ');
+	$dis_ca = number_format($ca, 2, ',', ' ');
+	$dis_cb = number_format($cb, 2, ',', ' ');
+
+	if ($am >= 0) {
+	  if ($month  == 'no_date') {
+	    $url_date = "&amp;tf_date_before=0000-00-00";
+	  } else if ($month == 'past') {
+	    $month_start = "$year-01-01";
+	    $url_date = "&amp;tf_date_before=$month_start";
+	  } else if ($month == 'future') {
+	    $month_end = "$year-12-31";
+	    $url_date = "&amp;tf_date_after=$month_end";
+	  } else {
+	    $month_start = "$col-01";
+	    $month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
+	    $url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
+	  }
+	  $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list&amp;sel_manager[]=$u_id&amp;cba_archive=1$url_date$url_sel_tt\">$dis_am</a>";
+	}
+
+	$dis_amount_row .= "
+          <td>$dis_am</td>";
+	$dis_margin_row .= "
+          <td>$dis_ma</td>";
+	$dis_balanced_row .= "
+          <td>$dis_ab</td>";
+	$dis_commission_row .= "
+          <td>$dis_ca</td>";
+	$dis_commission_balanced_row .= "
+          <td>$dis_cb</td>";
+      } else {
+	$dis_amount_row .= "<td $class_am> </td>";
+	$dis_margin_row .= "<td $class_ma> </td>";
+	$dis_balanced_row .= "<td $class_ab> </td>";
+	$dis_commission_row .= "<td $class_ca> </td>";
+	$dis_commission_balanced_row .= "<td $class_cb> </td>";
+      }
+    }
+
+    $dis_tam = number_format($tam, 2, ',', ' ');
+    $dis_tma = number_format($tma, 2, ',', ' ');
+    $dis_tab = number_format($tab, 2, ',', ' ');
+    $dis_tca = number_format($tca, 2, ',', ' ');
+    $dis_tcb = number_format($tcb, 2, ',', ' ');
+
+    $dis_amount_row .= "<td>$dis_tam</td>
+      </tr>";
+    $dis_margin_row .= "<td>$dis_tma</td>
+      </tr>";
+    $dis_balanced_row .= "<td>$dis_tab</td>
+      </tr>";
+    $dis_commission_row .= "<td>$dis_tca</td>
+      </tr>";
+    $dis_commission_balanced_row .= "<td>$dis_tcb</td>
+      </tr>";
+
+    $dis_year_detail .= "
+      $dis_user_row
+      $dis_amount_row
+      $dis_margin_row
+      $dis_balanced_row
+      $dis_commission_row
+      $dis_commission_balanced_row";
+  }
+
+  // Total row
+  $tam = 0;
+  $tma = 0;
+  $tab = 0;
+  $tca = 0;
+  $tcb = 0;
+  // Loop through each cols
+  foreach ($cols as $month => $col) {
+
+    $am = $d[$col][0]['amount'];
+    $ma = $d[$col][0]['margin'];
+    $ab = $d[$col][0]['amount_balanced'];
+    $ca = $d[$col][0]['commission'];
+    $cb = $d[$col][0]['commission_balanced'];
+
+    // 'past', 'future' and 'no date' not in Total
+    if (is_numeric($month)) {
+      $tam += $am;
+      $tma += $ma;
+      $tab += $ab;
+      $tca += $ca;
+      $tcb += $cb;
+    }
+
+    if ($am > 0) {
+
+      $dis_am = number_format($am, 2, ',', ' ');
+      $dis_ma = number_format($ma, 2, ',', ' ');
+      $dis_ab = number_format($ab, 2, ',', ' ');
+      $dis_ca = number_format($ca, 2, ',', ' ');
+      $dis_cb = number_format($cb, 2, ',', ' ');
+    
+      if ($month  == 'no_date') {
+	$url_date = "&amp;tf_date_before=0000-00-00";
+      } else if ($month == 'past') {
+	$month_start = "$year-01-01";
+	$url_date = "&amp;tf_date_before=$month_start";
+      } else if ($month == 'future') {
+	$month_end = "$year-12-31";
+	$url_date = "&amp;tf_date_after=$month_end";
+      } else {
+	$month_start = "$col-01";
+	$month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
+	$url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
+      }
+      $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list$url_sel_manager&amp;cba_archive=1$url_date$url_sel_tt\">$dis_am</a>";
+    } else {
+      $dis_am = '';
+      $dis_ma = '';
+      $dis_ab = '';
+      $dis_ca = '';
+      $dis_cb = '';
+    }
+
+    $dis_total_row .= "
+      <td>$dis_am</td>";
+    $dis_total_margin_row .= "
+      <td>$dis_ma</td>";
+    $dis_total_balanced_row .= "
+      <td>$dis_ab</td>";
+    $dis_total_commission_row .= "
+      <td>$dis_ca</td>";
+    $dis_total_commission_balanced_row .= "
+      <td>$dis_cb</td>";
+  }
+  $dis_tam = number_format($tam, 2, ',', ' ');
+  $dis_tma = number_format($tma, 2, ',', ' ');
+  $dis_tab = number_format($tab, 2, ',', ' ');
+  $dis_tca = number_format($tca, 2, ',', ' ');
+  $dis_tcb = number_format($tcb, 2, ',', ' ');
+  $dis_total_row .= "
+      <td>&nbsp;$dis_tam</td>";
+  $dis_total_margin_row .= "
+      <td>&nbsp;$dis_tma</td>";
+  $dis_total_balanced_row .= "
+      <td>&nbsp;$dis_tab</td>";
+  $dis_total_commission_row .= "
+      <td>&nbsp;$dis_tca</td>";
+  $dis_total_commission_balanced_row .= "
+      <td>&nbsp;$dis_tcb</td>";
+
+  // Artichow Chart
+  for ($month = 1; $month < 13; $month++) {
+    // left pad the month
+    if ($month > 9) {
+      $year_month = "$year-$month";
+    } else {
+      $year_month = "$year-0$month";
+    }
+    $am = $d["$year_month"]['0']['amount'];
+    $ab = $d["$year_month"]['0']['amount_balanced'];
+    $values[$month-1] = $am;
+    $labels[$month-1] = number_format($am/1000, 0, ',', ' ');
+    $xlabels[$month-1] = $l_monthsofyearshort[$month-1];
+    $values_ab[$month-1] = $ab;
+    $labels_ab[$month-1] = number_format($ab/1000, 0, ',', ' ');
+  }
+
+  $title = "$l_potential $year";
+  $plots['new_bar'] = array(1, 1);
+  $plots['legends'] = array($l_amount, $l_deal_balanced);
+  $plots['values'] = array($values, $values_ab);
+  $plots['labels'] = array($labels, $labels_ab);
+
+  $chart_pot_params .= "&amp;title=".urlencode($title)."&amp;plots=".urlencode(serialize($plots))."&amp;xlabels=".urlencode(serialize($xlabels));
+
+  $url_form = url_prepare('deal_index.php');
+
+  $block = "
+    <form method=\"post\" name=\"f_search\" action=\"$url_form\">
+    <fieldset class=\"detail\">
+    <legend>
+      <a href=\"javascript: return false;\"
+          onclick=\"yearfield=\$('year');
+                    newyear=Number(yearfield.innerHTML)-1;
+                    yearfield.innerHTML=newyear;
+                    document.forms.f_search.year.value=newyear;
+                    return false;\">
+      <img src=\"$ico_previous\" alt=\"\" /></a>
+        <span id=\"year\">$year</span>
+      <a href=\"javascript: return false;\"
+          onclick=\"yearfield=\$('year');
+                    newyear=Number(yearfield.innerHTML)+1;
+                    yearfield.innerHTML=newyear;
+                    document.forms.f_search.year.value=newyear;
+                    return false;\">
+        <img src=\"$ico_next\" alt=\"\" /></a>
+      </legend>
+      $block_tt
+      </fieldset>
+      <fieldset class=\"buttons\"
+        <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
+        <input type=\"hidden\" name=\"year\" value=\"$year\" />
+        <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
+        <input name=\"dash_view\" id=\"dash_view\" type=\"hidden\" value=\"year_detail\" />
+        <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
+      </fieldset>
+    </form>
+
+    <h1>$l_potential - $l_date $l_expected</h1>
+
+    <table class=\"spreadSheet\">
+    <colgroup span=\"16\" />
+    <colgroup class=\"highlight\" />
+    <thead>
+    <tr>
+      <th> </th>
+      <th> ? </th>
+      <th> &lt; </th>
+      $dis_row_head
+      <th> &gt; </th>
+      <th>$l_total $year</th>
+    </tr>
+    </thead>
+    $dis_year_detail
+    <tr>
+      <th colspan=\"17\">----- $l_total -----</th>
+    </tr>
+    <tr class=\"highlight\">
+      <td>$l_total</td>
+      $dis_total_row
+    </tr>
+    <tr class=\"highlight\">
+      <td>$l_margin</td>
+      $dis_total_margin_row
+    </tr>
+    <tr class=\"highlight\">
+      <td>$l_deal_balanced</td>
+      $dis_total_balanced_row
+    </tr>
+    <tr class=\"highlight\">
+      <td>$l_commission</td>
+      $dis_total_commission_row
+    </tr>
+    <tr class=\"highlight\">
+      <td>$l_commission_balanced</td>
+      $dis_total_commission_balanced_row
+    </tr>
+    </table>
+    <p />
+
+    <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pot_params\" alt=\"\" />
+";
+
+  return $block;
+} 
 
 
 ///////////////////////////////////////////////////////////////////////////////

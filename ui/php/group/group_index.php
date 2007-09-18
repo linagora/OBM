@@ -214,7 +214,7 @@ if (($action == 'index') || ($action == '')) {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_update_rights($params)) {
     if ($params["group_nb"] > 0) {
-      $nb = run_query_group_group_insert($params, $g["privacy"]);
+      $nb = run_query_group_group_insert($params);
       set_update_state();
       $display["msg"] .= display_ok_msg("$nb $l_group_added");
     } else {
