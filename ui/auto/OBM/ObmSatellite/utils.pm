@@ -6,8 +6,6 @@
 #########################################################################
 # Cree le 2007-03-12                                                    #
 #########################################################################
-# $Id: utils.pm 1492 2007-03-14 09:26:14Z anthony $   #
-#########################################################################
 package OBM::ObmSatellite::utils;
 
 require Exporter;
@@ -35,7 +33,15 @@ sub connectLdapSrv {
         return 0;
     }
 
-    my $errorCode = $ldapSrv->{"ldap_server"}->{"conn"}->bind();
+    my $errorCode;
+    if( defined($ldapSrv->{"login"}) && defined($ldapSrv->{"password"}) ) {
+        $errorCode = $ldapSrv->{"ldap_server"}->{"conn"}->bind(
+            $ldapSrv->{"login"},
+            password => $ldapSrv->{"password"}
+        );
+    }else {
+        $errorCode = $ldapSrv->{"ldap_server"}->{"conn"}->bind();
+    }
 
     if( $errorCode->code ) {
         return 0;
