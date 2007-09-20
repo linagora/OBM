@@ -7,6 +7,7 @@ use Net::Server::PreForkSimple;
 use URI::Escape;
 require OBM::Parameters::obmSatelliteConf;
 use FindBin qw($Bin);
+use Unicode::MapUTF8 qw(from_utf8 utf8_supported_charset);
 use strict;
 
 @ISA = qw(Net::Server::PreForkSimple);
@@ -38,6 +39,8 @@ sub configure_hook {
     # Lectrure des paramètres spécifiques
     my $daemonOptions = {
         ldap_server => [],
+        ldap_login => [],
+        ldap_password => [],
         max_badrequest => [],
         log_level => [],
         user => [],
@@ -61,6 +64,8 @@ sub configure_hook {
     # Option chargées depuis le fichier de configuration
     if( defined($daemonOptions->{ldap_server}->[0]) && (($daemonOptions->{ldap_server}->[0] =~ /^([1-2]?[0-9]{1,2}\.){3}[1-2]?[0-9]{1,2}$/) || ($daemonOptions->{ldap_server}->[0] =~ /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,6}$/)) ) {
         $self->{ldap_server}->{server} = $daemonOptions->{ldap_server}->[0];
+        $self->{ldap_server}->{login} = $daemonOptions->{ldap_login}->[0];
+        $self->{ldap_server}->{password} = $daemonOptions->{ldap_password}->[0];
     }else {
         print "Vous devez renseigner l'adresse du serveur LDAP !\n";
         exit 1;
@@ -434,7 +439,12 @@ sub getServerDomains {
     }
 
     # LDAP connection
-    $self->logMessage( "Connexion anonyme a l'annuaire LDAP" );
+    if( defined($self->{"ldap_server"}->{"login"}) ) {
+        $self->logMessage( "Connexion authentifiee a l'annuaire LDAP" );
+    }else {
+        $self->logMessage( "Connexion anonyme a l'annuaire LDAP" );
+    }
+
     if( !&OBM::ObmSatellite::utils::connectLdapSrv( $self->{ldap_server} ) ) {
         $self->logMessage( "Echec: connexion a l'annuaire LDAP" );
         print "Echec: Impossible de se connecter a l'annuaire LDAP\n";
@@ -448,7 +458,11 @@ sub getServerDomains {
     }
 
     for( my $i=0; $i<=$#ldapEntries; $i++ ) {
-        $domainList = $ldapEntries[$i]->get_value( $ldapAttributes->[0], asref => 1 );
+        my $entryDomainList = $ldapEntries[$i]->get_value( $ldapAttributes->[0], asref => 1 );
+        for( my $j=0; $j<=$#{$entryDomainList}; $j++ ) {
+            $entryDomainList->[$j] = from_utf8( { -string => $entryDomainList->[$j], -charset => "ISO-8859-1" } );
+            push( @{$domainList}, $entryDomainList->[$j] );
+        }
     }
 
     $self->logMessage( "Deconnexion de l'annuaire LDAP" );
@@ -466,7 +480,12 @@ sub processPostfixDomains {
     my $errors = 0;
 
     # LDAP connection
-    $self->logMessage( "Connexion anonyme a l'annuaire LDAP" );
+    if( defined($self->{"ldap_server"}->{"login"}) ) {
+        $self->logMessage( "Connexion authentifiee a l'annuaire LDAP" );
+    }else {
+        $self->logMessage( "Connexion anonyme a l'annuaire LDAP" );
+    }
+
     if( !&OBM::ObmSatellite::utils::connectLdapSrv( $self->{ldap_server} ) ) {
         $self->logMessage( "Echec: connexion a l'annuaire LDAP" );
         print "Echec: Impossible de se connecter a l'annuaire LDAP\n";

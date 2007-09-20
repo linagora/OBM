@@ -1,5 +1,7 @@
 # Adresse du serveur LDAP referent
 ldap_server         nom.server.ldap
+ldap_login                                              # DN de l'utilisateur LDAP - requetes anonymes par defaut
+ldap_password                                           # Mot de passe de l'utilisateur LDAP - requetes anonymes par defaut
 
 # Options communement modifiees
 log_level           0                                   # de 0 a 4 - 0 par defaut
