@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+set -x
+
+if [ -f /usr/share/debconf/confmodule ]; then
+    . /usr/share/debconf/confmodule
+fi
+if [ -f /usr/share/dbconfig-common/dpkg/postrm.mysql ]; then
+    . /usr/share/dbconfig-common/dpkg/postrm.mysql
+    dbc_go obm-ihm $@
+fi
+
+
+if [ "$1" = "purge" ]; then
+	rm -f /etc/obm-core/debian-db-obm.php
+	if which ucf >/dev/null 2>&1; then
+		ucf --purge /etc/obm-ihm/debian-db-obm.conf
+	fi
+fi
+
+#DEBHELPER#
