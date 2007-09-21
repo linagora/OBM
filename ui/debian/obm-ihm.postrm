@@ -13,7 +13,7 @@ fi
 
 
 if [ "$1" = "purge" ]; then
-	rm -f /etc/obm-core/debian-db-obm.php
+	rm -f /etc/obm-ihm/debian-db-obm.conf
 	if which ucf >/dev/null 2>&1; then
 		ucf --purge /etc/obm-ihm/debian-db-obm.conf
 	fi
