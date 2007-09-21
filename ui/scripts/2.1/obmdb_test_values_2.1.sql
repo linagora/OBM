@@ -84,6 +84,8 @@ INSERT INTO UserSystem VALUES (3,'samba','m#Pa!NtA','106','65534','/','SAMBA','A
 DELETE FROM Host;
 
 INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALUES ('1500', '1000', 'srv-mail', '10.0.0.101', 'Serveur de courrier');
+INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALUES ('1501', '1000', 'smtp-in', '10.0.0.100', 'SMTP entrant');
+INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALUES ('1502', '1000', 'smtp-out', '10.0.0.100', 'SMTP sortant');
 
 
 -------------------------------------------------------------------------------
@@ -92,7 +94,22 @@ INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALU
 DELETE FROM MailServer;
 
 -- Déclaration d'un serveur de BAL sans hôte relais (relayhost)
-INSERT INTO MailServer (mailserver_host_id) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail') );
+INSERT INTO MailServer (mailserver_host_id, mailserver_imap, mailserver_smtp_in, mailserver_smtp_out) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail'), 1, 0, 0 );
+-- Déclaration d'un serveur SMTP entrant sans hôte relais (relayhost)
+INSERT INTO MailServer (mailserver_host_id, mailserver_imap, mailserver_smtp_in, mailserver_smtp_out) VALUES ( (SELECT host_id FROM Host WHERE host_name='smtp-in'), 0, 1, 0 );
+-- Déclaration d'un serveur SMTP sortant sans hôte relais (relayhost)
+INSERT INTO MailServer (mailserver_host_id, mailserver_imap, mailserver_smtp_in, mailserver_smtp_out) VALUES ( (SELECT host_id FROM Host WHERE host_name='smtp-out'), 0, 0, 1 );
+
+
+-------------------------------------------------------------------------------
+-- Remplissage de la table 'DomainMailServer' : déclaration des serveurs de BALs
+-------------------------------------------------------------------------------
+DELETE FROM DomainMailServer;
+
+-- Assignation du serveur SMTP entrant au domain 'Domain 1'
+INSERT DomainMailServer (domainmailserver_domain_id, domainmailserver_mailserver_id, domainmailserver_role) VALUES ( (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT i.mailserver_id FROM MailServer i, Host j WHERE i.mailserver_host_id=j.host_id AND j.host_name='smtp-in'), 'smtp-in' );
+-- Assignation du serveur de BAL au domain 'Domain 1'
+INSERT DomainMailServer (domainmailserver_domain_id, domainmailserver_mailserver_id, domainmailserver_role) VALUES ( (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT i.mailserver_id FROM MailServer i, Host j WHERE i.mailserver_host_id=j.host_id AND j.host_name='srv-mail'), 'imap' );
 
 
 -------------------------------------------------------------------------------
