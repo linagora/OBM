@@ -98,8 +98,9 @@ function run_query_domain_detail($p_id) {
 //   $id : new domain id if ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_insert($domain) {
-  global $uid, $cdg_sql, $c_cr;
+  global $obm, $cdg_sql;
   
+  $uid = $obm['uid'];
   $now = date('Y-m-d H:i:s');
   $label = $domain['label'];
   $desc = $domain['desc'];
@@ -194,14 +195,15 @@ function run_query_domain_replace_properties($domain_id,$domain) {
 //   - $domain[]   : entry values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_update($d_id, $domain) {
-  global $uid, $cdg_sql;
+  global $obm, $cdg_sql;
 
+  $uid = $obm['uid'];
   $now = date('Y-m-d H:i:s');
   $label = $domain['label'];
   $desc = $domain['desc'];
   $alias = $domain['alias'];
   $mail_server = $domain['mail_server'];
-  
+
   $query = "UPDATE Domain SET
     domain_timeupdate='$now',
     domain_userupdate='$uid',

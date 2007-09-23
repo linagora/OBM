@@ -928,11 +928,12 @@ function get_all_email_list() {
 
   $all_emails = array() ;
 
+  $obm_q = new DB_OBM();
+
   // si mail activé, construire la liste des noms de domaines smtp (+alias) pour le domaine (sens obm) en cours.
   if ($cgp_use['service']['mail']) {
     $domain_list = array() ;
 
-    $obm_q = new DB_OBM() ;
     $query = "SELECT domain_name, domain_alias FROM Domain where domain_id = ".$obm['domain_id'] ;
     display_debug_msg($query, $cdg_sql, "get_all_emails_list / get domains names and aliases");
     $result = $obm_q->query($query) ;

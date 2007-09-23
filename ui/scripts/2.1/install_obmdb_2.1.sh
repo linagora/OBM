@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ###############################################################################
 # OBM - File : install_obmdb_2.1.sh                                           #
 #     - Desc : OBM Database 2.1 installation script                           #

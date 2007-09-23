@@ -136,6 +136,7 @@ function run_query_incident_search($incident) {
       incident_duration,
       $date,
       $timeupdate,
+      contract_label,
       u1.userobm_lastname as incident_logger_lastname,
       u2.userobm_lastname as incident_owner_lastname,
       Company.company_name as incident_company_name
@@ -159,7 +160,7 @@ function run_query_incident_search($incident) {
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0) || (! $ctu_sql_limit)) {
-    display_debug_msg($req, $cdg_sql, "run_query_incident_search()");
+    display_debug_msg($query, $cdg_sql, "run_query_incident_search()");
     $obm_q->query($query);
   }
 

@@ -15,6 +15,7 @@
 $fieldnames["incident_status"] = $l_status;
 $fieldnames["incident_label"] = $l_label;
 $fieldnames["incident_reference"] = $l_reference;
+$fieldnames["contract_label"] = $l_contract;
 $fieldnames["incident_priority"] = $l_priority;
 $fieldnames["incident_date"] = $l_date;
 $fieldnames["incident_duration"] = $l_duration;
@@ -279,6 +280,7 @@ function dis_incident_search_list($incident) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_search_list($in_q, $prefs, $incident) {
 
+  $text = urlencode($incident['text']);
   $lincident = urlencode($incident["lincident"]);
   $lcontract = urlencode($incident["lcontract"]);
   $company = urlencode($incident["company"]);
@@ -302,7 +304,7 @@ function html_incident_search_list($in_q, $prefs, $incident) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params("incident", $incident);
 
-  $url = url_prepare("incident_index.php?action=search$url_userdata&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority$param_status&amp;sel_resolutiontype=$reso&amp;contract_id=$contract_id&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cba_archive=$archive");
+  $url = url_prepare("incident_index.php?action=search$url_userdata&amp;tf_text=$text&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority$param_status&amp;sel_resolutiontype=$reso&amp;contract_id=$contract_id&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cba_archive=$archive");
 
   $dis_incidents_list=new OBM_DISPLAY("DATA", $prefs, "incident");
   $dis_incidents_list->data_set = $in_q;
