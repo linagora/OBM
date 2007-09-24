@@ -1,0 +1,83 @@
+2007-09-24  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	misc fixes for win mobile & blacberry.
+
+	upd to 6.5.1 APIs.
+	
+	* .classpath:
+	* build/build.xml:
+	* build/build_deploy.sh:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource), (CalendarSyncSource.beginSync),
+	(CalendarSyncSource.addSyncItem),
+	(CalendarSyncSource.getAllSyncItemKeys),
+	(CalendarSyncSource.getDeletedSyncItemKeys),
+	(CalendarSyncSource.getNewSyncItemKeys),
+	(CalendarSyncSource.getSyncItemKeysFromTwin),
+	(CalendarSyncSource.getUpdatedSyncItemKeys),
+	(CalendarSyncSource.removeSyncItem),
+	(CalendarSyncSource.updateSyncItem),
+	(CalendarSyncSource.getSyncItemFromId),
+	(CalendarSyncSource.getICalFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromICal),
+	(CalendarSyncSource.getXMLFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromXML),
+	(CalendarSyncSource.getFoundationFromSyncItem),
+	(CalendarSyncSource.getSyncItemFromFoundation):
+	* src/java/fr/aliasource/funambol/engine/source/ObmSyncSource.java:
+	(ObmSyncSource), (ObmSyncSource.ObmSyncSource),
+	(ObmSyncSource.init), (ObmSyncSource.getSourceType),
+	(ObmSyncSource.isEncode), (ObmSyncSource.setEncode),
+	(ObmSyncSource.toString), (ObmSyncSource.beginSync),
+	(ObmSyncSource.setOperationStatus),
+	(ObmSyncSource.getSyncItemKeysFromKeys), (ObmSyncSource.getDevice),
+	(ObmSyncSource.getRestrictions), (ObmSyncSource.setRestrictions),
+	(ObmSyncSource.commitSync), (ObmSyncSource.endSync),
+	(ObmSyncSource.getInfo), (ObmSyncSource.getName),
+	(ObmSyncSource.getSourceQuery), (ObmSyncSource.getSourceURI):
+	* src/java/fr/aliasource/funambol/security/ObmOfficer.java:
+	(ObmOfficer), (ObmOfficer.getClientAuth),
+	(ObmOfficer.getServerAuth), (ObmOfficer.getObmAddress),
+	(ObmOfficer.authenticateUser), (ObmOfficer.authorize),
+	(ObmOfficer.unAuthenticate), (ObmOfficer.setObmAddress):
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper), (CalendarHelper..getUTCFormatAllDay),
+	(CalendarHelper.), (CalendarHelper..getDateFromUTCString):
+	* src/java/fr/aliasource/funambol/utils/Helper.java:
+	(Helper.listToTab), (Helper.setToTab):
+	* src/java/fr/aliasource/funambol/utils/MyCal2Sif.java:
+	(MyCal2Sif), (MyCal2Sif.MyCal2Sif),
+	(MyCal2Sif.createTagFromAllDayProperty):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager), (CalendarManager.CalendarManager),
+	(CalendarManager.initRestriction), (CalendarManager.getSync),
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.foundationCalendarToObmEvent),
+	(CalendarManager.parseStart), (CalendarManager.parseEnd):
+
+2007-08-23  Thomas Cataldo  <thomas.cataldo@miliconvert.org>
+
+        newItemKeys is a no-op.
+
+	add .classpath, .project
+
+	some java5 fixes
+	
+	* .classpath:
+	* .project:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getNewSyncItemKeys):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager), (CalendarManager.CalendarManager),
+	(CalendarManager.initRestriction), (CalendarManager.logIn),
+	(CalendarManager.initUserEmail), (CalendarManager.getAllItemKeys),
+	(CalendarManager.getNewItemKeys),
+	(CalendarManager.getDeletedItemKeys),
+	(CalendarManager.getRefusedItemKeys),
+	(CalendarManager.getUpdatedItemKeys),
+	(CalendarManager.getItemFromId), (CalendarManager.removeItem),
+	(CalendarManager.updateItem), (CalendarManager.addItem),
+	(CalendarManager.getEventTwinKeys), (CalendarManager.getSync),
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.foundationCalendarToObmEvent):
+

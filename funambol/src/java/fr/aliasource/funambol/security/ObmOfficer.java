@@ -2,6 +2,9 @@ package fr.aliasource.funambol.security;
 
 import java.security.Principal;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.funambol.framework.core.Authentication;
 import com.funambol.framework.core.Cred;
 import com.funambol.framework.logging.FunambolLogger;
@@ -26,42 +29,26 @@ public class ObmOfficer implements Officer, java.io.Serializable{
     protected PersistentStore ps = null;
     private String clientAuth = Cred.AUTH_TYPE_BASIC;
     
-    private boolean loginFailed = false;
-    private boolean loginExpired = false;
     
-    private String serverAuth = Cred.AUTH_TYPE_BASIC;
+    private String serverAuth = Cred.AUTH_NONE;
     
     private String obmAddress = null;
 
-    public boolean isLoginFailed() {
-        return loginFailed;
-    }
-
+    private Log logger = LogFactory.getLog(getClass());
+    
     public String getClientAuth() {
+    	logger.info("getClientAuth");
         return this.clientAuth;
     }
 
-    public void setClientAuth(String clientAuth) {
-        this.clientAuth = clientAuth;
-    }
-
     public String getServerAuth() {
+    	logger.info("getServerAuth");
         return this.serverAuth;
     }
 
-    public void setServerAuth(String serverAuth) {
-        this.serverAuth = serverAuth;
-    }
-
-    public String getObmAddress() {
+    private String getObmAddress() {
         return this.obmAddress;
     }
-
-    public void setObmAddress(String obmAddress) {
-        this.obmAddress = obmAddress;
-    }
-
-    // Public methods
 
     /**
      * Authenticates a credential.
@@ -71,6 +58,7 @@ public class ObmOfficer implements Officer, java.io.Serializable{
      * @return true if the credential is autenticated, false otherwise
      */
     public Sync4jUser authenticateUser(Cred credential) {
+    	logger.info("authenticateUser");
 
         if (log.isTraceEnabled()) {
             log.trace(" ObmOfficer authenticate() Start");
@@ -97,6 +85,8 @@ public class ObmOfficer implements Officer, java.io.Serializable{
      * @return 
      */
     public AuthStatus authorize(Principal principal, String resource) {
+    	logger.info("authorize");
+
     	return AuthStatus.AUTHORIZED;
     }
 
@@ -108,18 +98,8 @@ public class ObmOfficer implements Officer, java.io.Serializable{
      * @param 
      */
     public void unAuthenticate(Sync4jUser user) {
+    	logger.info("unAuthenticate");
     }
-
-    /**
-     * @see com.funambol.framework.security.Officer
-     *
-     * @return boolean
-     */
-    public boolean isAccountExpired() {
-        return loginExpired;
-    }
-
-    // Private Methods
 
     /**
      *
@@ -235,5 +215,9 @@ public class ObmOfficer implements Officer, java.io.Serializable{
 		}
         return check;
     }
+
+	public void setObmAddress(String obmAddress) {
+		this.obmAddress = obmAddress;
+	}
 
 }

@@ -158,10 +158,6 @@ Build file for funambol-obm module.
       </fileset>
     </jar>
 
-    <antcall target="clean-module">
-      <param name="dir.module" value="${dir.module}"/>
-    </antcall>
-
   </target>
 
   <!-- =============================================== -->

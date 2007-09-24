@@ -5,6 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.funambol.common.pim.calendar.RecurrencePattern;
 import com.funambol.common.pim.calendar.RecurrencePatternException;
 
@@ -18,8 +21,10 @@ public class CalendarHelper extends Helper {
     private static final String DATE_UTC_PATTERN = "yyyyMMdd'T'HHmmss'Z'";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-    private static final SimpleDateFormat dateFormatUTC = new SimpleDateFormat(DATE_UTC_PATTERN);
+    private static final SimpleDateFormat dateFormat;
+    private static final SimpleDateFormat dateFormatUTC;
+    
+    private static Log logger = LogFactory.getLog(CalendarHelper.class);
     
     private static final byte[] foundationWeekDays = {
     	RecurrencePattern.DAY_OF_WEEK_MONDAY,
@@ -31,6 +36,8 @@ public class CalendarHelper extends Helper {
     	RecurrencePattern.DAY_OF_WEEK_SUNDAY };
 
     static {
+    	dateFormat = new SimpleDateFormat(DATE_FORMAT);
+    	dateFormatUTC = new SimpleDateFormat(DATE_UTC_PATTERN);
         dateFormatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
@@ -45,6 +52,14 @@ public class CalendarHelper extends Helper {
         String utc = null;
         if (date != null){
             utc = dateFormatUTC.format(date);
+        }
+        return utc;
+    }
+
+    public static String getUTCFormatAllDay(Date date) {
+        String utc = null;
+        if (date != null){
+            utc = dateFormat.format(date);
         }
         return utc;
     }
@@ -65,6 +80,7 @@ public class CalendarHelper extends Helper {
         		} else {
         			date = dateFormat.parse(sDate);
         		}
+    			logger.info("parsed '"+sDate+"' as '"+date+"'");
         	} catch (ParseException e) {
         		//echec
         	}

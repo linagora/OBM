@@ -7,11 +7,15 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.util.TimeZone;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.funambol.framework.engine.SyncItemKey;
 import com.funambol.framework.engine.source.AbstractSyncSource;
 import com.funambol.framework.engine.source.SyncContext;
 import com.funambol.framework.engine.source.SyncSource;
 import com.funambol.framework.engine.source.SyncSourceException;
+import com.funambol.framework.engine.source.SyncSourceInfo;
 import com.funambol.framework.logging.FunambolLogger;
 import com.funambol.framework.logging.FunambolLoggerFactory;
 import com.funambol.framework.security.Sync4jPrincipal;
@@ -23,173 +27,177 @@ import com.funambol.server.config.Configuration;
 
 /**
  */
-public abstract class ObmSyncSource extends AbstractSyncSource
-implements SyncSource, Serializable, LazyInitBean {
+public abstract class ObmSyncSource extends AbstractSyncSource implements
+		SyncSource, Serializable, LazyInitBean {
 
-    protected Principal principal = null;
+	protected Principal principal = null;
 
 	protected Sync4jDevice device = null;
-    protected String deviceTimezoneDescr = null;
-    protected TimeZone deviceTimezone = null;
-    protected String deviceCharset = null;
+	protected String deviceTimezoneDescr = null;
+	protected TimeZone deviceTimezone = null;
+	protected String deviceCharset = null;
 
-    public static final String MSG_TYPE_VCARD	= "text/x-vcard";
-    public static final String MSG_TYPE_ICAL	= "text/x-vcalendar";
-    
-    private boolean encode = true;
-    
-    private int restrictions = 1; //default private
-    private String obmAddress = null;
-    
-    protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
+	public static final String MSG_TYPE_VCARD = "text/x-vcard";
+	public static final String MSG_TYPE_ICAL = "text/x-vcalendar";
 
-    // ------------------------------------------------------------ Constructors
+	private boolean encode = true;
 
-    /** Creates a new instance of AbstractSyncSource */
-    public ObmSyncSource() {
-    	
-    }
+	private int restrictions = 1; // default private
+	private String obmAddress = null;
 
-    // ---------------------------------------------------------- Public methods
-    public void init() {
-		
-    
-    }
-    
-    
-    /**
-     * Equivalent of deprecated method
+	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
+	private Log logger = LogFactory.getLog(getClass());
+
+	// ------------------------------------------------------------ Constructors
+
+	/** Creates a new instance of AbstractSyncSource */
+	public ObmSyncSource() {
+
+	}
+
+	// ---------------------------------------------------------- Public methods
+	public void init() {
+
+	}
+
+	/**
+	 * Equivalent of deprecated method
+	 * 
 	 * @return syncsource type
 	 */
-    public String getSourceType() {
-    	if (getInfo() != null 
-    			&& getInfo().getPreferredType() != null ) {
-    		return getInfo().getSupportedTypes()[0].getType();
-    	} else {
-    		return "";
-    	}
-    }
-    
-    /**
-     * Equivalent of deprecated method
-     * @param type
-     * @param version
-     */
-    /*public void setSourceType(String type, String version) {
-    	ContentType[] contents = new ContentType[1];
-    	ContentType content = new ContentType(type,version);
-    	contents[0] = content;
-    	setInfo(new SyncSourceInfo(contents, 0));
-    }*/
+	public String getSourceType() {
+		if (getInfo() != null && getInfo().getPreferredType() != null) {
+			return getInfo().getSupportedTypes()[0].getType();
+		} else {
+			return "";
+		}
+	}
 
-    public boolean isEncode() {
-    	return encode;
-    }
+	/**
+	 * Equivalent of deprecated method
+	 * 
+	 * @param type
+	 * @param version
+	 */
+	/*
+	 * public void setSourceType(String type, String version) { ContentType[]
+	 * contents = new ContentType[1]; ContentType content = new
+	 * ContentType(type,version); contents[0] = content; setInfo(new
+	 * SyncSourceInfo(contents, 0)); }
+	 */
 
-    public void setEncode(boolean encode) {
-    	this.encode = encode;
-    }
-  
-    /**
-     * Returns a string representation of this object.
-     *
-     * @return a string representation of this object.
-     */
-    public String toString() {
-        StringBuffer sb = new StringBuffer(super.toString());
+	public boolean isEncode() {
+		return encode;
+	}
 
-        sb.append(" - {name: ").append(getName()      );
-        sb.append(" type: "   ).append(getSourceType());
-        sb.append(" uri: "    ).append(getSourceURI());
-        sb.append("}"         );
-        return sb.toString();
-    }
+	public void setEncode(boolean encode) {
+		this.encode = encode;
+	}
 
-    /**
-     * SyncSource's beginSync()
-     *
-     * @param context the context of the sync
-     */
-    public void beginSync(SyncContext context) throws SyncSourceException {
-    	
-        super.beginSync(context);
+	/**
+	 * Returns a string representation of this object.
+	 * 
+	 * @return a string representation of this object.
+	 */
+	public String toString() {
+		StringBuffer sb = new StringBuffer(super.toString());
 
-        this.principal = context.getPrincipal();
-        
-        String deviceId = null;
-        deviceId = ((Sync4jPrincipal) context.getPrincipal()).getDeviceId();
+		sb.append(" - {name: ").append(getName());
+		sb.append(" type: ").append(getSourceType());
+		sb.append(" uri: ").append(getSourceURI());
+		sb.append("}");
+		return sb.toString();
+	}
+
+	/**
+	 * SyncSource's beginSync()
+	 * 
+	 * @param context
+	 *            the context of the sync
+	 */
+	public void beginSync(SyncContext context) throws SyncSourceException {
+
+		super.beginSync(context);
+
+		this.principal = context.getPrincipal();
+
+		String deviceId = null;
+		deviceId = ((Sync4jPrincipal) context.getPrincipal()).getDeviceId();
 		try {
 			device = getDevice(deviceId);
 			String timezone = device.getTimeZone();
-			if (device.getConvertDate ()) {
-			     if (timezone != null && timezone.length() > 0) {
-			         deviceTimezoneDescr = timezone;
-			         deviceTimezone = TimeZone.getTimeZone(deviceTimezoneDescr);
-			     }
-			 }
+			if (device.getConvertDate()) {
+				if (timezone != null && timezone.length() > 0) {
+					deviceTimezoneDescr = timezone;
+					deviceTimezone = TimeZone.getTimeZone(deviceTimezoneDescr);
+				}
+			}
 
-	         deviceCharset = device.getCharset();
+			deviceCharset = device.getCharset();
 		} catch (PersistentStoreException e1) {
 			log.error("obm : error getting device");
 		}
-		
-    }
 
-    /**
-     * @see SyncSource
-     */
-    public void setOperationStatus(String operation, int statusCode, SyncItemKey[] keys) {
+	}
 
-        StringBuffer message = new StringBuffer("Received status code '");
-        message.append(statusCode).append("' for a '").append(operation).append("'").
-                append(" for this items: ");
+	/**
+	 * @see SyncSource
+	 */
+	public void setOperationStatus(String operation, int statusCode,
+			SyncItemKey[] keys) {
 
-        for (int i = 0; i < keys.length; i++) {
-            message.append("\n- " + keys[i].getKeyAsString());
-        }
+		StringBuffer message = new StringBuffer("Received status code '");
+		message.append(statusCode).append("' for a '").append(operation)
+				.append("'").append(" for this items: ");
 
-        if (log.isTraceEnabled()) {
-        	log.info(message.toString());
-        }
-    }
+		for (int i = 0; i < keys.length; i++) {
+			message.append("\n- " + keys[i].getKeyAsString());
+		}
 
-    public SyncItemKey[] getSyncItemKeysFromKeys(String[] keys) {
-    	int nb = 0;
-    	if (keys != null) {
-    		nb = keys.length;
-    	}
-    	SyncItemKey[] syncKeys = null;
-    	
-    	syncKeys = new SyncItemKey[nb];
-    	for (int i = 0 ; i < nb ; i++ ) {
-    		syncKeys[i] = new SyncItemKey(keys[i]);
-    	}
-    	
+		logger.info(message.toString());
+	}
+
+	public SyncItemKey[] getSyncItemKeysFromKeys(String[] keys) {
+		int nb = 0;
+		if (keys != null) {
+			nb = keys.length;
+		}
+		SyncItemKey[] syncKeys = null;
+
+		syncKeys = new SyncItemKey[nb];
+		for (int i = 0; i < nb; i++) {
+			syncKeys[i] = new SyncItemKey(keys[i]);
+		}
+
 		return syncKeys;
 	}
-    /**
-     * Return the device with the given deviceId
-     * @param deviceId String
-     * @return Sync4jDevice
-     * @throws PersistentStoreException
-     */
-    private Sync4jDevice getDevice(String deviceId) throws PersistentStoreException {
-        Sync4jDevice device = new Sync4jDevice(deviceId);
-        PersistentStore store = Configuration.getConfiguration().getStore();
-        store.read(device);
-        return device;
-    }
+
+	/**
+	 * Return the device with the given deviceId
+	 * 
+	 * @param deviceId
+	 *            String
+	 * @return Sync4jDevice
+	 * @throws PersistentStoreException
+	 */
+	private Sync4jDevice getDevice(String deviceId)
+			throws PersistentStoreException {
+		Sync4jDevice device = new Sync4jDevice(deviceId);
+		PersistentStore store = Configuration.getConfiguration().getStore();
+		store.read(device);
+		return device;
+	}
 
 	public int getRestrictions() {
 		if (log.isTraceEnabled()) {
-			log.trace(" getRestrcitions:"+restrictions);
+			log.trace(" getRestrcitions:" + restrictions);
 		}
 		return restrictions;
 	}
-	
+
 	public void setRestrictions(int restrictions) {
 		if (log.isTraceEnabled()) {
-			log.trace(" setRestrcitions:"+restrictions);
+			log.trace(" setRestrcitions:" + restrictions);
 		}
 		this.restrictions = restrictions;
 	}
@@ -200,6 +208,42 @@ implements SyncSource, Serializable, LazyInitBean {
 
 	public void setObmAddress(String obmAddress) {
 		this.obmAddress = obmAddress;
+	}
+
+	@Override
+	public void commitSync() throws SyncSourceException {
+		super.commitSync();
+		logger.info("commit sync");
+	}
+
+	@Override
+	public void endSync() throws SyncSourceException {
+		super.endSync();
+		logger.info("end sync");
+	}
+
+	@Override
+	public SyncSourceInfo getInfo() {
+		logger.info("getinfo");
+		return super.getInfo();
+	}
+
+	@Override
+	public String getName() {
+		logger.info("getName");
+		return super.getName();
+	}
+
+	@Override
+	public String getSourceQuery() {
+		logger.info("getsourcequery");
+		return super.getSourceQuery();
+	}
+
+	@Override
+	public String getSourceURI() {
+		logger.info("getsourceuri");
+		return super.getSourceURI();
 	}
 
 }

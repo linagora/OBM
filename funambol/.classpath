@@ -8,8 +8,6 @@
 	<classpathentry kind="lib" path="lib/commons-lang-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/funambol-admin-dev.jar"/>
-	<classpathentry kind="lib" path="lib/funambol-common-pim-6.0.3.jar"/>
-	<classpathentry kind="lib" path="lib/funambol-framework.jar"/>
 	<classpathentry kind="lib" path="lib/funambol-server.jar"/>
 	<classpathentry kind="lib" path="lib/jaxrpc.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
@@ -18,5 +16,9 @@
 	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="lib/wsdl4j.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/core-framework-6.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/foundation-6.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/pim-framework-6.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/server-framework-6.5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

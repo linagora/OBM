@@ -6,8 +6,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 
 import javax.xml.rpc.ServiceException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.funambol.framework.logging.FunambolLogger;
 import com.funambol.framework.logging.FunambolLoggerFactory;
@@ -32,6 +37,8 @@ public class CalendarManager extends ObmManager {
 	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
 	private String userEmail;
 
+	private Log logger = LogFactory.getLog(getClass());
+
 	public CalendarManager(String obmAddress) {
 
 		try {
@@ -41,15 +48,12 @@ public class CalendarManager extends ObmManager {
 					.getCalendar();
 			binding = calendarBinding;
 		} catch (ServiceException e) {
-			log.error(e.getMessage());
+			logger.error(e.getMessage(), e);
 		}
 	}
 
 	public void initRestriction(int restrictions) {
 		this.restrictions = restrictions;
-		if (log.isTraceEnabled()) {
-			log.trace(" init restrictions: " + restrictions);
-		}
 	}
 
 	public String getCalendar() {
@@ -300,6 +304,8 @@ public class CalendarManager extends ObmManager {
 		String user = token.getUser();
 
 		for (Event e : updated) {
+			logger.info("getSync: " + e.getTitle() + ", d: "
+					+ e.getDate().getTime());
 			if (e.getClassification() == 1
 					&& !calendar.equals(user)
 					|| (CalendarHelper.isUserRefused(userEmail, e
@@ -331,32 +337,43 @@ public class CalendarManager extends ObmManager {
 			Event obmevent, String type) {
 
 		com.funambol.common.pim.calendar.Calendar calendar = new com.funambol.common.pim.calendar.Calendar();
-		com.funambol.common.pim.calendar.CalendarContent event = null;
-		event = new com.funambol.common.pim.calendar.Event();
+		com.funambol.common.pim.calendar.CalendarContent event = new com.funambol.common.pim.calendar.Event();
 		calendar.setEvent((com.funambol.common.pim.calendar.Event) event);
 
 		event.getUid().setPropertyValue(obmevent.getUid());
-		/*
-		 * this.uid = uid; this.owner = owner; this.priority = priority;
-		 * this.classification = classification; this.allday = allday; this.date =
-		 * date; this.duration = duration; this.title = title; this.description =
-		 * description; this.category = category; this.location = location;
-		 * this.attendees = attendees; this.recurrence = recurrence;
-		 */
 
-		event.setAllDay(new Boolean(obmevent.isAllday()));
-
+		logger.info("bd -> pda - obmToFound: " + obmevent.getTitle()
+				+ " date: " + obmevent.getDate().getTime());
 		Date dstart = obmevent.getDate().getTime();
 
-		event.getDtStart()
-				.setPropertyValue(CalendarHelper.getUTCFormat(dstart));
+		logger.info("bd -> pda - utcFormat : "
+				+ CalendarHelper.getUTCFormat(dstart));
 
-		java.util.Calendar temp = java.util.Calendar.getInstance();
-		temp.setTime(dstart);
-		temp.add(java.util.Calendar.SECOND, obmevent.getDuration());
-		Date dend = temp.getTime();
+		Date dend = null;
+		if (!obmevent.isAllday()) {
+			event.getDtStart().setPropertyValue(
+					CalendarHelper.getUTCFormat(dstart));
 
-		event.getDtEnd().setPropertyValue(CalendarHelper.getUTCFormat(dend));
+			java.util.Calendar temp = java.util.Calendar.getInstance();
+			temp.setTime(dstart);
+			temp.add(java.util.Calendar.SECOND, obmevent.getDuration());
+			dend = temp.getTime();
+
+			event.getDtEnd()
+					.setPropertyValue(CalendarHelper.getUTCFormat(dend));
+		} else {
+			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+			cal.setTime(dstart);
+			String formattedDate = CalendarHelper.getUTCFormatAllDay(dstart);
+			event.getDtStart().setPropertyValue(formattedDate);
+//			cal.add(Calendar.DAY_OF_MONTH, 1);
+//			dend = cal.getTime();
+//			formattedDate = CalendarHelper.getUTCFormat(dend);
+			event.getDtEnd().setPropertyValue(formattedDate);
+			event.getDuration().setPropertyValue(0);
+		}
+
+		event.setAllDay(new Boolean(obmevent.isAllday()));
 
 		event.getSummary().setPropertyValue(obmevent.getTitle());
 		event.getDescription().setPropertyValue(obmevent.getDescription());
@@ -365,9 +382,9 @@ public class CalendarManager extends ObmManager {
 		event.getLocation().setPropertyValue(obmevent.getLocation());
 
 		if (obmevent.getClassification() == 1) {
-			event.getAccessClass().setPropertyValue("2"); // olPrivate
+			event.getAccessClass().setPropertyValue(new Short((short)2)); // olPrivate
 		} else {
-			event.getAccessClass().setPropertyValue("0"); // olNormal
+			event.getAccessClass().setPropertyValue(new Short((short)0)); // olNormal
 		}
 		event.setBusyStatus(new Short((short) 2)); // olBusy
 
@@ -386,7 +403,9 @@ public class CalendarManager extends ObmManager {
 		if (!obmrec.getKind().equals("none")) {
 			event.setRecurrencePattern(CalendarHelper.getRecurrence(dstart,
 					dend, obmrec));
+
 		}
+		event.setMileage(new Integer(0));
 
 		return calendar;
 	}
@@ -403,8 +422,7 @@ public class CalendarManager extends ObmManager {
 			com.funambol.common.pim.calendar.Calendar calendar, String type) {
 
 		Event event = new Event();
-		com.funambol.common.pim.calendar.CalendarContent foundation = calendar
-				.getCalendarContent();
+		com.funambol.common.pim.calendar.Event foundation = calendar.getEvent();
 
 		if (foundation.getUid() != null
 				&& foundation.getUid().getPropertyValueAsString() != "") {
@@ -413,35 +431,61 @@ public class CalendarManager extends ObmManager {
 
 		event.setAllday(foundation.getAllDay().booleanValue());
 
-		Date dstart = CalendarHelper.getDateFromUTCString(foundation
-				.getDtStart().getPropertyValueAsString());
-		java.util.Calendar cstart = java.util.Calendar.getInstance();
-		cstart.setTime(dstart);
+		if (foundation.getDtStamp() != null) {
+			logger.info("dtstamp: "
+					+ foundation.getDtStamp().getPropertyValue());
+		}
+		if (foundation.getDuration() != null) {
+			logger.info("duration: "
+					+ foundation.getDuration().getPropertyValue());
+		}
 
-		event.setDate(cstart);
+		List xtags = foundation.getXTags();
+		if (xtags != null) {
+			for (Object o : xtags) {
+				logger.info("     - xtag: '" + o + "'");
+			}
+		}
 
-		Date dend = CalendarHelper.getDateFromUTCString(foundation.getDtEnd()
-				.getPropertyValueAsString());
+		String prodId = calendar.getProdId().getPropertyValueAsString();
+		logger.info("prodId: " + prodId);
+		Date dstart = parseStart(prodId, foundation, event);
+		Date dend = parseEnd(prodId, foundation, event);
+
 		if (dend.getTime() != dstart.getTime()) {
 			event
 					.setDuration((int) ((dend.getTime() - dstart.getTime()) / 1000));
 		} else {
-			event.setDuration(0);
+			event.setDuration(3600);
 		}
 		event.setTitle(foundation.getSummary().getPropertyValueAsString());
-		event.setDescription(foundation.getDescription()
-				.getPropertyValueAsString());
 
-		event.setCategory(CalendarHelper.getOneCategory(foundation
-				.getCategories().getPropertyValueAsString()));
-		event.setLocation(foundation.getLocation().getPropertyValueAsString());
+		if (foundation.getDescription() != null) {
+			event.setDescription(foundation.getDescription()
+					.getPropertyValueAsString());
+		}
 
-		event.setPriority(Helper.getPriorityFromFoundation(foundation
-				.getPriority().getPropertyValueAsString()));
+		if (foundation.getCategories() != null) {
+			event.setCategory(CalendarHelper.getOneCategory(foundation
+					.getCategories().getPropertyValueAsString()));
+		}
 
-		if (Helper.nullToEmptyString(
-				foundation.getAccessClass().getPropertyValueAsString()).equals(
-				"0")) { // olNormal
+		if (foundation.getLocation() != null) {
+			event.setLocation(foundation.getLocation()
+					.getPropertyValueAsString());
+		}
+
+		if (foundation.getPriority() != null) {
+			event.setPriority(Helper.getPriorityFromFoundation(foundation
+					.getPriority().getPropertyValueAsString()));
+		} else {
+			event.setPriority(new Integer(1));
+		}
+
+		if (foundation.getAccessClass() != null
+				&& Helper.nullToEmptyString(
+						foundation.getAccessClass().getPropertyValueAsString())
+						.equals("0")) { // olNormal
 			event.setClassification(0); // public
 		} else {
 			event.setClassification(1); // private
@@ -462,4 +506,47 @@ public class CalendarManager extends ObmManager {
 		return event;
 	}
 
+	/**
+	 * bb hack : on ajoute 1j pour les blackberry. "le 19 à minuit GMT" est
+	 * converti en "le 18" par les classes funambol.
+	 * 
+	 * @param prodId
+	 * @param foundation
+	 * @param event
+	 * @return
+	 */
+	private Date parseStart(String prodId,
+			com.funambol.common.pim.calendar.Event foundation, Event event) {
+		String dtStart = foundation.getDtStart().getPropertyValueAsString();
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+		Date utcDate = CalendarHelper.getDateFromUTCString(dtStart);
+		cal.setTime(utcDate);
+
+		if (foundation.getAllDay() && "Blackberry".equals(prodId)) {
+
+			logger.info("bb detected, adding 1 day to dtstart");
+			cal.add(Calendar.DAY_OF_MONTH, 1);
+			logger.info("utcDate: " + utcDate + " prev dtstart: " + dtStart
+					+ " new dtstart: " + cal.getTime());
+		}
+		event.setDate(cal);
+		return cal.getTime();
+	}
+
+	private Date parseEnd(String prodId,
+			com.funambol.common.pim.calendar.Event foundation, Event event) {
+		String dtEnd = foundation.getDtEnd().getPropertyValueAsString();
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+		Date utcDate = CalendarHelper.getDateFromUTCString(dtEnd);
+		cal.setTime(utcDate);
+
+		if (foundation.getAllDay() && "Blackberry".equals(prodId)) {
+
+			logger.info("bb detected, adding 1 day to dtend");
+			cal.add(Calendar.DAY_OF_MONTH, 1);
+			logger.info("utcDate: " + utcDate + " prev dtend: " + dtEnd
+					+ " new dtend: " + cal.getTime());
+		}
+		return cal.getTime();
+	}
 }
