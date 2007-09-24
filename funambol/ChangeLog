@@ -1,3 +1,120 @@
+2007-09-24  Thomas Cataldo,,,  <set EMAIL_ADDRESS environment variable>
+
+        sife fix
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getSyncItemKeysFromTwin),
+	(CalendarSyncSource.getICalFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromICal),
+	(CalendarSyncSource.getFoundationFromSyncItem):
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper), (CalendarHelper.private),
+	(CalendarHelper..getUTCFormat), (CalendarHelper.),
+	(CalendarHelper..getUTCFormatAllDay),
+	(CalendarHelper..getDateFromUTCString),
+	(CalendarHelper..getOneCategory), (CalendarHelper..getRecurrence),
+	(CalendarHelper..getMonthOfYear), (CalendarHelper..getNthDay),
+	(CalendarHelper..getDayOfWeek), (CalendarHelper..getDayOfMonth),
+	(CalendarHelper..getDayOfWeekMask),
+	(CalendarHelper..getRecurrenceFromFoundation),
+	(CalendarHelper..getOBMDayOfWeekMask),
+	(CalendarHelper..isUserRefused), (CalendarHelper..refuseEvent),
+	(CalendarHelper..formatWithTiret):
+	* src/java/fr/aliasource/funambol/utils/MyCal2Sif.java:
+	(MyCal2Sif), (MyCal2Sif.createTagFromAllDayProperty):
+	* src/java/fr/aliasource/funambol/utils/MyCalContentConverter.java:
+	(MyCalContentConverter),
+	(MyCalContentConverter..MyCalContentConverter),
+	(MyCalContentConverter.), (MyCalContentConverter..cc2vcc),
+	(MyCalContentConverter..vcc2cc),
+	(MyCalContentConverter..composeFieldXTag),
+	(MyCalContentConverter..composeFieldRrule),
+	(MyCalContentConverter..extractAAlarmPropertyValue),
+	(MyCalContentConverter..composeFieldLastModified),
+	(MyCalContentConverter..extractRRulePropertyValue),
+	(MyCalContentConverter..extractExDatePropertyValue),
+	(MyCalContentConverter..extractRDatePropertyValue),
+	(MyCalContentConverter..extractExceptionsAsSCSVs),
+	(MyCalContentConverter..appendToStringBuffer),
+	(MyCalContentConverter..isEndDateOrDuration),
+	(MyCalContentConverter..instanceModifierToInt),
+	(MyCalContentConverter..isAnInstanceModifier),
+	(MyCalContentConverter..getRecurrencePattern),
+	(MyCalContentConverter..getRDates),
+	(MyCalContentConverter..getExDates),
+	(MyCalContentConverter..getExceptionsAsList),
+	(MyCalContentConverter..find),
+	(MyCalContentConverter..fixDateProperty),
+	(MyCalContentConverter..fixEventDates),
+	(MyCalContentConverter..fixTaskDates),
+	(MyCalContentConverter..isAllDayCheckingDuration),
+	(MyCalContentConverter..importance13To19),
+	(MyCalContentConverter..importance19To13),
+	(MyCalContentConverter..accessClassTo03),
+	(MyCalContentConverter..accessClassFrom03),
+	(MyCalContentConverter..convertAAlarmToReminder),
+	(MyCalContentConverter..convertAAlarmToReminderBasedOnMinutes):
+	* src/java/fr/aliasource/funambol/utils/MyVCalConverter.java:
+	(MyVCalConverter), (MyVCalConverter.MyVCalConverter),
+	(MyVCalConverter.vcalendar2calendar),
+	(MyVCalConverter.calendar2vcalendar),
+	(MyVCalConverter.setCommonProperties):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.foundationCalendarToObmEvent):
+
+2007-09-24  Thomas Cataldo,,,  <thomas.cataldo@aliasource.fr>
+
+	attempt at fixing ical for win mobile
+
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getSyncItemKeysFromTwin),
+	(CalendarSyncSource.getICalFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromICal),
+	(CalendarSyncSource.getFoundationFromSyncItem):
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper), (CalendarHelper..getUTCFormatAllDay):
+	* src/java/fr/aliasource/funambol/utils/MyCalContentConverter.java:
+	(MyCalContentConverter),
+	(MyCalContentConverter..MyCalContentConverter),
+	(MyCalContentConverter.), (MyCalContentConverter..cc2vcc),
+	(MyCalContentConverter..vcc2cc),
+	(MyCalContentConverter..composeFieldXTag),
+	(MyCalContentConverter..composeFieldRrule),
+	(MyCalContentConverter..extractAAlarmPropertyValue),
+	(MyCalContentConverter..composeFieldLastModified),
+	(MyCalContentConverter..extractRRulePropertyValue),
+	(MyCalContentConverter..extractExDatePropertyValue),
+	(MyCalContentConverter..extractRDatePropertyValue),
+	(MyCalContentConverter..extractExceptionsAsSCSVs),
+	(MyCalContentConverter..appendToStringBuffer),
+	(MyCalContentConverter..isEndDateOrDuration),
+	(MyCalContentConverter..instanceModifierToInt),
+	(MyCalContentConverter..isAnInstanceModifier),
+	(MyCalContentConverter..getRecurrencePattern),
+	(MyCalContentConverter..getRDates),
+	(MyCalContentConverter..getExDates),
+	(MyCalContentConverter..getExceptionsAsList),
+	(MyCalContentConverter..find),
+	(MyCalContentConverter..fixDateProperty),
+	(MyCalContentConverter..fixEventDates),
+	(MyCalContentConverter..fixTaskDates),
+	(MyCalContentConverter..isAllDayCheckingDuration),
+	(MyCalContentConverter..importance13To19),
+	(MyCalContentConverter..importance19To13),
+	(MyCalContentConverter..accessClassTo03),
+	(MyCalContentConverter..accessClassFrom03),
+	(MyCalContentConverter..convertAAlarmToReminder),
+	(MyCalContentConverter..convertAAlarmToReminderBasedOnMinutes):
+	* src/java/fr/aliasource/funambol/utils/MyVCalConverter.java:
+	(MyVCalConverter), (MyVCalConverter.MyVCalConverter),
+	(MyVCalConverter.vcalendar2calendar),
+	(MyVCalConverter.calendar2vcalendar),
+	(MyVCalConverter.setCommonProperties):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.foundationCalendarToObmEvent):
+
 2007-09-24  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	misc fixes for win mobile & blacberry.

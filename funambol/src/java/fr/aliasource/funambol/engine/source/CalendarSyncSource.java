@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.funambol.common.pim.calendar.Calendar;
+import com.funambol.common.pim.common.Property;
 import com.funambol.common.pim.converter.CalendarToSIFE;
 import com.funambol.common.pim.converter.ConverterException;
 import com.funambol.common.pim.converter.VCalendarConverter;
@@ -27,6 +28,7 @@ import com.funambol.framework.tools.Base64;
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.Helper;
 import fr.aliasource.funambol.utils.MyCal2Sif;
+import fr.aliasource.funambol.utils.MyVCalConverter;
 import fr.aliasource.obm.items.manager.CalendarManager;
 
 public class CalendarSyncSource extends ObmSyncSource {
@@ -151,8 +153,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 			syncItem.getKey().setKeyValue("");
 			Calendar event = getFoundationFromSyncItem(syncItem);
 
-			keys = manager.getEventTwinKeys(event, this.getSourceType());
+			keys = manager.getEventTwinKeys(event, getSourceType());
 		} catch (OBMException e) {
+			logger.error(e.getMessage(), e);
 			throw new SyncSourceException(e);
 		}
 		SyncItemKey[] ret = getSyncItemKeysFromKeys(keys);
@@ -260,9 +263,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 		// dateAsUTC(calendar);
 
 		try {
-			VCalendarConverter c2vcal = new VCalendarConverter(deviceTimezone,
+			VCalendarConverter c2vcal = new MyVCalConverter(deviceTimezone,
 					deviceCharset);
-			VCalendar cal = c2vcal.calendar2vcalendar(calendar, true);
+			VCalendar cal = c2vcal.calendar2vcalendar(calendar, false);
 			VComponentWriter writer = new VComponentWriter(
 					VComponentWriter.NO_FOLDING);
 			ical = writer.toString(cal);
@@ -295,7 +298,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 		try {
 			ICalendarParser parser = new ICalendarParser(buffer, deviceCharset);
 			VCalendar vcal = (VCalendar) parser.ICalendar();
-			VCalendarConverter vconvert = new VCalendarConverter(
+			VCalendarConverter vconvert = new MyVCalConverter(
 					deviceTimezone, deviceCharset);
 
 			Calendar ret = vconvert.vcalendar2calendar(vcal);
@@ -367,6 +370,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 
 		String content = Helper.getContentOfSyncItem(item, this.isEncode());
 		logger.info("foundFromSync:\n" + content);
+		logger.info(" ===> syncItemKey: " + item.getKey());
 
 		if (MSG_TYPE_ICAL.equals(getSourceType())) {
 			foundationCalendar = getFoundationCalendarFromICal(content);
@@ -374,8 +378,11 @@ public class CalendarSyncSource extends ObmSyncSource {
 			foundationCalendar = getFoundationCalendarFromXML(content);
 		}
 
-		foundationCalendar.getCalendarContent().getUid().setPropertyValue(
-				item.getKey().getKeyAsString());
+		logger.info("calContent.uid: "
+				+ foundationCalendar.getCalendarContent().getUid());
+		
+		foundationCalendar.getCalendarContent().setUid(new Property(item.getKey().getKeyAsString()));
+
 		return foundationCalendar;
 	}
 

@@ -362,15 +362,16 @@ public class CalendarManager extends ObmManager {
 			event.getDtEnd()
 					.setPropertyValue(CalendarHelper.getUTCFormat(dend));
 		} else {
-			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-			cal.setTime(dstart);
-			String formattedDate = CalendarHelper.getUTCFormatAllDay(dstart);
-			event.getDtStart().setPropertyValue(formattedDate);
-//			cal.add(Calendar.DAY_OF_MONTH, 1);
-//			dend = cal.getTime();
-//			formattedDate = CalendarHelper.getUTCFormat(dend);
-			event.getDtEnd().setPropertyValue(formattedDate);
-			event.getDuration().setPropertyValue(0);
+			event.getDtStart().setPropertyValue(
+					CalendarHelper.getUTCFormat(dstart));
+
+			java.util.Calendar temp = java.util.Calendar.getInstance();
+			temp.setTime(dstart);
+			temp.add(java.util.Calendar.SECOND, (int) (86400 * Math.ceil(((float)obmevent.getDuration()) / 86400)));
+			dend = temp.getTime();
+
+			event.getDtEnd()
+					.setPropertyValue(CalendarHelper.getUTCFormat(dend));
 		}
 
 		event.setAllDay(new Boolean(obmevent.isAllday()));
@@ -382,9 +383,9 @@ public class CalendarManager extends ObmManager {
 		event.getLocation().setPropertyValue(obmevent.getLocation());
 
 		if (obmevent.getClassification() == 1) {
-			event.getAccessClass().setPropertyValue(new Short((short)2)); // olPrivate
+			event.getAccessClass().setPropertyValue(new Short((short) 2)); // olPrivate
 		} else {
-			event.getAccessClass().setPropertyValue(new Short((short)0)); // olNormal
+			event.getAccessClass().setPropertyValue(new Short((short) 0)); // olNormal
 		}
 		event.setBusyStatus(new Short((short) 2)); // olBusy
 
@@ -447,7 +448,10 @@ public class CalendarManager extends ObmManager {
 			}
 		}
 
-		String prodId = calendar.getProdId().getPropertyValueAsString();
+		String prodId = "";
+		if (calendar.getProdId() != null) {
+			prodId = calendar.getProdId().getPropertyValueAsString();
+		}
 		logger.info("prodId: " + prodId);
 		Date dstart = parseStart(prodId, foundation, event);
 		Date dend = parseEnd(prodId, foundation, event);
