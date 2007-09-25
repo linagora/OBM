@@ -362,11 +362,15 @@ public class CalendarManager extends ObmManager {
 			event.getDtEnd()
 					.setPropertyValue(CalendarHelper.getUTCFormat(dend));
 		} else {
-			event.getDtStart().setPropertyValue(
-					CalendarHelper.getUTCFormat(dstart));
-
 			java.util.Calendar temp = java.util.Calendar.getInstance();
 			temp.setTime(dstart);
+			temp.set(Calendar.HOUR_OF_DAY, 0);
+			temp.set(Calendar.MINUTE, 0);
+			temp.set(Calendar.SECOND, 0);
+			
+			event.getDtStart().setPropertyValue(
+					CalendarHelper.getUTCFormat(temp.getTime()));
+
 			temp.add(java.util.Calendar.SECOND, (int) (86400 * Math.ceil(((float)obmevent.getDuration()) / 86400)));
 			dend = temp.getTime();
 
@@ -528,10 +532,10 @@ public class CalendarManager extends ObmManager {
 
 		if (foundation.getAllDay() && "Blackberry".equals(prodId)) {
 
-			logger.info("bb detected, adding 1 day to dtstart");
-			cal.add(Calendar.DAY_OF_MONTH, 1);
-			logger.info("utcDate: " + utcDate + " prev dtstart: " + dtStart
-					+ " new dtstart: " + cal.getTime());
+//			logger.info("bb detected, adding 1 day to dtstart");
+//			cal.add(Calendar.DAY_OF_MONTH, 1);
+//			logger.info("utcDate: " + utcDate + " prev dtstart: " + dtStart
+//					+ " new dtstart: " + cal.getTime());
 		}
 		event.setDate(cal);
 		return cal.getTime();
@@ -545,11 +549,11 @@ public class CalendarManager extends ObmManager {
 		cal.setTime(utcDate);
 
 		if (foundation.getAllDay() && "Blackberry".equals(prodId)) {
-
-			logger.info("bb detected, adding 1 day to dtend");
-			cal.add(Calendar.DAY_OF_MONTH, 1);
-			logger.info("utcDate: " + utcDate + " prev dtend: " + dtEnd
-					+ " new dtend: " + cal.getTime());
+//
+//			logger.info("bb detected, adding 1 day to dtend");
+//			cal.add(Calendar.DAY_OF_MONTH, 1);
+//			logger.info("utcDate: " + utcDate + " prev dtend: " + dtEnd
+//					+ " new dtend: " + cal.getTime());
 		}
 		return cal.getTime();
 	}

@@ -265,7 +265,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 		try {
 			VCalendarConverter c2vcal = new MyVCalConverter(deviceTimezone,
 					deviceCharset);
-			VCalendar cal = c2vcal.calendar2vcalendar(calendar, false);
+			VCalendar cal = c2vcal.calendar2vcalendar(calendar, true);
 			VComponentWriter writer = new VComponentWriter(
 					VComponentWriter.NO_FOLDING);
 			ical = writer.toString(cal);
@@ -290,9 +290,8 @@ public class CalendarSyncSource extends ObmSyncSource {
 	private Calendar getFoundationCalendarFromICal(String content)
 			throws OBMException {
 
-		// String toParse = content.replaceAll(";VALUE=DATE-TIME", "");
-		// toParse = toParse.replaceAll("\r\n", "\n");
-		ByteArrayInputStream buffer = new ByteArrayInputStream(content
+		String toParse = content.replaceAll(";VALUE=DATE-TIME", "");
+		ByteArrayInputStream buffer = new ByteArrayInputStream(toParse
 				.getBytes());
 
 		try {

@@ -1,3 +1,14 @@
+2007-09-25  Thomas Cataldo,,,  <set EMAIL_ADDRESS environment variable>
+
+	blackberry ok
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getICalFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromICal):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.parseStart), (CalendarManager.parseEnd):
+
 2007-09-24  Thomas Cataldo,,,  <set EMAIL_ADDRESS environment variable>
 
         sife fix
