@@ -18,7 +18,7 @@ IMPORTANT:
  - Ne pas oublier de faire un dump de la BD avant l'execution du script...
 
 Pré-requis:
- - BD source en Aliamin version 2.4 et OBM version 2.0
+ - BD source en Aliamin version 2.4 et OBM version 1.2
  - Le script update-1.2-2.0.php doit être présent dans le même répertoire ou 
    lancé à la main à la fin de l'execution de ce script
 

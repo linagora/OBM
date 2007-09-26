@@ -6,6 +6,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the navigation bar
 // Parameters:
@@ -27,7 +29,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") 
 
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
   $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
-  if($calendar["output_target"] != "print") {
+  if ($calendar["output_target"] != "print") {
     $display["features"] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable);
     if ($p_view == "month") {
       $block .= dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity);
@@ -1725,10 +1727,10 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
     if($day_num == $first_day_of_week || $current_time == $start_time) {
       $week_num = get_calendar_week_num($current_time);  
       $span = ((($first_day_of_week + 6) - $day_num) % 7) + 1;
-      if($span >= 3) {
-        $line2 .= "<th colspan=\"$span\">$l_week $week_num</th>";
+      if ($span >= 3) {
+        $line2 .= "<th colspan=\"$span\">$l_week <a href=\"calendar_index.php?action=view_week&amp;date=$iso_day\">$week_num</a></th>";
       } else {
-        $line2 .= "<th colspan=\"$span\">$week_num</th>";
+        $line2 .= "<th colspan=\"$span\"><a href=\"calendar_index.php?action=view_week&amp;date=$iso_day\">$week_num</a></th>";
       }
     }
     foreach ($calendar_entity as $type => $entity) {
