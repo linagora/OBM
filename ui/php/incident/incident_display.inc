@@ -123,7 +123,7 @@ function dis_incident_search_form($incident) {
 function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $reso, $incident) {
   global $c_all, $l_all, $l_text, $l_label, $l_id, $l_find;
   global $l_owner, $l_logger,$l_company,$l_contract, $l_status;
-  global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
+  global $l_redhot,$l_hot,$l_normal,$l_low,$l_new,$l_open,$l_call,$l_standby,$l_closed;
   global $l_date_after,$l_date_before,$l_archive,$l_reference;
 
   $text = stripslashes($incident["text"]);
@@ -591,7 +591,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   global $display, $path, $obm, $ico_contract, $l_header_new;
   global $c_php_isodate_format;
   global $l_label,$l_contract,$l_status, $l_find,$l_reference;
-  global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
+  global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_new,$l_standby,$l_closed;
   global $l_logger,$l_owner,$l_priority,$l_incident;
   global $l_update, $l_insert;
   global $l_duration,$l_solution,$l_date, $l_archive_new,$l_res_duration;

@@ -396,14 +396,14 @@ function run_query_incident_id($incident) {
  * @return void
  */
 function get_incident_status($target='') {
-  global $cdg_sql, $cinc_status;
+  global $cdg_sql, $cincident_status;
 
   $sta = array();
 
   if ($target != '') {
-    $status_target[$target] = $cinc_status[$target];
+    $status_target[$target] = $cincident_status[$target];
   } else {
-    $status_target = $cinc_status;
+    $status_target = $cincident_status;
   }
 
   foreach ($status_target as $status => $s_id) {
@@ -423,7 +423,7 @@ function get_incident_status($target='') {
 //                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_update($incident) {
-  global $obm, $cdg_sql, $cinc_status,$l_mail_incident_affected_subject;
+  global $obm, $cdg_sql, $cincident_status,$l_mail_incident_affected_subject;
   global $l_mail_incident_closed_subject, $cmail_incident,$cgp_host;
   global $l_mail_incident_closed_content, $l_mail_incident_affected_content;
 
@@ -458,8 +458,8 @@ function run_query_incident_update($incident) {
   if($inc_info['owner'] != $incident['owner']) {
     $owner_changed = true;
   }
-  if($inc_info['status_id'] != $cinc_status['closed'] 
-    && $status == $cinc_status['closed']) {
+  if ($inc_info['status_id'] != $cincident_status['closed'] 
+    && $status == $cincident_status['closed']) {
     $closed = true;  
   }
 

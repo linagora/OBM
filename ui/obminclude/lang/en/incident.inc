@@ -27,9 +27,8 @@ $l_hot = "Hot";
 $l_normal = "Normal";
 $l_low = "Low";
 $l_open = "Open";
-$l_call = "Call";
 $l_waitcall = "Wait Call";
-$l_paused = "Paused";
+$l_standby = "Standby";
 $l_closed = "Closed";
 
 // Action
@@ -64,8 +63,9 @@ $l_delete_confirm = "Really delete the Incident ?";
 $l_date_after_js = "Date After";
 
 // Incident
+$l_incidentstatus_new = "New";
 $l_incidentstatus_open = "Open";
-$l_incidentstatus_call = "Call";
-$l_incidentstatus_waitforcall = "Wait for call";
-$l_incidentstatus_paused = "Paused";
+$l_incidentstatus_affected = "Affected";
+$l_incidentstatus_standby = "Standby";
+$l_incidentstatus_solved = "Solved";
 $l_incidentstatus_closed = "Closed";

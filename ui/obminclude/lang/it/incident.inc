@@ -30,7 +30,7 @@ $l_low = "Basso";
 $l_open = "Aperto";
 $l_call = "Chiamata";
 $l_waitcall = "Attendi Chiamata";
-$l_paused = "Pausa";
+$l_standby = "Pausa";
 $l_closed = "Chiuso";
 
 // Action

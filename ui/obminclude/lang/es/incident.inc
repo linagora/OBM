@@ -27,7 +27,7 @@ $l_low = "Baja";
 $l_open = "Abierto";
 $l_call = "Llamar";
 $l_waitcall = "Esperar llamada";
-$l_paused = "Pausado";
+$l_standby = "Pausado";
 $l_closed = "Cerrado";
 $l_lastupdate = "Fecha de la última actualización";
 

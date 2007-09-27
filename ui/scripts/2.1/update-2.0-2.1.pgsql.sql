@@ -391,7 +391,7 @@ UPDATE Invoice set invoice_status_id = 1 WHERE invoice_status_id IN
 --
 -- Move Incident status id
 --
-UPDATE Incident set incident_status_id = 0 WHERE incident_status_id IN 
+UPDATE Incident set incident_status_id = 1 WHERE incident_status_id IN 
 (SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Open' OR incidentstatus_label='Ouvert');
 UPDATE Incident set incident_status_id = 1 WHERE incident_status_id IN 
 (SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Call' OR incidentstatus_label='Appel');
@@ -399,7 +399,7 @@ UPDATE Incident set incident_status_id = 2 WHERE incident_status_id IN
 (SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Wait for call' OR incidentstatus_label='Attente Appel');
 UPDATE Incident set incident_status_id = 3 WHERE incident_status_id IN 
 (SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Paused' OR incidentstatus_label='En Pause');
-UPDATE Incident set incident_status_id = 4 WHERE incident_status_id IN 
+UPDATE Incident set incident_status_id = 5 WHERE incident_status_id IN 
 (SELECT incidentstatus_id from IncidentStatus where incidentstatus_label='Closed' OR incidentstatus_label='Cloturé');
 
 

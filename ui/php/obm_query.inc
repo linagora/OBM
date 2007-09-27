@@ -244,14 +244,14 @@ function run_query_incident_status($user_id) {
  * @return void
  */
 function get_incident_status($target='') {
-  global $cdg_sql, $cinc_status;
+  global $cdg_sql, $cincident_status;
 
   $sta = array();
 
   if ($target != '') {
-    $status_target[$target] = $cinc_status[$target];
+    $status_target[$target] = $cincident_status[$target];
   } else {
-    $status_target = $cinc_status;
+    $status_target = $cincident_status;
   }
 
   foreach ($status_target as $status => $s_id) {

@@ -27,9 +27,8 @@ $l_hot = "Urgent";
 $l_normal = "Normal";
 $l_low = "Basse";
 $l_open = "Ouvert";
-$l_call = "Appel en abscence";
 $l_waitcall = "Attente de retour";
-$l_paused = "En Attente";
+$l_standby = "En pause";
 $l_closed = "Fermé";
 $l_lastupdate = "Dernière modification";
 
@@ -65,8 +64,9 @@ $l_delete_confirm = "Confirmer la suppression de l'Incident ?";
 $l_date_after_js = "Date Après";
 
 // Incident
+$l_incidentstatus_new = "Nouveau";
 $l_incidentstatus_open = "Ouvert";
-$l_incidentstatus_call = "Appel";
-$l_incidentstatus_waitforcall = "Attente Appel";
-$l_incidentstatus_paused = "En Pause";
+$l_incidentstatus_affected = "Affecté";
+$l_incidentstatus_standby = "En attente";
+$l_incidentstatus_solved = "Résolu";
 $l_incidentstatus_closed = "Cloturé";
