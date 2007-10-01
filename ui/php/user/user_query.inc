@@ -378,6 +378,9 @@ function run_query_user_insert($user) {
     $mail_ext_perms = ($user['mail_ext_perms'] == '' ? '0' : $user['mail_ext_perms']);
     $mail_server = ($user['mail_server'] == '' ? '0' : $user['mail_server']);
     $mail_quota = $user['mail_quota'];
+    if ($mail_quota == '') {
+      $mail_quota = '0';
+    }
     $query_insert_mail = ',
     userobm_mail_perms,
     userobm_mail_ext_perms,
@@ -577,7 +580,7 @@ function run_query_user_insert($user) {
     if(isset($user['file_tmp']) && $user['file_tmp'] != '') {
       $user['title'] = $login;
       $doc_id = run_query_global_insert_document($user, $id, 'user');
-      if($doc_id > 0) {
+      if ($doc_id > 0) {
         // Update userobm_photo_id
         $query = "UPDATE UserObm SET userobm_photo_id='$doc_id' WHERE userobm_id='$id'"; 
         display_debug_msg($query, $cdg_sql, 'run_query_user_insert(3)');
@@ -587,7 +590,7 @@ function run_query_user_insert($user) {
   }
 
   // Subscribe the user to his default group
-  run_query_user_init_group($user_id, $gid, NULL);
+  run_query_user_init_group($id, $gid, NULL);
 
   return $id;
 }
@@ -618,21 +621,22 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
   // we get the group gid from its id
   $group_id = get_group_id_from_gid($gid);
 
-  $query = "DELETE FROM UserObmGroup
+  if ($group_id > 0) {
+    $query = "DELETE FROM UserObmGroup
     WHERE userobmgroup_userobm_id = '$u_id'
       and userobmgroup_group_id = '$group_id'";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
 
-  $query = "INSERT INTO UserObmGroup (userobmgroup_group_id,
+    $query = "INSERT INTO UserObmGroup (userobmgroup_group_id,
       userobmgroup_userobm_id)
     VALUES ('$group_id', '$u_id')";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
+    $retour = $obm_q->query($query);
+  }
 
   return $retour;
 }
@@ -1114,13 +1118,16 @@ function check_user_login_in_use($login, $u_id='') {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  if ($u_id != '') {
+    $where_uid = "AND userobm_id != '$u_id'";
+  }
 
   $query = "SELECT
       userobm_id,
       userobm_login
     FROM UserObm
     WHERE userobm_login $like '$login'
-      AND userobm_id != '$u_id'";
+      $where_uid";
 
   display_debug_msg($query, $cdg_sql, 'check_user_login_in_use()');
   $obm_q->query($query);
@@ -1166,16 +1173,17 @@ function check_user_context($p_id, $user) {
 //   - $login : login
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_check_user($p_id, $user) {
-  global $cdg_sql, $c_multidomain;
+  global $cdg_sql, $c_multidomain, $obm;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $multidomain = sql_multidomain('userobm');
   $login = $user['login'];
-  $domain = $user['domain'];
-  $where_multidomain = " AND userobm_domain_id='$domain'";
-	
+  $domain_id = $user['domain'];
+  if ($domain_id == '') $domain_id = $obm['domain_id'];
+  $where_multidomain = " AND userobm_domain_id='$domain_id'";
+
   if ($p_id) {
     $where_user = "AND userobm_id != '$p_id'";
   }

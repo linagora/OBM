@@ -191,7 +191,7 @@ function dis_calendar_portal() {
   // Minicalendar
   $i = 0;
   do {
-    if ($i == 0) $dis_minical .= "<tr>";
+    if ($i == 0) $dis_minical .= '<tr>';
     $day = date ('j', $current_time);
     $iso_day = of_isodate_format($current_time);
     $check_month = of_date_get_month($current_time);
@@ -264,7 +264,7 @@ function dis_time_portal() {
   global $l_module_time, $l_my_time, $l_unfilled;
 
   $num = run_query_days_unfilled();
-  if( $num <= 1 ) {
+  if ( $num <= 1 ) {
     $class = 'info';
   } else {
     $class = 'error';

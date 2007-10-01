@@ -325,15 +325,16 @@ function run_query_calendar_waiting_events() {
       AND ( 1=0
       $multidomain";
 
-  if (is_array($writable_cal)) {
-    $query.= "OR ( entity_id IN ('".implode("','",$writable_cal["ids"])."') AND entity_entity = 'user')";    
-  } 
-  if (is_array($writable_res)) {
-    $query.= "OR ( entity_id IN ('".implode("','",$writable_res["ids"])."') AND entity_entity = 'resource')";
+  if (is_array($writable_cal) && (count($writable_cal['ids'])>0)) {
+    $query .= "OR ( entity_id IN ('".implode("','",$writable_cal['ids'])."') AND entity_entity = 'user')";    
+  }
+  if (is_array($writable_res) && (count($writable_res['ids'])>0)) {
+    $query .= "OR ( entity_id IN ('".implode("','",$writable_res['ids'])."') AND entity_entity = 'resource')";
   }
   $query .= " OR (entity_id = '$uid' AND entity_entity = 'user')) ORDER BY entity_entity, entity_label"; 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_waiting_events()");
   $obm_q->query($query);
+
   return $obm_q;
 }
 

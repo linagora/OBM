@@ -21,7 +21,7 @@ CREATE TABLE DomainProperty (
   domainproperty_key       varchar(255) NOT NULL,
   domainproperty_type      varchar(32),
   domainproperty_default   varchar(64),
-  domainproperty_readonly  int(1) DEFAULT 0,
+  domainproperty_readonly  integer DEFAULT 0,
   PRIMARY KEY (domainproperty_key)
 );
 
@@ -85,7 +85,7 @@ ALTER TABLE Invoice ALTER COLUMN invoice_credit_memo SET NOT NULL;
 -------------------------------------------------------------------------------
 -- Add ext_id column
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_ext_id varchar(32);
-ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_ext_id DEFAULT '';
+ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_ext_id SET DEFAULT '';
 -- Add extension column
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_properties text;
 -- Add color column
@@ -166,7 +166,7 @@ ALTER TABLE P_UserObm ADD COLUMN userobm_account_dateexp date;
 -- Update Resource table
 -------------------------------------------------------------------------------
 -- Add ResourceType link
-ALTER TABLE Resource ADD COLUMN resource_rtype_id integer AFTER resource_domain_id;
+ALTER TABLE Resource ADD COLUMN resource_rtype_id integer;
 
 -------------------------------------------------------------------------------
 -- Add delegation fields
@@ -184,10 +184,12 @@ ALTER TABLE P_UserObm ALTER COLUMN userobm_delegation SET DEFAULT '';
 -- UGroup
 ALTER TABLE UGroup ADD COLUMN group_delegation varchar(64);
 ALTER TABLE UGroup ALTER COLUMN group_delegation SET DEFAULT '';
-ALTER TABLE UGroup ADD COLUMN group_manager_id integer SET DEFAULT 0;
+ALTER TABLE UGroup ADD COLUMN group_manager_id integer;
+ALTER TABLE UGroup ALTER COLUMN group_manager_id SET DEFAULT 0;
 ALTER TABLE P_UGroup ADD COLUMN group_delegation varchar(64);
 ALTER TABLE P_UGroup ALTER COLUMN group_delegation SET DEFAULT '';
-ALTER TABLE P_UGroup ADD COLUMN group_manager_id integer SET DEFAULT 0;
+ALTER TABLE P_UGroup ADD COLUMN group_manager_id integer;
+ALTER TABLE P_UGroup ALTER COLUMN group_manager_id SET DEFAULT 0;
 
 -- MailShare
 ALTER TABLE MailShare ADD COLUMN mailshare_delegation varchar(64);
