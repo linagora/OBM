@@ -1,3 +1,10 @@
+2007-10-02  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+        Add "Z" to date if missing, to fix crash with synthesis SyncML
+	
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper..getDateFromUTCString):
+
 2007-09-25  Thomas Cataldo,,,  <set EMAIL_ADDRESS environment variable>
 
 	blackberry ok

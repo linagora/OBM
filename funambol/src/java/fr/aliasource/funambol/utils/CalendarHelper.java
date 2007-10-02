@@ -84,6 +84,9 @@ public class CalendarHelper extends Helper {
 		if (sDate != null) {
 			try {
 				if (sDate.contains("T")) {
+					if (!sDate.endsWith("Z")) {
+						sDate += "Z";
+					}
 					date = dateFormatUTC.parse(sDate);
 				} else {
 					if (sDate.contains("-")) {
@@ -94,7 +97,7 @@ public class CalendarHelper extends Helper {
 				}
 				logger.info("parsed '" + sDate + "' as '" + date + "'");
 			} catch (ParseException e) {
-				// echec
+				logger.error("cannot parse crappy date: " + sDate);
 			}
 		}
 
