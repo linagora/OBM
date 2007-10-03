@@ -1,10 +1,20 @@
 #!/bin/sh
 
 set -e
-set -x
+#set -x
 
 . /usr/share/debconf/confmodule
-. /usr/share/dbconfig-common/dpkg/prerm.mysql 
-dbc_go obm-core $@
 
+
+
+db_get obm-core/mysqlinstall
+if [ "$RET" = "true" ]; then
+	. /usr/share/dbconfig-common/dpkg/prerm.mysql 
+	dbc_go obm-core $@
+elif [ "$RET" = "false" ]; then
+	if [ -f /usr/share/dbconfig-common/dpkg/frontend.pretrm.mysql ]; then
+	   . /usr/share/dbconfig-common/dpkg/frontend.prerm.mysql
+	   dbc_go obm-core $@
+	fi
+fi
 #DEBHELPER#

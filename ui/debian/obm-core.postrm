@@ -1,14 +1,22 @@
 #!/bin/sh
 
 set -e
-set -x
+#set -x
 
 if [ -f /usr/share/debconf/confmodule ]; then
     . /usr/share/debconf/confmodule
 fi
-if [ -f /usr/share/dbconfig-common/dpkg/postrm.mysql ]; then
-    . /usr/share/dbconfig-common/dpkg/postrm.mysql
-    dbc_go obm-core $@
+db_get obm-core/mysqlinstall
+if [ "$RET" = "true" ]; then
+	if [ -f /usr/share/dbconfig-common/dpkg/postrm.mysql ]; then
+	    . /usr/share/dbconfig-common/dpkg/postrm.mysql
+	    dbc_go obm-core $@
+	fi
+elif [ "$RET" = "false" ]; then
+if [ -f /usr/share/dbconfig-common/dpkg/frontend.postrm.mysql ]; then
+   . /usr/share/dbconfig-common/dpkg/frontend.postrm.mysql
+   dbc_go obm-core $@
+fi
 fi
 
 
@@ -18,5 +26,4 @@ if [ "$1" = "purge" ]; then
 		ucf --purge /etc/obm/debian-db-obm.conf
 	fi
 fi
-
 #DEBHELPER#
