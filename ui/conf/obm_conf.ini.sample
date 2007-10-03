@@ -47,7 +47,7 @@ ldapRoot = local
 ; domaines OBM. Cette partition contient toutes les entités du domaine.
 ; Attention : l'activation ou la désactivation de cette option après que des
 ; entités aient été créés n'est pas transparente !
-cyrusParition = false
+cyrusPartition = false
 
 ; Adresse du serveur Samba sur lequel les repertoires personnels sont crees
 ; utile dans les hook

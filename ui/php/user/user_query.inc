@@ -1173,7 +1173,7 @@ function check_user_context($p_id, $user) {
 //   - $login : login
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_check_user($p_id, $user) {
-  global $cdg_sql, $c_multidomain, $obm;
+  global $cdg_sql, $c_singleNameSpace, $obm;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -1249,7 +1249,7 @@ function check_user_data_form($p_id, $user) {
   global $php_regexp_email, $php_regexp_email_name, $php_regexp_quota;
   global $php_regexp_home, $php_regexp_drive, $l_err_home, $l_err_drive;
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
-  global $c_multidomain, $obm, $cgp_use, $c_imagetype;
+  global $c_singleNameSpace, $obm, $cgp_use, $c_imagetype;
   global $c_max_image_size;
   global $l_err_delegation_target_outside, $l_err_delegation_outside_domain;
   global $l_err_delegation_outside_target, $l_err_delegation_target_profile;

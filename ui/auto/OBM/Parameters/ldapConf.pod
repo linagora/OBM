@@ -29,81 +29,81 @@ endroit (même DN) dans l'arbre LDAP.
 Les B<types non structurels> doivent complèter un type structurel. Ils doivent partager le
 même DN qu'un type structurel.
 
-Les types Aliamin déclarés sont :
+Les types OBM déclarés sont :
 
 =over 4
 
 =item $ROOT =E<gt> C<organization>, C<dcObject>
 
-B<structurel> - définit le type Aliamin ROOT, représentant la racine de l'arbre LDAP ;
+B<structurel> - définit le type OBM ROOT, représentant la racine de l'arbre LDAP ;
 
 =item $NODE =E<gt> C<organizationalUnit>
 
-B<structurel> - définit le type Aliamin NODE, représentant un noeud de l'arbre LDAP ;
+B<structurel> - définit le type OBM NODE, représentant un noeud de l'arbre LDAP ;
 
 =item $DOMAINROOT =E<gt> C<organizational>, C<dcObject>
 
-B<structurel> - définit le type Aliamin DOMAINROOT, représentant un noeud de
+B<structurel> - définit le type OBM DOMAINROOT, représentant un noeud de
 l'arbre LDAP correspondant à la racine d'un domaine ;
 
 =item $POSIXUSERS =E<gt> C<posixAccount>, C<shadowAccount>, C<inetOrgPerson>, C<aliaminUsers>
 
-B<structurel> - définit le type Aliamin POSIXUSERS, représentant un utilisateur POSIX ;
+B<structurel> - définit le type OBM POSIXUSERS, représentant un utilisateur POSIX ;
 
 =item $SAMBAUSERS =E<gt> C<sambaSamAccount>
 
-B<non structurel> - définit le type Aliamin SAMBAUSERS, représentant un utilisateur SAMBA ;
+B<non structurel> - définit le type OBM SAMBAUSERS, représentant un utilisateur SAMBA ;
 
 =item $SYSTEMUSER =E<gt> C<account>, C<posixAccount>
 
 B<structurel> - définit le type Alialin SYSTEMUSER, représentant un utilisateur non POSIX.
 Ce type sert à déclarer des utilisateurs définit lors de l'intégration. Ce ne sont pas
 des utilisateurs créées par l'interface. Ces utilisateurs sont utlisées par diverses applications
-(Samba) ou par Aliamin pour se connecter à certains services (LDAP, MySql) ;
+(Samba) ou par OBM pour se connecter à certains services (LDAP, MySql) ;
 
 =item $POSIXGROUPS =E<gt> C<posixGroup>
 
-B<structurel> - définit le type Aliamin POSIXGROUPS, représentant un groupe POSIX ;
+B<structurel> - définit le type OBM POSIXGROUPS, représentant un groupe POSIX ;
 
 =item $SAMBAGROUPS =E<gt> C<sambaGroupMapping>
 
-B<non structurel> - définit le type Aliamin SAMBAGROUPS, représentant un groups SAMBA ;
+B<non structurel> - définit le type OBM SAMBAGROUPS, représentant un groups SAMBA ;
 
 =item $SAMBAHOSTS =E<gt> C<inetOrgPerson>, C<posixAccount>, C<shadowAccount>, C<sambaSamAccount>
 
-B<structurel> - définit le type Aliamin SAMBAHOSTS, représentant un compte machine dans un
+B<structurel> - définit le type OBM SAMBAHOSTS, représentant un compte machine dans un
 domaine Samba ;
 
 =item $ADDRESSBOOK =E<gt> C<groupOfNames>, C<aliaminGroups>
 
-B<non structurel> - définit le type Aliamin ADDRESSBOOK permettant de stocker des contacts
+B<non structurel> - définit le type OBM ADDRESSBOOK permettant de stocker des contacts
 dans l'annuaire LDAP - expérimental 20040930 ;
 
 =item $SAMBADOMAIN =E<gt> C<sambaDomain>
 
-B<structurel> - définit le type Aliamin SAMBADOMAIN, représentant un des nombreux objets LDAP
+B<structurel> - définit le type OBM SAMBADOMAIN, représentant un des nombreux objets LDAP
 nécessaires au fonctionnement de Samba en PDC. Il 'sert' à stocker les informations du domaine
 (entre autre) ;
 
 =item $SAMBAFREEUNIXID =E<gt> C<inetOrgPerson>, C<sambaUnixIdPool>
 
-B<structurel> - définit le type Aliamin SAMBAFREEUNIXID, représentant un des nombreux objets LDAP
+B<structurel> - définit le type OBM SAMBAFREEUNIXID, représentant un des nombreux objets LDAP
 nécessaires au fonctionnement de Samba en PDC. Il 'sert' à stocker les prochains UID et GID
 libres - à approfondir 20040930 -- non implémenté 20070414 ;
 
-=item $POSTFIXCONF =E<gt> C<aliaminPostfix>
+=item $MAILSERVER =E<gt> C<aliaminPostfix>
 
-B<non structurel> - définit le type Aliamin POSTFIXCONF, représentant la
-configuration de postfix dans l'annuaire LDAP ;
+B<non structurel> - définit le type OBM MAILSERVER, représentant la
+configuration du service de messagerie dans l'annuaire LDAP ;
 
 =item $MAILSHARE =E<gt> C<mailShare>
 
-B<structurel> - définit le type Aliamin MAILSHARE représentant les
+B<structurel> - définit le type OBM MAILSHARE représentant les
 répertoires partagés de messagerie ;
 
 =item $GROUPOFNAME =E<gt> C<groupOfNames>
 
-B<structurel> - définit le type Aliamin GROUPOFNAME représentant les
+B<structurel> - définit le type OBM GROUPOFNAME représentant les
 groupes POSIX en utilisant les groupes de noms ;
 
 =back

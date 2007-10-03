@@ -107,7 +107,7 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.5
     MUST uid
 	MAY ( obmDomain ) )
 
-# Object : obmGroup
+# Objet : obmGroup
 # Definition de l'objet specifique a l'application OBM.
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.2
     NAME 'obmGroup'
@@ -116,7 +116,7 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.2
     MUST cn
     MAY ( mailBox $ mail $ mailAlias $ mailAccess $ obmDomain ) )
 
-# Object : obmMailShare
+# Objet : obmMailShare
 # Definition de l'objet permettant de stocker la description des repertoires
 # partages
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.3
@@ -126,7 +126,7 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.3
     MUST ( cn )
     MAY ( mailBox $ mailBoxServer $ mail $ description $ mailAlias $ mailAccess $ obmDomain ) )
 
-# Definition de l'objet 'obmHost'
+# Objet : obmHost
 # Definition de l'objet permettant ed stocker la description des hôtes
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.7
     NAME 'obmHost'
@@ -135,6 +135,7 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.7
     MUST cn
     MAY ( smtpInDomain $ cyrusDomain $ obmDomain ) )
 
+# Attribut : myDestination
 # Permet de stocker la liste des domaines locaux. plusieurs attributs
 # 'myDestination' sont possibles
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.6
@@ -144,6 +145,7 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.6
         SUBSTR caseIgnoreSubstringsMatch
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
+# Attribut : myNetwork
 # Permet de stocker la liste des plages d'adresses a considerer comme locales
 # Plusieurs 'myNetworks' sont possibles
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.7
@@ -153,6 +155,7 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.7
         SUBSTR caseIgnoreSubstringsMatch
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
+# Attribut : relayhost
 # Permet de stocker le relayhost a utiliser. Il doit etre precise sous la forme proto:adresseIP
 # C'est sur ce serveur que les courriers local est dirige.
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.8
@@ -163,6 +166,7 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.8
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{50} 
         SINGLE-VALUE )
 
+# Attribut : smarthost
 # Permet de stocker le smarthost a utiliser. Il doit etre precise sous la forme proto:adresseIP
 # C'est sur ce serveur que les courriers non locaux sont diriges.
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.9
@@ -173,6 +177,7 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.9
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{50} 
         SINGLE-VALUE )
 	
+# Attribut : localRestrictionSender
 # Permet de stocker la police par defaut a appliquer aux mails dont le champs
 # FROM fait partie d'un domaine local
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.10
@@ -183,6 +188,7 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.10
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{10} 
         SINGLE-VALUE )
 
+# Attribut : toLocalDomain
 # Permet de stocker la police par defaut a appliquer aux mails...
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.11
         NAME 'toLocalDomain'
@@ -192,14 +198,43 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.11
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{10} 
         SINGLE-VALUE )
 
-# Definition de l'objet 'obmPostfix'
+# Attribut : imapHost
+# Hôte(s) serveur(s) IMAP pour le domaine.
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.16
+        NAME 'imapHost'
+        DESC 'IMAP Hosts for domain'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Attribut : smtpInHost
+# Hôte(s) serveur(s) SMTP entrant pour le domaine.
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.17
+        NAME 'smtpInHost'
+        DESC 'SMTP-in Hosts for domain'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Attribut : smtpOutHost
+# Hôte(s) serveur(s) SMTP sortant pour le domaine.
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.18
+        NAME 'smtpOutHost'
+        DESC 'SMTP-out Hosts for domain'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Objet : obmMailServer
+# Definition de l'objet 'obmMailServer'
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.4
-    NAME 'obmPostfix'
-    DESC 'Postfix configuration object'
+    NAME 'obmMailServer'
+    DESC 'Mail servers configuration for the domain'
     SUP top STRUCTURAL
     MUST ( cn )
-    MAY ( myDestination $ obmDomain ) )
+    MAY ( myDestination $ obmDomain $ imapHost $ smtpInHost $ smtpOutHost ) )
 
+# objet : obmSamba
 # Definition de l'objet 'obmSamba'
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.6
     NAME 'obmSamba'

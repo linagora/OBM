@@ -63,7 +63,7 @@ function dis_admin_index($mode, $lifetime) {
 function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   global $l_check, $l_database_server, $l_database,$l_last_page,$l_user_ip,$l_execute;
   global $l_session_stats, $l_session, $l_user_session, $l_lifetime, $l_active_user, $l_login_date, $l_last_acces,$l_nb_connec;
-  global $obm_version, $l_version, $l_date, $l_host, $l_domain, $c_multidomain;
+  global $obm_version, $l_version, $l_date, $l_host, $l_domain, $c_singleNameSpace;
 
   $date = of_datetime_format();
   if ($lifetime > 0) {
@@ -94,7 +94,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
       </tr>";
   }
   
-  $multidomain = $c_multidomain == true ? "Multi" : "Single";
+  $multidomain = $c_singleNameSpace == false ? "Multi" : "Single";
 	 
   $block = "
     <div class=\"detail infos\">

@@ -396,7 +396,7 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
 //   - entity domain id
 ///////////////////////////////////////////////////////////////////////////////
 function of_domain_get_entity_domain_id($id, $entityu, $ptable="") {
-  global $cdg_sql, $c_multidomain;
+  global $cdg_sql, $c_singleNameSpace;
 
   // domain default value
   $dom_id = 0;

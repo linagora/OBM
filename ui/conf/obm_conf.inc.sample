@@ -17,9 +17,6 @@ $cgp_host = "http://obm/";
 // Resources alias absolute path. (default value is "/images")
 // $resources_path = "$cgp_host/images"; 
 
-// Multi-domain handling
-//$c_multidomain = true;
-
 // Home page redirection
 //$c_home_redirect = "$cgp_host" . "calendar/calendar_index.php";
 

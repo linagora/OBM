@@ -474,6 +474,9 @@ ALTER TABLE P_MailServer ALTER COLUMN mailserver_smtp_in SET DEFAULT 0;
 ALTER TABLE P_MailServer ADD COLUMN mailserver_smtp_out integer default 0;
 ALTER TABLE P_MailServer ALTER COLUMN mailserver_smtp_out SET DEFAULT 0;
 
+-- With OBM < 2.1, the mail servers are 'imap' and 'smtp-in'
+UPDATE MailServer SET mailserver_imap=1, mailserver_smtp_in=1;
+
 
 --
 -- Domain - Mail server link table
@@ -483,6 +486,10 @@ CREATE TABLE DomainMailServer (
   domainmailserver_mailserver_id  integer NOT NULL,
   domainmailserver_role           varchar(16) NOT NULL default 'imap'
 );
+
+-- With OBM < 2.1, the mail servers are 'imap' and 'smtp-in' for all domains
+INSERT INTO DomainMailServer (domainmailserver_mailserver_id, domainmailserver_domain_id, domainmailserver_role) SELECT i.mailserver_id, j.domain_id, 'imap' FROM MailServer i, Domain j WHERE i.mailserver_imap=1;
+INSERT INTO DomainMailServer (domainmailserver_mailserver_id, domainmailserver_domain_id, domainmailserver_role) SELECT i.mailserver_id, j.domain_id, 'smtp_in' FROM MailServer i, Domain j WHERE i.mailserver_smtp_in=1;
 
 
 --

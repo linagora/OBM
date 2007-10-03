@@ -132,7 +132,7 @@ sub getEntity {
 
 
     # Obtention des domaines pour lesquels cet hôte est serveur SMTP entrant
-    $query = "select distinct(i.domain_label) FROM Domain i, DomainMailServer j, MailServer k WHERE k.mailserver_host_id=".$self->{"hostDesc"}->{"host_id"}." AND k.mailserver_id=j.domainmailserver_mailserver_id AND j.domainmailserver_role='smtp-in' AND j.domainmailserver_domain_id=i.domain_id";
+    $query = "select distinct(i.domain_label) FROM Domain i, DomainMailServer j, MailServer k WHERE k.mailserver_host_id=".$self->{"hostDesc"}->{"host_id"}." AND k.mailserver_id=j.domainmailserver_mailserver_id AND j.domainmailserver_role='smtp_in' AND j.domainmailserver_domain_id=i.domain_id";
 #    $query = "SELECT i.domain_label from Domain i, MailServer j WHERE i.domain_mail_server_id=j.mailserver_id AND j.mailserver_host_id=".$hostId;
 
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -141,7 +141,7 @@ sub getEntity {
     }
 
     while( my( $obmDomain ) = $queryResult->fetchrow_array() ) {
-        push( @{$self->{"hostDesc"}->{"smtp-in_domain"}}, $obmDomain );
+        push( @{$self->{"hostDesc"}->{"smtpin_domain"}}, $obmDomain );
     }
 
     # Obtention des domaines pour lesquels cet hôte est serveur de courrier
@@ -302,12 +302,12 @@ sub createLdapEntry {
     }
 
     # Les domaines pour lesquels cet hôte est serveur SMTP entrant
-    if( defined($entry->{"smtp-in_domain"}) && (ref($entry->{"smtp-in_domain"}) eq "ARRAY" ) ) {
-        for( my $i=0; $i<=$#{$entry->{"smtp-in_domain"}}; $i++ ) {
-            $entry->{"smtp-in_domain"}->[$i] = to_utf8({ -string => $entry->{"smtp-in_domain"}->[$i], -charset => $defaultCharSet });
+    if( defined($entry->{"smtpin_domain"}) && (ref($entry->{"smtpin_domain"}) eq "ARRAY" ) ) {
+        for( my $i=0; $i<=$#{$entry->{"smtpin_domain"}}; $i++ ) {
+            $entry->{"smtpin_domain"}->[$i] = to_utf8({ -string => $entry->{"smtpin_domain"}->[$i], -charset => $defaultCharSet });
         }
 
-        $ldapEntry->add( smtpInDomain => $entry->{"smtp-in_domain"} );
+        $ldapEntry->add( smtpInDomain => $entry->{"smtpin_domain"} );
     }
 
     # Les domaines pour lesquels cet hôte est serveur Cyrus
@@ -345,7 +345,7 @@ sub updateLdapEntry {
     }
 
     # Les domaines pour lesquels cet hôte est serveur SMTP
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"smtp-in_domain"}, $ldapEntry, "smtpInDomain" ) ) {
+    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"smtpin_domain"}, $ldapEntry, "smtpInDomain" ) ) {
         $update = 1;
     }
 

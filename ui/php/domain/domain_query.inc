@@ -172,6 +172,11 @@ function run_query_domain_replace_properties($domain_id,$domain) {
   while($prop_q->next_record()) {
     $key = $prop_q->f('domainproperty_key');
     $value = $domain[$key];
+
+    if ($value == '') {
+        $value = $prop_q->f('domainproperty_default');
+    }
+
     if ($value != '') {
       $query = "INSERT INTO DomainPropertyValue (
         domainpropertyvalue_domain_id,
@@ -370,7 +375,8 @@ function run_query_domain_properties($domain_id=0) {
   $query = "SELECT 
       $val
       domainproperty_key,
-      domainproperty_type
+      domainproperty_type,
+      domainproperty_default
     FROM DomainProperty $join
     WHERE domainproperty_readonly = 0";
   

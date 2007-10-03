@@ -316,7 +316,7 @@ class Auth {
   
 
   function is_authenticated() {
-    global $obm, $c_multidomain;
+    global $obm, $c_singleNameSpace;
 
     if (
       $obm["uid"] && 

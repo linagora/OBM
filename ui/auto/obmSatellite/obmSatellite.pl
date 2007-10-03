@@ -244,7 +244,7 @@ sub process_request {
                 if( $currentRequest =~ /^smtpInConf: ([A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9])$/i ) {
                     my $hostName = $1;
 
-                    my $domainList = $self->getServerDomains( "smtp-in", $hostName );
+                    my $domainList = $self->getServerDomains( "smtp_in", $hostName );
                     if( !defined($domainList) || ( ref($domainList) ne "ARRAY" ) ) {
                         $self->logMessage( "L'hote '".$hostName."' n'est serveur SMTP entrant d'aucun domaine" );
                         $self->sendMessage( "ERROR", $hostName." n'est pas un serveur SMTP entrant" );
@@ -417,19 +417,23 @@ sub getServerDomains {
         return $domainList;
     }
 
-    my $ldapFilter = "(&(objectclass=obmHost)(cn=".$hostName."))";
-    my $ldapAttributes;
+    if( !defined($hostName) || ($hostName =~ /^$/) ) {
+        return $domainList;
+    }
+
+
+    my $ldapFilter;
 
     SWITCH: {
-        if( $type =~ /^smtp-in$/ ) {
+        if( $type =~ /^smtp_in$/ ) {
             $self->logMessage( "Obtention des domaines du serveur '".$hostName."' de type SMTP-in" );
-            $ldapAttributes = [ 'smtpInDomain' ];
+            $ldapFilter = "smtpInHost=".$hostName;
             last SWITCH;
         }
 
         if( $type =~ /^imap$/ ) {
             $self->logMessage( "Obtention des domaines du serveur '".$hostName."' de type IMAP" );
-            $ldapAttributes = [ 'cyrusDomain' ];
+            $ldapFilter = "imapHost=".$hostName;
             last SWITCH;
         }
 
@@ -438,7 +442,11 @@ sub getServerDomains {
         return $domainList;
     }
 
-    # LDAP connection
+    $ldapFilter = "(&(objectclass=obmMailServer)(".$ldapFilter."))";
+    my $ldapAttributes = [ 'obmDomain' ];
+
+
+    # LDAP connexion
     if( defined($self->{"ldap_server"}->{"login"}) ) {
         $self->logMessage( "Connexion authentifiee a l'annuaire LDAP" );
     }else {
@@ -464,6 +472,8 @@ sub getServerDomains {
             push( @{$domainList}, $entryDomainList->[$j] );
         }
     }
+
+    $self->logMessage( "Domaines associes a l'hote '".$hostName."' : ".join( ",", @{$domainList} ) );
 
     $self->logMessage( "Deconnexion de l'annuaire LDAP" );
     &OBM::ObmSatellite::utils::disconnectLdapSrv( $self->{ldap_server} );

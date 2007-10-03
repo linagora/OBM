@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
  
-global $set_lang_default,$set_theme_default,$c_multidomain;
+global $set_lang_default, $set_theme_default, $c_singleNameSpace;
 
 $login_javascript_footer = "
 <script type=\"text/javascript\">
@@ -33,7 +33,7 @@ if (file_exists($conf_login_page)) {
   $lp = $login_template;
 }
 
-if ($c_multidomain) {
+if (!$c_singleNameSpace) {
   $domain_id = isset($_REQUEST["sel_domain"])?$_REQUEST["sel_domain"]:$c_default_domain;
   $sel_domain = of_domain_dis_select($domain_id);
   $domain = $l_domain;

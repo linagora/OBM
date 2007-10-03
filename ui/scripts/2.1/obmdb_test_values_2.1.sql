@@ -107,7 +107,7 @@ INSERT INTO MailServer (mailserver_host_id, mailserver_imap, mailserver_smtp_in,
 DELETE FROM DomainMailServer;
 
 -- Assignation du serveur SMTP entrant au domain 'Domain 1'
-INSERT DomainMailServer (domainmailserver_domain_id, domainmailserver_mailserver_id, domainmailserver_role) VALUES ( (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT i.mailserver_id FROM MailServer i, Host j WHERE i.mailserver_host_id=j.host_id AND j.host_name='smtp-in'), 'smtp-in' );
+INSERT DomainMailServer (domainmailserver_domain_id, domainmailserver_mailserver_id, domainmailserver_role) VALUES ( (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT i.mailserver_id FROM MailServer i, Host j WHERE i.mailserver_host_id=j.host_id AND j.host_name='smtp-in'), 'smtp_in' );
 -- Assignation du serveur de BAL au domain 'Domain 1'
 INSERT DomainMailServer (domainmailserver_domain_id, domainmailserver_mailserver_id, domainmailserver_role) VALUES ( (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT i.mailserver_id FROM MailServer i, Host j WHERE i.mailserver_host_id=j.host_id AND j.host_name='srv-mail'), 'imap' );
 

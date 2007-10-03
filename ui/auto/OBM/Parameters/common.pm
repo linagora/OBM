@@ -78,7 +78,7 @@ if( lc($cfgFile->val( 'automate', 'oldSidMapping' )) eq "true" ) {
 }
 
 # Gestion d'une partition cyrus par domaine
-if( lc($cfgFile->val( 'automate', 'cyrusParition' )) eq "true" ) {
+if( lc($cfgFile->val( 'automate', 'cyrusPartition' )) eq "true" ) {
     $cyrusDomainPartition = 1;
 }else {
     $cyrusDomainPartition = 0;

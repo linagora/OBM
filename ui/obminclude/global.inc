@@ -26,9 +26,6 @@ $cgp_host = 'http://obmlocal/';
 // OBM default resources path
 $resources_path = '/images';
 
-// Multidomain
-$c_multidomain = true;
-
 // Todo lines to display
 $cgp_todo_nb = 5;
 
@@ -287,7 +284,7 @@ $cgp_show['module']['vacation'] = 'my';
 $cgp_show['module']['mailbox'] = 'my';
 
 // Display domain module only when multidomain is activate
-if ($c_multidomain) {
+if (!$c_singleNameSpace) {
   $cgp_show['module']['domain'] = 'admin';
 }
 
@@ -336,6 +333,9 @@ $obmdb_dbtype = $ini_array['dbtype'];
 $obmdb_db = $ini_array['db'];
 $obmdb_user = $ini_array['user'];
 $obmdb_password = $ini_array['password'];
+
+// Single og multi domain ?
+$c_singleNameSpace = $ini_array['singleNameSpace'];
 
 ///////////////////////////////////////////////////////////////////////////////
 // Fin du chargement
