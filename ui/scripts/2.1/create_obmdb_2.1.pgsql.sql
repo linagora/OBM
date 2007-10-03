@@ -1356,6 +1356,7 @@ CREATE TABLE Payment (
   payment_inout           char(1) NOT NULL DEFAULT '+',
   payment_number          varchar(24) NOT NULL DEFAULT '',
   payment_checked         char(1) NOT NULL DEFAULT '0',
+  payment_gap             decimal(10,2) DEFAULT '0.0' NOT NULL,
   payment_comment         text,
   PRIMARY KEY (payment_id)
 );

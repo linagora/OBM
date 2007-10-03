@@ -370,6 +370,14 @@ INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentk
 
 
 --
+-- UPDATE Payment Structure
+--
+ALTER TABLE Payment ADD COLUMN payment_gap decimal(10,2);
+ALTER TABLE Payment ALTER COLUMN SET DEFAULT '0,0';
+ALTER TABLE Payment ALTER COLUMN SET NOT NULL;
+
+
+--
 -- Move Invoice status id
 --
 UPDATE Invoice set invoice_status_id = 0 WHERE invoice_status_id IN 

@@ -144,11 +144,16 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == "mailserver_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params['mailserver_nb'] > 0) {
-    $nb = run_query_domain_mailserver_insert($params);
-    //      set_update_state();
-    $display["msg"] .= display_ok_msg("$nb $l_mailserver_added");
+  if (check_domain_can_add_mailserver($params)) {
+    if ($params['mailserver_nb'] > 0) {
+      $nb = run_query_domain_mailserver_insert($params);
+      //      set_update_state();
+      $display["msg"] .= display_ok_msg("$nb $l_mailserver_added");
+    } else {
+      $display['msg'] .= display_err_msg($l_no_mailserver_added);
+    }
   } else {
+    $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_err_msg($l_no_mailserver_added);
   }
   $display['detail'] = dis_domain_consult($params);

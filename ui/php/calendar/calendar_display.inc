@@ -2825,9 +2825,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   }
   $dis_min_b .= "</select>";  
 
- $dis_min_e = "<select name=\"sel_min_end\" style=\"width:4em;\">";
-  for ($i=4;$i>=1;$i--) {
-    $current_min = substr("0".(60 - (15*$i)),-2);
+  $dis_min_e = "<select name=\"sel_min_end\" style=\"width:4em;\">";
+  //  for ($i=4;$i>=1;$i--) {
+  //    $current_min = substr("0".(60 - (15*$i)),-2);
+  for ($i=60;$i>=1;$i--) {
+    $current_min = substr("0".(60 - (1*$i)),-2);
     if ($current_min  == $minend) {
       $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     } else {

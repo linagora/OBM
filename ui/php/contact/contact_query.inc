@@ -698,7 +698,11 @@ function run_query_contact_update($contact) {
   $email2 = $contact["email2"];
   $mailok = ($contact["mailok"] == "1" ? "1" : "0");
   $newsletter = ($contact["newsletter"] == "1" ? "1" : "0");
-  $date = ($contact["date"] ? "'".of_isodate_convert($contact["date"])."'" : "null");
+  if ($contact['date'] != '') {
+    $query_date = "contact_date = '".of_isodate_convert($contact['date'])."',";
+  } else {
+    $query_date = "contact_date = null,";
+  }
   $comment = $contact["comment"];
   $add_comment = $contact["add_comment"];
   if ($add_comment != "") {
@@ -756,7 +760,7 @@ function run_query_contact_update($contact) {
     contact_newsletter='$newsletter',
     contact_archive='$archive',
     contact_privacy='$priv',
-    contact_date=$date,
+    $query_date
     contact_comment='$comment',
     contact_comment2='$comment2',
     contact_comment3='$comment3'

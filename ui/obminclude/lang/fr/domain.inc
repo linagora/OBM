@@ -41,6 +41,7 @@ $l_mailserver_added = "Serveurs de messagerie ajoutés";
 $l_mailserver_removed = "Serveur de messagerie enlevé";
 $l_no_mailserver_added = "Pas de serveur de messagerie à ajouter";
 $l_mailserver_cant_delete = "Le serveur de messagerie ne peut être supprimé du domaine";
+$l_mailserver_invalid_role = "Le rôle du serveur de messagerie est incorrect";
 
 // JavaScript Messages
 $l_fill_title = "Vous devez renseigner le Label avant de valider.";

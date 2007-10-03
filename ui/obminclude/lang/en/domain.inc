@@ -27,9 +27,6 @@ $l_label_error = "Invalid label !";
 $l_can_delete = "The domain can be deleted.";
 $l_cant_delete = "The domain can't be deleted !";
 
-// JavaScript Messages
-$l_fill_title = "You have to fill the Title before submitting.";
-
 $l_max_user = "# users max";
 $l_max_resource = "# resources max";
 $l_max_mailshare = "# mailshares max";
@@ -37,3 +34,15 @@ $l_mail_quota = "Email quota";
 $l_address1 = "$l_address 1";
 $l_address2 = "$l_address 2";
 $l_address3 = "$l_address 3";
+
+$l_link_user_mailserver = "Mailserver stores some users in the domain";
+$l_link_user_mailserver_no = "Mailserver has no users in the domain";
+$l_mailserver_added = "Mailserver added";
+$l_mailserver_removed = "Mailserver removed";
+$l_no_mailserver_added = "No mailserver to add";
+$l_mailserver_cant_delete = "Mailserver can be removed from the domain";
+$l_mailserver_invalid_role = "The mailserver role is incorrect";
+
+// JavaScript Messages
+$l_fill_title = "You have to fill the Title before submitting.";
+

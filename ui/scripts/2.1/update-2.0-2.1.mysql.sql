@@ -356,6 +356,12 @@ INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentk
 
 
 --
+-- UPDATE Payment Structure
+--
+ALTER TABLE Payment ADD COLUMN payment_gap double(10,2) DEFAULT '0,0' NOT NULL AFTER payment_checked;
+
+
+--
 -- Move Invoice status id
 --
 UPDATE Invoice set invoice_status_id = 0 WHERE invoice_status_id IN 

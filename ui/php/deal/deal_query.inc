@@ -1,4 +1,4 @@
-<?php
+ <?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : deal_query.inc                                               //
 //     - Desc : Deal query File                                              //
@@ -13,69 +13,73 @@
 //   - $deal[]   : deal search criteria
 //   - $all : if it is set to 1 then return also the private deals ...
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_search($deal, $all="") {
+function run_query_deal_search($deal, $all='') {
   global $c_all, $cdg_sql, $ctu_sql_limit;
   global $cgp_archive_only;
 
-  $sql_order_dir = $deal["sql_order_dir"];
-  $sql_order_field = $deal["sql_order_field"];
+  $sql_order_dir = $deal['sql_order_dir'];
+  $sql_order_field = $deal['sql_order_field'];
 
-  $parent = $deal["parentdeal_id"];
-  $label = sql_search_text_parse($deal["label"]);
-  $company_id = $deal["company_id"];
-  $name = sql_search_text_parse($deal["company_name"]);
-  $zip = sql_search_text_parse($deal["zip"]);
-  $archive = $deal["archive"];
-  $kind = $deal["kind_id"];
-  $region = $deal["region"];
-  $tt = $deal["tasktype"];
-  $role = $deal["role"];
-  $status = $deal["status_id"];
-  $manager = $deal["manager"];
-  $date_field = ($deal["date_field"] ? $deal["date_field"] : "datealarm");
-  $date_after = of_isodate_convert($deal["date_after"],true);
-  $date_before = of_isodate_convert($deal["date_before"],true);
-  $role_company = sql_search_text_parse($deal["role_company"]);
-  $contact_id = $deal["contact_id"];
+  $parent = $deal['parentdeal_id'];
+  $label = sql_search_text_parse($deal['label']);
+  $company_id = $deal['company_id'];
+  $name = sql_search_text_parse($deal['company_name']);
+  $zip = sql_search_text_parse($deal['zip']);
+  $archive = $deal['archive'];
+  $kind = $deal['kind_id'];
+  $number = $deal['number'];
+  $region = $deal['region'];
+  $tt = $deal['tasktype'];
+  $role = $deal['role'];
+  $status = $deal['status_id'];
+  $manager = $deal['manager'];
+  $date_field = ($deal['date_field'] ? $deal['date_field'] : 'datealarm');
+  $date_after = of_isodate_convert($deal['date_after'],true);
+  $date_before = of_isodate_convert($deal['date_before'],true);
+  $role_company = sql_search_text_parse($deal['role_company']);
+  $contact_id = $deal['contact_id'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $datebegin = sql_date_format($db_type, "deal_datebegin", "deal_datebegin");
-  $datealarm = sql_date_format($db_type, "deal_datealarm", "deal_datealarm");
-  $dateexp = sql_date_format($db_type, "deal_dateexpected", "deal_dateexpected");
-  $dateend = sql_date_format($db_type, "deal_dateend", "deal_dateend");
-  $multidomain = sql_multidomain("deal");
+  $datebegin = sql_date_format($db_type, 'deal_datebegin', 'deal_datebegin');
+  $datealarm = sql_date_format($db_type, 'deal_datealarm', 'deal_datealarm');
+  $dateexp = sql_date_format($db_type, 'deal_dateexpected', 'deal_dateexpected');
+  $dateend = sql_date_format($db_type, 'deal_dateend', 'deal_dateend');
+  $multidomain = sql_multidomain('deal');
 	
-  $where .= sql_obm_entity_privacy("deal");
+  $where .= sql_obm_entity_privacy('deal');
 
-  if ($label != "") {
+  if ($label != '') {
     $where .= " AND deal_label $like '%$label%'";
   }
-  if (($kind != $c_all) && ($kind != "")) {
+  if ($number != '') {
+    $where .= " AND deal_number $like '%$number%'";
+  }
+  if (($kind != $c_all) && ($kind != '')) {
     $where .= " AND deal_type_id='$kind'";
   }
-  if (($region != $c_all) && ($region != "")) {
+  if (($region != $c_all) && ($region != '')) {
     $where .= " AND deal_region_id='$region'";
   }
-  if (($tt != $c_all) && ($tt != "")) {
+  if (($tt != $c_all) && ($tt != '')) {
     $where .= " AND deal_tasktype_id='$tt'";
   }
-  if (($role != $c_all) && ($role != "")) {
+  if (($role != $c_all) && ($role != '')) {
     $join_role = "LEFT JOIN DealCompany ON deal_id=dealcompany_deal_id";
     $where .= " AND dealcompany_role_id='$role'";
   }
-  if ($role_company != "") {
+  if ($role_company != '') {
     $join_role = "LEFT JOIN DealCompany ON deal_id=dealcompany_deal_id";
     $join_role .= " LEFT JOIN Company as dc ON dealcompany_company_id=dc.company_id";
-    $where .= sql_global_company_name_advanced_search($role_company, $like, "dc");
+    $where .= sql_global_company_name_advanced_search($role_company, $like, 'dc');
   }
-  if ($company_id != "") {
+  if ($company_id != '') {
     $join_comp = "LEFT JOIN Company ON deal_company_id=company_id";
     $where .= " AND deal_company_id='$company_id'";
   }
-  if ($name != "") {
+  if ($name != '') {
     $join_comp = "LEFT JOIN Company ON deal_company_id=company_id";
     $where .= sql_global_company_name_advanced_search($name, $like);
   }
@@ -83,51 +87,51 @@ function run_query_deal_search($deal, $all="") {
     $where .= " AND (deal_contact1_id='$contact_id'
                     OR deal_contact2_id='$contact_id')";
   }
-  if ($zip != "") {
+  if ($zip != '') {
     $join_comp = "LEFT JOIN Company ON deal_company_id=company_id";
     $where .= " AND company_zipcode $like '$zip%'";
   }
-  if (($status != $c_all) && ($status != "")) {
+  if (($status != $c_all) && ($status != '')) {
     $where .= " AND deal_status_id='$status'";
   }
-  if ($date_after != "") {
+  if ($date_after != '') {
     $where .= " AND deal_$date_field > '$date_after'";
   }
-  if ($date_before != "") {
+  if ($date_before != '') {
     $where .= " AND deal_$date_field < '$date_before'";
   }
-  if ($archive != "1") {
-    $where .= " AND deal_archive=0";
+  if ($archive != '1') {
+    $where .= ' AND deal_archive=0';
   } elseif($cgp_archive_only) {
-    $where .= " AND deal_archive=1";
+    $where .= ' AND deal_archive=1';
   }
-  if (($manager != $c_all) && ($manager != "")) {
+  if (($manager != $c_all) && ($manager != '')) {
     $where .= " AND (deal_technicalmanager_id='$manager'
                     OR deal_marketingmanager_id='$manager')";
   } 
-  if ($parent != "") {
+  if ($parent != '') {
     $where .= " AND deal_parentdeal_id='$parent'";
   }
 
   // User defined data
-  $userdata = of_userdata_query_search("deal", $deal);
-  if ($userdata["where"] != "") {
-    $where .= " AND ". $userdata["where"];
-    $join_userdata = $userdata["join"];
+  $userdata = of_userdata_query_search('deal', $deal);
+  if ($userdata['where'] != '') {
+    $where .= ' AND '. $userdata['where'];
+    $join_userdata = $userdata['join'];
   }
 
   $whereq = "WHERE $where $multidomain";
 
 
   // ORDER construction
-  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "deal_$date_field";
+  $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : "deal_$date_field";
   // Order exceptions (order on calculated rows)
-  if (strcmp($sql_order_field, "expected_quarter")==0) {
-    $order = "deal_dateexpected";
-  } else if (strcmp($sql_order_field, "end_quarter")==0) {
-    $order = "deal_dateend";
-  } else if (strcmp($sql_order_field, "sale_delay")==0) {
-    $order = "deal_dateexpected-deal_datebegin";
+  if (strcmp($sql_order_field, 'expected_quarter')==0) {
+    $order = 'deal_dateexpected';
+  } else if (strcmp($sql_order_field, 'end_quarter')==0) {
+    $order = 'deal_dateend';
+  } else if (strcmp($sql_order_field, 'sale_delay')==0) {
+    $order = 'deal_dateexpected-deal_datebegin';
   }
   $orderq = " ORDER BY $order $sql_order_dir $order_next";
 
@@ -184,7 +188,7 @@ function run_query_deal_search($deal, $all="") {
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0) || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "deal_search()");
+    display_debug_msg($query, $cdg_sql, 'deal_search()');
     $obm_q->query($query);
   }
 
@@ -203,14 +207,14 @@ function run_query_deal_detail($id) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
-  $datebegin = sql_date_format($db_type, "deal_datebegin", "datebegin");
-  $dateprop = sql_date_format($db_type, "deal_dateproposal", "dateproposal");
-  $datealarm = sql_date_format($db_type, "deal_datealarm", "datealarm");
-  $dateexp = sql_date_format($db_type, "deal_dateexpected", "dateexpected");
-  $dateend = sql_date_format($db_type, "deal_dateend", "dateend");
-  $timeupdate = sql_date_format($db_type, "deal_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($db_type, "deal_timecreate", "timecreate");
-  $multidomain = sql_multidomain("deal");
+  $datebegin = sql_date_format($db_type, 'deal_datebegin', 'datebegin');
+  $dateprop = sql_date_format($db_type, 'deal_dateproposal', 'dateproposal');
+  $datealarm = sql_date_format($db_type, 'deal_datealarm', 'datealarm');
+  $dateexp = sql_date_format($db_type, 'deal_dateexpected', 'dateexpected');
+  $dateend = sql_date_format($db_type, 'deal_dateend', 'dateend');
+  $timeupdate = sql_date_format($db_type, 'deal_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'deal_timecreate', 'timecreate');
+  $multidomain = sql_multidomain('deal');
 
   $query = "SELECT Deal.*,
       deal_privacy as privacy,
@@ -252,7 +256,7 @@ function run_query_deal_detail($id) {
     WHERE deal_id='$id'
       AND tasktype_id=deal_tasktype_id $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_detail()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -268,51 +272,51 @@ function run_query_deal_detail($id) {
 function run_query_deal_insert($deal) {
   global $cdg_sql, $l_no, $obm;
 
-  $now = date("Y-m-d H:i:s");
-  $pid = ($deal["parentdeal_id"] ? "'".$deal["parentdeal_id"]."'" : "null");
-  $num = $deal["num"];
-  $label = $deal["label"];
-  $priv = $deal["privacy"];
-  $datebegin = ($deal["datebegin"] ? "'".of_isodate_convert($deal["datebegin"])."'" : "null");
-  $dateprop = ($deal["dateproposal"] ? "'".of_isodate_convert($deal["dateproposal"])."'" : "null");
-  $dateend = ($deal["dateend"] ? "'".of_isodate_convert($deal["dateend"])."'" : "null");
-  $dateexp = ($deal["dateexpected"] ? "'".of_isodate_convert($deal["dateexpected"])."'" : "null");
-  $datealarm = ($deal["datealarm"] ? "'".of_isodate_convert($deal["datealarm"])."'" : "null");
-  $kind = $deal["kind_id"]; 
-  $region = $deal["region"]; 
-  $tt = $deal["tasktype"];
-  $comp = $deal["company_id"];
-  $market = ($deal["market"] ? "'".$deal["market"]."'" : "null");
-  $tech = ($deal["tech"] ? "'".$deal["tech"]."'" : "null");
-  $source_id = ($deal["source_id"] ? "'".$deal["source_id"]."'" : "0");
-  $source = $deal["source"];
+  $now = date('Y-m-d H:i:s');
+  $pid = ($deal['parentdeal_id'] ? "'".$deal['parentdeal_id']."'" : 'null');
+  $number = $deal['number'];
+  $label = $deal['label'];
+  $priv = $deal['privacy'];
+  $datebegin = ($deal['datebegin'] ? "'".of_isodate_convert($deal['datebegin'])."'" : 'null');
+  $dateprop = ($deal['dateproposal'] ? "'".of_isodate_convert($deal['dateproposal'])."'" : 'null');
+  $dateend = ($deal['dateend'] ? "'".of_isodate_convert($deal['dateend'])."'" : 'null');
+  $dateexp = ($deal['dateexpected'] ? "'".of_isodate_convert($deal['dateexpected'])."'" : 'null');
+  $datealarm = ($deal['datealarm'] ? "'".of_isodate_convert($deal['datealarm'])."'" : 'null');
+  $kind = $deal['kind_id']; 
+  $region = $deal['region']; 
+  $tt = $deal['tasktype'];
+  $comp = $deal['company_id'];
+  $market = ($deal['market'] ? "'".$deal['market']."'" : 'null');
+  $tech = ($deal['tech'] ? "'".$deal['tech']."'" : 'null');
+  $source_id = ($deal['source_id'] ? "'".$deal['source_id']."'" : '0');
+  $source = $deal['source'];
   $amount = ($deal['amount'] ? "'".$deal['amount']."'" : 'null');
   $margin = ($deal['margin'] ? "'".$deal['margin']."'" : 'null');
-  $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
-  if (($deal["hitrate"] != "")
-      && ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) {
-    $hitrate = "'".$deal["hitrate"]."'";
+  $commission = ($deal['commission'] ? "'".$deal['commission']."'" : '0');
+  if (($deal['hitrate'] != '')
+      && ($deal['hitrate'] >= 0) && ($deal['hitrate'] <= 100)) {
+    $hitrate = "'".$deal['hitrate']."'";
   } else {
-    $hitrate = "null";
+    $hitrate = 'null';
   }
-  $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
-  $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
-  $status = $deal["status_id"];
-  $archive = ($deal["archive"] == "1" ? "1" : "0");
-  $todo = $deal["todo"];
-  $comment = $deal["comment"];
-  $add_comment = $deal["add_comment"];
-  if ($add_comment != "") {
-    $datecomment = of_isodate_convert($deal["datecomment"]);
-    $today = date("Y-m-d");
+  $con1 = ($deal['contact1'] ? $deal['contact1'] : '0');
+  $con2 = ($deal['contact2'] ? $deal['contact2'] : '0');
+  $status = $deal['status_id'];
+  $archive = ($deal['archive'] == '1' ? '1' : '0');
+  $todo = $deal['todo'];
+  $comment = $deal['comment'];
+  $add_comment = $deal['add_comment'];
+  if ($add_comment != '') {
+    $datecomment = of_isodate_convert($deal['datecomment']);
+    $today = date('Y-m-d');
     if ($today == $datecomment) {
       $datecomment = $now;
     }
-    $usercomment = $deal["usercomment"];
+    $usercomment = $deal['usercomment'];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
-  $mail_comment = $deal["mail_comment"];
-  $domain_id = $obm["domain_id"];
+  $mail_comment = $deal['mail_comment'];
+  $domain_id = $obm['domain_id'];
 	
   $query = "INSERT INTO Deal (deal_timeupdate,
     deal_timecreate,
@@ -349,9 +353,9 @@ function run_query_deal_insert($deal) {
   VALUES (null,
     '$now',
     null,
-    '" . $obm["uid"] . "',
+    '" . $obm['uid'] . "',
     '$domain_id',
-    '$num',
+    '$number',
     '$label',
     $datebegin,
     '$kind',
@@ -379,12 +383,12 @@ function run_query_deal_insert($deal) {
     $pid,
     '$todo')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_insert()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);  
 
   $d_id = run_query_deal_id($deal);
-  $deal["deal_id"] = $d_id;
+  $deal['deal_id'] = $d_id;
 
   // if the deal inserted is not archived, we increment the company deal number
   if (($d_id) && ($archive == '0')) {
@@ -397,25 +401,25 @@ function run_query_deal_insert($deal) {
   }
 
   // DealCompany relations handling
-  if ( ($retour) && (is_array($deal["dc"]) )) {
-    $ret = run_query_deal_dealcompany_update($d_id, $deal["dc"]);
+  if ( ($retour) && (is_array($deal['dc']) )) {
+    $ret = run_query_deal_dealcompany_update($d_id, $deal['dc']);
   }
 
   // UserData handling
   if ($d_id > 0) {
-    $ret = of_userdata_query_update("deal", $d_id, $deal);
+    $ret = of_userdata_query_update('deal', $d_id, $deal);
   }
 
   // Delete associated Lead if exists
-  if (($d_id > 0) && ($deal["lead_id"] > 0)) {
+  if (($d_id > 0) && ($deal['lead_id'] > 0)) {
     $query = "DELETE FROM Lead WHERE lead_id='$deal[lead_id]'";
-    display_debug_msg($query, $cdg_sql, "run_query_deal_insert(2)");
+    display_debug_msg($query, $cdg_sql, 'run_query_deal_insert(2)');
     $retour = $obm_q->query($query);
-    update_last_visit("lead", $deal["lead_id"], "delete");
+    update_last_visit('lead', $deal['lead_id'], 'delete');
   }
 
   // If mail comment activated, send the updates by mail
-  if (($mail_comment != "") && ($mail_comment != "$l_no")) {
+  if (($mail_comment != '') && ($mail_comment != "$l_no")) {
     deal_send_mail($deal);
   }
 
@@ -431,57 +435,57 @@ function run_query_deal_insert($deal) {
 function run_query_deal_update($deal) {
   global $obm, $cdg_sql, $l_no;
 
-  $now = date("Y-m-d H:i:s");
-  $id = $deal["deal_id"];
-  $pid = ($deal["parentdeal_id"] ? "'".$deal["parentdeal_id"]."'" : "null");
-  $num = $deal["num"];
-  $label = $deal["label"];
-  $priv = $deal["privacy"];
-  $datebegin = ($deal["datebegin"] ? "'".of_isodate_convert($deal["datebegin"])."'" : "null");
-  $dateend = ($deal["dateend"] ? "'".of_isodate_convert($deal["dateend"])."'" : "null");
-  $dateprop = ($deal["dateproposal"] ? "'".of_isodate_convert($deal["dateproposal"])."'" : "null");
-  $dateexp = ($deal["dateexpected"] ? "'".of_isodate_convert($deal["dateexpected"])."'" : "null");
-  $datealarm = ($deal["datealarm"] ? "'".of_isodate_convert($deal["datealarm"])."'" : "null");
-  $kind = $deal["kind_id"]; 
-  $region = $deal["region"]; 
-  $tt = $deal["tasktype"];
-  $comp = $deal["company_id"];
-  $market = ($deal["market"] ? $deal["market"] : "null");
-  $tech = ($deal["tech"] ? $deal["tech"] : "null");
-  $source_id = ($deal["source_id"] ? $deal["source_id"] : "0");
-  $source = $deal["source"];
+  $now = date('Y-m-d H:i:s');
+  $id = $deal['deal_id'];
+  $pid = ($deal['parentdeal_id'] ? "'".$deal['parentdeal_id']."'" : 'null');
+  $number = $deal['number'];
+  $label = $deal['label'];
+  $priv = $deal['privacy'];
+  $datebegin = ($deal['datebegin'] ? "'".of_isodate_convert($deal['datebegin'])."'" : 'null');
+  $dateend = ($deal['dateend'] ? "'".of_isodate_convert($deal['dateend'])."'" : 'null');
+  $dateprop = ($deal['dateproposal'] ? "'".of_isodate_convert($deal['dateproposal'])."'" : 'null');
+  $dateexp = ($deal['dateexpected'] ? "'".of_isodate_convert($deal['dateexpected'])."'" : 'null');
+  $datealarm = ($deal['datealarm'] ? "'".of_isodate_convert($deal['datealarm'])."'" : 'null');
+  $kind = $deal['kind_id']; 
+  $region = $deal['region']; 
+  $tt = $deal['tasktype'];
+  $comp = $deal['company_id'];
+  $market = ($deal['market'] ? $deal['market'] : 'null');
+  $tech = ($deal['tech'] ? $deal['tech'] : 'null');
+  $source_id = ($deal['source_id'] ? $deal['source_id'] : '0');
+  $source = $deal['source'];
   $amount = ($deal['amount'] ? "'".$deal['amount']."'" : 'null');
   $margin = ($deal['margin'] ? "'".$deal['margin']."'" : 'null');
-  $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
-  if (($deal["hitrate"] != "")
-      && ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) {
-    $hitrate = "'".$deal["hitrate"]."'";
+  $commission = ($deal['commission'] ? "'".$deal['commission']."'" : '0');
+  if (($deal['hitrate'] != '')
+      && ($deal['hitrate'] >= 0) && ($deal['hitrate'] <= 100)) {
+    $hitrate = "'".$deal['hitrate']."'";
   } else {
-    $hitrate = "null";
+    $hitrate = 'null';
   }
-  $con1 = ($deal["contact1"] ? "'".$deal["contact1"]."'" : "null");
-  $con2 = ($deal["contact2"] ? "'".$deal["contact2"]."'" : "null");
-  $status = $deal["status_id"];
-  $archive = ($deal["archive"] == "1" ? "1" : "0");
-  $todo = $deal["todo"];
-  $comment = $deal["comment"];
-  $add_comment = $deal["add_comment"];
-  if ($add_comment != "") {
-    $datecomment = of_isodate_convert($deal["datecomment"]);
-    $today = date("Y-m-d");
+  $con1 = ($deal['contact1'] ? "'".$deal['contact1']."'" : 'null');
+  $con2 = ($deal['contact2'] ? "'".$deal['contact2']."'" : 'null');
+  $status = $deal['status_id'];
+  $archive = ($deal['archive'] == '1' ? '1' : '0');
+  $todo = $deal['todo'];
+  $comment = $deal['comment'];
+  $add_comment = $deal['add_comment'];
+  if ($add_comment != '') {
+    $datecomment = of_isodate_convert($deal['datecomment']);
+    $today = date('Y-m-d');
     if ($today == $datecomment) {
       $datecomment = $now;
     }
-    $usercomment = $deal["usercomment"];
+    $usercomment = $deal['usercomment'];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
-  $mail_comment = $deal["mail_comment"];
-  $multidomain = sql_multidomain("deal");
+  $mail_comment = $deal['mail_comment'];
+  $multidomain = sql_multidomain('deal');
   
   $query = "UPDATE Deal SET
     deal_timeupdate='$now',
-    deal_userupdate='".$obm["uid"]."',
-    deal_number='$num',
+    deal_userupdate='".$obm['uid']."',
+    deal_number='$number',
     deal_label='$label',
     deal_datebegin=$datebegin,
     deal_type_id='$kind',
@@ -512,12 +516,12 @@ function run_query_deal_update($deal) {
 
   $archive_old = get_deal_archive($id);
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $ret = of_userdata_query_update("deal", $id, $deal);
+    $ret = of_userdata_query_update('deal', $id, $deal);
   }
 
   // If deal archive status has changed, update the company deal number
@@ -530,12 +534,12 @@ function run_query_deal_update($deal) {
   }
 
   // DealCompany relations handling
-  if ( ($retour) && (is_array($deal["dc"]) )) {
-    $ret = run_query_deal_dealcompany_update($id, $deal["dc"]);
+  if ( ($retour) && (is_array($deal['dc']) )) {
+    $ret = run_query_deal_dealcompany_update($id, $deal['dc']);
   }
 
   // If mail comment activated, send the updates by mail
-  if (($mail_comment != "") && ($mail_comment != "$l_no")) {
+  if (($mail_comment != '') && ($mail_comment != "$l_no")) {
     deal_send_mail($deal);
   }
 
@@ -555,13 +559,13 @@ function run_query_deal_dealcompany_update($deal_id, $dc) {
 
   if ( (is_array($dc)) && (count($dc) > 0) ) {
     $query = "DELETE FROM DealCompany WHERE dealcompany_deal_id='$deal_id'";
-    display_debug_msg($query, $cdg_sql, "run_query_deal_dealcompany_update(1)");
+    display_debug_msg($query, $cdg_sql, 'run_query_deal_dealcompany_update(1)');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
 
     foreach ($dc as $one_dc) {
-      $c_id = $one_dc["company_id"];
-      $role_id = $one_dc["role_id"];
+      $c_id = $one_dc['company_id'];
+      $role_id = $one_dc['role_id'];
       
       if ($c_id > 0) {
   	$query = "INSERT INTO DealCompany (
@@ -574,7 +578,7 @@ function run_query_deal_dealcompany_update($deal_id, $dc) {
           '$role_id'
         )";
 
-	display_debug_msg($query, $cdg_sql, "run_query_deal_dealcompany_update(2)");
+	display_debug_msg($query, $cdg_sql, 'run_query_deal_dealcompany_update(2)');
 	$obm_q->query($query);
       }
     }
@@ -594,24 +598,24 @@ function deal_send_mail($deal) {
   global $l_no, $l_members, $l_group, $l_obm_title, $l_deal, $l_company;
   global $l_amount, $l_margin, $l_hitrate, $l_todo, $l_status, $l_alarm, $l_expected, $l_end;
 
-  $id = $deal["deal_id"];
+  $id = $deal['deal_id'];
   $d = get_deal_info($id);
-  $mail_comment = $deal["mail_comment"];
-  $market = $d["market"];
-  $tech = $d["tech"];
-  $company = $d["company"];
-  $label = $d["label"];
-  $status = $d["status"];
+  $mail_comment = $deal['mail_comment'];
+  $market = $d['market'];
+  $tech = $d['tech'];
+  $company = $d['company'];
+  $label = $d['label'];
+  $status = $d['status'];
   $amount = $deal['amount'];
   $margin = $deal['margin'];
-  $hitrate = $deal["hitrate"];
-  $dateexp = $deal["dateexpected"];
-  $dateend = $deal["dateend"];
-  $datealarm = $deal["datealarm"];
-  $todo = $deal["todo"];
-  $add_comment = $deal["add_comment"];
-  $datecomment = $deal["datecomment"];
-  $usercomment = $deal["usercomment"];
+  $hitrate = $deal['hitrate'];
+  $dateexp = $deal['dateexpected'];
+  $dateend = $deal['dateend'];
+  $datealarm = $deal['datealarm'];
+  $todo = $deal['todo'];
+  $add_comment = $deal['add_comment'];
+  $datecomment = $deal['datecomment'];
+  $usercomment = $deal['usercomment'];
 
   $subject = "$l_obm_title : $l_deal : $company - $label";
   $message = "$l_company: $company
@@ -634,7 +638,7 @@ $datecomment:$usercomment:$add_comment";
     $users_array = array();
   }
   $recipient_array = $users_array;
-  send_mail($subject, $message, $recipient_array,"");
+  send_mail($subject, $message, $recipient_array,'');
 
   return true;
 }
@@ -648,25 +652,25 @@ $datecomment:$usercomment:$add_comment";
 function run_query_deal_quick_update($deal) {
   global $obm, $cdg_sql, $l_no;
 
-  $id = $deal["deal_id"];
-  $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
-  $dateexp = ($deal["dateexpected"] ? "'".of_isodate_convert($deal["dateexpected"])."'" : "null");
-  $datealarm = ($deal["datealarm"] ? "'".of_isodate_convert($deal["datealarm"])."'" : "null");
-  $status = $deal["status_id"];
-  $todo = $deal["todo"];
-  $comment = $deal["comment"];
-  $add_comment = $deal["add_comment"];
-  if ($add_comment != "") {
-    $datecomment = of_isodate_convert($deal["datecomment"]);
-    $usercomment = $deal["usercomment"];
+  $id = $deal['deal_id'];
+  $hitrate = ($deal['hitrate'] ? "'".$deal['hitrate']."'" : 'null');
+  $dateexp = ($deal['dateexpected'] ? "'".of_isodate_convert($deal['dateexpected'])."'" : 'null');
+  $datealarm = ($deal['datealarm'] ? "'".of_isodate_convert($deal['datealarm'])."'" : 'null');
+  $status = $deal['status_id'];
+  $todo = $deal['todo'];
+  $comment = $deal['comment'];
+  $add_comment = $deal['add_comment'];
+  if ($add_comment != '') {
+    $datecomment = of_isodate_convert($deal['datecomment']);
+    $usercomment = $deal['usercomment'];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
-  $mail_comment = $deal["mail_comment"];
-  $multidomain = sql_multidomain("deal");
+  $mail_comment = $deal['mail_comment'];
+  $multidomain = sql_multidomain('deal');
   
   $query = "UPDATE Deal SET
-    deal_timeupdate='". date("Y-m-d H:i:s")."',
-    deal_userupdate='".$obm["uid"]."',
+    deal_timeupdate='". date('Y-m-d H:i:s')."',
+    deal_userupdate='".$obm['uid']."',
     deal_hitrate=$hitrate,
     deal_status_id='$status',
     deal_dateexpected=$dateexp,
@@ -676,12 +680,12 @@ function run_query_deal_quick_update($deal) {
   WHERE deal_id='$id'
     $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_quick_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_quick_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // If mail comment activated, send the updates by mail
-  if (($mail_comment != "") && ($mail_comment != "$l_no")) {
+  if (($mail_comment != '') && ($mail_comment != "$l_no")) {
     deal_send_mail($deal);
   }
 
@@ -699,33 +703,33 @@ function run_query_deal_quick_update($deal) {
 function run_query_deal_id($deal) {
   global $cdg_sql, $obm;
 
-  $num = $deal["num"];
-  $label = $deal["label"];
-  $priv = $deal["privacy"];
-  $datebegin = ($deal["datebegin"] ? "='".of_isodate_convert($deal["datebegin"])."'" : "is null");
-  $kind = $deal["kind_id"];
-  $region = $deal["region"];
-  $tt = $deal["tasktype"];
-  $comp = $deal["company_id"];
-  $market = ($deal["market"] ? "='".$deal["market"]."'" : "is null");
-  $tech = ($deal["tech"] ? "='".$deal["tech"]."'" : "is null");
-  $dateprop = ($deal["dateproposal"] ? "='".of_isodate_convert($deal["dateproposal"])."'" : "is null");
+  $number = $deal['number'];
+  $label = $deal['label'];
+  $priv = $deal['privacy'];
+  $datebegin = ($deal['datebegin'] ? "='".of_isodate_convert($deal['datebegin'])."'" : 'is null');
+  $kind = $deal['kind_id'];
+  $region = $deal['region'];
+  $tt = $deal['tasktype'];
+  $comp = $deal['company_id'];
+  $market = ($deal['market'] ? "='".$deal['market']."'" : 'is null');
+  $tech = ($deal['tech'] ? "='".$deal['tech']."'" : 'is null');
+  $dateprop = ($deal['dateproposal'] ? "='".of_isodate_convert($deal['dateproposal'])."'" : 'is null');
   $amount = ($deal['amount'] ? "='".$deal['amount']."'" : 'is null');
   $margin = ($deal['margin'] ? "='".$deal['margin']."'" : 'is null');
-  $hitrate = ($deal["hitrate"] ? "='".$deal["hitrate"]."'" : "is null");
-  $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
-  $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
-  $datealarm = ($deal["datealarm"] ? "='".of_isodate_convert($deal["datealarm"])."'" : "is null");
-  $status = $deal["status_id"];
-  $todo = $deal["todo"];
-  $archive = ($deal["archive"] == "1" ? "1" : "0");
-  $domain_id = $obm["domain_id"];
+  $hitrate = ($deal['hitrate'] ? "='".$deal['hitrate']."'" : 'is null');
+  $con1 = ($deal['contact1'] ? $deal['contact1'] : '0');
+  $con2 = ($deal['contact2'] ? $deal['contact2'] : '0');
+  $datealarm = ($deal['datealarm'] ? "='".of_isodate_convert($deal['datealarm'])."'" : 'is null');
+  $status = $deal['status_id'];
+  $todo = $deal['todo'];
+  $archive = ($deal['archive'] == '1' ? '1' : '0');
+  $domain_id = $obm['domain_id'];
 	
   // comment not searched because processed before stored in db
 
   $query = "SELECT deal_id
   FROM Deal
-  WHERE deal_number='$num'
+  WHERE deal_number='$number'
     AND deal_label='$label'
     AND deal_datebegin $datebegin
     AND deal_type_id='$kind'
@@ -746,13 +750,13 @@ function run_query_deal_id($deal) {
     AND deal_todo='$todo'
     AND deal_domain_id='$domain_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_id()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_id()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
     $obm_q->next_record();
-    $id = $obm_q->f("deal_id");
+    $id = $obm_q->f('deal_id');
   } else {
     $id = false;
   }
@@ -771,7 +775,7 @@ function run_query_deal_delete($id) {
 
   $archive = get_deal_archive($id);
   $comp_id = get_deal_company_id($id);
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
  	
   // If deal archive status is off (0), update the company deal number
   if ($archive == '0') {
@@ -780,12 +784,12 @@ function run_query_deal_delete($id) {
 
   // update the company total deal number
   run_query_deal_company_total_deal_dec($comp_id);
-  run_query_global_delete_document_links($id, "deal");
+  run_query_global_delete_document_links($id, 'deal');
 
-  $ret = of_userdata_query_delete("deal", $id);
+  $ret = of_userdata_query_delete('deal', $id);
 
   $query = "DELETE FROM Deal WHERE deal_id='$id' $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_deal_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_delete()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -809,7 +813,7 @@ function run_query_deal_company_info($id) {
     FROM Company
     WHERE company_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_company_info()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_info()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -823,23 +827,23 @@ function run_query_deal_company_info($id) {
 // Parameters:
 //   - $users_id : array of User id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_potential($users_id="") {
+function run_query_deal_potential($users_id='') {
   global $cdg_sql, $cdg_param;
 
   if ((is_array($users_id)) && (count($users_id) > 0)) {
-    $where_market_uid = "AND (";
-    $where_tech_uid = "AND (";
-    $or = "";
+    $where_market_uid = 'AND (';
+    $where_tech_uid = 'AND (';
+    $or = '';
     foreach ($users_id as $u_id) {
       $where_market_uid .= " $or deal_marketingmanager_id='$u_id'";
       $where_tech_uid .= " $or deal_technicalmanager_id='$u_id'";
-      $or = "OR";
+      $or = 'OR';
     }
-    $where_market_uid .= ")";
-    $where_tech_uid .= ")";
+    $where_market_uid .= ')';
+    $where_tech_uid .= ')';
   }
 	
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 	
   $query = "SELECT
       deal_marketingmanager_id AS uid,
@@ -865,7 +869,7 @@ function run_query_deal_potential($users_id="") {
       userobm_firstname
 ";
   
-  display_debug_msg($query, $cdg_sql, "run_query_deal_potential(1)");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_potential(1)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -877,20 +881,20 @@ function run_query_deal_potential($users_id="") {
   $nb = 0;
 
   while ($obm_q->next_record()) {
-    $u_id = $obm_q->f("uid");
+    $u_id = $obm_q->f('uid');
     $res['market']["$u_id"]['amount'] = $obm_q->f('amount');
     $res['market']["$u_id"]['margin'] = $obm_q->f('margin');
-    $res["market"]["$u_id"]["amount_balanced"] = $obm_q->f("amount_balanced");
-    $res["market"]["$u_id"]["commission"] = $obm_q->f("commission");
-    $res["market"]["$u_id"]["commission_balanced"] = $obm_q->f("commission_balanced");
-    $res["market"]["$u_id"]["number"] = $obm_q->f("nb");
-    $res["market"]["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
+    $res['market']["$u_id"]['amount_balanced'] = $obm_q->f('amount_balanced');
+    $res['market']["$u_id"]['commission'] = $obm_q->f('commission');
+    $res['market']["$u_id"]['commission_balanced'] = $obm_q->f('commission_balanced');
+    $res['market']["$u_id"]['number'] = $obm_q->f('nb');
+    $res['market']["$u_id"]['name'] = $obm_q->f('userobm_lastname') . ' ' . $obm_q->f('userobm_firstname');
     $am += $res['market']["$u_id"]['amount'];
     $ma += $res['market']["$u_id"]['margin'];
-    $ab += $res["market"]["$u_id"]["amount_balanced"];
-    $cm += $res["market"]["$u_id"]["commission"];
-    $cb += $res["market"]["$u_id"]["commission_balanced"];
-    $nb += $res["market"]["$u_id"]["number"];
+    $ab += $res['market']["$u_id"]['amount_balanced'];
+    $cm += $res['market']["$u_id"]['commission'];
+    $cb += $res['market']["$u_id"]['commission_balanced'];
+    $nb += $res['market']["$u_id"]['number'];
   }
 
   $res['market']['0']['amount'] = $am;
@@ -925,7 +929,7 @@ function run_query_deal_potential($users_id="") {
       userobm_firstname
 ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_potential(2)");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_potential(2)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -937,20 +941,20 @@ function run_query_deal_potential($users_id="") {
   $nb = 0;
 
   while ($obm_q->next_record()) {
-    $u_id = $obm_q->f("uid");
+    $u_id = $obm_q->f('uid');
     $res['tech']["$u_id"]['amount'] = $obm_q->f('amount');
     $res['tech']["$u_id"]['margin'] = $obm_q->f('margin');
-    $res["tech"]["$u_id"]["amount_balanced"] = $obm_q->f("amount_balanced");
-    $res["tech"]["$u_id"]["commission"] = $obm_q->f("commission");
-    $res["tech"]["$u_id"]["commission_balanced"] = $obm_q->f("commission_balanced");
-    $res["tech"]["$u_id"]["number"] = $obm_q->f("nb");
-    $res["tech"]["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
+    $res['tech']["$u_id"]['amount_balanced'] = $obm_q->f('amount_balanced');
+    $res['tech']["$u_id"]['commission'] = $obm_q->f('commission');
+    $res['tech']["$u_id"]['commission_balanced'] = $obm_q->f('commission_balanced');
+    $res['tech']["$u_id"]['number'] = $obm_q->f('nb');
+    $res['tech']["$u_id"]['name'] = $obm_q->f('userobm_lastname') . ' ' . $obm_q->f('userobm_firstname');
     $am += $res['tech']["$u_id"]['amount'];
     $ma += $res['tech']["$u_id"]['margin'];
-    $ab += $res["tech"]["$u_id"]["amount_balanced"];
-    $cm += $res["tech"]["$u_id"]["commission"];
-    $cb += $res["tech"]["$u_id"]["commission_balanced"];
-    $nb += $res["tech"]["$u_id"]["number"];
+    $ab += $res['tech']["$u_id"]['amount_balanced'];
+    $cm += $res['tech']["$u_id"]['commission'];
+    $cb += $res['tech']["$u_id"]['commission_balanced'];
+    $nb += $res['tech']["$u_id"]['number'];
   }
 
   $res['tech']['0']['amount'] = $am;
@@ -996,19 +1000,19 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
     $or = '';
     foreach ($tts as $tt_id) {
       $where_tt .= "$or deal_tasktype_id='$tt_id'";
-      $or = " OR";
+      $or = ' OR';
     }
-    $where_tt .= ")";
+    $where_tt .= ')';
   }
 
   if ((is_array($users_id)) && (count($users_id) > 0)) {
-    $where_market_uid = "AND (";
-    $or = "";
+    $where_market_uid = 'AND (';
+    $or = '';
     foreach ($users_id as $u_id) {
       $where_market_uid .= " $or deal_marketingmanager_id='$u_id'";
-      $or = "OR";
+      $or = 'OR';
     }
-    $where_market_uid .= ")";
+    $where_market_uid .= ')';
   }
   $multidomain = sql_multidomain('deal');
   $query = "SELECT
@@ -1036,7 +1040,7 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
       $target_date
 ";
   
-  display_debug_msg($query, $cdg_sql, "run_query_deal_dashboard_infos()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_dashboard_infos()');
   $obm_q->query($query);
 
   $res_users = array();
@@ -1048,7 +1052,7 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
   $nb = 0;
 
   while ($obm_q->next_record()) {
-    $u_id = $obm_q->f("uid");
+    $u_id = $obm_q->f('uid');
     if (! in_array($u_id, $res_users)) {
       $res_users[] = $u_id;
     }
@@ -1076,11 +1080,11 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
 
     $res[$month]["$u_id"]['amount'] += $am;
     $res[$month]["$u_id"]['margin'] += $ma;
-    $res[$month]["$u_id"]["amount_balanced"] += $ab;
-    $res[$month]["$u_id"]["commission"] += $ca;
-    $res[$month]["$u_id"]["commission_balanced"] += $cb;
-    $res[$month]["$u_id"]["number"] ++;
-    $res["name"]["$u_id"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
+    $res[$month]["$u_id"]['amount_balanced'] += $ab;
+    $res[$month]["$u_id"]['commission'] += $ca;
+    $res[$month]["$u_id"]['commission_balanced'] += $cb;
+    $res[$month]["$u_id"]['number'] ++;
+    $res['name']["$u_id"] = $obm_q->f('userobm_lastname') . ' ' . $obm_q->f('userobm_firstname');
 
     $res[$month][0]['amount'] += $am;
     $res[$month][0]['margin'] += $ma;
@@ -1102,58 +1106,58 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
 //   - $deal[]   : deal hash info
 //   - $users_id : array of User id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_dashboard_list($deal, $users_id="") {
+function run_query_deal_dashboard_list($deal, $users_id='') {
   global $cdg_sql, $cdg_param, $ctu_sql_limit;
 
-  $date_after = $deal["date_after"];
-  $date_before = $deal["date_before"];
+  $date_after = $deal['date_after'];
+  $date_before = $deal['date_before'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
-  $datebegin = sql_date_format($db_type, "deal_datebegin", "deal_datebegin");
-  $datealarm = sql_date_format($db_type, "deal_datealarm", "deal_datealarm");
-  $dateexp = sql_date_format($db_type, "deal_dateexpected", "deal_dateexpected");
-  $dateend = sql_date_format($db_type, "deal_dateend", "deal_dateend");
+  $datebegin = sql_date_format($db_type, 'deal_datebegin', 'deal_datebegin');
+  $datealarm = sql_date_format($db_type, 'deal_datealarm', 'deal_datealarm');
+  $dateexp = sql_date_format($db_type, 'deal_dateexpected', 'deal_dateexpected');
+  $dateend = sql_date_format($db_type, 'deal_dateend', 'deal_dateend');
 
   if ((is_array($users_id)) && (count($users_id) > 0)) {
-    $where_uid = "AND (";
-    $or = "";
+    $where_uid = 'AND (';
+    $or = '';
     foreach ($users_id as $u_id) {
       $where_uid .= " $or deal_marketingmanager_id='$u_id'";
-      $or = "OR";
+      $or = 'OR';
     }
-    $where_uid .= ")";
+    $where_uid .= ')';
   }
  
-  if ($date_before == "0000-00-00") {
-    $where_date .= " AND deal_dateexpected IS NULL";
+  if ($date_before == '0000-00-00') {
+    $where_date .= ' AND deal_dateexpected IS NULL';
   } else {
-    if ($date_after != "") {
+    if ($date_after != '') {
       $where_date .= " AND deal_dateexpected >= '$date_after'";
     }
-    if ($date_before != "") {
+    if ($date_before != '') {
       $where_date .= " AND deal_dateexpected <= '$date_before'";
     }
   }
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   // Tasktype filter
-  if (is_array($deal["tasktype"])) {
-    $where_tt .= " AND (";
-    $or = "";
-    foreach ($deal["tasktype"] as $tt_id) {
+  if (is_array($deal['tasktype'])) {
+    $where_tt .= ' AND (';
+    $or = '';
+    foreach ($deal['tasktype'] as $tt_id) {
       $where_tt .= "$or deal_tasktype_id='$tt_id'";
-      $or = " OR";
+      $or = ' OR';
     }
-    $where_tt .= ")";
+    $where_tt .= ')';
   }
 
   // Order by clause
-  $sql_order_field = $deal["sql_order_field"];
-  $sql_order_dir = $deal["sql_order_dir"];
+  $sql_order_field = $deal['sql_order_field'];
+  $sql_order_dir = $deal['sql_order_dir'];
   
-  $field = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "deal_marketingmanager";
+  $field = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'deal_marketingmanager';
   $orderq = " ORDER BY $field $sql_order_dir";
 
   $query = "SELECT
@@ -1221,7 +1225,7 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "run_query_deal_dashboard_list()");
+    display_debug_msg($query, $cdg_sql, 'run_query_deal_dashboard_list()');
     $obm_q->query($query);
   }
 
@@ -1239,13 +1243,13 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
 function run_query_deal_manager($archive = false) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   if (! $archive) {
-    $where_arch .= " deal_archive=0";
+    $where_arch .= ' deal_archive=0';
   }
 
-  if ($where_arch != "") {
+  if ($where_arch != '') {
     $where = "WHERE $where_arch $multidomain";
   } else {
     $where = "WHERE 1=1 $multidomain";
@@ -1270,7 +1274,7 @@ function run_query_deal_manager($archive = false) {
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_deal_manager()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_manager()');
 
   return $obm_q;
 }
@@ -1284,7 +1288,7 @@ function run_query_deal_manager($archive = false) {
 function run_query_deal_contact($p_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain('contact');
 
   $query = "SELECT contact_id,
       contact_lastname,
@@ -1295,7 +1299,7 @@ function run_query_deal_contact($p_id) {
       $multidomain
     ORDER BY contact_archive, contact_lastname";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_contact()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_contact()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1311,14 +1315,14 @@ function run_query_deal_contact($p_id) {
 function run_query_deal_company_active_deal_inc($comp_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain('company');
 
   $query = "UPDATE Company SET
       company_deal_number=company_deal_number+1
     WHERE company_id='$comp_id'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_company_active_deal_inc()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_active_deal_inc()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   return $retour;
@@ -1333,13 +1337,13 @@ function run_query_deal_company_active_deal_inc($comp_id) {
 function run_query_deal_company_active_deal_dec($comp_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain('company');
 
   $query = "UPDATE Company SET
       company_deal_number=company_deal_number-1
     WHERE company_id='$comp_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_company_active_deal_dec()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_active_deal_dec()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   return $retour;
@@ -1354,14 +1358,14 @@ function run_query_deal_company_active_deal_dec($comp_id) {
 function run_query_deal_company_total_deal_inc($comp_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain('company');
 
   $query = "UPDATE Company SET
       company_deal_total=company_deal_total+1
     WHERE company_id='$comp_id'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_company_total_deal_inc()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_total_deal_inc()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   return $retour;
@@ -1376,14 +1380,14 @@ function run_query_deal_company_total_deal_inc($comp_id) {
 function run_query_deal_company_total_deal_dec($comp_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain('company');
 
   $query = "UPDATE Company SET
       company_deal_total=company_deal_total-1
     WHERE company_id='$comp_id'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_company_total_deal_dec()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_total_deal_dec()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   return $retour;
@@ -1399,18 +1403,18 @@ function run_query_deal_company_total_deal_dec($comp_id) {
 function get_deal_archive($deal_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   $query = "SELECT deal_archive 
     FROM Deal
     WHERE deal_id='$deal_id'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_deal_archive()");
+  display_debug_msg($query, $cdg_sql, 'get_deal_archive()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $retour = $obm_q->f("deal_archive");
+  $retour = $obm_q->f('deal_archive');
 
   return $retour;
 }
@@ -1425,7 +1429,7 @@ function get_deal_archive($deal_id) {
 function get_deal_info($deal_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   $query = "SELECT *,
       company_name,
@@ -1438,17 +1442,17 @@ function get_deal_info($deal_id) {
     WHERE deal_id='$deal_id'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_deal_info()");
+  display_debug_msg($query, $cdg_sql, 'get_deal_info()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
-  $res["label"] = $obm_q->f("deal_label");
-  $res["company"] = $obm_q->f("company_name");
-  $res["status"] = $obm_q->f("dealstatus_label");
-  $res["type"] = $obm_q->f("dealtype_label");
-  $res["market"] = $obm_q->f("deal_marketingmanager_id");
-  $res["tech"] = $obm_q->f("deal_technicalmanager_id");
+  $res['label'] = $obm_q->f('deal_label');
+  $res['company'] = $obm_q->f('company_name');
+  $res['status'] = $obm_q->f('dealstatus_label');
+  $res['type'] = $obm_q->f('dealtype_label');
+  $res['market'] = $obm_q->f('deal_marketingmanager_id');
+  $res['tech'] = $obm_q->f('deal_technicalmanager_id');
 
   return $res;
 }
@@ -1476,22 +1480,22 @@ function get_deal_dealcompany_info($deal_id) {
     WHERE dealcompany_deal_id='$deal_id'
     ORDER BY dealcompany_role_id";
 
-  display_debug_msg($query, $cdg_sql, "get_deal_dealcompany_info()");
+  display_debug_msg($query, $cdg_sql, 'get_deal_dealcompany_info()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   $cpt = 0;
   while ($obm_q->next_record()) {
-    $company_id = $obm_q->f("dealcompany_company_id");
-    $company_name = $obm_q->f("company_name");
-    $role_id = $obm_q->f("dealcompany_role_id");
-    $role_code = $obm_q->f("dealcompanyrole_code");
-    $role_label = $obm_q->f("dealcompanyrole_label");
-    $res[$cpt]["company_id"] = $company_id;
-    $res[$cpt]["company_name"] = $company_name;
-    $res[$cpt]["role_id"] = $role_id;
-    $res[$cpt]["role_code"] = $role_code;
-    $res[$cpt]["role_label"] = $role_label;
+    $company_id = $obm_q->f('dealcompany_company_id');
+    $company_name = $obm_q->f('company_name');
+    $role_id = $obm_q->f('dealcompany_role_id');
+    $role_code = $obm_q->f('dealcompanyrole_code');
+    $role_label = $obm_q->f('dealcompanyrole_label');
+    $res[$cpt]['company_id'] = $company_id;
+    $res[$cpt]['company_name'] = $company_name;
+    $res[$cpt]['role_id'] = $role_id;
+    $res[$cpt]['role_code'] = $role_code;
+    $res[$cpt]['role_label'] = $role_label;
     $cpt++;
   }
 
@@ -1508,26 +1512,26 @@ function get_deal_dealcompany_info($deal_id) {
 function get_lead_info($lead_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("lead");
+  $multidomain = sql_multidomain('lead');
 
   $query = "SELECT *
     FROM Lead
     WHERE lead_id='$lead_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_lead_info()");
+  display_debug_msg($query, $cdg_sql, 'get_lead_info()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
-  $res["name"] = $obm_q->f("lead_name");
-  $res["company_id"] = $obm_q->f("lead_company_id");
-  $res["contact_id"] = $obm_q->f("lead_contact_id");
-  $res["source_id"] = $obm_q->f("lead_source_id");
-  $res["manager"] = $obm_q->f("lead_manager_id");
-  $res["date"] = $obm_q->f("lead_date");
-  $res["datealarm"] = $obm_q->f("lead_datealarm");
-  $res["todo"] = $obm_q->f("lead_todo");
-  $res["comment"] = $obm_q->f("lead_comment");
+  $res['name'] = $obm_q->f('lead_name');
+  $res['company_id'] = $obm_q->f('lead_company_id');
+  $res['contact_id'] = $obm_q->f('lead_contact_id');
+  $res['source_id'] = $obm_q->f('lead_source_id');
+  $res['manager'] = $obm_q->f('lead_manager_id');
+  $res['date'] = $obm_q->f('lead_date');
+  $res['datealarm'] = $obm_q->f('lead_datealarm');
+  $res['todo'] = $obm_q->f('lead_todo');
+  $res['comment'] = $obm_q->f('lead_comment');
 
   return $res;
 }
@@ -1542,15 +1546,15 @@ function get_lead_info($lead_id) {
 function get_deal_company_id($deal_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   $query = "SELECT deal_company_id FROM Deal WHERE deal_id='$deal_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_deal_company_id()");
+  display_debug_msg($query, $cdg_sql, 'get_deal_company_id()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $retour = $obm_q->f("deal_company_id");
+  $retour = $obm_q->f('deal_company_id');
 
   return $retour;
 }
@@ -1562,11 +1566,11 @@ function get_deal_company_id($deal_id) {
 function run_query_deal_type() {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("dealtype");
+  $multidomain = sql_multidomain('dealtype');
 
   $query = "SELECT * FROM DealType WHERE 1=1 $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_type()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_type()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -1581,9 +1585,9 @@ function run_query_deal_type() {
 function run_query_deal_kind_insert($deal) {
   global $cdg_sql, $obm;
 	
-  $label = $deal["kind_label"];
-  $inout = $deal["kind_inout"];
-  $domain_id = $obm["domain_id"];
+  $label = $deal['kind_label'];
+  $inout = $deal['kind_inout'];
+  $domain_id = $obm['domain_id'];
 	
   $query = "INSERT INTO DealType (dealtype_timeupdate,
     dealtype_timecreate,
@@ -1592,13 +1596,13 @@ function run_query_deal_kind_insert($deal) {
     dealtype_label,
     dealtype_inout)
   VALUES (null,
-    '".date("Y-m-d H:i:s")."',
-    '".$obm["uid"]."',
+    '".date('Y-m-d H:i:s')."',
+    '".$obm['uid']."',
     '$domain_id',
     '$label',
     '$inout')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_kind_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_kind_insert()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1614,21 +1618,21 @@ function run_query_deal_kind_insert($deal) {
 function run_query_deal_kind_update($deal) {
   global $obm, $cdg_sql;  
 
-  $label = $deal["kind_label"];
-  $kind = $deal["kind"];
-  $inout = $deal["kind_inout"];
-  //$inout = (($deal["kind_inout"]) == "+" ? $deal["kind_inout"] : '-');
-  $multidomain = sql_multidomain("dealtype");
+  $label = $deal['kind_label'];
+  $kind = $deal['kind'];
+  $inout = $deal['kind_inout'];
+  //$inout = (($deal['kind_inout']) == '+' ? $deal['kind_inout'] : '-');
+  $multidomain = sql_multidomain('dealtype');
 	
   $query = "UPDATE DealType SET
       dealtype_label='$label',
-      dealtype_timeupdate='" .date("Y-m-d H:i:s") . "',
-      dealtype_userupdate='" .$obm["uid"] ."',
+      dealtype_timeupdate='" .date('Y-m-d H:i:s') . "',
+      dealtype_userupdate='" .$obm['uid'] ."',
       dealtype_inout='$inout'
     WHERE dealtype_id='$kind'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_kind_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_kind_update()');
   $kind_q = new DB_OBM;
   $retour = $kind_q->query($query);
 
@@ -1644,11 +1648,11 @@ function run_query_deal_kind_update($deal) {
 function run_query_deal_kind_delete($id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("dealtype");
+  $multidomain = sql_multidomain('dealtype');
 
   $query = "DELETE FROM DealType WHERE dealtype_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_kind_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_kind_delete()');
   $kind_q = new DB_OBM;
   $retour = $kind_q->query($query);
 
@@ -1664,12 +1668,12 @@ function run_query_deal_kind_delete($id) {
 function run_query_deal_kind_links($k_id) {
   global $cdg_sql;
 	
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   $query = "SELECT deal_id, deal_label FROM Deal 
 		WHERE deal_type_id='$k_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_kind_links()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_kind_links()');
   $kind_q = new DB_OBM;
   $kind_q->query($query);
 
@@ -1683,12 +1687,12 @@ function run_query_deal_kind_links($k_id) {
 function run_query_deal_status_list() {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("dealstatus");
+  $multidomain = sql_multidomain('dealstatus');
 
   $query = "SELECT * FROM DealStatus WHERE 1=1 $multidomain 
 			ORDER BY dealstatus_order ASC";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_status_list()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_status_list()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -1703,10 +1707,10 @@ function run_query_deal_status_list() {
 function run_query_deal_status_insert($deal) {
   global $cdg_sql, $obm;
 	
-  $label = $deal["status_label"];
-  $order = $deal["status_order"];
-  $hitrate = $deal["status_hitrate"];
-  $domain_id = $obm["domain_id"];
+  $label = $deal['status_label'];
+  $order = $deal['status_order'];
+  $hitrate = $deal['status_hitrate'];
+  $domain_id = $obm['domain_id'];
 	
   $query = "INSERT INTO DealStatus (dealstatus_timeupdate,
     dealstatus_timecreate,
@@ -1716,14 +1720,14 @@ function run_query_deal_status_insert($deal) {
     dealstatus_order,
     dealstatus_hitrate)
   VALUES (null,
-    '".date("Y-m-d H:i:s")."',
-    ".$obm["uid"].",
+    '".date('Y-m-d H:i:s')."',
+    ".$obm['uid'].",
     '$domain_id',
     '$label',
     '$order',
     '$hitrate')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_status_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_status_insert()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1739,22 +1743,22 @@ function run_query_deal_status_insert($deal) {
 function run_query_deal_status_update($deal) {
   global $obm, $cdg_sql;
 
-  $status = $deal["status"];
-  $label = $deal["status_label"];
-  $order = $deal["status_order"];
-  $hitrate = $deal["status_hitrate"];
-  $multidomain = sql_multidomain("dealstatus");
+  $status = $deal['status'];
+  $label = $deal['status_label'];
+  $order = $deal['status_order'];
+  $hitrate = $deal['status_hitrate'];
+  $multidomain = sql_multidomain('dealstatus');
 	
   $query = "UPDATE DealStatus SET
     dealstatus_label='$label',
-    dealstatus_timeupdate='".date("Y-m-d H:i:s")."',
-    dealstatus_userupdate='".$obm["uid"]."',
+    dealstatus_timeupdate='".date('Y-m-d H:i:s')."',
+    dealstatus_userupdate='".$obm['uid']."',
     dealstatus_order='$order',
     dealstatus_hitrate='$hitrate'
   WHERE dealstatus_id='$status'
     $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_status_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_status_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1770,11 +1774,11 @@ function run_query_deal_status_update($deal) {
 function run_query_deal_status_delete($id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("dealstatus");
+  $multidomain = sql_multidomain('dealstatus');
 
   $query = "DELETE FROM DealStatus WHERE dealstatus_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_status_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_status_delete()');
   $sta_q = new DB_OBM;
   $retour = $sta_q->query($query);
 
@@ -1790,11 +1794,11 @@ function run_query_deal_status_delete($id) {
 function run_query_deal_status_links($s_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 	
   $query = "SELECT deal_id, deal_label FROM Deal WHERE deal_status_id='$s_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_status_links()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_status_links()');
   $sta_q = new DB_OBM;
   $sta_q->query($query);
 
@@ -1816,134 +1820,134 @@ function check_deal_form($did, $deal) {
   global $l_err_kind_empty, $l_err_task_empty, $l_err_market_empty, $l_err_tech_empty;
 
   // Check if the label is filled
-  if (trim($deal["label"]) == "") {
-    $err["msg"] = $l_err_label_empty;
+  if (trim($deal['label']) == '') {
+    $err['msg'] = $l_err_label_empty;
     return false;
   }
 
   // Check if the kind is filled
-  if ($deal["kind_id"] < 1) {
-    $err["msg"] = $l_err_kind_empty;
+  if ($deal['kind_id'] < 1) {
+    $err['msg'] = $l_err_kind_empty;
     return false;
   }
 
   // Check if the tasktype is filled
-  if ($deal["tasktype"] < 1) {
-    $err["msg"] = $l_err_task_empty;
+  if ($deal['tasktype'] < 1) {
+    $err['msg'] = $l_err_task_empty;
     return false;
   }
 
   // Check if the marketing resp. is filled
-  if ($deal["market"] < 1) {
-    $err["msg"] = $l_err_market_empty;
+  if ($deal['market'] < 1) {
+    $err['msg'] = $l_err_market_empty;
     return false;
   }
 
   // Check if the tech resp. is filled
-  if ($deal["tech"] < 1) {
-    $err["msg"] = $l_err_tech_empty;
+  if ($deal['tech'] < 1) {
+    $err['msg'] = $l_err_tech_empty;
     return false;
   }
 
   // If the amount is filled, Check if the hitrate is between 0 and 100
   if ( ( ($deal['amount']) && !($deal['amount'] == 0) )
        || (trim($deal['hitrate']) != '') ) {
-    if ( ($deal["hitrate"] == "") || (! is_numeric($deal["hitrate"]))
-	 || !( ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) ) {
-      $err["msg"] = $l_err_hitrate;
+    if ( ($deal['hitrate'] == '') || (! is_numeric($deal['hitrate']))
+	 || !( ($deal['hitrate'] >= 0) && ($deal['hitrate'] <= 100)) ) {
+      $err['msg'] = $l_err_hitrate;
       return false;
     }
   }
 
-  $datebegin = of_isodate_convert($deal["datebegin"],true);
+  $datebegin = of_isodate_convert($deal['datebegin'],true);
   // Begin Date check
-  if (($datebegin != "") && (preg_match($php_regexp_isodate, $datebegin) == 0)) {
-    $err["msg"] = "$l_begin : $l_invalid_date"; 
+  if (($datebegin != '') && (preg_match($php_regexp_isodate, $datebegin) == 0)) {
+    $err['msg'] = "$l_begin : $l_invalid_date"; 
     return false;
   }
 
-  $dateprop = of_isodate_convert($deal["dateproposal"],true);
+  $dateprop = of_isodate_convert($deal['dateproposal'],true);
   // Expected Date check
-  if (($dateprop != "") && (preg_match($php_regexp_isodate, $dateprop) == 0)) {
-    $err["msg"] = "$l_proposal : $l_invalid_date";
+  if (($dateprop != '') && (preg_match($php_regexp_isodate, $dateprop) == 0)) {
+    $err['msg'] = "$l_proposal : $l_invalid_date";
     return false;
   }
 
-  $dateexp = of_isodate_convert($deal["dateexpected"],true);
+  $dateexp = of_isodate_convert($deal['dateexpected'],true);
   // Expected Date check
-  if (($dateexp != "") && (preg_match($php_regexp_isodate, $dateexp) == 0)) {
-    $err["msg"] = "$l_expected : $l_invalid_date";
+  if (($dateexp != '') && (preg_match($php_regexp_isodate, $dateexp) == 0)) {
+    $err['msg'] = "$l_expected : $l_invalid_date";
     return false;
   }
 
-  $dateend = of_isodate_convert($deal["dateend"],true);
+  $dateend = of_isodate_convert($deal['dateend'],true);
   // End Date check
-  if (($datend != "") && (preg_match($php_regexp_isodate, $dateend) == 0)) {
-    $err["msg"] = "$l_end : $l_invalid_date";
+  if (($datend != '') && (preg_match($php_regexp_isodate, $dateend) == 0)) {
+    $err['msg'] = "$l_end : $l_invalid_date";
     return false;
   }
 
-  $datealarm = of_isodate_convert($deal["datealarm"],true);
+  $datealarm = of_isodate_convert($deal['datealarm'],true);
   // Alarm Date check
-  if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
-    $err["msg"] = "$l_alarm : $l_invalid_date";
+  if (($datealarm != '') && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
+    $err['msg'] = "$l_alarm : $l_invalid_date";
     return false;
   }
 
   // Check dates inconsistencies
-  if ($datebegin != "") { $ts_begin = strtotime($datebegin); }
-  if ($dateend != "") { $ts_end = strtotime($dateend); }
-  if ($dateprop != "") { $ts_prop = strtotime($dateprop); }
-  if ($dateexp != "") { $ts_exp = strtotime($dateexp); }
-  if ($datealarm != "") { $ts_alarm = strtotime($datealarm); }
+  if ($datebegin != '') { $ts_begin = strtotime($datebegin); }
+  if ($dateend != '') { $ts_end = strtotime($dateend); }
+  if ($dateprop != '') { $ts_prop = strtotime($dateprop); }
+  if ($dateexp != '') { $ts_exp = strtotime($dateexp); }
+  if ($datealarm != '') { $ts_alarm = strtotime($datealarm); }
 
   // Begin Date after proposal date
-  if (($datebegin != "") && ($dateprop != "") && ($ts_prop < $ts_begin)) {
-    $err["msg"] = "$l_date_inconsistency : $l_begin > $l_proposal !";
+  if (($datebegin != '') && ($dateprop != '') && ($ts_prop < $ts_begin)) {
+    $err['msg'] = "$l_date_inconsistency : $l_begin > $l_proposal !";
     return false;
   }
 
   // Begin Date after expected date
-  if (($datebegin != "") && ($dateexp != "") && ($ts_exp < $ts_begin)) {
-    $err["msg"] = "$l_date_inconsistency : $l_begin > $l_expected !";
+  if (($datebegin != '') && ($dateexp != '') && ($ts_exp < $ts_begin)) {
+    $err['msg'] = "$l_date_inconsistency : $l_begin > $l_expected !";
     return false;
   }
 
   // Begin Date after alarm date
-  if (($datebegin != "") && ($datealarm != "") && ($ts_alarm < $ts_begin)) {
-    $err["msg"] = "$l_date_inconsistency : $l_begin > $l_alarm !";
+  if (($datebegin != '') && ($datealarm != '') && ($ts_alarm < $ts_begin)) {
+    $err['msg'] = "$l_date_inconsistency : $l_begin > $l_alarm !";
     return false;
   }
 
   // Begin Date after end date
-  if (($datebegin != "") && ($dateend != "") && ($ts_end < $ts_begin)) {
-    $err["msg"] = "$l_date_inconsistency : $l_begin > $l_end !";
+  if (($datebegin != '') && ($dateend != '') && ($ts_end < $ts_begin)) {
+    $err['msg'] = "$l_date_inconsistency : $l_begin > $l_end !";
     return false;
   }
 
   // Proposal Date after expected date
-  if (($dateprop != "") && ($dateexp != "") && ($ts_exp < $ts_prop)) {
-    $err["msg"] = "$l_date_inconsistency : $l_proposal > $l_expected !";
+  if (($dateprop != '') && ($dateexp != '') && ($ts_exp < $ts_prop)) {
+    $err['msg'] = "$l_date_inconsistency : $l_proposal > $l_expected !";
     return false;
   }
 
   // Proposal Date after alarm date
-  if (($dateprop != "") && ($datealarm != "") && ($ts_alarm < $ts_prop)) {
-    $err["msg"] = "$l_date_inconsistency : $l_proposal > $l_alarm !";
+  if (($dateprop != '') && ($datealarm != '') && ($ts_alarm < $ts_prop)) {
+    $err['msg'] = "$l_date_inconsistency : $l_proposal > $l_alarm !";
     return false;
   }
 
   // Proposal Date after end date
-  if (($dateprop != "") && ($dateend != "") && ($ts_end < $ts_prop)) {
-    $err["msg"] = "$l_date_inconsistency : $l_proposal > $l_end !";
+  if (($dateprop != '') && ($dateend != '') && ($ts_end < $ts_prop)) {
+    $err['msg'] = "$l_date_inconsistency : $l_proposal > $l_end !";
     return false;
   }
 
 
-  $datecomment = of_isodate_convert($deal["datecomment"],true);
+  $datecomment = of_isodate_convert($deal['datecomment'],true);
   // Comment Date check
-  if (($datecomment != "") && (preg_match($php_regexp_isodate, $datecomment) == 0)) {
-    $err["msg"] = "$l_date_comment : $l_invalid_date";
+  if (($datecomment != '') && (preg_match($php_regexp_isodate, $datecomment) == 0)) {
+    $err['msg'] = "$l_date_comment : $l_invalid_date";
     return false;
   }
 
@@ -1961,24 +1965,24 @@ function check_deal_quick_form($deal) {
   global $php_regexp_isodate, $l_invalid_date, $l_alarm, $l_date_comment;
   global $err, $l_expected;
 
-  $dateexp = of_isodate_convert($deal["dateexpected"], true);
+  $dateexp = of_isodate_convert($deal['dateexpected'], true);
   // Expected Date check
-  if (($dateexp != "") && (preg_match($php_regexp_isodate, $dateexp) == 0)) {
-    $err["msg"] = "$l_expected : $l_invalid_date";
+  if (($dateexp != '') && (preg_match($php_regexp_isodate, $dateexp) == 0)) {
+    $err['msg'] = "$l_expected : $l_invalid_date";
     return false;
   }
 
-  $datealarm = of_isodate_convert($deal["datealarm"],true);
+  $datealarm = of_isodate_convert($deal['datealarm'],true);
   // Alarm Date check
-  if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
-    $err["msg"] = "$l_alarm : $l_invalid_date";
+  if (($datealarm != '') && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
+    $err['msg'] = "$l_alarm : $l_invalid_date";
     return false;
   }
 
-  $datecomment = of_isodate_convert($deal["datecomment"],true);
+  $datecomment = of_isodate_convert($deal['datecomment'],true);
   // Comment Date check
-  if (($datecomment != "") && (preg_match($php_regexp_isodate, $datecomment) == 0)) {
-    $err["msg"] = "$l_date_comment : $l_invalid_date";
+  if (($datecomment != '') && (preg_match($php_regexp_isodate, $datecomment) == 0)) {
+    $err['msg'] = "$l_date_comment : $l_invalid_date";
     return false;
   }
 
@@ -2001,28 +2005,28 @@ function check_can_delete_deal($p_id) {
   $delete_ok = true;
 
   // Links from Contract
-  $nb = get_global_linked_contract_nb($p_id, "deal", true);
+  $nb = get_global_linked_contract_nb($p_id, 'deal', true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] .= "$l_link_contract";
+    $err['msg'] .= "$l_link_contract";
   } else {
     $ok_msg .= "$l_link_contract_no";
   }
 
   // Links from Project
-  $nb = get_global_linked_project_nb($p_id, "deal", true);
+  $nb = get_global_linked_project_nb($p_id, 'deal', true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] .= "<br />$l_link_project";
+    $err['msg'] .= "<br />$l_link_project";
   } else {
     $ok_msg .= "<br />$l_link_project_no";
   }
 
   // Links from Invoice
-  $nb = get_global_linked_invoice_nb($p_id, "deal", true);
+  $nb = get_global_linked_invoice_nb($p_id, 'deal', true);
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] .= "<br />$l_link_invoice";
+    $err['msg'] .= "<br />$l_link_invoice";
   } else {
     $ok_msg .= "<br />$l_link_invoice_no";
   }
@@ -2043,8 +2047,8 @@ function check_deal_parent_form($pid, $deal) {
   global $err, $l_err_label_empty;
 
   // Check the label is filled
-  if (trim($deal["plabel"]) == "") {
-    $err["msg"] = $l_err_label_empty;
+  if (trim($deal['plabel']) == '') {
+    $err['msg'] = $l_err_label_empty;
     return false;
   }
 
@@ -2064,20 +2068,20 @@ function check_deal_can_delete_parentdeal($p_id) {
   global $l_link_deal;
 
   $delete_ok = true;
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
   // Check if the parentdeal has any deals
 
   $query = "SELECT count(*) FROM Deal 
 		WHERE deal_parentdeal_id='$pid' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "check_deal_can_delete_parentdeal()");
+  display_debug_msg($query, $cdg_sql, 'check_deal_can_delete_parentdeal()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   $nb = $obm_q->f(0);
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] .= "$l_link_deal";
+    $err['msg'] .= "$l_link_deal";
   }
 
   return $delete_ok;
@@ -2106,26 +2110,26 @@ function check_deal_can_delete_parentdeal($p_id) {
 function run_query_deal_search_parentdeal($deal) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $sql_order_dir = $deal["sql_order_dir"];
-  $sql_order_field = $deal["sql_order_field"];
+  $sql_order_dir = $deal['sql_order_dir'];
+  $sql_order_field = $deal['sql_order_field'];
 
-  $plabel = sql_search_text_parse($deal["plabel"]);
-  $pmanager = $deal["pmanager"];
-  $parchive = $deal["parchive"];
+  $plabel = sql_search_text_parse($deal['plabel']);
+  $pmanager = $deal['pmanager'];
+  $parchive = $deal['parchive'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $multidomain = sql_multidomain("parentdeal");
+  $multidomain = sql_multidomain('parentdeal');
 	
-  if ($plabel != "") {
+  if ($plabel != '') {
     $where .= " AND parentdeal_label $like '$plabel%'";
   }
   if ($parchive != 1) {
-    $where .= " AND parentdeal_archive=0";
+    $where .= ' AND parentdeal_archive=0';
   }
-  if (($pmanager != $c_all) && ($pmanager != "")) { 
+  if (($pmanager != $c_all) && ($pmanager != '')) { 
      $where .= " AND (parentdeal_technicalmanager_id='$pmanager'
 		    OR parentdeal_marketingmanager_id='$pmanager') ";
   }
@@ -2133,7 +2137,7 @@ function run_query_deal_search_parentdeal($deal) {
   $whereq = "WHERE 1=1 $where $multidomain";
 
   // Order by clause
-  $order=(strcmp($sql_order_field,"") != 0) ? $sql_order_field : "parentdeal_timecreate"; 
+  $order=(strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'parentdeal_timecreate'; 
   $orderq = " ORDER BY $order $sql_order_dir";
 
   $query = "SELECT
@@ -2157,7 +2161,7 @@ function run_query_deal_search_parentdeal($deal) {
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "parentdeal_search()");
+    display_debug_msg($query, $cdg_sql, 'parentdeal_search()');
     $obm_q->query($query);
   }
 
@@ -2173,11 +2177,11 @@ function run_query_deal_search_parentdeal($deal) {
 function run_query_deal_insert_parentdeal($deal) {
   global $obm, $cdg_sql;
 
-  $plabel = $deal["plabel"];
-  $pmarket = ($deal["pmarket"] ? $deal["pmarket"] : "null");
-  $ptech = ($deal["ptech"] ? $deal["ptech"] : "null");
-  $pcomment = $deal["pcom"];
-  $domain_id = $obm["domain_id"];
+  $plabel = $deal['plabel'];
+  $pmarket = ($deal['pmarket'] ? $deal['pmarket'] : 'null');
+  $ptech = ($deal['ptech'] ? $deal['ptech'] : 'null');
+  $pcomment = $deal['pcom'];
+  $domain_id = $obm['domain_id'];
 	
   $query = "INSERT INTO ParentDeal (parentdeal_timeupdate,
     parentdeal_timecreate,
@@ -2190,9 +2194,9 @@ function run_query_deal_insert_parentdeal($deal) {
     parentdeal_archive,
     parentdeal_comment)
   VALUES (null,
-    '" . date("Y-m-d H:i:s") ."',
+    '" . date('Y-m-d H:i:s') ."',
     null,
-    '" . $obm["uid"] . "',
+    '" . $obm['uid'] . "',
     '$plabel',
     '$domain_id',
     '$pmarket',
@@ -2200,7 +2204,7 @@ function run_query_deal_insert_parentdeal($deal) {
     '0',
     '$pcomment')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_insert_parentdeal()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_insert_parentdeal()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -2219,9 +2223,9 @@ function run_query_deal_parentdeal_detail($pid) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($db_type, "parentdeal_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($db_type, "parentdeal_timecreate", "timecreate");
-  $multidomain = sql_multidomain("parentdeal");
+  $timeupdate = sql_date_format($db_type, 'parentdeal_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'parentdeal_timecreate', 'timecreate');
+  $multidomain = sql_multidomain('parentdeal');
 	
   $query = "SELECT ParentDeal.*,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
@@ -2237,7 +2241,7 @@ function run_query_deal_parentdeal_detail($pid) {
         LEFT JOIN UserObm u ON parentdeal_userupdate=u.userobm_id
       WHERE parentdeal_id='$pid' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_parentdeal_detail()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_parentdeal_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -2253,16 +2257,16 @@ function run_query_deal_parentdeal_detail($pid) {
 function run_query_deal_parentdeal_update($deal) {
   global $obm, $cdg_sql;
 
-  $pid = ($deal["parentdeal_id"] ? $deal["parentdeal_id"] : "null");
-  $plabel = $deal["plabel"];
-  $pmarket = ($deal["pmarket"] ? $deal["pmarket"] : "null");
-  $ptech = ($deal["ptech"] ? $deal["ptech"] : "null");
-  $pcomment = $deal["pcom"];
-  $multidomain = sql_multidomain("parentdeal");
+  $pid = ($deal['parentdeal_id'] ? $deal['parentdeal_id'] : 'null');
+  $plabel = $deal['plabel'];
+  $pmarket = ($deal['pmarket'] ? $deal['pmarket'] : 'null');
+  $ptech = ($deal['ptech'] ? $deal['ptech'] : 'null');
+  $pcomment = $deal['pcom'];
+  $multidomain = sql_multidomain('parentdeal');
 	
   $query = "UPDATE ParentDeal SET
-    parentdeal_timeupdate='". date("Y-m-d H:i:s")."',
-    parentdeal_userupdate='".$obm["uid"]."',
+    parentdeal_timeupdate='". date('Y-m-d H:i:s')."',
+    parentdeal_userupdate='".$obm['uid']."',
     parentdeal_label='$plabel',
     parentdeal_marketingmanager_id='$pmarket',
     parentdeal_technicalmanager_id='$ptech',
@@ -2270,7 +2274,7 @@ function run_query_deal_parentdeal_update($deal) {
   WHERE parentdeal_id='$pid'
     $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_parentdeal_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_parentdeal_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -2287,17 +2291,17 @@ function run_query_deal_parentdeal_update($deal) {
 function run_query_deal_affect_deal_parentdeal($id, $deal) {
   global $obm, $cdg_sql;
     
-  $pid = $deal["parent"];
-  $mutidomain = sql_multidomain("deal");
+  $pid = $deal['parent'];
+  $mutidomain = sql_multidomain('deal');
 	
   $query = "UPDATE Deal SET
     deal_parentdeal_id='$pid',
-    deal_timeupdate='". date("Y-m-d H:i:s")."',
-    deal_userupdate='".$obm["uid"]."'
+    deal_timeupdate='". date('Y-m-d H:i:s')."',
+    deal_userupdate='".$obm['uid']."'
   WHERE deal_id='$id'
     $mutidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_affect_deal_parentdeal()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_affect_deal_parentdeal()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   
@@ -2313,10 +2317,10 @@ function run_query_deal_affect_deal_parentdeal($id, $deal) {
 function run_query_deal_parentdeal_delete($p_id) {
   global $cdg_sql;
 	
-  $multidomain = sql_multidomain("parentdeal");
+  $multidomain = sql_multidomain('parentdeal');
 	
   $query = "DELETE FROM ParentDeal WHERE parentdeal_id='$p_id' $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_deal_parentdeal_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_parentdeal_delete()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
@@ -2330,13 +2334,13 @@ function run_query_deal_parentdeal_delete($p_id) {
 function run_query_deal_updatearchive_parentdeal($p_id) {
   global $cdg_sql;
   
-  $multidomain = sql_multidomain("parentdeal");
+  $multidomain = sql_multidomain('parentdeal');
   
   $query = "UPDATE ParentDeal SET
     parentdeal_archive=1
   WHERE parentdeal_id='$p_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_deal_updatearchive_parentdeal()");
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_updatearchive_parentdeal()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
@@ -2350,17 +2354,17 @@ function run_query_deal_updatearchive_parentdeal($p_id) {
 function get_deal_kind_label($id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("dealtype");
+  $multidomain = sql_multidomain('dealtype');
 
   $query = "SELECT dealtype_label 
 		FROM DealType WHERE dealtype_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_deal_kind_label()");
+  display_debug_msg($query, $cdg_sql, 'get_deal_kind_label()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("dealtype_label");
+  $retour = $obm_q->f('dealtype_label');
   return $retour;
 }
 
@@ -2373,17 +2377,17 @@ function get_deal_kind_label($id) {
 function get_deal_status_label($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("dealstatus");
+	$multidomain = sql_multidomain('dealstatus');
 
   $query = "SELECT dealstatus_label FROM DealStatus 
 		WHERE dealstatus_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_deal_status_label()");
+  display_debug_msg($query, $cdg_sql, 'get_deal_status_label()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("dealstatus_label");
+  $retour = $obm_q->f('dealstatus_label');
   return $retour;
 }
 
@@ -2396,19 +2400,19 @@ function get_deal_status_label($id) {
 function get_deal_parent_label($p_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("parentdeal");
+	$multidomain = sql_multidomain('parentdeal');
 
   // We group by, to only have one row result
   $query = "SELECT parentdeal_label
     FROM ParentDeal
     WHERE parentdeal_id='$p_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_deal_parent_label()");
+  display_debug_msg($query, $cdg_sql, 'get_deal_parent_label()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q->f("parentdeal_label");
+  return $obm_q->f('parentdeal_label');
 }
 
 
@@ -2421,7 +2425,7 @@ function get_deal_parent_label($p_id) {
 function get_deal_parent_status($p_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("dealstatus");
+  $multidomain = sql_multidomain('dealstatus');
 
   // We order by dealstatus_id to get the min
   $query = "SELECT dealstatus_order, dealstatus_label
@@ -2430,12 +2434,12 @@ function get_deal_parent_status($p_id) {
       AND deal_status_id=dealstatus_id $multidomain
     ORDER BY dealstatus_order";
 
-  display_debug_msg($query, $cdg_sql, "get_deal_parent_status()");
+  display_debug_msg($query, $cdg_sql, 'get_deal_parent_status()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q->f("dealstatus_label");
+  return $obm_q->f('dealstatus_label');
 }
 
 
@@ -2448,7 +2452,7 @@ function get_deal_parent_status($p_id) {
 function get_deal_parent_dateproposal($p_id)  {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   $query = "SELECT deal_dateproposal
     FROM Deal
@@ -2463,7 +2467,7 @@ function get_deal_parent_dateproposal($p_id)  {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  return $obm_q->f("deal_dateproposal");
+  return $obm_q->f('deal_dateproposal');
 }
 
 
@@ -2476,7 +2480,7 @@ function get_deal_parent_dateproposal($p_id)  {
 function get_deal_parent_datealarm($p_id)  {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   $query = "SELECT deal_datealarm
     FROM Deal
@@ -2488,7 +2492,7 @@ function get_deal_parent_datealarm($p_id)  {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  return $obm_q->f("deal_datealarm");
+  return $obm_q->f('deal_datealarm');
 }
 
 
@@ -2501,7 +2505,7 @@ function get_deal_parent_datealarm($p_id)  {
 function get_deal_parent_expense($p_id)  {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   $query = "SELECT sum(deal_amount) as res
     FROM Deal, DealType
@@ -2517,7 +2521,7 @@ function get_deal_parent_expense($p_id)  {
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q->f("sum(deal_amount)");
+  return $obm_q->f('sum(deal_amount)');
 }
 
 
@@ -2530,7 +2534,7 @@ function get_deal_parent_expense($p_id)  {
 function get_deal_parent_income($p_id)  {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   $query = "SELECT sum(deal_amount) as res
     FROM Deal, DealType
@@ -2559,7 +2563,7 @@ function get_deal_parent_income($p_id)  {
 function get_deal_parent_potential($p_id)  {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain('deal');
 
   $query = "SELECT sum(deal_amount * deal_hitrate / 100) as res_balanced,
       sum(deal_amount) as res
@@ -2576,7 +2580,7 @@ function get_deal_parent_potential($p_id)  {
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return number_format($obm_q->f("res_balanced")) . " / " .$obm_q->f("res");
+  return number_format($obm_q->f('res_balanced')) . ' / ' .$obm_q->f('res');
 }
 
 ?>

@@ -266,8 +266,7 @@ function check_domain_data_form($d_id, $domain) {
     $err['msg'] = $l_label_error.' : '. $label;
     return false;
   }
-  
-  
+    
   return true;
 }
 
@@ -310,6 +309,43 @@ function get_linked_user_domain($domain_id) {
     WHERE userobm_domain_id='$domain_id'");
 
   return $nb;
+}
+
+
+/**
+ * Check if a mailserver can be added in a domain
+ *
+ * @param mixed $params : parameters : domain_id, mailserver_id
+ * @return true if the mailserver can be removed from the domain
+ **/
+function check_domain_can_add_mailserver($params) {
+  global $err;
+  global $l_mailserver_invalid_role;
+
+  $add_ok = true;
+  $role = $params['role']; 
+
+  // check mail servers have valid role
+  $cpt = 0;
+  $test_q = new DB_OBM;
+  while ($cpt < $params['mailserver_nb']) {
+    $cpt++;
+    $m_id = $params["mailserver$cpt"];
+    $query = "SELECT count(*) as nb FROM MailServer
+      WHERE mailserver_id='$m_id'
+        AND mailserver_$role='1'";
+    display_debug_msg($query, $cdg_sql, 'check_domain_can_add_mailserver()');
+    $test_q->query($query);
+    $test_q->next_record();
+    $nb = $test_q->f('nb');
+    if ($nb == 0) {
+      $add_ok = false;
+      $err['msg'] .= $l_mailserver_invalid_role;
+      return $add_ok;
+    }
+  }
+
+  return $add_ok;
 }
 
 
