@@ -45,7 +45,7 @@ sub getDbValues {
     }
 
     # On ajoute les informations de la structure
-    $postfixConfs[0]->{"node_type"} = $POSTFIXCONF;
+    $postfixConfs[0]->{"node_type"} = $MAILSERVER;
     $postfixConfs[0]->{"name"} = $postfixConfs[0]->{$attributeDef->{$postfixConfs[0]->{"node_type"}}->{"dn_value"}};
     $postfixConfs[0]->{"domain_id"} = $domainId;
     $postfixConfs[0]->{"dn"} = &OBM::ldap::makeDn( $postfixConfs[0], $parentDn );

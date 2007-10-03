@@ -52,13 +52,13 @@ sub init {
             next;
         }
 
-        if( !defined($currentDomainDesc->{"smtp-in_servers"}) ) {
+        if( !defined($currentDomainDesc->{"smtpin_servers"}) ) {
             next;
         }
 
-        my $domainSrvList = $currentDomainDesc->{"smtp-in_servers"};
+        my $domainSrvList = $currentDomainDesc->{"smtpin_servers"};
         for( my $j=0; $j<=$#$domainSrvList; $j++ ) {
-            $self->{"smtpInMailServerList"}->{$domainSrvList->[$j]->{"smtp-in_server_name"}} = $domainSrvList->[$j];
+            $self->{"smtpInMailServerList"}->{$domainSrvList->[$j]->{"smtpin_server_name"}} = $domainSrvList->[$j];
         }
     }
 
@@ -101,7 +101,7 @@ sub update {
     while( my( $serverName, $serverDesc ) = each(%{$srvList}) ) {
         &OBM::toolBox::write_log( "[Postfix::smtpInRemoteEngine]: connexion au serveur : '".$serverName."'", "W" );
         my $srvCon = new Net::Telnet(
-            Host => $serverDesc->{"smtp-in_server_ip"},
+            Host => $serverDesc->{"smtpin_server_ip"},
             Port => 30000,
             Timeout => 60,
             errmode => "return"

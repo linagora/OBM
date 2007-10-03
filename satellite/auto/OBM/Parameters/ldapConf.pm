@@ -5,7 +5,7 @@ require Exporter;
 use OBM::Parameters::common;
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw( $ldapAdminLogin $NODE $ROOT $DOMAINROOT $POSIXUSERS $POSIXGROUPS $SYSTEMUSERS $DOMAINHOSTS $SAMBADOMAIN $SAMBAFREEUNIXID $SAMBAUSERS $SAMBAGROUPS $SAMBAHOSTS $POSTFIXCONF $MAILSHARE $GROUPOFNAMES );
+@EXPORT_const = qw( $ldapAdminLogin $NODE $ROOT $DOMAINROOT $POSIXUSERS $POSIXGROUPS $SYSTEMUSERS $DOMAINHOSTS $SAMBADOMAIN $SAMBAFREEUNIXID $SAMBAUSERS $SAMBAGROUPS $SAMBAHOSTS $MAILSERVER $MAILSHARE $GROUPOFNAMES );
 @EXPORT_struct = qw($attributeDef $ldapStruct);
 @EXPORT = (@EXPORT_const, @EXPORT_struct);
 @EXPORT_OK = qw();
@@ -40,7 +40,7 @@ $SAMBAFREEUNIXID = "sambaFreeUnixId";
 $SAMBAUSERS = "sambaUsers";
 $SAMBAGROUPS = "sambaGroups";
 $SAMBAHOSTS = "sambaHosts";
-$POSTFIXCONF = "postfixConf";
+$MAILSERVER = "mailServer";
 $MAILSHARE = "mailShare";
 $GROUPOFNAMES = "groupOfNames";
 
@@ -324,12 +324,12 @@ $attributeDef = {
         }
     },
 
-    $POSTFIXCONF => {
+    $MAILSERVER => {
         structural => 1,
         is_branch => 0,
         dn_prefix => "cn",
         dn_value => "postfixconf_name",
-        objectclass => [ "obmPostfix" ],
+        objectclass => [ "obmMailServer" ],
         get_db_value => sub {
             my( $parentdn, $domainId ) = @_;
             require OBM::Ldap::typePostfixConf;
@@ -536,7 +536,7 @@ if( $obmModules->{"mail"} ) {
         name => "servicesConfiguration",
         node_type => "$NODE",
         description => "Services configuration",
-        data_type => [ $POSTFIXCONF ],
+        data_type => [ $MAILSERVER ],
         template => [],
         branch => []
     };

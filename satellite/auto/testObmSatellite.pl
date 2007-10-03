@@ -14,7 +14,7 @@ sub getParameter {
     my( $parameters ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "smtpInConf", "cyrusParitionsAdd", "cyrusParitionsDel", "help" );
+    &GetOptions( $parameters, "smtpInConf", "cyrusPartitionsAdd", "cyrusPartitionsDel", "help" );
 
     my $goodParams = 0;
     my $helpParam = 0;
@@ -26,13 +26,13 @@ sub getParameter {
                 last SWITCH;
             }
 
-            if( $paramName eq "cyrusParitionsAdd" ) {
+            if( $paramName eq "cyrusPartitionsAdd" ) {
                 &OBM::toolBox::write_log( "Mise a jour (ajout) des partitions Cyrus", "W" );
                 $goodParams++;
                 last SWITCH;
             }
 
-            if( $paramName eq "cyrusParitionsDel" ) {
+            if( $paramName eq "cyrusPartitionsDel" ) {
                 &OBM::toolBox::write_log( "Mise a jour (suppression) des partitions Cyrus", "W" );
                 $goodParams++;
                 last SWITCH;
@@ -50,8 +50,8 @@ sub getParameter {
     if( !$goodParams || $helpParam ) {
         print "Vous devez indiquer au moins un des paramètres suivants :\n";
         print "\tsmtpInConf: permet de régénérer les tables Postfix\n";
-        print "\tcyrusParitionsAdd: permet d'ajouter les partitions Cyrus manquantes - Provoque un redémarrage du/des services Cyrus !\n";
-        print "\tcyrusParitionsDel: permet de supprimer les partitions Cyrus non déclarées - Provoque un redémarrage du/des services Cyrus !\n\n";
+        print "\tcyrusPartitionsAdd: permet d'ajouter les partitions Cyrus manquantes - Provoque un redémarrage du/des services Cyrus !\n";
+        print "\tcyrusPartitionsDel: permet de supprimer les partitions Cyrus non déclarées - Provoque un redémarrage du/des services Cyrus !\n\n";
         return 0;
     }
 
@@ -123,7 +123,7 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 }
 
 # Obtention de la liste des serveurs SMTP
-my $query = "SELECT i.host_name, i.host_ip FROM Host i, MailServer j WHERE i.host_id=j.mailserver_host_id";
+my $query = "SELECT i.host_name, i.host_ip, j.mailserver_imap, j.mailserver_smtp_in, j.mailserver_smtp_out FROM Host i, MailServer j WHERE i.host_id=j.mailserver_host_id";
 
 # On execute la requete
 my $queryResult;
@@ -132,7 +132,7 @@ if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
     exit 1;
 }
 
-while( my( $serverName, $serverIp ) = $queryResult->fetchrow_array() ) {
+while( my( $serverName, $serverIp, $imapSrv, $smtpInSrv, $smtpOutSrv ) = $queryResult->fetchrow_array() ) {
     if( !defined($serverName) || !defined($serverIp) ) {
         next;
     }
@@ -141,19 +141,19 @@ while( my( $serverName, $serverIp ) = $queryResult->fetchrow_array() ) {
         my $cmd = undef;
 
         SWITCH: {
-            if( $paramName eq "smtpInConf" ) {
+            if( $smtpInSrv && ($paramName eq "smtpInConf") ) {
                 &OBM::toolBox::write_log( "Mise a jour des tables Postfix", "W" );
                 $cmd = "smtpInConf: ".$serverName;
                 last SWITCH;
             }
 
-            if( $paramName eq "cyrusParitionsAdd" ) {
+            if( $imapSrv && ($paramName eq "cyrusPartitionsAdd") ) {
                 &OBM::toolBox::write_log( "Mise a jour des partitions Cyrus - Ajout", "W" );
                 $cmd = "cyrusPartitions: add:".$serverName;
                 last SWITCH;
             }
 
-            if( $paramName eq "cyrusParitionsDel" ) {
+            if( $imapSrv && ($paramName eq "cyrusPartitionsDel") ) {
                 &OBM::toolBox::write_log( "Mise a jour des partitions Cyrus - Suppression", "W" );
                 $cmd = "cyrusPartitions: del:".$serverName;
                 last SWITCH;

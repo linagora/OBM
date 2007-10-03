@@ -61,7 +61,7 @@ $postfixMapsDesc = {
         postfix_map_separator => "\t",
         postfix_map_process => 1,
         postfix_map_postmap => 1,
-        ldap_filter => "(&(objectClass=obmPostfix)(obmDomain=<obmDomain>))",
+        ldap_filter => "(&(objectClass=obmMailServer)(obmDomain=<obmDomain>))",
         ldap_attibute => [ "myDestination" ],
         make_map => sub {
             my( $daemonRef, $domainMapFile, $obmDomains ) = @_;

@@ -26,7 +26,7 @@ require OBM::Entities::obmUser;
 require OBM::Entities::obmHost;
 require OBM::Entities::obmGroup;
 require OBM::Entities::obmMailshare;
-require OBM::Entities::obmPostfixConf;
+require OBM::Entities::obmMailServer;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 
@@ -242,8 +242,8 @@ sub _doGlobal {
 
 
     # Pour tous les domaines
-    # Traitement des entités de type 'postfixConf'
-    my $object = $self->_doPostfixConf( 1, 0 );
+    # Traitement des entités de type 'obmMailServer'
+    my $object = $self->_doMailServer( 1, 0 );
     my $return = $self->_runEngines( $object );
 
     if( $return ) {
@@ -909,7 +909,7 @@ sub _doHost {
 }
 
 
-sub _doPostfixConf {
+sub _doMailServer {
     my $self = shift;
     my( $links, $delete ) = 0;
     my $return = 1;
@@ -922,13 +922,13 @@ sub _doPostfixConf {
         $delete = 0;
     }
 
-    my $postfixConfObject = OBM::Entities::obmPostfixConf->new( $links, $delete );
-    $postfixConfObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    my $mailServerObject = OBM::Entities::obmMailServer->new( $links, $delete );
+    $mailServerObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
 
-    return $postfixConfObject;
+    return $mailServerObject;
 }
 
 

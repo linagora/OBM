@@ -147,7 +147,7 @@ sub getSmtpInServers {
         }
 
         &OBM::toolBox::write_log( "[Update::update]: recuperation des serveurs de courrier pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
-        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=1 AND domainmailserver_role='smtp-in' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
+        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=1 AND domainmailserver_role='smtp_in' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
 
         # On execute la requete
         my $queryResult;
@@ -159,11 +159,11 @@ sub getSmtpInServers {
         my @srvList = ();
         while( my( $hostId, $hostName, $hostIp) = $queryResult->fetchrow_array ) {
             my $srv;
-            $srv->{"smpt-in_server_id"} = $hostId;
-            $srv->{"smtp-in_server_name"} = $hostName;
-            $srv->{"smtp-in_server_ip"} = $hostIp;
+            $srv->{"smptin_server_id"} = $hostId;
+            $srv->{"smtpin_server_name"} = $hostName;
+            $srv->{"smtpin_server_ip"} = $hostIp;
 
-            push( @{$domainList->[$i]->{"smtp-in_servers"}}, $srv );
+            push( @{$domainList->[$i]->{"smtpin_servers"}}, $srv );
         }
     }
 

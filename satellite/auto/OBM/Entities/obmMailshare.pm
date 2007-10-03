@@ -100,10 +100,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "[Entities::obmMailshare]: pas de BAL partage d'identifiant : ".$mailShareId, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: pas de BAL partagee d'identifiant : ".$mailShareId, "W" );
         return 0;
     }elsif( $numRows > 1 ) {
-        &OBM::toolBox::write_log( "[Entities::obmMailshare]: plusieurs BAL partages d'identifiant : ".$mailShareId." ???", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: plusieurs BAL partagees d'identifiant : ".$mailShareId." ???", "W" );
         return 0;
     }
 
