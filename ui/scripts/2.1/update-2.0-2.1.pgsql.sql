@@ -373,7 +373,7 @@ INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentk
 -- UPDATE Payment Structure
 --
 ALTER TABLE Payment ADD COLUMN payment_gap decimal(10,2);
-ALTER TABLE Payment ALTER COLUMN SET DEFAULT '0,0';
+ALTER TABLE Payment ALTER COLUMN SET DEFAULT '0.0';
 ALTER TABLE Payment ALTER COLUMN SET NOT NULL;
 
 

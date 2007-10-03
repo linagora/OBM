@@ -358,7 +358,7 @@ INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentk
 --
 -- UPDATE Payment Structure
 --
-ALTER TABLE Payment ADD COLUMN payment_gap double(10,2) DEFAULT '0,0' NOT NULL AFTER payment_checked;
+ALTER TABLE Payment ADD COLUMN payment_gap double(10,2) DEFAULT '0.0' NOT NULL AFTER payment_checked;
 
 
 --
