@@ -5,6 +5,6 @@ set -x
 
 . /usr/share/debconf/confmodule
 . /usr/share/dbconfig-common/dpkg/prerm.mysql 
-dbc_go obm-ihm $@
+dbc_go obm-core $@
 
 #DEBHELPER#

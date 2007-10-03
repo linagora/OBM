@@ -8,14 +8,14 @@ if [ -f /usr/share/debconf/confmodule ]; then
 fi
 if [ -f /usr/share/dbconfig-common/dpkg/postrm.mysql ]; then
     . /usr/share/dbconfig-common/dpkg/postrm.mysql
-    dbc_go obm-ihm $@
+    dbc_go obm-core $@
 fi
 
 
 if [ "$1" = "purge" ]; then
-	rm -f /etc/obm-ihm/debian-db-obm.conf
+	rm -f /etc/obm/debian-db-obm.conf
 	if which ucf >/dev/null 2>&1; then
-		ucf --purge /etc/obm-ihm/debian-db-obm.conf
+		ucf --purge /etc/obm/debian-db-obm.conf
 	fi
 fi
 

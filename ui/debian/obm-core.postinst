@@ -1,0 +1,29 @@
+#!/bin/sh
+
+set -e
+set -x
+
+. /usr/share/debconf/confmodule
+
+###Génération de la BD Mysql
+. /usr/share/dbconfig-common/dpkg/postinst.mysql 
+dbc_generate_include=template:/etc/obm/debian-db-obm.conf
+dbc_generate_include_args="-o template_infile=/usr/share/obm/debian/debian-db.conf.template"
+#dbc_generate_include_owner="root:www-data"
+#dbc_generate_include_perms="0640"
+#dbc_generate_include_args="--dbname=obm"
+dbc_go obm-core $@
+
+###Gestion du virtualHost Apache
+#db_get obm-core/configapache
+#CHOICE=$RET
+##si vrai on install le virtualHost
+#if [ "$CHOICE" = "true" ]; then
+#	touch /tmp/createVHobm
+#fi
+
+
+
+
+
+#DEBHELPER#

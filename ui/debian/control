@@ -12,9 +12,9 @@ Description: OBM
     full installation of Open Business Management
 	Instalation of Bd Mysql, apache and VirtualHost
 
-Package: obm-ihm
+Package: obm-core
 Architecture: any
 Pre-Depends: dbconfig-common, ucf, ${misc:Depends}
-Description: OBM ihm
-    ihm of Open Business Management
+Description: OBM core
+    core of Open Business Management
 	Instalation of Bd Mysql, apache and VirtualHost

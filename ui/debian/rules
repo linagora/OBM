@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# debian/rules for obm-ihm package, by
+# debian/rules for obm-core package, by
 # sylvain garcia <sylvain.garcia@aliasource.fr>
 #
 
@@ -36,9 +36,9 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	#
-	# obm-ihm needs the sql skeleton here in order to create db:
+	# obm-core needs the sql skeleton here in order to create db:
 	#
-	cp misc/mysql.sql debian/obm-ihm/usr/share/dbconfig-common/data/obm-ihm/install/mysql
+	cp misc/mysql.sql debian/obm-core/usr/share/dbconfig-common/data/obm-ihm/install/mysql
 
 # Build architecture-independent files here.
 binary-indep: build install
