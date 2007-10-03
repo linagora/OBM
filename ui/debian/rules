@@ -38,7 +38,7 @@ install: build
 	#
 	# obm-core needs the sql skeleton here in order to create db:
 	#
-	cp misc/mysql.sql debian/obm-core/usr/share/dbconfig-common/data/obm-ihm/install/mysql
+	cp debian/misc/mysql.sql debian/obm-core/usr/share/dbconfig-common/data/obm-core/install/mysql
 
 # Build architecture-independent files here.
 binary-indep: build install
