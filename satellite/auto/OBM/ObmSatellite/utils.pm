@@ -20,7 +20,7 @@ sub connectLdapSrv {
         return 0;
     }
 
-    $ldapSrv->{"ldap_server"}->{"conn"} = Net::LDAP->new(
+    $ldapSrv->{"conn"} = Net::LDAP->new(
         $ldapSrv->{"server"},
         port => "389",
         debug => "0",
@@ -29,18 +29,18 @@ sub connectLdapSrv {
     ) or return 0;
 
 
-    if( !defined($ldapSrv->{"ldap_server"}->{"conn"}) ) {
+    if( !defined($ldapSrv->{"conn"}) ) {
         return 0;
     }
 
     my $errorCode;
     if( defined($ldapSrv->{"login"}) && defined($ldapSrv->{"password"}) ) {
-        $errorCode = $ldapSrv->{"ldap_server"}->{"conn"}->bind(
+        $errorCode = $ldapSrv->{"conn"}->bind(
             $ldapSrv->{"login"},
             password => $ldapSrv->{"password"}
         );
     }else {
-        $errorCode = $ldapSrv->{"ldap_server"}->{"conn"}->bind();
+        $errorCode = $ldapSrv->{"conn"}->bind();
     }
 
     if( $errorCode->code ) {
@@ -54,8 +54,8 @@ sub connectLdapSrv {
 sub disconnectLdapSrv {
     my( $ldapSrv ) = @_;
 
-    if( defined($ldapSrv->{"ldap_server"}->{"conn"}) ) {
-        $ldapSrv->{"ldap_server"}->{"conn"}->unbind();
+    if( defined($ldapSrv->{"conn"}) ) {
+        $ldapSrv->{"conn"}->unbind();
     }
 
     return 1;
@@ -68,10 +68,10 @@ sub ldapSearch {
     use Net::LDAP::Util qw(escape_filter_value);
     require Net::LDAP;
 
-    if( !defined($ldapSrv->{"ldap_server"}->{conn}) ) {
+    if( !defined($ldapSrv->{conn}) ) {
         return 1;
     }
-    my $ldapConn = $ldapSrv->{"ldap_server"}->{conn};
+    my $ldapConn = $ldapSrv->{conn};
 
     if( !defined($ldapFilter) ) {
         return 1;
@@ -82,7 +82,7 @@ sub ldapSearch {
     }
 
     my $ldapResult = $ldapConn->search(
-        base => "",
+        base => $ldapSrv->{"base"},
         filter => to_utf8( { -string => $ldapFilter, -charset => "ISO-8859-1"} ),
         scope => "sub",
         attrs => $ldapAttributes
