@@ -1,6 +1,10 @@
-usr/share/obm
 usr/share/dbconfig-common/data/obm-core/install
 usr/share/dbconfig-common/data/obm-core/upgrade/mysql
 usr/share/dbconfig-common/scripts/obm-core/upgrade/mysql
-etc/obm
+usr/share/obm
 usr/share/obm/debian
+usr/share/obm/sample
+usr/share/obm/www
+usr/share/obm/www/conf
+usr/share/doc/obm
+etc/obm

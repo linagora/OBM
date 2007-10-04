@@ -5,6 +5,24 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+is_initial_configuration() { 
+# Check if this is the initial configuration and not an upgrade of an 
+# existing configuration 
+# Usage: if is_initial_configuration "$@"; then ... fi from top level 
+
+	# Plain installation 
+	if [ "$1" = configure ] && [ -z "$2" ]; then 
+	        return 0 
+	fi 
+	# Configuration via dpkg-reconfigure 
+	if [ "$1" = reconfigure ] || [ "$DEBCONF_RECONFIGURE" ]; then 
+	        return 0 
+	fi 
+	return 1 
+} 
+
+
+
 ###Génération de la BD Mysql
 db_get obm-core/mysqlinstall
 if [ "$RET" = "true" ]; then
@@ -24,6 +42,36 @@ elif [ "$RET" = "false" ]; then
 	   dbc_go obm-core $@
 	fi
 fi
+
+#mise en place des fichier de conf OBM
+OBM_USER=`grep "dbuser" /etc/obm/debian-db-obm.conf | cut -d"=" -f2`
+OBM_PASSWD=`grep "dbpass" /etc/obm/debian-db-obm.conf | cut -d"=" -f2`	
+OBM_DBNAME=`grep "dbname" /etc/obm/debian-db-obm.conf | cut -d"=" -f2`	
+OBM_HOST=`grep "dbserver" /etc/obm/debian-db-obm.conf | cut -d"=" -f2`	
+if [ -z $OBM_HOST ] ; then
+	OBM_HOST="localhost"
+fi
+	
+
+#Installation des fichier de conf
+if is_initial_configuration "$@"; then
+	cp /usr/share/obm/sample/obm_conf.ini.sample /etc/obm/obm_conf.ini
+	ln -s /etc/obm/obm_conf.ini /usr/share/obm/www/conf/obm_conf.ini
+
+	cp /usr/share/obm/sample/obm_conf.inc.sample /etc/obm/obm_conf.inc
+	ln -s /etc/obm/obm_conf.inc /usr/share/obm/www/conf/obm_conf.inc
+fi
+
+sed -i -e "s#host = localhost#host = ${OBM_HOST}#" /etc/obm/obm_conf.ini
+sed -i -e "s#db = obm#db = ${OBM_DBNAME}#" /etc/obm/obm_conf.ini
+sed -i -e "s#user = obm#user = ${OBM_USER}#" /etc/obm/obm_conf.ini
+sed -i -e "s#password = \"aliasource\"#password = \"${OBM_PASSWD}\"#" /etc/obm/obm_conf.ini
+
+#if is_initial_configuration "$@"; then
+	db_get obm-core/ldapserver
+	OBM_LDAP_SERVER=$RET
+#fi
+	sed -i -e "s#ldapServer = localhost#ldapServer = ${OBM_LDAP_SERVER}#" /etc/obm/obm_conf.ini
 
 
 ###Gestion du virtualHost Apache

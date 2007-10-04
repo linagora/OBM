@@ -25,5 +25,9 @@ if [ "$1" = "purge" ]; then
 	if which ucf >/dev/null 2>&1; then
 		ucf --purge /etc/obm/debian-db-obm.conf
 	fi
+	rm -f /etc/obm/obm_conf.ini
+	rm -f /usr/share/obm/www/conf/obm_conf.ini
+	rm -f /etc/obm/obm_conf.inc
+	rm -f /usr/share/obm/www/conf/obm_conf.inc
 fi
 #DEBHELPER#
