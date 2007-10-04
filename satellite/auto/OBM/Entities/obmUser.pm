@@ -235,9 +235,12 @@ sub getEntity {
             }
 
             # Gestion de la BAL destination
-            $self->{"userDesc"}->{"user_mailbox"} = $self->{"userDesc"}->{"user_login"};
+            #   valeur dans LDAP
+            $self->{"userDesc"}->{"user_mailbox"} = $self->{"userDesc"}->{"user_login"}."@".$domainDesc->{"domain_name"};
+            #   nom de la BAL Cyrus
+            $self->{"userDesc"}->{"user_mailbox_name"} = $self->{"userDesc"}->{"user_login"};
             if( !$singleNameSpace ) {
-                $self->{"userDesc"}->{"user_mailbox"} .= "@".$domainDesc->{"domain_name"};
+                $self->{"userDesc"}->{"user_mailbox_name"} .= "@".$domainDesc->{"domain_name"};
             }
 
             # Partition Cyrus associée à cette BAL
@@ -822,7 +825,7 @@ sub getMailboxName {
     my $mailBoxName = undef;
 
     if( $self->{"userDesc"}->{"user_mailperms"} ) {
-        $mailBoxName = $self->{"userDesc"}->{"user_mailbox"};
+        $mailBoxName = $self->{"userDesc"}->{"user_mailbox_name"};
     }
 
     return $mailBoxName;
