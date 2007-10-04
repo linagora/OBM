@@ -28,8 +28,10 @@ obm-mail = true
 obm-samba = true
 obm-web = true
 
-; Paramètre permettant de configurer OBM pour n'utiliser qu'un seul espace de
-; nom pour les entités de ses différents domaines
+; Paramètre permettant de limiter à 1 le nombre de domaines OBM
+; Les identifiants utilisateurs sont de la forme 'login' au lieu de 'login@domaine'
+; Attention : la modification de cette varibale nécessite des modifications
+; systèmes
 singleNameSpace = false
 
 [automate]
@@ -45,8 +47,8 @@ ldapRoot = local
 ; Gestion des partition Cyrus
 ; si cette option est active, une partition Cyrus est créée pour chacun des
 ; domaines OBM. Cette partition contient toutes les entités du domaine.
-; Attention : l'activation ou la désactivation de cette option après que des
-; entités aient été créés n'est pas transparente !
+; Attention : l'activation ou la désactivation de cette option après la création
+; d'entités nécessite une migration des BALs
 cyrusPartition = false
 
 ; Adresse du serveur Samba sur lequel les repertoires personnels sont crees

@@ -1,5 +1,6 @@
 # Adresse du serveur LDAP referent
 ldap_server         nom.server.ldap
+ldap_base                                               # DIT de l'annuaire LDAP - si vide, positionner 'defaultsearchbase' côté serveur
 ldap_login                                              # DN de l'utilisateur LDAP - requetes anonymes par defaut
 ldap_password                                           # Mot de passe de l'utilisateur LDAP - requetes anonymes par defaut
 

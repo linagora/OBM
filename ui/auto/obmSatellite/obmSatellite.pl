@@ -39,6 +39,7 @@ sub configure_hook {
     # Lectrure des paramètres spécifiques
     my $daemonOptions = {
         ldap_server => [],
+        ldap_base => [],
         ldap_login => [],
         ldap_password => [],
         max_badrequest => [],
@@ -64,6 +65,11 @@ sub configure_hook {
     # Option chargées depuis le fichier de configuration
     if( defined($daemonOptions->{ldap_server}->[0]) && (($daemonOptions->{ldap_server}->[0] =~ /^([1-2]?[0-9]{1,2}\.){3}[1-2]?[0-9]{1,2}$/) || ($daemonOptions->{ldap_server}->[0] =~ /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,6}$/)) ) {
         $self->{ldap_server}->{server} = $daemonOptions->{ldap_server}->[0];
+        $self->{ldap_server}->{base} = $daemonOptions->{ldap_base}->[0];
+        if( !defined($self->{ldap_server}->{base}) ) {
+            $self->{ldap_server}->{base} = "";
+        }
+
         $self->{ldap_server}->{login} = $daemonOptions->{ldap_login}->[0];
         $self->{ldap_server}->{password} = $daemonOptions->{ldap_password}->[0];
     }else {

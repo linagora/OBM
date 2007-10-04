@@ -56,7 +56,7 @@ $db = "dbi:".lc( $cfgFile->val( 'global', 'dbtype' )).":database=$dbName;host=".
 # Mode d'espace de nom OBM
 if( lc($cfgFile->val( 'global', 'singleNameSpace' )) eq "true" ) {
     $singleNameSpace = 1;
-}else{
+}else {
     $singleNameSpace = 0;
 }
 
