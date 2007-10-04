@@ -135,10 +135,6 @@ sub getEntity {
 
     # On range les resultats dans la structure de donnees des resultats
     $self->{"mailShareDesc"}->{"mailshare_name"} = $dbMailShareDesc->{"mailshare_name"};
-    $self->{"mailShareDesc"}->{"mailshare_mailbox"} = "+".$dbMailShareDesc->{"mailshare_name"};
-    if( !$singleNameSpace ) {
-        $self->{"mailShareDesc"}->{"mailshare_mailbox"} .= "@".$domainDesc->{"domain_name"};
-    }
     $self->{"mailShareDesc"}->{"mailshare_description"} = $dbMailShareDesc->{"mailshare_description"};
     $self->{"mailShareDesc"}->{"mailshare_domain"} = $domainDesc->{"domain_label"};
 
@@ -161,7 +157,13 @@ sub getEntity {
             $self->{"mailShareDesc"}->{"mailshare_mailperms"} = 1;
 
             # Gestion de la BAL destination
-            $self->{"mailShareDesc"}->{"mailShare_mailbox"} = $self->{"mailShareDesc"}->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
+            #   valeur dans LDAP
+            $self->{"mailShareDesc"}->{"mailshare_mailbox"} = "+".$dbMailShareDesc->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
+            #   nom de la BAL Cyrus
+            $self->{"mailShareDesc"}->{"mailshare_mailbox_name"} = $dbMailShareDesc->{"mailshare_name"};
+            if( !$singleNameSpace ) {
+                $self->{"mailShareDesc"}->{"mailshare_mailbox_name"} .= "@".$domainDesc->{"domain_name"};
+            }
 
             # Partition Cyrus associée à cette BAL
             if( $OBM::Parameters::common::cyrusDomainPartition ) {
@@ -526,7 +528,7 @@ sub getMailboxName {
     my $mailShareName = undef;
 
     if( $self->{"mailShareDesc"}->{"mailshare_mailperms"} ) {
-        $mailShareName = $self->{"mailShareDesc"}->{"mailShare_mailbox"};
+        $mailShareName = $self->{"mailShareDesc"}->{"mailshare_mailbox_name"};
     }
 
     return $mailShareName;
