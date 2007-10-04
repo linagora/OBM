@@ -413,8 +413,7 @@ function run_query_domain_properties($domain_id=0) {
       domainproperty_key,
       domainproperty_type,
       domainproperty_default
-    FROM DomainProperty $join
-    WHERE domainproperty_readonly = 0";
+    FROM DomainProperty $join";
   
   display_debug_msg($query, $cdg_sql, 'run_query_domain_properties()');
   $obm_q = new DB_OBM;
