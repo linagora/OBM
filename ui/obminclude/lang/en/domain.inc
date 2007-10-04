@@ -26,6 +26,7 @@ $l_delete_error = "The deletion of the domain has failed !";
 $l_label_error = "Invalid label !";
 $l_can_delete = "The domain can be deleted.";
 $l_cant_delete = "The domain can't be deleted !";
+$l_cant_add_domain_single = "Only one domain can be created when OBM is configured in mono domain mode (singleNameSpace) ! Beware, going multi-domain mode needs an important system work";
 
 $l_max_user = "# users max";
 $l_max_resource = "# resources max";

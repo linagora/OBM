@@ -26,6 +26,7 @@ $l_no_found = "Aucun domaine trouvé !";
 $l_label_error = "Invalid label !";
 $l_can_delete = "Le domaine peut être supprimé.";
 $l_cant_delete = "Le domaine ne peut pas être supprimé !";
+$l_cant_add_domain_single = "Impossible de créer un nouveau domaine, OBM est configuré en mode mono domaine (singleNameSpace) ! Attention, le passage en multi-domaine nécessite une intervention système importante.";
 
 $l_max_user = "# users max";
 $l_max_resource = "# ressources max";

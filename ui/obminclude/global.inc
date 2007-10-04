@@ -226,6 +226,7 @@ $profiles['admin'] = array (
     'domain' => 0
     )
 );
+
 //-------------------------//
 // Default Displayed Infos //
 //-------------------------//
@@ -237,7 +238,6 @@ $cgp_show['section']['user']['url'] = "$path/settings/settings_index.php";
 $cgp_show['section']['admin']['url'] = "$path/admin/admin_index.php?mode=html";
 $cgp_show['section']['dic']['url'] = "$path/admin_ref/admin_ref_index.php?mode=html";
 $cgp_show['section']['my']['url'] = "$path/settings/settings_index.php";
-//$cgp_show['section']['aliamin']['url'] = "http://aliamin/";
 
 // modules
 $cgp_show['module']['company'] = 'com';
@@ -272,6 +272,7 @@ $cgp_show['module']['import'] = 'admin';
 $cgp_show['module']['backup'] = 'admin';
 $cgp_show['module']['mailserver'] = 'admin';
 $cgp_show['module']['samba'] = 'admin';
+$cgp_show['module']['domain'] = 'admin';
 $cgp_show['module']['admin_pref'] = 'dic';
 $cgp_show['module']['admin_data'] = 'dic';
 $cgp_show['module']['admin_lang'] = 'dic';
@@ -282,11 +283,6 @@ $cgp_show['module']['password'] = 'my';
 $cgp_show['module']['mailforward'] = 'my';
 $cgp_show['module']['vacation'] = 'my';
 $cgp_show['module']['mailbox'] = 'my';
-
-// Display domain module only when multidomain is activate
-if (!$c_singleNameSpace) {
-  $cgp_show['module']['domain'] = 'admin';
-}
 
 // Specific user data
 $cgp_user = array();
@@ -324,7 +320,7 @@ $cg_gid_smb_host = 515;
 //---------------------------------------------------------------------------//
 
 ///////////////////////////////////////////////////////////////////////////////
-// Recuperation des parametres du fichier de configuration global obm_conf.ini
+// Load global parameters from .ini file
 ///////////////////////////////////////////////////////////////////////////////
 $ini_array = parse_ini_file("$path/../conf/obm_conf.ini");
 
@@ -334,7 +330,7 @@ $obmdb_db = $ini_array['db'];
 $obmdb_user = $ini_array['user'];
 $obmdb_password = $ini_array['password'];
 
-// Single og multi domain ?
+// Single or multi domain
 $c_singleNameSpace = $ini_array['singleNameSpace'];
 
 ///////////////////////////////////////////////////////////////////////////////

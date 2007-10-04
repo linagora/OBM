@@ -28,11 +28,12 @@ obm-mail = true
 obm-samba = true
 obm-web = true
 
-; Paramètre permettant de limiter à 1 le nombre de domaines OBM
-; Les identifiants utilisateurs sont de la forme 'login' au lieu de 'login@domaine'
-; Attention : la modification de cette varibale nécessite des modifications
-; systèmes
+; singleNameSpace mode allow only one domain
+; login are 'login' and not 'login@domain'
+; Going multi-domain from mono domain needs system work (ldap, cyrus,...)
+; Multi-domain enabled by default
 singleNameSpace = false
+
 
 [automate]
 ; Parametrage specifique a l'automate

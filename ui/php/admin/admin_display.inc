@@ -10,18 +10,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Display the help screen
 // Parameters:
-//   - $mode   : "txt" ou "html"
+//   - $mode   : 'txt' ou 'html'
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_help($mode) {
 
-  if ($mode == "html")
+  if ($mode == 'html')
     echo "<table class=\"details\">
       <tr>
         <td><pre>";
 
-  include ("admin_help.inc");
+  include ('admin_help.inc');
 
-  if ($mode == "html")
+  if ($mode == 'html')
     echo "</pre></td>
       </tr>
       </table>";
@@ -31,16 +31,16 @@ function dis_admin_help($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the search form for data module
 // Parameters:
-//   - $mode     : "txt" ou "html"
+//   - $mode     : 'txt' ou 'html'
 //   - $lifetime : session lifetime
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_index($mode, $lifetime) {
 
   switch ($mode) {
-  case "txt":
+  case 'txt':
     echo "try -h to help\n";
     break;
-  case "html":
+  case 'html':
     $nb_user_ses = get_admin_usersession_number();
     $obm_u = run_query_admin_active_user($lifetime);
     $block = html_admin_status($lifetime, $nb_user_ses, $obm_u);
@@ -71,18 +71,18 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     $d_lifetime = $lifetime;
   } else {
     $nb_sess_to_clear = 0;
-    $d_lifetime = "unlimited";
+    $d_lifetime = 'unlimited';
   }
 
   $nbua = $obm_u->nf();
-  $list_user = "";
+  $list_user = '';
   while ($obm_u->next_record()) {
-    $last_acces = of_datetime_format($obm_u->f("timeupdate"));
-    $login = $obm_u->f("userobm_login");
-    $login_date = of_datetime_format($obm_u->f("timecreate"));
-    $nb_con = $obm_u->f("activeuserobm_nb_connexions");
-    $lastpage = $obm_u->f("activeuserobm_lastpage");
-    $ip = $obm_u->f("activeuserobm_ip");
+    $last_acces = of_datetime_format($obm_u->f('timeupdate'));
+    $login = $obm_u->f('userobm_login');
+    $login_date = of_datetime_format($obm_u->f('timecreate'));
+    $nb_con = $obm_u->f('activeuserobm_nb_connexions');
+    $lastpage = $obm_u->f('activeuserobm_lastpage');
+    $ip = $obm_u->f('activeuserobm_ip');
     $list_user .= "
       <tr>
       <td>$login</td>
@@ -94,7 +94,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
       </tr>";
   }
   
-  $multidomain = $c_singleNameSpace == false ? "Multi" : "Single";
+  $multidomain = $c_singleNameSpace == false ? 'Multi' : 'Single';
 	 
   $block = "
     <div class=\"detail infos\">
@@ -119,7 +119,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     </table>
     </div>
 
-    <form method=\"get\" action=\"" . url_prepare("admin_index.php"). "\">
+    <form method=\"get\" action=\"" . url_prepare('admin_index.php'). "\">
     <div class=\"detail infos\">
     <h1>Sessions</h1>
     <table>
@@ -183,7 +183,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
 ///////////////////////////////////////////////////////////////////////////////
 // Clear the Sessions and file it
 // Parameters:
-//   - $mode     : "txt" or "html"
+//   - $mode     : 'txt' or 'html'
 //   - $lifetime : session lifetime
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_clear_sess($mode, $lifetime) {
@@ -196,7 +196,7 @@ function dis_admin_clear_sess($mode, $lifetime) {
     $ltime = 86400;
   }
 
-  $date_limit = date("Y-m-d H:i:s",time() - $ltime);
+  $date_limit = date('Y-m-d H:i:s',time() - $ltime);
   $obm_q = run_query_admin_passive_user($ltime);
 
   while($obm_q->next_record()) {
@@ -204,7 +204,7 @@ function dis_admin_clear_sess($mode, $lifetime) {
     run_query_admin_activeuserobm_delete($obm_q->f('activeuserobm_sid'));
   }
 
-  if ($mode == "html") {
+  if ($mode == 'html') {
     dis_admin_index($mode, $ltime);
   }
 }
