@@ -483,7 +483,8 @@ function run_query_domain_properties($domain_id=0) {
       $val
       domainproperty_key,
       domainproperty_type,
-      domainproperty_default
+      domainproperty_default,
+      domainproperty_readonly
     FROM DomainProperty $join";
   
   display_debug_msg($query, $cdg_sql, 'run_query_domain_properties()');

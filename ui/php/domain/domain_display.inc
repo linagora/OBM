@@ -311,16 +311,19 @@ function html_domain_form($dom_q,$properties_q, $domain) {
   if (isset($domain['alias'])) { $alias = $domain['alias']; }
 
   while($properties_q->next_record()) {
-    $name = $properties_q->f('domainproperty_key');
-    $plabel = $GLOBALS["l_$name"];
-    if (isset($domain[$name])) { 
-      ${$name} = $domain[$name]; 
-    }
-    $properties_block .= "
+    $readonly = $properties_q->f('domainproperty_readonly');
+    if ($readonly != '1') {
+      $name = $properties_q->f('domainproperty_key');
+      $plabel = $GLOBALS["l_$name"];
+      if (isset($domain[$name])) { 
+	${$name} = $domain[$name]; 
+      }
+      $properties_block .= "
       <tr>
       <th>$plabel</th>
       <td><input type=\"text\" name=\"$name\" value=\"".${$name}."\" /></td>
       </tr>";
+    }
   }
   if ($properties_block != '') {
     $properties_block = "
