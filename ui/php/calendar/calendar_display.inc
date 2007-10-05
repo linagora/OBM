@@ -2412,12 +2412,12 @@ function dis_calendar_quick_form($calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $res, $groups,$tasks, $cats1, $alerts) {
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
-  global $ccalendar_resource, $ccalendar_weekstart, $ico_project;
-  global $ico_mini_cal, $ico_add,$ico_delete, $l_items, $l_header_new;
-  global $ccalendar_first_hour, $ccalendar_last_hour,$ico_project;
+  global $ccalendar_resource, $ccalendar_weekstart, $ccalendar_hour_fraction;
+  global $ico_mini_cal, $ico_add,$ico_delete, $ico_project, $l_header_new;
+  global $ccalendar_first_hour, $ccalendar_last_hour;
   // -- Labels
   global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_desc;
-  global $l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_items, $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_insert,$l_update,$l_repeat;
   global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
@@ -2815,21 +2815,25 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   $dis_hour_e .= "</select>";  
 
   $dis_min_b = "<select name=\"sel_min_begin\" style=\"width:4em;\">";
-  for ($i=4;$i>=1;$i--) {
-    $current_min = substr("0".(60 - (15*$i)),-2);
+  if ($ccalendar_hour_fraction <= 60 && $ccalendar_hour_fraction > 0) {
+    $hour_fraction = $ccalendar_hour_fraction;
+  } else {
+    $hour_fraction = 4;
+  }
+  $step = 60 / $hour_fraction;
+  for ($i=$hour_fraction; $i>=1; $i--) {
+    $current_min = substr("0".round((60 - ($step*$i))),-2);
     if ($current_min  == $minbegin) {
       $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     } else {
       $dis_min_b .= "<option value=\"$current_min\">$current_min</option>";
     }
   }
-  $dis_min_b .= "</select>";  
+  $dis_min_b .= "</select>";
 
   $dis_min_e = "<select name=\"sel_min_end\" style=\"width:4em;\">";
-  //  for ($i=4;$i>=1;$i--) {
-  //    $current_min = substr("0".(60 - (15*$i)),-2);
-  for ($i=60;$i>=1;$i--) {
-    $current_min = substr("0".(60 - (1*$i)),-2);
+  for ($i=$hour_fraction; $i>=1; $i--) {
+    $current_min = substr("0".round((60 - ($step*$i))),-2);
     if ($current_min  == $minend) {
       $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     } else {

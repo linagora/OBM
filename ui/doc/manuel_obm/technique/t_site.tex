@@ -4,22 +4,73 @@
 
 \section{Configuration spécifique d'un site}
 
-révision : \obm 2.0.0\\
+révision : \obm 2.1.0\\
 
 OBM est pensé pour faciliter la personnalisation d'une mise en oeuvre en restant compatible avec le produit générique.
 
-Pour ce faire les options de configurations et les données spécifiques d'un site sont situées dans un fichier et un répertoire dédiés.\\
+Pour ce faire les options de configurations et les données spécifiques d'un site sont situées dans 2 fichiers et un répertoire dédiés.\\
 
 \begin{tabular}{|p{7cm}|p{5cm}|}
 \hline
 Répertoire de configuration & conf/ \\
 \hline
-Fichier de configuration & conf/obm\_conf.inc \\
+Fichier de configuration système & conf/obm\_conf.ini \\
+\hline
+Fichier de configuration de l'application & conf/obm\_conf.inc \\
 \hline
 \end{tabular}
 
 
-\subsection{Les options de paramétrage}
+\subsection{obm\_conf.ini : Fichier de configuration système}
+
+
+\begin{longtable}{|p{3cm}|p{1cm}|p{2.5cm}|p{8cm}|}
+\hline
+\textbf{Option} & \textbf{Depuis} & \textbf{Défaut} & \textbf{Description} \\
+\hline
+\hline
+\multicolumn{4}{c}{\textbf{Paramètres globaux}}\\
+\hline
+\hline
+host & 2.0.0 & localhost & Connexion BD : hôte \\ 
+\hline
+dbtype & 2.0.0 & MYSQL & Connexion BD : type de la BD (MYSQL ou PGSQL) \\ 
+\hline
+db & 2.0.0 & obm & Connexion BD : nom de la BD \\ 
+\hline
+user & 2.0.0 & obm & Connexion BD : login de connexion à la BD \\ 
+\hline
+password & 2.0.0 & obm & Connexion BD : mot de passe de connexion à la BD \\ 
+\hline
+lang & 2.0.0 & fr & Langue par défaut \\ 
+\hline
+obm-ldap & 2.0.0 & false & Utilisation du service ldap \\ 
+\hline
+obm-mail & 2.0.0 & false & Utilisation du service messagerie (postfix + cyrus) \\ 
+\hline
+obm-samba & 2.0.0 & false & Utilisation du service PDC samba \\ 
+\hline
+obm-web & 2.0.0 & false & Utilisation du service acces web \\ 
+\hline
+singleNameSpace & 2.1.0 & false & Utilisation en mono-domaine (1 seul espace de nom cyrus, login sans domaine) \\ 
+
+\hline
+\hline
+\multicolumn{4}{c}{\textbf{Paramètres de l'automate}}\\
+\hline
+\hline
+ldapServer & 2.0.0 & localhost & Serveur Ldap \\ 
+\hline
+ldapRoot & 2.0.0 & local & Racine de l'arbre LDAP géré par obm-ldap \\ 
+\hline
+cyrusPartition & 2.1.0 & false & Gestion de partitions cyrus (séparation des domaines OBM) \\ 
+\hline
+sambaHomeServer & 2.0.0 & '' & Adresse du serveur Samba stockant les répertoires personnels \\ 
+\hline
+\end{longtable}
+
+
+\subsection{obm\_conf.inc : Fichier de configuration de l'application}
 
 Ces paramètres se définissent dans le fichier de configuration conf/obm\_conf.inc. Les valeurs par défaut des paramètres sont positionnées dans le fichier obminclude/global.inc.
 

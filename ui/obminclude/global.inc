@@ -128,14 +128,19 @@ $ccalendar_alerts = array ("300" => "5", "600" => "10", "900" => "15", "1800" =>
 //$ccalendar_weekstart = 'monday + 2 hours';
 // Calendar max user displayed in the calendar
 $ccalendar_max_users = 25;
+
 // Calendar first and last hour display
 $ccalendar_first_hour = 8;
 $ccalendar_last_hour = 20;
+
 // Calendar Resource usage
 $ccalendar_resource = true;
+
 // Calendar send ics file
 $ccalendar_send_ics = true;
 
+// Calendar hour fraction (minutes select granularity)
+$ccalendar_hour_fraction = 4;
 
 // Time : In how many parts we split up a day (Time management)
 $c_day_fraction = 8;
@@ -227,6 +232,59 @@ $profiles['admin'] = array (
     )
 );
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Load global parameters from .ini file
+///////////////////////////////////////////////////////////////////////////////
+$ini_array = parse_ini_file("$path/../conf/obm_conf.ini");
+
+$obmdb_host = $ini_array['host'];
+$obmdb_dbtype = $ini_array['dbtype']; 
+$obmdb_db = $ini_array['db'];
+$obmdb_user = $ini_array['user'];
+$obmdb_password = $ini_array['password'];
+
+// Single or multi domain
+$c_singleNameSpace = $ini_array['singleNameSpace'];
+
+//------------------//
+// Services enabled //
+//------------------//
+$cgp_use['service']['web'] = $ini_array['obm-web'];
+$cgp_use['service']['mail'] = $ini_array['obm-mail'];
+$cgp_use['service']['mail_nomad'] = $ini_array['obm-mail'];
+$cgp_use['service']['mail_vacation'] = $ini_array['obm-mail'];
+$cgp_use['service']['samba'] = $ini_array['obm-samba'];
+$cgp_use['service']['ldap'] = $ini_array['obm-ldap'];
+$cgp_use['service']['dns'] = false;
+$cgp_use['service']['firewall'] = false;
+$cgp_use['service']['network'] = false;
+
+if ($cgp_use['service']['ldap'] == false) {
+  $cgp_use['service']['mail'] = false;
+  $cgp_use['service']['samba'] = false;
+}
+
+if ($cgp_use['service']['mail'] == false) {
+  $cgp_use['service']['mail_nomad'] = false;
+  $cgp_use['service']['mail_vacation'] = false;
+}
+
+	   
+// UID : First User
+$c_first_uid = 1001;
+// First GID for simple users - first GID for group creation
+$c_first_gid_user = 1001;
+// First GID for admin users - by default, simple and admin users have same
+$c_first_gid_admin = $c_first_gid_user;
+
+// OBM-Windows Samba Groups
+$cg_gid_smb_admin = 512;
+$cg_gid_smb_user = 513;
+$cg_gid_smb_guest = 514;
+$cg_gid_smb_host = 515;
+
+
 //-------------------------//
 // Default Displayed Infos //
 //-------------------------//
@@ -263,15 +321,21 @@ $cgp_show['module']['group'] = 'user';
 $cgp_show['module']['resource'] = 'user';
 $cgp_show['module']['resourcegroup'] = 'user';
 $cgp_show['module']['host'] = 'user';
-$cgp_show['module']['mailshare'] = 'user';
+if ($cgp_use['service']['mail']) {
+  $cgp_show['module']['mailshare'] = 'user';
+}
 $cgp_show['module']['organizationalchart'] = 'user';
 $cgp_show['module']['tools'] = 'admin';
 $cgp_show['module']['control'] = 'admin';
 $cgp_show['module']['admin'] = 'admin';
 $cgp_show['module']['import'] = 'admin';
 $cgp_show['module']['backup'] = 'admin';
-$cgp_show['module']['mailserver'] = 'admin';
-$cgp_show['module']['samba'] = 'admin';
+if ($cgp_use['service']['mail']) {
+  $cgp_show['module']['mailserver'] = 'admin';
+}
+if ($cgp_use['service']['samba']) {
+  $cgp_show['module']['samba'] = 'admin';
+}
 $cgp_show['module']['domain'] = 'admin';
 $cgp_show['module']['admin_pref'] = 'dic';
 $cgp_show['module']['admin_data'] = 'dic';
@@ -280,62 +344,22 @@ $cgp_show['module']['admin_code'] = 'dic';
 $cgp_show['module']['admin_ref'] = 'dic';
 $cgp_show['module']['settings'] = 'my';
 $cgp_show['module']['password'] = 'my';
-$cgp_show['module']['mailforward'] = 'my';
-$cgp_show['module']['vacation'] = 'my';
-$cgp_show['module']['mailbox'] = 'my';
-
+if ($cgp_use['service']['mail_nomad']) {
+  $cgp_show['module']['mailforward'] = 'my';
+}
+if ($cgp_use['service']['mail_vacation']) {
+  $cgp_show['module']['vacation'] = 'my';
+}
+if ($cgp_use['service']['mail']) {
+  $cgp_show['module']['mailbox'] = 'my';
+}
+   
 // Specific user data
 $cgp_user = array();
-
-// OBM-LDAP, OBM-Mail, OBM-Windows values
-
-//------------------//
-// Services enabled //
-//------------------//
-$cgp_use['service']['web'] = false;
-$cgp_use['service']['mail'] = false;
-$cgp_use['service']['mail_nomad'] = false;
-$cgp_use['service']['mail_vacation'] = false;
-$cgp_use['service']['samba'] = false;
-$cgp_use['service']['ldap'] = false;
-$cgp_use['service']['dns'] = false;
-$cgp_use['service']['firewall'] = false;
-$cgp_use['service']['network']  = false;
-	   
-// UID : First User
-$c_first_uid = 1001;
-// First GID for simple users - first GID for group creation
-$c_first_gid_user = 1001;
-// First GID for admin users - by default, simple and admin users have same
-$c_first_gid_admin = $c_first_gid_user;
-
-// OBM-Windows Samba Groups
-$cg_gid_smb_admin = 512;
-$cg_gid_smb_user = 513;
-$cg_gid_smb_guest = 514;
-$cg_gid_smb_host = 515;
 
 //---------------------------------------------------------------------------//
 // END : OBM Default configurable Constants : Default values
 //---------------------------------------------------------------------------//
-
-///////////////////////////////////////////////////////////////////////////////
-// Load global parameters from .ini file
-///////////////////////////////////////////////////////////////////////////////
-$ini_array = parse_ini_file("$path/../conf/obm_conf.ini");
-
-$obmdb_host = $ini_array['host'];
-$obmdb_dbtype = $ini_array['dbtype']; 
-$obmdb_db = $ini_array['db'];
-$obmdb_user = $ini_array['user'];
-$obmdb_password = $ini_array['password'];
-
-// Single or multi domain
-$c_singleNameSpace = $ini_array['singleNameSpace'];
-
-///////////////////////////////////////////////////////////////////////////////
-// Fin du chargement
-///////////////////////////////////////////////////////////////////////////////
 
 require_once('conf/obm_conf.inc');
 require_once("$obminclude/phplib/obmlib.inc");
