@@ -122,132 +122,6 @@ function html_domain_search_list($obm_q, $prefs, $domain, $popup) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display domain Form
-// Parameters:
-//   - $usr_q     : domain database result
-//   - $domain      : default values or updated values (if error)
-//     kes used   : id, name, passwd, perms, email
-///////////////////////////////////////////////////////////////////////////////
-function html_domain_form($dom_q,$properties_q, $domain) {
-  global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
-  global $l_insert, $l_update,$l_mail_server;
-  global $display, $cgp_use,$l_properties;
-
-  // if update mode and first time value are taken from database
-  if ($domain['action'] == 'detailupdate') {
-    $id = $dom_q->f('domain_id');
-    $label = $dom_q->f('domain_label');
-    $desc = $dom_q->f('domain_description');
-    $domain_name = $dom_q->f('domain_name');
-    $alias = $dom_q->f('domain_alias');
-    while($properties_q->next_record()) {
-      ${$properties_q->f('domainproperty_key')} = $properties_q->f('domainpropertyvalue_value');
-    }
-    $properties_q->seek(0);
-  }
-
-  // If parameters have been given, they supercede the default action value
-  if (isset($domain['domain_id'])) { $id = $domain['domain_id']; }
-  if (isset($domain['label'])) { $label = $domain['label']; }
-  if (isset($domain['desc'])) { $desc = $domain['desc']; }
-  if (isset($domain['domain_name'])) { $domain_name = $domain['domain_name']; }
-  if (isset($domain['alias'])) { $alias = $domain['alias']; }
-
-  while($properties_q->next_record()) {
-    $name = $properties_q->f('domainproperty_key');
-    $plabel = $GLOBALS["l_$name"];
-    if (isset($domain[$name])) { 
-      ${$name} = $domain[$name]; 
-    }
-    $properties_block .= "
-      <tr>
-      <th>$plabel</th>
-      <td><input type=\"text\" name=\"$name\" value=\"".${$name}."\" /></td>
-      </tr>";
-  }
-  if ($properties_block != '') {
-    $properties_block = "
-     <fieldset class=\"detail infos\">
-     <legend>$l_properties</legend>
-     <table>
-     $properties_block
-     </table>
-     </fieldset>
-";
-  }  
-
-  // Buttons
-  if (($domain['action'] == 'new') || ($domain['action'] == 'insert')) {
-    $dis_domain_name = "<input name=\"tf_domain_name\" size=\"48\" maxlength=\"128\" value=\"$domain_name\" />";
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-          <input type=\"submit\" value=\"$l_insert\" />";
-
-  } elseif (($domain['action'] == 'detailupdate') || ($domain['action'] == 'update')) {
-    $dis_domain_name = $domain_name;
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\">
-          <input type=\"hidden\" name=\"domain_id\" value=\"$id\">
-          <input type=\"submit\" value=\"$l_update\">";
-  }
-  
-  if ($cgp_use['service']['mail']) {
-    // Mail server selection
-    $dis_mailserver = "
-    <tr>
-      <th class=\"$class[mail_server]\">$l_mail_server</th>
-      <td>
-      ".get_select_host_server($mail_server, ($id == '')?'0':$id)."
-      </td>
-    </tr>";
-  }
-
-  $display['title'] = "<div class=\"title\">$l_domain : $label </div>";
-
-  // --- HTML Template --------------------------------------------------------
-  $block = "
-    <form method=\"post\" name=\"f_entity\"
-      onsubmit=\"if (check_domain(this)) return true; else return false;\"
-      action=\"" . url_prepare('domain_index.php') . "\">
-
-    <fieldset class=\"detail infos\">
-    <legend>$l_domain</legend>
-    <table>
-    <tr>
-      <th>$l_label</th>
-      <td><input name=\"tf_label\" size=\"24\" maxlength=\"32\" value=\"$label\" /></td>
-    </tr>
-    <tr>
-      <th>$l_desc</th>
-      <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
-    </tr>
-    <tr>
-      <th>$l_domain_name</th>
-      <td>$dis_domain_name</td>
-    </tr>
-    $dis_mailserver
-    </table>
-    </fieldset>
-
-     <fieldset class=\"detail infos\">
-    <legend>$l_alias</legend>
-    <table>
-    <tr>
-      <th>$l_alias</th>
-      <td><textarea name=\"ta_alias\" rows=\"6\" cols=\"48\">$alias</textarea></td>
-    </tr>
-    </table>
-    </fieldset>
-    $properties_block
-
-    <fieldset class=\"buttons\">
-    $dis_button
-    </fieldset>
-    </form>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display domain Consultation
 // Parameters:
 //   - $domain : domain database result
@@ -259,7 +133,7 @@ function dis_domain_consult($domain) {
 
   $obm_q = run_query_domain_detail($id);
   $properties_q = run_query_domain_properties($id);
-  $mailservers = get_domain_mailserver($id);
+  $mailservers = of_domain_get_domain_mailserver('', $id);
   if ($obm_q->num_rows() == 1) {
     $block = html_domain_consult($obm_q, $mailservers, $properties_q);
   } else {
@@ -317,7 +191,7 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
         <td>$name</td>
         <td>$ip</td>
         <td>$role</td>
-        <td style=\"text-align: center;\"><a href=\"$path/domain/domain_index.php?action=mailserver_del&amp;domain_id=$id&amp;mailserver_id=$m_id&amp;role=$role\"><img src=\"$ico_delete\" alt=\"$l_header_delete\" /></a></td>
+        <td style=\"text-align: center;\"><a href=\"$path/domain/domain_index.php?action=mailserver_del&amp;domain_id=$id&amp;mail_server_id=$m_id&amp;role=$role\"><img src=\"$ico_delete\" alt=\"$l_header_delete\" /></a></td>
         </tr>";
 	}
       }
@@ -399,6 +273,160 @@ $properties_block
 ";
 
   return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display domain Form
+// Parameters:
+//   - $usr_q     : domain database result
+//   - $domain      : default values or updated values (if error)
+//     kes used   : id, name, passwd, perms, email
+///////////////////////////////////////////////////////////////////////////////
+function html_domain_form($dom_q,$properties_q, $domain) {
+  global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
+  global $l_insert, $l_update,$l_mail_server;
+  global $display, $cgp_use,$l_properties;
+
+  // if update mode and first time value are taken from database
+  if ($domain['action'] == 'detailupdate') {
+    $id = $dom_q->f('domain_id');
+    $label = $dom_q->f('domain_label');
+    $desc = $dom_q->f('domain_description');
+    $domain_name = $dom_q->f('domain_name');
+    $mail_server_id = $dom_q->f('domain_mail_server_id');
+    $alias = $dom_q->f('domain_alias');
+    while($properties_q->next_record()) {
+      ${$properties_q->f('domainproperty_key')} = $properties_q->f('domainpropertyvalue_value');
+    }
+    $properties_q->seek(0);
+  }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($domain['domain_id'])) { $id = $domain['domain_id']; }
+  if (isset($domain['label'])) { $label = $domain['label']; }
+  if (isset($domain['desc'])) { $desc = $domain['desc']; }
+  if (isset($domain['domain_name'])) { $domain_name = $domain['domain_name']; }
+  if (isset($domain['mail_server_id'])) { $mail_server_id = $domain['mail_server_id']; }
+  if (isset($domain['alias'])) { $alias = $domain['alias']; }
+
+  while($properties_q->next_record()) {
+    $name = $properties_q->f('domainproperty_key');
+    $plabel = $GLOBALS["l_$name"];
+    if (isset($domain[$name])) { 
+      ${$name} = $domain[$name]; 
+    }
+    $properties_block .= "
+      <tr>
+      <th>$plabel</th>
+      <td><input type=\"text\" name=\"$name\" value=\"".${$name}."\" /></td>
+      </tr>";
+  }
+  if ($properties_block != '') {
+    $properties_block = "
+     <fieldset class=\"detail infos\">
+     <legend>$l_properties</legend>
+     <table>
+     $properties_block
+     </table>
+     </fieldset>";
+  }
+
+  // Buttons
+  if (($domain['action'] == 'new') || ($domain['action'] == 'insert')) {
+    $dis_domain_name = "<input name=\"tf_domain_name\" size=\"48\" maxlength=\"128\" value=\"$domain_name\" />";
+    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+          <input type=\"submit\" value=\"$l_insert\" />";
+
+  } elseif (($domain['action'] == 'detailupdate') || ($domain['action'] == 'update')) {
+    $dis_domain_name = $domain_name;
+    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\">
+          <input type=\"hidden\" name=\"domain_id\" value=\"$id\">
+          <input type=\"submit\" value=\"$l_update\">";
+  }
+  
+  if ($cgp_use['service']['mail']) {
+    // Mail server selection
+    $dis_mailserver = "
+    <tr>
+      <th class=\"$class[mail_server]\">$l_mail_server</th>
+      <td>
+      ".dis_domain_mailserver_select('imap', "$mail_server_id", ($id == '')?'0':$id)."
+      </td>
+    </tr>";
+  }
+
+  $display['title'] = "<div class=\"title\">$l_domain : $label </div>";
+
+  // --- HTML Template --------------------------------------------------------
+  $block = "
+    <form method=\"post\" name=\"f_entity\"
+      onsubmit=\"if (check_domain(this)) return true; else return false;\"
+      action=\"" . url_prepare('domain_index.php') . "\">
+
+    <fieldset class=\"detail infos\">
+    <legend>$l_domain</legend>
+    <table>
+    <tr>
+      <th>$l_label</th>
+      <td><input name=\"tf_label\" size=\"24\" maxlength=\"32\" value=\"$label\" /></td>
+    </tr>
+    <tr>
+      <th>$l_desc</th>
+      <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
+    </tr>
+    <tr>
+      <th>$l_domain_name</th>
+      <td>$dis_domain_name</td>
+    </tr>
+    $dis_mailserver
+    </table>
+    </fieldset>
+
+     <fieldset class=\"detail infos\">
+    <legend>$l_alias</legend>
+    <table>
+    <tr>
+      <th>$l_alias</th>
+      <td><textarea name=\"ta_alias\" rows=\"6\" cols=\"48\">$alias</textarea></td>
+    </tr>
+    </table>
+    </fieldset>
+    $properties_block
+
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
+    </form>";
+
+  return $block;
+}
+
+
+/**
+ * Display : domain applicable mailserver select (host from domain or global)
+ * @param $role : restrict list to mail server role
+ * @param $sel_id : selected entry
+ * @param $domain_id : restrict list to mail server in this domain
+ **/
+function dis_domain_mailserver_select($role, $sel_id='', $domain_id='') {
+
+  $ms = get_domain_mailservers($role, $domain_id);
+
+  // select
+  $sel = "<select id=\"sel_mail_server_id\" name=\"sel_mail_server_id\">";
+  if (is_array($ms)) {
+    foreach ($ms as $m) {
+      $id = $m['id'];
+      $name = htmlentities($m['name']);
+      $sel .= "<option value=\"$id\"";
+      if ($id == $sel_id) { $sel .= " selected=\"selected\""; }
+      $sel .= ">$name</option>";
+    }
+  }
+  $sel .= "</select>";
+
+  return $sel;
 }
 
 

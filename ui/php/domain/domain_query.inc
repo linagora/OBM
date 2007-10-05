@@ -106,7 +106,7 @@ function run_query_domain_insert($domain) {
   $desc = $domain['desc'];
   $domain_name = $domain['domain_name'];
   $alias = $domain['alias'];
-  $mail_server = $domain['mail_server'];
+  $mail_server_id = $domain['mail_server_id'];
 
   $query = "INSERT INTO Domain (
     domain_timeupdate,
@@ -126,7 +126,7 @@ function run_query_domain_insert($domain) {
     '$label',
     '$desc',
     '$domain_name',
-    '$mail_server',
+    '$mail_server_id',
     '$alias')";
     
   display_debug_msg($query, $cdg_sql, 'run_query_domain_insert(1)');
@@ -207,14 +207,14 @@ function run_query_domain_update($d_id, $domain) {
   $label = $domain['label'];
   $desc = $domain['desc'];
   $alias = $domain['alias'];
-  $mail_server = $domain['mail_server'];
+  $mail_server_id = $domain['mail_server_id'];
 
   $query = "UPDATE Domain SET
     domain_timeupdate='$now',
     domain_userupdate='$uid',
     domain_label='$label',
     domain_description='$desc',
-    domain_mail_server_id='$mail_server',
+    domain_mail_server_id='$mail_server_id',
     domain_alias='$alias'
   WHERE domain_id='$d_id'";
 
@@ -390,10 +390,10 @@ function check_domain_can_delete_mailserver($params) {
 
   $delete_ok = true;
   $domain_id = $params['domain_id'];
-  $mailserver_id = $params['mailserver_id'];
+  $mail_server_id = $params['mail_server_id'];
 
   // Links from Users
-  $nb = get_domain_linked_user_mailserver($domain_id, $mailserver_id);
+  $nb = get_domain_linked_user_mailserver($domain_id, $mail_server_id);
   if ($nb > 0) {
     $delete_ok = false;
     $err['msg'] .= $l_link_user_mailserver;
@@ -420,6 +420,48 @@ function get_domain_linked_user_mailserver($domain_id, $mailserver_id) {
       AND userobm_mail_server_id='$mailserver_id'");
 
   return $nb;
+}
+
+
+/**
+ * Get the mailserver list candidate for a domain
+ * where mailserver host_domain_id matches or from domain 0)
+ * @param $role : restrict list to mail server role
+ * @param $domain_id : restrict list to mail server in this domain
+ *   if doma
+ * @return array with mail servers
+**/
+function get_domain_mailservers($role, $domain_id='') {
+  global $cdg_sql;
+
+  if ($domain_id > 0) {
+    // For one domain specified (domain update), global or domain mailserver
+    $where_domain = "AND (host_domain_id='$domain_id' OR host_domain_id=0)";
+  } else {
+    // New domain (no id specified), host from domain 0
+    $where_domain = "AND (host_domain_id=0)";
+  }
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT *
+    FROM MailServer
+      LEFT JOIN Host on mailserver_host_id = host_id
+    WHERE mailserver_$role = '1'
+      $where_domain";
+  display_debug_msg($query, $cdg_sql, 'get_domain_mailserver_list()');
+  $obm_q->query($query);
+
+  $m = array();
+  while($obm_q->next_record()) {
+    $id = $obm_q->f('mailserver_id');
+    $m[$id]['id'] = $id;
+    $m[$id]['name'] = $obm_q->f('host_name');
+    $m[$id]['imap'] = $obm_q->f('mailserver_imap');
+    $m[$id]['smtp_in'] = $obm_q->f('mailserver_smtp_in');
+    $m[$id]['smtp_out'] = $obm_q->f('mailserver_smtp_out');
+  }
+
+  return $m;
 }
 
 
@@ -450,58 +492,6 @@ function run_query_domain_properties($domain_id=0) {
 
   return $obm_q;
 
-}
-
-
-/**
- * Get one domain mailservers
- *
- * @param mixed $domain_id : domain_id
- * @return mailserver array
- **/
-function get_domain_mailserver($domain_id=0, $role='') {
-  global $cdg_sql;
-
-  if ($domain_id != 0) {
-    $where_domain = "domainmailserver_domain_id='$domain_id'";
-    $and = 'AND';
-  }
-  if ($role != '') {
-    $where_role = "$and domainmailserver_role='$role'";
-    $and = 'AND';
-  }
-
-  if (($where_domain != '') || ($where_role != '')) {
-    $where = "WHERE $where_domain $where_role";
-  }
-
-  $query = "SELECT distinct
-      domainmailserver_domain_id,
-      domainmailserver_mailserver_id,
-      domainmailserver_role,
-      mailserver_host_id,
-      host_name,
-      host_ip
-    FROM DomainMailServer
-      LEFT JOIN MailServer ON domainmailserver_mailserver_id=mailserver_id
-      LEFT JOIN Host ON mailserver_host_id=host_id
-    $where";
-  
-  display_debug_msg($query, $cdg_sql, 'get_domain_mailserver()');
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  $m = array();
-  while ($obm_q->next_record()) {
-    $d_id = $obm_q->f('domainmailserver_domain_id');
-    $m_id = $obm_q->f('domainmailserver_mailserver_id');
-    $role = $obm_q->f('domainmailserver_role');
-    $name = $obm_q->f('host_name');
-    $ip = $obm_q->f('host_ip');
-    $m[$d_id][$m_id][] = array ('name' => $name, 'ip' => $ip, 'role' => $role);
-  }
-
-  return $m;
 }
 
 
@@ -560,7 +550,7 @@ function run_query_domain_mailserver_delete($params) {
   global $obm, $cdg_sql;
 
   $id = $params['domain_id'];
-  $mailserver_id = $params['mailserver_id'];
+  $mailserver_id = $params['mail_server_id'];
   $role = $params['role'];
   $query = "DELETE FROM DomainMailServer
       WHERE domainmailserver_domain_id='$id'

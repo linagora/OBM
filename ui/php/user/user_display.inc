@@ -980,7 +980,7 @@ function html_user_form($usr_q, $user, $field='') {
     // mail
     $mail_perms = $usr_q->f("userobm_mail_perms");
     $mail_ext_perms = $usr_q->f("userobm_mail_ext_perms");
-    $mail_server = $usr_q->f("mailserver_id");
+    $mail_server_id = $usr_q->f("mailserver_id");
     $mail_server_host_name = $usr_q->f("mailserver_hostname");
     $email = $usr_q->f("userobm_email");
     $mail_quota = $usr_q->f("userobm_mail_quota");
@@ -1061,7 +1061,7 @@ function html_user_form($usr_q, $user, $field='') {
   // mail
   if (isset($user["mail_perms"])) { $mail_perms = $user["mail_perms"]; }
   if (isset($user["mail_ext_perms"])) { $mail_ext_perms = $user["mail_ext_perms"]; }
-  if (isset($user["mail_server"])) { $mail_server = $user["mail_server"]; }
+  if (isset($user["mail_server_id"])) { $mail_server_id = $user["mail_server_id"]; }
   if (isset($user["mail_server_hostname"])) { $mail_server_host_name = $user["mail_server_hostname"]; }
   if (isset($user["mail_quota"])) { $mail_quota = $user["mail_quota"]; }
 
@@ -1139,21 +1139,17 @@ function html_user_form($usr_q, $user, $field='') {
   </fieldset>";
   }
 
-  // Section Mail
-  if ($cgp_use["service"]["mail"]) {
+  if ($cgp_use['service']['mail']) {
     // Mail perms checkbox checked values
-    $mail_state  = ($mail_perms ? "checked" : "");
-    $mail_ext_state  = ($mail_ext_perms ? "checked" : "");
-    // Mail server selection
-    if (!$mail_server_host_name) {
-      if(!$mail_server) {
-        $mail_server = $obm["mailserver"];
-      }
-      $dis_mailserver = get_select_host_server($mail_server);
+    $mail_state  = ($mail_perms ? 'checked' : '');
+    $mail_ext_state  = ($mail_ext_perms ? 'checked' : '');
+    // Mail server can't be changed if set
+    if (! $mail_server_host_name) {
+      $dis_mailserver = of_domain_dis_mailserver_select('imap', $mail_server_id, $obm['domain_id']);
     } else {
       $dis_mailserver = "
-      <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server\">$mail_server_host_name</a>
-      <input type=\"hidden\" name=\"sel_mail_server\" value=\"$mail_server\" />
+      <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server_id\">$mail_server_host_name</a>
+      <input type=\"hidden\" name=\"sel_mail_server_id\" value=\"$mail_server_id\" />
       <input type=\"hidden\" name=\"sel_mail_server_hostname\" value=\"$mail_server_host_name\" />";
     }
 
@@ -1526,7 +1522,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   // mail
   $mail_perms = $user["mail_perms"];
   $mail_ext_perms = $user["mail_ext_perms"];
-  $mail_server = $user["mail_server"];
+  $mail_server_id = $user["mail_server_id"];
   $mail_quota = $user["mail_quota"];
 
   // mail nomad
@@ -1596,7 +1592,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
 
   <input type=\"hidden\" name=\"mail_perms\" value=\"$mail_perms\" />
   <input type=\"hidden\" name=\"mail_ext_perms\" value=\"$mail_ext_perms\" />
-  <input type=\"hidden\" name=\"mail_server\" value=\"$mail_server\" />
+  <input type=\"hidden\" name=\"mail_server_id\" value=\"$mail_server_id\" />
   <input type=\"hidden\" name=\"mail_quota\" value=\"$mail_quota\" />
 
   <input type=\"hidden\" name=\"nomade_perms\" value=\"$nomade_perms\" />

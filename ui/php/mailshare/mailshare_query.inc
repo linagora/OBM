@@ -132,7 +132,7 @@ function run_query_mailshare_insert($mailshare) {
   $quota = $mailshare["quota"];
   $email = $mailshare["email"];
   $desc = $mailshare["desc"];
-  $mail_server = $mailshare["mail_server"];
+  $mail_server_id = $mailshare["mail_server_id"];
   $now = date("Y-m-d H:i:s");
   $domain_id = $obm["domain_id"];
 
@@ -159,7 +159,7 @@ function run_query_mailshare_insert($mailshare) {
     '$obm[uid]',
     '$name'
     $q_delegation[value],
-    '$mail_server',
+    '$mail_server_id',
     '$quota',
     '$desc',
     '$email')";
@@ -210,7 +210,7 @@ function run_query_mailshare_update($mailshare) {
   $quota = $mailshare["quota"];
   $email = $mailshare["email"];
   $desc = $mailshare["desc"];
-  $mail_server = $mailshare["mail_server"];
+  $mail_server_id = $mailshare["mail_server_id"];
   $now = date("Y-m-d H:i:s");
   $multidomain = sql_multidomain("mailshare");
 
@@ -222,7 +222,7 @@ function run_query_mailshare_update($mailshare) {
     mailshare_userupdate = '$obm[uid]',
     mailshare_name = '$name',
     mailshare_quota = '$quota',
-    mailshare_mail_server_id = '$mail_server',
+    mailshare_mail_server_id = '$mail_server_id',
     mailshare_description = '$desc',
     mailshare_email = '$email'
     $q_delegation

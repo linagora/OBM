@@ -728,6 +728,12 @@ function run_query_contact_update($contact) {
   $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
   $dsrc = ($contact["datasource"] ? $contact["datasource"] : 0);
 
+  // Archived contact unsubscribed from mailings
+  if ($archive == '1') {
+    $mailok = '0';
+    $newsletter = '0';
+  }
+
   $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
     contact_userupdate='".$obm["uid"]."',
@@ -785,6 +791,7 @@ function run_query_contact_update($contact) {
 
   return $retour;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the number of static lists where the contact is registered

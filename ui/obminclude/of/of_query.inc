@@ -303,11 +303,10 @@ function get_query_count($query) {
 //--- Multi-domain handling -------------------------------------------------//
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Return the OBM domain list
-// Returns:
-//   - array with domains
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Return the OBM domain list
+ * @return array with domains
+**/
 function of_domain_get_list() {
   global $cdg_sql;
 
@@ -331,6 +330,58 @@ function of_domain_get_list() {
   }
 
   return $domain;
+}
+
+
+/**
+ * Get one domain mailservers
+ *
+ * @param mixed $domain_id : domain_id
+ * @return mailserver array
+ **/
+function of_domain_get_domain_mailserver($role='imap', $domain_id=0) {
+  global $cdg_sql;
+
+  if ($domain_id != 0) {
+    $where_domain = "domainmailserver_domain_id='$domain_id'";
+    $and = 'AND';
+  }
+  if ($role != '') {
+    $where_role = "$and domainmailserver_role='$role'";
+    $and = 'AND';
+  }
+
+  if (($where_domain != '') || ($where_role != '')) {
+    $where = "WHERE $where_domain $where_role";
+  }
+
+  $query = "SELECT distinct
+      domainmailserver_domain_id,
+      domainmailserver_mailserver_id,
+      domainmailserver_role,
+      mailserver_host_id,
+      host_name,
+      host_ip
+    FROM DomainMailServer
+      LEFT JOIN MailServer ON domainmailserver_mailserver_id=mailserver_id
+      LEFT JOIN Host ON mailserver_host_id=host_id
+    $where";
+  
+  display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_mailserver()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  $m = array();
+  while ($obm_q->next_record()) {
+    $d_id = $obm_q->f('domainmailserver_domain_id');
+    $m_id = $obm_q->f('domainmailserver_mailserver_id');
+    $role = $obm_q->f('domainmailserver_role');
+    $name = $obm_q->f('host_name');
+    $ip = $obm_q->f('host_ip');
+    $m[$d_id][$m_id][] = array ('name' => $name, 'ip' => $ip, 'role' => $role);
+  }
+
+  return $m;
 }
 
 
@@ -490,6 +541,43 @@ function of_domain_html_select($domains, $domain_id="", $first_element="", $sel_
   $sel_dom .= "</select>";
 
   return $sel_dom;
+}
+
+
+/**
+ * Display : domain mailserver html select
+ * @param $role : restrict list to mail server role
+ * @param $sel_id : selected entry
+ * @param $domain_id : restrict list to mail server in this domain
+ **/
+function of_domain_dis_mailserver_select($role, $sel_id='', $domain_id='') {
+
+  $dms = of_domain_get_domain_mailserver($role, $domain_id='');
+
+  // select
+  $sel = "<select id=\"sel_mail_server_id\" name=\"sel_mail_server_id\">";
+  if (is_array($dms)) {
+    // domain mail servers
+    foreach ($dms as $ms) {
+      if (is_array($ms)) {
+	// one mail server
+	foreach ($ms as $id => $m) {
+	  if (is_array($m)) {
+	    // one mail server role
+	    foreach ($m as $r) {
+	      $name = htmlentities($r['name']);
+	      $sel .= "<option value=\"$id\"";
+	      if ($id == $sel_id) { $sel .= " selected=\"selected\""; }
+	      $sel .= ">$name</option>";
+	    }
+	  }
+	}
+      }
+    }
+  }
+  $sel .= "</select>";
+
+  return $sel;
 }
 
 

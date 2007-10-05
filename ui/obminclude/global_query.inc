@@ -1286,22 +1286,5 @@ function randomColor() {
     return "rgb($color1, $color2, $color3)";
 }
 
-function run_query_get_mailserver($domain="") {
-  global $cdg_sql;
-  if($domain == "") {
-    $multidomain = sql_multidomain("host",true,true);
-  } else {
-    $multidomain = "AND host_domain_id = '$domain' OR host_domain_id = '0'";
-  }
-  $query = "SELECT
-    mailserver_id,
-    ms.host_name as host_name
-    FROM MailServer 
-    JOIN Host ms ON mailserver_host_id = ms.host_id
-    WHERE 1=1 $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_mailshare_get_mailserver())");
-  $obm_q= new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;    
-}
+
 ?>

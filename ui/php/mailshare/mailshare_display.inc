@@ -325,7 +325,7 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
   if (isset($mailshare["quota"])) { $quota = $mailshare["quota"]; }
   if (isset($mailshare["email"])) { $email = $mailshare["email"]; }
   if (isset($mailshare["desc"])) { $desc = stripslashes($mailshare["desc"]); }
-  if (isset($user["mail_server"])) { $mail_server = $user["mail_server"]; }
+  if (isset($user["mail_server_id"])) { $mail_server_id = $user["mail_server_id"]; }
   if (isset($user["mail_server_hostname"])) { $mail_server_host_name = $user["mail_server_hostname"]; }  
 
   // Mark the error field
@@ -335,15 +335,16 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
 
   $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
+  // Mail server can't be changed if set
   if (! $mail_server_host_name) {
-    if (! $mail_server) {
-      $mail_server = $obm["mailserver"];
-    }    
-    $dis_mailserver = get_select_host_server($mail_server);
+    if (! $mail_server_id) {
+      $mail_server_id = $obm["mailserver"];
+    }
+    $dis_mailserver = of_domain_dis_mailserver_select('imap', $mail_server_id, $obm['domain_id']);
   } else {
     $dis_mailserver = "
-    <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server\">$mail_server_host_name</a>
-    <input type=\"hidden\" name=\"sel_mail_server\" value=\"$mail_server\" />
+    <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server_id\">$mail_server_host_name</a>
+    <input type=\"hidden\" name=\"sel_mail_server_id\" value=\"$mail_server_id\" />
     <input type=\"hidden\" name=\"sel_mail_server_hostname\" value=\"$mail_server_host_name\" />";
   }
 

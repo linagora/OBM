@@ -273,7 +273,7 @@ function run_query_user_detail($p_id) {
          LEFT JOIN Domain on UserObm.userobm_domain_id=domain_id
          LEFT JOIN Host on UserObm.userobm_host_id=Host.host_id
          LEFT JOIN MailServer on UserObm.userobm_mail_server_id=mailserver_id
-         LEFT JOIN Host ms on ms.host_id=mailserver_host_id
+         LEFT JOIN Host ms on mailserver_host_id=ms.host_id
     WHERE UserObm.userobm_id='$p_id'
       $multidomain";
 
@@ -376,7 +376,7 @@ function run_query_user_insert($user) {
   if ($cgp_use['service']['mail']) {
     $mail_perms = ($user['mail_perms'] == '' ? '0' : $user['mail_perms']);
     $mail_ext_perms = ($user['mail_ext_perms'] == '' ? '0' : $user['mail_ext_perms']);
-    $mail_server = ($user['mail_server'] == '' ? '0' : $user['mail_server']);
+    $mail_server_id = ($user['mail_server_id'] == '' ? '0' : $user['mail_server_id']);
     $mail_quota = $user['mail_quota'];
     if ($mail_quota == '') {
       $mail_quota = '0';
@@ -389,7 +389,7 @@ function run_query_user_insert($user) {
     $query_values_mail = ",
     '$mail_perms',
     '$mail_ext_perms',
-    '$mail_server',
+    '$mail_server_id',
     '$mail_quota'";
   }
 
@@ -758,12 +758,12 @@ function run_query_user_update($p_id, $user) {
   if ($cgp_use['service']['mail']) {
     $mail_perms = ($user['mail_perms'] == '' ? '0' : $user['mail_perms']);
     $mail_ext_perms = ($user['mail_ext_perms'] == '' ? '0' : $user['mail_ext_perms']);
-    $mail_server = ($user['mail_server'] == '' ? '0' : $user['mail_server']);
+    $mail_server_id = ($user['mail_server_id'] == '' ? '0' : $user['mail_server_id']);
     $mail_quota = $user['mail_quota'];
     $query_mail = ",
     userobm_mail_perms='$mail_perms',
     userobm_mail_ext_perms='$mail_ext_perms',
-    userobm_mail_server_id='$mail_server',
+    userobm_mail_server_id='$mail_server_id',
     userobm_mail_quota='$mail_quota'";
   }
 
@@ -1274,7 +1274,7 @@ function check_user_data_form($p_id, $user) {
   $web_all = ($user['web_all'] == '1' ? '1' : '0');
   $mail_perms = $user['mail_perms'];
   $mail_ext_perms = $user['mail_ext_perms'];
-  $mail_server = $user['mail_server'];
+  $mail_server_id = $user['mail_server_id'];
   $mail_quota = $user['mail_quota'];
   $nomade_perms = $user['nomade_perms'];
   $nomade_enable = $user['nomade_enable'];
@@ -1354,7 +1354,7 @@ function check_user_data_form($p_id, $user) {
   }
 
   // If no mail server is set
-  if( ($mail_perms) && ($mail_server == '') ) {
+  if( ($mail_perms) && ($mail_server_id == '') ) {
     $err['msg'] = "$l_mail_server_error";
     $err['field'] = 'mail_server';
     //    return false;
