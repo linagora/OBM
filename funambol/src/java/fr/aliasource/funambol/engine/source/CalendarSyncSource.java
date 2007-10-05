@@ -291,6 +291,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 			throws OBMException {
 
 		String toParse = content.replaceAll(";VALUE=DATE-TIME", "");
+		toParse = content.replaceAll(";TYPE=X-EPOCSOUND", "");
 		ByteArrayInputStream buffer = new ByteArrayInputStream(toParse
 				.getBytes());
 

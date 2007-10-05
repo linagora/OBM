@@ -1,3 +1,10 @@
+2007-10-05  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	fix epocsound on aalarm fields
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getFoundationCalendarFromICal):
+
 2007-10-02  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
         Add "Z" to date if missing, to fix crash with synthesis SyncML
