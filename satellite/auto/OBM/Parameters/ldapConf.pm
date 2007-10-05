@@ -464,6 +464,10 @@ my $domainHostsDesc = {
     branch => []
 };
 
+if( $obmModules->{"samba"} ) {
+    push( @{$domainHostsDesc->{"data_type"}}, $SAMBAGROUPS );
+}
+
 push( @{$currentNode->{"branch"}}, $domainHostsDesc );
 
 # Branche contenant la déclaration des utilisateurs systèmes
@@ -511,23 +515,6 @@ if( $obmModules->{"mail"} ) {
 
     push( @{$currentNode->{"branch"}}, $mailShareDesc );
 }
-
-# Banche contenant la déclaration des hôtes du domaine windows
-my $hostDesc = {
-    dn => "",
-    name => "hosts",
-    node_type => "$NODE",
-    description => "Samba hosts",
-    data_type => [ $DOMAINHOSTS ],
-    template => [],
-    branch => []
-};
-
-if( $obmModules->{"samba"} ) {
-    push( @{$hostDesc->{"data_type"}}, $SAMBAGROUPS );
-}
-
-push( @{$currentNode->{"branch"}}, $hostDesc );
 
 if( $obmModules->{"mail"} ) {
     # Banche contenant la déclaration de la configuration des services

@@ -453,6 +453,7 @@ sub getServerDomains {
 
 
     # LDAP connexion
+    $self->logMessage( "'".$self->{"ldap_server"}->{"login"}."'" );
     if( defined($self->{"ldap_server"}->{"login"}) ) {
         $self->logMessage( "Connexion authentifiee a l'annuaire LDAP" );
     }else {

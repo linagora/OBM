@@ -94,7 +94,7 @@ sub update {
     my $globalReturn = 1;
 
     if( !defined($srvList) ) {
-        &OBM::toolBox::write_log( "[Postfix::smtpInRemoteEngine]: pas de serveur SMTP sortant a configurer", "W" );
+        &OBM::toolBox::write_log( "[Postfix::smtpInRemoteEngine]: pas de serveur SMTP entrant a configurer", "W" );
         return 1;
     }
 
