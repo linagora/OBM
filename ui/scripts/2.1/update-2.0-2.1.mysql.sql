@@ -131,6 +131,10 @@ ALTER TABLE UserObm ADD COLUMN userobm_nomade_dateend timestamp(14) AFTER userob
 -- user expiration date fields
 ALTER TABLE UserObm ADD COLUMN userobm_password_dateexp date AFTER userobm_password;
 ALTER TABLE UserObm ADD COLUMN userobm_account_dateexp date AFTER userobm_password_dateexp;
+-- Default value modification
+ALTER TABLE UserObm MODIFY COLUMN userobm_web_perms int(1) DEFAULT 0;
+ALTER TABLE UserObm MODIFY COLUMN userobm_mail_perms int(1) DEFAULT 0;
+ALTER TABLE UserObm MODIFY COLUMN userobm_mail_ext_perms int(1) DEFAULT 0;
 
 -- Production table
 -- Add nb login failed
@@ -154,6 +158,10 @@ ALTER TABLE P_UserObm ADD COLUMN userobm_nomade_dateend timestamp(14) AFTER user
 -- user expiration date fields
 ALTER TABLE P_UserObm ADD COLUMN userobm_password_dateexp date AFTER userobm_password;
 ALTER TABLE P_UserObm ADD COLUMN userobm_account_dateexp date AFTER userobm_password_dateexp;
+-- Default value modification
+ALTER TABLE P_UserObm MODIFY COLUMN userobm_web_perms int(1) DEFAULT 0;
+ALTER TABLE P_UserObm MODIFY COLUMN userobm_mail_perms int(1) DEFAULT 0;
+ALTER TABLE P_UserObm MODIFY COLUMN userobm_mail_ext_perms int(1) DEFAULT 0;
 
 
 -------------------------------------------------------------------------------
