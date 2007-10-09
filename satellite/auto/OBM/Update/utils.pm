@@ -114,7 +114,7 @@ sub getCyrusServers {
         }
 
         &OBM::toolBox::write_log( "[Update::update]: recuperation des serveurs de courrier IMAP pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
-        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=".$domainList->[$i]->{"domain_id"}." AND domainmailserver_role='imap' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
+        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=".$domainList->[$i]->{"domain_id"}." AND j.domainmailserver_role='imap' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
 
         # On execute la requete
         my $queryResult;
@@ -147,7 +147,7 @@ sub getSmtpInServers {
         }
 
         &OBM::toolBox::write_log( "[Update::update]: recuperation des serveurs de courrier SMTP-in pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
-        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=".$domainList->[$i]->{"domain_name"}." AND domainmailserver_role='smtp_in' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
+        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=".$domainList->[$i]->{"domain_id"}." AND j.domainmailserver_role='smtp_in' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
 
         # On execute la requete
         my $queryResult;
