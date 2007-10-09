@@ -25,7 +25,7 @@
 	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
 	(CalendarHelper..getDateFromUTCString):
 
-2007-09-25  Thomas Cataldo,,,  <set EMAIL_ADDRESS environment variable>
+2007-09-25  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	blackberry ok
 	
@@ -36,7 +36,7 @@
 	(CalendarManager.obmEventToFoundationCalendar),
 	(CalendarManager.parseStart), (CalendarManager.parseEnd):
 
-2007-09-24  Thomas Cataldo,,,  <set EMAIL_ADDRESS environment variable>
+2007-09-24  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
         sife fix
 	
