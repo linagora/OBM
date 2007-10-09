@@ -1,3 +1,16 @@
+2007-10-08  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	use xvcalparser for version 1.0 et icalparser
+	
+	* .classpath:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getFoundationCalendarFromICal),
+	(CalendarSyncSource.getFoundationFromSyncItem):
+	* tests/fr/aliasource/funambol/ICalParsingTest.java:
+	(ICalParsingTest), (ICalParsingTest.testAsIcal),
+	(ICalParsingTest.testAsVcal), (ICalParsingTest.setUp),
+	(ICalParsingTest.tearDown):
+
 2007-10-05  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	fix epocsound on aalarm fields

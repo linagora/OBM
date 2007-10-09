@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="tests"/>
 	<classpathentry kind="lib" path="lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/axis-ant.jar"/>
 	<classpathentry kind="lib" path="lib/axis.jar"/>
@@ -20,5 +21,6 @@
 	<classpathentry kind="lib" path="lib/foundation-6.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/pim-framework-6.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/server-framework-6.5.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

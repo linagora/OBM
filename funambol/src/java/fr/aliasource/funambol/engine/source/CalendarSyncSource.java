@@ -15,6 +15,7 @@ import com.funambol.common.pim.converter.VComponentWriter;
 import com.funambol.common.pim.icalendar.ICalendarParser;
 import com.funambol.common.pim.model.VCalendar;
 import com.funambol.common.pim.sif.SIFCalendarParser;
+import com.funambol.common.pim.xvcalendar.XVCalendarParser;
 import com.funambol.foundation.exception.EntityException;
 import com.funambol.framework.engine.SyncItem;
 import com.funambol.framework.engine.SyncItemImpl;
@@ -290,16 +291,27 @@ public class CalendarSyncSource extends ObmSyncSource {
 	private Calendar getFoundationCalendarFromICal(String content)
 			throws OBMException {
 
-		String toParse = content.replaceAll(";VALUE=DATE-TIME", "");
-		toParse = content.replaceAll(";TYPE=X-EPOCSOUND", "");
+		String toParse = content;
+		// toParse = content.replaceAll(";VALUE=DATE-TIME", "");
+		// toParse = content.replaceAll(";TYPE=X-EPOCSOUND", "");
 		ByteArrayInputStream buffer = new ByteArrayInputStream(toParse
 				.getBytes());
 
 		try {
-			ICalendarParser parser = new ICalendarParser(buffer, deviceCharset);
-			VCalendar vcal = (VCalendar) parser.ICalendar();
-			VCalendarConverter vconvert = new MyVCalConverter(
-					deviceTimezone, deviceCharset);
+			VCalendar vcal = null;
+			if (toParse.contains("VERSION:1.0")) {
+				logger.info("Parsing version 1.0 as xvcalendar");
+				XVCalendarParser parser = new XVCalendarParser(buffer,
+						deviceCharset);
+				vcal = (VCalendar) parser.XVCalendar();
+			} else {
+				logger.info("Parsing version 2.0 as icalendar");
+				ICalendarParser parser = new ICalendarParser(buffer,
+						deviceCharset);
+				vcal = parser.ICalendar();
+			}
+			VCalendarConverter vconvert = new MyVCalConverter(deviceTimezone,
+					deviceCharset);
 
 			Calendar ret = vconvert.vcalendar2calendar(vcal);
 			return ret;
@@ -380,8 +392,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 
 		logger.info("calContent.uid: "
 				+ foundationCalendar.getCalendarContent().getUid());
-		
-		foundationCalendar.getCalendarContent().setUid(new Property(item.getKey().getKeyAsString()));
+
+		foundationCalendar.getCalendarContent().setUid(
+				new Property(item.getKey().getKeyAsString()));
 
 		return foundationCalendar;
 	}
