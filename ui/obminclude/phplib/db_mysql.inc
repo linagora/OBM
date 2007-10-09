@@ -143,13 +143,16 @@ class DB_Sql {
   }
 
   /* public: walk result set */
-  function next_record() {
+  function next_record($type=MYSQL_BOTH) {
     if (!$this->Query_ID) {
       $this->halt("next_record called with no query pending.");
       return 0;
     }
-
-    $this->Record = @mysql_fetch_array($this->Query_ID);
+    // AliaSource
+    if ($type == 'BD_ASSOC') {
+      $type = MYSQL_ASSOC;
+    }
+    $this->Record = @mysql_fetch_array($this->Query_ID, $type);
     $this->Row   += 1;
     $this->Errno  = mysql_errno();
     $this->Error  = mysql_error();

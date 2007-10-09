@@ -98,8 +98,12 @@ class DB_Sql {
     return $this->Query_ID;
   }
   
-  function next_record() {
-    $this->Record = @pg_fetch_array($this->Query_ID, $this->Row++);
+  function next_record($type=PGSQL_BOTH) {
+    // AliaSource
+    if ($type == 'BD_ASSOC') {
+      $type = PGSQL_ASSOC;
+    }
+    $this->Record = @pg_fetch_array($this->Query_ID, $this->Row++, $type);
     
     $this->Error = pg_ErrorMessage($this->Link_ID);
     $this->Errno = ($this->Error == "")?0:1;

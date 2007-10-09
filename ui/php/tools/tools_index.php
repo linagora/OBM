@@ -30,8 +30,8 @@ if ($action == 'update_index') $action = 'update_detail';
 get_tools_action();
 $perm->check_permissions($module, $action);
 
-$entities = array('user' => array('UserObm', 'userobm', array('userobm_domain_id' => 1, 'userobm_timeupdate' => 1, 'userobm_timecreate' => 1, 'userobm_usercreate' => 1, 'userobm_userupdate' => 1, 'userobm_local' => 1, 'userobm_timelastaccess' => 1, 'userobm_nb_login_failed' => 1, 'userobm_delegation_target' => 1, 'userobm_calendar_version' => 1, 'userobm_nomade_datebegin' => 1, 'userobm_nomade_dateend' => 1, 'userobm_vacation_datebegin' => 1, 'userobm_vacation_dateend' => 1)),
-		  'group' => array('UGroup', 'group', array()),
+$entities = array('user' => array('UserObm', 'userobm', array('domain_id' => 1, 'timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1, 'local' => 1, 'timelastaccess' => 1, 'nb_login_failed' => 1, 'delegation_target' => 1, 'calendar_version' => 1, 'nomade_datebegin' => 1, 'nomade_dateend' => 1, 'vacation_datebegin' => 1, 'vacation_dateend' => 1)),
+		  'group' => array('UGroup', 'group', array('desc' => 1)),
 		  'host' => array('Host', 'host', array()),
 		  'mailshare' => array('MailShare', 'mailshare', array()));
 

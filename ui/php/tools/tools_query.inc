@@ -296,16 +296,18 @@ function get_update_entity_infos(&$e1, &$e2, $domain_id, $table, $field='', $rea
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
 
-  if ($field != "") {
+  if ($field != '') {
     $f = $field;
     $uc = "${field}_usercreate";
     $uu = "${field}_userupdate";
     $dg = "${field}_delegation";
+    $table_prefix = "${field}_";
   } else {
     $f = strtolower($table);
     $uc = "${f}_usercreate";
     $uu = "${f}_userupdate";
     $dg = "${f}_delegation";
+    $table_prefix = "${f}_";
   }
 
   $multidomain = "AND (${f}_domain_id='$domain_id')";
@@ -322,38 +324,65 @@ function get_update_entity_infos(&$e1, &$e2, $domain_id, $table, $field='', $rea
     $where_prod = "WHERE 1=1 $multidomain";
   }
 
+  // Select fields construct
+  $obm_qm = new DB_OBM;
+  $fields = $obm_qm->metadata($table, false);
+  $pos = strlen($table_prefix);
+  $coma = '';
+  foreach ($fields as $one_field) {
+    $field_name = substr($one_field['name'], $pos);
+    if ($exclude_fields[$field_name] != 1) {
+      $select_fields .= "$coma
+      $one_field[name] as $field_name";
+      $coma = ',';
+    }
+  }
+
+  //  $da = date('i:s:u');
+  //  echo "<br>$da : $table";
   // Get infos from Update table
-  $query = "SELECT * FROM $table $where_upd";
+  $query = "SELECT $select_fields FROM $table $where_upd";
   display_debug_msg($query, $cdg_sql, "get_update_entity_infos($table)");
   $retour = $obm_q->query($query);
+  //  $da = date('i:s:u');
+  //  echo "<br>$da : $table : after query table_update";
 
-  while($obm_q->next_record()) {
-    $id = $obm_q->f('0');  // Id
+  while($obm_q->next_record('BD_ASSOC')) {
+    $id = $obm_q->f('id');
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
       // keep only column name (remove column number entries and exclude fields)
-      if (((int)($fname) !== $fname) && !($exclude_fields[$fname] == 1)) {
+      //      if (((int)($fname) !== $fname) && !($exclude_fields[$fname] == 1)) {
+      if ( !($exclude_fields[$fname] == 1)) {
 	$e1[$id]["$fname"] = $fvalue;
       }
     }
   }
+  //  $da = date('i:s:u');
+  //  echo "<br>$da : $table : after e1 store";
 
   // Get infos from Production table
   $table_prod = "P_$table";
-  $query = "SELECT * FROM $table_prod $where_prod";
-  display_debug_msg($query, $cdg_sql, 'get_update_numbers()');
+  $query = "SELECT $select_fields FROM $table_prod $where_prod";
+  display_debug_msg($query, $cdg_sql, 'get_update_entity_info()');
   $retour = $obm_q->query($query);
+  //  $da = date('i:s:u');
+  //  echo "<br>$da : $table : after query table_prod";
 
-  while($obm_q->next_record()) {
-    $id = $obm_q->f('0');  // Id
+  while($obm_q->next_record('BD_ASSOC')) {
+    $id = $obm_q->f('id');
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
       // keep only column name (remove column number entries and exclude fields)
-      if (((int)($fname) !== $fname) && !($exclude_fields[$fname] == 1)) {
+      //      if (((int)($fname) !== $fname) && !($exclude_fields[$fname] == 1)) {
+      if ( !($exclude_fields[$fname] == 1)) {
 	$e2[$id]["$fname"] = $fvalue;
       }
     }
   }
+
+  //  $da = date('i:s:u');
+  //  echo "<br>$da : $table : after e2 store";
 
   return true;
 }

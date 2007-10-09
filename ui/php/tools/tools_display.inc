@@ -12,7 +12,7 @@
 // Display Update detail for an admin
 ///////////////////////////////////////////////////////////////////////////////
 function dis_tools_update_detail() {
-   global $display, $cgp_show, $profiles, $obm, $entities;
+  global $display, $cgp_show, $profiles, $obm, $entities;
   global $l_upd, $l_upd_needed, $l_upd_not_needed, $l_upd_running;
   global $l_upd_run, $l_created, $l_updated, $l_deleted, $l_links;
   global $l_upd_need_domain_update, $l_user, $l_group, $l_host, $l_mailshare;
