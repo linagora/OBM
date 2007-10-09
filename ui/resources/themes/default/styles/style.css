@@ -275,6 +275,23 @@ form {
   background-repeat: repeat-x;
   background-position: 0 0.9em;
 }
+
+#section a {
+  text-decoration: none;  
+  color: #fff;   
+}
+
+#section a:link {
+  color: #fff;   
+}
+
+#section a:visited {
+  color: #fff;  
+}
+
+#section a:hover {
+  color: #fff;
+}
 /* ------------------------------------------------------------------------- */
 /* Submenu (modules) */
 /* ------------------------------------------------------------------------- */
