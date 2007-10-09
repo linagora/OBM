@@ -398,12 +398,15 @@ sub createLdapEntry {
     if( $entry->{"mailshare_name"} ) {
         $ldapEntry->add(
             objectClass => $self->{"typeDesc"}->{"objectclass"},
-            cn => $entry->{"mailshare_name"},
-            mailBox => $entry->{"mailshare_mailbox"}
+            cn => $entry->{"mailshare_name"}
         );
 
     }else {
         return 0;
+    }
+
+    if( $entry->{"mailshare_mailbox"} ) {
+        $ldapEntry->add( mailBox => $entry->{"mailshare_mailbox"} );
     }
 
     if( $entry->{"mailshare_description"} ) {
