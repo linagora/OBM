@@ -14,77 +14,81 @@
 // - halt_halt     --         -- Halt the system
 ///////////////////////////////////////////////////////////////////////////////
 
-$path = "..";
-$module = "tools";
-$obminclude = getenv("OBM_INCLUDE_VAR");
-if ($obminclude == "") $obminclude = "obminclude";
+$path = '..';
+$module = 'tools';
+$obminclude = getenv('OBM_INCLUDE_VAR');
+if ($obminclude == '') $obminclude = 'obminclude';
 include("$obminclude/global.inc");
-page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 $params = get_tools_params();
 include("$obminclude/global_pref.inc");
-require("tools_display.inc");
-require("tools_query.inc");
+require('tools_display.inc');
+require('tools_query.inc');
 
-if ($action == "index") $action = "update_detail";
-if ($action == "update_index") $action = "update_detail";
+if ($action == 'index') $action = 'update_detail';
+if ($action == 'update_index') $action = 'update_detail';
 get_tools_action();
 $perm->check_permissions($module, $action);
 
+$entities = array('user' => array('UserObm', 'userobm', array('userobm_domain_id' => 1, 'userobm_timeupdate' => 1, 'userobm_timecreate' => 1, 'userobm_usercreate' => 1, 'userobm_userupdate' => 1, 'userobm_local' => 1, 'userobm_timelastaccess' => 1, 'userobm_nb_login_failed' => 1, 'userobm_delegation_target' => 1, 'userobm_calendar_version' => 1, 'userobm_nomade_datebegin' => 1, 'userobm_nomade_dateend' => 1, 'userobm_vacation_datebegin' => 1, 'userobm_vacation_dateend' => 1)),
+		  'group' => array('UGroup', 'group', array()),
+		  'host' => array('Host', 'host', array()),
+		  'mailshare' => array('MailShare', 'mailshare', array()));
 
-if ($action == "update_detail") {
+if ($action == 'update_detail') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_tools_update_detail();
+  $display['detail'] = dis_tools_update_detail();
 
-} elseif ($action == "update_update") {
+} elseif ($action == 'update_update') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_tools_update_context_ok($params)) {
     set_update_lock();
     set_update_state($params['domain_id']);
     store_update_data($params);
     $res = exec_tools_update_update($params);
-    if ($res == "0") {
-      $display["msg"] .= display_ok_msg($l_upd_running);
+    if ($res == '0') {
+      $display['msg'] .= display_ok_msg($l_upd_running);
     } else {
-      $display["msg"] .= display_err_msg("$l_upd_error ($res)");
+      $display['msg'] .= display_err_msg("$l_upd_error ($res)");
     }
-    $display["detail"] = dis_tools_update_detail();
+    $display['detail'] = dis_tools_update_detail();
     remove_update_lock();
   } else {
     // Si le contexte ne permet pas une modification de configuration
     $display['msg'] .= display_warn_msg($err['msg']);
-    $display["detail"] = dis_tools_update_detail();
+    $display['detail'] = dis_tools_update_detail();
   }
 
-} elseif ($action == "halt_index") {
+} elseif ($action == 'halt_index') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_tools_halt_index();
+  $display['detail'] = html_tools_halt_index();
 
-} elseif ($action == "halt_halt") {
+} elseif ($action == 'halt_halt') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["msg"] .= display_debug_msg($cmd_halt, $cdg_exe);
+  $display['msg'] .= display_debug_msg($cmd_halt, $cdg_exe);
   $ret = exec($cmd_halt);
 
-} elseif ($action == "remote_index") {
+} elseif ($action == 'remote_index') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_tools_remote_index();
+  $display['detail'] = html_tools_remote_index();
 
-} elseif ($action == "remote_update") {
+} elseif ($action == 'remote_update') {
 ///////////////////////////////////////////////////////////////////////////////
   $res = run_query_tools_remote_update($params);
 
   if ($res) {
-    $remote_access = $params["remote_access"];
-    if ($remote_access == "1") {
-      $display["msg"] .= display_debug_msg($cmd_enable_remote, $cdg_exe);
+    $remote_access = $params['remote_access'];
+    if ($remote_access == '1') {
+      $display['msg'] .= display_debug_msg($cmd_enable_remote, $cdg_exe);
       $ret = exec($cmd_enable_remote);
     } else {
-      $display["msg"] .= display_debug_msg($cmd_disable_remote, $cdg_exe);
+      $display['msg'] .= display_debug_msg($cmd_disable_remote, $cdg_exe);
       $ret = exec($cmd_disable_remote);
     }
-    $display["detail"] = html_tools_remote_index();
+    $display['detail'] = html_tools_remote_index();
   } else {
-    $display["msg"] .= display_err_msg("$l_update_error - $l_remote_access !");
-    $display["detail"] = html_tools_remote_index();
+    $display['msg'] .= display_err_msg("$l_update_error - $l_remote_access !");
+    $display['detail'] = html_tools_remote_index();
   }
 
 }
@@ -92,9 +96,9 @@ if ($action == "update_detail") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display page
 ///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head($l_tools);
-$display["header"] = display_menu($module);
-$display["end"] = display_end();
+$display['head'] = display_head($l_tools);
+$display['header'] = display_menu($module);
+$display['end'] = display_end();
 
 display_page($display);
 
@@ -107,7 +111,7 @@ function get_tools_params() {
   global $obm;
 
   // Get global params
-  $params = get_global_params("Tools");
+  $params = get_global_params('Tools');
 
   if ($obm['domain_id'] == '0') {
     $params['domain_id'] = (isset($params['domain_id']) ? $params['domain_id'] : $obm['domain_id']);
@@ -129,7 +133,7 @@ function get_tools_action() {
 
 
 // Tool Update
-  $actions["tools"]["update_detail"] = array (
+  $actions['tools']['update_detail'] = array (
     'Name'     => $l_header_tools_upd,
     'Right'    => $cright_read_admin,
     'Url'      => "$path/tools/tools_index.php?action=update_detail",
@@ -137,18 +141,18 @@ function get_tools_action() {
                                     );
 
 // Confirm Update
-  $actions["tools"]["update_update"] = array (
+  $actions['tools']['update_update'] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('none') 
                                     );
 
 // Tool Remote
-  $actions["tools"]["remote_update"] = array (
+  $actions['tools']['remote_update'] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('none') 
                                     );
 // Tool Halt
-  $actions["tools"]["halt_index"] = array (
+  $actions['tools']['halt_index'] = array (
     'Name'     => $l_header_tools_halt,
     'Url'      => "$path/tools/tools_index.php?action=halt_index",
     'Right'    => $cright_write_admin,
@@ -156,7 +160,7 @@ function get_tools_action() {
                                     );
 
 // Tool Halt
-  $actions["tools"]["halt_halt"] = array (
+  $actions['tools']['halt_halt'] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('none') 
                                     );

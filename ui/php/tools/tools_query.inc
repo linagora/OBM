@@ -20,11 +20,11 @@ function get_tools_remote_access() {
     FROM ObmInfo
     WHERE obminfo_name = 'remote_access'";
 
-  display_debug_msg($query, $cdg_sql, "get_tools_remote_access()");
+  display_debug_msg($query, $cdg_sql, 'get_tools_remote_access()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $ra = $obm_q->f("obminfo_value");
+  $ra = $obm_q->f('obminfo_value');
 
   return $ra;
 }
@@ -39,13 +39,13 @@ function get_tools_remote_access() {
 function run_query_tools_remote_update($tools) {
   global $cdg_sql;
 
-  $remote_access = $tools["remote_access"];
+  $remote_access = $tools['remote_access'];
 
   $query = "UPDATE ObmInfo SET
     obminfo_value = '$remote_access'
   WHERE obminfo_name = 'remote_access'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_tools_remote_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_remote_update()');
   $usr_q = new DB_OBM;
   $retour = $usr_q->query($query);
 
@@ -311,10 +311,10 @@ function get_update_entity_infos(&$e1, &$e2, $domain_id, $table, $field='', $rea
   $multidomain = "AND (${f}_domain_id='$domain_id')";
 
   // Restrict updates to the realm selected (user, domain, delegation)
-  if ($realm == "user") {
+  if ($realm == 'user') {
     $where_upd = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
     $where_prod = "WHERE 1=1 $multidomain";
-  } else if ($realm == "delegation") {
+  } else if ($realm == 'delegation') {
     $where_upd = "WHERE ($dg $like '$delegation%') $multidomain";
     $where_prod = "WHERE 1=1 $multidomain";
   } else {
@@ -324,15 +324,15 @@ function get_update_entity_infos(&$e1, &$e2, $domain_id, $table, $field='', $rea
 
   // Get infos from Update table
   $query = "SELECT * FROM $table $where_upd";
-  display_debug_msg($query, $cdg_sql, "get_update_numbers()");
+  display_debug_msg($query, $cdg_sql, "get_update_entity_infos($table)");
   $retour = $obm_q->query($query);
 
   while($obm_q->next_record()) {
-    $id = $obm_q->f("0");  // Id
+    $id = $obm_q->f('0');  // Id
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
       // keep only column name (remove column number entries and exclude fields)
-      if (((int)($fname) !== $fname) && !(in_array($fname, $exclude_fields))) {
+      if (((int)($fname) !== $fname) && !($exclude_fields[$fname] == 1)) {
 	$e1[$id]["$fname"] = $fvalue;
       }
     }
@@ -341,15 +341,15 @@ function get_update_entity_infos(&$e1, &$e2, $domain_id, $table, $field='', $rea
   // Get infos from Production table
   $table_prod = "P_$table";
   $query = "SELECT * FROM $table_prod $where_prod";
-  display_debug_msg($query, $cdg_sql, "get_update_numbers()");
+  display_debug_msg($query, $cdg_sql, 'get_update_numbers()');
   $retour = $obm_q->query($query);
 
   while($obm_q->next_record()) {
-    $id = $obm_q->f("0");  // Id
+    $id = $obm_q->f('0');  // Id
     $e = $obm_q->Record;
     foreach ($e as $fname => $fvalue) {
       // keep only column name (remove column number entries and exclude fields)
-      if (((int)($fname) !== $fname) && !(in_array($fname, $exclude_fields))) {
+      if (((int)($fname) !== $fname) && !($exclude_fields[$fname] == 1)) {
 	$e2[$id]["$fname"] = $fvalue;
       }
     }
@@ -420,7 +420,7 @@ function process_update_numbers($e1, $e2, $domain_id, $table, $realm) {
     display_debug_msg($query, $cdg_sql, 'run_query_user_delete(auto)');
     $retour = $obm_q->query($query);
     $obm_q->next_record();
-    $nb_del = $obm_q->f("nb");
+    $nb_del = $obm_q->f('nb');
     display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $table : deleted : $nb_del entries in table Deleted");
 
   } else {
@@ -723,7 +723,7 @@ function get_update_link_entity($domain_id, $entity, $realm) {
  * @return true (has update), else false
  */
 function store_update_data($params) {
-  global $cgp_show;
+  global $cgp_show, $entities;
 
   // If update type is global, we do not store Updated tables
   if ($params['update_type'] == 'global') {
@@ -732,11 +732,6 @@ function store_update_data($params) {
 
   $domain_id = $params['domain_id'];
   $realm = $params['realm'];
-
-  $entities = array('user' => array('UserObm', 'userobm', array('userobm_timeupdate', 'userobm_timelastaccess', 'userobm_calendar_version')),
-                    'group' => array('UGroup', 'group', array()),
-                    'host' => array('Host', 'host', array()),
-                    'mailshare' => array('MailShare', 'mailshare', array()));
 
   $has_update = false;
 

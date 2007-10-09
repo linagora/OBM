@@ -12,7 +12,7 @@
 // Display Update detail for an admin
 ///////////////////////////////////////////////////////////////////////////////
 function dis_tools_update_detail() {
-  global $display, $cgp_show, $profiles, $obm;
+   global $display, $cgp_show, $profiles, $obm, $entities;
   global $l_upd, $l_upd_needed, $l_upd_not_needed, $l_upd_running;
   global $l_upd_run, $l_created, $l_updated, $l_deleted, $l_links;
   global $l_upd_need_domain_update, $l_user, $l_group, $l_host, $l_mailshare;
@@ -41,11 +41,6 @@ function dis_tools_update_detail() {
   }
 
   $update_ok = check_tools_update_context_ok($params);
-  $entities = array('user' => array('UserObm', 'userobm', array('userobm_timeupdate', 'userobm_timelastaccess', 'userobm_calendar_version')),
-                    'group' => array('UGroup', 'group', array()),
-                    'host' => array('Host', 'host', array()),
-                    'mailshare' => array('MailShare', 'mailshare', array()));
-
 
   // Loop through all domains
   foreach ($domains as $domain_id => $domain) {
@@ -154,7 +149,7 @@ function dis_tools_update_detail() {
     $dis_domain";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_header_tools_upd</h1>";
+  $display['title'] = "<h1 class=\"title\">$l_header_tools_upd</h1>";
 
   return $block;
 }
