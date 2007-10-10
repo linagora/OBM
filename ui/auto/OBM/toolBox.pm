@@ -13,11 +13,11 @@ use OBM::Parameters::common;
 use OBM::Parameters::toolBoxConf;
 use OBM::dbUtils;
 require OBM::utils;
-use Sys::Syslog;
+require Sys::Syslog;
 require Exporter;
 
 @ISA = qw(Exporter);
-@EXPORT_function = qw( write_log makeConfigFile getLastUid getLastGid getGroupUsersMailEnable getGroupUsers getGroupUsersSID makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains);
+@EXPORT_function = qw(write_log makeConfigFile getLastUid getLastGid getGroupUsersMailEnable getGroupUsers getGroupUsersSID makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains);
 @EXPORT = (@EXPORT_function);
 @EXPORT_OK = qw();
 
@@ -29,29 +29,21 @@ $debug=1;
 sub write_log {
     local($text, $action) = @_;
 
-    SWITCH: {
-        if( !defined( $action ) ) {
-            last SWITCH;
-        }
+    if( $action !~ /^[O|W|C|WC]$/ ) {
+        return 1;
+    }
 
-    	if( $action eq "O" ) {
-    		Sys::Syslog::setlogsock("unix");
-	    	openlog( $text, "pid", "$facility_log" );
+    if( $action =~ /O/ ) {
+        Sys::Syslog::setlogsock("unix");
+        &Sys::Syslog::openlog( $text, "pid", "$facility_log" );
+    }
 
-            last SWITCH;
-        }
+    if( $action =~ /W/ ) {
+        &Sys::Syslog::syslog( "notice", $text );
+    }
 
-        if( ($action eq "W") || ($action eq "WC") ) {
-            syslog( "notice", $text );
-
-            last SWITCH;
-        }
-    
-        if( ($action eq "C") || ($action eq "WC") ) {
-            closelog();
-
-            last SWITCH;
-        }
+    if( $action =~ /C/ ) {
+        &Sys::Syslog::closelog();
     }
 
     return 0;
@@ -72,8 +64,7 @@ sub write_log {
 #	1 : tout est ok
 #	0 : manque des valeurs pour completer le fichier
 #------------------------------------------------------------------------------
-sub makeConfigFile
-{
+sub makeConfigFile {
 	my( $template, $data, $start, $end ) = @_;
 
     #
@@ -275,8 +266,7 @@ sub getGroupUsersMailEnable {
 # Retour :
 #	reference a un tableau contenant un login par case.
 #------------------------------------------------------------------------------
-sub getGroupUsers
-{
+sub getGroupUsers {
     my( $groupId, $dbHandler, $sqlRequest ) = @_;
 
     my @tabResult;
@@ -359,8 +349,7 @@ sub getGroupUsers
 # Retour :
 #	reference a un tableau contenant un SID par case.
 #------------------------------------------------------------------------------
-sub getGroupUsersSID
-{
+sub getGroupUsersSID {
     my( $groupId, $dbHandler, $SID ) = @_;
 
     my @tabResult;
