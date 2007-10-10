@@ -31,8 +31,8 @@ sub new {
         typeDesc => undef,
         ldapConn => {
             ldapServer => undef,
-            ldapAdmin => undef,
-            ldapAdminDn => undef,
+            ldapUser => undef,
+            ldapUserDn => undef,
             ldapPasswd => undef,
             conn => undef
         }
@@ -66,7 +66,8 @@ sub init {
 
     # Initialisation des paramètres de connexions LDAP
     $self->{"ldapConn"}->{"ldapServer"} = $self->{"domainList"}->[0]->{"ldap_admin_server"};
-    $self->{"ldapConn"}->{"ldapAdmin"} = $self->{"domainList"}->[0]->{"ldap_admin_login"};
+    $self->{"ldapConn"}->{"ldapUser"} = $self->{"domainList"}->[0]->{"ldap_admin_login"};
+    $self->{"ldapConn"}->{"ldapUserDn"} = $self->_makeDn( { node_type => $OBM::Parameters::ldapConf::SYSTEMUSERS, name => $self->{"ldapConn"}->{"ldapUser"} }, $self->_findTypeParentDn( undef, $OBM::Parameters::ldapConf::SYSTEMUSERS, 0 ) );
     $self->{"ldapConn"}->{"ldapPasswd"} = $self->{"domainList"}->[0]->{"ldap_admin_passwd"};
 
     # Etabli la connexion à l'annuaire
@@ -124,10 +125,14 @@ sub dump {
 
 sub _connectLdapSrv {
     my $self = shift;
-    my $ldapConn = $self->{"ldapConn"};
+    my( $ldapConn ) = @_;
     my $ldapStruct = $self->{"ldapStruct"};
 
-    if( !defined($ldapConn->{"ldapServer"}) || !defined($ldapConn->{"ldapAdmin"}) || !defined($ldapConn->{"ldapPasswd"}) ) {
+    if( !defined($ldapConn) ) {
+        $ldapConn = $self->{"ldapConn"};
+    }
+
+    if( !defined($ldapConn->{"ldapServer"}) || !defined($ldapConn->{"ldapUserDn"}) || !defined($ldapConn->{"ldapPasswd"}) ) {
         &OBM::toolBox::write_log( "[Ldap::ldapEngine]: pas d'information de connexion a l'annuaire LDAP", "W" );
         return 0;
     }
@@ -147,26 +152,12 @@ sub _connectLdapSrv {
         return 0;
     }
 
-    my $errorCode;
-    my $ldapAdmin = {
-        node_type => $OBM::Parameters::ldapConf::SYSTEMUSERS,
-        name => $ldapConn->{"ldapAdmin"}
-    };
+    &OBM::toolBox::write_log( "[Ldap::ldapEngine]: connexion a l'annuaire en tant que '".$ldapConn->{"ldapUserDn"}."'", "W" );
 
-    my $parentDn = $self->_findTypeParentDn( undef, $SYSTEMUSERS, 0 );
-    if( defined( $parentDn ) ) {
-        $ldapConn->{"ldapAdminDn"} = $self->_makeDn( $ldapAdmin, $parentDn );
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: connexion a l'annuaire en tant que '".$ldapConn->{"ldapAdminDn"}."'", "W" );
-
-        $errorCode = $ldapConn->{"conn"}->bind(
-            $ldapConn->{"ldapAdminDn"},
-            password => $ldapConn->{"ldapPasswd"}
-        );
-
-    }else {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: DN de l'administrateur LDAP inconnu", "W" );
-        return 0;
-    }
+    my $errorCode = $ldapConn->{"conn"}->bind(
+        $ldapConn->{"ldapUserDn"},
+        password => $ldapConn->{"ldapPasswd"}
+    );
 
     if( $errorCode->code ) {
         &OBM::toolBox::write_log( "[Ldap::ldapEngine]: echec de connexion : ".$errorCode->error, "W" );
@@ -542,6 +533,31 @@ sub update {
 
     if( !$self->_doWork( $objectDn, $object ) ) {
         &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme de traitement de l'objet de type '".$object->{"type"}."' - Operation annulee !", "W" );
+        return 0;
+    }
+
+    return 1;
+}
+
+
+sub checkUserPasswd {
+    my $self = shift;
+    my( $object ) = @_;
+
+    if( !defined($object) ) {
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour d'un objet non definit - Operation annulee !", "W" );
+        return 0;
+    }elsif( !defined($object->{"type"}) ) {
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour d'un objet de type non définit - Operation annulee !", "W" );
+        return 0;
+    }elsif( !defined($object->{"domainId"}) ) {
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour d'un objet de domaine non definit - Operation annulee !", "W" );
+        return 0;
+    }
+
+    my $domainDesc = $self->_findDomainbyId($object->{"domainId"});
+    if( !defined($domainDesc) ) {
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: description du domaine '".$object->{"domainId"}."' non definit - Operation annulee !", "W" );
         return 0;
     }
 
