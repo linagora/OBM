@@ -169,12 +169,7 @@ public class ContactHelper extends Helper {
 	}
 	
 	public static String getCountry(Address addr) {
-		String result = nullToEmptyString(addr.getCountry().getPropertyValueAsString());
-		if (result.length()>2) {
-			result = result.substring(0,2);
-		}
-		
-		return result;
+		return nullToEmptyString(addr.getCountry().getPropertyValueAsString());
 	}
 }
 	
