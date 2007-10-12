@@ -1989,7 +1989,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_alerts, $l_alerts_time;
   global $l_change_state,$l_groups,$l_all_day,$l_every;
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend; 
-  global $l_wait, $l_task, $l_exception, $l_yes, $l_no;
+  global $l_wait, $l_task, $l_exception, $l_yes, $l_no, $path;
   global $l_carac,$l_module_calendar, $l_items;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
@@ -2850,7 +2850,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     foreach($date_exception as $key => $value) {
       $value = of_date_upd_format($value,true);
       $block_exception_detail .= "<div class=\"elementRow\" id=\"date_exception-$key\">
-         <a href=\"javascript: remove_element(this.parentNode,'exceptionHome');\">
+         <a href=\"javascript: remove_element('date_exception-$key','exceptionHome');\">
          <img src=\"$ico_delete\" alt=\"[Delete]\">
          </a>
          <input type=\"text\" name=\"tf_date_exception[]\" value=\"$value\" class=\"datePicker\" />

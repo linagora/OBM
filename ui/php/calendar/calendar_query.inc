@@ -30,6 +30,8 @@ function run_query_calendar_detail($calendar_id) {
       $timeupdate,
       $timecreate,
       calendarevent_owner, 
+      o.userobm_lastname owner_lastname,
+      o.userobm_firstname owner_firstname,
       calendarevent_title, 
       calendarevent_description,
       calendarevent_properties,
@@ -51,6 +53,7 @@ function run_query_calendar_detail($calendar_id) {
       LEFT JOIN CalendarCategory1 ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN UserObm AS c ON calendarevent_usercreate = c.userobm_id
       LEFT JOIN UserObm AS u ON calendarevent_userupdate = u.userobm_id
+      LEFT JOIN UserObm AS o ON calendarevent_owner = o.userobm_id
     WHERE calendarevent_id = '$calendar_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_detail()");
@@ -238,6 +241,9 @@ function run_query_calendar_insert_decision($calendar) {
 function run_query_calendar_update_occurence_state($event_id, $entity, $entity_id,$state){
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
+  if($entity_id == "") {
+    $entity_id = $obm["uid"];
+  }
   if($obm["uid"] != $entity_id || $entity != "user") {
     if( $entity == "user") {
       $writable = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
@@ -344,11 +350,18 @@ function run_query_calendar_waiting_events() {
 // Parameters:
 //   - $calendar[] : hash values for the event
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_delete_event_entity($calendar) {
+function run_query_calendar_delete_event_entity($calendar, $users = null) {
   global $cdg_sql;
 
   $e_id = $calendar["calendar_id"];
   $query = "DELETE FROM EventEntity WHERE evententity_event_id = '$e_id'";
+  if(is_array($users)) {
+    if(count($users) != 0) {
+      $query .= " AND (evententity_entity != 'user' OR evententity_entity_id IN (".implode(",",$users)."))";
+    }
+  } else {
+     $query .= " AND evententity_entity != 'user'";
+  }
 
   display_debug_msg($query, $cdg_sql, "run_query_calendar_delete_event_entity()");
   $obm_q = new DB_OBM;
@@ -461,7 +474,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
     } else {
       $h_file = "";
     }
-    send_mail($subject, $message, $recipient_array, $resources_address, $mail, $h_file);
+    //send_mail($subject, $message, $recipient_array, $resources_address, $mail, $h_file);
     if ($ccalendar_send_ics) {
       unlink($tmp_filename);
     }
@@ -1402,15 +1415,37 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
 
   // XXXX bizarre les old_end et old_begin semblent etre affectes par l'update
   // ci-dessous sous mysql 4.0.23-10 (portable fourmi)
-  run_query_calendar_update_event_data($calendar);  
-  run_query_calendar_delete_event_entity($calendar);
+  run_query_calendar_update_event_data($calendar); 
+
+  // FIXME
+  // FIXME
+  // FIXME
+  // FIXME CECI EST MAUVAIS MAIS POUR LA DEMO DU 22 OCT 2007 CA SUFFIRA
+  // FIXME
+  // FIXME
+  // FIXME
+
+  global $mail_data;
+  if($mail_data["remove_attendee"]) {
+    $delete_entities = $mail_data["mails"]["remove_attendee"]["recipients"];
+  }
+  if($mail_data["add_attendee"]) {
+    $add_entities = $mail_data["mails"]["add_attendee"]["recipients"];
+  }
+  if($mail_data["reset_state"]) {
+    $delete_entities = array();
+    $add_entities = $users_array;
+  } 
+  run_query_calendar_delete_event_entity($calendar,$delete_entities);
 
   // User insertion
-  foreach($users_array as $user_id) {
-    if ($user_id == $obm["uid"] || in_array($user_id, $writable_cal["ids"])) {
-      run_query_calendar_insert_entity_event("user", $user_id, $event_id, 'A');	
-    } else {
-      run_query_calendar_insert_entity_event("user", $user_id, $event_id, 'W');	
+  if(is_array($add_entities)) {
+    foreach($add_entities as $user_id) {
+      if ($user_id == $obm["uid"] || in_array($user_id, $writable_cal["ids"])) {
+        run_query_calendar_insert_entity_event("user", $user_id, $event_id, 'A');	
+      } else {
+        run_query_calendar_insert_entity_event("user", $user_id, $event_id, 'W');	
+      }
     }
   }
 
@@ -1445,17 +1480,6 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
   }
 
-  $subject = "$l_update_event_mail_subject" . $mail_title;
-  $message = "$l_update_event_mail_head $mail_title
-$l_date : $l_from $datebegin $l_to $dateend";
-  if (($old_begin != $datebegin || $old_end != $dateend) ) {
-    $message .= "
-$l_update_event_mail_body $l_from $old_begin $l_to $old_end";
-  }
-  $message .= $message_resource; 
-
-  $recipient_array = array_diff($users_array, array($obm["uid"]));
-  send_mail($subject, $message, $recipient_array, $resources_address, $mail);
 }
 
 
@@ -1950,7 +1974,7 @@ function run_query_calendar_delete($calendar) {
   $message = $l_delete_event_mail_head.$title.$message_resource;   
   $subject = "$l_delete_event_mail_subject" . $title;
   $recipient_array = array_diff($users_array, array($obm["uid"]));
-  send_mail($subject, $message, $recipient_array, $resources_address, $mail);
+  //send_mail($subject, $message, $recipient_array, $resources_address, $mail);
 }
 
 
@@ -2676,8 +2700,8 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
   }
   $multidomain = sql_multidomain("calendarevent");
 
-  $day_start = strtotime(date("Ymd 00:00:00"),$time);
-  $day_end = strtotime("+1 day",$day_start);
+  $day_start = strtotime(date("Ymd 00:00:00"),$start);
+  $day_end = strtotime(date("Ymd 00:00:00"),$end);
   $query = "SELECT
       calendarevent_id,
       calendarevent_title,
@@ -2700,9 +2724,9 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
       $join_user
       $join_resource
     WHERE evententity_state = 'A'
-      AND 
+      AND calendarevent_repeatkind = 'none' AND
       (($calendarevent_date > $start - calendarevent_duration AND $calendarevent_date < $end) 
-        OR (calendarevent_allday = 1 AND $calendarevent_date >= $day_start AND $calendarevent_date < $day_end))
+        OR (calendarevent_allday = 1 AND $calendarevent_date >= $day_start - calendarevent_duration AND $calendarevent_date <= $day_end))
       $where_ent
       $where_event
       $multidomain
@@ -3726,4 +3750,230 @@ Class OccurrenceFactory {
   }
 }
 
+/**
+ * Difference between database values and params values for an event 
+ * 
+ * @param mixed $calendar
+ * @access public
+ * @return void
+ */
+function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
+  global $cdg_sql;
+  global $l_add_event_mail_subject, $l_update_event_mail_subject, $l_delete_event_mail_subject;
+  global $l_add_event_mail_body, $l_update_event_mail_body, $l_delete_event_mail_body;
+  global $l_add_exception_mail_body, $l_add_exception_mail_subject;
+  global $l_delete_exception_mail_body, $l_delete_exception_mail_subject;
+  global $l_update_state_mail_subject, $l_update_state_mail_body;
+  global $cgp_host, $ccalendar_send_ics, $obm;
+
+  
+  $mail_datas = array("reset_state" => false, "check_conflict" => false, 
+                "add_attendee" => false, "remove_attendee" => false,
+                "add_exception" => false, "remove_exception" => false,
+                "update_decision" => false, "mails" => array());
+  
+  $accept_link ="$cgp_host/calendar/calendar_index.php?action=update_decision&calendar_id=$calendar[calendar_id]&entity_kind=user&rd_decision_event=A";
+  $refuse_link ="$cgp_host/calendar/calendar_index.php?action=update_decision&calendar_id=$calendar[calendar_id]&entity_kind=user&rd_decision_event=R";
+  $consult_link = "$cgp_host/calendar/calendar_index.php?action=detail_consult&calendar_id=$calendar[calendar_id]";
+  
+  if($action == "update") {
+    if(!$event_q) {
+      $event_q = run_query_calendar_detail($calendar["calendar_id"]);
+    }
+    
+    $old_title = $event_q->f("calendarevent_title");
+    $title = $calendar["title"];
+    $old_datebegin = of_datetime_format($event_q->f("calendarevent_date"));
+    $datebegin =  of_datetime_format(strtotime($calendar["date_begin"]));
+    $old_dateend = of_datetime_format($event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration"));
+    $dateend = of_datetime_format(strtotime($calendar["date_end"]));
+    $old_location = $event_q->f("calendarevent_location");
+    $location = $calendar["location"];
+    $old_all_day = $event_q->f("calendarevent_allday");
+    ($calendar["all_day"] != 1)?$all_day= '0':$all_day = '1';
+    $old_duration = $event_q->f("calendarevent_duration");
+    $duration = $calendar["event_duration"];
+    $old_repeatkind = $event_q->f("calendarevent_repeatkind");
+    $repeatkind = $calendar["repeat_kind"];
+    $old_repeatdays = $event_q->f("calendarevent_repeatdays");
+    $repeatdays = $calendar["repeat_days"];
+    $old_repeatend = of_datetime_format($event_q->f("calendarevent_endrepeat"));
+    $repeatend = of_datetime_format(strtotime($calendar["repeat_end"]));
+    $old_repeatfrequence = $event_q->f("calendarevent_repeatfrequence");
+    $repeatfrequence = $calendar["repeatfrequency"];
+    $owner = $event_q->f("owner_lastname")." ".$event_q->f("owner_firstname");    
+
+    $mail_datas["reset_state"] = (($location != $old_location) || $mail_datas["reset_state"]);
+    $mail_datas["reset_state"] = (($all_day != $old_all_day) || $mail_datas["reset_state"]);
+    $mail_datas["reset_state"] = (($datebegin != $old_datebegin) || $mail_datas["reset_state"]);
+    $mail_datas["reset_state"] = (($duration != $old_duration) || $mail_datas["reset_state"]);
+    $mail_datas["reset_state"] = (($repeatkind != $old_repeatkind) || $mail_datas["reset_state"]);
+    $mail_datas["reset_state"] = (($repeatdays != $old_repeatdays) || $mail_datas["reset_state"]);
+    $mail_datas["reset_state"] = (($repeatend != $old_repeatend) || $mail_datas["reset_state"]);
+    $mail_datas["reset_state"] = (($repeatfrequence != $old_repeatfrequence) || $mail_datas["reset_state"]);
+
+    $date_exception = array();
+    $exceptions = array(); 
+    $p_exceptions = array();
+    $new_exceptions = array();
+    $old_exceptions = array();
+    $exceptions_q = run_query_get_one_event_exception($calendar["calendar_id"]);
+    $attendees_q = get_calendar_event_users_info($calendar["calendar_id"]);
+    
+    $attendees = array_intersect($calendar['sel_user_id'], $attendees_q);
+    $attendees = array_diff($attendees, array($obm["uid"]));
+    $old_attendees = array_diff($attendees_q,$calendar['sel_user_id'], array($obm["uid"]));
+    $new_attendees = array_diff($calendar['sel_user_id'],$attendees_q, array($obm["uid"]));
+
+    if(count($old_attendees) > 0) {
+      $mail_datas["remove_attendee"] = true;
+    }
+    if(count($new_attendees) > 0) {
+      $mail_datas["add_attendee"] = true;
+    }
+    if(!$mail_datas["reset_state"]) {
+      if(is_array($calendar["date_exception"])) {
+        $date_exception = array_unique($calendar["date_exception"]);
+      }
+      while($exceptions_q->next_record()) {
+        $exceptions[] = of_date_format($exceptions_q->f("calendarexception_date"));
+      }
+      foreach($date_exception as $value) {
+        if($value != "") {
+          $p_exceptions[] = $value; 
+        }
+      }
+      $old_exceptions = array_diff($exceptions,$p_exceptions);
+      $new_exceptions = array_diff($p_exceptions,$exceptions);
+      if(count($old_exceptions) > 0) {
+        $mail_datas["remove_exception"] = true;
+      }
+      if(count($new_exceptions) > 0) {
+        $mail_datas["add_exception"] = true;
+      }
+    }
+  } elseif ($action == "insert") {
+    $new_attendees = array_diff($calendar['sel_user_id'], array($obm["uid"]));
+    $mail_datas["add_attendee"] = true;    
+    $title = $calendar["title"];
+    $datebegin =  of_datetime_format(strtotime($calendar["date_begin"]));
+    $dateend = of_datetime_format(strtotime($calendar["date_end"]));
+    $location = $calendar["location"];
+  } elseif ($action == "delete") {
+    $event_q = run_query_calendar_detail($calendar["calendar_id"]);
+    $old_title = $event_q->f("calendarevent_title");
+    $old_datebegin = of_datetime_format($event_q->f("calendarevent_date"));
+    $old_dateend = of_datetime_format($event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration"));
+    $old_location = $event_q->f("calendarevent_location");
+    $old_attendees = get_calendar_event_users_info($calendar["calendar_id"]);
+    $old_attendees = array_diff($old_attendees, array($obm["uid"]));
+    $mail_datas["remove_attendee"] = true;    
+  } elseif ($action == "quick_delete") {
+    if($event_q->f("calendarevent_repeatkind") != "none") {
+      $title = $event_q->f("calendarevent_title");
+      $new_exceptions[] = $calendar["old_date_begin"];  
+      $attendees = get_calendar_event_users_info($calendar["calendar_id"]);
+      $attendees = array_diff($attendees, array($obm["uid"]));
+      $mail_datas["add_exception"] = true;
+    } else {
+      $old_title = $event_q->f("calendarevent_title");
+      $old_datebegin = of_datetime_format($event_q->f("calendarevent_date"));
+      $old_dateend = of_datetime_format($event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration"));
+      $old_location = $event_q->f("calendarevent_location");
+      $old_attendees = get_calendar_event_users_info($calendar["calendar_id"]);
+      $old_attendees = array_diff($old_attendees, array($obm["uid"]));
+      $mail_datas["remove_attendee"] = true;    
+    }
+  } elseif ($action == "quick_update") {
+    $old_title = $event_q->f("calendarevent_title");
+    $title = $calendar["title"];
+    $old_datebegin = of_datetime_format($event_q->f("calendarevent_date"));
+    $datebegin =  of_datetime_format(strtotime($calendar["date_begin"]));
+    $old_duration = $event_q->f("calendarevent_duration");
+    $duration = $calendar["duration"];
+    $old_dateend = of_datetime_format($event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration"));
+    $dateend = of_datetime_format(strtotime($calendar["date_begin"]) + $duration);
+    $mail_datas["reset_state"] = (($datebegin != $old_datebegin) || $mail_datas["reset_state"]);
+    $mail_datas["reset_state"] = (($duration != $old_duration) || $mail_datas["reset_state"]);
+    $attendees = get_calendar_event_users_info($calendar["calendar_id"]);
+  } elseif ($action == "update_decision" || $action == "decision") {
+    if($calendar['entity_kind'] == "user" && $event_q->f("calendarevent_owner") != $obm["uid"]) {
+      $userinfo = get_user_info();
+      $decision = $calendar['decision_event'];
+      $event_q = run_query_calendar_detail($calendar["calendar_id"]);
+      $title = $event_q->f("calendarevent_title");
+      $datebegin = of_datetime_format($event_q->f("calendarevent_date"));
+      $user =  $userinfo["lastname"]." ".$userinfo["firstname"];
+      $attendees = array($event_q->f("calendarevent_owner"));
+      $mail_datas["update_decision"] = true;
+    }
+  }
+ 
+  if($mail_datas["reset_state"]) {
+    $mail_datas["mails"]["reset_state"] = array (
+      "subject" => sprintf($l_update_event_mail_subject,$old_title),
+      "message" => sprintf($l_update_event_mail_body, $old_title, $old_datebegin, 
+                           $old_dateend, $old_location, $datebegin, $dateend, 
+                           $location,$consult_link,$accept_link,$refuse_link),
+      "recipients" => $attendees
+    ) ;
+  } 
+  if ($mail_datas["add_attendee"]) {
+    if ($ccalendar_send_ics) {
+      $tmp_filename = secure_tmpname(".ics","ics_");
+      create_calendar_ics_meeting_file($calendar, $calendar["calendar_id"], $new_attendees, array(), $tmp_filename);
+      $h_file = array(
+        array (
+               "filename" => "$tmp_filename",
+               "name" => "meeting.ics",
+               "type" => "ics"
+               )
+        );
+    }
+    $mail_datas["mails"]["add_attendee"] = array (
+      "subject" => sprintf($l_add_event_mail_subject,$title),
+      "message" => sprintf($l_add_event_mail_body, $datebegin, $dateend, 
+                           $title, $location, $consult_link,$accept_link,$refuse_link),
+      "recipients" => $new_attendees,
+      "h_file" => $hfile
+    ) ;
+  }
+  if ($mail_datas["remove_attendee"]) {
+    $mail_datas["mails"]["remove_attendee"] = array (
+      "subject" => sprintf($l_delete_event_mail_subject,$old_title),
+      "message" => sprintf($l_delete_event_mail_body, $old_title, $old_datebegin, 
+                           $old_dateend, $old_location),
+      "recipients" => $old_attendees
+    ) ;
+  }
+  if ($mail_datas["add_exception"]) {
+    $mail_datas["mails"]["add_exception"] = array (
+      "subject" => sprintf($l_add_exception_mail_subject,$title),
+      "message" => sprintf($l_add_exception_mail_body,$title,implode(", ", $new_exceptions),$consult_link),
+      "recipients" => $attendees
+    ) ;
+  }
+  if ($mail_datas["remove_exception"]) {
+    $mail_datas["mails"]["remove_exception"] = array (
+      "subject" => sprintf($l_delete_exception_mail_subject,$title),
+      "message" => sprintf($l_delete_exception_mail_body,$title,implode(", ", $old_exceptions),$consult_link),
+      "recipients" => $attendees
+    ) ;
+  }
+   if ($mail_datas["update_decision"]) {
+    $mail_datas["mails"]["update_decision"] = array (
+      "subject" => sprintf($l_update_state_mail_subject,$title),
+      "message" => sprintf($l_update_state_mail_body,$user,$title,$decision,$consult_link),
+      "recipients" => $attendees
+    ) ;
+  }
+
+  return $mail_datas;
+}
+
+function calendar_send_mail($mails) {
+  foreach($mails["mails"] as $mail) {
+    send_mail($mail["subject"], $mail["message"], $mail["recipients"], array(), $mail, $mail["h_file"]);
+  }
+}
 ?>

@@ -156,6 +156,56 @@ $l_update_event_mail_body = "\nAu lieu de :";
 $l_delete_event_mail_body = "Il aurait du avoir lieu : ";
 $l_confirm_mail = "Confirmer+forcer l'envoi de mail";
 
+$l_add_event_mail_subject = "Nouvel evenement sur OBM : %s";
+$l_update_event_mail_subject = "Modification evenement sur OBM : %s";
+$l_delete_event_mail_subject = "Suppression evenement sur OBM : %s";
+$l_delete_exception_mail_subject = "Modification evenement sur OBM : %s";
+$l_add_exception_mail_subject = "Modification evenement sur OBM : %s";
+$l_update_state_mail_subject = "Participation a l'evenement sur OBM : %s";
+
+$l_add_event_mail_body = 
+"Vous êtes invité à participer à un rendez-vous du %s au %s,
+qui à pour sujet %s (lieu : %s).
+Pour plus de détails sur les modifications cliquez-ici :
+%s
+Pour accepter ce rendez-vous cliquez ici : 
+%s
+Pour refuser ce rendez-vous cliquez ici : 
+%s
+";
+
+$l_update_event_mail_body = 
+"Bonjour, 
+Le rendez-vous %s, initialement prévu du %s au %s, (lieu : %s), a été
+modifié et se déroulera du %s au %s (lieu : %s).
+Pour plus de détails sur les modifications cliquez-ici :
+%s
+Pour accepter directement les modifications de ce rendez-vous cliquez-ici : 
+%s
+Pour refuser les directement modifications de ce rendez-vous cliquez-ici : 
+%s
+";
+
+$l_delete_event_mail_body = 
+"Le rendez-vous %s, initialiament prévut du %s au %s (lieu : %s), a été
+supprimé.
+";
+
+$l_delete_exception_mail_body = 
+"La ou les occurrences du rendez-vous %s, initialement annulées les %s auront lieu.
+Pour plus de détails sur les modifications cliquez-ici :
+%s";
+
+$l_add_exception_mail_body = 
+"La ou les occurrences du rendez-vous %s, initialement prévuent les %s sont annulées.
+Pour plus de détails sur les modifications cliquez-ici :
+%s";
+
+$l_update_state_mail_body = 
+"La participation de %s à l'événement %s est %s
+Pour plus de détails sur l'événement cliquez-ici :
+%s";
+
 $l_unknown = "Inconnu";
 $l_calendar_visible = "Agendas Visibles";
 $l_calendar_displayed = "Agendas affichés";
