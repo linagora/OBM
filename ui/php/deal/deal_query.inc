@@ -968,31 +968,21 @@ function run_query_deal_potential($users_id='') {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Get global Deal infos
-// Parameters:
-//   - $date_range  : array [date_start, date_end] for classification only
-//   - $target_date : deal_dateexpected, deal_dateend : date to sort
-//   - $users_id    : array of marketing User id (empty for all deals)
-//   - $sel_tt      : [optionnal] tasktype array filter
-// Returns:
-//     $res :array[date][u_id]([amount]|[balanced]|[commission][commission_ba])
-//            total in u_id=0
-//                 [users_id] = array(u_id)
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Get global Deal infos for dashboard
+ * @param $date_range  : array [date_start, date_end] for classification only
+ * @param $target_date : deal_dateexpected, deal_dateend : date to sort
+ * @param $users_id    : array of marketing User id (empty for all deals)
+ * @param $sel_tt      : [optionnal] tasktype array filter
+ * @return db object
+**/
 function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpected', $users_id='', $tts='') {
-  global $cdg_sql, $cdg_param;
-  global $l_total;
+  global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $dexp = sql_date_format($db_type, 'deal_dateexpected', 'dateexpected');
   $dend = sql_date_format($db_type, 'deal_dateend', 'dateend');
-
-  if (is_array($date_range)) {
-    $past = $date_range[0];
-    $future = $date_range[1];
-  }
 
   // Tasktype filter
   if (is_array($tts)) {
@@ -1016,11 +1006,15 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
   }
   $multidomain = sql_multidomain('deal');
   $query = "SELECT
+      deal_id,
+      deal_label,
       $dexp,
       $dend,
       deal_marketingmanager_id AS uid,
       deal_amount,
       deal_margin,
+      deal_hitrate,
+      company_name,
       (deal_amount * deal_hitrate / 100) as amount_balanced,
       (deal_amount * deal_commission / 100) as commission,
       (deal_amount * deal_commission * deal_hitrate / 10000) as commission_balanced,
@@ -1029,6 +1023,7 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
     FROM Deal
       LEFT JOIN DealType ON deal_type_id = dealtype_id
       LEFT JOIN UserObm ON deal_marketingmanager_id=userobm_id
+      LEFT JOIN Company ON deal_company_id=company_id
     WHERE dealtype_inout = '+'
       AND deal_hitrate > 0
       AND deal_hitrate < 100
@@ -1037,11 +1032,35 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
       $where_tt
       $multidomain
     ORDER BY
+      deal_hitrate,
       $target_date
 ";
   
   display_debug_msg($query, $cdg_sql, 'run_query_deal_dashboard_infos()');
   $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+/**
+ * Get Deal infos for dashboard year detail
+ * @param $date_range  : array [date_start, date_end] for classification only
+ * @param $target_date : deal_dateexpected, deal_dateend : date to sort
+ * @param $users_id    : array of marketing User id (empty for all deals)
+ * @param $sel_tt      : [optionnal] tasktype array filter
+ * @return $res : [date][u_id]([amount]|[balanced]|[commission][commission_ba])
+ *                total in u_id=0
+ *                [users_id] = array(u_id)
+**/
+function get_deal_dashboard_year_detail($date_range, $target_date='deal_dateexpected', $users_id='', $tts='') {
+
+  $obm_q = run_query_deal_dashboard_infos($date_range, 'deal_dateexpected', '', $deal['tasktype']);
+
+  if (is_array($date_range)) {
+    $past = $date_range[0];
+    $future = $date_range[1];
+  }
 
   $res_users = array();
   $am = 0;
@@ -1092,6 +1111,85 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
     $res[$month][0]['commission'] += $ca;
     $res[$month][0]['commission_balanced'] += $cb;
     $res[$month][0]['number'] ++;
+  }
+
+  $res['users_id'] = $res_users;
+
+  return $res;
+}
+
+
+/**
+ * Get Deal infos for dashboard panel
+ * @param $date_range  : array [date_start, date_end] for classification only
+ * @param $target_date : deal_dateexpected, deal_dateend : date to sort
+ * @param $users_id    : array of marketing User id (empty for all deals)
+ * @param $sel_tt      : [optionnal] tasktype array filter
+ * @return $res : [date][u_id]([amount]|[balanced]|[commission][commission_ba])
+ *                total in u_id=0
+ *                [users_id] = array(u_id)
+**/
+function get_deal_dashboard_panel($date_range, $target_date='deal_dateexpected', $users_id='', $tts='') {
+  global $l_quarter;
+
+  $obm_q = run_query_deal_dashboard_infos($date_range, 'deal_dateexpected', '', $deal['tasktype']);
+
+  if (is_array($date_range)) {
+    $past = $date_range[0];
+    $future = $date_range[1];
+  }
+
+  $res_users = array();
+  $am = 0;
+  $ma = 0;
+  $hr = 0;
+  $ab = 0;
+  $cm = 0;
+  $cb = 0;
+  $nb = 0;
+
+  while ($obm_q->next_record()) {
+    $u_id = $obm_q->f('uid');
+    if (! in_array($u_id, $res_users)) {
+      $res_users[] = $u_id;
+      $res['name'][$u_id] = $obm_q->f('userobm_lastname') . ' ' . $obm_q->f('userobm_firstname');
+    }
+    $d_id = $obm_q->f('deal_id');
+    $d_label = $obm_q->f('deal_label');
+    $company_name = $obm_q->f('company_name');
+    $am = $obm_q->f('deal_amount');
+    $ma = $obm_q->f('deal_margin');
+    $hr = $obm_q->f('deal_hitrate');
+    $ab = $obm_q->f('amount_balanced');
+    $ca = $obm_q->f('commission');
+    $cb = $obm_q->f('commission_balanced');
+    $end_date = of_isodate_format($obm_q->f('dateend'), 1);
+    $exp_date = of_isodate_format($obm_q->f('dateexpected'), 1);
+    if ($target_date == 'deal_dateexpected') {
+      $date_used = $exp_date;
+    } else {
+      $date_used = $end_date;
+    }
+    if ($date_used == '') {
+      $month = 'no_date';
+    } else if ($date_used < $past) {
+      $month = 'past';
+    } else if ($date_used > $future) {
+      $month = 'future';
+    } else {
+      $month = substr($date_used, 5, 2);
+      $q = floor(($month-1) / 3) + 1;
+      $quarter = "$l_quarter$q";
+    }
+
+    $res[$hr][$u_id][$d_id] = array ('company'=>$company_name, 'quarter'=>$quarter, 'label'=>$d_label, 'amount'=>$am, 'margin'=>$ma);
+    $res[$hr][$u_id]['total']['amount'] += $am;
+    $res[$hr][$u_id]['total']['amount_balanced'] += $ab;
+    $res[$hr][$u_id]['total']['margin'] += $ma;
+
+    $res[$hr][0]['amount'] += $am;
+    $res[$hr][0]['margin'] += $ma;
+    $res[$hr][0]['amount_balanced'] += $ab;
   }
 
   $res['users_id'] = $res_users;

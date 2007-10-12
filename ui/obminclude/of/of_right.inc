@@ -586,7 +586,8 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
   foreach ($accept_admin as $key => $ref) {
     $ref_ent = substr($ref, 0, 10);
     if ($ref_ent == "data-user-") {
-      if (! in_array($ref, $accept_write)) {
+      if ((! in_array($ref, $accept_read))
+	  && (! in_array($ref, $accept_write))) {
         $id = str_replace("data-user-","", $ref);
         $query = "INSERT INTO EntityRight (
           entityright_entity,

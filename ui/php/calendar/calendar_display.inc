@@ -3209,8 +3209,8 @@ function html_calendar_dis_delete($calendar) {
     <a href=\"calendar_index.php?action=detailconsult&calendar_id=$event_id&date=$iso_date\"><img src=\"$ico_cancel\" alt=\"[Cancel]\" /></a>
      $l_cancel
    </div>
-  </div>
-";
+  </div>";
+
   return $block;
 }
 
@@ -3231,6 +3231,10 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
 
   $time_unit = 60 / $_SESSION['set_cal_interval'];
   $datebegin = of_date_upd_format($calendar["date"]);
+  $hourbegin = $calendar['time_duration'];
+  if (($hourbegin == '') || ($hourbegin <= 0)) {
+    $hourbegin = '1';
+  }
   $dis_button = "
      <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"perform_meeting\" />
@@ -3278,8 +3282,8 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     <td id=\"sel_user_id\">
       <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
       $dis_sel_user
-    </td>
-  ";
+    </td>";
+
   if ($ccalendar_resource) {
     if (is_array($res["entity"])) {
       foreach ($res["entity"] as $r_id => $r_ent) {
