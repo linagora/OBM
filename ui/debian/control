@@ -25,3 +25,9 @@ Pre-Depends: dbconfig-common, ucf, ${misc:Depends}
 Description: OBM Web Interface
     Web of Open Business Management
 	Instalation of OBM
+
+Package: libobm-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends},
+Description: module OBM perl
+ module OBM perl
