@@ -1,0 +1,14 @@
+#Version control files and dirs.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^blib/
+^MakeMaker-\d
+
+#OBM satellite
+
