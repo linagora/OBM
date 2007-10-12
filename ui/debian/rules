@@ -72,11 +72,7 @@ install: build
 	#RULES OBM-CORE
 	# obm-core needs the sql skeleton here in order to create db:
 	cp debian/misc/mysql.sql debian/obm-core/usr/share/dbconfig-common/data/obm-core/install/mysql
-<<<<<<< .mine
 	#cp debian/misc/upgrade2.0-2.1.sh debian/obm-core/usr/share/dbconfig-common/scripts/obm-core/upgrade/mysql/1.0-2
-=======
-#	cp debian/misc/upgrade2.0-2.1.sh debian/obm-core/usr/share/dbconfig-common/scripts/obm-core/upgrade/mysql/1.0-2
->>>>>>> .r2147
 	#
 	################
 	#RULES OBM-UI
