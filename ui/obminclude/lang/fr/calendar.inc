@@ -182,12 +182,12 @@ Pour plus de détails sur les modifications cliquez-ici :
 %s
 Pour accepter directement les modifications de ce rendez-vous cliquez-ici : 
 %s
-Pour refuser les directement modifications de ce rendez-vous cliquez-ici : 
+Pour refuser directement les modifications de ce rendez-vous cliquez-ici : 
 %s
 ";
 
 $l_delete_event_mail_body = 
-"Le rendez-vous %s, initialiament prévut du %s au %s (lieu : %s), a été
+"Le rendez-vous %s, initialiament prévu du %s au %s (lieu : %s), a été
 supprimé.
 ";
 
@@ -197,7 +197,7 @@ Pour plus de détails sur les modifications cliquez-ici :
 %s";
 
 $l_add_exception_mail_body = 
-"La ou les occurrences du rendez-vous %s, initialement prévuent les %s sont annulées.
+"La ou les occurrences du rendez-vous %s, initialement prévues les %s sont annulées.
 Pour plus de détails sur les modifications cliquez-ici :
 %s";
 
