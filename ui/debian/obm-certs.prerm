@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+#suppression des certificats OBM
+rm -f /etc/obm/certs/*
+
+#DEBHELPER#
+
+exit 0

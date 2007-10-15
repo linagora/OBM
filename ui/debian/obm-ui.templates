@@ -1,0 +1,7 @@
+Template: obm-ui/virtualhostinstall
+Type: boolean
+Description: Install VirtualHost ?
+ .
+ If you don't install default virtaulHost on your server,
+ you can use exemple on /usr/share/doc/obm-ui/examples.
+

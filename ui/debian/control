@@ -14,14 +14,21 @@ Description: OBM
 
 Package: obm-core
 Architecture: any
-Pre-Depends: dbconfig-common, ucf, ${misc:Depends}
+Pre-Depends: mysql-server, dbconfig-common, ucf, php5-cli, ${misc:Depends}
 Description: OBM core
     core of Open Business Management
 	Instalation of Bd Mysql
 
+Package: obm-certs
+Architecture: any
+Pre-Depends:  openssl, ${misc:Depends}
+Description: OBM Web Interface
+    Web of Open Business Management
+	Instalation of OBM
+
 Package: obm-ui
 Architecture: any
-Pre-Depends: dbconfig-common, ucf, ${misc:Depends}
+Pre-Depends:  obm-certs, php5, apache2, libapache2-mod-php5, php5-mysql, ${misc:Depends}
 Description: OBM Web Interface
     Web of Open Business Management
 	Instalation of OBM
