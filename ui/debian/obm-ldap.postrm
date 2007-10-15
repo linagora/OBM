@@ -1,0 +1,27 @@
+#!/bin/sh
+
+#set -e
+#set -x
+
+case "$1" in
+	remove|failed-upgrade|abort-install|abort-upgrade|disappear)
+
+		# Supression de la conf LDAP
+		mv /etc/ldap/slapd.conf.orig /etc/ldap/slapd.conf || true
+		mv /etc/ldap/ldap.conf.orig /etc/ldap/ldap.conf || true
+		rm -f /etc/ldap/schema/ldap_icasso.schema || true
+	;;
+	
+
+    upgrade)
+    ;;
+
+    purge)
+		#Supression de la BD LDAP
+		echo -n "Purging OpenLDAP database... "
+		rm -rf /var/lib/ldap/* || true
+		echo done
+		invoke-rc.d slapd stop || true
+		invoke-rc.d slapd start || true
+	;;	
+esac

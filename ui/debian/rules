@@ -78,7 +78,7 @@ install: build
 	#RULES OBM-UI
 	################
 
-
+	################
 	#PERL
 
 	# Add commands to install the package into debian/$PACKAGE_NAME here
@@ -90,6 +90,16 @@ install: build
 	touch $@
  
 	#/PERL
+
+	##################
+	#RULES OBM-SERVICES
+	###################
+	#
+	cp auto/incrementalUpdate.pl debian/obm-services/usr/share/obm/www/auto/
+	cp auto/mailChangeSieve.pl debian/obm-services/usr/share/obm/www/auto/
+	cp auto/testObmSatellite.pl debian/obm-services/usr/share/obm/www/auto/
+	cp auto/ldapChangePasswd.pl debian/obm-services/usr/share/obm/www/auto/
+	cp auto/ldapChangePasswd.pod debian/obm-services/usr/share/obm/www/auto/
 
 # Build architecture-independent files here.
 binary-indep: build install

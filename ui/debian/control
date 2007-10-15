@@ -7,34 +7,46 @@ Standards-Version: 3.7.2
 
 Package: obm
 Architecture: any
-Pre-Depends: ${misc:Depends}
+Depends: ${misc:Depends}
 Description: OBM
     full installation of Open Business Management
 	Instalation of Bd Mysql
 
 Package: obm-core
 Architecture: any
-Pre-Depends: mysql-server, dbconfig-common, ucf, php5-cli, ${misc:Depends}
+Depends: mysql-server, dbconfig-common, ucf, php5-cli, ${misc:Depends}
 Description: OBM core
     core of Open Business Management
 	Instalation of Bd Mysql
 
 Package: obm-certs
 Architecture: any
-Pre-Depends:  openssl, ${misc:Depends}
+Depends:  openssl, ${misc:Depends}
 Description: OBM Web Interface
     Web of Open Business Management
 	Instalation of OBM
 
 Package: obm-ui
 Architecture: any
-Pre-Depends:  obm-certs, php5, apache2, libapache2-mod-php5, php5-mysql, ${misc:Depends}
+Depends:  obm-certs, php5, apache2, libapache2-mod-php5, php5-mysql, ${misc:Depends}
 Description: OBM Web Interface
     Web of Open Business Management
 	Instalation of OBM
 
 Package: libobm-perl
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends},
+Depends: libnet-telnet-perl, libcyrus-imap-perl22, libnet-server-perl, libcrypt-smbhash-perl, libdigest-sha1-perl, libunicode-maputf8-perl, libconfig-inifiles-perl, libnet-ldap-perl, ${perl:Depends}, ${misc:Depends},
 Description: module OBM perl
  module OBM perl
+
+Package: obm-services
+Architecture: any
+Pre-Depends:  ${misc:Depends}
+Description: OBM Automate
+   Instalation of OBM automate
+
+Package: obm-ldap
+Architecture: any
+Pre-Depends:  ${misc:Depends}
+Description: OBM Ldap
+   Configuration of obm-ldap

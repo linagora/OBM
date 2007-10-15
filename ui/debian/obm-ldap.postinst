@@ -1,0 +1,58 @@
+#!/bin/sh
+set -e
+set -x
+
+LDAPSERVER=`grep "ldapServer" /etc/obm/obm_conf.ini | cut -d" " -f3`
+
+is_initial_configuration() { 
+# Check if this is the initial configuration and not an upgrade of an 
+# existing configuration 
+# Usage: if is_initial_configuration "$@"; then ... fi from top level 
+
+	# Plain installation 
+	if [ "$1" = configure ] && [ -z "$2" ]; then 
+	        return 0 
+	fi 
+	# Configuration via dpkg-reconfigure 
+	if [ "$1" = reconfigure ] || [ "$DEBCONF_RECONFIGURE" ]; then 
+	        return 0 
+	fi 
+	return 1 
+}
+
+if is_initial_configuration "$@"; then
+   # Schéma LDAP OBM
+	if [ -e /usr/share/doc/obm-ldap/ldap_obm.schema.sample.gz ]; then
+	    zcat /usr/share/doc/obm-ldap/ldap_obm.schema.sample.gz > /etc/ldap/schema/obm.schema
+	else
+	    cat /usr/share/doc/obm-ldap/ldap_obm.schema.sample > /etc/ldap/schema/obm.schema
+	fi
+
+   # Gestion du fichier de configuration du service LDAP
+	cp /etc/ldap/slapd.conf /etc/ldap/slapd.conf.orig || true
+
+	if [ -e /usr/share/doc/obm-ldap/slapd.conf.debian.gz ]; then
+	    zcat /usr/share/doc/obm-ldap/slapd.conf.debian.gz > /etc/ldap/slapd.conf
+	else
+	    cat /usr/share/doc/obm-ldap/slapd.conf.debian > /etc/ldap/slapd.conf
+	fi
+
+	invoke-rc.d slapd stop || true
+	echo -n "Suppression des bases LDAP... "
+	rm -rf /var/lib/ldap/* || true
+	chown -R openldap.openldap /var/lib/ldap
+	echo " done"
+	invoke-rc.d slapd start || true
+
+
+	echo -n "Configuration de la librairie OpenLDAP..."
+	cp	/etc/ldap/ldap.conf /etc/ldap/ldap.conf.orig || true
+	cat >> /etc/ldap/ldap.conf <<EOF
+base dc=local
+host = ${LDAPSERVER}
+
+EOF
+	echo " done"
+
+fi
+
