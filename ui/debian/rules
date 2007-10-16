@@ -125,6 +125,18 @@ binary-indep: build install
 	dh_fixperms
 	dh_installdeb
 	dh_perl
+
+	#delete des .svn dans les paquet généré
+	( cd $(CURDIR)/debian;  \
+	IFS=$$'\n';\
+	for i in `ls -d obm-*`;\
+	do \
+   if [ -d $$i ]; \
+		then 	\
+		rm -rf `find $$i -name '.svn'`; 	\
+	fi\
+   done)
+
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
