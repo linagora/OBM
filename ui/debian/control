@@ -41,12 +41,20 @@ Description: module OBM perl
 
 Package: obm-services
 Architecture: any
-Pre-Depends:  ${misc:Depends}
+Depends:  ${misc:Depends}
 Description: OBM Automate
    Instalation of OBM automate
 
 Package: obm-ldap
 Architecture: any
-Pre-Depends:  ${misc:Depends}
+Depends:  ${misc:Depends}
 Description: OBM Ldap
    Configuration of obm-ldap
+
+
+Package: obm-cyrus
+Architecture: any
+Depends:  ${misc:Depends}
+Description: OBM Cyrus / SASL
+   Configuration of Cyrus and SASL
+

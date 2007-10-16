@@ -101,6 +101,12 @@ install: build
 	cp auto/ldapChangePasswd.pl debian/obm-services/usr/share/obm/www/auto/
 	cp auto/ldapChangePasswd.pod debian/obm-services/usr/share/obm/www/auto/
 
+	###################
+	#RULE OBM-CYRUS
+	###################
+	#
+	
+
 # Build architecture-independent files here.
 binary-indep: build install
 	dh_testdir
