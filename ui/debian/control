@@ -58,3 +58,9 @@ Depends:  ${misc:Depends}
 Description: OBM Cyrus / SASL
    Configuration of Cyrus and SASL
 
+
+Package: obm-satellite
+Architecture: any
+Depends:  ${misc:Depends}
+Description: OBM Satellite
+   Installation and configuration OBM Satellite

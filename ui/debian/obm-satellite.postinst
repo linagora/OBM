@@ -1,0 +1,54 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+. /usr/share/debconf/confmodule
+
+is_initial_configuration() { 
+# Check if this is the initial configuration and not an upgrade of an 
+# existing configuration 
+# Usage: if is_initial_configuration "$@"; then ... fi from top level 
+
+	# Plain installation 
+	if [ "$1" = configure ] && [ -z "$2" ]; then 
+	        return 0 
+	fi 
+	# Configuration via dpkg-reconfigure 
+	if [ "$1" = reconfigure ] || [ "$DEBCONF_RECONFIGURE" ]; then 
+	        return 0 
+	fi 
+	return 1 
+} 
+
+
+if is_initial_configuration "$@"; then
+	if [ -e /usr/share/doc/obm-satellite/obmSatellite.cf.sample.debian.gz ]; then
+	    zcat /usr/share/doc/obm-satellite/obmSatellite.cf.sample.debian.gz > /etc/obm-satellite/obmSatellite.cf
+	else
+	    cat /usr/share/doc/obm-satellite/obmSatellite.cf.sample.debian > /etc/obm-satellite/obmSatellite.cf
+	fi
+
+	ln -s /etc/obm-satellite/obmSatellite.cf  /usr/share/obm-satellite/obmSatellite.cf || true
+	
+	db_get obm-satellite/ldapserver
+	OBM_LDAP_SERVER=$RET
+	sed -i -e "s#_LDAPSERVER_#${OBM_LDAP_SERVER}#" /etc/obm-satellite/obmSatellite.cf
+	
+	db_get obm-satellite/obmserver
+	OBM_SERVER=$RET
+	sed -i -e "s#_CIDR_ALLOW_#${OBM_SERVER}#" /etc/obm-satellite/obmSatellite.cf
+	
+	db_get obm-satellite/postfixinstall
+	if [ "$RET" = "true" ]; then
+		#mise en place des fichier de map
+		touch /etc/postfix/virtual_mailbox && chown root:postfix /etc/postfix/virtual_mailbox && chmod 664 /etc/postfix/virtual_mailbox
+		touch /etc/postfix/virtual_alias && chown root:postfix /etc/postfix/virtual_alias && chmod 664 /etc/postfix/virtual_alias
+		touch /etc/postfix/transport && chown root:postfix /etc/postfix/transport && chmod 664 /etc/postfix/transport
+		touch /etc/postfix/virtual_domains && chown root:postfix /etc/postfix/virtual_domains && chmod 664 /etc/postfix/virtual_domains
+
+	fi	
+	
+fi
+#DEBHELPER#
+

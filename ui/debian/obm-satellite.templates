@@ -1,0 +1,22 @@
+Template: obm-satellite/postfixinstall
+Type: boolean
+Description: Do you configure obm-satellite for postfix maps ?
+ .
+ the installation script can prepare right on file for
+ postfix maps.
+
+Template: obm-satellite/obmserver
+Type: string
+Default: 127.0.0.1/32
+Description: where is obm-services ?
+ .
+ Location of automate services of OBM
+ Please enter CIDR notation : @IP/netmask.
+
+Template: obm-satellite/ldapserver
+Type: string
+Default: 127.0.0.1
+Description: where is LDAP server?
+ .
+ Location of an LDAP server
+ Please enter IP adress.

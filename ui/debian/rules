@@ -102,9 +102,13 @@ install: build
 	cp auto/ldapChangePasswd.pod debian/obm-services/usr/share/obm/www/auto/
 
 	###################
-	#RULE OBM-CYRUS
+	#RULE OBM-SATELLITE
 	###################
 	#
+	#generation du script d'init
+	( cd $(CURDIR)/debian; \
+	cat $(CURDIR)/auto/obmSatellite/debian/init-obmSatellite.sample.debian > obm-satellite.init)
+
 	
 
 # Build architecture-independent files here.
@@ -125,6 +129,7 @@ binary-indep: build install
 	dh_fixperms
 	dh_installdeb
 	dh_perl
+	dh_installinit
 
 	#delete des .svn dans les paquet généré
 	( cd $(CURDIR)/debian;  \
