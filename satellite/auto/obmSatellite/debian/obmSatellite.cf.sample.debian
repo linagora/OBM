@@ -1,0 +1,62 @@
+# Adresse du serveur LDAP referent
+ldap_server         _LDAPSERVER_
+# DIT de l'annuaire LDAP - si vide, positionner 'defaultsearchbase' côté serveur
+ldap_base 				dc=local
+# DN de l'utilisateur LDAP - requetes anonymes par defaut
+ldap_login
+# Mot de passe de l'utilisateur LDAP - requetes anonymes par defaut
+ldap_password
+
+# Options communement modifiees
+#
+# de 0 a 4 - 0 par defaut
+log_level           0
+# Le fichier de log - /var/log/obm/obmSatellite.log par defaut
+log_file            /var/log/obm/obmSatellite.log
+# Le PID - /var/run/obm/obmSatellite.pid par defaut
+pid_file            /var/run/obm/obmSatellite.pid
+
+# IP ayant droit de se connecter
+cidr_allow          _CIDR_ALLOW_
+
+# Attention a la modifications de ces options
+#
+# 2 par defaut
+max_badrequest      2
+# Le service fonctionne en tant qu'utilisateur postfix par defaut
+user                root
+# Le service fonctionne en tant que groupe postfix par defaut
+group               root
+
+# Configuration pour le service Postfix
+postmap_cmd         /usr/sbin/postmap
+#
+# Le type et le nom des map postfix a generer
+# 1 ou 0 - 1 par defaut
+process_mailbox     1
+# /etc/postfix/virtual_mailbox par defaut
+mailbox_map         /etc/postfix/virtual_mailbox
+# 1 ou 0 - 1 par defaut
+process_alias       1  
+# /etc/postfix/virtual_alias par defaut
+alias_map           /etc/postfix/virtual_alias
+# 1 ou 0 - 1 par defaut
+process_transport   1
+# /etc/postfix/transport par defaut
+transport_map       /etc/postfix/transport
+# 1 ou 0 - 1 par defaut
+process_domain      1
+# /etc/postfix/virtual_domains par defaut
+domain_map          /etc/postfix/virtual_domains
+
+# configuration pour le service Cyrus
+#
+# /etc/imapd.conf par defaut
+cyrus_imap_conf     /etc/imapd.conf
+# /etc/init.d/cyrus par defaut
+cyrus_service       /etc/init.d/cyrus2.2
+# 5 par defaut - temps attendu avant de considerer le service Cyrus comme
+# redemarre
+cyrus_restart       10
+# /var/spool/cyrus par defaut
+cyrus_partition_root    /var/spool/cyrus
