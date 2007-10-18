@@ -28,7 +28,6 @@ $l_mail_recv = "Messages reçus";
 $l_mail_kb_sent = "volume (ko) des messages envoyés";
 $l_mail_kb_recv = "volume (ko) des messages reçus";
 $l_maintenance = "Maintenance";
-$l_remote_access = "Accès distant";
 $l_sys_update = "Mise à jour du système en attente";
 $l_allowed = "Authorisé";
 $l_forbid = "Interdit";

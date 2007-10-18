@@ -32,9 +32,3 @@ $l_links = "Liaisons";
 
 $l_halt = "Arrêt du système";
 $l_halt_aliamin = "Arréter le système";
-
-$l_remote_access = "Prise de contrôle à distance";
-$l_remote_allowed = "La prise de contrôle à distance est <em class=\"messageOk\">autorisée</em>";
-$l_remote_not_allowed = "La prise de contrôle à distance est <em class=\"messageError\">interdite</em>";
-$l_remote_allow = "Autoriser la prise de contrôle à distance";
-$l_remote_not_allow = "Interdire la prise de contrôle à distance";

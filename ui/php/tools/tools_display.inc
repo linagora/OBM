@@ -178,47 +178,4 @@ function html_tools_halt_index() {
   return $block;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display Remote access tool
-///////////////////////////////////////////////////////////////////////////////
-function html_tools_remote_index() {
-  global $l_remote_access, $l_remote_allowed, $l_remote_not_allowed;
-  global $l_remote_allow, $l_remote_not_allow, $l_validate;
-
-  $remote_access = get_tools_remote_access();
-  if (! $remote_access) {
-    $dis_remote = "$l_remote_not_allowed";
-    $remote_access = "1";
-    $remote_label = $l_remote_allow;
-  } else {
-    $dis_remote = "$l_remote_allowed";
-    $remote_access = "0";
-    $remote_label = $l_remote_not_allow;    
-  }
-
-  $block = "
-    <div class=\"detailHead\">$l_remote_access</div>
-
-    <table class=\"detail\">
-    <tr>
-    <td class=\"detailLabel\">
-      $dis_remote
-    </tr>
-    </table>
-    <p />
-
-    <form method=\"post\" action=\"tools_index.php\">
-      <input type=\"hidden\" name=\"action\" value=\"remote_update\" />
-      <table class=\"detail\">
-      <tr>
-        <td class=\"detailLabel\"><input type=\"hidden\" name=\"remote_access\" value=\"$remote_access\" />$remote_label : </td>
-        <td class=\"detailForm\"><input type=\"submit\" name=\"submit\" value=\"$l_validate\" /></td>
-      </tr>
-      </table>
-    </form>
-";
-
-  return $block;
-}
 </script>

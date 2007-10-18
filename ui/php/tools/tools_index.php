@@ -68,29 +68,6 @@ if ($action == 'update_detail') {
   $display['msg'] .= display_debug_msg($cmd_halt, $cdg_exe);
   $ret = exec($cmd_halt);
 
-} elseif ($action == 'remote_index') {
-///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = html_tools_remote_index();
-
-} elseif ($action == 'remote_update') {
-///////////////////////////////////////////////////////////////////////////////
-  $res = run_query_tools_remote_update($params);
-
-  if ($res) {
-    $remote_access = $params['remote_access'];
-    if ($remote_access == '1') {
-      $display['msg'] .= display_debug_msg($cmd_enable_remote, $cdg_exe);
-      $ret = exec($cmd_enable_remote);
-    } else {
-      $display['msg'] .= display_debug_msg($cmd_disable_remote, $cdg_exe);
-      $ret = exec($cmd_disable_remote);
-    }
-    $display['detail'] = html_tools_remote_index();
-  } else {
-    $display['msg'] .= display_err_msg("$l_update_error - $l_remote_access !");
-    $display['detail'] = html_tools_remote_index();
-  }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
