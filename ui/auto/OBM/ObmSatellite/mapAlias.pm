@@ -1,7 +1,6 @@
 package OBM::ObmSatellite::mapAlias;
 
 require Exporter;
-
 use strict;
 
 

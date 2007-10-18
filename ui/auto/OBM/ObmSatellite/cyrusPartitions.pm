@@ -8,6 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+
 sub new {
     my $self = shift;
     my( $daemonRef, $domainList ) = @_;

@@ -1,7 +1,6 @@
 package OBM::ObmSatellite::mapTransport;
 
 require Exporter;
-
 use strict;
 
 
