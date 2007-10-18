@@ -1,4 +1,4 @@
-package OBM::ObmSatellite::mapMailbox;
+package ObmSatellite::mapMailbox;
 
 require Exporter;
 use strict;
@@ -25,7 +25,7 @@ sub makeMailboxMap {
         $ldapFilter =~ s/<obmDomain>/$obmDomains->[$i]/;
 
         my @ldapEntries;
-        if( &OBM::ObmSatellite::utils::ldapSearch( $daemonRef->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
+        if( &ObmSatellite::utils::ldapSearch( $daemonRef->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
             $daemonRef->logMessage( "Echec: lors de l'obtention des informations du domaine '".$obmDomains->[$i]."'" ) ;
             return 1;
         }
@@ -38,6 +38,6 @@ sub makeMailboxMap {
         }
     }
 
-    return &OBM::ObmSatellite::utils::writeMap( $mailBoxMapDesc->{postfix_map}, $mailBoxMapDesc->{postfix_map_separator}, \%mapEntries );
+    return &ObmSatellite::utils::writeMap( $mailBoxMapDesc->{postfix_map}, $mailBoxMapDesc->{postfix_map_separator}, \%mapEntries );
 
 }

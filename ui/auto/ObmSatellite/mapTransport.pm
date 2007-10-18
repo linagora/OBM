@@ -1,4 +1,4 @@
-package OBM::ObmSatellite::mapTransport;
+package ObmSatellite::mapTransport;
 
 require Exporter;
 use strict;
@@ -25,7 +25,7 @@ sub makeTransportMap {
         $ldapFilter =~ s/<obmDomain>/$obmDomains->[$i]/;
 
         my @ldapEntries;
-        if( &OBM::ObmSatellite::utils::ldapSearch( $daemonRef->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
+        if( &ObmSatellite::utils::ldapSearch( $daemonRef->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
             $daemonRef->logMessage( "Echec: lors de l'obtention des informations du domaine '".$obmDomains->[$i]."'" );
             return 1;
         }
@@ -45,6 +45,6 @@ sub makeTransportMap {
         }
     }
 
-    return &OBM::ObmSatellite::utils::writeMap( $transportMapDesc->{postfix_map}, $transportMapDesc->{postfix_map_separator}, \%mapEntries );
+    return &ObmSatellite::utils::writeMap( $transportMapDesc->{postfix_map}, $transportMapDesc->{postfix_map_separator}, \%mapEntries );
 
 }

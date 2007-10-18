@@ -5,7 +5,7 @@ package obmSatellite;
 use vars qw(@ISA);
 use Net::Server::PreForkSimple;
 use URI::Escape;
-require OBM::Parameters::obmSatelliteConf;
+require ObmSatellite::Parameters::obmSatelliteConf;
 use FindBin qw($Bin);
 use Unicode::MapUTF8 qw(from_utf8 utf8_supported_charset);
 use strict;
@@ -19,16 +19,16 @@ exit;
 
 $|=1;
 
-### Ecriture des fonctionnalités du service
+### Définition des fonctionnalités du service
 
 sub configure_hook {
     my $self = shift;
 
     # Initalisation des maps Postfix
-    if( defined($OBM::Parameters::obmSatelliteConf::postfixMapsDesc) ) {
-        $self->{postfix_maps} = $OBM::Parameters::obmSatelliteConf::postfixMapsDesc;
+    if( defined($ObmSatellite::Parameters::obmSatelliteConf::postfixMapsDesc) ) {
+        $self->{postfix_maps} = $ObmSatellite::Parameters::obmSatelliteConf::postfixMapsDesc;
     }else {
-        print "Erreur: aucune map Postfix n'est a gerer !\n";
+        print "Erreur: probleme avec la descriptions des maps Postfix !\n";
         exit 1;
     }
 
@@ -453,21 +453,20 @@ sub getServerDomains {
 
 
     # LDAP connexion
-    $self->logMessage( "'".$self->{"ldap_server"}->{"login"}."'" );
     if( defined($self->{"ldap_server"}->{"login"}) ) {
         $self->logMessage( "Connexion authentifiee a l'annuaire LDAP" );
     }else {
         $self->logMessage( "Connexion anonyme a l'annuaire LDAP" );
     }
 
-    if( !&OBM::ObmSatellite::utils::connectLdapSrv( $self->{ldap_server} ) ) {
+    if( !&ObmSatellite::utils::connectLdapSrv( $self->{ldap_server} ) ) {
         $self->logMessage( "Echec: connexion a l'annuaire LDAP" );
         print "Echec: Impossible de se connecter a l'annuaire LDAP\n";
         return 1;
     }
 
     my @ldapEntries;
-    if( &OBM::ObmSatellite::utils::ldapSearch( $self->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
+    if( &ObmSatellite::utils::ldapSearch( $self->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
         $self->logMessage( "Echec: lors de l'obtention des informations de l'hote '".$hostName."'" );
         return 1;
     }
@@ -483,7 +482,7 @@ sub getServerDomains {
     $self->logMessage( "Domaines associes a l'hote '".$hostName."' : ".join( ",", @{$domainList} ) );
 
     $self->logMessage( "Deconnexion de l'annuaire LDAP" );
-    &OBM::ObmSatellite::utils::disconnectLdapSrv( $self->{ldap_server} );
+    &ObmSatellite::utils::disconnectLdapSrv( $self->{ldap_server} );
 
     return $domainList;
 }
@@ -492,7 +491,7 @@ sub getServerDomains {
 sub processPostfixDomains {
     my $self = shift;
     my ( $domainList ) = @_;
-    use OBM::ObmSatellite::utils;
+    use ObmSatellite::utils;
 
     my $errors = 0;
 
@@ -503,7 +502,7 @@ sub processPostfixDomains {
         $self->logMessage( "Connexion anonyme a l'annuaire LDAP" );
     }
 
-    if( !&OBM::ObmSatellite::utils::connectLdapSrv( $self->{ldap_server} ) ) {
+    if( !&ObmSatellite::utils::connectLdapSrv( $self->{ldap_server} ) ) {
         $self->logMessage( "Echec: connexion a l'annuaire LDAP" );
         print "Echec: Impossible de se connecter a l'annuaire LDAP\n";
         return 1;
@@ -525,7 +524,7 @@ sub processPostfixDomains {
     }
 
     $self->logMessage( "Deconnexion de l'annuaire LDAP" );
-    &OBM::ObmSatellite::utils::disconnectLdapSrv( $self->{ldap_server} );
+    &ObmSatellite::utils::disconnectLdapSrv( $self->{ldap_server} );
 
     if( !$errors ) {
         my $postmapCmd = $self->{postmap_cmd};
@@ -575,8 +574,8 @@ sub processCyrusPartitions {
 
     my $errors = 0;
 
-    require OBM::ObmSatellite::cyrusPartitions;
-    my $cyrusPartitions = OBM::ObmSatellite::cyrusPartitions->new( $self, $domains );
+    require ObmSatellite::cyrusPartitions;
+    my $cyrusPartitions = ObmSatellite::cyrusPartitions->new( $self, $domains );
 
     if( !defined($cyrusPartitions) ) {
         $self->logMessage( "Echec: lors de la creation de l'objet 'cyrusPartitions'" );
