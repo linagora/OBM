@@ -1,12 +1,12 @@
 #########################################################################
-# OBM           - File : OBM::ObmSatellite::utils.pm (Perl Module)   #
+# OBM           - File : ObmSatellite::utils.pm (Perl Module)           #
 #               - Desc : Librairie Perl pour OBM                        #
 #               Les fonctions communes necessaires au service           #
 #               obmSatellite                                            #
 #########################################################################
 # Cree le 2007-03-12                                                    #
 #########################################################################
-package OBM::ObmSatellite::utils;
+package ObmSatellite::utils;
 
 require Exporter;
 use strict;

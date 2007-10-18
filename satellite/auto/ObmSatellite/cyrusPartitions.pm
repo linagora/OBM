@@ -1,4 +1,4 @@
-package OBM::ObmSatellite::cyrusPartitions;
+package ObmSatellite::cyrusPartitions;
 
 $VERSION = "1.0";
 
@@ -53,7 +53,7 @@ sub new {
 
     # LDAP connection
     $daemonRef->logMessage( "Connexion anonyme a l'annuaire LDAP" );
-    if( !&OBM::ObmSatellite::utils::connectLdapSrv( $daemonRef->{ldap_server} ) ) {
+    if( !&ObmSatellite::utils::connectLdapSrv( $daemonRef->{ldap_server} ) ) {
         $daemonRef->logMessage( "Echec: connexion a l'annuaire LDAP" );
         return undef;
     }
@@ -64,7 +64,7 @@ sub new {
         my $ldapAttributes = [ 'dc' ];
 
         my @ldapEntries;
-        if( &OBM::ObmSatellite::utils::ldapSearch( $daemonRef->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
+        if( &ObmSatellite::utils::ldapSearch( $daemonRef->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
             $daemonRef->logMessage( "Echec: lors de l'obtention du domaine de messagerie principal du domaine OBM '".$domainList->[$i]."'" );
             next;
         }
@@ -95,7 +95,7 @@ sub new {
     }
 
     $daemonRef->logMessage( "Deconnexion de l'annuaire LDAP" );
-    &OBM::ObmSatellite::utils::disconnectLdapSrv( $daemonRef->{ldap_server} );
+    &ObmSatellite::utils::disconnectLdapSrv( $daemonRef->{ldap_server} );
 
     $daemonRef->logMessage( "Objet 'cyrusPartitions' cree" );
 

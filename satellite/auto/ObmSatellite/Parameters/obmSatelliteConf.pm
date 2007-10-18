@@ -1,4 +1,4 @@
-package OBM::Parameters::obmSatelliteConf;
+package ObmSatellite::Parameters::obmSatelliteConf;
 
 require Exporter;
 
@@ -23,8 +23,8 @@ $postfixMapsDesc = {
         ldap_attibute => [ "mailbox" ],
         make_map => sub {
             my( $daemonRef, $mailBoxMapFile, $obmDomains ) = @_;
-            require OBM::ObmSatellite::mapMailbox;
-            return &OBM::ObmSatellite::mapMailbox::makeMailboxMap( $daemonRef, $mailBoxMapFile, $obmDomains );
+            require ObmSatellite::mapMailbox;
+            return &ObmSatellite::mapMailbox::makeMailboxMap( $daemonRef, $mailBoxMapFile, $obmDomains );
         }
     },
     alias => {
@@ -37,8 +37,8 @@ $postfixMapsDesc = {
         ldap_attibute => [ "mailbox", "mail", "mailAlias" ],
         make_map => sub {
             my( $daemonRef, $aliasMapFile, $obmDomains ) = @_;
-            require OBM::ObmSatellite::mapAlias;
-            return &OBM::ObmSatellite::mapAlias::makeAliasMap( $daemonRef, $aliasMapFile, $obmDomains );
+            require ObmSatellite::mapAlias;
+            return &ObmSatellite::mapAlias::makeAliasMap( $daemonRef, $aliasMapFile, $obmDomains );
         }
     },
     transport => {
@@ -51,8 +51,8 @@ $postfixMapsDesc = {
         ldap_attibute => [ "mailbox", "mailBoxServer" ],
         make_map => sub {
             my( $daemonRef, $transportMapFile, $obmDomains ) = @_;
-            require OBM::ObmSatellite::mapTransport;
-            return &OBM::ObmSatellite::mapTransport::makeTransportMap( $daemonRef, $transportMapFile, $obmDomains );
+            require ObmSatellite::mapTransport;
+            return &ObmSatellite::mapTransport::makeTransportMap( $daemonRef, $transportMapFile, $obmDomains );
         }
     },
     domain => {
@@ -65,8 +65,8 @@ $postfixMapsDesc = {
         ldap_attibute => [ "myDestination" ],
         make_map => sub {
             my( $daemonRef, $domainMapFile, $obmDomains ) = @_;
-            require OBM::ObmSatellite::mapDomains;
-            return &OBM::ObmSatellite::mapDomains::makeDomainsMap( $daemonRef, $domainMapFile, $obmDomains );
+            require ObmSatellite::mapDomains;
+            return &ObmSatellite::mapDomains::makeDomainsMap( $daemonRef, $domainMapFile, $obmDomains );
         }
     },
     networks => {
