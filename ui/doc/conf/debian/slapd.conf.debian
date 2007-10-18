@@ -85,6 +85,7 @@ dbconfig set_lk_max_objects 1500
 dbconfig set_lk_max_locks 1500
 # Number of lockers
 dbconfig set_lk_max_lockers 1500
+dbconfig set_flags DB_LOG_AUTOREMOVE
 
 # Indexing options for database #1
 index           objectClass eq
