@@ -1,7 +1,6 @@
 package OBM::ObmSatellite::mapMailbox;
 
 require Exporter;
-
 use strict;
 
 

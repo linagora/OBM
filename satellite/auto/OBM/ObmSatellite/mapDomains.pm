@@ -1,7 +1,6 @@
 package OBM::ObmSatellite::mapDomains;
 
 require Exporter;
-
 use strict;
 
 
