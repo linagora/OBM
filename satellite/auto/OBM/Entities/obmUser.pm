@@ -887,17 +887,24 @@ sub getSieveVacation {
     my $boxVacationMessage = $self->{"userDesc"}->{"user_vacation_message"};
 
     my $vacationMsg = "vacation :addresses [ ";
+    my $firstAddress = 1;
     for( my $i=0; $i<=$#{$boxEmails}; $i++ ) {
-        if( $i != 0 ) {
+        if( !$firstAddress ) {
             $vacationMsg .= ", ";
+        }else {
+            $firstAddress = 0;
         }
+
         $vacationMsg .= "\"".$boxEmails->[$i]."\"";
     }
 
     for( my $i=0; $i<=$#{$boxEmailsAlias}; $i++ ) {
-        if( $i != 0 ) {
+        if( !$firstAddress ) {
             $vacationMsg .= ", ";
+        }else {
+            $firstAddress = 0;
         }
+
         $vacationMsg .= "\"".$boxEmailsAlias->[$i]."\"";
     }
 
