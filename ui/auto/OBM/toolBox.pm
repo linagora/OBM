@@ -554,6 +554,13 @@ sub computeRight {
         }
     }
 
+    # Debug, affiche à l'écran pour chaque login le droit associé
+#   while( my( $right, $userName ) = each( %$rightList ) ) {
+#       while( my( $cle, $valeur ) = each( %$userName ) ) {
+#           print $cle." ".$right."\n";
+#       }
+#   }
+
     return $rightList;
 }
 
