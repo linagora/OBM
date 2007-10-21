@@ -1190,6 +1190,10 @@ function get_deal_dashboard_panel($date_range, $target_date='deal_dateexpected',
     $res[$hr][0]['amount'] += $am;
     $res[$hr][0]['margin'] += $ma;
     $res[$hr][0]['amount_balanced'] += $ab;
+
+    $res['total']['amount'] += $am;
+    $res['total']['margin'] += $ma;
+    $res['total']['amount_balanced'] += $ab;
   }
 
   $res['users_id'] = $res_users;

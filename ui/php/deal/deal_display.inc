@@ -2533,8 +2533,8 @@ function dis_deal_dashboard_panel($deal) {
   $year_next = $year + 1;
   $date_range = array("$year-01-01", "$year-12-31");
   $d = get_deal_dashboard_panel($date_range, 'deal_dateexpected', '', $deal['tasktype']);
-  $url_prev = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_prev");
-  $url_next = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_next");
+  $url_prev = url_prepare("deal_index.php?action=dashboard&amp;dash_view=panel&amp;year=$year_prev");
+  $url_next = url_prepare("deal_index.php?action=dashboard&amp;dash_view=panel&amp;year=$year_next");
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
   $tt_ids = $deal['tasktype'];
@@ -2583,7 +2583,7 @@ function dis_deal_dashboard_panel($deal) {
   foreach ($d as $hr => $one_hr) {
 
     // Skip user name and users_id columns
-    if (($hr == 'name') || ($hr == 'users_id')) {
+    if (($hr == 'name') || ($hr == 'total') || ($hr == 'users_id')) {
       continue;
     }
 
@@ -2615,8 +2615,8 @@ function dis_deal_dashboard_panel($deal) {
 	$company = $one_deal['company'];
 	$quarter = $one_deal['quarter'];
 	$label = $one_deal['label'];
-	$amount = $one_deal['amount'];
-	$margin = $one_deal['margin'];
+	$amount = number_format($one_deal['amount'], 2, ',', ' ');
+	$margin = number_format($one_deal['margin'], 2, ',', ' ');
 	if ($row%2 == 1) {
 	  $class = "class=\"pair\"";
 	} else {
@@ -2624,22 +2624,26 @@ function dis_deal_dashboard_panel($deal) {
 	}
 	$row++;
 
+	// First deal row : table row already initiated
 	if ($dis_first_deal_row == '') {
 	  $dis_first_deal_row = "<td>$company</td>
         <td>$quarter</td>
         <td>$label</td>
-        <td>$amount</td>
-        <td>$margin</td>";
+        <td style=\"text-align: right;\">$amount</td>
+        <td style=\"text-align: right;\">$margin</td>";
 	} else {
 	  $dis_deal_rows .= "<tr $class>
         <td>$company</td>
         <td>$quarter</td>
         <td>$label</td>
-        <td>$amount</td>
-        <td>$margin</td>
+        <td style=\"text-align: right;\">$amount</td>
+        <td style=\"text-align: right;\">$margin</td>
       </tr>";
 	}
       }
+      // First user row : table row already initiated
+      $total_d_am = number_format($deals['total']['amount'], 2, ',', ' ');
+      $total_d_mar = number_format($deals['total']['margin'], 2, ',', ' ');
       if ($dis_first_user_row == '') {
 	$dis_first_user_row = "
         <td rowspan=\"$nb_user_deal\">$u_name</td>
@@ -2648,8 +2652,8 @@ function dis_deal_dashboard_panel($deal) {
         $dis_deal_rows
         <tr class=\"highlight\">
           <td colspan=\"4\">$u_name</td>
-          <td>tot1</td>
-          <td>tot2</td>
+          <td style=\"text-align: right;\">$total_d_am</td>
+          <td style=\"text-align: right;\">$total_d_mar</td>
         </tr>";
       } else {
 	$dis_user_row .= "<tr>
@@ -2659,12 +2663,14 @@ function dis_deal_dashboard_panel($deal) {
         $dis_deal_rows
         <tr class=\"highlight\">
           <td colspan=\"4\">$u_name</td>
-          <td>tot1</td>
-          <td>tot2</td>
+          <td style=\"text-align: right;\">$total_d_am</td>
+          <td style=\"text-align: right;\">$total_d_mar</td>
         </tr>";
       }
     }
 
+    $total_hr_am = number_format($one_hr[0]['amount'], 2, ',', ' ');
+    $total_hr_mar = number_format($one_hr[0]['margin'], 2, ',', ' ');
     $dis_hr_rows .= "<tr>
       <td rowspan=\"$nb_hr_rows\">$hr</td>
       $dis_first_user_row
@@ -2672,11 +2678,14 @@ function dis_deal_dashboard_panel($deal) {
     $dis_user_row
     <tr>
       <th colspan=\"5\">$l_total $hr %</th>
-      <th>total1</th>
-      <th>total2</th>
+      <th style=\"text-align: right;\">$total_hr_am</th>
+      <th style=\"text-align: right;\">$total_hr_mar</th>
     </tr>
 ";
   }
+
+  $total_amount = number_format($d['total']['amount'], 2, ',', ' ');
+  $total_margin = number_format($d['total']['margin'], 2, ',', ' ');
 
   $url_form = url_prepare('deal_index.php');
 
@@ -2706,7 +2715,7 @@ function dis_deal_dashboard_panel($deal) {
         <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
         <input type=\"hidden\" name=\"year\" value=\"$year\" />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
-        <input name=\"dash_view\" id=\"dash_view\" type=\"hidden\" value=\"year_detail\" />
+        <input name=\"dash_view\" id=\"dash_view\" type=\"hidden\" value=\"panel\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
       </fieldset>
     </form>
@@ -2721,8 +2730,9 @@ function dis_deal_dashboard_panel($deal) {
     </thead>
     $dis_hr_rows
     <tr class=\"highlight\">
-      <td>$l_total</td>
-      $dis_total_row
+      <td colspan=\"5\">$l_total</td>
+      <td style=\"text-align: right;\">$total_amount</td>
+      <td style=\"text-align: right;\">$total_margin</td>
     </tr>
     </table>
     <p />

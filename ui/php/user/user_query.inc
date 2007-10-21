@@ -127,6 +127,8 @@ function run_query_user_search($user) {
 
   if ((trim($where) != '') || (trim($where_restriction) != '')) {
     $whereq = " WHERE $where $where_restriction $multidomain";
+  } else {
+    $whereq = " WHERE 1=1 $multidomain";
   }
 
   $select = "SELECT distinct UserObm.*,
