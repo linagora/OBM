@@ -314,7 +314,9 @@ public class ContactManager extends ObmManager {
     	
     	Address addr = bus.getAddress();
     	addr.getCity().setPropertyValue(obmcontact.getTown());
-    	addr.getCountry().setPropertyValue(obmcontact.getCountry());
+    	if (obmcontact.getCountry() != null) {
+    		addr.getCountry().setPropertyValue(obmcontact.getCountry());
+    	}
     	addr.getStreet().setPropertyValue( ContactHelper.getStreetFromObm(obmcontact) );
     	addr.getPostalCode().setPropertyValue(obmcontact.getZipCode());
     	addr.getPostOfficeAddress().setPropertyValue(obmcontact.getExpressPostal());
