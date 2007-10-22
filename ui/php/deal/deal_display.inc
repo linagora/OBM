@@ -2562,7 +2562,7 @@ function dis_deal_dashboard_panel($deal) {
     <th>$l_margin</th>";
 
 
-
+  // --- XXXXX to check here
 
   if ((is_array($users_id)) && (count($users_id) > 0)) {
     $users = $users_id;
@@ -2577,6 +2577,7 @@ function dis_deal_dashboard_panel($deal) {
     $url_sel_manager .= "&amp;sel_manager[]=$users";
   }
 
+  // -----------
   
 
   // Loop through hitrates
@@ -2689,6 +2690,22 @@ function dis_deal_dashboard_panel($deal) {
 
   $url_form = url_prepare('deal_index.php');
 
+  // Synthesis
+  foreach ($d as $hr => $one_hr) {
+
+    // Skip user name and users_id columns
+    if (($hr == 'name') || ($hr == 'total') || ($hr == 'users_id')) {
+      continue;
+    }
+    $s_am_total = number_format($one_hr['0']['amount'], 2, ',', ' ');
+    $s_ma_total = number_format($one_hr['0']['margin'], 2, ',', ' ');
+    $s_row .= "<tr>
+      <td>$hr</td>
+      <td style=\"text-align: right;\">$s_am_total</td>
+      <td style=\"text-align: right;\">$s_ma_total</td>
+    </tr>";
+  }
+
   $block = "
     <form method=\"post\" name=\"f_search\" action=\"$url_form\">
     <fieldset class=\"detail\">
@@ -2725,6 +2742,23 @@ function dis_deal_dashboard_panel($deal) {
     <table class=\"spreadSheet\">
     <thead>
     <tr>
+      <th>$l_hitrate</th>
+      <th style=\"text-align: right;\">$l_amount</th>
+      <th style=\"text-align: right;\">$l_margin</th>
+    </tr>
+    </thead>
+    $s_row
+    <tr class=\"highlight\">
+      <td>$l_total</td>
+      <td style=\"text-align: right;\">$total_amount</td>
+      <td style=\"text-align: right;\">$total_margin</td>
+    </tr>
+    </table>
+    <p />
+
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr>
       $dis_row_head
     </tr>
     </thead>
@@ -2736,7 +2770,6 @@ function dis_deal_dashboard_panel($deal) {
     </tr>
     </table>
     <p />
-
 ";
 
   return $block;

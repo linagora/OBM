@@ -984,6 +984,12 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
   $dexp = sql_date_format($db_type, 'deal_dateexpected', 'dateexpected');
   $dend = sql_date_format($db_type, 'deal_dateend', 'dateend');
 
+  if (is_array($date_range)) {
+    $past = $date_range[0];
+    $future = $date_range[1];
+    $where_date = "AND ($target_date >= '$past' AND $target_date <= '$future')";
+  }
+
   // Tasktype filter
   if (is_array($tts)) {
     $where_tt .= ' AND (';
@@ -1030,6 +1036,7 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
       AND deal_archive = '0'
       $where_market_uid
       $where_tt
+      $where_date
       $multidomain
     ORDER BY
       deal_hitrate,
@@ -1055,7 +1062,7 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
 **/
 function get_deal_dashboard_year_detail($date_range, $target_date='deal_dateexpected', $users_id='', $tts='') {
 
-  $obm_q = run_query_deal_dashboard_infos($date_range, 'deal_dateexpected', '', $deal['tasktype']);
+  $obm_q = run_query_deal_dashboard_infos('', $target_date, '', $tts);
 
   if (is_array($date_range)) {
     $past = $date_range[0];
@@ -1132,7 +1139,7 @@ function get_deal_dashboard_year_detail($date_range, $target_date='deal_dateexpe
 function get_deal_dashboard_panel($date_range, $target_date='deal_dateexpected', $users_id='', $tts='') {
   global $l_quarter;
 
-  $obm_q = run_query_deal_dashboard_infos($date_range, 'deal_dateexpected', '', $deal['tasktype']);
+  $obm_q = run_query_deal_dashboard_infos($date_range, $target_date, '', $tts);
 
   if (is_array($date_range)) {
     $past = $date_range[0];
