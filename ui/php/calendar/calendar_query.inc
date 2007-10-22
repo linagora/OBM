@@ -1878,18 +1878,30 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the event can be deleted
+// Check if the event can be deleted or modify
 // Parameters:
 //   - $id : event id
 // Returns:
 //   true if the event can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_calendar_can_delete($id) {
-  global $ok_msg;
+function check_calendar_can_modify($id) {
+  global $l_event_cant_delete, $obm, $delete_ok, $err, $l_rights, $l_err_reference;
+  
+  if(!$id) {
+    $err["msg"] = $l_err_reference;
+    return false;
+  }
+  $e = get_calendar_event_info($id);
+  if($e["owner"] == $obm["uid"]) {
+    return true;
+  }
+  $writable = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", array($e["owner"]), "userobm");
+  if(count($writable["ids"]) != 1) { 
+    $err["msg"] = $l_rights;
+    return false;
+  }
 
-  $delete_ok = true;
-
-  return $delete_ok;
+  return true;
 }
 
 
@@ -3897,6 +3909,9 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $mail_datas["reset_state"] = (($duration != $old_duration) || $mail_datas["reset_state"]);
     $attendees = get_calendar_event_users_info($calendar["calendar_id"]);
   } elseif ($action == "update_decision" || $action == "decision") {
+    if(!$event_q) {
+      $event_q = run_query_calendar_detail($calendar["calendar_id"]);
+    }    
     if($calendar['entity_kind'] == "user" && $event_q->f("calendarevent_owner") != $obm["uid"]) {
       $userinfo = get_user_info();
       $decision = $calendar['decision_event'];

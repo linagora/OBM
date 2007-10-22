@@ -3191,13 +3191,6 @@ function html_calendar_dis_delete($calendar) {
 
   $iso_date = $calendar["date"];
   $event_id = $calendar["calendar_id"];
-  $e = get_calendar_event_info($event_id);
-  $usercreate = $e["usercreate"];
-
-  if (($obm["uid"] != $usercreate) && (! $perm->check_right($module, $cright_write_admin))) {
-    $display["msg"] = display_warn_msg($l_event_cant_delete);
-    return;
-  }
 
   $block = "
    <h1>$l_confirm_delete</h1>

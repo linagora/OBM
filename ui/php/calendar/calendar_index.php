@@ -276,7 +276,8 @@ if ($action == 'index') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_data_form($params)) {
+  if (check_calendar_can_modify($params["calendar_id"]) && 
+      check_calendar_data_form($params)) {
     if ( (!$params['force'])
 	 && ($conflicts = check_calendar_conflict($params, $cal_entity_id)) ) {
       $display['search'] = html_calendar_dis_conflict($params,$conflicts) ;
@@ -297,17 +298,10 @@ if ($action == 'index') {
 
 } elseif ($action == 'quick_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_data_quick_form($params)) {
+  if (check_calendar_can_modify($params["calendar_id"]) && 
+      check_calendar_data_quick_form($params)) {
     $id = $params['calendar_id'];
     $eve_q = run_query_calendar_detail($id);
-    if ($obm['uid'] != $eve_q->f('calendarevent_owner')) {
-      $writable = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'write', array($eve_q->f('calendarevent_owner')), 'userobm');
-      if(count($writable['ids']) != 1) {
-        json_error_msg($l_invalid_data . ' : ' . $l_rights );
-        echo "({".$display['json']."})";
-        exit();
-      }
-    }
     $mail_data = run_query_prepare_event_mail($params, $action, $eve_q);
     if($eve_q->f('calendarevent_repeatkind') == 'none') {
       run_query_calendar_quick_event_update($params);
@@ -320,7 +314,7 @@ if ($action == 'index') {
     echo "({".$display['json']."})";
     exit();
   } else {
-    json_error_msg($l_invalid_data . ' : ' . $err['msg']);
+    json_error_msg($l_invalid_data . " : " . phpStringToJsString($err["msg"]));
     echo "({".$display['json']."})";
     exit();
   }
@@ -343,16 +337,8 @@ if ($action == 'index') {
 } elseif ($action == 'quick_delete') {  
 ///////////////////////////////////////////////////////////////////////////////
   $id = $params['calendar_id'];
-  if (check_calendar_can_delete($id)) {
+  if (check_calendar_can_modify($id)) {
     $eve_q = run_query_calendar_detail($id);    
-    if ($obm['uid'] != $eve_q->f('calendarevent_owner')) {
-      $writable = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'write', array($eve_q->f('calendarevent_owner')), 'userobm');
-      if(count($writable['ids']) != 1) {
-        json_error_msg($l_invalid_data . ' : ' . $l_rights );
-        echo "({".$display['json']."})";
-        exit();
-      }    
-    }    
     json_event_data($id,$params);
     $mail_data = run_query_prepare_event_mail($params, $action, $eve_q);
     if($eve_q->f('calendarevent_repeatkind') == 'none') {      
@@ -365,8 +351,9 @@ if ($action == 'index') {
     echo "({".$display['json']."})";
     exit();            
   } else {
-    json_error_msg($l_invalid_data);
+    json_error_msg($l_invalid_data . " : " .  phpStringToJsString($err["msg"]));
     echo "({".$display['json']."})";    
+    exit();
   }
 
 } elseif ($action == 'update_decision') {
@@ -384,10 +371,8 @@ if ($action == 'index') {
 
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_can_delete($params['calendar_id'])) {
-    if ($params['calendar_id'] > 0) {
-      $display['detail'] = html_calendar_dis_delete($params);
-    }
+  if (check_calendar_can_modify($params['calendar_id'])) {
+    $display['detail'] = html_calendar_dis_delete($params);
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
@@ -396,12 +381,10 @@ if ($action == 'index') {
 
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_can_delete($params['calendar_id'])) {
-    if ($params['calendar_id'] > 0) {
-      $mail_data = run_query_prepare_event_mail($params, $action);
-      run_query_calendar_delete($params);
-      calendar_send_mail($mail_data);
-    }
+  if (check_calendar_can_modify($params["calendar_id"])) {
+    $mail_data = run_query_prepare_event_mail($params, $action);
+    run_query_calendar_delete($params);
+    calendar_send_mail($mail_data);
     $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id);
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);

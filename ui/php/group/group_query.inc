@@ -532,7 +532,7 @@ function run_query_group_group_insert($group) {
     if ( (!$test_q->f("groupgroup_child_id"))
          && (! in_array($g_id, $parents))
          && ($id != $g_id)
-         && ($privacy == $test_q->f('group_privacy'))
+         && ($privacy == 1 || $test_q->f("group_privacy") != 1)
        ) {
         $query = "INSERT INTO GroupGroup (
           groupgroup_parent_id,
