@@ -31,29 +31,23 @@ obm-web = true
 ; singleNameSpace mode allow only one domain
 ; login are 'login' and not 'login@domain'
 ; Going multi-domain from mono domain needs system work (ldap, cyrus,...)
-; Multi-domain enabled by default
+; Multi-domain disabled by default
 singleNameSpace = false
 
 
 [automate]
-; Parametrage specifique a l'automate
+; Automate specific parameters
 
-; Adresse du serveur LDAP
+; LDAP server address
 ldapServer = localhost
 
-; Racine LDAP de l'arbre gérée pas OBM-Ldap
-; exemple : 'aliasource,local' place l'arbre LDAP d'OBM-Ldap sous le DN: 'dc=aliasource,dc=local' 
+; LDAP Root
+; Exemple : 'aliasource,local' means that the root DN is: 'dc=aliasource,dc=local' 
 ldapRoot = local
 
-; Gestion des partition Cyrus
-; si cette option est active, une partition Cyrus est créée pour chacun des
-; domaines OBM. Cette partition contient toutes les entités du domaine.
-; Attention : l'activation ou la désactivation de cette option après la création
-; d'entités nécessite une migration des BALs
+; Enable Cyrus partition support
+; if cyrusPartition is enable, a dedicated Cyrus partition is created for each OBM domain
+; Going cyrusPartition enabled from cyrusPartition disabled needs system work
 cyrusPartition = false
-
-; Adresse du serveur Samba sur lequel les repertoires personnels sont crees
-; utile dans les hook
-sambaHomeServer = ""
 
 ; EOF

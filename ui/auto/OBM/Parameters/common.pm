@@ -15,7 +15,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($facility_log $sieveSrv $singleNameSpace $ldapServer $ldapRoot $sambaSrvHome $sambaOldSidMapping $cyrusDomainPartition $obmModules $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($facility_log $sieveSrv $singleNameSpace $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_files = qw($automateMailChangeAlias $automateMailChangeSieve $automateCyrusAdmin $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixUpdate);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
@@ -66,9 +66,6 @@ $ldapServer = $cfgFile->val( 'automate', 'ldapServer' );
 # Racine LDAP de l'arbre gérée pas OBM-Ldap
 # exemple : 'aliasource,local' place l'arbre LDAP d'OBM-Ldap sous le DN: 'dc=aliasource,dc=local' 
 $ldapRoot = $cfgFile->val( 'automate', 'ldapRoot' );
-
-# Les serveurs Samba
-$sambaSrvHome = $cfgFile->val( 'automate', 'sambaHomeServer' );
 
 # Le mapping des UID<->SID
 if( lc($cfgFile->val( 'automate', 'oldSidMapping' )) eq "true" ) {
