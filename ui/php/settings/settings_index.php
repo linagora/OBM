@@ -7,137 +7,158 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$path = "..";
-$module = "settings";
+$path = '..';
+$module = 'settings';
 $display = array();
-$obminclude = getenv("OBM_INCLUDE_VAR");
-if ($obminclude == "") $obminclude="obminclude";
+$obminclude = getenv('OBM_INCLUDE_VAR');
+if ($obminclude == '') $obminclude='obminclude';
 include("$obminclude/global.inc");
 $params = get_settings_params();
-page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 
-if ($params["lang"] != "") {
-  $_SESSION['set_lang'] = $params["lang"];
-  update_user_pref($obm["uid"], "set_lang", $_SESSION['set_lang']);
+if ($params['lang'] != '') {
+  $_SESSION['set_lang'] = $params['lang'];
+  update_user_pref($obm['uid'], 'set_lang', $_SESSION['set_lang']);
 }
-if ($params["theme"] != "") {
-  $_SESSION['set_theme'] = $params["theme"];
-  update_user_pref($obm["uid"], "set_theme", $_SESSION['set_theme']);
+if ($params['theme'] != '') {
+  $_SESSION['set_theme'] = $params['theme'];
+  update_user_pref($obm['uid'], 'set_theme', $_SESSION['set_theme']);
 }
 
 // Validate user preferences
-if ($params["form_user_pref"]) {
+if ($params['form_user_pref']) {
 
   if ($perm->check_right($module, $cright_write_admin)) {
-    $set_debug = $params["debug_id"] | $params["debug_param"] | $params["debug_sess"] | $params["debug_sql"] | $params["debug_exe"];
+    $set_debug = $params['debug_id'] | $params['debug_param'] | $params['debug_sess'] | $params['debug_sql'] | $params['debug_exe'];
     $_SESSION['set_debug'] = $set_debug;
-    update_user_pref($obm["uid"], "set_debug", $_SESSION['set_debug']);
+    update_user_pref($obm['uid'], 'set_debug', $_SESSION['set_debug']);
   }
 
-  if ($params["menu"] != "") {
-    $_SESSION['set_menu'] = $params["menu"];
-    update_user_pref($obm["uid"], "set_menu", $_SESSION['set_menu']);
+  if ($params['menu'] != '') {
+    $_SESSION['set_menu'] = $params['menu'];
+    update_user_pref($obm['uid'], 'set_menu', $_SESSION['set_menu']);
   }
 
-  if ($params["display"] == "yes") {
-    $_SESSION['set_display'] = "yes";
+  if ($params['display'] == 'yes') {
+    $_SESSION['set_display'] = 'yes';
   } else {
-    $_SESSION['set_display'] = "no";
+    $_SESSION['set_display'] = 'no';
   }
-  update_user_pref($obm["uid"], "set_display", $_SESSION['set_display']);
+  update_user_pref($obm['uid'], 'set_display', $_SESSION['set_display']);
 
-  if ($params["rows"] != "") {
-    $_SESSION['set_rows'] = $params["rows"];
-    update_user_pref($obm["uid"], "set_rows", $_SESSION['set_rows']);
+  if ($params['rows'] != '') {
+    if ($params['rows'] > 0 && $params['rows'] <= $conf_display_max_rows) { 
+      $_SESSION['set_rows'] = $params['rows'];
+    } else {
+      $_SESSION['set_rows'] = $conf_display_max_rows;
+    }
+    update_user_pref($obm['uid'], 'set_rows', $_SESSION['set_rows']);
   }
 
-  if (($params["todo"] != "") && ($params["todo"] != $_SESSION['set_todo'])) {
-    $_SESSION['set_todo'] = $params["todo"];
-    update_user_pref($obm["uid"], "set_todo", $_SESSION['set_todo']);
+  if (($params['todo'] != '') && ($params['todo'] != $_SESSION['set_todo'])) {
+    $_SESSION['set_todo'] = $params['todo'];
+    update_user_pref($obm['uid'], 'set_todo', $_SESSION['set_todo']);
     global_session_load_user_todos($_SESSION['set_todo']);
   }
 
-  if ($params["dsrc"] != "") {
-    $_SESSION['set_dsrc'] = $params["dsrc"];
-    update_user_pref($obm["uid"], "set_dsrc", $_SESSION['set_dsrc']);
+  if ($params['dsrc'] != '') {
+    $_SESSION['set_dsrc'] = $params['dsrc'];
+    update_user_pref($obm['uid'], 'set_dsrc', $_SESSION['set_dsrc']);
   }
 
-  if ($params["date"] != "") {
-    $_SESSION['set_date'] = $params["date"];
-    update_user_pref($obm["uid"], "set_date", $_SESSION['set_date']);
+  if ($params['date'] != '') {
+    $_SESSION['set_date'] = $params['date'];
+    update_user_pref($obm['uid'], 'set_date', $_SESSION['set_date']);
   }
   
-  if ($params["date_upd"] != "") {
-    $_SESSION['set_date_upd'] = $params["date_upd"];
-    update_user_pref($obm["uid"], "set_date_upd", $_SESSION['set_date_upd']);
+  if ($params['date_upd'] != '') {
+    $_SESSION['set_date_upd'] = $params['date_upd'];
+    update_user_pref($obm['uid'], 'set_date_upd', $_SESSION['set_date_upd']);
   }
   
-  if ($params["commentorder"] != "") {
-    $_SESSION['set_commentorder'] = $params["commentorder"];
-    update_user_pref($obm["uid"], "set_commentorder", $_SESSION['set_commentorder']);
+  if ($params['commentorder'] != '') {
+    $_SESSION['set_commentorder'] = $params['commentorder'];
+    update_user_pref($obm['uid'], 'set_commentorder', $_SESSION['set_commentorder']);
   }
 
-  if ($params["mail"] == "yes") {
-    $_SESSION['set_mail'] = "yes";
+  if ($params['mail'] == 'yes') {
+    $_SESSION['set_mail'] = 'yes';
   } else {
-    $_SESSION['set_mail'] = "no";
+    $_SESSION['set_mail'] = 'no';
   }
-  update_user_pref($obm["uid"], "set_mail", $_SESSION['set_mail']);
+  update_user_pref($obm['uid'], 'set_mail', $_SESSION['set_mail']);
 
-  if ($params["cal_interval"] != "") {
-    $_SESSION['set_cal_interval'] = $params["cal_interval"];
-    update_user_pref($obm["uid"], "set_cal_interval", $_SESSION['set_cal_interval'], 1);
+  if ($params['cal_interval'] != '') {
+    $_SESSION['set_cal_interval'] = $params['cal_interval'];
+    update_user_pref($obm['uid'], 'set_cal_interval', $_SESSION['set_cal_interval'], 1);
   }
 
-  if ($params["csv_sep"] != "") {
-    $_SESSION['set_csv_sep'] = $params["csv_sep"];
-    update_user_pref($obm["uid"], "set_csv_sep", $_SESSION['set_csv_sep']);
+  if ($params['cal_first_hour'] != '') {
+    if ($params['cal_first_hour'] >= 0 && $params['cal_first_hour'] <= 24) {
+      $_SESSION['set_cal_first_hour'] = $params['cal_first_hour'];
+    } else {
+      $_SESSION['set_cal_first_hour'] = $ccalendar_first_hour;
+    }
+    update_user_pref($obm['uid'], 'set_cal_first_hour', $_SESSION['set_cal_first_hour'], 1);
+  }
+  if ($params['cal_last_hour'] != '') {
+    if ($params['cal_last_hour'] >= 0 && $params['cal_last_hour'] <= 24) {
+      $_SESSION['set_cal_last_hour'] = $params['cal_last_hour'];
+    } else {
+      $_SESSION['set_cal_last_hour'] = $ccalendar_last_hour;
+    }
+    update_user_pref($obm['uid'], 'set_cal_last_hour', $_SESSION['set_cal_last_hour'], 1);
+  }
+
+  if ($params['csv_sep'] != '') {
+    $_SESSION['set_csv_sep'] = $params['csv_sep'];
+    update_user_pref($obm['uid'], 'set_csv_sep', $_SESSION['set_csv_sep']);
   }
 
 }
 
 require("$obminclude/global_pref.inc");
-require("settings_display.inc");
+require('settings_display.inc');
 
-if ($action == "") $action = "index";
+if ($action == '') $action = 'index';
 get_settings_actions();
 $perm->check_permissions($module, $action);
 
 page_close();
 
-if (($_SESSION['set_debug'] & $cdg_id) == $cdg_id) $dg_id = "checked";
-if (($_SESSION['set_debug'] & $cdg_param) == $cdg_param) $dg_param = "checked";
-if (($_SESSION['set_debug'] & $cdg_sess) == $cdg_sess) $dg_sess = "checked";
-if (($_SESSION['set_debug'] & $cdg_sql) == $cdg_sql) $dg_sql = "checked";
-if (($_SESSION['set_debug'] & $cdg_exe) == $cdg_exe) $dg_exe = "checked";
+if (($_SESSION['set_debug'] & $cdg_id) == $cdg_id) $dg_id = 'checked';
+if (($_SESSION['set_debug'] & $cdg_param) == $cdg_param) $dg_param = 'checked';
+if (($_SESSION['set_debug'] & $cdg_sess) == $cdg_sess) $dg_sess = 'checked';
+if (($_SESSION['set_debug'] & $cdg_sql) == $cdg_sql) $dg_sql = 'checked';
+if (($_SESSION['set_debug'] & $cdg_exe) == $cdg_exe) $dg_exe = 'checked';
 
-if ($_SESSION['set_menu'] == $cme_txt) $me_txt = "checked";
-if ($_SESSION['set_menu'] == $cme_ico) $me_ico = "checked";
-if ($_SESSION['set_menu'] == $cme_both) $me_both = "checked";
+if ($_SESSION['set_menu'] == $cme_txt) $me_txt = 'checked';
+if ($_SESSION['set_menu'] == $cme_ico) $me_ico = 'checked';
+if ($_SESSION['set_menu'] == $cme_both) $me_both = 'checked';
 
-if ($_SESSION['set_date'] == $cda_iso) $da_iso = "checked";
-if ($_SESSION['set_date'] == $cda_en) $da_en = "checked";
-if ($_SESSION['set_date'] == $cda_fr) $da_fr = "checked";
-if ($_SESSION['set_date'] == $cda_txt) $da_txt = "checked";
+if ($_SESSION['set_date'] == $cda_iso) $da_iso = 'checked';
+if ($_SESSION['set_date'] == $cda_en) $da_en = 'checked';
+if ($_SESSION['set_date'] == $cda_fr) $da_fr = 'checked';
+if ($_SESSION['set_date'] == $cda_txt) $da_txt = 'checked';
 
-if ($_SESSION['set_date_upd'] == $cda_fr) $da_upd_fr = "checked";
-if ($_SESSION['set_date_upd'] == $cda_en) $da_upd_en = "checked";
-if ($_SESSION['set_date_upd'] == $cda_iso) $da_upd_iso = "checked";
+if ($_SESSION['set_date_upd'] == $cda_fr) $da_upd_fr = 'checked';
+if ($_SESSION['set_date_upd'] == $cda_en) $da_upd_en = 'checked';
+if ($_SESSION['set_date_upd'] == $cda_iso) $da_upd_iso = 'checked';
 
-if ($_SESSION['set_commentorder'] == $cco_chro) $co_chro = "checked";
-if ($_SESSION['set_commentorder'] == $cco_rev) $co_rev = "checked";
+if ($_SESSION['set_commentorder'] == $cco_chro) $co_chro = 'checked';
+if ($_SESSION['set_commentorder'] == $cco_rev) $co_rev = 'checked';
 
-if ($_SESSION['set_cal_interval'] == $ccal_4) $cal_4 = "checked";
-if ($_SESSION['set_cal_interval'] == $ccal_2) $cal_2 = "checked";
-if ($_SESSION['set_cal_interval'] == $ccal_1) $cal_1 = "checked";
+if ($_SESSION['set_cal_interval'] == $ccal_4) $cal_4 = 'checked';
+if ($_SESSION['set_cal_interval'] == $ccal_2) $cal_2 = 'checked';
+if ($_SESSION['set_cal_interval'] == $ccal_1) $cal_1 = 'checked';
 
-if ($_SESSION['set_csv_sep'] == $ccsvd_sc) $csvd_sc = "checked";
-if ($_SESSION['set_csv_sep'] == $ccsvd_tab) $csvd_tab = "checked";
+if ($_SESSION['set_csv_sep'] == $ccsvd_sc) $csvd_sc = 'checked';
+if ($_SESSION['set_csv_sep'] == $ccsvd_tab) $csvd_tab = 'checked';
 
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-$display["header"] = display_menu($module);
+$display['header'] = display_menu($module);
 
 // Todo Order select
 if ($_SESSION['set_todo'] == $cts_pri) { $todo_pri = "selected=\"selected\" "; }
@@ -152,12 +173,12 @@ $dsrc_q = run_query_global_datasource();
 $sel_dsrc = "<select name=\"dsrc\" id=\"dsrc\">
   <option value=\"$c_undef\">$l_undef</option>";
 while ($dsrc_q->next_record()) {
-  $d_id = $dsrc_q->f("datasource_id");
+  $d_id = $dsrc_q->f('datasource_id');
   $sel_dsrc .= "\n<option value=\"$d_id\"";
   if ($d_id == $_SESSION['set_dsrc']) { $sel_dsrc .= " selected=\"selected\" "; }
-  $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>";
+  $sel_dsrc .= '>'. $dsrc_q->f('datasource_name') . '</option>';
 }
-$sel_dsrc .= "</select>";
+$sel_dsrc .= '</select>';
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -187,8 +208,7 @@ while ($entry=$lang_dir->read()) {
   if (!preg_match("/^\..*$/",$entry) && is_dir($lang_dir->path."/".$entry)) {
         $dis_lang .= "
       <a href=\"settings_index.php?lang=$entry\">
-        <img src=\"".${"flag_$entry"}."\" alt=\"[Language $entry]\"/></a>
-      ";
+        <img src=\"".${"flag_$entry"}."\" alt=\"[Language $entry]\"/></a>";
   }
 }
 $lang_dir->close();
@@ -199,10 +219,10 @@ $lang_dir->close();
 // display en entry
 ///////////////////////////////////////////////////////////////////////////////
 $theme_dir = dir("../$path/resources/themes");
-$dis_theme = "";
+$dis_theme = '';
 while ($entry = $theme_dir->read()) {
-  $dotcase = strcmp($entry, "."); 
-  if (!preg_match("/^\..*$/",$entry) && strcmp($entry,"images") && is_dir($theme_dir->path."/".$entry)) {
+  $dotcase = strcmp($entry, '.'); 
+  if (!preg_match("/^\..*$/",$entry) && strcmp($entry,'images') && is_dir($theme_dir->path."/".$entry)) {
     $dis_theme .= "
       <a href=\"settings_index.php?theme=$entry\">
       <img src=\"".${"preview_".$entry}."\" alt=\"[Theme $entry]\" style=\"height:20%;width:20%;\"
@@ -217,11 +237,11 @@ $theme_dir->close();
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display
 ///////////////////////////////////////////////////////////////////////////////
-if ($form_user_pref) {
-  $display["msg"] .= display_ok_msg("$l_settings : $l_update_ok");
+if ($params['form_user_pref']) {
+  $display['msg'] .= display_ok_msg("$l_settings : $l_update_ok");
 }
 
-$display["detail"] .= "
+$display['detail'] .= "
 <!--User preferences current config -->
 
   <form action=\"settings_index.php\" method=\"get\">
@@ -239,17 +259,18 @@ $display["detail"] .= "
     <th>$l_auto_display</th>
     <td>
       <input type=\"checkbox\" name=\"display\" value=\"yes\" ";
-if ($_SESSION['set_display'] == "yes") $display["detail"] .= "checked = \"checked\"";
-$display["detail"] .= " /></td>
-  </tr><tr>
+if ($_SESSION['set_display'] == 'yes') $display['detail'] .= "checked = \"checked\"";
+$display['detail'] .= " /></td>
+  </tr>
+  <tr>
     <th>$l_set_rows</th>
     <td>
       <input size=\"3\" name=\"rows\" value=\"".$_SESSION['set_rows']."\" /></td>
   </tr>";
 
-if ($cgp_show["module"]["todo"]) {
+if ($cgp_show['module']['todo']) {
 
-  $display["detail"] .= "
+  $display['detail'] .= "
 
 <!-- Todo Order config -->
   <tr>
@@ -258,7 +279,7 @@ if ($cgp_show["module"]["todo"]) {
   </tr>";
 }
 
-$display["detail"] .= "
+$display['detail'] .= "
 
 <!-- Data Source config -->
   <tr>
@@ -281,13 +302,13 @@ $display["detail"] .= "
     <th>$l_send_mail</th>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"mail\" value=\"yes\" ";
-if ($_SESSION['set_mail'] == "yes") $display["detail"] .= "checked";
+if ($_SESSION['set_mail'] == 'yes') $display['detail'] .= 'checked';
 
-$display["detail"] .= " /></td>
+$display['detail'] .= " /></td>
   </tr>";
 
-if ($cgp_show["module"]["calendar"]) {
-  $display["detail"] .= "
+if ($cgp_show['module']['calendar']) {
+  $display['detail'] .= "
   <tr>
     <th>$l_set_cal_interval</th>
     <td>
@@ -295,10 +316,21 @@ if ($cgp_show["module"]["calendar"]) {
       <input type=\"radio\" name=\"cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2
       <input type=\"radio\" name=\"cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1
     </td>
-  </tr>";
+  </tr>
+  <tr>
+    <th>$l_set_cal_first_hour</th>
+    <td>
+      <input size=\"3\" maxlength=\"3\" name=\"cal_first_hour\" value=\"".$_SESSION['set_cal_first_hour']."\" /></td>
+  </tr>
+  <tr>
+    <th>$l_set_cal_last_hour</th>
+    <td>
+      <input size=\"3\" maxlength=\"3\" name=\"cal_last_hour\" value=\"".$_SESSION['set_cal_last_hour']."\" /></td>
+  </tr>
+";
 }
 
-$display["detail"] .= "
+$display['detail'] .= "
   <tr>
   <th>$l_set_csv_sep</th>
   <td>
@@ -338,7 +370,7 @@ $display["detail"] .= "
 <!-- Lang and theme current config -->
   <div class=\"detail infos\">
   <h1>$l_cur_lang</h1>
-  <img src=\"".${"flag_".$_SESSION['set_lang']}."\" alt=\"[language]\" />
+  <img src=\"".${'flag_'.$_SESSION['set_lang']}."\" alt=\"[language]\" />
   <h1>$l_set_lang</h1>
   $dis_lang
   </div>
@@ -356,8 +388,8 @@ $display["detail"] .= "
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head($l_settings);
-$display["end"] = display_end();
+$display['head'] = display_head($l_settings);
+$display['end'] = display_end();
 
 display_page($display);
 
@@ -369,7 +401,7 @@ display_page($display);
 function get_settings_params() {
   
   // Get global params
-  $params = get_global_params("Settings");
+  $params = get_global_params('Settings');
   
   return $params;
 }
@@ -381,7 +413,7 @@ function get_settings_params() {
 function get_settings_actions() {
   global $actions, $cright_read;
 
-  $actions["settings"]["index"] = array (
+  $actions['settings']['index'] = array (
     'Url'      => "$path/settings/settings_index.php?action=index",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 

@@ -26,6 +26,9 @@ $cgp_host = "http://obm/";
 // Todo lines to display
 $cgp_todo_nb = 5;
 
+// Maximum rows allowed to display
+$conf_display_max_rows = 200;
+
 // OBM System groups (groups id)
 $cg_adm = 1;
 $cg_com = 2;

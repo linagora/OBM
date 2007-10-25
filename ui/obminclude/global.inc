@@ -29,6 +29,9 @@ $resources_path = '/images';
 // Todo lines to display
 $cgp_todo_nb = 5;
 
+// Maximum rows allowed to display
+$conf_display_max_rows = 200;
+
 // Popup Display size
 $popup_width = 800;
 $popup_height = 600;

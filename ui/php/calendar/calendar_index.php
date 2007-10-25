@@ -35,6 +35,14 @@ page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => '
 include("$obminclude/global_pref.inc");
 $params = get_calendar_params();
 
+// Get user preferences if set for hour display range 
+if (isset($_SESSION['set_cal_first_hour'])) {
+  $ccalendar_first_hour = $_SESSION['set_cal_first_hour'];
+}
+if (isset($_SESSION['set_cal_last_hour'])) {
+  $ccalendar_last_hour = $_SESSION['set_cal_last_hour'];
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // specifique import ICS
 ///////////////////////////////////////////////////////////////////////////////
@@ -132,8 +140,8 @@ if ( ( (! is_array($cal_entity_id['user']))
 }
 
 // Category Filter 
-if(($action == 'insert') || ($action == 'update') 
-  || ($action == 'perform_meeting') ) {
+if (($action == 'insert') || ($action == 'update') 
+  || ($action == 'perform_meeting')) {
   $cal_category_filter = '';
 } elseif ( isset($params['category_filter'])) {
   $cal_category_filter = str_replace($c_all,'',$params['category_filter']);

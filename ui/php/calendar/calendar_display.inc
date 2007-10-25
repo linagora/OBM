@@ -471,7 +471,6 @@ function dis_calendar_month_planning($calendar, $calendar_entity,$writable_entit
   global $ico_previous, $ico_next;
   global $ccalendar_weekstart;
   global $ico_resize, $ico_periodic, $ico_meeting;
-  global $ccalendar_first_hour, $ccalendar_last_hour;
   global $l_private,$l_daysofweek, $l_previous, $l_next;
 
   $iso_date = $calendar["date"];
@@ -598,7 +597,6 @@ function dis_calendar_month_print($calendar, $calendar_entity,$writable_entity) 
   global $ico_previous, $ico_next;
   global $ccalendar_weekstart, $obm;
   global $ico_periodic, $ico_meeting;
-  global $ccalendar_first_hour, $ccalendar_last_hour;
   global $l_daysofweek, $l_previous, $l_next, $l_all_day, $l_location;
   global $l_task, $l_user, $l_resource, $l_private;
 
@@ -1688,9 +1686,8 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_plain_month_planning($calendar, $calendar_entity) { 
-  global $ico_previous,$ico_next,$l_week;
-  global $ccalendar_weekstart, $ico_new_event,$l_all_day;
-  global $ccalendar_first_hour, $ccalendar_last_hour,$obm;
+  global $obm, $ico_previous,$ico_next,$ico_new_event;
+  global $ccalendar_weekstart, $l_week, $l_all_day;
   global $l_private,$l_daysofweekfirst,$l_daysofweek, $l_previous, $l_next;
 
   $iso_date = $calendar["date"];
@@ -4059,14 +4056,14 @@ function json_event_data($id,$calendar) {
   switch($context)  {
     case "day" :
       $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
-      $day = $day || (date('H',$date + $duration) <  $ccalendar_first_hour);
-      $day = $day || (date('H',$date) >  $ccalendar_last_hour );
+      $day = $day || (date('H',$date + $duration) < $ccalendar_first_hour);
+      $day = $day || (date('H',$date) > $ccalendar_last_hour );
       $options = array(); 
       break;
     case "week" :
       $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
-      $day = $day || (date('H',$date + $duration) <  $ccalendar_first_hour);
-      $day = $day || (date('H',$date) >  $ccalendar_last_hour );
+      $day = $day || (date('H',$date + $duration) < $ccalendar_first_hour);
+      $day = $day || (date('H',$date) > $ccalendar_last_hour );
       $options = array();
       break;
     case "month" :
