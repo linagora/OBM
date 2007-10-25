@@ -589,10 +589,10 @@ sub _imapSetMailboxAcls {
                     if( !$self->_imapSetMailboxAcl( $cyrusSrv, $boxStruct[$i][0], $userName, $right ) ) {
                         $errors++;
                     }
+                }
 
-                    if( $userName eq "anyone" ) {
-                        $anyoneRight = 1;
-                    }
+                if( $userName eq "anyone" ) {
+                    $anyoneRight = 1;
                 }
             }
         }
