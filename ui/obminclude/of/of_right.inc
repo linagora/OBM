@@ -149,19 +149,29 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <input onchange=\"togglePrivacy(this,'readRightBox');\" onclick=\"togglePrivacy(this,'readRightBox')\"
     name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
     </td>";
+
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
+    $popup_add_button = "
+    <a id=\"lnk_accept_read\" href=\"javascript: return false;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+      <img src=\"$ico_add\" alt=\"[Add]\" />
+    </a>";
+
     $block_consumer_read = "
     <td class=\"detailLabel\" id=\"head_accept_read\">
-    $l_users 
+    $l_users
+    $popup_add_button
     </td>
     <td>
     <input type=\"text\" id=\"userReadSearch\" autocomplete=\"off\" /> 
     </td>
     </tr>
     <tr>
-    <td colspan=\"2\" lass=\"detailForm\" id=\"sel_accept_read\">
+    <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_read\">
       $dis_read_ok
     </td>
-    </tr>  ";
+    </tr>";
 
    $block_consumer_write_public = "
     <td class=\"detailLabel\">
@@ -171,9 +181,18 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <input onchange=\"togglePrivacy(this,'writeRightBox');\" onclick=\"togglePrivacy(this,'writeRightBox')\"
     name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked />
     </td>";
+
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
+    $popup_add_button = "
+      <a id=\"lnk_accept_write\" href=\"javascript: return false;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+       <img src=\"$ico_add\" alt=\"[Add]\" />
+     </a>";
+
     $block_consumer_write = "
     <td class=\"detailLabel\" id=\"head_accept_write\">
     $l_users
+    $popup_add_button
     </td>
     <td>
     <input type=\"text\" id=\"userWriteSearch\" autocomplete=\"off\" /> 
@@ -183,11 +202,18 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_write\">
        $dis_write_ok
     </td>
-    </tr>   ";
+    </tr>";
 
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
+    $popup_add_button = "
+      <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+       <img src=\"$ico_add\" alt=\"[Add]\" />
+     </a>";
     $block_consumer_admin = "
     <td class=\"detailLabel\" id=\"head_accept_admin\">
     $l_users
+    $popup_add_button
     </td>
     <td>
     <input type=\"text\" id=\"userAdminSearch\" autocomplete=\"off\" /> 
@@ -197,7 +223,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_admin\">
        $dis_admin_ok
     </td>
-    </tr>   ";
+    </tr>";
     
 
   $block = "

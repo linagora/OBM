@@ -188,17 +188,16 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
 //   - $new_action      : action to be passed
 //   - $calendar          : hash values
 //   - $calendar_entity : array of entities elements to display
-//   - $entity_readable : array of readable entities (["user"], ["resource"]
+//   - $entity_readable : array of readable entities (["user"], ["resource"])
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable) {
-  global $path, $obm, $c_all;
-  global $ccalendar_resource;
-  global $l_selection, $l_users,$l_resources, $l_validate,$l_search_users,$l_category_filter;
-  global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
-  global $ico_calendar_user3,$ico_calendar_user4,$ico_calendar_user5,$l_search_resources;
+  global $path, $obm, $c_all, $ccalendar_resource;
+  global $ico_add, $popup_width, $popup_height;
+  global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
+  global $l_search_users, $l_search_resources;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
 
-  $iso_date = $calendar["date"];
+  $iso_date = $calendar['date'];
   $this_group = $calendar["entity"]["group_view"];
   $category_filter = $calendar["category_filter"];
   //-- Group selection
@@ -232,7 +231,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   // loop through ["user"], ["resource"]
   foreach ($calendar_entity as $type => $entity) {
     foreach ($entity as $id => $data) {
-      $name = $data["name"];
+      $name = $data['name'];
       $data_id = "data-$type-$id";
       $div_id = "sel_ent-$data_id";
       $sel_ent .= "<input value=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
@@ -241,18 +240,29 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
 
 
   $user_text = phpStringToJsString($l_search_users);
+  $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction_calendar=calendar";
+  $user_add_button = "
+    <a href=\"javascript: return false;\" 
+    onclick=\"window.open('$url_user','','height=$popup_height,width=$popup_width,scrollbars=yes');
+  return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>";
 
   if ($ccalendar_resource) {
     $resource_text = phpStringToJsString($l_search_resources);
+    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction=user";
+    $resource_add_button = "    
+      <a href=\"javascript: return false;\"
+      onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+      <img src=\"$ico_add\" alt=\"[Add]\" /> </a>";
     $dis_block_resource = "
     </fieldset>
     <fieldset class=\"detail extra\">
-    <legend>           
+    <legend>
       $l_resources
-    </legend>       
-    <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />
-    ";
-    
+      $resource_add_button
+    </legend>
+    <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />";
+
     $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {restriction:'user', defaultText:'$resource_text'});";
   }
   $cats1 = of_category_get_ordered("calendar", "category1");
@@ -285,6 +295,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <fieldset class=\"detail extra\">
     <legend>
     $l_users
+    $user_add_button
     </legend>
     <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"user\" autocomplete=\"off\" />
     <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
@@ -310,8 +321,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       $resource_js
     });
     </script>    
-    
-    ";
+";
 
   return $block;
 }
@@ -932,9 +942,10 @@ function dis_calendar_week_print($calendar, $calendar_entity,$writable_entity) {
     $week_cal
     </tbody>
   </table>
-  ";
+";
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the day
@@ -1163,6 +1174,7 @@ function dis_calendar_day_print($calendar, $calendar_entity,$writable_entity) {
 
   return $block;
 }
+
 
 /**
  * Display Event List
@@ -1842,10 +1854,11 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
     }
   </script>  
   $hidden_div
-    ";    
+";    
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Conflicts
@@ -2440,7 +2453,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
       $charset = mb_internal_encoding();
       $item = "<?xml version='1.0' encoding='$charset'?>$properties";
     } else {
-      $item = "";
+      $item = '';
     }
     $datebegin = $event_q->f("calendarevent_date");
     $hourbegin = date("H",$datebegin);
@@ -2634,17 +2647,26 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     $hourend = $ccalendar_first_hour + 1;
   }
 
+  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+  $user_add_button = "
+    <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+      <img src=\"$ico_add\" alt=\"[Add]\" />
+    </a>";
+
   $block_user = "
     <th>
     $l_users
-     </th>
-     <td>
-       <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
-     </td>
-     </tr>
-     <tr>
-     <th>&nbsp;</th>    
-     <td id=\"sel_user_id\">$dis_sel_user</td>";
+    $user_add_button
+    </th>
+    <td>
+      <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
+    </td>
+    </tr>
+    <tr>
+    <th>&nbsp;</th>    
+    <td id=\"sel_user_id\">$dis_sel_user</td>";
 
   // group select
   if (is_array($groups["entity"])) {
@@ -2663,18 +2685,27 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     }
   }
 
+  $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
+  $group_add_button = "
+    <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+      <img src=\"$ico_add\" alt=\"[Add]\" />
+    </a>";
+
   $block_group = "
     <th>
     $l_groups
-     </th>    
-     <td>
-       <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />       
-     </td>
-     </tr>
+    $group_add_button
+    </th>
+    <td>
+      <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />
+    </td>
+    </tr>
 
-     <tr>
-     <th>&nbsp;</th>    
-     <td id=\"sel_group_id\">$dis_sel_group</td>";
+    <tr>
+    <th>&nbsp;</th>
+    <td id=\"sel_group_id\">$dis_sel_group</td>";
 
   if ($ccalendar_resource) {
     // resource select
@@ -2737,9 +2768,18 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
       }
     }
 
+    $url = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
+    $resource_add_button = "
+    <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+     <img src=\"$ico_add\" alt=\"[Add]\" />
+    </a>";
+
     $block_resource = "
     <th>
     $l_resources
+    $resource_add_button
      </th>    
      <td>
        <input type=\"text\" name=\"\" value=\"\" id=\"resourceSearch\" autocomplete=\"off\" />
@@ -3216,7 +3256,7 @@ function html_calendar_dis_delete($calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   global $display, $path;
-  global $ico_delete, $ico_mini_cal;
+  global $ico_add, $ico_delete, $ico_mini_cal;
   global $ccalendar_resource;
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
@@ -3268,10 +3308,18 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     }
   }
 
+  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+  $user_add_button = "
+    <a href=\"javascript: return false;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+      <img src=\"$ico_add\" alt=\"[Add]\" />
+    </a>";
   $block_user = "
     <th>
     $l_users
-    </th>    
+    $user_add_button
+    </th>
     <td id=\"sel_user_id\">
       <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
       $dis_sel_user
@@ -3292,16 +3340,26 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
           <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
           </div>";
       }
-    }  
+    }
+
+    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
+    $resource_add_button = "
+      <a href=\"javascript: return false;\"
+      onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"$ico_add\" alt=\"[Add]\" />
+      </a>";
+
     $dis_block_resource = "
     <tr>
       <th>
       $l_resources
+      $resource_add_button
       </th>
      <td id=\"sel_resource_id\">
       <input type=\"text\" name=\"\" value=\"\" id=\"resourceSearch\" autocomplete=\"off\" />
        $dis_sel_resource
-     </td>      
+     </td>
     </tr>";
   
     if (is_array($res_grp["entity"])) {
@@ -3318,17 +3376,27 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
           <input value=\"$sel_id\" name=\"sel_resource_group_id[]\" type=\"hidden\" />
           </div>";
       }
-    }  
+    }
+
+    $url_resource_group = "$path/resourcegroup/resourcegroup_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_group_id";
+    $rgroup_add_button = "
+      <a href=\"javascript: return false;\"
+      onclick=\"window.open('$url_resource_group','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"$ico_add\" alt=\"[Add]\" />
+      </a>";
+
     $dis_block_resource_group = "
     <tr>
       <th>
       $l_module_resourcegroup
+      $rgroup_add_button
       </th>
       <td id=\"sel_resource_group_id\">
       <input type=\"text\" name=\"\" value=\"\" id=\"resourcegroupSearch\" autocomplete=\"off\" />
 
        $dis_sel_resource_group
-     </td>      
+     </td>
      </tr>";
     $resource_js = "
       new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch');
@@ -3353,14 +3421,23 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     }
   }
 
+  $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
+  $group_add_button = "
+    <a href=\"javascript: return false;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"$ico_add\" alt=\"[Add]\" />
+    </a>";
+
   $block_group = "
     <th>
     $l_groups
-     </th>
-     <td id=\"sel_group_id\">
-       <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />
-       $dis_sel_group
-     </td>";
+    $group_add_button
+    </th>
+    <td id=\"sel_group_id\">
+      <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />
+      $dis_sel_group
+    </td>";
 
 
   $dis_hour_d = "<select name=\"sel_time_duration\">";

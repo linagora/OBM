@@ -51,7 +51,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
     $res['url'] = "$path/group/group_index.php?action=detailconsult&amp;group_id=".$OD->data_set->f('group_id');
   }
   if (($fieldname == 'data_element') && $params['ext_element'] != '') {
-    $res['name'] = '<span id=\"data-group-'.$OD->data_set->f('group_id').'\" style=\"display:none;\">'.
+    $res['name'] = "<span id=\"data-group-".$OD->data_set->f('group_id')."\" style=\"display:none;\">".
     $OD->data_set->f('group_name').'</span>';
   }  
 
