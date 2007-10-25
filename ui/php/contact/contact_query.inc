@@ -78,6 +78,7 @@ function run_query_contact_search($contact) {
                   AND ctry2.country_lang='$lang'";
 
     $company_fields = "company_name,
+      company_aka,
       company_phone,
       company_fax,
       company_address1,
@@ -237,6 +238,7 @@ function run_query_contact_search($contact) {
       contact_marketingmanager_id,
       contact_lastname,
       contact_firstname,
+      contact_aka,
       contact_function_id,
       contact_title,
       contact_service,

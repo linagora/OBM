@@ -14,6 +14,7 @@
 // Direct fields
 $fieldnames["contact_lastname"] = $l_lastname;
 $fieldnames["contact_firstname"] = $l_firstname;
+$fieldnames["contact_aka"] = $l_aka;
 $fieldnames["function_label"] = $l_function;
 $fieldnames["contact_title"] = $l_title;
 $fieldnames["kind_minilabel"] = $l_kind;
@@ -40,6 +41,7 @@ $fieldnames["contact_mailing_ok"] = $l_mailing_ok_first;
 $fieldnames["contact_newsletter"] = $l_news;
 // Calculated fields
 $fieldnames["company_name"] = $l_company;
+$fieldnames["company_aka"] = "$l_company $l_aka";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Contact specific dataset fields

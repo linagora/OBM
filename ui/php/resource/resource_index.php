@@ -108,6 +108,9 @@ if ($action == 'ext_get_ids') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_resource_data_form('', $params)) {
     // If the context (same resource) was confirmed ok, we proceed
+    if (is_array($params['accept_admin'])) {
+      $params['accept_write'] = $params['accept_admin'];
+    }
     $rid = run_query_resource_insert($params);
     if ($rid > 0) {
       $params['resource_id'] = $rid;
@@ -285,9 +288,7 @@ function get_resource_params() {
   
   // Get global params
   $params = get_global_params('Resource');
-  if (is_array($params['accept_admin'])) {
-    $params['accept_write'] = $params['accept_admin'];
-  }
+
   //Get resource specific params
   if (isset ($params['ext_id'])) $params['resource_id'] = $params['ext_id'];
   if ((isset ($params['entity_id'])) && (! isset($params['resource_id']))) {

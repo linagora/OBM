@@ -951,8 +951,14 @@ function get_list_query_num_rows($dynquery="", $list_q) {
 
   // If no extra info needed (as publication) take unique contact id
   $info_pub = ($list_q->f("list_info_publication") == 0 ? 0 : 1);
+  // If publication infos asked
   if ($info_pub) {
-    $distinct_id = "distinct subscription_id";
+    // if no subscription or publication criteria, count contacts
+    if (preg_match('/subscription/', $dynquery['where']) == 0) {
+      $distinct_id = " contact_id";
+    } else {
+      $distinct_id = "distinct subscription_id";
+    }
   } else {
     $distinct_id = "distinct contact_id";
   }
@@ -997,7 +1003,7 @@ function get_list_query_num_rows($dynquery="", $list_q) {
     $ret = -1;
   } else {
     $obm_q->next_record();
-    $ret = $obm_q->f("nb");
+    $ret = $obm_q->f('nb');
   }
 
   return $ret;
