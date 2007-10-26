@@ -2369,7 +2369,7 @@ function dis_calendar_quick_form($calendar) {
       <fieldset class=\"buttons\"> 
         <input type=\"button\" onclick=\"obm.calendarQuickForm.goTo();\" value=\"$l_details\" />
       <input type=\"button\" 
-      onclick=\"if(confirm('$l_confirm_delete')) obm.calendarQuickForm.submit('quick_delete');\"
+      onclick=\"if(confirm('".phpStringToJsString($l_confirm_delete)."')) obm.calendarQuickForm.submit('quick_delete');\"
       value=\"$l_c_delete\" />
       </fieldset>
       </form>
@@ -3965,7 +3965,7 @@ function dis_icalendar_insert($result) {
  */
 function json_ok_msg($msg) {
   global $display;
-
+  $msg = phpStringToJsString($msg);
   if($display['json'] != '') {
     $display['json'] .= ',';
   }
@@ -3982,6 +3982,7 @@ function json_ok_msg($msg) {
 function json_error_msg($msg) {
   global $display;
 
+  $msg = phpStringToJsString($msg);
   if($display['json'] != '') {
     $display['json'] .= ',';
   }

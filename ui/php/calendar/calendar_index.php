@@ -258,15 +258,22 @@ if ($action == 'index') {
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
-
+  if (check_calendar_access($params["calendar_id"], "all")) {
+    $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+  } else {
+    $display['msg'] .= display_err_msg($err['msg']);
+  } 
 } elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params['calendar_id'] > 0) {  
-    $eve_q = run_query_calendar_detail($params['calendar_id']);
-    $entities = get_calendar_event_entity($params['calendar_id']);
-    $display['detailInfo'] = display_record_info($eve_q);
-    $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities);
+    if (check_calendar_access($params["calendar_id"], "all")) {
+      $eve_q = run_query_calendar_detail($params['calendar_id']);
+      $entities = get_calendar_event_entity($params['calendar_id']);
+      $display['detailInfo'] = display_record_info($eve_q);
+      $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities);
+    } else {
+      $display['msg'] .= display_err_msg($err['msg']);
+    }
   } else {
     $display['msg'] .= display_err_msg($l_err_reference);
   }
@@ -284,7 +291,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_can_modify($params["calendar_id"]) && 
+  if (check_calendar_access($params["calendar_id"]) && 
       check_calendar_data_form($params)) {
     if ( (!$params['force'])
 	 && ($conflicts = check_calendar_conflict($params, $cal_entity_id)) ) {
@@ -306,7 +313,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'quick_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_can_modify($params["calendar_id"]) && 
+  if (check_calendar_access($params["calendar_id"]) && 
       check_calendar_data_quick_form($params)) {
     $id = $params['calendar_id'];
     $eve_q = run_query_calendar_detail($id);
@@ -322,7 +329,7 @@ if ($action == 'index') {
     echo "({".$display['json']."})";
     exit();
   } else {
-    json_error_msg($l_invalid_data . " : " . phpStringToJsString($err["msg"]));
+    json_error_msg($l_invalid_data . " : " . $err["msg"]);
     echo "({".$display['json']."})";
     exit();
   }
@@ -345,7 +352,7 @@ if ($action == 'index') {
 } elseif ($action == 'quick_delete') {  
 ///////////////////////////////////////////////////////////////////////////////
   $id = $params['calendar_id'];
-  if (check_calendar_can_modify($id)) {
+  if (check_calendar_access($id)) {
     $eve_q = run_query_calendar_detail($id);    
     json_event_data($id,$params);
     $mail_data = run_query_prepare_event_mail($params, $action, $eve_q);
@@ -359,7 +366,7 @@ if ($action == 'index') {
     echo "({".$display['json']."})";
     exit();            
   } else {
-    json_error_msg($l_invalid_data . " : " .  phpStringToJsString($err["msg"]));
+    json_error_msg($l_invalid_data . " : $err[msg]");
     echo "({".$display['json']."})";    
     exit();
   }
@@ -374,22 +381,28 @@ if ($action == 'index') {
   } else {
     $display['msg'] .= display_err_msg("$l_event  : $err[msg]");
   }
-  $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
-  //$display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id);
-
+  if (check_calendar_access($params["calendar_id"], "all")) {
+    $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+  } else {
+    $display['msg'] .= display_err_msg($err['msg']);
+  } 
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_can_modify($params['calendar_id'])) {
+  if (check_calendar_access($params['calendar_id'])) {
     $display['detail'] = html_calendar_dis_delete($params);
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    if (check_calendar_access($params["calendar_id"], "all")) {
+      $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    } else {
+      $display['msg'] .= display_err_msg($err['msg']);
+    } 
   }
 
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_can_modify($params["calendar_id"])) {
+  if (check_calendar_access($params["calendar_id"])) {
     $mail_data = run_query_prepare_event_mail($params, $action);
     run_query_calendar_delete($params);
     calendar_send_mail($mail_data);
@@ -397,7 +410,11 @@ if ($action == 'index') {
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    if (check_calendar_access($params["calendar_id"], "all")) {
+      $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    } else {
+      $display['msg'] .= display_err_msg($err['msg']);
+    } 
   }
 
 } elseif ($action == 'rights_admin') {

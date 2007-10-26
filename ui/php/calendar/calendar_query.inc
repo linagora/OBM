@@ -1884,8 +1884,8 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
 // Returns:
 //   true if the event can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_calendar_can_modify($id) {
-  global $l_event_cant_delete, $obm, $delete_ok, $err, $l_rights, $l_err_reference;
+function check_calendar_access($id, $right = "write") {
+  global $l_event_cant_delete, $obm, $delete_ok, $err, $l_insufficient_permission, $l_err_reference;
   
   if(!$id) {
     $err["msg"] = $l_err_reference;
@@ -1895,9 +1895,16 @@ function check_calendar_can_modify($id) {
   if($e["owner"] == $obm["uid"]) {
     return true;
   }
-  $writable = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", array($e["owner"]), "userobm");
-  if(count($writable["ids"]) != 1) { 
-    $err["msg"] = $l_rights;
+  if($right == "write") {
+    $access = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", array($e["owner"]), "userobm");
+  } else {
+    $access = of_right_entity_for_consumer("calendar", "user", $obm["uid"], $right, $e["attendees"]["user"], "userobm");
+    if(count($access["ids"]) == 0 ) {
+      $access = of_right_entity_for_consumer("resource", "user", $obm["uid"], $right, $e["attendees"]["resource"]);
+    }
+  }
+  if(count($access["ids"]) == 0) { 
+    $err["msg"] = $l_insufficient_permission;
     return false;
   }
 
@@ -2236,14 +2243,21 @@ function get_calendar_event_info($id) {
   }
 
   $multidomain = sql_multidomain("calendarevent");
-  $query = "SELECT * FROM CalendarEvent WHERE calendarevent_id='$id' $multidomain";
+  $query = "SELECT * FROM CalendarEvent 
+            LEFT JOIN EventEntity ON evententity_event_id = calendarevent_id
+            WHERE calendarevent_id='$id'
+            $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_calendar_event_info()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  $obm_q->next_record();
-  $e["usercreate"] = $obm_q->f("calendarevent_usercreate");
-  $e["owner"] = $obm_q->f("calendarevent_owner");
+  while($obm_q->next_record()) {
+    $e["usercreate"] = $obm_q->f("calendarevent_usercreate");
+    $e["owner"] = $obm_q->f("calendarevent_owner");
+    if($obm_q->f("evententity_entity_id")) {
+      $e["attendees"][$obm_q->f("evententity_entity")][] = $obm_q->f("evententity_entity_id");
+    }
+  }
 
   return $e;
 }
@@ -2758,7 +2772,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
 //   - $end             : timestamp of end date
 //   - $calendar_entity : array of entities elements to display
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$category_filter) {
+function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$category_filter = "") {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
