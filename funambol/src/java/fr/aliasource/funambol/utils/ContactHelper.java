@@ -172,5 +172,24 @@ public class ContactHelper extends Helper {
 	public static String getCountry(Address addr) {
 		return nullToEmptyString(addr.getCountry().getPropertyValueAsString());
 	}
+
+	public static String getLastName(
+			com.funambol.common.pim.contact.Contact foundation) {
+		String result = nullToEmptyString(foundation.getName().getLastName()
+				.getPropertyValueAsString());
+		if (result.equalsIgnoreCase("")) {
+			result = "-";
+		}
+		return result;
+	}
+
+	public static String constructDisplayName(String firstName, String lastName) {
+		
+		if (firstName != null && !firstName.equals("")) {
+			return lastName;
+		} else {
+			return firstName + "," + lastName;
+		}
+	}
 }
 	

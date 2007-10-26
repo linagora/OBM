@@ -300,7 +300,9 @@ public class ContactManager extends ObmManager {
     	
     	contact.getName().getFirstName().setPropertyValue(obmcontact.getFirstName());
     	contact.getName().getLastName().setPropertyValue(obmcontact.getLastName());
-    	contact.getName().getDisplayName().setPropertyValue(obmcontact.getFirstName()+","+obmcontact.getLastName());
+    	contact.getName().getDisplayName().setPropertyValue(
+				ContactHelper.constructDisplayName(obmcontact.getFirstName(),
+						obmcontact.getLastName()));
     	contact.getName().getNickname().setPropertyValue(obmcontact.getAka());
     	
     	BusinessDetail bus = contact.getBusinessDetail();
@@ -372,9 +374,8 @@ public class ContactManager extends ObmManager {
     	contact.setFirstName(
     			ContactHelper.nullToEmptyString(
     					foundation.getName().getFirstName().getPropertyValueAsString()) );
-    	contact.setLastName(
-    			ContactHelper.nullToEmptyString(
-    					foundation.getName().getLastName().getPropertyValueAsString()) );
+    	contact.setLastName(ContactHelper.getLastName(foundation));
+    	
     	if (ContactHelper.nullToEmptyString(
 				foundation.getName().getNickname().getPropertyValueAsString())
 				.equalsIgnoreCase("")) {
