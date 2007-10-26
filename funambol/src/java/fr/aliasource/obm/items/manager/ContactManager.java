@@ -371,9 +371,9 @@ public class ContactManager extends ObmManager {
     	contact.setLastName(
     			ContactHelper.nullToEmptyString(
     					foundation.getName().getLastName().getPropertyValueAsString()) );
-    	if (foundation.getName().getNickname().getPropertyValueAsString() == null
-				|| foundation.getName().getNickname()
-						.getPropertyValueAsString().equalsIgnoreCase("null")) {
+    	if (ContactHelper.nullToEmptyString(
+				foundation.getName().getNickname().getPropertyValueAsString())
+				.equalsIgnoreCase("")) {
 			contact.setAka(null);
 		} else {
 	    	contact.setAka(
