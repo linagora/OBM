@@ -45,7 +45,7 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 	private int restrictions = 1; // default private
 	private String obmAddress = null;
 
-	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
+	//protected FunambolLogger logger = FunambolLoggerFactory.getLogger("funambol");
 	private Log logger = LogFactory.getLog(getClass());
 
 	// ------------------------------------------------------------ Constructors
@@ -135,7 +135,7 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 
 			deviceCharset = device.getCharset();
 		} catch (PersistentStoreException e1) {
-			log.error("obm : error getting device");
+			logger.error("obm : error getting device");
 		}
 
 	}
@@ -189,15 +189,15 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 	}
 
 	public int getRestrictions() {
-		if (log.isTraceEnabled()) {
-			log.trace(" getRestrcitions:" + restrictions);
+		if (logger.isTraceEnabled()) {
+			logger.trace(" getRestrcitions:" + restrictions);
 		}
 		return restrictions;
 	}
 
 	public void setRestrictions(int restrictions) {
-		if (log.isTraceEnabled()) {
-			log.trace(" setRestrcitions:" + restrictions);
+		if (logger.isTraceEnabled()) {
+			logger.trace(" setRestrcitions:" + restrictions);
 		}
 		this.restrictions = restrictions;
 	}

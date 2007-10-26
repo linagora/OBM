@@ -80,11 +80,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 			throw new SyncSourceException(e);
 		}
 
-		if (log.isTraceEnabled()) {
-			log.trace(" created with id : "
+		logger.info(" created with id : "
 					+ created.getCalendarContent().getUid()
 							.getPropertyValueAsString());
-		}
 		return getSyncItemFromFoundation(created, SyncItemState.SYNCHRONIZED);
 	}
 
@@ -228,8 +226,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 	public SyncItem getSyncItemFromId(SyncItemKey syncItemKey)
 			throws SyncSourceException {
 
-		logger
-				.info("getSyncItemFromId(" + principal + ", " + syncItemKey
+		logger.info("getSyncItemFromId(" + principal + ", " + syncItemKey
 						+ ")");
 
 		String key = syncItemKey.getKeyAsString();

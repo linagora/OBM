@@ -8,6 +8,9 @@ import java.util.HashMap;
 
 import javax.xml.rpc.ServiceException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.funambol.common.pim.contact.Address;
 import com.funambol.common.pim.contact.BusinessDetail;
 import com.funambol.framework.logging.FunambolLogger;
@@ -30,6 +33,7 @@ public class ContactManager extends ObmManager {
 	private String book;
 	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
 	
+	private Log logger = LogFactory.getLog(getClass());
 	
 	public ContactManager(String obmAddress) {
 		
