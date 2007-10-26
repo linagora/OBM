@@ -297,7 +297,7 @@ public class ContactManager extends ObmManager {
     	contact.getName().getFirstName().setPropertyValue(obmcontact.getFirstName());
     	contact.getName().getLastName().setPropertyValue(obmcontact.getLastName());
     	contact.getName().getDisplayName().setPropertyValue(obmcontact.getFirstName()+","+obmcontact.getLastName());
-    	
+    	contact.getName().getNickname().setPropertyValue(obmcontact.getAka());
     	
     	BusinessDetail bus = contact.getBusinessDetail();
     	/*bus.addEmail(
@@ -310,7 +310,7 @@ public class ContactManager extends ObmManager {
     	ContactHelper.setFoundationTitle(
     			bus, obmcontact.getTitle(), ContactHelper.WORK_TITLE );
     	bus.getCompany().setPropertyValue(obmcontact.getCompany());
-    	
+    	bus.getDepartment().setPropertyValue(obmcontact.getService());
     	
     	Address addr = bus.getAddress();
     	addr.getCity().setPropertyValue(obmcontact.getTown());
@@ -321,9 +321,12 @@ public class ContactManager extends ObmManager {
     	addr.getPostalCode().setPropertyValue(obmcontact.getZipCode());
     	addr.getPostOfficeAddress().setPropertyValue(obmcontact.getExpressPostal());
     	
-    	
+    	//email 1
     	ContactHelper.setFoundationEmail(
     			contact.getPersonalDetail(), obmcontact.getEmail(), ContactHelper.WORK_EMAIL );
+    	//email 2
+    	ContactHelper.setFoundationEmail(
+    			contact.getPersonalDetail(), obmcontact.getEmail2(), ContactHelper.HOME_EMAIL );
     	
     	if (type.equals(ObmSyncSource.MSG_TYPE_VCARD)) {
     		ContactHelper.setFoundationPhone(
@@ -368,6 +371,9 @@ public class ContactManager extends ObmManager {
     	contact.setLastName(
     			ContactHelper.nullToEmptyString(
     					foundation.getName().getLastName().getPropertyValueAsString()) );
+    	contact.setAka(
+    			ContactHelper.nullToEmptyString(
+    					foundation.getName().getNickname().getPropertyValueAsString()) );
     	
     	
     	BusinessDetail bus = foundation.getBusinessDetail();	
@@ -383,7 +389,9 @@ public class ContactManager extends ObmManager {
     	contact.setCompany(
     			ContactHelper.nullToEmptyString(
     					bus.getCompany().getPropertyValueAsString()) );
-    	
+    	contact.setService(
+    			ContactHelper.nullToEmptyString(
+    					bus.getDepartment().getPropertyValueAsString()) );
     	
     	Address addr = bus.getAddress();
     	contact.setTown(
@@ -409,7 +417,12 @@ public class ContactManager extends ObmManager {
     			ContactHelper.nullToEmptyString(
     					ContactHelper.getEmail(
     							foundation.getPersonalDetail().getEmails(),ContactHelper.WORK_EMAIL)) );
- 
+    	//email 2
+    	contact.setEmail2(
+    			ContactHelper.nullToEmptyString(
+    					ContactHelper.getEmail(
+    							foundation.getPersonalDetail().getEmails(),ContactHelper.HOME_EMAIL)) );
+    	
     	// different in vcard
     	if (type.equals(ObmSyncSource.MSG_TYPE_VCARD)) {
     	   	contact.setHomePhone(

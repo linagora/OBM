@@ -23,6 +23,7 @@ public class ContactHelper extends Helper {
 	public static final String HOME_MOBILE	= "MobileTelephoneNumber";
 	public static final String OTHER_PHONE	= "OtherTelephoneNumber";
 	public static final String COMMENT		= "Body";
+	public static final String HOME_EMAIL 	= "Email2Address";
 	
 	public static void setFoundationPhone(ContactDetail detail, String phone, String type) {
 		
