@@ -10,12 +10,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // statistic Contact Per responsible query execution
-// Parametes:
+// Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_statistic_contact_manager() {
   global $cdg_sql;
-	
-  $multidomain = sql_multidomain("contact");
+
+  $multidomain = sql_multidomain('contact');
 
   $query = "SELECT userobm_id,
       userobm_lastname,
@@ -27,8 +27,8 @@ function run_query_statistic_contact_manager() {
     GROUP BY contact_marketingmanager_id,
       userobm_id, userobm_lastname,userobm_firstname";
 
-  display_debug_msg($query, $cdg_sql, "run_query_statistic_contact_manager()");
-  $obm_q= new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'run_query_statistic_contact_manager()');
+  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q; 
@@ -42,7 +42,7 @@ function run_query_statistic_contact_manager() {
 function run_query_statistic_company_manager() {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain('company');
 
   $query = "SELECT userobm_id,
       userobm_lastname,
@@ -54,7 +54,7 @@ function run_query_statistic_company_manager() {
     GROUP BY company_marketingmanager_id,userobm_id,userobm_firstname,
       userobm_lastname";
 
-  display_debug_msg($query, $cdg_sql, "run_query_statistic_company_manager()");
+  display_debug_msg($query, $cdg_sql, 'run_query_statistic_company_manager()');
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -73,7 +73,7 @@ function run_query_statistic_entity_per_country_per_cat($entity, $category) {
 
   $lang = get_lang();
   $table = ucfirst($entity);
-  $multidomain = sql_multidomain("$entity");
+  $multidomain = sql_multidomain($entity);
 
   $query = "SELECT
       country_iso3166,
@@ -98,7 +98,7 @@ function run_query_statistic_entity_per_country_per_cat($entity, $category) {
       category_label
     ORDER BY country_iso3166, category_id";
   
-  display_debug_msg($query, $cdg_sql, "run_query_statistic_entity_per_country_per_cat()");
+  display_debug_msg($query, $cdg_sql, 'run_query_statistic_entity_per_country_per_cat()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -121,12 +121,12 @@ function get_entity_nb($entity) {
     WHERE 1=1
       $multidomain";
   
-  display_debug_msg($query, $cdg_sql, "get_entity_nb()");
+  display_debug_msg($query, $cdg_sql, 'get_entity_nb()');
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q->f("nb");
+  return $obm_q->f('nb');
 }
 
 
@@ -137,14 +137,14 @@ function get_entity_nb($entity) {
 function run_query_statistic_get_lists() {
   global $cdg_sql;
  
-  $multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain('list');
   $query = "SELECT list_id, list_name
     FROM List 
     WHERE 1=1
       $multidomain
     ORDER BY list_name";
   
-  display_debug_msg($query, $cdg_sql, "run_query_statistic_get_lists()");
+  display_debug_msg($query, $cdg_sql, 'run_query_statistic_get_lists()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -158,13 +158,13 @@ function run_query_statistic_get_lists() {
 function run_query_statistic_get_list($id) {
   global $cdg_sql;
  
-  $multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain('list');
   $query = "SELECT *
     FROM List
     WHERE list_id = '$id'
       $multidomain";
   
-  display_debug_msg($query, $cdg_sql, "run_query_statistic_get_list()");
+  display_debug_msg($query, $cdg_sql, 'run_query_statistic_get_list()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -190,9 +190,9 @@ function run_query_statistic_selected_entity_per_country_per_cat($obm_q, $entity
     $where_entity = "AND ${entity}_id in(";
     while ($obm_q->next_record()) {
       $where_entity .= $coma.$obm_q->f("${entity}_id");
-      $coma = ",";
+      $coma = ',';
     }
-    $where_entity .= ")";
+    $where_entity .= ')';
   }
 
   $query = "SELECT
@@ -219,7 +219,7 @@ function run_query_statistic_selected_entity_per_country_per_cat($obm_q, $entity
       category_label
     ORDER BY country_iso3166, category_id";
   
-  display_debug_msg($query, $cdg_sql, "run_query_statistic_selected_entity_per_country_per_cat()");
+  display_debug_msg($query, $cdg_sql, 'run_query_statistic_selected_entity_per_country_per_cat()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -234,9 +234,9 @@ function run_query_statistic_selected_entity_per_country_per_cat($obm_q, $entity
 function get_statistic_contact_date_total() {
   global $obmdb_dbtype, $db_type_mysql, $db_type_pgsql, $cdg_sql;
 
-  $legend = array("Total");
+  $legend = array('Total');
 
-  $multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain('contact');
 
   // XXXXXX test a changer. requete doit etre ecrite 1 seule fois !
   if ($obmdb_dbtype == $db_type_mysql) {
@@ -258,7 +258,7 @@ function get_statistic_contact_date_total() {
         $multidomain 
       GROUP BY extract (year from contact_date), extract(month from contact_date)";
   }
-  display_debug_msg($query, $cdg_sql, "get_statistic_contact_date_total()");
+  display_debug_msg($query, $cdg_sql, 'get_statistic_contact_date_total()');
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -266,39 +266,39 @@ function get_statistic_contact_date_total() {
   $month=0;$year=0; 
   while ($obm_q->next_record()) {
     // Months without data
-    if (($obm_q->f("month") != (($month % 12) + 1))) {
-      while ($obm_q->f("month") != (($month % 12) + 1)) {
+    if (($obm_q->f('month') != (($month % 12) + 1))) {
+      while ($obm_q->f('month') != (($month % 12) + 1)) {
         $month = ($month % 12) + 1;
 
 	if ($year == 0) {
-           $year = $obm_q->f("year");
+           $year = $obm_q->f('year');
         } elseif ($month == 1) {
            $year += 1;
         } 
 	if ($month == 1)
           $legend[$i] = $year;
         else
-          $legend[$i] = "";
+          $legend[$i] = '';
         $data[$i] = $sum;
         $i++;
       }
     }
 
-    $sum +=  $obm_q->f("nb");
-	if ($obm_q->f("month") == 1)
-          $legend[$i] = $obm_q->f("year");
+    $sum +=  $obm_q->f('nb');
+	if ($obm_q->f('month') == 1)
+          $legend[$i] = $obm_q->f('year');
         else
-          $legend[$i] = "";
+          $legend[$i] = '';
     $data[$i] = $sum;
 
-    $month = $obm_q->f("month");
-    $year = $obm_q->f("year");
+    $month = $obm_q->f('month');
+    $year = $obm_q->f('year');
     $i++;
   }
 
   return array (
-     "data" => $data,
-     "legend" => $legend,
+     'data' => $data,
+     'legend' => $legend,
   );
 }
 

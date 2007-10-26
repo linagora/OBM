@@ -41,7 +41,8 @@ function get_admin_data_company_contact_number($id) {
 
   $query = "SELECT count(contact_id) as nb
     FROM Contact
-    WHERE contact_company_id='$id'";
+    WHERE contact_company_id='$id'
+      AND contact_archive='0'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

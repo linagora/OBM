@@ -39,13 +39,13 @@ function run_query_global_company_contact_number_update($comp_id) {
   $query = "SELECT count(*) as nb
       FROM Contact
       WHERE contact_company_id='$comp_id'
-        AND contact_archive != '1'";
+        AND contact_archive = '0'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, 'run_query_global_company_contact_number_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $obm_q->next_record();
-  $nb = $obm_q->f("nb");
+  $nb = $obm_q->f('nb');
 
   $query = "UPDATE Company
     SET company_contact_number='$nb'
