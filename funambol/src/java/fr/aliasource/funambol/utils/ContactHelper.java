@@ -185,10 +185,14 @@ public class ContactHelper extends Helper {
 
 	public static String constructDisplayName(String firstName, String lastName) {
 		
-		if (firstName != null && !firstName.equals("")) {
+		if (firstName == null) {
 			return lastName;
 		} else {
-			return firstName + "," + lastName;
+			if (firstName.equals("")) {
+				return lastName;
+			} else {
+				return firstName + "," + lastName;
+			}
 		}
 	}
 }
