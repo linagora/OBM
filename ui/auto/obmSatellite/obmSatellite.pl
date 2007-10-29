@@ -203,6 +203,8 @@ sub configure_hook {
 
 sub pre_loop_hook {
     my $self = shift;
+
+    $self->log( 1, $self->log_time." - Demarrage du service ".$self->{server}->{name}." sur le port ".$self->{server}->{port}->[0] );
 }
 
 
@@ -213,7 +215,6 @@ sub post_accept_hook {
 
     $self->logMessage( "Connexion de : ".$self->{server}->{client}->peerhost()." on port ".$self->{server}->{client}->sockport() );
     $self->sendMessage( "HELLO", undef );
-
 }
 
 
@@ -322,9 +323,9 @@ sub logMessage {
     my $peer = $self->{server}->{client}->peerhost();
 
     if( defined($peer) ) {
-        $self->log( 2, $self->log_time ." - ".$peer." - ".$msg );
+        $self->log( 2, $self->log_time." - ".$peer." - ".$msg );
     }else {
-        $self->log( 2, $self->log_time ." - ".$msg );
+        $self->log( 2, $self->log_time." - ".$msg );
     }
 }
 
