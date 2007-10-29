@@ -15,6 +15,7 @@ require OBM::ldap;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 use Getopt::Long;
+use Unicode::MapUTF8 qw(to_utf8);
 
 $ENV{PATH}=$automateOBM;
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
@@ -109,9 +110,12 @@ sub getParameter {
 
                 chop( $$parameters{"old-passwd"} );
             }
-
         }
+
+        # Conversion, si nécessaire, du mot de passe en UTF8 avant de l'utiliser
+        $$parameters{"old-passwd"} = to_utf8( { -string => $$parameters{"old-passwd"}, -charset => $defaultCharSet } );
     }
+
 
     # verification du nouveau mot de passe
     SWITCH: {
@@ -160,6 +164,9 @@ sub getParameter {
             }
         }
     }
+
+    # Conversion, si nécessaire, du mot de passe en UTF8 avant de l'utiliser
+    $$parameters{"passwd"} = to_utf8( { -string => $$parameters{"passwd"}, -charset => $defaultCharSet } );
 
 
     # Quel mot de passe est a traiter - par defaut mot de passe UNIX
