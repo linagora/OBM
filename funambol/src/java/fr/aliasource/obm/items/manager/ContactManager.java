@@ -201,7 +201,7 @@ public class ContactManager extends ObmManager {
 		Contact c = null;
 		
 		try {
-			c = binding.createContact(token,book,foundationContactToObm(contact, type));
+			c = binding.createContactWithoutDuplicate(token,book,foundationContactToObm(contact, type));
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {

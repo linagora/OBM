@@ -21,8 +21,10 @@ public class CalendarHelper extends Helper {
 	private static final String DATE_UTC_PATTERN = "yyyyMMdd'T'HHmmss'Z'";
 	private static final String DATE_FORMAT = "yyyyMMdd";
 	private static final String DATE_FORMAT_T = "yyyy-MM-dd";
+	private static final String DATE_FORMAT_EU = "yyyyMMdd'T'HHmmss";
 
 	private static final SimpleDateFormat dateFormat;
+	private static final SimpleDateFormat dateFormatEurope;
 	private static final SimpleDateFormat dateFormatTiret;
 	private static final SimpleDateFormat dateFormatUTC;
 
@@ -43,6 +45,9 @@ public class CalendarHelper extends Helper {
 
 		dateFormatUTC = new SimpleDateFormat(DATE_UTC_PATTERN);
 		dateFormatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
+		
+		dateFormatEurope = new SimpleDateFormat(DATE_FORMAT_EU);
+		dateFormatEurope.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
 	}
 
 	// ------------ Public Methods -----------
@@ -85,9 +90,10 @@ public class CalendarHelper extends Helper {
 			try {
 				if (sDate.contains("T")) {
 					if (!sDate.endsWith("Z")) {
-						sDate += "Z";
+						date = dateFormatEurope.parse(sDate);
+					} else {
+						date = dateFormatUTC.parse(sDate);
 					}
-					date = dateFormatUTC.parse(sDate);
 				} else {
 					if (sDate.contains("-")) {
 						date = dateFormatTiret.parse(sDate);

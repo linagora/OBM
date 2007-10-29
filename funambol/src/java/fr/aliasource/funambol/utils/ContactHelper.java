@@ -183,15 +183,14 @@ public class ContactHelper extends Helper {
 		return result;
 	}
 
-	public static String constructDisplayName(String firstName, String lastName) {
-		
-		if (firstName == null) {
-			return lastName;
+	public static String constructDisplayName(String firstName, String lastName) {	
+		if (lastName == null || lastName.equals("") || lastName.equals("-")) {
+			return firstName;
 		} else {
-			if (firstName.equals("")) {
+			if (firstName == null || firstName.equals("")) {
 				return lastName;
 			} else {
-				return firstName + "," + lastName;
+				return lastName + "," + firstName;
 			}
 		}
 	}
