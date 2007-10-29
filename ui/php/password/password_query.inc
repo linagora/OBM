@@ -89,7 +89,7 @@ function run_query_password_update($password, $uid, $usr_q) {
 
     // Modification a chaud du mot de passe dans le LDAP
     // XXXX cas user non encore cree (uniquement dans base maj) ?
-    $cmd = "$cmd_ldap_passwd --unix --login $login --domain $domain_id --type $password_encryption --passwd $new_pass --old-passwd $old_pass";
+    $cmd = "$cmd_ldap_passwd --unix --login $login --domain $domain_id --type $password_encryption --passwd '$new_pass' --old-passwd '$old_pass'";
 
     display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
     exec($cmd);
