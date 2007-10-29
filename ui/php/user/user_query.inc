@@ -1251,7 +1251,7 @@ function check_user_data_form($p_id, $user) {
   global $php_regexp_email, $php_regexp_email_name, $php_regexp_quota;
   global $php_regexp_home, $php_regexp_drive, $l_err_home, $l_err_drive;
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
-  global $obm, $cgp_use, $c_imagetype;
+  global $obm, $profiles, $cgp_use, $c_imagetype;
   global $c_max_image_size;
   global $l_err_delegation_target_outside, $l_err_delegation_outside_domain;
   global $l_err_delegation_outside_target, $l_err_delegation_target_profile;
@@ -1261,6 +1261,8 @@ function check_user_data_form($p_id, $user) {
   $login = $user['login'];
   $passwd = $user['passwd'];
   $profile = $user['profile'];
+  $delegation = stripslashes($user['delegation']);
+  $delegation_target = stripslashes($user['delegation_target']);
   $lname = $user['lastname'];
   $fname = $user['firstname'];
   $title = $user['title'];
@@ -1506,7 +1508,7 @@ function check_user_data_form($p_id, $user) {
   }
 
   // Photo
-  if($file != '') {
+  if ($file != '') {
     // Test image mime-type
     $image_type = exif_imagetype($file);
     if(!$image_type || !array_key_exists($image_type, $c_imagetype)) {
