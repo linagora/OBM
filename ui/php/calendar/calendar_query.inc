@@ -18,11 +18,11 @@ function run_query_calendar_detail($calendar_id) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type; 
-  $timeupdate = sql_date_format($db_type, "calendarevent_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($db_type, "calendarevent_timecreate", "timecreate");
-  $calendarevent_date = sql_date_format($db_type,"calendarevent_date","calendarevent_date");
-  $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat", "calendarevent_endrepeat");
-  $multidomain = sql_multidomain("calendarevent");
+  $timeupdate = sql_date_format($db_type, 'calendarevent_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'calendarevent_timecreate', 'timecreate');
+  $calendarevent_date = sql_date_format($db_type,'calendarevent_date','calendarevent_date');
+  $calendarevent_endrepeat = sql_date_format($db_type,'calendarevent_endrepeat', 'calendarevent_endrepeat');
+  $multidomain = sql_multidomain('calendarevent');
   $query = "SELECT DISTINCT
       calendarevent_id,
       c.userobm_login as usercreate,
@@ -56,7 +56,7 @@ function run_query_calendar_detail($calendar_id) {
       LEFT JOIN UserObm AS o ON calendarevent_owner = o.userobm_id
     WHERE calendarevent_id = '$calendar_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_detail()");
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -69,9 +69,9 @@ function run_query_calendar_detail($calendar_id) {
 // Parameters: 
 //   - $users : users id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_get_user_name($users="") {
+function run_query_calendar_get_user_name($users='') {
   global $cdg_sql;
-  $multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain('userobm');
 
   $in = "'".implode ("','", $users)."'";
 
@@ -81,7 +81,7 @@ function run_query_calendar_get_user_name($users="") {
 	    WHERE userobm_id IN ($in) $multidomain";
 
   $query.= " ORDER BY userobm_id"; 
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_get_user_name()");
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_user_name()');
   $obm_q->query($query);
 
   return $obm_q;
@@ -101,7 +101,7 @@ function run_query_calendar_get_resource_label($resources) {
     $where = " resource_id IN ($in)";
     $and = true;
   }
-  $multidomain = sql_multidomain("resource",$and);
+  $multidomain = sql_multidomain('resource',$and);
   $and = false; 
   $obm_q = new DB_OBM;
   $query = "SELECT resource_name, resource_id
@@ -109,7 +109,7 @@ function run_query_calendar_get_resource_label($resources) {
             WHERE $where $multidomain";
 
   $query.= " ORDER BY resource_id";
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_get_resource_label()");
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_resource_label()');
   $obm_q->query($query);
 
   return $obm_q;
@@ -124,17 +124,17 @@ function run_query_calendar_get_resource_label($resources) {
 function run_query_calendar_get_resource_property($r_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("resource");
+  $multidomain = sql_multidomain('resource');
   $obm_q = new DB_OBM;
   $query = "SELECT resourcetype_property 
     FROM ResourceType 
     LEFT JOIN Resource ON resource_rtype_id=resourcetype_id
     WHERE resource_id='$r_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_get_resource_propertyl()");
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_resource_property()');
   $obm_q->query($query);
   $obm_q->next_record();
-  $return = $obm_q->f("resourcetype_property");
+  $return = $obm_q->f('resourcetype_property');
 
   return $return;
 }
@@ -1900,7 +1900,7 @@ function check_calendar_access($id, $right = "write") {
   } else {
     $access = of_right_entity_for_consumer("calendar", "user", $obm["uid"], $right, $e["attendees"]["user"], "userobm");
     if(count($access["ids"]) == 0 ) {
-      $access = of_right_entity_for_consumer("resource", "user", $obm["uid"], $right, $e["attendees"]["resource"]);
+      $access = of_right_entity_for_consumer("Resource", "user", $obm["uid"], $right, $e["attendees"]["resource"]);
     }
   }
   if(count($access["ids"]) == 0) { 
@@ -3792,7 +3792,6 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   global $l_update_state_mail_subject, $l_update_state_mail_body;
   global $cgp_host, $ccalendar_send_ics, $obm;
 
-  
   $mail_datas = array("reset_state" => false, "check_conflict" => false, 
                 "add_attendee" => false, "remove_attendee" => false,
                 "add_exception" => false, "remove_exception" => false,
@@ -3878,9 +3877,11 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
         $mail_datas["add_exception"] = true;
       }
     }
-  } elseif ($action == "insert") {
-    $new_attendees = array_diff($calendar['sel_user_id'], array($obm["uid"]));
-    $mail_datas["add_attendee"] = true;    
+  } elseif ($action == 'insert') {
+    if (is_array($calendar['sel_user_id'])) {
+      $new_attendees = array_diff($calendar['sel_user_id'], array($obm['uid']));
+      $mail_datas['add_attendee'] = true;
+    }
     $title = $calendar["title"];
     $datebegin =  of_datetime_format(strtotime($calendar["date_begin"]));
     $dateend = of_datetime_format(strtotime($calendar["date_end"]));
@@ -3892,13 +3893,13 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $old_dateend = of_datetime_format($event_q->f("calendarevent_date") + $event_q->f("calendarevent_duration"));
     $old_location = $event_q->f("calendarevent_location");
     $old_attendees = get_calendar_event_users_info($calendar["calendar_id"]);
-    $old_attendees = array_diff($old_attendees, array($obm["uid"]));
+    $old_attendees = array_diff($old_attendees, array($obm['uid']));
     $mail_datas["remove_attendee"] = true;    
   } elseif ($action == "quick_delete") {
     if($event_q->f("calendarevent_repeatkind") != "none") {
       $title = $event_q->f("calendarevent_title");
       $new_exceptions[] = $calendar["old_date_begin"];  
-      $attendees = get_calendar_event_users_info($calendar["calendar_id"]);
+      $attendees = get_calendar_event_users_info($calendar['calendar_id']);
       $attendees = array_diff($attendees, array($obm["uid"]));
       $mail_datas["add_exception"] = true;
     } else {

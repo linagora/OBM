@@ -161,11 +161,10 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $reso, $incid
     $id = $logger_q->f("userobm_id");
     $dis_sel_logger.="\n<option value=\"$id\"";
     if ($id == $logger) 
-      $dis_sel_logger.=" selected=\"selected \"";
+      $dis_sel_logger .=" selected=\"selected \"";
     $dis_sel_logger.=">". $logger_q->f("userobm_lastname") . " " . $logger_q->f("userobm_firstname")."</option>";
   }
-  $dis_sel_logger.="</select>";
-
+  $dis_sel_logger .= "</select>";
 
   $sel_status_all = ($status == $c_all ? " selected = \"selected\"" : '');
   $sel_status = "<select name=\"sel_status\">

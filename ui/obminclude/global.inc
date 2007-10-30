@@ -589,12 +589,6 @@ $cinv_status['cancelled'] = 6;
 $cinv_status['loss'] = 7;
 
 // Incident status
-$cincident_status['open'] = 0;
-$cincident_status['call'] = 1;
-$cincident_status['waitforcall'] = 2;
-$cincident_status['paused'] = 3;
-$cincident_status['closed'] = 4;
-
 $cincident_status['new'] = 0;
 $cincident_status['open'] = 1;
 $cincident_status['affected'] = 2;
