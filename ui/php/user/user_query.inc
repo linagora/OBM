@@ -689,7 +689,7 @@ function run_query_user_update($p_id, $user) {
         }else {
           $user_domain = $obm['domain_id'];
         }
-        $cmd = "$cmd_ldap_passwd --login ".$user['login'].' --domain '.$user_domain.' --type '.$password_encryption.' --no-old --passwd '.$passwd;
+        $cmd = $cmd_ldap_passwd." --login ".$user['login']." --domain ".$user_domain." --type ".$password_encryption." --no-old --passwd '".$passwd."'";
         display_debug_msg($cmd, $cdg_exe, 'update_sieve()');
         exec($cmd);
       }
