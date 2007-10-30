@@ -60,3 +60,4 @@ $l_delete_confirm = "Really delete the user?";
 $l_j_check_email = "The email adress is not valid.";
 
 $l_user_display = "Display options for users lists"; 
+
