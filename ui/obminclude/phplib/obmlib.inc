@@ -239,7 +239,7 @@ class CAS_Auth extends Auth {
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri,$lock;
 
     include_once("obmCAS.inc");
-    obmCAS::setDebug('/tmp/dd');
+    obmCAS::setDebug('/tmp/obm-cas.log');
     if (!$lock) {
       obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri,true);
       $lock = true;
@@ -249,6 +249,7 @@ class CAS_Auth extends Auth {
 
   function is_authenticated() {
     global $ticket, $obm;
+    $ticket = $_REQUEST["ticket"];
     if (
       $obm["uid"] 
         && 
@@ -310,7 +311,7 @@ class CAS_Auth extends Auth {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
     } else {
-      header("location:".obmCAS::getServerBaseURL()."?error=1");
+      header("location:".obmCAS::getServerBaseURL());
     }
 
     $obm["profile"] = $perm;

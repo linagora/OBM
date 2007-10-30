@@ -213,5 +213,10 @@ class obmCAS extends phpCAS {
     function isSecure() {
       return true;
     }
+    
+    function getServerBaseURL() {
+      global $PHPCAS_CLIENT;
+      return $PHPCAS_CLIENT->getServerBaseURL();
+    }
 }
 ?>
