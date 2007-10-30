@@ -3223,14 +3223,14 @@ function html_calendar_waiting_events($obm_wait) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_dis_delete($calendar) {
   global $obm, $perm, $ico_validate,$ico_cancel,$ico_confirm_mail;
-  global $display, $l_confirm_delete,$l_confirm,$l_cancel,$l_confirm_mail;
+  global $display, $l_confirm_delete_all,$l_confirm,$l_cancel,$l_confirm_mail;
   global $l_event_cant_delete, $module, $cright_write_admin;
 
   $iso_date = $calendar["date"];
   $event_id = $calendar["calendar_id"];
 
   $block = "
-   <h1>$l_confirm_delete</h1>
+   <h1>$l_confirm_delete_all</h1>
    <div class=\"C\">
     <a href=\"calendar_index.php?action=delete&calendar_id=$event_id&cba_mail=1\"><img src=\"$ico_validate\" alt=\"[ValidateMail]\"/></a>
      $l_confirm_mail
