@@ -279,7 +279,7 @@ function check_domain_data_form($d_id, $domain) {
  **/
 function check_domain_can_delete($p_id) {
   global $err, $ok_msg;
-  global $l_link_user, $l_link_user_no;
+  global $l_link_user, $l_link_user_no, $l_link_host, $l_link_host_no;
 
   $delete_ok = true;
 
@@ -290,6 +290,15 @@ function check_domain_can_delete($p_id) {
     $err['msg'] .= $l_link_user;
   } else {
     $ok_msg .= $l_link_user_no;
+  }
+
+  // Links from Hosts
+  $nb = get_linked_host_domain($p_id);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err['msg'] .= $l_link_host;
+  } else {
+    $ok_msg .= $l_link_host_no;
   }
 
   return $delete_ok;
@@ -336,6 +345,22 @@ function get_linked_user_domain($domain_id) {
   $nb = get_query_count("SELECT count(userobm_id) as nb
     FROM UserObm
     WHERE userobm_domain_id='$domain_id'");
+
+  return $nb;
+}
+
+
+/**
+ * Count number of hosts in a domain
+ *
+ * @param mixed $domain_id : domain_id
+ * @return Number of hosts in a domain
+ **/
+function get_linked_host_domain($domain_id) {
+
+  $nb = get_query_count("SELECT count(host_id) as nb
+    FROM Host
+    WHERE host_domain_id='$domain_id'");
 
   return $nb;
 }

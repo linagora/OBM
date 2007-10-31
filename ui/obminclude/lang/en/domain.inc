@@ -36,6 +36,10 @@ $l_address1 = "$l_address 1";
 $l_address2 = "$l_address 2";
 $l_address3 = "$l_address 3";
 
+$l_link_user = "The domain has users";
+$l_link_user_no = "The domain has no users";
+$l_link_host = "The domain has hosts";
+$l_link_host_no = "The domain has no hosts";
 $l_link_user_mailserver = "Mailserver stores some users in the domain";
 $l_link_user_mailserver_no = "Mailserver has no users in the domain";
 $l_mailserver_added = "Mailserver added";

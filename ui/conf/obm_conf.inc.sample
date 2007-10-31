@@ -200,9 +200,6 @@ $cgp_use["service"]["samba"] = true;
 //$cgp_hide["contact"]["contact_comment3"] = true;
 //$cgp_hide["contact"]["contact_date"] = true;
 
-// Deal module
-//$cgp_hide["deal"]["category1"] = true;
-
 //--------------------//
 // User specific data //
 //--------------------//
