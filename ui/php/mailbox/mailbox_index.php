@@ -101,14 +101,14 @@ function get_mailbox_action() {
   $actions["mailbox"]["rights_admin"] = array (
     'Name'     => $l_header_right,
     'Url'      => "$path/mailbox/mailbox_index.php?action=rights_admin&amp;entity_id=".$params["mailbox_id"],
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('all')
                                      );
 
 // Rights Update
   $actions["mailbox"]["rights_update"] = array (
     'Url'      => "$path/mailbox/mailbox_index.php?action=rights_update&amp;entity_id=".$params["mailbox_id"],
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      );
 }

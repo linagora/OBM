@@ -78,7 +78,7 @@ function exec_tools_update_update($tools) {
     $update_type == 'global';
   }
 
-  // Creation de la commande d'execution de l'automate de mise a jour
+  // Update command creation
   $cmd = $cmd_update." --$update_type --domain $domain_id";
   
   if ($realm == 'user') {
@@ -113,7 +113,6 @@ function check_tools_update_context_ok($params) {
   $update_ok = true;
 
   $domain_id = $params['domain_id'];
-
   $update_type = $params['update_type'];
   $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
 
@@ -185,7 +184,7 @@ function check_tools_update_need_global_update($domain_id=0) {
     foreach ($e as $fname => $fvalue) {
       // keep only column name (remove column number entries)
       if ((int)($fname) !== $fname) {
-	$e1[$id]["$fname"] = $fvalue;
+	$e1[$id][$fname] = $fvalue;
       }
     }
   }
@@ -201,7 +200,7 @@ function check_tools_update_need_global_update($domain_id=0) {
     foreach ($e as $fname => $fvalue) {
       // keep only column name (remove column number entries)
       if ((int)($fname) !== $fname) {
-	$e2[$id]["$fname"] = $fvalue;
+	$e2[$id][$fname] = $fvalue;
       }
     }
   }
@@ -219,9 +218,7 @@ function check_tools_update_need_global_update($domain_id=0) {
     }
   }
 
-
   // Samba table check
-
   if ($domain_id != 0) {
     $where = "WHERE samba_domain_id = '$domain_id'";
   }
@@ -237,7 +234,7 @@ function check_tools_update_need_global_update($domain_id=0) {
     foreach ($e as $fname => $fvalue) {
       // keep only column name (remove column number entries)
       if ((int)($fname) !== $fname) {
-	$e1[$id]["$fname"] = $fvalue;
+	$e1[$id][$fname] = $fvalue;
       }
     }
   }
@@ -253,7 +250,7 @@ function check_tools_update_need_global_update($domain_id=0) {
     foreach ($e as $fname => $fvalue) {
       // keep only column name (remove column number entries)
       if ((int)($fname) !== $fname) {
-	$e2[$id]["$fname"] = $fvalue;
+	$e2[$id][$fname] = $fvalue;
       }
     }
   }
@@ -275,19 +272,18 @@ function check_tools_update_need_global_update($domain_id=0) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Get update types number for an entity
-// Parameters:
-//   - $domain_id : domain id to check
-//   - $table  : table where to check
-//   - $field  : field prefix (if not from table name) to check
-//   - $realm  : realm space to check updates (user | domain | delegation)
-//   - $exclude_fields : fields not to take in account for update check
-// Returns :
-//   fill $e1 (update) and $e2 (production) with table values
-///////////////////////////////////////////////////////////////////////////////
-function get_update_entity_infos(&$e1, &$e2, $domain_id, $table, $field='', $realm, $exclude_fields=array()) {
-  global $cdg_sql, $obm;
+/**
+ * Get production or update infos for an entity
+ * @param $target : 'prod' | 'upd'
+ * @param $domain_id : domain id to check
+ * @param $table  : table where to check
+ * @param $field  : field prefix (if not from table name) to check
+ * @param $realm  : realm space to check updates (user | domain | delegation)
+ * @param $exclude_fields : fields not to take in account for update check
+ * @return array $e filled with update or production values
+ **/
+function get_update_entity_infos($target='both', $domain_id, $table, $field='', $realm, $exclude_fields=array()) {
+  global $cdg_sql, $cdg_exe, $obm;
 
   $uid = $obm['uid'];
 
@@ -338,53 +334,46 @@ function get_update_entity_infos(&$e1, &$e2, $domain_id, $table, $field='', $rea
     }
   }
 
-  //  $da = date('i:s:u');
-  //  echo "<br>$da : $table";
-  // Get infos from Update table
-  $query = "SELECT $select_fields FROM $table $where_upd";
+  // Debug perf info
+  /*  $da = date('i:s:u');
+  $f = exec("ps auxwk-size | grep apache | head -1 | cut -c 25-32", $tmp, $ret);
+  display_debug_msg("<br>$da : mem=$f, realm=$realm, $table", $cdg_exe, 'Perf');
+  echo "<br>$da : mem=$f, realm=$realm, $table";
+  */
+
+  if ($target == 'upd') {
+    // Get infos from Update table
+    $query = "SELECT $select_fields FROM $table $where_upd";
+  } else if ($target == 'prod') {
+    $table_prod = "P_$table";
+    $query = "SELECT $select_fields FROM $table_prod $where_prod";
+  }
+
   display_debug_msg($query, $cdg_sql, "get_update_entity_infos($table)");
   $retour = $obm_q->query($query);
-  //  $da = date('i:s:u');
-  //  echo "<br>$da : $table : after query table_update";
 
   while($obm_q->next_record('BD_ASSOC')) {
     $id = $obm_q->f('id');
-    $e = $obm_q->Record;
-    foreach ($e as $fname => $fvalue) {
+    $er = $obm_q->Record;
+    foreach ($er as $fname => $fvalue) {
+      //    foreach ($obm_q->Record as $fname => $fvalue) {
       // keep only column name (remove column number entries and exclude fields)
       //      if (((int)($fname) !== $fname) && !($exclude_fields[$fname] == 1)) {
       if ( !($exclude_fields[$fname] == 1)) {
-	$e1[$id]["$fname"] = $fvalue;
-      }
-    }
-  }
-  //  $da = date('i:s:u');
-  //  echo "<br>$da : $table : after e1 store";
-
-  // Get infos from Production table
-  $table_prod = "P_$table";
-  $query = "SELECT $select_fields FROM $table_prod $where_prod";
-  display_debug_msg($query, $cdg_sql, 'get_update_entity_info()');
-  $retour = $obm_q->query($query);
-  //  $da = date('i:s:u');
-  //  echo "<br>$da : $table : after query table_prod";
-
-  while($obm_q->next_record('BD_ASSOC')) {
-    $id = $obm_q->f('id');
-    $e = $obm_q->Record;
-    foreach ($e as $fname => $fvalue) {
-      // keep only column name (remove column number entries and exclude fields)
-      //      if (((int)($fname) !== $fname) && !($exclude_fields[$fname] == 1)) {
-      if ( !($exclude_fields[$fname] == 1)) {
-	$e2[$id]["$fname"] = $fvalue;
+	$e[$id][$fname] = $fvalue;
+	//	$e1[$obm_q->f('id')][$fname] = $fvalue;
       }
     }
   }
 
-  //  $da = date('i:s:u');
-  //  echo "<br>$da : $table : after e2 store";
-
-  return true;
+  // Debug perf info
+  /*  $da = date('i:s:u');
+  $f = exec("ps auxwk-size | grep apache | head -1 | cut -c 25-32", $tmp, $ret);
+  display_debug_msg("<br>$da : mem=$f, $table : after $target store", $cdg_exe, 'Perf');
+  echo "<br>$da : mem=$f, $table : after $target store";
+  */
+  $obm_q->free();
+  return $e;
 }
 
 
@@ -474,20 +463,24 @@ function process_update_numbers($e1, $e2, $domain_id, $table, $realm) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get update types number for an entity
 // Parameters:
+//   - $e2     : entity prod infos
 //   - $domain_id : domain id to check
 //   - $table  : entity table
 //   - $field  : field prefix (if not from table name) to check
 //   - $realm  : realm space to check updates (user | domain | delegation)
 //   - $exclude_fields : fields not to take in account for update check
 ///////////////////////////////////////////////////////////////////////////////
-function get_update_entity_numbers($domain_id, $table, $field='', $realm, $exclude_fields) {
+function get_update_entity_numbers($e2='', $domain_id, $table, $field='', $realm, $exclude_fields) {
   global $cdg_sql, $obm;
 
-  $e1 = array();
-  $e2 = array();
-
-  get_update_entity_infos($e1, $e2, $domain_id, $table, $field, $realm, $exclude_fields);
+  $e1 = get_update_entity_infos('upd', $domain_id, $table, $field, $realm, $exclude_fields);
+  if ($e2 == '') {
+    // If not given, get the production infos
+    $e2 = get_update_entity_infos('prod', $domain_id, $table, $field, $realm, $exclude_fields);
+  }
   $nb = process_update_numbers($e1, $e2, $domain_id, $table, $realm);
+
+  unset($e1);
 
   return $nb;
 }
@@ -771,10 +764,12 @@ function store_update_data($params) {
     $field = $db_info[1];
     $exclude_fields = $db_info[2];
     if ($cgp_show['module']["$entity"]) {
-      $nb = get_update_entity_numbers($domain_id, $table, $field, $realm, $exclude_fields);
+      $e1 = get_update_entity_infos('upd', $domain_id, $table, $field, $realm, $exclude_fields);
+      $e2 = get_update_entity_infos('prod', $domain_id, $table, $field, $realm, $exclude_fields);
+      $nb = process_update_numbers($e1, $e2, $domain_id, $table, $realm);
       if ($nb['move'] > 0) {
         $has_update = true;
-	$ret = validate_update_entity($domain_id, $entity, $table, $field, $realm, $exclude_fields);
+	$nb = store_update_entity_infos($e1, $e2, $domain_id, $entity, $table, $realm);
       }
     }
   }
@@ -795,29 +790,6 @@ function store_update_data($params) {
   }
 
   return $has_update;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Validate update for one entity
-// Parameters:
-//   - $domain_id : domain id to validate
-//   - $entity : entity to get numbers
-//   - $table  : table where to check
-//   - $field  : field prefix (if not from table name) to check
-//   - $realm  : realm space to check updates (user | domain | delegation)
-//   - $exclude_fields : fields not to take in account for update check
-///////////////////////////////////////////////////////////////////////////////
-function validate_update_entity($domain_id, $entity, $table, $field="", $realm, $exclude_fields) {
-  global $cdg_sql, $obm;
-
-  $e1 = array();
-  $e2 = array();
-
-  get_update_entity_infos($e1, $e2, $domain_id, $table, $field, $realm, $exclude_fields);
-  $nb = store_update_entity_infos($e1, $e2, $domain_id, $entity, $table, $realm);
-
-  return $nb;
 }
 
 

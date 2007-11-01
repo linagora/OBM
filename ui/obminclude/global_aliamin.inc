@@ -16,12 +16,12 @@
 // Returns:
 //   - $mails : array of used emails
 ///////////////////////////////////////////////////////////////////////////////
-function get_email_used($id="", $gid="", $mid="") {
+function get_email_used($id='', $gid='', $mid='') {
   global $cdg_sql, $php_regexp_email_name, $l_user, $l_group, $l_mailshare;
 
   $mails = array();
 
-  if ($id != "") {
+  if ($id != '') {
     $where_user = "WHERE userobm_id != '$id'";
   }
   // Users
@@ -29,13 +29,13 @@ function get_email_used($id="", $gid="", $mid="") {
     FROM UserObm
     $where_user";
 
-  display_debug_msg($query, $cdg_sql, "get_email_used(1)");
+  display_debug_msg($query, $cdg_sql, 'get_email_used(1)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
-    $email = $obm_q->f("userobm_email");
-    $name = "$l_user : " . $obm_q->f("userobm_lastname") ." ". $obm_q->f("userobm_firstname");
+    $email = $obm_q->f('userobm_email');
+    $name = "$l_user : " . $obm_q->f('userobm_lastname') .' '. $obm_q->f('userobm_firstname');
     $em = strtok($email, "\r\n");
     while ($em) {
       $mails["$em"] = "$name";
@@ -44,38 +44,38 @@ function get_email_used($id="", $gid="", $mid="") {
   }
 
   // Groups
-  if ($gid != "") {
+  if ($gid != '') {
     $where_group = "WHERE group_id != '$gid'";
   }
   $query = "SELECT group_name, group_email
     FROM UGroup
     $where_group";
 
-  display_debug_msg($query, $cdg_sql, "get_email_used(2)");
+  display_debug_msg($query, $cdg_sql, 'get_email_used(2)');
   $g_q = new DB_OBM;
   $g_q->query($query);
 
   while ($g_q->next_record()) {
-    $email = $g_q->f("group_email");
-    $name = "$l_group : " . $g_q->f("group_name");
+    $email = $g_q->f('group_email');
+    $name = "$l_group : " . $g_q->f('group_name');
     $mails["$email"] = "$name";
   }
 
   // Mailshares
-  if ($mid != "") {
+  if ($mid != '') {
     $where_mailshare = "WHERE mailshare_id != '$mid'";
   }
   $query = "SELECT mailshare_name, mailshare_email
     FROM MailShare
     $where_mailshare";
 
-  display_debug_msg($query, $cdg_sql, "get_email_used(3)");
+  display_debug_msg($query, $cdg_sql, 'get_email_used(3)');
   $m_q = new DB_OBM;
   $m_q->query($query);
 
   while ($m_q->next_record()) {
-    $email = $m_q->f("mailshare_email");
-    $name = "$l_mailshare : " . $m_q->f("mailshare_name");
+    $email = $m_q->f('mailshare_email');
+    $name = "$l_mailshare : " . $m_q->f('mailshare_name');
     $mails["$email"] = "$name";
   }
 
@@ -93,11 +93,11 @@ function get_last_host_text($id) {
 
   if ($id > 0) {
     $query = "SELECT host_name FROM Host WHERE host_id='$id'";
-    display_debug_msg($query, $cdg_sql, "get_last_host_text()");
+    display_debug_msg($query, $cdg_sql, 'get_last_host_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $obm_q->next_record();
-    return $obm_q->f("host_name");
+    return $obm_q->f('host_name');
   }
   return;
 }
@@ -120,15 +120,15 @@ function get_hostname_by_id($id) {
 function get_samba_info() {
   global $cdg_sql;
 
-  $query = "select * from Samba";
+  $query = "SELECT * FROM Samba";
 
-  display_debug_msg($query, $cdg_sql, "get_samba_info()");
+  display_debug_msg($query, $cdg_sql, 'get_samba_info()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $cpt = 0;
   while ($obm_q->next_record()) {
-    $name = $obm_q->f("samba_name");
-    $value = $obm_q->f("samba_value");
+    $name = $obm_q->f('samba_name');
+    $value = $obm_q->f('samba_value');
     $smb["$name"] = $value;
   }
 
@@ -154,12 +154,12 @@ function get_first_user_free_uid($first_id=false) {
     FROM Host
     WHERE host_uid >= '$c_first_uid'
     ORDER BY uid";
-  display_debug_msg($query, $cdg_sql, "get_first_user_free_uid()");
+  display_debug_msg($query, $cdg_sql, 'get_first_user_free_uid()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
-    $uids[] = $obm_q->f("uid");
+    $uids[] = $obm_q->f('uid');
   }
 
   $query = "
@@ -167,11 +167,11 @@ function get_first_user_free_uid($first_id=false) {
     FROM UserObm
     WHERE userobm_uid >= '$c_first_uid'
     ORDER BY uid";
-  display_debug_msg($query, $cdg_sql, "get_first_user_free_uid()");
+  display_debug_msg($query, $cdg_sql, 'get_first_user_free_uid()');
   $obm_q->query($query);
   
   while ($obm_q->next_record()) {
-    $uids[] = $obm_q->f("uid");
+    $uids[] = $obm_q->f('uid');
   }
 
   // Avec Samba, les UID et GID doivent être unique car le SID en est déduit
@@ -184,12 +184,12 @@ function get_first_user_free_uid($first_id=false) {
     FROM UGroup
     WHERE group_gid >= '$first_id'
     ORDER BY group_gid";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, 'get_first_user_free_uid()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   while( $obm_q->next_record() ) {
-    $uids[] = $obm_q->f("uid");
+    $uids[] = $obm_q->f('uid');
   }
   
   // On ne tient pas compte des doublons - même si ce cas ne peut pas se
@@ -232,7 +232,7 @@ function get_group_id_from_gid($gid) {
   $obm_q->query($query);
   $obm_q->next_record();
 
-  $id = $obm_q->f("group_id");
+  $id = $obm_q->f('group_id');
 
   return $id;
 }
@@ -257,7 +257,7 @@ function get_first_group_free_gid() {
 // Returns:
 //   - $mails : array of used emails
 ///////////////////////////////////////////////////////////////////////////////
-function get_ip_used($id="") {
+function get_ip_used($id='') {
   global $cdg_sql, $php_regexp_email_name, $l_host;
 
   $ips = array();
@@ -265,13 +265,13 @@ function get_ip_used($id="") {
     FROM Host
     WHERE host_id != '$id'";
 
-  display_debug_msg($query, $cdg_sql, "get_ip_used()");
+  display_debug_msg($query, $cdg_sql, 'get_ip_used()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
-    $ip = $obm_q->f("host_ip");
-    $hname = $obm_q->f("host_name");
+    $ip = $obm_q->f('host_ip');
+    $hname = $obm_q->f('host_name');
     $name = "$l_host : $hname";
     $ips["$ip"] = "$name";
   }
@@ -296,14 +296,14 @@ function get_update_state($domain_id='no') {
     WHERE domainpropertyvalue_domain_id='$domain_id'
      AND domainpropertyvalue_property_key = 'update_state'";
 
-  display_debug_msg($query, $cdg_sql, "get_update_state()");
+  display_debug_msg($query, $cdg_sql, 'get_update_state()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $state = $obm_q->f("value");
+  $state = $obm_q->f('value');
 
-  if ($state == "1") return "1";
-  else return "0";
+  if ($state == '1') return '1';
+  else return '0';
 }
 
 
@@ -324,7 +324,7 @@ function set_update_state($domain_id='no', $state=1) {
     WHERE domainpropertyvalue_domain_id='$domain_id'
       AND domainpropertyvalue_property_key = 'update_state'";
 
-  display_debug_msg($query, $cdg_sql, "set_update_state($state)");
+  display_debug_msg($query, $cdg_sql, 'set_update_state($state)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }

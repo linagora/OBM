@@ -46,6 +46,17 @@ function dis_tools_update_detail() {
   foreach ($domains as $domain_id => $domain) {
     $has_domain_upd = check_tools_update_need_global_update($domain_id);
 
+    // Get all entities prod info (same for all realms)
+    foreach ($entities as $entity=>$db_info) {
+      $table = $db_info[0];
+      $field = $db_info[1];
+      $exclude_fields = $db_info[2];
+      $dis_entity = ${"l_$entity"};
+      if ($cgp_show['module']["$entity"]) {
+	$prod[$entity] = get_update_entity_infos('prod', $domain_id, $table, $field, $realm, $exclude_fields);
+      }
+    }
+
     // Loop through all udpates 'realms' (user, delegation, domain)
     foreach ($admin_realm as $realm) {
       $has_update = false;
@@ -64,7 +75,19 @@ function dis_tools_update_detail() {
 	$exclude_fields = $db_info[2];
 	$dis_entity = ${"l_$entity"};
 	if ($cgp_show['module']["$entity"]) {
-	  $nb = get_update_entity_numbers($domain_id, $table, $field, $realm, $exclude_fields);
+	  // Debug perf info
+	  //  $da = date('i:s:u');
+	  //  $f = exec("ps auxwk-size | grep apache | head -1 | cut -c 25-32", $tmp, $ret);
+	  //	  display_debug_msg("<br>$da : mem=$f, guen", $cdg_exe, 'Perf');
+	  //  echo "<br>$da : mem=$f, guen ".memory_get_usage().' '.memory_get_usage(true);
+
+	  $nb = get_update_entity_numbers($prod[$entity], $domain_id, $table, $field, $realm, $exclude_fields);
+
+	  // Debug perf info
+	  //  $da = date('i:s:u');
+	  //  $f = exec("ps auxwk-size | grep apache | head -1 | cut -c 25-32", $tmp, $ret);
+	  //  display_debug_msg("<br>$da : mem=$f, guen after", $cdg_exe, 'Perf');
+	  //  echo "<br>$da : mem=$f, guen after".memory_get_usage()." ".memory_get_usage(true);
 	  $links = get_update_link_entity($domain_id, $entity, $realm);
 	  $nb_links = count($links);
 	  if (($nb['move'] > 0) || ($nb_links > 0)) {
