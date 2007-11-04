@@ -1205,6 +1205,8 @@ function get_deal_dashboard_panel($date_range, $target_date='deal_dateexpected',
 
   $res['users_id'] = $res_users;
 
+  krsort($res);
+
   return $res;
 }
 

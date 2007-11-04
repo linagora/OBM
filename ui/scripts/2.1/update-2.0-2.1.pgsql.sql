@@ -13,7 +13,7 @@ UPDATE ObmInfo set obminfo_value='2.1' where obminfo_name='db_version';
 
 -------------------------------------------------------------------------------
 -- Add domain property tables
--------------------------------------------------------------------------------
+--------s-----------------------------------------------------------------------
 --
 -- Table structure for table 'DomainProperty'
 --
@@ -136,7 +136,7 @@ ALTER TABLE UserObm ADD COLUMN userobm_password_dateexp date;
 ALTER TABLE UserObm ADD COLUMN userobm_account_dateexp date;
 -- Default value modification
 ALTER TABLE UserObm ALTER COLUMN userobm_web_perms SET DEFAULT 0;
-ALTER TABLE UserObm ALTER COLUMN userobm_mail_perms SET SET DEFAULT 0;
+ALTER TABLE UserObm ALTER COLUMN userobm_mail_perms SET DEFAULT 0;
 ALTER TABLE UserObm ALTER COLUMN userobm_mail_ext_perms SET DEFAULT 0;
 
 -- Production table
@@ -381,8 +381,8 @@ INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentk
 -- UPDATE Payment Structure
 --
 ALTER TABLE Payment ADD COLUMN payment_gap decimal(10,2);
-ALTER TABLE Payment ALTER COLUMN SET DEFAULT '0.0';
-ALTER TABLE Payment ALTER COLUMN SET NOT NULL;
+ALTER TABLE Payment ALTER COLUMN payment_gap SET DEFAULT '0.0';
+ALTER TABLE Payment ALTER COLUMN payment_gap SET NOT NULL;
 
 
 --
