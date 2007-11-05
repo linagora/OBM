@@ -3,15 +3,20 @@ package fr.aliasource.funambol.utils;
 import java.util.ArrayList;
 import java.util.TimeZone;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.funambol.common.pim.calendar.Calendar;
 import com.funambol.common.pim.calendar.CalendarContent;
+import com.funambol.common.pim.common.Property;
 import com.funambol.common.pim.converter.ConverterException;
-import com.funambol.common.pim.converter.VCalendarContentConverter;
 import com.funambol.common.pim.converter.VCalendarConverter;
 import com.funambol.common.pim.model.VCalendar;
 import com.funambol.common.pim.model.VCalendarContent;
 
 public class MyVCalConverter extends VCalendarConverter {
+
+	private Log logger = LogFactory.getLog(getClass());
 
 	public MyVCalConverter(TimeZone timezone, String charset) {
 		super(timezone, charset);
@@ -41,8 +46,8 @@ public class MyVCalConverter extends VCalendarConverter {
 		String version = (xv ? "1.0" : "2.0");
 		vcal.addProperty(new com.funambol.common.pim.model.Property("VERSION",
 				false, new ArrayList(), version));
-		MyCalContentConverter vccf = new MyCalContentConverter(
-				timezone, charset);
+		MyCalContentConverter vccf = new MyCalContentConverter(timezone,
+				charset);
 		VCalendarContent vcc = vccf.cc2vcc(cal.getCalendarContent(), xv);
 		vcal.addComponent(vcc);
 
@@ -92,6 +97,17 @@ public class MyVCalConverter extends VCalendarConverter {
 		cal.setVersion(decodeField(vcal.getProperty("VERSION")));
 		cal.setCalScale(decodeField(vcal.getProperty("CALSCALE")));
 		cal.setMethod(decodeField(vcal.getProperty("METHOD")));
+	}
+
+	@Override
+	protected Property decodeField(com.funambol.common.pim.model.Property arg0) {
+//		logger.info("property: " + arg0);
+//		if (arg0 != null) {
+//			logger.info("prop "+arg0.getName()+" value: '" + arg0.getValue() + "'");
+//		}
+		Property ret = super.decodeField(arg0);
+//		logger.info("ret=" + ret);
+		return ret;
 	}
 
 }

@@ -1,3 +1,39 @@
+2007-11-05  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	force uppercase "encoding" to work correctly with syncje clients
+	
+	* build/build_deploy.sh:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource), (CalendarSyncSource.beginSync),
+	(CalendarSyncSource.addSyncItem),
+	(CalendarSyncSource.getAllSyncItemKeys),
+	(CalendarSyncSource.getDeletedSyncItemKeys),
+	(CalendarSyncSource.getNewSyncItemKeys),
+	(CalendarSyncSource.getSyncItemKeysFromTwin),
+	(CalendarSyncSource.getUpdatedSyncItemKeys),
+	(CalendarSyncSource.removeSyncItem),
+	(CalendarSyncSource.updateSyncItem),
+	(CalendarSyncSource.getSyncItemFromId),
+	(CalendarSyncSource.getICalFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromICal),
+	(CalendarSyncSource.getXMLFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromXML),
+	(CalendarSyncSource.getFoundationFromSyncItem),
+	(CalendarSyncSource.getSyncItemFromFoundation):
+	* src/java/fr/aliasource/funambol/utils/MyCalContentConverter.java:
+	(MyCalContentConverter.), (MyCalContentConverter..decodeField):
+	* src/java/fr/aliasource/funambol/utils/MyVCalConverter.java:
+	(MyVCalConverter), (MyVCalConverter.calendar2vcalendar),
+	(MyVCalConverter.decodeField):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.foundationCalendarToObmEvent):
+	* tests/fr/aliasource/funambol/ICalParsingTest.java:
+	(ICalParsingTest), (ICalParsingTest.testAsVcal):
+	* tests/fr/aliasource/funambol/QuotedPrintableCodecTest.java:
+	(QuotedPrintableCodecTest), (QuotedPrintableCodecTest.setUp),
+	(QuotedPrintableCodecTest.testDecode),
+	(QuotedPrintableCodecTest.tearDown):
+
 2007-10-08  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	use xvcalparser for version 1.0 et icalparser

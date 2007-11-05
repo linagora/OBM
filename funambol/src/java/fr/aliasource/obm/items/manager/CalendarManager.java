@@ -466,6 +466,9 @@ public class CalendarManager extends ObmManager {
 		} else {
 			event.setDuration(3600);
 		}
+		logger.info("summary:"+foundation.getSummary().getPropertyValueAsString());
+		logger.info("summary charset:"+foundation.getSummary().getCharset());
+		logger.info("summary enconding:"+foundation.getSummary().getEncoding());
 		event.setTitle(foundation.getSummary().getPropertyValueAsString());
 
 		if (foundation.getDescription() != null) {

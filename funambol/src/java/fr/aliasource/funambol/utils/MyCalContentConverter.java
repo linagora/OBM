@@ -1899,4 +1899,15 @@ public class MyCalContentConverter extends VCalendarConverter {
 		}
 		return reminder;
 	}
+
+	@Override
+	protected Property decodeField(com.funambol.common.pim.model.Property arg0) {
+//		logger.info("property: " + arg0);
+//		if (arg0 != null) {
+//			logger.info("prop "+arg0.getName()+" value: '" + arg0.getValue() + "'");
+//		}
+		Property ret = super.decodeField(arg0);
+//		logger.info("ret=" + ret);
+		return ret;
+	}
 }
