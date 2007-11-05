@@ -689,8 +689,8 @@ function run_query_user_update($p_id, $user) {
         }else {
           $user_domain = $obm['domain_id'];
         }
-        $cmd = $cmd_ldap_passwd." --login ".$user['login']." --domain ".$user_domain." --type ".$password_encryption." --no-old --passwd '".$passwd."'";
-        display_debug_msg($cmd, $cdg_exe, 'update_sieve()');
+        $cmd = $cmd_ldap_passwd." --login ".$user['login']." --domain ".$user_domain." --type ".$password_encryption." --no-old --passwd '".stripslashes($passwd)."'";
+        display_debug_msg($cmd, $cdg_exe, 'run_query_user_update()');
         exec($cmd);
       }
     }
@@ -1250,6 +1250,7 @@ function check_user_data_form($p_id, $user) {
   global $php_regexp_login;
   global $php_regexp_email, $php_regexp_email_name, $php_regexp_quota;
   global $php_regexp_home, $php_regexp_drive, $l_err_home, $l_err_drive;
+  global $php_regexp_password;
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
   global $obm, $profiles, $cgp_use, $c_imagetype;
   global $c_max_image_size;
@@ -1337,7 +1338,8 @@ function check_user_data_form($p_id, $user) {
   }
 
   // MANDATORY: User password on insert
-  if (($action == 'insert') && (trim($passwd) == '')) {
+  $check_passwd = format_name(stripslashes($passwd), false, true);
+  if( !preg_match($php_regexp_password, $check_passwd) || (($action == 'insert') && (trim($passwd) == '')) ) {
     $err['msg'] = $l_password_error ;
     $err['field'] = 'password';
     return false;

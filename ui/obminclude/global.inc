@@ -638,7 +638,7 @@ $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 $php_regexp_percent = "/^[1]?[0-9]?[0-9]$/"; // 0-100
 $php_regexp_backup = "/^obmdb-[0-9]{8}:[0-9]{6}-[0-9]{1,2}.[0-9]{1,2}(.[0-9]{1,2})?.dump$/";
 
-$php_regexp_password = "/^.{4,12}$/";
+$php_regexp_password = "/^[-\$\\\&~#{([|_`^@);\]+=}%!:\/\.,?>\"\w0-9]{4,12}$/";
 
 $php_regexp_groupname = "/^[A-Za-z0-9][A-Za-z0-9-._]{1,31}$/"; // group name
 $php_regexp_hostname = "/^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$/"; // host

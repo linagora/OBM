@@ -89,7 +89,7 @@ function run_query_password_update($password, $uid, $usr_q) {
 
     // Modification a chaud du mot de passe dans le LDAP
     // XXXX cas user non encore cree (uniquement dans base maj) ?
-    $cmd = "$cmd_ldap_passwd --unix --login $login --domain $domain_id --type $password_encryption --passwd '$new_pass' --old-passwd '$old_pass'";
+    $cmd = $cmd_ldap_passwd." --unix --login ".$login." --domain ".$domain_id." --type ".$password_encryption." --passwd '".stripslashes($new_pass)."' --old-passwd '".stripslashes($old_pass)."'";
 
     display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
     exec($cmd);
@@ -120,7 +120,14 @@ function check_data_form($usr_q, $password) {
   $passtype = $usr_q->f("userobm_password_type");
 
 
-  $old_pass = trim($password["old_password"]);
+  # On supprime les caractères invisibles en début et fin de chaines de l'ancien
+  # mot de passe
+  # On enlève les caractères d'échapement de l'ancien mot de passe
+  $old_pass = stripslashes(trim($password["old_password"]));
+
+  # On supprime les caractères invisibles en début et fin de chaines des nouvaux
+  # mots de passe - les caractères d'échapement sont enlevés au besoin (appel de
+  # l'automate, ...)
   $new_pass = trim($password["new_password"]);
   $new_pass_bis = trim($password["new_password_bis"]);
   if ($action == "update") {
@@ -153,8 +160,9 @@ function check_data_form($usr_q, $password) {
     }
 
     // Password is correct
+    $check_passwd = format_name(stripslashes($new_pass), false, true);
     if ( (trim($new_pass) == "")
-	 || (preg_match($php_regexp_password, $new_pass) == false) ) {
+        || (preg_match($php_regexp_password, $check_passwd) == false) ) {
       $err["msg"] = "$l_password_invalid";
       $err["field"] = "new_password";
       return false;

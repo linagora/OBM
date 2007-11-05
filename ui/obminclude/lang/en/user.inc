@@ -45,7 +45,7 @@ $l_cant_delete = "The user can't be deleted !";
 $l_link_timetask = "The user is referenced on project in time management";
 $l_link_timetask_no = "The user is not referenced on projects in time management";
 $l_login_error = "Invalid login !";
-$l_password_error = "Invalid password !";
+$l_password_error = "The password must be fill and valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?>\") !";
 $l_email_error = "Invalid email";
 $l_lname_error = "Invalid Name !";
 $l_exist_error = "already exists";

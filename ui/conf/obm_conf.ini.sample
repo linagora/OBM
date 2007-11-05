@@ -38,6 +38,9 @@ singleNameSpace = false
 [automate]
 ; Automate specific parameters
 
+; Log level
+logLevel = 2
+
 ; LDAP server address
 ldapServer = localhost
 

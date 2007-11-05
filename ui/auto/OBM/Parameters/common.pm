@@ -15,11 +15,11 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($facility_log $sieveSrv $singleNameSpace $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($logLevel $facility_log $sieveSrv $singleNameSpace $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_files = qw($automateMailChangeAlias $automateMailChangeSieve $automateCyrusAdmin $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixUpdate);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
-@EXPORT_regexp = qw($regexp_email $regexp_rootLdap $regexp_login);
+@EXPORT_regexp = qw($regexp_email $regexp_rootLdap $regexp_login $regexp_passwd);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db);
 @EXPORT = (@EXPORT_const, @EXPORT_db, @EXPORT_files, @EXPORT_command, @EXPORT_regexp, @EXPORT_dir);
 @EXPORT_OK = qw();
@@ -32,9 +32,6 @@ $cfgFile = Config::IniFiles->new( -file => $Bin."/../conf/obm_conf.ini" );
 
 # Initialisation du moteur de random
 # srand( time ^ $$ ^ unpack "%L*", `ps auwx | gzip` );
-
-# definition du niveau de log
-$facility_log = "local1";
 
 # racine relative pour les scripts Perl
 $racineOBM = $Bin."/..";
@@ -59,6 +56,17 @@ if( lc($cfgFile->val( 'global', 'singleNameSpace' )) eq "true" ) {
 }else {
     $singleNameSpace = 0;
 }
+
+# definition du niveau de log
+$logLevel = $cfgFile->val( 'automate', 'logLevel' );
+if( !defined($logLevel) || ($logLevel !~ /^[0-9]+$/) ) {
+    $logLevel = 2;
+}elsif( $logLevel > 4 ) {
+    $logLevel = 4;
+}elsif( $logLevel < 0 ) {
+    $logLevel = 0;
+}
+$facility_log = "local1";
 
 # Le serveur LDAP
 $ldapServer = $cfgFile->val( 'automate', 'ldapServer' );
@@ -151,6 +159,9 @@ $regexp_rootLdap = "^dc=(.+),dc=.+\$";
 #
 # Login regexp
 $regexp_login = "^[A-Za-z0-9][A-Za-z0-9-._]{1,31}\$";
+#
+# Passwd regexp
+$regexp_passwd = "^[-\\\$&\\\\~#\{\(\[\|_`\^@\);\\\]+=\}%!:\\\/\\\.,?>\\\"\\p{Alphabetic}0-9]{4,12}\$";
 
 #
 # Definitions des parametres Samba
