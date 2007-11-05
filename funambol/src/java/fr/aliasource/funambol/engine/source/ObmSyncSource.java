@@ -134,6 +134,7 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 			}
 
 			deviceCharset = device.getCharset();
+			logger.info("device charset : " + deviceCharset);
 		} catch (PersistentStoreException e1) {
 			logger.error("obm : error getting device");
 		}
