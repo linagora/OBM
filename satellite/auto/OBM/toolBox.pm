@@ -27,9 +27,13 @@ $debug=1;
 
 
 sub write_log {
-    local($text, $action) = @_;
+    my($text, $action, $level) = @_;
 
-    if( $action !~ /^[O|W|C|WC]$/ ) {
+    if( !defined($level) || ($level !~ /^[0-9]+$/) ) {
+        $level = 0;
+    }
+
+    if( $action !~ /^(O|W|C|WC)$/ ) {
         return 1;
     }
 
@@ -38,7 +42,7 @@ sub write_log {
         &Sys::Syslog::openlog( $text, "pid", "$facility_log" );
     }
 
-    if( $action =~ /W/ ) {
+    if( ($action =~ /W/) && ($level <= $logLevel) ) {
         &Sys::Syslog::syslog( "notice", $text );
     }
 

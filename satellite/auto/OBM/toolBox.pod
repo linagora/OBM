@@ -23,7 +23,7 @@ Description de l'API mise à disposition par ce module.
 
 =over 4
 
-=item B<write_log( $text, $action )>
+=item B<write_log( $text, $action, $level )>
 
 Sert à écrire et fermer un fichier log.
 ATTENTION : il faut que le fichier de log soit ouvert au préalable !
@@ -35,6 +35,24 @@ du log ;
 
 =item action : "W" -E<gt> écrit $text dans le fichier log, "C" -E<gt> ferme le fichier de log
 "WC" -E<gt> écrit $text puis ferme le fichier et "O" -E<gt> ouvre le log
+
+=item level : niveau de debug associé au message. Si ce niveau est inférieur ou
+égal au 'logLevel' indiqué dans le fichier de configuration, le message est
+journalisé, sinon il est ignoré. Signification des différents niveaux :
+
+=over 4
+
+=item 0 : uniquement informations critiques (nom du script, erreurs provoquant l'arrêt, ...) ;
+
+=item 1 : information sur les scripts en cours d'exécution ;
+
+=item 2 : information avancées - niveau par défaut ;
+
+=item 3 : niveau de debug faible ;
+
+=item 4 : niveau de debug fort.
+
+=back
 
 =back
 
