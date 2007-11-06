@@ -10,7 +10,4 @@
 ^#.*#$
 ^\.#
 .svn
-#Enleve le module ObmSatellite
-#
-#
-^ObmSatellite
+

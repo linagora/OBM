@@ -4,15 +4,13 @@ use ExtUtils::MakeMaker qw(WriteMakefile);
 use ExtUtils::Manifest qw(mkmanifest);
 
 
-#Write MANIFETS.SKIP
-
 mkmanifest();
 
 
 WriteMakefile(
-			NAME      => "OBM",
+			NAME      => "ObmSatellite",
          VERSION => "0.1",
-			PMLIBDIRS => (["OBM"]),
+			PMLIBDIRS => (["ObmSatellite"]),
 );
 
 
