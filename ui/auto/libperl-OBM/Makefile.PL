@@ -4,8 +4,6 @@ use ExtUtils::MakeMaker qw(WriteMakefile);
 use ExtUtils::Manifest qw(mkmanifest);
 
 
-#Write MANIFETS.SKIP
-
 mkmanifest();
 
 

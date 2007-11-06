@@ -16,8 +16,11 @@ export PERL_MM_USE_DEFAULT=1
 
 PACKAGE=$(shell dh_listpackages)
 
-TMPLIBPERL     =$(CURDIR)/debian/libobm-perl
-DIRPM   =$(CURDIR)/auto
+TMPLIBPERLOBM     =$(CURDIR)/debian/libobm-perl
+DIRPMOBM   =$(CURDIR)/auto/libperl-OBM
+
+TMPLIBPERLOBMSAT     =$(CURDIR)/debian/libobmsatellite-perl
+DIRPMOBMSAT   =$(CURDIR)/auto/libperl-ObmSatellite
 #/PERL
 
 
@@ -37,11 +40,17 @@ build-stamp: configure-stamp
 	# the dirs, we prevent this by setting the INSTALLVENDORARCH
 	# and VENDORARCHEXP environment variables.
 
+	#Generation de lib OBM
 	(cd $(CURDIR)/debian; \
-	./buildperl.sh $(TMPLIBPERL) $(DIRPM) makefile-pl)
+	./buildperl.sh $(TMPLIBPERLOBM) $(DIRPMOBM) makefile-pl)
+	(cd $(CURDIR)/debian; \
+	./buildperl.sh $(TMPLIBPERLOBM) $(DIRPMOBM) make)
 	
+	#Generation des lib ObmSatellite
 	(cd $(CURDIR)/debian; \
-	./buildperl.sh $(TMPLIBPERL) $(DIRPM) make)
+	./buildperl.sh $(TMPLIBPERLOBMSAT) $(DIRPMOBMSAT) makefile-pl)
+	(cd $(CURDIR)/debian; \
+	./buildperl.sh $(TMPLIBPERLOBMSAT) $(DIRPMOBMSAT) make)
 
 	touch $@
 #/PERL
@@ -57,8 +66,11 @@ clean:
 	rm -f build-stamp configure-stamp
 	#RM Build perlModule
 	(cd $(CURDIR)/debian; \
-	./buildperl.sh $(TMPLIBPERL) $(DIRPM) make-clean)
-	rm -f MANIFEST Makefile.old
+	./buildperl.sh $(TMPLIBPERLOBM) $(DIRPMOBM) make-clean; \
+	rm -f MANIFEST Makefile.old Makefile)
+	(cd $(CURDIR)/debian; \
+	./buildperl.sh $(TMPLIBPERLOBMSAT) $(DIRPMOBMSAT) make-clean; \
+	rm -f MANIFEST Makefile.old Makefile)
 	#
 	dh_clean
 
@@ -83,8 +95,13 @@ install: build
 
 	# Add commands to install the package into debian/$PACKAGE_NAME here
 #	$(MAKE) install DESTDIR=$(TMP) PREFIX=/usr
+
+   #Generation de lib OBM
 	(cd $(CURDIR)/debian; \
-	./buildperl.sh $(TMPLIBPERL) $(DIRPM) make-install)
+	./buildperl.sh $(TMPLIBPERLOBM) $(DIRPMOBM) make-install)
+   #Generation de lib ObmSatellite
+	(cd $(CURDIR)/debian; \
+	./buildperl.sh $(TMPLIBPERLOBMSAT) $(DIRPMOBMSAT) make-install)
   
  
 	touch $@

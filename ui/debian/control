@@ -39,6 +39,12 @@ Depends: libnet-telnet-perl, libcyrus-imap-perl22, libnet-server-perl, libcrypt-
 Description: module OBM perl
  module OBM perl
 
+Package: libobmsatellite-perl
+Architecture: all
+Depends: libnet-telnet-perl, libnet-server-perl, libnet-ldap-perl, ${perl:Depends}, ${misc:Depends},
+Description: module OBM perl
+ module OBM perl
+
 Package: obm-services
 Architecture: any
 Depends:  ${misc:Depends}
