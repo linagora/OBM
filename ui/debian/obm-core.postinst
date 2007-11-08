@@ -74,6 +74,9 @@ sed -i -e "s#password = \"aliasource\"#password = \"${OBM_PASSWD}\"#" /etc/obm/o
 	sed -i -e "s#ldapServer = localhost#ldapServer = ${OBM_LDAP_SERVER}#" /etc/obm/obm_conf.ini
 
 
+#On reset la variable de configuration pour les upgrade futur
+db_set obm-core/already_configured false
+db_go || true
 ###Gestion du virtualHost Apache
 #db_get obm-core/configapache
 #CHOICE=$RET
@@ -87,3 +90,5 @@ sed -i -e "s#password = \"aliasource\"#password = \"${OBM_PASSWD}\"#" /etc/obm/o
 
 
 #DEBHELPER#
+
+exit 0

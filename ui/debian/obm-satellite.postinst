@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -e
-#set -x
+set -x
 
 . /usr/share/debconf/confmodule
 
@@ -50,5 +50,13 @@ if is_initial_configuration "$@"; then
 	fi	
 	
 fi
+
+
+#On reset la variable de configuration pour les upgrade futur
+db_set obm-satellite/already_configured false
+db_go || true
+
+
 #DEBHELPER#
 
+exit 0

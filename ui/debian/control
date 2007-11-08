@@ -22,8 +22,8 @@ Description: OBM core
 Package: obm-certs
 Architecture: any
 Depends:  openssl, ${misc:Depends}
-Description: OBM Web Interface
-    Web of Open Business Management
+Description: OBM certificat
+    Certicat generation for OBM
 	Instalation of OBM
 
 Package: obm-ui
@@ -41,32 +41,32 @@ Description: module OBM perl
 
 Package: libobmsatellite-perl
 Architecture: all
-Depends: libnet-telnet-perl, libnet-server-perl, libnet-ldap-perl, ${perl:Depends}, ${misc:Depends},
+Depends: libnet-telnet-perl, libnet-server-perl, libnet-ldap-perl, libunicode-maputf8-perl, ${perl:Depends}, ${misc:Depends},
 Description: module OBM perl
- module OBM perl
+ module OBM-Satellite perl
 
 Package: obm-services
 Architecture: any
-Depends:  ${misc:Depends}
+Depends:  libobm-perl, ${misc:Depends}
 Description: OBM Automate
    Instalation of OBM automate
 
 Package: obm-ldap
 Architecture: any
-Depends:  ${misc:Depends}
+Depends:  slapd, ldap-utils, obm-services, ${misc:Depends}
 Description: OBM Ldap
    Configuration of obm-ldap
 
 
 Package: obm-cyrus
 Architecture: any
-Depends:  ${misc:Depends}
+Depends:  obm-ldap, cyrus-common-2.2, cyrus-admin-2.2, cyrus-imapd-2.2, cyrus-pop3d-2.2, cyrus-sasl2-dbg, cyrus-sasl2-doc, cyrus-clients-2.2, sasl2-bin, libsasl2, libsasl2-modules, ${misc:Depends}
 Description: OBM Cyrus / SASL
    Configuration of Cyrus and SASL
 
 
 Package: obm-satellite
 Architecture: any
-Depends:  ${misc:Depends}
+Depends: libobmsatellite-perl, ${misc:Depends}
 Description: OBM Satellite
    Installation and configuration OBM Satellite

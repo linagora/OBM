@@ -32,6 +32,7 @@ Listen 80
 Listen 443
 EOF
 		cp /usr/share/doc/obm-ui/virtualHostObm.conf /etc/apache2/sites-enabled/obm.conf || true
+		sed -i -e "s#FULL_NAME#${FULL_NAME}#" /etc/apache2/sites-enabled/obm.conf
 		echo -n "Desactivation VirtualHost par defaut... "
 		a2dissite default || true
 		echo -n "Avtivation module SSL... "
@@ -49,6 +50,9 @@ EOF
 fi
 
 
+#On reset la variable de configuration pour les upgrade futur
+db_set obm-core/already_configured false
+db_go || true
 
 
 #DEBHELPER#

@@ -1,3 +1,10 @@
+Template: obm-satellite/already_configured
+Type: boolean
+Default: false
+Description: for internal use.
+ .
+ Internal use for preconfigure and configure install via apt.
+
 Template: obm-satellite/postfixinstall
 Type: boolean
 Description: Do you configure obm-satellite for postfix maps ?

@@ -1,3 +1,10 @@
+Template: obm-core/already_configured
+Type: boolean
+Default: false
+Description: for internal use.
+ .
+ Internal use for preconfigure and configure install via apt.
+
 Template: obm-core/mysqlinstall
 Type: boolean
 Description: Database on this server ?

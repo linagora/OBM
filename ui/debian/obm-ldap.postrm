@@ -25,3 +25,5 @@ case "$1" in
 		invoke-rc.d slapd start || true
 	;;	
 esac
+
+exit 0

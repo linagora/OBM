@@ -54,3 +54,5 @@ if is_initial_configuration "$@"; then
 	#Generation du certificat	
 	gencertif
 fi
+
+exit 0

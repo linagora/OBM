@@ -133,6 +133,7 @@ binary-indep: build install
 	dh_testdir
 	dh_testroot
 	dh_install
+	dh_installinit
 	dh_installdebconf	
 	dh_installdocs
 	dh_installexamples
@@ -146,7 +147,6 @@ binary-indep: build install
 	dh_fixperms
 	dh_installdeb
 	dh_perl
-	dh_installinit
 
 	#delete des .svn dans les paquet généré
 	( cd $(CURDIR)/debian;  \

@@ -1,3 +1,10 @@
+Template: obm-ui/already_configured
+Type: boolean
+Default: false
+Description: for internal use.
+ .
+ Internal use for preconfigure and configure install via apt.
+
 Template: obm-ui/virtualhostinstall
 Type: boolean
 Description: Install VirtualHost ?

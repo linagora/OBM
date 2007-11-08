@@ -18,3 +18,4 @@ elif [ "$RET" = "false" ]; then
 	fi
 fi
 #DEBHELPER#
+exit 0

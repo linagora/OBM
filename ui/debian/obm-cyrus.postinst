@@ -58,12 +58,12 @@ fi
 
 #/etc/default/saslauthd
 if [ -e /etc/default/saslauthd ]; then
-	cp /etc/default/saslauthd /etc/saslauthd.orig || true
+	cp /etc/default/saslauthd /etc/default/saslauthd.orig || true
 fi
 if [ -e /usr/share/doc/obm-cyrus/cyrus_saslauthd.sample.gz ]; then
 	    zcat /usr/share/doc/obm-cyrus/cyrus_saslauthd.sample.gz > /etc/default/saslauthd
 	else
-	    cat /usr/share/doc/obm-cyrus/cyrus_saslauthd.sample > /etc/default/saslauthd.conf
+	    cat /usr/share/doc/obm-cyrus/cyrus_saslauthd.sample > /etc/default/saslauthd
 fi
 
 
@@ -71,6 +71,6 @@ echo "done"
 invoke-rc.d saslauthd start || true
 invoke-rc.d cyrus2.2 start || true
 
-
+exit 0
 
 
