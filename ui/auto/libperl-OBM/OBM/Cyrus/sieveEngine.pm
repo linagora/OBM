@@ -191,7 +191,7 @@ sub _doWork {
 
     my $sieveScriptName = $mailBoxName.".sieve";
     $sieveScriptName =~ s/@/-/g;
-    my $localSieveScriptName = $tmpOBM.$sieveScriptName;
+    my $localSieveScriptName = $tmpOBM."/".$sieveScriptName;
 
     &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: mise a jour du script Sieve pour l'utilisateur : '".$mailBoxName."'", "W" );
     my $currentScriptString = "";

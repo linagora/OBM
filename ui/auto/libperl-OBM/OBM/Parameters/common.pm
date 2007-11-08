@@ -136,7 +136,7 @@ $templateOBM = $racineOBM . "template/";
 # Definitions des fichiers temporaires.
 #
 # Le repertoire temporaire
-$tmpOBM = "/tmp/";
+$tmpOBM = "/tmp";
 
 
 #

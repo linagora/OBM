@@ -120,7 +120,7 @@ sub updateSieve {
 
     my $sieveScriptName = $boxLogin.".sieve";
     $sieveScriptName =~ s/@/-/g;
-    my $localSieveScriptName = $tmpOBM.$sieveScriptName;
+    my $localSieveScriptName = $tmpOBM."/".$sieveScriptName;
 
     &OBM::toolBox::write_log( "Mise a jour du script Sieve pour l'utilisateur : '".$boxLogin."'", "W" );
     my $currentScriptString = "";
