@@ -28,7 +28,7 @@ Description: OBM certificat
 
 Package: obm-ui
 Architecture: any
-Depends:  obm-certs, php5, apache2, libapache2-mod-php5, php5-mysql, ${misc:Depends}
+Depends:  obm-core, obm-certs, php5, apache2, libapache2-mod-php5, php5-mysql, ${misc:Depends}
 Description: OBM Web Interface
     Web of Open Business Management
 	Instalation of OBM
@@ -47,7 +47,7 @@ Description: module OBM perl
 
 Package: obm-services
 Architecture: any
-Depends:  sudo, libobm-perl, ${misc:Depends}
+Depends:  obm-core, sudo, libobm-perl, ${misc:Depends}
 Description: OBM Automate
    Instalation of OBM automate
 
@@ -73,7 +73,7 @@ Description: OBM Satellite
 
 Package: obm-postfix
 Architecture: any
-Depends:  postfix, obm-services, ${misc:Depends}
+Depends:  postfix, obm-satellite, ${misc:Depends}
 Description: OBM Postfix
    Configuration of obm-postfix
 

@@ -20,7 +20,11 @@ is_initial_configuration() {
 }
 
 if is_initial_configuration "$@"; then
-	echo "www-data ALL= (cyrus) NOPASSWD: /bin/tar, /bin/rm -rf /var/spool/cyrus/*, /bin/mkdir /var/spool/cyrus/*, /usr/sbin/cyrreconstruct -r -f*" >> /etc/sudoers
+
+echo "# L'utilisateur 'www-data' a certains droits 'root'" >> /etc/sudoers
+echo "www-data ALL= NOPASSWD: /bin/tar, /bin/chown www-data\:www-data backup*" >> /etc/sudoers
+echo "# L'utilisateur 'www-data' a certains droits 'cyrus'" >> /etc/sudoers
+echo "www-data ALL= (cyrus) NOPASSWD: /bin/tar, /bin/rm -rf /var/spool/cyrus/*, /bin/mkdir /var/spool/cyrus/*, /usr/sbin/cyrreconstruct -r -f backup@*" >> /etc/sudoers
 
 fi
 
