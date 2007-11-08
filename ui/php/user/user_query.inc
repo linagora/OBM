@@ -1239,7 +1239,8 @@ function check_user_update_rights($params) {
 //     keys used : name, passwd, email
 ///////////////////////////////////////////////////////////////////////////////
 function check_user_data_form($p_id, $user) {
-  global $l_exist_error,$l_login_error, $l_login_in_use, $l_password_error;
+  global $l_exist_error,$l_login_error, $l_login_in_use;
+  global $l_password_error, $l_password_empty;
   global $l_lname_error, $l_last_admin_error, $l_image_type_error;
   global $l_image_size_error, $l_email_error, $l_mail_server_error;
   global $l_email_exist, $l_uemail_exist;
@@ -1338,9 +1339,15 @@ function check_user_data_form($p_id, $user) {
   }
 
   // MANDATORY: User password on insert
-  $check_passwd = format_name(stripslashes($passwd), false, true);
-  if( !preg_match($php_regexp_password, $check_passwd) || (($action == 'insert') && (trim($passwd) == '')) ) {
-    $err['msg'] = $l_password_error ;
+  if (($action == 'insert') && (trim($passwd) == '')) {
+    $err['msg'] = $l_password_empty;
+    $err['field'] = 'password';
+    return false;
+  }
+
+  // If password is set, it must be valid
+  if ((trim($passwd) != '') && (!preg_match($php_regexp_password, $passwd))) {
+    $err['msg'] = $l_password_error;
     $err['field'] = 'password';
     return false;
   }

@@ -178,22 +178,23 @@ function dis_time_planning_week($obm_q,$time) {;
   global $c_working_days, $c_day_fraction, $c_dst_err, $l_daysofweekshort;
 
   while ($obm_q->next_record())  {
-    $date = $obm_q->f("date");
-    $wday = date("w", $date);
-    $result[$wday] = $obm_q->f("total_length");
+    $date = $obm_q->f('date');
+    $wday = date('w', $date);
+    $result[$wday] = $obm_q->f('total_length');
   }
   
   $nb_worked_days = array_sum($c_working_days);
   $tot_width = 500;
   $col_width = $tot_width / $nb_worked_days;
 
-  $first_day = time_first_day_week($time["date"]);
+  $first_day = time_first_day_week($time['date']);
   $curr_day = $first_day + $c_dst_err;
   $last_day = $first_day + 7*86400;
 
   // we loop through days
   while ($curr_day < $last_day) {
     $wday = date("w", $curr_day);
+    $day = date("d", $curr_day);
     $hum_wday = $l_daysofweekshort[$wday];
 
     if (!(isset($result[$wday]))) {
@@ -202,7 +203,7 @@ function dis_time_planning_week($obm_q,$time) {;
 
     if ($c_working_days[$wday] != 0) {
       $line1 .= "
-        <td>$hum_wday</td>";
+        <td>$hum_wday $day</td>";
       if ($result[$wday] == $c_day_fraction) {
         $line2 .= "
         <td class=\"downlight\">$c_day_fraction/$c_day_fraction</td>";
@@ -380,7 +381,7 @@ function dis_time_planning($time) {
 //   - $time[] : time hash
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_user_planning($obm_q, $time) {
-  global $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
+  global $path, $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
   global $l_daysofweekfirst;
 
   $year = substr($time["date"],0,4);
@@ -435,7 +436,7 @@ function dis_time_user_planning($obm_q, $time) {
   while (list($day,$val) = each($array_res)) {
     $lday = $l_daysofweekfirst[$val["dow"]];
     
-    $line0 .= "<th>$lday</th>\n";
+    $line0 .= "<th><a href=\"$path/time/time_index.php?action=index&amp;date=$year-$month-$day\">$lday</a></th>\n";
     $line1 .= "<td>$day</td>\n";
     
     foreach($planning as $u_id => $user_planning) {
