@@ -1,0 +1,13 @@
+Source: obm-funambol-core
+Section: misc
+Priority: optional
+Maintainer: sylvain Garcia <sylvain.garcia@aliasource.fr>
+Build-Depends-Indep: debhelper (>> 3.0.0)
+Standards-Version: 3.5.9
+
+Package: obm-funambol-core
+Architecture: all
+Depends: dbconfig-common, obm-core
+Recommends: mysql-server
+Description: mysql OBM funambol database
+ this package create mysql database OBM funambol.

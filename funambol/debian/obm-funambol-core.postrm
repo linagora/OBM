@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+if [ -f /usr/share/debconf/confmodule ]; then
+    . /usr/share/debconf/confmodule
+fi
+if [ -f /usr/share/dbconfig-common/dpkg/postrm.mysql ]; then
+	. /usr/share/dbconfig-common/dpkg/postrm.mysql
+	dbc_go obm-core $@
+fi
+
+if [ "$1" = "purge" ]; then
+   rm -f /etc/obm/debian-db-obm-funambol.conf
+   if which ucf >/dev/null 2>&1; then
+      ucf --purge /etc/obm/debian-db-obm-funambol.conf
+   fi
+fi
+
+#DEBHELPER#
+
+exit 0
+

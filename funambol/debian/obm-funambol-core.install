@@ -1,0 +1,2 @@
+debian/misc/debian-db.conf.template usr/share/obm-funambol-core/debian
+
