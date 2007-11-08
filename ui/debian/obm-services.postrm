@@ -1,0 +1,21 @@
+#!/bin/sh
+
+#set -e
+#set -x
+
+case "$1" in
+	remove|failed-upgrade|abort-install|abort-upgrade|disappear)
+	;;
+	
+
+    upgrade)
+    ;;
+
+    purge)
+	sed -i -e  "s#^www-data ALL= (cyrus) NOPASSWD: /bin/tar, /bin/rm -rf /var/spool/cyrus/\*, /bin/mkdir /var/spool/cyrus/\*, /usr/sbin/cyrreconstruct -r -f\*\$##" /etc/sudoers
+	;;	
+
+esac
+
+exit 0
+

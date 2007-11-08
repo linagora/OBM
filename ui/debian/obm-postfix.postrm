@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#set -e
+#set -x
+
+case "$1" in
+	remove|failed-upgrade|abort-install|abort-upgrade|disappear)
+
+		# Supression de la conf POSTFIX
+		invoke-rc.d postfix stop || true
+		mv /etc/postfix/main.cf.orig /etc/postfix/main.cf || true
+	;;
+	
+
+    upgrade)
+    ;;
+
+    purge)
+	;;	
+esac
+
+exit 0
