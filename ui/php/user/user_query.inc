@@ -164,6 +164,7 @@ function run_query_user_search($user) {
   return $obm_q;
 }
 
+
 /**
  * Search users from a single field 
  * 
@@ -173,6 +174,7 @@ function run_query_user_search($user) {
  */
 function run_query_user_ext_search($user) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
+
   $pattern = $user['pattern'];
   $restriction = $user['restriction'];
   $obm_q = new DB_OBM;
@@ -1240,7 +1242,7 @@ function check_user_update_rights($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_user_data_form($p_id, $user) {
   global $l_exist_error,$l_login_error, $l_login_in_use;
-  global $l_password_error, $l_password_empty;
+  global $l_password_error, $l_password_empty, $l_profile_privilege_error;
   global $l_lname_error, $l_last_admin_error, $l_image_type_error;
   global $l_image_size_error, $l_email_error, $l_mail_server_error;
   global $l_email_exist, $l_uemail_exist;
@@ -1296,8 +1298,18 @@ function check_user_data_form($p_id, $user) {
 
   if ($action == 'update') {
     $u = get_user_info($id);
-    // MANDATORY: we do not allow to update last admin'perms
     $usr_profile = $u['perms'];
+
+    // We can't handle a user with a more privileged profile
+    $level = $profiles[$obm['profile']]['level'];
+    if (($profiles[$profile]['level'] < $level)
+	 || ($profiles[$usr_profile]['level'] < $level)) {
+      $err['msg'] = "$l_profile_privilege_error";
+      $err['field'] = 'profile';
+      return false;
+    }
+
+    // MANDATORY: we do not allow to update last admin'perms
     if (($usr_profile == $perms_admin) && ($profile != $perms_admin)) {
       $nb_admin = get_nb_user_admin();
       if ($nb_admin < 2) {

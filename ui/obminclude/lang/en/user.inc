@@ -47,6 +47,7 @@ $l_link_timetask_no = "The user is not referenced on projects in time management
 $l_login_error = "Invalid login !";
 $l_password_empty = "The password must be fill and valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?>\") !";
 $l_password_error = "The password is not valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?>\") !";
+$l_profile_privilege_error = "Insufficients privileges to update this profile level !";
 $l_email_error = "Invalid email";
 $l_lname_error = "Invalid Name !";
 $l_exist_error = "already exists";

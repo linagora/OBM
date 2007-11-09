@@ -77,6 +77,7 @@ $l_login_error = "Le login doit être correctement renseigné ! Il ne doit pas êtr
 $l_login_in_use = "Le login est déjà attribué à un autre utilisateur !";
 $l_password_empty = "Le mot de passe doit être renseigné et valide - de 4 à 12 caractères (alphanumériques ou-\$\&~#{([|_`^@);]+=}%!:/.,?>\") !";
 $l_password_error = "Le mot de passe n'est pas valide : de 4 à 12 caractères (alphanumériques ou-\$\&~#{([|_`^@);]+=}%!:/.,?>\") !";
+$l_profile_privilege_error = "Privilèges insuffisants pour manipuler ce niveau de profil !";
 $l_last_admin_error = "Le profil du dernier administrateur ne peut être modifié !";
 $l_mail_perms_error = "La messagerie interne doit être activée afin de bénéficier de la messagerie externe !";
 $l_mail_server_error = "Vous devez indiquer un serveur de boîte à lettres !";

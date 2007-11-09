@@ -212,7 +212,8 @@ $profiles['user'] = array (
     'user' => 1,
     'my' => 1),
   'module' => array (
-    'default' => $perm_user)
+    'default' => $perm_user),
+  'level' => 3
 );
 
 $profiles['editor'] = array (
@@ -223,7 +224,8 @@ $profiles['editor'] = array (
     'user' => 1,
     'my' => 1),
   'module' => array (
-    'default' => $perm_editor)
+    'default' => $perm_editor),
+  'level' => 2
 );
 
 $profiles['admin'] = array (
@@ -231,8 +233,8 @@ $profiles['admin'] = array (
     'default' => 1),
   'module' => array (
     'default' => $perm_admin,
-    'domain' => 0
-    )
+    'domain' => 0),
+  'level' => 1
 );
 
 

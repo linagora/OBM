@@ -725,7 +725,8 @@ function of_delegation_check_update_rights($params, $current_delegation) {
 	  && (! in_array('domain', $admin_realm))) {
 
 	// Object (User,..) delegation must be in target delegation
-	if (strpos($current_delegation, $obm['delegation']) !== 0) {
+	if (($obm['delegation'] != '')
+	    && (strpos($current_delegation, $obm['delegation']) !== 0)) {
 	  return false;
 	}
 

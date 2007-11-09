@@ -142,7 +142,8 @@ $profiles['editor'] = array (
     'user' => 1,
     'my' => 1),
   'module' => array (
-    'default' => $perm_editor)
+    'default' => $perm_editor),
+  'level' => 2
 );
 $profiles['admin'] = array (
   'section' => array (
@@ -152,7 +153,8 @@ $profiles['admin'] = array (
     'domain' => 0),
   'properties' => array (
     'admin_realm' => array ('user', 'delegation', 'domain')
-    )
+    ),
+  'level' => 1
 );
 
 //------------------//
