@@ -7,10 +7,10 @@ Standards-Version: 3.7.2
 
 Package: obm
 Architecture: any
-Depends: ${misc:Depends}
+Depends: obm-cyrus, obm-postfix, obm-ui, ${misc:Depends}
 Description: OBM
     full installation of Open Business Management
-	Instalation of Bd Mysql
+	Instalation of OBM
 
 Package: obm-core
 Architecture: any
