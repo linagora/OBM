@@ -161,6 +161,54 @@ function run_query_calendar_get_entity_label($entities) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the id, lastname and firstname for the users which gave write rights
+// to the current user
+// Parameters:
+//  - $user_id: current user id
+// Returns:
+//  array of users id, lastname and firstname
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_get_possible_owners($user_id) {
+  global $cdg_sql;
+
+  $ret = array();
+  $multidomain = sql_multidomain('userobm');
+
+  $query = "SELECT
+    userobm_id,
+    userobm_lastname,
+    userobm_firstname
+  FROM UserObm
+  WHERE userobm_id = '$user_id'
+  UNION SELECT
+    userobm_id,
+    userobm_lastname,
+    userobm_firstname
+  FROM EntityRight
+  LEFT JOIN UserObm ON entityright_entity_id = userobm_id
+  WHERE 
+    entityright_entity = 'calendar' AND
+    entityright_write = '1' AND
+    entityright_consumer = 'user' AND
+    entityright_consumer_id = '$user_id'
+    $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_possible_owners()');
+  $u_q = new DB_OBM;
+  $u_q->query($query);
+  while ($u_q->next_record()) {
+    $ret[] = array(
+      'owner' => $u_q->f('userobm_id'),
+      'owner_lastname' => $u_q->f('userobm_lastname'),
+      'owner_firstname' => $u_q->f('userobm_firstname')
+    );
+  }
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Perform the concatenation of users and groups array in a users array with
 // users from the users array an users from group from the group array 
 // Parameters:
@@ -492,6 +540,7 @@ function run_query_calendar_insert_event_data($calendar) {
   global $cdg_sql, $obm;
 
   $now = date('Y-m-d H:i:s');
+  $owner = $calendar['owner'];
   $title = $calendar['title'];
   $category1_id = $calendar['category1'];
   $priority = $calendar['priority'];
@@ -561,7 +610,7 @@ function run_query_calendar_insert_event_data($calendar) {
     '$now',
     '$now',
     '$obm[uid]',
-    '$obm[uid]',
+    '$owner',
     '$title',
     '$datebegin',
     '$description',
@@ -1493,6 +1542,7 @@ function run_query_calendar_update_event_data($calendar) {
 
   $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
+  $owner = $calendar['owner'];
   $category1_id = $calendar['category1'];
   $priority = $calendar['priority'];
   $description = $calendar['description'];
@@ -1538,6 +1588,7 @@ function run_query_calendar_update_event_data($calendar) {
   $query = "UPDATE CalendarEvent SET
     calendarevent_timeupdate = '$now',
     calendarevent_userupdate = '$obm[uid]', 
+    calendarevent_owner = '$owner', 
     calendarevent_title = '$title', 
     calendarevent_date = '$datebegin',     
     calendarevent_description = '$description',

@@ -10,6 +10,7 @@
 $l_calendar = "Calendar";
 $l_attendees = "Attendees";
 $l_users = "Users";
+$l_owner = "Organizer";
 $l_resources = "Resources";
 $l_groups = "Groups";
 $l_title = "Title";

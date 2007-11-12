@@ -1997,7 +1997,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
   global $l_users, $l_resources, $l_title, $l_location, $l_priority,$l_private;
   global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week,$l_desc,$l_high;
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_alerts, $l_alerts_time;
-  global $l_change_state,$l_groups,$l_all_day,$l_every;
+  global $l_change_state,$l_groups,$l_all_day,$l_every,$l_owner;
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend; 
   global $l_wait, $l_task, $l_exception, $l_yes, $l_no, $path;
   global $l_carac,$l_module_calendar, $l_items;
@@ -2014,6 +2014,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     $title = $event_q->f("calendarevent_title");
     $location = $event_q->f("calendarevent_location");
     $cats1 = of_category_get_entitycategories("calendar", "category1", $id, "mono");
+    $owner = $event_q->f("calendarevent_owner");
+    $owner_lastname = $event_q->f("owner_lastname");
+    $owner_firstname = $event_q->f("owner_firstname");
     $priority = $event_q->f("calendarevent_priority"); 
     $properties = $event_q->f("calendarevent_properties");
     $description = $event_q->f("calendarevent_description");
@@ -2238,6 +2241,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     <td>$title</td>
   </tr>  
   <tr>
+    <th>$l_owner :</th>
+    <td>$owner_lastname $owner_firstname</td>
+  </tr> 
+  <tr>
     <th>$l_location :</th>
     <td>$location</td>
   </tr>  
@@ -2301,6 +2308,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
 //   - $entities : entities linked (event) or selected ["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
+  global $obm;
 
   if (($action == "detailupdate") || ($action == "duplicate")) {
     $users = $entities["user"];
@@ -2329,8 +2337,10 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
     }
   }
 
+  $possible_owners = run_query_calendar_get_possible_owners($obm['uid']);
+
   $cats1 = of_category_get_ordered("calendar", "category1");
-  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $resources, $groups,$tasks, $cats1, $alerts);
+  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $resources, $groups,$tasks, $cats1, $alerts);
 
   return $block;
 }
@@ -2420,7 +2430,7 @@ function dis_calendar_quick_form($calendar) {
 //   - $groups       : Array : selected groups [ids] [entity]
 //   - $cats1        : Array : Calendar categories1
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $users, $res, $groups,$tasks, $cats1, $alerts) {
+function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $res, $groups,$tasks, $cats1, $alerts) {
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ccalendar_hour_fraction;
   global $ico_mini_cal, $ico_add,$ico_delete, $ico_project, $l_header_new;
@@ -2428,7 +2438,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   // -- Labels
   global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_desc;
   global $l_items, $l_high,$l_low,$l_medium,$l_datebegin;
-  global $l_dateend,$l_insert,$l_update,$l_repeat;
+  global $l_dateend,$l_insert,$l_update,$l_repeat, $l_owner;
   global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
   global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_task;
@@ -2443,6 +2453,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     $title = htmlspecialchars($event_q->f("calendarevent_title"));
     $location = htmlspecialchars($event_q->f("calendarevent_location"));
     $cat1 = $event_q->f("calendarevent_category1_id");
+    $owner = $event_q->f("calendarevent_owner");
+    $owner_lastname = $event_q->f("owner_lastname");
+    $owner_firstname = $event_q->f("owner_firstname");
     $priority = $event_q->f("calendarevent_priority");
     $properties = $event_q->f("calendarevent_properties");
     $desc = $event_q->f("calendarevent_description");
@@ -2499,6 +2512,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
   if (isset($calendar["title"])) { $title = stripslashes($calendar["title"]); }
   if (isset($calendar["location"])) { $location = stripslashes($calendar["location"]); }
   if (isset($calendar["category1"])) { $cat1 = $calendar["category1"]; }
+  if (isset($calendat["owner"])) {
+    $owner = $calendar["owner"];
+    $owner_lastname = "?";  //FIXME
+    $owner_firstname = "?"; //FIXME
+  }
   if (isset($calendar["priority"])) { $priority = $calendar["priority"]; }
   if (isset($calendar["description"])) { $desc = stripslashes($calendar["description"]); }
   if (isset($calendar["all_day"])) { $all_day = $calendar["all_day"]; }
@@ -2651,6 +2669,21 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
+      
+  $block_owner = "
+    <th>
+    $l_owner :
+    </th>
+    <td>
+    <select name=\"sel_owner\">";  
+  foreach ($possible_owners as $o) {
+    $block_owner .= "
+      <option value=\"$o[owner]\" ".($o['owner']==$owner ? "selected=\"selected\"" : "").">$o[owner_lastname] $o[owner_firstname]</option>";
+  }
+  $block_owner .= "
+    </select>
+    </td>";
+
 
   $block_user = "
     <th>
@@ -2920,6 +2953,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $u
     <th>$l_title</th>
     <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"50\" size=\"25\" value=\"$title\" /></td>
   </tr> 
+  <tr>
+    $block_owner
+  </tr>
   <tr>
     <th>$l_location</th>
     <td><input type=\"text\" id=\"tf_location\" name=\"tf_location\" maxlength=\"60\" size=\"25\" value=\"$location\" /></td>

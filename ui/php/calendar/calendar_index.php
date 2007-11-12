@@ -243,6 +243,7 @@ if ($action == 'index') {
       $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
       $display['detail'] = dis_calendar_event_form($action, $params, '',$cal_entity_id);
     } else {
+print_r($params);
       run_query_calendar_add_event($params, $cal_entity_id, $event_id);
       $params["calendar_id"] = $event_id;
       $mail_data = run_query_prepare_event_mail($params, $action);
@@ -582,6 +583,15 @@ function get_calendar_params() {
       $params['repeat_days'] .= '1';
     } else {
       $params['repeat_days'] .= '0';
+    }
+  }
+
+  if ($params['owner']=='') {
+    $params['owner'] = $obm['uid'];
+  } else {
+    if (strcmp(substr($params['owner'], 0, 10),'data-user-') == 0) {
+      $data = explode('-', $params['owner']);
+      $params['owner'] = $data[2];
     }
   }
 
