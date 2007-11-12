@@ -31,8 +31,8 @@ if is_initial_configuration "$@"; then
 Listen 80
 Listen 443
 EOF
-		cp /usr/share/doc/obm-ui/virtualHostObm.conf /etc/apache2/sites-enabled/obm.conf || true
-		sed -i -e "s#FULL_NAME#${FULL_NAME}#" /etc/apache2/sites-enabled/obm.conf
+		cp /usr/share/doc/obm-ui/virtualHostObm.conf /etc/apache2/sites-available/obm.conf || true
+		sed -i -e "s#FULL_NAME#${FULL_NAME}#" /etc/apache2/sites-available/obm.conf
 		echo -n "Desactivation VirtualHost par defaut... "
 		a2dissite default || true
 		echo -n "Avtivation module SSL... "

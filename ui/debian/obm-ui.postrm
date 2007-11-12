@@ -16,7 +16,7 @@ case "$1" in
 			a2dissite obm.conf || true
 			a2ensite default || true
 			if [ -e "/etc/apache2/sites-available/obm.conf" ] ; then
-			    rm /etc/apache2/sites-available/icasso.conf
+			    rm /etc/apache2/sites-available/obm.conf
 			fi
 			if [ -e "/etc/apache2/ports.conf.orig" ] ; then
 			    cat /etc/apache2/ports.conf.orig > /etc/apache2/ports.conf

@@ -35,6 +35,9 @@ if is_initial_configuration "$@"; then
 	/usr/sbin/postconf -e mynetworks="127.0.0.0/8"
 	/usr/sbin/postconf -e myhostname="${FULL_NAME}"
 
+	#generation des alias
+	newaliases
+
 	invoke-rc.d postfix restart || true
 
 fi
