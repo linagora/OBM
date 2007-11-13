@@ -1,4 +1,4 @@
-ldap_servers: ldap://localhost/
+ldap_servers: ldap://_LDAP_SERVER_/
 ldap_version: 3
 ldap_search_base: dc=local
 ldap_verbose: off

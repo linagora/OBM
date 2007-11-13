@@ -43,8 +43,9 @@ EOF
 		a2enmod rewrite || true
 		echo -n "Avtivation site obm.conf... "
 		a2ensite obm.conf || true
-		echo -n "Reload Apache2... "
-		invoke-rc.d apache2 force-reload || true
+		echo -n "Stop/Start Apache2... "
+		invoke-rc.d apache2 stop || true
+		invoke-rc.d apache2 start || true
 	fi
 
 fi
