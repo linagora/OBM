@@ -7,7 +7,7 @@ Standards-Version: 3.7.2
 
 Package: obm
 Architecture: any
-Depends: obm-ldap, obm-cyrus, obm-postfix, obm-ui, ${misc:Depends}
+Depends: obm-ldap, obm-cyrus, obm-postfix, obm-ui, obm-services ${misc:Depends}
 Description: OBM
     full installation of Open Business Management
 	Instalation of OBM
