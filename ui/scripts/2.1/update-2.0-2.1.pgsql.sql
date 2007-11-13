@@ -188,6 +188,9 @@ ALTER TABLE UserObm ADD COLUMN userobm_delegation varchar(64);
 ALTER TABLE UserObm ALTER COLUMN userobm_delegation SET DEFAULT '';
 ALTER TABLE P_UserObm ADD COLUMN userobm_delegation varchar(64);
 ALTER TABLE P_UserObm ALTER COLUMN userobm_delegation SET DEFAULT '';
+DROP INDEX k_login_user_UserObm_index;
+CREATE INDEX k_login_user_UserObm_index ON UserObm (userobm_login);
+
 
 -- UGroup
 ALTER TABLE UGroup ADD COLUMN group_delegation varchar(64);

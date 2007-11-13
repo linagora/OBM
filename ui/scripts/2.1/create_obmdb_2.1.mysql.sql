@@ -147,7 +147,7 @@ CREATE TABLE UserObm (
   userobm_education           varchar(255),
   userobm_photo_id            int(8),
   PRIMARY KEY (userobm_id),
-  UNIQUE KEY k_login_user (userobm_login),
+  INDEX k_login_user (userobm_login),
   INDEX k_uid_user (userobm_uid)
 );
 

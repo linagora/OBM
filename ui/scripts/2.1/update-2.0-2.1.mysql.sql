@@ -179,6 +179,10 @@ ALTER TABLE UserObm ADD COLUMN userobm_delegation_target varchar(64) DEFAULT '' 
 ALTER TABLE P_UserObm ADD COLUMN userobm_delegation_target varchar(64) DEFAULT '' AFTER userobm_perms;
 ALTER TABLE UserObm ADD COLUMN userobm_delegation varchar(64) DEFAULT '' AFTER userobm_delegation_target;
 ALTER TABLE P_UserObm ADD COLUMN userobm_delegation varchar(64) DEFAULT '' AFTER userobm_delegation_target;
+ALTER TABLE UserObm DROP KEY k_login_user;
+ALTER TABLE P_UserObm DROP KEY k_login_user;
+ALTER TABLE UserObm ADD INDEX k_login_user (userobm_login);
+ALTER TABLE P_UserObm ADD INDEX k_login_user (userobm_login);
 
 -- UGroup
 ALTER TABLE UGroup ADD COLUMN group_delegation varchar(64) DEFAULT '' AFTER group_mailing;

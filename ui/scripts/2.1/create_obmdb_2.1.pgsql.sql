@@ -148,7 +148,7 @@ CREATE TABLE UserObm (
   userobm_photo_id            integer,
   PRIMARY KEY (userobm_id)
 );
-CREATE UNIQUE INDEX k_login_user_UserObm_index ON UserObm (userobm_login);
+CREATE INDEX k_login_user_UserObm_index ON UserObm (userobm_login);
 CREATE UNIQUE INDEX k_uid_user_UserObm_index ON UserObm (userobm_uid);
 
 
