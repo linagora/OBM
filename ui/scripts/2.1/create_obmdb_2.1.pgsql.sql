@@ -1836,8 +1836,8 @@ CREATE TABLE MailServerNetwork (
 CREATE TABLE P_Domain (like Domain);
 CREATE TABLE P_UserObm (like UserObm);
 CREATE TABLE P_UGroup (like UGroup);
-CREATE TABLE P_UserObmGroup (like UserObmGroup);
-CREATE TABLE P_GroupGroup (like GroupGroup);
+-- CREATE TABLE P_UserObmGroup (like UserObmGroup);
+-- CREATE TABLE P_GroupGroup (like GroupGroup);
 CREATE TABLE P_of_usergroup (like UserObmGroup);
 CREATE TABLE P_Host (like Host);
 CREATE TABLE P_Samba (like Samba);

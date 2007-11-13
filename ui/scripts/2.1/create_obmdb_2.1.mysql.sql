@@ -1462,8 +1462,8 @@ CREATE TABLE GroupGroup (
 --
 CREATE TABLE of_usergroup (
   of_usergroup_group_id    int(8) DEFAULT 0 NOT NULL,
-  of_usergroup_userobm_id  int(8) DEFAULT 0 NOT NULL,
-  PRIMARY KEY (of_usergroup_group_id, of_usergroup_userobm_id)
+  of_usergroup_user_id     int(8) DEFAULT 0 NOT NULL,
+  PRIMARY KEY (of_usergroup_group_id, of_usergroup_user_id)
 );
 
 
@@ -1868,8 +1868,9 @@ CREATE TABLE UserSystem (
 CREATE TABLE P_Domain like Domain;
 CREATE TABLE P_UserObm like UserObm;
 CREATE TABLE P_UGroup like UGroup;
-CREATE TABLE P_UserObmGroup like UserObmGroup;
-CREATE TABLE P_GroupGroup like GroupGroup;
+CREATE TABLE P_of_usergroup like of_usergroup;
+-- CREATE TABLE P_UserObmGroup like UserObmGroup;
+-- CREATE TABLE P_GroupGroup like GroupGroup;
 CREATE TABLE P_Host like Host;
 CREATE TABLE P_Samba like Samba;
 CREATE TABLE P_MailServer like MailServer;

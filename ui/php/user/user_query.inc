@@ -1006,6 +1006,11 @@ function run_query_user_unsubscribe_all_groups($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+  // Update internal usergroup mapping
+  $query = "DELETE
+  FROM of_usergroup
+  WHERE of_usergroup_user_id = '$p_id'";
+
   return $retour;
 }
 
@@ -1013,17 +1018,17 @@ function run_query_user_unsubscribe_all_groups($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Groups query execution
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_group($uid) {
-  global $cdg_sql;
+function run_query_user_public_owner_group($uid) {
+  global $obm, $cdg_sql;
 
   $query = "SELECT *
     FROM UGroup
-    JOIN UserObm ON group_domain_id = userobm_domain_id
-    WHERE 
-    userobm_id = '$uid'
-    ORDER by group_name";
+    JOIN UserObm ON userobm_id = '$uid' AND group_domain_id = userobm_domain_id
+    WHERE
+      (group_privacy=0 OR group_usercreate='$obm[uid]')
+    ORDER by group_privacy, group_name";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_group()');
+  display_debug_msg($query, $cdg_sql, 'run_query_user_public_owner_group()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1038,15 +1043,45 @@ function run_query_user_group($uid) {
 // Return: number of usergroup inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_update_user_group($user) {
-  global $cdg_sql, $perms_admin, $cg_gid_smb_admin, $cg_gid_smb_user;
+  global $obm, $cdg_sql, $perms_admin, $cg_gid_smb_admin, $cg_gid_smb_user;
 
   $u_id = $user['user_id'];
-  $query = "DELETE FROM UserObmGroup WHERE userobmgroup_userobm_id = '$u_id'";
 
+  // $groups tracks the user membership, to optimize internal mapping update
+  $groups = array();
+
+  // Get the displayed group list (public and owner)
+  $g_q = run_query_user_public_owner_group($u_id);
+
+  // Construct the group list for deletion clause (public or owner groups)
+  if ($g_q->num_rows() > 0) {
+    $w_g = 'AND (';
+    $or = '';
+    while ($g_q->next_record()) {
+      $g_id = $g_q->f('group_id');
+      $groups[$g_id] = 0;
+      $w_g .= " $or userobmgroup_group_id='$g_id'";
+      $or = 'OR';
+    }
+    $w_g .= ')';
+  }
+
+  // Get current membership and track it in groups
+  $m_q = run_query_user_user_group($u_id);
+  while ($m_q->next_record()) {
+    $g_id = $m_q->f('group_id');
+    $groups[$g_id] = 1;
+  }
+
+  // Delete the current user membership (from public and owner groups)
+  $query = "DELETE FROM UserObmGroup
+    WHERE userobmgroup_userobm_id = '$u_id'
+      $w_g";
   display_debug_msg($query, $cdg_sql, 'run_query_user_update_user_group()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+  // Renew the selected user membership
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $user['group_nb']) {
@@ -1061,12 +1096,25 @@ function run_query_user_update_user_group($user) {
         $u_id)";
 
     display_debug_msg($query, $cdg_sql, 'run_query_user_update_user_group()');
-    $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
     if (! $retour) {
       return -1;
     }
     $cpt_ins++;
+
+    // If this group membership is new (just set), update internal mapping
+    if ($groups[$g_id] != 1) {
+      of_usergroup_update_group_hierarchy($g_id);
+    }
+    unset ($groups[$g_id]);
+  }
+
+  // Finish the internal usergroup mapping update
+  // for groups membership that are no renewed (=remaining groups = 1)
+  foreach ($groups as $g_id => $value) {
+    if ($value != 0) {
+      of_usergroup_update_group_hierarchy($g_id);
+    }
   }
 
   // Si l'utilisateur est windows on l'inscrit dans un groupe Win par defaut
@@ -1856,10 +1904,10 @@ function run_query_user_insert_photo($user, $user_id) {
 
     // Create document on disk
     if (! run_query_document_create_file($document)) {
-    	$err_msg = $l_create_file_error;
-    	// If error, we delete The document infos to keep bd and rep on sync
-    	run_query_document_delete($doc_id);
-    	return false;
+      $err_msg = $l_create_file_error;
+      // If error, we delete The document infos to keep bd and rep on sync
+      run_query_document_delete($doc_id);
+      return false;
     }
   }   
 

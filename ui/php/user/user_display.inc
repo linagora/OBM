@@ -869,7 +869,7 @@ function html_user_group_consult($usr_q) {
   $fname = $usr_q->f("userobm_firstname");
 
   // Liste des groupes
-  $g_q = run_query_user_group($id);
+  $g_q = run_query_user_public_owner_group($id);
 
   // Liste des groupes de l'utilisateur : on remplit le tableau $groups
   $gu_q = run_query_user_user_group($id);

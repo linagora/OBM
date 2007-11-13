@@ -510,3 +510,20 @@ CREATE TABLE ObmBookmarkProperty (
 );
 
 
+--
+-- Update User-Group handling
+--
+DROP TABLE IF EXISTS of_usergroup;
+DROP TABLE IF EXISTS P_of_usergroup;
+--
+-- Table structure for table 'of_usergroup'
+--
+CREATE TABLE of_usergroup (
+  of_usergroup_group_id    int(8) DEFAULT 0 NOT NULL,
+  of_usergroup_user_id     int(8) DEFAULT 0 NOT NULL,
+  PRIMARY KEY (of_usergroup_group_id, of_usergroup_user_id)
+);
+CREATE TABLE P_of_usergroup like of_usergroup;
+
+DROP TABLE P_UserObmGroup;
+DROP TABLE P_GroupGroup;

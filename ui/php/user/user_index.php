@@ -224,7 +224,7 @@ if ($action == "ext_get_ids") {
   }
   $display["detail"] = dis_user_consult($params);
 
-}  elseif ($action == "display") {
+} elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $prefs = get_display_pref($obm["uid"], "user", 1);
   $display["detail"] = dis_user_display_pref($prefs);

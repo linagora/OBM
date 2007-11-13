@@ -532,3 +532,24 @@ CREATE TABLE ObmBookmarkProperty (
   PRIMARY KEY (obmbookmarkproperty_id)
 );
 CREATE INDEX bkmprop_idx_bkm ON ObmBookmarkProperty (obmbookmarkproperty_bookmark_id);
+
+
+--
+-- Update User-Group handling
+--
+DROP TABLE of_usergroup;
+DROP TABLE P_of_usergroup;
+CREATE TABLE of_usergroup (
+  of_usergroup_group_id    integer DEFAULT 0 NOT NULL,
+  of_usergroup_userobm_id  integer DEFAULT 0 NOT NULL,
+  PRIMARY KEY (of_usergroup_group_id, of_usergroup_userobm_id)
+);
+
+CREATE TABLE P_of_usergroup (
+  of_usergroup_group_id    integer DEFAULT 0 NOT NULL,
+  of_usergroup_userobm_id  integer DEFAULT 0 NOT NULL,
+  PRIMARY KEY (of_usergroup_group_id, of_usergroup_userobm_id)
+);
+
+DROP TABLE P_UserObmGroup;
+DROP TABLE P_GroupGroup;

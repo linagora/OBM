@@ -379,7 +379,7 @@ function run_query_group_delete($p_id) {
 
   // Delete all users registrations to this group
   $query = "DELETE FROM UserObmGroup WHERE userobmgroup_group_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_group_delete(1)");
+  display_debug_msg($query, $cdg_sql, "run_query_group_delete(users links)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -387,7 +387,12 @@ function run_query_group_delete($p_id) {
   $query = "DELETE FROM GroupGroup
     WHERE groupgroup_child_id='$p_id'
       OR groupgroup_parent_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_group_delete(2)");
+  display_debug_msg($query, $cdg_sql, "run_query_group_delete(groups links)");
+  $retour = $obm_q->query($query);
+
+  // Delete Internal users registrations to this group
+  $query = "DELETE FROM of_usergroup WHERE of_usergroup_group_id='$p_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_group_delete(internal links)");
   $retour = $obm_q->query($query);
 
   // Delete the Group
@@ -435,7 +440,7 @@ function run_query_group_delete($p_id) {
 function run_query_group_usergroup_insert($group) {
   global $obm, $cdg_sql;
 
-  $id = $group["group_id"];
+  $id = $group['group_id'];
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $group["user_nb"]) {
@@ -456,11 +461,16 @@ function run_query_group_usergroup_insert($group) {
         userobmgroup_userobm_id)
       VALUES ($id, $u_id)";
 
-      display_debug_msg($query, $cdg_sql, "run_query_group_usergroup_insert(2)");
+      display_debug_msg($query, $cdg_sql, 'run_query_group_usergroup_insert(2)');
       $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
       $cpt_ins++;
     }
+  }
+
+  // Update internal group membership direct mapping
+  if ($cpt_ins > 0) {
+    of_usergroup_update_group_hierarchy($id);
   }
 
   return $cpt_ins;
@@ -492,6 +502,11 @@ function run_query_group_usergroup_delete($group) {
     if ($retour) {
       $cpt_del++;
     }
+  }
+
+  // Update internal group membership direct mapping
+  if ($cpt_del > 0) {
+    of_usergroup_update_group_hierarchy($id);
   }
 
   return $cpt_del;
@@ -546,6 +561,11 @@ function run_query_group_group_insert($group) {
     }
   }
 
+  // Update internal group membership direct mapping
+  if ($cpt_ins > 0) {
+    of_usergroup_update_group_hierarchy($id);
+  }
+
   return $cpt_ins;
 }
 
@@ -576,6 +596,11 @@ function run_query_group_group_delete($group) {
     if ($retour) {
       $cpt_del++;
     }
+  }
+
+  // Update internal group membership direct mapping
+  if ($cpt_del > 0) {
+    of_usergroup_update_group_hierarchy($id);
   }
 
   return $cpt_del;
@@ -695,37 +720,6 @@ function get_group_nb_user($id) {
   $nb = $obm_q->f(0);
 
   return $nb;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return the group infos
-// Parameters:
-//   - $id : group id
-///////////////////////////////////////////////////////////////////////////////
-function get_group_info($id) {
-  global $cdg_sql;
-
-  if ($id == "") {
-    return false;
-  }
-  $multidomain = sql_multidomain("group");
-	
-  $query = "SELECT * FROM UGroup WHERE group_id='$id' $multidomain";
-
-  display_debug_msg($query, $cdg_sql, 'get_group_info()');
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $g['usercreate'] = $obm_q->f('group_usercreate');
-  $g['name'] = $obm_q->f('group_name');
-  $g['system'] = $obm_q->f('group_system');
-  $g['gid'] = $obm_q->f('group_gid');
-  $g['privacy'] = $obm_q->f('group_privacy');
-  $g['samba'] = $obm_q->f('group_samba');
-  $g['delegation'] = $obm_q->f('group_delegation');
-
-  return $g;
 }
 
 

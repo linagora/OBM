@@ -49,7 +49,7 @@ function get_admin_data_company_contact_number($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("nb");
+  $retour = $obm_q->f('nb');
   return $retour;
 }
 
@@ -71,7 +71,7 @@ function get_admin_data_company_active_deal_number($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("nb");
+  $retour = $obm_q->f('nb');
   return $retour;
 }
 
@@ -93,7 +93,7 @@ function get_admin_data_company_total_deal_number($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("nb");
+  $retour = $obm_q->f('nb');
   return $retour;
 }
 
@@ -224,10 +224,10 @@ function get_admin_data_document_list() {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
-  $ctt[0]["type"] = "field";
-  $ctt[0]["value"] = "document_path";
-  $ctt[1]["type"] = "field";
-  $ctt[1]["value"] = "document_name";
+  $ctt[0]['type'] = 'field';
+  $ctt[0]['value'] = 'document_path';
+  $ctt[1]['type'] = 'field';
+  $ctt[1]['value'] = 'document_name';
   $concat = sql_string_concat($db_type, $ctt);
 
   $query = "SELECT document_id,
@@ -254,11 +254,11 @@ function get_admin_data_document_list() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_admin_data_document_disk_relative_path($id) {
 
-  // The document disk path set in the subdirectory named "last id number"
+  // The document disk path set in the subdirectory named 'last id number'
   // Get the last number from Id
   $rel = substr($id, -1, 1);
 
-  $disk_path = "/" . $rel . "/" . $id;
+  $disk_path = '/' . $rel . '/' . $id;
   
   return $disk_path; 
 }
@@ -281,7 +281,7 @@ function get_admin_data_file_list($root, $with_dir=false) {
   $relative_path = substr($root, strlen($cdocument_root));
   while ( ($file = readdir($root_handler)) !== false ) {
     $path = "$root$file";
-    if (($file != "..") && ($file != ".")) {
+    if (($file != '..') && ($file != '.')) {
       $ret[$path] = $file;
     }
   }
@@ -306,6 +306,29 @@ function get_admin_data_file_list($root, $with_dir=false) {
     }
   }
   return $tree;
+}
+
+
+/**
+ * Get the public group list
+**/
+function get_admin_data_group_list() {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $query = "SELECT group_id,
+      group_name
+    FROM UGroup
+    WHERE group_privacy=0";
+
+  display_debug_msg($query, $cdg_sql, 'get_admin_data_group_list()');
+
+  $g_q = new DB_OBM;
+  $g_q->query($query);
+
+  return $g_q;
 }
 
 

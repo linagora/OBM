@@ -18,17 +18,17 @@
 // Returns:
 //   - Field query string
 ///////////////////////////////////////////////////////////////////////////////
-function sql_date_format($db_type, $field, $as="") {
+function sql_date_format($db_type, $field, $as='') {
   global $db_type_mysql, $db_type_pgsql;
 
   if ($db_type == $db_type_mysql) {
     $ret = "UNIX_TIMESTAMP($field)";
-    if ($as != "") {
+    if ($as != '') {
       $ret .= " as $as";
     }
   } elseif ($db_type == $db_type_pgsql) {
     $ret = "EXTRACT (EPOCH from $field)";
-    if ($as != "") {
+    if ($as != '') {
       $ret .= " as $as";
     }
   } else {
@@ -44,17 +44,17 @@ function sql_date_format($db_type, $field, $as="") {
 // Parameters:
 //   - $db_type : DB type
 // Returns:
-//   - sql word "ilike"
+//   - sql word 'ilike'
 ///////////////////////////////////////////////////////////////////////////////
 function sql_casei_like($db_type) {
   global $db_type_mysql, $db_type_pgsql;
 
   if ($db_type == $db_type_mysql) {
-    $ret = "like";
+    $ret = 'like';
   } elseif ($db_type == $db_type_pgsql) {
-    $ret = "ilike";
+    $ret = 'ilike';
   } else {
-    $ret = "like";
+    $ret = 'like';
   }
 
   return $ret;
@@ -86,7 +86,7 @@ function sql_search_text_parse($text) {
 // Parameters:
 //   - $db_type : DB type
 // Returns:
-//   - sql word "ilike"
+//   - sql word 'ilike'
 ///////////////////////////////////////////////////////////////////////////////
 function sql_casei_sort($db_type, $field) {
   global $db_type_mysql, $db_type_pgsql;
@@ -116,36 +116,36 @@ function sql_string_concat($db_type, $ctt) {
   global $cmy_character_set, $cmy_charset_collation;
 
   if ($db_type == $db_type_mysql) {
-    $start = "concat(";
-    $end = ")";
-    $sep = ",";
+    $start = 'concat(';
+    $end = ')';
+    $sep = ',';
     $intro = $cmy_character_set;
     if ($cmy_charset_collation) {
       $collation = " COLLATE $cmy_charset_collation";
     }
   } elseif ($db_type == $db_type_pgsql) {
-    $start = "(";
-    $end = ")";
-    $sep = "||";
+    $start = '(';
+    $end = ')';
+    $sep = '||';
   } else {
-    $start = "(";
-    $end = ")";
-    $sep = "||";
+    $start = '(';
+    $end = ')';
+    $sep = '||';
   }
 
   $ret = $start;
-  if ($ctt[0]["type"] == "field") {
-    $ret .= $ctt[0]["value"];
+  if ($ctt[0]['type'] == 'field') {
+    $ret .= $ctt[0]['value'];
   } else {
-    $ret .= "'" . $ctt[0]["value"] . "'";
+    $ret .= "'" . $ctt[0]['value'] . "'";
   }
   $i = 1;
   while ($ctt[$i]) {
     $ret .= " $sep ";
-    if ($ctt[$i]["type"] == "field") {
-      $ret .= $ctt[$i]["value"];
+    if ($ctt[$i]['type'] == 'field') {
+      $ret .= $ctt[$i]['value'];
     } else {
-      $ret .= "$intro'" . $ctt[$i]["value"] . "'$collation";
+      $ret .= "$intro'" . $ctt[$i]['value'] . "'$collation";
     }
     $i++;
   }
@@ -160,7 +160,7 @@ function sql_string_concat($db_type, $ctt) {
 // Parameters:
 //   - $db_type : DB type
 // Returns:
-//   - sql word "ilike"
+//   - sql word 'ilike'
 ///////////////////////////////////////////////////////////////////////////////
 function sql_if($db_type, $expr, $iftrue, $iffalse) {
   global $db_type_mysql, $db_type_pgsql;
@@ -188,28 +188,28 @@ function sql_if($db_type, $expr, $iftrue, $iffalse) {
 // Returns:
 //   - limit clause
 ///////////////////////////////////////////////////////////////////////////////
-function sql_limit($db_type, $number="", $p_offset="", $name="") {
+function sql_limit($db_type, $number='', $p_offset='', $name='') {
   global $db_type_mysql, $db_type_pgsql, $ctu_sql_limit;
   global $set_rows_default, $params;
 
   // If limit should not be used, return empty clause
-  if (! $ctu_sql_limit) { return ""; }
+  if (! $ctu_sql_limit) { return ''; }
 
-  if ($number != "") {
+  if ($number != '') {
     $num = $number;
-  } else if ($_SESSION['set_rows'] != "") {
+  } else if ($_SESSION['set_rows'] != '') {
     $num = $_SESSION['set_rows'];
   } else {
     $num = $set_rows_default;
   }
 
   // Handle cursor only if rigth dataset
-  if ($p_offset != "") {
+  if ($p_offset != '') {
     $off = $p_offset;
   } else if (($params['page'] > 0) && ($name == $params['of_display_name'])) {
     $off = ($params['page'] - 1) * $num;
   } else {
-    $off = "0";
+    $off = '0';
   }
 
   if (($db_type == $db_type_mysql) || ($db_type == $db_type_pgsql)) {
@@ -229,12 +229,12 @@ function sql_limit($db_type, $number="", $p_offset="", $name="") {
 //   - $p_uid  : user id to check access
 // Returns true if entity is visible, else false
 ///////////////////////////////////////////////////////////////////////////////
-function sql_obm_entity_privacy($entity, $p_uid="") {
+function sql_obm_entity_privacy($entity, $p_uid='') {
   global $obm, $cdg_sql;
 
   // Set uid if not given
-  if ($p_uid == "") {
-    $uid = $obm["uid"];
+  if ($p_uid == '') {
+    $uid = $obm['uid'];
   } else {
     $uid = $p_uid;
   }
@@ -260,16 +260,16 @@ function sql_obm_entity_privacy($entity, $p_uid="") {
 function sql_multidomain($entity, $and=true, $extended=false) {
   global $obm;
 
-  $where = "";
+  $where = '';
 
   // If user is multidomain, no restrictions on domain
-  if ($obm["domain_id"] == 0) {
+  if ($obm['domain_id'] == 0) {
     return $where;
   } else {
-    $domain_id = $obm["domain_id"];
+    $domain_id = $obm['domain_id'];
   }
   if ($and) {
-    $wand = "AND";
+    $wand = 'AND';
   }
   if ($extended) {
     $wext = "OR ${entity}_domain_id=0";
@@ -291,7 +291,7 @@ function get_query_count($query) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "get_query_count()");
+  display_debug_msg($query, $cdg_sql, 'get_query_count()');
   $obm_q->query($query);
   $obm_q->next_record();
   $count = $obm_q->f(0);
@@ -315,18 +315,18 @@ function of_domain_get_list() {
       domain_label,
       domain_name
     FROM Domain";
-  display_debug_msg($query, $cdg_sql, "of_domain_get_list()");
+  display_debug_msg($query, $cdg_sql, 'of_domain_get_list()');
   $obm_q->query($query);
 
   $domain = array();
-  $domain["0"]["id"] = "0";
-  $domain["0"]["label"] = "Global";
-  $domain["0"]["name"] = "";
+  $domain['0']['id'] = '0';
+  $domain['0']['label'] = 'Global';
+  $domain['0']['name'] = '';
   while($obm_q->next_record()) {
-    $id = $obm_q->f("domain_id");
-    $domain[$id]["id"] = $id;
-    $domain[$id]["label"] = $obm_q->f("domain_label");
-    $domain[$id]["name"] = $obm_q->f("domain_name");
+    $id = $obm_q->f('domain_id');
+    $domain[$id]['id'] = $id;
+    $domain[$id]['label'] = $obm_q->f('domain_label');
+    $domain[$id]['name'] = $obm_q->f('domain_name');
   }
 
   return $domain;
@@ -405,20 +405,20 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
       domain_mail_server_id
     FROM Domain
     WHERE domain_id = '$d_id'";
-    display_debug_msg($query, $cdg_sql, "of_domain_get_domain_infos()");
+    display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_infos()');
     $obm_q->query($query);
     $obm_q->next_record();
 
-    $domain["id"] = $obm_q->f("domain_id");
-    $domain["label"] = $obm_q->f("domain_label");
-    $domain["name"] = $obm_q->f("domain_name");
-    $domain["alias"] = $obm_q->f("domain_alias");
-    $domain["mailserver"] = $obm_q->f("domain_mail_server_id");
+    $domain['id'] = $obm_q->f('domain_id');
+    $domain['label'] = $obm_q->f('domain_label');
+    $domain['name'] = $obm_q->f('domain_name');
+    $domain['alias'] = $obm_q->f('domain_alias');
+    $domain['mailserver'] = $obm_q->f('domain_mail_server_id');
 
     if ($get_properties) {
       $query = "SELECT * FROM DomainPropertyValue
         WHERE domainpropertyvalue_domain_id='$d_id'";
-      display_debug_msg($query, $cdg_sql, "of_domain_get_domain_infos()");
+      display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_infos()');
       $obm_q->query($query);
       while ($obm_q->next_record()) {
 	$prop = $obm_q->f('domainpropertyvalue_property_key');
@@ -428,9 +428,9 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
     }
 
   } else {
-    $domain["id"] = "0";
-    $domain["label"] = "Global";
-    $domain["name"] = "global.local";
+    $domain['id'] = '0';
+    $domain['label'] = 'Global';
+    $domain['name'] = 'global.local';
   }
 
   return $domain;
@@ -446,14 +446,14 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
 // Returns:
 //   - entity domain id
 ///////////////////////////////////////////////////////////////////////////////
-function of_domain_get_entity_domain_id($id, $entityu, $ptable="") {
+function of_domain_get_entity_domain_id($id, $entityu, $ptable='') {
   global $cdg_sql;
 
   // domain default value
   $dom_id = 0;
   
   $entity = strtolower($entityu);
-  if ($ptable == "") {
+  if ($ptable == '') {
     $table = $entityu;
   } else {
     $table = $ptable;
@@ -463,10 +463,10 @@ function of_domain_get_entity_domain_id($id, $entityu, $ptable="") {
   $query = "SELECT ${entity}_domain_id as domain_id
     FROM $table
     WHERE ${entity}_id = '$id'";
-  display_debug_msg($query, $cdg_sql, "of_domain_get_entity_domain_id()");
+  display_debug_msg($query, $cdg_sql, 'of_domain_get_entity_domain_id()');
   $obm_q->query($query);
   $obm_q->next_record();
-  $dom_id = $obm_q->f("domain_id");
+  $dom_id = $obm_q->f('domain_id');
 
   return $dom_id;
 }
@@ -477,10 +477,10 @@ function of_domain_get_entity_domain_id($id, $entityu, $ptable="") {
 // Parameters:
 //   - $domains       : Domain array
 //   - $domain_id     : selected domain
-//   - $first_element : scalar or array : (["all"|"none"])
+//   - $first_element : scalar or array : (['all'|'none'])
 //   - $sel_append    : string (eg javascript code) to append at select
 ///////////////////////////////////////////////////////////////////////////////
-function of_domain_dis_select($domain_id="", $first_element="", $sel_append="") {
+function of_domain_dis_select($domain_id='', $first_element='', $sel_append='') {
   $domains = of_domain_get_list();
   $sel_dom = of_domain_html_select($domains, $domain_id, $first_element, $sel_append);
 
@@ -493,10 +493,10 @@ function of_domain_dis_select($domain_id="", $first_element="", $sel_append="") 
 // Parameters:
 //   - $domains       : Domain array
 //   - $domain_id     : selected domain
-//   - $first_element : scalar or array : (["all"|"none"])
+//   - $first_element : scalar or array : (['all'|'none'])
 //   - $sel_append    : string (eg javascript code) to append at select
 ///////////////////////////////////////////////////////////////////////////////
-function of_domain_html_select($domains, $domain_id="", $first_element="", $sel_append="") {
+function of_domain_html_select($domains, $domain_id='', $first_element='', $sel_append='') {
 
   if (is_array($first_element)) {
     foreach($first_element as $element) {
@@ -511,7 +511,7 @@ function of_domain_html_select($domains, $domain_id="", $first_element="", $sel_
 	<option value=\"${$c_element}\">${$l_element}</option>";
       }
     }
-  } else if ($first_element != "") {
+  } else if ($first_element != '') {
     $l_element = "l_${first_element}";
     $c_element = "c_${first_element}"; 
     global $$l_element, $$c_element;
@@ -529,16 +529,16 @@ function of_domain_html_select($domains, $domain_id="", $first_element="", $sel_
       $first_option";
   if (is_array($domains)) {
     foreach ($domains as $one_domain) {
-      $d_id = $one_domain["id"];
-      $d_label = htmlentities($one_domain["label"]);
-      $d_name = htmlentities($one_domain["name"]);
-      $dis_name = ($d_name != "") ? " ($d_name)" : "";
+      $d_id = $one_domain['id'];
+      $d_label = htmlentities($one_domain['label']);
+      $d_name = htmlentities($one_domain['name']);
+      $dis_name = ($d_name != '') ? " ($d_name)" : '';
       $sel_dom .= "\n<option value=\"$d_id\"";
       if ($d_id == $domain_id) { $sel_dom .= " selected=\"selected\""; }
       $sel_dom .= ">$d_label$dis_name</option>";
     }
   }
-  $sel_dom .= "</select>";
+  $sel_dom .= '</select>';
 
   return $sel_dom;
 }
@@ -575,7 +575,7 @@ function of_domain_dis_mailserver_select($role, $sel_id='', $domain_id='') {
       }
     }
   }
-  $sel .= "</select>";
+  $sel .= '</select>';
 
   return $sel;
 }
@@ -592,7 +592,7 @@ function of_domain_dis_mailserver_select($role, $sel_id='', $domain_id='') {
 function of_delegation_dis_search_form($value) {
   global $cgp_use, $l_delegation;
 
-  $block = "";
+  $block = '';
   if ($cgp_use['property']['delegation']) {
     $block = "
     <label>$l_delegation<br />
@@ -614,7 +614,7 @@ function of_delegation_dis_search_form($value) {
 function of_delegation_dis_block_consult($value) {
   global $cgp_use, $l_delegation;
 
-  $block = "";
+  $block = '';
   if ($cgp_use['property']['delegation']) {
     $block = "<tr>
     <th>$l_delegation</th>
@@ -635,7 +635,7 @@ function of_delegation_dis_block_consult($value) {
 function of_delegation_dis_block_update($value, $class) {
   global $obm, $cgp_use, $profiles, $l_delegation;
 
-  $block = "";
+  $block = '';
   if ($cgp_use['property']['delegation']) {
     $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
     $delegation = $value;
@@ -694,7 +694,7 @@ function of_delegation_query_insert_clauses($field, $value) {
 function of_delegation_query_update_clause($field, $value) {
   global $obm, $cgp_use, $profiles;
 
-  $q = "";
+  $q = '';
   if ($cgp_use['property']['delegation']) {
     $q = ", $field='$value'";
   }
@@ -753,7 +753,7 @@ function of_delegation_check_update_rights($params, $current_delegation) {
 //   - $entity : entity to retrieve field from
 //   - $all    : if not 0, get all fields (even those marked not to display)
 // Returns:
-//   - $prefs  : prefs[$fieldname] : ["order"], ["status"], ["notdefault"]
+//   - $prefs  : prefs[$fieldname] : ['order'], ['status'], ['notdefault']
 ///////////////////////////////////////////////////////////////////////////////
 function get_display_pref($u_id, $entity, $all=0) {
   global $cdg_sql;
@@ -768,24 +768,24 @@ function get_display_pref($u_id, $entity, $all=0) {
       AND display_entity='$entity'
     ORDER BY display_user_id, display_fieldorder"; 
 
-  display_debug_msg($query, $cdg_sql, "get_display_pref()");
+  display_debug_msg($query, $cdg_sql, 'get_display_pref()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   // The query is sorted by user_id, hence default values first
   while ($obm_q->next_record()) {
-    $user_id = $obm_q->f("display_user_id");
-    $fieldname = $obm_q->f("display_fieldname");
-    $fieldorder = $obm_q->f("display_fieldorder");
-    $fieldstatus = $obm_q->f("display_display");
+    $user_id = $obm_q->f('display_user_id');
+    $fieldname = $obm_q->f('display_fieldname');
+    $fieldorder = $obm_q->f('display_fieldorder');
+    $fieldstatus = $obm_q->f('display_display');
 
     // For specific user values, get them only if defined
     if ($user_id > 0) {
       if (isset($prefs[$fieldname])) {
 	// Note if user value different from default value
-        if ( ($prefs[$fieldname]["order"] != $fieldorder)
-             || ($prefs[$fieldname]["status"] != $fieldstatus) ) {
-          $prefs[$fieldname]["notdefault"] = true;
+        if ( ($prefs[$fieldname]['order'] != $fieldorder)
+             || ($prefs[$fieldname]['status'] != $fieldstatus) ) {
+          $prefs[$fieldname]['notdefault'] = true;
         }
 	// If get only not hidden fields
         if ($hide) {
@@ -796,14 +796,14 @@ function get_display_pref($u_id, $entity, $all=0) {
             unset($hidden[$fieldname]);
           }
         }
-        $index_sort[$prefs[$fieldname]["order"]] = $fieldorder;
-        $prefs[$fieldname]["order"] = $fieldorder;
-        $prefs[$fieldname]["status"] = $fieldstatus;
+        $index_sort[$prefs[$fieldname]['order']] = $fieldorder;
+        $prefs[$fieldname]['order'] = $fieldorder;
+        $prefs[$fieldname]['status'] = $fieldstatus;
       }
       // Default values (user id = 0)
     } else {
-      $prefs[$fieldname]["order"] = $fieldorder;
-      $prefs[$fieldname]["status"] = $fieldstatus;
+      $prefs[$fieldname]['order'] = $fieldorder;
+      $prefs[$fieldname]['status'] = $fieldstatus;
       $index_sort[$fieldorder] = $fieldorder;
       if (($hide) && ($fieldstatus == 0)) {
         $hidden[$fieldname] = true;
@@ -834,7 +834,7 @@ function get_display_pref($u_id, $entity, $all=0) {
 //   - $entity : entity to retrieve field from
 //   - $field  : field
 // Returns:
-//   - $prefs  : prefs[user_id] : ["order"],["status"], user_id in (0, $u_id)
+//   - $prefs  : prefs[user_id] : ['order'],['status'], user_id in (0, $u_id)
 ///////////////////////////////////////////////////////////////////////////////
 function get_one_display_pref($u_id, $entity, $fieldname) {
   global $cdg_sql;
@@ -846,18 +846,18 @@ function get_one_display_pref($u_id, $entity, $fieldname) {
       AND display_fieldname='$fieldname'
     ORDER BY display_user_id"; 
 
-  display_debug_msg($query, $cdg_sql, "get_one_display_pref()");
+  display_debug_msg($query, $cdg_sql, 'get_one_display_pref()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   // The query is sorted by user_id, hence default values first
   while ($obm_q->next_record()) {
-    $user_id = $obm_q->f("display_user_id");
-    $fieldorder = $obm_q->f("display_fieldorder");
-    $fieldstatus = $obm_q->f("display_display");
+    $user_id = $obm_q->f('display_user_id');
+    $fieldorder = $obm_q->f('display_fieldorder');
+    $fieldstatus = $obm_q->f('display_display');
 
-    $prefs[$user_id]["order"] = $fieldorder;
-    $prefs[$user_id]["status"] = $fieldstatus;
+    $prefs[$user_id]['order'] = $fieldorder;
+    $prefs[$user_id]['status'] = $fieldstatus;
   }
 
   return $prefs;
@@ -870,24 +870,24 @@ function get_one_display_pref($u_id, $entity, $fieldname) {
 //   - $params : hash with :
 //        entity      : entity affected
 //        fieldname   : fieldname to change the display value
-//        fieldstatus : new display status value; "" if not updated
-//        fieldorder  : new display order; "" if not updated
+//        fieldstatus : new display status value; '' if not updated
+//        fieldorder  : new display order; '' if not updated
 ///////////////////////////////////////////////////////////////////////////////
 function update_display_pref($params) {
   global $obm, $cdg_sql;
 
-  $entity = $params["entity"];
-  $fieldname = $params["fieldname"];
-  $new_status = $params["fieldstatus"];
-  $sql_order_field = $params["fieldorder"];
+  $entity = $params['entity'];
+  $fieldname = $params['fieldname'];
+  $new_status = $params['fieldstatus'];
+  $sql_order_field = $params['fieldorder'];
 
-  $uid = $obm["uid"];
+  $uid = $obm['uid'];
   $prefs = get_one_display_pref($uid, $entity, $fieldname);
-  $default_order = $prefs[0]["order"];
-  $default_status = $prefs[0]["status"];
-  $user_status = $prefs[$uid]["status"];
-  $user_order = $prefs[$uid]["order"];
-  if (($user_status != "") && ($user_status >= 0)) {
+  $default_order = $prefs[0]['order'];
+  $default_status = $prefs[0]['status'];
+  $user_status = $prefs[$uid]['status'];
+  $user_order = $prefs[$uid]['order'];
+  if (($user_status != '') && ($user_status >= 0)) {
     $current_status = $user_status;
   } else {
     $current_status = $default_status;
@@ -895,11 +895,11 @@ function update_display_pref($params) {
   $current_order = ($user_order > 0 ? $user_order : $default_order);
 
   // if status not set new_status set to current_status
-  if ($new_status == "") {
+  if ($new_status == '') {
     $new_status = $current_status;
   }
   // if order is updated, update other field concerned too (with current order)
-  if ($sql_order_field != "") {
+  if ($sql_order_field != '') {
     run_query_display_pref_level_update($uid, $entity, $sql_order_field, $current_order);
   } else {
     $sql_order_field = $current_order;
@@ -914,7 +914,7 @@ function update_display_pref($params) {
         AND display_entity='$entity'
         AND display_fieldname='$fieldname'";
 
-      display_debug_msg($query, $cdg_sql, "update_display_pref()");
+      display_debug_msg($query, $cdg_sql, 'update_display_pref()');
       $obm_q = new DB_OBM; 
       $obm_q->query($query);
     } else {
@@ -951,22 +951,22 @@ function update_display_pref($params) {
 //   - $status    : field status to set
 //   - $order     : [opt] field order to set
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_display_pref_update($u_id, $entity, $fieldname, $status, $order="") {
+function run_query_display_pref_update($u_id, $entity, $fieldname, $status, $order='') {
   global $cdg_sql;
 
-  $coma = "";
-  if ($status != "") {
+  $coma = '';
+  if ($status != '') {
     $update_status = "$coma
       display_display='$status'";
-    $coma = ",";
+    $coma = ',';
   }
-  if ($order != "") {
+  if ($order != '') {
     $update_order = "$coma
       display_fieldorder='$order'";
-    $coma = ",";
+    $coma = ',';
   }
   
-  if ($coma != "") {
+  if ($coma != '') {
     $query = "UPDATE DisplayPref SET
       $update_status
       $update_order
@@ -974,7 +974,7 @@ function run_query_display_pref_update($u_id, $entity, $fieldname, $status, $ord
       AND display_entity='$entity'
       AND display_fieldname='$fieldname'";
 
-    display_debug_msg($query, $cdg_sql, "run_query_display_pref_update()");
+    display_debug_msg($query, $cdg_sql, 'run_query_display_pref_update()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
   }
@@ -1006,7 +1006,7 @@ function run_query_display_pref_insert($u_id, $entity, $fieldname, $status, $ord
       '$order',
       '$status')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_display_pref_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_display_pref_insert()');
   $obm_q = new DB_OBM; 
   $obm_q->query($query);
 }
@@ -1035,15 +1035,15 @@ function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_l
     ORDER BY display_user_id";
 
   $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_display_pref_level_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_display_pref_level_update()');
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
-    $user_id = $obm_q->f("display_user_id");
-    $fieldname = $obm_q->f("display_fieldname");
-    $fieldstatus = $obm_q->f("display_display");
-    $current[$user_id]["name"] = $fieldname;
-    $current[$user_id]["status"] = $fieldstatus;
+    $user_id = $obm_q->f('display_user_id');
+    $fieldname = $obm_q->f('display_fieldname');
+    $fieldstatus = $obm_q->f('display_display');
+    $current[$user_id]['name'] = $fieldname;
+    $current[$user_id]['status'] = $fieldstatus;
   }
 
   // Get the default field for the new order (target)
@@ -1056,24 +1056,24 @@ function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_l
       AND display_entity='$entity'
       AND display_fieldorder='$new_level'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_display_pref_level_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_display_pref_level_update()');
   $obm_q->query($query);
   $obm_q->next_record();
-  $target[0]["name"] = $obm_q->f("display_fieldname");
-  $target[0]["status"] = $obm_q->f("display_display");
+  $target[0]['name'] = $obm_q->f('display_fieldname');
+  $target[0]['status'] = $obm_q->f('display_display');
 
   // If a specific user entry exists
   if (isset($current[$u_id])) {
 
     // If new values to set same as default values, we drop specific user value
-    if ( ($target[0]["name"] == $current[$u_id]["name"])
-	 && ($target[0]["status"] == $current[$u_id]["status"]) ) {
+    if ( ($target[0]['name'] == $current[$u_id]['name'])
+	 && ($target[0]['status'] == $current[$u_id]['status']) ) {
 
       $query = "DELETE FROM DisplayPref
       WHERE display_user_id='$u_id'
         AND display_entity='$entity'
-        AND display_fieldname='" . $target[0]["name"] . "'
-        AND display_display='" . $target[0]["status"] . "'
+        AND display_fieldname='" . $target[0]['name'] . "'
+        AND display_display='" . $target[0]['status'] . "'
         AND display_fieldorder='$fieldorder'";
 
     // Else we update the specific user value
@@ -1097,13 +1097,13 @@ function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_l
       ) VALUES (
       '$u_id',
       '$entity',
-      '".$current[0]["name"]."',
+      '".$current[0]['name']."',
       '$new_level',
       '$fieldstatus')";
   }    
 
   $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_display_pref_level_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_display_pref_level_update()');
   $obm_q->query($query);
 
 }
@@ -1112,9 +1112,9 @@ function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_l
 ///////////////////////////////////////////////////////////////////////////////
 // Reset User parameters to default values
 // Parameters:
-//   - $user_id : user id (if ==  "", reset for all users)
+//   - $user_id : user id (if ==  '', reset for all users)
 ///////////////////////////////////////////////////////////////////////////////
-function reset_preferences_to_default($user_id="") {
+function reset_preferences_to_default($user_id='') {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -1126,7 +1126,7 @@ function reset_preferences_to_default($user_id="") {
 
   if ($user_id > 0) {
     $where_user = "userobmpref_user_id = '$user_id'";
-  } else if ($user_id == "") {
+  } else if ($user_id == '') {
     $where_user = "userobmpref_user_id != 0";
   } else {
     return false;
@@ -1134,7 +1134,7 @@ function reset_preferences_to_default($user_id="") {
 
   //-- Drop current user preferences
   $query = "DELETE FROM UserObmPref WHERE $where_user";
-  display_debug_msg($query, $cdg_sql, "reset_preferences_to_default()");
+  display_debug_msg($query, $cdg_sql, 'reset_preferences_to_default()');
   $obm_q->query($query);
 
   //---------------------------------------------------------------------------
@@ -1143,7 +1143,7 @@ function reset_preferences_to_default($user_id="") {
 
   if ($user_id > 0) {
     $where_user = "display_user_id = '$user_id'";
-  } else if ($user_id == "") {
+  } else if ($user_id == '') {
     $where_user = "display_user_id != 0";
   } else {
     return false;
@@ -1151,7 +1151,7 @@ function reset_preferences_to_default($user_id="") {
 
   //-- Drop current user display preferences
   $query = "DELETE FROM DisplayPref WHERE $where_user";
-  display_debug_msg($query, $cdg_sql, "reset_preferences_to_default()");
+  display_debug_msg($query, $cdg_sql, 'reset_preferences_to_default()');
   $obm_q->query($query);
 
   return true;
@@ -1163,7 +1163,7 @@ function reset_preferences_to_default($user_id="") {
 // Parameters:
 //   - $u_id   : user id to retrieve the pref
 // Returns:
-//   - $prefs  : prefs[$option] : ["value"], ["notdefault"]
+//   - $prefs  : prefs[$option] : ['value'], ['notdefault']
 ///////////////////////////////////////////////////////////////////////////////
 function get_user_pref($u_id) {
   global $cdg_sql;
@@ -1173,27 +1173,27 @@ function get_user_pref($u_id) {
     WHERE (userobmpref_user_id='0' OR userobmpref_user_id='$u_id')
     ORDER BY userobmpref_user_id, userobmpref_option"; 
 
-  display_debug_msg($query, $cdg_sql, "get_user_pref()");
+  display_debug_msg($query, $cdg_sql, 'get_user_pref()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   // The query is sorted by user_id, hence default values first
   while ($obm_q->next_record()) {
-    $user_id = $obm_q->f("userobmpref_user_id");
-    $option = $obm_q->f("userobmpref_option");
-    $value = $obm_q->f("userobmpref_value");
+    $user_id = $obm_q->f('userobmpref_user_id');
+    $option = $obm_q->f('userobmpref_option');
+    $value = $obm_q->f('userobmpref_value');
 
     if ($user_id > 0) {
       // Some options do not have default value (eg: last visited entities)
       // Note if user value different from default value
-      if ( ($prefs[$option]["value"] != $value) ) {
-	$prefs[$option]["notdefault"] = true;
+      if ( ($prefs[$option]['value'] != $value) ) {
+	$prefs[$option]['notdefault'] = true;
       }
-      $prefs[$option]["value"] = $value;
+      $prefs[$option]['value'] = $value;
 
       // Default values (user id = 0)
     } else {
-      $prefs[$option]["value"] = $value;
+      $prefs[$option]['value'] = $value;
     }
   }
 
@@ -1207,7 +1207,7 @@ function get_user_pref($u_id) {
 //   - $u_id   : user id to retrieve the pref
 //   - $option : option
 // Returns:
-//   - $prefs  : prefs[user_id] : ["value"], where user_id in (0, $u_id)
+//   - $prefs  : prefs[user_id] : ['value'], where user_id in (0, $u_id)
 ///////////////////////////////////////////////////////////////////////////////
 function get_one_user_pref($u_id, $option) {
   global $cdg_sql;
@@ -1218,16 +1218,16 @@ function get_one_user_pref($u_id, $option) {
       AND userobmpref_option='$option'
     ORDER BY userobmpref_user_id"; 
 
-  display_debug_msg($query, $cdg_sql, "get_one_user_pref()");
+  display_debug_msg($query, $cdg_sql, 'get_one_user_pref()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   // The query is sorted by user_id, hence default values first
   while ($obm_q->next_record()) {
-    $user_id = $obm_q->f("userobmpref_user_id");
-    $value = $obm_q->f("userobmpref_value");
+    $user_id = $obm_q->f('userobmpref_user_id');
+    $value = $obm_q->f('userobmpref_value');
 
-    $prefs[$user_id]["value"] = $value;
+    $prefs[$user_id]['value'] = $value;
   }
 
   return $prefs;
@@ -1241,16 +1241,16 @@ function get_one_user_pref($u_id, $option) {
 //   - $option   : preference name
 //   - $value    : new preference value
 ///////////////////////////////////////////////////////////////////////////////
-function update_user_pref($user_id, $option, $new_value="") {
+function update_user_pref($user_id, $option, $new_value='') {
   global $cdg_sql;
 
   $prefs = get_one_user_pref($user_id, $option);
-  $default_value = $prefs[0]["value"];
-  $user_value = $prefs[$user_id]["value"];
-  $current_value = ($user_value != "" ? $user_value : $default_value);
+  $default_value = $prefs[0]['value'];
+  $user_value = $prefs[$user_id]['value'];
+  $current_value = ($user_value != '' ? $user_value : $default_value);
 
   // if new_value not set new_value set to current_value
-  if ($new_value === "") {
+  if ($new_value === '') {
     $new_value = $current_value;
   }
 
@@ -1260,7 +1260,7 @@ function update_user_pref($user_id, $option, $new_value="") {
     $query = "DELETE FROM UserObmPref
       WHERE userobmpref_user_id='$user_id'
         AND userobmpref_option='$option'";
-    display_debug_msg($query, $cdg_sql, "update_user_pref()");
+    display_debug_msg($query, $cdg_sql, 'update_user_pref()');
     $obm_q = new DB_OBM; 
     $obm_q->query($query);
 
@@ -1297,7 +1297,7 @@ function run_query_user_pref_insert($user_id, $option, $value) {
       '$option',
       '$value')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_pref_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_pref_insert()');
   $obm_q = new DB_OBM; 
   $obm_q->query($query);
 }
@@ -1318,7 +1318,7 @@ function run_query_user_pref_update($user_id, $option, $value) {
     WHERE userobmpref_user_id='$user_id'
       AND userobmpref_option='$option'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_user_pref_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_user_pref_update()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
@@ -1334,21 +1334,21 @@ function session_load_user_prefs() {
   // We reset $last_v in case of session persistence (changing user)
   $last_v = array();
 
-  $prefs = get_user_pref($obm["uid"]);
+  $prefs = get_user_pref($obm['uid']);
 
   if (is_array($prefs)) 
   while ( list($option, $info) = each($prefs) ) {
-    $value = $info["value"];
+    $value = $info['value'];
     global $$option;
     $$option = $value;
 
     // Last visit management (if last_visit entry, get the associated text)
-    if (substr($option, 0, 5) == "last_") {
+    if (substr($option, 0, 5) == 'last_') {
       $entity = substr($option, 5);
       $function_get_last_text = "get_last_${entity}_text";
       if (function_exists($function_get_last_text)) {
-	$last_v[$entity]["id"] = $$option;
-	$last_v[$entity]["text"] = $function_get_last_text($$option);
+	$last_v[$entity]['id'] = $$option;
+	$last_v[$entity]['text'] = $function_get_last_text($$option);
       }
       // Other preferences
     } else {
@@ -1356,7 +1356,7 @@ function session_load_user_prefs() {
     }
   }
 
-  $_SESSION["last_v"] = $last_v;
+  $_SESSION['last_v'] = $last_v;
 }
 
 
@@ -1374,10 +1374,10 @@ function run_query_userobm_update_lastaccess($id) {
   global $cdg_sql;
 
   $query = "UPDATE UserObm
-    SET userobm_timelastaccess='".date("Y-m-d H:i:s")."'
+    SET userobm_timelastaccess='".date('Y-m-d H:i:s')."'
     WHERE userobm_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_userobm_update_lastaccess(2)");
+  display_debug_msg($query, $cdg_sql, 'run_query_userobm_update_lastaccess(2)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
@@ -1395,7 +1395,7 @@ function run_query_logout() {
   $query = "SELECT *
     FROM ActiveUserObm 
     WHERE activeuserobm_sid = '".$sess->id."'";
-  display_debug_msg($query, $cdg_sql, "run_query_logout(1)");
+  display_debug_msg($query, $cdg_sql, 'run_query_logout(1)');
   $obm_q->query($query) ;
 
   if ($obm_q->next_record()) {
@@ -1405,7 +1405,7 @@ function run_query_logout() {
     // drop the connexion from the active user session table
     $query = "DELETE FROM ActiveUserObm
       WHERE activeuserobm_sid = '".$obm_q->f('activeuserobm_sid')."'";
-    display_debug_msg($query, $cdg_sql, "run_query_logout(2)");
+    display_debug_msg($query, $cdg_sql, 'run_query_logout(2)');
     $obm_q->query($query) ;
   }
 }
@@ -1451,13 +1451,13 @@ function run_query_log_session($obm_q) {
     $obm_q->f('activeuserobm_lastpage'), $obm_q->f('activeuserobm_ip'));
 
   $obm_q2 = new DB_OBM ;
-  display_debug_msg($uquery, $cdg_sql, "run_query_log_session(1)");
+  display_debug_msg($uquery, $cdg_sql, 'run_query_log_session(1)');
   $obm_q2->query($uquery);
   if ( $obm_q2->affected_rows() == 0) {
-    display_debug_msg($squery, $cdg_sql, "run_query_log_session(2)");
+    display_debug_msg($squery, $cdg_sql, 'run_query_log_session(2)');
     if ( $obm_q2->query($squery)
          && $obm_q2->next_record() && $obm_q2->f(0) == 0 ) {
-      display_debug_msg($iquery, $cdg_sql, "run_query_log_session(3)");
+      display_debug_msg($iquery, $cdg_sql, 'run_query_log_session(3)');
       $obm_q2->query($iquery);
     }
   }
@@ -1474,14 +1474,14 @@ function run_query_log_session($obm_q) {
 function update_last_visit($entity, $id, $action) {
   global $obm;
 
-  if ( ($id == $_SESSION['last_v'][$entity]["id"]) && (strcmp($action,"delete")==0) ) {
-    $_SESSION['last_v'][$entity]["id"] = 0;
-    $_SESSION['last_v'][$entity]["text"] = 0;
-  } else if ( ($id > 0 ) && ($_SESSION['last_v'][$entity]["id"] != $id) ) {
-    $_SESSION['last_v'][$entity]["id"] = $id;
-    update_user_pref($obm["uid"], "last_$entity", $id);
+  if ( ($id == $_SESSION['last_v'][$entity]['id']) && (strcmp($action,'delete')==0) ) {
+    $_SESSION['last_v'][$entity]['id'] = 0;
+    $_SESSION['last_v'][$entity]['text'] = 0;
+  } else if ( ($id > 0 ) && ($_SESSION['last_v'][$entity]['id'] != $id) ) {
+    $_SESSION['last_v'][$entity]['id'] = $id;
+    update_user_pref($obm['uid'], "last_$entity", $id);
     $function_get_last_text = "get_last_${entity}_text";
-    $_SESSION['last_v'][$entity]["text"] = $function_get_last_text($id);
+    $_SESSION['last_v'][$entity]['text'] = $function_get_last_text($id);
   }
   
 }
@@ -1497,11 +1497,11 @@ function get_last_user_text($id) {
 
   if ($id > 0) {
     $query = "SELECT userobm_login FROM UserObm WHERE userobm_id='$id'";
-    display_debug_msg($query, $cdg_sql, "get_last_user_text()");
+    display_debug_msg($query, $cdg_sql, 'get_last_user_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $obm_q->next_record();
-    return $obm_q->f("userobm_login");
+    return $obm_q->f('userobm_login');
   }
   return;
 }
@@ -1517,11 +1517,11 @@ function get_last_group_text($id) {
   
   if ($id > 0) {
     $query = "SELECT group_name FROM UGroup WHERE group_id='$id'";
-    display_debug_msg($query, $cdg_sql, "get_last_group_text()");
+    display_debug_msg($query, $cdg_sql, 'get_last_group_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $obm_q->next_record();
-    return $obm_q->f("group_name");
+    return $obm_q->f('group_name');
   }
   return;
 }
@@ -1537,11 +1537,11 @@ function get_last_organizationalchart_text($id) {
   if ($id > 0) {
     $query = "SELECT organizationalchart_name 
       FROM OrganizationalChart WHERE organizationalchart_id='$id'";
-    display_debug_msg($query, $cdg_sql, "get_last_organizationalchart_text()");
+    display_debug_msg($query, $cdg_sql, 'get_last_organizationalchart_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $obm_q->next_record();
-    return $obm_q->f("organizationalchart_name");
+    return $obm_q->f('organizationalchart_name');
   }
   return;
 }
@@ -1562,28 +1562,28 @@ function get_userobm_from_ids($users) {
   global $cdg_sql;
 
   if (is_array($users)) {
-    $where = "(0";
+    $where = '(0';
     foreach($users as $user) {
       $where .= ", $user";
     }
-    $where .= ")";
+    $where .= ')';
     $query = "SELECT *
     FROM UserObm
     WHERE userobm_archive = 0
       AND userobm_id IN $where
     ORDER by userobm_lastname";
-    display_debug_msg($query, $cdg_sql, "get_userobm_from_ids()");
+    display_debug_msg($query, $cdg_sql, 'get_userobm_from_ids()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     while ($obm_q->next_record()) {
-      $id = $obm_q->f("userobm_id");
-      $lname = $obm_q->f("userobm_lastname");
-      $fname = $obm_q->f("userobm_firstname");
-      $res["ids"][] = $id;
-      $res["entity"][$id] = array("label" => "$lname $fname");
+      $id = $obm_q->f('userobm_id');
+      $lname = $obm_q->f('userobm_lastname');
+      $fname = $obm_q->f('userobm_firstname');
+      $res['ids'][] = $id;
+      $res['entity'][$id] = array('label' => "$lname $fname");
     }
   } else {
-    $res = "";
+    $res = '';
   }
 
   return $res;
@@ -1601,19 +1601,19 @@ function get_userobm_from_ids($users) {
 function get_user_id($login) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain('userobm');
 
   if (isset($login)) {
     $query = "SELECT userobm_id FROM UserObm WHERE userobm_login='$login' $multidomain";
 
-    display_debug_msg($query, $cdg_sql, "get_user_id()");
+    display_debug_msg($query, $cdg_sql, 'get_user_id()');
     $obm_q = new DB_OBM;
-    $obm_q->query($query) ;
-    $obm_q->next_record() ;
-    return $obm_q->f("userobm_id") ;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f('userobm_id');
 
   } else {
-    return "" ;
+    return '';
   }
 }
 
@@ -1626,32 +1626,32 @@ function get_user_id($login) {
 //   - user hash values
 // Used by: time only !!
 ///////////////////////////////////////////////////////////////////////////////
-function get_user_info($id="") {
+function get_user_info($id='') {
   global $cdg_sql, $obm;
 
   $obm_q = new DB_OBM ;
   $db_type = $obm_q->type;
-  $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
+  $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
 
-  if ($id == "") $id = $obm["uid"];
+  if ($id == '') $id = $obm['uid'];
 
   $query = "SELECT *,
       $datebegin
     FROM UserObm
     WHERE userobm_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "get_user_info()");
+  display_debug_msg($query, $cdg_sql, 'get_user_info()');
   $obm_q->query($query);
   $obm_q->next_record();
   if (is_array($obm_q->Record)) {
     foreach ($obm_q->Record as $key => $user) {
-      $small_key = str_replace("userobm_", "", $key);
+      $small_key = str_replace('userobm_', '', $key);
       $u[$small_key] = $user;
     }
   }  
-  $u["datebegin"] = array();
-  $u["datebegin"]["iso"] = $obm_q->f("userobm_datebegin");
-  $u["datebegin"]["unix_timestamp"] = $obm_q->f("datebegin");
+  $u['datebegin'] = array();
+  $u['datebegin']['iso'] = $obm_q->f('userobm_datebegin');
+  $u['datebegin']['unix_timestamp'] = $obm_q->f('datebegin');
 
   return $u;
 }
@@ -1664,7 +1664,7 @@ function get_user_info($id="") {
 // Return:
 //   - Database Object : userobm list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm($id="") {
+function run_query_userobm($id='') {
   global $cdg_sql;
 
   if ($id) $where = "WHERE userobm_id='$id'";
@@ -1674,7 +1674,7 @@ function run_query_userobm($id="") {
     ORDER BY userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_userobm()");
+  display_debug_msg($query, $cdg_sql, 'run_query_userobm()');
 
   return $obm_q;
 }
@@ -1687,14 +1687,14 @@ function run_query_userobm($id="") {
 // Return:
 //   - Database Object : userobm list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_active($ids="") {
+function run_query_userobm_active($ids='') {
   global $cdg_sql;
-  $multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain('userobm');
   if (is_array($ids)) {
-    $where_add = "";
+    $where_add = '';
     $nb_add = count($ids);
     for ($i=0; $i<$nb_add; $i++) {
-      if ($ids[$i] != "") {
+      if ($ids[$i] != '') {
         $where_add .= " OR userobm_id = '$ids[$i]'";
       }
     }
@@ -1710,10 +1710,11 @@ function run_query_userobm_active($ids="") {
     ORDER BY userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_userobm_active()");
+  display_debug_msg($query, $cdg_sql, 'run_query_userobm_active()');
 
   return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Active Userobm query execution : All users not archived
@@ -1722,9 +1723,10 @@ function run_query_userobm_active($ids="") {
 // Return:
 //   - Database Object : userobm list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_responsable($table="",$fields="") {
+function run_query_userobm_responsable($table='',$fields='') {
   global $cdg_sql;
-  $multidomain = sql_multidomain("userobm");
+
+  $multidomain = sql_multidomain('userobm');
   if(is_array($fields)) {
     $join = "JOIN $table ON 1=0 ";
     foreach ($fields as $field) {
@@ -1745,88 +1747,7 @@ function run_query_userobm_responsable($table="",$fields="") {
     ORDER BY userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_userobm_responsable()");
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : Get the users list (id, name) from the given group
-// Recursive search to handle group trees
-// Parameters:
-//   - $group_id : Group id
-//   - $ids (optionnal) : array of UserObm Id to add to the result
-// Returns:
-//   array of user ids
-///////////////////////////////////////////////////////////////////////////////
-function get_all_users_from_group($g_id, $ids="") {
-  global $cdg_sql;
-
-  if (! ($g_id > 0)) {
-    return false;
-  }
-
-  $users = array();
-  $obm_q = run_query_all_users_from_group($g_id, $ids);
-  while ($obm_q->next_record()) {
-    $id = $obm_q->f("userobm_id");
-    $lname = $obm_q->f("userobm_lastname");
-    $fname = $obm_q->f("userobm_firstname");
-    $users[$id] = array ("id" => $id,
-			 "lastname" => $lname,
-			 "firstname" => $fname);
-  }
-  return $users;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : Get the users list from the given group
-// Recursive search to handle group trees
-// Parameters:
-//   - $g_id : Group id
-//   - $ids (optionnal) : array of UserObm Id to add to the result
-// Used by: company, contact, deal, project, contract, import
-///////////////////////////////////////////////////////////////////////////////
-function run_query_all_users_from_group($g_id, $ids="") {
-  global $cdg_sql;
-
-  $gusers = get_all_users_id_from_group($g_id);
-
-  if (is_array($gusers)) {
-    $where_gusers = "";
-    $nb_add = count($gusers);
-    for ($i=0; $i<$nb_add; $i++) {
-      if ($gusers[$i] != "") {
-        $where_gusers .= " OR userobm_id = '$gusers[$i]'";
-      }
-    }
-  }
-
-  if (is_array($ids)) {
-    $where_ids = "";
-    $nb_add = count($ids);
-    for ($i=0; $i<$nb_add; $i++) {
-      if ($ids[$i] != "") {
-        $where_ids .= " OR userobm_id = '$ids[$i]'";
-      }
-    }
-  }
-  $multidomain = sql_multidomain("userobm");
-
-  $query = "SELECT 
-      userobm_id,
-      userobm_lastname,
-      userobm_firstname
-    FROM UserObm
-    WHERE ((userobm_archive != '1' and (1=0 $where_gusers))
-    $where_ids)
-    $multidomain
-    ORDER BY userobm_lastname"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_all_users_from_group()");
+  display_debug_msg($query, $cdg_sql, 'run_query_userobm_responsable()');
 
   return $obm_q;
 }
@@ -1843,13 +1764,125 @@ function run_query_global_group_manager($g_id) {
 
   $query = "SELECT group_manager_id FROM UGroup
     WHERE group_id='$g_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_all_users_from_group()");
+  display_debug_msg($query, $cdg_sql, 'run_query_all_users_from_group()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $return = $obm_q->f("group_manager_id");
+  $return = $obm_q->f('group_manager_id');
  
   return $return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the group infos
+// Parameters:
+//   - $id : group id
+///////////////////////////////////////////////////////////////////////////////
+function get_group_info($id) {
+  global $cdg_sql;
+
+  if ($id == '') {
+    return false;
+  }
+  $multidomain = sql_multidomain('group');
+
+  $query = "SELECT * FROM UGroup WHERE group_id='$id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'get_group_info()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $g['usercreate'] = $obm_q->f('group_usercreate');
+  $g['name'] = $obm_q->f('group_name');
+  $g['system'] = $obm_q->f('group_system');
+  $g['gid'] = $obm_q->f('group_gid');
+  $g['privacy'] = $obm_q->f('group_privacy');
+  $g['samba'] = $obm_q->f('group_samba');
+  $g['delegation'] = $obm_q->f('group_delegation');
+
+  return $g;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Get the users list (id, name) from the given group
+// Recursive search to handle group trees
+// Parameters:
+//   - $group_id : Group id
+//   - $ids (optionnal) : array of UserObm Id to add to the result
+// Returns:
+//   array of user ids
+///////////////////////////////////////////////////////////////////////////////
+function get_all_users_from_group($g_id, $ids='') {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  $users = array();
+  $obm_q = run_query_all_users_from_group($g_id, $ids);
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f('userobm_id');
+    $lname = $obm_q->f('userobm_lastname');
+    $fname = $obm_q->f('userobm_firstname');
+    $users[$id] = array ('id' => $id,
+			 'lastname' => $lname,
+			 'firstname' => $fname);
+  }
+  return $users;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Get the users list from the given group
+// Recursive search to handle group trees
+// Parameters:
+//   - $g_id : Group id
+//   - $ids (optionnal) : array of UserObm Id to add to the result
+// Used by: company, contact, deal, project, contract, import
+///////////////////////////////////////////////////////////////////////////////
+function run_query_all_users_from_group($g_id, $ids='') {
+  global $cdg_sql;
+
+  $gusers = get_all_users_id_from_group($g_id);
+
+  if (is_array($gusers)) {
+    $where_gusers = '';
+    $nb_add = count($gusers);
+    for ($i=0; $i<$nb_add; $i++) {
+      if ($gusers[$i] != '') {
+        $where_gusers .= " OR userobm_id = '$gusers[$i]'";
+      }
+    }
+  }
+
+  if (is_array($ids)) {
+    $where_ids = '';
+    $nb_add = count($ids);
+    for ($i=0; $i<$nb_add; $i++) {
+      if ($ids[$i] != '') {
+        $where_ids .= " OR userobm_id = '$ids[$i]'";
+      }
+    }
+  }
+  $multidomain = sql_multidomain('userobm');
+
+  $query = "SELECT 
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    FROM UserObm
+    WHERE ((userobm_archive != '1' and (1=0 $where_gusers))
+    $where_ids)
+    $multidomain
+    ORDER BY userobm_lastname"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql, 'run_query_all_users_from_group()');
+
+  return $obm_q;
 }
 
 
@@ -1876,11 +1909,11 @@ function get_all_users_id_from_group($g_id) {
       WHERE groupgroup_parent_id='$g_id'";
 
   $obm_q = new DB_OBM; 
-  display_debug_msg($query, $cdg_sql, "get_all_users_id_from_group(1)");
+  display_debug_msg($query, $cdg_sql, 'get_all_users_id_from_group(1)');
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
-    $child_id = $obm_q->f("child_id");
+    $child_id = $obm_q->f('child_id');
     $gusers = get_all_users_id_from_group($child_id);
     $users = array_merge($users, $gusers);
   }
@@ -1891,17 +1924,128 @@ function get_all_users_id_from_group($g_id) {
     WHERE userobmgroup_group_id='$g_id'";
 
   $obm_q = new DB_OBM; 
-  display_debug_msg($query, $cdg_sql, "get_all_users_id_from_group(2)");
+  display_debug_msg($query, $cdg_sql, 'get_all_users_id_from_group(2)');
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
-    $u_id = $obm_q->f("user_id");
+    $u_id = $obm_q->f('user_id');
     if (! in_array($u_id, $users)) {
       array_push($users, $u_id);
     }
   }
 
   return $users;
+}
+
+
+/**
+ * Update one group internal user mapping
+ * @param $g_id group id
+ * @return false if problem
+ * @access public
+ */
+function of_usergroup_update_group_node($g_id) {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  $multidomain = sql_multidomain('userobm');
+  $users_id = get_all_users_id_from_group($g_id);
+  $ret = false;
+
+  // Delete current internal association
+  $query = "DELETE FROM of_usergroup
+    WHERE of_usergroup_group_id='$g_id'";
+  display_debug_msg($query, $cdg_sql, 'of_usergroup_update_group_node(delete)');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  // If group has users, Insert new internal association
+  if (is_array($users_id) && count($users_id) > 0) {
+    $query = "INSERT INTO of_usergroup (
+      of_usergroup_group_id,
+      of_usergroup_user_id
+    ) VALUES";
+
+    $coma = '';
+    foreach ($users_id as $u_id) {
+      $query .= "$coma ('$g_id', '$u_id')";
+      $coma = ',';
+    }
+
+    display_debug_msg($query, $cdg_sql, 'of_usergroup_update_group_node(insert)');
+    $ret = $obm_q->query($query);
+  } else {
+    $ret = true;
+  }
+
+  return $ret;
+}
+
+
+ /**
+ * Get all parent groups of a group
+ * @param $g_id group id
+ * @return false if problem
+ * @access public
+ */
+function get_all_parent_group_of_group($g_id) {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  $groups = array($g_id);
+
+  // Groups parents of this group
+  $query = "SELECT groupgroup_parent_id as parent_id
+    FROM GroupGroup
+    WHERE groupgroup_child_id='$g_id'";
+
+  $obm_q = new DB_OBM; 
+  display_debug_msg($query, $cdg_sql, 'get_all_parent_group_of_group()');
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $parent_id = $obm_q->f('parent_id');
+    $pgroups = get_all_parent_group_of_group($parent_id);
+    $groups = array_merge($groups, $pgroups);
+  }
+
+  return $groups;
+}
+
+
+ /**
+ * Update internal user mapping for a group and its top hierarchy
+ * @param $g_id group id
+ * @return false if problem
+ * @access public
+ */
+function of_usergroup_update_group_hierarchy($g_id) {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  // If group not public, we return
+  $g = get_group_info($g_id);
+  if ($g['privacy'] != 0) {
+    return true;
+  }
+
+  $groups = get_all_parent_group_of_group($g_id);
+  $ret = false;
+
+  foreach ($groups as $group_id) {
+    $ret = of_usergroup_update_group_node($group_id);
+  }
+
+  return $ret;
 }
 
 
@@ -1917,9 +2061,9 @@ function get_all_users_id_from_group($g_id) {
 //  - $recipients : Id Recipients array
 //  - $r_addr     : adresses array to add to recipients
 //  - $force      : Mail should be forced (all user even with no set_mail)
-//  - $h_file     : Attachments (array of ("name"=> "", "type=""))
+//  - $h_file     : Attachments (array of ('name'=> '', 'type=''))
 ///////////////////////////////////////////////////////////////////////////////
-function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file="") {
+function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file='') {
   global $cgp_mail_enabled;
   global $obm_version, $cgp_use; 
 
@@ -1940,14 +2084,14 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   // Construct recipient list
   if (is_object($reci_q)) {
     while ($reci_q->next_record()) {
-      $reci = $reci_q->f("userobm_email");
+      $reci = $reci_q->f('userobm_email');
     
       // If AliaSuite, construct recipient address.
-      if ($cgp_use["service"]["mail"]) {
-	$reci = strtok($reci, "\r\n")."@".$reci_q->f("domain_name");
+      if ($cgp_use['service']['mail']) {
+	$reci = strtok($reci, "\r\n")."@".$reci_q->f('domain_name');
       }
     
-      if ($reci_list == "") {
+      if ($reci_list == '') {
 	$reci_list = $reci;
       } else {
 	$reci_list .= " , $reci";
@@ -1958,7 +2102,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   // Add addresses given to recipient list
   if (is_array($r_addr)) {
     foreach($r_addr as $reci) {
-      if ($reci_list == "") {
+      if ($reci_list == '') {
 	$reci_list = $reci;
       } else {
 	$reci_list .= " , $reci";
@@ -1967,18 +2111,18 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   }
 
   // Headers
-  $boundary = '--' . md5( uniqid("myboundary") );
+  $boundary = '--' . md5( uniqid('myboundary') );
 
-  $headers .= "From: ";
+  $headers .= 'From: ';
   // If AliaSuite, construct sender address.
-  if($cgp_use["service"]["mail"]) {
-    $headers .= strtok($send_q->f("userobm_email"), "\r\n")."@".$send_q->f("domain_name")."\n";
+  if($cgp_use['service']['mail']) {
+    $headers .= strtok($send_q->f('userobm_email'), "\r\n")."@".$send_q->f('domain_name')."\n";
   } else {
-    $headers .= $send_q->f("userobm_email")."\n";
+    $headers .= $send_q->f('userobm_email')."\n";
   }
 
   // If attachements are provided
-  if ($h_file != "") {
+  if ($h_file != '') {
     $headers .= "Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
   } else {
     // Commented as this breaks mail encoding
@@ -2008,23 +2152,23 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   $sep = chr(13) . chr(10);
 
   // message
-  $msg="";
-  //$charset = "iso-8859-1";
+  $msg='';
+  //$charset = 'iso-8859-1';
   $charset = mb_internal_encoding();
-  if ($h_file !="") {
-    $ctencoding = "quoted-printable";
-    // $disposition="inline";  // Not used for now
-    // $body=iconv("ISO-8859-1","UTF-8",$body);
+  if ($h_file !='') {
+    $ctencoding = 'quoted-printable';
+    // $disposition='inline';  // Not used for now
+    // $body=iconv('ISO-8859-1','UTF-8',$body);
     $msg .="This is a multi-part message in MIME format.\n--$boundary\n";
     $msg .= "Content-Type: text/plain; charset=\"$charset\"\n";
     $msg .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";
     for ($i=0;$i<count($h_file);$i++){
-      $filename=$h_file[$i]["filename"];
-      $name=$h_file[$i]["name"];
-      $ctype=$type[$h_file[$i]["type"]];
+      $filename=$h_file[$i]['filename'];
+      $name=$h_file[$i]['name'];
+      $ctype=$type[$h_file[$i]['type']];
 
       $msg .= "--$boundary\n";
-      if ($ctype == "text/calendar") {
+      if ($ctype == 'text/calendar') {
         $msg .= "content-class: urn:content-classes:calendarmessage\n"; 
       }
       $msg .= "Content-type: $ctype;charset=$charset;name=\"$name\"\n";
@@ -2040,7 +2184,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   } else {
     $msg = $message; 
   }
-  if ($reci_list != "") {
+  if ($reci_list != '') {
     // as we don't have a mean to encode the subject, we drop its accents
     $subject = format_name($subject, 0, true);
     mail ($reci_list, $subject, $msg, $headers);         
@@ -2068,14 +2212,14 @@ function run_query_get_recipients($recipients, $force) {
              LEFT JOIN UserObmPref as up2 on up2.userobmpref_user_id=0
                AND up2.userobmpref_option = 'set_mail'";
   }
-  $coma = "";
+  $coma = '';
   foreach($recipients as $recipient) {
     if ($recipient) {
       $user_list .= $coma.$recipient;
-      $coma = ",";
+      $coma = ',';
     }
   }
-  if ($user_list != "") {
+  if ($user_list != '') {
     $user_in = "userobm_id IN ($user_list) AND";
   } else {
     return false;
@@ -2090,7 +2234,7 @@ function run_query_get_recipients($recipients, $force) {
       userobm_email != ''
       $mail_filter";
 
-  display_debug_msg($query, $cdg_sql, "run_query_get_recipients()");
+  display_debug_msg($query, $cdg_sql, 'run_query_get_recipients()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -2107,14 +2251,14 @@ function run_query_get_recipients($recipients, $force) {
 function run_query_get_resources_info($resources) {
   global $cdg_sql;
 
-  $coma = "";
+  $coma = '';
   foreach($resources as $resource) {
     if ($resource) {
       $res_list .= $coma.$resource;
-      $coma = ",";
+      $coma = ',';
     }
   }
-  if ($res_list != "") {
+  if ($res_list != '') {
     $res_in = "resource_id IN ($res_list)";
   } else {
     return false;
@@ -2122,10 +2266,9 @@ function run_query_get_resources_info($resources) {
 
   $query = "SELECT resource_name, resource_description
     FROM Resource 
-    WHERE $res_in
-  ";
+    WHERE $res_in";
 
-  display_debug_msg($query, $cdg_sql, "run_query_get_resources_info()");
+  display_debug_msg($query, $cdg_sql, 'run_query_get_resources_info()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -2139,14 +2282,14 @@ function run_query_get_resources_info($resources) {
 function run_query_get_sender() {
   global $obm, $cdg_sql;
 
-  $uid = $obm["uid"];
+  $uid = $obm['uid'];
   $query = "SELECT 
     userobm_email, userobm_lastname, userobm_firstname, domain_name
     FROM UserObm
     LEFT JOIN Domain ON userobm_domain_id = domain_id
     WHERE userobm_id = '$uid'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_get_sender()");
+  display_debug_msg($query, $cdg_sql, 'run_query_get_sender()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -2242,8 +2385,8 @@ function encode($in_str, $charset) {
    if ($out_str && $charset) {
 
      // define start delimimter, end delimiter and spacer
-     $end = "?=";
-     $start = "=?" . $charset . "?B?";
+     $end = '?=';
+     $start = '=?' . $charset . '?B?';
      $spacer = $end . "\r\n " . $start;
 
      // determine length of encoded text within chunks
@@ -2259,7 +2402,7 @@ function encode($in_str, $charset) {
      // remove trailing spacer and
      // add start and end delimiters
      $spacer = preg_quote($spacer);
-     $out_str = preg_replace("/" . $spacer . "$/", "", $out_str);
+     $out_str = preg_replace('/' . $spacer . "$/", '', $out_str);
      $out_str = $start . $out_str . $end;
    }
    return $out_str;

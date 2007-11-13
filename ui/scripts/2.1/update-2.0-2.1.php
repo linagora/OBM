@@ -11,6 +11,8 @@ $path = "../../php";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("../../obminclude/global.inc");
+include("$path/admin_data/admin_data_display.inc");
+include("$path/admin_data/admin_data_query.inc");
 
 echo "**** OBM : data migration 2.0 -> 2.1 : DB $obmdb_db ($obmdb_host)\n";
 
@@ -19,6 +21,7 @@ $d = get_domain_list();
 $dp = get_domainproperty_list();
 process_domain_list($d, $dp);
 
+dis_admin_data_group('data_update', 'txt');
 
 ///////////////////////////////////////////////////////////////////////////////
 // Process the domain list
