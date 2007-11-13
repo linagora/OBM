@@ -487,6 +487,98 @@ function get_update_entity_numbers($e2='', $domain_id, $table, $field='', $realm
 
 
 /******************************************************************************
+ * Get Group links updates (from of_usergroup)
+ *
+ * @param $domain_id : domain id to check
+ * @param $realm : realm space to check updates (user | domain | delegation)
+ * @return link array : $link[$group_id] = $group_id
+ */
+function get_update_link_group_new($domain_id, $realm) {
+  global $obm, $cdg_sql, $cdg_exe;
+
+  $uid = $obm['uid'];
+  $delegation = $obm['delegation'];
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
+
+  $e1 = array();
+  $e2 = array();
+
+  $eid = "group_id";
+  $uc = "group_usercreate";
+  $uu = "group_userupdate";
+  $dg = "group_delegation";
+
+  $multidomain = "AND (group_domain_id='$domain_id')";
+
+  // Restrict updates to the realm selected (user, domain, delegation)
+  if ($realm == "user") {
+    $where = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
+  } else if ($realm == "delegation") {
+    $where = "WHERE ($dg $like '$delegation%') $multidomain";
+  } else {
+    $where = "WHERE 1=1 $multidomain";
+  }
+
+  // UserObmGroup Link --------------------------------------------------------
+
+  // Get infos from Update table
+  $query = "SELECT *
+    FROM of_usergroup
+      LEFT JOIN UGroup ON of_usergroup_group_id=group_id
+    $where
+    ORDER BY of_usergroup_group_id, of_usergroup_user_id";
+  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $g_id = $obm_q->f('of_usergroup_group_id');
+    $u_id = $obm_q->f('of_usergroup_user_id');
+    $e1[$g_id][] = "u$u_id";
+  }
+
+  // Get infos from Production table
+  $query = "SELECT *
+    FROM P_of_usergroup
+      LEFT JOIN P_UGroup ON of_usergroup_group_id=group_id
+    $where
+    ORDER BY of_usergroup_group_id, of_usergroup_user_id";
+  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
+  $retour = $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $g_id = $obm_q->f('of_usergroup_group_id');
+    $u_id = $obm_q->f('of_usergroup_userobm_id');
+    $e2[$g_id][] = "u$u_id";
+  }
+
+  // Process and mark each group modified
+  foreach($e1 as $g_id => $users) {
+    if (count($e1[$g_id]) != count($e2[$g_id])) {
+      $res[$g_id] = $g_id;
+      $nb_link = count($e1[$g_id]);
+      $nb_link_prod = count($e2[$g_id]);
+      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; current #links=$nb_link_prod, new #links=$nb_link");
+
+    } else {
+      foreach ($users as $u_id) {
+	if (! in_array($u_id, $e2[$g_id])) {
+	  $res[$g_id] = $g_id;
+	  display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; diff=$u_id");
+	  break;
+	}
+      }
+    }
+  }
+
+  // Deleted entries, nothing to do (already handled by entity Update)
+
+  return $res;
+}
+
+
+/******************************************************************************
  * Get Group links updates (from UserObmGroup and GroupGroup)
  *
  * @param $domain_id : domain id to check

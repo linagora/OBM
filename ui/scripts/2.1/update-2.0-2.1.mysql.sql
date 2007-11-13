@@ -525,5 +525,5 @@ CREATE TABLE of_usergroup (
 );
 CREATE TABLE P_of_usergroup like of_usergroup;
 
-DROP TABLE P_UserObmGroup;
-DROP TABLE P_GroupGroup;
+-- DROP TABLE P_UserObmGroup;
+-- DROP TABLE P_GroupGroup;

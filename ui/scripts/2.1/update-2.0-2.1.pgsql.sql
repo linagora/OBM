@@ -551,5 +551,5 @@ CREATE TABLE P_of_usergroup (
   PRIMARY KEY (of_usergroup_group_id, of_usergroup_userobm_id)
 );
 
-DROP TABLE P_UserObmGroup;
-DROP TABLE P_GroupGroup;
+-- DROP TABLE P_UserObmGroup;
+-- DROP TABLE P_GroupGroup;
