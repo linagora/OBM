@@ -66,6 +66,10 @@ if [ -e /usr/share/doc/obm-cyrus/cyrus_saslauthd.sample.gz ]; then
 	    cat /usr/share/doc/obm-cyrus/cyrus_saslauthd.sample > /etc/default/saslauthd
 fi
 
+sed -i -e "s#_LDAP_SERVER_#${LDAPSERVER}#" /etc/saslauthd.conf
+
+
+
 
 echo "done"
 invoke-rc.d saslauthd start || true

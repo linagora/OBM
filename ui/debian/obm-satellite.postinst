@@ -3,6 +3,10 @@
 set -e
 set -x
 
+
+LDAPSERVER=`grep "ldapServer" /etc/obm/obm_conf.ini | cut -d" " -f3`
+
+
 . /usr/share/debconf/confmodule
 
 is_initial_configuration() { 
@@ -31,9 +35,10 @@ if is_initial_configuration "$@"; then
 
 	ln -s /etc/obm-satellite/obmSatellite.cf  /usr/share/obm-satellite/obmSatellite.cf || true
 	
-	db_get obm-satellite/ldapserver
-	OBM_LDAP_SERVER=$RET
-	sed -i -e "s#_LDAPSERVER_#${OBM_LDAP_SERVER}#" /etc/obm-satellite/obmSatellite.cf
+	#db_get obm-satellite/ldapserver
+	#OBM_LDAP_SERVER=$RET
+	#sed -i -e "s#_LDAPSERVER_#${OBM_LDAP_SERVER}#" /etc/obm-satellite/obmSatellite.cf
+	sed -i -e "s#_LDAPSERVER_#${LDAPSERVER}#" /etc/obm-satellite/obmSatellite.cf
 	
 	db_get obm-satellite/obmserver
 	OBM_SERVER=$RET

@@ -7,7 +7,7 @@ Standards-Version: 3.7.2
 
 Package: obm
 Architecture: any
-Depends: obm-cyrus, obm-postfix, obm-ui, ${misc:Depends}
+Depends: obm-ldap, obm-cyrus, obm-postfix, obm-ui, ${misc:Depends}
 Description: OBM
     full installation of Open Business Management
 	Instalation of OBM
@@ -53,21 +53,21 @@ Description: OBM Automate
 
 Package: obm-ldap
 Architecture: any
-Depends:  slapd, ldap-utils, obm-services, ${misc:Depends}
+Depends:  slapd, ldap-utils, ${misc:Depends}
 Description: OBM Ldap
    Configuration of obm-ldap
 
 
 Package: obm-cyrus
 Architecture: any
-Depends:  obm-ldap, cyrus-common-2.2, cyrus-admin-2.2, cyrus-imapd-2.2, cyrus-pop3d-2.2, cyrus-sasl2-dbg, cyrus-sasl2-doc, cyrus-clients-2.2, sasl2-bin, libsasl2, libsasl2-modules, ${misc:Depends}
+Depends:  obm-core, cyrus-common-2.2, cyrus-admin-2.2, cyrus-imapd-2.2, cyrus-pop3d-2.2, cyrus-sasl2-dbg, cyrus-sasl2-doc, cyrus-clients-2.2, sasl2-bin, libsasl2, libsasl2-modules, ${misc:Depends}
 Description: OBM Cyrus / SASL
    Configuration of Cyrus and SASL
 
 
 Package: obm-satellite
 Architecture: any
-Depends: libobmsatellite-perl, ${misc:Depends}
+Depends: obm-core, libobmsatellite-perl, ${misc:Depends}
 Description: OBM Satellite
    Installation and configuration OBM Satellite
 

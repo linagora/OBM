@@ -1,6 +1,12 @@
+obm (2.1-1) stable; urgency=low
+
+  * Maj du numero de version avec Version OBM
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Tue, 13 Nov 2007 10:52:19 +0100
+
 obm (1.0-1) stable; urgency=low
 
-  * Initial release. (Closes: #XXXXXX)
+  * Initial release.
 
  -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Tue, 11 Sep 2007 10:45:07 +0200
 
