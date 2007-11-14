@@ -21,7 +21,7 @@ $l_found = "serveurs de messagerie trouvés.";
 $l_no_found = "Aucun serveur de messagerie ne correspond à ces critères !";
 
 $l_err_host_invalid = "L'hôte n'a pas été sélectionné ou est invalide !";
-$l_err_host_is_mailserver = "L'hôte séléctionné est déjà référencé comme serveur de messagerie !";
+$l_err_host_is_mailserver = "L'hôte sélectionné est déjà référencé comme serveur de messagerie !";
 
 $l_can_delete = "Ce serveur de messagerie peu être supprimé";
 $l_cant_delete = "Ce serveur de messagerie ne peut pas être supprimé";
