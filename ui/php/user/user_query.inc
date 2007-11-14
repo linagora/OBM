@@ -1305,8 +1305,9 @@ function check_user_data_form($p_id, $user) {
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
   global $obm, $profiles, $cgp_use, $c_imagetype;
   global $c_max_image_size;
-  global $l_err_delegation_target_outside, $l_err_delegation_outside_domain;
-  global $l_err_delegation_outside_target, $l_err_delegation_target_profile;
+  global $l_err_delegation_target_outside_domain, $l_err_delegation_target_outside_target;
+  global $l_err_delegation_outside_domain, $l_err_delegation_outside_target;
+  global $l_err_delegation_target_profile;
 
   $action = $user['action'];
   $id = $user['user_id'];
@@ -1344,18 +1345,22 @@ function check_user_data_form($p_id, $user) {
   $smb_logon = $user['smb_logon'];
   $file = $user['file_tmp'];
 
-  if ($action == 'update') {
-    $u = get_user_info($id);
-    $usr_profile = $u['perms'];
+  $u = get_user_info($id);
+  $usr_profile = $u['perms'];
 
-    // We can't handle a user with a more privileged profile
-    $level = $profiles[$obm['profile']]['level'];
-    if (($profiles[$profile]['level'] < $level)
-	 || ($profiles[$usr_profile]['level'] < $level)) {
-      $err['msg'] = "$l_profile_privilege_error";
-      $err['field'] = 'profile';
-      return false;
-    }
+  // We can't handle a user with a more privileged profile
+  // Or same privilege with 'impair' profile
+  $level = $profiles[$obm['profile']]['level'];
+  if (($profiles[$profile]['level'] < $level)
+      || ($profiles[$usr_profile]['level'] < $level)
+      || (($profiles[$profile]['level'] == $level) && ($level % 2 == 1))
+      || (($profiles[$usr_profile]['level'] == $level) && ($level % 2 == 1))) {
+    $err['msg'] = "$l_profile_privilege_error";
+    $err['field'] = 'profile';
+    return false;
+  }
+
+  if ($action == 'update') {
 
     // MANDATORY: we do not allow to update last admin'perms
     if (($usr_profile == $perms_admin) && ($profile != $perms_admin)) {
@@ -1630,13 +1635,22 @@ function check_user_data_form($p_id, $user) {
 
   // Les contraintes sur la delegation ne sont pas valables pour le domaine 0
   if ((int)($domain_id) > 0) {
+
     // Verifier que pour un profil ayant delegation
-    // la cible de delegation est bien dans l'arbo. de l'entite
     if (is_array($profiles[$profile]['properties']['admin_realm'])
         && (in_array('delegation', $profiles[$profile]['properties']['admin_realm']))) {
+      // la cible de delegation est bien dans l'arbo. de l'entite
       if (isset($d['delegation']) && ($d['delegation'] != '')) {
 	if (strpos($delegation_target, $d['delegation']) !== 0) {
-	  $err['msg'] = "$l_err_delegation_target_outside ($d[delegation])";
+	  $err['msg'] = "$l_err_delegation_target_outside_domain ($d[delegation])";
+	  $err['field'] = 'delegation_target';
+	  return false;
+	}
+      }
+      // la cible de delegation est dans la cible de delegation de l'admin
+      if (isset($obm['delegation']) && ($obm['delegation'] != '')) {
+	if (strpos($delegation_target, $obm['delegation']) !== 0) {
+	  $err['msg'] = "$l_err_delegation_target_outside_target ($obm[delegation])";
 	  $err['field'] = 'delegation_target';
 	  return false;
 	}
@@ -1659,7 +1673,7 @@ function check_user_data_form($p_id, $user) {
       }
     }
 
-    // Verifier delegation est dans la cible de delegation
+    // Verifier delegation est dans la cible de delegation de l'admin
     if (isset($obm['delegation'])
         && ($obm['delegation'] != '')
         && (strpos($delegation, $obm['delegation']) !== 0)) {
@@ -1704,18 +1718,18 @@ function get_linked_user_timetask_nb($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the user can be deleted
 // Parameters:
-//   - $p_id : user id
+//   - $params[] : user values
 // Returns:
 //   true if the user can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_user_can_delete($p_id) {
-  global $err, $ok_msg;
-  global $l_link_timetask, $l_link_timetask_no;
+function check_user_can_delete($params) {
+  global $obm, $profiles, $err, $ok_msg;
+  global $l_profile_privilege_error, $l_link_timetask, $l_link_timetask_no;
 
   $delete_ok = true;
 
   // Links from Time management (referencing projects)
-  $nb = get_linked_user_timetask_nb($p_id);
+  $nb = get_linked_user_timetask_nb($params['user_id']);
   if ($nb > 0) {
     $delete_ok = false;
     $err['msg'] .= "$l_link_timetask";
@@ -1725,6 +1739,18 @@ function check_user_can_delete($p_id) {
 
   // Check that user has delegation rights for this user
   if (! check_user_update_rights($params)) {
+    $delete_ok = false;
+  }
+
+  $u = get_user_info($params['user_id']);
+  $usr_profile = $u['perms'];
+
+  // We can't delete a user with a more privileged profile
+  // Or same privilege with 'impair' profile
+  $level = $profiles[$obm['profile']]['level'];
+  if (($profiles[$usr_profile]['level'] < $level)
+      || (($profiles[$usr_profile]['level'] == $level) && ($level % 2 == 1))) {
+    $err['msg'] = "$l_profile_privilege_error";
     $delete_ok = false;
   }
 

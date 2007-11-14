@@ -53,6 +53,10 @@ $l_lname_error = "Invalid Name !";
 $l_exist_error = "already exists";
 $l_check_sameuser = "These users seem similar to this new entry !";
 
+$l_err_delegation_target_outside_domain = "The delegation target must be in the domain delegation !";
+$l_err_delegation_target_outside_target = "The delegation target must be in your delegation target !";
+$l_err_delegation_target_profile = "This profile don't support delegation target !";
+
 $l_add_users = "Add users";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)

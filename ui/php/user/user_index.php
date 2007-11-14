@@ -177,7 +177,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_user_can_delete($params["user_id"])) {
+  if (check_user_can_delete($params)) {
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_user_can_delete($params["user_id"]);
   } else {

@@ -101,21 +101,54 @@ Si le droit \$cright\_read est inclus dans la permission de l'utilisateur (de so
 
 \subsubsection{Définition des profils}
 
-Un profil est un ensemble de permissions sur des sections et des modules.
+Un profil est un ensemble de :
+\begin{itemize}
+\item Permissions sur des sections et des modules.
+\item Propriétés
+\end{itemize}
+
+\begin{tabular}{|p{5cm}|p{8cm}|}
+\hline
+\textbf{Caractéristique} & \textbf{Contenu} \\
+\hline
+section (permission) & Tableau des sections. Une valeur à 1 indique onglet affiché pour le profil (l'entrée 'default' définit la valeur pour les sections non listées \\ 
+\hline
+module (permission) & Tableau des modules. Définition des droits à chaque module. L'entrée 'default' définit la valeur pour les modules non listés \\ 
+\hline
+level & Niveau du profil. Un administrateur ou utilisateur ne peut pas créer / modifier / supprimer un utilisateur de privilège plus élevé (niveau 0 = privilège maximum). Si le niveau est pair, il est possible de gérer des utilisateurs de même niveau, sinon non \\ 
+\hline
+properties[admin\_realm] & Granularité d'administration (et de possibilité de mise à jour) pour un administrateur. Valeurs possibles : 'user', 'delegation', 'domain'.\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
 Une permission par défaut peut être attribuée à un profil pour les sections et les modules.
 Exemple de définition de profil :\\
 
 \shadowbox{
 \begin{minipage}{13cm}
 \begin{verbatim}
-$profiles["editor"] = array (
+$profiles['editor] = array (
   'section' => array (
     'default' => 0,
     'com' => 1,
     'prod' => 1,
     'user' => 1),
   'module' => array (
-    'default' => $perm_editor)
+    'default' => $perm_editor),
+  'level' => 3
+);
+$profiles['admin'] = array (
+  'section' => array (
+    'default' => 1,
+    'com' => 1,
+    'prod' => 1,
+    'user' => 1),
+  'module' => array (
+    'default' => $perm_admin),
+  'properties' => array (
+    'admin_realm' => array ('user', 'delegation', 'domain')),
+  'level' => 1
 );
 \end{verbatim}
 \end{minipage}
