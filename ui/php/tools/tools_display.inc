@@ -46,14 +46,14 @@ function dis_tools_update_detail() {
   foreach ($domains as $domain_id => $domain) {
     $has_domain_upd = check_tools_update_need_global_update($domain_id);
 
-    // Get all entities prod info (same for all realms)
+    // Get all entities prod info (need the 'domain' realm for all admin_realm)
     foreach ($entities as $entity=>$db_info) {
       $table = $db_info[0];
       $field = $db_info[1];
       $exclude_fields = $db_info[2];
       $dis_entity = ${"l_$entity"};
       if ($cgp_show['module']["$entity"]) {
-	$prod[$entity] = get_update_entity_infos('prod', $domain_id, $table, $field, $realm, $exclude_fields);
+	$prod[$entity] = get_update_entity_infos('prod', $domain_id, $table, $field, 'domain', $exclude_fields);
       }
     }
 

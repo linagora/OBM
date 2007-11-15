@@ -286,7 +286,6 @@ function get_update_entity_infos($target='both', $domain_id, $table, $field='', 
   global $cdg_sql, $cdg_exe, $obm;
 
   $uid = $obm['uid'];
-
   $delegation = $obm['delegation'];
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -352,6 +351,7 @@ function get_update_entity_infos($target='both', $domain_id, $table, $field='', 
   display_debug_msg($query, $cdg_sql, "get_update_entity_infos($table)");
   $retour = $obm_q->query($query);
 
+  $e = array();
   while($obm_q->next_record('BD_ASSOC')) {
     $id = $obm_q->f('id');
     $er = $obm_q->Record;
@@ -493,7 +493,7 @@ function get_update_entity_numbers($e2='', $domain_id, $table, $field='', $realm
  * @param $realm : realm space to check updates (user | domain | delegation)
  * @return link array : $link[$group_id] = $group_id
  */
-function get_update_link_group_new($domain_id, $realm) {
+function get_update_link_group($domain_id, $realm) {
   global $obm, $cdg_sql, $cdg_exe;
 
   $uid = $obm['uid'];
@@ -585,7 +585,7 @@ function get_update_link_group_new($domain_id, $realm) {
  * @param $realm : realm space to check updates (user | domain | delegation)
  * @return link array : $link[$group_id] = $group_id
  */
-function get_update_link_group($domain_id, $realm) {
+function get_update_link_group_oldsave($domain_id, $realm) {
   global $obm, $cdg_sql, $cdg_exe;
 
   $uid = $obm['uid'];
