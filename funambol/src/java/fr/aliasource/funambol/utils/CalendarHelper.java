@@ -310,9 +310,12 @@ public class CalendarHelper extends Helper {
 			}
 			logger.info("Computed end date : " + endTime.getTime());
 			cEndRec.setTime(endTime.getTime());
-		} else {
+		} else if (!rec.isNoEndDate()){
 			Date dEndRec = getDateFromUTCString(rec.getEndDatePattern());
 			cEndRec.setTime(dEndRec);
+		} else {
+			/*  infinite */
+			cEndRec.add(Calendar.YEAR, 2049);
 		}
 		recurrence.setEnd(cEndRec);
 
