@@ -1,1 +1,14 @@
+var/lib/obm
+var/lib/obm/backup
+var/lib/obm/documents
+var/lib/obm/documents/0
+var/lib/obm/documents/1
+var/lib/obm/documents/2
+var/lib/obm/documents/3
+var/lib/obm/documents/4
+var/lib/obm/documents/5
+var/lib/obm/documents/6
+var/lib/obm/documents/7
+var/lib/obm/documents/8
+var/lib/obm/documents/9
 

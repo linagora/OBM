@@ -48,7 +48,12 @@ EOF
 	fi
 
 fi
+#mise en place des permissions sur /var/lib/obm
+/bin/chown -R root.www-data /var/lib/obm
+/bin/chmod -R 770 /var/lib/obm
 
+sed -i -e 's#$cbackup_root = "/var/www/obmbackup";#$cbackup_root = "/var/lib/obm/backup";#' /etc/obm/obm_conf.inc
+sed -i -e 's#$cdocument_root = "/var/www/obmdocuments";#$cdocument_root = "/var/lib/obm/documents";#' /etc/obm/obm_conf.inc
 
 #On reset la variable de configuration pour les upgrade futur
 db_set obm-core/already_configured false
