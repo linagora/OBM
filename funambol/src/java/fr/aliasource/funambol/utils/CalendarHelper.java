@@ -2,6 +2,7 @@ package fr.aliasource.funambol.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -45,7 +46,7 @@ public class CalendarHelper extends Helper {
 
 		dateFormatUTC = new SimpleDateFormat(DATE_UTC_PATTERN);
 		dateFormatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
-		
+
 		dateFormatEurope = new SimpleDateFormat(DATE_FORMAT_EU);
 		dateFormatEurope.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
 	}
@@ -280,11 +281,35 @@ public class CalendarHelper extends Helper {
 		recurrence.setDays("");
 
 		java.util.Calendar cEndRec = java.util.Calendar.getInstance();
-		if (rec.isNoEndDate()) {
-			// obm need an end date -> 1 year + 1 day
-			cEndRec.setTime(dend);
-			cEndRec.add(java.util.Calendar.YEAR, 1);
-			cEndRec.add(java.util.Calendar.DAY_OF_MONTH, 1);
+		logger.info("recurrence: " + rec);
+		if (rec.getOccurrences() > 0) {
+			Date begin = getDateFromUTCString(rec.getStartDatePattern());
+			short type = rec.getTypeId();
+			Calendar endTime = Calendar
+					.getInstance(TimeZone.getTimeZone("GMT"));
+			endTime.setTime(begin);
+			switch (type) {
+			case RecurrencePattern.TYPE_DAYLY:
+				endTime.add(Calendar.DAY_OF_MONTH, (rec.getOccurrences() - 1)
+						* rec.getInterval());
+				break;
+			case RecurrencePattern.TYPE_MONTHLY:
+			case RecurrencePattern.TYPE_MONTH_NTH:
+				endTime.add(Calendar.MONTH, (rec.getOccurrences() - 1)
+						* rec.getInterval());
+				break;
+			case RecurrencePattern.TYPE_WEEKLY:
+				endTime.add(Calendar.WEEK_OF_YEAR, (rec.getOccurrences() - 1)
+						* rec.getInterval());
+				break;
+			case RecurrencePattern.TYPE_YEARLY:
+			case RecurrencePattern.TYPE_YEAR_NTH:
+				endTime.add(Calendar.YEAR, (rec.getOccurrences() - 1)
+						* rec.getInterval());
+				break;
+			}
+			logger.info("Computed end date : " + endTime.getTime());
+			cEndRec.setTime(endTime.getTime());
 		} else {
 			Date dEndRec = getDateFromUTCString(rec.getEndDatePattern());
 			cEndRec.setTime(dEndRec);

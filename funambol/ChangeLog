@@ -1,3 +1,10 @@
+2007-11-15  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	fix recurrence end date calculation
+	
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper..getRecurrenceFromFoundation):
+
 2007-11-05  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	force uppercase "encoding" to work correctly with syncje clients
