@@ -201,9 +201,14 @@ sub getEntity {
     }
 
     # Gestions des e-mails de l'utilisateur.
-    if( !defined($dbUserDesc->{"userobm_email"}) || ( $dbUserDesc->{"userobm_email"} eq "" ) ) {
+    $self->{"userDesc"}->{"user_mailperms"} = $dbUserDesc->{"userobm_mail_perms"};
+    if( $dbUserDesc->{"userobm_domain_id"} == 0 ) {
+        &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' annule - Pas de droit mail dans le domaine 'metadomain'", "W" );
+        $self->{"userDesc"}->{"user_mailperms"} = 0;
+
+    }elsif( !defined($dbUserDesc->{"userobm_email"}) || ( $dbUserDesc->{"userobm_email"} eq "" ) ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' annule - Pas d'adresse mail indiquée !", "W" );
-        $dbUserDesc->{"userobm_mail_perms"} = 0;
+        $self->{"userDesc"}->{"user_mailperms"} = 0;
 
     }else {
         my @email = split( /\r\n/, $dbUserDesc->{"userobm_email"} );
@@ -217,7 +222,7 @@ sub getEntity {
     }
 
     # Gestion du droit de messagerie
-    if( $dbUserDesc->{"userobm_mail_perms"} ) {
+    if( $self->{"userDesc"}->{"user_mailperms"} ) {
         my $localServerIp = $self->getHostIpById( $dbHandler, $dbUserDesc->{"mailserver_host_id"} );
 
         if( !defined($localServerIp) ) {

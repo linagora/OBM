@@ -245,7 +245,7 @@ function get_domain_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/domain/domain_index.php?action=new",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('search','index','insert','update','admin','detailconsult','display', 'mailserver_add', 'mailserver_del')
+    'Condition'=> array ('search','index','insert','update','delete','admin','detailconsult','display', 'mailserver_add', 'mailserver_del')
                                   );
 
 // Search
@@ -278,7 +278,7 @@ function get_domain_action() {
     'Right'    => $cright_write_admin,
     'Popup'    => 1,
     'Target'   => $l_domain,
-    'Condition'=> array ('detailconsult','mailserver_add','mailserver_del', 'update')
+    'Condition'=> array ('detailconsult','mailserver_add','mailserver_del','update')
                                     	  );
 
 // Mailserver add
@@ -332,6 +332,7 @@ function get_domain_action() {
 ///////////////////////////////////////////////////////////////////////////////
 function update_domain_action() {
   global $params, $actions, $path;
+  global $l_domain;
 
   $id = $params['domain_id'];
   if ($id > 0) {
@@ -350,7 +351,11 @@ function update_domain_action() {
     // Group Consult
     $actions['domain']['group_consult']['Url'] = "$path/domain/domain_index.php?action=group_consult&amp;domain_id=$id";
     $actions['domain']['group_consult']['Condition'][] = 'insert';
-  }
+
+    // Sel Mailserver add : Mail server selection
+    $actions['domain']['sel_mailserver_add']['Url'] = "$path/mailserver/mailserver_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=mailserver_add&amp;ext_url=".urlencode($path."/domain/domain_index.php")."&amp;ext_id=$id&amp;ext_target=$l_domain";
+    $actions['domain']['sel_mailserver_add']['Condition'][] = 'insert';
+ }
 }
 
 
