@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+. /usr/share/debconf/confmodule
+
+
+. /usr/share/dbconfig-common/dpkg/prerm.mysql 
+dbc_go obm-storage $@
+
+#DEBHELPER#
+exit 0

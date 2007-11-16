@@ -8,10 +8,9 @@ if [ -f /usr/share/debconf/confmodule ]; then
 fi
 
 if [ "$1" = "purge" ]; then
-	rm -f /usr/share/obm/www/conf/obm_conf.ini
-	rm -f /etc/obm/obm_conf.inc
-	rm -f /usr/share/obm/www/conf/obm_conf.inc
+	rm -f /etc/obm/obm_conf.ini
 fi
+
 #DEBHELPER#
 
 exit 0

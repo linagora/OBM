@@ -1,0 +1,27 @@
+Template: obm-conf/already_configured
+Type: boolean
+Default: false
+Description: for internal use.
+ .
+ Internal use for preconfigure and configure install via apt.
+
+Template: obm-conf/ldapserver
+Type: string
+Default: 127.0.0.1
+Description: where is Ldap server ?
+ .
+ Location of Ldap Server (obm-storage).
+
+Template: obm-conf/mysqlserver
+Type: string
+Default: 127.0.0.1
+Description: where is Mysql server ?
+ .
+  Location of Mysql Server .
+
+Template: obm-conf/mysqlpasswd
+Type: password
+Description: password of mysql obm user
+ .
+ Password of user OBM mysql (obm-storage).
+

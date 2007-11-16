@@ -12,9 +12,25 @@ Description: OBM
     full installation of Open Business Management
 	Instalation of OBM
 
+Package: obm-conf
+Architecture: any
+Depends: ${misc:Depends}
+Description: OBM conf
+    obm_conf.ini generation
+	Instalation of obm_conf.ini
+
+
+Package: obm-storage
+Architecture: any
+Depends: mysql-server, dbconfig-common, ucf, ${misc:Depends}
+Description: OBM storage
+   BD of Open Business Management
+	Instalation of Bd Mysql
+
+
 Package: obm-core
 Architecture: any
-Depends: mysql-server, dbconfig-common, ucf, php5-cli, ${misc:Depends}
+Depends:  php5-cli, ${misc:Depends}
 Description: OBM core
     core of Open Business Management
 	Instalation of Bd Mysql
