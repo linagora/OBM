@@ -1939,6 +1939,54 @@ function get_all_users_id_from_group($g_id) {
 
 
 /**
+ * Get all users of a group from the usergroup internal infos 
+ * @param $g_id group id
+ * @param $info if true, get lastname and firstname too else get only id
+ * @return false if problem
+ * @access public
+ */
+function of_usergroup_get_group_users($g_id, $info=false) {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  $users = array();
+  if ($info) {
+    $select_user = ',
+      userobm_lastname,
+      userobm_firstname';
+  }
+  // Users members of this group
+  $query = "SELECT of_usergroup_user_id as user_id
+      $select_user
+    FROM of_usergroup LEFT JOIN UserObm on of_userobm_user_id=userobm_id
+    WHERE userobm_archive != '1'
+      AND of_usergroup_group_id='$g_id'";
+
+  $obm_q = new DB_OBM; 
+  display_debug_msg($query, $cdg_sql, 'of_usergroup_get_group_users()');
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $u_id = $obm_q->f('user_id');
+    if ($info) {
+      $lastname = $obm_q->f('userobm_lastname');
+      $firstname = $obm_q->f('userobm_firstname');
+      $users[$u_id] = array('id' => $u_id,
+			    'lastname' => $lastname,
+			    'firstname' => $firstname);
+    } else {
+      array_push($users, $u_id);
+    }
+  }
+
+  return $users;
+}
+
+
+/**
  * Update one group internal user mapping
  * @param $g_id group id
  * @return false if problem
@@ -2033,10 +2081,10 @@ function of_usergroup_update_group_hierarchy($g_id) {
   }
 
   // If group not public, we return
-  $g = get_group_info($g_id);
-  if ($g['privacy'] != 0) {
-    return true;
-  }
+  //  $g = get_group_info($g_id);
+  //  if ($g['privacy'] != 0) {
+  //    return true;
+  //  }
 
   $groups = get_all_parent_group_of_group($g_id);
   $ret = false;

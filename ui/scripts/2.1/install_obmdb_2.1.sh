@@ -134,6 +134,10 @@ echo "*** Data checking and validation"
 # Set the current dir to php/admin_data (to resolve includes then)
 cd ../../php/admin_data
 
+# Update internal group values
+echo "  Update internal group values"
+$PHP admin_data_index.php -a data_update -m group
+
 # Update calculated values
 echo "  Update calculated values"
 $PHP admin_data_index.php -a data_update

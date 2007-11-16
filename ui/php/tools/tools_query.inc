@@ -307,15 +307,20 @@ function get_update_entity_infos($target='both', $domain_id, $table, $field='', 
 
   $multidomain = "AND (${f}_domain_id='$domain_id')";
 
+  // Specific condition according to table (eg handle only public groups)
+  if ($table == 'UGroup') {
+    $where_spec = 'AND group_privacy=0';
+  }
+
   // Restrict updates to the realm selected (user, domain, delegation)
   if ($realm == 'user') {
-    $where_upd = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
+    $where_upd = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $where_spec $multidomain";
     $where_prod = "WHERE 1=1 $multidomain";
   } else if ($realm == 'delegation') {
-    $where_upd = "WHERE ($dg $like '$delegation%') $multidomain";
+    $where_upd = "WHERE ($dg $like '$delegation%') $where_spec $multidomain";
     $where_prod = "WHERE 1=1 $multidomain";
   } else {
-    $where_upd = "WHERE 1=1 $multidomain";
+    $where_upd = "WHERE 1=1 $where_spec $multidomain";
     $where_prod = "WHERE 1=1 $multidomain";
   }
 
@@ -513,12 +518,12 @@ function get_update_link_group($domain_id, $realm) {
   $multidomain = "AND (group_domain_id='$domain_id')";
 
   // Restrict updates to the realm selected (user, domain, delegation)
-  if ($realm == "user") {
-    $where = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
-  } else if ($realm == "delegation") {
-    $where = "WHERE ($dg $like '$delegation%') $multidomain";
+  if ($realm == 'user') {
+    $where = "AND ($uu=$uid OR ($uc=$uid AND $uu is NULL))";
+  } else if ($realm == 'delegation') {
+    $where = "AND ($dg $like '$delegation%')";
   } else {
-    $where = "WHERE 1=1 $multidomain";
+    $where = '';
   }
 
   // UserObmGroup Link --------------------------------------------------------
@@ -527,7 +532,8 @@ function get_update_link_group($domain_id, $realm) {
   $query = "SELECT *
     FROM of_usergroup
       LEFT JOIN UGroup ON of_usergroup_group_id=group_id
-    $where
+    WHERE group_privacy=0
+      $where $multidomain
     ORDER BY of_usergroup_group_id, of_usergroup_user_id";
   display_debug_msg($query, $cdg_sql, "get_update_link_group()");
   $retour = $obm_q->query($query);
@@ -542,7 +548,8 @@ function get_update_link_group($domain_id, $realm) {
   $query = "SELECT *
     FROM P_of_usergroup
       LEFT JOIN P_UGroup ON of_usergroup_group_id=group_id
-    $where
+    WHERE group_privacy=0
+      $where $multidomain
     ORDER BY of_usergroup_group_id, of_usergroup_user_id";
   display_debug_msg($query, $cdg_sql, "get_update_link_group()");
   $retour = $obm_q->query($query);

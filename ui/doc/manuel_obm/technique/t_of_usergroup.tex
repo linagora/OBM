@@ -1,0 +1,201 @@
+% Documentation technique d'OBM : Gestion interne des groupes (mapping direct)
+% AliaSource Pierre Baudracco
+% $Id$
+
+
+\subsection{Gestion interne des groupes pour un mapping direct}
+\label{of_usergroup}
+révision : \obm 2.1.0\\
+
+\obm permet la gestion de groupes récursifs (groupes de groupes). Afin de garder un bon niveau de performance dans les recherches d'appartenance des utilisateurs aux groupes, et de permettre l'utilisation d'ACL sur les groupes, \obm maintient un mapping direct entre groupes et utilisateurs.
+
+Cette représentation des groupes ``à plat'' permet d'effectuer toute recherche en 1 seule passe et d'éviter des requêtes récursives.\\
+
+\subsubsection{Groupes privés et publics}
+
+Le mapping direct à plat doit-il contenir uniquement les groupes publics ou l'ensemble des groupes. Hypothèses de départ :\\
+\begin{itemize}
+\item Les groupes privés ne sont pas intégrés dans l'annuaire LDAP et donc omis par l'automate
+\item Les ACL ne doivent pas utiliser des groupes privés
+\item Nombre de groupes privés potentiel sur les très gros sites est une inconnue
+\end{itemize}
+\vspace{0.3cm}
+
+\shadowbox{Choix retenu et implémenté : of\_usergroup contient groupes publics + privés}\\
+
+\begin{tabular}{|p{2cm}|p{3.5cm}|p{8.5cm}|}
+\hline
+\textbf{Modèle à plat} & \textbf{Avantages} & \textbf{Méthodes pour accéder aux informations} \\
+\hline
+groupes publics &
+\begin{itemize}
+\item Les groupes privés n'ont pas à être traités par l'automate
+\item Les ACL ne doivent pas utiliser des groupes privés
+\end{itemize}
+&
+\begin{itemize}
+\item Membres d'un groupe (Agenda) : of\_usergroup pour publics, UserObmGroup + GroupGroup pour privés
+\item Recherche user par groupe : of\_usergroup pour publics, UserObmGroup + GroupGroup pour privés
+\item ACL : of\_usergroup
+\item Maj : of\_usergroup maj que si public
+\item Tableau de Maj : traitement standard of\_usergroup
+\item Automate : traitement standard of\_usergroup
+\end{itemize}
+\\
+\hline
+groupes publics + privés \textbf{choix retenu} &
+\begin{itemize}
+\item Ensemble des informations accessible à un seul endroit direct
+\end{itemize}
+&
+\begin{itemize}
+\item Membres d'un groupe (Agenda) : of\_usergroup
+\item Recherche user par groupe : of\_usergroup
+\item ACL : of\_usergroup avec jointure pour recherche que public
+\item Maj : of\_usergroup systématique : tableau de maj : traitement nécessite tri (public) de of\_usergroup
+\item Tableau de Maj : traitement nécessite tri (public) de of\_usergroup
+\item Automate : traitement nécessite tri (public) de of\_usergroup
+\end{itemize}
+\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+
+\subsubsection{Cohérence des données}
+
+Les données des liaisons utilisateurs - groupes et groupes - groupes sont donc présentes en redondance dans la base : dans le modèle hiérarchique et dans le modèle à plat.\\
+
+\begin{tabular}{|c|c|p{9cm}|}
+\hline
+\textbf{Table} & \textbf{Modèle} & \textbf{Informations} \\
+\hline
+UserObmGroup & Hiérarchique & Appartenance directe des utilisateurs aux groupes\\
+\hline
+GroupGroup & Hiérarchique & Appartenance des groupes aux groupes (récursivité)\\
+\hline
+of\_usergroup & A plat & Mapping direct des utilisateurs aux groupes (appartenance directe ou indirecte)\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+\paragraph{Cohérence en temps réel} : Afin de maintenir la cohérence entre les 2 modèles, à chaque opération portant sur les groupes, opération nativement effectuée dans le modèle hiérarchique, le modèle interne à plat est mis à jour.
+
+\begin{itemize}
+\item création de groupe
+\item ajout d'utilisateur à un groupe
+\item suppression d'utilisateur à un groupe
+\item ajout de groupe à un groupe
+\item suppression de groupe à un groupe
+\item suppression de groupe
+\item modification des groupes d'un utilisateur
+\item suppression d'utilisateur
+\end{itemize}
+
+
+\paragraph{Outil de mise à jour de la cohérence} : Afin de pallier à tout problème, un outil permet de recalculer le modèle à plat à partir du modèle hiérarchique.
+Cet outil est disponible via le menu 'Dictionnaire->Données->data\_update(groupe)' ou peut être éxécuté en ligne de commande.
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+php admin_data/admin_data_index.php -adata_update -m group
+\end{verbatim}
+\end{minipage}
+}
+
+Il est utilisé dans le script d'installation ainsi que dans le script de mise à jour de la base de la version 2.0 vers 2.1.
+
+
+\subsubsection{Implémentation : API fonctions publiques}
+
+\begin{tabular}{|c|p{9cm}|}
+\hline
+\textbf{Nom générique} & \textbf{Fonctions Définies dans} \\
+\hline
+of\_usergroup & \fichier{obminclude/of/of\_query.inc}\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+
+\paragraph{Fonctions de récupération de données} : \\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_usergroup_get_group_users($g_id, $info=false) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Récupération sous forme de tableau des utilisateurs d'un groupe}\\
+\hline
+\$g\_id & Id du groupe\\
+\hline
+\$info & Si false (par défaut) retourne tableau d'Id, sinon retourne tableau associatif avec id, nom et prénom des utilisateurs\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+Array & Tableau (id ou id => id, nom, prénom) des utilisateurs membres du groupe\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\paragraph{Fonctions de mise à jour base de données (internes)} : \\
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_usergroup_update_group_node($g_id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Fonction qui met à jour le mapping interne d'un groupe}\\
+\hline
+\$g\_id & Id du groupe\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+Boolean & true si OK, sinon false\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_usergroup_update_group_hierarchy($g_id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Fonction qui met à jour le mapping interne d'un groupe et de ses parents}\\
+\hline
+\$g\_id & Id du groupe\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+Boolean & true si OK, sinon false\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
