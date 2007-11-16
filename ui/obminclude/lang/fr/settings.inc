@@ -20,6 +20,7 @@ $l_set_todo = "Ordre d'affichage des tâches";
 $l_set_date_upd = "Format de saisie de date";
 $l_set_date = "Format d'affichage de date";
 $l_set_commentorder = "Affichage des commentaires";
+$l_set_display_days = "Calendrier : Jours affichés";
 $l_set_cal_interval = "Calendrier : Intervalle";
 $l_set_cal_first_hour = "Calendrier : Heure de début";
 $l_set_cal_last_hour = "Calendrier : Heure de fin";

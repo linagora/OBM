@@ -21,6 +21,7 @@ $l_set_todo = "Sort order for todo tasks";
 $l_set_date_upd = "Input date format";
 $l_set_date = "Date format";
 $l_set_commentorder = "Comment display";
+$l_set_display_days = "Calendar displayed days";
 $l_set_cal_interval = "Calendar interval";
 $l_set_cal_first_hour = "Calendar start hour";
 $l_set_cal_last_hour = "Calendar end hour";

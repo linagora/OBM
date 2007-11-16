@@ -736,7 +736,9 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
   $week_num = get_calendar_week_num($ts_date);
   $next_week = of_isodate_format(strtotime("+1 week", $ts_date));
   $prev_week = of_isodate_format(strtotime("-1 week", $ts_date));
-  
+
+  $display_days = $_SESSION['set_cal_display_days'];
+  if (empty($display_days)) $display_days = '1111111';
   $start_week_day = get_calendar_date_day_of_week($ts_date, $ccalendar_weekstart);
   $end_week_time = $start_week_day + ((6 * 24 + $ccalendar_last_hour) * 3600);
   $start_week_time = strtotime("+$ccalendar_first_hour hours",$start_week_day);
@@ -750,16 +752,18 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
   $k = 0; 
   // Week Days headers : loop day by day
   for ($ts = $start_week_time; $ts < $end_week_time; $ts = strtotime("+1 day",$ts) ) {
-    $iso_date = of_isodate_format($ts);
-    $this_date_l = calendar_localizeDate("week_list", $ts);
-    $week_day_list .= "
-    <td>
-      <a href=\"calendar_index.php?action=view_day&amp;date=$iso_date\">$this_date_l</a>
-    </td>";
-    $week_day_event_list .= "
-    <th id=\"day-".($ts - $start_week_time)."\">
-    </th>
-      ";
+    if (strcmp(substr($display_days,$k,1),"1")==0) {
+      $iso_date = of_isodate_format($ts);
+      $this_date_l = calendar_localizeDate("week_list", $ts);
+      $week_day_list .= "
+      <td>
+        <a href=\"calendar_index.php?action=view_day&amp;date=$iso_date\">$this_date_l</a>
+      </td>";
+      $week_day_event_list .= "
+      <th id=\"day-".($ts - $start_week_time)."\">
+      </th>
+        ";
+    }
     $k++;
   }
 
@@ -775,15 +779,24 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
       }
       $delta2 = $k * $time_unit;
       for ($i=0; $i<7; $i ++) {
-        $current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);
-        $iso_date = of_isodate_format($current_time);
-        $week_cal .= "<td id=\"time-$current_time\"></td>";
+        if (strcmp(substr($display_days,$i,1),"1")==0) {
+          $current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);
+          $iso_date = of_isodate_format($current_time);
+          $week_cal .= "<td id=\"time-$current_time\"></td>";
+        }
       }
       $week_cal .= "</tr>";
     }
   }
-  $occurrences = calendar_events_model($start_week_day,strtotime("+7 days",$start_week_day),$calendar_entity,$category_filter);
-  
+
+  $k = 0;
+  for ($ts = $start_week_day; $ts < $end_week_time; $ts = strtotime("+1 day",$ts) ) {
+    if (strcmp(substr($display_days,$k,1),"1")==0) {
+      $occurrences = calendar_events_model($ts,strtotime("+1 days",$ts),$calendar_entity,$category_filter);
+    }
+    $k++;
+  }
+
   if(is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
       $dis_event .= dis_calendar_event($occurrence, "hour",$calendar_entity,$writable_entity);

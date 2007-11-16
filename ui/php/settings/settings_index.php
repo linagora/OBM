@@ -88,6 +88,13 @@ if ($params['form_user_pref']) {
   }
   update_user_pref($obm['uid'], 'set_mail', $_SESSION['set_mail']);
 
+  // days to display in the week view
+  if ($params['display_days']=='0000000') {
+    $params['display_days'] = '1111111';
+  }
+  $_SESSION['set_cal_display_days'] = $params['display_days'];
+  update_user_pref($obm['uid'], 'set_cal_display_days', $_SESSION['set_cal_display_days']);
+
   if ($params['cal_interval'] != '') {
     $_SESSION['set_cal_interval'] = $params['cal_interval'];
     update_user_pref($obm['uid'], 'set_cal_interval', $_SESSION['set_cal_interval'], 1);
@@ -308,7 +315,30 @@ $display['detail'] .= " /></td>
   </tr>";
 
 if ($cgp_show['module']['calendar']) {
+
+  // days to display in the week view
+  $display_days = $_SESSION['set_cal_display_days'];
+  $start_week_day = strtotime($ccalendar_weekstart);
+
+  for ($i=0; $i<7; $i++) {
+    $day_num = date("w", $start_week_day);
+    $day = $l_daysofweekshort[$day_num];
+    $dis_display_days .= "<input type=\"checkbox\" name=\"cba_displayday_".$i."\" value=\"1\"";
+    if (strcmp(substr($display_days,$i,1),"1")==0) {
+      $dis_display_days .= " checked = \"checked\"";
+    }
+    $dis_display_days .= " /> $day";
+
+    $start_week_day = strtotime("+1 day", $start_week_day); 
+  }
+
   $display['detail'] .= "
+  <tr>
+    <th>$l_set_display_days</th>
+    <td>
+      $dis_display_days
+    </td>
+  </tr>
   <tr>
     <th>$l_set_cal_interval</th>
     <td>
@@ -402,7 +432,16 @@ function get_settings_params() {
   
   // Get global params
   $params = get_global_params('Settings');
-  
+
+  // days to display in the week view
+  for ($i=0; $i<7; $i++) {
+    if (isset($params["displayday_$i"])) {
+      $params['display_days'] .= '1';
+    } else {
+      $params['display_days'] .= '0';
+    }
+  }
+
   return $params;
 }
 
