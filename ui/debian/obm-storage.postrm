@@ -12,9 +12,9 @@ if [ -f /usr/share/dbconfig-common/dpkg/postrm.mysql ]; then
 fi
 
 if [ "$1" = "purge" ]; then
-	rm -f /etc/obm/debian-db-obm.conf
+	rm -f /etc/obm-storage/debian-db-obm.conf
 	if which ucf >/dev/null 2>&1; then
-		ucf --purge /etc/obm/debian-db-obm.conf
+		ucf --purge /etc/obm-storage/debian-db-obm.conf
 	fi
 fi
 

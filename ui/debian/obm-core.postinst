@@ -21,38 +21,6 @@ is_initial_configuration() {
 	return 1 
 } 
 
-
-
-####Génération de la BD Mysql
-#db_get obm-core/mysqlinstall
-#if [ "$RET" = "true" ]; then
-#	. /usr/share/dbconfig-common/dpkg/postinst.mysql 
-#	dbc_generate_include=template:/etc/obm/debian-db-obm.conf
-#	dbc_generate_include_args="-o template_infile=/usr/share/obm/debian/debian-db.conf.template"
-#	dbc_go obm-core $@
-#elif [ "$RET" = "false" ]; then
-#	if [ -f /usr/share/dbconfig-common/dpkg/frontend.postinst.mysql ]; then
-#	
-##		db_get obm-core/mysqlserver
-##		mysqlServer="totomonserver"
-#		#mysqlServer=$RET
-#	   . /usr/share/dbconfig-common/dpkg/frontend.postinst.mysql
-#		dbc_generate_include=template:/etc/obm/debian-db-obm.conf
-#		dbc_generate_include_args="-o template_infile=/usr/share/obm/debian/debian-db.conf.template"
-#	   dbc_go obm-core $@
-#	fi
-#fi
-
-##mise en place des fichier de conf OBM
-#OBM_USER=`grep "dbuser" /etc/obm/debian-db-obm.conf | cut -d"=" -f2`
-#OBM_PASSWD=`grep "dbpass" /etc/obm/debian-db-obm.conf | cut -d"=" -f2`	
-#OBM_DBNAME=`grep "dbname" /etc/obm/debian-db-obm.conf | cut -d"=" -f2`	
-#OBM_HOST=`grep "dbserver" /etc/obm/debian-db-obm.conf | cut -d"=" -f2`	
-#if [ -z $OBM_HOST ] ; then
-#	OBM_HOST="localhost"
-#fi
-	
-
 #Installation des fichier de conf
 if is_initial_configuration "$@"; then
 	#obm_conf.ini est déjà mis en place par obm-conf
@@ -60,6 +28,15 @@ if is_initial_configuration "$@"; then
 
 	cp /usr/share/obm/sample/obm_conf.inc.sample /etc/obm/obm_conf.inc
 	ln -s /etc/obm/obm_conf.inc /usr/share/obm/www/conf/obm_conf.inc
+
+	#mise en place des permissions sur /var/lib/obm
+	/bin/chown -R root.www-data /var/lib/obm
+	/bin/chmod -R 770 /var/lib/obm
+
+	#configuration	de obm_conf.inc
+	sed -i -e 's#$cbackup_root = "/var/www/obmbackup";#$cbackup_root = "/var/lib/obm/backup";#' /etc/obm/obm_conf.inc
+	sed -i -e 's#$cdocument_root = "/var/www/obmdocuments";#$cdocument_root = "/var/lib/obm/documents";#' /etc/obm/obm_conf.inc
+	
 fi
 
 #DEBHELPER#

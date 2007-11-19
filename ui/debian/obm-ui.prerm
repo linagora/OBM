@@ -1,7 +1,0 @@
-#!/bin/sh
-
-. /usr/share/debconf/confmodule
-
-#DEBHELPER#
-
-exit 0

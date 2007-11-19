@@ -17,11 +17,24 @@ Type: string
 Default: 127.0.0.1
 Description: where is Mysql server ?
  .
-  Location of Mysql Server .
+ Location of Mysql Server.
+
+Template: obm-conf/mysqldb
+Type: string
+Default: obm
+Description: Name of Database ?
+ .
+ Name of OBM database.
+
+Template: obm-conf/mysqluser
+Type: string
+Default: obm
+Description: login of DB ?
+ .
+ Location of User Mysql.
 
 Template: obm-conf/mysqlpasswd
 Type: password
 Description: password of mysql obm user
  .
  Password of user OBM mysql (obm-storage).
-
