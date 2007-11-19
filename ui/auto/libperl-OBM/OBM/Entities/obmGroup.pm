@@ -213,7 +213,7 @@ sub updateDbEntity {
     if( $self->isLinks() ) {
         # On supprime les liens actuels de la table de production des liens
         # utilisateurs/groupes
-        $query = "DELETE FROM P_UserObmGroup WHERE userobmgroup_group_id=".$self->{"groupId"};
+        $query = "DELETE FROM P_of_usergroup WHERE of_usergroup_group_id=".$self->{"groupId"};
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
             &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
             return 0;
@@ -221,7 +221,7 @@ sub updateDbEntity {
 
 
         # On copie les nouveaux droits
-        $query = "SELECT * FROM UserObmGroup WHERE userobmgroup_group_id=".$self->{"groupId"};
+        $query = "SELECT * FROM of_usergroup WHERE of_usergroup_group_id=".$self->{"groupId"};
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
             &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d' une requete SQL : ".$dbHandler->err, "W" );
@@ -229,45 +229,7 @@ sub updateDbEntity {
         }
 
         while( my $rowHash = $queryResult->fetchrow_hashref() ) {
-            $query = "INSERT INTO P_UserObmGroup SET ";
-
-            my $first = 1;
-            while( my( $column, $value ) = each(%{$rowHash}) ) {
-                if( !$first ) {
-                    $query .= ", ";
-                }else {
-                    $first = 0;
-                }
-
-                $query .= $column."=".$dbHandler->quote($value);
-            }
-
-            my $queryResult2;
-            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-                &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'executio n d'une requete SQL : ".$dbHandler->err, "W" );
-                return 0;
-             }
-        }
-
-        # On supprime les liens actuels de la table de production des liens
-        # utilisateurs/groupes
-        $query = "DELETE FROM P_GroupGroup WHERE groupgroup_parent_id=".$self->{"groupId"};
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-            return 0;
-        }
-
-
-        # On copie les nouveaux droits
-        $query = "SELECT * FROM GroupGroup WHERE groupgroup_parent_id=".$self->{"groupId"};
-
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d' une requete SQL : ".$dbHandler->err, "W" );
-            return 0;
-        }
-
-        while( my $rowHash = $queryResult->fetchrow_hashref() ) {
-            $query = "INSERT INTO P_GroupGroup SET ";
+            $query = "INSERT INTO P_of_usergroup SET ";
 
             my $first = 1;
             while( my( $column, $value ) = each(%{$rowHash}) ) {
@@ -369,16 +331,14 @@ sub _getGroupUsers {
 
 
     my $userObmTable = "UserObm";
-    my $userObmGroupTable = "UserObmGroup";
-    my $groupGroupTable = "GroupGroup";
+    my $userObmGroupTable = "of_usergroup";
     if( $self->getDelete() ) {
         $userObmTable = "P_".$userObmTable;
         $userObmGroupTable = "P_".$userObmGroupTable;
-        $groupGroupTable = "P_".$groupGroupTable;
     }
 
     # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = "SELECT i.userobm_login FROM ".$userObmTable." i, ".$userObmGroupTable." j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
+    my $query = "SELECT i.userobm_login FROM ".$userObmTable." i, ".$userObmGroupTable." j WHERE j.of_usergroup_group_id=".$groupId." AND j.of_usergroup_user_id=i.userobm_id";
 
     if( defined( $sqlRequest ) && ($sqlRequest ne "") ) {
         $query .= " ".$sqlRequest;
@@ -397,31 +357,6 @@ sub _getGroupUsers {
         push( @tabResult, $userLogin );
     }
 
-    # Recuperation de la liste des groupes du groupe id : $groupId.
-    $query = "SELECT groupgroup_child_id FROM ".$groupGroupTable." WHERE groupgroup_parent_id=".$groupId;
-
-    # On execute la requete
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme SQL lors de l'obtention des utilisateurs du groupe : ".$queryResult->err, "W" );
-        return undef;
-    }
-
-    # On traite les resultats
-    while( my( $groupGroupId ) = $queryResult->fetchrow_array ) {
-        my $userGroupTmp = $self->_getGroupUsers( $groupGroupId, $dbHandler, $sqlRequest );
-
-        for( my $i=0; $i<=$#$userGroupTmp; $i++ ) {
-            my $j =0;
-            while( ($j<=$#tabResult) && ($$userGroupTmp[$i] ne $tabResult[$j]) ) {
-                $j++;
-            }
-
-            if( $j>$#tabResult ) {
-                push( @tabResult, $$userGroupTmp[$i] );
-            }
-        }
-    }
-    
     return \@tabResult;
 }
 
