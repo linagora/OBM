@@ -1344,21 +1344,29 @@ function check_user_data_form($p_id, $user) {
   $smb_home_drive = $user['smb_home_drive'];
   $smb_logon = $user['smb_logon'];
   $file = $user['file_tmp'];
-
-  $u = get_user_info($id);
-  $usr_profile = $u['perms'];
-
+  
   // We can't handle a user with a more privileged profile
   // Or same privilege with 'impair' profile
   $level = $profiles[$obm['profile']]['level'];
   if (($profiles[$profile]['level'] < $level)
-      || ($profiles[$usr_profile]['level'] < $level)
-      || (($profiles[$profile]['level'] == $level) && ($level % 2 == 1))
-      || (($profiles[$usr_profile]['level'] == $level) && ($level % 2 == 1))) {
+      || (($profiles[$profile]['level'] == $level) && ($level % 2 == 1))) {
     $err['msg'] = "$l_profile_privilege_error";
     $err['field'] = 'profile';
     return false;
+  }    
+  
+  if($action == 'update') {
+    $u = get_user_info($id);
+    $usr_profile = $u['perms'];
+    if (($profiles[$usr_profile]['level'] < $level)
+        || (($profiles[$usr_profile]['level'] == $level) && ($level % 2 == 1))) {
+      $err['msg'] = "$l_profile_privilege_error";
+      $err['field'] = 'profile';
+      return false;
+    }    
   }
+
+
 
   if ($action == 'update') {
 
