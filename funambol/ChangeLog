@@ -1,6 +1,7 @@
 2007-11-20  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
-	fix all day bb (obm display bugs if duration % 86400 == 0 on all day)
+	fix all day bb (obm display bugs if (duration % 86400 == 0 and
+	dtstart=midnight) on all day)
 	
 	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
 	(CalendarHelper.), (CalendarHelper..getRecurrenceFromFoundation):
