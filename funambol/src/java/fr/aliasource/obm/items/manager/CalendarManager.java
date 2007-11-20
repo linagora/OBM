@@ -367,11 +367,12 @@ public class CalendarManager extends ObmManager {
 			temp.set(Calendar.HOUR_OF_DAY, 0);
 			temp.set(Calendar.MINUTE, 0);
 			temp.set(Calendar.SECOND, 0);
-			
+
 			event.getDtStart().setPropertyValue(
 					CalendarHelper.getUTCFormat(temp.getTime()));
 
-			temp.add(java.util.Calendar.SECOND, (int) (86400 * Math.ceil(((float)obmevent.getDuration()) / 86400)));
+			temp.add(java.util.Calendar.SECOND, (int) (86400 * Math
+					.ceil(((float) obmevent.getDuration()) / 86400)));
 			dend = temp.getTime();
 
 			event.getDtEnd()
@@ -421,6 +422,7 @@ public class CalendarManager extends ObmManager {
 	 * 
 	 * @param calendar
 	 * @param type
+	 * @param allDay
 	 * @return
 	 */
 	private Event foundationCalendarToObmEvent(
@@ -461,14 +463,23 @@ public class CalendarManager extends ObmManager {
 		Date dend = parseEnd(prodId, foundation, event);
 
 		if (dend.getTime() != dstart.getTime()) {
+			int fix = 0;
+			// le rdv s'affiche sur 1 jour de plus dans obm si la duration fait tomber la date de fin sur minuit
+			if (foundation.isAllDay()
+					&& ((dend.getTime() - dstart.getTime()) % 86400) == 0) {
+				fix = 1;
+			}
 			event
-					.setDuration((int) ((dend.getTime() - dstart.getTime()) / 1000));
+					.setDuration((int) ((dend.getTime() - dstart.getTime()) / 1000)
+							- fix);
 		} else {
 			event.setDuration(3600);
 		}
-		logger.info("summary:"+foundation.getSummary().getPropertyValueAsString());
-		logger.info("summary charset:"+foundation.getSummary().getCharset());
-		logger.info("summary enconding:"+foundation.getSummary().getEncoding());
+		logger.info("summary:"
+				+ foundation.getSummary().getPropertyValueAsString());
+		logger.info("summary charset:" + foundation.getSummary().getCharset());
+		logger.info("summary enconding:"
+				+ foundation.getSummary().getEncoding());
 		event.setTitle(foundation.getSummary().getPropertyValueAsString());
 
 		if (foundation.getDescription() != null) {
@@ -505,7 +516,7 @@ public class CalendarManager extends ObmManager {
 		EventRecurrence recurrence = null;
 		if (foundation.isRecurrent()) {
 			recurrence = CalendarHelper.getRecurrenceFromFoundation(foundation
-					.getRecurrencePattern(), dend);
+					.getRecurrencePattern(), dend, foundation.isAllDay());
 		} else {
 			recurrence = new EventRecurrence();
 			recurrence.setKind("none");
@@ -535,10 +546,10 @@ public class CalendarManager extends ObmManager {
 
 		if (foundation.getAllDay() && "Blackberry".equals(prodId)) {
 
-//			logger.info("bb detected, adding 1 day to dtstart");
-//			cal.add(Calendar.DAY_OF_MONTH, 1);
-//			logger.info("utcDate: " + utcDate + " prev dtstart: " + dtStart
-//					+ " new dtstart: " + cal.getTime());
+			// logger.info("bb detected, adding 1 day to dtstart");
+			// cal.add(Calendar.DAY_OF_MONTH, 1);
+			// logger.info("utcDate: " + utcDate + " prev dtstart: " + dtStart
+			// + " new dtstart: " + cal.getTime());
 		}
 		event.setDate(cal);
 		return cal.getTime();
@@ -552,11 +563,11 @@ public class CalendarManager extends ObmManager {
 		cal.setTime(utcDate);
 
 		if (foundation.getAllDay() && "Blackberry".equals(prodId)) {
-//
-//			logger.info("bb detected, adding 1 day to dtend");
-//			cal.add(Calendar.DAY_OF_MONTH, 1);
-//			logger.info("utcDate: " + utcDate + " prev dtend: " + dtEnd
-//					+ " new dtend: " + cal.getTime());
+			//
+			// logger.info("bb detected, adding 1 day to dtend");
+			// cal.add(Calendar.DAY_OF_MONTH, 1);
+			// logger.info("utcDate: " + utcDate + " prev dtend: " + dtEnd
+			// + " new dtend: " + cal.getTime());
 		}
 		return cal.getTime();
 	}

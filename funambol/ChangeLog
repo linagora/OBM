@@ -1,3 +1,17 @@
+2007-11-20  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	fix all day bb (obm display bugs if duration % 86400 == 0 on all day)
+	
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper.), (CalendarHelper..getRecurrenceFromFoundation):
+	* src/java/fr/aliasource/funambol/utils/MyCalContentConverter.java:
+	(MyCalContentConverter..cc2vcc), (MyCalContentConverter..vcc2cc),
+	(MyCalContentConverter..decodeField):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.obmEventToFoundationCalendar), (CalendarManager),
+	(CalendarManager.foundationCalendarToObmEvent),
+	(CalendarManager.parseStart), (CalendarManager.parseEnd):
+
 2007-11-15  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	fix recurrence end date calculation

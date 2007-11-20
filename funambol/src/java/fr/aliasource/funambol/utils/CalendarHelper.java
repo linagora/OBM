@@ -271,10 +271,11 @@ public class CalendarHelper extends Helper {
 	 * 
 	 * @param rec
 	 * @param dend
+	 * @param allDay
 	 * @return
 	 */
 	public static EventRecurrence getRecurrenceFromFoundation(
-			RecurrencePattern rec, Date dend) {
+			RecurrencePattern rec, Date dend, boolean allDay) {
 		EventRecurrence recurrence = new EventRecurrence();
 
 		recurrence.setFrequence(rec.getInterval());
@@ -308,13 +309,18 @@ public class CalendarHelper extends Helper {
 						* rec.getInterval());
 				break;
 			}
+			// funambol perd la tz en calculant la startDatePattern : le 19 à
+			// 23h utc (20 à 0h sur paris), devient le 19
+			if (allDay) {
+				endTime.add(Calendar.DAY_OF_YEAR, 1);
+			}
 			logger.info("Computed end date : " + endTime.getTime());
 			cEndRec.setTime(endTime.getTime());
-		} else if (!rec.isNoEndDate()){
+		} else if (!rec.isNoEndDate()) {
 			Date dEndRec = getDateFromUTCString(rec.getEndDatePattern());
 			cEndRec.setTime(dEndRec);
 		} else {
-			/*  infinite */
+			/* infinite */
 			cEndRec.add(Calendar.YEAR, 2049);
 		}
 		recurrence.setEnd(cEndRec);

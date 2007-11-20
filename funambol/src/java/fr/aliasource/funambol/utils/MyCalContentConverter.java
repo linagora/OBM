@@ -268,11 +268,10 @@ public class MyCalContentConverter extends VCalendarConverter {
 		 * i++){ //vcc.addProperty(composeFieldXTag(ccentXTag)); }
 		 */
 
-//		if (cc.getAllDay()) {
-//			logger.info("setting dtend to dtstart for all-day compat with pda");
-//			vcc.addProperty("DTEND", vcc.getProperty("DTSTART").getValue());
-//		}
-		
+		// if (cc.getAllDay()) {
+		// logger.info("setting dtend to dtstart for all-day compat with pda");
+		// vcc.addProperty("DTEND", vcc.getProperty("DTSTART").getValue());
+		// }
 		// @todo Add Task-specific properties
 		return vcc;
 
@@ -520,11 +519,11 @@ public class MyCalContentConverter extends VCalendarConverter {
 		logger.info("restoring dtstart & end : " + storedDtStart + " & "
 				+ storedDtEnd);
 		cc.setDtStart(new Property(storedDtStart));
-		if (cc.isAllDay()) {
-			cc.setDtEnd(new Property(storedDtStart));
-		} else {
-			cc.setDtEnd(new Property(storedDtEnd));
-		}
+		// if (cc.isAllDay()) {
+		// cc.setDtEnd(new Property(storedDtStart));
+		// } else {
+		cc.setDtEnd(new Property(storedDtEnd));
+		// }
 		return cc;
 	}
 
@@ -1902,12 +1901,13 @@ public class MyCalContentConverter extends VCalendarConverter {
 
 	@Override
 	protected Property decodeField(com.funambol.common.pim.model.Property arg0) {
-//		logger.info("property: " + arg0);
-//		if (arg0 != null) {
-//			logger.info("prop "+arg0.getName()+" value: '" + arg0.getValue() + "'");
-//		}
+		// logger.info("property: " + arg0);
+		// if (arg0 != null) {
+		// logger.info("prop "+arg0.getName()+" value: '" + arg0.getValue() +
+		// "'");
+		// }
 		Property ret = super.decodeField(arg0);
-//		logger.info("ret=" + ret);
+		// logger.info("ret=" + ret);
 		return ret;
 	}
 }
