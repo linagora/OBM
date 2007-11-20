@@ -95,8 +95,7 @@ Description: OBM Postfix
 
 Package: obm-filter
 Architecture: any
-Depends: ${misc:Depends},obm-postfix, amavisd-new, clamav-daemon, spamassassin, lha, arj, unrar, zoo, nomarch, lzop, cabextract, bzip2, libnet-dns-perl, libmail-spf-query-perl
+Depends: obm-postfix, amavisd-new, clamav-daemon, spamassassin, lha, arj, unrar, zoo, nomarch, lzop, cabextract, bzip2, libnet-dns-perl, libmail-spf-query-perl, ${misc:Depends}
 Description: OBM Filter
   Configuration of Amavisd-new, clamav and SpamAssassin for obm
-
 
