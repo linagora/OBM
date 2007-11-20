@@ -27,6 +27,10 @@ dbc_generate_include=template:/etc/obm/funambol_conf.ini
 dbc_generate_include_args="-o template_infile=/usr/share/obm-funambol-core/debian/debian-db.conf.template"
 dbc_go obm-funambol-core $@
 
+db_set obm-funambol-core/already_configured false
+db_go || true
+
+
 #DEBHELPER#
 
 exit 0
