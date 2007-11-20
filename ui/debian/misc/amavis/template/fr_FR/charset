@@ -1,0 +1,3 @@
+# This is charset for fr_FR messages.
+# If you are creating new messages, use 'iconv -l' to get possible encodings.
+UTF-8

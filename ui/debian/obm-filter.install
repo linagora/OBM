@@ -1,0 +1,5 @@
+debian/misc/amavis/conf/50-user.obm.sample etc/amavis/conf.d
+debian/misc/amavis/conf/master.cf.obm.sample etc/postfix
+debian/misc/amavis/template/fr_FR etc/amavis
+debian/misc/spamassassin/script/update-sa-rules.sh usr/bin
+debian/misc/spamassassin/conf/sa-update.cf etc/spamassassin

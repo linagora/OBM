@@ -1,0 +1,82 @@
+use strict;
+
+#
+# Place your configuration directives here.  They will override those in
+# earlier files.
+#
+# See /usr/share/doc/amavisd-new/ for documentation and examples of
+# the directives you can use in this file
+#
+
+## General
+# Nombre de processus de filtrage simultannés
+# Cette valeur doit être identique à la variable 
+# postfix "smtp-amavis_destination_concurrency_limit"
+$max_servers = 2;
+# Utiliser les domaines de postfix pour déterminer les domaines locaux
+@local_domains_maps =( read_hash('/etc/postfix/virtual_domains') );
+
+## MAIL FORWARDING
+# Supprime silencieusement les messages contenant des pièces jointes bannies
+$final_banned_destiny = D_DISCARD;
+# On autorise les spam a passer quelque soit son score
+$final_spam_destiny   = D_PASS; 
+
+## QUARANTINE
+# On désactive les quarantaines
+$QUARANTINEDIR = undef;
+
+## NOTIFICATIONS (DSN, admin, recip)
+#On ne notifie pas l'administrateur
+$virus_admin = undef;
+# On notifie uniquement le destinataire pour les messages contenant des virus
+$warnvirusrecip   = 1;
+# On notifie uniquement le destinataire pour les messages contenant des pièces jointes bannies
+$warnbannedrecip  = 1;
+# On definie les notifications en Francais pour les messages contenant des virus
+read_l10n_templates('fr_FR','/etc/amavis');
+# On definie les notifications en Francais pour les messages contenant des pièces jointes bannies
+ 
+
+## ANTI-VIRUS AND INVALID/FORBIDDEN CONTENTS CONTROLS
+# Définition des pièces jointes bannies
+$banned_namepath_re = new_RE(
+  # block these MIME types
+  qr'(?#NO X-MSDOWNLOAD)   ^(.*\t)? M=application/x-msdownload   (\t.*)? $'xmi,
+  qr'(?#NO X-MSDOS-PROGRAM)^(.*\t)? M=application/x-msdos-program(\t.*)? $'xmi,
+  qr'(?#NO HTA)            ^(.*\t)? M=application/hta            (\t.*)? $'xmi,
+
+  # block certain double extensions in filenames
+  qr'(?# BLOCK DOUBLE-EXTENSIONS )
+     ^ (.*\t)? N= [^\t\n]* \. [^./\t\n]* [A-Za-z] [^./\t\n]* \.
+                  (exe|vbs|pif|scr|bat|cmd|com|cpl|dll) \.? (\t.*)? $'xmi,
+  
+  # banned filename extensions (in declared names) anywhere - basic
+  qr'(?# BLOCK COMMON NAME EXENSIONS )
+     ^ (.*\t)? N= [^\t\n]* \. (exe|vbs|pif|scr|bat|com|cpl|dll) (\t.*)? $'xmi,
+
+  # banned filename extensions anywhere - WinZip vulnerability (pre-V9)
+  [ qr'(?# BLOCK EMPTY MIME PART APPLICATION/OCTET-STREAM )
+       ^ (.*\t)? M=application/octet-stream \t(.*\t)* T=empty (\t.*)? $'xmi
+  => 'DISCARD' ],
+
+  qr'(?# BLOCK Microsoft EXECUTABLES )
+     ^ (.*\t)? T=exe-ms (\t.*)? $'xm,              # banned file(1) type
+);
+# désactivation des anciens filtrages pour les pièces jointes bannies 
+@banned_filename_maps = ();
+# Activation de l'anti-virus
+@bypass_virus_checks_maps = (
+   \%bypass_virus_checks, \@bypass_virus_checks_acl, \$bypass_virus_checks_re);
+# Activation de l'anti-spam
+@bypass_spam_checks_maps = (
+   \%bypass_spam_checks, \@bypass_spam_checks_acl, \$bypass_spam_checks_re);
+   
+
+## ANTI-SPAM CONTROLS
+# Pas de connexion distante pour les tests de spamassassin
+#$sa_local_tests_only = 1;   # only tests which do not require internet access?
+
+
+#------------ Do not modify anything below this line -------------
+1;  # insure a defined return

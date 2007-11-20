@@ -1,0 +1,151 @@
+#!/bin/sh
+# postinst script for obm-filter
+#
+# see: dh_installdeb(1)
+
+set -e
+#set -x
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <postinst> `abort-remove'
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see http://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+
+
+case "$1" in
+    configure)
+			# Premiere configuration
+			if [ -z "${2}" ] ; then 
+				## Configuration d'amavis		
+				# Sauvegarde du fichier de conf (50-user) d'origine d'amavis
+				# si celui-ci n'existe pas déjà
+				if [ ! -e /etc/amavis/conf.d/50-user.amavis.orig ] ; then
+					mv -f /etc/amavis/conf.d/50-user /etc/amavis/conf.d/50-user.amavis.orig
+				fi
+				# On copie le fichier de configuration (50-user) d'amavis pour OBM
+				cp -a  /etc/amavis/conf.d/50-user.obm.sample /etc/amavis/conf.d/50-user
+
+				## Mise en place du filtre dans postfix
+        # Génération du fichier de configuration (master.cf) de postfix pour OBM
+        cat /etc/postfix/master.cf > /etc/postfix/master.cf.obm.sample.tmp
+        cat /etc/postfix/master.cf.obm.sample >> /etc/postfix/master.cf.obm.sample.tmp
+
+      	# Sauvegarde du fichier de conf (master.cf) d'origine de postfix
+				# si celui-ci n'existe pas déjà
+				if [ ! -e /etc/postfix/master.cf.postfix.orig ] ; then
+        	mv -f /etc/postfix/master.cf /etc/postfix/master.cf.postfix.orig
+      	fi
+				# On copie le fichier de configuration (master.cf) de postfix pour OBM			
+				mv -f /etc/postfix/master.cf.obm.sample.tmp /etc/postfix/master.cf
+				# Activation du filtre
+				postconf -e 'content_filter=smtp-amavis:[127.0.0.1]:10024'
+				# Limitation du nombre de processus de filtrage simultanés
+				postconf -e 'smtp-amavis_destination_concurrency_limit=2'
+
+				## Installation de clamav
+				# Ajout de l'utilisateur clamav au groupe amavis pour autoriser 
+				# clamav à vérifier les fichiers traités par amavis
+				usermod -a -G amavis clamav
+			fi
+			# Toutes les configurations	
+			db_get obm-filter/httpproxyserver
+			if [ -z "${RET}" ] ; then
+				mv /etc/clamav/freshclam.conf /etc/clamav/freshclam.conf.tmp
+				cat /etc/clamav/freshclam.conf.tmp | sed -e '/^HTTPProxyServer .*$/d' > /etc/clamav/freshclam.conf
+			else 
+			  HTTP_PROXY_SERVER=${RET}
+			  mv /etc/clamav/freshclam.conf /etc/clamav/freshclam.conf.tmp
+        cat /etc/clamav/freshclam.conf.tmp | sed -e '/^HTTPProxyServer .*$/d' > /etc/clamav/freshclam.conf
+				echo "HTTPProxyServer ${HTTP_PROXY_SERVER}" >> /etc/clamav/freshclam.conf
+			fi
+			db_get obm-filter/httpproxyport
+      if [ -z "${RET}" ] ; then
+        mv -f /etc/clamav/freshclam.conf /etc/clamav/freshclam.conf.tmp
+        cat /etc/clamav/freshclam.conf.tmp | sed -e '/^HTTPProxyport .*$/d' > /etc/clamav/freshclam.conf        
+      else
+				HTTP_PROXY_PORT=${RET}
+        mv  /etc/clamav/freshclam.conf /etc/clamav/freshclam.conf.tmp
+        cat /etc/clamav/freshclam.conf.tmp | sed -e '/^HTTPProxyport .*$/d' > /etc/clamav/freshclam.conf
+        echo "HTTPProxyport ${HTTP_PROXY_PORT}" >> /etc/clamav/freshclam.conf
+      fi
+			## Installation de spamassassin
+			# Mise en place de sa-update
+			if [ -n "${HTTP_PROXY_SERVER}" ] && [ -n "${HTTP_PROXY_PORT}" ] ; then
+				mv  /etc/spamassassin/sa-update.cf /etc/spamassassin/sa-update.cf.tmp
+        cat /etc/spamassassin/sa-update.cf.tmp | sed -e '/^SpamAssassinHttpProxy=.*$/d' > /etc/spamassassin/sa-update.cf
+				echo "SpamAssassinHttpProxy=\"http://${HTTP_PROXY_SERVER}:${HTTP_PROXY_PORT}/\";" >> /etc/spamassassin/sa-update.cf
+				db_get obm-filter/spamassassinextrachannel
+				if [ "${RET}" = "true" ] ; then
+					rm -f /etc/spamassassin/openprotect.gpg
+					http_proxy="http://${HTTP_PROXY_SERVER}:${HTTP_PROXY_PORT}/" \
+					  /usr/bin/sa-update --channel updates.spamassassin.org || true
+			 		  gpg --keyserver-option http-proxy="http://${HTTP_PROXY_SERVER}:${HTTP_PROXY_PORT}/" \
+						    --keyserver pgp.mit.edu --recv-keys BDE9DC10 >/dev/null 2>/dev/null || true
+ 					  gpg --armor -o /etc/spamassassin/openprotect.gpg --export BDE9DC10 >/dev/null 2>/dev/null || true
+						sa-update --import /etc/spamassassin/openprotect.gpg >/dev/null 2>/dev/null || true
+					http_proxy="http://${HTTP_PROXY_SERVER}:${HTTP_PROXY_PORT}/" \
+						/usr/bin/sa-update --allowplugins --gpgkey D1C035168C1EBC08464946DA258CDB3ABDE9DC10 \
+										           --channel saupdates.openprotect.com >/dev/null 2>/dev/null || true
+				  mv  /etc/spamassassin/sa-update.cf /etc/spamassassin/sa-update.cf.tmp
+	        cat /etc/spamassassin/sa-update.cf.tmp | sed -e '/^SpamAssassinExtraChannel=.*$/d' > /etc/spamassassin/sa-update.cf
+					echo "SpamAssassinExtraChannel=\"Yes\";" >> /etc/spamassassin/sa-update.cf
+				else
+					http_proxy="http://${HTTP_PROXY_SERVER}:${HTTP_PROXY_PORT}/" \
+					  /usr/bin/sa-update --channel updates.spamassassin.org >/dev/null 2>/dev/null || true
+					mv  /etc/spamassassin/sa-update.cf /etc/spamassassin/sa-update.cf.tmp
+          cat /etc/spamassassin/sa-update.cf.tmp | sed -e '/^SpamAssassinExtraChannel=.*$/d' > /etc/spamassassin/sa-update.cf
+          echo "SpamAssassinExtraChannel=\"No\";" >> /etc/spamassassin/sa-update.cf
+				fi
+			else
+				mv  /etc/spamassassin/sa-update.cf /etc/spamassassin/sa-update.cf.tmp
+        cat /etc/spamassassin/sa-update.cf.tmp | sed -e '/^SpamAssassinHttpProxy=.*$/d' > /etc/spamassassin/sa-update.cf
+			  echo "SpamAssassinHttpProxy=\"\";" >> /etc/spamassassin/sa-update.cf
+				db_get obm-filter/spamassassinextrachannel
+        if [ "${RET}" = "true" ] ; then
+					rm -f /etc/spamassassin/openprotect.gpg
+          /usr/bin/sa-update --channel updates.spamassassin.org >/dev/null 2>/dev/null || true
+          gpg --keyserver-option --keyserver pgp.mit.edu --recv-keys BDE9DC10 >/dev/null 2>/dev/null || true
+          gpg --armor -o /etc/spamassassin/openprotect.gpg --export BDE9DC10 >/dev/null 2>/dev/null || true
+          sa-update --import /etc/spamassassin/openprotect.gpg >/dev/null 2>/dev/null || true
+          /usr/bin/sa-update --allowplugins --gpgkey D1C035168C1EBC08464946DA258CDB3ABDE9DC10 \
+                             --channel saupdates.openprotect.com >/dev/null 2>/dev/null || true
+          mv  /etc/spamassassin/sa-update.cf /etc/spamassassin/sa-update.cf.tmp
+          cat /etc/spamassassin/sa-update.cf.tmp | sed -e '/^SpamAssassinExtraChannel=.*$/d' > /etc/spamassassin/sa-update.cf
+          echo "SpamAssassinExtraChannel=\"Yes\";" >> /etc/spamassassin/sa-update.cf
+        else
+          mv  /etc/spamassassin/sa-update.cf /etc/spamassassin/sa-update.cf.tmp
+          cat /etc/spamassassin/sa-update.cf.tmp | sed -e '/^SpamAssassinExtraChannel=.*$/d' > /etc/spamassassin/sa-update.cf
+          /usr/bin/sa-update --channel updates.spamassassin.org >/dev/null 2>/dev/null || true
+          echo "SpamAssassinExtraChannel=\"No\";" >> /etc/spamassassin/sa-update.cf
+        fi
+      fi	
+		  invoke-rc.d clamav-daemon restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null|| true
+    	invoke-rc.d amavis restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null|| true
+    	invoke-rc.d postfix restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null|| true
+		;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+# dh_installdeb will replace this with shell code automatically
+# generated by other debhelper scripts.
+
+#DEBHELPER#
+
+exit 0

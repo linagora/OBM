@@ -1,0 +1,19 @@
+Template: obm-filter/httpproxyserver
+Type: String
+Default: 
+Description: HTTP proxy server for updating clamav virus definition and spamassassin rules
+  If you need an HTTP proxy server to acces the internet, you have to set its host name here.
+  If you dont need one, leave it blanc.
+
+Template: obm-filter/httpproxyport
+Type: String
+Default:
+Description: HTTP proxy port for updating clamav virus definition ans spamassassin rules
+  You have to set the port of your HTTP proxy server here.
+
+Template: obm-filter/spamassassinextrachannel
+Type: Boolean
+Default: 
+Description: Using SARE rulesets in SpamAssassin
+  Do you want to use the SARE rulesets in SpamAssassin ?
+	SARE is a set of custom rules written by people for SpamAssassin.
