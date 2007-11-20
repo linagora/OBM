@@ -159,6 +159,7 @@ $l_add_event_mail_head = "New event on OBM :";
 $l_update_event_mail_head = "Event updated on OBM :";
 $l_delete_event_mail_head = "Event deleted on OBM :";
 
+$l_today_date = "Today";
 $l_update_event_mail_body = "Instead of : ";
 $l_delete_event_mail_body = "Date : ";
 $l_confirm_mail = "Confirm+Force notification";

@@ -23,12 +23,11 @@ function of_right_dis_admin($entity, $entity_id, $real_entity="") {
   }
 
   $uid = $obm["uid"];
-  $consumer = "user";
   $consumer_id = "$uid";
   $admin_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "admin","", $real_entity);
   $display["features"] = html_entityadmin_bar($admin_entity ,$entity_id, $entity);
 
-  $consumers = of_right_consumer_for_entity($entity, $entity_id, $consumer);
+  $consumers = of_right_consumer_for_entity($entity, $entity_id);
 
   return html_dis_right_admin($consumers, $entity_id);
 }
@@ -91,7 +90,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   global $l_authorize_list,$l_read_permission, $l_write_permission;
   global $l_right_validate ,$l_authorize,$l_deny, $ico_delete;
   global $l_public,$l_admin_permission;
-  global $ico_add,$l_users,$path;
+  global $ico_add,$l_users,$path, $l_groups;
 
   $l_userSearch = phpStringToJsString("$l_users...");
   foreach ($consumers["consumer"] as $one_consumer) {
@@ -151,22 +150,38 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </td>";
 
     $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
-    $popup_add_button = "
+    $popup_user_add_button = "
     <a id=\"lnk_accept_read\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
+    $popup_group_add_button = "
+      <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+       <img src=\"$ico_add\" alt=\"[Add]\" />
+      </a>";
 
     $block_consumer_read = "
-    <td class=\"detailLabel\" id=\"head_accept_read\">
+    <tr>
+    <td class=\"detailLabel\">
     $l_users
-    $popup_add_button
+    $popup_user_add_button
     </td>
     <td>
     <input type=\"text\" id=\"userReadSearch\" autocomplete=\"off\" /> 
     </td>
     </tr>
+    <tr>
+    <td class=\"detailLabel\">
+    $l_groups
+    $popup_group_add_button
+    </td>
+    <td>
+    <input type=\"text\" id=\"groupReadSearch\" autocomplete=\"off\" /> 
+    </td>
+    </tr>       
     <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_read\">
       $dis_read_ok
@@ -174,6 +189,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </tr>";
 
    $block_consumer_write_public = "
+    <tr>
     <td class=\"detailLabel\">
     $l_public
     </td>
@@ -183,21 +199,37 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </td>";
 
     $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
-    $popup_add_button = "
+    $popup_user_add_button = "
       <a id=\"lnk_accept_write\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
      </a>";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
+    $popup_group_add_button = "
+      <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+       <img src=\"$ico_add\" alt=\"[Add]\" />
+      </a>";
 
     $block_consumer_write = "
-    <td class=\"detailLabel\" id=\"head_accept_write\">
+    <tr>
+    <td class=\"detailLabel\">
     $l_users
-    $popup_add_button
+    $popup_user_add_button
     </td>
     <td>
     <input type=\"text\" id=\"userWriteSearch\" autocomplete=\"off\" /> 
     </td>
     </tr>
+    <tr>
+    <td class=\"detailLabel\">
+    $l_groups
+    $popup_group_add_button
+    </td>
+    <td>
+    <input type=\"text\" id=\"groupWriteSearch\" autocomplete=\"off\" /> 
+    </td>
+    </tr>       
     <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_write\">
        $dis_write_ok
@@ -205,20 +237,37 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </tr>";
 
     $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
-    $popup_add_button = "
+    $popup_user_add_button = "
       <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
-     </a>";
+      </a>";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
+    $popup_group_add_button = "
+      <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+       <img src=\"$ico_add\" alt=\"[Add]\" />
+      </a>";
+
     $block_consumer_admin = "
-    <td class=\"detailLabel\" id=\"head_accept_admin\">
+    <tr>
+    <td class=\"detailLabel\">
     $l_users
-    $popup_add_button
+    $popup_user_add_button
     </td>
     <td>
     <input type=\"text\" id=\"userAdminSearch\" autocomplete=\"off\" /> 
     </td>
     </tr>
+    <tr>
+    <td class=\"detailLabel\">
+    $l_groups
+    $popup_group_add_button
+    </td>
+    <td>
+    <input type=\"text\" id=\"groupAdminSearch\" autocomplete=\"off\" /> 
+    </td>
+    </tr>       
     <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_admin\">
        $dis_admin_ok
@@ -245,9 +294,9 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   <tr>
     $block_consumer_read_public
   </tr>
-  <tr style=\"$style_read\" id=\"readRightBox\">
+  <tbody style=\"$style_read\" id=\"readRightBox\">
     $block_consumer_read
-  </tr>
+  </tbody>
   </table>
   </fieldset>
 
@@ -257,18 +306,18 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   <tr>
     $block_consumer_write_public
   </tr>
-  <tr style=\"$style_write\" id=\"writeRightBox\">
+  <tbody style=\"$style_write\" id=\"writeRightBox\">
     $block_consumer_write
-  </tr>
+  </tbody>
   </table>
   </fieldset>
 
   <fieldset class=\"detail infos\">
   <legend>$l_admin_permission</legend>
   <table>
-  <tr>
+  <tbody>
     $block_consumer_admin
-  </tr>
+  </tbody>
   </table>
   </fieldset>
 
@@ -283,6 +332,9 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_admin', 'userAdminSearch');
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_write', 'userWriteSearch');
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_read', 'userReadSearch');
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_admin', 'groupAdminSearch');
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_write', 'groupWriteSearch');
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_read', 'groupReadSearch');
     });
   </script>
 ";
@@ -401,15 +453,16 @@ function of_right_entity_for_consumer($entityu, $consumer, $consumer_id, $right=
 // Returns:
 //   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2))
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="all") {
+function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $right="all") {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
-  if ($consumer == "user") {
+  if ($consumer == "user" || $consumer == "all" ) {
+
     $table_consumer = "UserObm";
-    $c_id = "c.userobm_id";
+    $c_id = "userobm_id";
     $ctt[0]["type"] = "field";
     $ctt[0]["value"] = "userobm_lastname";
     $ctt[1]["type"] = "string";
@@ -417,31 +470,32 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="al
     $ctt[2]["type"] = "field";
     $ctt[2]["value"] = "userobm_firstname";
     $c_label = sql_string_concat($db_type, $ctt);
-  } else if ($consumer == "group") {
+    $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'user' as entity_kind FROM UserObm";
+  }
+  if ($consumer == "group" || $consumer == "all" ) {
     $table_consumer = "UGroup";
-    $c_id = "c.group_id";
-    $c_label = "e.group_name";
+    $c_id = "group_id";
+    $c_label = "group_name";
+    $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'group' as entity_kind FROM UGroup";
   }
 
   if ($right != "all") {
     $where_right = "AND entityright_$right = 1";
   }
-
+  $table_consumer = implode(" UNION ", $entity_table);
   $query = "SELECT
-      $c_id as id,
-      $c_label as label,
+      entitydata_id as id,
+      entitydata_label as label,
+      entity_kind as consumer,
       entityright_consumer_id,
       entityright_read,
       entityright_write,
       entityright_admin
     FROM EntityRight
-      LEFT JOIN $table_consumer as c ON entityright_consumer_id = $c_id
-    WHERE entityright_entity = '$entity'
-      AND entityright_consumer = '$consumer'
-      AND entityright_entity_id = '$entity_id'
+      LEFT JOIN ($table_consumer) as entity ON entityright_consumer_id = entitydata_id AND entityright_consumer = entity_kind
+    WHERE entityright_entity_id = '$entity_id'
       $where_right
-    ORDER BY $c_label";
-
+    ORDER BY entitydata_label";
   display_debug_msg($query, $cdg_sql, "of_right_consumer_for_entity()");
   $obm_q->query($query);
 

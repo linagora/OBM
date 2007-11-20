@@ -83,7 +83,7 @@ $l_back_mono = "Revenir à ma vue";
 
 $l_collapse_all = "Tout réduire";
 $l_expand_all = "Tout développer";
-
+$l_today_date = "Date du jour";
 // actions 
 $l_meeting_perform = "Rechercher les créneaux libres";
 $l_insert = "Enregistrer le rdv";

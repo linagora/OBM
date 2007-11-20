@@ -787,6 +787,10 @@ input.datePicker {
   border-top: 1px solid #eaeaea;
 }
 
+.result div span {
+  float: left;
+}
+
 .result div a {
   font-weight: bold;
 }

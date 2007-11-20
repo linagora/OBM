@@ -213,7 +213,8 @@ $l_display_no = "Ne plus afficher ce champ";
 $l_display_yes = "Afficher ce champ";
 $l_down = "Déscendre le champ d'une ligne";
 $l_up = "Monter le champ d'une ligne";
-
+$l_select_all = "Tout sélectionner";
+$l_unselect_all = "Tout désélectionner";
 // Global display
 $l_last_visit = "Dernières visites";
 

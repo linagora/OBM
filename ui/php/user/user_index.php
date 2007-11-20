@@ -22,7 +22,6 @@
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple users (return id) 
 ///////////////////////////////////////////////////////////////////////////////
-
 $path = "..";
 $module = "user";
 $obminclude = getenv("OBM_INCLUDE_VAR");

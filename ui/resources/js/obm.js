@@ -206,7 +206,7 @@ function showMessage(klass, message) {
                   .addClass(klass)
                   .appendText(message)
                   .injectInside(content);
-  setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, 5000);
+  setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, 1500);
 }
 
 function overListBoxFix(overObject, forceDisplay) {

@@ -905,8 +905,8 @@ function run_query_contact_delete_subscription($p_id) {
 //   - $fname   : firstname
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_check($cid, $comp_id, $lname, $fname) {
-  global $cdg_sql, $cgp_show;
-
+  global $cdg_sql, $cgp_show, $obm;
+  $uid = $obm['uid'];
   $multidomain = sql_multidomain("contact");
 	
   $where_id = "";
@@ -928,8 +928,8 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
     FROM Contact
       $join_comp
     WHERE $where_id
-      ((contact_lastname='$lname' AND contact_firstname='$fname')
-      $where_comp)
+    ((contact_lastname='$lname' AND contact_firstname='$fname') $where_comp)
+    AND ((contact_privacy = '1' AND contact_usercreate = '$uid') OR contact_privacy = 0)
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_check()");

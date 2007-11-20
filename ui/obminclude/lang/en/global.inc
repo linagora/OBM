@@ -207,6 +207,8 @@ $l_display_no = "Stop displaying this field";
 $l_display_yes = "Display this field";
 $l_down = "Move the field down one row";
 $l_up = "Move the field up one row";
+$l_select_all = "Select all";
+$l_unselect_all = "Unselect all";
 
 // OBM_DISPLAY help screen
 $l_help = "Help";

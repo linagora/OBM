@@ -137,17 +137,6 @@ if ($action == "index") {
   } else {
     $display["msg"] = display_err_msg($l_error_permission);
   } 
-  /*  
-$q_account = run_query_account_detail ($params["account_id"]);
-  $today = account_compute_balance ($q_account); 
-  $other = account_compute_balance ($q_account, $tf_balance_date);  
-  echo "<br>calcul du solde pour aujourd'hui : <br>"; 
-  var_dump($today); 
-  echo "<br>calcul du solde pour le $tf_balance_date : <br>"; 
-  var_dump ($other); 
-  echo "<br><br><br>"; 
-  */
-
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($obm["profile"] != $perms_user) {  

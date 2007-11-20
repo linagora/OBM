@@ -130,7 +130,10 @@ $ico_meeting        = "$theme_path/ico_meeting.gif";
 $ico_periodic       = "$theme_path/ico_calendar_repeat.gif";
 $ico_popup_close    = "$theme_path/ico_popup_close.gif";
 $popup_queue        = "$theme_path/popup_queue.gif";
-
+$ico_day_view       = "$theme_path/ico_calendar_day_view.png";
+$ico_week_view      = "$theme_path/ico_calendar_week_view.png";
+$ico_month_view     = "$theme_path/ico_calendar_month_view.png";
+$ico_list_view      = "$theme_path/ico_calendar_list_view.png";
 // Company Icons
 $ico_clipboard      = "$theme_path/ico_clipboard.gif";
 

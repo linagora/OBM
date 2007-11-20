@@ -488,7 +488,7 @@ class OBM_DISPLAY {
     function dis_data_index($url, $dis_data_entity) {
     global $path, $params, $ctu_sql_limit;
     global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
-    global $set_rows_default,$module;
+    global $set_rows_default,$module, $l_select_all, $l_unselect_all;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
     global $ico_export, $ico_export_all, $ico_begin, $ico_end, $ico_previous, $ico_next;
 
@@ -497,7 +497,7 @@ class OBM_DISPLAY {
     $this_name = $this->display_name;
     $sql_order_dir = $this->sql_order_dir;
     $query = $this->data_set->obm_query;
-
+    $have_cb = ($this->data_cb_text != "");
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {
       $url .= "&amp;popup=1";
@@ -530,9 +530,33 @@ class OBM_DISPLAY {
     } else {
       $export_rows = $_SESSION['set_rows'];
     }
-
+    if($have_cb) {
+      $cb_script = "
+        function selectAllCb(container) {
+          var container = $(container);
+          var chks = container.getElements('input[type=checkbox]');
+          chks.each(function (chk) {
+            chk.checked = true;
+          })
+        }
+        function unSelectAllCb(container) {
+          container = $(container);
+          var chks = container.getElements('input[type=checkbox]');
+          chks.each(function (chk) {
+            chk.checked = false;
+          })          
+        }
+      ";
+      $cb_links = "
+        <span>
+        <a href=\"\" onclick=\"selectAllCb(this.parentNode.parentNode.parentNode);return false;\">$l_select_all</a>
+        <a href=\"\" onclick=\"unSelectAllCb();return false;\">$l_unselect_all</a>
+        </span>
+      ";
+    }
     $export_url = "$path/exportcsv/exportcsv_index.php";
     $content = "<div>
+      $cb_links
       <script type=\"text/javascript\">
         function exportResultSet(firstRow,nbRows) {
           form = new Element('form');
@@ -549,6 +573,7 @@ class OBM_DISPLAY {
           form.submit();
           return false;
         }
+        $cb_script
       </script>
     <a href=\"#\" onclick=\"return exportResultSet('$first_row','$export_rows');\" >$l_export</a>      
     <a href=\"#\" onclick=\"return exportResultSet('0','$nb_rows');\" >$l_export_all</a>   
