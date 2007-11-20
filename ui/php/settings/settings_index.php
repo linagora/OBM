@@ -332,6 +332,25 @@ if ($cgp_show['module']['calendar']) {
     $start_week_day = strtotime("+1 day", $start_week_day); 
   }
 
+  $dis_hour_b = "<select name=\"cal_first_hour\" style=\"width:4em;\">";
+  for ($current_hour=0; $current_hour<24; $current_hour++) {
+    if ($current_hour == $_SESSION['set_cal_first_hour']) {
+      $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+    } else {
+      $dis_hour_b .= "<option value=\"$current_hour\">$current_hour</option>";
+    }
+  }
+  $dis_hour_b .= "</select>"; 
+
+  $dis_hour_e = "<select name=\"cal_last_hour\" style=\"width:4em;\">";
+  for ($current_hour=0; $current_hour<24; $current_hour++) {
+    if ($current_hour == $_SESSION['set_cal_last_hour']) {
+      $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+    } else {
+      $dis_hour_e .= "<option value=\"$current_hour\">$current_hour</option>";
+    }
+  }
+  $dis_hour_e .= "</select>";    
   $display['detail'] .= "
   <tr>
     <th>$l_set_display_days</th>
@@ -349,13 +368,12 @@ if ($cgp_show['module']['calendar']) {
   </tr>
   <tr>
     <th>$l_set_cal_first_hour</th>
-    <td>
-      <input size=\"3\" maxlength=\"3\" name=\"cal_first_hour\" value=\"".$_SESSION['set_cal_first_hour']."\" /></td>
+    <td>$dis_hour_b</td>
+
   </tr>
   <tr>
     <th>$l_set_cal_last_hour</th>
-    <td>
-      <input size=\"3\" maxlength=\"3\" name=\"cal_last_hour\" value=\"".$_SESSION['set_cal_last_hour']."\" /></td>
+    <td>$dis_hour_e</td>
   </tr>
 ";
 }
