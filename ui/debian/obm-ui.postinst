@@ -44,7 +44,7 @@ EOF
 		echo -n "Avtivation site obm.conf... "
 		a2ensite obm.conf || true
 		echo -n "Stop/Start Apache2... "
-		invoke-rc.d apache2 reload || true
+		invoke-rc.d apache2 restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
 	fi
 
 fi

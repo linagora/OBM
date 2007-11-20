@@ -22,7 +22,7 @@ case "$1" in
 			    cat /etc/apache2/ports.conf.orig > /etc/apache2/ports.conf
 			    rm /etc/apache2/ports.conf.orig
 			fi
-			invoke-rc.d apache2 reload || true
+			invoke-rc.d apache2 restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
 		fi
 		db_purge
 	;;

@@ -7,7 +7,7 @@ Standards-Version: 3.7.2
 
 Package: obm
 Architecture: any
-Depends: obm-storage, obm-ldap, obm-ui, obm-cyrus, obm-postfix, obm-services ${misc:Depends}
+Depends: obm-storage, obm-ldap, obm-ui, obm-cyrus, obm-postfix, obm-services, ${misc:Depends}
 Description: OBM
     full installation of Open Business Management
 	Instalation of OBM
@@ -44,7 +44,7 @@ Description: OBM certificat
 
 Package: obm-ui
 Architecture: any
-Depends:  obm-core, obm-certs, php5, apache2, libapache2-mod-php5, php5-mysql, ${misc:Depends}
+Depends:  obm-core, obm-certs, php5, apache2, libapache2-mod-php5, php5-mysql, php5-gd, ${misc:Depends}
 Description: OBM Web Interface
     Web of Open Business Management
 	Instalation of OBM
