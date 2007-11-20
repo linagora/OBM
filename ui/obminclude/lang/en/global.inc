@@ -34,6 +34,8 @@ $l_print = "Print";
 $l_transparent = "Transparent";
 
 // Common messages
+$l_users = "Users";
+$l_groups = "Groups";
 $l_yes = "Yes";
 $l_no = "No";
 $l_all = "All";

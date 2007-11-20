@@ -22,7 +22,6 @@ include("$obminclude/global_pref.inc");
 require("mailbox_display.inc");
 require("mailbox_query.inc");
 require("$obminclude/of/of_right.inc");
-
 if (($action == "") || ($action == "index")) {
   $action = "rights_admin";
 }

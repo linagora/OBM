@@ -79,8 +79,14 @@ Obm.Menu = new Class({
 Obm.Portlets = new Class({
   
   initialize: function() {
-    if(!$('portlets'))
+    if(!$('portlets') )
       return false;
+    elements = $ES('.portlet',this.panel);
+    if (elements.length == 0) {
+      $('portletsPanel').setStyle('display','none');
+      $('mainPanel').setStyle('margin-left','0');
+      return false;
+    }
     img = new Element('img');
     img.src = obm.vars.images.minus;
     this.close = img.src;
@@ -114,7 +120,6 @@ Obm.Portlets = new Class({
       this.handle.set(0);
     }
 
-    elements = $ES('.portlet',this.panel);
   
     for(i=0;i<elements.length;i++) {
       el = elements[i];      
