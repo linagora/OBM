@@ -147,6 +147,7 @@ binary-indep: build install
 	dh_fixperms
 	dh_installdeb
 	dh_perl
+	dh_installcron
 
 	#delete des .svn dans les paquet généré
 	( cd $(CURDIR)/debian;  \
