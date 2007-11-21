@@ -41,6 +41,8 @@ EOF
 		a2enmod php5 || true
 		echo -n "Avtivation module REWRITE... "
 		a2enmod rewrite || true
+		echo -n "Avtivation module PROXY_AJP... "
+		a2enmod proxy_ajp ||true
 		echo -n "Avtivation site obm.conf... "
 		a2ensite obm.conf || true
 		echo -n "Stop/Start Apache2... "
