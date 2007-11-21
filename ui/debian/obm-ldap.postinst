@@ -42,6 +42,21 @@ if is_initial_configuration "$@"; then
 	rm -rf /var/lib/ldap/* || true
 	chown -R openldap.openldap /var/lib/ldap
 	echo " done"
+
+
+	cat >> /var/lib/ldap/DB_CONFIG <<EOF
+# For the Debian package we use 2MB as default but be sure to update this
+# value if you have plenty of RAM
+set_cachesize   0       2097152         0
+# Number of objects that can be locked at the same time.
+set_lk_max_objects      5000
+# Number of locks (both requested and granted)
+set_lk_max_locks        5000
+# Number of lockers
+set_lk_max_lockers      5000
+set_flags DB_LOG_AUTOREMOVE
+EOF
+
 	invoke-rc.d slapd start || true
 
 
