@@ -83,7 +83,7 @@ sub getEntity {
         $uGroupTable = "P_".$uGroupTable;
     }
 
-    my $query = "SELECT COUNT(*) FROM ".$uGroupTable." WHERE group_privacy=0 AND group_id=".$groupId;
+    my $query = "SELECT COUNT(*) FROM ".$uGroupTable." WHERE group_id=".$groupId;
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -95,8 +95,8 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: groupe prive ou inexistant d'identifiant : ".$groupId, "W" );
-        return 1;
+        &OBM::toolBox::write_log( "[Entities::obmGroup]: groupe inexistant d'identifiant : ".$groupId, "W" );
+        return 0;
 
     }elsif( $numRows > 1 ) {
         &OBM::toolBox::write_log( "[Entities::obmGroup]: plusieurs groupes d'identifiant : ".$groupId." ???", "W" );
@@ -106,7 +106,7 @@ sub getEntity {
 
 
     # La requete a executer - obtention des informations sur le groupe
-    $query = "SELECT * FROM ".$uGroupTable." WHERE group_privacy=0 AND group_id=".$groupId;
+    $query = "SELECT * FROM ".$uGroupTable." WHERE group_id=".$groupId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -177,33 +177,19 @@ sub updateDbEntity {
     &OBM::toolBox::write_log( "[Entities::obmGroup]: MAJ du groupe '".$dbGroupDesc->{"group_name"}."' dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
-    my $query = "DELETE FROM P_UGroup WHERE group_id=".$self->{"groupId"};
-    my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-        return 0;
-    }
-
-    # Obtention des noms de colonnes de la table
-    $query = "SELECT * FROM P_UGroup WHERE 0=1";
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-        return 0;
-    }
-    my $columnList = $queryResult->{NAME};
-
-    $query = "INSERT INTO P_UGroup SET ";
+    my $query = "REPLACE INTO P_UGroup SET ";
     my $first = 1;
-    for( my $i=0; $i<=$#$columnList; $i++ ) {
+    while( my( $columnName, $columnValue ) = each(%{$dbGroupDesc}) ) {
         if( !$first ) {
             $query .= ", ";
         }else {
             $first = 0;
         }
 
-        $query .= $columnList->[$i]."=".$dbHandler->quote($dbGroupDesc->{$columnList->[$i]});
+        $query .= $columnName."=".$dbHandler->quote($columnValue);
     }
 
+    my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;

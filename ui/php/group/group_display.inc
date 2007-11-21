@@ -698,22 +698,32 @@ function html_group_form($action, $group_q, $group, $field='') {
     $dis_private = ($priv == '1' ? $l_private : $l_public);
   }
 
-  if ($cgp_use['service']['samba']) {
-    // Samba group checkbox checked value
-    $samba_state  = ($samba ? 'checked' : '');
 
-    $block_samba = "
-  <tr id=\"sambaGroup\" class=\"$mail_class\">
-    <th class=\"$class[samba]\">$l_smb</th>
-    <td><input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state></td>
-  </tr>";
+  if( ($action == 'new' || $action == 'insert') || !$priv ) {
+    if ($cgp_use['service']['samba']) {
+      // Samba group checkbox checked value
+      $samba_state  = ($samba ? 'checked' : '');
+  
+      $block_samba = "
+    <tr id=\"sambaGroup\" class=\"$mail_class\">
+      <th class=\"$class[samba]\">$l_smb</th>
+      <td><input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state></td>
+    </tr>";
+    }
+  
+    $block_email = "
+    <tr id=\"emailGroup\" class=\"$mail_class\">
+      <th>$l_email</th>
+      <td><input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
+    </tr>
+    ";
+  
+    $block_mailing = "
+    <tr id=\"mailingGroup\" class=\"$mail_class\">
+      <th>$l_mailing</th>
+      <td><input name=\"cb_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
+    </tr>";
   }
-
-  $dis_mailing = "
-  <tr id=\"mailingGroup\" class=\"$mail_class\">
-    <th>$l_mailing</th>
-    <td><input name=\"cb_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
-  </tr>";
 
 
   if ($action == 'detailupdate' || $action == 'update') {
@@ -739,6 +749,8 @@ function html_group_form($action, $group_q, $group, $field='') {
     <th>$l_manager</th>
       <td>$sel_manager</td>
     </tr>";
+
+    $dis_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"".$priv."\" />".$dis_private;
   }
 
   $display["title"] = "<h1 class=\"title\">$l_group : $dis_title</h1>";
@@ -760,11 +772,8 @@ function html_group_form($action, $group_q, $group, $field='') {
     <td>$dis_private</td>
   </tr>
   $block_samba
-  <tr id=\"emailGroup\" class=\"$mail_class\">
-    <th>$l_email</th>
-    <td><input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
-  </tr>
-  $dis_mailing
+  $block_email
+  $block_mailing
   </table>
   </fieldset>
 
