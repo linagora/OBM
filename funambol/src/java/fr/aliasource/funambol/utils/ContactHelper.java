@@ -177,9 +177,6 @@ public class ContactHelper extends Helper {
 			com.funambol.common.pim.contact.Contact foundation) {
 		String result = nullToEmptyString(foundation.getName().getLastName()
 				.getPropertyValueAsString());
-		if (result.equalsIgnoreCase("")) {
-			result = "-";
-		}
 		return result;
 	}
 
