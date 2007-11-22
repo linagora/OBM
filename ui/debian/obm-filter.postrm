@@ -45,6 +45,7 @@ case "$1" in
 
 	  ## Fin de la desinstallation
 		invoke-rc.d clamav-daemon restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null|| true
+		invoke-rc.d clamav-freshclam restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null|| true
     invoke-rc.d amavis restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null|| true
     invoke-rc.d postfix restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null|| true
     ;;
