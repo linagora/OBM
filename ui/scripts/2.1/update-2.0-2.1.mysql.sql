@@ -86,6 +86,12 @@ ALTER TABLE CalendarEvent ADD COLUMN calendarevent_ext_id varchar(32) DEFAULT ''
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_properties text AFTER calendarevent_description;
 -- Add color column
 ALTER TABLE CalendarEvent ADD COLUMN  calendarevent_color varchar(7) AFTER calendarevent_endrepeat;
+-- Alter date column
+ALTER TABLE CalendarEvent CHANGE COLUMN calendarevent_date calendarevent_date DATETIME;
+-- Alter date column
+ALTER TABLE CalendarEvent CHANGE COLUMN calendarevent_endrepeat calendarevent_endrepeat DATETIME;
+-- Alter exception date column
+ALTER TABLE CalendarException CHANGE COLUMN calendarexception_date calendarexception_date DATETIME;
 
 --
 -- Table structure for table 'CalendarAlert'

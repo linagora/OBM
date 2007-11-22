@@ -694,13 +694,13 @@ CREATE TABLE CalendarEvent (
   calendarevent_category1_id     int(8) default 0,
   calendarevent_priority         int(2) default NULL,
   calendarevent_privacy          int(2) NOT NULL default 0,
-  calendarevent_date             timestamp(14) NOT NULL,
+  calendarevent_date             datetime NOT NULL,
   calendarevent_duration         int(8) NOT NULL default 0,
   calendarevent_allday	         int(1) NOT NULL default 0,
   calendarevent_repeatkind       varchar(20) default NULL,
   calendarevent_repeatfrequence  int(3) default NULL,
   calendarevent_repeatdays       varchar(7) default NULL,
-  calendarevent_endrepeat        timestamp(14) NOT NULL,
+  calendarevent_endrepeat        datetime NOT NULL,
   calendarevent_color            varchar(7),
   calendarevent_description      text,
   calendarevent_properties       text,
@@ -733,7 +733,7 @@ CREATE TABLE CalendarException (
   calendarexception_userupdate  int(8) default NULL,
   calendarexception_usercreate  int(8) default NULL,
   calendarexception_event_id    int(8),
-  calendarexception_date        timestamp(14) NOT NULL,
+  calendarexception_date        datetime NOT NULL,
   PRIMARY KEY (calendarexception_event_id,calendarexception_date)
 );
 

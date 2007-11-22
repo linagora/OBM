@@ -1294,7 +1294,7 @@ function dis_calendar_list_agenda($calendar, $calendar_entity, $writable_entity)
 
       $dis_events .= "
         <tr $class>
-          <td><a href=\"calendar_index.php?action=agenda&date=$day_evt\">$day_text_evt</a></td>
+          <td><a href=\"calendar_index.php?action=agenda&amp;view=day&amp;date=$day_evt\">$day_text_evt</a></td>
           <td>";
 
       foreach($occurrence as $k => $v) {

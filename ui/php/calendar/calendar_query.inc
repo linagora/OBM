@@ -3051,7 +3051,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       $filter
       AND $calendarevent_date <= $end 
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
-      OR $calendarevent_endrepeat = '0')
+      OR $calendarevent_endrepeat = '0' OR calendarevent_endrepeat IS NULL)
       AND $where_grp
       $multidomain
     ";
@@ -3085,7 +3085,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       AND evententity_state = 'A'
       AND $calendarevent_date <= $end 
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
-      OR $calendarevent_endrepeat = '0')
+      OR $calendarevent_endrepeat = '0' OR calendarevent_endrepeat IS NULL)
       $where_ent
       $multidomain
       $union
