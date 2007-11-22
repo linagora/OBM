@@ -1,29 +1,30 @@
 Template: obm-satellite/already_configured
 Type: boolean
 Default: false
-Description: for internal use.
+Description: Internal use.
  .
  Internal use for preconfigure and configure install via apt.
 
 Template: obm-satellite/postfixinstall
 Type: boolean
-Description: Do you configure obm-satellite for postfix maps ?
+Description: Do you want to use obm-satellite to configure postfix maps ?
  .
- the installation script can prepare right on file for
- postfix maps.
+ You can use obm-satellite to configure automaticaly postfix maps. It means that
+ obm-satellite will manage all postfix maps for each domain in OBM. 
 
 Template: obm-satellite/obmserver
 Type: string
 Default: 127.0.0.1/32
-Description: where is obm-services ?
+Description: What is the IP/Mask host containing OBM services ?
  .
- Location of automate services of OBM
- Please enter CIDR notation : @IP/netmask.
+ You have to set here the IP/Mask (CIDR notation) host address containing OBM 
+ services. For security reasons, only hosts matching will be allowed to connect 
+ to the satellite.  
 
 Template: obm-satellite/ldapserver
 Type: string
 Default: 127.0.0.1
-Description: where is LDAP server?
+Description: What is the IP host address for the OBM LDAP server ?
  .
- Location of an LDAP server
- Please enter IP adress.
+ You have to set here the IP host address for the OBM LDAP server. The satellite need
+ it to synchronize database DATA with LDAP data.  

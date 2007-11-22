@@ -1,40 +1,42 @@
 Template: obm-conf/already_configured
 Type: boolean
 Default: false
-Description: for internal use.
+Description: Internal use.
  .
  Internal use for preconfigure and configure install via apt.
 
 Template: obm-conf/ldapserver
 Type: string
 Default: 127.0.0.1
-Description: where is Ldap server ?
+Description: What is the ip host address for the OBM LDAP server ?
  .
- Location of Ldap Server (obm-storage).
+ You have to set here the IP host address for the OBM LDAP server.
 
 Template: obm-conf/mysqlserver
 Type: string
 Default: 127.0.0.1
-Description: where is Mysql server ?
+Description: What is the ip host address for the OBM database server ?
  .
- Location of Mysql Server.
+ You have to set here the IP host address for the OBM database server.
 
 Template: obm-conf/mysqldb
 Type: string
 Default: obm
-Description: Name of Database ?
+Description: What is the OBM database name ?
  .
- Name of OBM database.
+ You have to set here the OBM database name.
 
 Template: obm-conf/mysqluser
 Type: string
 Default: obm
-Description: login of DB ?
+Description: What the OBM database user name ?
  .
- Location of User Mysql.
+ You have to set here the name for the OBM Database user. This user is
+ used by obm-ui to access to the OBM database.
 
 Template: obm-conf/mysqlpasswd
 Type: password
-Description: password of mysql obm user
+Description: What is the OBM database user password ?
  .
- Password of user OBM mysql (obm-storage).
+ You have to set here the password for the OBM database user. For security 
+ reasons, it should'nt be a blank password. 

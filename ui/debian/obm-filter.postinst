@@ -33,6 +33,8 @@ case "$1" in
 				if [ ! -e /etc/amavis/conf.d/50-user.amavis.orig ] ; then
 					mv -f /etc/amavis/conf.d/50-user /etc/amavis/conf.d/50-user.amavis.orig
 				fi
+				# On cree le fichier /etc/mailname
+				touch /etc/mailname
 				# On copie le fichier de configuration (50-user) d'amavis pour OBM
 				cp -a  /etc/amavis/conf.d/50-user.obm.sample /etc/amavis/conf.d/50-user
 

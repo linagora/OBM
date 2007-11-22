@@ -1,14 +1,17 @@
 Template: obm-ui/already_configured
 Type: boolean
 Default: false
-Description: for internal use.
+Description: Internal use.
  .
  Internal use for preconfigure and configure install via apt.
 
 Template: obm-ui/virtualhostinstall
 Type: boolean
-Description: Install VirtualHost ?
+Description: Do you want OBM to install its virtualhost ?
  .
- If you don't install default virtaulHost on your server,
- you can use exemple on /usr/share/doc/obm-ui/examples.
-
+ If you says "Yes" here, OBM will desactivate the default virtualhost 
+ and copy and activate its virtualhost. 
+ Note that the "port.conf" file will also be replace by OBM and some 
+ apache modules activate.
+ If you don't want to install OBM virtualhost on your server now,
+ you can find an exemple in /usr/share/doc/obm-ui/examples.
