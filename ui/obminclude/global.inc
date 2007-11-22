@@ -829,6 +829,7 @@ function of_date_format($timestamp="", $null_empty="") {
   return $date;
 }
 
+
 /**
  * of_date_format
  * 
@@ -873,6 +874,7 @@ function of_date_upd_format($date="", $null_empty=false) {
   return $date;
 }
 
+
 /**
  * Guess the date format 
  *   case "t" :
@@ -902,6 +904,7 @@ function of_date_guess_format ($date) {
   }
   return false;
 }  
+
 
 /**
  * of_isodate_convert 
@@ -944,6 +947,7 @@ function of_isodate_convert($date, $null_empty=false) {
   } 
   return $date;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Iso Format a date

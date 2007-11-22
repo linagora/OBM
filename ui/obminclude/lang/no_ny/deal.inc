@@ -30,7 +30,6 @@ $l_proposal = "Forslag";
 $l_amount = "Sum";
 $l_contacts = "Kontaktar";
 $l_company = "Firma";
-$l_show_archive = "Vis arkiv";
 $l_date_init = "Startdato";
 $l_deal_select_company = "Velg firma det skal inngås avtale med.";
 $l_number_deal="Number";

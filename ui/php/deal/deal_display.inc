@@ -36,7 +36,7 @@ $fieldnames['parentdeal_label'] = $l_label;
 $fieldnames['parentdeal_comment'] = $l_comment;
 // Calculated or indirect fields
 $fieldnames['dealstatus_label'] = $l_status;
-$fieldnames['dealtype_label'] = $l_kind;
+$fieldnames['dealtype_label'] = $l_type;
 $fieldnames['tasktype_label'] = $l_tt;
 $fieldnames['region_label'] = $l_region;
 $fieldnames['deal_company_name'] = $l_company;
@@ -221,13 +221,13 @@ function dis_deal_index($deal='') {
   $archive = $deal['archive'];
 
   $usr_q = run_query_deal_manager($archive);
-  $type_q = run_query_deal_type();
+  $types = get_global_deal_types();
   $regions = of_category_get_ordered('', 'region');
   $tts = get_global_tasktype($ctt_sales);
   $roles = of_category_get_ordered('DealCompany', 'role');
   $status_q = run_query_deal_status_list();
   $block .= html_deal_parentdeal_search_form($deal, $usr_q);
-  $block .= html_deal_search_form($deal, $type_q, $regions, $tts, $roles, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $types, $regions, $tts, $roles, $status_q, $usr_q);
 
   return $block;
 }
@@ -244,12 +244,12 @@ function dis_deal_search_form($deal='') {
   $archive = $deal['archive'];
 
   $usr_q = run_query_deal_manager($archive);
-  $type_q = run_query_deal_type();
+  $types = get_global_deal_types();
   $regions = of_category_get_ordered('', 'region');
   $tts = get_global_tasktype($ctt_sales);
   $roles = of_category_get_ordered('DealCompany', 'role');
   $status_q = run_query_deal_status_list();
-  $block .= html_deal_search_form($deal, $type_q, $regions, $tts, $roles, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $types, $regions, $tts, $roles, $status_q, $usr_q);
 
   return $block;
 }
@@ -259,15 +259,15 @@ function dis_deal_search_form($deal='') {
 // XHTML Display Deal search form
 // Parameters : 
 //   - $deal[]     : default form values
-//   - $kind_q     : DB result object (deal kind list)
+//   - $types      : Deal types list
 //   - $regions    : regions array
 //   - $tts        : tasktype array
 //   - $roles      : array with dealcompany roles list 
 //   - $stat_q     : DB result object (deal status list)
 //   - $manager_q  : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, $manager_q) {
-  global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_status;
+function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $manager_q) {
+  global $l_deal, $l_label_start, $l_company, $l_type, $l_tt, $l_status;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_relation;
   global $l_number, $l_postcode, $l_region;
   global $l_date, $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm;
@@ -282,7 +282,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
   $name = stripslashes($deal['company_name']);
   $zip = stripslashes($deal['zip']);
   $archive = ($deal['archive'] == '1' ? "checked = \"checked\"" : '');
-  $kind = $deal['kind_id'];
+  $type = $deal['type_id'];
   $number = $deal['number'];
   $region = $deal['region'];
   $tt = $deal['tasktype'];
@@ -298,17 +298,16 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
   // User defined data
   $block_userdata .= of_userdata_dis_search('deal', $deal);
 
-  // Kind select construction
-  $sel_kind = "<select name=\"sel_kind_id\">
+  // Type select construction
+  $sel_type = "<select name=\"sel_type_id\">
      <option value=\"$c_all\">$l_all</option>";  
-  while ($kind_q->next_record()) {
-    $k_id = $kind_q->f('dealtype_id');
-    $klabel = $kind_q->f('dealtype_label');
-    $sel_kind .= "<option value=\"$k_id\"";
-    if ($kind == $k_id) $sel_kind .= " selected = \"selected\"";
-    $sel_kind .= ">$klabel</option>";
+  foreach($types as $t_id => $one_type) {
+    $tlabel = $one_type['label'];
+    $sel_type .= "<option value=\"$t_id\"";
+    if ($type == $t_id) $sel_type .= " selected = \"selected\"";
+    $sel_type .= ">$tlabel</option>";
   }
-  $sel_kind .= '</select>';
+  $sel_type .= '</select>';
 
   // TaskType select construction
   $sel_tt = "<select name=\"sel_tasktype\">
@@ -413,8 +412,8 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
     <label>$l_before<br />
      <input type=\"text\" name=\"tf_date_before\" value=\"$date_before\" class=\"datePicker\"/>
     </label>
-    <label>$l_kind<br />
-      $sel_kind
+    <label>$l_type<br />
+      $sel_type
     </label>
     <label>$l_tt<br />
       $sel_tt
@@ -546,7 +545,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
   $name = urlencode(stripslashes($deal['company_name']));
   $zip = urlencode(stripslashes($deal['zip']));
   $archive = $deal['archive'];
-  $kind = $deal['kind_id'];
+  $type = $deal['type_id'];
   $number = $deal['number'];
   $region = $deal['region'];
   $tt = $deal['tasktype'];
@@ -571,7 +570,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;tf_number=$number&amp;cba_archive=$archive&amp;sel_kind_id=$kind&amp;sel_region=$region&amp;sel_status_id=$status&amp;sel_tasktype=$tt&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp$url_userdata$url_ext");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;tf_number=$number&amp;cba_archive=$archive&amp;sel_type_id=$type&amp;sel_region=$region&amp;sel_status_id=$status&amp;sel_tasktype=$tt&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp$url_userdata$url_ext");
 
   $deal_d = new OBM_DISPLAY('DATA', $prefs, 'deal');
   if ($popup) {
@@ -616,6 +615,7 @@ function html_deal_links($deal_q) {
   $id = $deal_q->f('deal_id');
   $pid = $deal_q->f('deal_parentdeal_id');
   $cid = $deal_q->f('deal_company_id');
+  $type_id = $deal_q->f('deal_type_id');
   $tt_id = $deal_q->f('deal_tasktype_id');
   $cname = $deal_q->f('company_name');
   $uname = urlencode($cname);
@@ -650,7 +650,7 @@ function html_deal_links($deal_q) {
 
     // New project allowed only if hitrate = 100
     if ($hitrate == '100') {
-      $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;deal_id=$id&amp;deal_label=$label&amp;company_id=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
+      $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;deal_id=$id&amp;deal_label=$label&amp;company_id=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id&amp;sel_type_id=$type_id");
       $dis_ico_project .= "
         <li><a href=\"$url_pro_new\"><img src=\"$ico_add\" alt=\"\" /></a>
             <a href=\"$url_pro_new\">$l_new</a></li>";
@@ -757,8 +757,7 @@ function html_deal_links($deal_q) {
   <div id=\"dealDocument\" class=\"portlet\">
   $block_doc
   </div>      
- 
-";
+ ";
 
   return $block;
 }
@@ -794,7 +793,7 @@ function dis_deal_consult($deal) {
 function html_deal_consult($deal_q, $dc='') {
   global $ico_company, $ico_contact, $display;
   global $l_dates, $l_company, $l_contact, $l_other_relation, $l_relation;
-  global $l_label, $l_kind,$l_region,$l_marketing_manager,$l_technical_manager;
+  global $l_label, $l_type,$l_region,$l_marketing_manager,$l_technical_manager;
   global $l_amount, $l_margin, $l_hitrate, $l_commission_p, $l_sale_delay;
   global $l_number, $l_tt, $l_status,$l_archive,$l_comment;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_quarter;
@@ -824,7 +823,7 @@ function html_deal_consult($deal_q, $dc='') {
     $q = floor(($month_end-1) / 3) + 1;
     $quarter_end = "($year_end$l_quarter$q)";
   }
-  $kind = $deal_q->f('dealtype_label');
+  $type = $deal_q->f('dealtype_label');
   $tt_label = $deal_q->f('tasktype_label');
   $region_label = $deal_q->f('region_label');
   $market = $deal_q->f('lname1') . ' ' . $deal_q->f('fname1');
@@ -893,8 +892,8 @@ function html_deal_consult($deal_q, $dc='') {
       <td>$number</td>
     </tr>
     <tr>
-      <th>$l_kind</th>
-      <td>$kind</td>
+      <th>$l_type</th>
+      <td>$type</td>
     </tr>
     <tr>
       <th>$l_tt</th>
@@ -1057,7 +1056,7 @@ function dis_deal_form($deal) {
     $comp_q = '';
   }
 
-  $type_q = run_query_deal_type();
+  $types = get_global_deal_types();
   $tts = get_global_tasktype($ctt_sales);
   $sources = get_global_lead_sources();
   $usrc_q = run_query_all_users_from_group($cg_com, $users);
@@ -1067,7 +1066,7 @@ function dis_deal_form($deal) {
   $regions = of_category_get_ordered('', 'region');
   $roles = of_category_get_ordered('DealCompany', 'role');
 
-  $block = html_deal_form($action, $deal_q, $type_q, $regions, $tts, $sources, $usrc_q, $usrp_q, $comp_q, $con_q, $dc, $roles, $sta_q, $deal);
+  $block = html_deal_form($action, $deal_q, $types, $regions, $tts, $sources, $usrc_q, $usrp_q, $comp_q, $con_q, $dc, $roles, $sta_q, $deal);
 
   return $block;
 }
@@ -1078,7 +1077,7 @@ function dis_deal_form($deal) {
 // Parameters :
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the deal (null for new deal)
-//   - $kind_q    : DBO : deal kind list
+//   - $types     : Deal Types list
 //   - $regions   : Regions array
 //   - $tts       : TaskType array
 //   - $sources   : Lead Sources array
@@ -1092,11 +1091,11 @@ function dis_deal_form($deal) {
 //   - $comp_id   : id of the company concerned by the deal
 //   - deal[]     : default or transmitted values
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,$usrp_q,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
+function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $usrc_q,$usrp_q,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
   global $ico_company,$ico_contact,$ico_add, $l_header_new_f;
   global $c_php_isodate_format,$l_deal,$l_update,$l_insert, $l_private;
   global $l_dates, $l_company, $l_other_relation, $l_relation, $l_label;
-  global $l_number, $l_kind, $l_region, $l_todo;
+  global $l_number, $l_type, $l_region, $l_todo;
   global $l_tt, $l_marketing_manager, $l_technical_manager, $l_commission_p;
   global $l_amount, $l_margin, $l_hitrate, $l_contact,$l_status, $l_archive;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_source;
@@ -1121,7 +1120,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
     $dateprop = of_date_upd_format($deal_q->f('dateproposal'), true);
     $dateexpected = of_date_upd_format($deal_q->f('dateexpected'), true);
     $datealarm = of_date_upd_format($deal_q->f('datealarm'), true);
-    $kind = $deal_q->f('deal_type_id');
+    $type = $deal_q->f('deal_type_id');
     $region = $deal_q->f('deal_region_id');
     $tt = $deal_q->f('deal_tasktype_id');
     $priv = ($deal_q->f('privacy') == 0 ? '0' : '1');
@@ -1172,7 +1171,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   if (isset($deal['dateproposal'])) { $dateprop = of_date_upd_format(stripslashes($deal['dateproposal']),true); }
   if (isset($deal['dateexpected'])) { $dateexpected = of_date_upd_format(stripslashes($deal['dateexpected']),true); }
   if (isset($deal['datealarm'])) { $datealarm = of_date_upd_format(stripslashes($deal['datealarm']),true); }
-  if (isset($deal['kind_id'])) { $kind = $deal['kind_id']; }
+  if (isset($deal['type_id'])) { $type = $deal['type_id']; }
   if (isset($deal['region'])) { $region = $deal['region']; }
   if (isset($deal['tasktype'])) { $tt = $deal['tasktype']; }
   if (isset($deal['market'])) { $market = $deal['market']; }
@@ -1203,17 +1202,16 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,
   // User defined data
   $block_userdata = of_userdata_dis_entity_form('deal', $id, $deal);
  
-  // Kind select construction
-  $sel_kind = "<select name=\"sel_kind_id\">
-    <option value=\"$c_undef\">$l_undef</option>";
-  while ($kind_q->next_record()) {
-    $kid = $kind_q->f('dealtype_id');
-    $klabel = $kind_q->f('dealtype_label');
-    $sel_kind .= "\n<option value=\"$kid\"";
-    if ($kind == $kid) $sel_kind .= " selected = \"selected\""; 
-    $sel_kind .= ">$klabel</option>";
+  // Type select construction
+  $sel_type = "<select name=\"sel_type_id\">
+     <option value=\"$c_undef\">$l_undef</option>";  
+  foreach($types as $t_id => $one_type) {
+    $tlabel = $one_type['label'];
+    $sel_type .= "<option value=\"$t_id\"";
+    if ($type == $t_id) $sel_type .= " selected = \"selected\"";
+    $sel_type .= ">$tlabel</option>";
   }
-  $sel_kind .= '</select>';
+  $sel_type .= '</select>';
 
   $sel_region = of_category_html_select('', 'region', $regions, '', 'none');
 
@@ -1505,8 +1503,8 @@ $js_status_loop
         <th>$l_number</th>
         <td><input type=\"text\" name=\"tf_number\" size=\"40\" maxlength=\"32\" value=\"$number\" /></td>
     </tr><tr>
-      <th>$l_kind</th>
-      <td>$sel_kind</td>
+      <th>$l_type</th>
+      <td>$sel_type</td>
     </tr>
     <tr>
       <th>$l_tt</th>
@@ -1579,7 +1577,8 @@ $js_status_loop
     </tr><tr>
       <th>$l_todo</th>
       <td><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_archive</th>
       <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
     </tr>
@@ -2781,10 +2780,10 @@ function dis_deal_dashboard_panel($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_admin_index() {
 
-  $kind_q = run_query_deal_type();
+  $types = get_global_deal_types();
   $status_q = run_query_deal_status_list();
 
-  $block = html_deal_admin_form($kind_q, $status_q);
+  $block = html_deal_admin_form($types, $status_q);
 
   $roles = of_category_get_ordered('DealCompany', 'role');
   $block .= of_category_dis_admin_form('role', $roles);
@@ -2799,29 +2798,26 @@ function dis_deal_admin_index() {
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML Deal Administration Forms
 // Parametres:
-//   - $kind_q   : DBO : Deal kind list
+//   - $types    : Deal Type list
 //   - $status_q : DBO : Deal Status list
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_admin_form($kind_q, $status_q) {
-   // Labels : 
-  global $l_kind_manage,$l_kind_new,$l_kind_exist;
+function html_deal_admin_form($types, $status_q) {
+  global $l_code, $l_type_manage,$l_type_new,$l_type_exist;
   global $l_status_manage,$l_status_exist,$l_status_new,$l_c_new;
-  global $l_kind_label,$l_minus,$l_plus,$l_order,$ico_delete,$ico_ok;
-  // Actions : 
-  global $l_kind_checkdelete, $l_kind_update, $l_kind_insert;
+  global $l_type_label,$l_minus,$l_plus,$l_order,$ico_delete,$ico_ok;
+  global $l_type_checkdelete, $l_type_update, $l_type_insert;
   global $l_status_checkdelete,$l_status_update,$l_status_insert, $l_hitrate;
-
 
 
 
   $char_title = '=';
   $key = 0;
-  while ($kind_q->next_record()) {
-    $id = $kind_q->f('dealtype_id');
-    //$inout = $kind_q->f('dealtype_inout');
-    $inout_plus = ($kind_q->f('dealtype_inout'))== '+' ? "selected=\"selected\"" : '';
-    $inout_minus = ($kind_q->f('dealtype_inout'))== '-' ? "selected=\"selected\"" : '';
-    $label = $kind_q->f('dealtype_label');
+  foreach ($types as $id => $one_type) {
+    $key++;
+    $code = $one_type['code'];
+    $inout_plus = ($one_type['inout'])== '+' ? "selected=\"selected\"" : '';
+    $inout_minus = ($one_type['inout'])== '-' ? "selected=\"selected\"" : '';
+    $label = $one_type['label'];
    
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
@@ -2829,24 +2825,26 @@ function html_deal_admin_form($kind_q, $status_q) {
       $class = '';
     }
     $c_label = htmlentities($one_cat['label']);
-    $kind_list .= "
+    $type_list .= "
     <tr $class>
     <td>
-    <input type=\"hidden\" id=\"kind_$id\" value=\"$id\" />
-    <a href=\"?action=kind_checklink&amp;category=kind&amp;kind=$id\">
-    <img src=\"$ico_delete\" alt=\"$l_kind_checkdelete\" title=\"$l_kind_checkdelete\" />
-    </a></td>
-    <td>
-    <select id=\"rd_kind_inout_$id\">
-    <option value=\"-\" $inout_minus />$l_minus</option>
-    <option value=\"+\" $inout_plus />$l_plus</option>
-    </select>
+      <input type=\"hidden\" id=\"type_$id\" value=\"$id\" />
+      <a href=\"?action=type_checklink&amp;category=type&amp;type=$id\">
+      <img src=\"$ico_delete\" alt=\"$l_type_checkdelete\" title=\"$l_type_checkdelete\" />
+      </a>
     </td>
-    <td><input type=\"text\" id=\"tf_kind_label_$id\" value=\"$label\" /></td>
     <td>
-    <a href=\"#\" onclick=\"return updateLine($id,'kind');\">
-    <img src=\"$ico_ok\" alt=\"$l_kind_update\" title=\"$l_kind_update\" />
-    </a>
+      <select id=\"rd_type_inout_$id\">
+      <option value=\"-\" $inout_minus />$l_minus</option>
+      <option value=\"+\" $inout_plus />$l_plus</option>
+      </select>
+    </td>
+    <td><input type=\"text\" id=\"tf_code_$id\" size=\"10\" maxlength=\"10\" value=\"$code\" /></td>
+    <td><input type=\"text\" id=\"tf_type_label_$id\" value=\"$label\" /></td>
+    <td>
+      <a href=\"#\" onclick=\"return updateLine($id,'type');\">
+      <img src=\"$ico_ok\" alt=\"$l_type_update\" title=\"$l_type_update\" />
+      </a>
     </td>
     </tr>";
   }
@@ -2886,61 +2884,67 @@ function html_deal_admin_form($kind_q, $status_q) {
 
   $block = "
 
- <div class=\"detail admin\" >
-  <form id=\"form_kind_update\" action=\"?action=kind_update\" method=\"post\">
-  <input type=\"hidden\" name=\"rd_kind_inout\" value=\"\" />
-  <input type=\"hidden\" name=\"tf_kind_label\" value=\"\" />
-  <input type=\"hidden\" name=\"kind\" value=\"\" />
+  <div class=\"detail admin\" >
+  <form id=\"form_type_update\" action=\"?action=type_update\" method=\"post\">
+  <input type=\"hidden\" name=\"rd_type_inout\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_type_label\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_code\" value=\"\" />
+  <input type=\"hidden\" name=\"type\" value=\"\" />
   </form>    
-  <h1>$l_kind_manage</h1>
+  <h1>$l_type_manage</h1>
   <div class=\"overflow\">
   <table>
   <thead>
   <tr>
-  <td>&nbsp;</td>
-  <td>$l_minus / $l_plus</td>
-  <td>$l_kind_label</td>
-  <td>&nbsp;</td>  
+    <td>&nbsp;</td>
+    <td>$l_minus / $l_plus</td>
+    <td>$l_code</td>
+    <td>$l_type_label</td>
+    <td>&nbsp;</td>  
   </tr>    
   </thead>
   <tbody>
-  $kind_list
+  $type_list
   </tbody>
   </table>
   </div>  
 
-  <form id=\"form_kind_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category(this.tf_kind_label,'$jslabel')\">
+  <form id=\"form_type_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category(this.tf_type_label,'$jslabel')\">
   <table>
   <thead>
   <tr>
   <td colspan=\"3\">$l_c_new</td>
   </tr>
-  <tbody>   
+  <tbody>
   <tr>
   <td>
   &nbsp;
   </td>
-  <td>$l_kind_label</td>    
+  <td>$l_code</td>
+  <td>$l_type_label</td>
   </tr>
   <tr>
   <td>
-  <input type=\"radio\" name=\"rd_kind_inout\" value=\"-\" checked=\"checked\"/>$l_minus
-  <input type=\"radio\" name=\"rd_kind_inout\" value=\"+\" />$l_plus
+  <input type=\"radio\" name=\"rd_type_inout\" value=\"-\" checked=\"checked\"/>$l_minus
+  <input type=\"radio\" name=\"rd_type_inout\" value=\"+\" />$l_plus
   </td>
   <td>
-  <input type=\"text\" name=\"tf_kind_label\" value=\"\" />
+  <input type=\"text\" name=\"tf_code\" size=\"10\" maxlength=\"10\" value=\"\" />
+  </td>
+  <td>
+  <input type=\"text\" name=\"tf_type_label\" value=\"\" />
   </td>
   </tr>
   </tbody>
   <tfoot>
   <tr>
-  <td colspan=\"3\"><input type=\"submit\" value=\"$l_kind_insert\" /></td>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_type_insert\" /></td>
   </tr>
   </tfoot>
   </table>
-  <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
-  <input type=\"hidden\" name=\"category\" value=\"kind\" />
+  <input type=\"hidden\" name=\"action\" value=\"type_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"type\" />
   </form>
   </div>
 
@@ -3019,22 +3023,22 @@ function html_deal_admin_form($kind_q, $status_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the kind links
+// Displays the type links
 // Parameters:
-//   - $id : kind id
+//   - $id : type id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_deal_kind_links($id) {
-  global $display, $l_kind_link_deal, $l_kind_link_deal_no, $l_back;
-  global $l_kind_can_delete, $l_kind_cant_delete, $l_kind_delete;
+function dis_deal_type_links($id) {
+  global $display, $l_type_link_deal, $l_type_link_deal_no, $l_back;
+  global $l_type_can_delete, $l_type_cant_delete, $l_type_delete;
 
   $delete_ok = true;
-  $label = get_deal_kind_label($id);
-  $obm_q = run_query_deal_kind_links($id);
+  $label = get_deal_type_label($id);
+  $obm_q = run_query_deal_type_links($id);
 
-  $nb_kind = $obm_q->num_rows();
-  if ($nb_kind > 0) {
+  $nb_type = $obm_q->num_rows();
+  if ($nb_type > 0) {
     $delete_ok = false;
-    $dis_link_head = "<h1>$label : $l_kind_link_deal ($nb_kind)</h1>";
+    $dis_link_head = "<h1>$label : $l_type_link_deal ($nb_type)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
@@ -3043,12 +3047,12 @@ function dis_deal_kind_links($id) {
       $dlabel = $obm_q->f('deal_label');
       $dis_link = "<li><a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a></li>";
     }
-    if ($cpt < $nb_kind) {
+    if ($cpt < $nb_type) {
       $dis_link .= '<li>...</li>';
     }
 
   } else {
-    $dis_link_head = "<h1>$l_kind_link_deal_no</h1>";
+    $dis_link_head = "<h1>$l_type_link_deal_no</h1>";
   }
 
   $block = "<div class=\"detail\">
@@ -3065,12 +3069,12 @@ function dis_deal_kind_links($id) {
         </form>";
 
   if ($delete_ok == true) {
-    $display['msg'] .= display_ok_msg($l_kind_can_delete);
-    $dis_del = "<form name=\"form_kind_delete\".
+    $display['msg'] .= display_ok_msg($l_type_can_delete);
+    $dis_del = "<form name=\"form_type_delete\".
           method=\"post\" action=\"" . url_prepare('deal_index.php') . "\">
-        <input type=\"hidden\" name=\"action\" value=\"kind_delete\" />
-        <input type=\"hidden\" name=\"sel_kind_id\" value=\"$id\" />
-        <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\" />
+        <input type=\"hidden\" name=\"action\" value=\"type_delete\" />
+        <input type=\"hidden\" name=\"sel_type_id\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_type\" value=\"$l_type_delete\" />
         </form>";
     $block .= "
       <div class=\"buttons\">
@@ -3078,7 +3082,7 @@ function dis_deal_kind_links($id) {
         $dis_back
       </div>";
   } else {
-    $display['msg'] .= display_warn_msg($l_kind_cant_delete);
+    $display['msg'] .= display_warn_msg($l_type_cant_delete);
     $block .= "
       <div class=\"buttons\">
         $dis_back
@@ -3137,7 +3141,7 @@ function dis_deal_status_links($id) {
 
   if ($delete_ok == true) {
     $display['msg'] .= display_ok_msg($l_status_can_delete);
-    $dis_del = "<form name=\"form_kind_delete\".
+    $dis_del = "<form name=\"form_type_delete\".
         method=\"post\" action=\"" . url_prepare('deal_index.php') . "\">
       <input type=\"hidden\" name=\"action\" value=\"status_delete\" />
       <input type=\"hidden\" name=\"sel_status_id\" value=\"$id\" />
@@ -3262,12 +3266,12 @@ function dis_deal_parentdeal_consult($deal) {
   $prefs = get_display_pref ($obm['uid'], 'deal');
   $deal_q = run_query_deal_search($deal, 0);
   $num_rows = $deal_q->num_rows();
-  $kind_q = run_query_deal_type();
+  $types = get_global_deal_types();
   $tts = get_global_tasktype($ctt_sales);
   $status_q = run_query_deal_status_list();
   $usr_q = run_query_deal_manager($archive);
 
-  $block = html_deal_parentdeal_consult($obm_q, $deal_q, $deal, $prefs, $num_rows, $kind_q, $tts, $status_q, $usr_q);
+  $block = html_deal_parentdeal_consult($obm_q, $deal_q, $deal, $prefs, $num_rows, $types, $tts, $status_q, $usr_q);
 
   return $block;
 }
@@ -3283,12 +3287,12 @@ function dis_deal_parentdeal_consult($deal) {
 //   - $prefs    : display preferences for the deal list
 //   - $nbdeals  : number of deals in the list
 //     //---> used by the deal search form :
-//   - $kind_q   : list of deal types available
+//   - $types    : list of deal types available
 //   - $tts      : TaskType array
 //   - $status_q : list of deal status available 
 //   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$kind_q,$tts,$status_q,$usr_q) {
+function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$types,$tts,$status_q,$usr_q) {
   global $display, $path;
   global $l_parentdeal_deals,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_proposal,$l_alarm,$l_amount_in,$l_amount_out,$l_potential_balanced,$l_comment,$l_marketing_manager,$l_status;
@@ -3360,7 +3364,7 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   $block .= display_info_msg($l_parentdeal_deals);
 
   //----- deal search form 
-  $block .= html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $types, $regions, $tts, $roles, $status_q, $usr_q);
 
   //-----> deal list
   // if no record found, display it and stop
@@ -3371,14 +3375,14 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   $label = urlencode(stripslashes($deal['label']));
   $name = urlencode(stripslashes($deal['company_name']));
   $archive = $deal['archive'];
-  $kind = $deal['kind_id'];
+  $type = $deal['type_id'];
   $tt = $deal['tasktype'];
   $status = $deal['status_id'];
   $manager = $deal['manager'];
   $date_after = stripslashes($deal['date_after']);
   $date_before = stripslashes($deal['date_before']);
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cba_archive=$archive&amp;sel_kind_id=$kind&amp;sel_status_id=$status&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cba_archive=$archive&amp;sel_type_id=$type&amp;sel_status_id=$status&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent");
 
   // Display the list of deals attached to the parentdeal
   $dis_list_deal = new OBM_DISPLAY('DATA', $prefs, 'deal');

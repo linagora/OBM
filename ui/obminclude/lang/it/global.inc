@@ -48,6 +48,7 @@ $l_default = "Default";
 $l_status = "Stato";
 $l_archive = "Archivio";
 $l_archive_first = "A";
+$l_show_archive = "Mostra archivi";
 $l_dates = "Date";
 $l_date = "Data";
 $l_begin = "Inizio";
@@ -120,6 +121,7 @@ $l_aka = "Altri nome";
 $l_cat_tree = "Entera Categoria";
 $l_category = "Categoria";
 $l_aduplicate = "Copia";
+$l_type = "Tipo";
 
 // Entities
 $l_company = "Azienda";

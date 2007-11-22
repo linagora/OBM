@@ -26,7 +26,7 @@ function run_query_deal_search($deal, $all='') {
   $name = sql_search_text_parse($deal['company_name']);
   $zip = sql_search_text_parse($deal['zip']);
   $archive = $deal['archive'];
-  $kind = $deal['kind_id'];
+  $type = $deal['type_id'];
   $number = $deal['number'];
   $region = $deal['region'];
   $tt = $deal['tasktype'];
@@ -44,6 +44,7 @@ function run_query_deal_search($deal, $all='') {
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, 'deal_datebegin', 'deal_datebegin');
+  $dateprop = sql_date_format($db_type, 'deal_dateproposal', 'deal_dateproposal');
   $datealarm = sql_date_format($db_type, 'deal_datealarm', 'deal_datealarm');
   $dateexp = sql_date_format($db_type, 'deal_dateexpected', 'deal_dateexpected');
   $dateend = sql_date_format($db_type, 'deal_dateend', 'deal_dateend');
@@ -57,8 +58,8 @@ function run_query_deal_search($deal, $all='') {
   if ($number != '') {
     $where .= " AND deal_number $like '%$number%'";
   }
-  if (($kind != $c_all) && ($kind != '')) {
-    $where .= " AND deal_type_id='$kind'";
+  if (($type != $c_all) && ($type != '')) {
+    $where .= " AND deal_type_id='$type'";
   }
   if (($region != $c_all) && ($region != '')) {
     $where .= " AND deal_region_id='$region'";
@@ -154,6 +155,7 @@ function run_query_deal_search($deal, $all='') {
       deal_hitrate,
       deal_status_id,
       $datebegin,
+      $dateprop,
       $datealarm,
       $dateexp,
       $dateend,
@@ -282,7 +284,7 @@ function run_query_deal_insert($deal) {
   $dateend = ($deal['dateend'] ? "'".of_isodate_convert($deal['dateend'])."'" : 'null');
   $dateexp = ($deal['dateexpected'] ? "'".of_isodate_convert($deal['dateexpected'])."'" : 'null');
   $datealarm = ($deal['datealarm'] ? "'".of_isodate_convert($deal['datealarm'])."'" : 'null');
-  $kind = $deal['kind_id']; 
+  $type = $deal['type_id']; 
   $region = $deal['region']; 
   $tt = $deal['tasktype'];
   $comp = $deal['company_id'];
@@ -358,7 +360,7 @@ function run_query_deal_insert($deal) {
     '$number',
     '$label',
     $datebegin,
-    '$kind',
+    '$type',
     '$region',
     '$tt',
     '$comp',
@@ -446,7 +448,7 @@ function run_query_deal_update($deal) {
   $dateprop = ($deal['dateproposal'] ? "'".of_isodate_convert($deal['dateproposal'])."'" : 'null');
   $dateexp = ($deal['dateexpected'] ? "'".of_isodate_convert($deal['dateexpected'])."'" : 'null');
   $datealarm = ($deal['datealarm'] ? "'".of_isodate_convert($deal['datealarm'])."'" : 'null');
-  $kind = $deal['kind_id']; 
+  $type = $deal['type_id']; 
   $region = $deal['region']; 
   $tt = $deal['tasktype'];
   $comp = $deal['company_id'];
@@ -488,7 +490,7 @@ function run_query_deal_update($deal) {
     deal_number='$number',
     deal_label='$label',
     deal_datebegin=$datebegin,
-    deal_type_id='$kind',
+    deal_type_id='$type',
     deal_region_id='$region',
     deal_tasktype_id='$tt',
     deal_company_id='$comp',
@@ -707,7 +709,7 @@ function run_query_deal_id($deal) {
   $label = $deal['label'];
   $priv = $deal['privacy'];
   $datebegin = ($deal['datebegin'] ? "='".of_isodate_convert($deal['datebegin'])."'" : 'is null');
-  $kind = $deal['kind_id'];
+  $type = $deal['type_id'];
   $region = $deal['region'];
   $tt = $deal['tasktype'];
   $comp = $deal['company_id'];
@@ -732,7 +734,7 @@ function run_query_deal_id($deal) {
   WHERE deal_number='$number'
     AND deal_label='$label'
     AND deal_datebegin $datebegin
-    AND deal_type_id='$kind'
+    AND deal_type_id='$type'
     AND deal_region_id='$region'
     AND deal_tasktype_id='$tt'
     AND deal_company_id='$comp'
@@ -1672,48 +1674,34 @@ function get_deal_company_id($deal_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Deal Kind list
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_type() {
-  global $cdg_sql;
-
-  $multidomain = sql_multidomain('dealtype');
-
-  $query = "SELECT * FROM DealType WHERE 1=1 $multidomain";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_deal_type()');
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : Kind insert
+// Query execution : Type insert
 // Parameters:
-//   - $deal[] : deal hash info : keys used : kind_label, kind_inout
+//   - $deal[] : deal hash info : keys used : type_label, type_inout
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_kind_insert($deal) {
+function run_query_deal_type_insert($deal) {
   global $cdg_sql, $obm;
 	
-  $label = $deal['kind_label'];
-  $inout = $deal['kind_inout'];
+  $label = $deal['type_label'];
+  $inout = $deal['type_inout'];
+  $code = $deal['code'];
   $domain_id = $obm['domain_id'];
 	
   $query = "INSERT INTO DealType (dealtype_timeupdate,
     dealtype_timecreate,
     dealtype_usercreate,
-		dealtype_domain_id,
-    dealtype_label,
-    dealtype_inout)
+    dealtype_domain_id,
+    dealtype_inout,
+    dealtype_code,
+    dealtype_label)
   VALUES (null,
     '".date('Y-m-d H:i:s')."',
     '".$obm['uid']."',
     '$domain_id',
-    '$label',
-    '$inout')";
+    '$inout',
+    '$code',
+    '$label')";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_deal_kind_insert()');
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_type_insert()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1722,73 +1710,75 @@ function run_query_deal_kind_insert($deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Kind update
+// Query execution : type update
 // Parameters:
-//   - $deal[] : deal hash info : keys used : kind, kind_label, kind_inout
+//   - $deal[] : deal hash info : keys used : type, type_label, type_inout
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_kind_update($deal) {
+function run_query_deal_type_update($deal) {
   global $obm, $cdg_sql;  
 
-  $label = $deal['kind_label'];
-  $kind = $deal['kind'];
-  $inout = $deal['kind_inout'];
-  //$inout = (($deal['kind_inout']) == '+' ? $deal['kind_inout'] : '-');
+  $inout = $deal['type_inout'];
+  $code = $deal['code'];
+  $label = $deal['type_label'];
+  $type = $deal['type'];
+  //$inout = (($deal['type_inout']) == '+' ? $deal['type_inout'] : '-');
   $multidomain = sql_multidomain('dealtype');
 	
   $query = "UPDATE DealType SET
+      dealtype_code='$code',
       dealtype_label='$label',
       dealtype_timeupdate='" .date('Y-m-d H:i:s') . "',
       dealtype_userupdate='" .$obm['uid'] ."',
       dealtype_inout='$inout'
-    WHERE dealtype_id='$kind'
+    WHERE dealtype_id='$type'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_deal_kind_update()');
-  $kind_q = new DB_OBM;
-  $retour = $kind_q->query($query);
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_type_update()');
+  $type_q = new DB_OBM;
+  $retour = $type_q->query($query);
 
   return $retour;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : kind deletion
+// Query execution : Type deletion
 // Parameters:
-//   - $id : kind id to delete
+//   - $id : type id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_kind_delete($id) {
+function run_query_deal_type_delete($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('dealtype');
 
   $query = "DELETE FROM DealType WHERE dealtype_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_deal_kind_delete()');
-  $kind_q = new DB_OBM;
-  $retour = $kind_q->query($query);
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_type_delete()');
+  $type_q = new DB_OBM;
+  $retour = $type_q->query($query);
 
   return $retour;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Links to the Kind given
+// Query execution : Links to the Type given
 // Parameters:
-//   - $k_id : kind id
+//   - $t_id : type id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_kind_links($k_id) {
+function run_query_deal_type_links($t_id) {
   global $cdg_sql;
 	
   $multidomain = sql_multidomain('deal');
 
   $query = "SELECT deal_id, deal_label FROM Deal 
-		WHERE deal_type_id='$k_id' $multidomain";
+		WHERE deal_type_id='$t_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_deal_kind_links()');
-  $kind_q = new DB_OBM;
-  $kind_q->query($query);
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_type_links()');
+  $type_q = new DB_OBM;
+  $type_q->query($query);
 
-  return $kind_q;
+  return $type_q;
 }
 
 
@@ -1928,7 +1918,7 @@ function check_deal_form($did, $deal) {
   global $php_regexp_isodate, $l_invalid_date, $l_alarm;
   global $err, $l_err_label_empty, $l_err_hitrate, $l_date_comment;
   global $l_begin, $l_expected, $l_proposal, $l_end, $l_date_inconsistency;
-  global $l_err_kind_empty, $l_err_task_empty, $l_err_market_empty, $l_err_tech_empty;
+  global $l_err_type_empty, $l_err_task_empty, $l_err_market_empty, $l_err_tech_empty;
 
   // Check if the label is filled
   if (trim($deal['label']) == '') {
@@ -1936,9 +1926,9 @@ function check_deal_form($did, $deal) {
     return false;
   }
 
-  // Check if the kind is filled
-  if ($deal['kind_id'] < 1) {
-    $err['msg'] = $l_err_kind_empty;
+  // Check if the type is filled
+  if ($deal['type_id'] < 1) {
+    $err['msg'] = $l_err_type_empty;
     return false;
   }
 
@@ -2458,11 +2448,11 @@ function run_query_deal_updatearchive_parentdeal($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Kind
+// Get the label of a type
 // Parameters:
-//   - $id : kind id
+//   - $id : type id
 ///////////////////////////////////////////////////////////////////////////////
-function get_deal_kind_label($id) {
+function get_deal_type_label($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('dealtype');
@@ -2470,7 +2460,7 @@ function get_deal_kind_label($id) {
   $query = "SELECT dealtype_label 
 		FROM DealType WHERE dealtype_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, 'get_deal_kind_label()');
+  display_debug_msg($query, $cdg_sql, 'get_deal_type_label()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();

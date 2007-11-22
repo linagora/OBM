@@ -1277,6 +1277,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   global $l_datasource, $l_archive, $l_private, $l_coord, $l_contact, $l_market;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
+  global $extra_js;
 
   $uid = $obm["uid"];
 
@@ -1337,6 +1338,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
 
   // New form and first time
   } elseif ($action == "new") {
+    $kind = get_contact_kind_default();
     $dis_title = $l_header_new;
     $dsrc = $_SESSION['set_dsrc'];
     $mark = $obm["uid"];
@@ -1495,7 +1497,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $j=0;
     $k=0;
     $k_kind_js .= "lang_array = new Object();\n";
-    while ($kind_q->next_record()) {      
+    while ($kind_q->next_record()) {
       $k_id = $kind_q->f("kind_id");
       $k_lang = $kind_q->f("kind_lang");
       $k_label = $kind_q->f("kind_minilabel");
@@ -1540,10 +1542,10 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
 	  if ($k_label == $kind_label) {
 	    foreach ($k_kind_header as $k_header => $k_id) {
 	      $sel_kind_header .= "\n<option value=\"$k_id\"";
-	      if ($k_id == $kind) { 
+	      if ($k_id == $kind) {
 	        $sel_kind_lang .= "selected = \"selected\"";
 	        $sel_kind_label .= "selected = \"selected\"";
-	        $sel_kind_header .= "selected = \"selected\""; 
+	        $sel_kind_header .= "selected = \"selected\"";
 	      }
 	      $sel_kind_header .= ">$k_header</option>";
 	    }

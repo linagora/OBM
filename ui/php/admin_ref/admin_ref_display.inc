@@ -33,17 +33,17 @@ function html_admin_ref_country_form($ctry_q) {
   $char_title = '=';
   $key = 0;
   while ($ctry_q->next_record()) {
-    $iso = $ctry_q->f("country_iso3166");
-    $lang = $ctry_q->f("country_lang");
-    $name = $ctry_q->f("country_name");
-    $phone = $ctry_q->f("country_phone");
+    $iso = $ctry_q->f('country_iso3166');
+    $lang = $ctry_q->f('country_lang');
+    $name = $ctry_q->f('country_name');
+    $phone = $ctry_q->f('country_phone');
     
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
-      $class = "";
+      $class = '';
     }
-    $c_label = htmlentities($one_cat["label"]);
+    $c_label = htmlentities($one_cat['label']);
     $ctry_list .= "
     <tr $class>
     <td>
@@ -143,8 +143,8 @@ function dis_admin_ref_country_links($ref) {
   global $l_ctry_delete, $l_ctry_can_delete, $l_ctry_cant_delete;
 
   $delete_ok = true;
-  $iso = $ref["ctry_code"];
-  $lang = $ref["ctry_lang"];
+  $iso = $ref['ctry_code'];
+  $lang = $ref['ctry_lang'];
   $name = get_admin_ref_country_name($iso, $lang);
 
   // Company Links
@@ -154,8 +154,8 @@ function dis_admin_ref_country_links($ref) {
     $dis_link_comp_head = "<h1>$name($iso) : $l_ctry_link_company</h1>";
 
     while ($obm_q->next_record()) {
-      $cid = $obm_q->f("company_id");
-      $cname = $obm_q->f("company_name");
+      $cid = $obm_q->f('company_id');
+      $cname = $obm_q->f('company_name');
       $dis_link_comp .= "<li><a href=\"".url_prepare("company_index.php?action=detailconsult&amp;company_id=$cid"). "\">$cname</a></li>";
     }
 
@@ -170,8 +170,8 @@ function dis_admin_ref_country_links($ref) {
     $dis_link_cont_head = "<h1>$name($iso) : $l_ctry_link_contact</h1>";
 
     while ($obm_q->next_record()) {
-      $cid = $obm_q->f("contact_id");
-      $cname = $obm_q->f("contact_lastname")." ".$obm_q->f("contact_firstname");
+      $cid = $obm_q->f('contact_id');
+      $cname = $obm_q->f('contact_lastname').' '.$obm_q->f('contact_firstname');
       $dis_link_cont .= "<li><a href=\""
       .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid")
       . "\">$cname</a></li>";
@@ -195,7 +195,7 @@ function dis_admin_ref_country_links($ref) {
   $dis_back = "<a href=\"$path/admin_ref/admin_ref_index.php?action=country\">$l_back</a>";
 
   if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_ctry_can_delete);
+    $display['msg'] .= display_ok_msg($l_ctry_can_delete);
     $dis_del = "<a
     href=\"$path/admin_ref/admin_ref_index.php?action=country_delete&amp;ctry_code=$iso&amp;ctry_lang=$lang\">$l_ctry_delete</a>";
     $block .= "
@@ -204,7 +204,7 @@ function dis_admin_ref_country_links($ref) {
         $dis_back
       </div>";
   } else {
-    $display["msg"] .= display_warn_msg($l_ctry_cant_delete);
+    $display['msg'] .= display_warn_msg($l_ctry_cant_delete);
     $block .= "
       <div class=\"buttons\">
         $dis_back
@@ -239,13 +239,13 @@ function html_admin_ref_datasource_form($dsrc_q) {
   $char_title = '=';
   $key = 0;
   while ($dsrc_q->next_record()) {
-      $id = $dsrc_q->f("datasource_id");
-      $name = $dsrc_q->f("datasource_name");
+      $id = $dsrc_q->f('datasource_id');
+      $name = $dsrc_q->f('datasource_name');
     
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
-      $class = "";
+      $class = '';
     }
     $dsrc_list .= "
     <tr $class>
@@ -324,7 +324,7 @@ function dis_admin_ref_datasource_links($ref) {
   global $l_dsrc_delete, $l_dsrc_can_delete, $l_dsrc_cant_delete;
 
   $delete_ok = true;
-  $id = $ref["dsrc"];
+  $id = $ref['dsrc'];
   $name = get_admin_ref_datasource_name($id);
 
   // Company Links
@@ -335,8 +335,8 @@ function dis_admin_ref_datasource_links($ref) {
     $dis_link_comp_head = "<h1>$name : $l_dsrc_link_company ($nb)</h1>";
 
     while ($obm_q->next_record()) {
-      $cid = $obm_q->f("company_id");
-      $cname = $obm_q->f("company_name");
+      $cid = $obm_q->f('company_id');
+      $cname = $obm_q->f('company_name');
       $dis_link_comp .= "<li><a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$cid"). "\">$cname</a></li>";
     }
       } else {
@@ -351,8 +351,8 @@ function dis_admin_ref_datasource_links($ref) {
     $dis_link_cont_head = "<h1>$name : $l_dsrc_link_contact ($nb)</h1>";
 
     while ($obm_q->next_record()) {
-      $cid = $obm_q->f("contact_id");
-      $cname = $obm_q->f("contact_lastname")." ".$obm_q->f("contact_firstname");
+      $cid = $obm_q->f('contact_id');
+      $cname = $obm_q->f('contact_lastname').' '.$obm_q->f('contact_firstname');
       $dis_link_cont .= "<li><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$cid"). "\">$cname</a></li>";
     }
 
@@ -374,7 +374,7 @@ function dis_admin_ref_datasource_links($ref) {
   $dis_back = "<a href=\"$path/admin_ref/admin_ref_index.php?action=datasource\">$l_back</a>";
 
   if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_dsrc_can_delete);
+    $display['msg'] .= display_ok_msg($l_dsrc_can_delete);
     $dis_del = "<a
     href=\"$path/admin_ref/admin_ref_index.php?action=datasource_delete&amp;dsrc=$id&amp;dsrc_name=$name\">$l_dsrc_delete</a>";
     $block .= "
@@ -383,7 +383,7 @@ function dis_admin_ref_datasource_links($ref) {
         $dis_back
       </div>";
   } else {
-    $display["msg"] .= display_warn_msg($l_dsrc_cant_delete);
+    $display['msg'] .= display_warn_msg($l_dsrc_cant_delete);
     $block .= "
       <div class=\"buttons\">
         $dis_back
@@ -412,8 +412,8 @@ function dis_admin_ref_tasktype_index() {
 //   - $tts : Task Type array
 ///////////////////////////////////////////////////////////////////////////////
 function html_admin_ref_tasktype_form($tts) {
-  global $l_tt_manage, $l_tt_exist, $l_tt_no;
-  global $l_tt_checkdelete, $l_tt_update, $l_tt_new, $l_tt_insert;
+  global $l_code, $l_tt_manage, $l_tt_exist, $l_tt_no;
+  global $l_tt, $l_tt_checkdelete, $l_tt_update, $l_tt_new, $l_tt_insert;
   global $ctt_sales, $ctt_research, $ctt_others;
   global $l_tt_sales, $l_tt_research, $l_tt_others,$ico_delete,$ico_ok;
 
@@ -424,8 +424,9 @@ function html_admin_ref_tasktype_form($tts) {
   $type_prec = -1;
   if (is_array($tts)) {
     foreach ($tts as $id=>$one_tt) {
-      $tt_label = $one_tt["label"];
-      $tt_internal = $one_tt["internal"];
+      $tt_label = $one_tt['label'];
+      $tt_code = $one_tt['code'];
+      $tt_internal = $one_tt['internal'];
       
       // put menu titles
       $tasktypelist[$tt_internal] .= "
@@ -437,6 +438,7 @@ function html_admin_ref_tasktype_form($tts) {
     href=\"?action=tasktype_checklink&amp;category=tasktype&amp;tasktype_id=$id&amp;tasktype_internal=$tt_internal\">
     <img src=\"$ico_delete\" alt=\"$l_tt_delete\" title=\"$l_tt_delete\" />
     </a></td>
+    <td><input type=\"text\" id=\"tf_tt_code_$id\" size=\"10\" maxlength=\"10\" value=\"$tt_code\" /></td>
     <td><input type=\"text\" id=\"tf_tt_label_$id\" value=\"$tt_label\" /></td>
     <td>
     <a href=\"#\" onclick=\"return updateLine($id,'tasktype');\">
@@ -444,14 +446,15 @@ function html_admin_ref_tasktype_form($tts) {
     </a>
     </td>
     </tr>      
-      ";
+";
     } 
-    }
+  }
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
     <form id=\"form_tasktype_update\" method=\"post\" action=\"?action=tasktype_update\">
+    <input type=\"hidden\" name=\"tf_tt_code\" value=\"\" />
     <input type=\"hidden\" name=\"tf_tt_label\" value=\"\" />
     <input type=\"hidden\" name=\"tasktype_internal\" value=\"\" />
     <input type=\"hidden\" name=\"tasktype\" value=\"\" />
@@ -463,6 +466,7 @@ function html_admin_ref_tasktype_form($tts) {
     <thead>
     <tr>
     <td>&nbsp;</td>
+    <td>$l_code</td>
     <td>$l_tt_exist</td>
     <td>&nbsp;</td>
     </tr>
@@ -472,6 +476,7 @@ function html_admin_ref_tasktype_form($tts) {
     </tbody>
     </table>
     </div>
+
     <form id=\"form_tasktype1_new\" method=\"post\" action=\"\">
     <table>
     <thead>
@@ -481,10 +486,14 @@ function html_admin_ref_tasktype_form($tts) {
     </thead>
     <tbody>
     <tr>
-    <td>
-    <input type=\"hidden\" name=\"rd_internal\" value=\"0\"/>$l_tt_sales
-    </td>
-    <td colspan=\"2\"><input type=\"text\" name=\"tf_tt_label\" /></td>
+      <td>&nbsp;</td>
+      <td>$l_code</td>
+      <td>$l_tt</td>
+    </tr>
+    <tr>
+    <td><input type=\"hidden\" name=\"rd_internal\" value=\"0\"/></td>
+    <td><input type=\"text\" name=\"tf_tt_code\" size=\"10\" maxlength=\"10\" /></td>
+    <td><input type=\"text\" name=\"tf_tt_label\" /></td>
     </tr>
     </tbody>
     <tfoot>
@@ -498,6 +507,7 @@ function html_admin_ref_tasktype_form($tts) {
     </table>
     </form>
     </div>
+
    <div class=\"detail admin\">
     <h1>$tt_list[$ctt_others]</h1>
     <div class=\"overflow\">
@@ -505,6 +515,7 @@ function html_admin_ref_tasktype_form($tts) {
     <thead>
     <tr>
     <td>&nbsp;</td>
+    <td>$l_code</td>
     <td>$l_tt_exist</td>
     <td>&nbsp;</td>
     </tr>
@@ -523,10 +534,14 @@ function html_admin_ref_tasktype_form($tts) {
     </thead>
     <tbody>
     <tr>
-    <td>
-    <input type=\"hidden\" name=\"rd_internal\" value=\"2\"/>$l_tt_others
-    </td>
-    <td colspan=\"2\"><input type=\"text\" name=\"tf_tt_label\" /></td>
+      <td>&nbsp;</td>
+      <td>$l_code</td>
+      <td>$l_tt</td>
+    </tr>
+    <tr>
+    <td><input type=\"hidden\" name=\"rd_internal\" value=\"2\"/></td>
+    <td><input type=\"text\" name=\"tf_tt_code\" size=\"10\" maxlength=\"10\" /></td>
+    <td><input type=\"text\" name=\"tf_tt_label\" /></td>
     </tr>
     </tbody>
     <tfoot>
@@ -539,7 +554,8 @@ function html_admin_ref_tasktype_form($tts) {
     </tfoot>
     </table>
     </form>
-    </div>        
+    </div>
+
     <div class=\"detail admin\">
     <h1>$tt_list[$ctt_research]</h1>
     <div class=\"overflow\">
@@ -547,6 +563,7 @@ function html_admin_ref_tasktype_form($tts) {
     <thead>
     <tr>
     <td>&nbsp;</td>
+    <td>$l_code</td>
     <td>$l_tt_exist</td>
     <td>&nbsp;</td>
     </tr>
@@ -565,10 +582,14 @@ function html_admin_ref_tasktype_form($tts) {
     </thead>
     <tbody>
     <tr>
-    <td>
-    <input type=\"hidden\" name=\"rd_internal\" value=\"1\"/>$l_tt_research
-    </td>
-    <td colspan=\"2\"><input type=\"text\" name=\"tf_tt_label\" /></td>
+      <td>&nbsp;</td>
+      <td>$l_code</td>
+      <td>$l_tt</td>
+    </tr>
+    <tr>
+    <td><input type=\"hidden\" name=\"rd_internal\" value=\"1\"/></td>
+    <td><input type=\"text\" name=\"tf_tt_code\" size=\"10\" maxlength=\"10\" /></td>
+    <td><input type=\"text\" name=\"tf_tt_label\" /></td>
     </tr>
     </tbody>
     <tfoot>
@@ -581,8 +602,7 @@ function html_admin_ref_tasktype_form($tts) {
     </tfoot>
     </table>
     </form>
-    </div>       
-    
+    </div>    
 ";
 
   return $block;
@@ -600,7 +620,7 @@ function dis_admin_ref_tasktype_links($ref) {
   global $l_tt_delete, $l_tt_can_delete, $l_tt_cant_delete;
 
   $delete_ok = true;
-  $id = $ref["tasktype_id"];
+  $id = $ref['tasktype_id'];
   $label = get_admin_ref_tasktype_label($id);
 
   // Deal Links
@@ -613,8 +633,8 @@ function dis_admin_ref_tasktype_links($ref) {
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $did = $obm_q->f("deal_id");
-      $dlabel = $obm_q->f("deal_label");
+      $did = $obm_q->f('deal_id');
+      $dlabel = $obm_q->f('deal_label');
       $dis_link_deal .= "<li><a href=\""
       .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$did")
       . "\">$dlabel</a></li>";
@@ -636,8 +656,8 @@ function dis_admin_ref_tasktype_links($ref) {
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $pid = $obm_q->f("project_id");
-      $pname = $obm_q->f("project_name");
+      $pid = $obm_q->f('project_id');
+      $pname = $obm_q->f('project_name');
       $dis_link_proj .= "<a href=\"" .url_prepare("$path/project/project_index.php?action=detailconsult&amp;project_id=$pid") . "\">$pname</a>";
     }
     if ($cpt < $nb_proj) {
@@ -659,9 +679,9 @@ function dis_admin_ref_tasktype_links($ref) {
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $tid = $obm_q->f("timetask_user_id");
-      $tname = $obm_q->f("lastname") . " " . $obm_q->f("firstname");
-      $tdate = of_date_format($obm_q->f("date"), 1);
+      $tid = $obm_q->f('timetask_user_id');
+      $tname = $obm_q->f('lastname') . ' ' . $obm_q->f('firstname');
+      $tdate = of_date_format($obm_q->f('date'), 1);
       $dis_link_time .= "<li><a href=\""
       .url_prepare("$path/time/time_index.php?action=index&amp;sel_user_id=$tid&amp;wbegin=$tdate")
       . "\">$tname ($tdate)</a></li>";
@@ -692,7 +712,7 @@ function dis_admin_ref_tasktype_links($ref) {
   $dis_back = "<a href=\"$path/admin_ref/admin_ref_index.php?action=tasktype\">$l_back</a>";
 
   if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_tt_can_delete);
+    $display['msg'] .= display_ok_msg($l_tt_can_delete);
     $dis_del = "<a href=\"$path/admin_ref/admin_ref_index.php?action=tasktype_delete&amp;tasktype=$id\">$l_tt_delete</a>";
     $block .= "
       <div class=\"buttons\">
@@ -700,7 +720,7 @@ function dis_admin_ref_tasktype_links($ref) {
         $dis_back
       </div>";
   } else {
-    $display["msg"] .= display_warn_msg($l_tt_cant_delete);
+    $display['msg'] .= display_warn_msg($l_tt_cant_delete);
     $block .= "
       <div class=\"buttons\">
         $dis_back
@@ -725,22 +745,22 @@ function html_admin_ref_tasktype_select_list($ref) {
 
   $type_prec = -1;
 
-  $tts = get_global_tasktype($ref["tt_target"]);
+  $tts = get_global_tasktype($ref['tt_target']);
 
   if (is_array($tts)) {
 
-    $ext_action = $ref["ext_action"];
-    $ext_url = $ref["ext_url"];
-    $ext_id = $ref["ext_id"];
-    $ext_target = $ref["ext_target"];
-    $ext_widget = $ref["ext_widget"];
-    $ext_element = $ref["ext_element"];
+    $ext_action = $ref['ext_action'];
+    $ext_url = $ref['ext_url'];
+    $ext_id = $ref['ext_id'];
+    $ext_target = $ref['ext_target'];
+    $ext_widget = $ref['ext_widget'];
+    $ext_element = $ref['ext_element'];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
 
-    if ($ext_element != "") {
+    if ($ext_element != '') {
       $form_head = "
       <form onsubmit=\"of_select_fill_from_checkbox(this, 'tt'); window.close(); return false;\">";
-    } elseif ($ext_widget != "") {
+    } elseif ($ext_widget != '') {
       $form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";
     } else {
@@ -750,8 +770,8 @@ function html_admin_ref_tasktype_select_list($ref) {
 
     $table_tt = "<table>";
     foreach ($tts as $id=>$one_tt) {
-      $tt_label = $one_tt["label"];
-      $internal = $one_tt["internal"];
+      $tt_label = $one_tt['label'];
+      $internal = $one_tt['internal'];
       // put menu titles
       if ($internal != $type_prec) {
 	$table_tt .= "\n<tr><td class=\"detailLabel\">".$tt_list[$internal]."</td></tr>";
@@ -794,12 +814,11 @@ $table_tt
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_ref_region_index() {
 
-  $regions = of_category_get_ordered("", "region");
-  $block .= of_category_dis_admin_form("region", $regions);
+  $regions = of_category_get_ordered('', 'region');
+  $block .= of_category_dis_admin_form('region', $regions);
 
   return $block;
 }
-
 
 
 ?>

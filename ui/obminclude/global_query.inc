@@ -137,15 +137,15 @@ function run_query_global_contactfunction() {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Get Lead sources infos
-// Returns:
-//   $ret[] : [id]=[id][name]
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Get Lead sources infos
+ * @return   $ret[] : [id]=[id][name]
+ **/
 function get_global_lead_sources() {
   global $cdg_sql;
 
-  $query = "SELECT * FROM LeadSource ORDER BY leadsource_label";
+  $multidomain = sql_multidomain('leadsource');
+  $query = "SELECT * FROM LeadSource WHERE 1=1 $multidomain ORDER BY leadsource_label";
 
   display_debug_msg($query, $cdg_sql, 'get_global_lead_sources()');
   $obm_q = new DB_OBM;
@@ -155,6 +155,37 @@ function get_global_lead_sources() {
     $id = $obm_q->f('leadsource_id');
     $label = $obm_q->f('leadsource_label');
     $ret[$id] = array('id' => $id, 'label' => $label);
+  }
+
+  return $ret;
+}
+
+
+/**
+ * Get Deal type infos
+ * @return   $ret[] : [id]=[id][name]
+ **/
+function get_global_deal_types() {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('dealtype');
+  $query = "SELECT * FROM DealType
+    WHERE 1=1 $multidomain
+    ORDER BY dealtype_inout, dealtype_code, dealtype_label";
+
+  display_debug_msg($query, $cdg_sql, 'get_global_deal_types()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f('dealtype_id');
+    $inout = $obm_q->f('dealtype_inout');
+    $code = $obm_q->f('dealtype_code');
+    $label = $obm_q->f('dealtype_label');
+    $ret[$id] = array('id' => $id,
+		      'inout' => $inout,
+		      'code' => $code,
+		      'label' => $label);
   }
 
   return $ret;
@@ -173,10 +204,12 @@ function get_global_lead_sources() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_tasktype($tt_cat='', $tt_ids='') {
   global $cdg_sql, $ctt_sales, $ctt_research;
+
   $multidomain = sql_multidomain('tasktype');
   $query = "
     SELECT
       tasktype_id,
+      tasktype_code,
       tasktype_label, 
       tasktype_internal
     FROM TaskType";
@@ -215,9 +248,11 @@ function get_global_tasktype($tt_cat='', $tt_ids='') {
 
   while ($obm_q->next_record()) {
     $id = $obm_q->f('tasktype_id');
+    $code = $obm_q->f('tasktype_code');
     $label = $obm_q->f('tasktype_label');
     $internal = $obm_q->f('tasktype_internal');
     $tt[$id] = array ('label' => $label,
+		      'code' => $code,
 		      'internal' => $internal);
   }
 

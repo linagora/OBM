@@ -30,6 +30,7 @@ $l_default = "Default";
 $l_status = "Status";
 $l_archive = "Arkiv";
 $l_archive_first = "A";
+$l_show_archive = "Vis arkiv";
 $l_date = "Dato";
 $l_datebegin = "Begin date";
 $l_dateend = "End date";

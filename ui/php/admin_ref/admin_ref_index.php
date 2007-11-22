@@ -32,21 +32,21 @@
 // - tt_ext_get_ids       --                -- select multiple tt (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
-$path = "..";
-$module = "admin_ref";
-$obminclude = getenv("OBM_INCLUDE_VAR");
-if ($obminclude == "") $obminclude = "obminclude";
+$path = '..';
+$module = 'admin_ref';
+$obminclude = getenv('OBM_INCLUDE_VAR');
+if ($obminclude == '') $obminclude = 'obminclude';
 include("$obminclude/global.inc"); 
 $params = get_admin_ref_params();
-page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 
-require("admin_ref_display.inc");
-require("admin_ref_query.inc");
-require_once("admin_ref_js.inc");
+require('admin_ref_display.inc');
+require('admin_ref_query.inc');
+require_once('admin_ref_js.inc');
 require_once("$obminclude/of/of_category.inc");
 
-if ($action == "index") $action = "country";
+if ($action == 'index') $action = 'country';
 get_admin_ref_action();
 $perm->check_permissions($module, $action);
 
@@ -55,175 +55,175 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "tt_ext_get_ids") {
-  $display["detail"] = html_admin_ref_tasktype_select_list($params);
+if ($action == 'tt_ext_get_ids') {
+  $display['detail'] = html_admin_ref_tasktype_select_list($params);
   
-} elseif ($action == "index") {
+} elseif ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
-  //$display["detail"] = dis_ref_index();
+  //$display['detail'] = dis_ref_index();
 
-} elseif ($action == "country") {
+} elseif ($action == 'country') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_admin_ref_country_index();
+  $display['detail'] = dis_admin_ref_country_index();
 
-} elseif ($action == "country_insert") {
+} elseif ($action == 'country_insert') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_admin_ref_country_insert($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_country_insert_ok);
+    $display['msg'] .= display_ok_msg($l_country_insert_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_country_insert_error);
+    $display['msg'] .= display_err_msg($l_country_insert_error);
   }
-  $display["detail"] .= dis_admin_ref_country_index();
+  $display['detail'] .= dis_admin_ref_country_index();
 
-} elseif ($action == "country_update") {
+} elseif ($action == 'country_update') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_admin_ref_country_update($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_country_update_ok);
+    $display['msg'] .= display_ok_msg($l_country_update_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_country_update_error);
+    $display['msg'] .= display_err_msg($l_country_update_error);
   }
-  $display["detail"] .= dis_admin_ref_country_index();
+  $display['detail'] .= dis_admin_ref_country_index();
 
-} elseif ($action == "country_checklink") {
+} elseif ($action == 'country_checklink') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_admin_ref_country_links($params);
-  $display["detail"] .= dis_admin_ref_country_index();
+  $display['detail'] .= dis_admin_ref_country_links($params);
+  $display['detail'] .= dis_admin_ref_country_index();
 
-} elseif ($action == "country_delete") {
+} elseif ($action == 'country_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_admin_ref_country_delete($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_country_delete_ok);
+    $display['msg'] .= display_ok_msg($l_country_delete_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_country_delete_error);
+    $display['msg'] .= display_err_msg($l_country_delete_error);
   }
-  $display["detail"] .= dis_admin_ref_country_index();
+  $display['detail'] .= dis_admin_ref_country_index();
 
-} elseif ($action == "datasource") {
+} elseif ($action == 'datasource') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_admin_ref_datasource_index();
+  $display['detail'] = dis_admin_ref_datasource_index();
 
-} elseif ($action == "datasource_insert") {
+} elseif ($action == 'datasource_insert') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_admin_ref_datasource_insert($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_dsrc_insert_ok);
+    $display['msg'] .= display_ok_msg($l_dsrc_insert_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_dsrc_insert_error);
+    $display['msg'] .= display_err_msg($l_dsrc_insert_error);
   }
-  $display["detail"] .= dis_admin_ref_datasource_index();
+  $display['detail'] .= dis_admin_ref_datasource_index();
 
-} elseif ($action == "datasource_update") {
+} elseif ($action == 'datasource_update') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_admin_ref_datasource_update($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_dsrc_update_ok);
+    $display['msg'] .= display_ok_msg($l_dsrc_update_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_dsrc_update_error);
+    $display['msg'] .= display_err_msg($l_dsrc_update_error);
   }
-  $display["detail"] .= dis_admin_ref_datasource_index();
+  $display['detail'] .= dis_admin_ref_datasource_index();
 
-} elseif ($action == "datasource_checklink") {
+} elseif ($action == 'datasource_checklink') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_admin_ref_datasource_links($params);
+  $display['detail'] .= dis_admin_ref_datasource_links($params);
 
-} elseif ($action == "datasource_delete") {
+} elseif ($action == 'datasource_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_admin_ref_datasource_delete($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_dsrc_delete_ok);
+    $display['msg'] .= display_ok_msg($l_dsrc_delete_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_dsrc_delete_error);
+    $display['msg'] .= display_err_msg($l_dsrc_delete_error);
   }
-  $display["detail"] .= dis_admin_ref_datasource_index();
+  $display['detail'] .= dis_admin_ref_datasource_index();
 
-} elseif ($action == "tasktype") {
+} elseif ($action == 'tasktype') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_admin_ref_tasktype_index();
+  $display['detail'] = dis_admin_ref_tasktype_index();
 
-} elseif ($action == "tasktype_insert") {
+} elseif ($action == 'tasktype_insert') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_admin_ref_tasktype_insert($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_tt_insert_ok);
+    $display['msg'] .= display_ok_msg($l_tt_insert_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_tt_insert_error);
+    $display['msg'] .= display_err_msg($l_tt_insert_error);
   }
-  $display["detail"] .= dis_admin_ref_tasktype_index();
+  $display['detail'] .= dis_admin_ref_tasktype_index();
 
-} elseif ($action == "tasktype_update") {
+} elseif ($action == 'tasktype_update') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_admin_ref_tasktype_update($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_tt_update_ok);
+    $display['msg'] .= display_ok_msg($l_tt_update_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_tt_update_error);
+    $display['msg'] .= display_err_msg($l_tt_update_error);
   }
-  $display["detail"] .= dis_admin_ref_tasktype_index();
+  $display['detail'] .= dis_admin_ref_tasktype_index();
 
-} elseif ($action == "tasktype_checklink") {
+} elseif ($action == 'tasktype_checklink') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_admin_ref_tasktype_links($params);
+  $display['detail'] .= dis_admin_ref_tasktype_links($params);
 
-} elseif ($action == "tasktype_delete") {
+} elseif ($action == 'tasktype_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_admin_ref_tasktype_delete($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_tt_delete_ok);
+    $display['msg'] .= display_ok_msg($l_tt_delete_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_tt_delete_error);
+    $display['msg'] .= display_err_msg($l_tt_delete_error);
   }
-  $display["detail"] .= dis_admin_ref_tasktype_index();
+  $display['detail'] .= dis_admin_ref_tasktype_index();
 
-} elseif ($action == "region") {
+} elseif ($action == 'region') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_admin_ref_region_index();
+  $display['detail'] = dis_admin_ref_region_index();
 
-} elseif ($action == "region_insert") {
+} elseif ($action == 'region_insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("", "region", $params);
+  $retour = of_category_query_insert('', 'region', $params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_region : $l_insert_ok");
+    $display['msg'] .= display_ok_msg("$l_region : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_region : $l_insert_error");
+    $display['msg'] .= display_err_msg("$l_region : $l_insert_error");
   }
-  $display["detail"] = dis_admin_ref_region_index();
+  $display['detail'] = dis_admin_ref_region_index();
   
-} elseif ($action == "region_update") {
+} elseif ($action == 'region_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("", "region", $params);
+  $retour = of_category_query_update('', 'region', $params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_region : $l_update_ok");
+    $display['msg'] .= display_ok_msg("$l_region : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_region : $l_update_error");
+    $display['msg'] .= display_err_msg("$l_region : $l_update_error");
   }
-  $display["detail"] = dis_admin_ref_region_index();
+  $display['detail'] = dis_admin_ref_region_index();
   
-} elseif ($action == "region_checklink") {
+} elseif ($action == 'region_checklink') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links(array("deal"), "region", $params, "mono");
+  $display['detail'] .= of_category_dis_links(array('deal'), 'region', $params, 'mono');
   
-} elseif ($action == "region_delete") {
+} elseif ($action == 'region_delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("", "region", $params);
+  $retour = of_category_query_delete('', 'region', $params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_region : $l_delete_ok");
+    $display['msg'] .= display_ok_msg("$l_region : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_region : $l_delete_error");
+    $display['msg'] .= display_err_msg("$l_region : $l_delete_error");
   }
-  $display["detail"] = dis_admin_ref_region_index();
+  $display['detail'] = dis_admin_ref_region_index();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head($l_header_admin_ref);
-if (! $params["popup"]) {
-  $display["header"] = display_menu($module);
+$display['head'] = display_head($l_header_admin_ref);
+if (! $params['popup']) {
+  $display['header'] = display_menu($module);
  }
-$display["end"] = display_end();
+$display['end'] = display_end();
 
 display_page($display);
 
@@ -234,17 +234,17 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_admin_ref_params() {
 
-  $params = get_global_params("admin_ref");
+  $params = get_global_params('admin_ref');
 
   // Admin - Country fields
-  if (isset ($params["country"])) {
-    $sel_country = $params["country"];
-    $pos = strpos($sel_country, "-");
-    $params["iso"] = substr($sel_country, 0, $pos);
-    $params["lang"] = substr($sel_country, $pos+1);
+  if (isset ($params['country'])) {
+    $sel_country = $params['country'];
+    $pos = strpos($sel_country, '-');
+    $params['iso'] = substr($sel_country, 0, $pos);
+    $params['lang'] = substr($sel_country, $pos+1);
   }
 
-  if (isset ($$params["ext_id"])) { $params["id"] = $params["ext_id"]; }
+  if (isset ($$params['ext_id'])) { $params['id'] = $params['ext_id']; }
 
   return $params;
 }
@@ -260,7 +260,7 @@ function get_admin_ref_action() {
   global $cright_read, $cright_read_admin, $cright_write_admin;
 
   // Country index
-  $actions["admin_ref"]["country"] = array (
+  $actions['admin_ref']['country'] = array (
      'Name'     => $l_header_country,
      'Url'      => "$path/admin_ref/admin_ref_index.php?action=country&amp;mode=html",
      'Right'    => $cright_read_admin,
@@ -268,35 +268,35 @@ function get_admin_ref_action() {
                                     	  );
 
 // Country Insert
-  $actions["admin_ref"]["country_insert"] = array (
+  $actions['admin_ref']['country_insert'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Country Update
-  $actions["admin_ref"]["country_update"] = array (
+  $actions['admin_ref']['country_update'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Country Check Link
-  $actions["admin_ref"]["country_checklink"] = array (
+  $actions['admin_ref']['country_checklink'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Country Delete
-  $actions["admin_ref"]["country_delete"] = array (
+  $actions['admin_ref']['country_delete'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
   // DataSource index
-  $actions["admin_ref"]["datasource"] = array (
+  $actions['admin_ref']['datasource'] = array (
      'Name'     => $l_header_datasource,
      'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource&amp;mode=html",
      'Right'    => $cright_read_admin,
@@ -304,40 +304,40 @@ function get_admin_ref_action() {
                                     	  );
 
 // DataSource Insert
-  $actions["admin_ref"]["datasource_insert"] = array (
+  $actions['admin_ref']['datasource_insert'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // DataSource Update
-  $actions["admin_ref"]["datasource_update"] = array (
+  $actions['admin_ref']['datasource_update'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // DataSource Check Link
-  $actions["admin_ref"]["datasource_checklink"] = array (
+  $actions['admin_ref']['datasource_checklink'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // DataSource Delete
-  $actions["admin_ref"]["datasource_delete"] = array (
+  $actions['admin_ref']['datasource_delete'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
   // Tasktype management only displayed if deal or project or time module
-  if (($cgp_show["module"]["deal"])
-      || ($cgp_show["module"]["project"])
-      || ($cgp_show["module"]["time"])) {
+  if (($cgp_show['module']['deal'])
+      || ($cgp_show['module']['project'])
+      || ($cgp_show['module']['time'])) {
 
     // External : Get Ids
-    $actions["admin_ref"]["tt_ext_get_ids"] = array (
+    $actions['admin_ref']['tt_ext_get_ids'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids",
     'Right'    => $cright_read,
     'Condition'=> array ('none'),
@@ -345,7 +345,7 @@ function get_admin_ref_action() {
                                     );
 
     // Tasktype index
-    $actions["admin_ref"]["tasktype"] = array (
+    $actions['admin_ref']['tasktype'] = array (
      'Name'     => $l_header_tasktype,
      'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype&amp;mode=html",
      'Right'    => $cright_read_admin,
@@ -353,28 +353,28 @@ function get_admin_ref_action() {
                                     	  );
 
     // Tasktype Insert
-    $actions["admin_ref"]["tasktype_insert"] = array (
+    $actions['admin_ref']['tasktype_insert'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
     // Tasktype Update
-    $actions["admin_ref"]["tasktype_update"] = array (
+    $actions['admin_ref']['tasktype_update'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
     // Tasktype Check Link
-    $actions["admin_ref"]["tasktype_checklink"] = array (
+    $actions['admin_ref']['tasktype_checklink'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
     // Tasktype Delete
-    $actions["admin_ref"]["tasktype_delete"] = array (
+    $actions['admin_ref']['tasktype_delete'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
@@ -382,11 +382,11 @@ function get_admin_ref_action() {
   }
 
   // Region management only displayed if deal module
-  if (($cgp_show["module"]["deal"])
-      || ($cgp_show["module"]["deal"])) {
+  if (($cgp_show['module']['deal'])
+      || ($cgp_show['module']['deal'])) {
 
     // Region index
-    $actions["admin_ref"]["region"] = array (
+    $actions['admin_ref']['region'] = array (
      'Name'     => $l_header_region,
      'Url'      => "$path/admin_ref/admin_ref_index.php?action=region&amp;mode=html",
      'Right'    => $cright_read_admin,
@@ -394,28 +394,28 @@ function get_admin_ref_action() {
                                     	  );
 
     // Region Insert
-    $actions["admin_ref"]["region_insert"] = array (
+    $actions['admin_ref']['region_insert'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=region_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
     // Region Update
-    $actions["admin_ref"]["region_update"] = array (
+    $actions['admin_ref']['region_update'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=region_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
     // Region Check Link
-    $actions["admin_ref"]["region_checklink"] = array (
+    $actions['admin_ref']['region_checklink'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=region_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
     // Region Delete
-    $actions["admin_ref"]["region_delete"] = array (
+    $actions['admin_ref']['region_delete'] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=region_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 

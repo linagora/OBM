@@ -68,7 +68,7 @@ $l_iso_3166 = "Iso Code 3166";
 // Task Type
 $l_tt_manage = "Task Type management";
 $l_tt_exist = "Existing Task Types";
-$l_tt_new = "New Task Type";
+$l_tt_new = "New";
 $l_tt_no = "No Task Type defined";
 $l_tt_update = "Update Task Type";
 $l_tt_checkdelete = "Check or Delete Task Type";

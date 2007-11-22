@@ -24,10 +24,10 @@ function check_category(label,category) {
    }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Fill the content of the table line into the update form
 ///////////////////////////////////////////////////////////////////////////////
-
 function updateLine(id,category) {
   form = \$('form_' + category + '_update');
   for(i=0;i<form.elements.length;i++) {

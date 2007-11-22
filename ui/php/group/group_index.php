@@ -140,7 +140,11 @@ if (($action == 'index') || ($action == '')) {
   if (check_group_data_form($params)) {
     $retour = run_query_group_update($params);
     if ($retour) {
-      set_update_state();
+      // Set update state only if the update group is public
+      $g = get_group_info($params['group_id']);
+      if ($g['privacy'] == 0) {
+	set_update_state();
+      }
       $display["msg"] .= display_ok_msg("$l_group : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_group : $l_update_error");
@@ -168,7 +172,11 @@ if (($action == 'index') || ($action == '')) {
   if (check_group_can_delete($params["group_id"])) {
     $retour = run_query_group_delete($params["group_id"]);
     if ($retour) {
-      set_update_state();
+      // Set update state only if the deleted group is public
+      $g = get_group_info($params['group_id']);
+      if ($g['privacy'] == 0) {
+	set_update_state();
+      }
       $display["msg"] .= display_ok_msg("$l_group : $l_delete_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_group : $l_delete_error");
@@ -185,7 +193,11 @@ if (($action == 'index') || ($action == '')) {
   if (check_group_update_rights($params)) {
     if ($params["user_nb"] > 0) {
       $nb = run_query_group_usergroup_insert($params);
-      set_update_state();
+      // Set update state only if updated group is public
+      $g = get_group_info($params['group_id']);
+      if ($g['privacy'] == 0) {
+	set_update_state();
+      }
       $display["msg"] .= display_ok_msg("$nb $l_user_added");
     } else {
       $display["msg"] .= display_err_msg($l_no_user_added);
@@ -200,7 +212,11 @@ if (($action == 'index') || ($action == '')) {
   if (check_group_update_rights($params)) {
     if ($params["user_nb"] > 0) {
       $nb = run_query_group_usergroup_delete($params);
-      set_update_state();
+      // Set update state only if updated group is public
+      $g = get_group_info($params['group_id']);
+      if ($g['privacy'] == 0) {
+	set_update_state();
+      }
       $display["msg"] .= display_ok_msg("$nb $l_user_removed");
     } else {
       $display["msg"] .= display_err_msg($l_no_user_deleted);
@@ -215,7 +231,11 @@ if (($action == 'index') || ($action == '')) {
   if (check_group_update_rights($params)) {
     if ($params["group_nb"] > 0) {
       $nb = run_query_group_group_insert($params);
-      set_update_state();
+      // Set update state only if updated group is public
+      $g = get_group_info($params['group_id']);
+      if ($g['privacy'] == 0) {
+	set_update_state();
+      }
       $display["msg"] .= display_ok_msg("$nb $l_group_added");
     } else {
       $display["msg"] .= display_err_msg($l_no_group_added);
@@ -230,7 +250,11 @@ if (($action == 'index') || ($action == '')) {
   if (check_group_update_rights($params)) {
     if ($params["group_nb"] > 0) {
       $nb = run_query_group_group_delete($params);
-      set_update_state();
+      // Set update state only if updated group is public
+      $g = get_group_info($params['group_id']);
+      if ($g['privacy'] == 0) {
+	set_update_state();
+      }
       $display["msg"] .= display_ok_msg("$nb $l_group_removed");
     } else {
       $display["msg"] .= display_err_msg($l_no_group_deleted);

@@ -19,7 +19,6 @@ $l_amount_out = "Amout of outputs";
 $l_potential = "Weighted Potential";
 $l_label = "Label";
 $l_label_start = "Label start with";
-$l_kind = "Branche";
 $l_project_manager = "Projektleiter";
 $l_origin = "Origin";
 $l_marketing_manager = "Vertriebsleiter";
@@ -29,7 +28,6 @@ $l_proposal = "Vorschlag";
 $l_amount = "Bemerkung";
 $l_hitrate = "Hit Rate";
 $l_contacts = "Kontakte";
-$l_show_archive = "anzeigen Archiv";
 $l_date = "Datum";
 $l_date_init = "Startdatum";
 $l_after = "nach";
@@ -41,9 +39,9 @@ $l_deal_select_parentdeal = "Hauptvertrag auswählen";
 $l_parentdeal="Hauptvertrag";
 
 
-$l_type_manage = "Deal Kind Management";
-$l_type_exist = "Existing Kinds";
-$l_type_new = "New Kind";
+$l_type_manage = "Deal Type Management";
+$l_type_exist = "Existing Types";
+$l_type_new = "New Type";
 $l_status_manage = "Deal Status Management";
 $l_status_exist = "Existing States";
 $l_status_new = "New State";
@@ -71,9 +69,9 @@ $l_update_parent = "ändern Hauptvertrag";
 $l_delete_parent = "löschen Hauptvertrag";
 $l_affect = "zuordnen";
 
-$l_type_delete = "Delete Kind";
-$l_type_update = "Update Kind";
-$l_type_insert = "Insert Kind";
+$l_type_delete = "Delete Type";
+$l_type_update = "Update Type";
+$l_type_insert = "Insert Type";
 $l_status_update = "Update State";
 $l_status_delete = "Delete State";
 $l_status_insert = "Insert State";
@@ -107,13 +105,13 @@ $l_fill_date = "\\n You have to fill the Date before submitting.";
 $l_invalid_date = "Invalid Date Format (MM/JJ/AAAA or AAAA-MM-JJ).";
 $l_delete_confirm = "Confirm the vertrag deletion ?";
 
-$mj_type_delete_confirm = "Confirm the deal kind deletion ?";
-$mj_type_delete = "You have to select a kind to delete it !";
+$mj_type_delete_confirm = "Confirm the deal type deletion ?";
+$mj_type_delete = "You have to select a type to delete it !";
 $mj_status_delete_confirm = "Confirm the deal status deletion ?";
 $mj_status_delete = "You have to select a state to delete it !";
-$mj_type_update = "You have to select a kind and enter a new name to update it !";
+$mj_type_update = "You have to select a type and enter a new name to update it !";
 $mj_status_update = "You have to select a state and enter a new name to update it !";
-$mj_type_create = "You have to enter a new kind name to create it !";
+$mj_type_create = "You have to enter a new type name to create it !";
 $mj_status_create = "You have to enter a new state name to create it !";
 
 // For the display parameters modification screen

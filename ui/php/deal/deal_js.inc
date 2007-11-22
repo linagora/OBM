@@ -137,14 +137,14 @@ function check_parentdeal(f_parent) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the Deal Kind deletion is possible                               //
+// Check if the Deal Type deletion is possible                               //
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_checkdel(form) {
-   if (form.sel_kind_id.selectedIndex >= 0)
+function check_type_checkdel(form) {
+   if (form.sel_type_id.selectedIndex >= 0)
    {
      return true;
    } else {
-     alert(\"$l_j_kind_delete\");
+     alert(\"$l_j_type_delete\");
      return false;
    }
 }
@@ -167,15 +167,15 @@ function check_status_checkdel(form) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the kind update is possible                                      //
+// Check if the type update is possible                                      //
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_upd(form,formd) {
-  kind_pos = formd.sel_kind_id.selectedIndex;
-  if ((kind_pos >= 0) && (form.tf_label.value != \"\")) {
-    form.sel_kind_id.value=formd.sel_kind_id.options[kind_pos].value;
+function check_type_upd(form,formd) {
+  type_pos = formd.sel_type_id.selectedIndex;
+  if ((type_pos >= 0) && (form.tf_label.value != \"\")) {
+    form.sel_type_id.value=formd.sel_type_id.options[type_pos].value;
     return true;
    } else {
-     alert(\"$l_j_kind_update\");
+     alert(\"$l_j_type_update\");
      return false;
    }
 }
@@ -197,14 +197,14 @@ function check_status_upd(form,formd) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the Kind creation is possible                                    //
+// Check if the Type creation is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_new(form) {
+function check_type_new(form) {
    if (form.tf_label.value != \"\")
       return true;
    else
    {
-      alert(\"$l_j_kind_create\");
+      alert(\"$l_j_type_create\");
       return false;
    }
 }

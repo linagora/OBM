@@ -41,6 +41,7 @@ $l_default = "Default";
 $l_status = "Status";
 $l_archive = "Archiv";
 $l_archive_first = "A";
+$l_show_archive = "anzeigen Archiv";
 $l_date = "Date";
 $l_datebegin = "Date begin";
 $l_dateend = "Date End";
@@ -96,6 +97,7 @@ $l_resource = "Resource";
 $l_group = "Groupe";
 $l_resourcegroup = "Groupe de ressources";
 $l_settings = "Configuration";
+$l_kind = "Branche";
 
 // OBM_DISPLAY
 $l_entries = "Einträge";

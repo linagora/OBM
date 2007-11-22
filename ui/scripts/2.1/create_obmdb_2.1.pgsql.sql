@@ -483,6 +483,22 @@ CREATE TABLE LeadSource (
 
 
 --
+-- Table structure for table 'LeadStatus'
+--
+CREATE TABLE LeadStatus (
+  leadstatus_id          serial,
+  leadstatus_domain_id   integer default 0,
+  leadstatus_timeupdate  timestamp,
+  leadstatus_timecreate  timestamp,
+  leadstatus_userupdate  integer,
+  leadstatus_usercreate  integer,
+  leadstatus_label       varchar(24),
+  leadstatus_order       integer,
+  PRIMARY KEY (leadstatus_id)
+);
+
+
+--
 -- Table structure for the table 'Lead'
 --
 CREATE TABLE Lead (
@@ -500,6 +516,7 @@ CREATE TABLE Lead (
   lead_name        varchar(64),
   lead_date        date,
   lead_datealarm   date,
+  lead_status_id   integer,
   lead_archive     char(1) DEFAULT '0',
   lead_todo        varchar(128),
   lead_comment     text,
@@ -580,7 +597,6 @@ CREATE TABLE DealStatus (
   dealstatus_usercreate  integer,
   dealstatus_label       varchar(24),
   dealstatus_order       integer,
-  dealstatus_hitrate     char(3),
   PRIMARY KEY (dealstatus_id)
 );
 
@@ -595,8 +611,9 @@ CREATE TABLE DealType (
   dealtype_timecreate  timestamp,
   dealtype_userupdate  integer,
   dealtype_usercreate  integer,
-  dealtype_label       varchar(16),
   dealtype_inout       varchar(1) DEFAULT '-',
+  dealtype_code        varchar(10),
+  dealtype_label       varchar(16),
   PRIMARY KEY (dealtype_id)
 );
 
@@ -960,6 +977,7 @@ CREATE TABLE Project (
   project_usercreate     integer,
   project_name           varchar(128),
   project_shortname      varchar(10),
+  project_type_id        integer,
   project_tasktype_id    integer,
   project_company_id     integer,
   project_deal_id        integer,
@@ -1134,6 +1152,7 @@ CREATE TABLE TaskType (
   tasktype_userupdate  integer DEFAULT NULL,
   tasktype_usercreate  integer DEFAULT NULL,
   tasktype_internal    integer NOT NULL,
+  tasktype_code        varchar(10),
   tasktype_label       varchar(32) DEFAULT NULL,
   PRIMARY KEY (tasktype_id)
 );

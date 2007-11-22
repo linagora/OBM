@@ -556,3 +556,43 @@ CREATE TABLE P_of_usergroup (
 
 -- DROP TABLE P_UserObmGroup;
 -- DROP TABLE P_GroupGroup;
+
+
+--
+-- UPDATE Project Structure
+--
+-- add project_type
+ALTER TABLE Project ADD COLUMN project_type_id integer;
+
+
+--
+-- UPDATE DealType Structure
+--
+-- add dealtype_code
+ALTER TABLE DealType ADD COLUMN dealtype_code varchar(10);
+
+
+--
+-- UPDATE TaskType Structure
+--
+-- add tasktype_code
+ALTER TABLE TaskType ADD COLUMN tasktype_code varchar(10);
+
+
+--
+-- Table structure for table 'LeadStatus'
+--
+CREATE TABLE LeadStatus (
+  leadstatus_id          serial,
+  leadstatus_domain_id   integer default 0,
+  leadstatus_timeupdate  timestamp,
+  leadstatus_timecreate  timestamp,
+  leadstatus_userupdate  integer,
+  leadstatus_usercreate  integer,
+  leadstatus_label       varchar(24),
+  leadstatus_order       integer,
+  PRIMARY KEY (leadstatus_id)
+);
+
+-- add lead_status_id
+ALTER TABLE Lead ADD COLUMN lead_status_id integer;

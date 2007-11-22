@@ -483,6 +483,22 @@ CREATE TABLE LeadSource (
 
 
 --
+-- Table structure for table 'LeadStatus'
+--
+CREATE TABLE LeadStatus (
+  leadstatus_id          int(2) auto_increment,
+  leadstatus_domain_id   int(8) default 0,
+  leadstatus_timeupdate  timestamp(14),
+  leadstatus_timecreate  timestamp(14),
+  leadstatus_userupdate  int(8),
+  leadstatus_usercreate  int(8),
+  leadstatus_label       varchar(24),
+  leadstatus_order       int(2),
+  PRIMARY KEY (leadstatus_id)
+);
+
+
+--
 -- Table structure for the table 'Lead'
 --
 CREATE TABLE Lead (
@@ -500,6 +516,7 @@ CREATE TABLE Lead (
   lead_name        varchar(64),
   lead_date        date,
   lead_datealarm   date,
+  lead_status_id   int(2),
   lead_archive     char(1) DEFAULT '0',
   lead_todo        varchar(128),
   lead_comment     text,
@@ -597,8 +614,9 @@ CREATE TABLE DealType (
   dealtype_timecreate  timestamp(14),
   dealtype_userupdate  int(8),
   dealtype_usercreate  int(8),
-  dealtype_label       varchar(16),
   dealtype_inout       varchar(1) DEFAULT '-',
+  dealtype_code        varchar(10),
+  dealtype_label       varchar(16),
   PRIMARY KEY (dealtype_id)
 );
 
@@ -957,6 +975,7 @@ CREATE TABLE Project (
   project_usercreate     int(8),
   project_name           varchar(128),
   project_shortname      varchar(10),
+  project_type_id        int(8),
   project_tasktype_id    int(8),
   project_company_id     int(8),
   project_deal_id        int(8),
@@ -1131,6 +1150,7 @@ CREATE TABLE TaskType (
   tasktype_userupdate  int(8) default NULL,
   tasktype_usercreate  int(8) default NULL,
   tasktype_internal    int(1) NOT NULL,
+  tasktype_code        varchar(10),
   tasktype_label       varchar(32) default NULL,
   PRIMARY KEY (tasktype_id)
 ) TYPE=MyISAM;

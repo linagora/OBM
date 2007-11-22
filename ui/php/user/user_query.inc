@@ -113,8 +113,8 @@ function run_query_user_search($user) {
   if (trim($group) != '') {
      if (trim($where) != '') $where .= ' AND';
      $where .= " group_name like '%$group%'";
-     $join_grp = 'LEFT JOIN UserObmGroup ON userobm_id=userobmgroup_userobm_id
-                  LEFT JOIN UGroup ON userobmgroup_group_id=group_id';
+     $join_grp = 'LEFT JOIN of_usergroup ON userobm_id=of_usergroup_user_id
+                  LEFT JOIN UGroup ON of_usergroup_group_id=group_id';
   }
 
   if ($archive != '1') {
@@ -615,13 +615,13 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
 
     $query = "DELETE FROM UserObmGroup
       WHERE userobmgroup_userobm_id = '$u_id'
-      and userobmgroup_group_id = '$group_id'";
+      AND userobmgroup_group_id = '$group_id'";
 
     display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
   }
-  
+
   // we get the group gid from its id
   $group_id = get_group_id_from_gid($gid);
 
@@ -1110,7 +1110,7 @@ function run_query_user_update_user_group($user) {
   }
 
   // Finish the internal usergroup mapping update
-  // for groups membership that are no renewed (=remaining groups = 1)
+  // for groups membership that are not renewed (=remaining groups = 1)
   foreach ($groups as $g_id => $value) {
     if ($value != 0) {
       of_usergroup_update_group_hierarchy($g_id);

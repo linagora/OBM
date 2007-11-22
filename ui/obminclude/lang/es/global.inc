@@ -49,6 +49,7 @@ $l_default = "Por Omisión";
 $l_status = "Estado";
 $l_archive = "Archivo";
 $l_archive_first = "Arch";
+$l_show_archive = "Mostrar archivos";
 $l_dates = "Fechas";
 $l_date = "Fecha";
 $l_begin = "Inicio";
@@ -125,6 +126,7 @@ $l_aka = "Tambien Conocida como";
 $l_cat_tree = "Arbol de Categorías";
 $l_category = "Categoría";
 $l_aduplicate = "Duplicar";
+$l_kind = "Tipo";
 
 // Entities
 $l_company = "Compañía";

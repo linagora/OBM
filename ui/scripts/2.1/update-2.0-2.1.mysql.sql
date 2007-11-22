@@ -185,10 +185,6 @@ ALTER TABLE UserObm ADD COLUMN userobm_delegation_target varchar(64) DEFAULT '' 
 ALTER TABLE P_UserObm ADD COLUMN userobm_delegation_target varchar(64) DEFAULT '' AFTER userobm_perms;
 ALTER TABLE UserObm ADD COLUMN userobm_delegation varchar(64) DEFAULT '' AFTER userobm_delegation_target;
 ALTER TABLE P_UserObm ADD COLUMN userobm_delegation varchar(64) DEFAULT '' AFTER userobm_delegation_target;
-ALTER TABLE UserObm DROP KEY k_login_user;
-ALTER TABLE P_UserObm DROP KEY k_login_user;
-ALTER TABLE UserObm ADD INDEX k_login_user (userobm_login);
-ALTER TABLE P_UserObm ADD INDEX k_login_user (userobm_login);
 
 -- UGroup
 ALTER TABLE UGroup ADD COLUMN group_delegation varchar(64) DEFAULT '' AFTER group_mailing;
@@ -537,3 +533,57 @@ CREATE TABLE P_of_usergroup like of_usergroup;
 
 -- DROP TABLE P_UserObmGroup;
 -- DROP TABLE P_GroupGroup;
+
+
+--
+-- UPDATE Project Structure
+--
+-- add project_type
+ALTER TABLE Project ADD COLUMN project_type_id int(8) AFTER project_shortname;
+
+
+--
+-- UPDATE DealType Structure
+--
+-- add dealtype_code
+ALTER TABLE DealType ADD COLUMN dealtype_code varchar(10) AFTER dealtype_inout;
+
+
+--
+-- UPDATE TaskType Structure
+--
+-- add tasktype_code
+ALTER TABLE TaskType ADD COLUMN tasktype_code varchar(10) AFTER tasktype_internal;
+
+
+--
+-- Table structure for table 'LeadStatus'
+--
+CREATE TABLE LeadStatus (
+  leadstatus_id          int(2) auto_increment,
+  leadstatus_domain_id   int(8) default 0,
+  leadstatus_timeupdate  timestamp(14),
+  leadstatus_timecreate  timestamp(14),
+  leadstatus_userupdate  int(8),
+  leadstatus_usercreate  int(8),
+  leadstatus_label       varchar(24),
+  leadstatus_order       int(2),
+  PRIMARY KEY (leadstatus_id)
+);
+
+-- add lead_status_id
+ALTER TABLE Lead ADD COLUMN lead_status_id int(8) AFTER lead_datealarm;
+
+--
+-- Update Deal values
+--
+UPDATE Deal set deal_dateproposal = null WHERE deal_dateproposal = '0000-00-00';
+
+
+--
+-- Update UserObm constraints
+--
+ALTER IGNORE TABLE UserObm DROP KEY k_login_user;
+ALTER IGNORE TABLE P_UserObm DROP KEY k_login_user;
+ALTER TABLE UserObm ADD INDEX k_login_user (userobm_login);
+ALTER TABLE P_UserObm ADD INDEX k_login_user (userobm_login);

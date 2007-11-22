@@ -1162,12 +1162,11 @@ function check_can_delete_contact($p_id) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Get the contact infos
-// Parameters:
-//   - $con_id : contact id
-// Returns: $c hash with contact infos
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Get the contact infos
+ * @param $con_id : contact id
+ * @return : $c hash with contact infos
+ **/
 function get_contact_info($con_id) {
   global $cdg_sql;
 
@@ -1187,6 +1186,27 @@ function get_contact_info($con_id) {
   $c['privacy'] = $obm_q->f('contact_privacy');
 
   return $c;
+}
+
+
+/**
+ * Get the contact kind default value
+ * @return : $kind_id
+ **/
+function get_contact_kind_default() {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('kind');
+
+  $query = "SELECT kind_id FROM Kind WHERE kind_default=1 $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'get_contact_kind_default()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $kind_id = $obm_q->f('kind_id');
+
+  return $kind_id;
 }
 
 

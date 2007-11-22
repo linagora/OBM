@@ -60,6 +60,7 @@ $l_default = "Défaut";
 $l_status = "Etat";
 $l_archive = "Archive";
 $l_archive_first = "Arc";
+$l_show_archive = "Voir les archives";
 $l_dates = "Dates";
 $l_date = "Date";
 $l_begin = "Début";
@@ -159,6 +160,7 @@ $l_properties = "Propriétés";
 $l_items = "Accessoires";
 $l_received = "Reçu";
 $l_emitted = "Emis";
+$l_type ="Type";
 
 // Entities
 $l_company = "Société";

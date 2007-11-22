@@ -401,8 +401,9 @@ function run_query_group_delete($p_id) {
   display_debug_msg($query, $cdg_sql, "run_query_group_delete(3)");
   $retour = $obm_q->query($query);
 
-  // If this Group exists in Prod table, Insert it in Deleted table
-  $query = "SELECT group_id FROM P_UGroup WHERE group_id='$p_id'";
+  // If the Group exists in Prod table AND is public, Insert it in Deleted table
+  $query = "SELECT group_id FROM P_UGroup
+    WHERE group_id='$p_id' AND group_privacy=0";
   display_debug_msg($query, $cdg_sql, "run_query_group_delete(auto)");
   $obm_q->query($query);
 

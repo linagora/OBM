@@ -68,7 +68,7 @@ $l_iso_3166 = "Code Iso 3166";
 // Task Type
 $l_tt_manage = "Gestion des types de tâche";
 $l_tt_exist = "Types de tâche existants";
-$l_tt_new = "Nouveau type de tâche";
+$l_tt_new = "Nouveau";
 $l_tt_no = "Pas de type de tâche définis";
 $l_tt_update = "Modifier le type de tâche";
 $l_tt_checkdelete = "Vérifier ou Supprimer le type de tâche";
