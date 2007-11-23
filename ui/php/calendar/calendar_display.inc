@@ -949,8 +949,8 @@ function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity
             } else {
               $pre_span =  str_repeat("<td></td>",$j - $ccalendar_first_hour);
               $visible_duration = ($occurence->date + $occurence->event->duration) - $current_time;
-              $evt_span = ceil($visible_duration/3600);              
-              $post_span =  str_repeat("<td></td>",$span - ($evt_span + $j - $ccalendar_first_hour));            
+              $evt_span = ceil($visible_duration/3600);          
+              $post_span =  @str_repeat("<td></td>",$span - ($evt_span + $j - $ccalendar_first_hour));            
               $evt_cal .= "<tr>$pre_span<td colspan=\"$evt_span\">$event_data</td>$post_span</tr>";
             }
             unset($occurences[$key]);
@@ -1139,7 +1139,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
           $pre_span =  str_repeat("<td></td>",$i - $ccalendar_first_hour);
           $visible_duration = ($occurence->date + $occurence->event->duration) - $current_time;
           $evt_span = ceil($visible_duration/3600);                  
-          $post_span =  str_repeat("<td></td>",$span - ($evt_span + $i - $ccalendar_first_hour));
+          $post_span =  @str_repeat("<td></td>",$span - ($evt_span + $i - $ccalendar_first_hour));
           $events_list = "
             <div class=\"printableEvent $klass\">
             <h1>$schedule</h1>

@@ -3372,7 +3372,7 @@ function calendar_daily_repeatition($date,$start_time,$end_date,$repeatfrequence
     if ($temp_date > 0) {
       $temp_date = ($temp_date % $repeatfrequence);
     }	    
-    $temp_date = strtotime("+$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
+    $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
   }
   while ($temp_date < $end_date ) {
     $of = &OccurrenceFactory::getInstance();
