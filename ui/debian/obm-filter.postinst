@@ -59,9 +59,9 @@ case "$1" in
 				# Ajout de l'utilisateur clamav au groupe amavis pour autoriser 
 				# clamav à vérifier les fichiers traités par amavis
 				usermod -a -G amavis clamav
-			  mv /etc/clamav/freshclam.conf /etc/clamav/freshclam.conf.tmp
-        cat /etc/clamav/freshclam.conf.tmp | sed -e '/^DatabaseMirror .*$/d' > /etc/clamav/freshclam.conf
-				echo "DatabaseMirror database.clamav.net" >> /etc/clamav/freshclam.conf
+			  #mv /etc/clamav/freshclam.conf /etc/clamav/freshclam.conf.tmp
+        #cat /etc/clamav/freshclam.conf.tmp | sed -e '/^DatabaseMirror .*$/d' > /etc/clamav/freshclam.conf
+				#echo "DatabaseMirror database.clamav.net" >> /etc/clamav/freshclam.conf
 			fi
 			# Toutes les configurations	
 			db_get obm-filter/httpproxyserver
