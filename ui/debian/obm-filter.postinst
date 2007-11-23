@@ -59,6 +59,9 @@ case "$1" in
 				# Ajout de l'utilisateur clamav au groupe amavis pour autoriser 
 				# clamav à vérifier les fichiers traités par amavis
 				usermod -a -G amavis clamav
+			  mv /etc/clamav/freshclam.conf /etc/clamav/freshclam.conf.tmp
+        cat /etc/clamav/freshclam.conf.tmp | sed -e '/^DatabaseMirror .*$/d' > /etc/clamav/freshclam.conf
+				echo "DatabaseMirror database.clamav.net" >> /etc/clamav/freshclam.conf
 			fi
 			# Toutes les configurations	
 			db_get obm-filter/httpproxyserver
@@ -74,12 +77,12 @@ case "$1" in
 			db_get obm-filter/httpproxyport
       if [ -z "${RET}" ] ; then
         mv -f /etc/clamav/freshclam.conf /etc/clamav/freshclam.conf.tmp
-        cat /etc/clamav/freshclam.conf.tmp | sed -e '/^HTTPProxyport .*$/d' > /etc/clamav/freshclam.conf        
+        cat /etc/clamav/freshclam.conf.tmp | sed -e '/^HTTPProxyPort .*$/d' > /etc/clamav/freshclam.conf        
       else
 				HTTP_PROXY_PORT=${RET}
         mv  /etc/clamav/freshclam.conf /etc/clamav/freshclam.conf.tmp
-        cat /etc/clamav/freshclam.conf.tmp | sed -e '/^HTTPProxyport .*$/d' > /etc/clamav/freshclam.conf
-        echo "HTTPProxyport ${HTTP_PROXY_PORT}" >> /etc/clamav/freshclam.conf
+        cat /etc/clamav/freshclam.conf.tmp | sed -e '/^HTTPProxyPort .*$/d' > /etc/clamav/freshclam.conf
+        echo "HTTPProxyPort ${HTTP_PROXY_PORT}" >> /etc/clamav/freshclam.conf
       fi
 			## Installation de spamassassin
 			# Mise en place de sa-update
