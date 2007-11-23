@@ -492,8 +492,8 @@ CREATE TABLE LeadStatus (
   leadstatus_timecreate  timestamp,
   leadstatus_userupdate  integer,
   leadstatus_usercreate  integer,
+  leadstatus_code        varchar(10),
   leadstatus_label       varchar(24),
-  leadstatus_order       integer,
   PRIMARY KEY (leadstatus_id)
 );
 

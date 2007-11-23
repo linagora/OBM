@@ -16,6 +16,7 @@ $fieldnames['lead_name'] = $l_name;
 $fieldnames['leadsource_label'] = $l_source;
 $fieldnames['lead_archive'] = $l_archive_first;
 $fieldnames['date'] = $l_date;
+$fieldnames['leadstatus_label'] = $l_status;
 $fieldnames['datealarm'] = $l_alarm;
 $fieldnames['company_name'] = $l_company;
 $fieldnames['company_zipcode'] = $l_postcode;
@@ -73,8 +74,9 @@ function dis_lead_search_form($params='') {
   global $cgp_hide;
 
   $sources = get_global_lead_sources();
+  $status = get_lead_status();
   $managers = get_lead_managers();
-  $block .= html_lead_search_form($params, $sources, $managers);
+  $block .= html_lead_search_form($params, $sources, $status, $managers);
 
   return $block;
 }
@@ -85,15 +87,17 @@ function dis_lead_search_form($params='') {
 // Parameters:
 //   - $params[] : default form values
 //   - $sources  : sources infos
+//   - $status   : status infos
 //   - $managers : managers infos
 ///////////////////////////////////////////////////////////////////////////////
-function html_lead_search_form($params, $sources, $managers) {
+function html_lead_search_form($params, $sources, $status, $managers) {
   global $l_find, $l_all, $c_all;
-  global $l_text, $l_manager, $l_source, $l_company, $l_show_archive;
+  global $l_text, $l_manager, $l_source, $l_status, $l_company, $l_show_archive;
   global $l_date, $l_after, $l_before;
   global $l_both, $l_received, $l_emitted;
 
   $source_id = $params['source'];
+  $status_id = $params['status'];
   $manager_id = $params['manager'];
   $company = $params['company'];
   $archive = ($params['archive'] == '1' ? "checked = \"checked\"" : '');
@@ -113,6 +117,19 @@ function html_lead_search_form($params, $sources, $managers) {
     }
   }
   $sel_source .= '</select>';
+
+  // Status select
+  $sel_status = "
+    <select name=\"sel_status\">
+     <option value=\"$c_all\">$l_all</option>\n";
+  if (is_array($status) && (count($status) > 0)) {
+    foreach($status as $s_id => $one_status) {
+      $slabel = $one_status['label'];
+      $sselect = ($s_id == $status_id) ? 'selected' : '';
+      $sel_status .= "<option value=\"$s_id\" $sselect>$slabel</option>";
+    }
+  }
+  $sel_status .= '</select>';
 
   // Manager select
   $sel_manager = "
@@ -148,6 +165,10 @@ function html_lead_search_form($params, $sources, $managers) {
 
     <label>$l_source<br />
      $sel_source
+    </label>
+
+    <label>$l_status<br />
+     $sel_status
     </label>
 
     <label>$l_manager<br />
@@ -209,6 +230,7 @@ function html_lead_search_list($obm_q, $prefs, $params) {
   $date_after = $params['date_after'];
   $date_before = $params['date_before'];
   $source = $params['source'];
+  $status_id = $params['status'];
   $manager = $params['manager'];
   $archive = $params['archive'];
 
@@ -226,6 +248,7 @@ function html_lead_search_list($obm_q, $prefs, $params) {
 		    "&amp;tf_date_before=$date_before".
 		    "&amp;tf_date_after=$date_after".
 		    "&amp;sel_source=$source".
+		    "&amp;sel_status=$status_id".
 		    "&amp;sel_manager=$manager".
 		    "&amp;cba_archive=$archive".
 		    "$url_ext");
@@ -281,7 +304,7 @@ function dis_lead_consult($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_lead_consult($l_q) {
   global $path, $display, $ico_company, $ico_contact, $l_yes, $l_no;
-  global $l_company, $l_contact, $l_comment, $l_phone, $l_archive;
+  global $l_company, $l_contact, $l_comment, $l_phone, $l_status, $l_archive;
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
 
   $id = $l_q->f('lead_id');
@@ -291,6 +314,7 @@ function html_lead_consult($l_q) {
   $contact_id = $l_q->f('lead_contact_id');
   $contact_name = $l_q->f('contact_lastname') . ' ' . $l_q->f('contact_firstname') . ' - ' . $l_q->f('contact_phone');
   $source_label = $l_q->f('leadsource_label');
+  $status_label = $l_q->f('leadstatus_label');
   $manager = $l_q->f('manager');
   $date = of_date_format($l_q->f('date'));
   $datealarm = of_date_format($l_q->f('datealarm'));
@@ -350,6 +374,10 @@ function html_lead_consult($l_q) {
     <td>$archive</td>
   </tr>
   <tr>
+    <th>$l_status</th>
+    <td>$status_label</td>
+  </tr>
+  <tr>
     <th>$l_todo</th>
     <td>$todo</td>
   </tr>
@@ -393,9 +421,10 @@ function dis_lead_form($action, $params) {
   }
 
   $sources = get_global_lead_sources();
+  $status = get_lead_status();
   $managers = get_all_users_from_group($cg_com, $users);
 
-  $block = html_lead_form($action, $l_q, $sources, $managers, $params);
+  $block = html_lead_form($action, $l_q, $sources, $status, $managers, $params);
 
   return $block;
 }
@@ -406,17 +435,18 @@ function dis_lead_form($action, $params) {
 // Parameters:
 //   - $action    : action called
 //   - $l_q       : lead database result
-//   - $sources   : Lead sources array 
+//   - $sources   : Lead sources array
+//   - $status    : Lead status array
 //   - $managers  : Managers array 
 //   - $params[]  : parameters : form values
 ///////////////////////////////////////////////////////////////////////////////
-function html_lead_form($action, $l_q, $sources, $managers, $params) {
+function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
   global $obm, $display, $path, $c_undef, $l_undef;
   global $ico_company, $ico_contact, $ico_add, $ico_crow;
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
   global $l_update, $l_checkdelete, $l_insert, $l_company, $l_contact;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment, $l_archive;
-  global $l_no, $l_members, $l_group;
+  global $l_no, $l_members, $l_group, $l_status;
   global $l_header_new, $ico_mini_cal;
 
   $uid = $obm['uid'];
@@ -425,6 +455,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   if ($action == 'detailupdate') {
     $id = $l_q->f('lead_id');
     $source_id = $l_q->f('lead_source_id');
+    $status_id = $l_q->f('lead_status_id');
     $manager_id = $l_q->f('lead_manager_id');
     $c_id = $l_q->f('lead_company_id');
     $c_name = $l_q->f('company_name');
@@ -463,6 +494,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   if (isset($params['contact_new_name'])) { $contact_new_name = $params['contact_new_name']; }
   if (isset($params['lead_id'])) { $id = $params['lead_id']; }
   if (isset($params['source'])) { $source_id = $params['source']; }
+  if (isset($params['status'])) { $status_id = $params['status']; }
   if (isset($params['manager'])) { $manager_id = $params['manager']; }
   if (isset($params['name'])) { $name = $params['name']; }
   if (isset($params['date'])) { $date = of_date_upd_format($params['date']); }
@@ -476,8 +508,11 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   if (isset($params['mail_comment'])) { $mail_comment = $params['mail_comment']; }
 
 
-  // Lead kind field
+  // Lead source select
   $block_source = of_category_dis_entity_form('lead', 'source', $sources, 'mono', $source_id, 'none');
+
+  // Lead Status select
+  $block_status = of_category_dis_entity_form('lead', 'status', $status, 'mono', $status_id, 'none');
 
   // Manager select
   $sel_manager = "
@@ -595,6 +630,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       <th>$l_archive</th>
       <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
     </tr>
+    $block_status
     <tr>
       <th>$l_todo</th>
       <td><input type=\"text\" name=\"tf_todo\" size=\"32\" maxlength=\"128\" value=\"$todo\" /></td>
@@ -678,6 +714,9 @@ function dis_lead_admin_index() {
 
   $sources = of_category_get_ordered('lead', 'source');
   $block .= of_category_dis_admin_form('source', $sources);
+
+  $status = of_category_get_ordered('lead', 'status');
+  $block .= of_category_dis_admin_form('status', $status);
 
   return $block;
 }

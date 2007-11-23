@@ -1097,7 +1097,7 @@ function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $usrc_q,$
   global $l_dates, $l_company, $l_other_relation, $l_relation, $l_label;
   global $l_number, $l_type, $l_region, $l_todo;
   global $l_tt, $l_marketing_manager, $l_technical_manager, $l_commission_p;
-  global $l_amount, $l_margin, $l_hitrate, $l_contact,$l_status, $l_archive;
+  global $l_amount, $l_margin, $l_hitrate, $l_contact, $l_status, $l_archive;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_source;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;

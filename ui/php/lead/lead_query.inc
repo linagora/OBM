@@ -24,6 +24,7 @@ function run_query_lead_search($params) {
   $date_before = of_isodate_convert($params['date_before'],true);
   $date_field = $params['date_field'] ? $params['date_field'] : 'date';
   $source = $params['source'];
+  $status = $params['status'];
   $manager = $params['manager'];
   $archive = $params['archive'];
 
@@ -42,9 +43,9 @@ function run_query_lead_search($params) {
   $concat_manager = sql_string_concat($db_type, $manager_name);
 
   $where .= sql_obm_entity_privacy('lead');
-  
+
   $and = 'AND';
-  
+
   // search criterias :
   if ($text != '') {
     $where .= "$and (lead_name $like '%$text%'
@@ -69,6 +70,10 @@ function run_query_lead_search($params) {
   }
   if (($source != '') && ($source != "$c_all")) {
     $where .= " $and lead_source_id = '$source'";
+    $and = 'AND';
+  }
+  if (($status != '') && ($status != "$c_all")) {
+    $where .= " $and lead_status_id = '$status'";
     $and = 'AND';
   }
   if (($manager != '') && ($manager != "$c_all")) {
@@ -154,6 +159,7 @@ function run_query_lead_detail($p_id) {
       $date,
       $datealarm,
       leadsource_label,
+      leadstatus_label,
       company_name, company_address1, company_zipcode, company_town,
       company_phone,
       contact_lastname, contact_firstname, contact_phone,
@@ -162,6 +168,7 @@ function run_query_lead_detail($p_id) {
       $concat_manager as manager
     FROM Lead
          LEFT JOIN LeadSource ON lead_source_id=leadsource_id
+         LEFT JOIN LeadStatus ON lead_status_id=leadstatus_id
          LEFT JOIN Company ON lead_company_id=company_id
          LEFT JOIN Contact ON lead_contact_id=contact_id
          LEFT JOIN UserObm as c ON lead_usercreate=c.userobm_id
@@ -198,6 +205,7 @@ function run_query_lead_insert($params) {
     $contact_id = $params['contact_id'];
   }
   $source_id = $params['source'];
+  $status_id = $params['status'];
   $manager_id = $params['manager'];
   $name = $params['name'];
   $date = ($params['date'] ? "'".of_isodate_convert($params['date'])."'" : 'null');
@@ -226,6 +234,7 @@ function run_query_lead_insert($params) {
     lead_userupdate,
     lead_usercreate,
     lead_source_id,
+    lead_status_id,
     lead_manager_id,
     lead_company_id,
     lead_contact_id,
@@ -243,6 +252,7 @@ function run_query_lead_insert($params) {
     null,
     '$uid',
     '$source_id',
+    '$status_id',
     '$manager_id',
     '$company_id',
     '$contact_id',
@@ -302,6 +312,7 @@ function run_query_lead_update($pid, $params) {
     $contact_id = $params['contact_id'];
   }
   $source_id = $params['source'];
+  $status_id = $params['status'];
   $manager_id = $params['manager'];
   $name = $params['name'];
   $date = ($params['date'] ? "'".of_isodate_convert($params['date'])."'" : 'null');
@@ -329,6 +340,7 @@ function run_query_lead_update($pid, $params) {
     lead_timeupdate='$now',
     lead_userupdate='$uid',
     lead_source_id='$source_id',
+    lead_status_id='$status_id',
     lead_domain_id='$domain_id',
     lead_company_id='$company_id',
     lead_contact_id='$contact_id',
@@ -351,13 +363,11 @@ function run_query_lead_update($pid, $params) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Get Lead manager list (from lead database content)
-// Parameters:
-//   - $archive : if true, get managers of archive leads too
-// Return:
-//   - Database Object : userobm list
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Get Lead manager list (from lead database content)
+ * @param $archive : if true, get managers of archive leads too
+ * return : array : userobm list
+ **/
 function get_lead_managers($archive = false) {
   global $cdg_sql;
 
@@ -390,6 +400,33 @@ function get_lead_managers($archive = false) {
     $id = $obm_q->f('userobm_id');
     $name = $obm_q->f('userobm_lastname').' '.$obm_q->f('userobm_firstname');
     $ret[$id] = array('id' => $id, 'name' => $name);
+  }
+
+  return $ret;
+}
+
+
+/**
+ * Get Lead status list
+ * @param $archive : if true, get managers of archive leads too
+ * return : array : lead status list
+ **/
+function get_lead_status() {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('leadstatus');
+	
+  $query = "SELECT * FROM LeadStatus ORDER BY leadstatus_code, leadstatus_label";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql, 'get_lead_status()');
+
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f('leadstatus_id');
+    $code = $obm_q->f('leadstatus_code');
+    $label = $obm_q->f('leadstatus_label');
+    $ret[$id] = array('id' => $id, 'code' => $code, 'label' => $label);
   }
 
   return $ret;
