@@ -556,7 +556,7 @@ function get_update_link_group($domain_id, $realm) {
 
   while($obm_q->next_record()) {
     $g_id = $obm_q->f('of_usergroup_group_id');
-    $u_id = $obm_q->f('of_usergroup_userobm_id');
+    $u_id = $obm_q->f('of_usergroup_user_id');
     $e2[$g_id][] = "u$u_id";
   }
 
