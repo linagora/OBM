@@ -166,46 +166,99 @@ $l_add_exception_mail_subject = "Modification evenement sur OBM : %s";
 $l_update_state_mail_subject = "Participation a l'evenement sur OBM : %s";
 
 $l_add_event_mail_body = 
-"Vous êtes invité à participer à un rendez-vous du %s au %s,
-qui à pour sujet %s (lieu : %s).
-Pour plus de détails sur les modifications cliquez-ici :
+"Message automatique envoyé par OBM
+------------------------------------------------------------------
+NOUVEAU RENDEZ-VOUS !
+------------------------------------------------------------------
+
+Vous êtes invité à participer à un rendez-vous du %s au %s,
+qui a pour sujet %s (lieu : %s).
 %s
-Pour accepter ce rendez-vous cliquez ici : 
-%s
-Pour refuser ce rendez-vous cliquez ici : 
-%s
-";
+
+
+:: Pour plus de détails sur les modifications : %s
+:: Pour accepter ce rendez-vous : %s
+:: Pour refuser ce rendez-vous : %s
+
+-------------------------------------------------------------------
+Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
+%s";
 
 $l_update_event_mail_body = 
-"Bonjour, 
-Le rendez-vous %s, initialement prévu du %s au %s, (lieu : %s), a été
-modifié et se déroulera du %s au %s (lieu : %s).
-Pour plus de détails sur les modifications cliquez-ici :
-%s
-Pour accepter directement les modifications de ce rendez-vous cliquez-ici : 
-%s
-Pour refuser directement les modifications de ce rendez-vous cliquez-ici : 
-%s
-";
+"Message automatique envoyé par OBM
+------------------------------------------------------------------
+RENDEZ-VOUS MODIFIÉ !
+------------------------------------------------------------------
 
+Le rendez-vous %s,  initialement prévu du %s au %s, (lieu : %s),
+a été modifié et se déroulera du %s au %s (lieu : %s).
+%s
+
+:: Pour plus de détails sur les modifications : %s
+:: Pour accepter les modifications de ce rendez-vous : %s
+:: Pour refuser les modifications de ce rendez-vous : %s
+
+-------------------------------------------------------------------
+Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
+%s";
+  
 $l_delete_event_mail_body = 
-"Le rendez-vous %s, initialiament prévu du %s au %s (lieu : %s), a été
+"Message automatique envoyé par OBM
+------------------------------------------------------------------
+RENDEZ-VOUS SUPPRIMÉ !
+------------------------------------------------------------------
+
+Le rendez-vous %s, initialement prévu du %s au %s (lieu : %s), a été
 supprimé.
-";
+
+:: Pour contacter le responsable de l'annulation du rendez-vous : %s
+
+-------------------------------------------------------------------
+Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
+%s";
 
 $l_delete_exception_mail_body = 
-"La ou les occurrences du rendez-vous %s, initialement annulées les %s auront lieu.
-Pour plus de détails sur les modifications cliquez-ici :
+"Message automatique envoyé par OBM
+------------------------------------------------------------------
+OCCURENCE(S) RESTAURÉES !
+------------------------------------------------------------------
+
+La ou les occurrences du rendez-vous %s, initialement annulées 
+les %s auront lieu.
+
+:: Pour plus de détails sur les modifications : %s
+
+-------------------------------------------------------------------
+Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
 %s";
 
 $l_add_exception_mail_body = 
-"La ou les occurrences du rendez-vous %s, initialement prévues les %s sont annulées.
-Pour plus de détails sur les modifications cliquez-ici :
+"Message automatique envoyé par OBM
+------------------------------------------------------------------
+OCCURENCE(S) RESTAURÉES !
+------------------------------------------------------------------
+
+La ou les occurrences du rendez-vous %s, initialement prévues 
+les %s n'auront pas lieu.
+
+:: Pour plus de détails sur les modifications : %s
+
+-------------------------------------------------------------------
+Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
 %s";
 
 $l_update_state_mail_body = 
-"La participation de %s à l'événement %s est %s
-Pour plus de détails sur l'événement cliquez-ici :
+"Message automatique envoyé par OBM
+------------------------------------------------------------------
+PARTICIPATION AU RENDEZ-VOUS
+------------------------------------------------------------------
+
+La participation de %s à l'événement %s est %s.
+
+:: Pour plus de détails sur l'événement : %s
+
+-------------------------------------------------------------------
+Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
 %s";
 
 $l_unknown = "Inconnu";

@@ -3993,7 +3993,9 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       'subject' => sprintf($l_update_event_mail_subject,$old_title),
       'message' => sprintf($l_update_event_mail_body, $old_title, $old_datebegin, 
                            $old_dateend, $old_location, $datebegin, $dateend, 
-                           $location,$consult_link,$accept_link,$refuse_link),
+                           $location,$consult_link,$accept_link,$refuse_link,
+                           of_date_format(), date("H:i"), $userinfo["firstname"],
+                           $userinfo["lastname"],$cgp_host),
       'recipients' => $attendees
     ) ;
   } 
@@ -4012,7 +4014,9 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $mail_datas['mails']['add_attendee'] = array (
       'subject' => sprintf($l_add_event_mail_subject,$title),
       'message' => sprintf($l_add_event_mail_body, $datebegin, $dateend, 
-                           $title, $location, $consult_link,$accept_link,$refuse_link),
+                           $title, $location, $consult_link,$accept_link,$refuse_link,
+                           of_date_format(), date("H:i"), $userinfo["firstname"],
+                           $userinfo["lastname"],$cgp_host),
       'recipients' => $new_attendees,
       'h_file' => $hfile
     ) ;
@@ -4021,28 +4025,36 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $mail_datas['mails']['remove_attendee'] = array (
       'subject' => sprintf($l_delete_event_mail_subject,$old_title),
       'message' => sprintf($l_delete_event_mail_body, $old_title, $old_datebegin, 
-                           $old_dateend, $old_location),
+                           $old_dateend, $old_location,$userinfo["email"], 
+                           of_date_format(), date("H:i"), $userinfo["firstname"],
+                           $userinfo["lastname"],$cgp_host),
       'recipients' => $old_attendees
     ) ;
   }
   if ($mail_datas['add_exception']) {
     $mail_datas['mails']['add_exception'] = array (
       'subject' => sprintf($l_add_exception_mail_subject,$title),
-      'message' => sprintf($l_add_exception_mail_body,$title,implode(', ', $new_exceptions),$consult_link),
+      'message' => sprintf($l_add_exception_mail_body,$title,implode(', ', $new_exceptions),$consult_link, 
+                           of_date_format(), date("H:i"), $userinfo["firstname"],
+                           $userinfo["lastname"],$cgp_host),
       'recipients' => $attendees
     ) ;
   }
   if ($mail_datas['remove_exception']) {
     $mail_datas['mails']['remove_exception'] = array (
       'subject' => sprintf($l_delete_exception_mail_subject,$title),
-      'message' => sprintf($l_delete_exception_mail_body,$title,implode(', ', $old_exceptions),$consult_link),
+      'message' => sprintf($l_delete_exception_mail_body,$title,implode(', ', $old_exceptions),$consult_link, 
+                           of_date_format(), date("H:i"), $userinfo["firstname"],
+                           $userinfo["lastname"],$cgp_host),
       'recipients' => $attendees
     ) ;
   }
    if ($mail_datas['update_decision']) {
     $mail_datas['mails']['update_decision'] = array (
       'subject' => sprintf($l_update_state_mail_subject,$title),
-      'message' => sprintf($l_update_state_mail_body,$user,$title,$decision,$consult_link),
+      'message' => sprintf($l_update_state_mail_body,$user,$title,$decision,$consult_link, 
+                           of_date_format(), date("H:i"), $userinfo["firstname"],
+                           $userinfo["lastname"],$cgp_host),
       'recipients' => $attendees
     ) ;
   }

@@ -58,6 +58,12 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Day the week start 
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_day_weekstart','monday');
 
+-- Calendar start hour
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','cal_first_hour','8');
+
+-- Calendar last hour
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','cal_last_hour','20');
+
 -- Todo sort order
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_todo','todo_priority');
 
