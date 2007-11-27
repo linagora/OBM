@@ -72,7 +72,7 @@ EOF
 
 fi
 #On reset la variable de configuration pour les upgrade futur
-db_set obm-core/already_configured false
+db_set obm-ui/already_configured false
 db_go || true
 
 
