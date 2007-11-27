@@ -57,7 +57,7 @@ EOF
 
 			sed -i -e "s%#obm#ProxyRequests On%ProxyRequests On%" /etc/apache2/sites-available/obm.conf
 
-			sed -i -e "s%#obm#<Proxy *>%<Proxy *>%" /etc/apache2/sites-available/obm.conf
+			sed -i -e "s%#obm#<Proxy \*>%<Proxy \*>%" /etc/apache2/sites-available/obm.conf
 			sed -i -e "s%#obm#AddDefaultCharset off%AddDefaultCharset off%" /etc/apache2/sites-available/obm.conf
 			sed -i -e "s%#obm#Allow from all%Allow from all%" /etc/apache2/sites-available/obm.conf
 			sed -i -e "s%#obm#</Proxy>%</Proxy>%" /etc/apache2/sites-available/obm.conf
