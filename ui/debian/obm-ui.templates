@@ -17,7 +17,8 @@ Description: Do you want OBM to install its virtualhost ?
  you can find an exemple in /usr/share/doc/obm-ui/examples.
 
 Template: obm-ui/tomcat
-Type: boolean
+Type: string
+Default: 127.0.0.1
 Description: Where is OBM Tomcat ?
  .
  Empty for no installation of OBM Tomcat.
