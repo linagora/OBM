@@ -15,3 +15,10 @@ Description: Do you want OBM to install its virtualhost ?
  apache modules activate.
  If you don't want to install OBM virtualhost on your server now,
  you can find an exemple in /usr/share/doc/obm-ui/examples.
+
+Template: obm-ui/tomcat
+Type: boolean
+Description: Where is OBM Tomcat ?
+ .
+ Empty for no installation of OBM Tomcat.
+

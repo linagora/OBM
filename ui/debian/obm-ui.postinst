@@ -41,8 +41,29 @@ EOF
 		a2enmod php5 || true
 		echo -n "Avtivation module REWRITE... "
 		a2enmod rewrite || true
-		echo -n "Avtivation module PROXY_AJP... "
-		a2enmod proxy_ajp ||true
+		db_get  obm-ui/tomcat
+		TOMCAT_SERVER=$RET
+		if [ -n "$TOMCAT_SERVER" ]; then
+			echo -n "Avtivation module PROXY_AJP... "
+			a2enmod proxy_ajp ||true
+
+			sed -i -e "s%#obm#<Location /funambol/ds>%<Location /funambol/ds>%" /etc/apache2/sites-available/obm.conf
+			sed -i -e "s%#obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/funambol/ds%ProxyPass ajp://${TOMCAT_SERVER}:8009/funambol/ds%" /etc/apache2/sites-available/obm.conf
+			sed -i -e "s%#obm#</Location>%</Location>%" /etc/apache2/sites-available/obm.conf
+
+			sed -i -e "s%#obm#<Location /obm-sync>%<Location /obm-sync>%" /etc/apache2/sites-available/obm.conf
+			sed -i -e "s%#obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/obm-sync%ProxyPass ajp://${TOMCAT_SERVER}:8009/obm-sync%" /etc/apache2/sites-available/obm.conf
+#			sed -i -e "s%#obm#</Location>%</Location>%" /etc/apache2/sites-available/obm.conf
+
+			sed -i -e "s%#obm#ProxyRequests On%ProxyRequests On%" /etc/apache2/sites-available/obm.conf
+
+			sed -i -e "s%#obm#<Proxy *>%<Proxy *>%" /etc/apache2/sites-available/obm.conf
+			sed -i -e "s%#obm#AddDefaultCharset off%AddDefaultCharset off%" /etc/apache2/sites-available/obm.conf
+			sed -i -e "s%#obm#Allow from all%Allow from all%" /etc/apache2/sites-available/obm.conf
+			sed -i -e "s%#obm#</Proxy>%</Proxy>%" /etc/apache2/sites-available/obm.conf
+
+
+		fi
 		echo -n "Avtivation site obm.conf... "
 		a2ensite obm.conf || true
 		echo -n "Stop/Start Apache2... "
