@@ -53,6 +53,8 @@ if [ $? != 0 ]; then
     fi
   fi
 fi
+
+PHP="$PHP -d include_path=.:`dirname $0`/../.."
 echo $PHP : PHP interpreter found
 # Create the Artichow library link
 # mv ../../obminclude/Artichow-1.1.0-php4+5/ ../../obminclude/Artichow
