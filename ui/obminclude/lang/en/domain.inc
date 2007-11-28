@@ -28,13 +28,17 @@ $l_can_delete = "The domain can be deleted.";
 $l_cant_delete = "The domain can't be deleted !";
 $l_cant_add_domain_single = "Only one domain can be created when OBM is configured in mono domain mode (singleNameSpace) ! Beware, going multi-domain mode needs an important system work";
 
-$l_max_user = "# users max";
-$l_max_resource = "# resources max";
-$l_max_mailshare = "# mailshares max";
-$l_mail_quota = "Email quota";
+$l_update_state = "Update status";
+$l_max_users = "# users max";
+$l_max_resources = "# resources max";
+$l_max_mailshares = "# mailshares max";
+$l_quota_mail = "Email quota";
 $l_address1 = "$l_address 1";
 $l_address2 = "$l_address 2";
 $l_address3 = "$l_address 3";
+$l_group_admin = "Admin group id";
+$l_group_com = "Commercial group id";
+$l_group_prod = "Production group id";
 
 $l_link_user = "The domain has users";
 $l_link_user_no = "The domain has no users";

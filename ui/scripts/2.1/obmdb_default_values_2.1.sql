@@ -1,7 +1,7 @@
 --/////////////////////////////////////////////////////////////////////////////
 -- OBM - File : obm_default_values_2.1.sql                                   //
 --     - Desc : Insertion of Default values (database independant)           //
--- 2007-04-23 Pierre Baudracco                                               //
+-- 2007-04-23 Pierre Baudracco                                             about:  //
 --/////////////////////////////////////////////////////////////////////////////
 -- $Id$
 --/////////////////////////////////////////////////////////////////////////////
@@ -44,6 +44,9 @@ INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainprope
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('address3','text', '');
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('postcode','text', '');
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('town','text', '');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('group_admin','integer', 0);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('group_com','integer', 0);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('group_prod','integer', 0);
 
 -- Fill the initial update_state for each Domain
 INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) VALUES (0, 'update_state', 1);

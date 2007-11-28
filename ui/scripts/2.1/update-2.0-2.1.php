@@ -20,8 +20,11 @@ echo "**** OBM : data migration 2.0 -> 2.1 : DB $obmdb_db ($obmdb_host)\n";
 $d = get_domain_list();
 $dp = get_domainproperty_list();
 process_domain_list($d, $dp);
+update_domain_groups();
 
 dis_admin_data_group('data_update', 'txt');
+
+check_insert_admin0();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Process the domain list
@@ -110,6 +113,83 @@ function get_domainproperty_list() {
   return $d;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Update the groups domain associations
+///////////////////////////////////////////////////////////////////////////////
+function update_domain_groups() {
+  global $cdg_sql, $cg_adm, $cg_com, $cg_prod;
+
+  $obm_q = new DB_OBM;
+
+  // Admin group
+  $q = "UPDATE DomainPropertyValue
+    SET domainpropertyvalue_value=$cg_adm
+    WHERE domainpropertyvalue_domain_id=1
+      AND domainpropertyvalue_property_key='group_admin'";
+  $obm_q->query($q);
+  echo "\nDomain group_admin : $cg_adm";
+
+  // Commercial group
+  $q = "UPDATE DomainPropertyValue
+    SET domainpropertyvalue_value=$cg_com
+    WHERE domainpropertyvalue_domain_id=1
+      AND domainpropertyvalue_property_key='group_com'";
+  $obm_q->query($q);
+  echo "\nDomain group_com : $cg_com";
+ 
+ // Production group
+  $q = "UPDATE DomainPropertyValue
+    SET domainpropertyvalue_value=$cg_prod
+    WHERE domainpropertyvalue_domain_id=1
+      AND domainpropertyvalue_property_key='group_prod'";
+  $obm_q->query($q);
+  echo "\nDomain group_prod : $cg_prod";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Insert an admin0 if not present
+///////////////////////////////////////////////////////////////////////////////
+function check_insert_admin0() {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+
+  // Check if adomain 0 admin is present
+  $q = "Select userobm_id FROM UserObm WHERE userobm_domain_id=0";
+  $obm_q->query($q);
+  if ($obm_q->num_rows() > 0) {
+    echo "\nDomain 0 admin : yes\n";
+  } else {
+    echo "\nDomain 0 admin : no : insertion...";
+
+    $q = "INSERT INTO UserObm (
+        userobm_domain_id,
+        userobm_login,
+        userobm_password,
+        userobm_password_type,
+        userobm_perms,
+        userobm_lastname,
+        userobm_firstname,
+        userobm_uid,
+        userobm_gid)
+      VALUES (
+        0,
+       'admin0',
+       'admin',
+       'PLAIN',
+       'admin',
+       'Admin Lastname',
+       'Firstname',
+       '1000',
+       '512')";
+
+    $obm_q->query($q);
+    echo "OK\n";
+  }
+
+}
 
 
 </script>

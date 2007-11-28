@@ -2033,10 +2033,10 @@ function check_deal_form($did, $deal) {
   }
 
   // Proposal Date after alarm date
-  if (($dateprop != '') && ($datealarm != '') && ($ts_alarm < $ts_prop)) {
-    $err['msg'] = "$l_date_inconsistency : $l_proposal > $l_alarm !";
-    return false;
-  }
+  //  if (($dateprop != '') && ($datealarm != '') && ($ts_alarm < $ts_prop)) {
+  //    $err['msg'] = "$l_date_inconsistency : $l_proposal > $l_alarm !";
+  //    return false;
+  //  }
 
   // Proposal Date after end date
   if (($dateprop != '') && ($dateend != '') && ($ts_end < $ts_prop)) {

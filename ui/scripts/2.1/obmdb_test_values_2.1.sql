@@ -138,11 +138,20 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, us
 -------------------------------------------------------------------------------
 DELETE FROM UGroup;
 
--- Groupe de test SANS e-mail
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1000, 'grpTest00', 'Groupe de test 00', '', NULL);
+-- Admin Group
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1000, 'Admin', 'Admin', '', NULL);
+
+-- Commercial Group
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1001, 'Commercial', 'Commercial', '', NULL);
+
+-- Production Group
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1002, 'Production', 'Production', '', NULL);
+
+-- Group test without e-mail
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1003, 'grpTest00', 'Groupe de test 00', '', NULL);
 
 -- Groupe de test AVEC e-mail
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1001, 'grpTest01', 'Groupe de test 01 avec e-mail', 'grpTest01', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1004, 'grpTest01', 'Groupe de test 01 avec e-mail', 'grpTest01', NULL);
 
 
 -------------------------------------------------------------------------------
@@ -151,11 +160,23 @@ INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, g
 -------------------------------------------------------------------------------
 DELETE FROM UserObmGroup;
 
--- Le groupe 'grpTest00' contient les utilisateurs 'test00' et 'test01'
+-- Members of group 'Admin' : 'test00' 'test01'
+INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Admin'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test00'));
+INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Admin'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
+
+-- Members of group 'Commercial' : 'test00' 'test01'
+INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Commercial'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test00'));
+INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Commercial'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
+
+-- Members of group 'Production' : 'test00' 'test01'
+INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Production'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test00'));
+INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Production'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
+
+-- Members of group 'grpTest00' : 'test00' et 'test01'
 INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='grpTest00'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test00'));
 INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='grpTest00'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
 
--- Le groupe 'grpTest01' contient les utilisateurs 'test00' et 'test01'
+-- Members of group 'grpTest01' : 'test00' et 'test01'
 INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='grpTest01'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test00'));
 INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='grpTest01'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
 
