@@ -31,7 +31,7 @@ case "$1" in
     ## Restauration postfix
     # Restauration du fichier de conf (master.cf) d'origine de postfix
     # si celui-ci existe
-    if [ ! -e /etc/postfix/master.cf.postfix.orig ] ; then
+    if [ -e /etc/postfix/master.cf.postfix.orig ] ; then
        mv -f /etc/postfix/master.cf.postfix.orig /etc/postfix/master.cf
     fi
     # Desactivation du filtre

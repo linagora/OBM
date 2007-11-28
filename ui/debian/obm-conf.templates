@@ -8,35 +8,35 @@ Description: Internal use.
 Template: obm-conf/ldapserver
 Type: string
 Default: 127.0.0.1
-Description: What is the ip host address for the OBM LDAP server ?
+Description: Host IP address for OBM LDAP server
  .
- You have to set here the IP host address for the OBM LDAP server.
+ You have to set here the host IP address for the OBM LDAP server.
 
 Template: obm-conf/mysqlserver
 Type: string
 Default: 127.0.0.1
-Description: What is the ip host address for the OBM database server ?
+Description: Host IP address for OBM database server
  .
- You have to set here the IP host address for the OBM database server.
+ You have to set here the host IP address for the OBM database server.
 
 Template: obm-conf/mysqldb
 Type: string
 Default: obm
-Description: What is the OBM database name ?
+Description: OBM database name
  .
  You have to set here the OBM database name.
 
 Template: obm-conf/mysqluser
 Type: string
 Default: obm
-Description: What the OBM database user name ?
+Description: OBM database user name
  .
  You have to set here the name for the OBM Database user. This user is
  used by obm-ui to access to the OBM database.
 
 Template: obm-conf/mysqlpasswd
 Type: password
-Description: What is the OBM database user password ?
+Description: OBM database user password
  .
  You have to set here the password for the OBM database user. For
  security reasons, it shouldn't be a blank password.

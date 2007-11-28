@@ -7,7 +7,7 @@ Description: Internal use.
 
 Template: obm-ui/virtualhostinstall
 Type: boolean
-Description: Do you want OBM to install its virtualhost ?
+Description: OBM virtualhost configuration
  .
  If you say "Yes" here, OBM will desactivate the default virtualhost
  to activate its own.  
@@ -19,7 +19,8 @@ Description: Do you want OBM to install its virtualhost ?
 Template: obm-ui/tomcat
 Type: string
 Default: 127.0.0.1
-Description: Where is OBM Tomcat ?
+Description: Host IP address for the OBM Tomcat server
  .
- Leave blank if you are not using obm-sync / obm-funambol.
+ You have to set here the host IP address for the OBM tomcat server. 
+ Leave it blank if you are not using obm-sync / obm-funambol.
 
