@@ -9,17 +9,17 @@ Template: obm-ui/virtualhostinstall
 Type: boolean
 Description: Do you want OBM to install its virtualhost ?
  .
- If you says "Yes" here, OBM will desactivate the default virtualhost 
- and copy and activate its virtualhost. 
- Note that the "port.conf" file will also be replace by OBM and some 
- apache modules activate.
- If you don't want to install OBM virtualhost on your server now,
- you can find an exemple in /usr/share/doc/obm-ui/examples.
+ If you say "Yes" here, OBM will desactivate the default virtualhost
+ to activate its own.  
+ Note that the "port.conf" file will also be
+ replaced and some apache2 modules activated. If you don't want
+ to install OBM virtualhost on your server now, you can find an
+ exemple in /usr/share/doc/obm-ui/examples.
 
 Template: obm-ui/tomcat
 Type: string
 Default: 127.0.0.1
 Description: Where is OBM Tomcat ?
  .
- Empty for no installation of OBM Tomcat.
+ Leave blank if you are not using obm-sync / obm-funambol.
 

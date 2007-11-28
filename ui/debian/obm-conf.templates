@@ -38,5 +38,5 @@ Template: obm-conf/mysqlpasswd
 Type: password
 Description: What is the OBM database user password ?
  .
- You have to set here the password for the OBM database user. For security 
- reasons, it should'nt be a blank password. 
+ You have to set here the password for the OBM database user. For
+ security reasons, it shouldn't be a blank password.
