@@ -939,7 +939,7 @@ function html_company_consult_address($co_q) {
 //   - $company[] : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_form($action, $company) {
-  global $display, $cg_com, $cgp_hide, $obm, $l_err_reference;
+  global $display, $cgp_hide, $obm, $l_err_reference;
 
   // of: type, activity
   $show_naf = (! $cgp_hide["company"]["nafcode"]);
@@ -961,18 +961,18 @@ function dis_company_form($action, $company) {
     $naf_q = run_query_companynafcode();
   }
  
-  $users = array($obm["uid"]);
+  $uids = array($obm["uid"]);
   if ($company["market"] > 0) {
-    $users[] = $company["market"];
+    $uids[] = $company["market"];
   }
   if ($company["company_id"] > 0) {
-    $users[] = $comp_q->f("company_marketingmanager_id");
+    $uids[] = $comp_q->f("company_marketingmanager_id");
   }
-  $usr_q = run_query_all_users_from_group($cg_com, $users);
+  $users = of_usergroup_get_group_users($obm['group_com'], true, $uids);
   $ctry_q = run_query_global_country_for_lang();
   
-  $block = html_company_form($action, $comp_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company);
-  
+  $block = html_company_form($action, $comp_q, $dsrc_q, $types, $acts, $naf_q, $users, $ctry_q, $company);
+
   return $block;
 }
 
@@ -986,12 +986,12 @@ function dis_company_form($action, $company) {
  * @param mixed $types     : array of types referenced by the company 
  * @param mixed $acts      : array of activities referenced by the company
  * @param mixed $naf_q     : nafcode database result 
- * @param mixed $usr_q     : userobm database result 
+ * @param mixed $users     : array : userobm 
  * @param mixed $ctry_q    : country database result 
  * @param mixed $company[] : default values
  * @return string XHTML company form
  */
-function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $users, $ctry_q, $company) {
   global $display, $obm, $cgp_hide, $c_undef, $l_undef;
   global $ico_web,$ico_mail,$ico_add, $l_header_new_f;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
@@ -1138,11 +1138,10 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   // Marketing manager select
   $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
   <option value=\"$c_undef\">$l_undef</option>";
-  while ($usr_q->next_record()) {
-    $u_id = $usr_q->f("userobm_id");
+  foreach($users as $u_id => $one_user) {
     $sel_market .= "\n<option value=\"$u_id\"";
     if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
-    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>";
+    $sel_market .= '>'.$one_user['lastname'].' '.$one_user['firstname']."</option>";
   }
   $sel_market .= "</select>";
   
@@ -1204,13 +1203,9 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   } else { $link_web = "&nbsp;"; }
   
   // User comment select construction
-  if ($usr_q->nf()>0) {
-    $usr_q->seek(0);
-  }
   $sel_usercomment = "<select name=\"sel_usercomment\">";
-  while ($usr_q->next_record()) {
-    $cid = $usr_q->f("userobm_id");
-    $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+  foreach($users as $cid => $one_user) {
+    $cname = $one_user['lastname'].' '.$one_user['firstname'];
     $sel_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {

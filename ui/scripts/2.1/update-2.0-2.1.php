@@ -123,6 +123,7 @@ function update_domain_groups() {
   $obm_q = new DB_OBM;
 
   // Admin group
+  if (! ($cg_adm > 0)) { $cg_adm = 1; }
   $q = "UPDATE DomainPropertyValue
     SET domainpropertyvalue_value=$cg_adm
     WHERE domainpropertyvalue_domain_id=1
@@ -131,6 +132,7 @@ function update_domain_groups() {
   echo "\nDomain group_admin : $cg_adm";
 
   // Commercial group
+  if (! ($cg_com > 0)) { $cg_com = 2; }
   $q = "UPDATE DomainPropertyValue
     SET domainpropertyvalue_value=$cg_com
     WHERE domainpropertyvalue_domain_id=1
@@ -139,6 +141,7 @@ function update_domain_groups() {
   echo "\nDomain group_com : $cg_com";
  
  // Production group
+  if (! ($cg_prod > 0)) { $cg_prod = 3; }
   $q = "UPDATE DomainPropertyValue
     SET domainpropertyvalue_value=$cg_prod
     WHERE domainpropertyvalue_domain_id=1

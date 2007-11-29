@@ -256,13 +256,16 @@ class Auth {
 	// Login OK -> initialize the $obm datas
 	if ( $uid = $this->auth_validatelogin() ) {
 
-	  $obm["uid"] = $uid;
+	  $obm['uid'] = $uid;
 	  // Domain in session
 	  // XXXX optimisation, recup domaine_label in auth_vali
-	  $d = of_domain_get_domain_infos($obm["domain_id"]);
-	  $obm["domain_label"] = $d["label"];
-          $obm["domain_name"] = $d["name"];
-          $obm["mailserver"] = $d["mailserver"];
+	  $d = of_domain_get_domain_infos($obm['domain_id'], true);
+	  $obm['domain_label'] = $d['label'];
+          $obm['domain_name'] = $d['name'];
+          $obm['mailserver'] = $d['mailserver'];
+          $obm['group_admin'] = $d['group_admin'];
+          $obm['group_com'] = $d['group_com'];
+          $obm['group_prod'] = $d['group_prod'];
 
 	  // OBM : in OBM each time is in seconds. this->lifetime too.
 	  $this->auth["exp"] = time() + $this->lifetime;

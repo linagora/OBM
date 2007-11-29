@@ -445,29 +445,29 @@ function html_cv_consult($cv, $cv_q, $refs_q, $prefs){
 */
 
 function dis_cv_form($action, $cv) {
-  global $display, $l_query_error,$cg_com;
+  global $display, $l_query_error, $obm;
 
   // detailupdate
   if ($cv["cv_id"] > 0) {
     $cv_q = run_query_cv_detail($cv["cv_id"]);
     $users = array($contract["market"], $contract["tech"]);
-    $u_com_q = run_query_all_users_from_group($cg_com, $users);
+    $users_c = of_usergroup_get_group_users($obm['group_com'], true, $users);
     if ($cv_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($cv_q);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $cv_q->query . " !");
     }
     $refs_q = run_query_cv_refs_detail($cv["cv_id"]);
-  } 
+  }
   // new
   else {
     $cv_q = "";
     $refs_q = "";
     $users = array($contract["market"], $contract["tech"]);
-    $u_com_q = run_query_all_users_from_group($cg_com, $users);
+    $users_c = of_usergroup_get_group_users($obm['group_com'], true, $users);
   }
 
-  $block = html_cv_form($action, $cv, $cv_q, $refs_q,$u_com_q);
+  $block = html_cv_form($action, $cv, $cv_q, $refs_q, $users_c);
 
   return $block;
 }
@@ -477,9 +477,10 @@ function dis_cv_form($action, $cv) {
 * XHTML Display CV Form
 * @param string $action action called
 * @param array $cv[] default values
+* @param array $users_c[] users
 * @return string $block html cv form to display
 */
-function html_cv_form($action, $cv, $cv_q="", $refs_q="",$u_com_q) {
+function html_cv_form($action, $cv, $cv_q="", $refs_q="", $users_c) {
   global $display, $l_none,  $path;
   global $l_update, $l_insert, $l_delete;
   global $l_cv, $l_title, $l_comment, $l_user, $l_select_user, $l_duplicate;
@@ -577,19 +578,16 @@ function html_cv_form($action, $cv, $cv_q="", $refs_q="",$u_com_q) {
   $display["title"] = "<div class=\"title\">$l_cv : $title</div>";
 
   
-  //User select
-
-    // Marketing manager select
+  // Marketing manager select
   $sel_user = "<select name=\"sel_user_id\">
     <option value=\"$c_undef\">$l_undef</option>";
-  while ($u_com_q->next_record()) {
-   $sel_user .= "\n<option value=\"".$u_com_q->f("userobm_id")."\"";
-    if ($u_com_q->f("userobm_id") == $market_id) 
+  foreach ($users_c as $u_id => $one_user) {
+    $sel_user .= "\n<option value=\"$u_id\"";
+    if ($u_id == $market_id) 
       $sel_user.= " selected=\"selected\"";
-    $sel_user .= ">". $u_com_q->f("userobm_lastname") . " " . $u_com_q->f("userobm_firstname")."</option>";
+    $sel_user .= ">". $one_user['lastname']." ".$one_user['firstname']."</option>";
   }
   $sel_market.="</select>";
-
 
 
   // --- HTML Template --------------------------------------------------------

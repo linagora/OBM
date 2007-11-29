@@ -541,7 +541,7 @@ function html_incident_links($inc_q) {
 //   - $incident[] : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_form($action, $incident) {
-  global $display, $cg_com, $cg_prod;
+  global $display, $obm;
 
   $id = $incident ["incident_id"];
   if ($action == "new") {
@@ -562,13 +562,13 @@ function dis_incident_form($action, $incident) {
   }
 
   $usr_q = run_query_userobm_active($users);
-  $usrp_q = run_query_all_users_from_group($cg_prod,$users);
+  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, $users);
 
   $pri = of_category_get_ordered("incident", "priority");
   $sta = get_incident_status();
   $resos = of_category_get_ordered("incident", "resolutiontype","multi",0,"IncidentResolutionType");
 
-  $block = html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $resos);
+  $block = html_incident_form($action, $incident, $inc_q, $usr_q, $users_p, $pri, $sta, $resos);
 
   return $block;
 }
@@ -581,12 +581,12 @@ function dis_incident_form($action, $incident) {
 //   - $incident[] : default values
 //   - $inc_q      : incident database result 
 //   - $usr_q      : userobm database result 
-//   - $usrp_q     : userobm list from system group Production
+//   - $users_p    : userobm list from domain group Production
 //   - $pri        : array with incident priority list
 //   - $sta        : array with incident status list
 //   - $resos      : array with incident resolution types
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $resos) {
+function html_incident_form($action, $incident, $inc_q, $usr_q, $users_p, $pri, $sta, $resos) {
   global $display, $path, $obm, $ico_contract, $l_header_new;
   global $c_php_isodate_format;
   global $l_label,$l_contract,$l_status, $l_find,$l_reference;
@@ -649,12 +649,12 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   // Owner select
   if (! isset($owner)) { $owner = $obm["uid"]; }
   $dis_sel_owner="<select name=\"sel_owner\">";
-  while ($usrp_q->next_record()) {
-    $dis_sel_owner.="\n<option value=\"".$usrp_q->f("userobm_id")."\"";
-    if ($usrp_q->f("userobm_id") == $owner) {
+  foreach ($users_p as $u_id => $one_user) {
+    $dis_sel_owner.="\n<option value=\"$u_id\"";
+    if ($u_id == $owner) {
       $dis_sel_owner.=" selected=\"selected\"";
     }
-    $dis_sel_owner.=">". $usrp_q->f("userobm_lastname") . " " . $usrp_q->f("userobm_firstname")."</option>";
+    $dis_sel_owner .= '>'. $one_user['lastname'].' '.$one_user['firstname'].'</option>';
   }
   $dis_sel_owner .= "</select>";
 

@@ -1090,11 +1090,11 @@ function html_project_form($action, $project_q, $project) {
   global $l_project_date,$l_project_duration,$l_project_tech,$l_project_desc;
   global $l_type, $l_datebegin, $l_dateend, $c_undef, $l_undef,$l_tasks;
   global $l_comment, $l_add_comment, $l_upd_comment,$ico_project;
-  global $display, $obm, $cg_prod, $c_php_isodate_format,$l_shortname, $l_header_new;
+  global $display, $obm, $c_php_isodate_format,$l_shortname, $l_header_new;
   global $ctt_sales, $ctt_research, $ctt_others,$l_other;
   global $l_tt_sales, $l_tt_research, $l_tt_others,$path;
 
-  $usr_q = run_query_all_users_from_group($cg_prod, array($obm['uid']));
+  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, array($obm['uid']));
 
   if ($action == 'detailupdate') {
     $pid = $project_q->f('project_id');
@@ -1160,12 +1160,11 @@ function html_project_form($action, $project_q, $project) {
 
   if (($action == 'new') || ($action == 'insert')) {
     // member select
-    $mb_q = run_query_all_users_from_group($cg_prod);
+    $mbs = of_usergroup_get_group_users($obm['group_prod'], true);
     $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
       <option value=\"$c_undef\">$l_undef</option>\n";
-    while ($mb_q->next_record()) {
-	$mb_id = $mb_q->f('userobm_id');
-	$mb_name = $mb_q->f('userobm_lastname').' '.$mb_q->f('userobm_firstname');
+    foreach ($mbs as $mb_id => $one_user) {
+      $mb_name = $one_user['lastname'].' '.$one_user['firstname'];
 	$sel_member .= "
       <option value=\"$mb_id\"";
 	if ($mb_id == $member) { $sel_member .= " selected=\"selected\""; }
@@ -1270,13 +1269,9 @@ function html_project_form($action, $project_q, $project) {
   }
 
   // User comment select construction
-  if ($usr_q->nf()>0) {
-    $usr_q->seek(0);
-  }
   $sel_usercomment = "<select name=\"sel_usercomment\">";
-  while ($usr_q->next_record()) {
-    $cid = $usr_q->f('userobm_id');
-    $cname = $usr_q->f('userobm_lastname').' '.$usr_q->f('userobm_firstname');
+  foreach ($users_p as $cid => $one_user) {
+    $cname = $one_user['lastname'].' '.$one_user['firstname'];
     $sel_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {

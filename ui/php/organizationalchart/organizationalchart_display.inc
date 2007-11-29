@@ -444,31 +444,36 @@ function draw_consult($node_q) {
     $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
     switch($entity) {
       case "group":
-        $usr_q = run_query_all_users_from_group($entity_id);
+	$users = of_usergroup_get_group_users($entity_id, true);
         $g_manager = run_query_global_group_manager($entity_id);
         break;
       case "user":
-       $usr_q = run_query_userobm($entity_id);
+	$user = get_user_info($entity_id);
+	$u_id = $user['id'];
+	$lname = $user['lastname'];
+	$fname = $user['firstname'];
+	$users[$u_id] = array ('id' => $u_id,
+			       'lastname' => $lname,
+			       'firstname' => $fname);
        break;
     }
-    while($usr_q->next_record()) {
-      $userobm_id = $usr_q->f("userobm_id");
-      $userobm_url = "$path/user/user_index.php?action=detailconsult&amp;user_id=$userobm_id";
-      $userobm_name = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
-      $item_id = "item-${level}-${userobm_id}";
+    foreach ($users as $u_id => $one_user) {
+      $userobm_url = "$path/user/user_index.php?action=detailconsult&amp;user_id=$u_id";
+      $userobm_name = $one_user['lastname'].' '.$one_user['firstname'];
+      $item_id = "item-${level}-${u_id}";
 
-      if ($userobm_id != $g_manager) {
-        $block_detail_entities .= "<li id=\"item-${level}-${userobm_id}\">
+      if ($u_id != $g_manager) {
+        $block_detail_entities .= "<li id=\"item-${level}-${u_id}\">
           <a href=\"$userobm_url\" 
-			      onmouseover=\"obm.userDetail.compute($userobm_id, event);return false;\"
-            onmouseout=\"obm.userDetail.compute($userobm_id, event);return false;\">$userobm_name</a>
+			      onmouseover=\"obm.userDetail.compute($u_id, event);return false;\"
+            onmouseout=\"obm.userDetail.compute($u_id, event);return false;\">$userobm_name</a>
           </li>";
       } else {
         $manager = "<img src=\"$ico_manager\" />";
-        $block_detail_entities_boss .= "<li id=\"item-${level}-${userobm_id}\">
+        $block_detail_entities_boss .= "<li id=\"item-${level}-${u_id}\">
         <a href=\"$userobm_url\" 
-			    onmouseover=\"obm.userDetail.compute($userobm_id, event);return false;\"
-          onmouseout=\"obm.userDetail.compute($userobm_id, event);return false;\">$manager&nbsp;<b>$userobm_name</b></a>
+			    onmouseover=\"obm.userDetail.compute($u_id, event);return false;\"
+          onmouseout=\"obm.userDetail.compute($u_id, event);return false;\">$manager&nbsp;<b>$userobm_name</b></a>
         </li>";
       }
 

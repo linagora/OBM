@@ -1020,7 +1020,7 @@ function html_deal_consult($deal_q, $dc='') {
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_form($deal) {
-  global $display, $obm, $action, $ctt_sales, $cg_com, $cg_prod;
+  global $display, $obm, $action, $ctt_sales;
 
   if ($action == 'detailupdate') {
     $deal_q = run_query_deal_detail($deal['deal_id']);
@@ -1059,14 +1059,14 @@ function dis_deal_form($deal) {
   $types = get_global_deal_types();
   $tts = get_global_tasktype($ctt_sales);
   $sources = get_global_lead_sources();
-  $usrc_q = run_query_all_users_from_group($cg_com, $users);
-  $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+  $users_c = of_usergroup_get_group_users($obm['group_com'], true, $users);
+  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, $users);
   $sta_q = run_query_deal_status_list();
   $con_q = run_query_deal_contact($deal['company_id']);
   $regions = of_category_get_ordered('', 'region');
   $roles = of_category_get_ordered('DealCompany', 'role');
 
-  $block = html_deal_form($action, $deal_q, $types, $regions, $tts, $sources, $usrc_q, $usrp_q, $comp_q, $con_q, $dc, $roles, $sta_q, $deal);
+  $block = html_deal_form($action, $deal_q, $types, $regions, $tts, $sources, $users_c, $users_p, $comp_q, $con_q, $dc, $roles, $sta_q, $deal);
 
   return $block;
 }
@@ -1081,8 +1081,8 @@ function dis_deal_form($deal) {
 //   - $regions   : Regions array
 //   - $tts       : TaskType array
 //   - $sources   : Lead Sources array
-//   - $usrc_q    : DBO : list of userobm from system group Commercial
-//   - $usrp_q    : DBO : list of userobm from system group Production
+//   - $users_c   : array list of userobm from domain group Commercial
+//   - $users_p   : array list of userobm from domain group Production
 //   - $comp_q    : DBO : deal company infos (name, ad1, zip, town when new)
 //   - $con_q     : DBO : list of contact from the company 
 //   - $dc        : array of related companies
@@ -1091,7 +1091,7 @@ function dis_deal_form($deal) {
 //   - $comp_id   : id of the company concerned by the deal
 //   - deal[]     : default or transmitted values
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $usrc_q,$usrp_q,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
+function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $users_c,$users_p,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
   global $ico_company,$ico_contact,$ico_add, $l_header_new_f;
   global $c_php_isodate_format,$l_deal,$l_update,$l_insert, $l_private;
   global $l_dates, $l_company, $l_other_relation, $l_relation, $l_label;
@@ -1245,10 +1245,8 @@ function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $usrc_q,$
   // Marketing manager select construction
   $sel_market = "<select name=\"sel_market\">
     <option value=\"$c_undef\">$l_undef</option>";
-  while ($usrc_q->next_record()) {
-    $cid = $usrc_q->f('userobm_id');
-    $cname = $usrc_q->f('userobm_lastname') . ' ' .
-             $usrc_q->f('userobm_firstname');
+  foreach ($users_c as $cid => $one_user) {
+    $cname = $one_user['lastname'] . ' ' . $one_user['firstname'];
     $sel_market .= "\n<option value=\"$cid\"";
     if ($market == $cid) $sel_market .= " selected = \"selected\""; 
     $sel_market .= ">$cname</option>";
@@ -1258,10 +1256,8 @@ function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $usrc_q,$
   // Technical manager select construction
   $sel_tech = "<select name=\"sel_tech\">
     <option value=\"$c_undef\">$l_undef</option>";
-  while ($usrp_q->next_record()) {
-    $cid = $usrp_q->f('userobm_id');
-    $cname = $usrp_q->f('userobm_lastname') . ' ' .
-             $usrp_q->f('userobm_firstname');
+  foreach ($users_p as $cid => $one_user) {
+    $cname = $one_user['lastname'] . ' ' . $one_user['firstname'];
     $sel_tech .= "<option value=\"$cid\"";
     if ($tech == $cid) $sel_tech .= " selected = \"selected\""; 
     $sel_tech .= ">$cname</option>\n";
@@ -1377,13 +1373,8 @@ $js_status_loop
 ";
 
   // User comment select construction
-  if ($usrc_q->nf()>0) {
-    $usrc_q->seek(0);
-  }
-  $sel_usercomment = "<select name=\"sel_usercomment\">";
-  while ($usrc_q->next_record()) {
-    $cid = $usrc_q->f('userobm_id');
-    $cname = $usrc_q->f('userobm_lastname').' '.$usrc_q->f('userobm_firstname');
+  foreach ($users_c as $cid => $one_user) {
+    $cname = $one_user['lastname'].' '.$one_user['firstname'];
     $sel_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
@@ -1622,9 +1613,9 @@ function dis_deal_quick_form($deal) {
   if ($deal['deal_id'] > 0) {
     $deal_q = run_query_deal_detail($deal['deal_id']);
     $display['detailInfo'] = display_record_info($deal_q);
-    $usrc_q = run_query_all_users_from_group($cg_com, array($obm['uid']));
+    $users_c = of_usergroup_get_group_users($obm['group_com'], true, array($obm['uid']));
     $sta_q = run_query_deal_status_list();
-    $block = html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal);
+    $block = html_deal_quick_form($action, $deal_q, $users_c, $sta_q, $deal);
   }
 
   return $block;
@@ -1636,11 +1627,11 @@ function dis_deal_quick_form($deal) {
 // Parameters :
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the deal (null for new deal)
-//   - $usrc_q    : DBO : list of userobm from system group Commercial
+//   - $users_c   : array list of userobm from domain group Commercial
 //   - $sta_q     : DBO : list of deal status
 //   - deal[]     : default or transmitted values
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
+function html_deal_quick_form($action, $deal_q, $users_c, $sta_q, $deal) {
   global $c_php_isodate_format, $l_update;
   global $l_deal, $l_label;
   global $l_expected, $l_alarm, $l_status, $l_hitrate, $l_todo;
@@ -1718,13 +1709,9 @@ $js_status_loop
 ";
 
   // User comment select construction
-  if ($usrc_q->nf()>0) {
-    $usrc_q->seek(0);
-  }
   $sel_usercomment = "<select name=\"sel_usercomment\">";
-  while ($usrc_q->next_record()) {
-    $cid = $usrc_q->f('userobm_id');
-    $cname = $usrc_q->f('userobm_lastname').' '.$usrc_q->f('userobm_firstname');
+  foreach ($users_c as $cid => $one_user) {
+    $cname = $one_user['lastname'].' '.$one_user['firstname'];
     $sel_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
@@ -3406,7 +3393,7 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
 //     keys used : forwarded to html_deal_search_form and $url for OBM_DISPLAY
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_parentdeal_form($action, $deal) {
-  global $display, $ctt_sales, $cg_com, $cg_prod, $obm, $l_no_found;
+  global $display, $ctt_sales, $obm, $l_no_found;
 
   $users = array();
 
@@ -3421,9 +3408,9 @@ function dis_deal_parentdeal_form($action, $deal) {
     }
   }
 
-  $usrc_q = run_query_all_users_from_group($cg_com, $users);
-  $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-  $block = html_deal_parentdeal_form($action,$obm_q, $usrc_q, $usrp_q, $deal);
+  $users_c = of_usergroup_get_group_users($obm['group_com'], true, $users);
+  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, $users);
+  $block = html_deal_parentdeal_form($action,$obm_q, $users_c, $users_p, $deal);
 
   return $block;
 }
@@ -3434,12 +3421,12 @@ function dis_deal_parentdeal_form($action, $deal) {
 // Parameters :
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the parent deal (null for new deal)
-//   - $usrc_q    : DBO : OBM user list from system group Commercial
-//   - $usrp_q    : DBO : OBM user list from system group Production
+//   - $users_c   : array user list from domain group Commercial
+//   - $users_p   : array user list from domain group Production
 //   - deal[]     : default or transmitted values
 //     keys used  : parent_id, plabel, pmarket, ptech, pcom
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
+function html_deal_parentdeal_form($action, $deal_q, $users_c, $users_p, $deal) {
   global $l_update_parent,$l_insert_parent,$l_label,$l_marketing_manager;
   global $l_parentdeal,$l_technical_manager,$l_comment;
 
@@ -3461,19 +3448,19 @@ function html_deal_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
 
   // Marketing manager select
   $sel_market = "<select name=\"sel_pmarket\">";
-  while ($usrc_q->next_record()) {
-    $sel_market .= "<option value=\"" . $usrc_q->f('userobm_id') . "\"";
-    if ($usrc_q->f('userobm_id') == $pmarket) $sel_market .= " selected= \" selected \"";
-    $sel_market .= '>' . $usrc_q->f('userobm_lastname') . ' ' . $usrc_q->f('userobm_firstname').'</option>';
+  foreach ($users_c as $cid => $one_user) {
+    $sel_market .= "<option value=\"$cid\"";
+    if ($cid == $pmarket) $sel_market .= " selected= \" selected \"";
+    $sel_market .= '>' . $one_user['lastname'].' '.$one_user['firstname'].'</option>';
   }
   $sel_market .= '</select>';
 
   // Technical manager select
   $sel_tech = "<select name=\"sel_ptech\">";
-  while ($usrp_q->next_record()) {
-    $sel_tech .= "<option value=\"" . $usrp_q->f('userobm_id') . "\"";
-    if ($usrp_q->f('userobm_id') == $ptech) $sel_tech .= "selected= \" selected \"";
-    $sel_tech .= '>' . $usrp_q->f('userobm_lastname') . ' ' . $usrp_q->f('userobm_firstname').'</option>';
+  foreach ($users_p as $cid => $one_user) {
+    $sel_tech .= "<option value=\"$cid\"";
+    if ($cid == $ptech) $sel_tech .= "selected= \" selected \"";
+    $sel_tech .= '>' . $one_user['lastname'].' '.$one_user['firstname'].'</option>';
   }
   $sel_tech .= '</select>';
 

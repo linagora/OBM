@@ -613,7 +613,7 @@ function html_payment_invoice($amounts, $params) {
 //   - $params[]  : parameters : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_payment_form($action, $params) {
-  global $display, $cg_com, $l_aduplicate;
+  global $display, $l_aduplicate;
 
   $p_id = $params['payment_id'];
   if ($p_id > 0) {

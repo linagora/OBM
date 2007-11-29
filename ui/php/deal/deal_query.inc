@@ -596,7 +596,7 @@ function run_query_deal_dealcompany_update($deal_id, $dc) {
 //   - $deal[] : deal hash info
 ///////////////////////////////////////////////////////////////////////////////
 function deal_send_mail($deal) {
-  global $cdg_sql, $cg_com;
+  global $cdg_sql, $obm;
   global $l_no, $l_members, $l_group, $l_obm_title, $l_deal, $l_company;
   global $l_amount, $l_margin, $l_hitrate, $l_todo, $l_status, $l_alarm, $l_expected, $l_end;
 
@@ -634,7 +634,7 @@ $datecomment:$usercomment:$add_comment";
   if ($mail_comment == "$l_members") {
     $users_array = array($market, $tech);
   } else if ($mail_comment == "$l_group") {
-    $users_array = get_all_users_id_from_group($cg_com);
+    $users_array = of_usergroup_get_group_users($obm['group_com']);
   }
   if (! is_array($users_array)) {
     $users_array = array();

@@ -1764,7 +1764,7 @@ function run_query_global_group_manager($g_id) {
 
   $query = "SELECT group_manager_id FROM UGroup
     WHERE group_id='$g_id'";
-  display_debug_msg($query, $cdg_sql, 'run_query_all_users_from_group()');
+  display_debug_msg($query, $cdg_sql, 'run_query_global_group_manager()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1806,88 +1806,7 @@ function get_group_info($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution : Get the users list (id, name) from the given group
-// Recursive search to handle group trees
-// Parameters:
-//   - $group_id : Group id
-//   - $ids (optionnal) : array of UserObm Id to add to the result
-// Returns:
-//   array of user ids
-///////////////////////////////////////////////////////////////////////////////
-function get_all_users_from_group($g_id, $ids='') {
-  global $cdg_sql;
-
-  if (! ($g_id > 0)) {
-    return false;
-  }
-
-  $users = array();
-  $obm_q = run_query_all_users_from_group($g_id, $ids);
-  while ($obm_q->next_record()) {
-    $id = $obm_q->f('userobm_id');
-    $lname = $obm_q->f('userobm_lastname');
-    $fname = $obm_q->f('userobm_firstname');
-    $users[$id] = array ('id' => $id,
-			 'lastname' => $lname,
-			 'firstname' => $fname);
-  }
-  return $users;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : Get the users list from the given group
-// Recursive search to handle group trees
-// Parameters:
-//   - $g_id : Group id
-//   - $ids (optionnal) : array of UserObm Id to add to the result
-// Used by: company, contact, deal, project, contract, import
-///////////////////////////////////////////////////////////////////////////////
-function run_query_all_users_from_group($g_id, $ids='') {
-  global $cdg_sql;
-
-  $gusers = get_all_users_id_from_group($g_id);
-
-  if (is_array($gusers)) {
-    $where_gusers = '';
-    $nb_add = count($gusers);
-    for ($i=0; $i<$nb_add; $i++) {
-      if ($gusers[$i] != '') {
-        $where_gusers .= " OR userobm_id = '$gusers[$i]'";
-      }
-    }
-  }
-
-  if (is_array($ids)) {
-    $where_ids = '';
-    $nb_add = count($ids);
-    for ($i=0; $i<$nb_add; $i++) {
-      if ($ids[$i] != '') {
-        $where_ids .= " OR userobm_id = '$ids[$i]'";
-      }
-    }
-  }
-  $multidomain = sql_multidomain('userobm');
-
-  $query = "SELECT 
-      userobm_id,
-      userobm_lastname,
-      userobm_firstname
-    FROM UserObm
-    WHERE ((userobm_archive != '1' and (1=0 $where_gusers))
-    $where_ids)
-    $multidomain
-    ORDER BY userobm_lastname"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, 'run_query_all_users_from_group()');
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : Get the users ID list from the given group
+// Get the users ID list from the given group
 // Recursive search to handle group trees
 // Parameters:
 //   - $group_id : Group id
@@ -1942,33 +1861,47 @@ function get_all_users_id_from_group($g_id) {
  * Get all users of a group from the usergroup internal infos 
  * @param $g_id group id
  * @param $info if true, get lastname and firstname too else get only id
+ * @param $uids (optionnal) : array of UserObm Id to add to the result
  * @return false if problem
  * @access public
  */
-function of_usergroup_get_group_users($g_id, $info=false) {
+function of_usergroup_get_group_users($g_id, $info=false, $uids='') {
   global $cdg_sql;
 
   if (! ($g_id > 0)) {
     return false;
   }
 
-  $users = array();
   if ($info) {
     $select_user = ',
       userobm_lastname,
       userobm_firstname';
   }
+  if (is_array($uids) && count($uids)>0) {
+    foreach ($uids as $u_id) {
+      $where_uids .= " $or userobm_id='$u_id'";
+      $or = "OR";
+    }
+    $union = "UNION
+      SELECT userobm_id as user_id
+        $select_user
+      FROM UserObm
+      WHERE $where_uids";
+  }
+
   // Users members of this group
   $query = "SELECT of_usergroup_user_id as user_id
       $select_user
-    FROM of_usergroup LEFT JOIN UserObm on of_userobm_user_id=userobm_id
+    FROM of_usergroup LEFT JOIN UserObm ON of_usergroup_user_id=userobm_id
     WHERE userobm_archive != '1'
-      AND of_usergroup_group_id='$g_id'";
+      AND of_usergroup_group_id='$g_id'
+    $union";
 
   $obm_q = new DB_OBM; 
   display_debug_msg($query, $cdg_sql, 'of_usergroup_get_group_users()');
   $obm_q->query($query);
 
+  $users = array();
   while ($obm_q->next_record()) {
     $u_id = $obm_q->f('user_id');
     if ($info) {

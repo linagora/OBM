@@ -216,9 +216,9 @@ class OBM_Challenge_Auth extends Auth {
     }
 
     if ($encrypted == $pass) {
-      $obm["profile"] = $perm;
-      $obm["domain_id"] = $domain_id;
-      $obm["delegation"] = $delegation;
+      $obm['profile'] = $perm;
+      $obm['domain_id'] = $domain_id;
+      $obm['delegation'] = $delegation;
       return $uid;
     } else {
       return false;
@@ -314,9 +314,9 @@ class CAS_Auth extends Auth {
       header("location:".obmCAS::getServerBaseURL());
     }
 
-    $obm["profile"] = $perm;
-    $obm["login"] = $login;
-    $obm["domain_id"] = $domain_id;
+    $obm['profile'] = $perm;
+    $obm['login'] = $login;
+    $obm['domain_id'] = $domain_id;
 
     return $uid;
   }

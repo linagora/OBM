@@ -730,18 +730,17 @@ function html_group_form($action, $group_q, $group, $field='') {
     // Manager select
     $manager_id = $group_q->f('group_manager_id');
     if (isset($group['manager'])) { $manager_id = $group['manager']; }    
-    $all_usr_q = run_query_all_users_from_group($id);
+    $users = of_usergroup_get_group_users($id, true);
     $sel_manager = "<select name=\"sel_manager\" id=\"sel_manager\">
         <option value=\"$c_undef\">$l_undef</option>";
-    while($all_usr_q->next_record()) {
-      $userobm_id = $all_usr_q->f('userobm_id');
-      $userobm_name = $all_usr_q->f('userobm_lastname').' '.$all_usr_q->f('userobm_firstname');
-      if ($userobm_id == $manager_id) {
+    foreach ($users as $u_id => $one_user) {
+      $u_name = $one_user['lastname'].' '.$ine_user['firstname'];
+      if ($u_id == $manager_id) {
         $selected = 'selected';
       } else {
         $selected = '';
       }
-      $sel_manager .= "<option value=\"$userobm_id\" $selected> $userobm_name </option>";
+      $sel_manager .= "<option value=\"$u_id\" $selected> $u_name </option>";
     }
     $sel_manager .= '</select>';
 

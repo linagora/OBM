@@ -732,7 +732,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
 //   - $contract[] : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_form($action,$contract,$param_company) {
-  global $display, $cg_com, $cg_prod;
+  global $display, $obm;
 
   if ($action == "detailupdate") {
     $contract_q = run_query_contract_detail($contract["contract_id"]);
@@ -755,11 +755,11 @@ function dis_contract_form($action,$contract,$param_company) {
   $contact_q = run_query_contact_contract($comp_id);
   $prio_q = run_query_contract_priority();
   $status_q = run_query_contract_status();
-  $usrc_q = run_query_all_users_from_group($cg_com, $users);
-  $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+  $users_c = of_usergroup_get_group_users($obm['group_com'], true, $users);
+  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, $users);
   $type_q = run_query_contract_type();
  
-  $block = html_contract_form($action,$contract_q,$type_q, $usrc_q, $usrp_q, $company_q, $contact_q, $contract, $prio_q, $status_q);
+  $block = html_contract_form($action,$contract_q,$type_q, $users_c, $users_p, $company_q, $contact_q, $contract, $prio_q, $status_q);
 
   return $block;
 }
@@ -771,14 +771,14 @@ function dis_contract_form($action,$contract,$param_company) {
 //   - $action     : action called
 //   - $contract_q : DBO : information about the contract (null for new)
 //   - $type_q     : DBO : contract type list
-//   - $u_com_q    : DBO : list of userobm from Commercial group
-//   - $u_prod_q   : DBO : list of userobm from Production group
+//   - $users_c    : array : list of userobm from Commercial group
+//   - $users_p    : array : list of userobm from Production group
 //   - $comp_q     : DBO : company infos (name, ad1, zip, town when new)
 //   - $contact_q  : DBO : list of contact from the company 
 //   - contract[]  : default or transmitted values
 //     keys used   : all
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp_q,$contact_q, $contract,$pri_q,$sta_q){
+function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_q,$contact_q, $contract,$pri_q,$sta_q){
   // - Themes
   global $display, $cgp_show, $obm;
   global $ico_mail,$ico_company,$ico_deal,$ico_contact, $l_header_new;
@@ -956,22 +956,22 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   // Marketing manager select
   $sel_market = "<select name=\"sel_market\">
     <option value=\"$c_undef\">$l_undef</option>";
-  while ($u_com_q->next_record()) {
-   $sel_market .= "\n<option value=\"".$u_com_q->f("userobm_id")."\"";
-    if ($u_com_q->f("userobm_id") == $market_id) 
+  foreach ($users_c as $u_id => $one_user) {
+    $sel_market .= "\n<option value=\"$u_id\"";
+    if ($u_id == $market_id) 
       $sel_market .= " selected=\"selected\"";
-    $sel_market .= ">". $u_com_q->f("userobm_lastname") . " " . $u_com_q->f("userobm_firstname")."</option>";
+    $sel_market .= '>'. $one_user['lastname'].' '.$one_user['firstname'].'</option>';
   }
   $sel_market.="</select>";
  
   // Technical manager select
   $sel_tech = "<select name=\"sel_tech\">
     <option value=\"$c_undef\">$l_undef</option>";
-  while ($u_prod_q->next_record()) {
-   $sel_tech .= "\n<option value=\"".$u_prod_q->f("userobm_id")."\"";
-   if ($u_prod_q->f("userobm_id") == $tech) 
+  foreach ($users_p as $u_id => $one_user) {
+    $sel_tech .= "\n<option value=\"$u_id\"";
+   if ($u_id == $tech) 
       $sel_tech.=" selected=\"selected\"";
-   $sel_tech.=">". $u_prod_q->f("userobm_lastname") . " " . $u_prod_q->f("userobm_firstname")."</option>";
+   $sel_tech .= '>'. $one_user['lastname'].' '.$one_user['firstname'].'</option>';
   }
   $sel_tech .= "</select>";
 
@@ -1081,16 +1081,12 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   $dis_sel_con2.="</select>";
 
   // User comment select construction
-  if ($u_com_q->nf()>0) {
-    $u_com_q->seek(0);
-  }
   $sel_usercomment = "<select name=\"sel_usercomment\">";
-  while ($u_com_q->next_record()) {
-    $cid = $u_com_q->f("userobm_id");
-    $cname = $u_com_q->f("userobm_lastname")." ".$u_com_q->f("userobm_firstname");
+  foreach($users_c as $u_id => $one_user) {
+    $cname = $one_user['lastname'].' '.$one_user['firstname'];
     $sel_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
-    if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+    if ( ($usercomment == $u_id) || ($usercomment == $cname) ) {
       $sel_usercomment .= " selected = \"selected\"";
     }
     $sel_usercomment .= ">$cname</option>\n";

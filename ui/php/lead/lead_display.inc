@@ -410,7 +410,7 @@ function html_lead_consult($l_q) {
 //   - $params[]  : parameters : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_lead_form($action, $params) {
-  global $display, $obm, $cg_com;
+  global $display, $obm;
 
   $p_id = $params['lead_id'];
   if ($p_id > 0) {
@@ -422,7 +422,7 @@ function dis_lead_form($action, $params) {
 
   $sources = get_global_lead_sources();
   $status = get_lead_status();
-  $managers = get_all_users_from_group($cg_com, $users);
+  $managers = of_usergroup_get_group_users($obm['group_com'], true, $users);
 
   $block = html_lead_form($action, $l_q, $sources, $status, $managers, $params);
 

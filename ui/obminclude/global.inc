@@ -49,7 +49,6 @@ $cak_end = 'E';
 $c_default_domain = 1;
 
 // OBM System groups (groups id)
-$cg_adm = 1;
 $cg_com = 2;
 $cg_prod = 3;
 

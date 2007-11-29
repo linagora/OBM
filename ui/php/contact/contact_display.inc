@@ -12,36 +12,36 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["contact_lastname"] = $l_lastname;
-$fieldnames["contact_firstname"] = $l_firstname;
-$fieldnames["contact_aka"] = $l_aka;
-$fieldnames["function_label"] = $l_function;
-$fieldnames["contact_title"] = $l_title;
-$fieldnames["kind_minilabel"] = $l_kind;
-$fieldnames["kind_header"] = $l_header;
-$fieldnames["kind_lang"] = $l_lang;
-$fieldnames["contact_address"] = $l_address;
-$fieldnames["contact_service"] = $l_service;
-$fieldnames["contact_address1"] = "$l_address 1";
-$fieldnames["contact_address2"] = "$l_address 2";
-$fieldnames["contact_address3"] = "$l_address 3";
-$fieldnames["contact_zipcode"] = $l_postcode;
-$fieldnames["contact_town"] = $l_town;
-$fieldnames["contact_expresspostal"] = $l_expresspostal;
-$fieldnames["country_name"] = $l_country;
-$fieldnames["contact_address"] = $l_address;
-$fieldnames["contact_phone"] = $l_phone;
-$fieldnames["contact_homephone"] = $l_hphone;
-$fieldnames["contact_mobilephone"] = $l_mphone;
-$fieldnames["contact_fax"] = $l_fax;
-$fieldnames["contact_email"] = $l_email;
-$fieldnames["contact_archive"] = $l_archive_first;
-$fieldnames["contact_date"] = $l_date;
-$fieldnames["contact_mailing_ok"] = $l_mailing_ok_first;
-$fieldnames["contact_newsletter"] = $l_news;
+$fieldnames['contact_lastname'] = $l_lastname;
+$fieldnames['contact_firstname'] = $l_firstname;
+$fieldnames['contact_aka'] = $l_aka;
+$fieldnames['function_label'] = $l_function;
+$fieldnames['contact_title'] = $l_title;
+$fieldnames['kind_minilabel'] = $l_kind;
+$fieldnames['kind_header'] = $l_header;
+$fieldnames['kind_lang'] = $l_lang;
+$fieldnames['contact_address'] = $l_address;
+$fieldnames['contact_service'] = $l_service;
+$fieldnames['contact_address1'] = "$l_address 1";
+$fieldnames['contact_address2'] = "$l_address 2";
+$fieldnames['contact_address3'] = "$l_address 3";
+$fieldnames['contact_zipcode'] = $l_postcode;
+$fieldnames['contact_town'] = $l_town;
+$fieldnames['contact_expresspostal'] = $l_expresspostal;
+$fieldnames['country_name'] = $l_country;
+$fieldnames['contact_address'] = $l_address;
+$fieldnames['contact_phone'] = $l_phone;
+$fieldnames['contact_homephone'] = $l_hphone;
+$fieldnames['contact_mobilephone'] = $l_mphone;
+$fieldnames['contact_fax'] = $l_fax;
+$fieldnames['contact_email'] = $l_email;
+$fieldnames['contact_archive'] = $l_archive_first;
+$fieldnames['contact_date'] = $l_date;
+$fieldnames['contact_mailing_ok'] = $l_mailing_ok_first;
+$fieldnames['contact_newsletter'] = $l_news;
 // Calculated fields
-$fieldnames["company_name"] = $l_company;
-$fieldnames["company_aka"] = "$l_company $l_aka";
+$fieldnames['company_name'] = $l_company;
+$fieldnames['company_aka'] = "$l_company $l_aka";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Contact specific dataset fields
@@ -55,267 +55,267 @@ $fieldnames["company_aka"] = "$l_company $l_aka";
 function dis_data_contact(&$OD, $fieldname, $link_ok) {
   global $path, $params, $cgp_show, $ico_mail;
 
-  $show_date = (! $cgp_hide["contact"]["contact_date"]);
-  $ext_url = $params["ext_url"];
+  $show_date = (! $cgp_hide['contact']['contact_date']);
+  $ext_url = $params['ext_url'];
 
   // We set an indicator to tell if the contact has an address
-  if ( ($OD->data_set->f("contact_address1") != "")
-         || ($OD->data_set->f("contact_address2") != "")
-         || ($OD->data_set->f("contact_address3") != "")
-         || ($OD->data_set->f("contact_zipcode") != "")
-         || ($OD->data_set->f("contact_town") != "")
-         || (trim($OD->data_set->f("contact_country_iso3166")) != "")
-         || ($OD->data_set->f("contact_expresspostal") != "") ) {
+  if ( ($OD->data_set->f('contact_address1') != '')
+         || ($OD->data_set->f('contact_address2') != '')
+         || ($OD->data_set->f('contact_address3') != '')
+         || ($OD->data_set->f('contact_zipcode') != '')
+         || ($OD->data_set->f('contact_town') != '')
+         || (trim($OD->data_set->f('contact_country_iso3166')) != '')
+         || ($OD->data_set->f('contact_expresspostal') != '') ) {
     $contact_has_address = true;
   } else {
     $contact_has_address = false;
   }
 
-  //  if (($fieldname == "contact_lastname") && $link_ok) {
-  if ($fieldname == "contact_lastname") {
-    if ($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_contact_get_id(".$OD->data_set->f("contact_id").",'".addslashes($OD->data_set->f("contact_lastname"))."');";
-    } else if ($OD->display_ext == "get_id_url") {
-      $res["url"] = "javascript:check_contact_get_id_url('$ext_url',".$OD->data_set->f("contact_id").");";
+  //  if (($fieldname == 'contact_lastname') && $link_ok) {
+  if ($fieldname == 'contact_lastname') {
+    if ($OD->display_ext == 'get_id') {
+      $res['url'] = "javascript:check_contact_get_id(".$OD->data_set->f('contact_id').",'".addslashes($OD->data_set->f('contact_lastname'))."');";
+    } else if ($OD->display_ext == 'get_id_url') {
+      $res['url'] = "javascript:check_contact_get_id_url('$ext_url',".$OD->data_set->f('contact_id').");";
     } else {
-      $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f("contact_id");
+      $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('contact_id');
     }
   }
 
-  else if (($fieldname == "company_name") && $link_ok) {
-    if ($cgp_show["module"]["company"]) {
-      $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f("contact_company_id");
+  else if (($fieldname == 'company_name') && $link_ok) {
+    if ($cgp_show['module']['company']) {
+      $res['url'] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f('contact_company_id');
     } else {
-      $res["name"] = $OD->data_set->f("contact_company");
+      $res['name'] = $OD->data_set->f('contact_company');
     }      
   }
 
-  else if ($fieldname == "contact_archive") {
-    $res["align"] = "center";
+  else if ($fieldname == 'contact_archive') {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
-  else if (($fieldname == "contact_mailing_ok")
-	   || ($fieldname == "contact_newsletter")) {
-    $res["align"] = "center";
+  else if (($fieldname == 'contact_mailing_ok')
+	   || ($fieldname == 'contact_newsletter')) {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
-  else if ($fieldname == "contact_phone") {
-    $phone = trim($OD->data_set->f("contact_phone"));
-    $c_phone = trim($OD->data_set->f("company_phone"));
-    if ( (($phone == "") && ($c_phone != ""))
-         || ( ($phone != "") && ($phone == $c_phone)) ) {
+  else if ($fieldname == 'contact_phone') {
+    $phone = trim($OD->data_set->f('contact_phone'));
+    $c_phone = trim($OD->data_set->f('company_phone'));
+    if ( (($phone == '') && ($c_phone != ''))
+         || ( ($phone != '') && ($phone == $c_phone)) ) {
       $phone = "($c_phone)";
     }
-    $res["name"] = $phone;
+    $res['name'] = $phone;
   }
 
-  else if ($fieldname == "contact_fax") {
-    $fax = trim($OD->data_set->f("contact_fax"));
-    $c_fax = trim($OD->data_set->f("company_fax"));
-    if ( (($fax == "") && ($c_fax != ""))
-         || ( ($fax != "") && ($fax == $c_fax)) ) {
+  else if ($fieldname == 'contact_fax') {
+    $fax = trim($OD->data_set->f('contact_fax'));
+    $c_fax = trim($OD->data_set->f('company_fax'));
+    if ( (($fax == '') && ($c_fax != ''))
+         || ( ($fax != '') && ($fax == $c_fax)) ) {
       $fax = "($c_fax)";
     }
-    $res["name"] = $fax;
+    $res['name'] = $fax;
   }
 
-  else if ($fieldname == "contact_email") {
-    $email = $OD->data_set->f("contact_email");
-    if (strcmp($email,"") != 0) {
-      $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\" />";
-      $res["txt_name"] = $email;
+  else if ($fieldname == 'contact_email') {
+    $email = $OD->data_set->f('contact_email');
+    if (strcmp($email,'') != 0) {
+      $res['url'] = "mailto:$email";
+      $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\" />";
+      $res['txt_name'] = $email;
     }
   }
 
-  else if ($fieldname == "contact_address") {
+  else if ($fieldname == 'contact_address') {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
-      if ($OD->data_set->f("contact_service") != "") {
-	$res["name"] .= $OD->data_set->f("contact_service")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("contact_service") . " ";
+      if ($OD->data_set->f('contact_service') != '') {
+	$res['name'] .= $OD->data_set->f('contact_service')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('contact_service') . ' ';
       }
-      if ($OD->data_set->f("contact_address1") != "") {
-	$res["name"] .= $OD->data_set->f("contact_address1")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("contact_address1") . " ";
+      if ($OD->data_set->f('contact_address1') != '') {
+	$res['name'] .= $OD->data_set->f('contact_address1')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('contact_address1') . ' ';
       }
-      if ($OD->data_set->f("contact_address2") != "") {
-	$res["name"] .= $OD->data_set->f("contact_address2")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("contact_address2") . " ";
+      if ($OD->data_set->f('contact_address2') != '') {
+	$res['name'] .= $OD->data_set->f('contact_address2')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('contact_address2') . ' ';
       }
-      if ($OD->data_set->f("contact_address3") != "") {
-	$res["name"] .= $OD->data_set->f("contact_address3")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("contact_address3");
+      if ($OD->data_set->f('contact_address3') != '') {
+	$res['name'] .= $OD->data_set->f('contact_address3')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('contact_address3');
       }
-      if ($OD->data_set->f("contact_zipcode") != "") {
-	$res["name"] .= $OD->data_set->f("contact_zipcode")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("contact_zipcode");
+      if ($OD->data_set->f('contact_zipcode') != '') {
+	$res['name'] .= $OD->data_set->f('contact_zipcode')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('contact_zipcode');
       }
-      if ($OD->data_set->f("contact_town") != "") {
-	$res["name"] .= $OD->data_set->f("contact_town")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("contact_town");
+      if ($OD->data_set->f('contact_town') != '') {
+	$res['name'] .= $OD->data_set->f('contact_town')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('contact_town');
       }
-      if ($OD->data_set->f("contact_expresspostal") != "") {
-	$res["name"] .= $OD->data_set->f("contact_expresspostal")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("contact_expresspostal");
+      if ($OD->data_set->f('contact_expresspostal') != '') {
+	$res['name'] .= $OD->data_set->f('contact_expresspostal')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('contact_expresspostal');
       }
-      if ($OD->data_set->f("country_name") != "") {
-	$res["name"] .= $OD->data_set->f("country_name")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("country_name");
+      if ($OD->data_set->f('country_name') != '') {
+	$res['name'] .= $OD->data_set->f('country_name')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('country_name');
       }
       // else we get the contact Company address
     } else {
-      if ($OD->data_set->f("company_address1") != "") {
-	$res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("company_address1") . " ";
+      if ($OD->data_set->f('company_address1') != '') {
+	$res['name'] .= $OD->data_set->f('company_address1')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('company_address1') . ' ';
       }
-      if ($OD->data_set->f("company_address2") != "") {
-	$res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("company_address2") . " ";
+      if ($OD->data_set->f('company_address2') != '') {
+	$res['name'] .= $OD->data_set->f('company_address2')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('company_address2') . ' ';
       }
-      if ($OD->data_set->f("company_address3") != "") {
-	$res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("company_address3");
+      if ($OD->data_set->f('company_address3') != '') {
+	$res['name'] .= $OD->data_set->f('company_address3')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('company_address3');
       }
-      if ($OD->data_set->f("company_zipcode") != "") {
-	$res["name"] .= $OD->data_set->f("company_zipcode")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("company_zipcode");
+      if ($OD->data_set->f('company_zipcode') != '') {
+	$res['name'] .= $OD->data_set->f('company_zipcode')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('company_zipcode');
       }
-      if ($OD->data_set->f("company_town") != "") {
-	$res["name"] .= $OD->data_set->f("company_town")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("company_town");
+      if ($OD->data_set->f('company_town') != '') {
+	$res['name'] .= $OD->data_set->f('company_town')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('company_town');
       }
-      if ($OD->data_set->f("company_expresspostal") != "") {
-	$res["name"] .= $OD->data_set->f("company_expresspostal")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("company_expresspostal");
+      if ($OD->data_set->f('company_expresspostal') != '') {
+	$res['name'] .= $OD->data_set->f('company_expresspostal')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('company_expresspostal');
       }
-      if ($OD->data_set->f("company_country") != "") {
-	$res["name"] .= $OD->data_set->f("company_country")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("company_country");
+      if ($OD->data_set->f('company_country') != '') {
+	$res['name'] .= $OD->data_set->f('company_country')."<br />\n";
+	$res['txt_name'] .= $OD->data_set->f('company_country');
       }
     }
   }
 
-  else if ($fieldname == "contact_service") {
-    $res["name"].= $OD->data_set->f("contact_service");
+  else if ($fieldname == 'contact_service') {
+    $res['name'].= $OD->data_set->f('contact_service');
   }
 
-  else if ($fieldname == "contact_address1") {
+  else if ($fieldname == 'contact_address1') {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
-      if ($OD->data_set->f("contact_address1") != "") {
-	$res["name"] .= $OD->data_set->f("contact_address1");
+      if ($OD->data_set->f('contact_address1') != '') {
+	$res['name'] .= $OD->data_set->f('contact_address1');
       }
       // else we get the contact Company address
     } else {
-      if ($OD->data_set->f("company_address1") != "") {
-	$res["name"] .= $OD->data_set->f("company_address1");
+      if ($OD->data_set->f('company_address1') != '') {
+	$res['name'] .= $OD->data_set->f('company_address1');
       }
     }
   }
 
-  else if ($fieldname == "contact_address2") {
+  else if ($fieldname == 'contact_address2') {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
-      if ($OD->data_set->f("contact_address2") != "") {
-	$res["name"] .= $OD->data_set->f("contact_address2");
+      if ($OD->data_set->f('contact_address2') != '') {
+	$res['name'] .= $OD->data_set->f('contact_address2');
       }
       // else we get the contact Company address
     } else {
-      if ($OD->data_set->f("company_address2") != "") {
-	$res["name"] .= $OD->data_set->f("company_address2");
+      if ($OD->data_set->f('company_address2') != '') {
+	$res['name'] .= $OD->data_set->f('company_address2');
       }
     }
   }
 
-  else if ($fieldname == "contact_address3") {
+  else if ($fieldname == 'contact_address3') {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
-      if ($OD->data_set->f("contact_address3") != "") {
-	$res["name"] .= $OD->data_set->f("contact_address3");
+      if ($OD->data_set->f('contact_address3') != '') {
+	$res['name'] .= $OD->data_set->f('contact_address3');
       }
       // else we get the contact Company address
     } else {
-      if ($OD->data_set->f("company_address3") != "") {
-	$res["name"] .= $OD->data_set->f("company_address3");
+      if ($OD->data_set->f('company_address3') != '') {
+	$res['name'] .= $OD->data_set->f('company_address3');
       }
     }
   }
 
-  else if ($fieldname == "contact_town") {
+  else if ($fieldname == 'contact_town') {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
-      if ($OD->data_set->f("contact_town") != "") {
-	$res["name"] .= $OD->data_set->f("contact_town");
+      if ($OD->data_set->f('contact_town') != '') {
+	$res['name'] .= $OD->data_set->f('contact_town');
       }
       // else we get the contact Company address
     } else {
-      if ($OD->data_set->f("company_town") != "") {
-	$res["name"] .= $OD->data_set->f("company_town");
+      if ($OD->data_set->f('company_town') != '') {
+	$res['name'] .= $OD->data_set->f('company_town');
       }
     }
   }
 
-  else if ($fieldname == "contact_zipcode") {
+  else if ($fieldname == 'contact_zipcode') {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
-      if ($OD->data_set->f("contact_zipcode") != "") {
-	$res["name"] .= $OD->data_set->f("contact_zipcode");
+      if ($OD->data_set->f('contact_zipcode') != '') {
+	$res['name'] .= $OD->data_set->f('contact_zipcode');
       }
       // else we get the contact Company address
     } else {
-      if ($OD->data_set->f("company_zipcode") != "") {
-	$res["name"] .= $OD->data_set->f("company_zipcode");
+      if ($OD->data_set->f('company_zipcode') != '') {
+	$res['name'] .= $OD->data_set->f('company_zipcode');
       }
     }
   }
 
-  else if ($fieldname == "contact_expresspostal") {
+  else if ($fieldname == 'contact_expresspostal') {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
-      if ($OD->data_set->f("contact_expresspostal") != "") {
-	$res["name"] .= $OD->data_set->f("contact_expresspostal");
+      if ($OD->data_set->f('contact_expresspostal') != '') {
+	$res['name'] .= $OD->data_set->f('contact_expresspostal');
       }
       // else we get the contact Company address
     } else {
-      if ($OD->data_set->f("company_expresspostal") != "") {
-	$res["name"] .= $OD->data_set->f("company_expresspostal");
+      if ($OD->data_set->f('company_expresspostal') != '') {
+	$res['name'] .= $OD->data_set->f('company_expresspostal');
       }
     }
   }
 
-  else if ($fieldname == "country_name") {
+  else if ($fieldname == 'country_name') {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
-      if ($OD->data_set->f("contact_country") != "") {
-	$res["name"] .= $OD->data_set->f("contact_country");
+      if ($OD->data_set->f('contact_country') != '') {
+	$res['name'] .= $OD->data_set->f('contact_country');
       }
       // else we get the contact Company address
     } else {
-      if ($OD->data_set->f("company_country") != "") {
-	$res["name"] .= "(".$OD->data_set->f("company_country").")";
-	$res["txt_name"] .= $OD->data_set->f("company_country");
+      if ($OD->data_set->f('company_country') != '') {
+	$res['name'] .= '('.$OD->data_set->f('company_country').')';
+	$res['txt_name'] .= $OD->data_set->f('company_country');
       }
     }
   }
 
-  else if ($fieldname == "contact_date") {
+  else if ($fieldname == 'contact_date') {
     if ($show_date) {
-      $date = $OD->data_set->f("contact_date");
-      $res["name"] = ($date) ? of_date_format($date) : " ";
-      $res["align"] = "center";
+      $date = $OD->data_set->f('contact_date');
+      $res['name'] = ($date) ? of_date_format($date) : ' ';
+      $res['align'] = 'center';
     }
   }
 
@@ -328,15 +328,15 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 // Parameters:
 //   - $contact[] : hash with contact values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_contact_search_form($contact="") {
+function dis_contact_search_form($contact='') {
   global $cgp_hide;
 
-  if ($cgp_hide["contact"]["responsible"]) {
-    $usr_q = "";
+  if ($cgp_hide['contact']['responsible']) {
+    $usr_q = '';
   } else {
-    $usr_q = run_query_userobm_responsable("Contact",array("contact_marketingmanager_id"));
+    $usr_q = run_query_userobm_responsable('Contact',array('contact_marketingmanager_id'));
   }
-  $funcs = of_category_get_ordered("contact", "function");
+  $funcs = of_category_get_ordered('contact', 'function');
   $ctry_q = run_query_global_country_for_lang();
   $dsrc_q = run_query_global_datasource();
   $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q);
@@ -362,39 +362,39 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   global $l_after, $l_before, $l_mailing_ok_only, $l_newsletter, $l_archive;
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
 
-  $lname = stripslashes($contact["lname"]);
-  $fname = stripslashes($contact["fname"]);
-  $phone = stripslashes($contact["phone"]);
-  $company = stripslashes($contact["company"]);
-  $email = stripslashes($contact["email"]);
-  $zip = stripslashes($contact["zip"]);
-  $town = stripslashes($contact["town"]);
-  $ctry = $contact["country"];
-  $dsrc = $contact["datasource"];
-  $func = $contact["function"];
-  $title = $contact["title"];
-  $mark = $contact["market"];
+  $lname = stripslashes($contact['lname']);
+  $fname = stripslashes($contact['fname']);
+  $phone = stripslashes($contact['phone']);
+  $company = stripslashes($contact['company']);
+  $email = stripslashes($contact['email']);
+  $zip = stripslashes($contact['zip']);
+  $town = stripslashes($contact['town']);
+  $ctry = $contact['country'];
+  $dsrc = $contact['datasource'];
+  $func = $contact['function'];
+  $title = $contact['title'];
+  $mark = $contact['market'];
   $date_field = ($contact['date_field'] ? $contact['date_field'] : 'timeupdate');
-  $dateafter = of_date_upd_format(stripslashes($contact["date_after"]),true);
-  $datebefore = of_date_upd_format(stripslashes($contact["date_before"]),true);
-  $mailing_ok_only = ($contact["mailing_ok_only"] == "1" ? "checked = \"checked\"" : "");
-  $newsletter = ($contact["newsletter"] == "1" ? "checked = \"checked\"" : "");
-  $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
-  if (($contact["fuzzy"] == "1") ||
-      ($csearch_advanced_default && $action != "search") ) {
+  $dateafter = of_date_upd_format(stripslashes($contact['date_after']),true);
+  $datebefore = of_date_upd_format(stripslashes($contact['date_before']),true);
+  $mailing_ok_only = ($contact['mailing_ok_only'] == '1' ? "checked = \"checked\"" : '');
+  $newsletter = ($contact['newsletter'] == '1' ? "checked = \"checked\"" : '');
+  $archive = ($contact['archive'] == '1' ? "checked = \"checked\"" : '');
+  if (($contact['fuzzy'] == '1') ||
+      ($csearch_advanced_default && $action != 'search') ) {
     $fuzzy = "checked = \"checked\"";
   } else {
-    $fuzzy = "";
+    $fuzzy = '';
   }
-  $company_id = $contact["company_id"];
+  $company_id = $contact['company_id'];
 
-  $show_func = (! $cgp_hide["contact"]["function"]);
-  $show_title = (! $cgp_hide["contact"]["contact_title"]);
-  $show_resp = (! $cgp_hide["contact"]["responsible"]);
+  $show_func = (! $cgp_hide['contact']['function']);
+  $show_title = (! $cgp_hide['contact']['contact_title']);
+  $show_resp = (! $cgp_hide['contact']['responsible']);
   $show_date = (! $cgp_hide['contact']['contact_date']);
 
   // User defined data
-  $block_userdata .= of_userdata_dis_search("contact", $contact);
+  $block_userdata .= of_userdata_dis_search('contact', $contact);
 
   // Selected date field
   $s_date_field[$date_field] = "selected=\"selected\"";
@@ -403,18 +403,18 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   }
   
   // Function select
-  $block_function = of_category_dis_search_select("contact", "function", $funcs, $func);
+  $block_function = of_category_dis_search_select('contact', 'function', $funcs, $func);
 
   // Data source select
   $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
     <option value=\"$c_all\">$l_all</option>";
   while ($dsrc_q->next_record()) {
-    $d_id = $dsrc_q->f("datasource_id");
+    $d_id = $dsrc_q->f('datasource_id');
     $sel_dsrc .= "\n<option value=\"$d_id\"";
     if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
-    $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
+    $sel_dsrc .= '>'. $dsrc_q->f('datasource_name') . "</option>\n";
   }
-  $sel_dsrc .= "</select>";
+  $sel_dsrc .= '</select>';
 
   // Title Block
   if ($show_title) {
@@ -430,13 +430,13 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
       <option value=\"$c_all\">$l_all</option>";
     while ($usr_q->next_record()) {
-      $u_id = $usr_q->f("userobm_id");
-      $u_name = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+      $u_id = $usr_q->f('userobm_id');
+      $u_name = $usr_q->f('userobm_lastname').' '.$usr_q->f('userobm_firstname');
       $sel_market .= "\n<option value=\"$u_id\"";
       if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
       $sel_market .= ">$u_name</option>";
     }
-    $sel_market .= "</select>";
+    $sel_market .= '</select>';
 
     $block_resp = "
     <label>$l_market<br />
@@ -448,22 +448,22 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   $sel_ctry = "<select id=\"sel_country\" name=\"sel_country\">
     <option value=\"$c_all\">$l_all</option>";
   while ($ctry_q->next_record()) {
-    $ctry_iso3166 = $ctry_q->f("country_iso3166");
+    $ctry_iso3166 = $ctry_q->f('country_iso3166');
     $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";
     if ($ctry_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
-    $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
+    $sel_ctry .= '>'. $ctry_q->f('country_name') . "</option>\n";
   }
-  $sel_ctry .= "</select>";
+  $sel_ctry .= '</select>';
 
   if ($popup) {
-    $ext_action = $contact["ext_action"];
-    $ext_type = $contact["ext_type"];
-    $ext_url = $contact["ext_url"];
-    $ext_id = $contact["ext_id"];
-    $ext_title = $contact["ext_title"];
-    $ext_target = $contact["ext_target"];
-    $ext_widget = $contact["ext_widget"];
-    $ext_widget_text = $contact["ext_widget_text"];
+    $ext_action = $contact['ext_action'];
+    $ext_type = $contact['ext_type'];
+    $ext_url = $contact['ext_url'];
+    $ext_id = $contact['ext_id'];
+    $ext_title = $contact['ext_title'];
+    $ext_target = $contact['ext_target'];
+    $ext_widget = $contact['ext_widget'];
+    $ext_widget_text = $contact['ext_widget_text'];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_type\" type=\"hidden\" value=\"$ext_type\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
@@ -472,7 +472,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display['title'] = "<div class=\"title\">$ext_title</div>";
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -559,15 +559,15 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
 function dis_contact_search_list($contact) {
   global $display, $l_found, $l_no_found, $obm;
 
-  $popup = $contact["popup"];
+  $popup = $contact['popup'];
 
-  $prefs = get_display_pref($obm["uid"], "contact");
+  $prefs = get_display_pref($obm['uid'], 'contact');
   $obm_q = run_query_contact_search($contact);
   $nb_contact = $obm_q->num_rows_total();
   if ($nb_contact == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found);
+    $display['msg'] .= display_warn_msg($l_no_found);
   } else {
-    $display["msg"] .= display_info_msg("$nb_contact $l_found");
+    $display['msg'] .= display_info_msg("$nb_contact $l_found");
     $block = html_contact_search_list($obm_q, $prefs, $contact, $popup);
   }
 
@@ -588,48 +588,48 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   global $l_add, $l_close;
 
   if ($popup) {
-    $ext_action = $contact["ext_action"];
-    $ext_type = $contact["ext_type"];
-    $ext_url = $contact["ext_url"];
-    $ext_id = $contact["ext_id"];
-    $ext_target = $contact["ext_target"];
-    $ext_widget = $contact["ext_widget"];
-    $ext_widget_text = $contact["ext_widget_text"];
+    $ext_action = $contact['ext_action'];
+    $ext_type = $contact['ext_type'];
+    $ext_url = $contact['ext_url'];
+    $ext_id = $contact['ext_id'];
+    $ext_target = $contact['ext_target'];
+    $ext_widget = $contact['ext_widget'];
+    $ext_widget_text = $contact['ext_widget_text'];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_type=$ext_type&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
   }
 
   // we urlencode to avoid breakage for space char
-  $datasource = $contact["datasource"];
-  $archive = $contact["archive"];
-  $advanced = $contact["fuzzy"];
-  $mailng_ok_only = $contact["mailng_ok_only"];
-  $lname = urlencode(stripslashes($contact["lname"]));
-  $fname = stripslashes($contact["fname"]);
-  $phone = urlencode(stripslashes($contact["phone"]));
-  $email = stripslashes($contact["email"]);
-  $zip = stripslashes($contact["zip"]);
-  $town = stripslashes($contact["town"]);
-  $ctry = $contact["country"];
-  $dateafter = stripslashes($contact["date_after"]);
-  $datebefore = stripslashes($contact["date_before"]);
-  $company = urlencode(stripslashes($contact["company"]));
-  $company_id = $contact["company_id"];
-  $func = $contact["function"];
-  $title = urlencode(stripslashes($contact["title"]));
-  $mark = $contact["market"];
+  $datasource = $contact['datasource'];
+  $archive = $contact['archive'];
+  $advanced = $contact['fuzzy'];
+  $mailng_ok_only = $contact['mailng_ok_only'];
+  $lname = urlencode(stripslashes($contact['lname']));
+  $fname = stripslashes($contact['fname']);
+  $phone = urlencode(stripslashes($contact['phone']));
+  $email = stripslashes($contact['email']);
+  $zip = stripslashes($contact['zip']);
+  $town = stripslashes($contact['town']);
+  $ctry = $contact['country'];
+  $dateafter = stripslashes($contact['date_after']);
+  $datebefore = stripslashes($contact['date_before']);
+  $company = urlencode(stripslashes($contact['company']));
+  $company_id = $contact['company_id'];
+  $func = $contact['function'];
+  $title = urlencode(stripslashes($contact['title']));
+  $mark = $contact['market'];
 
   // User defined data
-  $url_userdata = of_userdata_get_url_search_params("contact", $contact);
+  $url_userdata = of_userdata_get_url_search_params('contact', $contact);
 
   $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
 
-  $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
+  $dis_contact = new OBM_DISPLAY('DATA', $prefs, 'contact');
   if ($popup) {
     $dis_contact->display_link = false;
-    if ($contact["ext_type"] == "multi") {
-      $dis_contact->data_cb_text = "X";
-      $dis_contact->data_idfield = "contact_id";
-      $dis_contact->data_cb_name = "cb_con";
+    if ($contact['ext_type'] == 'multi') {
+      $dis_contact->data_cb_text = 'X';
+      $dis_contact->data_idfield = 'contact_id';
+      $dis_contact->data_cb_name = 'cb_con';
       $dis_contact->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
       $dis_contact->data_form_end = "
@@ -647,10 +647,10 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";
     } else {
-      if ($ext_url != "") {
-	$dis_contact->display_ext = "get_id_url";
-      } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
-	$dis_contact->display_ext = "get_id";
+      if ($ext_url != '') {
+	$dis_contact->display_ext = 'get_id_url';
+      } else if ( ($ext_widget != '') && ($ext_widget_text != '') ) { 
+	$dis_contact->display_ext = 'get_id';
       }
       $display_popup_end = "<a href=\"\" onclick='window.close();'>$l_close</a>";
     }
@@ -658,10 +658,10 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
 
   $dis_contact->data_set = $obm_q;
   $dis_contact->data_url = $url;
-  $dis_contact->data_header = "both";
+  $dis_contact->data_header = 'both';
 
   // --- HTML Template --------------------------------------------------------
-  $block .= $dis_contact->display("dis_data_contact");
+  $block .= $dis_contact->display('dis_data_contact');
   $block .= $display_popup_end;
 
   return $block;
@@ -676,20 +676,20 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
 function dis_contact_consult($contact) {
   global $display, $l_no_found, $path, $l_err_reference;
 
-  $view = $contact["view"];
-  $id = $contact["contact_id"];
+  $view = $contact['view'];
+  $id = $contact['contact_id'];
   $con_q = run_query_contact_detail($id);
   if ($con_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_err_msg($l_err_reference);
   }
-  $display["detailInfo"] = display_record_info($con_q);
-  $display["link"] = html_contact_links($id);
-  $funcs = of_category_get_entitycategories("contact", "function", $id, "mono");
+  $display['detailInfo'] = display_record_info($con_q);
+  $display['link'] = html_contact_links($id);
+  $funcs = of_category_get_entitycategories('contact', 'function', $id, 'mono');
   $block .= html_contact_header($con_q, $funcs);
 
-  if ($view != "") {
-    include("$path/$view/".$view."_display.inc");
-    include("$path/$view/".$view."_query.inc");
+  if ($view != '') {
+    include("$path/$view/".$view.'_display.inc');
+    include("$path/$view/".$view.'_query.inc');
     $block .= dis_publication_subscription_external_list($contact);
   } else {
     $block .= html_contact_view_main($con_q);
@@ -711,46 +711,46 @@ function html_contact_header($co_q, $funcs) {
   global $cgp_show, $cgp_hide, $l_yes, $l_no;
   global $display, $path, $action;
 
-  $c_id = $co_q->f("contact_company_id");
-  $c_name = $co_q->f("company_name");
-  $id = $co_q->f("contact_id");
-  $kind_minilabel = $co_q->f("kind_minilabel");
-  $kind = "[" . $co_q->f("kind_lang") . "] $kind_minilabel";
-  $kind_header = $co_q->f("kind_header");
+  $c_id = $co_q->f('contact_company_id');
+  $c_name = $co_q->f('company_name');
+  $id = $co_q->f('contact_id');
+  $kind_minilabel = $co_q->f('kind_minilabel');
+  $kind = "[" . $co_q->f('kind_lang') . "] $kind_minilabel";
+  $kind_header = $co_q->f('kind_header');
   if ($kind_header != $kind) $kind .= " ($kind_header)";
-  $function = $co_q->f("function_label");
-  $title = $co_q->f("contact_title");
-  $market = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
-  $lname = $co_q->f("contact_lastname");
-  $fname = $co_q->f("contact_firstname");
-  $aka = $co_q->f("contact_aka");
-  $archive = ($co_q->f("contact_archive") == 1 ? $l_yes : $l_no);
-  $date = $co_q->f("contact_date");
+  $function = $co_q->f('function_label');
+  $title = $co_q->f('contact_title');
+  $market = $co_q->f('market_lname') . ' ' . $co_q->f('market_fname');
+  $lname = $co_q->f('contact_lastname');
+  $fname = $co_q->f('contact_firstname');
+  $aka = $co_q->f('contact_aka');
+  $archive = ($co_q->f('contact_archive') == 1 ? $l_yes : $l_no);
+  $date = $co_q->f('contact_date');
   $date = ($date != 0) ? of_date_format($date) : $l_no_date; 
  
   // Display Aka only if non empty
-  if ($aka != "") {
+  if ($aka != '') {
     $dis_aka = "
     <tr> 
       <th>$l_aka</th>
       <td>$aka</td>
     </tr>";
   } else {
-    $dis_aka = "";
+    $dis_aka = '';
   }
 
   // Conditionnal fields
-  $show_title = (! $cgp_hide["contact"]["contact_title"]);
-  $show_resp = (! $cgp_hide["contact"]["responsible"]);
-  $show_date = (! $cgp_hide["contact"]["contact_date"]);
+  $show_title = (! $cgp_hide['contact']['contact_title']);
+  $show_resp = (! $cgp_hide['contact']['responsible']);
+  $show_date = (! $cgp_hide['contact']['contact_date']);
 
-  $display["title"] = "<h1 class=\"title\">$l_contact : $lname $fname</h1>";
+  $display['title'] = "<h1 class=\"title\">$l_contact : $lname $fname</h1>";
 
   // Function
-  $block_function = of_category_dis_block_consult("contact", "function", $funcs, "mono");
+  $block_function = of_category_dis_block_consult('contact', 'function', $funcs, 'mono');
 
   // Company Display
-  if ($cgp_show["module"]["company"]) {
+  if ($cgp_show['module']['company']) {
     $dis_company = "<a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\"> $c_name</a>";
   } else {
     $dis_company = $c_name;
@@ -829,147 +829,147 @@ function html_contact_view_main($co_q) {
   global $ico_clipboard, $l_yes, $l_no,  $ico_mail;
   global $display, $cgp_show, $cgp_hide, $cclipboard_address;
 
-  $id = $co_q->f("contact_id");
-  $title = $co_q->f("contact_title");
-  $c_name = $co_q->f("company_name");
-  $c_phone = $co_q->f("company_phone");
-  $c_fax = $co_q->f("company_fax");
-  $c_ad1 = $co_q->f("company_address1");
-  $c_ad2 = $co_q->f("company_address2");
-  $c_ad3 = $co_q->f("company_address3");
-  $c_zip = $co_q->f("company_zipcode");
-  $c_town = $co_q->f("company_town");
-  $c_cdx = $co_q->f("company_expresspostal");
-  $c_ctry_name = $co_q->f("company_country_name");
-  $kind_minilabel = $co_q->f("kind_minilabel");
-  $lname = $co_q->f("contact_lastname");
-  $fname = $co_q->f("contact_firstname");
-  $service = $co_q->f("contact_service");
-  $ad1 = $co_q->f("contact_address1");
-  $ad2 = $co_q->f("contact_address2");
-  $ad3 = $co_q->f("contact_address3");
-  $zip = $co_q->f("contact_zipcode");
-  $town = $co_q->f("contact_town");
-  $cdx = $co_q->f("contact_expresspostal");
-  $ctry_name = $co_q->f("country_name");
-  $phone = trim($co_q->f("contact_phone"));
-  $hphone = $co_q->f("contact_homephone");
-  $mphone = $co_q->f("contact_mobilephone");
-  $fax = $co_q->f("contact_fax");
-  $email = $co_q->f("contact_email");
-  $email2 = $co_q->f("contact_email2");
-  $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $l_yes : $l_no);
-  $newsletter = ($co_q->f("contact_newsletter") == 1 ? $l_yes : $l_no);
-  $com  = beautify_comment(nl2br($co_q->f("contact_comment")));
-  $com2 = beautify_comment(nl2br($co_q->f("contact_comment2")));
-  $com3 = beautify_comment(nl2br($co_q->f("contact_comment3")));
+  $id = $co_q->f('contact_id');
+  $title = $co_q->f('contact_title');
+  $c_name = $co_q->f('company_name');
+  $c_phone = $co_q->f('company_phone');
+  $c_fax = $co_q->f('company_fax');
+  $c_ad1 = $co_q->f('company_address1');
+  $c_ad2 = $co_q->f('company_address2');
+  $c_ad3 = $co_q->f('company_address3');
+  $c_zip = $co_q->f('company_zipcode');
+  $c_town = $co_q->f('company_town');
+  $c_cdx = $co_q->f('company_expresspostal');
+  $c_ctry_name = $co_q->f('company_country_name');
+  $kind_minilabel = $co_q->f('kind_minilabel');
+  $lname = $co_q->f('contact_lastname');
+  $fname = $co_q->f('contact_firstname');
+  $service = $co_q->f('contact_service');
+  $ad1 = $co_q->f('contact_address1');
+  $ad2 = $co_q->f('contact_address2');
+  $ad3 = $co_q->f('contact_address3');
+  $zip = $co_q->f('contact_zipcode');
+  $town = $co_q->f('contact_town');
+  $cdx = $co_q->f('contact_expresspostal');
+  $ctry_name = $co_q->f('country_name');
+  $phone = trim($co_q->f('contact_phone'));
+  $hphone = $co_q->f('contact_homephone');
+  $mphone = $co_q->f('contact_mobilephone');
+  $fax = $co_q->f('contact_fax');
+  $email = $co_q->f('contact_email');
+  $email2 = $co_q->f('contact_email2');
+  $mailok = ($co_q->f('contact_mailing_ok') == 1 ? $l_yes : $l_no);
+  $newsletter = ($co_q->f('contact_newsletter') == 1 ? $l_yes : $l_no);
+  $com  = beautify_comment(nl2br($co_q->f('contact_comment')));
+  $com2 = beautify_comment(nl2br($co_q->f('contact_comment2')));
+  $com3 = beautify_comment(nl2br($co_q->f('contact_comment3')));
 
   $newline = "\\r\\n";
-  if (($ad1 == "") && ($ad2 == "") && ($ad3 == "") && ($zip == "")
-      && ($town == "") && ($cdx == "") && ($ctry_name == "")) {
-    $ad1 = ("$c_ad1" != "" ? "( $c_ad1 )" : "");
-    $ad2 = ("$c_ad2" != "" ? "( $c_ad2 )" : "");
-    $ad3 = ("$c_ad3" != "" ? "( $c_ad3 )" : "");
-    $zip = ("$c_zip" != "" ? "( $c_zip )" : "");
-    $town = ("$c_town" != "" ? "( $c_town )" : "");
-    $cdx = ("$c_cdx" != "" ? "( $c_cdx )" : "");
+  if (($ad1 == '') && ($ad2 == '') && ($ad3 == '') && ($zip == '')
+      && ($town == '') && ($cdx == '') && ($ctry_name == '')) {
+    $ad1 = ("$c_ad1" != '' ? "( $c_ad1 )" : '');
+    $ad2 = ("$c_ad2" != '' ? "( $c_ad2 )" : '');
+    $ad3 = ("$c_ad3" != '' ? "( $c_ad3 )" : '');
+    $zip = ("$c_zip" != '' ? "( $c_zip )" : '');
+    $town = ("$c_town" != '' ? "( $c_town )" : '');
+    $cdx = ("$c_cdx" != '' ? "( $c_cdx )" : '');
     $ctry_name = $c_ctry_name;
-    if (($c_ad1 != "") && (in_array("address1", $cclipboard_address))) {
+    if (($c_ad1 != '') && (in_array('address1', $cclipboard_address))) {
       $copy_addr_comp .= addslashes($c_ad1).$newline;
     }
-    if (($c_ad2 != "") && (in_array("address2", $cclipboard_address))) {
+    if (($c_ad2 != '') && (in_array('address2', $cclipboard_address))) {
       $copy_addr_comp .= addslashes($c_ad2).$newline;
     }
-    if (($c_ad3 != "") && (in_array("address3", $cclipboard_address))) {
+    if (($c_ad3 != '') && (in_array('address3', $cclipboard_address))) {
       $copy_addr_comp .= addslashes($c_ad3).$newline;
     }
-    if (($c_zip != "") && (in_array("zipcode", $cclipboard_address))) {
+    if (($c_zip != '') && (in_array('zipcode', $cclipboard_address))) {
       $copy_addr_comp .= addslashes($c_zip);
       $copy_zip = true;
     }
-    if (($c_town != "") && (in_array("town", $cclipboard_address))) {
-      $copy_addr_comp .= ($copy_zip ? " " : "") . addslashes($c_town);
+    if (($c_town != '') && (in_array('town', $cclipboard_address))) {
+      $copy_addr_comp .= ($copy_zip ? ' ' : '') . addslashes($c_town);
       $copy_town = true;
     }
     if ($copy_zip || $copy_town) {
       $copy_addr_comp .= $newline;
     }
-    if (($c_cdx != "") && (in_array("expresspostal", $cclipboard_address))) {
+    if (($c_cdx != '') && (in_array('expresspostal', $cclipboard_address))) {
       $copy_addr_comp .= addslashes($c_cdx).$newline;
     }
-    if (($c_ctry_name != "") && (in_array("country", $cclipboard_address))) {
+    if (($c_ctry_name != '') && (in_array('country', $cclipboard_address))) {
       $copy_addr_comp .= addslashes($c_ctry_name).$newline;
     }
   }
-  if ( (($phone == "") && ($c_phone != "")) ||
-       (($phone != "") && ($phone == $c_phone)) ) {
+  if ( (($phone == '') && ($c_phone != '')) ||
+       (($phone != '') && ($phone == $c_phone)) ) {
     $phone = "( $c_phone )";
   }
-  if ( (($fax == "") && ($c_fax != "")) ||
-       (($fax != "") && ($fax == $c_fax)) ) {
+  if ( (($fax == '') && ($c_fax != '')) ||
+       (($fax != '') && ($fax == $c_fax)) ) {
     $fax = "( $c_fax )";
   }
 
   // Conditionnal fields
-  $show_service = (! $cgp_hide["contact"]["contact_service"]);
-  $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
-  $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
-  $show_comment2 = (! $cgp_hide["contact"]["contact_comment2"]);
-  $show_comment3 = (! $cgp_hide["contact"]["contact_comment3"]);
+  $show_service = (! $cgp_hide['contact']['contact_service']);
+  $show_ad3 = (! $cgp_hide['contact']['contact_address3']);
+  $show_cdx = (! $cgp_hide['contact']['contact_expresspostal']);
+  $show_comment2 = (! $cgp_hide['contact']['contact_comment2']);
+  $show_comment3 = (! $cgp_hide['contact']['contact_comment3']);
 
   // User defined data
-  $block_userdata .= of_userdata_dis_entity_consult("contact", $id);
+  $block_userdata .= of_userdata_dis_entity_consult('contact', $id);
 
   $copy = addslashes("$kind_minilabel $fname $lname") . $newline;
-  if (($title != "")  && (in_array("title", $cclipboard_address))) {
+  if (($title != '')  && (in_array('title', $cclipboard_address))) {
     $copy .= addslashes($title) . $newline;
   }
-  if ($c_name != "") {
+  if ($c_name != '') {
     $copy .= addslashes($c_name) . $newline;
   }
-  if ($service != "") {
+  if ($service != '') {
     $copy .= addslashes($service) . $newline;
   }
   // If contact address is empty, get the company one
-  if ($copy_addr_comp != "") {
+  if ($copy_addr_comp != '') {
     $copy .= $copy_addr_comp;
   } else {
-    if (($ad1 != "") && (in_array("address1", $cclipboard_address))) {
+    if (($ad1 != '') && (in_array('address1', $cclipboard_address))) {
       $copy .= addslashes($ad1).$newline;
     }
-    if (($ad2 != "") && (in_array("address2", $cclipboard_address))) {
+    if (($ad2 != '') && (in_array('address2', $cclipboard_address))) {
       $copy .= addslashes($ad2).$newline;
     }
-    if (($ad3 != "") && (in_array("address3", $cclipboard_address))) {
+    if (($ad3 != '') && (in_array('address3', $cclipboard_address))) {
       $copy .= addslashes($ad3).$newline;
     }
     $copy_zip = false;
     $copy_town = false;
-    if (($zip != "") && (in_array("zipcode", $cclipboard_address))) {
+    if (($zip != '') && (in_array('zipcode', $cclipboard_address))) {
       $copy .= addslashes($zip);
       $copy_zip = true;
     }
-    if (($town != "") && (in_array("town", $cclipboard_address))) {
-      $copy .= ($copy_zip ? " " : "") . addslashes($town);
+    if (($town != '') && (in_array('town', $cclipboard_address))) {
+      $copy .= ($copy_zip ? ' ' : '') . addslashes($town);
       $copy_town = true;
     }
     if ($copy_zip || $copy_town) {
       $copy .= $newline;
     }
-    if (($ctry_name != "") && (in_array("country", $cclipboard_address))) {
+    if (($ctry_name != '') && (in_array('country', $cclipboard_address))) {
       $copy .= addslashes($ctry_name).$newline;
     }
   }
-  if (($phone != "") && (in_array("phone", $cclipboard_address))) {
+  if (($phone != '') && (in_array('phone', $cclipboard_address))) {
     $copy .= "$l_phone : " . addslashes($phone).$newline;
   }
-  if (($fax != "") && (in_array("fax", $cclipboard_address))) {
+  if (($fax != '') && (in_array('fax', $cclipboard_address))) {
     $copy .= "$l_fax : " . addslashes($fax).$newline;
   }
-  if (($mphone != "") && (in_array("mobile", $cclipboard_address))) {
+  if (($mphone != '') && (in_array('mobile', $cclipboard_address))) {
     $copy .= "$l_mphone : " . addslashes($mphone).$newline;
   }
-  if (($email != "") && (in_array("email", $cclipboard_address))) {
+  if (($email != '') && (in_array('email', $cclipboard_address))) {
     $copy .= "$l_email : " . addslashes($email).$newline;
   }
 
@@ -997,14 +997,14 @@ function html_contact_view_main($co_q) {
       <td>$cdx</td>";
   }
 
-  if ($email != "") {
+  if ($email != '') {
     $link_email = "
       <a href=\"mailto:$email\">
       <img src=\"$ico_mail\" alt=\"C\" />
       </a>";
   }
 
-  if ($email2 != "") {
+  if ($email2 != '') {
     $link_email2 = "
       <a href=\"mailto:$email2\">
       <img src=\"$ico_mail\" alt=\"C\" />
@@ -1112,11 +1112,11 @@ function html_contact_links($id) {
   global $path, $cgp_show;
 
   // Deal
-  if ($cgp_show["module"]["deal"]) {
+  if ($cgp_show['module']['deal']) {
     $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;contact_id=$id");
     $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;contact_id=$id&amp;cba_archive=1");
-    $deal_active = get_global_linked_deal_nb($id, "contact1", false, "contact2");
-    $deal_total = get_global_linked_deal_nb($id, "contact1", true, "contact2");
+    $deal_active = get_global_linked_deal_nb($id, 'contact1', false, 'contact2');
+    $deal_total = get_global_linked_deal_nb($id, 'contact1', true, 'contact2');
     $block_deal = "
   <div  class=\"portlet\" id=\"contactDeal\">
   <h1>$l_module_deal</h1>
@@ -1130,7 +1130,7 @@ function html_contact_links($id) {
   }
 
   // List
-  if ($cgp_show["module"]["list"]) {
+  if ($cgp_show['module']['list']) {
     $url_list = url_prepare("$path/list/list_index.php?action=search&amp;contact_id=$id");
     $list_nb = get_linked_contact_list_nb($id);
     $block_list = "
@@ -1144,9 +1144,9 @@ function html_contact_links($id) {
   }
 
   // Contract
-  if ($cgp_show["module"]["contract"]) {
-    $contract_active = get_global_linked_contract_nb($id,"contact1",false,"contact2");
-    $contract_total = get_global_linked_contract_nb($id,"contact1",true,"contact2");
+  if ($cgp_show['module']['contract']) {
+    $contract_active = get_global_linked_contract_nb($id,'contact1',false,'contact2');
+    $contract_total = get_global_linked_contract_nb($id,'contact1',true,'contact2');
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;contact_id=$id");
     $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;contact_id=$id&amp;cba_archive=1");
     $block_contract = "
@@ -1162,11 +1162,11 @@ function html_contact_links($id) {
   }
 
   // Document  
-  if ($cgp_show["module"]["document"]) {
+  if ($cgp_show['module']['document']) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=contact");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=contact");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
-    $nb_document = run_query_global_document_nb ($id, "contact");
+    $nb_document = run_query_global_document_nb ($id, 'contact');
     $block_doc = "
   <div  class=\"portlet\" id=\"contactDocument\">  
   <h1>$l_module_document</h1>
@@ -1184,8 +1184,8 @@ function html_contact_links($id) {
   </div>";
   }
 
-  // Publication  
-  if ($cgp_show["module"]["publication"]) {
+  // Publication
+  if ($cgp_show['module']['publication']) {
     $nb_subscription = run_query_contact_subscription_nb($id);
     $url_subscription = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;view=publication&amp;contact_id=$id");
     $url = urlencode($url_subscription);
@@ -1224,27 +1224,26 @@ function html_contact_links($id) {
  * @return string XHTML contact form
  */
 function dis_contact_form($action, $co_q, $contact) {
-  global $display, $cg_com, $cgp_hide, $obm;
+  global $display, $cgp_hide, $obm;
 
-  $cid = $contact["contact_id"];
+  $cid = $contact['contact_id'];
   $dsrc_q = run_query_global_datasource();
   $kind_q = run_query_contact_kind();
-  $funcs = of_category_get_ordered("contact", "function");
+  $funcs = of_category_get_ordered('contact', 'function');
 
-  $users = array($obm["uid"]);
+  $uids = array($obm['uid']);
 
-  if ($contact["market"] > 0) {
-    $users[] = $contact["market"];
+  if ($contact['market'] > 0) {
+    $uids[] = $contact['market'];
   }
   if (is_object($co_q)) {
-    $users[] = $co_q->f("contact_marketingmanager_id");
-  } elseif($contact["market"]) {
-    $users[] = $contact["market"];
+    $uids[] = $co_q->f('contact_marketingmanager_id');
+  } elseif($contact['market']) {
+    $uids[] = $contact['market'];
   }
-
-  $usr_q = run_query_all_users_from_group($cg_com, $users);
+  $users = of_usergroup_get_group_users($obm['group_com'], true, $uids);
   $ctry_q = run_query_global_country_for_lang();
-  $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact);
+  $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact);
 
   return $block;
 }
@@ -1255,22 +1254,20 @@ function dis_contact_form($action, $co_q, $contact) {
 // Parameters:
 //   - $action    : action called
 //   - $co_q      : contact database result (company detail on new)
-//   - $dsrc_q    : datasource database result 
-//   - $funcs     : Contact function array 
-//   - $kind_q    : kind database result 
-//   - $usr_q     : active userobm database result 
-//   - $ctry_q    : country database result 
+//   - $dsrc_q    : datasource database result
+//   - $funcs     : Contact function array
+//   - $kind_q    : kind database result
+//   - $users     : userobm list
+//   - $ctry_q    : country database result
 //   - $contact[] : default values
-//     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
-//                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact) {
+function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact) {
   global $ico_company, $l_company, $ico_add, $ico_crow, $l_header_new;
   global $cgp_mailing_default, $ccontact_private_default, $cright_write_admin;
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
   global $l_address, $l_town, $l_country, $l_service,$l_date, $l_no_date;
-  global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter; 
+  global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter;
   global $l_comment1, $l_add_comment1, $l_upd_comment1;
   global $l_comment2, $l_add_comment2, $l_upd_comment2;
   global $l_comment3, $l_add_comment3, $l_upd_comment3;
@@ -1279,69 +1276,69 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
   global $extra_js;
 
-  $uid = $obm["uid"];
+  $uid = $obm['uid'];
 
   // if update mode and first time values are taken from database
-  if ($action == "detailupdate") {
-    $id = $co_q->f("contact_id");
-    $c_id = $co_q->f("contact_company_id");
-    $c_name = $co_q->f("company_name");
-    $usercreate = $co_q->f("contact_usercreate");
-    $dsrc = $co_q->f("contact_datasource_id");
-    $kind = $co_q->f("contact_kind_id");
-    $mark = $co_q->f("contact_marketingmanager_id");
-    $date = $co_q->f("contact_date");
+  if ($action == 'detailupdate') {
+    $id = $co_q->f('contact_id');
+    $c_id = $co_q->f('contact_company_id');
+    $c_name = $co_q->f('company_name');
+    $usercreate = $co_q->f('contact_usercreate');
+    $dsrc = $co_q->f('contact_datasource_id');
+    $kind = $co_q->f('contact_kind_id');
+    $mark = $co_q->f('contact_marketingmanager_id');
+    $date = $co_q->f('contact_date');
     $date = of_date_upd_format($date, true);
-    $lname = $co_q->f("contact_lastname");
-    $fname = $co_q->f("contact_firstname");
-    $aka = $co_q->f("contact_aka");
-    $service = $co_q->f("contact_service");
-    $ad1 = $co_q->f("contact_address1");
-    $ad2 = $co_q->f("contact_address2");
-    $ad3 = $co_q->f("contact_address3");
-    $zip = $co_q->f("contact_zipcode");
-    $town = $co_q->f("contact_town");
-    $cdx = $co_q->f("contact_expresspostal");
-    $ctry = $co_q->f("contact_country_iso3166");
-    $func = $co_q->f("contact_function_id");
-    $title = $co_q->f("contact_title");
-    $phone = $co_q->f("contact_phone");
-    $hphone = $co_q->f("contact_homephone");
-    $mphone = $co_q->f("contact_mobilephone");
-    $fax = $co_q->f("contact_fax");
-    $email = $co_q->f("contact_email");
-    $email2 = $co_q->f("contact_email2");
-    $mailok = ($co_q->f("contact_mailing_ok") == 1 ? " checked" : "");
-    $newsletter = ($co_q->f("contact_newsletter") == 1 ? " checked" : "");
-    $archive = ($co_q->f("contact_archive") == 1 ? " checked" : "");
-    $priv = $co_q->f("privacy");
-    $comment = $co_q->f("contact_comment");
+    $lname = $co_q->f('contact_lastname');
+    $fname = $co_q->f('contact_firstname');
+    $aka = $co_q->f('contact_aka');
+    $service = $co_q->f('contact_service');
+    $ad1 = $co_q->f('contact_address1');
+    $ad2 = $co_q->f('contact_address2');
+    $ad3 = $co_q->f('contact_address3');
+    $zip = $co_q->f('contact_zipcode');
+    $town = $co_q->f('contact_town');
+    $cdx = $co_q->f('contact_expresspostal');
+    $ctry = $co_q->f('contact_country_iso3166');
+    $func = $co_q->f('contact_function_id');
+    $title = $co_q->f('contact_title');
+    $phone = $co_q->f('contact_phone');
+    $hphone = $co_q->f('contact_homephone');
+    $mphone = $co_q->f('contact_mobilephone');
+    $fax = $co_q->f('contact_fax');
+    $email = $co_q->f('contact_email');
+    $email2 = $co_q->f('contact_email2');
+    $mailok = ($co_q->f('contact_mailing_ok') == 1 ? ' checked' : '');
+    $newsletter = ($co_q->f('contact_newsletter') == 1 ? ' checked' : '');
+    $archive = ($co_q->f('contact_archive') == 1 ? ' checked' : '');
+    $priv = $co_q->f('privacy');
+    $comment = $co_q->f('contact_comment');
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
-    $comment2 = $co_q->f("contact_comment2");
+    $comment2 = $co_q->f('contact_comment2');
     $usercomment2 = $uid;
     $datecomment2 = of_date_upd_format();
-    $comment3 = $co_q->f("contact_comment3");
+    $comment3 = $co_q->f('contact_comment3');
     $usercomment3 = $uid;
     $datecomment3 = of_date_upd_format();
-    $c_phone = $co_q->f("company_phone");
-    $c_fax = $co_q->f("company_fax");
-    $c_ad1 = $co_q->f("company_address1");
-    $c_ad2 = $co_q->f("company_address2");
-    $c_ad3 = $co_q->f("company_address3");
-    $c_zip = $co_q->f("company_zipcode");
-    $c_town = $co_q->f("company_town");
-    $c_cdx = $co_q->f("company_expresspostal");
-    $c_ctry = $co_q->f("company_country_iso3166");
-    $c_ctry_name = $co_q->f("company_country_name");
+    $c_phone = $co_q->f('company_phone');
+    $c_fax = $co_q->f('company_fax');
+    $c_ad1 = $co_q->f('company_address1');
+    $c_ad2 = $co_q->f('company_address2');
+    $c_ad3 = $co_q->f('company_address3');
+    $c_zip = $co_q->f('company_zipcode');
+    $c_town = $co_q->f('company_town');
+    $c_cdx = $co_q->f('company_expresspostal');
+    $c_ctry = $co_q->f('company_country_iso3166');
+    $c_ctry_name = $co_q->f('company_country_name');
     $dis_title = "$lname $fname";
 
   // New form and first time
-  } elseif ($action == "new") {
+  } elseif ($action == 'new') {
     $kind = get_contact_kind_default();
     $dis_title = $l_header_new;
     $dsrc = $_SESSION['set_dsrc'];
-    $mark = $obm["uid"];
+    $mark = $obm['uid'];
     $date = of_date_upd_format();
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
@@ -1350,97 +1347,97 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $usercomment3 = $uid;
     $datecomment3 = of_date_upd_format();
     if ($ccontact_private_default) {
-      $private_c = " checked";
+      $private_c = ' checked';
     }
     if ($cgp_mailing_default) {
-      $mailok = " checked";
-      $newsletter = " checked";
+      $mailok = ' checked';
+      $newsletter = ' checked';
     }
     // if company given
     if (is_object($co_q)) {
       // fill the phone with company one
-      $c_phone = $co_q->f("company_phone");
-      $c_fax = $co_q->f("company_fax");
-      $c_ad1 = $co_q->f("company_address1");
-      $c_ad2 = $co_q->f("company_address2");
-      $c_ad3 = $co_q->f("company_address3");
-      $c_zip = $co_q->f("company_zipcode");
-      $c_town = $co_q->f("company_town");
-      $c_cdx = $co_q->f("company_expresspostal");
-      $c_ctry_name = $co_q->f("company_country_name");
-      $c_id = $co_q->f("company_id");
-      $c_name = $co_q->f("company_name");
+      $c_phone = $co_q->f('company_phone');
+      $c_fax = $co_q->f('company_fax');
+      $c_ad1 = $co_q->f('company_address1');
+      $c_ad2 = $co_q->f('company_address2');
+      $c_ad3 = $co_q->f('company_address3');
+      $c_zip = $co_q->f('company_zipcode');
+      $c_town = $co_q->f('company_town');
+      $c_cdx = $co_q->f('company_expresspostal');
+      $c_ctry_name = $co_q->f('company_country_name');
+      $c_id = $co_q->f('company_id');
+      $c_name = $co_q->f('company_name');
       $c_new_id = $c_id;
       $c_new_name = $c_name;
     }
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($contact["company_id"])) { $c_id = $contact["company_id"]; }
-  if (isset($contact["company_name"])) { $c_name = $contact["company_name"]; }
-  if (isset($contact["company_new_id"])) { $c_new_id = $contact["company_new_id"]; }
-  if (isset($contact["company_new_name"])) { $c_new_name = $contact["company_new_name"]; }
-  if (isset($contact["contact_id"])) { $id = $contact["contact_id"]; }
-  if (isset($contact["usercreate"])) { $usercreate = $contact["usercreate"]; }
-  if (isset($contact["datasource"])) { $dsrc = $contact["datasource"]; }
-  if (isset($contact["kind"])) { $kind = $contact["kind"]; }
-  if (isset($contact["market"])) { $mark = $contact["market"]; }
-  if (isset($contact["date"])) { $date = of_date_upd_format($contact["date"],true); }
-  if (isset($contact["lname"])) { $lname = stripslashes($contact["lname"]); }
-  if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
-  if (isset($contact["aka"])) { $aka = stripslashes($contact["aka"]); }
-  if (isset($contact["service"])) { $service = stripslashes($contact["service"]); }
-  if (isset($contact["ad1"])) { $ad1 = stripslashes($contact["ad1"]); }
-  if (isset($contact["ad2"])) { $ad2 = stripslashes($contact["ad2"]); }
-  if (isset($contact["ad3"])) { $ad3 = stripslashes($contact["ad3"]); }
-  if (isset($contact["zip"])) { $zip = stripslashes($contact["zip"]); }
-  if (isset($contact["town"])) { $town = stripslashes($contact["town"]); }
-  if (isset($contact["cdx"])) { $cdx = stripslashes($contact["cdx"]); }
-  if (isset($contact["ctry"])) { $ctry = $contact["country"]; }
-  if (isset($contact["function"])) { $func = $contact["function"]; }
-  if (isset($contact["title"])) { $title = stripslashes($contact["title"]); }
-  if (isset($contact["phone"])) { $phone = stripslashes($contact["phone"]); }
-  if (isset($contact["hphone"])) { $hphone = stripslashes($contact["hphone"]); }
-  if (isset($contact["mphone"])) { $mphone = stripslashes($contact["mphone"]); }
-  if (isset($contact["fax"])) { $fax = stripslashes($contact["fax"]); }
-  if (isset($contact["email"])) { $email = stripslashes($contact["email"]); }
-  if (isset($contact["email2"])) { $email2 = stripslashes($contact["email2"]); }
-  if (isset($contact["mailok"])) { $mailok = ($contact["mailok"] == 1 ? "checked" : ""); }
-  if (isset($contact["comment"])) { $comment = stripslashes($contact["comment"]); }
-  if (isset($contact["add_comment"])) { $add_comment = stripslashes($contact["add_comment"]); }
-  if (isset($contact["usercomment"])) { $usercomment = $contact["usercomment"]; }
-  if (isset($contact["datecomment"])) { $datecomment = of_date_upd_format($contact["datecomment"]); }
-  if (isset($contact["comment2"])) { $comment2 = stripslashes($contact["comment2"]); }
-  if (isset($contact["add_comment2"])) { $add_comment2 = stripslashes($contact["add_comment2"]); }
-  if (isset($contact["usercomment2"])) { $usercomment2 = $contact["usercomment2"]; }
-  if (isset($contact["datecomment2"])) { $datecomment2 = of_date_upd_format($contact["datecomment2"]); }
-  if (isset($contact["comment3"])) { $comment3 = stripslashes($contact["comment3"]); }
-  if (isset($contact["add_comment3"])) { $add_comment3 = stripslashes($contact["add_comment3"]); }
-  if (isset($contact["usercomment3"])) { $usercomment3 = $contact["usercomment3"]; }
-  if (isset($contact["datecomment3"])) { $datecomment3 = of_date_upd_format($contact["datecomment3"]); }
-  if (isset($contact["privacy"])) { $priv = stripslashes($contact["privacy"]); }
-  if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
+  if (isset($contact['company_id'])) { $c_id = $contact['company_id']; }
+  if (isset($contact['company_name'])) { $c_name = $contact['company_name']; }
+  if (isset($contact['company_new_id'])) { $c_new_id = $contact['company_new_id']; }
+  if (isset($contact['company_new_name'])) { $c_new_name = $contact['company_new_name']; }
+  if (isset($contact['contact_id'])) { $id = $contact['contact_id']; }
+  if (isset($contact['usercreate'])) { $usercreate = $contact['usercreate']; }
+  if (isset($contact['datasource'])) { $dsrc = $contact['datasource']; }
+  if (isset($contact['kind'])) { $kind = $contact['kind']; }
+  if (isset($contact['market'])) { $mark = $contact['market']; }
+  if (isset($contact['date'])) { $date = of_date_upd_format($contact['date'],true); }
+  if (isset($contact['lname'])) { $lname = stripslashes($contact['lname']); }
+  if (isset($contact['fname'])) { $fname = stripslashes($contact['fname']); }
+  if (isset($contact['aka'])) { $aka = stripslashes($contact['aka']); }
+  if (isset($contact['service'])) { $service = stripslashes($contact['service']); }
+  if (isset($contact['ad1'])) { $ad1 = stripslashes($contact['ad1']); }
+  if (isset($contact['ad2'])) { $ad2 = stripslashes($contact['ad2']); }
+  if (isset($contact['ad3'])) { $ad3 = stripslashes($contact['ad3']); }
+  if (isset($contact['zip'])) { $zip = stripslashes($contact['zip']); }
+  if (isset($contact['town'])) { $town = stripslashes($contact['town']); }
+  if (isset($contact['cdx'])) { $cdx = stripslashes($contact['cdx']); }
+  if (isset($contact['ctry'])) { $ctry = $contact['country']; }
+  if (isset($contact['function'])) { $func = $contact['function']; }
+  if (isset($contact['title'])) { $title = stripslashes($contact['title']); }
+  if (isset($contact['phone'])) { $phone = stripslashes($contact['phone']); }
+  if (isset($contact['hphone'])) { $hphone = stripslashes($contact['hphone']); }
+  if (isset($contact['mphone'])) { $mphone = stripslashes($contact['mphone']); }
+  if (isset($contact['fax'])) { $fax = stripslashes($contact['fax']); }
+  if (isset($contact['email'])) { $email = stripslashes($contact['email']); }
+  if (isset($contact['email2'])) { $email2 = stripslashes($contact['email2']); }
+  if (isset($contact['mailok'])) { $mailok = ($contact['mailok'] == 1 ? 'checked' : ''); }
+  if (isset($contact['comment'])) { $comment = stripslashes($contact['comment']); }
+  if (isset($contact['add_comment'])) { $add_comment = stripslashes($contact['add_comment']); }
+  if (isset($contact['usercomment'])) { $usercomment = $contact['usercomment']; }
+  if (isset($contact['datecomment'])) { $datecomment = of_date_upd_format($contact['datecomment']); }
+  if (isset($contact['comment2'])) { $comment2 = stripslashes($contact['comment2']); }
+  if (isset($contact['add_comment2'])) { $add_comment2 = stripslashes($contact['add_comment2']); }
+  if (isset($contact['usercomment2'])) { $usercomment2 = $contact['usercomment2']; }
+  if (isset($contact['datecomment2'])) { $datecomment2 = of_date_upd_format($contact['datecomment2']); }
+  if (isset($contact['comment3'])) { $comment3 = stripslashes($contact['comment3']); }
+  if (isset($contact['add_comment3'])) { $add_comment3 = stripslashes($contact['add_comment3']); }
+  if (isset($contact['usercomment3'])) { $usercomment3 = $contact['usercomment3']; }
+  if (isset($contact['datecomment3'])) { $datecomment3 = of_date_upd_format($contact['datecomment3']); }
+  if (isset($contact['privacy'])) { $priv = stripslashes($contact['privacy']); }
+  if (isset($contact['archive'])) { $archive = ($contact['archive'] == 1 ? 'checked' : ''); }
 
   // Conditionnal fields
-  $show_title = (! $cgp_hide["contact"]["contact_title"]);
-  $show_resp = (! $cgp_hide["contact"]["responsible"]);
-  $show_date = (! $cgp_hide["contact"]["contact_date"]);
-  $show_service = (! $cgp_hide["contact"]["contact_service"]);
-  $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
-  $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
-  $show_comment2 = (! $cgp_hide["contact"]["contact_comment2"]);
-  $show_comment3 = (! $cgp_hide["contact"]["contact_comment3"]);
+  $show_title = (! $cgp_hide['contact']['contact_title']);
+  $show_resp = (! $cgp_hide['contact']['responsible']);
+  $show_date = (! $cgp_hide['contact']['contact_date']);
+  $show_service = (! $cgp_hide['contact']['contact_service']);
+  $show_ad3 = (! $cgp_hide['contact']['contact_address3']);
+  $show_cdx = (! $cgp_hide['contact']['contact_expresspostal']);
+  $show_comment2 = (! $cgp_hide['contact']['contact_comment2']);
+  $show_comment3 = (! $cgp_hide['contact']['contact_comment3']);
 
   // User defined data
-  $block_userdata = of_userdata_dis_entity_form("contact", $id, $contact);
+  $block_userdata = of_userdata_dis_entity_form('contact', $id, $contact);
 
   // some constants
-  $csize_add = "48";
-  $cmax_add = "64";
-  $csize_phone = "24";
+  $csize_add = '48';
+  $cmax_add = '64';
+  $csize_phone = '24';
 
   // Function field
-  $block_function = of_category_dis_entity_form("contact", "function", $funcs, "mono", $func, "none");
+  $block_function = of_category_dis_entity_form('contact', 'function', $funcs, 'mono', $func, 'none');
 
   // Title field
   if ($show_title) {
@@ -1456,13 +1453,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     // Marketing manager select
     $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
       <option value=\"$c_undef\">$l_undef</option>";
-    while ($usr_q->next_record()) {
-      $u_id = $usr_q->f("userobm_id");
+    foreach ($users as $u_id => $one_user) {
       $sel_market .= "\n<option value=\"$u_id\"";
       if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
-      $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
+      $sel_market .= '>'. $one_user['lastname'].' '.$one_user['firstname'] . "</option>\n";
     }
-    $sel_market .= "</select>";
+    $sel_market .= '</select>';
 
     $block_resp = "
     <tr>
@@ -1486,22 +1482,22 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($dsrc_q->next_record()) {
-    $d_id = $dsrc_q->f("datasource_id");
+    $d_id = $dsrc_q->f('datasource_id');
     $sel_dsrc .= "\n<option value=\"$d_id\"";
     if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
-    $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
+    $sel_dsrc .= '>'. $dsrc_q->f('datasource_name') . "</option>\n";
   }
-  $sel_dsrc .= "</select>";
+  $sel_dsrc .= '</select>';
   if ($kind_q->nf()>0) {
     $i=0;
     $j=0;
     $k=0;
     $k_kind_js .= "lang_array = new Object();\n";
     while ($kind_q->next_record()) {
-      $k_id = $kind_q->f("kind_id");
-      $k_lang = $kind_q->f("kind_lang");
-      $k_label = $kind_q->f("kind_minilabel");
-      $k_header = $kind_q->f("kind_header");
+      $k_id = $kind_q->f('kind_id');
+      $k_lang = $kind_q->f('kind_lang');
+      $k_label = $kind_q->f('kind_minilabel');
+      $k_header = $kind_q->f('kind_header');
       if ($k_lang != $k_old_lang) {
 	$k_kind_js .= "lang_array[\"$k_lang\"] = new Object();\n";
 	$k_old_lang = $k_lang;
@@ -1556,9 +1552,9 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
       $sel_kind_lang .= ">$k_lang</option>";
     }
   }
-  $sel_kind_label .= "</select>";
-  $sel_kind_lang .= "</select>";
-  $sel_kind_header .= "</select>";
+  $sel_kind_label .= '</select>';
+  $sel_kind_lang .= '</select>';
+  $sel_kind_header .= '</select>';
   $script = "
     <script type=\"text/javascript\">
       $k_kind_js
@@ -1568,12 +1564,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   $sel_ctry = "<select name=\"sel_country\" id=\"sel_country\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($ctry_q->next_record()) {
-    $ctry_iso3166 = $ctry_q->f("country_iso3166");
+    $ctry_iso3166 = $ctry_q->f('country_iso3166');
     $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";
     if ($ctry_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
-    $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
+    $sel_ctry .= '>'. $ctry_q->f('country_name') . "</option>\n";
   }
-  $sel_ctry .= "</select>";
+  $sel_ctry .= '</select>';
 
   // Service field
   if ($show_service) {
@@ -1604,13 +1600,9 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   }
 
   // User comment select construction
-  if ($usr_q->nf()>0) {
-    $usr_q->seek(0);
-  }
-  $opt_usercomment = "";
-  while ($usr_q->next_record()) {
-    $cid = $usr_q->f("userobm_id");
-    $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+  $opt_usercomment = '';
+  foreach ($users as $cid => $one_user) {
+    $cname = $one_user['lastname'].' '.$one_user['firstname'];
     $opt_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
@@ -1621,7 +1613,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
 
   $sel_usercomment = "<select name=\"sel_usercomment\">$opt_usercomment</select>";
 
-  if (($action == "detailupdate") || ($action == "update")) {
+  if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_comment = "
         $l_upd_comment1
         <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>";
@@ -1664,7 +1656,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   }
 
   // Company Display
-  if ($cgp_show["module"]["company"]) {
+  if ($cgp_show['module']['company']) {
     $dis_company = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id") . "\">
       $c_name
       </a><input type=\"hidden\" name=\"company_id\" value=\"$c_id\" />
@@ -1682,17 +1674,17 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $display_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_private";
 
   // If new contact or contact update and user is owner, display visibility
-  } else if ( ($action == "new") || ($action == "insert") ||
-       ( (($action == "detailupdate") || ($action == "update")) &&
-         ($usercreate == $obm["uid"]) ) ) {
+  } else if ( ($action == 'new') || ($action == 'insert') ||
+       ( (($action == 'detailupdate') || ($action == 'update')) &&
+         ($usercreate == $obm['uid']) ) ) {
     if ($priv == '1') {
-      $private_c = " checked";
+      $private_c = ' checked';
     }
     $display_private = "<input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />";
   }
 
   // UPDATE 
-  if (($action == "detailupdate") || ($action == "update")) {
+  if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"contact_id\" value=\"$id\" />
@@ -1700,19 +1692,19 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
       <input type=\"submit\" value=\"$l_update\" />";
 
   // INSERT
-  } elseif (($action=="new") || ($action=="insert")) {
+  } elseif (($action == 'new') || ($action == 'insert')) {
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_contact : $dis_title</h1>";
+  $display['title'] = "<h1 class=\"title\">$l_contact : $dis_title</h1>";
 
   // --- HTML Template --------------------------------------------------------
   $block = "$script";
 
   $block .= "
-    <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare("contact_index.php")."\">
+    <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare('contact_index.php')."\">
 
     <fieldset class=\"detail infos\">
     <legend>$l_contact</legend>
@@ -1842,47 +1834,47 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $l_check_samecontact, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
-  $comp_id = ($contact["company_new_id"] ? $contact["company_new_id"] : $contact["company_id"]);
-  $lname = stripslashes($contact["lname"]);
-  $fname = stripslashes($contact["fname"]);
-  $kind = $contact["kind"];
-  $dsrc = $contact["datasource"];
-  $privacy = $contact["privacy"];
-  $func = $contact["function"];
-  $title = stripslashes($contact["title"]);
-  $mark = $contact["market"];
-  $service = stripslashes($contact["service"]);
-  $ad1 = stripslashes($contact["ad1"]);
-  $ad2 = stripslashes($contact["ad2"]);
-  $ad3 = stripslashes($contact["ad3"]);
-  $zip = stripslashes($contact["zip"]);
-  $town = stripslashes($contact["town"]);
-  $cdx = stripslashes($contact["cdx"]);
-  $ctry = $contact["country"];
-  $phone = stripslashes($contact["phone"]);
-  $hphone = stripslashes($contact["hphone"]);
-  $mphone = stripslashes($contact["mphone"]);
-  $fax = stripslashes($contact["fax"]);
-  $email = stripslashes($contact["email"]);
-  $email2 = stripslashes($contact["email2"]);
-  $mailok = $contact["mailok"];
-  $com = stripslashes($contact["comment"]);
-  $com2 = stripslashes($contact["comment2"]);
-  $com3 = stripslashes($contact["comment3"]);
-  $archive = $contact["archive"];
+  $comp_id = ($contact['company_new_id'] ? $contact['company_new_id'] : $contact['company_id']);
+  $lname = stripslashes($contact['lname']);
+  $fname = stripslashes($contact['fname']);
+  $kind = $contact['kind'];
+  $dsrc = $contact['datasource'];
+  $privacy = $contact['privacy'];
+  $func = $contact['function'];
+  $title = stripslashes($contact['title']);
+  $mark = $contact['market'];
+  $service = stripslashes($contact['service']);
+  $ad1 = stripslashes($contact['ad1']);
+  $ad2 = stripslashes($contact['ad2']);
+  $ad3 = stripslashes($contact['ad3']);
+  $zip = stripslashes($contact['zip']);
+  $town = stripslashes($contact['town']);
+  $cdx = stripslashes($contact['cdx']);
+  $ctry = $contact['country'];
+  $phone = stripslashes($contact['phone']);
+  $hphone = stripslashes($contact['hphone']);
+  $mphone = stripslashes($contact['mphone']);
+  $fax = stripslashes($contact['fax']);
+  $email = stripslashes($contact['email']);
+  $email2 = stripslashes($contact['email2']);
+  $mailok = $contact['mailok'];
+  $com = stripslashes($contact['comment']);
+  $com2 = stripslashes($contact['comment2']);
+  $com3 = stripslashes($contact['comment3']);
+  $archive = $contact['archive'];
 
   $disp_same_cont_head = "<h1>$l_check_samecontact</h1>";
   while ($co_q->next_record()) {
-    $id = $co_q->f("contact_id");
-    $samename = $co_q->f("contact_lastname")." ". $co_q->f("contact_firstname");
-    $company = $co_q->f("company_name");
+    $id = $co_q->f('contact_id');
+    $samename = $co_q->f('contact_lastname').' '. $co_q->f('contact_firstname');
+    $company = $co_q->f('company_name');
     $disp_same_cont .= "<li><a class=\"detail\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$id") . "\">
           $samename ($company)</a></li>";
 
   }
 
   // User defined data
-  $userdata = of_userdata_dis_hidden_fields("contact", $contact);
+  $userdata = of_userdata_dis_hidden_fields('contact', $contact);
 
   $hidden = "
     <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
@@ -1924,13 +1916,13 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     </div>
 
     <div class=\"buttons\">
-    <form method=\"post\" id=\"form_insert\" name=\"form_insert\" action=\"" .url_prepare("contact_index.php") . "\">
+    <form method=\"post\" id=\"form_insert\" name=\"form_insert\" action=\"" .url_prepare('contact_index.php') . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     $hidden
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
-    <form id=\"form_back\" name=\"form_back\" method=\"post\" action=\"" .url_prepare("contact_index.php") . "\">
+    <form id=\"form_back\" name=\"form_back\" method=\"post\" action=\"" .url_prepare('contact_index.php') . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     $hidden
     <input type=\"submit\" value=\"$l_back\" />
@@ -1957,7 +1949,7 @@ function dis_can_delete_contact($p_id) {
     $l_delete 
     </a>";
 
-  $display["msg"] .= display_ok_msg($l_can_delete);
+  $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
     <div class=\"buttons\">
@@ -1978,13 +1970,13 @@ function dis_contact_admin_index() {
   $kind_q = run_query_contact_kind();
   $block .= html_contact_kind_form($kind_q);
 
-  if (! $cgp_hide["contact"]["function"]) {
-    $funcs = of_category_get_ordered("contact", "function");
-    $block .= of_category_dis_admin_form("function", $funcs);
+  if (! $cgp_hide['contact']['function']) {
+    $funcs = of_category_get_ordered('contact', 'function');
+    $block .= of_category_dis_admin_form('function', $funcs);
   }
 
   // User defined data
-  $block .= of_userdata_dis_admin_form("contact");
+  $block .= of_userdata_dis_admin_form('contact');
 
   return $block;
 }
@@ -2003,19 +1995,19 @@ function html_contact_kind_form($kind_q) {
   $char_title = '=';
   $key = 0;
   while ($kind_q->next_record()) {
-    $id = $kind_q->f("kind_id");
-    $lang = $kind_q->f("kind_lang");
-    $default = ($kind_q->f("kind_default"))== 1 ? "checked=\"checked\"" : "";
-    $mlabel = $kind_q->f("kind_minilabel");
-    $header = $kind_q->f("kind_header");
+    $id = $kind_q->f('kind_id');
+    $lang = $kind_q->f('kind_lang');
+    $default = ($kind_q->f('kind_default'))== 1 ? "checked=\"checked\"" : '';
+    $mlabel = $kind_q->f('kind_minilabel');
+    $header = $kind_q->f('kind_header');
    
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
-      $class = "";
+      $class = '';
     }
     $key ++;
-    $c_label = htmlentities($one_cat["label"]);
+    $c_label = htmlentities($one_cat['label']);
     $kind_list .= "
     <tr $class>
     <td>
@@ -2115,7 +2107,7 @@ function dis_contact_kind_links($ref) {
   global $l_kind_delete, $l_kind_can_delete, $l_kind_cant_delete;
 
   $delete_ok = true;
-  $id = $ref["kind"];
+  $id = $ref['kind'];
   $name = get_contact_kind_label($id);
 
   // Contacts Links
@@ -2128,8 +2120,8 @@ function dis_contact_kind_links($ref) {
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $cid = $obm_q->f("contact_id");
-      $cname = $obm_q->f("contact_lastname")." ".$obm_q->f("contact_firstname");
+      $cid = $obm_q->f('contact_id');
+      $cname = $obm_q->f('contact_lastname').' '.$obm_q->f('contact_firstname');
       $dis_link .= "<li><a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a></li>";
     }
     if ($cpt < $nb_kind) {
@@ -2150,7 +2142,7 @@ function dis_contact_kind_links($ref) {
   $dis_back = "<a href=\"$path/contact/contact_index.php?action=admin\">$l_back</a>";
 
   if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_kind_can_delete);
+    $display['msg'] .= display_ok_msg($l_kind_can_delete);
     $dis_del = "<a href=\"$path/contact/contact_index.php?action=kind_delete&amp;sel_kind=$id\" >$l_kind_delete</a>";
     $block .= "
       <div class=\"buttons\">
@@ -2158,7 +2150,7 @@ function dis_contact_kind_links($ref) {
         $dis_back
       </div>";
   } else {
-    $display["msg"] .= display_warn_msg($l_kind_cant_delete);
+    $display['msg'] .= display_warn_msg($l_kind_cant_delete);
     $block .= "
       <div class=\"buttons\">
         $dis_back
@@ -2178,7 +2170,7 @@ function dis_contact_kind_links($ref) {
 function dis_contact_display_pref($prefs) {
   global $l_contact_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "contact");
+  $dis_pref = new OBM_DISPLAY('PREFERENCES', $prefs, 'contact');
   $dis_pref->pref_title = $l_contact_display;
   $dis_pref->pref_dis_help = 1;
 
@@ -2199,11 +2191,11 @@ function dis_contact_display_pref($prefs) {
 function dis_contact_vcard_export($contact) {
   global $display, $path, $l_err_reference;
 
-  $contact_id = $contact["contact_id"];
+  $contact_id = $contact['contact_id'];
   $con_q = run_query_contact_detail($contact_id);
-  $com_q = run_query_contact_company($con_q->f("company_id"));
+  $com_q = run_query_contact_company($con_q->f('company_id'));
   if ($con_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_err_msg($l_err_reference);
   }
   export_contact_vcard($con_q,$com_q);
 }
@@ -2216,94 +2208,94 @@ function dis_contact_vcard_export($contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function export_contact_vcard($co_q, $com_q) {
 
-  $id = $co_q->f("contact_id");
-  $kind_header = $co_q->f("kind_header");
-  $lname = $co_q->f("contact_lastname");
-  $fname = $co_q->f("contact_firstname");
-  $service = $co_q->f("contact_service");
+  $id = $co_q->f('contact_id');
+  $kind_header = $co_q->f('kind_header');
+  $lname = $co_q->f('contact_lastname');
+  $fname = $co_q->f('contact_firstname');
+  $service = $co_q->f('contact_service');
   
-  $c_name = $co_q->f("company_name");
-  $c_phone = $co_q->f("company_phone");
+  $c_name = $co_q->f('company_name');
+  $c_phone = $co_q->f('company_phone');
   
-  if ($c_phone != "")
+  if ($c_phone != '')
     $vcard_c_phone = "TEL;WORK;VOICE:$c_phone\n"; 
 
-  $c_fax = $co_q->f("company_fax");
-  if ($c_fax != "")
+  $c_fax = $co_q->f('company_fax');
+  if ($c_fax != '')
     $vcard_c_fax = "TEL;WORK;FAX:$c_fax\n";
 
-  $function = $co_q->f("function_label");
-  if ($function != "")
+  $function = $co_q->f('function_label');
+  if ($function != '')
     $vcard_function = "ROLE:$func\n";
 
-  $title = $co_q->f("contact_title");
-  if ($title != "")
+  $title = $co_q->f('contact_title');
+  if ($title != '')
     $vcard_title = "TITLE:$title\n";  
     
-  $ad1 = $co_q->f("contact_address1");
-  $ad2 = $co_q->f("contact_address2");
-  $ad3 = $co_q->f("contact_address3");
-  $zip = $co_q->f("contact_zipcode");
-  $town = $co_q->f("contact_town");
-  $cdx = $co_q->f("contact_expresspostal");
-  $ctry_name = $co_q->f("country_name");
+  $ad1 = $co_q->f('contact_address1');
+  $ad2 = $co_q->f('contact_address2');
+  $ad3 = $co_q->f('contact_address3');
+  $zip = $co_q->f('contact_zipcode');
+  $town = $co_q->f('contact_town');
+  $cdx = $co_q->f('contact_expresspostal');
+  $ctry_name = $co_q->f('country_name');
   if ($ad1 || $ad2 || $ad3 || $zip || $town || $cdx ||$ctry_name) {
     $vcard_contaddr = "ADR;HOME:$cdx;";
     if ($ad2)
       $vcard_contaddr .= "$ad2\\n";
     if ($ad3)
       $vcard_contaddr .= "$ad3";
-    $vcard_contaddr .= ";" ;
+    $vcard_contaddr .= ';';
     if ($ad1)
       $vcard_contaddr .= "$ad1\\n";
     $vcard_contaddr .= ";$town;;$zip;$ctry_name\n";
   }
-  $ad1 = $com_q->f("company_address1");
-  $ad2 = $com_q->f("company_address2");
-  $ad3 = $com_q->f("company_address3");
-  $zip = $com_q->f("company_zipcode");
-  $town = $com_q->f("company_town");
-  $cdx = $com_q->f("company_expresspostal");
-  $ctry_name = $com_q->f("country_name");    
+  $ad1 = $com_q->f('company_address1');
+  $ad2 = $com_q->f('company_address2');
+  $ad3 = $com_q->f('company_address3');
+  $zip = $com_q->f('company_zipcode');
+  $town = $com_q->f('company_town');
+  $cdx = $com_q->f('company_expresspostal');
+  $ctry_name = $com_q->f('country_name');    
   if ($ad1 || $ad2 || $ad3 || $zip || $town || $cdx ||$ctry_name) {
     $vcard_compaddr = "ADR;WORK:$cdx;";
     if ($ad2)
       $vcard_compaddr .= "$ad2\\n";
     if ($ad3)
       $vcard_compaddr .= "$ad3";
-    $vcard_compaddr .= ";" ;
+    $vcard_compaddr .= ';';
     if ($ad1)
      $vcard_compaddr .= "$ad1\\n";
     $vcard_compaddr .= ";$town;;$zip;$ctry_name\n";
   }  
 
-  $phone = $co_q->f("contact_phone");
-  if ($phone != "")
+  $phone = $co_q->f('contact_phone');
+  if ($phone != '')
     $vcard_phone =  "TEL;WORK;VOICE:$phone\n"; 
 
-  $hphone = $co_q->f("contact_homephone");
-  if ($hphone != "")
+  $hphone = $co_q->f('contact_homephone');
+  if ($hphone != '')
     $vcard_hphone =  "TEL;HOME;VOICE:$hphone\n";
 
-  $mphone = $co_q->f("contact_mobilephone");
-  if ($mphone != "")
+  $mphone = $co_q->f('contact_mobilephone');
+  if ($mphone != '')
     $vcard_mphone = "TEL;CELL:$mphone\n";  
 
-  $fax = $co_q->f("contact_fax");
-  if ($fax != "")
+  $fax = $co_q->f('contact_fax');
+  if ($fax != '')
     $vcard_fax = "TEL;HOME;FAX:$fax\n"; 
 
-  $email = $co_q->f("contact_email");    
-  if ($email != "")
+  $email = $co_q->f('contact_email');    
+  if ($email != '')
     $vcard_email = "EMAIL;WORK;INTERNET:$email\n";  
 
-  $email2 = $co_q->f("contact_email2");    
-  if ($email2 != "")
+  $email2 = $co_q->f('contact_email2');    
+  if ($email2 != '')
     $vcard_email2 = "EMAIL;OTHER;INTERNET:$email2\n";      
   
   header("Content-Type: text/x-vCard");
-  header("Content-Disposition: inline; filename=".str_replace(" ","_",$lname).",_".str_replace(" ","_",$fname).".vcf");
-  header("charset=utf-8"); 
+  header("Content-Disposition: inline; filename=".str_replace(' ','_',$lname).',_'.str_replace(' ','_',$fname).'.vcf');
+  header('charset=utf-8'); 
 
   $vcard = "BEGIN:VCARD\n";
   $vcard .= "VERSION:3.0\n";
@@ -2356,23 +2348,23 @@ function dis_category_contact_stats($params) {
   global $cgp_user, $display, $l_stats, $l_function;
   global $l_contact_date_evolution_graph;
 
-  $order = $params["order"];
-  $stat = $params["stat"];
+  $order = $params['order'];
+  $stat = $params['stat'];
 
-  if (($stat == "") || ($stat == "index")) {
+  if (($stat == '') || ($stat == 'index')) {
 
-  } elseif ($stat == "function") {
-    $cats = of_category_query_category_per_entity("contact","function","mono");
-    $block_stat = of_category_dis_entity_stats("contact", $stat, $cats,$order);
-  } elseif ($stat == "contact_date_evolution") {
-    $block_stat = dis_html_contact_date_graph_stats("contact"); 
+  } elseif ($stat == 'function') {
+    $cats = of_category_query_category_per_entity('contact','function','mono');
+    $block_stat = of_category_dis_entity_stats('contact', $stat, $cats,$order);
+  } elseif ($stat == 'contact_date_evolution') {
+    $block_stat = dis_html_contact_date_graph_stats('contact'); 
   } else {
-    $cats = of_category_user_get_category_distribution("contact", $stat);
-    $block_stat = of_category_dis_entity_stats("contact", $stat, $cats,$order);
+    $cats = of_category_user_get_category_distribution('contact', $stat);
+    $block_stat = of_category_dis_entity_stats('contact', $stat, $cats,$order);
   }
 
-  if (is_array($cgp_user["contact"]["category"])) {
-    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+  if (is_array($cgp_user['contact']['category'])) {
+    foreach($cgp_user['contact']['category'] as $cat_name => $one_cat) {
       global ${"l_$cat_name"};
       $l_cat = ${"l_$cat_name"};
       $block_contact .= "<li><a href=\"?action=statistics&amp;stat=$cat_name\">$l_cat</a></li>";
