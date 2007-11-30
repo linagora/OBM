@@ -464,7 +464,8 @@ public class CalendarManager extends ObmManager {
 
 		if (dend.getTime() != dstart.getTime()) {
 			int fix = 0;
-			// le rdv s'affiche sur 1 jour de plus dans obm si la duration fait tomber la date de fin sur minuit
+			// le rdv s'affiche sur 1 jour de plus dans obm si la duration fait
+			// tomber la date de fin sur minuit
 			if (foundation.isAllDay()
 					&& ((dend.getTime() - dstart.getTime()) % 86400) == 0) {
 				fix = 1;
@@ -475,12 +476,11 @@ public class CalendarManager extends ObmManager {
 		} else {
 			event.setDuration(3600);
 		}
-		logger.info("summary:"
-				+ foundation.getSummary().getPropertyValueAsString());
-		logger.info("summary charset:" + foundation.getSummary().getCharset());
-		logger.info("summary enconding:"
-				+ foundation.getSummary().getEncoding());
-		event.setTitle(foundation.getSummary().getPropertyValueAsString());
+		if (foundation.getSummary() != null) {
+			event.setTitle(foundation.getSummary().getPropertyValueAsString());
+		} else {
+			event.setTitle("[Sans titre]");
+		}
 
 		if (foundation.getDescription() != null) {
 			event.setDescription(foundation.getDescription()
