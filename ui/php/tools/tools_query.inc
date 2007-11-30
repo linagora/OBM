@@ -433,7 +433,7 @@ function process_update_numbers($e1, $e2, $domain_id, $table, $realm) {
     $nb_del = $obm_q->f('nb');
     display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $table : deleted : $nb_del entries in table Deleted");
 
-  } else if ($realm == "delegation") {
+  } else if ($realm == 'delegation') {
 
     // Get the delete from the Deleted table
     $query = "SELECT count(*) as nb FROM Deleted
@@ -510,10 +510,10 @@ function get_update_link_group($domain_id, $realm) {
   $e1 = array();
   $e2 = array();
 
-  $eid = "group_id";
-  $uc = "group_usercreate";
-  $uu = "group_userupdate";
-  $dg = "group_delegation";
+  $eid = 'group_id';
+  $uc = 'group_usercreate';
+  $uu = 'group_userupdate';
+  $dg = 'group_delegation';
 
   $multidomain = "AND (group_domain_id='$domain_id')";
 
@@ -535,7 +535,7 @@ function get_update_link_group($domain_id, $realm) {
     WHERE group_privacy=0
       $where $multidomain
     ORDER BY of_usergroup_group_id, of_usergroup_user_id";
-  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
+  display_debug_msg($query, $cdg_sql, 'get_update_link_group()');
   $retour = $obm_q->query($query);
 
   while($obm_q->next_record()) {
@@ -551,137 +551,13 @@ function get_update_link_group($domain_id, $realm) {
     WHERE group_privacy=0
       $where $multidomain
     ORDER BY of_usergroup_group_id, of_usergroup_user_id";
-  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
+  display_debug_msg($query, $cdg_sql, 'get_update_link_group()');
   $retour = $obm_q->query($query);
 
   while($obm_q->next_record()) {
     $g_id = $obm_q->f('of_usergroup_group_id');
     $u_id = $obm_q->f('of_usergroup_user_id');
     $e2[$g_id][] = "u$u_id";
-  }
-
-  // Process and mark each group modified
-  foreach($e1 as $g_id => $users) {
-    if (count($e1[$g_id]) != count($e2[$g_id])) {
-      $res[$g_id] = $g_id;
-      $nb_link = count($e1[$g_id]);
-      $nb_link_prod = count($e2[$g_id]);
-      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; current #links=$nb_link_prod, new #links=$nb_link");
-
-    } else {
-      foreach ($users as $u_id) {
-	if (! in_array($u_id, $e2[$g_id])) {
-	  $res[$g_id] = $g_id;
-	  display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; diff=$u_id");
-	  break;
-	}
-      }
-    }
-  }
-
-  // Deleted entries, nothing to do (already handled by entity Update)
-
-  return $res;
-}
-
-
-/******************************************************************************
- * Get Group links updates (from UserObmGroup and GroupGroup)
- *
- * @param $domain_id : domain id to check
- * @param $realm : realm space to check updates (user | domain | delegation)
- * @return link array : $link[$group_id] = $group_id
- */
-function get_update_link_group_oldsave($domain_id, $realm) {
-  global $obm, $cdg_sql, $cdg_exe;
-
-  $uid = $obm['uid'];
-  $delegation = $obm['delegation'];
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
-
-  $e1 = array();
-  $e2 = array();
-
-  $eid = "group_id";
-  $uc = "group_usercreate";
-  $uu = "group_userupdate";
-  $dg = "group_delegation";
-
-  $multidomain = "AND (group_domain_id='$domain_id')";
-
-  // Restrict updates to the realm selected (user, domain, delegation)
-  if ($realm == "user") {
-    $where = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
-  } else if ($realm == "delegation") {
-    $where = "WHERE ($dg $like '$delegation%') $multidomain";
-  } else {
-    $where = "WHERE 1=1 $multidomain";
-  }
-
-  // UserObmGroup Link --------------------------------------------------------
-
-  // Get infos from Update table
-  $query = "SELECT *
-    FROM UserObmGroup
-      LEFT JOIN UGroup ON userobmgroup_group_id=group_id
-    $where
-    ORDER BY userobmgroup_group_id, userobmgroup_userobm_id";
-  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $g_id = $obm_q->f('userobmgroup_group_id');
-    $u_id = $obm_q->f('userobmgroup_userobm_id');
-    $e1[$g_id][] = "u$u_id";
-  }
-
-  // Get infos from Production table
-  $query = "SELECT *
-    FROM P_UserObmGroup
-      LEFT JOIN P_UGroup ON userobmgroup_group_id=group_id
-    $where
-    ORDER BY userobmgroup_group_id, userobmgroup_userobm_id";
-  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $g_id = $obm_q->f('userobmgroup_group_id');
-    $u_id = $obm_q->f('userobmgroup_userobm_id');
-    $e2[$g_id][] = "u$u_id";
-  }
-
-  // GroupGroup Link --------------------------------------------------------
-
-  // Get infos from Update table
-  $query = "SELECT *
-    FROM GroupGroup
-      LEFT JOIN UGroup ON groupgroup_parent_id=group_id
-    $where
-    ORDER BY groupgroup_parent_id, groupgroup_child_id";
-  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $g_id = $obm_q->f('groupgroup_parent_id');
-    $c_id = $obm_q->f('groupgroup_child_id');
-    $e1[$g_id][] = "g$c_id";
-  }
-
-  // Get infos from Production table
-  $query = "SELECT *
-    FROM P_GroupGroup
-      LEFT JOIN P_UGroup ON groupgroup_parent_id=group_id
-    $where
-    ORDER BY groupgroup_parent_id, groupgroup_child_id";
-  display_debug_msg($query, $cdg_sql, "get_update_link_group()");
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $g_id = $obm_q->f('groupgroup_parent_id');
-    $c_id = $obm_q->f('groupgroup_child_id');
-    $e2[$g_id][] = "g$c_id";
   }
 
   // Process and mark each group modified
@@ -730,7 +606,7 @@ function get_update_link_entityright($domain_id, $entity, $table, $field, $realm
   $e1 = array();
   $e2 = array();
 
-  if ($field != "") {
+  if ($field != '') {
     $f = $field;
     $f_id = "${field}_id";
     $uc = "${field}_usercreate";
@@ -747,9 +623,9 @@ function get_update_link_entityright($domain_id, $entity, $table, $field, $realm
   $multidomain = "AND (${f}_domain_id='$domain_id')";
 
   // Restrict updates to the realm selected (user, domain, delegation)
-  if ($realm == "user") {
+  if ($realm == 'user') {
     $where = "AND ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
-  } else if ($realm == "delegation") {
+  } else if ($realm == 'delegation') {
     $where = "AND ($dg $like '$delegation%') $multidomain";
   } else {
     $where = "$multidomain";
@@ -762,7 +638,7 @@ function get_update_link_entityright($domain_id, $entity, $table, $field, $realm
     WHERE entityright_entity='$entity'
       $where
     ORDER BY entityright_entity_id, entityright_consumer, entityright_consumer_id";
-  display_debug_msg($query, $cdg_sql, "get_update_link_entityright()");
+  display_debug_msg($query, $cdg_sql, 'get_update_link_entityright()');
   $retour = $obm_q->query($query);
 
   while($obm_q->next_record()) {
@@ -780,7 +656,7 @@ function get_update_link_entityright($domain_id, $entity, $table, $field, $realm
     WHERE entityright_entity='$entity'
       $where
     ORDER BY entityright_entity_id, entityright_consumer, entityright_consumer_id";
-  display_debug_msg($query, $cdg_sql, "get_update_link_entityright()");
+  display_debug_msg($query, $cdg_sql, 'get_update_link_entityright()');
   $retour = $obm_q->query($query);
 
   while($obm_q->next_record()) {

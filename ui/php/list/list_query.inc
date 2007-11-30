@@ -1543,6 +1543,7 @@ function make_list_query_from_criteria($list) {
         contact_fax,
         contact_email,
         contact_archive,
+        contact_company,
         company_id,
         company_name,
         company_address1,
