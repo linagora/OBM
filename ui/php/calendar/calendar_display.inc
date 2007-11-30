@@ -354,12 +354,12 @@ function html_calendar_bar_date_selector($calendar) {
   $this_month = of_date_get_month($ts_date);
   $this_year = of_date_get_year($ts_date);
 
+  $start_time = strtotime("-3 month", $ts_date);
+  $month_time = $start_time;
   $check_week = $ts_date;
-  $start_week_time = get_calendar_date_day_of_week(strtotime("$this_year-01-01"), $ccalendar_weekstart);
+  $start_week_time = get_calendar_date_day_of_week($start_time, $ccalendar_weekstart);
   $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
-
-  $month_time = strtotime("$this_year-01-01");
-  $year_time = strtotime(($this_year-3)."-01-01");
+  $end_time = strtotime("+9 month", $ts_date);
   $dis_month = calendar_localizeDate ("month", $ts_date);
   $start_week_day = strtotime($ccalendar_weekstart);
   $start_day = get_calendar_date_day_of_week(strtotime("$this_year-$this_month-01"), $ccalendar_weekstart);
@@ -380,7 +380,7 @@ function html_calendar_bar_date_selector($calendar) {
     }
     $start_week_time = strtotime ("+1 week", $start_week_time);
     $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
-  } while (of_date_get_year($start_week_time) <= $this_year);
+  } while ($start_week_time <= $end_time);
 
   // Month Selection
   for ($i=0; $i<12; $i++) {
