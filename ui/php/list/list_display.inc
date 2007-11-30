@@ -1260,7 +1260,9 @@ function dis_list_add_criterion_form($list) {
     
   $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"list_add_criteria_line(this,$row_index);window.close();return false;\">";
 
-  $block .= html_list_company_criterion($cty_q,$usr_q,$dsr_q);
+  if ($cgp_show['module']['company']) {
+    $block .= html_list_company_criterion($cty_q,$usr_q,$dsr_q);
+  }
   $block .= html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q);
 
   if ($cgp_show["module"]["publication"]) {

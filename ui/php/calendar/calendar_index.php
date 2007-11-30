@@ -92,7 +92,7 @@ if ( ($params['new_group'] == '1')
   if ($params['group_view'] == $c_all) {
     $cal_entity_id['group'] = array();
   } else {
-    $cal_entity_id['user'] = get_all_users_id_from_group($params['group_view']);
+    $cal_entity_id['user'] = of_usergroup_get_group_users($params['group_view']);
     $cal_entity_id['group'] = array($params['group_view']);
   }
   $cal_entity_id['group_view'] = $params['group_view'];

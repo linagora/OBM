@@ -320,8 +320,7 @@ function get_admin_data_group_list() {
 
   $query = "SELECT group_id,
       group_name
-    FROM UGroup
-    WHERE group_privacy=0";
+    FROM UGroup";
 
   display_debug_msg($query, $cdg_sql, 'get_admin_data_group_list()');
 

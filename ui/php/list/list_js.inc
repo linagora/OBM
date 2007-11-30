@@ -90,14 +90,21 @@ function list_add_criteria_line(form,index) {
   cell = values.insertCell(3);
   cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
   cell = values.insertCell(4);
-  cell.innerHTML += '<select name=\"sel_log_not[]\"><option value=\"\" selected=\"true\">$l_empty</option><option value=\"NOT\">$l_not</option><option value=\"Exclude\">$l_exclude</option></select>';
-  i = list_add_company_criteria_line(form,labels,values,5);
+  cell.innerHTML += '<select name=\"sel_log_not[]\"><option value=\"\" selected=\"true\">$l_empty</option><option value=\"NOT\">$l_not</option><option value=\"Exclude\">$l_exclude</option></select>';";
+if ($cgp_show['module']['company']) {
+  $extra_js .= "
+  i = list_add_company_criteria_line(form,labels,values,5);";
+ } else {
+  $extra_js .= "
+  i = 5;";
+ }
+  
+$extra_js .= "
   i = list_add_contact_criteria_line(form,labels,values,i);";
-  if ($cgp_show["module"]["publication"]) {
-    $extra_js .= "
-  i = list_add_publication_criteria_line(form,labels,values,i);
-";
-  }
+if ($cgp_show['module']['publication']) {
+  $extra_js .= "
+  i = list_add_publication_criteria_line(form,labels,values,i);";
+}
 $extra_js .= "
 }
 

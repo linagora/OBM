@@ -1862,7 +1862,7 @@ function get_all_users_id_from_group($g_id) {
  * @param $g_id group id
  * @param $info if true, get lastname and firstname too else get only id
  * @param $uids (optionnal) : array of UserObm Id to add to the result
- * @return false if problem
+ * @return array of users infos (id=>infos) or array of users ids
  * @access public
  */
 function of_usergroup_get_group_users($g_id, $info=false, $uids='') {
