@@ -48,10 +48,6 @@ $cak_end = 'E';
 // Default domain id
 $c_default_domain = 1;
 
-// OBM System groups (groups id)
-$cg_com = 2;
-$cg_prod = 3;
-
 // Query limits (for user queries)
 $cql_max_row = 50000;    // Maximum rows to be returned
 $cql_max_cost = 300000;  // Maximum query cost (Postgres)
@@ -124,7 +120,7 @@ if ($phpversion >= 5) {
 }
 
 // calendar alert values (seconds => label or minutes displayed)
-$ccalendar_alerts = array ("300" => "5", "600" => "10", "900" => "15", "1800" => "30");
+$ccalendar_alerts = array ('300' => '5', '600' => '10', '900' => '15', '1800' => '30');
 
 // Calendar : First day of the week (+2h to fix a DST php bug)
 //$ccalendar_weekstart = 'monday + 2 hours';
@@ -657,7 +653,7 @@ $php_regexp_domain = "/^([a-z0-9-]+\.)+[a-z]{2,6}$/"; // Domain
 $php_regexp_localdomain = "/^([a-z0-9-]+\.)+[a-z]{2,6}$/"; // Local Domain
 $php_regexp_email_name = "/^[a-zA-Z0-9_&\'-]+(\.[a-zA-Z0-9_\'-]+)*$/";
 $php_regexp_email = "/^[a-zA-Z0-9_&\'-]+(\.[a-zA-Z0-9_\'-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/";
-$js_regexp_email="/^\w([\.'\w-_&]+)?@([\w'\-]+\.)+[A-Za-z]{2,4}$/";  // Email
+$js_regexp_email = "/^\w([\.'\w-_&]+)?@([\w'\-]+\.)+[A-Za-z]{2,4}$/";  // Email
 $php_regexp_quota = "/^[0-9]{1,6}$/";
 
 // Samba
@@ -667,20 +663,20 @@ $php_regexp_dflt_home = "/^\\\\\\\\[a-zA-Z0-9-]{1,32}\\\\([a-zA-Z0-9_\\\\.]{1,48
 $php_regexp_drive = "/^[D-Z]?$/";
 // Virus log
 $php_regexp_main_virus_db = "/^main\.cvd.*$/";
-$php_regexp_daily_virus_db ="/^daily\.cvd.*$/";
+$php_regexp_daily_virus_db = "/^daily\.cvd.*$/";
 $php_regexp_virus_db_update = "/^ClamAV update process started at.*$/";
 $php_regexp_virus_db_version = "(version: (.*),)sU";
 
 
-$global_dis_debug_msg = "";
-$global_dis_debug_param = "";
+$global_dis_debug_msg = '';
+$global_dis_debug_param = '';
 
 // Path to the OBM php root (if not set)
-if ($path == "") {
-  if ($module == "")
-    $path = "";
+if ($path == '') {
+  if ($module == '')
+    $path = '';
   else 
-    $path = "..";
+    $path = '..';
 }
 
 
@@ -692,7 +688,7 @@ if ($path == "") {
 //   - $msg         : message to display
 //   - $debug (opt) : debug flag required
 ///////////////////////////////////////////////////////////////////////////////
-function display_debug_msg($msg, $debug=0, $function_name="") {
+function display_debug_msg($msg, $debug=0, $function_name='') {
   global $global_dis_debug_msg,$cdg_exe;
 
   if (($_SESSION['set_debug'] > 0) && (($_SESSION['set_debug'] & $debug) == $debug)) {
@@ -708,7 +704,7 @@ function display_debug_variables() {
 
   $vars = func_get_args();
   foreach($vars as $var) {
-    $global_dis_debug_custom .="<pre>".var_export($var,true)."</pre><hr />";
+    $global_dis_debug_custom .='<pre>'.var_export($var,true).'</pre><hr />';
   }
 
   return $global_dis_debug_custom;
@@ -756,7 +752,7 @@ function display_debug_param($params) {
 function get_template($tpl) {
 
   // could be replace by file_get_contents (but PHP >= 4.3.0)
-  $fd = fopen($tpl, "rb");
+  $fd = fopen($tpl, 'rb');
   $template = fread($fd, filesize($tpl));
   fclose($fd);
   $template = str_replace('"', '\"', $template);
@@ -806,20 +802,20 @@ function debug_level_isset($debug) {
 // Returns:
 //   date formated as user settings
 ///////////////////////////////////////////////////////////////////////////////
-function of_date_format($timestamp="", $null_empty="") {
+function of_date_format($timestamp='', $null_empty='') {
   global $set_date_default;
 
   $format = $_SESSION['set_date'];
-  if (trim($format) == "") $format = $set_date_default;
-  if ($timestamp != "") {
-    if ($timestamp == "0") {
-      $date = "";
+  if (trim($format) == '') $format = $set_date_default;
+  if ($timestamp != '') {
+    if ($timestamp == '0') {
+      $date = '';
     } else {
       $date = date($format, $timestamp);
     }
   } else {
-    if ($null_empty != "") {
-      $date = "";
+    if ($null_empty != '') {
+      $date = '';
     } else {
       $date = date($format);
     }
@@ -837,34 +833,34 @@ function of_date_format($timestamp="", $null_empty="") {
  * @access public
  * @return void
  */
-function of_date_upd_format($date="", $null_empty=false) {
+function of_date_upd_format($date='', $null_empty=false) {
   
   if($date) {
     $type = of_date_guess_format($date);
   } elseif(!$null_empty) {
     $date = time();
-    $type = "t";
+    $type = 't';
   } else {
     return null;
   }
 
-  if ($type == "user") {
+  if ($type == 'user') {
     $type = $_SESSION['set_date_upd'];
   }
   switch ($type) {
-  case "Y-m-d" :
+  case 'Y-m-d' :
     preg_match("/^(\d{4})[-\/](\d{2})[-\/](\d{2})/",$date, $d);
     $date = date($_SESSION['set_date_upd'],mktime(0,0,0,$d[2],$d[3],$d[1]));
     break;
-  case "d/m/Y" :
+  case 'd/m/Y' :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
     $date = date($_SESSION['set_date_upd'],mktime(0,0,0,$d[2],$d[1],$d[3]));
     break;
-  case "m/d/Y" :
+  case 'm/d/Y' :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
     $date = date($_SESSION['set_date_upd'],mktime(0,0,0,$d[1],$d[2],$d[3]));        
     break;
-  case "t" :
+  case 't' :
     $date = date($_SESSION['set_date_upd'], $date);
     break;
      
@@ -876,7 +872,7 @@ function of_date_upd_format($date="", $null_empty=false) {
 
 /**
  * Guess the date format 
- *   case "t" :
+ *   case 't' :
     $date = date($_SESSION['set_date_upd'], $date);
     break;
 
@@ -899,7 +895,7 @@ function of_date_guess_format ($date) {
   }
   // 31130000 is the lowest number which cannot be a date (31129999 => 31/12/9999)
   if(is_numeric($date) && $date > 31130000) {
-    return "t";
+    return 't';
   }
   return false;
 }  
@@ -920,25 +916,25 @@ function of_isodate_convert($date, $null_empty=false) {
     $type = of_date_guess_format($date);
   } elseif(!$null_empty) {
     $date = time();
-    $type = "t";
+    $type = 't';
   } else {
     return null;
   }
-  if ($type == "user") {
+  if ($type == 'user') {
     $type = $_SESSION['set_date_upd'];
   }
   switch ($type) {
-  case "Y-m-d" :
+  case 'Y-m-d' :
     break;    
-  case "d/m/Y" :
+  case 'd/m/Y' :
     preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
     $date = date($c_php_isodate_format,mktime(0,0,0,$d[2],$d[1],$d[3]));
     break;
-  case "m/d/Y" :
+  case 'm/d/Y' :
     preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
     $date = date($c_php_isodate_format,mktime(0,0,0,$d[1],$d[2],$d[3]));        
     break;
-  case "t" :
+  case 't' :
     $date = date($c_php_isodate_format, $date);
     break;
     
@@ -952,12 +948,12 @@ function of_isodate_convert($date, $null_empty=false) {
 // Iso Format a date
 // Parameters:
 //   - $timestamp  : Unix timestamp
-//   - $null_empty : tell if null should returns empty (true) or today ("")
+//   - $null_empty : tell if null should returns empty (true) or today ('')
 //   - $time_flag  : tell if time info should be returned (true)
 // Returns:
 //   datetime formated iso
 ///////////////////////////////////////////////////////////////////////////////
-function of_isodate_format($timestamp="", $null_empty="", $time_flag=false) {
+function of_isodate_format($timestamp='', $null_empty='', $time_flag=false) {
   global $c_php_isodate_format, $c_php_isodatetime_format;
 
   if ($time_flag) {
@@ -965,15 +961,15 @@ function of_isodate_format($timestamp="", $null_empty="", $time_flag=false) {
   } else {
     $format = $c_php_isodate_format;
   }
-  if ($timestamp != "") {
-    if ($timestamp == "0") {
-      $date = "";
+  if ($timestamp != '') {
+    if ($timestamp == '0') {
+      $date = '';
     } else {
       $date = date($format, $timestamp);
     }
   } else {
-    if ($null_empty != "") {
-      $date = "";
+    if ($null_empty != '') {
+      $date = '';
     } else {
       $date = date($format);
     }
@@ -987,24 +983,24 @@ function of_isodate_format($timestamp="", $null_empty="", $time_flag=false) {
 // Format a date-time according to user preference
 // Parameters:
 //   - $timestamp  : Unix timestamp
-//   - $null_empty : tell if null should returns empty (true) or today ("")
+//   - $null_empty : tell if null should returns empty (true) or today ('')
 // Returns:
 //   datetime formated as user settings
 ///////////////////////////////////////////////////////////////////////////////
-function of_datetime_format($timestamp="", $null_empty="") {
+function of_datetime_format($timestamp='', $null_empty='') {
   global $set_date_default;
 
   $format = $_SESSION['set_date'];
-  if (trim($format) == "") $format = $set_date_default;
-  if ($timestamp != "") {
-    if ($timestamp == "0") {
-      $date = "";
+  if (trim($format) == '') $format = $set_date_default;
+  if ($timestamp != '') {
+    if ($timestamp == '0') {
+      $date = '';
     } else {
       $date = date("$format H:i:s", $timestamp);
     }
   } else {
-    if ($null_empty != "") {
-      $date = "";
+    if ($null_empty != '') {
+      $date = '';
     } else {
       $date = date("$format H:i:s");
     }
@@ -1037,12 +1033,12 @@ function isodatetime_to_timestamp($iso) {
 // Returns:
 //   year (1900-9999)
 ///////////////////////////////////////////////////////////////////////////////
-function of_date_get_year($timestamp="") {
+function of_date_get_year($timestamp='') {
 
-  if ($timestamp != "")
-    $date = date("Y", $timestamp);
+  if ($timestamp != '')
+    $date = date('Y', $timestamp);
   else
-    $date = date("Y");
+    $date = date('Y');
 
   return $date;
 }
@@ -1055,12 +1051,12 @@ function of_date_get_year($timestamp="") {
 // Returns:
 //   month (1-12)
 ///////////////////////////////////////////////////////////////////////////////
-function of_date_get_month($timestamp="") {
+function of_date_get_month($timestamp='') {
 
-  if ($timestamp != "")
-    $date = date("m", $timestamp);
+  if ($timestamp != '')
+    $date = date('m', $timestamp);
   else
-    $date = date("m");
+    $date = date('m');
 
   return $date;
 }
@@ -1073,12 +1069,12 @@ function of_date_get_month($timestamp="") {
 // Returns:
 //   day (1-31)
 ///////////////////////////////////////////////////////////////////////////////
-function of_date_get_day($timestamp="") {
+function of_date_get_day($timestamp='') {
 
-  if ($timestamp != "")
-    $date = date("d", $timestamp);
+  if ($timestamp != '')
+    $date = date('d', $timestamp);
   else
-    $date = date("d");
+    $date = date('d');
 
   return $date;
 }
@@ -1091,12 +1087,12 @@ function of_date_get_day($timestamp="") {
 // Returns:
 //   hour (0-23)
 ///////////////////////////////////////////////////////////////////////////////
-function of_date_get_hour($timestamp="") {
+function of_date_get_hour($timestamp='') {
 
-  if ($timestamp != "")
-    $date = date("H", $timestamp);
+  if ($timestamp != '')
+    $date = date('H', $timestamp);
   else
-    $date = date("H");
+    $date = date('H');
 
   return $date;
 }
@@ -1109,12 +1105,12 @@ function of_date_get_hour($timestamp="") {
 // Returns:
 //   min (0-59)
 ///////////////////////////////////////////////////////////////////////////////
-function of_date_get_min($timestamp="") {
+function of_date_get_min($timestamp='') {
 
-  if ($timestamp != "")
-    $date = date("i", $timestamp);
+  if ($timestamp != '')
+    $date = date('i', $timestamp);
   else
-    $date = date("i");
+    $date = date('i');
 
   return $date;
 }
@@ -1129,7 +1125,7 @@ function of_date_get_min($timestamp="") {
 ///////////////////////////////////////////////////////////////////////////////
 function of_date_get_full_hour($timestamp) {
 
-  $hour = of_date_get_hour($timestamp).":".of_date_get_min($timestamp);
+  $hour = of_date_get_hour($timestamp).':'.of_date_get_min($timestamp);
 
   return $hour;
 }
@@ -1145,9 +1141,9 @@ function of_date_get_full_hour($timestamp) {
 function of_date_in_letter($timestamp) {
   global $l_daysofweek, $l_monthsofyear;
 
-  $date = $l_daysofweek[date("w", $timestamp)%7]." ".
-          date("d", $timestamp)." ".
-          $l_monthsofyear[date("n", $timestamp)-1];
+  $date = $l_daysofweek[date('w', $timestamp)%7].' '.
+          date('d', $timestamp).' '.
+          $l_monthsofyear[date('n', $timestamp)-1];
 
   return $date;
 }
@@ -1160,10 +1156,10 @@ function of_date_in_letter($timestamp) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_lang() {
 
-  if ($_SESSION['set_lang'] != "")
+  if ($_SESSION['set_lang'] != '')
     return strtoupper($_SESSION['set_lang']);
   else
-    return "EN";
+    return 'EN';
 }
 
 
@@ -1194,28 +1190,28 @@ function get_global_params($table='') {
 
   // File
   if (isset ($_FILES['fi_file'])) {
-    $params["file"] = $_FILES['fi_file']["tmp_name"];
-    $params["file_name"] = $_FILES['fi_file']['name'];
-    $params["file_size"] = $_FILES['fi_file']['size'];
-    $params["file_type"] = $_FILES['fi_file']['type'];
+    $params['file'] = $_FILES['fi_file']['tmp_name'];
+    $params['file_name'] = $_FILES['fi_file']['name'];
+    $params['file_size'] = $_FILES['fi_file']['size'];
+    $params['file_type'] = $_FILES['fi_file']['type'];
   }
 
   foreach($parameters as $var => $value) {
-    if ($parameters["ajax"] == 1 && is_string($value)) {
+    if ($parameters['ajax'] == 1 && is_string($value)) {
       $value = utf8_decode($value);
     }
     // Handle automatic checkbox (1,0) paramaters (cba_)
-    $key = preg_replace("/^cba_/", "", $var);
+    $key = preg_replace("/^cba_/", '', $var);
     if ($key != $var) {
       $value = ($value == 1 ? 1 : 0);
       $params[$key] = $value;
       continue;
     }
 
-    $key = preg_replace($replace,"",$var);
+    $key = preg_replace($replace,'',$var);
 
     // sql_order_dir value control
-    if ($key == "sql_order_dir") {
+    if ($key == 'sql_order_dir') {
       if (!in_array($value, $order_dir_values)) {
         $value = $c_order_dir[0];
       }
@@ -1223,16 +1219,16 @@ function get_global_params($table='') {
 
     // XXXX SQL_order below can't access here $fieldnames...
     // sql_order_field value control
-    //    if ($key == "sql_order_field") {
+    //    if ($key == 'sql_order_field') {
     //      if (!in_array($value, array_keys($fieldnames)))
-    //        $value = "";
+    //        $value = '';
     //    }
 
     // XXXX SQL_order below can't access here $fieldnames...
     // sql_order_field value control
-    if ($key == "sql_order_field") {
+    if ($key == 'sql_order_field') {
       if (preg_match("/ /", $value))
-	$value = "";
+	$value = '';
     }
 
     // auto decode urls
@@ -1241,16 +1237,16 @@ function get_global_params($table='') {
     }
 
     // external text parameters (title)
-    if ($key == "ext_title") {
+    if ($key == 'ext_title') {
       $value = stripslashes(urldecode($value));
     }
 
     // Add value in hash table
     if (is_array($value)) {
       $params[$key] = $value;
-    } else if ($value != "") {
+    } else if ($value != '') {
       // some tags can be in queries; eg: <
-      if ($key == "query") {
+      if ($key == 'query') {
 	$params[$key] = trim($value);
       } else {
 	$params[$key] = trim(strip_tags($value));
@@ -1263,15 +1259,15 @@ function get_global_params($table='') {
       foreach($_SESSION as $var => $value) {
         if (is_array($value)) {
 	  $params[$key] = $value;
-        } else if ($value != "") {
+        } else if ($value != '') {
 	  $params[$key] = trim(strip_tags($value));
         }
       }
     } */
 
-  $action = $params["action"];
-  if ($action == "") $action = "index";
-  $popup = $params["popup"];
+  $action = $params['action'];
+  if ($action == '') $action = 'index';
+  $popup = $params['popup'];
   
   return $params;
 }
@@ -1288,14 +1284,14 @@ function get_global_params_document(&$mod_params) {
   $nb_d = 0;
   $parameters = array_merge($_POST, $_GET);
   foreach($parameters as $key => $value) {
-    if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
+    if (strcmp(substr($key, 0, 4),'cb_d') == 0) {
       $nb_d++;
       $d_num = substr($key, 4);
       $mod_params["doc$nb_d"] = $d_num;
     }
   }
   if ($nb_d > 0) {
-    $mod_params["doc_nb"] = $nb_d;
+    $mod_params['doc_nb'] = $nb_d;
   }
 
   return true;
@@ -1305,19 +1301,19 @@ function get_global_params_document(&$mod_params) {
 ///////////////////////////////////////////////////////////////////////////////
 // Parse and prepare the layout of a comment as a blog
 // Separe comment in section displayed with different colors
-// The secion separator is a line beginning with "nnnn-nn-nn:aa:"
+// The secion separator is a line beginning with 'nnnn-nn-nn:aa:'
 // Parameters:
 //   - $com     : comment text to handle
 //   - $p_order : Comment order (1 = reverse, else chronological)
 //              : if not set, take $set_commentorder pref
 ///////////////////////////////////////////////////////////////////////////////
-function beautify_comment($com, $p_order="") {
+function beautify_comment($com, $p_order='') {
   global $cco_chro, $cco_rev;
 
-  $col0 = "FFFFFF";
-  $col1 = "BBBBBB";
+  $col0 = 'FFFFFF';
+  $col1 = 'BBBBBB';
 
-  if ($p_order != "") {
+  if ($p_order != '') {
     $order = $p_order;
   } else {
     $order = $_SESSION['set_commentorder'];
@@ -1385,28 +1381,28 @@ function beautify_comment($com, $p_order="") {
 //   - $p_uid  : user id to check access
 // Returns true if entity is visible, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_privacy($module, $table, $action, $id="", $p_uid="") {
+function check_privacy($module, $table, $action, $id='', $p_uid='') {
   global $actions, $obm, $cdg_sql;
 
   // If action does not require privacy, grant access
-  if (! $actions[$module][$action]["Privacy"]) {
+  if (! $actions[$module][$action]['Privacy']) {
     return true;
   }
 
   // If id not set, grant access
-  if ($id == "") {
+  if ($id == '') {
     return true;
   }
 
   // Set uid if not given
-  if ($p_uid == "") {
-    $uid = $obm["uid"];
+  if ($p_uid == '') {
+    $uid = $obm['uid'];
   } else {
     $uid = $p_uid;
   }
  
   $entity = strtolower($table);
-  if ($entity == "ugroup") { $entity = "group"; }
+  if ($entity == 'ugroup') { $entity = 'group'; }
 
   $field_pri = "${entity}_privacy";
   $field_uc = "${entity}_usercreate";
@@ -1502,7 +1498,7 @@ function format_name($name, $up, $accent, $dot=false) {
   }
 
   if ($dot) {
-    $res = preg_replace("/[\.\-\'\\\]/", "", $res);
+    $res = preg_replace("/[\.\-\'\\\]/", '', $res);
   }
 
   if ($up == 1) {
@@ -1553,14 +1549,14 @@ function phonetic_key($name) {
 ////////////////////////////////////////////////////////////////////////////////
 function phpArrayToJsArray($var) {
 
-  $jsArray = "new Array(";
+  $jsArray = 'new Array(';
   if(is_array($var)) {
    foreach($var as $val) {
       $jsArray .= "'$val',";
     }
   $jsArray = substr($jsArray, 0, -1);
   }
-  $jsArray .= ")";
+  $jsArray .= ')';
 
   return $jsArray;
 }
@@ -1583,8 +1579,8 @@ function phpStringToJsString($var) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_global_create_document($params) {
 
-  $id = $params["document_id"];
-  $file = $params["file_tmp"];
+  $id = $params['document_id'];
+  $file = $params['file_tmp'];
 
   $disk_path = get_global_document_disk_path($id);
   $disk_fullname = $disk_path . $id; 
@@ -1634,11 +1630,11 @@ function run_query_global_remove_document($id) {
 function get_global_document_disk_path($id) {
   global $cdocument_root;
 
-  // The document disk path set in the subdirectory named "last id number"
+  // The document disk path set in the subdirectory named 'last id number'
   // Get the last number from Id
   $rel = substr($id, -1, 1);
 
-  $disk_path = $cdocument_root . "/" . $rel . "/";
+  $disk_path = $cdocument_root . '/' . $rel . '/';
   
   return $disk_path; 
 }
@@ -1652,27 +1648,27 @@ function get_global_document_disk_path($id) {
  */
 function random_color($nb) {
 
-  $colors[] = "238, 136, 0";
-  $colors[] = "221, 68, 119 ";
-  $colors[] = "204, 51, 51";
-  $colors[] = "153, 68, 153";
-  $colors[] = "102, 51, 204";
-  $colors[] = "51, 102, 153";
-  $colors[] = "51, 102, 204";
-  $colors[] = "34, 170, 153";
-  $colors[] = "50, 146, 98";
-  $colors[] = "16, 150, 24";
-  $colors[] = "102, 170, 0";
-  $colors[] = "170, 170, 17";
-  $colors[] = "214, 174, 0";
-  $colors[] = "221, 85, 17";
-  $colors[] = "168, 112, 112";
-  $colors[] = "140, 109, 140";
-  $colors[] = "98, 116, 135";
-  $colors[] = "112, 131, 168";
-  $colors[] = "92, 141, 135";
-  $colors[] = "137, 137, 81";
-  $colors[] = "176, 139, 89";
+  $colors[] = '238, 136, 0';
+  $colors[] = '221, 68, 119';
+  $colors[] = '204, 51, 51';
+  $colors[] = '153, 68, 153';
+  $colors[] = '102, 51, 204';
+  $colors[] = '51, 102, 153';
+  $colors[] = '51, 102, 204';
+  $colors[] = '34, 170, 153';
+  $colors[] = '50, 146, 98';
+  $colors[] = '16, 150, 24';
+  $colors[] = '102, 170, 0';
+  $colors[] = '170, 170, 17';
+  $colors[] = '214, 174, 0';
+  $colors[] = '221, 85, 17';
+  $colors[] = '168, 112, 112';
+  $colors[] = '140, 109, 140';
+  $colors[] = '98, 116, 135';
+  $colors[] = '112, 131, 168';
+  $colors[] = '92, 141, 135';
+  $colors[] = '137, 137, 81';
+  $colors[] = '176, 139, 89';
   $return = array();
   do {
     $return = array_merge($return, array_slice($colors,0,$nb));
