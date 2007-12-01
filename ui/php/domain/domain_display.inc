@@ -11,11 +11,11 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["domain_label"] = $l_label;
-$fieldnames["domain_description"] = $l_desc;
-$fieldnames["domain_name"] = $l_domain_name;
-$fieldnames["domain_alias"] = $l_alias;
-$fieldnames["domain_timecreate"] = $l_timecreate;
+$fieldnames['domain_label'] = $l_label;
+$fieldnames['domain_description'] = $l_desc;
+$fieldnames['domain_name'] = $l_domain_name;
+$fieldnames['domain_alias'] = $l_alias;
+$fieldnames['domain_timecreate'] = $l_timecreate;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,8 +30,8 @@ $fieldnames["domain_timecreate"] = $l_timecreate;
 function dis_domain_data(&$OD, $fieldname, $link_ok) {
   global $path, $ico_mail;
 
-  if (($fieldname == "domain_label") && $link_ok) {
-    $res["url"] = "$path/domain/domain_index.php?action=detailconsult&amp;domain_id=".$OD->data_set->f("domain_id");
+  if (($fieldname == 'domain_label') && $link_ok) {
+    $res['url'] = "$path/domain/domain_index.php?action=detailconsult&amp;domain_id=".$OD->data_set->f('domain_id');
   }
 
   return $res;
@@ -50,7 +50,7 @@ function html_domain_search_form($domain) {
   $text = $domain['text'];
   
   $block = "
-  <form method=\"get\" name=\"f_search\" class=\"search\" action=\"". url_prepare("domain_index.php")."\">
+  <form method=\"get\" name=\"f_search\" class=\"search\" action=\"". url_prepare('domain_index.php')."\">
 
     <label>$l_text<br />
       <input type=\"text\" name=\"tf_text\" size=\"16\" maxlength=\"32\"
@@ -427,7 +427,7 @@ function dis_domain_mailserver_select($role, $sel_id='', $domain_id='') {
       $sel .= ">$name</option>";
     }
   }
-  $sel .= "</select>";
+  $sel .= '</select>';
 
   return $sel;
 }
