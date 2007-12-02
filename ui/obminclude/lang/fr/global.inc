@@ -160,7 +160,7 @@ $l_properties = "Propriétés";
 $l_items = "Accessoires";
 $l_received = "Reçu";
 $l_emitted = "Emis";
-$l_type ="Type";
+$l_type = "Type";
 
 // Entities
 $l_company = "Société";

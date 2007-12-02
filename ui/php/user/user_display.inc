@@ -738,14 +738,6 @@ function html_user_consult($obm_q) {
     <td>$profile</td>
   </tr>
   $dis_delegation_target
-  <tr>
-    <th>$l_lastname</th>
-    <td>$lname</td>
-  </tr>
-  <tr>
-    <th>$l_firstname</th>
-    <td>$fname</td>
-  </tr>
   $dis_delegation
   <tr>
     <th>$l_title</th>
@@ -1746,6 +1738,317 @@ function dis_user_admin_index() {
   return $block;
 }
 
+
+/**
+ * Display the user csv import index
+ **/
+function dis_user_import_index() {
+  global $display, $l_user, $l_header_import, $l_kind;
+  global $l_lastname, $l_firstname, $l_login, $l_password, $l_password_type;
+  global $l_mail, $l_email, $l_quota, $l_profile, $l_title, $l_phone, $l_mphone;
+  global $l_fax, $l_company, $l_direction, $l_service, $l_address, $l_postcode;
+  global $l_town, $l_expresspostal;
+  global $l_import_msg, $l_file_format;
+
+  $display['title'] = "<h1 class=\"title\">$l_user : $l_header_import</h1>";
+
+  $block = "
+  <div class=\"detail extra\">
+    <h1>$l_file_format</h1>
+
+  <table class=\"spreadSheet\">
+  <thead>
+  <tr>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+    <th>5</th>
+    <th>6</th>
+    <th>7</th>
+    <th>8</th>
+    <th>9</th>
+    <th>10</th>
+    <th>11</th>
+    <th>12</th>
+    <th>13</th>
+    <th>14</th>
+    <th>15</th>
+    <th>16</th>
+    <th>17</th>
+    <th>18</th>
+    <th>19</th>
+    <th>20</th>
+    <th>21</th>
+    <th>22</th>
+    <th>23</th>
+    <th>24</th>
+    <th>25</th>
+  </tr>
+  <tr>
+    <th>$l_kind</th>
+    <th>$l_lastname</th>
+    <th>$l_firstname</th>
+    <th>$l_login</th>
+    <th>$l_password</th>
+    <th>$l_password_type</th>
+    <th>$l_mail</th>
+    <th>$l_email</th>
+    <th>$l_quota</th>
+    <th>$l_profile</th>
+    <th>$l_title</th>
+    <th>$l_phone 1</th>
+    <th>$l_phone 2</th>
+    <th>$l_mphone</th>
+    <th>$l_fax</th>
+    <th>$l_fax 2</th>
+    <th>$l_company</th>
+    <th>$l_direction</th>
+    <th>$l_service</th>
+    <th>$l_address 1</th>
+    <th>$l_address 2</th>
+    <th>$l_address 3</th>
+    <th>$l_postcode</th>
+    <th>$l_town</th>
+    <th>$l_expresspostal</th>
+  </tr>
+  </thead>
+  <tr>
+    <td>M</td>
+    <td>BAUD</td>
+    <td>Pierre</td>
+    <td>pierre</td>
+    <td>mot</td>
+    <td>PLAIN</td>
+    <td>X</td>
+    <td>pierre.baud</td>
+    <td>300</td>
+    <td>admin</td>
+    <td>Chief</td>
+    <td>+33 0 11 22 33 44</td>
+    <td></td>
+    <td>06 06 06 06 06</td>
+    <td>05 05 05 05 05</td>
+    <td></td>
+    <td>OBM corp</td>
+    <td>IT</td>
+    <td>SI</td>
+    <td>rue de la paix</td>
+    <td></td>
+    <td></td>
+    <td>310000</td>
+    <td>Ramonville</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td colspan=\"35\">$l_import_msg</td>
+  </tr>
+  </table>
+  </div>";
+
+  $block .= html_user_import_file();
+
+  return $block;
+}
+
+
+/**
+ * HTML Display Import Consultation File block
+ **/
+function html_user_import_file() {
+  global $l_user, $l_header_import, $l_file, $l_import_file,$l_unicity_check;
+  global $display;
+
+  $url = url_prepare("user_index.php");
+  $display["title"] = "<div class=\"title\">$l_user : $l_header_import</div>";
+
+  $block = "
+    <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
+      <input type=\"hidden\" name=\"action\" value=\"import_file\" />
+    <table>
+    <tr>
+      <th>$l_import_file</th>
+      <td>
+        <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
+        <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
+      </td>
+    </tr>
+    <tr>
+      <th>$l_unicity_check</th>
+      <td><input type=\"checkbox\" name=\"unicity_check\" checked=\"checked\" value=\"1\" /></td>
+    </tr>
+    </table>
+    <fieldset class=\"buttons\">
+      <input type=\"submit\" name=\"submit\" value=\"$l_import_file\" />
+    </fielset>
+    </form>
+    </div>";
+
+  return $block;
+}
+
+
+/**
+ * Process Import file
+ **/
+function dis_user_import_file_run($params) {
+  global $obm, $display, $err, $ccscd_tab, $l_user, $l_header_import;
+  global $l_login, $l_lastname, $l_firstname, $l_email, $l_mailboxtype, $l_login_in_use;
+
+  $display['title'] = "<div class=\"title\">$l_user : $l_header_import</div>";
+
+  $file = $params['file_saved'];
+  if ($file == '') {
+    $file = $params['file'];
+  }
+  $file_name = $params['file_name'];
+  $file_size = $params['file_size'];
+  $csv_sep = $_SESSION['set_csv_sep'];
+  if ($csv_sep == $ccsvd_tab) {
+    $csv_sep = "\t";
+  }
+
+  $csv_sep = ',';
+  $array_true = array('X', 'x', 'Y', 'YES', 'y', 'yes', 'O', 'OUI', 'o', 'oui', '1');
+
+  $cpt = 0;
+
+  $c_kind = $cpt++;
+  $c_lastname = $cpt++;
+  $c_firstname = $cpt++;
+  $c_login = $cpt++;
+  $c_password = $cpt++;
+  $c_password_type = $cpt++;
+  $c_mail = $cpt++;
+  $c_email = $cpt++;
+  $c_mail_quota = $cpt++;
+  $c_profile = $cpt++;
+  $c_title = $cpt++;
+  $c_phone1 = $cpt++;
+  $c_phone2 = $cpt++;
+  $c_mphone = $cpt++;
+  $c_fax = $cpt++;
+  $c_fax2 = $cpt++;
+  $c_company = $cpt++;
+  $c_direction = $cpt++;
+  $c_service = $cpt++;
+  $c_ad1 = $cpt++;
+  $c_ad2 = $cpt++;
+  $c_ad3 = $cpt++;
+  $c_postcode = $cpt++;
+  $c_town = $cpt++;
+  $c_expresspostal = $cpt++;
+
+  $domain_id = $obm['domain_id'];
+  $d = of_domain_get_domain_infos($domain_id, true);
+
+  $dis_import .= "
+  <thead>
+  <tr>
+    <th>$l_login</th>
+    <th>$l_lastname</th>
+    <th>$l_firstname</th>
+    <th>$l_email</th>
+    <th></th>
+  </tr>
+  </thead>";
+  $obm_q = new DB_OBM;
+  $multidomain = sql_multidomain("userobm");
+  $num_line = 0;
+  $fh = fopen($file, 'r');
+  while ( ($row = fgetcsv($fh, 4000, $csv_sep)) ) {
+    $num_line++;
+    $user['kind'] = addslashes(trim($row[$c_kind]));
+    $user['lastname'] = addslashes(trim($row[$c_lastname]));
+    $user['firstname'] = addslashes(trim($row[$c_firstname]));
+    $user['login'] = addslashes(trim($row[$c_login]));
+    $user['password'] = addslashes(trim($row[$c_password]));
+    if (trim($row[$c_password_type]) == 'CRYPT') {
+      $user['password_type'] = 'CRYPT';
+    } else if (trim($row[$c_password_type]) == 'MD5') {
+      $user['password_type'] = 'MD5';
+    } else {
+      $user['password_type'] = 'PLAIN';
+    }
+    if (in_array(trim($row[$c_mail]), $array_true)) {
+      $user['mail_perms'] = 1;
+      $user['mail_server'] = $obm['mailserver'];
+    }
+    $user['email'] = addslashes(trim($row[$c_email]));
+
+    // If quota no a number (and a correct one) get the domain default value
+    if (is_numeric(addslashes(trim($row[$c_mail_quota])))
+	&& (addslashes(trim($row[$c_mail_quota])) > 0)
+	&& (addslashes(trim($row[$c_mail_quota])) < 100000)) {
+      $user['quota'] = addslashes(trim($row[$c_mail_quota]));
+    } else {
+      $user['mail_quota'] = $d['mail_quota'];
+    }
+    $user['profile'] = (trim($row[$c_profile]) != '' ? addslashes(trim($row[$c_profile])) : 'user');
+    $user['title'] = addslashes($row[$c_title]);
+    $user['phone1'] = addslashes($row[$c_phone1]);
+    $user['phone2'] = addslashes($row[$c_phone2]);
+    $user['mphone'] = addslashes($row[$c_mphone]);
+    $user['fax'] = addslashes($row[$c_fax]);
+    $user['fax2'] = addslashes($row[$c_fax2]);
+    $user['company'] = addslashes($row[$c_company]);
+    $user['direction'] = addslashes($row[$c_direction]);
+    $user['service'] = addslashes($row[$c_service]);
+    $user['ad1'] = addslashes($row[$c_ad1]);
+    $user['ad2'] = addslashes($row[$c_ad1]);
+    $user['ad3'] = addslashes($row[$c_ad1]);
+    $user['zip'] = addslashes($row[$c_postcode]);
+    $user['town'] = addslashes($row[$c_town]);
+    $user['expresspostal'] = addslashes($row[$c_expresspostal]);
+
+    // Delegation
+    $user['delegation'] = str_replace(';', '/', $row[$c_delegation]);
+    
+    // Login
+    preg_match('/^(.*)@(.*)$/', $row[$c_email], $matches);
+    $user['login'] = $matches[1];
+
+    // Email Nomade
+    $user['email_nomade'] = $row[$c_email_nomade];
+    $user['nomade_perms'] = 1;
+    $user['nomade_enable'] = 1;
+    $logins = check_user_login_in_use($user['login'],$d,$id,true,$params["unicity_check"]);
+    if(count($local_login) == 0 && $params["unicity_check"]) {
+      $rlogins = check_user_login_remotely_in_use($user['login'],$d,true,$params["unicity_check"]);
+      $logins = array_merge($rlogins, $logins) ;
+    }
+    if (count($logins) > 0) {
+      $res = "$user[login] : $l_login_in_use";
+    } else {
+      // Insert the user
+      if (check_user_data_form('', $user)) {
+	$user['id'] = run_query_user_insert($user);
+	$res = '+';
+      } else {
+	// User not ok, stop for this row
+	$user['id'] = false;
+	$res = "! $err[field] - $err[msg]";
+      }
+    }
+
+    $dis_import .= "
+    <tr>
+      <td>$user[login]</td>
+      <td>$user[lastname]</td>
+      <td>$user[firstname]</td>
+      <td>$user[email]</td>
+      <td>$res</td>
+    </tr>";
+  }
+  fclose($fh);
+
+  $block = "
+  <table class=\"spreadSheet\">
+  $dis_import
+  </table>";
+
+  return $block;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////

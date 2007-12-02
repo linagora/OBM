@@ -223,25 +223,34 @@ if ($action == "ext_get_ids") {
   }
   $display["detail"] = dis_user_consult($params);
 
-} elseif ($action == "display") {
+} elseif ($action == 'import') {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($obm["uid"], "user", 1);
-  $display["detail"] = dis_user_display_pref($prefs);
+  $display['detail'] = dis_user_import_index();
 
-} else if ($action == "dispref_display") {
+} elseif ($action == 'import_file') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_user_import_file_run($params);
+
+} elseif ($action == 'admin') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_user_admin_index();
+
+} elseif ($action == 'display') {
+///////////////////////////////////////////////////////////////////////////////
+  $prefs = get_display_pref($obm['uid'], 'user', 1);
+  $display['detail'] = dis_user_display_pref($prefs);
+
+} else if ($action == 'dispref_display') {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($params);
-  $prefs = get_display_pref($obm["uid"], "user", 1);
-  $display["detail"] = dis_user_display_pref($prefs);
+  $prefs = get_display_pref($obm['uid'], 'user', 1);
+  $display['detail'] = dis_user_display_pref($prefs);
 
-} else if ($action == "dispref_level") {
+} else if ($action == 'dispref_level') {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($params);
-  $prefs = get_display_pref($obm["uid"], "user", 1);
-  $display["detail"] = dis_user_display_pref($prefs);
-} elseif ($action == "admin") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_user_admin_index();
+  $prefs = get_display_pref($obm['uid'], 'user', 1);
+  $display['detail'] = dis_user_display_pref($prefs);
 }
 
 of_category_user_action_switch($module, $action, $params);
@@ -249,12 +258,12 @@ of_category_user_action_switch($module, $action, $params);
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head($l_user);
-if (! $params["popup"]) {
+$display['head'] = display_head($l_user);
+if (! $params['popup']) {
   update_user_action();
-  $display["header"] = display_menu($module);
+  $display['header'] = display_menu($module);
 }
-$display["end"] = display_end();
+$display['end'] = display_end();
 
 display_page($display);
 
@@ -266,25 +275,25 @@ display_page($display);
 function get_user_params() {
   
   // Get global params
-  $params = get_global_params("UserObm");
+  $params = get_global_params('UserObm');
 
   if (isset($params)) {
     $nb_group = 0;
     while ( list( $key ) = each($params) ) {
-      if (strcmp(substr($key, 0, 7),"data-g-") == 0) {
+      if (strcmp(substr($key, 0, 7),'data-g-') == 0) {
         $nb_group++;
         $group_num = substr($key, 7);
         $params["group_$nb_group"] = $group_num;
       }
     }
-    $params["group_nb"] = $nb_group;
+    $params['group_nb'] = $nb_group;
   }
   
   if (isset ($_FILES['fi_file'])) {
-    $params["file_tmp"] = $_FILES['fi_file']["tmp_name"];
-    $params["file_name"] = $_FILES['fi_file']['name'];
-    $params["size"] = $_FILES['fi_file']['size'];
-    $params["type"] = $_FILES['fi_file']['type'];
+    $params['file_tmp'] = $_FILES['fi_file']['tmp_name'];
+    $params['file_name'] = $_FILES['fi_file']['name'];
+    $params['size'] = $_FILES['fi_file']['size'];
+    $params['type'] = $_FILES['fi_file']['type'];
   }
 
   return $params;
@@ -297,14 +306,14 @@ function get_user_params() {
 function get_user_action() {
   global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_header_consult,$l_header_display,$l_header_admin,$l_header_reset;
-  global $l_header_upd_group,$l_header_admin;
+  global $l_header_consult,$l_header_display,$l_header_admin,$l_header_import;
+  global $l_header_upd_group,$l_header_admin, $l_header_reset;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   
-  of_category_user_module_action("user");
+  of_category_user_module_action('user');
 
 // Index
-  $actions["user"]["index"] = array (
+  $actions['user']['index'] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/user/user_index.php?action=index",
     'Right'    => $cright_read,
@@ -312,7 +321,7 @@ function get_user_action() {
                                     );
 
 // Get Ids
-  $actions["user"]["ext_get_ids"] = array (
+  $actions['user']['ext_get_ids'] = array (
     'Url'      => "$path/user/user_index.php?action=ext_get_ids",
     'Right'    => $cright_read,
     'Condition'=> array ('none'),
@@ -320,7 +329,7 @@ function get_user_action() {
                                     );
                                     
 // Get Ids
-  $actions["user"]["ext_get_id"] = array (
+  $actions['user']['ext_get_id'] = array (
     'Url'      => "$path/user/user_index.php?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('none'),
@@ -328,7 +337,7 @@ function get_user_action() {
                                     );
 
 // New
-  $actions["user"]["new"] = array (
+  $actions['user']['new'] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/user/user_index.php?action=new",
     'Right'    => $cright_write_admin,
@@ -336,95 +345,109 @@ function get_user_action() {
                                   );
 
 // Search
-  $actions["user"]["search"] = array (
+  $actions['user']['search'] = array (
     'Url'      => "$path/user/user_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                   );
 // Search
-  $actions["user"]["ext_search"] = array (
+  $actions['user']['ext_search'] = array (
     'Url'      => "$path/user/user_index.php?action=ext_search",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
   );  
 
 // Get user id from external window (js)
-  $actions["user"]["getsearch"] = array (
+  $actions['user']['getsearch'] = array (
     'Url'      => "$path/user/user_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                   );
 // Detail Consult
-  $actions["user"]["detailconsult"] = array (
+  $actions['user']['detailconsult'] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/user/user_index.php?action=detailconsult&amp;user_id=".$params["user_id"]."",
+    'Url'      => "$path/user/user_index.php?action=detailconsult&amp;user_id=".$params['user_id'],
     'Right'    => $cright_read,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'group_consult', 'group_update')
                                   );
 
 // Detail Update
-  $actions["user"]["detailupdate"] = array (
+  $actions['user']['detailupdate'] = array (
      'Name'     => $l_header_update,
-     'Url'      => "$path/user/user_index.php?action=detailupdate&amp;user_id=".$params["user_id"]."",
+     'Url'      => "$path/user/user_index.php?action=detailupdate&amp;user_id=".$params['user_id'],
      'Right'    => $cright_write_admin,
      'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update')
                                      	   );
 
 // Insert
-  $actions["user"]["insert"] = array (
+  $actions['user']['insert'] = array (
     'Url'      => "$path/user/user_index.php?action=insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
 // Update
-  $actions["user"]["update"] = array (
+  $actions['user']['update'] = array (
     'Url'      => "$path/user/user_index.php?action=update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
 // Group Consult
-  $actions["user"]["group_consult"] = array (
+  $actions['user']['group_consult'] = array (
     'Name'     => $l_header_upd_group,
-    'Url'      => "$path/user/user_index.php?action=group_consult&amp;user_id=".$params["user_id"],
+    'Url'      => "$path/user/user_index.php?action=group_consult&amp;user_id=".$params['user_id'],
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update')
                                      );
 
 // Group Update
-  $actions["user"]["group_update"] = array (
+  $actions['user']['group_update'] = array (
     'Url'      => "$path/user/user_index.php?action=group_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
 // Reset
-  $actions["user"]["reset"] = array (
+  $actions['user']['reset'] = array (
     'Name'     => $l_header_reset,
-    'Url'      => "$path/user/user_index.php?action=reset&amp;user_id=".$params["user_id"]."",
+    'Url'      => "$path/user/user_index.php?action=reset&amp;user_id=".$params['user_id'],
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'group_consult', 'group_update') 
                                     );
 
 // Check Delete
-  $actions["user"]["check_delete"] = array (
+  $actions['user']['check_delete'] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/user/user_index.php?action=check_delete&amp;user_id=".$params["user_id"]."",
+    'Url'      => "$path/user/user_index.php?action=check_delete&amp;user_id=".$params['user_id'],
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update') 
                                      	   );
 
 // Delete
-  $actions["user"]["delete"] = array (
+  $actions['user']['delete'] = array (
     'Url'      => "$path/user/user_index.php?action=delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
+// Import
+  $actions['user']['import'] = array (
+    'Name'     => $l_header_import,
+    'Url'      => "$path/user/user_index.php?action=import",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('all')
+                                                 );
+
+// Import file
+  $actions['user']['import_file'] = array (
+    'Url'      => "$path/user/user_index.php?action=import_file",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                                 );
 
 // Display
-  $actions["user"]["display"] = array (
+  $actions['user']['display'] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/user/user_index.php?action=display",
     'Right'    => $cright_read,
@@ -432,26 +455,25 @@ function get_user_action() {
                                       	 );
 
 // Display
-  $actions["user"]["dispref_display"] = array (
+  $actions['user']['dispref_display'] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	 );
 // Display
-  $actions["user"]["dispref_level"] = array (
+  $actions['user']['dispref_level'] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	 );
 
 // Admin
-  $actions["user"]["admin"] = array (
+  $actions['user']['admin'] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/user/user_index.php?action=admin",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('all')
                                                  );
-
 
 }
 
@@ -462,23 +484,23 @@ function get_user_action() {
 function update_user_action() {
   global $params, $actions, $path;
 
-  $id = $params["user_id"];
+  $id = $params['user_id'];
   if ($id > 0) {
     // Detail Consult
-    $actions["user"]["detailconsult"]["Url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=$id";
-    $actions["user"]["detailconsult"]['Condition'][] = 'insert';
+    $actions['user']['detailconsult']['Url'] = "$path/user/user_index.php?action=detailconsult&amp;user_id=$id";
+    $actions['user']['detailconsult']['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["user"]["detailupdate"]['Url'] = "$path/user/user_index.php?action=detailupdate&amp;user_id=$id";
-    $actions["user"]["detailupdate"]['Condition'][] = 'insert';
+    $actions['user']['detailupdate']['Url'] = "$path/user/user_index.php?action=detailupdate&amp;user_id=$id";
+    $actions['user']['detailupdate']['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["user"]["check_delete"]['Url'] = "$path/user/user_index.php?action=check_delete&amp;user_id=$id";
-    $actions["user"]["check_delete"]['Condition'][] = 'insert';
+    $actions['user']['check_delete']['Url'] = "$path/user/user_index.php?action=check_delete&amp;user_id=$id";
+    $actions['user']['check_delete']['Condition'][] = 'insert';
 
     // Group Consult
-    $actions["user"]["group_consult"]["Url"] = "$path/user/user_index.php?action=group_consult&amp;user_id=$id";
-    $actions["user"]["group_consult"]['Condition'][] = 'insert';
+    $actions['user']['group_consult']['Url'] = "$path/user/user_index.php?action=group_consult&amp;user_id=$id";
+    $actions['user']['group_consult']['Condition'][] = 'insert';
   }
 }
 

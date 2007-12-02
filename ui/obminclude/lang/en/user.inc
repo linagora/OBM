@@ -25,6 +25,7 @@ $l_group = "Group";
 $l_delegation_target = "Delegation target";
 
 $l_group_member = "Member of groups";
+$l_password_type = "Password Crypt";
 
 // Actions
 $l_insert = "Insert the User";
