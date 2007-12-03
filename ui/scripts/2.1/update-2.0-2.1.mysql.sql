@@ -584,10 +584,19 @@ ALTER TABLE Lead ADD COLUMN lead_status_id int(8) AFTER lead_datealarm;
 UPDATE Deal set deal_dateproposal = null WHERE deal_dateproposal = '0000-00-00';
 
 -- Calendar start hour
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','cal_first_hour','8');
+INSERT INTO UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES ('0','cal_first_hour','8');
 
 -- Calendar last hour
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','cal_last_hour','20');
+INSERT INTO UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES ('0','cal_last_hour','20');
+
+
+-------------------------------------------------------------------------------
+-- Update some field size
+-------------------------------------------------------------------------------
+ALTER TABLE UserObm CHANGE COLUMN userobm_lastname userobm_lastname varchar(64) DEFAULT ''; 
+ALTER TABLE UserObm CHANGE COLUMN userobm_firstname userobm_firstname varchar(64) DEFAULT ''; 
+ALTER TABLE UserObm CHANGE COLUMN userobm_sound userobm_sound varchar(64); 
+
 
 --
 -- Update UserObm constraints

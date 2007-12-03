@@ -431,21 +431,6 @@ function get_user_action() {
     'Condition'=> array ('None') 
                                      );
 
-// Import
-  $actions['user']['import'] = array (
-    'Name'     => $l_header_import,
-    'Url'      => "$path/user/user_index.php?action=import",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('all')
-                                                 );
-
-// Import file
-  $actions['user']['import_file'] = array (
-    'Url'      => "$path/user/user_index.php?action=import_file",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                                 );
-
 // Display
   $actions['user']['display'] = array (
     'Name'     => $l_header_display,
@@ -466,6 +451,21 @@ function get_user_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	 );
+
+// Import
+  $actions['user']['import'] = array (
+    'Name'     => $l_header_import,
+    'Url'      => "$path/user/user_index.php?action=import",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('all')
+                                                 );
+
+// Import file
+  $actions['user']['import_file'] = array (
+    'Url'      => "$path/user/user_index.php?action=import_file",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                                 );
 
 // Admin
   $actions['user']['admin'] = array (

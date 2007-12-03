@@ -1752,6 +1752,9 @@ function dis_user_import_index() {
 
   $display['title'] = "<h1 class=\"title\">$l_user : $l_header_import</h1>";
 
+  global $obm;
+  //  print_r($obm);
+
   $block = "
   <div class=\"detail extra\">
     <h1>$l_file_format</h1>
@@ -1856,7 +1859,7 @@ function dis_user_import_index() {
  * HTML Display Import Consultation File block
  **/
 function html_user_import_file() {
-  global $l_user, $l_header_import, $l_file, $l_import_file,$l_unicity_check;
+  global $l_user, $l_header_import, $l_file, $l_import_file;
   global $display;
 
   $url = url_prepare("user_index.php");
@@ -1872,10 +1875,6 @@ function html_user_import_file() {
         <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
         <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
       </td>
-    </tr>
-    <tr>
-      <th>$l_unicity_check</th>
-      <td><input type=\"checkbox\" name=\"unicity_check\" checked=\"checked\" value=\"1\" /></td>
     </tr>
     </table>
     <fieldset class=\"buttons\">
@@ -1893,7 +1892,7 @@ function html_user_import_file() {
  **/
 function dis_user_import_file_run($params) {
   global $obm, $display, $err, $ccscd_tab, $l_user, $l_header_import;
-  global $l_login, $l_lastname, $l_firstname, $l_email, $l_mailboxtype, $l_login_in_use;
+  global $l_login, $l_lastname, $l_firstname, $l_email, $l_login_in_use;
 
   $display['title'] = "<div class=\"title\">$l_user : $l_header_import</div>";
 
@@ -1956,7 +1955,7 @@ function dis_user_import_file_run($params) {
   $multidomain = sql_multidomain("userobm");
   $num_line = 0;
   $fh = fopen($file, 'r');
-  while ( ($row = fgetcsv($fh, 4000, $csv_sep)) ) {
+  while ( ($row = fgetcsv($fh, 2000, $csv_sep)) ) {
     $num_line++;
     $user['kind'] = addslashes(trim($row[$c_kind]));
     $user['lastname'] = addslashes(trim($row[$c_lastname]));
@@ -1965,8 +1964,8 @@ function dis_user_import_file_run($params) {
     $user['password'] = addslashes(trim($row[$c_password]));
     if (trim($row[$c_password_type]) == 'CRYPT') {
       $user['password_type'] = 'CRYPT';
-    } else if (trim($row[$c_password_type]) == 'MD5') {
-      $user['password_type'] = 'MD5';
+    } else if (trim($row[$c_password_type]) == 'MD5SUM') {
+      $user['password_type'] = 'MD5SUM';
     } else {
       $user['password_type'] = 'PLAIN';
     }

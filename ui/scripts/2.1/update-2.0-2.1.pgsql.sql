@@ -599,3 +599,11 @@ CREATE TABLE LeadStatus (
 
 -- add lead_status_id
 ALTER TABLE Lead ADD COLUMN lead_status_id integer;
+
+
+-------------------------------------------------------------------------------
+-- Update some field size
+-------------------------------------------------------------------------------
+ALTER TABLE UserObm ALTER COLUMN userobm_lastname TYPE varchar(64);
+ALTER TABLE UserObm ALTER COLUMN userobm_firstname TYPE varchar(64);
+ALTER TABLE UserObm ALTER COLUMN userobm_sound TYPE varchar(64);
