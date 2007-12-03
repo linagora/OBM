@@ -44,7 +44,6 @@ $l_name_import_nomatch = "Import name is not valid";
 $l_import_exists = "Sorry but this import already exists";
 $l_check_sameimport = "These imports seem similar to this new entry !";
 $l_warn_delete = "Really delete this Import ?";
-$l_file_error = "The file is not available (or not filled) !";
 $l_import_end = "Import terminated";
 $l_lines_processed = "lines processed";
 $l_conflict_detected = "Conflict detected";

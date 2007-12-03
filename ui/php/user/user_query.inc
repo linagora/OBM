@@ -1368,24 +1368,24 @@ function check_user_data_form($p_id, $user) {
   // We can't handle a user with a more privileged profile
   // Or same privilege with 'impair' profile
   $level = $profiles[$obm['profile']]['level'];
+  $managepeers = $profiles[$obm['profile']]['level_managepeers'];
   if (($profiles[$profile]['level'] < $level)
-      || (($profiles[$profile]['level'] == $level) && ($level % 2 == 1))) {
+      || (($profiles[$profile]['level'] == $level) && (! $managepeers))) {
     $err['msg'] = "$l_profile_privilege_error";
     $err['field'] = 'profile';
     return false;
   }    
   
-  if($action == 'update') {
+  if ($action == 'update') {
     $u = get_user_info($id);
     $usr_profile = $u['perms'];
     if (($profiles[$usr_profile]['level'] < $level)
-        || (($profiles[$usr_profile]['level'] == $level) && ($level % 2 == 1))) {
+        || (($profiles[$usr_profile]['level'] == $level) && (! $managepeers))) {
       $err['msg'] = "$l_profile_privilege_error";
       $err['field'] = 'profile';
       return false;
     }    
   }
-
 
 
   if ($action == 'update') {
@@ -1534,6 +1534,7 @@ function check_user_data_form($p_id, $user) {
     return false;
   }
 
+  print_r($user);
   // User nomad email not null if active
   if ( ($email_nomade == '')
        && ($nomade_enable) ) {
@@ -1776,8 +1777,9 @@ function check_user_can_delete($params) {
   // We can't delete a user with a more privileged profile
   // Or same privilege with 'impair' profile
   $level = $profiles[$obm['profile']]['level'];
+  $managepeers = $profiles[$obm['profile']]['level_managepeers'];
   if (($profiles[$usr_profile]['level'] < $level)
-      || (($profiles[$usr_profile]['level'] == $level) && ($level % 2 == 1))) {
+      || (($profiles[$usr_profile]['level'] == $level) && (! $managepeers))) {
     $err['msg'] = "$l_profile_privilege_error";
     $delete_ok = false;
   }

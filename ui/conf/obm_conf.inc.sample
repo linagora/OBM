@@ -12,13 +12,13 @@
 // Global parameters --------------------------------------------------------//
 
 // OBM host (for mail links)
-$cgp_host = "http://obm/";
+$cgp_host = 'http://obm/';
 
-// Resources alias absolute path. (default value is "/images")
+// Resources alias absolute path. (default value is '/images')
 // $resources_path = "$cgp_host/images"; 
 
 // Home page redirection
-//$c_home_redirect = "$cgp_host" . "calendar/calendar_index.php";
+//$c_home_redirect = "$cgp_host" . 'calendar/calendar_index.php';
 
 // Use specific langs (was $cgp_site_include)
 //$conf_lang = true;
@@ -43,10 +43,10 @@ $cgp_sql_star = true;
 //$ctu_sql_limit = true;
 
 // MySQL (only 4.1+) charset used (for database and files !)
-//$cmy_character_set = "_latin1";
+//$cmy_character_set = '_latin1';
 
 // MySQL (only 4.1+) charset collation used (for database and files !)
-//$cmy_charset_collation = "latin1_general_ci";
+//$cmy_charset_collation = 'latin1_general_ci';
 
 // is Mail enabled for OBM ? (eg: calendar)
 $cgp_mail_enabled = true;
@@ -62,17 +62,17 @@ $cgp_sess_db = false;
 //$cgp_sess_db = true;
 
 // Cookie name and domain
-$cgp_cookie_name = "OBM_Session";
-$cgp_cookie_domain = "aliacom.local";
+$cgp_cookie_name = 'OBM_Session';
+$cgp_cookie_domain = 'aliacom.local';
 
 // authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
-//$auth_kind="CAS";
-//$cas_server = "sso.aliacom.local";
+//$auth_kind = 'CAS';
+//$cas_server = 'sso.aliacom.local';
 //$cas_server_port = 8443;
-//$cas_server_uri = "";
+//$cas_server_uri = '';
 
-// encyption used to store password : "PLAIN", "MD5SUM" or "CRYPT"
-$password_encryption = "PLAIN";
+// encyption used to store password : 'PLAIN', 'MD5SUM' or 'CRYPT'
+$password_encryption = 'PLAIN';
 
 // Modules specific parameters ----------------------------------------------//
 
@@ -96,10 +96,10 @@ $ccontact_private_default = true;
 $ccalendar_public_groups = true;
 
 // Calendar: generic E-mail resource admin for calendar module
-//$ccalendar_resource_admin = "resource@mydomain";
+//$ccalendar_resource_admin = 'resource@mydomain';
 
 // Calendar first ay of week, first and last hour display
-//$ccalendar_weekstart = "monday";
+//$ccalendar_weekstart = 'monday';
 $ccalendar_first_hour = 8;
 $ccalendar_last_hour = 20;
 
@@ -116,20 +116,20 @@ $ccalendar_send_ics = true;
 $ccalendar_hour_fraction = 4;
 
 // Generic E-mail for Incident module
-//$cmail_incident = "support@mydomain";
+//$cmail_incident = 'support@mydomain';
 
 // Document : Root of the document repository
-$cdocument_root = "/var/www/obmdocuments";
-$default_path = "/Default";                  // Default directory
+$cdocument_root = '/var/www/obmdocuments';
+$default_path = '/Default';                  // Default directory
 
 // Group : is a new group private by default
 $cgroup_private_default = true;
 
 // Backup : Backup root
-$cbackup_root = "/var/www/obmbackup";
+$cbackup_root = '/var/www/obmbackup';
 
 // default taxes values
-$cdefault_tax = array ("TVA 19,6" => 1.196, "TVA 5,5" => 1.055, "Pas de TVA" => 1);
+$cdefault_tax = array ('TVA 19,6' => 1.196, 'TVA 5,5' => 1.055, 'Pas de TVA' => 1);
 
 //----------------------//
 // Profiles definitions //
@@ -154,53 +154,54 @@ $profiles['admin'] = array (
   'properties' => array (
     'admin_realm' => array ('user', 'delegation', 'domain')
     ),
-  'level' => 1
+  'level' => 1,
+  'level_managepeers' => ,
 );
 
 //------------------//
 // Services enabled //
 //------------------//
-$cgp_use["service"]["web"] = true;
-$cgp_use["service"]["mail"] = true;
-$cgp_use["service"]["mail_nomad"] = true;
-$cgp_use["service"]["mail_vacation"] = true;
-$cgp_use["service"]["ldap"] = true;
-$cgp_use["service"]["samba"] = true;
+$cgp_use['service']['web'] = true;
+$cgp_use['service']['mail'] = true;
+$cgp_use['service']['mail_nomad'] = true;
+$cgp_use['service']['mail_vacation'] = true;
+$cgp_use['service']['ldap'] = true;
+$cgp_use['service']['samba'] = true;
 
 //-----------------//
 // Displayed Infos //
 //-----------------//
 // sections -- Default is true
-//$cgp_show["section"] = ""; // Needed if module order to change
-//$cgp_show["section"]["com"]["url"] = "$path/calendar/calendar_index.php";
-//$cgp_show["section"]["webmail"]["url"] = "http://webmail";
-//$cgp_show["section"]["webmail"]["target"] = "_blanck";
+//$cgp_show['section'] = ''; // Needed if module order to change
+//$cgp_show['section']['com']['url'] = "$path/calendar/calendar_index.php";
+//$cgp_show['section']['webmail']['url'] = 'http://webmail';
+//$cgp_show['section']['webmail']['target'] = '_blanck';
 
 // modules -- false to hide, otherwise section
-//$cgp_show["module"] = ""; // Needed if module order to change
-//$cgp_show["module"]["company"] = "com";
+//$cgp_show['module'] = ''; // Needed if module order to change
+//$cgp_show['module']['company'] = 'com';
 
 // References fields
-//$cgp_hide[""]["region"] = true;
+//$cgp_hide['']['region'] = true;
 
 // Company module
-//$cgp_hide["company"]["company_number"] = true;
-//$cgp_hide["company"]["company_vat"] = true;
-//$cgp_hide["company"]["company_siret"] = true;
-//$cgp_hide["company"]["type"] = true;
-//$cgp_hide["company"]["activity"] = true;
-//$cgp_hide["company"]["nafcode"] = true;
-//$cgp_hide["company"]["company_address3"] = true;
-//$cgp_hide["company"]["company_expresspostal"] = true;
+//$cgp_hide['company']['company_number'] = true;
+//$cgp_hide['company']['company_vat'] = true;
+//$cgp_hide['company']['company_siret'] = true;
+//$cgp_hide['company']['type'] = true;
+//$cgp_hide['company']['activity'] = true;
+//$cgp_hide['company']['nafcode'] = true;
+//$cgp_hide['company']['company_address3'] = true;
+//$cgp_hide['company']['company_expresspostal'] = true;
 
 // Contact module
-//$cgp_hide["contact"]["function"] = true;
-//$cgp_hide["contact"]["contact_title"] = true;
-//$cgp_hide["contact"]["responsible"] = true;
-//$cgp_hide["contact"]["contact_service"] = true;
-//$cgp_hide["contact"]["contact_comment2"] = true;
-//$cgp_hide["contact"]["contact_comment3"] = true;
-//$cgp_hide["contact"]["contact_date"] = true;
+//$cgp_hide['contact']['function'] = true;
+//$cgp_hide['contact']['contact_title'] = true;
+//$cgp_hide['contact']['responsible'] = true;
+//$cgp_hide['contact']['contact_service'] = true;
+//$cgp_hide['contact']['contact_comment2'] = true;
+//$cgp_hide['contact']['contact_comment3'] = true;
+//$cgp_hide['contact']['contact_date'] = true;
 
 //--------------------//
 // User specific data //
@@ -208,18 +209,18 @@ $cgp_use["service"]["samba"] = true;
 // Categories available for modules :
 // company, contact, incident, document
 // Lang var definitions here for example : Put these in conf/lang/
-//$l_companycategory1 = "Category1";
-//$cgp_user["company"]["category"]["companycategory1"] = array("mode"=>"multi");
-//$l_contactcategory1 = "Contact category1";
-//$cgp_user["contact"]["category"]["contactcategory1"] = array("mode"=>"multi");
-//$l_contactcategory2 = "Contact category2";
-//$cgp_user["contact"]["category"]["contactcategory2"] = array("mode"=>"multi");
-//$l_documentcategory1 = "Doc cat1";
-//$cgp_user["document"]["category"]["documentcategory1"] = array("mode"=>"mono");
+//$l_companycategory1 = 'Category1';
+//$cgp_user['company']['category']['companycategory1'] = array('mode'=>'multi');
+//$l_contactcategory1 = 'Contact category1';
+//$cgp_user['contact']['category']['contactcategory1'] = array('mode'=>'multi');
+//$l_contactcategory2 = 'Contact category2';
+//$cgp_user['contact']['category']['contactcategory2'] = array('mode'=>'multi');
+//$l_documentcategory1 = 'Doc cat1';
+//$cgp_user['document']['category']['documentcategory1'] = array('mode'=>'mono');
 
 // AliaSuite : Set if there is a link for Aliamin, Blogs and Aliacms
-//$aliamin_link = "http://aliamin.aliacom.local/";
-//$aliacms_link = "http://cms.aliacom.local/";
-//$blogs_link = "http://blogs.aliacom.local/";
+//$aliamin_link = 'http://aliamin.aliacom.local/';
+//$aliacms_link = 'http://cms.aliacom.local/';
+//$blogs_link = 'http://blogs.aliacom.local/';
 
 </script>

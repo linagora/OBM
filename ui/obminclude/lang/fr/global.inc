@@ -81,6 +81,7 @@ $l_number = "Numéro";
 $l_format = "Format";
 $l_file_format = "Format de fichier";
 $l_file = "Fichier";
+$l_file_error = "Le fichier est introuvable (ou non saisi) !";
 $l_size = "Taille";
 $l_email = "Email";
 $l_quota = "Quota";

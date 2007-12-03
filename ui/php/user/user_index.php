@@ -187,7 +187,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_user_can_delete($params["user_id"])) {
+  if (check_user_can_delete($params)) {
     $retour = run_query_user_delete($params["user_id"]);
     if ($retour) {
       set_update_state();

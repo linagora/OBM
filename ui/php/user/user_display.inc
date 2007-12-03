@@ -1743,17 +1743,14 @@ function dis_user_admin_index() {
  * Display the user csv import index
  **/
 function dis_user_import_index() {
-  global $display, $l_user, $l_header_import, $l_kind;
+  global $display, $l_user, $l_header_import, $l_enabled, $l_kind, $l_profile;
   global $l_lastname, $l_firstname, $l_login, $l_password, $l_password_type;
-  global $l_mail, $l_email, $l_quota, $l_profile, $l_title, $l_phone, $l_mphone;
-  global $l_fax, $l_company, $l_direction, $l_service, $l_address, $l_postcode;
-  global $l_town, $l_expresspostal;
-  global $l_import_msg, $l_file_format;
+  global $l_mail, $l_email, $l_quota, $l_email_nomade, $l_access_nomade;
+  global $l_title, $l_phone, $l_mphone, $l_fax, $l_company, $l_direction;
+  global $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal, $l_desc;
+  global $l_import_msg, $l_file_format, $l_perms, $l_local_copy;
 
   $display['title'] = "<h1 class=\"title\">$l_user : $l_header_import</h1>";
-
-  global $obm;
-  //  print_r($obm);
 
   $block = "
   <div class=\"detail extra\">
@@ -1787,20 +1784,28 @@ function dis_user_import_index() {
     <th>23</th>
     <th>24</th>
     <th>25</th>
+    <th>26</th>
+    <th>27</th>
+    <th>28</th>
+    <th>29</th>
   </tr>
   <tr>
     <th>$l_kind</th>
     <th>$l_lastname</th>
     <th>$l_firstname</th>
+    <th>$l_profile</th>
     <th>$l_login</th>
     <th>$l_password</th>
     <th>$l_password_type</th>
     <th>$l_mail</th>
     <th>$l_email</th>
     <th>$l_quota</th>
-    <th>$l_profile</th>
+    <th>$l_email_nomade</th>
+    <th>$l_access_nomade $l_perms</th>
+    <th>$l_access_nomade $l_enabled</th>
+    <th>$l_access_nomade $l_local_copy</th>
     <th>$l_title</th>
-    <th>$l_phone 1</th>
+    <th>$l_phone</th>
     <th>$l_phone 2</th>
     <th>$l_mphone</th>
     <th>$l_fax</th>
@@ -1814,19 +1819,24 @@ function dis_user_import_index() {
     <th>$l_postcode</th>
     <th>$l_town</th>
     <th>$l_expresspostal</th>
+    <th>$l_desc</th>
   </tr>
   </thead>
   <tr>
     <td>M</td>
     <td>BAUD</td>
     <td>Pierre</td>
+    <td>admin</td>
     <td>pierre</td>
     <td>mot</td>
     <td>PLAIN</td>
     <td>X</td>
     <td>pierre.baud</td>
     <td>300</td>
-    <td>admin</td>
+    <td>pb@mymail.org</td>
+    <td>X</td>
+    <td>X</td>
+    <td></td>
     <td>Chief</td>
     <td>+33 0 11 22 33 44</td>
     <td></td>
@@ -1839,9 +1849,10 @@ function dis_user_import_index() {
     <td>rue de la paix</td>
     <td></td>
     <td></td>
-    <td>310000</td>
+    <td>31000</td>
     <td>Ramonville</td>
-    <td></td>
+    <td>cedex 5</td>
+    <td>nice guy</td>
   </tr>
   <tr>
     <td colspan=\"35\">$l_import_msg</td>
@@ -1862,8 +1873,8 @@ function html_user_import_file() {
   global $l_user, $l_header_import, $l_file, $l_import_file;
   global $display;
 
-  $url = url_prepare("user_index.php");
-  $display["title"] = "<div class=\"title\">$l_user : $l_header_import</div>";
+  $url = url_prepare('user_index.php');
+  $display['title'] = "<div class=\"title\">$l_user : $l_header_import</div>";
 
   $block = "
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
@@ -1893,6 +1904,7 @@ function html_user_import_file() {
 function dis_user_import_file_run($params) {
   global $obm, $display, $err, $ccscd_tab, $l_user, $l_header_import;
   global $l_login, $l_lastname, $l_firstname, $l_email, $l_login_in_use;
+  global $l_file_error;
 
   $display['title'] = "<div class=\"title\">$l_user : $l_header_import</div>";
 
@@ -1907,7 +1919,6 @@ function dis_user_import_file_run($params) {
     $csv_sep = "\t";
   }
 
-  $csv_sep = ',';
   $array_true = array('X', 'x', 'Y', 'YES', 'y', 'yes', 'O', 'OUI', 'o', 'oui', '1');
 
   $cpt = 0;
@@ -1915,17 +1926,21 @@ function dis_user_import_file_run($params) {
   $c_kind = $cpt++;
   $c_lastname = $cpt++;
   $c_firstname = $cpt++;
+  $c_profile = $cpt++;
   $c_login = $cpt++;
   $c_password = $cpt++;
   $c_password_type = $cpt++;
   $c_mail = $cpt++;
   $c_email = $cpt++;
   $c_mail_quota = $cpt++;
-  $c_profile = $cpt++;
+  $c_email_nomade = $cpt++;
+  $c_nomade_perms = $cpt++;
+  $c_nomade_enable = $cpt++;
+  $c_nomade_local_copy = $cpt++;
   $c_title = $cpt++;
-  $c_phone1 = $cpt++;
+  $c_phone = $cpt++;
   $c_phone2 = $cpt++;
-  $c_mphone = $cpt++;
+  $c_mobile = $cpt++;
   $c_fax = $cpt++;
   $c_fax2 = $cpt++;
   $c_company = $cpt++;
@@ -1936,7 +1951,8 @@ function dis_user_import_file_run($params) {
   $c_ad3 = $cpt++;
   $c_postcode = $cpt++;
   $c_town = $cpt++;
-  $c_expresspostal = $cpt++;
+  $c_cdx = $cpt++;
+  $c_description = $cpt++;
 
   $domain_id = $obm['domain_id'];
   $d = of_domain_get_domain_infos($domain_id, true);
@@ -1951,10 +1967,16 @@ function dis_user_import_file_run($params) {
     <th></th>
   </tr>
   </thead>";
+
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("userobm");
   $num_line = 0;
   $fh = fopen($file, 'r');
+  if (! $fh) {
+    $display['msg'] .= display_err_msg($l_file_error);
+    return;
+  }
+
   while ( ($row = fgetcsv($fh, 2000, $csv_sep)) ) {
     $num_line++;
     $user['kind'] = addslashes(trim($row[$c_kind]));
@@ -1971,7 +1993,7 @@ function dis_user_import_file_run($params) {
     }
     if (in_array(trim($row[$c_mail]), $array_true)) {
       $user['mail_perms'] = 1;
-      $user['mail_server'] = $obm['mailserver'];
+      $user['mail_server_id'] = $obm['mailserver'];
     }
     $user['email'] = addslashes(trim($row[$c_email]));
 
@@ -1979,44 +2001,45 @@ function dis_user_import_file_run($params) {
     if (is_numeric(addslashes(trim($row[$c_mail_quota])))
 	&& (addslashes(trim($row[$c_mail_quota])) > 0)
 	&& (addslashes(trim($row[$c_mail_quota])) < 100000)) {
-      $user['quota'] = addslashes(trim($row[$c_mail_quota]));
+      $user['mail_quota'] = addslashes(trim($row[$c_mail_quota]));
     } else {
       $user['mail_quota'] = $d['mail_quota'];
     }
     $user['profile'] = (trim($row[$c_profile]) != '' ? addslashes(trim($row[$c_profile])) : 'user');
     $user['title'] = addslashes($row[$c_title]);
-    $user['phone1'] = addslashes($row[$c_phone1]);
+    $user['phone'] = addslashes($row[$c_phone]);
     $user['phone2'] = addslashes($row[$c_phone2]);
-    $user['mphone'] = addslashes($row[$c_mphone]);
+    $user['mobile'] = addslashes($row[$c_mobile]);
     $user['fax'] = addslashes($row[$c_fax]);
     $user['fax2'] = addslashes($row[$c_fax2]);
     $user['company'] = addslashes($row[$c_company]);
     $user['direction'] = addslashes($row[$c_direction]);
     $user['service'] = addslashes($row[$c_service]);
     $user['ad1'] = addslashes($row[$c_ad1]);
-    $user['ad2'] = addslashes($row[$c_ad1]);
-    $user['ad3'] = addslashes($row[$c_ad1]);
+    $user['ad2'] = addslashes($row[$c_ad2]);
+    $user['ad3'] = addslashes($row[$c_ad3]);
     $user['zip'] = addslashes($row[$c_postcode]);
     $user['town'] = addslashes($row[$c_town]);
-    $user['expresspostal'] = addslashes($row[$c_expresspostal]);
+    $user['cdx'] = addslashes($row[$c_cdx]);
+    $user['desc'] = addslashes($row[$c_description]);
 
     // Delegation
     $user['delegation'] = str_replace(';', '/', $row[$c_delegation]);
     
-    // Login
-    preg_match('/^(.*)@(.*)$/', $row[$c_email], $matches);
-    $user['login'] = $matches[1];
-
     // Email Nomade
-    $user['email_nomade'] = $row[$c_email_nomade];
-    $user['nomade_perms'] = 1;
-    $user['nomade_enable'] = 1;
-    $logins = check_user_login_in_use($user['login'],$d,$id,true,$params["unicity_check"]);
-    if(count($local_login) == 0 && $params["unicity_check"]) {
-      $rlogins = check_user_login_remotely_in_use($user['login'],$d,true,$params["unicity_check"]);
-      $logins = array_merge($rlogins, $logins) ;
+    if (trim($row[$c_email_nomade]) != '') {
+      $user['email_nomade'] = trim($row[$c_email_nomade]);
     }
-    if (count($logins) > 0) {
+    if (in_array(trim($row[$c_nomade_perms]), $array_true)) {
+      $user['nomade_perms'] = 1;
+    }
+    if (in_array(trim($row[$c_nomade_enable]), $array_true)) {
+      $user['nomade_enable'] = 1;
+    }
+    if (in_array(trim($row[$c_nomade_local_copy]), $array_true)) {
+      $user['nomade_local_copy'] = 1;
+    }
+    if (check_user_login_in_use($user['login'])) {
       $res = "$user[login] : $l_login_in_use";
     } else {
       // Insert the user

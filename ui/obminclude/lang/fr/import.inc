@@ -44,7 +44,6 @@ $l_name_import_nomatch = "Le nom de l'import n'est pas valide";
 $l_import_exists = "Cet import existe déjà !";
 $l_check_sameimport = "Ces imports sembles similaires au nouveau !";
 $l_warn_delete = "Effacer cet import ?";
-$l_file_error = "Le fichier est introuvable (ou non saisi) !";
 $l_import_end = "Import terminé";
 $l_lines_processed = "lignes traitées";
 $l_conflict_detected = "Conflit détecté";

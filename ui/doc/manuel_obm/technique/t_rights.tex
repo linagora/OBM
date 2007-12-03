@@ -115,7 +115,9 @@ section (permission) & Tableau des sections. Une valeur à 1 indique onglet affic
 \hline
 module (permission) & Tableau des modules. Définition des droits à chaque module. L'entrée 'default' définit la valeur pour les modules non listés \\ 
 \hline
-level & Niveau du profil. Un administrateur ou utilisateur ne peut pas créer / modifier / supprimer un utilisateur de privilège plus élevé (niveau 0 = privilège maximum). Si le niveau est pair, il est possible de gérer des utilisateurs de même niveau, sinon non \\ 
+level & Niveau du profil. Un administrateur ou utilisateur ne peut pas créer / modifier / supprimer un utilisateur de privilège plus élevé (niveau 0 = privilège maximum).\\ 
+\hline
+level\_managepeers & Capacité du profil à gérer des utilisateurs de même niveau de profil. Si cet indicateur est à true (ou 1), il est possible de gérer des utilisateurs de même niveau, sinon non \\ 
 \hline
 properties[admin\_realm] & Granularité d'administration (et de possibilité de mise à jour) pour un administrateur. Valeurs possibles : 'user', 'delegation', 'domain'.\\
 \hline
@@ -148,7 +150,8 @@ $profiles['admin'] = array (
     'default' => $perm_admin),
   'properties' => array (
     'admin_realm' => array ('user', 'delegation', 'domain')),
-  'level' => 1
+  'level' => 1,
+  'level_managepeers' => 1
 );
 \end{verbatim}
 \end{minipage}

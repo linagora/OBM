@@ -78,6 +78,7 @@ $l_number = "Number";
 $l_format = "Format";
 $l_file_format = "File format";
 $l_file = "File";
+$l_file_error = "The file is not available (or not filled) !";
 $l_size = "Size";
 $l_email = "Email";
 $l_quota = "Quota";

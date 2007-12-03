@@ -45,7 +45,6 @@ $l_name_import_nomatch = "El nombre de la importación no es válido";
 $l_import_exists = "Lo siento pero la importación ya existe";
 $l_check_sameimport = "Estas importaciones lucen similares a la nueva !";
 $l_warn_delete = "Realmente desea borrar esta importación ?";
-$l_file_error = "El archivo no esta disponible (o no ha sido llenado) !";
 $l_import_end = "Importación terminada";
 $l_lines_processed = "lineas procesadas";
 $l_conflict_detected = "Conflicto detectado";

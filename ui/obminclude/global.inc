@@ -229,7 +229,8 @@ $profiles['admin'] = array (
   'module' => array (
     'default' => $perm_admin,
     'domain' => 0),
-  'level' => 1
+  'level' => 1,
+  'level_managepeers' => 1
 );
 
 
