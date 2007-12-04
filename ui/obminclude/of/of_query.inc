@@ -1656,6 +1656,67 @@ function get_user_info($id='') {
   return $u;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Get Entity infos
+// Parameters:
+//   - $id  : entity id
+//   - $entity : entity type
+// Returns:
+//   - entity label, id, kind
+///////////////////////////////////////////////////////////////////////////////
+function get_entity_info($id, $entity) {
+  global $cdg_sql, $obm;
+  $e = array();
+  $obm_q = new DB_OBM ;
+  $db_type = $obm_q->type;
+  $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
+  if($id == "") {
+    $id = $obm["uid"];
+    $entity = "user";
+  } elseif ($entiy == "") {
+    $entiy = "user";
+  }
+  if ($entity == "user") {
+
+    $table_entity = "UserObm";
+    $c_id = "userobm_id";
+    $ctt[0]["type"] = "field";
+    $ctt[0]["value"] = "userobm_lastname";
+    $ctt[1]["type"] = "string";
+    $ctt[1]["value"] = " ";
+    $ctt[2]["type"] = "field";
+    $ctt[2]["value"] = "userobm_firstname";
+    $c_label = sql_string_concat($db_type, $ctt);
+    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'user' as entity_kind FROM UserObm";
+  } elseif ($entity == "group") {
+    $table_entity = "UGroup";
+    $c_id = "group_id";
+    $c_label = "group_name";
+    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'group' as entity_kind FROM UGroup";
+  } elseif ($entity == "resource") {
+    $table_entity = "Resource";
+    $c_id = "resource_id";
+    $c_label = "resource_name";
+    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'resource' as entity_kind FROM Resource";
+  }
+
+
+  $query = "SELECT *
+    FROM($entity_table) as Entity 
+    WHERE entity_id='$id'";
+
+  display_debug_msg($query, $cdg_sql, 'get_user_info()');
+  $obm_q->query($query);
+  $obm_q->next_record();
+  if (is_array($obm_q->Record)) {
+    foreach ($obm_q->Record as $key => $user) {
+      $small_key = str_replace('entity_', '', $key);
+      $e[$small_key] = $user;
+    }
+  }  
+
+  return $e;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Userobm query execution : All users (or the one for the id given)
@@ -2167,6 +2228,13 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
   }
   if ($reci_list != '') {
     // as we don't have a mean to encode the subject, we drop its accents
+    echo "
+      <pre>
+      TO : $reci_list
+      $subject
+      $msg
+      </pre>
+    ";
     $subject = format_name($subject, 0, true);
     mail ($reci_list, $subject, $msg, $headers);         
   }

@@ -174,15 +174,6 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </td>
     </tr>
     <tr>
-    <td class=\"detailLabel\">
-    $l_groups
-    $popup_group_add_button
-    </td>
-    <td>
-    <input type=\"text\" id=\"groupReadSearch\" autocomplete=\"off\" /> 
-    </td>
-    </tr>       
-    <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_read\">
       $dis_read_ok
     </td>
@@ -222,15 +213,6 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </td>
     </tr>
     <tr>
-    <td class=\"detailLabel\">
-    $l_groups
-    $popup_group_add_button
-    </td>
-    <td>
-    <input type=\"text\" id=\"groupWriteSearch\" autocomplete=\"off\" /> 
-    </td>
-    </tr>       
-    <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_write\">
        $dis_write_ok
     </td>
@@ -259,15 +241,6 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <input type=\"text\" id=\"userAdminSearch\" autocomplete=\"off\" /> 
     </td>
     </tr>
-    <tr>
-    <td class=\"detailLabel\">
-    $l_groups
-    $popup_group_add_button
-    </td>
-    <td>
-    <input type=\"text\" id=\"groupAdminSearch\" autocomplete=\"off\" /> 
-    </td>
-    </tr>       
     <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_admin\">
        $dis_admin_ok
@@ -332,9 +305,6 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_admin', 'userAdminSearch');
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_write', 'userWriteSearch');
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_read', 'userReadSearch');
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_admin', 'groupAdminSearch');
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_write', 'groupWriteSearch');
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_read', 'groupReadSearch');
     });
   </script>
 ";
@@ -458,7 +428,12 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-
+  if(count($entity_id) == 0) {
+    return array("ids" => array(), "entity" => array());
+  }
+  if(is_array($entity_id)) {
+    $entity_id = implode(",",$entity_id);
+  }
   if ($consumer == "user" || $consumer == "all" ) {
 
     $table_consumer = "UserObm";
@@ -493,12 +468,11 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
       entityright_admin
     FROM EntityRight
       LEFT JOIN ($table_consumer) as entity ON entityright_consumer_id = entitydata_id AND entityright_consumer = entity_kind
-    WHERE entityright_entity_id = '$entity_id'
+    WHERE entityright_entity_id IN ($entity_id)
       $where_right
     ORDER BY entitydata_label";
   display_debug_msg($query, $cdg_sql, "of_right_consumer_for_entity()");
   $obm_q->query($query);
-
   $ret_array = array();
   while($obm_q->next_record()) {
     $id = $obm_q->f("id");

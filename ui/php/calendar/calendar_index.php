@@ -328,6 +328,7 @@ if ($action == 'index') {
     $id = $params['calendar_id'];
     $eve_q = run_query_calendar_detail($id);
     $mail_data = run_query_prepare_event_mail($params, $action, $eve_q);
+    run_query_quick_attendee_update($params,$eve_q);    
     if($eve_q->f('calendarevent_repeatkind') == 'none') {
       run_query_calendar_quick_event_update($params);
     } else {

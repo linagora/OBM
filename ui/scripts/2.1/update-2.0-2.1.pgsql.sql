@@ -601,6 +601,13 @@ CREATE TABLE LeadStatus (
 ALTER TABLE Lead ADD COLUMN lead_status_id integer;
 
 
+-- Calendar start hour
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','cal_first_hour','8');
+
+-- Calendar last hour
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','cal_last_hour','20');
+
+
 -------------------------------------------------------------------------------
 -- Update some field size
 -------------------------------------------------------------------------------
