@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames['project_name'] = $l_name;
+$fieldnames['project_shortname'] = $l_shortname;
 $fieldnames['project_company'] = $l_company;
 $fieldnames['project_type'] = $l_type;
 $fieldnames['project_tasktype'] = $l_tasktype;

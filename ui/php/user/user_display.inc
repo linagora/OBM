@@ -1788,6 +1788,7 @@ function dis_user_import_index() {
     <th>27</th>
     <th>28</th>
     <th>29</th>
+    <th>30</th>
   </tr>
   <tr>
     <th>$l_kind</th>

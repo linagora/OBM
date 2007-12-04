@@ -101,6 +101,7 @@ function run_query_project_search($params) {
       project_id as id,
       project_id,
       project_name,
+      project_shortname,
       project_soldtime,
       project_estimatedtime,
       company_name as project_company,
