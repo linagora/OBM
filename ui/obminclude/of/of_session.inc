@@ -408,7 +408,9 @@ class Perm {
           ),
           'properties' => array (                                                       
             'admin_realm' => array ('domain')
-          )
+          ),
+          'level' => 0,
+          'level_managepeers' => true
         );
     }
   }
