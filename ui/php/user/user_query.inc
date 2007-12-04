@@ -1534,7 +1534,6 @@ function check_user_data_form($p_id, $user) {
     return false;
   }
 
-  print_r($user);
   // User nomad email not null if active
   if ( ($email_nomade == '')
        && ($nomade_enable) ) {
