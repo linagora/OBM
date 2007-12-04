@@ -155,7 +155,7 @@ $profiles['admin'] = array (
     'admin_realm' => array ('user', 'delegation', 'domain')
     ),
   'level' => 1,
-  'level_managepeers' => ,
+  'level_managepeers' => 1
 );
 
 //------------------//
