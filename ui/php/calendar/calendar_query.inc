@@ -1464,8 +1464,12 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
     if(count($resources_array) > 0) {
       $rresources = "AND NOT (evententity_entity_id IN (".implode(',',$resources_array).") AND evententity_entity = 'resource')";
     }
-    $users_array = array_diff($users_array,$entities['user']['ids']);
-    $resources_array = array_diff($resources_array, $entities['resource']['ids']);
+    if(is_array($entities['user']['ids'])) {
+      $users_array = array_diff($users_array,$entities['user']['ids']);
+    }
+    if(is_array($entities['resource']['ids'])) {
+      $resources_array = array_diff($resources_array, $entities['resource']['ids']);
+    }
   }
   
   $query = "DELETE FROM EventEntity WHERE 1=1 $qusers $rresources AND evententity_event_id = '$event_id'";
