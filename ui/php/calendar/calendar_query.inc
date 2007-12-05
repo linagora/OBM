@@ -1369,7 +1369,7 @@ function check_calendar_decision_conflict($calendar) {
 //   - $calendar      : Calendar params
 //   - $sel_entity_id : List entitis id ['user'] ['resource']
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) {
+function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, $reset_state) {
   global $c_use_connectors, $obm, $l_date;
   global $l_update_event_mail_head,$l_update_event_mail_subject,$l_update_event_mail_body,$l_to,$l_from;
   global $ccalendar_resource_admin, $l_resource_allocated;
@@ -1454,30 +1454,26 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
   // ci-dessous sous mysql 4.0.23-10 (portable fourmi)
   run_query_calendar_update_event_data($calendar); 
 
-  // FIXME
-  // FIXME
-  // FIXME
-  // FIXME CECI EST MAUVAIS MAIS POUR LA DEMO DU 22 OCT 2007 CA SUFFIRA
-  // FIXME
-  // FIXME
-  // FIXME
 
-  global $mail_data;
-  if($mail_data['remove_attendee']) {
-    $delete_entities = $mail_data['mails']['remove_attendee']['recipients'];
+  if(!$reset_state) {
+    $entities = get_calendar_event_entity($event_id); 
+    if(count($users_array) > 0) {
+      $qusers = "AND NOT (evententity_entity_id IN (".implode(',',$users_array).") AND evententity_entity = 'user')";
+    }
+    if(count($resources_array) > 0) {
+      $rresources = "AND NOT (evententity_entity_id IN (".implode(',',$resources_array).") AND evententity_entity = 'resource')";
+    }
+    $users_array = array_diff($users_array,$entities['user']['ids']);
+    $resources_array = array_diff($resources_array, $entities['resource']['ids']);
   }
-  if($mail_data['add_attendee']) {
-    $add_entities = $mail_data['mails']['add_attendee']['recipients'];
-  }
-  if($mail_data['reset_state']) {
-    $delete_entities = array();
-    $add_entities = $users_array;
-  } 
-  run_query_calendar_delete_event_entity($calendar,$delete_entities);
+  
+  $query = "DELETE FROM EventEntity WHERE 1=1 $qusers $rresources AND evententity_event_id = '$event_id'";
+  $db = new DB_OBM;
+  $db->query($query);
 
   // User insertion
-  if(is_array($add_entities)) {
-    foreach($add_entities as $user_id) {
+  if(is_array($users_array)) {
+    foreach($users_array as $user_id) {
       if ($user_id == $obm['uid'] || in_array($user_id, $writable_cal['ids'])) {
         run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'A');	
       } else {
@@ -1486,9 +1482,6 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
     }
   }
 
-  // Resource insertion
-  $resources_writable=array(); // Writable Resources
-  $resources_address =array(); // Resource Admin notification
   if (is_array($resources_array)) {
     foreach ($resources_array as $res_id) {
       if (in_array($res_id, $writable_res['ids'])) {
@@ -1496,18 +1489,9 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id) 
       } else {
 	run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'W');
       }
-      array_push($resources_writable, $res_id);
     }
   }
-  if ((count($resources_writable) > 0) && ($ccalendar_resource_admin != '')) {
-    $resources_address = array($ccalendar_resource_admin);
-    $message_resource = "\r\n\r\n$l_resource_allocated:";
-    $resource_q = run_query_get_resources_info($resources_writable);
-    while ($resource_q->next_record()) {
-      $message_resource .=  "\n  ".$resource_q->f('resource_name');
-    }
-  }
-
+  
   if ($task_id > 0) {
     run_query_calendar_insert_entity_event('task', $task_id, $event_id, 'A');
   }
@@ -1865,12 +1849,14 @@ function run_query_quick_attendee_update($params, $eve_q) {
   $entities = get_calendar_event_entity( $event_id);
   run_query_calendar_delete_event_entity($params,array());
   foreach ($entities as $entity => $data) {
-    foreach ($data["entity"] as $entity_id => $entity_data) {  
-      if (in_array($entity_id, $writable[$entity]["ids"])) {
-        run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 'A');	
-      } else {
-        run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 'W');	
-      }      
+    foreach ($data["entity"] as $entity_id => $entity_data) { 
+      if(is_array( $writable[$entity]["ids"]))  {
+        if (in_array($entity_id, $writable[$entity]["ids"])) {
+          run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 'A');	
+        } else {
+          run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 'W');	
+        }     
+      }
     }
   }
 }
