@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -e
-set -x
+#set -x
 
 case "$1" in
 	remove|failed-upgrade|abort-install|abort-upgrade|disappear)

@@ -37,7 +37,7 @@ Description: OBM core
 
 Package: obm-certs
 Architecture: any
-Depends:  openssl, ${misc:Depends}
+Depends:  openssl, obm-ca, ${misc:Depends}
 Description: OBM certificat
     Certicat generation for OBM
 	Instalation of OBM

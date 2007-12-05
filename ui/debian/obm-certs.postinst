@@ -23,29 +23,10 @@ is_initial_configuration() {
 
 gencertif ()
 {
-   cd /etc/obm/certs
-   cat >> $SHORT_NAME\_ssl.cnf <<EOF
-[ req ]
-default_bits = 2048
-encrypt_key = yes
-distinguished_name = req_dn
-x509_extensions = cert_type
-prompt = no
 
-[ req_dn ]
-O=OBM Server
-OU=Automatically-generated SSL key
-CN=${SHORT_NAME}
-
-[ cert_type ]
-nsCertType = server
-
-EOF
-
-   openssl req -new -x509 -days 365 -nodes -config $SHORT_NAME\_ssl.cnf \
-   -out obm_cert.pem -keyout obm_cert.pem
-   rm $SHORT_NAME\_ssl.cnf
-   openssl pkcs12  -password pass:aliasource -export -in obm_cert.pem -inkey obm_cert.pem -out obm_keystore.pkcs12 -name "tomcat"
+/usr/share/obm-ca/createcert.sh ${FULLNAME}
+rm -f /etc/obm/certs/obm_cert.pem
+ln -s /etc/obm/certs/${FULLNAME}_signed.pem /etc/obm/certs/obm_cert.pem
 
 }
 
