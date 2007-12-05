@@ -3982,7 +3982,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       $mail_datas['add_attendee'] = true;
     }
     if(is_array($calendar['sel_resource_id'])) {
-      $new_attendees = $calendar['sel_resource_id'];
+      $new_resources = $calendar['sel_resource_id'];
       $mail_datas['add_resource'] = true;
     }
     $title = $calendar['title'];
