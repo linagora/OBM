@@ -1403,8 +1403,9 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
     $writable_res = of_right_entity_for_consumer('Resource', 'user', $obm['uid'], 'write');
-  }    
-
+  } else {
+    $resources_array = array();
+  }
   $event_data = run_query_calendar_detail($event_id);
   $old_begin = of_isodate_format($event_data->f('calendarevent_date'),'', 1);
   $old_end = of_isodate_format($event_data->f('calendarevent_date') + $event_data->f('calendarevent_duration'),'',1);
