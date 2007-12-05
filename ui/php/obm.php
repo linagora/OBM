@@ -206,18 +206,18 @@ function dis_calendar_portal() {
       $klass = '';
     }
     if ($check_month != $this_month) {
-      $dis_minical .= "<td class=\"downlight $klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\"
+      $dis_minical .= "<td class=\"downlight $klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=agenda&amp;cal_range=day&amp;date=$iso_day'\"
         onmouseout=\"this.className='downlight $klass'\" onmouseover=\"this.className='hover'\">
         $day
         </td>";
     } else {
       if (of_isodate_format() == $iso_day) {
-        $dis_minical .= "<td class=\"highlight $klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\" 
+        $dis_minical .= "<td class=\"highlight $klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=agenda&amp;cal_range=day&amp;date=$iso_day'\" 
           onmouseout=\"this.className='highlight $klass'\" onmouseover=\"this.className='hover'\">
           $day
           </td>";
       } else {
-        $dis_minical .= "<td class=\"$klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=view_day&amp;date=$iso_day'\" 
+        $dis_minical .= "<td class=\"$klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?action=agenda&amp;cal_range=day&amp;date=$iso_day'\" 
           onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\">
           $day
           </td>";
