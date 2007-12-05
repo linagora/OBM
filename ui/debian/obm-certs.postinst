@@ -24,9 +24,9 @@ is_initial_configuration() {
 gencertif ()
 {
 
-/usr/share/obm-ca/createcert.sh ${FULLNAME}
+/usr/share/obm-ca/createcert.sh ${FULL_NAME}
 rm -f /etc/obm/certs/obm_cert.pem
-ln -s /etc/obm/certs/${FULLNAME}_signed.pem /etc/obm/certs/obm_cert.pem
+ln -s /etc/obm/certs/${FULL_NAME}_signed.pem /etc/obm/certs/obm_cert.pem
 
 }
 
