@@ -3,7 +3,7 @@
 --     - Desc : Insertion of Preferences values (database independant)       //
 -- 2007-04-23 Pierre Baudracco                                               //
 --/////////////////////////////////////////////////////////////////////////////
--- $Id$
+-- $Id:$
 --/////////////////////////////////////////////////////////////////////////////
 
 
@@ -29,7 +29,7 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_display','no');
 
 -- # Rows displayed in a result page
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_rows','12');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_rows','20');
 
 -- Default Data Source
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_dsrc','0');

@@ -1066,6 +1066,7 @@ CREATE TABLE ProjectClosing (
   projectclosing_used         int(8) NOT NULL,
   projectclosing_remaining    int(8) NOT NULL,
   projectclosing_type         int(8),
+  projectclosing_comment      text,
   PRIMARY KEY (projectclosing_id)
 );
 
