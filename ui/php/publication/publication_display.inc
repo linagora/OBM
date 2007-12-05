@@ -12,11 +12,11 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["publication_title"] = $l_publication_title;
-$fieldnames["publication_year"] = $l_year;
-$fieldnames["publication_lang"] = $l_lang;
+$fieldnames['publication_title'] = $l_publication_title;
+$fieldnames['publication_year'] = $l_year;
+$fieldnames['publication_lang'] = $l_lang;
 // Calculated or indirect fields
-$fieldnames["publicationtype_label"] = $l_type;
+$fieldnames['publicationtype_label'] = $l_type;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,12 +31,12 @@ $fieldnames["publicationtype_label"] = $l_type;
 function dis_data_publication(&$OD, $fieldname, $link_ok) {
   global $path,  $ico_mail, $ico_web, $ico_contact_new;
   
-  if ($fieldname == "publication_title") {
-    if($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("publication_id").",'".addslashes($OD->data_set->f("publication_title"))."');";
+  if ($fieldname == 'publication_title') {
+    if($OD->display_ext == 'get_id') {
+      $res['url'] = 'javascript:check_get_id('.$OD->data_set->f('publication_id').",'".addslashes($OD->data_set->f('publication_title'))."');";
     }
     else {    
-      $res["url"] = "$path/publication/publication_index.php?action=detailconsult&amp;publication_id=".$OD->data_set->f("publication_id");
+      $res['url'] = "$path/publication/publication_index.php?action=detailconsult&amp;publication_id=".$OD->data_set->f('publication_id');
     }
   }
 
@@ -58,10 +58,10 @@ function html_publication_search_form ($type_q,$publication) {
   global $l_all, $l_find,$popup; 
   global $c_all;
   
-  $title = stripslashes($publication["title"]);
-  $lang = stripslashes($publication["lang"]);
-  $type = $publication["type"];
-  $year = $publication["year"];
+  $title = stripslashes($publication['title']);
+  $lang = stripslashes($publication['lang']);
+  $type = $publication['type'];
+  $year = $publication['year'];
 
   if (!$popup) {
     $dis_title = "
@@ -82,11 +82,11 @@ function html_publication_search_form ($type_q,$publication) {
   }
   else {
     $sel_js = " onchange=\"this.form.submit();\" ";
-    $ext_action = $publication["ext_action"];
-    $ext_url = $publication["ext_url"];
-    $ext_id = $publication["ext_id"];
-    $ext_title = $publication["ext_title"];
-    $ext_target = $publication["ext_target"];
+    $ext_action = $publication['ext_action'];
+    $ext_url = $publication['ext_url'];
+    $ext_id = $publication['ext_id'];
+    $ext_title = $publication['ext_title'];
+    $ext_target = $publication['ext_target'];
     $dis_button = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
 	    <input name=\"popup\" type=\"hidden\" value=\"$popup\">
@@ -94,21 +94,21 @@ function html_publication_search_form ($type_q,$publication) {
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">
 	    <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />";
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display['title'] = "<div class=\"title\">$ext_title</div>";
   }
     
   // type select
   $sel_type = "<select id=\"sel_type\" name=\"sel_type\" $sel_js>
     <option value=\"$c_all\">$l_all</option>";
   while ($type_q->next_record()) {
-    $t_id = $type_q->f("publicationtype_id");
+    $t_id = $type_q->f('publicationtype_id');
     $sel_type .= "\n<option value=\"$t_id\"";
     if ($t_id == $type) { $sel_type .= " selected=\"selected\""; }
-    $sel_type .= ">". $type_q->f("publicationtype_label") . "</option>\n";
+    $sel_type .= '>'. $type_q->f('publicationtype_label') . "</option>\n";
   }
-  $sel_type .= "</select>";
+  $sel_type .= '</select>';
 
-  $url = url_prepare("publication_index.php");
+  $url = url_prepare('publication_index.php');
   
   // --- HTML Template --------------------------------------------------------
 
@@ -139,15 +139,15 @@ function html_publication_search_form ($type_q,$publication) {
 function dis_publication_search_list($publication) {
   global $obm, $display, $l_found, $l_no_found;
 
-  $popup = $publication["popup"];
+  $popup = $publication['popup'];
 
-  $prefs = get_display_pref($obm["uid"], "publication");
+  $prefs = get_display_pref($obm['uid'], 'publication');
   $obm_q = run_query_publication_search($publication);
   $nb_pub = $obm_q->num_rows_total();
   if ($nb_pub == 0) {
-    $display["msg"] = display_warn_msg($l_no_found);
+    $display['msg'] = display_warn_msg($l_no_found);
   } else {
-    $display["msg"] = display_info_msg("$nb_pub $l_found");
+    $display['msg'] = display_info_msg("$nb_pub $l_found");
     $block = html_publication_search_list($obm_q,$prefs,$publication,$popup);
   }
 
@@ -167,25 +167,25 @@ function html_publication_search_list($pub_q, $prefs, $publication, $popup) {
   global $l_close;
 
   if ($popup) {
-    $ext_action = $publication["ext_action"];
-    $ext_url = $publication["ext_url"];
-    $ext_id = $publication["ext_id"];
-    $ext_target = $publication["ext_target"];
+    $ext_action = $publication['ext_action'];
+    $ext_url = $publication['ext_url'];
+    $ext_id = $publication['ext_id'];
+    $ext_target = $publication['ext_target'];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
   }
 
   // we urlencode to avoid breakage for space char
-  $title = urlencode(stripslashes($publication["title"]));
-  $type = $publication["type"];
-  $year = $publication["year"]; 
-  $lang = $publication["lang"];
+  $title = urlencode(stripslashes($publication['title']));
+  $type = $publication['type'];
+  $year = $publication['year']; 
+  $lang = $publication['lang'];
  
   $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;sel_type=$type&amp;tf_year=$year&amp;tf_lang=$lang$url_ext");
 
-  $pub_d = new OBM_DISPLAY("DATA", $prefs, "publication");
+  $pub_d = new OBM_DISPLAY('DATA', $prefs, 'publication');
   if ($popup) {
     $pub_d->display_link = false;
-    $pub_d->display_ext = "get_id";
+    $pub_d->display_ext = 'get_id';
     $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
@@ -194,8 +194,8 @@ function html_publication_search_list($pub_q, $prefs, $publication, $popup) {
   
   $pub_d->data_set = $pub_q;
   $pub_d->data_url = $url;
-  $pub_d->data_header = "both";
-  $block = $pub_d->display("dis_data_publication");
+  $pub_d->data_header = 'both';
+  $block = $pub_d->display('dis_data_publication');
   $block .= $display_popup_end;  
 
   return $block;
@@ -215,22 +215,22 @@ function html_publication_subscription_search_list($pub_q, $prefs, $nb_pub,$publ
   global $display, $l_found,$l_close;
 
   // we urlencode to avoid breakage for space char
-  $archive = $publication["archive"];
-  $title = urlencode(stripslashes($publication["name"]));
-  $phone = urlencode(stripslashes($publication["phone"]));
-  $type = $publication["type"];
-  $act = $publication["activity"];
-  $zip = urlencode(stripslashes($publication["zip"]));
-  $market = $publication["marketing_manager"];
-  $popup = $publication["popup"]; 
+  $archive = $publication['archive'];
+  $title = urlencode(stripslashes($publication['name']));
+  $phone = urlencode(stripslashes($publication['phone']));
+  $type = $publication['type'];
+  $act = $publication['activity'];
+  $zip = urlencode(stripslashes($publication['zip']));
+  $market = $publication['marketing_manager'];
+  $popup = $publication['popup']; 
   
   $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_act=$act&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market$url_ext");
 
   $pub_q->seek($first_row);
 
-  $pub_d = new OBM_DISPLAY("DATA", $prefs, "publication");
+  $pub_d = new OBM_DISPLAY('DATA', $prefs, 'publication');
   if ($popup) {
-    $pub_d->display_ext = "get_id";
+    $pub_d->display_ext = 'get_id';
     $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
@@ -239,9 +239,9 @@ function html_publication_subscription_search_list($pub_q, $prefs, $nb_pub,$publ
   
   $pub_d->data_set = $pub_q;
   $pub_d->data_url = $url;
-  $pub_d->data_header = "both";
-  $display["msg"] = display_info_msg("$nb_pub $l_found");
-  $block = $pub_d->display("dis_data_publication");
+  $pub_d->data_header = 'both';
+  $display['msg'] = display_info_msg("$nb_pub $l_found");
+  $block = $pub_d->display('dis_data_publication');
   $block .= $display_popup_end;  
 
   return $block;
@@ -256,16 +256,16 @@ function html_publication_subscription_search_list($pub_q, $prefs, $nb_pub,$publ
 function dis_publication_consult($publication) {
   global $display, $l_err_reference;
 
-  if ($publication["publication_id"] > 0) {
-    $pub_q = run_query_publication_detail($publication["publication_id"]);
+  if ($publication['publication_id'] > 0) {
+    $pub_q = run_query_publication_detail($publication['publication_id']);
     if ($pub_q->num_rows() == 1) {
-      $display["detailInfo"] = display_record_info($pub_q);
+      $display['detailInfo'] = display_record_info($pub_q);
       $block = html_publication_consult($pub_q);
     } else {
-      $display["msg"] .= display_err_msg($l_err_reference);
+      $display['msg'] .= display_err_msg($l_err_reference);
     }
   } else {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_err_msg($l_err_reference);
   }
   
   return $block;
@@ -281,15 +281,15 @@ function html_publication_consult($pub_q) {
   global $l_publication_title, $l_type, $l_year, $l_lang, $l_publication;
   global $display, $c_yes, $c_no,$l_desc;
 
-  $id = $pub_q->f("publication_id");
-  $title = $pub_q->f("publication_title");
-  $type = $pub_q->f("publicationtype_label");
-  $year = $pub_q->f("publication_year");
-  $lang = $pub_q->f("publication_lang");
-  $desc = $pub_q->f("publication_desc");
+  $id = $pub_q->f('publication_id');
+  $title = $pub_q->f('publication_title');
+  $type = $pub_q->f('publicationtype_label');
+  $year = $pub_q->f('publication_year');
+  $lang = $pub_q->f('publication_lang');
+  $desc = $pub_q->f('publication_desc');
 
   $ldesc = nl2br($desc);
-  $display["title"] = "<h1 class=\"title\">$l_publication : $title</h1>";
+  $display['title'] = "<h1 class=\"title\">$l_publication : $title</h1>";
 
 
   // --- HTML Template --------------------------------------------------------
@@ -335,15 +335,15 @@ function html_publication_consult($pub_q) {
 function dis_publication_form($action, $publication) {
   global $display, $l_err_reference;
 
-  if ($publication["publication_id"] > 0) {
-    $pub_q = run_query_publication_detail($publication["publication_id"]);
+  if ($publication['publication_id'] > 0) {
+    $pub_q = run_query_publication_detail($publication['publication_id']);
     if ($pub_q->num_rows() == 1) {
-      $display["detailInfo"] = display_record_info($pub_q);
+      $display['detailInfo'] = display_record_info($pub_q);
     } else {
-      $display["msg"] .= display_err_msg($l_err_reference);
+      $display['msg'] .= display_err_msg($l_err_reference);
     }
   } else {
-    $pub_q = "";
+    $pub_q = '';
     $list_q = run_query_publication_list();
   }
 
@@ -374,13 +374,13 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
   global $l_contact_category1,$l_auto_sub, $public_contact_cat;
 
   // if update mode and first display values are taken from database
-  if ($action == "detailupdate") {
-    $id = $pub_q->f("publication_id");
-    $title = $pub_q->f("publication_title");
-    $type = $pub_q->f("publication_type_id");
-    $year = $pub_q->f("publication_year");
-    $desc = $pub_q->f("publication_desc");
-    $lang = $pub_q->f("publication_lang");    
+  if ($action == 'detailupdate') {
+    $id = $pub_q->f('publication_id');
+    $title = $pub_q->f('publication_title');
+    $type = $pub_q->f('publication_type_id');
+    $year = $pub_q->f('publication_year');
+    $desc = $pub_q->f('publication_desc');
+    $lang = $pub_q->f('publication_lang');    
     $dis_title = $title;
   } else if ($action == 'new') {
     $dis_title = $l_header_new_f;
@@ -388,53 +388,53 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
 
   $list_sub = array();
   // If parameters have been given, they supercede the default action value
-  if (isset($publication["publication_id"])) { $id = $publication["publication_id"]; }
-  if (isset($publication["title"])) { $title = stripslashes($publication["title"]); }
-  if (isset($publication["type"])) { $type = $publication["type"]; }
-  if (isset($publication["year"])) { $year = stripslashes($publication["year"]); }
-  if (isset($publication["lang"])) { $lang = stripslashes($publication["lang"]); }
-  if (isset($publication["desc"])) { $desc = stripslashes($publication["desc"]); }
+  if (isset($publication['publication_id'])) { $id = $publication['publication_id']; }
+  if (isset($publication['title'])) { $title = stripslashes($publication['title']); }
+  if (isset($publication['type'])) { $type = $publication['type']; }
+  if (isset($publication['year'])) { $year = stripslashes($publication['year']); }
+  if (isset($publication['lang'])) { $lang = stripslashes($publication['lang']); }
+  if (isset($publication['desc'])) { $desc = stripslashes($publication['desc']); }
   if (isset($publication[$public_contact_cat])) { $cats1 = $publication[$public_contact_cat]; }
-  if (isset($publication["list"])) { $list_sub = $publication["list"]; }
+  if (isset($publication['list'])) { $list_sub = $publication['list']; }
 
   // type select
   $sel_type = "<select name=\"sel_type\" id=\"sel_type\">";
   while ($type_q->next_record()) {
-    $k_id = $type_q->f("publicationtype_id");
+    $k_id = $type_q->f('publicationtype_id');
     $sel_type .= "\n<option value=\"$k_id\"";
     if ($k_id == $type) { $sel_type .= " selected=\"selected\""; }
-    $sel_type .= ">". $type_q->f("publicationtype_label") . "</option>\n";
+    $sel_type .= '>'. $type_q->f('publicationtype_label') . "</option>\n";
   }
-  $sel_type .= "</select>";
+  $sel_type .= '</select>';
   
-  if (($action == "detailupdate") || ($action == "update")) {
+  if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
-  } elseif (($action == "new") || ($action == "insert")) {
+  } elseif (($action == 'new') || ($action == 'insert')) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
 
     // auto subscription to all contact from a category or list only on insert
     $cats = of_category_user_get_infos($cats1);
-    $block_cat = of_category_user_dis_entity_form("contact", $public_contact_cat, $cats);
+    $block_cat = of_category_user_dis_entity_form('contact', $public_contact_cat, $cats);
 
     $sel_list = "<select name=\"sel_list[]\" multiple=\"multiple\">";
     while($list_q->next_record()) {
-      $l_id = $list_q->f("list_id");
-      $l_name = $list_q->f("list_name");
-      $l_login = $list_q->f("userobm_login");
+      $l_id = $list_q->f('list_id');
+      $l_name = $list_q->f('list_name');
+      $l_login = $list_q->f('userobm_login');
       $sel_list .= "<option value=\"$l_id\" ";
       if (in_array($l_id, $list_sub)) {
 	$sel_list .= "selected=\"selected\" ";
       }
       $sel_list .= ">$l_login : $l_name</option>";
     }
-    $sel_list .= "</select>";
+    $sel_list .= '</select>';
 
     $dis_auto_sub = "
     <fieldset class=\"detail infos\">
@@ -451,14 +451,14 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
 
   $url = "publication_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
 
-  $display["title"] = "<h1 class=\"title\">$l_publication : $dis_title</h1>";
+  $display['title'] = "<h1 class=\"title\">$l_publication : $dis_title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
     <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_publication(this)) return true; else return false;\"
-      action=\"".url_prepare("publication_index.php")."\">
+      action=\"".url_prepare('publication_index.php')."\">
 
 <fieldset class=\"detail infos\"> 
     <legend>$l_publication</legend>
@@ -501,45 +501,61 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_group_subscription_form($action,$pub_q, $publication) {
   global $display;
-  global $l_category;
+  global $l_category, $l_list;
   global $l_publication, $l_contact_category1, $l_auto_sub, $public_contact_cat;
 
-  $title = $pub_q->f("publication_title");
+  $title = $pub_q->f('publication_title');
+  $list_sub = array();
   // If parameters have been given, they supercede the default action value
-  if (isset($publication["publication_id"])) { $id = $publication["publication_id"]; }
+  if (isset($publication['publication_id'])) { $id = $publication['publication_id']; }
   if (isset($publication[$public_contact_cat])) { $cats1 = $publication[$public_contact_cat]; }
+  if (isset($publication['list'])) { $list_sub = $publication['list']; }
 
   $dis_button = "
     <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$id\" />  
     <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_group_subscription\" />
     <input type=\"submit\" value=\"$l_auto_sub\" />";
 
-    // auto subscription to all contact from a category or list only on insert
-    $cats = of_category_user_get_infos($cats1);
-    $block_cat = of_category_user_dis_entity_form("contact", $public_contact_cat, $cats);
+  // auto subscription to all contact from a category or list only on insert
+  $cats = of_category_user_get_infos($cats1);
+  $block_cat = of_category_user_dis_entity_form('contact', $public_contact_cat, $cats);
 
-  $display["title"] = "<h1 class=\"title\">$l_publication : $title</h1>";
+  $list_q = run_query_publication_list();
+  
+  $sel_list = "<select name=\"sel_list[]\" multiple=\"multiple\">";
+  while($list_q->next_record()) {
+    $l_id = $list_q->f('list_id');
+    $l_name = $list_q->f('list_name');
+    $l_login = $list_q->f('userobm_login');
+    $sel_list .= "<option value=\"$l_id\" ";
+    if (in_array($l_id, $list_sub)) {
+      $sel_list .= "selected=\"selected\" ";
+    }
+    $sel_list .= ">$l_login : $l_name</option>";
+  }
+  $sel_list .= '</select>';
+
+  $display['title'] = "<h1 class=\"title\">$l_publication : $title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
     <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_publication(this)) return true; else return false;\"
-      action=\"".url_prepare("publication_index.php")."\">
-<fieldset class=\"detail infos\">
+      action=\"".url_prepare('publication_index.php')."\">
+  <fieldset class=\"detail infos\">
     <legend>$l_publication</legend>
 
     <legend>$l_auto_sub</legend>
    
     <table>
     $block_cat
-    </tr>   
     <tr>
-      <th></td>
-      <td>$sel_recept</td>
-    </tr>       
+      <th>$l_list</th>
+      <td>$sel_list</td>
+    </tr>
     </table>    
-</fieldset>
+  </fieldset>
     <fieldset class=\"buttons\">
     $dis_button
     </fieldset>
@@ -567,42 +583,42 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
   global $l_subscription,$l_quantity, $l_renew, $l_recept, $l_lang, $l_desc;
   global $l_insert_sub,$l_update_sub,$l_checkdelete_sub, $l_publication;
 
-  $popup = $publication["popup"];
-  $ext_url = $publication["ext_url"];
+  $popup = $publication['popup'];
+  $ext_url = $publication['ext_url'];
 
-  if ($action == "detailupdate_subscription") {
-   $sub_id = $sub_q->f("subscription_id");
-   $pub_id = $sub_q->f("subscription_publication_id");
-   $title = $sub_q->f("publication_title");
-   $cont_id = $sub_q->f("subscription_contact_id");
-   $quantity = $sub_q->f("subscription_quantity");
-   if ($sub_q->f("subscription_renewal") == 1) $renew = " checked=\"checked\"";
-   $recept = $sub_q->f("subscription_reception_id");
-   $lang = $sub_q->f("publication_lang");
+  if ($action == 'detailupdate_subscription') {
+   $sub_id = $sub_q->f('subscription_id');
+   $pub_id = $sub_q->f('subscription_publication_id');
+   $title = $sub_q->f('publication_title');
+   $cont_id = $sub_q->f('subscription_contact_id');
+   $quantity = $sub_q->f('subscription_quantity');
+   if ($sub_q->f('subscription_renewal') == 1) $renew = " checked=\"checked\"";
+   $recept = $sub_q->f('subscription_reception_id');
+   $lang = $sub_q->f('publication_lang');
   }
   // If parameters have been given, they supercede the default action value
-  if (isset($publication["publication_id"])) { $pub_id = $publication["publication_id"]; }
-  if (isset($publication["title"])) { $title = stripslashes($publication["title"]); }
-  if (isset($publication["quantity"])) { $quantity = $publication["quantity"]; }
-  if (isset($publication["subscription_id"])) { $sub_id = $publication["subscription_id"]; }
-  if (isset($publication["contact_id"])) { $cont_id = $publication["contact_id"]; }
-  if ($publication["renewal"] == 1) { $renew = " checked=\"checked\""; }
-  if (isset($publication["lang"])) { $lang = stripslashes($publication["lang"]); }
-  if (isset($publication["recept"])) { $recept = stripslashes($publication["recept"]); }
+  if (isset($publication['publication_id'])) { $pub_id = $publication['publication_id']; }
+  if (isset($publication['title'])) { $title = stripslashes($publication['title']); }
+  if (isset($publication['quantity'])) { $quantity = $publication['quantity']; }
+  if (isset($publication['subscription_id'])) { $sub_id = $publication['subscription_id']; }
+  if (isset($publication['contact_id'])) { $cont_id = $publication['contact_id']; }
+  if ($publication['renewal'] == 1) { $renew = " checked=\"checked\""; }
+  if (isset($publication['lang'])) { $lang = stripslashes($publication['lang']); }
+  if (isset($publication['recept'])) { $recept = stripslashes($publication['recept']); }
   
 
   // reception mode select
   $sel_recept = "<select name=\"sel_recept\" id=\"sel_recept\">";
   while ($recept_q->next_record()) {
-    $k_id = $recept_q->f("subscriptionreception_id");
+    $k_id = $recept_q->f('subscriptionreception_id');
     $sel_recept .= "\n<option value=\"$k_id\"";
     if ($k_id == $recept) { $sel_recept .= " selected=\"selected\""; }
-    $sel_recept .= ">". $recept_q->f("subscriptionreception_label") . "</option>\n";
+    $sel_recept .= '>'. $recept_q->f('subscriptionreception_label') . "</option>\n";
   }
-  $sel_recept .= "</select>";
+  $sel_recept .= '</select>';
 
   $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang"; 
-  if (($action == "detailupdate_subscription") || ($action == "update_subscription")) {
+  if (($action == 'detailupdate_subscription') || ($action == 'update_subscription')) {
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"subscription_id\" id=\"subscription_id\" value=\"$sub_id\" />
@@ -610,7 +626,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
       <input type=\"submit\" value=\"$l_update_sub\" />";
      $block_publi = "$title<input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$pub_id\" />";
      	
-  } elseif (($action == "new_subscription") || ($action == "insert_subscription")) {
+  } elseif (($action == 'new_subscription') || ($action == 'insert_subscription')) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_subscription\" />
       <input type=\"submit\" value=\"$l_insert_sub\" />";
@@ -627,7 +643,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
       <input type=\"hidden\" id=\"ext_url\" name=\"ext_url\" value=\"$ext_url\" />
       <input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />";
 
-  $display["title"] = "<div class=\"title\">$l_subscription : $contact_firstname  $pub_title</div>";
+  $display['title'] = "<div class=\"title\">$l_subscription : $contact_firstname  $pub_title</div>";
 
   // --- HTML Template --------------------------------------------------------
   if (!isset($quantity)) $quantity = 1;
@@ -636,7 +652,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
 
     <form method=\"get\" name=\"form_subscription\"
       onsubmit=\"if (check_subscription(this)) return true; else return false;\"
-      action=\"".url_prepare("publication_index.php")."\">
+      action=\"".url_prepare('publication_index.php')."\">
 <fieldset class=\"detail infos\">
     <legend>$l_subscription</legend>
 
@@ -701,21 +717,21 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
   global $l_publication,$l_quantity, $l_renew, $l_recept,$l_year;
   global $l_publication_dest,$l_publication_orig;
   
-  $popup = $publication["popup"];
+  $popup = $publication['popup'];
 
-  $pub_id = $pub_q->f("publication_id"); 
-  $title = $pub_q->f("publication_title"); 
+  $pub_id = $pub_q->f('publication_id'); 
+  $title = $pub_q->f('publication_title'); 
   
 
   // reception mode select
   $sel_recept = "<select name=\"sel_recept\" id=\"sel_recept\">";
   while ($recept_q->next_record()) {
-    $k_id = $recept_q->f("subscriptionreception_id");
+    $k_id = $recept_q->f('subscriptionreception_id');
     $sel_recept .= "\n<option value=\"$k_id\"";
     if ($k_id == $recept) { $sel_recept .= " selected=\"selected\""; }
-    $sel_recept .= ">". $recept_q->f("subscriptionreception_label") . "</option>\n";
+    $sel_recept .= '>'. $recept_q->f('subscriptionreception_label') . "</option>\n";
   }
-  $sel_recept .= "</select>";
+  $sel_recept .= '</select>';
   $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang";   
  $block_publi_dest = "      
     <a href=\"\" onclick=\"popup('$url',''); return false;\">
@@ -731,7 +747,7 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
       ";
      	
 
-  $display["title"] = "<h1 class=\"title\">$l_renew : $title</h1>";
+  $display['title'] = "<h1 class=\"title\">$l_renew : $title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -739,7 +755,7 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
     $js_ctry
 
     <form method=\"get\" name=\"form_auto_subscription\"
-            action=\"".url_prepare("publication_index.php")."\">
+            action=\"".url_prepare('publication_index.php')."\">
 <fieldset class=\"detail extra\">
     <legend>$l_publication</legend>
 
@@ -785,7 +801,7 @@ function dis_publication_can_delete($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display;
 
-  $url = url_prepare("publication_index.php");
+  $url = url_prepare('publication_index.php');
 
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
@@ -800,7 +816,7 @@ function dis_publication_can_delete($p_id) {
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";
 
-  $display["msg"] .= display_ok_msg($l_can_delete);
+  $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
     <fieldset class=\"buttons\">
@@ -824,19 +840,19 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
   global $display, $l_check_samepublication, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
-  $title = $publication["title"];
-  $type = $publication["type"];
-  $year = $publication["year"];
-  $lang = $publication["lang"];
-  $desc = $publication["desc"];
-  $list = $publication["list"];
+  $title = $publication['title'];
+  $type = $publication['type'];
+  $year = $publication['year'];
+  $lang = $publication['lang'];
+  $desc = $publication['desc'];
+  $list = $publication['list'];
 
-  $display["msg"] .= display_warn_msg($l_check_samepublication);
+  $display['msg'] .= display_warn_msg($l_check_samepublication);
 
   while ($pub_q->next_record()) {
-    $id = $pub_q->f("publication_id");
-    $sametitle = $pub_q->f("publication_title");
-    $samelang = $pub_q->f("publication_lang");
+    $id = $pub_q->f('publication_id');
+    $sametitle = $pub_q->f('publication_title');
+    $samelang = $pub_q->f('publication_lang');
     $dis_same_pub .= "
       <li>     
          <a class=\"detail\" href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$id") . "\">
@@ -852,7 +868,7 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
   </div>
   <div class=\"buttons\">
     <form method=\"post\" name=\"form_insert\"
-    action=\"" .url_prepare("publication_index.php") . "\">
+    action=\"" .url_prepare('publication_index.php') . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
@@ -864,7 +880,7 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
     <form name=\"form_back\" method=\"post\"
-    action=\"" .url_prepare("publication_index.php") . "\">
+    action=\"" .url_prepare('publication_index.php') . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
@@ -904,19 +920,19 @@ function html_publication_type_form($type_q) {
   global $l_type_checkdelete,$l_type_update,$l_type_new,$l_type_insert;
   global $l_label,$l_c_new, $l_type;
 
-$char_title = '=';
-$key = 0;
-while ($type_q->next_record()) {
-  $id = $type_q->f("publicationtype_id");
-  $label = $type_q->f("publicationtype_label");
-
-  if($key%2 == 0) {
-    $class = "class=\"pair\"";
-  } else {
-    $class = "";
-  }
-  $c_label = htmlentities($one_cat["label"]);
-  $type_list .= "
+  $char_title = '=';
+  $key = 0;
+  while ($type_q->next_record()) {
+    $id = $type_q->f('publicationtype_id');
+    $label = $type_q->f('publicationtype_label');
+    
+    if($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = '';
+    }
+    $c_label = htmlentities($one_cat['label']);
+    $type_list .= "
     <tr $class>
     <td>
     <input type=\"hidden\" id=\"type_$id\" value=\"$id\" />
@@ -931,7 +947,7 @@ while ($type_q->next_record()) {
     </td>
     </tr>
     ";    
-}
+  }
 
 
 
@@ -1000,7 +1016,7 @@ function dis_publication_type_links($publication) {
   global $l_type_delete, $l_type_can_delete, $l_type_cant_delete;
 
   $delete_ok = true;
-  $id = $publication["type"];
+  $id = $publication['type'];
   $label = get_publication_type_label($id);
   $obm_q = run_query_publication_type_links($id);
 
@@ -1012,12 +1028,12 @@ function dis_publication_type_links($publication) {
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $cid = $obm_q->f("publication_id");
-      $cname = $obm_q->f("publication_title");
+      $cid = $obm_q->f('publication_id');
+      $cname = $obm_q->f('publication_title');
       $dis_link .= "<li><a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$cid") . "\">$cname</a></li>";
     }
     if ($cpt < $nb_type) {
-      $dis_link .= "<li>...</li>";
+      $dis_link .= '<li>...</li>';
     }
 
   } else {
@@ -1032,15 +1048,15 @@ function dis_publication_type_links($publication) {
     </div>";
 
   $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("publication_index.php") . "\">
+          action=\"" .url_prepare('publication_index.php') . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>";
 
   if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_type_can_delete);
+    $display['msg'] .= display_ok_msg($l_type_can_delete);
     $dis_del = "<form name=\"form_type_delete\".
-          method=\"post\" action=\"" . url_prepare("publication_index.php") . "\">
+          method=\"post\" action=\"" . url_prepare('publication_index.php') . "\">
         <input type=\"hidden\" name=\"action\" value=\"type_delete\" />
         <input type=\"hidden\" name=\"sel_type\" value=\"$id\" />
         <input type=\"submit\" name=\"sub_type\" value=\"$l_type_delete\" />
@@ -1051,7 +1067,7 @@ function dis_publication_type_links($publication) {
         $dis_back
       </div>";
   } else {
-    $display["msg"] .= display_warn_msg($l_type_cant_delete);
+    $display['msg'] .= display_warn_msg($l_type_cant_delete);
     $block .= "
       <div class=\"buttons\">
         $dis_back
@@ -1073,19 +1089,19 @@ function html_publication_subscription_reception_form($recept_q) {
   global $l_recept_checkdelete,$l_recept_update,$l_recept_new,$l_recept_insert;
   global $l_label,$l_c_new, $l_recept;
 
- $char_title = '=';
-$key = 0;
-while ($recept_q->next_record()) {
-  $id = $recept_q->f("subscriptionreception_id");
-  $label = $recept_q->f("subscriptionreception_label");
-
-  if($key%2 == 0) {
-    $class = "class=\"pair\"";
-  } else {
-    $class = "";
-  }
-  $c_label = htmlentities($one_cat["label"]);
-  $recept_list .= "
+  $char_title = '=';
+  $key = 0;
+  while ($recept_q->next_record()) {
+    $id = $recept_q->f('subscriptionreception_id');
+    $label = $recept_q->f('subscriptionreception_label');
+    
+    if($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = '';
+    }
+    $c_label = htmlentities($one_cat['label']);
+    $recept_list .= "
     <tr $class>
     <td>
     <input type=\"hidden\" id=\"recept_$id\" value=\"$id\" />
@@ -1098,17 +1114,13 @@ while ($recept_q->next_record()) {
     <img src=\"$ico_ok\" alt=\"$l_recept_update\" title=\"$l_recept_update\" />
     </a>
     </td>
-    </tr>
-    ";    
-}
+    </tr>";    
+  }
 
  
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-
-
-
  <div class=\"detail admin\" >
   <form id=\"form_recept_update\" action=\"?action=recept_update\" method=\"post\">
   <input type=\"hidden\" name=\"tf_recept_label\" value=\"\" />
@@ -1169,7 +1181,7 @@ function dis_publication_recept_links($publication) {
   global $l_recept_delete, $l_recept_can_delete, $l_recept_cant_delete;
  
   $delete_ok = true;
-  $id = $publication["recept"];
+  $id = $publication['recept'];
   $label = get_publication_recept_label($id);
   $obm_q = run_query_publication_recept_links($id);
 
@@ -1181,13 +1193,13 @@ function dis_publication_recept_links($publication) {
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $cid = $obm_q->f("publication_id");
-      $cname = $obm_q->f("publication_title");
+      $cid = $obm_q->f('publication_id');
+      $cname = $obm_q->f('publication_title');
       $dis_link .="<li><a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$cid") . "\">$cname</a></li>";
     }
     if ($cpt < $nb_recept) {
-      $dis_link .= "
-    <li>...</li>";
+      $dis_link .= '
+    <li>...</li>';
     }
 
   } else {
@@ -1200,15 +1212,15 @@ function dis_publication_recept_links($publication) {
     </div>";
 
   $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("publication_index.php") . "\">
+          action=\"" .url_prepare('publication_index.php') . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>";
 
   if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_recept_can_delete);
+    $display['msg'] .= display_ok_msg($l_recept_can_delete);
     $dis_del = "<form name=\"form_recept_delete\".
-          method=\"post\" action=\"" . url_prepare("publication_index.php") . "\">
+          method=\"post\" action=\"" . url_prepare('publication_index.php') . "\">
         <input type=\"hidden\" name=\"action\" value=\"recept_delete\" />
         <input type=\"hidden\" name=\"sel_recept\" value=\"$id\" />
         <input type=\"submit\" name=\"sub_recept\" value=\"$l_recept_delete\" />
@@ -1219,7 +1231,7 @@ function dis_publication_recept_links($publication) {
         $dis_back
       </div>";
   } else {
-    $display["msg"] .= display_warn_msg($l_recept_cant_delete);
+    $display['msg'] .= display_warn_msg($l_recept_cant_delete);
     $block .= "
       <div class=\"buttons\">
         $dis_back
@@ -1239,7 +1251,7 @@ function dis_publication_recept_links($publication) {
 function dis_publication_display_pref($prefs) {
   global $l_publication_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "publication");
+  $dis_pref = new OBM_DISPLAY('PREFERENCES', $prefs, 'publication');
   $dis_pref->pref_title = $l_publication_display;
   $dis_pref->pref_dis_help = 1;
 
@@ -1261,14 +1273,14 @@ function dis_publication_subscription_external_list($hash_table) {
   $obm_q = run_query_publication_subscription_external_search($hash_table);
   $nb_subscription = $obm_q->num_rows();
   if ($nb_subscription == 0) {
-    $display["msg"] = display_warn_msg($l_no_found_subscription);
+    $display['msg'] = display_warn_msg($l_no_found_subscription);
   } else {
     $block .= "
       <div class=\"detail extra\">
       <h1 class=\"detailHead\">$l_subscription</div>
       ";
     $block .= html_publication_subscription_list_result($obm_q,$nb_subscription);
-    $block .= "</div>";
+    $block .= '</div>';
   }
 
   return $block;
@@ -1290,8 +1302,8 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
 
   if ($perm->check_right($module, $cright_write)) {  
     $has_write_right = true;
-    $display_write .= "<th></th>
-    <th></th>";
+    $display_write .= '<th></th>
+    <th></th>';
   }
   
   $block = " 
@@ -1312,26 +1324,26 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
       <tbody>";
 
   while($sub_q->next_record()) {
-    $c_id = $sub_q->f("subscription_contact_id");
-    $p_id = $sub_q->f("subscription_publication_id");
-    $s_id = $sub_q->f("subscription_id");
-    $title = $sub_q->f("publication_title");
-    $year = $sub_q->f("publication_year");
-    $lang = $sub_q->f("publication_lang");
-    $rec_label = $sub_q->f("subscriptionreception_label");
-    $quantity = $sub_q->f("subscription_quantity");
-    $timecreate = of_datetime_format($sub_q->f("timecreate"));
-    if ($sub_q->f("timeupdate") != "") {
-      $timeupdate = of_datetime_format($sub_q->f("timeupdate"));
+    $c_id = $sub_q->f('subscription_contact_id');
+    $p_id = $sub_q->f('subscription_publication_id');
+    $s_id = $sub_q->f('subscription_id');
+    $title = $sub_q->f('publication_title');
+    $year = $sub_q->f('publication_year');
+    $lang = $sub_q->f('publication_lang');
+    $rec_label = $sub_q->f('subscriptionreception_label');
+    $quantity = $sub_q->f('subscription_quantity');
+    $timecreate = of_datetime_format($sub_q->f('timecreate'));
+    if ($sub_q->f('timeupdate') != '') {
+      $timeupdate = of_datetime_format($sub_q->f('timeupdate'));
     } else {
-      $timeupdate = "&nbsp;";
+      $timeupdate = '&nbsp;';
     }
     $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;publication_id=$p_id");
     $ext_url = urlencode(url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$c_id&amp;view=publication"));
 
     if ($has_write_right) {
-      $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;contact_id=$c_id&amp;param_subscription=$s_id&amp;popup=1&amp;ext_url=$ext_url");
-      $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_subscription=$s_id&amp;popup=1");
+      $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;contact_id=$c_id&amp;subscription_id=$s_id&amp;popup=1&amp;ext_url=$ext_url");
+      $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;subscription_id=$s_id&amp;popup=1");
 
       $display_write = "
     <td>
@@ -1340,19 +1352,19 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
       </a>
     </td>    
     <td>
-      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; popup('$url_subscription_delete',''); return false;\" alt=\"Update Subscription\">
+    
+  <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; popup('$url_subscription_delete',''); return false;\" alt=\"Update Subscription\">
       <img src=\"$ico_delete\" alt=\"Delete\" />
       </a>
       </td>";
     }
 
-    if ($sub_q->f("subscription_renewal") == "1") {
+    if ($sub_q->f('subscription_renewal') == '1') {
       $dis_renew = $l_yes;
     } else {
       $dis_renew = $l_no;
     }
     $block .= "
-    
     <tr>
     <td><a href=\"$url_publication_consult\">$title</a></td>
     <td>$year</td>
@@ -1363,10 +1375,9 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
     <td>$timecreate</td>
     <td>$timeupdate</td>    
     $display_write
-    </tr>
-    ";
+    </tr>";
   }
-  $block .= "</tbody></table>";
+  $block .= '</tbody></table>';
   return $block;
 }
 

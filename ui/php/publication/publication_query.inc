@@ -17,48 +17,48 @@
 function run_query_publication_search($publication) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $sql_order_dir = $publication["sql_order_dir"];
-  $sql_order_field = $publication["sql_order_field"];
+  $sql_order_dir = $publication['sql_order_dir'];
+  $sql_order_field = $publication['sql_order_field'];
 
-  $archive = $publication["archive"];
-  $title = sql_search_text_parse($publication["title"]);
-  $lang = sql_search_text_parse($publication["lang"]);
-  $type = $publication["type"];
-  $year = sql_search_text_parse($publication["year"]);
-  $market = $publication[""];
-  $zip = $publication["zip"];
+  $archive = $publication['archive'];
+  $title = sql_search_text_parse($publication['title']);
+  $lang = sql_search_text_parse($publication['lang']);
+  $type = $publication['type'];
+  $year = sql_search_text_parse($publication['year']);
+  $market = $publication[''];
+  $zip = $publication['zip'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $multidomain = sql_multidomain("publication");
+  $multidomain = sql_multidomain('publication');
 	
-  $and = "";
-  if ($title != "") {
+  $and = '';
+  if ($title != '') {
     $where .= " publication_title $like '$title%'";
-    $and = "AND";
+    $and = 'AND';
   }
-  if (($type != $c_all) && ($type != "")) { 
+  if (($type != $c_all) && ($type != '')) { 
     $where .= " $and publication_type_id='$type'";
-    $and = "AND";
+    $and = 'AND';
   }
-  if ($year != "") {
+  if ($year != '') {
     $where .= " $and publication_year $like '$year%'";
-    $and = "AND";
+    $and = 'AND';
   }
-  if ($lang != "") {
+  if ($lang != '') {
     $where .= " $and publication_lang $like '%$lang%'";
-    $and = "AND";
+    $and = 'AND';
   }
-  if ($where != "") {
+  if ($where != '') {
     $whereq = "WHERE $where $multidomain";
   } else {
     $whereq = "WHERE 1=1 $multidomain";
   }
 
   // ORDER construction
-  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : " publication_year DESC,publication_title";
+  $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : ' publication_year DESC,publication_title';
   $orderq = "ORDER BY $order $sql_order_dir";
 
   $query = "SELECT
@@ -80,7 +80,7 @@ function run_query_publication_search($publication) {
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "run_query_publication_search()");
+    display_debug_msg($query, $cdg_sql, 'run_query_publication_search()');
     $obm_q->query($query);
   }
 
@@ -99,9 +99,9 @@ function run_query_publication_detail($p_id) {
   $obm_q = new DB_OBM;
   $type = $obm_q->type;
 
-  $timeupdate = sql_date_format($type, "publication_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "publication_timecreate", "timecreate");
-  $multidomain = sql_multidomain("publication");
+  $timeupdate = sql_date_format($type, 'publication_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($type, 'publication_timecreate', 'timecreate');
+  $multidomain = sql_multidomain('publication');
 	
   $query = "SELECT *,
       $timeupdate,
@@ -115,7 +115,7 @@ function run_query_publication_detail($p_id) {
     WHERE publication_id='$p_id'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_detail()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -131,7 +131,7 @@ function run_query_publication_detail($p_id) {
 function run_query_publication_list() {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain('list');
 
   $query = "SELECT list_id,
       list_name,
@@ -141,7 +141,7 @@ function run_query_publication_list() {
     ORDER BY list_name"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_publication_list()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_list()');
 
   return $obm_q;
 }
@@ -156,15 +156,15 @@ function run_query_publication_list() {
 function run_query_publication_insert($publication) {
   global $obm, $cdg_sql, $public_contact_cat;
 
-  $title = $publication["title"];
-  $type = $publication["type"];
-  $lang = $publication["lang"];
-  $year = $publication["year"];
-  $desc = $publication["desc"];
+  $title = $publication['title'];
+  $type = $publication['type'];
+  $lang = $publication['lang'];
+  $year = $publication['year'];
+  $desc = $publication['desc'];
   $cats1 = $publication[$public_contact_cat];
-  $list_sub = $publication["list"];
-  $time = date("Y-m-d H:i:s");
-  $domain_id = $obm["domain_id"];
+  $list_sub = $publication['list'];
+  $time = date('Y-m-d H:i:s');
+  $domain_id = $obm['domain_id'];
   
   $query = "INSERT INTO Publication (
     publication_timeupdate,
@@ -180,7 +180,7 @@ function run_query_publication_insert($publication) {
   VALUES (null,
     '$time',
     null,
-    '" . $obm["uid"] . "',
+    '" . $obm['uid'] . "',
     '$domain_id',
     '$title',
     '$type',
@@ -189,23 +189,24 @@ function run_query_publication_insert($publication) {
     '$desc'
     )";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_insert()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $query = "SELECT publication_id
     FROM Publication
     WHERE publication_timecreate = '$time'
-      AND publication_usercreate = '" . $obm["uid"] . "'
+      AND publication_usercreate = '" . $obm['uid'] . "'
       AND publication_title = '$title'
       AND publication_year = '$year'";
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $obm_q->next_record();
-  $p_id = $obm_q->f("publication_id");
+  $p_id = $obm_q->f('publication_id');
+  $publication['publication_id'] = $p_id;
   
   if ( (is_array($cats1) && (count($cats1)>0) )
        || (is_array($list_sub) && (count($list_sub)>0) ) ) {
-    run_query_publication_auto_subscription($publication, $p_id);
+    run_query_publication_auto_subscription($publication);
   }
   return $p_id;
 }
@@ -219,11 +220,11 @@ function run_query_publication_insert($publication) {
 function run_query_publication_auto_insert($publication) {
   global $obm, $cdg_sql;
   
-  $id = $publication["publication_id"];
-  $id_orig = $publication["id_orig"];
-  $recept = $publication["recept"];
-  $domain_id = $obm["domain_id"];
-  if( $recept == "" || $id_orig == ""  ) {
+  $id = $publication['publication_id'];
+  $id_orig = $publication['id_orig'];
+  $recept = $publication['recept'];
+  $domain_id = $obm['domain_id'];
+  if( $recept == '' || $id_orig == ''  ) {
     return false;
   }
   $query = "INSERT INTO Subscription (
@@ -239,9 +240,9 @@ function run_query_publication_auto_insert($publication) {
     subscription_quantity)
   SELECT 
     null,
-    '" . date("Y-m-d H:i:s") . "',
+    '" . date('Y-m-d H:i:s') . "',
     null,
-    '" . $obm["uid"] . "',
+    '" . $obm['uid'] . "',
     '$domain_id',
     subscription_contact_id,
     '$id',
@@ -253,7 +254,7 @@ function run_query_publication_auto_insert($publication) {
     AND subscription_reception_id = '$recept'
     AND subscription_publication_id = '$id_orig'";
   
-  display_debug_msg($query, $cdg_sql, "run_query_publication_auto_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_auto_insert()');
 
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -265,39 +266,31 @@ function run_query_publication_auto_insert($publication) {
 // Auto Subscription Insertion query execution                                 
 // Parameters:
 //   - $publication : pub hash [$public_contact_cat], [list_sub] of interest
-//   - $p_id        :  Id of the subscription
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_publication_auto_subscription($publication, $p_id){
+function run_query_publication_auto_subscription($publication) {
   global $obm, $cdg_sql, $c_focsys, $public_contact_cat;
-  
+
+  $p_id = $publication['publication_id'];
   $cats1 = $publication[$public_contact_cat];
-  $list_sub = $publication["list"];
+  $list_sub = $publication['list'];
   $recept = $c_focsys;
-  $lang = $publication["lang"];
-  $lang_array = split("-", $lang);
-  $domain_id = $obm["domain_id"];
+  $lang = $publication['lang'];
+  $lang_array = split('-', $lang);
+  $domain_id = $obm['domain_id'];
+  $nb = 0;
 	
   // Subscription according to contact category 1
   if (is_array($cats1) && (count($cats1)>0)) {
     $obm_q = new DB_OBM;
     $type = $obm_q->type;
     $like = sql_casei_like($type);
-    $query = "INSERT INTO Subscription (
-      subscription_timeupdate,
-      subscription_timecreate,
-      subscription_userupdate,
-      subscription_usercreate,
-      subscription_domain_id,
-      subscription_contact_id,
-      subscription_publication_id,
-      subscription_renewal,
-      subscription_reception_id,
-      subscription_quantity)
+
+    $sub_query = "
     SELECT 
       null,
-      '" . date("Y-m-d H:i:s") . "',
+      '" . date('Y-m-d H:i:s') . "',
       null,
-      '" . $obm["uid"] . "',
+      '" . $obm['uid'] . "',
       '$domain_id',
       contact_id,
       '$p_id',
@@ -313,21 +306,40 @@ function run_query_publication_auto_subscription($publication, $p_id){
     WHERE categorylink_category_id IN (";
 
     foreach($cats1 as $category_id) {
-      $query .= "$coma '$category_id'";
+      $sub_query .= "$coma '$category_id'";
       $coma = ',';
     }
-    $query .= ") 
+    $sub_query .= ") 
   AND (";
-    $coma = "";
+    $coma = '';
     foreach($lang_array as $lang_id) {
-      $query .= "$coma kind_lang $like '$lang_id' ";
+      $sub_query .= "$coma kind_lang $like '$lang_id' ";
       $coma = 'OR';
     }
-    $query .= ") 
-  group by contact_id";
+    $sub_query .= ") 
+  GROUP BY contact_id";
 
-    display_debug_msg($query, $cdg_sql, "run_query_publication_auto_subscription()");
-    $retour = $obm_q->query($query);
+    display_debug_msg($sub_query, $cdg_sql, 'run_query_publication_auto_subscription()');
+    $retour = $obm_q->query($sub_query);
+    if ($obm_q->num_rows() > 0) {
+      $nb = $obm_q->num_rows();
+      $query = "INSERT INTO Subscription (
+      subscription_timeupdate,
+      subscription_timecreate,
+      subscription_userupdate,
+      subscription_usercreate,
+      subscription_domain_id,
+      subscription_contact_id,
+      subscription_publication_id,
+      subscription_renewal,
+      subscription_reception_id,
+      subscription_quantity)
+    $sub_query";
+      display_debug_msg($query, $cdg_sql, 'run_query_publication_auto_subscription()');
+      $retour = $obm_q->query($query);
+    } else {
+      $retour = true;
+    }
   }
 
 
@@ -342,7 +354,7 @@ function run_query_publication_auto_subscription($publication, $p_id){
 
       // Process each list contact (if not already done)
       while ($c_q->next_record()) {
-	$c_id = $c_q->f("contact_id");
+	$c_id = $c_q->f('contact_id');
 
 	// If subscription not already set for this contact
 	if (! in_array($c_id, $contacts)) {
@@ -363,9 +375,9 @@ function run_query_publication_auto_subscription($publication, $p_id){
             subscription_quantity)
           VALUES ( 
             null,
-            '" . date("Y-m-d H:i:s") . "',
+            '" . date('Y-m-d H:i:s') . "',
             null,
-            '" . $obm["uid"] . "',
+            '" . $obm['uid'] . "',
             '$domain_id',
             '$c_id',
             '$p_id',
@@ -378,9 +390,14 @@ function run_query_publication_auto_subscription($publication, $p_id){
 	}
       }
     }
+    $nb += count($contacts);
   }
 
-  return $retour;
+  if ($retour) {
+    return $nb;
+  } else {
+    return false;
+  }
 }
 
  
@@ -393,12 +410,12 @@ function run_query_publication_auto_subscription($publication, $p_id){
 function run_query_publication_insert_subscription($publication) {
   global $obm, $cdg_sql;
 
-  $c_id = $publication["contact_id"];
-  $quantity = $publication["quantity"];
-  $p_id = $publication["publication_id"];
-  $renewal = ($publication["renewal"] == "1" ? "1" : "0");
-  $recept = $publication["recept"];
-  $domain_id = $obm["domain_id"];
+  $c_id = $publication['contact_id'];
+  $quantity = $publication['quantity'];
+  $p_id = $publication['publication_id'];
+  $renewal = ($publication['renewal'] == '1' ? '1' : '0');
+  $recept = $publication['recept'];
+  $domain_id = $obm['domain_id'];
   
 /*  $query = "select count(subscription_contact_id) as num from
   Subscription where subscription_contact_id = '$c_id' and
@@ -407,7 +424,7 @@ function run_query_publication_insert_subscription($publication) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $obm_q->next_record();
-  if($obm_q->f("num") != 0) {
+  if($obm_q->f('num') != 0) {
     return true;
   }*/  
   $query = "INSERT INTO Subscription (
@@ -422,9 +439,9 @@ function run_query_publication_insert_subscription($publication) {
     subscription_reception_id,
     subscription_quantity)
   VALUES (null,
-    '" . date("Y-m-d H:i:s") . "',
+    '" . date('Y-m-d H:i:s') . "',
     null,
-    " . $obm["uid"] . ",
+    " . $obm['uid'] . ",
     '$domain_id',
     '$c_id',
     '$p_id',
@@ -433,7 +450,7 @@ function run_query_publication_insert_subscription($publication) {
     '$quantity'
     )";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_insert_subscription()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_insert_subscription()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   return $retour;
@@ -449,22 +466,22 @@ function run_query_publication_insert_subscription($publication) {
 function run_query_publication_update_subscription($publication) {
   global $obm, $cdg_sql;
 
-  $s_id = $publication["subscription_id"];
-  $quantity = $publication["quantity"];
-  $renewal = ($publication["renewal"] == "1" ? "1" : "0");
-  $recept = $publication["recept"];
-  $multidomain = sql_multidomain("subscription");
+  $s_id = $publication['subscription_id'];
+  $quantity = $publication['quantity'];
+  $renewal = ($publication['renewal'] == '1' ? '1' : '0');
+  $recept = $publication['recept'];
+  $multidomain = sql_multidomain('subscription');
   
   $query = "UPDATE Subscription SET 
-      subscription_timeupdate = '". date("Y-m-d H:i:s") ."',
-      subscription_userupdate='". $obm["uid"] ."',
+      subscription_timeupdate = '". date('Y-m-d H:i:s') ."',
+      subscription_userupdate='". $obm['uid'] ."',
       subscription_renewal='$renewal',
       subscription_reception_id='$recept',
       subscription_quantity='$quantity'
     WHERE	
       subscription_id = '$s_id' $multidomain";
     
-  display_debug_msg($query, $cdg_sql, "run_query_publication_update_subscription()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_update_subscription()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   return $retour;
@@ -480,16 +497,16 @@ function run_query_publication_update_subscription($publication) {
 function run_query_publication_update($pid, $publication) {
   global $obm, $cdg_sql;
 
-  $title = $publication["title"];
-  $type = $publication["type"];
-  $lang = $publication["lang"];
-  $year = $publication["year"];
-  $desc = $publication["desc"];
-  $multidomain = sql_multidomain("publication");
+  $title = $publication['title'];
+  $type = $publication['type'];
+  $lang = $publication['lang'];
+  $year = $publication['year'];
+  $desc = $publication['desc'];
+  $multidomain = sql_multidomain('publication');
 
   $query = "UPDATE Publication SET
-      publication_timeupdate='". date("Y-m-d H:i:s") ."',
-      publication_userupdate='". $obm["uid"] ."',
+      publication_timeupdate='". date('Y-m-d H:i:s') ."',
+      publication_userupdate='". $obm['uid'] ."',
       publication_title='$title',
       publication_lang='$lang',
       publication_year='$year',
@@ -497,7 +514,7 @@ function run_query_publication_update($pid, $publication) {
       publication_type_id='$type'
     WHERE publication_id='$pid' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   return $retour;
@@ -512,10 +529,10 @@ function run_query_publication_update($pid, $publication) {
 function run_query_publication_delete($p_id) {
   global $cdg_sql;
 	
-  $multidomain = sql_multidomain("publication");
+  $multidomain = sql_multidomain('publication');
   $query = "DELETE FROM Publication WHERE publication_id='$p_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_delete()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -529,14 +546,15 @@ function run_query_publication_delete($p_id) {
 //   - $p_id : publication id
 //   - $c_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_publication_delete_subscription($s_id) {
+function run_query_publication_delete_subscription($params) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("subscription");
+  $s_id = $params['subscription_id'];
+  $multidomain = sql_multidomain('subscription');
   $query = "DELETE FROM Subscription
     WHERE subscription_id='$s_id'
       $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_publication_delete_subscription()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_delete_subscription()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   
@@ -553,11 +571,11 @@ function run_query_publication_contact_links($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain('contact');
   $query = "SELECT DISTINCT contact_id, contact_lastname, contact_firstname 
     FROM Contact LEFT JOIN Subscription ON subscription_contact_id = contact_id
     WHERE subscription_publication_id='$p_id' $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_publication_contact_links()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_contact_links()');
   $obm_q->query($query);
 
   return $obm_q;
@@ -578,18 +596,18 @@ function run_query_publication_check($p_id, $title, $lang) {
   $type = $obm_q->type;
   $like = sql_casei_like($type);
 
-  $where_id = "";
-  if ($p_id != "") {
+  $where_id = '';
+  if ($p_id != '') {
     $where_id = "AND publication_id!='$p_id'";
   }
-  $multidomain = sql_multidomain("publication");
+  $multidomain = sql_multidomain('publication');
   $query = "SELECT distinct publication_id, publication_title, publication_lang
     FROM Publication
     WHERE publication_title $like '$title%'
       AND publication_lang $like '$lang%'
       $where_id $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_check()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_check()');
   $obm_q->query($query);
 
   return $obm_q;
@@ -604,13 +622,13 @@ function run_query_publication_check($p_id, $title, $lang) {
 function run_query_publication_type() {
   global $cdg_sql;
 	
-	$multidomain = sql_multidomain("publicationtype");
+	$multidomain = sql_multidomain('publicationtype');
 
   $query = "SELECT * FROM PublicationType 
 		WHERE 1=1 $multidomain ORDER BY publicationtype_label"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_publication_type()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_type()');
 
   return $obm_q;
 }
@@ -624,7 +642,7 @@ function run_query_publication_type() {
 function run_query_publication_subscription_reception() {
   global $cdg_sql, $c_focsys;
 
-  $multidomain = sql_multidomain("subscriptionreception");
+  $multidomain = sql_multidomain('subscriptionreception');
 
   $query = "SELECT *
     FROM SubscriptionReception
@@ -632,7 +650,7 @@ function run_query_publication_subscription_reception() {
     ORDER BY subscriptionreception_label DESC "; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_publication_subscription_reception()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_subscription_reception()');
 
   return $obm_q;
 }
@@ -646,10 +664,10 @@ function run_query_publication_subscription_reception() {
 function run_query_publication_type_insert($publication) {
   global $cdg_sql, $obm;
 
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $obm["uid"];
-  $type = $publication["type_label"];
-  $domain_id = $obm["domain_id"];
+  $timecreate = date('Y-m-d H:i:s');
+  $usercreate = $obm['uid'];
+  $type = $publication['type_label'];
+  $domain_id = $obm['domain_id'];
 	
   $query = "INSERT INTO PublicationType (
     publicationtype_timecreate,
@@ -662,7 +680,7 @@ function run_query_publication_type_insert($publication) {
     '$domain_id',
     '$type')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_type_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_type_insert()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -678,10 +696,10 @@ function run_query_publication_type_insert($publication) {
 function run_query_publication_recept_insert($publication) {
   global $obm, $cdg_sql;
 
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $obm["uid"];
-  $recept = $publication["recept_label"];
-  $domain_id = $obm["domain_id"];
+  $timecreate = date('Y-m-d H:i:s');
+  $usercreate = $obm['uid'];
+  $recept = $publication['recept_label'];
+  $domain_id = $obm['domain_id'];
 	
   $query = "INSERT INTO SubscriptionReception (
     subscriptionreception_timecreate,
@@ -694,7 +712,7 @@ function run_query_publication_recept_insert($publication) {
     '$domain_id',
     '$recept')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_recept_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_recept_insert()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -710,11 +728,11 @@ function run_query_publication_recept_insert($publication) {
 function run_query_publication_type_update($publication) {
   global $obm, $cdg_sql;
 
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $obm["uid"];
-  $id = $publication["type"];
-  $type = $publication["type_label"];
-  $multidomain = sql_multidomain("publicationtype");
+  $timeupdate = date('Y-m-d H:i:s');
+  $userupdate = $obm['uid'];
+  $id = $publication['type'];
+  $type = $publication['type_label'];
+  $multidomain = sql_multidomain('publicationtype');
 	
   $query = "UPDATE PublicationType SET
       publicationtype_label='$type',
@@ -723,7 +741,7 @@ function run_query_publication_type_update($publication) {
     WHERE
       publicationtype_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_type_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_type_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -739,11 +757,11 @@ function run_query_publication_type_update($publication) {
 function run_query_publication_recept_update($publication) {
   global $obm, $cdg_sql;
 
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $obm["uid"];
-  $id = $publication["recept"];
-  $recept = $publication["recept_label"];
-  $multidomain = sql_multidomain("subscriptionreception");
+  $timeupdate = date('Y-m-d H:i:s');
+  $userupdate = $obm['uid'];
+  $id = $publication['recept'];
+  $recept = $publication['recept_label'];
+  $multidomain = sql_multidomain('subscriptionreception');
 
   $query = "UPDATE SubscriptionReception SET
       subscriptionreception_label='$recept',
@@ -752,7 +770,7 @@ function run_query_publication_recept_update($publication) {
     WHERE
       subscriptionreception_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_recept_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_recept_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -768,10 +786,10 @@ function run_query_publication_recept_update($publication) {
 function run_query_publication_type_delete($id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("publicationtype");
+  $multidomain = sql_multidomain('publicationtype');
   $query = "DELETE FROM PublicationType WHERE publicationtype_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_type_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_type_delete()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -787,13 +805,13 @@ function run_query_publication_type_delete($id) {
 function run_query_publication_recept_delete($id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("subscriptionreception");
+  $multidomain = sql_multidomain('subscriptionreception');
 
   $query = "DELETE
     FROM SubscriptionReception
     WHERE subscriptionreception_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_recept_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_recept_delete()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -809,13 +827,13 @@ function run_query_publication_recept_delete($id) {
 function run_query_publication_type_links($p_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("publication");
+  $multidomain = sql_multidomain('publication');
 
   $query = "SELECT publication_title, publication_id, publication_type_id
     FROM Publication
     WHERE publication_type_id='$p_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_type_links()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_type_links()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -831,7 +849,7 @@ function run_query_publication_type_links($p_id) {
 function run_query_publication_recept_links($p_id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("subscription");
+  $multidomain = sql_multidomain('subscription');
 
   $query = "SELECT publication_title,
       publication_id,
@@ -843,7 +861,7 @@ function run_query_publication_recept_links($p_id) {
       LEFT JOIN Contact ON contact_id = subscription_contact_id
     WHERE subscription_reception_id='$p_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_recept_links()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_recept_links()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -859,18 +877,18 @@ function run_query_publication_recept_links($p_id) {
 function get_publication_type_label($id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("publicationtype");
+  $multidomain = sql_multidomain('publicationtype');
 
   $query = "SELECT publicationtype_label
     FROM PublicationType
     WHERE publicationtype_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_publication_type_label()");
+  display_debug_msg($query, $cdg_sql, 'get_publication_type_label()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("publicationtype_label");
+  $retour = $obm_q->f('publicationtype_label');
   return $retour;
 }
 
@@ -883,18 +901,18 @@ function get_publication_type_label($id) {
 function get_publication_recept_label($id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("subscriptionreception");
+  $multidomain = sql_multidomain('subscriptionreception');
 
   $query = "SELECT subscriptionreception_label
     FROM SubscriptionReception 
     WHERE subscriptionreception_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_publication_recept_label()");
+  display_debug_msg($query, $cdg_sql, 'get_publication_recept_label()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("subscriptionreception_label");
+  $retour = $obm_q->f('subscriptionreception_label');
   return $retour;
 }
 
@@ -909,8 +927,8 @@ function get_publication_recept_label($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_publication_context($cid, $publication) {
 
-  $title = $publication["title"];
-  $lang = $publication["lang"];
+  $title = $publication['title'];
+  $lang = $publication['lang'];
 
   // if a publication with same title and zip exists, return false
   $co_q = run_query_publication_check($cid, $title, $lang);
@@ -931,27 +949,27 @@ function check_publication_data($cid, $publication) {
   global $l_fill_title, $l_j_check_year,$l_j_fill_lang, $php_regexp_pub_lang;
   global $err, $l_j_check_lang;
 
-  $title = $publication["title"];
-  $year = $publication["year"];
-  $lang = $publication["lang"];
-  $desc = $publication["desc"];
-  $type = $publication["type"];
+  $title = $publication['title'];
+  $year = $publication['year'];
+  $lang = $publication['lang'];
+  $desc = $publication['desc'];
+  $type = $publication['type'];
 
-  if (trim($title) == "") {
-    $err["msg"] = $l_fill_title;
+  if (trim($title) == '') {
+    $err['msg'] = $l_fill_title;
     return false;
   }
 
-  if (($year == "") || ($year < 1900 || $year > 2200)) {
-    $err["msg"] = $l_j_check_year. " : $year";
+  if (($year == '') || ($year < 1900 || $year > 2200)) {
+    $err['msg'] = $l_j_check_year. " : $year";
     return false;
   }
 
-  if ($lang == "") {
-    $err["msg"] = $l_j_fill_lang;
+  if ($lang == '') {
+    $err['msg'] = $l_j_fill_lang;
     return false;
   } else if (preg_match($php_regexp_pub_lang, $lang) == 0) {
-    $err["msg"] = $l_j_check_lang . " : $lang";
+    $err['msg'] = $l_j_check_lang . " : $lang";
     return false;
   }
 
@@ -972,15 +990,15 @@ function check_publication_data_subscription_form($cid, $publication) {
   global $l_j_check_quantity,$l_j_select_publication ;
   global $err;
 
-  $quantity = $publication["quantity"];
-  $p_id = $publication["publication_id"];
+  $quantity = $publication['quantity'];
+  $p_id = $publication['publication_id'];
 
-  if (($p_id == "") || !($p_id >= 0) ) {
-    $err["msg"] = $l_j_select_publication;
+  if (($p_id == '') || !($p_id >= 0) ) {
+    $err['msg'] = $l_j_select_publication;
     return false;
   }
-  if (($quantity == "")) {
-    $err["msg"] = $l_j_check_quantity;
+  if (($quantity == '')) {
+    $err['msg'] = $l_j_check_quantity;
     return false;
   }
   return true; 
@@ -1007,7 +1025,7 @@ function check_publication_can_delete($p_id) {
 
   if ($nb > 0) {
     $delete_ok = false;
-    $err["msg"] = $l_link_contact;
+    $err['msg'] = $l_link_contact;
   } else {
     $ok_msg = "$l_link_contact_no";
   }
@@ -1024,18 +1042,18 @@ function check_publication_can_delete($p_id) {
 function run_query_publication_get_contact_lang($p_id) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
-  $multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain('contact');
 
   $obm_q = new DB_OBM;
     $query = "SELECT kind_lang
       FROM Contact LEFT JOIN Kind ON contact_kind_id = kind_id
       WHERE contact_id='$p_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_get_contact_lang()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_get_contact_lang()');
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q->f("kind_lang");
+  return $obm_q->f('kind_lang');
 }
 
 
@@ -1047,12 +1065,12 @@ function run_query_publication_get_contact_lang($p_id) {
 function run_query_publication_subscription_external_search($hash_table) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
-  $contact = $hash_table["contact_id"];
+  $contact = $hash_table['contact_id'];
   $obm_q = new DB_OBM;
   $type = $obm_q->type;
-  $timeupdate = sql_date_format($type, "subscription_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "subscription_timecreate", "timecreate");
-  $multidomain = sql_multidomain("subscription");
+  $timeupdate = sql_date_format($type, 'subscription_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($type, 'subscription_timecreate', 'timecreate');
+  $multidomain = sql_multidomain('subscription');
 	
   $query = "SELECT
       $timeupdate,
@@ -1072,7 +1090,7 @@ function run_query_publication_subscription_external_search($hash_table) {
     WHERE subscription_contact_id='$contact' $multidomain
     ORDER BY subscription_timecreate desc";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_subscription_external_search()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_subscription_external_search()');
   $obm_q->query($query);
 
   return $obm_q;
@@ -1084,11 +1102,12 @@ function run_query_publication_subscription_external_search($hash_table) {
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_publication_subscription_detail($s_id){
+function run_query_publication_subscription_detail($params){
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
+  $s_id = $params['subscription_id'];
   $obm_q = new DB_OBM;
-  $multidomain = sql_multidomain("subscription");
+  $multidomain = sql_multidomain('subscription');
 	
   $query = "SELECT
       subscription_id,
@@ -1102,7 +1121,7 @@ function run_query_publication_subscription_detail($s_id){
 	LEFT JOIN Publication ON publication_id = subscription_publication_id
     WHERE subscription_id='$s_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_publication_subscription_detail()");
+  display_debug_msg($query, $cdg_sql, 'run_query_publication_subscription_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
   return $obm_q;
