@@ -448,7 +448,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
     $users_array = array_unique($users_array);
   }
   if (! is_array($users_array)) {
-    $users_array = array();
+    $users_array = array($obm["uid"]);
   }
 
   // Insert the Event
@@ -1395,7 +1395,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
     $users_array = array_unique($users_array);
   }
   if (! is_array($users_array)) {
-    $users_array = array();
+    $users_array = array($obm["uid"]);
   }
 
   // Get the final resource list
