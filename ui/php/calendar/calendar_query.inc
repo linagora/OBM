@@ -1966,7 +1966,7 @@ function check_calendar_access($id, $right = 'write') {
     $access = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'write', array($e['owner']), 'userobm');
   } else {
     $access = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], $right, $e['attendees']['user'], 'userobm');
-    if(count($access['ids']) == 0 ) {
+    if(count($access['ids']) == 0  && is_array($e['attendees']['resource'])) {
       $access = of_right_entity_for_consumer('Resource', 'user', $obm['uid'], $right, $e['attendees']['resource']);
     }
   }
