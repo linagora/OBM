@@ -1703,7 +1703,7 @@ function get_entity_info($id, $entity) {
 
   $query = "SELECT *
     FROM($entity_table) as Entity 
-    WHERE entity_id='$id'";
+    WHERE entitydata_id='$id'";
 
   display_debug_msg($query, $cdg_sql, 'get_user_info()');
   $obm_q->query($query);
