@@ -1338,6 +1338,10 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   $ts_begin = isodatetime_to_timestamp($calendar['date_begin']);
   $ts_end = isodatetime_to_timestamp($calendar['date_end']);
   $id = $calendar['calendar_id'];
+  if($calendar['all_day'] == 1) {
+    $ts_begin = strtotime(date('Y-m-d 00:00:00',$ts_begin));
+    $ts_end = strtotime(date('Y-m-d 23:59:59',$ts_end));
+  }  
   $obm_q = run_query_calendar_conflict_events($ts_begin, $ts_end, $sel_entity_id, $id);
   if ($obm_q->nf() == 0) {
     return false;
@@ -1356,6 +1360,10 @@ function check_calendar_decision_conflict($calendar) {
   $e_q = run_query_calendar_detail($event_id);
   $ts_begin = $e_q->f('calendarevent_date');
   $ts_end = $e_q->f('calendarevent_date') + $e_q->f('calendarevent_duration');
+  if($e_q->f('all_day') == 1) {
+    $ts_begin = strtotime(date('Y-m-d 00:00:00',$ts_begin));
+    $ts_end = strtotime(date('Y-m-d 23:59:59',$ts_end));
+  }
   $c_q = run_query_calendar_conflict_events($ts_begin,$ts_end,$user,$event_id);
   if ($c_q->nf() == 0) {
     return false;
@@ -2786,7 +2794,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
   $multidomain = sql_multidomain('calendarevent');
 
   $day_start = strtotime(date('Ymd 00:00:00',$start));
-  $day_end = strtotime(date('Ymd 00:00:00',$end));
+  $day_end = strtotime(date('Ymd 23:59:59',$end));
   $query = "SELECT
       calendarevent_id,
       calendarevent_title,
