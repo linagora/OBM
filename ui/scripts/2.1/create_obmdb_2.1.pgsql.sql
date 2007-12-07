@@ -597,6 +597,7 @@ CREATE TABLE DealStatus (
   dealstatus_usercreate  integer,
   dealstatus_label       varchar(24),
   dealstatus_order       integer,
+  dealstatus_hitrate     char(3),
   PRIMARY KEY (dealstatus_id)
 );
 
@@ -1485,8 +1486,8 @@ CREATE TABLE GroupGroup (
 --
 CREATE TABLE of_usergroup (
   of_usergroup_group_id    integer DEFAULT 0 NOT NULL,
-  of_usergroup_userobm_id  integer DEFAULT 0 NOT NULL,
-  PRIMARY KEY (of_usergroup_group_id, of_usergroup_userobm_id)
+  of_usergroup_user_id  integer DEFAULT 0 NOT NULL,
+  PRIMARY KEY (of_usergroup_group_id, of_usergroup_user_id)
 );
 
 
@@ -1856,9 +1857,9 @@ CREATE TABLE MailServerNetwork (
 CREATE TABLE P_Domain (like Domain);
 CREATE TABLE P_UserObm (like UserObm);
 CREATE TABLE P_UGroup (like UGroup);
--- CREATE TABLE P_UserObmGroup (like UserObmGroup);
--- CREATE TABLE P_GroupGroup (like GroupGroup);
-CREATE TABLE P_of_usergroup (like UserObmGroup);
+CREATE TABLE P_UserObmGroup (like UserObmGroup);
+CREATE TABLE P_GroupGroup (like GroupGroup);
+CREATE TABLE P_of_usergroup (like of_usergroup);
 CREATE TABLE P_Host (like Host);
 CREATE TABLE P_Samba (like Samba);
 CREATE TABLE P_MailServer (like MailServer);

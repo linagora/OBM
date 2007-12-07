@@ -548,14 +548,14 @@ DROP TABLE of_usergroup;
 DROP TABLE P_of_usergroup;
 CREATE TABLE of_usergroup (
   of_usergroup_group_id    integer DEFAULT 0 NOT NULL,
-  of_usergroup_userobm_id  integer DEFAULT 0 NOT NULL,
-  PRIMARY KEY (of_usergroup_group_id, of_usergroup_userobm_id)
+  of_usergroup_user_id  integer DEFAULT 0 NOT NULL,
+  PRIMARY KEY (of_usergroup_group_id, of_usergroup_user_id)
 );
 
 CREATE TABLE P_of_usergroup (
   of_usergroup_group_id    integer DEFAULT 0 NOT NULL,
-  of_usergroup_userobm_id  integer DEFAULT 0 NOT NULL,
-  PRIMARY KEY (of_usergroup_group_id, of_usergroup_userobm_id)
+  of_usergroup_user_id  integer DEFAULT 0 NOT NULL,
+  PRIMARY KEY (of_usergroup_group_id, of_usergroup_user_id)
 );
 
 -- DROP TABLE P_UserObmGroup;
