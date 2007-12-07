@@ -156,20 +156,22 @@ class OBM_Challenge_Auth extends Auth {
   
   function auth_validatelogin() {
     global $obm, $params;
-    global $c_default_domain;
+    global $c_default_domain, $c_singleNameSpace;
 
     $login = $params["login"];
     $password = $params["password"];
     $domain = $params["domain"];
-    // if no domain set, set the default domain
-    if ((! isset($domain)) || ($domain == "")) {
-      $domain = "$c_default_domain";
-    }
+    if(!$c_singleNameSpace) {
+      // if no domain set, set the default domain
+      if ((! isset($domain)) || ($domain == "")) {
+        $domain = "$c_default_domain";
+      }
 
-    $where_domain = "AND userobm_domain_id='$domain'";
+      $where_domain = "AND userobm_domain_id='$domain'";
 
-    if (isset($login)) {
-      $obm["login"] = $login; // provides access for loginform.ihtml
+      if (isset($login)) {
+        $obm["login"] = $login; // provides access for loginform.ihtml
+      }
     }
 
     $user_table = $this->database_table;

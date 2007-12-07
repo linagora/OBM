@@ -33,7 +33,7 @@ if (file_exists($conf_login_page)) {
   $lp = $login_template;
 }
 
-if($c_singleNameSpace) {
+if(!$c_singleNameSpace) {
   $domain_id = isset($_REQUEST['sel_domain'])?$_REQUEST['sel_domain']:$c_default_domain;
   $sel_domain = of_domain_dis_select($domain_id);
   $domain = $l_domain;
