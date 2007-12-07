@@ -24,20 +24,37 @@ sub getParameter {
         &OBM::toolBox::write_log( "Parametre '--domain' manquant", "W" );
         $parameters->{"help"} = "";
 
+    }else {
+        &OBM::toolBox::write_log( "Mise a jour du domaine d'identifiant '".$parameters->{"domain"}."'", "W" );
     }
     
     if( exists($parameters->{"user"}) ) {
         if( exists($parameters->{"delegation"}) ) {
             &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
             $parameters->{"help"} = "";
+        }else{
+            &OBM::toolBox::write_log( "Uniquement les mises a jour de l'utilisateur d'identifiant '".$parameters->{"user"}."'", "W" );
         }
 
     }elsif( exists($parameters->{"delegation"}) ) {
         if( exists($parameters->{"user"}) ) {
             &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
             $parameters->{"help"} = "";
+        }else {
+            &OBM::toolBox::write_log( "Uniquement les mises a jour de la delegation '".$parameters->{"delegation"}."'", "W" );
         }
 
+    }
+
+    if( exists($parameters->{"incremental"}) && exists($parameters->{"global"}) ) {
+        &OBM::toolBox::write_log( "parametres '--incremental' et '--global' incompatibles", "W" );
+        $parameters->{"help"} = "";
+
+    }elsif( exists($parameters->{"incremental"}) ) {
+        &OBM::toolBox::write_log( "Mise a jour incrementale", "W" );
+
+    }elsif( exists($parameters->{"global"}) ) {
+        &OBM::toolBox::write_log( "Mise a jour globale", "W" );
     }
 
 
@@ -45,11 +62,12 @@ sub getParameter {
         &OBM::toolBox::write_log( "Affichage de l'aide", "WC" );
 
         print "Veuillez indiquer le critere de mise a jour :\n";
-        print "\tSyntaxe: script --domain id [--user id | --delegation word] [--global]\n";
+        print "\tSyntaxe: script --domain id [--user id | --delegation word] [--global | --incremental]\n";
         print "\tuser <id> : utilisateur d'identifiant <id> ;\n";
         print "\tdomain <id> : domaine d'identifiant <id> ;\n";
-        print "\tdelegation <word> : delegation de mot cle <word>.\n";
-        print "\tglobal : fait une mise a jour globale du domaine.\n";
+        print "\tdelegation <word> : delegation de mot cle <word> ;\n";
+        print "\tglobal : fait une mise a jour globale du domaine ;\n";
+        print "\tincremental : fait une mise a jour incrementale du domaine.\n";
 
         exit 0;
     }
