@@ -157,7 +157,8 @@ sub update {
     my $return = 1;
 
     if( $self->{"global"} ) {
-        $return = $self->_doGlobal();
+        $return = $self->_doGlobalUpdate();
+        $return = $return && $self->_doGlobalDelete();
     }else {
         $return = $self->_doIncremental();
     }
@@ -174,7 +175,7 @@ sub update {
 }
 
 
-sub _doGlobal {
+sub _doGlobalUpdate {
     my $self = shift;
     my $queryResult;
     my $globalReturn = 1;
@@ -252,6 +253,7 @@ sub _doGlobal {
         $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
     }
 
+
     # Traitement des entités de type 'hote'
     my $query = "SELECT host_id FROM Host WHERE host_domain_id=".$self->{"domain"};
     if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
@@ -289,6 +291,7 @@ sub _doGlobal {
         }
     }
 
+
     # Traitement des entités de type 'groupe'
     $query = "SELECT group_id FROM UGroup WHERE group_privacy=0 AND group_domain_id=".$self->{"domain"};
     if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
@@ -306,6 +309,7 @@ sub _doGlobal {
             $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
         }
     }
+
 
     # Traitement des entités de type 'mailshare'
     $query = "SELECT mailshare_id FROM MailShare WHERE mailshare_domain_id=".$self->{"domain"};
@@ -326,6 +330,106 @@ sub _doGlobal {
     }
 
     return $globalReturn; 
+}
+
+
+sub _doGlobalDelete {
+    my $self = shift;
+    my $queryResult;
+    my $globalReturn = 1;
+
+    if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
+        &OBM::toolBox::write_log( "[Update::update]: pas de domaine indique pour la MAJ totale", "W" );
+        return 0;
+    }
+    my $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
+
+    if( !defined($domainDesc) ) {
+        &OBM::toolBox::write_log( "[Update::update]: domaine d'identifiant '".$self->{"domain"}."' inexistant", "W" );
+        return 0;
+    }
+
+
+    &OBM::toolBox::write_log( "[Update::update]: detection des suppressions en BD pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
+
+
+    # Traitement des entités de type 'hote'
+    my $query = "SELECT host_id FROM P_Host WHERE host_domain_id=".$self->{"domain"}." AND host_id NOT IN (SELECT host_id FROM Host WHERE host_domain_id=".$self->{"domain"}.")";
+    if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        return 0;
+    }
+
+    while( my $hostId = $queryResult->fetchrow_array() ) {
+        my $object = $self->_doHost( 1, 1, $hostId );
+
+        my $return = $self->_runEngines( $object );
+        if( $return ) {
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # travail
+            $globalReturn = $globalReturn && $self->_deleteDbEntity( "Host", $hostId );
+        }
+    }
+
+
+    # Traitement des entités de type 'utilisateur'
+    $query = "SELECT userobm_id FROM P_UserObm WHERE userobm_domain_id=".$self->{"domain"}." AND userobm_id NOT IN (SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"}.")";
+    if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        return 0;
+    }
+
+    while( my( $userId ) = $queryResult->fetchrow_array() ) {
+        my $object = $self->_doUser( 1, 1, $userId );
+
+        my $return = $self->_runEngines( $object );
+        if( $return ) {
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # travail
+            $globalReturn = $globalReturn && $self->_deleteDbEntity( "UserObm", $userId );
+        }
+    }
+
+
+    # Traitement des entités de type 'groupe'
+    $query = "SELECT group_id FROM P_UGroup WHERE group_domain_id=".$self->{"domain"}." AND group_id NOT IN (SELECT group_id FROM UGroup WHERE group_domain_id=".$self->{"domain"}.")";
+    if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        return 0;
+    }
+
+    while( my( $groupId ) = $queryResult->fetchrow_array() ) {
+        my $object = $self->_doGroup( 1, 1, $groupId );
+
+        my $return = $self->_runEngines( $object );
+        if( $return ) {
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # travail
+            $globalReturn = $globalReturn && $self->_deleteDbEntity( "UGroup", $groupId );
+        }
+    }
+
+
+    # Traitement des entités de type 'mailshare'
+    $query = "SELECT mailshare_id FROM P_MailShare WHERE mailshare_domain_id=".$self->{"domain"}." AND mailshare_id NOT IN (SELECT mailshare_id FROM MailShare WHERE mailshare_domain_id=".$self->{"domain"}.")";
+    if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        return 0;
+    }
+
+    while( my( $mailshareId ) = $queryResult->fetchrow_array() ) {
+        my $object = $self->_doMailShare( 1, 1, $mailshareId );
+
+        my $return = $self->_runEngines( $object );
+        if( $return ) {
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # travail
+            $globalReturn = $globalReturn && $self->_deleteDbEntity( "MailShare", $mailshareId );
+        }
+    }
+
+
+    return $globalReturn;
 }
 
 

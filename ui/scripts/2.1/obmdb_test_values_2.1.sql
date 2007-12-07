@@ -83,9 +83,9 @@ INSERT INTO UserSystem VALUES (3,'samba','m#Pa!NtA','106','65534','/','SAMBA','A
 
 DELETE FROM Host;
 
-INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALUES ('1500', '1000', 'srv-mail', '10.0.0.101', 'Serveur de courrier');
-INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALUES ('1501', '1000', 'smtp-in', '10.0.0.100', 'SMTP entrant');
-INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALUES ('1502', '1000', 'smtp-out', '10.0.0.100', 'SMTP sortant');
+INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALUES ('1500', '1000', 'srv-mail', '10.0.0.11', 'Serveur de courrier');
+INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALUES ('1501', '1000', 'smtp-in', '10.0.0.10', 'SMTP entrant');
+INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALUES ('1502', '1000', 'smtp-out', '10.0.0.10', 'SMTP sortant');
 
 
 -------------------------------------------------------------------------------
