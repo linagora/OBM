@@ -531,7 +531,11 @@ function run_query_calendar_insert_event_data($calendar) {
   global $cdg_sql, $obm;
 
   $now = date('Y-m-d H:i:s');
-  $owner = $calendar['owner'];
+  if($calendar['owner']) {
+    $owner = $calendar['owner'];
+  } {
+    $owner = $obm['uid'];
+  }
   $title = $calendar['title'];
   $category1_id = $calendar['category1'];
   $priority = $calendar['priority'];
@@ -628,7 +632,8 @@ function run_query_calendar_insert_event_data($calendar) {
       AND calendarevent_date='$datebegin' 
       AND calendarevent_title='$title'
       AND calendarevent_duration='$event_duration'
-      AND calendarevent_domain_id='$obm[domain_id]'";
+      AND calendarevent_domain_id='$obm[domain_id]'
+      ORDER BY calendarevent_id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
   $obm_q->query($query);
   while($obm_q->next_record())$id = $obm_q->f('calendarevent_id');
