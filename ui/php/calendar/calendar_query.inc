@@ -2979,7 +2979,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
 //   - $calendar          : calendar params
 //   - $calendar_entity : array of entities elements to display
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_repeat_events($start, $end, $calendar_entity, $category_filter) {
+function run_query_calendar_repeat_events($start, $end, $calendar_entity, $category_filter='') {
   global $cdg_sql;
   
   $obm_q = new DB_OBM;
