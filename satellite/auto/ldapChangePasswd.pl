@@ -312,7 +312,7 @@ if( $parameters{"sql"} ) {
     if( $count != 1 ) {
         &OBM::toolBox::write_log( "Erreur: l'utilisateur de login '".$parameters{"login"}."' appartenant au domain '".$parameters{"domain_id"}."' n'existe pas en BD", "W", 0 );
     }else {
-        $query = "UPDATE UserObm SET userobm_password_type='".$parameters{"type"}."', userobm_password='".$parameters{"passwd"}."' WHERE userobm_domain_id=".$parameters{"domain_id"}." AND userobm_login='".$parameters{"login"}."'";
+        $query = "UPDATE UserObm SET userobm_nb_login_failed='0', userobm_password_type='".$parameters{"type"}."', userobm_password='".$parameters{"passwd"}."' WHERE userobm_domain_id=".$parameters{"domain_id"}." AND userobm_login='".$parameters{"login"}."'";
         # On execute la requete
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
             &OBM::toolBox::write_log( "Erreur: probleme lors de l'execution de la requete de mise a jour du mot de passe SQL : ".$dbHandler->err, "WC", 0 );
@@ -320,7 +320,7 @@ if( $parameters{"sql"} ) {
         }
 
 
-        $query = "UPDATE P_UserObm SET userobm_password_type='".$parameters{"type"}."', userobm_password='".$parameters{"passwd"}."' WHERE userobm_domain_id=".$parameters{"domain_id"}." AND userobm_login='".$parameters{"login"}."'";
+        $query = "UPDATE P_UserObm SET userobm_nb_login_failed='0', userobm_password_type='".$parameters{"type"}."', userobm_password='".$parameters{"passwd"}."' WHERE userobm_domain_id=".$parameters{"domain_id"}." AND userobm_login='".$parameters{"login"}."'";
         # On execute la requete
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
             &OBM::toolBox::write_log( "Erreur: probleme lors de l'execution de la requete de mise a jour du mot de passe SQL : ".$dbHandler->err, "WC", 0 );
