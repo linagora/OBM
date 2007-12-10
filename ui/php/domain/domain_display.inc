@@ -75,11 +75,11 @@ function html_domain_search_form($domain) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_domain_search_list($domain) {
   global $l_found, $l_no_found;
-  global $display, $uid;
+  global $display, $obm;
 
   $obm_q = run_query_domain_search($domain);
 
-  $prefs = get_display_pref($uid, 'domain');
+  $prefs = get_display_pref($obm['uid'], 'domain');
   $nb_domain = $obm_q->num_rows_total();
   if ($nb_domain == 0) {
     $display['msg'] .= display_warn_msg($l_no_found);

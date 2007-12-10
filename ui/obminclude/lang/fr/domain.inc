@@ -28,10 +28,10 @@ $l_can_delete = "Le domaine peut être supprimé.";
 $l_cant_delete = "Le domaine ne peut pas être supprimé !";
 $l_cant_add_domain_single = "Impossible de créer un nouveau domaine, OBM est configuré en mode mono domaine (singleNameSpace) ! Attention, le passage en multi-domaine nécessite une intervention système importante.";
 
-$l_max_users = "# utilisateurs max";
-$l_max_resources = "# ressources max";
-$l_max_mailshares = "# bals partagées max";
-$l_quota_mail = "Quota mail";
+$l_max_user = "# utilisateurs max";
+$l_max_resource = "# ressources max";
+$l_max_mailshare = "# bals partagées max";
+$l_mail_quota = "Quota mail";
 $l_address1 = "$l_address 1";
 $l_address2 = "$l_address 2";
 $l_address3 = "$l_address 3";

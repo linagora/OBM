@@ -237,7 +237,13 @@ function run_query_domain_delete($p_id) {
 
   $obm_q = new DB_OBM;
 
+  // Clean DomainPropertyValue
   $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id='$p_id'";
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_delete()');
+  $retour = $obm_q->query($query);
+
+  // Clean DomainMailServer
+  $query = "DELETE FROM DomainMailServer WHERE domainmailserver_domain_id='$p_id'";
   display_debug_msg($query, $cdg_sql, 'run_query_domain_delete()');
   $retour = $obm_q->query($query);
 
