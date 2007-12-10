@@ -2,8 +2,21 @@
 
 . /usr/share/debconf/confmodule
 
-#suppression des certificats OBM
-rm -f /etc/obm/certs/*
+
+case "$1" in
+        remove|failed-upgrade|abort-install|abort-upgrade|disappear)
+
+        db_purge
+        ;;
+        upgrade)
+        ;;
+        purge)
+	#suppression des certificats OBM
+	rm -f /etc/obm/certs/*
+        ;;
+esac
+
+
 
 #DEBHELPER#
 
