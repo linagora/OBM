@@ -10,8 +10,9 @@
 ; Information generales
 title = OBM
 
-; example : for http://extranet.aliasource.fr/obm/ 
+; example : for https://extranet.aliasource.fr/obm/ 
 ; external-url = extranet.aliasource.fr
+; external-protocol = https
 ; obm-prefix = /obm/
 external-url = obm
 external-protocol = http
