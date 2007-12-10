@@ -174,6 +174,11 @@ $c_max_image_size = array('width' => '96',
                           'height' => '96',
                           'size' => '100000');
 
+// Freeze
+$c_nb_login_failed = 3;
+$c_login_interval = 60;
+$c_frozen_duration = 300;
+
 //---------------------------------------------------------------------------//
 // Default access rights bits meanings
 // 0 - read  : data

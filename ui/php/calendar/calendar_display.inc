@@ -29,10 +29,10 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
 
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
   $writable_entity = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
-
+  $my_views = run_query_calendar_get_my_views();
   $calendar_function = "dis_calendar_".$p_range."_".$p_view;
   
-  $display["features"] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable);
+  $display["features"] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable, $my_views);
  
   $block .= dis_calendar_view_bar($p_view, $calendar["date"]);
   if(function_exists($calendar_function)) {
@@ -80,7 +80,7 @@ function dis_calendar_view_bar($p_kind,$date) {
 //   - $calendar_entity : array of entities elements to display
 //   - $entity_readable : array of readable entities (["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable) {
+function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable, $my_views) {
   global $action;
   global $output_target;
 
@@ -96,6 +96,9 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
   $block = html_calendar_bar_legend($new_action, $calendar_entity,$calendar);
   if ($action != "perform_meeting" && $output_target != "print") {
     $block .= html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable);
+    if ($new_action == "agenda") {
+      $block .= html_calendar_view_selector($new_action, $calendar, $my_views);
+    }
     $block .= html_calendar_bar_date_selector($calendar);
   }
 
@@ -116,9 +119,14 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
 
   // Legend
   $iso_date = $calendar["date"];
-  if($_COOKIE['calendarColorTemplate']) {
+  $view_color = $calendar["color"];
+  if($_COOKIE['calendarColorTemplate'] && empty($view_color)) {
     $colorTemplate = $_COOKIE['calendarColorTemplate'];
+  } elseif (!empty($view_color)) {
+    $colorTemplate = $view_color;
+    $_COOKIE['calendarColorTemplate'] = $view_color;
   }
+
   ${"select_color_".$colorTemplate} = "selected=\"selected\"";
   if ($action == "perform_meeting" || $action == "perform_res_meeting") {
     $l_legend = $l_meeting_legend;
@@ -473,6 +481,95 @@ function html_calendar_bar_date_selector($calendar) {
 
   return $block;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the view selector 
+// Parameters:
+//   - $calendar: calendar parameters
+///////////////////////////////////////////////////////////////////////////////
+function html_calendar_view_selector($new_action, $calendar, $my_views) {
+  global $obm;
+  global $l_views, $l_view_label, $l_select, $l_select_view; 
+  global $l_view_save, $l_view_delete, $l_validate, $l_fill_view_label;
+  global $l_confirm_delete_view, $l_no_sel_view, $l_conflict_view_label;
+  global $ico_delete;
+
+  $view_id = $calendar["view_id"];
+  $iso_date = $calendar["date"];
+  $cal_range = $calendar["cal_range"];
+
+  while($my_views->next_record()) {
+    $id =  $my_views->f("obmbookmark_id");
+    $label =  $my_views->f("obmbookmark_label");
+    if ($id == $view_id) {
+      $selected = "selected=\"selected\"";
+    } else {
+      $selected = "";
+    }
+    $obmbookmarkproperty = run_query_calendar_get_bookmark_property($id);
+    $sel_view .= "<option id=\"opt_$id\" value=\"calendar_index.php?$obmbookmarkproperty\" $selected>$label</option>";
+  }
+
+  $block = "
+  <div class=\"portlet\" id=\"calendarSelView\">
+    <h1>$l_views</h1>
+    <div>
+
+    <!-- Select view -->
+    <form action=\"calendar_index.php\" method=\"get\">
+      <fieldset class=\"detail extra\">
+      <legend>$l_select</legend>
+      <select id=\"sel_view\" name=\"sel_view\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+        <option value=\"calendar_index.php?action=$new_action&amp;sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date&color=\" >$l_select_view</option>
+        $sel_view
+      </select>
+      <input type=\"hidden\" id=\"view_id\" name=\"view_id\" value=\"$view_id\" />
+      <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.delete();\">
+        <img src=\"$ico_delete\" alt=\"[$l_view_delete]\"/>
+      </a>
+      </fieldset>
+    </form>
+
+    <!-- Save view -->
+    <form action=\"calendar_index.php\" method=\"get\">
+      <fieldset class=\"detail extra\">
+      <legend>$l_view_label</legend>
+        <input type=\"text\" name=\"tf_view_label\" id=\"tf_view_label\" /> 
+        <input type=\"hidden\" name=\"view_category\" id=\"view_category\" value=\"$category\" />
+        <input type=\"hidden\" name=\"new_action\" id=\"new_action\" value=\"$new_action\" />
+        <input type=\"hidden\" name=\"view_range\" id=\"view_range\" value=\"$cal_range\" />
+        <fieldset class=\"buttons\">
+          <input type=\"button\" onclick=\"obm.calendarView.insert();\" value=\"$l_view_save\" /> 
+        </fieldset>
+      </fieldset>
+    </form>
+<!--
+    <!-- Delete view -->
+    <form action=\"calendar_index.php\" method=\"get\">
+      <fieldset class=\"detail extra\">
+      <legend>$l_view_delete</legend>
+        <fieldset class=\"buttons\">
+          <input type=\"button\" onclick=\"obm.calendarView.delete();\" value=\"$l_validate\" /> 
+          <input type=\"hidden\" id=\"view_id\" name=\"view_id\" value=\"$view_id\" />
+        </fieldset>
+      </fieldset>
+    </form>
+-->
+    </div>
+  </div>
+    <script type=\"text/javascript\">
+      obm.calendarView = new Obm.CalendarView();
+      obm.vars.labels.fill_view_label = '$l_fill_view_label';
+      obm.vars.labels.delete_view = '$l_confirm_delete_view';
+      obm.vars.labels.no_sel_view = '$l_no_sel_view';
+      obm.vars.labels.conflict_view_label = '$l_conflict_view_label';
+    </script>
+  ";
+
+  return $block;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the month

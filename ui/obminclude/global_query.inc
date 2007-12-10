@@ -1322,4 +1322,97 @@ function randomColor() {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Freeze an unser
+// Parameters:
+//   - $params[]  : Entry's values
+///////////////////////////////////////////////////////////////////////////////
+function global_freeze_user($params) {
+  global $cdg_sql, $c_nb_login_failed, $c_frozen_duration, $c_login_interval;
+
+  $login = $params["login"];
+  $domain = $params["domain"];
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
+
+  // user exists?
+  $query = "SELECT userobm_id,
+    $lastaccess,
+    userobm_nb_login_failed
+    FROM UserObm WHERE userobm_login='$login'
+    AND userobm_domain_id='$domain'
+    AND userobm_archive='0'";
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $uid = $obm_q->f("userobm_id");
+  $timelastaccess = $obm_q->f("timelastaccess");
+  $nb_login_failed = $obm_q->f("userobm_nb_login_failed");
+ 
+  $now = mktime();
+
+  if (!empty($uid)) {
+    // user is freeze and frozen time is outdated
+    if ( ($nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration) ||
+         ($nb_login_failed < $c_nb_login_failed && $now > $timelastaccess + $c_login_interval) ) {
+      $query = "UPDATE UserObm SET
+        userobm_nb_login_failed='1',
+        userobm_timelastaccess=NOW()
+      WHERE userobm_id='$uid'";
+    } else if ($nb_login_failed < $c_nb_login_failed) {
+      // increase nb_login_failed 
+      $query = "UPDATE UserObm SET
+        userobm_nb_login_failed=userobm_nb_login_failed+1,
+        userobm_timelastaccess=NOW()
+      WHERE userobm_id='$uid'";
+    } else {
+      $query = "UPDATE UserObm SET
+        userobm_timelastaccess=NOW()
+      WHERE userobm_id='$uid'";
+    } 
+  }
+
+  $obm_q->query($query);
+
+  return;
+} 
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Unfrezze an user
+// Parameters:
+//   - $uid : User's id
+///////////////////////////////////////////////////////////////////////////////
+function global_unfreeze_user($uid) {
+  global $cdg_sql, $c_nb_login_failed, $c_frozen_duration;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
+
+  $query = "SELECT userobm_id,
+    $lastaccess,
+    userobm_nb_login_failed
+    FROM UserObm WHERE userobm_id='$uid'";
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $uid = $obm_q->f("userobm_id");
+  $timelastaccess = $obm_q->f("timelastaccess");
+  $nb_login_failed = $obm_q->f("userobm_nb_login_failed");
+
+  $now = mktime();
+
+  if (($nb_login_failed < $c_nb_login_failed) || ($nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration)) {
+    $query = "UPDATE UserObm SET
+      userobm_nb_login_failed='0',
+      userobm_timelastaccess=NOW()
+      WHERE userobm_id='$uid'";
+    $obm_q->query($query);
+    return true;
+  } else {
+    return false;
+  }
+}
+
 ?>

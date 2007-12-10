@@ -24,7 +24,6 @@ $l_low = "Low";
 $l_medium = "Medium";
 $l_details = "Details";
 
-$l_hour = "Hour";
 $l_occupied_day = "Whole day";
 $l_user_right = "Manage rights for";
 
@@ -90,6 +89,14 @@ $l_events = "Évents";
 $l_collapse_all = "Collapse all";
 $l_expand_all = "Expand all";
 
+
+$l_view = "View";
+$l_views = "Views";
+$l_select_view = "Select view";
+$l_view_label = "View label";
+$l_view_save = "Save view";
+$l_view_delete = "Delete view";
+
 // actions 
 $l_insert = "Insert the event";
 $l_update = "Update the event";
@@ -137,6 +144,11 @@ $l_err_days_repeat_not_weekly = "You can give repetition days only on weekly rep
 $l_err_weekly_repeat = "For weekly repetition, the end of the repetition must at least be seven day after the end of the event.";
 $l_err_repeatfrequency = "Frequency is invalid";
 $l_event_cant_delete = "You can only delete your own events !";
+
+$l_fill_view_label = "You have to fill the [$l_view_label] field";
+$l_confirm_delete_view = "Do you realy want to delete this view ?";
+$l_no_sel_view = "Can't delete : no selected view";
+$l_conflict_view_label = "$l_view_label : Conflict has been detected";
 
 $l_unknown="Inconnu";
 

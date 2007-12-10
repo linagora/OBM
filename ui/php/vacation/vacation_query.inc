@@ -15,8 +15,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_vacation_detail($u_id) {
   global $cdg_sql;
-    
-  $query = "SELECT userobm_id,
+
+  $obm_q = new DB_OBM;    
+  $db_type = $obm_q->type;
+
+  $vacation_datebegin = sql_date_format($db_type, 'UserObm.userobm_vacation_datebegin', 'vacation_datebegin');
+  $vacation_dateend = sql_date_format($db_type, 'UserObm.userobm_vacation_dateend', 'vacation_dateend');
+
+  $query = "SELECT 
+    $vacation_datebegin,
+    $vacation_dateend , 
+    userobm_id,
     userobm_domain_id,
     userobm_login,
     userobm_mail_perms,
@@ -26,7 +35,6 @@ function run_query_vacation_detail($u_id) {
   WHERE userobm_id = '$u_id'";
     
   display_debug_msg($query, $cdg_sql, "run_query_vacation_detail()");
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -60,7 +68,13 @@ function run_query_vacation_update($params, $u_id) {
     
   $enabled = $params["enabled"] == 1 ? "1": "0";
   if ($enabled == "1") {
-    $message_update = ", userobm_vacation_message ='".addslashes($params["message"])."' ";
+    $time_begin = $params["time_begin"].":".$params["min_begin"].":00";
+    $time_end = $params["time_end"].":".$params["min_end"].":00";
+    $vacation_datebegin = ($params['vacation_datebegin'] ? "'".of_isodate_convert($params['vacation_datebegin'])." $time_begin'" : 'null');
+    $vacation_dateend = ($params['vacation_dateend'] ? "'".of_isodate_convert($params['vacation_dateend'])." $time_end'" : 'null');
+    $message_update = ", userobm_vacation_message='".addslashes($params["message"])."'";
+    $message_update .= ", userobm_vacation_datebegin=".$vacation_datebegin;
+    $message_update .= ", userobm_vacation_dateend=".$vacation_dateend;
   }else {
     $message_update = "";
   }

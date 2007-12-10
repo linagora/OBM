@@ -1173,3 +1173,115 @@ Obm.TabbedPane = new Class({
     }.bind(this));
   }
 });
+
+
+/******************************************************************************
+ * Calendar View Creation and deletion function
+ ******************************************************************************/
+
+Obm.CalendarView = new Class({
+  initialize: function(el) {
+    this.label = $('tf_view_label'); 
+    this.new_action = $('new_action');
+    this.view_id = $('view_id');
+    this.view_range = $('view_range');
+  },
+
+  insert: function() {
+    if(this.label.value == "") {
+      alert(obm.vars.labels.fill_view_label);
+    } else {
+      var qstring = Object.toQueryString({
+        view_label: this.label.value,
+        view_action: this.new_action.value,
+        view_color: obm.vars.conf.calendarColor,
+        view_range: this.view_range.value
+      });
+
+      // Select input
+      var sel = $('sel_view');
+      var opt = sel.getChildren();
+
+      // Get current options
+      current_options = new Array();
+      for(i=0;i<opt.length;i++) {
+        var text = $(opt[i]).text;
+        current_options.push(text);
+      }
+
+      // Already exists ?
+      if(current_options.contains(this.label.value)) {
+        alert(obm.vars.labels.conflict_view_label);
+      } else {
+        var ajax = new Ajax('calendar_index.php',
+          {postBody: 'ajax=1&action=insert_view&'+qstring, onComplete: 
+            function(response){
+              try {
+                var resp = eval(response);
+              } catch (e) {
+                resp = new Object();
+                resp.error = 1;
+                resp.message = 'Fatal server error, please reload';
+              }
+              if(resp.error == 0) {
+                showOkMessage(resp.message);
+                var obmbookmark_id = resp.obmbookmark_id;
+                var obmbookmark_label = resp.obmbookmark_label;
+                var obmbookmark_properties = resp.obmbookmarkproperties;
+
+                var option = new Element('option')
+                  .setProperties({
+                    'id':'opt_'+obmbookmark_id,
+                    'value': 'calendar_index.php?'+obmbookmark_properties
+                   })
+                  .setHTML(obmbookmark_label);
+                sel.adopt(option);
+
+              } else {
+                showErrorMessage(resp.message);
+              }
+            }
+          });
+        ajax.request();
+      }
+    }
+  },
+ 
+  delete: function() {
+    if (this.view_id.value != "") {
+      if (confirm(obm.vars.labels.delete_view)) {
+        var qstring = Object.toQueryString({
+          view_id: this.view_id.value
+        });
+
+        var ajax = new Ajax('calendar_index.php',
+          {postBody: 'ajax=1&action=delete_view&'+qstring, onComplete: 
+            function(response){
+              try {
+                var resp = eval(response);
+              } catch (e) {
+                resp = new Object();
+                resp.error = 1;
+                resp.message = 'Fatal server error, please reload';
+              }
+              if(resp.error == 0) {
+                showOkMessage(resp.message);
+                var obmbookmark_id = resp.obmbookmark_id;
+
+                // Delete option
+                $('opt_'+obmbookmark_id).remove(); 
+
+                // Empty current view
+                $('view_id').value = "";
+              } else {
+                showErrorMessage(resp.message);
+              }
+            }
+          });
+        ajax.request();
+      }
+    } else {
+      alert(obm.vars.labels.no_sel_view);
+    }
+  }
+});

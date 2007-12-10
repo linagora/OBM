@@ -513,7 +513,21 @@ if (!$params['ajax']) {
   $display['head'] = display_head($l_calendar);
   $display['header'] = display_menu($module);
   $display['end'] = display_end();
-} 
+
+} elseif ($action == "insert_view") {
+///////////////////////////////////////////////////////////////////////////////
+  $msg = run_query_calendar_insert_view($params);
+  json_ok_msg("$l_view : $l_insert_ok");
+  echo "({".$display['json'].",$msg})";
+  exit();
+
+} elseif ($action == "delete_view") {
+///////////////////////////////////////////////////////////////////////////////
+  $msg = run_query_calendar_delete_view($params);
+  json_ok_msg("$l_view : $l_delete_ok");
+  echo "({".$display['json'].",$msg})";
+  exit();
+}
 display_page($display);
 
 
@@ -925,7 +939,19 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('none') 
                                        );
+// Insert view
+$actions['calendar']['insert_view'] = array (
+  'Url'      => "$path/calendar/calendar_index.php?action=insert_view",
+  'Right'    => $cright_read,
+  'Condition'=> array ('None')
+                                  	  );
 
+// Delete view
+$actions['calendar']['delete_view'] = array (
+  'Url'      => "$path/calendar/calendar_index.php?action=delete_view",
+  'Right'    => $cright_read,
+  'Condition'=> array ('None')
+                                  	  );
 
 }
 

@@ -246,6 +246,7 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
 
   $dis_group->data_set = $obm_q;
   $dis_group->data_url = $url;
+  $dis_group->data_header = "both";
 
   // --- HTML Template --------------------------------------------------------
   $block .= $dis_group->display("dis_data_resourcegroup");

@@ -3558,6 +3558,186 @@ function calendar_yearly_repeatition($date,$start_time,$end_date,$repeatfrequenc
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Return my views
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_get_my_views() {
+  global $cdg_sql, $obm;
+  
+  $user_id = $obm["uid"];
+  $obm_q = new DB_OBM;
+
+  $query = "SELECT * FROM ObmBookmark
+    WHERE obmbookmark_user_id='$user_id'
+    AND obmbookmark_entity='calendar'";
+
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_get_my_views()");
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Construct URL parameters
+// Parameters:
+//   - $id : OBM bookmark id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_get_bookmark_property($id) {
+  global $cdg_sql, $c_all;
+
+  $obm_q = new DB_OBM;
+  $url_param = array();
+
+  $query = "SELECT * FROM ObmBookmarkProperty WHERE obmbookmarkproperty_bookmark_id='$id'";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_get_bookmark_property()");
+  $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $property = $obm_q->f("obmbookmarkproperty_property");
+    $value = $obm_q->f("obmbookmarkproperty_value");
+
+    switch($property) {
+      case "users":
+        $users = explode(",", $value);
+        if (is_array($users)) {
+          foreach($users as $user) {
+            array_push($url_param, "sel_ent[]=data-user-$user");
+          }
+        } else {
+          array_push($url_param, "sel_ent[]=data-user-$value"); 
+        }
+        break;
+      case "resources":
+        $resources = explode(",", $value);
+        if (is_array($resources)) {
+          foreach($resources as $resource) {
+            array_push($url_param, "sel_ent[]=data-resource-$resource");
+          }
+        } else {
+          array_push($url_param, "sel_ent[]=data-resource-$value"); 
+        }
+        break;
+      case "group":
+        if (empty($value)) {
+          array_push($url_param, "new_group=1&amp;group_view=$c_all");
+        } else {
+          array_push($url_param, "group_id=$value&amp;new_group=1");
+        }
+        break;
+      case "category":
+        if (empty($value)) {
+          $value = $c_all;
+        }
+        array_push($url_param, "sel_category_filter=$value");
+        break;
+      default:
+        array_push($url_param, "$property=$value");
+        break; 
+    }
+  }
+
+  array_push($url_param, "view_id=$id");
+
+  $return = implode("&amp;", $url_param);
+  return $return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Insert a calendar view
+// Parameters:
+//   - $calendar : hashed calendar params
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_insert_view($calendar) {
+  global $cdg_sql, $obm;
+
+  $calendar_bookmarkproperties = array("action", "users", "group", "resources", "category", "color", "cal_range");
+
+  $obm_q = new DB_OBM;
+  $user_id = $obm["uid"];
+
+  $action = $calendar["view_action"];
+  $category = $calendar["category_filter"];
+  $label = $calendar["view_label"];
+  $group = $calendar["entity"]["group"][0];
+  $users = is_array($calendar["entity"]["user"]) ? implode(",", $calendar["entity"]["user"]) : "" ;
+  $resources = is_array($calendar["entity"]["resource"]) ? implode(",", $calendar["entity"]["resource"]) : "" ;
+  $color = $calendar["view_color"];
+  if (isset($calendar['cal_range'])) {
+    $cal_range = $calendar['cal_range'];
+  } elseif (isset($_SESSION['cal_range'])){
+    $cal_range = $_SESSION['cal_range'];
+  } else {
+    $cal_range = "week";
+  }
+
+  // Insert ObmBookmark
+  $query = "INSERT INTO ObmBookmark(
+    obmbookmark_user_id,
+    obmbookmark_label,
+    obmbookmark_entity) VALUES (
+    '$user_id',
+    '$label',
+    'calendar')";
+  $obm_q->query($query);
+
+  // Select obmbookmark_id
+  $query = "SELECT obmbookmark_id FROM ObmBookmark
+    WHERE obmbookmark_user_id='$user_id'
+    AND obmbookmark_label='$label'
+    AND obmbookmark_entity='calendar'";
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $obmbookmark_id = $obm_q->f("obmbookmark_id");
+
+  // Insert ObmBookmark properties 
+  if (is_array($calendar_bookmarkproperties)) {
+    foreach($calendar_bookmarkproperties as $property) {
+      $query = "INSERT INTO ObmBookmarkProperty (
+        obmbookmarkproperty_bookmark_id,
+        obmbookmarkproperty_property,
+        obmbookmarkproperty_value) VALUES (
+        '$obmbookmark_id',
+        '$property',
+        '".${$property}."')";
+      $obm_q->query($query);
+    }
+  }
+
+  $properties = str_replace("&amp;", "&", run_query_calendar_get_bookmark_property($obmbookmark_id));
+
+  $message = "\"obmbookmark_id\": \"$obmbookmark_id\", \"obmbookmark_label\":\"$label\", \"obmbookmarkproperties\":\"$properties\"";
+  
+  return $message;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Delete a calendar view
+// Parameters:
+//   - $calendar : hashed calendar params
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_delete_view($calendar) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+
+  $id = $calendar["view_id"];
+
+  // Delete view
+  $query = "DELETE FROM ObmBookmark WHERE obmbookmark_id='$id'";
+  $obm_q->query($query);
+
+  // Delete view properties
+  $query = "DELETE FROM ObmBookmarkProperty WHERE obmbookmarkproperty_bookmark_id='$id'";
+  $obm_q->query($query);
+
+  $message = "\"obmbookmark_id\": \"$id\"";
+  
+  return $message;
+}
+
+
 /**
  * Describe an Event 
  * 

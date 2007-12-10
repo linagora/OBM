@@ -22,7 +22,6 @@ $l_high = "Haute";
 $l_low = "Basse";
 $l_medium = "Normale";
 $l_go = "Voir";
-$l_hour = "Heure";
 $l_occupied_day = "Journée entière";
 $l_event_duration = "Durée de la réunion";
 $l_format = "(AAAA-MM-JJ)";
@@ -106,7 +105,14 @@ $l_update_error = "Des conflits ont été détectés, mise à jour annulée";
 $l_insert_error = "Des conflits ont été détectés, insertion annulée";
 $l_sendamail = "Forcer la notification par mail";
 $l_calendar_select_group = "Sélectionner les groupes.";
+
+$l_view = "Vue";
+$l_views = "Vues";
 $l_view_type = "Type de vue";
+$l_select_view = "Choisir vue";
+$l_view_label = "Nom de la vue";
+$l_view_save = "Mémoriser la vue";
+$l_view_delete = "Supprimer la vue";
 
 $l_ics = "Import" ;
 $l_ics_insert = "Importer" ;
@@ -131,6 +137,11 @@ $l_err_days_repeat_not_weekly = "Vous ne pouvez préciser des jours de répétition
 $l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de répétition doit au moins être de 7 jours supérieure à celle de fin d'événement.";
 $l_err_repeatfrequency = "La fréquence est invalide";
 $l_event_cant_delete = "Vous ne pouvez supprimer que vos événements !";
+
+$l_fill_view_label = "Vous devez spécifier le nom de la vue avant de valider";
+$l_confirm_delete_view = "Etes-vous sûr de vouloir supprimer cette vue ?";
+$l_no_sel_view = "Suppression impossible : aucune vue sélectionnée";
+$l_conflict_view_label = "$l_view_label : Un conflit a été détecté";
 
 $l_header_planning = "Planning";
 $l_header_meeting = "Nouvelle réunion";

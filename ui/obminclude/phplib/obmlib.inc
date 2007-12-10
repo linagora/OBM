@@ -156,7 +156,7 @@ class OBM_Challenge_Auth extends Auth {
   
   function auth_validatelogin() {
     global $obm, $params;
-    global $c_default_domain, $c_singleNameSpace;
+    global $c_default_domain, $c_singleNameSpace, $l_error;
 
     $login = $params["login"];
     $password = $params["password"];
@@ -218,11 +218,17 @@ class OBM_Challenge_Auth extends Auth {
     }
 
     if ($encrypted == $pass) {
-      $obm['profile'] = $perm;
-      $obm['domain_id'] = $domain_id;
-      $obm['delegation'] = $delegation;
-      return $uid;
+      $unfreeze = global_unfreeze_user($uid);
+      if ($unfreeze) {
+        $obm["profile"] = $perm;
+        $obm["domain_id"] = $domain_id;
+        $obm["delegation"] = $delegation;
+        return $uid;
+      } else {
+        return false;
+      }
     } else {
+      global_freeze_user($params);
       return false;
     }
 
@@ -273,10 +279,16 @@ class CAS_Auth extends Auth {
           return false;
         }
       }
-      return $obm["uid"] ;
+      $unfreeze = global_unfreeze_user($obm["uid"]);
+      if ($unfreeze) {
+        return $obm["uid"] ;
+      } else {
+        return false;
+      }
     } elseif (isset($ticket)) {
       return "form" ;
-    } else {
+    } else { 
+      global_freeze_user($params);
       return false;
     }
   }

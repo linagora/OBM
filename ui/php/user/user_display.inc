@@ -173,7 +173,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
   global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all;
-  global $display, $c_all, $profiles;
+  global $display, $c_all, $profiles, $l_recursive;
   
   $login = $user["login"];
   $profile = $user["profile"];
@@ -185,6 +185,7 @@ function html_user_search_form($user) {
   $group = $user["group"];
   $delegation = stripslashes($user["delegation"]);
   $archive = ($user["archive"] == "1" ? "checked" : "");
+  $recursive = ($user["recursive"] == "1" ? "checked" : "");
   $popup = $user["popup"];
   if ($user["restriction_calendar"]) {
     $dis_restriction = "<input name=\"restriction_calendar\" type=\"hidden\" value=\"calendar\" />";
@@ -430,7 +431,8 @@ function html_user_consult($obm_q) {
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
   global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
   global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
-  global $l_vacation, $l_vacation_message, $l_mail_server;
+  global $l_vacation, $l_vacation_message, $l_vacation_datebegin;
+  global $l_vacation_dateend,$l_mail_server;
   global $l_enabled, $l_disabled, $l_web_consult_list, $l_photo;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $obm, $cgp_use, $profiles, $path, $display, $c_yes, $c_no;
@@ -485,6 +487,8 @@ function html_user_consult($obm_q) {
   $nomade_enable = $obm_q->f("userobm_nomade_enable");
   $nomade_local_copy = $obm_q->f("userobm_nomade_local_copy");
   $vacation_enable = $obm_q->f("userobm_vacation_enable");
+  $vacation_datebegin = of_datetime_format($obm_q->f("vacation_datebegin"), 1);
+  $vacation_dateend = of_datetime_format($obm_q->f("vacation_dateend"), 1);
   $vacation_message = stripslashes($obm_q->f("userobm_vacation_message"));
   $smb_perms = $obm_q->f("userobm_samba_perms");
   $smb_home = $obm_q->f("userobm_samba_home");
@@ -651,6 +655,14 @@ function html_user_consult($obm_q) {
     <tr>
       <th>$l_enabled</th>
       <td>$vacation_enable</td>
+    </tr>
+    <tr>
+      <th>$l_vacation_datebegin</th>
+      <td>$vacation_datebegin</td>
+    </tr>
+    <tr>
+      <th>$l_vacation_dateend</th>
+      <td>$vacation_dateend</td>
     </tr>
     <tr>
       <th>$l_vacation_message</th>
@@ -919,11 +931,13 @@ function html_user_form($usr_q, $user, $field='') {
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
   global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
   global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
-  global $l_vacation, $l_vacation_message, $l_mail_server;
+  global $l_vacation, $l_vacation_message, $l_vacation_datebegin;
+  global $l_vacation_dateend, $l_mail_server;
   global $l_enabled, $l_disabled, $l_web_consult_list,$path;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $path, $display, $cgp_use, $action, $profiles, $c_yes, $c_no;
-  global $obm, $c_default_domain, $l_domain, $l_header_new;
+  global $obm, $c_default_domain, $l_domain, $l_header_new, $l_hour;
+  global $ccalendar_first_hour, $ccalendar_last_hour;
 
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
@@ -986,6 +1000,14 @@ function html_user_form($usr_q, $user, $field='') {
     // vacation
     $vacation_enable = $usr_q->f("userobm_vacation_enable");
     $vacation_message = stripslashes($usr_q->f("userobm_vacation_message"));
+    $vacation_datebegin = $usr_q->f("vacation_datebegin");
+    $vacation_dateend = $usr_q->f("vacation_dateend");
+    $hourbegin = date("H",$vacation_datebegin);
+    $minbegin = date("i",$vacation_datebegin);
+    $hourend = date("H",$vacation_dateend);
+    $minend = date("i",$vacation_dateend);
+    $vacation_datebegin = of_date_upd_format($vacation_datebegin);
+    $vacation_dateend = of_date_upd_format($vacation_dateend);
 
     // samba
     $smb_perms = $usr_q->f("userobm_samba_perms");
@@ -1065,8 +1087,13 @@ function html_user_form($usr_q, $user, $field='') {
 
   // vacation
   if (isset($user["vacation_enable"])) { $vacation_enable = $user["vacation_enable"]; }
+  if (isset($user["vacation_datebegin"])) { $vacation_datebegin = $user["vacation_datebegin"]; }
+  if (isset($user["vacation_dateend"])) { $vacation_dateend = $user["vacation_dateend"]; }
   if (isset($user["vacation_message"])) { $vacation_message = stripslashes( $user["vacation_message"] ); }
-
+  if (isset($user["time_begin"])) { $hourbegin = $user["time_begin"]; }
+  if (isset($user["min_begin"])) {$minbegin = $user["min_begin"]; }
+  if (isset($user["time_end"])) {$hourend = $user["time_end"]; }
+  if (isset($user["min_end"])) {$minend = $user["min_end"]; }
   // samba
   if (isset($user["smb_perms"])) { $smb_perms = $user["smb_perms"]; }
   if (isset($user["smb_home"])) { $smb_home = stripslashes($user["smb_home"]); }
@@ -1217,6 +1244,57 @@ function html_user_form($usr_q, $user, $field='') {
   }
 
   if ($cgp_use["service"]["mail_vacation"]) {
+
+    // hour begin
+    $dis_hour_b = "<select name=\"sel_time_begin\" style=\"width:4em;\">";
+    for ($i=$ccalendar_first_hour; $i<$ccalendar_last_hour; $i++) {
+      $current_hour = substr("0$i",-2,2); 
+      if ($current_hour == $hourbegin) {
+        $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+      } else {
+        $dis_hour_b .= "<option value=\"$current_hour\">$current_hour</option>";
+      }
+    }
+    $dis_hour_b .= "</select>";  
+    $dis_min_b = "<select name=\"sel_min_begin\" style=\"width:4em;\">";
+    if ($ccalendar_hour_fraction <= 60 && $ccalendar_hour_fraction > 0) {
+      $hour_fraction = $ccalendar_hour_fraction;
+    } else {
+      $hour_fraction = 4;
+    }
+    $step = 60 / $hour_fraction;
+    for ($i=$hour_fraction; $i>=1; $i--) {
+      $current_min = substr("0".round((60 - ($step*$i))),-2);
+      if ($current_min  == $minbegin) {
+        $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
+      } else {
+        $dis_min_b .= "<option value=\"$current_min\">$current_min</option>";
+      }
+    }
+    $dis_min_b .= "</select>";
+
+    // hour end
+    $dis_hour_e = "<select name=\"sel_time_end\" style=\"width:4em;\">";
+    for ($i=$ccalendar_first_hour; $i<=$ccalendar_last_hour; $i++) {
+      $current_hour = substr("0$i",-2,2); 
+      if ($current_hour == $hourend) {
+        $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+      } else {
+        $dis_hour_e .= "<option value=\"$current_hour\">$current_hour</option>";
+      }
+    }
+    $dis_hour_e .= "</select>";  
+    $dis_min_e = "<select name=\"sel_min_end\" style=\"width:4em;\">";
+    for ($i=$hour_fraction; $i>=1; $i--) {
+      $current_min = substr("0".round((60 - ($step*$i))),-2);
+      if ($current_min  == $minend) {
+        $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
+      } else {
+        $dis_min_e .= "<option value=\"$current_min\">$current_min</option>";
+      }
+    }
+    $dis_min_e .= "</select>";
+
     // Vacation checkbox checked value
     $vacation_state = ($vacation_enable ? "checked" : "");
     $vacation_section = "
@@ -1227,6 +1305,20 @@ function html_user_form($usr_q, $user, $field='') {
   <tr>
     <th class=\"$class[vacation_enable]\">$l_enabled</th>
     <td><input name=\"cb_vacation_enable\" type=\"checkbox\" value=\"1\" $vacation_state /></td>
+  </tr>
+  <tr>
+    <th class=\"$class[vacation_datebegin]\">$l_vacation_datebegin</th>
+    <td>
+      <input type=\"text\" name=\"tf_vacation_datebegin\" value=\"$vacation_datebegin\" class=\"datePicker\"/>
+      <span id=\"hour_begin\" style=\"$style\" class=\"NW\">$l_hour : $dis_hour_b : $dis_min_b</span>
+    </td>
+  </tr>
+  <tr>
+    <th class=\"$class[vacation_dateend]\">$l_vacation_dateend</th>
+    <td>
+      <input type=\"text\" name=\"tf_vacation_dateend\" value=\"$vacation_dateend\" class=\"datePicker\"/>
+      <span id=\"hour_end\" style=\"$style\" class=\"NW\">$l_hour : $dis_hour_e : $dis_min_e</span>
+    </td>
   </tr>
   <tr>
     <th class=\"$class[vacation_message]\">$l_vacation_message</th>
@@ -1526,6 +1618,8 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   // vacation
   $vacation_enable = $user["vacation_enable"];
   $vacation_message = $user["vacation_message"];
+  $vacation_datebegin = $user["vacation_datebegin"];
+  $vacation_dateend = $user["vacation_dateend"];
   
   // samba
   $smb_perms = $user["smb_perms"];
@@ -1594,6 +1688,8 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
 
   <input type=\"hidden\" name=\"vacation_enable\" value=\"$vacation_enable\" />
   <input type=\"hidden\" name=\"vacation_message\" value=\"$vacation_message\" />
+  <input type=\"hidden\" name=\"vacation_datebegin\" value=\"$vacation_datebegin\" />
+  <input type=\"hidden\" name=\"vacation_dateend\" value=\"$vacation_dateend\" />
 
   <input type=\"hidden\" name=\"smb_perms\" value=\"$smb_perms\" />
   <input type=\"hidden\" name=\"smb_home\" value=\"$smb_home\" />

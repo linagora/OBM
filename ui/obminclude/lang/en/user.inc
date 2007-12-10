@@ -23,7 +23,8 @@ $l_check_userupdate = " entries last updated by this user.";
 $l_no_user = "No user fields in this table";
 $l_group = "Group";
 $l_delegation_target = "Delegation target";
-
+$l_vacation_datebegin = "From";
+$l_vacation_dateend = "To";
 $l_group_member = "Member of groups";
 $l_password_type = "Password Crypt";
 

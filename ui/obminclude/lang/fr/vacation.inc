@@ -15,6 +15,8 @@ $l_vacation_enabled = "Le message d'absence est " ;
 $l_vacation_message = "Message d'absence";
 $l_enable_vacation = "Activer mon message d'absence" ;
 $l_vacation_text="Texte du message d'absence";
+$l_vacation_datebegin = "Du";
+$l_vacation_dateend = "Au";
 
 // forms and buttons labels
 $l_update = "Mettre à jour";

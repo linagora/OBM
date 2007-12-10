@@ -112,7 +112,7 @@ function run_query_user_search($user) {
   // If a group indication has been specified, get it
   if (trim($group) != '') {
      if (trim($where) != '') $where .= ' AND';
-     $where .= " group_name like '%$group%'";
+     $where .= " group_name like '$group%'";
      $join_grp = 'LEFT JOIN of_usergroup ON userobm_id=of_usergroup_user_id
                   LEFT JOIN UGroup ON of_usergroup_group_id=group_id';
   }

@@ -33,6 +33,8 @@ $l_access_nomade = "Accès nomade";
 $l_perms = "Autorisé";
 $l_vacation = "Message d'absence";
 $l_vacation_message = "Message";
+$l_vacation_datebegin = "Du";
+$l_vacation_dateend = "Au";
 $l_forbidden = "Interdit";
 $l_local_copy = "Copie locale";
 $l_access = "Accès Internet";
@@ -106,6 +108,8 @@ $l_image_size_error = "La photo ne doit pas dépasser 96px x 96px et avoir un poi
 $l_err_delegation_target_outside_domain = "La délégation d'administration doit être dans la délégation de l'entité !";
 $l_err_delegation_target_outside_target = "La délégation d'administration doit être dans votre cible de délégation !";
 $l_err_delegation_target_profile = "Ce profil d'utilisateur ne peut avoir de délégation d'administration !";
+$l_fill_vacation_datebegin = "Vous devez renseigner la date de début du message d'absence avant de valider";
+$l_fill_vacation_dateend = "Vous devez renseigner la date de fin du message d'absence avant de valider";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";

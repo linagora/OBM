@@ -32,6 +32,7 @@ $l_date_last_update = "Last Update";
 $l_delegation = "Delegation";
 $l_print = "Print";
 $l_transparent = "Transparent";
+$l_select_all = "Select all";
 
 // Common messages
 $l_users = "Users";
@@ -151,6 +152,8 @@ $l_properties = "Properties";
 $l_items = "Items";
 $l_received = "Received";
 $l_emitted = "Emitted";
+$l_recursive = "Recursive";
+$l_hour = "Hour";
 $l_type ="Type";
 
 // Entities

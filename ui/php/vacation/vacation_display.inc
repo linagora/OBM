@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function html_vacation_consult($usr_q) {
   global $l_vacation, $l_vacation_enabled, $l_vacation_message;
-  global $l_enabled, $l_disabled;
+  global $l_enabled, $l_disabled, $l_vacation_datebegin, $l_vacation_dateend;
 
   $enabled = $usr_q->f("userobm_vacation_enable");
   if ($enabled == 1) {
@@ -29,6 +29,8 @@ function html_vacation_consult($usr_q) {
   } else {
     $message = "---";
   }
+  $vacation_datebegin = of_datetime_format($usr_q->f("vacation_datebegin"), 1);
+  $vacation_dateend = of_datetime_format($usr_q->f("vacation_dateend"), 1);
 
   $block = "
   <div class=\"detail extra\">
@@ -39,6 +41,14 @@ function html_vacation_consult($usr_q) {
     <th>$l_vacation_enabled</th>
     <td>$status</td>
   </tr>
+   <tr>
+      <th>$l_vacation_datebegin</th>
+      <td>$vacation_datebegin</td>
+    </tr>
+    <tr>
+      <th>$l_vacation_dateend</th>
+      <td>$vacation_dateend</td>
+    </tr>
   <tr>
     <th>$l_vacation_message</th>
     <td>$message</td>
@@ -58,7 +68,8 @@ function html_vacation_consult($usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_vacation_form($usr_q, $vacation, $field="") {
   global $l_vacation, $l_enable_vacation, $l_vacation_message;
-  global $l_update, $l_vacation_not_allowed;
+  global $l_update, $l_vacation_not_allowed, $l_vacation_datebegin, $l_vacation_dateend;
+  global $ccalendar_first_hour, $ccalendar_last_hour, $l_hour;
 
   $action = $vacation["action"];
 
@@ -67,11 +78,25 @@ function html_vacation_form($usr_q, $vacation, $field="") {
     $enabled = $usr_q->f("userobm_vacation_enable");
     $message = stripslashes( $usr_q->f("userobm_vacation_message") );
     $mail_enable = $usr_q->f("userobm_mail_perms");
+    $vacation_datebegin = $usr_q->f("vacation_datebegin");
+    $vacation_dateend = $usr_q->f("vacation_dateend");
+    $hourbegin = date("H",$vacation_datebegin);
+    $minbegin = date("i",$vacation_datebegin);
+    $hourend = date("H",$vacation_dateend);
+    $minend = date("i",$vacation_dateend);
+    $vacation_datebegin = of_date_upd_format($vacation_datebegin);
+    $vacation_dateend = of_date_upd_format($vacation_dateend);
   }
 
   // If parameters have been given, they supercede the default action value
   if (isset($vacation["enabled"])) { $enabled = $vacation["enabled"]; }
   if (isset($vacation["message"])) { $message = $vacation["message"]; }
+  if (isset($user["vacation_datebegin"])) { $vacation_datebegin = $user["vacation_datebegin"]; }
+  if (isset($user["vacation_dateend"])) { $vacation_dateend = $user["vacation_dateend"]; }
+  if (isset($user["time_begin"])) { $hourbegin = $user["time_begin"]; }
+  if (isset($user["min_begin"])) {$minbegin = $user["min_begin"]; }
+  if (isset($user["time_end"])) {$hourend = $user["time_end"]; }
+  if (isset($user["min_end"])) {$minend = $user["min_end"]; }
 
   if (! $mail_enable) {
     return display_ok_msg($l_vacation_not_allowed);
@@ -81,6 +106,58 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   if ($enabled == 1) {
     $enabled_checked = " checked=\"checked\" " ;
     $message_enabled = "";
+
+    // hour begin
+    $dis_hour_b = "<select name=\"sel_time_begin\" style=\"width:4em;\">";
+    for ($i=$ccalendar_first_hour; $i<$ccalendar_last_hour; $i++) {
+      $current_hour = substr("0$i",-2,2); 
+      if ($current_hour == $hourbegin) {
+        $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+      } else {
+        $dis_hour_b .= "<option value=\"$current_hour\">$current_hour</option>";
+      }
+    }
+    $dis_hour_b .= "</select>";  
+    $dis_min_b = "<select name=\"sel_min_begin\" style=\"width:4em;\">";
+    if ($ccalendar_hour_fraction <= 60 && $ccalendar_hour_fraction > 0) {
+      $hour_fraction = $ccalendar_hour_fraction;
+    } else {
+      $hour_fraction = 4;
+    }
+    $step = 60 / $hour_fraction;
+    for ($i=$hour_fraction; $i>=1; $i--) {
+      $current_min = substr("0".round((60 - ($step*$i))),-2);
+      if ($current_min  == $minbegin) {
+        $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
+      } else {
+        $dis_min_b .= "<option value=\"$current_min\">$current_min</option>";
+      }
+    }
+    $dis_min_b .= "</select>";
+
+    // hour end
+    $dis_hour_e = "<select name=\"sel_time_end\" style=\"width:4em;\">";
+    for ($i=$ccalendar_first_hour; $i<=$ccalendar_last_hour; $i++) {
+      $current_hour = substr("0$i",-2,2); 
+      if ($current_hour == $hourend) {
+        $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+      } else {
+        $dis_hour_e .= "<option value=\"$current_hour\">$current_hour</option>";
+      }
+    }
+    $dis_hour_e .= "</select>";  
+    $dis_min_e = "<select name=\"sel_min_end\" style=\"width:4em;\">";
+    for ($i=$hour_fraction; $i>=1; $i--) {
+      $current_min = substr("0".round((60 - ($step*$i))),-2);
+      if ($current_min  == $minend) {
+        $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
+      } else {
+        $dis_min_e .= "<option value=\"$current_min\">$current_min</option>";
+      }
+    }
+    $dis_min_e .= "</select>";
+
+
   }else {
     $enabled_checked = " " ;
     $message_enabled = " disabled=\"disabled\" ";
@@ -100,6 +177,20 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   <tr>
     <th>$l_enable_vacation</th>
     <td><input type=\"checkbox\" name=\"cba_enabled\" value=\"1\" $enabled_checked onchange=\"disable_message_editing(this.form, this)\"/></td>
+  </tr>
+  <tr>
+    <th class=\"$class[vacation_datebegin]\">$l_vacation_datebegin</th>
+    <td>
+      <input type=\"text\" name=\"tf_vacation_datebegin\" value=\"$vacation_datebegin\" class=\"datePicker\"/>
+      <span id=\"hour_begin\" style=\"$style\" class=\"NW\">$l_hour : $dis_hour_b : $dis_min_b</span>
+    </td>
+  </tr>
+  <tr>
+    <th class=\"$class[vacation_datebegin]\">$l_vacation_dateend</th>
+    <td>
+      <input type=\"text\" name=\"tf_vacation_dateend\" value=\"$vacation_dateend\" class=\"datePicker\"/>
+      <span id=\"hour_end\" style=\"$style\" class=\"NW\">$l_hour : $dis_hour_e : $dis_min_e</span>
+    </td>
   </tr>
   <tr>
     <th>$l_vacation_message</th>
