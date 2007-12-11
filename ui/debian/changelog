@@ -1,3 +1,9 @@
+obm (2.1.0-2) stable; urgency=low
+
+  * obm-cert: generation du certificat sur external-url
+
+ -- sylvain garcia <sylvain.garcia@aliasource.fr>  Tue, 11 Dec 2007 14:41:15 +0100
+
 obm (2.1.0-1) stable; urgency=low
 
   * obm-conf : prise en charge de la conf external url

@@ -4,6 +4,7 @@
 
 SHORT_NAME=`/bin/hostname`
 FULL_NAME=`/bin/hostname -f`
+OBM_EXTERNALURL=`cat /etc/obm/obm_conf.ini | grep ^external-url | cut -d" " -f 3`
 
 is_initial_configuration() { 
 # Check if this is the initial configuration and not an upgrade of an 
@@ -24,9 +25,9 @@ is_initial_configuration() {
 gencertif ()
 {
 
-/usr/share/obm-ca/createcert.sh ${FULL_NAME}
+/usr/share/obm-ca/createcert.sh ${OBM_EXTERNALURL}
 rm -f /etc/obm/certs/obm_cert.pem
-ln -s /etc/obm/certs/${FULL_NAME}_signed.pem /etc/obm/certs/obm_cert.pem
+ln -s /etc/obm/certs/${OBM_EXTERNALURL}_signed.pem /etc/obm/certs/obm_cert.pem
 
 }
 
