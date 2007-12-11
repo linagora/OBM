@@ -28,47 +28,30 @@ if is_initial_configuration "$@"; then
    else
        cat /usr/share/doc/obm-conf/obm_conf.ini.sample > /etc/obm/obm_conf.ini
    fi
-fi
-#if [ -f /etc/obm-storage/debian-db-obm.conf ]; then
 
-db_get obm-conf/mysqlserver
-OBM_HOST=$RET
-db_get obm-conf/mysqldb
-OBM_DBNAME=$RET
-db_get obm-conf/mysqluser
-OBM_USER=$RET
-db_get obm-conf/mysqlpasswd
-OBM_PASSWD=$RET
-
-#	#mise en place des fichier de conf OBM
-#	OBM_USER=`grep "dbuser" /etc/obm-storage/debian-db-obm.conf | cut -d"=" -f2`
-#	OBM_PASSWD=`grep "dbpass" /etc/obm-storage/debian-db-obm.conf | cut -d"=" -f2`	
-#	OBM_DBNAME=`grep "dbname" /etc/obm-storage/debian-db-obm.conf | cut -d"=" -f2`	
-#	OBM_HOST=`grep "dbserver" /etc/obm-storage/debian-db-obm.conf | cut -d"=" -f2`	
-#	if [ -z $OBM_HOST ] ; then
-#		OBM_HOST="localhost"
-#	fi
+	db_get obm-conf/mysqlserver
+	OBM_HOST=$RET
+	db_get obm-conf/mysqldb
+	OBM_DBNAME=$RET
+	db_get obm-conf/mysqluser
+	OBM_USER=$RET
+	db_get obm-conf/mysqlpasswd
+	OBM_PASSWD=$RET
+	db_get obm-conf/externalurl
+	OBM_EXTERNALURL=$RET
 
 	sed -i -e "s#host = localhost#host = ${OBM_HOST}#" /etc/obm/obm_conf.ini
 	sed -i -e "s#db = obm#db = ${OBM_DBNAME}#" /etc/obm/obm_conf.ini
 	sed -i -e "s#user = obm#user = ${OBM_USER}#" /etc/obm/obm_conf.ini
 	sed -i -e "s#password = \"aliasource\"#password = \"${OBM_PASSWD}\"#" /etc/obm/obm_conf.ini
+	sed -i -e "s#external-url = obm#external-url = ${OBM_EXTERNALURL}#" /etc/obm/obm_conf.ini
+	sed -i -e "s#external-protocol = http#external-protocol = https#" /etc/obm/obm_conf.ini
+	
+	db_get obm-conf/ldapserver
+	OBM_LDAP_SERVER=$RET
+	sed -i -e "s#ldapServer = localhost#ldapServer = ${OBM_LDAP_SERVER}#" /etc/obm/obm_conf.ini
 
-#	db_get obm-conf/mysqlserver
-#	OBM_HOST=$RET
-#	db_get obm-conf/mysqlpasswd
-#	OBM_PASSWD=$RET
-#
-#	sed -i -e "s#host = localhost#host = ${OBM_HOST}#" /etc/obm/obm_conf.ini
-#	sed -i -e "s#db = obm#db = obm#" /etc/obm/obm_conf.ini
-#	sed -i -e "s#user = obm#user = obm#" /etc/obm/obm_conf.ini
-#	sed -i -e "s#password = \"aliasource\"#password = \"${OBM_PASSWD}\"#" /etc/obm/obm_conf.ini
-#fi
-
-db_get obm-conf/ldapserver
-OBM_LDAP_SERVER=$RET
-sed -i -e "s#ldapServer = localhost#ldapServer = ${OBM_LDAP_SERVER}#" /etc/obm/obm_conf.ini
-
+fi
 
 db_set obm-conf/already_configured false
 db_go || true
