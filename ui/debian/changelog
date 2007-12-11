@@ -1,3 +1,9 @@
+obm (2.1.0-3) stable; urgency=low
+
+  *obm-certs: pre-depends on obm-conf, require external-url in obm_conf.ini 
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Tue, 11 Dec 2007 15:21:47 +0100
+
 obm (2.1.0-2) stable; urgency=low
 
   * obm-cert: generation du certificat sur external-url
