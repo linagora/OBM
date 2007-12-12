@@ -1,7 +1,0 @@
-conf/themes usr/share/obm/www/conf
-conf/obm_conf.inc.sample usr/share/obm/sample
-contrib usr/share/obm/www
-obminclude usr/share/obm/www
-php usr/share/obm/www
-resources usr/share/obm/www
-scripts /usr/share/obm/www
