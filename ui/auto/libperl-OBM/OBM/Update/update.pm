@@ -394,7 +394,7 @@ sub _doGlobalDelete {
 
 
     # Traitement des entités de type 'groupe'
-    $query = "SELECT group_id FROM P_UGroup WHERE group_domain_id=".$self->{"domain"}." AND group_id NOT IN (SELECT group_id FROM UGroup WHERE group_domain_id=".$self->{"domain"}.")";
+    $query = "SELECT group_id FROM P_UGroup WHERE group_domain_id=".$self->{"domain"}." AND group_privacy=0 AND group_id NOT IN (SELECT group_id FROM UGroup WHERE group_domain_id=".$self->{"domain"}." AND group_privacy=0)";
     if( !&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
         return 0;
