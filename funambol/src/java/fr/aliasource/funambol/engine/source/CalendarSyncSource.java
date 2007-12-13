@@ -44,7 +44,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 
 	public void beginSync(SyncContext context) throws SyncSourceException {
 
-		logger.info("- Begin an OBM-Funambol Calendar sync");
+		logger.info("Begin an OBM-Funambol Calendar sync");
 
 		manager = new CalendarManager(getObmAddress());
 

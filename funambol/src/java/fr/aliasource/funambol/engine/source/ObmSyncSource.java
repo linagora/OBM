@@ -16,8 +16,6 @@ import com.funambol.framework.engine.source.SyncContext;
 import com.funambol.framework.engine.source.SyncSource;
 import com.funambol.framework.engine.source.SyncSourceException;
 import com.funambol.framework.engine.source.SyncSourceInfo;
-import com.funambol.framework.logging.FunambolLogger;
-import com.funambol.framework.logging.FunambolLoggerFactory;
 import com.funambol.framework.security.Sync4jPrincipal;
 import com.funambol.framework.server.Sync4jDevice;
 import com.funambol.framework.server.store.PersistentStore;
@@ -45,19 +43,20 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 	private int restrictions = 1; // default private
 	private String obmAddress = null;
 
-	//protected FunambolLogger logger = FunambolLoggerFactory.getLogger("funambol");
+	// protected FunambolLogger logger =
+	// FunambolLoggerFactory.getLogger("funambol");
 	private Log logger = LogFactory.getLog(getClass());
 
 	// ------------------------------------------------------------ Constructors
 
 	/** Creates a new instance of AbstractSyncSource */
 	public ObmSyncSource() {
-
+		logger.info("obmSyncSource ctor");
 	}
 
 	// ---------------------------------------------------------- Public methods
 	public void init() {
-
+		logger.info("init");
 	}
 
 	/**
@@ -116,7 +115,6 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 	 *            the context of the sync
 	 */
 	public void beginSync(SyncContext context) throws SyncSourceException {
-
 		super.beginSync(context);
 
 		this.principal = context.getPrincipal();
@@ -152,7 +150,7 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 				.append("'").append(" for this items: ");
 
 		for (int i = 0; i < keys.length; i++) {
-			message.append("\n- " + keys[i].getKeyAsString());
+			message.append("\n  - " + keys[i].getKeyAsString());
 		}
 
 		logger.info(message.toString());
@@ -163,9 +161,7 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 		if (keys != null) {
 			nb = keys.length;
 		}
-		SyncItemKey[] syncKeys = null;
-
-		syncKeys = new SyncItemKey[nb];
+		SyncItemKey[] syncKeys = new SyncItemKey[nb];
 		for (int i = 0; i < nb; i++) {
 			syncKeys[i] = new SyncItemKey(keys[i]);
 		}
@@ -225,26 +221,30 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 
 	@Override
 	public SyncSourceInfo getInfo() {
-		logger.info("getinfo");
-		return super.getInfo();
+		SyncSourceInfo info = super.getInfo();
+		logger.info("getinfo: " + info);
+		return info;
 	}
 
 	@Override
 	public String getName() {
-		logger.info("getName");
-		return super.getName();
+		String name = super.getName();
+		logger.info("getName: " + name);
+		return name;
 	}
 
 	@Override
 	public String getSourceQuery() {
-		logger.info("getsourcequery");
-		return super.getSourceQuery();
+		String ret = super.getSourceQuery();
+		logger.info("getsourcequery: " + ret);
+		return ret;
 	}
 
 	@Override
 	public String getSourceURI() {
-		logger.info("getsourceuri");
-		return super.getSourceURI();
+		String ret = super.getSourceURI();
+		logger.info("getsourceuri: " + ret);
+		return ret;
 	}
 
 }
