@@ -157,8 +157,10 @@ sub update {
     my $return = 1;
 
     if( $self->{"global"} ) {
-        $return = $self->_doGlobalUpdate();
+        # On traite les suppressions
         $return = $return && $self->_doGlobalDelete();
+        # On traite les mises à jour
+        $return = $self->_doGlobalUpdate();
     }else {
         $return = $self->_doIncremental();
     }
@@ -477,10 +479,10 @@ sub _doIncremental {
         return 0;
     }
 
-    # Mises à jour
-    $return = $return && $self->_incrementalUpdate( $sqlFilter{"updated"} );
-    # Suppression
+    # On traite les suppressions
     $return = $return && $self->_incrementalDelete( $sqlFilter{"deleted"} );
+    # On traite les mises à jour
+    $return = $return && $self->_incrementalUpdate( $sqlFilter{"updated"} );
 
 
     return $return;
