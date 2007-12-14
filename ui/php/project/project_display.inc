@@ -317,14 +317,18 @@ function html_project_search_list($proj_q, $prefs, $project) {
 // Display the planning for a month
 // Parameters : 
 //   - $obm_q    : tasks list to display 
-//   - $project[] : project hash
+//   - $params   : project hash
 ///////////////////////////////////////////////////////////////////////////////
-function dis_project_planning($project) {
+function dis_project_planning($params) {
   global $display, $l_project;
+
+  if (!isset ($params['date'])) {
+    $params['date'] = date('Ymd'); 
+  }
   
-  $obm_q = run_query_project_month_planning($project);
-  $block = html_project_nav_date($project);
-  $block .= html_project_planning($obm_q, $project) ;
+  $obm_q = run_query_project_month_planning($params);
+  $block = html_project_nav_date($params);
+  $block .= html_project_planning($obm_q, $params);
 
   $p = get_project_info($project['project_id']);
   $title = $p['name'];
@@ -1271,14 +1275,16 @@ function html_project_form($action, $project_q, $project) {
 
   // User comment select construction
   $sel_usercomment = "<select name=\"sel_usercomment\">";
-  foreach ($users_p as $cid => $one_user) {
-    $cname = $one_user['lastname'].' '.$one_user['firstname'];
-    $sel_usercomment .= "<option value=\"$cname\"";
-    // First time default to uid of connected user (uid) then set to name
-    if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
-      $sel_usercomment .= " selected = \"selected\"";
+  if (is_array($users_p)) {
+    foreach ($users_p as $cid => $one_user) {
+      $cname = $one_user['lastname'].' '.$one_user['firstname'];
+      $sel_usercomment .= "<option value=\"$cname\"";
+      // First time default to uid of connected user (uid) then set to name
+      if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+	$sel_usercomment .= " selected = \"selected\"";
+      }
+      $sel_usercomment .= ">$cname</option>\n";
     }
-    $sel_usercomment .= ">$cname</option>\n";
   }
   $sel_usercomment .= '</select>';
 
@@ -2032,11 +2038,186 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Project dashboard
-// Parameters:
-//   - $project : project hash infos
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display one Project closings
+ * @param $project : project hash infos
+ **/
+function dis_project_closing($params) {
+  global $display, $l_header_closing;
+  global $l_closing, $l_closing_no, $l_used, $l_missing, $l_comment;
+
+  $clos = get_project_closing($params['project_id']);
+
+  if (count($clos) > 0) {
+    $dis_title = $l_header_closing;
+    $block_clo = "
+      <table class=\"spreadSheet\">
+      <thead>
+      <tr>
+        <th>$l_date</th>
+        <th>$l_used</th>
+        <th>$l_missing</th>
+        <th>$l_comment</th>
+      </tr>
+      </thead>
+      <tbody>";
+
+    $k = 0;
+    foreach ($clos as $c_id => $clo) {
+      $c_date = of_date_format($clo['date']);
+      $c_used = $clo['used'];
+      $c_remaining = $clo['remaining'];
+      $c_comment = $clo['comment'];
+      $k ++;
+      ($k % 2 == 0) ? $class = 'pair' : $class = '';
+
+      $block_clo .= "
+      <tr class=\"$class\">
+        <td>$c_date</td>
+        <td>$c_used</td>
+<!--        <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$i_number</a></td> -->
+        <td>$c_remaining</td>
+        <td>$c_comment</td>
+      </tr>";
+    }
+  } else {
+    $dis_title = $l_closing_no;
+  }
+
+  $display['title'] = "<h1 class=\"title\">$l_header_closing</h1>";
+
+  $block = "
+<div class=\"detail extra\">
+  <h1>$dis_title</h1>
+  $block_clo
+</div>
+";
+
+  return $block;
+}
+
+
+/**
+ * Display Project Closing Form
+ *
+ * @param mixed $action action called
+ * @param mixed $params : default values
+ * @return string XHTML contact form
+ */
+function dis_project_closing_form($action, $params) {
+
+  $p_id = $params['project_id'];
+  $clo_id = $params['closing_id'];
+  if ($clo_id > 0) {
+    $clo = get_project_closing($p_id, $clo_id);
+  } else {
+    $clo = '';
+  }
+
+  $block = html_project_closing_form($action, $clo, $params);
+
+  return $block;
+}
+
+
+/**
+ * HTML Display Contact Form
+ * @param $action    : action called
+ * @param mixed $clo : closing data array or ''
+ * @param $params[] : default values
+ **/
+function html_project_closing_form($action, $clo, $params) {
+  global $display, $path, $obm, $l_header_closing, $l_header_new;
+  global $l_closing, $l_closing_no, $l_date, $l_used, $l_missing, $l_comment;
+  global $l_closing_update, $l_checkdelete, $l_closing_insert;
+
+  $uid = $obm['uid'];
+  $project_id = $params['project_id'];
+
+  // if update mode and first time values are taken from database
+  if (is_array($clo) && (count($clo) > 0)) {
+    foreach ($clo as $clo_id => $one_clo) {
+      $used = $one_clo['used'];
+      $remaining = $one_clo['remaining'];
+      $comment = $one_clo['comment'];
+      $date = $one_clo['date'];
+      $date = of_date_upd_format($date, true);
+    }
+    // New form and first time
+  } elseif ($action == 'closing_new') {
+    $dis_title = $l_header_new;
+    $date = of_date_upd_format();
+  }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($params['used'])) { $used = $params['used']; }
+  if (isset($params['remaining'])) { $remaining = $params['remaining']; }
+  if (isset($params['comment'])) { $comment = stripslashes($params['comment']); }
+  if (isset($params['date'])) { $date = of_date_upd_format($params['date'],true); }
+
+  // UPDATE 
+  if (($action == 'closing_detailupdate') || ($action == 'closing_update')) {
+    $dis_button = "
+      <input type=\"hidden\" name=\"action\" value=\"closing_update\" />
+      <input type=\"hidden\" name=\"closing_id\" value=\"$clo_id\" />
+      <input type=\"hidden\" name=\"hd_usercreate\" value=\"$usercreate\" />
+      <input type=\"submit\" value=\"$l_update\" />";
+
+  // INSERT
+  } elseif (($action == 'closing_new') || ($action == 'closing_insert')) {
+    $dis_button = "
+      <input type=\"hidden\" name=\"action\" value=\"closing_insert\" />
+      <input type=\"submit\" value=\"$l_closing_insert\" />";
+  }
+
+  $display['title'] = "<h1 class=\"title\">$l_closing : $dis_title</h1>";
+
+  // --- HTML Template --------------------------------------------------------
+  $block = "$script";
+
+  $block .= "
+    <form method=\"get\" name=\"f_entity\" action=\"".url_prepare('project_index.php')."\">
+
+    <fieldset class=\"detail infos\">
+    <legend>$l_closing</legend>
+
+    <table>
+    <tr>
+      <th>$l_date</th>
+      <td>
+        <input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>
+      </td>
+    </tr>
+    <tr>
+      <th>$l_used</th>
+      <td><input type=\"text\" name=\"tf_used\" size=\"30\" maxlength=\"64\" value=\"$used\" /></td>
+    </tr>
+    <tr>
+      <th>$l_missing</th>
+      <td><input type=\"text\" name=\"tf_remaining\" size=\"30\" maxlength=\"64\" value=\"$remaining\" /></td>
+    </tr>
+    </table>
+    </fieldset>
+   
+    <fieldset class=\"detail extra\">
+    <legend>$l_comment</legend>
+      <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>
+    </fieldset>
+
+    <fieldset class=\"buttons\">
+    $dis_button
+    <input type=\"hidden\" name=\"project_id\" value=\"$project_id\" />
+    </fieldset>
+    </form>";
+
+  return $block;
+}
+
+
+/**
+ * Display Project dashboard
+ * @param $project : project hash infos
+ **/
 function dis_project_dashboard($project) {
   global $display, $l_err_reference;
 

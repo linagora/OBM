@@ -23,8 +23,25 @@ $l_check_userupdate = " entries last updated by this user.";
 $l_no_user = "No user fields in this table";
 $l_group = "Group";
 $l_delegation_target = "Delegation target";
+$l_photo = "Photo";
+
+$l_mail_server = "Mail Server";
+$l_email_nomade = "Nomad email address";
+$l_nomade = "Mail forwarding";
+$l_access_nomade = "Mail forwarding";
+$l_perms = "Allowed";
+$l_local_copy = "Local copy";
+$l_vacation = "Message d'absence";
+$l_vacation_message = "Message";
 $l_vacation_datebegin = "From";
 $l_vacation_dateend = "To";
+$l_access = "Internet access";
+$l_web = "Web access";
+$l_smb = "Windows network";
+$l_smb_perms = "Windows user";
+$l_smb_home = "Home directory";
+$l_smb_home_drive = "Home drive";
+$l_smb_logon = "Logon script";
 $l_group_member = "Member of groups";
 $l_password_type = "Password Crypt";
 

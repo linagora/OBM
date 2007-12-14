@@ -15,18 +15,18 @@
 //   - $password : default values or updated values (if error)
 //   - $field    : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
-function html_password_form($usr_q, $password, $field="") {
+function html_password_form($usr_q, $password, $field='') {
   global $l_password, $l_old_password, $l_new_password, $l_new_password_bis;
   global $l_update;
 
   // Mark the error field
-  if ($field != "") {
-    $class[$field] = "error";
+  if ($field != '') {
+    $class[$field] = 'error';
   }
 
   $block = "
     <form method=\"post\" name=\"form_password\"
-      action=\"" . url_prepare("password_index.php") . "\">
+      action=\"" . url_prepare('password_index.php') . "\">
 
     <fieldset class=\"detail extra\">
     <legend>$l_password</legend>

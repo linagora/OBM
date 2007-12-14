@@ -151,6 +151,18 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
     }
   }
 
+  else if ($fieldname == 'userobm_mail_quota') {
+    $res['align'] = 'center';
+    $mq = $OD->data_set->f($fieldname);
+    if (($mq == 0) || ($mq == '')) {
+      $res['name'] = '-';
+    } else {
+      $mqu = $OD->data_set->f('userobm_mail_quota_use');
+      $percent = number_format($mqu / $mq * 100);
+      $res['name'] = "$percent % ($mqu/$mq)";
+    }
+  }
+
   else if ($fieldname == "timelastaccess") {
     $date = $OD->data_set->f($fieldname);
     $res["name"] = of_datetime_format($date, 1);

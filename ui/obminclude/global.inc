@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.1.1pre1';
+$obm_version = '2.1.1pre3';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -416,6 +416,7 @@ if (! $cgp_show['module']['company']) {
   $cgp_show['module']['project'] = false;
   $cgp_show['module']['contract'] = false;
   $cgp_show['module']['invoice'] = false;
+  $cgp_show['module']['import'] = false;
 }
 
 if (! $cgp_show['module']['contact']) {
@@ -841,9 +842,9 @@ function of_date_format($timestamp='', $null_empty='') {
  */
 function of_date_upd_format($date='', $null_empty=false) {
   
-  if($date) {
+  if ($date) {
     $type = of_date_guess_format($date);
-  } elseif(!$null_empty) {
+  } elseif (!$null_empty) {
     $date = time();
     $type = 't';
   } else {

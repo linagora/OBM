@@ -8,25 +8,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_internal_email = "Internal Email";
-
-$l_lastname = "Last Name";
-$l_firstname = "First Name";
-$l_email_nomade = "Adresse E-mail nomade";
-$l_nomade = "Accès E-mail nomade";
-$l_access_nomade = "Accès nomade";
-$l_state = "Etat";
-$l_perms = "Autorisé";
-$l_forbidden = "Interdit";
-$l_enable = "Activé";
-$l_disable = "Désactivé";
-$l_local_copy = "Copie locale";
-
-// Actions
-$l_update = "Modifier l'utilisateur";
-$l_confirm= "Confirmer l'action";
+$l_email_nomade = "Nomad email address";
+$l_state = "Status";
+$l_forbidden = "Forbidden";
+$l_local_copy = "Local copy";
 
 // Messages
-$l_nomade_not_allowed = "Le renvoi de messagerie n'est pas autorisé.";
-$l_nomade_local_copy_error = "La copie locale ne peut-être activée si l'E-mail nomade n'est pas autorisé et activé";
-// JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
+$l_err_email = "The email address is not valid !";
+$l_nomade_not_allowed = "The mail forwarding is not allowed";
+$l_err_nomade_local_copy = "Local copy can't be activated if mail forwarding is not allowed and activated";

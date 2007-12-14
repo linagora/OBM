@@ -67,7 +67,7 @@ function html_vacation_consult($usr_q) {
 //   - $field : if set, field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_vacation_form($usr_q, $vacation, $field="") {
-  global $l_vacation, $l_enable_vacation, $l_vacation_message;
+  global $obm, $l_vacation, $l_enable_vacation, $l_vacation_message;
   global $l_update, $l_vacation_not_allowed, $l_vacation_datebegin, $l_vacation_dateend;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_hour;
 
@@ -86,82 +86,83 @@ function html_vacation_form($usr_q, $vacation, $field="") {
     $minend = date("i",$vacation_dateend);
     $vacation_datebegin = of_date_upd_format($vacation_datebegin);
     $vacation_dateend = of_date_upd_format($vacation_dateend);
+  } else if ($action == 'update') {
+    $obm_q = run_query_vacation_detail($obm['uid']);
+    $mail_enable = $obm_q->f("userobm_mail_perms");
   }
 
   // If parameters have been given, they supercede the default action value
   if (isset($vacation["enabled"])) { $enabled = $vacation["enabled"]; }
   if (isset($vacation["message"])) { $message = $vacation["message"]; }
-  if (isset($user["vacation_datebegin"])) { $vacation_datebegin = $user["vacation_datebegin"]; }
-  if (isset($user["vacation_dateend"])) { $vacation_dateend = $user["vacation_dateend"]; }
-  if (isset($user["time_begin"])) { $hourbegin = $user["time_begin"]; }
-  if (isset($user["min_begin"])) {$minbegin = $user["min_begin"]; }
-  if (isset($user["time_end"])) {$hourend = $user["time_end"]; }
-  if (isset($user["min_end"])) {$minend = $user["min_end"]; }
+  if (isset($vacation["vacation_datebegin"])) { $vacation_datebegin = $vacation["vacation_datebegin"]; }
+  if (isset($vacation["vacation_dateend"])) { $vacation_dateend = $vacation["vacation_dateend"]; }
+  if (isset($vacation["time_begin"])) { $hourbegin = $vacation["time_begin"]; }
+  if (isset($vacation["min_begin"])) {$minbegin = $vacation["min_begin"]; }
+  if (isset($vacation["time_end"])) {$hourend = $vacation["time_end"]; }
+  if (isset($vacation["min_end"])) {$minend = $vacation["min_end"]; }
 
   if (! $mail_enable) {
-    return display_ok_msg($l_vacation_not_allowed);
+    return display_warn_msg($l_vacation_not_allowed);
   }
 
   // vacation enabled checkbox
   if ($enabled == 1) {
     $enabled_checked = " checked=\"checked\" " ;
     $message_enabled = "";
-
-    // hour begin
-    $dis_hour_b = "<select name=\"sel_time_begin\" style=\"width:4em;\">";
-    for ($i=$ccalendar_first_hour; $i<$ccalendar_last_hour; $i++) {
-      $current_hour = substr("0$i",-2,2); 
-      if ($current_hour == $hourbegin) {
-        $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
-      } else {
-        $dis_hour_b .= "<option value=\"$current_hour\">$current_hour</option>";
-      }
-    }
-    $dis_hour_b .= "</select>";  
-    $dis_min_b = "<select name=\"sel_min_begin\" style=\"width:4em;\">";
-    if ($ccalendar_hour_fraction <= 60 && $ccalendar_hour_fraction > 0) {
-      $hour_fraction = $ccalendar_hour_fraction;
-    } else {
-      $hour_fraction = 4;
-    }
-    $step = 60 / $hour_fraction;
-    for ($i=$hour_fraction; $i>=1; $i--) {
-      $current_min = substr("0".round((60 - ($step*$i))),-2);
-      if ($current_min  == $minbegin) {
-        $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
-      } else {
-        $dis_min_b .= "<option value=\"$current_min\">$current_min</option>";
-      }
-    }
-    $dis_min_b .= "</select>";
-
-    // hour end
-    $dis_hour_e = "<select name=\"sel_time_end\" style=\"width:4em;\">";
-    for ($i=$ccalendar_first_hour; $i<=$ccalendar_last_hour; $i++) {
-      $current_hour = substr("0$i",-2,2); 
-      if ($current_hour == $hourend) {
-        $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
-      } else {
-        $dis_hour_e .= "<option value=\"$current_hour\">$current_hour</option>";
-      }
-    }
-    $dis_hour_e .= "</select>";  
-    $dis_min_e = "<select name=\"sel_min_end\" style=\"width:4em;\">";
-    for ($i=$hour_fraction; $i>=1; $i--) {
-      $current_min = substr("0".round((60 - ($step*$i))),-2);
-      if ($current_min  == $minend) {
-        $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
-      } else {
-        $dis_min_e .= "<option value=\"$current_min\">$current_min</option>";
-      }
-    }
-    $dis_min_e .= "</select>";
-
-
-  }else {
+  } else {
     $enabled_checked = " " ;
     $message_enabled = " disabled=\"disabled\" ";
   }
+
+  // hour begin
+  $dis_hour_b = "<select name=\"sel_time_begin\" style=\"width:4em;\">";
+  for ($i=$ccalendar_first_hour; $i<$ccalendar_last_hour; $i++) {
+    $current_hour = substr("0$i",-2,2); 
+    if ($current_hour == $hourbegin) {
+      $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+    } else {
+      $dis_hour_b .= "<option value=\"$current_hour\">$current_hour</option>";
+    }
+  }
+  $dis_hour_b .= "</select>";  
+  $dis_min_b = "<select name=\"sel_min_begin\" style=\"width:4em;\">";
+  if ($ccalendar_hour_fraction <= 60 && $ccalendar_hour_fraction > 0) {
+    $hour_fraction = $ccalendar_hour_fraction;
+  } else {
+    $hour_fraction = 4;
+  }
+  $step = 60 / $hour_fraction;
+  for ($i=$hour_fraction; $i>=1; $i--) {
+    $current_min = substr("0".round((60 - ($step*$i))),-2);
+    if ($current_min  == $minbegin) {
+      $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
+    } else {
+      $dis_min_b .= "<option value=\"$current_min\">$current_min</option>";
+    }
+  }
+  $dis_min_b .= "</select>";
+
+  // hour end
+  $dis_hour_e = "<select name=\"sel_time_end\" style=\"width:4em;\">";
+  for ($i=$ccalendar_first_hour; $i<=$ccalendar_last_hour; $i++) {
+    $current_hour = substr("0$i",-2,2); 
+    if ($current_hour == $hourend) {
+      $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+    } else {
+      $dis_hour_e .= "<option value=\"$current_hour\">$current_hour</option>";
+    }
+  }
+  $dis_hour_e .= "</select>";  
+  $dis_min_e = "<select name=\"sel_min_end\" style=\"width:4em;\">";
+  for ($i=$hour_fraction; $i>=1; $i--) {
+    $current_min = substr("0".round((60 - ($step*$i))),-2);
+    if ($current_min  == $minend) {
+      $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
+    } else {
+      $dis_min_e .= "<option value=\"$current_min\">$current_min</option>";
+    }
+  }
+  $dis_min_e .= "</select>";
 
   // error and css classes : 
   $enabled_css = $field == "enabled" ?  "detailError" : "detailLabel";

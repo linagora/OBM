@@ -42,6 +42,9 @@ $l_tasks = "Tâches";
 $l_reftask_manage = "Gestion des taches de référence"; 
 $l_delete_reftask = "Vous etes sur le point de supprimer une tache de référence, voulez vous continuer?";
 $l_reftask = 'Tâche de référence';
+$l_closing = 'Clôture';
+$l_closing_no = 'Pas de clôture effectuée pour ce projet';
+
 // Titres
 $l_members_info = "Participants au projet";
 $l_progressinfos = "Détail : (temps : utilisé / estimé restant / total prévu)";
@@ -65,6 +68,9 @@ $l_task_add = "Ajouter la tâche";
 $l_task_upd = "Modifier la tâche";
 $l_task_del = "Supprimer les tâches sélectionnées";
 $l_progress_update = "Mettre à jour les avancements";
+$l_closing_insert = "Enregistrer la clôture";
+$l_closing_update = "Modifier la clôture Projet";
+$l_closing_delete = "Supprimer la clôture";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des projets correspondants.";
@@ -104,5 +110,8 @@ $l_fill_missing = "Le temps manquant doit être indiqué pour tous les membres du 
 $l_fill_missnumber = "Le temps manquant doit être un nombre entier de jours.";
 $l_delete_confirm = "Confirmer la suppression du projet ?";
 $l_tolong_shortname = "Le nom court est trop long";
+$l_err_used = "Le temps passé n'est pas correct !";
+$l_err_remaining = "Le temps restant n'est pas correct !";
+
 // For the display preferences modification screen 
 $l_project_display = "Options d'affichage des listes de projets";

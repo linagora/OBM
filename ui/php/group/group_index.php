@@ -103,7 +103,10 @@ if (($action == 'index') || ($action == '')) {
     // If the context (same group) was confirmed ok, we proceed
     if ($params["confirm"] == $c_yes) {
       $params["group_id"] = run_query_group_insert($params);
-      if ($params["group_id"]) {
+      if ($params["group_id"] > 0) {
+	if (! isset($params['privacy']) || ($params['privacy'] == '0')) {
+	  set_update_state();
+	}
 	$display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");
 	$display["detail"] = dis_group_consult($params, $obm["uid"]);
       } else {
@@ -119,7 +122,9 @@ if (($action == 'index') || ($action == '')) {
       } else {
 	$params["group_id"] = run_query_group_insert($params);
 	if ($params["group_id"] > 0) {
-	  set_update_state();
+	  if (! isset($params['privacy']) || ($params['privacy'] == '0')) {
+	    set_update_state();
+	  }
 	  $display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");
 	  $display["detail"] = dis_group_consult($params, $obm["uid"]);
 	} else {

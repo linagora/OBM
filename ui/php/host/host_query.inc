@@ -134,16 +134,15 @@ function run_query_host_insert($host) {
   $name = $host['name'];
   $ip = $host['ip'];
   $samba = ($host['samba'] == 1) ? 1 : 0;
-  $web_perms = $host['web_perms'];
-  $ftp_perms = $host['ftp_perms'];
-  $firewall_perms = $host['firewall_perms'];
-  $web_all = $host['web_all'];  
+  $web_perms = ($host['web_perms'] == 1) ? 1 : 0;
+  $ftp_perms = ($host['ftp_perms'] == 1) ? 1 : 0;
+  $firewall_perms = ($host['firewall_perms'] == 1) ? 1 : 0;
+  $web_all = ($host['web_all'] == 1) ? 1 : 0;
   $list = $host['web_list'];
   $desc = $host['desc'];
   $now = date('Y-m-d H:i:s');
   $host_uid = get_first_user_free_uid();
   $host_gid = $cg_gid_smb_host;
-
 
   if (isset($host['domain']) && $obm['domain'] == 0) {
     $domain_id = $host['domain'];
@@ -430,7 +429,7 @@ function get_host_name_exists($name, $id='') {
   global $cdg_sql;
 
   if ($id != '') {
-    $where_id = "host_id!='$id' and";
+    $where_id = "host_id != '$id' AND";
   }
 
   $multidomain = sql_multidomain('host');
@@ -466,7 +465,7 @@ function run_query_check_host($id, $name, $desc) {
   $like = sql_casei_like($db_type);
 
   if ($id != '') {
-    $where_id = "host_id!='$id' and";
+    $where_id = "host_id != '$id' AND";
   }
 
   // If name is short, we test equality, else similarity
@@ -484,7 +483,7 @@ function run_query_check_host($id, $name, $desc) {
       $wdesc = "host_description = '$desc'";
     }
   }
-  if ($wdesc != '') $wdesc = "or $wdesc";
+  if ($wdesc != '') $wdesc = "OR $wdesc";
 
   $multidomain = sql_multidomain('host');
   $query = "SELECT DISTINCT host_id, host_name, host_description

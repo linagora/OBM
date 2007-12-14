@@ -42,6 +42,9 @@ $l_project_duration = "Duration";
 $l_project_desc = "Description";
 $l_project_tech = "Technical description";
 
+$l_closing = 'Closing';
+$l_closing_no = 'No closing done for this project';
+
 // Titres
 $l_members_info = "Project members";
 $l_progressinfos = "Progress evaluation : time (used / missing / projected)";
@@ -65,6 +68,9 @@ $l_progress_update = "Update the project progress";
 $l_task_add = "Add the task";
 $l_task_upd = "Update task";
 $l_task_del = "Delete selected tasks";
+$l_closing_insert = "Save the closing";
+$l_closing_update = "Update the closing";
+$l_closing_delete = "Delete the closing";
 
 // Messages
 $l_no_display = "Fill the search fields and press < Find > to retrieve the projects.";
@@ -105,6 +111,8 @@ $l_fill_projnumber = "The projected time number is not valid.";
 $l_fill_missing = "The missing time must be filled for every member";
 $l_fill_missnumber = "The missing time number is not valid.";
 $l_tolong_shortname = "The short name is too long";
+$l_err_used = "Used time is invalid !";
+$l_err_remaining = "Remaining time is invalid !";
 $l_delete_confirm = "Confirm the project deletion ?";
 
 // For the display preferences modification screen 

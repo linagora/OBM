@@ -29,11 +29,6 @@ $cgp_todo_nb = 5;
 // Maximum rows allowed to display
 $conf_display_max_rows = 200;
 
-// OBM System groups (groups id)
-$cg_adm = 1;
-$cg_com = 2;
-$cg_prod = 3;
-
 // Allow * in search field
 $cgp_sql_star = true;
 // archive checkbox return only archived results

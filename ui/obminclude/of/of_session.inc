@@ -406,7 +406,7 @@ class Perm {
             'tools' => $perm_admin,
             'group' => $perm_user
           ),
-          'properties' => array (                                                       
+          'properties' => array (
             'admin_realm' => array ('domain')
           ),
           'level' => 0,

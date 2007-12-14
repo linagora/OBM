@@ -261,9 +261,13 @@ function get_ip_used($id='') {
   global $cdg_sql, $php_regexp_email_name, $l_host;
 
   $ips = array();
+
+  if ($id != '') {
+    $where_id = "WHERE host_id != '$id'";
+  }
   $query = "SELECT host_name, host_ip
     FROM Host
-    WHERE host_id != '$id'";
+    $where_id";
 
   display_debug_msg($query, $cdg_sql, 'get_ip_used()');
   $obm_q = new DB_OBM;

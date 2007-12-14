@@ -1447,11 +1447,10 @@ function get_project_participants($p_id = 0) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Get Project infos
-// Parameters:
-//   - $id : project id
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Get Project infos
+ * @param $id : project id
+ **/
 function get_project_info($id) {
   global $cdg_sql;
 
@@ -1499,6 +1498,152 @@ function get_project_info($id) {
   $res['comment'] = $obm_q->f('project_comment');
 
   return $res;
+}
+
+
+/**
+ * Get Project closing infos
+ * @param $id     : project id
+ * @param $clo_id : closing id, if not set get all project closings
+ **/
+function get_project_closing($id, $clo_id='') {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $date = sql_date_format($db_type, 'projectclosing_date', 'date');
+  $multidomain = sql_multidomain('project');
+
+  if (($clo_id != '') && ($clo_id > 0)) {
+    $where_clo_id = "AND projectclosing_id='$clo_id'";
+  }
+  $query = "SELECT
+      projectclosing_id,
+      projectclosing_used,
+      projectclosing_remaining,
+      projectclosing_comment,
+      $date,
+      userobm_login
+    FROM ProjectClosing
+      LEFT JOIN Project ON projectclosing_project_id=project_id
+      LEFT JOIN UserObm ON projectclosing_usercreate=userobm_id
+    WHERE projectclosing_project_id='$id'
+      $where_clo_id $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'get_project_closings()');
+  $obm_q->query($query);
+  while ($obm_q->next_record()) {
+    $c_id = $obm_q->f('projectclosing_id');
+    $res[$c_id]['date'] = $obm_q->f('date');
+    $res[$c_id]['used'] = $obm_q->f('projectclosing_used');
+    $res[$c_id]['remaining'] = $obm_q->f('projectclosing_remaining');
+    $res[$c_id]['comment'] = $obm_q->f('projectclosing_comment');
+    $res[$c_id]['usrcreate'] = $obm_q->f('userobm_login');
+  }
+
+  return $res;
+}
+
+
+/**
+ * Closing Insertion query execution
+ * @param $params[] : Entry's values
+ * @return : closing id
+ **/
+function run_query_project_closing_insert($params) {
+  global $obm, $cdg_sql;
+
+  $uid = $obm['uid'];
+  $date_now = date('Y-m-d H:i:s');
+  $project_id = $params['project_id'];
+  $used = $params['used'];
+  $remaining = $params['remaining'];
+  $date = of_isodate_convert($params['date']);
+  $comment = $params['comment'];
+
+  $query = "INSERT INTO ProjectClosing (
+    projectclosing_project_id,
+    projectclosing_timeupdate,
+    projectclosing_timecreate,
+    projectclosing_userupdate,
+    projectclosing_usercreate,
+    projectclosing_date,
+    projectclosing_used,
+    projectclosing_remaining,
+    projectclosing_comment)
+  VALUES ('$project_id',
+    null,
+    '$date_now',
+    null,
+    '$uid',
+    '$date',
+    '$used',
+    '$remaining',
+    '$comment')";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_project_closing_insert');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  // get the id of the inserted project. Date is to insure correct project
+  // is selected (and not similar from the same deal)
+  $query = "SELECT projectclosing_id
+            FROM ProjectClosing
+            WHERE projectclosing_project_id = '$project_id'
+              AND projectclosing_date = '$date'
+              AND projectclosing_used = '$used'
+              AND projectclosing_remaining = '$remaining'";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_project_closing_insert (get Id)');
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+    $obm_q->next_record();
+    $pid = $obm_q->f('projectclosing_id');
+  } else {
+    $pid = 0;
+  }
+  return $pid;
+}
+
+
+/**
+ * New Project Form Data checking and formatting
+ * @param $pid      : project id (empty on insertion)
+ * @param $params[] : values checked
+ * @return (true | false) : true if data are ok, else false 
+**/
+function check_project_closing_form($params) {
+  global $err, $php_regexp_isodate, $l_invalid_date, $l_err_used, $l_err_remaining;
+
+  $used = $params['used'];
+  $remaining = $params['remaining'];
+  $project_id = $params['project_id'];
+  $date = $params['date'];
+
+  // Date check
+  $date = of_isodate_convert($params['date'],true);
+  if (($date == '') || (preg_match($php_regexp_isodate, $date) == 0)) {
+    $err['msg'] = "$l_date : $l_invalid_date"; 
+    $err['date'] = 'date';
+    return false;
+  }
+
+  // Used time check
+  if (! is_numeric($used)) {
+    $err['msg'] = $l_err_used;
+    $err['field'] = 'used';
+    return false;
+  }
+
+  // Remaining time check
+  if (! is_numeric($remaining)) {
+    $err['msg'] = $l_err_remaining;
+    $err['field'] = 'remaining';
+    return false;
+  }
+
+  return true; 
 }
 
 

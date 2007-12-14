@@ -144,6 +144,9 @@ function run_query_user_search($user) {
 
   // ORDER construction
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'userobm_login';
+  if ($order == 'userobm_mail_quota') {
+    $order = 'userobm_mail_quota_use / userobm_mail_quota';
+  }
   $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "$select
@@ -1374,7 +1377,7 @@ function check_user_data_form($p_id, $user) {
     $err['msg'] = "$l_profile_privilege_error";
     $err['field'] = 'profile';
     return false;
-  }    
+  }
   
   if ($action == 'update') {
     $u = get_user_info($id);
