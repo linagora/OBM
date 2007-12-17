@@ -184,7 +184,7 @@ public class CalendarHelper extends Helper {
 
 			}
 		} catch (RecurrencePatternException e) {
-			e.printStackTrace();
+			logger.error("recpattern: " + e.getMessage(), e);
 		}
 		return result;
 	}
@@ -321,7 +321,7 @@ public class CalendarHelper extends Helper {
 			cEndRec.setTime(dEndRec);
 		} else {
 			/* infinite */
-			//cEndRec.add(Calendar.YEAR, 2049);
+			// cEndRec.add(Calendar.YEAR, 2049);
 			cEndRec = null;
 		}
 		recurrence.setEnd(cEndRec);
