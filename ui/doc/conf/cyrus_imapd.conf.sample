@@ -81,7 +81,7 @@ lmtp_admins: cyrus
 allowanonymouslogin: no
 
 # Minimum time between POP mail fetches in minutes
-popminpoll: 1
+popminpoll: 0
 
 # If nonzero, normal users may create their own IMAP accounts by creating
 # the mailbox INBOX.  The user's quota is set to the value if it is positive,
