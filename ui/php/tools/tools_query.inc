@@ -526,7 +526,7 @@ function get_update_link_group($domain_id, $realm) {
     $where = '';
   }
 
-  // UserObmGroup Link --------------------------------------------------------
+  // of_usergroup Link --------------------------------------------------------
 
   // Get infos from Update table
   $query = "SELECT *

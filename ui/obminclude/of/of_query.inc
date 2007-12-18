@@ -1547,6 +1547,69 @@ function get_last_organizationalchart_text($id) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Get Entity infos
+// Parameters:
+//   - $id  : entity id
+//   - $entity : entity type
+// Returns:
+//   - entity label, id, kind
+///////////////////////////////////////////////////////////////////////////////
+function get_entity_info($id, $entity) {
+  global $cdg_sql, $obm;
+
+  $e = array();
+  $obm_q = new DB_OBM ;
+  $db_type = $obm_q->type;
+  $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
+  if($id == '') {
+    $id = $obm['uid'];
+    $entity = 'user';
+  } elseif ($entiy == '') {
+    $entiy = 'user';
+  }
+  if ($entity == 'user') {
+
+    $table_entity = 'UserObm';
+    $c_id = 'userobm_id';
+    $ctt[0]['type'] = 'field';
+    $ctt[0]['value'] = 'userobm_lastname';
+    $ctt[1]['type'] = 'string';
+    $ctt[1]['value'] = ' ';
+    $ctt[2]['type'] = 'field';
+    $ctt[2]['value'] = 'userobm_firstname';
+    $c_label = sql_string_concat($db_type, $ctt);
+    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'user' as entity_kind FROM UserObm";
+  } elseif ($entity == 'group') {
+    $table_entity = 'UGroup';
+    $c_id = 'group_id';
+    $c_label = 'group_name';
+    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'group' as entity_kind FROM UGroup";
+  } elseif ($entity == 'resource') {
+    $table_entity = 'Resource';
+    $c_id = 'resource_id';
+    $c_label = 'resource_name';
+    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'resource' as entity_kind FROM Resource";
+  }
+
+  $query = "SELECT *
+    FROM($entity_table) as Entity 
+    WHERE entitydata_id='$id'";
+
+  display_debug_msg($query, $cdg_sql, 'get_user_info()');
+  $obm_q->query($query);
+  $obm_q->next_record();
+  if (is_array($obm_q->Record)) {
+    foreach ($obm_q->Record as $key => $user) {
+      $small_key = str_replace('entity_', '', $key);
+      $e[$small_key] = $user;
+    }
+  }  
+
+  return $e;
+}
+
+
 //--- User and group global functions ---------------------------------------//
 
 
@@ -1656,67 +1719,6 @@ function get_user_info($id='') {
   return $u;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Get Entity infos
-// Parameters:
-//   - $id  : entity id
-//   - $entity : entity type
-// Returns:
-//   - entity label, id, kind
-///////////////////////////////////////////////////////////////////////////////
-function get_entity_info($id, $entity) {
-  global $cdg_sql, $obm;
-  $e = array();
-  $obm_q = new DB_OBM ;
-  $db_type = $obm_q->type;
-  $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
-  if($id == "") {
-    $id = $obm["uid"];
-    $entity = "user";
-  } elseif ($entiy == "") {
-    $entiy = "user";
-  }
-  if ($entity == "user") {
-
-    $table_entity = "UserObm";
-    $c_id = "userobm_id";
-    $ctt[0]["type"] = "field";
-    $ctt[0]["value"] = "userobm_lastname";
-    $ctt[1]["type"] = "string";
-    $ctt[1]["value"] = " ";
-    $ctt[2]["type"] = "field";
-    $ctt[2]["value"] = "userobm_firstname";
-    $c_label = sql_string_concat($db_type, $ctt);
-    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'user' as entity_kind FROM UserObm";
-  } elseif ($entity == "group") {
-    $table_entity = "UGroup";
-    $c_id = "group_id";
-    $c_label = "group_name";
-    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'group' as entity_kind FROM UGroup";
-  } elseif ($entity == "resource") {
-    $table_entity = "Resource";
-    $c_id = "resource_id";
-    $c_label = "resource_name";
-    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'resource' as entity_kind FROM Resource";
-  }
-
-
-  $query = "SELECT *
-    FROM($entity_table) as Entity 
-    WHERE entitydata_id='$id'";
-
-  display_debug_msg($query, $cdg_sql, 'get_user_info()');
-  $obm_q->query($query);
-  $obm_q->next_record();
-  if (is_array($obm_q->Record)) {
-    foreach ($obm_q->Record as $key => $user) {
-      $small_key = str_replace('entity_', '', $key);
-      $e[$small_key] = $user;
-    }
-  }  
-
-  return $e;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Userobm query execution : All users (or the one for the id given)
@@ -1750,6 +1752,7 @@ function run_query_userobm($id='') {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_userobm_active($ids='') {
   global $cdg_sql;
+
   $multidomain = sql_multidomain('userobm');
   if (is_array($ids)) {
     $where_add = '';
@@ -1913,8 +1916,43 @@ function get_all_users_id_from_group($g_id) {
       array_push($users, $u_id);
     }
   }
+  $users = array_unique($users);
 
   return $users;
+}
+
+
+/**
+ * Get all parent groups of a group
+ * @param $g_id group id
+ * @return false if problem
+ * @access public
+ **/
+function get_all_parent_group_of_group($g_id) {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  $groups = array($g_id);
+
+  // Groups parents of this group
+  $query = "SELECT groupgroup_parent_id as parent_id
+    FROM GroupGroup
+    WHERE groupgroup_child_id='$g_id'";
+
+  $obm_q = new DB_OBM; 
+  display_debug_msg($query, $cdg_sql, 'get_all_parent_group_of_group()');
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $parent_id = $obm_q->f('parent_id');
+    $pgroups = get_all_parent_group_of_group($parent_id);
+    $groups = array_merge($groups, $pgroups);
+  }
+
+  return $groups;
 }
 
 
@@ -1925,7 +1963,7 @@ function get_all_users_id_from_group($g_id) {
  * @param $uids (optionnal) : array of UserObm Id to add to the result
  * @return array of users infos (id=>infos) or array of users ids
  * @access public
- */
+**/
 function of_usergroup_get_group_users($g_id, $info=false, $uids='') {
   global $cdg_sql;
 
@@ -1985,7 +2023,7 @@ function of_usergroup_get_group_users($g_id, $info=false, $uids='') {
  * @param $g_id group id
  * @return false if problem
  * @access public
- */
+**/
 function of_usergroup_update_group_node($g_id) {
   global $cdg_sql;
 
@@ -2024,40 +2062,6 @@ function of_usergroup_update_group_node($g_id) {
   }
 
   return $ret;
-}
-
-
- /**
- * Get all parent groups of a group
- * @param $g_id group id
- * @return false if problem
- * @access public
- */
-function get_all_parent_group_of_group($g_id) {
-  global $cdg_sql;
-
-  if (! ($g_id > 0)) {
-    return false;
-  }
-
-  $groups = array($g_id);
-
-  // Groups parents of this group
-  $query = "SELECT groupgroup_parent_id as parent_id
-    FROM GroupGroup
-    WHERE groupgroup_child_id='$g_id'";
-
-  $obm_q = new DB_OBM; 
-  display_debug_msg($query, $cdg_sql, 'get_all_parent_group_of_group()');
-  $obm_q->query($query);
-
-  while ($obm_q->next_record()) {
-    $parent_id = $obm_q->f('parent_id');
-    $pgroups = get_all_parent_group_of_group($parent_id);
-    $groups = array_merge($groups, $pgroups);
-  }
-
-  return $groups;
 }
 
 

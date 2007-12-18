@@ -734,7 +734,7 @@ function html_group_form($action, $group_q, $group, $field='') {
     $sel_manager = "<select name=\"sel_manager\" id=\"sel_manager\">
         <option value=\"$c_undef\">$l_undef</option>";
     foreach ($users as $u_id => $one_user) {
-      $u_name = $one_user['lastname'].' '.$ine_user['firstname'];
+      $u_name = $one_user['lastname'].' '.$one_user['firstname'];
       if ($u_id == $manager_id) {
         $selected = 'selected';
       } else {

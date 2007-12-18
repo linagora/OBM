@@ -21,7 +21,7 @@ function dis_tools_update_detail() {
 
   $domains = array();
 
-  // Determin which domain to display, and which admin realm
+  // Determine which domain to display, and which admin realm
   // For domain 0, only 'domain' realm and loop through all domains
   if ($obm['domain_id'] == '0') {
     $admin_realm = array('domain');

@@ -1033,6 +1033,8 @@ function run_query_user_unsubscribe_all_groups($p_id) {
   $query = "DELETE
   FROM of_usergroup
   WHERE of_usergroup_user_id = '$p_id'";
+  display_debug_msg($query, $cdg_sql, 'run_query_user_unsubscribe_all_groups()');
+  $retour = $obm_q->query($query);
 
   return $retour;
 }
