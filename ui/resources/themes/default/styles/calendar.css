@@ -181,7 +181,7 @@
   background-color: #83B6E6;
 }
 
-.eventOwner h1 {
+.eventOwner h1, li.eventOwner {
   background-color: #639CDA;
   border-top: 1px solid #81B2E3;
   border-bottom: 1px solid #447DCA;
@@ -192,7 +192,7 @@
   background-color: #f5b043;
 }
 
-.eventOwner0 h1 {
+.eventOwner0 h1, li.eventOwner0 {
   background-color: #f08620;
   border-top: 1px solid #f6b453;
   border-bottom: 1px solid #e96612;
@@ -203,7 +203,7 @@
   background-color: #EE7690;
 }
 
-.eventOwner1 h1 {
+.eventOwner1 h1, li.eventOwner1 {
   background-color: #E63C5A;
   border-top: 1px solid #F2778C;
   border-bottom: 1px solid #CF3D57;
@@ -214,7 +214,7 @@
   background-color: #98BF5E;
 }
 
-.eventOwner2 h1 {
+.eventOwner2 h1, li.eventOwner2 {
   background-color: #79A740;
   border-top: 1px solid #95BB60;
   border-bottom: 1px solid #598A28;
@@ -225,7 +225,7 @@
   background-color: #E7AB9E;
 }
 
-.eventOwner3 h1 {
+.eventOwner3 h1, li.eventOwner3 {
   background-color: #DC8F80;
   border-top: 1px solid #D6AC8F;
   border-bottom: 1px solid #CD6F60;
@@ -236,7 +236,7 @@
   background-color: #BBACC4;
 }
 
-.eventOwner4 h1 {
+.eventOwner4 h1, li.eventOwner4 {
   background-color: #A290AD;
   border-top: 1px solid #B7A8C0;
   border-bottom: 1px solid #B7A8C0;
@@ -247,7 +247,7 @@
   background-color: #5672d0;
 }
 
-.eventOwner5 h1 {
+.eventOwner5 h1, li.eventOwner5 {
   background-color: #2d4cb1;
   border-top: 1px solid #5776c8;
   border-bottom: 1px solid #1a3196;

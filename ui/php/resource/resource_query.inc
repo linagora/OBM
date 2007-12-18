@@ -38,7 +38,7 @@ function run_query_resource_search($resource) {
 	
   if ($restriction == "user") {
     $uid = $obm["uid"];
-    $rs = of_right_entity_for_consumer("Resource", "user", $uid, "read");
+    $rs = of_right_entity_for_user("Resource", $uid, "read");
     if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
       $where_restriction = " AND (resource_id IN (";
       foreach($rs["ids"] as $r_id) {
@@ -128,7 +128,7 @@ function run_query_resource_ext_search($resource) {
 
   if ($restriction == "user") {
     $uid = $obm["uid"];
-    $rs = of_right_entity_for_consumer("Resource", "user", $uid, "read");
+    $rs = of_right_entity_for_user("Resource", $uid, "read");
     if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
       $where_restriction = " AND (resource_id IN (";
       foreach($rs["ids"] as $r_id) {

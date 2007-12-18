@@ -119,7 +119,8 @@ obm.AutoComplete.Search = new Class({
       locked: false,                   // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
       restriction: null,               // obm needs
       fieldText: 'Search...',          // default text displayed when empty field
-      extension: null                  // obm needs
+      extension: null,                  // obm needs
+      name: null
     }, options || {});
   },
 
@@ -129,7 +130,11 @@ obm.AutoComplete.Search = new Class({
 
     this.url = url;                    // url used for ajax requests
     this.inputField = $(inputField);   // field used for the input
-    this.name = selectedBox;           // the name of the form validation paramater (also used as a prefix for results id)
+    if(this.options.name == null) {
+      this.name = selectedBox;           // the name of the form validation paramater (also used as a prefix for results id)
+    } else {
+      this.name = this.options.name;
+    }
     this.selectedBox = $(selectedBox); // box used to add selected results
     this.isMouseOver = false;          // is mouse over the resultBox ?
     this.requestId = 0;                // current request id
@@ -461,7 +466,7 @@ obm.AutoComplete.Search = new Class({
     var inputCoords = this.inputField.getCoordinates();
     this.resultBox.setStyles({                  
       'top':(inputCoords.top + inputCoords.height + 2) + 'px',
-      'left':inputCoords.left + 'px'});
+      'left':(inputCoords.left + 20) + 'px'});
     this.resultBox.setStyle('display', '');
   },
 
@@ -549,6 +554,10 @@ obm.AutoComplete.Search = new Class({
                           .setProperty('name',this.name+'[]')
                           .setProperty('value',id)
                           .injectInside(result);
+    } else {
+      this.inputField.blur();
+      this.resetFunc();
+      this.inputField.focus();
     }
   },
 

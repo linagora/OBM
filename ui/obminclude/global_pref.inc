@@ -130,7 +130,12 @@ include("$display_include_file");
 
 // Default module title
 $mod_title = ${"l_module_$module"};
-$display['title'] = "<h1 class=\"title\">$mod_title</h1>";
+$act_title = ${"l_header_$action"};
+if($act_title != "") {
+  $display['title'] = "<h1 class=\"title\">$mod_title : $act_title</h1>";
+} else {
+  $display['title'] = "<h1 class=\"title\">$mod_title</h1>";
+} 
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1453,10 +1453,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     // Marketing manager select
     $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
       <option value=\"$c_undef\">$l_undef</option>";
-    foreach ($users as $u_id => $one_user) {
-      $sel_market .= "\n<option value=\"$u_id\"";
-      if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
-      $sel_market .= '>'. $one_user['lastname'].' '.$one_user['firstname'] . "</option>\n";
+    if(is_array($users)) {
+      foreach ($users as $u_id => $one_user) {
+        $sel_market .= "\n<option value=\"$u_id\"";
+        if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
+        $sel_market .= '>'. $one_user['lastname'].' '.$one_user['firstname'] . "</option>\n";
+      }
     }
     $sel_market .= '</select>';
 
@@ -1601,15 +1603,18 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
 
   // User comment select construction
   $opt_usercomment = '';
-  foreach ($users as $cid => $one_user) {
-    $cname = $one_user['lastname'].' '.$one_user['firstname'];
-    $opt_usercomment .= "<option value=\"$cname\"";
-    // First time default to uid of connected user (uid) then set to name
-    if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
-      $opt_usercomment .= " selected = \"selected\"";
+  if(is_array($users)) {
+    foreach ($users as $cid => $one_user) {
+      $cname = $one_user['lastname'].' '.$one_user['firstname'];
+      $opt_usercomment .= "<option value=\"$cname\"";
+      // First time default to uid of connected user (uid) then set to name
+      if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+        $opt_usercomment .= " selected = \"selected\"";
+      }
+      $opt_usercomment .= ">$cname</option>\n";
     }
-    $opt_usercomment .= ">$cname</option>\n";
   }
+
 
   $sel_usercomment = "<select name=\"sel_usercomment\">$opt_usercomment</select>";
 

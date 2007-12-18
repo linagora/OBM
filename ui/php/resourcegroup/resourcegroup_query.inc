@@ -98,7 +98,7 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
 	
   if ($restriction == "user") {
     $uid = $obm["uid"];
-    $rs = of_right_entity_for_consumer("RGroup", "user", $uid, "read");
+    $rs = of_right_entity_for_user("RGroup", $uid, "read");
     if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
       $where_restriction = " AND (rgroup_id IN (";
       foreach($rs["ids"] as $r_id) {

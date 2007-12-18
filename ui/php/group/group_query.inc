@@ -1064,7 +1064,7 @@ function run_query_group_ext_search($group) {
 	
   if ($restriction == "user") {
     $uid = $obm["uid"];
-    $rs = of_right_entity_for_consumer("Group", "user", $uid, "read");
+    $rs = of_right_entity_for_user("Group", $uid, "read");
     if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
       $where_restriction = " AND (group_id IN (";
       foreach($rs["ids"] as $r_id) {

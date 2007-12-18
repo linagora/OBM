@@ -118,6 +118,11 @@ $l_ics = "Import" ;
 $l_ics_insert = "Importer" ;
 $l_ics_file = "Fichier ICS à importer" ;
 
+$l_view_agenda = "Calendrier";
+$l_view_planning = "Planning";
+$l_range_day = "quotidienne";
+$l_range_week = "hebdomadaire";
+$l_range_month = "mensuelle";
 // Messages
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez sélectionner le ou les jours de répétition";

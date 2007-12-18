@@ -294,9 +294,9 @@ function run_query_calendar_update_occurence_state($event_id, $entity, $entity_i
   }
   if($obm['uid'] != $entity_id || $entity != 'user') {
     if( $entity == 'user') {
-      $writable = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'write', '', 'userobm');
+      $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
     } elseif($entity == 'resource') {
-      $writable = of_right_entity_for_consumer('Resource', 'user', $obm['uid'], 'write');
+      $writable = of_right_entity_for_user('Resource', $obm['uid'], 'write');
     }
     
     if (!in_array($entity_id, $writable['ids'])) {
@@ -328,8 +328,8 @@ function run_query_calendar_waiting_events() {
   $uid = $obm['uid'];
   
   $multidomain = sql_multidomain('calendarevent');
-  $writable_cal = of_right_entity_for_consumer('calendar', 'user', $uid, 'write', '', 'userobm');
-  $writable_res = of_right_entity_for_consumer('Resource', 'user', $uid, 'write');
+  $writable_cal = of_right_entity_for_user('calendar', $uid, 'write', '', 'userobm');
+  $writable_res = of_right_entity_for_user('Resource', $uid, 'write');
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $concat = array (
@@ -429,7 +429,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
   global $l_from, $l_to, $l_date, $l_resource_allocated;
   global $l_add_event_mail_head,$l_add_event_mail_subject;
 
-  $writable_cal = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'write', '', 'userobm');
+  $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
   $mail  = $calendar['mail'];
   $groups = $sel_entity_id['group'];
   $mail_title = stripslashes($calendar['title']);
@@ -475,7 +475,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
   $resources_array = $sel_entity_id['resource'];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
-    $writable_res = of_right_entity_for_consumer('Resource', 'user', $obm['uid'], 'write');
+    $writable_res = of_right_entity_for_user('Resource', $obm['uid'], 'write');
     foreach ($resources_array as $res_id) {
       if (in_array($res_id, $writable_res['ids'])) {
 	run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'A');
@@ -1393,7 +1393,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
   $groups = $calendar['group'];
   $mail = $calendar['mail'];
   $mail_title = stripslashes($calendar['title']);
-  $writable_cal = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'write', '', 'userobm');
+  $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
 
   if($calendar['task_new_id']) $task_id = $calendar['task_new_id']; 
   else $task_id = $calendar['task_id'];
@@ -1415,7 +1415,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
   $resources_array = $sel_entity_id['resource'];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
-    $writable_res = of_right_entity_for_consumer('Resource', 'user', $obm['uid'], 'write');
+    $writable_res = of_right_entity_for_user('Resource', 'user', $obm['uid'], 'write');
   } else {
     $resources_array = array();
   }
@@ -1656,7 +1656,7 @@ function run_query_calendar_quick_event_update($calendar) {
 function run_query_calendar_quick_event_insert($calendar) {
   global $cdg_sql, $obm;
 
-  $writable_cal = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'write', '', 'userobm');
+  $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
   $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
   $datebegin = $calendar['date_begin'];
@@ -1861,9 +1861,9 @@ function run_query_quick_attendee_update($params, $eve_q) {
   global $l_update_event_mail_body, $l_update_event_mail_subject ;
 
   $event_id = $eve_q->f("calendarevent_id");
-  $writable["user"] = of_right_entity_for_consumer("calendar", "user", $obm["uid"], "write", "", "userobm");
+  $writable["user"] = of_right_entity_for_user("calendar", $obm["uid"], "write", "", "userobm");
   array_push($writable["user"]["ids"], $obm["uid"]); 
-  $writable["resource"] = of_right_entity_for_consumer("Resource", "user", $obm["uid"], "write");
+  $writable["resource"] = of_right_entity_for_user("Resource", $obm["uid"], "write");
   $entities = get_calendar_event_entity( $event_id);
   run_query_calendar_delete_event_entity($params,array());
   foreach ($entities as $entity => $data) {
@@ -1968,14 +1968,14 @@ function check_calendar_access($id, $right = 'write') {
     return true;
   }
   if($right == 'write') {
-    $access = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'write', array($e['owner']), 'userobm');
+    $access = of_right_entity_for_user('calendar', $obm['uid'], 'write', array($e['owner']), 'userobm');
   } else {
     if(in_array($obm['uid'],$e['attendees']['user'])) {
       return true;
     }
-    $access = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], $right, $e['attendees']['user'], 'userobm');
+    $access = of_right_entity_for_user('calendar', $obm['uid'], $right, $e['attendees']['user'], 'userobm');
     if(count($access['ids']) == 0  && is_array($e['attendees']['resource'])) {
-      $access = of_right_entity_for_consumer('Resource', 'user', $obm['uid'], $right, $e['attendees']['resource']);
+      $access = of_right_entity_for_user('Resource', $obm['uid'], $right, $e['attendees']['resource']);
     }
   }
   if(count($access['ids']) == 0) { 
@@ -2103,7 +2103,7 @@ function get_calendar_user_readable() {
        && ($calendar['entity']['group_view'] != $c_all) ) {
     $gusers = of_usergroup_get_group_users($calendar['entity']['group_view']);
   }
-  $entity = of_right_entity_for_consumer('calendar', 'user', $uid, 'read', $gusers, 'userobm');
+  $entity = of_right_entity_for_user('calendar', $uid, 'read', $gusers, 'userobm');
 
   // Add the user own calendar
   $entity['ids'][] = $uid;
@@ -2151,7 +2151,7 @@ function get_calendar_resource_readable() {
   global $cdg_sql, $obm, $ccalendar_public_groups;
 
   $uid = $obm['uid'];
-  $entity = of_right_entity_for_consumer('Resource', 'user', $uid, 'read');
+  $entity = of_right_entity_for_user('Resource', $uid, 'read');
 
   return $entity;
 }
@@ -2969,7 +2969,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       $where_ent
       $multidomain
       $union
-      ORDER BY calendarevent_date
+      ORDER BY calendarevent_date, evententity_entity, evententity_entity_id
 ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_no_repeat_events()');
@@ -3116,7 +3116,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       $multidomain
       $union
 
-    ORDER BY calendarevent_date"; 
+    ORDER BY calendarevent_date, evententity_entity, evententity_entity_id"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_repeat_events()');
   $obm_q->query($query);
@@ -4252,7 +4252,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     ) ;
   }
   if($mail_datas['reset_resource_state']) {
-    $rattendees =  of_right_consumer_for_entity('resource', $resources, 'user', 'write');
+    $rattendees =  of_right_users_for_entity('resource', $resources, 'write');
     $rattendees = array_diff($rattendees["ids"], array($obm['uid']));
     $mail_datas['mails']['reset_resource_state'] = array (
       'subject' => sprintf($l_update_event_mail_subject,$old_title),
@@ -4287,7 +4287,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     ) ;
   }
   if ($mail_datas['add_resource']) {
-    $rattendees =  of_right_consumer_for_entity('resource', $new_resources, 'user', 'write');
+    $rattendees =  of_right_users_for_entity('resource', $new_resources, 'write');
     $rattendees = array_diff($rattendees["ids"], array($obm['uid']));    
     $mail_datas['mails']['add_resource'] = array (
       'subject' => sprintf($l_add_event_mail_subject,$title),
@@ -4311,7 +4311,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     ) ;
   }
   if ($mail_datas['remove_resource']) {
-    $rattendees =  of_right_consumer_for_entity('resource', $old_resources, 'user', 'write');
+    $rattendees =  of_right_users_for_entity('resource', $old_resources, 'write');
     $rattendees = array_diff($rattendees["ids"], array($obm['uid']));    
     $mail_datas['mails']['remove_resource'] = array (
       'subject' => sprintf($l_delete_event_mail_subject,$old_title),
@@ -4323,7 +4323,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     ) ;
   }  
   if ($mail_datas['add_exception']) {
-    $rattendees =  of_right_consumer_for_entity('resource', $resources, 'user', 'write');
+    $rattendees =  of_right_users_for_entity('resource', $resources, 'write');
     $rattendees = array_diff($rattendees["ids"], array($obm['uid']));    
     $attendees = array_merge($attendees, $rattendees);    
     $mail_datas['mails']['add_exception'] = array (
@@ -4335,7 +4335,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     ) ;
   }
   if ($mail_datas['remove_exception']) {
-    $rattendees =  of_right_consumer_for_entity('resource', $resources, 'user', 'write');
+    $rattendees =  of_right_users_for_entity('resource', $resources, 'write');
     $rattendees = array_diff($rattendees["ids"], array($obm['uid']));    
     $attendees = array_merge($attendees, $rattendees);        
     $mail_datas['mails']['remove_exception'] = array (

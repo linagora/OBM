@@ -44,7 +44,7 @@ function run_query_user_search($user) {
   $multidomain = sql_multidomain('userobm');
 
   if ($restriction == 'calendar') {
-    $users = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'read','','userobm');
+    $users = of_right_entity_for_user('calendar', $obm['uid'], 'read','','userobm');
     if ((is_array($users['ids'])) && (count($users['ids']) > 0)) {
       $where_restriction = " AND (userobm_id IN ($obm[uid], ";
       foreach($users['ids'] as $u_id) {
@@ -188,7 +188,7 @@ function run_query_user_ext_search($user) {
   else $first_row = 0;
 
   if ($restriction == 'calendar') {
-    $users = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'read','','userobm');
+    $users = of_right_entity_for_user('calendar', $obm['uid'], 'read','','userobm');
     if ((is_array($users['ids'])) && (count($users['ids']) > 0)) {
       $where_restriction = " AND (userobm_id IN ($obm[uid], ";
       foreach($users['ids'] as $u_id) {
@@ -235,7 +235,6 @@ function run_query_user_ext_search($user) {
       $where_restriction
     ORDER BY  userobm_lastname, userobm_firstname
     LIMIT $first_row, $limit";
-
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->query($query);
 

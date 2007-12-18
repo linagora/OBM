@@ -22,9 +22,7 @@ function of_right_dis_admin($entity, $entity_id, $real_entity="") {
     return;
   }
 
-  $uid = $obm["uid"];
-  $consumer_id = "$uid";
-  $admin_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "admin","", $real_entity);
+  $admin_entity = of_right_entity_for_user($entity, $obm["uid"], "admin","", $real_entity);
   $display["features"] = html_entityadmin_bar($admin_entity ,$entity_id, $entity);
 
   $consumers = of_right_consumer_for_entity($entity, $entity_id);
@@ -95,6 +93,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   $l_userSearch = phpStringToJsString("$l_users...");
   foreach ($consumers["consumer"] as $one_consumer) {
     $id = $one_consumer["id"];
+    $entity = $one_consumer["entity"];
     $label = $one_consumer["label"];
     $write = $one_consumer["write"];
     $read = $one_consumer["read"];
@@ -111,28 +110,28 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       }
     } else {
       if ($write == 1) {
-	$sel_id = "data-user-$id";
-	$div_id = "sel_accept_write-data-user-$id";
-        $dis_write_ok .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_accept_write');\"><img src=\"$ico_delete\"></a>
+	$sel_id = "data-$entity-$id";
+	$div_id = "sel_accept_write-data-$entity-$id";
+        ${'dis_'.$entity.'_write_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_accept_".$entity."_write');\"><img src=\"$ico_delete\"></a>
         $label
        <input value=\"$sel_id\" name=\"sel_accept_write[]\" type=\"hidden\" />
        </div>";
       }
       if ($read == 1) {
-	$sel_id = "data-user-$id";
-	$div_id = "sel_accept_read-data-user-$id";
-        $dis_read_ok .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_accept_read');\"><img src=\"$ico_delete\"></a>
+	$sel_id = "data-$entity-$id";
+	$div_id = "sel_accept_read-data-$entity-$id";
+        ${'dis_'.$entity.'_read_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_accept_".$entity."_read');\"><img src=\"$ico_delete\"></a>
         $label
        <input value=\"$sel_id\" name=\"sel_accept_read[]\" type=\"hidden\" />
        </div>";
       }
       if ($admin == 1) {
-	$sel_id = "data-user-$id";
-        $div_id = "sel_accept_admin-data-user-$id";
-        $dis_admin_ok .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_accept_admin');\"><img src=\"$ico_delete\"></a>
+	$sel_id = "data-$entity-$id";
+        $div_id = "sel_accept_admin-data-$entity-$id";
+        ${'dis_'.$entity.'_admin_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_accept_".$entity."_admin');\"><img src=\"$ico_delete\"></a>
         $label
        <input value=\"$sel_id\" name=\"sel_accept_admin[]\" type=\"hidden\" />
        </div>";
@@ -149,14 +148,14 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
     </td>";
 
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_user_read";
     $popup_user_add_button = "
     <a id=\"lnk_accept_read\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group_read";
     $popup_group_add_button = "
       <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
@@ -174,8 +173,24 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </td>
     </tr>
     <tr>
+    <td class=\"detailLabel\">
+    $l_groups
+    $popup_group_add_button
+    </td>
+    <td>
+    <input type=\"text\" id=\"groupReadSearch\" autocomplete=\"off\" /> 
+    </td>
+    </tr>       
+    <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_read\">
-      $dis_read_ok
+      <fieldset id='sel_accept_user_read'>
+      <legend>$l_users</legend>
+      $dis_user_read_ok
+      </fieldset>
+      <fieldset id='sel_accept_group_read'>
+      <legend>$l_groups</legend>
+      $dis_group_read_ok
+      </fieldset>
     </td>
     </tr>";
 
@@ -189,13 +204,13 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked />
     </td>";
 
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_user_write";
     $popup_user_add_button = "
       <a id=\"lnk_accept_write\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
      </a>";
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group_write";
     $popup_group_add_button = "
       <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
@@ -213,18 +228,34 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </td>
     </tr>
     <tr>
+    <td class=\"detailLabel\">
+    $l_groups
+    $popup_group_add_button
+    </td>
+    <td>
+    <input type=\"text\" id=\"groupWriteSearch\" autocomplete=\"off\" /> 
+    </td>
+    </tr>       
+    <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_write\">
-       $dis_write_ok
+      <fieldset id='sel_accept_user_write'>
+      <legend>$l_users</legend>
+      $dis_user_write_ok
+      </fieldset>
+      <fieldset id='sel_accept_group_write'>
+      <legend>$l_groups</legend>
+      $dis_group_write_ok
+      </fieldset>    
     </td>
     </tr>";
 
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_user_admin";
     $popup_user_add_button = "
       <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group_admin";
     $popup_group_add_button = "
       <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
@@ -241,9 +272,25 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <input type=\"text\" id=\"userAdminSearch\" autocomplete=\"off\" /> 
     </td>
     </tr>
+    <td class=\"detailLabel\">
+    $l_groups
+    $popup_group_add_button
+    </td>
+    <td>
+    <input type=\"text\" id=\"groupAdminSearch\" autocomplete=\"off\" /> 
+    </td>
+    </tr>       
+    <tr>
     <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_admin\">
-       $dis_admin_ok
+      <fieldset id='sel_accept_user_admin'>
+      <legend>$l_users</legend>
+      $dis_user_admin_ok
+      </fieldset>
+      <fieldset id='sel_accept_group_admin'>
+      <legend>$l_groups</legend>
+      $dis_group_admin_ok
+      </fieldset>    
     </td>
     </tr>";
     
@@ -258,7 +305,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       }
     }
   </script>
-  <form method=\"get\" name=\"f_mod_right\"
+  <form method=\"post\" name=\"f_mod_right\"
     action=\"".url_prepare($_SERVER["PHP_SELF"])."\">
 
   <fieldset class=\"detail infos\">
@@ -302,9 +349,12 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   </form>
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_admin', 'userAdminSearch');
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_write', 'userWriteSearch');
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_read', 'userReadSearch');
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_admin', 'userAdminSearch', {name:'sel_accept_admin'});
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_write', 'userWriteSearch', {name:'sel_accept_write'});
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_read', 'userReadSearch', {name:'sel_accept_read'});
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_admin', 'groupAdminSearch', {name:'sel_accept_admin'});
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_write', 'groupWriteSearch', {name:'sel_accept_write'});
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_read', 'groupReadSearch', {name:'sel_accept_read'});
     });
   </script>
 ";
@@ -322,15 +372,14 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 // Get the list of entities for the consumer given with the corresponding right
 // Parameters:
 //   - $entityu     : target entity (table name with capital)
-//   - $consumer    : consumer type
-//   - $consumer_id : consumer id
+//   - $user_id : user id
 //   - $right       : right to get and select from : "read", "write" or "admin"
 //   - $ids_set     : array of ids restricting the result
 //   - $real_entity : real data entity (eg: userobm for entity calendar)
 // Returns:
 //   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2)))
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_entity_for_consumer($entityu, $consumer, $consumer_id, $right="read", $ids_set="", $real_entity="") {
+function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set="", $real_entity="") {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -353,10 +402,6 @@ function of_right_entity_for_consumer($entityu, $consumer, $consumer_id, $right=
     $ctt[2]["type"] = "field";
     $ctt[2]["value"] = "userobm_firstname";
     $e_label = sql_string_concat($db_type, $ctt);
-    /*  } else if ($entity == "resource") {
-    $table_entity = "Resource";
-    $e_id = "e.resource_id";
-    $e_label = "e.resource_name";*/
   } else {
     $table_entity = "$entityu";
     $e_id = "e.${entity}_id";
@@ -377,13 +422,13 @@ function of_right_entity_for_consumer($entityu, $consumer, $consumer_id, $right=
     FROM EntityRight
       LEFT JOIN $table_entity as e ON entityright_entity_id = $e_id
     WHERE entityright_entity = '$entity'
-      AND entityright_consumer = '$consumer'
-      AND (entityright_consumer_id = '$consumer_id'
-           OR entityright_consumer_id = 0)
+      AND ( (entityright_consumer = 'user' AND (entityright_consumer_id = '$user_id' OR entityright_consumer_id = 0))
+        OR (entityright_consumer = 'group'  AND (entityright_consumer_id IN (SELECT of_usergroup_group_id FROM of_usergroup WHERE of_usergroup_user_id = '$user_id')
+            OR entityright_consumer_id = 0)))
       $where_right
-    ORDER BY $e_label";
+    ORDER BY entityright_entity, $e_label";
 
-  display_debug_msg($query, $cdg_sql, "of_right_entity_for_consumer()");
+  display_debug_msg($query, $cdg_sql, "of_right_entity_for_user()");
   $obm_q->query($query);
 
   $ret_array = array();
@@ -445,13 +490,13 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
     $ctt[2]["type"] = "field";
     $ctt[2]["value"] = "userobm_firstname";
     $c_label = sql_string_concat($db_type, $ctt);
-    $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'user' as entity_kind FROM UserObm";
+    $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'user' as entitydata_kind FROM UserObm";
   }
   if ($consumer == "group" || $consumer == "all" ) {
     $table_consumer = "UGroup";
     $c_id = "group_id";
     $c_label = "group_name";
-    $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'group' as entity_kind FROM UGroup";
+    $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'group' as entitydata_kind FROM UGroup";
   }
 
   if ($right != "all") {
@@ -461,16 +506,16 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
   $query = "SELECT
       entitydata_id as id,
       entitydata_label as label,
-      entity_kind as consumer,
+      entitydata_kind as consumer,
       entityright_consumer_id,
       entityright_read,
       entityright_write,
       entityright_admin
     FROM EntityRight
-      LEFT JOIN ($table_consumer) as entity ON entityright_consumer_id = entitydata_id AND entityright_consumer = entity_kind
-    WHERE entityright_entity_id IN ($entity_id)
+      LEFT JOIN ($table_consumer) as entity ON entityright_consumer_id = entitydata_id AND entityright_consumer = entitydata_kind
+    WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity'
       $where_right
-    ORDER BY entitydata_label";
+    ORDER BY entitydata_kind, entitydata_label";
   display_debug_msg($query, $cdg_sql, "of_right_consumer_for_entity()");
   $obm_q->query($query);
   $ret_array = array();
@@ -478,6 +523,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
     $id = $obm_q->f("id");
     $label = $obm_q->f("label");
     $entity_id = $obm_q->f("entityright_entity_id");
+    $entity = $obm_q->f("consumer");
     $read = $obm_q->f("entityright_read");
     $write = $obm_q->f("entityright_write");
     $admin = $obm_q->f("entityright_admin");
@@ -485,7 +531,8 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
     $con_array[] = array(
 			 "id"    => $id,
 			 "label" => $label,
-			 "entity_id" => $entity_id,
+                         "entity_id" => $entity_id,
+                         "entity" => $entity,
 			 "read" => $read,
 			 "write" => $write,
 			 "admin" => $admin
@@ -515,7 +562,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
 function of_right_update_right($param, $entity, $real_entity="",$check_perms=true) {
   global $cdg_sql, $obm, $err, $l_of_right_err_auth,$obm;
 
-  $consumer = "user";
+  $consumer_ereg = "/^data-(user|group)-([0-9]+)$/";
 
   $eid = $param["entity_id"];
   $accept_write = $param["accept_write"];
@@ -541,9 +588,9 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
   // Rights on external objects : defined by module access
   // Rights on userobm entity : user need write right on the entity
   // If user manipulating NOT its own data, check if he has rights
-  if (($eid != $obm["uid"]) && $check_perms) {
-    $writable_entity = of_right_entity_for_consumer($entity, "user", $obm["uid"], "admin", "", $real_entity);
-    if (!in_array($eid, $writable_entity["ids"])) {
+  if (($eid != $obm["uid"] || $real_entity != 'userobm') && $check_perms) {
+    $admin_entity = of_right_entity_for_user($entity, $obm["uid"], "admin","", $real_entity);
+    if (!in_array($eid, $admin_entity["ids"])) {
       $err["msg"] = $l_of_right_err_auth;
       return false;
     }
@@ -570,7 +617,7 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
     ) VALUES (
       '$entity',
       '$eid',
-      '$consumer',
+      'user',
       '0',
       '$pr',
       '$pw')";
@@ -581,9 +628,9 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
   if (! $public_read) {
     // Insert all read entries (with write right correctly set)
     foreach ($accept_read as $key => $ref) {
-      $ref_ent = substr($ref, 0, 10);
-      if ($ref_ent == "data-user-") {
-	$id = str_replace("data-user-","", $ref);
+      if (preg_match($consumer_ereg,$ref,$matches)) {
+        $consumer = $matches[1];
+        $id = $matches[2];          
 	$w = (in_array($ref, $accept_write) ? 1 : 0);
 	$a = (in_array($ref, $accept_admin) ? 1 : 0);
 	$query = "INSERT INTO EntityRight (
@@ -611,10 +658,10 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
   if (! $public_write) {
     // Insert all write entries not already done by the read loop
     foreach ($accept_write as $key => $ref) {
-      $ref_ent = substr($ref, 0, 10);
-      if ($ref_ent == "data-user-") {
-	if (! in_array($ref, $accept_read)) {
-	  $id = str_replace("data-user-","", $ref);
+      if (preg_match($consumer_ereg,$ref,$matches)) {
+        if (! in_array($ref, $accept_read)) {
+          $consumer = $matches[1];
+          $id = $matches[2];          
 	  $a = (in_array($ref, $accept_admin) ? 1 : 0);
 	  $query = "INSERT INTO EntityRight (
             entityright_entity,
@@ -639,10 +686,11 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
 
   foreach ($accept_admin as $key => $ref) {
     $ref_ent = substr($ref, 0, 10);
-    if ($ref_ent == "data-user-") {
+    if (preg_match($consumer_ereg,$ref,$matches)) {
       if ((! in_array($ref, $accept_read))
-	  && (! in_array($ref, $accept_write))) {
-        $id = str_replace("data-user-","", $ref);
+        && (! in_array($ref, $accept_write))) {
+        $consumer = $matches[1];
+        $id = $matches[2];
         $query = "INSERT INTO EntityRight (
           entityright_entity,
           entityright_entity_id,
@@ -663,5 +711,127 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
 
   return true;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Get the list of users for the entity given with the corresponding right
+// Parameters:
+//   - $entity      : target entity
+//   - $entity_id   : entity id
+//   - $right       : right to get and select from : "all", "read", "write" or
+//                    "admin"
+// Returns:
+//   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2))
+///////////////////////////////////////////////////////////////////////////////
+function of_right_users_for_entity($entity, $entity_id, $right="all") {
+  global $cdg_sql;
 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  if(count($entity_id) == 0) {
+    return array("ids" => array(), "entity" => array());
+  }
+  if(is_array($entity_id)) {
+    $entity_id = implode(",",$entity_id);
+  }
+
+  if ($right != "all") {
+    $where_right = "AND entityright_$right = 1";
+  }
+  $query = "SELECT
+      userobm_firstname,
+      userobm_lastname,
+      userobm_id,
+      entityright_read,
+      entityright_write,
+      entityright_admin
+    FROM UserObm
+    LEFT JOIN of_usergroup ON userobm_id = of_usergroup_user_id
+    LEFT JOIN EntityRight ON (userobm_id = entityright_consumer_id AND entityright_consumer = 'user')
+                          OR (of_usergroup_group_id = entityright_consumer_id AND entityright_consumer = 'group') 
+    WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity' $where_right
+    ORDER BY userobm_firstname, userobm_lastname 
+  ";
+    
+  display_debug_msg($query, $cdg_sql, "of_right_users_for_entity()");
+  $obm_q->query($query);
+  $ret_array = array();
+  while($obm_q->next_record()) {
+    $id = $obm_q->f("id");
+    $label = $obm_q->f("userobm_lastname")." ".$obm_q->f("userobm_firstname");
+    $entity_id = $obm_q->f("entityright_entity_id");
+    $read = $obm_q->f("entityright_read");
+    $write = $obm_q->f("entityright_write");
+    $admin = $obm_q->f("entityright_admin");
+    $id_array[] = $id;
+    $con_array[] = array(
+			 "id"    => $id,
+			 "label" => $label,
+			 "entity_id" => $entity_id,
+			 "read" => $read,
+			 "write" => $write,
+                         "admin" => $admin
+			 );
+  }
+
+  $ret_array["ids"] = array();
+  if (is_array($id_array)) {
+    $ret_array["ids"] = $id_array;
+  }
+  $ret_array["consumer"] = array();
+  if (is_array($con_array)) {
+    $ret_array["consumer"] = $con_array;
+  }
+
+  return $ret_array;
+
+}
+/* ACL object model
+class OBM_Acl {
+  
+  var cache;
+
+  function &getInstance() {
+    static $singleton = null;
+    if (is_null($singleton)) {
+      $singleton = new OccurrenceFactory();
+    }
+    return $singleton;
+  }
+
+  function isAllowed($user_id, $entity_id, $entity, $action) {
+
+  }
+
+  function canRead($user_id, $entity_id, $entity) {
+
+  }
+
+  function canWrite($user_id, $entity_id, $entity) {
+
+  }
+
+  function canAdmin($user_id, $entity_id, $entity) {
+
+  }
+
+  function getEntityRoles($entity_id, $entity, $action = "all") {
+
+  }
+
+  function getEntityReaders($entity_id, $entity) {
+
+  }
+  
+  function getEntityWriters($entity_id, $entity) {
+
+  }
+
+  function getEntityAdmins($entity_id, $entity) {
+
+  }
+
+  function getEntityACL($entity_id, $entity) {
+
+  }
+}
+  */
 ?>

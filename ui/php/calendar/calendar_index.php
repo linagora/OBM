@@ -45,7 +45,9 @@ if (isset($_SESSION['cal_entity_id'])){
 if (isset($_SESSION['cal_category_filter'])){
   $cal_category_filter = $_SESSION['cal_category_filter'];
 }
-if (isset($_SESSION['cal_view'])){
+if (isset($params['cal_view'])) {
+  $cal_view = $params['cal_view'];
+} elseif (isset($_SESSION['cal_view'])){
   $cal_view = $_SESSION['cal_view'];
 } else {
   $cal_view = "agenda";
@@ -183,14 +185,16 @@ if ($popup) {
 }
 
 
+$display['search'] = dis_calendar_view_bar($cal_view, $cal_range, $params["date"],$action);
+
 if ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_wait = run_query_calendar_waiting_events();
   if ($obm_wait->nf() != 0) {
     $display['msg'] .= display_warn_msg($l_waiting_events.' : '.$obm_wait->nf());
-    $display['detail'] = html_calendar_waiting_events($obm_wait);
+    $display['detail'] .= html_calendar_waiting_events($obm_wait);
   } else {
-    $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
+    $display['detail'] .= dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
   }
 
 } elseif ($action == 'waiting_events') {
@@ -207,7 +211,7 @@ if ($action == 'index') {
 } elseif ($action == 'decision') {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
-    $display['search'] = html_calendar_dis_conflict($params, $conflicts) ;
+    $display['search'] .= html_calendar_dis_conflict($params, $conflicts) ;
     $display['detail'] = html_calendar_conflict_form($params);
     $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
   } else {
@@ -246,7 +250,7 @@ if ($action == 'index') {
   if (check_calendar_data_form($params)) {
     if ( (!$params['force'])
 	 && ($conflicts = check_calendar_conflict($params, $entities)) ) {
-      $display['search'] = html_calendar_dis_conflict($params,$conflicts) ;
+      $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
       $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
       $display['detail'] = dis_calendar_event_form($action, $params, '',$entities);
     } else {
@@ -255,7 +259,7 @@ if ($action == 'index') {
       $mail_data = run_query_prepare_event_mail($params, $action);
       calendar_send_mail($mail_data);
       $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
-      $params['date'] = $params['date_begin'];
+      $params["date"] = of_isodate_convert(strtotime($params["date_begin"]));
       $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
     }
   } else {
@@ -305,7 +309,7 @@ if ($action == 'index') {
       check_calendar_data_form($params)) {
     if ( (!$params['force'])
 	 && ($conflicts = check_calendar_conflict($params, $entities)) ) {
-      $display['search'] = html_calendar_dis_conflict($params,$conflicts) ;
+      $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
       $display['msg'] .= display_err_msg("$l_event : $l_update_error");
       $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
     } else {
@@ -313,7 +317,7 @@ if ($action == 'index') {
       run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
       calendar_send_mail($mail_data);
       $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
-      $params['date'] = $params['date_begin'];
+      $params["date"] = of_isodate_convert(strtotime($params["date_begin"]));
       $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
     }
   } else {
@@ -966,7 +970,7 @@ function update_calendar_action() {
   if($id) {
     $event_info = get_calendar_event_info($id);
     $owner = $event_info['owner'];
-    $writable_entity = of_right_entity_for_consumer('calendar', 'user', $obm['uid'], 'write', '', 'userobm');
+    $writable_entity = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
     if ($owner != $obm['uid'] && !in_array($owner,$writable_entity['ids'])) {
       // Detail Update
       unset($actions['calendar']['detailupdate']);

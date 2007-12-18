@@ -116,7 +116,7 @@ $phpversion = substr(phpversion(),0,1);
 if ($phpversion >= 5) {
   $ccalendar_weekstart = 'monday';
 } else {
-  $ccalendar_weekstart = 'wednesday + 2 hours'; // +2h to fix a DST php4 bug //
+  $ccalendar_weekstart = 'monday + 2 hours'; // +2h to fix a DST php4 bug //
 }
 
 // calendar alert values (seconds => label or minutes displayed)
