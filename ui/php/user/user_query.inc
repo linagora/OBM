@@ -1063,7 +1063,7 @@ function run_query_user_public_owner_group($uid) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : UserObmGroup global update
 // Parameters:
-//   - $user[] : user hash info : keys used : id, group_nb, group_X
+//   - $user[] : user hash info : keys used : user_id, group_nb, group_X
 // Return: number of usergroup inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_update_user_group($user) {
@@ -1177,6 +1177,31 @@ function get_nb_user_admin() {
   $resultat = $obm_q->f('nb');
 
   return $resultat;
+}
+
+
+/**
+ * Return the public group hash [name] => id
+ **/
+function get_user_group_public_hash() {
+  global $cdg_sql;
+
+  $groups = array();
+  $query = "SELECT group_id, group_name
+    FROM UGroup
+    WHERE group_privacy=0";
+
+  display_debug_msg($query, $cdg_sql, 'get_user_group_public_hash()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f('group_id');
+    $name = trim($obm_q->f('group_name'));
+    $groups[$name] = $id;
+  }
+
+  return $groups;
 }
 
 
@@ -1371,24 +1396,29 @@ function check_user_data_form($p_id, $user) {
   
   // We can't handle a user with a more privileged profile
   // Or same privilege with 'impair' profile
+  // If user profile level is not set, OK
   $level = $profiles[$obm['profile']]['level'];
   $managepeers = $profiles[$obm['profile']]['level_managepeers'];
-  if (($profiles[$profile]['level'] < $level)
-      || (($profiles[$profile]['level'] == $level) && (! $managepeers))) {
-    $err['msg'] = "$l_profile_privilege_error";
-    $err['field'] = 'profile';
-    return false;
+  if (isset($profiles[$profile]['level'])) {
+    if (($profiles[$profile]['level'] < $level)
+	|| (($profiles[$profile]['level'] == $level) && (! $managepeers))) {
+      $err['msg'] = "$l_profile_privilege_error";
+      $err['field'] = 'profile';
+      return false;
+    }
   }
   
   if ($action == 'update') {
     $u = get_user_info($id);
     $usr_profile = $u['perms'];
-    if (($profiles[$usr_profile]['level'] < $level)
-        || (($profiles[$usr_profile]['level'] == $level) && (! $managepeers))) {
-      $err['msg'] = "$l_profile_privilege_error";
-      $err['field'] = 'profile';
-      return false;
-    }    
+    if (isset($profiles[$usr_profile]['level'])) {
+      if (($profiles[$usr_profile]['level'] < $level)
+	  || (($profiles[$usr_profile]['level'] == $level) && (! $managepeers))) {
+	$err['msg'] = "$l_profile_privilege_error";
+	$err['field'] = 'profile';
+	return false;
+      }
+    }
   }
 
 

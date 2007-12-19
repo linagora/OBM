@@ -1855,7 +1855,8 @@ function dis_user_import_index() {
   global $l_lastname, $l_firstname, $l_login, $l_password, $l_password_type;
   global $l_mail, $l_email, $l_quota, $l_email_nomade, $l_access_nomade;
   global $l_title, $l_phone, $l_mphone, $l_fax, $l_company, $l_direction;
-  global $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal, $l_desc;
+  global $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
+  global $l_desc, $l_group;
   global $l_import_msg, $l_file_format, $l_perms, $l_local_copy;
 
   $display['title'] = "<h1 class=\"title\">$l_user : $l_header_import</h1>";
@@ -1897,6 +1898,7 @@ function dis_user_import_index() {
     <th>28</th>
     <th>29</th>
     <th>30</th>
+    <th>31</th>
   </tr>
   <tr>
     <th>$l_kind</th>
@@ -1929,6 +1931,7 @@ function dis_user_import_index() {
     <th>$l_town</th>
     <th>$l_expresspostal</th>
     <th>$l_desc</th>
+    <th>$l_group</th>
   </tr>
   </thead>
   <tr>
@@ -1962,6 +1965,7 @@ function dis_user_import_index() {
     <td>Ramonville</td>
     <td>cedex 5</td>
     <td>nice guy</td>
+    <td>Direction, Production</td>
   </tr>
   <tr>
     <td colspan=\"35\">$l_import_msg</td>
@@ -2011,7 +2015,7 @@ function html_user_import_file() {
  * Process Import file
  **/
 function dis_user_import_file_run($params) {
-  global $obm, $display, $err, $ccscd_tab, $l_user, $l_header_import;
+  global $obm, $display, $err, $ccscd_tab, $l_user, $l_header_import, $l_group;
   global $l_login, $l_lastname, $l_firstname, $l_email, $l_login_in_use;
   global $l_file_error;
 
@@ -2062,6 +2066,7 @@ function dis_user_import_file_run($params) {
   $c_town = $cpt++;
   $c_cdx = $cpt++;
   $c_description = $cpt++;
+  $c_group = $cpt++;
 
   $domain_id = $obm['domain_id'];
   $d = of_domain_get_domain_infos($domain_id, true);
@@ -2073,12 +2078,17 @@ function dis_user_import_file_run($params) {
     <th>$l_lastname</th>
     <th>$l_firstname</th>
     <th>$l_email</th>
+    <th># $l_group</th>
     <th></th>
   </tr>
   </thead>";
 
+  $groups = get_user_group_public_hash();
+  foreach($groups as $name => $id) {
+    $groups[strtoupper($name)] = $id;
+  }
   $obm_q = new DB_OBM;
-  $multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain('userobm');
   $num_line = 0;
   $fh = fopen($file, 'r');
   if (! $fh) {
@@ -2088,6 +2098,8 @@ function dis_user_import_file_run($params) {
 
   while ( ($row = fgetcsv($fh, 2000, $csv_sep)) ) {
     $num_line++;
+    $nb_group_ins = 0;
+    $user['user_id'] = 0;
     $user['kind'] = addslashes(trim($row[$c_kind]));
     $user['lastname'] = addslashes(trim($row[$c_lastname]));
     $user['firstname'] = addslashes(trim($row[$c_firstname]));
@@ -2153,11 +2165,23 @@ function dis_user_import_file_run($params) {
     } else {
       // Insert the user
       if (check_user_data_form('', $user)) {
-	$user['id'] = run_query_user_insert($user);
+	$user['user_id'] = run_query_user_insert($user);
 	$res = '+';
+	// handle groups membership
+	$group = trim(strtok($row[$c_group],','));
+	$cpt_g = 0;
+	while ($group) {
+	  if (array_key_exists($group, $groups)) {
+	    $cpt_g++;
+	    $user["group_$cpt_g"] = $groups[$group];
+	  }
+	  $group = trim(strtok(','));
+	}
+	$user['group_nb'] = $cpt_g;
+	$nb_group_ins = run_query_user_update_user_group($user);
       } else {
 	// User not ok, stop for this row
-	$user['id'] = false;
+	$user['user_id'] = false;
 	$res = "! $err[field] - $err[msg]";
       }
     }
@@ -2168,6 +2192,7 @@ function dis_user_import_file_run($params) {
       <td>$user[lastname]</td>
       <td>$user[firstname]</td>
       <td>$user[email]</td>
+      <td>$nb_group_ins</td>
       <td>$res</td>
     </tr>";
   }
