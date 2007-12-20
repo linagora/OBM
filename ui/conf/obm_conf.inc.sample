@@ -12,7 +12,7 @@
 // Global parameters --------------------------------------------------------//
 
 // OBM host (for mail links)
-$cgp_host = 'http://obm/';
+// CGP_HOST IS NOW IN obm_conf.ini
 
 // Resources alias absolute path. (default value is '/images')
 // $resources_path = "$cgp_host/images"; 

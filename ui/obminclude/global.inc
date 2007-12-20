@@ -20,9 +20,6 @@ $c_focsys = 3;
 
 // Global parameters --------------------------------------------------------//
 
-// OBM host
-$cgp_host = 'http://obmlocal/';
-
 // OBM default resources path
 $resources_path = '/images';
 
@@ -261,6 +258,7 @@ $obmdb_password = $ini_array['password'];
 // Single or multi domain
 $c_singleNameSpace = $ini_array['singleNameSpace'];
 
+$cgp_host = $ini_array['external-protocol'].'://'.$ini_array['external-url'].$ini_array['obm-prefix']
 //------------------//
 // Services enabled //
 //------------------//
