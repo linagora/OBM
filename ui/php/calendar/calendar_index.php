@@ -233,11 +233,6 @@ if ($action == 'index') {
   $cal_view = "agenda";
   $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
 
-} elseif ($action == 'planning') {
-///////////////////////////////////////////////////////////////////////////////
-  $cal_view = "planning";
-  $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
-
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_calendar_event_form($action, $params, '', $cal_entity_id);
@@ -400,7 +395,20 @@ if ($action == 'index') {
     $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
   } else {
     $display['msg'] .= display_err_msg($err['msg']);
-  } 
+  }
+} elseif ($action == 'update_alert') {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_calendar_event_alert_insert($params['calendar_id'], $params['user_id'],array($params['alert'] => 'dummy'));
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
+  } else {
+    $display['msg'] .= display_err_msg("$l_event  : $err[msg]");
+  }
+  if (check_calendar_access($params["calendar_id"], "all")) {
+    $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+  } else {
+    $display['msg'] .= display_err_msg($err['msg']);
+  }   
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id'])) {
@@ -742,14 +750,6 @@ function get_calendar_action() {
     'Condition'=> array ('all')
                                          );
 
-  // Planning
-  $actions['calendar']['planning'] = array (
-    'Name'     => $l_header_planning,
-    'Url'      => "$path/calendar/calendar_index.php?action=planning&amp;date=$date",
-    'Right'    => $cright_read, 
-    'Condition'=> array ('all') 
-                                    	 );
-
   // Decision
   $actions['calendar']['calendar'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=calendar",
@@ -762,7 +762,7 @@ function get_calendar_action() {
     'Url'      => "$path/calendar/calendar_index.php?action=new",
     'Right'    => $cright_write,
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
-       'update_decision','decision','update','delete', 'new_meeting',
+       'update_decision','update_alert','decision','update','delete', 'new_meeting',
        'agenda', 'rights_admin','rights_update', 'waiting_events','planning')
 		);
 
@@ -779,7 +779,7 @@ function get_calendar_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id&amp;date=$date",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult','update_alert','update_decision') 
   );
 
   // Duplicate
@@ -843,10 +843,17 @@ function get_calendar_action() {
 
   // Update
   $actions['calendar']['update_decision'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=update",
+    'Url'      => "$path/calendar/calendar_index.php?action=update_decision",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                          );
+
+  // Update
+  $actions['calendar']['update_alert'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=update_alert",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                         );  
 
   // Waiting events
   $actions['calendar']['waiting_events'] = array (

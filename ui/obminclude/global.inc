@@ -385,11 +385,11 @@ $password_encryption = strtoupper($password_encryption);
 
 // Automate commands
 $cmd_halt = "sudo /sbin/halt";
-$cmd_update = "../$path/auto/incrementalUpdate.pl";
+$cmd_update = "$path/../auto/incrementalUpdate.pl";
 $cmd_check_update = "ps aux | grep auto/incrementalUpdate.pl | grep -v grep";
-$cmd_mailforward = "../$path/auto/mailChangeSieve.pl";
-$cmd_vacation = "../$path/auto/mailChangeSieve.pl";
-$cmd_ldap_passwd = "../$path/auto/ldapChangePasswd.pl";
+$cmd_mailforward = "$path/../auto/mailChangeSieve.pl";
+$cmd_vacation = "$path/../auto/mailChangeSieve.pl";
+$cmd_ldap_passwd = "$path/../auto/ldapChangePasswd.pl";
 
 $section = $cgp_show['module'][$module];
 
@@ -689,7 +689,7 @@ $global_dis_debug_param = '';
 // Path to the OBM php root (if not set)
 if ($path == '') {
   if ($module == '')
-    $path = '';
+    $path = '.';
   else 
     $path = '..';
 }

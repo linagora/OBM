@@ -3,18 +3,43 @@ include_once("obminclude/lang/fr/calendar.inc");
 include_once("php/calendar/calendar_query.inc");
 include_once("CronJob.class.php");
 
+/**
+ * CalendarAlertCronJob 
+ * 
+ * @uses CronJob
+ * @package 
+ * @version $id:$
+ * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
+ * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @license GPL 2.0
+ */
 class CalendarAlertCronJob extends CronJob{
 
   var $jobDelta = 120;
 
+  /**
+   * mustExecute 
+   * 
+   * @param mixed $date 
+   * @access public
+   * @return void
+   */
   function mustExecute($date) {
     return true;
     $min = date("i");
-    return ($min%2 === 0);
+    $modulo = $this->jobDelta / 60;
+    return ($min%$modulo === 0);
   }
 
+  /**
+   * execute 
+   * 
+   * @param mixed $date 
+   * @access public
+   * @return void
+   */
   function execute($date) {
-    $delta = $this->jobDelta --;
+    $delta = $this->jobDelta - 1;
     $this->getAlerts($date, $date + $delta);
 
     $of = &OccurrenceFactory::getInstance();
@@ -25,15 +50,17 @@ class CalendarAlertCronJob extends CronJob{
       $delta = $this->getAlertDelta($event->id);
       
       $this->logger->debug("Alert for event ".$event->id." will be sent");
+      $consult_link = "$GLOBALS[cgp_host]/calendar/calendar_index.php?action=detailconsult&calendar_id=".$event->id;
       
       $events[$event->id] = array (
-        "subject" => sprintf($l_alert_mail_subject,addslashes($event->title)),
+        "subject" => sprintf($GLOBALS['l_alert_mail_subject'],addslashes($event->title)),
         "message" => sprintf($l_alert_mail_body,
                         addslashes($event->title), 
                         date('d/m/Y H:i',$occurrence->date + $delta), 
-                        date('d/m/Y H:i',$occurrence->date + $event->duration + $delta),
                         ($delta/60),
-                        $event->id
+                        $event->id,
+                        of_date_format(), date("H:i")
+                        ,$GLOBALS['cgp_host']
                      ),
         "recipents" => array_keys($event->attendee["user"]),
         "owner" => $event->owner
@@ -49,7 +76,7 @@ class CalendarAlertCronJob extends CronJob{
       }
     }    
 
-    $this->deleteDeprecatedAlerts($date);
+    $this->deleteDeprecatedAlerts($date + $delta);
 
     return true;
   }

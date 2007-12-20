@@ -1415,7 +1415,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
   $resources_array = $sel_entity_id['resource'];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
-    $writable_res = of_right_entity_for_user('Resource', 'user', $obm['uid'], 'write');
+    $writable_res = of_right_entity_for_user('Resource', $obm['uid'], 'write');
   } else {
     $resources_array = array();
   }
@@ -3226,25 +3226,30 @@ function run_query_get_one_event_exception($calendar_id) {
  * @access public
  * @return $alerts array ('second' => 'label')
  */
-function get_one_event_user_alert($event_id, $user_id) {
+function get_one_event_user_alert($event_id, $user_id = null) {
   global $cdg_sql;
 
   $alerts = array();
   $obm_q = new DB_OBM;
-
+  
   $query = "SELECT
-     calendaralert_duration
+    calendaralert_duration,
+    calendaralert_user_id
    FROM CalendarAlert
-   WHERE calendaralert_event_id='$event_id'
-     AND calendaralert_user_id='$user_id'"; 
+   WHERE calendaralert_event_id='$event_id' "; 
+
+  if($user_id) {
+    $query .= "AND calendaralert_user_id='$user_id'";
+  }
 
   display_debug_msg($query, $cdg_sql, 'get_one_event_user_alert()');
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
     $dur = $obm_q->f('calendaralert_duration');
+    $id = $obm_q->f('calendaralert_user_id');
     $dur_min = $dur / 60;
-    $alerts[$dur] = $dur_min;
+    $alerts[$id] = $dur;
   }
 
   return $alerts;

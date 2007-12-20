@@ -89,7 +89,7 @@ $ico_logout         = "$theme_path/logout.png";
 $ico_login          = "$theme_path/arrow_off.gif";  
 $ico_datepicker     = "$theme_path/ico_datepicker.png";
 $ico_colorpicker    = "$theme_path/ico_colorpicker.gif";
-$ico_delete         = "$theme_path/ico_delete.gif";
+$ico_delete         = "$theme_path/ico_trash.png";
 $ico_cancel         = "$theme_path/ico_delete.gif";
 $ico_validate       = "$theme_path/ico_validate.gif";
 $ico_update         = "$theme_path/ico_update.gif";
@@ -123,17 +123,28 @@ $preview_default    = "$theme_path/preview_theme.gif";
 $img_home           = "$theme_path/home_obm.png";
 
 // Agenda Icons
-$ico_resize         = "$theme_path/ico_resize.gif";
-$ico_previous       = "$theme_path/ico_previous.gif";
-$ico_next           = "$theme_path/ico_next.gif";
-$ico_meeting        = "$theme_path/ico_meeting.gif";
-$ico_periodic       = "$theme_path/ico_calendar_repeat.gif";
-$ico_popup_close    = "$theme_path/ico_popup_close.gif";
-$popup_queue        = "$theme_path/popup_queue.gif";
-$ico_day_view       = "$theme_path/ico_calendar_day_view.png";
-$ico_week_view      = "$theme_path/ico_calendar_week_view.png";
-$ico_month_view     = "$theme_path/ico_calendar_month_view.png";
-$ico_list_view      = "$theme_path/ico_calendar_list_view.png";
+$ico_resize                 = "$theme_path/ico_resize.gif";
+$ico_previous               = "$theme_path/ico_previous.gif";
+$ico_next                   = "$theme_path/ico_next.gif";
+$ico_meeting                = "$theme_path/ico_meeting.gif";
+$ico_periodic               = "$theme_path/ico_calendar_repeat.gif";
+$ico_popup_close            = "$theme_path/ico_popup_close.gif";
+$popup_queue                = "$theme_path/popup_queue.gif";
+$ico_day_view               = "$theme_path/ico_calendar_day_view.gif";
+$ico_week_view              = "$theme_path/ico_calendar_week_view.gif";
+$ico_month_view             = "$theme_path/ico_calendar_month_view.gif";
+$ico_day_view_current       = "$theme_path/ico_calendar_day_view_current.gif";
+$ico_week_view_current      = "$theme_path/ico_calendar_week_view_current.gif";
+$ico_month_view_current     = "$theme_path/ico_calendar_month_view_current.gif";
+$ico_list_view              = "$theme_path/ico_calendar_list.gif";
+$ico_agenda_view            = "$theme_path/ico_calendar_agenda.gif";
+$ico_planning_view          = "$theme_path/ico_calendar_planning.gif";
+$ico_printable_view         = "$theme_path/ico_calendar_printable.gif";
+$ico_list_view_current      = "$theme_path/ico_calendar_list_current.gif";
+$ico_agenda_view_current    = "$theme_path/ico_calendar_agenda_current.gif";
+$ico_planning_view_current  = "$theme_path/ico_calendar_planning_current.gif";
+$ico_printable_view_current = "$theme_path/ico_calendar_printable_current.gif";
+
 // Company Icons
 $ico_clipboard      = "$theme_path/ico_clipboard.gif";
 

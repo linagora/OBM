@@ -8,10 +8,11 @@ define("L_ERROR",2);
 define("L_ALERT",1);
 define("L_CRITICAL",0);
 
+
 class Logger {
 
   var $className;
-
+  
   function Logger($className) {
     $this->className = $className;
   }
@@ -48,7 +49,26 @@ class Logger {
   // TODO set log handler
   function log($message,$level, $caller) {
     if($level <= L_LEVEL) {
-      echo date("Y-m-d H:i:s")." [$level] [$caller] : $message \n";
+      echo date("Y-m-d H:i:s")." [".Logger::getLevelLabel($level)."] [$caller] : $message \n";
+    }
+  }
+
+  function getLevelLabel($level) {
+    switch($level) {
+    case L_CORE :
+      return "Core";
+    case L_DEBUG :
+      return "Debug";
+    case L_INFO :
+      return "Info";
+    case L_WARN :
+      return "Warning";
+    case L_ERROR :
+      return "Error";
+    case L_ALERT : 
+      return "Alert";
+    case L_CRITICAL :
+      return "Fatal";
     }
   }
   

@@ -169,9 +169,9 @@ class OBM_Challenge_Auth extends Auth {
 
       $where_domain = "AND userobm_domain_id='$domain'";
 
-      if (isset($login)) {
-        $obm["login"] = $login; // provides access for loginform.ihtml
-      }
+    }
+    if (isset($login)) {
+      $obm["login"] = $login; // provides access for loginform.ihtml
     }
 
     $user_table = $this->database_table;
@@ -216,7 +216,6 @@ class OBM_Challenge_Auth extends Auth {
       default:
         break;
     }
-
     if (global_allow_access($perm)) {
       if ($encrypted == $pass) {
         $unfreeze = global_unfreeze_user($uid);

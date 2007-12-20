@@ -93,6 +93,7 @@ $l_select_group = "Choisir groupe";
 $l_repeat_update = "Mettre à jour toutes les répétitions à venir";
 $l_go_to = "Aller à";
 $l_refuse = "Refuser";
+$l_state = "Partcipation";
 $l_change_state = "Votre participation à l'évenement";
 $l_force_insert = "Forcer l'insertion";
 $l_refuse_insert = "Refuser l'évenement";
@@ -118,11 +119,21 @@ $l_ics = "Import" ;
 $l_ics_insert = "Importer" ;
 $l_ics_file = "Fichier ICS à importer" ;
 
+$l_cal_view = "Type d'affichage";
+$l_cal_range = "Période d'affichage";
 $l_view_agenda = "Calendrier";
 $l_view_planning = "Planning";
 $l_range_day = "quotidienne";
 $l_range_week = "hebdomadaire";
 $l_range_month = "mensuelle";
+$l_view_agenda_desc = "Vue calendrier, cette vue est éditable";
+$l_view_printable_desc = "Vue imprimable du calendrier, cette vue n'est pas éditable";
+$l_view_planning_desc = "Vue planning du calendrier, cette vue n'est pas éditable";
+$l_view_list_desc = "Liste des événements, cette vue n'est pas éditable";
+$l_view_week_desc = "Voir les événements sur une semaine";
+$l_view_day_desc = "Voir les événements sur un jour";
+$l_view_month_desc = "Voir les événements sur un mois";
+
 // Messages
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez sélectionner le ou les jours de répétition";
@@ -180,6 +191,7 @@ $l_delete_event_mail_subject = "Suppression evenement sur OBM : %s";
 $l_delete_exception_mail_subject = "Modification evenement sur OBM : %s";
 $l_add_exception_mail_subject = "Modification evenement sur OBM : %s";
 $l_update_state_mail_subject = "Participation a l'evenement sur OBM : %s";
+$l_alert_mail_subject = "Evenement imminent : %s";
 
 $l_add_event_mail_body = 
 "Message automatique envoyé par OBM
@@ -321,6 +333,19 @@ La participation de %s à l'événement %s est %s.
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
 %s";
+
+$l_alert_mail_body = 
+"Message automatique envoyé par OBM
+------------------------------------------------------------------
+RENDEZ-VOUS IMMINENT
+------------------------------------------------------------------
+
+L'événement %s aura lieu à %s soit dans %s minutes (lieu : %s).
+
+:: Pour plus de détails sur l'événement : %s
+
+-------------------------------------------------------------------
+Ce message a été envoyé le %s à %s automatiquement par OBM %s";
 
 $l_unknown = "Inconnu";
 $l_calendar_visible = "Agendas Visibles";

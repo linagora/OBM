@@ -56,34 +56,80 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
  */
 function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   global $ico_week_view, $ico_day_view, $ico_month_view, $ico_list_view;
-  global $l_week, $l_day, $l_month, $l_list;
+  global $ico_week_view_current, $ico_day_view_current, $ico_month_view_current;
+  global $ico_agenda_view, $ico_printable_view, $ico_planning_view, $ico_list_view_current;
+  global $ico_agenda_view_current, $ico_printable_view_current, $ico_planning_view_current;
+  global $l_cal_range, $l_cal_view;
+  global $l_view_agenda_desc, $l_view_printable_desc, $l_view_planning_desc, $l_view_list_desc;
+  global $l_view_week_desc, $l_view_day_desc, $l_view_month_desc;
   global $path;
+  if($p_kind) {
+    ${"ico_".$p_kind."_view"} = ${"ico_".$p_kind."_view_current"};
+  }
+  if($p_range) {
+    ${"ico_".$p_range."_view"} = ${"ico_".$p_range."_view_current"};
+  }
+
   $block = "
-    <div style='margin:0;padding:0'>
-  <div style='margin:0;padding:0'>
+  <script type=\"text/javascript\">
+    function calendarViewToolTip(el, display) {
+      el = $(el); 
+      if(display) {
+        $('calendarViewToolTip').setHTML(el.getProperty('longdesc'));
+      } else {
+        $('calendarViewToolTip').setHTML('');
+      }
+    }
+  </script>
+  <fieldset style=\"display:inline;margin: 0; padding:0;\">
+  <legend>$l_cal_view</legend>
   <a href=\"$path/calendar/calendar_index.php?cal_view=agenda&amp;date=$date\">
-  <img src=\"$ico_day_view\" alt=\"$l_day\" title=\"$l_day\" /> Calendrier
+  <img 
+  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
+  longdesc=\"$l_view_agenda_desc\" 
+  src=\"$ico_agenda_view\" alt=\"$l_day\"/> 
   </a>
   <a href=\"$path/calendar/calendar_index.php?cal_view=printable&amp;date=$date\">
-  <img src=\"$ico_week_view\" alt=\"$l_week\" title=\"$l_week\" /> Calendrier *
+  <img 
+  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
+  longdesc=\"$l_view_printable_desc\" 
+  src=\"$ico_printable_view\" alt=\"$l_week\" />
   </a>
   <a href=\"$path/calendar/calendar_index.php?cal_view=planning&amp;date=$date\">
-  <img src=\"$ico_month_view\" alt=\"$l_month\" title=\"$l_month\" /> Planning
+  <img
+  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
+  longdesc=\"$l_view_planning_desc\" 
+  src=\"$ico_planning_view\" alt=\"$l_month\" />
   </a>
   <a href=\"$path/calendar/calendar_index.php?cal_view=list&amp;date=$date\">
-  <img src=\"$ico_list_view\" alt=\"$l_list\" title=\"$l_list\" /> Liste
+  <img
+  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
+  longdesc=\"$l_view_list_desc\" 
+   src=\"$ico_list_view\" alt=\"$l_list\" />
   </a>  
-    
+  </fieldset>
+  <fieldset style=\"display:inline; margin: 0; padding:0;\">
+  <legend>$l_cal_range</legend>
   <a href=\"$path/calendar/calendar_index.php?cal_range=day&amp;date=$date\">
-  <img src=\"$ico_day_view\" alt=\"$l_day\" title=\"$l_day\" />
+  <img
+  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
+  longdesc=\"$l_view_day_desc\" 
+  src=\"$ico_day_view\" alt=\"$l_day\" />
   </a>
   <a href=\"$path/calendar/calendar_index.php?cal_range=week&amp;date=$date\">
-  <img src=\"$ico_week_view\" alt=\"$l_week\" title=\"$l_week\" />
+  <img
+  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
+  longdesc=\"$l_view_week_desc\" 
+  src=\"$ico_week_view\" alt=\"$l_week\" />
   </a>
   <a href=\"$path/calendar/calendar_index.php?cal_range=month&amp;date=$date\">
-  <img src=\"$ico_month_view\" alt=\"$l_month\" title=\"$l_month\" />
+  <img
+  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
+  longdesc=\"$l_view_month_desc\" 
+  src=\"$ico_month_view\" alt=\"$l_month\" />
   </a>
-  </div>
+  </fieldset>
+  <div id=\"calendarViewToolTip\" class=\"info\" style=\"position:absolute\"></div>
   ";
   return $block;
 }
@@ -190,7 +236,6 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
   <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
   <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
   <input type=\"hidden\" name=\"new_group\" value=\"1\" />
-  <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
   <input type=\"hidden\" name=\"new_sel\" value=\"1\" />    
   </form>
   </div>";
@@ -239,7 +284,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     } else {
       $selected_s = "";
     }
-    $sel_group .= "<option value=\"calendar_index.php?action=$new_action&amp;date=$iso_date&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
+    $sel_group .= "<option value=\"calendar_index.php?date=$iso_date&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
   }
   $sel_group .= "</optgroup>
   </select>";
@@ -526,7 +571,7 @@ function html_calendar_view_selector($calendar, $my_views) {
     <form action=\"calendar_index.php\" method=\"get\">
       <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\"
         onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-        <option value=\"calendar_index.php?action=agenda&amp;sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\" >
+        <option value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\" >
           $l_select_view
         </option>
         $sel_view
@@ -715,7 +760,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
  * @access public
  * @return void
  */
-function dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity) {
+function dis_calendar_month_printable($calendar, $calendar_entity,$writable_entity) {
   global $ico_previous, $ico_next;
   global $ccalendar_weekstart, $obm;
   global $ico_periodic, $ico_meeting;
@@ -992,7 +1037,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
  * @access public
  * @return void
  */
-function dis_calendar_week_planning($calendar, $calendar_entity,$writable_entity) {
+function dis_calendar_week_printable($calendar, $calendar_entity,$writable_entity) {
   global $path, $ico_next, $ico_previous, $l_previous, $l_next;
   global $ccalendar_weekstart, $ico_meeting, $obm;
   global $ico_resize, $ico_periodic, $ico_meeting;
@@ -1205,7 +1250,7 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
  * @access public
  * @return void
  */
-function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity) {
+function dis_calendar_day_printable($calendar, $calendar_entity,$writable_entity) {
   global $ico_previous, $ico_next,$ico_resize,$ico_meeting;
   global $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting, $obm;
@@ -1948,7 +1993,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
 //   - $calendar: calendar parameters
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_list_planning($calendar, $calendar_entity) { 
+function dis_calendar_month_planning($calendar, $calendar_entity) { 
   global $obm, $ico_previous,$ico_next,$ico_new_event;
   global $ccalendar_weekstart, $l_week, $l_all_day;
   global $l_private,$l_daysofweekfirst,$l_daysofweek, $l_previous, $l_next;
@@ -2234,7 +2279,7 @@ function dis_calendar_event_consult($id) {
     if ($eve_q->num_rows() == 1) {
       $entities = get_calendar_event_entity($id);
       $exception_q = run_query_get_one_event_exception($id);
-      $alerts = get_one_event_user_alert($id, $obm['uid']);
+      $alerts = get_one_event_user_alert($id);
       $display["detailInfo"] = display_record_info($eve_q);
       $block = html_calendar_event_consult($eve_q, $exception_q, $entities, $alerts);
     } else {
@@ -2255,15 +2300,15 @@ function dis_calendar_event_consult($id) {
 //   - $entities : entities linked to the event ["user"], ["resource"]
 //   - $alerts   : alerts array
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_consult($event_q, $exception_q, $entities) {
+function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts) {
   global $obm, $display, $cgp_show, $ccalendar_weekstart, $ccalendar_resource;
   global $l_users, $l_resources, $l_title, $l_location, $l_priority,$l_private;
   global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week,$l_desc,$l_high;
-  global $l_dateend,$l_insert,$l_update,$l_repeat, $l_alerts, $l_alerts_time;
+  global $l_dateend,$l_insert,$l_update,$l_repeat, $l_alerts, $l_state, $l_user;
   global $l_change_state,$l_groups,$l_all_day,$l_every,$l_owner;
-  global $l_repeatkind,$l_repeatdays,$l_date_repeatend; 
+  global $l_repeatkind,$l_repeatdays,$l_date_repeatend, $l_none, $c_none; 
   global $l_wait, $l_task, $l_exception, $l_yes, $l_no, $path;
-  global $l_carac,$l_module_calendar, $l_items;
+  global $l_carac,$l_module_calendar, $l_items, $ccalendar_alerts;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
   $id = $event_q->f("calendarevent_id");
@@ -2402,23 +2447,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
      </div>";
   }
 
-  // Alerts
-  if (is_array($alerts) && count($alerts > 0)) {
-    foreach($alerts as $key => $value) {
-      $dis_alerts .= "$value <br />";
-    }
-    $block_alerts = "
-    <div class=\"detail infos\">
-     <h1>$l_alerts</h1>
-     <table>
-      <tr>
-       <th>$l_alerts_time :</th> 
-       <td>$dis_alerts</td>
-      </tr>
-     </table>
-     </div>";
-  }
-
   $attendee = $entities["user"];
   if (is_array($attendee["entity"])) {
     foreach ($attendee["entity"] as $u_id => $entity) {
@@ -2426,19 +2454,31 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
       $state = $entity["state"];
       if ($obm["uid"] == $u_id || in_array($u_id,$writable_users["ids"])) {
         $$state = "checked=\"checked\"";
-        $url= "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
+        $urld= "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
+        $urla= "$path/calendar/calendar_index.php?action=update_alert&calendar_id=$id&user_id=$u_id";
+        $sel_alert = "";
+        foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
+          if($alerts[$u_id] == $alert_sec) {
+            $sel_alert .= "<option value=\"$alert_sec\" selected=\"selected\">$alert_label</option>";
+          } else {
+            $sel_alert .= "<option value=\"$alert_sec\">$alert_label</option>";
+          }
+        }
+        $sel_alert = "<select name=\"sel_alert\" onchange=\"window.location='$urla&sel_alert='+this.options[this.selectedIndex].value\"><option value=\"$c_none\">$l_none</option>$sel_alert</select>";        
         $dis_user_list .= "
-        <span class=\"B I RF\">
-        <input $A type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"A\" onclick=\"window.location='$url&rd_decision_event=A'\" />A
-	<input $W type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"W\" onclick=\"window.location='$url&rd_decision_event=W'\" />W
-        <input $R type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"R\" onclick=\"window.location='$url&rd_decision_event=R'\" />R
-        </span>
-        <span class=\"RC\">$label</span>
-        <hr />
+        <tr>
+        <td>$label</td>
+        <td>$sel_alert</td>
+        <td class=\"C\">
+        <input $A type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"A\" onclick=\"window.location='$urld&rd_decision_event=A'\" />A
+	<input $W type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"W\" onclick=\"window.location='$urld&rd_decision_event=W'\" />W
+        <input $R type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"R\" onclick=\"window.location='$urld&rd_decision_event=R'\" />R
+        </td>
+        </tr>
         ";
         $$state = "";
       } else {
-        $dis_user_list .= "<span class=\"B I RF\">$state</span><span class=\"RC\">$label</span><hr />";
+        $dis_user_list .= "<tr><td>$label</td><td></td><td class=\"C\">$state</td></tr>";
       }
     }
   }
@@ -2460,6 +2500,12 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
             <td>".nl2br($value->item)."</td>
           </tr>";
         }
+        $dis_item_list = "<div class=\"detail infos\">
+        <h1>$l_items</h1>
+        <table>
+          $dis_item_list
+        </table>
+        </div>";        
       }
     }
 
@@ -2472,25 +2518,34 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
           $$state = "checked=\"checked\"";
           $url= "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
           $dis_resource_list .= "
-          <span class=\"B I RF\">
+          <tr>
+          <td>$label ($property[$r_id])</td>
+          <td class=\"C\">
           <input $A type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"A\" onclick=\"window.location='$url&rd_decision_event=A'\" />A
           <input $W type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"W\" onclick=\"window.location='$url&rd_decision_event=W'\" />W
           <input $R type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"R\" onclick=\"window.location='$url&rd_decision_event=R'\" />R
-          </span>
-          <span class=\"RC\">$label($property[$r_id])</span>
-          <hr />
+          </td>
+          </tr>  
         ";
           $$state = "";
         } else {
-          $dis_resource_list .= "<span class=\"B I RF\">$state</span><span class=\"RC\">$label($property[$r_id])</span><hr />";
+          $dis_resource_list .= "<tr><td>$label($property[$r_id])</td><td class=\"C\">$state</td></tr>";
         }
       }
+      $dis_resource_block = "
+        <div class=\"detail infos\">
+        <h1>$l_resources</h1>
+        <table  class=\"spreadSheet\">
+        <thead>
+        <tr>
+        <td>$l_user</td><td>$l_alerts</td><td>$l_state</td>
+        </tr>
+        </thead>      
+        </table>
+        $dis_resource_list
+        </div>";      
     }
-    $dis_resource_block = "
-      <tr>
-        <th>$l_resources :</th>
-        <td>$dis_resource_list</td>
-      </tr>";
+
   }
 
 
@@ -2511,28 +2566,18 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
     <th>$l_location :</th>
     <td>$location</td>
   </tr>  
-  <tr>
-    <th>$l_private :</th>
-    <td>$privacy</td>
-  </tr> 
+
   $block_category1
-  <tr>
-    <th>$l_users :</th>
-    <td>$dis_user_list</td>
-  </tr>
-  $dis_resource_block
-  $dis_task_block
   </table>
   </div>
-  <div class=\"detail infos\">
-  <h1>$l_items</h1>
-  <table>
-    $dis_item_list
-  </table>
-  </div>
+
   <div class=\"detail infos\">
   <h1>$l_carac</h1>
-   <table>   
+  <table>  
+     <tr>
+      <th>$l_private :</th>
+      <td>$privacy</td>
+    </tr>  
    $dis_all_day
     <tr>
      <th>$l_datebegin :</th>
@@ -2547,8 +2592,23 @@ function html_calendar_event_consult($event_q, $exception_q, $entities) {
      <td>$priority</td>
     </tr>      
    </table>
-  </div>
+   </div>  
   $repeat_block
+  <div class=\"detail infos\">
+  <h1>$l_users</h1>
+  <table  class=\"spreadSheet\">
+  <thead>
+  <tr>
+  <td>$l_user</td><td>$l_alerts</td><td>$l_state</td>
+  </tr>
+  </thead>
+  $dis_user_list
+  </table>
+  </div>   
+  $dis_resource_block
+  $dis_task_block
+  $dis_item_list
+
   $block_alert
 
    <div class=\"detail extra\">
@@ -2753,10 +2813,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $date_exception[] = of_date_upd_format($exception_q->f("calendarexception_date")); 
     }
     // Alerts
-    if (is_array($alerts) && count($alerts > 0)) {
-      foreach($alerts as $key => $value) {
-	$selected_alert = $key;
-      }
+    if (is_array($alerts) && isset($alerts[$owner])) {
+      $selected_alert = $alerts[$owner];
     }
     $dis_title = $title;
 
