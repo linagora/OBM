@@ -184,9 +184,9 @@ function run_query_contact_search($contact) {
   }
   // Get only not archived by default
   if ($archive != "1") {
-    $where .= " AND contact_archive=0";
+    $where .= " AND contact_archive='0'";
   } elseif ($cgp_archive_only) {
-    $where .= " AND contact_archive=1";
+    $where .= " AND contact_archive='1'";
   }
 
   // User defined data

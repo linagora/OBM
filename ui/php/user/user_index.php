@@ -189,6 +189,7 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_can_delete($params)) {
+    run_query_user_delete_profile($params["user_id"]);
     $retour = run_query_user_delete($params["user_id"]);
     if ($retour) {
       set_update_state();
@@ -196,7 +197,6 @@ if ($action == "ext_get_ids") {
     } else {
       $display["msg"] .= display_err_msg("$l_user : $l_delete_error");
     }
-    run_query_user_delete_profile($params["user_id"]);
     $display["search"] = html_user_search_form($params);
   } else {
     $display["msg"] .= display_warn_msg($err["msg"], false);

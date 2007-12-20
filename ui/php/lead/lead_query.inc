@@ -81,9 +81,9 @@ function run_query_lead_search($params) {
     $and = 'AND';
   }
   if ($archive != '1') {
-    $where .= " $and lead_archive=0";
+    $where .= " $and lead_archive='0'";
   } elseif($cgp_archive_only) {
-    $where .= ' $and lead_archive=1';
+    $where .= " $and lead_archive='1'";
     $and = 'AND';
   }
 
@@ -318,8 +318,8 @@ function run_query_lead_update($pid, $params) {
   $date = ($params['date'] ? "'".of_isodate_convert($params['date'])."'" : 'null');
   $datealarm = ($params['datealarm'] ? "'".of_isodate_convert($params['datealarm'])."'" : 'null');
   $todo = $params['todo'];
-  $archive = ($params['archive'] == 1 ? '1' : '0');
-  $privacy = ($params['privacy'] == 1 ? '1' : '0');
+  $archive = ($params['archive'] == '1' ? '1' : '0');
+  $privacy = ($params['privacy'] == '1' ? '1' : '0');
   $comment = $params['comment'];
 
   $add_comment = $params['add_comment'];
@@ -372,7 +372,7 @@ function get_lead_managers($archive = false) {
   global $cdg_sql;
 
   if (! $archive) {
-    $where_arch .= ' lead_archive=0';
+    $where_arch .= " lead_archive='0'";
   }
 
   if ($where_arch != '') {

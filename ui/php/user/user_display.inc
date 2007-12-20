@@ -466,7 +466,7 @@ function html_user_consult($obm_q) {
   $desc = $obm_q->f("userobm_description");
   $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
-  $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
+  $archive = ($obm_q->f("userobm_archive") == '1' ? $c_yes : $c_no);
   $photo_id = $obm_q->f("userobm_photo_id");
 
   $phone = $obm_q->f("userobm_phone");
@@ -1058,7 +1058,7 @@ function html_user_form($usr_q, $user, $field='') {
   if (isset($user["delegation_target"])) { $delegation_target = stripslashes($user["delegation_target"]); }
   if (isset($user["delegation"])) { $delegation = stripslashes($user["delegation"]); }
   if (isset($user["desc"])) { $desc = $user["desc"]; }
-  if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
+  if (isset($user["archive"])) { $archive = ($user["archive"] == '1' ? "checked" : ""); }
 
   // coord
   if (isset($user["phone"])) { $phone = $user["phone"]; }

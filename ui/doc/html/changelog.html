@@ -12,14 +12,13 @@
     
 <center>
 <h1>O.B.M. 2.1 ChangeLog</h1>
-version 2.1.1 - 2007-12-12
+version 2.1.1 - 2007-12-21
 <p>
 </center>
 
 To do
 <br>
 <UL>
-<LI> When deleting a user, move all his calendarevents from private to public ?
 <LI> how to detect doublons ?
 <li> Regressions tests (siege ?)
 <li> tenir compte contacts prives dans les listes (liste privee =>+ contact prives)!
@@ -37,7 +36,7 @@ To do
 - projectclosing : reutiliser requete project_statlog ??
 - usergroup : agir lorsqu'archivage d'un user ?
 
-2007-12-20 : version 2.1.1<br>
+2007-12-21 : version 2.1.1<br>
 
 <ul>
 <li> some fixes for PostgreSQL better compliance
@@ -47,6 +46,12 @@ To do
 <li> English translation improvement
 <li> Security enhancements : block users who try 5 connexions in a given time
 <li> Simple default User import tool, handling group membership
+<li> User Deletion now more complete (removing users infos, events,...)
+<li> Users with profile without level definition can be managed by default 
+<li> Calendar views menus reworked (view period and view type) with more views
+<li> ACL on group handling
+<li> Global cron system to handle automation (email alerts, auto vacation,..)
+<li> Domain creation fixes (creator info, ghost menu removed,..)
 </ul>
 
 2007-12-07 : version 2.1.0<br>
@@ -127,6 +132,7 @@ To do
 <li> Publication : subscription to contact lists allowed on existing publication
 <li> Contact : improve handling of multiple publications subscriptions
 </ul>
+
 2007-04-20 : version 2.0.1<br>
 
 <ul>

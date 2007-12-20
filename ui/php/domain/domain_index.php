@@ -318,6 +318,7 @@ function get_domain_action() {
 
 // Delete
   $actions['domain']['delete'] = array (
+    'Name'     => "aaa",
     'Url'      => "$path/domain/domain_index.php?action=delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
@@ -346,10 +347,6 @@ function update_domain_action() {
     // Check Delete
     $actions['domain']['check_delete']['Url'] = "$path/domain/domain_index.php?action=check_delete&amp;domain_id=$id";
     $actions['domain']['check_delete']['Condition'][] = 'insert';
-
-    // Group Consult
-    $actions['domain']['group_consult']['Url'] = "$path/domain/domain_index.php?action=group_consult&amp;domain_id=$id";
-    $actions['domain']['group_consult']['Condition'][] = 'insert';
 
     // Sel Mailserver add : Mail server selection
     $actions['domain']['sel_mailserver_add']['Url'] = "$path/mailserver/mailserver_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=mailserver_add&amp;ext_url=".urlencode($path."/domain/domain_index.php")."&amp;ext_id=$id&amp;ext_target=$l_domain";

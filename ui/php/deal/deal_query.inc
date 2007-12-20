@@ -102,9 +102,9 @@ function run_query_deal_search($deal, $all='') {
     $where .= " AND deal_$date_field < '$date_before'";
   }
   if ($archive != '1') {
-    $where .= ' AND deal_archive=0';
+    $where .= " AND deal_archive='0'";
   } elseif($cgp_archive_only) {
-    $where .= ' AND deal_archive=1';
+    $where .= " AND deal_archive='1'";
   }
   if (($manager != $c_all) && ($manager != '')) {
     $where .= " AND (deal_technicalmanager_id='$manager'
@@ -1359,7 +1359,7 @@ function run_query_deal_manager($archive = false) {
   $multidomain = sql_multidomain('deal');
 
   if (! $archive) {
-    $where_arch .= ' deal_archive=0';
+    $where_arch .= " deal_archive='0'";
   }
 
   if ($where_arch != '') {
@@ -2228,7 +2228,7 @@ function run_query_deal_search_parentdeal($deal) {
     $where .= " AND parentdeal_label $like '$plabel%'";
   }
   if ($parchive != 1) {
-    $where .= ' AND parentdeal_archive=0';
+    $where .= " AND parentdeal_archive='0'";
   }
   if (($pmanager != $c_all) && ($pmanager != '')) { 
      $where .= " AND (parentdeal_technicalmanager_id='$pmanager'
@@ -2438,7 +2438,7 @@ function run_query_deal_updatearchive_parentdeal($p_id) {
   $multidomain = sql_multidomain('parentdeal');
   
   $query = "UPDATE ParentDeal SET
-    parentdeal_archive=1
+    parentdeal_archive='1'
   WHERE parentdeal_id='$p_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_deal_updatearchive_parentdeal()');

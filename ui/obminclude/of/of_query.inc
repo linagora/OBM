@@ -1632,7 +1632,7 @@ function get_userobm_from_ids($users) {
     $where .= ')';
     $query = "SELECT *
     FROM UserObm
-    WHERE userobm_archive = 0
+    WHERE userobm_archive = '0'
       AND userobm_id IN $where
     ORDER by userobm_lastname";
     display_debug_msg($query, $cdg_sql, 'get_userobm_from_ids()');

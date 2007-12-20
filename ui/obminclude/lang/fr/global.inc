@@ -133,6 +133,7 @@ $l_ext_id = "Id ext";
 $l_manager = "Responsable";
 $l_project_manager = "Chef de projet";
 $l_member = "Participant";
+$l_attendee = "Participant";
 $l_relation = "Relation";
 $l_client = "Client";
 $l_supplier = "Fournisseur";

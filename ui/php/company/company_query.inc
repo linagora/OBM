@@ -102,10 +102,10 @@ function run_query_company_search($company) {
 
   // Get only not archived by default
   if ($archive != '1') {
-    $where .= " $and company_archive=0";
+    $where .= " $and company_archive='0'";
     $and = 'AND';
   } elseif($cgp_archive_only) {
-    $where .= " $and company_archive=1";
+    $where .= " $and company_archive='1'";
     $and = 'AND';
   }
 

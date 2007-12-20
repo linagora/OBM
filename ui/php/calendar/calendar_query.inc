@@ -1294,11 +1294,11 @@ function ics_get_obmuser_from_lotus(& $attendee, $cal_address) {
 function search_user_by_name($lastname, $firstname) {
   global $c_none ;
 
-  $sql = "SELECT userobm_id from UserObm " ;
-  $sql .= "WHERE " ;
-  $sql .= "UPPER(userobm_lastname) = '".strtoupper($lastname)."' AND " ;
-  $sql .= "UPPER(userobm_firstname) = '".strtoupper($firstname)."' AND " ;
-  $sql .= "userobm_archive = 0 ;" ;
+  $sql = "SELECT userobm_id from UserObm ";
+  $sql .= "WHERE ";
+  $sql .= "UPPER(userobm_lastname) = '".strtoupper($lastname)."' AND ";
+  $sql .= "UPPER(userobm_firstname) = '".strtoupper($firstname)."' AND ";
+  $sql .= "userobm_archive = '0';";
 
   $obm_q = new DB_OBM() ;
   $result = $obm_q->query($sql) ;

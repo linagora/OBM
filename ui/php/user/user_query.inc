@@ -1811,10 +1811,12 @@ function check_user_can_delete($params) {
   // Or same privilege with 'impair' profile
   $level = $profiles[$obm['profile']]['level'];
   $managepeers = $profiles[$obm['profile']]['level_managepeers'];
-  if (($profiles[$usr_profile]['level'] < $level)
-      || (($profiles[$usr_profile]['level'] == $level) && (! $managepeers))) {
-    $err['msg'] = "$l_profile_privilege_error";
-    $delete_ok = false;
+  if (isset($profiles[$usr_profile]['level'])) {
+    if (($profiles[$usr_profile]['level'] < $level)
+	|| (($profiles[$usr_profile]['level'] == $level) && (! $managepeers))) {
+      $err['msg'] = "$l_profile_privilege_error";
+      $delete_ok = false;
+    }
   }
 
   return $delete_ok;
@@ -1829,28 +1831,38 @@ function check_user_can_delete($params) {
 //   - $user_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_delete_profile($user_id)  {
-  global $cdg_sql;
+  global $cdg_sql, $l_attendee;
 
+  $now = date('Y-m-d H:i:s');
   $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $u = get_user_info($user_id);
+  $name = $u['firstname'] . ' ' . $u['lastname'];
 
   // Unsubscribe from all groups
   $retour = run_query_user_unsubscribe_all_groups($user_id);    
+
+  // Delete all the user private groups
+  $query = "DELETE FROM UGroup
+    WHERE group_usercreate='$user_id'
+      AND group_privacy != '0'"; 
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Group)');
+  $obm_q->query($query);
+
+  // Delete all the user private contact
+  $query = "DELETE FROM Contact
+    WHERE contact_usercreate='$user_id'
+      AND contact_privacy != '0'"; 
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Contact)');
+  $obm_q->query($query);
 
   // Delete all user prefs
   $query = "DELETE FROM UserObmPref WHERE userobmpref_user_id='$user_id'"; 
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(UserObmPref)');
   $obm_q->query($query);
-
   $query = "DELETE FROM DisplayPref WHERE display_user_id='$user_id'"; 
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(DisplayPref)');
-  $obm_q->query($query);
-
-  // Move all the user contact from private to public
-  $query = "UPDATE Contact SET
-      contact_privacy='0'
-    WHERE contact_usercreate='$user_id'
-      AND contact_privacy != '0'"; 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Contact)');
   $obm_q->query($query);
 
   // Move all the user deal from private to public
@@ -1869,20 +1881,38 @@ function run_query_user_delete_profile($user_id)  {
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(List)');
   $obm_q->query($query);
 
-  // Move all the user events from private to public
-  // Not activated ! case of private event with multiple users XXXXX to handle
-  $query = "UPDATE CalendarEvent SET
-      calendarevent_privacy='0'
-    WHERE calendarevent_usercreate='$user_id'
-      AND calendarevent_privacy != '0'"; 
-  //display_debug_msg($query, $cdg_sql);
-  //$obm_q->query($query);
+  // Update all events where user has participation (add user in comment)
+  $cdesc[0]['type'] = 'string';
+  $cdesc[0]['value'] = "$l_attendee : $name\r\n";
+  $cdesc[1]['type'] = 'field';
+  $cdesc[1]['value'] = 'calendarevent_description';
+  $concat = sql_string_concat($db_type, $cdesc);
+  $query = "UPDATE CalendarEvent
+    SET calendarevent_description = $concat,
+      calendarevent_timeupdate = '$now'
+    WHERE calendarevent_owner = '$user_id'
+      OR calendarevent_id IN (
+        SELECT evententity_event_id as event_id
+        FROM EventEntity
+        WHERE evententity_entity = 'user'
+          AND evententity_entity_id = '$user_id')";
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
+  $obm_q->query($query);
 
   // Remove all User event participation
   $query = "DELETE FROM EventEntity
     WHERE evententity_entity = 'user'
       AND evententity_entity_id = '$user_id'"; 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(EventEntity)');
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EventEntity)");
+  $obm_q->query($query);
+
+  // Remove all Events that have non attendees !
+  $query = "DELETE FROM CalendarEvent
+     WHERE calendarevent_id NOT IN (
+       SELECT distinct evententity_event_id
+       FROM EventEntity
+       WHERE evententity_entity = 'user')"; 
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
 
   // Remove all acl to the user and user's one

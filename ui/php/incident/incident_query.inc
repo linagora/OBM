@@ -542,7 +542,7 @@ function run_query_incident_owner($archive = false) {
   global $cdg_sql;
 
   if (! $archive) {
-    $where_arch .= ' incident_archive=0';
+    $where_arch .= " incident_archive='0'";
   }
 
 	$multidomain = sql_multidomain('incident');
@@ -581,7 +581,7 @@ function run_query_incident_logger($archive = false) {
   global $cdg_sql;
 
   if (! $archive) {
-    $where_arch .= ' incident_archive=0';
+    $where_arch .= " incident_archive='0'";
   }
 
 	$multidomain = sql_multidomain('incident');

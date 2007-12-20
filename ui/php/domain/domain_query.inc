@@ -74,12 +74,20 @@ function run_query_domain_detail($p_id) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  $timeupdate = sql_date_format($db_type, 'domain_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'domain_timecreate', 'timecreate');
 
   $query = "SELECT Domain.*,
-    host_name as mailserver_hostname
+      $timeupdate,
+      $timecreate,
+      host_name as mailserver_hostname,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
     FROM Domain
     LEFT JOIN MailServer ON mailserver_id = domain_mail_server_id
     LEFT JOIN Host ON host_id = mailserver_host_id
+    LEFT JOIN UserObm as c ON domain_usercreate=c.userobm_id
+    LEFT JOIN UserObm as u ON domain_userupdate=u.userobm_id
     WHERE domain_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql, 'run_query_domain_detail()');

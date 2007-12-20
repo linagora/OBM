@@ -375,6 +375,9 @@ ALTER TABLE CalendarCategory1 ADD COLUMN calendarcategory1_color char(6);
 -- UPDATE Deal Structure
 --
 ALTER TABLE Deal ADD COLUMN deal_margin decimal(12,2);
+-- These 2 columns were forgotten in Postgres OBM 2.0 and 2.1.0 !
+ALTER TABLE deal ADD COLUMN deal_source_id integer NOT NULL default 0;
+ALTER TABLE deal ADD COLUMN deal_source varchar(64);
 
 
 --

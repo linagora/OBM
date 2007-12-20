@@ -129,6 +129,7 @@ $l_ext_id = "Ext Id";
 $l_manager = "Manager";
 $l_project_manager = "Manager";
 $l_member = "Member";
+$l_attendee = "Attendee";
 $l_relation = "Relation";
 $l_client = "Customer";
 $l_supplier = "Supplier";
