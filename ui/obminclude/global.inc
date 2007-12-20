@@ -1770,6 +1770,10 @@ function global_allow_access($perm) {
   $access_restriction = $profiles[$perm][access_restriction];
   $access_exceptions = $profiles[$perm][access_exceptions];
 
+  if (empty($access_restriction)) {
+    $access_restriction = "ALLOW_ALL";
+  }
+
   $client_ip = get_global_ip_array();
   $except_list = array();
   if (is_array($access_exceptions)) {
