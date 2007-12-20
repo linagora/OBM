@@ -733,6 +733,7 @@ function run_query_user_update($p_id, $user) {
   $title = $user['title'];
   $email = $user['email'];
   $desc = $user['desc'];
+  $login = $user['login'];
   $multidomain = sql_multidomain('userobm');
   $photo_id = $user['document_id'];
 
@@ -852,6 +853,7 @@ function run_query_user_update($p_id, $user) {
     userobm_timeupdate='". date('Y-m-d H:i:s')."',
     userobm_userupdate='". $obm['uid'] ."',
     $passwd_update
+    userobm_login='$login',
     userobm_perms='$profile',
     userobm_gid='$gid',
     userobm_archive='$archive',
@@ -918,6 +920,11 @@ function run_query_user_update($p_id, $user) {
   if ($retour) {
     $ret = of_userdata_query_update('user', $p_id, $user);
   }
+
+  if ($p_id == $obm["uid"]) {
+    $obm["login"] = $login;
+  }
+
   return $retour;
 }
 

@@ -116,5 +116,6 @@ $l_fill_login = "Vous devez renseigner le login avant de valider.";
 $l_fill_password = "Vous devez renseigner le mot de passe avant de valider.";
 $l_delete_confirm = "Confirmer la suppression de l'utilisateur ?";
 $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
+$l_change_login_confirm = "Confirmer le changement d'identifiant ?";
 
 $l_user_display = "Options d'affichage des listes d'utilisateurs";

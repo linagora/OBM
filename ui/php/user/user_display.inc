@@ -956,6 +956,7 @@ function html_user_form($usr_q, $user, $field='') {
     // infos
     $id = $usr_q->f("userobm_id");
     $login = $usr_q->f("userobm_login");
+    $old_login = $login;
     $passwd = "";
     $profile = $usr_q->f("userobm_perms");
     $hidden = $usr_q->f("userobm_hidden");
@@ -1046,6 +1047,7 @@ function html_user_form($usr_q, $user, $field='') {
   if (isset($user["user_id"])) { $id = $user["user_id"]; }
   if (isset($user["domain"])) { $domain_id = $user["domain"]; }
   if (isset($user["login"])) { $login = $user["login"]; }
+  if (isset($user["old_login"])) { $old_login = $user["old_login"]; }
   if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
   if (isset($user["profile"])) { $profile = $user["profile"]; }
   if (isset($user["hidden"])) { $hidden = $user["hidden"]; }
@@ -1121,9 +1123,10 @@ function html_user_form($usr_q, $user, $field='') {
 
   // login (can't be updated, so only on insert)
   if (($action == "new") || ($action == "insert")) {
-    $dis_login = "<input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />";
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />";
   } else {
-    $dis_login = "$login<input type=\"hidden\" name=\"tf_login\" value=\"$login\" />";
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />
+                  <input type=\"hidden\" name=\"tf_old_login\" value=\"$old_login\" />";
   }
 
   // Domain (can't be updated, so only on insert)

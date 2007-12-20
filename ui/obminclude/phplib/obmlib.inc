@@ -217,18 +217,22 @@ class OBM_Challenge_Auth extends Auth {
         break;
     }
 
-    if ($encrypted == $pass) {
-      $unfreeze = global_unfreeze_user($uid);
-      if ($unfreeze) {
-        $obm["profile"] = $perm;
-        $obm["domain_id"] = $domain_id;
-        $obm["delegation"] = $delegation;
-        return $uid;
+    if (global_allow_access($perm)) {
+      if ($encrypted == $pass) {
+        $unfreeze = global_unfreeze_user($uid);
+        if ($unfreeze) {
+          $obm["profile"] = $perm;
+          $obm["domain_id"] = $domain_id;
+          $obm["delegation"] = $delegation;
+          return $uid;
+        } else {
+          return false;
+        }
       } else {
+        global_freeze_user($params);
         return false;
       }
     } else {
-      global_freeze_user($params);
       return false;
     }
 
@@ -328,11 +332,14 @@ class CAS_Auth extends Auth {
       header("location:".obmCAS::getServerBaseURL());
     }
 
-    $obm['profile'] = $perm;
-    $obm['login'] = $login;
-    $obm['domain_id'] = $domain_id;
-
-    return $uid;
+    if (global_allow_access()) {
+      $obm['profile'] = $perm;
+      $obm['login'] = $login;
+      $obm['domain_id'] = $domain_id;
+      return $uid;
+    } else {
+      return false;
+    }
   }
    
   function logout($nobody = "") {

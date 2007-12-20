@@ -77,10 +77,16 @@ function valider_suppression() {
 }
 
 function check_user(form) {
+
   // MANDATORY : Check that Login is not empty
   if (trim(form.tf_login.value) == \"\") {
     alert (\"$l_fill_login\");
     return false;
+  }
+
+  // UPDATE : check if login change
+  if ((form.tf_old_login.value != \"\") && (form.tf_login.value != form.tf_old_login.value)) {
+    return confirm(\"$l_change_login_confirm\");
   }
 
   // Check the email
@@ -90,6 +96,7 @@ function check_user(form) {
     return false;
   }
 
+return confirm('lala?');
   return true;
 }
 

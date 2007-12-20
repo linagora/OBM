@@ -3651,25 +3651,18 @@ function run_query_calendar_get_bookmark_property($id) {
 function run_query_calendar_insert_view($calendar) {
   global $cdg_sql, $obm;
 
-  $calendar_bookmarkproperties = array("action", "users", "group", "resources", "category", "color", "cal_range");
+  $calendar_bookmarkproperties = array("users", "group", "resources", "category", "cal_range", "cal_view");
 
   $obm_q = new DB_OBM;
   $user_id = $obm["uid"];
 
-  $action = $calendar["view_action"];
   $category = $calendar["category_filter"];
   $label = $calendar["view_label"];
   $group = $calendar["entity"]["group"][0];
   $users = is_array($calendar["entity"]["user"]) ? implode(",", $calendar["entity"]["user"]) : "" ;
   $resources = is_array($calendar["entity"]["resource"]) ? implode(",", $calendar["entity"]["resource"]) : "" ;
-  $color = $calendar["view_color"];
-  if (isset($calendar['cal_range'])) {
-    $cal_range = $calendar['cal_range'];
-  } elseif (isset($_SESSION['cal_range'])){
-    $cal_range = $_SESSION['cal_range'];
-  } else {
-    $cal_range = "week";
-  }
+  $cal_range = $_SESSION['cal_range'];
+  $cal_view = $_SESSION['cal_view'];
 
   // Insert ObmBookmark
   $query = "INSERT INTO ObmBookmark(

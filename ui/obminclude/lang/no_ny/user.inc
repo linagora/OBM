@@ -39,6 +39,7 @@ $l_exist_error = "finst alt";
 $l_login_error = "Ugyldig brukarnamn";
 $l_password_error = "Ugyldig passord";
 $l_email_error = "Ugyldig mailadresse";
+$l_change_login_confirm = "Really update user's login ?";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
 $l_fill_login = "\\n Du må fylle inn brukaren før du legg inn.";

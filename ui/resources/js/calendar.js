@@ -1182,9 +1182,11 @@ Obm.TabbedPane = new Class({
 Obm.CalendarView = new Class({
   initialize: function(el) {
     this.label = $('tf_view_label'); 
-    this.new_action = $('new_action');
     this.view_id = $('view_id');
-    this.view_range = $('view_range');
+
+    this.popup = $('viewSelectorForm');
+    this.popup.setStyle('position','absolute');
+    this.calendarSelViewPortlet = $('calendarSelView');
   },
 
   insert: function() {
@@ -1192,10 +1194,7 @@ Obm.CalendarView = new Class({
       alert(obm.vars.labels.fill_view_label);
     } else {
       var qstring = Object.toQueryString({
-        view_label: this.label.value,
-        view_action: this.new_action.value,
-        view_color: obm.vars.conf.calendarColor,
-        view_range: this.view_range.value
+        view_label: this.label.value
       });
 
       // Select input
@@ -1243,11 +1242,13 @@ Obm.CalendarView = new Class({
             }
           });
         ajax.request();
+        this.label.value = "";
+        this.hide();
       }
     }
   },
  
-  delete: function() {
+  remove: function() {
     if (this.view_id.value != "") {
       if (confirm(obm.vars.labels.delete_view)) {
         var qstring = Object.toQueryString({
@@ -1283,5 +1284,25 @@ Obm.CalendarView = new Class({
     } else {
       alert(obm.vars.labels.no_sel_view);
     }
+  },
+
+  toggle: function() {
+    if (this.popup.getStyle('display') == "block") {
+      this.hide();
+    } else {
+      this.show();
+    }
+  },
+
+  show: function() {
+    this.popup.setStyle('display','block');
+    var top = this.calendarSelViewPortlet.getTop(); // - this.calendarSelViewPortlet.offsetHeight;
+    this.popup.setStyle('top',  top + 'px');    
+    this.label.focus();
+  },
+
+  hide: function() {
+    this.popup.setStyle('display','none');
   }
+
 });

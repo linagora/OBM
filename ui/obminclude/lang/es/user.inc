@@ -59,6 +59,7 @@ $l_fill_login = "Tiene que llenar el login antes de enviar.";
 $l_fill_password = "Tiene que llenar la contraseña antes de enviar.";
 $l_delete_confirm = "Realmente desea borrar el usuario?";
 $l_j_check_email = "Dirección de correo electrónico no válida.";
+$l_change_login_confirm = "Really update user's login ?";
 
 $l_user_display = "Opciones de despliegue de las listas de usuarios"; 
 

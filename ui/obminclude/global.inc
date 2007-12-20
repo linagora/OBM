@@ -179,6 +179,8 @@ $c_nb_login_failed = 3;
 $c_login_interval = 60;
 $c_frozen_duration = 300;
 
+// Access restriction
+
 //---------------------------------------------------------------------------//
 // Default access rights bits meanings
 // 0 - read  : data
@@ -213,7 +215,9 @@ $profiles['user'] = array (
     'my' => 1),
   'module' => array (
     'default' => $perm_user),
-  'level' => 3
+  'level' => 3,
+  'access_restriction' => 'ALLOW_ALL',
+  'access_exeptions' => array()
 );
 
 $profiles['editor'] = array (
@@ -225,7 +229,9 @@ $profiles['editor'] = array (
     'my' => 1),
   'module' => array (
     'default' => $perm_editor),
-  'level' => 2
+  'level' => 2,
+  'access_restriction' => 'ALLOW_ALL',
+  'access_exeptions' => array()
 );
 
 $profiles['admin'] = array (
@@ -235,7 +241,9 @@ $profiles['admin'] = array (
     'default' => $perm_admin,
     'domain' => 0),
   'level' => 1,
-  'level_managepeers' => 1
+  'level_managepeers' => 1,
+  'access_restriction' => 'ALLOW_ALL',
+  'access_exeptions' => array()
 );
 
 
@@ -1626,7 +1634,6 @@ function run_query_global_remove_document($id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Calculate the real disk document path for a document
 // Parameters:
@@ -1645,6 +1652,159 @@ function get_global_document_disk_path($id) {
   
   return $disk_path; 
 }
+
+
+/**
+ * Get the ip addresses from HTTP_X_FORWARDED_FOR and REMOTE_ADDR
+ *
+ * @access public 
+ * @return array of ip adresses
+ */
+function get_global_ip_array() {
+  $ip_list = getenv('HTTP_X_FORWARDED_FOR');
+  $remote_addr = getenv('REMOTE_ADDR');
+  if (!empty($remote_addr)) {
+    if (!empty($ip_list))
+      $ip_list.= ", ";
+    $ip_list.= $remote_addr;
+  }
+
+  return array_map(trim, explode(',',$ip_list));
+}
+
+
+/** 
+ * Test if the given ip address is in the given network/mask
+ *
+ * @params $ip: IP address to test
+ *         $network: IP address of the network
+ *          $mask: network mask
+ * @access public
+ * @returns boolean (true if the ip is in the network)
+ */
+function global_is_ip_in_network($ip,$network,$mask) {
+  $b_ip   = ip2long($ip);
+  $b_net  = ip2long($network);
+  $b_mask = ip2long($mask);
+
+  return ( $b_net == ($b_ip & $b_mask) );
+}
+
+
+/**
+ * Test if the given ip address is in a network of the given list
+ *
+ * @params $ip: IP address to test
+ *         $network_list: array of list(network, mask)
+ * @access public
+ * @return boolean (true if the ip is in a network of the list)
+ */
+function global_is_ip_in_network_list($ip,$network_list) {
+  foreach ($network_list as $network) {
+    list($net,$mask) = $network;
+    if (global_is_ip_in_network($ip,$net,$mask))
+      return true;
+  }
+  return false;
+}
+
+
+/** 
+ * Convert a given network address to a list(network, mask)
+ * example
+ *  convert
+ *    192.168.1 or 192.168.1.0/24 or 192.168.1.0/255.255.255.0
+ *  to
+ *    array('192.168.1.0', '255.255.255.0')
+ *
+ * @params $address: the network address to convert
+ * @access public
+ * @return array(network, mask)
+ */
+function global_convert_network_address($address) {
+  list($ip, $mask) = array_map(trim, explode('/',$address));
+
+  $t = array_pad( explode('.',$ip), 4, '0');
+  $b_ip = ip2long( implode('.',$t) );
+  if ( $b_ip==-1 || $b_ip===FALSE )
+    return FALSE;
+
+  if ($mask=='0') {
+    return FALSE;
+
+  // NO MASK
+  } elseif (empty($mask)) {
+    $cidr = ($t[3]==0 ? ($t[2]==0 ? ($t[1]==0 ? 8 : 16) : 24) : 32);
+    $b_mask = 0xffffffff << (32 - $cidr);
+
+  // CIDR
+  } elseif (strpos($mask,'.')===FALSE && intval(trim($mask))<=32) {
+    $cidr = intval(trim($mask));
+    $b_mask = 0xffffffff << (32 - $cidr);
+
+  // MASK
+  } else {
+    $t = array_pad( explode('.',$mask), 4, '0');
+    $b_mask = ip2long( implode('.',$t) );
+    if ( $b_mask==-1 || $b_mask===FALSE )
+      return FALSE;
+
+  }
+
+  if ( $b_ip != ($b_ip & $b_mask) )
+    return FALSE;
+
+  return array( long2ip($b_ip), long2ip($b_mask) );
+}
+
+/**
+ * Test if ip client if allowed to access
+ * 
+ * @access public
+ * @param $perm user's permission
+ * @return boolean: true if it's ok :) or false if access if forbidden
+ */
+function global_allow_access($perm) {
+  global $profiles;
+
+  $access_restriction = $profiles[$perm][access_restriction];
+  $access_exceptions = $profiles[$perm][access_exceptions];
+
+  $client_ip = get_global_ip_array();
+  $except_list = array();
+  if (is_array($access_exceptions)) {
+    foreach($access_exceptions as $network_address) {
+      if (($network = global_convert_network_address($network_address))!==FALSE)
+        $except_list[] = $network;
+    }
+  }
+
+  if (empty($except_list)) {
+    $allowed = ($access_restriction=="ALLOW_ALL");
+
+  } elseif ($access_restriction=="DENY_ALL") {
+    // check that every ip in the $client_ip array are in the $access_exceptions
+    $allowed = true;
+    foreach ($client_ip as $ip) {
+      if (!global_is_ip_in_network_list($ip,$except_list)) {
+        $allowed = false;
+        echo "\"$ip\"<br/>";
+      }
+    }
+
+  } else {
+    // check that every ip in the $client_ip array are not in the $access_exceptions
+    $allowed = true;
+    foreach ($client_ip as $ip) {
+      if (global_is_ip_in_network_list($ip,$except_list))
+        $allowed = false;
+    }
+
+  }
+
+  return $allowed;
+}
+
 
 /**
  * Create an array of color.

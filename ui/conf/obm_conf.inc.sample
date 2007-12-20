@@ -141,7 +141,9 @@ $profiles['editor'] = array (
     'my' => 1),
   'module' => array (
     'default' => $perm_editor),
-  'level' => 3
+  'level' => 3,
+  'access_restriction' => 'ALLOW_ALL',
+  'access_exeptions' => array()
 );
 $profiles['admin_delegue'] = array (
   'section' => array (
@@ -153,7 +155,9 @@ $profiles['admin_delegue'] = array (
     'admin_realm' => array ('user', 'delegation')
     ),
   'level' => 2,
-  'level_managepeers' => 1
+  'level_managepeers' => 1,
+  'access_restriction' => 'ALLOW_ALL',
+  'access_exeptions' => array()
 );
 
 $profiles['admin'] = array (
@@ -166,7 +170,9 @@ $profiles['admin'] = array (
     'admin_realm' => array ('user', 'delegation', 'domain')
     ),
   'level' => 1,
-  'level_managepeers' => 1
+  'level_managepeers' => 1,
+  'access_restriction' => 'ALLOW_ALL',
+  'access_exeptions' => array()
 );
 
 //------------------//

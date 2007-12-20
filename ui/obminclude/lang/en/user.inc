@@ -83,6 +83,8 @@ $l_fill_login = "You have to fill the login before submitting.";
 $l_fill_password = "You have to fill the password before submitting.";
 $l_delete_confirm = "Really delete the user?";
 $l_j_check_email = "The email adress is not valid.";
+$l_change_login_confirm = "Really update user's login ?";
+
 
 $l_user_display = "Display options for users lists"; 
 

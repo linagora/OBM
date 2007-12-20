@@ -46,6 +46,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   return $block;
 }
 
+
 /**
  * dis_calendar_view_bar 
  * 
@@ -86,6 +87,8 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   ";
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML Display the navigation bar
 // Parameters:
@@ -109,8 +112,8 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
   $block = html_calendar_bar_legend($new_action, $calendar_entity,$calendar);
   if ($action != "perform_meeting" && $output_target != "print") {
     $block .= html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable);
-    if ($new_action == "agenda") {
-      $block .= html_calendar_view_selector($new_action, $calendar, $my_views);
+    if ($new_action == "agenda" || $new_action == "planning") {
+      $block .= html_calendar_view_selector($calendar, $my_views);
     }
     $block .= html_calendar_bar_date_selector($calendar);
   }
@@ -477,21 +480,23 @@ function html_calendar_bar_date_selector($calendar) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display the view selector 
-// Parameters:
-//   - $calendar: calendar parameters
-///////////////////////////////////////////////////////////////////////////////
-function html_calendar_view_selector($new_action, $calendar, $my_views) {
+/**
+ * HTML for the view selector portlet
+ *
+ * @param $calendar calendar parameters 
+ * @param $my_view user's views
+ * @access public
+ * @return HTML
+*/
+function html_calendar_view_selector($calendar, $my_views) {
   global $obm;
   global $l_views, $l_view_label, $l_select, $l_select_view; 
   global $l_view_save, $l_view_delete, $l_validate, $l_fill_view_label;
   global $l_confirm_delete_view, $l_no_sel_view, $l_conflict_view_label;
-  global $ico_delete;
+  global $ico_delete, $ico_validate, $ico_popup_close;
 
   $view_id = $calendar["view_id"];
   $iso_date = $calendar["date"];
-  $cal_range = $calendar["cal_range"];
 
   while($my_views->next_record()) {
     $id =  $my_views->f("obmbookmark_id");
@@ -505,60 +510,73 @@ function html_calendar_view_selector($new_action, $calendar, $my_views) {
     $sel_view .= "<option id=\"opt_$id\" value=\"calendar_index.php?$obmbookmarkproperty\" $selected>$label</option>";
   }
 
+  // Javascript Strings
+  $l_js_fill_view_label = phpStringToJsString($l_fill_view_label);
+  $l_js_confirm_delete_view = phpStringToJsString($l_confirm_delete_view);
+  $l_js_no_sel_view = phpStringToJsString($l_no_sel_view);
+  $l_js_conflict_view_label = phpStringToJsString($l_conflict_view_label);
+  $l_js_view_save = phpStringToJsString($l_view_save);
+  $l_js_validate = phpStringToJsString($l_validate);
+  $l_js_view_label = phpStringToJsString($l_view_label);
+
   $block = "
   <div class=\"portlet\" id=\"calendarSelView\">
     <h1>$l_views</h1>
-    <div>
-
-    <!-- Select view -->
+    <div style=\"margin: 2px;\">
     <form action=\"calendar_index.php\" method=\"get\">
-      <fieldset class=\"detail extra\">
-      <legend>$l_select</legend>
-      <select id=\"sel_view\" name=\"sel_view\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-        <option value=\"calendar_index.php?action=$new_action&amp;sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date&color=\" >$l_select_view</option>
+      <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\"
+        onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+        <option value=\"calendar_index.php?action=agenda&amp;sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\" >
+          $l_select_view
+        </option>
         $sel_view
       </select>
       <input type=\"hidden\" id=\"view_id\" name=\"view_id\" value=\"$view_id\" />
-      <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.delete();\">
+      <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.remove();return false;\">
         <img src=\"$ico_delete\" alt=\"[$l_view_delete]\"/>
       </a>
-      </fieldset>
+      <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.toggle();return false;\">
+        <img src=\"$ico_validate\" alt=\"[$l_view_save]\"/>
+      </a>
     </form>
 
-    <!-- Save view -->
-    <form action=\"calendar_index.php\" method=\"get\">
-      <fieldset class=\"detail extra\">
-      <legend>$l_view_label</legend>
-        <input type=\"text\" name=\"tf_view_label\" id=\"tf_view_label\" /> 
-        <input type=\"hidden\" name=\"view_category\" id=\"view_category\" value=\"$category\" />
-        <input type=\"hidden\" name=\"new_action\" id=\"new_action\" value=\"$new_action\" />
-        <input type=\"hidden\" name=\"view_range\" id=\"view_range\" value=\"$cal_range\" />
-        <fieldset class=\"buttons\">
-          <input type=\"button\" onclick=\"obm.calendarView.insert();\" value=\"$l_view_save\" /> 
-        </fieldset>
-      </fieldset>
-    </form>
-<!--
-    <!-- Delete view -->
-    <form action=\"calendar_index.php\" method=\"get\">
-      <fieldset class=\"detail extra\">
-      <legend>$l_view_delete</legend>
-        <fieldset class=\"buttons\">
-          <input type=\"button\" onclick=\"obm.calendarView.delete();\" value=\"$l_validate\" /> 
-          <input type=\"hidden\" id=\"view_id\" name=\"view_id\" value=\"$view_id\" />
-        </fieldset>
-      </fieldset>
-    </form>
--->
     </div>
   </div>
-    <script type=\"text/javascript\">
+  <script type=\"text/javascript\">
+    obm.vars.labels.fill_view_label = '$l_js_fill_view_label';
+    obm.vars.labels.delete_view = '$l_js_confirm_delete_view';
+    obm.vars.labels.no_sel_view = '$l_js_no_sel_view';
+    obm.vars.labels.conflict_view_label = '$l_js_conflict_view_label';
+    obm.vars.labels.save_view = '$l_js_view_save';
+    obm.vars.labels.validate = '$l_js_validate';
+    obm.vars.labels.view_label = '$l_js_view_label';
+    obm.vars.images.ico_close = '$ico_popup_close';
+
+    obm.initialize.chain(function() {
+      body = $('mainPanel');
+
+      var div = new Element('div').setProperty('id', 'viewSelectorForm').adopt(
+        new Element('h1').adopt(
+          new Element('a').adopt(
+            new Element('img').setProperty('src', obm.vars.images.ico_close))
+              .addEvent('click',
+                function() {
+                 obm.calendarView.hide(); 
+                }) ).adopt(
+          new Element('span').setHTML(obm.vars.labels.save_view)
+        )
+      ).adopt(
+        new Element('form').setProperties({'action':'calendar_index.php', 'method':'get', 'onsubmit':'obm.calendarView.insert();return false;'}).adopt(
+        new Element('fieldset').setHTML(obm.vars.labels.view_label+' :').adopt(
+          new Element('input').setProperties({'type':'text', 'id':'tf_view_label', 'name':'tf_view_label'})).adopt(
+          new Element('input').setProperties({'type':'submit','value':obm.vars.labels.validate}).addClass('button') ))
+      );
+      //.adopt(new Element('img').setProperty('src','/images/themes/default/images/popup_queue.gif'));
+      div.injectAfter(body);
+
       obm.calendarView = new Obm.CalendarView();
-      obm.vars.labels.fill_view_label = '$l_fill_view_label';
-      obm.vars.labels.delete_view = '$l_confirm_delete_view';
-      obm.vars.labels.no_sel_view = '$l_no_sel_view';
-      obm.vars.labels.conflict_view_label = '$l_conflict_view_label';
-    </script>
+    });
+  </script>
   ";
 
   return $block;

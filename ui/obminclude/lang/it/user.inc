@@ -48,5 +48,6 @@ $l_fill_username = "Scrivi prima il nome utente.";
 $l_fill_password = "Scrivi prima la password.";
 $l_delete_confirm = "Confermi eliminazione utente?";
 $l_j_check_email = "Email non valida";
+$l_change_login_confirm = "Really update user's login ?";
 
 $l_user_display = "Mostra opzioni lista Utenti";
