@@ -71,65 +71,46 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   }
 
   $block = "
-  <script type=\"text/javascript\">
-    function calendarViewToolTip(el, display) {
-      el = $(el); 
-      if(display) {
-        $('calendarViewToolTip').setHTML(el.getProperty('longdesc'));
-      } else {
-        $('calendarViewToolTip').setHTML('');
-      }
-    }
-  </script>
-  <fieldset style=\"display:inline;margin: 0; padding:0;\">
-  <legend>$l_cal_view</legend>
+  <div class=\"SB LF NM\" style=\"margin-top:-10px;margin-left:10px;>
   <a href=\"$path/calendar/calendar_index.php?cal_view=agenda&amp;date=$date\">
   <img 
-  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
-  longdesc=\"$l_view_agenda_desc\" 
+  title=\"$l_view_agenda_desc\" 
   src=\"$ico_agenda_view\" alt=\"$l_day\"/> 
   </a>
   <a href=\"$path/calendar/calendar_index.php?cal_view=printable&amp;date=$date\">
   <img 
-  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
-  longdesc=\"$l_view_printable_desc\" 
+  title=\"$l_view_printable_desc\" 
   src=\"$ico_printable_view\" alt=\"$l_week\" />
   </a>
   <a href=\"$path/calendar/calendar_index.php?cal_view=planning&amp;date=$date\">
   <img
-  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
-  longdesc=\"$l_view_planning_desc\" 
+  title=\"$l_view_planning_desc\" 
   src=\"$ico_planning_view\" alt=\"$l_month\" />
   </a>
   <a href=\"$path/calendar/calendar_index.php?cal_view=list&amp;date=$date\">
   <img
-  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
-  longdesc=\"$l_view_list_desc\" 
+  title=\"$l_view_list_desc\" 
    src=\"$ico_list_view\" alt=\"$l_list\" />
   </a>  
-  </fieldset>
-  <fieldset style=\"display:inline; margin: 0; padding:0;\">
-  <legend>$l_cal_range</legend>
+  </div>
+  <div  class=\"SB LF NM\" style=\"margin-top:-10px;margin-left:10px;\">
   <a href=\"$path/calendar/calendar_index.php?cal_range=day&amp;date=$date\">
   <img
-  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
-  longdesc=\"$l_view_day_desc\" 
+  title=\"$l_view_day_desc\" 
   src=\"$ico_day_view\" alt=\"$l_day\" />
   </a>
   <a href=\"$path/calendar/calendar_index.php?cal_range=week&amp;date=$date\">
   <img
-  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
-  longdesc=\"$l_view_week_desc\" 
+  title=\"$l_view_week_desc\" 
   src=\"$ico_week_view\" alt=\"$l_week\" />
   </a>
   <a href=\"$path/calendar/calendar_index.php?cal_range=month&amp;date=$date\">
   <img
-  onmouseover='calendarViewToolTip(this, true);' onmouseout='calendarViewToolTip(this, false);'
-  longdesc=\"$l_view_month_desc\" 
+  title=\"$l_view_month_desc\" 
   src=\"$ico_month_view\" alt=\"$l_month\" />
   </a>
-  </fieldset>
-  <div id=\"calendarViewToolTip\" class=\"info\" style=\"position:absolute\"></div>
+  </div>
+  <p class=\"LC\" />
   ";
   return $block;
 }
@@ -148,7 +129,6 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
 
   $output_target = $calendar["output_target"];
 
-  // If come from view (eg: month), keep view for links else set to week
   if ( ($action == "agenda") || ($action == "planning")) {
     $new_action = $action;
   } else {
@@ -173,8 +153,8 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
 // Parameters:
 //   - $calendar_entity : array of entities elements to display
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
-  global $ico_user, $ico_resource,$cal_range, $obm;
+function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
+  global $ico_user, $ico_resource, $obm;
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
   global $l_calendar_displayed, $l_resource_displayed,$c_all;
   global $action,$ico_delete,$output_target,$l_color,$l_users,$l_events;
@@ -194,7 +174,7 @@ function html_calendar_bar_legend($new_action, $calendar_entity,$calendar) {
     <li class=\"freeBusy\">$l_possible</li>
     <li class=\"free\">$l_free</li>
     <li class=\"busy\">$l_occupied</li>";
-  } elseif ( $action == "planning" && $cal_range == "list") {
+  } elseif ( $p_view == "planning" ) {
     $l_legend = $l_meeting_legend;
     $cats1 = of_category_get_ordered("calendar", "category1");
     $nb = count($cats1);
@@ -538,7 +518,7 @@ function html_calendar_view_selector($calendar, $my_views) {
   global $l_views, $l_view_label, $l_select, $l_select_view; 
   global $l_view_save, $l_view_delete, $l_validate, $l_fill_view_label;
   global $l_confirm_delete_view, $l_no_sel_view, $l_conflict_view_label;
-  global $ico_delete, $ico_validate, $ico_popup_close;
+  global $ico_delete, $ico_add, $ico_popup_close;
 
   $view_id = $calendar["view_id"];
   $iso_date = $calendar["date"];
@@ -581,7 +561,7 @@ function html_calendar_view_selector($calendar, $my_views) {
         <img src=\"$ico_delete\" alt=\"[$l_view_delete]\"/>
       </a>
       <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.toggle();return false;\">
-        <img src=\"$ico_validate\" alt=\"[$l_view_save]\"/>
+        <img src=\"$ico_add\" alt=\"[$l_view_save]\"/>
       </a>
     </form>
 
@@ -2538,11 +2518,11 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         <table  class=\"spreadSheet\">
         <thead>
         <tr>
-        <td>$l_user</td><td>$l_alerts</td><td>$l_state</td>
+        <td>$l_user</td><td>$l_state</td>
         </tr>
         </thead>      
-        </table>
         $dis_resource_list
+        </table>
         </div>";      
     }
 

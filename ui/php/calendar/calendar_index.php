@@ -227,12 +227,6 @@ if ($action == 'index') {
       $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
     }
   }
-
-} elseif ($action == 'agenda') {
-///////////////////////////////////////////////////////////////////////////////
-  $cal_view = "agenda";
-  $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
-
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_calendar_event_form($action, $params, '', $cal_entity_id);
@@ -742,14 +736,6 @@ function get_calendar_action() {
     'Condition'=> array ('None') 
                                          );
 
-  // View Month
-  $actions['calendar']['agenda'] = array (
-    'Name'     => $l_calendar,
-    'Url'      => "$path/calendar/calendar_index.php?action=agenda&amp;date=$date",
-    'Right'    => $cright_read,
-    'Condition'=> array ('all')
-                                         );
-
   // Decision
   $actions['calendar']['calendar'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=calendar",
@@ -763,7 +749,7 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
        'update_decision','update_alert','decision','update','delete', 'new_meeting',
-       'agenda', 'rights_admin','rights_update', 'waiting_events','planning')
+       'rights_admin','rights_update', 'waiting_events','planning')
 		);
 
   // Detail Consult

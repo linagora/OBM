@@ -11,7 +11,8 @@
 $l_vacation = "Message d'absence" ;
 $l_vacation_enabled = "Etat du message d'absence " ;
 $l_vacation_message = "Message d'absence";
-$l_enable_vacation = "Activer mon message d'absence" ;
+$l_enable_vacation = "Activer mon message d'absence immédiatement" ;
+$l_enable_auto_vacation = "Programmer l'activation automatique de mon message d'absence" ;
 $l_vacation_datebegin = "Du";
 $l_vacation_dateend = "Au";
 

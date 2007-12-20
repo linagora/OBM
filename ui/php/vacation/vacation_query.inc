@@ -65,19 +65,18 @@ function update_vacation($params, $vac_q) {
 //
 function run_query_vacation_update($params, $u_id) {
   global $cdg_sql;
-    
+  if(!$params['auto_enable']) {
+    $params['vacation_datebegin'] = '0';
+    $params['vacation_dateend'] = '0';
+  }    
   $enabled = $params["enabled"] == 1 ? "1": "0";
-  if ($enabled == "1") {
-    $time_begin = $params["time_begin"].":".$params["min_begin"].":00";
-    $time_end = $params["time_end"].":".$params["min_end"].":00";
-    $vacation_datebegin = ($params['vacation_datebegin'] ? "'".of_isodate_convert($params['vacation_datebegin'])." $time_begin'" : 'null');
-    $vacation_dateend = ($params['vacation_dateend'] ? "'".of_isodate_convert($params['vacation_dateend'])." $time_end'" : 'null');
-    $message_update = ", userobm_vacation_message='".addslashes($params["message"])."'";
-    $message_update .= ", userobm_vacation_datebegin=".$vacation_datebegin;
-    $message_update .= ", userobm_vacation_dateend=".$vacation_dateend;
-  }else {
-    $message_update = "";
-  }
+  $message_update = ", userobm_vacation_message='".addslashes($params["message"])."'";
+  $time_begin = $params["time_begin"].":".$params["min_begin"].":00";
+  $time_end = $params["time_end"].":".$params["min_end"].":00";
+  $vacation_datebegin = ($params['vacation_datebegin'] ? "'".of_isodate_convert($params['vacation_datebegin'])." $time_begin'" : '0');
+  $vacation_dateend = ($params['vacation_dateend'] ? "'".of_isodate_convert($params['vacation_dateend'])." $time_end'" : '0');
+  $message_update .= ", userobm_vacation_datebegin=".$vacation_datebegin;
+  $message_update .= ", userobm_vacation_dateend=".$vacation_dateend;
 
 
   // Update done in real-time, so updating UserObm AND P_UserObm

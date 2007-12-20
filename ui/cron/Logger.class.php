@@ -30,7 +30,6 @@ class Logger {
   }
   
   function warn($message) {
-    $message = $this->formatMessage($message);
     Logger::log($message,L_WARN,$this->className);
   }
 

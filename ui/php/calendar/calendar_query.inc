@@ -2170,7 +2170,9 @@ function get_calendar_resource_from_ids($resources) {
   if (is_array($resources)) {
     $where = '(0';
     foreach($resources as $resource) {
-      $where .= ", $resource";
+      if(is_numeric($resource)) {
+        $where .= ", $resource";
+      }
     }
     $multidomain = sql_multidomain('resource');
     $where .= ')';

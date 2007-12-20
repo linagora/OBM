@@ -87,6 +87,7 @@ function get_vacation_params() {
   // Get global params
   $params = get_global_params("vacation");
 
+
   return $params;
 }
 

@@ -1,6 +1,6 @@
 <?php
-include_once("php/vacation/vacation_query.inc");
-include_once("CronJob.class.php");
+include_once('php/vacation/vacation_query.inc');
+include_once('CronJob.class.php');
 
 class VacationCronJob extends CronJob{
 
@@ -15,7 +15,7 @@ class VacationCronJob extends CronJob{
    */
   function mustExecute($date) {
     return true;
-    $min = date("i");
+    $min = date('i');
     return ($min%15 === 0);
   }
 
@@ -60,16 +60,17 @@ class VacationCronJob extends CronJob{
 
     $obm_q = new DB_OBM;
     $query = "SELECT userobm_id, userobm_login, userobm_domain_id FROM UserObm
-      WHERE userobm_vacation_enable = 0 AND 
-      $vacation_datebegin < $date";
+      WHERE userobm_vacation_enable = 0 AND
+      $vacation_datebegin > 0 AND
+      $vacation_datebegin <= $date";
 
     $this->logger->core($query);
     $obm_q->query($query);
     $this->logger->info($obm_q->nf()." vacations to enable");
     while($obm_q->next_record()) {
-      $vacation[$obm_q->f('userobm_id')] = array($obm_q->f('userobm_login'),$obm_q->f('userobm_domain_id'));
+      $vacation[$obm_q->f('userobm_id')] = array("login" => $obm_q->f('userobm_login'), "domain" => $obm_q->f('userobm_domain_id'));
     }
-    $this->logger->info('List of vacation to enable : '.implode(',', $vacation));
+    $this->logger->info('List of vacation to enable : '.implode(',', array_keys($vacation)));
     return $vacation;
   }
 
@@ -88,15 +89,15 @@ class VacationCronJob extends CronJob{
 
     $obm_q = new DB_OBM;
     $query = "SELECT userobm_id, userobm_login, userobm_domain_id FROM UserObm
-      WHERE  $vacation_dateend > $date";
+      WHERE  $vacation_dateend <= $date AND $vacation_dateend > 0";
 
     $this->logger->core($query);
     $obm_q->query($query);
     $this->logger->info($obm_q->nf()." vacations to disable");
     while($obm_q->next_record()) {
-      $vacation[$obm_q->f('userobm_id')] = array($obm_q->f('userobm_login'),$obm_q->f('userobm_domain_id'));
+      $vacation[$obm_q->f('userobm_id')] = array("login" => $obm_q->f('userobm_login'), "domain" => $obm_q->f('userobm_domain_id'));
     }
-    $this->logger->info('List of vacation to disable : '.implode(',', $vacation));
+    $this->logger->info('List of vacation to disable : '.implode(',', array_keys($vacation)));
     return $vacation;
   }  
   /**
@@ -108,14 +109,17 @@ class VacationCronJob extends CronJob{
    */
   function enableVacation($users) {
     if(count($users) > 0) {
+      $this->logger->debug("Enabling ".count($users)."vacations in main table");
       $obm_q = new DB_OBM;
       $query = "UPDATE UserObm set userobm_vacation_enable = 1 WHERE userobm_id IN (".implode(',',array_keys($users)).")";
       $this->logger->core($query);
       $obm_q->query($query);      
+      $this->logger->debug("Enabling ".count($users)."vacations in P table");
       $obm_q = new DB_OBM;
       $query = "UPDATE P_UserObm set userobm_vacation_enable = 1 WHERE userobm_id IN (".implode(',',array_keys($users)).")";
       $this->logger->core($query);
       $obm_q->query($query);      
+      $this->logger->debug("Enabling ".count($users)."vacations in sieve");
       $this->updateVacation($users);
     }
   }
@@ -128,17 +132,26 @@ class VacationCronJob extends CronJob{
    */
   function disableVacation($users) {
     if(count($users) > 0) {
+      $this->logger->debug("Disabling ".count($users)."vacations in main table");
       $obm_q = new DB_OBM;
-      $query = "UPDATE UserObm set userobm_vacation_enable = 0 WHERE userobm_id IN (".implode(',',array_keys($users)).")";
+      $query = "UPDATE UserObm set 
+        userobm_vacation_enable = 0, 
+        userobm_vacation_datebegin = '0',
+        userobm_vacation_dateend = '0'
+        WHERE userobm_id IN (".implode(',',array_keys($users)).")";
       $this->logger->core($query);
       $obm_q->query($query);      
+      $this->logger->debug("Disabling ".count($users)."vacations in P table");
       $obm_q = new DB_OBM;
-      $query = "UPDATE P_UserObm set userobm_vacation_enable = 0 WHERE userobm_id IN (".implode(',',array_keys($users)).")";
+      $query = "UPDATE P_UserObm set userobm_vacation_enable = 0, 
+        userobm_vacation_datebegin = '0',
+        userobm_vacation_dateend = '0'
+        WHERE userobm_id IN (".implode(',',array_keys($users)).")";
       $this->logger->core($query);
       $obm_q->query($query);      
+      $this->logger->debug("Disabling ".count($users)."vacations in sieve");
       $this->updateVacation($users);
     }    
-    $this->updateVacation($users);
   }
   /**
    * enableVacation 
@@ -149,7 +162,9 @@ class VacationCronJob extends CronJob{
    */
   function updateVacation($users) {
     foreach($users as $user_identity) {
-      list($login, $domain) = split("@",$user_identity);
+      $login = $user_identity['login'];
+      $domain = $user_identity['domain'];
+      $this->logger->debug("Calling sieve automate for login : $login domain : $domain");
       update_sieve(array(), $login, $domain); 
     }
   }
