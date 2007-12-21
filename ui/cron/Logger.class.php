@@ -84,9 +84,13 @@ function errorHandler($code, $message, $file, $line) {
       Logger::log("$message in $file at $line",L_CRITICAL, $file);
       break;
     case E_NOTICE:
-        break;      
+      Logger::log("$message in $file at $line", L_DEBUG,$file);
+      break;     
+    case E_STRICT:
+      Logger::log("$message in $file at $line", L_DEBUG, $file);
+        break;
     default:
-      Logger::log("$message in $file at $line", L_INFO, $file);
+      Logger::log("$message in $file at $line", L_WARN, $file);
       break;
     }
 }
