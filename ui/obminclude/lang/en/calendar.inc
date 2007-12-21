@@ -88,7 +88,7 @@ $l_events = "Évents";
 
 $l_collapse_all = "Collapse all";
 $l_expand_all = "Expand all";
-
+$l_edit = "Edit";
 
 $l_view = "View";
 $l_views = "Views";

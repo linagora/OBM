@@ -33,15 +33,14 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   $my_views = run_query_calendar_get_my_views();
   $calendar_function = "dis_calendar_".$p_range."_".$p_view;
   
-  $display["features"] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable, $my_views);
+  $display["features"] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable, $my_views, $p_view);
   $display['title'] = "<div class=\"title\">$l_module_calendar : ".$GLOBALS["l_view_$p_view"]." ".$GLOBALS["l_range_$p_range"]." </div>";
   if(function_exists($calendar_function)) {
     $block = $calendar_function($calendar, $calendar_entity,$writable_entity,$date);
     $block .= dis_calendar_quick_form($calendar);
-    $display["print_url"] = "$path/calendar/calendar_index.php?action=planning&amp;date=".$calendar["date"];
+    $display["print_url"] = "$path/calendar/calendar_index.php?cal_view=printable&amp;date=".$calendar["date"];
   } else {
-    //    $block .= dis_calendar_week_view($calendar, $calendar_entity,$writable_entity);
-    $block .= "ERROR $p_view $p_range";
+     $block .= dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity);
   }
   return $block;
 }
@@ -71,7 +70,7 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   }
 
   $block = "
-  <div class=\"SB LF NM\" style=\"margin-top:-10px;margin-left:10px;>
+  <div class=\"SB LF NM\" style=\"margin-top:-10px;margin-left:10px;\">
   <a href=\"$path/calendar/calendar_index.php?cal_view=agenda&amp;date=$date\">
   <img 
   title=\"$l_view_agenda_desc\" 
@@ -93,7 +92,7 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
    src=\"$ico_list_view\" alt=\"$l_list\" />
   </a>  
   </div>
-  <div  class=\"SB LF NM\" style=\"margin-top:-10px;margin-left:10px;\">
+  <div id=\"calendarCalRange\" class=\"SB LF NM\" style=\"margin-top:-10px;margin-left:10px;\">
   <a href=\"$path/calendar/calendar_index.php?cal_range=day&amp;date=$date\">
   <img
   title=\"$l_view_day_desc\" 
@@ -110,6 +109,11 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   src=\"$ico_month_view\" alt=\"$l_month\" />
   </a>
   </div>
+  <script type=\"text/javascript\">
+    if(!obm.vars.conf.displayRange) {
+      $('calendarCalRange').setStyle('display','none');
+     }
+  </script>
   <p class=\"LC\" />
   ";
   return $block;
@@ -123,24 +127,16 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
 //   - $calendar_entity : array of entities elements to display
 //   - $entity_readable : array of readable entities (["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable, $my_views) {
+function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable, $my_views, $p_view) {
   global $action;
   global $output_target;
 
   $output_target = $calendar["output_target"];
 
-  if ( ($action == "agenda") || ($action == "planning")) {
-    $new_action = $action;
-  } else {
-    $new_action = "agenda";
-  }
-
-  $block = html_calendar_bar_legend($new_action, $calendar_entity,$calendar);
+  $block = html_calendar_bar_legend($p_view, $calendar_entity,$calendar);
   if ($action != "perform_meeting" && $output_target != "print") {
-    $block .= html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable);
-    if ($new_action == "agenda" || $new_action == "planning") {
-      $block .= html_calendar_view_selector($calendar, $my_views);
-    }
+    $block .= html_calendar_select_calendar_entity($p_view, $calendar, $calendar_entity, $entity_readable);
+    $block .= html_calendar_view_selector($calendar, $my_views);
     $block .= html_calendar_bar_date_selector($calendar);
   }
 
@@ -158,11 +154,10 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
   global $l_calendar_displayed, $l_resource_displayed,$c_all;
   global $action,$ico_delete,$output_target,$l_color,$l_users,$l_events;
-
   // Legend
   $iso_date = $calendar["date"];
   if(count($calendar_entity) == 1 && is_array($calendar_entity["user"])
-     && key($calendar_entity["user"]) == $obm["uid"]) {
+     && count($calendar_entity["user"]) == 1 && key($calendar_entity["user"]) == $obm["uid"]) {
     $colorTemplate = 'event';
   } else {
     $colorTemplate = 'user';
@@ -175,6 +170,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
     <li class=\"free\">$l_free</li>
     <li class=\"busy\">$l_occupied</li>";
   } elseif ( $p_view == "planning" ) {
+    $script_range = "obm.vars.conf.displayRange = true;";
     $l_legend = $l_meeting_legend;
     $cats1 = of_category_get_ordered("calendar", "category1");
     $nb = count($cats1);
@@ -183,12 +179,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
       $dis_legend .= "<li style=\"color:#fff;background-color:rgb($colors[$key])\">$cat_info[label]</li>";
     }
   } else {
-    $block = "
-      <script type=\"text/javascript\">
-         obm.vars.conf.calendarColor = '$colorTemplate';
-       </script>      
-      ";
-
+    $script_range = "obm.vars.conf.displayRange = true;";
     $l_legend = $l_calendar_displayed;
     foreach ($calendar_entity as $type => $entity) {
       foreach ($entity as $id => $data) {      
@@ -210,6 +201,10 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   <div class=\"portlet\" id=\"calendarLegend\">
   <h1>$l_legend</h1>
   <form action=\"\" onsubmit=\"return false;\">
+  <script type=\"text/javascript\">
+    obm.vars.conf.calendarColor = '$colorTemplate';
+    $script_range 
+   </script>      
   <ul>
     $dis_legend
   </ul>
@@ -310,7 +305,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   $cats1 = of_category_get_ordered("calendar", "category1");
   $sel_cat1 = of_category_html_select("calendar", "category1", $cats1, $category_filter,"all_f","onchange=\"this.form.submit()\"","category_filter");
 
-  $dis_back_myview = "<a href=\"calendar_index.php?action=$new_action&amp;sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_back_mono</a>";
+  $dis_back_myview = "<a href=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_back_mono</a>";
 
   $block = "
     <div class=\"portlet\" id=\"calendarSelection\">
@@ -320,7 +315,6 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <fieldset class=\"detail extra\">
     <legend>$l_category_filter</legend>
       $sel_cat1 
-      <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
       <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
     </fieldset>
     </form>
@@ -343,7 +337,6 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
     <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
     <input type=\"hidden\" name=\"new_group\" value=\"1\" />
-    <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
     <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
     </fieldset>
     $dis_block_resource
@@ -2105,9 +2098,9 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
     $css
   </style>
   <h1>
-    <a href=\"calendar_index.php?action=planning&amp;date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
     $display_date
-    <a href=\"calendar_index.php?action=planning&amp;date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
   </h1>   
   <table class=\"planning\">
   <colgroup>
@@ -2289,7 +2282,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend, $l_none, $c_none; 
   global $l_wait, $l_task, $l_exception, $l_yes, $l_no, $path;
   global $l_carac,$l_module_calendar, $l_items, $ccalendar_alerts;
-  global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
+  global $l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
   $id = $event_q->f("calendarevent_id");
   $writable_users = of_right_entity_for_user("calendar", $obm["uid"], "write", "", "userobm");
@@ -2509,7 +2502,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         ";
           $$state = "";
         } else {
-          $dis_resource_list .= "<tr><td>$label($property[$r_id])</td><td class=\"C\">$state</td></tr>";
+          $dis_resource_list .= "<tr><td>$label($property[$r_id])</td><td class=\"C\" >$state</td></tr>";
         }
       }
       $dis_resource_block = "
@@ -2518,7 +2511,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         <table  class=\"spreadSheet\">
         <thead>
         <tr>
-        <td>$l_user</td><td>$l_state</td>
+        <td>$l_resources</td><td>$l_state</td>
         </tr>
         </thead>      
         $dis_resource_list
@@ -2579,7 +2572,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   <table  class=\"spreadSheet\">
   <thead>
   <tr>
-  <td>$l_user</td><td>$l_alerts</td><td>$l_state</td>
+  <td>$l_users</td><td>$l_alerts</td><td>$l_state</td>
   </tr>
   </thead>
   $dis_user_list
@@ -2660,7 +2653,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
  */
 function dis_calendar_quick_form($calendar) {
   global $ico_popup_close,$l_validate,$popup_queue,$l_title;
-  global $l_desc,$l_confirm_delete,$l_c_delete,$l_category1;
+  global $l_desc,$l_confirm_delete,$l_c_delete,$l_category1, $l_edit;
   global $l_location,$l_members,$l_carac, $l_items,$l_details;
 
   $block = "
@@ -2680,9 +2673,10 @@ function dis_calendar_quick_form($calendar) {
         $l_title : <input type=\"text\" name=\"tf_title\" /> <input class=\"button\" type=\"submit\" value=\"$l_validate\" />
       </fieldset> 
       <fieldset class=\"buttons\"> 
-        <input type=\"button\" onclick=\"obm.calendarQuickForm.goTo();\" value=\"$l_details\" />
-      <input type=\"button\" 
-      onclick=\"if(confirm('".phpStringToJsString($l_confirm_delete)."')) obm.calendarQuickForm.submit('quick_delete');\"
+        <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" value=\"$l_edit\" />
+        <input type=\"button\" id=\"calendarQuickFormDetail\" onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value=\"$l_details\" />
+        <input type=\"button\" id=\"calendarQuickFormDelete\" 
+          onclick=\"if(confirm('".phpStringToJsString($l_confirm_delete)."')) obm.calendarQuickForm.submit('quick_delete');\"
       value=\"$l_c_delete\" />
       </fieldset>
       </form>
@@ -2746,7 +2740,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
   global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_task;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
-  global $l_resources,$l_format,$l_daysofweekshort, $l_exception, $l_items;
+  global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time, $l_color;
 
   $time_unit = 60 / $_SESSION['set_cal_interval'];  
@@ -3386,7 +3380,7 @@ function html_calendar_waiting_events($obm_wait) {
   global $l_users, $l_title, $l_location, $l_priority, $l_category,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_repeat,$l_change_state,$l_validate,$l_from, $l_user, $l_resource;
   global $l_repeatkind,$l_repeatdays2,$l_date_repeatend,$l_daily,$l_weekly,$ccalendar_weekstart,$l_wait;
-  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
    
   while ($obm_wait->next_record()) {
     $old_entity = $current_entity;
@@ -3486,7 +3480,7 @@ function html_calendar_waiting_events($obm_wait) {
     $date_end = of_datetime_format($obm_wait->f("calendarevent_date") + $obm_wait->f("calendarevent_duration"));
     $dis_events .= "
     <tr>
-     <td>".$obm_wait->f("calendarevent_title")."</td>
+     <td><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$obm_wait->f("calendarevent_id")."\">".$obm_wait->f("calendarevent_title")."</a></td>
      <td>".$obm_wait->f("calendarevent_location")."</td>
      <td>".$obm_wait->f("calendarcategory1_label")."</td>
      <td>$priority</td>
@@ -3594,7 +3588,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   global $ico_add, $ico_delete, $ico_mini_cal;
   global $ccalendar_resource;
   // -- Labels
-  global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
+  global $l_users,$l_datebegin,$l_dateend,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
   global $l_groups,$l_resources,$l_module_resourcegroup, $l_module_calendar;
 
   $time_unit = 60 / $_SESSION['set_cal_interval'];
@@ -3816,7 +3810,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   $dis_block_resource  
   $dis_block_resource_group
   <tr>
-    <th>$l_datebegin $l_format</th>
+    <th>$l_datebegin</th>
     <td>
       <input type=\"text\" name=\"tf_date_begin\" value=\"$datebegin\" class=\"datePicker\" />
     </td>

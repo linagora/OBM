@@ -24,7 +24,6 @@ $l_medium = "Normale";
 $l_go = "Voir";
 $l_occupied_day = "Journée entière";
 $l_event_duration = "Durée de la réunion";
-$l_format = "(AAAA-MM-JJ)";
 $l_repeat = "Répétition";
 $l_periodicity = "Fréquence";
 $l_repeatkind = "Type de répétition";
@@ -79,6 +78,7 @@ $l_conflicts = "Conflit(s) rencontré(s)";
 $l_date = "Date";
 $l_user = "Utilisateur";
 $l_back_mono = "Revenir à ma vue";
+$l_edit = "Editer";
 
 $l_collapse_all = "Tout réduire";
 $l_expand_all = "Tout développer";

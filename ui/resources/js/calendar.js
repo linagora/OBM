@@ -985,6 +985,9 @@ Obm.CalendarQuickForm = new Class({
     this.location = $('calendarQuickFormLocation');
     this.category = $('calendarQuickFormCategory');
     this.attendees = $('calendarQuickFormAttendees');
+    this.deleteButton = $('calendarQuickFormDelete');
+    this.detailButton = $('calendarQuickFormDetail');
+    this.editButton = $('calendarQuickFormEdit');
 
     this.popup.setStyle('position','absolute');
 
@@ -1050,6 +1053,9 @@ Obm.CalendarQuickForm = new Class({
 
     if(evt.event.updatable) {
       this.form.setStyle('display','block');
+      this.deleteButton.setStyle('display','');
+      this.editButton.setStyle('display','');
+      this.detailButton.setStyle('display','');
     } else {
       this.form.setStyle('display','none');
       this.title.setHTML(evt.event.title);
@@ -1097,6 +1103,9 @@ Obm.CalendarQuickForm = new Class({
     this.form.setStyle('display','block');
     this.data.setStyle('display','none');
     this.title.setStyle('display','none');
+    this.deleteButton.setStyle('display','none');
+    this.editButton.setStyle('display','');
+    this.detailButton.setStyle('display','none');    
     if(this.eventData.all_day != 1) {
       this.date.setHTML(date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
     } else {

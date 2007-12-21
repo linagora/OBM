@@ -45,7 +45,7 @@ class Cron {
     $this->logger = new Logger(get_class($this));
     $jobs = array();
     $this->date = time();
-    $this->logger->debug("Cron date set to : ".date("Y-m-d H:i:s",$this->date));
+    $this->logger->info("Executing OBM crontab at ".date("Y-m-d H:i:s",$this->date));
     $this->parseJobs($jobsPath);
     $this->orderJobs();
   }

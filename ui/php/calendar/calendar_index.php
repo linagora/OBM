@@ -189,14 +189,15 @@ $display['search'] = dis_calendar_view_bar($cal_view, $cal_range, $params["date"
 
 if ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_wait = run_query_calendar_waiting_events();
-  if ($obm_wait->nf() != 0) {
-    $display['msg'] .= display_warn_msg($l_waiting_events.' : '.$obm_wait->nf());
-    $display['detail'] .= html_calendar_waiting_events($obm_wait);
+  if(!$cal_view) {
+    $obm_wait = run_query_calendar_waiting_events();
+    if ($obm_wait->nf() != 0) {
+      $display['msg'] .= display_warn_msg($l_waiting_events.' : '.$obm_wait->nf());
+      $display['detail'] .= html_calendar_waiting_events($obm_wait);
+    }
   } else {
     $display['detail'] .= dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
-  }
-
+  }  
 } elseif ($action == 'waiting_events') {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_wait = run_query_calendar_waiting_events();
@@ -458,7 +459,7 @@ if ($action == 'index') {
   $ret = run_query_calendar_get_entity_label($cal_entity_id);
   $ret['resourcegroup'] = run_query_resource_resourcegroup($cal_entity_id['resource_group']);
   $entity_store = store_calendar_entities($ret);
-  $display['features'] = html_calendar_planning_bar($params, $cal_entity_id, $entity_store, $entity_readable);
+  $display['features'] = html_calendar_planning_bar($params, $cal_entity_id, $entity_store, $entity_readable,$cal_view);
   $display['detail'] = dis_calendar_free_interval($params, $entity_store);
 
 } elseif ($action == 'admin')  {
