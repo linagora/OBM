@@ -584,10 +584,13 @@ function html_calendar_view_selector($calendar, $my_views) {
           new Element('span').setHTML(obm.vars.labels.save_view)
         )
       ).adopt(
-        new Element('form').setProperties({'action':'calendar_index.php', 'method':'get', 'onsubmit':'obm.calendarView.insert();return false;'}).adopt(
+        new Element('form').setProperties({'action':'calendar_index.php', 'method':'get'}).adopt(
         new Element('fieldset').setHTML(obm.vars.labels.view_label+' :').adopt(
           new Element('input').setProperties({'type':'text', 'id':'tf_view_label', 'name':'tf_view_label'})).adopt(
-          new Element('input').setProperties({'type':'submit','value':obm.vars.labels.validate}).addClass('button') ))
+          new Element('input').setProperties({'type':'button','value':obm.vars.labels.validate}).addClass('button').addEvent('click', function() {
+            obm.calendarView.insert();
+            return false;
+          } )))
       );
       //.adopt(new Element('img').setProperty('src','/images/themes/default/images/popup_queue.gif'));
       div.injectAfter(body);
