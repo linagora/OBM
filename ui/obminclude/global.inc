@@ -258,7 +258,7 @@ $obmdb_password = $ini_array['password'];
 // Single or multi domain
 $c_singleNameSpace = $ini_array['singleNameSpace'];
 
-$cgp_host = $ini_array['external-protocol'].'://'.$ini_array['external-url'].$ini_array['obm-prefix']
+$cgp_host = $ini_array['external-protocol'].'://'.$ini_array['external-url'].$ini_array['obm-prefix'];
 //------------------//
 // Services enabled //
 //------------------//
