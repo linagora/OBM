@@ -127,8 +127,18 @@ sub getEntity {
 
     # On stocke les informations utiles dans la structure de donnees des
     # resultats
-    $self->{"hostDesc"} = $dbHostDesc;
-    $self->{"hostDesc"}->{"host_domain"} = $domainDesc->{"domain_label"};
+    $self->{hostDesc}->{host_uid} = $dbHostDesc->{host_uid};
+    $self->{hostDesc}->{host_gid} = $dbHostDesc->{host_gid};
+    $self->{hostDesc}->{host_name} = $dbHostDesc->{host_name};
+    $self->{hostDesc}->{host_ip} = $dbHostDesc->{host_ip};
+    $self->{hostDesc}->{host_delegation} = $dbHostDesc->{host_delegation};
+    $self->{hostDesc}->{host_description} = $dbHostDesc->{host_description};
+    $self->{hostDesc}->{host_web_perms} = $dbHostDesc->{host_web_perms};
+    $self->{hostDesc}->{host_web_list} = $dbHostDesc->{host_web_list};
+    $self->{hostDesc}->{host_web_all} = $dbHostDesc->{host_web_all};
+    $self->{hostDesc}->{host_ftp_perms} = $dbHostDesc->{host_ftp_perms};
+    $self->{hostDesc}->{host_firewall_perms} = $dbHostDesc->{host_firewall_perms};
+    $self->{hostDesc}->{host_domain} = $domainDesc->{domain_label};
 
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
