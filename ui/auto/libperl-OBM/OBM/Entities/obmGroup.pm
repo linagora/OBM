@@ -201,38 +201,17 @@ sub updateDbEntity {
         # utilisateurs/groupes
         $query = "DELETE FROM P_of_usergroup WHERE of_usergroup_group_id=".$self->{"groupId"};
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "obmUser: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
             return 0;
         }
 
 
         # On copie les nouveaux droits
-        $query = "SELECT * FROM of_usergroup WHERE of_usergroup_group_id=".$self->{"groupId"};
+        $query = "INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_group_id=".$self->{"groupId"};
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
             &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d' une requete SQL : ".$dbHandler->err, "W" );
             return 0;
-        }
-
-        while( my $rowHash = $queryResult->fetchrow_hashref() ) {
-            $query = "INSERT INTO P_of_usergroup SET ";
-
-            my $first = 1;
-            while( my( $column, $value ) = each(%{$rowHash}) ) {
-                if( !$first ) {
-                    $query .= ", ";
-                }else {
-                    $first = 0;
-                }
-
-                $query .= $column."=".$dbHandler->quote($value);
-            }
-
-            my $queryResult2;
-            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-                &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'executio n d'une requete SQL : ".$dbHandler->err, "W" );
-                return 0;
-             }
         }
     }
 
@@ -260,6 +239,40 @@ sub getEntityLinks {
     $self->{"links"} = 1;
 
     return 1;
+}
+
+
+sub getEntityDescription {
+    my $self = shift;
+    my $entry = $self->{"groupDesc"};
+    my $description = "";
+
+
+    if( defined($entry->{group_name}) ) {
+        $description .= "identifiant '".$entry->{group_name}."'";
+    }
+
+    if( defined($entry->{group_domain}) ) {
+        $description .= ", domaine '".$entry->{group_domain}."'";
+    }
+
+    if( ($description ne "") && defined($self->{type}) ) {
+        $description .= ", type '".$self->{type}."'";
+    }
+
+    if( $description ne "" ) {
+        return $description;
+    }
+
+    if( defined($self->{groupId}) ) {
+        $description .= "ID BD '".$self->{groupId}."'";
+    }
+
+    if( defined($self->{type}) ) {
+        $description .= ",type '".$self->{type}."'";
+    }
+
+    return $description;
 }
 
 

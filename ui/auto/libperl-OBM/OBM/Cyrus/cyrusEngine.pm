@@ -290,7 +290,7 @@ sub update {
     # Récupération du nom de la boîte à traiter
     my $mailBoxName = $object->getMailboxName();
     if( !defined($mailBoxName) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: pas de boite a lettres definie pour l'objet de type '".$object->{"type"}."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: pas de boite a lettres definies pour l'objet : ".$object->getEntityDescription(), "W" );
         return 1;
     }
 

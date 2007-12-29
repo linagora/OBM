@@ -351,7 +351,7 @@ sub update {
 
     # Si cette entité n'a pas d'interaction avec Sieve
     if( !$object->getMailboxSieve() ) {
-        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de compte SIEVE definit pour l'objet de type '".$object->{"type"}."'", 'W' );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de compte SIEVE definit pour l'objet : ".$object->getEntityDescription(), 'W' );
         return 1;
     }
 

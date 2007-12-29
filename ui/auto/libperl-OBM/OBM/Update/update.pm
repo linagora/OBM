@@ -445,7 +445,7 @@ sub _doIncremental {
         $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
 
         if( !defined($domainDesc) ) {
-            &OBM::toolBox::write_log( "[Update::update]: domaine d'idenfiant '".$self->{"domain"}."'", "W" );
+            &OBM::toolBox::write_log( "[Update::update]: domaine d'identifiant '".$self->{"domain"}."' inexistant", "W" );
             return 0;
         }
     }

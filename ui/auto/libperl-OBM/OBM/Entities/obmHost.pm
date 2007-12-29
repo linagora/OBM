@@ -201,6 +201,40 @@ sub getEntityLinks {
 }
 
 
+sub getEntityDescription {
+    my $self = shift;
+    my $entry = $self->{"hostDesc"};
+    my $description = "";
+
+
+    if( defined($entry->{host_name}) ) {
+        $description .= "identifiant '".$entry->{host_name}."'";
+    }
+
+    if( defined($entry->{host_domain}) ) {
+        $description .= ", domaine '".$entry->{host_domain}."'";
+    }
+
+    if( ($description ne "") && defined($self->{type}) ) {
+        $description .= ", type '".$self->{type}."'";
+    }
+
+    if( $description ne "" ) {
+        return $description;
+    }
+
+    if( defined($self->{hostId}) ) {
+        $description .= "ID BD '".$self->{hostId}."'";
+    }
+
+    if( defined($self->{type}) ) {
+        $description .= ",type '".$self->{type}."'";
+    }
+
+    return $description;
+}
+
+
 sub setDelete {
     my $self = shift;
 

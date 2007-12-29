@@ -307,6 +307,40 @@ sub getEntityLinks {
 }
 
 
+sub getEntityDescription {
+    my $self = shift;
+    my $entry = $self->{"mailShareDesc"};
+    my $description = "";
+
+
+    if( defined($entry->{mailshare_name}) ) {
+        $description .= "identifiant '".$entry->{mailshare_name}."'";
+    }
+
+    if( defined($entry->{mailshare_domain}) ) {
+        $description .= ", domaine '".$entry->{mailshare_domain}."'";
+    }
+
+    if( ($description ne "") && defined($self->{type}) ) {
+        $description .= ", type '".$self->{type}."'";
+    }
+
+    if( $description ne "" ) {
+        return $description;
+    }
+
+    if( defined($self->{mailShareId}) ) {
+        $description .= "ID BD '".$self->{mailShareId}."'";
+    }
+
+    if( defined($self->{type}) ) {
+        $description .= ",type '".$self->{type}."'";
+    }
+
+    return $description;
+}
+
+
 sub setDelete {
     my $self = shift;
 

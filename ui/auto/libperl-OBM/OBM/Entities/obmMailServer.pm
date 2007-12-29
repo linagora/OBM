@@ -123,6 +123,44 @@ sub updateDbEntity {
 }
 
 
+sub getEntityLinks {
+    my $self = shift;
+    my( $dbHandler, $domainDesc ) = @_;
+
+    return 1;
+}
+
+
+sub getEntityDescription {
+    my $self = shift;
+    my $entry = $self->{"postfixConf"};
+    my $description = "";
+
+
+    if( defined($entry->{postfixconf_domain}) ) {
+        $description .= "domaine '".$entry->{postfixconf_domain}."'";
+    }
+
+    if( ($description ne "") && defined($self->{type}) ) {
+        $description .= ", type '".$self->{type}."'";
+    }
+
+    if( $description ne "" ) {
+        return $description;
+    }
+
+    if( defined($self->{domainId}) ) {
+        $description .= "ID BD '".$self->{domainId}."'";
+    }
+
+    if( defined($self->{type}) ) {
+        $description .= ",type '".$self->{type}."'";
+    }
+
+    return $description;
+}
+
+
 sub setDelete {
     my $self = shift;
 
@@ -150,14 +188,6 @@ sub isLinks {
     my $self = shift;
 
     return $self->{"links"};
-}
-
-
-sub getEntityLinks {
-    my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
-
-    return 1;
 }
 
 

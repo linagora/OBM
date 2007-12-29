@@ -151,6 +151,48 @@ sub updateDbEntity {
 }
 
 
+sub getEntityLinks {
+    my $self = shift;
+    my( $dbHandler, $domainDesc ) = @_;
+
+    return 1;
+}
+
+
+sub getEntityDescription {
+    my $self = shift;
+    my $entry = $self->{"userDesc"};
+    my $description = "";
+
+
+    if( defined($entry->{user_login}) ) {
+        $description .= "identifiant '".$entry->{user_login}."'";
+    }
+
+    if( defined($entry->{user_domain}) ) {
+        $description .= ", domaine '".$entry->{user_domain}."'";
+    }
+
+    if( ($description ne "") && defined($self->{type}) ) {
+        $description .= ", type '".$self->{type}."'";
+    }
+
+    if( $description ne "" ) {
+        return $description;
+    }
+
+    if( defined($self->{userId}) ) {
+        $description .= "ID BD '".$self->{userId}."'";
+    }
+
+    if( defined($self->{type}) ) {
+        $description .= ",type '".$self->{type}."'";
+    }
+
+    return $description;
+}
+
+
 sub setDelete {
     my $self = shift;
 
@@ -178,14 +220,6 @@ sub isLinks {
     my $self = shift;
 
     return $self->{"links"};
-}
-
-
-sub getEntityLinks {
-    my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
-
-    return 1;
 }
 
 
