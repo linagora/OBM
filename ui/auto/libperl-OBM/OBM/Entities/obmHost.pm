@@ -157,35 +157,21 @@ sub updateDbEntity {
     &OBM::toolBox::write_log( "[Entities::obmHost]: MAJ de l'hote '".$dbHostDesc->{"host_name"}."' dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
-    my $query = "DELETE FROM P_Host WHERE host_id=".$self->{"hostId"};
-    my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-        return 0;
-    }
-
-    # Obtention des noms de colonnes de la table
-    $query = "SELECT * FROM P_Host WHERE 0=1";
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-        return 0;
-    }
-    my $columnList = $queryResult->{NAME};
-
-    $query = "INSERT INTO P_Host SET ";
+    my $query = "REPLACE INTO P_Host SET ";
     my $first = 1;
-    for( my $i=0; $i<=$#$columnList; $i++ ) {
+    while( my( $columnName, $columnValue ) = each(%{$dbHostDesc}) ) {
         if( !$first ) {
             $query .= ", ";
         }else {
             $first = 0;
         }
 
-        $query .= $columnList->[$i]."=".$dbHandler->quote($dbHostDesc->{$columnList->[$i]});
+        $query .= $columnName."=".$dbHandler->quote($columnValue);
     }
 
+    my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "obmMailshare: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 

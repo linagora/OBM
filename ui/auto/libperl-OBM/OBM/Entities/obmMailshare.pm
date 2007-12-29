@@ -108,9 +108,8 @@ sub getEntity {
     }
 
 
-    # La requete a executer - obtention des informations sur le répertoire
-    # partagé
-    $query = "SELECT * FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
+    # Obtention de la description BD de l'utilisateur
+    $query = "SELECT * FROM ".$mailShareTable." WHERE mailshare_id=".$mailShareId;
 
     # On execute la requete
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -124,6 +123,21 @@ sub getEntity {
 
     # On stocke la description BD utile pour la MAJ des tables
     $self->{"mailShareDbDesc"} = $dbMailShareDesc;
+
+
+    # La requete a executer - obtention des informations sur le répertoire
+    # partagé
+    $query = "SELECT * FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
+
+    # On execute la requete
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+    # On range les resultats dans la structure de donnees des resultats
+    $dbMailShareDesc = $queryResult->fetchrow_hashref();
+    $queryResult->finish();
 
     if( $self->getDelete() ) {
         &OBM::toolBox::write_log( "[Entities::obmMailshare]: suppression de la BAL partagee : '".$dbMailShareDesc->{"mailshare_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
@@ -217,33 +231,19 @@ sub updateDbEntity {
     &OBM::toolBox::write_log( "[Entities::obmMailshare]: MAJ de la boite a lettre partagee '".$dbMailShareDesc->{"mailshare_name"}."' dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
-    my $query = "DELETE FROM P_MailShare WHERE mailshare_id=".$self->{"mailShareId"};
-    my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-        return 0;
-    }
-
-    # Obtention des noms de colonnes de la table
-    $query = "SELECT * FROM P_MailShare WHERE 0=1";
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-        return 0;
-    }
-    my $columnList = $queryResult->{NAME};
-
-    $query = "INSERT INTO P_MailShare SET ";
+    my $query = "REPLACE INTO P_MailShare SET ";
     my $first = 1;
-    for( my $i=0; $i<=$#$columnList; $i++ ) {
+    while( my( $columnName, $columnValue ) = each(%{$dbMailShareDesc}) ) {
         if( !$first ) {
             $query .= ", ";
         }else {
             $first = 0;
         }
 
-        $query .= $columnList->[$i]."=".$dbHandler->quote($dbMailShareDesc->{$columnList->[$i]});
+        $query .= $columnName."=".$dbHandler->quote($columnValue);
     }
 
+    my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
@@ -261,32 +261,11 @@ sub updateDbEntity {
 
 
         # On copie les nouveaux droits
-        $query = "SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"mailShareId"};
+        $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"mailShareId"};
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
             &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
             return 0;
-        }
-
-        while( my $rowHash = $queryResult->fetchrow_hashref() ) {
-            $query = "INSERT INTO P_EntityRight SET ";
-
-            my $first = 1;
-            while( my( $column, $value ) = each(%{$rowHash}) ) {
-                if( !$first ) {
-                    $query .= ", ";
-                }else {
-                    $first = 0;
-                }
-
-                $query .= $column."=".$dbHandler->quote($value);
-            }
-
-            my $queryResult2;
-            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-                &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-                return 0;
-            }
         }
     }
 
