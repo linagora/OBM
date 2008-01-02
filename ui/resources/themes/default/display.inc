@@ -228,9 +228,6 @@ function display_modules_theme($section) {
     foreach ($section_link as $mod) {
       $module_name = $modules[$mod]["Name"];
       $module_tooltip = $modules[$mod]["Tooltip"];
-      if (empty($module_tooltip)) {
-        $module_tooltip = $module_name;
-      }
       $module_right = $perm->get_module_rights($mod); 
       if (($module_right & $modules[$mod]["Right"]) == $modules[$mod]["Right"]) {
 	// XXX specifier une target au lien du module (non configurable
@@ -259,7 +256,7 @@ function display_modules_theme($section) {
 }
 
 
-///////////////////////////////////////div////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Theme specific : Display the action block
 // Parameters:
 //   - $section : selected section
@@ -280,18 +277,13 @@ function display_actions_theme($section, $module) {
 	|| in_array($action, $value["Condition"]))) {
 	if (($module_right & $value["Right"]) == $value["Right"]) {
 
-          $tooltip = $value["tooltip"];
-          if (empty($tooltip)){
-            $tooltip = $value["Name"];
-          }
-           
 	  if ($value["Popup"] == 1) {
 	    if ($value["Target"]) {
 	      $wtarget = "window.name='" . $value['Target'] . "';";
 	    }
 	    $content = "
               <a href=\"\" 
-              title=\"".$tooltip."\" 
+              title=\"".$value["tooltip"]."\" 
               onclick=\"$wtarget popup('".$value['Url']."',''); return false;\">
 	      ".$value["Name"]."</a> &nbsp;";
 	  } else {
