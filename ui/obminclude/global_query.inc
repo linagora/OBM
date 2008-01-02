@@ -1330,8 +1330,8 @@ function randomColor() {
 function global_freeze_user($params) {
   global $cdg_sql, $c_nb_login_failed, $c_frozen_duration, $c_login_interval;
 
-  $login = $params["login"];
-  $domain = $params["domain"];
+  $login = $params['login'];
+  $domain = $params['domain'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -1346,9 +1346,9 @@ function global_freeze_user($params) {
     AND userobm_archive='0'";
   $obm_q->query($query);
   $obm_q->next_record();
-  $uid = $obm_q->f("userobm_id");
-  $timelastaccess = $obm_q->f("timelastaccess");
-  $nb_login_failed = $obm_q->f("userobm_nb_login_failed");
+  $uid = $obm_q->f('userobm_id');
+  $timelastaccess = $obm_q->f('timelastaccess');
+  $nb_login_failed = $obm_q->f('userobm_nb_login_failed');
  
   $now = mktime();
 
@@ -1380,7 +1380,7 @@ function global_freeze_user($params) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Unfrezze an user
+// Unfreeze an user
 // Parameters:
 //   - $uid : User's id
 ///////////////////////////////////////////////////////////////////////////////
@@ -1391,28 +1391,33 @@ function global_unfreeze_user($uid) {
   $db_type = $obm_q->type;
   $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
 
-  $query = "SELECT userobm_id,
-    $lastaccess,
-    userobm_nb_login_failed
-    FROM UserObm WHERE userobm_id='$uid'";
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $uid = $obm_q->f("userobm_id");
-  $timelastaccess = $obm_q->f("timelastaccess");
-  $nb_login_failed = $obm_q->f("userobm_nb_login_failed");
-
-  $now = mktime();
-
-  if (($nb_login_failed < $c_nb_login_failed) || ($nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration)) {
-    $query = "UPDATE UserObm SET
-      userobm_nb_login_failed='0',
-      userobm_timelastaccess=NOW()
-      WHERE userobm_id='$uid'";
+  if ($uid > 0) {
+    $query = "SELECT userobm_id,
+      $lastaccess,
+      userobm_nb_login_failed
+    FROM UserObm
+    WHERE userobm_id='$uid'";
     $obm_q->query($query);
-    return true;
+    $obm_q->next_record();
+    $uid = $obm_q->f('userobm_id');
+    $timelastaccess = $obm_q->f('timelastaccess');
+    $nb_login_failed = $obm_q->f('userobm_nb_login_failed');
+
+    $now = mktime();
+    if (($nb_login_failed < $c_nb_login_failed) || ($nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration)) {
+      $query = "UPDATE UserObm SET
+        userobm_nb_login_failed='0',
+        userobm_timelastaccess=NOW()
+      WHERE userobm_id='$uid'";
+      $obm_q->query($query);
+      return true;
+    } else {
+      return false;
+    }
   } else {
-    return false;
+    return true;
   }
+
 }
 
 ?>

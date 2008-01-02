@@ -967,10 +967,11 @@ function get_list_query_num_rows($dynquery="", $list_q) {
   if (! isset($dynquery["from"])) {
     $query = $list_q->f("list_query");
     // Distinguinsh simple queries to queries with sub-query for optimization
-    $pos = strpos(strtolower($query), 'select', 5);
+    $pos = strpos(strtolower($query), 'foo', 1);
 
     if ($pos > 1) {
       // The query has a sub-query
+      // XXXX potential pb : other sub-queries (AND contact_id NOT IN (SELECT..)
       if (preg_match('/FROM .* (FROM (.*))(\) AS FOO|GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
 	$query_c = "SELECT count($distinct_id) as nb " . $matches[1];
       } else {
@@ -1023,7 +1024,7 @@ function get_list_dynamic_contact_nb($dynquery="") {
     $query = $dynquery["query"];
 
     // distinguish simple queries to queries with sub-query for optimization
-    $pos = strpos(strtolower($query), 'select', 5);
+    $pos = strpos(strtolower($query), 'foo', 1);
  
     if ($pos > 1) {
       // The query is has a sub-query
@@ -1078,7 +1079,7 @@ function get_list_dynamic_company_nb($dynquery) {
     $query = $dynquery["query"];
 
     // distinguish simple queries to queries with sub-query for optimization
-    $pos = strpos(strtolower($query), 'select', 5);
+    $pos = strpos(strtolower($query), 'foo', 1);
 
     if ($pos > 1) {
       // The query has a sub-query
@@ -1087,9 +1088,9 @@ function get_list_dynamic_company_nb($dynquery) {
       } else {
 	return 0;
       }
-      
+
     } else {
-      // The query is a standard query (no sub-qurey)
+      // The query is a standard query (no sub-query)
       if (preg_match('/(FROM (.*))( ORDER BY|GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
 	$query_c = "SELECT count(distinct(company_id)) as nb ". $matches[1];
       } else {
@@ -1461,26 +1462,6 @@ function make_list_query_from_criteria($list) {
     "subscription_publication_id" => "
        LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
        LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ");
-  /*    "publication_lang" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
-    "publication_year" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
-    "subscription_renewal" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
-    "subscription_reception_id" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
-    "subscription_timeafter" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
-    "subscription_timebefore" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id "
-    );
-  */
   $field_join_equiv["publication_lang"] = "subscription_publication_id";
   $field_join_equiv["publication_year"] = "subscription_publication_id";
   $field_join_equiv["subscription_renewal"] = "subscription_publication_id";
@@ -1786,7 +1767,8 @@ function make_list_query_from_criteria($list) {
 	if ($line == 0) {
 	  $logical_criterion[$line] = "";
 	}
-	$where .= " " . $logical_criterion[$line]." ".$boolean_criterion[$line]." ($cond)";
+	$where .= "
+ " . $logical_criterion[$line]." ".$boolean_criterion[$line]." ($cond)";
 
 	// case AND NOT to n-n criteria line
       } else if ($cond_andnotn != "") {
