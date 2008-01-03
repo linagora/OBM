@@ -125,7 +125,9 @@ $img_home           = "$theme_path/home_obm.png";
 // Agenda Icons
 $ico_resize                 = "$theme_path/ico_resize.gif";
 $ico_previous               = "$theme_path/ico_previous.gif";
+$ico_far_previous           = "$theme_path/ico_far_previous.gif";
 $ico_next                   = "$theme_path/ico_next.gif";
+$ico_far_next               = "$theme_path/ico_far_next.gif";
 $ico_meeting                = "$theme_path/ico_meeting.gif";
 $ico_periodic               = "$theme_path/ico_calendar_repeat.gif";
 $ico_popup_close            = "$theme_path/ico_popup_close.gif";

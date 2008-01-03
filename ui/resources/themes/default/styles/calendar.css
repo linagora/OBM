@@ -521,3 +521,26 @@ li.freeBusy {
   width: auto;
   margin: 0 0.5em;
 }
+
+
+table.planning td {
+  vertical-align: top;
+  padding: 0;
+  font-size: 120%;
+}
+
+table.planning tbody th {
+  text-align: left;
+}
+
+table.planning ul {
+  padding: 0;
+  padding-left: 15px;
+  margin: 0;
+  list-style: circle;
+}
+
+table.planning li {
+  padding: 0;
+  margin: 0;
+}
