@@ -945,7 +945,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
       $week_cal .= "</tr>";
     }
   }
-  $occurrences = calendar_events_model($start_week_day,strtotime("+7 days",$start_week_day),$calendar_entity);
+  $occurrences = calendar_events_model($start_week_day,strtotime("+7 days",$start_week_day),$calendar_entity,$category_filter);
   $w = date("w",$start_week_day); 
   if(is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
