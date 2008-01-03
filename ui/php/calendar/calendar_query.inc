@@ -161,54 +161,6 @@ function run_query_calendar_get_entity_label($entities) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the id, lastname and firstname for the users which gave write rights
-// to the current user
-// Parameters:
-//  - $user_id: current user id
-// Returns:
-//  array of users id, lastname and firstname
-///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_get_possible_owners($user_id) {
-  global $cdg_sql;
-
-  $ret = array();
-  $multidomain = sql_multidomain('userobm');
-
-  $query = "SELECT
-    userobm_id,
-    userobm_lastname,
-    userobm_firstname
-  FROM UserObm
-  WHERE userobm_id = '$user_id'
-  UNION SELECT
-    userobm_id,
-    userobm_lastname,
-    userobm_firstname
-  FROM EntityRight
-  LEFT JOIN UserObm ON entityright_entity_id = userobm_id
-  WHERE 
-    entityright_entity = 'calendar' AND
-    entityright_write = '1' AND
-    entityright_consumer = 'user' AND
-    entityright_consumer_id = '$user_id'
-    $multidomain";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_possible_owners()');
-  $u_q = new DB_OBM;
-  $u_q->query($query);
-  while ($u_q->next_record()) {
-    $ret[] = array(
-      'owner' => $u_q->f('userobm_id'),
-      'owner_lastname' => $u_q->f('userobm_lastname'),
-      'owner_firstname' => $u_q->f('userobm_firstname')
-    );
-  }
-
-  return $ret;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Perform the concatenation of users and groups array in a users array with
 // users from the users array an users from group from the group array 
 // Parameters:
@@ -377,7 +329,8 @@ function run_query_calendar_waiting_events() {
     WHERE 
       evententity_state = 'W'
       AND ( 1=0
-      $multidomain";
+      $multidomain
+      ";
 
   if (is_array($writable_cal) && (count($writable_cal['ids'])>0)) {
     $query .= "OR ( entity_id IN ('".implode("','",$writable_cal['ids'])."') AND entity_entity = 'user')";    
@@ -385,7 +338,7 @@ function run_query_calendar_waiting_events() {
   if (is_array($writable_res) && (count($writable_res['ids'])>0)) {
     $query .= "OR ( entity_id IN ('".implode("','",$writable_res['ids'])."') AND entity_entity = 'resource')";
   }
-  $query .= " OR (entity_id = '$uid' AND entity_entity = 'user')) ORDER BY entity_entity, entity_label"; 
+  $query .= " OR (entity_id = '$uid' AND entity_entity = 'user')) ORDER BY entity_entity, entity_label, calendarevent_date"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_waiting_events()');
   $obm_q->query($query);
 
@@ -3994,7 +3947,7 @@ Class OccurrenceFactory {
    * @param timestamp $time 
    * @param int $duration 
    * @param HashMap $entityFilter 'entityKind' => [entity_ids,..] if set only
-   * count occurrence of the given entityKind and if set the given ids     
+   * count occurrence of the given entityKind and, if set, the given ids     
    * @param int $eventFilter 0:All events;1:All events but all day events;
    * 2: Only all day events
    * @access public

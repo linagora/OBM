@@ -414,18 +414,15 @@ function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set=""
 
   $query = "SELECT
       $e_id as id,
-      $e_label as label,
-      entityright_consumer_id,
-      entityright_read,
-      entityright_write,
-      entityright_admin
+      $e_label as label
     FROM EntityRight
       LEFT JOIN $table_entity as e ON entityright_entity_id = $e_id
     WHERE entityright_entity = '$entity'
       AND ( (entityright_consumer = 'user' AND (entityright_consumer_id = '$user_id' OR entityright_consumer_id = 0))
         OR (entityright_consumer = 'group'  AND (entityright_consumer_id IN (SELECT of_usergroup_group_id FROM of_usergroup WHERE of_usergroup_user_id = '$user_id')
             OR entityright_consumer_id = 0)))
-      $where_right
+        $where_right
+    GROUP BY id, label
     ORDER BY entityright_entity, $e_label";
 
   display_debug_msg($query, $cdg_sql, "of_right_entity_for_user()");

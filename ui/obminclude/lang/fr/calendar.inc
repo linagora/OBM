@@ -73,6 +73,7 @@ $l_task = "Tache";
 $l_category_filter = "Filtrer par catégorie";
 $l_from = "du";
 $l_to = "au";
+$l_periodic = "Périodique";
 
 $l_conflicts = "Conflit(s) rencontré(s)";
 $l_date = "Date";

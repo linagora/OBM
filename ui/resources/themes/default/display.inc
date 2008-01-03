@@ -375,8 +375,8 @@ function display_head_theme($p_module) {
   obm.vars.labels.dayShort = $daysShort;
   obm.vars.labels.dayMedium = $dayMedium;
   obm.vars.labels.dayLong = $dayLong;
-  obm.vars.labels.today = '$l_today';
-  obm.vars.labels.transparent = '$l_transparent';
+  obm.vars.labels.today = '".phpStringToJsString($l_today)."';
+  obm.vars.labels.transparent = '".phpStringToJsString($l_transparent)."';
   
   window.onresize= function() {
     while(obm.resize.chains && obm.resize.chains.length > 0) {

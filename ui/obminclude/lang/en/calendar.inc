@@ -165,7 +165,7 @@ $l_everyone = "Authorized everybody";
 $l_noone = "Authorized nobody";
 $l_authorize = "Authorize";
 $l_deny = "&gt;&gt;&gt;&gt;";
-
+$l_periodic = "Periodic";
 //Mail
 $l_add_event_mail_head = "New event on OBM :";
 $l_update_event_mail_head = "Event updated on OBM :";

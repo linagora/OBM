@@ -36,6 +36,28 @@
   text-align: center;
 }
 
+.printableCalendar td, .printableCalendar tr {
+  height: 100%;
+}
+
+.printableCalendar tbody td {
+  overflow: visible;
+  margin:0;
+  padding: 0;
+  background-color: #fff;
+}
+
+.printableCalendar thead th  {
+  background-color: #fff;
+  background-image: url('../images/ico_calendar_head_border.png');
+  background-repeat: repeat-x;
+  background-position: bottom;
+  border-left: 1px dotted #ddd; 
+  border-top: 1px solid #ccc;
+  padding-bottom: 9px;
+  text-align: left;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Week view styles */
 /* ------------------------------------------------------------------------- */
@@ -49,15 +71,7 @@
   background-color: #fff;
 }
 
-.printableWeek tbody td{
-  height: 1.8em;
-  overflow: visible;
-  margin:0;
-  padding: 0;
-  background-color: #fff;
-}
-
-.week thead th,.printableWeek thead th  {
+.week thead th  {
   background-color: #fff;
   background-image: url('../images/ico_calendar_head_border.png');
   background-repeat: repeat-x;
@@ -133,14 +147,6 @@
   padding-bottom: 9px;
 }
 
-.printableDay tbody td{
-  height: 1.8em;
-  overflow: visible;
-  margin:0;
-  padding: 0;
-  background-color: #fff;
-}
-
 /* ------------------------------------------------------------------------- */
 /* Events styles */
 /* ------------------------------------------------------------------------- */
@@ -148,6 +154,10 @@
 .event {
   position: absolute;
   overflow: hidden;
+}
+
+.printableEvent {
+  height: 100%;
 }
 
 .event h1, .printableEvent h1 {
@@ -158,7 +168,7 @@
   white-space: nowrap;
 }
 
-.event h1 a {
+.event h1 a, .printableEvent h1 a  {
   color: #fff;
 }
 
