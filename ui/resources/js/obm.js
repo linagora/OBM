@@ -12,6 +12,18 @@ Obm.Menu = new Class({
   
   initialize: function() {
     this.menuItems = new Object();
+
+    var sectionItems = $ES('.sectionItem');
+    for(i=0;i<sectionItems.length;i++) {
+      var item = sectionItems[i];
+      item.addEvent('mouseover', function(e){
+        this.addClass('hover');
+      });  
+      item.addEvent('mouseout', function(e){
+        this.removeClass('hover');
+      });        
+    }
+
   },  
 
   addItem: function(item) {
@@ -35,12 +47,12 @@ Obm.Menu = new Class({
     sectionBlock.addEvent('click', function(e){
       obm.menu.toggle(this.id)
     });   
-    sectionBlock.addEvent('mouseover', function(e){
-       this.addClass('hover');
-    });  
-    sectionBlock.addEvent('mouseout', function(e){
-        this.removeClass('hover');
-    });      
+    //sectionBlock.addEvent('mouseover', function(e){
+    //   this.addClass('hover');
+    //});  
+    //sectionBlock.addEvent('mouseout', function(e){
+    //    this.removeClass('hover');
+    //});      
   },
 
   toggle: function(item) {

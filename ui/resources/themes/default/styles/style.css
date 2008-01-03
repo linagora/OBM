@@ -276,6 +276,10 @@ form {
   background-position: 0 0.9em;
 }
 
+#section li.hover a {
+  color: #368397;
+}
+
 #section li.current {
   color: #368397;
   background-color: #e0e1e3;

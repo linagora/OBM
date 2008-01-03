@@ -183,7 +183,7 @@ function display_sections_theme($section) {
         if ($key == $section) {
           $ret .= "<li class=\"current\" id=\"section-$key\">$section_name</li>\n";
         } else {
-          $ret .= "<li id=\"section-$key\">$section_name</li>\n";
+          $ret .= "<li class=\"sectionItem\" id=\"section-$key\">$section_name</li>\n";
         }
       }
     }
@@ -276,6 +276,8 @@ function display_actions_theme($section, $module) {
         && (in_array("all", $value["Condition"])
 	|| in_array($action, $value["Condition"]))) {
 	if (($module_right & $value["Right"]) == $value["Right"]) {
+
+          $tooltip = $value["Tooltip"];
 
 	  if ($value["Popup"] == 1) {
 	    if ($value["Target"]) {
