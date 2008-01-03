@@ -37,6 +37,7 @@
 }
 
 .printableCalendar td, .printableCalendar tr {
+  vertical-align: top;
   height: 100%;
 }
 
@@ -157,7 +158,9 @@
 }
 
 .printableEvent {
-  height: 100%;
+  height:auto !important;
+  height:100%; 
+  min-height:100%; 
 }
 
 .event h1, .printableEvent h1 {

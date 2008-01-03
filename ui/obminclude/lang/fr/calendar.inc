@@ -107,6 +107,9 @@ $l_update_error = "Des conflits ont été détectés, mise à jour annulée";
 $l_insert_error = "Des conflits ont été détectés, insertion annulée";
 $l_sendamail = "Forcer la notification par mail";
 $l_calendar_select_group = "Sélectionner les groupes.";
+$l_A = "A";
+$l_W = "E";
+$l_R = "R";
 
 $l_view = "Vue";
 $l_views = "Vues";

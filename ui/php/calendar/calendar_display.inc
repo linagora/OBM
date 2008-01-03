@@ -2250,6 +2250,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_wait, $l_task, $l_exception, $l_yes, $l_no, $path;
   global $l_carac,$l_module_calendar, $l_items, $ccalendar_alerts;
   global $l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
+  global $l_A, $l_R, $l_W;
 
   $id = $event_q->f("calendarevent_id");
   $writable_users = of_right_entity_for_user("calendar", $obm["uid"], "write", "", "userobm");
@@ -2410,15 +2411,15 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         <td>$label</td>
         <td>$sel_alert</td>
         <td class=\"C\">
-        <input $A type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"A\" onclick=\"window.location='$urld&rd_decision_event=A'\" />A
-	<input $W type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"W\" onclick=\"window.location='$urld&rd_decision_event=W'\" />W
-        <input $R type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"R\" onclick=\"window.location='$urld&rd_decision_event=R'\" />R
+        <input $A type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"A\" onclick=\"window.location='$urld&rd_decision_event=A'\" />$l_A
+	<input $W type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"W\" onclick=\"window.location='$urld&rd_decision_event=W'\" />$l_W
+        <input $R type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"R\" onclick=\"window.location='$urld&rd_decision_event=R'\" />$l_R
         </td>
         </tr>
         ";
         $$state = "";
       } else {
-        $dis_user_list .= "<tr><td>$label</td><td></td><td class=\"C\">$state</td></tr>";
+        $dis_user_list .= "<tr><td>$label</td><td></td><td class=\"C\">".$GLOBALS["l_$state"]."</td></tr>";
       }
     }
   }
@@ -2461,15 +2462,15 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <tr>
           <td>$label ($property[$r_id])</td>
           <td class=\"C\">
-          <input $A type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"A\" onclick=\"window.location='$url&rd_decision_event=A'\" />A
-          <input $W type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"W\" onclick=\"window.location='$url&rd_decision_event=W'\" />W
-          <input $R type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"R\" onclick=\"window.location='$url&rd_decision_event=R'\" />R
+          <input $A type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"A\" onclick=\"window.location='$url&rd_decision_event=A'\" />$l_A
+          <input $W type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"W\" onclick=\"window.location='$url&rd_decision_event=W'\" />$l_W
+          <input $R type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"R\" onclick=\"window.location='$url&rd_decision_event=R'\" />$l_R
           </td>
           </tr>  
         ";
           $$state = "";
         } else {
-          $dis_resource_list .= "<tr><td>$label($property[$r_id])</td><td class=\"C\" >$state</td></tr>";
+          $dis_resource_list .= "<tr><td>$label($property[$r_id])</td><td class=\"C\" >".$GLOBALS["l_$state"]."</td></tr>";
         }
       }
       $dis_resource_block = "

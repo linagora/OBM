@@ -107,12 +107,15 @@ $l_select_group = "Select group";
 $l_repeat_update = "Update all occurrences of this appointment";
 $l_go_to = "Go to";
 $l_refuse = "Refuse";
+$l_state = "Status";
 $l_change_state = "Your event participation";
 $l_force_insert = "Force insert";
 $l_refuse_insert = "Refuse event";
 $l_cancel_insert = "Wait...";
 $l_calendar_select_group = "Select the groups.";
-
+$l_A = "A";
+$l_W = "W";
+$l_R = "R";
 $l_force = "Force the event insertion";
 $l_carac = "Caracteristics";
 $l_meeting_perform = "Seek for free crenels";
