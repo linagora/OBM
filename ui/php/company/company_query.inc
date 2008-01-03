@@ -285,7 +285,7 @@ function run_query_company_insert($company) {
     }
   }
   $sound = phonetic_key($name);
-  $dsrc = $company['datasource'];
+  $dsrc = ($company['datasource'] != '' ? $company['datasource'] : '0');
   $type = ($company['type'] != '' ? $company['type'] : '0');
   $act = ($company['activity'] != '' ? $company['activity'] : '0');
   $naf = ($company['naf'] != '' ? $company['naf'] : '0');
