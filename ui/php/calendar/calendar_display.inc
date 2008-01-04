@@ -233,36 +233,36 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
   global $l_search_users, $l_search_resources;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
+  global $ico_group, $c_public;
 
   $iso_date = $calendar['date'];
   $this_group = $calendar["entity"]["group_view"];
   $category_filter = $calendar["category_filter"];
-  //-- Group selection
-  if ($this_group == $c_all) {
+  $group_privacy = $calendar["group_privacy"];
+  //-- Private Group selection
+  if ($this_group == $c_all || $group_privacy == $c_public) {
     $sel_group = "<option selected=\"selected\">$l_select_group</option>";
   }
 
-  $sel_group .= "<optgroup label=\"$l_private\">";
-  $first_public = true;
+  if ($group_privacy == $c_public) {
+    $g_public_name = get_last_group_text($calendar["group_id"]);
+  }
+
   while ($entity_readable["group"]->next_record()) {
     $g_id = $entity_readable["group"]->f("group_id");
     $g_priv = $entity_readable["group"]->f("group_privacy");
     $g_name = $entity_readable["group"]->f("group_name");
-
-    if ($first_public && $g_priv != "1") {
-      $sel_group .= "</optgroup>
-      <optgroup label=\"$l_public\">\n";
-      $first_public = false;
+    if ($g_priv) {
+      if ($g_id == $this_group) {
+        $selected_s = "selected=\"selected\"";
+      } else {
+        $selected_s = "";
+      }
+      $sel_group .= "<option value=\"calendar_index.php?date=$iso_date&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
     }
-    if ($g_id == $this_group) {
-      $selected_s = "selected=\"selected\"";
-    } else {
-      $selected_s = "";
-    }
-    $sel_group .= "<option value=\"calendar_index.php?date=$iso_date&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
   }
-  $sel_group .= "</optgroup>
-  </select>";
+
+  $sel_group .= "</select>";
   //-- End Group selection
 
   // loop through ["user"], ["resource"]
@@ -274,7 +274,6 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       $sel_ent .= "<input value=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
     }
   }
-
 
   $user_text = phpStringToJsString($l_search_users);
   $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction_calendar=calendar";
@@ -324,6 +323,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
     $sel_group
     </select>
+    <input type=\"text\" name=\"\" value=\"$g_public_name\" id=\"group\" autocomplete=\"off\" />
     </fieldset>
     </form>
 
@@ -351,8 +351,11 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
    </div>
   </div>
   <script type=\"text/javascript\">
+    obm.vars.images.update = '$ico_group';
     obm.initialize.chain(function () {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {restriction:'calendar', defaultText:'$user_text'})
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group', {restriction:'calendar', mode: 'mono', locked: true, 
+        extrafunction:'sel_public_group(\"$iso_date\", element, this.inputField.value)'});
       $resource_js
     });
     </script>    
@@ -3188,7 +3191,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       
   $block_owner = "
     <th>
-    $l_owner :
+    $l_owner
     </th>
     <td>
     <select name=\"sel_owner\">";  

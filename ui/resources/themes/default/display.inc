@@ -115,6 +115,9 @@ function display_menu($module) {
   $domain = $obm['domain_label'];
   $domain_id = $obm['domain_id'];
   $section = $cgp_show['module'][$module];
+  if (empty($section)) {
+    $section = $module;
+  }
   $display['section'] = display_sections($section);
 //  $display["module"] = display_modules($section, $module);
   $display['last'] = display_last_visited();

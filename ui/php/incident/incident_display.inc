@@ -649,12 +649,14 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $users_p, $pri, 
   // Owner select
   if (! isset($owner)) { $owner = $obm["uid"]; }
   $dis_sel_owner="<select name=\"sel_owner\">";
-  foreach ($users_p as $u_id => $one_user) {
-    $dis_sel_owner.="\n<option value=\"$u_id\"";
-    if ($u_id == $owner) {
-      $dis_sel_owner.=" selected=\"selected\"";
+  if (is_array($users_p)) {
+    foreach ($users_p as $u_id => $one_user) {
+      $dis_sel_owner.="\n<option value=\"$u_id\"";
+      if ($u_id == $owner) {
+        $dis_sel_owner.=" selected=\"selected\"";
+      }
+      $dis_sel_owner .= '>'. $one_user['lastname'].' '.$one_user['firstname'].'</option>';
     }
-    $dis_sel_owner .= '>'. $one_user['lastname'].' '.$one_user['firstname'].'</option>';
   }
   $dis_sel_owner .= "</select>";
 

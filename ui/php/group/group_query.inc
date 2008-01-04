@@ -1056,12 +1056,15 @@ function run_query_group_ext_search($group) {
 
   $pattern = $group["pattern"];
   $restriction = $group["restriction"];
+
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("Group");
   $limit = $group['limit'];
   if(isset($group["first_row"])) $first_row = $group["first_row"] - 1;
   else $first_row = 0;
-	
+
+  $where_privacy = "AND (group_privacy = 0 OR (group_privacy = 1 AND group_usercreate = '$obm[uid]'))";
+
   if ($restriction == "user") {
     $uid = $obm["uid"];
     $rs = of_right_entity_for_user("Group", $uid, "read");
@@ -1073,6 +1076,8 @@ function run_query_group_ext_search($group) {
       }
       $where_restriction .= "))";
     }
+  } else if ($restriction == "calendar") {
+    $where_privacy = " AND group_privacy=0";
   }
 
   $query = "SELECT 
@@ -1080,7 +1085,7 @@ function run_query_group_ext_search($group) {
     FROM UGroup
     WHERE 
       group_name LIKE '$pattern%' 
-      AND (group_privacy = 0 OR (group_privacy = 1 AND group_usercreate = '$obm[uid]'))
+      $where_privacy
       $multidomain
       $where_restriction
     ORDER BY group_name  ";
@@ -1097,7 +1102,7 @@ function run_query_group_ext_search($group) {
     FROM UGroup
     WHERE 
       group_name LIKE '$pattern%' 
-      AND (group_privacy = 0 OR (group_privacy = 1 AND group_usercreate = '$obm[uid]'))
+      $where_privacy
       $multidomain
       $where_restriction
     ORDER BY group_name

@@ -289,6 +289,10 @@ form {
   background-position: 0 0.9em;
 }
 
+#section li.current a {
+  color: #368397;
+}
+
 #section a {
   text-decoration: none;  
   color: #fff;   

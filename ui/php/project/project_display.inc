@@ -1168,12 +1168,14 @@ function html_project_form($action, $project_q, $project) {
     $mbs = of_usergroup_get_group_users($obm['group_prod'], true);
     $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
       <option value=\"$c_undef\">$l_undef</option>\n";
-    foreach ($mbs as $mb_id => $one_user) {
-      $mb_name = $one_user['lastname'].' '.$one_user['firstname'];
-	$sel_member .= "
-      <option value=\"$mb_id\"";
-	if ($mb_id == $member) { $sel_member .= " selected=\"selected\""; }
-	$sel_member .= ">$mb_name</option>";
+    if (is_array($mbs)) {
+      foreach ($mbs as $mb_id => $one_user) {
+        $mb_name = $one_user['lastname'].' '.$one_user['firstname'];
+          $sel_member .= "
+        <option value=\"$mb_id\"";
+          if ($mb_id == $member) { $sel_member .= " selected=\"selected\""; }
+          $sel_member .= ">$mb_name</option>";
+      }
     }
     $sel_member .= '</select>';
 

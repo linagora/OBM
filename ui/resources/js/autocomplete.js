@@ -559,6 +559,7 @@ obm.AutoComplete.Search = new Class({
       this.resetFunc();
       this.inputField.focus();
     }
+    eval(this.options.extrafunction);
   },
 
   // removes an element from the selectedBox
@@ -608,6 +609,7 @@ obm.AutoComplete.Search = new Class({
     if (this.selectedBox.value != '') {
       this.displayAsValidated();
     }
+    eval(this.options.extrafunction);
   },
 
   // change the display of the field when focus is lost and the selection is validated
