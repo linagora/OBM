@@ -2872,6 +2872,8 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
 
   $possible_owners = of_right_entity_for_user("calendar", $obm["uid"], "write", "", "userobm");
   $possible_owners = $possible_owners["entity"];
+  $u = get_user_info();
+  $possible_owners[] = array("id"    => $u[id], "label" => "$u[lastname] $u[firstname]" );  
   $cats1 = of_category_get_ordered("calendar", "category1");
   $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $resources, $groups,$tasks, $cats1, $alerts);
 
@@ -3044,7 +3046,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar["title"])) { $title = stripslashes($calendar["title"]); }
   if (isset($calendar["location"])) { $location = stripslashes($calendar["location"]); }
   if (isset($calendar["category1"])) { $cat1 = $calendar["category1"]; }
-  if (isset($calendar["owner"])) {$owner = $calendar["owner"];}
+  if (isset($calendar["owner"])) {$owner = $calendar["owner"];} else {$owner = $obm['uid'];}
   if (isset($calendar["priority"])) { $priority = $calendar["priority"]; }
   if (isset($calendar["description"])) { $desc = stripslashes($calendar["description"]); }
   if (isset($calendar["all_day"])) { $all_day = $calendar["all_day"]; }
