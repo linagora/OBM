@@ -152,13 +152,14 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
 function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   global $ico_user, $ico_resource, $obm;
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
-  global $l_calendar_displayed, $l_resource_displayed,$c_all;
+  global $l_calendar_displayed, $l_resource_displayed,$c_all,$l_event_color_tt;
   global $action,$ico_delete,$output_target,$l_color,$l_users,$l_events;
   // Legend
   $iso_date = $calendar["date"];
   if(count($calendar_entity) == 1 && is_array($calendar_entity["user"])
      && count($calendar_entity["user"]) == 1 && key($calendar_entity["user"]) == $obm["uid"]) {
     $colorTemplate = 'event';
+    $tooltip = $l_event_color_tt;
   } else {
     $colorTemplate = 'user';
   }
@@ -185,7 +186,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
       foreach ($entity as $id => $data) {      
         $data_id = "data-$type-$id";        
         $dis_legend .= "
-          <li class=\"".$data["class"]."\"><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
+          <li title=\"$tooltip\" class=\"".$data["class"]."\"><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
           <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
         if ($output_target != "print") {
           $dis_legend .= "<input type=\"image\" src=\"$ico_delete\"

@@ -120,6 +120,8 @@ $l_force = "Force the event insertion";
 $l_carac = "Caracteristics";
 $l_meeting_perform = "Seek for free crenels";
 
+$l_event_color_tt = "Event's colors are the ones defined during the event creation.";
+
 $l_confirm_delete ="This operation will remove all the occurences of this event for all the users, are you sure to want to continue?";
 $l_confirm = "Confirm";
 $l_cancel = "Cancel";

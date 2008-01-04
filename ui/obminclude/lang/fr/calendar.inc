@@ -199,6 +199,8 @@ $l_add_exception_mail_subject = "Modification evenement sur OBM : %s";
 $l_update_state_mail_subject = "Participation a l'evenement sur OBM : %s";
 $l_alert_mail_subject = "Evenement imminent : %s";
 
+$l_event_color_tt = "Les couleurs utilisées sont celles définies lors de la création des événements.";
+
 $l_add_event_mail_body = 
 "Message automatique envoyé par OBM
 ------------------------------------------------------------------
