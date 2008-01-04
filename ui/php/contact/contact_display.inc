@@ -1233,12 +1233,12 @@ function dis_contact_form($action, $co_q, $contact) {
 
   $uids = array($obm['uid']);
 
-  if ($contact['market'] > 0) {
-    $uids[] = $contact['market'];
-  }
   if (is_object($co_q)) {
-    $uids[] = $co_q->f('contact_marketingmanager_id');
-  } elseif($contact['market']) {
+    if ($co_q->f('contact_marketingmanager_id') > 0) {
+      $uids[] = $co_q->f('contact_marketingmanager_id');
+    }
+  }
+  if ($contact['market'] > 0) {
     $uids[] = $contact['market'];
   }
   $users = of_usergroup_get_group_users($obm['group_com'], true, $uids);

@@ -418,7 +418,7 @@ function run_query_contact_company($c_id) {
       $multidomain";
 	
   display_debug_msg($query, $cdg_sql, "run_query_contact_company()");
-  $obm_q= new DB_OBM;
+  $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
