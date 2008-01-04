@@ -118,7 +118,7 @@ obm.AutoComplete.Search = new Class({
       mode: 'multiple',                // 'mono' or 'multiple'
       locked: false,                   // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
       restriction: null,               // obm needs
-      fieldText: 'Search...',          // default text displayed when empty field
+      fieldText: obm.vars.labels.autocompleteField,          // default text displayed when empty field
       extension: null,                  // obm needs
       name: null
     }, options || {});

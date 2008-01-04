@@ -38,6 +38,7 @@ $l_delegation = "Délégation";
 $l_print = "Imprimer";
 $l_transparent = "Transparent";
 $l_select_all = "Sélectionner tout";
+$l_autocomplete_field = "Rechercher ...";
 
 // Common messages
 $l_yes = "Oui";

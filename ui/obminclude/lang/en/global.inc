@@ -159,6 +159,7 @@ $l_emitted = "Emitted";
 $l_recursive = "Recursive";
 $l_hour = "Hour";
 $l_type ="Type";
+$l_autocomplete_field = "Search ...";
 
 // Entities
 $l_company = "Company";

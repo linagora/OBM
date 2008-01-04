@@ -324,6 +324,7 @@ function display_head_theme($p_module) {
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
   global $css_print_obm, $ico_delete, $ico_update, $output_target,$l_transparent;
+  global $l_autocomplete_field;
 
   $css = $css_obm;
 
@@ -387,6 +388,7 @@ function display_head_theme($p_module) {
   obm.vars.labels.dayLong = $dayLong;
   obm.vars.labels.today = '".phpStringToJsString($l_today)."';
   obm.vars.labels.transparent = '".phpStringToJsString($l_transparent)."';
+  obm.vars.labels.autocompleteField = '".phpStringToJsString($l_autocomplete_field)."';
   
   window.onresize= function() {
     while(obm.resize.chains && obm.resize.chains.length > 0) {
