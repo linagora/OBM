@@ -232,7 +232,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   global $path, $obm, $c_all, $ccalendar_resource;
   global $ico_add, $popup_width, $popup_height, $l_today;
   global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
-  global $l_search_users, $l_search_resources;
+  global $l_search_users, $l_search_resources,$l_private_group_members, $l_public_group_members;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
   global $ico_group, $c_public;
 
@@ -326,10 +326,13 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     </form>
     <form action=\"\" onsubmit=\"return false;\">
     <fieldset class=\"detail extra\">
-    <legend>$l_group_members</legend>
+    <legend>$l_private_group_members</legend>
     <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
     $sel_group
     </select>
+    </fieldset>
+    <fieldset class=\"detail extra\">
+    <legend>$l_public_group_members</legend>
     <input type=\"text\" name=\"\" value=\"$g_public_name\" id=\"group\" autocomplete=\"off\" />
     </fieldset>
     </form>

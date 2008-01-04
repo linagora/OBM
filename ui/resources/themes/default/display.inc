@@ -266,8 +266,15 @@ function display_modules_theme($section) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_actions_theme($section, $module) {
-  global $modules, $action;
-  global $actions, $perm;
+  global $modules, $action, $display;
+  global $actions, $perm, $display;
+
+  $mod_title = $GLOBALS["l_module_$module"];
+  if (empty($display['title']) && !empty($actions[$action]["title"])) {
+    $display['title'] = "<h1 class=\"title\"> : $act_title : ".$actions[$action]["title"]."</h1>";
+  } else if(empty($display['title'])) {
+    $display['title'] = "<h1 class=\"title\">$mod_title</h1>";
+  } 
 
   if (is_array($actions[$module])) {
     $module_right = $perm->get_module_rights($module); 

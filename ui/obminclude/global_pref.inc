@@ -128,18 +128,6 @@ $display_include_file = 'resources/themes/'.$_SESSION['set_theme'].'/display.inc
 include("$display_include_file");
 
 
-// Default module title
-$mod_title = ${"l_module_$module"};
-$act_title = ${"l_header_$action"};
-$long_title = ${"l_header_title_$action"};
-
-if (!empty($long_title)) {
-  $display['title'] = "<h1 class=\"title\">$mod_title : $long_title</h1>";
-} else if(!empty($act_title)) {
-  $display['title'] = "<h1 class=\"title\">$mod_title : $act_title</h1>";
-} else {
-  $display['title'] = "<h1 class=\"title\">$mod_title</h1>";
-} 
 
 
 ///////////////////////////////////////////////////////////////////////////////
