@@ -242,10 +242,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   //-- Private Group selection
   if ($this_group == $c_all || $group_privacy == $c_public) {
     $sel_group = "<option selected=\"selected\">$l_select_group</option>";
-  }
-
-  if ($group_privacy == $c_public) {
-    $g_public_name = get_last_group_text($calendar["group_id"]);
+  } else {
+    $sel_group = "<option>$l_select_group</option>";
   }
 
   while ($entity_readable["group"]->next_record()) {
@@ -261,8 +259,16 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       $sel_group .= "<option value=\"calendar_index.php?date=$iso_date&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
     }
   }
-
   $sel_group .= "</select>";
+
+
+  if ($group_privacy == $c_public) {
+    $g_public_name = get_last_group_text($calendar["group_id"]);
+    $sel_group .= "<input type=\"hidden\" id=\"group_privacy\" name=\"group_privacy\" value=\"$c_public\" />";
+  } else {
+    $sel_group .= "<input type=\"hidden\" id=\"group_privacy\" name=\"group_privacy\" value=\"\" />";
+  }
+
   //-- End Group selection
 
   // loop through ["user"], ["resource"]

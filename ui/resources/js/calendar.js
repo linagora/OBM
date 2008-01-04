@@ -1192,6 +1192,7 @@ Obm.CalendarView = new Class({
   initialize: function(el) {
     this.label = $('tf_view_label'); 
     this.view_id = $('view_id');
+    this.group_privacy = $('group_privacy');
 
     this.popup = $('viewSelectorForm');
     this.popup.setStyle('position','absolute');
@@ -1203,7 +1204,8 @@ Obm.CalendarView = new Class({
       alert(obm.vars.labels.fill_view_label);
     } else {
       var qstring = Object.toQueryString({
-        view_label: this.label.value
+        view_label: this.label.value,
+        group_privacy : this.group_privacy.value
       });
 
       // Select input
