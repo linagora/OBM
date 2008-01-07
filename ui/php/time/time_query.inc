@@ -848,8 +848,8 @@ function run_query_time_projecttask($time) {
 
   $obm_q= new DB_OBM;
   $db_type = $obm_q->type;
-	// array of the sql concataneted strings
-	$a_concat[]=array('type'=>'field', 'value'=>'b.projecttask_label');
+  // array of the sql concataneted strings
+  $a_concat[]=array('type'=>'field', 'value'=>'b.projecttask_label');
   $a_concat[]=array('type'=>'string', 'value'=>' --- ');
   $a_concat[]=array('type'=>'field', 'value'=>'a.projecttask_label');
   $concat = sql_string_concat($db_type, $a_concat);
@@ -867,7 +867,7 @@ function run_query_time_projecttask($time) {
     WHERE projectuser_projecttask_id = a.projecttask_id
       AND projectuser_user_id = $uid
       AND projectuser_projectedtime != 0
-      ORDER BY a.projecttask_project_id, a.projecttask_label";
+      ORDER BY a.projecttask_project_id, a.projecttask_parenttask_id, a.projecttask_label";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_projecttask');
   $obm_q = new DB_OBM;

@@ -1504,7 +1504,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
 	$k_kind_js .= "lang_array[\"$k_lang\"] = new Object();\n";
 	$k_old_lang = $k_lang;
       }     
-      if ($k_label != $k_old_label) {
+      if ($k_label !== $k_old_label) {
 	$k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"] = new Object();\n";
 	$k_old_label = $k_label;
       }

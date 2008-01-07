@@ -25,13 +25,13 @@ function run_query_calendar_detail($calendar_id) {
   $multidomain = sql_multidomain('calendarevent');
   $query = "SELECT DISTINCT
       calendarevent_id,
-      c.userobm_login as usercreate,
-      u.userobm_login as userupdate,
+      c.userobm_login AS usercreate,
+      u.userobm_login AS userupdate,
       $timeupdate,
       $timecreate,
       calendarevent_owner, 
-      o.userobm_lastname owner_lastname,
-      o.userobm_firstname owner_firstname,
+      o.userobm_lastname AS owner_lastname,
+      o.userobm_firstname AS owner_firstname,
       calendarevent_title, 
       calendarevent_description,
       calendarevent_properties,

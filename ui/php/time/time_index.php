@@ -66,6 +66,7 @@ if ($action == 'index') {
   if ($perm->check_right('time', $cright_read_admin)) {
     $display['features'] .= dis_user_select($params, run_query_userobm_active(), 1);
   }
+
 } elseif ($action == 'insert') {
 //////////////////////////////////////////////////////////////////////////////;
   $params['interval'] = 'week';
