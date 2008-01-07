@@ -161,7 +161,7 @@ function dis_todo_detail($todo, $todo_q) {
 
   $content = $todo_q->f("todo_content");
 
-  $display["title"] = "<h1 class=\"title\">$l_todo : $title</h1>";
+  $display["title"] = $title;
 
   $block = "
   <div class=\"detail infos\">
@@ -287,7 +287,7 @@ function dis_todo_form($todo, $todo_q = 0) {
       $dis_sel_user
     </td></tr>";
 
-  $display["title"] = "<h1 class=\"title\">$l_todo : $title</h1>";
+  $display["title"] = $title;
 
   // Priority select
   $sel_priority = "<select id=\"sel_priority\" name=\"sel_priority\">";

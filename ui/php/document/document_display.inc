@@ -85,7 +85,7 @@ function html_document_search_form ($document, $mime_q) {
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
+    $display["title"] = $ext_title;
   }
   
   // Mime-type select
@@ -275,7 +275,7 @@ function html_document_consult($doc_q) {
   $url = "document_index.php?action=accessfile&amp;document_id=$id&amp;popup=1";
 
   $dname =  ($name != '') ? "($name)" : ''; 
-  $display["title"] = "<h1 class=\"title\">$l_document : $title $dname</h1>";
+  $display["title"] = "$title $dname";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -490,7 +490,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
   $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" id=\"https\" value=\"$cdoc_kind_link\" $checked/><label for=\"https\">$l_links</label>";
 
   $dname =  ($name != '') ? "($name)" : ''; 
-  $display["title"] = "<div class=\"title\">$l_document : $dis_title $dname</div>";
+  $display["title"] = "$dis_title $dname";
   $url1 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=false"; 
   $url2 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=true"; 
 

@@ -242,7 +242,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">
             <input name=\"popup\" type=\"hidden\" value=\"$popup\" />";
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
+    $display["title"] = $ext_title;
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -605,7 +605,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   // --- HTML Template --------------------------------------------------------
 
   $display["link"] = html_contract_links($id, $label, $tech_id, $deal_id, $inc_nb, $last_inc);
-  $display["title"] = "<h1 class=\"title\">$l_contract : $label</h1>";
+  $display["title"] = $label;
 
 
   $block = "
@@ -835,7 +835,6 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
 
     $dis_title = $label;
   } elseif ($action == "new") {
-    $dis_title = $l_header_new;
     $comp_name = $comp_q->f("company_name");
     $ad1 = $comp_q->f("company_address1");
     $zip = $comp_q->f("company_zipcode");
@@ -1140,7 +1139,7 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
     </tr>";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_contract : $dis_title</h1>";
+  $display["title"] = $dis_title;
 
   $block = "
   <form method=\"post\" name=\"f_entity\"
@@ -2104,7 +2103,7 @@ function html_select_contract($con_q, $title, $url="") {
   }
   $display_cont.="</select>";
 
-  $display["title"] = "<h1 class=\"title\">$title</h1>";
+  $display["title"] = $title;
 
   // --- HTML Template --------------------------------------------------------
 

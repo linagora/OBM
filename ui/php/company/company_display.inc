@@ -290,7 +290,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
+    $display["title"] = $ext_title;
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -767,7 +767,7 @@ function html_company_consult($co_q) {
   </tr>";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_company : $name</h1>";
+  $display["title"] = $name;
 
 // --- HTML Template --------------------------------------------------------
 
@@ -1035,7 +1035,6 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
     $datecomment = of_date_upd_format();
     $dis_title = $name;
   } else if ($action == "new") {
-    $dis_title = $l_header_new_f;
     $mark = $obm["uid"];
     $dsrc = $_SESSION['set_dsrc'];
     $usercomment = $uid;
@@ -1239,7 +1238,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
     <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_company : $dis_title</h1>";
+  $display["title"] = $dis_title;
 
   // --- HTML Template --------------------------------------------------------
 

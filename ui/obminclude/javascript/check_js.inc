@@ -79,7 +79,11 @@ function remove_element(elemId,parentId) {
   try {
     container.removeChild(content);
   } catch (e) {
-    // what to do if element does not exists
+    try {
+      content.getParent().removeChild(content);
+    } catch (e) {
+      // what to do if element does not exists
+    }
   }
 }
 

@@ -335,7 +335,7 @@ function html_lead_consult($l_q) {
       <img src=\"$ico_contact\" alt=\"[details]\" /></a>";
   }
 
-  $display['title'] = "<div class=\"title\">$l_lead : $date $company_name</div>";
+  $display['title'] = "$date $company_name";
 
   $block = "
 <h1>$title</h1>
@@ -591,7 +591,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display['title'] = "<div class=\"title\">$l_lead : $dis_title</div>";
+  $display['title'] = $dis_title;
 
   // --- HTML Template --------------------------------------------------------
   $block .= "

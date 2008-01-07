@@ -186,7 +186,7 @@ function html_project_search_form ($types, $tts, $member_q, $project) {
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display['title'] = "<h1 class=\"title\">$ext_title</h1>";
+    $display['title'] = $ext_title;
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -336,7 +336,7 @@ function dis_project_planning($params) {
   if ($shortname != '') {
     $title .= " ($shortname)";
   }
-  $display['title'] = "<h1 class=\"title\">$l_project : $title</h1>";
+  $display['title'] = $title;
 
   return $block;
 }
@@ -991,7 +991,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   // --- HTML Template --------------------------------------------------------
 
   $display['link'] = html_project_links($project_q);
-  $display['title'] = "<h1 class=\"title\">$l_project : $name</h1>";
+  $display['title'] = $name;
 
   $block = "
     
@@ -1126,7 +1126,6 @@ function html_project_form($action, $project_q, $project) {
     $dis_title = $name;
   } else {
     if ($action == 'new') {
-      $dis_title = $l_header_new;
       $name = $project['deal_label'];
       // We pre-fill datebegin and dateend with current date
       $datebegin = of_date_upd_format(); 
@@ -1311,7 +1310,7 @@ function html_project_form($action, $project_q, $project) {
       <input type=\"hidden\" name=\"deal_id\" value=\"$deal\" />
       <input type=\"submit\" value=\"$text_button\" />";
   
-  $display['title'] = "<h1 class=\"title\">$l_project : $dis_title</h1>";
+  $display['title'] = $dis_title;
   
   // --- HTML Template --------------------------------------------------------
   
@@ -1515,7 +1514,7 @@ function html_project_task_form($ptask_q, $project) {
       $js_task
     </script>\n";
 
-  $display['title'] = "<h1 class=\"title\">$l_project : $pname</h1>";
+  $display['title'] = $pname;
 
   // --- HTML Template --------------------------------------------------------
 
@@ -1739,7 +1738,7 @@ function html_project_member_form($members_q, $project) {
     $span = 1;
   }
 
-  $display['title'] = "<h1 class=\"title\">$l_project : $pname</h1>";
+  $display['title'] = $pname;
 
   // --- HTML Template --------------------------------------------------------
 
@@ -1870,7 +1869,7 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
    
    $span = $cpt_m*2 + 1;
    
-   $display['title'] = "<div class=\"title\">$l_project : $pname</div>";
+   $display['title'] = $pname;
 
   // --- HTML Template --------------------------------------------------------
 
@@ -2009,7 +2008,7 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
      
   $span = $cpt_m*2 + 1;
      
-  $display['title'] = "<div class=\"title\">$l_project : $pname</div>";
+  $display['title'] = $pname;
 
   // --- HTML Template --------------------------------------------------------
 
@@ -2085,8 +2084,6 @@ function dis_project_closing($params) {
   } else {
     $dis_title = $l_closing_no;
   }
-
-  $display['title'] = "<h1 class=\"title\">$l_header_closing</h1>";
 
   $block = "
 <div class=\"detail extra\">
@@ -2172,7 +2169,7 @@ function html_project_closing_form($action, $clo, $params) {
       <input type=\"submit\" value=\"$l_closing_insert\" />";
   }
 
-  $display['title'] = "<h1 class=\"title\">$l_closing : $dis_title</h1>";
+  $display['title'] = $dis_title;
 
   // --- HTML Template --------------------------------------------------------
   $block = "$script";
@@ -2516,7 +2513,7 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
 
   // --- HTML Template --------------------------------------------------------
 
-  $display['title'] = "<div class=\"title\">$l_project : $name</div>";
+  $display['title'] = $name;
 
   $block = "
     $dis_comp

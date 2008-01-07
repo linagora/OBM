@@ -91,7 +91,7 @@ function html_resource_search_form($resource) {
     if ($ext_title == "") {
       $ext_title = $l_add_resources;
     }
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
+    $display["title"] = $ext_title;
   }
 
   // Resource Type
@@ -270,8 +270,6 @@ function html_resource_form($usr_q, $resource) {
     $rtype = $usr_q->f("resource_rtype_id");
     $qty = $usr_q->f("resource_qty");
     $dis_title = $name;
-  } else if ($action == 'new') {
-    $dis_title = $l_header_new_f;
   }
 
   // If parameters have been given, they supercede the default action value
@@ -322,7 +320,7 @@ function html_resource_form($usr_q, $resource) {
           <input type=\"submit\" value=\"$l_update\" />";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_resource : $dis_title</h1>";
+  $display["title"] = $dis_title;
 
   // --- HTML Template --------------------------------------------------------
   $block = "
@@ -403,7 +401,7 @@ function html_resource_consult($obm_q) {
   $rtype = ucfirst($obm_q->f("resourcetype_label"));
 
   $display["detailInfo"] = display_record_info($obm_q);
-  $display["title"] = "<div class=\"title\">$l_resource : $name</div>";
+  $display["title"] = $name;
 
   $block = "
   <div class=\"detail extra\">
@@ -474,7 +472,7 @@ function dis_resource_right_dis_admin($id) {
 
   $infos = get_resource_infos($id);
   $name = $infos["name"];
-  $display["title"] = "<h1>$l_resource : $name</h1>";
+  $display["title"] = $name;
   $block = of_right_dis_admin("Resource", $id);
 
   return $block;
@@ -919,7 +917,7 @@ function html_resource_resourceitem_popup($ri_q, $params) {
     </tr>";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_ritem</h1>";
+  $display["title"] = $l_ritem;
 
   // If no item, display error message
   if ($ritem_list == "") {

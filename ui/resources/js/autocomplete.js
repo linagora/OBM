@@ -536,12 +536,14 @@ obm.AutoComplete.Search = new Class({
       var result = new Element('div').addClass('elementRow');
       result.setProperties({'id': div_id});
       result.injectInside(this.selectedBox);
+      console.log('ici')
       new Element('a').adopt(
                         new Element('img')
                           .setProperty('src',obm.vars.images.del)
                       ).addEvent('mousedown',
                         function() {
                           var item = $(item_id);
+                          console.log(item_id,item, div_id, this.name);
                           if (item) { item.removeClass("selected"); }
                           remove_element(div_id,this.name);
                         }.bind(this)

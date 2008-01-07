@@ -29,7 +29,7 @@ function html_control_consult($domain_id="") {
   global $l_download_log;
 
 
-  $display["title"] = "<div class=\"title\">$l_control</div>";
+  $display["title"] = $l_control;
 
   if ($cgp_use["service"]["mail"]) {
 

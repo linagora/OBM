@@ -237,7 +237,7 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
   }
 
   $display['detailInfo'] = display_record_info($obm_q);
-  $display['title'] = "<h1 class=\"title\">$l_domain : $label </h1>";
+  $display['title'] = $label;
 
   $block = "
   <div class=\"detail infos\">
@@ -359,7 +359,7 @@ function html_domain_form($dom_q,$properties_q, $domain) {
     </tr>";
   }
 
-  $display['title'] = "<div class=\"title\">$l_domain : $label </div>";
+  $display['title'] = $label;
 
   // --- HTML Template --------------------------------------------------------
   $block = "
@@ -453,7 +453,7 @@ function dis_domain_can_delete($p_id) {
 
   $infos_q = run_query_domain_detail($p_id);
   $title = $infos_q->f('domain_label');
-  $display['title'] = "<div class=\"title\">$l_domain : $title</div>";
+  $display['title'] = $title;
   $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "

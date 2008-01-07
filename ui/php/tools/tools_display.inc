@@ -172,7 +172,6 @@ function dis_tools_update_detail() {
     $dis_domain";
   }
 
-  $display['title'] = "<h1 class=\"title\">$l_header_tools_upd</h1>";
 
   return $block;
 }

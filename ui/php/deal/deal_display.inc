@@ -376,7 +376,7 @@ function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\" />
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\" />
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\" />";
-    $display['title'] = "<h1 class=\"title\">$ext_title</h1>";
+    $display['title'] = $ext_title;
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -861,7 +861,7 @@ function html_deal_consult($deal_q, $dc='') {
   $block_userdata .= of_userdata_dis_entity_consult('deal', $id);
 
   $display['link'] = html_deal_links($deal_q);
-  $display['title'] = "<h1 class=\"title\">$l_deal : $label</h1>";
+  $display['title'] = $label;
 
   // DealCompany infos
   if ( (is_array($dc)) && (count($dc) > 0) ) {
@@ -1146,7 +1146,6 @@ function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $users_c,
     $town = $deal_q->f('company_town');
     $dis_title = $label;
   } elseif (($action == 'new') || ($action == 'insert')) {
-    $dis_title = $l_header_new_f;
     $comp = $comp_q->f('company_name');
     $ad1 = $comp_q->f('company_address1');
     $zip = $comp_q->f('company_zipcode');
@@ -1446,7 +1445,7 @@ $js_status_loop
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display['title'] = "<div class=\"title\">$l_deal : $dis_title</div>";
+  $display['title'] = $dis_title;
 
   $block = "
   $js_status
@@ -1730,7 +1729,7 @@ $js_status_loop
     $rd_mail_group_c = 'checked';
   }
 
-  $display['title'] = "<div class=\"title\">$l_deal : $dis_title</div>";
+  $display['title'] = $dis_title;
  
   $block = "
     $js_status
@@ -1881,7 +1880,7 @@ function dis_deal_dashboard_index($deal) {
   $url_year = url_prepare('deal_index.php?action=dashboard&amp;dash_view=year_detail');
   $url_panel = url_prepare('deal_index.php?action=dashboard&amp;dash_view=panel');
 
-  $display['title'] = "<h1 class=\"title\">$l_deal : $l_header_dashboard</h1>";
+  $display['title'] = $l_header_dashboard;
 
   $block = "
     <ul>
@@ -1926,7 +1925,7 @@ function dis_deal_dashboard_potential($deal) {
   global $l_forecast, $l_deal_balanced, $l_commission, $l_commission_balanced;
   global $l_marketing_manager, $l_technical_manager, $l_help_deal_forecast;
 
-  $display['title'] = "<div class=\"title\">$l_deal : $l_forecast</div>";
+  $display['title'] = $l_forecast;
 
   if (is_array($deal['manager'])) {
     $users_id = $deal['manager'];

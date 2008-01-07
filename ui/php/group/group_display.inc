@@ -190,7 +190,7 @@ function html_group_search_form ($group) {
     if ($ext_title == '') {
       $ext_title = $l_add_groups;
     }
-    $display['title'] = "<h1 class=\"title\">$ext_title</h1>";
+    $display['title'] = $ext_title;
   }
   
   // --- Var preparation ------------------------------------------------------
@@ -535,7 +535,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   }
   
   $display['detailInfo'] = display_record_info($group_q);
-  $display['title'] = "<h1 class=\"title\">$l_group : $name</h1>";
+  $display['title'] = $name;
 
   $block .= "
   <div class=\"detail infos\">
@@ -624,7 +624,6 @@ function html_group_form($action, $group_q, $group, $field='') {
     $mailing = $group_q->f('group_mailing');
     $dis_title = $name;
   } elseif ($action == 'new') {
-    $dis_title = $l_header_new;
     if ($cgroup_private_default) {
       $private_c = ' checked';
       $mail_class = 'H';
@@ -752,7 +751,7 @@ function html_group_form($action, $group_q, $group, $field='') {
     $dis_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"".$priv."\" />".$dis_private;
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_group : $dis_title</h1>";
+  $display["title"] = $dis_title;
 
   $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
@@ -929,7 +928,6 @@ function dis_group_import_index() {
   global $display, $l_group, $l_header_import;
   global $l_name, $l_email, $l_file_format, $l_user_member;
 
-  $display['title'] = "<h1 class=\"title\">$l_group : $l_header_import</h1>";
 
   $block = "
   <div class=\"detail extra\">
@@ -965,7 +963,6 @@ function html_group_import_file() {
   global $display;
 
   $url = url_prepare("group_index.php");
-  $display["title"] = "<div class=\"title\">$l_group : $l_header_import</div>";
 
   $block = "
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
@@ -991,8 +988,6 @@ function html_group_import_file() {
  **/
 function dis_group_import_file_run($params) {
   global $obm, $display, $ccscd_tab, $l_group, $l_name, $l_email, $l_header_import;
-
-  $display["title"] = "<div class=\"title\">$l_group : $l_header_import</div>";
 
   $file = $params['file_saved'];
   if ($file == '') {

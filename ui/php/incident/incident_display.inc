@@ -399,7 +399,7 @@ function html_incident_consult($inc_q) {
   if ($inc_q->f("incident_archive") == 1) {
     $dis_lab_archive ="<tr><th colspan=\"2\">$l_archive_consult</th></tr>";
   }
-  $display["title"] = "<h1 class=\"title\">$l_incident : $label</h1>";
+  $display["title"] = $label;
 
   // --- HTML Template --------------------------------------------------------
 
@@ -617,7 +617,6 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $users_p, $pri, 
     $c_label = $inc_q->f("contract_label");
     $dis_title = $lincident;
   } elseif ($action == "new") {
-    $dis_title = $l_header_new;
     // We pre-fill date with current date
     $date = of_date_upd_format();
     $datecomment = of_date_upd_format();
@@ -746,7 +745,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $users_p, $pri, 
     $dis_button .="<input type=\"hidden\" name=\"action\" value=\"insert\" />";
     $dis_button .="<input type=\"submit\" value=\"$l_insert\" />";
   }
-  $display["title"] = "<h1 class=\"title\">$l_incident : $dis_title</h1>";
+  $display["title"] = $dis_title;
 
   // --- html template --------------------------------------------------------
 

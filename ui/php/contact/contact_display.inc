@@ -472,7 +472,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display['title'] = "<div class=\"title\">$ext_title</div>";
+    $display['title'] = $ext_title;
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -744,7 +744,7 @@ function html_contact_header($co_q, $funcs) {
   $show_resp = (! $cgp_hide['contact']['responsible']);
   $show_date = (! $cgp_hide['contact']['contact_date']);
 
-  $display['title'] = "<h1 class=\"title\">$l_contact : $lname $fname</h1>";
+  $display['title'] = "$lname $fname";
 
   // Function
   $block_function = of_category_dis_block_consult('contact', 'function', $funcs, 'mono');
@@ -1336,7 +1336,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   // New form and first time
   } elseif ($action == 'new') {
     $kind = get_contact_kind_default();
-    $dis_title = $l_header_new;
     $dsrc = $_SESSION['set_dsrc'];
     $mark = $obm['uid'];
     $date = of_date_upd_format();
@@ -1703,7 +1702,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display['title'] = "<h1 class=\"title\">$l_contact : $dis_title</h1>";
+  $display['title'] = "$dis_title";
 
   // --- HTML Template --------------------------------------------------------
   $block = "$script";

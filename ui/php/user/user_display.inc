@@ -221,7 +221,7 @@ function html_user_search_form($user) {
     if ($ext_title == "") {
       $ext_title = $l_add_users;
     }
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
+    $display["title"] = $ext_title;
   }
 
   foreach ($profiles as $k_profile => $one_profile) {
@@ -718,7 +718,7 @@ function html_user_consult($obm_q) {
   }
   
   $display["detailInfo"] = display_record_info($obm_q);
-  $display["title"] = "<h1 class=\"title\">$l_user : $fname $lname</h1>";
+  $display["title"] = "$fname $lname";
 
   $block = "
 <div class=\"detail infos\">
@@ -1417,7 +1417,7 @@ function html_user_form($usr_q, $user, $field='') {
   $cmax_add = "64";
   $csize_phone = "24";
 
-  $display["title"] = "<h1 class=\"title\">$l_user : $dis_title</h1>";
+  $display["title"] = $dis_title;
 
   // --- HTML Template --------------------------------------------------------
   $block = "
@@ -1862,8 +1862,6 @@ function dis_user_import_index() {
   global $l_desc, $l_group;
   global $l_import_msg, $l_file_format, $l_perms, $l_local_copy;
 
-  $display['title'] = "<h1 class=\"title\">$l_user : $l_header_import</h1>";
-
   $block = "
   <div class=\"detail extra\">
     <h1>$l_file_format</h1>
@@ -1990,7 +1988,6 @@ function html_user_import_file() {
   global $display;
 
   $url = url_prepare('user_index.php');
-  $display['title'] = "<div class=\"title\">$l_user : $l_header_import</div>";
 
   $block = "
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
@@ -2022,7 +2019,6 @@ function dis_user_import_file_run($params) {
   global $l_login, $l_lastname, $l_firstname, $l_email, $l_login_in_use;
   global $l_file_error;
 
-  $display['title'] = "<div class=\"title\">$l_user : $l_header_import</div>";
 
   $file = $params['file_saved'];
   if ($file == '') {

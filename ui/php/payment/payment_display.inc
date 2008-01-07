@@ -87,7 +87,6 @@ function dis_payment_search_form($params='') {
   $kinds = get_payment_kinds();
   $accs = get_accounts();
   $block .= html_payment_search_form($params, $kinds, $accs);
-  $display['title'] = "<h1 class=\"title\">$l_module_payment</h1>";
 
   return $block;
 }

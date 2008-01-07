@@ -270,10 +270,17 @@ function display_actions_theme($section, $module) {
   global $actions, $perm, $display;
 
   $mod_title = $GLOBALS["l_module_$module"];
-  if (empty($display['title']) && !empty($actions[$action]["title"])) {
-    $display['title'] = "<h1 class=\"title\"> : $act_title : ".$actions[$action]["title"]."</h1>";
-  } else if(empty($display['title'])) {
-    $display['title'] = "<h1 class=\"title\">$mod_title</h1>";
+  if(!empty($actions[$module][$action]["Title"])) {
+    $act_title = '- '.$actions[$module][$action]["Title"];
+  } elseif(!empty($actions[$module][$action]["Name"])) {
+    $act_title = '- '.$actions[$module][$action]["Name"];
+  }
+
+
+  if (empty($display['title'])) {
+    $display['title'] = "<h1 class=\"title\">$mod_title $act_title</h1>";
+  } else if ($display['title'] == strip_tags($display['title'])) {
+    $display['title'] = "<h1 class=\"title\">$mod_title $act_title: $display[title]</h1>";
   } 
 
   if (is_array($actions[$module])) {

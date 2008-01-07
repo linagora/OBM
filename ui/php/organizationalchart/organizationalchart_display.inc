@@ -219,7 +219,6 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     $block_detail .= "<input type=\"hidden\" id=\"nb_child\" name=\"nb_child\" value=\"$nb_child\" />
       <input type=\"hidden\" id=\"organizationalchart_id\" name=\"organizationalchart_id\" value=\"$id\" /";
   } else {
-    $dis_title = $l_header_new;
     $block_detail = "
       <div id=\"1\" class=\"organizational_chart_node\">
         <div class=\"organizational_chart_wrap\">
@@ -263,7 +262,7 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<h1 class=\"title\">$l_organizationalchart : $dis_title</h1>";
+  $display["title"] = $dis_title;
 
   // --- HTML Template --------------------------------------------------------
 
@@ -336,7 +335,7 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
   $block_detail = draw_consult($root_node);
 
   $display["detailInfo"] = display_record_info($oc_q);
-  $display["title"] = "<h1 class=\"title\">$l_organizationalchart : $oc_name</h1>";
+  $display["title"] = $oc_name;
 
   // --- HTML Template --------------------------------------------------------
 

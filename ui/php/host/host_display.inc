@@ -85,7 +85,7 @@ function html_host_search_form($host) {
     if ($ext_title == '') {
       $ext_title = $l_add_hosts;
     }
-    $display['title'] = "<div class=\"title\">$ext_title</div>";
+    $display['title'] = $ext_title;
   }
   
   // --- Var preparation ------------------------------------------------------
@@ -284,7 +284,7 @@ function html_host_consult($host_q) {
   $block_delegation = of_delegation_dis_block_consult($delegation);
 
   $display['detailInfo'] = display_record_info($host_q);
-  $display['title'] = "<h1 class=\"title\">$l_module_host : $name</h1>";
+  $display['title'] = $name;
 
   // Section Web, seulement si squid en local pour les machines car 
   // acces geres dans les ACL donc dans squid.conf
@@ -448,8 +448,6 @@ function html_host_form($action, $host_q, $host, $field='') {
     $u_login = $host_q->f('userobm_login');
     $u_id = $host_q->f('userobm_id');
     $dis_title = $name;
-  } else if ($action == 'new') {
-    $dis_title = $l_header_new;
   }
 
   // If parameters have been given, they supercede the default action value
@@ -494,7 +492,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
   $display['detailInfo'] = display_record_info($host_q);
-  $display['title'] = "<h1 class=\"title\">$l_module_host : $dis_title</h1>";
+  $display['title'] = $dis_title;
 
   // Section Web, seulement si squid en local pour les machines car 
   // acces geres dans les ACL donc dans squid.conf

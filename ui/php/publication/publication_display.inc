@@ -94,7 +94,7 @@ function html_publication_search_form ($type_q,$publication) {
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">
 	    <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />";
-    $display['title'] = "<div class=\"title\">$ext_title</div>";
+    $display['title'] = $ext_title;
   }
     
   // type select
@@ -289,7 +289,7 @@ function html_publication_consult($pub_q) {
   $desc = $pub_q->f('publication_desc');
 
   $ldesc = nl2br($desc);
-  $display['title'] = "<h1 class=\"title\">$l_publication : $title</h1>";
+  $display['title'] = $title;
 
 
   // --- HTML Template --------------------------------------------------------
@@ -451,7 +451,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication, 
 
   $url = "publication_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
 
-  $display['title'] = "<h1 class=\"title\">$l_publication : $dis_title</h1>";
+  $display['title'] = $dis_title;
 
   // --- HTML Template --------------------------------------------------------
 
@@ -535,7 +535,7 @@ function html_publication_group_subscription_form($action,$pub_q, $publication) 
   }
   $sel_list .= '</select>';
 
-  $display['title'] = "<h1 class=\"title\">$l_publication : $title</h1>";
+  $display['title'] = $title;
 
   // --- HTML Template --------------------------------------------------------
 
@@ -643,7 +643,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
       <input type=\"hidden\" id=\"ext_url\" name=\"ext_url\" value=\"$ext_url\" />
       <input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />";
 
-  $display['title'] = "<div class=\"title\">$l_subscription : $contact_firstname  $pub_title</div>";
+  $display['title'] = "$contact_firstname  $pub_title";
 
   // --- HTML Template --------------------------------------------------------
   if (!isset($quantity)) $quantity = 1;
@@ -747,7 +747,7 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
       ";
      	
 
-  $display['title'] = "<h1 class=\"title\">$l_renew : $title</h1>";
+  $display['title'] = $title;
 
   // --- HTML Template --------------------------------------------------------
 

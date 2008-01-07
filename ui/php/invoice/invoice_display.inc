@@ -253,7 +253,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display['title'] = "<div class=\"title\">$ext_title</div>";
+    $display['title'] = $ext_title;
   }
 
   // Selected date field
@@ -730,7 +730,7 @@ function dis_invoice_detail($inv_q) {
   $project = $inv_q->f('project_name');
   $archive = ($inv_q->f('invoice_archive') == 1 ? $l_yes : $l_no);
 
-  $display['title'] = "<h1 class=\"title\">$l_invoice : $label</h1>";
+  $display['title'] = $label;
 
   $url_comp = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id");
   if ($deal_id > 0) {
@@ -898,7 +898,6 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
 
   // New form and first time
   } elseif ($action == 'new') {
-    $dis_title = $l_header_new_f;
     $date = of_date_upd_format(); 
     $expiration_date = $date;
     $payment_date = $date;
@@ -1043,7 +1042,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
     <input type=\"hidden\" name=\"action\" value=\"insert\" />";
   }
 
-  $display['title'] = "<h1 class=\"title\">$l_invoice : $dis_title</h1>";
+  $display['title'] = $dis_title;
 
   $block = "
   <form method=\"post\" name=\"f_entity\" action=\"invoice_index.php\">
@@ -1259,7 +1258,7 @@ function dis_invoice_dashboard_index($invoice) {
     $block .= dis_invoice_dashboard_year_to_year($invoice);
   }
 
-  $display['title'] = "<h1 class=\"title\">$title</h1>";
+  $display['title'] = $title;
  
   return $block;
 }

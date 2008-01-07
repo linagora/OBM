@@ -1037,6 +1037,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
 function dis_calendar_week_printable($calendar, $calendar_entity,$writable_entity) {
   global $path, $ico_next, $ico_previous, $l_previous, $l_next, $l_week;
   global $ccalendar_weekstart, $obm, $ico_far_next, $ico_far_previous;
+  global $ccalendar_first_hour;
 
   $ts_date = strtotime($calendar["date"]);
   $category_filter = $calendar["category_filter"];
@@ -1095,12 +1096,12 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
   // Week Calendar content
   for($ts = $start_time; $ts < $end_time; $ts += $day_duration ) {
     $first_hour = strtotime(date("Y-m-d $ccalendar_first_hour:00:00", $ts));
-    $this_date_l = calendar_localizeDate("day", $ts);  
-    $dis_printable_view .= "<tr><th colspan=\"$span\">$this_date_l</th></tr>";
+    $this_date_l = calendar_localizeDate("week_list", $ts);  
+    //$dis_printable_view .= "<tr><th colspan=\"$span\">$this_date_l</th></tr>";
+    $dis_printable_day = array();
     foreach($calendar_entity as $entity => $entities) {
       foreach($entities as $id => $data) {
         $view = array();
-        $dis_printable_line = '';
         $occurences = $of->getPeriodOccurrences($ts,$day_duration,array($entity => array($id)));
         if(is_array($occurences)) {
           foreach($occurences as $occurence) {
@@ -1111,14 +1112,14 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
           }
         }
         while(!empty($view)) {
-          $dis_printable_line .= "<tr>";
+          $dis_printable_line = '';
           for($i=0; $i <= $span; $i++) {
             if(isset($view[$i])) {
               $occurence = array_shift($view[$i]);
               $event = dis_calendar_printable_event($occurence, $calendar_entity, $ts);
               if($occurence->event->all_day || $i == $span) {
                 $dur = 0;
-                $dis_printable_view .= "<tr><td style='width:".($td_width*$span)."%;' colspan='$span'>$event</td></tr>";
+                array_unshift($dis_printable_day,"<td style='width:".($td_width*$span)."%;' colspan='$span'>$event</td>");
               } else {
                 $dur = floor((($occurence->date + $occurence->event->duration) - $first_hour) / $ts_interval) - $i;
                 if($dur >= $span) $dur = $span ;
@@ -1137,10 +1138,11 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
 
             }
           }
-          $dis_printable_line .= "</tr>";
-        }          
-        $dis_printable_view .= $dis_printable_line;
+          $dis_printable_day[] = $dis_printable_line;
+        }       
       }
+      if(($rowspan = count($dis_printable_day)) == 0) $rowspan = 1;  
+      $dis_printable_view .= "<tr><th rowspan='$rowspan' class=\"NW\">$this_date_l</th>".implode('</tr><tr>',$dis_printable_day)."</tr>";
     }
   }
   for ($j = 0; $j < $span; $j++) {
@@ -1150,7 +1152,7 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
   }
   $block .= "
   <table class='printableCalendar calendar'>
-  <thead><tr>$time_line</tr></thead>
+  <thead><tr><th></th>$time_line</tr></thead>
   <tbody>
   <tr>
   $dis_printable_view
@@ -1503,7 +1505,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   global $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
   global $l_date, $l_resources, $l_items, $l_event, $ico_search,$ccalendar_first_hour;
   global $l_expand_all, $l_collapse_all,$ccalendar_last_hour,$ccalendar_weekstart;
-
+  global $ico_periodic_alt, $ico_meeting_alt;
   $sel_user = $calendar_entity["user"];
   $sel_user_id = array();
   if (is_array($sel_user)) {
@@ -1596,6 +1598,12 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
               }
             }
           }
+          if($event->isMeeting()) {
+            $title = "<img src=\"$ico_meeting_alt\" alt=\"[Meeting]\" /> $title";
+          }
+          if($event->isPeriodic()) {
+            $title = "<img src=\"$ico_periodic_alt\" alt=\"[Periodic]\" /> $title";
+          }                  
         }
         $dis_attendees = "";
         $br = "";
@@ -2563,13 +2571,20 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 	foreach ($tasks["entity"] as $u_id => $entity) {
 	  $label = $entity["label"];
 	  $state = $entity["state"];
-	  $dis_task_list .= "$label<br />";
+	  $dis_task_list .= "<tr><td>$label</td></tr>";
 	}
 	$dis_task_block = "
+        <div class=\"detail infos\">
+        <h1>$l_task</h1>
+        <table  class=\"spreadSheet\">
+        <thead>
         <tr>
-          <th>$l_task :</th>
-          <td>$dis_task_list</td>
-        </tr>";
+        <td>$l_title</td>
+        </tr>
+        </thead>      
+        $dis_task_list
+        </table>
+        </div>"; 
       }
     }
     $display["title"] = "<div class=\"title\">$l_module_calendar : $title</div>";
@@ -2815,11 +2830,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   $dis_user_list
   </table>
   </div>   
+  <p class=\"LC\" />
   $dis_resource_block
-  $dis_task_block
   $dis_item_list
-
-  $block_alert
+  $dis_task_block
 
    <div class=\"detail extra\">
    <h1>$l_desc</h1>
@@ -3189,8 +3203,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if( $dateend == '' ) {
     $dateend = $datebegin;
   }
+
+  if( $hourbegin == '') {
+    $hourbegin = $ccalendar_first_hour;
+  }
   if( $hourend == '' ) {
-    $hourend = $ccalendar_first_hour + 1;
+    $hourend = $hourbegin + 1;
   }
 
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
@@ -3217,6 +3235,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
 
   $block_user = "
+    <fieldset class=\"detail infos\">
+    <legend>$l_users</legend>    
+    <table>
+    <tr>
     <th>
     $l_users
     $user_add_button
@@ -3227,7 +3249,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </tr>
     <tr>
     <th>&nbsp;</th>    
-    <td id=\"sel_user_id\">$dis_sel_user</td>";
+    <td id=\"sel_user_id\">$dis_sel_user</td>
+    </tr>
+    </table>
+    </fieldset>";
 
   // group select
   if (is_array($groups["entity"])) {
@@ -3254,7 +3279,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
 
-  $block_group = "
+    $block_group = "
+    <fieldset class=\"detail infos\">
+    <legend>$l_groups</legend>    
+    <table>
+    <tr>
     <th>
     $l_groups
     $group_add_button
@@ -3266,7 +3295,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
     <tr>
     <th>&nbsp;</th>
-    <td id=\"sel_group_id\">$dis_sel_group</td>";
+    <td id=\"sel_group_id\">$dis_sel_group</td>
+    </tr>
+    </table>
+    </fieldset>";
 
   if ($ccalendar_resource) {
     // resource select
@@ -3338,6 +3370,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </a>";
 
     $block_resource = "
+    <fieldset class=\"detail infos\">
+    <legend>$l_resources</legend>    
+    <table>
+    <tr>
     <th>
     $l_resources
     $resource_add_button
@@ -3349,11 +3385,17 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
     <tr>
     <th>&nbsp;</th>    
-    <td id=\"sel_resource_id\">$dis_sel_resource</td>";
+    <td id=\"sel_resource_id\">$dis_sel_resource</td>
+    </tr>
+    </table>
+    </fieldset>";
   }
 
   if ($cgp_show['module']['project']) {
     $block_task = "
+    <fieldset class=\"detail infos\">
+    <legend>$l_task</legend>    
+    <table>      
     <th>$l_task     
     <a href=\"\" onclick=\"url = get_selected_users_url();popup('$path/project/project_index.php?action=ext_get_task_id&amp;popup=1&amp;ext_widget=f_entity.task_new_id&amp;ext_widget_text=f_entity.task_new_name'+url,'Project'); return false;\">
     <img src=\"$ico_project\" alt=\"[Add]\" /></a>
@@ -3378,7 +3420,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <input type=\"hidden\" name=\"task_name\" value=\"$t_name\" />
       <input type=\"hidden\" name=\"task_new_id\" value=\"$t_new_id\" />
       <input type=\"text\" size=\"32\" name=\"task_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
-      </td>";
+      </td>
+      </tr>
+      </table>
+      </fieldset>";
   }
 
   if ($force == 1) {
@@ -3491,6 +3536,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <th>$l_location</th>
     <td><input type=\"text\" id=\"tf_location\" name=\"tf_location\" maxlength=\"60\" size=\"25\" value=\"$location\" /></td>
   </tr> 
+    $block_category1
   <tr>
     <th>$l_sendamail</th>
     <td><input type=\"checkbox\" id=\"cba_mail\" value=\"1\" name=\"cba_mail\" /></td>
@@ -3499,28 +3545,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <th>$l_force</th>
     <td>$dis_force</td>
   </tr>   
-  <tr>
-    <th>$l_private</th>
-    <td>$dis_privacy</td>
-  </tr> 
-    $block_category1
-  <tr>
-    $block_user
-  </tr>
-  <tr>
-    $block_group
-  </tr>    
-  <tr>
-    $block_resource
-  </tr>
-  <tr>
-    $block_task
-  </tr>    
   </table>
   </fieldset>
   <fieldset class=\"detail infos\">
   <legend>$l_carac</legend>
   <table>
+  <tr>
+    <th>$l_private</th>
+    <td>$dis_privacy</td>
+  </tr> 
   <tr>
     <th>$l_all_day</th>
     <td>
@@ -3575,10 +3608,18 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <tr id=\"repeatException\" style=\"display:$repeatDisplay\">
     <th> $l_exception $add_date</th>
     <td id=\"exceptionHome\">$block_exception_detail</td>
-  </tr>
+    </tr>
+  <tr>
+    <th></th>
+    <td>&nbsp;</td>
+  </tr>    
   </table>
   </fieldset>
-
+  $block_user
+  <p class=\"LC\" />
+  $block_resource
+  $block_group
+  $block_task
   <fieldset class=\"detail infos\">
   <legend>$l_alerts</legend>
   <table>    

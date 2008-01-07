@@ -113,7 +113,7 @@ function html_resourcegroup_search_form ($group) {
     if ($ext_title == "") {
       $ext_title = $l_add_resourcegroup;
     }
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
+    $display["title"] = $ext_title;
   }
   
   // --- Var preparation ------------------------------------------------------
@@ -278,7 +278,6 @@ function html_resourcegroup_form($action, $group_q, $group) {
     $priv = $group_q->f("privacy");
     $dis_title = $name;
   } elseif ($action == "new") {
-    $dis_title = $l_header_new;
     if ($cgroup_private_default) {
       $private_c = " checked";
     }
@@ -304,7 +303,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
   </tr>";
   } 
 
-  $display["title"] = "<h1 class=\"title\">$l_resourcegroup : $dis_title</h1>";
+  $display["title"] = $dis_title;
 
   $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("resourcegroup_index.php")."\">
@@ -413,7 +412,7 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
   $desc = $group_q->f("rgroup_desc");
 
   $display["detailInfo"] = display_record_info($group_q);
-  $display["title"] = "<h1 class=\"title\">$l_resourcegroup : $name</h1>";
+  $display["title"] = $name;
 
   $block = "
   <div class=\"detail extra\">

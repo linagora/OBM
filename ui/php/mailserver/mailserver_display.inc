@@ -82,7 +82,7 @@ function html_mailserver_search_form($params) {
     if ($ext_title == '') {
       $ext_title = $l_select_mailserver;
     }
-    $display['title'] = "<div class=\"title\">$ext_title</div>";
+    $display['title'] = $ext_title;
   }
   
   // --- Var preparation ------------------------------------------------------
@@ -278,7 +278,7 @@ function html_mailserver_consult($m_q) {
   if ($smtp_out == '1') $smtp_out = $c_yes; else $smtp_out = $c_no;
 
   $display['detailInfo'] = display_record_info($m_q);
-  $display['title'] = "<h1 class=\"title\">$l_mailserver : $host_name</h1>";
+  $display['title'] = $host_name;
 
   $block = "
     <div class=\"detail extras\">
@@ -392,7 +392,7 @@ function html_mailserver_form($action, $m_q, $params, $field='') {
     <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display['title'] = "<h1 class=\"title\">$l_mailserver : $dis_title</h1>";
+  $display['title'] = $dis_title;
 
   // --- HTML Template --------------------------------------------------------
 

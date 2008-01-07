@@ -609,7 +609,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
 
 
   $display['detailInfo'] = display_record_info($list_q);
-  $display['title'] = "<h1 class=\"title\">$l_list : $name</h1>";
+  $display['title'] = $name;
 
   $block = "
 <div class=\"detail extra\">
@@ -784,8 +784,6 @@ function html_list_form($action, $list_q, $list) {
     $contact_arch = ($list_q->f('list_contact_archive') == 0 ? '0' : '1');
     $info_pub = ($list_q->f('list_info_publication') == 0 ? '0' : '1');
     $dis_title = $name;
-  } else if ($action == 'new') {
-    $dis_title = $l_header_new_f;
   }
   
   // If parameters have been given, they supercede the default action value
@@ -827,7 +825,7 @@ function html_list_form($action, $list_q, $list) {
 
 
   $url = url_prepare('list_index.php');
-  $display['title'] = "<div class=\"title\">$l_list : $dis_title</div>";
+  $display['title'] = $dis_title;
 
   // If criteria are set, we display the criteria form, else the query
   if ($mode == $clist_mode_expert) {

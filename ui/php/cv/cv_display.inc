@@ -132,7 +132,7 @@ function html_cv_search_form($cv) {
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">
             <input name=\"popup\" type=\"hidden\" value=\"$popup\" />";
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
+    $display["title"] = $ext_title;
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -369,7 +369,7 @@ function html_cv_consult($cv, $cv_q, $refs_q, $prefs){
   // --- HTML Template --------------------------------------------------------
 
   //$display["link"] = html_cv_links($id, $label, $tech_id, $deal_id, $inc_nb, $last_inc);
-  $display["title"] = "<h1 class=\"title\">$l_cv  : $title</h1>";
+  $display["title"] = $title;
 
 
   $block = "
@@ -575,7 +575,7 @@ function html_cv_form($action, $cv, $cv_q="", $refs_q="", $users_c) {
       
   }
 
-  $display["title"] = "<div class=\"title\">$l_cv : $title</div>";
+  $display["title"] = $title;
 
   
   // Marketing manager select

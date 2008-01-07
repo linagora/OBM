@@ -191,7 +191,7 @@ function html_account_consult($obm_q_account, $p_action){
 
   // $col_balance = ($obm_q_account->f("account_balance")>0) ? $col_balance_pos:$col_balance_neg;
 
-  $display["title"] = "<h1 class=\"title\">$l_account : $label</h1>";
+  $display["title"] = $label;
   
   // number and label
   $block .= "

@@ -272,7 +272,7 @@ function html_import_consult($import_q) {
   }
 
   $display['detailInfo'] = display_record_info($import_q);
-  $display['title'] = "<h1 class=\"title\">$l_import : $name</div>";
+  $display['title'] = $name;
 
   $block = "
   <div class=\"detail extra\">
@@ -333,7 +333,7 @@ function html_import_consult_file($import_q) {
   $name = $import_q->f('import_name');
 
   $url = url_prepare('import_index.php');
-  $display['title'] = "<div class=\"title\">$l_import : $name</div>";
+  $display['title'] = $name;
 
   $block = "
     <div class=\"detail extra\">
@@ -1249,7 +1249,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $users) {
   }
 
   $url = url_prepare('import_index.php');
-  $display['title'] = "<div class=\"title\">$l_import : $dis_title</div>";
+  $display['title'] = $dis_title;
 
   $block = "
   <form method=\"post\" name=\"f_entity\" action=\"$url\"

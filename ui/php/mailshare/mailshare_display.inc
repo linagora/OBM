@@ -96,7 +96,7 @@ function html_mailshare_search_form($mailshare) {
     if ($ext_title == "") {
       $ext_title = $l_add_mailshares;
     }
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
+    $display["title"] = $ext_title;
   }
   
   // --- Var preparation ------------------------------------------------------
@@ -251,7 +251,7 @@ function html_mailshare_consult($mailshare_q) {
   $block_delegation = of_delegation_dis_block_consult($delegation);
 
   $display["detailInfo"] = display_record_info($mailshare_q);
-  $display["title"] = "<div class=\"title\">$l_mailshare : $name</div>";
+  $display["title"] = $name;
 
   $block = "
   <div class=\"detail extra\">
@@ -314,7 +314,6 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
     $dis_title = $name;
 
   } else if ($action == "new") {
-    $dis_title = $l_header_new;
     $quota = $cmailshare_default_quota;
   }
 
@@ -351,7 +350,7 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
   $main_domain = $obm["domain_name"];
 
   $display["detailInfo"] = display_record_info($mailshare_q);
-  $display["title"] = "<div class=\"title\">$l_mailshare : $dis_title</div>";
+  $display["title"] = $dis_title;
 
   if (($action == "new") || ($action == "insert")) {
     $dis_name = "<input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />";
@@ -438,7 +437,7 @@ function dis_mailshare_right_dis_admin($id="") {
   }
   $infos = get_mailshare_info($id);
   $name = $infos["name"];
-  $display["title"] = "<h1 class=\"title\">$l_mailshare : $name</h1>";
+  $display["title"] = $name;
   $block = of_right_dis_admin("MailShare", $id);
 
   return $block;
