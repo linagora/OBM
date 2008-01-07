@@ -271,9 +271,9 @@ function display_actions_theme($section, $module) {
 
   $mod_title = $GLOBALS["l_module_$module"];
   if(!empty($actions[$module][$action]["Title"])) {
-    $act_title = '- '.$actions[$module][$action]["Title"];
+    $act_title = '- '.$actions[$module][$action]["Title"].' ';
   } elseif(!empty($actions[$module][$action]["Name"])) {
-    $act_title = '- '.$actions[$module][$action]["Name"];
+    $act_title = '- '.$actions[$module][$action]["Name"].' ';
   }
 
 
