@@ -2587,14 +2587,14 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         </div>"; 
       }
     }
-    $display["title"] = "<div class=\"title\">$l_module_calendar : $title</div>";
+    $display["title"] = $title;
   } else {
     $title = $l_private; 
     $location = $l_private;
     $priority = $l_private;
     $description = $l_private;
     $priority = $l_private;
-    $display["title"] = "<div class=\"title\">$l_module_calendar : $l_private</div>";
+    $display["title"] = $l_private;
 
   }
 
@@ -3051,7 +3051,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
 
   } elseif ($action == "new") {
-    $dis_title = $l_header_new;
     $repeat_end = of_date_upd_format();
   }
 
@@ -3487,7 +3486,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
   }
   $dis_min_e .= "</select>";
-  $display['title'] = "<div class=\"title\">$l_module_calendar : $dis_title</div>";
+  $display['title'] = "$dis_title";
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[5]";
   $url2 = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[6]&amp;ext_title=" . urlencode($l_calendar_select_group);
 
@@ -3986,7 +3985,6 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     }
   }
   $dis_min_d .= "</select>";
-  $display["title"] = "<h1 class=\"title\">$l_module_calendar : $l_header_meeting</h1>";
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[0]";
 
   // --- HTML Template --------------------------------------------------------
@@ -4240,7 +4238,7 @@ function dis_calendar_right_dis_admin($id="") {
   }
   $infos = get_user_info($id);
   $name = $infos["firstname"] . " " . $infos["lastname"];
-  $display["title"] = "<h1 class=\"title\">$l_calendar : $name</h1>";
+  $display["title"] = $name;
   $block = of_right_dis_admin("calendar", $id, "userobm");
 
   return $block;
@@ -4452,7 +4450,6 @@ function dis_icalendar_import($params) {
   global $display ;
   global $l_ics, $l_ics_file, $l_ics_insert, $l_insert, $l_calendar ;
 
-  $display["title"] = "<h1 class=\"title\">$l_calendar : $l_ics</h1>" ;
 
   // --- HTML Template --------------------------------------------------------
   $dis_button = "<input type=\"hidden\" name=\"action\" value=\"ics_insert\">
