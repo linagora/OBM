@@ -16,7 +16,7 @@ $l_free_resources = "Resources libres : ";
 $l_groups = "Groupes";
 $l_title = "Titre";
 $l_location = "Lieu";
-$l_details = "Détailler";
+$l_details = "Consulter";
 $l_private_description = "Cet événement est personnel. Impossible de voir le détail.";
 $l_high = "Haute";
 $l_low = "Basse";
@@ -82,10 +82,12 @@ $l_date = "Date";
 $l_user = "Utilisateur";
 $l_back_mono = "Revenir à ma vue";
 $l_edit = "Editer";
+$l_edit_full = "Compléter";
 
 $l_collapse_all = "Tout réduire";
 $l_expand_all = "Tout développer";
 $l_today_date = "Date du jour";
+
 // actions 
 $l_meeting_perform = "Rechercher les créneaux libres";
 $l_insert = "Enregistrer le rdv";

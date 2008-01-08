@@ -234,17 +234,18 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
   global $l_search_users, $l_search_resources,$l_private_group_members, $l_public_group_members;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
-  global $ico_group, $c_public;
+  global $ico_group, $l_calendar;
 
   $iso_date = $calendar['date'];
   $this_group = $calendar["entity"]["group_view"];
   $category_filter = $calendar["category_filter"];
   $group_privacy = $calendar["group_privacy"];
-  //-- Private Group selection
-  if ($this_group == $c_all || $group_privacy == $c_public) {
+
+  //-- Group selection
+  if ($this_group == $c_all) {
     $sel_group = "<option selected=\"selected\">$l_select_group</option>";
   } else {
-    $sel_group = "<option>$l_select_group</option>";
+    $sel_group = "<option value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_select_group</option>";
   }
 
   while ($entity_readable["group"]->next_record()) {
@@ -262,14 +263,9 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   }
   $sel_group .= "</select>";
 
-
-  if ($group_privacy == $c_public) {
-    $g_public_name = get_last_group_text($calendar["group_id"]);
-    $sel_group .= "<input type=\"hidden\" id=\"group_privacy\" name=\"group_privacy\" value=\"$c_public\" />";
-  } else {
-    $sel_group .= "<input type=\"hidden\" id=\"group_privacy\" name=\"group_privacy\" value=\"\" />";
-  }
-
+  if ($this_group != $c_all && empty($selected_s)){
+    $g_public_name = get_last_group_text($this_group);
+  } 
   //-- End Group selection
 
   // loop through ["user"], ["resource"]
@@ -286,7 +282,13 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction_calendar=calendar";
   $user_add_button = "
     <a href=\"javascript: return false;\" 
-    onclick=\"window.open('$url_user','','height=$popup_height,width=$popup_width,scrollbars=yes');
+    onclick=\"popup('$url_user','$user_text');
+  return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>";
+
+  $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;restriction_calendar=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path."/calendar/calendar_index.php")."&amp;ext_target=$l_calendar&amp;iso_date=$iso_date";
+  $group_add_button = "
+    <a href=\"javascript: return false;\" 
+    onclick=\"popup('$url_group', '');
   return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>";
 
   if ($ccalendar_resource) {
@@ -294,7 +296,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction=user";
     $resource_add_button = "    
       <a href=\"javascript: return false;\"
-      onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      onclick=\"popup('$url_resource','');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" /> </a>";
     $dis_block_resource = "
@@ -312,7 +314,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   $sel_cat1 = of_category_html_select("calendar", "category1", $cats1, $category_filter,"all_f","onchange=\"this.form.submit()\"","category_filter");
 
   $dis_back_myview = "<a href=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_back_mono</a>";
-
+  $dis_go_today = "<a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format()."\" >$l_today</a>";
+  
   $block = "
     <div class=\"portlet\" id=\"calendarSelection\">
     <h1>$l_selection</h1>
@@ -324,7 +327,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
     </fieldset>
     </form>
-    <form action=\"\" onsubmit=\"return false;\">
+
+    <form name=\"f_entity_group\" action=\"\" onsubmit=\"return false;\">
     <fieldset class=\"detail extra\">
     <legend>$l_private_group_members</legend>
     <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
@@ -332,8 +336,9 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     </select>
     </fieldset>
     <fieldset class=\"detail extra\">
-    <legend>$l_public_group_members</legend>
-    <input type=\"text\" name=\"\" value=\"$g_public_name\" id=\"group\" autocomplete=\"off\" />
+    <legend>$l_public_group_members $group_add_button</legend>
+    <input type=\"text\" name=\"group_name\" value=\"$g_public_name\" id=\"group_name\" autocomplete=\"off\" />
+    <input type=\"hidden\" name=\"ext_group_id\" id=\"ext_group_id\" />
     </fieldset>
     </form>
 
@@ -356,7 +361,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     $sel_ent
     <input type=\"submit\" value=\"$l_validate\" />
     </fieldset>
-    $dis_back_myview - <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format()."\" >$l_today</a>
+    $dis_back_myview - $dis_go_today
     </form>
    </div>
   </div>
@@ -364,7 +369,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     obm.vars.images.update = '$ico_group';
     obm.initialize.chain(function () {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {restriction:'calendar', defaultText:'$user_text'})
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group', {restriction:'calendar', mode: 'mono', locked: true, 
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {restriction:'calendar', mode: 'mono', locked: true, 
         extrafunction:'sel_public_group(\"$iso_date\", element, this.inputField.value)'});
       $resource_js
     });
@@ -547,13 +552,10 @@ function html_calendar_view_selector($calendar, $my_views) {
   }
 
   // Javascript Strings
-  $l_js_fill_view_label = phpStringToJsString($l_fill_view_label);
   $l_js_confirm_delete_view = phpStringToJsString($l_confirm_delete_view);
   $l_js_no_sel_view = phpStringToJsString($l_no_sel_view);
   $l_js_conflict_view_label = phpStringToJsString($l_conflict_view_label);
   $l_js_view_save = phpStringToJsString($l_view_save);
-  $l_js_validate = phpStringToJsString($l_validate);
-  $l_js_view_label = phpStringToJsString($l_view_label);
 
   $block = "
   <div class=\"portlet\" id=\"calendarSelView\">
@@ -571,7 +573,7 @@ function html_calendar_view_selector($calendar, $my_views) {
       <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.remove();return false;\">
         <img src=\"$ico_delete\" alt=\"[$l_view_delete]\"/>
       </a>
-      <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.toggle();return false;\">
+      <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.show();return false;\">
         <img src=\"$ico_add\" alt=\"[$l_view_save]\"/>
       </a>
     </form>
@@ -579,42 +581,13 @@ function html_calendar_view_selector($calendar, $my_views) {
     </div>
   </div>
   <script type=\"text/javascript\">
-    obm.vars.labels.fill_view_label = '$l_js_fill_view_label';
     obm.vars.labels.delete_view = '$l_js_confirm_delete_view';
     obm.vars.labels.no_sel_view = '$l_js_no_sel_view';
     obm.vars.labels.conflict_view_label = '$l_js_conflict_view_label';
     obm.vars.labels.save_view = '$l_js_view_save';
-    obm.vars.labels.validate = '$l_js_validate';
-    obm.vars.labels.view_label = '$l_js_view_label';
-    obm.vars.images.ico_close = '$ico_popup_close';
 
-    obm.initialize.chain(function() {
-      body = $('mainPanel');
+    obm.calendarView = new Obm.CalendarView();
 
-      var div = new Element('div').setProperty('id', 'viewSelectorForm').adopt(
-        new Element('h1').adopt(
-          new Element('a').adopt(
-            new Element('img').setProperty('src', obm.vars.images.ico_close))
-              .addEvent('click',
-                function() {
-                 obm.calendarView.hide(); 
-                }) ).adopt(
-          new Element('span').setHTML(obm.vars.labels.save_view)
-        )
-      ).adopt(
-        new Element('form').setProperties({'action':'calendar_index.php', 'method':'get'}).adopt(
-        new Element('fieldset').setHTML(obm.vars.labels.view_label+' :').adopt(
-          new Element('input').setProperties({'type':'text', 'id':'tf_view_label', 'name':'tf_view_label'})).adopt(
-          new Element('input').setProperties({'type':'button','value':obm.vars.labels.validate}).addClass('button').addEvent('click', function() {
-            obm.calendarView.insert();
-            return false;
-          } )))
-      );
-      //.adopt(new Element('img').setProperty('src','/images/themes/default/images/popup_queue.gif'));
-      div.injectAfter(body);
-
-      obm.calendarView = new Obm.CalendarView();
-    });
   </script>
   ";
 
@@ -2906,9 +2879,9 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
  */
 function dis_calendar_quick_form($calendar) {
   global $ico_popup_close,$l_validate,$popup_queue,$l_title;
-  global $l_desc,$l_confirm_delete,$l_c_delete,$l_category1, $l_edit;
+  global $l_desc,$l_confirm_delete,$l_c_delete,$l_category1, $l_edit, $l_edit_full;
   global $l_location,$l_members,$l_carac, $l_items,$l_details;
-
+  
   $block = "
     <div id=\"calendarQuickForm\">
       <h1>
@@ -2923,10 +2896,11 @@ function dis_calendar_quick_form($calendar) {
       </h2> 
       <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
       <fieldset>
-        $l_title : <input type=\"text\" name=\"tf_title\" /> <input class=\"button\" type=\"submit\" value=\"$l_validate\" />
+        $l_title : <input type=\"text\" name=\"tf_title\" /> 
       </fieldset> 
       <fieldset class=\"buttons\"> 
-        <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" value=\"$l_edit\" />
+        <input class=\"button\" type=\"submit\" value=\"$l_validate\" />
+        <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" />
         <input type=\"button\" id=\"calendarQuickFormDetail\" onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value=\"$l_details\" />
         <input type=\"button\" id=\"calendarQuickFormDelete\" 
           onclick=\"if(confirm('".phpStringToJsString($l_confirm_delete)."')) obm.calendarQuickForm.submit('quick_delete');\"
@@ -2934,7 +2908,7 @@ function dis_calendar_quick_form($calendar) {
       </fieldset>
       </form>
       <div id=\"calendarQuickFormData\">
-      <div  id=\"calendarQuickFormAttendees\">
+      <div id=\"calendarQuickFormAttendees\">
       <h3>$l_members</h3>
       </div>
       <div>
@@ -2963,6 +2937,8 @@ function dis_calendar_quick_form($calendar) {
     </div>
     <script type=\"text/javascript\">
       obm.calendarQuickForm = new Obm.CalendarQuickForm();
+      obm.vars.labels.edit = '".phpStringToJsString($l_edit)."';
+      obm.vars.labels.edit_full = '".phpStringToJsString($l_edit_full)."';
     </script>
 ";
 
@@ -3213,7 +3189,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
   $user_add_button = "
     <a href=\"javascript: return false;\" 
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      onclick=\"popup('$url','');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
@@ -3273,7 +3249,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
   $group_add_button = "
     <a href=\"javascript: return false;\" 
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      onclick=\"popup('$url','');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
@@ -3363,7 +3339,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $url = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
     $resource_add_button = "
     <a href=\"javascript: return false;\" 
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      onclick=\"popup('$url','');
       return false;\">
      <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
@@ -3835,7 +3811,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
   $user_add_button = "
     <a href=\"javascript: return false;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      onclick=\"popup('$url','');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
@@ -3869,7 +3845,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
     $resource_add_button = "
       <a href=\"javascript: return false;\"
-      onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      onclick=\"popup('$url_resource','');
       return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
@@ -3905,7 +3881,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     $url_resource_group = "$path/resourcegroup/resourcegroup_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_group_id";
     $rgroup_add_button = "
       <a href=\"javascript: return false;\"
-      onclick=\"window.open('$url_resource_group','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      onclick=\"popup('$url_resource_group','');
       return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
@@ -3948,7 +3924,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
   $group_add_button = "
     <a href=\"javascript: return false;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      onclick=\"popup('$url','');
       return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";

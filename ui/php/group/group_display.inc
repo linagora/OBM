@@ -47,9 +47,17 @@ $fieldnames['group_user_email'] = $l_email;
 function dis_data_group(&$OD, $fieldname, $link_ok) {
   global $path, $obm, $params, $ico_mail,$cgp_use;
 
-  if (($fieldname == 'group_name') && $link_ok) {
-    $res['url'] = "$path/group/group_index.php?action=detailconsult&amp;group_id=".$OD->data_set->f('group_id');
+  if (($fieldname == 'group_name')) {
+    if ($OD->display_ext == "get_id") {
+      $res["url"] = "javascript:check_group_get_id(".$OD->data_set->f("group_id").",'".addslashes($OD->data_set->f("group_name"))."');";
+    } else {
+      if ($link_ok) {
+        $res['url'] = "$path/group/group_index.php?action=detailconsult&amp;group_id=".$OD->data_set->f('group_id');
+      }
+    }
   }
+
+
   if (($fieldname == 'data_element') && $params['ext_element'] != '') {
     $res['name'] = "<span id=\"data-group-".$OD->data_set->f('group_id')."\" style=\"display:none;\">".
     $OD->data_set->f('group_name').'</span>';
@@ -171,19 +179,26 @@ function html_group_search_form ($group) {
     $child_res = "<input name=\"child_res\" type=\"hidden\" value=\"1\">";
   }
 
+  if ($group['restriction_calendar'] == "calendar") {
+    $iso_date = $group["iso_date"];
+    $cal_res = "<input type=\"hidden\" name=\"restriction_calendar\" value=\"calendar\" />
+                <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />";
+  }
   if ($popup) {
     $ext_action = $group['ext_action'];
     $ext_target = $group['ext_target'];
     $ext_widget = $group['ext_widget'];
+    $ext_widget_text = $group['ext_widget_text'];
     $ext_url = $group['ext_url'];
     $ext_id = $group['ext_id'];
     $ext_title = stripslashes($group['ext_title']);
     $ext_element =  $group['ext_element'];
 
-    $ext = "<input name=\"ext_action\" type=\"hidden\" VALUE=\"$ext_action\">
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
       <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
       <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
       <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
+      <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
       <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
       <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">      
       <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
@@ -229,6 +244,7 @@ function html_group_search_form ($group) {
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $child_res
+      $cal_res
       $ext
     </label>
     <p class=\"CL\" />
@@ -248,7 +264,6 @@ function dis_group_search_group($group) {
   global $obm, $display, $l_found, $l_no_found;
 
   $child_res = $group['children_restriction'];
-  $widget = $group['ext_widget'];
 
   $prefs = get_display_pref($obm['uid'], 'group');
   if ($child_res) {
@@ -282,7 +297,6 @@ function html_group_search_group($obm_q, $prefs, $group) {
 
   $child_res = $group['children_restriction'];
   $popup = $group['popup'];
-  $widget = $group['ext_widget'];
 
   if ($popup) {
     $ext_action = $group['ext_action'];
@@ -303,30 +317,35 @@ function html_group_search_group($obm_q, $prefs, $group) {
   
   $dis_group = new OBM_DISPLAY('DATA', $prefs, 'group');
   if ($popup) {
-    $dis_group->display_link = false;
-    $dis_group->data_cb_text = 'X';
-    $dis_group->data_idfield = 'group_id';
-    $dis_group->data_cb_name = 'data-g-';
-    if ($ext_element != '') {
-      $dis_group->data_cb_name = '';
-      $form_attr = "
-      onsubmit=\"of_select_fill_from_checkbox(this); return false;\" ";
+    if (empty($ext_widget) && empty($ext_widget_text)) {
+      $dis_group->display_link = false;
+      $dis_group->data_cb_text = 'X';
+      $dis_group->data_idfield = 'group_id';
+      $dis_group->data_cb_name = 'data-g-';
     }
-    elseif ($widget == '') {
-      $form_attr = "target=\"$ext_target\" method=\"get\" action=\"$ext_url\"";
-    } else {
-      $form_attr = "onsubmit=\"fill_ext_form(this);return false;\"";
-      $input_target = "<input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />";
-    }
-    $dis_group->data_form_head = "<form $form_attr>";
+
     $dis_group->data_form_end = "
     <div class=\"buttons\">
       <input type=\"submit\" value=\"$l_add\" />
       <input type=\"hidden\" name=\"group_id\" value=\"$ext_id\" />
       <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-      $input_target
+      <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
     </div>
     </form>";
+
+    if ($ext_element != '') {
+      $dis_group->data_cb_name = '';
+      $dis_group->data_form_head = "
+      <form onsubmit=\"of_select_fill_from_checkbox(this); return false;\" > ";
+    } elseif ($ext_widget != '') {
+      $dis_group->display_ext = "get_id";
+      $dis_group->data_form_head = "
+      <form onsubmit=\"fill_ext_form(this); return false;\">";
+      $dis_group->data_form_end = "";
+    } else {
+      $dis_group->data_form_head = "
+      <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    }
 
     $display_popup_end = "
     <a href=\"\" onclick='window.close();'>$l_close</a>";

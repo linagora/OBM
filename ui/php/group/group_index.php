@@ -311,6 +311,16 @@ if (($action == 'index') || ($action == '')) {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
+
+} elseif ($action == "ext_get_id") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["search"] = html_group_search_form($params);
+  if ($_SESSION['set_display'] == "yes") {
+    $display["result"] = dis_group_search_list($params);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
+
 }
 
 of_category_user_action_switch($module, $action, $params);
@@ -457,7 +467,15 @@ function get_group_action() {
   $actions["group"]["ext_get_ids"] = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
-                                    	  );
+                                  	  );
+
+// Get Ids
+  $actions['group']['ext_get_id'] = array (
+    'Url'      => "$path/group/group_index.php?action=ext_get_id",
+    'Right'    => $cright_read,
+    'Condition'=> array ('none'),
+    'popup' => 1
+                                    );
 
 // sel group add : Groups selection
   $actions["group"]["sel_group_add"] = array (

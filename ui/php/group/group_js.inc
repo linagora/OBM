@@ -10,6 +10,7 @@
 
 require("obminclude/javascript/check_js.inc");
 
+
 // to avoid a javascript error when ext_widget is not defined
 if ($params["ext_widget"] != "") {
   $extra_js .= "
@@ -29,6 +30,22 @@ function fill_ext_form(int_form) {
        }
      }
    }
+}
+
+
+function check_group_get_id(valeur,text) {
+    if ((valeur < 1) || (valeur == null)) {
+      alert (\"$l_j_select_group\");
+      return false;
+    } else {
+      window.opener.document.$params[ext_widget].value=valeur;
+      window.opener.document.$params[ext_widget_text].value=text;
+      if ('$params[restriction_calendar]' == 'calendar') {
+        window.opener.location=('../calendar/calendar_index.php?date=$params[date]&group_id='+valeur+'&new_group=1');
+      }
+      window.close();
+      return true;
+    }
 }
 ";
 }

@@ -272,7 +272,7 @@
 
 #calendarQuickForm {
   display: none;
-  width: 28em;
+  width: 34em;
   text-align: center;
   z-index: 1000;
 }
@@ -286,12 +286,13 @@
 
 #calendarQuickForm h1 {
   margin: 0;
-  background-color: #d1d2d4;
+  background-color: #4692A9;
   font-weight: bold;
   font-size: 100%;
-  background-image: url('../images/popup_title_border.png');
+  background-image: url(../images/tab_border.png);
   background-repeat: repeat-x;
   background-position: 0 0.5em;  
+  color: #FFF;
 }
 
 #calendarQuickForm h2 {
@@ -328,10 +329,11 @@
 
 #calendarQuickForm fieldset {
   border: 0;
+  text-align: center;
 }
 
 #calendarQuickForm fieldset input{
-  width: 12em;
+  width: 18em;
 }
 #calendarQuickForm fieldset input.button{
   width: 6em;
@@ -459,69 +461,6 @@ li.freeBusy {
   border-left: none;
   text-align: left;
 }
-
-
-/* ------------------------------------------------------------------------- */
-/* View Selector Form */
-/* ------------------------------------------------------------------------- */
-
-#viewSelectorForm {
-  display: none;
-  width: 28em;
-  text-align: center;
-  margin-left: 18em;
-}
-
-#viewSelectorForm form  {
-/*  background-color: #ebebeb;*/
-  background-color: #FDDAA4;
-  border: 1px solid #b3b3b3;
-  text-align: left;
-  margin-bottom: 0;
-}
-
-#viewSelectorForm h1 {
-  margin: 0;
-  /*background-color: #d1d2d4;*/
-  font-weight: bold;
-  font-size: 100%;
-  /*background-image: url('../images/popup_title_border.png');*/
-  background-repeat: repeat-x;
-  background-position: 0 0.5em;
-
-  background-image: url(../images/tab_border.png);
-  background-color: #4692A9;
-  color: #FFF;
-  
-}
-
-#viewSelectorForm img {
-  margin-top: -2px;
-}
-
-#viewSelectorForm h1 img{
-  vertical-align: middle;
-  float: right;
-  margin: 1px 3px 0 0;
-}
-
-#viewSelectorForm fieldset {
-  border: 0;
-}
-
-#viewSelectorForm fieldset input{
-  width: 12em;
-}
-
-#viewSelectorForm fieldset input.button{
-  width: 6em;
-}
-
-#viewSelectorForm .buttons input{
-  width: auto;
-  margin: 0 0.5em;
-}
-
 
 table.planning td {
   vertical-align: top;

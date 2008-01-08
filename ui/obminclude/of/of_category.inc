@@ -219,7 +219,7 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
 
     $block_cat = "
     <tr>
-      <th>$link ${$l_cat} :</th>    
+      <th>$link ${$l_cat}</th>    
       <td id=\"sel_${cat}\">$sel_cat</td>
     </tr>";
   }

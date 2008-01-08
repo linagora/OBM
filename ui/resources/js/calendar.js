@@ -1050,18 +1050,19 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.element_id = evt.element.id;
     this.eventData.action = 'quick_update';
     this.gotoURI = 'action=detailupdate&calendar_id='+evt.event.id;
-
+    
     if(evt.event.updatable) {
       this.form.setStyle('display','block');
       this.deleteButton.setStyle('display','');
       this.editButton.setStyle('display','');
       this.detailButton.setStyle('display','');
+      this.editButton.value = obm.vars.labels.edit;
     } else {
       this.form.setStyle('display','none');
       this.title.setHTML(evt.event.title);
       this.title.setStyle('display','block');
-
     }
+
     this.description.setHTML(evt.event.description);
     this.item.setHTML(evt.event.item);
     this.category.setHTML(evt.event.category);
@@ -1099,6 +1100,7 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.element_id = '';
     this.eventData.action = 'quick_insert';   
     this.gotoURI = 'action=new';
+    this.editButton.value = obm.vars.labels.edit_full;
 
     this.form.setStyle('display','block');
     this.data.setStyle('display','none');
@@ -1190,72 +1192,59 @@ Obm.TabbedPane = new Class({
 
 Obm.CalendarView = new Class({
   initialize: function(el) {
-    this.label = $('tf_view_label'); 
     this.view_id = $('view_id');
-    this.group_privacy = $('group_privacy');
-
-    this.popup = $('viewSelectorForm');
-    this.popup.setStyle('position','absolute');
-    this.calendarSelViewPortlet = $('calendarSelView');
   },
 
-  insert: function() {
-    if(this.label.value == "") {
-      alert(obm.vars.labels.fill_view_label);
+  insert: function(label) {
+    var qstring = Object.toQueryString({
+      view_label: label
+    });
+
+    // Select input
+    var sel = $('sel_view');
+    var opt = sel.getChildren();
+
+    // Get current options
+    current_options = new Array();
+    for(i=0;i<opt.length;i++) {
+      var text = $(opt[i]).text;
+      current_options.push(text);
+    }
+
+    // Already exists ?
+    if(current_options.contains(label)) {
+      alert(obm.vars.labels.conflict_view_label);
     } else {
-      var qstring = Object.toQueryString({
-        view_label: this.label.value,
-        group_privacy : this.group_privacy.value
-      });
-
-      // Select input
-      var sel = $('sel_view');
-      var opt = sel.getChildren();
-
-      // Get current options
-      current_options = new Array();
-      for(i=0;i<opt.length;i++) {
-        var text = $(opt[i]).text;
-        current_options.push(text);
-      }
-
-      // Already exists ?
-      if(current_options.contains(this.label.value)) {
-        alert(obm.vars.labels.conflict_view_label);
-      } else {
-        var ajax = new Ajax('calendar_index.php',
-          {postBody: 'ajax=1&action=insert_view&'+qstring, onComplete: 
-            function(response){
-              try {
-                var resp = eval(response);
-              } catch (e) {
-                resp = new Object();
-                resp.error = 1;
-                resp.message = 'Fatal server error, please reload';
-              }
-              if(resp.error == 0) {
-                showOkMessage(resp.message);
-                var obmbookmark_id = resp.obmbookmark_id;
-                var obmbookmark_label = resp.obmbookmark_label;
-                var obmbookmark_properties = resp.obmbookmarkproperties;
-
-                var option = new Element('option')
-                  .setProperties({
-                    'id':'opt_'+obmbookmark_id,
-                    'value': 'calendar_index.php?'+obmbookmark_properties
-                   })
-                  .setHTML(obmbookmark_label);
-                sel.adopt(option);
-
-              } else {
-                showErrorMessage(resp.message);
-              }
+      var ajax = new Ajax('calendar_index.php',
+        {postBody: 'ajax=1&action=insert_view&'+qstring, onComplete: 
+          function(response){
+            try {
+              var resp = eval(response);
+            } catch (e) {
+              resp = new Object();
+              resp.error = 1;
+              resp.message = 'Fatal server error, please reload';
             }
-          });
-        ajax.request();
-        this.label.value = "";
-        this.hide();
-      }
+            if(resp.error == 0) {
+              showOkMessage(resp.message);
+              var obmbookmark_id = resp.obmbookmark_id;
+              var obmbookmark_label = resp.obmbookmark_label;
+              var obmbookmark_properties = resp.obmbookmarkproperties;
+
+              var option = new Element('option')
+                .setProperties({
+                  'id':'opt_'+obmbookmark_id,
+                  'value': 'calendar_index.php?'+obmbookmark_properties
+                 })
+                .setHTML(obmbookmark_label);
+              sel.adopt(option);
+
+            } else {
+              showErrorMessage(resp.message);
+            }
+          }
+        });
+      ajax.request();
     }
   },
  
@@ -1297,23 +1286,11 @@ Obm.CalendarView = new Class({
     }
   },
 
-  toggle: function() {
-    if (this.popup.getStyle('display') == "block") {
-      this.hide();
-    } else {
-      this.show();
-    }
-  },
-
   show: function() {
-    this.popup.setStyle('display','block');
-    var top = this.calendarSelViewPortlet.getTop(); // - this.calendarSelViewPortlet.offsetHeight;
-    this.popup.setStyle('top',  top + 'px');    
-    this.label.focus();
-  },
-
-  hide: function() {
-    this.popup.setStyle('display','none');
+    var newView = prompt(obm.vars.labels.save_view, "");
+    if (newView) {
+      this.insert(newView);
+    }
   }
 
 });

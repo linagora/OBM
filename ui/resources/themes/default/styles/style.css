@@ -1104,7 +1104,7 @@ input.datePicker {
 .tabs * {
   display: inline;
   font-size: 90%;
-  padding: 0 5px;
+  padding: 0 10px;
   margin: 0 2px;
   border: 1px solid #358399;
   cursor: pointer;
@@ -1388,7 +1388,7 @@ input.colorPicker {
 
 .node h1 {
   text-align: center;
-  font-size: 120%;
+  font-size: 100%;
   border-top: 1px solid #FFF;
   border-left: 1px solid #FFF;
   border-bottom: 1px solid #929292; 

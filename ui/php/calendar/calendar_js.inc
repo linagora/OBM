@@ -14,7 +14,7 @@ $extra_js .= "
 function sel_public_group(date, element, label) {
   var item_id = element.getProperty('id').split('-');
   var id = item_id[item_id.length - 1];
-  window.location=('calendar_index.php?date='+date+'&group_id='+id+'&new_group=1&group_privacy=$c_public');
+  window.location=('calendar_index.php?date='+date+'&group_id='+id+'&new_group=1');
 }
 
 function display_list_detail(display) {
