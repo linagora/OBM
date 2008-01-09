@@ -9,7 +9,7 @@ require Exporter;
 use strict;
 
 use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
+require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::toolBox;
 require OBM::dbUtils;
@@ -23,7 +23,6 @@ sub new {
     my %obmMailshareAttr = (
         type => undef,
         entityRightType => undef,
-        typeDesc => undef,
         links => undef,
         toDelete => undef,
         archive => undef,
@@ -31,7 +30,10 @@ sub new {
         mailShareId => undef,
         domainId => undef,
         mailShareDesc => undef,
-        mailShareDbDesc => undef
+        mailShareDbDesc => undef,
+        objectclass => undef,
+        dnPrefix => undef,
+        dnValue => undef
     );
 
 
@@ -51,11 +53,15 @@ sub new {
     $obmMailshareAttr{"links"} = $links;
     $obmMailshareAttr{"toDelete"} = $deleted;
 
-    $obmMailshareAttr{"type"} = $MAILSHARE;
+    $obmMailshareAttr{"type"} = $OBM::Parameters::ldapConf::MAILSHARE;
     $obmMailshareAttr{"entityRightType"} = "MailShare";
-    $obmMailshareAttr{"typeDesc"} = $attributeDef->{$obmMailshareAttr{"type"}};
     $obmMailshareAttr{"archive"} = 0;
     $obmMailshareAttr{"sieve"} = 0;
+
+    # Définition de la représentation LDAP de ce type
+    $obmMailshareAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{objectclass};
+    $obmMailshareAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{dn_prefix};
+    $obmMailshareAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{dn_value};
 
     bless( \%obmMailshareAttr, $self );
 }
@@ -64,7 +70,12 @@ sub new {
 sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
+
     my $mailShareId = $self->{"mailShareId"};
+    if( !defined($mailShareId) ) {
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: aucun identifiant de partage de messagerie definit", "W" );
+        return 0;
+    }
 
 
     if( !defined($dbHandler) ) {
@@ -350,6 +361,13 @@ sub isLinks {
 }
 
 
+sub getLdapObjectclass {
+    my $self = shift;
+
+    return $self->{objectclass};
+}
+
+
 sub _getEntityMailShareAcl {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
@@ -394,8 +412,8 @@ sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
 
-    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"mailShareDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
-        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"mailShareDesc"}->{$self->{"typeDesc"}->{"dn_value"}};
+    if( defined($self->{"dnPrefix"}) && defined($self->{"mailShareDesc"}->{$self->{"dnValue"}}) ) {
+        $dnPrefix = $self->{"dnPrefix"}."=".$self->{"mailShareDesc"}->{$self->{"dnValue"}};
     }
 
     return $dnPrefix;
@@ -410,7 +428,7 @@ sub createLdapEntry {
     # Les parametres necessaires
     if( $entry->{"mailshare_name"} ) {
         $ldapEntry->add(
-            objectClass => $self->{"typeDesc"}->{"objectclass"},
+            objectClass => $self->{"objectclass"},
             cn => $entry->{"mailshare_name"}
         );
 
@@ -460,7 +478,7 @@ sub createLdapEntry {
 
 sub updateLdapEntry {
     my $self = shift;
-    my( $ldapEntry ) = @_;
+    my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"mailShareDesc"};
     my $update = 0;
 

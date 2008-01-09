@@ -9,7 +9,7 @@ require Exporter;
 use strict;
 
 use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
+require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::toolBox;
 require OBM::dbUtils;
@@ -23,13 +23,15 @@ sub new {
 
     my %obmMailServerConfAttr = (
         type => undef,
-        typeDesc => undef,
         links => undef,
         toDelete => undef,
         archive => undef,
         sieve => undef,
         domainId => undef,
-        postfixConf => undef
+        postfixConf => undef,
+        objectclass => undef,
+        dnPrefix => undef,
+        dnValue => undef
     );
 
 
@@ -41,8 +43,12 @@ sub new {
     $obmMailServerConfAttr{"links"} = $links;
     $obmMailServerConfAttr{"toDelete"} = $deleted;
 
-    $obmMailServerConfAttr{"type"} = $MAILSERVER;
-    $obmMailServerConfAttr{"typeDesc"} = $attributeDef->{$obmMailServerConfAttr{"type"}};
+    $obmMailServerConfAttr{"type"} = $OBM::Parameters::ldapConf::MAILSERVER;
+
+    # Définition de la représentation LDAP de ce type
+    $obmMailServerConfAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailServerConfAttr{"type"}}->{objectclass};
+    $obmMailServerConfAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailServerConfAttr{"type"}}->{dn_prefix};
+    $obmMailServerConfAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailServerConfAttr{"type"}}->{dn_value};
 
     bless( \%obmMailServerConfAttr, $self );
 }
@@ -191,12 +197,19 @@ sub isLinks {
 }
 
 
+sub getLdapObjectclass {
+    my $self = shift;
+
+    return $self->{objectclass};
+}
+
+
 sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
 
-    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"postfixConf"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
-        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"postfixConf"}->{$self->{"typeDesc"}->{"dn_value"}};
+    if( defined($self->{"dnPrefix"}) && defined($self->{"postfixConf"}->{$self->{"dnValue"}}) ) {
+        $dnPrefix = $self->{"dnPrefix"}."=".$self->{"postfixConf"}->{$self->{"dnValue"}};
     }
 
     return $dnPrefix;
@@ -217,7 +230,7 @@ sub createLdapEntry {
     #
     # Les parametres nécessaires
     $ldapEntry->add(
-        objectClass => $self->{"typeDesc"}->{"objectclass"},
+        objectClass => $self->{"objectclass"},
         cn => to_utf8({ -string => $entry->{"postfixconf_name"}, -charset => $defaultCharSet })
     );
 
@@ -247,7 +260,7 @@ sub createLdapEntry {
 
 sub updateLdapEntry {
     my $self = shift;
-    my( $ldapEntry ) = @_;
+    my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"postfixConf"};
     my $update = 0;
 

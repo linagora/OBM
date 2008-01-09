@@ -116,14 +116,14 @@ INSERT INTO DomainMailServer (domainmailserver_domain_id, domainmailserver_mails
 -- Test User creation
 -------------------------------------------------------------------------------
 -- Utilisateur de test :
---  - appartenant a tous les domaines ;
+--  - appartenant au domaine global ;
 --  - ayant le droit mail ;
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_phone, userobm_fax, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description) VALUES ('0', 'test00', 'PLAIN', 'ptest00', 'user', 'User', 'Test 00',  '1050', '512', '23, rue des champs', 'Nolwen du lac', 'Près de la ferme', '31400', 'La ville à Ramon', '05 62 19 24 91', '05 62 19 24 92', '06 55 55 55 55', '1', '1', 'test00\r\nmail.test00', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Chef', 'Rapide', 'Utilisateur appartient au domaine global');
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_phone, userobm_fax, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description) VALUES ('0', 'test00', 'PLAIN', 'ptest00', 'user', 'User', 'Test 00',  '1050', '513', '23, rue des champs', 'Nolwen du lac', 'Près de la ferme', '31400', 'La ville à Ramon', '05 62 19 24 91', '05 62 19 24 92', '06 55 55 55 55', '1', '1', 'test00\r\nmail.test00', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Chef', 'Rapide', 'Utilisateur appartient au domaine global');
 
 -- Utilisateur de test :
 --  - appartenant au domaine 1 ;
 --  - ayant le droit mail ;
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description, userobm_vacation_enable, userobm_vacation_message) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test01', 'PLAIN', 'ptest01', 'user', 'User', 'Test 01', '1051', '512', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test01\r\nmail.test01', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Autan en emporte le vent', 'Compris', 'Utilisateur n''appartenant qu''au domaine 1', 1, 'Ceci est le message d''absence');
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description, userobm_vacation_enable, userobm_vacation_message) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test01', 'PLAIN', 'ptest01', 'user', 'User', 'Test 01', '1051', '513', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test01\r\nmail.test01', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Autan en emporte le vent', 'Compris', 'Utilisateur n''appartenant qu''au domaine 1', 1, 'Ceci est le message d''absence');
 
 
 -- Utilisateur de test :
@@ -153,6 +153,15 @@ INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, g
 -- Groupe de test AVEC e-mail
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1004, 'grpTest01', 'Groupe de test 01 avec e-mail', 'grpTest01', NULL);
 
+-- 'Administrateurs du domaine' Group
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 512, 'Administrateurs du domaine', 'Groupe des administrateurs du domaine et d''Aliamin', '', NULL);
+
+-- 'Utilisateurs du domaine' Group
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 513, 'Utilisateurs du domaine', 'Groupe des utilisateurs du domaine Samba', '', NULL);
+
+-- 'Invités du domaine' Group
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 514, 'Invités du domaine', 'Groupe des invités du domaine Samba', '', NULL);
+
 
 -------------------------------------------------------------------------------
 -- Remplissage de la table 'UserObmGroup' :  Positionnement d'utilisateurs dans
@@ -160,24 +169,23 @@ INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, g
 -------------------------------------------------------------------------------
 DELETE FROM UserObmGroup;
 
--- Members of group 'Admin' : 'test00' 'test01'
-INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Admin'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test00'));
+-- Members of group 'Admin' : 'test01' 'test02'
 INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Admin'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
+INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Admin'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test02'));
 
--- Members of group 'Commercial' : 'test00' 'test01'
-INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Commercial'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test00'));
+-- Members of group 'Commercial' : 'test01' 'test02'
 INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Commercial'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
+INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Commercial'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test02'));
 
--- Members of group 'Production' : 'test00' 'test01'
-INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Production'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test00'));
+-- Members of group 'Production' : 'test01' 'test02'
 INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Production'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
+INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='Production'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test02'));
 
--- Members of group 'grpTest00' : 'test00' et 'test01'
-INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='grpTest00'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test00'));
+-- Members of group 'grpTest00' : 'test01' et 'test02'
 INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='grpTest00'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
+INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='grpTest00'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test02'));
 
--- Members of group 'grpTest01' : 'test00' et 'test01'
-INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='grpTest01'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test00'));
+-- Members of group 'grpTest01' : 'test01'
 INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='grpTest01'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
 
 

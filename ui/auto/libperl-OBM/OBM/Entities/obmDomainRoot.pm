@@ -9,7 +9,7 @@ require Exporter;
 use strict;
 
 use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
+require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
@@ -20,11 +20,13 @@ sub new {
 
     my %obmDomainRootAttr = (
         type => undef,
-        typeDesc => undef,
         links => undef,
         toDelete => undef,
         domainId => undef,
-        domainDesc => undef
+        domainDesc => undef,
+        objectclass => undef,
+        dnPrefix => undef,
+        dnValue => undef
     );
 
 
@@ -36,8 +38,12 @@ sub new {
     $obmDomainRootAttr{"links"} = $links;
     $obmDomainRootAttr{"toDelete"} = $deleted;
 
-    $obmDomainRootAttr{"type"} = $DOMAINROOT;
-    $obmDomainRootAttr{"typeDesc"} = $attributeDef->{$obmDomainRootAttr{"type"}};
+    $obmDomainRootAttr{"type"} = $OBM::Parameters::ldapConf::DOMAINROOT;
+
+    # Définition de la représentation LDAP de ce type
+    $obmDomainRootAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmDomainRootAttr{"type"}}->{objectclass};
+    $obmDomainRootAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmDomainRootAttr{"type"}}->{dn_prefix};;
+    $obmDomainRootAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmDomainRootAttr{"type"}}->{dn_value};
 
     bless( \%obmDomainRootAttr, $self );
 }
@@ -84,12 +90,19 @@ sub getArchive {
 }
 
 
+sub getLdapObjectclass {
+    my $self = shift;
+
+    return $self->{objectclass};
+}
+
+
 sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
 
-    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"domainDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
-        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"domainDesc"}->{"domain_dn"};
+    if( defined($self->{"dnPrefix"}) && defined($self->{"domainDesc"}->{$self->{"dnValue"}}) ) {
+        $dnPrefix = $self->{"dnPrefix"}."=".$self->{"domainDesc"}->{"domain_dn"};
     }
 
     return $dnPrefix;
@@ -105,7 +118,7 @@ sub createLdapEntry {
     # On construit la nouvelle entree
     if( $entry->{"domain_label"} ) {
         $ldapEntry->add(
-            objectClass => $self->{"typeDesc"}->{"objectclass"},
+            objectClass => $self->{"objectclass"},
             dc => to_utf8( { -string => $entry->{"domain_dn"}, -charset => $defaultCharSet } ),
             o => to_utf8( { -string => $entry->{"domain_label"}, -charset => $defaultCharSet } )
         );
@@ -125,7 +138,7 @@ sub createLdapEntry {
 
 sub updateLdapEntry {
     my $self = shift;
-    my( $ldapEntry ) = @_;
+    my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"domainDesc"};
     my $update = 0;
 

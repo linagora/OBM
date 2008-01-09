@@ -12,6 +12,7 @@ use strict;
 require OBM::toolBox;
 require OBM::ldap;
 require OBM::imapd;
+require OBM::dbUtils;
 require OBM::Update::utils;
 require OBM::Ldap::ldapEngine;
 require OBM::Cyrus::cyrusEngine;
@@ -27,6 +28,7 @@ require OBM::Entities::obmHost;
 require OBM::Entities::obmGroup;
 require OBM::Entities::obmMailshare;
 require OBM::Entities::obmMailServer;
+require OBM::Entities::obmSambaDomain;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 
@@ -35,7 +37,7 @@ sub new {
     my $self = shift;
     my( $dbHandler, $parameters ) = @_;
 
-    # Definition des attributs de l'objet
+    # Définition des attributs de l'objet
     my %updateAttr = (
         user => undef,
         user_name => undef,
@@ -87,19 +89,16 @@ sub new {
 
 
     # Obtention des informations sur les domaines nécessaires
-    if( defined($updateAttr{"domain"}) ) {
-        $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"dbHandler"}, $updateAttr{"domain"} );
-    }else {
-        $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"dbHandler"}, undef );
-    }
+    $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"dbHandler"}, $updateAttr{"domain"} );
 
-    # initialisation des moteurs
 
     # Obtention des serveurs LDAP par domaines
     &OBM::Update::utils::getLdapServer( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
 
+
+    # Initialisation du moteur LDAP
     $updateAttr{"engine"}->{"ldapEngine"} = OBM::Ldap::ldapEngine->new( $updateAttr{"domainList"} );
-    if( !$updateAttr{"engine"}->{"ldapEngine"}->init() ) {
+    if( !$updateAttr{"engine"}->{"ldapEngine"}->init( 1 ) ) {
         delete( $updateAttr{"engine"}->{"ldapEngine"} );
     }
 
@@ -112,11 +111,13 @@ sub new {
     # Parametrage des serveurs SMTP-in par domaine
     &OBM::Update::utils::getSmtpInServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
 
+    # Initialisation du moteur Cyrus
     $updateAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $updateAttr{"domainList"} );
     if( !$updateAttr{"engine"}->{"cyrusEngine"}->init() ) {
         delete( $updateAttr{"engine"}->{"cyrusEngine"} );
     }
 
+    # Initialisation du moteur Sieve
     $updateAttr{"engine"}->{"sieveEngine"} = OBM::Cyrus::sieveEngine->new( $updateAttr{"domainList"} );
     if( !$updateAttr{"engine"}->{"sieveEngine"}->init() ) {
         delete( $updateAttr{"engine"}->{"sieveEngine"} );
@@ -186,7 +187,7 @@ sub _doGlobalUpdate {
         &OBM::toolBox::write_log( "[Update::update]: pas de domaine indique pour la MAJ totale", "W" );
         return 0;
     }
-    my $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
+    my $domainDesc = &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} );
 
     if( !defined($domainDesc) ) {
         &OBM::toolBox::write_log( "[Update::update]: domaine d'identifiant '".$self->{"domain"}."' inexistant", "W" );
@@ -245,9 +246,19 @@ sub _doGlobalUpdate {
 
 
     # Pour tous les domaines
-    # Traitement des entités de type 'obmMailServer'
-    my $object = $self->_doMailServer( 1, 0 );
+    # Traitement des informations du domaine Samba
+    my $object = $self->_doSambaDomain( 1, 0 );
     my $return = $self->_runEngines( $object );
+
+    if( $return ) {
+        # La MAJ de l'entité c'est bien passée, on met a jour la BD de travail
+        $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
+    }
+
+
+    # Traitement des entités de type 'obmMailServer'
+    $object = $self->_doMailServer( 1, 0 );
+    $return = $self->_runEngines( $object );
 
     if( $return ) {
         # La MAJ de l'entité c'est bien passée, on met a jour la BD de
@@ -344,7 +355,7 @@ sub _doGlobalDelete {
         &OBM::toolBox::write_log( "[Update::update]: pas de domaine indique pour la MAJ totale", "W" );
         return 0;
     }
-    my $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
+    my $domainDesc = &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} );
 
     if( !defined($domainDesc) ) {
         &OBM::toolBox::write_log( "[Update::update]: domaine d'identifiant '".$self->{"domain"}."' inexistant", "W" );
@@ -442,7 +453,7 @@ sub _doIncremental {
 
 
     if( defined($self->{"domain"}) ) {
-        $domainDesc = $self->_findDomainbyId( $self->{"domain"} );
+        $domainDesc = &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} );
 
         if( !defined($domainDesc) ) {
             &OBM::toolBox::write_log( "[Update::update]: domaine d'identifiant '".$self->{"domain"}."' inexistant", "W" );
@@ -863,30 +874,9 @@ sub _updateIncrementalTable {
 }
 
 
-sub _findDomainbyId {
-    my $self = shift;
-    my( $domainId ) = @_;
-    my $domainDesc = undef;
-
-    if( !defined($domainId) || ($domainId !~ /^\d+$/) ) {
-        return undef;
-    }
-
-    for( my $i=0; $i<=$#{$self->{"domainList"}}; $i++ ) {
-        if( $self->{"domainList"}->[$i]->{"domain_id"} == $domainId ) {
-            $domainDesc = $self->{"domainList"}->[$i];
-            last;
-        }
-    }
-
-    return $domainDesc;
-}
-
-
 sub _doSystemUser {
     my $self = shift;
     my( $links, $delete, $systemUserId ) = @_;
-    my $return = 1;
 
     if( !defined($systemUserId) || $systemUserId !~ /^\d+$/ ) {
         return 0;
@@ -897,7 +887,7 @@ sub _doSystemUser {
     }
 
     my $systemUserObject = OBM::Entities::obmSystemUser->new( $links, $delete, $systemUserId );
-    $return = $systemUserObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    my $return = $systemUserObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -910,7 +900,6 @@ sub _doSystemUser {
 sub _doUser {
     my $self = shift;
     my( $links, $delete, $userId ) = @_;
-    my $return = 1;
 
     if( !defined($userId) || ($userId !~ /^\d+$/) ) {
         return 0;
@@ -925,7 +914,7 @@ sub _doUser {
     }
 
     my $userObject = OBM::Entities::obmUser->new( $links, $delete, $userId );
-    $return = $userObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    my $return = $userObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -937,7 +926,6 @@ sub _doUser {
 sub _doGroup {
     my $self = shift;
     my( $links, $delete, $groupId ) = @_;
-    my $return = 1;
 
     if( !defined($groupId) || ($groupId !~ /^\d+$/) ) {
         return 0;
@@ -952,7 +940,7 @@ sub _doGroup {
     }
 
     my $groupObject = OBM::Entities::obmGroup->new( $links, $delete, $groupId );
-    $return = $groupObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    my $return = $groupObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -964,7 +952,6 @@ sub _doGroup {
 sub _doMailShare {
     my $self =shift;
     my( $links, $delete, $mailshareId ) = @_;
-    my $return = 1;
 
     if( !defined($mailshareId) || ($mailshareId !~ /^\d+$/) ) {
         return 0;
@@ -979,7 +966,7 @@ sub _doMailShare {
     }
 
     my $mailShareObject = OBM::Entities::obmMailshare->new( $links, $delete, $mailshareId );
-    $return = $mailShareObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    my $return = $mailShareObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -991,7 +978,6 @@ sub _doMailShare {
 sub _doHost {
     my $self = shift;
     my( $links, $delete, $hostId ) = @_;
-    my $return = 1;
 
     if( !defined($hostId) || ($hostId !~ /^\d+$/) ) {
         return 0;
@@ -1006,7 +992,7 @@ sub _doHost {
     }
 
     my $hostObject = OBM::Entities::obmHost->new( $links, $delete, $hostId );
-    $return = $hostObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    my $return = $hostObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -1015,10 +1001,31 @@ sub _doHost {
 }
 
 
+sub _doSambaDomain {
+    my $self = shift;
+    my( $links, $delete ) = @_;
+
+    if( !defined($links) ) {
+        $links = 0;
+    }
+
+    if( !defined($delete) ) {
+        $delete = 0;
+    }
+
+    my $sambaDomainObject = OBM::Entities::obmSambaDomain->new( $links, $delete );
+    my $return = $sambaDomainObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
+    if( !$return ) {
+        return undef;
+    }
+
+    return $sambaDomainObject;
+}
+
+
 sub _doMailServer {
     my $self = shift;
-    my( $links, $delete ) = 0;
-    my $return = 1;
+    my( $links, $delete ) = @_;
 
     if( !defined($links) ) {
         $links = 0;
@@ -1029,7 +1036,7 @@ sub _doMailServer {
     }
 
     my $mailServerObject = OBM::Entities::obmMailServer->new( $links, $delete );
-    $mailServerObject->getEntity( $self->{"dbHandler"}, $self->_findDomainbyId( $self->{"domain"} ) );
+    my $return = $mailServerObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -1091,126 +1098,61 @@ sub _updateDbDomain {
     }
     my $domainId = $self->{"domain"};
 
-    # MAJ des informations de domaine
-    my $query = "SELECT * FROM Domain WHERE domain_id=".$domainId;
 
-    # On execute la requete
+    # Les informations du domaine
+    my $query = "DELETE FROM P_Domain WHERE Domain_id=".$domainId;
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
-    while( my $hashResult = $queryResult->fetchrow_hashref() ) {
-        if( $hashResult->{"domain_id"} != $domainId ) {
-            next;
-        }
-        
-        $query = "DELETE FROM P_Domain WHERE Domain_id=".$domainId;
-        my $queryResult2;
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
-            return 0;
-        }
-
-        $query = "INSERT INTO P_Domain SET ";
-        my $first = 1;
-        while( my( $column, $value ) = each(%{$hashResult}) ) {
-            if( !$first ) {
-                $query .= ", ";
-            }else {
-                $first = 0;
-            }
-
-            $query .= $column."=".$dbHandler->quote($value);
-        }
-
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
-            return 0;
-        }
-
-    }
-
-
-    # MAJ des informations de serveur mail du domaine
-    $query = "SELECT i.mailserver_id, i.mailserver_host_id FROM MailServer i, Host j WHERE i.mailserver_host_id=j.host_id AND (j.host_domain_id=".$domainId." OR j.host_domain_id=0)";
-    # On execute la requete
+    $query = "INSERT INTO P_Domain SELECT * FROM Domain WHERE domain_id=".$domainId;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
-    while( my( $mailServerId, $hostId ) = $queryResult->fetchrow_array() ) {
-        my $queryResult2;
 
-        # Les hôtes serveurs de mails
-        $query = "DELETE FROM P_MailServer WHERE mailserver_id=".$mailServerId;
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
-            return 0;
-        }
+    # Les hôtes serveurs de mails
+    $query = "DELETE FROM P_MailServer WHERE mailserver_host_id IN (SELECT host_id FROM P_Host WHERE host_domain_id=".$domainId.")";
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
+    }
 
-        $query = "SELECT * FROM MailServer WHERE mailserver_id=".$mailServerId;
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
-            return 0;
-        }
+    $query = "INSERT IGNORE INTO P_MailServer SELECT * FROM MailServer WHERE mailserver_host_id IN (SELECT host_id FROM Host WHERE host_domain_id=".$domainId.")";
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
+    }
 
-        while( my $hashResult = $queryResult2->fetchrow_hashref() ) {
-            $query = "INSERT INTO P_MailServer SET ";
 
-            my $queryResult3;
-            my $first = 1;
-            while( my( $column, $value ) = each(%{$hashResult}) ) {
-                if( !$first ) {
-                    $query .= ", ";
-                }else {
-                    $first = 0;
-                }
+    # Les informations associées aux hôtes serveurs de mails
+    $query = "DELETE FROM P_MailServerNetwork WHERE mailservernetwork_host_id IN (SELECT host_id FROM P_Host WHERE host_domain_id=".$domainId.")";
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
+    }
 
-                $query .= $column."=".$dbHandler->quote($value);
-            }
+    $query = "INSERT IGNORE INTO P_MailServerNetwork SELECT * FROM MailServerNetwork WHERE mailservernetwork_host_id IN (SELECT host_id FROM Host WHERE host_domain_id=".$domainId.")";
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
+    }
 
-            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult3 ) ) {
-                &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
-                return 0;
-            }
-        }
 
-        # Les informations associées aux hôtes serveurs de mails
-        $query = "DELETE FROM P_MailServerNetwork WHERE mailservernetwork_host_id=".$hostId;
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
-            return 0;
-        }
+    # Les informations du domaine Samba
+    $query = "DELETE FROM P_Samba WHERE samba_domain_id=".$domainId;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
+    }
 
-        $query = "SELECT * FROM MailServerNetwork WHERE mailservernetwork_host_id=".$hostId;
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
-            return 0;
-        }
-
-        while( my $hashResult = $queryResult2->fetchrow_hashref() ) {
-            $query = "INSERT INTO P_MailServerNetwork SET ";
-
-            my $queryResult3;
-            my $first = 1;
-            while( my( $column, $value ) = each(%{$hashResult}) ) {
-                if( !$first ) {
-                    $query .= ", ";
-                }else {
-                    $first = 0;
-                }
-
-                $query .= $column."=".$dbHandler->quote($value);
-            }
-
-            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult3 ) ) {
-                &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
-                return 0;
-            }
-        }
+    $query = "INSERT INTO P_Samba SELECT * FROM Samba WHERE samba_domain_id=".$domainId;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
     }
 
 

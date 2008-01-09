@@ -19,7 +19,7 @@ sub getDomains {
     my @domainList;
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "[Update::utils]: connection à la base de donnée incorrect !", "W" );
+        &OBM::toolBox::write_log( "[Update::utils]: connection à la base de donnée incorrecte !", "W" );
         return undef;
     }
 
@@ -34,7 +34,21 @@ sub getDomains {
 
 
     # Requete de recuperation des informations des domaines
-    my $queryDomain = "SELECT domain_id, domain_label, domain_description, domain_name, domain_alias, samba_value FROM Domain LEFT JOIN Samba ON samba_name=\"samba_sid\" AND samba_domain_id=domain_id";
+    my $queryDomain = "SELECT   domain_id,
+                                domain_label,
+                                domain_description,
+                                domain_name,
+                                domain_alias,
+                                name.samba_value as samba_domain_name,
+                                sid.samba_value as samba_domain_sid,
+                                pdc.samba_value as samba_domain_pdc,
+                                profile.samba_value as samba_user_profile
+                        FROM Domain
+                        LEFT JOIN Samba as name ON name.samba_name=\"samba_domain\" AND name.samba_domain_id=domain_id
+                        LEFT JOIN Samba as sid ON sid.samba_name=\"samba_sid\" AND sid.samba_domain_id=domain_id
+                        LEFT JOIN Samba as pdc ON pdc.samba_name=\"samba_pdc\" AND pdc.samba_domain_id=domain_id
+                        LEFT JOIN Samba as profile ON profile.samba_name=\"samba_profile\" AND profile.samba_domain_id=domain_id";
+
     if( defined($obmDomainId) && $obmDomainId =~ /^\d+$/ ) {
         $queryDomain .= " WHERE domain_id=".$obmDomainId;
     }
@@ -50,7 +64,7 @@ sub getDomains {
         return undef;
     }
 
-    while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias, $domainSambaSid ) = $queryDomainResult->fetchrow_array ) {
+    while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias, $domainSambaName, $domainSambaSid, $domainSambaPdc, $domainSambaUserProfile ) = $queryDomainResult->fetchrow_array ) {
         my $currentDomain;
         $currentDomain->{"meta_domain"} = 0;
         $currentDomain->{"domain_id"} = $domainId;
@@ -64,7 +78,10 @@ sub getDomains {
             push( @{$currentDomain->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
         }
 
+        $currentDomain->{"domain_samba_name"} = $domainSambaName;
         $currentDomain->{"domain_samba_sid"} = $domainSambaSid;
+        $currentDomain->{"domain_samba_pdc"} = $domainSambaPdc;
+        $currentDomain->{"domain_samba_user_profile"} = $domainSambaUserProfile;
 
         push( @domainList, $currentDomain );
     }
@@ -169,3 +186,25 @@ sub getSmtpInServers {
 
     return 0;
 }
+
+
+sub findDomainbyId {
+    my( $domainList, $domainId ) = @_;
+    my $domainDesc = undef;
+
+    if( !defined($domainId) || ($domainId !~ /^\d+$/) ) {
+        return undef;
+    }
+
+    for( my $i=0; $i<=$#{$domainList}; $i++ ) {
+        if( $domainList->[$i]->{"domain_id"} == $domainId ) {
+            $domainDesc = $domainList->[$i];
+            last;
+        }
+    }
+
+    return $domainDesc;
+}
+
+
+

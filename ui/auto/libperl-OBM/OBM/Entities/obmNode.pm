@@ -9,7 +9,7 @@ require Exporter;
 use strict;
 
 use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
+require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
@@ -20,11 +20,13 @@ sub new {
 
     my %obmNodeAttr = (
         type => undef,
-        typeDesc => undef,
         links => undef,
         toDelete => undef,
         domainId => undef,
-        nodeDesc => undef
+        nodeDesc => undef,
+        objectclass => undef,
+        dnPrefix => undef,
+        dnValue => undef
     );
 
 
@@ -37,8 +39,12 @@ sub new {
     $obmNodeAttr{"links"} = $links;
     $obmNodeAttr{"toDelete"} = $deleted;
 
-    $obmNodeAttr{"type"} = $NODE;
-    $obmNodeAttr{"typeDesc"} = $attributeDef->{$obmNodeAttr{"type"}};
+    $obmNodeAttr{"type"} = $OBM::Parameters::ldapConf::NODE;
+
+    # Définition de la représentation LDAP de ce type
+    $obmNodeAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmNodeAttr{"type"}}->{objectclass};
+    $obmNodeAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmNodeAttr{"type"}}->{dn_prefix};
+    $obmNodeAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmNodeAttr{"type"}}->{dn_value};
 
     bless( \%obmNodeAttr, $self );
 }
@@ -92,12 +98,19 @@ sub getArchive {
 }
 
 
+sub getLdapObjectclass {
+    my $self = shift;
+
+    return $self->{objectclass};
+}
+
+
 sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
 
-    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"nodeDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
-        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"nodeDesc"}->{$self->{"typeDesc"}->{"dn_value"}};
+    if( defined($self->{"dnPrefix"}) && defined($self->{"nodeDesc"}->{$self->{"dnValue"}}) ) {
+        $dnPrefix = $self->{"dnPrefix"}."=".$self->{"nodeDesc"}->{$self->{"dnValue"}};
     }
 
     return $dnPrefix;
@@ -112,7 +125,7 @@ sub createLdapEntry {
     # On construit la nouvelle entree
     if( $entry->{"name"} ) {
         $ldapEntry->add(
-            objectClass => $self->{"typeDesc"}->{"objectclass"},
+            objectClass => $self->{"objectclass"},
             ou => to_utf8({ -string => $entry->{"name"}, -charset => $defaultCharSet })
         );
                 
@@ -131,7 +144,7 @@ sub createLdapEntry {
 
 sub updateLdapEntry {
     my $self = shift;
-    my( $ldapEntry ) = @_;
+    my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"nodeDesc"};
     my $update = 0;
 

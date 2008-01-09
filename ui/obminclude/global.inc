@@ -387,7 +387,7 @@ $cmd_update = "$path/../auto/incrementalUpdate.pl";
 $cmd_check_update = "ps aux | grep auto/incrementalUpdate.pl | grep -v grep";
 $cmd_mailforward = "$path/../auto/mailChangeSieve.pl";
 $cmd_vacation = "$path/../auto/mailChangeSieve.pl";
-$cmd_ldap_passwd = "$path/../auto/ldapChangePasswd.pl";
+$cmd_ldap_passwd = "$path/../auto/changePasswd.pl";
 
 $section = $cgp_show['module'][$module];
 

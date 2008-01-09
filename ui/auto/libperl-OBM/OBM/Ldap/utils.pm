@@ -148,3 +148,52 @@ sub addAttrList {
 
     return $update;
 }
+
+
+sub diffObjectclassAttrs {
+    my( $deleteObjectclass, $origObjectclass, $objectclassDesc ) = @_;
+    my %deleteAttrs;
+    my %origAttrs;
+    my %diffAttrs;
+
+    if( ref($deleteObjectclass) ne "ARRAY" ) {
+        return undef;
+    }
+
+    if( ref($origObjectclass) ne "ARRAY" ) {
+        return undef;
+    }
+
+    if( ref($objectclassDesc) ne "HASH" ) {
+        return undef;
+    }
+
+
+    for( my $i=0; $i<=$#{$deleteObjectclass}; $i++ ) {
+        my $currentObjectclassDesc = $objectclassDesc->{$deleteObjectclass->[$i]};
+        for( my $j=0; $j<=$#{$currentObjectclassDesc}; $j++ ) {
+            $deleteAttrs{$currentObjectclassDesc->[$j]->{name}} = 1;
+        }
+    }
+
+
+    for( my $i=0; $i<=$#{$origObjectclass}; $i++ ) {
+        my $currentObjectclassDesc = $objectclassDesc->{$origObjectclass->[$i]};
+        for( my $j=0; $j<=$#{$currentObjectclassDesc}; $j++ ) {
+            $origAttrs{$currentObjectclassDesc->[$j]->{name}} = 1;
+        }
+    }
+
+
+    # On détermine les attributs à supprimer en repérant ceux qui appartiennent
+    # à une classe à supprimer, sans appartenir à une classe restante
+    while( my($key, $value) = each(%deleteAttrs) ) {
+        if( !exists($origAttrs{$key}) ) {
+            $diffAttrs{$key} = 1;
+        }
+    }
+
+
+    my @diffAttrs = keys(%diffAttrs);
+    return \@diffAttrs;
+}

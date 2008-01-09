@@ -35,7 +35,8 @@ sub new {
             ldapUserDn => undef,
             ldapPasswd => undef,
             conn => undef
-        }
+        },
+        objectclassDesc => undef
     );
 
 
@@ -54,8 +55,13 @@ sub new {
 
 sub init {
     my $self = shift;
+    my( $checkLdap ) = @_;
 
-    if( !$OBM::Parameters::common::obmModules->{"ldap"} && !$OBM::Parameters::common::obmModules->{"web"} ) {
+    if( !defined($checkLdap) ) {
+        $checkLdap = 1;
+    }
+
+    if( !$OBM::Parameters::common::obmModules->{"ldap"} ) {
         return 0;
     }
 
@@ -75,11 +81,13 @@ sub init {
         return 0;
     }
 
-    # On vérifie l'arborescence
-    &OBM::toolBox::write_log( "[Ldap::ldapEngine]: verification de l'arborescence de l'annuaire LDAP", "W" );
-    if( !$self->checkLdapTree( $self->{"ldapStruct"} ) ) {
-        $self->destroy();
-        return 0;
+    if( $checkLdap ) {
+        # On vérifie l'arborescence
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: verification de l'arborescence de l'annuaire LDAP", "W" );
+        if( !$self->checkLdapTree( $self->{"ldapStruct"} ) ) {
+            $self->destroy();
+            return 0;
+        }
     }
 
     return 1;
@@ -172,7 +180,11 @@ sub _connectLdapSrv {
 
 sub _disconnectLdapSrv {
     my $self = shift;
-    my $ldapConn = $self->{"ldapConn"};
+    my( $ldapConn ) = @_;
+
+    if( !defined($ldapConn) ) {
+        $ldapConn = $self->{"ldapConn"};
+    }
 
     if( defined($ldapConn->{"conn"}) ) {
         &OBM::toolBox::write_log( "[Ldap::ldapEngine]: deconnexion de l'annuaire LDAP '".$ldapConn->{"ldapServer"}."'", "W" );
@@ -394,7 +406,7 @@ sub _findTypeParentDn {
         return 0;
     }
 
-    if( defined($ldapStruct->{"data_type"}) && defined($ldapStruct->{"domain_id"}) &&  ($ldapStruct->{"domain_id"} == $domainId) ) {
+    if( defined($ldapStruct->{"data_type"}) && defined($ldapStruct->{"domain_id"}) && ($ldapStruct->{"domain_id"} == $domainId) ) {
         for( my $i=0; $i<=$#{$ldapStruct->{"data_type"}}; $i++ ) {
             if( $ldapStruct->{"data_type"}->[$i] eq $type ) {
                 return $ldapStruct->{"dn"};
@@ -464,8 +476,11 @@ sub _doWork {
         }
 
     }elsif( defined($ldapEntry) && !($object->getDelete() || $object->getArchive()) ) {
+        # Obtention de la description des classes d'objets
+        $self->_getObjectclassDesc( $ldapEntry );
+
         # Mise à jour
-        if( $object->updateLdapEntry($ldapEntry) ) {
+        if( $object->updateLdapEntry($ldapEntry, $self->{objectclassDesc}) ) {
             &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour du noeud : ".$dn, "W" );
 
             if( !$self->updateLdapEntity($ldapEntry) ) {
@@ -514,25 +529,15 @@ sub update {
         return 0;
     }
 
-    my $parentDn = $self->_findTypeParentDn( undef, $object->{"type"}, $object->{"domainId"} );
-    if( !defined($parentDn) ) {
-        # Le fait que l'entité n'ait pas de DN parent signifie simplement qu'elle n'a pas
-        # de représentation LDAP, ce n'est donc pas une erreur fatale.
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: type d'objet '".$object->{"type"}."' non definit dans l'arborescence du domaine '".$object->{"domainId"}."'", "W" );
+    my $objectDn;
+    if( $self->getObjectDN( $object, \$objectDn ) == 1 ) {
         return 1;
-    }
-
-    my $ldapPrefix = $object->getLdapDnPrefix();
-    if( !defined($ldapPrefix) ) {
-        # Si par contre elle a un DN parent mais pas de DN propre, c'est une
-        # erreur fatale.
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme lors de l'obtention du DN de l'objet de type '".$object->{"type"}."' - Operation annulee !", "W" );
+    }elsif( $self->getObjectDN( $object, \$objectDn ) ) {
         return 0;
     }
-    my $objectDn = $ldapPrefix.",".$parentDn;
 
     if( !$self->_doWork( $objectDn, $object ) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme de traitement de l'objet de type '".$object->{"type"}."' - Operation annulee !", "W" );
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme de traitement de l'objet : ".$object->getEntityDescription()." - Operation annulee !", "W" );
         return 0;
     }
 
@@ -560,6 +565,125 @@ sub checkUserPasswd {
         &OBM::toolBox::write_log( "[Ldap::ldapEngine]: description du domaine '".$object->{"domainId"}."' non definit - Operation annulee !", "W" );
         return 0;
     }
+
+    return 1;
+}
+
+
+sub _getObjectclassDesc {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $objectclassDesc = $self->{objectclassDesc};
+
+    if( !defined($self->{ldapConn}->{conn}) ) {
+        return 0;
+    }
+    my $ldapConn = $self->{ldapConn}->{conn};
+
+
+    my $objectObjectclass = $ldapEntry->get_value( "objectClass", asref => 1);
+
+
+    for( my $i=0; $i<=$#$objectObjectclass; $i++ ) {
+        if( !exists($objectclassDesc->{$objectObjectclass->[$i]}) ) {
+            # On construit une table de hachage :
+            #   - clé : nom du schéma LDAP ;
+            #   - valeur : référence à un tableau contenant une référence à un
+            #   hachage contenant la description d'un attribut
+            #   (equality, name, oid, desc, aliases, type, single-value,
+            #   syntax)
+    
+            my $ldapSchema = $ldapConn->schema;
+            @{$objectclassDesc->{$objectObjectclass->[$i]}} = $ldapSchema->must($objectObjectclass->[$i]);
+            push( @{$objectclassDesc->{$objectObjectclass->[$i]}}, $ldapSchema->may($objectObjectclass->[$i]) );
+
+            $self->{objectclassDesc} = $objectclassDesc;
+        }
+    }
+
+    return 1;
+}
+
+
+sub getObjectDN {
+    my $self = shift;
+    my( $object, $dnEntry ) = @_;
+
+    if( !defined( $object ) ) {
+        return undef;
+    }
+
+    my $parentDn = $self->_findTypeParentDn( undef, $object->{"type"}, $object->{"domainId"} );
+    if( !defined($parentDn) ) {
+        # Le fait que l'entité n'ait pas de DN parent signifie simplement qu'elle n'a pas
+        # de représentation LDAP, ce n'est donc pas une erreur fatale.
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: type d'objet '".$object->{"type"}."' non definit dans l'arborescence du domaine '".$object->{"domainId"}."'", "W" );
+        return 1;
+    }
+
+    my $ldapPrefix = $object->getLdapDnPrefix();
+    if( !defined($ldapPrefix) ) {
+        # Si par contre elle a un DN parent mais pas de DN propre, c'est une
+        # erreur fatale.
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme lors de l'obtention du DN de l'objet de type '".$object->{"type"}."' - Operation annulee !", "W" );
+        return 2;
+    }
+
+    $$dnEntry = $ldapPrefix.",".$parentDn."\n";
+    return 0;
+}
+
+
+sub checkPasswd {
+    my $self = shift;
+    my( $object, $passwd ) = @_;
+
+    my $objectDn;
+    if( $self->getObjectDN( $object, \$objectDn ) ) {
+        return 0;
+    }
+
+
+    my %ldapConn = (
+        ldapServer => $self->{ldapConn}->{ldapServer},
+        ldapUserDn => $objectDn,
+        ldapPasswd => $passwd
+    );
+
+    if( !$self->_connectLdapSrv( \%ldapConn ) ) {
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: ancien mot de passe incorrect", "W" );
+        return 0;
+    }else {
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: ancien mot de passe correct", "W" );
+        $self->_disconnectLdapSrv( \%ldapConn );
+    }
+
+    return 1;
+}
+
+
+sub updatePassword {
+    my $self = shift;
+    my( $object, $passwordDesc ) = @_;
+
+    my $objectDn;
+    if( $self->getObjectDN( $object, \$objectDn ) ) {
+        return 0;
+    }
+
+    my $ldapEntry = $self->findDn($objectDn);
+    if( defined($ldapEntry) ) {
+        my $update = $object->updateLdapEntryPassword( $ldapEntry, $passwordDesc );
+        if( $update ) {
+            if( !$self->updateLdapEntity( $ldapEntry ) ) {
+                &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme de traitement de l'objet : ".$object->getEntityDescription()." - Operation annulee !", "W" );
+                return 0;
+            }
+        }
+    }else {
+        return 0;
+    }
+
 
     return 1;
 }

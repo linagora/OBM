@@ -9,10 +9,11 @@ require Exporter;
 use strict;
 
 use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
+require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::toolBox;
 require OBM::dbUtils;
+require OBM::passwd;
 use URI::Escape;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
@@ -23,14 +24,17 @@ sub new {
 
     my %obmHostAttr = (
         type => undef,
-        typeDesc => undef,
         links => undef,
         toDelete => undef,
         sieve => undef,
         hostId => undef,
         domainId => undef,
-        hostDesc => undef,
-        hostDbDesc => undef
+        hostDbDesc => undef,        # Pure description BD
+        hostDesc => undef,          # Propriétés calculées
+        hostLinks => undef,         # Les relations avec d'autres entités
+        objectclass => undef,
+        dnPrefix => undef,
+        dnValue => undef
     );
 
 
@@ -49,8 +53,12 @@ sub new {
     $obmHostAttr{"toDelete"} = $deleted;
     $obmHostAttr{"sieve"} = 0;
 
-    $obmHostAttr{"type"} = $DOMAINHOSTS;
-    $obmHostAttr{"typeDesc"} = $attributeDef->{$obmHostAttr{"type"}};
+    $obmHostAttr{"type"} = $OBM::Parameters::ldapConf::DOMAINHOSTS;
+
+    # Définition de la représentation LDAP de ce type
+    $obmHostAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmHostAttr{"type"}}->{objectclass};
+    $obmHostAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmHostAttr{"type"}}->{dn_prefix};
+    $obmHostAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmHostAttr{"type"}}->{dn_value};
 
     bless( \%obmHostAttr, $self );
 }
@@ -59,7 +67,12 @@ sub new {
 sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
+
     my $hostId = $self->{"hostId"};
+    if( !defined($hostId) ) {
+        &OBM::toolBox::write_log( "[Entities::obmHost]: aucun identifiant d'hote definit", "W" );
+        return 0;
+    }
 
 
     if( !defined($dbHandler) ) {
@@ -112,33 +125,38 @@ sub getEntity {
     }
 
     # On range les resultats dans la structure de donnees des resultats
-    my $dbHostDesc = $queryResult->fetchrow_hashref();
+    my $dbEntry = $queryResult->fetchrow_hashref();
     $queryResult->finish();
 
     # On stocke la description BD utile pour la MAJ des tables
-    $self->{"hostDbDesc"} = $dbHostDesc;
+    $self->{"hostDbDesc"} = $dbEntry;
 
-    # Action effectuee
     if( $self->getDelete() ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: gestion de l'hote supprime '".$dbHostDesc->{"host_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: gestion de l'hote supprime : ".$self->getEntityDescription(), "W" );
     }else {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: gestion de l'hote '".$dbHostDesc->{"host_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmHost]: gestion de l'hote : ".$self->getEntityDescription(), "W" );
     }
 
-    # On stocke les informations utiles dans la structure de donnees des
-    # resultats
-    $self->{hostDesc}->{host_uid} = $dbHostDesc->{host_uid};
-    $self->{hostDesc}->{host_gid} = $dbHostDesc->{host_gid};
-    $self->{hostDesc}->{host_name} = $dbHostDesc->{host_name};
-    $self->{hostDesc}->{host_ip} = $dbHostDesc->{host_ip};
-    $self->{hostDesc}->{host_delegation} = $dbHostDesc->{host_delegation};
-    $self->{hostDesc}->{host_description} = $dbHostDesc->{host_description};
-    $self->{hostDesc}->{host_web_perms} = $dbHostDesc->{host_web_perms};
-    $self->{hostDesc}->{host_web_list} = $dbHostDesc->{host_web_list};
-    $self->{hostDesc}->{host_web_all} = $dbHostDesc->{host_web_all};
-    $self->{hostDesc}->{host_ftp_perms} = $dbHostDesc->{host_ftp_perms};
-    $self->{hostDesc}->{host_firewall_perms} = $dbHostDesc->{host_firewall_perms};
+    # On range les résultats calculés dans la structure de données dédiée
     $self->{hostDesc}->{host_domain} = $domainDesc->{domain_label};
+
+
+    # Les données Samba
+    if( $OBM::Parameters::common::obmModules->{samba} && $dbEntry->{host_samba} ) {
+        $self->{hostDesc}->{host_samba} = 1;
+        $self->{hostDesc}->{host_login} = $dbEntry->{host_name}."\$";
+        $self->{hostDesc}->{host_samba_sid} = $domainDesc->{domain_samba_sid}."-".eval{return 2*$dbEntry->{host_uid}+1;};
+        $self->{hostDesc}->{host_samba_group_sid} = $domainDesc->{domain_samba_sid}."-".$dbEntry->{host_gid};
+        $self->{hostDesc}->{host_samba_flags} = "[W]";
+
+        if( &OBM::passwd::getNTLMPasswd( $dbEntry->{host_name}, \$self->{hostDesc}->{"host_lm_passwd"}, \$self->{hostDesc}->{"host_nt_passwd"} ) ) {
+            &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de la generation du mot de passe de l'hote : ".$self->getEntityDescription(), "W" );
+            return 0;
+        }
+
+    }else {
+        $self->{hostDesc}->{host_samba} = 0;
+    }
 
 
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
@@ -159,17 +177,17 @@ sub updateDbEntity {
         return 0;
     }
 
-    my $dbHostDesc = $self->{"hostDbDesc"};
-    if( !defined($dbHostDesc) ) {
+    my $dbEntry = $self->{"hostDbDesc"};
+    if( !defined($dbEntry) ) {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "[Entities::obmHost]: MAJ de l'hote '".$dbHostDesc->{"host_name"}."' dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "[Entities::obmHost]: MAJ de l'hote '".$dbEntry->{"host_name"}."' dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "REPLACE INTO P_Host SET ";
     my $first = 1;
-    while( my( $columnName, $columnValue ) = each(%{$dbHostDesc}) ) {
+    while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
         if( !$first ) {
             $query .= ", ";
         }else {
@@ -199,16 +217,17 @@ sub getEntityLinks {
 
 sub getEntityDescription {
     my $self = shift;
-    my $entry = $self->{"hostDesc"};
+    my $dbEntry = $self->{hostDbDesc};
+    my $entryProp = $self->{hostDesc};
     my $description = "";
 
 
-    if( defined($entry->{host_name}) ) {
-        $description .= "identifiant '".$entry->{host_name}."'";
+    if( defined($dbEntry->{host_name}) ) {
+        $description .= "identifiant '".$dbEntry->{host_name}."'";
     }
 
-    if( defined($entry->{host_domain}) ) {
-        $description .= ", domaine '".$entry->{host_domain}."'";
+    if( defined($entryProp->{host_domain}) ) {
+        $description .= ", domaine '".$entryProp->{host_domain}."'";
     }
 
     if( ($description ne "") && defined($self->{type}) ) {
@@ -265,24 +284,56 @@ sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
 
-    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"hostDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
-        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"hostDesc"}->{$self->{"typeDesc"}->{"dn_value"}};
+    if( defined($self->{dnPrefix}) && defined($self->{hostDbDesc}->{$self->{dnValue}}) ) {
+        $dnPrefix = $self->{dnPrefix}."=".$self->{hostDbDesc}->{$self->{dnValue}};
     }
 
     return $dnPrefix;
 }
 
 
+sub getLdapObjectclass {
+    my $self = shift;
+    my($objectclass, $deletedObjectclass) = @_;
+    my $entryProp = $self->{hostDesc};
+    my %realObjectClass;
+
+    if( !defined($objectclass) || (ref($objectclass) ne "ARRAY") ) {
+        $objectclass = $self->{objectclass};
+    }
+
+    for( my $i=0; $i<=$#$objectclass; $i++ ) {
+        if( (lc($objectclass->[$i]) eq "sambasamaccount") && !$entryProp->{host_samba} ) {
+            push( @{$deletedObjectclass}, $objectclass->[$i] );
+            next;
+        }
+
+        $realObjectClass{$objectclass->[$i]} = 1;
+    }
+
+    # Si le droit Samba est actif, on s'assure de la présence des classes
+    # nécessaires - nécessaires pour les MAJ
+    if( $entryProp->{host_samba} ) {
+        $realObjectClass{sambaSamAccount} = 1;
+    }
+
+    my @realObjectClass = keys(%realObjectClass);
+    return \@realObjectClass;
+}
+
+
 sub createLdapEntry {
     my $self = shift;
     my ( $ldapEntry ) = @_;
-    my $entry = $self->{"hostDesc"};
+    my $dbEntry = $self->{hostDbDesc};
+    my $entryProp = $self->{hostDesc};
+    my $entryLinks = $self->{hostLinks};
 
     # Les paramètres nécessaires
-    if( $entry->{"host_name"} ) {
+    if( $dbEntry->{host_name} ) {
         $ldapEntry->add(
-            objectClass => $self->{"typeDesc"}->{"objectclass"},
-            cn => $entry->{"host_name"}
+            objectClass => $self->getLdapObjectclass(),
+            cn => $dbEntry->{host_name}
         );
 
     }else {
@@ -290,18 +341,46 @@ sub createLdapEntry {
     }
 
     # La description
-    if( $entry->{"host_description"} ) {
-        $ldapEntry->add( description => to_utf8({ -string => $entry->{"host_description"}, -charset => $defaultCharSet }) );
+    if( $dbEntry->{host_description} ) {
+        $ldapEntry->add( description => to_utf8({ -string => $dbEntry->{host_description}, -charset => $defaultCharSet }) );
     }
 
     # L'adresse IP
-    if( $entry->{"host_ip"} ) {
-        $ldapEntry->add( ipHostNumber => $entry->{"host_ip"} );
+    if( $dbEntry->{host_ip} ) {
+        $ldapEntry->add( ipHostNumber => $dbEntry->{host_ip} );
     }
 
     # Le domaine OBM
-    if( $entry->{"host_domain"} ) {
-        $ldapEntry->add( obmDomain => to_utf8({ -string => $entry->{"host_domain"}, -charset => $defaultCharSet }) );
+    if( $entryProp->{host_domain} ) {
+        $ldapEntry->add( obmDomain => to_utf8({ -string => $entryProp->{host_domain}, -charset => $defaultCharSet }) );
+    }
+
+    # Le nom windows
+    if( $entryProp->{host_login} ) {
+        $ldapEntry->add( uid => to_utf8({ -string => $entryProp->{host_login}, -charset => $defaultCharSet }) );
+    }
+
+    # Le SID de l'hôte
+    if( $entryProp->{host_samba_sid} ) {
+        $ldapEntry->add( sambaSID => to_utf8({ -string => $entryProp->{host_samba_sid}, -charset => $defaultCharSet }) );
+    }
+
+    # Le groupe de l'hôte
+    if( $entryProp->{host_samba_group_sid} ) {
+        $ldapEntry->add( sambaPrimaryGroupSID => to_utf8({ -string => $entryProp->{host_samba_group_sid}, -charset => $defaultCharSet }) );
+    }
+
+    # Les flags de l'hôte Samba
+    if( $entryProp->{host_samba_flags} ) {
+        $ldapEntry->add( sambaAcctFlags => to_utf8({ -string => $entryProp->{host_samba_flags}, -charset => $defaultCharSet }) );
+    }
+
+    # Les mots de passes windows
+    if( $entryProp->{host_lm_passwd} ) {
+        $ldapEntry->add( sambaLMPassword => $entryProp->{host_lm_passwd} );
+    }
+    if( $entryProp->{host_nt_passwd} ) {
+        $ldapEntry->add( sambaNTPassword => $entryProp->{host_nt_passwd} );
     }
 
     return 1;
@@ -310,22 +389,65 @@ sub createLdapEntry {
 
 sub updateLdapEntry {
     my $self = shift;
-    my( $ldapEntry ) = @_;
-    my $entry = $self->{"hostDesc"};
+    my( $ldapEntry, $objectclassDesc ) = @_;
     my $update = 0;
+    my $dbEntry = $self->{hostDbDesc};
+    my $entryProp = $self->{hostDesc};
+    my $entryLinks = $self->{hostLinks};
+
+    # Vérification des objectclass
+    my @deletedObjectclass;
+    my $currentObjectclass = $self->getLdapObjectclass( $ldapEntry->get_value("objectClass", asref => 1), \@deletedObjectclass);
+    if( &OBM::Ldap::utils::modifyAttrList( $currentObjectclass, $ldapEntry, "objectClass" ) ) {
+        $update = 1;
+    }
+
+    if( $#deletedObjectclass >= 0 ) {
+        # Pour les schémas LDAP supprimés, on détermine les attributs à
+        # supprimer.
+        # Uniquement ceux qui ne sont pas utilisés par d'autres objets.
+        my $deleteAttrs = &OBM::Ldap::utils::diffObjectclassAttrs(\@deletedObjectclass, $currentObjectclass, $objectclassDesc);
+
+        for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
+            if( &OBM::Ldap::utils::modifyAttrList( undef, $ldapEntry, $deleteAttrs->[$i] ) ) {
+                $update = 1;
+            }
+        }
+    }
+
 
     # La description
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"host_description"}, $ldapEntry, "description" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{"host_description"}, $ldapEntry, "description" ) ) {
         $update = 1;
     }
 
     # L'adresse IP
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"host_ip"}, $ldapEntry, "ipHostNumber" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{"host_ip"}, $ldapEntry, "ipHostNumber" ) ) {
         $update = 1;
     }
 
     # Le domaine OBM
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"host_domain"}, $ldapEntry, "obmDomain" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{"host_domain"}, $ldapEntry, "obmDomain" ) ) {
+        $update = 1;
+    }
+
+    # Le nom windows
+    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_login}, $ldapEntry, "uid" ) ) {
+        $update = 1;
+    }
+
+    # Le SID de l'hôte
+    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_samba_sid}, $ldapEntry, "sambaSID" ) ) {
+        $update = 1;
+    }
+
+    # Le groupe de l'hôte
+    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_samba_group_sid}, $ldapEntry, "sambaPrimaryGroupSID" ) ) {
+        $update = 1;
+    }
+
+    # Les flags de l'hôte Samba
+    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_samba_flags}, $ldapEntry, "sambaAcctFlags" ) ) {
         $update = 1;
     }
 

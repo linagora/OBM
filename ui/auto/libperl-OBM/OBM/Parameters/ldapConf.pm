@@ -53,26 +53,6 @@ $attributeDef = {
         dn_prefix => "dc",
         dn_value => "name",
         objectclass => [ "dcObject", "organization" ],
-        init_struct => sub {
-            my( $ldapStruct, $parentDn ) = @_;
-            require OBM::Ldap::typeRoot;
-            return OBM::Ldap::typeRoot::initStruct( $ldapStruct, $parentDn );
-        },
-        get_db_value => sub {
-            my( $parentDn, $domainId ) = @_;
-            require OBM::Ldap::typeRoot;
-            return OBM::Ldap::typeRoot::getDbValues( $parentDn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeRoot;
-            return OBM::Ldap::typeRoot::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeRoot;
-            return OBM::Ldap::typeRoot::updateLdapEntry( $entry, $ldapEntry );
-        }
     },
 
     $DOMAINROOT => {
@@ -81,22 +61,6 @@ $attributeDef = {
         dn_prefix => "dc",
         dn_value => "domain_name",
         objectclass => [ "dcObject", "organization" ],
-        init_struct => sub {
-            my( $ldapStruct, $parentDn ) = @_;
-            require OBM::Ldap::typeDomainRoot;
-            return OBM::Ldap::typeDomainRoot::initStruct( $ldapStruct, $parentDn );
-        },
-        get_db_value => sub {
-            my( $parentDn, $domainId ) = @_;
-            require OBM::Ldap::typeDomainRoot;
-            return OBM::Ldap::typeDomainRoot::getDbValues( $parentDn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeDomainRoot;
-            return OBM::Ldap::typeDomainRoot::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub { return 0; }
     },
 
     $NODE => {
@@ -105,49 +69,14 @@ $attributeDef = {
         dn_prefix => "ou",
         dn_value => "name",
         objectclass => [ "organizationalUnit" ],
-        get_db_value => sub {
-            my( $parentDn, $domainId ) = @_;
-            require OBM::Ldap::typeNode;
-            return OBM::Ldap::typeNode::getDbValues( $parentDn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeNode;
-            return OBM::Ldap::typeNode::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeNode;
-            return OBM::Ldap::typeNode::updateLdapEntry( $entry, $ldapEntry );
-        }
     },
 
     $POSIXUSERS => {
         structural => 1,
         is_branch => 0,
         dn_prefix => "uid",
-        dn_value => "user_login",
-        objectclass => [ "posixAccount", "shadowAccount", "inetOrgPerson", "obmUser" ],
-        get_db_value => sub {
-            my( $parentDn, $domainId ) = @_;
-            require OBM::Ldap::typePosixUsers;
-            return OBM::Ldap::typePosixUsers::getDbValues( $parentDn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typePosixUsers;
-            return OBM::Ldap::typePosixUsers::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typePosixUsers;
-            return OBM::Ldap::typePosixUsers::updateLdapEntry( $entry, $ldapEntry );
-        },
-        update_passwd => sub {
-            my( $ldapEntry, $passwdType, $newPasswd ) = @_;
-            require OBM::Ldap::typePosixUsers;
-            return OBM::Ldap::typePosixUsers::updatePasswd( $ldapEntry, $passwdType, $newPasswd );
-        }
+        dn_value => "userobm_login",
+        objectclass => [ "posixAccount", "shadowAccount", "inetOrgPerson", "obmUser", "sambaSamAccount" ],
     },
 
     $SYSTEMUSERS => {
@@ -156,21 +85,6 @@ $attributeDef = {
         dn_prefix => "uid",
         dn_value => "user_login",
         objectclass => [ "person", "posixAccount", "obmSystemUser" ],
-        get_db_value => sub {
-            my( $parentdn, $domainId ) = @_;
-            require OBM::Ldap::typeSystemUsers;
-            return OBM::Ldap::typeSystemUsers::getDbValues( $parentdn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeSystemUsers;
-            return OBM::Ldap::typeSystemUsers::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeSystemUsers;
-            return OBM::Ldap::typeSystemUsers::updateLdapEntry( $entry, $ldapEntry );
-        }
     },
 
     $DOMAINHOSTS => {
@@ -178,7 +92,7 @@ $attributeDef = {
         is_branch => 0,
         dn_prefix => "cn",
         dn_value => "host_name",
-        objectclass => [ "device", "ipHost", "obmHost" ]
+        objectclass => [ "device", "ipHost", "obmHost", "sambaSamAccount" ]
     },
 
     $POSIXGROUPS => {
@@ -186,22 +100,7 @@ $attributeDef = {
         is_branch => 0,
         dn_prefix => "cn",
         dn_value => "group_name",
-        objectclass => [ "posixGroup", "obmGroup" ],
-        get_db_value => sub {
-            my( $parentdn, $domainId ) = @_;
-            require OBM::Ldap::typePosixGroups;
-            return OBM::Ldap::typePosixGroups::getDbValues( $parentdn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typePosixGroups;
-            return OBM::Ldap::typePosixGroups::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typePosixGroups;
-            return OBM::Ldap::typePosixGroups::updateLdapEntry( $entry, $ldapEntry );
-        }
+        objectclass => [ "posixGroup", "obmGroup", "sambaGroupMapping" ]
     },
 
     $MAILSHARE => {
@@ -210,44 +109,14 @@ $attributeDef = {
         dn_prefix => "cn",
         dn_value => "mailshare_name",
         objectclass => [ "obmMailShare" ],
-        get_db_value => sub {
-            my( $parentdn, $domainId ) = @_;
-            require OBM::Ldap::typeMailShare;
-            return OBM::Ldap::typeMailShare::getDbValues( $parentdn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeMailShare;
-            return OBM::Ldap::typeMailShare::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeMailShare;
-            return OBM::Ldap::typeMailShare::updateLdapEntry( $entry, $ldapEntry );
-        }
     },
 
     $SAMBADOMAIN => {
         structural => 1,
         is_branch => 0,
         dn_prefix => "sambaDomainName",
-        dn_value => "samba_domain",
+        dn_value => "sambaConf_domain_name",
         objectclass => [ "sambaDomain", "obmSamba" ],
-        get_db_value => sub {
-            my( $parentdn, $domainId ) = @_;
-            require OBM::Ldap::typeSambaDomain;
-            return OBM::Ldap::typeSambaDomain::getDbValues( $parentdn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeSambaDomain;
-            return OBM::Ldap::typeSambaDomain::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeSambaDomain;
-            return OBM::Ldap::typeSambaDomain::updateLdapEntry( $entry, $ldapEntry );
-        }
     },
 
     $SAMBAUSERS => {
@@ -256,26 +125,6 @@ $attributeDef = {
         dn_prefix => "uid",
         dn_value => "user_login",
         objectclass => [ "sambaSamAccount" ],
-        get_db_value => sub {
-            my( $parentdn, $domainId ) = @_;
-            require OBM::Ldap::typeSambaUsers;
-            return OBM::Ldap::typeSambaUsers::getDbValues( $parentdn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeSambaUsers;
-            return OBM::Ldap::typeSambaUsers::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeSambaUsers;
-            return OBM::Ldap::typeSambaUsers::updateLdapEntry( $entry, $ldapEntry );
-        },
-        update_passwd => sub {
-            my( $ldapEntry, $passwdType, $newPasswd ) = @_;
-            require OBM::Ldap::typeSambaUsers;
-            return OBM::Ldap::typeSambaUsers::updatePasswd( $ldapEntry, $passwdType, $newPasswd );
-        }
     },
 
     $SAMBAGROUPS => {
@@ -284,21 +133,6 @@ $attributeDef = {
         dn_prefix => "cn",
         dn_value => "group_name",
         objectclass => [ "sambaGroupMapping" ],
-        get_db_value => sub {
-            my( $parentdn, $domainId ) = @_;
-            require OBM::Ldap::typeSambaGroups;
-            return OBM::Ldap::typeSambaGroups::getDbValues( $parentdn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeSambaGroups;
-            return OBM::Ldap::typeSambaGroups::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeSambaGroups;
-            return OBM::Ldap::typeSambaGroups::updateLdapEntry( $entry, $ldapEntry );
-        }
     },
 
     $SAMBAHOSTS => {
@@ -307,21 +141,6 @@ $attributeDef = {
         dn_prefix => "uid",
         dn_value => "host_login",
         objectclass => [ "person", "sambaSamAccount", "obmSamba" ],
-        get_db_value => sub {
-            my( $parentdn, $domainId ) = @_;
-            require OBM::Ldap::typeSambaHosts;
-            return OBM::Ldap::typeSambaHosts::getDbValues( $parentdn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeSambaHosts;
-            return OBM::Ldap::typeSambaHosts::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typeSambaHosts;
-            return OBM::Ldap::typeSambaHosts::updateLdapEntry( $entry, $ldapEntry );
-        }
     },
 
     $MAILSERVER => {
@@ -330,21 +149,6 @@ $attributeDef = {
         dn_prefix => "cn",
         dn_value => "postfixconf_name",
         objectclass => [ "obmMailServer" ],
-        get_db_value => sub {
-            my( $parentdn, $domainId ) = @_;
-            require OBM::Ldap::typePostfixConf;
-            return OBM::Ldap::typePostfixConf::getDbValues( $parentdn, $domainId );
-        },
-        create_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typePostfixConf;
-            return OBM::Ldap::typePostfixConf::createLdapEntry( $entry, $ldapEntry );
-        },
-        update_ldap => sub {
-            my( $entry, $ldapEntry ) = @_;
-            require OBM::Ldap::typePostfixConf;
-            return OBM::Ldap::typePostfixConf::updateLdapEntry( $entry, $ldapEntry );
-        }
     }
 };
 

@@ -20,7 +20,8 @@ function run_query_password($u_id) {
       userobm_domain_id,
       userobm_login,
       userobm_password,
-      userobm_password_type
+      userobm_password_type,
+      userobm_samba_perms
     FROM UserObm
     WHERE userobm_id='$u_id'";
 
@@ -48,6 +49,7 @@ function run_query_password_update($password, $uid, $usr_q) {
 
   $login = $usr_q->f("userobm_login");
   $domain_id = $usr_q->f("userobm_domain_id");;
+  $samba_perms = $usr_q->f("userobm_samba_perms");
   $old_pass = trim($password["old_password"]);
   $new_pass = trim($password["new_password"]);
 
@@ -78,7 +80,7 @@ function run_query_password_update($password, $uid, $usr_q) {
   $error = $usr_q->query($query);
   $usr_q->next_record();
 
-  if( $usr_q->f("nb_user") == 1 ) {
+  if ($usr_q->f("nb_user") == 1 && $cgp_use['service']['ldap']) {
 
     $query = "UPDATE P_UserObm SET
       userobm_password='$new_passwd_crypt',
@@ -88,14 +90,23 @@ function run_query_password_update($password, $uid, $usr_q) {
     $retour = $usr_q->query($query);
 
     // Modification a chaud du mot de passe dans le LDAP
-    // XXXX cas user non encore cree (uniquement dans base maj) ?
-    $cmd = $cmd_ldap_passwd." --unix --login ".$login." --domain ".$domain_id." --type ".$password_encryption." --passwd '".stripslashes($new_pass)."' --old-passwd '".stripslashes($old_pass)."'";
+    // Uniquement dans le cas où la mise à jour de la table de prooduction c'est
+    // produite sans erreur (tuple inexistant...)
+    if ($retour) {
+      $parameters = " --unix";
 
-    display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
-    exec($cmd);
+      if ($samba_perms && ($cgp_use['service']['samba'] || $password_encryption != "PLAIN")) {
+        $parameters .= " --samba";
+      }
+
+      if ($parameters) {
+        $cmd = $cmd_ldap_passwd.$parameters." --login ".$login." --domain ".$domain_id." --type ".$password_encryption." --passwd '".stripslashes($new_pass)."' --no-old";
+
+        display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
+        exec($cmd);
+      }
+    }
   }
-
-
 
 
   return $retour;

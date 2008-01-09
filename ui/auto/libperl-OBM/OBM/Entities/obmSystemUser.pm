@@ -9,7 +9,7 @@ require Exporter;
 use strict;
 
 use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
+require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::passwd;
 require OBM::toolBox;
@@ -24,14 +24,16 @@ sub new {
 
     my %obmSystemUserAttr = (
         type => undef,
-        typeDesc => undef,
         links => undef,
         toDelete => undef,
         archive => undef,
         sieve => undef,
         userId => undef,
         domainId => undef,
-        userDesc => undef
+        userDesc => undef,
+        objectclass => undef,
+        dnPrefix => undef,
+        dnValue => undef
     );
 
 
@@ -50,10 +52,14 @@ sub new {
     $obmSystemUserAttr{"links"} = $links;
     $obmSystemUserAttr{"toDelete"} = $deleted;
 
-    $obmSystemUserAttr{"type"} = $SYSTEMUSERS;
-    $obmSystemUserAttr{"typeDesc"} = $attributeDef->{$obmSystemUserAttr{"type"}};
+    $obmSystemUserAttr{"type"} = $OBM::Parameters::ldapConf::SYSTEMUSERS;
     $obmSystemUserAttr{"archive"} = 0;
     $obmSystemUserAttr{"sieve"} = 0;
+
+    # Définition de la représentation LDAP de ce type
+    $obmSystemUserAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmSystemUserAttr{"type"}}->{objectclass};
+    $obmSystemUserAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmSystemUserAttr{"type"}}->{dn_prefix};
+    $obmSystemUserAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmSystemUserAttr{"type"}}->{dn_value};
 
     bless( \%obmSystemUserAttr, $self );
 }
@@ -62,7 +68,12 @@ sub new {
 sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
+
     my $userId = $self->{"userId"};
+    if( !defined($userId) ) {
+        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: aucun identifiant d'utilisateur systeme definit", "W" );
+        return 0;
+    }
 
 
     if( !defined($dbHandler) ) {
@@ -223,12 +234,19 @@ sub isLinks {
 }
 
 
+sub getLdapObjectclass {
+    my $self = shift;
+
+    return $self->{objectclass};
+}
+
+
 sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
 
-    if( defined($self->{"typeDesc"}->{"dn_prefix"}) && defined($self->{"userDesc"}->{$self->{"typeDesc"}->{"dn_value"}}) ) {
-        $dnPrefix = $self->{"typeDesc"}->{"dn_prefix"}."=".$self->{"userDesc"}->{$self->{"typeDesc"}->{"dn_value"}};
+    if( defined($self->{"dnPrefix"}) && defined($self->{"userDesc"}->{$self->{"dnValue"}}) ) {
+        $dnPrefix = $self->{"dnPrefix"}."=".$self->{"userDesc"}->{$self->{"dnValue"}};
     }
 
     return $dnPrefix;
@@ -264,7 +282,7 @@ sub createLdapEntry {
         }
                 
         $ldapEntry->add(
-            objectClass => $self->{"typeDesc"}->{"objectclass"},
+            objectClass => $self->{"objectclass"},
             uid => to_utf8({ -string => $entry->{"user_login"}, -charset => $defaultCharSet }),
             cn => to_utf8({ -string => $longName, -charset => $defaultCharSet }),
             sn => to_utf8({ -string => $entry->{"user_lastname"}, -charset => $defaultCharSet }),
@@ -286,7 +304,7 @@ sub createLdapEntry {
 
 sub updateLdapEntry {
     my $self = shift;
-    my( $ldapEntry ) = @_;
+    my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"userDesc"};
     my $update = 0;
 
