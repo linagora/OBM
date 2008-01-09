@@ -10,6 +10,7 @@
 // Labels et textes
 $l_detail = "Détail";
 $l_title = "Fonction";
+$l_add_child_tooltip = "Ajouter un fils";
 
 // Actions
 $l_insert = "Enregistrer l'organigramme";

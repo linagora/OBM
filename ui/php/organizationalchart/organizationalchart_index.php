@@ -29,6 +29,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 
 $extra_js_include[] = "organizationalchart.js";
+$extra_css[] = $css_organizationalchart;
 
 require("organizationalchart_display.inc");
 require("organizationalchart_query.inc");

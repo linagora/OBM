@@ -1,0 +1,167 @@
+/* ------------------------------------------------------------------------- 
+ * Organizational Chart
+/* ------------------------------------------------------------------------- 
+
+/* Form */
+.organizationalChartNode {
+  width: 20em;
+  padding: 2px;
+  float: left;
+}
+
+.organizationalChartWrap {
+  background-image: url('../images/hatch.gif');
+  width: 18em;
+  border: 1px solid #ABABAB;
+  background-color: #D2D2D2;
+  margin-bottom: 10px;
+  float: left;
+  padding: 6px 6px 0px 6px;
+}
+
+.organizationalChartWrap input {
+  margin-bottom: 2px;
+}
+
+.newButtons {
+  clear: left;
+  text-align: center;
+}
+
+.elementRow{
+  background: inherit;
+  font-weight: bold;
+}
+
+.color1 {
+  border: 1px solid #F5B043;
+  background-color: #F9CF8B;
+}
+
+.color2 {
+  border: 1px solid #EE7690;
+  background-color: #F7BBC8;
+}
+
+.color3 {
+  border: 1px solid #98BF5E;
+  background-color: #BBD595;
+}
+
+.color4 {
+  border: 1px solid #E7AB9E;
+  background-color: #F6DFDA;
+}
+
+.color5 {
+  border: 1px solid #BBACC4;
+  background-color: #DFD9E3;
+}
+
+.color6 {
+  border: 1px solid #94A6E1;
+  background-color: #CFD8F2;
+}
+
+/* User popup */
+.userdetail {
+  min-width: 350px;
+  background-color: #FFF;
+  border: 1px solid #646567; 
+}
+
+.blockItem {
+  margin-left: 1em;
+  text-align: left;
+}
+
+.userphoto {
+  float: left;
+  background-color: #FFF;
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  text-align: center;
+}
+
+.userdetailName {
+  text-align: left;
+  font-weight: bold;
+  text-align: center;
+  left: 100px;
+  font-size: 110%;
+  border-top: 1px solid #FFF;
+  border-left: 1px solid #FFF;
+  border-bottom: 1px solid #929292;
+  background-color: #B3B2B2;
+  background-image: url('../images/background_tableHead.gif');
+  background-repeat: repeat-x;
+  background-position: top;     
+}
+
+/* Consult */
+.container {
+  float: left;
+  text-align: center;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 30px;
+}
+
+.nodeWrap {
+  float: left;
+  margin: auto !important;
+  margin: 0;
+}
+
+.node {
+  width: 140px;
+  margin: auto;
+  border: 1px solid #646567;
+  background-color: #FFF;
+}
+
+.node h1 {
+  text-align: center;
+  font-size: 100%;
+  border-top: 1px solid #FFF;
+  border-left: 1px solid #FFF;
+  border-bottom: 1px solid #929292; 
+  background-color: #B3B2B2;
+  background-image: url('../images/background_tableHead.gif');
+  background-repeat: repeat-x;
+  background-position: top;
+}
+
+.node .handle {
+  float: right;
+}
+
+.node ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 2px 0 0 2px;
+}
+
+.nodeTail {
+  height: 10px;
+  width: 1px;
+  background-color: #646567;
+  margin: auto !important;
+  margin: 0;
+}
+
+.nodeStart {
+  height: 1px;
+  font-size: 1px;
+  background-color: #646567;
+  margin: 0;
+}
+
+.nodeEnd {
+  height: 1px;
+  font-size: 1px;
+  background-color: #646567;
+}
+
+

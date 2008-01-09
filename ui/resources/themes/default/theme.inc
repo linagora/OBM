@@ -15,6 +15,7 @@ $theme_path = "$resources_path/themes/default/images";
 $css_obm = "$resources_path/themes/default/styles/style.css";
 $css_print_obm = "$resources_path/themes/default/styles/print.css";
 $css_calendar = "$resources_path/themes/default/styles/calendar.css";
+$css_organizationalchart = "$resources_path/themes/default/styles/organizationalchart.css";
 $css_portal = "$resources_path/themes/default/styles/portal.css";
 
 // Templates 

@@ -10,6 +10,8 @@
 // Labels et textes
 $l_detail = "Detail";
 $l_title = "Title";
+$l_add_child_tooltip = "Add a child";
+
 
 // Actions
 $l_insert = "Insert organizational chart";

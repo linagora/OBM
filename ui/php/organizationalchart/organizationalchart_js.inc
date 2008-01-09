@@ -43,20 +43,20 @@ function check_form(form) {
 ///////////////////////////////////////////////////////////////////////////////
 // Create new ogroup form 
 ///////////////////////////////////////////////////////////////////////////////
-function add_entity(level) {
+function add_entity(parent_level) {
 
-  var child = window.document.f_entity.nb_child.value;
-  var new_child_id = level+'.'+child;
-  var container = $(level);
+  var child = $('nb_child').value;
+  var new_child_id = parent_level+'.'+child;
+  var container = $(parent_level);
   var num_color = (new_child_id.replace(/[0-9]/g, '').length)%7;
 
   var row = new Element('div').
-    addClass('organizational_chart_node').
+    addClass('organizationalChartNode').
     setProperty('id', new_child_id).
     setStyle('margin-left', '3em');
 
   var wrap = new Element('div').
-    addClass('organizational_chart_wrap color'+num_color);
+    addClass('organizationalChartWrap color'+num_color);
 
   // Delete button
   var delete_button = new Element('a').addEvent('click', function() {
@@ -75,19 +75,22 @@ function add_entity(level) {
   var ico_group = new Element('img').
     setProperty('src', '$ico_group');
 
+  // div buttons
+  var div_buttons = new Element('div').addClass('newButtons');
+
   // Add child button
   var child_button = new Element('a').addEvent('click', function() {
     add_entity(new_child_id);
-  }).setStyle('float','right').adopt(new Element('img').setProperty('src', '$ico_add'));
+  }).adopt(new Element('img').setProperties({'src':'$ico_add', 'title':'$l_add_child_tooltip'}));
 
   // child name text field
   var child_name = new Element('input').
-    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'size':'24', 'maxlength':'16', 'value':''}).
+    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'size':'18', 'maxlength':'16', 'value':''}).
     addClass('mandatory');
 
   // parent id hidden 
   var parent_id = new Element('input').
-    setProperties({'type':'hidden', 'name':'tf_parent_level['+new_child_id+']', 'value':level});
+    setProperties({'type':'hidden', 'name':'tf_parent_level['+new_child_id+']', 'value':parent_level});
  
   // entity div
   var sel_ent = new Element('div').
@@ -96,11 +99,11 @@ function add_entity(level) {
   row.adopt(wrap.
     adopt(delete_button).
     adopt(child_name).
-    adopt(child_button).
     adopt(parent_id).
     adopt(new Element('br')).adopt(ico_user).adopt(user_input).
     adopt(new Element('br')).adopt(ico_group).adopt(group_input).
-    adopt(sel_ent)
+    adopt(sel_ent).
+    adopt(div_buttons.adopt(child_button))
   );
 
   container.adopt(row);
@@ -108,7 +111,7 @@ function add_entity(level) {
   new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent'+new_child_id, 'user'+new_child_id, {defaultText:'$user_text'})
   new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent'+new_child_id, 'group'+new_child_id, {defaultText:'$user_text'})
 
-  window.document.f_entity.nb_child.value ++;
+  $('nb_child').value ++;
 }
 
 
