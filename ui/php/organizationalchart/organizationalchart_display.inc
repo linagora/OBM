@@ -665,9 +665,9 @@ function draw_form($node_q) {
         <!-- Entities -->
         $block_detail_entities
       </div>
-          <div class=\"newButtons\"> 
-            <a href=\"javascript: add_entity('1');\"><img src=\"$ico_add\" alt=\"[Add]\" title=\"$l_add_child_tooltip\" /></a>
-          </div>
+      <div class=\"newButtons\"> 
+        <a href=\"javascript: add_entity('$level');\"><img src=\"$ico_add\" alt=\"[Add]\" title=\"$l_add_child_tooltip\" /></a>
+      </div>
     </div>
     $block_detail_child
     </div>

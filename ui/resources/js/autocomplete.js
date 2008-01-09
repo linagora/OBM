@@ -117,6 +117,7 @@ obm.AutoComplete.Search = new Class({
       delay: 400,                      // delay before the last key pressed and the request
       mode: 'multiple',                // 'mono' or 'multiple'
       locked: false,                   // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
+      resetable: false,                // only in 'mono' mode : reset field value
       restriction: null,               // obm needs
       fieldText: obm.vars.labels.autocompleteField,          // default text displayed when empty field
       extension: null,                  // obm needs
@@ -145,25 +146,17 @@ obm.AutoComplete.Search = new Class({
       this.validateResultValue = this.setResultValue;
       this.resetFunc = this.monoModeReset;
       this.textChangedFunc = function() { this.unvalidateSelection(); this.resetResultBox(); };
-      // 'mono' mode elements
-      this.updateBtn = new Element('a').adopt(
-                                         new Element('img')
-                                           .setProperty('src',obm.vars.images.update)
-                                       ).addEvent('mousedown',
-                                         function(){
-                                           this.inputField.focus();
-                                           this.inputField.removeClass('validated');
-                                           this.inputField.removeProperty('readonly');
-                                           this.updateBtn.remove();
-                                         }.bind(this)
-                                       );
+
       // 'mono' mode initializations 
       if (this.selectedBox.value != '')
         this.currentValue = this.inputField.value;
-      if (this.options.locked) {
+      if (this.inputField.value != '') {
       	this.lockedLabel = this.inputField.value;
       	this.lockedKey = this.selectedBox.value;
       }
+      this.inputField.addEvent('focus', this.monoModeOnFocus.bindAsEventListener(this))
+                     .addEvent('keypress', this.monoModeOnKeyPress.bindWithEvent(this));
+
     } else {
       this.validateResultValue = this.addResultValue;
       this.resetFunc = this.reset;
@@ -536,14 +529,12 @@ obm.AutoComplete.Search = new Class({
       var result = new Element('div').addClass('elementRow');
       result.setProperties({'id': div_id});
       result.injectInside(this.selectedBox);
-      console.log('ici')
       new Element('a').adopt(
                         new Element('img')
                           .setProperty('src',obm.vars.images.del)
                       ).addEvent('mousedown',
                         function() {
                           var item = $(item_id);
-                          console.log(item_id,item, div_id, this.name);
                           if (item) { item.removeClass("selected"); }
                           remove_element(div_id,this.name);
                         }.bind(this)
@@ -561,7 +552,7 @@ obm.AutoComplete.Search = new Class({
       this.resetFunc();
       this.inputField.focus();
     }
-    eval(this.options.extrafunction);
+    eval(this.options.selectfunction);
   },
 
   // removes an element from the selectedBox
@@ -608,17 +599,7 @@ obm.AutoComplete.Search = new Class({
       this.lockedKey = this.selectedBox.value;
     }
     this.resetResultBox();
-    if (this.selectedBox.value != '') {
-      this.displayAsValidated();
-    }
-    eval(this.options.extrafunction);
-  },
-
-  // change the display of the field when focus is lost and the selection is validated
-  displayAsValidated: function() {
-    this.inputField.addClass('validated');
-    this.inputField.setProperty('readonly','readonly');
-    this.updateBtn.injectBefore(this.inputField);
+    eval(this.options.selectfunction);
   },
 
   // unvalidate the current validated element
@@ -635,11 +616,36 @@ obm.AutoComplete.Search = new Class({
     }
     if (this.selectedBox.value != '' && this.currentValue == this.inputField.value) {
       this.resetResultBox();
-      this.displayAsValidated();
     } else {
       this.unvalidateSelection();
       this.reset();
-  	}
+    }
+    if (this.inputField.value == this.options.fieldText) {
+      this.inputField.addClass('downlight');
+    }
+  },
+
+  monoModeOnKeyPress: function(e) {
+    switch (e.key) {
+      case 'enter' :
+        if (this.options.resetable) {
+          this.currentValue = this.options.fieldText;
+          this.inputField.value = this.options.fieldText;
+          this.lockedKey = this.options.fieldText;
+          this.lockedLabel = this.options.fieldText;
+          this.inputField.addClass('downlight');
+        }
+        e.stop();
+        break;
+      case 'esc' : 
+        this.inputField.blur();
+        break;
+    }
+  },
+
+  monoModeOnFocus: function() {
+    this.inputField.value='';
+    this.inputField.removeClass('downlight');
   }
 
 });

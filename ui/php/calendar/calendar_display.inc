@@ -369,8 +369,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     obm.vars.images.update = '$ico_group';
     obm.initialize.chain(function () {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {restriction:'calendar', defaultText:'$user_text'})
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {restriction:'calendar', mode: 'mono', locked: true, 
-        extrafunction:'sel_public_group(\"$iso_date\", element, this.inputField.value)'});
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {restriction:'calendar', mode: 'mono',
+        locked: 'true', resetable: 'true', selectfunction:'sel_public_group(\"$iso_date\", element, this.inputField.value)'});
       $resource_js
     });
     </script>    
