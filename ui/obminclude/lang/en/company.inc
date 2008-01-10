@@ -79,8 +79,8 @@ $l_fill_name = "You have to fill the Name before submitting.";
 $l_j_check_zip = "The zip code is not valid.";
 $l_j_check_phone = "The phone number is not valid.";
 $l_j_check_fax = "The fax number is not valid.";
-$l_j_check_email = "The email adress is not valid.";
-$l_j_check_web = "The web adress is not valid.";
+$l_j_check_email = "The email address is not valid.";
+$l_j_check_web = "The web address is not valid.";
 $l_j_select_company = "You have to select a company !";
 
 // For the display parameters modification screen

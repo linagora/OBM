@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.1.2';
+$obm_version = '2.1.3pre2';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -365,7 +365,7 @@ if ($cgp_use['service']['mail_vacation']) {
 if ($cgp_use['service']['mail']) {
   $cgp_show['module']['mailbox'] = 'my';
 }
-   
+
 // Specific user data
 $cgp_user = array();
 
@@ -634,8 +634,8 @@ $js_regexp_fax="/^[0-9+x \(\)-\.]+$/";   // digits + SPACE ( ) - fax number
 $php_regexp_fax="/^[0-9+x \(\)-\.]+$/";
 $js_regexp_zip="/^[0-9A-Z- ]{2,14}$/";     // 2-8 digits or letters
 $php_regexp_zip="/^[0-9A-Z- ]{2,14}$/";
-$js_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}([\-_\.\/A-Za-z0-9])*$/";  // Web
-$php_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[a-z]{2,3}([\-_\.\/A-Za-z0-9]*)$/i"; // Web
+$js_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}([\-_\.\,\/A-Za-z0-9])*$/";  // Web
+$php_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[a-z]{2,3}([\-_\.\,\/A-Za-z0-9]*)$/i"; // Web
 $php_regexp_isodate = "/^[0-9]{4}-[01][0-9]-[0123][0-9]$/";
 $php_regexp_isodatetime = "/^[0-9]{4}-[01][0-9]-[0123][0-9] [012][0-9]:[0-5][0-9]:[0-5][0-9]$/";
 $php_regexp_pub_lang = "/^[A-Za-z-]+$/";  // Publication lang
@@ -1846,4 +1846,5 @@ function random_color($nb) {
      
   return $return;
 }
+
 </script>

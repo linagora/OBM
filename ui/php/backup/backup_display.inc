@@ -13,11 +13,11 @@
 // Parameters:
 //   - $backup[] : hash with backup values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_backup_index($backup="") {
+function dis_backup_index($backup='') {
   global $display;
 
-  $display["search"] = dis_backup_search_form($backup);
-  $display["result"] = dis_backup_search_list($backup);
+  $display['search'] = dis_backup_search_form($backup);
+  $display['result'] = dis_backup_search_list($backup);
 
   return $true;
 }
@@ -28,7 +28,7 @@ function dis_backup_index($backup="") {
 // Parameters:
 //   - $backup[] : hash with backup values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_backup_search_form($backup="") {
+function dis_backup_search_form($backup='') {
 
   $block .= html_backup_search_form($backup);
 
@@ -44,11 +44,11 @@ function dis_backup_search_form($backup="") {
 function html_backup_search_form($backup) {
   global $display, $l_find, $l_date, $l_version;
 
-  $filename = stripslashes($backup["filename"]);
-  $version = stripslashes($backup["version"]);
-  $date = of_date_upd_format(stripslashes($backup["date"]));
+  $filename = stripslashes($backup['filename']);
+  $version = stripslashes($backup['version']);
+  $date = of_date_upd_format(stripslashes($backup['date']));
 
-  $url = url_prepare("backup_index.php");
+  $url = url_prepare('backup_index.php');
 
   // --- HTML Template --------------------------------------------------------
 
@@ -84,7 +84,7 @@ function dis_backup_search_list($backup) {
   $files = get_backup_list($backup);
   $nb_files = count($files);
   if ($nb_files == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found);
+    $display['msg'] .= display_warn_msg($l_no_found);
   } else {
     $block = html_backup_search_list($files, $nb_files);
   }
@@ -105,10 +105,10 @@ function html_backup_search_list($files, $nb_files) {
 
   foreach ($files as $file => $one_file) {
     $cpt++;
-    $data = "data" . ($cpt % 2);
-    $date = of_datetime_format($one_file["date"]);
-    $version = $one_file["version"];
-    $size = $one_file["size"];
+    $data = 'data' . ($cpt % 2);
+    $date = of_datetime_format($one_file['date']);
+    $version = $one_file['version'];
+    $size = $one_file['size'];
 
     $dis_files .= "
       <tr class=\"$data\">
@@ -121,7 +121,7 @@ function html_backup_search_list($files, $nb_files) {
       </tr>";
   }
 
-  $display["msg"] .= display_info_msg("$nb_files $l_found");
+  $display['msg'] .= display_info_msg("$nb_files $l_found");
 
   $block = "
     <table class=\"resultTable\">
@@ -150,7 +150,7 @@ function dis_backup_form() {
 
   $dis_ok = "<a href=\"$path/backup/backup_index.php?action=insert\">$l_confirm </a>";
 
-  $display["msg"] .= display_ok_msg($l_can_create);
+  $display['msg'] .= display_ok_msg($l_can_create);
 
   $block .= "<div class=\"buttons\">
              $dis_ok
@@ -174,7 +174,7 @@ function dis_can_delete_backup($filename) {
 
   $dis_delete = "<a href=\"$path/backup/backup_index.php?action=delete&amp;tf_filename=$filename\">$l_delete</a>";
 
-  $display["msg"] .= display_ok_msg($l_can_delete);
+  $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
       <div class=\"buttons\">
@@ -192,8 +192,8 @@ function dis_can_delete_backup($filename) {
 function dis_backup_file($doc_q) {
   global $cdoc_kind_link;
 
-  $name = $doc_q->f("document_name");  
-  $kind = $doc_q->f("document_kind");
+  $name = $doc_q->f('document_name');  
+  $kind = $doc_q->f('document_kind');
 
   // If document is a link we transfer to the link
   if ($kind == $cdoc_kind_link) {
@@ -202,13 +202,13 @@ function dis_backup_file($doc_q) {
 
   } else {
 
-    $id = $doc_q->f("document_id");
-    $mime = $doc_q->f("documentmimetype_mime");  
+    $id = $doc_q->f('document_id');
+    $mime = $doc_q->f('documentmimetype_mime');  
     $disk_path = get_document_disk_path($id);
     $disk_fullname = $disk_path . $id; 
 
     // Else Document is a file, we send the file
-    $handle = fopen ($disk_fullname, "r");
+    $handle = fopen ($disk_fullname, 'r');
     header("Content-Type: $mime");
     header("Content-Disposition: inline; filename=$name");
     echo fread($handle, filesize ($disk_fullname));

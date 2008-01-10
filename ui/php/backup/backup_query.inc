@@ -18,8 +18,8 @@
 function get_backup_list($backup) {
   global $cbackup_root;
 
-  $version = $backup["version"];
-  $date = $backup["date"];
+  $version = $backup['version'];
+  $date = of_isodate_convert($backup['date']);
 
   if ( substr($cbackup_root, strlen($cbackup_root)-1 ) != '/' ) {
     $backup_path = $cbackup_root . '/';
@@ -29,7 +29,7 @@ function get_backup_list($backup) {
 
   $root_handler = opendir($backup_path);
   while (($file = readdir($root_handler)) !== false) {
-    if (($file != "..") && ($file != ".")) {
+    if (($file != '..') && ($file != '.')) {
       $fullname = $backup_path . $file;
       if (! is_dir($fullname)) {
         preg_match('/[0-9]{1,2}\.[0-9]{1,2}(\.[0-9]{1,2})?/', $file, $matches);
@@ -37,9 +37,9 @@ function get_backup_list($backup) {
 	if (preg_match("/^$version/", $b_version)) {
 	  $b_date = filemtime($fullname);
 	  if (preg_match("/^$date/", of_datetime_format($b_date))) {
-	    $files[$file]["version"] = $b_version;
-	    $files[$file]["date"] = $b_date;
-	    $files[$file]["size"] = filesize($fullname);
+	    $files[$file]['version'] = $b_version;
+	    $files[$file]['date'] = $b_date;
+	    $files[$file]['size'] = filesize($fullname);
 	  }
 	}
       }
@@ -59,8 +59,8 @@ function run_query_backup_create() {
   global $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
   global $db_type_mysql, $db_type_pgsql;
 
-  $date = date("Ymd:His");
-  $version = get_obm_info("db_version");
+  $date = date('Ymd:His');
+  $version = get_obm_info('db_version');
   $filename = "obmdb-$date-$version.dump";
   $disk_path = get_backup_disk_path();
   $disk_fullname = $disk_path . $filename; 
@@ -75,12 +75,12 @@ function run_query_backup_create() {
     $cmd = "pg_dump -U $obmdb_user $obmdb_db -f $disk_fullname";
     exec($cmd, $output, $ret);
   } else {
-    $err["msg"] = "$l_err_unknown_db ($obmdb_dbtype)";
+    $err['msg'] = "$l_err_unknown_db ($obmdb_dbtype)";
     return false;
   }
 
   if ($ret != 0) {
-    $err["msg"] = $l_create_backup_error;
+    $err['msg'] = $l_create_backup_error;
     return false;
   }
 
@@ -100,7 +100,7 @@ function run_query_backup_restore($filename) {
   $disk_fullname = $disk_path . $filename; 
   
   if ( (! is_file($disk_fullname)) || (! is_readable($disk_fullname) ) ) {
-    $err["msg"] = "$l_err_backup_file ($disk_fullname)";
+    $err['msg'] = "$l_err_backup_file ($disk_fullname)";
     return;
   }
 
@@ -127,11 +127,11 @@ function run_query_backup_restore($filename) {
     $obm_q = new DB_OBM;
     $tables = $obm_q->table_names();
     $i = 0;
-    while ($tables[$i]["table_name"]) {
-      $table = $tables[$i]["table_name"];
+    while ($tables[$i]['table_name']) {
+      $table = $tables[$i]['table_name'];
 
       // We exclude POSTGRES meta table (sql_xxxx)
-      if (! (substr($table, 0, 4) == "sql_")) {
+      if (! (substr($table, 0, 4) == 'sql_')) {
 	$query = "DELETE FROM $table";
 	$obm_q->query($query);
       }
@@ -151,7 +151,7 @@ function run_query_backup_restore($filename) {
     exec($cmd, $output, $ret);
 
   } else {
-    $err["msg"] = "$l_err_unknown_db ($obmdb_dbtype)";
+    $err['msg'] = "$l_err_unknown_db ($obmdb_dbtype)";
     return false;
   }
 
@@ -175,7 +175,7 @@ function run_query_backup_delete($filename) {
   $retour = run_query_backup_delete_backup_file($filename);
 
   if (! $retour) {
-    $err["msg"] = $l_delete_file_error;
+    $err['msg'] = $l_delete_file_error;
   }
 
   return $retour;
@@ -226,7 +226,7 @@ function check_backup_can_delete($filename) {
 
   // Filename check (to avoid filename corruptions)
   if (preg_match($php_regexp_backup, $filename) == 0) {
-    $err["msg"] = "$l_err_backup_name : $filename"; 
+    $err['msg'] = "$l_err_backup_name : $filename"; 
     $delete_ok = false;
   }
 

@@ -299,8 +299,8 @@ function run_query_company_insert($company) {
   $ctry = $company['country'];
   $phone = $company['phone'];
   $fax = $company['fax'];
-  $web = $company['web'];
-  $email = $company['email'];
+  $web = trim($company['web']);
+  $email = trim($company['email']);
   $comment = $company['comment'];
   $add_comment = $company['add_comment'];
   if ($add_comment != '') {
@@ -454,8 +454,8 @@ function run_query_company_update($cid, $company) {
   $ctry = $company['country'];
   $phone = $company['phone'];
   $fax = $company['fax'];
-  $web = $company['web'];
-  $email = $company['email'];
+  $web = trim($company['web']);
+  $email = trim($company['email']);
   $comment = $company['comment'];
   $add_comment = $company['add_comment'];
   if ($add_comment != '') {
@@ -767,8 +767,8 @@ function check_company_data_form($cid, $company) {
   $zip = $company['zip'];
   $phone = $company['phone'];
   $fax = $company['fax'];
-  $web = $company['web'];
-  $email = $company['email'];
+  $web = trim($company['web']);
+  $email = trim($company['email']);
 
   // MANDATORY: Company name
   if (trim($name) == '') {

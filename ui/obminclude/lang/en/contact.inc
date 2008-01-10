@@ -88,7 +88,7 @@ $l_j_check_phone = "The phone number is not valid.";
 $l_j_check_hphone = "The personal phone number is not valid.";
 $l_j_check_mphone = "The mobile phone number is not valid.";
 $l_j_check_fax = "The fax number is not valid.";
-$l_j_check_email = "The email adress is not valid.";
+$l_j_check_email = "The email address is not valid.";
 $l_j_select_contact = "You have to select a contact !";
 // JavaScript messages - Kind
 $l_j_kind_delete = "You have to select a kind to check or delete it !";
