@@ -328,6 +328,7 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
   global $display;
   global $l_organizationalchart, $l_detail;
   global $l_name, $l_desc, $l_archive, $l_yes, $l_no;
+  global $l_zoom_big, $l_zoom_small, $l_zoom;
 
   $oc_name = $oc_q->f("organizationalchart_name");
   $desc = $oc_q->f("organizationalchart_description");
@@ -357,6 +358,12 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
         </tr>
        </table>
     <h1>$l_detail</h1>
+    <form action=\"\" method=\"\" onsubmit=\"return false;\">
+      $l_zoom : <select onchange=\"zoom(this.options[this.selectedIndex].value);\">
+        <option value=\"big\">$l_zoom_big</option>
+        <option value=\"small\">$l_zoom_small</option>
+      </select>
+    </form>
     <div id=\"container\" class=\"container\">
       $block_detail
     </div>
@@ -464,16 +471,16 @@ function draw_consult($node_q) {
       $userobm_name = $one_user['lastname'].' '.$one_user['firstname'];
       $item_id = "item-${level}-${user_id}";
       if ($user_id != $g_manager) {
-        $block_detail_entities .= "<li id=\"item-${level}-${user_id}\">
-          <a href=\"$userobm_url\" 
-	    onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
-            onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$userobm_name</a>
-          </li>";
+         $block_detail_entities .= "<li id=\"item-${level}-${user_id}\">
+           <a href=\"$userobm_url\" 
+	     onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
+             onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$userobm_name</a>
+           </li>";
       } else {
         $manager = "<img src=\"$ico_manager\" />";
         $block_detail_entities_boss .= "<li id=\"item-${level}-${user_id}\">
         <a href=\"$userobm_url\" 
-			    onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
+	  onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
           onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$manager&nbsp;<b>$userobm_name</b></a>
         </li>";
       }
@@ -484,10 +491,12 @@ function draw_consult($node_q) {
   $t_child = run_query_organizationalchart_node_child($node_id);
   $nb_children = sizeof($t_child);
   $nb_leaves = run_query_organizationalchart_get_leaves($node_id, true);
+  $wrap_width = 150;
+
   if ($nb_children > 0) {
-    $wrap_width = $nb_leaves * 150;
-    $node_queue = "<div class=\"nodeTail\"></div>";
-	  foreach($t_child as $key => $child_id){
+    $wrap_width = $nb_leaves * $wrap_width;
+    $node_queue = "<div class=\"nodeLnk\"></div>";
+    foreach($t_child as $key => $child_id){
       if ($nb_children >= 2) {
         if ($key == 0){
           // first child
@@ -501,49 +510,34 @@ function draw_consult($node_q) {
       $t_draw = draw_consult($child_q);
       $block_detail_child .= $t_draw;
     }
-  } else {
-    $wrap_width = 150;
-  }
+  } 
 
   if ($parent_node_id > 0) {
-    $node_head = "<div class=\"nodeTail\"></div>";
+    $node_head = "<div class=\"nodeLnk\"></div>";
     if (in_array($node_id, $f)) {  // is first child ?
-      $node_edge = "<div class=\"nodeStart\" style=\"width: ".($wrap_width/2)."px;
-        margin-left: ".($wrap_width/2)."px\"></div>";
+      $node_edge = "<div class=\"nodeStart\" style=\"width: ".(ceil($wrap_width/2))."px;
+        margin-left: ".((ceil($wrap_width/2)))."px\"></div>";
     } else if (in_array($node_id, $l)) {  // is last child ?
-      $node_edge = "<div class=\"nodeEnd\" style=\"width: ".($wrap_width/2)."px;
-        margin-right: ".($wrap_width/2)."px\"\"></div>";
+      $node_edge = "<div class=\"nodeEnd\" style=\"width: ".(ceil($wrap_width/2))."px;
+        margin-right: ".((ceil($wrap_width/2)))."px\"></div>";
     } else {  // not first or last child
+      // $node_head = "<div class=\"nodeLnk\"></div>";
       $t = array_merge($f, $l);
       if (!in_array($node_id, $t)) {
         $t_child = run_query_organizationalchart_node_child($parent_node_id);
         $nb_neighbour = sizeof($t_child);
-        if ($nb_neighbour > 1) {    
-          $border_top = "border-top: 1px solid #646567;";
-        } else {
-          $border_top = "border-top: 0.1px solid #eff0f2;";
-        }
+        if ($nb_neighbour > 1) {
+          $style = "border-top: 1px solid #646567;";
+        } 
       }
     }
-  } else {
-    $node_head = "";
-    $wrap_width = $nb_leaves * 150;
-  }
-
-  $js .= "
-    div = $('node-$node_id');
-    title = div.getFirst();
-    content = title.getNext();
-    title.slide = new Fx.Slide(content, {duration: 150,wait:false});
-    title.addEvent('click', function(e){
-    this.slide.toggle();
-    });";
+  } 
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
     <div id=\"node-wrap-$node_id\" class=\"nodeWrap\"
-      style=\"width: ${wrap_width}px; $border_top\">
+      style=\"width: ${wrap_width}px; $style\">
       $node_edge
       $node_head
       <div id=\"node-$node_id\" class=\"node\">
@@ -556,7 +550,6 @@ function draw_consult($node_q) {
       $node_queue
       $block_detail_child
     </div>
-    <script type='text/javascript'>$js</script>
   ";
 
   return $block;
@@ -736,13 +729,17 @@ function dis_organizationalchart_userdetail() {
  * @return void
  */
 function organizationalchart_json_event($usr_q) {
-  global $display;
+  global $display, $obm;
 
   $userobm_email = $usr_q->f("userobm_email");
-  if($userobm_email !=  "") {
-    $email = $userobm_email."@".get_last_domain_text($usr_q->f("userobm_domain_id"));
-  } else {
-    $email = "";
+  $email = "";
+  if (!empty($userobm_email)) {
+    $main_domain = $obm["domain_name"];
+    $emails = explode("\n",$userobm_email);
+    $email = trim($emails[0])."@$main_domain";
+  }
+  if (strlen($email) > 30 ) {
+    $email = substr($email, 0, 30)."...";
   }
 
   $info[] = "id:".$usr_q->f("userobm_id");

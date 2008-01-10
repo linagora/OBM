@@ -2,6 +2,7 @@
  * Organizational Chart
 /* ------------------------------------------------------------------------- 
 
+
 /* Form */
 .organizationalChartNode {
   width: 20em;
@@ -65,7 +66,7 @@
 
 /* User popup */
 .userdetail {
-  min-width: 350px;
+  width: 350px;
   background-color: #FFF;
   border: 1px solid #646567; 
 }
@@ -89,7 +90,6 @@
   font-weight: bold;
   text-align: center;
   left: 100px;
-  font-size: 110%;
   border-top: 1px solid #FFF;
   border-left: 1px solid #FFF;
   border-bottom: 1px solid #929292;
@@ -112,6 +112,7 @@
   float: left;
   margin: auto !important;
   margin: 0;
+  display: inline;
 }
 
 .node {
@@ -133,17 +134,13 @@
   background-position: top;
 }
 
-.node .handle {
-  float: right;
-}
-
 .node ul {
   list-style-type: none;
   margin: 0;
   padding: 2px 0 0 2px;
 }
 
-.nodeTail {
+.nodeLnk {
   height: 10px;
   width: 1px;
   background-color: #646567;
@@ -151,17 +148,46 @@
   margin: 0;
 }
 
+/* FIXME: IE6*/
 .nodeStart {
+  font-size: 0px;
   height: 1px;
-  font-size: 1px;
   background-color: #646567;
-  margin: 0;
+
+  /* border-top: 1px solid #646567;
+  border-left: 1px solid #646567;
+  height: 10px; */
+
 }
 
 .nodeEnd {
+  font-size: 0px;
   height: 1px;
-  font-size: 1px;
   background-color: #646567;
+
+  /* border-top: 1px solid #646567;
+  border-right: 1px solid #646567;
+  height: 10px; */
+}
+
+/* small */
+.nodesmall {
+  width: 70px;
+  margin: auto;
+  border: 1px solid #646567;
+  background-color: #FFF;
+  font-size: 80%;
+}
+
+.nodesmall h1 {
+  text-align: center;
+  background-color: #CCC;
+}
+
+.nodesmall ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 2px 0 0 2px;
 }
 
 

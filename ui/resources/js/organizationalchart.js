@@ -60,19 +60,52 @@ Obm.UserDetail = new Class({
       this.sendDetailEvent(user_id);
       this.show();
 
+      // Popup position
+      //
+      // FIXME: Position when scrolling
+      //
+      // var target = $(evt);
+      // if (IE4) {
+      //   windowWidth = document.body.clientWidth;
+      // } else if (W3C) {
+      //   windowWidth = window.innerWidth;
+      // } else {
+      //   windowWidth = document.documentElement.clientWidth;
+      // }
+
+      // var left = target.getLeft() - Math.round((this.popup.offsetWidth - target.offsetWidth)/2);
+      // var top = target.getTop() - this.popup.offsetHeight - Math.round(target.offsetHeight);
+      // var popupLeft = left + this.popup.offsetWidth;
+      // if (popupLeft > windowWidth) {
+      //   left = left - (popupLeft - windowWidth) - 20;
+      // }
+
+      // this.popup.setStyles({
+      //   'top':  top + 'px',
+      //   'left': left  + 'px'
+      // });  
+
       var currentX, currentY;	
+      var windowWidth = window.innerWidth;
       if (IE4) {
         evt = window.event;
+        windowWidth = document.body.clientWidth;
       }
       if ( W3C ) {
-        currentX = evt.clientX - 135;
-        currentY = evt.clientY - 120;
+        currentX = evt.clientX - this.popup.offsetWidth/2;
+        currentY = evt.clientY - this.popup.offsetHeight - 15;
       } else if ( NS4 ) {
-        currentX = evt.pageX - 135;
-        currentY = evt.pageY - 120;
+        currentX = evt.pageX - this.popup.offsetWidth/2;
+        currentY = evt.pageY - this.popup.offsetHeight - 15;
       } else {
-        currentX = evt.clientX - 135;
-        currentY = evt.clientY - 120;
+        windowWidth = document.documentElement.clientWidth;
+        currentX = evt.clientX - this.popup.offsetWidth/2;
+        currentY = evt.clientY - this.popup.offsetHeight - 15;
+      }
+
+      var popupLeft = currentX + this.popup.offsetWidth;
+      if (popupLeft > windowWidth) {
+        currentX = currentX - (popupLeft - windowWidth) - 20;
       }
 
       this.popup.setStyle('top', currentY+'px');

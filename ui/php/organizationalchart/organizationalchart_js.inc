@@ -14,6 +14,68 @@ $url_group = "$path/group/group_index.php?action=ext_get_ids&popup=1&ext_element
 
 $extra_js .= "
 
+function zoom(z) {
+
+  var nodestart = \$ES('.nodeStart');
+  var nodeend = \$ES('.nodeEnd');
+  var nodewrap = \$ES('.nodeWrap');
+
+  if (z == 'small') {
+    newClass = 'nodesmall';
+    oldClass = 'node';
+
+    for(i=0;i<nodestart.length;i++) {
+      var el = nodestart[i];
+      w = $(el).getStyle('width').split('px');
+      $(el).setStyle('width', Math.round((w[0]/2))+'px');
+      $(el).setStyle('margin-left', Math.round((w[0]/2))+'px');
+    }
+    for(i=0;i<nodeend.length;i++) {
+      var el = nodeend[i];
+      w = $(el).getStyle('width').split('px');
+      $(el).setStyle('width', Math.round((w[0]/2))+'px');
+      $(el).setStyle('margin-right', Math.round((w[0]/2))+'px');
+    }
+    for(i=0;i<nodewrap.length;i++) {
+      var el = nodewrap[i];
+      w = $(el).getStyle('width').split('px');
+      $(el).setStyle('width', Math.round((w[0]/2))+'px');
+    }
+  } else if (z == 'big') {
+    newClass = 'node';
+    oldClass = 'nodesmall';
+
+    for(i=0;i<nodestart.length;i++) {
+      var el = nodestart[i];
+      w = $(el).getStyle('width').split('px');
+      $(el).setStyle('width', (w[0]*2)+'px');
+      $(el).setStyle('margin-left', (w[0]*2)+'px');
+    }
+    for(i=0;i<nodeend.length;i++) {
+      var el = nodeend[i];
+      w = $(el).getStyle('width').split('px');
+      $(el).setStyle('width', (w[0]*2)+'px');
+      $(el).setStyle('margin-right', (w[0]*2)+'px');
+    }
+    for(i=0;i<nodewrap.length;i++) {
+      var el = nodewrap[i];
+      w = $(el).getStyle('width').split('px');
+      $(el).setStyle('width', (w[0]*2)+'px');
+    }
+  }
+
+  var nodes = \$ES('.'+oldClass);    
+  for(i=0;i<nodes.length;i++) {
+    var node = nodes[i];
+    $(node).addClass(newClass);
+    $(node).removeClass(oldClass);
+  }
+
+
+
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check organizational chart data form 
 ///////////////////////////////////////////////////////////////////////////////
