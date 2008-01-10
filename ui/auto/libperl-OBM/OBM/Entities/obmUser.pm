@@ -225,7 +225,7 @@ sub getEntity {
         &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur '".$dbUserDesc->{userobm_login}."', domaine '".$domainDesc->{domain_label}."' annule - Pas de droit mail dans le domaine 'metadomain'", "W" );
         $self->{userDesc}->{userobm_mail_perms} = 0;
 
-    }elsif( !defined($dbUserDesc->{userobm_email}) || ( $dbUserDesc->{userobm_email} eq "" ) ) {
+    }elsif( $self->{userDesc}->{userobm_mail_perms} && !$dbUserDesc->{userobm_email} ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur '".$dbUserDesc->{userobm_login}."', domaine '".$domainDesc->{domain_label}."' annule - Pas d'adresse mail indiquée !", "W" );
         $self->{userDesc}->{userobm_mail_perms} = 0;
 
@@ -617,7 +617,7 @@ sub createLdapEntry {
 
 
     # Les paramètres nécessaires
-    if( $dbEntry->{userobm_login} && $dbEntry->{userobm_uid} && $dbEntry->{userobm_gid} && $dbEntry->{userobm_shell} ) {
+    if( $dbEntry->{userobm_login} && $dbEntry->{userobm_uid} && $dbEntry->{userobm_gid} && $entryProp->{userobm_shell} ) {
 
         $ldapEntry->add(
             objectClass => $self->getLdapObjectclass(),
