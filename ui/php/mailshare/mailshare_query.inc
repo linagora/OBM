@@ -128,7 +128,7 @@ function run_query_mailshare_detail($id) {
 function run_query_mailshare_insert($mailshare) {
   global $cdg_sql, $obm;
 
-  $name = $mailshare["name"];
+  $name = strtolower($mailshare["name"]);
   $quota = $mailshare["quota"];
   $email = $mailshare["email"];
   $desc = $mailshare["desc"];
@@ -206,7 +206,7 @@ function run_query_mailshare_update($mailshare) {
   global $obm, $cdg_sql;
 
   $id = $mailshare["mailshare_id"];
-  $name = $mailshare["name"];
+  $name = strtolower($mailshare["name"]);
   $quota = $mailshare["quota"];
   $email = $mailshare["email"];
   $desc = $mailshare["desc"];
@@ -425,7 +425,7 @@ function run_query_check_mailshare($id, $name, $desc) {
 function check_mailshare_context($id, $mailshare) {
   global $cdg_sql;
 
-  $name = $mailshare["name"];
+  $name = strtolower($mailshare["name"]);
   $desc = $mailshare["desc"];
 
   // return the mailshares with same name or desc
@@ -493,7 +493,7 @@ function check_mailshare_data_form($mailshare) {
   global $l_err_mailshare_uemail_exist, $l_err_mailshare_quota;
 
   $id = $mailshare["mailshare_id"];
-  $name = $mailshare["name"];
+  $name = strtolower($mailshare["name"]);
   $quota = $mailshare["quota"];
   $email = $mailshare["email"];
   $desc = $mailshare["desc"];

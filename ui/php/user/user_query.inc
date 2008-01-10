@@ -304,7 +304,7 @@ function run_query_user_insert($user) {
 
   $now = date('Y-m-d H:i:s');
   $uid = $obm['uid'];
-  $login = $user['login'];
+  $login = strtolower($user['login']);
   $passwd = $user['passwd'];
   if ($passwd != '') {
     // If a password type is given, get it else get the system parameter
@@ -745,7 +745,7 @@ function run_query_user_update($p_id, $user) {
   $title = $user['title'];
   $email = $user['email'];
   $desc = $user['desc'];
-  $login = $user['login'];
+  $login = strtolower($user['login']);
   $multidomain = sql_multidomain('userobm');
   $photo_id = $user['document_id'];
 
@@ -933,8 +933,8 @@ function run_query_user_update($p_id, $user) {
     $ret = of_userdata_query_update('user', $p_id, $user);
   }
 
-  if ($p_id == $obm["uid"]) {
-    $obm["login"] = $login;
+  if ($p_id == $obm['uid']) {
+    $obm['login'] = $login;
   }
 
   return $retour;
@@ -1299,7 +1299,7 @@ function run_query_user_check_user($p_id, $user) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $multidomain = sql_multidomain('userobm');
-  $login = $user['login'];
+  $login = strtolower($user['login']);
   $domain_id = $user['domain'];
   if ($domain_id == '') $domain_id = $obm['domain_id'];
   $where_multidomain = " AND userobm_domain_id='$domain_id'";
@@ -1379,7 +1379,7 @@ function check_user_data_form($p_id, $user) {
 
   $action = $user['action'];
   $id = $user['user_id'];
-  $login = $user['login'];
+  $login = strtolower($user['login']);
   $passwd = $user['passwd'];
   $profile = $user['profile'];
   $delegation = stripslashes($user['delegation']);

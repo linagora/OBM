@@ -319,7 +319,7 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
 
   // If parameters have been given, they supercede the default action value
   if (isset($mailshare["mailshare_id"])) { $id = $mailshare["mailshare_id"]; }
-  if (isset($mailshare["name"])) { $name = stripslashes($mailshare["name"]); }
+  if (isset($mailshare["name"])) { $name = strtolower(stripslashes($mailshare["name"])); }
   if (isset($mailshare["delegation"])) { $delegation = stripslashes($mailshare["delegation"]); }
   if (isset($mailshare["quota"])) { $quota = $mailshare["quota"]; }
   if (isset($mailshare["email"])) { $email = $mailshare["email"]; }
@@ -512,7 +512,7 @@ function dis_mailshare_warn_insert($id, $h_q, $mailshare) {
   global $display, $l_check_samemailshare, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
-  $name = $mailshare["name"];
+  $name = strtolower($mailshare["name"]);
   $delegation = $mailshare["delegation"];
   $desc = $mailshare["desc"];
   $email = $mailshare["email"];

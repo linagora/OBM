@@ -1046,7 +1046,7 @@ function html_user_form($usr_q, $user, $field='') {
   // infos
   if (isset($user["user_id"])) { $id = $user["user_id"]; }
   if (isset($user["domain"])) { $domain_id = $user["domain"]; }
-  if (isset($user["login"])) { $login = $user["login"]; }
+  if (isset($user["login"])) { $login = strtolower($user["login"]); }
   if (isset($user["old_login"])) { $old_login = $user["old_login"]; }
   if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
   if (isset($user["profile"])) { $profile = $user["profile"]; }
