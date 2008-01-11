@@ -27,19 +27,17 @@ function zoom(z) {
     for(i=0;i<nodestart.length;i++) {
       var el = nodestart[i];
       w = $(el).getStyle('width').split('px');
-      $(el).setStyle('width', Math.round((w[0]/2))+'px');
-      $(el).setStyle('margin-left', Math.round((w[0]/2))+'px');
+      $(el).setStyle('width', ((w[0]/2))+'px');
     }
     for(i=0;i<nodeend.length;i++) {
       var el = nodeend[i];
       w = $(el).getStyle('width').split('px');
-      $(el).setStyle('width', Math.round((w[0]/2))+'px');
-      $(el).setStyle('margin-right', Math.round((w[0]/2))+'px');
+      $(el).setStyle('width', ((w[0]/2))+'px');
     }
     for(i=0;i<nodewrap.length;i++) {
       var el = nodewrap[i];
       w = $(el).getStyle('width').split('px');
-      $(el).setStyle('width', Math.round((w[0]/2))+'px');
+      $(el).setStyle('width', ((w[0]/2))+'px');
     }
   } else if (z == 'big') {
     newClass = 'node';
@@ -49,13 +47,11 @@ function zoom(z) {
       var el = nodestart[i];
       w = $(el).getStyle('width').split('px');
       $(el).setStyle('width', (w[0]*2)+'px');
-      $(el).setStyle('margin-left', (w[0]*2)+'px');
     }
     for(i=0;i<nodeend.length;i++) {
       var el = nodeend[i];
       w = $(el).getStyle('width').split('px');
       $(el).setStyle('width', (w[0]*2)+'px');
-      $(el).setStyle('margin-right', (w[0]*2)+'px');
     }
     for(i=0;i<nodewrap.length;i++) {
       var el = nodewrap[i];
@@ -107,8 +103,9 @@ function check_form(form) {
 ///////////////////////////////////////////////////////////////////////////////
 function add_entity(parent_level) {
 
-  var child = $('nb_child').value;
-  var new_child_id = parent_level+'.'+child;
+  var child = $('nb_child_'+parent_level).value;
+  var n = parseInt(child) + 1;
+  var new_child_id = parent_level+'.' + n;
   var container = $(parent_level);
   var num_color = (new_child_id.replace(/[0-9]/g, '').length)%7;
 
@@ -158,10 +155,15 @@ function add_entity(parent_level) {
   var sel_ent = new Element('div').
     setProperty('id', 'sel_ent'+new_child_id);
 
+  // nb_child div hidden
+  var nb_child_div = new Element('input').
+    setProperties({'type':'hidden', 'name':'nb_child_'+new_child_id, 'id':'nb_child_'+new_child_id, 'value':'0'});
+
   row.adopt(wrap.
     adopt(delete_button).
     adopt(child_name).
     adopt(parent_id).
+    adopt(nb_child_div).
     adopt(new Element('br')).adopt(ico_user).adopt(user_input).
     adopt(new Element('br')).adopt(ico_group).adopt(group_input).
     adopt(sel_ent).
@@ -173,7 +175,7 @@ function add_entity(parent_level) {
   new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent'+new_child_id, 'user'+new_child_id, {defaultText:'$user_text'})
   new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent'+new_child_id, 'group'+new_child_id, {defaultText:'$user_text'})
 
-  $('nb_child').value ++;
+  $('nb_child_'+parent_level).value ++;
 }
 
 

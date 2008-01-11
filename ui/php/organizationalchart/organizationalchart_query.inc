@@ -153,6 +153,7 @@ function run_query_organizationalchart_insert($organizationalchart) {
 // Parameters:
 //   - $organizationalchart[] : Entry's values
 //   - $id : Organizational Chart id
+// FIXME: ogroup_level varchar(16) ===> ogroup_level varchar(255);
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_organizational_chart_entity_insert($organizationalchart, $organizationalchart_id) {
   global $obm, $cdg_sql;
@@ -480,7 +481,7 @@ function run_query_organizationalchart_node_child($id) {
   $query = "SELECT *
     FROM OGroup 
     WHERE ogroup_parent_id='$id' 
-    ORDER BY ogroup_level ASC";
+    ORDER BY ogroup_id ASC";
 
     $obm_q = new DB_OBM;
     display_debug_msg($query, $cdg_sql, "run_query_organizationalchart_node_child()");

@@ -1,3 +1,20 @@
+Obm.OrganizationalChart = new Class({
+  initialize: function() {
+    elements = $ES('.node');
+    for (i=0;i<elements.length;i++) {
+      el = elements[i];
+      title = el.getFirst();
+      content = title.getNext();
+      title.slide = new Fx.Slide(content, {duration: 150,wait:false});
+      title.addEvent('click', function(e){
+        this.slide.toggle();
+      });
+
+    }
+  }
+
+});
+
 /******************************************************************************
 * Organizational Chart popup user detail
 ******************************************************************************/

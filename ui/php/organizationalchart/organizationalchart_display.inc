@@ -222,11 +222,11 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     $block_detail = "
       <div id=\"1\" class=\"organizationalChartNode\">
         <div class=\"organizationalChartWrap\">
-          $l_name : <input type=\"text\" class=\"mandatory\" id=\"tf_ogroup[1]\" name=\"tf_ogroup[1]\" maxlength=\"16\" size=\"18\" value=\"$ogroup\" />
+          <input type=\"text\" class=\"mandatory\" id=\"tf_ogroup[1]\" name=\"tf_ogroup[1]\" maxlength=\"16\" size=\"18\" value=\"$ogroup\" />
           <input type=\"hidden\" id=\"tf_parent_level[1]\" name=\"tf_parent_level[1]\" value=\"0\" />
           <div><img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user1\" autocomplete=\"off\" /></div>
           <div><img src=\"$ico_group\" /><input type=\"text\" name=\"\" value=\"\" id=\"group1\" autocomplete=\"off\" /></div>
-          <input type=\"hidden\" name=\"nb_child\" id=\"nb_child\" value=\"1\" />
+          <input type=\"hidden\" name=\"nb_child_1\" id=\"nb_child_1\" value=\"0\" />
           <div id=\"sel_ent1\">
             <!-- Entities -->
           </div>
@@ -367,7 +367,11 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
     <div id=\"container\" class=\"container\">
       $block_detail
     </div>
-  </div>";
+  </div>
+  <script type=\"text/javascript\">
+    // obm.organizationalChart = new Obm.OrganizationalChart();
+  </script>
+  ";
  
   $block .= dis_organizationalchart_userdetail();
 
@@ -488,9 +492,13 @@ function draw_consult($node_q) {
   }
  
   // Get node children 
+  // TODO: Optimized
   $t_child = run_query_organizationalchart_node_child($node_id);
   $nb_children = sizeof($t_child);
   $nb_leaves = run_query_organizationalchart_get_leaves($node_id, true);
+  $brother = run_query_organizationalchart_node_child($parent_node_id);
+  $nb_brother = sizeof($brother) - 1;
+
   $wrap_width = 150;
 
   if ($nb_children > 0) {
@@ -505,6 +513,8 @@ function draw_consult($node_q) {
           // last child
           $l[] = $child_id;
         }
+      } else {
+        $node_queue = "";
       }
       $child_q = run_query_organizationalchart_node_infos($child_id);
       $t_draw = draw_consult($child_q);
@@ -512,26 +522,19 @@ function draw_consult($node_q) {
     }
   } 
 
-  if ($parent_node_id > 0) {
+  if ($parent_node_id > 0) { // If not root node
+    $style = "border-top: 1px solid #646567";
     $node_head = "<div class=\"nodeLnk\"></div>";
     if (in_array($node_id, $f)) {  // is first child ?
-      $node_edge = "<div class=\"nodeStart\" style=\"width: ".(ceil($wrap_width/2))."px;
-        margin-left: ".((ceil($wrap_width/2)))."px\"></div>";
+      $node_edge = "<div class=\"nodeStart\" style=\"width:".(ceil($wrap_width/2))."px;\"></div>";
     } else if (in_array($node_id, $l)) {  // is last child ?
-      $node_edge = "<div class=\"nodeEnd\" style=\"width: ".(ceil($wrap_width/2))."px;
-        margin-right: ".((ceil($wrap_width/2)))."px\"></div>";
-    } else {  // not first or last child
-      // $node_head = "<div class=\"nodeLnk\"></div>";
-      $t = array_merge($f, $l);
-      if (!in_array($node_id, $t)) {
-        $t_child = run_query_organizationalchart_node_child($parent_node_id);
-        $nb_neighbour = sizeof($t_child);
-        if ($nb_neighbour > 1) {
-          $style = "border-top: 1px solid #646567;";
-        } 
-      }
-    }
+      $node_edge = "<div class=\"nodeEnd\" style=\"width:".(ceil($wrap_width/2))."px;\"></div>";
+    } 
   } 
+  
+  if (!$nb_brother) {
+    $style = "";
+  }
 
   // --- HTML Template --------------------------------------------------------
 
@@ -542,10 +545,12 @@ function draw_consult($node_q) {
       $node_head
       <div id=\"node-$node_id\" class=\"node\">
         <h1>$node_name</h1>
-        <ul>
-          $block_detail_entities_boss
-          $block_detail_entities
-        </ul>
+        <div class=\"nodeContent\">
+          <ul>
+            $block_detail_entities_boss
+            $block_detail_entities
+          </ul>
+        </div>
       </div>
       $node_queue
       $block_detail_child
@@ -584,24 +589,27 @@ function draw_form($node_q) {
   // Get node detail
   $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
   while($ogroupentity_q->next_record()) {
-     $entity = $ogroupentity_q->f("ogroupentity_entity");
-     $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
-     switch($entity) {
-       case "user":
-         $name_q = run_query_userobm($entity_id);
-         $name_q->next_record();
-         $name = $name_q->f("userobm_lastname")." ".$name_q->f("userobm_firstname");
-       break;
-       case "group":
-         $name = get_last_group_text($entity_id);
-       break;
-     }
-     $block_detail_entities .= "<div class=\"elementRow\" id=\"sel_ent${entity}${level}data-${entity}-${entity_id}\">
-       <a href=\"javascript: remove_element('sel_ent${entity}${level}data-${entity}-${entity_id}','sel_ent${level}');\">
-        <img src=\"$ico_delete\">
-       </a>
-       $name
-       <input value=\"data-${entity}-${entity_id}\" name=\"sel_ent${level}[]\" type=\"hidden\"></div>";
+    $block_detail_entities = "";
+    $entity = $ogroupentity_q->f("ogroupentity_entity");
+    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
+    switch($entity) {
+      case "user":
+        $name_q = run_query_userobm($entity_id);
+        $name_q->next_record();
+        $name = $name_q->f("userobm_lastname")." ".$name_q->f("userobm_firstname");
+      break;
+      case "group":
+        $name = get_last_group_text($entity_id);
+      break;
+    }
+    $block_detail_entities .= "
+      <div class=\"elementRow\" id=\"sel_ent${entity}${level}data-${entity}-${entity_id}\">
+        <a href=\"javascript: remove_element('sel_ent${entity}${level}data-${entity}-${entity_id}','sel_ent${level}');\">
+         <img src=\"$ico_delete\">
+        </a>
+        $name 
+        <input value=\"data-${entity}-${entity_id}\" name=\"sel_ent${level}[]\" type=\"hidden\" />
+      </div>";
   }
 
   // Get node children 
@@ -632,37 +640,29 @@ function draw_form($node_q) {
       <img src=\"$ico_delete\" alt=\"[Delete]\" style=\"float: right;\" title=\"$l_add_child_tooltip\">
     </a>";
     $flour = strlen($level) - strlen(str_replace(".", "", $level));  
-    $last_flour = strlen($parent_level) - strlen(str_replace(".", "", $parent_level));  
-    if ($last_flour < $flour) {
-      $margin = "style=\"margin-left: 3em;\"";
-    } else if ($last_flour > $flour) {
-      $margin = "style=\"margin-left: -3em;\"";
-    } else {
-      $margin = "";
-    }
     $color = "color".($flour)%7;
   }
 
   // Urls for extmod
-  $block = "<div id=\"$level\" class=\"organizationalChartNode\" $margin>
-    <div class=\"organizationalChartWrap $color\">
-      $ico_del_entity
-      $l_name : <input type=\"text\" class=\"mandatory\" id=\"tf_ogroup[$level]\" name=\"tf_ogroup[$level]\" 
-        maxlength=\"16\" size=\"18\" value=\"$node_name\" />
-      <input type=\"hidden\" id=\"tf_parent_level[$level]\" name=\"tf_parent_level[$level]\" value=\"$parent_level\" />
-      <br />
-      <img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user$level\" autocomplete=\"off\" />
-      <br />
-      <img src=\"$ico_group\" /><input type=\"text\" name=\"\" value=\"\" id=\"group$level\" autocomplete=\"off\" />
-      <div id=\"sel_ent$level\">
-        <!-- Entities -->
-        $block_detail_entities
+  $block = "
+    <div id=\"$level\" class=\"organizationalChartNode\" style=\"margin-left: 3em;\">
+      <div class=\"organizationalChartWrap $color\">
+        $ico_del_entity
+        <input type=\"text\" class=\"mandatory\" id=\"tf_ogroup[$level]\" name=\"tf_ogroup[$level]\" 
+          maxlength=\"16\" size=\"18\" value=\"$node_name\" />
+          <input type=\"hidden\" name=\"nb_child_${level}\" id=\"nb_child_${level}\" value=\"$nb_children\" />
+        <input type=\"hidden\" id=\"tf_parent_level[$level]\" name=\"tf_parent_level[$level]\" value=\"$parent_level\" />
+        <div><img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user$level\" autocomplete=\"off\" /></div>
+        <div><img src=\"$ico_group\" /><input type=\"text\" name=\"\" value=\"\" id=\"group$level\" autocomplete=\"off\" /></div>
+        <div id=\"sel_ent$level\">
+          <!-- Entities -->
+          $block_detail_entities
+        </div>
+        <div class=\"newButtons\"> 
+          <a href=\"javascript: add_entity('$level');\"><img src=\"$ico_add\" alt=\"[Add]\" title=\"$l_add_child_tooltip\" /></a>
+        </div>
       </div>
-      <div class=\"newButtons\"> 
-        <a href=\"javascript: add_entity('$level');\"><img src=\"$ico_add\" alt=\"[Add]\" title=\"$l_add_child_tooltip\" /></a>
-      </div>
-    </div>
-    $block_detail_child
+      $block_detail_child
     </div>
     <script type=\"text/javascript\">
       obm.initialize.chain(function () {

@@ -21,7 +21,6 @@
 }
 
 .organizationalChartWrap input {
-  margin-bottom: 2px;
 }
 
 .newButtons {
@@ -30,7 +29,7 @@
 }
 
 .elementRow{
-  background: inherit;
+  background-color: transparent;
   font-weight: bold;
 }
 
@@ -105,14 +104,16 @@
   text-align: center;
   width: 100%;
   overflow-x: auto;
+  padding-top: 10px;
   padding-bottom: 30px;
+  position: relative;
 }
 
 .nodeWrap {
   float: left;
   margin: auto !important;
-  margin: 0;
-  display: inline;
+  position: relative;
+
 }
 
 .node {
@@ -148,26 +149,25 @@
   margin: 0;
 }
 
-/* FIXME: IE6*/
 .nodeStart {
-  font-size: 0px;
+  background-color: #EFF0F2;
   height: 1px;
-  background-color: #646567;
-
-  /* border-top: 1px solid #646567;
-  border-left: 1px solid #646567;
-  height: 10px; */
+  font-size: 1px;
+  position: relative;
+  margin-bottom: -1px;
+  top: -1px;
+  margin-right: 50%;
 
 }
 
 .nodeEnd {
-  font-size: 0px;
+  background-color: #EFF0F2;
   height: 1px;
-  background-color: #646567;
-
-  /* border-top: 1px solid #646567;
-  border-right: 1px solid #646567;
-  height: 10px; */
+  font-size: 1px;
+  position: relative;
+  margin-bottom: -1px;
+  top: -1px;
+  margin-left: 50%;
 }
 
 /* small */
