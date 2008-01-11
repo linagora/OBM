@@ -168,7 +168,7 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
       <th>$l_mail_server</th>
       <td>";
     if ($mail_server_id) {
-      $dis_mailserver .= "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server_id\">$mail_server_host_name</a>";
+      $dis_mailserver .= "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&mailserver_id=$mail_server_id\">$mail_server_host_name</a>";
     } else {
       $dis_mailserver .= '-';
     }

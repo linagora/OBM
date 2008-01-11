@@ -1030,7 +1030,6 @@ function html_user_form($usr_q, $user, $field='') {
 
     $dis_title = "$fname $lname";
   } elseif ($action == "new") {
-    $dis_title = $l_header_new;
     $dom_infos = of_domain_get_domain_infos($obm['domain_id'], true);
     $ad1 = $dom_infos['address1'];
     $ad2 = $dom_infos['address2'];
