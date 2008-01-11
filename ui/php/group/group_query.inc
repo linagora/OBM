@@ -890,12 +890,17 @@ function check_group_update_rights($params, $g='') {
 //   - $group[]  : values checked
 //     keys used : name, desc, email
 ///////////////////////////////////////////////////////////////////////////////
-function check_group_data_form($group) {
+function check_group_data_form(&$group) {
   global $php_regexp_email_name, $php_regexp_email, $l_fill_name;
   global $l_group_exists, $l_email_exist;
   global $obm, $perm, $err, $action, $cright_write_admin;
   global $l_j_check_email, $l_system_no_priv, $l_err_system_samba;
   global $l_only_owner_priv, $l_err_public_rights, $l_err_private_email;
+
+
+  if(!check_user_defined_rules("group", $group)) {
+    return false;
+  }
 
   $id = $group['group_id'];
   $name = $group['name'];
@@ -907,6 +912,7 @@ function check_group_data_form($group) {
   $usercreate = $g['usercreate'];
   $system = $g['system'];
   $gsamba = $g['samba'];
+
 
   // MANDATORY: Group name not empty
   if (trim($name) == '') {

@@ -273,12 +273,11 @@ Obm.CalendarDayEvent = new Class({
   setDuration: function(duration) {
     this.event.duration = duration;
     startTime = new Date(this.event.time * 1000);
-    startTime.setHours(2);
+    startTime.setHours(0);
     startTime = startTime.getTime()/1000;
     endTime = new Date((this.event.time + this.event.duration)*1000);
-    endTime.setHours(3);
     endTime = endTime.getTime()/1000;
-    var dayDuration = Math.floor((endTime - startTime) / 86400) + 1;
+    var dayDuration = Math.ceil((endTime - startTime) / 86400);
     this.setSize(dayDuration);
   },
 
@@ -338,17 +337,19 @@ Obm.CalendarDayEvent = new Class({
   },
   
   drawExtensions: function() {
-    dayBegin = (new Date(this.event.time * 1000).getDay() + this.hidden - obm.vars.consts.weekStart + 7) % 7; 
-    dayEnd = (dayBegin + this.size + 6) % 7;
-    while(dayEnd < dayBegin || this.size > 7) {
-      var extensionSize = dayEnd + 1;
-      this.size -= extensionSize;
-      var extensionOrigin = this.origin + this.size * 86400;
-      dayEnd = 6;
-      if($(this.options.type+'-'+extensionOrigin)) {
-        this.extensions.push(new Obm.CalendarDayEventExtension(this,extensionSize, extensionOrigin));
-      } else {
-        this.length -= extensionSize;
+    if(this.size != 1) {
+      dayBegin = (new Date(this.event.time * 1000).getDay() + this.hidden - obm.vars.consts.weekStart + 7) % 7; 
+      dayEnd = (dayBegin + this.size + 6) % 7;
+      while(dayEnd < dayBegin || this.size > 7) {
+        var extensionSize = dayEnd + 1;
+        this.size -= extensionSize;
+        var extensionOrigin = this.origin + this.size * 86400;
+        dayEnd = 6;
+        if($(this.options.type+'-'+extensionOrigin)) {
+          this.extensions.push(new Obm.CalendarDayEventExtension(this,extensionSize, extensionOrigin));
+        } else {
+          this.length -= extensionSize;
+        }
       }
     }
   },

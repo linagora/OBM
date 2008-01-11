@@ -1,0 +1,68 @@
+<?php
+/*
+This file let you define 'custom' validation and replacement rules for 
+some modules insert/update action. This rules will be parsed *before* 
+obm standards rules. The standards rules will be parsed anyway, this
+feature let you add rules, not replace the standards ones.
+To activate this feature you must set the 'conf_check' to true in obm_conf.inc
+This file should be named after the module to check's name. For example to 
+define custom rules for the user module, create a file user.inc in this
+repository
+*/
+
+// This variable must be names 'rules'.
+
+$rules = array (
+  /* 
+  'fieldname' must be the name of the key of the field to check in
+  OBM params framework. To find the field key, you can activate param's debug
+  in obm configuration or take a look at the html source and remove the prefix
+  to the fieldname. For example : 'tf_lastname' field key will be 'lastname'
+  */
+  "fieldname" => array( 
+    /* 
+    Field max size, if this size is exceeded, obm will not throw an error,
+    but will truncate the field. To define a error on max size exceeded, go to
+    regexp section
+    */
+    "length" => 40,
+    /*
+    Set replacement regext. Replacement must be a associatve array, key is the
+    search pattern, it can be a regexp put it always be enclosed by /(key)+/g,
+    value is the replace string. The replacements will be execute one after the
+    other, so 'a' => 'b', 'b' => 'c' is the same as 'a|b' => 'c'.
+    */
+    "replacement" => array (
+      "'" => "-",
+      "\s" => "",
+      "_" => "."
+    ), 
+    /*
+    Callback function. It can be a php or an userdefined function, but it's
+    this is case sensitive. The function must accept only one (or zero) 
+    argument. 'callback' can be a string or an array of string.
+    */
+    "callback" => "strtoupper", // "callback" => array('strtoupper','trim');
+    /*
+    Error message, this can be a string or an array, if only one string is
+    defined, it will be the default error message, else the array must be
+    an associative array with the key being the message id and the value the
+    message content. The 'default' key will set the default error message.
+
+    */
+    "message" => "Error", // "message"=>array('default'=>'Error!','empty' => 'Empty!')
+    /*
+    Validation regexp, validation will be done after 'replacement', 'length'
+    and 'callback' application. If field value does not match this regexp, it will
+    throw an error. This can be an string or an array. If it's a string the error
+    message will be the default one, else it must be an associative array with the
+    key being the regexp id, and the value the regexp pattern. If an error is thrown
+    the message will be the one with the same id than the regexp (if doesn't exist,
+    the default on will be used). The regexp will be executed in the set order, if
+    one throw an error the second one will not be tested.
+    */
+    "regexp" => "/^[ a-z0-9A-Z\-]*$/"// 'regexp'=>array('empty'=>'/^.+$/','valid'=>'/^[a-z]*$/')
+  )
+);
+
+?>

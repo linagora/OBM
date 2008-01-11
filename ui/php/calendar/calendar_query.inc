@@ -438,39 +438,12 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
       array_push($resources_writable, $res_id);
     }
   }    
-  if ((count($resources_writable) > 0) && ($ccalendar_resource_admin != '')) {
-    $resources_address = array($ccalendar_resource_admin);
-    $message_resource = "\r\n\r\n$l_resource_allocated:";
-    $resource_q = run_query_get_resources_info($resources_writable);
-    while ($resource_q->next_record()) {
-      $message_resource .=  "\n  ".$resource_q->f('resource_name');
-    }
-  }
 
   // Insert My alert if set
   if (isset($calendar['alert'])) {
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
   }
 
-  if (count($recipient_array) > 0 || count($r_address) > 0) {
-    if ($ccalendar_send_ics) {
-      $tmp_filename = secure_tmpname('.ics','ics_');
-      create_calendar_ics_meeting_file($calendar, $event_id, $recipient_array, $resources_writable, $tmp_filename);
-      $h_file = array(
-        array (
-	       'filename' => "$tmp_filename",
-	       'name' => 'meeting.ics',
-	       'type' => 'ics'
-	       )
-        );
-    } else {
-      $h_file = '';
-    }
-    //send_mail($subject, $message, $recipient_array, $resources_address, $mail, $h_file);
-    if ($ccalendar_send_ics) {
-      unlink($tmp_filename);
-    }
-  }
 }
 
 
@@ -1972,16 +1945,7 @@ function run_query_calendar_delete($calendar) {
   while ($obm_q->next_record()) {
     array_push($resources, $obm_q->f('evententity_entity_id'));
   }
-  $resources_address = array();
-  if (count($resources) > 0 && ($ccalendar_resource_admin != '')) {
-    $resources_address = array($ccalendar_resource_admin);
-    $message_resource = "\r\n\r\n$l_resource_allocated:";
-    $resource_q = run_query_get_resources_info($resources);
-    while ($resource_q->next_record()) {
-      $message_resource .=  "\n  ".$resource_q->f('resource_name');
-    }
-  }
-
+  
   $query = "DELETE FROM CalendarException WHERE calendarexception_event_id = '$event_id'";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
   $obm_q->query($query);
@@ -2018,10 +1982,6 @@ function run_query_calendar_delete($calendar) {
     $retour = $obm_q->query($query);
   }
 
-  $message = $l_delete_event_mail_head.$title.$message_resource;   
-  $subject = "$l_delete_event_mail_subject" . $title;
-  $recipient_array = array_diff($users_array, array($obm['uid']));
-  //send_mail($subject, $message, $recipient_array, $resources_address, $mail);
 }
 
 

@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.1.3pre2';
+$obm_version = '2.1.3';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -175,6 +175,9 @@ $c_max_image_size = array('width' => '96',
 $c_nb_login_failed = 3;
 $c_login_interval = 60;
 $c_frozen_duration = 300;
+
+// Activate user defined check rules
+$conf_check = false;
 
 // Access restriction
 
@@ -1586,6 +1589,7 @@ function phpArrayToJsArray($var) {
 ////////////////////////////////////////////////////////////////////////////////
 function phpStringToJsString($var) {
   $jsString = str_replace("\n","\\n",addslashes($var));
+  $jsString = str_replace('"','&quot;',$jsString);
   $jsString = str_replace("\r","",$jsString);
   return $jsString;
 }

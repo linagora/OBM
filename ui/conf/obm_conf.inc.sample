@@ -23,6 +23,9 @@
 // Use specific langs (was $cgp_site_include)
 //$conf_lang = true;
 
+// Use specific check controls (see conf/check/module.inc)
+//$conf_check = true
+
 // Todo lines to display
 $cgp_todo_nb = 5;
 

@@ -837,48 +837,47 @@ function html_company_consult_address($co_q) {
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
-  $newline = "\\r\\n";
-  $copy = addslashes($name).$newline;
+  $newline = "\r\n";
+  $copy = $name.$newline;
   if (($ad1 != "") && (in_array("address1", $cclipboard_address))) {
-    $copy .= addslashes($ad1).$newline;
+    $copy .= $ad1.$newline;
   }
   if (($ad2 != "") && (in_array("address2", $cclipboard_address))) {
-    $copy .= addslashes($ad2).$newline;
+    $copy .= $ad2.$newline;
   }
   if (($ad3 != "") && (in_array("address3", $cclipboard_address))) {
-    $copy .= addslashes($ad3).$newline;
+    $copy .= $ad3.$newline;
   }
   if (($zip != "") && (in_array("zipcode", $cclipboard_address))) {
-    $copy .= addslashes($zip);
+    $copy .= $zip;
     $copy_zip = true;
   }
   if (($town != "") && (in_array("town", $cclipboard_address))) {
-    $copy .= ($copy_zip ? " " : "") . addslashes($town);
+    $copy .= ($copy_zip ? " " : "") . $town;
     $copy_town = true;
   }
   if ($copy_zip || $copy_town) {
     $copy .= $newline;
   }
   if (($cdx != "") && (in_array("expresspostal", $cclipboard_address))) {
-    $copy .= addslashes($cdx).$newline;
+    $copy .= $cdx.$newline;
   }
   if (($ctry_name != "") && (in_array("country", $cclipboard_address))) {
-    $copy .= addslashes($ctry_name).$newline;
+    $copy .= $ctry_name.$newline;
   }
   if (($phone != "") && (in_array("phone", $cclipboard_address))) {
-    $copy .= "$l_phone : " . addslashes($phone).$newline;
+    $copy .= "$l_phone : " . $phone.$newline;
   }
   if (($fax != "") && (in_array("fax", $cclipboard_address))) {
-    $copy .= "$l_fax : " . addslashes($fax).$newline;
+    $copy .= "$l_fax : " . $fax.$newline;
   }
   if (($email != "") && (in_array("email", $cclipboard_address))) {
-    $copy .= "$l_email : " . addslashes($email).$newline;
+    $copy .= "$l_email : " . $email.$newline;
   }
   if (($web != "") && (in_array("web", $cclipboard_address))) {
-    $copy .= "$l_web : " . addslashes($web).$newline;
+    $copy .= "$l_web : " . $web.$newline;
   }
-  $copy = "'$copy'"; 
-
+  $copy = "'".phpStringToJsString($copy)."'"; 
   // Address3 field
   if ($show_ad3) {
     $block_ad3 = "
