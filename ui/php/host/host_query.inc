@@ -141,8 +141,10 @@ function run_query_host_insert($host) {
   $list = $host['web_list'];
   $desc = $host['desc'];
   $now = date('Y-m-d H:i:s');
+
+  // Postitionnement du l'UID et le GID
   $host_uid = get_first_user_free_uid();
-  $host_gid = $cg_gid_smb_host;
+  $host_gid = $cg_gid_host;
 
   if (isset($host['domain']) && $obm['domain'] == 0) {
     $domain_id = $host['domain'];

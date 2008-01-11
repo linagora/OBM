@@ -486,9 +486,6 @@ sub _doWork {
             if( !$self->updateLdapEntity($ldapEntry) ) {
                 return 0;
             }
-        }else {
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: description BD de : ".$object->getEntityDescription()." incorrecte.", "W" );
-            return 0;
         }
 
     }elsif( !defined($ldapEntry) && !($object->getDelete() || $object->getArchive()) ) {

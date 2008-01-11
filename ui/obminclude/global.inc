@@ -283,18 +283,25 @@ if ($cgp_use['service']['mail'] == false) {
 }
 
 	   
-// UID : First User
+// User UID and GID
+// First UID for users
 $c_first_uid = 1001;
-// First GID for simple users - first GID for group creation
-$c_first_gid_user = 1001;
-// First GID for admin users - by default, simple and admin users have same
-$c_first_gid_admin = $c_first_gid_user;
 
-// OBM-Windows Samba Groups
+// GID for simple users without Samba
+$c_first_gid_user = 1001;
+// GID for admin users without Samba
+$c_first_gid_admin = $c_first_gid_user;
+// GID for admin users with Samba
 $cg_gid_smb_admin = 512;
+// GID for simple users with Samba
 $cg_gid_smb_user = 513;
+// GID for guest users with Samba
 $cg_gid_smb_guest = 514;
+
+
+// Host UID and GID
 $cg_gid_smb_host = 515;
+$cg_gid_host = 515;
 
 
 //-------------------------//

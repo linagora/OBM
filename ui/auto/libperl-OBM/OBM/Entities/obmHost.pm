@@ -145,7 +145,7 @@ sub getEntity {
     if( $OBM::Parameters::common::obmModules->{samba} && $dbEntry->{host_samba} ) {
         $self->{hostDesc}->{host_samba} = 1;
         $self->{hostDesc}->{host_login} = $dbEntry->{host_name}."\$";
-        $self->{hostDesc}->{host_samba_sid} = $domainDesc->{domain_samba_sid}."-".eval{return 2*$dbEntry->{host_uid}+1;};
+        $self->{hostDesc}->{host_samba_sid} = $domainDesc->{domain_samba_sid}."-".$dbEntry->{host_uid};
         $self->{hostDesc}->{host_samba_group_sid} = $domainDesc->{domain_samba_sid}."-".$dbEntry->{host_gid};
         $self->{hostDesc}->{host_samba_flags} = "[W]";
 

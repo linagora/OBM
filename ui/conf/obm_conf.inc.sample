@@ -175,12 +175,6 @@ $profiles['admin'] = array (
   'access_exeptions' => array()
 );
 
-//------------------//
-// Services enabled //
-//------------------//
-$cgp_use['service']['mail_nomad'] = true;
-$cgp_use['service']['mail_vacation'] = true;
-
 //-----------------//
 // Displayed Infos //
 //-----------------//
