@@ -15,7 +15,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($logLevel $facility_log $sieveSrv $singleNameSpace $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($logLevel $facility_log $sieveSrv $singleNameSpace $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_files = qw($automateMailChangeAlias $automateMailChangeSieve $automateCyrusAdmin $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixUpdate);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
@@ -122,6 +122,13 @@ if( lc($cfgFile->val( 'global', 'obm-web' )) eq "true" ) {
     $obmModules->{"web"} = 1;
 }else {
     $obmModules->{"web"} = 0;
+}
+
+# supporte-t-on le renommage de BAL utilisateur
+if( lc($cfgFile->val( 'global', 'renameUserMailbox' )) eq "true" ) {
+    $renameUserMailbox = 1;
+}else {
+    $renameUserMailbox = 0;
 }
 
 # Le repertoire pere des repertoires personnels

@@ -13,6 +13,7 @@ require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::toolBox;
 require OBM::dbUtils;
+require OBM::Samba::utils;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
@@ -159,7 +160,7 @@ sub getEntity {
     # Les données Samba
     if( $OBM::Parameters::common::obmModules->{samba} && $dbGroupDesc->{group_samba} ) {
         $self->{groupDesc}->{group_samba} = 1;
-        $self->{groupDesc}->{group_samba_sid} = $domainDesc->{domain_samba_sid}."-".$dbGroupDesc->{group_gid};
+        $self->{groupDesc}->{group_samba_sid} = &OBM::Samba::utils::getGroupSID( $domainDesc->{domain_samba_sid}, $dbGroupDesc->{group_gid} );
 
         $self->{groupDesc}->{group_samba_type} = 2;
 
@@ -348,7 +349,7 @@ sub _getGroupUsersSid {
     my $uidList = $self->_getGroupUsers( $dbHandler, $domainDesc, "userobm_uid", "AND i.userobm_samba_perms=1" );
 
     for( my $i=0; $i<=$#$uidList; $i++ ) {
-        $uidList->[$i] = $domainDesc->{domain_samba_sid}."-".eval{return 2*$uidList->[$i];};
+        $uidList->[$i] = $domainDesc->{domain_samba_sid}."-".$uidList->[$i];
     }
 
     return $uidList;
@@ -519,11 +520,26 @@ sub createLdapEntry {
     }
 
     # La liste des utilisateurs Samba
-    if( $entryLinks->{group_samba_users} ) {
+    if( $self->isLinks() && $#{$entryLinks->{group_samba_users}} != -1 ) {
         $ldapEntry->add( sambaSIDList => $entryLinks->{group_samba_users} );
     }
 
     return 1;
+}
+
+
+sub updateLdapEntryDn {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
+
+    return $update;
 }
 
 
@@ -534,6 +550,11 @@ sub updateLdapEntry {
     my $dbEntry = $self->{groupDbDesc};
     my $entryProp = $self->{groupDesc};
     my $entryLinks = $self->{groupLinks};
+
+    
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
 
 
     # Vérification des objectclass
@@ -591,16 +612,6 @@ sub updateLdapEntry {
         $update = 1;
     }
 
-    # Les membres du groupe
-    if( &OBM::Ldap::utils::modifyAttrList( $entryLinks->{group_users}, $ldapEntry, "memberUid" ) ) {
-        $update = 1;
-    }
-
-    # Le cas des contacts
-    if( &OBM::Ldap::utils::modifyAttrList( $entryLinks->{group_contacts}, $ldapEntry, "mailBox" ) ) {
-        $update = 1;
-    }
-
     # Le SID Samba
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{group_samba_sid}, $ldapEntry, "sambaSID" ) ) {
         $update = 1;
@@ -613,6 +624,38 @@ sub updateLdapEntry {
 
     # Le nom Samba affichable du groupe
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{group_samba_name}, $ldapEntry, "displayName" ) ) {
+        $update = 1;
+    }
+
+
+    if( $self->isLinks() ) {
+        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+    }
+
+
+    return $update;
+}
+
+
+sub updateLdapEntryLinks {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+    my $entryLinks = $self->{groupLinks};
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
+
+    # Les membres du groupe
+    if( &OBM::Ldap::utils::modifyAttrList( $entryLinks->{group_users}, $ldapEntry, "memberUid" ) ) {
+        $update = 1;
+    }
+
+    # Le cas des contacts
+    if( &OBM::Ldap::utils::modifyAttrList( $entryLinks->{group_contacts}, $ldapEntry, "mailBox" ) ) {
         $update = 1;
     }
 

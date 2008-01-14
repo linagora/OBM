@@ -136,11 +136,32 @@ sub createLdapEntry {
 }
 
 
+sub updateLdapEntryDn {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
+
+    return $update;
+}
+
+
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"domainDesc"};
     my $update = 0;
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
 
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"domain_label"}, $ldapEntry, "o" ) ) {
         $update = 1;
@@ -149,6 +170,21 @@ sub updateLdapEntry {
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"domain_desc"}, $ldapEntry, "description" ) ) {
         $update = 1;
     }
+
+    return $update;
+}
+
+
+sub updateLdapEntryLinks {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
 
     return $update;
 }

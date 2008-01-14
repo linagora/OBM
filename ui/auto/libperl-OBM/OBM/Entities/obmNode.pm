@@ -98,6 +98,13 @@ sub getArchive {
 }
 
 
+sub isLinks {
+    my $self = shift;
+
+    return $self->{links};
+}
+
+
 sub getLdapObjectclass {
     my $self = shift;
 
@@ -142,15 +149,57 @@ sub createLdapEntry {
 }
 
 
+sub updateLdapEntryDn {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
+
+    return $update;
+}
+
+
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"nodeDesc"};
     my $update = 0;
 
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
+
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"description"}, $ldapEntry, "description" ) ) {
         $update = 1;
     }
+
+
+    if( $self->isLinks() ) {
+        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+    }
+
+
+    return $update;
+}
+
+
+sub updateLdapEntryLinks {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
 
     return $update;
 }

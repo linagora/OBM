@@ -28,10 +28,9 @@ sub new {
         userLogin => undef,
         userId => undef,
         userObject => undef,
-        domainLabel => undef,
         domainId => undef,
         domainList => undef,
-        engine => undef,
+        engine => undef
     );
 
     if( !defined($dbHandler) || !defined($parameters) ) {
@@ -56,7 +55,7 @@ sub new {
 
 
     # Obtention du userId BD
-    $updatePasswdAttr{userId} = $self->_getUserIdFromUserLoginDomain( $updatePasswdAttr{dbHandler}, $updatePasswdAttr{userLogin}, $updatePasswdAttr{domainId} );
+    $updatePasswdAttr{userId} = &OBM::Update::utils::getUserIdFromUserLoginDomain( $updatePasswdAttr{dbHandler}, $updatePasswdAttr{userLogin}, $updatePasswdAttr{domainId} );
     if( !defined($updatePasswdAttr{userId}) ) {
         &OBM::toolBox::write_log( "[Update::updatePassword]: utilisateur '".$updatePasswdAttr{userLogin}."' inconnu", "W" );
         return undef;
@@ -71,15 +70,29 @@ sub new {
 
     # Initialisation du moteur LDAP
     $updatePasswdAttr{engine}->{ldapEngine} = OBM::Ldap::ldapEngine->new( $updatePasswdAttr{domainList} );
-    if( !$updatePasswdAttr{"engine"}->{"ldapEngine"}->init( 0 ) ) {
+    if( !defined($updatePasswdAttr{engine}->{ldapEngine}) ) {
+        &OBM::toolBox::write_log( "[Update::updatePassword]: probleme a l'initialisation du moteur LDAP.", "W" );
         return undef;
     }
 
-    # Création de l'objet de l'utilisateur
-    $updatePasswdAttr{userObject} = OBM::Entities::obmUser->new( 0, 0, $updatePasswdAttr{userId} );
-    if( !$updatePasswdAttr{userObject}->getEntity( $updatePasswdAttr{dbHandler}, &OBM::Update::utils::findDomainbyId( $updatePasswdAttr{domainList}, $updatePasswdAttr{domainId} ) ) ) {
+    if( !$updatePasswdAttr{"engine"}->{"ldapEngine"}->init( 0 ) ) {
+        &OBM::toolBox::write_log( "[Update::updatePassword]: probleme a l'initialisation du moteur LDAP.", "W" );
         return undef;
     }
+
+
+    # Création de l'objet de l'utilisateur
+    $updatePasswdAttr{userObject} = OBM::Entities::obmUser->new( 0, 0, $updatePasswdAttr{userId} );
+    if( !defined($updatePasswdAttr{userObject}) ) {
+        &OBM::toolBox::write_log( "[Update::updatePassword]: erreur a la mise a jour de l'utilisateur.", "W" );
+        return undef;
+    }
+
+    if( !$updatePasswdAttr{userObject}->getEntity( $updatePasswdAttr{dbHandler}, &OBM::Update::utils::findDomainbyId( $updatePasswdAttr{domainList}, $updatePasswdAttr{domainId} ) ) ) {
+        &OBM::toolBox::write_log( "[Update::updatePassword]: erreur a la mise a jour de l'utilisateur.", "W" );
+        return undef;
+    }
+
 
     bless( \%updatePasswdAttr, $self );
 }
@@ -108,33 +121,6 @@ sub update {
     }
 
     return 1;
-}
-
-
-sub _getUserIdFromUserLoginDomain {
-    my $self = shift;
-    my( $dbHandler, $userLogin, $domainId ) = @_;
-
-    if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "[Update::updatePassword]: connection à la base de donnees incorrecte !", "W" );
-        return undef;
-    }
-
-    my $query = "SELECT userobm_id FROM UserObm WHERE userobm_login=".$dbHandler->quote($userLogin)." AND userobm_domain_id=".$domainId;
-    my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::updatePassword]: probleme lors de l'execution de la requete.", "W" );
-        if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( "[Update::updatePassword]: ".$queryResult->err, "W" );
-        }
-
-        return undef;
-    }
-
-    my( $userId ) = $queryResult->fetchrow_array();
-    $queryResult->finish();
-
-    return $userId;
 }
 
 

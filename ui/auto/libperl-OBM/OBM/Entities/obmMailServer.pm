@@ -258,11 +258,30 @@ sub createLdapEntry {
 }
 
 
+sub updateLdapEntryDn {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
+    return $update;
+}
+
+
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"postfixConf"};
     my $update = 0;
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
 
     # Les domaines de messagerie
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_mail_domains"}, $ldapEntry, "myDestination" ) ) {
@@ -283,6 +302,27 @@ sub updateLdapEntry {
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_smtpin_srv"}, $ldapEntry, "smtpInHost" ) ) {
         $update = 1;
     }
+
+
+    if( $self->isLinks() ) {
+        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+    }
+
+
+    return $update;
+}
+
+
+sub updateLdapEntryLinks {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
 
     return $update;
 }

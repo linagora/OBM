@@ -247,7 +247,7 @@ sub _doWork {
 
     }elsif( $isExist && !$object->getDelete() ) {  
         # On met à jour
-        if( $self->_updateBox( $cyrusSrv, $object ) ) {
+        if( $self->_updateMailbox( $cyrusSrv, $object ) ) {
             &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: MAJ de la boite '".$object->getMailboxName()."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
         }else {
             &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec lors de la MAJ de la boite", "W" );
@@ -661,7 +661,7 @@ sub _createMailbox {
     }
 
     # On met a jour la boîte
-    if( !$self->_updateBox( $cyrusSrv, $object ) ) {
+    if( !$self->_updateMailbox( $cyrusSrv, $object ) ) {
         return 0;
     }
 
@@ -669,7 +669,7 @@ sub _createMailbox {
 }
 
 
-sub _updateBox {
+sub _updateMailbox {
     my $self = shift;
     my( $cyrusSrv, $object ) = @_;
 
@@ -690,7 +690,7 @@ sub _updateBox {
         return 0;
     }
 
-    # Uniquement en mode non incrémental
+    # Uniquement si les liens de l'entité sont à mettre à jour
     if( $object->isLinks() ) {
         # Positionnement des ACL
         if( !$self->_imapSetMailboxAcls( $cyrusSrv, $object ) ) {

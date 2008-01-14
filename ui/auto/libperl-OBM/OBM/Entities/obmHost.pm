@@ -145,8 +145,8 @@ sub getEntity {
     if( $OBM::Parameters::common::obmModules->{samba} && $dbEntry->{host_samba} ) {
         $self->{hostDesc}->{host_samba} = 1;
         $self->{hostDesc}->{host_login} = $dbEntry->{host_name}."\$";
-        $self->{hostDesc}->{host_samba_sid} = $domainDesc->{domain_samba_sid}."-".$dbEntry->{host_uid};
-        $self->{hostDesc}->{host_samba_group_sid} = $domainDesc->{domain_samba_sid}."-".$dbEntry->{host_gid};
+        $self->{hostDesc}->{host_samba_sid} = &OBM::Samba::utils::getUserSID( $domainDesc->{domain_samba_sid}, $dbEntry->{host_uid} );
+        $self->{hostDesc}->{host_samba_group_sid} = &OBM::Samba::utils::getGroupSID( $domainDesc->{domain_samba_sid}, $dbEntry->{host_gid} );
         $self->{hostDesc}->{host_samba_flags} = "[W]";
 
         if( &OBM::passwd::getNTLMPasswd( $dbEntry->{host_name}, \$self->{hostDesc}->{"host_lm_passwd"}, \$self->{hostDesc}->{"host_nt_passwd"} ) ) {
@@ -387,6 +387,21 @@ sub createLdapEntry {
 }
 
 
+sub updateLdapEntryDn {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
+
+    return $update;
+}
+
+
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
@@ -394,6 +409,12 @@ sub updateLdapEntry {
     my $dbEntry = $self->{hostDbDesc};
     my $entryProp = $self->{hostDesc};
     my $entryLinks = $self->{hostLinks};
+
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
 
     # Vérification des objectclass
     my @deletedObjectclass;
@@ -436,6 +457,19 @@ sub updateLdapEntry {
         $update = 1;
     }
 
+    if( defined($entryProp->{host_samba_sid}) ) {
+        my @currentLdapHostSambaSid = $ldapEntry->get_value( "sambaSID", asref => 1 );
+        if( $#currentLdapHostSambaSid < 0 ) {
+            # Si le SID de l'hôte n'est pas actuellement dans LDAP mais est dans
+            # la description de l'hôte, c'est qu'on vient de ré-activer le droit
+            # samba de l'hôte. Il faut donc placer les mots de passes.
+            if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_lm_passwd}, $ldapEntry, "sambaLMPassword" ) ) {
+                &OBM::Ldap::utils::modifyAttr( $entryProp->{host_nt_passwd}, $ldapEntry, "sambaNTPassword" );
+                $update = 1;
+            }
+        }
+    }
+
     # Le SID de l'hôte
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_samba_sid}, $ldapEntry, "sambaSID" ) ) {
         $update = 1;
@@ -449,6 +483,26 @@ sub updateLdapEntry {
     # Les flags de l'hôte Samba
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_samba_flags}, $ldapEntry, "sambaAcctFlags" ) ) {
         $update = 1;
+    }
+
+
+    if( $self->isLinks() ) {
+        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+    }
+
+
+    return $update;
+}
+
+
+sub updateLdapEntryLinks {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+    my $entryLinks = $self->{hostLinks};
+
+    if( !defined($ldapEntry) ) {
+        return 0;
     }
 
     return $update;

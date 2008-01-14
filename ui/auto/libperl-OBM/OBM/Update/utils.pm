@@ -207,4 +207,27 @@ sub findDomainbyId {
 }
 
 
+sub getUserIdFromUserLoginDomain {
+    my( $dbHandler, $userLogin, $domainId ) = @_;
 
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( "[Update::updatePassword]: connection à la base de donnees incorrecte !", "W" );
+        return undef;
+    }
+
+    my $query = "SELECT userobm_id FROM UserObm WHERE userobm_login=".$dbHandler->quote($userLogin)." AND userobm_domain_id=".$domainId;
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::updatePassword]: probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            &OBM::toolBox::write_log( "[Update::updatePassword]: ".$queryResult->err, "W" );
+        }
+
+        return undef;
+    }
+
+    my( $userId ) = $queryResult->fetchrow_array();
+    $queryResult->finish();
+
+    return $userId;
+}

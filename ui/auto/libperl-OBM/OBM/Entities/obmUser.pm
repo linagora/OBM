@@ -14,6 +14,7 @@ require OBM::Ldap::utils;
 require OBM::passwd;
 require OBM::toolBox;
 require OBM::dbUtils;
+require OBM::Samba::utils;
 use URI::Escape;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
@@ -37,7 +38,8 @@ sub new {
         userLinks => undef,         # Les relations avec d'autres entités
         objectclass => undef,
         dnPrefix => undef,
-        dnValue => undef
+        newDnValue => undef,
+        currentDnValue => undef
     );
 
 
@@ -64,7 +66,8 @@ sub new {
     # Définition de la représentation LDAP de ce type
     $obmUserAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmUserAttr{"type"}}->{objectclass};
     $obmUserAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmUserAttr{"type"}}->{dn_prefix};
-    $obmUserAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmUserAttr{"type"}}->{dn_value};
+    $obmUserAttr{newDnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmUserAttr{"type"}}->{dn_value};
+    $obmUserAttr{currentDnValue} = "current_".$OBM::Parameters::ldapConf::attributeDef->{$obmUserAttr{"type"}}->{dn_value};
 
     bless( \%obmUserAttr, $self );
 }
@@ -141,22 +144,33 @@ sub getEntity {
     $self->{"userDbDesc"} = $dbUserDesc;
 
 
-    # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT * FROM ".$mailServerTable." i, ".$userObmTable." j WHERE j.userobm_mail_server_id=i.mailserver_id AND j.userobm_id=".$userId;
+    # La requête à executer - obtention des informations sur l'utilisateur
+    if( $self->getDelete() ) {
+        $query = "SELECT i.mailserver_host_id
+                    FROM ".$userObmTable." j
+                    LEFT JOIN ".$mailServerTable." i ON j.userobm_mail_server_id=i.mailserver_id
+                    WHERE j.userobm_id=".$userId;
+    }else {
+        $query = "SELECT i.mailserver_host_id, k.userobm_login as current_userobm_login
+                    FROM ".$userObmTable." j
+                    LEFT JOIN ".$mailServerTable." i ON j.userobm_mail_server_id=i.mailserver_id
+                    LEFT JOIN P_".$userObmTable." k ON k.userobm_id=j.userobm_id
+                    WHERE j.userobm_id=".$userId;
+    }
 
-    # On execute la requete
+    # On exécute la requête
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
-    my $dbMailServerDesc = $queryResult->fetchrow_hashref();
+    my $dbUserMoreDesc = $queryResult->fetchrow_hashref();
     $queryResult->finish();
 
     # Positionnement du flag archive
     $self->{archive} = $dbUserDesc->{userobm_archive};
 
-    # Action effectuee
+    # Action effectuée
     if( $self->getDelete() ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: chargement de l'utilisateur supprime  : ".$self->getEntityDescription(), "W" );
         
@@ -169,8 +183,14 @@ sub getEntity {
     }
 
         
-    # On range les resultats dans la structure de donnees des resultats
+    # On range les résultats dans la structure de données des résultats
     $self->{userDesc}->{userobm_domain} = $domainDesc->{domain_label};
+
+    if( !defined($dbUserMoreDesc->{current_userobm_login}) ) {
+        $self->{userDesc}->{current_userobm_login} = $dbUserDesc->{userobm_login};
+    }else {
+        $self->{userDesc}->{current_userobm_login} = $dbUserMoreDesc->{current_userobm_login};
+    }
 
     $self->{userDesc}->{userobm_crypt_passwd} = &OBM::passwd::convertPasswd( $dbUserDesc->{userobm_password_type}, $dbUserDesc->{userobm_password} );
 
@@ -224,11 +244,11 @@ sub getEntity {
     # Gestion du droit de messagerie de l'utilisateur
     $self->{userDesc}->{userobm_mail_perms} = $dbUserDesc->{userobm_mail_perms};
     if( $dbUserDesc->{userobm_domain_id} == 0 ) {
-        &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur : ".$self->getEntityDescription()." annule - Pas de droit mail dans le domaine 'metadomain'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur : ".$self->getEntityDescription()." - annule, pas de droit mail dans le domaine 'metadomain'", "W" );
         $self->{userDesc}->{userobm_mail_perms} = 0;
 
     }elsif( !$dbUserDesc->{userobm_email} ) {
-        &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur : ".$self->getEntityDescription()." annule - Pas d'adresse mail indiquée !", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur : ".$self->getEntityDescription()." - annule, pas d'adresse mail indiquee !", "W" );
         $self->{userDesc}->{userobm_mail_perms} = 0;
 
     }else {
@@ -244,10 +264,11 @@ sub getEntity {
 
     # Gestion du droit de messagerie
     if( $self->{userDesc}->{userobm_mail_perms} ) {
-        my $localServerIp = $self->getHostIpById( $dbHandler, $dbMailServerDesc->{mailserver_host_id} );
+        my $localServerIp = $self->getHostIpById( $dbHandler, $dbUserMoreDesc->{mailserver_host_id} );
 
         if( !defined($localServerIp) ) {
-            &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur '".$dbUserDesc->{userobm_login}."', domaine '".$domainDesc->{domain_label}."' annule - Serveur inconnu !", "W" );
+            &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de
+            l'utilisateur '".$dbUserDesc->{userobm_login}."', domaine '".$domainDesc->{domain_label}."' - annule, serveur inconnu !", "W" );
 
             # On invalide le droit mail
             $self->{userDesc}->{userobm_mail_perms} = 0;
@@ -278,7 +299,7 @@ sub getEntity {
             }
 
             # Gestion du serveur de mail
-            $self->{userDesc}->{userobm_mailbox_server} = $dbMailServerDesc->{mailserver_host_id};
+            $self->{userDesc}->{userobm_mailbox_server} = $dbUserMoreDesc->{mailserver_host_id};
 
             # Gestion du quota
             $self->{userDesc}->{userobm_mailbox_quota} = $dbUserDesc->{userobm_mail_quota}*1000;
@@ -313,8 +334,8 @@ sub getEntity {
             $self->{userDesc}->{userobm_uid} = 0;
         }
  
-        $self->{userDesc}->{userobm_samba_sid} = $domainDesc->{domain_samba_sid}."-".$dbUserDesc->{userobm_uid};
-        $self->{userDesc}->{userobm_samba_group_sid} = $domainDesc->{domain_samba_sid}."-".$dbUserDesc->{userobm_gid};
+        $self->{userDesc}->{userobm_samba_sid} = &OBM::Samba::utils::getUserSID( $domainDesc->{domain_samba_sid}, $dbUserDesc->{userobm_uid} );
+        $self->{userDesc}->{userobm_samba_group_sid} = &OBM::Samba::utils::getGroupSID( $domainDesc->{domain_samba_sid}, $dbUserDesc->{userobm_gid} );
         $self->{userDesc}->{userobm_samba_flags} = "[U]";
 
         # Le script de session
@@ -574,10 +595,19 @@ sub _getEntityMailboxAcl {
 
 sub getLdapDnPrefix {
     my $self = shift;
+    my( $getNewDn ) = @_;
     my $dnPrefix = undef;
+    my $dbEntry = $self->{"userDbDesc"};
+    my $entryProp = $self->{userDesc};
 
-    if( defined($self->{"dnPrefix"}) && defined($self->{userDbDesc}->{$self->{dnValue}}) ) {
-        $dnPrefix = $self->{"dnPrefix"}."=".$self->{"userDbDesc"}->{$self->{"dnValue"}};
+    if( $getNewDn ) {
+        if( defined($self->{"dnPrefix"}) && defined($dbEntry->{$self->{newDnValue}}) ) {
+            $dnPrefix = $self->{"dnPrefix"}."=".$dbEntry->{$self->{newDnValue}};
+        }
+    }else {
+        if( defined($self->{"dnPrefix"}) && defined($entryProp->{$self->{currentDnValue}}) ) {
+            $dnPrefix = $self->{"dnPrefix"}."=".$entryProp->{$self->{currentDnValue}};
+        }
     }
 
     return $dnPrefix;
@@ -623,7 +653,7 @@ sub createLdapEntry {
 
 
     # Les paramètres nécessaires
-    if( $dbEntry->{userobm_login} && $entryProp->{userobm_uid} && $dbEntry->{userobm_gid} && $entryProp->{userobm_shell} ) {
+    if( $dbEntry->{userobm_login} && defined($entryProp->{userobm_uid}) && defined($dbEntry->{userobm_gid}) && $entryProp->{userobm_shell} ) {
 
         $ldapEntry->add(
             objectClass => $self->getLdapObjectclass(),
@@ -795,6 +825,31 @@ sub createLdapEntry {
 }
 
 
+sub updateLdapEntryDn {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $dbEntry = $self->{userDbDesc};
+    my $update = 0;
+
+    if( !$OBM::Parameters::common::renameUserMailbox ) {
+        return 0;
+    }
+
+    if( !defined($ldapEntry) ) {
+        return 0;
+    }
+
+    # L'UID
+    if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{"userobm_login"}, $ldapEntry, "uid" ) ) {
+        # Si cet attribut est modifié, son DN doit aussi être mis à jour
+        $ldapEntry->add( newrdn => to_utf8( { -string => $self->getLdapDnPrefix( 1 ), -charset => $defaultCharSet } ) );
+        $update = 1;
+    }
+
+    return $update;
+ }
+
+
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
@@ -804,7 +859,7 @@ sub updateLdapEntry {
     my $entryLinks = $self->{userLinks};
     
     
-    # Vérification des objectclass
+   # Vérification des objectclass
     my @deletedObjectclass;
     my $currentObjectclass = $self->getLdapObjectclass( $ldapEntry->get_value("objectClass", asref => 1), \@deletedObjectclass);
     if( &OBM::Ldap::utils::modifyAttrList( $currentObjectclass, $ldapEntry, "objectClass" ) ) {
@@ -824,12 +879,12 @@ sub updateLdapEntry {
         }
     }
 
-    # L'UID
+    # L'UID number
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{"userobm_uid"}, $ldapEntry, "uidNumber" ) ) {
         $update = 1;
     }
     
-    # Le GID
+    # Le GID number
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{"userobm_gid"}, $ldapEntry, "gidNumber" ) ) {
         $update = 1;
     }
@@ -953,10 +1008,10 @@ sub updateLdapEntry {
 
     if( defined($entryProp->{userobm_samba_sid}) ) {
         my @currentLdapUserSambaSid = $ldapEntry->get_value( "sambaSID", asref => 1 );
-        if( ($#currentLdapUserSambaSid < 0) ) {
+        if( $#currentLdapUserSambaSid < 0 ) {
             # Si le SID de l'utilisateur n'est pas actuellement dans LDAP mais est dans
             # la description de l'utilisateur, c'est qu'on vient de ré-activer le droit
-            # samba de l'utilisateur. Il faut donc placer les mots de passes
+            # samba de l'utilisateur. Il faut donc placer les mots de passes.
             if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_lm_password}, $ldapEntry, "sambaLMPassword" ) ) {
                 &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_nt_password}, $ldapEntry, "sambaNTPassword" );
                 $update = 1;
@@ -996,6 +1051,25 @@ sub updateLdapEntry {
     }
 
 
+    if( $self->isLinks() ) {
+        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+    }
+
+
+    return $update;
+}
+
+
+sub updateLdapEntryLinks {
+    my $self = shift;
+    my( $ldapEntry ) = @_;
+    my $update = 0;
+    my $entryLinks = $self->{userLinks};
+
+    if( !defined($ldapEntry) ) {
+        return $update;
+    }
+    
     return $update;
 }
 

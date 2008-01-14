@@ -43,6 +43,10 @@ obm-web = true
 ; Multi-domain disabled by default
 singleNameSpace = false
 
+; renameUserMailbox mode allow to rename user mailbox
+; need Cyrus 2.3 or greater
+renameUserMailbox = false
+
 
 [automate]
 ; Automate specific parameters
@@ -61,5 +65,11 @@ ldapRoot = local
 ; if cyrusPartition is enable, a dedicated Cyrus partition is created for each OBM domain
 ; Going cyrusPartition enabled from cyrusPartition disabled needs system work
 cyrusPartition = false
+
+; oldSidMapping mode is for compatibility with Aliamin and old install
+; Modifying this on a running system need Samba domain work (re-register host,
+; ACL...) 
+; For new one, leave this to 'false'
+oldSidMapping = false
 
 ; EOF

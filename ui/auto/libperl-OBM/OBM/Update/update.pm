@@ -102,13 +102,13 @@ sub new {
         delete( $updateAttr{"engine"}->{"ldapEngine"} );
     }
 
-    # Parametrage des serveurs IMAP par domaine
+    # Paramétrage des serveurs IMAP par domaine
     &OBM::Update::utils::getCyrusServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
     if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} ) ) {
         return undef;
     }
 
-    # Parametrage des serveurs SMTP-in par domaine
+    # Paramétrage des serveurs SMTP-in par domaine
     &OBM::Update::utils::getSmtpInServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
 
     # Initialisation du moteur Cyrus
@@ -547,8 +547,10 @@ sub _incrementalUpdate {
         SWITCH: {
             if( lc($updatedTable) eq "userobm" ) {
                 if( $numRows ) {
+                    # Mise à jour de l'entité avec ses liaisons
                     $object = $self->_doUser( 1, 0, $updatedEntityId );
                 }else {
+                    # Mise à jour de l'entité sans ses liaisons
                     $object = $self->_doUser( 0, 0, $updatedEntityId );
                 }
                 last SWITCH;
@@ -556,8 +558,10 @@ sub _incrementalUpdate {
 
             if( lc($updatedTable) eq "ugroup" ) {
                 if( $numRows ) {
+                    # Mise à jour de l'entité avec ses liaisons
                     $object = $self->_doGroup( 1, 0, $updatedEntityId );
                 }else {
+                    # Mise à jour de l'entité sans ses liaisons
                     $object = $self->_doGroup( 0, 0, $updatedEntityId );
                 }
                 last SWITCH;
@@ -565,8 +569,10 @@ sub _incrementalUpdate {
 
             if( lc($updatedTable) eq "mailshare" ) {
                 if( $numRows ) {
+                    # Mise à jour de l'entité avec ses liaisons
                     $object = $self->_doMailShare( 1, 0, $updatedEntityId );
                 }else {
+                    # Mise à jour de l'entité sans ses liaisons
                     $object = $self->_doMailShare( 0, 0, $updatedEntityId );
                 }
                 last SWITCH;
@@ -574,8 +580,10 @@ sub _incrementalUpdate {
 
             if( lc($updatedTable) eq "host" ) {
                 if( $numRows ) {
+                    # Mise à jour de l'entité avec ses liaisons
                     $object = $self->_doHost( 1, 0, $updatedEntityId );
                 }else {
+                    # Mise à jour de l'entité sans ses liaisons
                     $object = $self->_doHost( 0, 0, $updatedEntityId );
                 }
                 last SWITCH;
@@ -1062,6 +1070,7 @@ sub _runEngines {
     }
 
     if( !$return ) {
+        # On ré-initialise le compteur interne de la table de hachage
         keys(%{$engines});
     }
 

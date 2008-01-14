@@ -358,13 +358,13 @@ sub update {
     # Récupération du nom de la boîte à traiter
     my $mailBoxName = $object->getMailboxName();
     if( !defined($mailBoxName) ) {
-        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de support SIEVE pour l'objet de type '".$object->{"type"}."'", 'W' );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de support SIEVE pour l'objet : ".$object->getEntityDescription(), 'W' );
         return 1;
     }
 
     # Si l'objet est marqué à effacer, on ne fait rien
     if( $object->getDelete() ) {
-        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: suppression de l'objet de type '".$object->{"type"}."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: suppression de l'objet : ".$object->getEntityDescription(), "W" );
         return 1;
     }
 
@@ -389,7 +389,7 @@ sub update {
 
     # Traitement
     if( !$self->_doWork( $sieveSrv, $object ) ) {
-        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: probleme de traitement de l'objet de type '".$object->{"type"}."' - Operation annulee !", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: probleme de traitement de l'objet : ".$object->getEntityDescription()."' - Operation annulee !", "W" );
 
         # On se deconnecte de serveur SIEVE
         $self->_disconnectSrvSieve($sieveSrv);
@@ -404,5 +404,3 @@ sub update {
 
     return 1;
 }
-
-
