@@ -1,10 +1,15 @@
 #!/usr/bin/perl -w
 #####################################################################
-# OBM               - File : changePasswd.pl                    #
+# OBM               - File : changePasswd.pl                        #
 #                   - Desc : Script permettant de modifier le mot   #
 #                   de passe de l'utilisateur dont le login est     #
 #                   passe en paramètre                              #
-#--------------------------------------------------------------------
+#####################################################################
+# Retour :                                                          #
+#    - 0 : tout c'est bien passé                                    #
+#    - 1 : erreur à l'analyse des paramètres du script              #
+#    - 2 : erruer à l'ouverture de la BD                            #
+#####################################################################
 
 use strict;
 require OBM::toolBox;
@@ -216,6 +221,7 @@ getParameter( \%parameters );
 
 # On se connecte a la base
 my $dbHandler;
+&OBM::toolBox::write_log( "Connexion a la base de donnees OBM", "W" );
 if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
     if( defined($dbHandler) ) {
         &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
@@ -223,12 +229,15 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
         &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : erreur inconnue", "WC" );
     }
 
-    exit 1;
+    exit 2;
 }
 
 
 my $updatePasswd = OBM::Update::updatePassword->new( $dbHandler, \%parameters );
-my $errorCode = $updatePasswd->update();
+my $errorCode = 0;
+if( defined($updatePasswd) ) {
+    $errorCode = $updatePasswd->update();
+}
 
 
 # On referme la connexion à la base
