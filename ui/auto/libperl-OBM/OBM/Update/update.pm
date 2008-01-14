@@ -200,6 +200,7 @@ sub _doGlobalUpdate {
     # MAJ des informations de domaine
     $globalReturn = $self->_updateDbDomain();
 
+
     # Uniquement pour le metadomaine
     if( $self->{"domain"} == 0 ) {
         # Traitement des entités de type 'utilisateur système'
@@ -219,29 +220,6 @@ sub _doGlobalUpdate {
                 $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
             }
         }
-    }
-
-    # Pour tous les domaines, sauf le metadomaine
-    if( $self->{"domain"} != 0 ) {
-        # Mise a jour des partitions Cyrus
-        my $updateMailSrv = OBM::Cyrus::cyrusRemoteEngine->new( $self->{"domainList"} );
-        if( $updateMailSrv->init() ) {
-            $globalReturn = $globalReturn && $updateMailSrv->update( "add" );
-        }
-        $updateMailSrv->destroy();
-
-        # Si tout c'est bien passé, il faut rétablir les connexions à Cyrus
-        if( $globalReturn  && defined($self->{"engine"}->{"cyrusEngine"}) ) {
-            if( !$self->{"engine"}->{"cyrusEngine"}->init() ) {
-                delete( $self->{"engine"}->{"cyrusEngine"} );
-            }
-        }
-    }
-
-    # Si on a déjà rencontré une erreur, on s'arrête
-    if( !$globalReturn ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de la mise a jour des partitions Cyrus du domaine '".$self->{"domain"}."' - Operation annulee !", "W" );
-        return $globalReturn;
     }
 
 
@@ -283,6 +261,30 @@ sub _doGlobalUpdate {
             # travail
             $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
         }
+    }
+
+
+    # Pour tous les domaines, sauf le metadomaine
+    if( $self->{"domain"} != 0 ) {
+        # Mise a jour des partitions Cyrus
+        my $updateMailSrv = OBM::Cyrus::cyrusRemoteEngine->new( $self->{"domainList"} );
+        if( $updateMailSrv->init() ) {
+            $globalReturn = $globalReturn && $updateMailSrv->update( "add" );
+        }
+        $updateMailSrv->destroy();
+
+        # Si tout c'est bien passé, il faut rétablir les connexions à Cyrus
+        if( $globalReturn  && defined($self->{"engine"}->{"cyrusEngine"}) ) {
+            if( !$self->{"engine"}->{"cyrusEngine"}->init() ) {
+                delete( $self->{"engine"}->{"cyrusEngine"} );
+            }
+        }
+    }
+
+    # Si on a déjà rencontré une erreur, on s'arrête
+    if( !$globalReturn ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme lors de la mise a jour des partitions Cyrus du domaine '".$self->{"domain"}."' - Operation annulee !", "W" );
+        return $globalReturn;
     }
 
 

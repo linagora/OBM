@@ -586,7 +586,7 @@ sub _getEntityMailboxAcl {
         $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".$entityRightTable." WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
 
         # On recupere la definition des ACL
-        $self->{"userLinks"}->{"user_mailbox_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domainDesc, \%rightDef, $userId );
+        $self->{"userLinks"}->{"userobm_mailbox_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domainDesc, \%rightDef, $userId );
     }
 
     return 1;
@@ -1168,8 +1168,8 @@ sub getMailboxPartition {
     my $dbEntry = $self->{userDbDesc};
     my $entryProp = $self->{userDesc};
 
-    if( $entryProp->{user_mailperms} ) {
-        $mailboxPartition = $entryProp->{user_mailbox_partition};
+    if( $entryProp->{userobm_mail_perms} ) {
+        $mailboxPartition = $entryProp->{userobm_mailbox_partition};
     }
 
     return $mailboxPartition;
@@ -1182,8 +1182,8 @@ sub getMailboxQuota {
     my $dbEntry = $self->{userDbDesc};
     my $entryProp = $self->{userDesc};
 
-    if( $entryProp->{user_mailperms} ) {
-        $mailBoxQuota = $entryProp->{user_mailbox_quota};
+    if( $entryProp->{userobm_mail_perms} ) {
+        $mailBoxQuota = $entryProp->{userobm_mailbox_quota};
     }
 
     return $mailBoxQuota;
@@ -1197,8 +1197,8 @@ sub getMailboxAcl {
     my $entryProp = $self->{userDesc};
     my $entryLinks = $self->{userLinks};
 
-    if( $entryProp->{"user_mailperms"} ) {
-        $mailBoxAcl = $entryLinks->{user_mailbox_acl};
+    if( $entryProp->{userobm_mail_perms} ) {
+        $mailBoxAcl = $entryLinks->{userobm_mailbox_acl};
     }
 
     return $mailBoxAcl;
