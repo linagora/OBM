@@ -182,6 +182,8 @@ sub _doGlobalUpdate {
     my $self = shift;
     my $queryResult;
     my $globalReturn = 1;
+    my $updateDbReturn = 1;
+    my $return;
 
     if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
         &OBM::toolBox::write_log( "[Update::update]: pas de domaine indique pour la MAJ totale", "W" );
@@ -198,7 +200,11 @@ sub _doGlobalUpdate {
     &OBM::toolBox::write_log( "[Update::update]: MAJ totale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
     # MAJ des informations de domaine
-    $globalReturn = $self->_updateDbDomain();
+    $updateDbReturn = $self->_updateDbDomain();
+    if( !$updateDbReturn ) {
+        &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour du domaine dans la BD", "W" );
+        return 0;
+    }
 
 
     # Uniquement pour le metadomaine
@@ -213,11 +219,18 @@ sub _doGlobalUpdate {
         while( my( $systemUserId ) = $queryResult->fetchrow_array() ) {
             my $object = $self->_doSystemUser( 1, 0, $systemUserId );
 
-            my $return = $self->_runEngines( $object );
+            $return = $self->_runEngines( $object );
             if( $return ) {
                 # La MAJ de l'entité c'est bien passée, on met a jour la BD de
                 # travail
-                $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
+                $updateDbReturn = $$object->updateDbEntity( $self->{"dbHandler"} );
+                if( !$updateDbReturn ) {
+                    &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un utilisateur systeme dans la BD", "W" );
+                    $globalReturn = 0;
+                }
+            }else {
+                &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un utilisateur systeme", "W" );
+                $globalReturn = 0;
             }
         }
     }
@@ -226,11 +239,18 @@ sub _doGlobalUpdate {
     # Pour tous les domaines
     # Traitement des informations du domaine Samba
     my $object = $self->_doSambaDomain( 1, 0 );
-    my $return = $self->_runEngines( $object );
+    $return = $self->_runEngines( $object );
 
     if( $return ) {
         # La MAJ de l'entité c'est bien passée, on met a jour la BD de travail
-        $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
+        $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        if( !$updateDbReturn ) {
+            &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour du domaine Samba dans la BD", "W" );
+            $globalReturn = 0;
+        }
+    }else {
+        &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour du domaine Samba", "W" );
+        $globalReturn = 0;
     }
 
 
@@ -239,9 +259,39 @@ sub _doGlobalUpdate {
     $return = $self->_runEngines( $object );
 
     if( $return ) {
-        # La MAJ de l'entité c'est bien passée, on met a jour la BD de
-        # travail
-        $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
+        # La MAJ de l'entité c'est bien passée, on met a jour la BD de travail
+        $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        if( !$updateDbReturn ) {
+            &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour des serveurs de courriers dans la BD", "W" );
+            $globalReturn = 0;
+        }
+    }else {
+        &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour des serveurs de courriers", "W" );
+        $globalReturn = 0;
+    }
+
+
+    # Pour tous les domaines, sauf le metadomaine
+    if( $self->{"domain"} != 0 ) {
+        # Mise à jour des partitions Cyrus
+        my $updateMailSrv = OBM::Cyrus::cyrusRemoteEngine->new( $self->{"domainList"} );
+        $return = $updateMailSrv->init();
+        if( $return ) {
+            $return = $updateMailSrv->update( "add" );
+        }
+        $updateMailSrv->destroy();
+
+        if( $return ) {
+            # Si tout c'est bien passé, il faut rétablir les connexions à Cyrus
+            if( defined($self->{"engine"}->{"cyrusEngine"}) ) {
+                if( !$self->{"engine"}->{"cyrusEngine"}->init() ) {
+                    delete( $self->{"engine"}->{"cyrusEngine"} );
+                }
+            }
+        }else {
+            &OBM::toolBox::write_log( "[Update::update]: probleme lors de la mise a jour des partitions Cyrus du domaine '".$self->{"domain"}."' - Operation annulee !", "W" );
+            return 0;
+        }
     }
 
 
@@ -257,34 +307,16 @@ sub _doGlobalUpdate {
 
         my $return = $self->_runEngines( $object );
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
-            # travail
-            $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
-        }
-    }
-
-
-    # Pour tous les domaines, sauf le metadomaine
-    if( $self->{"domain"} != 0 ) {
-        # Mise a jour des partitions Cyrus
-        my $updateMailSrv = OBM::Cyrus::cyrusRemoteEngine->new( $self->{"domainList"} );
-        if( $updateMailSrv->init() ) {
-            $globalReturn = $globalReturn && $updateMailSrv->update( "add" );
-        }
-        $updateMailSrv->destroy();
-
-        # Si tout c'est bien passé, il faut rétablir les connexions à Cyrus
-        if( $globalReturn  && defined($self->{"engine"}->{"cyrusEngine"}) ) {
-            if( !$self->{"engine"}->{"cyrusEngine"}->init() ) {
-                delete( $self->{"engine"}->{"cyrusEngine"} );
+            # La MAJ de l'entité c'est bien passée, on met a jour la BD de travail
+            $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            if( !$updateDbReturn ) {
+                &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un hote dans la BD", "W" );
+                $globalReturn = 0;
             }
+        }else {
+            &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un hote", "W" );
+            $globalReturn = 0;
         }
-    }
-
-    # Si on a déjà rencontré une erreur, on s'arrête
-    if( !$globalReturn ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de la mise a jour des partitions Cyrus du domaine '".$self->{"domain"}."' - Operation annulee !", "W" );
-        return $globalReturn;
     }
 
 
@@ -302,7 +334,14 @@ sub _doGlobalUpdate {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
-            $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
+            $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            if( !$updateDbReturn ) {
+                &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un utilisateur dans la BD", "W" );
+                $globalReturn = 0;
+            }
+        }else {
+            &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un utilisateur", "W" );
+            $globalReturn = 0;
         }
     }
 
@@ -321,7 +360,14 @@ sub _doGlobalUpdate {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
-            $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
+            $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            if( !$updateDbReturn ) {
+                &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un groupe dans la BD", "W" );
+                $globalReturn = 0;
+            }
+        }else {
+            &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un groupe", "W" );
+            $globalReturn = 0;
         }
     }
 
@@ -340,11 +386,18 @@ sub _doGlobalUpdate {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
-            $globalReturn = $globalReturn && $object->updateDbEntity( $self->{"dbHandler"} );
+            $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            if( !$updateDbReturn ) {
+                &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un repertoire partage de messagerie dans la BD", "W" );
+                $globalReturn = 0;
+            }
+        }else {
+            &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un repertoire partage de messagerie", "W" );
+            $globalReturn = 0;
         }
     }
 
-    return $globalReturn; 
+    return $globalReturn;
 }
 
 
