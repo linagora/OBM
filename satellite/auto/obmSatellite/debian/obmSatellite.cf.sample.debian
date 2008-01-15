@@ -10,7 +10,7 @@ ldap_password
 # Options communement modifiees
 #
 # de 0 a 4 - 0 par defaut
-log_level           0
+log_level           1
 # Le fichier de log - /var/log/obm/obmSatellite.log par defaut
 log_file            /var/log/obm/obmSatellite.log
 # Le PID - /var/run/obm/obmSatellite.pid par defaut
@@ -37,7 +37,7 @@ process_mailbox     1
 # /etc/postfix/virtual_mailbox par defaut
 mailbox_map         /etc/postfix/virtual_mailbox
 # 1 ou 0 - 1 par defaut
-process_alias       1  
+process_alias       1
 # /etc/postfix/virtual_alias par defaut
 alias_map           /etc/postfix/virtual_alias
 # 1 ou 0 - 1 par defaut
