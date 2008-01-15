@@ -304,9 +304,12 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
  * @return HTML
  */
 function dis_organizationalchart_consult($organizationalchart) {
+  global $display;
 
   $id = $organizationalchart["organizationalchart_id"];
   if ($id) {
+    // FIXME
+    // $display["print_url"] = "$path/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$id";
     $oc_q = run_query_organizationalchart_detail($id);
     $root_node = run_query_organizationalchart_root_node($id);
     $block = html_organizationalchart_consult($organizationalchart, $oc_q, $root_node); 

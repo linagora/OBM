@@ -798,7 +798,7 @@ function html_deal_consult($deal_q, $dc='') {
   global $l_number, $l_tt, $l_status,$l_archive,$l_comment;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_quarter;
   global $l_parentdeal,$l_todo, $l_deal, $l_source;
-  global $display, $path, $c_yes, $c_no;
+  global $display, $path, $l_yes, $l_no;
 
   $id = $deal_q->f('deal_id');
   $pid = $deal_q->f('deal_parentdeal_id');
@@ -837,7 +837,7 @@ function html_deal_consult($deal_q, $dc='') {
   $hitrate = $deal_q->f('deal_hitrate');
   $datealarm = of_date_format($deal_q->f('datealarm'), 1);
   $status = $deal_q->f('dealstatus_label');
-  $archive = ($deal_q->f('deal_archive') == 1 ? $c_yes : $c_no);
+  $archive = ($deal_q->f('deal_archive') == 1 ? $l_yes : $l_no);
   $todo = $deal_q->f('deal_todo');
   $com = beautify_comment(nl2br($deal_q->f('deal_comment')));
   $comp_id = $deal_q->f('deal_company_id');

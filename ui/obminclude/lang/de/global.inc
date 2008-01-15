@@ -100,7 +100,7 @@ $l_settings = "Configuration";
 $l_kind = "Branche";
 
 // OBM_DISPLAY
-$l_entries = "Einträge";
+$l_entries = "Einträge #";
 $l_page_res = "Ergebnisse";
 $l_export = "Export";
 $l_export_all = "Gesamtexport";

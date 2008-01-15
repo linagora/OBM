@@ -452,13 +452,13 @@ function html_user_consult($obm_q) {
   global $l_vacation_dateend,$l_mail_server;
   global $l_enabled, $l_disabled, $l_web_consult_list, $l_photo;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
-  global $obm, $cgp_use, $profiles, $path, $display, $c_yes, $c_no;
+  global $obm, $cgp_use, $profiles, $path, $display, $l_yes, $l_no;
 
   $id = $obm_q->f("userobm_id");
   $domain_label = ($obm_q->f("domain_label") != "" ? $obm_q->f("domain_label") : "GLOBAL");
   $system = $obm_q->f("userobm_system");
   $login = $obm_q->f("userobm_login");
-  $local = ($obm_q->f("userobm_local") == 1 ? $c_yes : $c_no);
+  $local = ($obm_q->f("userobm_local") == 1 ? $l_yes : $l_no);
   $ext_id = $obm_q->f("userobm_ext_id");
   $profile = $obm_q->f("userobm_perms");
   $hidden = $obm_q->f("userobm_hidden");
@@ -471,7 +471,7 @@ function html_user_consult($obm_q) {
   $desc = $obm_q->f("userobm_description");
   $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
-  $archive = ($obm_q->f("userobm_archive") == '1' ? $c_yes : $c_no);
+  $archive = ($obm_q->f("userobm_archive") == '1' ? $l_yes : $l_no);
   $photo_id = $obm_q->f("userobm_photo_id");
 
   $phone = $obm_q->f("userobm_phone");
@@ -512,10 +512,10 @@ function html_user_consult($obm_q) {
   $smb_home_drive = $obm_q->f("userobm_samba_home_drive");
   $smb_logon = $obm_q->f("userobm_samba_logon_script");
 
-  $nomade_perms = ($nomade_perms ? $c_yes : $c_no);
-  $nomade_enable = ($nomade_enable ? $c_yes : $c_no);
-  $nomade_local_copy = ($nomade_local_copy ? $c_yes : $c_no);
-  $vacation_enable = ($vacation_enable ? $c_yes : $c_no);
+  $nomade_perms = ($nomade_perms ? $l_yes : $l_no);
+  $nomade_enable = ($nomade_enable ? $l_yes : $l_no);
+  $nomade_local_copy = ($nomade_local_copy ? $l_yes : $l_no);
+  $vacation_enable = ($vacation_enable ? $l_yes : $l_no);
   $vacation_message = ($vacation_enable ? nl2br($vacation_message) : "---");
   //  $mail = get_mail_info();
   if( $obm_q->f("domain_name") != "") {
@@ -952,7 +952,7 @@ function html_user_form($usr_q, $user, $field='') {
   global $l_vacation_dateend, $l_mail_server;
   global $l_enabled, $l_disabled, $l_web_consult_list,$path;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
-  global $path, $display, $cgp_use, $action, $profiles, $c_yes, $c_no;
+  global $path, $display, $cgp_use, $action, $profiles;
   global $obm, $c_default_domain, $l_domain, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour;
 

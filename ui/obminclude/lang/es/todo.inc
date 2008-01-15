@@ -12,7 +12,7 @@ $l_date = "Fecha de colocación";
 $l_deadline = "Fecha Final";
 $l_todotitle = "Título";
 $l_content = "Contenido";
-$l_percent = "Progreso";
+$l_percent = "Progreso %";
 
 $l_del = "Borrar.";
 $l_delete = "Borrar";

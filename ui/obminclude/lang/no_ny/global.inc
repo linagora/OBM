@@ -61,7 +61,7 @@ $l_before = "Før";
 $l_profile = "Autorisering";
 
 // OBM_DISPLAY
-$l_entries = "Entries";
+$l_entries = "Entries #";
 $l_page_res = "Result pages";
 $l_field = "Field";
 $l_displayed = "Displayed";

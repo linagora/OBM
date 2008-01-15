@@ -145,7 +145,7 @@ $l_group = "Gruppo";
 $l_settings = "Impostazioni";
 
 // OBM_DISPLAY
-$l_entries = "Resultati";
+$l_entries = "Resultati #";
 $l_page_res = "Pagine resultati";
 $l_export = "Esporta";
 $l_export_all = "Esporta tutto";

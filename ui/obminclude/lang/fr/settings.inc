@@ -29,13 +29,13 @@ $l_set_debug = "Niveau de debug";
 $l_send_mail = "Accepter les e-mail";
 
 // Dates format
-$l_da_iso = "yyyy-mm-dd";
-$l_da_en = "mm/dd/yyyy";
-$l_da_fr = "dd/mm/yyyy";
-$l_da_txt = "dd mois yyyy";
+$l_da_iso = "aaaa-mm-jj";
+$l_da_en = "mm/jj/aaaa";
+$l_da_fr = "jj/mm/aaaa";
+$l_da_txt = "jj mois aaaa";
 
-$l_da_dmy = "dmy";
-$l_da_mdy = "mdy";
+$l_da_dmy = "jma";
+$l_da_mdy = "mja";
 
 $l_deadline = "date limite";
 

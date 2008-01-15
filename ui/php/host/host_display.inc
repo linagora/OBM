@@ -235,7 +235,7 @@ function dis_host_consult($host) {
  * @return XHTML Display block
  */
 function html_host_consult($host_q) {
-  global $cgp_use, $c_yes, $c_no;
+  global $cgp_use, $l_yes, $l_no;
   global $l_module_host, $l_name, $l_ip, $l_desc, $l_smb;
   global $display, $perm, $menu, $action, $cright_write;
   global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_mode;
@@ -265,7 +265,7 @@ function html_host_consult($host_q) {
     </tr>";
 
   // Formatage des informations de la BD
-  if ($samba) $samba = $c_yes; else $samba = $c_no;
+  if ($samba) $samba = $l_yes; else $samba = $l_no;
   $web_state  = ($web_perms ? $l_enable : $l_disable);
   $web_access = ($web_all ? $l_web_all : $l_web_list_only);
   $ftp_state  = ($ftp_perms ? $l_enable : $l_disable);
@@ -279,7 +279,7 @@ function html_host_consult($host_q) {
   } else {
     $dis_user = "<a href=\"$path/user/user_index.php?action=detailconsult&amp;user_id=$user_id\">$user_login</a>";
   }
-  if ($mail_server) $mail_server = $c_yes; else $mail_server = $c_no;
+  if ($mail_server) $mail_server = $l_yes; else $mail_server = $l_no;
 
   $block_delegation = of_delegation_dis_block_consult($delegation);
 

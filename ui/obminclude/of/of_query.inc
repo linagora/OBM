@@ -1967,7 +1967,7 @@ function get_all_parent_group_of_group($g_id) {
 function of_usergroup_get_group_users($g_id, $info=false, $uids='') {
   global $cdg_sql;
 
-  if (! ($g_id > 0)) {
+  if (! ($g_id > 0) && empty($uids)) {
     return false;
   }
 

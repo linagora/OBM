@@ -489,7 +489,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
       <input type=\"text\" name=\"tf_phone\" size=\"12\" maxlength=\"24\" value=\"$phone\" />
     </label>
     <label>$l_email<br />
-      <input type=\"text\" name=\"tf_email\" size=\"16\" value=\"$email\" />
+      <input type=\"text\" name=\"tf_email\" size=\"32\" value=\"$email\" />
     </label>
     <label>$l_from_company<br />
       <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
@@ -499,7 +499,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
       value=\"$zip\" />
     </label>
     <label>$l_town<br />
-      <input type=\"text\" name=\"tf_town\" id=\"tf_town\" size=\"8\"
+      <input type=\"text\" name=\"tf_town\" id=\"tf_town\" size=\"24\"
       value=\"$town\" />
     </label>
     <label>$l_country<br />

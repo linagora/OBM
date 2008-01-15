@@ -261,7 +261,7 @@ function dis_mailserver_consult($params) {
  * @return XHTML Display block
  */
 function html_mailserver_consult($m_q) {
-  global $display, $cgp_use, $c_yes, $c_no;
+  global $display, $cgp_use, $l_yes, $l_no;
   global $l_mailserver, $l_host, $l_ip, $l_imap, $l_smtp_in, $l_smtp_out;
 
   $id = $m_q->f('mailserver_id');
@@ -273,9 +273,9 @@ function html_mailserver_consult($m_q) {
   $smtp_out = $m_q->f('mailserver_smtp_out');
 
   // Formatage des informations de la BD
-  if ($imap == '1') $imap = $c_yes; else $imap = $c_no;
-  if ($smtp_in == '1') $smtp_in = $c_yes; else $smtp_in = $c_no;
-  if ($smtp_out == '1') $smtp_out = $c_yes; else $smtp_out = $c_no;
+  if ($imap == '1') $imap = $l_yes; else $imap = $l_no;
+  if ($smtp_in == '1') $smtp_in = $l_yes; else $smtp_in = $l_no;
+  if ($smtp_out == '1') $smtp_out = $l_yes; else $smtp_out = $l_no;
 
   $display['detailInfo'] = display_record_info($m_q);
   $display['title'] = $host_name;

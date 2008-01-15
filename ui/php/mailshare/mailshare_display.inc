@@ -399,7 +399,7 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
   $block_delegation
   <tr>
     <th class=\"$class[quota]\">$l_quota</th>
-    <td><input name=\"tf_quota\" maxlength=\"8\" size=\"8\" value=\"$quota\" />M</td>
+    <td><input name=\"tf_quota\" maxlength=\"8\" size=\"8\" value=\"$quota\" /></td>
   </tr>
   <tr>
     <th class=\"$class[mail_server]\">$l_mail_server</th>

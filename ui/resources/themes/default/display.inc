@@ -239,7 +239,9 @@ function display_modules_theme($section) {
 	$module_target = $modules[$mod]['Target'];
 	if (isset($module_target)) {
 	  $target = " target='$module_target'";
-	}
+	} else {
+          $target = "";
+        }
         $block .= "<li>";
         if ($fico) {
           $ico = $modules[$mod]['Ico'];

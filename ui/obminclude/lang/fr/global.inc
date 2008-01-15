@@ -210,7 +210,7 @@ $l_organizationalchart = "Organigramme";
 
 $l_permission_denied = $l_insufficient_permission;
 // OBM_DISPLAY
-$l_entries = "Entrées";
+$l_entries = "Entrées #";
 $l_page_res = "Pages de résultat";
 $l_export = "Exporter";
 $l_export_all = "Tout exporter";

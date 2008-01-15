@@ -392,9 +392,9 @@ $display['detail'] .= "
   <tr>
   <td>$l_set_date_upd</td>
   <td>
-    <input type=\"radio\" name=\"date_upd\" value=\"$cda_fr\" $da_upd_fr />$l_da_fr
-    <input type=\"radio\" name=\"date_upd\" value=\"$cda_en\" $da_upd_en />$l_da_en
     <input type=\"radio\" name=\"date_upd\" value=\"$cda_iso\" $da_upd_iso />$l_da_iso
+    <input type=\"radio\" name=\"date_upd\" value=\"$cda_en\" $da_upd_en />$l_da_en
+    <input type=\"radio\" name=\"date_upd\" value=\"$cda_fr\" $da_upd_fr />$l_da_fr
   </td>
   <td>$l_set_date</td>
   <td>

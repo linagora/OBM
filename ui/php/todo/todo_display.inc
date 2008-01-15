@@ -331,7 +331,7 @@ function dis_todo_form($todo, $todo_q = 0) {
     <td>$sel_priority</td>
   </tr><tr>
     <th>$l_percent</th>
-    <td><input type=\"text\" id=\"tf_percent\" name=\"tf_percent\" maxlength=\"3\" size=\"3\" value=\"$percent\" />%</td>
+    <td><input type=\"text\" id=\"tf_percent\" name=\"tf_percent\" maxlength=\"3\" size=\"3\" value=\"$percent\" /></td>
   </tr><tr>
     <th>$l_deadline</th>
     <td><input type=\"text\" name=\"tf_deadline\" value=\"$deadline\" class=\"datePicker\"/></td>

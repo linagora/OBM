@@ -257,12 +257,12 @@ function html_document_consult($doc_q) {
   global $l_document, $l_size, $l_bytes, $l_title, $l_mimetype, $l_private;
   global $l_author, $l_path, $l_name; 
   global $l_file, $l_consult, $l_insert, $l_update, $l_checkdelete;
-  global $c_yes, $c_no;
+  global $l_yes, $l_no;
 
   $id = $doc_q->f("document_id");
   $title = $doc_q->f("document_title");
   $author = $doc_q->f("document_author");
-  $privacy = ($doc_q->f("document_privacy") == 1 ? $c_yes : $c_no );
+  $privacy = ($doc_q->f("document_privacy") == 1 ? $l_yes : $l_no );
   $mimetype = $doc_q->f("documentmimetype_label");
   $path = $doc_q->f("document_path");
   $size = $doc_q->f("document_size");

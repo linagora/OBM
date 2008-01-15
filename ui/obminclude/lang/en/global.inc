@@ -207,7 +207,7 @@ $l_permission_denied = $l_insufficient_permission;
 $l_last_visit = "Last visits";
 
 // OBM_DISPLAY
-$l_entries = "Entries";
+$l_entries = "Entries #";
 $l_page_res = "Result pages";
 $l_export = "Export";
 $l_export_all = "Export All";

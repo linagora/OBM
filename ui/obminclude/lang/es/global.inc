@@ -154,7 +154,7 @@ $l_resourcegroup = "Grupo de Recursos";
 $l_settings = "Opciones";
 
 // OBM_DISPLAY
-$l_entries = "Entradas";
+$l_entries = "Entradas #";
 $l_page_res = "Páginas de resultado";
 $l_export = "Exportar";
 $l_export_all = "Exportar Todo";
