@@ -223,7 +223,7 @@ sub _doGlobalUpdate {
             if( $return ) {
                 # La MAJ de l'entité c'est bien passée, on met a jour la BD de
                 # travail
-                $updateDbReturn = $$object->updateDbEntity( $self->{"dbHandler"} );
+                $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
                 if( !$updateDbReturn ) {
                     &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un utilisateur systeme dans la BD", "W" );
                     $globalReturn = 0;
