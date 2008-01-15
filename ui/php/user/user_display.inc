@@ -184,13 +184,14 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
-  global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all;
+  global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all, $l_firstname;
   global $display, $c_all, $profiles, $l_recursive;
   
   $login = $user["login"];
   $profile = $user["profile"];
   $domain_id = $user["domain"];
   $lname = stripslashes($user["lastname"]);
+  $fname = stripslashes($user["firstname"]);
   $email = $user["email"];
   $phone = $user["phone"];
   $desc = $user["desc"];
@@ -249,6 +250,10 @@ function html_user_search_form($user) {
     <label>$l_lastname<br />
       <input type=\"text\" name=\"tf_lastname\" size=\"16\" maxlength=\"32\"
       value=\"$lname\" />
+    </label>
+    <label>$l_firstname<br />
+      <input type=\"text\" name=\"tf_firstname\" size=\"16\" maxlength=\"32\"
+      value=\"$fname\" />
     </label>
     $dis_domain
     <label>$l_profile<br />

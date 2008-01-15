@@ -110,10 +110,7 @@ if ($action == 'perform_meeting' &&
 } else if ($action != 'perform_meeting') {
   unset($cal_entity_id['resource_group']);
 }
-// If event insert or update, reset the selected group
-if (($action == 'insert') || ($action == 'update')) {
-  $cal_entity_id['group_view'] = $c_all;
-}
+
 // If no group view selected, explicitely set it
 if ($cal_entity_id['group_view'] == '') $cal_entity_id['group_view'] = $c_all;
 
@@ -131,9 +128,6 @@ if ($action == 'new' && (is_array($params['sel_resource_id']))) {
   // Join resources from group with normal resources.
   $cal_entity_id['resource'] = array_merge($params['sel_resource_id'],$cal_entity_id['resource']);
 } else if (($params['new_sel']) || (is_array($params['sel_resource_id']))) {
-  $cal_entity_id['resource'] = $params['sel_resource_id'];
-} else if (($action == 'insert') || ($action == 'update')) {
-  // If event creation (form submission) we set session even if selection empty
   $cal_entity_id['resource'] = $params['sel_resource_id'];
 }
 

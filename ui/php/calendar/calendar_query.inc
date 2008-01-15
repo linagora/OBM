@@ -2521,8 +2521,8 @@ function calendar_localizeDate($format, $timestamp) {
  global $l_daysofweek, $l_daysofweekshort;
  global $l_monthsofyear, $l_monthsofyearshort;
 
- $day = '%A %e %B';
- $week = '%e %B';
+ $day = '%A %e %B %Y';
+ $week = '%e %B %Y';
  $week_list = '%a %e';
  $week_jump = '%e %b';
  $month = '%B %Y';
@@ -3058,6 +3058,7 @@ function run_query_get_events_attendee($events) {
   $multidomain = sql_multidomain('calendarevent');
   $query = "SELECT
    calendarevent_id,
+   evententity_state,
    evententity_entity_id,
    evententity_entity,
    userobm_firstname,
@@ -3283,6 +3284,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
       $id = $attendee_q->f('calendarevent_id');
       $entity = $attendee_q->f('evententity_entity');
       $entity_id = $attendee_q->f('evententity_entity_id');
+      $entity_state = $attendee_q->f('evententity_state');
       switch($entity) {
         case 'user':
           $entity_label = $attendee_q->f('userobm_lastname').' '.$attendee_q->f('userobm_firstname');
@@ -3295,7 +3297,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
           break;
       }
       $event = &$of->events[$id];
-      $event->add_attendee($entity,$entity_id,$entity_label);
+      $event->addAttendee($entity,$entity_id,$entity_label,$entity_state);
     }
   }
   return $of->getOccurrences(); 
@@ -3733,8 +3735,8 @@ Class Event {
    * @access public
    * @return void
    */
-  function add_attendee($entity,$entity_id,$entity_label) {
-    $this->attendee[$entity][$entity_id] = $entity_label;
+  function addAttendee($entity,$entity_id,$entity_label, $entity_state) {
+    $this->attendee[$entity][$entity_id] = $entity_label.'('.$GLOBALS["l_$entity_state"].')';
   }
 
 }

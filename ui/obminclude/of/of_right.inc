@@ -380,10 +380,13 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 //   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2)))
 ///////////////////////////////////////////////////////////////////////////////
 function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set="", $real_entity="") {
-  global $cdg_sql;
+  global $cdg_sql, $obm;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+
+  $ent_array = array();
+  $id_array = array();
 
   $entity = strtolower($entityu);
   if ($real_entity != "") {
@@ -402,6 +405,8 @@ function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set=""
     $ctt[2]["type"] = "field";
     $ctt[2]["value"] = "userobm_firstname";
     $e_label = sql_string_concat($db_type, $ctt);
+    $u = get_user_info($user_id);
+    $union = "UNION SELECT '$u[id]' as id, '$u[lastname] $u[firstname]' as label, '$entity' as entityright_entity" ;
   } else {
     $table_entity = "$entityu";
     $e_id = "e.${entity}_id";
@@ -415,7 +420,7 @@ function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set=""
   $query = "SELECT
       $e_id as id,
       $e_label as label,
-      entityright_entity
+      '$entity' as entityright_entity
     FROM EntityRight
       LEFT JOIN $table_entity as e ON entityright_entity_id = $e_id
     WHERE entityright_entity = '$entity'
@@ -424,12 +429,12 @@ function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set=""
             OR entityright_consumer_id = 0)))
         $where_right
     GROUP BY id, label, entityright_entity
-    ORDER BY entityright_entity, $e_label";
+    $union
+    ORDER BY entityright_entity, label";
 
   display_debug_msg($query, $cdg_sql, "of_right_entity_for_user()");
   $obm_q->query($query);
 
-  $ret_array = array();
   while($obm_q->next_record()) {
     $id = $obm_q->f("id");
     if ( ($ids_set == "")
@@ -442,6 +447,7 @@ function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set=""
 			   );
     }
   }
+  $ret_array = array();
   $ret_array["ids"] = array();
   if (is_array($id_array)) {
     $ret_array["ids"] = $id_array;
@@ -477,6 +483,10 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
   if(is_array($entity_id)) {
     $entity_id = implode(",",$entity_id);
   }
+
+  $id_array = array();
+  $con_array = array();
+
   if ($consumer == "user" || $consumer == "all" ) {
 
     $table_consumer = "UserObm";
@@ -489,6 +499,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
     $ctt[2]["value"] = "userobm_firstname";
     $c_label = sql_string_concat($db_type, $ctt);
     $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'user' as entitydata_kind FROM UserObm";
+    $u = get_user_info($user_id);
   }
   if ($consumer == "group" || $consumer == "all" ) {
     $table_consumer = "UGroup";
@@ -795,39 +806,40 @@ class OBM_Acl {
     return $singleton;
   }
 
-  function isAllowed($user_id, $entity_id, $entity, $action) {
+  function isAllowed($userId, $entityId, $entity, $action) {
+    if(isset($this->cache[$entity][$entityId][$action]));
 
   }
 
-  function canRead($user_id, $entity_id, $entity) {
+  function canRead($userId, $entityId, $entity) {
+    return this->isAllowed($userId, $entityId, $entity, 'read');
+  }
+
+  function canWrite($userId, $entityId, $entity) {
+    return this->isAllowed($userId, $entityId, $entity, 'write');
+  }
+
+  function canAdmin($userId, $entityId, $entity) {
+    return this->isAllowed($userId, $entityId, $entity, 'admin');
+  }
+
+  function getEntityRoles($entityId, $entity, $action = "all") {
 
   }
 
-  function canWrite($user_id, $entity_id, $entity) {
-
-  }
-
-  function canAdmin($user_id, $entity_id, $entity) {
-
-  }
-
-  function getEntityRoles($entity_id, $entity, $action = "all") {
-
-  }
-
-  function getEntityReaders($entity_id, $entity) {
-
+  function getEntityReaders($entityId, $entity) {
+    return $this->getEntityRoles($entityId,$entity,'read')
   }
   
-  function getEntityWriters($entity_id, $entity) {
-
+  function getEntityWriters($entityId, $entity) {
+    return $this->getEntityRoles($entityId,$entity,'write')
   }
 
-  function getEntityAdmins($entity_id, $entity) {
-
+  function getEntityAdmins($entityId, $entity) {
+    return $this->getEntityRoles($entityId,$entity,'admin')
   }
 
-  function getEntityACL($entity_id, $entity) {
+  function getEntityACL($entityId, $entity) {
 
   }
 }

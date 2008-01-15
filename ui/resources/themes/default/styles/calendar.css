@@ -476,7 +476,7 @@ table.planning ul {
   padding: 0;
   padding-left: 15px;
   margin: 0;
-  list-style: circle;
+  list-style: disc;
 }
 
 table.planning li {

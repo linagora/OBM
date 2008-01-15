@@ -319,19 +319,13 @@ if ($cgp_show['module']['calendar']) {
   // days to display in the week view
   $display_days = $_SESSION['set_cal_display_days'];
   $start_week_day = strtotime($ccalendar_weekstart);
-
-/*  for ($i=0; $i<7; $i++) {
-    $day_num = date("w", $start_week_day);
-    $day = $l_daysofweekshort[$day_num];
-    $dis_display_days .= "<input type=\"checkbox\" name=\"cba_displayday_".$i."\" value=\"1\"";
-    if (strcmp(substr($display_days,$i,1),"1")==0) {
-      $dis_display_days .= " checked = \"checked\"";
-    }
-    $dis_display_days .= " /> $day";
-
-    $start_week_day = strtotime("+1 day", $start_week_day); 
+  echo $display_days;
+  if( $display_days == '1111100') {
+    $without = 'selected="selected"';
+  } else {
+    $with = 'selected="selected"';
   }
- */
+  
   $dis_hour_b = "<select name=\"cal_first_hour\" style=\"width:4em;\">";
   for ($current_hour=0; $current_hour<24; $current_hour++) {
     if ($current_hour == $_SESSION['cal_first_hour']) {
@@ -355,7 +349,10 @@ if ($cgp_show['module']['calendar']) {
   <tr>
     <th>$l_set_display_days</th>
     <td>
-      $dis_display_days
+    <select name='sel_display_days'>
+    <option $with value='1111111'>$l_with_weekend</option>
+    <option $without value='1111100'>$l_without_weekend</option>
+    </select>
     </td>
   </tr>
   <tr>
@@ -450,15 +447,6 @@ function get_settings_params() {
   
   // Get global params
   $params = get_global_params('Settings');
-
-  // days to display in the week view
-  for ($i=0; $i<7; $i++) {
-    if (isset($params["displayday_$i"])) {
-      $params['display_days'] .= '1';
-    } else {
-      $params['display_days'] .= '0';
-    }
-  }
 
   return $params;
 }

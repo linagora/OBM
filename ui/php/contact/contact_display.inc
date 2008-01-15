@@ -1270,7 +1270,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter;
   global $l_comment1, $l_add_comment1, $l_upd_comment1;
   global $l_comment2, $l_add_comment2, $l_upd_comment2;
-  global $l_comment3, $l_add_comment3, $l_upd_comment3;
+  global $l_comment3, $l_add_comment3, $l_upd_comment3,$l_lang;
   global $l_datasource, $l_archive, $l_private, $l_coord, $l_contact, $l_market;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
@@ -1727,8 +1727,16 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       <td><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
     </tr>
     <tr>
+      <th>$l_lang</th>
+      <td> $sel_kind_lang</td>
+    </tr>
+    <tr>
       <th>$l_kind</th>
-      <td> $sel_kind_lang $sel_kind_label $l_letter : $sel_kind_header </td>
+      <td>$sel_kind_label</td>
+    </tr>
+    <tr>
+      <th>$l_letter</th>
+      <td>$sel_kind_header </td>
     </tr>
     <tr>
       <th>$l_datasource</th> 

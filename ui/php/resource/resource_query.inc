@@ -372,10 +372,15 @@ function check_resource_context($p_id, $resource) {
 //   - $resource[]   : values checked
 //     keys used : name, resource 
 ///////////////////////////////////////////////////////////////////////////////
-function check_resource_data_form($p_id, $resource) {
+function check_resource_data_form($p_id, &$resource) {
   global $l_exist_error, $l_name_error, $l_desc_error;
   global $l_lname_error;
   global $err, $action, $cdg_sql;
+
+  if(!check_user_defined_rules("resource", $resource)) {
+    return false;
+  }
+
 
   $id = $resource["resource_id"];
   $name = $resource["name"];

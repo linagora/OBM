@@ -156,12 +156,15 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   global $action,$ico_delete,$output_target,$l_color,$l_users,$l_events;
   // Legend
   $iso_date = $calendar["date"];
+  global $mono_user;
   if(count($calendar_entity) == 1 && is_array($calendar_entity["user"])
      && count($calendar_entity["user"]) == 1 && key($calendar_entity["user"]) == $obm["uid"]) {
     $colorTemplate = 'event';
     $tooltip = $l_event_color_tt;
+    $mono_user = true;
   } else {
     $colorTemplate = 'user';
+    $mono_user = false;
   }
   ${"select_color_".$colorTemplate} = "selected=\"selected\"";
   if ($action == "perform_meeting" || $action == "perform_res_meeting") {
@@ -736,7 +739,7 @@ function dis_calendar_month_printable($calendar, $calendar_entity,$writable_enti
   global $ccalendar_weekstart, $obm;
   global $ico_periodic, $ico_meeting;
   global $l_daysofweek, $l_previous, $l_next, $l_all_day, $l_location;
-  global $l_task, $l_user, $l_resource, $l_private;
+  global $l_task, $l_private;
 
   $day_duration = 86400;
   $iso_date = $calendar["date"];
@@ -805,7 +808,7 @@ function dis_calendar_month_printable($calendar, $calendar_entity,$writable_enti
         $entity_id = $occurence->id;
         $entity = $occurence->entity;
         $klass = $calendar_entity[$entity][$entity_id]["class"];
-        $attendee = "$l_user : ". $calendar_entity[$entity][$entity_id]["name"];
+        $attendee = $calendar_entity[$entity][$entity_id]["name"];
         $schedule = "";
         if($occurence->event->isMeeting()) {
           $schedule .= "<img src=\"$ico_meeting\" alt=\"[Meeting]\" />";
@@ -1026,7 +1029,12 @@ function dis_calendar_week_printable($calendar, $calendar_entity,$writable_entit
   $end_week = calendar_localizeDate("week", $end_week_time);
   $end_time = strtotime("+7 days", $start_week_day);
   $display_date = "$start_week - $end_week"; 
-
+  $display_days = $_SESSION['set_cal_display_days'];
+  if (empty($display_days)) $display_days = '1111111';
+  // FIXME Only work with the 'with or without week end' feature
+  if($display_days == '1111100') {
+    $end_time = strtotime("+5 days", $start_week_day);
+  }  
   $dis_print = dis_calendar_printable_view ($start_week_day, $end_time, $calendar_entity, $category_filter);
 
   $block = "
@@ -1148,8 +1156,8 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
 function dis_calendar_printable_event(&$occurence, &$calendar_entity, $ts) {
   global $obm, $path;
   global $l_private, $l_location, $l_all_day;
-  global $l_task, $l_user, $l_resource, $l_private;
-  global $ico_meeting, $ico_periodic;
+  global $l_task, $l_private, $l_user;
+  global $ico_meeting, $ico_periodic, $mono_user;
   
   $location = "";
   if ($occurrence->event->privacy == 1 && !(in_array($obm["uid"],$occurrence->event->attendee["user"]))) {
@@ -1162,10 +1170,10 @@ function dis_calendar_printable_event(&$occurence, &$calendar_entity, $ts) {
   }
   $entity_id = $occurence->id;
   $entity = $occurence->entity;
-  $attendee = "$l_user : ". $calendar_entity[$entity][$entity_id]["name"];
+  $attendee = $l_user .' : '.$calendar_entity[$entity][$entity_id]["name"];
   $klass = $calendar_entity[$entity][$entity_id]["class"];
   // FIXME
-  if($occurence->event->color != "") {
+  if($mono_user && $occurence->event->color != "") {
     $bgColor = "style=\"background-color:".$occurence->event->color."\"";
   } else {
     $bgColor = "";
@@ -1195,9 +1203,9 @@ function dis_calendar_printable_event(&$occurence, &$calendar_entity, $ts) {
   $event_data = "
     <div class=\"printableEvent $klass\" $bgColor>
     <h1 $bgColor><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurence->event->id."\">$schedule</a></h1>
-    $title <br />
-    $attendee
-    $location
+    <span>$title</span> 
+    <span class='attendee'><br />$attendee</span>
+    <span>$location</span>
     </div>"; 
   return $event_data;  
 }
@@ -1413,7 +1421,12 @@ function dis_calendar_week_list($calendar, $calendar_entity, $writable_entity) {
   $prev_month = of_isodate_format(strtotime("-1 month", $ts_date));
 
   $list_title = "$start_week - $end_week"; 
-
+  $display_days = $_SESSION['set_cal_display_days'];
+  if (empty($display_days)) $display_days = '1111111';
+  // FIXME Only work with the 'with or without week end' feature
+  if($display_days == '1111100') {
+    $end_time = strtotime("+5 days", $start_week_day);
+  }  
   $block = "<h1>
     <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
     <a href=\"calendar_index.php?date=$prev_week\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
@@ -2166,7 +2179,12 @@ function dis_calendar_week_planning($calendar, $calendar_entity, $writable_entit
   $end_time = strtotime("+7 days", $start_week_day);
 
   $display_date = "$start_week - $end_week"; 
-
+  $display_days = $_SESSION['set_cal_display_days'];
+  if (empty($display_days)) $display_days = '1111111';
+  // FIXME Only work with the 'with or without week end' feature
+  if($display_days == '1111100') {
+    $end_time = strtotime("+5 days", $start_week_day);
+  }  
   $dis_planning = dis_calendar_planning_view ($start_week_day, $end_time, $calendar_entity, $category_filter);
 
   $block = "
@@ -2348,8 +2366,8 @@ function dis_calendar_planning_event(&$occurence, &$calendar_entity, $ts, $cats_
   }
 
   $event_data = "
-    <li $bgColor>
-    <a style='$style' href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurence->event->id."\">$schedule - $title</a>
+    <li style='$style'>
+    <a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurence->event->id."\">$schedule - $title</a>
     </li>";
 
   return $event_data;  
@@ -2650,6 +2668,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     foreach ($attendee["entity"] as $u_id => $entity) {
       $label = $entity["label"];
       $state = $entity["state"];
+      $A = '';
+      $W = '';
+      $R = '';
       if ($obm["uid"] == $u_id || in_array($u_id,$writable_users["ids"])) {
         $$state = "checked=\"checked\"";
         $urld= "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
@@ -2668,15 +2689,23 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         <td>$label</td>
         <td>$sel_alert</td>
         <td class=\"C\">
-        <input $A type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"A\" onclick=\"window.location='$urld&rd_decision_event=A'\" />$l_A
-	<input $W type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"W\" onclick=\"window.location='$urld&rd_decision_event=W'\" />$l_W
-        <input $R type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"R\" onclick=\"window.location='$urld&rd_decision_event=R'\" />$l_R
+        <input $A type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"A\" onclick=\"window.location='$urld&rd_decision_event=A'\" /><span>$l_A</span>
+	<input $W type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"W\" onclick=\"window.location='$urld&rd_decision_event=W'\" /><span>$l_W</span>
+        <input $R type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"R\" onclick=\"window.location='$urld&rd_decision_event=R'\" /><span>$l_R</span>
         </td>
         </tr>
         ";
         $$state = "";
       } else {
-        $dis_user_list .= "<tr><td>$label</td><td></td><td class=\"C\">".$GLOBALS["l_$state"]."</td></tr>";
+        $A = 'class="disabled"';
+        $W = 'class="disabled"';
+        $R = 'class="disabled"';
+        $$state = '';
+        $dis_user_list .= "<tr><td>$label</td><td></td><td class=\"C\">
+        <input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"A\" onclick=\"window.location='$urld&rd_decision_event=A'\" /><span $A>$l_A</span>
+	<input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"W\" onclick=\"window.location='$urld&rd_decision_event=W'\" /><span $W>$l_W</span>
+        <input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"R\" onclick=\"window.location='$urld&rd_decision_event=R'\" /><span $R>$l_R</span>
+          </td></tr>";
       }
     }
   }
@@ -4116,10 +4145,10 @@ function dis_calendar_free_interval($calendar, $entity_store) {
             foreach($free_ressources as $groupId => $group) {
               if(is_array($possible_ressources[$groupId])) {
                 $resource_ul .= html_calendar_ressource_list($group[0]["groupLabel"],$possible_ressources[$groupId]);
-                $resource_url .= "&amp;sel_resource_id[]=".$possible_ressources[$groupId][0]["id"];
+                $resource_url .= "&amp;sel_resource_id[]=data-resource-".$possible_ressources[$groupId][0]["id"];
               }else {
                 $resource_ul .= html_calendar_ressource_list($group[0]["groupLabel"],$group,true);
-                $resource_url .= "&amp;sel_resource_id[]=".$free_ressources[$groupId][0]["id"];
+                $resource_url .= "&amp;sel_resource_id[]=data-resource-".$free_ressources[$groupId][0]["id"];
               }
             }
             $resource_div .= "

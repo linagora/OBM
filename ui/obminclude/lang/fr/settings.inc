@@ -51,3 +51,5 @@ $l_co_rev = "Inverse";
 // CSV Separators
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";
+$l_with_weekend = "Avec week-end";
+$l_without_weekend = "Sans week-end";

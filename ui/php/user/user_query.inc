@@ -28,6 +28,7 @@ function run_query_user_search($user) {
   $profile = $user['profile'];
   $domain_id = $user['domain'];
   $lname = sql_search_text_parse($user['lastname']);
+  $fname = sql_search_text_parse($user['firstname']);
   $delegation = sql_search_text_parse($user['delegation']);
   $email = sql_search_text_parse($user['email']);
   $desc = sql_search_text_parse($user['desc']);
@@ -81,6 +82,12 @@ function run_query_user_search($user) {
   if (trim($lname) != '') {
      if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_lastname $like '$lname%'";
+  }
+
+  // If a lastname indication has been specified, get it
+  if (trim($fname) != '') {
+     if (trim($where) != '') $where .= ' AND';
+     $where .= " userobm_firstname $like '$fname%'";
   }
 
   // If a delegation indication has been specified, get it
@@ -2032,7 +2039,7 @@ function run_query_user_insert_photo($user, $user_id) {
   $author = get_last_user_text($uid);
   $mime = '';
   $name = $user['name'];
-  $path = '';
+  $path = '/';
   $size = $user['size'];
   $kind = '';
   $url = '';
