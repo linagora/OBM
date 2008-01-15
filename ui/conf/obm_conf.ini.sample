@@ -64,7 +64,7 @@ ldapRoot = local
 ; Enable Cyrus partition support
 ; if cyrusPartition is enable, a dedicated Cyrus partition is created for each OBM domain
 ; Going cyrusPartition enabled from cyrusPartition disabled needs system work
-cyrusPartition = false
+cyrusPartition = true
 
 ; oldSidMapping mode is for compatibility with Aliamin and old install
 ; Modifying this on a running system need Samba domain work (re-register host,
