@@ -2888,8 +2888,6 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
 
   $possible_owners = of_right_entity_for_user("calendar", $obm["uid"], "write", "", "userobm");
   $possible_owners = $possible_owners["entity"];
-  $u = get_user_info();
-  $possible_owners[] = array("id"    => $u[id], "label" => "$u[lastname] $u[firstname]" );  
   $cats1 = of_category_get_ordered("calendar", "category1");
   $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $resources, $groups,$tasks, $cats1, $alerts);
 
