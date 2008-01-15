@@ -480,7 +480,11 @@ sub getServerDomains {
         }
     }
 
-    $self->logMessage( "Domaines associes a l'hote '".$hostName."' : ".join( ",", @{$domainList} ) );
+    if( $#{$domainList} < 0 ) {
+        $self->logMessage( "Pas de domaines associes a l'hote '".$hostName."'" );
+    }else {
+        $self->logMessage( "Domaines associes a l'hote '".$hostName."' : ".join( ",", @{$domainList} ) );
+    }
 
     $self->logMessage( "Deconnexion de l'annuaire LDAP" );
     &ObmSatellite::utils::disconnectLdapSrv( $self->{ldap_server} );
