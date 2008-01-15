@@ -3072,12 +3072,18 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   if (isset($calendar["date_begin"]) && !is_object($event_q)) {
     $ts = isodatetime_to_timestamp($calendar["date_begin"]);
+    if($ts < 0) {
+      $ts = 3113000;
+    }    
     $datebegin = of_date_upd_format($ts);
     $hourbegin = of_date_get_hour($ts);
     $minbegin = date("i", $ts);
   }
   if (isset($calendar["date_end"]) && !is_object($event_q)) {
     $ts = isodatetime_to_timestamp($calendar["date_end"]);
+    if($ts < 0) {
+      $ts = 3113000;
+    }
     $dateend = of_date_upd_format($ts);
     $hourend = of_date_get_hour($ts);
     $minend = date("i", $ts);

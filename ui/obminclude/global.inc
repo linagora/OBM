@@ -948,13 +948,15 @@ function of_isodate_convert($date, $null_empty=false) {
   }
   switch ($type) {
   case 'Y-m-d' :
+    preg_match("/^(\d{4})[-\/](\d{2})[-\/](\d{2})/",$date, $d);
+    $date = date($c_php_isodate_format,mktime(0,0,0,$d[2],$d[3],$d[1]));    
     break;    
   case 'd/m/Y' :
-    preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
+    preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
     $date = date($c_php_isodate_format,mktime(0,0,0,$d[2],$d[1],$d[3]));
     break;
   case 'm/d/Y' :
-    preg_match("/^(\d{2})[-\/](\d{2})[-\/](\d{4})/",$date, $d);
+    preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
     $date = date($c_php_isodate_format,mktime(0,0,0,$d[1],$d[2],$d[3]));        
     break;
   case 't' :
