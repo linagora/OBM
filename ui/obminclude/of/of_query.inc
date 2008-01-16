@@ -2475,7 +2475,7 @@ function isWindows() {
  */
 function check_user_defined_rules($module, &$fields) {
   global $path, $err, $conf_check;
-  if($conf_check && !file_exists("$path/../conf/check/$module.inc")) {
+  if($conf_check || !file_exists("$path/../conf/check/$module.inc")) {
     return true;
   }
   include("conf/check/$module.inc");
@@ -2511,9 +2511,9 @@ function check_user_defined_rules($module, &$fields) {
           } else {
             $err["msg"] = $field_rules["message"]["default"];
           }
-        }
-        $err["field"] = $field;
-        $return = false;        
+          $err["field"] = $field;
+          $return = false;            
+        }      
       }
     }
     $fields[$field] = stripslashes($value);

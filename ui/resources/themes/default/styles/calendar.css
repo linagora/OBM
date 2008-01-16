@@ -157,7 +157,7 @@
   overflow: hidden;
 }
 
-.printableEvent {
+.printableCalendar .printableEvent {
   height:auto !important;
   height:100%; 
   min-height:100%; 
@@ -188,6 +188,241 @@
   bottom: 0px;
   right: 0px;
 }
+
+.eventOwner {
+  color: #fff;
+  background-color: rgb(102, 140, 217);
+}
+
+.eventOwner h1, li.eventOwner {
+  background-color: rgb(41, 82, 163);
+  border-top: rgb(102, 140, 217);
+  border-bottom: rgb(102, 140, 217);
+}
+
+.eventOwner0 {
+  color: #fff;
+  background-color: rgb(216, 102, 102);
+}
+
+.eventOwner0 h1, li.eventOwner0 {
+  background-color: rgb(163, 41, 41);
+  border-top: rgb(216, 102, 102);
+  border-bottom: rgb(216, 102, 102);
+}
+
+
+.eventOwner1 {
+  color: #fff;
+  background-color: rgb(230, 115, 153);
+}
+
+.eventOwner1 h1, li.eventOwner1 {
+  background-color: rgb(177, 54, 95);
+  border-top: rgb(163, 41, 41);
+  border-bottom: rgb(163, 41, 41);
+}
+
+.eventOwner2 {
+  color: #fff;
+  background-color: rgb(179, 115, 179);
+}
+
+.eventOwner2 h1, li.eventOwner2 {
+  background-color: rgb(122, 54, 122);
+  border-top: rgb(163, 41, 41);
+  border-bottom: rgb(163, 41, 41);
+}
+
+.eventOwner3 {
+  color: #fff;
+  background-color: rgb(140, 102, 217);
+}
+
+.eventOwner3 h1, li.eventOwner3 {
+  background-color: rgb(82, 41, 163);
+  border-top: rgb(163, 41, 41);
+  border-bottom: rgb(163, 41, 41);
+}
+
+.eventOwner4 {
+  color: #fff;
+  background-color: rgb(102, 140, 179);
+}
+
+.eventOwner4 h1, li.eventOwner4 {
+  background-color: rgb(41, 82, 122);
+  border-top: rgb(102, 140, 179);
+  border-bottom: rgb(102, 140, 179);
+}
+
+.eventOwner5 {
+  color: #fff;
+  background-color: rgb(89, 191, 179);
+}
+
+.eventOwner5 h1, li.eventOwner5 {
+  background-color: rgb(27, 136, 122);
+  border-top: rgb(89, 191, 179);
+  border-bottom: rgb(89, 191, 179);
+}
+
+.eventOwner6 {
+  color: #fff;
+  background-color: rgb(101, 173, 137);
+}
+
+.eventOwner6 h1, li.eventOwner6 {
+  background-color: rgb(40, 117, 78);
+  border-top: rgb(101, 173, 137);
+  border-bottom: rgb(101, 173, 137);
+}
+
+.eventOwner7 {
+  color: #fff;
+  background-color: rgb(76, 176, 82);
+}
+
+.eventOwner7 h1, li.eventOwner7 {
+  background-color: rgb(13, 120, 19);
+  border-top: rgb(76, 176, 82);
+  border-bottom: rgb(76, 176, 82);
+}
+
+.eventOwner8 {
+  color: #fff;
+  background-color: rgb(140, 191, 64);
+}
+
+.eventOwner8 h1, li.eventOwner8 {
+  background-color: rgb(82, 136, 0);
+  border-top: rgb(140, 191, 64);
+  border-bottom: rgb(140, 191, 64);
+}
+
+.eventOwner9 {
+  color: #fff;
+  background-color: rgb(191, 191, 77);
+}
+
+.eventOwner9 h1, li.eventOwner9 {
+  background-color: rgb(136, 136, 14);
+  border-top: rgb(191, 191, 77);
+  border-bottom: rgb(191, 191, 77);
+}
+
+.eventOwner10 {
+  color: #fff;
+  background-color: rgb(224, 194, 64);
+}
+
+.eventOwner10 h1, li.eventOwner10 {
+  background-color: rgb(171, 139, 0);
+  border-top: rgb(224, 194, 64);
+  border-bottom: rgb(224, 194, 64);
+}
+
+.eventOwner11 {
+  color: #fff;
+  background-color: rgb(242, 166, 64);
+}
+
+.eventOwner11 h1, li.eventOwner11 {
+  background-color: rgb(190, 109, 0);
+  border-top: rgb(242, 166, 64);
+  border-bottom: rgb(242, 166, 64);
+}
+
+.eventOwner12 {
+  color: #fff;
+  background-color: rgb(230, 128, 77);
+}
+
+.eventOwner12 h1, li.eventOwner12 {
+  background-color: rgb(177, 68, 14);
+  border-top: rgb(230, 128, 77);
+  border-bottom: rgb(230, 128, 77);
+}
+
+.eventOwner13 {
+  color: #fff;
+  background-color: rgb(190, 148, 148);
+}
+
+.eventOwner13 h1, li.eventOwner13 {
+  background-color: rgb(134, 90, 90);
+  border-top: rgb(190, 148, 148);
+  border-bottom: rgb(190, 148, 148);
+}
+
+.eventOwner14 {
+  color: #fff;
+  background-color: rgb(169, 146, 169);
+}
+
+.eventOwner14 h1, li.eventOwner14 {
+  background-color: rgb(112, 87, 112);
+  border-top: rgb(169, 146, 169);
+  border-bottom: rgb(169, 146, 169);
+}
+
+.eventOwner15 {
+  color: #fff;
+  background-color: rgb(137, 151, 165);
+}
+
+.eventOwner15 h1, li.eventOwner15 {
+  background-color: rgb(78, 93, 108);
+  border-top: rgb(137, 151, 165);
+  border-bottom: rgb(137, 151, 165;
+}
+
+.eventOwner16 {
+  color: #fff;
+  background-color: rgb(148, 162, 190);
+}
+
+.eventOwner16 h1, li.eventOwner16 {
+  background-color: rgb(90, 105, 134);
+  border-top: rgb(148, 162, 190);
+  border-bottom: rgb(148, 162, 190);
+}
+
+.eventOwner17 {
+  color: #fff;
+  background-color: rgb(133, 170, 165);
+}
+
+.eventOwner17 h1, li.eventOwner17 {
+  background-color: rgb(74, 113, 108);
+  border-top: rgb(133, 170, 165);
+  border-bottom: rgb(133, 170, 165);
+}
+
+.eventOwner18 {
+  color: #fff;
+  background-color: rgb(167, 167, 125);
+}
+
+.eventOwner18 h1, li.eventOwner18 {
+  background-color: rgb(110, 110, 65);
+  border-top: rgb(167, 167, 125);
+  border-bottom: rgb(167, 167, 125);
+}
+
+.eventOwner19 {
+  color: #fff;
+  background-color: rgb(196, 168, 131);
+}
+
+.eventOwner19 h1, li.eventOwner19 {
+  background-color: rgb(141, 111, 71);
+  border-top: rgb(196, 168, 131);
+  border-bottom: rgb(196, 168, 131);
+}
+
+/*
+
 
 .eventOwner {
   color: #fff;
@@ -265,7 +500,7 @@
   border-top: 1px solid #5776c8;
   border-bottom: 1px solid #1a3196;
 }
-
+*/
 /* ------------------------------------------------------------------------- */
 /* Calendar Quick Form */
 /* ------------------------------------------------------------------------- */

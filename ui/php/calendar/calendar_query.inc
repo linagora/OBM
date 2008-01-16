@@ -2179,7 +2179,7 @@ function store_calendar_entities($entities_q) {
           'type'  => 'user',
           'id'    => $user_q->f('userobm_id'));
         $i++;
-        $i = $i%6;
+        $i = $i%21;
       }
     }
   }
@@ -2439,6 +2439,7 @@ function check_calendar_data_form($calendar) {
   $kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
   $repeatfrequency = $calendar['repeatfrequency'];
+  $event_duration = $calendar['event_duration'];
   ($calendar['all_day'] != 1)?$all_day= '0':$all_day = '1';
 
   if (trim($title) == '') {
@@ -2478,7 +2479,7 @@ function check_calendar_data_form($calendar) {
     return false;
   }
 
-  if ($dateend < $datebegin || ( $all_day !=  1 && $dateend == $datebegin)) {
+  if ($dateend < $datebegin || $event_duration < 0 || ( $all_day !=  1 && $dateend == $datebegin)) {
     $err['msg'] = $l_err_begin_end;
     return false;
   } 
@@ -3961,7 +3962,6 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   global $l_add_exception_mail_body, $l_add_exception_mail_subject;
   global $l_delete_exception_mail_body, $l_delete_exception_mail_subject;
   global $l_update_state_mail_subject, $l_update_state_mail_body;
-  global $l_add_resource_mail_body;
   global $cgp_host, $ccalendar_send_ics, $obm;
 
   $mail_datas = array('reset_state' => false, 'reset_resource_state' => false, 

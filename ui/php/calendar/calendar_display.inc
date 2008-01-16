@@ -823,9 +823,9 @@ function dis_calendar_month_printable($calendar, $calendar_entity,$writable_enti
         }
         $events_list .= "
           <div class=\"printableEvent $klass\">
-          <h1>$schedule</h1>
+          <h1><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurence->event->id."\">$schedule</a></h1>
           $title
-          <br />$attendee
+          <span class='attendee'><br />$attendee</span>
           $location
           </div>";
       }

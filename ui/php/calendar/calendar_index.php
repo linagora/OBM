@@ -118,27 +118,18 @@ if ($cal_entity_id['group_view'] == '') $cal_entity_id['group_view'] = $c_all;
 if (($params['new_sel']) || (is_array($params['sel_user_id'])) 
     && !(($action == 'insert') || ($action == 'update'))) {
   $cal_entity_id['user'] = $params['sel_user_id'];
-/*} else if (($action == 'insert') || ($action == 'update')) {
-  // If event creation (form submission) we set session even if selection empty
-  $cal_entity_id['user'] = $params['sel_user_id'];*/
 }
 
 // If resources selection present we override session content
-if ($action == 'new' && (is_array($params['sel_resource_id']))) {
-  // Join resources from group with normal resources.
-  $cal_entity_id['resource'] = array_merge($params['sel_resource_id'],$cal_entity_id['resource']);
-} else if (($params['new_sel']) || (is_array($params['sel_resource_id']))) {
+if (($params['new_sel']) || (is_array($params['sel_resource_id']))
+    && !(($action == 'insert') || ($action == 'update'))) {
   $cal_entity_id['resource'] = $params['sel_resource_id'];
 }
 
 // If group selection present we override session content
 if (is_array($params['sel_group_id'])) {
   $cal_entity_id['group'] = $params['sel_group_id'];
-} else if (($action == 'insert') || ($action == 'update')) {
-  // If event creation (form submission) we set session even if selection empty
-  $cal_entity_id['group'] = $params['sel_group_id'];
-}
-
+} 
 // If no user or resource selected, we select the connected user
 if ( ( (! is_array($cal_entity_id['user']))
        || (count($cal_entity_id['user']) == 0) )

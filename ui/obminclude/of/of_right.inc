@@ -807,8 +807,7 @@ class OBM_Acl {
   }
 
   function isAllowed($userId, $entityId, $entity, $action) {
-    if(isset($this->cache[$entity][$entityId][$action]));
-
+    return $this->getACL($userId, $entityId, $entity,$action);
   }
 
   function canRead($userId, $entityId, $entity) {
@@ -828,19 +827,25 @@ class OBM_Acl {
   }
 
   function getEntityReaders($entityId, $entity) {
-    return $this->getEntityRoles($entityId,$entity,'read')
+    return $this->getEntityRoles($entityId,$entity,'read');
   }
   
   function getEntityWriters($entityId, $entity) {
-    return $this->getEntityRoles($entityId,$entity,'write')
+    return $this->getEntityRoles($entityId,$entity,'write');
   }
 
   function getEntityAdmins($entityId, $entity) {
-    return $this->getEntityRoles($entityId,$entity,'admin')
+    return $this->getEntityRoles($entityId,$entity,'admin');
   }
 
   function getEntityACL($entityId, $entity) {
 
+  }
+
+  function isCached($entity, $entityId, $entity, $action) {
+    if(isset($this->cache['acl'][$userId][$entity][$entityId][$action])) {
+      
+    }
   }
 }
   */
