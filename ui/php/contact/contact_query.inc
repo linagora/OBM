@@ -1109,7 +1109,7 @@ function check_can_delete_contact($p_id) {
   global $err, $perm, $cright_write_admin, $ok_msg;
   global $l_link_deal, $l_link_deal_no, $l_link_contract, $l_link_contract_no;
   global $l_link_list, $l_link_list_no, $l_link_publication, $l_link_publication_no;
-  global $l_err_public_rights;
+  global $l_err_public_rights, $cgp_show;
 
   $delete_ok = true;
 
@@ -1123,41 +1123,47 @@ function check_can_delete_contact($p_id) {
   }
 
   // Links from deals
-  $nb = get_global_linked_deal_nb($p_id, 'contact1', true, 'contact2');
-  if ($nb > 0) {
-    $delete_ok = false;
-    $err['msg'] .= "$l_link_deal";
-  } else {
-    $ok_msg .= "$l_link_deal_no";
+  if ($cgp_show["module"]["deal"]) {
+    $nb = get_global_linked_deal_nb($p_id, 'contact1', true, 'contact2');
+    if ($nb > 0) {
+      $delete_ok = false;
+      $err['msg'] .= "$l_link_deal";
+    } else {
+      $ok_msg .= "$l_link_deal_no";
+    }
   }
 
   // Links from lists
-  $nb = get_linked_contact_list_nb($p_id);
-  if ($nb > 0) {
-    $delete_ok = false;
-    $err['msg'] .= "<br />$l_link_list";
-  } else {
-    $ok_msg .= "<br />$l_link_list_no";
+  if ($cgp_show["module"]["list"]) {
+    $nb = get_linked_contact_list_nb($p_id);
+    if ($nb > 0) {
+      $delete_ok = false;
+      $err['msg'] .= "<br />$l_link_list";
+    } else {
+      $ok_msg .= "<br />$l_link_list_no";
+    }
   }
 
   // Links from Contract
-  $nb = get_global_linked_contract_nb($p_id, 'contact1', true, 'contact2');
-  if ($nb > 0) {
-    $delete_ok = false;
-    $err['msg'] .= "<br />$l_link_contract";
-  } else {
-    $ok_msg .= "<br />$l_link_contract_no";
+  if ($cgp_show["module"]["contract"]) {
+    $nb = get_global_linked_contract_nb($p_id, 'contact1', true, 'contact2');
+    if ($nb > 0) {
+      $delete_ok = false;
+      $err['msg'] .= "<br />$l_link_contract";
+    } else {
+      $ok_msg .= "<br />$l_link_contract_no";
+    }
   }
-
-  // Links from Publications (Subscriptions)
-  $nb = get_linked_contact_publication_nb($p_id);
-  if ($nb > 0) {
-    $delete_ok = false;
-    $err['msg'] .= "<br />$l_link_publication";
-  } else {
-    $ok_msg .= "<br />$l_link_publication_no";
+  if ($cgp_show["module"]["publication"]) {
+    // Links from Publications (Subscriptions)
+    $nb = get_linked_contact_publication_nb($p_id);
+    if ($nb > 0) {
+      $delete_ok = false;
+      $err['msg'] .= "<br />$l_link_publication";
+    } else {
+      $ok_msg .= "<br />$l_link_publication_no";
+    }
   }
-
   return $delete_ok;
 }
 
