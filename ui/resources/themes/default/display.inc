@@ -112,7 +112,7 @@ function display_menu($module) {
   $obm['uid'];
   $login = $obm['login'];
   $profil = $obm['profile'];
-  $p = isset($GLOBALS["l_$profil"]) ? $GLOBALS["l_$profil"] : $profil;
+  $p = isset($GLOBALS["l_perm_$profil"]) ? $GLOBALS["l_perm_$profil"] : $profil;
   $domain = $obm['domain_label'];
   $domain_id = $obm['domain_id'];
   $section = $cgp_show['module'][$module];
