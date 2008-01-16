@@ -473,8 +473,8 @@ function html_user_consult($obm_q) {
   $login = $obm_q->f("userobm_login");
   $local = ($obm_q->f("userobm_local") == 1 ? $l_yes : $l_no);
   $ext_id = $obm_q->f("userobm_ext_id");
-  $p = $obm_q->f("userobm_perms");
-  $profile = isset($GLOBALS["l_perm_$p"]) ? $GLOBALS["l_perm_$p"] : $p;
+  $profile = $obm_q->f("userobm_perms");
+  $dis_profile = isset($GLOBALS["l_perm_$profile"]) ? $GLOBALS["l_perm_$profile"] : $profile;
   $hidden = $obm_q->f("userobm_hidden");
   $kind = $obm_q->f("userobm_kind");
   $lname = $obm_q->f("userobm_lastname");
@@ -779,7 +779,7 @@ function html_user_consult($obm_q) {
   </tr>
   <tr>
     <th>$l_profile</th>
-    <td>$profile</td>
+    <td>$dis_profile</td>
   </tr>
   $dis_delegation_target
   $dis_delegation
@@ -1165,9 +1165,9 @@ function html_user_form($usr_q, $user, $field='') {
     } else {
       $selected = "";
     }
-    $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;    
+    $dis_profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;    
     $block_profile .= "
-      <option value=\"$k_profile\"$selected>$profile</option>";
+      <option value=\"$k_profile\"$selected>$dis_profile</option>";
   }
 
   // Section Web
