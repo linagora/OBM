@@ -192,8 +192,8 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
           <li title=\"$tooltip\" class=\"".$data["class"]."\"><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
           <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
         if ($output_target != "print") {
-          $dis_legend .= "<input type=\"image\" src=\"$ico_delete\"
-          onclick=\"\$('$data_id').remove(); this.form.submit();\" />";
+          $dis_legend .= "<img src=\"$ico_delete\"
+          onclick=\"\$('$data_id').remove(); $('calendarSelectForm').submit();\" onmouseover=\"this.style.cursor = 'pointer';\"/>";
         }
         $dis_legend .= " &nbsp;".$data["name"]."
           </li>";
@@ -204,7 +204,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   $block .= "
   <div class=\"portlet\" id=\"calendarLegend\">
   <h1>$l_legend</h1>
-  <form action=\"\" onsubmit=\"return false;\">
+  <form action=\"\" id=\"calendarSelectForm\" onsubmit=\"return false;\">
   <script type=\"text/javascript\">
     obm.vars.conf.calendarColor = '$colorTemplate';
     $script_range 
