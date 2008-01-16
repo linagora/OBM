@@ -322,6 +322,7 @@ sub _updateSieveNomade {
     my $nomadeMark = "# OBM2 - Nomade";
 
     if( my $nomadeMsg = $object->getSieveNomade() ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: gestion de la redirection de la boite '".$object->getMailboxName()."'", "W" );
         push( @{$newSieveScript}, $nomadeMark."\n" );
         push( @{$newSieveScript}, $nomadeMsg );
         push( @{$newSieveScript}, $nomadeMark."\n" );

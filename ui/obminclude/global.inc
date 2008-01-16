@@ -395,8 +395,8 @@ $password_encryption = strtoupper($password_encryption);
 $cmd_halt = "sudo /sbin/halt";
 $cmd_update = "$path/../auto/incrementalUpdate.pl";
 $cmd_check_update = "ps aux | grep auto/incrementalUpdate.pl | grep -v grep";
-$cmd_mailforward = "$path/../auto/mailChangeSieve.pl";
-$cmd_vacation = "$path/../auto/mailChangeSieve.pl";
+$cmd_mailforward = "$path/../auto/updateSieve.pl";
+$cmd_vacation = "$path/../auto/updateSieve.pl";
 $cmd_ldap_passwd = "$path/../auto/changePasswd.pl";
 
 $section = $cgp_show['module'][$module];

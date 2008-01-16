@@ -59,7 +59,7 @@ sub getParameter {
 
 
 # On prepare le log
-&OBM::toolBox::write_log( "MailChangeSieve: ", "O" );
+&OBM::toolBox::write_log( "UpdateSieve: ", "O" );
 
 # Traitement des parametres
 &OBM::toolBox::write_log( "Analyse des parametres du script", "W" );

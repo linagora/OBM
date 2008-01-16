@@ -17,11 +17,10 @@ use FindBin qw($Bin);
 @ISA = qw(Exporter);
 @EXPORT_const = qw($logLevel $facility_log $sieveSrv $singleNameSpace $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
-@EXPORT_files = qw($automateMailChangeAlias $automateMailChangeSieve $automateCyrusAdmin $automateLdapUpdate $automateLdapUpdatePasswd $automatePostfixUpdate);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_regexp = qw($regexp_email $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db);
-@EXPORT = (@EXPORT_const, @EXPORT_db, @EXPORT_files, @EXPORT_command, @EXPORT_regexp, @EXPORT_dir);
+@EXPORT = (@EXPORT_const, @EXPORT_db, @EXPORT_command, @EXPORT_regexp, @EXPORT_dir);
 @EXPORT_OK = qw();
 
 # Necessaire pour le bon fonctionnement du package
@@ -189,13 +188,6 @@ $minGID = 1000;
 #
 # Le repertoire contenant les scripts de l'automate
 $automateOBM = $racineOBM . "auto/";
-#
-$automateMailChangeAlias = $automateOBM . "mailChangeAlias.pl";
-$automateMailChangeSieve = $automateOBM . "mailChangeSieve.pl";
-$automateCyrusAdmin = $automateOBM . "mailCyrusAdmin.pl";
-$automatePostfixUpdate = $automateOBM . "mailPostfixMapsUpdate.pl";
-$automateLdapUpdate = $automateOBM . "ldapModifBase.pl";
-$automateLdapUpdatePasswd = $automateOBM . "ldapChangePasswd.pl";
 
 #
 # ACL : Definition des entites et des consomateurs
