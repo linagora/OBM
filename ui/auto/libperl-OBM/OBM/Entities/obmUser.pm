@@ -283,11 +283,10 @@ sub getEntity {
 
             # Gestion de la BAL destination
             #   valeur dans LDAP
-            $self->{userDesc}->{userobm_mailbox_ldap_name} = $dbUserDesc->{userobm_login};
+            $self->{userDesc}->{userobm_mailbox_ldap_name} = $dbUserDesc->{userobm_login}."@".$domainDesc->{domain_name};
             #   nom de la BAL Cyrus
             $self->{userDesc}->{userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
             if( !$singleNameSpace ) {
-                $self->{userDesc}->{userobm_mailbox_ldap_name} .= "@".$domainDesc->{domain_name};
                 $self->{userDesc}->{userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
             }
 
