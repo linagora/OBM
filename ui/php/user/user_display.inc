@@ -79,7 +79,12 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
     } else {
       $res["name"] = " ";
     }
-  } 
+  }
+
+  else if ($fieldname == "userobm_perms") {
+    $profil = $OD->data_set->f($fieldname); 
+    $res["name"] = isset($GLOBALS["l_perm_$profil"]) ? $GLOBALS["l_perm_$profil"] : $profil;
+  }
 
   else if ($fieldname == "userobm_archive") {
     $res["align"] = "center";
@@ -226,8 +231,9 @@ function html_user_search_form($user) {
   }
 
   foreach ($profiles as $k_profile => $one_profile) {
+    $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
     $block_profile .= "
-      <option value=\"$k_profile\"> $k_profile</option>";
+      <option value=\"$k_profile\"> $profile</option>";
   }
 
   if ($obm["domain_id"] == 0) {
@@ -460,7 +466,8 @@ function html_user_consult($obm_q) {
   $login = $obm_q->f("userobm_login");
   $local = ($obm_q->f("userobm_local") == 1 ? $l_yes : $l_no);
   $ext_id = $obm_q->f("userobm_ext_id");
-  $profile = $obm_q->f("userobm_perms");
+  $p = $obm_q->f("userobm_perms");
+  $profile = isset($GLOBALS["l_perm_$p"]) ? $GLOBALS["l_perm_$p"] : $p;
   $hidden = $obm_q->f("userobm_hidden");
   $kind = $obm_q->f("userobm_kind");
   $lname = $obm_q->f("userobm_lastname");
@@ -1150,8 +1157,9 @@ function html_user_form($usr_q, $user, $field='') {
     } else {
       $selected = "";
     }
+    $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;    
     $block_profile .= "
-      <option value=\"$k_profile\"$selected> $k_profile</option>";
+      <option value=\"$k_profile\"$selected>$profile</option>";
   }
 
   // Section Web

@@ -168,6 +168,12 @@ $l_recursive = "Récursif";
 $l_hour = "Heure";
 $l_type ="Type";
 
+// Profiles
+$l_perm_admin = "Admin";
+$l_perm_admin_delegue = "Admin délégué";
+$l_perm_user = "Utilisateur";
+$l_perm_editor = "Editeur";
+
 // Entities
 $l_company = "Société";
 $l_contact = "Contact";

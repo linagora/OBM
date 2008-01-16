@@ -60,6 +60,7 @@ $l_add_comment2 = "Ajouter un commentaire 2";
 $l_upd_comment2 = "Modifier le commentaire 2";
 $l_add_comment3 = "Ajouter un commentaire 3";
 $l_upd_comment3 = "Modifier le commentaire 3";
+$l_copy = "Copier";
 
 // Messages
 $l_check_samecontact = "Ces contacts semblent similaires à cette nouvelle entrée !";

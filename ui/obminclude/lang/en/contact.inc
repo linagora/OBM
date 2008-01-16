@@ -57,6 +57,7 @@ $l_add_comment2 = "Add a comment 2";
 $l_upd_comment2 = "Update comment 2";
 $l_add_comment3 = "Add a comment 3";
 $l_upd_comment3 = "Update comment 3";
+$l_copy = "Copy";
 
 // Messages
 $l_check_samecontact = "These contacts seem similar to this new entry !";

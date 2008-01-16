@@ -47,6 +47,7 @@ $l_add_comment2 = "Add a kommentar 2";
 $l_upd_comment2 = "Update the kommentar 2";
 $l_add_comment3 = "Add a Kommentar 3";
 $l_upd_comment3 = "Update the kommentar 3";
+$l_copy = "Copy";
 
 // Messages
 $l_contact_del_verif_error = " Verträge sind noch zugeordnet: Kontakt kann nicht gelöscht werden";

@@ -112,6 +112,7 @@ function display_menu($module) {
   $obm['uid'];
   $login = $obm['login'];
   $profil = $obm['profile'];
+  $p = isset($GLOBALS["l_$profil"]) ? $GLOBALS["l_$profil"] : $profil;
   $domain = $obm['domain_label'];
   $domain_id = $obm['domain_id'];
   $section = $cgp_show['module'][$module];
@@ -143,7 +144,7 @@ $display['section']
 <ul id='information'>
 $dis_scope
 <li> $login ($domain)</li>
-<li>$l_profile : $profil</li>
+<li>$l_profile : $p</li>
 <li><a href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
 $dis_printer
 </ul>
@@ -180,7 +181,9 @@ function display_sections_theme($section) {
 	} else {
 	  if (isset($section_target)) {
 	    $target = "target='$section_target'";
-	  }
+	  } else {
+            $target = "";
+          }
           $section_name = "<a $target href=\"$show[url]\">$section_name</a>";
         }
         if ($key == $section) {

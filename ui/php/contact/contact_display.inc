@@ -826,7 +826,7 @@ function html_contact_view_main($co_q) {
   global $l_service, $l_coord, $l_town, $l_country;
   global $l_expresspostal, $l_comment1, $l_comment2, $l_comment3;
   global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter;
-  global $ico_clipboard, $l_yes, $l_no,  $ico_mail;
+  global $ico_clipboard, $l_copy, $l_yes, $l_no,  $ico_mail;
   global $display, $cgp_show, $cgp_hide, $cclipboard_address;
 
   $id = $co_q->f('contact_id');
@@ -1050,7 +1050,7 @@ function html_contact_view_main($co_q) {
     </tr><tr>
       <th>
       $l_address 1
-      <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"Copy\" ><img alt=\"Copy\" src=\"$ico_clipboard\" /></a>
+      <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"$l_copy\" ><img alt=\"$l_copy\" src=\"$ico_clipboard\" /></a>
       </th>
       <td>$ad1</td>
     </tr><tr>
