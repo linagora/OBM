@@ -132,6 +132,14 @@ function run_query_user_search($user) {
     $where .= " userobm_archive = '1'";
   }
 
+  // User defined data
+  $userdata = of_userdata_query_search('user', $user, 'UserObm');
+  if ($userdata['where'] != '') {
+    if (trim($where) != '') $where .= ' AND ';
+    $where .= $userdata['where'];
+    $join_userdata = $userdata['join'];
+  }
+
   if ((trim($where) != '') || (trim($where_restriction) != '')) {
     $whereq = " WHERE $where $where_restriction $multidomain";
   } else {
@@ -146,7 +154,8 @@ function run_query_user_search($user) {
       $lastaccess
     FROM UserObm 
     LEFT JOIN Domain ON userobm_domain_id = domain_id
-    $join_grp";
+    $join_grp
+    $join_userdata";
 
 
   // ORDER construction
@@ -162,7 +171,7 @@ function run_query_user_search($user) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $whereq");
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_userdata $whereq");
     $obm_q->set_num_rows_total($count);
   }
 

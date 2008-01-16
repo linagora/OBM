@@ -209,6 +209,9 @@ function html_user_search_form($user) {
     $dis_restriction = "<input name=\"restriction_calendar\" type=\"hidden\" value=\"calendar\" />";
   }
 
+  // User defined data
+  $block_userdata .= of_userdata_dis_search('user', $user);
+
   if ($popup) {
     $ext_action = $user["ext_action"];
     $ext_title = stripslashes($user["ext_title"]);
@@ -285,6 +288,7 @@ function html_user_search_form($user) {
       <input type=\"text\" name=\"tf_group\" size=\"16\" maxlength=\"32\"
       value=\"$group\" />
     </label>
+    $block_userdata
     <label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </label>
@@ -350,6 +354,9 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
   $group = urlencode($user["group"]);
   $archive = $user["archive"];
 
+  // User defined data
+  $url_userdata = of_userdata_get_url_search_params('user', $user);
+
   if ($popup) {
     $ext_action = $user["ext_action"];
     $ext_url = $user["ext_url"];
@@ -361,7 +368,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
   }
 
-  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_group=$group&amp;cba_archive=$archive$url_ext");
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext");
 
   $user_d = new OBM_DISPLAY("DATA", $prefs, "user");
   if ($popup) {
@@ -542,6 +549,7 @@ function html_user_consult($obm_q) {
   $mail_ext_state  = ($mail_ext_perms ? $l_enabled : $l_disabled);
   $smb_state  = ($smb_perms ? $l_enabled : $l_disabled);
 
+  // User defined data
   $block_userdata .= of_userdata_dis_entity_consult("user", $id);
 
   // Liste des groupes de l'utilisateur

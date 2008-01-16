@@ -12,30 +12,30 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["company_name"] = $l_name;
-$fieldnames["company_number"] = $l_number;
-$fieldnames["company_vat"] = $l_vat;
-$fieldnames["company_siret"] = $l_siret;
-$fieldnames["company_archive"] = $l_archive_first;
-$fieldnames["company_address"] = $l_address;
-$fieldnames["company_address1"] = "$l_address 1";
-$fieldnames["company_address2"] = "$l_address 2";
-$fieldnames["company_address3"] = "$l_address 3";
-$fieldnames["company_zipcode"] = $l_postcode;
-$fieldnames["company_town"] = $l_town;
-$fieldnames["company_expresspostal"] = $l_expresspostal;
-$fieldnames["country_name"] = $l_country;
-$fieldnames["company_phone"] = $l_phone;
-$fieldnames["company_fax"] = $l_fax;
-$fieldnames["company_email"] = $l_email;
-$fieldnames["company_web"] = $l_web;
+$fieldnames['company_name'] = $l_name;
+$fieldnames['company_number'] = $l_number;
+$fieldnames['company_vat'] = $l_vat;
+$fieldnames['company_siret'] = $l_siret;
+$fieldnames['company_archive'] = $l_archive_first;
+$fieldnames['company_address'] = $l_address;
+$fieldnames['company_address1'] = "$l_address 1";
+$fieldnames['company_address2'] = "$l_address 2";
+$fieldnames['company_address3'] = "$l_address 3";
+$fieldnames['company_zipcode'] = $l_postcode;
+$fieldnames['company_town'] = $l_town;
+$fieldnames['company_expresspostal'] = $l_expresspostal;
+$fieldnames['country_name'] = $l_country;
+$fieldnames['company_phone'] = $l_phone;
+$fieldnames['company_fax'] = $l_fax;
+$fieldnames['company_email'] = $l_email;
+$fieldnames['company_web'] = $l_web;
 // Calculated or indirect fields
-$fieldnames["type_label"] = $l_type;
-$fieldnames["activity_label"] = $l_activity;
-$fieldnames["nafcode_code"] = $l_nafcode;
-$fieldnames["company_contact_number"] = "<img src=\"$ico_contact\" alt=\"Contact\" />";
-$fieldnames["company_new_contact"] = "<img src=\"$ico_add\" alt=\"New Contact\" />";
-$fieldnames["company_deal_number"] = "<img src=\"$ico_deal\" alt=\"Deal\" />";
+$fieldnames['type_label'] = $l_type;
+$fieldnames['activity_label'] = $l_activity;
+$fieldnames['nafcode_code'] = $l_nafcode;
+$fieldnames['company_contact_number'] = "<img src=\"$ico_contact\" alt=\"Contact\" />";
+$fieldnames['company_new_contact'] = "<img src=\"$ico_add\" alt=\"New Contact\" />";
+$fieldnames['company_deal_number'] = "<img src=\"$ico_deal\" alt=\"Deal\" />";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,112 +50,112 @@ $fieldnames["company_deal_number"] = "<img src=\"$ico_deal\" alt=\"Deal\" />";
 function dis_data_company(&$OD, $fieldname, $link_ok) {
   global $path, $params, $ico_mail, $ico_web, $ico_add;
 
-  $ext_url = $params["ext_url"];
+  $ext_url = $params['ext_url'];
 
-  if ($fieldname == "company_name") {
-    if ($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_company_get_id(".$OD->data_set->f("company_id").",'".addslashes($OD->data_set->f("company_name"))."');";
-    } else if ($OD->display_ext == "get_id_url") {
-      $res["url"] = "javascript:check_company_get_id_url('$ext_url',".$OD->data_set->f("company_id").");";
+  if ($fieldname == 'company_name') {
+    if ($OD->display_ext == 'get_id') {
+      $res['url'] = 'javascript:check_company_get_id('.$OD->data_set->f('company_id').",'".addslashes($OD->data_set->f('company_name'))."');";
+    } else if ($OD->display_ext == 'get_id_url') {
+      $res['url'] = "javascript:check_company_get_id_url('$ext_url',".$OD->data_set->f('company_id').');';
     } else {
-      $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f("company_id");
+      $res['url'] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f('company_id');
     }
   }
 
-  else if ($fieldname == "company_archive") {
-    $res["align"] = "center";
+  else if ($fieldname == 'company_archive') {
+    $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
-      $res["name"] = "X";
+      $res['name'] = 'X';
     } else {
-      $res["name"] = "&nbsp;";
-      $res["txt_name"] = " ";
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
     }
   }
 
-  else if (($fieldname == "company_email") && $link_ok) {
-    $email = $OD->data_set->f("company_email");
-    if (strcmp($email,"") != 0) {
-      $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\" />";
-      $res["txt_name"] = $email;
+  else if (($fieldname == 'company_email') && $link_ok) {
+    $email = $OD->data_set->f('company_email');
+    if (strcmp($email,'') != 0) {
+      $res['url'] = "mailto:$email";
+      $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\" />";
+      $res['txt_name'] = $email;
     }
   }
 
-  else if (($fieldname == "company_web") && $link_ok) {
-    $web = $OD->data_set->f("company_web");
-    if (strcmp($web,"") != 0) {
-      if ( (strcmp(substr($web,0,7), "http://") == 0)
-           || (strcmp(substr($web,0,8), "https://") == 0) ) {
-	$link_web = "";
+  else if (($fieldname == 'company_web') && $link_ok) {
+    $web = $OD->data_set->f('company_web');
+    if (strcmp($web,'') != 0) {
+      if ( (strcmp(substr($web,0,7), 'http://') == 0)
+           || (strcmp(substr($web,0,8), 'https://') == 0) ) {
+	$link_web = '';
       } else {
-	$link_web = "http://";
+	$link_web = 'http://';
       }
       $link_web .= "$web";
-      $res["url"] = $link_web;
-      $res["window"] = true;
-      $res["popup_width"] = 800;
-      $res["popup_height"] = 600;
-      $res["name"] = "<img src=\"$ico_web\" alt=\"$web\" />";
-      $res["txt_name"] = $web;
+      $res['url'] = $link_web;
+      $res['window'] = true;
+      $res['popup_width'] = 800;
+      $res['popup_height'] = 600;
+      $res['name'] = "<img src=\"$ico_web\" alt=\"$web\" />";
+      $res['txt_name'] = $web;
     }
   }
 
-  else if ($fieldname == "company_contact_number") {
-    $res["name"] = $OD->data_set->f("company_contact_number");
-    if (($res["name"] > 0) && $link_ok) {
-      $res["url"] = "$path/contact/contact_index.php?action=search&amp;company_id=".$OD->data_set->f("company_id")."&amp;tf_company=".urlencode("".$OD->data_set->f("company_name"));
+  else if ($fieldname == 'company_contact_number') {
+    $res['name'] = $OD->data_set->f('company_contact_number');
+    if (($res['name'] > 0) && $link_ok) {
+      $res['url'] = "$path/contact/contact_index.php?action=search&amp;company_id=".$OD->data_set->f('company_id')."&amp;tf_company=".urlencode(''.$OD->data_set->f('company_name'));
     }
-    $res["align"] = "center";
+    $res['align'] = 'center';
   }
 
-  else if (($fieldname == "company_new_contact") && $link_ok){
-    $res["align"] = "center";
-    $market = $OD->data_set->f("company_marketingmanager_id");
-    $email = $OD->data_set->f("company_email");
-    $ctry = $OD->data_set->f("company_country_iso3166");
-    $res["url"] = "$path/contact/contact_index.php?action=new&amp;company_id=".$OD->data_set->f("company_id")."&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email";
-    $res["name"] = "<img src=\"$ico_add\" title=\"Add contact\" alt=\"Add Contact\" />";
-    $res["txt_name"] = " ";
+  else if (($fieldname == 'company_new_contact') && $link_ok){
+    $res['align'] = 'center';
+    $market = $OD->data_set->f('company_marketingmanager_id');
+    $email = $OD->data_set->f('company_email');
+    $ctry = $OD->data_set->f('company_country_iso3166');
+    $res['url'] = "$path/contact/contact_index.php?action=new&amp;company_id=".$OD->data_set->f('company_id')."&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email";
+    $res['name'] = "<img src=\"$ico_add\" title=\"Add contact\" alt=\"Add Contact\" />";
+    $res['txt_name'] = ' ';
   }
 
-  else if ($fieldname == "company_deal_number") {
-    $res["name"] = $OD->data_set->f("company_deal_number") . " / ";
-    $res["name"] .= $OD->data_set->f("company_deal_total");
+  else if ($fieldname == 'company_deal_number') {
+    $res['name'] = $OD->data_set->f('company_deal_number') . ' / ';
+    $res['name'] .= $OD->data_set->f('company_deal_total');
 
-    $c_id = $OD->data_set->f("company_id");
-    if (($res["name"] != "0 / 0") && $link_ok) {
-      $res["url"] = "$path/deal/deal_index.php?action=search&amp;company_id=$c_id";
+    $c_id = $OD->data_set->f('company_id');
+    if (($res['name'] != '0 / 0') && $link_ok) {
+      $res['url'] = "$path/deal/deal_index.php?action=search&amp;company_id=$c_id";
     }
-    $res["align"] = "center";
+    $res['align'] = 'center';
   }
   
-  else if ($fieldname == "company_address") {
-    if ($OD->data_set->f("company_address1") != "") {
-      $res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
+  else if ($fieldname == 'company_address') {
+    if ($OD->data_set->f('company_address1') != '') {
+      $res['name'] .= $OD->data_set->f('company_address1')."<br />\n";
     }
-    if ($OD->data_set->f("company_address2") != "") {
-      $res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
+    if ($OD->data_set->f('company_address2') != '') {
+      $res['name'] .= $OD->data_set->f('company_address2')."<br />\n";
     }
-    if ($OD->data_set->f("company_address3") != "") {
-      $res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
+    if ($OD->data_set->f('company_address3') != '') {
+      $res['name'] .= $OD->data_set->f('company_address3')."<br />\n";
     }
-    if ($OD->data_set->f("company_zipcode") != "" ) {
-      $res["name"] .= $OD->data_set->f("company_zipcode") . " ";
+    if ($OD->data_set->f('company_zipcode') != '') {
+      $res['name'] .= $OD->data_set->f('company_zipcode') . ' ';
     } else {
-      $res["name"] .= " ";
+      $res['name'] .= ' ';
     }
-    if ($OD->data_set->f("company_town") != "" ) {
-      $res["name"] .= $OD->data_set->f("company_town");
+    if ($OD->data_set->f('company_town') != '') {
+      $res['name'] .= $OD->data_set->f('company_town');
     }
-    if ($OD->data_set->f("country_name") != "" ) {
-      $res["name"] .= " " . $OD->data_set->f("country_name");
+    if ($OD->data_set->f('country_name') != '') {
+      $res['name'] .= ' ' . $OD->data_set->f('country_name');
     }
-    $res["txt_name"] = trim($OD->data_set->f("company_address1") . " " .
-                       $OD->data_set->f("company_address2") . " " .
-                       $OD->data_set->f("company_address3") . " " .
-                       $OD->data_set->f("company_zipcode") . " " .
-                       $OD->data_set->f("company_town") . " " .
-		       $OD->data_set->f("country_name"));
+    $res['txt_name'] = trim($OD->data_set->f('company_address1') . ' ' .
+                       $OD->data_set->f('company_address2') . ' ' .
+                       $OD->data_set->f('company_address3') . ' ' .
+                       $OD->data_set->f('company_zipcode') . ' ' .
+                       $OD->data_set->f('company_town') . ' ' .
+		       $OD->data_set->f('country_name'));
   }
 
   return $res;
@@ -167,12 +167,12 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 // Parameters:
 //   - $company[] : hash with company values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_company_search_form($company="") {
+function dis_company_search_form($company='') {
 
-  $types = of_category_get_ordered("company", "type");
-  $acts = of_category_get_ordered("company", "activity");
+  $types = of_category_get_ordered('company', 'type');
+  $acts = of_category_get_ordered('company', 'activity');
   $naf_q = run_query_companynafcode();
-  $usr_q = run_query_userobm_responsable("Company",array("company_marketingmanager_id"));
+  $usr_q = run_query_userobm_responsable('Company',array('company_marketingmanager_id'));
   $ctry_q = run_query_global_country_for_lang();
   $dsrc_q = run_query_global_datasource();
   $block .= html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
@@ -200,37 +200,37 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
   global $l_market, $l_country, $l_after, $l_before, $l_nafcode; 
   global $l_all, $l_find, $l_datasource, $l_select_company;
 
-  $popup = $company["popup"];
-  $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
-  $name = stripslashes($company["name"]);
-  $number = stripslashes($company["number"]);
-  $phone = stripslashes($company["phone"]);
-  $town = stripslashes($company["town"]);
-  $type = $company["type"];
-  $act = $company["activity"];
-  $naf = $company["naf"];
-  $ctry = $company["country"];
-  $mark = $company["market"];
-  $dsrc = $company["datasource"];
-  $zip = stripslashes($company["zip"]);
-  $dateafter = of_date_upd_format(stripslashes($company["date_after"]),true);
-  $datebefore = of_date_upd_format(stripslashes($company["date_before"]),true);
-  if (($company["fuzzy"] == "1") ||
-      ($csearch_advanced_default && $action != "search") ) {
+  $popup = $company['popup'];
+  $archive = ($company['archive'] == '1' ? "checked = \"checked\"" : '');
+  $name = stripslashes($company['name']);
+  $number = stripslashes($company['number']);
+  $phone = stripslashes($company['phone']);
+  $town = stripslashes($company['town']);
+  $type = $company['type'];
+  $act = $company['activity'];
+  $naf = $company['naf'];
+  $ctry = $company['country'];
+  $mark = $company['market'];
+  $dsrc = $company['datasource'];
+  $zip = stripslashes($company['zip']);
+  $dateafter = of_date_upd_format(stripslashes($company['date_after']),true);
+  $datebefore = of_date_upd_format(stripslashes($company['date_before']),true);
+  if (($company['fuzzy'] == '1') ||
+      ($csearch_advanced_default && $action != 'search') ) {
     $fuzzy = "checked = \"checked\"";
   } else {
-    $fuzzy = "";
+    $fuzzy = '';
   }
 
   // User defined data
-  $block_userdata .= of_userdata_dis_search("company", $company);
+  $block_userdata .= of_userdata_dis_search('company', $company);
 
   // Type, activity select
-  $block_type = of_category_dis_search_select("company", "type", $types, $type);
-  $block_activity = of_category_dis_search_select("company", "activity", $acts, $act);
+  $block_type = of_category_dis_search_select('company', 'type', $types, $type);
+  $block_activity = of_category_dis_search_select('company', 'activity', $acts, $act);
 
   // Naf Code select
-  $show_naf = (! $cgp_hide["company"]["nafcode"]);
+  $show_naf = (! $cgp_hide['company']['nafcode']);
   if ($show_naf) {
     $sel_naf = dis_select_company_nafcode($naf_q, "<option value=\"$c_all\">$l_all</option>", $naf);
 
@@ -244,45 +244,45 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
   $sel_ctry = "<select name=\"sel_country\">
     <option value=\"$c_all\">$l_all</option>";
   while ($ctry_q->next_record()) {
-    $ctry_iso3166 = $ctry_q->f("country_iso3166");
+    $ctry_iso3166 = $ctry_q->f('country_iso3166');
     $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";
     if ($ctry_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
-    $sel_ctry .= ">". htmlentities($ctry_q->f("country_name")) . "</option>\n";
+    $sel_ctry .= '>'. htmlentities($ctry_q->f('country_name')) . "</option>\n";
   }
-  $sel_ctry .= "</select>";
+  $sel_ctry .= '</select>';
 
   // Marketing manager select
   $sel_market = "<select name=\"sel_market\">
     <option value=\"$c_all\">$l_all</option>";
   while ($usr_q->next_record()) {
-    $u_id = $usr_q->f("userobm_id");
+    $u_id = $usr_q->f('userobm_id');
     $sel_market .= "\n<option value=\"$u_id\"";
     if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
-    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
+    $sel_market .= '>'. $usr_q->f('userobm_lastname').' '.$usr_q->f('userobm_firstname') . "</option>\n";
   }
-  $sel_market .= "</select>";
+  $sel_market .= '</select>';
 
   // Data source select
   $sel_dsrc = "<select name=\"sel_datasource\">
     <option value=\"$c_all\">$l_all</option>";
   while ($dsrc_q->next_record()) {
-    $d_id = $dsrc_q->f("datasource_id");
+    $d_id = $dsrc_q->f('datasource_id');
     $sel_dsrc .= "\n<option value=\"$d_id\"";
     if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
-    $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
+    $sel_dsrc .= '>'. $dsrc_q->f('datasource_name') . "</option>\n";
   }
-  $sel_dsrc .= "</select>";
+  $sel_dsrc .= '</select>';
 
-  $url = url_prepare("company_index.php");
+  $url = url_prepare('company_index.php');
 
   if ($popup) {
-    $ext_action = $company["ext_action"];
-    $ext_url = $company["ext_url"];
-    $ext_id = $company["ext_id"];
-    $ext_title = ($company["ext_title"] ? $company["ext_title"] : $l_select_company);
-    $ext_target = $company["ext_target"];
-    $ext_widget = $company["ext_widget"];
-    $ext_widget_text = $company["ext_widget_text"];
+    $ext_action = $company['ext_action'];
+    $ext_url = $company['ext_url'];
+    $ext_id = $company['ext_id'];
+    $ext_title = ($company['ext_title'] ? $company['ext_title'] : $l_select_company);
+    $ext_target = $company['ext_target'];
+    $ext_widget = $company['ext_widget'];
+    $ext_widget_text = $company['ext_widget_text'];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
@@ -290,7 +290,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = $ext_title;
+    $display['title'] = $ext_title;
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -364,14 +364,14 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
 function dis_company_search_list($company) {
   global $display, $l_found, $l_no_found, $obm;
 
-  $popup = $company["popup"];
-  $prefs = get_display_pref($obm["uid"], "company");
+  $popup = $company['popup'];
+  $prefs = get_display_pref($obm['uid'], 'company');
   $obm_q = run_query_company_search($company);
   $nb_company = $obm_q->num_rows_total();
   if ($nb_company == 0) {
-    $display["msg"] = display_warn_msg($l_no_found);
+    $display['msg'] = display_warn_msg($l_no_found);
   } else {
-    $display["msg"] = display_info_msg("$nb_company $l_found");
+    $display['msg'] = display_info_msg("$nb_company $l_found");
     $block = html_company_search_list($obm_q, $prefs, $company, $popup);
   }
 
@@ -391,51 +391,51 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   global $l_close;
 
   if ($popup) {
-    $ext_action = $company["ext_action"];
-    $ext_url = urlencode($company["ext_url"]);
-    $ext_id = $company["ext_id"];
-    $ext_target = $company["ext_target"];
-    $ext_widget = $company["ext_widget"];
-    $ext_widget_text = $company["ext_widget_text"];
+    $ext_action = $company['ext_action'];
+    $ext_url = urlencode($company['ext_url']);
+    $ext_id = $company['ext_id'];
+    $ext_target = $company['ext_target'];
+    $ext_widget = $company['ext_widget'];
+    $ext_widget_text = $company['ext_widget_text'];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
   // we urlencode to avoid breakage for space char
-  $name = urlencode(stripslashes($company["name"]));
-  $number = urlencode(stripslashes($company["number"]));
-  $phone = urlencode(stripslashes($company["phone"]));
-  $town = stripslashes($company["town"]);
-  $ctry = $company["country"];
-  $type = $company["type"];
-  $act = $company["activity"];
-  $naf = $company["naf"];
-  $zip = urlencode(stripslashes($company["zip"]));
-  $market = $company["market"];
-  $dsrc = $company["datasource"];
-  $dateafter = stripslashes($company["date_after"]);
-  $datebefore = stripslashes($company["date_before"]);
-  $fuzzy = $company["fuzzy"];
-  $archive = $company["archive"];
+  $name = urlencode(stripslashes($company['name']));
+  $number = urlencode(stripslashes($company['number']));
+  $phone = urlencode(stripslashes($company['phone']));
+  $town = stripslashes($company['town']);
+  $ctry = $company['country'];
+  $type = $company['type'];
+  $act = $company['activity'];
+  $naf = $company['naf'];
+  $zip = urlencode(stripslashes($company['zip']));
+  $market = $company['market'];
+  $dsrc = $company['datasource'];
+  $dateafter = stripslashes($company['date_after']);
+  $datebefore = stripslashes($company['date_before']);
+  $fuzzy = $company['fuzzy'];
+  $archive = $company['archive'];
 
   // User defined data
-  $url_userdata = of_userdata_get_url_search_params("company", $company);
+  $url_userdata = of_userdata_get_url_search_params('company', $company);
 
   $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_number=$number&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_datasource=$dsrc&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_fuzzy=$fuzzy$url_userdata$url_ext");
 
-  $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
+  $comp_d = new OBM_DISPLAY('DATA', $prefs, 'company');
   if ($popup) {
     $comp_d->display_link = false;
-    if ($ext_url != "") {
-      $comp_d->display_ext = "get_id_url";
-    } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
-      $comp_d->display_ext = "get_id";
+    if ($ext_url != '') {
+      $comp_d->display_ext = 'get_id_url';
+    } else if ( ($ext_widget != '') && ($ext_widget_text != '') ) { 
+      $comp_d->display_ext = 'get_id';
     }
     $display_popup_end = "<a href=\"\" onclick='window.close();'>$l_close</a>";
   }
 
   $comp_d->data_set = $comp_q;
   $comp_d->data_url = $url;
-  $comp_d->data_header = "both";
-  $block = $comp_d->display("dis_data_company");
+  $comp_d->data_header = 'both';
+  $block = $comp_d->display('dis_data_company');
   $block .= $display_popup_end;
 
   return $block;
@@ -458,19 +458,19 @@ function html_company_links($co_q) {
   global $l_module_document, $l_module_payment, $l_document_add;
   global $l_company, $path, $cgp_show;
 
-  $id = $co_q->f("company_id");
-  $name = $co_q->f("company_name");
-  $market = $co_q->f("company_marketingmanager_id");
-  $email = $co_q->f("company_email");
-  $ctry = $co_q->f("company_country_iso3166");
-  $con_num = $co_q->f("company_contact_number");
-  $deal_num = $co_q->f("company_deal_number");
-  $deal_total = $co_q->f("company_deal_total");
+  $id = $co_q->f('company_id');
+  $name = $co_q->f('company_name');
+  $market = $co_q->f('company_marketingmanager_id');
+  $email = $co_q->f('company_email');
+  $ctry = $co_q->f('company_country_iso3166');
+  $con_num = $co_q->f('company_contact_number');
+  $deal_num = $co_q->f('company_deal_number');
+  $deal_total = $co_q->f('company_deal_total');
 
   $uname = urlencode($name);
 
   // Contact
-  if ($cgp_show["module"]["contact"]) {
+  if ($cgp_show['module']['contact']) {
     $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;company_id=$id&amp;tf_company=$uname");
     $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;company_id=$id&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email");
     $block_contact = "
@@ -486,7 +486,7 @@ function html_company_links($co_q) {
   }
   
   // Deal
-  if ($cgp_show["module"]["deal"]) {
+  if ($cgp_show['module']['deal']) {
     $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname");
     $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname&amp;cba_archive=1");
     $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
@@ -505,8 +505,8 @@ function html_company_links($co_q) {
   }
 
   // Lead
-  if ($cgp_show["module"]["lead"]) {
-    $nb_lead = get_global_linked_element_nb("Lead", $id, "company", 1);
+  if ($cgp_show['module']['lead']) {
+    $nb_lead = get_global_linked_element_nb('Lead', $id, 'company', 1);
     $url_lead_list = url_prepare("$path/lead/lead_index.php?action=search&amp;company_id=$id&amp;tf_company=$uname");
     $url_lead_new = url_prepare("$path/lead/lead_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
     $block_lead = "
@@ -522,11 +522,11 @@ function html_company_links($co_q) {
   }
 
   // Document
-  if ($cgp_show["module"]["document"]) {
+  if ($cgp_show['module']['document']) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;entity_id=$id&amp;entity=company");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;entity_id=$id&amp;entity=company");
-    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$id&amp;ext_target=$l_company";
-    $nb_document = run_query_global_document_nb ($id, "company");
+    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path.'/company/company_index.php')."&amp;ext_id=$id&amp;ext_target=$l_company";
+    $nb_document = run_query_global_document_nb ($id, 'company');
     $block_doc = "
 <div class=\"portlet\" id=\"companyDocument\">
 <h1>$l_module_document</h1>
@@ -545,11 +545,11 @@ function html_company_links($co_q) {
   }
 
   // Project
-  if ($cgp_show["module"]["project"]) {
+  if ($cgp_show['module']['project']) {
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;company_id=$id");
     $url_pro_tot = url_prepare("$path/project/project_index.php?action=search&amp;company_id=$id&amp;cba_archive=1");
-    $nb_pro = get_global_linked_project_nb($id, "company");
-    $nb_pro_total = get_global_linked_project_nb ($id, "company", 1);
+    $nb_pro = get_global_linked_project_nb($id, 'company');
+    $nb_pro_total = get_global_linked_project_nb ($id, 'company', 1);
     $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
     $block_project = "
 <div class=\"portlet\" id=\"companyProject\">
@@ -565,9 +565,9 @@ function html_company_links($co_q) {
   }
 
   // Contract
-  if ($cgp_show["module"]["contract"]) {
-    $nb_ctra = get_global_linked_contract_nb($id, "company");
-    $nb_ctra_total = get_global_linked_contract_nb($id, "company", 1);
+  if ($cgp_show['module']['contract']) {
+    $nb_ctra = get_global_linked_contract_nb($id, 'company');
+    $nb_ctra_total = get_global_linked_contract_nb($id, 'company', 1);
     $url_ctra = url_prepare("$path/contract/contract_index.php?action=search&amp;company_id=$id");
     $url_ctra_total = url_prepare("$path/contract/contract_index.php?action=search&amp;company_id=$id&amp;cba_archive=1");
     $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
@@ -586,12 +586,12 @@ function html_company_links($co_q) {
   }
 
   // Invoice
-  if ($cgp_show["module"]["invoice"]) {
+  if ($cgp_show['module']['invoice']) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;company_id=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;company_id=$id&amp;cba_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;company_id=$id&amp;company_name=$uname");
-    $nb_inv_tot = get_global_linked_invoice_nb($id, "company", 1);
-    $nb_inv = get_global_linked_invoice_nb($id, "company");
+    $nb_inv_tot = get_global_linked_invoice_nb($id, 'company', 1);
+    $nb_inv = get_global_linked_invoice_nb($id, 'company');
     $block_invoice = "
 <div class=\"portlet\" id=\"companyInvoice\">
 <h1>$l_module_invoice</h1>
@@ -606,10 +606,10 @@ function html_company_links($co_q) {
   }
 
   // Payment
-  if ($cgp_show["module"]["payment"]) {
+  if ($cgp_show['module']['payment']) {
     $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;company_id=$id");
     $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;company_id=$id&amp;company_name=$uname");
-    $nb_pay = get_global_linked_payment_nb($id, "company");
+    $nb_pay = get_global_linked_payment_nb($id, 'company');
     $block_payment = "
 <div class=\"portlet\" id=\"companyPayment\">
 <h1>$l_module_payment</h1>
@@ -645,32 +645,32 @@ $block_payment";
 function dis_company_consult($params) {
   global $path, $display, $obminclude, $l_err_reference;
 
-  $cid = $params["company_id"];
+  $cid = $params['company_id'];
 
   if ($cid > 0) {
     $comp_q = run_query_company_detail($cid);
     if ($comp_q->num_rows() == 1) {
-      $display["detailInfo"] = display_record_info($comp_q);
-      $display["link"] = html_company_links($comp_q);
+      $display['detailInfo'] = display_record_info($comp_q);
+      $display['link'] = html_company_links($comp_q);
       $block .= html_company_consult($comp_q);
-      $view = $params["view"];
+      $view = $params['view'];
       
-      if ($view != "") {
+      if ($view != '') {
 	global $fieldnames;
-	include("$obminclude/lang/".$_SESSION['set_lang']."/global.inc");
+	include("$obminclude/lang/".$_SESSION['set_lang'].'/global.inc');
 	include("$obminclude/lang/".$_SESSION['set_lang']."/$view.inc");
-	include("$path/$view/".$view."_display.inc");
-	include("$path/$view/".$view."_query.inc");
+	include("$path/$view/".$view.'_display.inc');
+	include("$path/$view/".$view.'_query.inc');
 	$ext_func = "ext_dis_${view}_list";
-	$block .= $ext_func($params, "company", $cid);
+	$block .= $ext_func($params, 'company', $cid);
       } else {
 	$block .= html_company_consult_address($comp_q);
       }
     } else {
-      $display["msg"] .= display_err_msg($l_err_reference);
+      $display['msg'] .= display_err_msg($l_err_reference);
     }
   } else {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_err_msg($l_err_reference);
   }
 
   return $block;
@@ -688,44 +688,44 @@ function html_company_consult($co_q) {
   global $l_company, $l_archive;
   global $display, $l_yes, $l_no, $cgp_hide;
   
-  $id = $co_q->f("company_id");
-  $number = $co_q->f("company_number");
-  $vat = $co_q->f("company_vat");
-  $siret = $co_q->f("company_siret");
-  $archive = ($co_q->f("company_archive") == 1 ? $l_yes : $l_no);
-  $name = $co_q->f("company_name");
-  $aka = $co_q->f("company_aka");
-  $type = $co_q->f("companytype_label");
-  $act = $co_q->f("companyactivity_label");
-  $naf = $co_q->f("companynafcode_code")." - ".$co_q->f("companynafcode_label");
-  $mark = $co_q->f("company_marketingmanager_id");
+  $id = $co_q->f('company_id');
+  $number = $co_q->f('company_number');
+  $vat = $co_q->f('company_vat');
+  $siret = $co_q->f('company_siret');
+  $archive = ($co_q->f('company_archive') == 1 ? $l_yes : $l_no);
+  $name = $co_q->f('company_name');
+  $aka = $co_q->f('company_aka');
+  $type = $co_q->f('companytype_label');
+  $act = $co_q->f('companyactivity_label');
+  $naf = $co_q->f('companynafcode_code').' - '.$co_q->f('companynafcode_label');
+  $mark = $co_q->f('company_marketingmanager_id');
   
-  $types = array(array("label" => $type));
-  $acts = array(array("label" => $act));
+  $types = array(array('label' => $type));
+  $acts = array(array('label' => $act));
   
   if ($mark > 0) {
-    $lmarket = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
+    $lmarket = $co_q->f('market_lname') . ' ' . $co_q->f('market_fname');
   } else {
-    $lmarket = "&nbsp;";
+    $lmarket = '&nbsp;';
   }
 
   // Display Aka only if non empty
-  if ($aka != "") {
+  if ($aka != '') {
     $dis_aka = "
   <tr> 
     <th>$l_aka :</th>
     <td>$aka</td>
   </tr>";
   } else {
-    $dis_aka = "";
+    $dis_aka = '';
   }
   
   // Conditionnal fields
   // of: activity, type, activity
-  $show_number = (! $cgp_hide["company"]["company_number"]);
-  $show_vat = (! $cgp_hide["company"]["company_vat"]);
-  $show_siret = (! $cgp_hide["company"]["company_siret"]);
-  $show_naf = (! $cgp_hide["company"]["nafcode"]);
+  $show_number = (! $cgp_hide['company']['company_number']);
+  $show_vat = (! $cgp_hide['company']['company_vat']);
+  $show_siret = (! $cgp_hide['company']['company_siret']);
+  $show_naf = (! $cgp_hide['company']['nafcode']);
 
   // Number field
   if ($show_number) {
@@ -755,8 +755,8 @@ function html_company_consult($co_q) {
   }
 
   // Type, activity fields
-  $block_type = of_category_dis_block_consult("company", "type", $types, "mono");
-  $block_activity = of_category_dis_block_consult("company", "activity", $acts, "mono");
+  $block_type = of_category_dis_block_consult('company', 'type', $types, 'mono');
+  $block_activity = of_category_dis_block_consult('company', 'activity', $acts, 'mono');
 
   // Naf code field
   if ($show_naf) {
@@ -767,7 +767,7 @@ function html_company_consult($co_q) {
   </tr>";
   }
 
-  $display["title"] = $name;
+  $display['title'] = $name;
 
 // --- HTML Template --------------------------------------------------------
 
@@ -814,67 +814,67 @@ function html_company_consult_address($co_q) {
   global $l_company, $l_coord,$ico_mail,$ico_web;
   global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard,$cclipboard_address;
   
-  $id = $co_q->f("company_id");
-  $archive = ($co_q->f("company_archive") == 1 ? $l_yes : $l_no);
-  $name = $co_q->f("company_name");
-  $ad1 = $co_q->f("company_address1");
-  $ad2 = $co_q->f("company_address2");
-  $ad3 = $co_q->f("company_address3");
-  $zip = $co_q->f("company_zipcode");
-  $town = $co_q->f("company_town");
-  $cdx = $co_q->f("company_expresspostal");
-  $ctry_name = $co_q->f("country_name");
-  $phone = $co_q->f("company_phone");
-  $fax = $co_q->f("company_fax");
-  $web = $co_q->f("company_web");
-  $email = $co_q->f("company_email");
-  $com = beautify_comment(nl2br($co_q->f("company_comment")));
+  $id = $co_q->f('company_id');
+  $archive = ($co_q->f('company_archive') == 1 ? $l_yes : $l_no);
+  $name = $co_q->f('company_name');
+  $ad1 = $co_q->f('company_address1');
+  $ad2 = $co_q->f('company_address2');
+  $ad3 = $co_q->f('company_address3');
+  $zip = $co_q->f('company_zipcode');
+  $town = $co_q->f('company_town');
+  $cdx = $co_q->f('company_expresspostal');
+  $ctry_name = $co_q->f('country_name');
+  $phone = $co_q->f('company_phone');
+  $fax = $co_q->f('company_fax');
+  $web = $co_q->f('company_web');
+  $email = $co_q->f('company_email');
+  $com = beautify_comment(nl2br($co_q->f('company_comment')));
 
   // User defined data
-  $block_userdata .= of_userdata_dis_entity_consult("company", $id);
+  $block_userdata .= of_userdata_dis_entity_consult('company', $id);
 
   // Conditionnal fields
-  $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
-  $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
+  $show_ad3 = (! $cgp_hide['company']['company_address3']);
+  $show_cdx = (! $cgp_hide['company']['company_expresspostal']);
 
   $newline = "\r\n";
   $copy = $name.$newline;
-  if (($ad1 != "") && (in_array("address1", $cclipboard_address))) {
+  if (($ad1 != '') && (in_array('address1', $cclipboard_address))) {
     $copy .= $ad1.$newline;
   }
-  if (($ad2 != "") && (in_array("address2", $cclipboard_address))) {
+  if (($ad2 != '') && (in_array('address2', $cclipboard_address))) {
     $copy .= $ad2.$newline;
   }
-  if (($ad3 != "") && (in_array("address3", $cclipboard_address))) {
+  if (($ad3 != '') && (in_array('address3', $cclipboard_address))) {
     $copy .= $ad3.$newline;
   }
-  if (($zip != "") && (in_array("zipcode", $cclipboard_address))) {
+  if (($zip != '') && (in_array('zipcode', $cclipboard_address))) {
     $copy .= $zip;
     $copy_zip = true;
   }
-  if (($town != "") && (in_array("town", $cclipboard_address))) {
-    $copy .= ($copy_zip ? " " : "") . $town;
+  if (($town != '') && (in_array('town', $cclipboard_address))) {
+    $copy .= ($copy_zip ? ' ' : '') . $town;
     $copy_town = true;
   }
   if ($copy_zip || $copy_town) {
     $copy .= $newline;
   }
-  if (($cdx != "") && (in_array("expresspostal", $cclipboard_address))) {
+  if (($cdx != '') && (in_array('expresspostal', $cclipboard_address))) {
     $copy .= $cdx.$newline;
   }
-  if (($ctry_name != "") && (in_array("country", $cclipboard_address))) {
+  if (($ctry_name != '') && (in_array('country', $cclipboard_address))) {
     $copy .= $ctry_name.$newline;
   }
-  if (($phone != "") && (in_array("phone", $cclipboard_address))) {
+  if (($phone != '') && (in_array('phone', $cclipboard_address))) {
     $copy .= "$l_phone : " . $phone.$newline;
   }
-  if (($fax != "") && (in_array("fax", $cclipboard_address))) {
+  if (($fax != '') && (in_array('fax', $cclipboard_address))) {
     $copy .= "$l_fax : " . $fax.$newline;
   }
-  if (($email != "") && (in_array("email", $cclipboard_address))) {
+  if (($email != '') && (in_array('email', $cclipboard_address))) {
     $copy .= "$l_email : " . $email.$newline;
   }
-  if (($web != "") && (in_array("web", $cclipboard_address))) {
+  if (($web != '') && (in_array('web', $cclipboard_address))) {
     $copy .= "$l_web : " . $web.$newline;
   }
   $copy = "'".phpStringToJsString($copy)."'"; 
@@ -897,33 +897,33 @@ function html_company_consult_address($co_q) {
   }
 
   // Email link
-  if ($email != "") {
+  if ($email != '') {
     $link_email = "<a href=\"mailto:$email\">
     <img border=\"0\" src=\"$ico_mail\"
     alt=\"$email\" /></a>";
   } else {
-    $link_email = "&nbsp;";
+    $link_email = '&nbsp;';
   }
 
   // Web link
-  if ($web != "") {
+  if ($web != '') {
     $link_web = "<a target=\"_blank\" href=\"";
-    if ( (strcmp(substr($web,0,7), "http://") == 0)
-	 || (strcmp(substr($web,0,8), "https://") == 0) ){
-      $link_web .= "";
+    if ( (strcmp(substr($web,0,7), 'http://') == 0)
+	 || (strcmp(substr($web,0,8), 'https://') == 0) ){
+      $link_web .= '';
     } else {
-      $link_web .= "http://";
+      $link_web .= 'http://';
     }
     $link_web .= "$web\">
     <img border=\"0\" src=\"$ico_web\"
     alt=\"$web\" /></a>";
   } else {
-    $link_web = "&nbsp;";
+    $link_web = '&nbsp;';
   }
   
   // --- HTML Template --------------------------------------------------------
 
-  $template = get_template("company_consult.tpl");
+  $template = get_template('company_consult.tpl');
   eval ("\$template = \"$template\";");
   $block = $template;
   
@@ -941,31 +941,31 @@ function dis_company_form($action, $company) {
   global $display, $cgp_hide, $obm, $l_err_reference;
 
   // of: type, activity
-  $show_naf = (! $cgp_hide["company"]["nafcode"]);
+  $show_naf = (! $cgp_hide['company']['nafcode']);
 
-  $c_id = $company["company_id"];
+  $c_id = $company['company_id'];
   if ($c_id > 0) {
     $comp_q = run_query_company_detail($c_id);
     if ($comp_q->num_rows() == 1) {
-      $display["detailInfo"] = display_record_info($comp_q);
+      $display['detailInfo'] = display_record_info($comp_q);
     } else {
-      $display["msg"] .= display_err_msg($l_err_reference);
+      $display['msg'] .= display_err_msg($l_err_reference);
     }
   }
   $dsrc_q = run_query_global_datasource();
-  $types = of_category_get_ordered("company", "type");
-  $acts = of_category_get_ordered("company", "activity");
+  $types = of_category_get_ordered('company', 'type');
+  $acts = of_category_get_ordered('company', 'activity');
 
   if ($show_naf) {
     $naf_q = run_query_companynafcode();
   }
  
-  $uids = array($obm["uid"]);
-  if ($company["market"] > 0) {
-    $uids[] = $company["market"];
+  $uids = array($obm['uid']);
+  if ($company['market'] > 0) {
+    $uids[] = $company['market'];
   }
-  if ($company["company_id"] > 0) {
-    $uids[] = $comp_q->f("company_marketingmanager_id");
+  if ($company['company_id'] > 0) {
+    $uids[] = $comp_q->f('company_marketingmanager_id');
   }
   $users = of_usergroup_get_group_users($obm['group_com'], true, $uids);
   $ctry_q = run_query_global_country_for_lang();
@@ -999,91 +999,91 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
   global $l_number, $l_vat, $l_siret, $l_market, $l_coord;
   global $l_insert, $l_update, $l_internal, $l_company, $l_archive;
 
-  $uid = $obm["uid"];
+  $uid = $obm['uid'];
   $lang = get_lang();
 
   // if update mode and first display values are taken from database
-  if ($action == "detailupdate") {
-    $id = $co_q->f("company_id");
-    $number = $co_q->f("company_number");
-    $vat = $co_q->f("company_vat");
-    $siret = $co_q->f("company_siret");
-    $archive = ($co_q->f("company_archive") == 1 ? " checked" : "");
-    $name = $co_q->f("company_name");
-    $aka = $co_q->f("company_aka");
-    $dsrc = $co_q->f("company_datasource_id");
-    $type = $co_q->f("company_type_id");
-    $act = $co_q->f("company_activity_id");
-    $naf = $co_q->f("company_nafcode_id");
-    $mark = $co_q->f("company_marketingmanager_id");
-    $ad1 = $co_q->f("company_address1");
-    $ad2 = $co_q->f("company_address2");
-    $ad3 = $co_q->f("company_address3");
-    $zip = $co_q->f("company_zipcode");
-    $town = $co_q->f("company_town");
-    $cdx = $co_q->f("company_expresspostal");
-    $ctry = $co_q->f("company_country_iso3166");
-    $phone = $co_q->f("company_phone");
-    $fax = $co_q->f("company_fax");
-    $web = $co_q->f("company_web");
-    $email = $co_q->f("company_email");
-    $con_num = $co_q->f("company_contact_number");
-    $deal_num = $co_q->f("company_deal_number");
-    $comment = $co_q->f("company_comment");
+  if ($action == 'detailupdate') {
+    $id = $co_q->f('company_id');
+    $number = $co_q->f('company_number');
+    $vat = $co_q->f('company_vat');
+    $siret = $co_q->f('company_siret');
+    $archive = ($co_q->f('company_archive') == 1 ? ' checked' : '');
+    $name = $co_q->f('company_name');
+    $aka = $co_q->f('company_aka');
+    $dsrc = $co_q->f('company_datasource_id');
+    $type = $co_q->f('company_type_id');
+    $act = $co_q->f('company_activity_id');
+    $naf = $co_q->f('company_nafcode_id');
+    $mark = $co_q->f('company_marketingmanager_id');
+    $ad1 = $co_q->f('company_address1');
+    $ad2 = $co_q->f('company_address2');
+    $ad3 = $co_q->f('company_address3');
+    $zip = $co_q->f('company_zipcode');
+    $town = $co_q->f('company_town');
+    $cdx = $co_q->f('company_expresspostal');
+    $ctry = $co_q->f('company_country_iso3166');
+    $phone = $co_q->f('company_phone');
+    $fax = $co_q->f('company_fax');
+    $web = $co_q->f('company_web');
+    $email = $co_q->f('company_email');
+    $con_num = $co_q->f('company_contact_number');
+    $deal_num = $co_q->f('company_deal_number');
+    $comment = $co_q->f('company_comment');
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
     $dis_title = $name;
-  } else if ($action == "new") {
-    $mark = $obm["uid"];
+  } else if ($action == 'new') {
+    $mark = $obm['uid'];
     $dsrc = $_SESSION['set_dsrc'];
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
   }
   
   // If parameters have been given, they supercede the default action value
-  if (isset($company["company_id"])) { $id = $company["company_id"]; }
-  if (isset($company["number"])) { $number = stripslashes($company["number"]); }
-  if (isset($company["vat"])) { $vat = stripslashes($company["vat"]); }
-  if (isset($company["siret"])) { $siret = stripslashes($company["siret"]); }
-  if (isset($company["archive"])) { $archive = ($company["archive"] == 1 ? "checked" : ""); }
-  if (isset($company["name"])) { $name = stripslashes($company["name"]); }
-  if (isset($company["aka"])) { $aka = stripslashes($company["aka"]); }
-  if (isset($company["datasource"])) { $dsrc = $company["datasource"]; }
-  if (isset($company["type"])) { $kind = $company["type"]; }
-  if (isset($company["activity"])) { $act = $company["activity"]; }
-  if (isset($company["naf"])) { $naf = $company["naf"]; }
-  if (isset($company["market"])) { $mark = $company["market"]; }
-  if (isset($company["ad1"])) { $ad1 = stripslashes($company["ad1"]); }
-  if (isset($company["ad2"])) { $ad2 = stripslashes($company["ad2"]); }
-  if (isset($company["ad3"])) { $ad3 = stripslashes($company["ad3"]); }
-  if (isset($company["zip"])) { $zip = stripslashes($company["zip"]); }
-  if (isset($company["town"])) { $town = stripslashes($company["town"]); }
-  if (isset($company["cdx"])) { $cdx = stripslashes($company["cdx"]); }
-  if (isset($company["country"])) { $ctry = $company["country"]; }
-  if (isset($company["phone"])) { $phone = stripslashes($company["phone"]); }
-  if (isset($company["fax"])) { $fax = stripslashes($company["fax"]); }
-  if (isset($company["web"])) { $web = stripslashes($company["web"]); }
-  if (isset($company["email"])) { $email = stripslashes($company["email"]); }
-  if (isset($company["comment"])) { $comment = stripslashes($company["comment"]); }
-  if (isset($company["add_comment"])) { $add_comment = stripslashes($company["add_comment"]); }
-  if (isset($company["usercomment"])) { $usercomment = $company["usercomment"]; }
-  if (isset($company["datecomment"])) { $datecomment = of_date_upd_format($company["datecomment"]); }
+  if (isset($company['company_id'])) { $id = $company['company_id']; }
+  if (isset($company['number'])) { $number = stripslashes($company['number']); }
+  if (isset($company['vat'])) { $vat = stripslashes($company['vat']); }
+  if (isset($company['siret'])) { $siret = stripslashes($company['siret']); }
+  if (isset($company['archive'])) { $archive = ($company['archive'] == 1 ? 'checked' : ''); }
+  if (isset($company['name'])) { $name = stripslashes($company['name']); }
+  if (isset($company['aka'])) { $aka = stripslashes($company['aka']); }
+  if (isset($company['datasource'])) { $dsrc = $company['datasource']; }
+  if (isset($company['type'])) { $kind = $company['type']; }
+  if (isset($company['activity'])) { $act = $company['activity']; }
+  if (isset($company['naf'])) { $naf = $company['naf']; }
+  if (isset($company['market'])) { $mark = $company['market']; }
+  if (isset($company['ad1'])) { $ad1 = stripslashes($company['ad1']); }
+  if (isset($company['ad2'])) { $ad2 = stripslashes($company['ad2']); }
+  if (isset($company['ad3'])) { $ad3 = stripslashes($company['ad3']); }
+  if (isset($company['zip'])) { $zip = stripslashes($company['zip']); }
+  if (isset($company['town'])) { $town = stripslashes($company['town']); }
+  if (isset($company['cdx'])) { $cdx = stripslashes($company['cdx']); }
+  if (isset($company['country'])) { $ctry = $company['country']; }
+  if (isset($company['phone'])) { $phone = stripslashes($company['phone']); }
+  if (isset($company['fax'])) { $fax = stripslashes($company['fax']); }
+  if (isset($company['web'])) { $web = stripslashes($company['web']); }
+  if (isset($company['email'])) { $email = stripslashes($company['email']); }
+  if (isset($company['comment'])) { $comment = stripslashes($company['comment']); }
+  if (isset($company['add_comment'])) { $add_comment = stripslashes($company['add_comment']); }
+  if (isset($company['usercomment'])) { $usercomment = $company['usercomment']; }
+  if (isset($company['datecomment'])) { $datecomment = of_date_upd_format($company['datecomment']); }
   
   // Conditionnal fields
-  $show_number = (! $cgp_hide["company"]["company_number"]);
-  $show_vat = (! $cgp_hide["company"]["company_vat"]);
-  $show_siret = (! $cgp_hide["company"]["company_siret"]);
-  $show_naf = (! $cgp_hide["company"]["nafcode"]);
-  $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
-  $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
+  $show_number = (! $cgp_hide['company']['company_number']);
+  $show_vat = (! $cgp_hide['company']['company_vat']);
+  $show_siret = (! $cgp_hide['company']['company_siret']);
+  $show_naf = (! $cgp_hide['company']['nafcode']);
+  $show_ad3 = (! $cgp_hide['company']['company_address3']);
+  $show_cdx = (! $cgp_hide['company']['company_expresspostal']);
 
   // User defined data
-  $block_userdata = of_userdata_dis_entity_form("company", $id, $company);
+  $block_userdata = of_userdata_dis_entity_form('company', $id, $company);
 
   // some constants
-  $csize_add = "48";
-  $cmax_add = "64";
-  $csize_phone = "24";
+  $csize_add = '48';
+  $cmax_add = '64';
+  $csize_phone = '24';
   
   // Number field
   if ($show_number) {
@@ -1113,15 +1113,15 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
   $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
   <option value=\"$c_undef\">$l_undef</option>";
   while ($dsrc_q->next_record()) {
-    $d_id = $dsrc_q->f("datasource_id");
+    $d_id = $dsrc_q->f('datasource_id');
     $sel_dsrc .= "\n<option value=\"$d_id\"";
     if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
-    $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
+    $sel_dsrc .= '>'. $dsrc_q->f('datasource_name') . "</option>\n";
   }
-  $sel_dsrc .= "</select>";
+  $sel_dsrc .= '</select>';
 
-  $block_type = of_category_dis_entity_form("company", "type", $types, "mono", $type, "none");
-  $block_activity = of_category_dis_entity_form("company", "activity", $acts, "mono", $act, "none");
+  $block_type = of_category_dis_entity_form('company', 'type', $types, 'mono', $type, 'none');
+  $block_activity = of_category_dis_entity_form('company', 'activity', $acts, 'mono', $act, 'none');
 
   // Naf code select field
   if ($show_naf) {
@@ -1174,33 +1174,33 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
     country_phone[0] = '';
     ";
   while ($ctry_q->next_record()) {
-    $c_iso3166 = $ctry_q->f("country_iso3166");
-    $c_name = $ctry_q->f("country_name");
-    $c_phone = $ctry_q->f("country_phone");
+    $c_iso3166 = $ctry_q->f('country_iso3166');
+    $c_name = $ctry_q->f('country_name');
+    $c_phone = $ctry_q->f('country_phone');
     $sel_ctry .= "\n<option value=\"$c_iso3166\"";
     if ($c_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
     $sel_ctry .= ">$c_name</option>";
     $js_ctry .= "country_phone['$c_iso3166'] = '$c_phone';\n";
   }
-  $sel_ctry .= "</select>";
-  $js_ctry .= "
-  </script>";
+  $sel_ctry .= '</select>';
+  $js_ctry .= '
+  </script>';
 
   // Email link
-  if (($action=="detailupdate") || ($action=="update")) { 
-    if ($email != "") {
+  if (($action=='detailupdate') || ($action=='update')) { 
+    if ($email != '') {
       $link_email = "<a href=\"mailto:$email\">
       <img src=\"$ico_mail\" alt=\"$email\" /></a>";
-    } else { $link_email = "&nbsp;"; }
-  } else { $link_email = "&nbsp;"; }
+    } else { $link_email = '&nbsp;'; }
+  } else { $link_email = '&nbsp;'; }
 
   // Web link
-  if (($action=="detailupdate") || ($action=="update")) {
-    if ($web != "") {
+  if (($action=='detailupdate') || ($action=='update')) {
+    if ($web != '') {
       $link_web = "<a target=\"_blank\" href=\"$web\">
       <img src=\"$ico_web\" alt=\"$web\" /></a>";
-    } else { $link_web = "&nbsp;"; }
-  } else { $link_web = "&nbsp;"; }
+    } else { $link_web = '&nbsp;'; }
+  } else { $link_web = '&nbsp;'; }
   
   // User comment select construction
   $sel_usercomment = "<select name=\"sel_usercomment\">";
@@ -1215,9 +1215,9 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
       $sel_usercomment .= ">$cname</option>\n";
     }
   }
-  $sel_usercomment .= "</select>";
+  $sel_usercomment .= '</select>';
   
-  if (($action == "detailupdate") || ($action == "update")) {
+  if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_comment = "
     $l_upd_comment
     <textarea name=\"ta_comment\" rows=\"6\">$comment</textarea>
@@ -1225,19 +1225,19 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
   }
 
   // Buttons
-  if (($action == "detailupdate") || ($action == "update")) {
+  if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_button = "
     <!-- Update button -->
     <input type=\"hidden\" name=\"company_id\" id=\"company_id\" value=\"$id\" />
     <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
     <input type=\"submit\" value=\"$l_update\" />";
-  } elseif (($action == "new") || ($action == "insert")) {
+  } elseif (($action == 'new') || ($action == 'insert')) {
     $dis_button = "
     <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
     <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = $dis_title;
+  $display['title'] = $dis_title;
 
   // --- HTML Template --------------------------------------------------------
 
@@ -1246,7 +1246,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
 
   <form method=\"post\" name=\"f_entity\"
   onsubmit=\"if (check_company(this)) return true; else return false;\"
-    action=\"".url_prepare("company_index.php")."\">
+    action=\"".url_prepare('company_index.php')."\">
   <fieldset class=\"detail infos\">  
   <legend>$l_company</legend>
 
@@ -1336,7 +1336,7 @@ function dis_can_delete_company($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display,$path;
   
-  $display["msg"] .= display_ok_msg($l_can_delete);
+  $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
   <div class=\"buttons\">
@@ -1364,34 +1364,34 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   global $display, $l_check_samecompany, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
-  $number = $company["number"];
-  $vat = $company["vat"];
-  $siret = $company["siret"];
-  $archive = ($company["archive"] == 1 ? "1" : "0");
-  $name = $company["name"];
-  $kind = $company["kind"];
-  $dsrc = $company["datasource"];
-  $act = $company["activity"];
-  $naf = $company["naf"];
-  $mark = $company["market"];
-  $ad1 = $company["ad1"];
-  $ad2 = $company["ad2"];
-  $ad3 = $company["ad3"];
-  $zip = $company["zip"];
-  $town = $company["town"];
-  $cdx = $company["cdx"];
-  $ctry = $company["country"];
-  $phone = $company["phone"];
-  $fax = $company["fax"];
-  $web = $company["web"];
-  $email = $company["email"];
-  $com = $company["comment"];
-  $display["msg"] .= display_warn_msg($l_check_samecompany);
+  $number = $company['number'];
+  $vat = $company['vat'];
+  $siret = $company['siret'];
+  $archive = ($company['archive'] == 1 ? '1' : '0');
+  $name = $company['name'];
+  $kind = $company['kind'];
+  $dsrc = $company['datasource'];
+  $act = $company['activity'];
+  $naf = $company['naf'];
+  $mark = $company['market'];
+  $ad1 = $company['ad1'];
+  $ad2 = $company['ad2'];
+  $ad3 = $company['ad3'];
+  $zip = $company['zip'];
+  $town = $company['town'];
+  $cdx = $company['cdx'];
+  $ctry = $company['country'];
+  $phone = $company['phone'];
+  $fax = $company['fax'];
+  $web = $company['web'];
+  $email = $company['email'];
+  $com = $company['comment'];
+  $display['msg'] .= display_warn_msg($l_check_samecompany);
 
   while ($co_q->next_record()) {
-    $id = $co_q->f("company_id");
-    $samename = $co_q->f("company_name");
-    $samezip = $co_q->f("company_zip");
+    $id = $co_q->f('company_id');
+    $samename = $co_q->f('company_name');
+    $samezip = $co_q->f('company_zip');
     $dis_same_comp .= "
     <li><a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;company_id=$id") . "\">
         $samename ($samezip)</a>
@@ -1399,7 +1399,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   }
 
   // User defined data
-  $userdata = of_userdata_dis_hidden_fields("company", $company);
+  $userdata = of_userdata_dis_hidden_fields('company', $company);
 
   $hidden_fields = "
   $userdata
@@ -1457,23 +1457,23 @@ $dis_same_comp
 function dis_company_admin_index() {
   global $cgp_hide;
 
-  if (! $cgp_hide["company"]["type"]) {
-    $types = of_category_get_ordered("company", "type");
-    $block .= of_category_dis_admin_form("type", $types);
+  if (! $cgp_hide['company']['type']) {
+    $types = of_category_get_ordered('company', 'type');
+    $block .= of_category_dis_admin_form('type', $types);
   }
 
-  if (! $cgp_hide["company"]["activity"]) {
-    $acts = of_category_get_ordered("company", "activity");
-    $block .= of_category_dis_admin_form("activity", $acts);
+  if (! $cgp_hide['company']['activity']) {
+    $acts = of_category_get_ordered('company', 'activity');
+    $block .= of_category_dis_admin_form('activity', $acts);
   }
   
-  if (! $cgp_hide["company"]["nafcode"]) {
+  if (! $cgp_hide['company']['nafcode']) {
     $naf_q = run_query_companynafcode();
     $block .= html_company_nafcode_form($naf_q);
   }
 
   // User defined data
-  $block .= of_userdata_dis_admin_form("company");
+  $block .= of_userdata_dis_admin_form('company');
 
   return $block;
 }
@@ -1492,23 +1492,23 @@ function html_company_nafcode_form($naf_q) {
   $char_title = '=';
   $key = 0;
   while ($naf_q->next_record()) {
-    $id = $naf_q->f("companynafcode_id");
-    $title = ($naf_q->f("companynafcode_title"))?"checked=\"checked\"":"";
+    $id = $naf_q->f('companynafcode_id');
+    $title = ($naf_q->f('companynafcode_title'))?"checked=\"checked\"":'';
     if ($title) {
       $pre = "$char_title";
     } else {
-      $pre = ".";
+      $pre = '.';
     }
-    $code = $naf_q->f("companynafcode_code");
-    $label = $naf_q->f("companynafcode_label");
+    $code = $naf_q->f('companynafcode_code');
+    $label = $naf_q->f('companynafcode_label');
     
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
-      $class = "";
+      $class = '';
     }
     $key ++;
-    $c_label = htmlentities($one_cat["label"]);
+    $c_label = htmlentities($one_cat['label']);
     $nafcode_list .= "
     <tr $class>
     <td>
@@ -1598,7 +1598,7 @@ function dis_company_nafcode_links($company) {
   global $l_naf_delete, $l_naf_can_delete, $l_naf_cant_delete;
   
   $delete_ok = true;
-  $id = $company["naf"];
+  $id = $company['naf'];
   $label = get_company_nafcode_label($id);
   $obm_q = run_query_company_nafcode_links($id);
   
@@ -1610,12 +1610,12 @@ function dis_company_nafcode_links($company) {
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $cid = $obm_q->f("company_id");
-      $cname = $obm_q->f("company_name");
+      $cid = $obm_q->f('company_id');
+      $cname = $obm_q->f('company_name');
       $dis_link .= "<li><a href=\"company_index.php?action=detailconsult&amp;company_id=$cid\">$cname</a></li>";
     }
     if ($cpt < $nb_naf) {
-      $dis_link .= "<li>...</li>";
+      $dis_link .= '<li>...</li>';
     }
 
   } else {
@@ -1633,7 +1633,7 @@ function dis_company_nafcode_links($company) {
   $dis_back = "<a href=\"$path/company/company_index.php?action=admin\">$l_back</a>";
 
   if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_naf_can_delete);
+    $display['msg'] .= display_ok_msg($l_naf_can_delete);
     $dis_del = "<a href=\"$path/company/company_index.php?action=nafcode_delete&amp;sel_naf=$id\" >$l_naf_delete</a>";
     $block .= "
       <div class=\"buttons\">
@@ -1641,7 +1641,7 @@ function dis_company_nafcode_links($company) {
       $dis_back
       </div>";
   } else {
-    $display["msg"] .= display_warn_msg($l_naf_cant_delete);
+    $display['msg'] .= display_warn_msg($l_naf_cant_delete);
     $block .= "
       <div class=\"buttons\">
         $dis_back
@@ -1660,7 +1660,7 @@ function dis_company_nafcode_links($company) {
 function dis_company_display_pref($prefs) {
   global $l_company_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "company");
+  $dis_pref = new OBM_DISPLAY('PREFERENCES', $prefs, 'company');
   $dis_pref->pref_title = $l_company_display;
   $dis_pref->pref_dis_help = 1;
 
@@ -1678,16 +1678,16 @@ function dis_company_display_pref($prefs) {
 function dis_select_company_nafcode($naf_q, $line1, $selected) {
   global $cgp_hide;
 
-  $show_naf = (! $cgp_hide["company"]["nafcode"]);
+  $show_naf = (! $cgp_hide['company']['nafcode']);
 
   if ($show_naf) {
     $sel_naf = "<select name=\"sel_naf\">
     $line1";
     while ($naf_q->next_record()) {
-      $n_id = $naf_q->f("companynafcode_id");
-      $n_disabled = $naf_q->f("companynafcode_title");
-      $n_code = $naf_q->f("companynafcode_code");
-      $n_label = $naf_q->f("companynafcode_label");
+      $n_id = $naf_q->f('companynafcode_id');
+      $n_disabled = $naf_q->f('companynafcode_title');
+      $n_code = $naf_q->f('companynafcode_code');
+      $n_label = $naf_q->f('companynafcode_label');
       $sel_naf .= "\n<option value=\"$n_id\"";
       if ($n_disabled == '1') {
 	$sel_naf .= " disabled=\"disabled\"";
@@ -1697,7 +1697,7 @@ function dis_select_company_nafcode($naf_q, $line1, $selected) {
       if ($n_id == $selected) { $sel_naf .= " selected=\"selected\""; }
       $sel_naf .= ">$n_code $n_label</option>\n";
     }
-    $sel_naf .= "</select>";
+    $sel_naf .= '</select>';
   }
 
   return $sel_naf;

@@ -65,7 +65,8 @@ function update_vacation($params, $vac_q) {
 //
 function run_query_vacation_update($params, $u_id) {
   global $cdg_sql;
-  if(!$params['auto_enable']) {
+
+  if (!$params['auto_enable']) {
     $params['vacation_datebegin'] = '0';
     $params['vacation_dateend'] = '0';
   }    

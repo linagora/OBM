@@ -368,7 +368,7 @@ function get_user_action() {
   $actions['user']['detailconsult'] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/user/user_index.php?action=detailconsult&amp;user_id=".$params['user_id'],
-    'Right'    => $cright_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'group_consult', 'group_update')
                                   );
 
@@ -406,7 +406,7 @@ function get_user_action() {
   $actions['user']['group_update'] = array (
     'Url'      => "$path/user/user_index.php?action=group_update",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // Reset
@@ -429,28 +429,28 @@ function get_user_action() {
   $actions['user']['delete'] = array (
     'Url'      => "$path/user/user_index.php?action=delete",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // Display
   $actions['user']['display'] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/user/user_index.php?action=display",
-    'Right'    => $cright_read,
-    'Condition'=> array ('all') 
+    'Right'    => $cright_read_admin,
+    'Condition'=> array ('all')
                                       	 );
 
 // Display
   $actions['user']['dispref_display'] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_display",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Right'    => $cright_read_admin,
+    'Condition'=> array ('None')
                                       	 );
 // Display
   $actions['user']['dispref_level'] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_level",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Right'    => $cright_read_admin,
+    'Condition'=> array ('None')
                                       	 );
 
 // Import

@@ -17,6 +17,7 @@ $fieldnames['project_shortname'] = $l_shortname;
 $fieldnames['project_company'] = $l_company;
 $fieldnames['project_type'] = $l_type;
 $fieldnames['project_tasktype'] = $l_tasktype;
+$fieldnames['project_code'] = $l_code;
 $fieldnames['project_soldtime'] = $l_soldtime;
 $fieldnames['project_estimatedtime'] = $l_estimatedtime;
 $fieldnames['project_datebegin'] = $l_datebegin;
@@ -56,6 +57,11 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
       $res['name'] = '&nbsp;';
       $res['txt_name'] = ' ';
     }
+  }
+
+  else if ($fieldname == 'project_code') {
+    $res['align'] = 'center';
+    $res['name'] = get_project_code($OD->data_set);
   }
 
   else if ($fieldname == 'project_datebegin') {
@@ -610,7 +616,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   global $l_deal, $l_project, $l_progress, $l_progressinfos,$l_shortname;
   global $l_type, $l_used, $l_missing, $l_sold, $l_estimated, $l_comment;
   global $l_allotted, $l_no_members, $l_progress_update, $l_project, $l_resume;
-  global $l_alloestimated, $l_usedestimated, $l_progeval, $l_tasks;
+  global $l_alloestimated, $l_usedestimated, $l_progeval, $l_tasks, $l_code;
   global $l_members, $l_task_list, $l_members_info, $l_archive, $l_yes, $l_no;
   global $l_alloproj, $l_usedproj, $l_no_tasks,$ico_hierarchy,$l_allosold;
   global $l_ref, $l_project_date, $l_project_duration, $l_project_desc, $l_project_tech;
@@ -633,10 +639,10 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   $estimated = $project_q->f('project_estimatedtime');
   $datebegin = of_date_format($project_q->f('datebegin'), 1);
   $dateend = of_date_format($project_q->f('dateend'), 1);
-  $reference_date =  $project_q->f('project_reference_date');
-  $reference_duration =  $project_q->f('project_reference_duration');
-  $reference_desc =  nl2br($project_q->f('project_reference_desc'));
-  $reference_tech =  nl2br($project_q->f('project_reference_tech'));
+  $reference_date = $project_q->f('project_reference_date');
+  $reference_duration = $project_q->f('project_reference_duration');
+  $reference_desc = nl2br($project_q->f('project_reference_desc'));
+  $reference_tech = nl2br($project_q->f('project_reference_tech'));
   $comment = beautify_comment(nl2br($project_q->f('project_comment')));
 
   // Labels are different for sales and R&D projects
@@ -648,34 +654,45 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     $value_time = $estimated;
   }
 
-  // Company name
-  if ($company > 0) {
-    if ($deal > 0) {
-      $dis_deal = "
-    </tr><tr>
+  // Project references
+  $code = get_project_code($project_q);
+  $dis_code = "
+    <tr>
+      <th>$l_code</th>
+      <td>
+        $code
+      </td>
+    </tr>";
+  if ($deal > 0) {
+    $dis_deal = "
+    <tr>
       <th>$l_deal</th>
       <td>
         <a href=\"". url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal")."\">
         <img src=\"$ico_deal\" alt=\"[details]\" /></a>
         $deal_label
-      </td>";
-    }
-    $dis_comp = "
+      </td>
+    </tr>";
+  }
+  if ($company > 0) {
+    $company_link = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$company")."\">
+        <img src=\"$ico_company\" alt=\"[details]\" /></a>";
+  }
+  $dis_comp = "
     <div class=\"detail infos\">
     <h1>$l_company</h1>
     <table>
     <tr>
       <th>$l_company</th>
       <td>
-        <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$company")."\">
-        <img src=\"$ico_company\" alt=\"[details]\" /></a>
+        $company_link
         $company_name
       </td>
-    $dis_deal
     </tr>
+    $dis_deal
+    $dis_code
     </table>
     </div>";
-  }
 
   if (($members_q != 0) && ($members_q->num_rows() != 0)){
     while ($members_q->next_record()) {
@@ -1033,6 +1050,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     </div>
 
     $dis_comp
+
    <div class=\"detail infos\">
     $dis_reference
    </div>
@@ -1182,7 +1200,6 @@ function html_project_form($action, $project_q, $project) {
   </tr><tr>
     <th>$l_member</th>
     <td>$sel_member</td>";
-
 
     $url = "$path/project/project_index.php?action=ext_get_reftask_ids&amp;popup=1&amp;ext_element=sel_task_id";
   // task

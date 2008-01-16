@@ -1608,9 +1608,16 @@ function of_userdata_dis_admin_form($entity) {
 // Parameters:
 //   - $entity : user category for this entity
 //   - $params : array with parameters
+//   - $table : tablename of entity if different
 ///////////////////////////////////////////////////////////////////////////////
-function of_userdata_query_search($entity, $params) {
+function of_userdata_query_search($entity, $params, $table='') {
   global $cgp_user, $c_all, $c_none;
+
+  if ($table != '') {
+    $entitytablefield = strtolower($table);
+  } else {
+    $entitytablefield = strtolower($entity);
+  }
 
   // User defined categories
   if (is_array($cgp_user[$entity]["category"])) {
@@ -1623,7 +1630,7 @@ function of_userdata_query_search($entity, $params) {
       if (($cat != $c_all) && ($cat != $c_none) && ($cat != "")) {
 	$where_cat_user = "";
 	$join_cat_user .= "LEFT JOIN CategoryLink AS $tlink
-          ON ${entity}_id=$tlink.categorylink_entity_id
+          ON ${entitytablefield}_id=$tlink.categorylink_entity_id
           AND $tlink.categorylink_entity='$entity'
           AND $tlink.categorylink_category='$cat_name'";
 	if ($cat_tree) {
@@ -1634,7 +1641,7 @@ function of_userdata_query_search($entity, $params) {
 	$and = "AND";
       } else if ($cat == $c_none) {
 	$join_cat_user .= " LEFT JOIN CategoryLink AS $tlink
-          ON ${entity}_id=$tlink.categorylink_entity_id
+          ON ${entitytablefield}_id=$tlink.categorylink_entity_id
           AND $tlink.categorylink_entity='$entity'
           AND $tlink.categorylink_category='$cat_name'";
 	$where .= " $and $tlink.categorylink_category_id IS NULL";

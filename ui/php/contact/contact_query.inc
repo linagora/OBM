@@ -16,43 +16,43 @@ function run_query_contact_search($contact) {
   global $cgp_show, $cdg_sql, $c_all, $ctu_sql_limit;
   global $cgp_archive_only;
 
-  $sql_order_dir = $contact["sql_order_dir"];
-  $sql_order_field = $contact["sql_order_field"];
+  $sql_order_dir = $contact['sql_order_dir'];
+  $sql_order_field = $contact['sql_order_field'];
 
-  $company_id = $contact["company_id"];
-  $fuzzy = $contact["fuzzy"];
-  $lname = sql_search_text_parse($contact["lname"]);
-  $fname = sql_search_text_parse($contact["fname"]);
-  $phone = sql_search_text_parse($contact["phone"]);
-  $email = sql_search_text_parse($contact["email"]);
-  $company = sql_search_text_parse($contact["company"]);
-  $market = $contact["market"];
-  $func = $contact["function"];
-  $title = $contact["title"];
-  $zip = sql_search_text_parse($contact["zip"]);
-  $town = sql_search_text_parse($contact["town"]);
-  $ctry = $contact["country"];
-  $dsrc = $contact["datasource"];
+  $company_id = $contact['company_id'];
+  $fuzzy = $contact['fuzzy'];
+  $lname = sql_search_text_parse($contact['lname']);
+  $fname = sql_search_text_parse($contact['fname']);
+  $phone = sql_search_text_parse($contact['phone']);
+  $email = sql_search_text_parse($contact['email']);
+  $company = sql_search_text_parse($contact['company']);
+  $market = $contact['market'];
+  $func = $contact['function'];
+  $title = $contact['title'];
+  $zip = sql_search_text_parse($contact['zip']);
+  $town = sql_search_text_parse($contact['town']);
+  $ctry = $contact['country'];
+  $dsrc = $contact['datasource'];
   $date_field = ($contact['date_field'] ? $contact['date_field'] : 'timeupdate');
-  $dateafter = of_isodate_convert($contact["date_after"],true);
-  $datebefore = of_isodate_convert($contact["date_before"],true);
-  $mailing_ok_only = $contact["mailing_ok_only"];
-  $newsletter = $contact["newsletter"];
-  $archive = $contact["archive"];
+  $dateafter = of_isodate_convert($contact['date_after'],true);
+  $datebefore = of_isodate_convert($contact['date_before'],true);
+  $mailing_ok_only = $contact['mailing_ok_only'];
+  $newsletter = $contact['newsletter'];
+  $archive = $contact['archive'];
   $lang = get_lang();
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $date = sql_date_format($db_type, "contact_date", "contact_date");
-  $multidomain = sql_multidomain("contact");
+  $date = sql_date_format($db_type, 'contact_date', 'contact_date');
+  $multidomain = sql_multidomain('contact');
 
   // only the one which are allowed (ie. publics )
-  $where .= sql_obm_entity_privacy("contact");
+  $where .= sql_obm_entity_privacy('contact');
 
   // If company module used (external from Contact)
-  if ($cgp_show["module"]["company"]) {
+  if ($cgp_show['module']['company']) {
 
    // To allow sorting on contact and company addresses infos
    $if_condition = "(
@@ -63,16 +63,16 @@ function run_query_contact_search($contact) {
       (contact_town != '') OR 
       (contact_expresspostal != ''))";
 
-    $if_ad1 = sql_if($db_type, $if_condition, "contact_address1 ", "company_address1") . " as contact_address1,";
-    $if_ad2 = sql_if($db_type, $if_condition, "contact_address2 ", "company_address2") . " as contact_address2,";
-    $if_ad3 = sql_if($db_type, $if_condition, "contact_address3 ", "company_address3") . " as contact_address3,";
-    $if_zip = sql_if($db_type, $if_condition, "contact_zipcode ", "company_zipcode") . " as contact_zipcode,";
+    $if_ad1 = sql_if($db_type, $if_condition, 'contact_address1 ', 'company_address1') . ' as contact_address1,';
+    $if_ad2 = sql_if($db_type, $if_condition, 'contact_address2 ', 'company_address2') . ' as contact_address2,';
+    $if_ad3 = sql_if($db_type, $if_condition, 'contact_address3 ', 'company_address3') . ' as contact_address3,';
+    $if_zip = sql_if($db_type, $if_condition, 'contact_zipcode ', 'company_zipcode') . ' as contact_zipcode,';
     $where_zip = "(contact_zipcode $like '$zip%' OR contact_zipcode='' AND company_zipcode $like '$zip%')";
-    $if_town = sql_if($db_type, $if_condition, "contact_town ", "company_town") . " as contact_town,";
+    $if_town = sql_if($db_type, $if_condition, 'contact_town ', 'company_town') . ' as contact_town,';
     $where_town = "(contact_town $like '$town%' OR contact_town='' AND company_town $like '$town%')";
-    $if_express = sql_if($db_type, $if_condition, "contact_expresspostal ", "company_expresspostal") . " as contact_expresspostal,";
-    $if_express = sql_if($db_type, $if_condition, "ctry1.country_name ", "ctry2.country_name") . " as country_name,";
-    $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
+    $if_express = sql_if($db_type, $if_condition, 'contact_expresspostal ', 'company_expresspostal') . ' as contact_expresspostal,';
+    $if_express = sql_if($db_type, $if_condition, 'ctry1.country_name ', 'ctry2.country_name') . ' as country_name,';
+    $join_comp = 'LEFT JOIN Company ON contact_company_id=company_id';
     $join_ctry2 = "LEFT JOIN Country as ctry2 ON
                   Company.company_country_iso3166 = ctry2.country_iso3166
                   AND ctry2.country_lang='$lang'";
@@ -90,131 +90,131 @@ function run_query_contact_search($contact) {
       ctry2.country_name as company_country,";
 
   } else {
-    $if_ad1 = "contact_address1,";
-    $if_ad2 = "contact_address2,";
-    $if_ad3 = "contact_address3,";
-    $if_zip = "contact_zipcode,";
+    $if_ad1 = 'contact_address1,';
+    $if_ad2 = 'contact_address2,';
+    $if_ad3 = 'contact_address3,';
+    $if_zip = 'contact_zipcode,';
     $where_zip = "(contact_zipcode $like '$zip%')";
-    $if_town = "contact_town,";
+    $if_town = 'contact_town,';
     $where_town = "(contact_town $like '$town%')";
-    $if_express = "contact_expresspostal,";
-    $if_country = "ctry1.country_name as country_name,";
-    $company_fields = "contact_company as company_name,";
+    $if_express = 'contact_expresspostal,';
+    $if_country = 'ctry1.country_name as country_name,';
+    $company_fields = 'contact_company as company_name,';
   }
 
   // If a lastname has been specified, get it 
-  if ($lname != "") {
+  if ($lname != '') {
     $where_name .= "(contact_lastname $like '$lname%' or contact_aka like '$lname%')";
   }
   // If a firstname has been specified, get it 
-  if ($fname != "") {
+  if ($fname != '') {
     $where .= " AND contact_firstname $like '$fname%'";
   }
   // If a phone number has been specified, get it 
-  if ($phone != "") {
+  if ($phone != '') {
     $where .= " AND (contact_phone $like '$phone%' OR
                  contact_homephone $like '$phone%' OR
                  contact_mobilephone $like '$phone%')";
   }
   // If an email indication has been specified, get it 
-  if ($email != "") {
+  if ($email != '') {
     $where .= " AND (contact_email $like '$email%' OR
                      contact_email2 $like '$email%')";
   }
   // If a company name indication has been specified (without id) get it 
-  if (($company != "") && ($company_id == "")) {
-    if ($cgp_show["module"]["company"]) {
+  if (($company != '') && ($company_id == '')) {
+    if ($cgp_show['module']['company']) {
       $where .= sql_global_company_name_advanced_search($company, $like);
-      $join_comp_count = "LEFT JOIN Company ON contact_company_id=company_id";
+      $join_comp_count = 'LEFT JOIN Company ON contact_company_id=company_id';
     } else {
       $where .= " AND contact_company $like '$company%'";
     }
   }
   // If a company was sent as parameter, get it
-  if ($company_id != "") {
+  if ($company_id != '') {
     $where .= " AND contact_company_id='$company_id'";
   }
   // If a post code has been specified, get it
-  if ($zip != "") {
+  if ($zip != '') {
     $where .= " AND $where_zip";
   }
   // If a town has been specified, get it 
-  if ($town != "") {
+  if ($town != '') {
     $where .= " AND $where_town";
   }
   // If a country has been set
-  if (($ctry != $c_all) && ($ctry != "")) {
-    if ($cgp_show["module"]["company"]) {
+  if (($ctry != $c_all) && ($ctry != '')) {
+    if ($cgp_show['module']['company']) {
       $where .= " AND (contact_country_iso3166='$ctry' OR
        contact_country_iso3166=0 AND company_country_iso3166='$ctry')";
-      $join_comp_count = "LEFT JOIN Company ON contact_company_id=company_id";
+      $join_comp_count = 'LEFT JOIN Company ON contact_company_id=company_id';
     } else {
       $where .= " AND contact_country_iso3166='$ctry'";
     }
   }
 
   // If a person in charge has been set
-  if (($market != $c_all) && ($market != "")) { 
+  if (($market != $c_all) && ($market != '')) { 
     $where .= " AND contact_marketingmanager_id='$market'";
   }
   // If a function has been set
-  if (($func != $c_all) && ($func != "")) { 
+  if (($func != $c_all) && ($func != '')) { 
     $where .= " AND contact_function_id='$func'";
   }
   // If a title has been specified, get it 
-  if ($title != "") {
+  if ($title != '') {
     $where .= " AND contact_title $like '$title%'";
   }
   // If a datasource has been specified, get it 
-  if (($dsrc != $c_all) && ($dsrc != "")) { 
+  if (($dsrc != $c_all) && ($dsrc != '')) { 
     $where .= " AND contact_datasource_id='$dsrc'";
   }
-  if ($dateafter != "") {
+  if ($dateafter != '') {
     $where .= " AND contact_$date_field > '$dateafter'";
   }
-  if ($datebefore != "") {
+  if ($datebefore != '') {
     $where .= " AND contact_$date_field < '$datebefore'";
   }
   // Get all by default 
-  if ($mailing_ok_only == "1") {
-    $where .= " AND contact_mailing_ok=1";
+  if ($mailing_ok_only == '1') {
+    $where .= ' AND contact_mailing_ok=1';
   }
-  if ($newsletter == "1") {
-    $where .= " AND contact_newsletter=1";
+  if ($newsletter == '1') {
+    $where .= ' AND contact_newsletter=1';
   }
   // Get only not archived by default
-  if ($archive != "1") {
+  if ($archive != '1') {
     $where .= " AND contact_archive='0'";
   } elseif ($cgp_archive_only) {
     $where .= " AND contact_archive='1'";
   }
 
   // User defined data
-  $userdata = of_userdata_query_search("contact", $contact);
-  if ($userdata["where"] != "") {
-    $where .= " AND ". $userdata["where"];
-    $join_userdata = $userdata["join"];
+  $userdata = of_userdata_query_search('contact', $contact);
+  if ($userdata['where'] != '') {
+    $where .= ' AND '. $userdata['where'];
+    $join_userdata = $userdata['join'];
   }
   
   $whereq = "WHERE $where $multidomain";
-  if ($where_name != "") {
+  if ($where_name != '') {
     $whereq .= " AND $where_name";
   }
 
   // order
-  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "contact_lastname";
-  if (($order == "contact_lastname") || ($order == "contact_firstname")) {
+  $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'contact_lastname';
+  if (($order == 'contact_lastname') || ($order == 'contact_firstname')) {
     $order = sql_casei_sort($db_type, $order);
   }
 
   // Order exceptions (order on calculated rows)
-  if (strcmp($sql_order_field,"contact_address") == 0) {
-    $order = "contact_address1";
-    $order_next = ", contact_address2, contact_address3, contact_zipcode, contact_town";
-  } else if (strcmp($sql_order_field,"country_name") == 0) {
-    $order = "country_name";
-    if ($cgp_show["module"]["company"]) {
-      $order_next = ", company_country";
+  if (strcmp($sql_order_field,'contact_address') == 0) {
+    $order = 'contact_address1';
+    $order_next = ', contact_address2, contact_address3, contact_zipcode, contact_town';
+  } else if (strcmp($sql_order_field,'country_name') == 0) {
+    $order = 'country_name';
+    if ($cgp_show['module']['company']) {
+      $order_next = ', company_country';
     }
   }
   $orderq = " ORDER BY $order $sql_order_dir $order_next";
@@ -271,7 +271,7 @@ function run_query_contact_search($contact) {
         $join_ctry2";
 
 
-  if ((! $fuzzy) || ($lname == "")) {
+  if ((! $fuzzy) || ($lname == '')) {
     if ($ctu_sql_limit) {
       $count = get_query_count("SELECT count(distinct contact_id) FROM Contact $left_join $whereq");
       $obm_q->set_num_rows_total($count);
@@ -279,7 +279,7 @@ function run_query_contact_search($contact) {
     // If any results (from limited) or result not limited, we get the data
     if (($count > 0) || (! $ctu_sql_limit)) {
       $query = "$select $left_join $whereq $orderq $limit";
-      display_debug_msg($query, $cdg_sql, "contact_search(1)");
+      display_debug_msg($query, $cdg_sql, 'contact_search(1)');
       $obm_q->query($query);
       if (! $ctu_sql_limit) {
 	$count = $obm_q->num_rows();
@@ -288,7 +288,7 @@ function run_query_contact_search($contact) {
   }
 
   // if fuzzy or unsuccessful search (meaningful only if name has been entered)
-  if ( ( ($fuzzy) || ($count == 0) ) && ($lname != "") ) {
+  if ( ( ($fuzzy) || ($count == 0) ) && ($lname != '') ) {
     $auto_aka = format_name($lname, 0, true, true);
     $sound = phonetic_key($lname);
     $where_name = " AND ($where_name OR contact_aka $like '%$auto_aka%'
@@ -300,7 +300,7 @@ function run_query_contact_search($contact) {
     }
     if (($count > 0) || (! $ctu_sql_limit)) {
       $query = "$select $left_join $whereq $orderq $limit";
-      display_debug_msg($query, $cdg_sql, "contact_search(2)");
+      display_debug_msg($query, $cdg_sql, 'contact_search(2)');
       $obm_q->query($query);
     }
   }
@@ -320,14 +320,14 @@ function run_query_contact_detail($p_id) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($db_type, "contact_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($db_type, "contact_timecreate", "timecreate");
+  $timeupdate = sql_date_format($db_type, 'contact_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'contact_timecreate', 'timecreate');
   $lang = get_lang();
-  $date = sql_date_format($db_type, "contact_date", "contact_date");
-  $multidomain = sql_multidomain("contact");
+  $date = sql_date_format($db_type, 'contact_date', 'contact_date');
+  $multidomain = sql_multidomain('contact');
 
-  if ($cgp_show["module"]["company"]) {
-    $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
+  if ($cgp_show['module']['company']) {
+    $join_comp = 'LEFT JOIN Company ON contact_company_id=company_id';
     $join_ctry2 = "LEFT JOIN Country as C2
                    ON company_country_iso3166=C2.country_iso3166
                     AND C2.country_lang='$lang'";
@@ -344,7 +344,7 @@ function run_query_contact_detail($p_id) {
         company_country_iso3166,
         C2.country_name as company_country_name";
   } else {
-    $company_fields = "contact_company as company_name";
+    $company_fields = 'contact_company as company_name';
   }
 
   $query = "SELECT Contact.*,
@@ -379,7 +379,7 @@ function run_query_contact_detail($p_id) {
         contact_id='$p_id'
         $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_detail()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -397,7 +397,7 @@ function run_query_contact_company($c_id) {
   global $cdg_sql;
 
   $lang = get_lang();
-  $multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain('company');
 	
   $query = "SELECT company_id,
       company_name,
@@ -417,7 +417,7 @@ function run_query_contact_company($c_id) {
     WHERE company_id='$c_id'
       $multidomain";
 	
-  display_debug_msg($query, $cdg_sql, "run_query_contact_company()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_company()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -433,7 +433,7 @@ function run_query_contact_company($c_id) {
 function run_query_contact_kind() {
   global $cdg_sql;
   
-  $multidomain = sql_multidomain("kind");
+  $multidomain = sql_multidomain('kind');
 	
   $query = "SELECT kind_id,
       kind_minilabel,
@@ -445,7 +445,7 @@ function run_query_contact_kind() {
       $multidomain
     ORDER BY kind_lang, kind_minilabel, kind_header";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_kind()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_kind()');
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -464,74 +464,74 @@ function run_query_contact_kind() {
 function run_query_contact_insert($contact) {
   global $cgp_show, $cdg_sql, $obm;
 
-  $now = date("Y-m-d H:i:s");
-  $uid = $obm["uid"];
+  $now = date('Y-m-d H:i:s');
+  $uid = $obm['uid'];
 	
-  $comp_id = $contact["company_new_id"];
+  $comp_id = $contact['company_new_id'];
   if ($comp_id < 1) {
-    $comp_id = $contact["company_id"];
+    $comp_id = $contact['company_id'];
   }
   // In case company module not used, to avoid postgres error
-  if ($comp_id == "") {
-    $comp_id = "0";
+  if ($comp_id == '') {
+    $comp_id = '0';
   }
   
-  $domain_id = $obm["domain_id"];
-  $dsrc = ($contact["datasource"] ? $contact["datasource"] : 0);
-  $company = $contact["company"];
-  $kind = $contact["kind"];
-  $market = ($contact["market"] ? $contact["market"] : 0);
-  $lname = $contact["lname"];
-  $fname = $contact["fname"];
-  $aka = trim($contact["aka"]);
+  $domain_id = $obm['domain_id'];
+  $dsrc = ($contact['datasource'] ? $contact['datasource'] : 0);
+  $company = $contact['company'];
+  $kind = $contact['kind'];
+  $market = ($contact['market'] ? $contact['market'] : 0);
+  $lname = $contact['lname'];
+  $fname = $contact['fname'];
+  $aka = trim($contact['aka']);
   // If aka is empty we auto fill it
-  if ($aka == "") {
+  if ($aka == '') {
     $auto_aka = format_name($lname, 0, true, true);
     if ($auto_aka != $lname) {
       $aka = $auto_aka;
     }
   }
   $sound = phonetic_key($lname);
-  $service = $contact["service"];
-  $ad1 = $contact["ad1"];
-  $ad2 = $contact["ad2"];
-  $ad3 = $contact["ad3"];
-  $zip = $contact["zip"];
-  $town = $contact["town"];
-  $cdx = $contact["cdx"];
-  $ctry = $contact["country"];
-  $func = ($contact["function"] ? $contact["function"] : 0);
-  $title = $contact["title"];
-  $phone = $contact["phone"];
-  $hphone = $contact["hphone"];
-  $mphone = $contact["mphone"];
-  $fax = $contact["fax"];
-  $email = $contact["email"];
-  $email2 = $contact["email2"];
-  $mailok = ($contact["mailok"] == "1" ? "1" : "0");
-  $newsletter = ($contact["newsletter"] == "1" ? "1" : "0");
-  $date = ($contact["date"] ? "'".of_isodate_convert($contact["date"])."'" : "null");
-  $add_comment = $contact["add_comment"];
-  if ($add_comment != "") {
-    $datecomment = of_isodate_convert($contact["datecomment"]);
-    $usercomment = $contact["usercomment"];
+  $service = $contact['service'];
+  $ad1 = $contact['ad1'];
+  $ad2 = $contact['ad2'];
+  $ad3 = $contact['ad3'];
+  $zip = $contact['zip'];
+  $town = $contact['town'];
+  $cdx = $contact['cdx'];
+  $ctry = $contact['country'];
+  $func = ($contact['function'] ? $contact['function'] : 0);
+  $title = $contact['title'];
+  $phone = $contact['phone'];
+  $hphone = $contact['hphone'];
+  $mphone = $contact['mphone'];
+  $fax = $contact['fax'];
+  $email = $contact['email'];
+  $email2 = $contact['email2'];
+  $mailok = ($contact['mailok'] == '1' ? '1' : '0');
+  $newsletter = ($contact['newsletter'] == '1' ? '1' : '0');
+  $date = ($contact['date'] ? "'".of_isodate_convert($contact['date'])."'" : 'null');
+  $add_comment = $contact['add_comment'];
+  if ($add_comment != '') {
+    $datecomment = of_isodate_convert($contact['datecomment']);
+    $usercomment = $contact['usercomment'];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
-  $add_comment2 = $contact["add_comment"];
-  if ($add_comment2 != "") {
-    $datecomment2 = of_isodate_convert($contact["datecomment2"]);
-    $usercomment2 = $contact["usercomment2"];
+  $add_comment2 = $contact['add_comment'];
+  if ($add_comment2 != '') {
+    $datecomment2 = of_isodate_convert($contact['datecomment2']);
+    $usercomment2 = $contact['usercomment2'];
     $comment2 .= "\n$datecomment2:$usercomment2:$add_comment2";
   }
-  $add_comment3 = $contact["add_comment3"];
-  if ($add_comment3 != "") {
-    $datecomment3 = of_isodate_convert($contact["datecomment3"]);
-    $usercomment3 = $contact["usercomment3"];
+  $add_comment3 = $contact['add_comment3'];
+  if ($add_comment3 != '') {
+    $datecomment3 = of_isodate_convert($contact['datecomment3']);
+    $usercomment3 = $contact['usercomment3'];
     $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
   }
 
-  $archive = ($contact["archive"] == "1" ? "1" : "0");
-  $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
+  $archive = ($contact['archive'] == '1' ? '1' : '0');
+  $priv = (isset($contact['privacy']) ? $contact['privacy'] : '0');
 
   $query = "INSERT INTO Contact (contact_timeupdate,
     contact_timecreate,
@@ -611,11 +611,11 @@ function run_query_contact_insert($contact) {
     '$comment3'
   )";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_insert(1)");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_insert(1)');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  if (($cgp_show["module"]["company"]) && ($retour)) {
+  if (($cgp_show['module']['company']) && ($retour)) {
     run_query_global_company_contact_number_update($comp_id);
   }
 
@@ -630,13 +630,13 @@ function run_query_contact_insert($contact) {
       AND contact_zipcode = '$zip'
       AND contact_domain_id='$domain_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_insert(2)");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_insert(2)');
   $obm_q->query($query);
   $obm_q->next_record();
-  $id = $obm_q->f("contact_id");
+  $id = $obm_q->f('contact_id');
 
   if ($id > 0) {
-    $ret = of_userdata_query_update("contact", $id, $contact);
+    $ret = of_userdata_query_update('contact', $id, $contact);
   }
   
   return $id;
@@ -654,81 +654,81 @@ function run_query_contact_insert($contact) {
 function run_query_contact_update($contact) {
   global $obm, $cgp_show, $cdg_sql;
 
-  $multidomain = sql_multidomain("contact");
-  $id = $contact["contact_id"];
-  $comp_old_id = $contact["company_id"];
-  $comp_new_id = $contact["company_new_id"];
+  $multidomain = sql_multidomain('contact');
+  $id = $contact['contact_id'];
+  $comp_old_id = $contact['company_id'];
+  $comp_new_id = $contact['company_new_id'];
 
-  $comp_id = $contact["company_new_id"];
+  $comp_id = $contact['company_new_id'];
   if ($comp_id < 1) {
-    $comp_id = $contact["company_id"];
+    $comp_id = $contact['company_id'];
   }
   // In case company module not used, to avoid postgres error
-  if ($comp_id == "") {
-    $comp_id = "0";
+  if ($comp_id == '') {
+    $comp_id = '0';
   }
-  $dsrc = ($contact["datasource"] ? $contact["datasource"] : 0);
-  $company = $contact["company"];
-  $kind = $contact["kind"];
-  $market = ($contact["market"] ? $contact["market"] : 0);
-  $lname = $contact["lname"];
-  $fname = $contact["fname"];
-  $aka = trim($contact["aka"]);
+  $dsrc = ($contact['datasource'] ? $contact['datasource'] : 0);
+  $company = $contact['company'];
+  $kind = $contact['kind'];
+  $market = ($contact['market'] ? $contact['market'] : 0);
+  $lname = $contact['lname'];
+  $fname = $contact['fname'];
+  $aka = trim($contact['aka']);
   // If aka is empty we auto fill it
-  if ($aka == "") {
+  if ($aka == '') {
     $auto_aka = format_name($lname, 0, true, true);
     if ($auto_aka != $lname) {
       $aka = $auto_aka;
     }
   }
   $sound = phonetic_key($lname);
-  $service = $contact["service"];
-  $ad1 = $contact["ad1"];
-  $ad2 = $contact["ad2"];
-  $ad3 = $contact["ad3"];
-  $zip = $contact["zip"];
-  $town = $contact["town"];
-  $cdx = $contact["cdx"];
-  $ctry = $contact["country"];
-  $func = ($contact["function"] ? $contact["function"] : 0);
-  $title = $contact["title"];
-  $phone = $contact["phone"];
-  $hphone = $contact["hphone"];
-  $mphone = $contact["mphone"];
-  $fax = $contact["fax"];
-  $email = $contact["email"];
-  $email2 = $contact["email2"];
-  $mailok = ($contact["mailok"] == "1" ? "1" : "0");
-  $newsletter = ($contact["newsletter"] == "1" ? "1" : "0");
+  $service = $contact['service'];
+  $ad1 = $contact['ad1'];
+  $ad2 = $contact['ad2'];
+  $ad3 = $contact['ad3'];
+  $zip = $contact['zip'];
+  $town = $contact['town'];
+  $cdx = $contact['cdx'];
+  $ctry = $contact['country'];
+  $func = ($contact['function'] ? $contact['function'] : 0);
+  $title = $contact['title'];
+  $phone = $contact['phone'];
+  $hphone = $contact['hphone'];
+  $mphone = $contact['mphone'];
+  $fax = $contact['fax'];
+  $email = $contact['email'];
+  $email2 = $contact['email2'];
+  $mailok = ($contact['mailok'] == '1' ? '1' : '0');
+  $newsletter = ($contact['newsletter'] == '1' ? '1' : '0');
   if ($contact['date'] != '') {
     $query_date = "contact_date = '".of_isodate_convert($contact['date'])."',";
   } else {
-    $query_date = "contact_date = null,";
+    $query_date = 'contact_date = null,';
   }
-  $comment = $contact["comment"];
-  $add_comment = $contact["add_comment"];
-  if ($add_comment != "") {
-    $datecomment = of_isodate_convert($contact["datecomment"]);
-    $usercomment = $contact["usercomment"];
+  $comment = $contact['comment'];
+  $add_comment = $contact['add_comment'];
+  if ($add_comment != '') {
+    $datecomment = of_isodate_convert($contact['datecomment']);
+    $usercomment = $contact['usercomment'];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
-  $comment2 = $contact["comment2"];
-  $add_comment2 = $contact["add_comment2"];
-  if ($add_comment2 != "") {
-    $datecomment2 = of_isodate_convert($contact["datecomment2"]);
-    $usercomment2 = $contact["usercomment2"];
+  $comment2 = $contact['comment2'];
+  $add_comment2 = $contact['add_comment2'];
+  if ($add_comment2 != '') {
+    $datecomment2 = of_isodate_convert($contact['datecomment2']);
+    $usercomment2 = $contact['usercomment2'];
     $comment2 .= "\n$datecomment2:$usercomment2:$add_comment2";
   }
-  $comment3 = $contact["comment3"];
-  $add_comment3 = $contact["add_comment3"];
-  if ($add_comment3 != "") {
-    $datecomment3 = of_isodate_convert($contact["datecomment3"]);
-    $usercomment3 = $contact["usercomment3"];
+  $comment3 = $contact['comment3'];
+  $add_comment3 = $contact['add_comment3'];
+  if ($add_comment3 != '') {
+    $datecomment3 = of_isodate_convert($contact['datecomment3']);
+    $usercomment3 = $contact['usercomment3'];
     $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
   }
-  $archive = ($contact["archive"] == "1" ? "1" : "0");
-  $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
-  $dsrc = ($contact["datasource"] ? $contact["datasource"] : 0);
+  $archive = ($contact['archive'] == '1' ? '1' : '0');
+  $priv = (isset($contact['privacy']) ? $contact['privacy'] : '0');
+  $dsrc = ($contact['datasource'] ? $contact['datasource'] : 0);
 
   // Archived contact unsubscribed from mailings
   if ($archive == '1') {
@@ -737,8 +737,8 @@ function run_query_contact_update($contact) {
   }
 
   $query = "UPDATE Contact SET
-    contact_timeupdate='".date("Y-m-d H:i:s")."',
-    contact_userupdate='".$obm["uid"]."',
+    contact_timeupdate='".date('Y-m-d H:i:s')."',
+    contact_userupdate='".$obm['uid']."',
     contact_datasource_id='$dsrc',
     contact_company_id='$comp_id',
     contact_company='$company',
@@ -775,15 +775,15 @@ function run_query_contact_update($contact) {
   WHERE contact_id='$id'
     $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $ret = of_userdata_query_update("contact", $id, $contact);
+    $ret = of_userdata_query_update('contact', $id, $contact);
   }
 
-  if ($cgp_show["module"]["company"]) {
+  if ($cgp_show['module']['company']) {
     // If company has changed, update the companies contact number
     if (($retour) && ($comp_new_id > 0) && ($comp_new_id != $comp_old_id)) {
       run_query_global_company_contact_number_update($comp_new_id);
@@ -807,11 +807,11 @@ function get_linked_contact_list_nb($p_id) {
     FROM ContactList
     WHERE contactlist_contact_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql, "get_linked_contact_list_nb()");
+  display_debug_msg($query, $cdg_sql, 'get_linked_contact_list_nb()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $nb = $obm_q->f("nb");
+  $nb = $obm_q->f('nb');
 
   return $nb;
 }
@@ -829,11 +829,11 @@ function get_linked_contact_publication_nb($p_id) {
     FROM Subscription 
     WHERE subscription_contact_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql, "get_linked_contact_publication_nb()");
+  display_debug_msg($query, $cdg_sql, 'get_linked_contact_publication_nb()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $nb = $obm_q->f("nb");
+  $nb = $obm_q->f('nb');
 
   return $nb;
 }
@@ -848,25 +848,25 @@ function run_query_contact_delete($p_id) {
   global $cdg_sql, $c_use_connectors;
 
   $c = get_contact_info($p_id);
-  $comp_id = $c["company_id"];
-  $multidomain = sql_multidomain("contact");
+  $comp_id = $c['company_id'];
+  $multidomain = sql_multidomain('contact');
 
-  run_query_global_delete_document_links($p_id, "contact");    
+  run_query_global_delete_document_links($p_id, 'contact');    
   run_query_contact_delete_subscription($p_id);    
-  $ret = of_userdata_query_delete("contact", $p_id);
+  $ret = of_userdata_query_delete('contact', $p_id);
 
   $query = "DELETE FROM Contact WHERE contact_id='$p_id' $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_contact_delete(1)");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_delete(1)');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // If connectors in use
   if ($c_use_connectors) {
-    $now = date("Y-m-d H:i:s");
+    $now = date('Y-m-d H:i:s');
     $query = "INSERT INTO
       DeletedContact (deletedcontact_contact_id, deletedcontact_timestamp)
       VALUES ('$p_id', '$now')";
-    display_debug_msg($query, $cdg_sql, "run_query_contact_delete(2)");
+    display_debug_msg($query, $cdg_sql, 'run_query_contact_delete(2)');
     $retour = $obm_q->query($query);
   }
 
@@ -887,7 +887,7 @@ function run_query_contact_delete_subscription($p_id) {
 
   $query = "DELETE FROM Subscription WHERE subscription_contact_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_delete_subscription()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_delete_subscription()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -907,17 +907,17 @@ function run_query_contact_delete_subscription($p_id) {
 function run_query_contact_check($cid, $comp_id, $lname, $fname) {
   global $cdg_sql, $cgp_show, $obm;
   $uid = $obm['uid'];
-  $multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain('contact');
 	
-  $where_id = "";
-  if ($cid != "") {
+  $where_id = '';
+  if ($cid != '') {
     $where_id = "contact_id!='$cid' AND";
   }
 
-  if ($cgp_show["module"]["company"]) {
-    $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
+  if ($cgp_show['module']['company']) {
+    $join_comp = 'LEFT JOIN Company ON contact_company_id=company_id';
     $where_comp = "OR (contact_company_id='$comp_id' AND contact_lastname='$lname')";
-    $select_comp = ", company_name";
+    $select_comp = ', company_name';
   }
 
   $query = "SELECT DISTINCT contact_id,
@@ -932,7 +932,7 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
     AND ((contact_privacy = '1' AND contact_usercreate = '$uid') OR contact_privacy = 0)
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_check()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_check()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -952,11 +952,11 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
 function check_contact_context($cid, $contact) {
   global $cgp_show;
 
-  $lname = $contact["lname"];
-  $fname = $contact["fname"];
-  $comp_new_id = $contact["company_new_id"];
-  $comp_id = $contact["company_id"];
-  $comp = ($comp_new_id != "") ? $comp_new_id : $comp_id;
+  $lname = $contact['lname'];
+  $fname = $contact['fname'];
+  $comp_new_id = $contact['company_new_id'];
+  $comp_id = $contact['company_id'];
+  $comp = ($comp_new_id != '') ? $comp_new_id : $comp_id;
 
   // return contacts with same lastname and firstname or
   // within the same company with same lname
@@ -1225,14 +1225,14 @@ function get_contact_kind_default() {
 function run_query_contact_kind_insert($contact) {
   global $cdg_sql, $obm;
 
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $obm["uid"];
-  $label = $contact["kind_label"];
-  $lang = $contact["kind_lang"];
-  $header = $contact["kind_header"];
-  //$default = ($contact["kind_default"] == 1 ? 1 : 0);
-  $default = (isset($contact["kind_default"]) ? $contact["kind_default"] : '0');
-  $domain_id = $obm["domain_id"];
+  $timecreate = date('Y-m-d H:i:s');
+  $usercreate = $obm['uid'];
+  $label = $contact['kind_label'];
+  $lang = $contact['kind_lang'];
+  $header = $contact['kind_header'];
+  //$default = ($contact['kind_default'] == 1 ? 1 : 0);
+  $default = (isset($contact['kind_default']) ? $contact['kind_default'] : '0');
+  $domain_id = $obm['domain_id'];
 	
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
@@ -1256,7 +1256,7 @@ function run_query_contact_kind_insert($contact) {
     '$lang',
     '$default')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_kind_insert()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_kind_insert()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1272,13 +1272,13 @@ function run_query_contact_kind_insert($contact) {
 function run_query_contact_kind_clear_default($lang) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("kind");
+  $multidomain = sql_multidomain('kind');
 
   $query = "UPDATE Kind
     SET kind_default=0
     WHERE kind_lang = '$lang' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_kind_clear_default()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_kind_clear_default()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1295,14 +1295,14 @@ function run_query_contact_kind_clear_default($lang) {
 function run_query_contact_kind_update($contact) {
   global $obm, $cdg_sql;
 
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $obm["uid"];
-  $id = $contact["kind"];
-  $label = $contact["kind_label"];
-  $lang = $contact["kind_lang"];
-  $header = $contact["kind_header"];
-  $default = (isset($contact["kind_default"]) ? $contact["kind_default"] : '0');
-  $multidomain = sql_multidomain("kind");
+  $timeupdate = date('Y-m-d H:i:s');
+  $userupdate = $obm['uid'];
+  $id = $contact['kind'];
+  $label = $contact['kind_label'];
+  $lang = $contact['kind_lang'];
+  $header = $contact['kind_header'];
+  $default = (isset($contact['kind_default']) ? $contact['kind_default'] : '0');
+  $multidomain = sql_multidomain('kind');
 	
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
@@ -1319,7 +1319,7 @@ function run_query_contact_kind_update($contact) {
     WHERE
       kind_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_kind_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_kind_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1335,11 +1335,11 @@ function run_query_contact_kind_update($contact) {
 function run_query_contact_kind_delete($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("kind");
+	$multidomain = sql_multidomain('kind');
 
   $query = "DELETE FROM Kind WHERE kind_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_kind_delete()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_kind_delete()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1355,7 +1355,7 @@ function run_query_contact_kind_delete($id) {
 function run_query_contact_kind_links($id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain('contact');
 
   $query = "SELECT contact_lastname,
       contact_firstname,
@@ -1364,7 +1364,7 @@ function run_query_contact_kind_links($id) {
     FROM Contact 
     WHERE contact_kind_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_kind_links()");
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_kind_links()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1380,19 +1380,19 @@ function run_query_contact_kind_links($id) {
 function get_contact_kind_label($id) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("kind");	
+  $multidomain = sql_multidomain('kind');	
 
   $query = "SELECT kind_lang, kind_minilabel, kind_header
     FROM Kind
     WHERE kind_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_contact_kind_label()");
+  display_debug_msg($query, $cdg_sql, 'get_contact_kind_label()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("kind_lang") . " " . $obm_q->f("kind_minilabel") . " " .
-            $obm_q->f("kind_header");
+  $retour = $obm_q->f('kind_lang') . ' ' . $obm_q->f('kind_minilabel') . ' ' .
+            $obm_q->f('kind_header');
   return $retour;
 }
 
@@ -1414,7 +1414,7 @@ function run_query_contact_subscription_nb($id) {
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $obm_q->next_record();
-    $retour = $obm_q->f("nb");
+    $retour = $obm_q->f('nb');
   } else { 
     $retour = 0;
   }

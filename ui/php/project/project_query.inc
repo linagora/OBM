@@ -105,7 +105,10 @@ function run_query_project_search($params) {
       project_soldtime,
       project_estimatedtime,
       company_name as project_company,
+      dealtype_code as type_code,
       dealtype_label as project_type,
+      tasktype_internal,
+      tasktype_code,
       tasktype_label as project_tasktype,
       $datebegin,
       $dateend,
@@ -155,11 +158,15 @@ function run_query_project_detail($p_id) {
       project_id,
       project_name,
       project_shortname,
+      project_type_id,
       project_tasktype_id,
       project_company_id,
       project_deal_id,
+      dealtype_code as type_code,
       dealtype_label as type_label,
+      tasktype_code,
       tasktype_label as project_tasktype_label,
+      tasktype_internal,
       company_name,
       deal_label,
       project_soldtime,
@@ -177,12 +184,12 @@ function run_query_project_detail($p_id) {
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
     FROM Project
-         left join Company on project_company_id=company_id
-         left join Deal on project_deal_id=deal_id
-         left join DealType on project_type_id=dealtype_id
-         left join TaskType on project_tasktype_id=tasktype_id
-         LEFT JOIN UserObm as c on project_usercreate=c.userobm_id
-         LEFT JOIN UserObm as u on project_userupdate=u.userobm_id
+         LEFT JOIN Company ON project_company_id=company_id
+         LEFT JOIN Deal ON project_deal_id=deal_id
+         LEFT JOIN DealType ON project_type_id=dealtype_id
+         LEFT JOIN TaskType ON project_tasktype_id=tasktype_id
+         LEFT JOIN UserObm as c ON project_usercreate=c.userobm_id
+         LEFT JOIN UserObm as u ON project_userupdate=u.userobm_id
     WHERE project_id='$p_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_detail');
@@ -565,6 +572,38 @@ function run_query_project_update($pid, $params) {
   $obm_q->query($query);
 
   return $obm_q;
+}
+
+
+/**
+ * Return the project calculated code
+ * @param : db object with project infos
+ **/
+function get_project_code($project_q) {
+  global $ctt_sales;
+
+  // Billed / internal
+  $task_internal = $project_q->f('tasktype_internal');
+  if ($task_internal == "$ctt_sales") {
+    $dis_internal = '1';
+  } else {
+    $dis_internal = '0';
+  }
+
+  // Type
+  $type_code = $project_q->f('type_code');
+  $dis_type = "$type_code";
+
+  // Tasktype (skill)
+  $tasktype_code = $project_q->f('tasktype_code');
+  $dis_tasktype = "$tasktype_code";
+
+  // Tasktype (skill)
+  $shortname = $project_q->f('project_shortname');
+  
+  $code = "$dis_internal-$dis_type-$dis_tasktype-$shortname";
+
+  return $code;
 }
 
 

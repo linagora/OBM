@@ -320,7 +320,7 @@ if ($action == 'ext_get_id') {
     }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
-    $display['detail'] = dis_project_closing_form($action, '', $params);
+    $display['detail'] = dis_project_closing_form($action, $params);
   }
 
 } elseif ($action == 'allocate_update') {
