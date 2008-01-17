@@ -101,12 +101,11 @@ if ( ($params['new_group'] == '1')
   $cal_entity_id['resource'] = array();
 }
 // Resources groups, only on meeting
-if ($action == 'perform_meeting' && 
-  (is_array($params['sel_resource_group_id']) || is_array($params['sel_user_id'])
-  || is_array($params['sel_resource_id']))) { 
+if ($action == 'perform_meeting') { 
   $cal_entity_id['resource_group'] = $params['sel_resource_group_id'];
   $cal_entity_id['user'] = $params['sel_user_id'];
   $cal_entity_id['resource'] = $params['sel_resource_id'];    
+  $cal_entity_id['group'] = $params['sel_group_id'];
 } else if ($action != 'perform_meeting') {
   unset($cal_entity_id['resource_group']);
 }

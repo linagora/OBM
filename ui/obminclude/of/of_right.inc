@@ -806,43 +806,44 @@ class OBM_Acl {
     return $singleton;
   }
 
-  function isAllowed($userId, $entityId, $entity, $action) {
+  function isAllowed($userId, $resourceUri , $action) {
     return $this->getACL($userId, $entityId, $entity,$action);
   }
 
-  function canRead($userId, $entityId, $entity) {
+  function canRead($userId, $resourceUri) {
     return this->isAllowed($userId, $entityId, $entity, 'read');
   }
 
-  function canWrite($userId, $entityId, $entity) {
+  function canWrite($userId, $resourceUri) {
     return this->isAllowed($userId, $entityId, $entity, 'write');
   }
 
-  function canAdmin($userId, $entityId, $entity) {
+  function canAdmin($userId, $resourceUri) {
     return this->isAllowed($userId, $entityId, $entity, 'admin');
   }
 
-  function getEntityRoles($entityId, $entity, $action = "all") {
+  function getEntityRoles($uri , $action = "all") {
 
   }
 
-  function getEntityReaders($entityId, $entity) {
+  function getEntityReaders($resourceUri) {
     return $this->getEntityRoles($entityId,$entity,'read');
   }
   
-  function getEntityWriters($entityId, $entity) {
+  function getEntityWriters($resourceUri) {
     return $this->getEntityRoles($entityId,$entity,'write');
   }
 
-  function getEntityAdmins($entityId, $entity) {
+  function getEntityAdmins($resourceUri) {
     return $this->getEntityRoles($entityId,$entity,'admin');
   }
 
-  function getEntityACL($entityId, $entity) {
-
+  function getACL($userId, $resourceUri, $action) {
+    $uri = explode('/',$res)
   }
+  
 
-  function isCached($entity, $entityId, $entity, $action) {
+  function isCached($userId, $resourceUri) {
     if(isset($this->cache['acl'][$userId][$entity][$entityId][$action])) {
       
     }

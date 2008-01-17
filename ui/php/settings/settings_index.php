@@ -319,7 +319,6 @@ if ($cgp_show['module']['calendar']) {
   // days to display in the week view
   $display_days = $_SESSION['set_cal_display_days'];
   $start_week_day = strtotime($ccalendar_weekstart);
-  echo $display_days;
   if( $display_days == '1111100') {
     $without = 'selected="selected"';
   } else {

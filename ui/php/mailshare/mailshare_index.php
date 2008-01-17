@@ -321,7 +321,7 @@ function get_mailshare_action() {
     'Name'     => $l_header_right,
     'Url'      => "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=".$params["mailshare_id"]."",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult')
+    'Condition'=> array ('detailconsult','update','insert')
                                      );
 
 // Rights Update
