@@ -28,6 +28,8 @@ loglevel        0
 # Where the dynamically loaded modules are stored
 modulepath	/usr/lib/ldap
 moduleload	back_bdb
+#module pour syncrepl en MASTER
+#moduleload  syncprov
 
 # The maximum number of entries that is returned for a search operation
 sizelimit 500
@@ -85,10 +87,27 @@ dbconfig set_lk_max_objects 1500
 dbconfig set_lk_max_locks 1500
 # Number of lockers
 dbconfig set_lk_max_lockers 1500
-dbconfig set_flags DB_LOG_AUTOREMOVE
 
-# Indexing options for database #1
+#Indexing options for database #1
+index           uidNumber,gidNumber             eq
+index           default                         sub
+# Sans Samba
+index           cn,sn,uid           pres,sub,eq
 index           objectClass eq
+# Avec Samba
+#index           cn,sn,uid,displayName           pres,sub,eq
+#index           sambaSID                        eq
+#index           sambaPrimaryGroupSID            eq
+#index           sambaDomainName                 eq
+#index           objectClass                     pres,eq
+
+###Index pour SyncRepl MASTER
+#index entryCSN,entryUUID eq
+
+#####Replication SyncRepl en MASTER
+#overlay syncprov
+#syncprov-checkpoint 100 10
+#syncprov-sessionlog 100
 
 # Save the time that the entry gets modified, for database #1
 lastmod         on
@@ -101,24 +120,15 @@ lastmod         on
 # Others should not be able to see it, except the
 # admin entry below
 # These access lines apply to database #1 only
+#
+
+###DEBUT des ACLs sans SAMBA
 access to attrs=userPassword,shadowLastChange
 	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
     by anonymous auth
     by self write
     by * none
 
-#access to attrs=sambaNTPassword
-#	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-#	by anonymous auth
-#	by self write
-#	by * none
-#
-#access to attrs=sambaLMPassword
-#	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-#	by anonymous auth
-#	by self write
-#	by * none
-#
 # Ensure read access to the base for things like
 # supportedSASLMechanisms.  Without this you may
 # have problems with SASL not knowing what
@@ -136,11 +146,40 @@ access to dn.base=""
 # can read everything.
 access to *
 	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-    by * read
+   by * read
 
 # For Netscape Roaming support, each user gets a roaming
 # profile for which they have write access to
 #access to dn=".*,ou=Roaming,o=morsnet"
 #        by dn="cn=admin,dc=aliacom,dc=local" write
-#        by dnattr=owner write
+#  by dnattr=owner write
+# 
+###FIN des ACLs sans SAMBA
+
+####DEBUT des ACL avec SAMBA
+#
+#access to attrs=userPassword,shadowLastChange
+#      by anonymous auth
+#      by self write
+#      by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+#		by dn="uid=samba,ou=sysusers,dc=<domain>,dc=local" write
+#      by * none
+#
+#access to dn.base=""
+#        by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+#        by * read
+#
+#access to attrs=sambaLMPassword,sambaNTPassword,sambaPwdLastSet,sambaPwdMustChange,sambaPwdCanChange,sambaPasswordHistory
+#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+#    by dn="uid=samba,ou=sysusers,dc=<domain>,dc=local" write
+#    by anonymous auth
+#    by self write
+#    by * none
+#
+#access to *
+#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+#    by dn="uid=samba,ou=sysusers,dc=<domain>,dc=local" write
+#    by * read
+#
+#FIN des ACL avec SAMBA
 
