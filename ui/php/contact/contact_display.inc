@@ -361,6 +361,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_datasource;
   global $l_after, $l_before, $l_mailing_ok_only, $l_newsletter, $l_archive;
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
+  global $l_private_only;
 
   $lname = stripslashes($contact['lname']);
   $fname = stripslashes($contact['fname']);
@@ -378,6 +379,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   $dateafter = of_date_upd_format(stripslashes($contact['date_after']),true);
   $datebefore = of_date_upd_format(stripslashes($contact['date_before']),true);
   $mailing_ok_only = ($contact['mailing_ok_only'] == '1' ? "checked = \"checked\"" : '');
+  $private_only = ($contact['private_only'] == '1' ? "checked = \"checked\"" : '');
   $newsletter = ($contact['newsletter'] == '1' ? "checked = \"checked\"" : '');
   $archive = ($contact['archive'] == '1' ? "checked = \"checked\"" : '');
   if (($contact['fuzzy'] == '1') ||
@@ -484,6 +486,9 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     </label>
     <label>$l_firstname<br />
       <input type=\"text\" name=\"tf_fname\" size=\"12\" value=\"$fname\" />
+    </label>
+    <label>$l_private_only<br />
+    <input type=\"checkbox\" name=\"cba_private_only\" value=\"1\" $private_only />
     </label>
     <label>$l_phone<br />
       <input type=\"text\" name=\"tf_phone\" size=\"12\" maxlength=\"24\" value=\"$phone\" />
@@ -602,7 +607,8 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   $datasource = $contact['datasource'];
   $archive = $contact['archive'];
   $advanced = $contact['fuzzy'];
-  $mailng_ok_only = $contact['mailng_ok_only'];
+  $mailing_ok_only = $contact['mailing_ok_only'];
+  $private_only = $contact['private_only'];
   $lname = urlencode(stripslashes($contact['lname']));
   $fname = stripslashes($contact['fname']);
   $phone = urlencode(stripslashes($contact['phone']));
@@ -621,7 +627,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('contact', $contact);
 
-  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_private_only=$private_only&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
 
   $dis_contact = new OBM_DISPLAY('DATA', $prefs, 'contact');
   if ($popup) {
@@ -1269,7 +1275,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   global $l_address, $l_town, $l_country, $l_service,$l_date, $l_no_date;
   global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter;
   global $l_comment1, $l_add_comment1, $l_upd_comment1;
-  global $l_comment2, $l_add_comment2, $l_upd_comment2;
+  global $l_comment2, $l_add_comment2, $l_upd_comment2,$l_yes;
   global $l_comment3, $l_add_comment3, $l_upd_comment3,$l_lang;
   global $l_datasource, $l_archive, $l_private, $l_coord, $l_contact, $l_market;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
@@ -1675,7 +1681,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
 
   // Check
   if (! $perm->check_right('contact', $cright_write_admin)) {
-    $display_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_private";
+    $display_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_yes";
 
   // If new contact or contact update and user is owner, display visibility
   } else if ( ($action == 'new') || ($action == 'insert') ||

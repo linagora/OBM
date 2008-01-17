@@ -16,6 +16,7 @@ $l_email = "@M";
 $l_email_other = "Autre Mail";
 $l_mailing_ok = "Activé pour mailing";
 $l_mailing_ok_only = "Activé pour mailing seulement";
+$l_private_only = "Contacts privé uniquement";
 $l_newsletter = "Newsletter";
 $l_news = "News";
 $l_contact_name = "Nom Contact";

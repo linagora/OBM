@@ -17,6 +17,7 @@ $l_email = "E-Mail";
 $l_email_other = "Other E-Mail";
 $l_mailing_ok = "Mailing enabled";
 $l_mailing_ok_only = "Mailing enabled only";
+$l_private_only = "Private contacts only";
 $l_newsletter = "Newsletter";
 $l_news = "News";
 $l_code = "Code";
