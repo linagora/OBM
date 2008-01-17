@@ -278,19 +278,19 @@ sub _doGlobalUpdate {
         $return = $updateMailSrv->init();
         if( $return ) {
             $return = $updateMailSrv->update( "add" );
-        }
-        $updateMailSrv->destroy();
-
-        if( $return ) {
-            # Si tout c'est bien passé, il faut rétablir les connexions à Cyrus
-            if( defined($self->{"engine"}->{"cyrusEngine"}) ) {
-                if( !$self->{"engine"}->{"cyrusEngine"}->init() ) {
-                    delete( $self->{"engine"}->{"cyrusEngine"} );
+            $updateMailSrv->destroy();
+    
+            if( $return ) {
+                # Si tout c'est bien passé, il faut rétablir les connexions à Cyrus
+                if( defined($self->{"engine"}->{"cyrusEngine"}) ) {
+                    if( !$self->{"engine"}->{"cyrusEngine"}->init() ) {
+                        delete( $self->{"engine"}->{"cyrusEngine"} );
+                    }
                 }
+            }else {
+                &OBM::toolBox::write_log( "[Update::update]: probleme lors de la mise a jour des partitions Cyrus du domaine '".$self->{"domain"}."' - Operation annulee !", "W" );
+                return 0;
             }
-        }else {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de la mise a jour des partitions Cyrus du domaine '".$self->{"domain"}."' - Operation annulee !", "W" );
-            return 0;
         }
     }
 
