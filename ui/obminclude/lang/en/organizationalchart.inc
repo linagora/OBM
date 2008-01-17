@@ -18,6 +18,7 @@ $l_zoom_small = "Small";
 // Actions
 $l_insert = "Insert organizational chart";
 $l_update = "update organizational chart";
+$l_export = "LDIF Export";
 
 // Messages
 $l_no_display = "Fill the search fields and press < Find > to retrieve the organizational chart";

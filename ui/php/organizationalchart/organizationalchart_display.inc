@@ -680,6 +680,59 @@ function draw_form($node_q) {
 
 
 /**
+ * Export OrganizationalChart to LDIF
+ * @params $organizationalchart
+ * @access public
+ * @return HTML
+ */
+function organizationalchart_export_ldif($organizationalchart) {
+  global $obm;
+
+  $id = $organizationalchart["organizationalchart_id"];
+  if ($id) {
+    $oc_q = run_query_organizationalchart_detail($id);
+    $oc_name = trim($oc_q->f("organizationalchart_name"));
+    $root_node = run_query_organizationalchart_root_node($id);
+    $ldif = export_ldif($root_node);
+
+    // Ldif construction
+    $block = trim($GLOBALS["organization"]);
+    if (is_array($GLOBALS["units"])) {
+      foreach($GLOBALS["units"] as $u) {
+        $block .= $u;
+      }
+    }
+    if (is_array($GLOBALS["persons"])) {
+      foreach($GLOBALS["persons"] as $p) {
+        $block .= $p;
+      }
+    }
+
+    // LDIF filename
+    $filename = "$oc_name.ldif";
+ 
+    // Write LDIF in tmp file
+    $tmpfname = tempnam("/tmp", "obm_") ;
+    $file = fopen($tmpfname, "w");
+    fwrite($file, $block);
+    fclose($file);
+
+    // Download file
+    $file = fopen($tmpfname, "r");
+    header("Content-Type: application/octet-stream") ;
+    header("Content-Disposition: attachment; filename=\"$filename\";") ;
+    header("Cache-Control:" ) ;
+    header("Cache-Control: must-revalidate, pre-check=0, post-check=0, max-age=0" ) ;
+    fpassthru($file) ;
+    fclose($file) ;
+
+    // Delete tmp file
+    unlink($tmpfname) ; 
+  }
+}
+
+
+/**
  * User detail popup
  * @params
  * @access public

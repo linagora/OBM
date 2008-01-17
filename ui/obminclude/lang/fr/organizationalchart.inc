@@ -18,6 +18,7 @@ $l_zoom_small = "Petit";
 // Actions
 $l_insert = "Enregistrer l'organigramme";
 $l_update = "Modifier l'organigramme";
+$l_export = "Export LDIF";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des organigrammes correspondants.";
