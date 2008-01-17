@@ -34,8 +34,8 @@ lang = fr
 ; Modules OBM fonctionnels
 obm-ldap = true
 obm-mail = true
-obm-samba = true
-obm-web = true
+obm-samba = false
+obm-web = false
 
 ; singleNameSpace mode allow only one domain
 ; login are 'login' and not 'login@domain'
