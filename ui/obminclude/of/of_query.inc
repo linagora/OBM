@@ -1973,8 +1973,14 @@ function of_usergroup_get_group_users($g_id, $info=false, $uids='') {
 
   if ($info) {
     $select_user = ',
+      userobm_login,
+      userobm_firstname,
       userobm_lastname,
-      userobm_firstname';
+      userobm_title,
+      userobm_phone,
+      userobm_mobile,
+      userobm_description,
+      userobm_email';
   }
   if (is_array($uids) && count($uids)>0) {
     foreach ($uids as $u_id) {
@@ -2006,9 +2012,21 @@ function of_usergroup_get_group_users($g_id, $info=false, $uids='') {
     if ($info) {
       $lastname = $obm_q->f('userobm_lastname');
       $firstname = $obm_q->f('userobm_firstname');
+      $login = $obm_q->f('userobm_login');
+      $title = $obm_q->f('userobm_title');
+      $phone = $obm_q->f('userobm_phone');
+      $mobile = $obm_q->f('userobm_mobile');
+      $email = $obm_q->f('userobm_email');
+      $description = $obm_q->f('userobm_description');
       $users[$u_id] = array('id' => $u_id,
+                            'login' => $login,
 			    'lastname' => $lastname,
-			    'firstname' => $firstname);
+			    'firstname' => $firstname,
+                            'title' => $title,
+                            'phone' => $phone,
+                            'mobile' => $mobile,
+                            'email' => $email,
+                            'description' => $description);
     } else {
       array_push($users, $u_id);
     }

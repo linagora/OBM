@@ -700,6 +700,7 @@ function export_ldif($node_q, $ou_arr=array()) {
               }              
               break;
             case "cn":
+              $cn = "";
               foreach($ldif_attributes[$k_ldif] as $key) {
                 $cn .= $one_user[$key]." ";
               }
@@ -711,6 +712,7 @@ function export_ldif($node_q, $ou_arr=array()) {
               }
               break;
             case "displayName":
+              $displayName = "";
               foreach($ldif_attributes[$k_ldif] as $key) {
                 $displayName .= $one_user[$key]." ";
               }
