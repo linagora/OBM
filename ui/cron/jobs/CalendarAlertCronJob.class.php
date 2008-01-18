@@ -25,7 +25,6 @@ class CalendarAlertCronJob extends CronJob{
    * @return void
    */
   function mustExecute($date) {
-    return true;
     $min = date("i");
     $modulo = $this->jobDelta / 60;
     return ($min%$modulo === 0);

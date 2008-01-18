@@ -15,6 +15,7 @@
 function run_query_contact_search($contact) {
   global $cgp_show, $cdg_sql, $c_all, $ctu_sql_limit;
   global $cgp_archive_only,$obm;
+  global $c_public, $c_private;
 
   $sql_order_dir = $contact['sql_order_dir'];
   $sql_order_field = $contact['sql_order_field'];
@@ -37,7 +38,7 @@ function run_query_contact_search($contact) {
   $dateafter = of_isodate_convert($contact['date_after'],true);
   $datebefore = of_isodate_convert($contact['date_before'],true);
   $mailing_ok_only = $contact['mailing_ok_only'];
-  $private_only = $contact['private_only'];
+  $privacy = $contact["privacy"];
   $newsletter = $contact['newsletter'];
   $archive = $contact['archive'];
   $lang = get_lang();
@@ -180,9 +181,11 @@ function run_query_contact_search($contact) {
   if ($mailing_ok_only == '1') {
     $where .= ' AND contact_mailing_ok=1';
   }
-  if ($private_only == '1') {
-    $where .= " AND contact_privacy=1 AND contact_usercreate = $obm[uid]";
-  }
+  if ($privacy == $c_public) {
+    $where .= " AND contact_privacy = 0";
+  } elseif ($privacy == $c_private) { 
+    $where .= " AND contact_privacy = 1";
+  }  
   if ($newsletter == '1') {
     $where .= ' AND contact_newsletter=1';
   }

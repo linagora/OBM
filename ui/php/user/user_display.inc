@@ -633,7 +633,7 @@ function html_user_consult($obm_q) {
       <td>$email (@$main_domain)</td>
     </tr>
     <tr>
-      <th>$l_quota (Mo)</th>
+      <th>$l_quota</th>
       <td>$mail_quota</td>
     </tr>
     </table>
@@ -1206,7 +1206,7 @@ function html_user_form($usr_q, $user, $field='') {
       <input type=\"hidden\" name=\"sel_mail_server_id\" value=\"$mail_server_id\" />
       <input type=\"hidden\" name=\"sel_mail_server_hostname\" value=\"$mail_server_host_name\" />";
     }
-
+    $main_domain = $obm["domain_name"];
     $mail_section = "
   <fieldset class=\"detail infos\">
   <legend>$l_mail</legend>
@@ -1229,7 +1229,7 @@ function html_user_form($usr_q, $user, $field='') {
     <td><textarea name=\"ta_email\" cols=\"32\" rows=\"3\">$email</textarea>@$main_domain</td>
   </tr>
   <tr>
-    <th class=\"$class[mail_quota]\">$l_quota (Mo)</th>
+    <th class=\"$class[mail_quota]\">$l_quota</th>
     <td><input name=\"tf_mail_quota\" maxlength=\"6\" size=\"6\" value=\"$mail_quota\" /></td>
   </tr>
   </table>

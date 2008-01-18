@@ -15,6 +15,7 @@
 $fieldnames['contact_lastname'] = $l_lastname;
 $fieldnames['contact_firstname'] = $l_firstname;
 $fieldnames['contact_aka'] = $l_aka;
+$fieldnames['contact_privacy'] = $l_private;
 $fieldnames['function_label'] = $l_function;
 $fieldnames['contact_title'] = $l_title;
 $fieldnames['kind_minilabel'] = $l_kind;
@@ -42,6 +43,7 @@ $fieldnames['contact_newsletter'] = $l_news;
 // Calculated fields
 $fieldnames['company_name'] = $l_company;
 $fieldnames['company_aka'] = "$l_company $l_aka";
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Contact specific dataset fields
@@ -110,7 +112,15 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
       $res['txt_name'] = ' ';
     }
   }
-
+  else if ($fieldname == 'contact_privacy') {
+    $res['align'] = 'center';
+    if ($OD->data_set->f($fieldname)) {
+      $res['name'] = 'X';
+    } else {
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
+    }
+  }
   else if ($fieldname == 'contact_phone') {
     $phone = trim($OD->data_set->f('contact_phone'));
     $c_phone = trim($OD->data_set->f('company_phone'));
@@ -361,7 +371,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_datasource;
   global $l_after, $l_before, $l_mailing_ok_only, $l_newsletter, $l_archive;
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
-  global $l_private_only;
+  global $l_visibility;
 
   $lname = stripslashes($contact['lname']);
   $fname = stripslashes($contact['fname']);
@@ -379,7 +389,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   $dateafter = of_date_upd_format(stripslashes($contact['date_after']),true);
   $datebefore = of_date_upd_format(stripslashes($contact['date_before']),true);
   $mailing_ok_only = ($contact['mailing_ok_only'] == '1' ? "checked = \"checked\"" : '');
-  $private_only = ($contact['private_only'] == '1' ? "checked = \"checked\"" : '');
+  $privacy = $contact['privacy'];
   $newsletter = ($contact['newsletter'] == '1' ? "checked = \"checked\"" : '');
   $archive = ($contact['archive'] == '1' ? "checked = \"checked\"" : '');
   if (($contact['fuzzy'] == '1') ||
@@ -397,6 +407,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
 
   // User defined data
   $block_userdata .= of_userdata_dis_search('contact', $contact);
+  $sel_privacy = dis_privacy_search_select($privacy);
 
   // Selected date field
   $s_date_field[$date_field] = "selected=\"selected\"";
@@ -487,9 +498,9 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>$l_firstname<br />
       <input type=\"text\" name=\"tf_fname\" size=\"12\" value=\"$fname\" />
     </label>
-    <label>$l_private_only<br />
-    <input type=\"checkbox\" name=\"cba_private_only\" value=\"1\" $private_only />
-    </label>
+    <label>$l_visibility<br />
+      $sel_privacy
+    </label>      
     <label>$l_phone<br />
       <input type=\"text\" name=\"tf_phone\" size=\"12\" maxlength=\"24\" value=\"$phone\" />
     </label>
@@ -608,7 +619,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   $archive = $contact['archive'];
   $advanced = $contact['fuzzy'];
   $mailing_ok_only = $contact['mailing_ok_only'];
-  $private_only = $contact['private_only'];
+  $privacy = $contact['privacy'];
   $lname = urlencode(stripslashes($contact['lname']));
   $fname = stripslashes($contact['fname']);
   $phone = urlencode(stripslashes($contact['phone']));
@@ -627,7 +638,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('contact', $contact);
 
-  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_private_only=$private_only&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;sel_privacy=$privacy&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
 
   $dis_contact = new OBM_DISPLAY('DATA', $prefs, 'contact');
   if ($popup) {

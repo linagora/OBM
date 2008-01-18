@@ -14,7 +14,6 @@ class VacationCronJob extends CronJob{
    * @return void
    */
   function mustExecute($date) {
-    return true;
     $min = date('i');
     return ($min%15 === 0);
   }

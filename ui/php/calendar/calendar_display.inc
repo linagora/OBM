@@ -233,7 +233,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable) {
   global $path, $obm, $c_all, $ccalendar_resource;
-  global $ico_add, $popup_width, $popup_height, $l_today;
+  global $ico_add, $popup_width, $popup_height, $l_today, $ico_add;
   global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
   global $l_search_users, $l_search_resources,$l_private_group_members, $l_public_group_members;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
