@@ -148,14 +148,14 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
     </td>";
 
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_user_read";
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
     $popup_user_add_button = "
     <a id=\"lnk_accept_read\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group_read";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
     $popup_group_add_button = "
       <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
@@ -204,13 +204,13 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked />
     </td>";
 
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_user_write";
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
     $popup_user_add_button = "
       <a id=\"lnk_accept_write\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
      </a>";
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group_write";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
     $popup_group_add_button = "
       <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
@@ -249,13 +249,13 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </td>
     </tr>";
 
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_user_admin";
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
     $popup_user_add_button = "
       <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group_admin";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
     $popup_group_add_button = "
       <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
