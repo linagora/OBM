@@ -109,10 +109,12 @@ function run_query_lead_search($params) {
     company_zipcode,
     company_phone,
     leadsource_label,
+    leadstatus_label,
     $concat_manager as manager
   FROM Lead
     LEFT JOIN Company ON lead_company_id=company_id
     LEFT JOIN LeadSource ON lead_source_id=leadsource_id
+    LEFT JOIN LeadStatus ON lead_status_id=leadstatus_id
     LEFT JOIN UserObm ON lead_manager_id=userobm_id
   $whereq
   $orderq
