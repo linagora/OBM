@@ -119,3 +119,4 @@ $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
 $l_change_login_confirm = "Confirmer le changement d'identifiant ?";
 
 $l_user_display = "Options d'affichage des listes d'utilisateurs";
+$l_hidden = 'BAL cachée';

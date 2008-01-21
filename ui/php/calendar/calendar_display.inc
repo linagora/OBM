@@ -1078,7 +1078,7 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
   for($ts = $start_time; $ts < $end_time; $ts += $day_duration ) {
     $first_hour = strtotime(date("Y-m-d $ccalendar_first_hour:00:00", $ts));
     $this_date_l = calendar_localizeDate("week_list", $ts);  
-    //$dis_printable_view .= "<tr><th colspan=\"$span\">$this_date_l</th></tr>";
+    $dis_printable_day = array();
     $dis_printable_day = array();
     foreach($calendar_entity as $entity => $entities) {
       foreach($entities as $id => $data) {
@@ -1106,6 +1106,7 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
                 if($dur >= $span) $dur = $span ;
                 if($dur <= 0) {
                   $view[$span][] = $occurence;
+                  $dur = 1;
                 } else {
                   $dis_printable_line .= "<td style='width:".($td_width*$dur)."%;' colspan='$dur'>$event</td>";
                 }
@@ -1116,15 +1117,16 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
               $i += ($dur -1);
             } elseif($i != $span) {
               $dis_printable_line .= "<td style='width:$td_width%;'></td>";
-
             }
           }
-          $dis_printable_day[] = $dis_printable_line;
+          if($dis_printable_line != '') {
+            $dis_printable_day[] = $dis_printable_line;
+          }
         }       
       }
-      if(($rowspan = count($dis_printable_day)) == 0) $rowspan = 1;  
-      $dis_printable_view .= "<tr><th rowspan='$rowspan' class=\"NW\">$this_date_l</th>".implode('</tr><tr>',$dis_printable_day)."</tr>";
     }
+    if(($rowspan = count($dis_printable_day)) == 0) $rowspan = 1;  
+    $dis_printable_view .= "<tr><th rowspan='$rowspan' class=\"NW\">$this_date_l</th>".implode('</tr><tr>',$dis_printable_day)."</tr>";
   }
   for ($j = 0; $j < $span; $j++) {
     $min = str_pad((60/$interval) * ($j % $interval),2,0);

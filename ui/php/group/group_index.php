@@ -316,7 +316,7 @@ if (($action == 'index') || ($action == '')) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_group_search_form($params);
   if ($_SESSION['set_display'] == "yes") {
-    $display["result"] = dis_group_search_list($params);
+    $display["result"] = dis_group_search_group($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }

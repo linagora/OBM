@@ -258,9 +258,9 @@ $display['detail'] .= "
   <tr>
     <th>$l_set_menu</th>
     <td>
-      <input type=\"radio\" name=\"menu\" value=\"$cme_txt\" $me_txt />$l_me_txt
-      <input type=\"radio\" name=\"menu\" value=\"$cme_ico\" $me_ico />$l_me_ico
-      <input type=\"radio\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both
+      <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_txt\" $me_txt />$l_me_txt</span>
+      <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_ico\" $me_ico />$l_me_ico</span>
+      <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both</span>
     </td>
   </tr><tr>
     <th>$l_auto_display</th>
@@ -302,8 +302,8 @@ $display['detail'] .= "
   <tr>
     <th>$l_set_commentorder</th>
     <td>
-      <input type=\"radio\" name=\"commentorder\" value=\"$cco_chro\" $co_chro />$l_co_chro
-      <input type=\"radio\" name=\"commentorder\" value=\"$cco_rev\" $co_rev />$l_co_rev
+      <span class=\"NW\"><input type=\"radio\" name=\"commentorder\" value=\"$cco_chro\" $co_chro />$l_co_chro</span>
+      <span class=\"NW\"><input type=\"radio\" name=\"commentorder\" value=\"$cco_rev\" $co_rev />$l_co_rev</span>
     </td>
   </tr><tr>
     <th>$l_send_mail</th>
@@ -357,9 +357,9 @@ if ($cgp_show['module']['calendar']) {
   <tr>
     <th>$l_set_cal_interval</th>
     <td>
-      <input type=\"radio\" name=\"cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4
-      <input type=\"radio\" name=\"cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2
-      <input type=\"radio\" name=\"cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1
+      <span class=\"NW\"><input type=\"radio\" name=\"cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4</span>
+      <span class=\"NW\"><input type=\"radio\" name=\"cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2</span>
+      <span class=\"NW\"><input type=\"radio\" name=\"cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1</span>
     </td>
   </tr>
   <tr>
@@ -378,8 +378,8 @@ $display['detail'] .= "
   <tr>
   <th>$l_set_csv_sep</th>
   <td>
-    <input type=\"radio\" name=\"csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc
-    <input type=\"radio\" name=\"csv_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab
+    <span class=\"NW\"><input type=\"radio\" name=\"csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc</span>
+    <span class=\"NW\"><input type=\"radio\" name=\"csv_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab</span>
   </td>
   </tr>
   $dis_debug
@@ -391,16 +391,16 @@ $display['detail'] .= "
   <tr>
   <td>$l_set_date_upd</td>
   <td>
-    <input type=\"radio\" name=\"date_upd\" value=\"$cda_iso\" $da_upd_iso />$l_da_iso
-    <input type=\"radio\" name=\"date_upd\" value=\"$cda_en\" $da_upd_en />$l_da_en
-    <input type=\"radio\" name=\"date_upd\" value=\"$cda_fr\" $da_upd_fr />$l_da_fr
+    <span class=\"NW\"><input type=\"radio\" name=\"date_upd\" value=\"$cda_iso\" $da_upd_iso />$l_da_iso</span>
+    <span class=\"NW\"><input type=\"radio\" name=\"date_upd\" value=\"$cda_en\" $da_upd_en />$l_da_en</span>
+    <span class=\"NW\"><input type=\"radio\" name=\"date_upd\" value=\"$cda_fr\" $da_upd_fr />$l_da_fr</span>
   </td>
   <td>$l_set_date</td>
   <td>
-    <input type=\"radio\" name=\"date\" value=\"$cda_iso\" $da_iso />$l_da_iso
-    <input type=\"radio\" name=\"date\" value=\"$cda_en\" $da_en />$l_da_en
-    <input type=\"radio\" name=\"date\" value=\"$cda_fr\" $da_fr />$l_da_fr
-    <input type=\"radio\" name=\"date\" value=\"$cda_txt\" $da_txt />$l_da_txt
+    <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_iso\" $da_iso />$l_da_iso</span>
+    <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_en\" $da_en />$l_da_en</span>
+    <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_fr\" $da_fr />$l_da_fr</span>
+    <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_txt\" $da_txt />$l_da_txt</span>
   </td>
   </tr>
   </table>

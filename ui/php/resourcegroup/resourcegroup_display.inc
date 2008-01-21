@@ -267,7 +267,7 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
 function html_resourcegroup_form($action, $group_q, $group) {
   global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_header_new;
   global $cgroup_private_default, $l_insert, $l_update, $l_back, $l_private;
-  global $obm, $display;
+  global $obm, $display,$l_no;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -301,6 +301,13 @@ function html_resourcegroup_form($action, $group_q, $group) {
     <th>$l_private</th>
     <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
   </tr>";
+  } else {
+  $dis_private = "
+  <tr>
+    <th>$l_private</th>
+    <td>$l_no</td>
+  </tr>";
+    
   } 
 
   $display["title"] = $dis_title;

@@ -46,6 +46,7 @@ $fieldnames['group_user_email'] = $l_email;
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_group(&$OD, $fieldname, $link_ok) {
   global $path, $obm, $params, $ico_mail,$cgp_use;
+  global $module, $cright_write_admin, $perm;
 
   if (($fieldname == 'group_name')) {
     if ($OD->display_ext == "get_id") {
@@ -120,7 +121,10 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == 'group_user_email') {
     $email = $OD->data_set->f('group_user_email');
-    if (strcmp($email ,'') != 0) {
+    if($OD->data_set->f("userobm_hidden") == 1 && !$perm->check_right('user', $cright_write_admin)) {
+      $res["align"] = "center";
+      $res['name'] = '-';
+    } elseif (strcmp($email ,'') != 0) {
       if ($cgp_use['service']['mail']) {
         if($OD->data_set->f('domain_name') != '') {
           $main_domain = $OD->data_set->f('domain_name');
@@ -412,7 +416,7 @@ function dis_group_consult($group, $uid) {
 function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $l_yes, $l_no, $ico_mail, $l_undef, $c_undef;
   global $l_group, $l_name, $l_desc, $l_email, $l_mailing, $l_no_user, $l_no_group_group;
-  global $l_system, $l_local, $l_ext_id, $l_smb;
+  global $l_system, $l_local, $l_ext_id, $l_smb, $l_no,$l_yes;
   global $l_visibility, $l_private, $l_public, $l_manager;  
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
   global $obm, $display, $module, $action, $cright_write;
@@ -626,7 +630,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
 function html_group_form($action, $group_q, $group, $field='') {
   global $obm, $perm, $cgroup_private_default, $cgp_use, $cright_write_admin;
   global $display, $l_group, $l_name, $l_desc, $l_smb, $l_email, $l_mailing;
-  global $l_private, $l_public, $l_insert, $l_update, $l_back;
+  global $l_private, $l_public, $l_insert, $l_update, $l_back, $l_no,$l_yes;
   global $l_manager, $c_undef, $l_undef, $l_header_new;
 
   // if update mode and first time, values are taken from db
@@ -713,7 +717,7 @@ function html_group_form($action, $group_q, $group, $field='') {
     onchange=\"privacyShowHide(this)\" value=\"1\" $private_c />";
     }
   } else {
-    $dis_private = ($priv == '1' ? $l_private : $l_public);
+    $dis_private = ($priv == '1' ? $l_yes : $l_no);
   }
 
 

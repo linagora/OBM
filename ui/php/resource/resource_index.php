@@ -401,7 +401,7 @@ function get_resource_action() {
     'Name'     => $l_header_right,
     'Url'      => "$path/resource/resource_index.php?action=rights_admin&amp;entity_id=".$params['resource_id'],
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult','rights_update','rights_admin','detailupdate','insert','update')
+    'Condition'=> array ('detailconsult','rights_update','rights_admin','detailupdate','update')
                                      );
 
 // Rights Update
@@ -489,7 +489,7 @@ function get_resource_action() {
 // Add Resource Item
   $actions['resource']['ext_ritem'] = array (
     'Url'      => "$path/resource/resource_index.php?action=ext_ritem",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      	       );
 
@@ -502,6 +502,10 @@ function get_resource_action() {
 function update_resource_action() {
   global $params, $actions, $path;
 
+  $id = $params["resource_id"];
+  if ($id > 0) {
+    $actions["resource"]["rights_admin"]['Condition'][] = 'insert';
+  }
   // Detail Consult
   $actions['resource']['detailconsult']['Url'] = "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$params['resource_id'];
 

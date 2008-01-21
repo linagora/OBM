@@ -50,6 +50,7 @@ $fieldnames["userobm_description"] = $l_desc;
 function dis_user_data(&$OD, $fieldname, $link_ok) {
   global $path,  $ico_mail, $params,$obm,$cgp_use;
   global $l_enabled, $l_disabled, $l_forbidden, $l_perms;
+  global $perm, $cright_write_admin, $module;
 
   $ext_url = $params["ext_url"];
   $ext_element = $params["ext_element"];
@@ -115,7 +116,10 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
   } 
   else if ($fieldname == "userobm_email") {
     $email = $OD->data_set->f("userobm_email");
-    if (strcmp($email ,"") != 0) {
+    if($OD->data_set->f("userobm_hidden") == 1 && !$perm->check_right($module, $cright_write_admin)) {
+      $res["align"] = "center";
+      $res['name'] = '-';
+    } elseif (strcmp($email ,"") != 0) {
       if ($cgp_use["service"]["mail"]) {
         if ($OD->data_set->f("domain_name") != "") {
           $main_domain = $OD->data_set->f("domain_name");
@@ -457,13 +461,13 @@ function html_user_consult($obm_q) {
   global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal, $l_title;
   global $l_delegation_target, $l_delegation, $l_direction, $l_service;
   global $l_company, $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_email;
-  global $l_group_member, $l_group, $l_local, $l_ext_id;
+  global $l_group_member, $l_group, $l_local, $l_ext_id,$l_hidden;
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
   global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
   global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
   global $l_vacation, $l_vacation_message, $l_vacation_datebegin;
-  global $l_vacation_dateend,$l_mail_server;
-  global $l_enabled, $l_disabled, $l_web_consult_list, $l_photo;
+  global $l_vacation_dateend,$l_mail_server,$perm, $cright_write_admin;
+  global $l_enabled, $l_disabled, $l_web_consult_list, $l_photo, $module;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $obm, $cgp_use, $profiles, $path, $display, $l_yes, $l_no;
 
@@ -486,6 +490,7 @@ function html_user_consult($obm_q) {
   $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
   $archive = ($obm_q->f("userobm_archive") == '1' ? $l_yes : $l_no);
+  $hidden = ($obm_q->f("userobm_hidden") == '1' ? $l_yes : $l_no);
   $photo_id = $obm_q->f("userobm_photo_id");
 
   $phone = $obm_q->f("userobm_phone");
@@ -509,7 +514,11 @@ function html_user_consult($obm_q) {
   $web_all = $obm_q->f("userobm_web_all");
   $mail_perms = $obm_q->f("userobm_mail_perms");
   $mail_ext_perms = $obm_q->f("userobm_mail_ext_perms");
-  $email = $obm_q->f("userobm_email");
+  if($obm_q->f('userobm_hidden') != 1 || $perm->check_right($module, $cright_write_admin)) {
+    $email = $obm_q->f("userobm_email");
+  } else {
+    $email = '';
+  }
   $mail_server_id = $obm_q->f("userobm_mail_server_id");
   $mail_server_host_name = $obm_q->f("mailserver_hostname");
   $mail_quota = $obm_q->f("userobm_mail_quota");
@@ -956,7 +965,7 @@ function html_user_group_consult($usr_q) {
 function html_user_form($usr_q, $user, $field='') {
   global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
   global $l_user, $l_title, $l_archive, $l_datebegin, $l_insert, $l_update;
-  global $l_delegation_target, $l_hidden, $l_photo;
+  global $l_delegation_target, $l_hidden, $l_photo; $l_hidden;
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_company, $l_direction, $l_service, $l_address;
   global $l_postcode, $l_town, $l_expresspostal;
@@ -990,6 +999,7 @@ function html_user_form($usr_q, $user, $field='') {
     $desc = $usr_q->f("userobm_description");
     $datebegin = of_date_upd_format($usr_q->f("userobm_datebegin"),true);
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
+    $hidden = ($usr_q->f("userobm_hidden") == "1" ? " checked" : "");
     $photo_id = $usr_q->f("userobm_photo_id");
 
     // coord
@@ -1080,6 +1090,7 @@ function html_user_form($usr_q, $user, $field='') {
   if (isset($user["delegation"])) { $delegation = stripslashes($user["delegation"]); }
   if (isset($user["desc"])) { $desc = $user["desc"]; }
   if (isset($user["archive"])) { $archive = ($user["archive"] == '1' ? "checked" : ""); }
+  if (isset($user["hidden"])) { $hidden = ($user["hidden"] == '1' ? "checked" : ""); }
 
   // coord
   if (isset($user["phone"])) { $phone = $user["phone"]; }
@@ -1472,6 +1483,10 @@ function html_user_form($usr_q, $user, $field='') {
   </tr>
   $dis_domain
   <tr>
+    <th class=\"$class[hidden]\">$l_hidden</th>
+    <td><input name=\"cba_hidden\" type=\"checkbox\" value=\"1\" $hidden /></td>
+  </tr>
+  <tr>
     <th class=\"$class[archive]\">$l_archive</th>
     <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
   </tr>
@@ -1685,6 +1700,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
   <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
   <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
+  <input type=\"hidden\" name=\"cba_hidden\" value=\"$hidden\" />
   <input type=\"hidden\" name=\"sel_domain\" value=\"$domain\" />
   <input type=\"hidden\" name=\"delegation\" value=\"$delegation\" />
   <input type=\"hidden\" name=\"delegation_target\" value=\"$delegation_target\" />
@@ -2252,7 +2268,7 @@ function dis_user_display_pref($prefs) {
  * @return void
  */
 function json_search_users($user,$results) {
-  global $display;
+  global $display, $module, $cright_write_admin, $perm;
 
   $user_q = $results['datas'];
 
@@ -2260,7 +2276,11 @@ function json_search_users($user,$results) {
   while($user_q->next_record()) {
     $id = $user_q->f("userobm_id");
     $label = phpStringToJsString($user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname"));
-    $extra = phpStringToJsString($user_q->f("userobm_email"));
+    if($user_q->f('userobm_hidden') != 1 || $perm->check_right($module, $cright_write_admin)) {
+      $extra = phpStringToJsString($user_q->f("userobm_email"));
+    } else {
+      $extra = '';
+    }
     $users[] = "{id:'data-user-$id', label:'$label', extra:'$extra'}";
   }
   $display["json"] = "{length:".$results['length'].", datas:[".implode(",",$users)."]}";

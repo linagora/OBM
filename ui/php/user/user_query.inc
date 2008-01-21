@@ -239,6 +239,7 @@ function run_query_user_ext_search($user) {
       userobm_id,
       userobm_lastname,
       userobm_firstname,
+      userobm_hidden,
       userobm_email
     FROM UserObm
     WHERE (
@@ -345,6 +346,7 @@ function run_query_user_insert($user) {
   // infos
   $profile = $user['profile'];
   $archive = ($user['archive'] == '1' ? '1' : '0');
+  $hidden = ($user['hidden'] == '1' ? '1' : '0');
   $hidden = ($user['hidden'] == '1' ? '1' : '0');
   $kind = $user['kind'];
   $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
@@ -514,6 +516,7 @@ function run_query_user_insert($user) {
     userobm_uid,
     userobm_gid,
     userobm_archive,
+    userobm_hidden,
     userobm_datebegin,
     userobm_hidden,
     userobm_kind,
@@ -557,6 +560,7 @@ function run_query_user_insert($user) {
     '$user_uid',
     '$gid',
     '$archive',
+    '$hidden',
     $datebegin,
     '$hidden',
     '$kind',
@@ -757,6 +761,7 @@ function run_query_user_update($p_id, $user) {
   // infos
   $profile = $user['profile'];
   $archive = ($user['archive'] == '1' ? '1' : '0');
+  $hidden = ($user['hidden'] == '1' ? '1' : '0');
   $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
   $hidden = ($user['hidden'] == '1' ? '1' : '0');
   $kind = $user['kind'];
@@ -935,6 +940,7 @@ function run_query_user_update($p_id, $user) {
     userobm_perms='$profile',
     userobm_gid='$gid',
     userobm_archive='$archive',
+    userobm_hidden='$hidden',
     userobm_datebegin=$datebegin,
     userobm_hidden='$hidden',
     userobm_kind='$kind',

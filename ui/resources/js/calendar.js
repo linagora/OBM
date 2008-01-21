@@ -33,6 +33,7 @@ Obm.CalendarDayEventExtension = new Class({
     this.element = new Element('div').addClass('event')
                                      .addClass(this.event.klass)
                                      .setProperty('id',id)
+                                     .setProperty('title', this.event.title)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
                                  .injectInside(this.element);     
@@ -48,7 +49,12 @@ Obm.CalendarDayEventExtension = new Class({
   },
 
   resetTitle: function() {
-    this.titleContainer.setHTML(this.event.title);
+    var title = this.event.title;
+    if(this.event.all_day == 0) {
+      title = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
+    }
+    this.element.setProperty('title', this.event.title)
+    this.titleContainer.setHTML(title);
   },
 
   setPeriodicity: function() {
@@ -165,6 +171,7 @@ Obm.CalendarDayEvent = new Class({
     this.element = new Element('div').addClass('event')
                                      .addClass(this.event.klass)
                                      .setProperty('id','event-'+id)
+                                     .setProperty('title', this.event.title)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
                                  .injectInside(this.element);     
@@ -190,12 +197,17 @@ Obm.CalendarDayEvent = new Class({
   },
 
   resetTitle: function() {
-    this.setTitle(this.event.title);
+    var title = this.event.title;
+    if(this.event.all_day == 0) {
+      title = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
+    }
+    this.element.setProperty('title', this.event.title)
+    this.titleContainer.setHTML(title);    
   },
 
   setTitle: function(title) {
     this.event.title = title;
-    this.titleContainer.setHTML(this.event.title);
+    this.resetTitle();
     this.extensions.each(function (extension) {
       extension.resetTitle();
     })
@@ -439,6 +451,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     this.element = new Element('div').addClass('event')
                                      .addClass(this.event.klass)
                                      .setProperty('id','event-'+id)
+                                     .setProperty('title', this.event.title)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
                                  .injectInside(this.element);     
@@ -459,7 +472,19 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     this.resetTitle();
 
   },
-  
+
+  resetTitle: function() {
+    var title = this.event.title;
+    var time = new Date(this.event.time * 1000).format("H:i");
+    if(this.event.duration <= this.options.unit) {
+      time = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
+      title = '';
+    }
+    this.element.setProperty('title', this.event.title)
+    this.timeContainer.setHTML(time);
+    this.titleContainer.setHTML(title);
+  },
+
   setDuration: function(duration) {
     this.event.duration = duration;
     size = Math.ceil(duration/this.options.yUnit);
@@ -522,7 +547,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     origin = time - (time - obm.calendarManager.startTime)%this.options.yUnit;
     if(this.setOrigin(origin)) {
       this.event.time = this.guessEventTime(time);
-      this.timeContainer.setHTML(new Date(this.event.time * 1000).format("H:i"));
+      this.resetTitle(); 
     } else {
       if(obm.calendarManager.lock()) {
         this.redraw();
@@ -869,8 +894,8 @@ Obm.CalendarManager = new Class({
         if(ivent.state == 'A') {
           obm.calendarManager.unregister(id);
           evt.event.id = ivent.id;
-          evt.setTime(ivent.time);
           evt.setDuration(ivent.duration);
+          evt.setTime(ivent.time);
           obm.calendarManager.register(id);           
           evt.setTitle(ivent.title);
         } else if (evt) {
