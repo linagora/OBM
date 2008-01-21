@@ -1,16 +1,26 @@
 <?php
 /*
-This file let you define 'custom' validation and replacement rules for 
-some modules insert/update action. This rules will be parsed *before* 
-obm standards rules. The standards rules will be parsed anyway, this
-feature let you add rules, not replace the standards ones.
-To activate this feature you must set the 'conf_check' to true in obm_conf.inc
+This file let you define :
+- hook functions called by obm
+- 'custom' validation and replacement rules for some modules insert/update action. This rules will be parsed *before* obm standards rules.
+The standards rules will be parsed anyway, this feature let you add rules, not replace the standards ones.
+To activate this feature you must set the 'conf_modules' to true in obm_conf.inc
 This file should be named after the module to check's name. For example to 
 define custom rules for the user module, create a file user.inc in this
 repository
 */
 
-// This variable must be names 'rules'.
+// Hook functions -------------------------------------------------------------
+
+function hook_pre_check_contact_update_rights($params, $c='') {
+  global $actions, $perm, $err, $cright_write_admin;
+
+  echo "Hello Hook world";
+
+  return true;
+}
+
+// Rules handling -------------------------------------------------------------
 
 $rules = array (
   /* 

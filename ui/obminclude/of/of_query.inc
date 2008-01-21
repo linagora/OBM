@@ -2483,6 +2483,7 @@ function isWindows() {
    return (DIRECTORY_SEPARATOR == '\\' ? true : false);
 }
 
+
 /**
  * check rules defined by the user 
  * 
@@ -2492,50 +2493,50 @@ function isWindows() {
  * @return void
  */
 function check_user_defined_rules($module, &$fields) {
-  global $path, $err, $conf_check;
-  if(!$conf_check || !file_exists("$path/../conf/check/$module.inc")) {
-    return true;
-  }
-  include("conf/check/$module.inc");
+  global $err, $rules;
 
   $return = true;
-  foreach($rules as $field => $field_rules) {
-    /* Normalize rules */
-    foreach($field_rules as $rule => $content) {
-      if (!is_array($content)) {
-        $field_rules[$rule] = array('default' => $content);
-      }    
-    }
-    $value = $fields[$field];
-    if($field_rules["length"]["default"] > 0) {
-      $value = substr($value,0,$field_rules["length"]["default"]);
-    }
-    if(is_array($field_rules["replacement"])) {
-      foreach($field_rules["replacement"] as $pattern => $replacement) {
-        $value = preg_replace("/($pattern)+/",$replacement,$value);
-        
+
+  if (is_array($rules)) {
+    foreach($rules as $field => $field_rules) {
+      /* Normalize rules */
+      foreach($field_rules as $rule => $content) {
+	if (!is_array($content)) {
+	  $field_rules[$rule] = array('default' => $content);
+	}
       }
-    }
-    if(is_array($field_rules["callback"])) {
-      foreach($field_rules["callback"] as $callback) {
-        $value = $callback($value);
+      $value = $fields[$field];
+      if ($field_rules['length']['default'] > 0) {
+	$value = substr($value,0,$field_rules['length']['default']);
       }
-    }
-    if($return && is_array($field_rules["regexp"])) {
-      foreach($field_rules["regexp"] as $name => $regexp) {
-        if(!preg_match($regexp, $value)) {
-          if(isset($field_rules['message'][$name])) {
-            $err["msg"] =  $field_rules["message"][$name];
-          } else {
-            $err["msg"] = $field_rules["message"]["default"];
-          }
-          $err["field"] = $field;
-          $return = false;            
-        }      
+      if (is_array($field_rules['replacement'])) {
+	foreach($field_rules['replacement'] as $pattern => $replacement) {
+	  $value = preg_replace("/($pattern)+/",$replacement,$value);
+	}
       }
+      if (is_array($field_rules['callback'])) {
+	foreach($field_rules['callback'] as $callback) {
+	  $value = $callback($value);
+	}
+      }
+      if ($return && is_array($field_rules['regexp'])) {
+	foreach($field_rules['regexp'] as $name => $regexp) {
+	  if (!preg_match($regexp, $value)) {
+	    if (isset($field_rules['message'][$name])) {
+	      $err['msg'] =  $field_rules['message'][$name];
+	    } else {
+	      $err['msg'] = $field_rules['message']['default'];
+	    }
+	    $err['field'] = $field;
+	    $return = false;
+	  }
+	}
+      }
+      $fields[$field] = stripslashes($value);
     }
-    $fields[$field] = stripslashes($value);
   }
+
   return $return;
 }
+
 ?>

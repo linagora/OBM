@@ -990,6 +990,16 @@ function check_contact_update_rights($params, $c='') {
     if (! is_array($c)) {
       $c = get_contact_info($id);
     }
+  }
+
+  // Hook : Pre
+  if (function_exists('hook_pre_check_contact_update_rights')) {
+    if (! hook_pre_check_contact_update_rights($params, $c='')) {
+      return false;
+    }
+  }
+
+  if ($id > 0) {
 
     /*    // Check delegation update right
     if (! of_delegation_check_update_rights($params, $g['delegation'])) {

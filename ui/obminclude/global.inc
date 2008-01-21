@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.1.4pre1';
+$obm_version = '2.1.4pre2';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -176,8 +176,8 @@ $c_nb_login_failed = 3;
 $c_login_interval = 60;
 $c_frozen_duration = 300;
 
-// Activate user defined check rules
-$conf_check = false;
+// Activate user defined code : check rules, hook functions
+$conf_modules = false;
 
 // Access restriction
 

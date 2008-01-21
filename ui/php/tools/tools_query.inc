@@ -529,13 +529,13 @@ function get_update_link_group($domain_id, $realm) {
   // of_usergroup Link --------------------------------------------------------
 
   // Get infos from Update table
-  $query = "SELECT *
+  $query = "SELECT of_usergroup_group_id, of_usergroup_user_id
     FROM of_usergroup
       LEFT JOIN UGroup ON of_usergroup_group_id=group_id
     WHERE group_privacy=0
       $where $multidomain
     ORDER BY of_usergroup_group_id, of_usergroup_user_id";
-  display_debug_msg($query, $cdg_sql, 'get_update_link_group()');
+  display_debug_msg($query, $cdg_sql, "get_update_link_group($realm)");
   $retour = $obm_q->query($query);
 
   while($obm_q->next_record()) {
@@ -545,13 +545,13 @@ function get_update_link_group($domain_id, $realm) {
   }
 
   // Get infos from Production table
-  $query = "SELECT *
+  $query = "SELECT of_usergroup_group_id, of_usergroup_user_id
     FROM P_of_usergroup
       LEFT JOIN P_UGroup ON of_usergroup_group_id=group_id
     WHERE group_privacy=0
       $where $multidomain
     ORDER BY of_usergroup_group_id, of_usergroup_user_id";
-  display_debug_msg($query, $cdg_sql, 'get_update_link_group()');
+  display_debug_msg($query, $cdg_sql, "get_update_link_group(prod $realm)");
   $retour = $obm_q->query($query);
 
   while($obm_q->next_record()) {
@@ -567,7 +567,6 @@ function get_update_link_group($domain_id, $realm) {
       $nb_link = count($e1[$g_id]);
       $nb_link_prod = count($e2[$g_id]);
       display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; current #links=$nb_link_prod, new #links=$nb_link");
-
     } else {
       foreach ($users as $u_id) {
 	if (! in_array($u_id, $e2[$g_id])) {
@@ -579,7 +578,15 @@ function get_update_link_group($domain_id, $realm) {
     }
   }
 
-  // Deleted entries, nothing to do (already handled by entity Update)
+  // Get empty or deleted groups (not in $e1) that were not empty (in $e2)
+  foreach($e2 as $g_id => $users) {
+    if (! isset($e1[$g_id])) {
+      $res[$g_id] = $g_id;
+      $nb_link = 0;
+      $nb_link_prod = count($e2[$g_id]);
+      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; current #links=$nb_link_prod, new #links=$nb_link");
+    }
+  }
 
   return $res;
 }
@@ -684,7 +691,15 @@ function get_update_link_entityright($domain_id, $entity, $table, $field, $realm
     }
   }
 
-  // Deleted entries, nothing to do (already handled by entity Update)
+  // Get empty or deleted entries (not in $e1) that were not empty (in $e2)
+  foreach($e2 as $e_id => $entry) {
+    if (! isset($e1[$e_id])) {
+      $res[$e_id] = $e_id;
+      $nb_link = 0;
+      $nb_link_prod = count($e2[$e_id]);
+      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $entity links ; updated id=$e_id ; current #links=$nb_link_prod, new #links=$nb_link");
+    }
+  }
 
   return $res;
 }

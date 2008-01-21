@@ -172,7 +172,6 @@ function dis_tools_update_detail() {
     $dis_domain";
   }
 
-
   return $block;
 }
 
