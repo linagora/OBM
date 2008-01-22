@@ -2225,26 +2225,32 @@ function store_calendar_entities($entities_q) {
 // Parameters:
 //   - $id : event id
 ///////////////////////////////////////////////////////////////////////////////
-function get_calendar_event_info($id) {
+function get_calendar_event_info($id,$attendees=true) {
   global $cdg_sql;
 
   if ($id == '') {
     return false;
   }
-
+  if($attendees) {
+    $a_sql = 'LEFT JOIN EventEntity ON evententity_event_id = calendarevent_id';
+  }
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $calendarevent_date_l = sql_date_format($db_type,'calendarevent_date','calendarevent_date');
   $multidomain = sql_multidomain('calendarevent');
-  $query = "SELECT * FROM CalendarEvent 
-            LEFT JOIN EventEntity ON evententity_event_id = calendarevent_id
+  $query = "SELECT *, $calendarevent_date_l FROM CalendarEvent 
+            $a_sql
             WHERE calendarevent_id='$id'
             $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_calendar_event_info()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   while($obm_q->next_record()) {
     $e['usercreate'] = $obm_q->f('calendarevent_usercreate');
     $e['owner'] = $obm_q->f('calendarevent_owner');
-    if($obm_q->f('evententity_entity_id')) {
+    $e['date'] = $obm_q->f('calendarevent_date');
+    $e['duration'] = $obm_q->f('calendarevent_duration');
+    if($obm_q->f('evententity_entity_id') && $attendees) {
       $e['attendees'][$obm_q->f('evententity_entity')][] = $obm_q->f('evententity_entity_id');
     }
   }

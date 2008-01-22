@@ -281,7 +281,9 @@ if ($action == 'index') {
   $entities['resource'] = $params['sel_resource_id'];
   if (check_calendar_access($params["calendar_id"]) && 
       check_calendar_data_form($params)) {
-    if ( (!$params['force'])
+    $c = get_calendar_event_info($params['calendar_id'],false); 
+    if ( (!$params['force']) 
+         && !(date('Y-m-d h:i:s',$c['calendarevent_date']) == $params['date_begin'] && $c['calendarevent_duration'] == $params['event_duration'])
 	 && ($conflicts = check_calendar_conflict($params, $entities)) ) {
       $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
       $display['msg'] .= display_err_msg("$l_event : $l_update_error");
