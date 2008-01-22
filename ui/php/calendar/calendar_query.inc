@@ -3249,11 +3249,12 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
       $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$color);
     }
     $event_start =  $start_time ;
-    $delta = date('H',$date) * 3600 + date('i',$date) * 60 + date('s',$date) + $duration;
+    $delta_t = date('H',$date) * 3600 + date('i',$date) * 60 + date('s',$date) ;
+    $delta = $delta_t + $duration;
     $delta = floor($delta/$day_duration);
     $event_start -= $delta * $day_duration;
     $end_date = ($endrepeat < $end_time) ? $endrepeat : $end_time;
-    $end_date += $day_duration;
+    $end_date += $delta_t + 1;
     if ($addOcc) {
       switch ($repeatkind) {
         case 'daily' :
@@ -3324,6 +3325,7 @@ function calendar_daily_repeatition($date,$start_time,$end_date,$repeatfrequence
     $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
   }
   while ($temp_date < $end_date ) {
+    echo date('Ymd H:i:s', $temp_date).' '.date('Ymd H:i:s',$end_date).'<br />';
     $of = &OccurrenceFactory::getInstance();
     $of->addOccurrence($event, $temp_date, $entity, $entity_id);
     $temp_date = strtotime("+$repeatfrequence days",$temp_date);
