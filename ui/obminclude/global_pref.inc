@@ -189,7 +189,7 @@ if ($cgp_show["module"]["list"]) {
 if ($cgp_show["module"]["calendar"]) {
   $modules["calendar"] = array('Name'=> $l_module_calendar,
                                     'Ico' => "$ico_calendar",
-                                    'Url' => "$path/calendar/calendar_index.php",
+                                    'Url' => "$path/calendar/calendar_index.php?action=waiting_events",
                                     'Right'=> $cright_read);
 }
 if ($cgp_show["module"]["cv"]) {
