@@ -479,7 +479,6 @@ function html_user_consult($obm_q) {
   $ext_id = $obm_q->f("userobm_ext_id");
   $profile = $obm_q->f("userobm_perms");
   $dis_profile = isset($GLOBALS["l_perm_$profile"]) ? $GLOBALS["l_perm_$profile"] : $profile;
-  $hidden = $obm_q->f("userobm_hidden");
   $kind = $obm_q->f("userobm_kind");
   $lname = $obm_q->f("userobm_lastname");
   $fname = $obm_q->f("userobm_firstname");
@@ -965,7 +964,7 @@ function html_user_group_consult($usr_q) {
 function html_user_form($usr_q, $user, $field='') {
   global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
   global $l_user, $l_title, $l_archive, $l_datebegin, $l_insert, $l_update;
-  global $l_delegation_target, $l_hidden, $l_photo; $l_hidden;
+  global $l_delegation_target, $l_hidden, $l_photo; 
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_company, $l_direction, $l_service, $l_address;
   global $l_postcode, $l_town, $l_expresspostal;
@@ -988,7 +987,6 @@ function html_user_form($usr_q, $user, $field='') {
     $old_login = $login;
     $passwd = "";
     $profile = $usr_q->f("userobm_perms");
-    $hidden = $usr_q->f("userobm_hidden");
     $lastaccess = $usr_q->f("lastaccess");
     $kind = $usr_q->f("userobm_kind");
     $lname = $usr_q->f("userobm_lastname");
@@ -1079,7 +1077,6 @@ function html_user_form($usr_q, $user, $field='') {
   if (isset($user["old_login"])) { $old_login = $user["old_login"]; }
   if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
   if (isset($user["profile"])) { $profile = $user["profile"]; }
-  if (isset($user["hidden"])) { $hidden = $user["hidden"]; }
   if (isset($user["kind"])) { $kind = $user["kind"]; }
   if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
@@ -1691,7 +1688,6 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />
   <input type=\"hidden\" name=\"tf_passwd\" value=\"$passwd\" />
   <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
-  <input type=\"hidden\" name=\"hidden\" value=\"$hidden\" />
   <input type=\"hidden\" name=\"tf_kind\" value=\"$kind\" />
   <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
   <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
