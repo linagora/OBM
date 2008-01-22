@@ -400,14 +400,14 @@ function get_resource_action() {
   $actions['resource']['rights_admin'] = array (
     'Name'     => $l_header_right,
     'Url'      => "$path/resource/resource_index.php?action=rights_admin&amp;entity_id=".$params['resource_id'],
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult','rights_update','rights_admin','detailupdate','update')
                                      );
 
 // Rights Update
   $actions['resource']['rights_update'] = array (
     'Url'      => "$path/resource/resource_index.php?action=rights_update&amp;entity_id=".$params['resource_id'],
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      );
 
