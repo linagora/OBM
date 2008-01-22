@@ -755,7 +755,18 @@ function of_right_users_for_entity($entity, $entity_id, $right="all") {
     FROM UserObm
     LEFT JOIN of_usergroup ON userobm_id = of_usergroup_user_id
     LEFT JOIN EntityRight ON (userobm_id = entityright_consumer_id AND entityright_consumer = 'user')
-                          OR (of_usergroup_group_id = entityright_consumer_id AND entityright_consumer = 'group') 
+    WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity' $where_right
+    UNION
+    SELECT
+      userobm_firstname,
+      userobm_lastname,
+      userobm_id,
+      entityright_read,
+      entityright_write,
+      entityright_admin
+    FROM UserObm
+    LEFT JOIN of_usergroup ON userobm_id = of_usergroup_user_id 
+    LEFT JOIN EntityRight ON (of_usergroup_group_id = entityright_consumer_id AND entityright_consumer = 'group') 
     WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity' $where_right
     ORDER BY userobm_firstname, userobm_lastname 
   ";
