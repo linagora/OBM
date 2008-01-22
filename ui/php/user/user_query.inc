@@ -347,7 +347,6 @@ function run_query_user_insert($user) {
   $profile = $user['profile'];
   $archive = ($user['archive'] == '1' ? '1' : '0');
   $hidden = ($user['hidden'] == '1' ? '1' : '0');
-  $hidden = ($user['hidden'] == '1' ? '1' : '0');
   $kind = $user['kind'];
   $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
   $lname = $user['lastname'];
@@ -518,7 +517,6 @@ function run_query_user_insert($user) {
     userobm_archive,
     userobm_hidden,
     userobm_datebegin,
-    userobm_hidden,
     userobm_kind,
     userobm_lastname,
     userobm_firstname,
@@ -562,7 +560,6 @@ function run_query_user_insert($user) {
     '$archive',
     '$hidden',
     $datebegin,
-    '$hidden',
     '$kind',
     '$lname',
     '$fname',
@@ -761,7 +758,6 @@ function run_query_user_update($p_id, $user) {
   // infos
   $profile = $user['profile'];
   $archive = ($user['archive'] == '1' ? '1' : '0');
-  $hidden = ($user['hidden'] == '1' ? '1' : '0');
   $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
   $hidden = ($user['hidden'] == '1' ? '1' : '0');
   $kind = $user['kind'];
@@ -942,7 +938,6 @@ function run_query_user_update($p_id, $user) {
     userobm_archive='$archive',
     userobm_hidden='$hidden',
     userobm_datebegin=$datebegin,
-    userobm_hidden='$hidden',
     userobm_kind='$kind',
     userobm_lastname='$lname',
     userobm_firstname='$fname',
