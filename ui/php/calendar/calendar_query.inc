@@ -3325,7 +3325,6 @@ function calendar_daily_repeatition($date,$start_time,$end_date,$repeatfrequence
     $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
   }
   while ($temp_date < $end_date ) {
-    echo date('Ymd H:i:s', $temp_date).' '.date('Ymd H:i:s',$end_date).'<br />';
     $of = &OccurrenceFactory::getInstance();
     $of->addOccurrence($event, $temp_date, $entity, $entity_id);
     $temp_date = strtotime("+$repeatfrequence days",$temp_date);
