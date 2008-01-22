@@ -321,8 +321,8 @@ public class CalendarHelper extends Helper {
 			cEndRec.setTime(dEndRec);
 		} else {
 			/* infinite */
-			// cEndRec.add(Calendar.YEAR, 2049);
-			cEndRec = null;
+			cEndRec.add(Calendar.YEAR, 2049);
+			//cEndRec = null;
 		}
 		recurrence.setEnd(cEndRec);
 
