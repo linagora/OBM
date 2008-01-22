@@ -473,7 +473,7 @@ function run_query_contact_insert($contact) {
 
   $now = date('Y-m-d H:i:s');
   $uid = $obm['uid'];
-	
+
   $comp_id = $contact['company_new_id'];
   if ($comp_id < 1) {
     $comp_id = $contact['company_id'];
@@ -643,7 +643,16 @@ function run_query_contact_insert($contact) {
   $id = $obm_q->f('contact_id');
 
   if ($id > 0) {
+    $contact['contact_id'] = $id;
+
     $ret = of_userdata_query_update('contact', $id, $contact);
+
+    // Hook : Post
+    if (function_exists('hook_post_run_query_contact_insert')) {
+      if (! hook_post_run_query_contact_insert($contact)) {
+	return false;
+      }
+    }
   }
   
   return $id;
@@ -786,15 +795,22 @@ function run_query_contact_update($contact) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  if ($retour) {
-    $ret = of_userdata_query_update('contact', $id, $contact);
-  }
-
   if ($cgp_show['module']['company']) {
     // If company has changed, update the companies contact number
     if (($retour) && ($comp_new_id > 0) && ($comp_new_id != $comp_old_id)) {
       run_query_global_company_contact_number_update($comp_new_id);
       run_query_global_company_contact_number_update($comp_old_id);
+    }
+  }
+
+  if ($retour) {
+    $ret = of_userdata_query_update('contact', $id, $contact);
+
+    // Hook : Post
+    if (function_exists('hook_post_run_query_contact_update')) {
+      if (! hook_post_run_query_contact_update($contact)) {
+	return false;
+      }
     }
   }
 
@@ -857,6 +873,13 @@ function run_query_contact_delete($p_id) {
   $c = get_contact_info($p_id);
   $comp_id = $c['company_id'];
   $multidomain = sql_multidomain('contact');
+
+  // Hook : Pre
+  if (function_exists('hook_pre_run_query_contact_delete')) {
+    if (! hook_pre_run_query_contact_delete($p_id)) {
+      return false;
+    }
+  }
 
   run_query_global_delete_document_links($p_id, 'contact');    
   run_query_contact_delete_subscription($p_id);    
@@ -994,7 +1017,7 @@ function check_contact_update_rights($params, $c='') {
 
   // Hook : Pre
   if (function_exists('hook_pre_check_contact_update_rights')) {
-    if (! hook_pre_check_contact_update_rights($params, $c='')) {
+    if (! hook_pre_check_contact_update_rights($params, $c)) {
       return false;
     }
   }
@@ -1034,12 +1057,16 @@ function check_contact_update_rights($params, $c='') {
 //     keys used  : lname, fname, phone, hphone, mphone, fax, email
 //                  company_id, comp_new_id
 ///////////////////////////////////////////////////////////////////////////////
-function check_contact_data_form($cid, $contact) {
+function check_contact_data_form($cid, &$contact) {
   global $perm, $cgp_show, $cright_write_admin;
   global $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
   global $l_fill_lastname, $l_fill_company, $l_j_check_phone;
   global $l_j_check_hphone,$l_j_check_mphone, $l_j_check_fax, $l_j_check_email;
   global $err, $l_exist_error, $l_err_public_rights;
+
+  if (!check_user_defined_rules('contact', $contact)) {
+    return false;
+  }
 
   $lname = $contact['lname'];
   $fname = $contact['fname'];
