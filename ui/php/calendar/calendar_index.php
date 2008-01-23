@@ -218,6 +218,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
+  $entities['group'] = $params['sel_group_id'];
   $entities['user'] = $params['sel_user_id'];
   $entities['task'] = $params['sel_task_id'];
   $entities['resource'] = $params['sel_resource_id'];
@@ -276,6 +277,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
+  $entities['group'] = $params['sel_group_id'];
   $entities['user'] = $params['sel_user_id'];
   $entities['task'] = $params['sel_task_id'];
   $entities['resource'] = $params['sel_resource_id'];

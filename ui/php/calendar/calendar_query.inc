@@ -1316,7 +1316,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
   $datebegin = $calendar['date_begin'];
   $dateend = $calendar['date_end'];
   $event_id = $calendar['calendar_id'];
-  $groups = $calendar['group'];
+  $groups = $sel_entity_id['group'];
   $mail = $calendar['mail'];
   $mail_title = stripslashes($calendar['title']);
   $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
@@ -3982,7 +3982,16 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   $consult_link = "$cgp_host/calendar/calendar_index.php?action=detailconsult&calendar_id=$calendar[calendar_id]";
   
   $userinfo = get_user_info();
-  
+  $groups = $calendar['sel_group_id']; 
+  if (is_array($groups)) {
+    $user_group_array = array();
+    foreach($groups as $group_id) {
+      $user_group_array = array_merge($user_group_array, of_usergroup_get_group_users($group_id));
+    }
+    $calendar['sel_user_id'] = array_merge($calendar['sel_user_id'], $user_group_array);
+    $calendar['sel_user_id'] = array_unique($calendar['sel_user_id']);
+  }
+
   if($action == 'update') {
     if(!$event_q) {
       $event_q = run_query_calendar_detail($calendar['calendar_id']);
