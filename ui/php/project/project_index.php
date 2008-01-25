@@ -133,7 +133,7 @@ if ($action == 'ext_get_id') {
   if (check_project_form('', $params)) {
     
     $params['project_id'] = run_query_project_insert($params);
-    if ($params['project_id']) {
+    if ($params['project_id'] > 0) {
       $display['msg'] .= display_ok_msg("$l_project : $l_insert_ok");
       $display['detail'] = dis_project_consult($params['project_id']);
     } else {

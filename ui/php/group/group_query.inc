@@ -1087,7 +1087,7 @@ function run_query_group_ext_search($group) {
   }
 
   $query = "SELECT 
-      count(*) as resultsCount
+      count(*) as resultscount
     FROM UGroup
     WHERE 
       group_name LIKE '$pattern%' 
@@ -1099,8 +1099,7 @@ function run_query_group_ext_search($group) {
   display_debug_msg($query, $cdg_sql, "run_query_group_ext_search()");
   $obm_q->query($query);
   $obm_q->next_record();
-  $resultsCount = $obm_q->f("resultsCount");
-
+  $resultsCount = $obm_q->f("resultscount");
   $query = "SELECT 
       group_id,
       group_name,
@@ -1112,7 +1111,7 @@ function run_query_group_ext_search($group) {
       $multidomain
       $where_restriction
     ORDER BY group_name
-    LIMIT $first_row, $limit";
+    LIMIT $limit OFFSET $first_row";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_ext_search()");
   $obm_q->query($query);

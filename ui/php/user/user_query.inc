@@ -219,7 +219,7 @@ function run_query_user_ext_search($user) {
   }
 
   $query = "SELECT 
-      count(*) as resultsCount
+      count(*) as resultscount
     FROM UserObm
     WHERE (
       userobm_lastname LIKE '$pattern%'
@@ -233,8 +233,7 @@ function run_query_user_ext_search($user) {
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->query($query);
   $obm_q->next_record();
-  $resultsCount = $obm_q->f('resultsCount');
-
+  $resultsCount = $obm_q->f('resultscount');
   $query = "SELECT 
       userobm_id,
       userobm_lastname,
@@ -251,7 +250,7 @@ function run_query_user_ext_search($user) {
       $multidomain
       $where_restriction
     ORDER BY  userobm_lastname, userobm_firstname
-    LIMIT $first_row, $limit";
+    LIMIT $limit OFFSET $first_row";
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->query($query);
 

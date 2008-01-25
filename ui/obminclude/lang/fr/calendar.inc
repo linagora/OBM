@@ -319,7 +319,7 @@ Ce message a été envoyé le %s à %s par une action de %s %s dans OBM
 $l_add_exception_mail_body = 
 "Message automatique envoyé par OBM
 ------------------------------------------------------------------
-OCCURENCE(S) RESTAURÉES !
+OCCURENCE(S) ANNULÈES !
 ------------------------------------------------------------------
 
 La ou les occurrences du rendez-vous %s, initialement prévues 

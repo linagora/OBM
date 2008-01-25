@@ -190,7 +190,7 @@ function run_query_project_detail($p_id) {
          LEFT JOIN TaskType ON project_tasktype_id=tasktype_id
          LEFT JOIN UserObm as c ON project_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON project_userupdate=u.userobm_id
-    WHERE project_id='$p_id' $multidomain";
+    WHERE project_id=$p_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_detail');
   $obm_q->query($query);
@@ -1309,7 +1309,7 @@ function run_query_project_statlog($p_id) {
   $multidomain = sql_multidomain('project');
 	
   $query = "
-    SELECT (sum(timetask_length)/8) as time_used
+    SELECT (sum(timetask_length)/8) as time_used, project_id
       FROM TimeTask, ProjectTask, Project
     WHERE timetask_projecttask_id = projecttask_id
     AND project_id = projecttask_project_id
@@ -1324,7 +1324,7 @@ function run_query_project_statlog($p_id) {
   $time_used = $obm_q->f('time_used');
   if ($time_used == '')  $time_used = 0;
   $multidomain = sql_multidomain('userobm');
-  $query = "SELECT sum(projectuser_missingtime) as time_left
+  $query = "SELECT sum(projectuser_missingtime) as time_left,projectuser_project_id
             FROM ProjectUser JOIN UserObm ON projectuser_user_id = userobm_id
             WHERE projectuser_project_id = '$p_id' $multidomain
             GROUP BY projectuser_project_id";
@@ -1517,7 +1517,7 @@ function get_project_info($id) {
       LEFT JOIN TaskType on project_tasktype_id=tasktype_id
       LEFT JOIN Deal on project_deal_id=deal_id
       LEFT JOIN Company on project_company_id=company_id
-    WHERE project_id='$id' $multidomain";
+    WHERE project_id=$id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_project_info()');
   $obm_q->query($query);
@@ -1845,7 +1845,7 @@ function check_project_task_form($pid, $params) {
 
   // If parent task is given, it should not have parents
   // Can happen if update from another window simultaneously
-  if (project_task_has_parent($ptask)) {
+  if ($ptask > 0 && project_task_has_parent($ptask)) {
     $err['msg'] = $l_ptask_has_parent;
     return false;
   }
@@ -1864,7 +1864,7 @@ function check_project_task_form($pid, $params) {
 
   // If a parent task has been given, check that there are no links from
   // User to the parent task (a parent task can't be assigned to users)
-  if (project_task_has_user($ptask)) {
+  if ($task > 0 && project_task_has_user($ptask)) {
     $pt_has_user = true;
   } else {
     $pt_has_user = false;
@@ -1925,7 +1925,7 @@ function project_task_has_parent($tid) {
 
   $query = "SELECT projecttask_parenttask_id
     FROM ProjectTask JOIN Project on project_id = projecttask_project_id
-    WHERE projecttask_id = '$tid' $multidomain";
+    WHERE projecttask_id = $tid $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'project_task_has_parent()');
   $t_q = new DB_OBM;
@@ -2023,7 +2023,7 @@ function run_query_project_month_planning($params) {
     SELECT
       projecttask_id as id,
       projecttask_label as label,
-      sum(timetask_length) timetask_length,
+      sum(timetask_length) as timetask_length,
       $date,
       userobm_id,
       userobm_lastname,

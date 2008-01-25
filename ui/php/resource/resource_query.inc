@@ -140,20 +140,21 @@ function run_query_resource_ext_search($resource) {
   }
 
   $query = "SELECT 
-      count(*) as resultsCount
+      count(*) as resultscount,
+      resource_name
     FROM Resource
     LEFT JOIN ResourceType ON resource_rtype_id = resourcetype_id
     WHERE 
       resource_name LIKE '$pattern%' 
       $multidomain
       $where_restriction
+    GROUP BY resource_name
     ORDER BY resource_name  ";
 
   display_debug_msg($query, $cdg_sql, "run_query_resource_ext_search()");
   $obm_q->query($query);
   $obm_q->next_record();
-  $resultsCount = $obm_q->f("resultsCount");
-
+  $resultsCount = $obm_q->f("resultscount")+0;
   $query = "SELECT 
       resource_id,
       resource_name,
@@ -168,7 +169,7 @@ function run_query_resource_ext_search($resource) {
       $multidomain
       $where_restriction
     ORDER BY resource_name
-    LIMIT $first_row, $limit  ";
+    LIMIT $limit OFFSET $first_row";
 
   display_debug_msg($query, $cdg_sql, "run_query_resource_ext_search()");
   $obm_q->query($query);

@@ -2179,7 +2179,7 @@ function store_calendar_entities($entities_q) {
           'type'  => 'user',
           'id'    => $user_q->f('userobm_id'));
         $i++;
-        $i = $i%21;
+        $i = $i%20;
       }
     }
   }
@@ -2195,7 +2195,7 @@ function store_calendar_entities($entities_q) {
         'id'    => $id
       );
       $i++;
-      $i = $i%21;
+      $i = $i%20;
     }
   }
   $resourcegroup_q = $entities_q['resourcegroup'];
@@ -2212,7 +2212,7 @@ function store_calendar_entities($entities_q) {
         'groupLabel' => $resourcegroup_q->f('rgroup_name'),
       );
       $i++;
-      $i = $i%21;
+      $i = $i%20;
     }
   }  
 

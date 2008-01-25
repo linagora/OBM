@@ -1032,6 +1032,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
     <form method=\"post\" name=\"f_file\" action=\"$url\">
     <fieldset class=\"detail extra\">
     <legend>$l_auto_resolv</legend>
+    <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
     <input $auto_check_0 type=\"radio\" name=\"rd_auto_conflict\" id=\"auto_conflict_0\" value=\"0\" />
     <label for=\"auto_conflict_0\">$l_always_ask</label><br />
     <input $auto_check_1 type=\"radio\" name=\"rd_auto_conflict\" id=\"auto_conflict_1\" value=\"1\" />
@@ -1070,7 +1071,6 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
         <input type=\"hidden\" name=\"file_saved\" value=\"$file_saved\" />
         <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
         <input type=\"hidden\" name=\"row_start\" value=\"$num_line\" />
-        <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
         <input type=\"hidden\" name=\"action\" value=\"file_import\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_validate\" />
       </td> 

@@ -336,7 +336,7 @@ function dis_project_planning($params) {
   $block = html_project_nav_date($params);
   $block .= html_project_planning($obm_q, $params);
 
-  $p = get_project_info($project['project_id']);
+  $p = get_project_info($params['project_id']);
   $title = $p['name'];
   $shortname = $p['shortname'];
   if ($shortname != '') {

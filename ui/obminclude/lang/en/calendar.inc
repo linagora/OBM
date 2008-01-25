@@ -124,7 +124,7 @@ $l_meeting_perform = "Seek for free crenels";
 
 $l_event_color_tt = "Event's colors are the ones defined during the event creation.";
 
-$l_confirm_delete ="This operation will remove all the occurences of this event for all the users, are you sure to want to continue?";
+$l_confirm_delete ="This operation will remove this occurence of this event for all the users, are you sure to want to continue?";
 $l_confirm = "Confirm";
 $l_cancel = "Cancel";
 $l_update_warning = "Warning : some conflicts have been detected";
@@ -197,4 +197,177 @@ $mj_invalid_day = "Ce jour n'existe pas pour le mois selectionne.";
 $mj_date_incompatibility = "La date de fin ne peut etre anterieure a la date de debut.";
 $mj_repeat_date_incompatibility = "La date de fin de repetition ne peut etre anterieure a la date de debut."; 
 $mj_event_delete_confirm = "Confirmer la suppression du rdv ?"; 
-$mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses repetitions ?"; 
+$mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses repetitions ?";
+
+$l_view_agenda_desc = 'Calendar view, this view is editable';
+$l_view_planning_desc = 'Planning view, this view cannot be edited';
+$l_view_printable_desc = 'Printable view, this view cannot be edited';
+$l_view_list_desc = 'List view, this view cannot be edited';
+$l_view_week_desc = 'Week view';
+$l_view_day_desc = 'Day view ';
+$l_view_month_desc = 'Month_view';
+$l_expand_all = "Expand All";
+$l_edit_full = "Advanced";
+$l_confirm_delete_all ="This operation will remove all the occurences of this event for all the users, are you sure to want to continue?";
+$l_ics_insert = 'Import';
+$l_ics_file = 'ICS file to import';
+$l_add_exception_mail_body = 'Updated event on OBM: %s';
+$l_delete_exception_mail_subject = 'Updated event on OBM: %s';
+$l_update_state_mail_subject = 'Attendees update on OBM event: %s';
+
+$l_add_event_mail_body = 
+"This mail was automaticly sent by OBM
+------------------------------------------------------------------
+NEW RENDEZVOUS
+------------------------------------------------------------------
+
+You are invited to participate to a rendezvous from %s to %s,
+and wich subjecti is %s (location : %s).
+
+
+:: More information about this rendezvous : %s
+:: To accept this rendezvous : %s
+:: To refuse this rendezvous : %s
+
+-------------------------------------------------------------------
+This message was send on %s at %s by %s %s from OBM 
+%s";
+
+$l_add_resource_mail_body = 
+"This mail was automaticly sent by OBM
+------------------------------------------------------------------
+NEW RESOURCE RESERVATION !
+------------------------------------------------------------------
+
+A new resource reservation was scheduled on %s to %s for %s
+(location: %s).
+
+
+:: To accpet or refuse this reservation : %s
+
+-------------------------------------------------------------------
+This message was send on %s at %s by %s %s from OBM 
+%s";
+
+$l_update_event_mail_body = 
+"This mail was automaticly sent by OBM
+------------------------------------------------------------------
+UPDATED RENDEZVOUS !
+------------------------------------------------------------------
+
+The rendezvous %s, initially scheduled from %s to %s,(location %s),
+was updated and will take place from %s to %s (location : %s).
+
+:: More information about this modifications : %s
+:: To accept those modifications : %s
+:: To refuse those modifications : %s
+
+-------------------------------------------------------------------
+This message was send on %s at %s by %s %s from OBM 
+%s";
+
+$l_update_resource_mail_body = 
+"This mail was automaticly sent by OBM
+------------------------------------------------------------------
+UPDATED RESOURCE RESERVATION !
+------------------------------------------------------------------
+
+The resource reservation %s initialy scheduled from %s to %s
+(location: %s) was modified and will take place from %s to %s
+(location: %s).
+
+:: To accept or refuse those modifications : %s
+
+-------------------------------------------------------------------
+This message was send on %s at %s by %s %s from OBM 
+%s";
+
+$l_delete_event_mail_body = 
+"This mail was automaticly sent by OBM
+------------------------------------------------------------------
+DELETED RENDEZVOUS !
+------------------------------------------------------------------
+
+The rendezvous %s, initialy scheduled on %s to %s (location : %s),
+was deleted.
+
+:: To contact the organiser of this event : %s
+
+-------------------------------------------------------------------
+This message was send on %s at %s by %s %s from OBM 
+%s";
+
+$l_delete_resource_mail_body = 
+"This mail was automaticly sent by OBM
+------------------------------------------------------------------
+CANCELED RESOURCE RESERVATION !
+------------------------------------------------------------------
+
+The resource reservation %s, initialy scheduled from %s to %s
+(location: %s), was cancelled.
+
+:: To contact the organiser of this event : %s
+
+-------------------------------------------------------------------
+This message was send on %s at %s by %s %s from OBM 
+%s";
+
+$l_delete_exception_mail_body = 
+"This mail was automaticly sent by OBM
+------------------------------------------------------------------
+OCCURENCE(S) RESTORED !
+------------------------------------------------------------------
+
+One or more occurrences of the rendezvous %s, initialy cancelled 
+(%s) were restored.
+
+:: For more informations : %s
+
+-------------------------------------------------------------------
+This message was send on %s at %s by %s %s from OBM 
+%s";
+
+$l_add_exception_mail_body = 
+"This mail was automaticly sent by OBM
+------------------------------------------------------------------
+OCCURENCE(S) CANCELLED !
+------------------------------------------------------------------
+
+One or more occurrences of the rendezvous %s, initialy scheduled
+on %s were canceled.
+
+:: For more informations : %s
+
+-------------------------------------------------------------------
+This message was send on %s at %s by %s %s from OBM 
+%s";
+
+$l_update_state_mail_body = 
+"This mail was automaticly sent by OBM
+------------------------------------------------------------------
+ATTENDEE STATE UPDATED
+------------------------------------------------------------------
+
+The attendee %s to %s have changed to %s.
+
+:: For more information about this rendezvous : %s
+
+-------------------------------------------------------------------
+This message was send on %s at %s by %s %s from OBM 
+%s";
+
+$l_alert_mail_body = 
+"This mail was automaticly sent by OBM
+------------------------------------------------------------------
+IMPENDING RENDEZVOUS
+------------------------------------------------------------------
+
+The rendezvous %s(%s) will take place in %s minutes (location: %s).
+
+:: For more information about this rendezvous : %s
+
+-------------------------------------------------------------------
+This message was send on %s at %s by OBM 
+%s";
+
+
