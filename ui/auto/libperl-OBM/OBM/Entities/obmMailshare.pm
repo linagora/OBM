@@ -165,11 +165,15 @@ sub getEntity {
 
     if( $dbMailShareDesc->{"mailshare_email"} ) {
         # Gestion de l'adresse mail principale
-        push( @{$self->{"mailShareDesc"}->{"mailshare_mail"}}, $dbMailShareDesc->{"mailshare_email"}."@".$domainDesc->{"domain_name"} );
 
         # Gestion des alias
-        for( my $j=0; $j<=$#{$domainDesc->{"domain_alias"}}; $j++ ) {
-            push( @{$self->{"mailShareDesc"}->{"mailshare_mail_alias"}}, $dbMailShareDesc->{"mailshare_email"}."@".$domainDesc->{"domain_alias"}->[$j] );
+        my @email = split( /\r\n/, $dbMailShareDesc->{"mailshare_email"} );
+        for( my $i=0; $i<=$#email; $i++ ) {
+            push( @{$self->{"mailShareDesc"}->{"mailshare_mail"}}, $email[$i]."@".$domainDesc->{"domain_name"} );
+
+            for( my $j=0; $j<=$#{$domainDesc->{"domain_alias"}}; $j++ ) {
+                push( @{$self->{"mailShareDesc"}->{"mailshare_mail_alias"}}, $email[$i]."@".$domainDesc->{"domain_alias"}->[$j] );
+            }
         }
 
         my $localServerIp = $self->getHostIpById( $dbHandler, $dbMailShareDesc->{"mailserver_host_id"} );
