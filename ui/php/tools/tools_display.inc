@@ -46,65 +46,34 @@ function dis_tools_update_detail() {
   foreach ($domains as $domain_id => $domain) {
     $has_domain_upd = check_tools_update_need_global_update($domain_id);
 
-    // Get all entities prod info (need the 'domain' realm for all admin_realm)
-    foreach ($entities as $entity=>$db_info) {
-      $table = $db_info[0];
-      $field = $db_info[1];
-      $exclude_fields = $db_info[2];
-      $dis_entity = ${"l_$entity"};
-      if ($cgp_show['module']["$entity"]) {
-	$prod[$entity] = get_update_entity_infos('prod', $domain_id, $table, $field, 'domain', $exclude_fields);
-      }
-    }
-
     // Loop through all udpates 'realms' (user, delegation, domain)
     foreach ($admin_realm as $realm) {
       $has_update = false;
       $dis_realm_board = '';
       $dis_row_update = '';
-      $detail_title = "l_upd_$realm";
-      global $$detail_title;
-      $dis_detail_title = $$detail_title;
+      $dis_detail_title = $GLOBALS["l_upd_$realm"];
       if ($realm == 'delegation') {
 	$dis_detail_title .= ' ('. $obm['delegation'] . ') ';
       }
-
       foreach ($entities as $entity=>$db_info) {
-	$table = $db_info[0];
-	$field = $db_info[1];
-	$exclude_fields = $db_info[2];
 	$dis_entity = ${"l_$entity"};
 	if ($cgp_show['module']["$entity"]) {
-	  // Debug perf info
-	  //  $da = date('i:s:u');
-	  //  $f = exec("ps auxwk-size | grep apache | head -1 | cut -c 25-32", $tmp, $ret);
-	  //	  display_debug_msg("<br>$da : mem=$f, guen", $cdg_exe, 'Perf');
-	  //  echo "<br>$da : mem=$f, guen ".memory_get_usage().' '.memory_get_usage(true);
-
-	  $nb = get_update_entity_numbers($prod[$entity], $domain_id, $table, $field, $realm, $exclude_fields);
-
-	  // Debug perf info
-	  //  $da = date('i:s:u');
-	  //  $f = exec("ps auxwk-size | grep apache | head -1 | cut -c 25-32", $tmp, $ret);
-	  //  display_debug_msg("<br>$da : mem=$f, guen after", $cdg_exe, 'Perf');
-	  //  echo "<br>$da : mem=$f, guen after".memory_get_usage()." ".memory_get_usage(true);
-	  $links = get_update_link_entity($domain_id, $entity, $realm);
-	  $nb_links = count($links);
-	  if (($nb['move'] > 0) || ($nb_links > 0)) {
+          $nb = run_query_tools_perform_scope($db_info,$realm,$domain_id);
+          if ( $nb['diff'] > 0 ) {
 	    $has_update = true;
 	  }
 	  $class_cre = ($nb['created'] > 0 ? " class=\"highlight\"" : '');
 	  $class_upd = ($nb['updated'] > 0 ? " class=\"highlight\"" : '');
 	  $class_del = ($nb['deleted'] > 0 ? " class=\"highlight\"" : '');
-	  $class_lnk = ($nb_links > 0 ? " class=\"highlight\"" : '');
+	  $class_lnk = ($nb['links'] > 0 ? " class=\"highlight\"" : '');
 	  $dis_row_update .= "
-      <tr>
-        <td>$dis_entity</td>
-        <td$class_cre>$nb[created]</td>
-        <td$class_upd>$nb[updated]</td>
-        <td$class_del>$nb[deleted]</td>
-        <td$class_lnk>$nb_links</td>
-      </tr>";
+          <tr>
+            <td>$dis_entity</td>
+            <td$class_cre>$nb[created]</td>
+            <td$class_upd>$nb[updated]</td>
+            <td$class_del>$nb[deleted]</td>
+            <td$class_lnk>$nb[links]</td>
+          </tr>";
 	}
       }
 
@@ -158,7 +127,7 @@ function dis_tools_update_detail() {
 	$dis_button = "$l_upd_not_needed";
       }
 
-      $dis_domain = "
+      $dis_domain .= "
       <div class=\"detail extra\">
       <h1>$domain[label] : $dis_detail_title</h1>
       $dis_realm_board

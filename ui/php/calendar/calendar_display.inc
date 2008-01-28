@@ -4383,10 +4383,10 @@ END:VEVENT";
       $description = "";
     }
     $date_b = $ev_q->f("calendarevent_date");
-    $date_b = date("Ymd",$date_b)."T".date("His",$date_b);
+    $date_b = gmdate("Ymd\THis\Z",$date_b);
+    $date_e = $ev_q->f("calendarevent_date") + $ev_q->f("calendarevent_duration") ;
+    $date_e = gmdate("Ymd\THis\Z",$date_e);
     $start_date = $date_b;
-    $date_e = $ev_q->f("calendarevent_date") + $ev_q->f("calendarevent_duration");
-    $date_e = date("Ymd",$date_e)."T".date("His",$date_e);
     $kind = $ev_q->f("calendarevent_repeatkind");
     $end = $ev_q->f("calendarevent_endrepeat");
     $end = date("Ymd",$end)."T".date("His",$end);

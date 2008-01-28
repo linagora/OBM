@@ -273,460 +273,337 @@ function check_tools_update_need_global_update($domain_id=0) {
 
 
 /**
- * Get production or update infos for an entity
- * @param $target : 'prod' | 'upd'
- * @param $domain_id : domain id to check
- * @param $table  : table where to check
- * @param $field  : field prefix (if not from table name) to check
- * @param $realm  : realm space to check updates (user | domain | delegation)
- * @param $exclude_fields : fields not to take in account for update check
- * @return array $e filled with update or production values
- **/
-function get_update_entity_infos($target='both', $domain_id, $table, $field='', $realm, $exclude_fields=array()) {
-  global $cdg_sql, $cdg_exe, $obm;
+ * run_query_tools_perform_scope 
+ * 
+ * @param mixed $metadata 
+ * @param mixed $realm 
+ * @param mixed $domain 
+ * @access public
+ * @return void
+ */
+function run_query_tools_perform_scope(&$metadata, $realm, $domain, $update = false) {
+  global $obm, $obmdb_dbtype;
 
-  $uid = $obm['uid'];
-  $delegation = $obm['delegation'];
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
+  $rules = array('update' => array('1=1'), 'delete' => array('1=1'), 'purge' => array('1=1'));
+  $del_rules = array('1=1'); 
+  $like = sql_casei_like($obmdb_dbtype); 
+  
+  switch ($realm) {
+    case 'user':
+      $rules['update'][] = "(Current.$metadata[prefix]_userupdate = $obm[uid] OR 
+                  (Current.$metadata[prefix]_userupdate IS NULL AND Current.$metadata[prefix]_usercreate = $obm[uid]))";
+      $rules['delete'][] = "Current.deleted_user_id = $obm[uid]";
+      $rules['purge'][] = "updated_user_id = $obm[uid]";
+      $rules['purgelinks'][] = "updatedlinks_user_id = $obm[uid]";
+      break;
+    case 'delegation':
+      $rules['update'][] = "Current.$metadata[prefix]_delegation $like '$obm[delegation]%'" ;
+      $rules['delete'][] = "Current.deleted_delegation $like '$obm[delegation]%'";  
+      $rules['purge'][] = "updated_delegation $like '$obm[delegation]%'";
+      $rules['purgelinks'][] = "updatedlinks_delegation $like '$obm[delegation]%'";
+      break;
+    default:
+      break;
+  }
+  if ($domain != 0) {
+    $rules['update'][] = "Current.$metadata[prefix]_domain_id = $domain";
+    $rules['delete'][] = "Current.deleted_domain_id = $domain";
+    $rules['purge'][] = "updated_domain_id = $domain";
+    $rules['purgelinks'][] = "updatedlinks_domain_id = $domain";
+  }
 
-  if ($field != '') {
-    $f = $field;
-    $uc = "${field}_usercreate";
-    $uu = "${field}_userupdate";
-    $dg = "${field}_delegation";
-    $table_prefix = "${field}_";
+  if(is_array($metadata['rules'])) {
+    foreach($metadata['rules'] as $field => $value) {
+      $rules['update'][] ="Current.$metadata[prefix]_$field = '$value'";
+    }   
+  }
+  $rules['link'] = $rules['update'];
+
+  if(is_array($metadata['link']['rules'])) {
+    foreach($metadata['link']['rules'] as $field => $value) {
+      $rules['link'][] ="Link.$field = '$value'";
+    }   
+  }
+  if($update) {
+    $userdata = array('uid' =>  $obm['uid'], 'delegation' => $obm[delegation], 'domain' => $domain );
+    $return = run_query_tools_set_scope($metadata, $rules,$userdata);
   } else {
-    $f = strtolower($table);
-    $uc = "${f}_usercreate";
-    $uu = "${f}_userupdate";
-    $dg = "${f}_delegation";
-    $table_prefix = "${f}_";
+    $return = run_query_tools_get_scope($metadata, $rules);
   }
+  
+  return $return;
+    
+}
 
-  $multidomain = "AND (${f}_domain_id='$domain_id')";
+/**
+ * run_query_tools_get_scope 
+ * 
+ * @param mixed $metadata 
+ * @param mixed $rules 
+ * @access public
+ * @return void
+ */
+function run_query_tools_get_scope(&$metadata, &$rules) {
+  global $obm, $cdg_sql;
 
-  // Specific condition according to table (eg handle only public groups)
-  if ($table == 'UGroup') {
-    $where_spec = 'AND group_privacy=0';
-  }
-
-  // Restrict updates to the realm selected (user, domain, delegation)
-  if ($realm == 'user') {
-    $where_upd = "WHERE ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $where_spec $multidomain";
-    $where_prod = "WHERE 1=1 $multidomain";
-  } else if ($realm == 'delegation') {
-    $where_upd = "WHERE ($dg $like '$delegation%') $where_spec $multidomain";
-    $where_prod = "WHERE 1=1 $multidomain";
-  } else {
-    $where_upd = "WHERE 1=1 $where_spec $multidomain";
-    $where_prod = "WHERE 1=1 $multidomain";
-  }
-
-  // Select fields construct
   $obm_qm = new DB_OBM;
-  $fields = $obm_qm->metadata($table, false);
-  $pos = strlen($table_prefix);
-  $coma = '';
-  foreach ($fields as $one_field) {
-    $field_name = substr($one_field['name'], $pos);
-    if ($exclude_fields[$field_name] != 1) {
-      $select_fields .= "$coma
-      $one_field[name] as $field_name";
-      $coma = ',';
-    }
-  }
+  $db_type = $obm_qm->type;
+  $like = sql_casei_like($db_type); 
 
-  // Debug perf info
-  /*  $da = date('i:s:u');
-  $f = exec("ps auxwk-size | grep apache | head -1 | cut -c 25-32", $tmp, $ret);
-  display_debug_msg("<br>$da : mem=$f, realm=$realm, $table", $cdg_exe, 'Perf');
-  echo "<br>$da : mem=$f, realm=$realm, $table";
-  */
-
-  if ($target == 'upd') {
-    // Get infos from Update table
-    $query = "SELECT $select_fields FROM $table $where_upd";
-  } else if ($target == 'prod') {
-    $table_prod = "P_$table";
-    $query = "SELECT $select_fields FROM $table_prod $where_prod";
-  }
-
-  display_debug_msg($query, $cdg_sql, "get_update_entity_infos($table)");
-  $retour = $obm_q->query($query);
-
-  $e = array();
-  while($obm_q->next_record('BD_ASSOC')) {
-    $id = $obm_q->f('id');
-    $er = $obm_q->Record;
-    foreach ($er as $fname => $fvalue) {
-      //    foreach ($obm_q->Record as $fname => $fvalue) {
-      // keep only column name (remove column number entries and exclude fields)
-      //      if (((int)($fname) !== $fname) && !($exclude_fields[$fname] == 1)) {
-      if ( !($exclude_fields[$fname] == 1)) {
-	$e[$id][$fname] = $fvalue;
-	//	$e1[$obm_q->f('id')][$fname] = $fvalue;
+  $diff = array();
+  $primaries = array();
+  $join = array();
+  
+  $return = array('created' => 0, 'deleted' => 0, 'updated' => 0, 'links' => 0, 'diff' => 0);
+  $ids = array('0');
+  /**
+   * PERFORM UPDATED ENTITIES 
+   */
+  
+  $fields = $obm_qm->metadata($metadata['table'], false);
+  foreach ($fields as $field) {
+    if(strpos($field['flags'],'primary_key') === false) {
+      if(!isset($metadata['exclude'][str_replace($metadata['prefix'].'_','',$field['name'])])) { 
+        $diff[] = "Production.$field[name] != Current.$field[name]";
       }
-    }
-  }
-
-  // Debug perf info
-  /*  $da = date('i:s:u');
-  $f = exec("ps auxwk-size | grep apache | head -1 | cut -c 25-32", $tmp, $ret);
-  display_debug_msg("<br>$da : mem=$f, $table : after $target store", $cdg_exe, 'Perf');
-  echo "<br>$da : mem=$f, $table : after $target store";
-  */
-  $obm_q->free();
-  return $e;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Process update infos : Calculate entries differences for an entity
-// Parameters:
-//   - $table  : table to get numbers
-//   - $realm  : realm space to check updates (user | domain | delegation)
-// Returns:
-//   - differences in an array 'created', 'updated', 'deleted', 'move'
-///////////////////////////////////////////////////////////////////////////////
-function process_update_numbers($e1, $e2, $domain_id, $table, $realm) {
-  global $obm, $cdg_sql, $cdg_exe;
-
-  $nb_add = 0;
-  $nb_upd = 0;
-  $nb_del = 0;
-
-  $uid = $obm['uid'];
-  $delegation = $obm['delegation'];
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
-
-  // Process infos for differences (created and updated entries)
-  foreach ($e1 as $id => $row) {
-    if (! array_key_exists($id, $e2)) {
-      $nb_add++;
-      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; $table : new : $id");
     } else {
-      foreach($row as $fname => $fvalue) {
-	if ($e2[$id][$fname] != $fvalue) {
-	  $nb_upd++;
-	  $prod_value = $e2[$id][$fname];
-	  display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; $table ; updated id=$id ; $fname (current value=$prod_value, new value=$fvalue)");
-	  break;
-	}
-      }
+      $diff[] = "Production.$field[name] IS NULL";
+      $diff[] = "Current.$field[name] IS NULL";
+      $primaries['production'] = "Production.$field[name]";
+      $primaries['current'] = "Current.$field[name]";
+      $join[] = "Current.$field[name] = Production.$field[name]";
     }
   }
 
-  // Get infos for deleted entities
-  if ($realm == 'user') {
+  $query = "
+      SELECT count(*) as updated
+      FROM $metadata[table] as Current
+      JOIN P_$metadata[table] as Production ON ".implode(' AND ', $join)."
+      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['update']).")";
 
-    // Get the delete from the Deleted table
-    $query = "SELECT count(*) as nb FROM Deleted
-     WHERE deleted_user_id=$uid
-       AND deleted_table='$table'";
-    display_debug_msg($query, $cdg_sql, 'run_query_user_delete(auto)');
-    $retour = $obm_q->query($query);
-    $obm_q->next_record();
-    $nb_del = $obm_q->f('nb');
-    display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $table : deleted : $nb_del entries in table Deleted");
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(updated)');
+  $obm_qm->query($query);
+  $obm_qm->next_record();
+  
+  $return['updated'] = $obm_qm->f('updated');
+  $return['diff'] += $return['updated'];
 
-  } else if ($realm == 'delegation') {
+  /**
+   * PERFORM CREATED ENTITIES 
+   */
 
-    // Get the delete from the Deleted table
-    $query = "SELECT count(*) as nb FROM Deleted
-     WHERE deleted_delegation $like '$delegation%'
-       AND deleted_table='$table'
-       AND deleted_domain_id='$domain_id'";
-    display_debug_msg($query, $cdg_sql, 'run_query_user_delete(auto)');
-    $retour = $obm_q->query($query);
-    $obm_q->next_record();
-    $nb_del = $obm_q->f('nb');
-    display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $table : deleted : $nb_del entries in table Deleted");
+  $query = "
+      SELECT count(*) as created 
+      FROM $metadata[table] as Current
+      LEFT JOIN P_$metadata[table] as Production ON ".implode(' AND ', $join)."
+      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['update']).") 
+      AND $primaries[production] IS NULL";
 
-  } else {
-    // Case domain, just count lines present in prod, but not present in upd
-    foreach ($e2 as $id => $row) {
-      if (! array_key_exists($id, $e1)) {
-	$nb_del++;
-	display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $table : deleted : id=$id");
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(created)');
+  $obm_qm->query($query);
+  $obm_qm->next_record();
+
+  $return['created'] = $obm_qm->f('created');
+  $return['diff'] += $return['created'];
+
+  /**
+   * PERFORM DELETED ENTITIES 
+   */
+
+  $query = "
+    SELECT count(*) as deleted FROM Deleted as Current
+    JOIN $metadata[table] as Production ON deleted_entity_id = $primaries[production] AND deleted_table = '$metadata[table]'
+    AND (".implode(' AND ',$rules['delete']).")
+    ";
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(deleted)');
+  $obm_qm->query($query);
+  $obm_qm->next_record();
+  $return['deleted'] = $obm_qm->f('deleted');
+  $return['diff'] += $return['deleted'];
+  
+  if(!isset($metadata['link'])) {
+    return $return;
+  }
+  /**
+   * PERFORM UPDATED LINKS 
+   */
+  $diff = array();
+  $join = array();
+  $fields = $obm_qm->metadata($metadata['link']['table'], false);
+  foreach ($fields as $field) {
+    if(strpos($field['flags'],'primary_key') === false) {
+      if(!isset($exclude_fields[$prefix.'_'.$field['name']])) {
+        $diff[] = "Production.$field[name] != Link.$field[name]";
       }
+    } else {
+      $diff[] = "Production.$field[name] IS NULL";
+      $diff[] = "Link.$field[name] IS NULL";
+      $join[] = "Link.$field[name] = Production.$field[name]";
     }
   }
+  $query = "
+      SELECT count(distinct Link.".$metadata['link']['id'].") as links 
+      FROM ".$metadata['link']['table']." as Link 
+      JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
+      LEFT JOIN P_".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
+      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")";
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links)');
+  $obm_qm->query($query);
+  $obm_qm->next_record();
+  $return['links'] = $obm_qm->f('links');
 
-  $nb['created'] = $nb_add;
-  $nb['updated'] = $nb_upd;
-  $nb['deleted'] = $nb_del;
-  $nb['move'] = $nb_add + $nb_upd + $nb_del;
-
-  return $nb;
+  return $return;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Get update types number for an entity
-// Parameters:
-//   - $e2     : entity prod infos
-//   - $domain_id : domain id to check
-//   - $table  : entity table
-//   - $field  : field prefix (if not from table name) to check
-//   - $realm  : realm space to check updates (user | domain | delegation)
-//   - $exclude_fields : fields not to take in account for update check
-///////////////////////////////////////////////////////////////////////////////
-function get_update_entity_numbers($e2='', $domain_id, $table, $field='', $realm, $exclude_fields) {
-  global $cdg_sql, $obm;
-
-  $e1 = get_update_entity_infos('upd', $domain_id, $table, $field, $realm, $exclude_fields);
-  if ($e2 == '') {
-    // If not given, get the production infos
-    $e2 = get_update_entity_infos('prod', $domain_id, $table, $field, $realm, $exclude_fields);
-  }
-  $nb = process_update_numbers($e1, $e2, $domain_id, $table, $realm);
-
-  unset($e1);
-
-  return $nb;
-}
-
-
-/******************************************************************************
- * Get Group links updates (from of_usergroup)
- *
- * @param $domain_id : domain id to check
- * @param $realm : realm space to check updates (user | domain | delegation)
- * @return link array : $link[$group_id] = $group_id
+/**
+ * run_query_tools_get_scope 
+ * 
+ * @param mixed $metadata 
+ * @param mixed $rules 
+ * @access public
+ * @return void
  */
-function get_update_link_group($domain_id, $realm) {
-  global $obm, $cdg_sql, $cdg_exe;
+function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
+  global $obm, $cdg_sql;
 
-  $uid = $obm['uid'];
-  $delegation = $obm['delegation'];
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
+  $obm_qm = new DB_OBM;
+  $db_type = $obm_qm->type;
+  $like = sql_casei_like($db_type); 
 
-  $e1 = array();
-  $e2 = array();
+  $diff = array();
+  $primaries = array();
+  $join = array();
 
-  $eid = 'group_id';
-  $uc = 'group_usercreate';
-  $uu = 'group_userupdate';
-  $dg = 'group_delegation';
+  $return = 0;
 
-  $multidomain = "AND (group_domain_id='$domain_id')";
+  /**
+  * PURGE 
+  */
+  
+  $query = "DELETE FROM Updated WHERE updated_domain_id = '$userdata[domain]'
+      AND updated_table = '$metadata[table]' AND ".implode(' AND ', $rules['purge'])."";
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(purge)');
+  $obm_qm->query($query);
+  $query = "DELETE FROM Updatedlinks WHERE updatedlinks_domain_id = '$userdata[domain]'
+      AND updatedlinks_table = '$metadata[table]' AND ".implode(' AND ', $rules['purgelinks'])."";
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(purge)');
+  $obm_qm->query($query);
 
-  // Restrict updates to the realm selected (user, domain, delegation)
-  if ($realm == 'user') {
-    $where = "AND ($uu=$uid OR ($uc=$uid AND $uu is NULL))";
-  } else if ($realm == 'delegation') {
-    $where = "AND ($dg $like '$delegation%')";
-  } else {
-    $where = '';
-  }
-
-  // of_usergroup Link --------------------------------------------------------
-
-  // Get infos from Update table
-  $query = "SELECT of_usergroup_group_id, of_usergroup_user_id
-    FROM of_usergroup
-      LEFT JOIN UGroup ON of_usergroup_group_id=group_id
-    WHERE group_privacy=0
-      $where $multidomain
-    ORDER BY of_usergroup_group_id, of_usergroup_user_id";
-  display_debug_msg($query, $cdg_sql, "get_update_link_group($realm)");
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $g_id = $obm_q->f('of_usergroup_group_id');
-    $u_id = $obm_q->f('of_usergroup_user_id');
-    $e1[$g_id][] = "u$u_id";
-  }
-
-  // Get infos from Production table
-  $query = "SELECT of_usergroup_group_id, of_usergroup_user_id
-    FROM P_of_usergroup
-      LEFT JOIN P_UGroup ON of_usergroup_group_id=group_id
-    WHERE group_privacy=0
-      $where $multidomain
-    ORDER BY of_usergroup_group_id, of_usergroup_user_id";
-  display_debug_msg($query, $cdg_sql, "get_update_link_group(prod $realm)");
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $g_id = $obm_q->f('of_usergroup_group_id');
-    $u_id = $obm_q->f('of_usergroup_user_id');
-    $e2[$g_id][] = "u$u_id";
-  }
-
-  // Process and mark each group modified
-  foreach($e1 as $g_id => $users) {
-    if (count($e1[$g_id]) != count($e2[$g_id])) {
-      $res[$g_id] = $g_id;
-      $nb_link = count($e1[$g_id]);
-      $nb_link_prod = count($e2[$g_id]);
-      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; current #links=$nb_link_prod, new #links=$nb_link");
-    } else {
-      foreach ($users as $u_id) {
-	if (! in_array($u_id, $e2[$g_id])) {
-	  $res[$g_id] = $g_id;
-	  display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; diff=$u_id");
-	  break;
-	}
+  /**
+   * PERFORM UPDATED ENTITIES 
+   */
+  
+  $fields = $obm_qm->metadata($metadata['table'], false);
+  foreach ($fields as $field) {
+    if(strpos($field['flags'],'primary_key') === false) {
+      if(!isset($metadata['exclude'][str_replace($metadata['prefix'],'',$field['name'])])) { 
+        $diff[] = "Production.$field[name] != Current.$field[name]";
       }
-    }
-  }
-
-  // Get empty or deleted groups (not in $e1) that were not empty (in $e2)
-  foreach($e2 as $g_id => $users) {
-    if (! isset($e1[$g_id])) {
-      $res[$g_id] = $g_id;
-      $nb_link = 0;
-      $nb_link_prod = count($e2[$g_id]);
-      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; Group links ; updated id=$g_id ; current #links=$nb_link_prod, new #links=$nb_link");
-    }
-  }
-
-  return $res;
-}
-
-
-/******************************************************************************
- * Get EntityRight links updates for an entity
- *
- * @param $entity : entity
- * @param $table  : entity table
- * @param $field  : field prefix (if not from table name) to check
- * @param $realm : realm space to check updates (user | domain | delegation)
- * @return link array : $link[$entity_id] = $entity_id
- */
-function get_update_link_entityright($domain_id, $entity, $table, $field, $realm) {
-  global $obm, $cdg_sql, $cdg_exe;
-
-  $uid = $obm['uid'];
-  $delegation = $obm['delegation'];
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
-
-  $e1 = array();
-  $e2 = array();
-
-  if ($field != '') {
-    $f = $field;
-    $f_id = "${field}_id";
-    $uc = "${field}_usercreate";
-    $uu = "${field}_userupdate";
-    $dg = "${field}_delegation";
-  } else {
-    $f = strtolower($table);
-    $f_id = "${f}_id";
-    $uc = "${f}_usercreate";
-    $uu = "${f}_userupdate";
-    $dg = "${f}_delegation";
-  }
-
-  $multidomain = "AND (${f}_domain_id='$domain_id')";
-
-  // Restrict updates to the realm selected (user, domain, delegation)
-  if ($realm == 'user') {
-    $where = "AND ($uu=$uid OR ($uc=$uid AND $uu is NULL)) $multidomain";
-  } else if ($realm == 'delegation') {
-    $where = "AND ($dg $like '$delegation%') $multidomain";
-  } else {
-    $where = "$multidomain";
-  }
-
-  // Get infos from Update table
-  $query = "SELECT *
-    FROM EntityRight
-      LEFT JOIN $table ON entityright_entity_id=$f_id
-    WHERE entityright_entity='$entity'
-      $where
-    ORDER BY entityright_entity_id, entityright_consumer, entityright_consumer_id";
-  display_debug_msg($query, $cdg_sql, 'get_update_link_entityright()');
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $e_id = $obm_q->f('entityright_entity_id');
-    $cons = $obm_q->f('entityright_consumer');
-    $cons_id = $obm_q->f('entityright_consumer_id');
-    $e1[$e_id][] = "$cons-$cons_id";
-  }
-
-  // Get infos from Production table
-  $table_prod = "P_$table";
-  $query = "SELECT *
-    FROM P_EntityRight
-      LEFT JOIN $table_prod ON entityright_entity_id=$f_id
-    WHERE entityright_entity='$entity'
-      $where
-    ORDER BY entityright_entity_id, entityright_consumer, entityright_consumer_id";
-  display_debug_msg($query, $cdg_sql, 'get_update_link_entityright()');
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $e_id = $obm_q->f('entityright_entity_id');
-    $cons = $obm_q->f('entityright_consumer');
-    $cons_id = $obm_q->f('entityright_consumer_id');
-    $e2[$e_id][] = "$cons-$cons_id";
-  }
-
-  // Process and mark each entity modified
-  foreach($e1 as $e_id => $consumers) {
-    if (count($e1[$e_id]) != count($e2[$e_id])) {
-      $res[$e_id] = $e_id;
-      $nb_link = count($e1[$e_id]);
-      $nb_link_prod = count($e2[$e_id]);
-      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $entity links ; updated id=$e_id ; current #links=$nb_link_prod, new #links=$nb_link");
     } else {
-      foreach ($consumers as $c_id) {
-	if (! in_array($c_id, $e2[$e_id])) {
-	  $res[$e_id] = $e_id;
-	  display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $entity links ; updated id=$e_id ; diff=$c_id");
-	  break;
-	}
+      $diff[] = "Production.$field[name] IS NULL";
+      $diff[] = "Current.$field[name] IS NULL";
+      $primaries['production'] = "Production.$field[name]";
+      $primaries['current'] = "Current.$field[name]";
+      $join[] = "Current.$field[name] = Production.$field[name]";
+    }
+  }
+
+  $query = "
+    INSERT INTO Updated (
+        updated_domain_id,
+        updated_user_id,
+        updated_delegation,
+        updated_table,
+        updated_entity_id,
+        updated_type
+    ) SELECT 
+      $userdata[domain],
+      $userdata[uid],
+      '$userdata[delegation]',
+      '$metadata[table]',
+      $primaries[current], 
+      'U'
+    FROM $metadata[table] as Current
+      JOIN P_$metadata[table] as Production ON ".implode(' AND ', $join)."
+      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['update']).")";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(updated)');
+  $obm_qm->query($query);
+  $return += $obm_qm->affected_rows();
+
+  /**
+   * PERFORM CREATED ENTITIES 
+   */
+
+  $query = "
+    INSERT INTO Updated  (
+        updated_domain_id,
+        updated_user_id,
+        updated_delegation,
+        updated_table,
+        updated_entity_id,
+        updated_type
+    ) SELECT 
+      $userdata[domain],
+      $userdata[uid],
+      '$userdata[delegation]',
+      '$metadata[table]',
+      $primaries[current], 
+      'C'
+      FROM $metadata[table] as Current
+      LEFT JOIN P_$metadata[table] as Production ON ".implode(' AND ', $join)."
+      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['update']).") 
+      AND $primaries[production] IS NULL";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(created)');
+  $obm_qm->query($query);
+  $return += $obm_qm->affected_rows();
+  
+  if(!isset($metadata['link'])) {
+    return $return;
+  }
+  $diff = array();
+  $join = array();
+  $fields = $obm_qm->metadata($metadata['link']['table'], false);
+  foreach ($fields as $field) {
+    if(strpos($field['flags'],'primary_key') === false) {
+      if(!isset($exclude_fields[$prefix.'_'.$field['name']])) {
+        $diff[] = "Production.$field[name] != Link.$field[name]";
       }
+    } else {
+      $diff[] = "Production.$field[name] IS NULL";
+      $diff[] = "Link.$field[name] IS NULL";
+      $join[] = "Link.$field[name] = Production.$field[name]";
     }
   }
+  $query = "
+    INSERT INTO Updatedlinks (
+        updatedlinks_domain_id,
+        updatedlinks_user_id,
+        updatedlinks_delegation,
+        updatedlinks_table,
+        updatedlinks_entity,
+        updatedlinks_entity_id            
+      )
+      SELECT 
+      $userdata[domain],
+      $userdata[uid],
+      '$userdata[delegation]',
+      '$metadata[table]',
+      $primaries[current],
+      Link.".$metadata['link']['id']." 
+    FROM ".$metadata['link']['table']." as Link 
+      JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
+      LEFT JOIN P_".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
+      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")
+      GROUP BY Link.".$metadata['link']['id']." ";
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links)');
+  $obm_qm->query($query);
+  $obm_qm->next_record();
+  $return += $obm_qm->affected_rows();
 
-  // Get empty or deleted entries (not in $e1) that were not empty (in $e2)
-  foreach($e2 as $e_id => $entry) {
-    if (! isset($e1[$e_id])) {
-      $res[$e_id] = $e_id;
-      $nb_link = 0;
-      $nb_link_prod = count($e2[$e_id]);
-      display_debug_msg($cmd, $cdg_exe, "domain=$domain_id ; realm=$realm ; $entity links ; updated id=$e_id ; current #links=$nb_link_prod, new #links=$nb_link");
-    }
-  }
-
-  return $res;
+  return $return;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get update types number for a link
-// Parameters:
-//   - $domain_id : domain id to check
-//   - $entity : entity
-//   - $field  : field prefix (if not from table name) to check
-//   - $realm  : realm space to check updates (user | domain | delegation)
-///////////////////////////////////////////////////////////////////////////////
-function get_update_link_entity($domain_id, $entity, $realm) {
-  global $cdg_sql, $obm;
-
-  if ($entity == 'group') {
-    $links = get_update_link_group($domain_id, $realm);
-  } else if ($entity == 'mailshare') {
-    $links = get_update_link_entityright($domain_id, $entity, 'MailShare', 'mailshare', $realm);
-  } else if ($entity == 'user') {
-    $links = get_update_link_entityright($domain_id, 'mailbox', 'UserObm', 'userobm', $realm);
-  }
-
-  return $links;
-}
-
 
 /******************************************************************************
  * Store update data in update tables
@@ -754,170 +631,14 @@ function store_update_data($params) {
     $field = $db_info[1];
     $exclude_fields = $db_info[2];
     if ($cgp_show['module']["$entity"]) {
-      $e1 = get_update_entity_infos('upd', $domain_id, $table, $field, $realm, $exclude_fields);
-      $e2 = get_update_entity_infos('prod', $domain_id, $table, $field, $realm, $exclude_fields);
-      $nb = process_update_numbers($e1, $e2, $domain_id, $table, $realm);
-      if ($nb['move'] > 0) {
+      $nb = run_query_tools_perform_scope($db_info,$realm,$domain_id,true); 
+      if($nb > 0) {
         $has_update = true;
-	$nb = store_update_entity_infos($e1, $e2, $domain_id, $entity, $table, $realm);
-      }
-    }
-  }
-
-  // Process links
-
-  foreach ($entities as $entity=>$db_info) {
-    $table = $db_info[0];
-    $field = $db_info[1];
-    if ($cgp_show['module']["$entity"]) {
-      $links = get_update_link_entity($domain_id, $entity, $realm);
-      $nb_links = count($links);
-      if ($nb_links > 0) {
-        $has_update = true;
-	$ret = store_update_entity_links_infos($domain_id, $links, $entity);
       }
     }
   }
 
   return $has_update;
-}
-
-
-/**
- * Store update infos in Automate tables for an Entity
- *
- * @param $entity : entity to get numbers
- * @param $domain_id : domain id where to check
- * @param $table  : table where to check
- * @param $field  : field prefix (if not from table name) to check
- * @param $realm  : realm space to check updates (user | domain | delegation)
- */
-function store_update_entity_infos($e1, $e2, $domain_id, $entity, $table, $realm) {
-  global $cdg_sql, $obm;
-
-  $nb_add = 0;
-  $nb_upd = 0;
-  $nb_del = 0;
-
-  $uid = $obm['uid'];
-  $delegation = $obm['delegation'];
-  $obm_q = new DB_OBM;
-
-  // Purge actual values
-  if ($realm == 'user') {
-    $where_purge = "AND updated_user_id='$uid'";
-  } else if ($realm == 'delegation') {
-    $where_purge = "AND updated_delegation like '$delegation%'";
-  }
-  $query = "DELETE FROM Updated
-    WHERE updated_domain_id = '$domain_id'
-      AND updated_table = '$table'
-      $where_purge";
-  display_debug_msg($query, $cdg_sql, 'store_update_entity_infos(purge)');
-  $retour = $obm_q->query($query);
-
-
-  // Process infos for created and updated entities
-  foreach ($e1 as $id => $row) {
-    if (! array_key_exists($id, $e2)) {
-      // INSERT
-      $query = "INSERT INTO Updated (
-        updated_domain_id,
-        updated_user_id,
-        updated_delegation,
-        updated_table,
-        updated_entity_id,
-        updated_type
-      ) VALUES (
-        '$domain_id',
-        '$uid',
-        '$delegation',
-        '$table',
-        '$id',
-        'C')";
-      display_debug_msg($query, $cdg_sql, 'store_update_entity_infos()');
-      $retour = $obm_q->query($query);
-      $nb_add++;
-    } else {
-      foreach($row as $fname => $fvalue) {
-	if ($e2[$id][$fname] != $fvalue) {
-	  // UPDATE
-	  $query = "INSERT INTO Updated (
-            updated_domain_id,
-            updated_user_id,
-            updated_delegation,
-            updated_table,
-            updated_entity_id,
-            updated_type
-          ) VALUES (
-            '$domain_id',
-            '$uid',
-            '$delegation',
-            '$table',
-            '$id',
-            'U')";
-	  display_debug_msg($query, $cdg_sql, 'store_update_entity_infos()');
-	  $retour = $obm_q->query($query);
-	  $nb_upd++;
-	  break;
-	}
-      }
-    }
-  }
-
-  return $nb_add;
-}
-
-
-/**
- * Store update infos in Automate tables for Entity link
- *
- * @param $domain_id : domain id where to check
- * @param $links  : 
- * @param $entity : entity to get numbers
- */
-function store_update_entity_links_infos($domain_id, $links, $entity) {
-  global $cdg_sql, $obm;
-
-  $nb_add = 0;
-  $nb_upd = 0;
-  $nb_del = 0;
-
-  $uid = $obm['uid'];
-  $delegation = $obm['delegation'];
-  $obm_q = new DB_OBM;
-
-  if ($entity == 'group') {
-    $table = 'UGroup';
-  } else if ($entity == 'mailshare') {
-    $table = 'MailShare';
-  } else if ($entity == 'user') {
-    $table = 'UserObm';
-  }
-
-  // Process infos for created and updated entities
-  foreach ($links as $id) {
-    // INSERT
-    $query = "INSERT INTO Updatedlinks (
-        updatedlinks_domain_id,
-        updatedlinks_user_id,
-        updatedlinks_delegation,
-        updatedlinks_table,
-        updatedlinks_entity,
-        updatedlinks_entity_id
-      ) VALUES (
-        '$domain_id',
-        '$uid',
-        '$delegation',
-        '$table',
-        '$entity',
-        '$id')";
-    display_debug_msg($query, $cdg_sql, 'store_update_entity_links_infos()');
-    $retour = $obm_q->query($query);
-    $nb_add++;
-  }
-
-  return $nb_add;
 }
 
 

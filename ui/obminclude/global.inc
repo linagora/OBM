@@ -429,7 +429,6 @@ if ((! $cgp_use['service']['mail']) && (! $cgp_use['service']['samba'])) {
 //----------------------------//
 if (! $cgp_show['module']['company']) {
   $cgp_show['module']['deal'] = false;
-  $cgp_show['module']['project'] = false;
   $cgp_show['module']['contract'] = false;
   $cgp_show['module']['invoice'] = false;
   $cgp_show['module']['import'] = false;

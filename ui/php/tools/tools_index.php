@@ -30,10 +30,50 @@ if ($action == 'update_index') $action = 'update_detail';
 get_tools_action();
 $perm->check_permissions($module, $action);
 
-$entities = array('user' => array('UserObm', 'userobm', array('domain_id' => 1, 'timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1, 'local' => 1, 'timelastaccess' => 1, 'nb_login_failed' => 1, 'delegation_target' => 1, 'calendar_version' => 1, 'nomade_datebegin' => 1, 'nomade_dateend' => 1, 'vacation_datebegin' => 1, 'vacation_dateend' => 1)),
-		  'group' => array('UGroup', 'group', array('desc' => 1)),
-		  'host' => array('Host', 'host', array()),
-		  'mailshare' => array('MailShare', 'mailshare', array()));
+$entities = array(
+  'user' => array(
+    'table'   => 'UserObm', 
+    'link'    => array(
+      'table' => 'EntityRight', 
+      'id' => 'entityright_entity_id', 
+      'rules' => array('entityright_entity' => 'mailbox')
+    ),
+    'prefix'  => 'userobm',
+    'exclude' => array('domain_id' => 1, 'timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1, 
+                       'local' => 1, 'timelastaccess' => 1, 'nb_login_failed' => 1, 'delegation_target' => 1, 
+                       'calendar_version' => 1, 'nomade_datebegin' => 1, 'nomade_dateend' => 1, 'vacation_datebegin' => 1,
+                       'vacation_dateend' => 1),
+    'rules'   => array()
+  ),
+  'group' => array(
+    'table'   => 'UGroup',
+    'link'    => array(
+      'table' => 'of_usergroup', 
+      'id' => 'of_usergroup_group_id'
+    ),
+    'prefix'  => 'group', 
+    'exclude' => array('domain_id' => 1, 'timecreate' => 1, 'usercreate' => 1, 'desc' => 1, 'timeupdate' => 1, 
+                        'privacy' => 1,'usercreate' => 1),
+    'rules'   => array('privacy' => '0')
+  ),
+  'host' => array(
+    'table'   => 'Host',
+    'prefix'  => 'host',
+    'exclude' => array(),
+    'rules'   => array()
+  ),
+  'mailshare' => array(
+    'table'   => 'MailShare',
+    'link'    => array(
+      'table' => 'EntityRight', 
+      'id' => 'entityright_entity_id', 
+      'rules' => array('entityright_entity' => 'MailShare')
+    ),    
+    'prefix'  => 'mailshare',
+    'exclude' => array(),
+    'rules'   => array()
+  )
+);
 
 if ($action == 'update_detail') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,7 +84,6 @@ if ($action == 'update_detail') {
   if (check_tools_update_context_ok($params)) {
     set_update_lock();
     set_update_state($params['domain_id']);
-    store_update_data($params);
     $res = exec_tools_update_update($params);
     if ($res == '0') {
       $display['msg'] .= display_ok_msg($l_upd_running);

@@ -1136,7 +1136,11 @@ function ics_date_to_timestamp($icsdate) {
   }
   preg_match('/.*(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})){0,1}/', $icsdate, $result) ;
   list($all, $year, $month, $day, $time, $hour, $minute, $second) = $result ;
-  return mktime($hour, $minute, $second, $month, $day, $year) ;
+  if(preg_match('/^.*Z$/',$icsdate)) {
+    return gmmktime($hour, $minute, $second, $month, $day, $year) ;
+  } else {
+    return mktime($hour, $minute, $second, $month, $day, $year) ;
+  }
 }
 
 

@@ -38,7 +38,7 @@ $cgp_sql_star = true;
 //$cgp_archive_only = true;
 
 // Tuning constants
-//$ctu_sql_limit = true;
+$ctu_sql_limit = true;
 
 // MySQL (only 4.1+) charset used (for database and files !)
 //$cmy_character_set = '_latin1';
