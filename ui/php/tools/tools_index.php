@@ -84,6 +84,8 @@ if ($action == 'update_detail') {
   if (check_tools_update_context_ok($params)) {
     set_update_lock();
     set_update_state($params['domain_id']);
+    store_update_data($params);
+    
     $res = exec_tools_update_update($params);
     if ($res == '0') {
       $display['msg'] .= display_ok_msg($l_upd_running);

@@ -625,7 +625,6 @@ function store_update_data($params) {
   $has_update = false;
 
   // Process entities
-
   foreach ($entities as $entity=>$db_info) {
     $table = $db_info[0];
     $field = $db_info[1];
