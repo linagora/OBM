@@ -24,7 +24,7 @@
 //$conf_lang = true;
 
 // Use specific check controls (see conf/modules/module.inc)
-//$conf_modules = true
+//$conf_modules = true;
 
 // Todo lines to display
 $cgp_todo_nb = 5;

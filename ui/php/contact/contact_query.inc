@@ -1157,6 +1157,13 @@ function check_can_delete_contact($p_id) {
 
   $delete_ok = true;
 
+  // Hook : Pre
+  if (function_exists('hook_pre_check_can_delete_contact')) {
+    if (! hook_pre_check_can_delete_contact($p_id)) {
+      return false;
+    }
+  }
+
   // Allow public contact handling only if write_admin right
   $lc = get_contact_info($p_id);
   if (($lc['privacy'] == '0') &&
@@ -1167,7 +1174,7 @@ function check_can_delete_contact($p_id) {
   }
 
   // Links from deals
-  if ($cgp_show["module"]["deal"]) {
+  if ($cgp_show['module']['deal']) {
     $nb = get_global_linked_deal_nb($p_id, 'contact1', true, 'contact2');
     if ($nb > 0) {
       $delete_ok = false;
@@ -1178,7 +1185,7 @@ function check_can_delete_contact($p_id) {
   }
 
   // Links from lists
-  if ($cgp_show["module"]["list"]) {
+  if ($cgp_show['module']['list']) {
     $nb = get_linked_contact_list_nb($p_id);
     if ($nb > 0) {
       $delete_ok = false;
@@ -1189,7 +1196,7 @@ function check_can_delete_contact($p_id) {
   }
 
   // Links from Contract
-  if ($cgp_show["module"]["contract"]) {
+  if ($cgp_show['module']['contract']) {
     $nb = get_global_linked_contract_nb($p_id, 'contact1', true, 'contact2');
     if ($nb > 0) {
       $delete_ok = false;
@@ -1198,7 +1205,7 @@ function check_can_delete_contact($p_id) {
       $ok_msg .= "<br />$l_link_contract_no";
     }
   }
-  if ($cgp_show["module"]["publication"]) {
+  if ($cgp_show['module']['publication']) {
     // Links from Publications (Subscriptions)
     $nb = get_linked_contact_publication_nb($p_id);
     if ($nb > 0) {

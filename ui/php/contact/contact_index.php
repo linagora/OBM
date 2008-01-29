@@ -172,19 +172,24 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_contact_data_form('', $params)) {
-    $retour = run_query_contact_update($params);
-    if ($retour) {
-      $display['msg'] .= display_ok_msg("$l_contact : $l_update_ok");
+  if (check_contact_update_rights($params)) {
+    if (check_contact_data_form('', $params)) {
+      $retour = run_query_contact_update($params);
+      if ($retour) {
+	$display['msg'] .= display_ok_msg("$l_contact : $l_update_ok");
+      } else {
+	$display['msg'] .= display_err_msg("$l_contact : $l_update_error");
+      }
+      if ($params['contact_id'] > 0) {
+	$display['detail'] = dis_contact_consult($params);
+      }
     } else {
-      $display['msg'] .= display_err_msg("$l_contact : $l_update_error");
+      $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
+      $display['detail'] = dis_contact_form($action, '', $params);
     }
-    if ($params['contact_id'] > 0) {
-      $display['detail'] = dis_contact_consult($params);
-    }    
   } else {
-    $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
-    $display['detail'] = dis_contact_form($action, '', $params);
+    $display['msg'] .= display_warn_msg($err['msg']);
+    $display['detail'] = dis_contact_consult($params);
   }
   
 } elseif ($action == 'check_delete') {
