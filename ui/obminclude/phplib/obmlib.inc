@@ -162,12 +162,17 @@ class OBM_Challenge_Auth extends Auth {
     $password = $params["password"];
     $domain = $params["domain"];
     if(!$c_singleNameSpace) {
+      if(strpos($login,"@") !== false) {
+        list($login, $domain) = split("@",$login);
+        $domain_query = "domain_name";
+      } else {
+        $domain_query = "userobm_domain_id";
+      }      
       // if no domain set, set the default domain
       if ((! isset($domain)) || ($domain == "")) {
         $domain = "$c_default_domain";
       }
-
-      $where_domain = "AND userobm_domain_id='$domain'";
+      $where_domain = "AND $domain_query = '$domain'";
 
     }
     if (isset($login)) {
@@ -185,6 +190,7 @@ class OBM_Challenge_Auth extends Auth {
         userobm_domain_id,
         userobm_delegation_target
       FROM $user_table
+      LEFT JOIN Domain ON userobm_domain_id = domain_id      
       WHERE userobm_login = '$user_login'
         AND userobm_archive = '0'
         $where_domain";
