@@ -432,9 +432,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   $fields = $obm_qm->metadata($metadata['link']['table'], false);
   foreach ($fields as $field) {
     if(strpos($field['flags'],'primary_key') === false) {
-      if(!isset($exclude_fields[$prefix.'_'.$field['name']])) {
-        $diff[] = "Production.$field[name] != Link.$field[name]";
-      }
+      $diff[] = "Production.$field[name] != Link.$field[name]";
     } else {
       $diff[] = "Production.$field[name] IS NULL";
       $diff[] = "Link.$field[name] IS NULL";
@@ -496,7 +494,7 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
   $fields = $obm_qm->metadata($metadata['table'], false);
   foreach ($fields as $field) {
     if(strpos($field['flags'],'primary_key') === false) {
-      if(!isset($metadata['exclude'][str_replace($metadata['prefix'],'',$field['name'])])) { 
+      if(!isset($metadata['exclude'][str_replace($metadata['prefix'].'_','',$field['name'])])) { 
         $diff[] = "Production.$field[name] != Current.$field[name]";
       }
     } else {
@@ -526,7 +524,6 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
     FROM $metadata[table] as Current
       JOIN P_$metadata[table] as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['update']).")";
-
   display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(updated)');
   $obm_qm->query($query);
   $return += $obm_qm->affected_rows();
@@ -567,9 +564,7 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
   $fields = $obm_qm->metadata($metadata['link']['table'], false);
   foreach ($fields as $field) {
     if(strpos($field['flags'],'primary_key') === false) {
-      if(!isset($exclude_fields[$prefix.'_'.$field['name']])) {
-        $diff[] = "Production.$field[name] != Link.$field[name]";
-      }
+      $diff[] = "Production.$field[name] != Link.$field[name]";
     } else {
       $diff[] = "Production.$field[name] IS NULL";
       $diff[] = "Link.$field[name] IS NULL";

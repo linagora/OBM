@@ -873,10 +873,9 @@ function run_query_icalendar_insert($params) {
 
     // organizer (if none, then current userobm)
     if (isset($properties['organizer'])) { 
-      $sel_entity_id['user'][] = $properties['organizer']['uid'] ;
-    }
-    else {
-      $sel_entity_id['user'][] = $obm['uid'] ;
+      $priority['owner'] = $properties['organizer']['uid'] ;
+    } else {
+      $priority['owner'] = $obm['uid'];
     }
 
     // attendee(s)
@@ -885,7 +884,9 @@ function run_query_icalendar_insert($params) {
         $sel_entity_id['user'][] = $attendee['uid'] ;
       }
     }
-
+    if(empty($sel_entity_id['user'])) {
+      $sel_entity_id['user'][] = $obm['uid'] ;
+    }
     run_query_calendar_add_event($properties, $sel_entity_id, &$event_id) ;
     $nb_processed_event++ ;
   }
