@@ -75,13 +75,20 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 
   //  if (($fieldname == 'contact_lastname') && $link_ok) {
   if ($fieldname == 'contact_lastname') {
+    if(trim($OD->data_set->f('contact_lastname')) == '') {
+      $contact_lastname = '-';
+      $res['align'] = 'center';
+    } else {
+      $contact_lastname = $OD->data_set->f('contact_lastname');
+    }
     if ($OD->display_ext == 'get_id') {
-      $res['url'] = "javascript:check_contact_get_id(".$OD->data_set->f('contact_id').",'".addslashes($OD->data_set->f('contact_lastname'))."');";
+      $res['url'] = "javascript:check_contact_get_id(".$OD->data_set->f('contact_id').",'".phpStringToJsString($contact_lastname)."');";
     } else if ($OD->display_ext == 'get_id_url') {
       $res['url'] = "javascript:check_contact_get_id_url('$ext_url',".$OD->data_set->f('contact_id').");";
     } else {
       $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('contact_id');
     }
+    $res['name'] = $contact_lastname;
   }
 
   else if (($fieldname == 'company_name') && $link_ok) {
