@@ -2165,6 +2165,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
 function dis_calendar_week_planning($calendar, $calendar_entity, $writable_entity) {
   global $path, $ico_next, $ico_previous, $l_previous, $l_next, $l_week;
   global $ccalendar_weekstart, $obm, $ico_far_next, $ico_far_previous;
+  global $ccalendar_first_hour;
 
   $ts_date = strtotime($calendar["date"]);
   $category_filter = $calendar["category_filter"];
