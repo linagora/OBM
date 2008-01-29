@@ -78,11 +78,13 @@ sub getGroupSID {
         # Si nouvelle génération du SID
         if( !$OBM::Parameters::common::sambaOldSidMapping ) {
             $groupSID = $domainSid."-".$groupGID;
+            last SWITCH;
         }
 
         # Si ancienne génération du SID
         if( $OBM::Parameters::common::sambaOldSidMapping ) {
             $groupSID = $domainSid."-".(2*$groupGID+1001);
+            last SWITCH;
         }
 
         $groupSID = undef;

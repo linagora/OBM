@@ -133,9 +133,9 @@ sub getEntity {
     $self->{groupDbDesc} = $dbGroupDesc;
 
     if( $self->getDelete() ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: suppression du groupe : '".$dbGroupDesc->{group_name}."', domaine '".$domainDesc->{domain_label}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmGroup]: suppression du groupe : ".$self->getEntityDescription(), "W" );
     }else {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: gestion du groupe : '".$dbGroupDesc->{group_name}."', domaine '".$domainDesc->{domain_label}."'", "W" );
+        &OBM::toolBox::write_log( "[Entities::obmGroup]: gestion du groupe : ".$self->getEntityDescription(), "W" );
     }
 
     # On range les resultats calculés dans la structure de donnees dédiée
@@ -161,10 +161,13 @@ sub getEntity {
     if( $OBM::Parameters::common::obmModules->{samba} && $dbGroupDesc->{group_samba} ) {
         $self->{groupDesc}->{group_samba} = 1;
         $self->{groupDesc}->{group_samba_sid} = &OBM::Samba::utils::getGroupSID( $domainDesc->{domain_samba_sid}, $dbGroupDesc->{group_gid} );
-
-        $self->{groupDesc}->{group_samba_type} = 2;
-
-        $self->{groupDesc}->{group_samba_name} = $dbGroupDesc->{group_name};
+        if( !defined($self->{groupDesc}->{group_samba_sid}) ) {
+            &OBM::toolBox::write_log( "[Entities::obmGroup]: annulation du droit Samba du groupe : " .$self->getEntityDescription()." - SID non definit", "W" );
+            $self->{groupDesc}->{group_samba} = 0;
+        }else {
+            $self->{groupDesc}->{group_samba_type} = 2;
+            $self->{groupDesc}->{group_samba_name} = $dbGroupDesc->{group_name};
+        }
     }else {
         $self->{groupDesc}->{group_samba} = 0;
     }
