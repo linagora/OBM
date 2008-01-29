@@ -575,8 +575,9 @@ function run_query_organizationalchart_get_leaves($node_id, $reset) {
 }
 
 
-
-
+///////////////////////////////////////////////////////////////////////////////
+// Generate LDIF from OrganizationalChart 
+///////////////////////////////////////////////////////////////////////////////
 function export_ldif($node_q, $ou_arr=array()) {
   global $obm, $organization, $units, $persons;
   global $php_regexp_login;
@@ -704,11 +705,13 @@ function export_ldif($node_q, $ou_arr=array()) {
               foreach($ldif_attributes[$k_ldif] as $key) {
                 $cn .= $one_user[$key]." ";
               }
-              if (contains_ascii($cn)) {
-                $cn = base64_encode($cn);
-                $person .= "$k_ldif:: $cn$eol";                                
-              } else {
-                $person .= "$k_ldif: $cn$eol";              
+              if (!empty($cn)) {
+                if (contains_ascii($cn)) {
+                  $cn = base64_encode($cn);
+                  $person .= "$k_ldif:: $cn$eol";                                
+                } else {
+                  $person .= "$k_ldif: $cn$eol";              
+                }
               }
               break;
             case "displayName":
@@ -716,11 +719,13 @@ function export_ldif($node_q, $ou_arr=array()) {
               foreach($ldif_attributes[$k_ldif] as $key) {
                 $displayName .= $one_user[$key]." ";
               }
-              if (contains_ascii($displayName)) {
-                $displayName = base64_encode($displayName);
-                $person .= "$k_ldif:: $displayName$eol";
-              } else {
-                $person .= "$k_ldif: $displayName$eol";
+              if (!empty($displayName)) {
+                if (contains_ascii($displayName)) {
+                  $displayName = base64_encode($displayName);
+                  $person .= "$k_ldif:: $displayName$eol";
+                } else {
+                  $person .= "$k_ldif: $displayName$eol";
+                }
               }
               break;
             case "mail":
@@ -734,18 +739,18 @@ function export_ldif($node_q, $ou_arr=array()) {
                   } else {
                     $person .= "$k_ldif: $mail$eol";              
                   }
-                } else {
-                  $person .= "$k_ldif:$eol";
-                }
+                } 
               }
               break;
             default:
               $val = $one_user[$k_obm];
-              if (contains_ascii($val)) {
-                $val = base64_encode($val);
-                $person .= "$k_ldif:: $val$eol";                                
-              } else {
-                $person .= "$k_ldif: $val$eol";                
+              if (!empty($val)) {
+                if (contains_ascii($val)) {
+                  $val = base64_encode($val);
+                  $person .= "$k_ldif:: $val$eol";                                
+                } else {
+                  $person .= "$k_ldif: $val$eol";                
+                }
               }
               break;
           }
