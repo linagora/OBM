@@ -24,6 +24,7 @@ import com.funambol.framework.engine.SyncItemState;
 import com.funambol.framework.engine.source.SyncContext;
 import com.funambol.framework.engine.source.SyncSource;
 import com.funambol.framework.engine.source.SyncSourceException;
+import com.funambol.framework.protocol.SyncInitialization;
 import com.funambol.framework.tools.Base64;
 
 import fr.aliasource.funambol.OBMException;
@@ -80,10 +81,17 @@ public class CalendarSyncSource extends ObmSyncSource {
 			throw new SyncSourceException(e);
 		}
 
-		logger.info(" created with id : "
+		if (created == null) {
+			logger.warn("Sending faked syncitem to PDA, we skipped this event");
+			syncItem.setState(SyncItemState.SYNCHRONIZED);
+			return syncItem;
+		} else {
+			logger.info(" created with id : "
 					+ created.getCalendarContent().getUid()
 							.getPropertyValueAsString());
-		return getSyncItemFromFoundation(created, SyncItemState.SYNCHRONIZED);
+			return getSyncItemFromFoundation(created,
+					SyncItemState.SYNCHRONIZED);
+		}
 	}
 
 	/*
@@ -216,7 +224,12 @@ public class CalendarSyncSource extends ObmSyncSource {
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
-
+		
+		if (event == null) {
+			logger.warn("Sending faked syncitem to PDA, we skipped this event");
+			syncItem.setState(SyncItemState.SYNCHRONIZED);
+			return syncItem;
+		}
 		return getSyncItemFromFoundation(event, SyncItemState.SYNCHRONIZED);
 	}
 
@@ -226,7 +239,8 @@ public class CalendarSyncSource extends ObmSyncSource {
 	public SyncItem getSyncItemFromId(SyncItemKey syncItemKey)
 			throws SyncSourceException {
 
-		logger.info("getSyncItemFromId(" + principal + ", " + syncItemKey
+		logger
+				.info("getSyncItemFromId(" + principal + ", " + syncItemKey
 						+ ")");
 
 		String key = syncItemKey.getKeyAsString();

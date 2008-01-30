@@ -218,18 +218,21 @@ public class CalendarManager extends ObmManager {
 			throw new OBMException(e.getMessage());
 		}
 
-		return obmEventToFoundationCalendar(c, type);
+		if (c == null) {
+			return null;
+		} else {
+			return obmEventToFoundationCalendar(c, type);
+		}
 	}
 
 	public com.funambol.common.pim.calendar.Calendar addItem(
 			com.funambol.common.pim.calendar.Calendar event, String type)
 			throws OBMException {
 
-		String uid = null;
 		Event evt = null;
 
 		try {
-			uid = binding.createEvent(token, calendar,
+			String uid = binding.createEvent(token, calendar,
 					foundationCalendarToObmEvent(event, type));
 			evt = binding.findEvent(token, calendar, uid);
 		} catch (AuthFault e) {
@@ -240,7 +243,11 @@ public class CalendarManager extends ObmManager {
 			throw new OBMException(e.getMessage());
 		}
 
-		return obmEventToFoundationCalendar(evt, type);
+		if (evt == null) {
+			return null;
+		} else {
+			return obmEventToFoundationCalendar(evt, type);
+		}
 	}
 
 	public String[] getEventTwinKeys(
@@ -253,6 +260,9 @@ public class CalendarManager extends ObmManager {
 
 		// log.info(" look twin of :
 		// "+c.getFirstName()+","+c.getLastName()+","+c.getCompany());
+		if (evt == null) {
+			return new String[0];
+		}
 
 		try {
 			evt.setUid(null);
@@ -428,9 +438,23 @@ public class CalendarManager extends ObmManager {
 	private Event foundationCalendarToObmEvent(
 			com.funambol.common.pim.calendar.Calendar calendar, String type) {
 
-		Event event = new Event();
 		com.funambol.common.pim.calendar.Event foundation = calendar.getEvent();
 
+		if (foundation != null) {
+			Event event = fillObmEventWithVEvent(calendar, foundation);
+			return event;
+		} else {
+			logger
+					.warn("Received ICalendar does not contain a VEVENT, VTODO ?");
+			return null;
+		}
+
+	}
+
+	private Event fillObmEventWithVEvent(
+			com.funambol.common.pim.calendar.Calendar calendar,
+			com.funambol.common.pim.calendar.Event foundation) {
+		Event event = new Event();
 		if (foundation.getUid() != null
 				&& foundation.getUid().getPropertyValueAsString() != "") {
 			event.setUid(foundation.getUid().getPropertyValueAsString());
@@ -464,7 +488,8 @@ public class CalendarManager extends ObmManager {
 
 		if (dend.getTime() != dstart.getTime()) {
 			int fix = 0;
-			// le rdv s'affiche sur 1 jour de plus dans obm si la duration fait
+			// le rdv s'affiche sur 1 jour de plus dans obm si la duration
+			// fait
 			// tomber la date de fin sur minuit
 			if (foundation.isAllDay()
 					&& ((dend.getTime() - dstart.getTime()) % 86400) == 0) {
@@ -524,7 +549,6 @@ public class CalendarManager extends ObmManager {
 			recurrence.setFrequence(1);
 		}
 		event.setRecurrence(recurrence);
-
 		return event;
 	}
 

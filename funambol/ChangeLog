@@ -1,3 +1,18 @@
+2008-01-30  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Symbian sends vtodo during calendar sync... skip them
+	
+	* build/build_deploy_vm.sh:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.addSyncItem),
+	(CalendarSyncSource.updateSyncItem),
+	(CalendarSyncSource.getSyncItemFromId):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.updateItem), (CalendarManager.addItem),
+	(CalendarManager.getEventTwinKeys),
+	(CalendarManager.foundationCalendarToObmEvent), (CalendarManager),
+	(CalendarManager.fillObmEventWithVEvent):
+
 2007-12-17  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	rm remaining printStackTrace in recurrence handling
