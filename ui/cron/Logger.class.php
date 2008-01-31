@@ -47,9 +47,9 @@ class Logger {
 
   // TODO set log handler
   function log($message,$level, $caller) {
-    if($level <= L_LEVEL) {
-      echo date("Y-m-d H:i:s")." [".Logger::getLevelLabel($level)."] [$caller] : $message \n";
-    }
+    //if($level <= L_LEVEL) {
+    //  echo date("Y-m-d H:i:s")." [".Logger::getLevelLabel($level)."] [$caller] : $message \n";
+    //}
   }
 
   function getLevelLabel($level) {
@@ -84,7 +84,7 @@ function errorHandler($code, $message, $file, $line) {
       Logger::log("$message in $file at $line",L_CRITICAL, $file);
       break;
     case E_NOTICE:
-      Logger::log("$message in $file at $line", L_DEBUG,$file);
+      Logger::log("$message in $file at $line", L_CORE,$file);
       break;     
     case E_STRICT:
       Logger::log("$message in $file at $line", L_DEBUG, $file);

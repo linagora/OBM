@@ -114,6 +114,10 @@ class Cron {
       foreach($this->jobs as $job) {
         if($job->mustExecute($this->date)) {
           $this->logger->info(get_class($job)." will be executed");
+          $files = $job->getJobsFiles();
+          foreach($files as $file) {
+            include_once($file);
+          }
           $job->execute($this->date); 
         }
       }

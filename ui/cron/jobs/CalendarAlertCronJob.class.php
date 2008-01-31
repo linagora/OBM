@@ -1,6 +1,4 @@
 <?php
-include_once("obminclude/lang/fr/calendar.inc");
-include_once("php/calendar/calendar_query.inc");
 include_once("CronJob.class.php");
 
 /**
@@ -31,6 +29,16 @@ class CalendarAlertCronJob extends CronJob{
   }
 
   /**
+   * getJobsFiles 
+   * 
+   * @access public
+   * @return void
+   */
+  function getJobsFiles() {
+    return array('php/calendar/calendar_query.inc');
+  }
+
+  /**
    * execute 
    * 
    * @param mixed $date 
@@ -38,6 +46,7 @@ class CalendarAlertCronJob extends CronJob{
    * @return void
    */
   function execute($date) {
+    include_once('obminclude/lang/fr/calendar.inc');
     $delta = $this->jobDelta - 1;
     $this->getAlerts($date, $date + $delta);
 
@@ -52,12 +61,14 @@ class CalendarAlertCronJob extends CronJob{
       $consult_link = "$GLOBALS[cgp_host]/calendar/calendar_index.php?action=detailconsult&calendar_id=".$event->id;
       
       $events[$event->id] = array (
-        "subject" => sprintf($GLOBALS['l_alert_mail_subject'],addslashes($event->title)),
+        "subject" => sprintf($l_alert_mail_subject,addslashes($event->title)),
         "message" => sprintf($l_alert_mail_body,
                         addslashes($event->title), 
                         date('d/m/Y H:i',$occurrence->date + $delta), 
+                        date('d/m/Y H:i',$occurrence->date + $delta + $event->duration), 
                         ($delta/60),
-                        $event->id,
+                        $event->location,
+                        $consult_link,
                         of_date_format(), date("H:i")
                         ,$GLOBALS['cgp_host']
                      ),
@@ -151,6 +162,7 @@ class CalendarAlertCronJob extends CronJob{
       $priority = $nr_q->f("calendarevent_priority");
       $date = $nr_q->f("calendarevent_date");
       $duration = $nr_q->f("calendarevent_duration");
+      $state = $nr_q->f("evententity_state");
       $all_day = $nr_q->f("calendarevent_allday");
       $entity = $nr_q->f("evententity_entity");
       $entity_id = $nr_q->f("evententity_entity_id");
@@ -161,7 +173,7 @@ class CalendarAlertCronJob extends CronJob{
         $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$color);
       }
       $this->logger->debug("$entity $entity_id ($entity_label) added on event ".$event->id);
-      $event->addAttendee($entity,$entity_id,$entity_label);
+      $event->addAttendee($entity,$entity_id,$entity_label,$state);
       $of->addOccurrence($event, $date, $entity, $entity_id);
     }    
   }
@@ -197,6 +209,7 @@ class CalendarAlertCronJob extends CronJob{
       $entity = $r_q->f("evententity_entity");
       $entity_id = $r_q->f("evententity_entity_id");    
       $entity_label = $r_q->f("userobm_lastname") ." ".$r_q->f("userobm_firstname");
+      $state = $nr_q->f("evententity_state");
       $all_day = $r_q->f("calendarevent_allday");       
       $owner = $r_q->f("calendarevent_owner");
       if (!$endrepeat) {
@@ -208,7 +221,7 @@ class CalendarAlertCronJob extends CronJob{
         $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$color);
       }
       $this->logger->debug("$entity $entity_id ($entity_label) added on event ".$event->id);
-      $event->add_attendee($entity,$entity_id,$entity_label);      
+      $event->addAttendee($entity,$entity_id,$entity_label,$state);      
       $event_start =  $start_time ;
       $delta = date("H",$date) * 3600 + date("i",$date) * 60 + date("s",$date) + $duration;
       $delta = floor($delta/$day_duration);
@@ -289,6 +302,7 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       calendarevent_owner,
       evententity_entity_id,
       evententity_entity,
+      evententity_state,
       $calendarevent_date_l - calendaralert_duration as calendarevent_date,
       calendaralert_duration,
       calendarevent_duration,
@@ -345,6 +359,7 @@ function run_query_calendar_repeat_alerts($start, $end) {
       calendarevent_owner,
       evententity_entity,
       evententity_entity_id,
+      evententity_state,
       calendarevent_repeatdays,
       calendarevent_allday,
       userobm_lastname,

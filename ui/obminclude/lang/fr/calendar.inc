@@ -351,7 +351,7 @@ $l_alert_mail_body =
 RENDEZ-VOUS IMMINENT
 ------------------------------------------------------------------
 
-L'événement %s aura lieu à %s %s soit dans %s minutes (lieu : %s).
+L'événement %s aura lieu de %s à %s soit dans %s minutes (lieu : %s).
 
 :: Pour plus de détails sur l'événement : %s
 

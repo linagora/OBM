@@ -19,5 +19,9 @@ class CronJob {
   function dependsOn() {
     return array();
   }
+
+  function getJobsFiles() {
+    return array();
+  }
 }
 ?>

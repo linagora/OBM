@@ -1,5 +1,4 @@
 <?php
-include_once('php/vacation/vacation_query.inc');
 include_once('CronJob.class.php');
 
 class VacationCronJob extends CronJob{
@@ -21,6 +20,16 @@ class VacationCronJob extends CronJob{
     } else {
       return false;
     }
+  }
+
+  /**
+   * getJobsFiles 
+   * 
+   * @access public
+   * @return void
+   */
+  function getJobsFiles() {
+    return array('php/vacation/vacation_query.inc');
   }
 
   /**
