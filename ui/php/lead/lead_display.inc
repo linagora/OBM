@@ -462,6 +462,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
     $contact_id = $l_q->f('lead_contact_id');
     $contact_lname = $l_q->f('contact_lastname');
     $contact_fname = $l_q->f('contact_firstname');
+    $contact_name = "$contact_lname $contact_fname";
     $name = $l_q->f('lead_name');
     $date = $l_q->f('date');
     $dis_date = of_date_format($date);
