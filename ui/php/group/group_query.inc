@@ -38,8 +38,8 @@ function run_query_group_search($group) {
   $where = "group_name $like '$name%'";
   if ($user != '') {
     $join_user = "
-      LEFT JOIN UserObmGroup ON group_id=UserObmGroup_group_id
-      LEFT JOIN UserObm as C ON UserObmGroup.userobmgroup_userobm_id=C.userobm_id";
+      LEFT JOIN of_usergroup as D ON D.of_usergroup_group_id=group_id
+      LEFT JOIN UserObm as C ON D.of_usergroup_user_id = C.userobm_id";
     $where .= " AND C.userobm_lastname $like '$user%'";
   }
   // If a delegation indication has been specified, get it
@@ -63,16 +63,53 @@ function run_query_group_search($group) {
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "group_name";
   $orderq .= " ORDER BY $order $sql_order_dir";
 
-  $query = "SELECT DISTINCT UGroup.*, group_id as id,
+  $query = "SELECT  
+      group_id as id,
+      group_id,
+      group_domain_id,
+      group_system,
+      group_privacy,
+      group_local,
+      group_ext_id,
+      group_samba,
+      group_gid,
+      group_mailing,
+      group_delegation,
+      group_manager_id,
+      group_name,
+      group_desc,
+      group_email,
+      group_contacts,
       $timecreate,
       $timeupdate,
       A.userobm_login as usercreate,
-      B.userobm_login as userupdate
+      B.userobm_login as userupdate,
+      count(usergroup.of_usergroup_user_id) as group_nb_user
     FROM UGroup
-      $join_user
+      LEFT JOIN of_usergroup usergroup ON of_usergroup_group_id=group_id
       LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
+      $join_user
     $whereq
+    GROUP BY group_id,
+      group_domain_id,
+      group_system,
+      group_privacy,
+      group_local,
+      group_ext_id,
+      group_samba,
+      group_gid,
+      group_mailing,
+      group_delegation,
+      group_manager_id,
+      group_name,
+      group_desc,
+      group_email,
+      group_contacts,
+      timecreate,
+      timeupdate,
+      usercreate,
+      userupdate
     $orderq
     $limit";
 

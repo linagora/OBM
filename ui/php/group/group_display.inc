@@ -105,12 +105,6 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == 'group_nb_user') {
-    $nb_q = new DB_OBM;
-    $id = $OD->data_set->f('group_id');
-    $query = "SELECT count(*) FROM UserObmGroup WHERE userobmgroup_group_id='$id'";
-    $nb_q->query($query);
-    $nb_q->next_record();
-    $res['name'] = $nb_q->f(0);
     $res['align'] = 'center';
   }
 
@@ -316,8 +310,9 @@ function html_group_search_group($obm_q, $prefs, $group) {
   $name = urlencode(stripslashes($group['name']));
   $delegation = urlencode(stripslashes($group['delegation']));
   $user = urlencode(stripslashes($group['user']));
+  $privacy = $group["privacy"];
 
-  $url = url_prepare("group_index.php?action=search&amp;tf_name=$name&amp;tf_user=$user&amp;tf_delegation=$delegation$url_ext");
+  $url = url_prepare("group_index.php?action=search&amp;tf_name=$name&amp;tf_user=$user&amp;tf_delegation=$delegation&amp;privacy=$privacy$url_ext");
   
   $dis_group = new OBM_DISPLAY('DATA', $prefs, 'group');
   if ($popup) {
@@ -667,6 +662,11 @@ function html_group_form($action, $group_q, $group, $field='') {
     $class[$field] = 'error';
   }
 
+  // Mailing checkbox
+  if ($mailing == '1') {
+    $mailing_c = ' checked';
+  }
+
   $block_userdata = of_userdata_dis_entity_form('group', $id, $group);
 
   $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
@@ -680,9 +680,6 @@ function html_group_form($action, $group_q, $group, $field='') {
       if ($priv == '1') {
 	$private_c = ' checked';
 	$mail_class = 'H';
-      }
-      if ($mailing == '1') {
-	$mailing_c = ' checked';
       }
       $dis_private = "
     <script type=\"text/javascript\">
