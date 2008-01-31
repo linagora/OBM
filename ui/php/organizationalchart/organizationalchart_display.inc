@@ -785,17 +785,20 @@ function dis_organizationalchart_userdetail() {
  * @return void
  */
 function organizationalchart_json_event($usr_q) {
-  global $display, $obm, $cgp;
+  global $display, $obm, $cgp_use;
 
   $userobm_email = $usr_q->f("userobm_email");
   $email = "";
+
   if ($cgp_use["service"]["mail"] && !empty($userobm_email)) {
     $main_domain = $obm["domain_name"];
     $emails = explode("\n",$userobm_email);
     $email = trim($emails[0])."@$main_domain";
   } else {
-    $email = $userobm_email;
+    $emails = explode("\n",$userobm_email);
+    $email = trim($emails[0]);
   }
+
   if (strlen($email) > 30 ) {
     $email = substr($email, 0, 30)."...";
   }
