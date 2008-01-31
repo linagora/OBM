@@ -887,6 +887,9 @@ function run_query_icalendar_insert($params) {
     if(empty($sel_entity_id['user'])) {
       $sel_entity_id['user'][] = $obm['uid'] ;
     }
+    if(!$properties['repeatfrequency'] || $properties['repeatfrequency'] == '0') {
+      $properties['repeatfrequency'] = 1;
+    }
     run_query_calendar_add_event($properties, $sel_entity_id, &$event_id) ;
     $nb_processed_event++ ;
   }
