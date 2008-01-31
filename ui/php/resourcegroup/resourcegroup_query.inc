@@ -42,8 +42,8 @@ function run_query_resourcegroup_search($group) {
 
   if ($resource != '') {
     $join_resource = "
-      LEFT JOIN ResourceGroup ON rgroup_id=ResourceGroup_rgroup_id
-      LEFT JOIN Resource as C ON ResourceGroup.resourcegroup_resource_id=C.resource_id";
+      LEFT JOIN ResourceGroup as D ON rgroup_id=D.ResourceGroup_rgroup_id
+      LEFT JOIN Resource as C ON D.resourcegroup_resource_id=C.resource_id";
     $where .= " and C.resource_name $like '$resource%'";
   }
   // only the one which are allowed (ie. publics )
@@ -55,16 +55,34 @@ function run_query_resourcegroup_search($group) {
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "rgroup_name";
   $orderq .= " order by $order $sql_order_dir";
 
-  $query = "select distinct RGroup.*, rgroup_id as id,
+  $query = "select
+      rgroup_id as id,
+      rgroup_id,
+      rgroup_domain_id,
+      rgroup_privacy,
+      rgroup_name,
+      rgroup_desc,
       $timecreate,
       $timeupdate,
       A.userobm_login as usercreate,
-      B.userobm_login as userupdate
+      B.userobm_login as userupdate,
+      count(rg.resourcegroup_resource_id) as rgroup_nb_resource
     from RGroup
       $join_resource
+      LEFT JOIN ResourceGroup as rg ON rgroup_id=rg.ResourceGroup_rgroup_id      
       LEFT JOIN UserObm as A ON RGroup.rgroup_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON RGroup.rgroup_userupdate=B.userobm_id
     $whereq 
+    GROUP BY
+      rgroup_id,
+      rgroup_domain_id,
+      rgroup_privacy,
+      rgroup_name,
+      rgroup_desc,
+      timecreate,
+      timeupdate,
+      usercreate,
+      userupdate
     $orderq
     $limit";
 

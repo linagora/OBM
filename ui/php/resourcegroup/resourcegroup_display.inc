@@ -54,12 +54,6 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
     $res["name"] = "<span id=\"data-resourcegroup-".$OD->data_set->f("rgroup_id")."\" style=\"display:none;\">".
     $OD->data_set->f("rgroup_name")."</span>";
   } else if ($fieldname == "rgroup_nb_resource") {
-    $nb_q = new DB_OBM;
-    $id = $OD->data_set->f("rgroup_id");
-    $query = "select count(*) from ResourceGroup where resourcegroup_rgroup_id='$id'";
-    $nb_q->query($query);
-    $nb_q->next_record();
-    $res["name"] = $nb_q->f(0);
     $res["align"] = "center";
   }
   // For RGroup resource lists
