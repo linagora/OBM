@@ -14,8 +14,13 @@ class VacationCronJob extends CronJob{
    * @return void
    */
   function mustExecute($date) {
-    $min = date('i');
-    return ($min%15 === 0);
+    global $cgp_use;
+    if ($cgp_use["service"]["mail"]) {
+      $min = date('i');
+      return ($min%15 === 0);
+    } else {
+      return false;
+    }
   }
 
   /**

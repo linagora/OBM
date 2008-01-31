@@ -4288,7 +4288,8 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   if ($mail_datas['update_decision']) {
     $mail_datas['mails']['update_decision'] = array (
       'subject' => sprintf($l_update_state_mail_subject,$title),
-      'message' => sprintf($l_update_state_mail_body,$entity,$title,$decision,$consult_link, 
+      'message' => sprintf($l_update_state_mail_body,$userinfo["firstname"],$userinfo["lastname"],
+                           $title,$decision,$consult_link, 
                            of_date_format(), date("H:i"), $userinfo["firstname"],
                            $userinfo["lastname"],$cgp_host),
       'recipients' => $attendees

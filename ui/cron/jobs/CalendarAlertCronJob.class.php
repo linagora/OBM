@@ -139,7 +139,7 @@ class CalendarAlertCronJob extends CronJob{
     $of = &OccurrenceFactory::getInstance();
     $day_duration = 86400;
     $this->logger->debug("Getting alerts on non-reccurent events between ".date("Y-m-d H:i:s",$start_time)." and ".date("Y-m-d H:i:s",$end_time));
-    $nr_q = run_query_calendar_no_repeat_alerts($start_time,$end_time,$calendar_entity);
+    $nr_q = run_query_calendar_no_repeat_alerts($start_time,$end_time);
     $this->logger->debug($nr_q->nf()." potentials alerts founded on non-reccurent event");
     while ($nr_q->next_record()) {
       $id = $nr_q->f("calendarevent_id");
@@ -161,7 +161,7 @@ class CalendarAlertCronJob extends CronJob{
         $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$color);
       }
       $this->logger->debug("$entity $entity_id ($entity_label) added on event ".$event->id);
-      $event->add_attendee($entity,$entity_id,$entity_label);
+      $event->addAttendee($entity,$entity_id,$entity_label);
       $of->addOccurrence($event, $date, $entity, $entity_id);
     }    
   }

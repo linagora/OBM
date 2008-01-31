@@ -47,9 +47,9 @@ class Logger {
 
   // TODO set log handler
   function log($message,$level, $caller) {
-//    if($level <= L_LEVEL) {
-//      echo date("Y-m-d H:i:s")." [".Logger::getLevelLabel($level)."] [$caller] : $message \n";
-//    }
+    if($level <= L_LEVEL) {
+      echo date("Y-m-d H:i:s")." [".Logger::getLevelLabel($level)."] [$caller] : $message \n";
+    }
   }
 
   function getLevelLabel($level) {
