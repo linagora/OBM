@@ -61,7 +61,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
     } else if ($OD->display_ext == "get_id_url") {
       $res["url"] = "javascript:check_user_get_id_url('$ext_url',".$OD->data_set->f("userobm_id").");";
     } else {
-      if ($link_ok)
+      if ($link_ok && $perm->check_right($module, $cright_read_admin))
         $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
     }
   }
