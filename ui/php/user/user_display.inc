@@ -50,7 +50,7 @@ $fieldnames["userobm_description"] = $l_desc;
 function dis_user_data(&$OD, $fieldname, $link_ok) {
   global $path,  $ico_mail, $params,$obm,$cgp_use;
   global $l_enabled, $l_disabled, $l_forbidden, $l_perms;
-  global $perm, $cright_write_admin, $module;
+  global $perm, $cright_write_admin, $module, $cright_read_admin;
 
   $ext_url = $params["ext_url"];
   $ext_element = $params["ext_element"];
