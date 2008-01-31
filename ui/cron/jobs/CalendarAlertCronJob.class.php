@@ -46,6 +46,8 @@ class CalendarAlertCronJob extends CronJob{
    * @return void
    */
   function execute($date) {
+    global $obm;
+
     include_once('obminclude/lang/fr/calendar.inc');
     $delta = $this->jobDelta - 1;
     $this->getAlerts($date, $date + $delta);
@@ -59,7 +61,7 @@ class CalendarAlertCronJob extends CronJob{
       
       $this->logger->debug("Alert for event ".$event->id." will be sent");
       $consult_link = "$GLOBALS[cgp_host]/calendar/calendar_index.php?action=detailconsult&calendar_id=".$event->id;
-      
+       
       $events[$event->id] = array (
         "subject" => sprintf($l_alert_mail_subject,addslashes($event->title)),
         "message" => sprintf($l_alert_mail_body,
