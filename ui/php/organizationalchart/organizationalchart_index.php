@@ -200,7 +200,7 @@ function get_organizationalchart_params() {
 function get_organizationalchart_action() {
   global $params, $actions, $path;
   global $l_header_find, $l_header_new, $l_header_display, $l_header_consult;
-  global $l_header_update, $l_header_delete, $l_export;
+  global $l_header_update, $l_header_delete, $l_ldif_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   $id = $params["organizationalchart_id"];
@@ -260,7 +260,7 @@ function get_organizationalchart_action() {
 
   // Ldif export
     $actions["organizationalchart"]["export_ldif"]  = array (
-      'Name'     => $l_export,
+      'Name'     => $l_ldif_export,
       'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=export_ldif&amp;organizationalchart_id=$id",
       'Right'    => $cright_read,
       'Condition'=> array ('detailconsult', 'insert', 'update') );
