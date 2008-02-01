@@ -612,7 +612,12 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
       AND entityright_entity = '$entity'";
   display_debug_msg($query, $cdg_sql, "of_right_update_right(1)");
   $obm_q->query($query);
-	
+  if ($public_read) {
+    $accept_read = array();
+  }
+  if( $public_write) {
+    $accept_write = array();
+  }
   if ($public_read || $public_write) {
     $pr = ($public_read ? 1 : 0);
     $pw = ($public_write ? 1 : 0);
