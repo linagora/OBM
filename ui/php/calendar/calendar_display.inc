@@ -1924,7 +1924,6 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $attendees[] = "{label:'".$label_entity."', entities:['".implode("','",$ent)."']}"; 
   }
   $ed[] = "attendees:[".implode(',',$attendees)."]";
-
   switch($unit)  {
     case "day" :
       $day = true;
@@ -1935,7 +1934,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     case "hour" :
       $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
       $day = $day || (date('H',$date) <  $ccalendar_first_hour);
-      $day = $day || (date('H',$date) >  $ccalendar_last_hour );
+      $day = $day || (date('H',$date) >=  $ccalendar_last_hour );
       if($updatable) {
         $options[] = "draggable:true"; 
         $options[] = "resizable:true"; 
@@ -4599,13 +4598,13 @@ function json_event_data($id,$calendar) {
     case "day" :
       $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
       $day = $day || (date('H',$date + $duration) < $ccalendar_first_hour);
-      $day = $day || (date('H',$date) > $ccalendar_last_hour );
+      $day = $day || (date('H',$date) >= $ccalendar_last_hour );
       $options = array(); 
       break;
     case "week" :
       $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
       $day = $day || (date('H',$date + $duration) < $ccalendar_first_hour);
-      $day = $day || (date('H',$date) > $ccalendar_last_hour );
+      $day = $day || (date('H',$date) >= $ccalendar_last_hour );
       $options = array();
       break;
     case "month" :
