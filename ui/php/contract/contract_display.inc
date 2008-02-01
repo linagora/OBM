@@ -955,22 +955,26 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
   // Marketing manager select
   $sel_market = "<select name=\"sel_market\">
     <option value=\"$c_undef\">$l_undef</option>";
-  foreach ($users_c as $u_id => $one_user) {
-    $sel_market .= "\n<option value=\"$u_id\"";
-    if ($u_id == $market_id) 
-      $sel_market .= " selected=\"selected\"";
-    $sel_market .= '>'. $one_user['lastname'].' '.$one_user['firstname'].'</option>';
+  if (is_array($users_c)) {
+    foreach ($users_c as $u_id => $one_user) {
+      $sel_market .= "\n<option value=\"$u_id\"";
+      if ($u_id == $market_id) 
+        $sel_market .= " selected=\"selected\"";
+      $sel_market .= '>'. $one_user['lastname'].' '.$one_user['firstname'].'</option>';
+    }
   }
   $sel_market.="</select>";
  
   // Technical manager select
   $sel_tech = "<select name=\"sel_tech\">
     <option value=\"$c_undef\">$l_undef</option>";
-  foreach ($users_p as $u_id => $one_user) {
-    $sel_tech .= "\n<option value=\"$u_id\"";
-   if ($u_id == $tech) 
-      $sel_tech.=" selected=\"selected\"";
-   $sel_tech .= '>'. $one_user['lastname'].' '.$one_user['firstname'].'</option>';
+  if (is_array($users_p)) {
+    foreach ($users_p as $u_id => $one_user) {
+     $sel_tech .= "\n<option value=\"$u_id\"";
+     if ($u_id == $tech) 
+        $sel_tech.=" selected=\"selected\"";
+     $sel_tech .= '>'. $one_user['lastname'].' '.$one_user['firstname'].'</option>';
+    }
   }
   $sel_tech .= "</select>";
 
@@ -1081,14 +1085,16 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
 
   // User comment select construction
   $sel_usercomment = "<select name=\"sel_usercomment\">";
-  foreach($users_c as $u_id => $one_user) {
-    $cname = $one_user['lastname'].' '.$one_user['firstname'];
-    $sel_usercomment .= "<option value=\"$cname\"";
-    // First time default to uid of connected user (uid) then set to name
-    if ( ($usercomment == $u_id) || ($usercomment == $cname) ) {
-      $sel_usercomment .= " selected = \"selected\"";
+  if (is_array($users_c)) {
+    foreach($users_c as $u_id => $one_user) {
+      $cname = $one_user['lastname'].' '.$one_user['firstname'];
+      $sel_usercomment .= "<option value=\"$cname\"";
+      // First time default to uid of connected user (uid) then set to name
+      if ( ($usercomment == $u_id) || ($usercomment == $cname) ) {
+        $sel_usercomment .= " selected = \"selected\"";
+      }
+      $sel_usercomment .= ">$cname</option>\n";
     }
-    $sel_usercomment .= ">$cname</option>\n";
   }
   $sel_usercomment .= "</select>";
 

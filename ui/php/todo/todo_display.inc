@@ -127,8 +127,10 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
     "\" onsubmit=\"if (confirm_del()) return true; else return false\" >";
 
   $todo_d->data_form_end = "
+  <fieldset class=\"buttons\">
       <input type=\"hidden\" name=\"action\" value=\"delete\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_delete\" />
+  </fieldset>
   </form>";
 
   $block .= $todo_d->display("dis_data_todo");
