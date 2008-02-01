@@ -174,7 +174,7 @@ function dis_logout_detail() {
 function dis_calendar_portal() {
   global $ico_big_calendar,$path;
   global $l_module_calendar,$l_daysofweekfirst,$l_my_calendar,$l_waiting_events;
-  global $obm, $ccalendar_weekstart, $day_duration;
+  global $obm, $ccalendar_weekstart, $day_duration, $modules;
 
   $obm_q = run_query_calendar_waiting_events() ;
   $num = $obm_q->num_rows();
@@ -252,7 +252,7 @@ function dis_calendar_portal() {
    </tbody>
    </table>  
    $num $l_waiting_events
-   <a class=\"link\" href=\"$path/calendar/calendar_index.php\">$l_my_calendar</a>
+   <a class=\"link\" href=\"".$modules["calendar"]["Url"]."\">$l_my_calendar</a>
   </div>
 ";
 

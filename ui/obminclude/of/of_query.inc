@@ -1329,7 +1329,7 @@ function run_query_user_pref_update($user_id, $option, $value) {
 // This must be called in an open session (between page_open and page_close )
 ///////////////////////////////////////////////////////////////////////////////
 function session_load_user_prefs() {
-  global $obm, $last_v;
+  global $obm, $last_v,$ccalendar_last_hour,$ccalendar_first_hour;
 
   // We reset $last_v in case of session persistence (changing user)
   $last_v = array();
@@ -1357,6 +1357,13 @@ function session_load_user_prefs() {
   }
 
   $_SESSION['last_v'] = $last_v;
+  if (isset($_SESSION['set_cal_first_hour'])) {
+   $_SESSION['set_cal_first_hour'] = $ccalendar_first_hour;
+  }
+  if (isset($_SESSION['set_cal_last_hour'])) {
+    $_SESSION['set_cal_last_hour'] = $ccalendar_last_hour;
+  }
+  
 }
 
 
