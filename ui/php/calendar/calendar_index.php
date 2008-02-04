@@ -218,6 +218,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
+  $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
   $entities['group'] = $params['sel_group_id'];
   $entities['user'] = $params['sel_user_id'];
   $entities['task'] = $params['sel_task_id'];
@@ -277,6 +278,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
+  $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
   $entities['group'] = $params['sel_group_id'];
   $entities['user'] = $params['sel_user_id'];
   $entities['task'] = $params['sel_task_id'];

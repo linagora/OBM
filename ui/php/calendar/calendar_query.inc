@@ -400,7 +400,10 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
     $users_array = array_merge($users_array, $user_group_array);
     $users_array = array_unique($users_array);
   }
-  if (! is_array($users_array)) {
+  
+  $resources_array = $sel_entity_id['resource'];
+  
+  if (!is_array($resources_array) && !is_array($users_array)) {
     $users_array = array($obm["uid"]);
   }
 
@@ -425,7 +428,6 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
   $resources_writable = array(); // Writable Resources  
   $resources_address = array(); // Resource Admin notification
   // Get the final resource list and insert resource links
-  $resources_array = $sel_entity_id['resource'];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
     $writable_res = of_right_entity_for_user('Resource', $obm['uid'], 'write');
@@ -1341,9 +1343,6 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
     $users_array = array_merge($users_array,$user_group_array);
     $users_array = array_unique($users_array);
   }
-  if (! is_array($users_array)) {
-    $users_array = array($obm["uid"]);
-  }
 
   // Get the final resource list
   $resources_array = $sel_entity_id['resource'];
@@ -1353,6 +1352,11 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
   } else {
     $resources_array = array();
   }
+
+  if (!is_array($resources_array) && !is_array($users_array)) {
+    $users_array = array($obm["uid"]);
+  }
+
   $event_data = run_query_calendar_detail($event_id);
   $old_begin = of_isodate_format($event_data->f('calendarevent_date'),'', 1);
   $old_end = of_isodate_format($event_data->f('calendarevent_date') + $event_data->f('calendarevent_duration'),'',1);
@@ -2253,6 +2257,7 @@ function get_calendar_event_info($id,$attendees=true) {
 
   display_debug_msg($query, $cdg_sql, 'get_calendar_event_info()');
   $obm_q->query($query);
+  $e = array('attendees' => array('user' => array()));
   while($obm_q->next_record()) {
     $e['usercreate'] = $obm_q->f('calendarevent_usercreate');
     $e['owner'] = $obm_q->f('calendarevent_owner');
@@ -3990,7 +3995,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   $consult_link = "$cgp_host/calendar/calendar_index.php?action=detailconsult&calendar_id=$calendar[calendar_id]";
   
   $userinfo = get_user_info();
-  $groups = $calendar['sel_group_id']; 
+  $groups = $calendar['sel_group_id'];
   if (is_array($groups)) {
     $user_group_array = array();
     foreach($groups as $group_id) {
@@ -4044,8 +4049,12 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $exceptions_q = run_query_get_one_event_exception($calendar['calendar_id']);
     $entities = get_calendar_event_entity($calendar['calendar_id']); 
     
-    
-    $attendees_q = $entities["user"]["ids"];
+    if(is_array($entities["user"]["ids"])) {
+      $attendees_q = $entities["user"]["ids"];
+    } else {
+      $attendees_q = array();
+    }
+  
     if(is_array($entities["resource"]["ids"])) {
       $resources_q = $entities["resource"]["ids"];
     } else {
@@ -4174,7 +4183,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       $title = $event_q->f('calendarevent_title');
       $datebegin = of_datetime_format($event_q->f('calendarevent_date'));
       $entityinfo = get_entity_info($calendar['entity_id'],$calendar['entity_kind']);
-      $entity =  $entityinfo['lastname'].' '.$entityinfo['firstname'];
+
       $attendees = array($event_q->f('calendarevent_owner'));
       $mail_datas['update_decision'] = true;
     }
@@ -4288,7 +4297,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   if ($mail_datas['update_decision']) {
     $mail_datas['mails']['update_decision'] = array (
       'subject' => sprintf($l_update_state_mail_subject,$title),
-      'message' => sprintf($l_update_state_mail_body,$userinfo["firstname"],$userinfo["lastname"],
+      'message' => sprintf($l_update_state_mail_body,$entityinfo["label"],
                            $title,$decision,$consult_link, 
                            of_date_format(), date("H:i"), $userinfo["firstname"],
                            $userinfo["lastname"],$cgp_host),

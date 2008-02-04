@@ -1608,7 +1608,7 @@ function get_entity_info($id, $entity) {
   $obm_q->next_record();
   if (is_array($obm_q->Record)) {
     foreach ($obm_q->Record as $key => $user) {
-      $small_key = str_replace('entity_', '', $key);
+      $small_key = str_replace('entitydata_', '', $key);
       $e[$small_key] = $user;
     }
   }  
