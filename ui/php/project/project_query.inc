@@ -575,38 +575,6 @@ function run_query_project_update($pid, $params) {
 }
 
 
-/**
- * Return the project calculated code
- * @param : db object with project infos
- **/
-function get_project_code($project_q) {
-  global $ctt_sales;
-
-  // Billed / internal
-  $task_internal = $project_q->f('tasktype_internal');
-  if ($task_internal == "$ctt_sales") {
-    $dis_internal = '1';
-  } else {
-    $dis_internal = '0';
-  }
-
-  // Type
-  $type_code = $project_q->f('type_code');
-  $dis_type = "$type_code";
-
-  // Tasktype (skill)
-  $tasktype_code = $project_q->f('tasktype_code');
-  $dis_tasktype = "$tasktype_code";
-
-  // Tasktype (skill)
-  $shortname = $project_q->f('project_shortname');
-  
-  $code = "$dis_internal-$dis_type-$dis_tasktype-$shortname";
-
-  return $code;
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Return the number of timetask entries assigned to the project
 // Parameters:

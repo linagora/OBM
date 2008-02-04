@@ -162,7 +162,10 @@ function run_query_user_search($user) {
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'userobm_login';
   if ($order == 'userobm_mail_quota') {
     $order = 'userobm_mail_quota_use / userobm_mail_quota';
+  } else if ($order == 'userobm_nomade') {
+    $order = "userobm_nomade_perms $sql_order_dir, userobm_nomade_enable $sql_order_dir, userobm_nomade_local_copy";
   }
+
   $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "$select
@@ -868,64 +871,68 @@ function run_query_user_update($p_id, $user) {
   $gid = $userDesc['gid'];
   if ($cgp_use['service']['samba']) {
     if ($userDesc['perms'] == "$perms_admin" && $profile == "$perms_admin") {
-      // Utilisateur était et est admin
+      // Utilisateur etait et est admin
       if ($userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur était Samba et n'est plus Samba
+        // Utilisateur etait Samba et n'est plus Samba
         $gid = $c_first_gid_admin;
-      }elseif (!$userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur n'était pas Samba et est Samba
+      } elseif (!$userDesc['samba_perms'] && $smb_perms) {
+        // Utilisateur n'etait pas Samba et est Samba
         $gid = $cg_gid_smb_admin;
       }
-    }elseif ($userDesc['perms'] == "$perms_admin" && $profile != "$perms_admin") {
-      // Utilisateur était et n'est plus admin
+    } elseif ($userDesc['perms'] == "$perms_admin" && $profile != "$perms_admin") {
+      // Utilisateur etait et n'est plus admin
       if ($userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur était Samba et est Samba
+        // Utilisateur etait Samba et est Samba
         $gid = $cg_gid_smb_user;
-      }elseif ($userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur était Samba et n'est plus Samba
+      } elseif ($userDesc['samba_perms'] && !$smb_perms) {
+        // Utilisateur etait Samba et n'est plus Samba
         $gid = $c_first_gid_user;
-      }elseif (!$userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur n'était pas Samba et est Samba
+      } elseif (!$userDesc['samba_perms'] && $smb_perms) {
+        // Utilisateur n'etait pas Samba et est Samba
         $gid = $cg_gid_smb_user;
-      }elseif (!$userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur n'était pas Samba et n'est pas Samba
+      } elseif (!$userDesc['samba_perms'] && !$smb_perms) {
+        // Utilisateur n'etait pas Samba et n'est pas Samba
         $gid = $c_first_gid_user;
       }
-    }elseif ($userDesc['perms'] != "$perms_admin" && $profile == "$perms_admin") {
-      // Utilisateur n'était pas et est admin
+    } elseif ($userDesc['perms'] != "$perms_admin" && $profile == "$perms_admin") {
+      // Utilisateur n'etait pas et est admin
       if ($userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur était Samba et est Samba
+        // Utilisateur etait Samba et est Samba
         $gid = $cg_gid_smb_admin;
-      }elseif ($userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur était Samba et n'est plus Samba
+      } elseif ($userDesc['samba_perms'] && !$smb_perms) {
+        // Utilisateur etait Samba et n'est plus Samba
         $gid = $c_first_gid_admin;
-      }elseif (!$userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur n'était pas Samba et est Samba
+      } elseif (!$userDesc['samba_perms'] && $smb_perms) {
+        // Utilisateur n'etait pas Samba et est Samba
         $gid = $cg_gid_smb_admin;
-      }elseif (!$userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur n'était pas Samba et n'est pas Samba
+      } elseif (!$userDesc['samba_perms'] && !$smb_perms) {
+        // Utilisateur n'etait pas Samba et n'est pas Samba
         $gid = $c_first_gid_admin;
       }
-    }elseif ($userDesc['perms'] != "$perms_admin" && $profile != "$perms_admin") {
-      // Utilisateur n'était pas et n'est pas admin
+    } elseif ($userDesc['perms'] != "$perms_admin" && $profile != "$perms_admin") {
+      // Utilisateur n'etait pas et n'est pas admin
       if ($userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur était Samba et n'est plus Samba
+        // Utilisateur etait Samba et n'est plus Samba
         $gid = $c_first_gid_user;
-      }elseif (!$userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur n'était pas Samba et est Samba
+      } elseif (!$userDesc['samba_perms'] && $smb_perms) {
+        // Utilisateur n'etait pas Samba et est Samba
         $gid = $cg_gid_smb_user;
       }
     }
-  }else {
+  } else {
     if ($userDesc['perms'] == "$perms_admin" && $profile != "$perms_admin") {
-      // Utilisateur était et n'est plus admin
+      // Utilisateur etait et n'est plus admin
       $gid = $c_first_gid_user;
-    }elseif ($userDesc['perms'] != "$perms_admin" && $profile == "$perms_admin") {
-      // Utilisateur n'était pas et est admin
+    } elseif ($userDesc['perms'] != "$perms_admin" && $profile == "$perms_admin") {
+      // Utilisateur n'etait pas et est admin
       $gid = $c_first_gid_admin;
     }
   }
 
+  // If gid not set, give it an integer value
+  if ($gid == '') {
+    $gid = 0;
+  }
 
   $query = "UPDATE UserObm SET
     userobm_timeupdate='". date('Y-m-d H:i:s')."',
