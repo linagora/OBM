@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.1.5';
+$obm_version = '2.1.6pre1';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -1290,7 +1290,10 @@ function get_global_params($table='') {
     } */
 
   $action = $params['action'];
-  if ($action == '') $action = 'index';
+  if ($action == '') {
+    $action = 'index';
+    $params['action'] = $action;
+  }
   $popup = $params['popup'];
   
   return $params;

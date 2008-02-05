@@ -104,7 +104,7 @@ if ($cgp_show['module']['contract'] && $perm->check_right('contract', $cright_wr
   $block .= dis_contract_portal();
 }
 
-if ($cgp_show['module']['invoice'] && $perm->check_right('invoice', $cright_read)) { 
+if ($cgp_show['module']['invoice'] && $perm->check_right('invoice', $cright_read_admin)) { 
   require_once("$path/invoice/invoice_query.inc");
   $block .= dis_invoice_portal();
 }
@@ -252,7 +252,7 @@ function dis_calendar_portal() {
    </tbody>
    </table>  
    $num $l_waiting_events
-   <a class=\"link\" href=\"".$modules["calendar"]["Url"]."\">$l_my_calendar</a>
+   <a class=\"link\" href=\"".$modules['calendar']['Url']."\">$l_my_calendar</a>
   </div>
 ";
 

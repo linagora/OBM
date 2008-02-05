@@ -84,7 +84,7 @@ function dis_time_data(&$OD, $fieldname, $link_ok) {
 //   - $time[] : time search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_index($time) {
-  global $display, $perm, $cright_write_admin;
+  global $display, $perm, $cright_write_admin, $cright_read_admin;
 
   $time["interval"] = "week";
   $display["result"] = dis_time_nav_date($time);
@@ -94,7 +94,10 @@ function dis_time_index($time) {
   $display["result"] .= dis_time_form_addtask($time, $val_days); 
 
   $display["result"] .= dis_time_task_list($time);
-  if ($perm->check_right("time", $cright_write_admin)) {
+
+  // Allow user select for write admin and read admin 
+  if (($perm->check_right("time", $cright_write_admin))
+      || (($perm->check_right("time", $cright_read_admin)))) {
     $display["features"] .= dis_user_select($time, run_query_userobm_active());
   }
 }

@@ -33,6 +33,7 @@ function run_query_deal_search($deal, $all='') {
   $role = $deal['role'];
   $status = $deal['status_id'];
   $manager = $deal['manager'];
+  $manager_type = $deal['manager_type'];
   $date_field = ($deal['date_field'] ? $deal['date_field'] : 'datealarm');
   $date_after = of_isodate_convert($deal['date_after'],true);
   $date_before = of_isodate_convert($deal['date_before'],true);
@@ -107,9 +108,15 @@ function run_query_deal_search($deal, $all='') {
     $where .= " AND deal_archive='1'";
   }
   if (($manager != $c_all) && ($manager != '')) {
-    $where .= " AND (deal_technicalmanager_id='$manager'
+    if ($manager_type == $c_all) {
+      $where .= " AND (deal_technicalmanager_id='$manager'
                     OR deal_marketingmanager_id='$manager')";
-  } 
+    } else if ($manager_type == 'technical') {
+      $where .= " AND deal_technicalmanager_id='$manager'";
+    } else {
+      $where .= " AND deal_marketingmanager_id='$manager'";
+    }
+  }
   if ($parent != '') {
     $where .= " AND deal_parentdeal_id='$parent'";
   }
@@ -141,6 +148,7 @@ function run_query_deal_search($deal, $all='') {
       deal_id as id,
       deal_id,
       deal_label,
+      deal_number,
       deal_parentdeal_id,
       deal_type_id,
       deal_tasktype_id,

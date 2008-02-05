@@ -268,7 +268,8 @@ function dis_deal_search_form($deal='') {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $manager_q) {
   global $l_deal, $l_label_start, $l_company, $l_type, $l_tt, $l_status;
-  global $l_after, $l_before, $l_manager, $l_show_archive, $l_relation;
+  global $l_after, $l_before, $l_show_archive, $l_relation;
+  global $l_manager, $l_marketing_manager,$l_technical_manager;
   global $l_number, $l_postcode, $l_region;
   global $l_date, $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm;
   global $l_all, $l_all_f, $l_find, $c_all;
@@ -289,6 +290,7 @@ function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $
   $role = $deal['role'];
   $status = $deal['status_id'];
   $manager = $deal['manager'];
+  $manager_type = $deal['manager_type'];
   $date_field = ($deal['date_field'] ? $deal['date_field'] : 'datealarm');
   $date_after = of_date_upd_format(stripslashes($deal['date_after']),true);
   $date_before = of_date_upd_format(stripslashes($deal['date_before']),true);
@@ -355,6 +357,16 @@ function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $
     $sel_manager .= ">$lname</option>";
   }
   $sel_manager .= '</select>';
+
+  // Manager type select construction
+  if ($manager_type == "$c_all") $sel_all = "selected =\"selected\"";
+  if ($manager_type == "marketing") $sel_market = "selected =\"selected\"";
+  if ($manager_type == "technical") $sel_tech = "selected =\"selected\"";
+  $sel_manager_type = "<select name=\"sel_manager_type\">
+     <option value=\"$c_all\" $sel_all>$l_all</option>
+     <option value=\"marketing\" $sel_market>$l_marketing_manager</option>
+     <option value=\"technical\" $sel_tech>$l_technical_manager</option>
+     </select>";
 
   // Selected date field
   $s_date_field[$date_field] = "selected=\"selected\"";
@@ -429,6 +441,7 @@ function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $
     </label>
     <label>$l_manager<br />
       $sel_manager
+      $sel_manager_type
     </label>
     <label>$l_show_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />

@@ -176,20 +176,21 @@ if ($action == 'index') {
   if(!$cal_view) {
     $obm_wait = run_query_calendar_waiting_events();
     if ($obm_wait->nf() != 0) {
-      $display['msg'] .= display_warn_msg($l_waiting_events.' : '.$obm_wait->nf());
+      $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
       $display['detail'] .= html_calendar_waiting_events($obm_wait);
     }
   } else {
     $display['detail'] .= dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
-  }  
+  }
+
 } elseif ($action == 'waiting_events') {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_wait = run_query_calendar_waiting_events();
   if ($obm_wait->nf() != 0) {
-    $display['msg'] .= display_warn_msg($l_waiting_events.' : '.$obm_wait->nf());
+    $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
     $display['detail'] = html_calendar_waiting_events($obm_wait);
   } else {
-    $display['msg'] .= display_warn_msg($l_waiting_events.' : '.$obm_wait->nf());
+    $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
     $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
   }
 
@@ -205,7 +206,7 @@ if ($action == 'index') {
     calendar_send_mail($mail_data);    
     $obm_wait = run_query_calendar_waiting_events();
     if ($obm_wait->nf() != 0) {
-      $display['msg'] .= display_warn_msg($l_waiting_events.' : '.$obm_wait->nf());
+      $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
       $display['detail'] = html_calendar_waiting_events($obm_wait);
     } else {
       $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
