@@ -427,6 +427,14 @@ function dis_organizationalchart_display_pref($prefs) {
 
 
 /**
+ * Sort node detail by user lastname
+ */
+function sort_node_detail($a, $b) {
+    return strcmp(strtolower($a["lastname"]), strtolower($b["lastname"]));
+}
+
+
+/**
  * Draw a node 
  * @param $node_q
  * @access public
@@ -452,47 +460,63 @@ function draw_consult($node_q) {
 
   // Get node detail
   $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
+  $users = array();
   while($ogroupentity_q->next_record()) {
-    $users = array();
     $entity = $ogroupentity_q->f("ogroupentity_entity");
     $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
     switch($entity) {
       case "group":
-	$users = of_usergroup_get_group_users($entity_id, true);
+	$users_q = of_usergroup_get_group_users($entity_id, true);
         $g_manager = run_query_global_group_manager($entity_id);
+        foreach($users_q as $user) {
+          if ($user['id'] == $g_manager) { 
+            $users[$user['id']] = array('id' => $user['id'],
+              'lastname' => $user['lastname'],
+              'firstname' => $user['firstname'],
+              'manager' => true);
+          } else {
+            $users[$user['id']] = array('id' => $user['id'],
+              'lastname' => $user['lastname'],
+              'firstname' => $user['firstname']);
+          }
+        }
         break;
       case "user":
 	$user = get_user_info($entity_id);
 	$u_id = $user['id'];
-
 	$lname = $user['lastname'];
 	$fname = $user['firstname'];
 	$users[$u_id] = array ('id' => $u_id,
-			       'lastname' => $lname,
-			       'firstname' => $fname);
+	  'lastname' => $lname,
+	  'firstname' => $fname);
        break;
     }
+  }
 
+  if (is_array($users)) {
+    usort($users, "sort_node_detail");
     foreach ($users as $user_id => $one_user) {
       $userobm_url = "$path/user/user_index.php?action=detailconsult&amp;user_id=$user_id";
       $userobm_name = $one_user['lastname'].' '.$one_user['firstname'];
+      $is_manager = $one_user['manager'];
       $item_id = "item-${level}-${user_id}";
-      if ($user_id != $g_manager) {
+      if (!$is_manager) {
          $block_detail_entities .= "<li id=\"item-${level}-${user_id}\">
            <a href=\"$userobm_url\" 
-	     onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
+             onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
              onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$userobm_name</a>
            </li>";
       } else {
         $manager = "<img src=\"$ico_manager\" />";
         $block_detail_entities_boss .= "<li id=\"item-${level}-${user_id}\">
         <a href=\"$userobm_url\" 
-	  onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
+          onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
           onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$manager&nbsp;<b>$userobm_name</b></a>
         </li>";
       }
     }
   }
+  // }
  
   // Get node children 
   // TODO: Optimized
@@ -591,18 +615,18 @@ function draw_form($node_q) {
 
   // Get node detail
   $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
+  $block_detail_entities = "";
   while($ogroupentity_q->next_record()) {
-    $block_detail_entities = "";
     $entity = $ogroupentity_q->f("ogroupentity_entity");
     $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
     switch($entity) {
+      case "group":
+        $name = get_last_group_text($entity_id);
+      break;
       case "user":
         $name_q = run_query_userobm($entity_id);
         $name_q->next_record();
         $name = $name_q->f("userobm_lastname")." ".$name_q->f("userobm_firstname");
-      break;
-      case "group":
-        $name = get_last_group_text($entity_id);
       break;
     }
     $block_detail_entities .= "
