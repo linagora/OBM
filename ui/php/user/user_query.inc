@@ -2032,6 +2032,11 @@ function run_query_user_delete_profile($user_id)  {
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(TimeTask)');
   $obm_q->query($query);
 
+  // Remove all users in Organizational Chart
+  $query = "DELETE FROM OGroupEntity
+    WHERE ogroupentity_entity='user' AND ogroupentity_entity_id='$user_id'";
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(OrganizationalChart)');
+  $obm_q->query($query);
 }
 
 ?>

@@ -142,7 +142,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
         $email .= '@'.$obm['domain_name'];
       }
       $res['url'] = "mailto:$email";
-      $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\" />";
+      $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\" />$email";
       $res['txt_name'] = $email;
     }
   }

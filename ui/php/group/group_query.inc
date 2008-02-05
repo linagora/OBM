@@ -1102,6 +1102,8 @@ function run_query_group_ext_search($group) {
 
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("Group");
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
   $limit = $group['limit'];
   if(isset($group["first_row"])) $first_row = $group["first_row"] - 1;
   else $first_row = 0;
@@ -1127,7 +1129,7 @@ function run_query_group_ext_search($group) {
       count(*) as resultscount
     FROM UGroup
     WHERE 
-      group_name LIKE '$pattern%' 
+      group_name $like '$pattern%' 
       $where_privacy
       $multidomain
       $where_restriction
@@ -1143,7 +1145,7 @@ function run_query_group_ext_search($group) {
       group_desc
     FROM UGroup
     WHERE 
-      group_name LIKE '$pattern%' 
+      group_name $like '$pattern%' 
       $where_privacy
       $multidomain
       $where_restriction
