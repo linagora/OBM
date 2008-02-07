@@ -356,8 +356,8 @@ function run_query_calendar_delete_event_entity($calendar, $users = null) {
 
   $e_id = $calendar['calendar_id'];
   $query = "DELETE FROM EventEntity WHERE evententity_event_id = '$e_id'";
-  if(is_array($users)) {
-    if(count($users) != 0) {
+  if (is_array($users)) {
+    if (count($users) != 0) {
       $query .= " AND (evententity_entity != 'user' OR evententity_entity_id IN (".implode(",",$users)."))";
     }
   } else {
@@ -1333,6 +1333,8 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
 
   if($calendar['task_new_id']) $task_id = $calendar['task_new_id']; 
   else $task_id = $calendar['task_id'];
+
+  $user_group_array = array();
 
   // Get the final user list
   $users_array = $sel_entity_id['user'];
