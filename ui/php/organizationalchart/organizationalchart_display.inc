@@ -536,7 +536,7 @@ function draw_consult($node_q, $output) {
   }
 
   if (is_array($users)) {
-    usort($users, "sort_node_detail");
+    uasort($users, "sort_node_detail");
     foreach ($users as $user_id => $one_user) {
       $userobm_url = "$path/user/user_index.php?action=detailconsult&amp;user_id=$user_id";
       $userobm_name = $one_user['lastname'].' '.$one_user['firstname'];
