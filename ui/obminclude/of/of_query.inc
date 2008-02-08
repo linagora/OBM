@@ -2193,11 +2193,13 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
   }
 
   // If attachements are provided
+  $headers.= "MIME-Version: 1.0\n"; 
   if ($h_file != '') {
-    $headers .= "Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
+    $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\n"; 
   } else {
     // Commented as this breaks mail encoding
-    // $headers.="Mime-Version: 1.0\nContent-Type: text/plain;\n charset=$charset\n"; 
+    $header .= "Content-Type: text/plain; charset=ISO-8859-1\n";
+    $header .= "Content-Transfer-Encoding: 8bit\n";
   } 
   $headers .= "X-Mailer: OBM $obm_version\n";
   
@@ -2224,30 +2226,22 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
 
   // message
   $msg='';
-  //$charset = 'iso-8859-1';
-  $charset = mb_internal_encoding();
   if ($h_file !='') {
-    $ctencoding = 'quoted-printable';
-    // $disposition='inline';  // Not used for now
-    // $body=iconv('ISO-8859-1','UTF-8',$body);
-    $msg .="This is a multi-part message in MIME format.\n--$boundary\n";
-    $msg .= "Content-Type: text/plain; charset=\"$charset\"\n";
-    $msg .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";
+    $msg .= "\n--$boundary\n";
+    $msg .= "Content-Type: text/plain; charset=ISO-8859-1\n";
+    $msg .= "Content-Transfer-Encoding: 8bit\n\n";
+    $msg .= $body."\n\n";    
     for ($i=0;$i<count($h_file);$i++){
       $filename=$h_file[$i]['filename'];
       $name=$h_file[$i]['name'];
       $ctype=$type[$h_file[$i]['type']];
 
       $msg .= "--$boundary\n";
-      if ($ctype == 'text/calendar') {
-        $msg .= "content-class: urn:content-classes:calendarmessage\n"; 
-      }
-      $msg .= "Content-type: $ctype;charset=$charset;name=\"$name\"\n";
-      $msg .= "Content-Encoding: $charset\n";
-      $msg .= "Content-Transfer-Encoding: 8bit;filename=\"$name\"\n";
+      $msg .= "Content-Type: $ctype; charset=ISO-8859-1;name=\"$name\"\n";
+      $msg .= "Content-Transfer-Encoding: 8bit\n\n";
+      $msg .= "Content-Disposition: inline; filename=\"$name\"\n";
       $linesz = filesize($filename)+1;
       $fp = fopen($filename, 'r');
-//      $content = chunk_split(base64_encode(fread($fp,$linesz)));
       $content = fread($fp,$linesz);
       fclose($fp);
       $msg .= $sep.$content;
@@ -2256,8 +2250,9 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
     $msg = $message; 
   }
   if ($reci_list != '') {
-    // as we don't have a mean to encode the subject, we drop its accents
-    $subject = format_name($subject, 0, true);
+    // as we don't have a mean to encode the subject, we drop its accentsr
+    $subject = mb_encode_mimeheader($subject, "ISO-8859-1", "Q");
+    var_dump($reci_list, $subject, $msg, $headers);
     mail ($reci_list, $subject, $msg, $headers);         
   }
 }

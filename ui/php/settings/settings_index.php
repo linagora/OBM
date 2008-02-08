@@ -16,6 +16,9 @@ include("$obminclude/global.inc");
 $params = get_settings_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 
+if(!$_SESSION['set_cal_first_hour']) $_SESSION['set_cal_first_hour'] = $ccalendar_first_hour;
+if(!$_SESSION['set_cal_last_hour']) $_SESSION['set_cal_last_hour'] = $ccalendar_last_hour;
+
 if ($params['lang'] != '') {
   $_SESSION['set_lang'] = $params['lang'];
   update_user_pref($obm['uid'], 'set_lang', $_SESSION['set_lang']);

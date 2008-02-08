@@ -245,6 +245,7 @@ Obm.CalendarDayEvent = new Class({
   setOrigin: function(origin) {
     if(origin < 0) {   
       this.hidden = -(origin / this.options.xUnit);
+      this.hidden = Math.ceil(this.hidden);
       origin = 0;
     } else if(this.hidden != 0) {
         this.hidden = 0;

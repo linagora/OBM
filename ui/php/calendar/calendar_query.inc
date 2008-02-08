@@ -671,7 +671,9 @@ METHOD:REQUEST";
         $description .=  "\\n  ".$resource_q->f('resource_name');
       }
     }
-    $description = "\n" . wordwrap($description,74,"\n ",1);
+    if($description != '') {
+      $description = "\n" . wordwrap($description,74,"\n ",1);
+    }
     $date_b = $obm_event->f('calendarevent_date');
     $date_b = gmdate("Ymd\THis\Z",$date_b);
     $date_e = $obm_event->f('calendarevent_date') + $obm_event->f('calendarevent_duration') ;
@@ -695,12 +697,15 @@ METHOD:REQUEST";
     $organizer_email=$organizer_q->f('userobm_email');
     $attendee_q = run_query_get_recipients($attendees, 1);
     $msg_attendee = '';
-    if (is_array($attendee_q)) {
+    if (is_object($attendee_q)) {
       while ($attendee_q->next_record()) {
-        $msg_attendee .= "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=\"'";
+        $msg_attendee .= " ATTENDEE;ROLE=REQ-PARTICIPANT; PARTSTAT=NEEDS-ACTION; RSVP=TRUE; CN=\"'";
         $msg_attendee .= $attendee_q->f('userobm_lastname').' '.$attendee_q->f('userobm_firstname');
         $msg_attendee .= "'\":MAILTO:";
         $msg_attendee .= $attendee_q->f('userobm_email');
+      }
+      if($msg_attendee != '') {
+        $msg_attendee = wordwrap($msg_attendee,74,"\n ");
       }
     }
     $msg .= "
@@ -820,7 +825,6 @@ END:VCALENDAR";
 function run_query_icalendar_insert($params) {
   global $obm ;
   global $all_emails ;
-
   // --- get the unfolding ics
   $ics = file($params['ics_tmp']) ;
   $new_ics = array() ; // unfolded $ics
@@ -1338,6 +1342,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
 
   // Get the final user list
   $users_array = $sel_entity_id['user'];
+  $user_group_array = array();
   if (is_array($groups)) {
     foreach($groups as $group_id) {
       $user_group_array = array_merge($user_group_array, of_usergroup_get_group_users($group_id));
@@ -4217,14 +4222,12 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   if ($mail_datas['add_attendee']) {
     if ($ccalendar_send_ics) {
       $tmp_filename = secure_tmpname('.ics','ics_');
-      create_calendar_ics_meeting_file($calendar, $calendar['calendar_id'], $new_attendees, array(), $tmp_filename);
-      $h_file = array(
-        array (
-               'filename' => "$tmp_filename",
-               'name' => 'meeting.ics',
-               'type' => 'ics'
-               )
-        );
+      create_calendar_ics_meeting_file($calendar, $calendar['calendar_id'], $calendar['sel_user_id'], array(), $tmp_filename);
+      $h_file[] = array(
+         'filename' => "$tmp_filename",
+         'name' => 'meeting.ics',
+         'type' => 'ics'
+      );
     }
     $mail_datas['mails']['add_attendee'] = array (
       'subject' => sprintf($l_add_event_mail_subject,$title),
@@ -4233,7 +4236,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
                            of_date_format(), date("H:i"), $userinfo["firstname"],
                            $userinfo["lastname"],$cgp_host),
       'recipients' => $new_attendees,
-      'h_file' => $hfile
+      'h_file' => $h_file
     ) ;
   }
   if ($mail_datas['add_resource']) {
@@ -4245,8 +4248,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
                            $title, $location, $consult_link,
                            of_date_format(), date("H:i"), $userinfo["firstname"],
                            $userinfo["lastname"],$cgp_host),
-      'recipients' => $rattendees,
-      'h_file' => $hfile
+      'recipients' => $rattendees
     ) ;
 
   }
@@ -4315,4 +4317,137 @@ function calendar_send_mail($mails) {
     send_mail($mail['subject'], $mail['message'], $mail['recipients'], array(), $mail, $mail['h_file']);
   }
 }
+
+
+
+class ICS_Utils {
+
+  function parse($file) {
+    $document = new ICS_Document();
+    $handle = fopen($file, 'r');
+    while(($line = fgets($handle)) && strcmp(trim($line),'BEGIN:VCALENDAR') !== 0);
+    ICS_Utils::parseElement($handle, $document->vcalendar);
+    fclose($handle);
+    return $document;
+  }
+
+  function parseElement(&$handle,&$element) {
+    while(($line = fgets($handle)) && preg_match('/^END:.*$/',$line) === 0) {
+      if(preg_match('/^BEGIN:(.*)$/',$line,$match) !== 0) {
+        $document = $element->getDocument();
+        $child = $document->createElement($match[1]);
+        $element->appendChild($child);
+        ICS_Utils::parseElement($handle,$child);
+      } else {
+        $property = ICS_Utils::parseProperty($handle, $line);
+        $element->setProperty($property['name'],$property['values'],$property['options']);
+      }
+    }
+  }
+
+  function parseProperty(&$handle, $line) {
+    $propertyLine = '';
+    $indent = 0;
+    $properties = array('name','options','values');
+    do {
+      $offset = ftell($handle);
+      $propertyLine .= trim($line);
+      $line = fgets($handle);
+      $indent++;
+    } while(preg_match('/^\s{'.$indent.'}.*$/',$line) !== 0);
+    fseek($handle,$offset);
+    preg_match('/^([^;:]*);?([^:]*):(.*)$/',$propertyLine, $match);
+    $property['name'] = $match[1];
+    $property['options'] = array();
+    $options = explode(';',$match[2]);
+    foreach($options as $option) {
+      list($optionName, $optionValue) = explode('=', $option);
+      $property['options'][$optionName] = $optionValue;
+    }
+    $property['values'] = array();
+    $values = explode(';',$match[3]);
+    foreach($values as $value) {
+      if(strpos('=',$value) !== FALSE) {
+        list($valueName, $valueValue) = explode('=', $value);
+        $property['values'][$valueName] = $valueValue;
+      } else {
+        $property['values'][] = $value;
+      }
+    }
+    return $property;
+  }
+}
+
+class ICS_Element {
+  
+  var $properties = array();
+
+  var $document = NULL;
+  var $name;
+
+  var $child = array();
+
+  function ICS_Element(&$document, $name) {
+    $this->document = $document;
+    $this->name = $name;
+  }
+
+  function setProperty($name, $values, $options) {
+    if(method_exists($this, 'set'.strtoupper($name))) {
+      $this->${'set'.strtoupper($name)}($values, $options);
+    } else {
+      $this->$name = array('values' => $values, 'options' => $options);
+    }    
+  }
+
+  function getDocument() {
+    return $this->document;
+  }
+
+  function appendChild(&$child) {
+    $this->child[] = &$child;
+  }
+}
+
+class ICS_VEVENT extends ICS_Element {
+  
+  function setProperty($name, $values, $options) {
+
+  }
+
+  function setDTSTART($values,$options) {
+    $date = array_shift($values);
+    preg_match('/.*(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})){0,1}/', $date, $match) ;
+    $date = gmmktime($hour, $minute, $second, $month, $day, $year);
+    if($options['TZID']) {
+      $document = $this->getDocument();
+      $timeZones = $document->getElementByName('timezone');   
+      foreach($timeZones as $timeZone) {
+        if(strcmp($timeZone->tzid,$options['TZID']) === 0) {
+          break;
+        }
+      }
+
+    } else {
+      $this->dtstart = array('values' => array($date),
+                             'options' => $options);
+    }
+  }
+}
+
+
+class ICS_Document {
+
+  var $vcalendar;
+
+  function ICS_Document () {
+    $this->vcalendar = new ICS_Element($this,'vcalendar');
+  }
+
+  function createElement($name) {
+    return new ICS_Element($this, $name);
+  }
+
+}
+
 ?>

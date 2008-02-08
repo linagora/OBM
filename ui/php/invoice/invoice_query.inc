@@ -787,17 +787,13 @@ function check_invoice_data_form($id, $invoice) {
 
   // Status if invoice has payment
   $pays = get_invoice_payment($id);
-  $total_pay_amount = 0;
-  foreach ($pays as $pay_id => $pay) {
-    $total_pay_amount += $pay['affected_amount'];
-  } 
+  $total_pay_amount = $pays['total']['affected_amount'];
 
   // If invoice has been paid, status must be 'paid'
   if (($total_pay_amount == $ttc) && ($status != $cinv_status['paid'])) {
     $err['msg'] = $l_err_paid_status;
     return false;
   }
-
   // If invoice partially paid, status must be 'ppaid', 'conflict' or 'dailly'
   if (($total_pay_amount != $ttc) && ($total_pay_amount > 0)
       && ! (($status == $cinv_status['ppaid'])

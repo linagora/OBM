@@ -194,13 +194,13 @@ $l_update_event_mail_body = "\nAu lieu de :";
 $l_delete_event_mail_body = "Il aurait du avoir lieu : ";
 $l_confirm_mail = "Confirmer+forcer l'envoi de mail";
 
-$l_add_event_mail_subject = "Nouvel evenement sur OBM : %s";
-$l_update_event_mail_subject = "Modification evenement sur OBM : %s";
-$l_delete_event_mail_subject = "Suppression evenement sur OBM : %s";
-$l_delete_exception_mail_subject = "Modification evenement sur OBM : %s";
-$l_add_exception_mail_subject = "Modification evenement sur OBM : %s";
-$l_update_state_mail_subject = "Participation a l'evenement sur OBM : %s";
-$l_alert_mail_subject = "Evenement imminent : %s";
+$l_add_event_mail_subject = "Nouvel événement sur OBM : %s";
+$l_update_event_mail_subject = "Modification événement sur OBM : %s";
+$l_delete_event_mail_subject = "Suppression événement sur OBM : %s";
+$l_delete_exception_mail_subject = "Modification événement sur OBM : %s";
+$l_add_exception_mail_subject = "Modification événement sur OBM : %s";
+$l_update_state_mail_subject = "Participation à l'événement sur OBM : %s";
+$l_alert_mail_subject = "Événement imminent : %s";
 
 $l_event_color_tt = "Les couleurs utilisées sont celles définies lors de la création des événements.";
 

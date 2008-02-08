@@ -1277,3 +1277,9 @@ input.colorPicker {
   color: #636466;
 }
 
+#cb_read_public {
+  display:none;
+}
+#cb_write_public {
+  display:none;
+}

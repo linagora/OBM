@@ -62,6 +62,7 @@ if (isset($params['cal_range'])) {
 ///////////////////////////////////////////////////////////////////////////////
 // specifique import ICS
 ///////////////////////////////////////////////////////////////////////////////
+define('CRLF',"\r\n");
 define('RFC2445_CRLF',               "\r\n");
 define('RFC2445_WSP',                "\t ");
 define('RFC2445_FOLDED_LINE_LENGTH', 75);
@@ -101,7 +102,9 @@ if ( ($params['new_group'] == '1')
   $cal_entity_id['resource'] = array();
 }
 // Resources groups, only on meeting
-if ($action == 'perform_meeting') { 
+if ($action == 'perform_meeting' &&
+  ($params['sel_resource_group_id'] || $params['sel_user_id'] ||
+  $params['sel_resource_id'] || $params['sel_group_id'])) { 
   $cal_entity_id['resource_group'] = $params['sel_resource_group_id'];
   $cal_entity_id['user'] = $params['sel_user_id'];
   $cal_entity_id['resource'] = $params['sel_resource_id'];    
@@ -150,7 +153,6 @@ if (($action == 'insert') || ($action == 'update')
 // We copy the entity array structure to the parameter hash
 $params['entity'] = $cal_entity_id;
 $params['category_filter'] = $cal_category_filter;
-
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
