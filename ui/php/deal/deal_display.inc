@@ -1384,7 +1384,8 @@ $js_status_loop
 </script>
 ";
 
-  // User comment select construction
+// User comment select construction
+  $sel_usercomment .= "<select name=\"sel_usercomment\">";
   foreach ($users_c as $cid => $one_user) {
     $cname = $one_user['lastname'].' '.$one_user['firstname'];
     $sel_usercomment .= "<option value=\"$cname\"";
