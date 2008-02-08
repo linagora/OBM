@@ -14,6 +14,7 @@ $l_add_child_tooltip = "Ajouter un fils";
 $l_zoom = "Zoom";
 $l_zoom_big = "Grand";
 $l_zoom_small = "Petit";
+$l_outline = "Hierarchique";
 
 // Actions
 $l_insert = "Enregistrer l'organigramme";

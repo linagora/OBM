@@ -304,12 +304,11 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
  * @return HTML
  */
 function dis_organizationalchart_consult($organizationalchart) {
-  global $display;
+  global $display, $action;
 
   $id = $organizationalchart["organizationalchart_id"];
   if ($id) {
-    // FIXME
-    // $display["print_url"] = "$path/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$id";
+    $display["print_url"] = "$path/organizationalchart/organizationalchart_index.php?action= $action&amp;organizationalchart_id=$id";
     $oc_q = run_query_organizationalchart_detail($id);
     $root_node = run_query_organizationalchart_root_node($id);
     $block = html_organizationalchart_consult($organizationalchart, $oc_q, $root_node); 
@@ -328,15 +327,56 @@ function dis_organizationalchart_consult($organizationalchart) {
  * @return HTML
  */
 function html_organizationalchart_consult($organizationalchart, $oc_q, $root_node) {
-  global $display;
-  global $l_organizationalchart, $l_detail;
-  global $l_name, $l_desc, $l_archive, $l_yes, $l_no;
-  global $l_zoom_big, $l_zoom_small, $l_zoom;
+  global $display, $path;
+  global $l_organizationalchart, $l_detail, $l_zoom_big, $l_zoom_small, $l_zoom;
+  global $l_name, $l_desc, $l_archive, $l_yes, $l_no,  $l_outline, $action;
+  global $ico_organizationalchart_view, $ico_organizationalchart_view_current;
+  global $ico_outline_view, $ico_outline_view_current;
 
   $oc_name = $oc_q->f("organizationalchart_name");
+  $oc_id = $oc_q->f("organizationalchart_id");
   $desc = $oc_q->f("organizationalchart_description");
   $archive = $oc_q->f("organizationalchart_archive") == 1 ? $l_yes : $l_no;
-  $block_detail = draw_consult($root_node);
+  $output = $organizationalchart["output_target"];
+
+  $ico_organizationnalchart = $ico_organizationalchart_view;
+  $ico_outline = $ico_outline_view;
+
+  if ($action == "detailconsult" || $action == "update" || $action == "insert") {
+    // Zoom
+    $dis_zoom = "<div class=\"LF MN\" style=\"height: 24px; margin-left: 10px;\">
+    <form action=\"\" method=\"\" onsubmit=\"return false;\">
+      $l_zoom : <select onchange=\"zoom(this.options[this.selectedIndex].value);\">
+        <option value=\"big\">$l_zoom_big</option>
+        <option value=\"small\">$l_zoom_small</option>
+      </select>
+    </form></div>";
+    $block_detail = draw_consult($root_node, $output);
+    $ico_organizationnalchart = $ico_organizationalchart_view_current;
+  } elseif ($action == "detailconsult_outline") {
+    $block_detail = draw_form_outline($root_node, $output);
+    $ico_outline = $ico_outline_view_current;
+  }
+
+  $output = $organizationalchart["output_target"];
+
+  // View select
+  $dis_view = "
+    <div class=\"LF MN\" style=\"margin-left: 10px;\">
+    <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult&organizationalchart_id=$oc_id\">
+      <img title=\"$l_organizationalchart\" src=\"$ico_organizationnalchart\" alt=\"$l_organizationalchart\"/> 
+    </a>
+    <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult_outline&organizationalchart_id=$oc_id\">
+      <img title=\"$l_outline\" src=\"$ico_outline\" alt=\"$l_outline\"/> 
+    </a>
+    </div>";
+
+  // Printable view
+  if ($output == "print") {
+    $dis_zoom = "";
+    $dis_view= "";
+    $print = "Printable";
+  }
 
   $display["detailInfo"] = display_record_info($oc_q);
   $display["title"] = $oc_name;
@@ -348,26 +388,22 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
     <h1>$l_organizationalchart</h1>
       <table>
         <tr>
-          <th>$l_name :</th>
+          <th>$l_name</th>
           <td>$oc_name</td>
         </tr>
         <tr>
-          <th>$l_desc :</th>
+          <th>$l_desc</th>
           <td>$desc</td>
         </tr>
         <tr>
-          <th>$l_archive :</th>
+          <th>$l_archive</th>
           <td>$archive</td>
         </tr>
        </table>
     <h1>$l_detail</h1>
-    <form action=\"\" method=\"\" onsubmit=\"return false;\">
-      $l_zoom : <select onchange=\"zoom(this.options[this.selectedIndex].value);\">
-        <option value=\"big\">$l_zoom_big</option>
-        <option value=\"small\">$l_zoom_small</option>
-      </select>
-    </form>
-    <div id=\"container\" class=\"container\">
+    $dis_view
+    $dis_zoom
+    <div id=\"container\" class=\"container$print\">
       $block_detail
     </div>
   </div>
@@ -435,12 +471,12 @@ function sort_node_detail($a, $b) {
 
 
 /**
- * Draw a node 
+ * Draw node detail 
  * @param $node_q
  * @access public
  * @return HTML
  */
-function draw_consult($node_q) {
+function draw_consult($node_q, $output) {
   global $f, $l; 
   global $l_title, $l_phone, $l_mphone, $l_email;
   global $ico_manager, $ico_nophoto;
@@ -456,6 +492,12 @@ function draw_consult($node_q) {
 
   if (!isset($f)) {
     $f = array();
+  }
+
+  $wrap_width = 150;
+  if ($output == "print") {
+    $wrap_width = 40;
+    $print = "Printable";
   }
 
   // Get node detail
@@ -500,19 +542,23 @@ function draw_consult($node_q) {
       $userobm_name = $one_user['lastname'].' '.$one_user['firstname'];
       $is_manager = $one_user['manager'];
       $item_id = "item-${level}-${user_id}";
-      if (!$is_manager) {
-         $block_detail_entities .= "<li id=\"item-${level}-${user_id}\">
-           <a href=\"$userobm_url\" 
-             onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
-             onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$userobm_name</a>
-           </li>";
+      if ($output != "print") {
+        if (!$is_manager) {
+           $block_detail_entities .= "<li id=\"item-${level}-${user_id}\">
+             <a href=\"$userobm_url\" 
+               onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
+               onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$userobm_name</a>
+             </li>";
+        } else {
+          $manager = "<img src=\"$ico_manager\" />";
+          $block_detail_entities_boss .= "<li id=\"item-${level}-${user_id}\">
+          <a href=\"$userobm_url\" 
+            onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
+            onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$manager&nbsp;<b>$userobm_name</b></a>
+          </li>";
+        }
       } else {
-        $manager = "<img src=\"$ico_manager\" />";
-        $block_detail_entities_boss .= "<li id=\"item-${level}-${user_id}\">
-        <a href=\"$userobm_url\" 
-          onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
-          onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$manager&nbsp;<b>$userobm_name</b></a>
-        </li>";
+        $block_detail_entities .= "<li>$userobm_name</li>";
       }
     }
   }
@@ -525,8 +571,6 @@ function draw_consult($node_q) {
   $nb_leaves = run_query_organizationalchart_get_leaves($node_id, true);
   $brother = run_query_organizationalchart_node_child($parent_node_id);
   $nb_brother = sizeof($brother) - 1;
-
-  $wrap_width = 150;
 
   if ($nb_children > 0) {
     $wrap_width = $nb_leaves * $wrap_width;
@@ -544,7 +588,7 @@ function draw_consult($node_q) {
         $node_queue = "";
       }
       $child_q = run_query_organizationalchart_node_infos($child_id);
-      $t_draw = draw_consult($child_q);
+      $t_draw = draw_consult($child_q, $output);
       $block_detail_child .= $t_draw;
     }
   } 
@@ -553,9 +597,9 @@ function draw_consult($node_q) {
     $style = "border-top: 1px solid #646567";
     $node_head = "<div class=\"nodeLnk\"></div>";
     if (in_array($node_id, $f)) {  // is first child ?
-      $node_edge = "<div class=\"nodeStart\" style=\"width:".(ceil($wrap_width/2))."px;\"></div>";
+      $node_edge = "<div class=\"nodeStart$print\" style=\"width:".(ceil($wrap_width/2))."px;\"></div>";
     } else if (in_array($node_id, $l)) {  // is last child ?
-      $node_edge = "<div class=\"nodeEnd\" style=\"width:".(ceil($wrap_width/2))."px;\"></div>";
+      $node_edge = "<div class=\"nodeEnd$print\" style=\"width:".(ceil($wrap_width/2))."px;\"></div>";
     } 
   } 
   
@@ -570,7 +614,7 @@ function draw_consult($node_q) {
       style=\"width: ${wrap_width}px; $style\">
       $node_edge
       $node_head
-      <div id=\"node-$node_id\" class=\"node\">
+      <div id=\"node-$node_id\" class=\"node$print\">
         <h1>$node_name</h1>
         <div class=\"nodeContent\">
           <ul>
@@ -589,13 +633,99 @@ function draw_consult($node_q) {
 
 
 /**
- * Draw a node form
+ * Draw node outline
+ * @param $node_q
+ * @access public
+ * @return HTML
+ */
+function draw_form_outline($node_q) {
+  global $ico_delete, $ico_add, $ico_user, $ico_group;
+  global $l_add_child_tooltip, $l_name;
+
+  $node_name = $node_q->f("ogroup_name");
+  $node_id = $node_q->f("ogroup_id");
+  $level = $node_q->f("ogroup_level");
+
+  // Get node detail
+  $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
+  $users = array();
+  while($ogroupentity_q->next_record()) {
+    $entity = $ogroupentity_q->f("ogroupentity_entity");
+    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
+    switch($entity) {
+      case "group":
+	$users_q = of_usergroup_get_group_users($entity_id, true);
+        $g_manager = run_query_global_group_manager($entity_id);
+        foreach($users_q as $user) {
+          $users[$user['id']] = array('id' => $user['id'],
+            'lastname' => $user['lastname'],
+            'firstname' => $user['firstname'],
+            'title' => $user['title']);
+        }
+        break;
+      case "user":
+	$user = get_user_info($entity_id);
+	$u_id = $user['id'];
+	$lname = $user['lastname'];
+	$fname = $user['firstname'];
+	$title = $user['title'];
+	$users[$u_id] = array ('id' => $u_id,
+	  'lastname' => $lname,
+	  'firstname' => $fname,
+          'title' => $title);
+       break;
+    }
+  }
+ 
+  // Users list
+  if (is_array($users)) {
+    usort($users, "sort_node_detail");
+    foreach ($users as $user_id => $one_user) {
+      $userobm_name = $one_user['lastname'].' '.$one_user['firstname'];
+      $userobm_title = empty($one_user['title'])? "": "(".$one_user['title'].")";
+      $block_detail_entities .= "<li><b>$userobm_name</b> $userobm_title</li>";
+    }
+  }
+
+  // Get node children 
+  $t_child = run_query_organizationalchart_node_child($node_id);
+  $nb_children = sizeof($t_child);
+  if ($nb_children > 0) {
+    foreach($t_child as $key => $child_id){
+      $child_q = run_query_organizationalchart_node_infos($child_id);
+      $t_draw = draw_form_outline($child_q);
+      $block_detail_child .= $t_draw;
+    }
+  } 
+
+  if ($level > 1) { 
+    $flour = strlen($level) - strlen(str_replace(".", "", $level));  
+    $color = "color".($flour)%7;
+  }
+
+  // Urls for extmod
+  $block = "
+    <div id=\"$level\" class=\"organizationalChartNode\" style=\"margin-left: 3em;\">
+      <div style=\"float:left;\" class=\"B\">:: $node_name</div>
+      <div class=\"organizationalChartWrapOutline $color\">
+        <ul>
+        $block_detail_entities
+        <ul>
+      </div>
+      $block_detail_child
+    </div>";
+
+  return $block;
+}
+
+
+/**
+ * Draw node form
  * @param $node_q
  * @access public
  * @return HTML
  */
 function draw_form($node_q) {
-  global $f, $l; 
   global $ico_delete, $ico_add, $ico_user, $ico_group;
   global $l_add_child_tooltip, $l_name;
 
@@ -604,14 +734,6 @@ function draw_form($node_q) {
   $parent_node_id = $node_q->f("ogroup_parent_id");
   $parent_level = $node_q->f("parent_level");
   $level = $node_q->f("ogroup_level");
-
-  if (!isset($l)) {
-    $l = array();
-  }
-
-  if (!isset($f)) {
-    $f = array();
-  }
 
   // Get node detail
   $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
@@ -643,26 +765,14 @@ function draw_form($node_q) {
   $t_child = run_query_organizationalchart_node_child($node_id);
   $nb_children = sizeof($t_child);
   if ($nb_children > 0) {
-	  foreach($t_child as $key => $child_id){
-      if ($nb_children >= 2) {
-        if ($key == 0){
-          // first child
-          $f[] = $child_id;
-        } else if ($key == ($nb_children-1)){
-          // last child
-          $l[] = $child_id;
-        }
-      }
+    foreach($t_child as $key => $child_id){
       $child_q = run_query_organizationalchart_node_infos($child_id);
       $t_draw = draw_form($child_q);
       $block_detail_child .= $t_draw;
     }
   } 
 
-  if ($level == 1) { // root node
-    $ico_del_entity = "";
-    $color = "";
-  } else { 
+  if ($level > 1) { 
     $ico_del_entity = "<a href='javascript: del_entity(\"$level\");'>
       <img src=\"$ico_delete\" alt=\"[Delete]\" style=\"float: right;\" title=\"$l_add_child_tooltip\">
     </a>";

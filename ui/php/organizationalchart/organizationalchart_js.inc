@@ -21,7 +21,7 @@ function zoom(z) {
   var nodewrap = \$ES('.nodeWrap');
 
   if (z == 'small') {
-    newClass = 'nodesmall';
+    newClass = 'nodeSmall';
     oldClass = 'node';
 
     for(i=0;i<nodestart.length;i++) {
@@ -41,7 +41,7 @@ function zoom(z) {
     }
   } else if (z == 'big') {
     newClass = 'node';
-    oldClass = 'nodesmall';
+    oldClass = 'nodeSmall';
 
     for(i=0;i<nodestart.length;i++) {
       var el = nodestart[i];

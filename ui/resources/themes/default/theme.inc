@@ -150,6 +150,12 @@ $ico_agenda_view_current    = "$theme_path/ico_calendar_agenda_current.gif";
 $ico_planning_view_current  = "$theme_path/ico_calendar_planning_current.gif";
 $ico_printable_view_current = "$theme_path/ico_calendar_printable_current.gif";
 
+// OrganizationalChart icon
+$ico_outline_view = "$theme_path/ico_outline_view.gif";
+$ico_outline_view_current = "$theme_path/ico_outline_view_current.gif";
+$ico_organizationalchart_view = "$theme_path/ico_organizationalchart_view.gif";
+$ico_organizationalchart_view_current = "$theme_path/ico_organizationalchart_view_current.gif";
+
 // Company Icons
 $ico_clipboard      = "$theme_path/ico_clipboard.gif";
 

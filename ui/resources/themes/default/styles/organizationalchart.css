@@ -1,12 +1,6 @@
-/* ------------------------------------------------------------------------- 
- * Organizational Chart
-/* ------------------------------------------------------------------------- 
-
-
-/* Form */
 .organizationalChartNode {
   width: 20em;
-  padding: 2px;
+  padding-top: 2px;
   float: left;
 }
 
@@ -20,7 +14,19 @@
   padding: 6px 6px 0px 6px;
 }
 
-.organizationalChartWrap input {
+.organizationalChartWrapOutline {
+  width: 30em;
+  border: 1px solid #ABABAB;
+  background-color: #D2D2D2;
+  float: left;
+  text-align: left;
+  padding-left: 1em;
+}
+
+.organizationalChartWrapOutline ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 2px 0 0 2px;
 }
 
 .newButtons {
@@ -170,8 +176,9 @@
   margin-left: 50%;
 }
 
+
 /* small */
-.nodesmall {
+.nodeSmall {
   width: 70px;
   margin: auto;
   border: 1px solid #646567;
@@ -179,15 +186,67 @@
   font-size: 80%;
 }
 
-.nodesmall h1 {
+.nodeSmall h1 {
   text-align: center;
   background-color: #CCC;
 }
 
-.nodesmall ul {
+.nodeSmall ul {
   list-style-type: none;
   margin: 0;
   padding: 2px 0 0 2px;
 }
+
+
+/* printable */
+.containerPrintable {
+  float: left;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 30px;
+  position: relative;
+}
+.nodeStartPrintable {
+  background-color: #FFF;
+  height: 1px;
+  font-size: 1px;
+  position: relative;
+  margin-bottom: -1px;
+  top: -1px;
+  margin-right: 50%;
+
+}
+
+.nodeEndPrintable {
+  background-color: #FFF;
+  height: 1px;
+  font-size: 1px;
+  position: relative;
+  margin-bottom: -1px;
+  top: -1px;
+  margin-left: 50%;
+}
+
+.nodePrintable {
+  width: 35px;
+  margin: auto;
+  border: 1px solid #646567;
+  background-color: #FFF;
+  font-size: 60%;
+}
+
+.nodePrintable h1 {
+  text-align: center;
+  background-color: #CCC;
+  width: 30px;
+  overflow: hidden;
+}
+
+.nodePrintable ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 2px 0 0 2px;
+}
+
 
 

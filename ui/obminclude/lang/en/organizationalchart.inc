@@ -14,6 +14,7 @@ $l_add_child_tooltip = "Add a child";
 $l_zoom = "Zoom";
 $l_zoom_big = "Big";
 $l_zoom_small = "Small";
+$l_outline = "Outline";
 
 // Actions
 $l_insert = "Insert organizational chart";
