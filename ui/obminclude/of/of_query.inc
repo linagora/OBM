@@ -2198,8 +2198,8 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
     $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\n"; 
   } else {
     // Commented as this breaks mail encoding
-    $header .= "Content-Type: text/plain; charset=ISO-8859-1\n";
-    $header .= "Content-Transfer-Encoding: 8bit\n";
+    $headers .= "Content-Type: text/plain; charset=ISO-8859-1\n";
+    $headers .= "Content-Transfer-Encoding: 8bit\n";
   } 
   $headers .= "X-Mailer: OBM $obm_version\n";
   
@@ -2238,8 +2238,8 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
 
       $msg .= "--$boundary\n";
       $msg .= "Content-Type: $ctype; charset=ISO-8859-1;name=\"$name\"\n";
-      $msg .= "Content-Transfer-Encoding: 8bit\n\n";
-      $msg .= "Content-Disposition: inline; filename=\"$name\"\n";
+      $msg .= "Content-Transfer-Encoding: 8bit\n";
+      $msg .= "Content-Disposition: inline; filename=\"$name\"\n\n";
       $linesz = filesize($filename)+1;
       $fp = fopen($filename, 'r');
       $content = fread($fp,$linesz);
@@ -2252,7 +2252,6 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
   if ($reci_list != '') {
     // as we don't have a mean to encode the subject, we drop its accentsr
     $subject = mb_encode_mimeheader($subject, "ISO-8859-1", "Q");
-    var_dump($reci_list, $subject, $msg, $headers);
     mail ($reci_list, $subject, $msg, $headers);         
   }
 }
