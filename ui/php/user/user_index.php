@@ -114,7 +114,7 @@ if ($action == "ext_get_ids") {
   if (check_user_data_form("", $params)) {
 
     // If the context (same user) was confirmed ok, we proceed
-    if ($hd_confirm == $c_yes) {
+    if ($params["confirm"] == $c_yes) {
       $cid = run_query_user_insert($params);
       if ($cid > 0) {
 	$params["user_id"] = $cid;
