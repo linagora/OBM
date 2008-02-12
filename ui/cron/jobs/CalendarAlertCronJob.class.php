@@ -211,7 +211,7 @@ class CalendarAlertCronJob extends CronJob{
       $entity = $r_q->f("evententity_entity");
       $entity_id = $r_q->f("evententity_entity_id");    
       $entity_label = $r_q->f("userobm_lastname") ." ".$r_q->f("userobm_firstname");
-      $state = $nr_q->f("evententity_state");
+      $state = $r_q->f("evententity_state");
       $all_day = $r_q->f("calendarevent_allday");       
       $owner = $r_q->f("calendarevent_owner");
       if (!$endrepeat) {
