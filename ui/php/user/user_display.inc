@@ -189,7 +189,6 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 // Display User search form
 // Parameters:
 //   - $user[]   : default form values
-//     keys used : login, lastname, perms, archive, popup
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
@@ -314,7 +313,6 @@ function html_user_search_form($user) {
 // Display the User search result
 // Parameters:
 //   - $user[]   : user search criteria
-//     keys used : name, perms
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_search_list($user) {
   global $l_found, $l_no_found;
@@ -1612,7 +1610,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   // infos
   $login = $user["login"];
   $passwd = $user["passwd"];
-  $perms = $user["perms"];
+  $profile = $user["profile"];
   $hidden = $user["hidden"];
   $kind = $user["kind"];
   $lname = $user["lastname"];
@@ -1687,7 +1685,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $hidden_fields = "
   <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />
   <input type=\"hidden\" name=\"tf_passwd\" value=\"$passwd\" />
-  <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
+  <input type=\"hidden\" name=\"sel_profile\" value=\"$profile\" />
   <input type=\"hidden\" name=\"tf_kind\" value=\"$kind\" />
   <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
   <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />

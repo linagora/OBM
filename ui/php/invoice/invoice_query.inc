@@ -366,7 +366,58 @@ function run_query_invoice_update($invoice) {
   $retour = $obm_q->query($query);
 
   return $retour;
-} 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get invoice status list with conditions
+// Parameters:
+//   - $target : 'payment' : get status where invoice should have a payment
+//             : 'tocreate' : get status where invoice has not been cretated
+//             : 'dashboard' : valid invoices (remove cancelled,...)
+//             : a number  : get status where status id = this number
+// Returns:
+//   - $sta : array of status [id] [label]
+///////////////////////////////////////////////////////////////////////////////
+function get_invoice_status($target='') {
+  global $cdg_sql, $cinv_status;
+
+  $sta = array();
+
+  if ($target == 'payment') {
+    $status_target['sent'] = $cinv_status['sent'];
+    $status_target['ppaid'] = $cinv_status['ppaid'];
+    $status_target['paid'] = $cinv_status['paid'];
+    $status_target['conflict'] = $cinv_status['conflict'];
+  } else if ($target == 'tocreate') {
+    $status_target['tocreate'] = $cinv_status['tocreate'];
+  } else if ($target == 'dashboard') {
+    $status_target['tocreate'] = $cinv_status['tocreate'];
+    $status_target['sent'] = $cinv_status['sent'];
+    $status_target['ppaid'] = $cinv_status['ppaid'];
+    $status_target['paid'] = $cinv_status['paid'];
+    $status_target['conflict'] = $cinv_status['conflict'];
+  } else if (is_numeric($target)) {
+    foreach ($cinv_status as $label => $id) {
+      if ($target == $id) {
+	$status_target[$label] = $cinv_status[$label];
+	break;
+      }
+    }
+  } else if ($target != '') {
+    $status_target[$target] = $cinv_status[$target];
+  } else {
+    $status_target = $cinv_status;
+  }
+
+  foreach ($status_target as $status => $s_id) {
+    $s_label = "l_invoicestatus_$status";
+    global $$s_label;
+    $sta[$s_id] = $$s_label;
+  }
+
+  return $sta;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////

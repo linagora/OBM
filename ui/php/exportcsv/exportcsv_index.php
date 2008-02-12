@@ -41,6 +41,7 @@ if (($action == 'index') || ($action == '')) {
   if ($emodule != '') {
     require_once("$obminclude/lang/".$_SESSION['set_lang']."/${emodule}.inc");
     require_once("$path/$emodule/${emodule}_display.inc");
+    require_once("$path/$emodule/${emodule}_query.inc");
   } else {
     $emodule = 'obm';
   }
@@ -58,7 +59,7 @@ if (($action == 'index') || ($action == '')) {
   }
   
   // Check if banned words are included
-  $excluded_words = array ('insert', 'update', 'delete', 'create', 'alter', 'drop', 'userobm_password');
+  $excluded_words = array ('insert', 'update', 'delete', 'create', 'alter', 'drop', 'lock', 'userobm_password');
   while ( list($key, $value) = each($excluded_words) ) {
     if (preg_match("/\b$value\b/i", $query)) {
       $err['msg'] = "$l_err_query_banned $l_banned_word : $value";

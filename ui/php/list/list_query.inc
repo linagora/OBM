@@ -847,7 +847,7 @@ function check_list_data($id, $list) {
   // If a query has been given, check if it is correct
   if (trim($query) != "") {
     // Check if banned words are included
-    $excluded_words = array ('insert', 'update', 'delete', 'create', 'alter', 'drop', 'userobm_password');
+    $excluded_words = array ('insert', 'update', 'delete', 'create', 'alter', 'drop', 'lock', 'userobm_password');
     while ( list($key, $value) = each($excluded_words) ) {
       if (preg_match("/\b$value\b/i", $query)) {
 	$err["msg"] = "$l_invalid_query $l_banned_word : $value";
