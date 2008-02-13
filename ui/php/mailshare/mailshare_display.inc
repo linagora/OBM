@@ -207,6 +207,7 @@ function html_mailshare_search_list($obm_q, $pref_q, $nb_mailshare, $mailshare) 
   
   $dis_mailshare->data_set = $obm_q;
   $dis_mailshare->data_url = $url;
+  $dis_mailshare->data_header = "both";
 
   // --- HTML Template --------------------------------------------------------
   $display["msg"] .= display_ok_msg("$nb_mailshare $l_found");
