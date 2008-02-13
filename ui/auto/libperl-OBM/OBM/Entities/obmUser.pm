@@ -204,9 +204,18 @@ sub getEntity {
         $self->{userDesc}->{userobm_full_name} = $dbUserDesc->{userobm_lastname}
     }
 
+    # Gestion du shell
     $self->{userDesc}->{userobm_shell} = "/bin/bash";
 
+    # Gestion du répertoire personnel
     $self->{userDesc}->{userobm_homedir} = $baseHomeDir."/".$dbUserDesc->{userobm_login};
+
+    # Gestion de la visibilité
+    if( $dbUserDesc->{userobm_hidden} ) {
+        $self->{userDesc}->{userobm_hidden} = "TRUE";
+    }else {
+        $self->{userDesc}->{userobm_hidden} = "FALSE";
+    }
 
 
     # gestion de l'adresse
@@ -776,7 +785,12 @@ sub createLdapEntry {
     if( $dbEntry->{userobm_town} ) {
         $ldapEntry->add( l => to_utf8({ -string => $dbEntry->{userobm_town}, -charset => $defaultCharSet }) );
     }
-    
+
+    # La visibilité
+    if( $entryProp->{userobm_hidden} ) {
+        $ldapEntry->add( hiddenUser => $entryProp->{userobm_hidden} );
+    }
+
     # Le domaine
     if( $entryProp->{userobm_domain} ) {
         $ldapEntry->add( obmDomain => to_utf8({ -string => $entryProp->{userobm_domain}, -charset => $defaultCharSet }) );
@@ -996,6 +1010,11 @@ sub updateLdapEntry {
     
     # La ville
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{userobm_town}, $ldapEntry, "l" ) ) {
+        $update = 1;
+    }
+
+    # La visibilité
+    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_hidden}, $ldapEntry, "hiddenUser" ) ) {
         $update = 1;
     }
     

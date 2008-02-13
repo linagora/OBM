@@ -12,8 +12,8 @@ include         /etc/ldap/schema/core.schema
 include         /etc/ldap/schema/cosine.schema
 include         /etc/ldap/schema/nis.schema
 include         /etc/ldap/schema/inetorgperson.schema
-include		    /etc/ldap/schema/obm.schema
-include		    /etc/ldap/schema/samba.schema
+include            /etc/ldap/schema/obm.schema
+include            /etc/ldap/schema/samba.schema
 
 # Where the pid file is put. The init.d script
 # will not stop the server if you change this.
@@ -26,8 +26,8 @@ argsfile        /var/run/slapd/slapd.args
 loglevel        0
 
 # Where the dynamically loaded modules are stored
-modulepath	/usr/lib/ldap
-moduleload	back_bdb
+modulepath    /usr/lib/ldap
+moduleload    back_bdb
 
 # The maximum number of entries that is returned for a search operation
 sizelimit 500
@@ -44,14 +44,14 @@ defaultsearchbase "dc=local"
 # Specific Backend Directives for bdb:
 # Backend specific directives apply to this backend until another
 # 'backend' directive occurs
-backend		bdb
+backend        bdb
 checkpoint 512 30
 
 #######################################################################
 # Specific Backend Directives for 'other':
 # Backend specific directives apply to this backend until another
 # 'backend' directive occurs
-#backend		<other>
+#backend        <other>
 
 #######################################################################
 # Specific Directives for database #1, of type bdb:
@@ -66,7 +66,7 @@ overlay glue
 # rootdn directive for specifying a superuser on the database. This is needed
 # for syncrepl.
 rootdn          "uid=ldapadmin,ou=sysusers,dc=local"
-rootpw		{SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
+rootpw        {SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
 
 # Where the database file are physically stored for database #1
 directory       "/var/lib/ldap"
@@ -93,7 +93,7 @@ index           objectClass eq
 lastmod         on
 
 # Where to store the replica logs for database #1
-# replogfile	/var/lib/ldap/replog
+# replogfile    /var/lib/ldap/replog
 
 # The userPassword by default can be changed
 # by the entry owning it if they are authenticated.
@@ -101,24 +101,34 @@ lastmod         on
 # admin entry below
 # These access lines apply to database #1 only
 access to attrs=userPassword,shadowLastChange
-	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
     by anonymous auth
     by self write
     by * none
 
 access to attrs=sambaNTPassword
-	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-	by dn="uid=samba,ou=sysusers,dc=<domaine>,dc=local" write
-	by anonymous auth
-	by self write
-	by * none
+    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+    by dn="uid=samba,ou=sysusers,dc=<domaine>,dc=local" write
+    by anonymous auth
+    by self write
+    by * none
 
 access to attrs=sambaLMPassword
-	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-	by dn="uid=samba,ou=sysusers,dc=<domaine>,dc=local" write
-	by anonymous auth
-	by self write
-	by * none
+    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+    by dn="uid=samba,ou=sysusers,dc=<domaine>,dc=local" write
+    by anonymous auth
+    by self write
+    by * none
+
+# ACL sample to limit access on entries in relation to 'hiddenUser'
+# attribute
+# This ACL could be tuned to get more flexibility (see 'man slapd.access')
+#access to filter=(hiddenUser=TRUE)
+#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+#    by dn="uid=ldapreader,ou=sysusers,dc=local" write
+#    by anonymous auth
+#    by self write
+#    by * none
 
 # Ensure read access to the base for things like
 # supportedSASLMechanisms.  Without this you may
@@ -130,14 +140,14 @@ access to attrs=sambaLMPassword
 # want SASL (and possible other things) to work 
 # happily.
 access to dn.base=""
-	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-	by * read
+    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+    by * read
 
 # The admin dn has full write access, everyone else
 # can read everything.
 access to *
-	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-	by dn="uid=samba,ou=sysusers,dc=<domaine>,dc=local" write
+    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+    by dn="uid=samba,ou=sysusers,dc=<domaine>,dc=local" write
     by * read
 
 # For Netscape Roaming support, each user gets a roaming

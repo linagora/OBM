@@ -71,14 +71,24 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.12
     SUBSTR caseIgnoreIA5SubstringsMatch
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
 
-# Objet : obmUser
-# Definition de l'objet specifique a l'application OBM.
+# Attribut : hiddenUser
+# Attribut à utiliser dans les ACL LDAP afin de cacher tout ou partie de la
+# description de l'utilisateur (pour les requêtes anonymes par exemple)
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.14
+    NAME 'hiddenUser'
+    DESC 'User must be hidden for any/some LDAP query'
+    EQUALITY booleanMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+    SINGLE-VALUE )
+
+# Classe d'objet: obmUser
+# complète la description d'un utilisateur avec les paramètres OBM
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.1
 	NAME 'obmUser'
 	DESC 'OBM user description'
 	SUP top AUXILIARY
     MUST uid
-	MAY ( webAccess $ mailAccess $ mailAlias $ mailLocalOnly $ mailBox $ mailBoxServer $ obmDomain $ personalTitle $ organizationName ) )
+	MAY ( webAccess $ mailAccess $ mailAlias $ mailLocalOnly $ mailBox $ mailBoxServer $ obmDomain $ personalTitle $ organizationName $ hiddenUser ) )
 
 # Objet : obmSystemUser
 # Definition de l'objet specifique a l'application OBM.
