@@ -439,10 +439,12 @@ function run_query_group_delete($p_id) {
   $retour = $obm_q->query($query);
 
   // If the Group exists in Prod table AND is public, Insert it in Deleted table
-  $query = "SELECT group_id FROM P_UGroup
+  $query = "SELECT group_id, group_delegation FROM P_UGroup
     WHERE group_id='$p_id' AND group_privacy=0";
   display_debug_msg($query, $cdg_sql, "run_query_group_delete(auto)");
   $obm_q->query($query);
+  $obm_q->next_record();
+  $delegation = $obm_q->f('group_delegation');
 
   if ($obm_q->num_rows() > 0) {
     $uid = $obm["uid"];
@@ -451,15 +453,17 @@ function run_query_group_delete($p_id) {
 
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
+      deleted_user_id,
+      deleted_delegation,
       deleted_table,
       deleted_entity_id,
-      deleted_user_id,
       deleted_timestamp)
     VALUES (
       '$domain_id',
+      '$uid',
+      '$delegation',
       'UGroup',
       '$p_id',
-      '$uid',
       '$now')";
     display_debug_msg($query, $cdg_sql, "run_query_group_delete(auto)");
     $retour = $obm_q->query($query);

@@ -1043,12 +1043,18 @@ function run_query_user_delete($p_id) {
   $ret = of_userdata_query_delete('user', $p_id);
   $obm_q = new DB_OBM;
 
-  // Remove user's photo (document & documententity)
-  $query = "SELECT userobm_photo_id FROM UserObm WHERE userobm_id='$p_id' $multidomain";
+  // Get some user infos
+  $query = "SELECT userobm_photo_id,
+      userobm_delegation
+    FROM UserObm
+    WHERE userobm_id='$p_id' $multidomain";
   $obm_q->query($query);
   $obm_q->next_record();
   $photo_id = $obm_q->f('userobm_photo_id');
-  if($photo_id > 0) {
+  $delegation = $obm_q->f('userobm_delegation');
+
+  // Remove user's photo (document & documententity)
+  if ($photo_id > 0) {
     run_query_global_delete_document($photo_id);
   }
 
@@ -1071,15 +1077,17 @@ function run_query_user_delete($p_id) {
 
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
+      deleted_user_id,
+      deleted_delegation,
       deleted_table,
       deleted_entity_id,
-      deleted_user_id,
       deleted_timestamp)
     VALUES (
       '$domain_id',
+      '$uid',
+      '$delegation',
       'UserObm',
       '$p_id',
-      '$uid',
       '$now')";
     display_debug_msg($query, $cdg_sql, 'run_query_user_delete(auto)');
     $retour = $obm_q->query($query);
