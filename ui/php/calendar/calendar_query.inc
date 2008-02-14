@@ -843,8 +843,8 @@ function run_query_icalendar_insert($params) {
   global $obm ;
   global $all_emails ;
   // --- get the unfolding ics
-  /* TEST FOR 2.1.6 + 1
   $ics = file($params['ics_tmp']) ;
+  /* TEST FOR 2.1.6 + 1
   echo "<pre>";
   $document = ICS_Utils::parse($params['ics_tmp']);
   
