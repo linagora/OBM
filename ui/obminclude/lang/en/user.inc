@@ -24,6 +24,7 @@ $l_no_user = "No user fields in this table";
 $l_group = "Group";
 $l_delegation_target = "Delegation target";
 $l_photo = "Photo";
+$l_delete_userobmphoto = "Delete user's photo";
 
 $l_mail_server = "Mail Server";
 $l_email_nomade = "Nomad email address";

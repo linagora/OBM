@@ -761,12 +761,14 @@ function run_query_global_update_document($params, $id) {
   $name = $params['file_name'];
   $path = '/';
   $size = $params['size'];
-   
+  $title = $params['title'];
+
   $query = "UPDATE Document SET
      document_timeupdate='$now',
      document_userupdate='$uid',
      document_size='$size',
-     document_name='$name'
+     document_name='$name',
+     document_title='$title'
    WHERE document_id='$id'";
   
   display_debug_msg($query, $cdg_sql, 'run_query_document_update()');

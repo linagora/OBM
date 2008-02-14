@@ -28,6 +28,7 @@ $l_checkdelete = "Controlla o elimina utente";
 $l_reset = "Reset impostazioni utente";
 $l_delete = "Elimina utente";
 $l_add = "Aggiungi i utenti";
+$l_delete_userobmphoto = "Delete user's photo";
 
 // Messages
 $l_no_display = "Riempi i campi e premi <TROVA> per la ricerca";

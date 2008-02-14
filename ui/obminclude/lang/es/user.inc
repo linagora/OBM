@@ -22,6 +22,7 @@ $l_check_usercreate = " entradas que pertenecen a este usuario.";
 $l_check_userupdate = " últimas entradas actualizadas por este usuario.";
 $l_no_user = "No campos de usuarios en esta tabla";
 $l_group = "Grupo";
+$l_delete_userobmphoto = "Delete user's photo";
 
 // Titres
 $l_user = "Usuario";

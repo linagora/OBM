@@ -24,6 +24,7 @@ $l_no_user = "Pas de champs utilisateurs dans cette table";
 $l_group = "Groupe";
 $l_delegation_target = "Administration déléguée";
 $l_photo = "Photo";
+$l_delete_userobmphoto = "Supprimer la photo de l'utilisateur";
 
 $l_mail_ext = "Messagerie externe";
 $l_mail_server = "Serveur de boîte à lettres";

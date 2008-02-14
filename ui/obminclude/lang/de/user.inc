@@ -26,6 +26,7 @@ $l_user_new = "Neuer Benutzer";
 $l_user_insert = "Benutzer einfügen";
 $l_user_update = "Benutzer ändern";
 $l_user_delete = "Benutzer löschen";
+$l_delete_userobmphoto = "Delete user's photo";
 
 // Actions
 $l_insert = "anlegen Benutzer";

@@ -96,9 +96,14 @@ function check_user(form) {
     return false;
   }
 
-return confirm('lala?');
   return true;
 }
+
+function delete_user_photo() {
+  $('block_photo_detail').remove();
+
+  return false;
+} 
 
 ";
 

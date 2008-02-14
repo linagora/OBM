@@ -975,7 +975,7 @@ function html_user_form($usr_q, $user, $field='') {
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $path, $display, $cgp_use, $action, $profiles;
   global $obm, $c_default_domain, $l_domain, $l_header_new, $l_hour;
-  global $ccalendar_first_hour, $ccalendar_last_hour;
+  global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
 
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
@@ -1086,6 +1086,7 @@ function html_user_form($usr_q, $user, $field='') {
   if (isset($user["desc"])) { $desc = $user["desc"]; }
   if (isset($user["archive"])) { $archive = ($user["archive"] == '1' ? "checked" : ""); }
   if (isset($user["hidden"])) { $hidden = ($user["hidden"] == '1' ? "checked" : ""); }
+  if (isset($user["photo_id"])) { $photo_id = $user["photo_id"]; }
 
   // coord
   if (isset($user["phone"])) { $phone = $user["phone"]; }
@@ -1414,12 +1415,15 @@ function html_user_form($usr_q, $user, $field='') {
 
   // Photo
   if($photo_id > 0) {
-    $block_photo_detail = "<tr>
-    <th>&nbsp;</th>
-    <td>
-      <img src=\"$path/document/document_index.php?action=accessfile&document_id=$photo_id\" alt=\"\"/ />
-      <input type=\"hidden\" name=\"document_id\" value=\"$photo_id\" />
-    </td></tr>";
+    $block_photo_detail = "
+    <tr id=\"block_photo_detail\">
+      <th>&nbsp;</th>
+      <td>
+        <img src=\"$path/document/document_index.php?action=accessfile&document_id=$photo_id\" alt=\"\"/ />
+        <input type=\"hidden\" name=\"photo_id\" value=\"$photo_id\" />
+        <a href=\"#\" onclick=\"javascript:delete_user_photo();\" >$l_delete_userobmphoto</a>
+      </td>
+    </tr>";
   } else {
     $block_photo_detail = "";
   }

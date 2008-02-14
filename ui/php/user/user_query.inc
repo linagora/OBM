@@ -770,7 +770,7 @@ function run_query_user_update($p_id, $user) {
   $desc = $user['desc'];
   $login = strtolower($user['login']);
   $multidomain = sql_multidomain('userobm');
-  $photo_id = $user['document_id'];
+  $photo_id = $user['photo_id'];
 
   // Target Delegation handling (if updated user as delegation admin realm)
   $admin_realm = $profiles[$profile]['properties']['admin_realm'];
@@ -983,23 +983,40 @@ function run_query_user_update($p_id, $user) {
 
   // Update photo
   if(isset($user['file_tmp']) && $user['file_tmp'] != '') {
+    $user['title'] = $login;
+
     // Select user photo
     $query = "SELECT userobm_photo_id FROM UserObm WHERE userobm_id='$p_id'";
+    display_debug_msg($query, $cdg_sql, 'run_query_user_update(2)');
     $obm_q->query($query);
     $obm_q->next_record();
-    if($obm_q->f('userobm_photo_id') == '') {
-      // Insert
-      $doc_id = run_query_global_insert_document($user, $p_id, 'user');
-      if($doc_id > 0) {
-        // Update userobm_photo_id
-        $query = "UPDATE UserObm SET userobm_photo_id='$doc_id' WHERE userobm_id='$p_id'"; 
-        display_debug_msg($query, $cdg_sql, 'run_query_user_update(2)');
-        $obm_q->query($query);
-      }
-    } else {
-      // Update a photo
-      run_query_global_update_document($user, $photo_id);
-    }
+
+    // Update user's photo
+    run_query_global_delete_document($obm_q->f('userobm_photo_id'));
+    $doc_id = run_query_global_insert_document($user, $p_id, 'user');
+
+    if($doc_id > 0) {
+      // Update userobm_photo_id
+      $query = "UPDATE UserObm SET userobm_photo_id='$doc_id' WHERE userobm_id='$p_id'"; 
+      display_debug_msg($query, $cdg_sql, 'run_query_user_update(3)');
+      $obm_q->query($query);
+     }
+
+  } else {
+    $doc_id = $user['photo_id'];
+    if (empty($doc_id)) {
+      // Select user photo
+      $query = "SELECT userobm_photo_id FROM UserObm WHERE userobm_id='$p_id'";
+      $obm_q->query($query);
+      $obm_q->next_record();
+      $photo_id = $obm_q->f('userobm_photo_id');
+      run_query_global_delete_document($photo_id);
+
+      // Update userobm_photo_id
+      $query = "UPDATE UserObm SET userobm_photo_id=NULL WHERE userobm_id='$p_id'"; 
+      display_debug_msg($query, $cdg_sql, 'run_query_user_update(remove photo)');
+      $obm_q->query($query);
+    } 
   }
 
   if ($retour) {

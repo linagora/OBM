@@ -29,6 +29,7 @@ $l_user_delete = "Slett brukar";
 $l_insert = "Legg inn brukaren";
 $l_update = "Oppdater brukaren";
 $l_delete = "Slett brukaren";
+$l_delete_userobmphoto = "Delete user's photo";
 
 // Messages
 $l_no_display = "Fyll inn søkefeltet og trykk < Finn > for å hente ut brukarar";
