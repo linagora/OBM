@@ -412,7 +412,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
 
   $query = "
     SELECT count(*) as deleted FROM Deleted as Current
-    JOIN $metadata[table] as Production ON deleted_entity_id = $primaries[production] AND deleted_table = '$metadata[table]'
+    JOIN P_$metadata[table] as Production ON deleted_entity_id = $primaries[production] AND deleted_table = '$metadata[table]'
     AND (".implode(' AND ',$rules['delete']).")
     ";
   display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(deleted)');
@@ -449,6 +449,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   $obm_qm->query($query);
   $obm_qm->next_record();
   $return['links'] = $obm_qm->f('links');
+  $return['diff'] += $return['links'];
 
   return $return;
 }

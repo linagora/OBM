@@ -94,7 +94,7 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resourcegroup_data_form($params)) {
+  if (check_user_defined_rules() && check_resourcegroup_data_form($params)) {
 
     // If the context (same group) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
@@ -132,7 +132,7 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resourcegroup_data_form($params)) {
+  if (check_user_defined_rules() && check_resourcegroup_data_form($params)) {
     $retour = run_query_resourcegroup_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_resourcegroup : $l_update_ok");

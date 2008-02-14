@@ -67,7 +67,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if(check_organizationalchart_data_form($params)) {
+  if(check_user_defined_rules() && check_organizationalchart_data_form($params)) {
     $oid = run_query_organizationalchart_insert($params);
     if($oid > 0) {
       $params["organizationalchart_id"] = $oid;
@@ -107,7 +107,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_organizationalchart_data_form($params)) {
+  if (check_user_defined_rules() && check_organizationalchart_data_form($params)) {
     $retour = run_query_organizationalchart_update($params["organizationalchart_id"], $params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_organizationalchart : $l_update_ok");

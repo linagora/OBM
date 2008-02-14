@@ -105,10 +105,15 @@ if ( ($params['new_group'] == '1')
 if ($action == 'perform_meeting' &&
   ($params['sel_resource_group_id'] || $params['sel_user_id'] ||
   $params['sel_resource_id'] || $params['sel_group_id'])) { 
-  $cal_entity_id['resource_group'] = $params['sel_resource_group_id'];
   $cal_entity_id['user'] = $params['sel_user_id'];
   $cal_entity_id['resource'] = $params['sel_resource_id'];    
   $cal_entity_id['group'] = $params['sel_group_id'];
+  if($params['resource_group_search'] == 'all') {
+    $resources = run_query_calendar_get_group_resource($params['sel_resource_group_id']);
+    $cal_entity_id['resource'] = array_merge($cal_entity_id['resource'], $resources );
+  } else {
+    $cal_entity_id['resource_group'] = $params['sel_resource_group_id'];
+  }
 } else if ($action != 'perform_meeting') {
   unset($cal_entity_id['resource_group']);
 }
@@ -120,6 +125,9 @@ if ($cal_entity_id['group_view'] == '') $cal_entity_id['group_view'] = $c_all;
 if (($params['new_sel']) || (is_array($params['sel_user_id'])) 
     && !(($action == 'insert') || ($action == 'update'))) {
   $cal_entity_id['user'] = $params['sel_user_id'];
+  if (is_array($params['sel_group_id'])) {
+    $cal_entity_id['group'] = $params['sel_group_id'];
+  }       
 }
 
 // If resources selection present we override session content
@@ -129,9 +137,7 @@ if (($params['new_sel']) || (is_array($params['sel_resource_id']))
 }
 
 // If group selection present we override session content
-if (is_array($params['sel_group_id'])) {
-  $cal_entity_id['group'] = $params['sel_group_id'];
-} 
+
 // If no user or resource selected, we select the connected user
 if ( ( (! is_array($cal_entity_id['user']))
        || (count($cal_entity_id['user']) == 0) )

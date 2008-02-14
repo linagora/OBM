@@ -89,7 +89,7 @@ if ($action == "ext_get_id") {
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_mailshare_data_form($params)) {
+  if (check_user_defined_rules() && check_mailshare_data_form($params)) {
     
     // If the context (same mailshare ?) was confirmed ok, we proceed
     if ($params["confirm"] == $c_yes) {
@@ -132,7 +132,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_mailshare_data_form($params)) {
+  if (check_user_defined_rules() && check_mailshare_data_form($params)) {
     $retour = run_query_mailshare_update($params);
     if ($retour) {
       set_update_state();

@@ -3796,6 +3796,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
   global $l_groups,$l_resources,$l_module_resourcegroup, $l_module_calendar;
+  global $l_resources_one_freebusy,$l_resources_all_freebusy,$l_resource_group_search;
 
   $time_unit = 60 / $_SESSION['set_cal_interval'];
   $datebegin = of_date_upd_format($calendar["date"]);
@@ -3936,7 +3937,21 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     $resource_js = "
       new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch');
       new obm.AutoComplete.Search('$path/resourcegroup/resourcegroup_index.php?action=ext_search', 'sel_resource_group_id', 'resourcegroupSearch');  
-    ";
+      ";
+    $dis_block_resource = "
+      <fieldset class=\"detail infos\">
+      <legend>$l_resources</legend>  
+      <table>
+      $dis_block_resource 
+      $dis_block_resource_group
+      <tr><th>$l_resource_group_search</th><td>
+      <select name='resource_group_search'>
+      <option value='one'>$l_resources_one_freebusy</option>
+      <option value='all'>$l_resources_all_freebusy</option>
+      </select>
+      </td></tr>      
+      </table>
+      </fieldset>";      
   }
   
   // group select
@@ -3975,7 +3990,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     </td>";
 
 
-  $dis_hour_d = "<select name=\"sel_time_duration\">";
+  $dis_hour_d = "<select style='width:4em;' name=\"sel_time_duration\">";
   for ($i=0;$i<24;$i++) {
     $current_hour = substr("0$i",-2,2); 
     if ($current_hour == $hourbegin){
@@ -3986,7 +4001,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   }
   $dis_hour_d .= "</select>";
  
-  $dis_min_d = "<select name=\"sel_min_duration\">";
+  $dis_min_d = "<select style='width:4em;' name=\"sel_min_duration\">";
   for ($i=4;$i>=1;$i--) {
     $current_min = substr("0".(60 - (15*$i)),-2);
     if ($current_min  == $mindur){
@@ -4003,17 +4018,10 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   <form method=\"post\" name=\"f_entity\"
    onsubmit=\"if (calendar_check_meeting(this)) return true; else return false;\"
    action=\"calendar_index.php\">
-  <fieldset class=\"detail extra\">  
+  </fieldset>
+  <fieldset class=\"detail infos\">  
   <legend>$l_header_meeting</legend>
   <table>
-  <tr>
-    $block_user
-  </tr>
-  <tr>
-    $block_group
-  </tr>
-  $dis_block_resource  
-  $dis_block_resource_group
   <tr>
     <th>$l_datebegin</th>
     <td>
@@ -4025,7 +4033,19 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     <td>$dis_hour_d : $dis_min_d</td>
   </tr>
   </table>
-  </fieldset>
+  </fieldset>   
+  <fieldset class=\"detail infos\">  
+  <legend>$l_users</legend>
+  <table>
+  <tr>
+    $block_user
+  </tr>
+  <tr>
+    $block_group
+    </tr>
+  </table>
+  </fieldset>   
+  $dis_block_resource
   <fieldset class=\"buttons\">
     $dis_button
   </fieldset>    
@@ -4055,7 +4075,7 @@ function dis_calendar_free_interval($calendar, $entity_store) {
   global $l_private,$l_private_description,$display,$l_free_resources,$l_all_f;
   global $l_previous, $l_next;
 
-  $iso_date = $calendar["date"];
+  $iso_date = $calendar["date_begin"];
   $ts_date = strtotime($iso_date);
   $time_unit = 60 / $_SESSION['set_cal_interval']; 
   $time_unit_sec = 3600 / $_SESSION['set_cal_interval'];; 

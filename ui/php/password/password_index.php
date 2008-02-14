@@ -39,7 +39,7 @@ if (($action == "index") || ($action == "")) {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_password($obm["uid"]);
-  if (check_data_form($obm_q, $params)) {
+  if (check_user_defined_rules() && check_data_form($obm_q, $params)) {
     $retour = run_query_password_update($params, $obm["uid"], $obm_q);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_password : $l_update_ok");

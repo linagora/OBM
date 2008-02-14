@@ -2488,14 +2488,11 @@ function isWindows() {
 /**
  * check rules defined by the user 
  * 
- * @param mixed $rules 
- * @param mixed $fields 
  * @access public
  * @return void
  */
-function check_user_defined_rules($module, &$fields) {
-  global $err, $rules;
-
+function check_user_defined_rules() {
+  global $err, $rules, $params;
   $return = true;
 
   if (is_array($rules)) {
@@ -2506,7 +2503,7 @@ function check_user_defined_rules($module, &$fields) {
 	  $field_rules[$rule] = array('default' => $content);
 	}
       }
-      $value = $fields[$field];
+      $value = $params[$field];
       if ($field_rules['length']['default'] > 0) {
 	$value = substr($value,0,$field_rules['length']['default']);
       }
@@ -2533,7 +2530,7 @@ function check_user_defined_rules($module, &$fields) {
 	  }
 	}
       }
-      $fields[$field] = stripslashes($value);
+      $params[$field] = stripslashes($value);
     }
   }
 

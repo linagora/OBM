@@ -118,7 +118,7 @@ else if ($action == "new_criterion") {
     // or no more graphical criteria (query should be set to empty)
     $params["query"] = stripslashes($params["query"]);
   }
-  if (check_list_data("", $params)) {
+  if (check_user_defined_rules() && check_list_data("", $params)) {
     // If the context (same list) was confirmed ok, we proceed
     if ($params["confirm"] == $c_yes) {
       $params["list_id"] = run_query_list_insert($params);
@@ -161,7 +161,7 @@ else if ($action == "new_criterion") {
     // or no more graphical criteria (query should be set to empty)
     $params["query"] = stripslashes($params["query"]);
   }
-  if (check_list_data($params["list_id"], $params)) {
+  if (check_user_defined_rules() && check_list_data($params["list_id"], $params)) {
     $retour = run_query_list_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_list : $l_update_ok");

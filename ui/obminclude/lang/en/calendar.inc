@@ -215,6 +215,10 @@ $l_add_exception_mail_body = 'Updated event on OBM: %s';
 $l_delete_exception_mail_subject = 'Updated event on OBM: %s';
 $l_update_state_mail_subject = 'Attendees update on OBM event: %s';
 
+$l_resource_group_search = "Crenel is free if";
+$l_resources_one_freebusy = "One resource is free by group";
+$l_resources_all_freebusy = "All resources are free";
+  
 $l_add_event_mail_body = 
 "This mail was automaticly sent by OBM
 ------------------------------------------------------------------

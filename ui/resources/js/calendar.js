@@ -353,10 +353,13 @@ Obm.CalendarDayEvent = new Class({
     if(this.size != 1) {
       dayBegin = (new Date(this.event.time * 1000).getDay() + this.hidden - obm.vars.consts.weekStart + 7) % 7; 
       dayEnd = (dayBegin + this.size + 6) % 7;
+      var startDate = new Date((obm.calendarManager.startTime + this.origin) * 1000);
       while(dayEnd < dayBegin || this.size > 7) {
         var extensionSize = dayEnd + 1;
         this.size -= extensionSize;
-        var extensionOrigin = this.origin + this.size * 86400;
+        var extensionDate = new Date(startDate.getTime());
+        extensionDate.setDate(startDate.getDate() + this.size);
+        var extensionOrigin = Math.floor(extensionDate.getTime()/1000) - obm.calendarManager.startTime;
         dayEnd = 6;
         if($(this.options.type+'-'+extensionOrigin)) {
           this.extensions.push(new Obm.CalendarDayEventExtension(this,extensionSize, extensionOrigin));

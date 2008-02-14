@@ -120,7 +120,7 @@ elseif ($action == "ext_get_ids") {
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_data_form("", $params)) {
+  if (check_user_defined_rules() && check_document_data_form("", $params)) {
     $params["document_id"] = run_query_document_insert($params);
     if ($params["document_id"]) {
       update_last_visit("document", $params["document_id"], $action);
@@ -138,7 +138,7 @@ elseif ($action == "ext_get_ids") {
 
 } elseif ($action == "insert_dir") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_dir_data_form($params)) {
+  if (check_user_defined_rules() && check_document_dir_data_form($params)) {
     $retour = run_query_document_insert_dir($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_dir : $l_insert_ok");
@@ -154,7 +154,7 @@ elseif ($action == "ext_get_ids") {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_data_form($params["document_id"], $params)) {
+  if (check_user_defined_rules() && check_document_data_form($params["document_id"], $params)) {
     $retour = run_query_document_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_document : $l_update_ok");
@@ -171,7 +171,7 @@ elseif ($action == "ext_get_ids") {
 
 } elseif ($action == "update_dir") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_dir_data_form($params)) {
+  if (check_user_defined_rules() && check_document_dir_data_form($params)) {
     $retour = run_query_document_update_dir($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_dir : $l_update_ok");

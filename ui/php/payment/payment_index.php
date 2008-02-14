@@ -51,7 +51,7 @@ if ($action == "index") {
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_payment_data_form("", $params)) {
+  if (check_user_defined_rules() && check_payment_data_form("", $params)) {
     $id = run_query_payment_insert($params);
     if ($id > 0) {
       $params["payment_id"] = $id;
@@ -90,7 +90,7 @@ if ($action == "index") {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_payment_data_form($params["payment_id"], $params)) {
+  if (check_user_defined_rules() && check_payment_data_form($params["payment_id"], $params)) {
     $retour = run_query_payment_update($params["payment_id"], $params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_payment : $l_update_ok");
@@ -105,7 +105,7 @@ if ($action == "index") {
 
 } elseif ($action == "invoice_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_payment_invoice_data_form($params)) {
+  if (check_user_defined_rules() && check_payment_invoice_data_form($params)) {
     $retour = run_query_payment_invoice_update($params["payment_id"], $params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_payment : $l_update_ok");

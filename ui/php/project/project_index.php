@@ -130,7 +130,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_project_form('', $params)) {
+  if (check_user_defined_rules() && check_project_form('', $params)) {
     
     $params['project_id'] = run_query_project_insert($params);
     if ($params['project_id'] > 0) {
@@ -146,7 +146,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_project_form($params['project_id'], $params)) {
+  if (check_user_defined_rules() && check_project_form($params['project_id'], $params)) {
     $retour = run_query_project_update($params['project_id'], $params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_project : $l_update_ok");
@@ -202,7 +202,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'task_add') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_project_task_form($params['project_id'], $params)) {
+  if (check_user_defined_rules() && check_project_task_form($params['project_id'], $params)) {
     $retour = run_query_project_task_insert($params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_task : $l_insert_ok");
@@ -223,7 +223,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'task_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_project_task_form($params['project_id'], $params)) {
+  if (check_user_defined_rules() && check_project_task_form($params['project_id'], $params)) {
     $retour = run_query_project_task_update($params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_task : $l_update_ok");
@@ -310,7 +310,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'closing_insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_project_closing_form($params)) {
+  if (check_user_defined_rules() && check_project_closing_form($params)) {
     $params['closing_id'] = run_query_project_closing_insert($params);
     if ($params['closing_id'] > 0) {
       $display['msg'] .= display_ok_msg("$l_closing : $l_insert_ok");

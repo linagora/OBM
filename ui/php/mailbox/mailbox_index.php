@@ -21,6 +21,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("mailbox_display.inc");
 require("mailbox_query.inc");
+require('obminclude/javascript/check_js.inc');
 require("$obminclude/of/of_right.inc");
 if (($action == "") || ($action == "index")) {
   $action = "rights_admin";

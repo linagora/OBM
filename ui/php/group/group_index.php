@@ -98,7 +98,7 @@ if (($action == 'index') || ($action == '')) {
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_group_data_form($params)) {
+  if (check_user_defined_rules() && check_group_data_form($params)) {
 
     // If the context (same group) was confirmed ok, we proceed
     if ($params["confirm"] == $c_yes) {
@@ -142,7 +142,7 @@ if (($action == 'index') || ($action == '')) {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_group_data_form($params)) {
+  if (check_user_defined_rules() && check_group_data_form($params)) {
     $retour = run_query_group_update($params);
     if ($retour) {
       // Set update state only if the update group is public

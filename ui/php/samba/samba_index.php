@@ -38,7 +38,7 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($params)) {
+  if (check_user_defined_rules() && check_data_form($params)) {
     $retour = run_query_samba_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);

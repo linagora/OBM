@@ -1454,7 +1454,7 @@ function check_user_update_rights($params) {
 //   - $user[]   : values checked
 //     keys used : name, passwd, email
 ///////////////////////////////////////////////////////////////////////////////
-function check_user_data_form($p_id, $user) {
+function check_user_data_form($p_id, &$user) {
   global $l_exist_error,$l_login_error, $l_login_in_use;
   global $l_password_error, $l_password_empty, $l_profile_privilege_error;
   global $l_lname_error, $l_last_admin_error, $l_image_type_error;

@@ -46,7 +46,7 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_vacation_data_form($params)) {
+  if (check_user_defined_rules() && check_vacation_data_form($params)) {
     $obm_q = run_query_vacation_detail($obm["uid"]);
     if (update_vacation($params, $obm_q)) {
       $display["msg"] .= display_ok_msg("$l_vacation : $l_update_ok");

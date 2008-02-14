@@ -939,10 +939,6 @@ function check_group_data_form(&$group) {
   global $l_j_check_email, $l_system_no_priv, $l_err_system_samba;
   global $l_only_owner_priv, $l_err_public_rights, $l_err_private_email;
 
-  if (!check_user_defined_rules('group', $group)) {
-    return false;
-  }
-
   $id = $group['group_id'];
   $name = $group['name'];
   $samba = $group['samba'];

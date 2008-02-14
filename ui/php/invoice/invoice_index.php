@@ -92,7 +92,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_invoice_data_form('', $params)) {
+  if (check_user_defined_rules() && check_invoice_data_form('', $params)) {
     $retour = run_query_invoice_insert($params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_invoice : $l_insert_ok");
@@ -107,7 +107,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_invoice_data_form($params['invoice_id'], $params)) {
+  if (check_user_defined_rules() && check_invoice_data_form($params['invoice_id'], $params)) {
     $retour = run_query_invoice_update($params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_invoice : $l_update_ok");

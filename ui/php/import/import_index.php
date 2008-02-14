@@ -121,7 +121,7 @@ if (($action == 'index') || ($action == '')) {
 
 } else if ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_import_data_form('', $params)) {
+  if (check_user_defined_rules() && check_import_data_form('', $params)) {
 
     // If the context (same import) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
@@ -159,7 +159,7 @@ if (($action == 'index') || ($action == '')) {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_import_data_form($params['import_id'], $params)) {
+  if (check_user_defined_rules() && check_import_data_form($params['import_id'], $params)) {
     $retour = run_query_import_update($params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_import : $l_update_ok");

@@ -217,6 +217,23 @@ function run_query_resource_resourcegroup($group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Get the resources of the given group                    //
+// Parameters:
+//   - $group[] : Group parameters
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_get_group_resource($group) {
+  $obm_q = run_query_resource_resourcegroup($group);
+  $resources = array();
+  if(is_object($obm_q)) {
+    while($obm_q->next_record()) {
+      $resources[] = $obm_q->f('resource_id');
+    }
+  }
+  return $resources;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Insert a user decision for an user
 // Parameters:
 //   - $calendar : Calendar params
@@ -826,7 +843,28 @@ function run_query_icalendar_insert($params) {
   global $obm ;
   global $all_emails ;
   // --- get the unfolding ics
+  /* TEST FOR 2.1.6 + 1
   $ics = file($params['ics_tmp']) ;
+  echo "<pre>";
+  $document = ICS_Utils::parse($params['ics_tmp']);
+  
+  $vevents = &$document->getVevents();
+  foreach($vevents as $vevent) {
+    echo "
+      TITRE : ".$vevent->title['value']."
+      DATE : ".date('Y-m-d H:i:s',$vevent->date['value'])."      
+      RRULE : ".$vevent->rrule['value']."      
+      DURATION : ".$vevent->duration['value']."      
+      PRIORITY : ".$vevent->priority['value']."      
+      DESCRIPTION : ".$vevent->description['value']."     
+      LOCATION : ".$vevent->location['value']." 
+      PRIVATE : ".$vevent->privacy['value']." 
+      TIME CREATE : ".date('Y-m-d H:i:s',$vevent->timecreate['value'])."
+      TIME UPDATE : ".date('Y-m-d H:i:s',$vevent->timeupdate['value'])."
+      ";
+  }
+  echo "</pre>";
+   */
   $new_ics = array() ; // unfolded $ics
   $prevline = '' ;
   $i = -1 ;
@@ -902,15 +940,6 @@ function run_query_icalendar_insert($params) {
 
   return array($nb_processed_event) ;
 
-  // process todos
-  //foreach($vtodos as $vtodo) {
-  //  echo "VTODO : " ;
-  //  echo ics_get_property('SUMMARY', $vtodo) ;
-  //  $icsdate = ics_get_property('DTSTART', $vtodo) ;
-  //  $date = date("d/m/Y H:i:s", ics_date_to_timestamp($icsdate)) ;
-  //  echo " (".$icsdate." -> ".$date.")" ;
-  //  echo "<br>\n" ;
-  //}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1047,7 +1076,6 @@ function ics_get_vevent_properties($vevent) {
     if (strpos($line, 'DTSTART') === 0) {
       $icsdate = substr($line, strlen('DTSTART') + 1) ;
       $date_begin = ics_date_to_timestamp($icsdate) ;
-      //echo date('Y-m-d H:i:s', $date_begin)."<br>" ;
       $properties['date_begin'] = date('Y-m-d H:i:s', $date_begin) ;
       continue ;
     }
@@ -3339,7 +3367,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity) {
   global $day_duration;
-
+  $day_duration = 86400;
   $temp_date = $date;
   if ($temp_date < $start_time) {
     $temp_date = ceil(($start_time - $date) / $day_duration);
@@ -4320,134 +4348,6 @@ function calendar_send_mail($mails) {
 
 
 
-class ICS_Utils {
 
-  function parse($file) {
-    $document = new ICS_Document();
-    $handle = fopen($file, 'r');
-    while(($line = fgets($handle)) && strcmp(trim($line),'BEGIN:VCALENDAR') !== 0);
-    ICS_Utils::parseElement($handle, $document->vcalendar);
-    fclose($handle);
-    return $document;
-  }
-
-  function parseElement(&$handle,&$element) {
-    while(($line = fgets($handle)) && preg_match('/^END:.*$/',$line) === 0) {
-      if(preg_match('/^BEGIN:(.*)$/',$line,$match) !== 0) {
-        $document = $element->getDocument();
-        $child = $document->createElement($match[1]);
-        $element->appendChild($child);
-        ICS_Utils::parseElement($handle,$child);
-      } else {
-        $property = ICS_Utils::parseProperty($handle, $line);
-        $element->setProperty($property['name'],$property['values'],$property['options']);
-      }
-    }
-  }
-
-  function parseProperty(&$handle, $line) {
-    $propertyLine = '';
-    $indent = 0;
-    $properties = array('name','options','values');
-    do {
-      $offset = ftell($handle);
-      $propertyLine .= trim($line);
-      $line = fgets($handle);
-      $indent++;
-    } while(preg_match('/^\s{'.$indent.'}.*$/',$line) !== 0);
-    fseek($handle,$offset);
-    preg_match('/^([^;:]*);?([^:]*):(.*)$/',$propertyLine, $match);
-    $property['name'] = $match[1];
-    $property['options'] = array();
-    $options = explode(';',$match[2]);
-    foreach($options as $option) {
-      list($optionName, $optionValue) = explode('=', $option);
-      $property['options'][$optionName] = $optionValue;
-    }
-    $property['values'] = array();
-    $values = explode(';',$match[3]);
-    foreach($values as $value) {
-      if(strpos('=',$value) !== FALSE) {
-        list($valueName, $valueValue) = explode('=', $value);
-        $property['values'][$valueName] = $valueValue;
-      } else {
-        $property['values'][] = $value;
-      }
-    }
-    return $property;
-  }
-}
-
-class ICS_Element {
-  
-  var $properties = array();
-
-  var $document = NULL;
-  var $name;
-
-  var $child = array();
-
-  function ICS_Element(&$document, $name) {
-    $this->document = $document;
-    $this->name = $name;
-  }
-
-  function setProperty($name, $values, $options) {
-    if(method_exists($this, 'set'.strtoupper($name))) {
-      $this->${'set'.strtoupper($name)}($values, $options);
-    } else {
-      $this->$name = array('values' => $values, 'options' => $options);
-    }    
-  }
-
-  function getDocument() {
-    return $this->document;
-  }
-
-  function appendChild(&$child) {
-    $this->child[] = &$child;
-  }
-}
-
-class ICS_VEVENT extends ICS_Element {
-  
-  function setProperty($name, $values, $options) {
-
-  }
-
-  function setDTSTART($values,$options) {
-    $date = array_shift($values);
-    preg_match('/.*(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})){0,1}/', $date, $match) ;
-    $date = gmmktime($hour, $minute, $second, $month, $day, $year);
-    if($options['TZID']) {
-      $document = $this->getDocument();
-      $timeZones = $document->getElementByName('timezone');   
-      foreach($timeZones as $timeZone) {
-        if(strcmp($timeZone->tzid,$options['TZID']) === 0) {
-          break;
-        }
-      }
-
-    } else {
-      $this->dtstart = array('values' => array($date),
-                             'options' => $options);
-    }
-  }
-}
-
-
-class ICS_Document {
-
-  var $vcalendar;
-
-  function ICS_Document () {
-    $this->vcalendar = new ICS_Element($this,'vcalendar');
-  }
-
-  function createElement($name) {
-    return new ICS_Element($this, $name);
-  }
-
-}
 
 ?>

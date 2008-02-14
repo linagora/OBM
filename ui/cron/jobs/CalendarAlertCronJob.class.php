@@ -1,6 +1,6 @@
 <?php
 include_once("CronJob.class.php");
-
+define('DAY_DURATION',86400);
 /**
  * CalendarAlertCronJob 
  * 
@@ -150,7 +150,6 @@ class CalendarAlertCronJob extends CronJob{
    */
   function getSimpleAlerts($start_time, $end_time) {
     $of = &OccurrenceFactory::getInstance();
-    $day_duration = 86400;
     $this->logger->debug("Getting alerts on non-reccurent events between ".date("Y-m-d H:i:s",$start_time)." and ".date("Y-m-d H:i:s",$end_time));
     $nr_q = run_query_calendar_no_repeat_alerts($start_time,$end_time);
     $this->logger->debug($nr_q->nf()." potentials alerts founded on non-reccurent event");
@@ -226,10 +225,10 @@ class CalendarAlertCronJob extends CronJob{
       $event->addAttendee($entity,$entity_id,$entity_label,$state);      
       $event_start =  $start_time ;
       $delta = date("H",$date) * 3600 + date("i",$date) * 60 + date("s",$date) + $duration;
-      $delta = floor($delta/$day_duration);
-      $event_start -= $delta * $day_duration;
+      $delta = floor($delta/DAY_DURATION);
+      $event_start -= $delta * DAY_DURATION;
       $end_date = ($endrepeat < $end_time) ? $endrepeat : $end_time;
-      $end_date += $day_duration;
+      $end_date += DAY_DURATION;
       switch ($repeatkind) {
         case "daily" :
           calendar_daily_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity);	

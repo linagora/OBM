@@ -140,15 +140,13 @@ function run_query_resource_ext_search($resource) {
   }
 
   $query = "SELECT 
-      count(*) as resultscount,
-      resource_name
+      count(*) as resultscount
     FROM Resource
     LEFT JOIN ResourceType ON resource_rtype_id = resourcetype_id
     WHERE 
       resource_name LIKE '$pattern%' 
       $multidomain
       $where_restriction
-    GROUP BY resource_name
     ORDER BY resource_name  ";
 
   display_debug_msg($query, $cdg_sql, "run_query_resource_ext_search()");
@@ -173,7 +171,6 @@ function run_query_resource_ext_search($resource) {
 
   display_debug_msg($query, $cdg_sql, "run_query_resource_ext_search()");
   $obm_q->query($query);
-
   return array('length' => $resultsCount, 'datas' => $obm_q);
 }
 
@@ -377,11 +374,6 @@ function check_resource_data_form($p_id, &$resource) {
   global $l_exist_error, $l_name_error, $l_desc_error;
   global $l_lname_error;
   global $err, $action, $cdg_sql;
-
-  if(!check_user_defined_rules("resource", $resource)) {
-    return false;
-  }
-
 
   $id = $resource["resource_id"];
   $name = $resource["name"];

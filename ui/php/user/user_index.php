@@ -111,7 +111,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_user_data_form("", $params)) {
+  if (check_user_defined_rules() && check_user_data_form("", $params)) {
 
     // If the context (same user) was confirmed ok, we proceed
     if ($params["confirm"] == $c_yes) {
@@ -160,7 +160,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_user_data_form($params["user_id"], $params)) {
+  if (check_user_defined_rules() && check_user_data_form($params["user_id"], $params)) {
     $retour = run_query_user_update($params["user_id"], $params);
     if ($retour) {
       set_update_state();

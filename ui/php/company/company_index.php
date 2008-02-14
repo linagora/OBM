@@ -103,7 +103,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_company_data_form('', $params)) {
+  if (check_user_defined_rules() && check_company_data_form('', $params)) {
 
     // If the context (same companies) was confirmed ok, we proceed
     if ($params['confirm'] == $c_yes) {
@@ -142,7 +142,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_company_data_form($params['company_id'], $params)) {
+  if (check_user_defined_rules() && check_company_data_form($params['company_id'], $params)) {
     $retour = run_query_company_update($params['company_id'], $params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_company : $l_update_ok");

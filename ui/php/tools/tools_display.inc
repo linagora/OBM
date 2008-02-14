@@ -55,6 +55,9 @@ function dis_tools_update_detail() {
       if ($realm == 'delegation') {
 	$dis_detail_title .= ' ('. $obm['delegation'] . ') ';
       }
+      if ($realm == 'delegation' && $obm['delegation'] == '') {
+        break;
+      }
       foreach ($entities as $entity=>$db_info) {
 	$dis_entity = ${"l_$entity"};
 	if ($cgp_show['module']["$entity"]) {
@@ -76,7 +79,6 @@ function dis_tools_update_detail() {
           </tr>";
 	}
       }
-
       if (($has_update) || ($has_domain_upd)) {
 	set_update_state($domain_id);
   

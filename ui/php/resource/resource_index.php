@@ -106,7 +106,7 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resource_data_form('', $params)) {
+  if (check_user_defined_rules() && check_resource_data_form('', $params)) {
     // If the context (same resource) was confirmed ok, we proceed
     if (is_array($params['accept_admin'])) {
       $params['accept_write'] = $params['accept_admin'];
@@ -128,7 +128,7 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resource_data_form($params['resource_id'], $params)) {
+  if (check_user_defined_rules() && check_resource_data_form($params['resource_id'], $params)) {
     $retour = run_query_resource_update($params['resource_id'], $params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_resource : $l_update_ok");

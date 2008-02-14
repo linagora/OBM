@@ -50,7 +50,7 @@ if (($action == 'index') || ($action == '')) {
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_mailforward_detail($obm['uid']);
-  if (check_mailforward_data_form($obm_q, $params)) {
+  if (check_user_defined_rules() && check_mailforward_data_form($obm_q, $params)) {
     $retour = run_query_mailforward_update($params, $obm['uid']);
     if ($retour) {
       exec_change_alias($obm_q, $params);

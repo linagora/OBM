@@ -155,7 +155,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'insert_subscription') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_publication_data_subscription_form('', $params)) {
+  if (check_user_defined_rules() && check_publication_data_subscription_form('', $params)) {
     $retour = run_query_publication_insert_subscription($params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_subscription : $l_insert_ok");
@@ -234,7 +234,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'update_subscription') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_publication_data_subscription_form('', $params)) {
+  if (check_user_defined_rules() && check_publication_data_subscription_form('', $params)) {
     $retour = run_query_publication_update_subscription($params);
     if ($retour) {
       $quit = "

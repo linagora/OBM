@@ -136,7 +136,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_deal_form('', $params)) {
+  if (check_user_defined_rules() && check_deal_form('', $params)) {
     $params['deal_id'] = run_query_deal_insert($params);
     if ($params['deal_id']) {
       $display['msg'] .= display_ok_msg("$l_deal : $l_insert_ok");
@@ -152,7 +152,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_deal_form('', $params)) {
+  if (check_user_defined_rules() && check_deal_form('', $params)) {
     $retour = run_query_deal_update($params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_deal : $l_update_ok");

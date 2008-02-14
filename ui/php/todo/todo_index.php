@@ -45,7 +45,7 @@ if ($action == 'index' || $action == '') {
 
 } else if ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_todo_data_form($params)) {
+  if (check_user_defined_rules() && check_todo_data_form($params)) {
     $retour = run_query_todo_insert($params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_todo : $l_insert_ok");
@@ -91,7 +91,7 @@ if ($action == 'index' || $action == '') {
 
 } else if ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_todo_data_form($params)) {
+  if (check_user_defined_rules() && check_todo_data_form($params)) {
     $retour = run_query_todo_update($params);
 
     if ($popup) {

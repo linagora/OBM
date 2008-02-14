@@ -72,7 +72,7 @@ if ($action == 'ext_get_ids') {
 
 } else if ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_mailserver_data_form($params)) {
+  if (check_user_defined_rules() && check_mailserver_data_form($params)) {
     $retour = run_query_mailserver_insert($params);
     if ($retour) {
       $params['mailserver_id'] = $retour;
@@ -89,7 +89,7 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_mailserver_data_form($params)) {
+  if (check_user_defined_rules() && check_mailserver_data_form($params)) {
     $retour = run_query_mailserver_update($params);
     if ($retour) {
       $display['msg'] .= display_ok_msg($l_update_ok);

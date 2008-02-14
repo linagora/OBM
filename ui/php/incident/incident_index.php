@@ -92,7 +92,7 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_incident_form($params)) {
+  if (check_user_defined_rules() && check_incident_form($params)) {
     $params["incident_id"] = run_query_incident_insert($params);
     if ($params["incident_id"] > 0) {
       $display["msg"] = display_ok_msg("$l_incident : $l_insert_ok");
@@ -108,7 +108,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_incident_form($params)) {
+  if (check_user_defined_rules() && check_incident_form($params)) {
     $ret = run_query_incident_update($params);
     if ($ret) {
       $display["msg"] = display_ok_msg("$l_incident : $l_update_ok");

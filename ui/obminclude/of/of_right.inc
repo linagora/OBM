@@ -150,15 +150,13 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 
     $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
     $popup_user_add_button = "
-    <a id=\"lnk_accept_read\" href=\"javascript: return false;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+    <a id=\"lnk_accept_read\" href=\"#\" onclick=\"return popup('$url');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
     $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
     $popup_group_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
 
@@ -206,14 +204,12 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 
     $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
     $popup_user_add_button = "
-      <a id=\"lnk_accept_write\" href=\"javascript: return false;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a id=\"lnk_accept_write\" href=\"#\" onclick=\"return popup('$url');\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
      </a>";
     $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
     $popup_group_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
 
@@ -251,14 +247,12 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 
     $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
     $popup_user_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
     $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
     $popup_group_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"javascript: return false;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
 

@@ -107,7 +107,7 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_contract_form("", $params)) {
+  if (check_user_defined_rules() && check_contract_form("", $params)) {
     // If the context (same contracts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
       $params["contract_id"] = run_query_contract_insert($params);
@@ -134,7 +134,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_contract_form("", $params)) {  
+  if (check_user_defined_rules() && check_contract_form("", $params)) {  
     $ret = run_query_contract_update($params);         
     if ($ret) {
       $display["msg"] .= display_ok_msg("$l_contract : $l_update_ok");

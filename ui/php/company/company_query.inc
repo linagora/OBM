@@ -760,7 +760,7 @@ function check_company_data_form($cid, $company) {
   global $l_j_check_email, $l_j_check_web, $l_err_act_empty;
   global $err;
   global $php_regexp_zip,$php_regexp_phone,$php_regexp_fax,$php_regexp_email,$php_regexp_web;
-
+     
   $number = $company['number'];
   $name = $company['name'];
   $act = $company['activity'];

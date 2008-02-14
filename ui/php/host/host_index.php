@@ -87,7 +87,7 @@ if ($action == 'ext_get_id') {
 
 } else if ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_host_data_form($params)) {
+  if (check_user_defined_rules() && check_host_data_form($params)) {
     
     // If the context (same host) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
@@ -125,7 +125,7 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_host_data_form($params)) {
+  if (check_user_defined_rules() && check_host_data_form($params)) {
     $retour = run_query_host_update($params);
     if ($retour) {
       set_update_state();

@@ -56,10 +56,15 @@ if ($action == "index") {
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_account_insert($params);
-  $display["msg"] = display_ok_msg("$l_account : $l_insert_ok");
-  require("account_js.inc");
-  $display["search"] = html_account_search_form($action, $params);
+  if(check_user_defined_rules()) {
+    run_query_account_insert($params);
+    $display["msg"] = display_ok_msg("$l_account : $l_insert_ok");
+    require("account_js.inc");
+    $display["search"] = html_account_search_form($action, $params);
+  } else {
+    $display["detail"] = html_account_form($obm_q_accounts, $action);
+    $display["msg"] = display_err_msg($err);
+  }
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////

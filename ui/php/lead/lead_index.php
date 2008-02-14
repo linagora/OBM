@@ -50,7 +50,7 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_lead_data_form('', $params)) {
+  if (check_user_defined_rules() && check_lead_data_form('', $params)) {
     $id = run_query_lead_insert($params);
     if ($id > 0) {
       $params['lead_id'] = $id;
@@ -77,7 +77,7 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_lead_data_form($params['lead_id'], $params)) {
+  if (check_user_defined_rules() && check_lead_data_form($params['lead_id'], $params)) {
     $retour = run_query_lead_update($params['lead_id'], $params);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_lead : $l_update_ok");
