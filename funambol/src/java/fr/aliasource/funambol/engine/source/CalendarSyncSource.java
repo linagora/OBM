@@ -24,7 +24,6 @@ import com.funambol.framework.engine.SyncItemState;
 import com.funambol.framework.engine.source.SyncContext;
 import com.funambol.framework.engine.source.SyncSource;
 import com.funambol.framework.engine.source.SyncSourceException;
-import com.funambol.framework.protocol.SyncInitialization;
 import com.funambol.framework.tools.Base64;
 
 import fr.aliasource.funambol.OBMException;
@@ -303,7 +302,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 			throws OBMException {
 
 		String toParse = content;
-		toParse = toParse.replaceAll("encoding", "ENCODING");
+		toParse = toParse.replace("encoding", "ENCODING");
+		toParse = toParse.replace("PRINTABLE:", "PRINTABLE;CHARSET=UTF-8:");
+		toParse = toParse.replace("=0D=0A=\r\n\r\n", "=0D=0A\r\n");
 		ByteArrayInputStream buffer = new ByteArrayInputStream(toParse
 				.getBytes());
 

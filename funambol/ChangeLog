@@ -1,3 +1,12 @@
+2008-02-14  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Fix for "notes" usage on windows mobile with synthesis : 
+	replace =0D=0A=\r\n\r\n with =0D=0A\r\n
+	
+	* build/build_deploy_vm.sh:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getFoundationCalendarFromICal):
+
 2008-01-30  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	Symbian sends vtodo during calendar sync... skip them
