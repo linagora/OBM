@@ -37,7 +37,8 @@ function html_admin_ref_country_form($ctry_q) {
     $lang = $ctry_q->f('country_lang');
     $name = $ctry_q->f('country_name');
     $phone = $ctry_q->f('country_phone');
-    
+    $key = "$iso-$lang";
+
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
@@ -52,15 +53,15 @@ function html_admin_ref_country_form($ctry_q) {
     <img src=\"$ico_delete\" alt=\"$l_ctry_checkdelete\" title=\"$l_ctry_checkdelete\" />
     </a></td>
     <td>
-    <input type=\"hidden\" id=\"tf_ctry_old_code_$iso\" value=\"$iso\" size=\"3\" />
-    <input type=\"text\" id=\"tf_ctry_code_$iso\" maxlength=\"2\"  value=\"$iso\" size=\"3\" /></td>
+    <input type=\"hidden\" id=\"tf_ctry_old_code_$key\" value=\"$iso\" size=\"3\" />
+    <input type=\"text\" id=\"tf_ctry_code_$key\" maxlength=\"2\" value=\"$iso\" size=\"3\" /></td>
     <td>
-    <input type=\"hidden\" id=\"tf_ctry_old_lang_$iso\" value=\"$lang\" size=\"3\" />
-    <input type=\"text\" id=\"tf_ctry_lang_$iso\" maxlength=\"2\" value=\"$lang\" size=\"3\" /></td>
-    <td><input type=\"text\" id=\"tf_ctry_name_$iso\" value=\"$name\" size=\"12\" /></td>
-    <td><input type=\"text\" id=\"tf_ctry_phone_$iso\" value=\"$phone\" size=\"6\" /></td>
+    <input type=\"hidden\" id=\"tf_ctry_old_lang_$key\" value=\"$lang\" size=\"3\" />
+    <input type=\"text\" id=\"tf_ctry_lang_$key\" maxlength=\"2\" value=\"$lang\" size=\"3\" /></td>
+    <td><input type=\"text\" id=\"tf_ctry_name_$key\" value=\"$name\" size=\"12\" /></td>
+    <td><input type=\"text\" id=\"tf_ctry_phone_$key\" value=\"$phone\" size=\"6\" /></td>
     <td>
-    <a  onclick=\"return updateLine('$iso','country');\">
+    <a  onclick=\"return updateLine('$key','country');\">
     <img src=\"$ico_ok\" alt=\"$l_ctry_update\" title=\"$l_ctry_update\" />
     </a>
     </td>

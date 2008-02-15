@@ -1567,7 +1567,8 @@ function get_project_closing($id, $clo_id='') {
       LEFT JOIN Project ON projectclosing_project_id=project_id
       LEFT JOIN UserObm ON projectclosing_usercreate=userobm_id
     WHERE projectclosing_project_id='$id'
-      $where_clo_id $multidomain";
+      $where_clo_id $multidomain
+    ORDER BY projectclosing_date";
 
   display_debug_msg($query, $cdg_sql, 'get_project_closings()');
   $obm_q->query($query);

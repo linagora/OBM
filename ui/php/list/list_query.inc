@@ -1811,19 +1811,19 @@ function make_list_query_from_criteria($list) {
 
   // Handle the Mailing enable flag
   if ($mailing_ok == 1) {
-    $where = " contact_mailing_ok = 1 AND ($where) ";
+    $where = " contact_mailing_ok = '1' AND ($where) ";
   }
 
   // Handle the contact archive flag
   if ($contact_arch == 0) {
-    $where = " (contact_archive != 1) AND ($where) ";
+    $where = " (contact_archive != '1') AND ($where) ";
   }
 
   // Handle the privacy
   if ($privacy == $c_private) {
-    $where = " (contact_privacy = '0' or contact_usercreate = '$obm[uid]') AND ($where) ";
+    $where = " (contact_privacy = 0 or contact_usercreate = '$obm[uid]') AND ($where) ";
   } else {
-    $where = " (contact_privacy = '0') AND ($where) ";
+    $where = " (contact_privacy = 0) AND ($where) ";
   }
 
   // If any (not in insert mode), add statics contacts to the query
