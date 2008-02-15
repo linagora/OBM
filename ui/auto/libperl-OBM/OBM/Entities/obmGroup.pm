@@ -196,7 +196,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "[Entities::obmGroup]: MAJ du groupe '".$dbGroupDesc->{group_name}."' dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "[Entities::obmGroup]: MAJ du groupe ".$self->getEntityDescription()." dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "REPLACE INTO P_UGroup SET ";
@@ -217,29 +217,42 @@ sub updateDbEntity {
         return 0;
     }
 
-    # Les liens
-    if( $self->isLinks() ) {
-        # On supprime les liens actuels de la table de production des liens
-        # utilisateurs/groupes
-        $query = "DELETE FROM P_of_usergroup WHERE of_usergroup_group_id=".$self->{groupId};
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-            return 0;
-        }
-
-
-        # On copie les nouveaux droits
-        $query = "INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_group_id=".$self->{groupId};
-
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d' une requete SQL : ".$dbHandler->err, "W" );
-            return 0;
-        }
-    }
 
     return 1;
 }
 
+
+sub updateDbEntityLinks {
+    my $self = shift;
+    my( $dbHandler ) = @_;
+    my $queryResult;
+
+    if( !defined($dbHandler) ) {
+        return 0;
+    }
+
+    &OBM::toolBox::write_log( "[Entities::obmGroup]: MAJ des liens du groupe ".$self->getEntityDescription()." dans les tables de production", "W" );
+
+    # On supprime les liens actuels de la table de production des liens
+    # utilisateurs/groupes
+    my $query = "DELETE FROM P_of_usergroup WHERE of_usergroup_group_id=".$self->{groupId};
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+
+    # On copie les nouveaux droits
+    $query = "INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_group_id=".$self->{groupId};
+
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d' une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+
+    return 1;
+}
 
 
 sub getEntityLinks {

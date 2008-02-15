@@ -243,7 +243,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "[Entities::obmMailshare]: MAJ de la boite a lettre partagee '".$dbMailShareDesc->{"mailshare_name"}."' dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "[Entities::obmMailshare]: MAJ de la boite a lettre partagee ".$self->getEntityDescription()." dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "REPLACE INTO P_MailShare SET ";
@@ -264,25 +264,37 @@ sub updateDbEntity {
         return 0;
     }
 
-    # Les liens
-    if( $self->isLinks() ) {
-        # On supprime les liens actuels de la table de production
-        $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"mailShareId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
 
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-            return 0;
-        }
+    return 1;
+}
 
 
-        # On copie les nouveaux droits
-        $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"mailShareId"};
+sub updateDbEntityLinks {
+    my $self = shift;
+    my( $dbHandler ) = @_;
+    my $queryResult;
 
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-            return 0;
-        }
+    if( !defined($dbHandler) ) {
+        return 0;
     }
+
+    &OBM::toolBox::write_log( "[Entities::obmMailshare]: MAJ des liens de la boite a lettre partagee ".$self->getEntityDescription()." dans les tables de production", "W" );
+
+    # On supprime les liens actuels de la table de production
+    my $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"mailShareId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+
+    # On copie les nouveaux droits
+    $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"mailShareId"};
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
 
     return 1;
 }

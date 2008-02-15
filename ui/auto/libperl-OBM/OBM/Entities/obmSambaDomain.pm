@@ -88,10 +88,30 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
+    my( $dbHandler ) = @_;
     # Pas de tables de production pour le type obmSambaDomain. Ces informations
     # font parties des informations de domaines
 
+#    if( !defined($dbHandler) ) {
+#        return 0;
+#    }
+
     return 1;
+}
+
+
+sub updateDbEntityLinks {
+    my $self = shift;
+    my( $dbHandler ) = @_;
+    # Pas de tables de production pour le type obmSambaDomain. Ces informations
+    # font parties des informations de domaines
+
+#    if( !defined($dbHandler) ) {
+#        return 0;
+#    }
+
+    return 1;
+
 }
 
 

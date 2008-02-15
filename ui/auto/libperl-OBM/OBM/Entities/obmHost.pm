@@ -182,7 +182,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "[Entities::obmHost]: MAJ de l'hote '".$dbEntry->{"host_name"}."' dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "[Entities::obmHost]: MAJ de l'hote ".$self->getEntityDescription()." dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "REPLACE INTO P_Host SET ";
@@ -202,6 +202,20 @@ sub updateDbEntity {
         &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
+
+    return 1;
+}
+
+
+sub updateDbEntityLinks {
+    my $self = shift;
+    my( $dbHandler ) = @_;
+
+#    if( !defined($dbHandler) ) {
+#        return 0;
+#    }
+#
+#    &OBM::toolBox::write_log( "[Entities::obmHost]: MAJ des liens de l'hote ".$self->getEntityDescription()." dans les tables de production", "W" );
 
     return 1;
 }

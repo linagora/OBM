@@ -98,16 +98,16 @@ sub getLdapServer {
     }
 
     for( my $i=0; $i<=$#$domainList; $i++ ) {
-        &OBM::toolBox::write_log( "[Update::update]: recuperation du serveur LDAP pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
+        &OBM::toolBox::write_log( "[Update::utils]: recuperation du serveur LDAP pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
 
         my $queryLdapAdmin = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$ldapAdminLogin."'";
 
         # On execute la requete concernant l'administrateur LDAP associé
         my $queryLdapAdminResult;
         if( !&OBM::toolBox::execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete.", "W" );
+            &OBM::toolBox::write_log( "[Update::utils]: probleme lors de l'execution de la requete.", "W" );
             if( defined($queryLdapAdminResult) ) {
-                &OBM::toolBox::write_log( "[Update::update]: ".$queryLdapAdminResult->err, "W" );
+                &OBM::toolBox::write_log( "[Update::utils]: ".$queryLdapAdminResult->err, "W" );
             }
         }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
             $domainList->[$i]->{"ldap_admin_server"} = $ldapServer;
@@ -130,13 +130,13 @@ sub getCyrusServers {
             next;
         }
 
-        &OBM::toolBox::write_log( "[Update::update]: recuperation des serveurs de courrier IMAP pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
+        &OBM::toolBox::write_log( "[Update::utils]: recuperation des serveurs de courrier IMAP pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
         my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=".$domainList->[$i]->{"domain_id"}." AND j.domainmailserver_role='imap' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
 
         # On execute la requete
         my $queryResult;
         if( !&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Update::utils]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             next;
         }
 
@@ -163,13 +163,13 @@ sub getSmtpInServers {
             next;
         }
 
-        &OBM::toolBox::write_log( "[Update::update]: recuperation des serveurs de courrier SMTP-in pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
+        &OBM::toolBox::write_log( "[Update::utils]: recuperation des serveurs de courrier SMTP-in pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
         my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=".$domainList->[$i]->{"domain_id"}." AND j.domainmailserver_role='smtp_in' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
 
         # On execute la requete
         my $queryResult;
         if( !&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            &OBM::toolBox::write_log( "[Update::utils]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
             next;
         }
 
@@ -211,16 +211,26 @@ sub getUserIdFromUserLoginDomain {
     my( $dbHandler, $userLogin, $domainId ) = @_;
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "[Update::updatePassword]: connection à la base de donnees incorrecte !", "W" );
+        &OBM::toolBox::write_log( "[Update::utils]: connection à la base de donnees incorrecte !", "W" );
+        return undef;
+    }
+
+    if( $userLogin !~ /$regexp_login/ ) {
+        &OBM::toolBox::write_log( "[Update::utils] nom d'utilisateur non specifie ou incorrect", "W" );
+        return undef;
+    }
+
+    if( $domainId !~ /^[0-9]+$/ ) {
+        &OBM::toolBox::write_log( "[Update::utils] Id BD de domaine non specifie ou incorrect", "W" );
         return undef;
     }
 
     my $query = "SELECT userobm_id FROM UserObm WHERE userobm_login=".$dbHandler->quote($userLogin)." AND userobm_domain_id=".$domainId;
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::updatePassword]: probleme lors de l'execution de la requete.", "W" );
+        &OBM::toolBox::write_log( "[Update::utils]: probleme lors de l'execution de la requete.", "W" );
         if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( "[Update::updatePassword]: ".$queryResult->err, "W" );
+            &OBM::toolBox::write_log( "[Update::utils]: ".$queryResult->err, "W" );
         }
 
         return undef;
@@ -230,4 +240,40 @@ sub getUserIdFromUserLoginDomain {
     $queryResult->finish();
 
     return $userId;
+}
+
+
+sub getMailshareIdFromMailshareNameDomain {
+    my( $dbHandler, $mailshareName, $domainId ) = @_;
+
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( "[Update::utils] connection à la base de donnees incorrecte :", "W" );
+        return undef;
+    }
+
+    if( $mailshareName !~ /$regexp_login/ ) {
+        &OBM::toolBox::write_log( "[Update::utils] nom de repertoire partage non specifie", "W" );
+        return undef;
+    }
+
+    if( $domainId !~ /^[0-9]+$/ ) {
+        &OBM::toolBox::write_log( "[Update::utils] Id BD de domaine non specifie ou incorrect", "W" );
+        return undef;
+    }
+
+    my $query = "SELECT mailshare_id FROM MailShare WHERE mailshare_name=".$dbHandler->quote($mailshareName)." AND mailshare_domain_id=".$domainId;
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::utils]: probleme lors de l'execution de la requete.", "W" );
+        if( defined($queryResult) ) {
+            &OBM::toolBox::write_log( "[Update::utils]: ".$queryResult->err, "W" );
+        }
+
+        return undef;
+    }
+
+    my( $mailshareId ) = $queryResult->fetchrow_array();
+    $queryResult->finish();
+
+    return $mailshareId;
 }

@@ -322,6 +322,36 @@ sub update {
 }
 
 
+sub updateAcl {
+    my $self = shift;
+    my( $object ) = @_;
+
+    if( !defined($object) ) {
+        return 0;
+    }
+
+    # Récupération du nom de la boîte à traiter
+    my $mailBoxName = $object->getMailboxName();
+    if( !defined($mailBoxName) ) {
+        return 0;
+    }
+
+    # Récupération de la description du serveur de la boîte à traiter
+    my $cyrusSrv = $self->_findCyrusSrvbyId( $object->{"domainId"}, $object->getMailServerId() );
+    if( !defined($cyrusSrv) ) {
+    print "ppp\n";
+        return 0;
+    }
+
+    # Est-on connecté à ce serveur
+    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
+        return 0;
+    }
+
+    return $self->_imapSetMailboxAcls( $cyrusSrv, $object );
+}
+
+
 sub isMailboxExist {
     my $self = shift;
     my( $cyrusSrv, $object, $srvBalDesc ) = @_;
@@ -405,13 +435,8 @@ sub getMailboxQuotaUse {
         return undef;
     }
 
-    # Récupération des identifiants du serveur de la boîte à traiter
-    my $mailBoxDomainId;
-    my $mailBoxServerId;
-    $object->getMailServerRef( \$mailBoxDomainId, \$mailBoxServerId );
-
     # Récupération de la description du serveur de la boîte à traiter
-    my $cyrusSrv = $self->_findCyrusSrvbyId( $mailBoxDomainId, $mailBoxServerId );
+    my $cyrusSrv = $self->_findCyrusSrvbyId( $object->{"domainId"}, $object->getMailServerId() );
     if( !defined($cyrusSrv) ) {
         return undef;
     }

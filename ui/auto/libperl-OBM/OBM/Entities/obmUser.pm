@@ -230,7 +230,7 @@ sub getEntity {
     if( defined($dbUserDesc->{userobm_address3}) && ($dbUserDesc->{userobm_address3} ne "") ) {
         $self->{userDesc}->{userobm_address} .= "\r\n".$dbUserDesc->{userobm_address3};
     }
-        
+
 
     # Gestion du téléphone
     if( defined($dbUserDesc->{userobm_phone}) && ($dbUserDesc->{userobm_phone} ne "") ) {
@@ -392,7 +392,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "[Entities::obmUser]: MAJ de l'utilisateur '".$dbUserDesc->{"userobm_login"}."' dans les tables de production", "W" );
+    &OBM::toolBox::write_log( "[Entities::obmUser]: MAJ de l'utilisateur ".$self->getEntityDescription()." dans les tables de production", "W" );
 
     # MAJ de l'entité dans la table de production
     my $query = "REPLACE INTO P_UserObm SET ";
@@ -413,25 +413,39 @@ sub updateDbEntity {
         return 0;
     }
 
-    # Les liens
-    if( $self->isLinks() ) {
-        # On supprime les liens actuels de la table de production
-        $query = "DELETE FROM P_EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"userId"};
 
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-            return 0;
-        }
+    return 1;
+}
 
 
-        # On copie les nouveaux droits
-        $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"userId"};
+sub updateDbEntityLinks {
+    my $self = shift;
+    my( $dbHandler ) = @_;
 
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
-            return 0;
-        }
+    if( !defined($dbHandler) ) {
+        return 0;
     }
+
+    &OBM::toolBox::write_log( "[Entities::obmUser]: MAJ des liens de l'utilisateur ".$self->getEntityDescription()." dans les tables de production", "W" );
+
+    # On supprime les liens actuels de la table de production
+    my $query = "DELETE FROM P_EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"userId"};
+
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+
+    # On copie les nouveaux droits
+    $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"userId"};
+
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
 
     return 1;
 }

@@ -224,6 +224,10 @@ sub _doGlobalUpdate {
                 # La MAJ de l'entité c'est bien passée, on met a jour la BD de
                 # travail
                 $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+                if( $object->isLinks() ) {
+                    $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+                }
+
                 if( !$updateDbReturn ) {
                     &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un utilisateur systeme dans la BD", "W" );
                     $globalReturn = 0;
@@ -244,6 +248,10 @@ sub _doGlobalUpdate {
     if( $return ) {
         # La MAJ de l'entité c'est bien passée, on met a jour la BD de travail
         $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        if( $object->isLinks() ) {
+            $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+        }
+
         if( !$updateDbReturn ) {
             &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour du domaine Samba dans la BD", "W" );
             $globalReturn = 0;
@@ -261,6 +269,10 @@ sub _doGlobalUpdate {
     if( $return ) {
         # La MAJ de l'entité c'est bien passée, on met a jour la BD de travail
         $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        if( $object->isLinks() ) {
+            $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+        }
+
         if( !$updateDbReturn ) {
             &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour des serveurs de courriers dans la BD", "W" );
             $globalReturn = 0;
@@ -309,6 +321,10 @@ sub _doGlobalUpdate {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de travail
             $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            if( $object->isLinks() ) {
+                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+            }
+
             if( !$updateDbReturn ) {
                 &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un hote dans la BD", "W" );
                 $globalReturn = 0;
@@ -335,6 +351,10 @@ sub _doGlobalUpdate {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
             $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            if( $object->isLinks() ) {
+                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+            }
+
             if( !$updateDbReturn ) {
                 &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un utilisateur dans la BD", "W" );
                 $globalReturn = 0;
@@ -361,6 +381,10 @@ sub _doGlobalUpdate {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
             $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            if( $object->isLinks() ) {
+                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+            }
+
             if( !$updateDbReturn ) {
                 &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un groupe dans la BD", "W" );
                 $globalReturn = 0;
@@ -387,6 +411,10 @@ sub _doGlobalUpdate {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
             $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            if( $object->isLinks() ) {
+                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+            }
+
             if( !$updateDbReturn ) {
                 &OBM::toolBox::write_log( "[Update::update]: probleme de mise a jour d'un repertoire partage de messagerie dans la BD", "W" );
                 $globalReturn = 0;
@@ -653,6 +681,9 @@ sub _incrementalUpdate {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
             $return = $object->updateDbEntity( $self->{"dbHandler"} );
+            if( $object->isLinks() ) {
+                $return = !$return || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+            }
 
             if( $return ) {
                 # MAJ de la BD de travail ok, on nettoie les tables de MAJ
@@ -714,7 +745,7 @@ sub _incrementalUpdate {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
-            $return = $object->updateDbEntity( $self->{"dbHandler"} );
+            $return = $object->updateDbEntityLinks( $self->{"dbHandler"} );
 
             if( $return ) {
                 # MAJ de la BD de travail ok, on nettoie les tables de MAJ

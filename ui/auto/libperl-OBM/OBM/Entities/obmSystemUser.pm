@@ -156,7 +156,25 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
+    my( $dbHandler ) = @_;
     # Pas de table de production pour les entités de type utilisateur système
+
+#    if( !defined($dbHandler) ) {
+#        return 0;
+#    }
+
+    return 1;
+}
+
+
+sub updateDbEntityLinks {
+    my $self = shift;
+    my( $dbHandler ) = @_;
+    # Pas de table de production pour les entités de type utilisateur système
+
+#    if( !defined($dbHandler) ) {
+#        return 0;
+#    }
 
     return 1;
 }
