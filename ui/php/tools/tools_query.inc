@@ -283,7 +283,6 @@ function check_tools_update_need_global_update($domain_id=0) {
  */
 function run_query_tools_perform_scope(&$metadata, $realm, $domain, $update = false) {
   global $obm, $obmdb_dbtype;
-
   $rules = array('update' => array('1=1'), 'delete' => array('1=1'), 'purge' => array('1=1'));
   $del_rules = array('1=1'); 
   $like = sql_casei_like($obmdb_dbtype); 
@@ -506,7 +505,7 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
       $join[] = "Current.$field[name] = Production.$field[name]";
     }
   }
-
+  
   $query = "
     INSERT INTO Updated (
         updated_domain_id,

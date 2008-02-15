@@ -39,7 +39,6 @@ function dis_tools_update_detail() {
       $admin_realm = array('domain');
     }
   }
-
   $update_ok = check_tools_update_context_ok($params);
 
   // Loop through all domains
