@@ -134,7 +134,7 @@ $cdefault_tax = array ('TVA 19,6' => 1.196, 'TVA 5,5' => 1.055, 'Pas de TVA' => 
 //----------------------//
 
 $profiles['user']['level'] = 4;
-
+$profiles['user']['module']['mailbox'] = $perm_editor;
 $profiles['editor'] = array (
   'section' => array (
     'default' => 0,
