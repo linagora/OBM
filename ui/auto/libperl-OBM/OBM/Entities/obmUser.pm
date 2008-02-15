@@ -416,7 +416,7 @@ sub updateDbEntity {
     # Les liens
     if( $self->isLinks() ) {
         # On supprime les liens actuels de la table de production
-        $query = "DELETE FROM P_of_usergroup WHERE of_usergroup_user_id=".$self->{"userId"};
+        $query = "DELETE FROM P_EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"userId"};
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
             &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
@@ -425,7 +425,8 @@ sub updateDbEntity {
 
 
         # On copie les nouveaux droits
-        $query = "INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_user_id=".$self->{"userId"};
+        $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"userId"};
+    &OBM::toolBox::write_log( $query, "W" );
 
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
             &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
