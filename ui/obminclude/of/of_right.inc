@@ -87,7 +87,7 @@ function html_entityadmin_bar($writable_entity,$entity_id, $entity) {
 function html_dis_right_admin(&$consumers, $entity_id) {
   global $l_authorize_list,$l_read_permission, $l_write_permission;
   global $l_right_validate ,$l_authorize,$l_deny, $ico_delete;
-  global $l_public,$l_admin_permission;
+  global $l_public,$l_admin_permission, $module;
   global $ico_add,$l_users,$path, $l_groups;
 
   $l_userSearch = phpStringToJsString("$l_users...");
@@ -153,13 +153,29 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <a id=\"lnk_accept_read\" href=\"#\" onclick=\"return popup('$url');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
-    </a>";
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
-    $popup_group_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
-       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
-
+    if($module != 'mailbox' && $module != 'mailshare') {
+      $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
+      $popup_group_add_button = "
+        <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
+         <img src=\"$ico_add\" alt=\"[Add]\" />
+         </a>";
+      $block_group_read = "
+        <tr>
+        <td class=\"detailLabel\">
+        $l_groups
+        $popup_group_add_button
+        </td>
+        <td>
+        <input type=\"text\" id=\"groupReadSearch\" autocomplete=\"off\" /> 
+        </td>
+        </tr>";
+      $block_group_buttons_read = "
+      <fieldset id='sel_accept_group_read'>
+      <legend>$l_groups</legend>
+      $dis_group_read_ok
+      </fieldset>";        
+    }
     $block_consumer_read = "
     <tr>
     <td class=\"detailLabel\">
@@ -170,25 +186,14 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <input type=\"text\" id=\"userReadSearch\" autocomplete=\"off\" /> 
     </td>
     </tr>
-    <tr>
-    <td class=\"detailLabel\">
-    $l_groups
-    $popup_group_add_button
-    </td>
-    <td>
-    <input type=\"text\" id=\"groupReadSearch\" autocomplete=\"off\" /> 
-    </td>
-    </tr>       
+    $block_group_read
     <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_read\">
       <fieldset id='sel_accept_user_read'>
       <legend>$l_users</legend>
       $dis_user_read_ok
       </fieldset>
-      <fieldset id='sel_accept_group_read'>
-      <legend>$l_groups</legend>
-      $dis_group_read_ok
-      </fieldset>
+      $block_group_buttons_read
     </td>
     </tr>";
 
@@ -207,12 +212,28 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       <a id=\"lnk_accept_write\" href=\"#\" onclick=\"return popup('$url');\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
      </a>";
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
-    $popup_group_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
-       <img src=\"$ico_add\" alt=\"[Add]\" />
-      </a>";
-
+    if($module != 'mailbox' && $module != 'mailshare') {
+      $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
+      $popup_group_add_button = "
+        <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
+         <img src=\"$ico_add\" alt=\"[Add]\" />
+        </a>";
+      $block_group_write = "
+      <tr>
+      <td class=\"detailLabel\">
+      $l_groups
+      $popup_group_add_button
+      </td>
+      <td>
+      <input type=\"text\" id=\"groupWriteSearch\" autocomplete=\"off\" /> 
+      </td>
+      </tr>";
+      $block_group_buttons_write = "      
+      <fieldset id='sel_accept_group_write'>
+      <legend>$l_groups</legend>
+      $dis_group_write_ok
+      </fieldset>";
+    }
     $block_consumer_write = "
     <tr>
     <td class=\"detailLabel\">
@@ -223,25 +244,14 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <input type=\"text\" id=\"userWriteSearch\" autocomplete=\"off\" /> 
     </td>
     </tr>
-    <tr>
-    <td class=\"detailLabel\">
-    $l_groups
-    $popup_group_add_button
-    </td>
-    <td>
-    <input type=\"text\" id=\"groupWriteSearch\" autocomplete=\"off\" /> 
-    </td>
-    </tr>       
+    $block_group_write
     <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_write\">
       <fieldset id='sel_accept_user_write'>
       <legend>$l_users</legend>
       $dis_user_write_ok
       </fieldset>
-      <fieldset id='sel_accept_group_write'>
-      <legend>$l_groups</legend>
-      $dis_group_write_ok
-      </fieldset>    
+      $block_group_buttons_write
     </td>
     </tr>";
 
@@ -250,12 +260,28 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
        <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
-    $popup_group_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
-       <img src=\"$ico_add\" alt=\"[Add]\" />
-      </a>";
-
+    if($module != 'mailbox' && $module != 'mailshare') {
+      $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
+      $popup_group_add_button = "
+        <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
+         <img src=\"$ico_add\" alt=\"[Add]\" />
+         </a>";
+      $block_group_admin = "    
+        <tr>
+        <td class=\"detailLabel\">
+        $l_groups
+        $popup_group_add_button
+        </td>
+        <td>
+        <input type=\"text\" id=\"groupAdminSearch\" autocomplete=\"off\" /> 
+        </td>
+        </tr>";
+      $block_group_buttons_admin =  "      
+      <fieldset id='sel_accept_group_admin'>
+      <legend>$l_groups</legend>
+      $dis_group_admin_ok
+      </fieldset>  ";
+    }
     $block_consumer_admin = "
     <tr>
     <td class=\"detailLabel\">
@@ -266,14 +292,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     <input type=\"text\" id=\"userAdminSearch\" autocomplete=\"off\" /> 
     </td>
     </tr>
-    <td class=\"detailLabel\">
-    $l_groups
-    $popup_group_add_button
-    </td>
-    <td>
-    <input type=\"text\" id=\"groupAdminSearch\" autocomplete=\"off\" /> 
-    </td>
-    </tr>       
+    $block_group_admin
     <tr>
     <tr>
     <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_admin\">
@@ -281,10 +300,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       <legend>$l_users</legend>
       $dis_user_admin_ok
       </fieldset>
-      <fieldset id='sel_accept_group_admin'>
-      <legend>$l_groups</legend>
-      $dis_group_admin_ok
-      </fieldset>    
+      $block_group_buttons_admin
     </td>
     </tr>";
     

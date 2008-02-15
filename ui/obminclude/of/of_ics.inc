@@ -24,7 +24,7 @@ class ICalendar_Utils {
 //    $handle = fopen($file, 'r');
     //    while(($line = fgets($handle)) && strcmp(trim($line),'BEGIN:VCALENDAR') !== 0);
     while($reader->nextElement()){
-      
+       
     }
     
     ICalendar_Utils::parseElement($reader, $document->vcalendar);
@@ -167,10 +167,15 @@ class ICalendar_ICS_Reader {
   function isEndLine() {
     return ($this->attribute['name'] == 'end');
   }
+  
+  function nextElement() {
+    while(($return = $this->getAttribute()) && !$this->isBeginLine());
+    return $return;
+  }
 
   function parseElement() {
 
-    while(($line = fgets($this->handle)) && $this->isBeginLine()) {
+    while(($line = fgets($this->handle)) && $this->isEndLine()) {
 
       if(preg_match('/^BEGIN:(.*)$/',$line,$match) !== 0) {
         $document = &$element->getDocument();
