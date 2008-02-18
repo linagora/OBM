@@ -49,6 +49,8 @@ Précisions:
 
 
 
+$default_mailserver_host_id = 2; // id de l'hote qui heberge le serveur de courrier par defaut
+// utile uniquement si le dflt_mailserver n'est pas défini dans la table Mail
 
 // CONFIG FICHIERS CONF.
 // configuration des chemins d'accès au fichiers de conf d'aliamin et d'obm
@@ -245,7 +247,7 @@ while ($row = mysql_fetch_array($res)) {
 	elseif ($row[0]== 'domain')
 		$domain_alias .= (empty($domain_alias) ? "" : " ").$row[1];
 }
-
+if (!isset($mailserver_host_id)) $mailserver_host_id = $default_mailserver_host_id;
 if (empty($domain_name))
     die ('Echec\nImpossible de trouver le nom de domaine (table Mail)');
 
