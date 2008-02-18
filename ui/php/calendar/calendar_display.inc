@@ -2722,7 +2722,11 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 //      $xml = simplexml_load_string($item);
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
-          $property["$value->res_id"] = "$value->property_name : $value->property_value";
+          if ($value->property_name) {
+            $property["$value->res_id"] = "($value->property_name : $value->property_value)";
+          } else {
+            $property["$value->res_id"] = "";
+          }
           $dis_item_list .= "
           <tr>
             <th>$value->res_name :</th>
@@ -2748,7 +2752,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           $url= "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
           $dis_resource_list .= "
           <tr>
-          <td>$label ($property[$r_id])</td>
+          <td>$label $property[$r_id]</td>
           <td class=\"C\">
           <input $A type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"A\" onclick=\"window.location='$url&rd_decision_event=A'\" />$l_A
           <input $W type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"W\" onclick=\"window.location='$url&rd_decision_event=W'\" />$l_W
@@ -2758,7 +2762,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         ";
           $$state = "";
         } else {
-          $dis_resource_list .= "<tr><td>$label($property[$r_id])</td><td class=\"C\" >".$GLOBALS["l_$state"]."</td></tr>";
+          $dis_resource_list .= "<tr><td>$label $property[$r_id]</td><td class=\"C\" >".$GLOBALS["l_$state"]."</td></tr>";
         }
       }
       $dis_resource_block = "
@@ -3348,6 +3352,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         if ($property_value == "") {
           $property_value = $property_name;
         }        
+        if (!empty($property_name)) {
+          $block_property = "<div>
+              <input type=\"hidden\" name=\"property-name[$r_id]\" id=\"property-name[$r_id]\" value=\"$property_name\" />
+              <input type=\"text\" name=\"property[$r_id]\" id=\"property[$r_id]\" value=\"$property_value\" 
+                onclick=\"if (this.value=='$property_name') this.value='';\"/>
+          </div>";
+        } else {
+          $block_property = "";
+        }
 	$dis_sel_resource .= "
           <div class=\"elementRow\" id=\"$div_id\">
             <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
@@ -3363,10 +3376,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
               <input type=\"hidden\" id=\"res-name[$r_id]\" name=\"res-name[$r_id]\" value=\"$r_name\" />
               <input type=\"hidden\" id=\"res-id[$r_id]\" name=\"res-id[$r_id]\" value=\"$r_id\" />
             </div>
-            <div>
-              <input type=\"hidden\" name=\"property-name[$r_id]\" id=\"property-name[$r_id]\" value=\"$property_name\" />
-              <input type=\"text\" name=\"property[$r_id]\" id=\"property[$r_id]\" value=\"$property_value\" onclick=\"if (this.value=='$property_name') this.value='';\"/>
-            </div>
+            $block_property
           </div>";
       }
     }
@@ -4693,16 +4703,16 @@ function parse_item($item) {
     if (in_array($att, $match_attribut)) { 
       // $item_detail->resource->$att = $value["value"];
       $${att} = $value["value"];
-    }
-    if (isset($res_id) && isset($res_name) && isset($property_name) && isset($property_value)) {
-      $item_detail = new Item($res_id, $res_name, $item, $item_id, $property_name, $property_value);
-      $item_list->resource[] =  $item_detail;
-      unset($res_id);
-      unset($res_name);
-      unset($item);
-      unset($item_id);
-      unset($property_name);
-      unset($property_value);
+      if ($att == "resource" && $value["type"] == "close") {
+        $item_detail = new Item($res_id, $res_name, $item, $item_id, $property_name, $property_value);
+        $item_list->resource[] =  $item_detail;
+        unset($res_id);
+        unset($res_name);
+        unset($item);
+        unset($item_id);
+        unset($property_name);
+        unset($property_value);
+      }
     }
   }
 
