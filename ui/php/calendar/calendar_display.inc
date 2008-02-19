@@ -1582,7 +1582,15 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
             $xml = parse_item($item);
             if (is_object($xml)) {
               foreach($xml->resource as $key => $value) {
-                $item_list .= "<strong>$value->res_name:</strong><br/>".nl2br($value->item)."$value->property_name:$value->property_value<br/>";
+                if (!empty($value->item)) {
+                  if (!empty($value->property_value)) {
+                     $block_property = "($value->property_name:$value->property_value)";
+                  } else {
+                     $block_property = "";
+                  }
+                  $item_list .= "<strong>$value->res_name</strong> $block_property<br>".
+                    nl2br($value->item);
+                }
               }
             }
           }
@@ -1880,12 +1888,14 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       $xml = parse_item($item);
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
-          $item_list .= "
-            <strong>$value->res_name: </strong><br/>
-            ".nl2br($value->item)."<br/>";
+          if (!empty($value->item)) {
+            $item_list .= "
+              <h4>$value->res_name</h4>
+              ".nl2br($value->item);
+          }
         }
+        $item_list = phpStringToJsString(str_replace("\n\r", ", ", $item_list));
       }
-      $item_list = phpStringToJsString(str_replace("\n\r", "<br>", $item_list));
     }
     $location = phpStringToJsString($event->location);
     $category = phpStringToJsString($event->category1);  
@@ -2727,11 +2737,13 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           } else {
             $property["$value->res_id"] = "";
           }
-          $dis_item_list .= "
-          <tr>
-            <th>$value->res_name :</th>
-            <td>".nl2br($value->item)."</td>
-          </tr>";
+          if (!empty($value->item)) {
+            $dis_item_list .= "
+            <tr>
+              <th>$value->res_name :</th>
+              <td>".nl2br($value->item)."</td>
+            </tr>";
+          }
         }
         $dis_item_list = "<div class=\"detail infos\">
         <h1>$l_items</h1>
@@ -2961,9 +2973,8 @@ function dis_calendar_quick_form($calendar) {
         <h3>$l_desc</h3>
         <p id=\"calendarQuickFormDescription\"></p>
       </div>
-      <div>
+      <div id=\"calendarQuickFormItem\">
         <h3>$l_items</h3>
-        <p id=\"calendarQuickFormItem\"></p>
       </div>
       </div>
       <img src=\"$popup_queue\" alt=\"\"/>
