@@ -50,9 +50,9 @@ function run_query_organizationalchart_search($organizationalchart) {
     $left_user = "
       LEFT JOIN OGroup ON ogroup_organizationalchart_id = organizationalchart_id
       LEFT JOIN OGroupEntity ON ogroupentity_ogroup_id = ogroup_id
-      LEFT JOIN UserObmGroup ON (userobmgroup_group_id=ogroupentity_entity_id AND ogroupentity_entity='group') 
+      LEFT JOIN of_usergroup ON (of_usergroup_group_id=ogroupentity_entity_id AND ogroupentity_entity='group') 
       LEFT JOIN UserObm as u ON (u.userobm_id=ogroupentity_entity_id AND ogroupentity_entity='user') 
-        OR (u.userobm_id=userobmgroup_userobm_id)";
+        OR (u.userobm_id=of_usergroup_user_id)";
     $where .= " $and (userobm_lastname $like '$user%' OR userobm_firstname $like '$user%')";
   }
  

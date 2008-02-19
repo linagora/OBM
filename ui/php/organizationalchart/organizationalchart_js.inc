@@ -144,7 +144,7 @@ function add_entity(parent_level) {
 
   // child name text field
   var child_name = new Element('input').
-    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'size':'18', 'maxlength':'16', 'value':''}).
+    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'id': 'focus_'+new_child_id, 'size':'18', 'maxlength':'16', 'value':''}).
     addClass('mandatory');
 
   // parent id hidden 
@@ -176,6 +176,7 @@ function add_entity(parent_level) {
   new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent'+new_child_id, 'group'+new_child_id, {defaultText:'$user_text'})
 
   $('nb_child_'+parent_level).value ++;
+  $('focus_'+new_child_id).focus();
 }
 
 
