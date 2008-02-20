@@ -1,20 +1,3 @@
-Obm.OrganizationalChart = new Class({
-  initialize: function() {
-    elements = $ES('.node');
-    for (i=0;i<elements.length;i++) {
-      el = elements[i];
-      title = el.getFirst();
-      content = title.getNext();
-      title.slide = new Fx.Slide(content, {duration: 150,wait:false});
-      title.addEvent('click', function(e){
-        this.slide.toggle();
-      });
-
-    }
-  }
-
-});
-
 /******************************************************************************
 * Organizational Chart popup user detail
 ******************************************************************************/
@@ -29,7 +12,7 @@ Obm.UserDetail = new Class({
     this.useremail = $('userdetail_email');
     
     this.nophoto = new Element('img').setProperty('src',obm.vars.images.nophoto);
-    this.ico_load = new Element('img').setProperty('src',obm.vars.images.load);
+    // this.ico_load = new Element('img').setProperty('src',obm.vars.images.load);
 
     this.popup.setStyle('position','absolute');
     this.popup.setStyle('display','none');
@@ -70,39 +53,15 @@ Obm.UserDetail = new Class({
     this.useremail.setHTML(userData.email);
   },
 
-  compute: function (user_id, evt) {
+  compute: function (user_id, evt, item) {
     if(this.popup.getStyle('display') == 'none') {
       this.userphoto.setHTML("&nbsp;<img src=\"/images/themes/default/images/ico_load.gif\" alt=\"[Photo]\" />&nbsp;");
       //this.userphoto.replaceWith(this.ico_load);
       this.sendDetailEvent(user_id);
       this.show();
 
-      // Popup position
-      //
-      // FIXME: Position when scrolling
-      //
-      // var target = $(evt);
-      // if (IE4) {
-      //   windowWidth = document.body.clientWidth;
-      // } else if (W3C) {
-      //   windowWidth = window.innerWidth;
-      // } else {
-      //   windowWidth = document.documentElement.clientWidth;
-      // }
-
-      // var left = target.getLeft() - Math.round((this.popup.offsetWidth - target.offsetWidth)/2);
-      // var top = target.getTop() - this.popup.offsetHeight - Math.round(target.offsetHeight);
-      // var popupLeft = left + this.popup.offsetWidth;
-      // if (popupLeft > windowWidth) {
-      //   left = left - (popupLeft - windowWidth) - 20;
-      // }
-
-      // this.popup.setStyles({
-      //   'top':  top + 'px',
-      //   'left': left  + 'px'
-      // });  
-
       var currentX, currentY;	
+      var target = $(item);
       var windowWidth = window.innerWidth;
       if (IE4) {
         evt = window.event;
@@ -124,9 +83,11 @@ Obm.UserDetail = new Class({
       if (popupLeft > windowWidth) {
         currentX = currentX - (popupLeft - windowWidth) - 20;
       }
+      var top = target.getTop() - this.popup.offsetHeight - Math.round(target.offsetHeight);
 
-      this.popup.setStyle('top', currentY+'px');
+      this.popup.setStyle('top', top+'px');
       this.popup.setStyle('left', currentX+'px');
+
     } else {
       this.hide();
     }

@@ -217,7 +217,7 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     $dis_title = $name;
     $block_detail = draw_form($root_node);
     $block_detail .= "<input type=\"hidden\" id=\"nb_child\" name=\"nb_child\" value=\"$nb_child\" />
-      <input type=\"hidden\" id=\"organizationalchart_id\" name=\"organizationalchart_id\" value=\"$id\" /";
+      <input type=\"hidden\" id=\"organizationalchart_id\" name=\"organizationalchart_id\" value=\"$id\" />";
   } else {
     $block_detail = "
       <div id=\"1\" class=\"organizationalChartNode\">
@@ -252,7 +252,6 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
     <!-- Update button -->
-    <input type=\"hidden\" name=\"organizationalchart_id\" id=\"organizationalchart_id\" value=\"$id\" />
     <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
     <input type=\"submit\" value=\"$l_update\" />";
   } elseif (($action == "new") || ($action == "insert")) {
@@ -352,9 +351,11 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
       </select>
     </form></div>";
     $block_detail = draw_consult($root_node, $output);
+    $block_popup = dis_organizationalchart_userdetail();
     $ico_organizationnalchart = $ico_organizationalchart_view_current;
   } elseif ($action == "detailconsult_outline") {
     $block_detail = draw_form_outline($root_node, $output);
+    $block_popup = "";
     $ico_outline = $ico_outline_view_current;
   }
 
@@ -407,13 +408,8 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
       $block_detail
     </div>
   </div>
-  <script type=\"text/javascript\">
-    // obm.organizationalChart = new Obm.OrganizationalChart();
-  </script>
-  ";
+  $block_popup";
  
-  $block .= dis_organizationalchart_userdetail();
-
   return $block;
 }
 
@@ -546,15 +542,15 @@ function draw_consult($node_q, $output) {
         if (!$is_manager) {
            $block_detail_entities .= "<li id=\"item-${level}-${user_id}\">
              <a href=\"$userobm_url\" 
-               onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
-               onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$userobm_name</a>
+               onmouseover=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\"
+               onmouseout=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\">$userobm_name</a>
              </li>";
         } else {
           $manager = "<img src=\"$ico_manager\" />";
           $block_detail_entities_boss .= "<li id=\"item-${level}-${user_id}\">
           <a href=\"$userobm_url\" 
-            onmouseover=\"obm.userDetail.compute($user_id, event);return false;\"
-            onmouseout=\"obm.userDetail.compute($user_id, event);return false;\">$manager&nbsp;<b>$userobm_name</b></a>
+            onmouseover=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\"
+            onmouseout=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\">$manager&nbsp;<b>$userobm_name</b></a>
           </li>";
         }
       } else {
@@ -600,7 +596,7 @@ function draw_consult($node_q, $output) {
       $node_edge = "<div class=\"nodeStart$print\" style=\"width:".(ceil($wrap_width/2))."px;\"></div>";
     } else if (in_array($node_id, $l)) {  // is last child ?
       $node_edge = "<div class=\"nodeEnd$print\" style=\"width:".(ceil($wrap_width/2))."px;\"></div>";
-    } 
+    }
   } 
   
   if (!$nb_brother) {
@@ -703,7 +699,6 @@ function draw_form_outline($node_q) {
     $color = "color".($flour)%7;
   }
 
-  // Urls for extmod
   $block = "
     <div id=\"$level\" class=\"organizationalChartNode\" style=\"margin-left: 3em;\">
       <div style=\"float:left;\" class=\"B\">:: $node_name</div>
