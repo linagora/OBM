@@ -436,20 +436,20 @@ function get_user_action() {
   $actions['user']['display'] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/user/user_index.php?action=display",
-    'Right'    => $cright_read_admin,
+    'Right'    => $cright_read,
     'Condition'=> array ('all')
                                       	 );
 
 // Display
   $actions['user']['dispref_display'] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_display",
-    'Right'    => $cright_read_admin,
+    'Right'    => $cright_read,
     'Condition'=> array ('None')
                                       	 );
 // Display
   $actions['user']['dispref_level'] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_level",
-    'Right'    => $cright_read_admin,
+    'Right'    => $cright_read,
     'Condition'=> array ('None')
                                       	 );
 

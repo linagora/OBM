@@ -109,6 +109,9 @@ if ($action == 'perform_meeting' &&
   $cal_entity_id['resource'] = $params['sel_resource_id'];    
   $cal_entity_id['group'] = $params['sel_group_id'];
   if($params['resource_group_search'] == 'all') {
+    if(!is_array($cal_entity_id['resource'])) {
+      $cal_entity_id['resource'] = array();
+    }
     $resources = run_query_calendar_get_group_resource($params['sel_resource_group_id']);
     $cal_entity_id['resource'] = array_merge($cal_entity_id['resource'], $resources );
   } else {

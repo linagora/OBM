@@ -1532,7 +1532,6 @@ function run_query_calendar_update_event_data($calendar) {
       $properties .= "<resource>
          <res_name>$res</res_name>
          <res_id>$res_id[$key]</res_id>";
-
       if (is_array($item) && isset($item[$key])) {
         $properties .= "<item>$item[$key]</item>
           <item_id>$item_id[$key]</item_id>";
@@ -1923,7 +1922,7 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the event can be deleted or modify
+// Check if the event can be accessed
 // Parameters:
 //   - $id : event id
 // Returns:

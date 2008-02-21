@@ -1569,13 +1569,13 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
 	  $dis_repeat = ${"l_$repeat"};
         }
 
-        if ($event->privacy == 1 && !($updatable || in_array($obm["uid"],$attendee["user"]))) {
+        if ($event->privacy == 1 && !(in_array($obm["uid"],$attendee["user"]))) {
 	  $title = $l_private;
 	  $description = $title;
         } else {
 	  $title = $event->title;
 	  $description = $event->description;
-	  $properties = $event->properties;
+          $properties = $event->properties;
           $item_list = "";
           if ($properties != "") {
             $item = "<?xml version='1.0' encoding='$charset'?>$properties";
@@ -1794,7 +1794,7 @@ function dis_calendar_list_print($calendar, $calendar_entity, $writable_entity) 
 	  $dis_repeat = ${"l_$repeat"};
         }
 
-        if ($event->privacy == 1 && !($updatable || in_array($obm["uid"],$attendee["user"]))) {
+        if ($event->privacy == 1 && !(in_array($obm["uid"],$attendee["user"]))) {
 	  $title = $l_private;
 	  $description = $title;
         } else {
@@ -1873,7 +1873,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   }
 
   $attendee = $event->attendee;
-  if ($event->privacy == 1 && !($updatable || in_array($obm["uid"],$attendee["user"]))) {
+  if ($event->privacy == 1 && !(in_array($obm["uid"],$attendee["user"]))) {
     $title = phpStringToJsString($l_private);
     $description = $title;
     $location = $title;
@@ -2394,7 +2394,9 @@ function dis_calendar_planning_event(&$occurence, &$calendar_entity, $ts, $cats_
 function html_calendar_dis_conflict($calendar, $c_q) {
   global $l_title, $l_location, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
-
+  
+  $readable_entity = of_right_entity_for_user("calendar", $obm["uid"], "read", "", "userobm");
+  
   while ($c_q->next_record()) {
     $id = $c_q->f("calendarevent_id"); 
     $title = $c_q->f("calendarevent_title");
@@ -2423,9 +2425,8 @@ function html_calendar_dis_conflict($calendar, $c_q) {
         <td>$location</td>
         <td>$date_b</td>
         <td>$date_e</td>
-        <td>$name</td>";
-
-     $dis_conflict .= "</tr>";
+        <td>$name</td>
+      </tr>";
   }
   $block = "
   $dis_form_begin
@@ -2534,11 +2535,12 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
   $id = $event_q->f("calendarevent_id");
   $writable_users = of_right_entity_for_user("calendar", $obm["uid"], "write", "", "userobm");
+  $administrable_users = 
   $writable_resources = of_right_entity_for_user("Resource", $obm["uid"], "write");
   
   if ($event_q->f("calendarevent_privacy") == 0 || 
       $event_q->f("calendarevent_owner") == $obm["uid"] ||
-      in_array($event_q->f("calendarevent_owner"),$writable_users["ids"])) {
+      in_array($obm['uid'],$entities["user"]['ids'])) {
 
     $title = $event_q->f("calendarevent_title");
     $location = $event_q->f("calendarevent_location");
@@ -2725,11 +2727,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
   if ($ccalendar_resource) {
 
-
     // item
     if ($item != "") {
-        $xml = parse_item($item);
-//      $xml = simplexml_load_string($item);
+      $xml = parse_item($item);
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
           if ($value->property_name) {
@@ -4359,6 +4359,8 @@ function dis_calendar_export_handle($calendar) {
 
   header("Content-Type: text/x-vCalendar");
   header("Content-Disposition: inline; filename=ObmCalendar.ics");
+  header('Cache-Control: maxage=3600'); 
+  header('Pragma: public');  
   echo "BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//OBM/OBM V$obm_version Calendar//EN
@@ -4701,7 +4703,6 @@ function parse_item($item) {
   if ($item == "") {
     return false;
   }
-
   $p = xml_parser_create();
   xml_parser_set_option($p, XML_OPTION_TARGET_ENCODING, "ISO-8859-1");
   xml_parse_into_struct($p, $item, $vals, $index);
@@ -4712,7 +4713,6 @@ function parse_item($item) {
   foreach($vals as $key => $value) {
     $att = strtolower($value["tag"]);
     if (in_array($att, $match_attribut)) { 
-      // $item_detail->resource->$att = $value["value"];
       $${att} = $value["value"];
       if ($att == "resource" && $value["type"] == "close") {
         $item_detail = new Item($res_id, $res_name, $item, $item_id, $property_name, $property_value);

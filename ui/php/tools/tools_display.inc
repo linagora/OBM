@@ -55,7 +55,7 @@ function dis_tools_update_detail() {
 	$dis_detail_title .= ' ('. $obm['delegation'] . ') ';
       }
       if ($realm == 'delegation' && $obm['delegation'] == '') {
-        break;
+        continue;
       }
       foreach ($entities as $entity=>$db_info) {
 	$dis_entity = ${"l_$entity"};

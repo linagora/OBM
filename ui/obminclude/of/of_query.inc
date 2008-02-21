@@ -2251,11 +2251,10 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
   }
   if ($reci_list != '') {
     // as we don't have a mean to encode the subject, we drop its accentsr
-    $subject = mb_encode_mimeheader($subject, "ISO-8859-1", "Q");
+    $subject = mb_encode_mimeheader($subject, "ISO-8859-1", "Q","\n");
     mail ($reci_list, $subject, $msg, $headers);         
   }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get recipients mail addresses
