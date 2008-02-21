@@ -4096,7 +4096,7 @@ function dis_calendar_free_interval($calendar, $entity_store) {
   global $l_private,$l_private_description,$display,$l_free_resources,$l_all_f;
   global $l_previous, $l_next;
 
-  $iso_date = $calendar["date_begin"];
+  $iso_date = $calendar["date"];
   $ts_date = strtotime($iso_date);
   $time_unit = 60 / $_SESSION['set_cal_interval']; 
   $time_unit_sec = 3600 / $_SESSION['set_cal_interval'];; 

@@ -53,41 +53,25 @@ Obm.UserDetail = new Class({
     this.useremail.setHTML(userData.email);
   },
 
-  compute: function (user_id, evt, item) {
+  compute: function (user_id, item) {
     if(this.popup.getStyle('display') == 'none') {
       this.userphoto.setHTML("&nbsp;<img src=\"/images/themes/default/images/ico_load.gif\" alt=\"[Photo]\" />&nbsp;");
       //this.userphoto.replaceWith(this.ico_load);
       this.sendDetailEvent(user_id);
       this.show();
 
-      var currentX, currentY;	
       var target = $(item);
-      var windowWidth = window.innerWidth;
-      if (IE4) {
-        evt = window.event;
-        windowWidth = document.body.clientWidth;
-      }
-      if ( W3C ) {
-        currentX = evt.clientX - this.popup.offsetWidth/2;
-        currentY = evt.clientY - this.popup.offsetHeight - 15;
-      } else if ( NS4 ) {
-        currentX = evt.pageX - this.popup.offsetWidth/2;
-        currentY = evt.pageY - this.popup.offsetHeight - 15;
-      } else {
-        windowWidth = document.documentElement.clientWidth;
-        currentX = evt.clientX - this.popup.offsetWidth/2;
-        currentY = evt.clientY - this.popup.offsetHeight - 15;
-      }
-
-      var popupLeft = currentX + this.popup.offsetWidth;
-      if (popupLeft > windowWidth) {
-        currentX = currentX - (popupLeft - windowWidth) - 20;
-      }
+      var windowWidth = document.body.clientWidth;
       var top = target.getTop() - this.popup.offsetHeight - Math.round(target.offsetHeight);
+      var left = target.getLeft() - Math.round((this.popup.offsetWidth - target.offsetWidth)/2);
+      var popupRight = left + this.popup.offsetWidth;
+      if (popupRight > windowWidth) {
+        left = left - (popupRight - windowWidth) - 20;
+      }
 
+      // Set popup position
       this.popup.setStyle('top', top+'px');
-      this.popup.setStyle('left', currentX+'px');
-
+      this.popup.setStyle('left', left+'px');
     } else {
       this.hide();
     }

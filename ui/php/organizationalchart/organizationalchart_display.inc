@@ -215,7 +215,7 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     $archive = $oc_q->f("organizationalchart_archive") == "1" ? "checked" : "";
     $nb_child = ($oc_q->f("node") + 1);
     $dis_title = $name;
-    $block_detail = draw_form($root_node);
+    $block_detail = dis_organizationalchart_draw_form($root_node);
     $block_detail .= "<input type=\"hidden\" id=\"nb_child\" name=\"nb_child\" value=\"$nb_child\" />
       <input type=\"hidden\" id=\"organizationalchart_id\" name=\"organizationalchart_id\" value=\"$id\" />";
   } else {
@@ -350,11 +350,11 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
         <option value=\"small\">$l_zoom_small</option>
       </select>
     </form></div>";
-    $block_detail = draw_consult($root_node, $output);
+    $block_detail = dis_organizationalchart_draw_consult($root_node, $output);
     $block_popup = dis_organizationalchart_userdetail();
     $ico_organizationnalchart = $ico_organizationalchart_view_current;
   } elseif ($action == "detailconsult_outline") {
-    $block_detail = draw_form_outline($root_node, $output);
+    $block_detail = dis_organizationalchart_draw_consult_outline($root_node, $output);
     $block_popup = "";
     $ico_outline = $ico_outline_view_current;
   }
@@ -472,7 +472,7 @@ function sort_node_detail($a, $b) {
  * @access public
  * @return HTML
  */
-function draw_consult($node_q, $output) {
+function dis_organizationalchart_draw_consult($node_q, $output) {
   global $f, $l; 
   global $l_title, $l_phone, $l_mphone, $l_email;
   global $ico_manager, $ico_nophoto;
@@ -542,15 +542,15 @@ function draw_consult($node_q, $output) {
         if (!$is_manager) {
            $block_detail_entities .= "<li id=\"item-${level}-${user_id}\">
              <a href=\"$userobm_url\" 
-               onmouseover=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\"
-               onmouseout=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\">$userobm_name</a>
+               onmouseover=\"obm.userDetail.compute($user_id, 'item-${level}-${user_id}');return false;\"
+               onmouseout=\"obm.userDetail.compute($user_id, 'item-${level}-${user_id}');return false;\">$userobm_name</a>
              </li>";
         } else {
           $manager = "<img src=\"$ico_manager\" />";
           $block_detail_entities_boss .= "<li id=\"item-${level}-${user_id}\">
           <a href=\"$userobm_url\" 
-            onmouseover=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\"
-            onmouseout=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\">$manager&nbsp;<b>$userobm_name</b></a>
+            onmouseover=\"obm.userDetail.compute($user_id, 'item-${level}-${user_id}');return false;\"
+            onmouseout=\"obm.userDetail.compute($user_id, 'item-${level}-${user_id}');return false;\">$manager&nbsp;<b>$userobm_name</b></a>
           </li>";
         }
       } else {
@@ -584,7 +584,7 @@ function draw_consult($node_q, $output) {
         $node_queue = "";
       }
       $child_q = run_query_organizationalchart_node_infos($child_id);
-      $t_draw = draw_consult($child_q, $output);
+      $t_draw = dis_organizationalchart_draw_consult($child_q, $output);
       $block_detail_child .= $t_draw;
     }
   } 
@@ -634,7 +634,7 @@ function draw_consult($node_q, $output) {
  * @access public
  * @return HTML
  */
-function draw_form_outline($node_q) {
+function dis_organizationalchart_draw_consult_outline($node_q) {
   global $ico_delete, $ico_add, $ico_user, $ico_group;
   global $l_add_child_tooltip, $l_name;
 
@@ -689,7 +689,7 @@ function draw_form_outline($node_q) {
   if ($nb_children > 0) {
     foreach($t_child as $key => $child_id){
       $child_q = run_query_organizationalchart_node_infos($child_id);
-      $t_draw = draw_form_outline($child_q);
+      $t_draw = dis_organizationalchart_draw_consult_outline($child_q);
       $block_detail_child .= $t_draw;
     }
   } 
@@ -720,7 +720,7 @@ function draw_form_outline($node_q) {
  * @access public
  * @return HTML
  */
-function draw_form($node_q) {
+function dis_organizationalchart_draw_form($node_q) {
   global $ico_delete, $ico_add, $ico_user, $ico_group;
   global $l_add_child_tooltip, $l_name;
 
@@ -762,7 +762,7 @@ function draw_form($node_q) {
   if ($nb_children > 0) {
     foreach($t_child as $key => $child_id){
       $child_q = run_query_organizationalchart_node_infos($child_id);
-      $t_draw = draw_form($child_q);
+      $t_draw = dis_organizationalchart_draw_form($child_q);
       $block_detail_child .= $t_draw;
     }
   } 
@@ -798,8 +798,8 @@ function draw_form($node_q) {
     </div>
     <script type=\"text/javascript\">
       obm.initialize.chain(function () {
-        new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'user$level', {defaultText:'$user_text'})
-        new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'group$level', {defaultText:'$user_text'})
+        new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'user$level', {defaultText:'$user_text'});
+        new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'group$level', {defaultText:'$user_text'});
       });
     </script>
 ";
