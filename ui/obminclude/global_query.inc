@@ -592,57 +592,6 @@ function run_query_global_document_delete_file($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// query execution : Insert document linked with a entity
-// Parameters:
-//   - $id  :  Id of entity
-//   - $entity  :  Type of entity (deal, company..)
-// Return:
-//   - $cpt_ins : # documents inserted
-///////////////////////////////////////////////////////////////////////////////
-function run_query_global_insert_documents_links($ids, $entity) {
-  global $cdg_sql;
-
-  $id = $ids[$entity.'_id'];
-  if($id == '') {
-    $id = $ids['ext_id'];
-  }
-  $cpt = 0;
-  $cpt_ins = 0;
-  while ($cpt < $ids['doc_nb']) {
-    $cpt++;
-    $d_id = $ids["doc$cpt"];
-    
-    $query = "SELECT *
-      FROM DocumentEntity
-      WHERE documententity_entity='$entity'
-        AND documententity_entity_id='$id'
-        AND documententity_document_id = '$d_id'";
-    display_debug_msg($query, $cdg_sql, 'run_query_global_insert_documents_links(1)');
-    $test_q = new DB_OBM;
-    $retour = $test_q->query($query);
-    
-    // If the entry doesn't already exist, we insert it
-    if ($test_q->num_rows() == 0) {
-      $query = "INSERT INTO DocumentEntity (
-        	documententity_entity,
-	       documententity_entity_id,
-	       documententity_document_id
-       )VALUES (    
-	       '$entity',
-	       '$id',
-	       '$d_id'
-      )";
-      display_debug_msg($query, $cdg_sql, 'run_query_global_insert_documents_links(2)');
-      $obm_q = new DB_OBM;
-      $retour = $obm_q->query($query);
-      $cpt_ins++;
-    }
-  }
-
-  return $cpt_ins;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // query execution : Insert document
 // Parameters:
 //   - $id  :  Id of entity
@@ -731,8 +680,18 @@ function run_query_global_insert_document($params, $id, $entity) {
       // If error, delete file
       run_query_global_delete_document($id); // todo
     } else {
+      $entity_id = $params[$entity.'_id'];
       // Insert links
-      run_query_global_insert_documents_links($id, $entity);
+      $query = "INSERT INTO DocumentEntity (
+        documententity_entity,
+        documententity_entity_id,
+        documententity_document_id
+       )VALUES (    
+        '$entity',
+        '$entity_id',
+        '$id')";
+      display_debug_msg($query, $cdg_sql, 'run_query_global_insert_document(3)');
+      $obm_q->query($query); 
       return $id;
     }
   }

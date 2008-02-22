@@ -1054,6 +1054,7 @@ function check_document_can_delete($p_id) {
   // Warn if document has links
   if ($nb > 0) {
     $err["msg"] = $l_have_link;
+    $delete_ok = false;
   } else {
     $err["msg"] = $l_have_no_link;
   }
