@@ -885,7 +885,7 @@ Obm.CalendarManager = new Class({
     } catch (e) {
       resp = new Object();
       resp.error = 1;
-      resp.message = 'Fatal server error, please reload';
+      resp.message = obm.vars.labels.fatalServerErr;
     }
     var events = resp.eventsData;
     if(resp.error == 0) {
@@ -932,7 +932,7 @@ Obm.CalendarManager = new Class({
     } catch (e) {
       resp = new Object();
       resp.error = 1;
-      resp.message = 'Fatal server error, please reload';
+      resp.message = obm.vars.labels.fatalServerErr;
     }    
     var events = resp.eventsData;
     if(resp.error == 0) {
@@ -970,7 +970,7 @@ Obm.CalendarManager = new Class({
     } catch (e) {
       resp = new Object();
       resp.error = 1;
-      resp.message = 'Fatal server error, please reload';
+      resp.message = obm.vars.labels.fatalServerErr;
     }
     var events = resp.eventsData;
     if(resp.error == 0) {
@@ -1253,7 +1253,7 @@ Obm.CalendarView = new Class({
             } catch (e) {
               resp = new Object();
               resp.error = 1;
-              resp.message = 'Fatal server error, please reload';
+              resp.message = obm.vars.labels.fatalServerErr;
             }
             if(resp.error == 0) {
               showOkMessage(resp.message);
@@ -1293,7 +1293,7 @@ Obm.CalendarView = new Class({
               } catch (e) {
                 resp = new Object();
                 resp.error = 1;
-                resp.message = 'Fatal server error, please reload';
+                resp.message = obm.vars.labels.fatalServerErr;
               }
               if(resp.error == 0) {
                 showOkMessage(resp.message);

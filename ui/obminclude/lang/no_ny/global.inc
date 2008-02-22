@@ -59,6 +59,8 @@ $l_aduplicate = "Duplicate";
 $l_after = "Etter";
 $l_before = "Før";
 $l_profile = "Autorisering";
+$l_autocomplete_field = "Search ...";
+$l_fatal_server_err = "Fatal server error, please reload";
 
 // OBM_DISPLAY
 $l_entries = "Entries #";

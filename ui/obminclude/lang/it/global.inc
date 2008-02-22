@@ -122,6 +122,8 @@ $l_cat_tree = "Entera Categoria";
 $l_category = "Categoria";
 $l_aduplicate = "Copia";
 $l_type = "Tipo";
+$l_autocomplete_field = "Search ...";
+$l_fatal_server_err = "Fatal server error, please reload";
 
 // Entities
 $l_company = "Azienda";

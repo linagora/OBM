@@ -542,15 +542,15 @@ function dis_organizationalchart_draw_consult($node_q, $output) {
         if (!$is_manager) {
            $block_detail_entities .= "<li id=\"item-${level}-${user_id}\">
              <a href=\"$userobm_url\" 
-               onmouseover=\"obm.userDetail.compute($user_id, 'item-${level}-${user_id}');return false;\"
-               onmouseout=\"obm.userDetail.compute($user_id, 'item-${level}-${user_id}');return false;\">$userobm_name</a>
+               onmouseover=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\"
+               onmouseout=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\">$userobm_name</a>
              </li>";
         } else {
           $manager = "<img src=\"$ico_manager\" />";
           $block_detail_entities_boss .= "<li id=\"item-${level}-${user_id}\">
           <a href=\"$userobm_url\" 
-            onmouseover=\"obm.userDetail.compute($user_id, 'item-${level}-${user_id}');return false;\"
-            onmouseout=\"obm.userDetail.compute($user_id, 'item-${level}-${user_id}');return false;\">$manager&nbsp;<b>$userobm_name</b></a>
+            onmouseover=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\"
+            onmouseout=\"obm.userDetail.compute($user_id, event, 'item-${level}-${user_id}');return false;\">$manager&nbsp;<b>$userobm_name</b></a>
           </li>";
         }
       } else {

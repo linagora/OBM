@@ -160,6 +160,7 @@ $l_recursive = "Recursive";
 $l_hour = "Hour";
 $l_type ="Type";
 $l_autocomplete_field = "Search ...";
+$l_fatal_server_err = "Fatal server error, please reload";
 
 // Entities
 $l_company = "Company";

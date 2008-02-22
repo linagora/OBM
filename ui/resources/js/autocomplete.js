@@ -328,7 +328,7 @@ obm.AutoComplete.Search = new Class({
 
   // when an ajax error occurs (during request)
   onFailure: function(response) {
-    showErrorMessage('Fatal server error, please reload');
+    showErrorMessage(obm.vars.labels.fatalServerErr);
   },
 
   // when receiving a success response for a new request

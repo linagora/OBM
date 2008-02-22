@@ -74,6 +74,8 @@ $l_aka = "Also known as";
 $l_category = "Kategorie";
 $l_aduplicate = "Duplicate";
 $l_profile = "Berechtigung";
+$l_autocomplete_field = "Search ...";
+$l_fatal_server_err = "Fatal server error, please reload";
 
 // Entities
 $l_company = "Firma";

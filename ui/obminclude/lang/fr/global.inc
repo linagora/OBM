@@ -39,6 +39,7 @@ $l_print = "Imprimer";
 $l_transparent = "Transparent";
 $l_select_all = "Sélectionner tout";
 $l_autocomplete_field = "Rechercher ...";
+$l_fatal_server_err = "Erreur fatale du serveur, veuillez recharger la page";
 
 // Common messages
 $l_yes = "Oui";
