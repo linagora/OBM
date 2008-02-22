@@ -329,6 +329,10 @@ function update_organizationalchart_action() {
     // Check Delete
     $actions["organizationalchart"]["check_delete"]['Url'] = "$path/organizationalchart/organizationalchart_index.php?action=check_delete&amp;organizationalchart_id=$id";
     $actions["organizationalchart"]["check_delete"]['Condition'][] = 'insert';
+
+    // LDIF Export
+    $actions["organizationalchart"]["export_ldif"]['Url'] = "$path/organizationalchart/organizationalchart_index.php?action=export_ldif&amp;organizationalchart_id=$id";
+    $actions["organizationalchart"]["export_ldif"]['Condition'][] = 'insert';
    }
 }
 ?>

@@ -564,11 +564,11 @@ function dis_organizationalchart_draw_consult($node_q, $output) {
   // TODO: Optimized
   $t_child = run_query_organizationalchart_node_child($node_id);
   $nb_children = sizeof($t_child);
-  $nb_leaves = run_query_organizationalchart_get_leaves($node_id, true);
   $brother = run_query_organizationalchart_node_child($parent_node_id);
   $nb_brother = sizeof($brother) - 1;
 
   if ($nb_children > 0) {
+    $nb_leaves = run_query_organizationalchart_get_leaves($node_id, true);
     $wrap_width = $nb_leaves * $wrap_width;
     $node_queue = "<div class=\"nodeLnk\"></div>";
     foreach($t_child as $key => $child_id){
@@ -598,7 +598,8 @@ function dis_organizationalchart_draw_consult($node_q, $output) {
       $node_edge = "<div class=\"nodeEnd$print\" style=\"width:".(ceil($wrap_width/2))."px;\"></div>";
     }
   } 
-  
+
+  // has brother? 
   if (!$nb_brother) {
     $style = "";
   }
@@ -722,7 +723,7 @@ function dis_organizationalchart_draw_consult_outline($node_q) {
  */
 function dis_organizationalchart_draw_form($node_q) {
   global $ico_delete, $ico_add, $ico_user, $ico_group;
-  global $l_add_child_tooltip, $l_name;
+  global $l_add_child_tooltip, $l_name, $l_delete;
 
   $node_name = $node_q->f("ogroup_name");
   $node_id = $node_q->f("ogroup_id");
@@ -769,7 +770,7 @@ function dis_organizationalchart_draw_form($node_q) {
 
   if ($level > 1) { 
     $ico_del_entity = "<a href='javascript: del_entity(\"$level\");'>
-      <img src=\"$ico_delete\" alt=\"[Delete]\" style=\"float: right;\" title=\"$l_add_child_tooltip\">
+      <img src=\"$ico_delete\" alt=\"[Delete]\" style=\"float: right;\" title=\"$l_delete\">
     </a>";
     $flour = strlen($level) - strlen(str_replace(".", "", $level));  
     $color = "color".($flour)%7;
