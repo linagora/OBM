@@ -49,7 +49,7 @@ if (($action == "index") || ($action == "")) {
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (of_right_update_right($params, "mailbox", "userobm")) {
-    set_update_state();
+    update_mailbox_acl( $obm['login'], $obm['domain_id'] );
     $display["msg"] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
     $display["msg"] .= display_warn_msg($err["msg"]);
