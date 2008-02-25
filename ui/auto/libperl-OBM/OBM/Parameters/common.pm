@@ -27,6 +27,11 @@ use FindBin qw($Bin);
 $debug=1;
 
 # Lecture du fichier ini
+if( ! -r $Bin."/../conf/obm_conf.ini" ) {
+    print STDERR "Le fichier de configuration 'obm_conf.ini' n'existe pas ou n'est pas lisible\n";
+    exit 1;
+}
+
 $cfgFile = Config::IniFiles->new( -file => $Bin."/../conf/obm_conf.ini" );
 
 # Initialisation du moteur de random
