@@ -15,7 +15,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($logLevel $facility_log $sieveSrv $singleNameSpace $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_regexp = qw($regexp_email $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain $regexp_login);
@@ -54,6 +54,12 @@ if( lc($cfgFile->val( 'global', 'singleNameSpace' )) eq "true" ) {
     $singleNameSpace = 1;
 }else {
     $singleNameSpace = 0;
+}
+
+# La racine du backup
+$backupRoot = $cfgFile->val( 'global', 'backupRoot' );
+if( !defined( $backupRoot ) ) {
+    $backupRoot = "/var/lib/obm/backup";
 }
 
 # definition du niveau de log

@@ -123,9 +123,6 @@ $default_path = '/Default';                  // Default directory
 // Group : is a new group private by default
 $cgroup_private_default = true;
 
-// Backup : Backup root
-$cbackup_root = '/var/www/obmbackup';
-
 // default taxes values
 $cdefault_tax = array ('TVA 19,6' => 1.196, 'TVA 5,5' => 1.055, 'Pas de TVA' => 1);
 

@@ -261,6 +261,13 @@ $obmdb_password = $ini_array['password'];
 // Single or multi domain
 $c_singleNameSpace = $ini_array['singleNameSpace'];
 
+// Backup root
+if (is_null($ini_array['backupRoot'])) {
+    $cbackup_root = "/var/lib/obm/backup";
+}else {
+    $cbackup_root = $ini_array['backupRoot'];
+}
+
 $cgp_host = $ini_array['external-protocol'].'://'.$ini_array['external-url'].$ini_array['obm-prefix'];
 //------------------//
 // Services enabled //
@@ -398,6 +405,7 @@ $cmd_check_update = "ps aux | grep auto/incrementalUpdate.pl | grep -v grep";
 $cmd_mailforward = "$path/../auto/updateSieve.pl";
 $cmd_vacation = "$path/../auto/updateSieve.pl";
 $cmd_ldap_passwd = "$path/../auto/changePasswd.pl";
+$cmd_update_bal_acl = "$path/../auto/updateCyrusAcl.pl";
 
 $section = $cgp_show['module'][$module];
 
