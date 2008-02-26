@@ -18,7 +18,7 @@ use FindBin qw($Bin);
 @EXPORT_const = qw($logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
-@EXPORT_regexp = qw($regexp_email $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain $regexp_login);
+@EXPORT_regexp = qw($regexp_email $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain $regexp_login $regexp_ip);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db);
 @EXPORT = (@EXPORT_const, @EXPORT_db, @EXPORT_command, @EXPORT_regexp, @EXPORT_dir);
 @EXPORT_OK = qw();
@@ -182,6 +182,9 @@ $regexp_passwd = "^[-\\\$&\\\\~#\{\(\[\|_`\^@\);\\\]+=\}%!:\\\/\\\.,?>\\\"\\p{Al
 #
 # Domain regexp
 $regexp_domain = "^[0-9]+\$";
+#
+# Les adresses IP
+$regexp_ip = "/^([1-2]?[0-9]{1,2}\\\.){3}[1-2]?[0-9]{1,2}\$/";
 
 #
 # Definitions des parametres Samba

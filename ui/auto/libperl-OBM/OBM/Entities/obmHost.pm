@@ -140,6 +140,12 @@ sub getEntity {
     # On range les résultats calculés dans la structure de données dédiée
     $self->{hostDesc}->{host_domain} = $domainDesc->{domain_label};
 
+    # Gestion de l'adresse IP de l'hôte
+    if( !$dbEntry->{host_ip} || $dbEntry->{host_ip} !~ $regexp_ip ) {
+        $self->{hostDesc}->{host_ip} = "0.0.0.0";
+    }else {
+        $self->{hostDesc}->{host_ip} = $dbEntry->{host_ip};
+    }
 
     # Les données Samba
     if( $OBM::Parameters::common::obmModules->{samba} && $dbEntry->{host_samba} ) {
@@ -360,8 +366,8 @@ sub createLdapEntry {
     }
 
     # L'adresse IP
-    if( $dbEntry->{host_ip} ) {
-        $ldapEntry->add( ipHostNumber => $dbEntry->{host_ip} );
+    if( $entryProp->{host_ip} ) {
+        $ldapEntry->add( ipHostNumber => $entryProp->{host_ip} );
     }
 
     # Le domaine OBM
@@ -457,7 +463,7 @@ sub updateLdapEntry {
     }
 
     # L'adresse IP
-    if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{"host_ip"}, $ldapEntry, "ipHostNumber" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{"host_ip"}, $ldapEntry, "ipHostNumber" ) ) {
         $update = 1;
     }
 
