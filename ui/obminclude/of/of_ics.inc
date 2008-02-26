@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ICalendar_Utils 
+ * Utilities helping ICS format performing 
  * 
  * @package 
  * @version $id:$
@@ -12,115 +12,58 @@
 class ICalendar_Utils {
 
   /**
-   * parse 
+   * Parse an ICS File into a ICS_Document
    * 
-   * @param mixed $file 
+   * @param string $file ICS file name
    * @access public
-   * @return void
+   * @return ICalendar_Document ICS Document resulting from parsing $file
    */
   function parseICS($file) {
     $reader = new ICalendar_ICS_Reader($file);
     $document = new ICalendar_Document();
-//    $handle = fopen($file, 'r');
-    //    while(($line = fgets($handle)) && strcmp(trim($line),'BEGIN:VCALENDAR') !== 0);
-    while($reader->nextElement()){
-       
-    }
-    
-    ICalendar_Utils::parseElement($reader, $document->vcalendar);
-    //    fclose($handle);
+    $document->vcalendar = &$reader->parseElement($document);
+    $reader->setObmUsers($document);
+//    $reader->setObmFlags($document); 
     $reader->close;
     return $document;
   }
 
-  /**
-   * parseElement 
-   * 
-   * @param mixed $handle 
-   * @param mixed $element 
-   * @access public
-   * @return void
-   */
-  function parseElement(&$reader,&$element) {
-    while($reader->nextElement()){
-
-    }
- 
-    while(($line = fgets($handle)) && preg_match('/^END:.*$/',$line) === 0) {
-      if(preg_match('/^BEGIN:(.*)$/',$line,$match) !== 0) {
-        $document = &$element->getDocument();
-        $child = &$document->createElement(trim($match[1]));
-        $element->appendChild($child);
-        ICalendar_Utils::parseElement($handle,$child);
-        unset($child);
-      } else {
-        $property = ICalendar_Utils::parseProperty($handle, $line);
-        $element->setProperty($property['name'],$property['value'],$property['options']);
-      }
-    }
-  }
-
-  /**
-   * parseProperty 
-   * 
-   * @param mixed $handle 
-   * @param mixed $line 
-   * @access public
-   * @return void
-   */
-  function parseProperty(&$handle, $line) {
-    $propertyLine = '';
-    $indent = 0;
-    $properties = array('name','options','values');
-    do {
-      $offset = ftell($handle);
-      $propertyLine .= trim($line);
-      $line = fgets($handle);
-      $indent++;
-    } while(preg_match('/^\s{'.$indent.'}.*$/',$line) !== 0);
-    fseek($handle,$offset);
-
-    preg_match('/^([^;:]*);?([^:]*):(.*)$/',$propertyLine, $match);
-    $property['name'] = strtolower($match[1]);
-
-    $property['options'] = array();
-    $options = explode(';',$match[2]);
-    foreach($options as $option) {
-      list($optionName, $optionValue) = explode('=', $option);
-      $optionName = strtolower($optionName);
-      $property['options'][$optionName] = $optionValue;
-    }
-
-    $property['value'] = array();
-    $values = explode(';',$match[3]);
-    foreach($values as $value) {
-      if(strpos('=',$value) !== FALSE) {
-        list($valueName, $valueValue) = explode('=', $value);
-        $valueName = strtolower($valueName);
-        $property['value'][$valueName] = $valueValue;
-      } else {
-        $property['value'][] = $value;
-      }
-    }
-    if(count($property['value']) == 1) {
-      $property['value'] = array_shift($property['value']);
-    }
-
-    return $property;
-  }
 }
 
 
+/**
+ * Parse an ICS File into an ICalendar_Document
+ * 
+ * @package 
+ * @version $id:$
+ * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
+ * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @license GPL 2.0
+ */
 class ICalendar_ICS_Reader {
 
   var $handler;
 
   var $attribute;
 
+  /**
+   * Constructor 
+   * 
+   * @param string $file ICS file name 
+   * @access public
+   * @return void
+   */
   function ICalendar_ICS_Reader($file) {
     $this->handle = fopen($file, 'r');
+    $this->attribute = array('name' => '', 'options' => array(), 'value' => array());
   }
 
+  /**
+   * Read an ICS Attribute and store properties in an internal value. 
+   * 
+   * @access public
+   * @return boolean True if a ICS line is read, False if eof or empty line
+   */
   function getAttribute() {
     $propertyLine = '';
     $indent = 0;
@@ -129,67 +72,175 @@ class ICalendar_ICS_Reader {
       $offset = ftell($this->handle);
       $indent++;
     }
-    fseek($handle,$offset);
+    fseek($this->handle,$offset);
     
+    if($propertyLine == '') {
+      return false;
+    } 
+
     preg_match('/^([^;:]*);?([^:]*):(.*)$/',$propertyLine, $match);   
-    $this->attribute = array('name' => '', 'options' => array(), => 'value' => array());
+    $this->attribute = array('name' => '', 'options' => array(), 'value' => array());
     
-    $property['name'] = trim(strtolower($match[1]));
-    
-    $options = explode(';',$match[2]);
+    $this->attribute['name'] = trim(strtolower($match[1]));
+    $this->attribute['options'] = ICalendar_ICS_Reader::parseAttributeOptions(explode(';',$match[2]));
+    $this->attribute['value'] = $match[3];
+
+    return true;
+  }
+
+  /**
+   * Parse an array of OptionName=OptionValue and store it into
+   * an hash map 
+   * 
+   * @param array $options 
+   * @access public
+   * @return hasmap of options
+   */
+  function parseAttributeOptions($options) {
+    $property = array();
     foreach($options as $option) {
       list($optionName, $optionValue) = explode('=', $option);
       $optionName = strtolower($optionName);
-      $this->attribute['options'][$optionName] = $optionValue;
+      $property[$optionName] = $optionValue;
     }
-
-    $property['value'] = array();
-    $values = explode(';',$match[3]);
-    foreach($values as $value) {
-      if(strpos('=',$value) !== FALSE) {
-        list($valueName, $valueValue) = explode('=', $value);
-        $valueName = strtolower($valueName);
-        $this->attribute['value'][$valueName] = $valueValue;
-      } else {
-        $property['value'][] = $value;
-      }
-    }
-    if(count($property['value']) == 1) {
-      $this->attribute['value'] = array_shift($this->attribute['value']);
-    }    
-
+    return $property;
   }
 
+  /**
+   * Return True if the current ICS Attribute is a new ICS
+   * element attribute 
+   * 
+   * @access public
+   * @return boolean
+   */
   function isBeginLine() {
     return ($this->attribute['name'] == 'begin');
   }
 
+  /**
+   * Return True if the current ICS Attribute is the end of ICS
+   * an element  
+   * 
+   * @access public
+   * @return boolean
+   */
   function isEndLine() {
     return ($this->attribute['name'] == 'end');
   }
   
+  /**
+   * Search for the next ICS element beginning 
+   * 
+   * @access public
+   * @return boolean True if a new element is found
+   */
   function nextElement() {
-    while(($return = $this->getAttribute()) && !$this->isBeginLine());
+    while((!$this->isBeginLine() && ($return = $this->getAttribute())) );
     return $return;
   }
 
-  function parseElement() {
+  /**
+   * Parse an ICS Element and his child 
+   * 
+   * @param ICS_Document $document ICS document
+   * @access public
+   * @return ICalendar_Element Parsed element
+   */
+  function parseElement(&$document) {
 
-    while(($line = fgets($this->handle)) && $this->isEndLine()) {
-
-      if(preg_match('/^BEGIN:(.*)$/',$line,$match) !== 0) {
-        $document = &$element->getDocument();
-        $child = &$document->createElement(trim($match[1]));
-        $element->appendChild($child);
-        ICalendar_Utils::parseElement($handle,$child);
-        unset($child);
+    $r = $this->nextElement();
+    $element = $document->createElement($this->attribute['value']);
+    while($this->getAttribute() && !$this->isEndLine()) {
+      if($this->isBeginLine()) {
+        $children[] = &$this->parseElement($document);
       } else {
-        $property = ICalendar_Utils::parseProperty($handle, $line);
-        $element->setProperty($property['name'],$property['value'],$property['options']);
+        $properties[] = $this->attribute;
       }
     }
-
+    if(is_array($children)) {
+      foreach($children as $child) {
+        $element->appendChild($child);
+        unset($child);
+      }
+    }
+    $element->setProperties($properties);
+    return $element;
   }
+
+  /**
+   * Find all reference to user into the document
+   * and try to map them with an obm id. 
+   * 
+   * @param ICS_Document $document 
+   * @access public
+   * @return void
+   */
+  function setObmUsers(&$document) {
+    $users = $this->getICSIds($document->vcalendar);
+    //$obmIds = get_userobm_from_ics($users);
+    $this->setObmIds($users);
+  }
+
+  /**
+   * Find all reference to users into a element 
+   * 
+   * @param ICalendar_Element $element 
+   * @access public
+   * @return array hashmap containing all reference to users 
+   */
+  function getICSIds(&$element) {
+    $users = array();
+    if(($organizer = $element->getValue('organizer')) && !$element->getOption('organizer','x-obm-id')) {
+      $users[$organizer] = $element->getOptions('organizer');
+    }
+    if(($attendees = $element->getValue('attendee'))) {
+      if(!is_array($attendees) && !$element->getOption('attendee','x-obm-id')) {
+        $users[$attendees] = $element->getOptions('attendee');
+      } else {
+        foreach($attendees as $key => $attendee) {
+          if(!$element->getOption('attendee','x-obm-id',$key)) {
+            $users[$attendee] = $element->getOptions('attendee',$key);
+          }
+        }
+      }
+    }
+    if(is_array($element->children)) {
+      for($i=0;$i < count($element->children); $i++) {
+        $users = array_merge($users, $this->getICSIds($element->children[$i]));
+      }
+    }
+    return $users;
+  }
+
+  /**
+   * Add an x-obm-id to all users reference in a element. 
+   * 
+   * @param ICalendar_Element $element 
+   * @access public
+   * @return void
+   */
+  function setICSIds(&$element, &$users) {
+    $users = array();
+    if(($organizer = $element->getValue('organizer')) && !$element->getOption('organizer','x-obm-id')) {
+      $element->addOption('organizer','x-obm-id',$users[$organizer]['x-obm-id']);
+    }
+    if(($attendees = $element->getValue('attendee'))) {
+      if(!is_array($attendees) && !$element->getOption('attendee','x-obm-id')) {
+        $element->addOption('organizer','x-obm-id',$users[$attendees]['x-obm-id']);
+      } else {
+        foreach($attendees as $key => $attendee) {
+          if(!$element->getOption('attendee','x-obm-id',$key)) {
+            $element->addOption('organizer','x-obm-id',$users[$attendees]['x-obm-id'],$key);
+          }
+        }
+      }
+    }
+    if(is_array($element->children)) {
+      for($i=0;$i < count($element->children); $i++) {
+        $this->setICSIds($element->children[$i]);
+      }
+    }
+  }  
 }
 
 class ICalendar_ICS_Writer {
@@ -205,7 +256,7 @@ class ICalendar_OBM_Writer {
 }
 
 /**
- * ICalendar_Document 
+ * OBM Icalendar Document  
  * 
  * @package 
  * @version $id:$
@@ -215,16 +266,11 @@ class ICalendar_OBM_Writer {
  */
 class ICalendar_Document {
 
-  /**
-   * vcalendar 
-   * 
-   * @var mixed
-   * @access public
-   */
   var $vcalendar;
 
   /**
-   * ICalendar_Document 
+   * Constructor
+   * Create a vcalendar Element. //FIXME necessaire?
    * 
    * @access public
    * @return void
@@ -234,11 +280,11 @@ class ICalendar_Document {
   }
 
   /**
-   * createElement 
+   * Create a new ICS element 
    * 
-   * @param mixed $name 
+   * @param string $name kind of element
    * @access public
-   * @return void
+   * @return ICalendar_Element
    */
   function createElement($name) {
     if(class_exists('ICalendar_'.ucfirst($name))) {
@@ -250,17 +296,17 @@ class ICalendar_Document {
   }
 
   /**
-   * getVevents 
+   * Get all vevent in the document 
    * 
    * @access public
-   * @return void
+   * @return array of ICalendar_Element
    */
   function getVevents() {
     return $this->vcalendar->getElementByName('vevent');
   }
 }
 /**
- * ICalendar_Element 
+ * ICalendar Element 
  * 
  * @package 
  * @version $id:$
@@ -316,6 +362,20 @@ class ICalendar_Element {
   }
 
   /**
+   * setProperties 
+   * 
+   * @access public
+   * @return void
+   */
+  function setProperties($properties) {
+    if(is_array($properties)) {
+      foreach($properties as $property) {
+        $this->setProperty($property['name'],$property['value'], $property['options']);
+      }
+    }
+  }
+
+  /**
    * setProperty 
    * 
    * @param mixed $name 
@@ -326,15 +386,14 @@ class ICalendar_Element {
    */
   function setProperty($name, $value, $options) {
     $methodName = 'set'.str_replace(' ','',ucwords(str_replace('-',' ',$name)));
-
     if(method_exists($this, $methodName)) {
       $this->$methodName($value, $options);
     } else {
-      if(isset($this->name)) {
-        if(isset($this->name['value'])) {
-          $this->name[] =  $this->name;
+      if(isset($this->$name)) {
+        if(array_key_exists('value',$this->$name)) {
+          $this->$name =  array($this->$name);
         }
-        $this->name[] = array('value' => $value, 'options' => $options);
+        array_push($this->$name,array('value' => $value, 'options' => $options));
       } else {
         $this->$name = array('value' => $value, 'options' => $options);
       }
@@ -385,6 +444,14 @@ class ICalendar_Element {
     return $elements;
   }
 
+  /**
+   * parseDate 
+   * 
+   * @param mixed $value 
+   * @param mixed $options 
+   * @access public
+   * @return void
+   */
   function parseDate($value, $options) {
     preg_match('/.*(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})){0,1}/', $value, $match) ;
     list($all, $year, $month, $day, $time, $hour, $minute, $second) = $match;
@@ -394,7 +461,106 @@ class ICalendar_Element {
     }
     return $date;
   }  
+  
+  //FIXME Doit retourner un tableau ou une valeur. 
+  /**
+   * getValue 
+   * 
+   * @param mixed $propertyName 
+   * @access public
+   * @return void
+   */
+  function getValue($propertyName,$key=NULL) {
+    if(isset($this->$propertyName)) {
+      if(is_null($key)) {
+        if(array_key_exists('value',$this->$propertyName)) {
+          return $this->{$propertyName}['value'];
+        } else {
+          $values = array();
+          foreach($this->$propertyName as $property) {
+            $values[] = $property['value'];
+          }
+          return $values;
+        }
+      } else {
+        if(array_key_exists($this->{$propertyName}, $key)) {
+          return $this->{$propertyName}[$key]['value'];
+        }
+      }
+    }
+    return false;
+  }
+  //FIXME Doit retourner un tableau ou une valeur. 
+  /**
+   * getOption 
+   * 
+   * @param mixed $propertyName 
+   * @param mixed $optionName 
+   * @access public
+   * @return void
+   */
+  function getOption($propertyName,$optionName,$key=NULL) {
+    if(isset($this->$propertyName)) {
+      if(is_null($key)) {
+        if(array_key_exists('options',$this->$propertyName)) {
+          if(isset($this->{$propertyName}['options'][$optionName])) {
+            return $this->{$propertyName}['options'][$optionName];
+          }
+        } else {
+          $values = array();
+          foreach($this->$propertyName as $property) {
+            if(isset($property['options'][$optionName])) {
+              $values[] = $property['options'][$optionName];
+              $isset = true;
+            } else {
+              $values[] = NULL;
+            }
+          }
+          if($isset) {
+            return $values;
+          }
+        }
+      } else {
+        return $this->{$propertyName}[$key]['options'][$optionName];
+      }
+    }
+    return false;
+  }  
+  
+  /**
+   * getOption 
+   * 
+   * @param mixed $propertyName 
+   * @param mixed $optionName 
+   * @param mixed $key 
+   * @access public
+   * @return void
+   */
+  function getOptions($propertyName,$key=NULL) {
+    if(isset($this->$propertyName)) {
+      if(isset($this->{$propertyName}['options']))
+        if(is_null($key)) {
+          return $this->{$propertyName}['options'];
+        } else {
+          return $this->{$propertyName}[$key]['options'];
+        }
+    }
+    return false;
+  }  
 
+  /**
+   * addOption 
+   * 
+   * @param mixed $propertyName 
+   * @param mixed $optionName 
+   * @param mixed $value 
+   * @param mixed $key 
+   * @access public
+   * @return void
+   */
+  function addOption($propertyName,$optionName,$value,$key = NULL) {
+
+  } 
   /**
    * postCreate 
    * 
@@ -454,7 +620,7 @@ class ICalendar_Vevent extends ICalendar_Element {
    * @return void
    */
   function setDtend($value,$options) {
-    $this->dtend = array('value' => ICalendar_Element::parseDate($value),
+    $this->dtend = array('value' => ICalendar_Element::parseDate($value,$options),
                          'options' => $options);
 
   }
@@ -508,8 +674,9 @@ class ICalendar_Vevent extends ICalendar_Element {
    * @return void
    */
   function postCreate() {
-    //TODO: DTEND
-    //TODO: User ids
+    if($this->dtend) {
+      $this->setDuration(($this->dtend - $this->dtstart), array());
+    }
   }
   
 }

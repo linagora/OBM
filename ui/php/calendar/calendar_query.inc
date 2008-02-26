@@ -478,7 +478,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $now = date('Y-m-d H:i:s');
   if($calendar['owner']) {
     $owner = $calendar['owner'];
-  } {
+  } else {
     $owner = $obm['uid'];
   }
   $title = $calendar['title'];
@@ -845,26 +845,28 @@ function run_query_icalendar_insert($params) {
   // --- get the unfolding ics
   $ics = file($params['ics_tmp']) ;
   /* TEST FOR 2.1.6 + 1
+  include_once("obminclude/of/of_ics.inc");
   echo "<pre>";
-  $document = ICS_Utils::parse($params['ics_tmp']);
-  
+  $document = ICalendar_Utils::parseICS($params['ics_tmp']);
+  //var_dump($document);
   $vevents = &$document->getVevents();
   foreach($vevents as $vevent) {
     echo "
-      TITRE : ".$vevent->title['value']."
-      DATE : ".date('Y-m-d H:i:s',$vevent->date['value'])."      
+      TITRE : ".$vevent->summary['value']."
+      DATE : ".date('Y-m-d H:i:s',$vevent->dtstart['value'])."      
       RRULE : ".$vevent->rrule['value']."      
       DURATION : ".$vevent->duration['value']."      
-      PRIORITY : ".$vevent->priority['value']."      
+      CLASS : ".$vevent->class['value']."      
       DESCRIPTION : ".$vevent->description['value']."     
       LOCATION : ".$vevent->location['value']." 
-      PRIVATE : ".$vevent->privacy['value']." 
-      TIME CREATE : ".date('Y-m-d H:i:s',$vevent->timecreate['value'])."
-      TIME UPDATE : ".date('Y-m-d H:i:s',$vevent->timeupdate['value'])."
-      ";
+      PRIVATE : ".$vevent->class['value']." 
+      TIME CREATE : ".date('Y-m-d H:i:s',$vevent->lastModified['value'])."
+      TIME UPDATE : ".date('Y-m-d H:i:s',$vevent->created['value'])."
+      ORGANISER : ".$vevent->organizer['value']."
+      ATTENDEE : "; var_dump($vevent->attendee);
   }
   echo "</pre>";
-   */
+  */
   $new_ics = array() ; // unfolded $ics
   $prevline = '' ;
   $i = -1 ;
@@ -2741,7 +2743,9 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
     }
     $where_user.= ')';
     $where_user .= " AND evententity_entity = 'user' )"; 
-    $select_user = "userobm_lastname,
+    $select_user = "
+      userobm_id,
+      userobm_lastname,
       userobm_firstname,";
     $join_user = "LEFT JOIN UserObm ON evententity_entity_id = userobm_id";
   }   	     	    
@@ -2774,6 +2778,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
   $day_end = strtotime(date('Ymd 23:59:59',$end));
   $query = "SELECT
       calendarevent_id,
+      calendarevent_owner,
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description, 

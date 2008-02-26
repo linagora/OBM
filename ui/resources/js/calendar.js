@@ -1172,7 +1172,7 @@ Obm.CalendarQuickForm = new Class({
     if(action) {
       this.gotoURI += '&action='+action;
     }
-    this.gotoURI += '&all_day='+this.eventData.all_day+'&date_begin='+this.eventData.date_begin+'&duration='+this.eventData.duration+'&title='+this.form.tf_title.value;
+    this.gotoURI += '&all_day='+this.eventData.all_day+'&date_begin='+this.eventData.date_begin+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value);
     window.location.href = 'calendar_index.php?'+this.gotoURI;
   }
 });

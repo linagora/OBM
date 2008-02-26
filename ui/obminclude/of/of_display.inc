@@ -160,7 +160,7 @@ class OBM_DISPLAY {
       $fielddefault = (! $fieldinfo["notdefault"]);
 
       if ($fielddefault) {
-        $dis_default = "X";
+        $dis_default = "=";
       } else {
         $dis_default = "&nbsp;";
       }

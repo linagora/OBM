@@ -1165,17 +1165,6 @@ function html_user_form($usr_q, $user, $field='') {
   </tr>";
   }
 
-  // Profiles
-  foreach ($profiles as $k_profile => $one_profile) {
-    if ($profile == $k_profile) {
-      $selected = " selected";
-    } else {
-      $selected = "";
-    }
-    $dis_profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;    
-    $block_profile .= "
-      <option value=\"$k_profile\"$selected>$dis_profile</option>";
-  }
 
   // Section Web
   if ($cgp_use["service"]["web"]) {
@@ -1428,17 +1417,31 @@ function html_user_form($usr_q, $user, $field='') {
     $block_photo_detail = "";
   }
 
-  // Target Delegation handling (if updated user as delegation admin realm)
-  $admin_realm = $profiles[$profile]['properties']['admin_realm'];
-  if (is_array($admin_realm)) {
-    if (in_array('delegation', $admin_realm)) {
-      $dis_delegation_target = "
-  <tr>
-    <th class=\"$class[delegation_target]\">$l_delegation_target</th>
-    <td><input name=\"tf_delegation_target\" size=\"32\" maxlength=\"64\" value=\"$delegation_target\" /></td>
-  </tr>";
+  // Profiles
+  foreach ($profiles as $k_profile => $one_profile) {
+    $admin_realm = $profiles[$k_profile]['properties']['admin_realm'];
+    if(is_array($admin_realm) && in_array('delegation', $admin_realm)) {
+      $onselect .= "profiles['$k_profile'] = true\n";
+      if(!isset($delegation_class) || $profile == $k_profile ) $delegation_class = ''; 
+    } else {
+      $onselect .= "profiles['$k_profile'] = false\n";
+      if(!isset($delegation_class) || $profile == $k_profile) $delegation_class = 'H'; 
     }
+    if ($profile == $k_profile) {
+      $selected = " selected";
+    } else {
+      $selected = "";
+    }
+    $dis_profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;    
+    $block_profile .= "
+      <option value=\"$k_profile\"$selected>$dis_profile</option>";
   }
+
+  $dis_delegation_target = "
+  <tr class='$delegation_class' id='delegationTargetBlock'>
+    <th class=\"$class[delegation_target]\">$l_delegation_target</th>
+    <td><input id='delegationTargetField' name=\"tf_delegation_target\" size=\"32\" maxlength=\"64\" value=\"$delegation_target\" /></td>
+  </tr>";
 
   $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
@@ -1455,10 +1458,21 @@ function html_user_form($usr_q, $user, $field='') {
     enctype=\"multipart/form-data\"
     onsubmit=\"if (check_user(this)) return true; else return false;\"
     action=\"" . url_prepare("user_index.php") . "\">
-
   <fieldset class=\"detail infos\">
   <legend>$l_user</legend>
-
+  <script type='text/javascript'>
+    var profiles = new Object();
+    $onselect
+    function showDelegation(field) {
+      var value = field.options[field.selectedIndex].value;
+      if(profiles[value]) {
+        $('delegationTargetBlock').removeClass('H');
+      } else {
+        $('delegationTargetBlock').addClass('H');
+        $('delegationTargetField').value = '';
+      }
+    }
+  </script>
   <table>
   <tr>
     <th class=\"$class[kind]\">$l_kind</th>
@@ -1491,7 +1505,7 @@ function html_user_form($usr_q, $user, $field='') {
   </tr>
   <tr>
     <th class=\"$class[profile]\">$l_profile</th>
-    <td><select name=\"sel_profile\">
+    <td><select name=\"sel_profile\" onchange='showDelegation(this);'>
       $block_profile
       </select>
     </td>

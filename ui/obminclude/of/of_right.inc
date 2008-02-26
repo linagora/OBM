@@ -37,8 +37,11 @@ function of_right_dis_admin($entity, $entity_id, $real_entity="") {
 //   - $writable_user : Array of user on who you can manage the calandar
 ///////////////////////////////////////////////////////////////////////////////
 function html_entityadmin_bar($writable_entity,$entity_id, $entity) {
-  global $l_entity_right, $l_validate;
+  global $l_entity_right, $l_validate,$path, $module;
 
+  if($module != '') {
+    $uri = $path.'/'.$module.'/'.$module.'_index.php';
+  }
   // Entity Selection
   if (count($writable_entity["ids"]) > 0) {
     $dis_sel .= "<select name=\"entity_id\">";
@@ -61,7 +64,7 @@ function html_entityadmin_bar($writable_entity,$entity_id, $entity) {
     <div class=\"portlet\" id=\"rightManagerPortlet\">
       <h1>$l_entity_right</h1>
       <div>
-      <form action=\"".$_SERVER["PHP_SELF"]."\" method=\"get\" $check_sel_user>
+      <form action=\"$uri\" method=\"get\" $check_sel_user>
       <fieldset class=\"detail\">
       $dis_sel
       </fieldset>

@@ -1873,7 +1873,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   }
 
   $attendee = $event->attendee;
-  if ($event->privacy == 1 && !(in_array($obm["uid"],$attendee["user"]))) {
+  if ($event->privacy == 1 && (is_null($attendee["user"][$obm["uid"]])) && $owner != $obm['uid']) {
     $title = phpStringToJsString($l_private);
     $description = $title;
     $location = $title;
@@ -2394,19 +2394,36 @@ function dis_calendar_planning_event(&$occurence, &$calendar_entity, $ts, $cats_
 function html_calendar_dis_conflict($calendar, $c_q) {
   global $l_title, $l_location, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
+  global $l_private;
   
-  $readable_entity = of_right_entity_for_user("calendar", $obm["uid"], "read", "", "userobm");
+  $readable_calendars = of_right_entity_for_user("calendar", $obm["uid"], "read", "", "userobm");
+  $readable_resources = of_right_entity_for_user("Resource", $obm["uid"], "read", "");
   
   while ($c_q->next_record()) {
-    $id = $c_q->f("calendarevent_id"); 
-    $title = $c_q->f("calendarevent_title");
-    $location = $c_q->f("calendarevent_location");
+    $private = true;
     $entity = $c_q->f("evententity_entity");
-    if ($entity == "user") {
+    if($entity == "user") {
       $name = $c_q->f("userobm_lastname")." ".$c_q->f("userobm_firstname");
-    } else if ($entity == "resource") {
+      if (((in_array($c_q->f("userobm_id"),$readable_calendars['ids']) || in_array($c_q->f("calendarevent_owner"),$readable_calendars['ids']))&& $c_q->f("calendarevent_privacy") != '1')
+          || $c_q->f("calendarevent_owner") == $obm["uid"] || $c_q->f("userobm_id") == $obm['uid']){
+        $private = false;   
+      }
+    } elseif($entity == "resource") {
       $name = $c_q->f("resource_name");
+      if (((in_array($c_q->f("resource_id"),$readable_resources['ids']) || in_array($c_q->f("calendarevent_owner"),$readable_calendars['ids']))&& $c_q->f("calendarevent_privacy") != '1')
+          || $c_q->f("calendarevent_owner") == $obm["uid"] || $c_q->f("userobm_id") == $obm['uid']){
+        $private = false;
+      }
     }
+    $id = $c_q->f("calendarevent_id"); 
+    if(!$private) {
+      $title = $c_q->f("calendarevent_title");
+      $location = $c_q->f("calendarevent_location");
+    } else {
+      $title = $l_private;
+      $location = $l_private;
+    }
+
     $date_begin = $c_q->f("calendarevent_date");
     $all_day = $c_q->f("calendarevent_allday");
     $date_end = $c_q->f("calendarevent_date") + $c_q->f("calendarevent_duration");
@@ -3820,7 +3837,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   global $l_resources_one_freebusy,$l_resources_all_freebusy,$l_resource_group_search;
 
   $time_unit = 60 / $_SESSION['set_cal_interval'];
-  $datebegin = of_date_upd_format($calendar["date"]);
+  $date = of_date_upd_format($calendar["date"]);
   $hourbegin = $calendar['time_duration'];
   if (($hourbegin == '') || ($hourbegin <= 0)) {
     $hourbegin = '1';
@@ -4046,7 +4063,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   <tr>
     <th>$l_datebegin</th>
     <td>
-      <input type=\"text\" name=\"tf_date_begin\" value=\"$datebegin\" class=\"datePicker\" />
+      <input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\" />
     </td>
   </tr>
   <tr>    
