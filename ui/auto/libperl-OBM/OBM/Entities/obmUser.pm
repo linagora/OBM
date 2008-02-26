@@ -1062,9 +1062,7 @@ sub updateLdapEntry {
     }
 
     # Les flags de l'utilisateur
-    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_flags}, $ldapEntry, "sambaAcctFlags") ) {
-        $update = 1;
-    }
+    # Non mis à jour car peuvent évoluer via les outils d'administration windows
 
     # Le script de session
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_logon_script}, $ldapEntry, "sambaLogonScript") ) {
