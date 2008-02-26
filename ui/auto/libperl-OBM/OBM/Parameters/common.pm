@@ -15,7 +15,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_regexp = qw($regexp_email $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain $regexp_login $regexp_ip);
@@ -25,6 +25,14 @@ use FindBin qw($Bin);
 
 # Necessaire pour le bon fonctionnement du package
 $debug=1;
+
+# Détainte la variable '$Bin'
+if( (-d $Bin) && ($Bin =~ /^([\p{Alphabetic}0-9\/_\-\s]+)$/) ) {
+    $Bin = $1;
+}else {
+    print STDERR "Syntaxe incorrecte du chemin d'acces aux scripts de l'automate\n";
+    exit 1;
+}
 
 # Lecture du fichier ini
 if( ! -r $Bin."/../conf/obm_conf.ini" ) {
