@@ -14,6 +14,31 @@ $url_group = "$path/group/group_index.php?action=ext_get_ids&popup=1&ext_element
 
 $extra_js .= "
 
+///////////////////////////////////////////////////////////////////////////////
+// Collapse/Expande node 
+///////////////////////////////////////////////////////////////////////////////
+function node_toggle(level) {
+
+  if ($('child_'+level).getStyle('display') == 'block') {
+    $('child_'+level).setStyle('display', 'none');
+    $('img_'+level).src = obm.vars.images.plus;
+  } else {
+    $('child_'+level).setStyle('display', 'block');
+    $('img_'+level).src = obm.vars.images.minus;
+    var children_ids = $('child_'+level).getChildren().getProperty('id');
+    for(i=0;i<children_ids.length;i++) {
+      id = children_ids[i];
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent'+id, 'user'+id);    
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent'+id, 'group'+id);    
+    }
+  }
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Zoom function
+///////////////////////////////////////////////////////////////////////////////
 function zoom(z) {
 
   var nodestart = \$ES('.nodeStart');
@@ -67,8 +92,6 @@ function zoom(z) {
     $(node).removeClass(oldClass);
   }
 
-
-
 }
 
 
@@ -103,10 +126,19 @@ function check_form(form) {
 ///////////////////////////////////////////////////////////////////////////////
 function add_entity(parent_level) {
 
-  var child = $('nb_child_'+parent_level).value;
-  var n = parseInt(child) + 1;
+  if ($('child_'+parent_level).getStyle('display') == 'none') {
+    node_toggle(parent_level);
+  }
+
+  // var child = $('nb_child_'+parent_level).value;
+  // var n = parseInt(child) + 1;
+  var n = 1;
   var new_child_id = parent_level+'.' + n;
-  var container = $(parent_level);
+  while($(new_child_id)) {
+    n++;
+    new_child_id = parent_level+'.' + n;
+  }
+  var container = $('child_'+parent_level);
   var num_color = (new_child_id.replace(/[0-9]/g, '').length)%7;
 
   var row = new Element('div').
@@ -120,7 +152,7 @@ function add_entity(parent_level) {
   // Delete button
   var delete_button = new Element('a').addEvent('click', function() {
     del_entity(new_child_id);
-  }).setStyle('float','right').adopt(new Element('img').setProperty('src', '$ico_delete'));
+  }).setProperty('id', 'trash_'+new_child_id).adopt(new Element('img').setProperty('src', '$ico_delete'));
 
   // Add user
   var user_input = new Element('input').
@@ -144,12 +176,12 @@ function add_entity(parent_level) {
 
   // child name text field
   var child_name = new Element('input').
-    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'id': 'focus_'+new_child_id, 'size':'18', 'maxlength':'16', 'value':''}).
+    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'id': 'tf_ogroup['+new_child_id+']', 'size':'18', 'maxlength':'16', 'value':''}).
     addClass('mandatory');
 
   // parent id hidden 
   var parent_id = new Element('input').
-    setProperties({'type':'hidden', 'name':'tf_parent_level['+new_child_id+']', 'value':parent_level});
+    setProperties({'type':'hidden', 'id':'tf_parent_level['+new_child_id+']', 'name':'tf_parent_level['+new_child_id+']', 'value':parent_level});
  
   // entity div
   var sel_ent = new Element('div').
@@ -159,37 +191,59 @@ function add_entity(parent_level) {
   var nb_child_div = new Element('input').
     setProperties({'type':'hidden', 'name':'nb_child_'+new_child_id, 'id':'nb_child_'+new_child_id, 'value':'0'});
 
+  // Child div
+  var child_div = new Element('div').setProperty('id', 'child_'+new_child_id);
+
   row.adopt(wrap.
-    adopt(delete_button).
     adopt(child_name).
+    adopt(delete_button).
     adopt(parent_id).
     adopt(nb_child_div).
     adopt(new Element('br')).adopt(ico_user).adopt(user_input).
     adopt(new Element('br')).adopt(ico_group).adopt(group_input).
     adopt(sel_ent).
     adopt(div_buttons.adopt(child_button))
-  );
+  ).adopt(child_div);
 
   container.adopt(row);
 
+  // Autocomplete fields  
   new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent'+new_child_id, 'user'+new_child_id, {defaultText:'$user_text'})
   new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent'+new_child_id, 'group'+new_child_id, {defaultText:'$user_text'})
 
+  if ($('nb_child_'+parent_level).value < 1) {
+    // Add toggle icon on parent node
+    var img_toggle = new Element('a').addEvent('click', function() {
+      node_toggle(parent_level);
+    }).adopt(new Element('img').setProperties({'id':'img_'+parent_level, 'src':obm.vars.images.minus}).setStyle('float','right'));
+    img_toggle.injectBefore($('tf_ogroup['+parent_level+']'));
+  }
+
+  // Increase nb child
   $('nb_child_'+parent_level).value ++;
-  $('focus_'+new_child_id).focus();
+
+  // Give focus on last entity created
+  $('tf_ogroup['+new_child_id+']').focus();
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // remove an ogroup + its child 
 ///////////////////////////////////////////////////////////////////////////////
-function del_entity(parentId) {
+function del_entity(level) {
   if(confirm(\"$l_js_delete_node\")) {
+    var parent_level = $('tf_parent_level['+level+']').value;
     var target = window.document;
-    var container = target.getElementById(parentId);
+    var container = target.getElementById(level);
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
+
+    $('nb_child_'+parent_level).value--;
+    if ( $('nb_child_'+parent_level).value == 0) {
+      $('img_'+parent_level).remove();
+    }
+
   }
 }
 

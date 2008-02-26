@@ -234,6 +234,7 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
             <a href=\"javascript: add_entity('1');\"><img src=\"$ico_add\" alt=\"[Add]\" title=\"$l_add_child_tooltip\" /></a>
           </div>
         </div>
+      <div id=\"child_1\"></div>
       </div>
       <script type=\"text/javascript\">
         obm.initialize.chain(function () {
@@ -722,8 +723,8 @@ function dis_organizationalchart_draw_consult_outline($node_q) {
  * @return HTML
  */
 function dis_organizationalchart_draw_form($node_q) {
-  global $ico_delete, $ico_add, $ico_user, $ico_group;
-  global $l_add_child_tooltip, $l_name, $l_delete;
+  global $ico_delete, $ico_add, $ico_user, $ico_group, $ico_plus;
+  global $l_add_child_tooltip, $l_name, $l_delete, $l_autocomplete_field;
 
   $node_name = $node_q->f("ogroup_name");
   $node_id = $node_q->f("ogroup_id");
@@ -748,8 +749,8 @@ function dis_organizationalchart_draw_form($node_q) {
       break;
     }
     $block_detail_entities .= "
-      <div class=\"elementRow\" id=\"sel_ent${entity}${level}data-${entity}-${entity_id}\">
-        <a href=\"javascript: remove_element('sel_ent${entity}${level}data-${entity}-${entity_id}','sel_ent${level}');\">
+      <div class=\"elementRow\" id=\"sel_ent${level}-data-${entity}-${entity_id}\">
+        <a href=\"javascript: remove_element('sel_ent${level}-data-${entity}-${entity_id}','sel_ent${level}');\">
          <img src=\"$ico_delete\">
         </a>
         $name 
@@ -761,31 +762,41 @@ function dis_organizationalchart_draw_form($node_q) {
   $t_child = run_query_organizationalchart_node_child($node_id);
   $nb_children = sizeof($t_child);
   if ($nb_children > 0) {
+    $ico_toggle = "<a href=\"javascript: node_toggle('$level');\">
+      <img id=\"img_$level\" src=\"$ico_plus\" style=\"float:right;\"/>
+    </a>";
     foreach($t_child as $key => $child_id){
       $child_q = run_query_organizationalchart_node_infos($child_id);
       $t_draw = dis_organizationalchart_draw_form($child_q);
       $block_detail_child .= $t_draw;
     }
-  } 
+  }
 
   if ($level > 1) { 
     $ico_del_entity = "<a href='javascript: del_entity(\"$level\");'>
-      <img src=\"$ico_delete\" alt=\"[Delete]\" style=\"float: right;\" title=\"$l_delete\">
+      <img id=\"trash_$level\" src=\"$ico_delete\" alt=\"[Delete]\" title=\"$l_delete\">
     </a>";
     $flour = strlen($level) - strlen(str_replace(".", "", $level));  
     $color = "color".($flour)%7;
+  } else {
+    $dis_js = "<script type=\"text/javascript\">
+    obm.initialize.chain(function () {
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'user$level', {defaultText:'$user_text'});
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'group$level', {defaultText:'$user_text'});
+    });
+    </script>";
   }
 
-  // Urls for extmod
   $block = "
     <div id=\"$level\" class=\"organizationalChartNode\" style=\"margin-left: 3em;\">
       <div class=\"organizationalChartWrap $color\">
-        $ico_del_entity
+        $ico_toggle
         <input type=\"text\" class=\"mandatory\" id=\"tf_ogroup[$level]\" name=\"tf_ogroup[$level]\" 
           maxlength=\"16\" size=\"18\" value=\"$node_name\" />
-          <input type=\"hidden\" name=\"nb_child_${level}\" id=\"nb_child_${level}\" value=\"$nb_children\" />
+        $ico_del_entity
+        <input type=\"hidden\" name=\"nb_child_${level}\" id=\"nb_child_${level}\" value=\"$nb_children\" />
         <input type=\"hidden\" id=\"tf_parent_level[$level]\" name=\"tf_parent_level[$level]\" value=\"$parent_level\" />
-        <div><img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user$level\" autocomplete=\"off\" /></div>
+        <div><img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user$level\" autocomplete=\"off\" class=\"input_user\" /></div>
         <div><img src=\"$ico_group\" /><input type=\"text\" name=\"\" value=\"\" id=\"group$level\" autocomplete=\"off\" /></div>
         <div id=\"sel_ent$level\">
           <!-- Entities -->
@@ -795,15 +806,11 @@ function dis_organizationalchart_draw_form($node_q) {
           <a href=\"javascript: add_entity('$level');\"><img src=\"$ico_add\" alt=\"[Add]\" title=\"$l_add_child_tooltip\" /></a>
         </div>
       </div>
-      $block_detail_child
+      <div id=\"child_$level\" style=\"display:none;\">
+        $block_detail_child
+      </div>
     </div>
-    <script type=\"text/javascript\">
-      obm.initialize.chain(function () {
-        new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'user$level', {defaultText:'$user_text'});
-        new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'group$level', {defaultText:'$user_text'});
-      });
-    </script>
-";
+    $dis_js";
 
   return $block;
 }

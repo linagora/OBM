@@ -3576,23 +3576,27 @@ function run_query_calendar_get_bookmark_property($id) {
 
     switch($property) {
       case "users":
-        $users = explode(",", $value);
-        if (is_array($users)) {
-          foreach($users as $user) {
-            array_push($url_param, "sel_ent[]=data-user-$user");
+        if (!empty($value)) {
+          $users = explode(",", $value);
+          if (is_array($users)) {
+            foreach($users as $user) {
+              array_push($url_param, "sel_ent[]=data-user-$user");
+            }
+          } else {
+            array_push($url_param, "sel_ent[]=data-user-$value"); 
           }
-        } else {
-          array_push($url_param, "sel_ent[]=data-user-$value"); 
         }
         break;
       case "resources":
-        $resources = explode(",", $value);
-        if (is_array($resources)) {
-          foreach($resources as $resource) {
-            array_push($url_param, "sel_ent[]=data-resource-$resource");
+        if (!empty($value)) {
+          $resources = explode(",", $value);
+          if (is_array($resources)) {
+            foreach($resources as $resource) {
+              array_push($url_param, "sel_ent[]=data-resource-$resource");
+            }
+          } else {
+            array_push($url_param, "sel_ent[]=data-resource-$value"); 
           }
-        } else {
-          array_push($url_param, "sel_ent[]=data-resource-$value"); 
         }
         break;
       case "group":
@@ -3603,9 +3607,6 @@ function run_query_calendar_get_bookmark_property($id) {
         }
         break;
       case "category":
-        if (empty($value)) {
-          $value = $c_all;
-        }
         array_push($url_param, "sel_category_filter=$value");
         break;
       default:
@@ -3627,18 +3628,37 @@ function run_query_calendar_get_bookmark_property($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_view($calendar) {
   global $cdg_sql, $obm;
+  global $c_all;
 
-  $calendar_bookmarkproperties = array("users", "group", "resources", "category", "cal_range", "cal_view");
+  $calendar_bookmarkproperties = array("category", "cal_range", "cal_view");
 
   $obm_q = new DB_OBM;
   $user_id = $obm["uid"];
 
-  $category = $calendar["category_filter"];
   $label = $calendar["view_label"];
+  // Category
+  $category = $calendar["category_filter"];
+  if (empty($category)) {
+    $category = $c_all;
+  }
+  
+  // Entity
   $group = $calendar["entity"]["group"][0];
-  $users = is_array($calendar["entity"]["user"]) ? implode(",", $calendar["entity"]["user"]) : "" ;
-  $resources = is_array($calendar["entity"]["resource"]) ? implode(",", $calendar["entity"]["resource"]) : "" ;
+  if (empty($group)) {
+    $users = is_array($calendar["entity"]["user"]) ? implode(",", array_unique($calendar["entity"]["user"])) : "" ;
+    array_push($calendar_bookmarkproperties, "users");
+  } else {
+    array_push($calendar_bookmarkproperties, "group");
+  }
+  $resources = is_array($calendar["entity"]["resource"]) ? implode(",", array_unique($calendar["entity"]["resource"])) : "" ;
+  if (!empty($resources)) {
+    array_push($calendar_bookmarkproperties, "resources");
+  }
+
+  // Range
   $cal_range = $_SESSION['cal_range'];
+
+  // View
   $cal_view = $_SESSION['cal_view'];
 
   // Insert ObmBookmark
