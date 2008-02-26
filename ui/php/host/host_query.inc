@@ -128,7 +128,7 @@ function run_query_host_detail($id) {
  * @return true if insert ok
  */
 function run_query_host_insert($host) {
-  global $obm, $cdg_sql, $cg_gid_smb_host;
+  global $obm, $cdg_sql, $cg_gid_host;
 
   $domain_id = $obm['domain_id'];
   $name = $host['name'];
