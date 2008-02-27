@@ -61,13 +61,13 @@ sub getParameter {
     if( exists( $parameters->{"help"} ) ) {
         &OBM::toolBox::write_log( "Affichage de l'aide", "WC" );
 
-        print "Veuillez indiquer le critere de mise a jour :\n";
-        print "\tSyntaxe: script --domain id [--user id | --delegation word] [--global | --incremental]\n";
-        print "\tuser <id> : utilisateur d'identifiant <id> ;\n";
-        print "\tdomain <id> : domaine d'identifiant <id> ;\n";
-        print "\tdelegation <word> : delegation de mot cle <word> ;\n";
-        print "\tglobal : fait une mise a jour globale du domaine ;\n";
-        print "\tincremental : fait une mise a jour incrementale du domaine.\n";
+        print STDERR "Veuillez indiquer le critere de mise a jour :\n";
+        print STDERR "\tSyntaxe: script --domain id [--user id | --delegation word] [--global | --incremental]\n";
+        print STDERR "\tuser <id> : utilisateur d'identifiant <id> ;\n";
+        print STDERR "\tdomain <id> : domaine d'identifiant <id> ;\n";
+        print STDERR "\tdelegation <word> : delegation de mot cle <word> ;\n";
+        print STDERR "\tglobal : fait une mise a jour globale du domaine ;\n";
+        print STDERR "\tincremental : fait une mise a jour incrementale du domaine.\n";
 
         exit 0;
     }

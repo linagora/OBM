@@ -17,10 +17,12 @@ require Exporter;
 @EXPORT_OK = qw();
 
 #
-# Necessaire pour le bon fonctionnement du package
+# Nécessaire pour le bon fonctionnement du package
 $debug=1;
 
 
+# Permet d'exécuter une commande système et de retourner le code retour de
+# celle-ci
 sub execCmd {
     local( $cmd, $verbose ) = @_;
 
@@ -42,11 +44,22 @@ sub execCmd {
 }
 
 
-#------------------------------------------------------------------------------
 # Permet de cloner une structure complexe
-#------------------------------------------------------------------------------
 sub cloneStruct {
     my( $structRef ) = @_;
 
     return dclone($structRef);
+}
+
+
+# Permet de déterminer si une variable est tainté ou pas
+sub is_tainted {
+    my( $var ) = @_;
+    require Scalar::Util;
+
+    if( Scalar::Util::tainted( $var ) ) {
+        return 1;
+    }
+
+    return 0;
 }
