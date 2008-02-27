@@ -27,7 +27,80 @@ class ICalendar_Utils {
     $reader->close;
     return $document;
   }
+  
+  /**
+   * Retrieve users id from ICS Properties 
+   * 
+   * @param array $users contained ics properties
+   * @access public
+   * @return array $users with an additionnal x-obm-id property
+   */
+  function getUidFromICSProperty($users) {
+    $db = new DB_OBM;
+    foreach($users as $id => $user) {
+      if(!empty($user['cn'])) {
+        $cns[] = "'$user[cn]'";
+      }
+      if(($mail = ICalendar_Utils::parseMailto($id))) {
+        $mails[] = "'$mail'";
+      } elseif($cn = ICalendar_Utils::parseLotusCN($id)) {
+        $cns[] = "'$cn'";
+      }
+    }
+    $concat = array (array ('type' => 'field','value' => 'userobm_firstname'),
+                     array ('type' => 'string','value' => ' '),
+                     array ('type' => 'field','value' => 'userobm_lastname') 
+                    );
+    $user_label = sql_string_concat($db->type,$concat);    
 
+    $query = 'SELECT userobm_id as id, userobm_email as mail, '.$user_label.' as cn
+              FROM UserObm WHERE userobm_email IN ('.implode(',',$mails).') OR '.$user_label.' IN ('.implode(',',$cns).')
+              GROUP BY id';
+    echo $query;
+    $db->query($query);
+    while($db->next_record()) {
+      var_dump($db->Record);
+    }
+  }
+
+
+  /**
+   * Parse a MAILTO:xxx@xx.fr into xxx@xx.fr
+   * or xxx depending on obm configuration
+   * 
+   * @param mixed $mailto 
+   * @access public
+   * @return mail
+   */
+  function parseMailto($mailto) {
+    if(preg_match('/^\s*mailto\s*:\s*(([^@]*)@([^\s]*))\s*$/i',$mailto, $match)) {
+      if(!preg_match($GLOBALS['php_regexp_email'], $match[1] )) {
+        return false;  
+      }
+      if($GLOBALS['cgp_use']['service']['mail']) {
+        return $match[2];
+      } else {
+        return $match[1];
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Parse a lotus CN MAILTO:A B/X-Y@Y 
+   * into A B
+   * @param mixed $lotusCN 
+   * @access public
+   * @return CN
+   */
+  function parseLotusCN($lotusCN) {
+    if (preg_match('/^\s*(CN|MAILTO)\s*[:=]\s*([^\/]*).*$/i',$lotusCN, $matches)) {
+      if(!empty($matches[2])) {
+        return $mathches[2];
+      }
+    }
+    return false;
+  }
 }
 
 
@@ -177,8 +250,8 @@ class ICalendar_ICS_Reader {
    */
   function setObmUsers(&$document) {
     $users = $this->getICSIds($document->vcalendar);
-    //$obmIds = get_userobm_from_ics($users);
-    $this->setObmIds($users);
+    $obmIds = ICalendar_Utils::getUidFromICSProperty($users);
+    //$this->setObmIds($users);
   }
 
   /**
@@ -244,7 +317,7 @@ class ICalendar_ICS_Reader {
 }
 
 class ICalendar_ICS_Writer {
-
+  
 }
 
 class ICalendar_OBM_Reader {
@@ -538,12 +611,11 @@ class ICalendar_Element {
    */
   function getOptions($propertyName,$key=NULL) {
     if(isset($this->$propertyName)) {
-      if(isset($this->{$propertyName}['options']))
-        if(is_null($key)) {
-          return $this->{$propertyName}['options'];
-        } else {
-          return $this->{$propertyName}[$key]['options'];
-        }
+      if(is_null($key)) {
+        return $this->{$propertyName}['options'];
+      } else {
+        return $this->{$propertyName}[$key]['options'];
+      }
     }
     return false;
   }  

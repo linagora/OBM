@@ -844,8 +844,8 @@ function run_query_icalendar_insert($params) {
   global $all_emails ;
   // --- get the unfolding ics
   $ics = file($params['ics_tmp']) ;
-  /* TEST FOR 2.1.6 + 1
-  include_once("obminclude/of/of_ics.inc");
+  /* TEST FOR 2.1.6 + 1*/
+  /*include_once("obminclude/of/of_ics.inc");
   echo "<pre>";
   $document = ICalendar_Utils::parseICS($params['ics_tmp']);
   //var_dump($document);
@@ -866,7 +866,7 @@ function run_query_icalendar_insert($params) {
       ATTENDEE : "; var_dump($vevent->attendee);
   }
   echo "</pre>";
-  */
+  /**/
   $new_ics = array() ; // unfolded $ics
   $prevline = '' ;
   $i = -1 ;
@@ -4371,7 +4371,36 @@ function calendar_send_mail($mails) {
 }
 
 
+/**
+ * Reset the user calendar. 
+ * 
+ * @access public
+ * @return void
+ */
+function run_query_calendar_reset($id) {
+  global $cdg_sql, $obm;
+  
+  $obm_q = new DB_OBM;
 
+  $query = "DELETE FROM EventEntity WHERE evententity_entity_id = '$id' AND evententity_entity = 'user'";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
+  $obm_q->query($query);
+
+  $query = "SELECT calendarevent_id
+    FROM CalendarEvent 
+    LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
+    WHERE evententity_entity_id IS NULL";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
+  $obm_q->query($query);
+  while($obm_q->next_record()) {
+    $ids[] = $obm_q->f("calendarevent_id");
+  }
+  if(is_array($ids)) {
+    $query = "DELETE FROM CalendarEvent WHERE calendarevent_id IN (".implode(',',$ids).")";
+    display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
+    $obm_q->query($query);
+  }
+}
 
 
 ?>
