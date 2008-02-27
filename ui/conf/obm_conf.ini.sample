@@ -18,7 +18,6 @@ external-url = obm
 external-protocol = http
 obm-prefix = /
 
-
 ; Database infos
 host = localhost
 ; dbtype = PGSQL
@@ -46,6 +45,9 @@ singleNameSpace = false
 ; renameUserMailbox mode allow to rename user mailbox
 ; need Cyrus 2.3 or greater
 renameUserMailbox = false
+
+; backupRoot is the directory used to store backup data
+backupRoot = "/var/lib/obm/backup"
 
 
 [automate]
