@@ -844,29 +844,6 @@ function run_query_icalendar_insert($params) {
   global $all_emails ;
   // --- get the unfolding ics
   $ics = file($params['ics_tmp']) ;
-  /* TEST FOR 2.1.6 + 1*/
-  /*include_once("obminclude/of/of_ics.inc");
-  echo "<pre>";
-  $document = ICalendar_Utils::parseICS($params['ics_tmp']);
-  //var_dump($document);
-  $vevents = &$document->getVevents();
-  foreach($vevents as $vevent) {
-    echo "
-      TITRE : ".$vevent->summary['value']."
-      DATE : ".date('Y-m-d H:i:s',$vevent->dtstart['value'])."      
-      RRULE : ".$vevent->rrule['value']."      
-      DURATION : ".$vevent->duration['value']."      
-      CLASS : ".$vevent->class['value']."      
-      DESCRIPTION : ".$vevent->description['value']."     
-      LOCATION : ".$vevent->location['value']." 
-      PRIVATE : ".$vevent->class['value']." 
-      TIME CREATE : ".date('Y-m-d H:i:s',$vevent->lastModified['value'])."
-      TIME UPDATE : ".date('Y-m-d H:i:s',$vevent->created['value'])."
-      ORGANISER : ".$vevent->organizer['value']."
-      ATTENDEE : "; var_dump($vevent->attendee);
-  }
-  echo "</pre>";
-  /**/
   $new_ics = array() ; // unfolded $ics
   $prevline = '' ;
   $i = -1 ;

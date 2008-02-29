@@ -1792,30 +1792,30 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     <table>
     <tr>
     <th>$l_phone</th>
-    <td><input type=\"text\" name=\"tf_phone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$phone\" /> $c_phone</td>
+    <td><input type=\"text\" name=\"tf_phone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$phone\" /> <br /> $c_phone</td>
     </tr><tr>
     <th>$l_hphone</th>
     <td><input type=\"text\" name=\"tf_hphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$hphone\" /></td>
     </tr><tr>
     <th>$l_fax</th>
-    <td><input type=\"text\" name=\"tf_fax\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$fax\" /> $c_fax</td>
+    <td><input type=\"text\" name=\"tf_fax\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$fax\" /> <br /> $c_fax</td>
     </tr><tr>
     <th>$l_mphone</th>
     <td><input type=\"text\" name=\"tf_mphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$mphone\" /></td>
     $block_service
     </tr><tr>
     <th>$l_address 1</th>
-    <td><input type=\"text\" name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /> $c_ad1</td>
+    <td><input type=\"text\" name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /> <br /> $c_ad1</td>
     </tr><tr>
     <th>$l_address 2</th>
-    <td><input type=\"text\" name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /> $c_ad2</td>
+    <td><input type=\"text\" name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /> <br /> $c_ad2</td>
     $block_ad3
     </tr><tr>
     <th>$l_postcode</th>
-    <td><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /> $c_zip</td>
+    <td><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /> <br /> $c_zip</td>
     </tr><tr>
     <th>$l_town</th>
-    <td><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /> $c_town</td>
+    <td><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /> <br /> $c_town</td>
     $block_cdx
     </tr><tr>
     <th>$l_country</th>

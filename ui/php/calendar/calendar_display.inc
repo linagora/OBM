@@ -160,7 +160,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   $iso_date = $calendar["date"];
   global $mono_user;
   if(count($calendar_entity) == 1 && is_array($calendar_entity["user"])
-     && count($calendar_entity["user"]) == 1 && key($calendar_entity["user"]) == $obm["uid"]) {
+     && count($calendar_entity["user"]) == 1) {
     $colorTemplate = 'event';
     $tooltip = $l_event_color_tt;
     $mono_user = true;

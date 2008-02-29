@@ -493,7 +493,11 @@ function html_host_form($action, $host_q, $host, $field='') {
 
   $display['detailInfo'] = display_record_info($host_q);
   $display['title'] = $dis_title;
-
+  if($action != 'insert' && $action !='new') {
+    $dis_name = "$name <input type=\"hidden\" name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />";
+  } else {
+    $dis_name = "<input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />";
+  }
   // Section Web, seulement si squid en local pour les machines car 
   // acces geres dans les ACL donc dans squid.conf
   if ($cgp_use['service']['web_local']) {
@@ -565,7 +569,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   <tr>
     <th class=\"$class[name]\">$l_name</th>
     <td>
-      <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />
+    $dis_name
     </td>
   </tr>
   $dis_domain
