@@ -2014,6 +2014,11 @@ function dis_contact_admin_index() {
   // User defined data
   $block .= of_userdata_dis_admin_form('contact');
 
+  // Hook : Post
+  if (function_exists('hook_post_dis_contact_admin_index')) {
+    $block = hook_post_dis_contact_admin_index($block);
+  }
+
   return $block;
 }
 
