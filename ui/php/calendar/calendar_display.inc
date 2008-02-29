@@ -70,7 +70,8 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   }
 
   $block = "
-  <div class=\"SB LF NM\" style=\"margin-top:-10px;margin-left:10px;\">
+  <div style=\"margin-top:-10px;\">
+  <div class=\"SB LF NM\" style=\"margin-left:10px;\">
   <a href=\"$path/calendar/calendar_index.php?cal_view=agenda&amp;date=$date\">
   <img 
   title=\"$l_view_agenda_desc\" 
@@ -92,7 +93,7 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
    src=\"$ico_list_view\" alt=\"$l_list\" />
   </a>  
   </div>
-  <div id=\"calendarCalRange\" class=\"SB LF NM\" style=\"margin-top:-10px;margin-left:10px;\">
+  <div id=\"calendarCalRange\" class=\"SB LF NM\" style=\"margin-left:10px;\">
   <a href=\"$path/calendar/calendar_index.php?cal_range=day&amp;date=$date\">
   <img
   title=\"$l_view_day_desc\" 
@@ -108,6 +109,7 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   title=\"$l_view_month_desc\" 
   src=\"$ico_month_view\" alt=\"$l_month\" />
   </a>
+  </div>
   </div>
   <script type=\"text/javascript\">
     if(!obm.vars.conf.displayRange) {
