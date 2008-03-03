@@ -22,7 +22,7 @@ sub getParameter {
 
     if( !exists($parameters->{"domain"}) ) {
         &OBM::toolBox::write_log( "Parametre '--domain' manquant", "W" );
-        $parameters->{"help"} = "";
+        $parameters->{"help"} = 1;
 
     }else {
         &OBM::toolBox::write_log( "Mise a jour du domaine d'identifiant '".$parameters->{"domain"}."'", "W" );
@@ -31,7 +31,7 @@ sub getParameter {
     if( exists($parameters->{"user"}) ) {
         if( exists($parameters->{"delegation"}) ) {
             &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
-            $parameters->{"help"} = "";
+            $parameters->{"help"} = 1;
         }else{
             &OBM::toolBox::write_log( "Uniquement les mises a jour de l'utilisateur d'identifiant '".$parameters->{"user"}."'", "W" );
         }
@@ -39,7 +39,7 @@ sub getParameter {
     }elsif( exists($parameters->{"delegation"}) ) {
         if( exists($parameters->{"user"}) ) {
             &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
-            $parameters->{"help"} = "";
+            $parameters->{"help"} = 1;
         }else {
             &OBM::toolBox::write_log( "Uniquement les mises a jour de la delegation '".$parameters->{"delegation"}."'", "W" );
         }
@@ -48,13 +48,16 @@ sub getParameter {
 
     if( exists($parameters->{"incremental"}) && exists($parameters->{"global"}) ) {
         &OBM::toolBox::write_log( "parametres '--incremental' et '--global' incompatibles", "W" );
-        $parameters->{"help"} = "";
+        $parameters->{"help"} = 1;
 
     }elsif( exists($parameters->{"incremental"}) ) {
+        $parameters->{"incremental"} = 1;
         &OBM::toolBox::write_log( "Mise a jour incrementale", "W" );
 
-    }elsif( exists($parameters->{"global"}) ) {
+    }elsif( exists($parameters->{"global"}) || !(exists($parameters->{"incremental"}) || exists($parameters->{"global"})) ) {
+        $parameters->{"global"} = 1;
         &OBM::toolBox::write_log( "Mise a jour globale", "W" );
+
     }
 
 
@@ -66,7 +69,7 @@ sub getParameter {
         print STDERR "\tuser <id> : utilisateur d'identifiant <id> ;\n";
         print STDERR "\tdomain <id> : domaine d'identifiant <id> ;\n";
         print STDERR "\tdelegation <word> : delegation de mot cle <word> ;\n";
-        print STDERR "\tglobal : fait une mise a jour globale du domaine ;\n";
+        print STDERR "\tglobal : fait une mise a jour globale du domaine - action par defaut ;\n";
         print STDERR "\tincremental : fait une mise a jour incrementale du domaine.\n";
 
         exit 0;
