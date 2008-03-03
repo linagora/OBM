@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w -T
 #####################################################################
-# OBM               - File : incrementalUpdate.pl                   #
+# OBM               - File : update.pl                              #
 #                   - Desc : Script permettant de mettre à jour le  #
 #                   système de façon incrémentale                   #
 #####################################################################
@@ -75,7 +75,7 @@ sub getParameter {
 
 
 # On prepare le log
-&OBM::toolBox::write_log( "incrementalUpdate.pl: ", "O" );
+&OBM::toolBox::write_log( "update.pl: ", "O" );
 
 # Traitement des paramètres
 &OBM::toolBox::write_log( "Analyse des parametres du script", "W" );
