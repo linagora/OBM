@@ -400,8 +400,8 @@ $password_encryption = strtoupper($password_encryption);
 
 // Automate commands
 $cmd_halt = "sudo /sbin/halt";
-$cmd_update = "$path/../auto/incrementalUpdate.pl";
-$cmd_check_update = "ps aux | grep auto/incrementalUpdate.pl | grep -v grep";
+$cmd_update = "$path/../auto/update.pl";
+$cmd_check_update = "ps aux | grep auto/update.pl | grep -v grep";
 $cmd_mailforward = "$path/../auto/updateSieve.pl";
 $cmd_vacation = "$path/../auto/updateSieve.pl";
 $cmd_ldap_passwd = "$path/../auto/changePasswd.pl";

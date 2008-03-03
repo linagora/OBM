@@ -53,7 +53,7 @@ $entities = array(
       'id' => 'of_usergroup_group_id'
     ),
     'prefix'  => 'group', 
-    'exclude' => array('domain_id' => 1, 'timecreate' => 1, 'usercreate' => 1, 'desc' => 1, 'timeupdate' => 1, 
+    'exclude' => array('domain_id' => 1, 'timecreate' => 1, 'usercreate' => 1, 'timeupdate' => 1, 
                         'privacy' => 1,'usercreate' => 1),
     'rules'   => array('privacy' => '0')
   ),

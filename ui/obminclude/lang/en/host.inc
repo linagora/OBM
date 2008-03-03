@@ -24,6 +24,7 @@ $l_web_access = "Internet acces";
 $l_restrict = "restrictions";
 $l_not_assigned = "Not assigned";
 $l_mailserver = "Mail server";
+$l_ip = "IP";
 
 // Labels et textes
 $l_host_display = "Display options for hosts list";

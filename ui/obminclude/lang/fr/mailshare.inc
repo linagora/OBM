@@ -9,6 +9,7 @@
 
 // Labels et textes
 $l_mailshare_display = "Options d'affichage des listes de partages mail";
+$l_mail_server = "Serveur de mail";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les partages mail correspondants.";
@@ -30,5 +31,3 @@ $l_err_mailshare_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
 $l_err_mailshare_uemail_exist = "L'adresse E-mail est saisie plusieurs fois !";
 
 $l_check_samemailshare = "Ces partages mail semblent similaires à celui saisi";
-
-$l_mail_server = "Serveur de mail";
