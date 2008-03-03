@@ -3,10 +3,6 @@
 #               - Desc : Librairie Perl pour OBM                        #
 #               Definition des constantes et des parametres communs     #
 #########################################################################
-# Cree le 2002-07-18                                                    #
-#########################################################################
-# $Id$   #
-#########################################################################
 package OBM::Parameters::common;
 
 require Exporter;
@@ -34,11 +30,13 @@ if( (-d $Bin) && ($Bin =~ /^([\p{Alphabetic}0-9\/_\-\s]+)$/) ) {
     exit 1;
 }
 
+
 # Lecture du fichier ini
 if( ! -r $Bin."/../conf/obm_conf.ini" ) {
     print STDERR "Le fichier de configuration 'obm_conf.ini' n'existe pas ou n'est pas lisible\n";
     exit 1;
 }
+
 
 $cfgFile = Config::IniFiles->new( -file => $Bin."/../conf/obm_conf.ini" );
 
@@ -47,9 +45,6 @@ $cfgFile = Config::IniFiles->new( -file => $Bin."/../conf/obm_conf.ini" );
 
 # racine relative pour les scripts Perl
 $racineOBM = $Bin."/..";
-if( !($racineOBM =~ /\/$/) ) {
-    $racineOBM .= "/";
-}
 
 # Definition des bases de donnees
 $userDb = $cfgFile->val( 'global', 'user' );
@@ -73,6 +68,9 @@ if( lc($cfgFile->val( 'global', 'singleNameSpace' )) eq "true" ) {
 $backupRoot = $cfgFile->val( 'global', 'backupRoot' );
 if( !defined( $backupRoot ) ) {
     $backupRoot = "/var/lib/obm/backup";
+}else {
+    $backupRoot =~ s/^"//;
+    $backupRoot =~ s/"$//;
 }
 
 # definition du niveau de log
@@ -156,7 +154,7 @@ $baseHomeDir = "/home";
 # Definition des fichiers modeles
 #
 # Le repertoire contenant les modeles
-$templateOBM = $racineOBM . "template/";
+$templateOBM = $racineOBM . "/template";
 
 # Definitions des fichiers temporaires.
 #
@@ -209,7 +207,7 @@ $minGID = 1000;
 # Les scripts de l'automate
 #
 # Le repertoire contenant les scripts de l'automate
-$automateOBM = $racineOBM . "auto/";
+$automateOBM = $racineOBM . "/auto";
 
 #
 # ACL : Definition des entites et des consomateurs

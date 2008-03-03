@@ -3,10 +3,10 @@
 # OBM               - File : incrementalUpdate.pl                   #
 #                   - Desc : Script permettant de mettre à jour le  #
 #                   système de façon incrémentale                   #
-#-------------------------------------------------------------------#
+#####################################################################
 
 use strict;
-require OBM::Update::update;
+require OBM::toolBox;
 use Getopt::Long;
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
@@ -95,9 +95,21 @@ if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
 }
 
 
-my $update = OBM::Update::update->new( $dbHandler, \%parameters );
-$update->update();
-$update->destroy();
+my $update;
+if( $parameters{"global"} ) {
+    require OBM::Update::updateGlobal;
+    $update = OBM::Update::updateGlobal->new( $dbHandler, \%parameters );
+}else {
+    require OBM::Update::updateIncremental;
+    $update = OBM::Update::updateIncremental->new( $dbHandler, \%parameters );
+}
+
+if( !defined($update) ) {
+    &OBM::toolBox::write_log( "Probleme a l'initialisation de l'objet de mise a jour", "W" );
+}else {
+    $update->update();
+    $update->destroy();
+}
 
 
 # On referme la connexion a la base

@@ -10,7 +10,6 @@ use strict;
 
 
 require OBM::toolBox;
-require OBM::ldap;
 require OBM::imapd;
 require OBM::dbUtils;
 require OBM::Update::utils;
