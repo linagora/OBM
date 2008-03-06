@@ -23,10 +23,10 @@ use FindBin qw($Bin);
 $debug=1;
 
 # Détainte la variable '$Bin'
-if( (-d $Bin) && ($Bin =~ /^([\p{Alphabetic}0-9\/_\-\s]+)$/) ) {
+if( (-d $Bin) && ($Bin =~ /^([\p{Alphabetic}0-9\/_\-\s\.]+)$/) ) {
     $Bin = $1;
 }else {
-    print STDERR "Syntaxe incorrecte du chemin d'acces aux scripts de l'automate\n";
+    print STDERR "Syntaxe incorrecte du chemin d'acces aux scripts de l'automate. Le chemin d'acces ne peut contenir que les caracteres : [A-Za-z0-9/_-. ]\n";
     exit 1;
 }
 
