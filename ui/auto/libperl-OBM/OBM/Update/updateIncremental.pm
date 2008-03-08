@@ -66,7 +66,7 @@ sub new {
         my $query = "SELECT userobm_login FROM UserObm WHERE userobm_id=".$updateAttr{"user"};
         my $queryResult;
         if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
             return 0;
         }
 
@@ -180,7 +180,7 @@ sub _doIncremental {
         $domainDesc = &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} );
 
         if( !defined($domainDesc) ) {
-            &OBM::toolBox::write_log( "[Update::update]: domaine d'identifiant '".$self->{"domain"}."' inexistant", "W" );
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: domaine d'identifiant '".$self->{"domain"}."' inexistant", "W" );
             return 0;
         }
     }
@@ -189,7 +189,7 @@ sub _doIncremental {
     if( defined($self->{"user"}) ) {
         # Si le paramètre utilisateur est indiqué, on fait une MAJ incrémentale par
         # utilisateur
-        &OBM::toolBox::write_log( "[Update::update]: MAJ incrementale pour l'utilisateur '".$self->{"user_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: MAJ incrementale pour l'utilisateur '".$self->{"user_name"}."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
         $sqlFilter{"updated"}->[0] = "updated_user_id=".$self->{"user"};
         $sqlFilter{"updated"}->[1] = "updatedlinks_user_id=".$self->{"user"};
         $sqlFilter{"deleted"} = "deleted_user_id=".$self->{"user"};
@@ -197,7 +197,7 @@ sub _doIncremental {
     }elsif( defined($self->{"delegation"}) ) {
         # Si le paramètre délégation est indiqué, on fait une MAJ incrémentale
         # par délégation
-        &OBM::toolBox::write_log( "[Update::update]: MAJ incrementale pour la delegation '".$self->{"delegation"}."'", "W" );
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: MAJ incrementale pour la delegation '".$self->{"delegation"}."'", "W" );
         $sqlFilter{"updated"}->[0] = "updated_delegation LIKE '".$self->{"delegation"}."%'";
         $sqlFilter{"updated"}->[1] = "updatedlinks_delegation LIKE '".$self->{"delegation"}."%'";
         $sqlFilter{"deleted"} = "deleted_delegation LIKE '".$self->{"delegation"}."%'";
@@ -205,7 +205,7 @@ sub _doIncremental {
     }elsif( defined($self->{"domain"}) ) {
         # Si le paramètre domaine est indiqué, on fait une MAJ incrémentale
         # par domaine
-        &OBM::toolBox::write_log( "[Update::update]: MAJ incrementale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: MAJ incrementale pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
         $sqlFilter{"updated"}->[0] = "updated_domain_id='".$self->{"domain"}."'";
         $sqlFilter{"updated"}->[1] = "updatedlinks_domain_id='".$self->{"domain"}."'";
         $sqlFilter{"deleted"} = "deleted_domain_id=".$self->{"domain"};
@@ -244,7 +244,7 @@ sub _incrementalUpdate {
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
         return 0;
     }
 
@@ -261,7 +261,7 @@ sub _incrementalUpdate {
 
         my $queryResult2;
         if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
             return 0;
         }
         my( $numRows ) = $queryResult2->fetchrow_array();
@@ -347,7 +347,7 @@ sub _incrementalUpdate {
     }
 
     if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
         return 0;
     }
 
@@ -420,9 +420,9 @@ sub _incrementalDelete {
     }
 
     if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete", "W" );
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete", "W" );
         if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( "[Update::update]: ".$queryResult->err, "W" );
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
         }
 
         return 0;
@@ -482,6 +482,21 @@ sub _incrementalDelete {
 }
 
 
+sub _tableNamePrefix {
+    my $self = shift;
+    my( $table ) = @_;
+    my $columnPrefix;
+    
+    if( lc($table) eq "ugroup" ) {
+        $columnPrefix = "group";
+    }else {
+        $columnPrefix = lc($table);
+    }
+
+    return $columnPrefix;
+}
+
+
 sub _deleteDbEntity {
     my $self = shift;
     my ( $table, $id ) = @_;
@@ -504,9 +519,9 @@ sub _deleteDbEntity {
     my $queryResult;
     my $query = "DELETE FROM P_".$table." WHERE ".$columnPrefix."_id=".$id;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete", "W" );
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete", "W" );
         if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( "[Update::update]: ".$queryResult->err, "W" );
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
         }
 
         return 0;
@@ -534,9 +549,9 @@ sub _updateIncrementalTable {
     my $deleteQueryResult;
     my $query = "DELETE FROM ".$table." WHERE ".lc($table)."_id=".$id;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$deleteQueryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete", "W" );
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete", "W" );
         if( defined($deleteQueryResult) ) {
-            &OBM::toolBox::write_log( "[Update::update]: ".$deleteQueryResult->err, "W" );
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$deleteQueryResult->err, "W" );
         }
 
         return 0;

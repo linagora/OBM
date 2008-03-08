@@ -183,7 +183,7 @@ sub _doWork {
     }
 
     # Récupération du nom de la boîte à traiter
-    my $mailBoxName = $object->getMailboxName();
+    my $mailBoxName = $object->getMailboxName( "new" );
     if( !defined($mailBoxName) ) {
         return 0;
     }
@@ -301,7 +301,7 @@ sub _updateSieveVacation {
             unshift( @{$headers}, "require \"vacation\";\n" );
         }
 
-        my $boxLogin = $object->getMailboxName();
+        my $boxLogin = $object->getMailboxName( "new" );
         &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: gestion du message d'absence de la boite '".$boxLogin."'", "W" );
 
         push( @{$newSieveScript}, $vacationMark."\n" );
@@ -322,7 +322,7 @@ sub _updateSieveNomade {
     my $nomadeMark = "# OBM2 - Nomade";
 
     if( my $nomadeMsg = $object->getSieveNomade() ) {
-        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: gestion de la redirection de la boite '".$object->getMailboxName()."'", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: gestion de la redirection de la boite '".$object->getMailboxName( "new" )."'", "W" );
         push( @{$newSieveScript}, $nomadeMark."\n" );
         push( @{$newSieveScript}, $nomadeMsg );
         push( @{$newSieveScript}, $nomadeMark."\n" );
@@ -357,7 +357,7 @@ sub update {
     }
 
     # Récupération du nom de la boîte à traiter
-    my $mailBoxName = $object->getMailboxName();
+    my $mailBoxName = $object->getMailboxName( "new" );
     if( !defined($mailBoxName) ) {
         &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de support SIEVE pour l'objet : ".$object->getEntityDescription(), 'W' );
         return 1;

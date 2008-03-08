@@ -697,67 +697,6 @@ function run_query_user_update($p_id, $user) {
   // Connect to the BD
   $obm_q = new DB_OBM;
 
-  $passwd = $user['passwd'];
-  if ($passwd != '') {
-    // If a password type is given, get it else get the system parameter
-    $passwd_type = $user['password_type'];
-    if (($passwd_type == 'PLAIN')
-	|| ($passwd_type == 'CRYPT')
-	|| ($passwd_type == 'PLAIN')) {
-      $passwd_type = $passwd_type;
-    } else {
-      $passwd_type = $password_encryption;
-    }
-    if ($passwd_type == 'CRYPT') {
-      $passwd_crypt = crypt($passwd);
-    } else if ($passwd_type == 'MD5SUM') {
-      $passwd_crypt = md5($passwd);
-    } else {
-      $passwd_crypt = $passwd;
-    }
-
-    $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type='$password_encryption'";
-
-    if ($cgp_use['service']['ldap']) {
-      $query = "UPDATE P_UserObm SET
-        $passwd_update
-        WHERE userobm_id='$p_id'";
-
-      display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
-      $retour = $obm_q->query($query);
-
-      if ($retour) {
-        // Get the user domain if admin in domain 0 or domain not set
-        if ((!isset($obm['domain_id'])) || ($obm['domain_id'] == '') || ($obm['domain_id'] == '0')) {
-          $query = "SELECT userobm_domain_id FROM UserObm WHERE userobm_id='$p_id'";
-          display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
-          $retour = $obm_q->query($query);
-          $obm_q->next_record();
-          $user_domain = $obm_q->f('userobm_domain_id');
-        } else {
-          $user_domain = $obm['domain_id'];
-        }
-
-        if ($retour) {
-          $parameters = " --unix";
-
-          if ($user['smb_perms'] && ($cgp_use['service']['samba'] || $password_encryption != "PLAIN")) {
-            $parameters .= " --samba";
-          }
-
-          if ($parameters) {
-            $cmd = $cmd_ldap_passwd.$parameters." --login ".$user['login']." --domain ".$user_domain." --type ".$password_encryption." --no-old --passwd '".stripslashes($passwd)."'";
-
-            display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
-            exec($cmd);
-          }
-        }
-      }
-    }
-
-    $passwd_update .= ',';
-  }
-
   // infos
   $profile = $user['profile'];
   $archive = ($user['archive'] == '1' ? '1' : '0');
@@ -976,6 +915,67 @@ function run_query_user_update($p_id, $user) {
 
   display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
   $retour = $obm_q->query($query);
+
+  $passwd = $user['passwd'];
+  if ($passwd != '') {
+    // If a password type is given, get it else get the system parameter
+    $passwd_type = $user['password_type'];
+    if (($passwd_type == 'PLAIN')
+	|| ($passwd_type == 'CRYPT')
+	|| ($passwd_type == 'PLAIN')) {
+      $passwd_type = $passwd_type;
+    } else {
+      $passwd_type = $password_encryption;
+    }
+    if ($passwd_type == 'CRYPT') {
+      $passwd_crypt = crypt($passwd);
+    } else if ($passwd_type == 'MD5SUM') {
+      $passwd_crypt = md5($passwd);
+    } else {
+      $passwd_crypt = $passwd;
+    }
+
+    $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type='$password_encryption'";
+
+    if ($cgp_use['service']['ldap']) {
+      $query = "UPDATE P_UserObm SET
+        $passwd_update
+        WHERE userobm_id='$p_id'";
+
+      display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
+      $retour = $obm_q->query($query);
+
+      if ($retour) {
+        // Get the user domain if admin in domain 0 or domain not set
+        if ((!isset($obm['domain_id'])) || ($obm['domain_id'] == '') || ($obm['domain_id'] == '0')) {
+          $query = "SELECT userobm_domain_id FROM UserObm WHERE userobm_id='$p_id'";
+          display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
+          $retour = $obm_q->query($query);
+          $obm_q->next_record();
+          $user_domain = $obm_q->f('userobm_domain_id');
+        } else {
+          $user_domain = $obm['domain_id'];
+        }
+
+        if ($retour) {
+          $parameters = " --unix";
+
+          if ($user['smb_perms'] && ($cgp_use['service']['samba'] || $password_encryption != "PLAIN")) {
+            $parameters .= " --samba";
+          }
+
+          if ($parameters) {
+            $cmd = $cmd_ldap_passwd.$parameters." --login ".$user['login']." --domain ".$user_domain." --type ".$password_encryption." --no-old --passwd '".stripslashes($passwd)."'";
+
+            display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
+            exec($cmd);
+          }
+        }
+      }
+    }
+
+    $passwd_update .= ',';
+  }
 
   // If the user is archived, we unsubscribe it from all Groups
   if ($archive == '1') {

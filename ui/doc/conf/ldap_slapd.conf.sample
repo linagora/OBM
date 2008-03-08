@@ -122,10 +122,10 @@ access to attrs=sambaLMPassword
 
 # ACL sample to limit access on entries in relation to 'hiddenUser'
 # attribute
-# This ACL could be tuned to get more flexibility (see 'man slapd.access')
+# This ACL can be tuned to get more flexibility (see 'man slapd.access')
 #access to filter=(hiddenUser=TRUE)
 #    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-#    by dn="uid=ldapreader,ou=sysusers,dc=local" write
+#    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
 #    by anonymous auth
 #    by self write
 #    by * none

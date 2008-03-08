@@ -40,7 +40,7 @@ sub _updateState {
     my $dbHandler = $self->{"dbHandler"};
 
     if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "[Update::updateGlobal]: pas de domaine indique pour la MAJ totale", "W" );
+        &OBM::toolBox::write_log( "[Update::commonGlobalIncremental]: pas de domaine indique pour la MAJ totale", "W" );
         return 0;
     }
     my $domainId = $self->{"domain"};
@@ -48,7 +48,7 @@ sub _updateState {
     my $query = "UPDATE DomainPropertyValue SET domainpropertyvalue_value=0 WHERE domainpropertyvalue_property_key='update_state' AND domainpropertyvalue_domain_id=".$domainId;
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::updateGlobal]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::commonGlobalIncremental]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 

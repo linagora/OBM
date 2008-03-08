@@ -136,17 +136,17 @@ sub getEntity {
     $self->{"mailShareDbDesc"} = $dbMailShareDesc;
 
 
-    # La requete a executer - obtention des informations sur le répertoire
+    # La requete a exécuter - obtention des informations sur le répertoire
     # partagé
     $query = "SELECT * FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
 
-    # On execute la requete
+    # On exécute la requête
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
-    # On range les resultats dans la structure de donnees des resultats
+    # On range les résultats dans la structure de données des résultats
     $dbMailShareDesc = $queryResult->fetchrow_hashref();
     $queryResult->finish();
 
@@ -158,7 +158,7 @@ sub getEntity {
 
     }
 
-    # On range les resultats dans la structure de donnees des resultats
+    # On range les resultats dans la structure de données des resultats
     $self->{"mailShareDesc"}->{"mailshare_name"} = $dbMailShareDesc->{"mailshare_name"};
     $self->{"mailShareDesc"}->{"mailshare_description"} = $dbMailShareDesc->{"mailshare_description"};
     $self->{"mailShareDesc"}->{"mailshare_domain"} = $domainDesc->{"domain_label"};

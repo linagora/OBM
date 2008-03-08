@@ -130,13 +130,13 @@ sub getEntity {
     # Obtention de la description BD de l'utilisateur
     $query = "SELECT * FROM ".$userObmTable." WHERE userobm_id=".$userId;
 
-    # On execute la requete
+    # On exécute la requête
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
     }
 
-    # On range les resultats dans la structure de donnees des resultats
+    # On range les résultats dans la structure de données des résultats
     my $dbUserDesc = $queryResult->fetchrow_hashref();
     $queryResult->finish();
 
@@ -144,7 +144,7 @@ sub getEntity {
     $self->{"userDbDesc"} = $dbUserDesc;
 
 
-    # La requête à executer - obtention des informations sur l'utilisateur
+    # La requête à exécuter - obtention des informations sur l'utilisateur
     if( $self->getDelete() ) {
         $query = "SELECT i.mailserver_host_id
                     FROM ".$userObmTable." j
@@ -173,7 +173,7 @@ sub getEntity {
     # Action effectuée
     if( $self->getDelete() ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: chargement de l'utilisateur supprime  : ".$self->getEntityDescription(), "W" );
-        
+
     }elsif( $dbUserDesc->{userobm_archive} ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: chargement de l'utilisateur archive : ".$self->getEntityDescription(), "W" );
 
@@ -182,13 +182,16 @@ sub getEntity {
 
     }
 
-        
+
     # On range les résultats dans la structure de données des résultats
     $self->{userDesc}->{userobm_domain} = $domainDesc->{domain_label};
 
-    if( !defined($dbUserMoreDesc->{current_userobm_login}) ) {
+#    if( !defined($dbUserMoreDesc->{current_userobm_login}) ) {
+#        $self->{userDesc}->{current_userobm_login} = $dbUserDesc->{userobm_login};
+#    }else {
+    if( $self->getDelete() ) {
         $self->{userDesc}->{current_userobm_login} = $dbUserDesc->{userobm_login};
-    }else {
+    }elsif( defined($dbUserMoreDesc->{current_userobm_login}) ) {
         $self->{userDesc}->{current_userobm_login} = $dbUserMoreDesc->{current_userobm_login};
     }
 
@@ -293,10 +296,37 @@ sub getEntity {
             # Gestion de la BAL destination
             #   valeur dans LDAP
             $self->{userDesc}->{userobm_mailbox_ldap_name} = $dbUserDesc->{userobm_login}."@".$domainDesc->{domain_name};
+
             #   nom de la BAL Cyrus
-            $self->{userDesc}->{userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
+            # Son nouveau nom - qui peut si on ne le change pas et que la
+            # BAL existe déjà, ou qu'on supprime l'entrée, être le même que
+            # l'ancien
+            $self->{userDesc}->{new_userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
             if( !$singleNameSpace ) {
-                $self->{userDesc}->{userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
+                $self->{userDesc}->{new_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
+            }
+
+            if( !$self->getDelete() ) {
+                if( defined($dbUserMoreDesc->{current_userobm_login}) ) {
+                    # Si l'utilisateur existe déjà dans la tables P_UserObm, on
+                    # récupère le nom actuel de sa BAL
+                    $self->{userDesc}->{current_userobm_mailbox_cyrus_name} = $dbUserMoreDesc->{current_userobm_login};
+
+                    if( !$singleNameSpace ) {
+                        $self->{userDesc}->{current_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
+                    }
+
+                }
+
+            }else {
+                # En cas de suppression de l'utilisateur, la BAL 'new' est la
+                # même que la BAL 'current'
+                $self->{userDesc}->{current_userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
+
+                if( !$singleNameSpace ) {
+                    $self->{userDesc}->{current_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
+                }
+
             }
 
             # Partition Cyrus associée à cette BAL
@@ -617,16 +647,16 @@ sub _getEntityMailboxAcl {
 
 sub getLdapDnPrefix {
     my $self = shift;
-    my( $getNewDn ) = @_;
+    my( $which ) = @_;
     my $dnPrefix = undef;
     my $dbEntry = $self->{"userDbDesc"};
     my $entryProp = $self->{userDesc};
 
-    if( $getNewDn ) {
+    if( (lc($which) =~ /^new$/) && !$self->getDelete() ) {
         if( defined($self->{"dnPrefix"}) && defined($dbEntry->{$self->{newDnValue}}) ) {
             $dnPrefix = $self->{"dnPrefix"}."=".$dbEntry->{$self->{newDnValue}};
         }
-    }else {
+    }elsif( lc($which) =~ /^current$/ ) {
         if( defined($self->{"dnPrefix"}) && defined($entryProp->{$self->{currentDnValue}}) ) {
             $dnPrefix = $self->{"dnPrefix"}."=".$entryProp->{$self->{currentDnValue}};
         }
@@ -869,7 +899,7 @@ sub updateLdapEntryDn {
     # L'UID
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{"userobm_login"}, $ldapEntry, "uid" ) ) {
         # Si cet attribut est modifié, son DN doit aussi être mis à jour
-        $ldapEntry->add( newrdn => to_utf8( { -string => $self->getLdapDnPrefix( 1 ), -charset => $defaultCharSet } ) );
+        $ldapEntry->add( newrdn => to_utf8( { -string => $self->getLdapDnPrefix( "new" ), -charset => $defaultCharSet } ) );
         $update = 1;
     }
 
@@ -1180,12 +1210,18 @@ sub getMailboxSieve {
 
 sub getMailboxName {
     my $self = shift;
+    my( $which ) = @_;
     my $mailBoxName = undef;
     my $dbEntry = $self->{userDbDesc};
     my $entryProp = $self->{userDesc};
 
+
     if( $entryProp->{userobm_mail_perms} ) {
-        $mailBoxName = $entryProp->{userobm_mailbox_cyrus_name};
+        if( lc($which) =~ /^new$/ ) {
+            $mailBoxName = $entryProp->{new_userobm_mailbox_cyrus_name};
+        }elsif( lc($which) =~ /^current$/ ) {
+            $mailBoxName = $entryProp->{current_userobm_mailbox_cyrus_name};
+        }
     }
 
     return $mailBoxName;

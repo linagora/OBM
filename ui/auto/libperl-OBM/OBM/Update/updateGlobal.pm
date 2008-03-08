@@ -218,7 +218,7 @@ sub _doGlobalUpdate {
 
             $return = $self->_runEngines( $object );
             if( $return ) {
-                # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+                # La MAJ de l'entité s'est bien passée, on met a jour la BD de
                 # travail
                 $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
                 if( $object->isLinks() ) {
@@ -345,7 +345,7 @@ sub _doGlobalUpdate {
 
         my $return = $self->_runEngines( $object );
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
             # travail
             $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
             if( $object->isLinks() ) {
@@ -535,7 +535,7 @@ sub _updateDbDomain {
     my $dbHandler = $self->{"dbHandler"};
 
     if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "[Update::update]: pas de domaine indique pour la MAJ totale", "W" );
+        &OBM::toolBox::write_log( "[Update::updateGlobal]: pas de domaine indique pour la MAJ totale", "W" );
         return 0;
     }
     my $domainId = $self->{"domain"};
@@ -545,13 +545,13 @@ sub _updateDbDomain {
     my $query = "DELETE FROM P_Domain WHERE Domain_id=".$domainId;
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::updateGlobal]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
     $query = "INSERT INTO P_Domain SELECT * FROM Domain WHERE domain_id=".$domainId;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::updateGlobal]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -559,13 +559,13 @@ sub _updateDbDomain {
     # Les hôtes serveurs de mails
     $query = "DELETE FROM P_MailServer WHERE mailserver_host_id IN (SELECT host_id FROM P_Host WHERE host_domain_id=".$domainId.")";
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::updateGlobal]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
     $query = "INSERT IGNORE INTO P_MailServer SELECT * FROM MailServer WHERE mailserver_host_id IN (SELECT host_id FROM Host WHERE host_domain_id=".$domainId.")";
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::updateGlobal]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -573,13 +573,13 @@ sub _updateDbDomain {
     # Les informations associées aux hôtes serveurs de mails
     $query = "DELETE FROM P_MailServerNetwork WHERE mailservernetwork_host_id IN (SELECT host_id FROM P_Host WHERE host_domain_id=".$domainId.")";
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::updateGlobal]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
     $query = "INSERT IGNORE INTO P_MailServerNetwork SELECT * FROM MailServerNetwork WHERE mailservernetwork_host_id IN (SELECT host_id FROM Host WHERE host_domain_id=".$domainId.")";
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::updateGlobal]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
@@ -587,13 +587,13 @@ sub _updateDbDomain {
     # Les informations du domaine Samba
     $query = "DELETE FROM P_Samba WHERE samba_domain_id=".$domainId;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::updateGlobal]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 
     $query = "INSERT INTO P_Samba SELECT * FROM Samba WHERE samba_domain_id=".$domainId;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::update]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        &OBM::toolBox::write_log( "[Update::updateGlobal]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
         return 0;
     }
 

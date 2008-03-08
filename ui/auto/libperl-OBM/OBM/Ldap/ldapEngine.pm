@@ -84,7 +84,7 @@ sub init {
     }
 
     if( $checkLdap ) {
-        # On vérifie l'arborescence
+        # On vérifie l'arboréscence
         &OBM::toolBox::write_log( "[Ldap::ldapEngine]: verification de l'arborescence de l'annuaire LDAP", "W" );
         if( !$self->checkLdapTree( $self->{"ldapStruct"} ) ) {
             $self->destroy();
@@ -301,7 +301,7 @@ sub checkLdapTree {
         return 0;
     }
 
-    $self->_doWork( $ldapStruct->{"rdn"}, $ldapStruct->{"parentDn"}, $ldapStruct->{"object"} );
+    $self->_doWork( $ldapStruct->{"parentDn"}, $ldapStruct->{"object"} );
 
     # On parcours les sous branches
     for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
@@ -319,22 +319,22 @@ sub updateLdapEntity {
     my( $ldapEntry ) = @_;
 
     if( !defined($self->{"ldapConn"}->{"conn"}) ) {
-        return 0;
+        return 1;
     }
     my $ldapConn = $self->{"ldapConn"}->{"conn"};
 
     if( !defined($ldapEntry) ) {
-        return 0;
+        return 1;
     }
 
     my $result = $ldapEntry->update( $ldapConn );
 
     if( $result->is_error() ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: erreur LDAP : ".$result->code." - ".$result->error, "W" );
-        return 0;
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: erreur LDAP : ".$result->code()." - ".$result->error(), "W" );
+        return $result->code();
     }
 
-    return 1;
+    return 0;
 }
 
 
@@ -464,83 +464,120 @@ sub _findDomainbyId {
 
 sub _doWork {
     my $self = shift;
-    my( $rdn, $parentDn, $object ) = @_;
+    my( $parentDn, $object ) = @_;
+    my $returnCode = 1;
+    my( $newLdapEntry, $currentLdapEntry );
 
-    if( !defined($rdn) ) {
+    my $currentRdn = $object->getLdapDnPrefix( "current" );
+    my $currentDn = $currentRdn;
+    if( defined($currentDn) && defined($parentDn) ) {
+        $currentDn .= ",".$parentDn;
+    }
+    $currentLdapEntry = $self->findDn($currentDn);
+
+    my $newRdn = $object->getLdapDnPrefix( "new" );
+    my $newDn = $newRdn;
+    if( defined($newDn) && defined($parentDn) ) {
+        $newDn .= ",".$parentDn;
+    }elsif( !defined($newDn) ) {
         return 0;
     }
+    $newLdapEntry = $self->findDn($newDn);
 
-    my $dn = $rdn;
-    if( defined($parentDn) ) {
-        $dn .= ",".$parentDn;
+
+    SWITCH: {
+        if( defined($currentLdapEntry) && defined($newLdapEntry) && ($currentDn ne $newDn) ) {
+            # Cas particulier, le DN actuel et le nouveau existent bien que
+            # différents...
+            # On supprime le DN actuel pour corriger l'annuaire
+            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: les DN '".$currentDn."' et '".$newDn."' existent. Suppression de l'ancien DN '".$currentDn."'", "W" );
+            if( !$self->deleteLdapEntity($currentLdapEntry) ) {
+                return 0;
+            }
+
+            $currentLdapEntry = undef;
+        }
+
+        if( defined($currentLdapEntry) && ($object->getDelete() || $object->getArchive()) ) {
+            # Suppression du DN actuel
+            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: suppression du noeud : ".$currentDn, "W" );
+    
+            if( !$self->deleteLdapEntity($currentLdapEntry) ) {
+                return 0;
+            }
+        
+            last SWITCH;
+        }
+
+        if( !defined($currentLdapEntry) && !defined($newLdapEntry) && !($object->getDelete() || $object->getArchive()) ) {
+            # Création de l'entité de DN nouveau
+            my $ldapEntry = Net::LDAP::Entry->new;
+            if( $object->createLdapEntry($ldapEntry) ) {
+                &OBM::toolBox::write_log( "[Ldap::ldapEngine]: creation du DN '".$newDn."'", "W" );
+
+                $ldapEntry->dn( to_utf8( { -string => $newDn, -charset => $defaultCharSet } ) );
+            }
+
+            if( $self->updateLdapEntity($ldapEntry) ) {
+                return 0;
+            }
+
+            last SWITCH;
+        }
+
+        if( defined($currentLdapEntry) && !($object->getDelete() || $object->getArchive()) ) {
+            # Mise à jour de l'entité de DN actuel
+
+            # Obtention de la description des classes d'objets
+            $self->_getObjectclassDesc( $currentLdapEntry );
+    
+            if( $object->updateLdapEntry($currentLdapEntry, $self->{objectclassDesc}) ) {
+                &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour du DN '".$currentDn."'", "W" );
+    
+                if( $self->updateLdapEntity($currentLdapEntry) ) {
+                    return 0;
+                }
+            }
+
+            if( $object->updateLdapEntryDn($currentLdapEntry) ) {
+                # Mise à jour du DN de l'entité vers le nouveau DN
+                &OBM::toolBox::write_log( "[Ldap::ldapEngine]: renommage du  DN '".$currentDn."', en '".$newDn."'", "W" );
+    
+                $currentLdapEntry->replace( deleteoldrdn => to_utf8( { -string => $currentDn, -charset => $defaultCharSet } ) );
+                $currentLdapEntry->changetype( "moddn" );
+                if( $self->updateLdapEntity($currentLdapEntry) ) {
+                    return 0;
+                }
+
+                $returnCode = 2;
+            }
+
+            last SWITCH;
+        }
+
+        if( defined($newLdapEntry) && !($object->getDelete() || $object->getArchive()) ) {
+            # Mise à jour de l'entité de DN nouveau
+
+            # Obtention de la description des classes d'objets
+            $self->_getObjectclassDesc( $newLdapEntry );
+
+            if( $object->updateLdapEntry($newLdapEntry, $self->{objectclassDesc}) ) {
+                &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour du DN '".$newDn."'", "W" );
+                
+                if( $self->updateLdapEntity($newLdapEntry) ) {
+                    return 0;
+                }
+            }
+
+            last SWITCH;
+        }
+
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: description BD de : ".$object->getEntityDescription()." incorrecte.", "W" );
+        return 0;
+
     }
 
-
-    my $ldapEntry = $self->findDn($dn);
-    if( defined($ldapEntry) && ($object->getDelete() || $object->getArchive()) ) {
-        # Suppression
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: suppression du noeud : ".$dn, "W" );
-
-        if( !$self->deleteLdapEntity($ldapEntry) ) {
-            return 0;
-        }
-
-    }elsif( defined($ldapEntry) && !($object->getDelete() || $object->getArchive()) ) {
-        # Obtention de la description des classes d'objets
-        $self->_getObjectclassDesc( $ldapEntry );
-
-        # Mise à jour de l'entité
-        if( $object->updateLdapEntry($ldapEntry, $self->{objectclassDesc}) ) {
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour du noeud : ".$dn, "W" );
-
-            if( !$self->updateLdapEntity($ldapEntry) ) {
-                return 0;
-            }
-        }
-
-        # Mise à jour du DN de l'entité
-        if( $object->updateLdapEntryDn($ldapEntry) ) {
-            my $newDn = $ldapEntry->get_value( "newrdn" );
-            if( defined($parentDn) ) {
-                $newDn .= ",".$parentDn;
-            }
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour du DN : ".$newDn, "W" );
-
-            $ldapEntry->replace( deleteoldrdn => to_utf8( { -string => $dn, -charset => $defaultCharSet } ) );
-            $ldapEntry->changetype( "moddn" );
-            if( !$self->updateLdapEntity($ldapEntry) ) {
-                return 0;
-            }
-        }
-    }elsif( !defined($ldapEntry) && !($object->getDelete() || $object->getArchive()) ) {
-        # Création
-        my $ldapEntry = Net::LDAP::Entry->new;
-        if( $object->createLdapEntry($ldapEntry) ) {
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: creation du noeud : ".$dn, "W" );
-
-            # On positionne le DN
-            my $currentRdn = $object->getLdapDnPrefix( 1 );
-            if( !defined($currentRdn) ) {
-                return 0;
-            }
-
-            my $currentDn = $currentRdn;
-            if( defined($parentDn) ) {
-                $currentDn .= ",".$parentDn
-            }
-            $ldapEntry->dn( to_utf8( { -string => $currentDn, -charset => $defaultCharSet } ) );
-
-            if( !$self->updateLdapEntity($ldapEntry) ) {
-                return 0;
-            }
-        }else {
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: description BD de : ".$object->getEntityDescription()." incorrecte.", "W" );
-            return 0;
-        }
-    }
-
-
-    return 1;
+    return $returnCode;
 }
 
 
@@ -568,14 +605,14 @@ sub update {
 
     my $objectRdn;
     my $parentDn;
-    my $return = $self->getObjectDN( $object, \$objectRdn, \$parentDn );
+    my $return = $self->getObjectParentDN( $object, \$parentDn );
     if( $return == 1 ) {
         return 1;
     }elsif( $return ) {
         return 0;
     }
 
-    my $returnCode = $self->_doWork( $objectRdn, $parentDn, $object );
+    my $returnCode = $self->_doWork( $parentDn, $object );
     if( !$returnCode ) {
         &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme de traitement de l'objet : ".$object->getEntityDescription()." - Operation annulee !", "W" );
         return 0;
@@ -645,9 +682,9 @@ sub _getObjectclassDesc {
 }
 
 
-sub getObjectDN {
+sub getObjectParentDN {
     my $self = shift;
-    my( $object, $entryRdn, $parentDn ) = @_;
+    my( $object, $parentDn ) = @_;
 
     if( !defined( $object ) ) {
         return undef;
@@ -661,14 +698,6 @@ sub getObjectDN {
         return 1;
     }
 
-    $$entryRdn = $object->getLdapDnPrefix( 0 );
-    if( !defined($$entryRdn) ) {
-        # Si par contre elle a un DN parent mais pas de DN propre, c'est une
-        # erreur fatale.
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme lors de l'obtention du DN de l'objet : ".$object->getEntityDescription()." - operation annulee !", "W" );
-        return 2;
-    }
-
     return 0;
 }
 
@@ -677,9 +706,13 @@ sub checkPasswd {
     my $self = shift;
     my( $object, $passwd ) = @_;
 
-    my $objectRdn;
     my $parentDn;
-    if( $self->getObjectDN( $object, \$objectRdn, \$parentDn ) ) {
+    if( $self->getObjectParentDN( $object, \$parentDn ) ) {
+        return 0;
+    }
+
+    my $objectRdn = $object->getLdapDnPrefix( "current" );
+    if( !defined($objectRdn) ) {
         return 0;
     }
     my $objectDn = $objectRdn.",".$parentDn;
@@ -707,9 +740,13 @@ sub updatePassword {
     my $self = shift;
     my( $object, $passwordDesc ) = @_;
 
-    my $objectRdn;
     my $parentDn;
-    if( $self->getObjectDN( $object, \$objectRdn, \$parentDn ) ) {
+    if( $self->getObjectParentDN( $object, \$parentDn ) ) {
+        return 0;
+    }
+
+    my $objectRdn = $object->getLdapDnPrefix( "current" );
+    if( !defined($objectRdn) ) {
         return 0;
     }
     my $objectDn = $objectRdn.",".$parentDn;
@@ -718,7 +755,7 @@ sub updatePassword {
     if( defined($ldapEntry) ) {
         my $update = $object->updateLdapEntryPassword( $ldapEntry, $passwordDesc );
         if( $update ) {
-            if( !$self->updateLdapEntity( $ldapEntry ) ) {
+            if( $self->updateLdapEntity( $ldapEntry ) ) {
                 &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme de traitement de l'objet : ".$object->getEntityDescription()." - Operation annulee !", "W" );
                 return 0;
             }
