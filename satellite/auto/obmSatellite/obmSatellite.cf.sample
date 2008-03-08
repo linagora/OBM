@@ -3,8 +3,10 @@ ldap_server         nom.server.ldap
 # DIT de l'annuaire LDAP - si vide, positionner 'defaultsearchbase' côté serveur
 ldap_base
 # DN de l'utilisateur LDAP - requêtes anonymes par défaut
+# Ex: ldap_login    uid=obmsatellite,ou=sysusers,dc=local
 ldap_login
 # Mot de passe de l'utilisateur LDAP - requêtes anonymes par défaut
+# Ex: ldap_password     mG4_Zdnh
 ldap_password
 
 # Options communément modifiées
