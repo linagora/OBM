@@ -492,7 +492,12 @@ function run_query_calendar_insert_event_data($calendar) {
   $event_duration = $calendar['event_duration'];
   if ($calendar['privacy']!=1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar['repeat_kind'];
-  $repeat_days = $calendar['repeat_days']; 
+  $repeat_days = $calendar['repeat_days'];
+  if(!is_null($calendar['repeat_end'])) {
+    $repeat_end = "'".of_isodate_convert($calendar['repeat_end'])."'";
+  } else {
+    $repeat_end = 'NULL';
+  }  
   $repeat_end = of_isodate_convert($calendar['repeat_end']);
   $repeatfrequency = $calendar['repeatfrequency'];  
   $date_exception = $calendar['date_exception'];
@@ -583,14 +588,16 @@ function run_query_calendar_insert_event_data($calendar) {
   $obm_q->query($query);
   while($obm_q->next_record())$id = $obm_q->f('calendarevent_id');
   $calendar['calendar_id'] = $id;
-
-  // Exception
-  if ($repeat_kind != 'none' && is_array($date_exception)) {
-    foreach(array_unique($date_exception) as $value) {
+    
+  $timebegin = strtotime($datebegin);
+  $hour = date('H', $timebegin);
+  $min = date('i',$timebegin);
+  if($repeat_kind != 'none' && is_array($date_exception)) {
+    foreach(array_unique($date_exception) as $key => $value) {
       if($value != '') {
         $value = of_isodate_convert($value);
-        $calendar['old_date_begin'] = $value.' '.$calendar['time_begin'].':'.$calendar['min_begin'].':00';
-        run_query_calendar_event_exception_insert($calendar); 
+        $calendar['old_date_begin'] = date('Y-m-d H:i:s',strtotime("+$hour hours +$min minutes",strtotime($value)));        
+        run_query_calendar_event_exception_insert($calendar);
       }
     }
   }
@@ -645,193 +652,22 @@ function create_calendar_ics_meeting_file($calendar, $event_id, $attendees, $res
   global $l_file_error, $l_write_error, $l_read_error;
   global $l_resource_allocated;
 
+  include_once('obminclude/of/vcalendar/writer/ICS.php');
+  include_once('obminclude/of/vcalendar/reader/OBM.php');
+
+  $calendar_user["user"] = array ($obm["uid"] => "dummy");
+  
+  $reader = new Vcalendar_Reader_OBM($calendar_user,array($event_id));
+  $document = $reader->getDocument();
+  $writer = new Vcalendar_Writer_ICS();  
+  $writer->writeDocument($document);
+
   $fd_dest = fopen ($filename,'w');
+
   if ($fd_dest == false) {
     die ($l_file_error.$dest.'dead');
   }
-
-  $iso_date = $calendar['date'];
-  $ts_date = strtotime($iso_date);  
- 
-  $start_time = strtotime('-1 year', $ts_date);
-  $end_time = strtotime('+1 year', $ts_date);
-
-  $calendar_user = array ($obm['uid'] => 'dummy');  
-  $obm_event = run_query_calendar_detail($event_id);
-
-  $msg =  "
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//OBM/OBM V$obm_version Calendar//EN
-METHOD:REQUEST";
-
-  if ($obm_event->f('calendarevent_repeatkind') == 'none') {
-    $id = $obm_event->f('calendarevent_id');
-    $title = 'SUMMARY:' . $obm_event->f('calendarevent_title');
-    $title = wordwrap($title,74,"\n ",1);
-    $location = $obm_event->f('calendarevent_location');
-    $priority = $obm_event->f('calendarevent_priority');
-    $category1 = strtoupper($obm_event->f('calendarcategory1_label')); 
-    $date_ts = $obm_event->f('calendarevent_timeupdate');
-    $date_ts = gmdate("Ymd\THis\Z",$date_ts);
-    if ($obm_event->f('calendarevent_description') != '') {
-      $description = preg_replace("/\\r?\\n/","\\n",$obm_event->f('calendarevent_description'));
-      $description = 'DESCRIPTION:' . $description;
-    } else {
-      $description = '';
-    }
-    if (count($resources) > 0) {
-      if ($description == '') $description = 'DESCRIPTION:';
-      $description .= "$l_resource_allocated:";
-      $resource_q = run_query_get_resources_info($resources);
-      while ($resource_q->next_record()) {
-        $description .=  "\\n  ".$resource_q->f('resource_name');
-      }
-    }
-    if($description != '') {
-      $description = "\n" . wordwrap($description,74,"\n ",1);
-    }
-    $date_b = $obm_event->f('calendarevent_date');
-    $date_b = gmdate("Ymd\THis\Z",$date_b);
-    $date_e = $obm_event->f('calendarevent_date') + $obm_event->f('calendarevent_duration') ;
-    $date_e = gmdate("Ymd\THis\Z",$date_e);
-    switch($priority) {
-      case 1 : $priority = 3;
-	break;
-      case 3 : $priority = 1;
-	break;
-    }
-    $private = $obm_event->f('calendarevent_privacy');
-    switch($private) {
-      case 0 : $private = 'PUBLIC';
-	break;
-      case 1 : $private = 'PRIVATE';
-	break;
-    }        
-    $organizer_q = run_query_get_recipients(array($obm_event->f('calendarevent_owner')), 1);
-    $organizer_q->next_record();
-    $organizer_cn = $organizer_q->f('userobm_lastname').' '.$organizer_q->f('userobm_firstname');
-    $organizer_email=$organizer_q->f('userobm_email');
-    $attendee_q = run_query_get_recipients($attendees, 1);
-    $msg_attendee = '';
-    if (is_object($attendee_q)) {
-      while ($attendee_q->next_record()) {
-        $msg_attendee .= " ATTENDEE;ROLE=REQ-PARTICIPANT; PARTSTAT=NEEDS-ACTION; RSVP=TRUE; CN=\"'";
-        $msg_attendee .= $attendee_q->f('userobm_lastname').' '.$attendee_q->f('userobm_firstname');
-        $msg_attendee .= "'\":MAILTO:";
-        $msg_attendee .= $attendee_q->f('userobm_email');
-      }
-      if($msg_attendee != '') {
-        $msg_attendee = wordwrap($msg_attendee,74,"\n ");
-      }
-    }
-    $msg .= "
-BEGIN:VEVENT
-UID:$id    
-$title
-CLASS:$private
-ORGANIZER;CN=\"$organizer_cn\":MAILTO:$organizer_email
-$msg_attendee
-LOCATION:$location
-CATEGORIES:$category1
-STATUS:CONFIRMED$description
-DTSTART:$date_b
-DTEND:$date_e
-DTSTAMP:$date_ts
-END:VEVENT";
-
-  } else {  
-    $id = $obm_event->f('calendarevent_id');
-    $title = $obm_event->f('calendarevent_title');
-    $location = $obm_event->f('calendarevent_location');
-    $priority = $obm_event->f('calendarevent_priority'); 
-    $category1 = strtoupper($obm_event->f('calendarcategory1_label')); 
-    if ($obm_event->f('calendarevent_description') != '') {
-      $description = "\nDESCRIPTION:".$obm_event->f('calendarevent_description');
-    } else {
-      $description = '';
-    }
-    if (count($resources) > 0) {
-      if ($description == '') $description = 'DESCRIPTION:';
-      $description .= "$l_resource_allocated:";
-      $resource_q = run_query_get_resources_info($resources);
-      while ($resource_q->next_record()) {
-        $description .=  "\\n  ".$resource_q->f('resource_name');
-      }
-    }
-    $date_b = $obm_event->f('calendarevent_date');
-    $date_b = date('Ymd',$date_b).'T'.date('His',$date_b);
-    $start_date = $date_b;
-    $date_e = $obm_event->f('calendarevent_date') + $obm_event->f('calendarevent_duration') ;
-    $date_e = date('Ymd',$date_e).'T'.date('His',$date_e);
-    $kind = $obm_event->f('calendarevent_repeatkind');
-    $end = $obm_event->f('calendarevent_endrepeat');
-    $end = date('Ymd',$end).'T'.date('His',$end);
-    $repeat_days = $obm_event->f('calendarevent_repeatdays');
-    $repeat_frequence = $obm_event->f('calendarevent_repeatfrequence');
-    switch($priority) {
-      case 1 : $priority = 3;
-  	  break;
-      case 3 : $priority = 1;
-	  break;
-    }
-    $private = $obm_event->f('calendarevent_privacy');
-    switch($private) {
-      case 0 : $private = 'PUBLIC';
-	  break;
-      case 1 : $private = 'PRIVATE';
-	  break;
-    }   
-    if ($kind == 'daily') {
-      $repeat = "FREQ=DAILY;UNTIL=$end;INTERVAL=$repeat_frequence";
-    } elseif($kind == 'weekly') {
-      $l_day_repeat = array('SU','MO','TU','WE','TH','FR','SA');
-      $start_week_day = strtotime($ccalendar_weekstart);
-      for ($i=0; $i<7; $i++) {
-  	$day_num = date('w', $start_week_day);
-      	$day = $l_day_repeat[$day_num];
-	if (strcmp(substr($repeat_days,$i,1),'1')==0) {
-	  if ($i!=0) {
-	    $dis_repeat_days .= ',';
-	  }
-	  $dis_repeat_days .= "$day";
-  	}
-      	$start_week_day = strtotime('+1 day', $start_week_day); 
-      } 
-      $repeat = "FREQ=WEEKLY;UNTIL=$end;INTERVAL=1;BYDAY=$dis_repeat_days";
-    } elseif ($kind == 'monthlybydate') {
-      $day = date('d',$start_date);
-      $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$day"; 
-    } elseif ($kind == 'monthlybyday') {
-      $start_week_day = date('w',$start_date);
-      $daypos = ceil(substr($start_date,6,2)/7);
-      $day_num = date('w',strtotime("+ $start_week_day days",$start_date));
-      $day = $l_day_repeat[$day_num];
-      $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$daypos$day";
-    } elseif($kind == 'yearly') {
-      $monthpos = date('m',$start_date);
-      $repeat = "FREQ=YEARLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYMONTH=$monthpos";
-    }
-    $msg .= "
-BEGIN:VEVENT
-UID:$id    
-SUMMARY:$title
-CLASS:$private
-LOCATION:$location
-CATEGORIES:$category1
-STATUS:CONFIRMED$description
-DTSTART:$date_b
-DTEND:$date_e
-RRULE:$repeat
-END:VEVENT";
-  }
-
-  $msg .= "
-END:VCALENDAR";
-
-
-  // we don't forget the last line :
-  fputs($fd_dest, $msg);
+  fputs($fd_dest, $writer->buffer);
   fclose($fd_dest);
 }
 
@@ -843,80 +679,15 @@ function run_query_icalendar_insert($params) {
   global $obm ;
   global $all_emails ;
   // --- get the unfolding ics
-  $ics = file($params['ics_tmp']) ;
-  $new_ics = array() ; // unfolded $ics
-  $prevline = '' ;
-  $i = -1 ;
-  foreach ($ics as $line) {
-    // use ISO-8859-15
-    $line = mb_convert_encoding($line, 'ISO-8859-15', 'UTF-8, ISO-8859-15');
+  $ics = $params['ics_tmp'] ;
 
-    // if begin with RFC2445_WSP, add to previous line
-    if (preg_match("/^[".RFC2445_WSP."]/", $line)) { 
-      $line = preg_replace("/^[".RFC2445_WSP."]/",'',$line) ;
-      $prevline .= $line ;
-      $line = '' ;
-      continue ;
-    }
-
-    if ($prevline !== '') {
-      $new_ics[] = $prevline ;
-    }
-
-    $prevline = preg_replace(array("/\n/","/\r/"),'',$line) ;
-  } ;
-  if ($prevline !== '') {
-    $new_ics[] = $prevline ;
-  }
-
-  // --- get calendars
-  $vcalendars = ics_get_component('VCALENDAR', $new_ics) ; // return an array of calendar components
-
-  // get events and todos
-  foreach ($vcalendars as $vcalendar) {
-    $vevents = ics_get_component('VEVENT', $vcalendar) ;
-    //$vtodos = ics_get_component('VTODO', $vcalendar) ;
-  }
-
-  // for future use, constructs a hash of all users emails
-  $all_emails = get_all_email_list() ;
-
-  // process events
-  $nb_processed_event = 0 ;
-  foreach($vevents as $vevent) {
-    $properties = array() ;
-    $properties = ics_get_vevent_properties($vevent) ;
-
-    //if no property returned, event is not processed (ex : organizer is set but not equal to current userobm)
-    if (count($properties) == 0) {
-      continue ;
-    }
-
-    $sel_entity_id = array() ;
-
-    // organizer (if none, then current userobm)
-    if (isset($properties['organizer'])) { 
-      $priority['owner'] = $properties['organizer']['uid'] ;
-    } else {
-      $priority['owner'] = $obm['uid'];
-    }
-
-    // attendee(s)
-    if (isset($properties['attendees'])) {
-      foreach($properties['attendees'] as $attendee) {
-        $sel_entity_id['user'][] = $attendee['uid'] ;
-      }
-    }
-    if(empty($sel_entity_id['user'])) {
-      $sel_entity_id['user'][] = $obm['uid'] ;
-    }
-    if(!$properties['repeatfrequency'] || $properties['repeatfrequency'] == '0') {
-      $properties['repeatfrequency'] = 1;
-    }
-    run_query_calendar_add_event($properties, $sel_entity_id, &$event_id) ;
-    $nb_processed_event++ ;
-  }
-
+  include_once('obminclude/of/vcalendar/reader/ICS.php');
+  include_once('obminclude/of/vcalendar/writer/OBM.php');
+  $reader = new Vcalendar_Reader_ICS($ics);
+  $document = $reader->getDocument();
+  $writer = new Vcalendar_Writer_OBM();  
+  $writer->writeDocument($document);
+  $nb_processed_event = count($document->getVevents());
   return array($nb_processed_event) ;
 
 }
@@ -1555,12 +1326,15 @@ function run_query_calendar_update_event_data($calendar) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(2)');
   $obm_q->query($query);
 
+  $timebegin = strtotime($datebegin);
+  $hour = date('H', $timebegin);
+  $min = date('i',$timebegin);
   if($repeat_kind != 'none' && is_array($date_exception)) {
     foreach(array_unique($date_exception) as $key => $value) {
       if($value != '') {
         $value = of_isodate_convert($value);
-        $calendar['old_date_begin'] = $value.' '.$calendar['time_begin'].':'.$calendar['min_begin'].':00';
-        run_query_calendar_event_exception_insert($calendar); 
+        $calendar['old_date_begin'] = date('Y-m-d H:i:s',strtotime("+$hour hours +$min minutes",strtotime($value)));        
+        run_query_calendar_event_exception_insert($calendar);
       }
     }
   }
@@ -1974,11 +1748,14 @@ function run_query_calendar_delete($calendar) {
   $query = "DELETE FROM CalendarException WHERE calendarexception_event_id = '$event_id'";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
   $obm_q->query($query);
-  $query = "DELETE FROM EventEntity WHERE evententity_event_id = '$event_id'";
+  $query = "DELETE FROM CalendarAlert WHERE calendaralert_event_id = '$event_id'";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(3)');
+  $obm_q->query($query);  
+  $query = "DELETE FROM EventEntity WHERE evententity_event_id = '$event_id'";
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(4)');
   $obm_q->query($query);
   $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = '$event_id'";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(4)');
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
   $obm_q->query($query);
 
   // Alerts
@@ -1991,7 +1768,7 @@ function run_query_calendar_delete($calendar) {
     // We purge the individual user entries
     $query = "DELETE FROM DeletedCalendarEvent
       WHERE deletedcalendarevent_event_id = '$event_id'";
-    display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete()');
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(6)');
     $retour = $obm_q->query($query);
 
     // We note the event deletion
@@ -2003,7 +1780,7 @@ function run_query_calendar_delete($calendar) {
         '$event_id',
         null,
         '$now')";
-    display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete()');
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(7)');
     $retour = $obm_q->query($query);
   }
 
@@ -2867,6 +2644,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       calendarevent_id,
       calendarevent_title,
       calendarevent_privacy,
+      calendarevent_priority,
       calendarevent_description,
       calendarevent_properties,
       calendarevent_location,
@@ -2896,6 +2674,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       calendarevent_id,
       calendarevent_title,
       calendarevent_privacy,
+      calendarevent_priority,
       calendarevent_description,
       calendarevent_properties,
       calendarevent_location,
@@ -3005,6 +2784,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       calendarevent_id,
       calendarevent_title,
       calendarevent_privacy,
+      calendarevent_priority,
       calendarevent_description, 
       calendarevent_properties, 
       calendarevent_location, 
@@ -3038,6 +2818,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       calendarevent_id,
       calendarevent_title,
       calendarevent_privacy,
+      calendarevent_priority,
       calendarevent_description, 
       calendarevent_properties, 
       calendarevent_location, 
@@ -3123,20 +2904,24 @@ function run_query_get_events_attendee($events) {
  * @access public
  * @return void
  */
-function run_query_get_events_exception($events,$start_time,$end_time) {
+function run_query_get_events_exception($events,$start_time = NULL,$end_time = NULL) {
   global $cdg_sql;
   $event_list = implode(',',$events) ;
   $obm_q = new DB_OBM;
   $calendarexception_date = sql_date_format($obm_q->type,'calendarexception_date');
   $calendarexception_date_l = sql_date_format($obm_q->type,'calendarexception_date','calendarexception_date');  
-
+  if(!is_null($start_time)) {
+    $start = "AND $calendarexception_date > $start_time";
+  }
+  if(!is_null($end_time)) {
+    $end = "AND $calendarexception_date < $end_time";
+  }
   $query = "SELECT
     calendarexception_event_id,
     $calendarexception_date_l
    FROM CalendarException
    WHERE calendarexception_event_id IN ($event_list) 
-   AND $calendarexception_date > $start_time 
-   AND $calendarexception_date < $end_time";
+   $start $end";
   display_debug_msg($query, $cdg_sql, 'run_query_get_events_exception()');
   $obm_q->query($query);
   return $obm_q;
@@ -4356,27 +4141,45 @@ function calendar_send_mail($mails) {
  */
 function run_query_calendar_reset($id) {
   global $cdg_sql, $obm;
+  $obm_q = new DB_OBM;
+  $calendar['mail'] = false;
+
+  $query = "SELECT calendarevent_id FROM CalendarEvent WHERE calendarevent_owner = $id";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
+  $obm_q->query($query);
   
+  while($obm_q->next_record()) {
+    $calendar['calendar_id'] = $obm_q->f('calendarevent_id');
+    run_query_calendar_delete($calendar);
+  }
+  $query = "DELETE FROM EventEntity WHERE evententity_entity_id = $id AND evententity_entity = 'user'";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
+  $obm_q->query($query);
+  
+  $query = "DELETE FROM CalendarAlert WHERE calendaralert_event_id NOT IN (SELECT evententity_event_id FROM EventEntity) 
+                  OR calendaralert_user_id = $id";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
+  $obm_q->query($query);
+    
+  $query = "DELETE FROM CalendarException WHERE calendarexception_event_id NOT IN (SELECT evententity_event_id FROM EventEntity)";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
+  $obm_q->query($query);
+  
+  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id NOT IN (SELECT evententity_event_id FROM EventEntity)";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
+  $obm_q->query($query);
+
+/*  
   $obm_q = new DB_OBM;
 
   $query = "DELETE FROM EventEntity WHERE evententity_entity_id = '$id' AND evententity_entity = 'user'";
   display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
   $obm_q->query($query);
 
-  $query = "SELECT calendarevent_id
-    FROM CalendarEvent 
-    LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
-    WHERE evententity_entity_id IS NULL";
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
+  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id NOT IN (SELECT evententity_event_id FROM EventEntity GROUP BY evententity_event_id)";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset(bis)");
   $obm_q->query($query);
-  while($obm_q->next_record()) {
-    $ids[] = $obm_q->f("calendarevent_id");
-  }
-  if(is_array($ids)) {
-    $query = "DELETE FROM CalendarEvent WHERE calendarevent_id IN (".implode(',',$ids).")";
-    display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
-    $obm_q->query($query);
-  }
+ */
 }
 
 

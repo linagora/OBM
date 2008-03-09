@@ -59,10 +59,11 @@ function run_query_user_search($user) {
     }
   }
 
-  $where = '';
+  $where = '1=1';
 
   // If a login indication has been specified, get it
   if (trim($login) != '') {
+     if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_login $like '$login%'";
   }
 

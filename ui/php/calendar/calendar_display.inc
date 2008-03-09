@@ -4370,150 +4370,23 @@ function dis_calendar_export_handle($calendar) {
   $iso_date = $calendar["date"];
   $ts_date = strtotime($iso_date);
 
-  $start_time = strtotime("-1 year", $ts_date);
-  $end_time = strtotime("+1 year", $ts_date);
+  $start_time = strtotime("-10 year", $ts_date);
+  $end_time = strtotime("+10 year", $ts_date);
+
+  include_once('obminclude/of/vcalendar/writer/ICS.php');
+  include_once('obminclude/of/vcalendar/reader/OBM.php');
 
   $calendar_user["user"] = array ($obm["uid"] => "dummy");
-  $ev_q = run_query_calendar_no_repeat_events($start_time,$end_time,$calendar_user);
-
+  
+  $reader = new Vcalendar_Reader_OBM($calendar_user,NULL,$start_time,$end_time);
+  $document = $reader->getDocument();
+  $writer = new Vcalendar_Writer_ICS();  
+  $writer->writeDocument($document);
   header("Content-Type: text/x-vCalendar");
   header("Content-Disposition: inline; filename=ObmCalendar.ics");
   header('Cache-Control: maxage=3600'); 
   header('Pragma: public');  
-  echo "BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//OBM/OBM V$obm_version Calendar//EN
-METHOD:PUBLISH";
-  while ($ev_q->next_record()) {
-    $id = $ev_q->f("calendarevent_id");
-    $title = "SUMMARY:" . $ev_q->f("calendarevent_title");
-    $title = wordwrap($title,74,"\n ",1);
-    $location = $ev_q->f("calendarevent_location");
-    $priority = $ev_q->f("calendarevent_priority");
-    $category1 = strtoupper($ev_q->f("calendarcategory1_label")); 
-    $date_ts = $ev_q->f("calendarevent_timeupdate");
-    $date_ts = gmdate("Ymd\THis\Z",$date_ts);
-    if ($ev_q->f("calendarevent_description") != "") {
-      $description = preg_replace("/\\r?\\n/","\\n",$ev_q->f("calendarevent_description"));
-      $description = "DESCRIPTION:" . $description;
-      $description = "\n" . wordwrap($description,74,"\n ",1);
-    } else {
-      $description = "";
-    }
-    $date_b = $ev_q->f("calendarevent_date");
-    $date_b = gmdate("Ymd\THis\Z",$date_b);
-    $date_e = $ev_q->f("calendarevent_date") + $ev_q->f("calendarevent_duration") ;
-    $date_e = gmdate("Ymd\THis\Z",$date_e);
-    switch($priority) {
-      case 1 : $priority = 3;
-	break;
-      case 3 : $priority = 1;
-	break;
-    }
-    $private = $ev_q->f("calendarevent_privacy");
-    switch($private) {
-      case 0 : $private = "PUBLIC";
-	break;
-      case 1 : $private = "PRIVATE";
-	break;
-    }        
-    echo "
-BEGIN:VEVENT
-UID:$id    
-$title
-CLASS:$private
-LOCATION:$location
-CATEGORIES:$category
-STATUS:CONFIRMED$description
-DTSTART:$date_b
-DTEND:$date_e
-DTSTAMP:$date_ts
-END:VEVENT";
-  }
-  
-  $ev_q = run_query_calendar_repeat_events($start_time,$end_time,$calendar_user);
-  
-  while($ev_q->next_record()) {
-    $id = $ev_q->f("calendarevent_id");
-    $title = $ev_q->f("calendarevent_title");
-    $location = $ev_q->f("calendarevent_location");
-    $priority = $ev_q->f("calendarevent_priority");
-    $category = strtoupper($ev_q->f("calendarcategory1_label"));
-    if ($ev_q->f("calendarevent_description") != "") {
-      $description = "\nDESCRIPTION:".$ev_q->f("calendarevent_description");
-    } else {
-      $description = "";
-    }
-    $date_b = $ev_q->f("calendarevent_date");
-    $date_b = gmdate("Ymd\THis\Z",$date_b);
-    $date_e = $ev_q->f("calendarevent_date") + $ev_q->f("calendarevent_duration") ;
-    $date_e = gmdate("Ymd\THis\Z",$date_e);
-    $start_date = $date_b;
-    $kind = $ev_q->f("calendarevent_repeatkind");
-    $end = $ev_q->f("calendarevent_endrepeat");
-    $end = date("Ymd",$end)."T".date("His",$end);
-    $repeat_days = $ev_q->f("calendarevent_repeatdays");
-    $repeat_frequence = $ev_q->f("calendarevent_repeatfrequence");
-    switch($priority) {
-      case 1 : $priority = 3;
-	break;
-      case 3 : $priority = 1;
-	break;
-    }
-    $private = $ev_q->f("calendarevent_privacy");
-    switch($private) {
-      case 0 : $private = "PUBLIC";
-	break;
-      case 1 : $private = "PRIVATE";
-	break;
-    }   
-    if ($kind == "daily") {
-      $repeat = "FREQ=DAILY;UNTIL=$end;INTERVAL=$repeat_frequence";
-    } elseif($kind == "weekly") {
-      $l_day_repeat = array("SU","MO","TU","WE","TH","FR","SA");
-      $start_week_day = strtotime($ccalendar_weekstart);
-      for ($i=0; $i<7; $i++) {
-      	$day_num = date("w", $start_week_day);
-      	$day = $l_day_repeat[$day_num];
-	if (strcmp(substr($repeat_days,$i,1),"1")==0) {
-	  if ($i!=0) {
-	    $dis_repeat_days .= ",";
-	  }
-	  $dis_repeat_days .= "$day";
-	}
-       	$start_week_day = strtotime("+1 day", $start_week_day); 
-      } 
-      $repeat = "FREQ=WEEKLY;UNTIL=$end;INTERVAL=1;BYDAY=$dis_repeat_days";
-    }
-    elseif ($kind == "monthlybydate") {
-      $day = date("d",$start_date);
-      $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$day"; 
-    }
-    elseif ($kind == "monthlybyday") {
-      $start_week_day = date("w",$start_date);
-      $daypos = ceil(substr($start_date,6,2)/7);
-      $day_num = date("w",strtotime("+ $start_week_day days",$start_date));
-      $day = $l_day_repeat[$day_num];
-      $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$daypos$day";
-    } elseif ($kind == "yearly") {
-      $monthpos = date("m",$start_date);
-      $repeat = "FREQ=YEARLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYMONTH=$monthpos";
-    }
-    echo "
-BEGIN:VEVENT
-UID:$id    
-SUMMARY:$title
-CLASS:$private
-LOCATION:$location
-CATEGORIES:$category
-STATUS:CONFIRMED$description
-DTSTART:$date_b
-DTEND:$date_e
-RRULE:$repeat
-END:VEVENT";
-  }
-  echo "
-END:VCALENDAR";
+  echo $writer->buffer;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

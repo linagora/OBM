@@ -1706,8 +1706,10 @@ function get_user_info($id='') {
   if ($id == '') $id = $obm['uid'];
 
   $query = "SELECT *,
+      domain_name,
       $datebegin
-    FROM UserObm
+      FROM UserObm
+    LEFT JOIN Domain ON userobm_domain_id = domain_id      
     WHERE userobm_id='$id'";
 
   display_debug_msg($query, $cdg_sql, 'get_user_info()');
@@ -1716,6 +1718,10 @@ function get_user_info($id='') {
   if (is_array($obm_q->Record)) {
     foreach ($obm_q->Record as $key => $user) {
       $small_key = str_replace('userobm_', '', $key);
+      if($small_key == 'email' && $GLOBALS['cgp_use']['service']['mail']) {
+        $emails = explode("\n",$user);
+        $user = trim($emails[0]).'@'.$obm_q->f('domain_name');
+      }      
       $u[$small_key] = $user;
     }
   }  
@@ -1871,7 +1877,11 @@ function get_group_info($id) {
   $g['privacy'] = $obm_q->f('group_privacy');
   $g['samba'] = $obm_q->f('group_samba');
   $g['delegation'] = $obm_q->f('group_delegation');
-
+  if($GLOBALS['cgp_use']['service']['mail']) {
+    $g['email'] = $obm_q->f('group_email').'@'.$obm_q->f('domain_name');
+  } else {
+    $g['email'] = $obm_q->f('group_email');
+  }
   return $g;
 }
 
