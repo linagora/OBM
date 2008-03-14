@@ -82,6 +82,11 @@
   padding-bottom: 9px;
 }
 
+.week tbody tr.hover th { 
+  border-color: #FF0000;
+}
+
+
 /* ------------------------------------------------------------------------- */
 /* Month view styles */
 /* ------------------------------------------------------------------------- */
@@ -187,6 +192,9 @@
   position: absolute;
   bottom: 0px;
   right: 0px;
+/*  cursor: n-resize;
+  width: 100%;
+  height: 4px; */
 }
 
 .eventOwner {

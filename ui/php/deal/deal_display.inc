@@ -1035,6 +1035,11 @@ function html_deal_consult($deal_q, $dc='') {
 function dis_deal_form($deal) {
   global $display, $obm, $action, $ctt_sales;
 
+  // Hook : Pre
+  if (function_exists('hook_pre_dis_deal_form')) {
+    $deal = hook_pre_dis_deal_form($deal);
+  }
+
   if ($action == 'detailupdate') {
     $deal_q = run_query_deal_detail($deal['deal_id']);
     $display['detailInfo'] = display_record_info($deal_q);
@@ -1225,7 +1230,7 @@ function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $users_c,
   }
   $sel_type .= '</select>';
 
-  $sel_region = of_category_html_select('', 'region', $regions, '', 'none');
+  $sel_region = of_category_html_select('', 'region', $regions, $region, 'none');
 
   // Sources select
   $sel_source = "

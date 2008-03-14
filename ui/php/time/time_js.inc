@@ -115,7 +115,7 @@ function fill_projectall(sel_list) {
     }
   }
 
-  proj_array.sort();
+//  proj_array.sort();
 
   sel_list.options[0] = new Option('$l_undef');
   sel_list.options[0].value = 0; 
@@ -163,7 +163,7 @@ function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
       for (i = 0; i < project[tt_location].length; i++) {
         proj_array[i] = project[tt_location][i];
       }
-      proj_array.sort();
+//      proj_array.sort();
 
       // Fill the project select widget
       for (i = 0; i < proj_array.length; i++) {

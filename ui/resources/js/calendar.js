@@ -34,8 +34,9 @@ Obm.CalendarDayEventExtension = new Class({
                                      .addClass(this.event.klass)
                                      .setProperty('id',id)
                                      .setProperty('title', this.event.title)
-                                     .injectInside(document.body);
+                                    .injectInside(document.body);
     this.dragHandler = new Element('h1')
+                                 .setProperty('style','cursor: move;')
                                  .injectInside(this.element);     
     if(this.event.meeting) {                                 
       this.meeting = new Element('img').setProperty('src',obm.vars.images.meeting)
@@ -174,6 +175,7 @@ Obm.CalendarDayEvent = new Class({
                                      .setProperty('title', this.event.title)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
+                                 .setProperty('style','cursor: move;')
                                  .injectInside(this.element);     
     if(this.event.meeting) {                                 
       this.meeting = new Element('img').setProperty('src',obm.vars.images.meeting)
@@ -442,12 +444,12 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     this.length = 1;
     this.buildEvent();
     this.switchColor(obm.vars.conf.calendarColor);
-    if(this.options.resizable) 
+    if(this.options.resizable)
       this.makeResizable(options);
     if(this.options.draggable)
-      this.makeDraggable();      
+      this.makeDraggable();
     this.setTime(this.event.time);
-    this.setDuration(this.event.duration);          
+    this.setDuration(this.event.duration);
   },
   
   buildEvent: function() {
@@ -458,6 +460,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
                                      .setProperty('title', this.event.title)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
+                                 .setProperty('style','cursor: move;')
                                  .injectInside(this.element);     
     if(this.event.meeting) {                                 
       new Element('img').setProperty('src',obm.vars.images.meeting)
@@ -465,13 +468,22 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     }
     this.setPeriodicity();
     if(this.options.resizable) {
-      this.resizeHandler = new Element('img').setProperty('src',obm.vars.images.resize)
-                                             .addClass('handle')
-                                             .injectInside(this.element);
+	this.resizeHandler = new Element('img')
+	    .setProperty('src',obm.vars.images.resize)
+	    .addClass('handle')
+	    .injectInside(this.element);
+
+		/*	this.resizeHandler = new Element('div')
+	    .addClass(this.event.klass)
+	    .addClass('handle')
+	    .injectInside(this.element);
+		*/
     }
+
     this.titleContainer = new Element('span').injectInside(this.element);
-    this.timeContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
-                                         .injectInside(this.dragHandler);
+    this.timeContainer = new Element('a')
+       .setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
+       .injectInside(this.dragHandler);
     this.timeContainer.onclick = function () {if(obm.calendarManager.redrawLock) return false;};
     this.resetTitle();
 

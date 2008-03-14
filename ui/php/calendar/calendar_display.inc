@@ -931,9 +931,11 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
     $delta = $j - $ccalendar_first_hour;
     for ($k=0; $k<$_SESSION['set_cal_interval']; $k++) {
       if ($k==0) {
-        $week_cal .= "\n<tr><th>".($j).":00</th>";
+        $week_cal .= "\n<tr onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\"><th>".($j).':00</th>';
+	//        $week_cal .= "\n<tr><th>".($j).":00</th>";
       } else {
-        $week_cal .= "\n<tr><th></th>";
+	$week_cal .= "\n<tr onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\"><th></th>";
+	//        $week_cal .= "\n<tr><th></th>";
       }
       $delta2 = $k * $time_unit;
       for ($i=0; $i<7; $i ++) {

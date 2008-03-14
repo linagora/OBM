@@ -792,7 +792,7 @@ function run_query_time_used_tasktype($uid = 0) {
       ORDER BY tasktype_internal, tasktype_label";
 
     display_debug_msg($query, $cdg_sql, 'run_query_time_used_tasktype');
-    $obm_q= new DB_OBM;
+    $obm_q = new DB_OBM;
     $obm_q->query($query);
   }
 
@@ -814,6 +814,7 @@ function run_query_time_project($time) {
       project_id,
       project_company_id,
       project_name,
+      project_shortname,
       company_name,
       project_tasktype_id
     FROM Project
@@ -824,7 +825,7 @@ function run_query_time_project($time) {
       AND projecttask_project_id = project_id
       AND projectuser_user_id = '$uid'
       AND projectuser_projectedtime != '0'
-      ORDER BY project_tasktype_id, company_name, project_name";
+      ORDER BY project_tasktype_id, project_shortname, company_name, project_name";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_project');
   $obm_q= new DB_OBM;

@@ -439,12 +439,19 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
     }
   }
   $query = "
-      SELECT count(distinct Link.".$metadata['link']['id'].") as links 
+    SELECT count(distinct Link.".$metadata['link']['id'].") as links 
       FROM ".$metadata['link']['table']." as Link 
       JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
       LEFT JOIN P_".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
+      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")
+  UNION
+      SELECT count(distinct Link.".$metadata['link']['id'].") as links 
+      FROM P_".$metadata['link']['table']." as Link 
+      JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
+      LEFT JOIN ".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")";
-  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links)');
+
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links, '.$metadata['link']['table']).')');
   $obm_qm->query($query);
   $obm_qm->next_record();
   $return['links'] = $obm_qm->f('links');

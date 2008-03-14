@@ -1978,10 +1978,11 @@ function get_all_parent_group_of_group($g_id) {
  * @param $g_id group id
  * @param $info if true, get lastname and firstname too else get only id
  * @param $uids (optionnal) : array of UserObm Id to add to the result
+ * @param $sort (optionnal) : sort field
  * @return array of users infos (id=>infos) or array of users ids
  * @access public
 **/
-function of_usergroup_get_group_users($g_id, $info=false, $uids='') {
+function of_usergroup_get_group_users($g_id, $info=false, $uids='', $order='') {
   global $cdg_sql;
 
   if (! ($g_id > 0) && empty($uids)) {
@@ -1998,6 +1999,9 @@ function of_usergroup_get_group_users($g_id, $info=false, $uids='') {
       userobm_mobile,
       userobm_description,
       userobm_email';
+  }
+  if ($order != '') {
+    $order_clause = "ORDER BY $order";
   }
   if (is_array($uids) && count($uids)>0) {
     foreach ($uids as $u_id) {
@@ -2017,7 +2021,8 @@ function of_usergroup_get_group_users($g_id, $info=false, $uids='') {
     FROM of_usergroup LEFT JOIN UserObm ON of_usergroup_user_id=userobm_id
     WHERE userobm_archive != '1'
       AND of_usergroup_group_id='$g_id'
-    $union";
+    $union
+    $order_clause";
 
   $obm_q = new DB_OBM; 
   display_debug_msg($query, $cdg_sql, 'of_usergroup_get_group_users()');
