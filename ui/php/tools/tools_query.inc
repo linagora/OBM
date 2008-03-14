@@ -438,6 +438,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
       $join[] = "Link.$field[name] = Production.$field[name]";
     }
   }
+  // Union to get all changes ! (eg: links that have been deleted)
   $query = "
     SELECT count(distinct Link.".$metadata['link']['id'].") as links 
       FROM ".$metadata['link']['table']." as Link 
@@ -455,6 +456,9 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   $obm_qm->query($query);
   $obm_qm->next_record();
   $return['links'] = $obm_qm->f('links');
+  // Add Union result (bi directionnal => 2 results)
+  $obm_qm->next_record();
+  $return['links'] .= $obm_qm->f('links');
   $return['diff'] += $return['links'];
 
   return $return;
