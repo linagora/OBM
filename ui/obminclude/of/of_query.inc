@@ -2042,8 +2042,8 @@ function of_usergroup_get_group_users($g_id, $info=false, $uids='', $order='') {
       $description = $obm_q->f('userobm_description');
       $users[$u_id] = array('id' => $u_id,
                             'login' => $login,
-			    'lastname' => $lastname,
-			    'firstname' => $firstname,
+                            'lastname' => $lastname,
+                            'firstname' => $firstname,
                             'title' => $title,
                             'phone' => $phone,
                             'mobile' => $mobile,

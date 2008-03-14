@@ -44,7 +44,7 @@ $l_update_ok = "Host update successfull.";
 $l_update_error = "Host update fail !";
 $l_delete_ok = "Host delete successfull.";
 $l_delete_error = "Host delete fail !";
-$l_can_delete = "Host can't be delete";
+$l_can_delete = "Host can be delete";
 $l_cant_delete_mailserver = "Host can't be delete because it's declare as mail server.";
 
 $l_err_host_name_empty = "Host name must be fill";

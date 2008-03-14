@@ -23,7 +23,7 @@ $l_no_found = "Aucun serveur de messagerie ne correspond à ces critères !";
 $l_err_host_invalid = "L'hôte n'a pas été sélectionné ou est invalide !";
 $l_err_host_is_mailserver = "L'hôte sélectionné est déjà référencé comme serveur de messagerie !";
 
-$l_can_delete = "Ce serveur de messagerie peu être supprimé";
+$l_can_delete = "Ce serveur de messagerie peut être supprimé";
 $l_cant_delete = "Ce serveur de messagerie ne peut pas être supprimé";
 $l_link_domain = "Le serveur de messagerie est référencé dans des domaines";
 $l_link_domain_no = "Le serveur de messagerie n'est pas référencé dans les domaines";

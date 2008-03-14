@@ -628,6 +628,7 @@ function html_group_form($action, $group_q, $group, $field='') {
   global $l_private, $l_public, $l_insert, $l_update, $l_back, $l_no,$l_yes;
   global $l_manager, $c_undef, $l_undef, $l_header_new;
 
+  // Load values
   // if update mode and first time, values are taken from db
   if ($action == 'detailupdate') {
     $id = $group_q->f('group_id');
@@ -642,7 +643,7 @@ function html_group_form($action, $group_q, $group, $field='') {
     $mailing = $group_q->f('group_mailing');
     $dis_title = $name;
   } elseif ($action == 'new') {
-    if ($cgroup_private_default) {
+    if (!isset($group['privacy']) && $cgroup_private_default) {
       $private_c = ' checked';
       $mail_class = 'H';
     }
@@ -678,9 +679,10 @@ function html_group_form($action, $group_q, $group, $field='') {
 
     } else {
       if ($priv == '1') {
-	$private_c = ' checked';
-	$mail_class = 'H';
+        $private_c = ' checked';
+        $mail_class = 'H';
       }
+
       $dis_private = "
     <script type=\"text/javascript\">
       function privacyShowHide(input) {
