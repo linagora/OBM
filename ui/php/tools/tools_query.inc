@@ -602,7 +602,21 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
       JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
       LEFT JOIN P_".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")
-      GROUP BY Link.".$metadata['link']['id']." ";
+      GROUP BY Link.".$metadata['link']['id']."
+  UNION
+      SELECT 
+      $userdata[domain],
+      $userdata[uid],
+      '$userdata[delegation]',
+      '$metadata[table]',
+      $primaries[current],
+      Link.".$metadata['link']['id']." 
+    FROM P_".$metadata['link']['table']." as Link 
+      JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
+      LEFT JOIN ".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
+      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")
+      GROUP BY Link.".$metadata['link']['id'];
+
   display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links)');
   $obm_qm->query($query);
   $obm_qm->next_record();
@@ -610,6 +624,7 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
 
   return $return;
 }
+
 
 /******************************************************************************
  * Store update data in update tables
