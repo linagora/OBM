@@ -132,22 +132,46 @@ sub addPartitions {
     $line = undef;
 
     # Parcours du fichier de configuration pour :
-    #   - creer un modele sans definition de partitions
-    #   - reperer les partitions déjà définies.
+    #   - créer un modèle sans définition de partitions
+    #   - repérer les partitions déjà définies.
     my %currentPartitions;
+    my $defaultPartitionName;
     my @template;
     for( my $i=0; $i<=$#file; $i++ ) {
-        if( $file[$i] =~ /^partition-(.+):(.+)$/ ) {
-            $currentPartitions{$1} = $2;
+        if( $file[$i] =~ /^partition-(.+)\s*:(.+)$/ ) {
+            my $partitionName = $1;
+            $currentPartitions{$partitionName} = $2;
+            $currentPartitions{$partitionName} =~ s/^\s+//;
+
+            $self->{"daemonRef"}->logMessage( "Chargement de la partition '".$partitionName."', repertoire '".$currentPartitions{$partitionName}."' depuis le fichier '".$self->{"cyrusConfFile"}."'" );
+        }elsif( $file[$i] =~ /^defaultpartition\s*:(.+)$/ ) {
+            $defaultPartitionName = $1;
+            $defaultPartitionName =~ s/^\s+//;
+
+            if( $defaultPartitionName !~ /^[a-zA-Z0-9]+$/ ) {
+                $self->{"daemonRef"}->logMessage( "Le nom de la partition par defaut '".$defaultPartitionName."' est incorrect. Il doit etre compose uniquement de caracteres alpha-numeriques" );
+                $defaultPartitionName = undef;
+            }else {
+                $self->{"daemonRef"}->logMessage( "Chargement de la partition par defaut '".$defaultPartitionName."' depuis le fichier '".$self->{"cyrusConfFile"}."'" );
+            }
         }else {
             push( @template, $file[$i] );
         }
     }
 
+    if( !defined($defaultPartitionName) ) {
+        $self->{"daemonRef"}->logMessage( "Pas de partition par defaut definie" );
+    }
+
+    if( defined($defaultPartitionName) && !defined($currentPartitions{$defaultPartitionName}) ) {
+        $self->{"daemonRef"}->logMessage( "Pas de definition de la partition par defaut '".$defaultPartitionName."'" );
+        $defaultPartitionName = undef;
+    }
+
     while( my( $domainLabel, $domainCyrusPartition ) = each(%{$self->{"domainList"}}) ) {
         if( !exists($currentPartitions{$domainCyrusPartition}) ) {
-            $self->{"daemonRef"}->logMessage( "Ajout de la partition du domaine '".$domainLabel."'" );
             $currentPartitions{$domainCyrusPartition} = $self->{cyrusPartitionRoot}."/".$domainCyrusPartition;
+            $self->{"daemonRef"}->logMessage( "Ajout de la partition '".$domainCyrusPartition."', repertoire '".$currentPartitions{$domainCyrusPartition}."', du domaine '".$domainLabel."'" );
         }
     }
 
@@ -156,14 +180,21 @@ sub addPartitions {
 
     # On parcours le modèle pour remettre la définition des partitions
     $self->{"daemonRef"}->logMessage( "Re-ecriture du fichier de configuration du service Cyrus Imapd '".$self->{"cyrusConfFile"}."'" );
+    my $partitionsDone = 0;
     open( FIC, ">".$self->{"cyrusConfFile"} ) or return 1;
-    for( my $i=0; $i<=$#template; $i++ ) {
-        if( $template[$i] =~ /^defaultpartition/ ) {
-            while( my( $partitionName, $partitionPath ) = each(%currentPartitions) ) {
-                print FIC "partition-".$partitionName.": ".$partitionPath."\n";
-            }
-        }
 
+    # Definition des partitions Cyrus
+    while( my( $partitionName, $partitionPath ) = each(%currentPartitions) ) {
+        print FIC "partition-".$partitionName.": ".$partitionPath."\n";
+    }
+
+    if( defined($defaultPartitionName) ) {
+        print FIC "defaultpartition: ".$defaultPartitionName."\n";
+    }else {
+    	$self->{"daemonRef"}->logMessage( "[ATTENTION] Pas de partition par defaut definie, si vous souhaitez en definir une, ajoutez la directive 'defaultpartition' dans le fichier '".$self->{"cyrusConfFile"}."', et re-demarrez le service Cyrus" );
+    }
+
+    for( my $i=0; $i<=$#template; $i++ ) {
         print FIC $template[$i]."\n";
     }
     close(FIC);
