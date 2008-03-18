@@ -222,7 +222,7 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
     $block_detail = "
       <div id=\"1\" class=\"organizationalChartNode\">
         <div class=\"organizationalChartWrap\">
-          <input type=\"text\" class=\"mandatory\" id=\"tf_ogroup[1]\" name=\"tf_ogroup[1]\" maxlength=\"16\" size=\"18\" value=\"$ogroup\" />
+          <input type=\"text\" class=\"mandatory\" id=\"tf_ogroup[1]\" name=\"tf_ogroup[1]\" maxlength=\"32\" size=\"18\" value=\"$ogroup\" />
           <input type=\"hidden\" id=\"tf_parent_level[1]\" name=\"tf_parent_level[1]\" value=\"0\" />
           <div><img src=\"$ico_user\" /><input type=\"text\" name=\"\" value=\"\" id=\"user1\" autocomplete=\"off\" /></div>
           <div><img src=\"$ico_group\" /><input type=\"text\" name=\"\" value=\"\" id=\"group1\" autocomplete=\"off\" /></div>
@@ -792,7 +792,7 @@ function dis_organizationalchart_draw_form($node_q) {
       <div class=\"organizationalChartWrap $color\">
         $ico_toggle
         <input type=\"text\" class=\"mandatory\" id=\"tf_ogroup[$level]\" name=\"tf_ogroup[$level]\" 
-          maxlength=\"16\" size=\"18\" value=\"$node_name\" />
+          maxlength=\"32\" size=\"18\" value=\"$node_name\" />
         $ico_del_entity
         <input type=\"hidden\" name=\"nb_child_${level}\" id=\"nb_child_${level}\" value=\"$nb_children\" />
         <input type=\"hidden\" id=\"tf_parent_level[$level]\" name=\"tf_parent_level[$level]\" value=\"$parent_level\" />

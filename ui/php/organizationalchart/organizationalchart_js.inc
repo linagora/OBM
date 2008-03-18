@@ -176,7 +176,7 @@ function add_entity(parent_level) {
 
   // child name text field
   var child_name = new Element('input').
-    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'id': 'tf_ogroup['+new_child_id+']', 'size':'18', 'maxlength':'16', 'value':''}).
+    setProperties({'type':'text', 'name':'tf_ogroup['+new_child_id+']', 'id': 'tf_ogroup['+new_child_id+']', 'size':'18', 'maxlength':'32', 'value':''}).
     addClass('mandatory');
 
   // parent id hidden 
