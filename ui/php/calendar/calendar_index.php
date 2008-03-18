@@ -381,7 +381,7 @@ if ($action == 'index') {
 } elseif ($action == 'update_decision') {
 ///////////////////////////////////////////////////////////////////////////////
   $mail_data = run_query_prepare_event_mail($params, $action);
-  $retour = run_query_calendar_update_occurence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
+  $retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
   if ($retour) {
     calendar_send_mail($mail_data);
     $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
@@ -871,14 +871,14 @@ function get_calendar_action() {
   $actions['calendar']['rights_admin'] = array (
     'Name'     => $l_header_right,
     'Url'      => "$path/calendar/calendar_index.php?action=rights_admin",
-    'Right'    => $cright_write,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                          );
 
   // Update Right
   $actions['calendar']['rights_update'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=rights_update",
-    'Right'    => $cright_write,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                          );
 

@@ -50,7 +50,7 @@ Obm.CalendarDayEventExtension = new Class({
   },
 
   resetTitle: function() {
-    var title = this.event.title;
+    var title = this.event.title + ' ';
     if(this.event.all_day == 0) {
       title = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
     }
@@ -199,7 +199,7 @@ Obm.CalendarDayEvent = new Class({
   },
 
   resetTitle: function() {
-    var title = this.event.title;
+    var title = this.event.title + ' ';
     if(this.event.all_day == 0) {
       title = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
     }
@@ -490,7 +490,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   },
 
   resetTitle: function() {
-    var title = this.event.title;
+    var title = this.event.title + ' ';
     var time = new Date(this.event.time * 1000).format("H:i");
     if(this.event.duration <= this.options.unit) {
       time = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
@@ -1184,7 +1184,7 @@ Obm.CalendarQuickForm = new Class({
     if(action) {
       this.gotoURI += '&action='+action;
     }
-    this.gotoURI += '&all_day='+this.eventData.all_day+'&date_begin='+this.eventData.date_begin+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value);
+    this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+this.eventData.date_begin+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value);
     window.location.href = 'calendar_index.php?'+this.gotoURI;
   }
 });

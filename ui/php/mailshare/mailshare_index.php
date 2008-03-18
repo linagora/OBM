@@ -320,14 +320,14 @@ function get_mailshare_action() {
   $actions["mailshare"]["rights_admin"] = array (
     'Name'     => $l_header_right,
     'Url'      => "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=".$params["mailshare_id"]."",
-    'Right'    => $cright_write,
+    'Right'    => $cright_read,
     'Condition'=> array ('detailconsult','update','rights_update','rights_admin')
                                      );
 
 // Rights Update
   $actions["mailshare"]["rights_update"] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=rights_update&amp;entity_id=".$params["mailshare_id"]."",
-    'Right'    => $cright_write,
+    'Right'    => $cright_read,
     'Condition'=> array ('None')
                                      );
 

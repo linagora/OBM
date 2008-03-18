@@ -244,7 +244,7 @@ function run_query_calendar_insert_decision($calendar) {
   $event_id = $calendar['calendar_id'];
   $state = $calendar['decision_event'];
 
-  run_query_calendar_update_occurence_state($event_id,$entity,$entity_id,$state);
+  run_query_calendar_update_occurrence_state($event_id,$entity,$entity_id,$state);
 }
 
 
@@ -255,7 +255,7 @@ function run_query_calendar_insert_decision($calendar) {
 //   - $user_id  : User id
 //   - $state    : New state to set (A, W or R)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_update_occurence_state($event_id, $entity, $entity_id,$state){
+function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state){
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
   if($entity_id == '') {
@@ -281,7 +281,7 @@ function run_query_calendar_update_occurence_state($event_id, $entity, $entity_i
               AND evententity_event_id = '$event_id'
               ";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurence_state()');  
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   return $retour;    
@@ -607,7 +607,7 @@ function run_query_calendar_insert_event_data($calendar) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Insert an occurence of a event
+// Insert an occurrence of a event
 // Parameters: 
 //   - $entity : entity type 'user', 'resource'
 //   - $entity_id :
@@ -1051,7 +1051,7 @@ function ics_get_obmuser_from_smtp($cal_address) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check for conflict : Only with the first occurence of each event,
+// Check for conflict : Only with the first occurrence of each event,
 // Parameters:
 //   - $calendar       : calendar parameters
 //   - sel_entity_id : selected entities id
@@ -1074,7 +1074,7 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check for conflict : Only with the first occurence of each event
+// Check for conflict : Only with the first occurrence of each event
 ///////////////////////////////////////////////////////////////////////////////
 function check_calendar_decision_conflict($calendar) {
   
@@ -3612,7 +3612,7 @@ Class Occurrence {
 }
 
 /**
- * Store all Event/Occurence/Date relations 
+ * Store all Event/Occurrence/Date relations 
  */
 Class OccurrenceFactory {
 
@@ -3649,7 +3649,7 @@ Class OccurrenceFactory {
   }
 
   /**
-   * add an occurence for a given event 
+   * add an occurrence for a given event 
    * 
    * @param Event $event 
    * @param timestamp $date 
@@ -3666,7 +3666,7 @@ Class OccurrenceFactory {
   }
 
   /**
-   * remove all occurence of an event 
+   * remove all occurrence of an event 
    * 
    * @param event id $id 
    * @param timestamp $date 
@@ -3682,7 +3682,7 @@ Class OccurrenceFactory {
   }
 
   /**
-   * Returl all occurence
+   * Returl all occurrence
    * 
    * @access public
    * @return array
@@ -3710,7 +3710,7 @@ Class OccurrenceFactory {
    * @access public
    * @return boolean
    */
-  function eventHaveOccurences($id) {
+  function eventHaveOccurrences($id) {
     return isset($this->events[$id]);
   }
 
@@ -3727,14 +3727,14 @@ Class OccurrenceFactory {
    */
   function periodHaveOccurrences($time, $duration, $entityFilter=null) {
     foreach($this->occurrences as $evtOccurrences) {
-      foreach($evtOccurrences as $occurence) {
+      foreach($evtOccurrences as $occurrence) {
         if(!$entityFilter || ( 
-           is_array($entityFilter[$occurence->entity]) && (
-             count($entityFilter[$occurence->entity]) == 0 || 
-             in_array($occurence->id,$entityFilter[$occurence->entity])))) {
-          $eventDuration = $occurence->event->duration;
-          $eventDate = $occurence->date;
-          $eventAllDay = $occurence->event->all_day;
+           is_array($entityFilter[$occurrence->entity]) && (
+             count($entityFilter[$occurrence->entity]) == 0 || 
+             in_array($occurrence->id,$entityFilter[$occurrence->entity])))) {
+          $eventDuration = $occurrence->event->duration;
+          $eventDate = $occurrence->date;
+          $eventAllDay = $occurrence->event->all_day;
           if(($eventAllDay && date('Ymd',$time) == date('Ymd',$eventDate)) 
               || ($time < ($eventDate + $eventDuration) && ($time + $duration) > $eventDate)) {
             return true;
@@ -3758,30 +3758,30 @@ Class OccurrenceFactory {
    * @return boolean
    */
   function getPeriodOccurrences($time, $duration, $entityFilter=null, $eventFilter=0) {
-    $occurences = array();
+    $occurrences = array();
     foreach($this->occurrences as $evtOccurrences) {
-      foreach($evtOccurrences as $occurence) {
+      foreach($evtOccurrences as $occurrence) {
         if(!$entityFilter || ( 
-           is_array($entityFilter[$occurence->entity]) && (
-             count($entityFilter[$occurence->entity]) == 0 || 
-             in_array($occurence->id,$entityFilter[$occurence->entity])))) {
-          $eventDuration = $occurence->event->duration;
-          $eventDate = $occurence->date;
-          $eventAllDay = $occurence->event->all_day;
+           is_array($entityFilter[$occurrence->entity]) && (
+             count($entityFilter[$occurrence->entity]) == 0 || 
+             in_array($occurrence->id,$entityFilter[$occurrence->entity])))) {
+          $eventDuration = $occurrence->event->duration;
+          $eventDate = $occurrence->date;
+          $eventAllDay = $occurrence->event->all_day;
           if(($eventFilter == 0 || ($eventFilter == 1 && !$eventAllDay) || ($eventFilter == 2 && $eventAllDay))
             && (($eventAllDay && date('Ymd',$time) == date('Ymd',$eventDate)) 
             || ($time < ($eventDate + $eventDuration) && ($time + $duration) > $eventDate))) {
             if($eventAllDay) {
-              array_unshift($occurences,$occurence);
+              array_unshift($occurrences,$occurrence);
             } else {
-              array_push($occurences,$occurence);
+              array_push($occurrences,$occurrence);
             }
           }
         }
       }
     }
-    if(count($occurence) > 0) {
-      return $occurences;
+    if(count($occurrence) > 0) {
+      return $occurrences;
     } else {
       return NULL;
     }

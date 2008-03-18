@@ -173,7 +173,7 @@ $display['header'] = display_menu($module);
 // Todo Order select
 if ($_SESSION['set_todo'] == $cts_pri) { $todo_pri = "selected=\"selected\" "; }
 if ($_SESSION['set_todo'] == $cts_dead) { $todo_dead = "selected=\"selected\" "; }
-$sel_todo = "<select name=\"todo_id\" id=\"todo_id\">
+$sel_todo = "<select name=\"todo\" id=\"todo_id\">
   <option value=\"$cts_pri\" $todo_pri>$l_priority</option>
   <option value=\"$cts_dead\" $todo_dead>$l_deadline</option>
 </select>";

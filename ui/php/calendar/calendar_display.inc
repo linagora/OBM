@@ -793,39 +793,39 @@ function dis_calendar_month_printable($calendar, $calendar_entity,$writable_enti
       $dis_month_cal .= "
       <tr><th>$week_num</th>";
     }
-    $occurences = $of->getPeriodOccurrences($current_time,$day_duration);
+    $occurrences = $of->getPeriodOccurrences($current_time,$day_duration);
     $events_list = "";
-    if($occurences != null) {
-      foreach($occurences as $occurence) {
+    if($occurrences != null) {
+      foreach($occurrences as $occurrence) {
         $attendee = "";
         $location = "";
-        if ($occurrence->event->privacy == 1 && !(in_array($obm["uid"],$attendee["user"]))) {
+        if ($occurrence->event->privacy == 1 && !(in_array($obm["uid"],$occurrence->event->attendee["user"]))) {
           $title = $l_private;
         } else {
-          $title = $occurence->event->title;
-          if($occurence->event->location != "") {
-            $location = "<br />$l_location : ".$occurence->event->location;
+          $title = $occurrence->event->title;
+          if($occurrence->event->location != "") {
+            $location = "<br />$l_location : ".$occurrence->event->location;
           }            
         }                
-        $entity_id = $occurence->id;
-        $entity = $occurence->entity;
+        $entity_id = $occurrence->id;
+        $entity = $occurrence->entity;
         $klass = $calendar_entity[$entity][$entity_id]["class"];
         $attendee = $calendar_entity[$entity][$entity_id]["name"];
         $schedule = "";
-        if($occurence->event->isMeeting()) {
+        if($occurrence->event->isMeeting()) {
           $schedule .= "<img src=\"$ico_meeting\" alt=\"[Meeting]\" />";
         }
-        if($occurence->event->isPeriodic()) {
+        if($occurrence->event->isPeriodic()) {
           $schedule .= "<img src=\"$ico_periodic\" alt=\"[Periodic]\" />";
         }        
-        if(!$occurence->event->all_day) {
-          $schedule .= date("H:i",$occurence->date) ."-". date("H:i",$occurence->date + $occurence->event->duration);
+        if(!$occurrence->event->all_day) {
+          $schedule .= date("H:i",$occurrence->date) ."-". date("H:i",$occurrence->date + $occurrence->event->duration);
         } else {
           $schedule .= $l_all_day;
         }
         $events_list .= "
           <div class=\"printableEvent $klass\">
-          <h1><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurence->event->id."\">$schedule</a></h1>
+          <h1><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$schedule</a></h1>
           $title
           <span class='attendee'><br />$attendee</span>
           $location
@@ -1087,29 +1087,29 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
     foreach($calendar_entity as $entity => $entities) {
       foreach($entities as $id => $data) {
         $view = array();
-        $occurences = $of->getPeriodOccurrences($ts,$day_duration,array($entity => array($id)));
-        if(is_array($occurences)) {
-          foreach($occurences as $occurence) {
-            $key = floor(($occurence->date - $first_hour) / $ts_interval);
+        $occurrences = $of->getPeriodOccurrences($ts,$day_duration,array($entity => array($id)));
+        if(is_array($occurrences)) {
+          foreach($occurrences as $occurrence) {
+            $key = floor(($occurrence->date - $first_hour) / $ts_interval);
             if($key < 0) $key = 0;
             if($key > $span) $key = $span;
-            $view[$key][] = $occurence;
+            $view[$key][] = $occurrence;
           }
         }
         while(!empty($view)) {
           $dis_printable_line = '';
           for($i=0; $i <= $span; $i++) {
             if(isset($view[$i])) {
-              $occurence = array_shift($view[$i]);
-              $event = dis_calendar_printable_event($occurence, $calendar_entity, $ts);
-              if($occurence->event->all_day || $i == $span) {
+              $occurrence = array_shift($view[$i]);
+              $event = dis_calendar_printable_event($occurrence, $calendar_entity, $ts);
+              if($occurrence->event->all_day || $i == $span) {
                 $dur = 0;
                 array_unshift($dis_printable_day,"<td style='width:".($td_width*$span)."%;' colspan='$span'>$event</td>");
               } else {
-                $dur = floor((($occurence->date + $occurence->event->duration) - $first_hour) / $ts_interval) - $i;
+                $dur = floor((($occurrence->date + $occurrence->event->duration) - $first_hour) / $ts_interval) - $i;
                 if($dur >= $span) $dur = $span ;
                 if($dur <= 0) {
-                  $view[$span][] = $occurence;
+                  $view[$span][] = $occurrence;
                   $dur = 1;
                 } else {
                   $dis_printable_line .= "<td style='width:".($td_width*$dur)."%;' colspan='$dur'>$event</td>";
@@ -1155,11 +1155,11 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
 /**
  * Generate the html code for an event in the printable view 
  * 
- * @param mixed $occurence 
+ * @param mixed $occurrence 
  * @access public
  * @return void
  */
-function dis_calendar_printable_event(&$occurence, &$calendar_entity, $ts) {
+function dis_calendar_printable_event(&$occurrence, &$calendar_entity, $ts) {
   global $obm, $path;
   global $l_private, $l_location, $l_all_day;
   global $l_task, $l_private, $l_user;
@@ -1169,46 +1169,46 @@ function dis_calendar_printable_event(&$occurence, &$calendar_entity, $ts) {
   if ($occurrence->event->privacy == 1 && !(in_array($obm["uid"],$occurrence->event->attendee["user"]))) {
     $title = $l_private;
   } else {
-    $title = $occurence->event->title;
-    if($occurence->event->location != "") {
-      $location = "<br />$l_location : ".$occurence->event->location;
+    $title = $occurrence->event->title;
+    if($occurrence->event->location != "") {
+      $location = "<br />$l_location : ".$occurrence->event->location;
     }            
   }
-  $entity_id = $occurence->id;
-  $entity = $occurence->entity;
+  $entity_id = $occurrence->id;
+  $entity = $occurrence->entity;
   $attendee = $l_user .' : '.$calendar_entity[$entity][$entity_id]["name"];
   $klass = $calendar_entity[$entity][$entity_id]["class"];
   // FIXME
-  if($mono_user && $occurence->event->color != "") {
-    $bgColor = "style=\"background-color:".$occurence->event->color."\"";
+  if($mono_user && $occurrence->event->color != "") {
+    $bgColor = "style=\"background-color:".$occurrence->event->color."\"";
   } else {
     $bgColor = "";
   }         
-  if($occurence->event->isMeeting()) {
+  if($occurrence->event->isMeeting()) {
     $schedule = "<img src=\"$ico_meeting\" alt=\"[Meeting]\" />";
   }
-  if($occurence->event->isPeriodic()) {
+  if($occurrence->event->isPeriodic()) {
     $schedule = "<img src=\"$ico_periodic\" alt=\"[Periodic]\" />";
   }           
-  if($occurence->event->all_day == 1) {
+  if($occurrence->event->all_day == 1) {
     $schedule .= $l_all_day; 
   } else {
-    if(date("Ymd",$occurence->date) != date("Ymd",$ts)) {
-      $beg = of_datetime_format($occurence->date);
+    if(date("Ymd",$occurrence->date) != date("Ymd",$ts)) {
+      $beg = of_datetime_format($occurrence->date);
     } else {
-      $beg = date("H:i",$occurence->date);
+      $beg = date("H:i",$occurrence->date);
     }
-    if(date("Ymd",$occurence->date + $occurence->event->duration) != date("Ymd",$ts)) {
-      $end = of_datetime_format($occurence->date + $occurence->event->duration);
+    if(date("Ymd",$occurrence->date + $occurrence->event->duration) != date("Ymd",$ts)) {
+      $end = of_datetime_format($occurrence->date + $occurrence->event->duration);
     } else {
-      $end = date("H:i",$occurence->date + $occurence->event->duration);
+      $end = date("H:i",$occurrence->date + $occurrence->event->duration);
     }
     
     $schedule .=  "$beg - $end";              
   }
   $event_data = "
     <div class=\"printableEvent $klass\" $bgColor>
-    <h1 $bgColor><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurence->event->id."\">$schedule</a></h1>
+    <h1 $bgColor><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$schedule</a></h1>
     <span>$title</span> 
     <span class='attendee'><br />$attendee</span>
     <span>$location</span>
@@ -2061,11 +2061,11 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
         } else {
           $today_events = array();
           $day_content = "";
-          $occurences = $of->getPeriodOccurrences($current_time,$day_duration,array($type => array($id)));
-          if ($occurences != null) {
+          $occurrences = $of->getPeriodOccurrences($current_time,$day_duration,array($type => array($id)));
+          if ($occurrences != null) {
             $haveevent = true;
-            foreach ($occurences as $occurence) {
-              $event = &$occurence->event;
+            foreach ($occurrences as $occurrence) {
+              $event = &$occurrence->event;
               $category = $event->category1;
               $location = $event->location;
               if($event->all_day) {
@@ -2308,11 +2308,11 @@ function dis_calendar_planning_view($start_time, $end_time, $calendar_entity, $c
       $dis_planning_view .= '<tr><th>'.$data['name'].'</th>';
       for($ts = $start_time; $ts < $end_time; $ts += $day_duration ) {
         $view = array();
-        $occurences = $of->getPeriodOccurrences($ts,$day_duration,array($entity => array($id)));
-        if(is_array($occurences)) {
+        $occurrences = $of->getPeriodOccurrences($ts,$day_duration,array($entity => array($id)));
+        if(is_array($occurrences)) {
           $dis_planning_view .= "<td style=\"width:$td_width%\"><ul>";
-          foreach($occurences as $occurence) {
-            $dis_planning_view .= dis_calendar_planning_event($occurence, $calendar_entity, $ts,$cats_color);
+          foreach($occurrences as $occurrence) {
+            $dis_planning_view .= dis_calendar_planning_event($occurrence, $calendar_entity, $ts,$cats_color);
           }
           $dis_planning_view .= '</ul></td>';
         } else {
@@ -2347,43 +2347,42 @@ function dis_calendar_planning_view($start_time, $end_time, $calendar_entity, $c
 /**
  * Generate the html code for an event in the planning view 
  * 
- * @param mixed $occurence 
+ * @param mixed $occurrence 
  * @access public
  * @return void
  */
-function dis_calendar_planning_event(&$occurence, &$calendar_entity, $ts, $cats_color) {
+function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $ts, $cats_color) {
   global $obm, $path;
   global $l_private, $l_location, $l_all_day;
   global $l_task, $l_user, $l_resource, $l_private;
   global $ico_meeting, $ico_periodic;
-  
   $location = "";
   if ($occurrence->event->privacy == 1 && !(in_array($obm["uid"],$occurrence->event->attendee["user"]))) {
     $title = $l_private;
   } else {
-    $title = $occurence->event->title;
-    if($occurence->event->location != "") {
-      $location = "<br />$l_location : ".$occurence->event->location;
+    $title = $occurrence->event->title;
+    if($occurrence->event->location != "") {
+      $location = "<br />$l_location : ".$occurrence->event->location;
     }            
   }
-  $entity_id = $occurence->id;
-  $entity = $occurence->entity;
+  $entity_id = $occurrence->id;
+  $entity = $occurrence->entity;
 
-  $style = "color:rgb(".$cats_color[$occurence->event->category1].")";  
-  if($occurence->event->all_day == 1) {
+  $style = "color:rgb(".$cats_color[$occurrence->event->category1].")";  
+  if($occurrence->event->all_day == 1) {
     $schedule = $l_all_day; 
   } else {
-    if(date("Ymd",$occurence->date) != date("Ymd",$ts)) {
-      $beg = of_datetime_format($occurence->date);
+    if(date("Ymd",$occurrence->date) != date("Ymd",$ts)) {
+      $beg = of_datetime_format($occurrence->date);
     } else {
-      $beg = date("H:i",$occurence->date);
+      $beg = date("H:i",$occurrence->date);
     }
     $schedule =  "$beg";              
   }
 
   $event_data = "
     <li style='$style'>
-    <a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurence->event->id."\">$schedule - $title</a>
+    <a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$schedule - $title</a>
     </li>";
 
   return $event_data;  
