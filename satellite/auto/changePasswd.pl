@@ -218,8 +218,8 @@ sub getParameter {
 &OBM::toolBox::write_log( "Analyse des parametres du script", "W", 3 );
 my %parameters;
 if( getParameter( \%parameters ) ) {
-     &OBM::toolBox::write_log( "", "C" );
-     exit 1;
+    &OBM::toolBox::write_log( "", "C" );
+    exit 1;
 }
 
 # On se connecte a la base
