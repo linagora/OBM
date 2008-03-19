@@ -67,7 +67,7 @@ class Vcalendar_Writer_ICS {
   }
   
   function parseProperty($property) {
-    return trim(chunk_split($property,75,"\n "));
+    return trim(chunk_split($property,74,"\n "));
   }
   
   function writeDtstart($name,$value) {
@@ -77,7 +77,7 @@ class Vcalendar_Writer_ICS {
   
   function writeOrganizer($name, $value) {
       $userInfo = get_user_info($value);
-      $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
+      $params[] = $this->parseName('x-obm-id').'='.$value;
       $params[] = 'CN='.$this->parseText($userInfo['firstname'].' '.$userInfo['lastname']);
       $value =  'MAILTO:'.$userInfo['email'];
       $property = $this->parseProperty($this->parseName($name).';'.implode(';',$params).':'.$value);

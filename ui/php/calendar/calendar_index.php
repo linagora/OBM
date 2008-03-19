@@ -232,9 +232,13 @@ if ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
   $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
   $entities['group'] = $params['sel_group_id'];
-  $entities['user'] = $params['sel_user_id'];
   $entities['task'] = $params['sel_task_id'];
   $entities['resource'] = $params['sel_resource_id'];
+  $entities['user'] = $params['sel_user_id'];
+  if (count($entities,COUNT_RECURSIVE) <= 4) {
+    $entities['user']  = array($obm['uid']);
+    $params['sel_user_id'] = array($obm['uid']);
+  }
   if (check_calendar_data_form($params)) {
     if ( (!$params['force'])
 	 && ($conflicts = check_calendar_conflict($params, $entities)) ) {

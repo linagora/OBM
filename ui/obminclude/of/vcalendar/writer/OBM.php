@@ -76,7 +76,11 @@ class Vcalendar_Writer_OBM {
   }
 
   function getEventById($id) {
-    return run_query_calendar_detail($id);
+    $eventData = run_query_calendar_detail($id);
+    if($eventData->nf() == 0) {
+      return null;
+    }
+    return $eventData;    
   }
 
   function parseEventData(&$vevent) {
@@ -130,7 +134,7 @@ class Vcalendar_Writer_OBM {
     foreach($states as $entity => $stateInfo) {
       foreach($stateInfo as $entityId => $state) {
         if(!is_null($state)) {
-          run_query_calendar_update_occurence_state($id,$entity,$entityId,$state);
+          run_query_calendar_update_occurrence_state($id,$entity,$entityId,$state);
         }
       }
     }

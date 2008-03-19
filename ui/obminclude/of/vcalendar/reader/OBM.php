@@ -59,10 +59,12 @@ class Vcalendar_Reader_OBM {
     while($attendees->next_record()) {
       $this->addAttendee($this->vevents[$attendees->f('calendarevent_id')] , $attendees->Record);
     }
-    $exceptions = run_query_get_events_exception(array_keys($this->vevents));
-    while($exceptions->next_record()) {
-      $this->addExdate($this->vevents[$exceptions->f('calendarexception_event_id')] , $exceptions->f('calendarexception_date'));
-    }    
+    if(count($this->vevents) > 0) {
+      $exceptions = run_query_get_events_exception(array_keys($this->vevents));
+      while($exceptions->next_record()) {
+        $this->addExdate($this->vevents[$exceptions->f('calendarexception_event_id')] , $exceptions->f('calendarexception_date'));
+      }    
+    }
     return $this->document;
   }
 
@@ -76,11 +78,10 @@ class Vcalendar_Reader_OBM {
 
   function & addVevent(&$data) {
     $vevent = &$this->document->createElement('vevent');
-    if($data['calendarevent_allday'] == 0) {
-      $vevent->set('dtstart', $this->parseDate($data['calendarevent_date']));
-      $vevent->set('duration', $data['calendarevent_duration']);
-    } else {
-      //TODO All day event
+    $vevent->set('dtstart', $this->parseDate($data['calendarevent_date']));
+    $vevent->set('duration', $data['calendarevent_duration']);
+    if($data['calendarevent_allday'] != 0) {
+      $vevent->set('x-obm-all-day', 1);
     }
     $vevent->set('summary', $data['calendarevent_title']);
     $vevent->set('description', $data['calendarevent_description']);

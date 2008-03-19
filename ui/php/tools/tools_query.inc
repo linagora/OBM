@@ -596,7 +596,7 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
       $userdata[uid],
       '$userdata[delegation]',
       '$metadata[table]',
-      $primaries[current],
+      '$metadata[prefix]',
       Link.".$metadata['link']['id']." 
     FROM ".$metadata['link']['table']." as Link 
       JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."

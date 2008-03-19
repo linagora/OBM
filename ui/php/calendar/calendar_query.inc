@@ -753,255 +753,6 @@ function get_all_email_list() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// ics_get_component
-// params : 
-// 	$keyword	: keyword for searching in vcalendar (BEGIN... and END...)
-//	$cal		: array of lines containing the (unfolded) ics file
-///////////////////////////////////////////////////////////////////////////////
-function ics_get_component($keyword, $cal) {
-  $components = array() ;
-  $flagGet = false ;
-
-  foreach($cal as $line) {
-    if (strpos($line, 'BEGIN:'.$keyword) === 0) {
-      $component = array() ;
-      $component[] = $line ;
-      $flagGet = true ;
-    }
-    if ($flagGet) {
-      $component[] = $line ;
-    }
-    if (strpos($line, 'END:'.$keyword) === 0) {
-      $components[] = $component ;
-      $flagGet = false ;
-    }
-  }
-
-  return $components ;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// ics_get_property
-///////////////////////////////////////////////////////////////////////////////
-function ics_get_property($keyword, $component) {
-  $value = '' ;
-
-  foreach ($component as $line) {
-    if (strpos($line, $keyword) === 0) {
-      $value = substr($line, strlen($keyword)+1) ;
-      break ;
-    }
-  }
-
-  return $value ;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// ics_get_vevent_properties
-///////////////////////////////////////////////////////////////////////////////
-function ics_get_vevent_properties($vevent) {
-  global $c_none, $ics_event_priority_to_obm, $obm ;
-  //$duration = strtotime($date_end) - strtotime($date_begin); 
-
-  $properties = array() ;
-  $properties['attendees'] = array() ;
-  foreach ($vevent as $line) {
-
-    // direct import, no processing
-    $no_process = array('SUMMARY' => 'title', 
-    			'DURATION' => 'event_duration',
-			'DESCRIPTION' => 'description',
-			'LOCATION' => 'location') ;
-    foreach ($no_process as $keyword => $field) {
-      if(strpos($line, $keyword) === 0) {
-        $properties[$field] = addslashes(substr($line, strlen($keyword) + 1)) ;
-        continue ;
-      }
-    }
-
-    // date_begin
-    $date_begin = '' ;
-    if (strpos($line, 'DTSTART') === 0) {
-      $icsdate = substr($line, strlen('DTSTART') + 1) ;
-      $date_begin = ics_date_to_timestamp($icsdate) ;
-      $properties['date_begin'] = date('Y-m-d H:i:s', $date_begin) ;
-      continue ;
-    }
-
-    // duration
-    if (strpos($line, 'DTEND') === 0) {
-      $icsdate = substr($line, strlen('DTEND') + 1) ;
-      $date_end = ics_date_to_timestamp($icsdate) ;
-      // date_begin ?
-      if ($date_begin == '') {
-        $date_begin = ics_date_to_timestamp(ics_get_property('DTSTART', $vevent)) ;
-      }
-      if ($date_begin != '') {
-      	$duration = $date_end - $date_begin ;
-	if ($duration > 0) {
-	  $properties['event_duration'] = $duration ;
-	}
-      }
-      continue ;
-    }
-
-    // priority
-    if (strpos($line, 'PRIORITY') === 0) {
-      $priority = substr($line, strlen('PRIORITY') + 1) ;
-      $properties['priority'] = $ics_event_priority_to_obm[$priority] ;
-      continue ;
-    }
-
-    // privacy
-    if (strpos($line, 'CLASS') === 0) {
-      $class = substr($line, strlen('CLASS') + 1) ;
-      if ($class == 'PUBLIC') {
-        $privacy = 0 ;
-      }
-      else {
-        $privacy = 1 ;
-      }
-      $properties['privacy'] = $privacy ;
-      continue ;
-    }
-
-    // organizer
-    if (strpos($line, 'ORGANIZER') === 0) {
-      $organizer = substr($line, strlen('ORGANIZER')) ;
-      $userobm = ics_get_obmuser_from_icsuser($organizer) ;
-      if ((is_array($userobm)) and (isset($userobm['uid'])) and ($userobm['uid'] == $obm['uid'])) {
-      	$properties['organizer'] = $userobm ;
-      }
-      else {
-        // current userobm_id is not organizer for this event, stop all process
-	return array() ;
-      }
-      continue ;
-    }
-
-    // attendees
-    if (strpos($line, 'ATTENDEE') === 0) {
-      $attendee = substr($line, strlen('ATTENDEE')) ;
-      $userobm = ics_get_obmuser_from_icsuser($attendee) ;
-      // if attendee ROLE is CHAIR, forget it
-      // if attendee obm_uid is 0, forget it
-      if ((is_array($userobm)) and ($userobm['params']['ROLE'] != 'CHAIR') and isset($userobm['uid']) and ($userobm['uid'] != $c_none)) {
-      	$properties['attendees'][] = $userobm ;
-      }
-    }
-
-    // recurent events
-
-
-  }
-  
-  if ($properties['priority'] == 0) {
-    $properties['priority'] = 2 ;
-  }
-  if ($properties['repeat_kind'] == '') {
-    $properties['repeat_kind'] = 'none' ;
-  }
-
-  return $properties ;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// ics_get_vtodo_properties
-///////////////////////////////////////////////////////////////////////////////
-function ics_get_vtodo_properties($vtodo) {
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// ics_date_to_timestamp
-///////////////////////////////////////////////////////////////////////////////
-function ics_date_to_timestamp($icsdate) {
-  if ($icsdate == '') {
-    return 0 ;
-  }
-  preg_match('/.*(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})){0,1}/', $icsdate, $result) ;
-  list($all, $year, $month, $day, $time, $hour, $minute, $second) = $result ;
-  if(preg_match('/^.*Z$/',$icsdate)) {
-    return gmmktime($hour, $minute, $second, $month, $day, $year) ;
-  } else {
-    return mktime($hour, $minute, $second, $month, $day, $year) ;
-  }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// ics_get_obmuser_from_icsuser
-///////////////////////////////////////////////////////////////////////////////
-function ics_get_obmuser_from_icsuser($attendee_line) {
-  global $c_none ;
-
-  $parameters = array() ;
-  $params = array() ;
-  $cal_address = '' ;
-  $attendee = array() ;
-
-  // split parameters from value (cal address)
-  list($all_parameters, $cal_address) = explode(':', $attendee_line, 2) ;
-  if (strpos($parameters, ';') === 0) {
-    $parameters = rtrim($parameters, ';') ; # FIXME utilité du test ?
-  }
- 
-  if ($cal_address == '') {
-    return $c_none ; // invalid field
-  }
-
-  // get parameters
-  if ($all_parameters != '') {
-    $parameters = split(';', $all_parameters) ;
-    if (count($parameters) > 0) {
-      for ($i = 0; $i < count($parameters) ; $i++) {
-        list($key, $val) = split('=', $parameters[$i]) ;
-        $attendee['params'][$key] = $val ;
-      }
-    }
-  }
-
-  // -- Lotus Note way
-  ics_get_obmuser_from_lotus($attendee, $cal_address) ;
-
-  // -- standard way
-  if (!isset($attendee['uid']) or ($attendee['uid'] == $c_none)) {
-    $attendee['uid'] = ics_get_obmuser_from_smtp($cal_address) ;
-  }
-
-  return $attendee ;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// LOTUS SPECIFIC
-// ics_get_obmuser_from_lotus
-///////////////////////////////////////////////////////////////////////////////
-function ics_get_obmuser_from_lotus(& $attendee, $cal_address) {
- // recup CN ?
-  if (isset($attendee['params']) and (array_key_exists('CN', $attendee['params']))) {
-    list($firstname, $lastname) = explode(' ', $attendee['params']['CN']) ;
-    $uid = search_user_by_name($lastname, $firstname) ;
-    $attendee['uid'] = $uid ;
-  }
-  else { // try to analyse cal_address 
-    if (preg_match('#^(?:CN=|MAILTO:)([^/]*)/#i', trim($cal_address), $matches)) {
-      // seems that some lotus versions have '_' separator and others versions have ' ' separator
-      if (strpos($matches[1], '_') !== false) {
-        list($firstname, $lastname) = explode('_', $matches[1]) ;
-      }
-      else {
-        list($firstname, $lastname) = explode(' ', $matches[1]) ;
-      }
-      $uid = search_user_by_name($lastname, $firstname) ;
-      $attendee['uid'] = $uid ;
-    }
-  }
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // search_user_by_name
 // Parameters:
 //   - $lastname
@@ -1029,26 +780,6 @@ function search_user_by_name($lastname, $firstname) {
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// STANDARD : SMTP address
-// ics_get_obmuser_from_smtp
-///////////////////////////////////////////////////////////////////////////////
-function ics_get_obmuser_from_smtp($cal_address) {
-  global $c_none, $all_emails ;
-
-  $uid = $c_none ;
-
-  if (preg_match('#^MAILTO:([^@]*)@(.*)$#i', trim($cal_address), $matches)) {
-    $user = $matches[1];
-    $domain = $matches[2] ;
-
-    if (array_key_exists("$user@$domain", $all_emails)) {
-      $uid = $all_emails["$user@$domain"] ;
-    }
-  }
-
-  return $uid ;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurrence of each event,
@@ -2906,8 +2637,8 @@ function run_query_get_events_attendee($events) {
  */
 function run_query_get_events_exception($events,$start_time = NULL,$end_time = NULL) {
   global $cdg_sql;
-  $event_list = implode(',',$events) ;
   $obm_q = new DB_OBM;
+  $event_list = implode(',',$events) ;
   $calendarexception_date = sql_date_format($obm_q->type,'calendarexception_date');
   $calendarexception_date_l = sql_date_format($obm_q->type,'calendarexception_date','calendarexception_date');  
   if(!is_null($start_time)) {
@@ -4143,8 +3874,18 @@ function run_query_calendar_reset($id) {
   global $cdg_sql, $obm;
   $obm_q = new DB_OBM;
   $calendar['mail'] = false;
-
-  $query = "SELECT calendarevent_id FROM CalendarEvent WHERE calendarevent_owner = $id";
+  
+  $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
+  $writable = $writable['ids'];
+  # Delete all events where the user is the owner and an attendee and all events where the owner
+  # is writable and the user is the only attendee
+  $query = "SELECT calendarevent_id FROM CalendarEvent LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
+            WHERE (calendarevent_owner = $id AND evententity_entity_id = $id AND evententity_entity = 'user')
+            UNION
+            SELECT calendarevent_id FROM CalendarEvent LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
+            WHERE calendarevent_owner IN  (".implode(',',$writable).") AND evententity_entity = 'user'
+            GROUP BY calendarevent_id HAVING MAX(evententity_entity_id) = MIN(evententity_entity_id)
+            ";
   display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
   $obm_q->query($query);
   
@@ -4152,34 +3893,20 @@ function run_query_calendar_reset($id) {
     $calendar['calendar_id'] = $obm_q->f('calendarevent_id');
     run_query_calendar_delete($calendar);
   }
-  $query = "DELETE FROM EventEntity WHERE evententity_entity_id = $id AND evententity_entity = 'user'";
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
+
+  # Refuse all other events
+  $query = "SELECT evententity_event_id FROM EventEntity WHERE evententity_entity_id = $id and evententity_entity = 'user'
+            AND evententity_state != 'R'";
   $obm_q->query($query);
-  
+  while($obm_q->next_record()) {
+    run_query_calendar_update_occurrence_state($obm_q->f('calendarevent_id'), 'user', $id, 'R');
+  }
+  # Delete all alerts
+
   $query = "DELETE FROM CalendarAlert WHERE calendaralert_event_id NOT IN (SELECT evententity_event_id FROM EventEntity) 
                   OR calendaralert_user_id = $id";
   display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
   $obm_q->query($query);
-    
-  $query = "DELETE FROM CalendarException WHERE calendarexception_event_id NOT IN (SELECT evententity_event_id FROM EventEntity)";
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
-  $obm_q->query($query);
-  
-  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id NOT IN (SELECT evententity_event_id FROM EventEntity)";
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
-  $obm_q->query($query);
-
-/*  
-  $obm_q = new DB_OBM;
-
-  $query = "DELETE FROM EventEntity WHERE evententity_entity_id = '$id' AND evententity_entity = 'user'";
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset()");
-  $obm_q->query($query);
-
-  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id NOT IN (SELECT evententity_event_id FROM EventEntity GROUP BY evententity_event_id)";
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_reset(bis)");
-  $obm_q->query($query);
- */
 }
 
 

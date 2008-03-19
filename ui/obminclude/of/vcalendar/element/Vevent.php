@@ -49,13 +49,13 @@ class Vcalendar_Element_Vevent extends Vcalendar_Element {
   }
     
   function isAllDay() {
+    if($this->get('x-obm-all-day') == 1) {
+      return true;
+    }
     if(date('His', $this->date) == '000000' && date('His', $this->date + $this->duration) == '000000') {
       return true;
     }
     if($this->duration == '0') {
-      return true;
-    }
-    if($this->xObmAllDay == 1) {
       return true;
     }
     return false;
