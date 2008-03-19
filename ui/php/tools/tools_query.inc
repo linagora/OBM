@@ -458,7 +458,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   $return['links'] = $obm_qm->f('links');
   // Add Union result (bi directionnal => 2 results)
   $obm_qm->next_record();
-  $return['links'] .= $obm_qm->f('links');
+  $return['links'] += $obm_qm->f('links');
   $return['diff'] += $return['links'];
 
   return $return;

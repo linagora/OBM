@@ -8,6 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -28,7 +29,7 @@ sub new {
         toDelete => undef,
         archive => undef,
         sieve => undef,
-        userId => undef,
+        objectId => undef,
         domainId => undef,
         userDesc => undef,
         objectclass => undef,
@@ -45,7 +46,7 @@ sub new {
         return undef;
 
     }else {
-        $obmSystemUserAttr{"userId"} = $userId;
+        $obmSystemUserAttr{"objectId"} = $userId;
     }
 
 
@@ -69,7 +70,7 @@ sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
 
-    my $userId = $self->{"userId"};
+    my $userId = $self->{"objectId"};
     if( !defined($userId) ) {
         &OBM::toolBox::write_log( "[Entities::obmSystemUser]: aucun identifiant d'utilisateur systeme definit", "W" );
         return 0;
@@ -210,8 +211,8 @@ sub getEntityDescription {
         return $description;
     }
 
-    if( defined($self->{userId}) ) {
-        $description .= "ID BD '".$self->{userId}."'";
+    if( defined($self->{objectId}) ) {
+        $description .= "ID BD '".$self->{objectId}."'";
     }
 
     if( defined($self->{type}) ) {
@@ -219,43 +220,6 @@ sub getEntityDescription {
     }
 
     return $description;
-}
-
-
-sub setDelete {
-    my $self = shift;
-
-    $self->{"toDelete"} = 1;
-
-    return 1;
-}
-
-
-sub getDelete {
-    my $self = shift;
-
-    return $self->{"toDelete"};
-}
-
-
-sub getArchive {
-    my $self = shift;
-
-    return $self->{"archive"};
-}
-
-
-sub isLinks {
-    my $self = shift;
-
-    return $self->{"links"};
-}
-
-
-sub getLdapObjectclass {
-    my $self = shift;
-
-    return $self->{objectclass};
 }
 
 

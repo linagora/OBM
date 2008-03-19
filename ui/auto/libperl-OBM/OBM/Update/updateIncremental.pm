@@ -27,7 +27,7 @@ require OBM::Entities::obmMailshare;
 require OBM::Entities::obmMailServer;
 require OBM::Entities::obmSambaDomain;
 require OBM::Update::utils;
-use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost);
+use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost _deleteDbEntity);
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 
@@ -318,19 +318,26 @@ sub _incrementalUpdate {
 
         my $return = $self->_runEngines( $object );
 
+        if( $return == 2 ) {
+            $return = $self->_updateUpdatedLinks( $object );
+        }
+
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # La MAJ de l'entité c'est bien passée, on met à jour la BD de
             # travail
             $return = $object->updateDbEntity( $self->{"dbHandler"} );
-            if( $object->isLinks() ) {
-                $return = !$return || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+            if( $return && $object->isLinks() ) {
+                $return = $object->updateDbEntityLinks( $self->{"dbHandler"} );
             }
 
             if( $return ) {
                 # MAJ de la BD de travail ok, on nettoie les tables de MAJ
                 # incrémentales
                 $return = $self->_updateIncrementalTable( "Updated", $updatedId );
-                
+
+                if( $return && $object->isLinks() ) {
+                    $return = $self->_updateIncrementalTable( "Updatedlinks", $updatedId );
+                }
             }
         }
 
@@ -497,41 +504,6 @@ sub _tableNamePrefix {
 }
 
 
-sub _deleteDbEntity {
-    my $self = shift;
-    my ( $table, $id ) = @_;
-
-    if( !defined($table) ) {
-        return 0;
-    }
-
-    if( !defined($id) || ($id !~ /^\d+$/) )  {
-        return 0;
-    }
-
-
-    # Gestion des exceptions
-    my $columnPrefix = $self->_tableNamePrefix( $table );
-
-
-    # On supprime les informations de l'entité de la table de travail
-    my $dbHandler = $self->{"dbHandler"};
-    my $queryResult;
-    my $query = "DELETE FROM P_".$table." WHERE ".$columnPrefix."_id=".$id;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete", "W" );
-        if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
-        }
-
-        return 0;
-    }
-
-
-    return 1;
-}
-
-
 sub _updateIncrementalTable {
     my $self = shift;
     my( $table, $id ) = @_;
@@ -549,12 +521,123 @@ sub _updateIncrementalTable {
     my $deleteQueryResult;
     my $query = "DELETE FROM ".$table." WHERE ".lc($table)."_id=".$id;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$deleteQueryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete", "W" );
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
         if( defined($deleteQueryResult) ) {
             &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$deleteQueryResult->err, "W" );
         }
 
         return 0;
+    }
+
+    return 1;
+}
+
+
+sub _updateUpdatedLinks {
+    my $self = shift;
+    my ( $object ) = @_;
+    my $dbHandler = $self->{"dbHandler"};
+    my( $domain, $user, $delegation ) = @_;
+
+    if( !defined($self->{domain}) ) {
+        return 0;
+    }else {
+        $domain = $self->{domain};
+    }
+
+    if( !defined($self->{user}) ) {
+        $user = "NULL";
+    }else {
+        $user = $self->{user};
+    }
+
+    if( !defined($self->{delegation}) ) {
+        $delegation = "";
+    }else {
+        $delegation = $self->{delegation};
+    }
+
+
+    SWITCH: {
+        if( defined($object->getEntityId()) && ($object->getType() eq $OBM::Parameters::ldapConf::POSIXUSERS) ) {
+            my $queryResult;
+
+            # Obtention des groupes impactés par le changement d'identifiant
+            my $query = "INSERT INTO Updatedlinks
+                (updatedlinks_domain_id, updatedlinks_user_id, updatedlinks_delegation, updatedlinks_table, updatedlinks_entity, updatedlinks_entity_id)
+                SELECT
+                  ".$domain.",
+                  ".$user.",
+                  \"".$delegation."\",
+                  \"UGroup\",
+                  of_usergroup_group_id,
+                  of_usergroup_group_id
+                FROM P_of_usergroup
+                LEFT JOIN Updatedlinks ON of_usergroup_group_id=updatedlinks_entity_id AND updatedlinks_table=\"UGroup\" AND updatedlinks_domain_id=".$domain."
+                WHERE updatedlinks_entity_id is null AND of_usergroup_user_id=".$object->getEntityId();
+
+            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+                $query =~ s/\s+/ /g;
+                &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
+                if( defined($queryResult) ) {
+                    &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
+                }
+
+                return 0;
+            }
+
+
+            # Obtention des partages de messagerie impactés par le changement
+            # d'identifiant
+            $query = "INSERT INTO Updatedlinks
+                (updatedlinks_domain_id, updatedlinks_user_id, updatedlinks_delegation, updatedlinks_table, updatedlinks_entity, updatedlinks_entity_id)
+                SELECT
+                  ".$domain.",
+                  ".$user.",
+                  \"".$delegation."\",
+                  \"MailShare\",
+                  entityright_entity_id,
+                  entityright_entity_id
+                FROM P_EntityRight
+                LEFT JOIN Updatedlinks ON updatedlinks_entity_id=entityright_entity_id AND updatedlinks_table=\"MailShare\"
+                WHERE updatedlinks_entity_id is null AND entityright_consumer=\"user\" AND entityright_consumer_id=".$object->getEntityId()." AND entityright_entity=\"MailShare\"";
+
+            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+                $query =~ s/\s+/ /g;
+                &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
+                if( defined($queryResult) ) {
+                    &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
+                }
+
+                return 0;
+            }
+
+
+            # Obtention des partages de messagerie impactés par le changement
+            # d'identifiant
+            $query = "INSERT INTO Updatedlinks
+                (updatedlinks_domain_id, updatedlinks_user_id, updatedlinks_delegation, updatedlinks_table, updatedlinks_entity, updatedlinks_entity_id)
+                SELECT
+                  ".$domain.",
+                  ".$user.",
+                  \"".$delegation."\",
+                  \"UserObm\",
+                  entityright_entity_id,
+                  entityright_entity_id
+                FROM P_EntityRight
+                LEFT JOIN Updatedlinks ON updatedlinks_entity_id=entityright_entity_id AND updatedlinks_table=\"mailbox\"
+                WHERE updatedlinks_entity_id is null AND entityright_consumer=\"user\" AND entityright_consumer_id=".$object->getEntityId()." AND entityright_entity=\"mailbox\"";
+
+            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+                $query =~ s/\s+/ /g;
+                &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
+                if( defined($queryResult) ) {
+                    &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
+                }
+
+                return 0;
+            }
+        }
     }
 
     return 1;

@@ -258,7 +258,7 @@ sub _doWork {
         # On la crée
         $returnCode = $self->_createMailbox( $cyrusSrv, $object );
         if( !$returnCode ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec lors de la creation de la boite", "W" );
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec lors de la creation/renommage de la boite", "W" );
             return 0;
         }
 
@@ -688,7 +688,10 @@ sub _createMailbox {
     # Si la BAL 'current' est définie, existe et est différente de la BAL 'new', on renomme
     # Si la BAL 'current' est définie et n'existe pas, on crée la 'new'
     # Si la BAL 'current' n'est pas définie, on crée la 'new'
+    my $action;
     if( defined($currentBoxName) && ($currentBoxName ne $newBoxName) && ($self->isMailboxExist( $cyrusSrv, undef, $boxPrefix, $currentBoxName) ) ) {
+        $action = "rename";
+
         # On renomme la BAL
         if( !defined( $boxPartition ) ) {
             &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: renommage de la boite '".$currentBoxName."' vers '".$newBoxName."' sur la partition Cyrus par defaut, du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
@@ -699,6 +702,8 @@ sub _createMailbox {
         $cyrusSrvConn->rename( $boxPrefix.$currentBoxName, $boxPrefix.$newBoxName, $boxPartition );
         $returnCode = 2;
     }else {
+        $action = "create";
+
         # Création de la boîte
         if( !defined( $boxPartition ) ) {
             &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: creation de la boite '".$newBoxName."' sur la partition Cyrus par defaut, du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
@@ -711,7 +716,14 @@ sub _createMailbox {
     }
 
     if( $cyrusSrvConn->error() ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a la creation/renommage de la BAL : ".$cyrusSrvConn->error(), "W" );
+        if( $action eq "rename" ) {
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus au renommage de la BAL : ".$cyrusSrvConn->error(), "W" );
+        }elsif( $action eq "create" ) {
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a la creation de la BAL : ".$cyrusSrvConn->error(), "W" );
+        }else {
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus : ".$cyrusSrvConn->error(), "W" );
+        }
+            
         &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: verifiez que la version de Cyrus (2.1 min) et que l'option 'allowusermoves' est active !", "W" );
         return 0;
     }

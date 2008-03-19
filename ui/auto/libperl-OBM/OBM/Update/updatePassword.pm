@@ -84,12 +84,12 @@ sub new {
     # Création de l'objet de l'utilisateur
     $updatePasswdAttr{userObject} = OBM::Entities::obmUser->new( 0, 0, $updatePasswdAttr{userId} );
     if( !defined($updatePasswdAttr{userObject}) ) {
-        &OBM::toolBox::write_log( "[Update::updatePassword]: erreur a la mise a jour de l'utilisateur.", "W" );
+        &OBM::toolBox::write_log( "[Update::updatePassword]: erreur a l'initialisation de l'utilisateur.", "W" );
         return undef;
     }
 
     if( !$updatePasswdAttr{userObject}->getEntity( $updatePasswdAttr{dbHandler}, &OBM::Update::utils::findDomainbyId( $updatePasswdAttr{domainList}, $updatePasswdAttr{domainId} ) ) ) {
-        &OBM::toolBox::write_log( "[Update::updatePassword]: erreur a la mise a jour de l'utilisateur.", "W" );
+        &OBM::toolBox::write_log( "[Update::updatePassword]: erreur a l'initialisation de l'utilisateur.", "W" );
         return undef;
     }
 

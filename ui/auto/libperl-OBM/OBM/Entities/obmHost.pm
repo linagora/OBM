@@ -8,6 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -27,7 +28,7 @@ sub new {
         links => undef,
         toDelete => undef,
         sieve => undef,
-        hostId => undef,
+        objectId => undef,
         domainId => undef,
         hostDbDesc => undef,        # Pure description BD
         hostDesc => undef,          # Propriétés calculées
@@ -45,7 +46,7 @@ sub new {
         &OBM::toolBox::write_log( "[Entities::obmHost]: identifiant d'hote incorrect", "W" );
         return undef;
     }else {
-        $obmHostAttr{"hostId"} = $hostId;
+        $obmHostAttr{"objectId"} = $hostId;
     }
 
 
@@ -68,7 +69,7 @@ sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
 
-    my $hostId = $self->{"hostId"};
+    my $hostId = $self->{"objectId"};
     if( !defined($hostId) ) {
         &OBM::toolBox::write_log( "[Entities::obmHost]: aucun identifiant d'hote definit", "W" );
         return 0;
@@ -141,7 +142,7 @@ sub getEntity {
     $self->{hostDesc}->{host_domain} = $domainDesc->{domain_label};
 
     # Gestion de l'adresse IP de l'hôte
-    if( !$dbEntry->{host_ip} || $dbEntry->{host_ip} !~ $regexp_ip ) {
+    if( !$dbEntry->{host_ip} || $dbEntry->{host_ip} !~ /$regexp_ip/ ) {
         $self->{hostDesc}->{host_ip} = "0.0.0.0";
     }else {
         $self->{hostDesc}->{host_ip} = $dbEntry->{host_ip};
@@ -258,8 +259,8 @@ sub getEntityDescription {
         return $description;
     }
 
-    if( defined($self->{hostId}) ) {
-        $description .= "ID BD '".$self->{hostId}."'";
+    if( defined($self->{objectId}) ) {
+        $description .= "ID BD '".$self->{objectId}."'";
     }
 
     if( defined($self->{type}) ) {
@@ -267,36 +268,6 @@ sub getEntityDescription {
     }
 
     return $description;
-}
-
-
-sub setDelete {
-    my $self = shift;
-
-    $self->{"toDelete"} = 1;
-
-    return 1;
-}
-
-
-sub getDelete {
-    my $self = shift;
-
-    return $self->{"toDelete"};
-}
-
-
-sub getArchive {
-    my $self = shift;
-
-    return 0;
-}
-
-
-sub isLinks {
-    my $self = shift;
-
-    return $self->{"links"};
 }
 
 

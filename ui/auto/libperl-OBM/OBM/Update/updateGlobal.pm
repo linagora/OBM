@@ -28,8 +28,7 @@ require OBM::Entities::obmMailshare;
 require OBM::Entities::obmMailServer;
 require OBM::Entities::obmSambaDomain;
 require OBM::Update::utils;
-use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost _doSystemUser _doSambaDomain
-_doMailServer);
+use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost _doSystemUser _doSambaDomain _doMailServer _deleteDbEntity);
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 

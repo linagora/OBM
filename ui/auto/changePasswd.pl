@@ -217,7 +217,10 @@ sub getParameter {
 # Traitement des paramètres
 &OBM::toolBox::write_log( "Analyse des parametres du script", "W", 3 );
 my %parameters;
-getParameter( \%parameters );
+if( getParameter( \%parameters ) ) {
+     &OBM::toolBox::write_log( "", "C" );
+     exit 1;
+}
 
 # On se connecte a la base
 my $dbHandler;

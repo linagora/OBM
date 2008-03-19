@@ -28,6 +28,7 @@ $VERSION = "1.0";
                     _doSystemUser
                     _doSambaDomain
                     _doMailServer
+                    _deleteDbEntity
                );
 
 
@@ -83,10 +84,18 @@ sub _runEngines {
 
     my $engines = $self->{"engine"};
     while( (my( $engineType, $engine ) = each(%{$engines})) && $return ) {
+        my $engineReturn;
         if( defined( $engine ) ) {
-            $return = $engine->update( $object );
+            $engineReturn = $engine->update( $object );
+        }
+
+        if( !$engineReturn ) {
+            $return = $engineReturn;
+        }elsif( $engineReturn > $return ) {
+            $return = $engineReturn;
         }
     }
+
 
     if( !$return ) {
         # On ré-initialise le compteur interne de la table de hachage
@@ -264,4 +273,39 @@ sub _doMailServer {
     }
 
     return $mailServerObject;
+}
+
+
+sub _deleteDbEntity {
+    my $self = shift;
+    my ( $table, $id ) = @_;
+
+    if( !defined($table) ) {
+        return 0;
+    }
+
+    if( !defined($id) || ($id !~ /^\d+$/) )  {
+        return 0;
+    }
+
+
+    # Gestion des exceptions
+    my $columnPrefix = $self->_tableNamePrefix( $table );
+
+
+    # On supprime les informations de l'entité de la table de travail
+    my $dbHandler = $self->{"dbHandler"};
+    my $queryResult;
+    my $query = "DELETE FROM P_".$table." WHERE ".$columnPrefix."_id=".$id;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete", "W" );
+        if( defined($queryResult) ) {
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
+        }
+
+        return 0;
+    }
+
+
+    return 1;
 }

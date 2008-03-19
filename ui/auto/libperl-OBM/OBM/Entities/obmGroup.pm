@@ -8,6 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -27,7 +28,7 @@ sub new {
         toDelete => undef,
         archive => undef,
         sieve => undef,
-        groupId => undef,
+        objectId => undef,
         domainId => undef,
         groupDbDesc => undef,       # Pure description BD
         groupDesc => undef,         # Propriétés calculées
@@ -46,7 +47,7 @@ sub new {
         return undef;
 
     }else {
-        $obmGroupAttr{groupId} = $groupId;
+        $obmGroupAttr{objectId} = $groupId;
     }
 
     $obmGroupAttr{links} = $links;
@@ -69,7 +70,7 @@ sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
 
-    my $groupId = $self->{groupId};
+    my $groupId = $self->{objectId};
     if( !defined($groupId) ) {
         &OBM::toolBox::write_log( "[Entities::obmGroup]:aucun identifiant de groupe definit", "W" );
         return 0;
@@ -235,7 +236,7 @@ sub updateDbEntityLinks {
 
     # On supprime les liens actuels de la table de production des liens
     # utilisateurs/groupes
-    my $query = "DELETE FROM P_of_usergroup WHERE of_usergroup_group_id=".$self->{groupId};
+    my $query = "DELETE FROM P_of_usergroup WHERE of_usergroup_group_id=".$self->{objectId};
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
@@ -243,7 +244,7 @@ sub updateDbEntityLinks {
 
 
     # On copie les nouveaux droits
-    $query = "INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_group_id=".$self->{groupId};
+    $query = "INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_group_id=".$self->{objectId};
 
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d' une requete SQL : ".$dbHandler->err, "W" );
@@ -302,8 +303,8 @@ sub getEntityDescription {
         return $description;
     }
 
-    if( defined($self->{groupId}) ) {
-        $description .= "ID BD '".$self->{groupId}."'";
+    if( defined($self->{objectId}) ) {
+        $description .= "ID BD '".$self->{objectId}."'";
     }
 
     if( defined($self->{type}) ) {
@@ -311,36 +312,6 @@ sub getEntityDescription {
     }
 
     return $description;
-}
-
-
-sub setDelete {
-    my $self = shift;
-
-    $self->{toDelete} = 1;
-
-    return 1;
-}
-
-
-sub getDelete {
-    my $self = shift;
-
-    return $self->{toDelete};
-}
-
-
-sub getArchive {
-    my $self = shift;
-
-    return $self->{archive};
-}
-
-
-sub isLinks {
-    my $self = shift;
-
-    return $self->{links};
 }
 
 
@@ -375,7 +346,7 @@ sub _getGroupUsersSid {
 sub _getGroupUsers {
     my $self = shift;
     my( $dbHandler, $domainDesc, $sqlResultColumn, $sqlRequest ) = @_;
-    my $groupId = $self->{groupId};
+    my $groupId = $self->{objectId};
 
 
     if( !defined($dbHandler) ) {

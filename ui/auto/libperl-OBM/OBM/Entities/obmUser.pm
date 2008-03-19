@@ -8,6 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -31,7 +32,7 @@ sub new {
         toDelete => undef,
         archive => undef,
         sieve => undef,
-        userId => undef,
+        objectId => undef,
         domainId => undef,
         userDbDesc => undef,        # Pure description BD
         userDesc => undef,          # Propriétés calculées
@@ -51,7 +52,7 @@ sub new {
         return undef;
 
     }else {
-        $obmUserAttr{"userId"} = $userId;
+        $obmUserAttr{"objectId"} = $userId;
     }
 
 
@@ -77,7 +78,7 @@ sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
 
-    my $userId = $self->{"userId"};
+    my $userId = $self->{"objectId"};
     if( !defined($userId) ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: aucun identifiant d'utilisateur definit", "W" );
         return 0;
@@ -186,9 +187,6 @@ sub getEntity {
     # On range les résultats dans la structure de données des résultats
     $self->{userDesc}->{userobm_domain} = $domainDesc->{domain_label};
 
-#    if( !defined($dbUserMoreDesc->{current_userobm_login}) ) {
-#        $self->{userDesc}->{current_userobm_login} = $dbUserDesc->{userobm_login};
-#    }else {
     if( $self->getDelete() ) {
         $self->{userDesc}->{current_userobm_login} = $dbUserDesc->{userobm_login};
     }elsif( defined($dbUserMoreDesc->{current_userobm_login}) ) {
@@ -459,7 +457,7 @@ sub updateDbEntityLinks {
     &OBM::toolBox::write_log( "[Entities::obmUser]: MAJ des liens de l'utilisateur ".$self->getEntityDescription()." dans les tables de production", "W" );
 
     # On supprime les liens actuels de la table de production
-    my $query = "DELETE FROM P_EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"userId"};
+    my $query = "DELETE FROM P_EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"objectId"};
 
     my $queryResult;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
@@ -469,7 +467,7 @@ sub updateDbEntityLinks {
 
 
     # On copie les nouveaux droits
-    $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"userId"};
+    $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"objectId"};
 
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
@@ -502,7 +500,7 @@ sub updateDbEntityPassword {
     &OBM::toolBox::write_log( "[Entities::obmUser]: mise a jour du mot de passe SQL de l'utilisateur : ".$self->getEntityDescription(), "W" );
     
 
-    my $query = "UPDATE UserObm SET userobm_password_type=".$dbHandler->quote($passwordDesc->{newPasswordType}).", userobm_password=".$dbHandler->quote($passwordDesc->{newPassword})." WHERE userobm_id=".$self->{userId};
+    my $query = "UPDATE UserObm SET userobm_password_type=".$dbHandler->quote($passwordDesc->{newPasswordType}).", userobm_password=".$dbHandler->quote($passwordDesc->{newPassword})." WHERE userobm_id=".$self->{objectId};
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution de la requete.", "W" );
         if( defined($queryResult) ) {
@@ -513,7 +511,7 @@ sub updateDbEntityPassword {
     }
 
 
-    $query = "UPDATE P_UserObm SET userobm_password_type=".$dbHandler->quote($passwordDesc->{newPasswordType}).", userobm_password=".$dbHandler->quote($passwordDesc->{newPassword})." WHERE userobm_id=".$self->{userId};
+    $query = "UPDATE P_UserObm SET userobm_password_type=".$dbHandler->quote($passwordDesc->{newPasswordType}).", userobm_password=".$dbHandler->quote($passwordDesc->{newPassword})." WHERE userobm_id=".$self->{objectId};
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution de la requete.", "W" );
         if( defined($queryResult) ) {
@@ -564,8 +562,8 @@ sub getEntityDescription {
         return $description;
     }
 
-    if( defined($self->{userId}) ) {
-        $description .= "ID BD '".$self->{userId}."'";
+    if( defined($self->{objectId}) ) {
+        $description .= "ID BD '".$self->{objectId}."'";
     }
 
     if( defined($self->{type}) ) {
@@ -576,42 +574,12 @@ sub getEntityDescription {
 }
 
 
-sub setDelete {
-    my $self = shift;
-
-    $self->{"toDelete"} = 1;
-
-    return 1;
-}
-
-
-sub getDelete {
-    my $self = shift;
-
-    return $self->{"toDelete"};
-}
-
-
-sub getArchive {
-    my $self = shift;
-
-    return $self->{"archive"};
-}
-
-
-sub isLinks {
-    my $self = shift;
-
-    return $self->{"links"};
-}
-
-
 sub _getEntityMailboxAcl {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
     my $dbEntry = $self->{userDbDesc};
     my $entryProp = $self->{"userDesc"};
-    my $userId = $self->{"userId"};
+    my $userId = $self->{"objectId"};
 
     if( $entryProp->{"userobm_mail_perms"} ) {
         my $entityType = $self->{"entityRightType"};

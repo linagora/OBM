@@ -8,6 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -27,7 +28,7 @@ sub new {
         toDelete => undef,
         archive => undef,
         sieve => undef,
-        mailShareId => undef,
+        objectId => undef,
         domainId => undef,
         mailShareDesc => undef,
         mailShareDbDesc => undef,
@@ -45,7 +46,7 @@ sub new {
         return undef;
 
     }else {
-        $obmMailshareAttr{"mailShareId"} = $mailShareId;
+        $obmMailshareAttr{"objectId"} = $mailShareId;
 
     }
 
@@ -71,7 +72,7 @@ sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
 
-    my $mailShareId = $self->{"mailShareId"};
+    my $mailShareId = $self->{"objectId"};
     if( !defined($mailShareId) ) {
         &OBM::toolBox::write_log( "[Entities::obmMailshare]: aucun identifiant de partage de messagerie definit", "W" );
         return 0;
@@ -281,7 +282,7 @@ sub updateDbEntityLinks {
     &OBM::toolBox::write_log( "[Entities::obmMailshare]: MAJ des liens de la boite a lettre partagee ".$self->getEntityDescription()." dans les tables de production", "W" );
 
     # On supprime les liens actuels de la table de production
-    my $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"mailShareId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
+    my $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"objectId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
@@ -289,7 +290,7 @@ sub updateDbEntityLinks {
 
 
     # On copie les nouveaux droits
-    $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"mailShareId"};
+    $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"objectId"};
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmMailshare]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
         return 0;
@@ -335,8 +336,8 @@ sub getEntityDescription {
         return $description;
     }
 
-    if( defined($self->{mailShareId}) ) {
-        $description .= "ID BD '".$self->{mailShareId}."'";
+    if( defined($self->{objectId}) ) {
+        $description .= "ID BD '".$self->{objectId}."'";
     }
 
     if( defined($self->{type}) ) {
@@ -347,47 +348,10 @@ sub getEntityDescription {
 }
 
 
-sub setDelete {
-    my $self = shift;
-
-    $self->{"toDelete"} = 1;
-
-    return 1;
-}
-
-
-sub getDelete {
-    my $self = shift;
-
-    return $self->{"toDelete"};
-}
-
-
-sub getArchive {
-    my $self = shift;
-
-    return $self->{"archive"};
-}
-
-
-sub isLinks {
-    my $self = shift;
-
-    return $self->{"links"};
-}
-
-
-sub getLdapObjectclass {
-    my $self = shift;
-
-    return $self->{objectclass};
-}
-
-
 sub _getEntityMailShareAcl {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
-    my $mailShareId = $self->{"mailShareId"};
+    my $mailShareId = $self->{"objectId"};
 
     if( !$self->{"mailShareDesc"}->{"mailshare_mailperms"} ) {
         $self->{"mailShareDesc"}->{"user_mailshare_acl"} = undef;

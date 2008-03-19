@@ -8,6 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -64,36 +65,6 @@ sub getEntity {
     $self->{"domainDesc"} = $domainDesc;
 
     return 1;
-}
-
-
-sub setDelete {
-    my $self = shift;
-
-    $self->{"toDelete"} = 1;
-
-    return 1;
-}
-
-
-sub getDelete {
-    my $self = shift;
-
-    return $self->{"toDelete"};
-}
-
-
-sub getArchive {
-    my $self = shift;
-
-    return 0;
-}
-
-
-sub getLdapObjectclass {
-    my $self = shift;
-
-    return $self->{objectclass};
 }
 
 
