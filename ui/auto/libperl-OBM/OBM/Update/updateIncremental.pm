@@ -563,6 +563,7 @@ sub _updateUpdatedLinks {
             my $queryResult;
 
             # Obtention des groupes impactés par le changement d'identifiant
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: programmation de la mise a jour des liens des groupes liees a l'entite renommee", "W" );
             my $query = "INSERT INTO Updatedlinks
                 (updatedlinks_domain_id, updatedlinks_user_id, updatedlinks_delegation, updatedlinks_table, updatedlinks_entity, updatedlinks_entity_id)
                 SELECT
@@ -589,6 +590,7 @@ sub _updateUpdatedLinks {
 
             # Obtention des partages de messagerie impactés par le changement
             # d'identifiant
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: programmation de la mise a jour des liens des repertoires partages liees a l'entite renommee", "W" );
             $query = "INSERT INTO Updatedlinks
                 (updatedlinks_domain_id, updatedlinks_user_id, updatedlinks_delegation, updatedlinks_table, updatedlinks_entity, updatedlinks_entity_id)
                 SELECT
@@ -615,6 +617,7 @@ sub _updateUpdatedLinks {
 
             # Obtention des partages de messagerie impactés par le changement
             # d'identifiant
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: programmation de la mise a jour des liens des utilisateurs liees a l'entite renommee", "W" );
             $query = "INSERT INTO Updatedlinks
                 (updatedlinks_domain_id, updatedlinks_user_id, updatedlinks_delegation, updatedlinks_table, updatedlinks_entity, updatedlinks_entity_id)
                 SELECT

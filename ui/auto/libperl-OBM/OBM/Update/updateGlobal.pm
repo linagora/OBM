@@ -170,6 +170,11 @@ sub update {
         $return = $self->_updateState();
     }
 
+    if( $return ) {
+        # Suite à une exécution en mode global, on s'assure que les tables Updated
+        $self->_cleanUpdateDbTable();
+    }
+
     return $return;
 }
 
@@ -242,7 +247,7 @@ sub _doGlobalUpdate {
     $return = $self->_runEngines( $object );
 
     if( $return ) {
-        # La MAJ de l'entité c'est bien passée, on met a jour la BD de travail
+        # La MAJ de l'entité s'est bien passée, on met a jour la BD de travail
         $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
         if( $object->isLinks() ) {
             $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
@@ -263,7 +268,7 @@ sub _doGlobalUpdate {
     $return = $self->_runEngines( $object );
 
     if( $return ) {
-        # La MAJ de l'entité c'est bien passée, on met a jour la BD de travail
+        # La MAJ de l'entité s'est bien passée, on met a jour la BD de travail
         $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
         if( $object->isLinks() ) {
             $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
@@ -289,7 +294,7 @@ sub _doGlobalUpdate {
             $updateMailSrv->destroy();
     
             if( $return ) {
-                # Si tout c'est bien passé, il faut rétablir les connexions à Cyrus
+                # Si tout s'est bien passé, il faut rétablir les connexions à Cyrus
                 if( defined($self->{"engine"}->{"cyrusEngine"}) ) {
                     if( !$self->{"engine"}->{"cyrusEngine"}->init() ) {
                         delete( $self->{"engine"}->{"cyrusEngine"} );
@@ -315,7 +320,7 @@ sub _doGlobalUpdate {
 
         my $return = $self->_runEngines( $object );
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met a jour la BD de travail
+            # La MAJ de l'entité s'est bien passée, on met a jour la BD de travail
             $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
             if( $object->isLinks() ) {
                 $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
@@ -374,7 +379,7 @@ sub _doGlobalUpdate {
 
         my $return = $self->_runEngines( $object );
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
             # travail
             $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
             if( $object->isLinks() ) {
@@ -404,7 +409,7 @@ sub _doGlobalUpdate {
 
         my $return = $self->_runEngines( $object );
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
             # travail
             $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
             if( $object->isLinks() ) {
@@ -457,7 +462,7 @@ sub _doGlobalDelete {
 
         my $return = $self->_runEngines( $object );
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
             # travail
             $globalReturn = $globalReturn && $self->_deleteDbEntity( "Host", $hostId );
         }
@@ -476,7 +481,7 @@ sub _doGlobalDelete {
 
         my $return = $self->_runEngines( $object );
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
             # travail
             $globalReturn = $globalReturn && $self->_deleteDbEntity( "UserObm", $userId );
         }
@@ -495,7 +500,7 @@ sub _doGlobalDelete {
 
         my $return = $self->_runEngines( $object );
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
             # travail
             $globalReturn = $globalReturn && $self->_deleteDbEntity( "UGroup", $groupId );
         }
@@ -514,7 +519,7 @@ sub _doGlobalDelete {
 
         my $return = $self->_runEngines( $object );
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met a jour la BD de
+            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
             # travail
             $globalReturn = $globalReturn && $self->_deleteDbEntity( "MailShare", $mailshareId );
         }
@@ -593,6 +598,90 @@ sub _updateDbDomain {
     $query = "INSERT INTO P_Samba SELECT * FROM Samba WHERE samba_domain_id=".$domainId;
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Update::updateGlobal]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        return 0;
+    }
+
+
+    return 1;
+}
+
+
+# Suite à une exécution en mode global, on s'assure que les tables Updated,
+# Updatedinks et Deleted ne contiennent pas d'informations en rapport aux
+# données conservées
+sub _cleanUpdateDbTable {
+    my $self = shift;
+    my $queryResult;
+
+    if( !defined($self->{"dbHandler"}) ) {
+        return 0;
+    }
+    my $dbHandler = $self->{"dbHandler"};
+
+    if( !defined($self->{domain}) ) {
+        return 0;
+    }
+
+
+    # Purge de la table Updated
+    my $query = "DELETE FROM Updated WHERE updated_domain_id=".$self->{domain};
+    if( defined($self->{user}) ) {
+        $query .= " AND updated_user_id=".$self->{user};
+    }
+    if( defined($self->{delegation}) ) {
+        $query .= " AND updatedlinks_delegation=\"".$self->{delegation}."\"";
+    }
+    &OBM::toolBox::write_log( "[Update::updateGlobal]: purge de la table 'Updated'", "W" );
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        $query =~ s/\s+/ /g;
+
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
+        if( defined($dbHandler->err) ) {
+           &OBM::toolBox::write_log( "[Update::updateGlobal]: ".$dbHandler->err, "W" );
+        }
+
+        return 0;
+    }
+
+
+    # Purge de la table Updatedlinks
+    $query = "DELETE FROM Updatedlinks WHERE updatedlinks_domain_id=".$self->{domain};
+    if( defined($self->{user}) ) {
+        $query .= " AND updatedlinks_user_id=".$self->{user};
+    }
+    if( defined($self->{delegation}) ) {
+        $query .= " AND updatedlinks_delegation=\"".$self->{delegation}."\"";
+    }
+    &OBM::toolBox::write_log( "[Update::updateGlobal]: purge de la table 'Updatedlinks'", "W" );
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        $query =~ s/\s+/ /g;
+
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
+        if( defined($dbHandler->err) ) {
+            &OBM::toolBox::write_log( "[Update::updateGlobal]: ".$dbHandler->err, "W" );
+        }
+
+        return 0;
+    }
+
+
+    # Purge de la table Deleted
+    $query = "DELETE FROM Deleted WHERE deleted_domain_id=".$self->{domain};
+    if( defined($self->{user}) ) {
+        $query .= " AND deleted_user_id=".$self->{user};
+    }
+    if( defined($self->{delegation}) ) {
+        $query .= " AND deleted_delegation=\"".$self->{delegation}."\"";
+    }
+    &OBM::toolBox::write_log( "[Update::updateGlobal]: purge de la table 'Deleted'", "W" );
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        $query =~ s/\s+/ /g;
+
+        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
+        if( defined($dbHandler->err) ) {
+            &OBM::toolBox::write_log( "[Update::updateGlobal]: ".$dbHandler->err, "W" );
+        }
+
         return 0;
     }
 
