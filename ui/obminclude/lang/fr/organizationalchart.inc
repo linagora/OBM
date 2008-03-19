@@ -20,6 +20,7 @@ $l_outline = "Hierarchique";
 $l_insert = "Enregistrer l'organigramme";
 $l_update = "Modifier l'organigramme";
 $l_ldif_export = "Export LDIF";
+$l_svg_export = "Export SVG";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des organigrammes correspondants.";

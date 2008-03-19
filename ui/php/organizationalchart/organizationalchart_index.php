@@ -25,6 +25,14 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 $params = get_organizationalchart_params();
+
+// View (chart|outline)
+if (isset($params["view"])) {
+  $view = $params["view"];
+} else {
+  $view = "chart";
+}
+
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 
@@ -71,7 +79,7 @@ if ($action == "index" || $action == "") {
     $oid = run_query_organizationalchart_insert($params);
     if($oid > 0) {
       $params["organizationalchart_id"] = $oid;
-      $display["detail"] = dis_organizationalchart_consult($params);
+      $display["detail"] = dis_organizationalchart_consult($params, $view);
       $display["msg"] .= display_ok_msg("$l_organizationalchart : $l_insert_ok");
     } else {
 	    $display["detail"] = dis_organizationalchart_form($action, $params);
@@ -84,11 +92,7 @@ if ($action == "index" || $action == "") {
   }
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_organizationalchart_consult($params);
-
-} elseif ($action == "detailconsult_outline") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_organizationalchart_consult($params);
+  $display["detail"] = dis_organizationalchart_consult($params, $view);
 
 } else if ($action == "userdetail") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -114,7 +118,7 @@ if ($action == "index" || $action == "") {
     } else {
       $display["msg"] .= display_err_msg("$l_organizationalchart : $l_update_error");
     }
-    $display["detail"] = dis_organizationalchart_consult($params);
+    $display["detail"] = dis_organizationalchart_consult($params, $view);
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err["msg"]);
     $display["detail"] = dis_organizationalchart_form($action, $params);
@@ -122,7 +126,12 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "export_ldif") {
 ///////////////////////////////////////////////////////////////////////////////
-  organizationalchart_export_ldif($params);
+  dis_organizationalchart_export_ldif($params);
+  exit();
+
+} elseif ($action == "export_svg") {
+///////////////////////////////////////////////////////////////////////////////
+  organizationalchart_export_svg($params, $view);
   exit();
 
 } elseif ($action == "check_delete") {
@@ -133,7 +142,7 @@ if ($action == "index" || $action == "") {
   } else {
     $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_organizationalchart_consult($params);
+    $display["detail"] = dis_organizationalchart_consult($params, $view);
   }
 
 } elseif ($action == "delete") {
@@ -149,7 +158,7 @@ if ($action == "index" || $action == "") {
   } else {
     $display["msg"] .= display_warn_msg($err["msg"], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_organizationalchart_consult($params);
+    $display["detail"] = dis_organizationalchart_consult($params, $view);
   }
 
 } elseif ($action == "display") {
@@ -202,9 +211,9 @@ function get_organizationalchart_params() {
 // User Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_organizationalchart_action() {
-  global $params, $actions, $path;
+  global $params, $actions, $path, $view;
   global $l_header_find, $l_header_new, $l_header_display, $l_header_consult;
-  global $l_header_update, $l_header_delete, $l_ldif_export;
+  global $l_header_update, $l_header_delete, $l_ldif_export, $l_svg_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   $id = $params["organizationalchart_id"];
@@ -227,7 +236,7 @@ function get_organizationalchart_action() {
   	'Name'     => $l_header_new,
   	'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=new",
   	'Right'    => $cright_write_admin,
-  	'Condition'=> array ('search', 'index', 'detailconsult', 'detailconsult_outline', 'insert', 'update', 'delete', 'display', 'export_ldif') );
+  	'Condition'=> array ('search', 'index', 'detailconsult', 'insert', 'update', 'delete', 'display', 'export_ldif') );
   
   // Insert
     $actions["organizationalchart"]["insert"] = array (
@@ -242,13 +251,6 @@ function get_organizationalchart_action() {
       'Right'    => $cright_read,
       'Condition'=> array ('detailupdate', 'export_ldif') );
 
-  // Detail Consult Outline
-    $actions["organizationalchart"]["detailconsult_outline"]  = array (
-      'Name'     => $l_header_consult,
-      'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=detailconsult_outline&amp;organizationalchart_id=$id",
-      'Right'    => $cright_read,
-      'Condition'=> array ('None') );
-
   // User Detail
     $actions["organizationalchart"]["userdetail"]  = array (
       'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=userdetail",
@@ -261,7 +263,7 @@ function get_organizationalchart_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=detailupdate&amp;organizationalchart_id=$id",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult', 'detailconsult_outline', 'update', 'export_ldif') );  
+    'Condition'=> array ('detailconsult', 'update', 'export_ldif') );  
 
   // Update
   $actions["organizationalchart"]["update"] = array (
@@ -274,14 +276,22 @@ function get_organizationalchart_action() {
       'Name'     => $l_ldif_export,
       'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=export_ldif&amp;organizationalchart_id=$id",
       'Right'    => $cright_read,
-      'Condition'=> array ('detailconsult', 'detailconsult_outline', 'insert', 'update') );
+      'Condition'=> array ('detailconsult', 'insert', 'update') );
+
+  // SVG export
+    $actions["organizationalchart"]["export_svg"]  = array (
+      'Name'     => $l_svg_export,
+      'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=export_svg&amp;organizationalchart_id=$id&amp;view=$view",
+      'Right'    => $cright_read,
+      'Condition'=> array ('detailconsult', 'insert', 'update') );
+
 
   // Check Delete
   $actions["organizationalchart"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=check_delete&amp;organizationalchart_id=$id",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult', 'detailconsult_outline', 'detailupdate', 'update', 'export_ldif') );
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'export_ldif') );
 
   // Delete
   $actions["organizationalchart"]["delete"] = array (
@@ -317,6 +327,7 @@ function update_organizationalchart_action() {
   global $params, $actions, $path;
 
   $id = $params["organizationalchart_id"];
+
   if ($id > 0) {
     // Detail Consult
     $actions["organizationalchart"]["detailconsult"]["Url"] = "$path/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$id";
@@ -333,6 +344,11 @@ function update_organizationalchart_action() {
     // LDIF Export
     $actions["organizationalchart"]["export_ldif"]['Url'] = "$path/organizationalchart/organizationalchart_index.php?action=export_ldif&amp;organizationalchart_id=$id";
     $actions["organizationalchart"]["export_ldif"]['Condition'][] = 'insert';
+
+    // SVG Export
+    $view = $params["view"];
+    $actions["organizationalchart"]["export_svg"]['Url'] = "$path/organizationalchart/organizationalchart_index.php?action=export_svg&amp;organizationalchart_id=$id&amp;view=$view";
+    $actions["organizationalchart"]["export_svg"]['Condition'][] = 'insert';
    }
 }
 ?>

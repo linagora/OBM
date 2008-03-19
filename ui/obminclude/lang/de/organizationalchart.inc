@@ -20,6 +20,7 @@ $l_outline = "Outline";
 $l_insert = "Insert organizational chart";
 $l_update = "update organizational chart";
 $l_ldif_export = "LDIF Export";
+$l_svg_export = "SVG Export";
 
 // Messages
 $l_no_display = "Fill the search fields and press < Find > to retrieve the organizational chart";

@@ -303,7 +303,7 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
  * @access public
  * @return HTML
  */
-function dis_organizationalchart_consult($organizationalchart) {
+function dis_organizationalchart_consult($organizationalchart, $view) {
   global $display, $action;
 
   $id = $organizationalchart["organizationalchart_id"];
@@ -311,7 +311,7 @@ function dis_organizationalchart_consult($organizationalchart) {
     $display["print_url"] = "$path/organizationalchart/organizationalchart_index.php?action= $action&amp;organizationalchart_id=$id";
     $oc_q = run_query_organizationalchart_detail($id);
     $root_node = run_query_organizationalchart_root_node($id);
-    $block = html_organizationalchart_consult($organizationalchart, $oc_q, $root_node); 
+    $block = html_organizationalchart_consult($organizationalchart, $view, $oc_q, $root_node); 
   }
 
   return $block;
@@ -319,14 +319,14 @@ function dis_organizationalchart_consult($organizationalchart) {
 
 
 /**
- *  XHTML Display Organizational Chart Detail
+ * XHTML Display Organizational Chart Detail
  * @param $organizationalchart 
  * @param $oc_q ogroup database result
  * @param $root_node database result
  * @access public
  * @return HTML
  */
-function html_organizationalchart_consult($organizationalchart, $oc_q, $root_node) {
+function html_organizationalchart_consult($organizationalchart, $view, $oc_q, $root_node) {
   global $display, $path;
   global $l_organizationalchart, $l_detail, $l_zoom_big, $l_zoom_small, $l_zoom;
   global $l_name, $l_desc, $l_archive, $l_yes, $l_no,  $l_outline, $action;
@@ -337,12 +337,14 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
   $oc_id = $oc_q->f("organizationalchart_id");
   $desc = $oc_q->f("organizationalchart_description");
   $archive = $oc_q->f("organizationalchart_archive") == 1 ? $l_yes : $l_no;
+
+  // Params
   $output = $organizationalchart["output_target"];
 
   $ico_organizationnalchart = $ico_organizationalchart_view;
   $ico_outline = $ico_outline_view;
 
-  if ($action == "detailconsult" || $action == "update" || $action == "insert") {
+  if ($view == "chart") {
     // Zoom
     $dis_zoom = "<div class=\"LF MN\" style=\"height: 24px; margin-left: 10px;\">
     <form action=\"\" method=\"\" onsubmit=\"return false;\">
@@ -351,24 +353,22 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
         <option value=\"small\">$l_zoom_small</option>
       </select>
     </form></div>";
-    $block_detail = dis_organizationalchart_draw_consult($root_node, $output);
+    $block_detail = dis_organizationalchart_consult_chart($root_node, $output);
     $block_popup = dis_organizationalchart_userdetail();
     $ico_organizationnalchart = $ico_organizationalchart_view_current;
-  } elseif ($action == "detailconsult_outline") {
-    $block_detail = dis_organizationalchart_draw_consult_outline($root_node, $output);
+  } elseif ($view == "outline") {
+    $block_detail = dis_organizationalchart_consult_outline($root_node, $output);
     $block_popup = "";
     $ico_outline = $ico_outline_view_current;
   }
 
-  $output = $organizationalchart["output_target"];
-
   // View select
   $dis_view = "
     <div class=\"LF MN\" style=\"margin-left: 10px;\">
-    <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult&organizationalchart_id=$oc_id\">
+    <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$oc_id&amp;view=chart\">
       <img title=\"$l_organizationalchart\" src=\"$ico_organizationnalchart\" alt=\"$l_organizationalchart\"/> 
     </a>
-    <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult_outline&organizationalchart_id=$oc_id\">
+    <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$oc_id&amp;view=outline\">
       <img title=\"$l_outline\" src=\"$ico_outline\" alt=\"$l_outline\"/> 
     </a>
     </div>";
@@ -384,7 +384,6 @@ function html_organizationalchart_consult($organizationalchart, $oc_q, $root_nod
   $display["title"] = $oc_name;
 
   // --- HTML Template --------------------------------------------------------
-
   $block = "
   <div class=\"detail extra\">
     <h1>$l_organizationalchart</h1>
@@ -441,25 +440,6 @@ function dis_can_delete_organizationalchart($id) {
 
 
 /**
- * Display OrganizationalChart Display preference screen 
- * @param $prefs Display preferences 
- * @access public
- * @return HTML
- */
-function dis_organizationalchart_display_pref($prefs) {
-  global $l_organizationalchart_display;
-
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "organizationalchart");
-  $dis_pref->pref_title = $l_organizationalchart_display;
-  $dis_pref->pref_dis_help = 1;
-
-  $block = $dis_pref->display();
-
-  return $block;
-}
-
-
-/**
  * Sort node detail by user lastname
  */
 function sort_node_detail($a, $b) {
@@ -473,7 +453,7 @@ function sort_node_detail($a, $b) {
  * @access public
  * @return HTML
  */
-function dis_organizationalchart_draw_consult($node_q, $output) {
+function dis_organizationalchart_consult_chart($node_q, $output) {
   global $f, $l; 
   global $l_title, $l_phone, $l_mphone, $l_email;
   global $ico_manager, $ico_nophoto;
@@ -568,7 +548,7 @@ function dis_organizationalchart_draw_consult($node_q, $output) {
   $brother = run_query_organizationalchart_node_child($parent_node_id);
   $nb_brother = sizeof($brother) - 1;
 
-  if ($nb_children > 0) {
+  if ($nb_children) {
     $nb_leaves = run_query_organizationalchart_get_leaves($node_id, true);
     $wrap_width = $nb_leaves * $wrap_width;
     $node_queue = "<div class=\"nodeLnk\"></div>";
@@ -585,12 +565,12 @@ function dis_organizationalchart_draw_consult($node_q, $output) {
         $node_queue = "";
       }
       $child_q = run_query_organizationalchart_node_infos($child_id);
-      $t_draw = dis_organizationalchart_draw_consult($child_q, $output);
+      $t_draw = dis_organizationalchart_consult_chart($child_q, $output);
       $block_detail_child .= $t_draw;
     }
   } 
 
-  if ($parent_node_id > 0) { // If not root node
+  if ($parent_node_id) { // If not root node
     $style = "border-top: 1px solid #646567";
     $node_head = "<div class=\"nodeLnk\"></div>";
     if (in_array($node_id, $f)) {  // is first child ?
@@ -636,13 +616,13 @@ function dis_organizationalchart_draw_consult($node_q, $output) {
  * @access public
  * @return HTML
  */
-function dis_organizationalchart_draw_consult_outline($node_q) {
-  global $ico_delete, $ico_add, $ico_user, $ico_group;
-  global $l_add_child_tooltip, $l_name;
+function dis_organizationalchart_consult_outline($node_q) {
 
   $node_name = $node_q->f("ogroup_name");
   $node_id = $node_q->f("ogroup_id");
   $level = $node_q->f("ogroup_level");
+  $flour = strlen($level) - strlen(str_replace(".", "", $level));  
+  $color = "color".($flour)%7;
 
   // Get node detail
   $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
@@ -653,7 +633,6 @@ function dis_organizationalchart_draw_consult_outline($node_q) {
     switch($entity) {
       case "group":
 	$users_q = of_usergroup_get_group_users($entity_id, true);
-        $g_manager = run_query_global_group_manager($entity_id);
         foreach($users_q as $user) {
           $users[$user['id']] = array('id' => $user['id'],
             'lastname' => $user['lastname'],
@@ -691,15 +670,10 @@ function dis_organizationalchart_draw_consult_outline($node_q) {
   if ($nb_children > 0) {
     foreach($t_child as $key => $child_id){
       $child_q = run_query_organizationalchart_node_infos($child_id);
-      $t_draw = dis_organizationalchart_draw_consult_outline($child_q);
+      $t_draw = dis_organizationalchart_consult_outline($child_q);
       $block_detail_child .= $t_draw;
     }
   } 
-
-  if ($level > 1) { 
-    $flour = strlen($level) - strlen(str_replace(".", "", $level));  
-    $color = "color".($flour)%7;
-  }
 
   $block = "
     <div id=\"$level\" class=\"organizationalChartNode\" style=\"margin-left: 3em;\">
@@ -822,7 +796,7 @@ function dis_organizationalchart_draw_form($node_q) {
  * @access public
  * @return HTML
  */
-function organizationalchart_export_ldif($organizationalchart) {
+function dis_organizationalchart_export_ldif($organizationalchart) {
   global $obm;
 
   $id = $organizationalchart["organizationalchart_id"];
@@ -865,6 +839,98 @@ function organizationalchart_export_ldif($organizationalchart) {
 
     // Delete tmp file
     unlink($tmpfname) ; 
+  }
+}
+
+
+/**
+ * Export OrganizationalChart to SVG 
+ * @params
+ * @access public
+ * @return XML 
+ */
+function organizationalchart_export_svg($organizationalchart, $view) {
+  global $l_organizationalchart;
+
+  $id = $organizationalchart["organizationalchart_id"];
+  if ($id) {
+    $mode = $organizationalchart["mode"];
+    $oc_q = run_query_organizationalchart_detail($id);
+    $oc_name = trim($oc_q->f("organizationalchart_name"));
+    $root_node = run_query_organizationalchart_root_node($id);
+
+    // Build XML
+    $xml = new DOMDocument("1.0", "utf-8");
+    $svg = $xml->createElement("svg");
+    $svg->setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
+    if ($view == "chart") {
+      // gradient
+      $linearGradient = $xml->createElement("linearGradient");
+      $linearGradient->setAttribute("id", "NodeTitleStyle");
+      $linearGradient->setAttribute("x1", "0%");
+      $linearGradient->setAttribute("y1", "0%");
+      $linearGradient->setAttribute("x2", "0%");
+      $linearGradient->setAttribute("y2", "100%");
+      
+      // top color
+      $top = $xml->createElement("stop");
+      $top->setAttribute("offset", "35%"); 
+      $top->setAttribute("stop-color", "#509CBC"); 
+      $linearGradient->appendChild($top);
+ 
+      // bottom color
+      $bottom = $xml->createElement("stop");
+      $bottom->setAttribute("offset", "65%"); 
+      $bottom->setAttribute("stop-color", "#378299"); 
+      $linearGradient->appendChild($bottom);   
+
+      $svg->appendChild($linearGradient);
+    }
+   
+    // OrganizationalChart name
+    $name = $xml->createElement("text");
+    $name->setAttribute("style", "font-size:22px;font-weight:bold;fill:#636466");
+    $name->setAttribute("x", 10);
+    $name->setAttribute("y", 30);
+    $name->appendChild($xml->createTextNode("$l_organizationalchart : $oc_name"));
+    $svg->appendChild($name);
+
+    // OBM Logo
+    // $logo = $xml->createElement("image");
+    // $logo->setAttribute("x", 0);
+    // $logo->setAttribute("y", 0);
+    // $logo->setAttribute("width", 100);
+    // $logo->setAttribute("height", 100);
+    // $logo->setAttribute("href", "ico_outline_current.png");
+    // $svg->appendChild($logo);
+
+    $function_export = "export_svg_${view}";
+    $export = $function_export($root_node, $xml, $svg);
+
+    $xml->appendChild($export);
+
+    if ($mode == "html") {
+      // Display XML on browser
+      header('Content-Type: text/xml');
+      echo $xml->saveXML();
+    } else {
+      // Write SVG
+      $tmpfname = tempnam("/tmp", "obm_") ;
+      $xml->save($tmpfname);
+
+      // Download file
+      $file = fopen($tmpfname, "r");
+      header("Content-Type: application/octet-stream") ;
+      header("Content-Disposition: attachment; filename=\"$oc_name.svg\";") ;
+      header("Cache-Control:" ) ;
+      header("Cache-Control: must-revalidate, pre-check=0, post-check=0, max-age=0" ) ;
+      fpassthru($file) ;
+      fclose($file) ;
+
+      // Delete temp file.
+      unlink($tmpfname);
+    }
   }
 }
 
@@ -913,6 +979,510 @@ function dis_organizationalchart_userdetail() {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Generate LDIF from OrganizationalChart 
+///////////////////////////////////////////////////////////////////////////////
+function export_ldif($node_q, $ou_arr=array()) {
+  global $obm, $organization, $units, $persons;
+  global $php_regexp_login;
+
+  $eol = "\n";
+
+  $ldif_attributes = array(
+    "dn" => "login",
+    "uid" => "login",
+    "objectClass" => array("top", "person", "organizationalPerson", "inetOrgPerson"),
+    "sn" => "lastname",
+    "givenName" => "firstname",
+    "cn" => array("lastname", "firstname"),
+    "displayName" => array("firstname", "lastname"),
+    "title" => "title",
+    "telephoneNumber" => "phone",
+    "mobile" => "mobile",
+    "description" => "description",
+    "mail" => "email",
+  );
+
+  $node_name = $node_q->f("ogroup_name");
+  $node_id = $node_q->f("ogroup_id");
+  $domain = $obm['domain_name'];
+  if (empty($domain)) {
+    $domain = get_last_domain_text($node_q->f("ogroup_domain_id"));
+  } 
+
+  array_unshift($ou_arr, $node_name);
+  $ou = "ou=".implode($ou_arr, ",ou=");
+  $cn_arr = explode(".", $domain);
+  $oc = "dc=$cn_arr[0],dc=$cn_arr[1]";
+
+  if (!isset($units)) {
+    $units = array();
+  }
+  if (!isset($persons)) {
+    $persons = array();
+  }
+
+  // Header + Organization
+  if (!isset($organization)) {
+    $topdn = $oc;
+    if (contains_ascii($topdn)) {
+      $topdn = "dn:: ".base64_encode($topdn);
+    } else {
+      $topdn = "dn: $topdn";
+    }
+    $o = $cn_arr[0];
+    if (contains_ascii($o)) {
+      $o = "o:: ".base64_encode($o);
+    } else {
+      $o = "o: $o";
+    }
+    $organization =  "# extended LDIF$eol";
+    $organization .= "#$eol";
+    $organization .= "# LDAPv3$eol";
+    $organization .= "# base <> with scope subtree$eol";
+    $organization .= "# filter: (objectclass=*)$eol";
+    $organization .= "# requesting: ALL$eol";
+    $organization .= "#$eol";
+    $organization .= "# $cn_arr[0], $cn_arr[1]$eol";
+    $organization .= "$topdn$eol";
+    $organization .= "objectClass: top$eol";
+    $organization .= "objectClass: organization$eol";
+    $organization .= "$o$eol";
+  }
+  
+  // Add Unit
+  $org_dn = "$ou,$oc";
+  if (contains_ascii($org_dn)) {
+     $org_dn = "dn:: ".base64_encode($org_dn);
+  } else {
+    $org_dn = "dn: $org_dn";
+  }
+  $org_ou = $node_name;
+  if (contains_ascii($org_ou)) {
+    $org_ou = "ou:: ".base64_encode($org_ou);
+  } else {
+    $org_ou = "ou: $org_ou";
+  }
+  $unit = "$eol# ".implode($ou_arr, ", ").", $cn_arr[0], $cn_arr[1]$eol";
+  $unit .= "$org_dn$eol";
+  $unit .= "objectClass: organizationalUnit$eol";
+  $unit .= "$org_ou$eol";
+  array_push($units, $unit);
+
+  // Get node detail
+  $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
+  while($ogroupentity_q->next_record()) {
+    $users = array();
+    $entity = $ogroupentity_q->f("ogroupentity_entity");
+    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
+    switch($entity) {
+      case "group":
+	$users = of_usergroup_get_group_users($entity_id, true);
+        break;
+      case "user":
+	$user = get_user_info($entity_id);
+	$u_id = $user['id'];
+	$users[$u_id] = $user;
+       break;
+    }
+    foreach ($users as $user_id => $one_user) {
+      $uid = $one_user["login"];
+      $person = "$eol# $uid, ".implode($ou_arr, ", ").", $cn_arr[0], $cn_arr[1]$eol";
+      foreach($ldif_attributes as $k_ldif => $k_obm) {
+          switch($k_ldif) {
+            case "dn":
+              $dn = "uid=$one_user[$k_obm],$ou,$oc";
+              if (contains_ascii($dn)) {
+                $dn = base64_encode($dn);
+                $person .= "$k_ldif:: $dn$eol";                                
+              } else {
+                $person .= "$k_ldif: $dn$eol";              
+              }
+              break;
+            case "objectClass":
+              foreach($ldif_attributes[$k_ldif] as $key) {
+                $person .= "$k_ldif: $key$eol";
+              }              
+              break;
+            case "cn":
+              $cn = "";
+              foreach($ldif_attributes[$k_ldif] as $key) {
+                $cn .= $one_user[$key]." ";
+              }
+              if (!empty($cn)) {
+                if (contains_ascii($cn)) {
+                  $cn = base64_encode($cn);
+                  $person .= "$k_ldif:: $cn$eol";                                
+                } else {
+                  $person .= "$k_ldif: $cn$eol";              
+                }
+              }
+              break;
+            case "displayName":
+              $displayName = "";
+              foreach($ldif_attributes[$k_ldif] as $key) {
+                $displayName .= $one_user[$key]." ";
+              }
+              if (!empty($displayName)) {
+                if (contains_ascii($displayName)) {
+                  $displayName = base64_encode($displayName);
+                  $person .= "$k_ldif:: $displayName$eol";
+                } else {
+                  $person .= "$k_ldif: $displayName$eol";
+                }
+              }
+              break;
+            case "mail":
+              $emails = explode("\n", $one_user[$k_obm]);
+              foreach($emails as $email) {
+                if (!empty($email)) {
+                  $mail = trim($email)."@$domain";
+                  if (contains_ascii($mail)) {
+                    $mail = base64_encode($mail);
+                    $person .= "$k_ldif:: $mail$eol";                                
+                  } else {
+                    $person .= "$k_ldif: $mail$eol";              
+                  }
+                } 
+              }
+              break;
+            default:
+              $val = $one_user[$k_obm];
+              if (!empty($val)) {
+                if (contains_ascii($val)) {
+                  $val = base64_encode($val);
+                  $person .= "$k_ldif:: $val$eol";                                
+                } else {
+                  $person .= "$k_ldif: $val$eol";                
+                }
+              }
+              break;
+          }
+      }
+      // Add Person
+      array_push($persons, "$person");
+    }
+  }
+ 
+  // Get node children 
+  $t_child = run_query_organizationalchart_node_child($node_id);
+  $nb_children = sizeof($t_child);
+
+  if ($nb_children > 0) {
+    foreach($t_child as $key => $child_id) {
+      $child_q = run_query_organizationalchart_node_infos($child_id);
+      $t_draw = export_ldif($child_q, $ou_arr);
+    }
+  } 
+
+  return ;
+}
+
+
+/**
+ * Build XML for Outline SVG 
+ * 
+ * @param $node_q 
+ * @param &$xml
+ * @param &$svg
+ * @access public
+ * @return DOM Object 
+ */
+function export_svg_outline($node_q, &$xml, &$svg) {
+  global $y;
+ 
+  // Properties
+  $node_width = 300;
+  $margin_top = 50;
+  $style = "
+    font-size:10px;
+    font-weight:bold;
+    fill:#636466;
+    font-family:Bitstream Vera Sans";
+  $t_color = array("#D2D2D2", "#F9CF8B", "#F7BBC8", "#BBD595", "#F6DFDA", "#DFD9E3", "#CFD8F2");
+
+  $node_name = $node_q->f("ogroup_name");
+  $node_id = $node_q->f("ogroup_id");
+  $level = $node_q->f("ogroup_level");
+  $flour = strlen($level) - strlen(str_replace(".", "", $level));  
+
+  $color = $t_color[$flour%7];
+  $x = 50 * $flour + 10;
+  if (!isset($y)) $y=$margin_top;
+
+  // Get node detail
+  $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
+  $users = array();
+  while($ogroupentity_q->next_record()) {
+    $entity = $ogroupentity_q->f("ogroupentity_entity");
+    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
+    switch($entity) {
+      case "group":
+	$users_q = of_usergroup_get_group_users($entity_id, true);
+        foreach($users_q as $user) {
+          $users[$user['id']] = array('id' => $user['id'],
+            'lastname' => $user['lastname'],
+            'firstname' => $user['firstname'],
+            'title' => $user['title']);
+        }
+        break;
+      case "user":
+	$user = get_user_info($entity_id);
+	$u_id = $user['id'];
+	$lname = $user['lastname'];
+	$fname = $user['firstname'];
+	$title = $user['title'];
+	$users[$u_id] = array ('id' => $u_id,
+	  'lastname' => $lname,
+	  'firstname' => $fname,
+          'title' => $title);
+       break;
+    }
+  }
+
+  $text = $xml->createElement("text");
+  $text->setAttribute("style", $style);
+  $text->setAttribute("x", $x);
+  $text->setAttribute("y", $y);
+  $text->appendChild($xml->createTextNode(":: $node_name"));
+  $svg->appendChild($text);
+  $y += 2; // margin-bottom between nodes
+
+  // Node
+  $node_height = sizeof($users)*12+4;
+  $rectNode = $xml->createElement('rect');
+  $rectNode->setAttribute("x", $x);
+  $rectNode->setAttribute("y", $y);
+  $rectNode->setAttribute("width", $node_width);
+  $rectNode->setAttribute("height", $node_height);
+  $rectNode->setAttribute("style", "fill:$color;");
+  $svg->appendChild($rectNode);
+
+  // Users list
+  if (is_array($users)) {
+    usort($users, "sort_node_detail");
+    foreach ($users as $user_id => $one_user) {
+      $y += 12; // new line
+      $userobm_name = $one_user['lastname'].' '.$one_user['firstname'];
+      $userobm_title = empty($one_user['title'])? "": "(".$one_user['title'].")";
+      $text = $xml->createElement("text");
+      $text->setAttribute("style", $style);
+      $text->setAttribute("x", $x+10); // $x+10: margin-left
+      $text->setAttribute("y", $y);
+      $text->appendChild($xml->createTextNode("$userobm_name $userobm_title"));
+      $svg->appendChild($text);
+    }
+  }
+
+
+  // Get node children 
+  $t_child = run_query_organizationalchart_node_child($node_id);
+  $nb_children = sizeof($t_child);
+  if ($nb_children > 0) {
+    foreach($t_child as $key => $child_id){
+      $y+=20;
+      $child_q = run_query_organizationalchart_node_infos($child_id);
+      export_svg_outline($child_q, &$xml, &$svg);
+    }
+  } 
+
+  return $svg;
+}
+
+
+/**
+ * Build XML for Chart SVG 
+ * 
+ * @param $node_q 
+ * @param &$xml
+ * @param &$svg
+ * @access public
+ * @return DOM Object 
+ */
+function export_svg_chart($node_q, &$xml, &$svg) {
+  global $l, $x, $t_x, $t_y; 
+
+  if (!isset($l)) $l = array();
+  if (!isset($t_x)) $t_x = array();
+
+  // Properties
+  $node_width = 200;
+  $node_space = $node_width+5;
+  $node_link = 15;
+  $font_size = 12;
+  $line_height = $font_size+2;
+  $margin_top = 50;
+  $style = "
+    font-size:${font_size}px;
+    font-weight:bold;
+    font-family:Arial";
+
+  $node_name = $node_q->f("ogroup_name");
+  $node_id = $node_q->f("ogroup_id");
+  $parent_node_id = $node_q->f("ogroup_parent_id");
+  $level = $node_q->f("ogroup_level");
+  $flour = strlen($level) - strlen(str_replace(".", "", $level));  
+
+  $nb_leaves = run_query_organizationalchart_get_leaves($node_id, true);
+  if($nb_leaves) {
+    $node_x = $node_space/2*$nb_leaves+$x;
+  }
+
+  $t_child = run_query_organizationalchart_node_child($node_id);
+  $nb_children = sizeof($t_child);
+  $brother = run_query_organizationalchart_node_child($parent_node_id);
+  $nb_brother = sizeof($brother) - 1;
+
+  // Get node detail
+  $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
+  $users = array();
+  while($ogroupentity_q->next_record()) {
+    $entity = $ogroupentity_q->f("ogroupentity_entity");
+    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
+    switch($entity) {
+      case "group":
+	$users_q = of_usergroup_get_group_users($entity_id, true);
+        $g_manager = run_query_global_group_manager($entity_id);
+        foreach($users_q as $user) {
+          if ($user['id'] == $g_manager) { 
+            $users[$user['id']] = array('id' => $user['id'],
+              'lastname' => $user['lastname'],
+              'firstname' => $user['firstname'],
+              'manager' => true);
+          } else {
+            $users[$user['id']] = array('id' => $user['id'],
+              'lastname' => $user['lastname'],
+              'firstname' => $user['firstname']);
+          }
+        }
+        break;
+      case "user":
+	$user = get_user_info($entity_id);
+	$u_id = $user['id'];
+	$lname = $user['lastname'];
+	$fname = $user['firstname'];
+	$users[$u_id] = array ('id' => $u_id,
+	  'lastname' => $lname,
+	  'firstname' => $fname);
+       break;
+    }
+  }
+
+  // node height
+  $nb_users = sizeof($users);
+  $node_height = ($nb_users+2)*$line_height; 
+
+  // y coord
+  if ($parent_node_id) {
+    $node_y = $t_y[$parent_node_id]+$node_link;
+  } else {
+    $node_y = $flour*$node_height*2+$margin_top;
+  }
+
+  // node
+  $rectNode = $xml->createElement('rect');
+  $rectNode->setAttribute("x", $node_x);
+  $rectNode->setAttribute("y", $node_y);
+  $rectNode->setAttribute("width", $node_width);
+  $rectNode->setAttribute("height", $node_height);
+  $rectNode->setAttribute("style", "fill:#FFF;stroke:#000;stroke-width:1;");
+  $svg->appendChild($rectNode);
+
+  // node title
+  $rectTitle = $xml->createElement('rect');
+  $rectTitle->setAttribute("x", $node_x);
+  $rectTitle->setAttribute("y", $node_y);
+  $rectTitle->setAttribute("width", $node_width);
+  $rectTitle->setAttribute("height", $line_height);
+  $rectTitle->setAttribute("style", "fill:url(#NodeTitleStyle);stroke:#000;stroke-width:1;");
+  $svg->appendChild($rectTitle);
+  $text = $xml->createElement("text");
+  $text->setAttribute("style", $style);
+  $text->setAttribute("fill", "#FFF");
+  $text->setAttribute("x", $node_x+20);             // +20: margin-left
+  $text->setAttribute("y", $node_y+$line_height-2); // -2: margin-bottom
+  $text->appendChild($xml->createTextNode($node_name));
+  $svg->appendChild($text);
+
+  if (is_array($users)) {
+    uasort($users, "sort_node_detail");
+    $user_y = $node_y+$line_height;
+    foreach ($users as $user_id => $one_user) {
+      // build users list
+      $userobm_name = $one_user['lastname'].' '.$one_user['firstname'];
+      if ($one_user['manager']) {
+        $userobm_name = "* $userobm_name";
+      }
+      $user_y += $line_height; // new line
+      $text = $xml->createElement("text");
+      $text->setAttribute("style", $style);
+      $text->setAttribute("fill", "#636466");
+      $text->setAttribute("x", $node_x+5);
+      $text->setAttribute("y", $user_y);
+      $text->appendChild($xml->createTextNode($userobm_name));
+      $svg->appendChild($text);
+    }
+  }
+
+  if ($nb_children) {
+    // node tail
+    $nodeTail = $xml->createElement('rect');
+    $nodeTail->setAttribute("x", $node_x+$node_width/2);
+    $nodeTail->setAttribute("y", $node_y+$node_height);
+    $nodeTail->setAttribute("width", 1);
+    $nodeTail->setAttribute("height", $node_link);
+    $svg->appendChild($nodeTail);
+
+    // node y coord.
+    $t_y[$node_id] = $node_y+$node_height+$node_link;
+ 
+    foreach($t_child as $key => $child_id){
+      if ($nb_children >= 2) {
+        if ($key == 0){ // first child
+          // node x coord.
+          $child_leaves = run_query_organizationalchart_get_leaves($child_id, true);
+          $child_x = $x+($node_space*$child_leaves+$node_width)/2;
+          $t_x[$child_id] = $child_x;
+        } else if ($key == ($nb_children-1)){ // last child
+          $l[] = $child_id;
+        }
+      }
+      $child_q = run_query_organizationalchart_node_infos($child_id);
+      export_svg_chart($child_q, &$xml, &$svg);
+    }
+  } 
+
+  if ($parent_node_id) { // If not root node
+    // node head
+    $nodeHead = $xml->createElement('rect');
+    $nodeHead->setAttribute("x", $node_x+$node_width/2);
+    $nodeHead->setAttribute("y", $t_y[$parent_node_id]);
+    $nodeHead->setAttribute("width", 1);
+    $nodeHead->setAttribute("height", $node_link);
+    $svg->appendChild($nodeHead);
+    if (in_array($node_id, $l)) {  // is last child ?
+      $first_x = $t_x[$brother[0]];
+      $parent_y = $t_y[$parent_node_id];
+      // line
+      $line = $xml->createElement('line');
+      $line->setAttribute("x1", $first_x);
+      $line->setAttribute("y1", $parent_y);
+      $line->setAttribute("x2", $node_x+$node_width/2);
+      $line->setAttribute("y2", $parent_y);
+      $line->setAttribute("style", "stroke:#000000;stroke-width:1;");
+      $svg->appendChild($line);
+    }
+  } 
+
+  // has brother? 
+  if ($nb_brother) {
+    $x += $node_space;
+  }
+
+  return $svg;
+}
+
+
 /**
  * Build a JSON message with all the event data
  * the respone is a table of event objects.
@@ -950,6 +1520,24 @@ function organizationalchart_json_event($usr_q) {
 
   $json = implode(",",$info);
   $display['json'] =  "$json,error:0";
+}
+
+/**
+ * Display OrganizationalChart Display preference screen 
+ * @param $prefs Display preferences 
+ * @access public
+ * @return HTML
+ */
+function dis_organizationalchart_display_pref($prefs) {
+  global $l_organizationalchart_display;
+
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "organizationalchart");
+  $dis_pref->pref_title = $l_organizationalchart_display;
+  $dis_pref->pref_dis_help = 1;
+
+  $block = $dis_pref->display();
+
+  return $block;
 }
 
 ?>
