@@ -115,17 +115,17 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == 'group_user_email') {
     $email = $OD->data_set->f('group_user_email');
-    if($OD->data_set->f("userobm_hidden") == 1 && !$perm->check_right('user', $cright_write_admin)) {
-      $res["align"] = "center";
+    if ($OD->data_set->f('userobm_hidden') == 1 && !$perm->check_right('user', $cright_write_admin)) {
+      $res['align'] = 'center';
       $res['name'] = '-';
     } elseif (strcmp($email ,'') != 0) {
       if ($cgp_use['service']['mail']) {
-        if($OD->data_set->f('domain_name') != '') {
+        if ($OD->data_set->f('domain_name') != '') {
           $main_domain = $OD->data_set->f('domain_name');
         } else {
           $main_domain = $obm['domain_name'];
         }
-        $emails = explode('\n',$email);
+        $emails = explode("\n",$email);
         $email = trim($emails[0])."@$main_domain";
       }
       $res['url'] = "mailto:$email";

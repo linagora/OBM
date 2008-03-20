@@ -192,9 +192,9 @@
   position: absolute;
   bottom: 0px;
   right: 0px;
-/*  cursor: n-resize;
+  cursor: n-resize;
   width: 100%;
-  height: 4px; */
+  height: 4px;
 }
 
 .eventOwner {
@@ -202,7 +202,7 @@
   background-color: rgb(102, 140, 217);
 }
 
-.eventOwner h1, li.eventOwner {
+.eventOwner h1, li.eventOwner, .eventOwner .handle {
   background-color: rgb(41, 82, 163);
   border-top: rgb(102, 140, 217);
   border-bottom: rgb(102, 140, 217);
@@ -213,7 +213,7 @@
   background-color: rgb(216, 102, 102);
 }
 
-.eventOwner0 h1, li.eventOwner0 {
+.eventOwner0 h1, li.eventOwner0, .eventOwner0 .handle {
   background-color: rgb(163, 41, 41);
   border-top: rgb(216, 102, 102);
   border-bottom: rgb(216, 102, 102);
@@ -225,7 +225,7 @@
   background-color: rgb(230, 115, 153);
 }
 
-.eventOwner1 h1, li.eventOwner1 {
+.eventOwner1 h1, li.eventOwner1, .eventOwner1 .handle {
   background-color: rgb(177, 54, 95);
   border-top: rgb(163, 41, 41);
   border-bottom: rgb(163, 41, 41);
@@ -236,7 +236,7 @@
   background-color: rgb(179, 115, 179);
 }
 
-.eventOwner2 h1, li.eventOwner2 {
+.eventOwner2 h1, li.eventOwner2, .eventOwner2 .handle {
   background-color: rgb(122, 54, 122);
   border-top: rgb(163, 41, 41);
   border-bottom: rgb(163, 41, 41);
@@ -247,7 +247,7 @@
   background-color: rgb(140, 102, 217);
 }
 
-.eventOwner3 h1, li.eventOwner3 {
+.eventOwner3 h1, li.eventOwner3, .eventOwner3 .handle {
   background-color: rgb(82, 41, 163);
   border-top: rgb(163, 41, 41);
   border-bottom: rgb(163, 41, 41);
@@ -258,7 +258,7 @@
   background-color: rgb(102, 140, 179);
 }
 
-.eventOwner4 h1, li.eventOwner4 {
+.eventOwner4 h1, li.eventOwner4, .eventOwner4 .handle {
   background-color: rgb(41, 82, 122);
   border-top: rgb(102, 140, 179);
   border-bottom: rgb(102, 140, 179);
@@ -269,7 +269,7 @@
   background-color: rgb(89, 191, 179);
 }
 
-.eventOwner5 h1, li.eventOwner5 {
+.eventOwner5 h1, li.eventOwner5, .eventOwner5 .handle {
   background-color: rgb(27, 136, 122);
   border-top: rgb(89, 191, 179);
   border-bottom: rgb(89, 191, 179);
@@ -280,7 +280,7 @@
   background-color: rgb(101, 173, 137);
 }
 
-.eventOwner6 h1, li.eventOwner6 {
+.eventOwner6 h1, li.eventOwner6, .eventOwner6 .handle {
   background-color: rgb(40, 117, 78);
   border-top: rgb(101, 173, 137);
   border-bottom: rgb(101, 173, 137);
@@ -291,7 +291,7 @@
   background-color: rgb(76, 176, 82);
 }
 
-.eventOwner7 h1, li.eventOwner7 {
+.eventOwner7 h1, li.eventOwner7, .eventOwner7 .handle {
   background-color: rgb(13, 120, 19);
   border-top: rgb(76, 176, 82);
   border-bottom: rgb(76, 176, 82);
@@ -302,7 +302,7 @@
   background-color: rgb(140, 191, 64);
 }
 
-.eventOwner8 h1, li.eventOwner8 {
+.eventOwner8 h1, li.eventOwner8, .eventOwner8 .handle {
   background-color: rgb(82, 136, 0);
   border-top: rgb(140, 191, 64);
   border-bottom: rgb(140, 191, 64);
@@ -313,7 +313,7 @@
   background-color: rgb(191, 191, 77);
 }
 
-.eventOwner9 h1, li.eventOwner9 {
+.eventOwner9 h1, li.eventOwner9, .eventOwner9 .handle {
   background-color: rgb(136, 136, 14);
   border-top: rgb(191, 191, 77);
   border-bottom: rgb(191, 191, 77);
@@ -324,7 +324,7 @@
   background-color: rgb(224, 194, 64);
 }
 
-.eventOwner10 h1, li.eventOwner10 {
+.eventOwner10 h1, li.eventOwner10, .eventOwner10 .handle {
   background-color: rgb(171, 139, 0);
   border-top: rgb(224, 194, 64);
   border-bottom: rgb(224, 194, 64);
@@ -335,7 +335,7 @@
   background-color: rgb(242, 166, 64);
 }
 
-.eventOwner11 h1, li.eventOwner11 {
+.eventOwner11 h1, li.eventOwner11, .eventOwner11 .handle {
   background-color: rgb(190, 109, 0);
   border-top: rgb(242, 166, 64);
   border-bottom: rgb(242, 166, 64);
@@ -346,7 +346,7 @@
   background-color: rgb(230, 128, 77);
 }
 
-.eventOwner12 h1, li.eventOwner12 {
+.eventOwner12 h1, li.eventOwner12, .eventOwner12 .handle {
   background-color: rgb(177, 68, 14);
   border-top: rgb(230, 128, 77);
   border-bottom: rgb(230, 128, 77);
@@ -357,7 +357,7 @@
   background-color: rgb(190, 148, 148);
 }
 
-.eventOwner13 h1, li.eventOwner13 {
+.eventOwner13 h1, li.eventOwner13, .eventOwner13 .handle {
   background-color: rgb(134, 90, 90);
   border-top: rgb(190, 148, 148);
   border-bottom: rgb(190, 148, 148);
@@ -368,7 +368,7 @@
   background-color: rgb(169, 146, 169);
 }
 
-.eventOwner14 h1, li.eventOwner14 {
+.eventOwner14 h1, li.eventOwner14, .eventOwner14 .handle {
   background-color: rgb(112, 87, 112);
   border-top: rgb(169, 146, 169);
   border-bottom: rgb(169, 146, 169);
@@ -379,7 +379,7 @@
   background-color: rgb(137, 151, 165);
 }
 
-.eventOwner15 h1, li.eventOwner15 {
+.eventOwner15 h1, li.eventOwner15, .eventOwner15 .handle {
   background-color: rgb(78, 93, 108);
   border-top: rgb(137, 151, 165);
   border-bottom: rgb(137, 151, 165);
@@ -390,7 +390,7 @@
   background-color: rgb(148, 162, 190);
 }
 
-.eventOwner16 h1, li.eventOwner16 {
+.eventOwner16 h1, li.eventOwner16, .eventOwner16 .handle {
   background-color: rgb(90, 105, 134);
   border-top: rgb(148, 162, 190);
   border-bottom: rgb(148, 162, 190);
@@ -401,7 +401,7 @@
   background-color: rgb(133, 170, 165);
 }
 
-.eventOwner17 h1, li.eventOwner17 {
+.eventOwner17 h1, li.eventOwner17, .eventOwner17 .handle {
   background-color: rgb(74, 113, 108);
   border-top: rgb(133, 170, 165);
   border-bottom: rgb(133, 170, 165);
@@ -412,7 +412,7 @@
   background-color: rgb(167, 167, 125);
 }
 
-.eventOwner18 h1, li.eventOwner18 {
+.eventOwner18 h1, li.eventOwner18, .eventOwner18 .handle {
   background-color: rgb(110, 110, 65);
   border-top: rgb(167, 167, 125);
   border-bottom: rgb(167, 167, 125);
@@ -423,7 +423,7 @@
   background-color: rgb(196, 168, 131);
 }
 
-.eventOwner19 h1, li.eventOwner19 {
+.eventOwner19 h1, li.eventOwner19, .eventOwner19 .handle {
   background-color: rgb(141, 111, 71);
   border-top: rgb(196, 168, 131);
   border-bottom: rgb(196, 168, 131);

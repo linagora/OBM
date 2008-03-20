@@ -787,41 +787,43 @@ function of_right_users_for_entity($entity, $entity_id, $right="all") {
     LEFT JOIN EntityRight ON (of_usergroup_group_id = entityright_consumer_id AND entityright_consumer = 'group') 
     WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity' $where_right
     ORDER BY userobm_firstname, userobm_lastname 
-  ";
-    
-  display_debug_msg($query, $cdg_sql, "of_right_users_for_entity()");
+";
+
+  display_debug_msg($query, $cdg_sql, 'of_right_users_for_entity()');
   $obm_q->query($query);
   $ret_array = array();
   while($obm_q->next_record()) {
-    $id = $obm_q->f("id");
-    $label = $obm_q->f("userobm_lastname")." ".$obm_q->f("userobm_firstname");
-    $entity_id = $obm_q->f("entityright_entity_id");
-    $read = $obm_q->f("entityright_read");
-    $write = $obm_q->f("entityright_write");
-    $admin = $obm_q->f("entityright_admin");
+    $id = $obm_q->f('userobm_id');
+    $label = $obm_q->f('userobm_lastname').' '.$obm_q->f('userobm_firstname');
+    $entity_id = $obm_q->f('entityright_entity_id');
+    $read = $obm_q->f('entityright_read');
+    $write = $obm_q->f('entityright_write');
+    $admin = $obm_q->f('entityright_admin');
     $id_array[] = $id;
     $con_array[] = array(
-			 "id"    => $id,
-			 "label" => $label,
-			 "entity_id" => $entity_id,
-			 "read" => $read,
-			 "write" => $write,
-                         "admin" => $admin
+			 'id'    => $id,
+			 'label' => $label,
+			 'entity_id' => $entity_id,
+			 'read' => $read,
+			 'write' => $write,
+                         'admin' => $admin
 			 );
   }
 
-  $ret_array["ids"] = array();
+  $ret_array['ids'] = array();
   if (is_array($id_array)) {
-    $ret_array["ids"] = $id_array;
+    $ret_array['ids'] = $id_array;
   }
-  $ret_array["consumer"] = array();
+  $ret_array['consumer'] = array();
   if (is_array($con_array)) {
-    $ret_array["consumer"] = $con_array;
+    $ret_array['consumer'] = $con_array;
   }
 
   return $ret_array;
 
 }
+
+
 /* ACL object model
 class OBM_Acl {
   

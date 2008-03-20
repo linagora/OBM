@@ -40,6 +40,18 @@ require("$obminclude/of/of_right.inc");
 include("$obminclude/of/of_category.inc");
 
 get_resource_action();
+
+// If user has individual admin right on the selected resource,	give access
+// if user does not have admin right on module, check for the resource right
+if (($params['resource_id'] > 0)
+  && (! $perm->check_right('resource', $cright_write_admin))) {
+  $users = of_right_users_for_entity('resource', $params['resource_id'], 'admin');
+  if (in_array($obm['uid'], $users['ids'])) {
+    $actions['resource']['rights_admin']['Right'] = $cright_read;
+    $actions['resource']['rights_update']['Right'] = $cright_read;
+  }
+}
+
 $perm->check_permissions($module, $action);
 if (! check_privacy($module, 'Resource', $action, $params['resource_id'], $obm['uid'])) {
   $display['msg'] = display_err_msg($l_error_visibility);
@@ -400,14 +412,14 @@ function get_resource_action() {
   $actions['resource']['rights_admin'] = array (
     'Name'     => $l_header_right,
     'Url'      => "$path/resource/resource_index.php?action=rights_admin&amp;entity_id=".$params['resource_id'],
-    'Right'    => $cright_read,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult','rights_update','rights_admin','detailupdate','update')
                                      );
 
 // Rights Update
   $actions['resource']['rights_update'] = array (
     'Url'      => "$path/resource/resource_index.php?action=rights_update&amp;entity_id=".$params['resource_id'],
-    'Right'    => $cright_read,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                      );
 

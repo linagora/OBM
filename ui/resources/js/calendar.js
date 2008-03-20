@@ -468,16 +468,16 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     }
     this.setPeriodicity();
     if(this.options.resizable) {
-	this.resizeHandler = new Element('img')
+	/*	this.resizeHandler = new Element('img')
 	    .setProperty('src',obm.vars.images.resize)
 	    .addClass('handle')
 	    .injectInside(this.element);
-
-		/*	this.resizeHandler = new Element('div')
+	*/
+	this.resizeHandler = new Element('div')
 	    .addClass(this.event.klass)
 	    .addClass('handle')
 	    .injectInside(this.element);
-		*/
+		
     }
 
     this.titleContainer = new Element('span').injectInside(this.element);
