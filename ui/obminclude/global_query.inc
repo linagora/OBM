@@ -143,7 +143,7 @@ function run_query_global_contactfunction() {
  **/
 function get_global_lead_sources() {
   global $cdg_sql;
-
+  $ret = array();
   $multidomain = sql_multidomain('leadsource');
   $query = "SELECT * FROM LeadSource WHERE 1=1 $multidomain ORDER BY leadsource_label";
 
@@ -167,7 +167,7 @@ function get_global_lead_sources() {
  **/
 function get_global_deal_types() {
   global $cdg_sql;
-
+  $ret = array();
   $multidomain = sql_multidomain('dealtype');
   $query = "SELECT * FROM DealType
     WHERE 1=1 $multidomain
@@ -204,7 +204,7 @@ function get_global_deal_types() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_tasktype($tt_cat='', $tt_ids='') {
   global $cdg_sql, $ctt_sales, $ctt_research;
-
+  $tt = array();
   $multidomain = sql_multidomain('tasktype');
   $query = "
     SELECT
