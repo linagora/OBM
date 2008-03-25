@@ -186,7 +186,7 @@ class Vcalendar_Writer_OBM {
     if(is_null($categories)) {
       return NULL;
     }
-    $name = array_shift($categories);
+    $name = addslashes(array_shift($categories));
     $query = "SELECT calendarcategory1_id as id FROM CalendarCategory1 WHERE
                      calendarcategory1_label = '$name' AND 
                      calendarcategory1_domain_id = ".$GLOBALS['obm']['domain_id'];
@@ -215,9 +215,9 @@ class Vcalendar_Writer_OBM {
 
   function parsePriority($value) {
     if($value > 5 ) {
-      return 3;
-    } elseif ($value < 5) {
       return 1;
+    } elseif ($value < 5) {
+      return 3;
     }
     return 2;
   }
@@ -256,7 +256,7 @@ class Vcalendar_Writer_OBM {
         break;
       case 'monthly' :
         $countUnit = 'month';
-        if(!is_null($event['byday'])) {
+        if(!is_null($rrule['byday'])) {
           $event['repeat_kind'] = 'monthlybyday';
         } else {
           $event['repeat_kind'] = 'monthlybydate';

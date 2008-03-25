@@ -52,7 +52,7 @@ class Vcalendar_Element_Vevent extends Vcalendar_Element {
     if($this->get('x-obm-all-day') == 1) {
       return true;
     }
-    if(date('His', $this->date) == '000000' && date('His', $this->date + $this->duration) == '000000') {
+    if(date('His', strtotime($this->dtstart)) == '000000' && date('His', strtotime($this->dtstart + $this->duration)) == '000000') {
       return true;
     }
     if($this->duration == '0') {

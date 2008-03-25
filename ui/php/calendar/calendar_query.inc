@@ -493,12 +493,11 @@ function run_query_calendar_insert_event_data($calendar) {
   if ($calendar['privacy']!=1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
-  if(!is_null($calendar['repeat_end'])) {
+  if(isset($calendar['repeat_end'])) {
     $repeat_end = "'".of_isodate_convert($calendar['repeat_end'])."'";
   } else {
     $repeat_end = 'NULL';
   }  
-  $repeat_end = of_isodate_convert($calendar['repeat_end']);
   $repeatfrequency = $calendar['repeatfrequency'];  
   $date_exception = $calendar['date_exception'];
   $item = $calendar['list-item'];
@@ -570,13 +569,13 @@ function run_query_calendar_insert_event_data($calendar) {
     '$repeat_days',
     '$all_day',
     '$color',
-    '$repeat_end',
+    $repeat_end,
     '$obm[domain_id]')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
   $obm_q->query($query);
   
-  $query = "SELECT calendarevent_id
+  $query = "SELECT MAX(calendarevent_id) as calendarevent_id
     FROM CalendarEvent
     WHERE calendarevent_timecreate = '$now'
       AND calendarevent_date='$datebegin' 
@@ -586,7 +585,8 @@ function run_query_calendar_insert_event_data($calendar) {
       ORDER BY calendarevent_id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
   $obm_q->query($query);
-  while($obm_q->next_record())$id = $obm_q->f('calendarevent_id');
+  $obm_q->next_record();
+  $id = $obm_q->f('calendarevent_id');
   $calendar['calendar_id'] = $id;
     
   $timebegin = strtotime($datebegin);
@@ -998,7 +998,11 @@ function run_query_calendar_update_event_data($calendar) {
   if ($calendar['privacy'] != 1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
-  $repeat_end = of_isodate_convert($calendar['repeat_end']);
+  if(isset($calendar['repeat_end'])) {
+    $repeat_end = "'".of_isodate_convert($calendar['repeat_end'])."'";
+  } else {
+    $repeat_end = 'NULL';
+  }    
   $frequency = $calendar['repeatfrequency']; 
   $color = $calendar['color']; 
   $date_exception = $calendar['date_exception'];
@@ -1046,7 +1050,7 @@ function run_query_calendar_update_event_data($calendar) {
     calendarevent_repeatkind = '$repeat_kind',
     calendarevent_repeatfrequence = '$frequency',
     calendarevent_repeatdays = '$repeat_days',
-    calendarevent_endrepeat = '$repeat_end'
+    calendarevent_endrepeat = $repeat_end
   WHERE
     calendarevent_id = '$event_id'";
 
@@ -2803,9 +2807,9 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     $delta_t = date('H',$date) * 3600 + date('i',$date) * 60 + date('s',$date) ;
     $delta = $delta_t + $duration;
     $delta = floor($delta/$day_duration);
-    $event_start -= $delta * $day_duration;
+    $event_start -= strtotime( "-$delta day", $event_start);
     $end_date = ($endrepeat < $end_time) ? $endrepeat : $end_time;
-    $end_date += $delta_t + 1;
+    $end_date = strtotime('+'.($delta_t + 1).' seconds',$end_date);
     if ($addOcc) {
       switch ($repeatkind) {
         case 'daily' :
@@ -3007,7 +3011,6 @@ function calendar_monthlybydate_repeatition($date,$start_time,$end_date,$repeatf
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity) {  
   global $day_duration;
-
   $temp_date = $date;    
   if ($temp_date < $start_time) {
     $temp_date = strtotime(date('Y-m-01',$start_time));
