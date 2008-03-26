@@ -110,7 +110,7 @@ function dis_time_index($time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_nav_date($time) {
   global $cdg_param, $c_dst_err, $l_monthsofyear;
-  global $ico_previous,$ico_next;
+  global $ico_previous, $ico_next;
 
   $action = $time['action'];
   $interval = $time['interval'];
@@ -877,8 +877,7 @@ function dis_time_form_addtask($time, $validate_days) {
     // Action button
     $dis_button .= "
        <input type=\"hidden\" name=\"date\" value=\"".$time['date']."\" />
-       <input type=\"submit\" value=\"$l_add\" />
-      ";
+       <input type=\"submit\" value=\"$l_add\" />";
 
     // Script that prefill values
     $dis_script .= "
@@ -1039,10 +1038,11 @@ function html_time_month_users_total($time, $array_res) {
 //   - $time[] : time search criteria
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_time_statsuser($statproj_q, $stattt_q, $time) {
+function dis_time_statsuser($statproj_q, $stattt, $time) {
   global $cdg_param, $obm;
   global $l_proj_stats, $l_no_proj_stats;
   global $l_tt_stats, $l_no_tt_stats;
+  global $l_tasktype, $l_total,$l_total_period, $l_total_before, $l_total_after;
 
   if ($statproj_q->num_rows() != 0) {
     $prefs_p = get_display_pref($obm['uid'], 'time_proj');
@@ -1059,7 +1059,7 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
     $block .= display_warn_msg($l_no_proj_stats);
   }
   
-  if ($stattt_q->num_rows() != 0) {
+  /*  if ($stattt_q->num_rows() != 0) {
     $prefs_t = get_display_pref($obm['uid'], 'time_tt');
 
     $dis_ttuser_list = new OBM_DISPLAY('DATA', $prefs_t, 'time', 'time_tt');
@@ -1072,7 +1072,63 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
     $block .= $dis_ttuser_list->display('dis_time_data');
   } else {
     $block .= display_warn_msg($l_no_tt_stats);
+    }*/
+
+  if (is_array($stattt)) {
+    foreach($stattt as $tt_id => $tt) {
+      if ($tt_id != '0') {
+        $cpt++;
+        if($cpt % 2 == 0) {
+          $class = "class=\"pair\"";
+        } else {
+          $class = '';
+        }
+	$label = $tt['label'];
+	$time = $tt['time'];
+	$time_before = $tt['time_before'];
+	$time_after = $tt['time_after'];
+	// $amount = number_format($pu['amount']);
+	$dis_tt_array .= "
+      <tr $class>
+        <td>$label</td>
+        <td style=\"text-align: right;\">$time&nbsp;</td>
+        <td style=\"text-align: right;\">$time_before&nbsp;</td>
+        <td style=\"text-align: right;\">$time_after&nbsp;</td>
+      </tr>";
+      }
+    }
+
+    $total_time = $stattt[0]['time_total'];
+    $total_time_before = $stattt[0]['time_before_total'];
+    $total_time_after = $stattt[0]['time_after_total'];
+    
+    $dis_stat_tt = "
+    <h1>$l_tt_stats</h1>
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr>
+      <th>$l_tasktype</th>
+      <th>$l_total_period</th>
+      <th>$l_total_before</th>
+      <th>$l_total_after</th>
+    </tr>
+    </thead>
+    $dis_tt_array
+    <tfoot>
+    <tr>
+      <td>$l_total</td>
+      <td>$total_time&nbsp;</td>
+      <td>$total_time_before&nbsp;</td>
+      <td>$total_time_after&nbsp;</td>
+    </tr>
+    </tfoot>
+    </table>";
+  } else {
+    $dis_stat_tt = "
+    <h1>$l_no_tt_stats</h1>";
   }
+
+  $block .= $dis_stat_tt;
   
   return $block;
 }

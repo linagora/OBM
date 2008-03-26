@@ -127,15 +127,13 @@ function run_query_time_stat_project($time) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Task grouped by month and summed by tasktype
-// Parameters:
-//   - $time[]    :    time search criteria
-//     keys used       date
-// Returns:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_time_stat_tasktype($time) {
+/**
+ * Task grouped by month and summed by tasktype
+ *
+ * @param mixed $time[] :    time search criteria
+ * @return mixed info array
+ */
+function get_time_stat_tasktype($time) {
   global $c_day_fraction, $cdg_sql;
 
   $tail = 0;
@@ -160,6 +158,7 @@ function run_query_time_stat_tasktype($time) {
   // task_valid 0 if checkbox not to be shown
   $query = "
     SELECT
+      tasktype_id,
       tasktype_label,
       FORMAT(sum(if (timetask_date < '$month_begin', timetask_length, 0)) / $c_day_fraction,3) as total_before,
       FORMAT(sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0)) / $c_day_fraction,3) as total_length,
@@ -170,13 +169,32 @@ function run_query_time_stat_tasktype($time) {
       AND timetask_user_id in $uid_tab
     GROUP BY tasktype_id
     having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
-    ";
+";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_time_stat_project_by_month');
+  display_debug_msg($query, $cdg_sql, 'get_time_stat_tasktype');
 
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  return $obm_db;
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  $res = array();
+  while ($obm_q->next_record()) {
+    $tt_id = $obm_q->f('tasktype_id');
+    $tt_label = $obm_q->f('tasktype_label');
+    $time_before = $obm_q->f('total_before');
+    $time = $obm_q->f('total_length');
+    $time_after = $obm_q->f('total_after');
+
+    $res[$tt_id]['label'] = $tt_label;
+    $res[$tt_id]['time'] = $time;
+    $res[$tt_id]['time_before'] = $time_before;
+    $res[$tt_id]['time_after'] = $time_after;
+
+    $res[0]['time_total'] += $time;
+    $res[0]['time_before_total'] += $time_before;
+    $res[0]['time_after_total'] += $time_after;
+  }
+
+  return $res;
 }
 
 

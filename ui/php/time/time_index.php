@@ -125,12 +125,12 @@ if ($action == 'index') {
   // interval is week -- see if we may need to use others intervals
   $params['interval'] = 'month';
   $statproj_q = run_query_time_stat_project($params);
-  $stattt_q = run_query_time_stat_tasktype($params);
+  $stattt = get_time_stat_tasktype($params);
   $display['detail'] = dis_time_nav_date($params);
   if ($perm->check_right('time', $cright_read_admin)) {
     $display['features'] .= dis_user_select($params, run_query_userobm_active(), 1);
   }
-  $display['detail'] .= dis_time_statsuser($statproj_q, $stattt_q, $params);
+  $display['detail'] .= dis_time_statsuser($statproj_q, $stattt, $params);
 
 } elseif ($action == 'display') {
 ///////////////////////////////////////////////////////////////////////////////

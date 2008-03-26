@@ -57,7 +57,7 @@ if (isset($params['cal_range'])) {
 } elseif (isset($_SESSION['cal_range'])){
   $cal_range = $_SESSION['cal_range'];
 } else {
-  $cal_range = "week";
+  $cal_range = 'week';
 }
 ///////////////////////////////////////////////////////////////////////////////
 // specifique import ICS
@@ -162,6 +162,7 @@ if (($action == 'insert') || ($action == 'update')
 // We copy the entity array structure to the parameter hash
 $params['entity'] = $cal_entity_id;
 $params['category_filter'] = $cal_category_filter;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -180,7 +181,7 @@ if ($popup) {
 }
 
 
-$display['search'] = dis_calendar_view_bar($cal_view, $cal_range, $params["date"],$action);
+$display['search'] = dis_calendar_view_bar($cal_view, $cal_range, $params['date'],$action);
 
 if ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////

@@ -26,6 +26,7 @@ $l_delegation_target = "Administration déléguée";
 $l_photo = "Photo";
 $l_delete_userobmphoto = "Supprimer la photo de l'utilisateur";
 
+$l_hidden = 'BAL cachée';
 $l_mail_ext = "Messagerie externe";
 $l_mail_server = "Serveur de boîte à lettres";
 $l_email_nomade = "Adresse E-mail nomade";
@@ -120,4 +121,3 @@ $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
 $l_change_login_confirm = "Vous avez modifié le login de l'utilisateur.\\nIl est *impératif* que l'utilisateur dont le login a été modifié soit déconnecté de toutes applications liées à OBM lors de la validation de cette modification (OBM, client de messagerie, webmail, connecteur).\\nConfirmer le changement d'identifiant ?";
 
 $l_user_display = "Options d'affichage des listes d'utilisateurs";
-$l_hidden = 'BAL cachée';
