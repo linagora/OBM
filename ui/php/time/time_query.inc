@@ -71,15 +71,13 @@ function run_query_time_task_list($time) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Task grouped by month and summed by task project
-// Parameters:
-//   - $time[]    :    time search criteria
-//     keys used       date
-// Returns:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_time_stat_project($time) {
+/**
+ * Task grouped by month and summed by project
+ *
+ * @param mixed $time[] : time search criteria
+ * @return mixed info array
+ */
+function get_time_stat_project($time) {
   global $c_day_fraction, $cdg_sql;
 
   $tail = 0;
@@ -93,24 +91,29 @@ function run_query_time_stat_project($time) {
 
   $uid_tab .= ')';
 
-  $year = substr($time['date'],0,4);
-  $month = substr($time['date'],4,2);
-  $day=1;
+  $iso_date = $time['date'];
+  $ts_date = strtotime($iso_date);
+  $month = of_date_get_month($ts_date);
+  $year = of_date_get_year($ts_date);
+  $day = 1;
 
   // First and last days of month
-  $month_begin = date('Ymd', mktime(0,0,0,$month, 1, $year));
-  $month_end = date('Ymd', mktime(23,0,0,$month+1, $day-1, $year));
+  $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
+  $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
   // task_valid 0 if checkbox not to be shown
   $query = "
     SELECT
+      project_id,
       project_name,
+      tasktype_label,
       company_name,
       FORMAT(sum(if (timetask_date < '$month_begin', timetask_length, 0)) / $c_day_fraction,3) as total_before,
       FORMAT(sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0)) / $c_day_fraction,3) as total_length,
       FORMAT(sum(timetask_length) / $c_day_fraction,3) as total_after
     FROM TimeTask, ProjectTask, Project
       LEFT JOIN Company ON project_company_id = company_id
+      LEFT JOIN TaskType ON project_tasktype_id = tasktype_id
     WHERE timetask_date <= '$month_end'
       AND timetask_projecttask_id = projecttask_id
       AND projecttask_project_id = project_id
@@ -121,16 +124,39 @@ function run_query_time_stat_project($time) {
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_stat_project_by_month');
 
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  return $obm_db;
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  $res = array();
+  while ($obm_q->next_record()) {
+    $p_id = $obm_q->f('project_id');
+    $p_name = $obm_q->f('project_name');
+    $tt_label = $obm_q->f('tasktype_label');
+    $company = $obm_q->f('company_name');
+    $time_before = $obm_q->f('total_before');
+    $time = $obm_q->f('total_length');
+    $time_after = $obm_q->f('total_after');
+
+    $res[$p_id]['project'] = $p_name;
+    $res[$p_id]['tasktype'] = $tt_label;
+    $res[$p_id]['company'] = $company;
+    $res[$p_id]['time'] = $time;
+    $res[$p_id]['time_before'] = $time_before;
+    $res[$p_id]['time_after'] = $time_after;
+
+    $res[0]['time_total'] += $time;
+    $res[0]['time_before_total'] += $time_before;
+    $res[0]['time_after_total'] += $time_after;
+  }
+
+  return $res;
 }
 
 
 /**
  * Task grouped by month and summed by tasktype
  *
- * @param mixed $time[] :    time search criteria
+ * @param mixed $time[] : time search criteria
  * @return mixed info array
  */
 function get_time_stat_tasktype($time) {
@@ -147,13 +173,15 @@ function get_time_stat_tasktype($time) {
 
   $uid_tab .= ')';
 
-  $year = substr($time['date'],0,4);
-  $month = substr($time['date'],4,2);
+  $iso_date = $time['date'];
+  $ts_date = strtotime($iso_date);
+  $month = of_date_get_month($ts_date);
+  $year = of_date_get_year($ts_date);
   $day = 1;
 
   // First and last days of month
-  $month_begin = date('Ymd', mktime(0,0,0,$month, 1, $year));
-  $month_end = date('Ymd', mktime(23,0,0,$month+1, $day-1, $year));
+  $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
+  $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
   // task_valid 0 if checkbox not to be shown
   $query = "
@@ -171,6 +199,25 @@ function get_time_stat_tasktype($time) {
     having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
 ";
 
+  $query = "
+    SELECT
+      timett.tasktype_id as time_tasktype_id,
+      timett.tasktype_label as time_tasktype_label,
+      projtt.tasktype_id as proj_tasktype_id,
+      projtt.tasktype_label as proj_tasktype_label,
+      FORMAT(sum(if (timetask_date < '$month_begin', timetask_length, 0)) / $c_day_fraction,3) as total_before,
+      FORMAT(sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0)) / $c_day_fraction,3) as total_length,
+      FORMAT(sum(timetask_length) / $c_day_fraction,3) as total_after
+    FROM TimeTask JOIN TaskType as timett on timetask_tasktype_id=timett.tasktype_id
+      LEFT JOIN ProjectTask on timetask_projecttask_id=projecttask_id 
+      LEFT JOIN Project on projecttask_project_id=project_id 
+      LEFT JOIN TaskType as projtt on project_tasktype_id=projtt.tasktype_id 
+    WHERE timetask_date <= '$month_end'
+      AND timetask_user_id in $uid_tab
+    GROUP BY projtt.tasktype_id, timett.tasktype_id
+    having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
+    ORDER BY projtt.tasktype_id";
+
   display_debug_msg($query, $cdg_sql, 'get_time_stat_tasktype');
 
   $obm_q = new DB_OBM;
@@ -178,16 +225,25 @@ function get_time_stat_tasktype($time) {
 
   $res = array();
   while ($obm_q->next_record()) {
-    $tt_id = $obm_q->f('tasktype_id');
-    $tt_label = $obm_q->f('tasktype_label');
+    $tt_id = $obm_q->f('time_tasktype_id');
+    $tt_label = $obm_q->f('time_tasktype_label');
+    $proj_tt_id = $obm_q->f('proj_tasktype_id');
+    $proj_tt_label = $obm_q->f('proj_tasktype_label');
     $time_before = $obm_q->f('total_before');
     $time = $obm_q->f('total_length');
     $time_after = $obm_q->f('total_after');
-
-    $res[$tt_id]['label'] = $tt_label;
-    $res[$tt_id]['time'] = $time;
-    $res[$tt_id]['time_before'] = $time_before;
-    $res[$tt_id]['time_after'] = $time_after;
+    // Tasktype_id : use project tasktype id is exists, else timetask one
+    if ($proj_tt_id != '') {
+      $tt_id = $proj_tt_id;
+      $res[$tt_id]['label'] = $proj_tt_label;
+      $res[$tt_id]['type'] = 'project';
+    } else {
+      $res[$tt_id]['label'] = $tt_label;
+      $res[$tt_id]['type'] = 'tt_others';
+    }
+    $res[$tt_id]['time'] += $time;
+    $res[$tt_id]['time_before'] += $time_before;
+    $res[$tt_id]['time_after'] += $time_after;
 
     $res[0]['time_total'] += $time;
     $res[0]['time_before_total'] += $time_before;
@@ -514,13 +570,15 @@ function run_query_time_validate($who) {
 function run_query_time_adminvalidate($time) {
   global $cdg_sql, $cdg_param;
 
-  $year=substr($time['date'],0,4);
-  $month=substr($time['date'],4,2);
-  $day=1;
+  $iso_date = $time['date'];
+  $ts_date = strtotime($iso_date);
+  $month = of_date_get_month($ts_date);
+  $year = of_date_get_year($ts_date);
+  $day = 1;
 
   // First and last days of month
-  $month_begin = date('Ymd', mktime(0,0,0,$month, 1, $year));
-  $month_end = date('Ymd', mktime(23,0,0,$month+1, $day-1, $year));
+  $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
+  $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
   $user_id = $time['user_id'];
 
@@ -529,8 +587,7 @@ function run_query_time_adminvalidate($time) {
     set timetask_status = 2
     where timetask_user_id = '$user_id'
       and timetask_date >= '$month_begin' 
-      and timetask_date <= '$month_end' 
-    ";
+      and timetask_date <= '$month_end'";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_adminvalidate');
   $obm_db = new DB_OBM;
@@ -539,8 +596,9 @@ function run_query_time_adminvalidate($time) {
   return $obm_db; 
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Task Validation Cancelling for the admin                                  //
+// Task Validation Cancelling for the admin
 // Parameters:
 //   - $time[]    :    time search criteria
 //     keys used       date, user_id
@@ -548,13 +606,15 @@ function run_query_time_adminvalidate($time) {
 function run_query_time_adminunvalidate($time) {
   global $cdg_sql, $cdg_param;
 
-  $year=substr($time['date'],0,4);
-  $month=substr($time['date'],4,2);
-  $day=1;
+  $iso_date = $time['date'];
+  $ts_date = strtotime($iso_date);
+  $month = of_date_get_month($ts_date);
+  $year = of_date_get_year($ts_date);
+  $day = 1;
 
   // First and last days of month
-  $month_begin = date('Ymd', mktime(0,0,0,$month, 1, $year));
-  $month_end = date('Ymd', mktime(23,0,0,$month+1, $day-1, $year));
+  $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
+  $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
   $user_id = $time['user_id'];
 
@@ -563,8 +623,7 @@ function run_query_time_adminunvalidate($time) {
     set timetask_status = 1
     where timetask_user_id = '$user_id'
       and timetask_date >= '$month_begin' 
-      and timetask_date <= '$month_end' 
-    ";
+      and timetask_date <= '$month_end'";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_adminvalidate');
   $obm_db = new DB_OBM;
@@ -582,13 +641,15 @@ function run_query_time_adminunvalidate($time) {
 function run_query_time_short_month($time) {
   global $cdg_sql, $cdg_param;
 
-  $year = substr($time['date'],0,4);
-  $month = substr($time['date'],4,2);
+  $iso_date = $time['date'];
+  $ts_date = strtotime($iso_date);
+  $month = of_date_get_month($ts_date);
+  $year = of_date_get_year($ts_date);
   $day = 1;
 
   // First and last days of month
-  $month_begin = date('Ymd', mktime(0,0,0,$month, 1, $year));
-  $month_end = date('Ymd', mktime(23,0,0,$month+1, $day-1, $year));
+  $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
+  $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
   $query = "
     select
@@ -605,7 +666,7 @@ function run_query_time_short_month($time) {
              userobm_firstname,
              timetask_user_id
     order by userobm_lastname, userobm_firstname
-    ";
+";
   
   display_debug_msg($query, $cdg_sql, 'run_query_time_short_month');
   $obm_db = new DB_OBM;
@@ -616,7 +677,7 @@ function run_query_time_short_month($time) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Timemanager: qet tasks for given user and month                 
+// Timemanager: get tasks for given user and month                 
 // Parameters:
 //   - $time[] : time search criteria
 // Returns : DB object result
@@ -624,13 +685,15 @@ function run_query_time_short_month($time) {
 function run_query_time_task_one_month($time) {
   global $cdg_sql, $cdg_param;
 
-  $year=substr($time['date'],0,4);
-  $month=substr($time['date'],4,2);
-  $day=1;
+  $iso_date = $time['date'];
+  $ts_date = strtotime($iso_date);
+  $month = of_date_get_month($ts_date);
+  $year = of_date_get_year($ts_date);
+  $day = 1;
 
   // First and last days of month
-  $month_begin = date('Ymd', mktime(0,0,0,$month, 1, $year));
-  $month_end = date('Ymd', mktime(23,0,0,$month+1, $day-1, $year));
+  $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
+  $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
   $user_id = $time['user_id'];
 
@@ -650,8 +713,7 @@ function run_query_time_task_one_month($time) {
       and timetask_user_id = userobm_id
       and timetask_user_id = $user_id
     GROUP by timetask_user_id, date, timetask_status
-    ORDER by date
-    ";
+    ORDER by date";
   
   display_debug_msg($query, $cdg_sql, 'run_query_time_task_one_month');
   $obm_db = new DB_OBM;
@@ -659,6 +721,7 @@ function run_query_time_task_one_month($time) {
 
   return $obm_db; 
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: qet tasks for given users and month                 
@@ -669,14 +732,17 @@ function run_query_time_task_one_month($time) {
 function run_query_time_user_month_planning($time) {
   global $cdg_sql, $cdg_param;
 
-  $year = substr($time['date'],0,4);
-  $month = substr($time['date'],4,2);
+  $iso_date = $time['date'];
+  $ts_date = strtotime($iso_date);
+  $month = of_date_get_month($ts_date);
+  $year = of_date_get_year($ts_date);
   $day = 1;
-  $uid_tab = '('.implode(',',$time['user_ids']).')';
-  // First and last days of month
-  $month_begin = date('Ymd', mktime(0,0,0,$month, 1, $year));
-  $month_end = date('Ymd', mktime(23,0,0,$month+1, $day-1, $year));
 
+  // First and last days of month
+  $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
+  $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
+
+  $uid_tab = '('.implode(',',$time['user_ids']).')';
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -739,7 +805,7 @@ function run_query_time_user_month_planning($time) {
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_time_task_one_week($time) {
-global $cdg_sql, $cdg_param;
+  global $cdg_sql, $cdg_param;
 
   $week = get_time_week_point($time['date']);
 
@@ -785,6 +851,7 @@ function run_query_time_used_tasktype($uid = 0) {
         AND project_id = projectuser_project_id
         AND project_archive = '0'
         AND projectuser_user_id = '$uid'
+        AND projectuser_projecttask_id is not null
       ORDER BY tasktype_internal, tasktype_label";
 
     display_debug_msg($query, $cdg_sql, 'run_query_time_used_tasktype');
@@ -924,50 +991,31 @@ function get_time_week_working_days_dates($date) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Get the starting and ending date of a week in YYYYMMDD format
-// Parameters:
-//   - $date : date with YYYYMMDD format
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Get the starting and ending date of a week
+ *
+ * @param mixed $date date in iso format
+ * @return array ($weekstart, $weekend) in iso format
+ */
 function get_time_week_point($date) {
 
   if (is_null($date)) {
-    $p_date = date('Ymd');
+    $p_date = of_isodate_format();
   } else {
     $p_date = $date;
   }
 
-  $week_first_day = time_first_day_week($p_date);
+  $week_first_day = of_date_get_first_day_week($p_date);
   // beginning and end of week (Ymd format)
-  $weekstart = date('Ymd', $week_first_day);
-  $weekend = date('Ymd', $week_first_day + 6 * 86400);
+  $weekstart = of_isodate_format($week_first_day);
+  $weekend = of_isodate_format($week_first_day + 6 * 86400);
 
   return array($weekstart, $weekend);
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Return the first day of the week (in timestamp format) in where the date is
-// Parameters :
-// - $date : with YYYYMMDD format
-///////////////////////////////////////////////////////////////////////////////
-function time_first_day_week($date) {
-  global $c_week_first_day;
-
-  $date_int = strtotime($date);
-  $year = date('Y', $date_int);
-  $month = date('m', $date_int);
-  $day = date('d', $date_int);
-  $dow = date('w', $date_int);
-  $obm_dow = ($dow - $c_week_first_day + 7) % 7;
-  $weekstart = mktime(6, 0, 0, $month, $day - $obm_dow, $year);
-
-  return ($weekstart); 
-}
-
-
 /////////////////////////////////////////////////////////////////////////////
-// Return a string list of the elements of the array                //
+// Return a string list of the elements of the array
 //Parameters :
 // - $array = any array 
 ///////////////////////////////////////////////////////////////////////////
@@ -1008,25 +1056,30 @@ function time_is_working_day($date) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Return number of 'Open days' (jours ouvrables) in a month
-// Parameters :
-//   - $date = a date in the month in the AAAAMMDD format 
-///////////////////////////////////////////////////////////////////////////////
-function get_time_nb_working_days($date) {
+/**
+ * Return number of 'working days' (jours ouvrables) in a month
+ *
+ * @param mixed $iso_date date in iso format in the month
+ * @return integer $workingdays : number of working days in the month
+ */
+function get_time_nb_working_days($iso_date) {
 
-  $date_int = strtotime(substr($date,0,6).'01');
-  $date_int += 43200;  // We add 12h
-  $month = date('m', $date_int);
-  $year = date('Y', $date_int);
-  $first_next_month = mktime(0,0,0,$month+1, 1, $year);
+  $ts_date = strtotime($iso_date);
+  $month = of_date_get_month($ts_date);
+  $year = of_date_get_year($ts_date);
+  $day = 1;
 
+  // First and last days of month
+  $ts_month_begin = mktime(12,0,0,$month, 1, $year);
+  $ts_next_month = mktime(0,0,0,$month+1, 1, $year);
+
+  $date = $ts_month_begin;
   $workingdays = 0;
-  while ($date_int < $first_next_month) {
-    if (time_is_working_day($date_int)) {
+  while ($date < $ts_next_month) {
+    if (time_is_working_day($date)) {
       $workingdays++;
     }
-    $date_int += 86400;
+    $date += 86400;
   }
 
   return $workingdays;

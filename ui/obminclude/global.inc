@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.1.8';
+$obm_version = '2.1.9pre1';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -1161,6 +1161,32 @@ function of_date_get_full_hour($timestamp) {
 
   return $hour;
 }
+
+
+/**
+ * of_date_get_first_day_week
+ * Get the timestamp of the first day of the week of the date given
+ *
+ * @param mixed $date date in iso format 'yyyy-mm-dd' 
+ * @param mixed $null_empty 
+ * @access public
+ * @return timestamp
+ */
+function of_date_get_first_day_week($iso_date) {
+  global $c_week_first_day;
+
+  $ts_date = strtotime($iso_date);
+  $year = of_date_get_year($ts_date);
+  $month = of_date_get_month($ts_date);
+  $day = of_date_get_day($ts_date);
+  $dow = date('w', $ts_date);
+  // Get obm day of week (as obm week first day can be configured)
+  $obm_dow = ($dow - $c_week_first_day + 7) % 7;
+  $ts_weekstart = mktime(6, 0, 0, $month, $day - $obm_dow, $year);
+
+  return ($ts_weekstart); 
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

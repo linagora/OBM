@@ -23,10 +23,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Todo
-// - review actions : stats
-// - probleme de date !! stockage different Mysql et postgres (timetask_date)
-//   mysql : 20041116..., postgres 2004-11-16...
-//   d'ou toutes les fonctions substr... pour recup mois, jour depuis bd ko !! avec pg (attention pas depuis time[date]
 // - point sur timetask_status ! dans globalview : incoherent
 //   => d'ou sur validate, unvalidate et valid auto
 
@@ -76,7 +72,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
-  $d_start_week = time_first_day_week($params['date']);
+  $d_start_week = of_date_get_first_day_week($params['date']);
   $val_days = run_query_time_valid_search($params);
   $display['result'] .= dis_time_form_addtask($params, $val_days);
 
@@ -90,7 +86,7 @@ if ($action == 'index') {
      window.opener.location.href='$path/time/time_index.php?action=index&user_id=".$params['user_id']."&date=".$params['date']."';
      window.close();
     </script>
-  ";
+";
 
 } elseif ($action == 'delete') {
 //////////////////////////////////////////////////////////////////////////////
@@ -124,13 +120,14 @@ if ($action == 'index') {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
   $params['interval'] = 'month';
-  $statproj_q = run_query_time_stat_project($params);
+  $statproj = get_time_stat_project($params);
   $stattt = get_time_stat_tasktype($params);
   $display['detail'] = dis_time_nav_date($params);
   if ($perm->check_right('time', $cright_read_admin)) {
     $display['features'] .= dis_user_select($params, run_query_userobm_active(), 1);
   }
-  $display['detail'] .= dis_time_statsuser($statproj_q, $stattt, $params);
+  $display['detail'] .= dis_time_stats_project($statproj, $params);
+  $display['detail'] .= dis_time_stats_tasktype($stattt, $params);
 
 } elseif ($action == 'display') {
 ///////////////////////////////////////////////////////////////////////////////

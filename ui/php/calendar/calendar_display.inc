@@ -394,19 +394,19 @@ function html_calendar_bar_date_selector($calendar) {
   global $ccalendar_weekstart,$ico_ok;
   global $l_go, $l_go_to, $l_daysofweekfirst;
 
-  $iso_date = $calendar["date"];
+  $iso_date = $calendar['date'];
   $ts_date = strtotime($iso_date);
 
   $this_month = of_date_get_month($ts_date);
   $this_year = of_date_get_year($ts_date);
 
-  $start_time = strtotime("-3 month", $ts_date);
+  $start_time = strtotime('-3 month', $ts_date);
   $month_time = $start_time;
   $check_week = $ts_date;
   $start_week_time = get_calendar_date_day_of_week($start_time, $ccalendar_weekstart);
   $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
-  $end_time = strtotime("+9 month", $ts_date);
-  $dis_month = calendar_localizeDate ("month", $ts_date);
+  $end_time = strtotime('+9 month', $ts_date);
+  $dis_month = calendar_localizeDate ('month', $ts_date);
   $start_week_day = strtotime($ccalendar_weekstart);
   $start_day = get_calendar_date_day_of_week(strtotime("$this_year-$this_month-01"), $ccalendar_weekstart);
 
@@ -415,8 +415,8 @@ function html_calendar_bar_date_selector($calendar) {
   // Week Selection
   do {
     $weekdate = of_isodate_format($start_week_time);
-    $select_week1 = calendar_localizeDate("week_jump", $start_week_time);
-    $select_week2 = calendar_localizeDate("week_jump", $end_week_time);
+    $select_week1 = calendar_localizeDate('week_jump', $start_week_time);
+    $select_week2 = calendar_localizeDate('week_jump', $end_week_time);
     if (($check_week >= $start_week_time) && ($check_week <= $end_week_time)) {
       $sel_week .= "
         <option value=\"calendar_index.php?cal_range=week&amp;date=$weekdate\" selected=\"selected\">$select_week1 - $select_week2</option>";
@@ -424,36 +424,36 @@ function html_calendar_bar_date_selector($calendar) {
       $sel_week .= "
         <option value=\"calendar_index.php?cal_range=week&amp;date=$weekdate\">$select_week1 - $select_week2</option>";
     }
-    $start_week_time = strtotime ("+1 week", $start_week_time);
+    $start_week_time = strtotime ('+1 week', $start_week_time);
     $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
   } while ($start_week_time <= $end_time);
 
   // Month Selection
   for ($i=0; $i<12; $i++) {
     $monthdate = of_isodate_format($month_time);
-    $month_month = date("m", $month_time);
-    $select_month = calendar_localizeDate("month", $month_time);
+    $month_month = date('m', $month_time);
+    $select_month = calendar_localizeDate('month', $month_time);
     if ($month_month == $this_month) {
       $sel_month .= "<option value=\"calendar_index.php?cal_range=month&amp;date=$monthdate\" selected=\"selected\">$select_month</option>\n";
     } else {
       $sel_month .= "<option value=\"calendar_index.php?cal_range=month&amp;date=$monthdate\">$select_month</option>\n";
     }
-    $month_time = strtotime ("+1 month", $month_time);
+    $month_time = strtotime ('+1 month', $month_time);
   }
 
   // Minicalendar Head
   for ($i=0; $i<7; $i++) {
-    $day_num = date("w", $start_week_day);
+    $day_num = date('w', $start_week_day);
     $day = $l_daysofweekfirst[$day_num];
     $dis_minical_head .= "<td>$day</td>\n";
-    $start_week_day = strtotime("+1 day", $start_week_day);
+    $start_week_day = strtotime('+1 day', $start_week_day);
   }
 
   // Minicalendar
   $i = 0;
   do {
     if ($i == 0) $dis_minical .= "<tr>\n";
-    $day = date ("j", $start_day);
+    $day = date ('j', $start_day);
     $iso_day = of_isodate_format($start_day);
     $check_month = of_date_get_month($start_day);
 
@@ -475,7 +475,7 @@ function html_calendar_bar_date_selector($calendar) {
           </td>";
       }
     }
-    $start_day = strtotime("+1 day", $start_day);
+    $start_day = strtotime('+1 day', $start_day);
     $i++;
     if ($i == 7) {
       $dis_minical .= "</tr>\n";
@@ -488,11 +488,11 @@ function html_calendar_bar_date_selector($calendar) {
   $block = "
   <div class=\"portlet\" id=\"calendarMiniCal\">
     <h1>
-    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime("-1 year",$ts_date))."\">&lt;&lt;</a>
-    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime("-1 month",$ts_date))."\">&lt;</a>
+    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime('-1 year',$ts_date))."\">&lt;&lt;</a>
+    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime('-1 month',$ts_date))."\">&lt;</a>
     $dis_month
-    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime("+1 month",$ts_date))."\">&gt;</a>
-    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime("+1 year",$ts_date))."\">&gt;&gt;</a>
+    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime('+1 month',$ts_date))."\">&gt;</a>
+    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime('+1 year',$ts_date))."\">&gt;&gt;</a>
     </h1>
     <div>
       <table class=\"miniCalendar\">

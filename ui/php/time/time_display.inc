@@ -129,30 +129,32 @@ function dis_time_nav_date($time) {
     }
   }
 
+  $iso_date = $time['date'];
+  $ts_date = strtotime($iso_date);
+
   if ($interval == 'week') {
 
     $tot_width = 500;
 
     // get the current start and end of week
-    $d_start_week = time_first_day_week($time['date']);
+    $d_start_week = of_date_get_first_day_week($iso_date);
     $d_end_week = $d_start_week+6*86400;
-    $hum_date_start = dis_time_human_date(date('Ymd', $d_start_week));
-    $hum_date_end = dis_time_human_date(date('Ymd', $d_end_week));
+    $hum_date_start = of_date_format($d_start_week);
+    $hum_date_end = of_date_format($d_end_week);
     $title = "$user $hum_date_start - $hum_date_end";
 
     // get the previous and next beginning of week
-    $d_prev = date('Ymd',$d_start_week-7*86400);
-    $d_next = date('Ymd',$d_start_week+7*86400+$c_dst_err); // prevent DST bug
+    $d_prev = of_isodate_format($d_start_week-7*86400);
+    $d_next = of_isodate_format($d_start_week+7*86400+$c_dst_err); // prevent DST bug
 
   } else if ($interval == 'month') {
 
     $tot_width = (in_array($action, $no_user)) ? 200 : 400;
 
-    // This should work for january also (month 0 = december) 
-    $month = substr($time['date'],4,2);
-    $year = substr($time['date'],0,4);
-    $d_prev = date('Ymd', mktime(0,0,0,$month-1,1,$year));
-    $d_next = date('Ymd', mktime(0,0,0,$month+1,1,$year));
+    $month = of_date_get_month($ts_date);
+    $year = of_date_get_year($ts_date);
+    $d_prev = of_isodate_format(mktime(0,0,0,$month-1,1,$year));
+    $d_next = of_isodate_format(mktime(0,0,0,$month+1,1,$year));
     $title = "$user ". $l_monthsofyear[$month-1] . " $year";;
   }
 
@@ -164,8 +166,7 @@ function dis_time_nav_date($time) {
     <a href=\"$url_prev\"><img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>     
     $title
     <a href=\"$url_next\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
-    </h1> 
-    ";    
+    </h1>";
 
   return $block;
 }
@@ -190,7 +191,7 @@ function dis_time_planning_week($obm_q,$time) {;
   $tot_width = 500;
   $col_width = $tot_width / $nb_worked_days;
 
-  $first_day = time_first_day_week($time['date']);
+  $first_day = of_date_get_first_day_week($time['date']);
   $curr_day = $first_day + $c_dst_err;
   $last_day = $first_day + 7*86400;
 
@@ -253,8 +254,10 @@ function dis_time_planning_month($obm_q, $time) {
   $span = 0;
   $nb_worked_days = array_sum($c_working_days);
 
-  $year = substr($time['date'],0,4);
-  $month = substr($time['date'],4,2);
+  $iso_date = $time['date'];
+  $ts_date = strtotime($iso_date);
+  $month = of_date_get_month($ts_date);
+  $year = of_date_get_year($ts_date);
 
   // first day of the month in second
   $first_day_sec = mktime(0,0,0,$month, 1, $year);
@@ -321,7 +324,7 @@ function dis_time_planning_month($obm_q, $time) {
 
     // last day of the week 
     if (($val['obm_dow'] == 6) or ($day == $month_length)) {
-      $week = get_time_week_point($year.$month.$day);
+      $week = get_time_week_point("$year-$month-$day");
       $url = url_prepare("time_index.php?action=index&amp;date=".$week[0]);
       
       if ($time_length != $time_worked) {
@@ -387,8 +390,10 @@ function dis_time_user_planning($obm_q, $time) {
   global $path, $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
   global $l_daysofweekfirst;
 
-  $year = substr($time['date'],0,4);
-  $month = substr($time['date'],4,2);
+  $iso_date = $time['date'];
+  $ts_date = strtotime($iso_date);
+  $month = of_date_get_month($ts_date);
+  $year = of_date_get_year($ts_date);
 
   // first day of the month in second
   $first_day_sec = mktime(0,0,0,$month, 1, $year);
@@ -653,7 +658,7 @@ function dis_time_form_addtask($time, $validate_days) {
   $projecttask_q = run_query_time_projecttask($time);
   $tasktype_q = run_query_time_used_tasktype($time['user_id']);
   $nb_worked_days = array_sum($c_working_days);
-  $d_start_week = time_first_day_week($time['date']);  
+  $d_start_week = of_date_get_first_day_week($time['date']);  
   $work_day_dates = get_time_week_working_days_dates($d_start_week);
 
   $cpt_end = $c_week_first_day + 7;
@@ -1032,49 +1037,95 @@ function html_time_month_users_total($time, $array_res) {
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display the Stats TimeManager result page
-// Parameters:
-//   - $time[] : time search criteria
-//     keys used  : 
-///////////////////////////////////////////////////////////////////////////////
-function dis_time_statsuser($statproj_q, $stattt, $time) {
+/**
+ * Display Projects activity stats
+ *
+ * @param mixed $statp : project tasktime infos array
+ * @param mixed $time[] : time parameters
+ */
+function dis_time_stats_project($statp, $time) {
   global $cdg_param, $obm;
-  global $l_proj_stats, $l_no_proj_stats;
-  global $l_tt_stats, $l_no_tt_stats;
-  global $l_tasktype, $l_total,$l_total_period, $l_total_before, $l_total_after;
+  global $l_proj_stats, $l_no_proj_stats, $l_project, $l_tt, $l_company;
+  global $l_total,$l_total_period, $l_total_before, $l_total_after;
 
-  if ($statproj_q->num_rows() != 0) {
-    $prefs_p = get_display_pref($obm['uid'], 'time_proj');
+  if (is_array($statp)) {
+    foreach($statp as $p_id => $p) {
+      if ($p_id != '0') {
+        $cpt++;
+        if($cpt % 2 == 0) {
+          $class = "class=\"pair\"";
+        } else {
+          $class = '';
+        }
+	$name = $p['project'];
+	$tasktype = $p['tasktype'];
+	$company = $p['company'];
+	$time = $p['time'];
+	$time_before = $p['time_before'];
+	$time_after = $p['time_after'];
+	$dis_p_array .= "
+      <tr $class>
+        <td>$name</td>
+        <td>$tasktype</td>
+        <td>$company</td>
+        <td style=\"text-align: right;\">$time&nbsp;</td>
+        <td style=\"text-align: right;\">$time_before&nbsp;</td>
+        <td style=\"text-align: right;\">$time_after&nbsp;</td>
+      </tr>";
+      }
+    }
 
-    $dis_projuser_list = new OBM_DISPLAY('DATA', $prefs_p, 'time', 'time_proj');
-    $dis_projuser_list->data_set = $statproj_q;
-    $dis_projuser_list->data_order = false;
-    $dis_projuser_list->data_page = false;
-    $dis_projuser_list->data_header = 'top';
-
-    $block .= "<h1>$l_proj_stats</h1>";
-    $block .= $dis_projuser_list->display('dis_time_data');
+    $total_time = $statp[0]['time_total'];
+    $total_time_before = $statp[0]['time_before_total'];
+    $total_time_after = $statp[0]['time_after_total'];
+    
+    $dis_stat_p = "
+    <h1>$l_proj_stats</h1>
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr>
+      <th>$l_project</th>
+      <th>$l_tt</th>
+      <th>$l_company</th>
+      <th>$l_total_period</th>
+      <th>$l_total_before</th>
+      <th>$l_total_after</th>
+    </tr>
+    </thead>
+    $dis_p_array
+    <tfoot>
+    <tr>
+      <td colspan=\"3\">$l_total</td>
+      <td>$total_time&nbsp;</td>
+      <td>$total_time_before&nbsp;</td>
+      <td>$total_time_after&nbsp;</td>
+    </tr>
+    </tfoot>
+    </table>";
   } else {
-    $block .= display_warn_msg($l_no_proj_stats);
+    $dis_stat_p = "
+    <h1>$l_no_proj_stats</h1>";
   }
+
+  $block .= $dis_stat_p;
   
-  /*  if ($stattt_q->num_rows() != 0) {
-    $prefs_t = get_display_pref($obm['uid'], 'time_tt');
+  return $block;
+}
 
-    $dis_ttuser_list = new OBM_DISPLAY('DATA', $prefs_t, 'time', 'time_tt');
-    $dis_ttuser_list->data_set = $stattt_q;
-    $dis_ttuser_list->data_order = false;
-    $dis_ttuser_list->data_page = false;
-    $dis_projuser_list->data_header = 'top';
 
-    $block .= "<h1>$l_tt_stats</h1>";
-    $block .= $dis_ttuser_list->display('dis_time_data');
-  } else {
-    $block .= display_warn_msg($l_no_tt_stats);
-    }*/
+/**
+ * Display TimeTask stats
+ *
+ * @param mixed $stattt : tasktype infos array
+ * @param mixed $time[] : time parameters
+ */
+function dis_time_stats_tasktype($stattt, $time) {
+  global $cdg_param, $obm;
+  global $l_tt_stats, $l_no_tt_stats, $l_tt, $l_tt_others;
+  global $l_total, $l_total_period, $l_total_before, $l_total_after;
 
   if (is_array($stattt)) {
+    $prec_type = '';
     foreach($stattt as $tt_id => $tt) {
       if ($tt_id != '0') {
         $cpt++;
@@ -1084,10 +1135,27 @@ function dis_time_statsuser($statproj_q, $stattt, $time) {
           $class = '';
         }
 	$label = $tt['label'];
-	$time = $tt['time'];
-	$time_before = $tt['time_before'];
-	$time_after = $tt['time_after'];
-	// $amount = number_format($pu['amount']);
+	$time = number_format($tt['time'],3);
+	$time_before = number_format($tt['time_before'],3);
+	$time_after = number_format($tt['time_after'],3);
+	$type = $tt['type'];
+	if (($type != $prec_type) && ($prec_type != '')) {
+	  $title = ${"l_$prec_type"};
+	  $dis_tt_array .= "
+      <tr>
+        <th>$l_total : $title</th>
+        <th>$type_time&nbsp;</th>
+        <th>$type_time_before&nbsp;</th>
+        <th>$type_time_after&nbsp;</th>
+      </tr>";
+	  $type_time = 0;
+	  $type_time_before = 0;
+	  $type_time_after = 0;
+	}
+	$prec_type = $type;
+	$type_time += $tt['time'];
+	$type_time_before += $tt['time_before'];
+	$type_time_after += $tt['time_after'];
 	$dis_tt_array .= "
       <tr $class>
         <td>$label</td>
@@ -1098,6 +1166,14 @@ function dis_time_statsuser($statproj_q, $stattt, $time) {
       }
     }
 
+    $dis_tt_array .= "
+      <tr>
+        <th>$l_total</th>
+        <th>$type_time&nbsp;</th>
+        <th>$type_time_before&nbsp;</th>
+        <th>$type_time_after&nbsp;</th>
+      </tr>";
+
     $total_time = $stattt[0]['time_total'];
     $total_time_before = $stattt[0]['time_before_total'];
     $total_time_after = $stattt[0]['time_after_total'];
@@ -1107,7 +1183,7 @@ function dis_time_statsuser($statproj_q, $stattt, $time) {
     <table class=\"spreadSheet\">
     <thead>
     <tr>
-      <th>$l_tasktype</th>
+      <th>$l_tt</th>
       <th>$l_total_period</th>
       <th>$l_total_before</th>
       <th>$l_total_after</th>
@@ -1152,24 +1228,5 @@ function dis_time_display_pref($prefs) {
   $block .= $dis_pref->dis_pref_help();
   return $block;
 }
-
-
-//////////////////////////////////////////////////////////////////////////
-// Show a date in human format
-//  params : $p_date : date in yyyymmdd format
-//////////////////////////////////////////////////////////////////////////
-function dis_time_human_date($p_date) {
-  global $cdg_sql, $l_monthsofyear;
-    
-  $p_year=substr($p_date,0,4);
-  $p_month=substr($p_date,4,2);
-  $p_day=substr($p_date,6,2);
-   
-  $mois = $l_monthsofyear[$p_month-1];
-
-  return "$p_day $mois $p_year";
-
-}
-
 
 ?>

@@ -258,13 +258,14 @@ function run_query_calendar_insert_decision($calendar) {
 function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state){
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
-  if($entity_id == '') {
+
+  if ($entity_id == '') {
     $entity_id = $obm['uid'];
   }
-  if($obm['uid'] != $entity_id || $entity != 'user') {
-    if( $entity == 'user') {
+  if ($obm['uid'] != $entity_id || $entity != 'user') {
+    if ($entity == 'user') {
       $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
-    } elseif($entity == 'resource') {
+    } elseif ($entity == 'resource') {
       $writable = of_right_entity_for_user('Resource', $obm['uid'], 'write');
     }
     
@@ -278,8 +279,7 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
             SET evententity_state = '$state'
             WHERE evententity_entity_id = $entity_id
               AND evententity_entity = '$entity'
-              AND evententity_event_id = '$event_id'
-              ";
+              AND evententity_event_id = '$event_id'";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
   $obm_q = new DB_OBM;
@@ -655,7 +655,7 @@ function create_calendar_ics_meeting_file($calendar, $event_id, $attendees, $res
   include_once('obminclude/of/vcalendar/writer/ICS.php');
   include_once('obminclude/of/vcalendar/reader/OBM.php');
 
-  $calendar_user["user"] = array ($obm["uid"] => "dummy");
+  $calendar_user['user'] = array ($obm['uid'] => 'dummy');
   
   $reader = new Vcalendar_Reader_OBM($calendar_user,array($event_id));
   $document = $reader->getDocument();
