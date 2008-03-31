@@ -434,8 +434,8 @@ function run_query_incident_update($incident) {
   $id = $incident['incident_id'];
   $lincident = $incident['lincident'];
   $reference = $incident['reference'];
-  $owner = ($incident['owner'] ? "='".$incident['owner']."'" : 'is null');
-  $logger = ($incident['logger'] ? "='".$incident['logger']."'" : 'is null');
+  $owner = ($incident['owner'] ? "='".$incident['owner']."'" : '= null');
+  $logger = ($incident['logger'] ? "='".$incident['logger']."'" : '= null');
   $solu = $incident['solution'];
   $priority = $incident['priority'];
   $status = $incident['status'];
