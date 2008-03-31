@@ -875,10 +875,32 @@ function run_query_user_update($p_id, $user) {
     $gid = 0;
   }
 
+    $passwd = $user['passwd'];
+  if ($passwd != '') {
+    // If a password type is given, get it else get the system parameter
+    $passwd_type = $user['password_type'];
+    if (($passwd_type == 'PLAIN')
+	|| ($passwd_type == 'CRYPT')
+	|| ($passwd_type == 'PLAIN')) {
+      $passwd_type = $passwd_type;
+    } else {
+      $passwd_type = $password_encryption;
+    }
+    if ($passwd_type == 'CRYPT') {
+      $passwd_crypt = crypt($passwd);
+    } else if ($passwd_type == 'MD5SUM') {
+      $passwd_crypt = md5($passwd);
+    } else {
+      $passwd_crypt = $passwd;
+    }
+
+    $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type='$password_encryption'";
+    $passwd_update_q = $passwd_update.',';
+  }
   $query = "UPDATE UserObm SET
     userobm_timeupdate='". date('Y-m-d H:i:s')."',
     userobm_userupdate='". $obm['uid'] ."',
-    $passwd_update
+    $passwd_update_q
     userobm_login='$login',
     userobm_perms='$profile',
     userobm_gid='$gid',
@@ -917,27 +939,9 @@ function run_query_user_update($p_id, $user) {
   display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
   $retour = $obm_q->query($query);
 
-  $passwd = $user['passwd'];
+
+
   if ($passwd != '') {
-    // If a password type is given, get it else get the system parameter
-    $passwd_type = $user['password_type'];
-    if (($passwd_type == 'PLAIN')
-	|| ($passwd_type == 'CRYPT')
-	|| ($passwd_type == 'PLAIN')) {
-      $passwd_type = $passwd_type;
-    } else {
-      $passwd_type = $password_encryption;
-    }
-    if ($passwd_type == 'CRYPT') {
-      $passwd_crypt = crypt($passwd);
-    } else if ($passwd_type == 'MD5SUM') {
-      $passwd_crypt = md5($passwd);
-    } else {
-      $passwd_crypt = $passwd;
-    }
-
-    $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type='$password_encryption'";
-
     if ($cgp_use['service']['ldap']) {
       $query = "UPDATE P_UserObm SET
         $passwd_update
@@ -975,7 +979,6 @@ function run_query_user_update($p_id, $user) {
       }
     }
 
-    $passwd_update .= ',';
   }
 
   // If the user is archived, we unsubscribe it from all Groups
