@@ -1357,10 +1357,10 @@ function session_load_user_prefs() {
   }
 
   $_SESSION['last_v'] = $last_v;
-  if (isset($_SESSION['set_cal_first_hour'])) {
+  if (!isset($_SESSION['set_cal_first_hour'])) {
    $_SESSION['set_cal_first_hour'] = $ccalendar_first_hour;
   }
-  if (isset($_SESSION['set_cal_last_hour'])) {
+  if (!isset($_SESSION['set_cal_last_hour'])) {
     $_SESSION['set_cal_last_hour'] = $ccalendar_last_hour;
   }
   

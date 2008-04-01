@@ -640,9 +640,9 @@ function html_host_form($action, $host_q, $host, $field='') {
 //   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
 function dis_host_display_pref($prefs) {
-  global $l_host_display;
+  global $l_host_display, $module;
 
-  $dis_pref = new OBM_DISPLAY('PREFERENCES', $prefs);
+  $dis_pref = new OBM_DISPLAY('PREFERENCES', $prefs, $module);
   $dis_pref->display_entity = 'host'; 
   $dis_pref->pref_title = $l_host_display;
   $dis_pref->pref_dis_help = 1;
