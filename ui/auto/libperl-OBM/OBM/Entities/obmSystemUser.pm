@@ -303,11 +303,13 @@ sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"userDesc"};
-    my $update = 0;
+
+    require OBM::Entities::entitiesUpdateState;
+    my $update = OBM::Entities::entitiesUpdateState->new();
 
 
     if( !defined($ldapEntry) ) {
-        return 0;
+        return undef;
     }
 
 
@@ -317,7 +319,7 @@ sub updateLdapEntry {
         # On synchronise le surname
         &OBM::Ldap::utils::modifyAttr( $longName, $ldapEntry, "sn" );
 
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le mot de passe
@@ -325,19 +327,21 @@ sub updateLdapEntry {
         my $userPasswd = &OBM::passwd::convertPasswd( $entry->{"user_passwd_type"}, $entry->{"user_passwd"} );
         if( defined( $userPasswd ) ) {
             if( &OBM::Ldap::utils::modifyAttr( $userPasswd, $ldapEntry, "userpassword" ) ) {
-                $update = 1;
+                $update->setUpdate();
             }
         }
     }
 
     # Le domaine
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_domain"}, $ldapEntry, "obmDomain") ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
 
     if( $self->isLinks() ) {
-        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
+            $update->setUpdate();
+        }
     }
 
 

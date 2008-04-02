@@ -475,56 +475,60 @@ sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"mailShareDesc"};
-    my $update = 0;
+
+    require OBM::Entities::entitiesUpdateState;
+    my $update = OBM::Entities::entitiesUpdateState->new();
 
 
     if( !defined($ldapEntry) ) {
-        return 0;
+        return undef;
     }
 
 
     # Le nom de la BAL
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailshare_mailbox"}, $ldapEntry, "mailbox" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # La description
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailshare_description"}, $ldapEntry, "description" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le cas des alias mails
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"mailshare_mail"}, $ldapEntry, "mail" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le cas des alias mails secondaires
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"mailshare_mail_alias"}, $ldapEntry, "mailAlias" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # L'acces au mail
     if( $entry->{"mailshare_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
-        $update = 1;
+        $update->setUpdate();
 
     }elsif( !$entry->{"mailshare_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "REJECT", $ldapEntry, "mailAccess" )) ) {
-        $update = 1;
+        $update->setUpdate();
 
     }
 
     # Le serveur de BAL local
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailShare_mailLocalServer"}, $ldapEntry, "mailBoxServer" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le domaine
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailshare_domain"}, $ldapEntry, "obmDomain" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
 
     if( $self->isLinks() ) {
-        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
+            $update->setUpdate();
+        }
     }
 
 

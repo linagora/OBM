@@ -1,9 +1,23 @@
 package OBM::Samba::utils;
 
-require Exporter;
 
-require OBM::Parameters::common;
+$debug = 1;
+
+
+use 5.006_001;
 use strict;
+use vars qw( @EXPORT_OK $VERSION );
+use base qw(Exporter);
+
+
+use OBM::Parameters::common;
+
+
+$VERSION = "1.0";
+
+@EXPORT_OK = qw(    getUserSID
+                    getGroupSID
+               );
 
 
 sub getUserSID {
@@ -72,6 +86,12 @@ sub getGroupSID {
         # Groupe des invites
         if( $groupGID == 514 ) {
             $groupSID = $domainSid."-514";
+            last SWITCH;
+        }
+
+        # Groupe des hôtes
+        if( $groupGID == 515 ) {
+            $groupSID = $domainSid."-515";
             last SWITCH;
         }
 

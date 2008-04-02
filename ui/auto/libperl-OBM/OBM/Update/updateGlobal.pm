@@ -28,7 +28,7 @@ require OBM::Entities::obmMailshare;
 require OBM::Entities::obmMailServer;
 require OBM::Entities::obmSambaDomain;
 require OBM::Update::utils;
-use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost _doSystemUser _doSambaDomain _doMailServer _deleteDbEntity);
+use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost _doSystemUser _doSambaDomain _doMailServer _deleteDbEntity _tableNamePrefix);
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 
@@ -158,9 +158,9 @@ sub update {
     my $return = 1;
 
     # On traite les suppressions
-    $return = $return && $self->_doGlobalDelete();
+    $return = $self->_doGlobalDelete();
     # On traite les mises à jour
-    $return = $self->_doGlobalUpdate();
+    $return = $return & $self->_doGlobalUpdate();
 
     if( $return ) {
         $return = $self->_doRemoteConf();
@@ -461,11 +461,7 @@ sub _doGlobalDelete {
         my $object = $self->_doHost( 1, 1, $hostId );
 
         my $return = $self->_runEngines( $object );
-        if( $return ) {
-            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
-            # travail
-            $globalReturn = $globalReturn && $self->_deleteDbEntity( "Host", $hostId );
-        }
+        $globalReturn = ($return && $self->_deleteDbEntity( "Host", $hostId )) & $globalReturn;
     }
 
 
@@ -480,11 +476,7 @@ sub _doGlobalDelete {
         my $object = $self->_doUser( 1, 1, $userId );
 
         my $return = $self->_runEngines( $object );
-        if( $return ) {
-            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
-            # travail
-            $globalReturn = $globalReturn && $self->_deleteDbEntity( "UserObm", $userId );
-        }
+        $globalReturn = ($return && $self->_deleteDbEntity( "UserObm", $userId)) & $globalReturn;
     }
 
 
@@ -499,11 +491,7 @@ sub _doGlobalDelete {
         my $object = $self->_doGroup( 1, 1, $groupId );
 
         my $return = $self->_runEngines( $object );
-        if( $return ) {
-            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
-            # travail
-            $globalReturn = $globalReturn && $self->_deleteDbEntity( "UGroup", $groupId );
-        }
+        $globalReturn = ($return && $self->_deleteDbEntity( "UGroup", $groupId)) & $globalReturn;
     }
 
 
@@ -518,11 +506,7 @@ sub _doGlobalDelete {
         my $object = $self->_doMailShare( 1, 1, $mailshareId );
 
         my $return = $self->_runEngines( $object );
-        if( $return ) {
-            # La MAJ de l'entité s'est bien passée, on met a jour la BD de
-            # travail
-            $globalReturn = $globalReturn && $self->_deleteDbEntity( "MailShare", $mailshareId );
-        }
+        $globalReturn = ($return && $self->_deleteDbEntity( "MailShare", $mailshareId )) & $globalReturn;
     }
 
 

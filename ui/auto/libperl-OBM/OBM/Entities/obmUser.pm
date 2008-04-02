@@ -253,15 +253,15 @@ sub getEntity {
 
     # Gestion du droit de messagerie de l'utilisateur
     $self->{userDesc}->{userobm_mail_perms} = $dbUserDesc->{userobm_mail_perms};
-    if( $dbUserDesc->{userobm_domain_id} == 0 ) {
+    if( $self->{userDesc}->{userobm_mail_perms} && $dbUserDesc->{userobm_domain_id} == 0 ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur : ".$self->getEntityDescription()." - annule, pas de droit mail dans le domaine 'metadomain'", "W" );
         $self->{userDesc}->{userobm_mail_perms} = 0;
 
-    }elsif( !$dbUserDesc->{userobm_email} ) {
+    }elsif( $self->{userDesc}->{userobm_mail_perms} && !$dbUserDesc->{userobm_email} ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur : ".$self->getEntityDescription()." - annule, pas d'adresse mail indiquee !", "W" );
         $self->{userDesc}->{userobm_mail_perms} = 0;
 
-    }else {
+    }elsif( $self->{userDesc}->{userobm_mail_perms} ) {
         my @email = split( /\r\n/, $dbUserDesc->{userobm_email} );
         for( my $j=0; $j<=$#email; $j++ ) {
             push( @{$self->{userDesc}->{userobm_email}}, $email[$j]."@".$domainDesc->{domain_name} );
@@ -504,7 +504,7 @@ sub updateDbEntityPassword {
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution de la requete.", "W" );
         if( defined($queryResult) ) {
-            &ONM::toolBox::write_log( $queryResult->err, "W" );
+            &OBM::toolBox::write_log( $queryResult->err, "W" );
         }
 
         return 0;
@@ -515,7 +515,7 @@ sub updateDbEntityPassword {
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution de la requete.", "W" );
         if( defined($queryResult) ) {
-            &ONM::toolBox::write_log( $queryResult->err, "W" );
+            &OBM::toolBox::write_log( $queryResult->err, "W" );
         }
 
         return 0;
@@ -878,17 +878,24 @@ sub updateLdapEntryDn {
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
-    my $update = 0;
     my $dbEntry = $self->{userDbDesc};
     my $entryProp = $self->{userDesc};
     my $entryLinks = $self->{userLinks};
-    
+
+    require OBM::Entities::entitiesUpdateState;
+    my $update = OBM::Entities::entitiesUpdateState->new();
+
+
+    if( !defined($ldapEntry) ) {
+        return undef;
+    }
+
     
    # Vérification des objectclass
     my @deletedObjectclass;
     my $currentObjectclass = $self->getLdapObjectclass( $ldapEntry->get_value("objectClass", asref => 1), \@deletedObjectclass);
     if( &OBM::Ldap::utils::modifyAttrList( $currentObjectclass, $ldapEntry, "objectClass" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     if( $#deletedObjectclass >= 0 ) {
@@ -898,141 +905,148 @@ sub updateLdapEntry {
         my $deleteAttrs = &OBM::Ldap::utils::diffObjectclassAttrs(\@deletedObjectclass, $currentObjectclass, $objectclassDesc);
 
         for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
+            SWITCH: {
+                if( $deleteAttrs->[$i] =~ /^sambaSID$/ ) {
+                    $update->setUpdateLinks();
+                    last SWITCH;
+                }
+            }
+
             if( &OBM::Ldap::utils::modifyAttrList( undef, $ldapEntry, $deleteAttrs->[$i] ) ) {
-                $update = 1;
+                $update->setUpdate();
             }
         }
     }
 
     # L'UID number
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{"userobm_uid"}, $ldapEntry, "uidNumber" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # Le GID number
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{"userobm_gid"}, $ldapEntry, "gidNumber" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le shell utilisateur
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_shell}, $ldapEntry, "loginShell" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_full_name}, $ldapEntry, "cn" ) ) {
     # On synchronise le nom affichable
         &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_full_name}, $ldapEntry, "displayName" );
     
-        $update = 1;
+        $update->setUpdate();
     }
     
     # Le nom de famille
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{userobm_lastname}, $ldapEntry, "sn" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # Le prénom
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{userobm_firstname}, $ldapEntry, "givenName" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le répertoire personnel
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_homedir}, $ldapEntry, "homeDirectory" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le téléphone
     if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{userobm_phone}, $ldapEntry, "telephoneNumber" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # Le fax
     if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{userobm_fax}, $ldapEntry, "facsimileTelephoneNumber" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # Le mobile
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{userobm_mobile}, $ldapEntry, "mobile" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
  
     # Le titre
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{userobm_title}, $ldapEntry, "title" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # Le service
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{userobm_service}, $ldapEntry, "ou" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # La description
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{userobm_description}, $ldapEntry, "description" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # L'accés au web
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{userobm_web_perms}, $ldapEntry, "webAccess" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # La boîte à lettres de l'utilisateur
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_mailbox_ldap_name}, $ldapEntry, "mailBox" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # Le serveur de BAL local
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_mailLocalServer}, $ldapEntry, "mailBoxServer" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # L'accés au mail
     if( $entryProp->{userobm_mail_perms} && ( &OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" ) ) ) {
-        $update = 1;
+        $update->setUpdate();
     
     }elsif( !$entryProp->{userobm_mail_perms} && ( &OBM::Ldap::utils::modifyAttr( "REJECT", $ldapEntry, "mailAccess" ) ) ) {
-        $update = 1;    
+        $update->setUpdate();
     }
     
     # La limitation au domaine local
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_mailLocalOnly}, $ldapEntry, "mailLocalOnly" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Les adresses mails
     if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{userobm_email}, $ldapEntry, "mail" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Les adresses mail secondaires
     if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{userobm_email_alias}, $ldapEntry, "mailAlias" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
    
     # L'adresse postale
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_address}, $ldapEntry, "street" ) ) {
         &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_address}, $ldapEntry, "postalAddress" );
-        $update = 1;
+        $update->setUpdate();
     }
     
     # Le code postal
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{userobm_zipcode}, $ldapEntry, "postalCode" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # La ville
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{userobm_town}, $ldapEntry, "l" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # La visibilité
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_hidden}, $ldapEntry, "hiddenUser" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
     
     # Le domaine
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_domain}, $ldapEntry, "obmDomain") ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
 
@@ -1044,19 +1058,21 @@ sub updateLdapEntry {
             # samba de l'utilisateur. Il faut donc placer les mots de passes.
             if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_lm_password}, $ldapEntry, "sambaLMPassword" ) ) {
                 &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_nt_password}, $ldapEntry, "sambaNTPassword" );
-                $update = 1;
+                $update->setUpdate();
             }
         }
     }
 
     # Le SID de l'utilisateur
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_sid}, $ldapEntry, "sambaSID") ) {
-        $update = 1;
+        $update->setUpdate();
+        $update->setUpdateLinks();
     }
 
     # Le SID du groupe de l'utilisateur
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_group_sid}, $ldapEntry, "sambaPrimaryGroupSID") ) {
-        $update = 1;
+        $update->setUpdate();
+        $update->setUpdateLinks();
     }
 
     # Les flags de l'utilisateur
@@ -1064,23 +1080,25 @@ sub updateLdapEntry {
 
     # Le script de session
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_logon_script}, $ldapEntry, "sambaLogonScript") ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le répertoire personnel et la lettre du lecteur associé
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_home_drive}, $ldapEntry, "sambaHomeDrive") ) {
         &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_home}, $ldapEntry, "sambaHomePath");
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le répertoire du profil W2k
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_user_profile}, $ldapEntry, "sambaProfilePath") ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
 
     if( $self->isLinks() ) {
-        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
+            $update->setUpdate();
+        }
     }
 
 
@@ -1360,7 +1378,7 @@ sub getHostIpById {
     if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
         &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution de la requete.", "W" );
         if( defined($queryResult) ) {
-            &ONM::toolBox::write_log( $queryResult->err, "W" );
+            &OBM::toolBox::write_log( $queryResult->err, "W" );
         }
 
         return undef;

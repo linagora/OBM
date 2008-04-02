@@ -27,7 +27,7 @@ require OBM::Entities::obmMailshare;
 require OBM::Entities::obmMailServer;
 require OBM::Entities::obmSambaDomain;
 require OBM::Update::utils;
-use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost _deleteDbEntity);
+use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost _deleteDbEntity _tableNamePrefix);
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 
@@ -486,21 +486,6 @@ sub _incrementalDelete {
     }
 
     return $globalReturn;
-}
-
-
-sub _tableNamePrefix {
-    my $self = shift;
-    my( $table ) = @_;
-    my $columnPrefix;
-    
-    if( lc($table) eq "ugroup" ) {
-        $columnPrefix = "group";
-    }else {
-        $columnPrefix = lc($table);
-    }
-
-    return $columnPrefix;
 }
 
 

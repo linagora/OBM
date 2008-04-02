@@ -396,14 +396,16 @@ sub updateLdapEntryDn {
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
-    my $update = 0;
     my $dbEntry = $self->{hostDbDesc};
     my $entryProp = $self->{hostDesc};
     my $entryLinks = $self->{hostLinks};
 
+    require OBM::Entities::entitiesUpdateState;
+    my $update = OBM::Entities::entitiesUpdateState->new();
+
 
     if( !defined($ldapEntry) ) {
-        return 0;
+        return undef;
     }
 
 
@@ -411,7 +413,7 @@ sub updateLdapEntry {
     my @deletedObjectclass;
     my $currentObjectclass = $self->getLdapObjectclass( $ldapEntry->get_value("objectClass", asref => 1), \@deletedObjectclass);
     if( &OBM::Ldap::utils::modifyAttrList( $currentObjectclass, $ldapEntry, "objectClass" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     if( $#deletedObjectclass >= 0 ) {
@@ -422,7 +424,7 @@ sub updateLdapEntry {
 
         for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
             if( &OBM::Ldap::utils::modifyAttrList( undef, $ldapEntry, $deleteAttrs->[$i] ) ) {
-                $update = 1;
+                $update->setUpdate();
             }
         }
     }
@@ -430,22 +432,22 @@ sub updateLdapEntry {
 
     # La description
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{"host_description"}, $ldapEntry, "description" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # L'adresse IP
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{"host_ip"}, $ldapEntry, "ipHostNumber" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le domaine OBM
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{"host_domain"}, $ldapEntry, "obmDomain" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le nom windows
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_login}, $ldapEntry, "uid" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     if( defined($entryProp->{host_samba_sid}) ) {
@@ -456,29 +458,31 @@ sub updateLdapEntry {
             # samba de l'hôte. Il faut donc placer les mots de passes.
             if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_lm_passwd}, $ldapEntry, "sambaLMPassword" ) ) {
                 &OBM::Ldap::utils::modifyAttr( $entryProp->{host_nt_passwd}, $ldapEntry, "sambaNTPassword" );
-                $update = 1;
+                $update->setUpdate();
             }
         }
     }
 
     # Le SID de l'hôte
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_samba_sid}, $ldapEntry, "sambaSID" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le groupe de l'hôte
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_samba_group_sid}, $ldapEntry, "sambaPrimaryGroupSID" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Les flags de l'hôte Samba
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{host_samba_flags}, $ldapEntry, "sambaAcctFlags" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
 
     if( $self->isLinks() ) {
-        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
+            $update->setUpdate();
+        }
     }
 
 

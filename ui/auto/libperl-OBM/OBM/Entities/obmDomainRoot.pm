@@ -126,21 +126,31 @@ sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"domainDesc"};
-    my $update = 0;
+
+    require OBM::Entities::entitiesUpdateState;
+    my $update = OBM::Entities::entitiesUpdateState->new();
 
 
     if( !defined($ldapEntry) ) {
-        return 0;
+        return undef;
     }
 
 
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"domain_label"}, $ldapEntry, "o" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"domain_desc"}, $ldapEntry, "description" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
+
+
+    if( $self->isLinks() ) {
+        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
+            $update->setUpdate();
+        }
+    }
+
 
     return $update;
 }

@@ -29,6 +29,7 @@ $VERSION = "1.0";
                     _doSambaDomain
                     _doMailServer
                     _deleteDbEntity
+                    _tableNamePrefix
                );
 
 
@@ -308,4 +309,19 @@ sub _deleteDbEntity {
 
 
     return 1;
+}
+
+
+sub _tableNamePrefix {
+    my $self = shift;
+    my( $table ) = @_;
+    my $columnPrefix;
+    
+    if( lc($table) eq "ugroup" ) {
+        $columnPrefix = "group";
+    }else {
+        $columnPrefix = lc($table);
+    }
+
+    return $columnPrefix;
 }

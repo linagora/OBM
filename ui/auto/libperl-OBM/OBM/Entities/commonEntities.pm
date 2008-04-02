@@ -49,7 +49,7 @@ sub getDelete {
 sub getArchive {
     my $self = shift;
 
-    return 0;
+    return $self->{"archive"};
 }
 
 

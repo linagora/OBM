@@ -209,27 +209,31 @@ sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"sambaConf"};
-    my $update = 0;
+
+    require OBM::Entities::entitiesUpdateState;
+    my $update = OBM::Entities::entitiesUpdateState->new();
 
 
     if( !defined($ldapEntry) ) {
-        return 0;
+        return undef;
     }
 
 
     # Le SID du domaine
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"sambaConf_domain_sid"}, $ldapEntry, "sambaSID") ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le nom du domaine
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"sambaConf_domain_name"}, $ldapEntry, "sambaDomainName" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
 
     if( $self->isLinks() ) {
-        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
+            $update->setUpdate();
+        }
     }
 
 

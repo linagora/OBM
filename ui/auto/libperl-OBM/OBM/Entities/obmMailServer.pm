@@ -258,37 +258,41 @@ sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
     my $entry = $self->{"postfixConf"};
-    my $update = 0;
+
+    require OBM::Entities::entitiesUpdateState;
+    my $update = OBM::Entities::entitiesUpdateState->new();
 
 
     if( !defined($ldapEntry) ) {
-        return 0;
+        return undef;
     }
 
 
     # Les domaines de messagerie
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_mail_domains"}, $ldapEntry, "myDestination" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le domaine
     if( &OBM::Ldap::utils::modifyAttr( $entry->{"postfixconf_domain"}, $ldapEntry, "obmDomain") ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Les hôtes IMAP
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_imap_srv"}, $ldapEntry, "imapHost" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Les hôtes SMTP-in
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_smtpin_srv"}, $ldapEntry, "smtpInHost" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
 
     if( $self->isLinks() ) {
-        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
+            $update->setUpdate();
+        }
     }
 
 

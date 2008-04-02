@@ -533,14 +533,16 @@ sub updateLdapEntryDn {
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
-    my $update = 0;
     my $dbEntry = $self->{groupDbDesc};
     my $entryProp = $self->{groupDesc};
     my $entryLinks = $self->{groupLinks};
 
+    require OBM::Entities::entitiesUpdateState;
+    my $update = OBM::Entities::entitiesUpdateState->new();
+
     
     if( !defined($ldapEntry) ) {
-        return 0;
+        return undef;
     }
 
 
@@ -548,7 +550,7 @@ sub updateLdapEntry {
     my @deletedObjectclass;
     my $currentObjectclass = $self->getLdapObjectclass( $ldapEntry->get_value("objectClass", asref => 1), \@deletedObjectclass);
     if( &OBM::Ldap::utils::modifyAttrList( $currentObjectclass, $ldapEntry, "objectClass" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     if( $#deletedObjectclass >= 0 ) {
@@ -559,7 +561,7 @@ sub updateLdapEntry {
 
         for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
             if( &OBM::Ldap::utils::modifyAttrList( undef, $ldapEntry, $deleteAttrs->[$i] ) ) {
-                $update = 1;
+                $update->setUpdate();
             }
         }
     }
@@ -567,56 +569,58 @@ sub updateLdapEntry {
 
     # verification du GID
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{group_gid}, $ldapEntry, "gidNumber" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # La description
     if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{group_desc}, $ldapEntry, "description" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # L'acces au mail
     if( $entryProp->{group_mailperms} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
-        $update = 1;
+        $update->setUpdate();
 
     }elsif( !$entryProp->{group_mailperms} && (&OBM::Ldap::utils::modifyAttr( "REJECT", $ldapEntry, "mailAccess" )) ) {
-        $update = 1;
+        $update->setUpdate();
 
     }
 
     # Le cas des alias mails
     if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{group_email}, $ldapEntry, "mail" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le cas des alias mails secondaires
     if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{group_email_alias}, $ldapEntry, "mailAlias" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le domaine
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{group_domain}, $ldapEntry, "obmDomain") ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le SID Samba
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{group_samba_sid}, $ldapEntry, "sambaSID" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le type Samba du groupe
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{group_samba_type}, $ldapEntry, "sambaGroupType" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
     # Le nom Samba affichable du groupe
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{group_samba_name}, $ldapEntry, "displayName" ) ) {
-        $update = 1;
+        $update->setUpdate();
     }
 
 
     if( $self->isLinks() ) {
-        $update = $update || $self->updateLdapEntryLinks( $ldapEntry );
+        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
+            $update->setUpdate();
+        }
     }
 
 

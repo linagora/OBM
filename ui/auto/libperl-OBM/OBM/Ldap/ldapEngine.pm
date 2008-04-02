@@ -479,8 +479,6 @@ sub _doWork {
     my $newDn = $newRdn;
     if( defined($newDn) && defined($parentDn) ) {
         $newDn .= ",".$parentDn;
-    }elsif( !defined($newDn) ) {
-        return 0;
     }
     $newLdapEntry = $self->findDn($newDn);
 
@@ -489,23 +487,28 @@ sub _doWork {
         if( defined($currentLdapEntry) && defined($newLdapEntry) && ($currentDn ne $newDn) ) {
             # Cas particulier, le DN actuel et le nouveau existent bien que
             # différents...
-            # On supprime le DN actuel pour corriger l'annuaire
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: les DN '".$currentDn."' et '".$newDn."' existent. Suppression de l'ancien DN '".$currentDn."'", "W" );
-            if( !$self->deleteLdapEntity($currentLdapEntry) ) {
-                return 0;
-            }
+            # On ignore le DN actuel (qui peut correspondre en fait à un nouvel
+            # utilisateur dont le DN est le DN actuel de l'entité a renommer)
+            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: les DN '".$currentDn."' et '".$newDn."' existent. Ignore le DN '".$currentDn."'", "W" );
 
             $currentLdapEntry = undef;
         }
 
         if( defined($currentLdapEntry) && ($object->getDelete() || $object->getArchive()) ) {
             # Suppression du DN actuel
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: suppression du noeud : ".$currentDn, "W" );
+            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: suppression du noeud '".$currentDn."'", "W" );
     
             if( !$self->deleteLdapEntity($currentLdapEntry) ) {
                 return 0;
             }
         
+            last SWITCH;
+        }
+
+        if( !defined($currentLdapEntry) && !defined($newLdapEntry) && ($object->getDelete() || $object->getArchive()) ) {
+            # Noeud a supprimé non présent dans l'annuaire
+            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: noeud '".$currentDn."' non présent dans l'annuaire. Suppression deja effectuee", "W" );
+
             last SWITCH;
         }
 
@@ -531,7 +534,12 @@ sub _doWork {
             # Obtention de la description des classes d'objets
             $self->_getObjectclassDesc( $currentLdapEntry );
     
-            if( $object->updateLdapEntry($currentLdapEntry, $self->{objectclassDesc}) ) {
+            my $return = $object->updateLdapEntry($currentLdapEntry, $self->{objectclassDesc});
+            if( !defined($return) ) {
+                return 0;
+            }
+
+            if( $return->getUpdate() ) {
                 &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour du DN '".$currentDn."'", "W" );
     
                 if( $self->updateLdapEntity($currentLdapEntry) ) {
@@ -549,6 +557,10 @@ sub _doWork {
                     return 0;
                 }
 
+                $return->setUpdateLinks();
+            }
+
+            if( $return->getUpdateLinks() ) {
                 $returnCode = 2;
             }
 
@@ -561,7 +573,12 @@ sub _doWork {
             # Obtention de la description des classes d'objets
             $self->_getObjectclassDesc( $newLdapEntry );
 
-            if( $object->updateLdapEntry($newLdapEntry, $self->{objectclassDesc}) ) {
+            my $return = $object->updateLdapEntry($newLdapEntry, $self->{objectclassDesc});
+            if( !defined($return) ) {
+                return 0;
+            }
+
+            if( $return->getUpdate() ) {
                 &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour du DN '".$newDn."'", "W" );
                 
                 if( $self->updateLdapEntity($newLdapEntry) ) {
@@ -569,12 +586,15 @@ sub _doWork {
                 }
             }
 
+            if( $return->getUpdateLinks() ) {
+                $returnCode = 2;
+            }
+
             last SWITCH;
         }
 
         &OBM::toolBox::write_log( "[Ldap::ldapEngine]: description BD de : ".$object->getEntityDescription()." incorrecte.", "W" );
         return 0;
-
     }
 
     return $returnCode;
