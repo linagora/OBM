@@ -229,9 +229,12 @@ You are invited to participate to a rendezvous from %s to %s,
 and wich subjecti is %s (location : %s).
 
 
-:: More information about this rendezvous : %s
-:: To accept this rendezvous : %s
-:: To refuse this rendezvous : %s
+:: More information about this rendezvous : 
+%s
+:: To accept this rendezvous : 
+%s
+:: To refuse this rendezvous : 
+%s
 
 -------------------------------------------------------------------
 This message was send on %s at %s by %s %s from OBM 
@@ -247,7 +250,8 @@ A new resource reservation was scheduled on %s to %s for %s
 (location: %s).
 
 
-:: To accpet or refuse this reservation : %s
+:: To accpet or refuse this reservation : 
+%s
 
 -------------------------------------------------------------------
 This message was send on %s at %s by %s %s from OBM 
@@ -262,9 +266,12 @@ UPDATED RENDEZVOUS !
 The rendezvous %s, initially scheduled from %s to %s,(location %s),
 was updated and will take place from %s to %s (location : %s).
 
-:: More information about this modifications : %s
-:: To accept those modifications : %s
-:: To refuse those modifications : %s
+:: More information about this modifications : 
+%s
+:: To accept those modifications : 
+%s
+:: To refuse those modifications : 
+%s
 
 -------------------------------------------------------------------
 This message was send on %s at %s by %s %s from OBM 
@@ -280,7 +287,8 @@ The resource reservation %s initialy scheduled from %s to %s
 (location: %s) was modified and will take place from %s to %s
 (location: %s).
 
-:: To accept or refuse those modifications : %s
+:: To accept or refuse those modifications : 
+%s
 
 -------------------------------------------------------------------
 This message was send on %s at %s by %s %s from OBM 
@@ -295,7 +303,8 @@ DELETED RENDEZVOUS !
 The rendezvous %s, initialy scheduled on %s to %s (location : %s),
 was deleted.
 
-:: To contact the organiser of this event : %s
+:: To contact the organiser of this event : 
+%s
 
 -------------------------------------------------------------------
 This message was send on %s at %s by %s %s from OBM 
@@ -310,7 +319,8 @@ CANCELED RESOURCE RESERVATION !
 The resource reservation %s, initialy scheduled from %s to %s
 (location: %s), was cancelled.
 
-:: To contact the organiser of this event : %s
+:: To contact the organiser of this event : 
+%s
 
 -------------------------------------------------------------------
 This message was send on %s at %s by %s %s from OBM 
@@ -325,7 +335,8 @@ OCCURENCE(S) RESTORED !
 One or more occurrences of the rendezvous %s, initialy cancelled 
 (%s) were restored.
 
-:: For more informations : %s
+:: For more informations : 
+%s
 
 -------------------------------------------------------------------
 This message was send on %s at %s by %s %s from OBM 
@@ -340,7 +351,8 @@ OCCURENCE(S) CANCELLED !
 One or more occurrences of the rendezvous %s, initialy scheduled
 on %s were canceled.
 
-:: For more informations : %s
+:: For more informations : 
+%s
 
 -------------------------------------------------------------------
 This message was send on %s at %s by %s %s from OBM 
@@ -354,7 +366,8 @@ ATTENDEE STATE UPDATED
 
 The attendee %s to %s have changed to %s.
 
-:: For more information about this rendezvous : %s
+:: For more information about this rendezvous : 
+%s
 
 -------------------------------------------------------------------
 This message was send on %s at %s by %s %s from OBM 
@@ -368,7 +381,8 @@ IMPENDING RENDEZVOUS
 
 The rendezvous %s(%s) will take place in %s minutes (location: %s).
 
-:: For more information about this rendezvous : %s
+:: For more information about this rendezvous : 
+%s
 
 -------------------------------------------------------------------
 This message was send on %s at %s by OBM 

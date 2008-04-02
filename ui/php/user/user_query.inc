@@ -875,7 +875,7 @@ function run_query_user_update($p_id, $user) {
     $gid = 0;
   }
 
-    $passwd = $user['passwd'];
+  $passwd = $user['passwd'];
   if ($passwd != '') {
     // If a password type is given, get it else get the system parameter
     $passwd_type = $user['password_type'];

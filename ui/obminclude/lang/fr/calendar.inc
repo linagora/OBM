@@ -218,9 +218,12 @@ Vous êtes invité à participer à un rendez-vous du %s au %s,
 qui a pour sujet %s (lieu : %s).
 
 
-:: Pour plus de détails sur le rendez-vous : %s
-:: Pour accepter ce rendez-vous : %s
-:: Pour refuser ce rendez-vous : %s
+:: Pour plus de détails sur le rendez-vous : 
+%s
+:: Pour accepter ce rendez-vous : 
+%s
+:: Pour refuser ce rendez-vous : 
+%s
 
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
@@ -236,7 +239,8 @@ Une ressource dont vous êtes responsable à été réservée du %s au %s,
 pour : %s (lieu : %s).
 
 
-:: Pour accepter/refuser la réservation : %s
+:: Pour accepter/refuser la réservation : 
+%s
 
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
@@ -251,9 +255,12 @@ RENDEZ-VOUS MODIFIÉ !
 Le rendez-vous %s,  initialement prévu du %s au %s, (lieu : %s),
 a été modifié et se déroulera du %s au %s (lieu : %s).
 
-:: Pour plus de détails sur les modifications : %s
-:: Pour accepter les modifications de ce rendez-vous : %s
-:: Pour refuser les modifications de ce rendez-vous : %s
+:: Pour plus de détails sur les modifications : 
+%s
+:: Pour accepter les modifications de ce rendez-vous :
+%s
+:: Pour refuser les modifications de ce rendez-vous : 
+%s
 
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
@@ -269,7 +276,8 @@ La réservation %s d'une ressource dont vous êtes responsable
 initialement prévue du %s au %s, (lieu : %s), a été modifiée et se
 déroulera du %s au %s (lieu : %s).
 
-:: Pour accepter/refuser les modifications : %s
+:: Pour accepter/refuser les modifications : 
+%s
 
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
@@ -284,7 +292,8 @@ RENDEZ-VOUS SUPPRIMÉ !
 Le rendez-vous %s, initialement prévu du %s au %s (lieu : %s), a été
 supprimé.
 
-:: Pour contacter le responsable de l'annulation du rendez-vous : %s
+:: Pour contacter le responsable de l'annulation du rendez-vous : 
+%s
 
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
@@ -299,7 +308,8 @@ RESERVATION DE RESSOURCE ANNULEE !
 La réservation %s, initialement prévu du %s au %s (lieu : %s), a 
 été annulée.
 
-:: Pour contacter le responsable de l'annulation du rendez-vous : %s
+:: Pour contacter le responsable de l'annulation du rendez-vous : 
+%s
 
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
@@ -314,7 +324,8 @@ OCCURENCE(S) RESTAURÉES !
 La ou les occurrences du rendez-vous %s, initialement annulées 
 les %s auront lieu.
 
-:: Pour plus de détails sur les modifications : %s
+:: Pour plus de détails sur les modifications : 
+%s
 
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
@@ -329,7 +340,8 @@ OCCURENCE(S) ANNULÈES !
 La ou les occurrences du rendez-vous %s, initialement prévues 
 les %s n'auront pas lieu.
 
-:: Pour plus de détails sur les modifications : %s
+:: Pour plus de détails sur les modifications : 
+%s
 
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
@@ -343,7 +355,8 @@ PARTICIPATION AU RENDEZ-VOUS
 
 La participation de %s à l'événement %s est %s.
 
-:: Pour plus de détails sur l'événement : %s
+:: Pour plus de détails sur l'événement : 
+%s
 
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s par une action de %s %s dans OBM 
@@ -357,7 +370,8 @@ RENDEZ-VOUS IMMINENT
 
 L'événement %s aura lieu de %s à %s soit dans %s minutes (lieu : %s).
 
-:: Pour plus de détails sur l'événement : %s
+:: Pour plus de détails sur l'événement : 
+%s
 
 -------------------------------------------------------------------
 Ce message a été envoyé le %s à %s automatiquement par OBM %s";
