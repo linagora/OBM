@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.1.9pre1';
+$obm_version = '2.1.9';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -172,9 +172,9 @@ $c_max_image_size = array('width' => '96',
                           'size' => '100000');
 
 // Freeze
-$c_nb_login_failed = 3;
-$c_login_interval = 60;
-$c_frozen_duration = 300;
+$c_nb_login_failed = 10;
+$c_login_interval = 10;
+$c_frozen_duration = 10;
 
 // Activate user defined code : check rules, hook functions
 $conf_modules = false;
