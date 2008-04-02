@@ -1,6 +1,8 @@
 #!/bin/bash
 
-test -f ${HOME}/kvm/$1/vm.conf || {
+source /etc/qemu-kvm.conf
+
+test -f ${HOME}/${vm_storage_dir}/$1/vm.conf || {
     echo "usage: $0 <vm_name> where vm_name is a valid KVM virtual machine name"
     exit 1
 }
