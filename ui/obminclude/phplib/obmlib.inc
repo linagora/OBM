@@ -337,7 +337,7 @@ class CAS_Auth extends Auth {
       header("location:".obmCAS::getServerBaseURL());
     }
 
-    if (global_allow_access()) {
+    if (global_allow_access($perm)) {
       $obm['profile'] = $perm;
       $obm['login'] = $login;
       $obm['domain_id'] = $domain_id;
