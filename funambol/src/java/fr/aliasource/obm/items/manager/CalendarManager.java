@@ -358,7 +358,7 @@ public class CalendarManager extends ObmManager {
 
 		logger.info("bd -> pda - utcFormat : "
 				+ CalendarHelper.getUTCFormat(dstart));
-
+		
 		Date dend = null;
 		if (!obmevent.isAllday()) {
 			event.getDtStart().setPropertyValue(
@@ -388,7 +388,23 @@ public class CalendarManager extends ObmManager {
 			event.getDtEnd()
 					.setPropertyValue(CalendarHelper.getUTCFormat(dend));
 		}
-
+		
+		if (obmevent.getAlert() != -1 && obmevent.getAlert() != 0) {
+			com.funambol.common.pim.calendar.Reminder remind = new com.funambol.common.pim.calendar.Reminder();
+			
+			remind.setMinutes(obmevent.getAlert() / 60);
+			remind.setActive(true);
+			event.setReminder(remind);
+		
+		} else {
+			com.funambol.common.pim.calendar.Reminder remind = new com.funambol.common.pim.calendar.Reminder();
+			remind.setActive(false);
+			event.setReminder(remind);
+		}
+		/*
+		logger.info("alert import:"+event.getReminder());
+		logger.info("alert import:"+obmevent.getAlert());
+		*/
 		event.setAllDay(new Boolean(obmevent.isAllday()));
 
 		event.getSummary().setPropertyValue(obmevent.getTitle());
@@ -422,7 +438,7 @@ public class CalendarManager extends ObmManager {
 
 		}
 		event.setMileage(new Integer(0));
-
+		
 		return calendar;
 	}
 
@@ -483,9 +499,11 @@ public class CalendarManager extends ObmManager {
 			prodId = calendar.getProdId().getPropertyValueAsString();
 		}
 		logger.info("prodId: " + prodId);
+		
 		Date dstart = parseStart(prodId, foundation, event);
 		Date dend = parseEnd(prodId, foundation, event);
-
+		Date dalarm = null;
+		
 		if (dend.getTime() != dstart.getTime()) {
 			int fix = 0;
 			// le rdv s'affiche sur 1 jour de plus dans obm si la duration
@@ -495,12 +513,21 @@ public class CalendarManager extends ObmManager {
 					&& ((dend.getTime() - dstart.getTime()) % 86400) == 0) {
 				fix = 1;
 			}
-			event
-					.setDuration((int) ((dend.getTime() - dstart.getTime()) / 1000)
+			event.setDuration((int) ((dend.getTime() - dstart.getTime()) / 1000)
 							- fix);
 		} else {
 			event.setDuration(3600);
 		}
+		
+		if (foundation.getReminder() != null && foundation.getReminder().getMinutes() != 0) {
+			event.setAlert(foundation.getReminder().getMinutes() * 60);
+		} else {
+			event.setAlert(0);
+		}
+		
+		logger.info("alert export : " + event.getAlert());
+		
+		
 		if (foundation.getSummary() != null) {
 			event.setTitle(foundation.getSummary().getPropertyValueAsString());
 		} else {
@@ -549,6 +576,10 @@ public class CalendarManager extends ObmManager {
 			recurrence.setFrequence(1);
 		}
 		event.setRecurrence(recurrence);
+		
+		if (foundation.getReminder() != null)
+			logger.info("alert Reminder:" + foundation.getReminder());
+		
 		return event;
 	}
 
