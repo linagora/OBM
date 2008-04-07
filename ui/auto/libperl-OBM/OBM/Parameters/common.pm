@@ -174,8 +174,8 @@ $recode = "/usr/bin/recode l1..utf8";
 #
 # Definitions des expressions regulieres
 #
-# Balise email
-$regexp_email = "^([a-z0-9_\\-]{1,16}(\\.[a-z0-9_\\-]{1,16}){0,3})@([a-z0-9\\-]{1,16}\\.){1,3}[a-z]{2,3}\$";
+# Email
+$regexp_email = "^([a-z0-9_\\-]+(\\.[a-z0-9_\\-]*)*)@([a-z0-9\\-]{1,16}\\.)+[a-z]{2,6}\$";
 #
 # LDAP root
 $regexp_rootLdap = "^dc=(.+),dc=.+\$";

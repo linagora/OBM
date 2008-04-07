@@ -974,7 +974,7 @@ function html_user_form($usr_q, $user, $field='') {
   global $l_enabled, $l_disabled, $l_web_consult_list,$path;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $path, $display, $cgp_use, $action, $profiles;
-  global $obm, $c_default_domain, $l_domain, $l_header_new, $l_hour;
+  global $obm, $c_default_domain, $c_renameUserMailbox, $l_domain, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
 
   // if update mode and first time value are taken from database
@@ -1150,6 +1150,9 @@ function html_user_form($usr_q, $user, $field='') {
   // login (can't be updated, so only on insert)
   if (($action == "new") || ($action == "insert")) {
     $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />";
+  } elseif (!$c_renameUserMailbox) {
+    $dis_login = "$login
+                  <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />";
   } else {
     $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />
                   <input type=\"hidden\" name=\"tf_old_login\" value=\"$old_login\" />";

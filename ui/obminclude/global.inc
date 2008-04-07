@@ -261,6 +261,9 @@ $obmdb_password = $ini_array['password'];
 // Single or multi domain
 $c_singleNameSpace = $ini_array['singleNameSpace'];
 
+// Allow user mailbox rename
+$c_renameUserMailbox = $ini_array['renameUserMailbox'];
+
 // Backup root
 if (is_null($ini_array['backupRoot'])) {
     $cbackup_root = "/var/lib/obm/backup";

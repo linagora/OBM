@@ -693,7 +693,7 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
 function run_query_user_update($p_id, $user) {
   global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
-  global $cmd_ldap_passwd;
+  global $c_renameUserMailbox, $cmd_ldap_passwd;
 
   // Connect to the BD
   $obm_q = new DB_OBM;
@@ -709,7 +709,9 @@ function run_query_user_update($p_id, $user) {
   $title = $user['title'];
   $email = $user['email'];
   $desc = $user['desc'];
-  $login = strtolower($user['login']);
+  if ($c_renameUserMailbox) {
+    $user_update_q = "userobm_login='".strtolower($user['login'])."',";
+  }
   $multidomain = sql_multidomain('userobm');
   $photo_id = $user['photo_id'];
 
@@ -901,7 +903,7 @@ function run_query_user_update($p_id, $user) {
     userobm_timeupdate='". date('Y-m-d H:i:s')."',
     userobm_userupdate='". $obm['uid'] ."',
     $passwd_update_q
-    userobm_login='$login',
+    $user_update_q
     userobm_perms='$profile',
     userobm_gid='$gid',
     userobm_archive='$archive',
