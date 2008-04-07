@@ -43,7 +43,7 @@ obm-web = false
 singleNameSpace = false
 
 ; renameUserMailbox mode allow to rename user mailbox
-; need Cyrus 2.3 or greater
+; need Cyrus 2.2 or greater and the Cyrus parameter 'allowusermoves: yes'
 renameUserMailbox = false
 
 ; backupRoot is the directory used to store backup data

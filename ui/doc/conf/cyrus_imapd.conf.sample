@@ -27,6 +27,15 @@ altnamespace: no
 # mailbox of user "helmer.fudd" is stored in "user.elmer^fud.rabbit^holes"
 unixhierarchysep: yes
 
+# Allow user mailbox rename
+# Set to yes, and cyrus allow mailbox rename.
+# Need Cyrus 2.2 or greater
+# Warning: measures should be taken to make sure that the user being moved is
+# not logged in, and can not login during he move.
+# Failure to do so may result in the user’s meta-data (seen state,
+# subscriptions, etc) being corrupted or out of date.
+allowusermoves: no
+
 # Rejecting illegal characters in headers
 # Headers of RFC2882 messages must not have characters with the 8th bit
 # set. However, too many badly-written MUAs generate this, including most

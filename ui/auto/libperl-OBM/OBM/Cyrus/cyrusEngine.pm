@@ -724,7 +724,7 @@ sub _createMailbox {
             &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus : ".$cyrusSrvConn->error(), "W" );
         }
             
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: verifiez que la version de Cyrus (2.1 min) et que l'option 'allowusermoves' est active !", "W" );
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: verifiez que la version de Cyrus (2.2 min) et que l'option 'allowusermoves' est active !", "W" );
         return 0;
     }
 
