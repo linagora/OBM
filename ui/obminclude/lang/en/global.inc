@@ -468,3 +468,5 @@ $l_dg_param = "Parameters";
 $l_dg_sess = "Session";
 $l_dg_sql = "SQL";
 $l_dg_exe = "Exec";
+
+$l_all_aliases = "All aliases";

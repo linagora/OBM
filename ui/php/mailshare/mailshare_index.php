@@ -235,6 +235,21 @@ function get_mailshare_params() {
   if ((isset ($params["entity_id"])) && (! isset($params["mailshare_id"]))) {
     $params["mailshare_id"] = $params["entity_id"];
   }
+  
+  if(is_array($params['email'])) {
+    while(!empty($params['email'])) {
+      $email = trim(array_shift($params['email']));
+      $domain = array_shift($params['aliases']);
+      if(!empty($email)) {
+       if(!empty($domain)) {
+          $email_aliases[] = $email.'@'.$domain;
+        } else {
+          $email_aliases[] = $email;
+        }
+      }
+    }
+    $params['email'] = implode("\r\n",$email_aliases);
+  }
 
   return $params;
 }

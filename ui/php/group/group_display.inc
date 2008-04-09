@@ -119,15 +119,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
       $res['align'] = 'center';
       $res['name'] = '-';
     } elseif (strcmp($email ,'') != 0) {
-      if ($cgp_use['service']['mail']) {
-        if ($OD->data_set->f('domain_name') != '') {
-          $main_domain = $OD->data_set->f('domain_name');
-        } else {
-          $main_domain = $obm['domain_name'];
-        }
-        $emails = explode("\n",$email);
-        $email = trim($emails[0])."@$main_domain";
-      }
+      $email = get_entity_email($email, $OD->data_set->f("domain_name"));
       $res['url'] = "mailto:$email";
       $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\">$email";
       $res['txt_name'] = "$email";
@@ -138,9 +130,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == 'group_email') {
     $email = $OD->data_set->f('group_email');
     if (strcmp($email,'') != 0) {
-      if ($cgp_use['service']['mail']) {
-        $email .= '@'.$obm['domain_name'];
-      }
+      $email = get_entity_email($email, $OD->data_set->f("domain_name"));
       $res['url'] = "mailto:$email";
       $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\" />$email";
       $res['txt_name'] = $email;
@@ -435,12 +425,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $mailing = ($group_q->f('group_mailing') == 1 ? $l_yes : $l_no);
   $manager = $group_q->f('userobm_lastname').' '.$group_q->f('userobm_firstname');
 
-  if ($email != '') {
-    if ($cgp_use['service']['mail']) {
-      $email = "$email@$obm[domain_name]";
-    } 
-    $dis_email = "$email";
-  }
+  $dis_email = get_entity_email($email);
 
   if ($privacy == 0) {
     $dis_email = "<tr>
@@ -731,11 +716,16 @@ function html_group_form($action, $group_q, $group, $field='') {
       <td><input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state></td>
     </tr>";
     }
-  
+   if ($cgp_use['service']['mail']) {
+     $dis_mail = dis_group_mail_field($email,$class); 
+   } else {
+     $dis_mail = "<th>$l_email</th>
+      <td><input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>";
+
+   }
     $block_email = "
     <tr id=\"emailGroup\" class=\"$mail_class\">
-      <th>$l_email</th>
-      <td><input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
+      $dis_mail
     </tr>
     ";
   
@@ -1163,4 +1153,93 @@ function json_search_group($group,$results) {
   }
   $display['json'] = '{length:'.$results['length'].', datas:['.implode(',',$groups).']}';
 }
+
+/**
+ * Generate email field  
+ * 
+ * @param mixed $name 
+ * @param mixed $values 
+ * @access public
+ * @return void
+ */
+function dis_group_mail_field($values,$class) {
+  $d = of_domain_get_domain_infos($GLOBALS['obm']['domain_id'], true);
+  if(!empty($d['alias'])) {
+    $aliases = explode("\r\n",$d['alias']);
+  } else {
+    $aliases = array();
+  }
+  array_unshift($aliases,$d['name']);
+  if(!empty($values)) {
+    $emails = explode("\r\n",$values);
+  }
+  $count = 0;
+  if(is_array($emails)) {
+    foreach($emails as $key => $email) {
+      $sel_alias = '';
+      list($mail,$domain) = explode('@',$email);  
+      foreach($aliases as $alias) {
+        if( $alias == $domain) {
+          $sel_alias .= "<option selected='selected' value='$alias'>$alias</option>";
+        } else {
+          $sel_alias .= "<option value='$alias'>$alias</option>";
+        } 
+      }
+      $sel_alias = "<select name='sel_aliases[]'>
+        <option value=''>$GLOBALS[l_all_aliases]</option>
+        $sel_alias
+        </select>";
+    
+      $email_block .= "<div class=\"multiple\">
+        <a onclick=\"remove_element(this.parentNode,'groupMailHome'); show_hide_add_button();return false\" href=\"\">
+         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+        </a>        
+        <input name='tf_email[]' value='$mail' /> @ $sel_alias
+        </div>";
+      $count ++;
+    }
+  }
+  $sel_alias = '';
+  foreach($aliases as $alias) {
+    $sel_alias .= "<option value=\"$alias\">$alias</option>";
+    $sel_js .= "aliasSelectTemplate.adopt(new Element('option').setProperty('value','$alias').appendText('$alias'));\n";
+  }
+  $sel_alias = "
+    <select name=\"sel_aliases[]\">
+    <option value=\"\">$GLOBALS[l_all_aliases]</option>
+    $sel_alias
+    </select>";
+  if($GLOBALS['c_max_group_alias'] ==0 || $count < $GLOBALS['c_max_group_alias']) {
+    $email_block .= "
+      <div class=\"multiple\">
+      <a onclick=\"remove_element(this.parentNode,'groupMailHome'); show_hide_add_button();return false\" href=\"\">
+       <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+      </a>        
+      <input name='tf_email[]' value='' /> @ $sel_alias 
+      </div>         
+      ";
+    $count++;
+  } 
+  if($GLOBALS['c_max_group_alias'] ==0 || $count < $GLOBALS['c_max_group_alias']) {
+    $add_button = "<a href=\'\' onclick=\"add_email_field(aliasSelectTemplate); show_hide_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+  }
+  $email_block = "
+  <th class=\"$class[email]\" id='groupMailLabel'>
+  $GLOBALS[l_email]
+  <script type='text/javascript'>
+    var aliasSelectTemplate = new Element('select').setProperty('name','sel_aliases[]');
+    aliasSelectTemplate.adopt(new Element('option').setProperty('value','').appendText('$GLOBALS[l_all_aliases]'));
+    $sel_js
+  </script>
+  $add_button
+  </th>
+  <td id='groupMailHome'>
+  $email_block
+  </td>
+  ";
+
+  return $email_block;
+}
+
+
 ?>

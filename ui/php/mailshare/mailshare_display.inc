@@ -244,7 +244,7 @@ function html_mailshare_consult($mailshare_q) {
   $name = $mailshare_q->f("mailshare_name");
   $quota = $mailshare_q->f("mailshare_quota");
   $desc = $mailshare_q->f("mailshare_description");
-  $email = $mailshare_q->f("mailshare_email");
+  $email = get_entity_email($mailshare_q->f("mailshare_email"),null,false);
   $delegation = $mailshare_q->f("mailshare_delegation");
   $mail_server_id = $mailshare_q->f("userobm_mail_server_id");
   $mail_server_host_name = $mailshare_q->f("mailserver_hostname");
@@ -381,7 +381,8 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" />";
   }
-
+  
+  $mail_block = dis_mailshare_mail_field($email,$class);
   $block = "
   <form method=\"post\" name=\"f_mailshare\" action=\"".url_prepare("mailshare_index.php")."\">
 
@@ -394,8 +395,7 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
     <td>$dis_name</td>
   </tr>
   <tr>
-    <th class=\"$class[email]\">$l_email</th>
-    <td><textarea name=\"ta_email\" cols=\"32\" rows=\"3\">$email</textarea>@$main_domain</td>
+  $mail_block
   </tr>
   $block_delegation
   <tr>
@@ -563,4 +563,94 @@ function dis_mailshare_warn_insert($id, $h_q, $mailshare) {
 
   return $block;
 }
+
+
+
+/**
+ * Generate email field  
+ * 
+ * @param mixed $name 
+ * @param mixed $values 
+ * @access public
+ * @return void
+ */
+function dis_mailshare_mail_field($values) {
+  $d = of_domain_get_domain_infos($GLOBALS['obm']['domain_id'], true);
+  if(!empty($d['alias'])) {
+    $aliases = explode("\r\n",$d['alias']);
+  } else {
+    $aliases = array();
+  }
+  array_unshift($aliases,$d['name']);
+  if(!empty($values)) {
+    $emails = explode("\r\n",$values);
+  }
+  $count = 0;
+  if(is_array($emails)) {
+    foreach($emails as $key => $email) {
+      $sel_alias = '';
+      list($mail,$domain) = explode('@',$email);  
+      foreach($aliases as $alias) {
+        if( $alias == $domain) {
+          $sel_alias .= "<option selected='selected' value='$alias'>$alias</option>";
+        } else {
+          $sel_alias .= "<option value='$alias'>$alias</option>";
+        } 
+      }
+      $sel_alias = "<select name='sel_aliases[]'>
+        <option value=''>$GLOBALS[l_all_aliases]</option>
+        $sel_alias
+        </select>";
+
+      $email_block .= "<div class=\"multiple\">
+        <a onclick=\"remove_element(this.parentNode,'mailshareMailHome');show_hide_add_button();return false\" href=\"\">
+         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+        </a>        
+        <input name='tf_email[]' value='$mail' /> @ $sel_alias
+        </div>";
+      $count ++;
+    }
+  }
+  $sel_alias = '';
+  foreach($aliases as $alias) {
+    $sel_alias .= "<option value=\"$alias\">$alias</option>";
+    $sel_js .= "aliasSelectTemplate.adopt(new Element('option').setProperty('value','$alias').appendText('$alias'));\n";
+  }
+  $sel_alias = "
+    <select name=\"sel_aliases[]\">
+    <option value=\"\">$GLOBALS[l_all_aliases]</option>
+    $sel_alias
+    </select>";
+  if($GLOBALS['c_max_mailshare_alias'] ==0 || $count < $GLOBALS['c_max_mailshare_alias']) {
+    $email_block .= "
+      <div class=\"multiple\">
+      <a onclick=\"remove_element(this.parentNode,'mailshareMailHome');show_hide_add_button();return false\" href=\"\">
+       <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+      </a>        
+      <input name='tf_email[]' value='' /> @ $sel_alias 
+      </div>         
+      ";
+    $count++;
+  } 
+  if($GLOBALS['c_max_mailshare_alias'] ==0 || $count < $GLOBALS['c_max_mailshare_alias']) {
+    $add_button = "<a id='addMailButton' href=\'\' onclick=\"add_email_field(aliasSelectTemplate);show_hide_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+  } 
+  $email_block = "
+  <th class=\"$class[email]\" id='mailshareMailLabel'>
+  $GLOBALS[l_email]
+  <script type='text/javascript'>
+    var aliasSelectTemplate = new Element('select').setProperty('name','sel_aliases[]');
+    aliasSelectTemplate.adopt(new Element('option').setProperty('value','').appendText('$GLOBALS[l_all_aliases]'));
+    $sel_js
+  </script>
+  $add_button
+  </th>
+  <td id='mailshareMailHome'>
+  $email_block
+  </td>
+  ";
+
+  return $email_block;
+}
+
 </script>

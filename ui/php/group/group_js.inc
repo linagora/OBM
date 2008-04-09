@@ -50,6 +50,37 @@ function check_group_get_id(valeur,text) {
 ";
 }
 
+$extra_js .= "
+function add_email_field(template) {
+
+  var mailHome = $('groupMailHome');
+  // Create the div
+  var div = new Element('div').addClass('multiple');
+  div.adopt(new Element('a').addEvent('click', function () {
+              remove_element(this.parentNode,'groupMailHome');
+              show_hide_add_button();
+            }).adopt(new Element('img').setProperty('src','$ico_delete')));
+  mailHome.adopt(div);
+  div.appendText(' ').adopt(new Element('input').setProperty('name','tf_email[]').setProperty('type','text'));
+  div.appendText(' @ ');
+  div.adopt(template.clone());
+  
+}  
+
+function show_hide_add_button() {
+  var button = $('addMailButton'); 
+  var parent = $('groupMailHome');
+  var childs = parent.getChildren();
+  if(childs.length >= $GLOBALS[c_max_group_alias] && button) {
+    button.remove();
+  } else if(childs.length < $GLOBALS[c_max_group_alias] && !button) {
+    $('groupMailLabel').adopt((new Element('a').addEvent('click', function () {
+              add_email_field(aliasSelectTemplate);
+              show_hide_add_button();
+            }).setProperty('id','addMailButton').adopt(new Element('img').setProperty('src','$ico_add'))));     
+  }
+}
+";
 if ($params["ext_element"] != "") {
   require_once("$obminclude/of/of_select.inc");
 }

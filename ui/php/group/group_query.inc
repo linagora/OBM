@@ -659,7 +659,7 @@ function run_query_group_user_group($group) {
 
   $obm_q = new DB_OBM; 
   $db_type = $obm_q->type;
-  $limit = sql_limit($db_type);
+  $limit = sql_limit($db_type,'', '',  'group_user');
 
   $id = $group["group_id"];
   $entity = $group["entity"];
@@ -935,7 +935,7 @@ function check_group_update_rights($params, $g='') {
 function check_group_data_form(&$group) {
   global $php_regexp_email_name, $php_regexp_email, $l_fill_name;
   global $l_group_exists, $l_email_exist;
-  global $obm, $perm, $err, $action, $cright_write_admin;
+  global $obm, $perm, $err, $action, $cright_write_admin,$cgp_use;
   global $l_j_check_email, $l_system_no_priv, $l_err_system_samba;
   global $l_only_owner_priv, $l_err_public_rights, $l_err_private_email;
 
@@ -964,26 +964,44 @@ function check_group_data_form(&$group) {
     $err['field'] = 'name';
     return false;
   }
+  
+  if ($cgp_use['service']['mail']) {
+    if ($email != '') {
+      $um = array();
+      $em = strtok($email, "\r\n");
+      while ($em) {
+        if (! preg_match($php_regexp_email_name, $em) && !preg_match($php_regexp_email, $em)) {
+	  $err['msg'] .= "$em : $l_email_error";
+	  $err['field'] = 'email';
+	  return false;
+        }
 
-  // Group email
-  if (($email != '') && (! preg_match($php_regexp_email_name, $email))
-      && (! preg_match($php_regexp_email, $email))) {
-    $err['msg'] = " $email : $l_j_check_email";
-    $err['field'] = 'email';
-    return false;
-  }
-
-  // If email not empty, must not already exists
-  if ($email != '') {
-    $mails = get_global_email_used('', $id);
-
-    // Email address not already used
-    if (array_key_exists($email, $mails)) {
-      $err['msg'] = "$l_email_exist : $email (" . $mails["$email"] . ')';
+	// Email address not already used by this user
+	if (in_array($em, $um)) {
+	  $err['msg'] = "$l_email_exist : $em ";
+	  $err['field'] = 'email';
+	  return false;
+        }
+        $emails[] = $em;
+	array_push($um, $em);
+	$em = strtok("\r\n");
+      }
+      $mails = get_email_used($emails, $id);
+      if(!empty($mails)) {
+        $err['msg'] = "$l_email_exist : $mails ";
+        $err['field'] = 'email';
+        return false;
+      }
+    }
+  } else {
+    // OBM-Mail disabled, email must be full (user@domain)
+    if (($email != '') && (preg_match($php_regexp_email, $email) == 0)) {
+      $err['msg'] = $l_email_error.' :  '. $email;
       $err['field'] = 'email';
       return false;
     }
   }
+
 
   // Allow public group handling only if write_admin right
   if (($priv != 1) && (! $perm->check_right('group', $cright_write_admin))) {

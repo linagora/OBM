@@ -1010,7 +1010,7 @@ function run_query_document_update_dir($document) {
 // Document Form Data checking and formatting
 // Parameters:
 //   - $document[] : values checked
-//     keys used  : num, name, zip, phone, fax, web, email
+//     keys used  : num, name, zip, phone, fax, web
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////

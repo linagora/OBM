@@ -494,7 +494,7 @@ function check_mailshare_data_form($mailshare) {
   global $php_regexp_login, $l_name_error, $l_name_in_use;
   global $php_regexp_email_name, $php_regexp_quota, $l_err_mailshare_email;
   global $l_err_mailshare_email_empty, $l_err_mailshare_email_exist;
-  global $l_err_mailshare_uemail_exist, $l_err_mailshare_quota;
+  global $l_err_mailshare_uemail_exist, $l_err_mailshare_quota,$php_regexp_email;
 
   $id = $mailshare["mailshare_id"];
   $name = strtolower($mailshare["name"]);
@@ -546,20 +546,13 @@ function check_mailshare_data_form($mailshare) {
 
   // User email addresses (only the name before @)
   if ($email != "") {
-    $mails = get_email_used("", "", $id);
     $um = array();
 
     // All email addresses given are valid and not already used
     $em = strtok($email, "\r\n");
     while ($em) {
-      if (! preg_match($php_regexp_email_name, $em)) {
+      if (! preg_match($php_regexp_email_name, $em) && !preg_match($php_regexp_email, $em)) {
         $err["msg"] .= "$em : $l_err_mailshare_email";
-	$err["field"] = "email";
-        return false;
-      }
-      // Email address not already used
-      if (array_key_exists($em, $mails)) {
-	$err["msg"] = "$l_err_mailshare_email_exist : $em (". $mails["$em"] .")";
 	$err["field"] = "email";
         return false;
       }
@@ -569,9 +562,16 @@ function check_mailshare_data_form($mailshare) {
 	$err["field"] = "email";
         return false;
       }
+      $emails[] = $em;
       array_push($um, $em);
       $em = strtok("\r\n");
     }
+    $mails = get_email_used($emails, "", "", $id);
+    if(!empty($mails)) {
+      $err['msg'] = "$l_err_mailshare_email_exist : $mails ";
+      $err['field'] = 'email';
+      return false;
+    }    
   }
  
   return true;

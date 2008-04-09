@@ -51,7 +51,8 @@ $l_mailserver_removed = "Mailserver removed";
 $l_no_mailserver_added = "No mailserver to add";
 $l_mailserver_cant_delete = "Mailserver can be removed from the domain";
 $l_mailserver_invalid_role = "The mailserver role is incorrect";
-
+$l_name_in_use = "Those name or aliases are already in use";
+$l_alias_user_used = "Cannot change or remove aliases used in email adress";
 // JavaScript Messages
 $l_fill_title = "You have to fill the Title before submitting.";
 

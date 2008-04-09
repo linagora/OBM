@@ -41,7 +41,7 @@ function run_query_samba_update($samba) {
 // Samba Form Data checking and formatting
 // Parameters:
 //   - $samba[]  : values checked
-//     keys used : name, desc, email
+//     keys used : name, desc
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($samba) {
   global $err;

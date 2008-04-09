@@ -73,7 +73,6 @@ function get_elem(doc, name) {
 // Remove an element line from the list form
 ///////////////////////////////////////////////////////////////////////////////
 function remove_element(elemId,parentId) {
-
   content = $(elemId);
   container = $(parentId);
   try {

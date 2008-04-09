@@ -23,8 +23,10 @@ function run_query_mailforward_detail($u_id) {
       userobm_nomade_perms,
       userobm_nomade_enable,
       userobm_email_nomade,
-      userobm_nomade_local_copy
+      userobm_nomade_local_copy,
+      domain_name
     FROM UserObm
+    LEFT JOIN Domain ON domain_id = userobm_domain_id
     WHERE userobm_id='$u_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_mailforward_detail()");

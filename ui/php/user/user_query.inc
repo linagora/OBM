@@ -1634,31 +1634,33 @@ function check_user_data_form($p_id, &$user) {
   if ($cgp_use['service']['mail']) {
     // User email addresses (only the name before @)
     if ($email != '') {
-      $mails = get_email_used($id);
       $um = array();
 
       // All email addresses given are valid and not already used
       $em = strtok($email, "\r\n");
       while ($em) {
-	if (! preg_match($php_regexp_email_name, $em)) {
+
+        if (! preg_match($php_regexp_email_name, $em) && !preg_match($php_regexp_email, $em)) {
 	  $err['msg'] .= "$em : $l_email_error";
 	  $err['field'] = 'email';
 	  return false;
-	}
-	// Email address not already used
-	if (array_key_exists($em, $mails)) {
-	  $err['msg'] = "$l_email_exist : $em (" . $mails["$em"] . ')';
-	  $err['field'] = 'email';
-	  return false;
-	}
+        }
+
 	// Email address not already used by this user
 	if (in_array($em, $um)) {
 	  $err['msg'] = "$l_uemail_exist : $em";
 	  $err['field'] = 'email';
 	  return false;
-	}
+        }
+        $emails[] = $em;
 	array_push($um, $em);
 	$em = strtok("\r\n");
+      }
+      $mails = get_email_used($emails, $id);
+      if(!empty($mails)) {
+        $err['msg'] = "$l_email_exist : $mails ";
+        $err['field'] = 'email';
+        return false;
       }
     }
   } else {

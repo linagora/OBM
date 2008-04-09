@@ -455,7 +455,7 @@ function sort_node_detail($a, $b) {
  */
 function dis_organizationalchart_consult_chart($node_q, $output) {
   global $f, $l; 
-  global $l_title, $l_phone, $l_mphone, $l_email;
+  global $l_title, $l_phone, $l_mphone;
   global $ico_manager, $ico_nophoto;
 
   $node_name = $node_q->f("ogroup_name");
@@ -1133,17 +1133,14 @@ function export_ldif($node_q, $ou_arr=array()) {
               }
               break;
             case "mail":
-              $emails = explode("\n", $one_user[$k_obm]);
+              $emails = get_entity_email($one_user[$k_obm], $domain, false, null);
               foreach($emails as $email) {
-                if (!empty($email)) {
-                  $mail = trim($email)."@$domain";
-                  if (contains_ascii($mail)) {
-                    $mail = base64_encode($mail);
-                    $person .= "$k_ldif:: $mail$eol";                                
-                  } else {
-                    $person .= "$k_ldif: $mail$eol";              
-                  }
-                } 
+                if (contains_ascii($email)) {
+                  $email = base64_encode($email);
+                  $person .= "$k_ldif:: $email$eol";                                
+                } else {
+                  $person .= "$k_ldif: $email$eol";              
+                }
               }
               break;
             default:
@@ -1495,16 +1492,8 @@ function organizationalchart_json_event($usr_q) {
   global $display, $obm, $cgp_use;
 
   $userobm_email = $usr_q->f("userobm_email");
-  $email = "";
+  $email = get_entity_email($usr_q->f("userobm_email"));
 
-  if ($cgp_use["service"]["mail"] && !empty($userobm_email)) {
-    $main_domain = $obm["domain_name"];
-    $emails = explode("\n",$userobm_email);
-    $email = trim($emails[0])."@$main_domain";
-  } else {
-    $emails = explode("\n",$userobm_email);
-    $email = trim($emails[0]);
-  }
 
   if (strlen($email) > 30 ) {
     $email = substr($email, 0, 30)."...";

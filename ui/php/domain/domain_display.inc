@@ -358,7 +358,7 @@ function html_domain_form($dom_q,$properties_q, $domain) {
       </td>
     </tr>";
   }
-
+  $dis_alias = dis_domain_mail_field($alias,$class);
   $display['title'] = $label;
 
   // --- HTML Template --------------------------------------------------------
@@ -390,8 +390,7 @@ function html_domain_form($dom_q,$properties_q, $domain) {
     <legend>$l_alias</legend>
     <table>
     <tr>
-      <th>$l_alias</th>
-      <td><textarea name=\"ta_alias\" rows=\"6\" cols=\"48\">$alias</textarea></td>
+      $dis_alias
     </tr>
     </table>
     </fieldset>
@@ -483,5 +482,55 @@ function dis_domain_display_pref($prefs) {
   return $block;
 }
 
+/**
+ * Generate alias field  
+ * 
+ * @param mixed $name 
+ * @param mixed $values 
+ * @access public
+ * @return void
+ */
+function dis_domain_mail_field($values,$class) {
+  if(!empty($values)) {
+    $aliases = explode("\r\n",$values);
+  }
+  $count = 0;
+  if(is_array($aliases)) {
+    foreach($aliases as $key => $alias) {
+      $alias_block .= "<div class=\"multiple\">
+        <a onclick=\"remove_element(this.parentNode,'domainDomainHome');show_hide_add_button();return false\" href=\"\">
+         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+        </a>        
+        <input name='tf_alias[]' value='$alias' />
+        </div>";
+      $count ++;
+    }
+  }
+  if($GLOBALS['c_max_domain_alias'] ==0 || $count < $GLOBALS['c_max_domain_alias']) {
+    $alias_block .= "
+      <div class=\"multiple\">
+      <a onclick=\"remove_element(this.parentNode,'domainDomainHome');show_hide_add_button();return false\" href=\"\">
+       <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+      </a>        
+      <input name='tf_alias[]' value='' /> 
+      </div>         
+      ";
+    $count++;
+  } 
+  if($GLOBALS['c_max_domain_alias'] ==0 || $count < $GLOBALS['c_max_domain_alias']) {
+    $add_button = "<a id='addDomainButton' href=\'\' onclick=\"add_alias_field();show_hide_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add alias field]\" /></a>";
+  }
+  
+  $alias_block = "
+  <th class=\"$class[alias]\" id='domainDomainLabel'>
+  $GLOBALS[l_alias]
+  $add_button
+  </th>
+  <td id='domainDomainHome'>
+  $alias_block
+  </td>
+  ";
 
+  return $alias_block;
+}
 ?>

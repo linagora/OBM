@@ -8,81 +8,70 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return an array of all used emails (users, groups, mailshare)
+// Return an array of all used emails (users, groups, mailshare) conflicting
+// with the given email set
 // Parameters:
+//   - $emails : email set
 //   - $id  : User id to exclude from the result
 //   - $gid : Group id to exclude from the result
 //   - $mid : Mailshare id to exclude from the result
 // Returns:
 //   - $mails : array of used emails
 ///////////////////////////////////////////////////////////////////////////////
-function get_email_used($id='', $gid='', $mid='') {
-  global $cdg_sql, $php_regexp_email_name, $l_user, $l_group, $l_mailshare;
+function get_email_used($emails, $id='', $gid='', $mid='') {
+  global $cdg_sql;
 
-  $mails = array();
-
-  if ($id != '') {
-    $where_user = "WHERE userobm_id != '$id'";
-  }
-  // Users
-  $query = "SELECT userobm_lastname, userobm_firstname, userobm_email
-    FROM UserObm
-    $where_user";
-
-  display_debug_msg($query, $cdg_sql, 'get_email_used(1)');
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  while ($obm_q->next_record()) {
-    $email = $obm_q->f('userobm_email');
-    $name = "$l_user : " . $obm_q->f('userobm_lastname') .' '. $obm_q->f('userobm_firstname');
-    $em = strtok($email, "\r\n");
-    while ($em) {
-      $mails["$em"] = "$name";
-      $em = strtok("\r\n");
+  foreach($emails as $email) {
+    list($mail,$domain) = explode('@', $email);
+    $user_query[] = "userobm_email LIKE '%$mail%'";
+    $mailshare_query[] = "mailshare_email LIKE '%$mail%'";
+    $group_query[] = "group_email LIKE '$mail%'";
+    $regexp[] = $mail;
+    if(empty($domain)) {
+      $regexp[] = $mail."@.*";
+    } else {
+      $regexp[] = $email;
     }
   }
-
-  // Groups
+  if ($id != '') {
+    $where_user = " AND userobm_id != '$id'";
+  }
+  $where_user .= sql_multidomain('userobm');
   if ($gid != '') {
-    $where_group = "WHERE group_id != '$gid'";
+    $where_group = " AND group_id != '$gid'";
   }
-  $query = "SELECT group_name, group_email
-    FROM UGroup
-    $where_group";
-
-  display_debug_msg($query, $cdg_sql, 'get_email_used(2)');
-  $g_q = new DB_OBM;
-  $g_q->query($query);
-
-  while ($g_q->next_record()) {
-    $email = $g_q->f('group_email');
-    $name = "$l_group : " . $g_q->f('group_name');
-    $mails["$email"] = "$name";
-  }
-
-  // Mailshares
+  $where_group .= sql_multidomain('group');
   if ($mid != '') {
-    $where_mailshare = "WHERE mailshare_id != '$mid'";
+    $where_mailshare = " AND mailshare_id != '$mid'";
   }
-  $query = "SELECT mailshare_name, mailshare_email
-    FROM MailShare
-    $where_mailshare";
+  $where_mailshare .= sql_multidomain('mailshare');
 
-  display_debug_msg($query, $cdg_sql, 'get_email_used(3)');
-  $m_q = new DB_OBM;
-  $m_q->query($query);
+  $obm_q = new DB_OBM;
+  $ctt[0]["type"] = "field";
+  $ctt[0]["value"] = "userobm_lastname";
+  $ctt[1]["type"] = "string";
+  $ctt[1]["value"] = " ";
+  $ctt[2]["type"] = "field";
+  $ctt[2]["value"] = "userobm_firstname";
+  $user_label = sql_string_concat($obm_q->type, $ctt);
 
-  while ($m_q->next_record()) {
-    $email = $m_q->f('mailshare_email');
-    $name = "$l_mailshare : " . $m_q->f('mailshare_name');
-    $mails["$email"] = "$name";
+  $query = "SELECT userobm_email as mail, $user_label as label FROM UserObm WHERE (".implode(' OR ', $user_query).") $where_user
+            UNION
+            SELECT mailshare_email as mail, mailshare_name as label FROM MailShare WHERE (".implode(' OR ', $mailshare_query).") $where_mailshare
+            UNION
+            SELECT group_email as mail, group_name as label FROM UGroup WHERE (".implode(' OR ', $group_query).") $where_group"; 
+
+  display_debug_msg($query, $cdg_sql, 'get_email_used(1)');
+  $obm_q->query($query);
+  $regexp = implode('|',$regexp);
+  $return = array();
+  while($obm_q->next_record()) {
+    preg_match_all('/^('.$regexp.')\r?$/m',$obm_q->f('mail'),$results);
+    $return = array_merge($return, $results[1]);
   }
-
-  return $mails;
-}
-
-
+  return implode(', ',$return);
+ 
+} 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the host name from the host Id
 // Parameters:

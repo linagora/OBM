@@ -79,7 +79,7 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
 //     keys used  : name, user
 ///////////////////////////////////////////////////////////////////////////////
 function html_resourcegroup_search_form ($group) {
-  global $display, $l_name, $l_resourcegroup_resource, $l_email, $l_find;
+  global $display, $l_name, $l_resourcegroup_resource, $l_find;
   global $l_visibility, $l_add_resourcegroup;
 
   $popup = $group["popup"];
@@ -259,7 +259,7 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
 //     keys used  : name, desc, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_resourcegroup_form($action, $group_q, $group) {
-  global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_header_new;
+  global $l_resourcegroup, $l_name, $l_desc, $l_header_new;
   global $cgroup_private_default, $l_insert, $l_update, $l_back, $l_private;
   global $obm, $display,$l_no;
   
@@ -326,15 +326,6 @@ function html_resourcegroup_form($action, $group_q, $group) {
     <tr>
     <th>$l_desc</th>
     <td><input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
-<!--      
-  </tr><tr>
-    <th>$l_email</th>
-    <td><input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
-  </tr>
-  </tr><tr>
-    <th>$l_private</th>
-    <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
--->    
   </tr>
   </table>
   </fieldset>";
@@ -400,7 +391,7 @@ function dis_resourcegroup_consult($group, $uid) {
 function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
   global $display, $perm, $module, $action, $cright_write;
   global $l_yes, $l_no, $ico_mail;
-  global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_visibility, $l_no_user, $l_no_resourcegroup_resourcegroup;
+  global $l_resourcegroup, $l_name, $l_desc, $l_visibility, $l_no_user, $l_no_resourcegroup_resourcegroup;
   global $l_system, $l_local, $l_ext_id;
   global $l_del_resource_sel, $l_resource_member, $l_del_resourcegroup_sel, $l_resourcegroup_member;
 

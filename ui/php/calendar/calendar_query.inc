@@ -459,7 +459,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
   }    
 
   // Insert My alert if set
-  if (isset($calendar['alert'])) {
+  if (($calendar['alert']) > 0) {
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
   }
 
@@ -693,66 +693,6 @@ function run_query_icalendar_insert($params) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// get_all_emails_list
-// Constructs a list of all possible users emails in OBM
-///////////////////////////////////////////////////////////////////////////////
-function get_all_email_list() {
-  global $cgp_use, $cdg_sql, $obm ;
-
-  $all_emails = array();
-
-  $obm_q = new DB_OBM();
-
-  // si mail activé, construire la liste des noms de domaines smtp (+alias) pour le domaine (sens obm) en cours.
-  if ($cgp_use['service']['mail']) {
-    $domain_list = array();
-
-    $query = "SELECT domain_name, domain_alias FROM Domain where domain_id = ".$obm['domain_id'] ;
-    display_debug_msg($query, $cdg_sql, 'get_all_emails_list / get domains names and aliases');
-    $result = $obm_q->query($query);
-    if ($obm_q->num_rows() > 0) {
-      while ($obm_q->next_record()) {
-        $domain_list[] = $obm_q->f('domain_name');
-	array_merge($domain_list, explode("\n", $obm_q->f('domain_alias')));
-      }
-    }
-  }
-
-  // pour chaque utilisateur
-  $query = "SELECT userobm_id, userobm_email FROM UserObm WHERE userobm_domain_id = ".$obm['domain_id'] ;
-  display_debug_msg($query, $cdg_sql, 'get_all_emails_list / get user list');
-  $result = $obm_q->query($query);
-
-  while ($obm_q->next_record()) {
-    $emails = $obm_q->f('userobm_email');
-    $uid = $obm_q->f('userobm_id');
-
-    // -- si mail actif, on mixe les parties gauche et les nom de domaines smtp
-    if ($cgp_use['service']['mail']) {
-      // ---- partie gauche
-      $gauche_list = explode("\n", $emails);
-      foreach($gauche_list as $email) {
-        if ($email != '') {
-	  $email = rtrim($email, "\r");
-          // ---- partie droite
-          foreach ($domain_list as $domain) {
-            $all_emails["$email@$domain"] = $uid ;
-          }
-        }
-      }
-    }
-    // -- si mail inactif, on récupère direct l'adresse
-    else {
-      if ($emails != '') {
-        $all_emails[$emails] = $uid ;
-      }
-    }
-  }
-
-  return $all_emails ;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // search_user_by_name
 // Parameters:
 //   - $lastname
@@ -969,7 +909,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
   }
 
   // Insert My alert if set
-  if (isset($calendar['alert'])) {
+  if (($calendar['alert']) > 0) {
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
   }
 

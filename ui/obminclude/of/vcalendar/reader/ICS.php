@@ -490,6 +490,7 @@ class Vcalendar_Reader_ICS {
   }
 
   function parseText($text) {
+    $text = htmlspecialchars($text);
     $text = stripcslashes($text);
     return $text;    
   }

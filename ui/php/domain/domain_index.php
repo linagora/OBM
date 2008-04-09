@@ -214,7 +214,15 @@ function get_domain_params() {
     }
   }
   $params['mailserver_nb'] = $nb_m;
-
+  if(is_array($params['alias'])) {
+    while(!empty($params['alias'])) {
+      $alias= trim(array_shift($params['alias']));
+      if(!empty($alias)) {
+        $aliases[] = $alias;
+      }
+    }
+    $params['alias'] = implode("\r\n",$aliases);
+  }
   return $params;
 }
 

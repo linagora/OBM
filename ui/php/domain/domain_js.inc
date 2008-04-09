@@ -19,7 +19,34 @@ function check_domain(form) {
 
   return true;
 }
+
+function add_alias_field() {
+
+  var aliasesHome = $('domainDomainHome');
+  // Create the div
+  var div = new Element('div').addClass('multiple');
+  div.adopt(new Element('a').addEvent('click', function () {
+              remove_element(this.parentNode,'domainDomainHome');
+              show_hide_add_button();
+            }).adopt(new Element('img').setProperty('src','$ico_delete')));
+  aliasesHome.adopt(div);
+  div.appendText(' ').adopt(new Element('input').setProperty('name','tf_alias[]').setProperty('type','text'));
   
+}
+
+function show_hide_add_button() {
+  var button = $('addDomainButton'); 
+  var parent = $('domainDomainHome');
+  var childs = parent.getChildren();
+  if(childs.length >= $GLOBALS[c_max_domain_alias] && button) {
+    button.remove();
+  } else if(childs.length < $GLOBALS[c_max_domain_alias] && !button) {
+    $('domainDomainLabel').adopt((new Element('a').addEvent('click', function () {
+              add_alias_field();
+              show_hide_add_button();
+            }).setProperty('id','addDomainButton').adopt(new Element('img').setProperty('src','$ico_add'))));     
+  }
+}  
   ";
   
 ?>

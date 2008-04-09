@@ -509,7 +509,7 @@ function run_query_check_host($id, $name, $desc) {
 // Parameters:
 //   - $id     : host id
 //   - $host[] : host values
-//     keys used : name, desc, email
+//     keys used : name, desc
 // Returns:
 //   - Host Database object with host of similar hosts
 ///////////////////////////////////////////////////////////////////////////////
@@ -559,7 +559,7 @@ function check_host_update_rights($params) {
 // Host Form Data checking and formatting
 // Parameters:
 //   - $host[]  : values checked
-//     keys used : name, desc, email
+//     keys used : name, desc
 ///////////////////////////////////////////////////////////////////////////////
 function check_host_data_form($host) {
   global $php_regexp_hostname, $l_err_host_name_empty, $l_err_host_name_exist;

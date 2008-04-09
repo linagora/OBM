@@ -20,7 +20,7 @@ function html_forward_consult($usr_q) {
   global $obm, $c_yes, $c_no;
 
   $id = $usr_q->f('userobm_id');
-  $email = $usr_q->f('userobm_email');
+  $email = get_entity_email($usr_q->f('userobm_email'),$usr_q->f('domain_name'));
   $email_nomade = $usr_q->f('userobm_email_nomade');
   $nomade_perms = $usr_q->f('userobm_nomade_perms');
   $nomade_enable = $usr_q->f('userobm_nomade_enable');
@@ -57,7 +57,7 @@ function html_forward_consult($usr_q) {
     <table>
     <tr>
       <th>$l_internal_email</th>
-      <td>$email (@$obm[domain_name])</td>
+      <td>$email</td>
     </tr>
     $dis_nomade
     </table>";
@@ -79,7 +79,7 @@ function html_forward_form($usr_q, $forward, $field='') {
   global $obm, $action, $c_yes, $c_no, $l_update;
 
   $id = $usr_q->f('userobm_id');
-  $email = $usr_q->f('userobm_email');
+  $email = get_entity_email($usr_q->f('userobm_email'),$usr_q->f('domain_name'));
   $nomade_perms = $usr_q->f('userobm_nomade_perms');
 
   $domain = $obm['domain_name'];
@@ -134,7 +134,7 @@ function html_forward_form($usr_q, $forward, $field='') {
     <table>
     <tr>
       <th>$l_internal_email</th>
-      <td>$email (@$domain)</td>
+      <td>$email</td>
     </tr>
     $dis_nomade      
     <tr>

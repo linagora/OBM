@@ -559,6 +559,9 @@ fieldset.detail {
   width: expression(this.type == "checkbox" || this.type == "radio" ? "auto" : ""); /*IE Crappy hack 2*/ 
 }
 
+.multiple input, .multiple select {
+  width: auto;
+}
 .extra {
   clear: left;
 }

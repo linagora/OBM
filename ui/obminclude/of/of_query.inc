@@ -1586,24 +1586,42 @@ function get_entity_info($id, $entity) {
     $ctt[2]['type'] = 'field';
     $ctt[2]['value'] = 'userobm_firstname';
     $c_label = sql_string_concat($db_type, $ctt);
-    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'user' as entity_kind FROM UserObm";
+    $c_email = 'userobm_email';
+    $c_domain = 'userobm_domain_id';
+    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id,
+                            $c_id as entitydata_id, 'user' as entity_kind FROM UserObm";
   } elseif ($entity == 'group') {
     $table_entity = 'UGroup';
     $c_id = 'group_id';
     $c_label = 'group_name';
-    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'group' as entity_kind FROM UGroup";
+    $c_email = 'group_email';
+    $c_domain = 'group_domain_id';
+    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id,
+                            $c_id as entitydata_id, 'group' as entity_kind FROM UGroup";
   } elseif ($entity == 'resource') {
     $table_entity = 'Resource';
     $c_id = 'resource_id';
     $c_label = 'resource_name';
-    $entity_table = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'resource' as entity_kind FROM Resource";
+    $c_email = 'NULL';
+    $c_domain = 'resource_domain_id';
+    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, 
+                            $c_id as entitydata_id, 'resource' as entity_kind FROM Resource";
+  } elseif ($entity == 'mailshare') {
+    $table_entity = 'MailShare';
+    $c_id = 'mailshare_id';
+    $c_label = 'mailshare_name';
+    $c_email = 'mailshare_email';
+    $c_domain = 'mailshare_domain_id';
+    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id,
+                            $c_id as entitydata_id, 'mailshare' as entity_kind FROM MailShare";
   }
 
-  $query = "SELECT *
+  $query = "SELECT Entity.*, domain_name as entity_domain
     FROM($entity_table) as Entity 
+    LEFT JOIN Domain ON domain_id = entitydata_domain_id
     WHERE entitydata_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, 'get_user_info()');
+  display_debug_msg($query, $cdg_sql, 'get_entity_info()');
   $obm_q->query($query);
   $obm_q->next_record();
   if (is_array($obm_q->Record)) {
@@ -1718,9 +1736,8 @@ function get_user_info($id='') {
   if (is_array($obm_q->Record)) {
     foreach ($obm_q->Record as $key => $user) {
       $small_key = str_replace('userobm_', '', $key);
-      if($small_key == 'email' && $GLOBALS['cgp_use']['service']['mail']) {
-        $emails = explode("\n",$user);
-        $user = trim($emails[0]).'@'.$obm_q->f('domain_name');
+      if($small_key == 'email' ) {
+        $user = get_entity_email($user, $obm_q->f('domain_name'));
       }      
       $u[$small_key] = $user;
     }
@@ -1732,7 +1749,53 @@ function get_user_info($id='') {
   return $u;
 }
 
+/**
+ * Format entities email. 
+ * 
+ * @param mixed $mail Brut email(s) (if not set use id and entity to retrieve
+ * all informations including domain name)
+ * @param mixed $domain current domain name (if not set use obm['domain_name'])
+ * @param mixed $first_only return only the first entity email if true, all if
+ * false
+ * @param string $separator if null return an array, if not null return a 
+ * string containing all email, separated by '$separator'
+ * @param mixed $id Entity id, needed only if $mail is null 
+ * @param string $entity Entity kind, needed only if $mail is null
+ * @access public
+ * @return array | string
+ */
+function get_entity_email($mail=null, $domain=null, $first_only=true, $separator=', ', $id=null, $entity='user') {
+  global $obm, $cgp_use;
+  if(is_null($mail)) {
+    if(is_null($id)) {
+      return false;
+    }
+    $e = get_entity_info($id, $entity);
+    $mail = $e['email'];
+    $domain = $e['domain_name'];
+  }
 
+  if(is_null($domain) && $obm['domain_id'] != 0) {
+    $domain = $obm['domain_name'];
+  }    
+  $mail = explode("\r\n",$mail);
+  if($first_only && count($mail) > 1) {
+    $mail = array(array_shift($mail));
+  }
+  $emails = array();
+  foreach($mail as $key => $email) {
+    if(strpos($email,'@') === false && !empty($email)) {
+      $emails[] = $email.'@'.$domain;
+    } elseif(!empty($email)) {
+      $emails[] = $email;
+    }
+  }
+  if(!is_null($separator)) {
+    return implode($separator,$emails);
+  } else {
+    return $emails;
+  }
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Userobm query execution : All users (or the one for the id given)
 // Parameters:
@@ -2173,9 +2236,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
       $reci = $reci_q->f('userobm_email');
     
       // If AliaSuite, construct recipient address.
-      if ($cgp_use['service']['mail']) {
-	$reci = strtok($reci, "\r\n")."@".$reci_q->f('domain_name');
-      }
+      $reci = get_entity_email($reci, $reci_q->f('domain_name'));
     
       if ($reci_list == '') {
 	$reci_list = $reci;
@@ -2201,11 +2262,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
 
   $headers .= 'From: ';
   // If AliaSuite, construct sender address.
-  if($cgp_use['service']['mail']) {
-    $headers .= strtok($send_q->f('userobm_email'), "\r\n")."@".$send_q->f('domain_name')."\n";
-  } else {
-    $headers .= $send_q->f('userobm_email')."\n";
-  }
+  $headers .= get_entity_email($send_q->f('userobm_email'), $send_q->f('domain_name'))."\n";
 
   // If attachements are provided
   $headers.= "MIME-Version: 1.0\n"; 

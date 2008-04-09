@@ -120,15 +120,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
       $res["align"] = "center";
       $res['name'] = '-';
     } elseif (strcmp($email ,"") != 0) {
-      if ($cgp_use["service"]["mail"]) {
-        if ($OD->data_set->f("domain_name") != "") {
-          $main_domain = $OD->data_set->f("domain_name");
-        } else {
-          $main_domain = $obm["domain_name"];
-        }
-        $emails = explode("\n",$email);
-        $email = trim($emails[0])."@$main_domain";
-      }
+      $email = get_entity_email($email, $OD->data_set->f("domain_name"));
       $res["url"] = "mailto:$email";
       $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\">$email";
       $res["txt_name"] = "$email";
@@ -511,8 +503,14 @@ function html_user_consult($obm_q) {
   $web_all = $obm_q->f("userobm_web_all");
   $mail_perms = $obm_q->f("userobm_mail_perms");
   $mail_ext_perms = $obm_q->f("userobm_mail_ext_perms");
+  //  $mail = get_mail_info();
+  if( $obm_q->f("domain_name") != "") {
+    $main_domain = $obm_q->f("domain_name");
+  } else {
+    $main_domain = $obm["domain_name"];
+  }  
   if($obm_q->f('userobm_hidden') != 1 || $perm->check_right($module, $cright_write_admin)) {
-    $email = $obm_q->f("userobm_email");
+    $email = get_entity_email($obm_q->f("userobm_email"),$main_domain, false);
   } else {
     $email = '';
   }
@@ -537,12 +535,7 @@ function html_user_consult($obm_q) {
   $nomade_local_copy = ($nomade_local_copy ? $l_yes : $l_no);
   $vacation_enable = ($vacation_enable ? $l_yes : $l_no);
   $vacation_message = ($vacation_enable ? nl2br($vacation_message) : "---");
-  //  $mail = get_mail_info();
-  if( $obm_q->f("domain_name") != "") {
-    $main_domain = $obm_q->f("domain_name");
-  } else {
-    $main_domain = $obm["domain_name"];
-  }
+
   if ($host_name == '') {
     $dis_host = $l_empty;
   } else {
@@ -636,7 +629,7 @@ function html_user_consult($obm_q) {
     </tr>
     <tr>
       <th>$l_email</th>
-      <td>$email (@$main_domain)</td>
+      <td>$email </td>
     </tr>
     <tr>
       <th>$l_quota</th>
@@ -1193,6 +1186,8 @@ function html_user_form($usr_q, $user, $field='') {
   }
 
   if ($cgp_use['service']['mail']) {
+    $dis_mail = dis_user_mail_field($email,$class);
+    
     // Mail perms checkbox checked values
     $mail_state  = ($mail_perms ? 'checked' : '');
     $mail_ext_state  = ($mail_ext_perms ? 'checked' : '');
@@ -1223,9 +1218,7 @@ function html_user_form($usr_q, $user, $field='') {
     <th class=\"$class[mail_server]\">$l_mail_server</th>
     <td>$dis_mailserver</td>
   </tr>
-  <tr>
-    <th class=\"$class[email]\">$l_email</th>
-    <td><textarea name=\"ta_email\" cols=\"32\" rows=\"3\">$email</textarea>@$main_domain</td>
+    $dis_mail
   </tr>
   <tr>
     <th class=\"$class[mail_quota]\">$l_quota</th>
@@ -2300,4 +2293,96 @@ function json_search_users($user,$results) {
   }
   $display["json"] = "{length:".$results['length'].", datas:[".implode(",",$users)."]}";
 }
+
+
+/**
+ * Generate email field  
+ * 
+ * @param mixed $name 
+ * @param mixed $values 
+ * @access public
+ * @return void
+ */
+function dis_user_mail_field($values,$class) {
+  $d = of_domain_get_domain_infos($GLOBALS['obm']['domain_id'], true);
+  if(!empty($d['alias'])) {
+    $aliases = explode("\r\n",$d['alias']);
+  } else {
+    $aliases = array();
+  }
+  array_unshift($aliases,$d['name']);
+  if(!empty($values)) {
+    $emails = explode("\r\n",$values);
+  }
+  $count = 0;
+  if(is_array($emails)) {
+    foreach($emails as $key => $email) {
+      $sel_alias = '';
+      list($mail,$domain) = explode('@',$email);  
+      foreach($aliases as $alias) {
+        if( $alias == $domain) {
+          $sel_alias .= "<option selected='selected' value='$alias'>$alias</option>";
+        } else {
+          $sel_alias .= "<option value='$alias'>$alias</option>";
+        } 
+      }
+      $sel_alias = "<select name='sel_aliases[]'>
+        <option value=''>$GLOBALS[l_all_aliases]</option>
+        $sel_alias
+        </select>";
+
+      $email_block .= "<div class=\"multiple\">
+        <a onclick=\"remove_element(this.parentNode,'userMailHome');show_hide_add_button();return false\" href=\"\">
+         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+        </a>        
+        <input name='tf_email[]' value='$mail' /> @ $sel_alias
+        </div>";
+      $count ++;
+    }
+  }
+  $sel_alias = '';
+  foreach($aliases as $alias) {
+    $sel_alias .= "<option value=\"$alias\">$alias</option>";
+    $sel_js .= "aliasSelectTemplate.adopt(new Element('option').setProperty('value','$alias').appendText('$alias'));\n";
+  }
+  $sel_alias = "
+    <select name=\"sel_aliases[]\">
+    <option value=\"\">$GLOBALS[l_all_aliases]</option>
+    $sel_alias
+    </select>";
+  if($GLOBALS['c_max_user_alias'] ==0 || $count < $GLOBALS['c_max_user_alias']) {
+    $email_block .= "
+      <div class=\"multiple\">
+      <a onclick=\"remove_element(this.parentNode,'userMailHome');show_hide_add_button();return false\" href=\"\">
+       <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+      </a>        
+      <input name='tf_email[]' value='' /> @ $sel_alias 
+      </div>         
+      ";
+    $count++;
+  } 
+  if($GLOBALS['c_max_user_alias'] ==0 || $count < $GLOBALS['c_max_user_alias']) {
+    $add_button = "<a id='addMailButton' href=\'\' onclick=\"add_email_field(aliasSelectTemplate);show_hide_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+  }
+  
+  $email_block = "
+  <th class=\"$class[email]\" id='userMailLabel'>
+  $GLOBALS[l_email]
+  <script type='text/javascript'>
+    var aliasSelectTemplate = new Element('select').setProperty('name','sel_aliases[]');
+    aliasSelectTemplate.adopt(new Element('option').setProperty('value','').appendText('$GLOBALS[l_all_aliases]'));
+    $sel_js
+  </script>
+  $add_button
+  </th>
+  <td id='userMailHome'>
+  $email_block
+  </td>
+  ";
+
+  return $email_block;
+}
+
+
+
 ?>

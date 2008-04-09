@@ -50,6 +50,8 @@ $l_mailserver_removed = "Serveur de messagerie enlevé";
 $l_no_mailserver_added = "Pas de serveur de messagerie à ajouter";
 $l_mailserver_cant_delete = "Le serveur de messagerie ne peut être supprimé du domaine";
 $l_mailserver_invalid_role = "Le rôle du serveur de messagerie est incorrect";
+$l_name_in_use = "Le nom de domaine ou l'un des alias est déjà utilisé";
+$l_alias_user_used = "Impossible de modifier ou supprimer des alias utilisés dans des adresses mails";
 
 // JavaScript Messages
 $l_fill_title = "Vous devez renseigner le Label avant de valider.";

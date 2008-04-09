@@ -179,6 +179,11 @@ $c_frozen_duration = 10;
 // Activate user defined code : check rules, hook functions
 $conf_modules = false;
 
+// Max domain alias, users, group and mailshares mail alias (0=unlimted)
+$c_max_user_alias = 0;
+$c_max_domain_alias = 8;
+$c_max_mailshare_alias = 0;
+$c_max_group_alias = 1;
 // Access restriction
 
 //---------------------------------------------------------------------------//
