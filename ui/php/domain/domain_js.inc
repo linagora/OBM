@@ -38,13 +38,15 @@ function show_hide_add_button() {
   var button = $('addDomainButton'); 
   var parent = $('domainDomainHome');
   var childs = parent.getChildren();
-  if(childs.length >= $GLOBALS[c_max_domain_alias] && button) {
-    button.remove();
-  } else if(childs.length < $GLOBALS[c_max_domain_alias] && !button) {
-    $('domainDomainLabel').adopt((new Element('a').addEvent('click', function () {
-              add_alias_field();
-              show_hide_add_button();
-            }).setProperty('id','addDomainButton').adopt(new Element('img').setProperty('src','$ico_add'))));     
+  if($GLOBALS[c_max_domain_alias] > 0) {
+    if(childs.length >= $GLOBALS[c_max_domain_alias] && button) {
+      button.remove();
+    } else if(childs.length < $GLOBALS[c_max_domain_alias] && !button) {
+      $('domainDomainLabel').adopt((new Element('a').addEvent('click', function () {
+                add_alias_field();
+                show_hide_add_button();
+              }).setProperty('id','addDomainButton').adopt(new Element('img').setProperty('src','$ico_add'))));     
+    }
   }
 }  
   ";
