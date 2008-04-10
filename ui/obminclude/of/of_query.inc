@@ -1770,6 +1770,9 @@ function get_entity_email($mail=null, $domain=null, $first_only=true, $separator
     if(is_null($id)) {
       return false;
     }
+    if(is_null($id)) {
+      $id = $obm['uid'];
+    }
     $e = get_entity_info($id, $entity);
     $mail = $e['email'];
     $domain = $e['domain_name'];

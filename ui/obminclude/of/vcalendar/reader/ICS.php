@@ -110,7 +110,7 @@ class Vcalendar_Reader_ICS {
     foreach($values as $value) {
       list($valueName, $valueValue) = explode('=', $value);
       $valueName = strtolower($valueName);
-      $property[$valueName] = $this->parseText($valueValue);
+      $property[$valueName] = $valueValue;
     }
     return $property;
   }
@@ -205,7 +205,7 @@ class Vcalendar_Reader_ICS {
     if(method_exists($this, $methodName)) {
       return array('name' => $name, 'value' => $this->$methodName($value, $options));
     } else {
-      return array('name' => $name, 'value' => $this->parseText($value));
+      return array('name' => $name, 'value' => $this->parseText($value, $options));
     }
   }
 
@@ -259,7 +259,7 @@ class Vcalendar_Reader_ICS {
   }
 
   function parseCategories($value, $options) {
-    return explode(',',$this->parseText($value));
+    return explode(',',$this->parseText($value,$options));
   }
 
   function parseExdate($value, $options) {
@@ -489,7 +489,7 @@ class Vcalendar_Reader_ICS {
     }
   }
 
-  function parseText($text) {
+  function parseText($text,$options) {
     $text = htmlspecialchars($text);
     $text = stripcslashes($text);
     return $text;    
