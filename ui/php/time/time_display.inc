@@ -390,6 +390,7 @@ function dis_time_user_planning($obm_q, $time) {
   global $path, $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
   global $l_daysofweekfirst;
 
+  $col_nwday = 'A0A0A0';
   $iso_date = $time['date'];
   $ts_date = strtotime($iso_date);
   $month = of_date_get_month($ts_date);
@@ -406,21 +407,20 @@ function dis_time_user_planning($obm_q, $time) {
   $day = 1;
   while ($day_in_sec < $last_day_sec) {
     $fday = ($day>9) ? "$day" : "0$day";
-    $array_res["$fday"]['length'] = 0;
-    $array_res["$fday"]['dow'] = $dow;
-    $array_res["$fday"]['obm_dow'] = $obm_dow;
+    $days["$fday"]['dow'] = $dow;
+    $days["$fday"]['obm_dow'] = $obm_dow;
     $day++;
 
     $day_in_sec += 86400;
     $dow = date('w', $day_in_sec);
     $obm_dow = ($dow - $c_week_first_day + 7) % 7;
   }
-  $day_amount = $day - 1;
+  $nb_days = $day - 1;
   $planning = array();
   $task_days = array();
   $line = array();
   $css = array();
-  while ($obm_q->next_record())  {
+  while ($obm_q->next_record()) {
     $day = date('d', $obm_q->f('date'));
     $project_id = $obm_q->f('id');
     $u_id = $obm_q->f('userobm_id');
@@ -436,39 +436,55 @@ function dis_time_user_planning($obm_q, $time) {
       $shortname = $dis_label;
     }
     $projects[$type.$project_id] = "<abbr title=\"$label\">$shortname</abbr>";
-    $users[$u_id] = $obm_q->f('userobm_firstname').' '. $obm_q->f('userobm_lastname');
+    $users[$u_id] = $obm_q->f('userobm_lastname').' '. $obm_q->f('userobm_firstname');
     $planning[$u_id][$type.$project_id]["$day"] = $obm_q->f('timetask_length')/$c_day_fraction;
     $planning[$u_id][$type.$project_id]['length'] += $obm_q->f('timetask_length')/$c_day_fraction;
   }
 
-  while (list($day,$val) = each($array_res)) {
+  // Loop through each month days
+  while (list($day,$val) = each($days)) {
+    // Display the month planning
     $lday = $l_daysofweekfirst[$val['dow']];
-    
     $line0 .= "<th><a href=\"$path/time/time_index.php?action=index&amp;date=$year-$month-$day\">$lday</a></th>\n";
-    $line1 .= "<td>$day</td>\n";
-    
+    if (! $c_working_days[$val['dow']]) {
+      $line1 .= "<td style=\"background-color: #$col_nwday;\">$day</td>\n";
+    } else {
+      $line1 .= "<td>$day</td>\n";
+    }
+
+    // Fill the day cell for each user
     foreach($planning as $u_id => $user_planning) {
       foreach($user_planning as $project_id => $work) {
-        if(isset($work[$day])) {
+        if (isset($work[$day])) {
           $length = $work[$day]*100;
           $line[$u_id][$project_id] .= "<td title=\"$length%\"><div style=\"width:$length%;\">&nbsp;</div></td>";
         } else {
-          $line[$u_id][$project_id] .= '<td></td>';
+	  if (! $c_working_days[$days[$day]['dow']]) {
+	    $line[$u_id][$project_id] .= "<td style=\"background-color: #$col_nwday;\"></td>";
+	  } else {
+	    $line[$u_id][$project_id] .= "<td></td>";
+	  }
         }
       }
     }
   }
+
+  // Fill the displayed rows
   foreach($planning as $u_id => $user_planning) {
+    $total_length = 0;
     foreach($user_planning as $project_id => $work) {
       $line[$u_id][$project_id] = "<tr class=\"$project_id\">
         <th>".$projects[$project_id].'</th>'.$line[$u_id][$project_id]."
         <th>&nbsp;</th><td>".$work['length'].'</td></tr>';
       $color = randomColor();
       $css[$project_id] .= ".$project_id th {color:$color;} \n.$project_id div {background-color:$color;}";
-    }  
+      $total_length += $work['length'];
+    }
+    $users_length[$u_id] = $total_length;
   }
+
   foreach($line as $u_id => $l) {
-    $d_l .= "<tr><th colspan=\"".($day_amount+3)."\"><br/>".$users[$u_id]."<br/>&nbsp;</th></tr>".
+    $d_l .= "<tr><th colspan=\"".($nb_days+2)."\"><br/>".$users[$u_id]."<br/>&nbsp;</th><th>".$users_length[$u_id]."</th></tr>".
     implode($l);
   }
   $css = implode("\n",$css);
@@ -479,7 +495,7 @@ function dis_time_user_planning($obm_q, $time) {
   <table class=\"planning\">
   <colgroup>
   </colgroup>
-  <colgroup class=\"main\" span=\"$day_amount\">
+  <colgroup class=\"main\" span=\"$nb_days\">
   </colgroup> 
   <colgroup class=\"total\" span=\"2\">
   </colgroup>    
@@ -953,7 +969,7 @@ function dis_time_month_users_total($time) {
       $f_name = $month_q->f('userobm_firstname');
       $l_name = $month_q->f('userobm_lastname');
       $array_res[$cpt]['id'] = $month_q->f('userid');
-      $array_res[$cpt]['name'] = $f_name . ' ' . $l_name;
+      $array_res[$cpt]['name'] = $l_name . ' ' . $f_name;
       $array_res[$cpt]['status'] = $month_q->f('status');
       $array_res[$cpt]['length'] = $month_q->f('total_length');
       $cpt++;

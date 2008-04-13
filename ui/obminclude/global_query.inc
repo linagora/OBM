@@ -623,8 +623,8 @@ function run_query_global_delete_document($doc_id) {
   $retour = $obm_q->query($query);
 
   return $retour;
-
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Delete File from Disk

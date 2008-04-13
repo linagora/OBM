@@ -389,9 +389,10 @@ function html_project_nav_date($project) {
 //   - $time[] : time hash
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_planning($obm_q, $params) {
-  global $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
+  global $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill, $l_total;
   global $l_daysofweekfirst;
 
+  $col_nwday = 'A0A0A0';
   $p_ids = $params['project_ids'];
   $year = substr($params['date'],0,4);
   $month = substr($params['date'],4,2);
@@ -407,16 +408,15 @@ function html_project_planning($obm_q, $params) {
   $day = 1;
   while ($day_in_sec < $last_day_sec) {
     $fday = ($day>9) ? "$day" : "0$day";
-    $array_res["$fday"]['length'] = 0;
-    $array_res["$fday"]['dow'] = $dow;
-    $array_res["$fday"]['obm_dow'] = $obm_dow;
+    $days["$fday"]['dow'] = $dow;
+    $days["$fday"]['obm_dow'] = $obm_dow;
     $day++;
 
     $day_in_sec += 86400;
     $dow = date('w', $day_in_sec);
     $obm_dow = ($dow - $c_week_first_day + 7) % 7;
   }
-  $day_amount = $day - 1;
+  $nb_days = $day - 1;
   $planning = array();
   $task_days = array();
   $line = array();
@@ -435,7 +435,7 @@ function html_project_planning($obm_q, $params) {
     $u_id = $obm_q->f('userobm_id');
 
     $projects[$project_id] = $project_label;
-    
+
     $tasks[$task_id] = "<abbr title=\"$task_label\">$dis_task_label</abbr>";
     $users[$u_id] = $obm_q->f('userobm_firstname').' '. $obm_q->f('userobm_lastname');
 
@@ -444,24 +444,34 @@ function html_project_planning($obm_q, $params) {
     $planning[$u_id][$task_id]['length'] += $obm_q->f('timetask_length')/$c_day_fraction;
   }
 
-  while (list($day,$val) = each($array_res)) {
+  while (list($day,$val) = each($days)) {
+    // Display the month planning
     $lday = $l_daysofweekfirst[$val['dow']];
-    
     $line0 .= "<th>$lday</th>\n";
-    $line1 .= "<td>$day</td>\n";
+    if (! $c_working_days[$val['dow']]) {
+      $line1 .= "<td style=\"background-color: #$col_nwday;\">$day</td>\n";
+    } else {
+      $line1 .= "<td>$day</td>\n";
+    }
 
+    // Fill the day cell for each user
     foreach($planning as $u_id => $user_planning) {
       foreach($user_planning as $task_id => $work) {
         if(isset($work[$day])) {
           $length = $work[$day]*100;
           $line[$u_id][$task_id] .= "<td title=\"$length%\" ><div style=\"width:$length%;\">&nbsp;</div></td>";
         } else {
-          $line[$u_id][$task_id] .= '<td></td>';
+	  if (! $c_working_days[$days[$day]['dow']]) {
+	    $line[$u_id][$task_id] .= "<td style=\"background-color: #$col_nwday;\"></td>";
+	  } else {
+	    $line[$u_id][$task_id] .= "<td></td>";
+	  }
         }
       }
     }
   }
 
+  // Fill the displayed rows
   foreach($planning as $u_id => $user_planning) {
     foreach($user_planning as $task_id => $work) {
       $line[$u_id][$task_id] = "<tr class=\"t$task_id\">
@@ -469,14 +479,22 @@ function html_project_planning($obm_q, $params) {
         <th></th><td>".$work['length'].'</td></tr>';
       $color = randomColor();
       $css[$project_id] .= ".t$task_id th {color:$color;} \n.t$task_id div {background-color:$color;}";
-    }  
-  } 
+      $total_length += $work['length'];
+    }
+  }
 
   foreach($line as $u_id => $l) {
-    $d_l .= '<tr><th>'.$users[$u_id]."</th><th colspan=\"".($day_amount+2)."\"></th></tr>".
+    $d_l .= '<tr><th>'.$users[$u_id]."</th><th colspan=\"".($nb_days+2)."\"></th></tr>".
     implode($l);
   }
   $css = implode("\n",$css);
+
+  // Total line
+  if ($total_length > 0) {
+    $total_span = $nb_days+1;
+    $dis_total = "<tr><th>&nbsp;</th><td colspan=\"$total_span\">$l_total</td><td>$total_length</td></tr>";
+  }
+
   $block = "
   <style>
     $css
@@ -485,15 +503,16 @@ function html_project_planning($obm_q, $params) {
   <table class=\"planning\">
   <colgroup>
   </colgroup>
-  <colgroup class=\"main\" span=\"$day_amount\">
+  <colgroup class=\"main\" span=\"$nb_days\">
   </colgroup> 
   <colgroup class=\"main\" span=\"2\">
   </colgroup>    
   <thead>
-  <tr><th></th>$line0</tr>  
+  <tr><th></th>$line0</tr>
   <tr><th></th>$line1</tr>
   </thead>
   $d_l
+  $dis_total
   </table>
     <div>
 ";

@@ -788,10 +788,10 @@ function run_query_time_user_month_planning($time) {
       AND timetask_date <= '$month_end'
       AND timetask_user_id IN $uid_tab
     GROUP BY  date, timetask_status, id, label,userobm_id,userobm_lastname,userobm_firstname,type
-    ORDER by type,label
+    ORDER BY userobm_lastname, type, label
 ";
   
-  display_debug_msg($query, $cdg_sql, 'run_query_time_task_one_month');
+  display_debug_msg($query, $cdg_sql, 'run_query_time_user_month_planning');
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 
