@@ -524,8 +524,13 @@ function json_search_resources($resource,$results) {
       // Display resource item
       // TODO : Afficher le lien seulement si des accessoires sont dispo. 
       $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&resource_id=$id";
+      if($items > 0 || $property != '') {
+        $extension = "new Element('div')";
+      } else {
+        $extension = "''";
+      }
       if ($items > 0) {
-        $extension = "new Element('div').adopt(new Element('a').
+        $extension .= ".adopt(new Element('a').
           setProperties({'id' : 'a[$id]', 'href' : 'javascript: void(0);'}).
           setProperty('onclick', 'popup(\"$url_item\", \"\")').
           appendText('$l_ritem').adopt(
