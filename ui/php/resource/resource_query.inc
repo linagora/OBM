@@ -159,13 +159,16 @@ function run_query_resource_ext_search($resource) {
       resource_qty,
       resource_rtype_id,
       resourcetype_property,
-      resourcetype_pkind
+      resourcetype_pkind,
+      count(resourceitem_id) as items
     FROM Resource
     LEFT JOIN ResourceType ON resource_rtype_id = resourcetype_id
+    LEFT JOIN ResourceItem ON resourceitem_resourcetype_id = resourcetype_id
     WHERE 
       resource_name LIKE '$pattern%' 
       $multidomain
       $where_restriction
+    GROUP BY resource_id, resource_name, resource_qty, resource_rtype_id, resourcetype_property, resourcetype_pkind 
     ORDER BY resource_name
     LIMIT $limit OFFSET $first_row";
 

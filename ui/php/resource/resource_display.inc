@@ -517,25 +517,28 @@ function json_search_resources($resource,$results) {
     $resourcetype_id = $res_q->f("resource_rtype_id");
     $label = phpStringToJsString($res_q->f("resource_name"));
     $extra = phpStringToJsString("$l_qty : ".$res_q->f("resource_qty"));
+    $items = $res_q->f('items');
     $property = $res_q->f("resourcetype_property");
 
     if ($form == "event" && $resourcetype_id != "") {
       // Display resource item
       // TODO : Afficher le lien seulement si des accessoires sont dispo. 
       $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&resource_id=$id";
-      $extension = "new Element('div').adopt(new Element('a').
-        setProperties({'id' : 'a[$id]', 'href' : 'javascript: void(0);'}).
-        setProperty('onclick', 'popup(\"$url_item\", \"\")').
-        appendText('$l_ritem').adopt(
-        new Element('textarea').
-          setProperties({'id':'list-item[$id]', 'name':'list-item[$id]', 'readonly':'readonly'}).
-          setStyle('display', 'block')).adopt(
-        new Element('input').
-          setProperties({'id':'list-item-id[$id]', 'name':'list-item-id[$id]', 'type':'hidden'})).adopt(
-        new Element('input').
-          setProperties({'id':'res-name[$id]', 'name':'res-name[$id]', 'type':'hidden', 'value':'$label'})).adopt(
-        new Element('input').
-          setProperties({'id':'res-id[$id]', 'name':'res-id[$id]', 'type':'hidden', 'value':'$id'})))";
+      if ($items > 0) {
+        $extension = "new Element('div').adopt(new Element('a').
+          setProperties({'id' : 'a[$id]', 'href' : 'javascript: void(0);'}).
+          setProperty('onclick', 'popup(\"$url_item\", \"\")').
+          appendText('$l_ritem').adopt(
+          new Element('textarea').
+            setProperties({'id':'list-item[$id]', 'name':'list-item[$id]', 'readonly':'readonly'}).
+            setStyle('display', 'block')).adopt(
+          new Element('input').
+            setProperties({'id':'list-item-id[$id]', 'name':'list-item-id[$id]', 'type':'hidden'})).adopt(
+          new Element('input').
+            setProperties({'id':'res-name[$id]', 'name':'res-name[$id]', 'type':'hidden', 'value':'$label'})).adopt(
+          new Element('input').
+            setProperties({'id':'res-id[$id]', 'name':'res-id[$id]', 'type':'hidden', 'value':'$id'})))";
+      }
 
       // Display resource property if exists
       if ($property != "") {
