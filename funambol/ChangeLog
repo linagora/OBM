@@ -1,3 +1,16 @@
+2008-04-16  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Handle synthesis indented output.
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getFoundationCalendarFromICal):
+	* src/java/fr/aliasource/funambol/utils/FunambolHelper.java:
+	* src/java/fr/aliasource/funambol/utils/FunisHelper.java:
+	(FunisHelper), (FunisHelper.removeQuotedPrintableFromVCalString),
+	(FunisHelper.nextLineIsIndented), (FunisHelper.safeSplit):
+	* tests/fr/aliasource/funambol/VCalQuotedTest.java:
+	(VCalQuotedTest.processVCal):
+
 2008-04-15  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	Remove soft line breaks from quote printable content & put it back

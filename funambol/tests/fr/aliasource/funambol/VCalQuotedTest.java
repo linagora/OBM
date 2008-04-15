@@ -10,7 +10,7 @@ import com.funambol.common.pim.model.VCalendar;
 import com.funambol.common.pim.xvcalendar.ParseException;
 import com.funambol.common.pim.xvcalendar.XVCalendarParser;
 
-import fr.aliasource.funambol.utils.FunambolHelper;
+import fr.aliasource.funambol.utils.FunisHelper;
 
 public class VCalQuotedTest extends TestCase {
 
@@ -23,7 +23,7 @@ public class VCalQuotedTest extends TestCase {
 	}
 
 	private String processVCal(String vcal) {
-		String ret = FunambolHelper.removeQuotedPrintableFromVCalString(vcal);
+		String ret = FunisHelper.removeQuotedPrintableFromVCalString(vcal);
 		System.out.println("Fixed vcal:\n"+ret);
 		return ret;
 	}
