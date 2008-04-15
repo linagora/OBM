@@ -1060,6 +1060,11 @@ sub updateLdapEntry {
                 &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_nt_password}, $ldapEntry, "sambaNTPassword" );
                 $update->setUpdate();
             }
+
+            # On replace aussi les flags de l'utilisateur
+            if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_flags}, $ldapEntry, "sambaAcctFlags" ) ) {
+                $update->setUpdate();
+            }
         }
     }
 
@@ -1083,9 +1088,13 @@ sub updateLdapEntry {
         $update->setUpdate();
     }
 
-    # Le répertoire personnel et la lettre du lecteur associé
+    # Le répertoire personnel
+    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_home}, $ldapEntry, "sambaHomePath") ) {
+        $update->setUpdate();
+    }
+
+    # La lettre du lecteur associée au répertoire personnel
     if( &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_home_drive}, $ldapEntry, "sambaHomeDrive") ) {
-        &OBM::Ldap::utils::modifyAttr( $entryProp->{userobm_samba_home}, $ldapEntry, "sambaHomePath");
         $update->setUpdate();
     }
 
