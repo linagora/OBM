@@ -1,3 +1,20 @@
+2008-04-15  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Remove soft line breaks from quote printable content & put it back
+	on one line.
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getFoundationCalendarFromICal):
+	* src/java/fr/aliasource/funambol/utils/FunambolHelper.java:
+	(FunambolHelper),
+	(FunambolHelper.removeQuotedPrintableFromVCalString),
+	(FunambolHelper.safeSplit):
+	* test-data/quoted.vcal:
+	* tests/fr/aliasource/funambol/VCalQuotedTest.java:
+	(VCalQuotedTest), (VCalQuotedTest.setUp),
+	(VCalQuotedTest.tearDown), (VCalQuotedTest.processVCal),
+	(VCalQuotedTest.readTestFile), (VCalQuotedTest.testParsing):
+
 2008-02-14  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	Fix for "notes" usage on windows mobile with synthesis : 

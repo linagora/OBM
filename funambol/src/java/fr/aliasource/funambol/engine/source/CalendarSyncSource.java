@@ -27,6 +27,7 @@ import com.funambol.framework.engine.source.SyncSourceException;
 import com.funambol.framework.tools.Base64;
 
 import fr.aliasource.funambol.OBMException;
+import fr.aliasource.funambol.utils.FunambolHelper;
 import fr.aliasource.funambol.utils.Helper;
 import fr.aliasource.funambol.utils.MyCal2Sif;
 import fr.aliasource.funambol.utils.MyVCalConverter;
@@ -304,7 +305,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 		String toParse = content;
 		toParse = toParse.replace("encoding", "ENCODING");
 		toParse = toParse.replace("PRINTABLE:", "PRINTABLE;CHARSET=UTF-8:");
-		toParse = toParse.replace("=0D=0A=\r\n\r\n", "=0D=0A\r\n");
+		toParse = FunambolHelper.removeQuotedPrintableFromVCalString(toParse);
 		ByteArrayInputStream buffer = new ByteArrayInputStream(toParse
 				.getBytes());
 
