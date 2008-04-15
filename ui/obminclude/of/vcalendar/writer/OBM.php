@@ -12,9 +12,9 @@ class Vcalendar_Writer_OBM {
 
   var $ids;
 
-  var $frequency = array("daily","weekly","monthly","yearly");
+  var $frequency = array('daily','weekly','monthly','monthlybydate', 'monthlybyday', 'yearly');
 
-  var $repeat = array("byday","bymonthday","byyearday","byweekno","bymonth","bysetpos","wkst");
+  var $repeat = array('byday','bymonthday','byyearday','byweekno','bymonth','bysetpos','wkst');
 
   var $rights;
 
@@ -262,11 +262,17 @@ class Vcalendar_Writer_OBM {
           $event['repeat_kind'] = 'monthlybydate';
         }
         break;
+      case 'monthlybyday' :
+        $countUnit = 'month';
+        break;        
+      case 'monthlybydate' :
+        $countUnit = 'month';
+        break;        
     }
     if(!is_null($rrule['until'])) {
       $event['repeat_end'] = $rrule['until'];
     }elseif(!is_null($rrule['count'])) {
-      $countFactor = ceil($countFactor * $rrule['count']);
+      $countFactor = ceil($countFactor * ($rrule['count'] - 1));
       $event['repeat_end'] = strtotime("+$countFactor $countUnit", strtotime($vevent->get('dtstart')));
     }else {
       $event['repeat_end'] = NULL;

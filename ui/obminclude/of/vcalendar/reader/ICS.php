@@ -13,7 +13,7 @@ include_once('obminclude/of/Vcalendar.php');
  */
 class Vcalendar_Reader_ICS {
 
-  var $handler;
+  var $handle;
 
   var $attribute;
 
@@ -43,7 +43,6 @@ class Vcalendar_Reader_ICS {
   function & getDocument() {
     $document = new Vcalendar();
     $document->vcalendar = &$this->parseElement($document);
-    //$this->setObmUsers($document);
     $this->close;
     return $document;
   }
@@ -60,7 +59,6 @@ class Vcalendar_Reader_ICS {
     while(($line = fgets($this->handle)) && preg_match('/^\s'.$separator.'(.*)$/',$line,$match)) {
       $propertyLine .= trim($match[1],"\n\r");
       $offset = ftell($this->handle);
-      $indent++;
       $separator = '';
     }
     fseek($this->handle,$offset);
@@ -415,12 +413,9 @@ class Vcalendar_Reader_ICS {
     if(!preg_match($GLOBALS['php_regexp_email'], $match[1] )) {
       return false;
     }
-    if($GLOBALS['cgp_use']['service']['mail']) {
-      return array('mail' => strtolower($match[2]));
-    } else {
-      return array('mail' => strtolower($match[1]));
-    }
-    return array();
+    return array('email' => strtolower($match[1]),
+                 'mail' => strtolower($match[2]),
+                 'domain' => strtolower($match[3]) );
   }
 
   function getLotusCN($match) {
@@ -431,8 +426,13 @@ class Vcalendar_Reader_ICS {
   }
 
   function getOBMId($attendee, $entity) {
-    if(isset($attendee['mail']) && isset($this->mails[$attendee['mail']])) {
-      return $this->mails[$entity][$attendee['mail']];
+    if(isset($attendee['mail'])) {
+      if(isset($this->mails[$attendee['mail']])) {
+        return $this->mails[$entity][$attendee['mail']];
+      }
+      if(isset($this->mails[$attendee['email']])) {
+        return $this->mails[$entity][$attendee['email']];
+      }
     }
     if(isset($attendee['cn']) && isset($this->cns[$attendee['cns']])) {
       return $this->cns[$entity][$attendee['cns']];
@@ -444,7 +444,7 @@ class Vcalendar_Reader_ICS {
     }
     if(!is_null($attendee['mail'])) {
       $this->mails[$entity][$attendee['mail']] = NULL;
-      $mail = "OR mail = '".$attendee['mail']."' ";
+      $mail = "OR mail like '%".$attendee['mail']."%' ";
     }
 
     $entityTable = $this->buildEntityQuery($entity, $db);
@@ -452,13 +452,20 @@ class Vcalendar_Reader_ICS {
       return NULL;
     }
     $query = 'SELECT id, mail, cn
-              FROM ('.$entityTable.') as Entity WHERE 1 = 0 '.$cn.' '.$mail.'
+              FROM ('.$entityTable.') as Entity WHERE (1 = 0 '.$cn.' '.$mail.') 
+              AND domain_id = '.$GLOBALS['obm']['domain_id'].'
               GROUP BY id';
     $db->query($query);
-    if($db->next_record()) {
-      $this->cns[strtolower($db->f('cn'))][$entity] = $db->f('id');
-      $this->cns[strtolower($db->f('mail'))][$entity] = $db->f('id');
-      return $db->f('id');
+    while($db->next_record()) {
+      if((!is_null($attendee['cn']) && strtolower($db->f('cn')) == $attendee['cn']) ||
+         preg_match_all('/^('.($attendee['mail']).'|'.$attendee['email'].')\r?$/m',$db->f('mail'),$results)) { 
+        $this->cns[strtolower($db->f('cn'))][$entity] = $db->f('id');
+        $emails = get_entity_email($db->f('mail'),null,true,null);
+        foreach($emails as $email) {
+          $this->mails[strtolower($email)][$entity] = $db->f('id');
+        } 
+        return  $db->f('id');
+      }
     }
     return NULL;
   }
@@ -466,12 +473,12 @@ class Vcalendar_Reader_ICS {
   function buildEntityQuery($entity, &$db) {
     switch ($entity) {
       case 'group' :
-        return "Select group_name as cn, group_id as id, group_email as mail, 'group' as kind FROM UGroup";
+        return "Select group_domain_id as domain_id, group_name as cn, group_id as id, group_email as mail, 'group' as kind FROM UGroup";
       case 'task' :
-        return "SELECT projecttask_id as id, projecttask_label as cn, projecttask_label as mail, 'task' as kind FROM ProjectTask";
+        return "SELECT ".$GLOBALS['obm']['domain_id']." as domain_id, projecttask_id as id, projecttask_label as cn, projecttask_label as mail, 'task' as kind FROM ProjectTask";
         break;
       case 'resource' :
-        return "SELECT resource_name AS cn, resource_name AS mail, resource_id AS id, 'resource' AS kind FROM Resource";
+        return "SELECT resource_domain_id as domain_id, resource_name AS cn, resource_name AS mail, resource_id AS id, 'resource' AS kind FROM Resource";
         break;
       case 'user' :
         $c_id = "userobm_id";
@@ -482,7 +489,7 @@ class Vcalendar_Reader_ICS {
         $concat[2]["type"] = "field";
         $concat[2]["value"] = "userobm_lastname";
         $label = sql_string_concat($db->type, $concat);
-        return "SELECT $label as cn, userobm_id as id, userobm_email as mail, 'user' as kind FROM UserObm";
+        return "SELECT userobm_domain_id as domain_id, $label as cn, userobm_id as id, userobm_email as mail, 'user' as kind FROM UserObm";
         break;
       default:
         return NULL;

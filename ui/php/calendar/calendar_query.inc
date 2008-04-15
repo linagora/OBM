@@ -680,14 +680,18 @@ function run_query_icalendar_insert($params) {
   global $all_emails ;
   // --- get the unfolding ics
   $ics = $params['ics_tmp'] ;
-  $format = $params['format'] ;
+  include_once('obminclude/of/vcalendar/Utils.php');
   include_once('obminclude/of/vcalendar/writer/OBM.php');
+  $format = VCalendar_Utils::getFileType($ics);
   if($format == 'vcs') {
     include_once('obminclude/of/vcalendar/reader/VCS.php');
     $reader = new Vcalendar_Reader_VCS($ics);
-  } else {
+  } elseif($format == 'ics') {
     include_once('obminclude/of/vcalendar/reader/ICS.php');
     $reader = new Vcalendar_Reader_ICS($ics);
+  } else {
+    $err[''] = '';
+    return false;
   }
   $document = $reader->getDocument();
   $writer = new Vcalendar_Writer_OBM();  

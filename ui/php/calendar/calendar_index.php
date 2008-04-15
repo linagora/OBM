@@ -514,8 +514,13 @@ if ($action == 'index') {
 } elseif ($action == 'ics_insert')  {
 ///////////////////////////////////////////////////////////////////////////////
   $result = run_query_icalendar_insert($params) ;
-  $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
-  $display['detail'] = dis_icalendar_insert($result);
+  if($result !== false) {
+    $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
+    $display['detail'] = dis_icalendar_insert($result);
+  } else {
+    $display['msg'] .= display_err_msg("$l_file_format $l_unknown");
+    $display['detail'] .= dis_icalendar_import($params);
+  }
 }
 
 $_SESSION['cal_entity_id'] = $cal_entity_id;
