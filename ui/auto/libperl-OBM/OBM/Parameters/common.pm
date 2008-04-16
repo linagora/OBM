@@ -14,7 +14,7 @@ use FindBin qw($Bin);
 @EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
-@EXPORT_regexp = qw($regexp_email $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain $regexp_login $regexp_ip);
+@EXPORT_regexp = qw($regexp_email $regexp_email_left $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain $regexp_login $regexp_ip);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db);
 @EXPORT = (@EXPORT_const, @EXPORT_db, @EXPORT_command, @EXPORT_regexp, @EXPORT_dir);
 @EXPORT_OK = qw();
@@ -176,6 +176,7 @@ $recode = "/usr/bin/recode l1..utf8";
 #
 # Email
 $regexp_email = "^([a-z0-9_\\-]+(\\.[a-z0-9_\\-]*)*)@([a-z0-9\\-]{1,16}\\.)+[a-z]{2,6}\$";
+$regexp_email_left = "^([a-z0-9_\\-]+(\\.[a-z0-9_\\-]*)*)\$";
 #
 # LDAP root
 $regexp_rootLdap = "^dc=(.+),dc=.+\$";
@@ -184,7 +185,7 @@ $regexp_rootLdap = "^dc=(.+),dc=.+\$";
 $regexp_login = "^([A-Za-z0-9][A-Za-z0-9-._]{1,31})\$";
 #
 # Passwd regexp
-$regexp_passwd = "^[-\\\$&\\\\~#\{\(\[\|_`\^@\);\\\]+=\}%!:\\\/\\\.,?>\\\"\\p{Alphabetic}0-9]{4,12}\$";
+$regexp_passwd = "^[-\\\$&\\\\~#\{\(\[\|_`\^@\);\\\]+=\}%!:\\\/\\\.,?<>\\\"\\p{Alphabetic}0-9]{4,12}\$";
 #
 # Domain regexp
 $regexp_domain = "^[0-9]+\$";

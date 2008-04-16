@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId makeEntityEmail);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -35,7 +35,7 @@ sub new {
         objectId => undef,
         domainId => undef,
         userDbDesc => undef,        # Pure description BD
-        userDesc => undef,          # Propriétés calculées
+        properties => undef,        # Propriétés calculées
         userLinks => undef,         # Les relations avec d'autres entités
         objectclass => undef,
         dnPrefix => undef,
@@ -185,214 +185,214 @@ sub getEntity {
 
 
     # On range les résultats dans la structure de données des résultats
-    $self->{userDesc}->{userobm_domain} = $domainDesc->{domain_label};
+    $self->{"properties"}->{userobm_domain} = $domainDesc->{domain_label};
 
     if( $self->getDelete() ) {
-        $self->{userDesc}->{current_userobm_login} = $dbUserDesc->{userobm_login};
+        $self->{"properties"}->{current_userobm_login} = $dbUserDesc->{userobm_login};
     }elsif( defined($dbUserMoreDesc->{current_userobm_login}) ) {
-        $self->{userDesc}->{current_userobm_login} = $dbUserMoreDesc->{current_userobm_login};
+        $self->{"properties"}->{current_userobm_login} = $dbUserMoreDesc->{current_userobm_login};
     }
 
-    $self->{userDesc}->{userobm_crypt_passwd} = &OBM::passwd::convertPasswd( $dbUserDesc->{userobm_password_type}, $dbUserDesc->{userobm_password} );
+    $self->{"properties"}->{userobm_crypt_passwd} = &OBM::passwd::convertPasswd( $dbUserDesc->{userobm_password_type}, $dbUserDesc->{userobm_password} );
 
-    $self->{userDesc}->{userobm_uid} = $dbUserDesc->{userobm_uid};
+    $self->{"properties"}->{userobm_uid} = $dbUserDesc->{userobm_uid};
 
     # Le nom complet de l'utilisateur
-    $self->{userDesc}->{userobm_full_name} = $dbUserDesc->{userobm_firstname};
-    if( $self->{userDesc}->{userobm_full_name} && $dbUserDesc->{userobm_lastname} ) {
-        $self->{userDesc}->{userobm_full_name} .= " ".$dbUserDesc->{userobm_lastname};
+    $self->{"properties"}->{userobm_full_name} = $dbUserDesc->{userobm_firstname};
+    if( $self->{"properties"}->{userobm_full_name} && $dbUserDesc->{userobm_lastname} ) {
+        $self->{"properties"}->{userobm_full_name} .= " ".$dbUserDesc->{userobm_lastname};
     }elsif( $dbUserDesc->{userobm_lastname} ) {
-        $self->{userDesc}->{userobm_full_name} = $dbUserDesc->{userobm_lastname}
+        $self->{"properties"}->{userobm_full_name} = $dbUserDesc->{userobm_lastname}
     }
 
     # Gestion du shell
-    $self->{userDesc}->{userobm_shell} = "/bin/bash";
+    $self->{"properties"}->{userobm_shell} = "/bin/bash";
 
     # Gestion du répertoire personnel
-    $self->{userDesc}->{userobm_homedir} = $baseHomeDir."/".$dbUserDesc->{userobm_login};
+    $self->{"properties"}->{userobm_homedir} = $baseHomeDir."/".$dbUserDesc->{userobm_login};
 
     # Gestion de la visibilité
     if( $dbUserDesc->{userobm_hidden} ) {
-        $self->{userDesc}->{userobm_hidden} = "TRUE";
+        $self->{"properties"}->{userobm_hidden} = "TRUE";
     }else {
-        $self->{userDesc}->{userobm_hidden} = "FALSE";
+        $self->{"properties"}->{userobm_hidden} = "FALSE";
     }
 
 
     # gestion de l'adresse
     if( defined($dbUserDesc->{userobm_address1}) && ($dbUserDesc->{userobm_address1} ne "") ) {
-        $self->{userDesc}->{userobm_address} = $dbUserDesc->{userobm_address1};
+        $self->{"properties"}->{userobm_address} = $dbUserDesc->{userobm_address1};
     }
         
     if( defined($dbUserDesc->{userobm_address2}) && ($dbUserDesc->{userobm_address2} ne "") ) {
-        $self->{userDesc}->{userobm_address} .= "\r\n".$dbUserDesc->{userobm_address2};
+        $self->{"properties"}->{userobm_address} .= "\r\n".$dbUserDesc->{userobm_address2};
     }
         
     if( defined($dbUserDesc->{userobm_address3}) && ($dbUserDesc->{userobm_address3} ne "") ) {
-        $self->{userDesc}->{userobm_address} .= "\r\n".$dbUserDesc->{userobm_address3};
+        $self->{"properties"}->{userobm_address} .= "\r\n".$dbUserDesc->{userobm_address3};
     }
 
 
     # Gestion du téléphone
     if( defined($dbUserDesc->{userobm_phone}) && ($dbUserDesc->{userobm_phone} ne "") ) {
-        push( @{$self->{userDesc}->{userobm_phone}}, $dbUserDesc->{userobm_phone} );
+        push( @{$self->{"properties"}->{userobm_phone}}, $dbUserDesc->{userobm_phone} );
     }
 
     if( defined($dbUserDesc->{userobm_phone2}) && ($dbUserDesc->{userobm_phone2} ne "") ) {
-        push( @{$self->{userDesc}->{userobm_phone}}, $dbUserDesc->{userobm_phone2} );
+        push( @{$self->{"properties"}->{userobm_phone}}, $dbUserDesc->{userobm_phone2} );
     }
 
     # Gestion du fax
     if( defined($dbUserDesc->{userobm_fax}) && ($dbUserDesc->{userobm_fax} ne "") ) {
-        push( @{$self->{userDesc}->{userobm_fax}}, $dbUserDesc->{userobm_fax} );
+        push( @{$self->{"properties"}->{userobm_fax}}, $dbUserDesc->{userobm_fax} );
     }
 
     if( defined($dbUserDesc->{userobm_fax2}) && ($dbUserDesc->{userobm_fax2} ne "") ) {
-        push( @{$self->{userDesc}->{userobm_fax}}, $dbUserDesc->{userobm_fax2} );
+        push( @{$self->{"properties"}->{userobm_fax}}, $dbUserDesc->{userobm_fax2} );
     }
 
     # Gestion du droit de messagerie de l'utilisateur
-    $self->{userDesc}->{userobm_mail_perms} = $dbUserDesc->{userobm_mail_perms};
-    if( $self->{userDesc}->{userobm_mail_perms} && $dbUserDesc->{userobm_domain_id} == 0 ) {
-        &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur : ".$self->getEntityDescription()." - annule, pas de droit mail dans le domaine 'metadomain'", "W" );
-        $self->{userDesc}->{userobm_mail_perms} = 0;
+    $self->{"properties"}->{userobm_mail_perms} = $dbUserDesc->{userobm_mail_perms};
 
-    }elsif( $self->{userDesc}->{userobm_mail_perms} && !$dbUserDesc->{userobm_email} ) {
-        &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur : ".$self->getEntityDescription()." - annule, pas d'adresse mail indiquee !", "W" );
-        $self->{userDesc}->{userobm_mail_perms} = 0;
-
-    }elsif( $self->{userDesc}->{userobm_mail_perms} ) {
-        my @email = split( /\r\n/, $dbUserDesc->{userobm_email} );
-        for( my $j=0; $j<=$#email; $j++ ) {
-            push( @{$self->{userDesc}->{userobm_email}}, $email[$j]."@".$domainDesc->{domain_name} );
-
-            for( my $k=0; $k<=$#{$domainDesc->{domain_alias}}; $k++ ) {
-                push( @{$self->{userDesc}->{userobm_email_alias}}, $email[$j]."@".$domainDesc->{domain_alias}->[$k] );
-            }
+    my $localServerIp;
+    SWITCH: {
+        if( !$self->{"properties"}->{userobm_mail_perms} ) {
+            last SWITCH;
         }
+
+        if( $dbUserDesc->{userobm_domain_id} == 0 ) {
+            &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur : ".$self->getEntityDescription()." - annule, pas de droit mail dans le domaine 'metadomain'", "W" );
+            $self->{"properties"}->{userobm_mail_perms} = 0;
+            last SWITCH;
+        }
+
+        $localServerIp = $self->getHostIpById( $dbHandler, $dbUserMoreDesc->{mailserver_host_id} );
+        if( !defined($localServerIp) ) {
+            &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur '".$dbUserDesc->{userobm_login}."', domaine '".$domainDesc->{domain_label}."' - annule, serveur inconnu !", "W" );
+            $self->{"properties"}->{userobm_mail_perms} = 0;
+            last SWITCH;
+        }
+
+        # Gestion des adresses de l'utilisateur
+        my $return = $self->makeEntityEmail( $dbUserDesc->{userobm_email}, $domainDesc->{domain_name}, $domainDesc->{domain_alias} );
+        if( $return == 0 ) {
+            &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de l'utilisateur : ".$self->getEntityDescription()." - annule, pas d'adresses mails valides", "W" );
+            $self->{"properties"}->{userobm_mail_perms} = 0;
+            last SWITCH;
+        }
+
+        $self->{"properties"}->{userobm_mail_perms} = 1;
     }
 
     # Gestion du droit de messagerie
-    if( $self->{userDesc}->{userobm_mail_perms} ) {
-        my $localServerIp = $self->getHostIpById( $dbHandler, $dbUserMoreDesc->{mailserver_host_id} );
+    if( $self->{"properties"}->{userobm_mail_perms} ) {
+        # Limite la messagerie aux domaines locaux
+        if( !$dbUserDesc->{userobm_mail_ext_perms} ) {
+            $self->{"properties"}->{userobm_mailLocalOnly} = "local_only";
+        }
 
-        if( !defined($localServerIp) ) {
-            &OBM::toolBox::write_log( "[Entities::obmUser]: droit mail de
-            l'utilisateur '".$dbUserDesc->{userobm_login}."', domaine '".$domainDesc->{domain_label}."' - annule, serveur inconnu !", "W" );
+        # Gestion de la BAL destination
+        #   valeur dans LDAP
+        $self->{"properties"}->{userobm_mailbox_ldap_name} = $dbUserDesc->{userobm_login}."@".$domainDesc->{domain_name};
 
-            # On invalide le droit mail
-            $self->{userDesc}->{userobm_mail_perms} = 0;
+        #   nom de la BAL Cyrus
+        # Son nouveau nom - qui peut si on ne le change pas et que la
+        # BAL existe déjà, ou qu'on supprime l'entrée, être le même que
+        # l'ancien
+        $self->{"properties"}->{new_userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
+        if( !$singleNameSpace ) {
+            $self->{"properties"}->{new_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
+        }
 
-        }else {
-            $self->{userDesc}->{userobm_mail_perms} = 1;
-
-            # Limite la messagerie aux domaines locaux
-            if( !$dbUserDesc->{userobm_mail_ext_perms} ) {
-                $self->{userDesc}->{userobm_mailLocalOnly} = "local_only";
-            }
-
-            # Gestion de la BAL destination
-            #   valeur dans LDAP
-            $self->{userDesc}->{userobm_mailbox_ldap_name} = $dbUserDesc->{userobm_login}."@".$domainDesc->{domain_name};
-
-            #   nom de la BAL Cyrus
-            # Son nouveau nom - qui peut si on ne le change pas et que la
-            # BAL existe déjà, ou qu'on supprime l'entrée, être le même que
-            # l'ancien
-            $self->{userDesc}->{new_userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
-            if( !$singleNameSpace ) {
-                $self->{userDesc}->{new_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
-            }
-
-            if( !$self->getDelete() ) {
-                if( defined($dbUserMoreDesc->{current_userobm_login}) ) {
-                    # Si l'utilisateur existe déjà dans la tables P_UserObm, on
-                    # récupère le nom actuel de sa BAL
-                    $self->{userDesc}->{current_userobm_mailbox_cyrus_name} = $dbUserMoreDesc->{current_userobm_login};
-
-                    if( !$singleNameSpace ) {
-                        $self->{userDesc}->{current_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
-                    }
-
-                }
-
-            }else {
-                # En cas de suppression de l'utilisateur, la BAL 'new' est la
-                # même que la BAL 'current'
-                $self->{userDesc}->{current_userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
+        if( !$self->getDelete() ) {
+            if( defined($dbUserMoreDesc->{current_userobm_login}) ) {
+                # Si l'utilisateur existe déjà dans la tables P_UserObm, on
+                # récupère le nom actuel de sa BAL
+                $self->{"properties"}->{current_userobm_mailbox_cyrus_name} = $dbUserMoreDesc->{current_userobm_login};
 
                 if( !$singleNameSpace ) {
-                    $self->{userDesc}->{current_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
+                    $self->{"properties"}->{current_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
                 }
 
             }
 
-            # Partition Cyrus associée à cette BAL
-            if( $OBM::Parameters::common::cyrusDomainPartition ) {
-                $self->{userDesc}->{userobm_mailbox_partition} = $domainDesc->{domain_dn};
-                $self->{userDesc}->{userobm_mailbox_partition} =~ s/\./_/g;
-                $self->{userDesc}->{userobm_mailbox_partition} =~ s/-/_/g;
+        }else {
+            # En cas de suppression de l'utilisateur, la BAL 'new' est la
+            # même que la BAL 'current'
+            $self->{"properties"}->{current_userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
+
+            if( !$singleNameSpace ) {
+                $self->{"properties"}->{current_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
             }
 
-            # Gestion du serveur de mail
-            $self->{userDesc}->{userobm_mailbox_server} = $dbUserMoreDesc->{mailserver_host_id};
-
-            # Gestion du quota
-            $self->{userDesc}->{userobm_mailbox_quota} = $dbUserDesc->{userobm_mail_quota}*1000;
-
-            # Gestion du message d'absence
-            $self->{userDesc}->{userobm_vacation_message} = uri_unescape($dbUserDesc->{userobm_vacation_message});
-
-            # Gestion de la livraison du courrier
-            $self->{userDesc}->{userobm_mailLocalServer} = "lmtp:".$localServerIp.":24";
         }
+
+        # Partition Cyrus associée à cette BAL
+        if( $OBM::Parameters::common::cyrusDomainPartition ) {
+            $self->{"properties"}->{userobm_mailbox_partition} = $domainDesc->{domain_dn};
+            $self->{"properties"}->{userobm_mailbox_partition} =~ s/\./_/g;
+            $self->{"properties"}->{userobm_mailbox_partition} =~ s/-/_/g;
+        }
+
+        # Gestion du serveur de mail
+        $self->{"properties"}->{userobm_mailbox_server} = $dbUserMoreDesc->{mailserver_host_id};
+
+        # Gestion du quota
+        $self->{"properties"}->{userobm_mailbox_quota} = $dbUserDesc->{userobm_mail_quota}*1000;
+
+        # Gestion du message d'absence
+        $self->{"properties"}->{userobm_vacation_message} = uri_unescape($dbUserDesc->{userobm_vacation_message});
+
+        # Gestion de la livraison du courrier
+        $self->{"properties"}->{userobm_mailLocalServer} = "lmtp:".$localServerIp.":24";
     }
 
-    if( !$self->{userDesc}->{userobm_mail_perms} ) {
+
+    if( !$self->{"properties"}->{userobm_mail_perms} ) {
         # Si la personne n'a pas le droit mail, mais a une adresse mail
         # valide, on la positionne dans l'annuaire.
         if( defined($dbUserDesc->{userobm_email}) && ($dbUserDesc->{userobm_email} =~ /$regexp_email/) ) {
-            push( @{$self->{userDesc}->{userobm_email}}, $dbUserDesc->{userobm_email} );
+            push( @{$self->{"properties"}->{"email"}}, $dbUserDesc->{userobm_email} );
         }
     }
 
     # Gestion du droit Samba de l'utilisateur
     if( $OBM::Parameters::common::obmModules->{samba} && $dbUserDesc->{userobm_samba_perms} ) {
         # Le mot de passe
-        my $errorCode = &OBM::passwd::getNTLMPasswd( $dbUserDesc->{userobm_password}, \$self->{userDesc}->{userobm_samba_lm_password}, \$self->{userDesc}->{userobm_samba_nt_password} );
+        my $errorCode = &OBM::passwd::getNTLMPasswd( $dbUserDesc->{userobm_password}, \$self->{"properties"}->{userobm_samba_lm_password}, \$self->{"properties"}->{userobm_samba_nt_password} );
         if( $errorCode ) {
             &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de la generation du mot de passe windows de l'utilisateur : ".$self->getEntityDescription(), "W" );
             return 0;
         }
 
-        $self->{userDesc}->{userobm_samba_perms} = 1;
+        $self->{"properties"}->{userobm_samba_perms} = 1;
         if( lc($dbUserDesc->{userobm_perms}) eq "admin" ) {
-            $self->{userDesc}->{userobm_uid} = 0;
+            $self->{"properties"}->{userobm_uid} = 0;
         }
  
-        $self->{userDesc}->{userobm_samba_sid} = &OBM::Samba::utils::getUserSID( $domainDesc->{domain_samba_sid}, $dbUserDesc->{userobm_uid} );
-        $self->{userDesc}->{userobm_samba_group_sid} = &OBM::Samba::utils::getGroupSID( $domainDesc->{domain_samba_sid}, $dbUserDesc->{userobm_gid} );
-        $self->{userDesc}->{userobm_samba_flags} = "[U]";
+        $self->{"properties"}->{userobm_samba_sid} = &OBM::Samba::utils::getUserSID( $domainDesc->{domain_samba_sid}, $dbUserDesc->{userobm_uid} );
+        $self->{"properties"}->{userobm_samba_group_sid} = &OBM::Samba::utils::getGroupSID( $domainDesc->{domain_samba_sid}, $dbUserDesc->{userobm_gid} );
+        $self->{"properties"}->{userobm_samba_flags} = "[U]";
 
         # Le script de session
         if( $dbUserDesc->{userobm_samba_logon_script} ) {
-            $self->{userDesc}->{userobm_samba_logon_script} = $dbUserDesc->{userobm_samba_logon_script};
+            $self->{"properties"}->{userobm_samba_logon_script} = $dbUserDesc->{userobm_samba_logon_script};
         }
 
         # La lettre du lecteur du répertoire personnel
         if( $dbUserDesc->{userobm_samba_home_drive} && $dbUserDesc->{userobm_samba_home} ) {
-            $self->{userDesc}->{userobm_samba_home_drive} = $dbUserDesc->{userobm_samba_home_drive}.":";
-            $self->{userDesc}->{userobm_samba_home} = $dbUserDesc->{userobm_samba_home};
+            $self->{"properties"}->{userobm_samba_home_drive} = $dbUserDesc->{userobm_samba_home_drive}.":";
+            $self->{"properties"}->{userobm_samba_home} = $dbUserDesc->{userobm_samba_home};
         }
 
         # Le répertoire du profil W2k (version antérieures voir smb.conf)
         if( $domainDesc->{domain_samba_user_profile} ) {
-            $self->{userDesc}->{userobm_samba_user_profile} = $domainDesc->{domain_samba_user_profile};
-            $self->{userDesc}->{userobm_samba_user_profile} =~ s/\%u/$dbUserDesc->{userobm_login}/g;
+            $self->{"properties"}->{userobm_samba_user_profile} = $domainDesc->{domain_samba_user_profile};
+            $self->{"properties"}->{userobm_samba_user_profile} =~ s/\%u/$dbUserDesc->{userobm_login}/g;
 
         }
     }else {
-        $self->{userDesc}->{userobm_samba_perms} = 0;
+        $self->{"properties"}->{userobm_samba_perms} = 0;
     }
 
 
@@ -542,7 +542,7 @@ sub getEntityLinks {
 sub getEntityDescription {
     my $self = shift;
     my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
     my $description = "";
 
 
@@ -578,7 +578,7 @@ sub _getEntityMailboxAcl {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
     my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{"userDesc"};
+    my $entryProp = $self->{"properties"};
     my $userId = $self->{"objectId"};
 
     if( $entryProp->{"userobm_mail_perms"} ) {
@@ -618,7 +618,7 @@ sub getLdapDnPrefix {
     my( $which ) = @_;
     my $dnPrefix = undef;
     my $dbEntry = $self->{"userDbDesc"};
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
 
     if( (lc($which) =~ /^new$/) && !$self->getDelete() ) {
         if( defined($self->{"dnPrefix"}) && defined($dbEntry->{$self->{newDnValue}}) ) {
@@ -637,7 +637,7 @@ sub getLdapDnPrefix {
 sub getLdapObjectclass {
     my $self = shift;
     my($objectclass, $deletedObjectclass) = @_;
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
     my %realObjectClass;
 
     if( !defined($objectclass) || (ref($objectclass) ne "ARRAY") ) {
@@ -668,7 +668,7 @@ sub createLdapEntry {
     my $self = shift;
     my ( $ldapEntry ) = @_;
     my $dbEntry = $self->{"userDbDesc"};
-    my $entryProp = $self->{"userDesc"};
+    my $entryProp = $self->{"properties"};
     my $entryLinks = $self->{"userLinks"};
 
 
@@ -770,13 +770,13 @@ sub createLdapEntry {
     }
     
     # Les adresses mails
-    if( $entryProp->{userobm_email} ) {
-        $ldapEntry->add( mail => $entryProp->{userobm_email} );
+    if( $entryProp->{"email"} ) {
+        $ldapEntry->add( mail => $entryProp->{"email"} );
     }
     
     # Les adresses mail secondaires
-    if( $entryProp->{userobm_email_alias} ) {
-        $ldapEntry->add( mailAlias => $entryProp->{userobm_email_alias} );
+    if( $entryProp->{"emailAlias"} ) {
+        $ldapEntry->add( mailAlias => $entryProp->{"emailAlias"} );
     }
     
     # L'adresse postale
@@ -879,7 +879,7 @@ sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
     my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
     my $entryLinks = $self->{userLinks};
 
     require OBM::Entities::entitiesUpdateState;
@@ -1014,12 +1014,12 @@ sub updateLdapEntry {
     }
 
     # Les adresses mails
-    if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{userobm_email}, $ldapEntry, "mail" ) ) {
+    if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{"email"}, $ldapEntry, "mail" ) ) {
         $update->setUpdate();
     }
 
     # Les adresses mail secondaires
-    if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{userobm_email_alias}, $ldapEntry, "mailAlias" ) ) {
+    if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{"emailAlias"}, $ldapEntry, "mailAlias" ) ) {
         $update->setUpdate();
     }
    
@@ -1179,7 +1179,7 @@ sub getMailServerId {
     my $self = shift;
     my $mailServerId = undef;
     my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
 
     if( $entryProp->{userobm_mail_perms} ) {
         $mailServerId = $entryProp->{userobm_mailbox_server};
@@ -1208,7 +1208,7 @@ sub getMailboxName {
     my( $which ) = @_;
     my $mailBoxName = undef;
     my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
 
 
     if( $entryProp->{userobm_mail_perms} ) {
@@ -1227,7 +1227,7 @@ sub getMailboxPartition {
     my $self = shift;
     my $mailboxPartition = undef;
     my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
 
     if( $entryProp->{userobm_mail_perms} ) {
         $mailboxPartition = $entryProp->{userobm_mailbox_partition};
@@ -1241,7 +1241,7 @@ sub getMailboxQuota {
     my $self = shift;
     my $mailBoxQuota = undef;
     my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
 
     if( $entryProp->{userobm_mail_perms} ) {
         $mailBoxQuota = $entryProp->{userobm_mailbox_quota};
@@ -1255,7 +1255,7 @@ sub getMailboxAcl {
     my $self = shift;
     my $mailBoxAcl = undef;
     my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
     my $entryLinks = $self->{userLinks};
 
     if( $entryProp->{userobm_mail_perms} ) {
@@ -1269,17 +1269,17 @@ sub getMailboxAcl {
 sub getSieveVacation {
     my $self = shift;
     my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
 
     if( !$dbEntry->{userobm_vacation_enable} ) {
         return undef;
     }
 
-    if( !$entryProp->{userobm_email} ) {
+    if( !$entryProp->{"email"} ) {
         return undef;
     }
-    my $boxEmails = $entryProp->{userobm_email};
-    my $boxEmailsAlias = $entryProp->{userobm_email_alias};
+    my $boxEmails = $entryProp->{"email"};
+    my $boxEmailsAlias = $entryProp->{"emailAlias"};
 
     if( !$entryProp->{userobm_vacation_message} ) {
         return undef;
@@ -1318,7 +1318,7 @@ sub getSieveVacation {
 sub getSieveNomade {
     my $self = shift;
     my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{userDesc};
+    my $entryProp = $self->{"properties"};
 
     if( !$dbEntry->{userobm_nomade_perms} ) {
         return undef;

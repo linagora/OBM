@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId makeEntityEmail);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -30,9 +30,9 @@ sub new {
         sieve => undef,
         objectId => undef,
         domainId => undef,
-        groupDbDesc => undef,       # Pure description BD
-        groupDesc => undef,         # Propriétés calculées
-        groupLinks => undef,        # Les relations avec d'autres entités
+        groupDbDesc => undef,   # Pure description BD
+        properties => undef,    # Propriétés calculées
+        groupLinks => undef,    # Les relations avec d'autres entités
         objectclass => undef,
         dnPrefix => undef,
         dnValue => undef
@@ -139,38 +139,35 @@ sub getEntity {
         &OBM::toolBox::write_log( "[Entities::obmGroup]: gestion du groupe : ".$self->getEntityDescription(), "W" );
     }
 
-    # On range les resultats calculés dans la structure de donnees dédiée
-    $self->{groupDesc}->{group_domain} = $domainDesc->{domain_label};
+    # On range les resultats calculés dans la structure de données dédiée
+    $self->{"properties"}->{group_domain} = $domainDesc->{domain_label};
 
-    if( $dbGroupDesc->{group_email} ) {
-        $self->{groupDesc}->{group_mailperms} = 1;
 
-        # L'adresse du groupe
-        my $group_email = lc($dbGroupDesc->{group_email});
-        push( @{$self->{groupDesc}->{group_email}}, $group_email."@".$domainDesc->{domain_name} );
-
-        for( my $j=0; $j<=$#{$domainDesc->{domain_alias}}; $j++ ) {
-            push( @{$self->{groupDesc}->{group_email_alias}}, $group_email."@".$domainDesc->{domain_alias}->[$j] );
+    SWITCH: {
+        # Les adresses du groupe
+        my $return = $self->makeEntityEmail( $dbGroupDesc->{group_email}, $domainDesc->{domain_name}, $domainDesc->{domain_alias} );
+        if( $return == 0 ) {
+            $self->{"properties"}->{group_mailperms} = 0;
+            last SWITCH;
         }
 
-    }else {
-        $self->{groupDesc}->{group_mailperms} = 0;
+        $self->{"properties"}->{group_mailperms} = 1;
     }
 
 
     # Les données Samba
     if( $OBM::Parameters::common::obmModules->{samba} && $dbGroupDesc->{group_samba} ) {
-        $self->{groupDesc}->{group_samba} = 1;
-        $self->{groupDesc}->{group_samba_sid} = &OBM::Samba::utils::getGroupSID( $domainDesc->{domain_samba_sid}, $dbGroupDesc->{group_gid} );
-        if( !defined($self->{groupDesc}->{group_samba_sid}) ) {
+        $self->{"properties"}->{group_samba} = 1;
+        $self->{"properties"}->{group_samba_sid} = &OBM::Samba::utils::getGroupSID( $domainDesc->{domain_samba_sid}, $dbGroupDesc->{group_gid} );
+        if( !defined($self->{"properties"}->{group_samba_sid}) ) {
             &OBM::toolBox::write_log( "[Entities::obmGroup]: annulation du droit Samba du groupe : " .$self->getEntityDescription()." - SID non definit", "W" );
-            $self->{groupDesc}->{group_samba} = 0;
+            $self->{"properties"}->{group_samba} = 0;
         }else {
-            $self->{groupDesc}->{group_samba_type} = 2;
-            $self->{groupDesc}->{group_samba_name} = $dbGroupDesc->{group_name};
+            $self->{"properties"}->{group_samba_type} = 2;
+            $self->{"properties"}->{group_samba_name} = $dbGroupDesc->{group_name};
         }
     }else {
-        $self->{groupDesc}->{group_samba} = 0;
+        $self->{"properties"}->{group_samba} = 0;
     }
 
 
@@ -264,12 +261,12 @@ sub getEntityLinks {
     $self->{groupLinks}->{group_users} = $self->_getGroupUsers( $dbHandler, $domainDesc, undef, undef );
 
     # Gestion des utilisateurs de la liste ayant droit au mail
-    if( $self->{groupDesc}->{group_mailperms} ) {
+    if( $self->{"properties"}->{group_mailperms} ) {
         $self->{groupLinks}->{group_contacts} = $self->_getGroupUsersMailEnable( $dbHandler, $domainDesc );
     }
 
     # Gestion des utilisateurs de la liste ayant le droit Samba
-    if( $self->{groupDesc}->{group_samba} ) {
+    if( $self->{"properties"}->{group_samba} ) {
         $self->{groupLinks}->{group_samba_users} = $self->_getGroupUsersSid( $dbHandler, $domainDesc );
     }
 
@@ -283,7 +280,7 @@ sub getEntityLinks {
 sub getEntityDescription {
     my $self = shift;
     my $dbEntry = $self->{groupDbDesc};
-    my $entryProp = $self->{groupDesc};
+    my $entryProp = $self->{"properties"};
     my $description = "";
 
 
@@ -408,7 +405,7 @@ sub getLdapDnPrefix {
 sub getLdapObjectclass {
     my $self = shift;
     my($objectclass, $deletedObjectclass) = @_;
-    my $entryProp = $self->{groupDesc};
+    my $entryProp = $self->{"properties"};
     my %realObjectClass;
 
     if( !defined($objectclass) || (ref($objectclass) ne "ARRAY") ) {
@@ -439,10 +436,10 @@ sub createLdapEntry {
     my $self = shift;
     my ( $ldapEntry ) = @_;
     my $dbEntry = $self->{groupDbDesc};
-    my $entryProp = $self->{groupDesc};
+    my $entryProp = $self->{"properties"};
     my $entryLinks = $self->{groupLinks};
 
-    # Les parametres nécessaires
+    # Les paramètres nécessaires
     if( $dbEntry->{group_name} && $dbEntry->{group_gid} ) {
         $ldapEntry->add(
             objectClass => $self->getLdapObjectclass(),
@@ -470,20 +467,20 @@ sub createLdapEntry {
     }
 
     # L'acces mail
-    if( ($dbEntry->{group_email}) && ($entryProp->{group_mailperms}) ) {
+    if( $entryProp->{group_mailperms} ) {
         $ldapEntry->add( mailAccess => "PERMIT" );
     }else {
         $ldapEntry->add( mailAccess => "REJECT" );
     }
 
     # Les adresses mails
-    if( $#{$entryProp->{group_email}} != -1 ) {
-        $ldapEntry->add( mail => $entryProp->{group_email} );
+    if( $entryProp->{"email"} ) {
+        $ldapEntry->add( mail => $entryProp->{"email"} );
     }
 
     # Les adresses mails secondaires
-    if( $#{$entryProp->{group_email_alias}} != -1 ) {
-        $ldapEntry->add( mailAlias => $entryProp->{group_email_alias} );
+    if( $entryProp->{"emailAlias"} ) {
+        $ldapEntry->add( mailAlias => $entryProp->{"emailAlias"} );
     }
             
     # Le domaine
@@ -534,7 +531,7 @@ sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
     my $dbEntry = $self->{groupDbDesc};
-    my $entryProp = $self->{groupDesc};
+    my $entryProp = $self->{"properties"};
     my $entryLinks = $self->{groupLinks};
 
     require OBM::Entities::entitiesUpdateState;
@@ -587,12 +584,12 @@ sub updateLdapEntry {
     }
 
     # Le cas des alias mails
-    if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{group_email}, $ldapEntry, "mail" ) ) {
+    if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{"email"}, $ldapEntry, "mail" ) ) {
         $update->setUpdate();
     }
 
     # Le cas des alias mails secondaires
-    if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{group_email_alias}, $ldapEntry, "mailAlias" ) ) {
+    if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{"emailAlias"}, $ldapEntry, "mailAlias" ) ) {
         $update->setUpdate();
     }
 

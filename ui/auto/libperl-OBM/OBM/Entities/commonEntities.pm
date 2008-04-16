@@ -19,6 +19,7 @@ $VERSION = "1.0";
                     getLdapObjectclass
                     isLinks
                     getEntityId
+                    makeEntityEmail
                );
 
 
@@ -71,4 +72,38 @@ sub getEntityId {
     my $self = shift;
 
     return $self->{objectId};
+}
+
+
+sub makeEntityEmail {
+    require OBM::Parameters::common;
+    my $self = shift;
+    my( $mailAddress, $mainDomain, $domainAlias ) = @_;
+    my $totalEmails = 0;
+
+    my @email = split( /\r\n/, $mailAddress );
+    
+    for( my $i=0; $i<=$#email; $i++ ) {
+        SWITCH: {
+            if( $email[$i] =~ /$OBM::Parameters::common::regexp_email/ ) {
+                push( @{$self->{"properties"}->{"email"}}, $email[$i] );
+                $totalEmails++;
+                last SWITCH;
+            }
+
+            if( $email[$i] =~ /$OBM::Parameters::common::regexp_email_left/ ) {
+                push( @{$self->{"properties"}->{"email"}}, $email[$i]."@".$mainDomain );
+                $totalEmails++;
+
+                for( my $j=0; $j<=$#{$domainAlias}; $j++ ) {
+                    push( @{$self->{"properties"}->{"emailAlias"}}, $email[$i]."@".$domainAlias->[$j] );
+                    $totalEmails++;
+                }
+
+                last SWITCH;
+            }
+        }
+    }
+
+    return $totalEmails;
 }
