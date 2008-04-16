@@ -296,7 +296,9 @@ function get_user_params() {
     $params['size'] = $_FILES['fi_file']['size'];
     $params['type'] = $_FILES['fi_file']['type'];
   }
+
   if(is_array($params['email'])) {
+    $email_aliases = array();
     while(!empty($params['email'])) {
       $email = trim(array_shift($params['email']));
       $domain = array_shift($params['aliases']);
@@ -308,8 +310,10 @@ function get_user_params() {
         }
       }
     }
-    $params['email'] = implode("\r\n",$email_aliases);
+
+    $params['email'] = implode("\r\n", $email_aliases);
   }
+
   return $params;
 }
 
