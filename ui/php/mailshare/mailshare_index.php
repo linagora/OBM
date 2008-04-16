@@ -237,6 +237,8 @@ function get_mailshare_params() {
   }
   
   if(is_array($params['email'])) {
+    $email_aliases = array();
+
     while(!empty($params['email'])) {
       $email = trim(array_shift($params['email']));
       $domain = array_shift($params['aliases']);

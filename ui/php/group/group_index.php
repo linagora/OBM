@@ -367,7 +367,9 @@ function get_group_params() {
   }
   $params["user_nb"] = $nb_u;
   $params["group_nb"] = $nb_group;
+
   if(is_array($params['email'])) {
+    $email_aliases = array();
     while(!empty($params['email'])) {
       $email = trim(array_shift($params['email']));
       $domain = array_shift($params['aliases']);
