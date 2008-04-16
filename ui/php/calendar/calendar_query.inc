@@ -2763,19 +2763,19 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     if ($addOcc) {
       switch ($repeatkind) {
         case 'daily' :
-          calendar_daily_repeatition($date,$event_start,$end_date,$repeatfrequence,&$event,$entity_id,$entity);	
+          calendar_daily_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity);	
           break; 
         case 'weekly' :
-          calendar_weekly_repeatition($date,$event_start,$end_date,$repeatdays,$repeatfrequence,&$event,$entity_id,$entity); 
+          calendar_weekly_repeatition($date,$event_start,$end_date,$repeatdays,$repeatfrequence,$event,$entity_id,$entity); 
           break;
         case 'monthlybyday' :
-          $stored = calendar_monthlybyday_repeatition($date,$event_start,$end_date,$repeatfrequence,&$event,$entity_id,$entity); 
+          $stored = calendar_monthlybyday_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity); 
           break;
         case 'monthlybydate' :
-          $stored = calendar_monthlybydate_repeatition($date,$event_start,$end_date,$repeatfrequence,&$event,$entity_id,$entity);
+          $stored = calendar_monthlybydate_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity);
           break;
         case 'yearly' :
-          $stored = calendar_yearly_repeatition($date,$event_start,$end_date,$repeatfrequence,&$event,$entity_id,$entity);
+          $stored = calendar_yearly_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity);
           break;	
       }
     }
