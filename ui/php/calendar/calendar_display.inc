@@ -3573,7 +3573,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <table>
   <tr>
     <th>$l_title</th>
-    <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"50\" size=\"25\" value=\"$title\" /></td>
+    <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"250\" size=\"25\" value=\"$title\" /></td>
   </tr> 
   <tr>
     $block_owner

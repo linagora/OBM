@@ -986,7 +986,7 @@ function check_group_data_form(&$group) {
 	array_push($um, $em);
 	$em = strtok("\r\n");
       }
-      $mails = get_email_used($emails, $id);
+      $mails = get_email_used($emails, '', $id);
       if(!empty($mails)) {
         $err['msg'] = "$l_email_exist : $mails ";
         $err['field'] = 'email';
