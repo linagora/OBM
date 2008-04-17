@@ -169,6 +169,8 @@ INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, g
 -- 'Invités du domaine' Group
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 514, 'Invités du domaine', 'Groupe des invités du domaine Samba', '', NULL);
 
+-- "Hôtes du domaine' Group
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 515, 'Hôtes du domaine', 'Groupe des hôtes du domaine Samba', '', NULL);
 
 -------------------------------------------------------------------------------
 -- Remplissage de la table 'UserObmGroup' :  Positionnement d'utilisateurs dans
