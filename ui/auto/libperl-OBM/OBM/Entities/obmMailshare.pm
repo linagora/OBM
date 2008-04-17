@@ -192,7 +192,7 @@ sub getEntity {
         $self->{"properties"}->{"mailshare_mailperms"} = 1;
     }
 
-    if( $dbMailShareDesc->{"mailshare_mailperms"} ) {
+    if( $self->{"properties"}->{"mailshare_mailperms"} ) {
         # Gestion de la BAL destination
         #   valeur dans LDAP
         $self->{"properties"}->{"mailshare_mailbox"} = "+".$dbMailShareDesc->{"mailshare_name"}."@".$domainDesc->{"domain_name"};

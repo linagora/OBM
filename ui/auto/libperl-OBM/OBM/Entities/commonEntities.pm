@@ -80,23 +80,28 @@ sub makeEntityEmail {
     my $self = shift;
     my( $mailAddress, $mainDomain, $domainAlias ) = @_;
     my $totalEmails = 0;
+    my %emails;
+    my %emailsAlias;
 
     my @email = split( /\r\n/, $mailAddress );
     
     for( my $i=0; $i<=$#email; $i++ ) {
         SWITCH: {
             if( $email[$i] =~ /$OBM::Parameters::common::regexp_email/ ) {
-                push( @{$self->{"properties"}->{"email"}}, $email[$i] );
+                $emails{$email[$i]} = 1;
+#                push( @{$self->{"properties"}->{"email"}}, $email[$i] );
                 $totalEmails++;
                 last SWITCH;
             }
 
             if( $email[$i] =~ /$OBM::Parameters::common::regexp_email_left/ ) {
-                push( @{$self->{"properties"}->{"email"}}, $email[$i]."@".$mainDomain );
+                $emails{$email[$i]."@".$mainDomain} = 1;
+#                push( @{$self->{"properties"}->{"email"}}, $email[$i]."@".$mainDomain );
                 $totalEmails++;
 
                 for( my $j=0; $j<=$#{$domainAlias}; $j++ ) {
-                    push( @{$self->{"properties"}->{"emailAlias"}}, $email[$i]."@".$domainAlias->[$j] );
+                    $emailsAlias{$email[$i]."@".$domainAlias->[$j]} = 1;
+#                    push( @{$self->{"properties"}->{"emailAlias"}}, $email[$i]."@".$domainAlias->[$j] );
                     $totalEmails++;
                 }
 
@@ -104,6 +109,12 @@ sub makeEntityEmail {
             }
         }
     }
+
+    @email = keys(%emails);
+    $self->{"properties"}->{"email"} = \@email;
+
+    @email = keys(%emailsAlias);
+    $self->{"properties"}->{"emailAlias"} = \@email;
 
     return $totalEmails;
 }
