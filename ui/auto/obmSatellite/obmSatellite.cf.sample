@@ -50,6 +50,10 @@ transport_map       /etc/postfix/transport
 process_domain      1
 # /etc/postfix/virtual_domains par défaut
 domain_map          /etc/postfix/virtual_domains
+# 1 ou 0 - 1 par défaut
+process_transport_smtp  1
+# /etc/postfix/transport_local par défaut
+transport_smtp_map  /etc/postfix/transport_smtp
 
 # configuration pour le service Cyrus
 #

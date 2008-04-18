@@ -55,6 +55,20 @@ $postfixMapsDesc = {
             return &ObmSatellite::mapTransport::makeTransportMap( $daemonRef, $transportMapFile, $obmDomains );
         }
     },
+    transport_smtp => {
+        postfix_map => "/etc/postfix/transport_smtp",
+	postfix_map_type => "hash",
+	postfix_map_separator => "\t",
+	postfix_map_process => 1,
+	postfix_map_postmap => 1,
+	ldap_filter => "(&(mailAccess=PERMIT)(obmdomain=<obmDomain>))",
+	ldap_attibute => [ "mail", "mailalias" ],
+	make_map => sub {
+	    my( $daemonRef, $transportSmtpMapFile, $obmDomains ) = @_;
+	    use ObmSatellite::mapTransportSmtp;
+	    return &ObmSatellite::mapTransportSmtp::makeTransportSmtpMap( $daemonRef, $transportSmtpMapFile, $obmDomains );
+	}
+    },
     domain => {
         postfix_map => "/etc/postfix/virtual_domains",
         postfix_map_type => "hash",

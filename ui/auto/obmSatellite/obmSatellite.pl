@@ -55,6 +55,8 @@ sub configure_hook {
         transport_map => [],
         process_domain => [],
         domain_map => [],
+	process_transport_smtp => [],
+	transport_smtp_map => [],
         cyrus_service => [],
         cyrus_imap_conf => [],
         cyrus_restart => [],
@@ -126,6 +128,14 @@ sub configure_hook {
     }
     if( defined($daemonOptions->{domain_map}->[0]) ) {
         $self->{postfix_maps}->{domain}->{postfix_map} = $daemonOptions->{domain_map}->[0];
+    }
+
+    # La table de transport SMTP
+    if( $daemonOptions->{process_transport_smtp}->[0] =~ /^[01]$/ ) {
+        $self->{postfix_maps}->{transport_smtp}->{postfix_map_process} = $daemonOptions->{process_transport_smtp}->[0];
+    }
+    if( defined($daemonOptions->{transport_smtp_map}->[0]) ) {
+        $self->{postfix_maps}->{transport_smtp}->{postfix_map} = $daemonOptions->{transport_smtp_map}->[0];
     }
 
     # Le script du service Cyrus
@@ -255,6 +265,18 @@ sub process_request {
                     if( !defined($domainList) || ( ref($domainList) ne "ARRAY" ) ) {
                         $self->logMessage( "L'hote '".$hostName."' n'est serveur SMTP entrant d'aucun domaine" );
                         $self->sendMessage( "ERROR", $hostName." n'est pas un serveur SMTP entrant" );
+                    }else {
+                        $self->processPostfixDomains( $domainList );
+                    }
+                }
+
+                if( $currentRequest =~ /^smtpOutConf: ([A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9])$/i ) {
+                    my $hostName = $1;
+
+                    my $domainList = $self->getServerDomains( "smtp_out", $hostName );
+                    if( !defined($domainList) || ( ref($domainList) ne "ARRAY" ) ) {
+                        $self->logMessage( "L'hote '".$hostName."' n'est serveur SMTP sortant d'aucun domaine" );
+                        $self->sendMessage( "ERROR", $hostName." n'est pas un serveur SMTP sortant" );
                     }else {
                         $self->processPostfixDomains( $domainList );
                     }
@@ -405,6 +427,10 @@ sub checkClientRequest {
             return 0;
         }
         
+        if( $$request =~ /^smtpOutConf: (.+:)*.+$/i ) {
+            return 0;
+        }
+        
         if( $$request =~ /^cyrusPartitions: (.+:)*.+$/i ) {
             return 0;
         }
@@ -435,6 +461,12 @@ sub getServerDomains {
         if( $type =~ /^smtp_in$/ ) {
             $self->logMessage( "Obtention des domaines du serveur '".$hostName."' de type SMTP-in" );
             $ldapFilter = "smtpInHost=".$hostName;
+            last SWITCH;
+        }
+
+        if( $type =~ /^smtp_out$/ ) {
+            $self->logMessage( "Obtention des domaines du serveur '".$hostName."' de type SMTP-out" );
+            $ldapFilter = "smtpOutHost=".$hostName;
             last SWITCH;
         }
 
