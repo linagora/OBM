@@ -110,11 +110,11 @@ sub makeEntityEmail {
         }
     }
 
-    @email = keys(%emails);
-    $self->{"properties"}->{"email"} = \@email;
+    my @emails = keys(%emails);
+    $self->{"properties"}->{"email"} = \@emails;
 
-    @email = keys(%emailsAlias);
-    $self->{"properties"}->{"emailAlias"} = \@email;
+    my @emailsAlias = keys(%emailsAlias);
+    $self->{"properties"}->{"emailAlias"} = \@emailsAlias;
 
     return $totalEmails;
 }

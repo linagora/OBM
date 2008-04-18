@@ -13,6 +13,7 @@ use base qw(Exporter);
 require OBM::toolBox;
 require OBM::dbUtils;
 require OBM::Postfix::smtpInRemoteEngine;
+require OBM::Postfix::smtpOutRemoteEngine;
 require OBM::Update::utils;
 
 
@@ -62,8 +63,14 @@ sub _doRemoteConf {
     my $self = shift;
     my $return = 1;
 
-    # MAJ des map Postfix sur les serveurs entrant
+    # MAJ des maps Postfix sur les serveurs entrant
     my $updateMailSrv = OBM::Postfix::smtpInRemoteEngine->new( $self->{"domainList"} );
+    if( $updateMailSrv->init() ) {
+        $return = $updateMailSrv->update();
+    }
+
+    # MAJ des maps Postfix sur les serveurs sortant
+    $updateMailSrv = OBM::Postfix::smtpOutRemoteEngine->new( $self->{"domainList"} );
     if( $updateMailSrv->init() ) {
         $return = $updateMailSrv->update();
     }

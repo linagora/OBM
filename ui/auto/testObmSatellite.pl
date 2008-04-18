@@ -14,14 +14,20 @@ sub getParameter {
     my( $parameters ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "smtpInConf", "cyrusPartitionsAdd", "cyrusPartitionsDel", "help" );
+    &GetOptions( $parameters, "smtpInConf", "smtpOutConf", "cyrusPartitionsAdd", "cyrusPartitionsDel", "help" );
 
     my $goodParams = 0;
     my $helpParam = 0;
     while( my( $paramName, $paramValue ) = each(%{$parameters}) ) {
         SWITCH: {
             if( $paramName eq "smtpInConf" ) {
-                &OBM::toolBox::write_log( "Mise a jour des tables Postfix", "W" );
+                &OBM::toolBox::write_log( "Mise a jour des tables Postfix des serveurs SMTP-in", "W" );
+                $goodParams++;
+                last SWITCH;
+            }
+
+            if( $paramName eq "smtpOutConf" ) {
+                &OBM::toolBox::write_log( "Mise a jour des tables Postfix des serveurs SMTP-out", "W" );
                 $goodParams++;
                 last SWITCH;
             }
@@ -49,7 +55,8 @@ sub getParameter {
     # Affichage de l'aide
     if( !$goodParams || $helpParam ) {
         print "Vous devez indiquer au moins un des paramètres suivants :\n";
-        print "\tsmtpInConf: permet de régénérer les tables Postfix\n";
+        print "\tsmtpInConf: permet de régénérer les tables Postfix des serveurs SMTP-in\n";
+        print "\tsmtpOutConf: permet de régénérer les tables Postfix des serveurs SMTP-out\n";
         print "\tcyrusPartitionsAdd: permet d'ajouter les partitions Cyrus manquantes - Provoque un redémarrage du/des services Cyrus !\n";
         print "\tcyrusPartitionsDel: permet de supprimer les partitions Cyrus non déclarées - Provoque un redémarrage du/des services Cyrus !\n\n";
         return 0;
@@ -83,7 +90,6 @@ sub updateServer {
         &OBM::toolBox::write_log( "Reponse : '".$line."'", "W" );
     }
 
-    
 
     &OBM::toolBox::write_log( "Envoi de la commande : '".$cmd."'", "W" );
     $srvCon->print( $cmd );
@@ -142,8 +148,14 @@ while( my( $serverName, $serverIp, $imapSrv, $smtpInSrv, $smtpOutSrv ) = $queryR
 
         SWITCH: {
             if( $smtpInSrv && ($paramName eq "smtpInConf") ) {
-                &OBM::toolBox::write_log( "Mise a jour des tables Postfix", "W" );
+                &OBM::toolBox::write_log( "Mise a jour des tables Postfix des serveurs SMTP-in", "W" );
                 $cmd = "smtpInConf: ".$serverName;
+                last SWITCH;
+            }
+
+            if( $smtpOutSrv && ($paramName eq "smtpOutConf") ) {
+                &OBM::toolBox::write_log( "Mise a jour des tables Postfix des serveurs SMTP-out", "W" );
+                $cmd = "smtpOutConf: ".$serverName;
                 last SWITCH;
             }
 

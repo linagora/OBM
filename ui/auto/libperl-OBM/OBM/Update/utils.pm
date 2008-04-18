@@ -188,6 +188,39 @@ sub getSmtpInServers {
 }
 
 
+sub getSmtpOutServers {
+    my( $dbHandler, $domainList ) = @_;
+
+    for( my $i=0; $i<=$#$domainList; $i++ ) {
+        if( $domainList->[$i]->{"meta_domain"} ) {
+            next;
+        }
+
+        &OBM::toolBox::write_log( "[Update::utils]: recuperation des serveurs de courrier SMTP-out pour le domaine '".$domainList->[$i]->{"domain_name"}."'", "W" );
+        my $srvQuery = "SELECT i.host_id, i.host_name, i.host_ip FROM Host i, DomainMailServer j, MailServer k WHERE j.domainmailserver_domain_id=".$domainList->[$i]->{"domain_id"}." AND j.domainmailserver_role='smtp_out' AND j.domainmailserver_mailserver_id=k.mailserver_id AND k.mailserver_host_id=i.host_id";
+
+        # On exécute la requête
+        my $queryResult;
+        if( !&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "[Update::utils]: probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+            next;
+        }
+
+        my @srvList = ();
+        while( my( $hostId, $hostName, $hostIp) = $queryResult->fetchrow_array ) {
+            my $srv;
+            $srv->{"smptout_server_id"} = $hostId;
+            $srv->{"smtpout_server_name"} = $hostName;
+            $srv->{"smtpout_server_ip"} = $hostIp;
+
+            push( @{$domainList->[$i]->{"smtpout_servers"}}, $srv );
+        }
+    }
+
+    return 0;
+}
+
+
 sub findDomainbyId {
     my( $domainList, $domainId ) = @_;
     my $domainDesc = undef;

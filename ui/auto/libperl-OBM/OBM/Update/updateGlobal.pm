@@ -111,6 +111,9 @@ sub new {
     # Paramétrage des serveurs SMTP-in par domaine
     &OBM::Update::utils::getSmtpInServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
 
+    # Paramétrage des serveurs SMTP-out par domaine
+    &OBM::Update::utils::getSmtpOutServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+
     # Initialisation du moteur Cyrus
     $updateAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $updateAttr{"domainList"} );
     if( !$updateAttr{"engine"}->{"cyrusEngine"}->init() ) {

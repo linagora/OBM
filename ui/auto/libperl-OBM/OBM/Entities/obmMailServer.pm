@@ -237,6 +237,11 @@ sub createLdapEntry {
         $ldapEntry->add( smtpInHost => $entry->{"postfixconf_smtpin_srv"} );
     }
 
+    # Les hôtes SMTP-out
+    if( $entry->{"postfixconf_smtpout_srv"} ) {
+        $ldapEntry->add( smtpOutHost => $entry->{"postfixconf_smtpout_srv"} );
+    }
+
     return 1;
 }
 
@@ -285,6 +290,11 @@ sub updateLdapEntry {
 
     # Les hôtes SMTP-in
     if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_smtpin_srv"}, $ldapEntry, "smtpInHost" ) ) {
+        $update->setUpdate();
+    }
+
+    # Les hôtes SMTP-out
+    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_smtpout_srv"}, $ldapEntry, "smtpOutHost" ) ) {
         $update->setUpdate();
     }
 
