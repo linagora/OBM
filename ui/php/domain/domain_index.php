@@ -215,6 +215,8 @@ function get_domain_params() {
   }
   $params['mailserver_nb'] = $nb_m;
   if(is_array($params['alias'])) {
+    $aliases = array();
+
     while(!empty($params['alias'])) {
       $alias= trim(array_shift($params['alias']));
       if(!empty($alias)) {
