@@ -125,12 +125,10 @@ function display_menu($module) {
   $display['todo'] = display_todos();
   $display['action'] = display_actions($section, $module);
   $update_state = get_update_state($domain_id);
-
   if (($update_state) && ($perm->check_right('tools', $cright_write_admin))) {
     $dis_scope = "<li><a href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
   }
   if ($display['print_url'] != "") {
-//    $dis_printer = "<li><a target=\"top\" href=\"".$display["print_url"]."&amp;output_target=print\"><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
     $url = $display['print_url']."&amp;output_target=print";
     $dis_printer = "<li><a href=\"#\" onclick=\"popup('$url');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
   }

@@ -288,7 +288,6 @@ function get_update_state($domain_id='no') {
     FROM DomainPropertyValue
     WHERE domainpropertyvalue_domain_id='$domain_id'
      AND domainpropertyvalue_property_key = 'update_state'";
-
   display_debug_msg($query, $cdg_sql, 'get_update_state()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);

@@ -2592,7 +2592,7 @@ function check_user_defined_rules() {
 	}
       }
       if ($return && is_array($field_rules['regexp'])) {
-	foreach($field_rules['regexp'] as $name => $regexp) {
+        foreach($field_rules['regexp'] as $name => $regexp) {
 	  if (!preg_match($regexp, $value)) {
 	    if (isset($field_rules['message'][$name])) {
 	      $err['msg'] =  $field_rules['message'][$name];

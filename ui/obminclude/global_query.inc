@@ -576,7 +576,10 @@ function run_query_global_insert_documents_links($ids, $entity) {
 function run_query_global_delete_document_links($ent_id, $entity, $doc_id='') {
   global $cdg_sql;
 
-  $where = '1=1';
+  if(!$ent_id && !$entity && !$doc_id) {
+    return true;
+  }
+  $where = '1=0';
 
   if ($ent_id != '') {
     $where .= " AND documententity_entity_id = '$ent_id'";
@@ -605,7 +608,9 @@ function run_query_global_delete_document_links($ent_id, $entity, $doc_id='') {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_global_delete_document($doc_id) {
   global $cdg_sql;
-
+  if(!$doc_id) {
+    return true;
+  }
   $multidomain = sql_multidomain('document');
 
   // Delete all links to documents
