@@ -42,6 +42,7 @@ $l_insert = "Registra il contatto";
 $l_update = "Modifica il contatto";
 $l_checkdelete = "Verifica o elimina il contatto";
 $l_select_company = "Scegli l'azienda";
+$l_pdf_settings = "PDF impostazioni";
 
 // Messages
 $l_projects_manager = "Projects managers conferma tasks qui:";
@@ -80,3 +81,17 @@ $l_j_check_email = "L'indirizzo email non è corretto.Verifica il dominio ";
 
 // For the display preferences modification screen
 $l_contact_display = "Opzioni di visualizzazione dell'elenco contatti.";
+
+// PDF related strings
+$l_pdf_no_project_selected = "Seleziona un minimo di un progetto.";
+$l_pdf_bad_date = "Data o il formato della data non è valido.";
+$l_pdf_com_date_format = "d/m/Y";
+$l_pdf_title = "Relazione di attività";
+$l_pdf_date = "Documento generato il :";
+$l_pdf_date_format = "d/m/Y H:i";
+$l_pdf_user = "Collaboratore : ";
+$l_pdf_visa_user = "Collaboratore Visa";
+$l_pdf_visa_client = "Client Visa";
+$l_pdf_visa_company = "Missione manager";
+$l_pdf_comments = "Commenti :";
+$l_pdf_projects = "Progetti";

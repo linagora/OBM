@@ -1247,4 +1247,135 @@ function dis_time_display_pref($prefs) {
   return $block;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//  Display the Activity Report Form
+//  Parameters:
+//    - $ra_values : form values
+//////////////////////////////////////////////////////////////////////////
+function dis_time_form_ra($time)
+{
+
+  global $display;
+  global $c_undef, $l_undef, $l_intern, $l_comment;
+  global $l_projects, $l_week, $l_month, $l_period, $l_date;
+  global $l_pdf_settings, $l_generate;
+  global $l_monthsofyear, $l_monthsofyearshort;
+  global $c_working_days, $c_week_first_day;
+  global $c_dst_err;
+
+  if (!isset($display['msg']) && isset($time['pdf_form'])) {
+    $pdf = new PDF();
+    $pdf->AliasNbPages();
+    $pdf->AddPage();
+    $pdf->Init($time);
+    $pdf->Body();
+    $pdf->Output($pdf->filename, 'I');
+    exit();
+  }
+
+  $proj_q = run_query_time_project($time);
+
+  $sel_proj  = '<select name="sel_projects[]" multiple="multiple" size="5">';
+  if ($proj_q->num_rows() != 0) {
+    while ($proj_q->next_record()) {
+      $proj_id = $proj_q->f("project_id");
+      $company = $proj_q->f("company_name");
+      $company = ($company != "") ? $company : $l_intern;
+      $proj_name = addslashes($proj_q->f("project_name"));
+      $proj_name = (strlen($proj_name) > 35) ? substr($proj_name,0,35)."..." : $proj_name;
+      $proj_label = "$company -- $proj_name";
+      if (isset($time['projects']))
+        $selected = in_array($proj_id, $time['projects']) ? ' selected="selected" ' : '';
+      $sel_proj .= "<option value=\"$proj_id\"$selected>$proj_label</option>";
+    }
+  }
+  $sel_proj .= '</select>';
+
+  $sel_month  = '<select name="sel_month" onChange="selectRadio(\'int_month\')">';
+  foreach ($l_monthsofyear as $key => $value) {
+    $key++;
+    if (isset($time['month']))
+        $selected = $key == $time['month'] ? ' selected="selected" ' : '';
+    else
+        $selected = $key == date('m') ? ' selected="selected" ' : '';
+    $key = ($key > 9 ? "$key" : "0$key");
+    $sel_month .= '<option value="'.$key.'"'.$selected.'>'.$value.'</option>';
+  }
+  $sel_month .= '</select>';
+
+  $d_start_week = of_date_get_first_day_week($time["date"]);
+  $d_week = $d_start_week - (7 * (date("W") - 1) * 86400);
+
+  $sel_week  = '<select name="sel_week" onChange="selectRadio(\'int_week\')">';
+  $week_selected_{$time['week']} = 'selected="selected"';
+  for ($i = 1; $i < 53; $i++)	{
+    $d_week_mon = date('d/m', $d_week);
+    $d_week_sun = date('d/m', $d_week + 6 * 86400 + $c_dst_err);
+    $val = date('Ymd', $d_week);
+    if (isset($time['week']))
+        $selected = $val == $time['week'] ? ' selected="selected"' : '';
+    else
+        $selected = date('W', $d_week) == date('W') ? ' selected="selected" ' : '';
+
+    $sel_week .= '<option value="'.$val.'"'.$selected.'>s'.date('W', $d_week).': '.$d_week_mon.' - '.$d_week_sun.'</option>';
+    $d_week += 7 * 86400 + $c_dst_err;
+  }
+  $sel_week .= '</select>';
+
+  $sel_int  = '<select name="sel_int_type" onChange="selectRadio(\'int_date\')">';
+  $sel_int .= '<option value="week">'.$l_week.'</option>';
+  $sel_int .= '<option value="month">'.$l_month.'</option>';
+  $sel_int .= '</select>';
+
+  if (isset($time['interval']))
+    ${'chk_' . $time['interval']} = 'checked="checked"';
+  else
+    $chk_week = 'checked="checked"';
+
+  $html_content = '
+  <script type="text/javascript">
+    function selectRadio(radio)
+    {
+      document.getElementById(radio).checked = "checked";
+    }
+  </script>
+
+  <form action="time_index.php?action=activity_report" method="post">
+    <fieldset class="detail">
+      <legend>'.$l_pdf_settings.'</legend>
+      <table>
+        <tr>
+          <th>'.$l_projects.'</th>
+          <td>'.$sel_proj.'</td>
+        </tr>
+        <tr>
+          <th>'.$l_period.'</th>
+          <td>
+            <input type="radio" name="interval" id="int_week" value="week" '.$chk_week.' />
+            '.$l_week.': '.$sel_week.'
+            <input type="radio" name="interval" id="int_month" value="month" '.$chk_month.' />
+            '.$l_month.': '.$sel_month.'
+            <br />
+            <input type="radio" name="interval" id="int_date" value="date" '.$chk_date.' />
+            '.$l_date.':
+            <input type="text" name="tf_int_date" onChange="selectRadio(\'int_date\')" class="datePicker" />
+            '.$sel_int.'
+          </td>
+        </tr>
+        <tr>
+          <th>'.$l_comment.'</th>
+          <td>
+            <textarea name="ta_comment">'.$time['comment'].'</textarea>
+          </td>
+        </tr>
+      </table>
+    </fieldset>
+    <fieldset class="buttons">
+      <input name="pdf_form" type="submit" value="'.$l_generate.' PDF" />
+    </fieldset>
+  </form>';
+
+  return $html_content;
+}
+
 ?>

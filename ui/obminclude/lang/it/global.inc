@@ -27,6 +27,7 @@ $l_date_creation = "Creazione";
 $l_updater = "Aggiornato da ";
 $l_date_last_update = "Ultima modifica";
 $l_delegation = "Delegation";
+$l_generate = "Generare";
 
 // Common messages
 $l_yes = "Si";
@@ -135,7 +136,8 @@ $l_event = "Appuntamento";
 $l_todo = "Da Fare";
 $l_publication = "Publicazione";
 $l_time = "Time management";
-$l_project = "Project";
+$l_project = "Progetto";
+$l_projects = "Progetti";
 $l_contract = "Contratto";
 $l_incident = "Incident";
 $l_document = "Documento";
@@ -189,6 +191,7 @@ $l_week = "Settimana";
 $l_month = "Mese";
 $l_year = "Anno";
 $l_today = "Oggi";
+$l_period = "Periodo";
 $l_monthsofyear = array ('Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Lug','Agosto', 'Settembre','Ottobre','Novembre', 'Dicembre');
 $l_monthsofyearshort = array ('Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic');
 $l_daysofweek = array ('Domenica','Lunedi','Martedi','Mercoledi','Giovedi','Venerdi','Sabato');
@@ -278,6 +281,9 @@ $l_header_day = "Giorno";
 $l_header_week = "Settimana";
 $l_header_month = "Mese";
 $l_header_new_event = "Nuovo Appuntamento";
+
+//time headers
+$l_header_activityreport = "Rapporto di Attività";
 
 // Debug
 $l_dg_id = "Id";

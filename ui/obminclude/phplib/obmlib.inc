@@ -159,7 +159,7 @@ class OBM_Challenge_Auth extends Auth {
     global $c_default_domain, $c_singleNameSpace, $l_error;
 
     $login = $params["login"];
-    $password = $params["password"];
+    $password = stripslashes($params['password']);
     $domain = $params["domain"];
     if(!$c_singleNameSpace) {
       if(strpos($login,"@") !== false) {

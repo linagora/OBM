@@ -40,6 +40,7 @@ $total_menu="Récapitulatifs";
 $total_tasks="Total par taches";
 $total_companies="Total par société";
 $total_projects="Total par projet/affaire";
+$l_pdf_settings="Paramètrage du PDF";
 
 // short names for days
 $l_daysofweekshort = array (	'Dim',
@@ -74,3 +75,16 @@ $l_j_select_project = "Vous devez sélectionner un project pour une tâche facturé
 $l_j_select_projecttask = "Vous devez sélectionner une tâche du projet project pour une tâche facturée.";
 $l_delete_confirm = "Confirmer la suppression de ces taches ?";
 
+// PDF related strings
+$l_pdf_no_project_selected = "Selectionnez au moins un projet.";
+$l_pdf_bad_date = "Date incorrecte ou format invalide.";
+$l_pdf_com_date_format = "d/m/Y";
+$l_pdf_title = "Relevé d'activité";
+$l_pdf_date = "Document généré le :";
+$l_pdf_date_format = "d/m/Y H:i";
+$l_pdf_user = "Collaborateur : ";
+$l_pdf_visa_user = "Visa Collaborateur";
+$l_pdf_visa_client = "Visa Client";
+$l_pdf_visa_company = "Visa Responsable Mission";
+$l_pdf_comments = "Commentaires :";
+$l_pdf_projects = "Projets :";

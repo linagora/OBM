@@ -40,6 +40,7 @@ $total_menu="Resumen";
 $total_tasks="Tarea total";
 $total_companies="Total por compañía";
 $total_projects="Total por proyecto/negocio";
+$l_pdf_settings = "PDF ajustes";
 
 // short names for days
 $l_daysofweekshort = array (	'Dom',
@@ -74,3 +75,16 @@ $l_j_select_project = "Debe escoger un proyecto con un tipo de tarea.";
 $l_j_select_projecttask = "Debe escoger una tarea del proyecto.";
 $l_delete_confirm = "Confirme eliminacion de la tarea(s) ?";
 
+// PDF related strings
+$l_pdf_no_project_selected = "Seleccione al menos un proyecto.";
+$l_pdf_bad_date = "Fecha no válida o formato de fecha.";
+$l_pdf_com_date_format = "d/m/Y";
+$l_pdf_title = "Informe de actividades";
+$l_pdf_date = "Documento generado el";
+$l_pdf_date_format = "d/m/Y H:i";
+$l_pdf_user = "Colaborador : ";
+$l_pdf_visa_user = "Colaborador Visa";
+$l_pdf_visa_client = "Cliente Visa";
+$l_pdf_visa_company = "Misión sdministrador Visa";
+$l_pdf_comments = "Comentarios :";
+$l_pdf_projects = "Proyectos :";

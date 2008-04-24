@@ -19,9 +19,9 @@ function run_query_time_task_list($time) {
   $date = $time['date'];
   $user_id = $time['user_id'];
 
-  if ($time['interval'] == 'week') {
+  //if ($time['interval'] == 'week') {
     $array_date = get_time_week_point($date);
-  }
+  //}
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -42,6 +42,7 @@ function run_query_time_task_list($time) {
   $query = "
     SELECT timetask_id,
       timetask_user_id,
+      project_id,
       $datetask,
       $timeupdate,
       $timecreate,
@@ -833,8 +834,41 @@ function run_query_time_task_one_week($time) {
   return $obm_q; 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Timemanager: Projects for pdf generation
+// Returns : DB object result with project satisfying criteria
+///////////////////////////////////////////////////////////////////////////////
+function run_query_time_ra_projects($time) {
+  global $cdg_sql;
 
+  $uid = $time['user_id'];
+  $projs = implode(',', $time['projects']);
 
+  $query = "
+    SELECT distinct
+      project_id,
+      project_company_id,
+      project_name,
+      project_shortname,
+      company_name,
+      project_tasktype_id
+    FROM Project
+      LEFT JOIN Company ON company_id = project_company_id,
+      ProjectTask, ProjectUser
+    WHERE project_archive='0'
+      AND projectuser_projecttask_id = projecttask_id
+      AND projecttask_project_id = project_id
+      AND projectuser_user_id = '$uid'
+      AND projectuser_projectedtime != '0'
+      AND project_id IN ($projs)
+      ORDER BY project_id, project_tasktype_id, company_name, project_name";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_time_project');
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: TaskType select query execution

@@ -38,6 +38,7 @@ $l_delegation = "Délégation";
 $l_print = "Imprimer";
 $l_transparent = "Transparent";
 $l_select_all = "Sélectionner tout";
+$l_generate = "Générer";
 $l_autocomplete_field = "Rechercher ...";
 $l_fatal_server_err = "Erreur fatale du serveur, veuillez recharger la page";
 
@@ -188,6 +189,7 @@ $l_todo = "A faire";
 $l_stats = "Stats";
 $l_time = "Gestion du temps";
 $l_project = "Projet";
+$l_projects = "Projets";
 $l_contract = "Contrat";
 $l_incident = "Incident";
 $l_document = "Document";
@@ -266,6 +268,7 @@ $l_week = "Semaine";
 $l_month = "Mois";
 $l_year = "Année";
 $l_today = "Aujourd'hui";
+$l_period = "Période";
 $l_monthsofyear = array ('Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août', 'Septembre','Octobre','Novembre', 'Décembre');
 $l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc');
 $l_daysofweek = array ('Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi');
@@ -415,6 +418,7 @@ $l_header_statsuser = "Statistiques utilisateur";
 $l_header_weeklyview = "Semaine";
 $l_header_monthlyview = "Mois";
 $l_header_globalview = "Validation";
+$l_header_activityreport = "Relevé d'activité";
 
 //document headers
 $l_document_new = "Nouveau document";

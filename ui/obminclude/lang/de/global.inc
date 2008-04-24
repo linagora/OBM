@@ -250,6 +250,7 @@ $l_header_statsuser = "Benutzerstatistik";
 $l_header_weeklyview = "Wochenansicht";
 $l_header_monthlyview = "Monatsansicht";
 $l_header_globalview = "?globalview";
+$l_header_activityreport = "Tätigkeitsbericht";
 
 //document headers
 $l_document_new = "Neues Dokument";

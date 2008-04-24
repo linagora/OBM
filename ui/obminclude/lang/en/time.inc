@@ -38,6 +38,7 @@ $total_menu="Summary";
 $total_tasks="Task total";
 $total_companies="Total per company";
 $total_projects="Total per project/deal";
+$l_pdf_settings="PDF Settings";
 
 // short names for days
 $l_daysofweekshort = array (	'Sun',
@@ -72,3 +73,16 @@ $l_j_select_project = "You must select a projet with a billed task type.";
 $l_j_select_projecttask = "You must select a project task.";
 $l_delete_confirm = "Confirm task(s) deletion ?";
 
+// PDF related strings
+$l_pdf_no_project_selected = "Select at least a project.";
+$l_pdf_bad_date = "Invalid date or date format.";
+$l_pdf_com_date_format = "Y-m-d";
+$l_pdf_title = "Activity report";
+$l_pdf_date = "Document generated on :";
+$l_pdf_date_format = "Y-m-d H:i";
+$l_pdf_user = "Contributor : ";
+$l_pdf_visa_user = "Contributor Visa";
+$l_pdf_visa_client = "Client Visa";
+$l_pdf_visa_company = "Mission Manager Visa";
+$l_pdf_comments = "Comments :";
+$l_pdf_projects = "Projects :";

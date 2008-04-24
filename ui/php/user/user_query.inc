@@ -325,7 +325,7 @@ function run_query_user_insert($user) {
   $now = date('Y-m-d H:i:s');
   $uid = $obm['uid'];
   $login = strtolower($user['login']);
-  $passwd = $user['passwd'];
+  $passwd = stripslashes($user['passwd']);
   if ($passwd != '') {
     // If a password type is given, get it else get the system parameter
     $passwd_type = $user['password_type'];
@@ -344,6 +344,7 @@ function run_query_user_insert($user) {
     } else {
       $passwd_crypt = $passwd;
     }
+    $passwd_crypt = addslashes($passwd_crypt);
   }
 
   // infos
@@ -877,7 +878,7 @@ function run_query_user_update($p_id, $user) {
     $gid = 0;
   }
 
-  $passwd = $user['passwd'];
+  $passwd = stripslashes($user['passwd']);
   if ($passwd != '') {
     // If a password type is given, get it else get the system parameter
     $passwd_type = $user['password_type'];
@@ -895,6 +896,7 @@ function run_query_user_update($p_id, $user) {
     } else {
       $passwd_crypt = $passwd;
     }
+    $passwd_crypt = addslashes($passwd_crypt);
 
     $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type='$password_encryption'";
     $passwd_update_q = $passwd_update.',';
@@ -972,7 +974,7 @@ function run_query_user_update($p_id, $user) {
           }
 
           if ($parameters) {
-            $cmd = $cmd_ldap_passwd.$parameters." --login ".$user['login']." --domain ".$user_domain." --type ".$password_encryption." --no-old --passwd '".stripslashes($passwd)."'";
+            $cmd = $cmd_ldap_passwd.$parameters." --login ".$user['login']." --domain ".$user_domain." --type ".$password_encryption." --no-old --passwd '".$passwd."'";
 
             display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
             exec($cmd);
@@ -985,7 +987,7 @@ function run_query_user_update($p_id, $user) {
 
   // If the user is archived, we unsubscribe it from all Groups
   if ($archive == '1') {
-    $retour = run_query_user_unsubscribe_all_groups($p_id);    
+    $retour = run_query_user_unsubscribe_all_groups($p_id);
   }
 
   // Update photo

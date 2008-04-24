@@ -29,6 +29,7 @@ $l_date_creation = "Creación";
 $l_updater = "Actualizado por";
 $l_date_last_update = "Última Actualización";
 $l_delegation = "Delegation";
+$l_generate = "Generar";
 
 // Common messages
 $l_yes = "Si";
@@ -143,6 +144,7 @@ $l_publication = "Publicación";
 $l_todo = "Tarea";
 $l_time = "Control de tiempo";
 $l_project = "Proyecto";
+$l_projects = "Proyectos";
 $l_contract = "Contrato";
 $l_incident = "Incidente";
 $l_document = "Documento";
@@ -198,6 +200,7 @@ $l_week = "Semana";
 $l_month = "Mes";
 $l_year = "Año";
 $l_today = "Hoy";
+$l_period = "Período";
 $l_monthsofyear = array ('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
 $l_monthsofyearshort = array ('ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic');
 $l_daysofweek = array ('Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sábado');
@@ -317,6 +320,7 @@ $l_header_statsuser = "Estadísticas de usuarios";
 $l_header_weeklyview = "Semana";
 $l_header_monthlyview = "Mes";
 $l_header_globalview = "Validación";
+$l_header_activityreport = "Informe de actividades";
 
 //document headers
 $l_document_new = "Nuevo documento";

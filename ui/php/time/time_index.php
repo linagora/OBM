@@ -40,6 +40,8 @@ require('time_display.inc');
 require('time_query.inc');
 require('time_js.inc');
 
+require('obminclude/lib/Fpdf/pdf.php');
+
 get_time_actions();
 $perm->check_permissions($module, $action);
 
@@ -145,7 +147,28 @@ if ($action == 'index') {
   update_display_pref($params);
   $prefs = get_display_pref($obm['uid'], 'time', 1);
   $display['detail'] = dis_time_display_pref($prefs);
-}  
+} else if ($action == 'activity_report') {
+///////////////////////////////////////////////////////////////////////////////
+  global $l_pdf_no_project_selected;
+  global $l_pdf_bad_date;
+  if (isset($params['pdf_form'])) {
+    if (empty($params['projects']))
+      $display['msg'] = display_err_msg($l_pdf_no_project_selected);
+    elseif ($params['interval'] === 'date') {
+      $elms = array('d', 'm', 'Y');
+      $repl = array('(?P<day>\d{2})', '(?P<month>\d{2})', '(?P<year>\d{4})');
+      $patt = '#'.str_replace($elms, $repl, $_SESSION['set_date_upd']).'#';
+      preg_match($patt, $params['int_date'], $arr);
+      $date = $arr['year'].'-'.$arr['month'].'-'.$arr['day'];
+
+      if (!strtotime($date))
+          $display['msg'] = display_err_msg($l_pdf_bad_date);
+      else
+        $params['int_date'] = date("Ymd", strtotime($date));
+    }
+  }
+  $display['detail']  = dis_time_form_ra($params);
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -227,7 +250,7 @@ function update_time_session_params() {
 function get_time_actions() {
   global $params, $path, $actions;
   global $l_header_weeklyview, $l_header_monthlyview, $l_header_globalview;
-  global $l_header_stats, $l_header_display;
+  global $l_header_stats, $l_header_display, $l_header_activityreport;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
@@ -327,6 +350,18 @@ function get_time_actions() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
+
+///////////////////////////////////////////////////////////////////////////////
+// PDF generation for activity reports
+///////////////////////////////////////////////////////////////////////////////
+// Activity Report View
+  $actions['time']['activity_report'] = array (
+    'Name'     => $l_header_activityreport,
+    'Url'      => "$path/time/time_index.php?action=activity_report",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all')
+                                              );
+
 }
 
 ?>

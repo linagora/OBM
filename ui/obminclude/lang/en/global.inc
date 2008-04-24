@@ -36,6 +36,7 @@ $l_delegation = "Delegation";
 $l_print = "Print";
 $l_transparent = "Transparent";
 $l_select_all = "Select all";
+$l_generate = "Generate";
 
 // Common messages
 $l_users = "Users";
@@ -175,6 +176,7 @@ $l_stats = "Stats";
 $l_time = "Time management";
 $l_cv = "CV";
 $l_project = "Project";
+$l_projects = "Projects";
 $l_contract = "Contract";
 $l_incident = "Incident";
 $l_document = "Document";
@@ -257,6 +259,7 @@ $l_week = "Week";
 $l_month = "Month";
 $l_year = "Year";
 $l_today = "Today";
+$l_period = "Period";
 $l_monthsofyear = array('January','February', 'March','April','May','June','July','August','September','October','November','December');
 $l_monthsofyearshort = array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec');
 $l_daysofweek = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
@@ -398,6 +401,7 @@ $l_header_statsuser = "User stats";
 $l_header_weeklyview = "Week";
 $l_header_monthlyview = "Month";
 $l_header_globalview = "Validation";
+$l_header_activityreport = "Activity Report";
 
 //document headers
 $l_document_new = "New document";

@@ -25,7 +25,7 @@ function run_query_password($u_id) {
     FROM UserObm
     WHERE userobm_id='$u_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_password()");
+  display_debug_msg($query, $cdg_sql, 'run_query_password()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -47,21 +47,21 @@ function run_query_password($u_id) {
 function run_query_password_update($password, $uid, $usr_q) {
   global $cdg_sql, $cdg_exe, $cgp_use, $cmd_ldap_passwd, $password_encryption;
 
-  $login = $usr_q->f("userobm_login");
-  $domain_id = $usr_q->f("userobm_domain_id");;
-  $samba_perms = $usr_q->f("userobm_samba_perms");
-  $old_pass = trim($password["old_password"]);
-  $new_pass = trim($password["new_password"]);
+  $login = $usr_q->f('userobm_login');
+  $domain_id = $usr_q->f('userobm_domain_id');;
+  $samba_perms = $usr_q->f('userobm_samba_perms');
+  $new_pass = stripslashes(trim($password['new_password']));
 
-  if ($password_encryption == "CRYPT") {
+  if ($password_encryption == 'CRYPT') {
     $new_passwd_crypt = crypt($new_pass);
-  } else if ($password_encryption == "MD5SUM") {
+  } else if ($password_encryption == 'MD5SUM') {
     $new_passwd_crypt = md5($new_pass);
   } else {
     $new_passwd_crypt = $new_pass;
   }
+  $new_passwd_crypt = addslashes($new_passwd_crypt);
 
-  $passwd_update = "";
+  $passwd_update = '';
 
   // Update done in real-time, so updating UserObm AND P_UserObm
   $query = "UPDATE UserObm SET
@@ -69,7 +69,7 @@ function run_query_password_update($password, $uid, $usr_q) {
     userobm_password_type='$password_encryption'
   WHERE userobm_id = '$uid'";
 
-  display_debug_msg("DB_OBM : $query", $cdg_sql, "run_query_password_update()");
+  display_debug_msg("DB_OBM : $query", $cdg_sql, 'run_query_password_update()');
   // Update database update
   $usr_q = new DB_OBM;
   $retour = $usr_q->query($query);
@@ -80,7 +80,7 @@ function run_query_password_update($password, $uid, $usr_q) {
   $error = $usr_q->query($query);
   $usr_q->next_record();
 
-  if ($usr_q->f("nb_user") == 1 && $cgp_use['service']['ldap']) {
+  if ($usr_q->f('nb_user') == 1 && $cgp_use['service']['ldap']) {
 
     $query = "UPDATE P_UserObm SET
       userobm_password='$new_passwd_crypt',
@@ -93,16 +93,16 @@ function run_query_password_update($password, $uid, $usr_q) {
     // Uniquement dans le cas où la mise à jour de la table de prooduction c'est
     // produite sans erreur (tuple inexistant...)
     if ($retour) {
-      $parameters = " --unix";
+      $parameters = ' --unix';
 
-      if ($samba_perms && ($cgp_use['service']['samba'] || $password_encryption != "PLAIN")) {
-        $parameters .= " --samba";
+      if ($samba_perms && ($cgp_use['service']['samba'] || $password_encryption != 'PLAIN')) {
+        $parameters .= ' --samba';
       }
 
       if ($parameters) {
-        $cmd = $cmd_ldap_passwd.$parameters." --login ".$login." --domain ".$domain_id." --type ".$password_encryption." --passwd '".stripslashes($new_pass)."' --no-old";
+        $cmd = $cmd_ldap_passwd.$parameters.' --login '.$login.' --domain '.$domain_id.' --type '.$password_encryption." --passwd '".$new_pass."' --no-old";
 
-        display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
+        display_debug_msg($cmd, $cdg_exe, 'run_query_password_update()');
         exec($cmd);
       }
     }
@@ -125,57 +125,57 @@ function check_data_form($usr_q, $password) {
   global $php_regexp_password, $password_encryption;
   global $err, $action, $cdg_sql;
 
-  $id = $usr_q->f("userobm_id");
-  $login = $usr_q->f("userobm_login");
-  $pass = $usr_q->f("userobm_password");
-  $passtype = $usr_q->f("userobm_password_type");
+  $id = $usr_q->f('userobm_id');
+  $login = $usr_q->f('userobm_login');
+  $pass = $usr_q->f('userobm_password');
+  $passtype = $usr_q->f('userobm_password_type');
 
 
   # On supprime les caractères invisibles en début et fin de chaines de l'ancien
   # mot de passe
   # On enlève les caractères d'échapement de l'ancien mot de passe
-  $old_pass = stripslashes(trim($password["old_password"]));
+  $old_pass = stripslashes(trim($password['old_password']));
 
   # On supprime les caractères invisibles en début et fin de chaines des nouvaux
   # mots de passe - les caractères d'échapement sont enlevés au besoin (appel de
   # l'automate, ...)
-  $new_pass = trim($password["new_password"]);
-  $new_pass_bis = trim($password["new_password_bis"]);
-  if ($action == "update") {
+  $new_pass = stripslashes(trim($password['new_password']));
+  $new_pass_bis = stripslashes(trim($password['new_password_bis']));
+  if ($action == 'update') {
     // Verifie que le mot de passe actuel est correct
-    if ($passtype == "CRYPT") {
+    if ($passtype == 'CRYPT') {
       $old_passwd_crypt = crypt($old_pass,$pass);
-    } else if ($passtype == "MD5SUM") {
+    } else if ($passtype == 'MD5SUM') {
       $old_passwd_crypt = md5($old_pass);
     } else {
       $old_passwd_crypt = $old_pass;
     }
     if ($pass != $old_passwd_crypt) {
-      $err["msg"] = "$l_wrong_password";
-      $err["field"] = "old_password";
+      $err['msg'] = "$l_wrong_password";
+      $err['field'] = 'old_password';
       return false;
     }
 
     // Verifie que les mots de passe sont saisis
-    if (($old_pass == "") || ($new_pass == "")) {
-      $err["msg"] = "$l_fill_password";
-      $err["field"] = "new_password";
+    if (($old_pass == '') || ($new_pass == '')) {
+      $err['msg'] = "$l_fill_password";
+      $err['field'] = 'new_password';
       return false;
     }
 
     // Verifie que les 2 mots de passe nouveaux sont identiques
     if ($new_pass != $new_pass_bis) {
-      $err["msg"] = "$l_new_password_differ";
-      $err["field"] = "new_password_bis";
+      $err['msg'] = "$l_new_password_differ";
+      $err['field'] = 'new_password_bis';
       return false;
     }
 
     // Password is correct
-    $check_passwd = format_name(stripslashes($new_pass), false, true);
-    if ( (trim($new_pass) == "")
-        || (preg_match($php_regexp_password, $check_passwd) == false) ) {
-      $err["msg"] = "$l_password_invalid";
-      $err["field"] = "new_password";
+    //    $check_passwd = format_name(stripslashes($new_pass), false, true);
+    if ( (trim($new_pass) == '')
+        || (preg_match($php_regexp_password, $new_pass) == false) ) {
+      $err['msg'] = "$l_password_invalid";
+      $err['field'] = 'new_password';
       return false;
     }
   }
