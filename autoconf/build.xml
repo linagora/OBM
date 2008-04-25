@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<project name="obm-autoconf" default="dist" basedir=".">
+
+	<target name="init">
+		<echo>Initializing project variables</echo>
+		<tstamp />
+
+		<!-- ======================== -->
+		<!-- Project properties       -->
+		<!-- ======================== -->
+		<!-- ======================== -->
+		<!-- User properties          -->
+		<!-- ======================== -->
+		<property file="build.properties" />
+
+
+		<property name="main.build" value="build/main" />
+		<property name="dist" value="dist" />
+		<property name="main.src" value="src" />
+		<!-- Classes dir holds runtime (and compile time) mandatory jar files -->
+		<property name="main.classes" value="classes/main" />
+		<property name="common.classes" value="classes/common" />
+
+		<!-- Libs dir holds compile-time only jar files -->
+		<property name="main.libs" value="lib" />
+
+		<property name="debug" value="on" />
+		<property name="optimize" value="on" />
+		<property name="application.name" value="${ant.project.name}" />
+
+		<!-- ======================== -->
+		<!-- Classpaths               -->
+		<!-- ======================== -->
+		<path id="main.classpath">
+			<pathelement path="${classpath}" />
+			<fileset dir="${main.classes}">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${main.libs}">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+
+	</target>
+
+
+	<target name="main.compile" depends="init">
+		<echo>Compiling project</echo>
+		<mkdir dir="${main.build}" />
+
+
+		<javac deprecation="yes" destdir="${main.build}" debug="${debug}" optimize="${optimize}" source="5">
+			<src path="${main.src}" />
+			<classpath refid="main.classpath" />
+		</javac>
+		<copy todir="${main.build}">
+			<fileset dir="${main.src}">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="main.dist" depends="main.compile">
+		<echo>Packaging project</echo>
+		<mkdir dir="${dist}/xpi" />
+		<mkdir dir="${dist}/WEB-INF" />
+		<mkdir dir="${dist}/WEB-INF/lib" />
+		<mkdir dir="${dist}/WEB-INF/classes" />
+
+		<!-- Create the application jar file -->
+		<jar destfile="${dist}/WEB-INF/lib/${application.name}.jar" basedir="${main.build}">
+			<!--<metainf dir="jar-services" includes="**/*" />-->
+			<manifest>
+				<attribute name="Built-By" value="${user.name}" />
+			</manifest>
+		</jar>
+
+		<!-- Move classes to WEB-INF/lib -->
+		<copy todir="${dist}/WEB-INF/lib">
+			<fileset dir="${main.classes}" includes="*.jar" />
+		</copy>
+
+		<!-- Move ressources to WEB-INF/classes -->
+		<copy todir="${dist}/WEB-INF/classes">
+			<fileset dir="resources" includes="*.xml" />
+		</copy>
+
+		<!-- Move ressources to WEB-INF/classes -->
+		<copy todir="${dist}/WEB-INF/classes">
+			<fileset dir="resources" includes="*.properties" />
+		</copy>
+
+		<!-- Configuration -->
+		<copy todir="${dist}/WEB-INF">
+			<fileset dir="descriptors" includes="*.xml" />
+		</copy>
+
+		<!-- Autoconf -->
+		<copy todir="${dist}">
+			<fileset dir="autoconfiguration" includes="*.xml" />
+			<fileset dir="autoconfiguration" includes="*.js" />
+		</copy>
+
+		<!-- XPI -->
+		<copy todir="${dist}/xpi">
+			<fileset dir="autoconfiguration/xpi" includes="*.xpi" />
+		</copy>
+
+	</target>
+
+
+	<!--target name="dist" depends="main.dist,test.dist,test.run"></target-->
+	<target name="dist" depends="main.dist">
+	</target>
+
+	<target name="clean" depends="init">
+		<echo>Cleaning...</echo>
+		<delete dir="${main.build}" />
+		<delete dir="${dist}" />
+		<!-- Tomcat 5 rants when the dist dir does not exist -->
+		<mkdir dir="${dist}" />
+	</target>
+
+</project>
+
