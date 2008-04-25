@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Context path="/obm-autoconf" docBase="/etc/obm-autoconf"
+  debug="0" privileged="false">
+
+</Context>

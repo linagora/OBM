@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Fonction : fichier de configuration XML
+
+  Remarque: partout où noté "LDAP", des données provenant du serveur LDAP central
+            viennent compléter le document XML.
+            le motif est de la forme
+              |nom_attribut_LDAP|
+            qui sera remplacé par le servlet par la valeur issue de l'annuaire.
+-->
+
+<configuration xmlns="http://ns.aliasource.fr/mozilla/1.0">
+
+  <!-- IDENTITÉS -->
+  <identities>
+    <identity id="identite-x"
+              smtpServer="serveur-smtp-x"
+              fullName="|cn|"
+              fromAddress="|mail|"
+              draftFolder="imap://|mailBox|@|mailHost|/Drafts"
+              draftFolder_pickerMode="0"
+              stationeryFolder="imap://|mailBox|@|mailHost|/Templates"
+              stationeryFolder_pickerMode="0"
+              fccFolder="imap://|mailBox|@|mailHost|/Sent"
+              fccFolder_pickerMode="0"
+              autocompleteDirectory="serveur-ldap-x"/>
+  </identities>
+
+  <!-- SERVEURS -->
+  <servers>
+    <server id="serveur-courrier-x"
+            type="imap"
+            label="|cn|"
+            username="|mailBox|"
+            hostname="|mailHost|"
+            port="143"
+            secureConnection="tls"
+            trashFolder="Trash"
+            secureAuthentication="false"/>
+    <server id="serveur-smtp-x"
+            type="smtp"
+            label="Serveur SMTP X"
+            username="|mailBox|"
+            hostname="|mailHost|"
+            port="25"
+            secureConnection="tls"/>
+  </servers>
+
+  <!-- COMPTES -->
+  <accounts defaultAccount="compte-x">
+    <account id="compte-x"
+             identities="identite-x"
+             server="serveur-courrier-x"/>
+  </accounts>
+
+  <!-- ANNUAIRES -->
+  <directories>
+
+    <directory id="serveur-ldap-groupes-publics"
+               label="Listes locales"
+               uri="ldap://|mailHost|:389/ou=groups,dc=|mailHost|,dc=xxxxx,dc=fr??sub?(objectclass=*)"/> <!-- LDAP -->
+  </directories>
+
+  <!-- PREFERENCES -->
+  <preferences>
+
+	<!-- Global Preferences  -->
+		<!-- login de l'utilisateur -->
+		<preference type="string"
+		            name="config.obm.login"
+		            value="|mailBox|"
+		            set="user"/> <!-- LDAP -->
+
+		<!-- désactiver le service de mise à jour intégré pour l'application -->
+		<preference type="boolean"
+		            name="app.update.enabled"
+		            value="false"
+		            set="lock"/>
+
+		<!-- page d'accueil de thunderbird -->
+	<!--	<preference type="string"
+		            name="mailnews.start_page.override_url"
+		            value="http://server/thunderbird.html"
+		            set="user"/>              
+		<preference type="string"
+		            name="mailnews.start_page.url"
+		            value="http://server/thunderbird.html"
+		            set="user"/>              
+		<preference type="string"
+		            name="mailnews.start_page.welcome_url"
+		            value="http://server/thunderbird.html"
+		            set="user"/>       
+	-->
+		
+
+    <!-- Installed extensions preferences -->
+		<!-- Extension spellchecker -->
+	<!--	<preference type="string"
+		            name="spellchecker.dictionary"
+		            value="fr-FR"
+		            set="user"/>
+-->
+		<!-- URL du serveur Web OBM -->
+	<!--	<preference type="string"
+		            name="config.obm.server"
+		            value="https://|mailHost|/"
+		            set="user"/>
+	-->
+		<!-- URL de connection au service Web d'OBM-Sync -->
+		<preference type="string"
+		            name="extensions.obm.server"
+		            value="https://|mailHost|:8443/obm-sync/services"
+		            set="user"/> <!-- LDAP -->
+		
+  </preferences>
+
+  <!-- EXTENSIONS -->
+  <extensions>
+    <!-- Dictionnaire -->
+ <!--   <extension id="fr-FR@dictionaries.addons.mozilla.org"
+               src="autoconfHost/xpi/dictionnaire-francais_1.6.xpi"
+               name="Dictionnaire MySpell en Français"
+               version="1.6">
+      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+                         minVersion="2.0a1"
+                         maxVersion="2.0.0.*"/>
+    </extension>
+-->
+    <!-- Lightning (Thunderbird, Windows) -->
+<!--    <extension id="{e2fda1a4-762b-4020-b5ad-a41df1933103}"
+               src="autoconfHost/xpi/lightning_0.5.win32.xpi"
+               version="0.5">
+      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+                         minVersion="1.5"
+                         maxVersion="2.0.*"/>
+      <targetPlatform name="WINNT_x86-msvc"/>
+    </extension>
+-->
+    <!-- Lightning (Thunderbird, Linux) -->
+   <!-- <extension id="{e2fda1a4-762b-4020-b5ad-a41df1933103}"
+               src="autoconfHost/xpi/lightning_0.5.linux-i686.xpi"
+               version="0.5">
+      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+                         minVersion="1.5"
+                         maxVersion="2.0.*"/>
+      <targetPlatform name="Linux_x86-gcc3"/>
+    </extension>
+-->
+
+    <!-- Connecteur OBM -->
+    <extension id="obm-mozilla-calendar@aliasource.fr"
+               src="http://localhost/xpi/obm-extension.xpi"
+               version="2.1.5"/>
+      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+                         minVersion="1.5"
+                         maxVersion="2.0.*"/>
+    </extension>
+
+    <!-- Extension multi-ldap -->
+ <!--   <extension id="multildap@milimail.org"
+               src="autoconfHost/xpi/multi_ldap-0.2.4.0.xpi"
+               version="0.2.4.0">
+      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+                         minVersion="2.0"
+                         maxVersion="2.0.*"/>
+    </extension>
+-->
+  </extensions>
+
+  <!-- CERTIFICATS -->
+  <!--<certificates>
+    <certificate src="autoconfHost/ac-racine.crt"
+                 md5Fingerprint="25:44:35:56:18:E4:EF:65:02:25:99:C6:4E:17:00:38"/>
+  </certificates>
+-->
+  <!-- PROXYS -->
+<!--  <proxies>
+
+    <proxy type="auto"
+           value="autoconfHost/proxy.pac"/>
+
+  </proxies>
+-->
+</configuration>

@@ -1,0 +1,7 @@
+//constants
+ldapHost = 192.168.1.8
+ldapPort = 389
+ldapSearchBase = dc=local
+ldapAtts = cn,mail,mailAlias,mailBox
+ldapFilter = mail
+configXml = /etc/obm-autoconf/config.xml
