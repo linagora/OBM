@@ -1,3 +1,15 @@
+2008-04-25  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	fix brain bug : s/endsWith/startsWith to detect indented vcal
+	lines.
+	
+	* src/java/fr/aliasource/funambol/utils/FunisHelper.java:
+	(FunisHelper.removeQuotedPrintableFromVCalString),
+	(FunisHelper.nextLineIsIndented):
+	* test-data/sga.vcal:
+	* tests/fr/aliasource/funambol/VCalQuotedTest.java:
+	(VCalQuotedTest.testParsingSGA):
+
 2008-04-16  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	Handle synthesis indented output.

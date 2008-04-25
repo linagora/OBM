@@ -24,7 +24,6 @@ public class FunisHelper {
 		// concat quoted lines ending with =
 		for (int i = 0; i < lines.length; i++) {
 			String l = lines[i];
-			logger.warn("funishelper: '"+l+"'");
 			
 			if (l.contains("QUOTED-PRINTABLE")) {
 				quotedMode = true;
@@ -46,7 +45,7 @@ public class FunisHelper {
 	}
 
 	private static boolean nextLineIsIndented(String l) {
-		return l.endsWith(" ");
+		return l.startsWith(" ");
 	}
 
 	private static String[] safeSplit(String s, char sep) {
