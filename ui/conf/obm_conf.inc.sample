@@ -116,6 +116,9 @@ $ccalendar_hour_fraction = 4;
 // Generic E-mail for Incident module
 //$cmail_incident = 'support@mydomain';
 
+// Time : activity report logo
+$cimage_logo = 'linagora.jpg';
+
 // Document : Root of the document repository
 $cdocument_root = '/var/www/obmdocuments';
 $default_path = '/Default';                  // Default directory
