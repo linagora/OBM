@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="classes/main/ldap.jar"/>
+	<classpathentry kind="lib" path="classes/main/utilities.jar"/>
+	<classpathentry kind="lib" path="dist/WEB-INF/lib/ldap.jar"/>
+	<classpathentry kind="lib" path="dist/WEB-INF/lib/obm-autoconf.jar"/>
+	<classpathentry kind="lib" path="dist/WEB-INF/lib/utilities.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="build/main"/>
+</classpath>
