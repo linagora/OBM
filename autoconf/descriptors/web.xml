@@ -13,7 +13,7 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
   
   <servlet>
     <servlet-name>autoconf</servlet-name>
-    <display-name>Thunderbird Autoconfigurationt</display-name>
+    <display-name>Thunderbird Autoconfiguration</display-name>
     <servlet-class>
       fr.aliasource.obm.autoconf.AutoconfService
     </servlet-class>

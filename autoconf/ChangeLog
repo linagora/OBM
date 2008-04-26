@@ -1,0 +1,30 @@
+2008-04-26  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Make it more object oriented.
+
+	Add unit tests.
+	
+	* .classpath:
+	* descriptors/web.xml:
+	* src/fr/aliasource/obm/autoconf/AutoconfService.java:
+	(AutoconfService), (AutoconfService.AutoconfService),
+	(AutoconfService.doGet):
+	* src/fr/aliasource/obm/autoconf/DirectoryConfig.java:
+	(DirectoryConfig), (DirectoryConfig.DirectoryConfig),
+	(DirectoryConfig.getLdapPort), (DirectoryConfig.getLdapSearchBase),
+	(DirectoryConfig.getLdapAtts), (DirectoryConfig.getLdapFilter),
+	(DirectoryConfig.getLdapHost), (DirectoryConfig.getConfigXml),
+	(DirectoryConfig.setConfigXml):
+	* src/fr/aliasource/obm/autoconf/LDAPQueryTool.java:
+	(LDAPQueryTool), (LDAPQueryTool.LDAPQueryTool),
+	(LDAPQueryTool.getLDAPInformations):
+	* src/fr/aliasource/obm/autoconf/TemplateLoader.java:
+	(TemplateLoader), (TemplateLoader.TemplateLoader),
+	(TemplateLoader.applyTemplate), (TemplateLoader.generateXMLConfig):
+	* src/fr/aliasource/obm/utils/DOMUtils.java:
+	* tests/fr/aliasource/obm/autoconf/AutoconfTestCase.java:
+	(AutoconfTestCase), (AutoconfTestCase.setUp),
+	(AutoconfTestCase.tearDown):
+	* tests/fr/aliasource/obm/autoconf/TemplateLoaderTests.java:
+	(TemplateLoaderTests), (TemplateLoaderTests.testApplyTemplates):
+
