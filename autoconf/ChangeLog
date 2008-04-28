@@ -1,3 +1,10 @@
+2008-04-28  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Add ldap unit test
+	
+	* tests/fr/aliasource/obm/autoconf/LDAPQueryToolTests.java:
+	(LDAPQueryToolTests), (LDAPQueryToolTests.testQuery):
+
 2008-04-26  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	Make it more object oriented.
