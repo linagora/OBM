@@ -1,0 +1,16 @@
+Pour créer un installeur de Thunderbird intégrant l'autoconfiguration :
+
+ * éditer le fichier config.jsc.sample en config.jsc en mettant l'adresse du serveur d'autonconf
+ * ouvrir l'archive de l'instatalleur standard .exe de Thunderbird avec 7-Zip
+ 
+ Sous 7-Zip :
+ 
+ * ajouter le fichier "config.jsc" du SVN dans "\nonlocalized"
+ * extraire le fichier "\nonlocalized\greprefs\all.js"
+ * modifier le fichier "all.js" précédemment extrait, en lui ajoutant
+    à la fin le contenu de "all.js.add" du SVN
+ * dans l'archive, renommer le fichier "all.js", en "all_.js" par exemple
+   (car suppression semble non supportée sous 7-Zip)
+ * ajouter le fichier "all.js" dans l'archive, dans "\nonlocalized\greprefs"
+
+L'installeur .exe est prêt à être utilisé.

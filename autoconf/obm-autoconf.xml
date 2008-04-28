@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<Context path="/obm-autoconf" docBase="/etc/obm-autoconf"
+<Context path="/obm-autoconf" docBase="/usr/lib/obm-autoconf"
   debug="0" privileged="false">
 
+  <ResourceLink name="UserTransaction" global="UTransaction"
+                type="javax.transaction.UserTransaction"/>
+
+  <Resource name="jdbc/AutoConfDS" auth="Container"
+	    type="javax.sql.DataSource"
+	    factory="fr.aliacom.jndi.DataSourceFactory"
+	    login="obm"
+	    password="obm"
+	    className="com.mysql.jdbc.Driver"
+	    url="jdbc:mysql://localhost/obm?relaxAutocommit=true&amp;zeroDateTimeBehavior=convertToNull&amp;jdbcCompliantTruncation=false"
+	    max="4"
+	    pingQuery="SELECT 1"/>
 </Context>

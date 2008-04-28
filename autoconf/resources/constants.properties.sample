@@ -1,7 +1,8 @@
-//constants
-ldapHost = 192.168.1.8
+//CONSTANTS
+ldapHost = ldap.aliacom.local
 ldapPort = 389
 ldapSearchBase = dc=local
-ldapAtts = cn,mail,mailAlias,mailBox
+ldapAtts = cn,mail,mailAlias,mailBox,obmDomain,uid
 ldapFilter = mail
-configXml = /etc/obm-autoconf/config.xml
+configXml = /usr/lib/obm-autoconf/config.xml
+dbQuery = SELECT host_name from Host, MailServer, Domain, UserObm WHERE host_id = mailserver_host_id AND mailserver_id = userobm_mail_server_id AND userobm_domain_id = domain_id AND userobm_login =? AND domain_name =?

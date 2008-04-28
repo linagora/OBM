@@ -9,7 +9,18 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
   <session-config>
     <!-- Default to 5 minute session timeouts -->
     <session-timeout>5</session-timeout>
-  </session-config>
+  </session-config>
+  <resource-env-ref>
+    <description>DB Connection</description>
+    <resource-env-ref-name>jdbc/AutoConfDS</resource-env-ref-name>
+    <resource-env-ref-type>javax.sql.DataSource</resource-env-ref-type>
+  </resource-env-ref>
+
+  <resource-env-ref>
+    <description>JTA Transaction</description>
+    <resource-env-ref-name>UserTransaction</resource-env-ref-name>
+    <resource-env-ref-type>javax.transaction.UserTransaction</resource-env-ref-type>
+  </resource-env-ref>
   
   <servlet>
     <servlet-name>autoconf</servlet-name>

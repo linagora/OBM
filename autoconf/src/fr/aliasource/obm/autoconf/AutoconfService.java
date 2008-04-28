@@ -56,14 +56,20 @@ public class AutoconfService extends HttpServlet {
 					+ login);
 			return;
 		}
-
+		
+		DBConfig dbc = new DBConfig(ConstantService.getInstance(), attributeSet
+				.getAttribute("uid").getStringValue(), attributeSet
+				.getAttribute("obmDomain").getStringValue());
+		DBQueryTool dbqt = new DBQueryTool(dbc);
+		String mailHost = dbqt.getDBInformation();
+		
 		SimpleDateFormat formatter = new SimpleDateFormat(
 				"EEE, dd MMM yyyy HH:mm:ss z");
 		resp.setHeader("Expires", formatter.format(new Date()));
 		resp.setContentType("application/xml");
 
 		TemplateLoader tl = new TemplateLoader(dc);
-		tl.applyTemplate(attributeSet, resp.getOutputStream());
+		tl.applyTemplate(attributeSet, mailHost, resp.getOutputStream());
 	}
 
 }

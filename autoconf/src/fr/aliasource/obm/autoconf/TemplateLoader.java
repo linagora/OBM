@@ -23,15 +23,15 @@ public class TemplateLoader {
 		this.configXml = dc.getConfigXml();
 	}
 
-	public void applyTemplate(LDAPAttributeSet attributeSet, OutputStream out)
+	public void applyTemplate(LDAPAttributeSet attributeSet, String mailHost, OutputStream out)
 			throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(configXml));
-		generateXMLConfig(reader, out, attributeSet);
+		generateXMLConfig(reader, out, attributeSet, mailHost);
 	}
 
 	@SuppressWarnings("unchecked")
 	private void generateXMLConfig(BufferedReader reader, OutputStream out,
-			LDAPAttributeSet attributeSet) throws IOException {
+			LDAPAttributeSet attributeSet, String mailHost) throws IOException {
 
 		String line = null;
 		while ((line = reader.readLine()) != null) {
@@ -41,6 +41,7 @@ public class TemplateLoader {
 				line = line.replace("|" + att.getName() + "|", att
 						.getStringValue());
 			}
+			line = line.replace ("|mailHost|", mailHost); 
 
 			out.write(line.getBytes());
 		}
