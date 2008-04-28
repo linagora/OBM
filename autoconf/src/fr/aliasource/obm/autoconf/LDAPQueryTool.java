@@ -34,6 +34,11 @@ public class LDAPQueryTool {
 		} catch (LDAPException e) {
 			logger.error("Error finding user info", e);
 			return null;
+		} finally {
+			try {
+				ld.disconnect();
+			} catch (LDAPException e) {
+			}
 		}
 	}
 

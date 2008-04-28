@@ -1,5 +1,12 @@
 2008-04-28  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
+	Close LDAP connection.
+	
+	* src/fr/aliasource/obm/autoconf/LDAPQueryTool.java:
+	(LDAPQueryTool.getLDAPInformations):
+
+2008-04-28  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
 	Add ldap unit test
 	
 	* tests/fr/aliasource/obm/autoconf/LDAPQueryToolTests.java:
