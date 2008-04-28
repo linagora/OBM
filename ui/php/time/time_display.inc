@@ -741,8 +741,7 @@ function dis_time_form_addtask($time, $validate_days) {
 	}
 
 
-        $ch_day .= "<input type=\"checkbox\" id=\"lbl_$day\" name=\"cb_day[$dda\
-te]\" $dis_attr /><label for=\"lbl_$day\">$dlabel</label>\n";
+        $ch_day .= "<input type=\"checkbox\" id=\"lbl_$day\" name=\"cb_day[$ddate]\" $dis_attr /><label for=\"lbl_$day\">$dlabel</label>\n";
       }
     }
   }
