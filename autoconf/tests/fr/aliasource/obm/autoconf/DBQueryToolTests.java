@@ -8,6 +8,6 @@ public class DBQueryToolTests extends AutoconfTestCase {
 		DBQueryTool dqt = new DBQueryTool(dbc);
 		String mailHost = dqt.getDBInformation();
 		assertNotNull(mailHost);
-		System.out.println("mailHost :"+mailHost);
+		System.out.println("mailHost: "+mailHost);
 	}
 }
