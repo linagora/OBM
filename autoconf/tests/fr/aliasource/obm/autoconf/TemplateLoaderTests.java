@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 
 import com.novell.ldap.LDAPAttributeSet;
 
+import fr.aliasource.obm.autoconf.impl.AutoconfTestCase;
+
 public class TemplateLoaderTests extends AutoconfTestCase {
 
 	public void testApplyTemplates() {
@@ -19,7 +21,6 @@ public class TemplateLoaderTests extends AutoconfTestCase {
 			String transformed = out.toString();
 			assertNotNull(transformed);
 			System.out.println("transformed:\n" + transformed);
-			assertFalse(transformed.contains("|"));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Error should not occur");

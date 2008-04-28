@@ -1,6 +1,3 @@
-/**
- * 
- */
 package fr.aliasource.obm.autoconf;
 
 import fr.aliasource.obm.utils.ConstantService;

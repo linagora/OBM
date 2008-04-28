@@ -1,5 +1,37 @@
 2008-04-28  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
+	Add plumbing for running unit tests with a connection pool.
+	
+	* .classpath:
+	* src/fr/aliasource/obm/autoconf/DBConfig.java:
+	* test-data/db.properties.sample:
+	* tests/fr/aliasource/obm/autoconf/AutoconfTestCase.java:
+	* tests/fr/aliasource/obm/autoconf/DBQueryToolTests.java:
+	* tests/fr/aliasource/obm/autoconf/LDAPQueryToolTests.java:
+	* tests/fr/aliasource/obm/autoconf/TemplateLoaderTests.java:
+	(TemplateLoaderTests.testApplyTemplates):
+	* tests/fr/aliasource/obm/autoconf/impl/AutoconfTestCase.java:
+	(AutoconfTestCase), (AutoconfTestCase.setUp),
+	(AutoconfTestCase.tearDown):
+	* tests/fr/aliasource/obm/autoconf/impl/DataSourceEnv.java:
+	(DataSourceEnv), (DataSourceEnv.DataSourceEnv),
+	(DataSourceEnv.bindPool), (DataSourceEnv.shutdown):
+	* tests/fr/aliasource/obm/autoconf/impl/MemoryContext.java:
+	(MemoryContext), (MemoryContext.MemoryContext),
+	(MemoryContext.lookup), (MemoryContext.bind),
+	(MemoryContext.rebind), (MemoryContext.createSubcontext),
+	(MemoryContext.addToEnvironment), (MemoryContext.close),
+	(MemoryContext.composeName), (MemoryContext.destroySubcontext),
+	(MemoryContext.getEnvironment), (MemoryContext.getNameInNamespace),
+	(MemoryContext.getNameParser), (MemoryContext.list),
+	(MemoryContext.listBindings), (MemoryContext.lookupLink),
+	(MemoryContext.removeFromEnvironment), (MemoryContext.rename),
+	(MemoryContext.unbind):
+	* tests/fr/aliasource/obm/autoconf/impl/MemoryContextFactory.java:
+	(MemoryContextFactory), (MemoryContextFactory.getInitialContext):
+
+2008-04-28  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
 	Close LDAP connection.
 	
 	* src/fr/aliasource/obm/autoconf/LDAPQueryTool.java:

@@ -1,0 +1,4 @@
+url=jdbc:mysql://10.0.0.5/obm?relaxAutocommit=true&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false
+login=obm
+password=obm
+driver=com.mysql.jdbc.Driver

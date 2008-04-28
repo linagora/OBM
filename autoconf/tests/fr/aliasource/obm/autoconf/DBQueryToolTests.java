@@ -1,5 +1,7 @@
 package fr.aliasource.obm.autoconf;
 
+import fr.aliasource.obm.autoconf.impl.AutoconfTestCase;
+
 public class DBQueryToolTests extends AutoconfTestCase {
 
 	public void testQuery() {

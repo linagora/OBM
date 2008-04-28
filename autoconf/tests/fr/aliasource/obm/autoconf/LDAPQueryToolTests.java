@@ -5,6 +5,8 @@ import java.util.Iterator;
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPAttributeSet;
 
+import fr.aliasource.obm.autoconf.impl.AutoconfTestCase;
+
 public class LDAPQueryToolTests extends AutoconfTestCase {
 
 	@SuppressWarnings("unchecked")
