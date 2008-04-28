@@ -34,8 +34,7 @@ function runAutoconfiguration() {
     if ( !login ) {
       login = _displayPrompt("Demande d'identifiant",
                                "Autoconfiguration de Thunderbird." + "\n\n"
-                             + "Veuillez entrer votre adresse de messagerie" + "\n"
-                             + "(de la forme prenom.nom@...gouv.fr)");
+                             + "Veuillez entrer votre identifiant." );
     }
 
     if ( !login ) {
@@ -619,6 +618,12 @@ function _setupAccounts(aConfigurationData) {
       } else {
         _setPreference("mail.smtpserver." + server.@id + ".auth_method", 0);
       }
+
+	  if ( "@port" in server ) {
+        _setPreference("mail.smtpserver." + server.@id + ".port",
+                       server.@port.toString());
+      }
+
       if ( "@secureConnection" in server ) {
         var value;
         switch ( server.@secureConnection.toString() ) {
@@ -685,13 +690,15 @@ function _setupDirectories(aConfigurationData) {
     _setPreference("ldap_2.servers." + directory.@id + ".replication.lastChangeNumber"
                     , 0);                
     
-    //extension multi-ldap : activer l'annuaire pour l'auto-complétion
-    if ( !autoCompleteDirectories.match("ldap_2.servers." + directory.@id) ) {
-      if (autoCompleteDirectories != "") {
-        autoCompleteDirectories += ",";
-      }
-      autoCompleteDirectories += "ldap_2.servers." + directory.@id;
-    }
+	if ( "@autocomplete" in directory ) {
+		//extension multi-ldap : activer l'annuaire pour l'auto-complétion
+		if ( !autoCompleteDirectories.match("ldap_2.servers." + directory.@id) ) {
+		  if (autoCompleteDirectories != "") {
+		    autoCompleteDirectories += ",";
+		  }
+		  autoCompleteDirectories += "ldap_2.servers." + directory.@id;
+		}
+	}
     
   }
   //extension multi-ldap : activer tous les annuaires pour l'auto-complétion
