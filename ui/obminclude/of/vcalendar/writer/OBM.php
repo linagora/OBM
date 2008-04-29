@@ -17,12 +17,16 @@ class Vcalendar_Writer_OBM {
   var $repeat = array('byday','bymonthday','byyearday','byweekno','bymonth','bysetpos','wkst');
 
   var $rights;
-
-  function Vcalendar_Writer_OBM() {
+  
+  function Vcalendar_Writer_OBM($force=false) {
     $this->db = new DB_OBM;
     $this->lazyRead = true;
-    $rights = of_right_entity_for_user('calendar', $GLOBALS['obm']['uid'], 'write', '', 'userobm');
-    $this->rights = $rights['ids'];
+    if(!$force) {
+      $rights = of_right_entity_for_user('calendar', $GLOBALS['obm']['uid'], 'write', '', 'userobm');
+      $this->rights = $rights['ids'];
+    } else {
+      $this->rights = true;
+    }
   }
 
   function writeDocument(&$document) {
@@ -125,7 +129,9 @@ class Vcalendar_Writer_OBM {
   
   function insertEvent(&$vevent) {
     $data = $this->parseEventData($vevent);
-    $data['event']['owner'] = $GLOBALS['obm']['uid'];
+    if(!$this->haveAccess($data['event']['owner'])) {
+      $data['event']['owner'] = $GLOBALS['obm']['uid'];
+    }
     run_query_calendar_add_event($data['event'], $data['entities'], $id);
     $this->updateStates($data['states'], $id);
   }
@@ -134,7 +140,7 @@ class Vcalendar_Writer_OBM {
     foreach($states as $entity => $stateInfo) {
       foreach($stateInfo as $entityId => $state) {
         if(!is_null($state)) {
-          run_query_calendar_update_occurrence_state($id,$entity,$entityId,$state);
+          run_query_calendar_update_occurrence_state($id,$entity,$entityId,$state,($this->rights === true));
         }
       }
     }
@@ -179,7 +185,6 @@ class Vcalendar_Writer_OBM {
   }
 
   function addAttendee($id, &$vevent) {
-    echo "AJOUT DES PARTICIPANTS => $id";
   }
 
   function parseCategories($categories) {
@@ -281,7 +286,7 @@ class Vcalendar_Writer_OBM {
   }
 
   function haveAccess($organizer) {
-    if(in_array($organizer,$this->rights)) {
+    if($this->rights === true || in_array($organizer,$this->rights)) {
       return true;
     }
     return false;

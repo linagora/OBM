@@ -375,7 +375,7 @@ class Vcalendar_Reader_VCS {
         $state = 'R';
         break;
       case null :
-        $state = null;
+        $state = 'A';
         break;
       default :
         $state = 'W';
@@ -439,7 +439,7 @@ class Vcalendar_Reader_VCS {
     }
     if(!is_null($attendee['mail'])) {
       $this->mails[$entity][$attendee['mail']] = NULL;
-      $mail = "OR mail like '%".$attendee['mail']."%' ";
+      $mail = "OR mail like '%".addslashes($attendee['mail'])."%' ";
     }
 
     $entityTable = $this->buildEntityQuery($entity, $db);

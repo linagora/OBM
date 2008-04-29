@@ -255,14 +255,14 @@ function run_query_calendar_insert_decision($calendar) {
 //   - $user_id  : User id
 //   - $state    : New state to set (A, W or R)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state){
+function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state, $force = false){
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
 
   if ($entity_id == '') {
     $entity_id = $obm['uid'];
   }
-  if ($obm['uid'] != $entity_id || $entity != 'user') {
+  if (!$force && ($obm['uid'] != $entity_id || $entity != 'user')) {
     if ($entity == 'user') {
       $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
     } elseif ($entity == 'resource') {
@@ -675,7 +675,7 @@ function create_calendar_ics_meeting_file($calendar, $event_id, $attendees, $res
 ///////////////////////////////////////////////////////////////////////////////
 // Analyse the imported ics file
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_icalendar_insert($params) {
+function run_query_icalendar_insert($params, $force = false) {
   global $obm ;
   global $all_emails ;
   // --- get the unfolding ics
@@ -694,7 +694,7 @@ function run_query_icalendar_insert($params) {
     return false;
   }
   $document = $reader->getDocument();
-  $writer = new Vcalendar_Writer_OBM();  
+  $writer = new Vcalendar_Writer_OBM($force);  
   $writer->writeDocument($document);
   $nb_processed_event = count($document->getVevents());
   return array($nb_processed_event);
