@@ -297,12 +297,13 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setSize: function(size) {
+    hr = $(this.element.parentNode);
     this.trashExtensions();
     this.size = size - this.hidden;
     this.length = this.size;
     this.drawExtensions();
     if(obm.calendarManager.lock()) {
-      this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
+      this.setWidth(this.size * (hr.clientWidth+1) - 1);
       if(this.drag) {
         this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;
       }
@@ -314,9 +315,9 @@ Obm.CalendarDayEvent = new Class({
     hr = $(this.element.parentNode);
     this.element.setStyles({
       'top':  hr.getTop() + hr.getStyle('padding-top').toInt() + 'px',
-      'left': hr.getLeft() + 'px'
+      'left': (hr.getLeft() + (hr.clientLeft || 0)) + 'px'
     });
-    this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
+    this.setWidth(this.size * (hr.clientWidth+1) - 1);
     if(this.options.draggable) {
       this.drag.options.limit = {
         'x': [this.options.context.left,this.options.context.right - obm.calendarManager.defaultWidth],
@@ -600,7 +601,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     hr = $(this.element.parentNode);
     this.element.setStyles({
       'top':  hr.getTop() + 'px',
-      'left': hr.getLeft()  + 'px'      
+      'left': (hr.getLeft() + (hr.clientLeft || 0)) + 'px'      
     });
     this.setHeight(this.size * obm.calendarManager.defaultHeight);
     if(this.options.draggable) {
@@ -616,11 +617,15 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   },
 
   conflict: function(size, position) {
+    hr = $(this.element.parentNode);
+    var modulo       = hr.clientWidth%size;
+    var correctWidth = (modulo > position ? 1 : 0);
+    var correctPos   = (modulo > position ? position : modulo);
     if(size > 1)
-      this.setWidth(obm.calendarManager.defaultWidth/size);
+      this.setWidth(Math.floor(hr.clientWidth/size)+correctWidth);
     else
-      this.setWidth(obm.calendarManager.defaultWidth);
-    this.setMargin((obm.calendarManager.defaultWidth/size)*position);
+      this.setWidth(hr.clientWidth);
+    this.setMargin(Math.floor(hr.clientWidth/size)*position+correctPos);
   },
 
   setColor: function(color) {
