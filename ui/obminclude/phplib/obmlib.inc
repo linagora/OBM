@@ -157,7 +157,14 @@ class OBM_Challenge_Auth extends Auth {
   function auth_validatelogin() {
     global $obm, $params;
     global $c_default_domain, $c_singleNameSpace, $l_error;
-
+      
+    if(isset($params['ticket'])) {
+      $udata = $this->check_ticket_auth($params['ticket']);
+      if(!$udata) {
+        return false;
+      }
+      $params = array_merge($params,$udata);
+    }
     $login = $params["login"];
     $password = stripslashes($params['password']);
     $domain = $params["domain"];
@@ -194,7 +201,6 @@ class OBM_Challenge_Auth extends Auth {
       WHERE userobm_login = '$user_login'
         AND userobm_archive = '0'
         $where_domain";
-
     $class = $this->database_class;
     $this->db = new $class;
 
@@ -242,9 +248,30 @@ class OBM_Challenge_Auth extends Auth {
     }
 
   }
+
+  /**
+   * Check the given ticket against the OBM SSO server.
+   * If ok, get the username else return false 
+   */
+  function check_ticket_auth($ticket) {
+    $url = $GLOBALS['cgp_host']."/sso/sso_index.php?action=validate&ticket=$ticket";
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $buf = curl_exec ($ch);
+    if ( $buf === FALSE || $buf == "") {
+      return false;
+    }
+    curl_close ($ch);
+    if($buf == "invalidOBMTicket") {
+      return false;
+    }
+    parse_str($buf,$values);
+    return $values;
+  }
+
 }
-
-
 class CAS_Auth extends Auth {
 
   var $lifetime       =  0;

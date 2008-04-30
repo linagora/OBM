@@ -2610,5 +2610,24 @@ function check_user_defined_rules() {
 
   return $return;
 }
-
+if ( !function_exists('sys_get_temp_dir') ) {
+  function sys_get_temp_dir() {
+    if ( !empty($_ENV['TMP']) ) {
+      return realpath( $_ENV['TMP'] );
+    } else if ( !empty($_ENV['TMPDIR']) ) {
+      return realpath( $_ENV['TMPDIR'] );
+    } else if ( !empty($_ENV['TEMP']) ) {
+      return realpath( $_ENV['TEMP'] );
+    } else {
+      $temp_file = tempnam( md5(uniqid(rand(), TRUE)), '' );
+      if ( $temp_file)  {
+        $temp_dir = realpath( dirname($temp_file) );
+        unlink( $temp_file );
+        return $temp_dir;
+      } else {
+        return FALSE;
+      }
+    }
+  }
+}
 ?>
