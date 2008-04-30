@@ -158,8 +158,8 @@ class OBM_Challenge_Auth extends Auth {
     global $obm, $params;
     global $c_default_domain, $c_singleNameSpace, $l_error;
       
-    if(isset($params['ticket'])) {
-      $udata = $this->check_ticket_auth($params['ticket']);
+    if(isset($params['auth_ticket'])) {
+      $udata = $this->check_ticket_auth($params['auth_ticket']);
       if(!$udata) {
         return false;
       }
