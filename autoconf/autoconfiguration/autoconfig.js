@@ -19,7 +19,8 @@
 const PREF_LOGIN = "config.obm.login";
 const PREF_AUTOCONF = "config.obm.autoconfigStatus";
 
-const CONFIG_XML_URL = "http://10.73.0.11/obm-autoconf/autoconfiguration/%s";
+const CONFIG_XML_URL = "https://obm-sync.wadac.md/obm-autoconf/autoconfiguration/%s";
+//const CONFIG_XML_URL = "https://10.73.0.11/obm-autoconf/autoconfiguration/%s";
 
 const promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                                 .getService(Components.interfaces.nsIPromptService);
@@ -34,7 +35,8 @@ function runAutoconfiguration() {
     if ( !login ) {
       login = _displayPrompt("Demande d'identifiant",
                                "Autoconfiguration de Thunderbird." + "\n\n"
-                             + "Veuillez entrer votre identifiant." );
+                             + "Veuillez entrer votre adresse email." );
+	  _displayMessage("Autoconfiguration", "Quand Thunderbird s'ouvrira patientez un peu, fermez et relancez.")
     }
 
     if ( !login ) {
@@ -114,7 +116,7 @@ function _getDataHTTP(aURL) {
 
   var inputStream = channel.open();
 
-  var charset = "UTF-8";
+  var charset = "iso8859-1";
   const replacementChar = Components.interfaces.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER;
   var converterInputStream = Components.classes["@mozilla.org/intl/converter-input-stream;1"]
                                        .createInstance(Components.interfaces.nsIConverterInputStream);

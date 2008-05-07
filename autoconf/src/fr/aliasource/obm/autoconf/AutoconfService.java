@@ -17,7 +17,7 @@ import com.novell.ldap.LDAPAttributeSet;
 import fr.aliasource.obm.utils.ConstantService;
 
 /**
- * @author fritos
+ * @author nicolasl
  * 
  */
 public class AutoconfService extends HttpServlet {
@@ -62,6 +62,12 @@ public class AutoconfService extends HttpServlet {
 				.getAttribute("obmDomain").getStringValue());
 		DBQueryTool dbqt = new DBQueryTool(dbc);
 		String mailHost = dbqt.getDBInformation();
+		
+		if (mailHost == null) {
+			logger.warn("NULL information obtained from DBQueryTool for "
+					+ login);
+			return;
+		}
 		
 		SimpleDateFormat formatter = new SimpleDateFormat(
 				"EEE, dd MMM yyyy HH:mm:ss z");
