@@ -1,16 +1,17 @@
-Pour créer un installeur de Thunderbird intégrant l'autoconfiguration :
+**Création de l'installeur thunderbird avec autoconf**
 
- * éditer le fichier config.jsc.sample en config.jsc en mettant l'adresse du serveur d'autonconf
- * ouvrir l'archive de l'instatalleur standard .exe de Thunderbird avec 7-Zip
- 
- Sous 7-Zip :
- 
- * ajouter le fichier "config.jsc" du SVN dans "\nonlocalized"
- * extraire le fichier "\nonlocalized\greprefs\all.js"
- * modifier le fichier "all.js" précédemment extrait, en lui ajoutant
-    à la fin le contenu de "all.js.add" du SVN
- * dans l'archive, renommer le fichier "all.js", en "all_.js" par exemple
-   (car suppression semble non supportée sous 7-Zip)
- * ajouter le fichier "all.js" dans l'archive, dans "\nonlocalized\greprefs"
+Prérequis :
+- 7zip installé     : http://7-zip.org
 
-L'installeur .exe est prêt à être utilisé.
+Création :
+
+- éditer config.jsc pour mettre l'addresse du serveur d'autoconf
+- lancer le script add_autoconf.bat avec en paramètre
+ le path complet vers l'installeur standard de thunderbird à packager
+ (sans espaces dans le nom).
+
+Le script :
+ * extrait l'installeur
+ * concatène all.js.add à all.js pour ajouté les préférences activant l'autoconfiguration
+ * ajoute le fichier config.jsc reférencé dans le all.js contenant l'url du script d'autoconfiguration à télécharger et éxécuter.
+ * reconstruit l'archive de l'installeur
