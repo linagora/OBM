@@ -99,43 +99,63 @@ sub configure_hook {
     }
 
     # La table des BALs
-    if( $daemonOptions->{process_mailbox}->[0] =~ /^[01]$/ ) {
+    if( (defined($daemonOptions->{process_mailbox}->[0])) && ($daemonOptions->{process_mailbox}->[0] =~ /^[01]$/ )) {
         $self->{postfix_maps}->{mailbox}->{postfix_map_process} = $daemonOptions->{process_mailbox}->[0];
+    }else {
+        $self->{postfix_maps}->{mailbox}->{postfix_map_process} = 0;
     }
     if( defined($daemonOptions->{mailbox_map}->[0]) ) {
         $self->{postfix_maps}->{mailbox}->{postfix_map} = $daemonOptions->{mailbox_map}->[0];
+    }else {
+        $self->{postfix_maps}->{mailbox}->{postfix_map} = "/etc/postfix/virtual_mailbox";
     }
 
     # La table des alias
-    if( $daemonOptions->{process_alias}->[0] =~ /^[01]$/ ) {
+    if( (defined($daemonOptions->{process_alias}->[0])) && ($daemonOptions->{process_alias}->[0] =~ /^[01]$/ )) {
         $self->{postfix_maps}->{alias}->{postfix_map_process} = $daemonOptions->{process_alias}->[0];
+    }else {
+        $self->{postfix_maps}->{alias}->{postfix_map_process} = 0;
     }
     if( defined($daemonOptions->{alias_map}->[0]) ) {
         $self->{postfix_maps}->{alias}->{postfix_map} = $daemonOptions->{alias_map}->[0];
+    }else {
+        $self->{postfix_maps}->{alias}->{postfix_map} = "/etc/postfix/virtual_alias";
     }
 
     # La table de transport
-    if( $daemonOptions->{process_transport}->[0] =~ /^[01]$/ ) {
+    if( (defined($daemonOptions->{process_transport}->[0])) &&  ($daemonOptions->{process_transport}->[0] =~ /^[01]$/ )) {
         $self->{postfix_maps}->{transport}->{postfix_map_process} = $daemonOptions->{process_transport}->[0];
+    }else {
+        $self->{postfix_maps}->{transport}->{postfix_map_process} = 0;
     }
     if( defined($daemonOptions->{transport_map}->[0]) ) {
         $self->{postfix_maps}->{transport}->{postfix_map} = $daemonOptions->{transport_map}->[0];
+    }else {
+        $self->{postfix_maps}->{transport}->{postfix_map} = "/etc/postfix/transport";
     }
 
     # La table des domaines
-    if( $daemonOptions->{process_domain}->[0] =~ /^[01]$/ ) {
+    if( (defined($daemonOptions->{process_domain}->[0])) && ($daemonOptions->{process_domain}->[0] =~ /^[01]$/ )) {
         $self->{postfix_maps}->{domain}->{postfix_map_process} = $daemonOptions->{process_domain}->[0];
+    }else {
+        $self->{postfix_maps}->{domain}->{postfix_map_process} = 0;
     }
     if( defined($daemonOptions->{domain_map}->[0]) ) {
         $self->{postfix_maps}->{domain}->{postfix_map} = $daemonOptions->{domain_map}->[0];
+    }else {
+        $self->{postfix_maps}->{domain}->{postfix_map} = "/etc/postfix/virtual_domains"
     }
 
     # La table de transport SMTP
-    if( $daemonOptions->{process_transport_smtp}->[0] =~ /^[01]$/ ) {
+    if( (defined($daemonOptions->{process_transport_smtp}->[0])) && ($daemonOptions->{process_transport_smtp}->[0] =~ /^[01]$/ )) {
         $self->{postfix_maps}->{transport_smtp}->{postfix_map_process} = $daemonOptions->{process_transport_smtp}->[0];
+    }else {
+        $self->{postfix_maps}->{transport_smtp}->{postfix_map_process} = 0;
     }
     if( defined($daemonOptions->{transport_smtp_map}->[0]) ) {
         $self->{postfix_maps}->{transport_smtp}->{postfix_map} = $daemonOptions->{transport_smtp_map}->[0];
+    }else {
+        $self->{postfix_maps}->{transport_smtp}->{postfix_map} = "/etc/postfix/transport_smtp";
     }
 
     # Le script du service Cyrus
