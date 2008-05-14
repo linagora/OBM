@@ -74,4 +74,14 @@ cyrusPartition = true
 ; For new one, leave this to 'false'
 oldSidMapping = false
 
+; userMailboxDefaultFolders are IMAP folders who are automaticaly created
+; at user creation ( must be enclosed with " and in IMAP UTF-7 modified encoding)
+; Small convertion table
+; é -> &AOk-
+; è -> &AOg-
+; à -> &AOA-
+; & -> &
+; Example : userMailboxDefaultFolders = "Envoy&AOk-s,Corbeille,Brouillons,El&AOk-ments ind&AOk-sirables"
+userMailboxDefaultFolders = ""
+
 ; EOF
