@@ -29,12 +29,12 @@ START {
 SERVICES {
 	# --- Normal cyrus spool, or Murder backends ---
 	# add or remove based on preferences
-	imap		cmd="imapd -U 30" listen="imap" prefork=0 maxchild=100
-	#imaps		cmd="imapd -s -U 30" listen="imaps" prefork=0 maxchild=100
-	pop3		cmd="pop3d -U 30" listen="pop3" prefork=0 maxchild=50
-	#pop3s		cmd="pop3d -s -U 30" listen="pop3s" prefork=0 maxchild=50
-	nntp		cmd="nntpd -U 30" listen="nntp" prefork=0 maxchild=100
-	#nntps		cmd="nntpd -s -U 30" listen="nntps" prefork=0 maxchild=100
+	imap		cmd="imapd -U 30" listen="imap" prefork=0 maxchild=100 proto=tcp4
+	#imaps		cmd="imapd -s -U 30" listen="imaps" prefork=0 maxchild=100 proto=tcp4
+	pop3		cmd="pop3d -U 30" listen="pop3" prefork=0 maxchild=50 proto=tcp4
+	#pop3s		cmd="pop3d -s -U 30" listen="pop3s" prefork=0 maxchild=50 proto=tcp4
+	nntp		cmd="nntpd -U 30" listen="nntp" prefork=0 maxchild=100 proto=tcp4
+	#nntps		cmd="nntpd -s -U 30" listen="nntps" prefork=0 maxchild=100 proto=tcp4
 
 	# At least one form of LMTP is required for delivery
 	# (you must keep the Unix socket name in sync with imap.conf)
