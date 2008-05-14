@@ -597,6 +597,12 @@ sub getMailboxName {
     return $mailShareName;
 }
 
+sub getMailboxDefaultFolders {
+    my $self = shift;
+    return ();
+}    
+
+
 
 sub getMailboxPartition {
     my $self = shift;

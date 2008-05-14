@@ -1195,6 +1195,25 @@ sub getMailboxPrefix {
     return "user/";
 }
 
+sub getMailboxDefaultFolders {
+    my $self = shift;
+
+    my @folderList = ();
+    my $folderString = $userMailboxDefaultFolders;
+    # On elimine les caracteres " en debut et fin de chaine
+    $folderString =~ s/"//g;
+    &OBM::toolBox::write_log( "[Entities::obmUser]: Liste des repertoires par defaut '".$folderString."'", "W" );
+    foreach my $folder ( split( ',', $folderString ) ) {
+	if( $folder =~ m/(^[\/",]$)|(^$)/ ) {
+            &OBM::toolBox::write_log( "[Entities::obmUser]: Repertoire '".$folder."' invalide [IGNORE]", "W" );
+        }else {
+            &OBM::toolBox::write_log( "[Entities::obmUser]: Repertoire '".$folder."' [OK]", "W" );
+            push( @folderList, $folder );
+        }
+    }
+    return @folderList;
+}
+
 
 sub getMailboxSieve {
     my $self = shift;

@@ -733,7 +733,49 @@ sub _createMailbox {
         return 0;
     }
 
+
+    # On cree les repertoires par defaut si necessaire
+    if( !$self->_createMailboxDefaultFolders( $cyrusSrv, $object ) ) {
+        return 0;
+    }
+
     return $returnCode;
+}
+
+sub _createMailboxDefaultFolders {
+    my $self = shift;
+    my( $cyrusSrv, $object ) = @_;
+
+    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
+        return 0;
+    }
+    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
+    
+    if( !defined($object) ) {
+        return 0;
+    }
+
+    my $boxName = $object->getMailboxName();
+    my $boxPrefix = $object->getMailboxPrefix();
+    my $boxPartition = $object->getMailboxPartition();
+    my @boxDefaultFolders = $object->getMailboxDefaultFolders();
+
+    my $folderError = 0;
+    foreach my $folder ( @boxDefaultFolders ) {
+        my $boxFolderName = $boxName."/".$folder;
+	$cyrusSrvConn->create( $boxPrefix.$boxFolderName, $boxPartition );
+	if( $cyrusSrvConn->error() ) {
+	   &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: Erreur lors de la creation du repertoire '".$folder."'", "W" );
+	   $folderError ++;
+	}else {
+	   &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: Creation du repertoire '".$folder."' reussie", "W" );
+	}
+    }
+    if( $folderError > 0 ) {
+        return 0;
+    }else {
+        return 1;
+    }
 }
 
 
