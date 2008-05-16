@@ -7,7 +7,7 @@
 ; OBM Automate need the [global] for the perl section (beware : php is permissive)
 
 [global]
-; Information generales
+; General information
 title = OBM
 
 ; example : for https://extranet.aliasource.fr/obm/ 
@@ -30,7 +30,7 @@ password = "aliasource"
 ; Default language
 lang = fr
 
-; Modules OBM fonctionnels
+; Enabled OBM module
 obm-ldap = true
 obm-mail = true
 obm-samba = false
