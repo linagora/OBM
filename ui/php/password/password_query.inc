@@ -48,7 +48,7 @@ function run_query_password_update($password, $uid, $usr_q) {
   global $cdg_sql, $cdg_exe, $cgp_use, $cmd_ldap_passwd, $password_encryption;
 
   $login = $usr_q->f('userobm_login');
-  $domain_id = $usr_q->f('userobm_domain_id');;
+  $domain_id = $usr_q->f('userobm_domain_id');
   $samba_perms = $usr_q->f('userobm_samba_perms');
   $new_pass = stripslashes(trim($password['new_password']));
 
