@@ -34,6 +34,7 @@ group               root
 postmap_cmd         /usr/sbin/postmap
 #
 # Le type et le nom des map postfix a générer
+# Pour les directives 'process_*', 1 active la génération de la map, 0 la désactive
 # 1 ou 0 - 1 par defaut
 process_mailbox     1
 # /etc/postfix/virtual_mailbox par défaut
