@@ -11,7 +11,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER $userMailboxDefaultFolders);
+@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_regexp = qw($regexp_email $regexp_email_left $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain $regexp_login $regexp_ip);
@@ -48,8 +48,12 @@ $racineOBM = $Bin."/..";
 
 # Definition des bases de donnees
 $userDb = $cfgFile->val( 'global', 'user' );
-$cfgFile->val( 'global', 'password' ) =~ /^"(.*)"$/;
-$userPasswd = $1;
+$userPasswd = $cfgFile->val( 'global', 'password' );
+if( defined( $userPasswd ) && $userPasswd =~ /^"(.*)"$/ ) {
+    $userPasswd = $1;
+}else {
+    $userPasswd = undef;
+}
 
 # La base de travail
 #
@@ -58,7 +62,8 @@ $dbName = $cfgFile->val( 'global', 'db' );
 $db = "dbi:".lc( $cfgFile->val( 'global', 'dbtype' )).":database=$dbName;host=".$cfgFile->val( 'global', 'host' );
 
 # Mode d'espace de nom OBM
-if( lc($cfgFile->val( 'global', 'singleNameSpace' )) eq "true" ) {
+$singleNameSpace = $cfgFile->val( 'global', 'singleNameSpace' );
+if( defined( $singleNameSpace ) && lc($singleNameSpace) eq "true" ) {
     $singleNameSpace = 1;
 }else {
     $singleNameSpace = 0;
@@ -86,20 +91,28 @@ $facility_log = "local1";
 
 # Le serveur LDAP
 $ldapServer = $cfgFile->val( 'automate', 'ldapServer' );
+if( !defined($ldapServer) ) {
+    $ldapServer = "127.0.0.1";
+}
 
 # Racine LDAP de l'arbre gérée pas OBM-Ldap
 # exemple : 'aliasource,local' place l'arbre LDAP d'OBM-Ldap sous le DN: 'dc=aliasource,dc=local' 
 $ldapRoot = $cfgFile->val( 'automate', 'ldapRoot' );
+if( !defined($ldapRoot) ) {
+    $ldapRoot = "local";
+}
 
 # Le mapping des UID<->SID
-if( lc($cfgFile->val( 'automate', 'oldSidMapping' )) eq "true" ) {
+$sambaOldSidMapping = $cfgFile->val( 'automate', 'oldSidMapping' );
+if( defined($sambaOldSidMapping) && lc($sambaOldSidMapping) eq "true" ) {
     $sambaOldSidMapping = 1;
 }else {
     $sambaOldSidMapping = 0;
 }
 
 # Gestion d'une partition cyrus par domaine
-if( lc($cfgFile->val( 'automate', 'cyrusPartition' )) eq "true" ) {
+$cyrusDomainPartition = $cfgFile->val( 'automate', 'cyrusPartition' );
+if( defined( $cyrusDomainPartition ) && lc($cyrusDomainPartition) eq "true" ) {
     $cyrusDomainPartition = 1;
 }else {
     $cyrusDomainPartition = 0;
@@ -113,27 +126,31 @@ $obmModules = {
     web => 0
 };
 
-if( lc($cfgFile->val( 'global', 'obm-ldap' )) eq "true" ) {
+$obmModule = $cfgFile->val( 'global', 'obm-ldap' );
+if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
     $obmModules->{"ldap"} = 1;
 }else {
     $obmModules->{"ldap"} = 0;
 }
 
-if( lc($cfgFile->val( 'global', 'obm-mail' )) eq "true" ) {
+$obmModule = $cfgFile->val( 'global', 'obm-mail' );
+if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
     $obmModules->{"ldap"} = 1;
     $obmModules->{"mail"} = 1;
 }else {
     $obmModules->{"mail"} = 0;
 }
 
-if( lc($cfgFile->val( 'global', 'obm-samba' )) eq "true" ) {
+$obmModule = $cfgFile->val( 'global', 'obm-samba' );
+if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
     $obmModules->{"ldap"} = 1;
     $obmModules->{"samba"} = 1;
 }else {
     $obmModules->{"samba"} = 0;
 }
 
-if( lc($cfgFile->val( 'global', 'obm-web' )) eq "true" ) {
+$obmModule = $cfgFile->val( 'global', 'obm-web' );
+if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
     $obmModules->{"ldap"} = 1;
     $obmModules->{"web"} = 1;
 }else {
@@ -141,7 +158,8 @@ if( lc($cfgFile->val( 'global', 'obm-web' )) eq "true" ) {
 }
 
 # supporte-t-on le renommage de BAL utilisateur
-if( lc($cfgFile->val( 'global', 'renameUserMailbox' )) eq "true" ) {
+$renameUserMailbox = $cfgFile->val( 'global', 'renameUserMailbox' );
+if( defined( $renameUserMailbox ) && lc($renameUserMailbox) eq "true" ) {
     $renameUserMailbox = 1;
 }else {
     $renameUserMailbox = 0;
@@ -149,6 +167,19 @@ if( lc($cfgFile->val( 'global', 'renameUserMailbox' )) eq "true" ) {
 
 # Creation de repertoires a la creation de l'utilisateur
 $userMailboxDefaultFolders = $cfgFile->val( 'automate', 'userMailboxDefaultFolders' );
+if( defined( $userMailboxDefaultFolders ) && $userMailboxDefaultFolders =~ /^"(.*)"$/ ) {
+    $userMailboxDefaultFolders = $1;
+}else {
+    $userMailboxDefaultFolders = undef;
+}
+
+# Creation de repertoires a la creation de partage
+$shareMailboxDefaultFolders = $cfgFile->val( 'automate', 'shareMailboxDefaultFolders' );
+if( defined( $shareMailboxDefaultFolders ) && $shareMailboxDefaultFolders =~ /^"(.*)"$/ ) {
+    $shareMailboxDefaultFolders = $1;
+}else {
+    $shareMailboxDefaultFolders = undef;
+}
 
 # Le repertoire pere des repertoires personnels
 # Ne pas mettre le '/' de la fin du chemin

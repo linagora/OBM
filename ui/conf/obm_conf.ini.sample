@@ -84,4 +84,9 @@ oldSidMapping = false
 ; Example : userMailboxDefaultFolders = "Envoy&AOk-s,Corbeille,Brouillons,El&AOk-ments ind&AOk-sirables"
 userMailboxDefaultFolders = ""
 
+; shareMailboxDefaultFolders are IMAP folders who are automaticaly created
+; at share creation ( must be enclosed with " and in IMAP UTF-7 modified
+; encoding)
+shareMailboxDefaultFolders = ""
+
 ; EOF

@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId makeEntityEmail);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId makeEntityEmail getMailboxDefaultFolders);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -209,14 +209,33 @@ sub getEntity {
             $self->{"properties"}->{"mailShare_partition"} =~ s/-/_/g;
         }
 
+        # Gestion du quota
+        $self->{"properties"}->{"mailshare_mailbox_quota"} = $dbMailShareDesc->{"mailshare_quota"}*1024;
+
+        # Gestion des sous-répertoires de la BAL a créer
+        if( defined($shareMailboxDefaultFolders) ) {
+            foreach my $folderTree ( split( ',', $shareMailboxDefaultFolders ) ) {
+                if( $folderTree !~ /(^[",]$)|(^$)/ ) {
+                    my $folderName = $dbMailShareDesc->{"mailshare_name"};
+                    foreach my $folder ( split( '/', $folderTree ) ) {
+                        $folder =~ s/^\s+//;
+
+                        $folderName .= '/'.$folder;
+                        if( !$singleNameSpace ) {
+                            push( @{$self->{"properties"}->{mailbox_folders}}, $folderName.'@'.$domainDesc->{domain_name} );
+                        }else {
+                            push( @{$self->{"properties"}->{mailbox_folders}}, $folderName );
+                        }
+                    }
+                }
+            }
+        }
+
         # On ajoute le serveur de mail associé
         $self->{"properties"}->{"mailShare_mailLocalServer"} = "lmtp:".$localServerIp.":24";
 
         # Gestion du serveur de mail
         $self->{"properties"}->{"mailShare_server"} = $dbMailShareDesc->{"mailserver_host_id"};
-
-        # Gestion du quota
-        $self->{"properties"}->{"user_mailbox_quota"} = $dbMailShareDesc->{"mailshare_quota"}*1000;
     }
 
 
@@ -597,12 +616,6 @@ sub getMailboxName {
     return $mailShareName;
 }
 
-sub getMailboxDefaultFolders {
-    my $self = shift;
-    return ();
-}    
-
-
 
 sub getMailboxPartition {
     my $self = shift;
@@ -628,7 +641,7 @@ sub getMailboxQuota {
     my $mailShareQuota = undef;
 
     if( $self->{"properties"}->{"mailshare_mailperms"} ) {
-        $mailShareQuota = $self->{"properties"}->{"user_mailbox_quota"};
+        $mailShareQuota = $self->{"properties"}->{"mailshare_mailbox_quota"};
     }
 
     return $mailShareQuota;

@@ -728,16 +728,16 @@ sub _createMailbox {
         return 0;
     }
 
+    # On crée les répertoires par défaut si nécessaire
+    if( !$self->_createMailboxDefaultFolders( $cyrusSrv, $object ) ) {
+        return 0;
+    }
+
     # On met à jour la boîte
     if( !$self->_updateMailbox( $cyrusSrv, $object ) ) {
         return 0;
     }
 
-
-    # On cree les repertoires par defaut si necessaire
-    if( !$self->_createMailboxDefaultFolders( $cyrusSrv, $object ) ) {
-        return 0;
-    }
 
     return $returnCode;
 }
@@ -755,23 +755,28 @@ sub _createMailboxDefaultFolders {
         return 0;
     }
 
-    my $boxName = $object->getMailboxName();
+    my $boxName = $object->getMailboxName( "current" );
     my $boxPrefix = $object->getMailboxPrefix();
     my $boxPartition = $object->getMailboxPartition();
-    my @boxDefaultFolders = $object->getMailboxDefaultFolders();
+    my $boxDefaultFolders = $object->getMailboxDefaultFolders();
+
+    if( !defined($boxDefaultFolders) ) {
+        return 1;
+    }
 
     my $folderError = 0;
-    foreach my $folder ( @boxDefaultFolders ) {
-        my $boxFolderName = $boxName."/".$folder;
-	$cyrusSrvConn->create( $boxPrefix.$boxFolderName, $boxPartition );
-	if( $cyrusSrvConn->error() ) {
-	   &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: Erreur lors de la creation du repertoire '".$folder."'", "W" );
-	   $folderError ++;
-	}else {
-	   &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: Creation du repertoire '".$folder."' reussie", "W" );
-	}
+    foreach my $folder ( @{$boxDefaultFolders} ) {
+        $cyrusSrvConn->create( $boxPrefix.$folder, $boxPartition );
+
+        if( $cyrusSrvConn->error() ) {
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: Erreur lors de la creation du repertoire '".$folder."'", "W" );
+            $folderError++;
+        }else {
+            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: Creation du repertoire '".$folder."' reussie", "W" );
+        }
     }
-    if( $folderError > 0 ) {
+
+    if( $folderError ) {
         return 0;
     }else {
         return 1;

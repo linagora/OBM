@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId makeEntityEmail);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId makeEntityEmail getMailboxDefaultFolders);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -295,7 +295,7 @@ sub getEntity {
         #   valeur dans LDAP
         $self->{"properties"}->{userobm_mailbox_ldap_name} = $dbUserDesc->{userobm_login}."@".$domainDesc->{domain_name};
 
-        #   nom de la BAL Cyrus
+        # Nom de la BAL Cyrus
         # Son nouveau nom - qui peut si on ne le change pas et que la
         # BAL existe déjà, ou qu'on supprime l'entrée, être le même que
         # l'ancien
@@ -338,13 +338,32 @@ sub getEntity {
         $self->{"properties"}->{userobm_mailbox_server} = $dbUserMoreDesc->{mailserver_host_id};
 
         # Gestion du quota
-        $self->{"properties"}->{userobm_mailbox_quota} = $dbUserDesc->{userobm_mail_quota}*1000;
+        $self->{"properties"}->{userobm_mailbox_quota} = $dbUserDesc->{userobm_mail_quota}*1024;
 
-        # Gestion du message d'absence
-        $self->{"properties"}->{userobm_vacation_message} = uri_unescape($dbUserDesc->{userobm_vacation_message});
+        # Gestion des sous-répertoires de la BAL a créer
+        if( defined($userMailboxDefaultFolders) ) {
+            foreach my $folderTree ( split( ',', $userMailboxDefaultFolders ) ) {
+                if( $folderTree !~ /(^[",]$)|(^$)/ ) {
+                    my $folderName = $dbUserDesc->{userobm_login};
+                    foreach my $folder ( split( '/', $folderTree ) ) {
+                        $folder =~ s/^\s+//;
+
+                        $folderName .= '/'.$folder;
+                        if( !$singleNameSpace ) {
+                            push( @{$self->{"properties"}->{mailbox_folders}}, $folderName.'@'.$domainDesc->{domain_name} );
+                        }else {
+                            push( @{$self->{"properties"}->{mailbox_folders}}, $folderName );
+                        }
+                    }
+                }
+            }
+        }
 
         # Gestion de la livraison du courrier
         $self->{"properties"}->{userobm_mailLocalServer} = "lmtp:".$localServerIp.":24";
+
+        # Gestion du message d'absence
+        $self->{"properties"}->{userobm_vacation_message} = uri_unescape($dbUserDesc->{userobm_vacation_message});
     }
 
 
@@ -1193,25 +1212,6 @@ sub getMailboxPrefix {
     my $self = shift;
     
     return "user/";
-}
-
-sub getMailboxDefaultFolders {
-    my $self = shift;
-
-    my @folderList = ();
-    my $folderString = $userMailboxDefaultFolders;
-    # On elimine les caracteres " en debut et fin de chaine
-    $folderString =~ s/"//g;
-    &OBM::toolBox::write_log( "[Entities::obmUser]: Liste des repertoires par defaut '".$folderString."'", "W" );
-    foreach my $folder ( split( ',', $folderString ) ) {
-	if( $folder =~ m/(^[\/",]$)|(^$)/ ) {
-            &OBM::toolBox::write_log( "[Entities::obmUser]: Repertoire '".$folder."' invalide [IGNORE]", "W" );
-        }else {
-            &OBM::toolBox::write_log( "[Entities::obmUser]: Repertoire '".$folder."' [OK]", "W" );
-            push( @folderList, $folder );
-        }
-    }
-    return @folderList;
 }
 
 

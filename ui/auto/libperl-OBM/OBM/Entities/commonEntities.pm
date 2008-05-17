@@ -20,6 +20,7 @@ $VERSION = "1.0";
                     isLinks
                     getEntityId
                     makeEntityEmail
+                    getMailboxDefaultFolders
                );
 
 
@@ -118,4 +119,12 @@ sub makeEntityEmail {
     }
 
     return $totalEmails;
+}
+
+
+sub getMailboxDefaultFolders {
+    my $self = shift;
+    my $entryProp = $self->{"properties"};
+
+    return $self->{"properties"}->{mailbox_folders};
 }
