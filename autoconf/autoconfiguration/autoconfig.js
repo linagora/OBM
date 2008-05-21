@@ -56,6 +56,7 @@ function runAutoconfiguration() {
                                          + "impossible de contacter l'annuaire" + "\n"
                                          + "   ou" + "\n"
                                          + "pas d'adresse correspondante dans l'annuaire.");
+		_setPreference(PREF_LOGIN, "");
         return;
       }
 
