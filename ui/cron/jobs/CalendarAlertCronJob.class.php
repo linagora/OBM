@@ -74,7 +74,7 @@ class CalendarAlertCronJob extends CronJob{
                         of_date_format(), date("H:i")
                         ,$GLOBALS['cgp_host']
                      ),
-        "recipents" => array_keys($event->attendee["user"]),
+        "recipents" => array_unique(array_keys($event->attendee["user"])),
         "owner" => $event->owner
 
       );

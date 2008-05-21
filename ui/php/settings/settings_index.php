@@ -339,7 +339,7 @@ if ($cgp_show['module']['calendar']) {
   $dis_hour_b .= "</select>"; 
 
   $dis_hour_e = "<select name=\"cal_last_hour\" style=\"width:4em;\">";
-  for ($current_hour=0; $current_hour<24; $current_hour++) {
+  for ($current_hour=1; $current_hour<=24; $current_hour++) {
     if ($current_hour == $_SESSION['set_cal_last_hour']) {
       $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
     } else {

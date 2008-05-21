@@ -17,7 +17,7 @@ class Vcalendar_Writer_OBM {
   var $repeat = array('byday','bymonthday','byyearday','byweekno','bymonth','bysetpos','wkst');
 
   var $rights;
-  
+
   function Vcalendar_Writer_OBM($force=false) {
     $this->db = new DB_OBM;
     $this->lazyRead = true;

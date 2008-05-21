@@ -291,10 +291,12 @@ function html_group_search_group($obm_q, $prefs, $group) {
     $ext_url = $group['ext_url'];
     $ext_target = $group['ext_target'];
     $ext_widget = $group['ext_widget'];
+    $ext_widget_text = $group['ext_widget_text'];
     $ext_id = $group['ext_id'];
     $ext_element = $group['ext_element'];
     $ext_title = urlencode(stripslashes($group['ext_title']));
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_titled&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;child_res=$child_res";
+    $restriction_calendar = $group['restriction_calendar'];
+    $url_ext = "&amp;restriction_calendar=$restriction_calendar&amp;popup=1&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_titled&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;child_res=$child_res";
   }
 
   $name = urlencode(stripslashes($group['name']));

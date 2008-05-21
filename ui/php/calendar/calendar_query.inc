@@ -258,7 +258,6 @@ function run_query_calendar_insert_decision($calendar) {
 function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state, $force = false){
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
-
   if ($entity_id == '') {
     $entity_id = $obm['uid'];
   }
@@ -3867,7 +3866,7 @@ function run_query_calendar_reset($id) {
             AND evententity_state != 'R'";
   $obm_q->query($query);
   while($obm_q->next_record()) {
-    run_query_calendar_update_occurrence_state($obm_q->f('calendarevent_id'), 'user', $id, 'R');
+    run_query_calendar_update_occurrence_state($obm_q->f('evententity_event_id'), 'user', $id, 'R');
   }
   # Delete all alerts
 

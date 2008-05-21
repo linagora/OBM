@@ -363,7 +363,6 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field="") {
       <fieldset class=\"detail extra\">
       <legend>$l_admin_permission : <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" /></legend>
       <input type=\"hidden\" name=\"sel_accept_admin[]\" value=\"data-user-$obm[uid]\" />
-      <input type=\"hidden\" name=\"sel_read_public\" value=\"1\" />
       <div id=\"sel_accept_admin\">     
       </div>
       </fieldset>";
