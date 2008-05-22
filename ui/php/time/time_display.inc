@@ -511,15 +511,14 @@ function dis_time_user_planning($obm_q, $time) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display TimeManager User search Form
-// Parameters:
-//   - $time[] : default form values
-//   - $usr_q  : DBO : UserObm list
-//   - $multi  : if false, mono select else select multi
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display TimeManager User search Form
+ * @param $time[] default form values
+ * @param $usr_q  DBO : UserObm list
+ * @param $multi if false, mono select else select multi
+ **/
 function dis_user_select($time, $usr_q, $multi=false) {
-  global $l_see, $l_user, $l_all;
+  global $l_see, $l_user, $l_all, $c_all;
 
   $sel_user_ids = $time['user_ids'];
 
@@ -570,14 +569,103 @@ function dis_user_select($time, $usr_q, $multi=false) {
     </fieldset>
     <fieldset class=\"buttons\">
       <input type=\"hidden\" name=\"date\" value=\"".$time['date']."\" />
-        <input type=\"hidden\" name=\"action\" value=\"$act\" />
-        <input type=\"submit\" name=\"submit\" value=\"$l_see\" />
-        $dis_button_all
+      <input type=\"hidden\" name=\"group_id\" value=\"$c_all\" />
+      <input type=\"hidden\" name=\"action\" value=\"$act\" />
+      <input type=\"submit\" name=\"submit\" value=\"$l_see\" />
+      $dis_button_all
     </fieldset>
     </form>
     </div>
 ";
 
+  return $block;
+}
+
+
+/**
+ * Display TimeManager Group selection Form
+ * @param $time[] default form values
+ * @param $usr_q  DBO : UserObm list
+ * @param $multi if false, mono select else select multi
+ **/
+function dis_time_group_select($time, $groups, $multi=false) {
+  global $path, $c_all, $ico_add, $l_time, $l_group;
+  global $l_select_group, $l_public_group_members, $l_private_group_members;
+
+  $iso_date = $time['date'];
+  $sel_group_id = $time['group_id'];
+
+  // Define the action to follow
+  if ($time['action'] == 'stats')
+    $action = 'stats';
+  else if ($time['action'] == 'viewmonth')
+    $action = 'viewmonth';
+  else 
+    $action = 'index';
+
+  // private group Select
+  if ($sel_group_id == $c_all) {
+    $sel_group = "<option selected=\"selected\">$l_select_group</option>";
+  } else {
+    $sel_group = "<option value=\"time_index.php?action=$action&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_select_group</option>";
+  }
+  $selected = false;
+  foreach ($groups as $g_id => $one_group) {
+    $gname = $one_group['name'];
+    if ($g_id == $sel_group_id) {
+      $selected = " selected=\"selected\"";
+    } else {
+      $selected = '';
+    }
+    $sel_group .= "\n<option value=\"time_index.php?action=$action&amp;sel_group_id=$g_id&amp;date=$iso_date\" $selected>$gname</option>";
+  }
+
+  if (($sel_group_id > 0) && ($sel_group_id != $c_all)) {
+    $g_public_name = get_last_group_text($sel_group_id);
+  } 
+
+  $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;ext_action=$action&amp;ext_url=".urlencode($path.'/time/time_index.php')."&amp;ext_target=$l_time&amp;iso_date=$iso_date";
+  $group_add_button = "
+    <a href=\"javascript: return false;\" 
+    onclick=\"popup('$url_group', '');
+  return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>";
+
+  $block = "
+  <div class=\"portlet\" id=\"userSelection\">
+    <h1>$l_group</h1>
+    <div>
+
+    <form name=\"f_entity_group\" action=\"\" onsubmit=\"return false;\">
+    <fieldset class=\"detail extra\">
+    <legend>$l_private_group_members</legend>
+    <select name=\"action\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+    $sel_group
+    </select>
+    </fieldset>
+    <fieldset class=\"detail extra\">
+    <legend>$l_public_group_members $group_add_button</legend>
+    <input type=\"text\" name=\"group_name\" value=\"$g_public_name\" id=\"group_name\" autocomplete=\"off\" />
+    <input type=\"hidden\" name=\"ext_group_id\" id=\"ext_group_id\" />
+    </fieldset>
+    </form>
+    </div>
+  </div>
+
+  <script type=\"text/javascript\">
+    obm.vars.images.update = '$ico_group';
+    obm.initialize.chain(function () {
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {mode: 'mono',
+        locked: 'true', resetable: 'true', selectfunction:'sel_public_group(\"$iso_date\", element, \"$action\")'});
+    });
+  </script>    
+";
+
+
+
+
+
+  
+  
   return $block;
 }
 
@@ -872,16 +960,14 @@ function dis_time_form_addtask($time, $validate_days) {
     $dis_button .= "
        <input type=\"hidden\" name=\"date\" value=\"".$time['date']."\" />
        <input type=\"hidden\" name=\"task_id\" value=\"$task_id\" />
-       <input type=\"submit\" value=\"$l_update\" />
-      ";
+       <input type=\"submit\" value=\"$l_update\" />";
 
     // Script that prefill values (only if tasktype has project and tasks)
     if ($is_proj > 0) {
       $dis_select_defaults = "
         fill_projecttask(document.f_add_task.sel_projecttask, \"$is_proj\");
         select_default(document.f_add_task.sel_project, $is_proj);
-        select_default(document.f_add_task.sel_projecttask, \"$is_projtask\");
-";
+        select_default(document.f_add_task.sel_projecttask, \"$is_projtask\");";
     }
     $dis_script .= "
       <input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />
@@ -990,8 +1076,8 @@ function dis_time_month_users_total($time) {
 //   - 
 ///////////////////////////////////////////////////////////////////////////////
 function html_time_month_users_total($time, $array_res) {
-  global  $c_working_days, $c_day_fraction;
-  global $l_see, $l_fill, $l_valid, $l_unvalid, $l_admin_valid;
+  global $c_working_days, $c_day_fraction;
+  global $l_user, $l_total, $l_see, $l_fill, $l_valid, $l_unvalid, $l_admin_valid;
   global $ico_update,$ico_nok,$ico_ok;
 
   $date = $time['date'];
@@ -1039,13 +1125,18 @@ function html_time_month_users_total($time, $array_res) {
   }
 
   $block = "
-
-   <h1>$l_admin_valid</h1>
-    <table class=\"spreadSheet\">
-    <tbody>
+  <h1>$l_admin_valid</h1>
+  <table class=\"spreadSheet\">
+  <thead>
+    <tr>
+    <th><a href=\"time_index.php?action=globalview&amp;date=$date&amp;order=user\">$l_user</th>
+    <th><a href=\"time_index.php?action=globalview&amp;date=$date&amp;order=activity\">$l_total</th>
+    </tr>
+  </thead>
+  <tbody>
     $dis_months
-    </tbody>
-    </table>";
+  </tbody>
+  </table>";
 
   return $block;
 }

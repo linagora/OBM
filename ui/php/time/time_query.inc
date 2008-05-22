@@ -633,6 +633,7 @@ function run_query_time_adminunvalidate($time) {
   return $obm_db; 
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Short month query (gets the total of task length for each user this month)
 //   - $time[]    :    time search criteria
@@ -652,21 +653,27 @@ function run_query_time_short_month($time) {
   $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
   $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
+  if ($time['order'] == 'activity') {
+    $order = 'total_length';
+  } else {
+    $order = 'userobm_lastname, userobm_firstname';
+  }
+
   $query = "
-    select
+    SELECT
       userobm_lastname,
       userobm_firstname,
       sum(timetask_length) as total_length,
       timetask_user_id as userid,
       min(timetask_status) as status
-    from TimeTask, UserObm
-    where timetask_date >= '$month_begin' 
-      and timetask_date <= '$month_end'
-      and timetask_user_id = userobm_id
-    group by userobm_lastname,
+    FROM TimeTask, UserObm
+    WHERE timetask_date >= '$month_begin' 
+      AND timetask_date <= '$month_end'
+      AND timetask_user_id = userobm_id
+    GROUP BY userobm_lastname,
              userobm_firstname,
              timetask_user_id
-    order by userobm_lastname, userobm_firstname
+    ORDER BY $order
 ";
   
   display_debug_msg($query, $cdg_sql, 'run_query_time_short_month');
@@ -743,7 +750,11 @@ function run_query_time_user_month_planning($time) {
   $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
   $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
-  $uid_tab = '('.implode(',',$time['user_ids']).')';
+  if ((is_array($time['user_ids'])) && (count($time['user_ids']) > 0)) {
+    $uid_tab = '('.implode(',',$time['user_ids']).')';
+  } else {
+    $uid_tab = '(0)';
+  }
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;

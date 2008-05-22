@@ -43,6 +43,9 @@ function check_group_get_id(valeur,text) {
       if ('$params[restriction_calendar]' == 'calendar') {
         window.opener.location=('../calendar/calendar_index.php?date=$params[date]&group_id='+valeur+'&new_group=1');
       }
+      if ('$params[ext_target]' == '$l_time') {
+        window.opener.location=('../time/time_index.php?action=$params[ext_action]&date=$params[date]&group_id='+valeur);
+      }
       window.close();
       return true;
     }

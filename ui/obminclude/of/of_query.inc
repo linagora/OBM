@@ -1638,14 +1638,41 @@ function get_entity_info($id, $entity) {
 //--- User and group global functions ---------------------------------------//
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Get users infos from the uid array given
-// Used by: agenda, todo
-// Parameters:
-//   - users : array of users id
-// Returns:
-//   array [ids], [entity] (label=>)
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Get private group list for one user
+ * @param user id
+ * @return array group [ids], [name] (label=>)
+ **/
+function get_private_groups($user_id) {
+  global $cdg_sql;
+
+  if ($user_id > 0) {
+    $query = "SELECT *
+    FROM UGroup
+    WHERE group_usercreate = '$user_id'
+      AND group_privacy = '1'";
+    display_debug_msg($query, $cdg_sql, 'get_private_groups(user_id)');
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    while ($obm_q->next_record()) {
+      $id = $obm_q->f('group_id');
+      $name = $obm_q->f('group_name');
+      $res[$id] = array('name' => "$name");
+    }
+  } else {
+    $res = '';
+  }
+
+  return $res;
+}
+
+
+/**
+ * Get users infos from the uid array given
+ * Used by: agenda, todo
+ * @param users : array of users id
+ * @return array [ids], [entity] (label=>)
+ **/
 function get_userobm_from_ids($users) {
   global $cdg_sql;
 

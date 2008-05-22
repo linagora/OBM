@@ -168,9 +168,11 @@ function html_group_search_form ($group) {
   }
 
   if ($group['restriction_calendar'] == "calendar") {
-    $iso_date = $group["iso_date"];
-    $cal_res = "<input type=\"hidden\" name=\"restriction_calendar\" value=\"calendar\" />
-                <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />";
+    $cal_res = "<input type=\"hidden\" name=\"restriction_calendar\" value=\"calendar\" />";
+  }
+  if (isset($group['iso_date'])) {
+    $iso_date = $group['iso_date'];
+    $date_res = "<input type=\"hidden\" name=\"date\" value=\"$iso_date\" />";
   }
   if ($popup) {
     $ext_action = $group['ext_action'];
@@ -233,6 +235,7 @@ function html_group_search_form ($group) {
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $child_res
       $cal_res
+      $date_res
       $ext
     </label>
     <p class=\"CL\" />

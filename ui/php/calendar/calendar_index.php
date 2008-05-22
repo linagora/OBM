@@ -50,7 +50,7 @@ if (isset($params['cal_view'])) {
 } elseif (isset($_SESSION['cal_view'])){
   $cal_view = $_SESSION['cal_view'];
 } else {
-  $cal_view = "agenda";
+  $cal_view = 'agenda';
 }
 if (isset($params['cal_range'])) {
   $cal_range = $params['cal_range'];
@@ -69,7 +69,6 @@ define('RFC2445_FOLDED_LINE_LENGTH', 75);
 $ics_event_priority_to_obm = array(1 => 3, 2 => 3, 3 => 3, 4 => 2, 5 => 2, 6 => 2, 7 => 1, 8 => 1, 9 => 1) ;
 ///////////////////////////////////////////////////////////////////////////////
 
-
 $extra_css[] = $css_calendar;
 $extra_js_include[] = 'calendar.js';
 $extra_js_include[] = 'colorpicker.js';
@@ -83,7 +82,6 @@ require_once("$obminclude/of/of_category.inc");
 get_calendar_action();
 update_calendar_action();
 $perm->check_permissions($module, $action);
-
 
 page_close();
 

@@ -11,6 +11,13 @@
 require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
+
+function sel_public_group(date, element, action) {
+  var item_id = element.getProperty('id').split('-');
+  var id = item_id[item_id.length - 1];
+  window.location=('time_index.php?action='+action+'&date='+date+'&group_id='+id);
+}
+
 function confirm_del() {
   if (confirm (\"$l_delete_confirm\"))
     return true;

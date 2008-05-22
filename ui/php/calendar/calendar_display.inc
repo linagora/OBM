@@ -20,16 +20,16 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   global $display, $path, $ccalendar_max_users, $obm;
   global $l_module_calendar;
 
-  $group_view = $calendar["entity"]["group_view"];
+  $group_view = $calendar['entity']['group_view'];
   $entity_readable = get_calendar_entity_readable();
   $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users, $entity_readable);
 
   $sel_entity_id = $visible_entities_id;
   // we restore the selected group for session storage
-  $sel_entity_id["group_view"] = $group_view;
+  $sel_entity_id['group_view'] = $group_view;
 
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
-  $writable_entity = of_right_entity_for_user("calendar", $obm["uid"], "write", "", "userobm");
+  $writable_entity = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
   $my_views = run_query_calendar_get_my_views();
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view;
   
@@ -156,10 +156,10 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
   global $l_calendar_displayed, $l_resource_displayed,$c_all,$l_event_color_tt;
   global $action,$ico_delete,$output_target,$l_color,$l_users,$l_events;
-  // Legend
+
   $iso_date = $calendar['date'];
   global $mono_user;
-  if(count($calendar_entity) == 1 && is_array($calendar_entity['user'])
+  if (count($calendar_entity) == 1 && is_array($calendar_entity['user'])
      && count($calendar_entity['user']) == 1) {
     $colorTemplate = 'event';
     $tooltip = $l_event_color_tt;
@@ -246,7 +246,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   $category_filter = $calendar['category_filter'];
   $group_privacy = $calendar['group_privacy'];
 
-  //-- Group selection
+  //-- Private Group selection
   if ($this_group == $c_all) {
     $sel_group = "<option selected=\"selected\">$l_select_group</option>";
   } else {
@@ -268,10 +268,10 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   }
   $sel_group .= '</select>';
 
-  if ($this_group != $c_all && empty($selected_s)){
+  if ($this_group != $c_all && empty($selected_s)) {
     $g_public_name = get_last_group_text($this_group);
   } 
-  //-- End Group selection
+  //-- End private Group selection
 
   // loop through ['user'], ['resource']
   foreach ($calendar_entity as $type => $entity) {

@@ -85,7 +85,6 @@ $l_user_calendar		= "vista multi utente";
 $l_go_to			= "vai a";
 $l_go				= "vai";
 $l_repeat_update		= "modifica i legami a questo appuntamento";
-$l_calendar_select_group	= "scegli il gruppo";
 $l_sendamail			= "&#232; richiesta notifica email";
 $l_force			= "forzatura";
 $l_carac			= "catatteristiche";

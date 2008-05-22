@@ -36,11 +36,11 @@ $l_label = "Label";
 $l_duration = "Durée";
 
 $l_searchtime_display = "Options d'affichage des listes de tâches";
-$total_menu="Récapitulatifs";
-$total_tasks="Total par taches";
-$total_companies="Total par société";
-$total_projects="Total par projet/affaire";
-$l_pdf_settings="Paramètrage du PDF";
+$total_menu = "Récapitulatifs";
+$total_tasks = "Total par taches";
+$total_companies = "Total par société";
+$total_projects = "Total par projet/affaire";
+$l_pdf_settings = "Paramètrage du PDF";
 
 // short names for days
 $l_daysofweekshort = array (	'Dim',

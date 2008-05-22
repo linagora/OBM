@@ -135,6 +135,10 @@ $l_local = "Local";
 $l_ext_id = "Id ext";
 $l_manager = "Responsable";
 $l_project_manager = "Chef de projet";
+$l_select_group = "Choisir groupe";
+$l_group_members = "Membres du groupe";
+$l_private_group_members = "Mes groupes";
+$l_public_group_members = "Groupes publics";
 $l_member = "Participant";
 $l_attendee = "Participant";
 $l_relation = "Relation";
@@ -168,7 +172,7 @@ $l_received = "Reçu";
 $l_emitted = "Emis";
 $l_recursive = "Récursif";
 $l_hour = "Heure";
-$l_type ="Type";
+$l_type = "Type";
 
 // Profiles
 $l_perm_admin = "Admin";
