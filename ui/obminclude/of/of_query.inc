@@ -1792,7 +1792,7 @@ function get_user_info($id='') {
  * @return array | string
  */
 function get_entity_email($mail=null, $domain=null, $first_only=true, $separator=', ', $id=null, $entity='user') {
-  global $obm, $cgp_use;
+  global $obm;
   if(is_null($mail)) {
     if(is_null($id)) {
       return false;

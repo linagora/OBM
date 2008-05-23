@@ -870,7 +870,7 @@ function run_query_time_ra_projects($time) {
       AND projectuser_projecttask_id = projecttask_id
       AND projecttask_project_id = project_id
       AND projectuser_user_id = '$uid'
-      AND projectuser_projectedtime != '0'
+      AND projectuser_missingtime != '0'
       AND project_id IN ($projs)
       ORDER BY project_id, project_tasktype_id, company_name, project_name";
 
@@ -954,7 +954,7 @@ function run_query_time_project($time) {
       AND projectuser_projecttask_id = projecttask_id
       AND projecttask_project_id = project_id
       AND projectuser_user_id = '$uid'
-      AND projectuser_projectedtime != '0'
+      AND projectuser_missingtime != '0'
       ORDER BY project_tasktype_id, project_shortname, company_name, project_name";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_project');
@@ -997,7 +997,7 @@ function run_query_time_projecttask($time) {
        ProjectUser
     WHERE projectuser_projecttask_id = a.projecttask_id
       AND projectuser_user_id = $uid
-      AND projectuser_projectedtime != 0
+      AND projectuser_missingtime != 0
       ORDER BY a.projecttask_project_id, a.projecttask_parenttask_id, a.projecttask_label";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_projecttask');

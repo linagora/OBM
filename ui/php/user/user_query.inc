@@ -1959,7 +1959,7 @@ function check_user_can_delete($params) {
 //   - $user_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_delete_profile($user_id)  {
-  global $cdg_sql, $l_attendee;
+  global $cdg_sql, $l_attendee, $obm;
 
   $now = date('Y-m-d H:i:s');
   $obm_q = new DB_OBM;
@@ -2026,7 +2026,10 @@ function run_query_user_delete_profile($user_id)  {
           AND evententity_entity_id = '$user_id')";
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
   $obm_q->query($query);
-
+  
+  $query = "UPDATE CalendarEvent SET calendarevent_owner = $obm[uid] WHERE calendarevent_owner = $user_id";
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
+  $obm_q->query($query);
   // Remove all User event participation
   $query = "DELETE FROM EventEntity
     WHERE evententity_entity = 'user'
