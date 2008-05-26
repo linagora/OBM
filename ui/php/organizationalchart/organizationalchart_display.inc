@@ -832,8 +832,8 @@ function dis_organizationalchart_export_ldif($organizationalchart) {
     $file = fopen($tmpfname, "r");
     header("Content-Type: application/octet-stream") ;
     header("Content-Disposition: attachment; filename=\"$filename\";") ;
-    header("Cache-Control:" ) ;
-    header("Cache-Control: must-revalidate, pre-check=0, post-check=0, max-age=0" ) ;
+    header("Cache-Control: maxage=3600");
+    header('Pragma: public');
     fpassthru($file) ;
     fclose($file) ;
 
@@ -923,8 +923,8 @@ function organizationalchart_export_svg($organizationalchart, $view) {
       $file = fopen($tmpfname, "r");
       header("Content-Type: application/octet-stream") ;
       header("Content-Disposition: attachment; filename=\"$oc_name.svg\";") ;
-      header("Cache-Control:" ) ;
-      header("Cache-Control: must-revalidate, pre-check=0, post-check=0, max-age=0" ) ;
+      header("Cache-Control: maxage=3600");
+      header('Pragma: public');
       fpassthru($file) ;
       fclose($file) ;
 
