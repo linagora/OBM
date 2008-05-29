@@ -17,7 +17,7 @@ public class TemplateLoaderTests extends AutoconfTestCase {
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			tl.applyTemplate(las, "mailhost",  out);
+			tl.applyTemplate(las, "imapMailhost", "smtpMailHost", "ldapHost",  out);
 			String transformed = out.toString();
 			assertNotNull(transformed);
 			System.out.println("transformed:\n" + transformed);

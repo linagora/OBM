@@ -75,6 +75,11 @@
 			</manifest>
 		</jar>
 
+		<!-- Context -->
+		<copy todir="${dist}/WEB-INF">
+			<fileset dir="." includes="obm-autoconf.xml" />
+		</copy>
+
 		<!-- Move classes to WEB-INF/lib -->
 		<copy todir="${dist}/WEB-INF/lib">
 			<fileset dir="${main.classes}" includes="*.jar" />
@@ -104,6 +109,11 @@
 		<!-- XPI -->
 		<copy todir="${dist}/xpi">
 			<fileset dir="autoconfiguration/xpi" includes="*.xpi" />
+		</copy>
+		
+		<!-- Certificates -->
+		<copy todir="${dist}/certificates">
+			<fileset dir="autoconfiguration/certificates" includes="*.crt" />
 		</copy>
 
 	</target>

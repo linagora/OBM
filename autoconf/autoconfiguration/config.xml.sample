@@ -14,63 +14,78 @@
 
   <!-- IDENTITÉS -->
   <identities>
-    <identity id="identite-x"
-              smtpServer="serveur-smtp-x"
+    <identity id="identite-sga"
+              smtpServer="serveur-smtp-sga"
               fullName="|cn|"
               fromAddress="|mail|"
-              draftFolder="imap://|mailBox|@|mailHost|/Drafts"
-              draftFolder_pickerMode="0"
-              stationeryFolder="imap://|mailBox|@|mailHost|/Templates"
-              stationeryFolder_pickerMode="0"
-              fccFolder="imap://|mailBox|@|mailHost|/Sent"
-              fccFolder_pickerMode="0"
-              autocompleteDirectory="serveur-ldap-x"/>
+              draftFolder="imap://|mailBox|@|imapMailHost|/Brouillons"
+              draftFolder_pickerMode="1"
+              fccFolder="imap://|mailBox|@|imapMailHost|/Envoy&amp;AOk-s"
+              fccFolder_pickerMode="1"
+              autocompleteDirectory="serveur-ldap-sga"/>
   </identities>
 
   <!-- SERVEURS -->
   <servers>
-    <server id="serveur-courrier-x"
+    <server id="serveur-courrier-sga"
             type="imap"
             label="|cn|"
             username="|mailBox|"
-            hostname="|mailHost|"
+            hostname="|imapMailHost|"
             port="143"
             secureConnection="tls"
-            trashFolder="Trash"
-            secureAuthentication="false"/>
-    <server id="serveur-smtp-x"
+            trashFolder="Corbeille"
+            secureAuthentication="false"
+            downloadBodies="true"
+            offlineDownload="true"/>
+    <server id="serveur-smtp-sga"
             type="smtp"
-            label="Serveur SMTP X"
+            label="Serveur Smtp SGA"
             username="|mailBox|"
-            hostname="|mailHost|"
-            port="25"
-            secureConnection="tls"/>
+            hostname="|smtpMailHost|"
+            port="465"
+            secureConnection="ssl"/>
   </servers>
 
   <!-- COMPTES -->
-  <accounts defaultAccount="compte-x">
-    <account id="compte-x"
-             identities="identite-x"
-             server="serveur-courrier-x"/>
+  <accounts defaultAccount="compte-sga">
+    <account id="compte-sga"
+             identities="identite-sga"
+             server="serveur-courrier-sga"/>
   </accounts>
 
   <!-- ANNUAIRES -->
   <directories>
+	
+	<directory id="ldap-annuaire-dsn"
+		label="Annuaire de la DSN"
+		uri="ldap://ldap.sga.defense.gouv.fr:389/dc=dsn,dc=defense,dc=gouv,dc=fr??sub?(objectclass=*)"/>
 
-    <directory id="serveur-ldap-groupes-publics"
-               label="Listes locales"
-               uri="ldap://|mailHost|:389/ou=groups,dc=|mailHost|,dc=xxxxx,dc=fr??sub?(objectclass=*)"/> <!-- LDAP -->
+	<directory id="ldap-annuaire-annudef"
+		label="Annuaire de la Défense"
+		uri="ldap://annudef.sga.defense.gouv.fr:389/dc=defense,dc=gouv,dc=fr??sub?(objectclass=*)"/>
+
+	<directory id="ldap-contacts-publics"
+		label="Melamel - Contacts publics"
+		uri="ldap://|ldapHost|:389/ou=contacts,dc=defense.gouv.fr,dc=local??sub?(&amp;(objectClass=*)(mail=*))"
+		autocomplete="true"/>
+
+	<directory id="ldap-annuaire-mel"
+		label="Annuaire Melamel"
+		uri="ldap://|ldapHost|:389/dc=defense.gouv.fr,dc=local??sub?(&amp;(|(objectclass=obmMailShare)(objectClass=obmUser)(objectClass=obmGroup))(mail=*))"
+		autocomplete="true"/>
+
+<!--
+	<directory id="ldap-maia"
+		label="MAIA"
+		uri="ldap://annuaire.ader.gouv.fr:389/??sub?(objectclass=*)"/>
+-->		
   </directories>
 
   <!-- PREFERENCES -->
   <preferences>
 
 	<!-- Global Preferences  -->
-		<!-- login de l'utilisateur -->
-		<preference type="string"
-		            name="config.obm.login"
-		            value="|mailBox|"
-		            set="user"/> <!-- LDAP -->
 
 		<!-- désactiver le service de mise à jour intégré pour l'application -->
 		<preference type="boolean"
@@ -92,86 +107,154 @@
 		            value="http://server/thunderbird.html"
 		            set="user"/>       
 	-->
+		<!-- Toujours afficher l'état du quota-->
+		<preference type="integer"
+		            name="mail.quota.mainwindow_threshold.show"
+		            value="1"
+		            set="user"/>
 		
+		<!--Use 'Collected addresses' in replace of 'Personnal Adresses' for collecting addresses-->		
+		<preference type="string"
+					name="mail.collect_addressbook"
+					value="moz-abmdbdirectory://history.mab"
+					set="user"/>
+		
+		<!--Donwload messages for ofline use -->
+		<preference type="string"
+				          name="spellchecker.dictionary"
+				          value="fr-FR"
+				          set="user"/>
 
     <!-- Installed extensions preferences -->
-		<!-- Extension spellchecker -->
-	<!--	<preference type="string"
-		            name="spellchecker.dictionary"
-		            value="fr-FR"
-		            set="user"/>
--->
-		<!-- URL du serveur Web OBM -->
-	<!--	<preference type="string"
-		            name="config.obm.server"
-		            value="https://|mailHost|/"
-		            set="user"/>
-	-->
-		<!-- URL de connection au service Web d'OBM-Sync -->
-		<preference type="string"
-		            name="extensions.obm.server"
-		            value="https://|mailHost|:8443/obm-sync/services"
-		            set="user"/> <!-- LDAP -->
+			<!-- Extension spellchecker -->
+			<preference type="string"
+				          name="spellchecker.dictionary"
+				          value="fr-FR"
+				          set="user"/>
+		
+			<!-- Extensions minimize to tray -->
+			<preference type="boolean"
+				          name="extensions.minimizetotray.always"
+				          value="true"
+				          set="user"/>
+			<preference type="boolean"
+				          name="extensions.minimizetotray.minimize-on-close"
+				          value="true"
+				          set="user"/>
+			<preference type="boolean"
+				          name="extensions.minimizetotray.two-click-restore"
+				          value="false"
+				          set="user"/>
+			<preference type="boolean"
+				          name="extensions.minimizetotray.with-windows"
+				          value="true"
+				          set="user"/>
+
+			<!-- URL de connection au service Web d'melamel-sync -->
+			<preference type="string"
+				          name="extensions.obm.server"
+				          value="https://melamel-sync.sga.defense.gouv.fr/obm/services"
+				          set="user"/>
+		
+			<!-- URL de connection à OBM Web -->
+			<preference type="string"
+				          name="config.sga.obmUrl"
+				          value="https://melamel.sga.defense.gouv.fr"
+				          set="user"/>
+
+			<!-- login de l'utilisateur -->
+			<preference type="string"
+				          name="config.sga.login"
+				          value="|mailBox|"
+				          set="user"/>
+			
+			<!-- Lighning synchronisation automatique de l'agenda en minutes -->
+			<preference type="boolean"
+				          name="calendar.autorefresh.enabled"
+				          value="true"
+				          set="user"/>
+			<preference type="integer"
+				          name="calendar.autorefresh.timeout"
+				          value="10"
+				          set="user"/>
 		
   </preferences>
 
   <!-- EXTENSIONS -->
   <extensions>
-    <!-- Dictionnaire -->
- <!--   <extension id="fr-FR@dictionaries.addons.mozilla.org"
-               src="autoconfHost/xpi/dictionnaire-francais_1.6.xpi"
-               name="Dictionnaire MySpell en Français"
+
+    <!-- Minimize To Tray -->
+    <extension id="{31513E58-F253-47ad-86DB-D5F21E905429}"
+               src="https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/xpi/minimizetotray-0.0.1.2006102615+-fx+zm+sb+tb.xpi"
+               version="0.0.1">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+ 
+	<!-- Minimize To Tray Enhancer -->
+    <extension id="{de1b245c-de57-11da-ba2d-0050c2490048}"
+               src="https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/xpi/minimize_to_tray_enhancer-0.7.5.3-fx+tb+sb.xpi"
+               version="0.7.5.3">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+ 
+	<!-- Multi LDAP-->
+    <extension id="multildap@milimail.org"
+               src="https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/xpi/multi_ldap-0.2.5.0.xpi"
+               version="0.2.5.0">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+	
+	<!-- Smart Save -->
+	<extension id="{031984cf-187c-40a2-bc8c-3ca45ccdb3e8}"
+               src="https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/xpi/smartsave_thunderbird_extension-0.1.5.2-tb.xpi"
+               version="0.1.5.2">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+ 
+	<!-- Dictionnaire Fr -->
+    <extension id="fr-FR@dictionaries.addons.mozilla.org"
+               src="https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/xpi/dictionnaire_myspell_en_fran__ais-1.6-fx+tb+sm.xpi"
                version="1.6">
-      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
-                         minVersion="2.0a1"
-                         maxVersion="2.0.0.*"/>
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
     </extension>
--->
-    <!-- Lightning (Thunderbird, Windows) -->
-<!--    <extension id="{e2fda1a4-762b-4020-b5ad-a41df1933103}"
-               src="autoconfHost/xpi/lightning_0.5.win32.xpi"
-               version="0.5">
-      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
-                         minVersion="1.5"
-                         maxVersion="2.0.*"/>
-      <targetPlatform name="WINNT_x86-msvc"/>
-    </extension>
--->
-    <!-- Lightning (Thunderbird, Linux) -->
-   <!-- <extension id="{e2fda1a4-762b-4020-b5ad-a41df1933103}"
-               src="autoconfHost/xpi/lightning_0.5.linux-i686.xpi"
-               version="0.5">
-      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
-                         minVersion="1.5"
-                         maxVersion="2.0.*"/>
-      <targetPlatform name="Linux_x86-gcc3"/>
-    </extension>
--->
 
-    <!-- Connecteur OBM -->
+	<!-- Lightning windows -->
+    <extension id="{e2fda1a4-762b-4020-b5ad-a41df1933103}"
+               src="https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/xpi/lightning-0.7.win32.xpi"
+               version="0.7">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+			   <targetPlatform name="WINNT_x86-msvc"/>
+    </extension>
+
+	<!-- Connecteur OBM -->
     <extension id="obm-mozilla-calendar@aliasource.fr"
-               src="http://localhost/xpi/obm-extension.xpi"
-               version="2.1.5">
-      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
-                         minVersion="1.5"
-                         maxVersion="2.0.*"/>
+               src="https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/xpi/obm-mozilla-calendar-sga_2.1.5.1.xpi"
+               version="2.1.5.1">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
     </extension>
 
-    <!-- Extension multi-ldap -->
- <!--   <extension id="multildap@milimail.org"
-               src="autoconfHost/xpi/multi_ldap-0.2.4.0.xpi"
-               version="0.2.4.0">
-      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
-                         minVersion="2.0"
-                         maxVersion="2.0.*"/>
-    </extension>
--->
   </extensions>
 
   <!-- CERTIFICATS -->
-  <!--<certificates>
-    <certificate src="autoconfHost/ac-racine.crt"
-                 md5Fingerprint="25:44:35:56:18:E4:EF:65:02:25:99:C6:4E:17:00:38"/>
+  <certificates>
+    <certificate src="https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/certificates/IGCG_ACD_METROPOLE_MINDEF.crt"
+                 sha1Fingerprint="23:04:5A:97:EB:C8:EF:D7:75:ED:10:D2:3E:E0:33:3D:C4:01:CA:6B"/>
+    <certificate src="https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/certificates/IGCG_ACR_MINDEF.crt"
+                 sha1Fingerprint="C8:27:B7:2F:7B:F3:19:3E:58:22:6B:32:85:C2:E1:F5:81:66:60:09"/>
   </certificates>
 -->
   <!-- PROXYS -->

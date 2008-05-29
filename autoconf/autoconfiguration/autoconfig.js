@@ -19,28 +19,36 @@
 const PREF_LOGIN = "config.obm.login";
 const PREF_AUTOCONF = "config.obm.autoconfigStatus";
 
-const CONFIG_XML_URL = "https://obm-sync.wadac.md/obm-autoconf/autoconfiguration/%s";
-//const CONFIG_XML_URL = "https://10.73.0.11/obm-autoconf/autoconfiguration/%s";
+const CONFIG_XML_URL = "https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/autoconfiguration/%s";
 
 const promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                                 .getService(Components.interfaces.nsIPromptService);
+                                
+const appStartup = Components.interfaces.nsIAppStartup;
+const appStartupService = Components.classes["@mozilla.org/toolkit/app-startup;1"]
+            										.getService(appStartup);
 
 runAutoconfiguration();
 
 function runAutoconfiguration() {
   try {
-    var login = _getPreference(PREF_LOGIN);
+    var login = _getPreference(PREF_LOGIN,"");
     var autoconfStatus = _getPreference(PREF_AUTOCONF, null);
     
-    if ( !login ) {
+    while ( login == "" ) {
       login = _displayPrompt("Demande d'identifiant",
                                "Autoconfiguration de Thunderbird." + "\n\n"
                              + "Veuillez entrer votre adresse email." );
-	  _displayMessage("Autoconfiguration", "Quand Thunderbird s'ouvrira patientez un peu, fermez et relancez.")
+      if (login == null) {
+      	//user canceled
+      	appStartupService.quit(appStartup.eForceQuit);
+        return;
+      }
+      _displayMessage("Autoconfiguration", "Quand Thunderbird s'ouvrira patientez un peu, fermez et relancez.");
     }
 
     if ( !login ) {
-      // code APE inconnu et l'utilisateur ne l'a pas renseigné
+      // utilisateur inconnu ou login non renseigné
       // -> autoconfiguration avortée
       _setPreference(PREF_AUTOCONF, autoconfStatus == null ? 0 : 1);
       return;
@@ -56,8 +64,9 @@ function runAutoconfiguration() {
                                          + "impossible de contacter l'annuaire" + "\n"
                                          + "   ou" + "\n"
                                          + "pas d'adresse correspondante dans l'annuaire.");
-		_setPreference(PREF_LOGIN, "");
-        return;
+				_setPreference(PREF_LOGIN, "");
+				appStartupService.quit(appStartup.eForceQuit);
+				return;
       }
 
       var configurationData = configurationXML;
@@ -65,6 +74,8 @@ function runAutoconfiguration() {
          configurationData = new XML(configurationData.replace(/<\?xml .*\?>/, ""));
       } catch (e) {
          _displayError("Autoconfiguration", "Fichier XML de configuration non valide.");
+         _setPreference(PREF_LOGIN, "");
+         appStartupService.quit(appStartup.eForceQuit);
          return;
       }
       
@@ -103,9 +114,13 @@ function _displayMessage(title, text) {
 }
 
 function _displayPrompt(title, text) {
-  var input = { value: null };
-  promptService.prompt(null, title, text, input, null, {});
-  return input.value;
+  var input = { value: "" };
+  if (promptService.prompt(null, title, text, input, null, {}) ) {
+  	return input.value;
+  } else {
+  	//cancel pressed
+  	return null;
+  }
 }
 
 // effectue une requête HTTP (générique)
@@ -596,8 +611,18 @@ function _setupAccounts(aConfigurationData) {
 
       if ( "@trashFolder" in server ) {
         _setPreference("mail.server." + server.@id + ".trash_folder_name",
-                       server.@trashFolder.toString());
-      }      
+                       server.@trashFolder.toString().replace("@","%40"));
+      }
+      
+      if ( "@downloadBodies" in server ) {
+      	_setPreference("mail.server." + server.@id + ".download_bodies_on_get_new_mail",
+      								server.@downloadBodies == "true" ? true : false);
+      }
+      
+      if ( "@offlineDownload" in server ) {
+      	_setPreference("mail.server." + server.@id + ".offline_download",
+      								server.@offlineDownload == "true" ? true : false);
+      }
   }
 
   var addedServers = [];

@@ -61,21 +61,32 @@ public class AutoconfService extends HttpServlet {
 				.getAttribute("uid").getStringValue(), attributeSet
 				.getAttribute("obmDomain").getStringValue());
 		DBQueryTool dbqt = new DBQueryTool(dbc);
-		String mailHost = dbqt.getDBInformation();
+		String hostIp = dbqt.getDBInformation();
 		
-		if (mailHost == null) {
+		if (hostIp == null) {
 			logger.warn("NULL information obtained from DBQueryTool for "
 					+ login);
 			return;
 		}
-		
+
+		// map host ip with imap host and smtp host
+		String hosts = ConstantService.getInstance().getStringValue(hostIp);
+
+		if (hosts == null || hosts.isEmpty() || !(hosts.split(",").length == 3)) {
+			logger.warn("No hosts found for  " + login);
+			return;
+		}
+		String imapMailHost = hosts.split(",")[0];
+		String smtpMailHost = hosts.split(",")[1];
+		String ldapHost = hosts.split(",")[2];
+
 		SimpleDateFormat formatter = new SimpleDateFormat(
 				"EEE, dd MMM yyyy HH:mm:ss z");
 		resp.setHeader("Expires", formatter.format(new Date()));
 		resp.setContentType("application/xml");
 
 		TemplateLoader tl = new TemplateLoader(dc);
-		tl.applyTemplate(attributeSet, mailHost, resp.getOutputStream());
+		tl.applyTemplate(attributeSet, imapMailHost, smtpMailHost, ldapHost, resp.getOutputStream());
 	}
 
 }
