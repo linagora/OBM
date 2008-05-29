@@ -222,7 +222,7 @@ NEW RENDEZVOUS
 ------------------------------------------------------------------
 
 You are invited to participate to a rendezvous from %s to %s,
-and wich subjecti is %s (location : %s).
+and which subject is %s (location : %s).
 
 
 :: More information about this rendezvous : 
