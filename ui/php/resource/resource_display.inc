@@ -115,7 +115,7 @@ function html_resource_search_form($resource) {
     action=\"". url_prepare("resource_index.php")."\" class=\"search\">
 
     <label>$l_name<br />
-      <input type=\"text\" name=\"tf_name\" size=\"30\" maxlength=\"120\"
+      <input type=\"text\" name=\"tf_name\" size=\"30\" maxlength=\"32\"
       value=\"$lname\" />
     </label>
     <label>$l_desc<br />
@@ -333,7 +333,7 @@ function html_resource_form($usr_q, $resource) {
     <table>
     <tr>
       <th>$l_name</th>
-      <td><input id=\"tf_name\" name=\"tf_name\" size=\"40\" maxlength=\"120\" value=\"$name\" /></td>
+      <td><input id=\"tf_name\" name=\"tf_name\" size=\"40\" maxlength=\"32\" value=\"$name\" /></td>
     </tr><tr>
       <th>$l_rtype</th>
       <td>$block_resourcetype</td>

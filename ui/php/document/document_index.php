@@ -52,7 +52,6 @@ $display["detail"] = html_document_tree($params, $params["ext_disp_file"]);
 
     if ($doc_q->num_rows() == 1) {
       dis_document_file($doc_q);
-      exit();
     }
   } else {
     $display["msg"] .= display_err_msg("$l_no_document !");

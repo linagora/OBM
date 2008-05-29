@@ -118,6 +118,8 @@ function run_query_company_search($company) {
 
   if (($where != '') || ($where_name != '')) {
     $whereq = " WHERE $where_name $where $multidomain";
+  } else {
+    $whereq = " WHERE 1=1 AND $multidomain";
   }
 
   // ORDER construction

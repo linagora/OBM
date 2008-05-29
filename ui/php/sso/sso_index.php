@@ -29,7 +29,9 @@ if($action == "ticket") {
 
 if ($action == "validate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $udata = run_query_validate($_REQUEST["ticket"]);
+  if($_REQUEST['ticket']) {
+    $udata = run_query_validate($_REQUEST["ticket"]);
+  }
   if(is_array($udata)) {
     echo "login=$udata[login]&password=$udata[password]";
   } else {

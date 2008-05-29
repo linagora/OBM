@@ -293,6 +293,7 @@ $cgp_use['service']['network'] = false;
 if ($cgp_use['service']['ldap'] == false) {
   $cgp_use['service']['mail'] = false;
   $cgp_use['service']['samba'] = false;
+  $cgp_show['module']['tools'] = false;
 }
 
 if ($cgp_use['service']['mail'] == false) {

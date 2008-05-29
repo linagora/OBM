@@ -3138,7 +3138,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $frequency_block = sprintf($GLOBALS['l_'.$repeat_kind.'_unit'], "<input type=\"text\" size=\"4\" style=\"width:3em;\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />");
   } else {
     $repeatDisplay = 'none';
-    $frequency_block = "<input type=\"text\" size=\"4\" style=\"width:3em;\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />";
+    $frequency_block = "<input type=\"text\" size=\"4\" style=\"width:3em;\" id=\"tf_repeatfrequency\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />";
   }
   if (isset($calendar['task_id'])) { $t_id = $calendar['task_id']; }
   if (isset($calendar['task_name'])) { $t_name = stripslashes($calendar['task_name']); }
@@ -3609,14 +3609,14 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <tr>
     <th>$l_datebegin</th>
     <td>
-      <input type=\"text\" name=\"tf_date_begin\" value=\"$datebegin\" class=\"datePicker\" onchange=\"this.form.tf_date_end.value=this.value\"/>
+      <input type=\"text\" name=\"tf_date_begin\" id=\"tf_date_begin\" value=\"$datebegin\" class=\"datePicker\" onchange=\"this.form.tf_date_end.value=this.value\"/>
       <span id=\"hour_begin\" style=\"$style\" class=\"NW\">$l_hour : $dis_hour_b : $dis_min_b</span>
     </td>
   </tr>
   <tr>
     <th>$l_dateend</th>
     <td>
-      <input type=\"text\" name=\"tf_date_end\" value=\"$dateend\" class=\"datePicker\" />
+      <input type=\"text\" name=\"tf_date_end\" id=\"tf_date_end\" value=\"$dateend\" class=\"datePicker\" />
       <span id=\"hour_end\" style=\"$style\"  class=\"NW\">$l_hour : $dis_hour_e : $dis_min_e</span>
     </td>       
   </tr>
@@ -3644,7 +3644,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <tr id=\"repeatEnd\" style=\"display:$repeatDisplay\">    
     <th>$l_date_repeatend</th> 
     <td>
-      <input type=\"text\" name=\"tf_repeat_end\" value=\"$repeat_end\" class=\"datePicker\" />
+      <input type=\"text\" name=\"tf_repeat_end\" id=\"tf_repeat_end\" value=\"$repeat_end\" class=\"datePicker\" />
     </td>
   </tr>
   <tr id=\"repeatDays\" style=\"display:$repeatDaysDisplay\">  

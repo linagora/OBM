@@ -990,7 +990,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
 	  target=\"_blank\" >
 	  ".$info["name"]."
 	 </a>
-  }";
+  ";
   }
   $content.= "
 	</td>
@@ -1104,7 +1104,7 @@ function display_document_popup_tree($tree,$current_directory,$name,$indent) {
 // Consult File
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_file($doc_q) {
-  global $cdoc_kind_link;
+  global $cdoc_kind_link, $display,$l_no_document;
 
   $name = $doc_q->f("document_name");  
   $kind = $doc_q->f("document_kind");
@@ -1122,12 +1122,21 @@ function dis_document_file($doc_q) {
     $disk_fullname = $disk_path . $id; 
 
     // Else Document is a file, we send the file
-    $handle = fopen ($disk_fullname, "r");
-    header("Content-Type: $mime");
-    header("Content-Disposition: inline; filename=$name");
-    echo fread($handle, filesize ($disk_fullname));
-    fclose ($handle); 
-  
+    
+    if(file_exists($disk_fullname))$handle = fopen ($disk_fullname, "r");
+    if($handle) {
+      header("Content-Type: $mime");
+      header("Content-Disposition: inline; filename=".addslashes(str_replace(" ", "_", $name)));
+      
+      while ( !feof($handle) ) {
+        echo fread($handle, 4096);
+        ob_flush();
+      } 
+      fclose ($handle); 
+      exit();
+    } else {
+      $display["msg"] .= display_err_msg($l_no_document); 
+    }
   }
 
 }

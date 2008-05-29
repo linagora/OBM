@@ -120,23 +120,59 @@ function repeat_form(value) {
     case 'daily' : 
       showRepeatBlockDisplay('".phpStringToJsString($l_daily_unit)."');
       $('repeatDays').setStyle('display','none');
+      var dateEnd = getFieldDate($('tf_date_end').value); 
+      var repeatEnd = getFieldDate($('tf_repeat_end').value);
+      var interval = parseInt($('tf_repeatfrequency').value);
+      dateEnd.setDate(dateEnd.getDate() + interval);
+      if(repeatEnd < dateEnd) {
+        $('tf_repeat_end').value = getDateString(dateEnd);
+      } 
       break;           
     case 'weekly' :
       showRepeatBlockDisplay('".phpStringToJsString($l_weekly_unit)."');
       $('repeatDays').setStyle('display','');
+      var dateEnd = getFieldDate($('tf_date_end').value); 
+      var repeatEnd = getFieldDate($('tf_repeat_end').value);
+      var interval = parseInt($('tf_repeatfrequency').value) * 7;
+      dateEnd.setDate(dateEnd.getDate() + interval);
+      if(repeatEnd < dateEnd) {
+        $('tf_repeat_end').value = getDateString(dateEnd);
+      }       
       break;            
      case 'monthlybydate' :
       showRepeatBlockDisplay('".phpStringToJsString($l_monthlybydate_unit)."');
       $('repeatDays').setStyle('display','none');
+      var dateEnd = getFieldDate($('tf_date_end').value); 
+      var repeatEnd = getFieldDate($('tf_repeat_end').value);
+      var interval = parseInt($('tf_repeatfrequency').value) * 31;
+      dateEnd.setDate(dateEnd.getDate() + interval);
+      if(repeatEnd < dateEnd) {
+        $('tf_repeat_end').value = getDateString(dateEnd);
+      }       
       break;      
     case 'monthlybyday' : 
       showRepeatBlockDisplay('".phpStringToJsString($l_monthlybyday_unit)."');
       $('repeatDays').setStyle('display','none');
+      var dateEnd = getFieldDate($('tf_date_end').value); 
+      var repeatEnd = getFieldDate($('tf_repeat_end').value);
+      var interval = parseInt($('tf_repeatfrequency').value) * 31;
+      dateEnd.setDate(dateEnd.getDate() + interval);
+      if(repeatEnd < dateEnd) {
+        dateEnd.setDate(dateEnd.getDate() + interval);
+        $('tf_repeat_end').value = getDateString(dateEnd);
+      }       
       break;
     case 'yearly' : 
       $('repeatFrequency').setStyle('display','');
       showRepeatBlockDisplay('".phpStringToJsString($l_yearly_unit)."');
       $('repeatDays').setStyle('display','none');
+      var dateEnd = getFieldDate($('tf_date_end').value);
+      var repeatEnd = getFieldDate($('tf_repeat_end').value);
+      var interval = parseInt($('tf_repeatfrequency').value) * 366;
+      dateEnd.setDate(dateEnd.getDate() + interval);
+      if(repeatEnd < dateEnd) {
+        $('tf_repeat_end').value = getDateString(dateEnd);
+      }       
       break;
       
   }

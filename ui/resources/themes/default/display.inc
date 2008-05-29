@@ -125,7 +125,7 @@ function display_menu($module) {
   $display['todo'] = display_todos();
   $display['action'] = display_actions($section, $module);
   $update_state = get_update_state($domain_id);
-  if (($update_state) && ($perm->check_right('tools', $cright_write_admin))) {
+  if (($update_state) && $cgp_show['module']['tools'] && ($perm->check_right('tools', $cright_write_admin))) {
     $dis_scope = "<li><a href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
   }
   if ($display['print_url'] != "") {
