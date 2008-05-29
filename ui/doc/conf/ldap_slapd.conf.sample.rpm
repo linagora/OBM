@@ -8,11 +8,11 @@
 #allow bind_v2
 
 # Schema and objectClass definitions
-include         /etc/ldap/schema/core.schema
-include         /etc/ldap/schema/cosine.schema
-include         /etc/ldap/schema/nis.schema
-include         /etc/ldap/schema/inetorgperson.schema
-include         /etc/ldap/schema/obm.schema
+include         /etc/openldap/schema/core.schema
+include         /etc/openldap/schema/cosine.schema
+include         /etc/openldap/schema/nis.schema
+include         /etc/openldap/schema/inetorgperson.schema
+include         /etc/openldap/schema/obm.schema
 #include        /etc/ldap/schema/samba.schema
 
 # Where the pid file is put. The init.d script
@@ -26,8 +26,8 @@ argsfile        /var/run/openldap/slapd.args
 loglevel        0
 
 # Where the dynamically loaded modules are stored
-modulepath	/usr/lib/openldap
-moduleload	back_bdb.la
+#modulepath	/usr/lib/openldap
+#moduleload	back_bdb.la
 #module pour syncrepl en MASTER
 #moduleload  syncprov
 
