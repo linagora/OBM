@@ -195,7 +195,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   $inout = $invoice['inout'];
   $tt = $invoice['tt'];
   $deal_id = $invoice['deal_id'];
-  $company = $invoice['company'];
+  $company = stripslashes($invoice['company']);
   $comp_id = $invoice['company_id'];
   $project_new_id = $invoice['project_id'];
   $archive = ($invoice['archive']) ? 'checked' : '' ;
@@ -221,10 +221,10 @@ function html_invoice_search_form($invoice, $sta, $tts) {
     $rb_both = 'checked';
   }
   if ($inout == '+') {
-    $rb_client = ' checked ';
+    $rb_customer = ' checked ';
   }
   if ($inout == '-') {
-    $rb_four = ' checked ';
+    $rb_supplier = ' checked ';
   }
 
   if (($credit_memo == "$c_all") || ($credit_memo == '')) {
@@ -309,11 +309,11 @@ function html_invoice_search_form($invoice, $sta, $tts) {
       $l_both &nbsp;
     </label>
     <label><br />
-      <input type=\"radio\" name=\"rd_inout\" value=\"+\" $rb_client />
+      <input type=\"radio\" name=\"rd_inout\" value=\"+\" $rb_customer />
       $l_client &nbsp;
     </label>
     <label><br />
-      <input type=\"radio\" name=\"rd_inout\" value=\"-\" $rb_four />
+      <input type=\"radio\" name=\"rd_inout\" value=\"-\" $rb_supplier />
       $l_supplier &nbsp;
     </label>
 
@@ -408,7 +408,7 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
   $date_field = ($invoice['date_field'] ? $invoice['date_field'] : 'date');
   $date_after = of_date_upd_format($invoice['date_after'], true);
   $date_before = of_date_upd_format($invoice['date_before'], true);
-  $inout = $invoice['inout'];
+  $inout = urlencode($invoice['inout']);
   $credit_memo = $invoice['credit_memo'];
   $company = urlencode($invoice['company']);
   $archive = $invoice['archive'];
@@ -1051,7 +1051,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
 
   <table>
   <tr>
-    <th>$l_company</th>
+    <th class=\"$class[company]\">$l_company</th>
     <td>
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id") . "\">
       $c_name
@@ -1063,7 +1063,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
       <input type=\"text\" size=\"32\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
   </tr><tr>
-    <th>$l_deal</th>
+    <th class=\"$class[deal]\">$l_deal</th>
     <td>
       <a href=\"". url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$d_id") . "\">
       $d_label
@@ -1075,7 +1075,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
       <input type=\"text\" size=\"32\" name=\"deal_new_label\" value=\"$d_new_label\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
   </tr><tr>
-    <th>$l_project</th>
+    <th class=\"$class[project]\">$l_project</th>
     <td>
       <a href=\"". url_prepare("$path/project/project_index.php?action=detailconsult&amp;project_id=$d_id") . "\">
       $p_name
@@ -1101,30 +1101,30 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
 
   <table>
   <tr>
-    <th>$l_label</th>
+    <th class=\"$class[label]\">$l_label</th>
     <td>
       <input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" />
     </td>
   </tr><tr>
-    <th>$l_number</th>
+    <th class=\"$class[number]\">$l_number</th>
     <td>
       <input name=\"tf_number\" type=\"text\" size=\"11\" value=\"$number\" />
     </td>
   </tr><tr>
-    <th>$l_archive</th>
+    <th class=\"$class[archive]\">$l_archive</th>
     <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
   </tr><tr>
-    <th>$l_date</th>
+    <th class=\"$class[date]\">$l_date</th>
     <td>
       <input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>
     </td>
   </tr><tr>
-    <th>$l_expiration_date</th>
+    <th class=\"$class[expiration_date]\">$l_expiration_date</th>
     <td>
       <input type=\"text\" name=\"tf_expiration_date\" value=\"$expiration_date\" class=\"datePicker\"/>
     </td>
   </tr><tr>
-    <th>$l_payment_date</th>
+    <th class=\"$class[payment_date]\">$l_payment_date</th>
     <td>
     <input type=\"text\" name=\"tf_payment_date\" value=\"$payment_date\" class=\"datePicker\"/>
     </td>
@@ -1134,15 +1134,15 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
     <td>$sel_status</td>
   </tr>
   <tr>
-    <th>$l_amount_ht</th>
+    <th class=\"$class[amount_ht]\">$l_amount_ht</th>
     <td>
       <input name=\"tf_amount_ht\" type=\"text\" size=\"15\" value=\"$ht\" onChange=\"compute_tax(this.form, true);\" />
     </td>
   </tr><tr>
-    <th>$l_tax_rate</th>
+    <th class=\"$class[tax_rate]\">$l_tax_rate</th>
     <td>$sel_tax</td>
   </tr><tr>
-    <th>$l_amount_ttc</th>
+    <th class=\"$class[amount_ttc]\">$l_amount_ttc</th>
     <td>
       <input name=\"tf_amount_ttc\" type=\"text\" size=\"15\" value=\"$ttc\" />
     </td>

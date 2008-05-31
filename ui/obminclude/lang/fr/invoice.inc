@@ -30,7 +30,7 @@ $l_select_invoice = "Sélectionner la facture";
 // Invoice status
 $l_invoicestatus_tocreate = 'A Créer';
 $l_invoicestatus_sent = 'Envoyée';
-$l_invoicestatus_dailly = 'Dailly';
+$l_invoicestatus_received = 'Reçue';
 $l_invoicestatus_ppaid = 'Partiellement Payée';
 $l_invoicestatus_paid = 'Payée';
 $l_invoicestatus_conflict = 'En conflit';
@@ -89,8 +89,9 @@ $l_fill_amount = "Les montants doivent être correctement renseignés !";
 $l_error_number_exist = "Ce numéro de facture est déjà attribué !";
 
 $l_err_paid_status = "La facture a été payée, l'état doit être à '$l_invoicestatus_paid' !";
-$l_err_ppaid_status = "La facture a été partiellement payée, l'état doit être à '$l_invoicestatus_ppaid', '$l_invoicestatus_dailly' ou '$l_invoicestatus_conflict' !";
+$l_err_ppaid_status = "La facture a été partiellement payée, l'état doit être à '$l_invoicestatus_ppaid' ou '$l_invoicestatus_conflict' !";
 $l_err_no_payment_status = "La facture n'a pas de paiement, l'état ne peut être '$l_invoicestatus_paid' ou '$l_invoicestatus_ppaid' !";
+$l_err_status_received_customer = "L'état $l_invoicestatus_received n'est pas valide pour les factures de type $l_client !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_check_number = "\\nLe Numéro de la Facture n'est pas valide !";

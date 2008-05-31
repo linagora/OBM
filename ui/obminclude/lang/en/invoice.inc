@@ -31,7 +31,7 @@ $l_select_invoice = "Select the invoice";
 // Invoice status
 $l_invoicestatus_tocreate = 'To create';
 $l_invoicestatus_sent = 'Sent';
-$l_invoicestatus_dailly = 'Dailly';
+$l_invoicestatus_received = 'Received';
 $l_invoicestatus_ppaid = 'Partially paid';
 $l_invoicestatus_paid = 'Paid';
 $l_invoicestatus_conflict = 'Conflict';
@@ -75,8 +75,9 @@ $l_fill_amount = "Tha amounts must be correctly filled !";
 $l_error_number_exist = "This invoice number is already used !";
 
 $l_err_paid_status = "The invoice has been paid, status must be '$l_invoicestatus_paid' !";
-$l_err_ppaid_status = "The invoice has been partially paid, status must be '$l_invoicestatus_ppaid', '$l_invoicestatus_dailly' or '$l_invoicestatus_conflict' !";
+$l_err_ppaid_status = "The invoice has been partially paid, status must be '$l_invoicestatus_ppaid', '$l_invoicestatus_received' or '$l_invoicestatus_conflict' !";
 $l_err_no_payment_status = "The invoice has no payments, status can't be '$l_invoicestatus_paid' or '$l_invoicestatus_ppaid' !";
+$l_err_status_received_customer = "The invoice status $l_invoicestatus_received is not valide for $l_client invoices !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_check_number = "\\nThe invoice number is not valid!";

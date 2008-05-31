@@ -1974,7 +1974,7 @@ function run_query_user_delete_profile($user_id)  {
   // Delete all the user private groups
   $query = "DELETE FROM UGroup
     WHERE group_usercreate='$user_id'
-      AND group_privacy != '0'"; 
+      AND group_privacy != '0'";
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Group)');
   $obm_q->query($query);
 

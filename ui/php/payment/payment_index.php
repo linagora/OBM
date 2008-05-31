@@ -7,9 +7,9 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$path = "..";
-$module = "payment";
-$obminclude = getenv("OBM_INCLUDE_VAR");
+$path = '..';
+$module = 'payment';
+$obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/global.inc");
 $params = get_payment_params();
@@ -394,13 +394,13 @@ function update_payment_action() {
   if ($id > 0) {
 
     $p = get_payment_info($id);
-    
+    print_r($p);
     // Detail Consult
     $actions["payment"]["detailconsult"]["Url"] = "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id";
     $actions["payment"]["detailconsult"]['Condition'][] = 'insert';
 
     // Sel invoice : Invoice selection (menu)
-    $actions["payment"]["sel_invoice"]["Url"] = "$path/invoice/invoice_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice_id=")."&amp;ext_id=$id&amp;ext_target=$l_payment&amp;company=$p[company]";
+    $actions["payment"]["sel_invoice"]["Url"] = "$path/invoice/invoice_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice_id=")."&amp;ext_id=$id&amp;ext_target=$l_payment&amp;company=".urlencode($p['company']);
     $actions["payment"]["sel_invoice"]['Condition'][] = 'insert';
 
     // Invoice

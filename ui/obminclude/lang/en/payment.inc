@@ -21,6 +21,7 @@ $l_pick_account = "choose an account";
 $l_payment_account = "Account ";
 $l_paid = "Paid";
 $l_unpaid = "Not Paid";
+$l_already_paid = "Already paid";
 
 // invoice
 $l_no_invoice = "No invoices related to this payment";
@@ -46,11 +47,13 @@ $l_duplicate = "Duplicate that Payment";
 
 // Messages 
 $l_no_display = "Fill the search fields and press < Find > to retrieve the payments";
-$l_found="payments found.";
-$l_no_found="No payment corresponding to your query";
+$l_found = "payments found.";
+$l_no_found = "No payment corresponding to your query";
 $l_no_invoices_connected = "No Invoices connected to that Payment";
 $l_cant_delete = "The payment can't be deleted !";
 $l_can_delete = "The payment can be deleted.";
+$l_invoice_added = "The connection with the invoice has been created";
+$l_no_invoice_added = "The connection with the invoice has failed !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_no_number = "\\nThe payment number is not valid!";

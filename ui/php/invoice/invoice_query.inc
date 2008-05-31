@@ -749,7 +749,7 @@ function check_invoice_data_form($id, $invoice) {
   global $l_fill_inout, $l_fill_amount, $l_fill_date, $l_date, $l_invalid_date;
   global $l_expiration_date, $l_payment_date;
   global $l_err_paid_status, $l_err_ppaid_status, $l_err_no_payment_status;
-  global $err, $l_exist_error, $cinv_status;
+  global $err, $l_exist_error, $cinv_status, $l_err_status_received_customer;
 
   $label = $invoice['label'];
   $number = $invoice['number'];
@@ -771,12 +771,14 @@ function check_invoice_data_form($id, $invoice) {
   // MANDATORY: Invoice label
   if (trim($label) == '') {
     $err['msg'] = $l_fill_label;
+    $err['field'] = 'label';
     return false;
   }
 
   // MANDATORY: Invoice inout must be set
   if (($inout != '+') && ($inout != '-')) {
     $err['msg'] = $l_fill_inout;
+    $err['field'] = 'inout';
     return false;
   }
 
@@ -785,11 +787,13 @@ function check_invoice_data_form($id, $invoice) {
     // If invoice in a status 'created', exp date must be set
     if ($status_created) {
       $err['msg'] = $l_fill_date;
+      $err['field'] = 'date';
       return false;
     }
   } else if (preg_match($php_regexp_isodate, $date) == 0) {
     $err['msg'] = "$l_date : $date : $l_invalid_date"; 
-    return false;
+    $err['field'] = 'date';
+   return false;
   }
 
   // Expiration Date check
@@ -797,28 +801,33 @@ function check_invoice_data_form($id, $invoice) {
     // If invoice in a status 'created', exp date must be set
     if ($status_created) {
       $err['msg'] = "$l_expiration_date : $l_fill_date";
+      $err['field'] = 'expiration_date';
       return false;
     }
   } else if (preg_match($php_regexp_isodate, $expiration_date) == 0) {
     $err['msg'] = "$l_expiration_date : $expiration_date : $l_invalid_date"; 
+    $err['field'] = 'expiration_date';
     return false;
   }
 
   // Payment Date check
   if (($payment_date != '') && (preg_match($php_regexp_isodate, $payment_date) == 0)) {
     $err['msg'] = "$l_payment_date : $payment_date : $l_invalid_date"; 
+    $err['field'] = 'payment_date';
     return false;
   }
 
   // MANDATORY: a company must be set
   if (($c_id < 1) && ($c_new_id < 1)) {
     $err['msg'] = $l_fill_company;
+    $err['field'] = 'company';
     return false;
   }
 
   // MANDATORY: Amount must be set
   if ( !($ht > 0) || !($ttc > 0)) {
     $err['msg'] = $l_fill_amount;
+    $err['field'] = 'amount_ht';
     return false;
   }
 
@@ -826,11 +835,13 @@ function check_invoice_data_form($id, $invoice) {
   if ($status_created) {
     if (trim($number) == '') {
       $err['msg'] = $l_fill_number;
+      $err['field'] = 'number';
       return false;
     } else {
       $nb = get_invoice_nb_having_number($number, $id);
       if ($nb > 0) {
 	$err['msg'] = $l_error_number_exist;
+	$err['field'] = 'number';
 	return false;
       }
     }
@@ -843,6 +854,7 @@ function check_invoice_data_form($id, $invoice) {
   // If invoice has been paid, status must be 'paid'
   if (($total_pay_amount == $ttc) && ($status != $cinv_status['paid'])) {
     $err['msg'] = $l_err_paid_status;
+    $err['field'] = 'status';
     return false;
   }
   // If invoice partially paid, status must be 'ppaid', 'conflict' or 'dailly'
@@ -861,6 +873,13 @@ function check_invoice_data_form($id, $invoice) {
 	  || ($status == $cinv_status['paid']))) {
     $err['msg'] = $l_err_no_payment_status;
     $err['field'] = 'status';
+    return false;
+  }
+
+  // If status is 'received', type must be supplier
+  if (($status == $cinv_status['received']) && ($inout == '+')) {
+    $err['field'] = 'status';
+    $err['msg'] = $l_err_status_received_customer;
     return false;
   }
 

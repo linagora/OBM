@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.1.10pre3';
+$obm_version = '2.1.10pre4';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -617,7 +617,7 @@ $cdoc_kind_link = 2;
 // Invoice status
 $cinv_status['tocreate'] = 0;
 $cinv_status['sent'] = 1;
-$cinv_status['dailly'] = 2;
+$cinv_status['received'] = 2;
 $cinv_status['ppaid'] = 3;
 $cinv_status['paid'] = 4;
 $cinv_status['conflict'] = 5;

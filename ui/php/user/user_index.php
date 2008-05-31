@@ -199,7 +199,7 @@ if ($action == "ext_get_ids") {
     }
     $display["search"] = html_user_search_form($params);
   } else {
-    $display["msg"] .= display_warn_msg($err["msg"], false);
+    $display["msg"] .= display_warn_msg($err['msg'], false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_user_consult($params);
   }

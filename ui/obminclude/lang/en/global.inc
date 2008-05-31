@@ -370,6 +370,9 @@ $l_header_add_contact = "Add contact";
 // Project Agenda
 $l_header_right = "Right management";
 
+// Payment
+$l_header_link_invoice = "Link to invoice";
+
 // Project headers
 $l_header_man_task = "Tasks";
 $l_header_man_member = "Members";

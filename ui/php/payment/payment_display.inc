@@ -676,7 +676,8 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   if (isset($params['company_id'])) { $c_id = $params['company_id']; }
   if (isset($params['company_name'])) { $c_name = $params['company_name']; }
   if (isset($params['company_new_id'])) { $c_new_id = $params['company_new_id']; }
-  if (isset($params['company_new_name'])) { $c_new_name = $params['company_new_name']; }
+  if (isset($params['company_new_name'])) { $c_new_name = urlencode($params['company_new_name']); }
+  //  if (isset($params['company_new_name'])) { $c_new_name = $params['company_new_name']; }
   if (isset($params['payment_id'])) { $id = $params['payment_id']; }
   if (isset($params['invoice_id'])) { $invoice_id = $params['invoice_id']; }
   if (isset($params['account'])) { $account = $params['account']; }
