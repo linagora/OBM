@@ -484,7 +484,8 @@ function dis_time_user_planning($obm_q, $time) {
   }
 
   foreach($line as $u_id => $l) {
-    $d_l .= "<tr><th colspan=\"".($nb_days+2)."\"><br/>".$users[$u_id]."<br/>&nbsp;</th><th>".$users_length[$u_id]."</th></tr>".
+    $d_l .= "<tr><th
+    colspan=\"".($nb_days+2)."\"><br/>".$users[$u_id]."<br/>&nbsp;</th><th>".$users_length[$u_id]."</th></tr><tr><th>&nbsp;</th>$line0<tr></tr><th>&nbsp;</th>$line1</tr>".
     implode($l);
   }
   $css = implode("\n",$css);
@@ -500,10 +501,8 @@ function dis_time_user_planning($obm_q, $time) {
   <colgroup class=\"total\" span=\"2\">
   </colgroup>    
   <thead>
-  <tr><th></th>$line0</tr>  
-  <tr><th></th>$line1</tr>
-  </thead>
   $d_l
+  </thead>
   </table>
 ";
 
@@ -610,14 +609,17 @@ function dis_time_group_select($time, $groups, $multi=false) {
     $sel_group = "<option value=\"time_index.php?action=$action&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_select_group</option>";
   }
   $selected = false;
-  foreach ($groups as $g_id => $one_group) {
-    $gname = $one_group['name'];
-    if ($g_id == $sel_group_id) {
-      $selected = " selected=\"selected\"";
-    } else {
-      $selected = '';
+  if( isset($groups) ) {
+    // Don't compute private group if none defined
+    foreach ($groups as $g_id => $one_group) {
+      $gname = $one_group['name'];
+      if ($g_id == $sel_group_id) {
+        $selected = " selected=\"selected\"";
+      } else {
+        $selected = '';
+      }
+      $sel_group .= "\n<option value=\"time_index.php?action=$action&amp;sel_group_id=$g_id&amp;date=$iso_date\" $selected>$gname</option>";
     }
-    $sel_group .= "\n<option value=\"time_index.php?action=$action&amp;sel_group_id=$g_id&amp;date=$iso_date\" $selected>$gname</option>";
   }
 
   if (($sel_group_id > 0) && ($sel_group_id != $c_all)) {
