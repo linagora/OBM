@@ -445,11 +445,11 @@ function dis_time_user_planning($obm_q, $time) {
   while (list($day,$val) = each($days)) {
     // Display the month planning
     $lday = $l_daysofweekfirst[$val['dow']];
-    $line0 .= "<th><a href=\"$path/time/time_index.php?action=index&amp;date=$year-$month-$day\">$lday</a></th>\n";
+    $line0 .= "<th><a href=\"$path/time/time_index.php?action=index&amp;date=$year-$month-$day<SELECTEDUSER>\">$lday</a></th>\n";
     if (! $c_working_days[$val['dow']]) {
-      $line1 .= "<td style=\"background-color: #$col_nwday;\">$day</td>\n";
+      $line1 .= "<td style=\"background-color: #$col_nwday; text-align: center\">$day</td>\n";
     } else {
-      $line1 .= "<td>$day</td>\n";
+      $line1 .= "<td style=\"text-align: center\">$day</td>\n";
     }
 
     // Fill the day cell for each user
@@ -484,8 +484,15 @@ function dis_time_user_planning($obm_q, $time) {
   }
 
   foreach($line as $u_id => $l) {
-    $d_l .= "<tr><th
-    colspan=\"".($nb_days+2)."\"><br/>".$users[$u_id]."<br/>&nbsp;</th><th>".$users_length[$u_id]."</th></tr><tr><th>&nbsp;</th>$line0<tr></tr><th>&nbsp;</th>$line1</tr>".
+    if( isset($u_id) ) {
+        $replace = "&amp;sel_user_id=".$u_id;
+    }else {
+        $replace = "";
+    }
+    $currentLine0 = ereg_replace( "<SELECTEDUSER>", $replace, $line0);
+
+    $d_l .= '<tr><th
+    colspan=\"'.($nb_days+2).'\"><br/>'.$users[$u_id].'<br/>&nbsp;</th><th>'.$users_length[$u_id].'</th></tr><tr><th>&nbsp;</th>'.$currentLine0.'<tr></tr><th>&nbsp;</th>'.$line1.'</tr>'.
     implode($l);
   }
   $css = implode("\n",$css);
