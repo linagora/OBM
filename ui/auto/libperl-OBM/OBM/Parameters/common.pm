@@ -123,7 +123,8 @@ $obmModules = {
     ldap => 0,
     mail => 0,
     samba => 0,
-    web => 0
+    web => 0,
+    contact => 0
 };
 
 $obmModule = $cfgFile->val( 'global', 'obm-ldap' );
@@ -155,6 +156,13 @@ if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
     $obmModules->{"web"} = 1;
 }else {
     $obmModules->{"web"} = 0;
+}
+
+$obmModule = $cfgFile->val( 'global', 'obm-contact' );
+if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
+    $obmModules->{"contact"} = 1;
+}else {
+    $obmModules->{"contact"} = 0;
 }
 
 # supporte-t-on le renommage de BAL utilisateur

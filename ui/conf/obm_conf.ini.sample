@@ -35,6 +35,7 @@ obm-ldap = true
 obm-mail = true
 obm-samba = false
 obm-web = false
+obm-contact = false
 
 ; singleNameSpace mode allow only one domain
 ; login are 'login' and not 'login@domain'

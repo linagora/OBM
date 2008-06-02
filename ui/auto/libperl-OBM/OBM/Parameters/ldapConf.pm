@@ -5,7 +5,7 @@ require Exporter;
 use OBM::Parameters::common;
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw( $ldapAdminLogin $NODE $ROOT $DOMAINROOT $POSIXUSERS $POSIXGROUPS $SYSTEMUSERS $DOMAINHOSTS $SAMBADOMAIN $SAMBAFREEUNIXID $SAMBAUSERS $SAMBAGROUPS $SAMBAHOSTS $MAILSERVER $MAILSHARE $GROUPOFNAMES );
+@EXPORT_const = qw( $ldapAdminLogin $NODE $ROOT $DOMAINROOT $POSIXUSERS $POSIXGROUPS $SYSTEMUSERS $DOMAINHOSTS $SAMBADOMAIN $SAMBAFREEUNIXID $SAMBAUSERS $SAMBAGROUPS $SAMBAHOSTS $MAILSERVER $MAILSHARE $CONTACTS);
 @EXPORT_struct = qw($attributeDef $ldapStruct);
 @EXPORT = (@EXPORT_const, @EXPORT_struct);
 @EXPORT_OK = qw();
@@ -42,7 +42,7 @@ $SAMBAGROUPS = "sambaGroups";
 $SAMBAHOSTS = "sambaHosts";
 $MAILSERVER = "mailServer";
 $MAILSHARE = "mailShare";
-$GROUPOFNAMES = "groupOfNames";
+$CONTACTS = "publicContact";
 
 #
 # Déclaration des attributs des différents types
@@ -149,7 +149,15 @@ $attributeDef = {
         dn_prefix => "cn",
         dn_value => "postfixconf_name",
         objectclass => [ "obmMailServer" ],
+    },
+    
+    $CONTACTS => {
+        structural => 1,
+        is_branch => 0,
+        dn_prefix => "uid",
+        objectclass => [ "inetOrgPerson" ]
     }
+
 };
 
 
@@ -333,6 +341,21 @@ if( $obmModules->{"mail"} ) {
     };
 
     push( @{$currentNode->{"branch"}}, $postConf );
+}
+
+if( $obmModules->{"contact"} ) {
+    # Branche contenant la déclaration des contacts publics OBM
+    my $contacts = {
+        dn => "",
+        name => "contacts",
+        node_type => "$NODE",
+        description => "Publics contacts",
+        data_type => [ $CONTACTS ],
+        template => [],
+        branch => []
+    };
+
+    push(  @{$currentNode->{"branch"}}, $contacts );
 }
 
 return 1;
