@@ -1,0 +1,230 @@
+#!/usr/bin/perl -w -T
+#####################################################################
+# OBM               - File : ldapContacts.pl                        #
+#                   - Desc : Script permettant de gérer le contenu  #
+#                   de la branche des contacts publics              #
+#####################################################################
+
+use strict;
+use Getopt::Long;
+
+require OBM::Ldap::ldapEngine;
+require OBM::Update::utils;
+require OBM::Entities::obmContact;
+
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
+
+sub getParameter {
+    my( $parameters ) = @_;
+
+    # Analyse de la ligne de commande
+    &GetOptions( $parameters, "global", "incremental", "help" );
+
+    if( exists($parameters->{"incremental"}) && exists($parameters->{"global"}) ) {
+        print STDERR "ERREUR: Parametres '--incremental' et '--global' incompatibles\n\n";
+        $parameters->{"help"} = "";
+
+    }elsif( exists($parameters->{"incremental"}) ) {
+        &OBM::toolBox::write_log( "Mise a jour incrementale", "W" );
+        $parameters->{"incremental"} = 1;
+        $parameters->{"global"} = 0;
+
+    }elsif( exists($parameters->{"global"}) ) {
+        &OBM::toolBox::write_log( "Mise a jour globale", "W" );
+        $parameters->{"incremental"} = 0;
+        $parameters->{"global"} = 1;
+
+    }else{
+        &OBM::toolBox::write_log( "Mise a jour globale", "W" );
+        $parameters->{"incremental"} = 0;
+        $parameters->{"global"} = 1;
+    }
+
+    if( exists( $parameters->{"help"} ) ) {
+        &OBM::toolBox::write_log( "Affichage de l'aide", "WC" );
+        print "Script qui permet de faire une synchronisation des contacts publics d'OBM dans une branche de l'annuaire LDAP (ou=contacts).\n\n";
+
+        print "Veuillez indiquer le critere de mise a jour :\n";
+        print "\tSyntaxe: $0 [--global | --incremental]\n";
+        print "\t--global : Fait une mise a jour globale des contacts ;\n";
+        print "\t--incremental : Fait une mise a jour incrementale du domaine (Option par defaut)\n";
+
+        exit 0;
+    }
+}
+
+# On prepare le log
+my ($scriptname) = ($0=~'.*/([^/]+)');
+&OBM::toolBox::write_log( "$scriptname: ", "O" );
+
+# Traitement des paramètres
+&OBM::toolBox::write_log( "Analyse des parametres du script", "W" );
+my %parameters;
+&getParameter( \%parameters );
+
+# On se connecte a la base
+my $dbHandler;
+if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
+    if( defined($dbHandler) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+    }else {
+        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : erreur inconnue", "WC" );
+    }
+
+    exit 1;
+}
+
+
+# Obtention de la liste des domaines
+&OBM::toolBox::write_log( "Obtention des domaines OBM", "W" );
+my $domainList = &OBM::Update::utils::getDomains( $dbHandler, undef );
+
+# Obtention des serveurs LDAP par domaines
+&OBM::Update::utils::getLdapServer( $dbHandler, $domainList );
+
+# On démarre un moteur LDAP
+&OBM::toolBox::write_log( "Initialisation du moteur LDAP", "W" );
+my $ldapEngine = OBM::Ldap::ldapEngine->new( $domainList );
+$ldapEngine->init();
+
+# Traitement des contacts publics, domaine/domaine
+for( my $i=0; $i<=$#{$domainList}; $i++ ) {
+    my $domain = $domainList->[$i];
+    my $parentDn = undef;
+    my $timeStamp;
+    
+    my $object = OBM::Entities::obmContact->new( 0, 1, 0, $domain->{"domain_id"} );
+    if( $ldapEngine->getObjectParentDN( $object, \$parentDn ) ) {
+        # Pas de branche LDAP définie pour les objets contacts
+        next;
+    }
+    
+
+    if( $parameters{"incremental"} ) {
+        # Obtention du timestamp pour la synchronisation des contacts publics
+        &OBM::toolBox::write_log( "Obtention de la date de derniere synchronisation pour le domaine '".$domain->{"domain_label"}."'", "W" );
+        my $query = "SELECT domainpropertyvalue_value
+                        FROM DomainPropertyValue
+                        WHERE domainpropertyvalue_domain_id='".$domain->{"domain_id"}."'
+                        AND domainpropertyvalue_property_key = 'last_public_contact_export'
+                        LIMIT 1";
+        my $queryResult;
+        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            &OBM::toolBox::write_log( "Probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+            exit 1;
+        }
+
+        $timeStamp = $queryResult->fetchrow_array();
+        if( !defined($timeStamp) ) {
+            if( exists($parameters{"incremental"}) ) {
+                &OBM::toolBox::write_log( "Date de derniere synchronisation inconnue, execution en mode global", "W" );
+                $parameters{"global"} = 1;
+                $parameters{"incremental"} = 0;
+            }
+        }
+    }
+
+    if( $parameters{"global"} ) {
+        &OBM::toolBox::write_log( "Synchronisation complete des contacts publics du domaine '".$domain->{"domain_id"}."'", 'W' );
+        $timeStamp = 0;
+    }else {
+        &OBM::toolBox::write_log( "Synchronisation des contacts publics du domaine '".$domain->{"domain_id"}."', depuis le '".$timeStamp."'", 'W' );
+    }
+    
+    
+    &OBM::toolBox::write_log( "Suppression des contacts publics ou prives du domaine '". $domain->{"domain_label"}."'", "W" );	
+    
+    my $query = "(SELECT contact_id
+                    FROM Contact
+                    WHERE (contact_privacy='1' OR contact_archive='1')
+                    AND contact_domain_id='".$domain->{"domain_id"}."'
+                    AND UNIX_TIMESTAMP(contact_timeupdate) > '".$timeStamp."')
+                UNION
+                (SELECT deletedcontact_contact_id AS contact_id
+                    FROM DeletedContact
+                    WHERE UNIX_TIMESTAMP(deletedcontact_timestamp) > '".$timeStamp."')";
+
+    my $queryResult;
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        exit 1;
+    }
+    
+    while( my( $contactId ) = $queryResult->fetchrow_array() ) {
+        my $object = OBM::Entities::obmContact->new( 0, 1, $contactId, $domain->{"domain_id"} );
+
+        my $entryDn = $object->getLdapDnPrefix();
+        if( !defined( $entryDn ) ) {
+            &OBM::toolBox::write_log( "Erreur: description LDAP de l'objet invalide : ".$object->getEntityDescription(), "W", 1 );
+
+        }else {
+            &OBM::toolBox::write_log( "Suppression de l'objet : ".$object->getEntityDescription(), "W", 1 );
+
+            my $ldapEntry = $ldapEngine->findDn($entryDn.",".$parentDn);
+            if( defined( $ldapEntry ) ) {
+                if( !$ldapEngine->deleteLdapEntity( $ldapEntry ) ) {
+                    &OBM::toolBox::write_log( "Erreur: a la suppression de l'objet : ".$object->getEntityDescription(), "W", 1 );
+                }
+
+            }else {
+                &OBM::toolBox::write_log( "Objet non present dans l'annuaire : ".$object->getEntityDescription(), "W", 2 );
+            }
+        }
+    }
+
+   
+    &OBM::toolBox::write_log( "Ajout ou mise a jour des contacts publics du domaine '". $domain->{"domain_label"}."'", "W" );
+    
+    $query = "SELECT contact_id
+                    FROM Contact
+                    WHERE contact_privacy='0'
+                    AND contact_archive='0'
+                    AND contact_domain_id='".$domain->{"domain_id"}."'
+                    AND UNIX_TIMESTAMP(contact_timeupdate) > '".$timeStamp."'";
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        exit 1;
+    }
+    
+    while( my( $contactId ) = $queryResult->fetchrow_array() ) {
+        my $object = OBM::Entities::obmContact->new( 0, 0, $contactId );
+        &OBM::toolBox::write_log( "Ajout de l'objet : ".$object->getEntityDescription(), "W", 2 );
+
+        if( !$object->getEntity( $dbHandler, $domain ) ) {
+            &OBM::toolBox::write_log( "Erreur: description LDAP de l'objet invalide : ".$object->getEntityDescription(), "W", 1 );
+            next;
+        }
+	
+        if( !$ldapEngine->update( $object ) ) {
+            &OBM::toolBox::write_log( "Erreur: a l'ajout de l'objet : ".$object->getEntityDescription(), "W", 1 );
+        }
+    }
+
+
+    $timeStamp = time();
+    &OBM::toolBox::write_log( "Synchronisation terminee avec succes, mise a jour de la date de derniere synchronisation", "W", 2 );
+    $query = 'INSERT INTO DomainPropertyValue
+                ( domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value )
+                VALUES
+                ( '.$domain->{"domain_id"}.", 'last_public_contact_export', ".$timeStamp." )
+                ON DUPLICATE KEY UPDATE domainpropertyvalue_value='".$timeStamp."'";
+
+    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+        &OBM::toolBox::write_log( "Probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        exit 1;
+    }
+}
+
+# On arrete le moteur LDAP
+$ldapEngine->destroy();
+
+# On referme la connexion a la base
+if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
+    &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "W" );
+}
+
+# On ferme le log
+&OBM::toolBox::write_log( "Fin du traitement", "W" );
+&OBM::toolBox::write_log( "", "C" );
+
+exit 0
