@@ -26,6 +26,12 @@ NameVirtualHost *:443
 #    php_value session.gc_maxlifetime 2880
     php_value magic_quotes_gpc  On
 
+    # Forbid access to '.inc' files
+    <Files ~ "\.inc$">
+        Order allow,deny
+        Deny from all
+    </Files>
+
 #   <Location /funambol/ds>
 #   ProxyPass ajp://_TOMCAT_SERVER_:8009/funambol/ds
 #   </Location>
