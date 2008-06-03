@@ -411,7 +411,7 @@ function get_contact_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','index','search','new','detailconsult','update','statistics','check_delete','delete','admin','display') 
+    'Condition'=> array ('','index','search','insert','new','detailconsult','update','statistics','check_delete','delete','admin','display') 
                                      );
 
 // Detail Consult

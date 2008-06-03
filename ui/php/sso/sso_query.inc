@@ -12,6 +12,8 @@
  *  
  */
 function run_query_validate($ticket) {
+  global $c_singleNameSpace;
+  
   $ticket_dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'OBM_Ticket'.DIRECTORY_SEPARATOR;
   run_query_purge_dir($ticket_dir);
   if(!file_exists($ticket_dir.$ticket)) {
@@ -28,7 +30,11 @@ function run_query_validate($ticket) {
     $login = $obm_q->f('userobm_login');
     $password = $obm_q->f('userobm_password');
     $domain = $obm_q->f('domain_name');
-    return array('login' => "$login@$domain", 'password' => $password);
+    if(!$c_singleNameSpace) {
+      return array('login' => "$login@$domain", 'password' => $password);
+    } else {
+      return array('login' => $login, 'password' => $password);
+    }
   } else {
     return false;
   }
