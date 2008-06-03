@@ -367,11 +367,13 @@ sub getEntity {
     }
 
 
-    if( !$self->{"properties"}->{userobm_mail_perms} ) {
-        # Si la personne n'a pas le droit mail, mais a une adresse mail
-        # valide, on la positionne dans l'annuaire.
-        if( defined($dbUserDesc->{userobm_email}) && ($dbUserDesc->{userobm_email} =~ /$regexp_email/) ) {
-            push( @{$self->{"properties"}->{"email"}}, $dbUserDesc->{userobm_email} );
+    if( $ldapAllMainMailAddress && !$self->{"properties"}->{userobm_mail_perms} ) {
+        # Si la personne n'a pas le droit mail, mais a une/des adresses mails
+        # valides, on la positionne dans l'annuaire. On ne positionne que les
+        # attributs 'mail', pas les 'mailAlias'.
+        my $return = $self->makeEntityEmail( $dbUserDesc->{userobm_email}, $domainDesc->{domain_name}, $domainDesc->{domain_alias} );
+        if( $return && exists( $self->{"properties"}->{"emailAlias"} ) ) {
+            delete( $self->{"properties"}->{"emailAlias"} );
         }
     }
 

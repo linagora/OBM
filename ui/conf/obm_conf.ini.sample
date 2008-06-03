@@ -69,11 +69,10 @@ ldapRoot = local
 ; Going cyrusPartition enabled from cyrusPartition disabled needs system work
 cyrusPartition = true
 
-; oldSidMapping mode is for compatibility with Aliamin and old install
-; Modifying this on a running system need Samba domain work (re-register host,
-; ACL...) 
-; For new one, leave this to 'false'
-oldSidMapping = false
+; ldapAllMainMailAddress :
+;    false : publish user mail address only if mail right is enable - default
+;    true : publish main user mail address, even if mail right is disable
+ldapAllMainMailAddress = false
 
 ; userMailboxDefaultFolders are IMAP folders who are automaticaly created
 ; at user creation ( must be enclosed with " and in IMAP UTF-7 modified encoding)
@@ -89,5 +88,11 @@ userMailboxDefaultFolders = ""
 ; at share creation ( must be enclosed with " and in IMAP UTF-7 modified
 ; encoding)
 shareMailboxDefaultFolders = ""
+
+; oldSidMapping mode is for compatibility with Aliamin and old install
+; Modifying this on a running system need Samba domain work (re-register host,
+; ACL...) 
+; For new one, leave this to 'false'
+oldSidMapping = false
 
 ; EOF

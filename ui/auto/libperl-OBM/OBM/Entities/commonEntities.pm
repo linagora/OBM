@@ -84,6 +84,10 @@ sub makeEntityEmail {
     my %emails;
     my %emailsAlias;
 
+    if( !defined($mailAddress) || ($mailAddress eq "") ) {
+        return $totalEmails;
+    }
+
     my @email = split( /\r\n/, $mailAddress );
     
     for( my $i=0; $i<=$#email; $i++ ) {

@@ -11,7 +11,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $obmModules $renameUserMailbox $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $renameUserMailbox $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_regexp = qw($regexp_email $regexp_email_left $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain $regexp_login $regexp_ip);
@@ -116,6 +116,15 @@ if( defined( $cyrusDomainPartition ) && lc($cyrusDomainPartition) eq "true" ) {
     $cyrusDomainPartition = 1;
 }else {
     $cyrusDomainPartition = 0;
+}
+
+# Publication des adresses principales des utilisateurs n'ayant pas le droit
+# mail activé
+$ldapAllMainMailAddress = $cfgFile->val( 'automate', 'ldapAllMainMailAddress' );
+if( defined($ldapAllMainMailAddress) && lc($ldapAllMainMailAddress) eq "true" ) {
+    $ldapAllMainMailAddress = 1;
+}else {
+    $ldapAllMainMailAddress = 0;
 }
 
 # Les modules OBM actifs
