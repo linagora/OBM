@@ -75,14 +75,38 @@ dbconfig set_cachesize        0  2097152  0
 # to get slapd running at all. See http://bugs.debian.org/303057
 # for more information.
 
+# BEGIN DBD file environment setings
+# Modify this options need to recover DB_CONFIG file and BDB file environment
+# which need to stop 'slapd' and recover BDB files(1) if done on hot LDAP database.
+# Else you can simply remove database files before starting 'slapd'.
+#
+# 1) to recover BDB file environment :
+#    Debian : db_recover -cev -h 'directory'
+#    RedHat : slap_db_recover -cev -h 'directory'
+
 # Number of objects that can be locked at the same time.
 dbconfig set_lk_max_objects   1500
 # Number of locks (both requested and granted)
 dbconfig set_lk_max_locks     1500
 # Number of lockers
 dbconfig set_lk_max_lockers   1500
+# END DBD file environment setings
+
+# BEGIN DBD LDAP database tuning
 # Sync BDB cache every 1024 Kb write or 30s
 checkpoint                    1024      30
+
+## BEGIN BDB backend fine tuning
+## Modify this options need 'slapd' restart
+## Maintain n entries in cache memory - default 1000
+#cachesize                     1000
+## Free n cache entries when reach 'cachesize' - default 1
+#cachefree                     1
+## Maintain n DN entries in DN cache memory - default 2*'cachesize' - ideal as of
+## real DN database entries
+#dncachesize                   2000
+## END BDB backend fine tuning
+# END DBD LDAP database tuning
 
 # Database Index
 index           uidNumber,gidNumber     eq
@@ -97,10 +121,10 @@ index           objectClass eq
 #index           sambaDomainName         eq
 #index           objectClass             pres,eq
 
-###Index pour SyncRepl MASTER
+## Index pour SyncRepl MASTER
 #index           entryCSN,entryUUID      eq
 
-#####Replication SyncRepl en MASTER
+## Replication SyncRepl en MASTER
 #overlay syncprov
 #syncprov-checkpoint 100 10
 #syncprov-sessionlog 100
@@ -110,11 +134,6 @@ lastmod         on
 
 # Where to store the replica logs for database #1
 #replogfile     /var/lib/ldap/replog
-
-
-
-
-
 
 
 ## BEGIN Common ACLs
