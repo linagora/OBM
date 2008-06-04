@@ -68,7 +68,6 @@ rootpw          {SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
 # Where the database file are physically stored for database #1
 directory       "/var/lib/ldap"
 
-#
 # BEGIN DBD file environment setings
 # Modify this options need to recover DB_CONFIG file and BDB file environment
 # which need to stop 'slapd' and recover BDB files(1) if done on hot LDAP database.
@@ -95,11 +94,10 @@ dbconfig set_lk_max_lockers   1500
 
 
 # BEGIN DBD LDAP database tuning
+# Modify this options need 'slapd' restart
+
 # Sync BDB cache every 1024 Kb write or 30s
 checkpoint                    1024      30
-
-## BEGIN BDB backend fine tuning
-## Modify this options need 'slapd' restart
 ## Maintain n entries in cache memory - default 1000
 #cachesize                     1000
 ## Free n cache entries when reach 'cachesize' - default 1
@@ -107,7 +105,6 @@ checkpoint                    1024      30
 ## Maintain n DN entries in DN cache memory - default 2*'cachesize' - ideal as of
 ## real DN database entries
 #dncachesize                   2000
-## END BDB backend fine tuning
 # END DBD LDAP database tuning
 
 
