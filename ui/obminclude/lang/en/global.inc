@@ -36,6 +36,8 @@ $l_delegation = "Delegation";
 $l_print = "Print";
 $l_transparent = "Transparent";
 $l_select_all = "Select all";
+$l_fast_search = "Fast search";
+$l_or = "or";
 $l_generate = "Generate";
 
 // Common messages
@@ -88,11 +90,11 @@ $l_size = "Size";
 $l_email = "Email";
 $l_quota = "Quota";
 $l_invalid_data = "Invalid Data";
-$l_insert_ok = "Insertion successfull";
+$l_insert_ok = "Insertion successful";
 $l_insert_error = "Insertion Error";
-$l_update_ok = "Update succesfull";
+$l_update_ok = "Update successful";
 $l_update_error = "Update Error";
-$l_delete_ok = "Deletion successfull";
+$l_delete_ok = "Deletion successful";
 $l_delete_error = "Deletion Error";
 $l_date_incionsistency = "Dates inconsistency";
 $l_error_permission = "You are not allowed to execute this action";
