@@ -68,13 +68,7 @@ rootpw          {SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
 # Where the database file are physically stored for database #1
 directory       "/var/lib/ldap"
 
-# For the Debian package we use 2MB as default but be sure to update this
-# value if you have plenty of RAM
-dbconfig set_cachesize        0  2097152  0
-# Sven Hartge reported that he had to set this value incredibly high
-# to get slapd running at all. See http://bugs.debian.org/303057
-# for more information.
-
+#
 # BEGIN DBD file environment setings
 # Modify this options need to recover DB_CONFIG file and BDB file environment
 # which need to stop 'slapd' and recover BDB files(1) if done on hot LDAP database.
@@ -84,6 +78,13 @@ dbconfig set_cachesize        0  2097152  0
 #    Debian : db_recover -cev -h 'directory'
 #    RedHat : slap_db_recover -cev -h 'directory'
 
+# For the Debian package we use 2MB as default but be sure to update this
+# value if you have plenty of RAM
+dbconfig set_cachesize        0  2097152  0
+# Sven Hartge reported that he had to set this value incredibly high
+# to get slapd running at all. See http://bugs.debian.org/303057
+# for more information.
+
 # Number of objects that can be locked at the same time.
 dbconfig set_lk_max_objects   1500
 # Number of locks (both requested and granted)
@@ -91,6 +92,7 @@ dbconfig set_lk_max_locks     1500
 # Number of lockers
 dbconfig set_lk_max_lockers   1500
 # END DBD file environment setings
+
 
 # BEGIN DBD LDAP database tuning
 # Sync BDB cache every 1024 Kb write or 30s
@@ -108,6 +110,8 @@ checkpoint                    1024      30
 ## END BDB backend fine tuning
 # END DBD LDAP database tuning
 
+
+# BEGIN index definition
 # Database Index
 index           uidNumber,gidNumber     eq
 index           default                 sub
@@ -123,6 +127,8 @@ index           objectClass eq
 
 ## Index pour SyncRepl MASTER
 #index           entryCSN,entryUUID      eq
+# BEGIN index definition
+#
 
 ## Replication SyncRepl en MASTER
 #overlay syncprov
