@@ -49,7 +49,6 @@ defaultsearchbase "dc=local"
 # Backend specific directives apply to this backend until another
 # 'backend' directive occurs
 backend        bdb
-checkpoint     512 30
 
 #######################################################################
 # Specific Directives for database #1, of type bdb:
@@ -72,7 +71,6 @@ directory       "/var/lib/ldap"
 # For the Debian package we use 2MB as default but be sure to update this
 # value if you have plenty of RAM
 dbconfig set_cachesize        0  2097152  0
-
 # Sven Hartge reported that he had to set this value incredibly high
 # to get slapd running at all. See http://bugs.debian.org/303057
 # for more information.
@@ -83,6 +81,8 @@ dbconfig set_lk_max_objects   1500
 dbconfig set_lk_max_locks     1500
 # Number of lockers
 dbconfig set_lk_max_lockers   1500
+# Sync BDB cache every 1024 Kb write or 30s
+checkpoint                    1024      30
 
 # Database Index
 index           uidNumber,gidNumber     eq
