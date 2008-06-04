@@ -595,7 +595,7 @@ function check_host_data_form($host) {
   }
 
   // If IP not empty, must not already exists
-
+  if($ip != '') {
     // Host IP correct
     if (! preg_match($php_regexp_ip, $ip)) {
       $err['msg'] = " $ip : $l_err_host_ip";
@@ -618,6 +618,7 @@ function check_host_data_form($host) {
         return false;
       }
     }
+  }
  
   if ($cgp_use['service']['firewall']) {
     $firewall_perms = $host['firewall_perms'];
