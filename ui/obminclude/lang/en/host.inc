@@ -38,11 +38,11 @@ $l_no_display = "Fill the search fields and press < Find > to retrieve the hosts
 $l_found = "hosts found.";
 $l_no_found = "No host found matching the query !";
 
-$l_insert_ok = "Host insertion successfull.";
+$l_insert_ok = "Host insertion successful.";
 $l_insert_error = "Host insertion fail !";
-$l_update_ok = "Host update successfull.";
+$l_update_ok = "Host update successful.";
 $l_update_error = "Host update fail !";
-$l_delete_ok = "Host delete successfull.";
+$l_delete_ok = "Host delete successful.";
 $l_delete_error = "Host delete fail !";
 $l_can_delete = "Host can be delete";
 $l_cant_delete_mailserver = "Host can't be delete because it's declare as mail server.";
