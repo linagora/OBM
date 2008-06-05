@@ -72,7 +72,7 @@ public class AutoconfService extends HttpServlet {
 		// map host ip with imap host and smtp host
 		String hosts = ConstantService.getInstance().getStringValue(hostIp);
 
-		if (hosts == null || hosts.isEmpty() || !(hosts.split(",").length == 3)) {
+		if (hosts == null || !(hosts.length() == 0) || !(hosts.split(",").length == 3)) {
 			logger.warn("No hosts found for  " + login);
 			return;
 		}

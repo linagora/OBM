@@ -18,9 +18,9 @@
               smtpServer="serveur-smtp-sga"
               fullName="|cn|"
               fromAddress="|mail|"
-              draftFolder="imap://|mailBox|@|imapMailHost|/Brouillons"
+              draftFolder="imap://|mailBox|@|imapMailHost|/INBOX/Brouillons"
               draftFolder_pickerMode="1"
-              fccFolder="imap://|mailBox|@|imapMailHost|/Envoy&amp;AOk-s"
+              fccFolder="imap://|mailBox|@|imapMailHost|/INBOX/Envoy&amp;AOk-s"
               fccFolder_pickerMode="1"
               autocompleteDirectory="serveur-ldap-sga"/>
   </identities>
@@ -239,13 +239,7 @@
     </extension>
 
 	<!-- Connecteur OBM -->
-    <extension id="obm-mozilla-calendar@aliasource.fr"
-               src="https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/xpi/obm-mozilla-calendar-sga_2.1.5.1.xpi"
-               version="2.1.5.1">
-               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
-               minVersion="1.5"
-               maxVersion="2.0.*"/>
-    </extension>
+    set="user"/
 
   </extensions>
 
