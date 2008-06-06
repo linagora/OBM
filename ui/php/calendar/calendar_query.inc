@@ -934,7 +934,9 @@ function run_query_calendar_update_event_data($calendar) {
 
   $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
-  $owner = $calendar['owner'];
+  if($calendar['owner'] > 0) {
+    $owner = "calendarevent_owner = '$calendar[owner]'," 
+  }
   $category1_id = $calendar['category1'];
   $priority = $calendar['priority'];
   $description = $calendar['description'];
@@ -982,8 +984,8 @@ function run_query_calendar_update_event_data($calendar) {
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
     calendarevent_timeupdate = '$now',
+    $owner
     calendarevent_userupdate = '$obm[uid]', 
-    calendarevent_owner = '$owner', 
     calendarevent_title = '$title', 
     calendarevent_date = '$datebegin',     
     calendarevent_description = '$description',
