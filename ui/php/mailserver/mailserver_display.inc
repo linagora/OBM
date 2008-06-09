@@ -261,7 +261,7 @@ function dis_mailserver_consult($params) {
  * @return XHTML Display block
  */
 function html_mailserver_consult($m_q) {
-  global $display, $cgp_use, $l_yes, $l_no;
+  global $path, $display, $cgp_use, $l_yes, $l_no;
   global $l_mailserver, $l_host, $l_ip, $l_imap, $l_smtp_in, $l_smtp_out;
 
   $id = $m_q->f('mailserver_id');
@@ -347,7 +347,7 @@ function dis_mailserver_form($action, $params, $field='') {
  * @return string XHTML mailserver form
  */
 function html_mailserver_form($action, $m_q, $params, $field='') {
-  global $display, $obm, $ico_host;
+  global $path, $display, $obm, $ico_host;
   global $l_mailserver, $l_name, $l_host, $l_imap, $l_smtp_in, $l_smtp_out;
   global $l_insert, $l_update, $l_header_new;
 

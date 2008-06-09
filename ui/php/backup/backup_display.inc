@@ -144,7 +144,7 @@ function html_backup_search_list($files, $nb_files) {
 // Display the validation form to create a backup
 ///////////////////////////////////////////////////////////////////////////////
 function dis_backup_form() {
-  global $display, $l_back, $l_confirm, $l_can_create;
+  global $path, $display, $l_back, $l_confirm, $l_can_create;
 
   $dis_back = "<a href=\"$path/backup/backup_index.php?action=index\">$l_back</a>";
 
@@ -167,7 +167,7 @@ function dis_backup_form() {
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_can_delete_backup($filename) {
-  global $display, $l_can_delete, $l_cant_delete, $l_back, $l_delete;
+  global $path, $display, $l_can_delete, $l_cant_delete, $l_back, $l_delete;
 
 
   $dis_back = "<a href=\"$path/backup/backup_index.php?action=index&amp;tf_filename=$filename\">$l_back</a>";

@@ -1127,7 +1127,7 @@ function html_contact_view_main($co_q) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_links($id) {
-  global  $ico_document, $ico_add, $ico_deal,$ico_contract;
+  global $ico_document, $ico_add, $ico_deal,$ico_contract;
   global $ico_list, $ico_publication;
   global $l_module_document, $l_contact;
   global $l_module_deal, $l_module_list, $l_module_contract;
@@ -1976,7 +1976,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_can_delete_contact($p_id) {
   global $l_can_delete, $l_back, $l_delete;
-  global $display;
+  global $path, $display;
 
   $dis_back = "<a href=\"$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$p_id\">$l_back</a>";
 
@@ -2143,7 +2143,8 @@ function html_contact_kind_form($kind_q) {
 //   - $ref : kind hash info : keys used : id, name
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_kind_links($ref) {
-  global $display, $l_back, $l_kind_link_company, $l_kind_link_company_no;
+  global $path, $display;
+  global $l_back, $l_kind_link_company, $l_kind_link_company_no;
   global $l_kind_link_contact, $l_kind_link_contact_no;
   global $l_kind_delete, $l_kind_can_delete, $l_kind_cant_delete;
 
@@ -2366,7 +2367,7 @@ function export_contact_vcard($co_q, $com_q) {
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_html_contact_date_graph_stats($entity) {
-  global $l_contact_date_evolution_graph;
+  global $path, $l_contact_date_evolution_graph;
 
   $url = url_prepare("$path/statistic/statistic_index.php?action=contact_date_evolution_graph");
 

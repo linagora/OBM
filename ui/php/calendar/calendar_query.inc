@@ -934,8 +934,8 @@ function run_query_calendar_update_event_data($calendar) {
 
   $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
-  if($calendar['owner'] > 0) {
-    $owner = "calendarevent_owner = '$calendar[owner]'," 
+  if ($calendar['owner'] > 0) {
+    $owner = "calendarevent_owner = '$calendar[owner]',";
   }
   $category1_id = $calendar['category1'];
   $priority = $calendar['priority'];
