@@ -318,6 +318,7 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       AND calendarevent_repeatkind = 'none'
       AND ($calendarevent_date - calendaralert_duration) >= $start
       AND ($calendarevent_date - calendaralert_duration) <=  $end
+      AND  calendaralert_duration > 0
       $multidomain
       ORDER BY calendarevent_date
 ";
@@ -374,6 +375,7 @@ function run_query_calendar_repeat_alerts($start, $end) {
       AND ($calendarevent_date  - calendaralert_duration) <= $end 
       AND (($calendarevent_endrepeat  - calendaralert_duration) >= $start
       OR $calendarevent_endrepeat = '0')
+      AND  calendaralert_duration > 0
       $multidomain
     ORDER BY calendarevent_date"; 
 
