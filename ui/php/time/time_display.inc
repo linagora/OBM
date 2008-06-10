@@ -449,7 +449,7 @@ function dis_time_user_planning($obm_q, $time) {
     if (! $c_working_days[$val['dow']]) {
       $line1 .= "<td style=\"background-color: #$col_nwday; text-align: center\">$day</td>\n";
     } else {
-      $line1 .= "<td style=\"text-align: center\">$day</td>\n";
+      $line1 .= "<td style=\"background-color: #$col_nwday; text-align: center; color: #FFFFFF\">$day</td>\n";
     }
 
     // Fill the day cell for each user
@@ -460,9 +460,9 @@ function dis_time_user_planning($obm_q, $time) {
           $line[$u_id][$project_id] .= "<td title=\"$length%\"><div style=\"width:$length%;\">&nbsp;</div></td>";
         } else {
 	  if (! $c_working_days[$days[$day]['dow']]) {
-	    $line[$u_id][$project_id] .= "<td style=\"background-color: #$col_nwday;\"></td>";
+	    $line[$u_id][$project_id] .= "<td style=\"background-color: #$col_nwday;\">&nbsp;</td>";
 	  } else {
-	    $line[$u_id][$project_id] .= "<td></td>";
+	    $line[$u_id][$project_id] .= '<td></td>';
 	  }
         }
       }
@@ -484,12 +484,12 @@ function dis_time_user_planning($obm_q, $time) {
   }
 
   foreach($line as $u_id => $l) {
-    if( isset($u_id) ) {
-        $replace = "&amp;sel_user_id=".$u_id;
-    }else {
-        $replace = "";
+    if (isset($u_id)) {
+      $replace = "&amp;sel_user_id=".$u_id;
+    } else {
+      $replace = "";
     }
-    $currentLine0 = ereg_replace( "<SELECTEDUSER>", $replace, $line0);
+    $currentLine0 = preg_replace('/<SELECTEDUSER>/', $replace, $line0);
 
     $d_l .= '<tr><th
     colspan=\"'.($nb_days+2).'\"><br/>'.$users[$u_id].'<br/>&nbsp;</th><th>'.$users_length[$u_id].'</th></tr><tr><th>&nbsp;</th>'.$currentLine0.'<tr></tr><th>&nbsp;</th>'.$line1.'</tr>'.
