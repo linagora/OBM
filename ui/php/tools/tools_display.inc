@@ -54,7 +54,7 @@ function dis_tools_update_detail() {
       if ($realm == 'delegation') {
 	$dis_detail_title .= ' ('. $obm['delegation'] . ') ';
       }
-      if ($realm == 'delegation' && $obm['delegation'] == '') {
+      if ($realm == 'delegation' && $obm['delegation'] == '' && in_array('domain',$admin_realm)) {
         continue;
       }
       foreach ($entities as $entity=>$db_info) {
