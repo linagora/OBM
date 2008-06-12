@@ -1928,6 +1928,13 @@ function check_deal_form($did, $deal) {
   global $l_begin, $l_expected, $l_proposal, $l_end, $l_date_inconsistency;
   global $l_err_type_empty, $l_err_task_empty, $l_err_market_empty, $l_err_tech_empty;
 
+  // Hook : Pre
+  if (function_exists('hook_pre_check_deal_form')) {
+    if (! hook_pre_check_deal_form($deal)) {
+      return false;
+    }
+  }
+
   // Check if the label is filled
   if (trim($deal['label']) == '') {
     $err['msg'] = $l_err_label_empty;

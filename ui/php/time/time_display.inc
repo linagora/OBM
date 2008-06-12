@@ -1246,7 +1246,7 @@ function dis_time_stats_tasktype($stattt, $time) {
     foreach($stattt as $tt_id => $tt) {
       if ($tt_id != '0') {
         $cpt++;
-        if($cpt % 2 == 0) {
+        if ($cpt % 2 == 0) {
           $class = "class=\"pair\"";
         } else {
           $class = '';
@@ -1260,7 +1260,7 @@ function dis_time_stats_tasktype($stattt, $time) {
 	  $title = ${"l_$prec_type"};
 	  $dis_tt_array .= "
       <tr>
-        <th>$l_total : $title</th>
+        <th>t=$type, pt=$prec_type $l_total : $title</th>
         <th>$type_time&nbsp;</th>
         <th>$type_time_before&nbsp;</th>
         <th>$type_time_after&nbsp;</th>

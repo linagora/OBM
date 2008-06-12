@@ -775,13 +775,11 @@ function check_payment_invoice_data_form($params) {
     $already_paid = $pinfos['invoices']["$i_id"]['already_paid'];
     $invoice_amount = $pinfos['invoices']["$i_id"]['invoice_amount'];
     $remaining_amount = $invoice_amount - $already_paid;
-    if ($affected_amount > $remaining_amount) {
+    if (round($affected_amount,2) > round($remaining_amount,2)) {
       $err['msg'] = "$l_err_affected_invoice ($affected_amount > $remaining_amount)";
       return false;
     }
   }
-
-
 
   return true;
 }

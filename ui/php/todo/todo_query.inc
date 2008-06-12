@@ -17,26 +17,26 @@
 function run_query_todo_todolist($todo) {
   global $obm, $cdg_sql, $ctu_sql_limit;
 
-  $sql_order_dir = $todo["sql_order_dir"];
-  $sql_order_field = $todo["sql_order_field"];
+  $sql_order_dir = $todo['sql_order_dir'];
+  $sql_order_field = $todo['sql_order_field'];
 
-  $uid = $obm["uid"];;
-  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "todo_priority";
-  $sql_order_dir = (strcmp($sql_order_dir,"") != 0) ? $sql_order_dir : "desc";
+  $uid = $obm['uid'];;
+  $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'todo_priority';
+  $sql_order_dir = (strcmp($sql_order_dir,'') != 0) ? $sql_order_dir : 'desc';
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
-  $date = sql_date_format($db_type, "todo_date", "date_todo");
-  $deadline = sql_date_format($db_type, "todo_deadline", "date_deadline");
-	$multidomain = sql_multidomain("todo");
+  $date = sql_date_format($db_type, 'todo_date', 'date_todo');
+  $deadline = sql_date_format($db_type, 'todo_deadline', 'date_deadline');
+	$multidomain = sql_multidomain('todo');
   $whereq = "WHERE todo_user = '$uid' $multidomain";
 
   // Order exceptions (order on calculated rows)
-  if (strcmp($sql_order_field, "todo_update") == 0) {
-    $order = "todo_priority";
-  } else if (strcmp($sql_order_field,"") == 0) {
-    $order = "todo_priority";
+  if (strcmp($sql_order_field, 'todo_update') == 0) {
+    $order = 'todo_priority';
+  } else if (strcmp($sql_order_field,'') == 0) {
+    $order = 'todo_priority';
   }
   $orderq = " ORDER BY $order $sql_order_dir $order_next";
 
@@ -51,15 +51,14 @@ function run_query_todo_todolist($todo) {
   FROM Todo
   $whereq
   $orderq
-  $limit
-  ";
+  $limit";
 
   if ($ctu_sql_limit) {
     $count = get_query_count("select count(*) from Todo $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "todo_search()");
+    display_debug_msg($query, $cdg_sql, 'todo_search()');
     $obm_q->query($query);
   }
   
@@ -76,15 +75,15 @@ function run_query_todo_todolist($todo) {
 function run_query_todo_detail($todo) {
   global $cdg_sql;
 
-  $t_id = $todo["todo_id"];
+  $t_id = $todo['todo_id'];
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($db_type, "todo_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($db_type, "todo_timecreate", "timecreate");
-  $date = sql_date_format($db_type, "todo_date", "date_todo");
-  $deadline = sql_date_format($db_type, "todo_deadline", "date_deadline");
-	$multidomain = sql_multidomain("todo");
+  $timeupdate = sql_date_format($db_type, 'todo_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'todo_timecreate', 'timecreate');
+  $date = sql_date_format($db_type, 'todo_date', 'date_todo');
+  $deadline = sql_date_format($db_type, 'todo_deadline', 'date_deadline');
+  $multidomain = sql_multidomain('todo');
 	
   $query = "
   SELECT
@@ -107,7 +106,7 @@ function run_query_todo_detail($todo) {
   WHERE todo_id = $t_id $multidomain
     AND Author.userobm_id = todo_usercreate";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, 'run_query_todo_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -124,18 +123,18 @@ function run_query_todo_detail($todo) {
 function run_query_todo_insert($todo) {
   global $cdg_sql, $obm;
 
-  $now = date("Y-m-d H:i:s");
-  $uid = $obm["uid"];
-  $title = $todo["title"];
-  $users = $todo["userid"];
-  $priority = $todo["priority"];
-  $percent = $todo["percent"];
-  if ($percent == "") {
-    $percent = "0";
+  $now = date('Y-m-d H:i:s');
+  $uid = $obm['uid'];
+  $title = $todo['title'];
+  $users = $todo['userid'];
+  $priority = $todo['priority'];
+  $percent = $todo['percent'];
+  if ($percent == '') {
+    $percent = '0';
   }
-  $deadline = of_isodate_convert($todo["deadline"],true);
-  $content = $todo["content"];
-	$domain_id = $obm["domain_id"];
+  $deadline = of_isodate_convert($todo['deadline'],true);
+  $content = $todo['content'];
+  $domain_id = $obm['domain_id'];
 
   $obm_q = new DB_OBM;
 
@@ -169,7 +168,7 @@ function run_query_todo_insert($todo) {
         '$title',
         '$content'
       )";
-      display_debug_msg($query, $cdg_sql);
+      display_debug_msg($query, $cdg_sql, 'run_query_todo_insert()');
       $retour = $obm_q->query($query);
     }
   }
@@ -187,22 +186,22 @@ function run_query_todo_insert($todo) {
 function run_query_todo_update($todo) {
   global $obm, $cdg_sql;
 
-  $now = date("Y-m-d H:i:s");
+  $now = date('Y-m-d H:i:s');
 
-  $t_id = $todo["todo_id"];
-  $uid = $obm["uid"];
-  $title = $todo["title"];
-  $users = $todo["userid"];
+  $t_id = $todo['todo_id'];
+  $uid = $obm['uid'];
+  $title = $todo['title'];
+  $users = $todo['userid'];
   $user = $users[0];
-  $priority = $todo["priority"];
-  $deadline = of_isodate_convert($todo["deadline"],true);
-  $content = $todo["content"];
-  $percent = $todo["percent"];
-  if ($percent == "") {
-    $percent = "0";
+  $priority = $todo['priority'];
+  $deadline = of_isodate_convert($todo['deadline'],true);
+  $content = $todo['content'];
+  $percent = $todo['percent'];
+  if ($percent == '') {
+    $percent = '0';
   }
 
-  $multidomain = sql_multidomain("todo");
+  $multidomain = sql_multidomain('todo');
 		
   $query = "UPDATE Todo SET
     todo_timeupdate = '$now',
@@ -215,7 +214,7 @@ function run_query_todo_update($todo) {
     todo_content = '$content'
   WHERE todo_id = '$t_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, 'run_query_todo_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -231,27 +230,27 @@ function run_query_todo_update($todo) {
 function run_query_todo_delete($parms) {
   global $cdg_sql, $c_use_connectors;
   
-	$multidomain = sql_multidomain("todo");
+  $multidomain = sql_multidomain('todo');
 	
   foreach($parms as $key => $val) {
-    $id_todo = strstr($key,"_");
+    $id_todo = strstr($key,'_');
 
-    if ($id_todo != "") {
+    if ($id_todo != '') {
       $id_todo = substr($id_todo, 1);
     
-      if ($val == "on") {
+      if ($val == 'on') {
         $query = "DELETE FROM Todo WHERE todo_id = '$id_todo' $multidomain";
-	display_debug_msg($query, $cdg_sql, "run_query_todo_delete");
+	display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(1)');
         $obm_q = new DB_OBM;
         $obm_q->query($query);
 
 	// If connectors in use
 	if ($c_use_connectors) {
-	  $now = date("Y-m-d H:i:s");
+	  $now = date('Y-m-d H:i:s');
 	  $query = "INSERT INTO
             DeletedTodo (deletedtodo_todo_id, deletedtodo_timestamp)
             VALUES ('$id_todo', '$now')";
-	  display_debug_msg($query, $cdg_sql);
+	  display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(2)');
 	  $retour = $obm_q->query($query);
 	}
       }    
@@ -268,22 +267,22 @@ function run_query_todo_delete($parms) {
 function run_query_todo_delete_unique($t_id) {
   global $cdg_sql, $c_use_connectors;
 
-  $multidomain = sql_multidomain("todo");
+  $multidomain = sql_multidomain('todo');
 
   $query = "DELETE FROM Todo WHERE todo_id = '$t_id' $multidomain";
   
-  display_debug_msg($query, $cdg_sql, "run_query_todo_delete_unique");
+  display_debug_msg($query, $cdg_sql, 'run_query_todo_delete_unique(1)');
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
 
   // If connectors in use
   if ($c_use_connectors) {
-    $now = date("Y-m-d H:i:s");
+    $now = date('Y-m-d H:i:s');
     $query = "INSERT INTO
       DeletedTodo (deletedtodo_todo_id, deletedtodo_timestamp)
       VALUES ('$t_id', '$now')";
 
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, 'run_query_todo_delete_unique(2)');
     $retour = $obm_q->query($query);
   }
 
@@ -300,25 +299,25 @@ function check_todo_data_form($todo) {
   global $php_regexp_percent, $l_err_percent, $l_j_fill_title;
   global $err, $obm;
 
-  $t_id = $todo["todo_id"];
-  $uid = $obm["uid"];
-  $title = $todo["title"];
-  $users = $todo["userid"];
+  $t_id = $todo['todo_id'];
+  $uid = $obm['uid'];
+  $title = $todo['title'];
+  $users = $todo['userid'];
   $user = $users[0];
-  $priority = $todo["priority"];
-  $deadline = $todo["deadline"];
-  $content = $todo["content"];
-  $percent = $todo["percent"];
+  $priority = $todo['priority'];
+  $deadline = $todo['deadline'];
+  $content = $todo['content'];
+  $percent = $todo['percent'];
 
   // MANDATORY: Todo title
-  if (trim($title) == "") {
-    $err["msg"] = $l_j_fill_title;
+  if (trim($title) == '') {
+    $err['msg'] = $l_j_fill_title;
     return false;
   }
 
   // Percent
-  if (($percent != "") && (preg_match($php_regexp_percent, $percent) == 0)) {
-    $err["msg"] = $l_err_percent . " : $percent";
+  if (($percent != '') && (preg_match($php_regexp_percent, $percent) == 0)) {
+    $err['msg'] = $l_err_percent . " : $percent";
     return false;
   }
 
