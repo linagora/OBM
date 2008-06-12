@@ -157,6 +157,9 @@ class Vcalendar_Writer_OBM {
     if(!$this->lazyWrite) {
       //TODO : Hard working update.
     }
+    if(!$this->haveAccess($data['event']['owner'])) {
+      $data['event']['owner'] = $GLOBALS['obm']['uid'];
+    }    
     $data['event']['calendar_id'] = $id;
     run_query_calendar_event_update($data['event'], $data['entities'], $id, true);
     $this->updateStates($data['states'], $id);

@@ -319,7 +319,6 @@ class Vcalendar_Reader_VCS {
       $repeat = strtolower($repeat);
       $rrule['byday'][] = $this->weekDays[$repeat];
     }
-    var_dump($rrule);
     return $rrule;
   }
 
@@ -423,10 +422,10 @@ class Vcalendar_Reader_VCS {
   function getOBMId($attendee, $entity) {
     if(isset($attendee['mail'])) {
       if(isset($this->mails[$attendee['mail']])) {
-        return $this->mails[$entity][$attendee['mail']];
+        return $this->mails[$attendee['mail']][$entity];
       }
       if(isset($this->mails[$attendee['email']])) {
-        return $this->mails[$entity][$attendee['email']];
+        return $this->mails[$attendee['email']][$entity];
       }
     }
     if(isset($attendee['cn']) && isset($this->cns[$attendee['cns']])) {
