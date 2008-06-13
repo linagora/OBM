@@ -59,25 +59,25 @@ class CalendarAlertCronJob extends CronJob{
       $event = $occurrence->event;
       $delta = $this->getAlertDelta($event->id);
       
-      $this->logger->debug("Alert for event ".$event->id." will be sent");
-      $consult_link = "$GLOBALS[cgp_host]/calendar/calendar_index.php?action=detailconsult&calendar_id=".$event->id;
-       
-      $events[$event->id] = array (
-        "subject" => sprintf($l_alert_mail_subject,addslashes($event->title)),
-        "message" => sprintf($l_alert_mail_body,
-                        addslashes($event->title), 
-                        date('d/m/Y H:i',$occurrence->date + $delta), 
-                        date('d/m/Y H:i',$occurrence->date + $delta + $event->duration), 
-                        ($delta/60),
-                        $event->location,
-                        $consult_link,
-                        of_date_format(), date("H:i")
-                        ,$GLOBALS['cgp_host']
-                     ),
-        "recipents" => array_unique(array_keys($event->attendee["user"])),
-        "owner" => $event->owner
-
-      );
+      if($occurrence->date >= $date && $occurrence->date <= $date  + $delta) {
+        $this->logger->debug("Alert for event ".$event->id." will be sent");
+        $consult_link = "$GLOBALS[cgp_host]/calendar/calendar_index.php?action=detailconsult&calendar_id=".$event->id;
+        $events[$event->id] = array (
+          "subject" => sprintf($l_alert_mail_subject,addslashes($event->title)),
+          "message" => sprintf($l_alert_mail_body,
+                          addslashes($event->title), 
+                          date('d/m/Y H:i',$occurrence->date + $delta), 
+                          date('d/m/Y H:i',$occurrence->date + $delta + $event->duration), 
+                          ($delta/60),
+                          $event->location,
+                          $consult_link,
+                          of_date_format(), date("H:i")
+                          ,$GLOBALS['cgp_host']
+                       ),
+          "recipents" => array_unique(array_keys($event->attendee["user"])),
+          "owner" => $event->owner
+        );
+      } 
     }
 
     if(is_array($events)) {

@@ -3829,7 +3829,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
 
 function calendar_send_mail($mails) {
   foreach($mails['mails'] as $mail) {
-    send_mail($mail['subject'], $mail['message'], $mail['recipients'], array(), $mail, $mail['h_file']);
+    send_mail(stripslashes($mail['subject']), $mail['message'], $mail['recipients'], array(), $mail, $mail['h_file']);
   }
 }
 
