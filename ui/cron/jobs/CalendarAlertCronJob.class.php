@@ -1,6 +1,8 @@
 <?php
 include_once("CronJob.class.php");
 define('DAY_DURATION',86400);
+global $day_duration;
+$day_duration = DAY_DURATION;
 /**
  * CalendarAlertCronJob 
  * 
@@ -158,6 +160,7 @@ class CalendarAlertCronJob extends CronJob{
       $title = $nr_q->f("calendarevent_title");
       $privacy = $nr_q->f("calendarevent_privacy");
       $description = $nr_q->f("calendarevent_description"); 
+      $entity_label = $r_q->f("userobm_lastname") ." ".$r_q->f("userobm_firstname");
       $location = $nr_q->f("calendarevent_location"); 
       $category1 = $nr_q->f("calendarcategory1_label");
       $priority = $nr_q->f("calendarevent_priority");

@@ -33,10 +33,10 @@ function get_backup_list($backup) {
       $fullname = $backup_path . $file;
       if (! is_dir($fullname)) {
         preg_match('/[0-9]{1,2}\.[0-9]{1,2}(\.[0-9]{1,2})?/', $file, $matches);
-	$b_version = $matches[0];
+        $b_version = $matches[0];
 	if (preg_match("/^$version/", $b_version)) {
 	  $b_date = filemtime($fullname);
-	  if (preg_match("/^$date/", of_datetime_format($b_date))) {
+	  if (preg_match("/^$date/", of_isodate_convert($b_date))) {
 	    $files[$file]['version'] = $b_version;
 	    $files[$file]['date'] = $b_date;
 	    $files[$file]['size'] = filesize($fullname);
