@@ -35,12 +35,12 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   
   $display['features'] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable, $my_views, $p_view);
   $display['title'] = "<div class=\"title\">$l_module_calendar : ".$GLOBALS["l_view_$p_view"].' '.$GLOBALS["l_range_$p_range"].' </div>';
-  if(function_exists($calendar_function)) {
+  if (function_exists($calendar_function)) {
     $block = $calendar_function($calendar, $calendar_entity,$writable_entity,$date);
     $block .= dis_calendar_quick_form($calendar);
     $display['print_url'] = "$path/calendar/calendar_index.php?cal_view=printable&amp;date=".$calendar['date'];
   } else {
-     $block .= dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity);
+    $block .= dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity);
   }
   return $block;
 }
@@ -62,10 +62,10 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   global $l_view_agenda_desc, $l_view_printable_desc, $l_view_planning_desc, $l_view_list_desc;
   global $l_view_week_desc, $l_view_day_desc, $l_view_month_desc;
   global $path;
-  if($p_kind) {
+  if ($p_kind) {
     ${'ico_'.$p_kind.'_view'} = ${'ico_'.$p_kind.'_view_current'};
   }
-  if($p_range) {
+  if ($p_range) {
     ${'ico_'.$p_range.'_view'} = ${'ico_'.$p_range.'_view_current'};
   }
 
@@ -870,12 +870,14 @@ function dis_calendar_month_printable($calendar, $calendar_entity,$writable_enti
   return $block;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Display the planning for the week beginning at the specified date
-// Parameters:
-//    - $calendar          : calendar parameters
-//    - $calendar_entity : array of entities to display ['user'] ['resource'] 
-///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Display the week working view
+ *
+ * @param array $calendar calendar parameters
+ * @param array $calendar_entity : entities to display ['user'] ['resource'] 
+ * @param array $writable_entity : entities with write access
+ */
 function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) {
   global $path, $ico_next, $ico_previous, $l_previous, $l_next;
   global $ccalendar_weekstart, $ico_meeting, $ico_far_next, $ico_far_previous;
@@ -905,7 +907,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
   
   $day_duration = 86400;
   $k = 0; 
-  $width=0;
+  $width = 0;
   // Week Days headers : loop day by day
   for ($ts = $start_week_time; $ts < $end_week_time; $ts = strtotime('+1 day',$ts) ) {
     if (strcmp(substr($display_days,$k,1),'1')==0) {
@@ -917,9 +919,8 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
       </td>";
       $week_day_event_list .= "
       <th id=\"day-".($ts - $start_week_time)."\">
-      </th>
-       ";
-      $width ++;
+      </th>";
+      $width++;
     }
     $k++;
   }
@@ -948,16 +949,16 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
     }
   }
   $occurrences = calendar_events_model($start_week_day,strtotime('+7 days',$start_week_day),$calendar_entity,$category_filter);
-  $w = date('w',$start_week_day); 
-  if(is_array($occurrences)) {
+  $w = date('w',$start_week_day);
+  if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
       $day_num = (date('w', $occurrence->date) - $w +7)%7;
-      if($display_days[$day_num] == 1) {
-        $dis_event .= dis_calendar_event($occurrence, 'hour',$calendar_entity,$writable_entity);
+      if ($display_days[$day_num] == 1) {
+        $dis_event .= dis_calendar_event($occurrence, 'hour', $calendar_entity, $writable_entity);
       }
     }
   }
-  
+
   $block = "
   <h1>
     <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
@@ -1004,6 +1005,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
   return $block;
 }
 
+
 /**
  * Week printable view 
  * 
@@ -1048,11 +1050,11 @@ function dis_calendar_week_printable($calendar, $calendar_entity,$writable_entit
     <a href=\"calendar_index.php?date=$next_week\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
     <a href=\"calendar_index.php?date=$next_month\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
   </h1>
-  $dis_print  
-  ";
+  $dis_print";
 
   return $block;
 }
+
 
 /**
  *  
@@ -1074,7 +1076,6 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
   $ts_interval = 3600 / $interval;
   $span = ($ccalendar_last_hour - $ccalendar_first_hour)*$interval;
   $td_width = floor(100/$span);
-  
 
 
   // Week Calendar content
@@ -1877,7 +1878,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $title = phpStringToJsString($l_private);
     $description = $title;
     $location = $title;
-    $category = $title;      
+    $category = $title;
   } else {
     $title = phpStringToJsString($event->title);
     $description = phpStringToJsString($event->description);
@@ -1906,8 +1907,12 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $id = $event->id;
   $entity_id = $occurrence->id;
   $entity = $occurrence->entity;
+  $entity_state = $occurrence->entity_state;
   $all_day = $event->all_day;
   $entityClass = $calendar_entity[$entity][$entity_id]['class'];
+  if ($entity_state == 'W') {
+    $entityClass .= '_W';
+  }
   $eventColor = $event->color;
 
   $ed[] = "id:$id";
@@ -1923,7 +1928,8 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "location:'$location'";
   $ed[] = "category:'$category'";
   $ed[] = "colors: {event:'$eventColor'}";
-  
+  $ed[] = "status:'$entity_state'";
+
   $attendees = array();
   foreach ($attendee as $entity => $entities) {
     $label_entity = phpStringToJsString(${"l_$entity"});
@@ -1933,11 +1939,11 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     }
     $attendees[] = "{label:'".$label_entity."', entities:['".implode("','",$ent)."']}"; 
   }
-  $ed[] = "attendees:[".implode(',',$attendees)."]";
+  $ed[] = 'attendees:['.implode(',',$attendees).']';
   switch($unit)  {
     case 'day' :
       $day = true;
-      if($updatable) {
+      if ($updatable) {
         $options[] = 'draggable:true'; 
       }
       break;
@@ -1945,7 +1951,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
       $day = $day || (date('H',$date) <  $ccalendar_first_hour);
       $day = $day || (date('H',$date) >=  $ccalendar_last_hour );
-      if($updatable) {
+      if ($updatable) {
         $options[] = 'draggable:true'; 
         $options[] = 'resizable:true'; 
       }
@@ -1968,16 +1974,16 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $head .= date('H:i',$date);
   }
   
-  $opt = "{".implode(',',$options)."}";
-  $event_data =  "{".implode(',',$ed)."}";
-  if($day) {
+  $opt = '{'.implode(',',$options).'}';
+  $event_data =  '{'.implode(',',$ed).'}';
+  if ($day) {
     $display_events = "        
         obm.calendarManager.newDayEvent($event_data,$opt);
-      ";
+";
   } else {
     $display_events = "
         obm.calendarManager.newEvent($event_data,$opt);
-      ";
+";
   }
   return $display_events;
 } 

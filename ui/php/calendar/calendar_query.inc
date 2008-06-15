@@ -2267,12 +2267,11 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
   $db_type = $obm_q->type;
   $calendarevent_date = sql_date_format($db_type,'calendarevent_date');
   $calendarevent_date_l = sql_date_format($db_type,'calendarevent_date','calendarevent_date');
-  
 
   $multidomain = sql_multidomain('calendarevent');
   if($category_filter != '') {
     $filter = " AND calendarcategory1_id = '$category_filter' ";
-  }  
+  }
   if (is_array($calendar_entity['user'])
       && (count($calendar_entity['user']) > 0) ) {
     $has_user = true;
@@ -2320,7 +2319,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       $where_grp .= "$coma'$id'";
       $coma = ',';
     }
-    $where_grp.= ")";
+    $where_grp.= ')';
     $where_grp .= " AND evententity_entity = 'resource' )"; 
     
     $union = "
@@ -2337,6 +2336,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       calendarevent_owner,
       evententity_entity_id,
       'resourcegroup' as evententity_entity,
+      evententity_state,
       calendarcategory1_label,
       $calendarevent_date_l,
       calendarevent_duration,
@@ -2346,7 +2346,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       LEFT JOIN CalendarCategory1
         ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
-    WHERE evententity_state = 'A'
+    WHERE (evententity_state = 'A' OR evententity_state = 'W')
       $filter
       AND calendarevent_repeatkind = 'none'
       AND $calendarevent_date >= $start - calendarevent_duration
@@ -2367,6 +2367,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       calendarevent_owner,
       evententity_entity_id,
       evententity_entity,
+      evententity_state,
       calendarcategory1_label,
       $calendarevent_date_l,
       calendarevent_duration,
@@ -2376,7 +2377,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       LEFT JOIN CalendarCategory1
         ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
-    WHERE evententity_state = 'A'
+    WHERE (evententity_state = 'A' OR evententity_state = 'W')
       $filter
       AND calendarevent_repeatkind = 'none'
       AND $calendarevent_date >= $start - calendarevent_duration
@@ -2482,6 +2483,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       calendarevent_owner,
       'resourcegroup' as evententity_entity,
       evententity_entity_id,
+      evententity_state,
       calendarevent_repeatdays,
       calendarevent_color,
       calendarevent_allday
@@ -2495,8 +2497,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
       OR $calendarevent_endrepeat = '0' OR calendarevent_endrepeat IS NULL)
       AND $where_grp
-      $multidomain
-    ";
+      $multidomain";
   }
 
   $query = "SELECT
@@ -2516,6 +2517,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
       calendarevent_owner,
       evententity_entity,
       evententity_entity_id,
+      evententity_state,
       calendarevent_repeatdays,
       calendarevent_color,
       calendarevent_allday
@@ -2686,10 +2688,11 @@ function get_one_event_user_alert($event_id, $user_id = null) {
 //   - $end_time        : timestamp of end date
 //   - $calendar_entity :
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_events_model($start_time, $end_time, $calendar_entity,$category_filter = '', $unique=false) {
+function calendar_events_model($start_time, $end_time, $calendar_entity,$category_filter='', $unique=false) {
   global $day_duration;
 
   $day_duration = 86400;
+  // Get all non repeating events and construct occurences & events model
   $nr_q = run_query_calendar_no_repeat_events($start_time,$end_time,$calendar_entity,$category_filter);
   $of = &OccurrenceFactory::getInstance();
   $of->setBegin($start_time);
@@ -2699,7 +2702,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     $title = $nr_q->f('calendarevent_title');
     $privacy = $nr_q->f('calendarevent_privacy');
     $description = $nr_q->f('calendarevent_description'); 
-    $properties = $nr_q->f('calendarevent_properties'); ;
+    $properties = $nr_q->f('calendarevent_properties');
     $location = $nr_q->f('calendarevent_location'); 
     $category1 = $nr_q->f('calendarcategory1_label');
     $priority = $nr_q->f('calendarevent_priority');
@@ -2709,38 +2712,41 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     $all_day = $nr_q->f('calendarevent_allday');
     $entity = $nr_q->f('evententity_entity');
     $entity_id = $nr_q->f('evententity_entity_id');
+    $entity_state = $nr_q->f('evententity_state');
     $owner = $nr_q->f('calendarevent_owner');
     if (isset($of->events[$id])) {
       $event = &$of->events[$id];
       if (!$unique) {
-        $of->addOccurrence($event, $date, $entity, $entity_id);
+	$of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
       }
     } else {
       $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$color);
-      $of->addOccurrence($event, $date, $entity, $entity_id);
+      $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
     }
   }
   
+  // Get all repeating events and construct occurences & events model
   $r_q = run_query_calendar_repeat_events($start_time,$end_time,$calendar_entity,$category_filter);
   while ($r_q->next_record()) {
     $id = $r_q->f('calendarevent_id');
     $title = $r_q->f('calendarevent_title');
     $privacy = $r_q->f('calendarevent_privacy');
-    $description = $r_q->f('calendarevent_description'); 
-    $properties = $r_q->f('calendarevent_properties'); 
-    $location = $r_q->f('calendarevent_location'); 
+    $description = $r_q->f('calendarevent_description');
+    $properties = $r_q->f('calendarevent_properties');
+    $location = $r_q->f('calendarevent_location');
     $category1 = $r_q->f('calendarcategory1_label');
     $date = $r_q->f('calendarevent_date');
     $duration = $r_q->f('calendarevent_duration');
     $repeatkind = $r_q->f('calendarevent_repeatkind');
     $endrepeat = $r_q->f('calendarevent_endrepeat');
     $entity = $r_q->f('evententity_entity');
-    $all_day = $r_q->f('calendarevent_allday');     
+    $all_day = $r_q->f('calendarevent_allday');
     $color = $r_q->f('calendarevent_color');
     $repeatfrequence = $r_q->f('calendarevent_repeatfrequence');
     $repeatdays = $r_q->f('calendarevent_repeatdays');
-    $entity_id = $r_q->f('evententity_entity_id');    
-    $all_day = $r_q->f('calendarevent_allday');       
+    $entity_id = $r_q->f('evententity_entity_id');
+    $entity_state = $nr_q->f('evententity_state');
+    $all_day = $r_q->f('calendarevent_allday');    
     $owner = $r_q->f('calendarevent_owner');
     if (!$endrepeat) {
       $endrepeat = $end_time;
@@ -2781,12 +2787,17 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
       }
     }
   }
+
+  // Process the model : exceptions, attendees
   if (count($of->events) > 0) {
+
+    // Handle exceptions : remove occurences from the model
     $exception_q = run_query_get_events_exception(array_keys($of->events),$start_time,$end_time);
     while($exception_q->next_record()) {
       $of->removeOccurrences($exception_q->f('calendarexception_event_id'), $exception_q->f('calendarexception_date'));
     }
 
+    // Add attendees to events
     $attendee_q = run_query_get_events_attendee(array_keys($of->events));
     while($attendee_q->next_record()) {
       $id = $attendee_q->f('calendarevent_id');
@@ -3276,22 +3287,25 @@ Class Occurrence {
   var $date;
   var $entity;
   var $id;
+  var $entity_state;
 
   /**
-   * Occurrence 
-   * 
-   * @param mixed $event 
-   * @param mixed $date 
-   * @param mixed $entity 
-   * @param mixed $id 
+   * Occurrence
+   *
+   * @param mixed $event
+   * @param mixed $date
+   * @param mixed $entity
+   * @param mixed $id
+   * @param mixed $state entity state
    * @access public
    * @return void
    */
-  function Occurrence(&$event, $date, $entity, $id) {
+  function Occurrence(&$event, $date, $entity, $id, $state) {
     $this->event = &$event;
     $this->date = $date;
     $this->entity = $entity;
     $this->id = $id;
+    $this->entity_state = $state;
   }
 
 }
@@ -3334,18 +3348,19 @@ Class OccurrenceFactory {
   }
 
   /**
-   * add an occurrence for a given event 
+   * add an occurrence for a given event (add the event if not set)
    * 
-   * @param Event $event 
-   * @param timestamp $date 
-   * @param string $entity 
-   * @param id $id 
+   * @param Event $event
+   * @param timestamp $date
+   * @param string $entity
+   * @param string $id entity id
+   * @param mixed $state entity state
    * @access public
    * @return void
    */
-  function addOccurrence(&$event, $date, $entity, $id) {
+  function addOccurrence(&$event, $date, $entity, $id, $state='A') {
     if ($date < $this->end && ($date + $event->duration) > $this->begin) {
-      $this->occurrences[$event->id][] = &new Occurrence($event, $date, $entity, $id);
+      $this->occurrences[$event->id][] = &new Occurrence($event, $date, $entity, $id, $state);
       $this->events[$event->id] = &$event;
     }
   }
@@ -3360,14 +3375,14 @@ Class OccurrenceFactory {
    */
   function removeOccurrences($id, $date) {
     foreach($this->occurrences[$id] as $key => $occurrence) {
-      if(date('Ymd',$date) ==  date('Ymd',$occurrence->date)) {
+      if(date('Ymd',$date) == date('Ymd',$occurrence->date)) {
         unset($this->occurrences[$id][$key]); 
       }
     }
   }
 
   /**
-   * Returl all occurrence
+   * Returl all occurrences
    * 
    * @access public
    * @return array
@@ -3375,7 +3390,7 @@ Class OccurrenceFactory {
   function getOccurrences() {
     $return = array();
     foreach($this->occurrences as $evtOccurrences) {
-      $return = array_merge($return,$evtOccurrences);
+      $return = array_merge($return, $evtOccurrences);
     }
     return $return;
   }
@@ -3465,7 +3480,7 @@ Class OccurrenceFactory {
         }
       }
     }
-    if(count($occurrence) > 0) {
+    if (count($occurrence) > 0) {
       return $occurrences;
     } else {
       return NULL;
@@ -3537,7 +3552,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $repeatend = of_datetime_format(strtotime($calendar['repeat_end']));
     $old_repeatfrequence = $event_q->f('calendarevent_repeatfrequence');
     $repeatfrequence = $calendar['repeatfrequency'];
-    $owner = $event_q->f('owner_lastname').' '.$event_q->f('owner_firstname');    
+    $owner = $event_q->f('owner_lastname').' '.$event_q->f('owner_firstname');
 
     $mail_datas['reset_state'] = (($location != $old_location) || $mail_datas['reset_state']);
     $mail_datas['reset_state'] = (($all_day != $old_all_day) || $mail_datas['reset_state']);
