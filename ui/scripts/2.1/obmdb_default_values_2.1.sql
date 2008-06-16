@@ -52,3 +52,24 @@ INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainprope
 -- Fill the initial update_state for each Domain
 INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) VALUES (0, 'update_state', 1);
 
+-------------------------------------------------------------------------------
+-- Remplissage de la table 'UserSystem' : Utilisateurs systeme
+-- La modification des valeurs de cette table a des impact sur la configuration
+-- système
+-------------------------------------------------------------------------------
+DELETE FROM UserSystem;
+
+-- utilisateur 'cyrus', mot de passe 'cyrus' - doit être administrateur Cyrus
+INSERT INTO UserSystem VALUES (1,'cyrus','cyrus','103','8','/var/spool/cyrus','Cyrus','Administrator','/bin/false');
+-- utilisateur 'ldapadmin', mot de passe 'mdp3PaAL' - doit avoir le droit
+-- d'écriture sur l'arborescence LDAP d'OBM
+INSERT INTO UserSystem VALUES (2,'ldapadmin','mdp3PaAL','150','65534','/var/lib/ldap','LDAP','Administrator','/bin/false');
+-- utilisateur 'samba', mot de passe 'm#Pa!NtA' - doit avoir le droit de
+-- lecture/écriture sur une partie de l'arborescence (cf. Samba doc)
+INSERT INTO UserSystem VALUES (3,'samba','m#Pa!NtA','106','65534','/','SAMBA','LDAP writer','/bin/false');
+-- utilisateur 'obmsatellite', mot de passe 'mG4_Zdnh' - doit avoir le droit de
+-- lecture sur l'arborescence d'OBM
+INSERT INTO UserSystem VALUES (4,'obmsatellite','mG4_Zdnh','200','65534','/','OBM Satellite','LDAP Reader','/bin/false');
+
+
+
