@@ -54,6 +54,8 @@ function show_hide_calendar_dates(field) {
   target = window.document;
   begin = target.getElementById('hour_begin');   
   end = target.getElementById('hour_end');
+  $('hour_end').getElement('select[name=sel_time_end]').options.selectedIndex = $('hour_begin').getElement('select[name=sel_time_begin]').options.selectedIndex + 1;
+  $('hour_end').getElement('select[name=sel_min_end]').options.selectedIndex = $('hour_begin').getElement('select[name=sel_min_begin]').options.selectedIndex;
   if(field.checked) {
     end.style.display = 'none';
     begin.style.display = 'none';

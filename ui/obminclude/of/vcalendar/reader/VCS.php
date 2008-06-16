@@ -434,7 +434,7 @@ class Vcalendar_Reader_VCS {
     $db = new DB_OBM;
     if(!is_null($attendee['cn'])) {
       $this->cns[$entity][$attendee['cn']] = NULL;
-      $cn = "OR cn = '".$attendee['cn']."'";
+      $cn = "OR cn = '".addslashes($attendee['cn'])."'";
     }
     if(!is_null($attendee['mail'])) {
       $this->mails[$entity][$attendee['mail']] = NULL;
