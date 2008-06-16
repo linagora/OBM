@@ -12,11 +12,11 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["resource_name"] = $l_name;
-$fieldnames["resource_description"] = $l_desc; // description 
-$fieldnames["resource_qty"] = $l_qty; // quantity 
-$fieldnames["resourcetype_label"] = $l_rtype; 
-$fieldnames["resource_id"] = $l_update;
+$fieldnames['resource_name'] = $l_name;
+$fieldnames['resource_description'] = $l_desc; // description 
+$fieldnames['resource_qty'] = $l_qty; // quantity 
+$fieldnames['resourcetype_label'] = $l_rtype; 
+$fieldnames['resource_id'] = $l_update;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,19 +31,19 @@ $fieldnames["resource_id"] = $l_update;
 function dis_data_resource(&$OD, $fieldname, $link_ok) {
   global $path, $ico_update, $params;
 
-  if (($fieldname == "resource_name") && $link_ok) {
-    $res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$OD->data_set->f("resource_id");
+  if (($fieldname == 'resource_name') && $link_ok) {
+    $res['url'] = "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$OD->data_set->f('resource_id');
   }
-  if (($fieldname == "data_element") && $params["ext_element"] != "") {
-    $res["name"] = "<span id=\"data-resource-".$OD->data_set->f("resource_id")."\" style=\"display:none;\">".
-    $OD->data_set->f("resource_name").
+  if (($fieldname == 'data_element') && $params['ext_element'] != '') {
+    $res['name'] = "<span id=\"data-resource-".$OD->data_set->f('resource_id')."\" style=\"display:none;\">".
+    $OD->data_set->f('resource_name').
     "</span>";
   }
-  else if ($fieldname == "resource_id") {
-    $t_id = $OD->data_set->f("resource_id");
-    $res["url"] = "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=$t_id";
-    $res["name"] = "<img src=\"$ico_update\" alt=\"\" />";
-    $res["txt_name"] = " ";
+  else if ($fieldname == 'resource_id') {
+    $t_id = $OD->data_set->f('resource_id');
+    $res['url'] = "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=$t_id";
+    $res['name'] = "<img src=\"$ico_update\" alt=\"\" />";
+    $res['txt_name'] = ' ';
   }
 
   return $res;
@@ -62,25 +62,25 @@ function html_resource_search_form($resource) {
   global $display, $c_all, $l_rtype;
   global $l_undef, $c_undef;
 
-  $lname = $resource["name"];
-  $ldesc = stripslashes($resource["desc"]);
-  $qtyinf = $resource["qtyinf"];
-  $qtysup = $resource["qtysup"];
-  $popup = $resource["popup"];
-  $sel_rtype = $resource["rtype"];
+  $lname = $resource['name'];
+  $ldesc = stripslashes($resource['desc']);
+  $qtyinf = $resource['qtyinf'];
+  $qtysup = $resource['qtysup'];
+  $popup = $resource['popup'];
+  $sel_rtype = $resource['rtype'];
 
-  if ($resource["restriction"]) {
+  if ($resource['restriction']) {
     $dis_restriction = "<input name=\"restriction\" type=\"hidden\" value=\"user\">";
   }
 
   if ($popup) {
-    $ext_action = $resource["ext_action"];
-    $ext_title = stripslashes($resource["ext_title"]);
-    $ext_url = $resource["ext_url"];
-    $ext_id = $resource["ext_id"];
-    $ext_target = $resource["ext_target"];
-    $ext_widget = $resource["ext_widget"];
-    $ext_element =  $resource["ext_element"];
+    $ext_action = $resource['ext_action'];
+    $ext_title = stripslashes($resource['ext_title']);
+    $ext_url = $resource['ext_url'];
+    $ext_id = $resource['ext_id'];
+    $ext_target = $resource['ext_target'];
+    $ext_widget = $resource['ext_widget'];
+    $ext_element =  $resource['ext_element'];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
@@ -88,10 +88,10 @@ function html_resource_search_form($resource) {
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
 	          <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    if ($ext_title == "") {
+    if ($ext_title == '') {
       $ext_title = $l_add_resources;
     }
-    $display["title"] = $ext_title;
+    $display['title'] = $ext_title;
   }
 
   // Resource Type
@@ -99,20 +99,20 @@ function html_resource_search_form($resource) {
   $block_resourcetype = "<select name=\"sel_rtype\" id=\"sel_rtype\">
     <option value=\"$c_undef\">$l_undef</option>";
   while($resourcetype_q->next_record()) {
-    $id = $resourcetype_q->f("resourcetype_id");
-    $label = $resourcetype_q->f("resourcetype_label");
+    $id = $resourcetype_q->f('resourcetype_id');
+    $label = $resourcetype_q->f('resourcetype_label');
     if ($id == $sel_rtype) {
-      $selected = "selected";
+      $selected = 'selected';
     } else {
-      $selected = "";
+      $selected = '';
     }
     $block_resourcetype .= "<option value=\"$id\" $selected>$label</option>";
   }
-  $block_resourcetype .= "</select>";
+  $block_resourcetype .= '</select>';
 
   $block = "
   <form method=\"get\" name=\"f_search\"
-    action=\"". url_prepare("resource_index.php")."\" class=\"search\">
+    action=\"". url_prepare('resource_index.php')."\" class=\"search\">
 
     <label>$l_name<br />
       <input type=\"text\" name=\"tf_name\" size=\"30\" maxlength=\"32\"
@@ -160,16 +160,16 @@ function dis_resource_search_list($resource) {
   global $l_found, $l_no_found;
   global $display, $obm;
 
-  $popup = $resource["popup"];
-  $restriction = $resource["restriction"];
+  $popup = $resource['popup'];
+  $restriction = $resource['restriction'];
 
-  $prefs = get_display_pref($obm["uid"], "resource");
+  $prefs = get_display_pref($obm['uid'], 'resource');
   $obm_q = run_query_resource_search($resource);
   $nb_resource = $obm_q->num_rows_total();
   if ($nb_resource == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found);
+    $display['msg'] .= display_warn_msg($l_no_found);
   } else {
-    $display["msg"] .= display_info_msg("$nb_resource $l_found");
+    $display['msg'] .= display_info_msg("$nb_resource $l_found");
     $block = html_resource_search_list($obm_q, $prefs, $resource, $popup);
   }
 
@@ -189,35 +189,35 @@ function dis_resource_search_list($resource) {
 function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
   global $l_close, $l_add;
 
-  $lname = urlencode($resource["name"]);
-  $ldesc = urlencode($resource["desc"]);
-  $lqtyinf = urlencode($resource["qtyinf"]);
-  $lqtysup = urlencode($resource["qtysup"]);
-  $rtype = $resource["rtype"];
+  $lname = urlencode($resource['name']);
+  $ldesc = urlencode($resource['desc']);
+  $lqtyinf = urlencode($resource['qtyinf']);
+  $lqtysup = urlencode($resource['qtysup']);
+  $rtype = $resource['rtype'];
 
   if ($popup) {
-    $ext_action = $resource["ext_action"];
-    $ext_url = $resource["ext_url"];
-    $ext_id = $resource["ext_id"];
-    $ext_target = $resource["ext_target"];
-    $ext_widget = $resource["ext_widget"];
-    $ext_element =  $resource["ext_element"];
+    $ext_action = $resource['ext_action'];
+    $ext_url = $resource['ext_url'];
+    $ext_id = $resource['ext_id'];
+    $ext_target = $resource['ext_target'];
+    $ext_widget = $resource['ext_widget'];
+    $ext_element =  $resource['ext_element'];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
   }
 
   $url = url_prepare("resource_index.php?action=search&amp;tf_name=$lname&amp;tf_desc=$ldesc&amp;tf_qtyinf=$lqtyinf&amp;tf_qtysup=$lqtysup&amp;sel_rtype=$rtype$url_ext");
 
-  $resource_d = new OBM_DISPLAY("DATA", $prefs, "resource");
+  $resource_d = new OBM_DISPLAY('DATA', $prefs, 'resource');
   if ($popup) {
     $resource_d->display_link = false;
-    $resource_d->data_cb_text = "X";
-    $resource_d->data_idfield = "resource_id";
-    $resource_d->data_cb_name = "data-r-";
-    if ($ext_widget != "") {
+    $resource_d->data_cb_text = 'X';
+    $resource_d->data_idfield = 'resource_id';
+    $resource_d->data_cb_name = 'data-r-';
+    if ($ext_widget != '') {
       $resource_d->data_form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";
-    } elseif ($ext_element != "")  {
-      $resource_d->data_cb_name = "";
+    } elseif ($ext_element != '')  {
+      $resource_d->data_cb_name = '';
       $resource_d->data_form_head = "
       <form onsubmit=\"of_select_fill_from_checkbox(this);return false;\">";
     } else {
@@ -238,11 +238,11 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
       </p>";
   }
   $resource_d->data_set = $obm_q;
-  $resource_d->data_header = "both";
+  $resource_d->data_header = 'both';
   $resource_d->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  $block .= $resource_d->display("dis_data_resource");
+  $block .= $resource_d->display('dis_data_resource');
   $block .= $display_popup_end;
 
   return $block;
@@ -263,39 +263,39 @@ function html_resource_form($usr_q, $resource) {
   global $l_undef, $c_undef,$l_admin_permission;
 
   // if update mode and first time value are taken from database
-  if ($action == "detailupdate") {
-    $id = $usr_q->f("resource_id");
-    $name = $usr_q->f("resource_name");
-    $desc = $usr_q->f("resource_description");
-    $rtype = $usr_q->f("resource_rtype_id");
-    $qty = $usr_q->f("resource_qty");
+  if ($action == 'detailupdate') {
+    $id = $usr_q->f('resource_id');
+    $name = $usr_q->f('resource_name');
+    $desc = $usr_q->f('resource_description');
+    $rtype = $usr_q->f('resource_rtype_id');
+    $qty = $usr_q->f('resource_qty');
     $dis_title = $name;
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($resource["resource_id"])) { $id = $resource["resource_id"]; }
-  if (isset($resource["name"])) { $name = $resource["name"]; }
-  if (isset($resource["qty"])) { $qty = $resource["qty"]; }
-  if (isset($resource["rtype"])) { $rtype = $resource["rtype"]; }
+  if (isset($resource['resource_id'])) { $id = $resource['resource_id']; }
+  if (isset($resource['name'])) { $name = $resource['name']; }
+  if (isset($resource['qty'])) { $qty = $resource['qty']; }
+  if (isset($resource['rtype'])) { $rtype = $resource['rtype']; }
 
   // Resource Type
   $resourcetype_q = run_query_resourcetype();
   $block_resourcetype = "<select name=\"sel_rtype\" id=\"sel_rtype\">
     <option value=\"$c_undef\">$l_undef</option>";
   while($resourcetype_q->next_record()) {
-    $rtype_id = $resourcetype_q->f("resourcetype_id");
-    $label = $resourcetype_q->f("resourcetype_label");
+    $rtype_id = $resourcetype_q->f('resourcetype_id');
+    $label = $resourcetype_q->f('resourcetype_label');
     if ($rtype_id == $rtype) {
-      $selected = "selected";
+      $selected = 'selected';
     } else {
-      $selected = "";
+      $selected = '';
     }
     $block_resourcetype .= "<option value=\"$rtype_id\" $selected>$label</option>";
   }
-  $block_resourcetype .= "</select>";
+  $block_resourcetype .= '</select>';
 
   // Buttons
-  if (($action == "new") || ($action == "insert")) {
+  if (($action == 'new') || ($action == 'insert')) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
 
@@ -314,19 +314,19 @@ function html_resource_form($usr_q, $resource) {
     });
     </script>";
 
-  } elseif (($action=="detailupdate") || ($action=="update")) {
+  } elseif (($action == 'detailupdate') || ($action == 'update')) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
           <input type=\"hidden\" name=\"resource_id\" value=\"$id\" />
           <input type=\"submit\" value=\"$l_update\" />";
   }
 
-  $display["title"] = $dis_title;
+  $display['title'] = $dis_title;
 
   // --- HTML Template --------------------------------------------------------
   $block = "
     <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_resource(this)) return true; else return false;\"
-      action=\"" . url_prepare("resource_index.php") . "\">
+      action=\"" . url_prepare('resource_index.php') . "\">
     
     <fieldset class=\"detail extra\">
     <legend>$l_resource</legend>
@@ -368,17 +368,17 @@ function html_resource_form($usr_q, $resource) {
 function dis_resource_consult($resource) {
   global $display, $l_err_reference;
 
-  $id = $resource["resource_id"];
+  $id = $resource['resource_id'];
 
   if ($id > 0) {
     $obm_q = run_query_resource_detail($id);
     if ($obm_q->num_rows() == 1) {
       $block = html_resource_consult($obm_q);
     } else {
-      $display["msg"] .= display_err_msg($l_err_reference);
+      $display['msg'] .= display_err_msg($l_err_reference);
     }
   } else {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_err_msg($l_err_reference);
   }
 
   return $block;
@@ -394,14 +394,14 @@ function html_resource_consult($obm_q) {
   global $l_resource, $l_name, $l_desc, $l_qty, $l_rtype;
   global $path, $display, $c_yes, $c_no;
 
-  $id = $obm_q->f("resource_id");
-  $name = $obm_q->f("resource_name");
-  $desc = $obm_q->f("resource_description");
-  $qty = $obm_q->f("resource_qty");
-  $rtype = ucfirst($obm_q->f("resourcetype_label"));
+  $id = $obm_q->f('resource_id');
+  $name = $obm_q->f('resource_name');
+  $desc = $obm_q->f('resource_description');
+  $qty = $obm_q->f('resource_qty');
+  $rtype = ucfirst($obm_q->f('resourcetype_label'));
 
-  $display["detailInfo"] = display_record_info($obm_q);
-  $display["title"] = $name;
+  $display['detailInfo'] = display_record_info($obm_q);
+  $display['title'] = $name;
 
   $block = "
   <div class=\"detail extra\">
@@ -437,7 +437,7 @@ function html_resource_consult($obm_q) {
 function dis_resource_can_delete($p_id) {
   global $display, $l_delete, $l_can_delete, $l_back;
 
-  $url = url_prepare("resource_index.php");
+  $url = url_prepare('resource_index.php');
 
   $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
@@ -451,7 +451,7 @@ function dis_resource_can_delete($p_id) {
     <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 
-  $display["msg"] .= display_ok_msg($l_can_delete);
+  $display['msg'] .= display_ok_msg($l_can_delete);
   $block .= "
       <div class=\"buttons\">
         $dis_delete
@@ -471,9 +471,9 @@ function dis_resource_right_dis_admin($id) {
   global $display, $l_resource;
 
   $infos = get_resource_infos($id);
-  $name = $infos["name"];
-  $display["title"] = $name;
-  $block = of_right_dis_admin("Resource", $id);
+  $name = $infos['name'];
+  $display['title'] = $name;
+  $block = of_right_dis_admin('Resource', $id);
 
   return $block;
 }
@@ -487,7 +487,7 @@ function dis_resource_right_dis_admin($id) {
 function dis_resource_display_pref($prefs) {
   global $l_resource_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "resource");
+  $dis_pref = new OBM_DISPLAY('PREFERENCES', $prefs, 'resource');
   $dis_pref->pref_title = $l_resource_display;
   $dis_pref->pref_dis_help = 1;
 
@@ -513,14 +513,14 @@ function json_search_resources($resource,$results) {
 
   $resources = array();
   while($res_q->next_record()) {
-    $id = $res_q->f("resource_id");
-    $resourcetype_id = $res_q->f("resource_rtype_id");
-    $label = phpStringToJsString($res_q->f("resource_name"));
-    $extra = phpStringToJsString("$l_qty : ".$res_q->f("resource_qty"));
+    $id = $res_q->f('resource_id');
+    $resourcetype_id = $res_q->f('resource_rtype_id');
+    $label = phpStringToJsString($res_q->f('resource_name'));
+    $extra = phpStringToJsString("$l_qty : ".$res_q->f('resource_qty'));
     $items = $res_q->f('items');
-    $property = $res_q->f("resourcetype_property");
+    $property = $res_q->f('resourcetype_property');
 
-    if ($form == "event" && $resourcetype_id != "") {
+    if ($form == 'event' && $resourcetype_id != '') {
       // Display resource item
       // TODO : Afficher le lien seulement si des accessoires sont dispo. 
       $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&resource_id=$id";
@@ -546,7 +546,7 @@ function json_search_resources($resource,$results) {
       }
 
       // Display resource property if exists
-      if ($property != "") {
+      if ($property != '') {
         $l_property = phpStringToJsString(ucfirst($property));
         $extension .= ".
           adopt(
@@ -567,14 +567,14 @@ function json_search_resources($resource,$results) {
               )
           )";
       } else {
-        $extension .= "";
+        $extension .= '';
       }
     } else {
       $extension = "''";
     }
     $resources[] = "{id:'data-resource-$id', label:'$label', extra:'$extra', extension: $extension}";
   }
-  $display["json"] = "{length:".$results['length'].", datas:[".implode(",",$resources)."]}";
+  $display['json'] = "{length:".$results['length'].", datas:[".implode(',',$resources)."]}";
 }
 
 
@@ -610,14 +610,14 @@ function html_resource_resourcetype_form($rt_q) {
 
   $key = 0;
   while($rt_q->next_record()) {
-    $id = $rt_q->f("resourcetype_id");
-    $label = $rt_q->f("resourcetype_label");
-    $property = $rt_q->f("resourcetype_property");
-    $kind = $rt_q->f("resourcetype_kind");
+    $id = $rt_q->f('resourcetype_id');
+    $label = $rt_q->f('resourcetype_label');
+    $property = $rt_q->f('resourcetype_property');
+    $kind = $rt_q->f('resourcetype_kind');
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
-      $class = "";
+      $class = '';
     }
     $key ++;
 
@@ -712,30 +712,30 @@ function html_resource_resourceitem_form($ri_q) {
 
   $key = 0;
   while($ri_q->next_record()) {
-    $id = $ri_q->f("resourceitem_id");
-    $label = $ri_q->f("resourceitem_label");
-    $desc = $ri_q->f("resourceitem_description"); 
-    $type_id = $ri_q->f("resourceitem_resourcetype_id");
+    $id = $ri_q->f('resourceitem_id');
+    $label = $ri_q->f('resourceitem_label');
+    $desc = $ri_q->f('resourceitem_description'); 
+    $type_id = $ri_q->f('resourceitem_resourcetype_id');
 
     $rt_q = run_query_resourcetype();
     $sel_type = "<select name=\"sel_rtype\" id=\"sel_rtype_$id\">";
     while($rt_q->next_record()) {
-      $rtype_id = $rt_q->f("resourcetype_id");
-      $rtype_label = $rt_q->f("resourcetype_label");
+      $rtype_id = $rt_q->f('resourcetype_id');
+      $rtype_label = $rt_q->f('resourcetype_label');
       if ($type_id == $rtype_id) {
-        $selected = "selected";
+        $selected = 'selected';
       } else {
-        $selected = "";
+        $selected = '';
       }
       $sel_type .= "<option value=\"$rtype_id\" $selected>$rtype_label</option>";
   
     } 
-    $sel_type .= "</select>";
+    $sel_type .= '</select>';
 
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
-      $class = "";
+      $class = '';
     }
     $key ++;
 
@@ -760,17 +760,17 @@ function html_resource_resourceitem_form($ri_q) {
   $rt_q = run_query_resourcetype();
   $sel_type = "<select name=\"sel_rtype\" id=\"sel_rtype_$id\">";
   while($rt_q->next_record()) {
-    $rtype_id = $rt_q->f("resourcetype_id");
-    $rtype_label = $rt_q->f("resourcetype_label");
+    $rtype_id = $rt_q->f('resourcetype_id');
+    $rtype_label = $rt_q->f('resourcetype_label');
     if ($type_id == $rtype_id) {
-      $selected = "selected";
+      $selected = 'selected';
     } else {
-      $selected = "";
+      $selected = '';
     }
     $sel_type .= "<option value=\"$rtype_id\">$rtype_label</option>";
   
   } 
-  $sel_type .= "</select>";
+  $sel_type .= '</select>';
 
   // --- HTML Template --------------------------------------------------------
   $block = "
@@ -848,7 +848,7 @@ function dis_resource_links($params, $kind) {
 
   $id = $params["${kind}"];
   
-  if ($kind == "rtype") {
+  if ($kind == 'rtype') {
     $obm_q = run_query_resource_rtype_links($params);
   } else {
     $obm_q = run_query_resource_ritem_links($params); 
@@ -856,9 +856,9 @@ function dis_resource_links($params, $kind) {
 
   $nb = $obm_q->num_rows();
   if ($nb > 0) {
-    $display["msg"] .= display_warn_msg("${$l_kind} : $l_c_cant_delete");    
+    $display['msg'] .= display_warn_msg("${$l_kind} : $l_c_cant_delete");    
   } else {
-    $display["msg"] .= display_ok_msg("${$l_kind} : $l_c_can_delete");
+    $display['msg'] .= display_ok_msg("${$l_kind} : $l_c_can_delete");
     $dis_buttons .= "<a href=\"?action=${kind}_delete&amp;${kind}=$id\">$l_c_delete</a>";
   }
 
@@ -882,7 +882,7 @@ function dis_resource_links($params, $kind) {
 function dis_ritem_popup($params) {
 
   // ResourceItem
-  $r_id = $params["resource_id"];
+  $r_id = $params['resource_id'];
   $ri_q = run_query_resourceitem($r_id);
   $block .= html_resource_resourceitem_popup($ri_q, $params);
 
@@ -902,16 +902,16 @@ function html_resource_resourceitem_popup($ri_q, $params) {
   global $l_close, $l_ritem, $l_ritem_add, $l_add;
   global $l_no_item_available;
 
-  $res_id = $params["resource_id"];
+  $res_id = $params['resource_id'];
   
   while($ri_q->next_record()) {
-    $id = $ri_q->f("resourceitem_id");
-    $label = $ri_q->f("resourceitem_label");
-    $desc = $ri_q->f("resourceitem_description");
+    $id = $ri_q->f('resourceitem_id');
+    $label = $ri_q->f('resourceitem_label');
+    $desc = $ri_q->f('resourceitem_description');
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
-      $class = "";
+      $class = '';
     }
     $key ++;
     $ritem_list .= "
@@ -921,14 +921,14 @@ function html_resource_resourceitem_popup($ri_q, $params) {
      <span id=\"data-ritem-$id\" name=\"data-ritem-$id\" style=\"display: none;\">$label</span>
     </td>
     <td> $label </td>
-    <td>".nl2br($desc)."</td>
-    </tr>";
+    <td>".nl2br($desc).'</td>
+    </tr>';
   }
 
-  $display["title"] = $l_ritem;
+  $display['title'] = $l_ritem;
 
   // If no item, display error message
-  if ($ritem_list == "") {
+  if ($ritem_list == '') {
     return display_err_msg($l_no_item_available);
   } else {
 

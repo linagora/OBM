@@ -14,16 +14,16 @@
 //   - $entity_id : entity id
 //   - $real_entity : [optionnal] if set, real data entity (eg mailbox->user)
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_dis_admin($entity, $entity_id, $real_entity="") {
+function of_right_dis_admin($entity, $entity_id, $real_entity='') {
   global $display, $obm, $l_of_right_err_empty;
 
-  if (!isset($entity_id) || ($entity_id == "")) {
-    $display["msg"] .= display_err_msg($l_of_right_err_empty);
+  if (!isset($entity_id) || ($entity_id == '')) {
+    $display['msg'] .= display_err_msg($l_of_right_err_empty);
     return;
   }
 
-  $admin_entity = of_right_entity_for_user($entity, $obm["uid"], "admin","", $real_entity);
-  $display["features"] = html_entityadmin_bar($admin_entity ,$entity_id, $entity);
+  $admin_entity = of_right_entity_for_user($entity, $obm['uid'], 'admin','', $real_entity);
+  $display['features'] = html_entityadmin_bar($admin_entity ,$entity_id, $entity);
 
   $consumers = of_right_consumer_for_entity($entity, $entity_id);
 
@@ -37,23 +37,23 @@ function of_right_dis_admin($entity, $entity_id, $real_entity="") {
 //   - $writable_user : Array of user on who you can manage the calandar
 ///////////////////////////////////////////////////////////////////////////////
 function html_entityadmin_bar($writable_entity,$entity_id, $entity) {
-  global $l_entity_right, $l_validate,$path, $module;
+  global $l_entity_right, $l_validate, $path, $module;
 
-  if($module != '') {
+  if ($module != '') {
     $uri = $path.'/'.$module.'/'.$module.'_index.php';
   }
   // Entity Selection
-  if (count($writable_entity["ids"]) > 0) {
+  if (count($writable_entity['ids']) > 0) {
     $dis_sel .= "<select name=\"entity_id\">";
-    foreach ($writable_entity["entity"] as $entity) {
-      $id = $entity["id"];
-      $label =  $entity["label"];
+    foreach ($writable_entity['entity'] as $entity) {
+      $id = $entity['id'];
+      $label =  $entity['label'];
       $dis_sel .= "\n<option value=\"$id\"";
       if ($id == $entity_id ) {
         $tag = " selected=\"selected\"";
       }
       $dis_sel .= " $tag>$label</option>";
-      $tag = "";
+      $tag = '';
     }
     $dis_sel .= "</select>
     <br />
@@ -91,24 +91,24 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   global $l_authorize_list,$l_read_permission, $l_write_permission;
   global $l_right_validate ,$l_authorize,$l_deny, $ico_delete;
   global $l_public,$l_admin_permission, $module;
-  global $ico_add,$l_users,$path, $l_groups;
+  global $path, $ico_add, $l_users, $l_groups;
 
   $l_userSearch = phpStringToJsString("$l_users...");
-  foreach ($consumers["consumer"] as $one_consumer) {
-    $id = $one_consumer["id"];
-    $entity = $one_consumer["entity"];
-    $label = $one_consumer["label"];
-    $write = $one_consumer["write"];
-    $read = $one_consumer["read"];
-    $admin = $one_consumer["admin"];
+  foreach ($consumers['consumer'] as $one_consumer) {
+    $id = $one_consumer['id'];
+    $entity = $one_consumer['entity'];
+    $label = $one_consumer['label'];
+    $write = $one_consumer['write'];
+    $read = $one_consumer['read'];
+    $admin = $one_consumer['admin'];
 
     if ($id == 0) {
       if ($read == 1) {
-        $style_read = "visibility:hidden;";
+        $style_read = 'visibility:hidden;';
         $public_read_checked = "checked=\"checked\"";
       }
       if ($write == 1) {
-        $style_write = "visibility:hidden;";
+        $style_write = 'visibility:hidden;';
         $public_write_checked = "checked=\"checked\"";
       }
     } else {
@@ -319,7 +319,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     }
   </script>
   <form method=\"post\" name=\"f_mod_right\"
-    action=\"".url_prepare($_SERVER["PHP_SELF"])."\">
+    action=\"".url_prepare($_SERVER['PHP_SELF'])."\">
 
   <fieldset class=\"detail infos\">
   <legend>$l_read_permission</legend>
@@ -392,7 +392,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 // Returns:
 //   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2)))
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set="", $real_entity="") {
+function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set='', $real_entity='') {
   global $cdg_sql, $obm;
 
   $obm_q = new DB_OBM;
@@ -402,21 +402,21 @@ function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set=""
   $id_array = array();
 
   $entity = strtolower($entityu);
-  if ($real_entity != "") {
+  if ($real_entity != '') {
     $r_entity = $real_entity;
   } else {
     $r_entity = $entity;
   }
 
-  if ($r_entity == "userobm") {
-    $table_entity = "UserObm";
-    $e_id = "e.userobm_id";
-    $ctt[0]["type"] = "field";
-    $ctt[0]["value"] = "userobm_lastname";
-    $ctt[1]["type"] = "string";
-    $ctt[1]["value"] = " ";
-    $ctt[2]["type"] = "field";
-    $ctt[2]["value"] = "userobm_firstname";
+  if ($r_entity == 'userobm') {
+    $table_entity = 'UserObm';
+    $e_id = 'e.userobm_id';
+    $ctt[0]['type'] = 'field';
+    $ctt[0]['value'] = 'userobm_lastname';
+    $ctt[1]['type'] = 'string';
+    $ctt[1]['value'] = ' ';
+    $ctt[2]['type'] = 'field';
+    $ctt[2]['value'] = 'userobm_firstname';
     $e_label = sql_string_concat($db_type, $ctt);
     $u = get_user_info($user_id);
     $union = "UNION SELECT '$u[id]' as id, '$u[lastname] $u[firstname]' as label, '$entity' as entityright_entity" ;
@@ -426,7 +426,7 @@ function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set=""
     $e_label = "e.${entity}_name";
   }
 
-  if ($right != "all") {
+  if ($right != 'all') {
     $where_right = "AND entityright_$right = 1";
   }
 
@@ -445,29 +445,29 @@ function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set=""
     $union
     ORDER BY entityright_entity, label";
 
-  display_debug_msg($query, $cdg_sql, "of_right_entity_for_user()");
+  display_debug_msg($query, $cdg_sql, 'of_right_entity_for_user()');
   $obm_q->query($query);
 
   while($obm_q->next_record()) {
-    $id = $obm_q->f("id");
-    if ( ($ids_set == "")
+    $id = $obm_q->f('id');
+    if ( ($ids_set == '')
 	 || ( (is_array($ids_set)) && (in_array($id, $ids_set)) ) ) {
-      $label = $obm_q->f("label");
+      $label = $obm_q->f('label');
       $id_array[] = $id;
       $ent_array[] = array(
-			   "id"    => $id,
-			   "label" => $label
+			   'id'    => $id,
+			   'label' => $label
 			   );
     }
   }
   $ret_array = array();
-  $ret_array["ids"] = array();
+  $ret_array['ids'] = array();
   if (is_array($id_array)) {
-    $ret_array["ids"] = $id_array;
+    $ret_array['ids'] = $id_array;
   }
-  $ret_array["entity"] = array();
+  $ret_array['entity'] = array();
   if (is_array($ent_array)) {
-    $ret_array["entity"] = $ent_array;
+    $ret_array['entity'] = $ent_array;
   }
 
   return $ret_array;
@@ -480,51 +480,51 @@ function of_right_entity_for_user($entityu, $user_id, $right="read", $ids_set=""
 //   - $entity      : target entity
 //   - $entity_id   : entity id
 //   - $consumer    : consumer type
-//   - $right       : right to get and select from : "all", "read", "write" or
-//                    "admin"
+//   - $right       : right to get and select from : 'all', 'read', 'write' or
+//                    'admin'
 // Returns:
-//   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2))
+//   array ('ids'=>(id1, id2, id3), 'entity'=>((id1,label1), (id2,label2))
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $right="all") {
+function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $right='all') {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   if(count($entity_id) == 0) {
-    return array("ids" => array(), "entity" => array());
+    return array('ids' => array(), 'entity' => array());
   }
   if(is_array($entity_id)) {
-    $entity_id = implode(",",$entity_id);
+    $entity_id = implode(',',$entity_id);
   }
 
   $id_array = array();
   $con_array = array();
 
-  if ($consumer == "user" || $consumer == "all" ) {
+  if ($consumer == 'user' || $consumer == 'all' ) {
 
-    $table_consumer = "UserObm";
-    $c_id = "userobm_id";
-    $ctt[0]["type"] = "field";
-    $ctt[0]["value"] = "userobm_lastname";
-    $ctt[1]["type"] = "string";
-    $ctt[1]["value"] = " ";
-    $ctt[2]["type"] = "field";
-    $ctt[2]["value"] = "userobm_firstname";
+    $table_consumer = 'UserObm';
+    $c_id = 'userobm_id';
+    $ctt[0]['type'] = 'field';
+    $ctt[0]['value'] = 'userobm_lastname';
+    $ctt[1]['type'] = 'string';
+    $ctt[1]['value'] = ' ';
+    $ctt[2]['type'] = 'field';
+    $ctt[2]['value'] = 'userobm_firstname';
     $c_label = sql_string_concat($db_type, $ctt);
     $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'user' as entitydata_kind FROM UserObm";
     $u = get_user_info($user_id);
   }
-  if ($consumer == "group" || $consumer == "all" ) {
-    $table_consumer = "UGroup";
-    $c_id = "group_id";
-    $c_label = "group_name";
+  if ($consumer == 'group' || $consumer == 'all' ) {
+    $table_consumer = 'UGroup';
+    $c_id = 'group_id';
+    $c_label = 'group_name';
     $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'group' as entitydata_kind FROM UGroup";
   }
 
-  if ($right != "all") {
+  if ($right != 'all') {
     $where_right = "AND entityright_$right = 1";
   }
-  $table_consumer = implode(" UNION ", $entity_table);
+  $table_consumer = implode(' UNION ', $entity_table);
   $query = "SELECT
       entitydata_id as id,
       entitydata_label as label,
@@ -538,36 +538,36 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
     WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity'
       $where_right
     ORDER BY entitydata_kind, entitydata_label";
-  display_debug_msg($query, $cdg_sql, "of_right_consumer_for_entity()");
+  display_debug_msg($query, $cdg_sql, 'of_right_consumer_for_entity()');
   $obm_q->query($query);
   $ret_array = array();
   while($obm_q->next_record()) {
-    $id = $obm_q->f("id");
-    $label = $obm_q->f("label");
-    $entity_id = $obm_q->f("entityright_entity_id");
-    $entity = $obm_q->f("consumer");
-    $read = $obm_q->f("entityright_read");
-    $write = $obm_q->f("entityright_write");
-    $admin = $obm_q->f("entityright_admin");
+    $id = $obm_q->f('id');
+    $label = $obm_q->f('label');
+    $entity_id = $obm_q->f('entityright_entity_id');
+    $entity = $obm_q->f('consumer');
+    $read = $obm_q->f('entityright_read');
+    $write = $obm_q->f('entityright_write');
+    $admin = $obm_q->f('entityright_admin');
     $id_array[] = $id;
     $con_array[] = array(
-			 "id"    => $id,
-			 "label" => $label,
-                         "entity_id" => $entity_id,
-                         "entity" => $entity,
-			 "read" => $read,
-			 "write" => $write,
-			 "admin" => $admin
+			 'id'    => $id,
+			 'label' => $label,
+                         'entity_id' => $entity_id,
+                         'entity' => $entity,
+			 'read' => $read,
+			 'write' => $write,
+			 'admin' => $admin
 			 );
   }
 
-  $ret_array["ids"] = array();
+  $ret_array['ids'] = array();
   if (is_array($id_array)) {
-    $ret_array["ids"] = $id_array;
+    $ret_array['ids'] = $id_array;
   }
-  $ret_array["consumer"] = array();
+  $ret_array['consumer'] = array();
   if (is_array($con_array)) {
-    $ret_array["consumer"] = $con_array;
+    $ret_array['consumer'] = $con_array;
   }
 
   return $ret_array;
@@ -581,17 +581,17 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer="all", $rig
 //   - $entity : entity type to update
 //   - $real_entity : [optionnal] if set, real data entity (eg mailbox->user)
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_update_right($param, $entity, $real_entity="",$check_perms=true) {
+function of_right_update_right($param, $entity, $real_entity='',$check_perms=true) {
   global $cdg_sql, $obm, $err, $l_of_right_err_auth,$obm;
 
   $consumer_ereg = "/^data-(user|group)-([0-9]+)$/";
 
-  $eid = $param["entity_id"];
-  $accept_write = $param["accept_write"];
-  $accept_read = $param["accept_read"];
-  $accept_admin = $param["accept_admin"];
-  $public_write = $param["write_public"];
-  $public_read = $param["read_public"];
+  $eid = $param['entity_id'];
+  $accept_write = $param['accept_write'];
+  $accept_read = $param['accept_read'];
+  $accept_admin = $param['accept_admin'];
+  $public_write = $param['write_public'];
+  $public_read = $param['read_public'];
 
   if (! is_array($accept_read)) {
     $accept_read = array();
@@ -610,10 +610,10 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
   // Rights on external objects : defined by module access
   // Rights on userobm entity : user need write right on the entity
   // If user manipulating NOT its own data, check if he has rights
-  if (($eid != $obm["uid"] || $real_entity != 'userobm') && $check_perms) {
-    $admin_entity = of_right_entity_for_user($entity, $obm["uid"], "admin","", $real_entity);
-    if (!in_array($eid, $admin_entity["ids"])) {
-      $err["msg"] = $l_of_right_err_auth;
+  if (($eid != $obm['uid'] || $real_entity != 'userobm') && $check_perms) {
+    $admin_entity = of_right_entity_for_user($entity, $obm['uid'], 'admin','', $real_entity);
+    if (!in_array($eid, $admin_entity['ids'])) {
+      $err['msg'] = $l_of_right_err_auth;
       return false;
     }
   }
@@ -623,7 +623,7 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
     FROM EntityRight
     WHERE entityright_entity_id = '$eid'
       AND entityright_entity = '$entity'";
-  display_debug_msg($query, $cdg_sql, "of_right_update_right(1)");
+  display_debug_msg($query, $cdg_sql, 'of_right_update_right(1)');
   $obm_q->query($query);
   if ($public_read) {
     $accept_read = array();
@@ -648,7 +648,7 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
       '0',
       '$pr',
       '$pw')";
-    display_debug_msg($query, $cdg_sql, "of_right_update_right(2)");
+    display_debug_msg($query, $cdg_sql, 'of_right_update_right(2)');
     $obm_q->query($query);
   }
 
@@ -676,7 +676,7 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
           '1',
           '$w',
           '$a')";
-	display_debug_msg($query, $cdg_sql, "of_right_update_right(3)");
+	display_debug_msg($query, $cdg_sql, 'of_right_update_right(3)');
 	$obm_q->query($query);
       }
     }
@@ -704,7 +704,7 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
             '$id',
             '1',
             '$a')";
-	  display_debug_msg($query, $cdg_sql, "of_right_update_right(4)");
+	  display_debug_msg($query, $cdg_sql, 'of_right_update_right(4)');
 	  $obm_q->query($query);
 	}
       }
@@ -730,7 +730,7 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
           '$consumer',
           '$id',
           '1')";
-        display_debug_msg($query, $cdg_sql, "of_right_update_right(5)");
+        display_debug_msg($query, $cdg_sql, 'of_right_update_right(5)');
         $obm_q->query($query);
       }
     }
@@ -743,24 +743,24 @@ function of_right_update_right($param, $entity, $real_entity="",$check_perms=tru
 // Parameters:
 //   - $entity      : target entity
 //   - $entity_id   : entity id
-//   - $right       : right to get and select from : "all", "read", "write" or
-//                    "admin"
+//   - $right       : right to get and select from : 'all', 'read', 'write' or
+//                    'admin'
 // Returns:
-//   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2))
+//   array ('ids'=>(id1, id2, id3), 'entity'=>((id1,label1), (id2,label2))
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_users_for_entity($entity, $entity_id, $right="all") {
+function of_right_users_for_entity($entity, $entity_id, $right='all') {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   if(count($entity_id) == 0) {
-    return array("ids" => array(), "entity" => array());
+    return array('ids' => array(), 'entity' => array());
   }
   if(is_array($entity_id)) {
-    $entity_id = implode(",",$entity_id);
+    $entity_id = implode(',',$entity_id);
   }
 
-  if ($right != "all") {
+  if ($right != 'all') {
     $where_right = "AND entityright_$right = 1";
   }
   $query = "SELECT
@@ -853,7 +853,7 @@ class OBM_Acl {
     return this->isAllowed($userId, $entityId, $entity, 'admin');
   }
 
-  function getEntityRoles($uri , $action = "all") {
+  function getEntityRoles($uri , $action = 'all') {
 
   }
 

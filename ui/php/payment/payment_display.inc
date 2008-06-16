@@ -149,11 +149,12 @@ function html_payment_search_form($params, $kinds, $accs) {
   $sel_kind ="
     <select name=\"sel_kind\">
      <option value=\"$c_all\">$l_all</option>";
-     if(is_array($kinds))
-  foreach($kinds as $k_id => $one_kind) {
-    $klabel = $one_kind['label'];
-    $kselect = ($k_id == $kind) ? 'selected' : '';
-    $sel_kind .= "<option value=\"$k_id\" $kselect>$klabel</option>";
+  if (is_array($kinds)) {
+    foreach($kinds as $k_id => $one_kind) {
+      $klabel = $one_kind['label'];
+      $kselect = ($k_id == $kind) ? 'selected' : '';
+      $sel_kind .= "<option value=\"$k_id\" $kselect>$klabel</option>";
+    }
   }
   $sel_kind .= '</select>';
 

@@ -17,29 +17,29 @@
 function run_query_mailshare_search($mailshare) {
   global $cdg_sql, $ctu_sql_limit;
 
-  $sql_order_dir = $user["sql_order_dir"];
-  $sql_order_field = $user["sql_order_field"];
+  $sql_order_dir = $user['sql_order_dir'];
+  $sql_order_field = $user['sql_order_field'];
 
-  $name = sql_search_text_parse($mailshare["name"]);
-  $delegation = sql_search_text_parse($mailshare["delegation"]);
-  $email = sql_search_text_parse($mailshare["email"]);
-  $quota = sql_search_text_parse($mailshare["quota"]);
-  $desc = sql_search_text_parse($mailshare["desc"]);
+  $name = sql_search_text_parse($mailshare['name']);
+  $delegation = sql_search_text_parse($mailshare['delegation']);
+  $email = sql_search_text_parse($mailshare['email']);
+  $quota = sql_search_text_parse($mailshare['quota']);
+  $desc = sql_search_text_parse($mailshare['desc']);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $timeupdate = sql_date_format($db_type,"mailshare_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($db_type,"mailshare_timecreate", "timecreate");
-  $multidomain = sql_multidomain("mailshare");
+  $timeupdate = sql_date_format($db_type,'mailshare_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type,'mailshare_timecreate', 'timecreate');
+  $multidomain = sql_multidomain('mailshare');
 
-  $where = "(1=1)";
+  $where = '(1=1)';
   if ($name != '') {
     $where .= " AND mailshare_name $like '$name%'";
   }
   // If a delegation indication has been specified, get it
-  if (trim($delegation) != "") {
+  if (trim($delegation) != '') {
     $where .= " AND mailshare_delegation $like '$delegation%'";
   }
   if ($email != '') {
@@ -54,7 +54,7 @@ function run_query_mailshare_search($mailshare) {
   $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
-  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "mailshare_name";
+  $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'mailshare_name';
   $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "SELECT DISTINCT MailShare.*,
@@ -76,7 +76,7 @@ function run_query_mailshare_search($mailshare) {
   }
 
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "run_query_mailshare_search()");
+    display_debug_msg($query, $cdg_sql, 'run_query_mailshare_search()');
     $obm_q->query($query);
   }
 
@@ -95,9 +95,9 @@ function run_query_mailshare_detail($id) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($db_type,"mailshare_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($db_type,"mailshare_timecreate", "timecreate");
-  $multidomain = sql_multidomain("mailshare");
+  $timeupdate = sql_date_format($db_type,'mailshare_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type,'mailshare_timecreate', 'timecreate');
+  $multidomain = sql_multidomain('mailshare');
 
   $query = "SELECT *,
       host_name as mailserver_hostname,
@@ -112,7 +112,7 @@ function run_query_mailshare_detail($id) {
          LEFT JOIN UserObm as u ON mailshare_userupdate=u.userobm_id
     WHERE mailshare_id = '$id'
       $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_mailshare_detail()");
+  display_debug_msg($query, $cdg_sql, 'run_query_mailshare_detail()');
   $obm_q->query($query) ;
   $obm_q->next_record();
 
@@ -128,16 +128,16 @@ function run_query_mailshare_detail($id) {
 function run_query_mailshare_insert($mailshare) {
   global $cdg_sql, $obm;
 
-  $name = strtolower($mailshare["name"]);
-  $quota = $mailshare["quota"];
-  $email = $mailshare["email"];
-  $desc = $mailshare["desc"];
-  $mail_server_id = $mailshare["mail_server_id"];
-  $now = date("Y-m-d H:i:s");
-  $domain_id = $obm["domain_id"];
+  $name = strtolower($mailshare['name']);
+  $quota = $mailshare['quota'];
+  $email = $mailshare['email'];
+  $desc = $mailshare['desc'];
+  $mail_server_id = $mailshare['mail_server_id'];
+  $now = date('Y-m-d H:i:s');
+  $domain_id = $obm['domain_id'];
 
   // Delegation handling
-  $q_delegation = of_delegation_query_insert_clauses('mailshare_delegation', stripslashes($mailshare["delegation"]));
+  $q_delegation = of_delegation_query_insert_clauses('mailshare_delegation', stripslashes($mailshare['delegation']));
 
   $query = "INSERT INTO MailShare (
     mailshare_domain_id,
@@ -164,7 +164,7 @@ function run_query_mailshare_insert($mailshare) {
     '$desc',
     '$email')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_mailshare_insert(1)");
+  display_debug_msg($query, $cdg_sql, 'run_query_mailshare_insert(1)');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -183,12 +183,12 @@ function run_query_mailshare_insert($mailshare) {
       AND mailshare_email = '$email'
       AND mailshare_description = '$desc'";
 
-    display_debug_msg($query, $cdg_sql, "run_query_mailshare_insert(2)");
+    display_debug_msg($query, $cdg_sql, 'run_query_mailshare_insert(2)');
     $obm_q->query($query);
     $obm_q->next_record();
-    $id = $obm_q->f("id");
-    $mailshare["entity_id"] = $id;
-    of_right_update_right($mailshare, "MailShare", "",false) ;
+    $id = $obm_q->f('id');
+    $mailshare['entity_id'] = $id;
+    of_right_update_right($mailshare, 'MailShare', '',false) ;
 
     return $id;
   } else {
@@ -205,17 +205,17 @@ function run_query_mailshare_insert($mailshare) {
 function run_query_mailshare_update($mailshare) {
   global $obm, $cdg_sql;
 
-  $id = $mailshare["mailshare_id"];
-  $name = strtolower($mailshare["name"]);
-  $quota = $mailshare["quota"];
-  $email = $mailshare["email"];
-  $desc = $mailshare["desc"];
-  $mail_server_id = $mailshare["mail_server_id"];
-  $now = date("Y-m-d H:i:s");
-  $multidomain = sql_multidomain("mailshare");
+  $id = $mailshare['mailshare_id'];
+  $name = strtolower($mailshare['name']);
+  $quota = $mailshare['quota'];
+  $email = $mailshare['email'];
+  $desc = $mailshare['desc'];
+  $mail_server_id = $mailshare['mail_server_id'];
+  $now = date('Y-m-d H:i:s');
+  $multidomain = sql_multidomain('mailshare');
 
   // Delegation handling
-  $q_delegation = of_delegation_query_update_clause('mailshare_delegation', stripslashes($mailshare["delegation"]));
+  $q_delegation = of_delegation_query_update_clause('mailshare_delegation', stripslashes($mailshare['delegation']));
   
   $query = "UPDATE MailShare set
     mailshare_timeupdate = '$now',
@@ -229,7 +229,7 @@ function run_query_mailshare_update($mailshare) {
   WHERE mailshare_id='$id'
     $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_mailshare_update()");
+  display_debug_msg($query, $cdg_sql, 'run_query_mailshare_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -245,34 +245,34 @@ function run_query_mailshare_update($mailshare) {
 function run_query_mailshare_delete($p_id) {
   global $cdg_sql, $obm;
 
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain('mailshare');
 
   // Delete ACL for this mailshare
   $query = "DELETE FROM EntityRight
     WHERE entityright_entity='mailshare'
       AND entityright_entity_id='$p_id'";
   $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_mailshare_delete(1)");
+  display_debug_msg($query, $cdg_sql, 'run_query_mailshare_delete(1)');
   $obm_q->query($query);
 
   // Delete the Mailshare
   $query = "DELETE FROM MailShare
     WHERE mailshare_id='$p_id'
       $multidomain";
-  display_debug_msg($query, $cdg_sql, "run_query_mailshare_delete(2)");
+  display_debug_msg($query, $cdg_sql, 'run_query_mailshare_delete(2)');
   $retour = $obm_q->query($query);
 
   // If this mailshare exists in Prod table, Insert it in Deleted table
   $query = "SELECT mailshare_id, mailshare_delegation FROM P_MailShare WHERE mailshare_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_mailshare_delete(auto)");
+  display_debug_msg($query, $cdg_sql, 'run_query_mailshare_delete(auto)');
   $obm_q->query($query);
   $obm_q->next_record();
   $delegation = $obm_q->f('mailshare_delegation');
 
   if ($obm_q->num_rows() > 0) {
-    $uid = $obm["uid"];
-    $domain_id = $obm["domain_id"];
-    $now = date("Y-m-d H:i:s");
+    $uid = $obm['uid'];
+    $domain_id = $obm['domain_id'];
+    $now = date('Y-m-d H:i:s');
     
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
@@ -288,7 +288,7 @@ function run_query_mailshare_delete($p_id) {
       'MailShare',
       '$p_id',
       '$now')";
-    display_debug_msg($query, $cdg_sql, "run_query_mailshare_delete(auto)");
+    display_debug_msg($query, $cdg_sql, 'run_query_mailshare_delete(auto)');
     $retour = $obm_q->query($query);
   }
 
@@ -303,10 +303,10 @@ function run_query_mailshare_delete($p_id) {
  * @param mixed $id mailshare id
  * @return mixed infos array
  */
-function get_mailshare_info($id="") {
+function get_mailshare_info($id='') {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain('mailshare');
   $obm_q = new DB_OBM ;
   $db_type = $obm_q->type;
 
@@ -315,14 +315,14 @@ function get_mailshare_info($id="") {
     WHERE mailshare_id='$id'
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_mailshare_infos()");
+  display_debug_msg($query, $cdg_sql, 'get_mailshare_infos()');
   $obm_q->query($query);
   $obm_q->next_record();
   if (is_array($obm_q->Record)) {
-    $m["name"] = $obm_q->f("mailshare_name");
-    $m["delegation"] = $obm_q->f("mailshare_delegation");
-    $m["quota"] = $obm_q->f("mailshare_quota");
-    $m["email"] = $obm_q->f("mailshare_email");
+    $m['name'] = $obm_q->f('mailshare_name');
+    $m['delegation'] = $obm_q->f('mailshare_delegation');
+    $m['quota'] = $obm_q->f('mailshare_quota');
+    $m['email'] = $obm_q->f('mailshare_email');
   }  
 
   return $m;
@@ -337,12 +337,12 @@ function get_mailshare_info($id="") {
 // Returns:
 //   - true (if a mailshare exists) or false
 ///////////////////////////////////////////////////////////////////////////////
-function get_mailshare_name_exists($name, $id="") {
+function get_mailshare_name_exists($name, $id='') {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain('mailshare');
 
-  if ($id != "") {
+  if ($id != '') {
     $where_id = "AND mailshare_id != '$id'";
   }
 
@@ -353,7 +353,7 @@ function get_mailshare_name_exists($name, $id="") {
       $where_id
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "get_mailshare_name_exists()");
+  display_debug_msg($query, $cdg_sql, 'get_mailshare_name_exists()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -379,9 +379,9 @@ function run_query_check_mailshare($id, $name, $desc) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain('mailshare');
 
-  if ($id != "") {
+  if ($id != '') {
     $where_id = "AND mailshare_id!='$id'";
   }
 
@@ -393,14 +393,14 @@ function run_query_check_mailshare($id, $name, $desc) {
   }
 
   // If desc is short, we test equality, else similarity
-  if (trim($desc) != "") {
+  if (trim($desc) != '') {
     if (strlen($desc) > 2) {
       $wdesc = "mailshare_description $like '%$desc%'";
     } else {
       $wdesc = "mailshare_description = '$desc'";
     }
   }
-  if ($wdesc != "") $wdesc = "OR $wdesc";
+  if ($wdesc != '') $wdesc = "OR $wdesc";
 
   $query = "SELECT DISTINCT mailshare_id,
       mailshare_name,
@@ -411,7 +411,7 @@ function run_query_check_mailshare($id, $name, $desc) {
       $where_id
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "run_query_check_mailshare()");
+  display_debug_msg($query, $cdg_sql, 'run_query_check_mailshare()');
   $obm_q->query($query);
 
   return $obm_q;
@@ -429,8 +429,8 @@ function run_query_check_mailshare($id, $name, $desc) {
 function check_mailshare_context($id, $mailshare) {
   global $cdg_sql;
 
-  $name = strtolower($mailshare["name"]);
-  $desc = $mailshare["desc"];
+  $name = strtolower($mailshare['name']);
+  $desc = $mailshare['desc'];
 
   // return the mailshares with same name or desc
   $m_q = run_query_check_mailshare($id, $name, $desc);
@@ -465,7 +465,7 @@ function check_can_delete_mailshare($p_id) {
 function check_mailshare_update_rights($params) {
   global $err, $cgp_use, $l_error_delegation;
 
-  $id = $params["mailshare_id"];
+  $id = $params['mailshare_id'];
 
   if ($id > 0) {
 
@@ -496,77 +496,77 @@ function check_mailshare_data_form($mailshare) {
   global $l_err_mailshare_email_empty, $l_err_mailshare_email_exist;
   global $l_err_mailshare_uemail_exist, $l_err_mailshare_quota,$php_regexp_email;
 
-  $id = $mailshare["mailshare_id"];
-  $name = strtolower($mailshare["name"]);
-  $quota = $mailshare["quota"];
-  $email = $mailshare["email"];
-  $desc = $mailshare["desc"];
+  $id = $mailshare['mailshare_id'];
+  $name = strtolower($mailshare['name']);
+  $quota = $mailshare['quota'];
+  $email = $mailshare['email'];
+  $desc = $mailshare['desc'];
 
   // MANDATORY: Mailshare name not empty
-  if (trim($name) == "") {
-    $err["msg"] = $l_err_mailshare_name_empty;
-    $err["field"] = "name";
+  if (trim($name) == '') {
+    $err['msg'] = $l_err_mailshare_name_empty;
+    $err['field'] = 'name';
     return false;
   } else {
     if (! preg_match($php_regexp_login, $name)) {
-      $err["msg"] .= "$name : $l_name_error";
-      $err["field"] = "name";
+      $err['msg'] .= "$name : $l_name_error";
+      $err['field'] = 'name';
       return false;
     }
     // Name not already in use
     if (name_in_use($name, $id)) {
-      $err["msg"] = "$name : $l_name_in_use";
-      $err["field"] = "name";
+      $err['msg'] = "$name : $l_name_in_use";
+      $err['field'] = 'name';
       return false;
     }
   }
 
   // MANDATORY: Host name unique
   if (get_mailshare_name_exists($name, $id)) {
-    $err["msg"] = "$l_err_mailshare_name_exist ($name)";
-    $err["field"] = "name";
+    $err['msg'] = "$l_err_mailshare_name_exist ($name)";
+    $err['field'] = 'name';
     return false;
   }
 
   // If quota set, must be numerical
-  if ($quota != "") {
+  if ($quota != '') {
     if (! preg_match($php_regexp_quota, $quota)) {
-      $err["msg"] = " $quota : $l_err_mailshare_quota";
-      $err["field"] = "quota";
+      $err['msg'] = " $quota : $l_err_mailshare_quota";
+      $err['field'] = 'quota';
       return false;
     }
   }
 
   // MANDATORY: Email filled
-  if (trim($email) == "") {
-    $err["msg"] = "$l_err_mailshare_email_empty";
-    $err["field"] = "email";
+  if (trim($email) == '') {
+    $err['msg'] = "$l_err_mailshare_email_empty";
+    $err['field'] = 'email';
     return false;
   }
 
   // User email addresses (only the name before @)
-  if ($email != "") {
+  if ($email != '') {
     $um = array();
 
     // All email addresses given are valid and not already used
     $em = strtok($email, "\r\n");
     while ($em) {
       if (! preg_match($php_regexp_email_name, $em) && !preg_match($php_regexp_email, $em)) {
-        $err["msg"] .= "$em : $l_err_mailshare_email";
-	$err["field"] = "email";
+        $err['msg'] .= "$em : $l_err_mailshare_email";
+	$err['field'] = 'email';
         return false;
       }
       // Email address not already used by this user
       if (in_array($em, $um)) {
-	$err["msg"] = "$l_err_mailshare_uemail_exist : $em";
-	$err["field"] = "email";
+	$err['msg'] = "$l_err_mailshare_uemail_exist : $em";
+	$err['field'] = 'email';
         return false;
       }
       $emails[] = $em;
       array_push($um, $em);
       $em = strtok("\r\n");
     }
-    $mails = get_email_used($emails, "", "", $id);
+    $mails = get_email_used($emails, '', '', $id);
     if(!empty($mails)) {
       $err['msg'] = "$l_err_mailshare_email_exist : $mails ";
       $err['field'] = 'email';
@@ -585,10 +585,10 @@ function check_mailshare_data_form($mailshare) {
 // Returns:
 //   - true if found, else false
 ///////////////////////////////////////////////////////////////////////////////
-function name_in_use($name, $u_id="") {
+function name_in_use($name, $u_id='') {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("mailshare");
+  $multidomain = sql_multidomain('mailshare');
 
   $query = "SELECT
     mailshare_id,
@@ -598,7 +598,7 @@ function name_in_use($name, $u_id="") {
     AND mailshare_id != '$u_id'
     $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "name_in_use()");
+  display_debug_msg($query, $cdg_sql, 'name_in_use()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 

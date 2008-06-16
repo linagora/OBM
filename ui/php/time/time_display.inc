@@ -1260,7 +1260,7 @@ function dis_time_stats_tasktype($stattt, $time) {
 	  $title = ${"l_$prec_type"};
 	  $dis_tt_array .= "
       <tr>
-        <th>t=$type, pt=$prec_type $l_total : $title</th>
+        <th>$l_total : $title</th>
         <th>$type_time&nbsp;</th>
         <th>$type_time_before&nbsp;</th>
         <th>$type_time_after&nbsp;</th>

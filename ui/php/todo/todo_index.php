@@ -133,7 +133,7 @@ if ($action == 'index' || $action == '') {
 // Todo top list (same as the bookmarks : id and titles are registered)
 ///////////////////////////////////////////////////////////////////////////////
 // If the todo list was updated, we reload the todo in session
-if (in_array($action, array('insert', 'detailupdate', 'delete', 'delete_unique')))
+if (in_array($action, array('insert', 'update', 'delete', 'delete_unique')))
   global_session_load_user_todos();
 
 

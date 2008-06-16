@@ -23,23 +23,23 @@
 // - dispref_level   --                  -- update one field display position 
 ///////////////////////////////////////////////////////////////////////////////
 
-$path = "..";
-$module = "mailshare";
-$obminclude = getenv("OBM_INCLUDE_VAR");
-if ($obminclude == "") $obminclude = "obminclude";
+$path = '..';
+$module = 'mailshare';
+$obminclude = getenv('OBM_INCLUDE_VAR');
+if ($obminclude == '') $obminclude = 'obminclude';
 include("$obminclude/global.inc");
 $params = get_mailshare_params();
-page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
-require("mailshare_display.inc");
-require("mailshare_query.inc");
-require("mailshare_js.inc");
+require('mailshare_display.inc');
+require('mailshare_query.inc');
+require('mailshare_js.inc');
 require("$obminclude/of/of_right.inc");
 
-if ($action == "") $action = "index";
+if ($action == '') $action = 'index';
 get_mailshare_action();
 $perm->check_permissions($module, $action);
-update_last_visit("mailshare", $params["mailshare_id"], $action);
+update_last_visit('mailshare', $params['mailshare_id'], $action);
 
 page_close();
 
@@ -48,175 +48,175 @@ page_close();
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // XXXXXXX ????
-if ($action == "ext_get_id") {
-  $display["search"] = html_host_search_form($params);
-  if ($_SESSION['set_display'] == "yes") {
-    $display["result"] = dis_host_search_list($params);
+if ($action == 'ext_get_id') {
+  $display['search'] = html_host_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_host_search_list($params);
   } else {
-    $display["msg"] = display_info_msg($l_no_display);
+    $display['msg'] = display_info_msg($l_no_display);
   }
 
-} else if (($action == "index") || ($action == "")) {
+} else if (($action == 'index') || ($action == '')) {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_mailshare_search_form($params);
-  if ($_SESSION['set_display'] == "yes") {
-    $display["result"] = dis_mailshare_search_list("");
+  $display['search'] = html_mailshare_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_mailshare_search_list('');
   } else {
-    $display["msg"] .= display_ok_msg($l_no_display);
+    $display['msg'] .= display_ok_msg($l_no_display);
   }
 
-} else if ($action == "search") {
+} else if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_mailshare_search_form($params);
-  $display["result"] = dis_mailshare_search_list($params);
+  $display['search'] = html_mailshare_search_form($params);
+  $display['result'] = dis_mailshare_search_list($params);
 
-} else if ($action == "new") {
+} else if ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_mailshare_form($action, "", $params);
+  $display['detail'] = html_mailshare_form($action, '', $params);
 
-} else if ($action == "detailconsult") {
+} else if ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_mailshare_consult($params);
+  $display['detail'] = dis_mailshare_consult($params);
 
-} else if ($action == "detailupdate") {
+} else if ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_mailshare_update_rights($params)) {
-    $obm_q = run_query_mailshare_detail($params["mailshare_id"]);
-    $display["detail"] = html_mailshare_form($action, $obm_q, $params);
+    $obm_q = run_query_mailshare_detail($params['mailshare_id']);
+    $display['detail'] = html_mailshare_form($action, $obm_q, $params);
   } else {
-    $display["msg"] .= display_warn_msg($err['msg']);
+    $display['msg'] .= display_warn_msg($err['msg']);
   }
 
-} else if ($action == "insert") {
+} else if ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_mailshare_data_form($params)) {
     
     // If the context (same mailshare ?) was confirmed ok, we proceed
-    if ($params["confirm"] == $c_yes) {
+    if ($params['confirm'] == $c_yes) {
       $id = run_query_mailshare_insert($params);
       if ($id > 0) {
-	$params["mailshare_id"] = $id;
+	$params['mailshare_id'] = $id;
 	set_update_state();
-        $display["msg"] .= display_ok_msg("$l_mailshare : $l_insert_ok");
+        $display['msg'] .= display_ok_msg("$l_mailshare : $l_insert_ok");
       } else {
-        $display["msg"] .= display_err_msg("$l_mailshare : $l_insert_error");
+        $display['msg'] .= display_err_msg("$l_mailshare : $l_insert_error");
       }
-      $display["detail"] = dis_mailshare_consult($params);
+      $display['detail'] = dis_mailshare_consult($params);
       
     // If first try, we warn the user if some mailshare seem similar
     } else {
-      $obm_q = check_mailshare_context("", $params);
+      $obm_q = check_mailshare_context('', $params);
       if ($obm_q->num_rows() > 0) {
-        $display["detail"] = dis_mailshare_warn_insert("", $obm_q, $params);
+        $display['detail'] = dis_mailshare_warn_insert('', $obm_q, $params);
       } else {
         $id = run_query_mailshare_insert($params);
 
 	if ($id > 0) {
-	  $params["mailshare_id"] = $id;
+	  $params['mailshare_id'] = $id;
           set_update_state();
-          $display["msg"] .= display_ok_msg("$l_mailshare : $l_insert_ok");
+          $display['msg'] .= display_ok_msg("$l_mailshare : $l_insert_ok");
 	} else {
 
-          $display["msg"] .= display_err_msg("$l_mailshare : $l_insert_error");
+          $display['msg'] .= display_err_msg("$l_mailshare : $l_insert_error");
         }
     
-        $display["detail"] = dis_mailshare_consult($params);
+        $display['detail'] = dis_mailshare_consult($params);
       }
     }
     
   // Form data are not valid
   } else {
-    $display["msg"] .= display_err_msg($err["msg"]);
-    $display["detail"].= html_mailshare_form($action, "", $params, $err["field"]);
+    $display['msg'] .= display_err_msg($err['msg']);
+    $display['detail'].= html_mailshare_form($action, '', $params, $err['field']);
   }
 
-} elseif ($action == "update")  {
+} elseif ($action == 'update')  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_mailshare_data_form($params)) {
     $retour = run_query_mailshare_update($params);
     if ($retour) {
       set_update_state();
-      $display["msg"] .= display_ok_msg("$l_mailshare : $l_update_ok");
+      $display['msg'] .= display_ok_msg("$l_mailshare : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg("$l_mailshare : $l_update_error");
+      $display['msg'] .= display_err_msg("$l_mailshare : $l_update_error");
     }
-    $display["detail"] = dis_mailshare_consult($params);
+    $display['detail'] = dis_mailshare_consult($params);
   } else {
-    $display["msg"] .= display_err_msg($err["msg"]);
-    $mailshare_q = run_query_mailshare_detail($params["mailshare_id"]);
-    $display["detail"] = html_mailshare_form($action, $mailshare_q, $params, $err["field"]);
+    $display['msg'] .= display_err_msg($err['msg']);
+    $mailshare_q = run_query_mailshare_detail($params['mailshare_id']);
+    $display['detail'] = html_mailshare_form($action, $mailshare_q, $params, $err['field']);
   }
 
-} elseif ($action == "check_delete")  {
+} elseif ($action == 'check_delete')  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_mailshare($params["mailshare_id"])) {
-    $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_mailshare($params["mailshare_id"]);
+  if (check_can_delete_mailshare($params['mailshare_id'])) {
+    $display['msg'] .= display_info_msg($ok_msg, false);
+    $display['detail'] = dis_can_delete_mailshare($params['mailshare_id']);
   } else {
-    $display["msg"] .= display_warn_msg($err["msg"], false);
-    $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_mailshare_consult($params);
+    $display['msg'] .= display_warn_msg($err['msg'], false);
+    $display['msg'] .= display_warn_msg($l_cant_delete, false);
+    $display['detail'] = dis_mailshare_consult($params);
   }
 
-} elseif ($action == "delete")  {
+} elseif ($action == 'delete')  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_mailshare($params["mailshare_id"])) {
-    $retour = run_query_mailshare_delete($params["mailshare_id"]);
+  if (check_can_delete_mailshare($params['mailshare_id'])) {
+    $retour = run_query_mailshare_delete($params['mailshare_id']);
     if ($retour) {
       set_update_state();
-      $display["msg"] .= display_ok_msg("$l_mailshare : $l_delete_ok");
+      $display['msg'] .= display_ok_msg("$l_mailshare : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg("$l_mailshare : $l_delete_error");
+      $display['msg'] .= display_err_msg("$l_mailshare : $l_delete_error");
     }
-    $display["search"] = html_mailshare_search_form("");
+    $display['search'] = html_mailshare_search_form('');
   } else {
-    $display["msg"] .= display_warn_msg($err["msg"], false);
-    $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_mailshare_consult($params);
+    $display['msg'] .= display_warn_msg($err['msg'], false);
+    $display['msg'] .= display_warn_msg($l_cant_delete, false);
+    $display['detail'] = dis_mailshare_consult($params);
   }
 
-} elseif ($action == "rights_admin") {
+} elseif ($action == 'rights_admin') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_mailshare_right_dis_admin($params["entity_id"]);
+  $display['detail'] = dis_mailshare_right_dis_admin($params['entity_id']);
 
-} elseif ($action == "rights_update") {
+} elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (of_right_update_right($params, "MailShare")) {
+  if (of_right_update_right($params, 'MailShare')) {
     set_update_state();
-    $display["msg"] .= display_ok_msg("$l_rights : $l_update_ok");
+    $display['msg'] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
-    $display["msg"] .= display_warn_msg($err["msg"]);
+    $display['msg'] .= display_warn_msg($err['msg']);
   }
-  $display["detail"] = dis_mailshare_right_dis_admin($params["entity_id"]);
+  $display['detail'] = dis_mailshare_right_dis_admin($params['entity_id']);
 
-} else if ($action == "display") {
+} else if ($action == 'display') {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($obm["uid"], "mailshare", 1);
-  $display["detail"] = dis_mailshare_display_pref($prefs);
+  $prefs = get_display_pref($obm['uid'], 'mailshare', 1);
+  $display['detail'] = dis_mailshare_display_pref($prefs);
 
-} else if ($action == "dispref_display") {
-///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($params);
-  $prefs = get_display_pref($obm["uid"], "mailshare", 1);
-  $display["detail"] = dis_mailshare_display_pref($prefs);
-
-} else if($action == "dispref_level") {
+} else if ($action == 'dispref_display') {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($params);
-  $prefs = get_display_pref($obm["uid"], "mailshare", 1);
-  $display["detail"] = dis_mailshare_display_pref($prefs);
+  $prefs = get_display_pref($obm['uid'], 'mailshare', 1);
+  $display['detail'] = dis_mailshare_display_pref($prefs);
+
+} else if($action == 'dispref_level') {
+///////////////////////////////////////////////////////////////////////////////
+  update_display_pref($params);
+  $prefs = get_display_pref($obm['uid'], 'mailshare', 1);
+  $display['detail'] = dis_mailshare_display_pref($prefs);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head($l_mailshare);
-if (! $params["popup"]) {
+$display['head'] = display_head($l_mailshare);
+if (! $params['popup']) {
   update_mailshare_action();
-  $display["header"] = display_menu($module);
+  $display['header'] = display_menu($module);
 }
-$display["end"] = display_end();
+$display['end'] = display_end();
 
 display_page($display);
 
@@ -230,10 +230,10 @@ function get_mailshare_params() {
   global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read;
 
   // Get global params
-  $params = get_global_params("MailShare");
+  $params = get_global_params('MailShare');
 
-  if ((isset ($params["entity_id"])) && (! isset($params["mailshare_id"]))) {
-    $params["mailshare_id"] = $params["entity_id"];
+  if ((isset ($params['entity_id'])) && (! isset($params['mailshare_id']))) {
+    $params['mailshare_id'] = $params['entity_id'];
   }
   
   if(is_array($params['email'])) {
@@ -267,7 +267,7 @@ function get_mailshare_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
-  $actions["mailshare"]["index"] = array (
+  $actions['mailshare']['index'] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/mailshare/mailshare_index.php?action=index",
     'Right'    => $cright_read,
@@ -275,13 +275,13 @@ function get_mailshare_action() {
                                     );
 
 // Search
-  $actions["mailshare"]["search"] = array (
+  $actions['mailshare']['search'] = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                   );
 
 // New
-  $actions["mailshare"]["new"] = array (
+  $actions['mailshare']['new'] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/mailshare/mailshare_index.php?action=new",
     'Right'    => $cright_write,
@@ -289,87 +289,87 @@ function get_mailshare_action() {
                                   );
 
 // Detail Consult
-  $actions["mailshare"]["detailconsult"] = array (
+  $actions['mailshare']['detailconsult'] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/mailshare/mailshare_index.php?action=detailconsult&amp;mailshare_id=".$params["mailshare_id"]."",
+    'Url'      => "$path/mailshare/mailshare_index.php?action=detailconsult&amp;mailshare_id=".$params['mailshare_id'],
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate', 'showlist', 'update', 'rights_admin', 'rights_update') 
                                   );
 
 // Detail Update
-  $actions["mailshare"]["detailupdate"] = array (
+  $actions['mailshare']['detailupdate'] = array (
      'Name'     => $l_header_update,
-     'Url'      => "$path/mailshare/mailshare_index.php?action=detailupdate&amp;mailshare_id=".$params["mailshare_id"]."",
+     'Url'      => "$path/mailshare/mailshare_index.php?action=detailupdate&amp;mailshare_id=".$params['mailshare_id'],
      'Right'    => $cright_write,
      'Condition'=> array ('detailconsult', 'showlist', 'update') 
                                      	   );
 					   
 // Insert
-  $actions["mailshare"]["insert"] = array (
+  $actions['mailshare']['insert'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      );
 
 // Update
-  $actions["mailshare"]["update"] = array (
+  $actions['mailshare']['update'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      );
 
 // Check Delete
-  $actions["mailshare"]["check_delete"] = array (
+  $actions['mailshare']['check_delete'] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/mailshare/mailshare_index.php?action=check_delete&amp;mailshare_id=".$params["mailshare_id"]."",
+    'Url'      => "$path/mailshare/mailshare_index.php?action=check_delete&amp;mailshare_id=".$params['mailshare_id'],
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'showlist', 'showlist', 'detailupdate') 
                                      	   );
 
 // Delete
-  $actions["mailshare"]["delete"] = array (
+  $actions['mailshare']['delete'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=delete",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      );
 
 // Rights Admin.
-  $actions["mailshare"]["rights_admin"] = array (
+  $actions['mailshare']['rights_admin'] = array (
     'Name'     => $l_header_right,
-    'Url'      => "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=".$params["mailshare_id"]."",
+    'Url'      => "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=".$params['mailshare_id'],
     'Right'    => $cright_read,
     'Condition'=> array ('detailconsult','update','rights_update','rights_admin')
                                      );
 
 // Rights Update
-  $actions["mailshare"]["rights_update"] = array (
-    'Url'      => "$path/mailshare/mailshare_index.php?action=rights_update&amp;entity_id=".$params["mailshare_id"]."",
+  $actions['mailshare']['rights_update'] = array (
+    'Url'      => "$path/mailshare/mailshare_index.php?action=rights_update&amp;entity_id=".$params['mailshare_id'],
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                      );
 
 // Display
-  $actions["mailshare"]["display"] = array (
+  $actions['mailshare']['display'] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/mailshare/mailshare_index.php?action=display",
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                       	 );
 // Dispay Prefs
-  $actions["mailshare"]["dispref_display"] = array (
+  $actions['mailshare']['dispref_display'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	 );
 // Display
-  $actions["mailshare"]["dispref_level"] = array (
+  $actions['mailshare']['dispref_level'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	 );
 
 // External call
-  $actions["mailshare"]["ext_get_id"] = array (
+  $actions['mailshare']['ext_get_id'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
@@ -383,22 +383,22 @@ function get_mailshare_action() {
 function update_mailshare_action() {
   global $params, $actions, $path;
 
-  $id = $params["mailshare_id"];
+  $id = $params['mailshare_id'];
   if ($id > 0) {
     // Detail Consult
-    $actions["mailshare"]["detailconsult"]["Url"] = "$path/mailshare/mailshare_index.php?action=detailconsult&amp;mailshare_id=$id";
+    $actions['mailshare']['detailconsult']['Url'] = "$path/mailshare/mailshare_index.php?action=detailconsult&amp;mailshare_id=$id";
     
     // Detail Update
-    $actions["mailshare"]["detailupdate"]['Url'] = "$path/mailshare/mailshare_index.php?action=detailupdate&amp;mailshare_id=$id";
-    $actions["mailshare"]["detailupdate"]['Condition'][] = 'insert';
+    $actions['mailshare']['detailupdate']['Url'] = "$path/mailshare/mailshare_index.php?action=detailupdate&amp;mailshare_id=$id";
+    $actions['mailshare']['detailupdate']['Condition'][] = 'insert';
     
     // Check Delete
-    $actions["mailshare"]["check_delete"]['Url'] = "$path/mailshare/mailshare_index.php?action=check_delete&amp;mailshare_id=$id";
-    $actions["mailshare"]["check_delete"]['Condition'][] = 'insert';
+    $actions['mailshare']['check_delete']['Url'] = "$path/mailshare/mailshare_index.php?action=check_delete&amp;mailshare_id=$id";
+    $actions['mailshare']['check_delete']['Condition'][] = 'insert';
 
     // Rights admin
-    $actions["mailshare"]["rights_admin"]['Url'] = "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=$id";
-    $actions["mailshare"]["rights_admin"]['Condition'][] = 'insert';
+    $actions['mailshare']['rights_admin']['Url'] = "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=$id";
+    $actions['mailshare']['rights_admin']['Condition'][] = 'insert';
   }
 }
 
