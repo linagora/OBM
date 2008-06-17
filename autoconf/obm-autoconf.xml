@@ -9,9 +9,9 @@
 	    type="javax.sql.DataSource"
 	    factory="fr.aliacom.jndi.DataSourceFactory"
 	    login="obm"
-	    password="Q2t60RTi"
+	    password="obm"
 	    className="com.mysql.jdbc.Driver"
-	    url="jdbc:mysql://melamel.sga.defense.gouv.fr/obm?relaxAutocommit=true&amp;zeroDateTimeBehavior=convertToNull&amp;jdbcCompliantTruncation=false"
+	    url="jdbc:mysql://localhost/obm?relaxAutocommit=true&amp;zeroDateTimeBehavior=convertToNull&amp;jdbcCompliantTruncation=false"
 	    max="4"
 	    pingQuery="SELECT 1"/>
 </Context>

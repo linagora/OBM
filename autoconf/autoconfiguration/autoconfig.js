@@ -19,7 +19,7 @@
 const PREF_LOGIN = "config.obm.login";
 const PREF_AUTOCONF = "config.obm.autoconfigStatus";
 
-const CONFIG_XML_URL = "https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/autoconfiguration/%s";
+const CONFIG_XML_URL = "https://10.73.0.12/obm-autoconf/autoconfiguration/%s";
 
 const promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                                 .getService(Components.interfaces.nsIPromptService);
@@ -58,11 +58,16 @@ function runAutoconfiguration() {
 
       // récupère les données de configuration stockées
       // sur le serveur de référence en XML
+      
       var configurationXML = _getDataHTTP(CONFIG_XML_URL.replace("%s", login));
+      
+      if ( configurationXML == null) {
+      	_displayMessage("Autoconfiguration","Impossible de contacter le service d'autoconfiguration.");
+      	return;
+      }
+      
       if ( configurationXML == "" ) {
         _displayError("Autoconfiguration", "Erreur lors de l'autoconfiguration :" + "\n\n"
-                                         + "impossible de contacter l'annuaire" + "\n"
-                                         + "   ou" + "\n"
                                          + "pas d'adresse correspondante dans l'annuaire.");
 				_setPreference(PREF_LOGIN, "");
 				appStartupService.quit(appStartup.eForceQuit);
@@ -129,21 +134,25 @@ function _getDataHTTP(aURL) {
                             .getService(Components.interfaces.nsIIOService);
 
   var channel = ioService.newChannel(aURL, null, null);
-
   var inputStream = channel.open();
+  httpChannel = channel.QueryInterface(Components.interfaces.nsIHttpChannel);
+	try {
+			responseStatus = httpChannel.responseStatus;
+			var charset = "iso8859-1";
+			const replacementChar = Components.interfaces.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER;
+			var converterInputStream = Components.classes["@mozilla.org/intl/converter-input-stream;1"]
+				                                   .createInstance(Components.interfaces.nsIConverterInputStream);
+			converterInputStream.init(inputStream, charset, 32768, replacementChar);
+			var str = "";
+			var buffer = {};
+			while ( converterInputStream.readString(32768, buffer) != 0 ) {
+				str += buffer.value;
+			}
 
-  var charset = "iso8859-1";
-  const replacementChar = Components.interfaces.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER;
-  var converterInputStream = Components.classes["@mozilla.org/intl/converter-input-stream;1"]
-                                       .createInstance(Components.interfaces.nsIConverterInputStream);
-  converterInputStream.init(inputStream, charset, 32768, replacementChar);
-
-  var str = "";
-  var buffer = {};
-  while ( converterInputStream.readString(32768, buffer) != 0 ) {
-    str += buffer.value;
-  }
-  return str;
+			return str;
+	} catch (e) {
+		return null;
+	}
 }
 
 // positionne les préférences utilisateur, qui seront stockées dans le
