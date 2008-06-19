@@ -1,34 +1,53 @@
 # This is the main slapd configuration file. See slapd.conf(5) for more
 # info on the configuration options.
 # Designed on Debian from OpenLDAP 2.3 or greater
-
-#######################################################################
+###################################################################
+#Variables for packaging Redhat,Debian
+# _PATH_SCHEMA_
+#Debian : /etc/ldap/schema
+#Redhat : /etc/openldap/schema 
+#
+#_PATH_PIDFILE_
+#Debian : /var/run/slapd 
+#Redhat : /var/run/openldap
+#
+##_PATH_ARGSFILE_
+#Debian : /var/run/slapd 
+#Redhat : /var/run/openldap
+#
+#_COMMENT_
+#Dedian Need modulepath and moduleload, whereas  Redhat no.
+#
+#_ROOT_PW_
+#root password...
+#
+###################################################################
 # Global Directives:
 
 # Features to permit
 #allow bind_v2
 
 # Schema and objectClass definitions
-include         /etc/ldap/schema/core.schema
-include         /etc/ldap/schema/cosine.schema
-include         /etc/ldap/schema/nis.schema
-include         /etc/ldap/schema/inetorgperson.schema
-include         /etc/ldap/schema/obm.schema
-include         /etc/ldap/schema/samba.schema
+include         _PATH_SCHEMA_/core.schema
+include         _PATH_SCHEMA_/cosine.schema
+include         _PATH_SCHEMA_/nis.schema
+include         _PATH_SCHEMA_/inetorgperson.schema
+include         _PATH_SCHEMA_/obm.schema
+include         _PATH_SCHEMA_/samba.schema
 
 # Where the pid file is put. The init.d script
 # will not stop the server if you change this.
-pidfile         /var/run/slapd/slapd.pid
+pidfile         _PATH_PIDFILE_/slapd.pid
 
 # List of arguments that were passed to the server
-argsfile        /var/run/slapd/slapd.args
+argsfile        _PATH_ARGSFILE_/slapd.args
 
 # Read slapd.conf(5) for possible values
 loglevel        0
 
 # Where the dynamically loaded modules are stored
-modulepath      /usr/lib/ldap
-moduleload      back_bdb
+_COMMENT_modulepath      /usr/lib/ldap
+_COMMENT_moduleload      back_bdb
 #module pour syncrepl en MASTER
 #moduleload      syncprov
 
@@ -63,7 +82,8 @@ overlay         glue
 # rootdn directive for specifying a superuser on the database. This is needed
 # for syncrepl.
 rootdn          "uid=ldapadmin,ou=sysusers,dc=local"
-rootpw          {SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
+rootpw		_ROOT_PW_
+#rootpw          {SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
 
 # Where the database file are physically stored for database #1
 directory       "/var/lib/ldap"
