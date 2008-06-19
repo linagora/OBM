@@ -18,8 +18,6 @@
 #_COMMENT_
 #Dedian Need modulepath and moduleload, whereas  Redhat no.
 #
-#_ROOT_PW_
-#root password...
 #
 ###################################################################
 # Global Directives:
@@ -82,8 +80,8 @@ overlay         glue
 # rootdn directive for specifying a superuser on the database. This is needed
 # for syncrepl.
 rootdn          "uid=ldapadmin,ou=sysusers,dc=local"
-rootpw		_ROOT_PW_
-#rootpw          {SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
+#PLEASE, change password, cf /usr/share/doc/obm-ldap/
+rootpw          {SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
 
 # Where the database file are physically stored for database #1
 directory       "/var/lib/ldap"
