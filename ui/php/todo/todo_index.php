@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_index.php                                            //
 //     - Desc : Company Index File                                           //
-// 2003-09-15 Aliacom - Bastien Continsouzas                                 //
+// 2003-09-15 Aliacom - Pierre Baudracco                                     //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,6 +22,7 @@ include("$obminclude/global.inc");
 $params = get_todo_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
+$max_priority = 5;
 require('todo_query.inc');
 require('todo_display.inc');
 require_once('todo_js.inc');
@@ -34,26 +35,41 @@ page_close();
 
 if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_todo_form($params);
+  $display['search'] = dis_todo_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_todo_search_list($params);
+  } else {
+    $display['msg'] .= display_info_msg($l_no_display);
+  }
+  
+} elseif ($action == 'search') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['search'] = dis_todo_search_form($params);
   $display['result'] .= dis_todo_search_list($params);
+
+} else if ($action == 'new') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_todo_form($params);
 
 } else if ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $params_q = run_query_todo_detail($params);
-  $display['detailInfo'] = display_record_info($params_q);
-  $display['detail'] .= dis_todo_detail($params, $params_q);
+  $display['detail'] .= dis_todo_consult($params);
 
 } else if ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_todo_data_form($params)) {
-    $retour = run_query_todo_insert($params);
-    if ($retour) {
+    $id = run_query_todo_insert($params);
+    if ($id == 'other_user') {
       $display['msg'] .= display_ok_msg("$l_todo : $l_insert_ok");
+      $display['result'] .= dis_todo_search_list($params);
+    } else if ($id > 0) {
+      $params['todo_id'] = $id;
+      $display['msg'] .= display_ok_msg("$l_todo : $l_insert_ok");
+      $display['detail'] .= dis_todo_consult($params);
     } else {
       $display['msg'] .= display_err_msg("$l_todo : $l_insert_error");
+      $display['detail'] = dis_todo_form($params);
     }
-    $display['result'] = dis_todo_form('');
-    $display['result'] .= dis_todo_search_list($params);
   // Form data are not valid
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -63,8 +79,8 @@ if ($action == 'index' || $action == '') {
 } else if ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_todo_delete($_POST);
-  $display['result'] = dis_todo_form($params);
-  $display['result'] .= dis_todo_search_list($params);
+  $display['msg'] = display_ok_msg("$l_todo : $l_delete_ok");
+  $display['detail'] .= dis_todo_search_form($params);
 
 } else if ($action == 'delete_unique') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,13 +91,11 @@ if ($action == 'index' || $action == '') {
     } else {
       $display['msg'] = display_err_msg("$l_todo : $l_delete_error");
     }
-    $display['result'] = dis_todo_form($params);
-    $display['result'] .= dis_todo_search_list($params);
+    $display['detail'] .= dis_todo_search_form($params);
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    $params_q = run_query_todo_detail($params);
-    $display['detail'] .= dis_todo_detail($params, $params_q);
+    $display['detail'] .= dis_todo_consult($params);
   }
 
 } else if ($action == 'detailupdate') {
@@ -93,7 +107,6 @@ if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_todo_data_form($params)) {
     $retour = run_query_todo_update($params);
-
     if ($popup) {
       $display['result'] .= "
       <script language=\"javascript\">
@@ -101,8 +114,7 @@ if ($action == 'index' || $action == '') {
        window.close();
       </script>";
     } else {
-      $display['result'] = dis_todo_form('');
-      $display['result'] .= dis_todo_search_list($params);
+      $display['detail'] = dis_todo_consult($params);
     }
 
     // Form data are not valid
@@ -141,11 +153,11 @@ if (in_array($action, array('insert', 'update', 'delete', 'delete_unique')))
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 if (! $popup) {
+  update_todo_action();     
   $display['header'] = display_menu($module);
 }
 $display['head'] = display_head($l_todo);
 $display['end'] = display_end();
-     
 display_page($display);
 
 
@@ -178,43 +190,66 @@ function get_todo_params() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Action 
+// Todo Actions 
 ///////////////////////////////////////////////////////////////////////////////
 function get_todo_action() {
   global $params, $actions, $path;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
-  global $l_header_list, $l_header_delete, $l_header_update;
+  global $l_header_find, $l_header_new, $l_header_delete, $l_header_update;
   global $l_header_consult, $l_header_admin, $l_header_display;
 
 // Index
   $actions['todo']['index'] = array (
-    'Name'     => $l_header_list,
+    'Name'     => $l_header_find,
     'Url'      => "$path/todo/todo_index.php?action=index",
     'Right'    => $cright_read,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('all')
                                     	 );
 
 // Search
+  $actions['todo']['search'] = array (
+    'Url'      => "$path/todo/todo_index.php?action=search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+                                    	 );
+
+// New
+  $actions['todo']['new'] = array (
+    'Name'     => $l_header_new,
+    'Url'      => "$path/todo/todo_index.php?action=new",
+    'Right'    => $cright_write,
+    'Condition'=> array ('index','search','insert','new','detailconsult','update','check_delete','delete','admin','display')
+                                     );
+
+// Detail Consult
   $actions['todo']['detailconsult'] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/todo/todo_index.php?action=detailconsult&amp;todo_id=". $params['todo_id'],
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('detailupdate', 'insert', 'update')
                                     	 );
 
 // Insert a todo
   $actions['todo']['insert'] = array (
     'Url'      => "$path/todo/todo_index.php?action=insert",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                     	 );
 
 // Delete a list of todo
   $actions['todo']['delete'] = array (
     'Url'      => "$path/todo/todo_index.php?action=delete",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
+
+// Detail Update
+  $actions['todo']['detailupdate']  = array (
+    'Name'     => $l_header_update,
+    'Url'      => "$path/todo/todo_index.php?action=detailupdate&amp;todo_id=". $params['todo_id'],
+    'Right'    => $cright_write,
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update')
+                                      );
 
 // Update
   $actions['todo']['update']  = array (
@@ -223,20 +258,12 @@ function get_todo_action() {
     'Condition'=> array ('None') 
                                       );
 
-// Update
-  $actions['todo']['detailupdate']  = array (
-    'Name'     => $l_header_update,
-    'Url'      => "$path/todo/todo_index.php?action=detailupdate&amp;todo_id=". $params['todo_id'],
-    'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate') 
-                                      );
-
 // Delete a todo
   $actions['todo']['delete_unique'] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/todo/todo_index.php?action=delete_unique&amp;todo_id=". $params['todo_id'],
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update') 
 
                                      );
 
@@ -262,6 +289,29 @@ function get_todo_action() {
     'Condition'=> array ('None') 
                                      		 );
 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Todo Actions updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_todo_action() {
+  global $params, $actions, $path, $cright_write_admin;
+
+  $id = $params['todo_id'];
+  if ($id > 0) {
+
+    // Detail Consult
+    $actions['todo']['detailconsult']['Url'] = "$path/todo/todo_index.php?action=detailconsult&amp;todo_id=$id";
+    
+    // Detail Update
+    $actions['todo']['detailupdate']['Url'] = "$path/todo/todo_index.php?action=detailupdate&amp;todo_id=$id";
+    $actions['todo']['detailupdate']['Condition'][] = 'insert';
+    
+    // Check Delete
+    $actions['todo']['delete_unique']['Url'] = "$path/todo/todo_index.php?action=delete_unique&amp;todo_id=$id";
+    $actions['todo']['delete_unique']['Condition'][] = 'insert';
+  }
 }
 
 

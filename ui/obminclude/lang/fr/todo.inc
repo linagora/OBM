@@ -8,9 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_author = "Auteur";
-$l_date = "Date de saisie";
+$l_date_create = "Date de saisie";
 $l_deadline = "Date limite";
-$l_todotitle = "Titre";
 $l_content = "Description";
 $l_percent = "Avancement (%)";
 
@@ -19,7 +18,9 @@ $l_delete = "Supprimer";
 $l_add = "Ajouter";
 $l_update = "Modifier";
 
-$l_no_found = "Pas de tâches à faire";
+$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des post-it correspondants.";
+$l_found = "tâches trouvées";
+$l_no_found = "Aucune tâche ne correspond à ces critères !";
 $l_no_deadline = "Non spécifiée";
 $l_insert_ok = "L'insertion du post-it a été correctement effectuée.";
 $l_insert_error = "L'insertion du post-it a échoué !";

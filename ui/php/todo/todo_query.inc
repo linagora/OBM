@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : todo_query.inc                                               //
 //     - Desc : todo query File                                              //
-// 2003-15-09 Bastien Continsouzas                                           //
+// 2003-15-09 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -14,11 +14,21 @@
 //   - $todo[]       : company search criteria
 //     keys used       uid
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_todo_todolist($todo) {
-  global $obm, $cdg_sql, $ctu_sql_limit;
+function run_query_todo_search($params) {
+  global $obm, $cdg_sql, $ctu_sql_limit, $c_all;
 
-  $sql_order_dir = $todo['sql_order_dir'];
-  $sql_order_field = $todo['sql_order_field'];
+  $sql_order_dir = $params['sql_order_dir'];
+  $sql_order_field = $params['sql_order_field'];
+
+  $text = sql_search_text_parse($params['text']);
+  $priority = $params['priority'];
+  $percent = $params['percent'];
+  $date_field = ($params['date_field'] ? $params['date_field'] : 'deadline');
+  if ($date_field == 'date_create') {
+    $date_field = 'date';
+  }
+  $dateafter = of_isodate_convert($params['date_after'],true);
+  $datebefore = of_isodate_convert($params['date_before'],true);
 
   $uid = $obm['uid'];;
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'todo_priority';
@@ -26,11 +36,31 @@ function run_query_todo_todolist($todo) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   $date = sql_date_format($db_type, 'todo_date', 'date_todo');
   $deadline = sql_date_format($db_type, 'todo_deadline', 'date_deadline');
-	$multidomain = sql_multidomain('todo');
-  $whereq = "WHERE todo_user = '$uid' $multidomain";
+  $multidomain = sql_multidomain('todo');
+
+  if ($text != '') {
+    $where .= " AND (todo_title $like '$text%' OR todo_content $like '$text%')";
+  }
+  if (($priority != '') && ($priority != $c_all)) {
+    $where .= " AND todo_priority = '$priority'";
+  }
+  if ($percent != '') {
+    $where .= " AND todo_percent > '$percent'";
+  }
+  if ($dateafter != '') {
+    $where .= " AND todo_$date_field > '$dateafter'";
+  }
+  if ($datebefore != '') {
+    $where .= " AND todo_$date_field < '$datebefore'";
+  }
+
+  $whereq = "WHERE todo_user = '$uid'
+    $where
+    $multidomain";
 
   // Order exceptions (order on calculated rows)
   if (strcmp($sql_order_field, 'todo_update') == 0) {
@@ -103,7 +133,8 @@ function run_query_todo_detail($todo) {
        LEFT JOIN UserObm as uu ON todo_userupdate = uu.userobm_id
        LEFT JOIN UserObm as u ON todo_user = u.userobm_id,
      UserObm as Author
-  WHERE todo_id = $t_id $multidomain
+  WHERE todo_id = '$t_id'
+    $multidomain
     AND Author.userobm_id = todo_usercreate";
 
   display_debug_msg($query, $cdg_sql, 'run_query_todo_detail()');
@@ -170,6 +201,33 @@ function run_query_todo_insert($todo) {
       )";
       display_debug_msg($query, $cdg_sql, 'run_query_todo_insert()');
       $retour = $obm_q->query($query);
+    }
+
+    if ($retour) {
+      if (in_array($uid, $users)) {
+	$where_user = "AND todo_user ='$uid'";
+      } else {
+	$where_user = "";
+      }
+      $query = "SELECT todo_id
+      FROM Todo
+      WHERE todo_timeupdate = '$now'
+        $where_user
+        AND todo_domain_id = '$domain_id'
+        AND todo_deadline ='$deadline'
+        AND todo_percent ='$percent'
+        AND todo_title = '$title'";
+
+      display_debug_msg($query, $cdg_sql, 'run_query_todo_insert(2)');
+      $obm_q->query($query);
+      $obm_q->next_record();
+      $id = $obm_q->f('todo_id');
+    }
+
+    if (in_array($uid, $users)) {
+      $retour = $id;
+    } else {
+      $retour = 'other_user';
     }
   }
 

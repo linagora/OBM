@@ -11,11 +11,11 @@
 //---------------------------------------------------------------------------//
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
-$fieldnames['date_todo'] = $l_date;
+$fieldnames['date_todo'] = $l_date_create;
 $fieldnames['date_deadline'] = $l_deadline;
 $fieldnames['todo_priority'] = $l_priority;
 $fieldnames['todo_percent'] = $l_percent;
-$fieldnames['todo_title'] = $l_todotitle;
+$fieldnames['todo_title'] = $l_title;
 $fieldnames['todo_percent'] = $l_percent;
 $fieldnames['todo_update'] = $l_update;
 
@@ -73,20 +73,126 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 }
 
 
+/**
+ * Display Todo search form
+ *
+ * @param $params[] : hash with search values
+ **/
+function dis_todo_search_form($params='') {
+  global $cgp_hide;
+
+  $block .= html_todo_search_form($params);
+
+  return $block;
+}
+
+
+/**
+ * Display: XHTML Todo search Form
+ *
+ * @param $prams[] : default form values
+ **/
+function html_todo_search_form($params) {
+  global $action, $max_priority, $l_find, $popup, $display, $c_all, $l_all;
+  global $l_deadline, $l_date, $l_date_create;;
+  global $l_title, $l_percent, $l_priority, $l_text, $l_after, $l_before;
+
+  $text = stripslashes($params['text']);
+  $priority = $params['priority'];
+  $percent = $params['percent'];
+  $date_field = ($params['date_field'] ? $params['date_field'] : 'deadline');
+  $dateafter = of_date_upd_format(stripslashes($params['date_after']),true);
+  $datebefore = of_date_upd_format(stripslashes($params['date_before']),true);
+  $archive = ($params['archive'] == '1' ? "checked = \"checked\"" : '');
+
+  // Selected date field
+  $s_date_field[$date_field] = "selected=\"selected\"";
+
+  // Priority select
+  $sel_priority = "<select id=\"sel_priority\" name=\"sel_priority\">
+    <option value=\"$c_all\">$l_all</option>";
+  for ($i=1; $i<=$max_priority; $i++) {
+    $selected = ($i == $priority) ? "selected=\"selected\"" : '';
+    $sel_priority .= "<option value=\"$i\" $selected>$i</option>";
+  }
+  $sel_priority .= '</select>';
+  
+  if ($popup) {
+    $ext_action = $params['ext_action'];
+    $ext_type = $params['ext_type'];
+    $ext_url = $params['ext_url'];
+    $ext_id = $params['ext_id'];
+    $ext_title = $params['ext_title'];
+    $ext_target = $params['ext_target'];
+    $ext_widget = $params['ext_widget'];
+    $ext_widget_text = $params['ext_widget_text'];
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_type\" type=\"hidden\" value=\"$ext_type\">
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
+            <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    $display['title'] = $ext_title;
+  }
+
+  // --- HTML Template --------------------------------------------------------
+  $block = "
+  <form class=\"search\" method=\"get\" name=\"f_search\" 
+  action=\"todo_index.php\">
+    <label>$l_text<br />
+      <input type=\"text\" name=\"tf_text\" size=\"16\" value=\"$text\" />
+    </label>
+    <label>$l_priority<br />
+      $sel_priority
+    </label>
+    <label>$l_percent<br />
+      <input type=\"text\" name=\"tf_percent\" size=\"12\" value=\"$percent\" maxlength=\"2\"/>
+    </label>
+    <label>$l_date<br />
+      <select name=\"sel_date_field\">
+        <option value=\"deadline\" $s_date_field[deadline]>$l_deadline</option>
+        <option value=\"date_create\" $s_date_field[date_create]>$l_date_create</option>
+      </select>
+    </label>
+    <label>$l_after<br />
+      <input type=\"text\" name=\"tf_date_after\" class=\"datePicker\" value=\"$dateafter\" />
+    </label>
+    <label>$l_before<br />
+      <input type=\"text\" name=\"tf_date_before\" class=\"datePicker\" value=\"$datebefore\" />
+    </label>
+<!--    <label>$l_archive<br />
+      <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
+    </label>-->
+    <label>&nbsp;<br />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
+      <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
+      $ext &nbsp;
+    </label>
+    <p class=\"CL\" />
+  </form>";
+
+  return $block;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Todo search result
 // Parameters:
 //   - $todo[]    : todo search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_search_list($todo) {
-  global $display, $obm, $l_no_found;
+  global $display, $obm, $l_found, $l_no_found;
 
-  $todo_q = run_query_todo_todolist($todo);
+  $todo_q = run_query_todo_search($todo);
   $nb_todo = $todo_q->num_rows_total();
   if ($nb_todo == 0) {
-    $display['msg'] .= display_info_msg($l_no_found);
+    $display['msg'] .= display_warn_msg($l_no_found);
   } else {
     $prefs = get_display_pref($obm['uid'], 'todo', 0);
+    $display['msg'] .= display_info_msg("$nb_todo $l_found");
     $display['result'] .= html_todo_search_list($todo, $todo_q, $prefs);
   }
 
@@ -105,12 +211,16 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
   global $obm, $l_del, $l_delete;
 
   $uid = $obm['uid'];
-  $title = $todo['title'];
+  $text = stripslashes($todo['text']);
   $users = $todo['userid'];
   $user = $users[0];
   $priority = $todo['priority'];
+  $percent = $todo['percent'];
+  $date_field = $todo['date_field'];
+  $date_after = $todo['date_after'];
+  $date_before = $todo['date_before'];
 
-  $url = url_prepare("todo_index.php?action=index&amp;tf_title=$title&amp;tf_user=$user&amp;sel_priority=$priority");
+  $url = url_prepare("todo_index.php?action=search&amp;tf_text=$text&amp;tf_user=$user&amp;sel_priority=$priority&amp;tf_percent=$percent&amp;date_field=$date_field&amp;date_after=$date_after&amp;date_before=$date_before");
 
 
   $todo_d = new OBM_DISPLAY('DATA', $prefs, 'todo');
@@ -139,16 +249,35 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
 }
 
 
+/**
+ * Display Todo detail
+ *
+ * @param $contact[] : contact values (id)
+ **/
+function dis_todo_consult($params) {
+  global $display, $l_no_found, $path, $l_err_reference;
+
+  $id = $params['todo_id'];
+  $todo_q = run_query_todo_detail($params);
+  if ($todo_q->num_rows() != 1) {
+    $display['msg'] .= display_err_msg($l_err_reference);
+  }
+  $display['detailInfo'] = display_record_info($todo_q);
+
+  $block .= html_todo_consult($todo_q);
+
+  return $block;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Todo Detail (all informations)
 // Parameters:
 //   - $todo_q    : todo list
-//   - $todo[]    : default values
-//     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_todo_detail($todo, $todo_q) {
+function html_todo_consult($todo_q) {
   global $display;
-  global $l_todo, $l_todotitle, $l_user, $l_author, $l_priority, $l_date;
+  global $l_todo, $l_todotitle, $l_user, $l_author, $l_priority, $l_date_create;
   global $l_deadline, $l_content, $l_no_deadline, $l_percent;
 
   $title = $todo_q->f('todo_title');
@@ -160,7 +289,6 @@ function dis_todo_detail($todo, $todo_q) {
   $date = of_date_format($todo_q->f('date_todo'));
   $deadline = $todo_q->f('date_deadline');
   $deadline = ($deadline != 0) ? of_date_format($deadline) : $l_no_deadline;
-
   $content = $todo_q->f('todo_content');
 
   $display['title'] = $title;
@@ -169,35 +297,40 @@ function dis_todo_detail($todo, $todo_q) {
   <div class=\"detail infos\">
     <h1>$l_todo</h1>
     <table>
-     <tr>
-      <th>$l_todotitle</th>
+    <tr>
+      <th>$l_title</th>
       <td>$title</td>
-     </tr><tr>
+    </tr>
+    <tr>
       <th>$l_author</th>
       <td>$author</td>
-     </tr><tr>
+    </tr>
+    <tr>
       <th>$l_priority</th>
       <td>$priority</td>
-     </tr><tr>
+    </tr>
+    <tr>
       <th>$l_percent</th>
       <td>$percent</td>
-     </tr><tr>
-      <th>$l_date</th>
+    </tr>
+    <tr>
+      <th>$l_date_create</th>
       <td>$date</td>
-     </tr><tr>
+    </tr>
+    <tr>
       <th>$l_deadline</th>
       <td>$deadline</td>
-     </tr>
-     </table>
-   </div>
+    </tr>
+    </table>
+  </div>
 
-   <div class=\"detail infos\">
+  <div class=\"detail infos\">
     <h1>$l_user</h1>
     <table>
-     <tr>
+    <tr>
       <th>$l_user</th>
       <td>$user</td>
-     </tr>
+    </tr>
     </table>
    </div>
   
@@ -218,20 +351,19 @@ function dis_todo_detail($todo, $todo_q) {
 //   - $todo_q : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_form($todo, $todo_q = 0) {
-  global $path, $obm;
+  global $path, $obm, $max_priority;
   global $ico_mini_cal, $ico_add, $ico_delete;
   global $l_add, $l_update, $l_close,$display,$l_todo,$l_user;
-  global $l_deadline, $l_priority, $l_todotitle, $l_percent, $l_content;
+  global $l_deadline, $l_priority, $l_title, $l_percent, $l_content;
 
-  $max_priority = 5;
   $action = $todo['action'];
   $popup = $todo['popup'];
  
   if ($action == 'detailupdate') {
     $t_id = $todo['todo_id'];
     $u_id = $todo_q->f('todo_user');
-    $title = $todo_q->f('todo_title');
-    $content = $todo_q->f('todo_content');
+    $title = htmlentities($todo_q->f('todo_title'));
+    $content = htmlentities($todo_q->f('todo_content'));
     $priority = $todo_q->f('todo_priority');
     $percent = $todo_q->f('todo_percent');
     $deadline = $todo_q->f('date_deadline');
@@ -324,7 +456,7 @@ function dis_todo_form($todo, $todo_q = 0) {
  <legend>$l_todo</legend>
   <table>
   <tr>
-    <th>$l_todotitle</th>
+    <th>$l_title</th>
     <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"100\" size=\"100\" value=\"$title\" /></td>
     </tr><tr>
     <th>$l_priority</th>

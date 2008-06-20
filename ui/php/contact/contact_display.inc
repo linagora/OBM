@@ -340,11 +340,11 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Contact search form
-// Parameters:
-//   - $contact[] : hash with contact values
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display Contact search form
+ *
+ * @param $contact[] : hash with contact values
+ **/
 function dis_contact_search_form($contact='') {
   global $cgp_hide;
 
@@ -362,16 +362,15 @@ function dis_contact_search_form($contact='') {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display: XHTML Contact search Form
-// Parameters:
-//   - $contact[] : default form values
-//     keys used  : name, company
-//   - $usr_q     : database object with userobm list
-//   - $funcs     : array with contact function list
-//   - $ctry_q    : database object with country list
-//   - $dsrc_q    : database object with datasource list
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display: XHTML Contact search Form
+ *
+ * @param $contact[] : default form values
+ * @param $usr_q     : database object with userobm list
+ * @param $funcs     : array with contact function list
+ * @param $ctry_q    : database object with country list
+ * @param $dsrc_q    : database object with datasource list
+ **/
 function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   global $action, $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
   global $csearch_advanced_default, $l_fuzzy, $l_date, $l_timeupdate;
@@ -692,11 +691,11 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display: Contact detail
-// Parameters:
-//   - $contact[] : contact values (id)
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display: Contact detail
+ *
+ * @param $contact[] : contact values (id)
+ **/
 function dis_contact_consult($contact) {
   global $display, $l_no_found, $path, $l_err_reference;
 

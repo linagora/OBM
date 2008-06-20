@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_author = "Autor";
-$l_date = "Fecha de colocación";
+$l_date_create = "Fecha de colocación";
 $l_deadline = "Fecha Final";
 $l_todotitle = "Título";
 $l_content = "Contenido";
