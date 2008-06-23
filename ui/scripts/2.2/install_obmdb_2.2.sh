@@ -7,30 +7,23 @@
 # $Id$
 ###############################################################################
 
-# Get obm_conf.ini parameters
-getVal () {
-   echo Recherche $1
-   VALUE=`grep ^$1\ *= ../../conf/obm_conf.ini | cut -d= -f2 | tr -d '^ ' | tr -d '" '`
-   echo $VALUE
-}
-
 # Lecture des parametres de connexion a la BD
-getVal host
+get_val host
 H=$VALUE
 
-getVal dbtype
+get_val dbtype
 DBTYPE=$VALUE
 
-getVal user
+get_val user
 U=$VALUE
 
-getVal password
+get_val password
 P=$VALUE
 
-getVal db
+get_val db
 DB=$VALUE
 
-getVal lang
+get_val lang
 OBM_LANG=$VALUE
 
 echo "*** Parameters used"
@@ -40,24 +33,7 @@ echo "database user = $U"
 echo "database password = $P"
 echo "install lang = $OBM_LANG"
 
-
-# We search for PHP interpreter (different name on Debian, RedHat, Mandrake)
-PHP=`which php4 2> /dev/null`
-if [ $? != 0 ]; then
-  PHP=`which php 2> /dev/null`
-  if [ $? != 0 ]; then
-    PHP=`which php-cgi 2> /dev/null`
-    if [ $? != 0 ]; then
-      echo "Can't find php interpreter"
-      exit
-    fi
-  fi
-fi
-
-PHP="$PHP -d include_path=.:`dirname $0`/../.."
-echo $PHP : PHP interpreter found
-# Create the Artichow library link
-# mv ../../obminclude/Artichow-1.1.0-php4+5/ ../../obminclude/Artichow
+locate_php_interp
 
 echo "*** Document repository creation"
 $PHP install_document_2.2.php || (echo $?; exit $?)

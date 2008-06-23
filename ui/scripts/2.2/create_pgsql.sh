@@ -1,39 +1,20 @@
 #!/bin/bash
 
-# Get obm_conf.ini parameters
-getVal () {
-   VALUE=`grep ^$1\ *= ../../conf/obm_conf.ini | cut -d= -f2 | tr -d '^ ' | tr -d '" '`
-}
+source `dirname $0`/obm-sh.lib
 
-# Lecture des parametres de connexion a la BD
-getVal user
+# DB parameters
+get_val user
 U=$VALUE
-
-getVal password
+get_val password
 P=$VALUE
-
-getVal db
+get_val db
 DB=$VALUE
+get_val lang
+OBM_LANG=$VALUE
 
-su postgres -c "./create_pgsql_as_postgres.sh ${DB} ${U} ${P}"
+su postgres -c "./create_pgsql_as_postgres.sh ${DB} ${U} ${P} ${OBM_LANG}"
 
-
-# We search for PHP interpreter (different name on Debian, RedHat, Mandrake)
-PHP=`which php4 2> /dev/null`
-if [ $? != 0 ]; then
-  PHP=`which php 2> /dev/null`
-  if [ $? != 0 ]; then
-    PHP=`which php-cgi 2> /dev/null`
-    if [ $? != 0 ]; then
-      echo "Can't find php interpreter"
-      exit
-    fi
-  fi
-fi
-
-PHP="$PHP -d include_path=.:`dirname $0`/../.."
-echo "PHP interpreter found: ${PHP}"
-
+locate_php_interp
 
 echo "*** Data checking and validation"
 
