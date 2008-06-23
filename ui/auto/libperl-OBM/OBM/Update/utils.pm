@@ -27,14 +27,14 @@ sub getDomains {
     # Création du meta-domaine
     $domainList[0]->{"meta_domain"} = 1;
     $domainList[0]->{"domain_id"} = 0;
-    $domainList[0]->{"domain_label"} = "metadomain";
-    $domainList[0]->{"domain_name"} = "metadomain";
-    $domainList[0]->{"domain_dn"} = "metadomain";
-    $domainList[0]->{"domain_desc"} = "Informations de l'annuaire ne faisant partie d'aucun domaine";
+    $domainList[0]->{"domain_label"} = 'metadomain';
+    $domainList[0]->{"domain_name"} = 'metadomain';
+    $domainList[0]->{"domain_dn"} = 'metadomain';
+    $domainList[0]->{"domain_desc"} = 'Informations de l\'annuaire ne faisant partie d\'aucun domaine';
 
 
     # Requete de recuperation des informations des domaines
-    my $queryDomain = "SELECT   domain_id,
+    my $queryDomain = 'SELECT   domain_id,
                                 domain_label,
                                 domain_description,
                                 domain_name,
@@ -44,10 +44,10 @@ sub getDomains {
                                 pdc.samba_value as samba_domain_pdc,
                                 profile.samba_value as samba_user_profile
                         FROM Domain
-                        LEFT JOIN Samba as name ON name.samba_name=\"samba_domain\" AND name.samba_domain_id=domain_id
-                        LEFT JOIN Samba as sid ON sid.samba_name=\"samba_sid\" AND sid.samba_domain_id=domain_id
-                        LEFT JOIN Samba as pdc ON pdc.samba_name=\"samba_pdc\" AND pdc.samba_domain_id=domain_id
-                        LEFT JOIN Samba as profile ON profile.samba_name=\"samba_profile\" AND profile.samba_domain_id=domain_id";
+                        LEFT JOIN Samba as name ON name.samba_name=\'samba_domain\' AND name.samba_domain_id=domain_id
+                        LEFT JOIN Samba as sid ON sid.samba_name=\'samba_sid\' AND sid.samba_domain_id=domain_id
+                        LEFT JOIN Samba as pdc ON pdc.samba_name=\'samba_pdc\' AND pdc.samba_domain_id=domain_id
+                        LEFT JOIN Samba as profile ON profile.samba_name=\'samba_profile\' AND profile.samba_domain_id=domain_id';
 
     if( defined($obmDomainId) && $obmDomainId =~ /^\d+$/ ) {
         $queryDomain .= " WHERE domain_id=".$obmDomainId;

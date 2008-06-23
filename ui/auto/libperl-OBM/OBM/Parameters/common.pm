@@ -59,7 +59,24 @@ if( defined( $userPasswd ) && $userPasswd =~ /^"(.*)"$/ ) {
 #
 # La base des mises à jours
 $dbName = $cfgFile->val( 'global', 'db' );
-$db = "dbi:".lc( $cfgFile->val( 'global', 'dbtype' )).":database=$dbName;host=".$cfgFile->val( 'global', 'host' );
+$dbHost = $cfgFile->val( 'global', 'host' );
+$dbType = lc( $cfgFile->val( 'global', 'dbtype' ));
+
+# Conversion du nom du type de BD utilisée en driver DBI associé
+SWITCH: {
+    if( $dbType eq 'mysql' ) {
+        $dbDriver = 'mysql';
+        last SWITCH;
+    }
+
+    if( $dbType eq 'pgsql' ) {
+        $dbDriver = 'Pg';
+        last SWITCH;
+    }
+}
+
+# Construction de la chaîne DBI de connexion à la BD
+$db = "dbi:".$dbDriver.":database=$dbName;host=".$dbHost;
 
 # Mode d'espace de nom OBM
 $singleNameSpace = $cfgFile->val( 'global', 'singleNameSpace' );
