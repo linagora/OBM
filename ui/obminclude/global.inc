@@ -294,7 +294,6 @@ $cgp_use['service']['network'] = false;
 if ($cgp_use['service']['ldap'] == false) {
   $cgp_use['service']['mail'] = false;
   $cgp_use['service']['samba'] = false;
-  $cgp_show['module']['tools'] = false;
 }
 
 if ($cgp_use['service']['mail'] == false) {
@@ -391,6 +390,10 @@ if ($cgp_use['service']['mail_vacation']) {
 }
 if ($cgp_use['service']['mail']) {
   $cgp_show['module']['mailbox'] = 'my';
+}
+
+if (!$cgp_use['service']['ldap']) {
+  $cgp_show['module']['tools'] = false;
 }
 
 // Specific user data

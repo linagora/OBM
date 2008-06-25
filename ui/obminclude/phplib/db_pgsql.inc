@@ -177,22 +177,27 @@ class DB_Sql {
     $count = 0;
     $id    = 0;
     $res   = array();
-
+    
     $this->connect();
-    $id = pg_query($this->Link_ID, "select * from $table");
+    $id = $this->query("SELECT c.column_name, data_type, tc.constraint_type, character_maximum_length
+                 FROM information_schema.columns c 
+                   LEFT JOIN information_schema.constraint_column_usage ccu ON ccu.column_name = c.column_name
+                   LEFT JOIN information_schema.table_constraints tc ON ccu.constraint_name = tc.constraint_name
+                 WHERE c.table_name ilike '$table'");    
     if ($id < 0) {
       $this->Error = pg_ErrorMessage($id);
       $this->Errno = 1;
       $this->halt("Metadata query failed.");
     }
-    $count = pg_NumFields($id);
     
-    for ($i=0; $i<$count; $i++) {
-      $res[$i]["table"] = $table;
-      $res[$i]["name"]  = pg_FieldName  ($id, $i); 
-      $res[$i]["type"]  = pg_FieldType  ($id, $i);
-      $res[$i]["len"]   = pg_FieldSize  ($id, $i);
-      $res[$i]["flags"] = "";
+    while($this->next_record()) {
+      $res[$this->f('column_name')]["table"] = $table;
+      $res[$this->f('column_name')]["name"]  = $this->f('column_name'); 
+      $res[$this->f('column_name')]["type"]  = $this->f('data_type');
+      $res[$this->f('column_name')]["len"]   = $this->f('character_maximum_length');
+      if($this->f('constraint_type')) {
+        $res[$this->f('column_name')]["flags"] .= " ".$this->f('constraint_type');
+      }
     }
     
     pg_FreeResult($id);

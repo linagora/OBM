@@ -69,7 +69,7 @@ echo "  Delete old database if exists"
 if [ $DBTYPE == "MYSQL" ]; then
   mysql -h $H -u $U -p$P -e "DROP DATABASE IF EXISTS $DB"
 elif [ $DBTYPE == "PGSQL" ]; then
-  echo "PGSQL : nothing"
+  psql -U $U template1 -c "DROP DATABASE $DB"
 fi
 
 echo "  Create new $DB database"

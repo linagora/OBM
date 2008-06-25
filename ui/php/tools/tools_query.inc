@@ -361,7 +361,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   
   $fields = $obm_qm->metadata($metadata['table'], false);
   foreach ($fields as $field) {
-    if(strpos($field['flags'],'primary_key') === false) {
+    if(strpos(strtolower($field['flags']),'primary') === false) {
       if(!isset($metadata['exclude'][str_replace($metadata['prefix'].'_','',$field['name'])])) { 
         $diff[] = "Production.$field[name] != Current.$field[name]";
       }
@@ -430,7 +430,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   $join = array();
   $fields = $obm_qm->metadata($metadata['link']['table'], false);
   foreach ($fields as $field) {
-    if(strpos($field['flags'],'primary_key') === false) {
+    if(strpos(strtolower($field['flags']),'primary') === false) {
       $diff[] = "Production.$field[name] != Link.$field[name]";
     } else {
       $diff[] = "Production.$field[name] IS NULL";
@@ -504,7 +504,7 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
   
   $fields = $obm_qm->metadata($metadata['table'], false);
   foreach ($fields as $field) {
-    if(strpos($field['flags'],'primary_key') === false) {
+    if(strpos(strtolower($field['flags']),'primary') === false) {
       if(!isset($metadata['exclude'][str_replace($metadata['prefix'].'_','',$field['name'])])) { 
         $diff[] = "Production.$field[name] != Current.$field[name]";
       }
@@ -574,7 +574,7 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
   $join = array();
   $fields = $obm_qm->metadata($metadata['link']['table'], false);
   foreach ($fields as $field) {
-    if(strpos($field['flags'],'primary_key') === false) {
+    if(strpos(strtolower($field['flags']),'primary') === false) {
       $diff[] = "Production.$field[name] != Link.$field[name]";
     } else {
       $diff[] = "Production.$field[name] IS NULL";

@@ -2178,18 +2178,15 @@ function of_usergroup_update_group_node($g_id) {
   // If group has users, Insert new internal association
   if (is_array($users_id) && count($users_id) > 0) {
     $query = "INSERT INTO of_usergroup (
-      of_usergroup_group_id,
-      of_usergroup_user_id
-    ) VALUES";
-
-    $coma = '';
+                of_usergroup_group_id,
+                of_usergroup_user_id
+              ) VALUES (%d,%d)";
     foreach ($users_id as $u_id) {
-      $query .= "$coma ('$g_id', '$u_id')";
-      $coma = ',';
+      if(is_numeric($g_id) && $g_id > 0 && is_numeric($u_id) && $u_id > 0) {
+        display_debug_msg(sprintf($query,$g_id,$u_id), $cdg_sql, 'of_usergroup_update_group_node(insert)');
+        $ret = $obm_q->query(sprintf($query,$g_id,$u_id));
+      }
     }
-
-    display_debug_msg($query, $cdg_sql, 'of_usergroup_update_group_node(insert)');
-    $ret = $obm_q->query($query);
   } else {
     $ret = true;
   }

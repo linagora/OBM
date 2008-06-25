@@ -391,7 +391,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
 //   - $calendar: calendar parameters
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_bar_date_selector($calendar) {
-  global $ccalendar_weekstart,$ico_ok;
+  global $ccalendar_weekstart,$ico_ok, $path;
   global $l_go, $l_go_to, $l_daysofweekfirst;
 
   $iso_date = $calendar['date'];
@@ -2398,7 +2398,7 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $ts, $cats
 function html_calendar_dis_conflict($calendar, $c_q) {
   global $l_title, $l_location, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
-  global $l_private;
+  global $l_private, $obm;
   
   $readable_calendars = of_right_entity_for_user('calendar', $obm['uid'], 'read', '', 'userobm');
   $readable_resources = of_right_entity_for_user('Resource', $obm['uid'], 'read', '');
