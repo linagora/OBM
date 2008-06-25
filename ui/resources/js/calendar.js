@@ -199,8 +199,12 @@ Obm.CalendarDayEvent = new Class({
 
   resetTitle: function() {
     var title = this.event.title + ' ';
-    if(this.event.all_day == 0) {
+    if (this.event.all_day == 0) {
       title = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
+    }
+    // Display the location only if set
+    if (this.event.location != '') {
+      title = title + ' (' + this.event.location + ')'; 
     }
     this.element.setProperty('title', this.event.title)
     this.titleContainer.setHTML(title);    
@@ -481,6 +485,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     }
 
     this.titleContainer = new Element('span').injectInside(this.element);
+    this.locationContainer = new Element('span').injectInside(this.element);
     this.timeContainer = new Element('a')
        .setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
        .injectInside(this.dragHandler);
@@ -490,6 +495,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   },
 
   resetTitle: function() {
+    var location = '(' + this.event.location + ') ';
     var title = this.event.title + ' ';
     var time = new Date(this.event.time * 1000).format("H:i");
     if(this.event.duration <= this.options.unit) {
@@ -499,6 +505,10 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     this.element.setProperty('title', this.event.title)
     this.timeContainer.setHTML(time);
     this.titleContainer.setHTML(title);
+    // Display the location only if set
+    if (this.event.location != '') {
+      this.locationContainer.setHTML(location);
+    }
   },
 
   setDuration: function(duration) {
