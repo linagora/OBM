@@ -233,7 +233,7 @@ and which subject is %s (location : %s).
 %s
 
 -------------------------------------------------------------------
-This message was send on %s at %s by %s %s from OBM 
+This message was sent on %s at %s by %s %s from OBM 
 %s";
 
 $l_add_resource_mail_body = 
@@ -250,7 +250,7 @@ A new resource reservation was scheduled on %s to %s for %s
 %s
 
 -------------------------------------------------------------------
-This message was send on %s at %s by %s %s from OBM 
+This message was sent on %s at %s by %s %s from OBM 
 %s";
 
 $l_update_event_mail_body = 
@@ -270,7 +270,7 @@ was updated and will take place from %s to %s (location : %s).
 %s
 
 -------------------------------------------------------------------
-This message was send on %s at %s by %s %s from OBM 
+This message was sent on %s at %s by %s %s from OBM 
 %s";
 
 $l_update_resource_mail_body = 
@@ -287,7 +287,7 @@ The resource reservation %s initialy scheduled from %s to %s
 %s
 
 -------------------------------------------------------------------
-This message was send on %s at %s by %s %s from OBM 
+This message was sent on %s at %s by %s %s from OBM 
 %s";
 
 $l_delete_event_mail_body = 
@@ -303,7 +303,7 @@ was deleted.
 %s
 
 -------------------------------------------------------------------
-This message was send on %s at %s by %s %s from OBM 
+This message was sent on %s at %s by %s %s from OBM 
 %s";
 
 $l_delete_resource_mail_body = 
@@ -319,7 +319,7 @@ The resource reservation %s, initialy scheduled from %s to %s
 %s
 
 -------------------------------------------------------------------
-This message was send on %s at %s by %s %s from OBM 
+This message was sent on %s at %s by %s %s from OBM 
 %s";
 
 $l_delete_exception_mail_body = 
@@ -335,7 +335,7 @@ One or more occurrences of the rendezvous %s, initialy cancelled
 %s
 
 -------------------------------------------------------------------
-This message was send on %s at %s by %s %s from OBM 
+This message was sent on %s at %s by %s %s from OBM 
 %s";
 
 $l_add_exception_mail_body = 
@@ -351,7 +351,7 @@ on %s were canceled.
 %s
 
 -------------------------------------------------------------------
-This message was send on %s at %s by %s %s from OBM 
+This message was sent on %s at %s by %s %s from OBM 
 %s";
 
 $l_update_state_mail_body = 
@@ -366,7 +366,7 @@ The attendee %s to %s have changed to %s.
 %s
 
 -------------------------------------------------------------------
-This message was send on %s at %s by %s %s from OBM 
+This message was sent on %s at %s by %s %s from OBM 
 %s";
 
 $l_alert_mail_body = 
@@ -381,7 +381,7 @@ The rendezvous %s(%s) will take place in %s minutes (location: %s).
 %s
 
 -------------------------------------------------------------------
-This message was send on %s at %s by OBM 
+This message was sent on %s at %s by OBM 
 %s";
 
 
