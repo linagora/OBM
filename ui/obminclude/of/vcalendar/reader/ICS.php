@@ -428,10 +428,10 @@ class Vcalendar_Reader_ICS {
   function getOBMId($attendee, $entity) {
     if(isset($attendee['mail'])) {
       if(isset($this->mails[$attendee['mail']])) {
-        return $this->mails[$entity][$attendee['mail']];
+        return $this->mails[$attendee['mail']][$entity];
       }
       if(isset($this->mails[$attendee['email']])) {
-        return $this->mails[$entity][$attendee['email']];
+        return $this->mails[$attendee['email']][$entity];
       }
     }
     if(isset($attendee['cn']) && isset($this->cns[$attendee['cns']])) {
@@ -440,11 +440,11 @@ class Vcalendar_Reader_ICS {
     $db = new DB_OBM;
     if(!is_null($attendee['cn'])) {
       $this->cns[$entity][$attendee['cn']] = NULL;
-      $cn = "OR cn = '".$attendee['cn']."'";
+      $cn = "OR cn = '".addslashes($attendee['cn'])."'";
     }
     if(!is_null($attendee['mail'])) {
       $this->mails[$entity][$attendee['mail']] = NULL;
-      $mail = "OR mail like '%".$attendee['mail']."%' ";
+      $mail = "OR mail like '%".addslashes($attendee['mail'])."%' ";
     }
 
     $entityTable = $this->buildEntityQuery($entity, $db);
@@ -496,7 +496,10 @@ class Vcalendar_Reader_ICS {
     }
   }
 
-  function parseText($text,$options) {
+  function parseText($text, $options) {
+    if(strtolower($options['encoding']) == 'quoted-printable') {
+      $text = quoted_printable_decode($text);
+    }
     $text = htmlspecialchars($text);
     $text = stripcslashes($text);
     return $text;    
