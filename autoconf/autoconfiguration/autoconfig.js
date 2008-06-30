@@ -19,7 +19,7 @@
 const PREF_LOGIN = "config.obm.login";
 const PREF_AUTOCONF = "config.obm.autoconfigStatus";
 
-const CONFIG_XML_URL = "https://10.73.0.12/obm-autoconf/autoconfiguration/%s";
+const CONFIG_XML_URL = "https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/autoconfiguration/%s";
 
 const promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                                 .getService(Components.interfaces.nsIPromptService);
@@ -134,6 +134,7 @@ function _getDataHTTP(aURL) {
                             .getService(Components.interfaces.nsIIOService);
 
   var channel = ioService.newChannel(aURL, null, null);
+
   var inputStream = channel.open();
   httpChannel = channel.QueryInterface(Components.interfaces.nsIHttpChannel);
 	try {
@@ -556,17 +557,29 @@ function _setupAccounts(aConfigurationData) {
     
     
     if ( "@draftFolder" in identity ) {
-      _setPreference("mail.identity." + identity.@id + ".draft_folder",
-                     identity.@draftFolder.toString().replace("@","%40"));
+ 			var value = identity.@draftFolder.toString();
+    	if ( value.match(/.*@.*@/) ) {
+    		//multi-domain : replace 'login@domain@server' by 'login%40domain@server'
+    		value = value.replace("@","%40");
+    	}
+      _setPreference("mail.identity." + identity.@id + ".draft_folder", value);
                      
     }
     if ( "@fccFolder" in identity ) {
-      _setPreference("mail.identity." + identity.@id + ".fcc_folder",
-                     identity.@fccFolder.toString().replace("@","%40"));
+    	var value = identity.@fccFolder.toString();
+    	if ( value.match(/.*@.*@/) ) {
+    		//multi-domain : replace 'login@domain@server' by 'login%40domain@server'
+    		value = value.replace("@","%40");
+    	}
+      _setPreference("mail.identity." + identity.@id + ".fcc_folder", value);
     }
     if ( "@stationeryFolder" in identity ) {
-      _setPreference("mail.identity." + identity.@id + ".stationery_folder",
-                     identity.@stationeryFolder.toString().replace("@","%40"));
+    	var value = identity.@stationeryFolder.toString();
+    	if ( value.match(/.*@.*@/) ) {
+    		//multi-domain : replace 'login@domain@server' by 'login%40domain@server'
+    		value = value.replace("@","%40");
+    	}
+      _setPreference("mail.identity." + identity.@id + ".stationery_folder", value);
     }
   }
 
@@ -619,8 +632,12 @@ function _setupAccounts(aConfigurationData) {
       }
 
       if ( "@trashFolder" in server ) {
-        _setPreference("mail.server." + server.@id + ".trash_folder_name",
-                       server.@trashFolder.toString().replace("@","%40"));
+      	var value = server.@trashFolder.toString();
+      	if ( value.match(/.*@.*@/) ) {
+      		//multi-domain : replace 'login@domain@server' by 'login%40domain@server'
+      		value = value.replace("@","%40");
+      	}
+        _setPreference("mail.server." + server.@id + ".trash_folder_name", value);
       }
       
       if ( "@downloadBodies" in server ) {
@@ -630,6 +647,11 @@ function _setupAccounts(aConfigurationData) {
       
       if ( "@offlineDownload" in server ) {
       	_setPreference("mail.server." + server.@id + ".offline_download",
+      								server.@offlineDownload == "true" ? true : false);
+      }
+      
+      if ( "@useSubscription" in server ) {
+      	_setPreference("mail.server." + server.@id + ".using_subscription",
       								server.@offlineDownload == "true" ? true : false);
       }
   }
