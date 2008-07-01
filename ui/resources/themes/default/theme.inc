@@ -133,6 +133,7 @@ $ico_meeting                = "$theme_path/ico_meeting.gif";
 $ico_meeting_alt            = "$theme_path/ico_meeting_alt.gif";
 $ico_periodic               = "$theme_path/ico_calendar_repeat.gif";
 $ico_periodic_alt           = "$theme_path/ico_calendar_repeat_alt.gif";
+$ico_extension              = "$theme_path/ico_calendar_extension.gif";
 $ico_popup_close            = "$theme_path/ico_popup_close.gif";
 $popup_queue                = "$theme_path/popup_queue.gif";
 $ico_day_view               = "$theme_path/ico_calendar_day_view.gif";

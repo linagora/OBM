@@ -1,5 +1,5 @@
-
-
+// Extension : when an event is on more than one day, other days displays are
+// considered as display extensions (eg month view)
 Obm.CalendarDayEventExtension = new Class({
   initialize: function(parentEvent,size,origin) {
     this.event = parentEvent.event;
@@ -38,9 +38,11 @@ Obm.CalendarDayEventExtension = new Class({
     this.dragHandler = new Element('h1')
                                  .setProperty('style','cursor: move;')
                                  .injectInside(this.element);     
+    this.extension = new Element('img').setProperty('src',obm.vars.images.extension)
+                                       .injectInside(this.dragHandler);
     if (this.event.meeting) {                                 
       this.meeting = new Element('img').setProperty('src',obm.vars.images.meeting)
-                        .injectInside(this.dragHandler);
+                                       .injectInside(this.dragHandler);
     }
     this.setPeriodicity();
     this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
@@ -51,10 +53,11 @@ Obm.CalendarDayEventExtension = new Class({
 
   resetTitle: function() {
     var title = this.event.title + ' ';
-    if (this.event.all_day == 0) {
-      title = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
+    // Display the location only if set
+    if (this.event.location != '') {
+      title = title + ' (' + this.event.location + ')'; 
     }
-    this.element.setProperty('title', this.event.title)
+    this.element.setProperty('title', title)
     this.titleContainer.setHTML(title);
   },
 
@@ -85,7 +88,7 @@ Obm.CalendarDayEventExtension = new Class({
 
   destroy: function() {
     this.element.remove();
-  },        
+  },
 
   conflict: function(size, position) {
     this.element.setStyle('margin-top',position * this.element.offsetHeight + 'px');
@@ -100,12 +103,13 @@ Obm.CalendarDayEventExtension = new Class({
       this.dragHandler.setStyle('backgroundColor','');
     }
   }
-   
+
 })
+
 
 /******************************************************************************
  * Calendar event object, can be dragged but have no graphical representation
- * of it's duration.
+ * of it's duration (eg bar in month view or all day event)
  ******************************************************************************/
 Obm.CalendarDayEvent = new Class({
   
@@ -176,8 +180,8 @@ Obm.CalendarDayEvent = new Class({
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
                                  .setProperty('style','cursor: move;')
-                                 .injectInside(this.element);     
-    if(this.event.meeting) {                                 
+                                 .injectInside(this.element);
+    if (this.event.meeting) {
       this.meeting = new Element('img').setProperty('src',obm.vars.images.meeting)
                         .injectInside(this.dragHandler);
     }
@@ -186,9 +190,17 @@ Obm.CalendarDayEvent = new Class({
                                           .injectInside(this.dragHandler);
     this.titleContainer.onclick = function () { if(obm.calendarManager.redrawLock) return false;};
     this.resetTitle();
-
   },
- 
+
+  // Add extension (arrow) to avent extensions
+  setExtension: function(time) {
+    var eventTime = time * 1000;
+    var calendarStartTime = obm.calendarManager.startTime * 1000;
+    if (eventTime < calendarStartTime) {
+      this.extension = new Element('img').setProperty('src',obm.vars.images.extension).injectTop(this.titleContainer);
+    }
+  },
+
   setPeriodicity: function() {
     if (this.event.periodic) {
       this.periodic = new Element('img').setProperty('src',obm.vars.images.periodic).injectInside(this.dragHandler);
@@ -200,14 +212,15 @@ Obm.CalendarDayEvent = new Class({
   resetTitle: function() {
     var title = this.event.title + ' ';
     if (this.event.all_day == 0) {
-      title = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
+      title = new Date(this.event.time * 1000).format("H:i") + ' ' + title;
     }
     // Display the location only if set
     if (this.event.location != '') {
-      title = title + ' (' + this.event.location + ')'; 
+      title = title + ' (' + this.event.location + ')';
     }
-    this.element.setProperty('title', this.event.title)
-    this.titleContainer.setHTML(title);    
+    this.element.setProperty('title', title)
+    this.titleContainer.setHTML(title);
+    this.setExtension(this.event.time);
   },
 
   setTitle: function(title) {
@@ -495,20 +508,20 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   },
 
   resetTitle: function() {
-    var location = '(' + this.event.location + ') ';
+    var location = '';
+    if (this.event.location != '') {
+      location = '(' + this.event.location + ')';
+    }
     var title = this.event.title + ' ';
     var time = new Date(this.event.time * 1000).format("H:i");
-    if(this.event.duration <= this.options.unit) {
+    if (this.event.duration <= this.options.unit) {
       time = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
       title = '';
     }
-    this.element.setProperty('title', this.event.title)
+    this.element.setProperty('title', this.event.title + ' ' + location);
     this.timeContainer.setHTML(time);
     this.titleContainer.setHTML(title);
-    // Display the location only if set
-    if (this.event.location != '') {
-      this.locationContainer.setHTML(location);
-    }
+    this.locationContainer.setHTML(location);
   },
 
   setDuration: function(duration) {
