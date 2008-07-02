@@ -97,7 +97,7 @@ sub getEntity {
     }
 
     my $query = 'SELECT COUNT(*) FROM '.$uGroupTable.' WHERE group_id='.$groupId;
-    &OBM::toolBox::write_log( $query, 'W', 3 );
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: '.$query, 'W', 3 );
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
@@ -120,7 +120,7 @@ sub getEntity {
 
     # La requete a executer - obtention des informations sur le groupe
     $query = "SELECT * FROM ".$uGroupTable." WHERE group_id=".$groupId;
-    &OBM::toolBox::write_log( $query, 'W', 3 );
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: '.$query, 'W', 3 );
 
     # On execute la requete
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
@@ -192,8 +192,8 @@ sub updateDbEntity {
         return 0;
     }
 
-    my $dbGroupDesc = $self->{groupDbDesc};
-    if( !defined($dbGroupDesc) ) {
+    my $dbEntry = $self->{groupDbDesc};
+    if( !defined($dbEntry) ) {
         return 0;
     }
 
@@ -206,7 +206,7 @@ sub updateDbEntity {
     # MAJ de l'entité dans la table de production
     my @updateFields;
     my @whereFields;
-    while( my( $columnName, $columnValue ) = each(%{$dbGroupDesc}) ) {
+    while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
         if( $columnName =~ /$exceptFields/ ) {
             push( @whereFields, $columnName."=".$dbHandler->quote($columnValue) );
         }else {
@@ -215,7 +215,7 @@ sub updateDbEntity {
     }
 
     my $query = 'UPDATE P_UGroup SET '.join( ', ', @updateFields ).' WHERE '.join( ' AND ', @whereFields );
-    &OBM::toolBox::write_log( $query, 'W', 3 );
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: '.$query, 'W', 3 );
 
 
     my $queryResult;
@@ -224,23 +224,24 @@ sub updateDbEntity {
     if( !defined($result) ) {
         &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
+
     }elsif( $result == 0 ) {
         my @fields;
         my @fieldsValues;
-        while( my( $columnName, $columnValue ) = each(%{$dbGroupDesc}) ) {
+        while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
             push( @fields, $columnName );
             push( @fieldsValues, $dbHandler->quote($columnValue) );
         }
 
         $query = 'INSERT INTO P_UGroup ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')'; 
-        &OBM::toolBox::write_log( $query, 'W', 3 );
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: '.$query, 'W', 3 );
         
         $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
         if( !defined($result) ) {
             &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
             return 0;
         }elsif( $result != 1 ) {
-            &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : groupe insere '.$result.' fois dans les tebles de production !', 'W', 2 );
+            &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : groupe insere '.$result.' fois dans les tables de production !', 'W', 2 );
             return 0;
         }
     }
@@ -265,7 +266,7 @@ sub updateDbEntityLinks {
     # On supprime les liens actuels de la table de production des liens
     # utilisateurs/groupes
     my $query = 'DELETE FROM P_of_usergroup WHERE of_usergroup_group_id='.$self->{objectId};
-    &OBM::toolBox::write_log( $query, 'W', 3 );
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: '.$query, 'W', 3 );
 
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
@@ -275,7 +276,7 @@ sub updateDbEntityLinks {
 
     # On copie les nouveaux droits
     $query = 'INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_group_id='.$self->{objectId};
-    &OBM::toolBox::write_log( $query, 'W', 3 );
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: '.$query, 'W', 3 );
 
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
@@ -409,7 +410,7 @@ sub _getGroupUsers {
         $query .= " ".$sqlRequest;
     }
 
-    &OBM::toolBox::write_log( $query, 'W', 3 );
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: '.$query, 'W', 3 );
 
     # On exécute la requête
     my $queryResult;

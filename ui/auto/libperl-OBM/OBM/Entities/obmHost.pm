@@ -98,10 +98,11 @@ sub getEntity {
 
 
     my $query = "SELECT COUNT(*) FROM ".$hostTable." WHERE host_id=".$hostId;
+    &OBM::toolBox::write_log( '[Entities::obmHost]: '.$query, 'W', 3 );
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
         return 0;
     }
 
@@ -116,12 +117,13 @@ sub getEntity {
         return 0;
     }
 
-    # La requete a executer - obtention des informations sur l'hote
+    # La requête à exécuter - obtention des informations sur l'hôte
     $query = "SELECT * FROM ".$hostTable." WHERE host_id=".$hostId;
+    &OBM::toolBox::write_log( '[Entities::obmHost]: '.$query, 'W', 3 );
 
-    # On execute la requete
+    # On exécute la requête
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
         return 0;
     }
 
@@ -184,31 +186,60 @@ sub updateDbEntity {
         return 0;
     }
 
-    my $dbEntry = $self->{"hostDbDesc"};
+    my $dbEntry = $self->{'hostDbDesc'};
     if( !defined($dbEntry) ) {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "[Entities::obmHost]: MAJ de l'hote ".$self->getEntityDescription()." dans les tables de production", "W" );
+    &OBM::toolBox::write_log( '[Entities::obmHost]: MAJ de l\'hote '.$self->getEntityDescription().' dans les tables de production', 'W' );
+
+    # Champs de la BD qui ne sont pas mis à jour car champs références
+    my $exceptFields = '^(host_id)$';
 
     # MAJ de l'entité dans la table de production
-    my $query = "REPLACE INTO P_Host SET ";
-    my $first = 1;
+    my @updateFields;
+    my @whereFields;
     while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
-        if( !$first ) {
-            $query .= ", ";
+        if( $columnName =~ /$exceptFields/ ) {
+            push( @whereFields, $columnName."=".$dbHandler->quote($columnValue) );
         }else {
-            $first = 0;
+            push( @updateFields, $columnName."=".$dbHandler->quote($columnValue) );
         }
-
-        $query .= $columnName."=".$dbHandler->quote($columnValue);
     }
+
+    my $query = 'UPDATE P_Host SET '.join( ', ', @updateFields ).' WHERE '.join( ' AND ', @whereFields );
+    &OBM::toolBox::write_log( '[Entities::obmHost]: '.$query, 'W', 3 );
+
 
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
+    my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+                                                                              
+    if( !defined($result) ) {
+        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
+
+    }elsif( $result == 0 ) {
+        my @fields;
+        my @fieldsValues;
+        while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
+            push( @fields, $columnName );
+            push( @fieldsValues, $dbHandler->quote($columnValue) );
+        }
+
+        $query = 'INSERT INTO P_Host ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')';
+        &OBM::toolBox::write_log( '[Entities::obmHost]: '.$query, 'W', 3 );
+
+        $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+        if( !defined($result) ) {
+            &OBM::toolBox::write_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
+            return 0;
+        }elsif( $result != 1 ) {
+            &OBM::toolBox::write_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : hote insere '.$result.' fois dans les tables de production !', 'W', 2 );
+            return 0;
+        }
     }
+
+    &OBM::toolBox::write_log( '[Entities::obmHost]: MAJ des tables de production reussie', 'W', 2 );
 
     return 1;
 }
