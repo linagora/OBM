@@ -53,7 +53,7 @@ sub getParameter {
     }
 }
 
-# On prepare le log
+# On prépare le log
 my ($scriptname) = ($0=~'.*/([^/]+)');
 &OBM::toolBox::write_log( "$scriptname: ", "O" );
 
@@ -62,7 +62,7 @@ my ($scriptname) = ($0=~'.*/([^/]+)');
 my %parameters;
 &getParameter( \%parameters );
 
-# On se connecte a la base
+# On se connecte à la base
 my $dbHandler;
 if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
     if( defined($dbHandler) ) {
@@ -109,8 +109,8 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
                         AND domainpropertyvalue_property_key = 'last_public_contact_export'
                         LIMIT 1";
         my $queryResult;
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+        if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+            &OBM::toolBox::write_log( 'Probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
             exit 1;
         }
 
@@ -145,8 +145,8 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
                     WHERE UNIX_TIMESTAMP(deletedcontact_timestamp) > '".$timeStamp."')";
 
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( 'Probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         exit 1;
     }
     
@@ -181,8 +181,8 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
                     AND contact_archive='0'
                     AND contact_domain_id='".$domain->{"domain_id"}."'
                     AND UNIX_TIMESTAMP(contact_timeupdate) > '".$timeStamp."'";
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( 'Probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         exit 1;
     }
     
@@ -209,8 +209,8 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
                 ( '.$domain->{"domain_id"}.", 'last_public_contact_export', ".$timeStamp." )
                 ON DUPLICATE KEY UPDATE domainpropertyvalue_value='".$timeStamp."'";
 
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( 'Probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         exit 1;
     }
 }

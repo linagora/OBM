@@ -133,8 +133,8 @@ my $query = "SELECT i.host_name, i.host_ip, j.mailserver_imap, j.mailserver_smtp
 
 # On execute la requete
 my $queryResult;
-if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "WC" );
+if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+    &OBM::toolBox::write_log( 'Probleme lors de l\'execution de la requete : '.$dbHandler->err, 'WC' );
     exit 1;
 }
 
