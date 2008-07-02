@@ -100,8 +100,8 @@ sub getEntity {
     my $query = "SELECT COUNT(*) FROM ".$yserSystemTable." WHERE usersystem_id=".$userId;
 
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         return 0;
     }
 
@@ -121,8 +121,8 @@ sub getEntity {
     $query = "SELECT usersystem_id, usersystem_login, usersystem_password, usersystem_uid, usersystem_gid, usersystem_homedir, usersystem_lastname, usersystem_firstname, usersystem_shell FROM ".$yserSystemTable." WHERE usersystem_id=".$userId;
 
     # On execute la requete
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         return 0;
     }
 

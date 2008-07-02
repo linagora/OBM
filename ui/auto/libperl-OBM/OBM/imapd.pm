@@ -88,8 +88,8 @@ sub getAdminImapPasswd {
     my $query = "SELECT usersystem_password FROM UserSystem WHERE usersystem_login='".$cyrusAdmin->{"login"}."'";
 
     # On execute la requete
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( 'Probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
         return 0;
     }
 
@@ -127,8 +127,8 @@ sub getServerByDomain {
 
         # On execute la requete
         my $queryResult;
-        if( !&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+        if( !defined(&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult )) ) {
+            &OBM::toolBox::write_log( 'Probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
             next;
         }
 

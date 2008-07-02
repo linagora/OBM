@@ -30,8 +30,8 @@ sub getDbValues {
 
     # On execute la requete
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( 'Probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
         return undef;
     }
 

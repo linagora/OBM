@@ -286,10 +286,10 @@ sub getGroupUsers {
     
     #
     # On execute la requete
-    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete.", "W" );
+    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
+        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
         if( defined($queryResult) ) {
-            write_log( $queryResult->err, "W" );
+            write_log( $queryResult->err, 'W' );
         }
 
         write_log( "", "C" );
@@ -307,10 +307,10 @@ sub getGroupUsers {
     $query = "SELECT groupgroup_child_id FROM P_GroupGroup WHERE groupgroup_parent_id=".$groupId;
     #
     # On execute la requete
-    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete.", "W" );
+    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
+        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
         if( defined($queryResult) ) {
-            write_log( $queryResult->err, "W" );
+            write_log( $queryResult->err, 'W' );
         }
 
         write_log( "", "C" );
@@ -364,10 +364,10 @@ sub getGroupUsersSID {
     my $query = "SELECT i.userobm_uid FROM P_UserObm i, P_UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id= i.userobm_id";
     #
     # On execute la requete
-    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete.", "W" );
+    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
+        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
         if( defined($queryResult) ) {
-            write_log( $queryResult->err, "W" );
+            write_log( $queryResult->err, 'W' );
         }
 
         write_log( "", "C" );
@@ -385,8 +385,8 @@ sub getGroupUsersSID {
     $query = "SELECT groupgroup_child_id FROM P_GroupGroup WHERE groupgroup_parent_id=".$groupId;
     #
     # On execute la requete
-    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete.", "W" );
+    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
+        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
         if( defined($queryResult) ) {
             write_log( $queryResult->err, "W" );
         }
@@ -461,8 +461,8 @@ sub getEntityRight {
 
 
     # On execute la requete
-    if( !execQuery( $rightDef->{"public"}->{"sqlQuery"}, $dbHandler, \$queryResult ) ) {
-        write_log( "Echec : probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+    if( !defined(execQuery( $rightDef->{"public"}->{"sqlQuery"}, $dbHandler, \$queryResult )) ) {
+        write_log( 'Echec : probleme lors de l\'execution de la requete : '.$queryResult->err, 'W' );
         return undef;
     }
 
@@ -509,20 +509,20 @@ sub getEntityRight {
         }
 
         # On execute la requête correspondant au droit
-        if( !execQuery( $rightDef->{$right}->{"sqlQuery"}, $dbHandler, \$queryResult ) ) {
-            write_log( "Echec : probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+        if( !defined(execQuery( $rightDef->{$right}->{"sqlQuery"}, $dbHandler, \$queryResult )) ) {
+            write_log( 'Echec : probleme lors de l\'execution de la requete : '.$queryResult->err, 'W' );
             return undef;
         }
 
         while( my( $userId, $userLogin ) = $queryResult->fetchrow_array ) {
-            if( defined($domain->{"domain_name"}) && !$singleNameSpace ) {
-                $userLogin .= "@".$domain->{"domain_name"};
+            if( defined($domain->{'domain_name'}) && !$singleNameSpace ) {
+                $userLogin .= '@'.$domain->{'domain_name'};
             }
 
             # Si l'utilisateur n'a pas déjà été trouvé, on l'initialise
             # avec les valeurs du template
             if( !exists( $usersList{$userLogin} ) ) {
-                $usersList{$userLogin}->{"userId"} = $userId;
+                $usersList{$userLogin}->{'userId'} = $userId;
                 while( my( $templateRight, $templateValue ) = each( %entityTemplate ) ) {
                     $usersList{$userLogin}->{$templateRight} = $templateValue;
                 }
@@ -624,8 +624,8 @@ sub getHostIpById {
     #
     # On execute la requete
     my $queryResult;
-    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete.", "W" );
+    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
+        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
         if( defined($queryResult) ) {
             write_log( $queryResult->err, "W" );
         }
@@ -669,10 +669,10 @@ sub getHostNameById {
     #
     # On execute la requete
     my $queryResult;
-    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete.", "W" );
+    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
+        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
         if( defined($queryResult) ) {
-            write_log( $queryResult->err, "W" );
+            write_log( $queryResult->err, 'W' );
         }
 
         return undef;
@@ -708,10 +708,10 @@ sub getMailServerList {
     #
     # On execute la requete
     my $queryResult;
-    if( !execQuery( $query, $dbHandler, \$queryResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete.", "W" );
+    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
+        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
         if( defined($queryResult) ) {
-            write_log( $queryResult->err, "W" );
+            write_log( $queryResult->err, 'W' );
         }
 
         return undef;
@@ -764,8 +764,8 @@ sub getDomains {
 
     # On execute la requete concernant les domaines
     my $queryDomainResult;
-    if( !execQuery( $queryDomain, $dbHandler, \$queryDomainResult ) ) {
-        write_log( "Probleme lors de l'execution de la requete.", "W" );
+    if( !defined(execQuery( $queryDomain, $dbHandler, \$queryDomainResult )) ) {
+        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
         if( defined($queryDomainResult) ) {
             write_log( $queryDomainResult->err, "W" );
         }
@@ -775,20 +775,20 @@ sub getDomains {
 
     while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias, $domainSambaSid, $domainSambaPdc ) = $queryDomainResult->fetchrow_array ) {
         my $currentDomain = &OBM::utils::cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
-        $currentDomain->{"meta_domain"} = 0;
-        $currentDomain->{"domain_id"} = $domainId;
-        $currentDomain->{"domain_label"} = $domainLabel;
-        $currentDomain->{"domain_desc"} = $domainDesc;
-        $currentDomain->{"domain_name"} = $domainName;
-        $currentDomain->{"domain_dn"} = $domainName;
+        $currentDomain->{'meta_domain'} = 0;
+        $currentDomain->{'domain_id'} = $domainId;
+        $currentDomain->{'domain_label'} = $domainLabel;
+        $currentDomain->{'domain_desc'} = $domainDesc;
+        $currentDomain->{'domain_name'} = $domainName;
+        $currentDomain->{'domain_dn'} = $domainName;
 
-        $currentDomain->{"domain_alias"} = [];
+        $currentDomain->{'domain_alias'} = [];
         if( defined($domainAlias) ) {
-            push( @{$currentDomain->{"domain_alias"}}, split( /\r\n/, $domainAlias ) );
+            push( @{$currentDomain->{'domain_alias'}}, split( /\r\n/, $domainAlias ) );
         }
 
-        $currentDomain->{"domain_samba_sid"} = $domainSambaSid;
-        $currentDomain->{"domain_samba_pdc"} = $domainSambaPdc;
+        $currentDomain->{'domain_samba_sid'} = $domainSambaSid;
+        $currentDomain->{'domain_samba_pdc'} = $domainSambaPdc;
 
         push( @{domainList}, $currentDomain );
     }

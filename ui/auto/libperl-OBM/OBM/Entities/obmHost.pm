@@ -100,8 +100,8 @@ sub getEntity {
     my $query = "SELECT COUNT(*) FROM ".$hostTable." WHERE host_id=".$hostId;
 
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         return 0;
     }
 
@@ -120,8 +120,8 @@ sub getEntity {
     $query = "SELECT * FROM ".$hostTable." WHERE host_id=".$hostId;
 
     # On execute la requete
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         return 0;
     }
 
@@ -205,8 +205,8 @@ sub updateDbEntity {
     }
 
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         return 0;
     }
 

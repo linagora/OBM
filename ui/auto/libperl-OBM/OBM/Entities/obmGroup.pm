@@ -72,18 +72,18 @@ sub getEntity {
 
     my $groupId = $self->{objectId};
     if( !defined($groupId) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]:aucun identifiant de groupe definit", "W" );
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: aucun identifiant de groupe defini', 'W', 3 );
         return 0;
     }
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: connecteur a la base de donnee invalide", "W" );
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: connecteur a la base de donnee invalide', 'W', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{domain_id}) || ($domainDesc->{domain_id} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: description de domaine OBM incorrecte", "W" );
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: description de domaine OBM incorrecte', 'W', 3 );
         return 0;
 
     }else {
@@ -96,11 +96,12 @@ sub getEntity {
         $uGroupTable = "P_".$uGroupTable;
     }
 
-    my $query = "SELECT COUNT(*) FROM ".$uGroupTable." WHERE group_id=".$groupId;
+    my $query = 'SELECT COUNT(*) FROM '.$uGroupTable.' WHERE group_id='.$groupId;
+    &OBM::toolBox::write_log( $query, 'W', 3 );
 
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
@@ -108,21 +109,22 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: groupe inexistant d'identifiant : ".$groupId, "W" );
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: groupe inexistant d\'identifiant : '.$groupId, 'W', 3 );
         return 0;
 
     }elsif( $numRows > 1 ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: plusieurs groupes d'identifiant : ".$groupId." ???", "W" );
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: plusieurs groupes d\'identifiant : '.$groupId.' ???', 'W', 3 );
         return 0;
     }
 
 
     # La requete a executer - obtention des informations sur le groupe
     $query = "SELECT * FROM ".$uGroupTable." WHERE group_id=".$groupId;
+    &OBM::toolBox::write_log( $query, 'W', 3 );
 
     # On execute la requete
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
@@ -134,40 +136,41 @@ sub getEntity {
     $self->{groupDbDesc} = $dbGroupDesc;
 
     if( $self->getDelete() ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: suppression du groupe : ".$self->getEntityDescription(), "W" );
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: suppression du groupe : '.$self->getEntityDescription(), 'W', 1 );
     }else {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: gestion du groupe : ".$self->getEntityDescription(), "W" );
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: gestion du groupe : '.$self->getEntityDescription(), 'W', 1 );
     }
 
     # On range les resultats calculés dans la structure de données dédiée
-    $self->{"properties"}->{group_domain} = $domainDesc->{domain_label};
+    $self->{'properties'}->{'group_domain'} = $domainDesc->{'domain_label'};
 
 
     SWITCH: {
         # Les adresses du groupe
-        my $return = $self->makeEntityEmail( $dbGroupDesc->{group_email}, $domainDesc->{domain_name}, $domainDesc->{domain_alias} );
+        my $return = $self->makeEntityEmail( $dbGroupDesc->{'group_email'}, $domainDesc->{'domain_name'}, $domainDesc->{'domain_alias'} );
         if( $return == 0 ) {
-            $self->{"properties"}->{group_mailperms} = 0;
+            $self->{'properties'}->{'group_mailperms'} = 0;
             last SWITCH;
         }
 
-        $self->{"properties"}->{group_mailperms} = 1;
+        $self->{'properties'}->{'group_mailperms'} = 1;
     }
 
 
     # Les données Samba
-    if( $OBM::Parameters::common::obmModules->{samba} && $dbGroupDesc->{group_samba} ) {
-        $self->{"properties"}->{group_samba} = 1;
-        $self->{"properties"}->{group_samba_sid} = &OBM::Samba::utils::getGroupSID( $domainDesc->{domain_samba_sid}, $dbGroupDesc->{group_gid} );
-        if( !defined($self->{"properties"}->{group_samba_sid}) ) {
-            &OBM::toolBox::write_log( "[Entities::obmGroup]: annulation du droit Samba du groupe : " .$self->getEntityDescription()." - SID non definit", "W" );
-            $self->{"properties"}->{group_samba} = 0;
+    if( $OBM::Parameters::common::obmModules->{'samba'} && $dbGroupDesc->{'group_samba'} ) {
+        $self->{'properties'}->{'group_samba'} = 1;
+        $self->{'properties'}->{'group_samba_sid'} =
+        &OBM::Samba::utils::getGroupSID( $domainDesc->{'domain_samba_sid'}, $dbGroupDesc->{'group_gid'} );
+        if( !defined($self->{'properties'}->{'group_samba_sid'}) ) {
+            &OBM::toolBox::write_log( '[Entities::obmGroup]: annulation du droit Samba du groupe : '.$self->getEntityDescription().' - SID non definit', 'W', 2 );
+            $self->{'properties'}->{'group_samba'} = 0;
         }else {
-            $self->{"properties"}->{group_samba_type} = 2;
-            $self->{"properties"}->{group_samba_name} = $dbGroupDesc->{group_name};
+            $self->{'properties'}->{'group_samba_type'} = 2;
+            $self->{'properties'}->{'group_samba_name'} = $dbGroupDesc->{'group_name'};
         }
     }else {
-        $self->{"properties"}->{group_samba} = 0;
+        $self->{'properties'}->{'group_samba'} = 0;
     }
 
 
@@ -194,27 +197,55 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "[Entities::obmGroup]: MAJ du groupe ".$self->getEntityDescription()." dans les tables de production", "W" );
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: MAJ du groupe '.$self->getEntityDescription().' dans les tables de production', 'W', 1 );
+
+
+    # Champs de la BD qui ne sont pas mis à jour car champs références
+    my $exceptFields = '^(group_id)$';
 
     # MAJ de l'entité dans la table de production
-    my $query = "REPLACE INTO P_UGroup SET ";
-    my $first = 1;
+    my @updateFields;
+    my @whereFields;
     while( my( $columnName, $columnValue ) = each(%{$dbGroupDesc}) ) {
-        if( !$first ) {
-            $query .= ", ";
+        if( $columnName =~ /$exceptFields/ ) {
+            push( @whereFields, $columnName."=".$dbHandler->quote($columnValue) );
         }else {
-            $first = 0;
+            push( @updateFields, $columnName."=".$dbHandler->quote($columnValue) );
         }
-
-        $query .= $columnName."=".$dbHandler->quote($columnValue);
     }
+
+    my $query = 'UPDATE P_UGroup SET '.join( ', ', @updateFields ).' WHERE '.join( ' AND ', @whereFields );
+    &OBM::toolBox::write_log( $query, 'W', 3 );
+
 
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+
+    if( !defined($result) ) {
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
+    }elsif( $result == 0 ) {
+        my @fields;
+        my @fieldsValues;
+        while( my( $columnName, $columnValue ) = each(%{$dbGroupDesc}) ) {
+            push( @fields, $columnName );
+            push( @fieldsValues, $dbHandler->quote($columnValue) );
+        }
+
+        $query = 'INSERT INTO P_UGroup ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')'; 
+        &OBM::toolBox::write_log( $query, 'W', 3 );
+        
+        $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+        if( !defined($result) ) {
+            &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
+            return 0;
+        }elsif( $result != 1 ) {
+            &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : groupe insere '.$result.' fois dans les tebles de production !', 'W', 2 );
+            return 0;
+        }
     }
 
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: MAJ des tables de production reussie', 'W', 2 );
 
     return 1;
 }
@@ -229,25 +260,29 @@ sub updateDbEntityLinks {
         return 0;
     }
 
-    &OBM::toolBox::write_log( "[Entities::obmGroup]: MAJ des liens du groupe ".$self->getEntityDescription()." dans les tables de production", "W" );
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: MAJ des liens du groupe '.$self->getEntityDescription().' dans les tables de production', 'W', 1 );
 
     # On supprime les liens actuels de la table de production des liens
     # utilisateurs/groupes
-    my $query = "DELETE FROM P_of_usergroup WHERE of_usergroup_group_id=".$self->{objectId};
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    my $query = 'DELETE FROM P_of_usergroup WHERE of_usergroup_group_id='.$self->{objectId};
+    &OBM::toolBox::write_log( $query, 'W', 3 );
+
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
 
     # On copie les nouveaux droits
-    $query = "INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_group_id=".$self->{objectId};
+    $query = 'INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_group_id='.$self->{objectId};
+    &OBM::toolBox::write_log( $query, 'W', 3 );
 
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme lors de l'execution d' une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: MAJ des tables de production reussie', 'W', 2 );
 
     return 1;
 }
@@ -358,6 +393,7 @@ sub _getGroupUsers {
         $sqlResultColumn = "userobm_login";
     }
 
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: obtention des utilisateurs du groupe : '.$self->getEntityDescription(), 'W', 1 );
 
     my $userObmTable = "UserObm";
     my $userObmGroupTable = "of_usergroup";
@@ -366,17 +402,19 @@ sub _getGroupUsers {
         $userObmGroupTable = "P_".$userObmGroupTable;
     }
 
-    # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = "SELECT i.".$sqlResultColumn." FROM ".$userObmTable." i, ".$userObmGroupTable." j WHERE j.of_usergroup_group_id=".$groupId." AND j.of_usergroup_user_id=i.userobm_id";
+    # Récupération de la liste d'utilisateur de ce groupe id : $groupId.
+    my $query = 'SELECT i.'.$sqlResultColumn.' FROM '.$userObmTable.' i, '.$userObmGroupTable.' j WHERE j.of_usergroup_group_id='.$groupId.' AND j.of_usergroup_user_id=i.userobm_id';
 
     if( defined( $sqlRequest ) && ($sqlRequest ne "") ) {
         $query .= " ".$sqlRequest;
     }
-    
-    # On execute la requete
+
+    &OBM::toolBox::write_log( $query, 'W', 3 );
+
+    # On exécute la requête
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmGroup]: probleme SQL lors de l'obtention des utilisateurs du groupe : ".$queryResult->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmGroup]: probleme SQL lors de l\'obtention des utilisateurs du groupe : '.$queryResult->err.' - '.$dbHandler->errstr, 'W', 2 );
         return undef;
     }
 
@@ -385,6 +423,8 @@ sub _getGroupUsers {
     while( my( $userLogin ) = $queryResult->fetchrow_array ) {
         push( @tabResult, $userLogin );
     }
+
+    &OBM::toolBox::write_log( '[Entities::obmGroup]: '.eval{$#tabResult+1}.' utilisateurs font parti du groupe', 'W', 3 );
 
     return \@tabResult;
 }

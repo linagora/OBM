@@ -86,8 +86,8 @@ sub getEntity {
     my $query = "SELECT COUNT(*) FROM Contact WHERE contact_id=".$contactId;
 
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmContact]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmContact]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         return 0;
     }
 
@@ -106,8 +106,8 @@ sub getEntity {
     $query = "SELECT * FROM Contact LEFT JOIN Company ON contact_company_id=company_id WHERE contact_id=".$contactId;
 
     # On execute la requete
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmContact]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmContact]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         return 0;
     }
 

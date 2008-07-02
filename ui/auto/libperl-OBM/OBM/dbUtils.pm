@@ -19,7 +19,6 @@ require Exporter;
 @EXPORT = (@EXPORT_const, @EXPORT_function);
 @EXPORT_OK = qw();
 
-#
 # Necessaire pour le bon fonctionnement du package
 $debug=1;
 
@@ -27,52 +26,65 @@ $debug=1;
 sub dbState {
 	local($action, *dbh) = @_;
 
-	if( $action eq "connect" )
-	{
-		# On etablie la connection a la base
+	if( $action eq "connect" ) {
+		# On établie la connection à la base
 		$dbh = DBI->connect($db, $userDb, $userPasswd);
 
 		# On teste si la connexion a reussie
-		if( $dbh )
-		{
+		if( $dbh ) {
 			return 1;
-		}else
-		{
+		}else {
 			return 0;
 		}
 
-	}elsif( $action eq "disconnect" )
-	{
-		# On se deconnecte de la base
+	}elsif( $action eq "disconnect" ) {
+		# On se déconnecte de la base
 		$dbh->disconnect;
 
 		undef $dbh;
 		return 1;
-	}else
-	{
-		# Probleme avec le parametre $action
+	}else {
+		# Problème avec le paramètre $action
 		return 0;
 	}
 }
 
 
+# Retour :
+#   undef : si erreur
+#   nombre de lignes affectées par la requête :
+#       - si 'SELECT', O peut simplement signifier qu'il est impossible de
+#         connaître le nombre de lignes à l'avance. Dans ce cas le 0 pourra être
+#         interprété comme un 'true' ;
+#       - si non 'SELECT', si il n'est pas possiblde de connaître le nombre de
+#         lignes affectées, la valeur retour est '-1'.
 sub execQuery {
 	local($query, $dbh, *sth) = @_;
 
-	# On verifie que la requete n'est pas nulle
+	# On vérifie que la rêquete n'est pas nulle
 	if( !defined($query) || ($query eq "") ) {
-		return 0;
+		return undef;
 
 	}else {
-		# On prepare la requete, puis on l'execute et analyse la valeur
+		# On prépare la rêquete, puis on l'exécute et analyse la valeur
 		# retour.
 		$sth = $dbh->prepare( $query );
 		my $rv = $sth->execute();
 
-		if( $rv ) {
-			return 1;
-		}else {
-			return 0;
+		if( !defined($rv) ) {
+            return undef;
 		}
+
+        if( $query =~ /^SELECT/i ) {
+            if( $sth->{NUM_OF_FIELDS} > 0 ) {
+                return $sth->{NUM_OF_FIELDS};
+            }else {
+                return $rv;
+            }
+        }else {
+            return $rv;
+        }
 	}
+
+    return undef;
 }

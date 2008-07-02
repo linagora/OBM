@@ -41,15 +41,15 @@ sub getServerByDomain {
 
         # On execute la requete concernant l'administrateur LDAP associé
         my $queryLdapAdminResult;
-        if( !&OBM::toolBox::execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult ) ) {
-            &OBM::toolBox::write_log( "Probleme lors de l'execution de la requete.", "W" );
+        if( !defined(&OBM::toolBox::execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult )) ) {
+            &OBM::toolBox::write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
             if( defined($queryLdapAdminResult) ) {
-                &OBM::toolBox::write_log( $queryLdapAdminResult->err, "W" );
+                &OBM::toolBox::write_log( $queryLdapAdminResult->err, 'W' );
             }
         }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
-            $domainList->[$i]->{"ldap_admin_server"} = $ldapServer;
-            $domainList->[$i]->{"ldap_admin_login"} = $ldapAdminLogin;
-            $domainList->[$i]->{"ldap_admin_passwd"} = $ldapAdminPasswd;
+            $domainList->[$i]->{'ldap_admin_server'} = $ldapServer;
+            $domainList->[$i]->{'ldap_admin_login'} = $ldapAdminLogin;
+            $domainList->[$i]->{'ldap_admin_passwd'} = $ldapAdminPasswd;
 
             $queryLdapAdminResult->finish;
         }

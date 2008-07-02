@@ -92,8 +92,8 @@ sub getEntity {
     my $query = "SELECT i.host_name, k.domainmailserver_role FROM Host i, MailServer j, DomainMailServer k WHERE i.host_id=j.mailserver_host_id AND j.mailserver_id=k.domainmailserver_mailserver_id AND k.domainmailserver_domain_id=".$self->{"domainId"};
 
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Entities::obmUser]: probleme lors de l'execution d'une requete SQL : ".$dbHandler->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
         return 0;
     }
 

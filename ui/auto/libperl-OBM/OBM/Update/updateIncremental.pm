@@ -65,8 +65,8 @@ sub new {
 
         my $query = "SELECT userobm_login FROM UserObm WHERE userobm_id=".$updateAttr{"user"};
         my $queryResult;
-        if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
-            &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution d'une requete SQL : ".$self->{"dbHandler"}->err, "W" );
+        if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
+            &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
             return 0;
         }
 
@@ -246,8 +246,8 @@ sub _incrementalUpdate {
     }
 
     my $queryResult;
-    if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete : '.$queryResult->err, 'W' );
         return 0;
     }
 
@@ -263,8 +263,8 @@ sub _incrementalUpdate {
         }
 
         my $queryResult2;
-        if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult2 ) ) {
-            &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+        if( !defined(&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult2 )) ) {
+            &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete : '.$queryResult->err, 'W' );
             return 0;
         }
         my( $numRows ) = $queryResult2->fetchrow_array();
@@ -356,8 +356,8 @@ sub _incrementalUpdate {
         $sqlQuery .= " WHERE ".$sqlFilter->[1];
     }
 
-    if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete : ".$queryResult->err, "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete : '.$queryResult->err, 'W' );
         return 0;
     }
 
@@ -429,10 +429,10 @@ sub _incrementalDelete {
         $sqlQuery .= " WHERE ".$sqlFilter;
     }
 
-    if( !&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete", "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult )) ) {
+        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete', 'W' );
         if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
+            &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$queryResult->err, 'W' );
         }
 
         return 0;
@@ -508,10 +508,10 @@ sub _updateIncrementalTable {
     my $dbHandler = $self->{"dbHandler"};
     my $deleteQueryResult;
     my $query = "DELETE FROM ".$table." WHERE ".lc($table)."_id=".$id;
-    if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$deleteQueryResult ) ) {
-        &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
+    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$deleteQueryResult )) ) {
+        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
         if( defined($deleteQueryResult) ) {
-            &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$deleteQueryResult->err, "W" );
+            &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$deleteQueryResult->err, 'W' );
         }
 
         return 0;
@@ -565,11 +565,11 @@ sub _updateUpdatedLinks {
                 LEFT JOIN Updatedlinks ON of_usergroup_group_id=updatedlinks_entity_id AND updatedlinks_table=\"UGroup\" AND updatedlinks_domain_id=".$domain."
                 WHERE updatedlinks_entity_id is null AND of_usergroup_user_id=".$object->getEntityId();
 
-            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
                 $query =~ s/\s+/ /g;
-                &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
+                &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
                 if( defined($queryResult) ) {
-                    &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
+                    &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$queryResult->err, 'W' );
                 }
 
                 return 0;
@@ -592,11 +592,11 @@ sub _updateUpdatedLinks {
                 LEFT JOIN Updatedlinks ON updatedlinks_entity_id=entityright_entity_id AND updatedlinks_table=\"MailShare\"
                 WHERE updatedlinks_entity_id is null AND entityright_consumer=\"user\" AND entityright_consumer_id=".$object->getEntityId()." AND entityright_entity=\"MailShare\"";
 
-            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
                 $query =~ s/\s+/ /g;
-                &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
+                &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
                 if( defined($queryResult) ) {
-                    &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
+                    &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$queryResult->err, 'W' );
                 }
 
                 return 0;
@@ -619,11 +619,11 @@ sub _updateUpdatedLinks {
                 LEFT JOIN Updatedlinks ON updatedlinks_entity_id=entityright_entity_id AND updatedlinks_table=\"mailbox\"
                 WHERE updatedlinks_entity_id is null AND entityright_consumer=\"user\" AND entityright_consumer_id=".$object->getEntityId()." AND entityright_entity=\"mailbox\"";
 
-            if( !&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult ) ) {
+            if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
                 $query =~ s/\s+/ /g;
-                &OBM::toolBox::write_log( "[Update::updateIncremental]: probleme lors de l'execution de la requete '".$query."'", "W" );
+                &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
                 if( defined($queryResult) ) {
-                    &OBM::toolBox::write_log( "[Update::updateIncremental]: ".$queryResult->err, "W" );
+                    &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$queryResult->err, 'W' );
                 }
 
                 return 0;
